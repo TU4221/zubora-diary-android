@@ -293,7 +293,7 @@ public class CalendarFragment extends Fragment {
                 .collect(Collectors.toList());
     }
 
-    // カレンダー設定1
+    // カレンダー設定
     private void configureCalendarBinders(List<DayOfWeek> daysOfWeek) {
         CalendarView calendar = binding.calendar;
 
