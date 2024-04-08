@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/tvListYear"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <!--<TextView
+        android:id="@+id/tvRowListYearMonthBackground"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:background="?attr/colorPrimaryContainer"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/tvRowDiaryListYearMonth_YearNum"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:text="2023"
+        android:textColor="?attr/colorOnPrimaryContainer"
+        app:layout_constraintBaseline_toBaselineOf="@+id/tvRowListYearMonthBackground"
+        app:layout_constraintStart_toStartOf="@+id/tvRowListYearMonthBackground" />
+
+    <TextView
+        android:id="@+id/tvRowDiaryListYearMonth_Year"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/row_list_year"
+        android:textColor="?attr/colorOnPrimaryContainer"
+        app:layout_constraintBaseline_toBaselineOf="@+id/tvRowListYearMonthBackground"
+        app:layout_constraintStart_toEndOf="@+id/tvRowDiaryListYearMonth_YearNum" />
+
+    <TextView
+        android:id="@+id/tvRowDiaryListYearMonth_MonthNum"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="11"
+        android:textColor="?attr/colorOnPrimaryContainer"
+        app:layout_constraintBaseline_toBaselineOf="@+id/tvRowListYearMonthBackground"
+        app:layout_constraintStart_toEndOf="@+id/tvRowDiaryListYearMonth_Year" />
+
+    <TextView
+        android:id="@+id/tvRowDiaryListYearMonth_Month"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/row_list_month"
+        android:textColor="?attr/colorOnPrimaryContainer"
+        app:layout_constraintBaseline_toBaselineOf="@+id/tvRowListYearMonthBackground"
+        app:layout_constraintStart_toEndOf="@+id/tvRowDiaryListYearMonth_MonthNum" />-->
+
+    <TextView
+        android:id="@+id/text_section_bar"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:hint="0000年00月"
+        android:background="?attr/colorPrimaryContainer"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recycler_day_list"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:background="?attr/colorSurface"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/text_section_bar"
+        app:layout_constraintVertical_bias="1.0" />
+</androidx.constraintlayout.widget.ConstraintLayout>

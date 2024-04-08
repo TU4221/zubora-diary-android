@@ -1,0 +1,672 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+    <data>
+        <import type="android.view.View" />
+        <variable
+            name="edit_diary_view_model"
+            type="com.websarva.wings.android.zuboradiary.ui.editdiary.EditDiaryViewModel" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="?attr/colorSurface"
+        tools:context=".ui.editdiary.EditDiaryFragment">
+
+        <androidx.core.widget.NestedScrollView
+            android:id="@+id/nested_scroll_full_screen"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <!-- 注意
+                     日付入力欄はダイアログフラグメントを使用して入力する為、android:text は「@」の「1.」を記述する。
+                     「2.」の双方向データバイディングを記述した場合、ダイアログで変数値を変更した時に Ovservr が2回起動する。
+
+                     1. android:text="@{edit_diary_view_model.date}"
+                     2. android:text="@={edit_diary_view_model.date}"
+                      -->
+                <EditText
+                    android:id="@+id/edit_text_date"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginEnd="8dp"
+                    android:ems="10"
+                    android:text="@{edit_diary_view_model.date}"
+                    android:hint="@string/edit_diary_date_hint"
+                    android:textSize="20sp"
+                    android:focusable="false"
+                    android:lines="1"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:id="@+id/text_weather"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginTop="16dp"
+                    android:text="@string/edit_diary_weather"
+                    android:textSize="16sp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/edit_text_date" />
+
+                <Spinner
+                    android:id="@+id/spinner_Weather_1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:entries="@array/edit_diary_weather_selection"
+                    app:layout_constraintBaseline_toBaselineOf="@+id/text_weather"
+                    app:layout_constraintStart_toEndOf="@+id/text_weather" />
+
+                <TextView
+                    android:id="@+id/text_weather_slush"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/edit_diary_weather_slush"
+                    android:textSize="16sp"
+                    app:layout_constraintBaseline_toBaselineOf="@+id/spinner_Weather_1"
+                    app:layout_constraintStart_toEndOf="@+id/spinner_Weather_1" />
+
+                <Spinner
+                    android:id="@+id/spinner_Weather_2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:entries="@array/edit_diary_weather_selection"
+                    app:layout_constraintBaseline_toBaselineOf="@+id/spinner_Weather_1"
+                    app:layout_constraintStart_toEndOf="@+id/text_weather_slush" />
+
+                <TextView
+                    android:id="@+id/text_condition"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginTop="16dp"
+                    android:text="@string/edit_diary_condition"
+                    android:textSize="16sp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/text_weather" />
+
+                <Spinner
+                    android:id="@+id/spinner_condition"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:entries="@array/edit_diary_condition_selection"
+                    app:layout_constraintBaseline_toBaselineOf="@+id/text_condition"
+                    app:layout_constraintStart_toEndOf="@+id/text_condition" />
+
+                <TextView
+                    android:id="@+id/text_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginTop="16dp"
+                    android:text="@string/edit_diary_title"
+                    android:textSize="16sp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/text_condition" />
+
+                <EditText
+                    android:id="@+id/edit_text_title"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginEnd="8dp"
+                    android:ems="10"
+                    android:text="@={edit_diary_view_model.title}"
+                    android:hint="@string/edit_diary_title_hint"
+                    android:inputType="text"
+                    android:textSize="20sp"
+                    android:lines="1"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/text_title" />
+
+                <TextView
+                    android:id="@+id/text_title_length"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="8dp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/edit_text_title" />
+
+                <TextView
+                    android:id="@+id/text_item_1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginTop="16dp"
+                    android:text="@string/edit_diary_item_1"
+                    android:textSize="16sp"
+                    android:visibility="@{edit_diary_view_model.items[0].isVisible ? View.VISIBLE : View.GONE}"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/text_title_length" />
+
+                <ImageButton
+                    android:id="@+id/image_button_item_1_delete"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:src="@drawable/ic_delete_forever_24"
+                    android:background="@drawable/bg_image_button"
+                    android:visibility="@{edit_diary_view_model.items[0].isVisible ? View.VISIBLE : View.GONE}"
+                    app:layout_constraintBottom_toBottomOf="@+id/text_item_1"
+                    app:layout_constraintStart_toEndOf="@+id/text_item_1"
+                    app:layout_constraintTop_toTopOf="@+id/text_item_1" />
+
+                <!-- 下記 EditText は他フラグメントから入力する為、android:text は単一方向データバインディングとする。 -->
+                <EditText
+                    android:id="@+id/edit_text_item_1_title"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginEnd="8dp"
+                    android:text="@{edit_diary_view_model.items[0].title}"
+                    android:hint="@string/edit_diary_item_hint"
+                    android:textSize="16sp"
+                    android:focusable="false"
+                    android:visibility="@{edit_diary_view_model.items[0].isVisible ? View.VISIBLE : View.GONE}"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/text_item_1" />
+
+                <androidx.core.widget.NestedScrollView
+                    android:id="@+id/nested_scroll_item_1_comment"
+                    android:layout_width="0dp"
+                    android:layout_height="108dp"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginTop="4dp"
+                    android:layout_marginEnd="8dp"
+                    android:background="@drawable/border_gray"
+                    android:scrollbarDefaultDelayBeforeFade="3000"
+                    android:scrollbarFadeDuration="500"
+                    android:scrollbarSize="10dp"
+                    android:scrollbarStyle="insideInset"
+                    android:scrollbarThumbVertical="@android:color/darker_gray"
+                    android:scrollbars="vertical"
+                    android:visibility="@{edit_diary_view_model.items[0].isVisible ? View.VISIBLE : View.GONE}"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/edit_text_item_1_title">
+
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+
+                        <EditText
+                            android:id="@+id/edit_text_item_1_comment"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="8dp"
+                            android:layout_marginTop="8dp"
+                            android:layout_marginEnd="8dp"
+                            android:background="@null"
+                            android:ems="10"
+                            android:gravity="start|top"
+                            android:text="@={edit_diary_view_model.items[0].comment}"
+                            android:hint="@string/edit_diary_content_hint"
+                            android:inputType="textMultiLine"
+                            android:minLines="5"
+                            android:textSize="16sp"
+                            android:visibility="@{edit_diary_view_model.items[0].isVisible ? View.VISIBLE : View.GONE}"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+                </androidx.core.widget.NestedScrollView>
+
+                <TextView
+                    android:id="@+id/text_item_1_comment_length"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="8dp"
+                    android:text="@string/edit_diary_num_of_char"
+                    android:visibility="@{edit_diary_view_model.items[0].isVisible ? View.VISIBLE : View.GONE}"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/nested_scroll_item_1_comment" />
+
+
+                <TextView
+                    android:id="@+id/text_item_2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginTop="16dp"
+                    android:text="@string/edit_diary_item_2"
+                    android:textSize="16sp"
+                    android:visibility="@{edit_diary_view_model.items[1].isVisible ? View.VISIBLE : View.GONE}"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/text_item_1_comment_length" />
+
+                <ImageButton
+                    android:id="@+id/image_button_item_2_delete"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:src="@drawable/ic_delete_forever_24"
+                    android:background="@drawable/bg_image_button"
+                    android:visibility="@{edit_diary_view_model.items[1].isVisible ? View.VISIBLE : View.GONE}"
+                    app:layout_constraintBottom_toBottomOf="@+id/text_item_2"
+                    app:layout_constraintStart_toEndOf="@+id/text_item_2"
+                    app:layout_constraintTop_toTopOf="@+id/text_item_2" />
+
+                <!-- 下記 EditText は他フラグメントから入力する為、android:text は単一方向データバインディングとする。 -->
+                <EditText
+                    android:id="@+id/edit_text_item_2_title"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginEnd="8dp"
+                    android:text="@{edit_diary_view_model.items[1].title}"
+                    android:hint="@string/edit_diary_item_hint"
+                    android:textSize="16sp"
+                    android:focusable="false"
+                    android:visibility="@{edit_diary_view_model.items[1].isVisible ? View.VISIBLE : View.GONE}"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/text_item_2" />
+
+                <androidx.core.widget.NestedScrollView
+                    android:id="@+id/nested_scroll_item_2_comment"
+                    android:layout_width="0dp"
+                    android:layout_height="108dp"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginTop="4dp"
+                    android:layout_marginEnd="8dp"
+                    android:background="@drawable/border_gray"
+                    android:scrollbarDefaultDelayBeforeFade="3000"
+                    android:scrollbarFadeDuration="500"
+                    android:scrollbarSize="10dp"
+                    android:scrollbarStyle="insideInset"
+                    android:scrollbarThumbVertical="@android:color/darker_gray"
+                    android:scrollbars="vertical"
+                    android:visibility="@{edit_diary_view_model.items[1].isVisible ? View.VISIBLE : View.GONE}"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/edit_text_item_2_title">
+
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+
+                        <EditText
+                            android:id="@+id/edit_text_item_2_comment"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="8dp"
+                            android:layout_marginTop="8dp"
+                            android:layout_marginEnd="8dp"
+                            android:background="@null"
+                            android:ems="10"
+                            android:gravity="start|top"
+                            android:text="@={edit_diary_view_model.items[1].comment}"
+                            android:hint="@string/edit_diary_content_hint"
+                            android:inputType="textMultiLine"
+                            android:minLines="5"
+                            android:textSize="16sp"
+                            android:visibility="@{edit_diary_view_model.items[1].isVisible ? View.VISIBLE : View.GONE}"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+                </androidx.core.widget.NestedScrollView>
+
+                <TextView
+                    android:id="@+id/text_item_2_comment_length"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="8dp"
+                    android:text="@string/edit_diary_num_of_char"
+                    android:visibility="@{edit_diary_view_model.items[1].isVisible ? View.VISIBLE : View.GONE}"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/nested_scroll_item_2_comment" />
+
+                <TextView
+                    android:id="@+id/text_item_3"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginTop="16dp"
+                    android:text="@string/edit_diary_item_3"
+                    android:textSize="16sp"
+                    android:visibility="@{edit_diary_view_model.items[2].isVisible ? View.VISIBLE : View.GONE}"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/text_item_2_comment_length" />
+
+                <ImageButton
+                    android:id="@+id/image_button_item_3_delete"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:src="@drawable/ic_delete_forever_24"
+                    android:background="@drawable/bg_image_button"
+                    android:visibility="@{edit_diary_view_model.items[2].isVisible ? View.VISIBLE : View.GONE}"
+                    app:layout_constraintBottom_toBottomOf="@+id/text_item_3"
+                    app:layout_constraintStart_toEndOf="@+id/text_item_3"
+                    app:layout_constraintTop_toTopOf="@+id/text_item_3" />
+
+                <!-- 下記 EditText は他フラグメントから入力する為、android:text は単一方向データバインディングとする。 -->
+                <EditText
+                    android:id="@+id/edit_text_item_3_title"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginEnd="8dp"
+                    android:text="@{edit_diary_view_model.items[2].title}"
+                    android:hint="@string/edit_diary_item_hint"
+                    android:textSize="16sp"
+                    android:focusable="false"
+                    android:visibility="@{edit_diary_view_model.items[2].isVisible ? View.VISIBLE : View.GONE}"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/text_item_3" />
+
+                <androidx.core.widget.NestedScrollView
+                    android:id="@+id/nested_scroll_item_3_comment"
+                    android:layout_width="0dp"
+                    android:layout_height="108dp"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginTop="4dp"
+                    android:layout_marginEnd="8dp"
+                    android:background="@drawable/border_gray"
+                    android:scrollbarDefaultDelayBeforeFade="3000"
+                    android:scrollbarFadeDuration="500"
+                    android:scrollbarSize="10dp"
+                    android:scrollbarStyle="insideInset"
+                    android:scrollbarThumbVertical="@android:color/darker_gray"
+                    android:scrollbars="vertical"
+                    android:visibility="@{edit_diary_view_model.items[2].isVisible ? View.VISIBLE : View.GONE}"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/edit_text_item_3_title">
+
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+
+                        <EditText
+                            android:id="@+id/edit_text_item_3_comment"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="8dp"
+                            android:layout_marginTop="8dp"
+                            android:layout_marginEnd="8dp"
+                            android:background="@null"
+                            android:ems="10"
+                            android:gravity="start|top"
+                            android:text="@={edit_diary_view_model.items[2].comment}"
+                            android:hint="@string/edit_diary_content_hint"
+                            android:inputType="textMultiLine"
+                            android:minLines="5"
+                            android:textSize="16sp"
+                            android:visibility="@{edit_diary_view_model.items[2].isVisible ? View.VISIBLE : View.GONE}"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+                </androidx.core.widget.NestedScrollView>
+
+                <TextView
+                    android:id="@+id/text_item_3_comment_length"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="8dp"
+                    android:text="@string/edit_diary_num_of_char"
+                    android:visibility="@{edit_diary_view_model.items[2].isVisible ? View.VISIBLE : View.GONE}"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/nested_scroll_item_3_comment" />
+
+
+                <TextView
+                    android:id="@+id/text_item_4"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginTop="16dp"
+                    android:text="@string/edit_diary_item_4"
+                    android:textSize="16sp"
+                    android:visibility="@{edit_diary_view_model.items[3].isVisible ? View.VISIBLE : View.GONE}"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/text_item_3_comment_length" />
+
+                <ImageButton
+                    android:id="@+id/image_button_item_4_delete"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:src="@drawable/ic_delete_forever_24"
+                    android:background="@drawable/bg_image_button"
+                    android:visibility="@{edit_diary_view_model.items[3].isVisible ? View.VISIBLE : View.GONE}"
+                    app:layout_constraintBottom_toBottomOf="@+id/text_item_4"
+                    app:layout_constraintStart_toEndOf="@+id/text_item_4"
+                    app:layout_constraintTop_toTopOf="@+id/text_item_4" />
+
+                <!-- 下記 EditText は他フラグメントから入力する為、android:text は単一方向データバインディングとする。 -->
+                <EditText
+                    android:id="@+id/edit_text_item_4_title"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginEnd="8dp"
+                    android:text="@{edit_diary_view_model.items[3].title}"
+                    android:hint="@string/edit_diary_item_hint"
+                    android:textSize="16sp"
+                    android:focusable="false"
+                    android:visibility="@{edit_diary_view_model.items[3].isVisible ? View.VISIBLE : View.GONE}"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/text_item_4" />
+
+                <androidx.core.widget.NestedScrollView
+                    android:id="@+id/nested_scroll_item_4_comment"
+                    android:layout_width="0dp"
+                    android:layout_height="108dp"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginTop="4dp"
+                    android:layout_marginEnd="8dp"
+                    android:background="@drawable/border_gray"
+                    android:scrollbarDefaultDelayBeforeFade="3000"
+                    android:scrollbarFadeDuration="500"
+                    android:scrollbarSize="10dp"
+                    android:scrollbarStyle="insideInset"
+                    android:scrollbarThumbVertical="@android:color/darker_gray"
+                    android:scrollbars="vertical"
+                    android:visibility="@{edit_diary_view_model.items[3].isVisible ? View.VISIBLE : View.GONE}"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/edit_text_item_4_title">
+
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+
+                        <EditText
+                            android:id="@+id/edit_text_item_4_comment"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="8dp"
+                            android:layout_marginTop="8dp"
+                            android:layout_marginEnd="8dp"
+                            android:background="@null"
+                            android:ems="10"
+                            android:gravity="start|top"
+                            android:text="@={edit_diary_view_model.items[3].comment}"
+                            android:hint="@string/edit_diary_content_hint"
+                            android:inputType="textMultiLine"
+                            android:minLines="5"
+                            android:textSize="16sp"
+                            android:visibility="@{edit_diary_view_model.items[3].isVisible ? View.VISIBLE : View.GONE}"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+                </androidx.core.widget.NestedScrollView>
+
+                <TextView
+                    android:id="@+id/text_item_4_comment_length"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="8dp"
+                    android:text="@string/edit_diary_num_of_char"
+                    android:visibility="@{edit_diary_view_model.items[3].isVisible ? View.VISIBLE : View.GONE}"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/nested_scroll_item_4_comment" />
+
+
+                <TextView
+                    android:id="@+id/text_item_5"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginTop="16dp"
+                    android:text="@string/edit_diary_item_5"
+                    android:textSize="16sp"
+                    android:visibility="@{edit_diary_view_model.items[4].isVisible ? View.VISIBLE : View.GONE}"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/text_item_4_comment_length" />
+
+                <ImageButton
+                    android:id="@+id/image_button_item_5_delete"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:src="@drawable/ic_delete_forever_24"
+                    android:background="@drawable/bg_image_button"
+                    android:visibility="@{edit_diary_view_model.items[4].isVisible ? View.VISIBLE : View.GONE}"
+                    app:layout_constraintBottom_toBottomOf="@+id/text_item_5"
+                    app:layout_constraintStart_toEndOf="@+id/text_item_5"
+                    app:layout_constraintTop_toTopOf="@+id/text_item_5" />
+
+                <!-- 下記 EditText は他フラグメントから入力する為、android:text は単一方向データバインディングとする。 -->
+                <EditText
+                    android:id="@+id/edit_text_item_5_title"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginEnd="8dp"
+                    android:text="@{edit_diary_view_model.items[4].title}"
+                    android:hint="@string/edit_diary_item_hint"
+                    android:textSize="16sp"
+                    android:focusable="false"
+                    android:visibility="@{edit_diary_view_model.items[4].isVisible ? View.VISIBLE : View.GONE}"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/text_item_5" />
+
+                <androidx.core.widget.NestedScrollView
+                    android:id="@+id/nested_scroll_item_5_comment"
+                    android:layout_width="0dp"
+                    android:layout_height="108dp"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginTop="4dp"
+                    android:layout_marginEnd="8dp"
+                    android:background="@drawable/border_gray"
+                    android:scrollbarDefaultDelayBeforeFade="3000"
+                    android:scrollbarFadeDuration="500"
+                    android:scrollbarSize="10dp"
+                    android:scrollbarStyle="insideInset"
+                    android:scrollbarThumbVertical="@android:color/darker_gray"
+                    android:scrollbars="vertical"
+                    android:visibility="@{edit_diary_view_model.items[4].isVisible ? View.VISIBLE : View.GONE}"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/edit_text_item_5_title">
+
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+
+                        <EditText
+                            android:id="@+id/edit_text_item_5_comment"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="8dp"
+                            android:layout_marginTop="8dp"
+                            android:layout_marginEnd="8dp"
+                            android:background="@null"
+                            android:ems="10"
+                            android:gravity="start|top"
+                            android:text="@={edit_diary_view_model.items[4].comment}"
+                            android:hint="@string/edit_diary_content_hint"
+                            android:inputType="textMultiLine"
+                            android:minLines="5"
+                            android:textSize="16sp"
+                            android:visibility="@{edit_diary_view_model.items[4].isVisible ? View.VISIBLE : View.GONE}"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+                </androidx.core.widget.NestedScrollView>
+
+                <TextView
+                    android:id="@+id/text_item_5_comment_length"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="8dp"
+                    android:text="@string/edit_diary_num_of_char"
+                    android:visibility="@{edit_diary_view_model.items[4].isVisible ? View.VISIBLE : View.GONE}"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/nested_scroll_item_5_comment" />
+
+
+                <ImageButton
+                    android:id="@+id/image_button_add_item"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginEnd="8dp"
+                    android:src="@drawable/ic_add_circle_outline_24"
+                    android:background="@drawable/bg_image_button"
+                    android:visibility="@{edit_diary_view_model.items[4].isVisible ? View.GONE : View.VISIBLE}"
+                    android:onClick="@{(view) -> edit_diary_view_model.onClickAddItemButton(view)}"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/text_item_5_comment_length" />
+
+                <ImageView
+                    android:id="@+id/image_attach"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginEnd="8dp"
+                    android:layout_marginBottom="8dp"
+                    android:background="@drawable/border_gray"
+                    android:src="@drawable/ic_image_24"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/image_button_add_item" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+        </androidx.core.widget.NestedScrollView>
+
+        <androidx.fragment.app.FragmentContainerView
+            android:id="@+id/fragment_container_child"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</layout>

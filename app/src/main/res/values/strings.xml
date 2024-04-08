@@ -1,0 +1,112 @@
+<resources>
+    <string name="app_name">ズボラ日記</string>
+    <string name="title_list">List</string>
+    <string name="title_dashboard">Calender</string>
+    <string name="title_notifications">Notifications</string>
+
+    <string name="list_toolbar_title">ズボラ日記</string>
+    <string name="list_toolbar_option_word_search">ワード検索</string>
+    <string name="list_toolbar_option_set_year_month">先頭表示年月設定</string>
+
+    <string name="list_delete_confirm_dialog_title">削除確認</string>
+    <string name="list_delete_confirm_dialog_message_year">年</string>
+    <string name="list_delete_confirm_dialog_message_month">月</string>
+    <string name="list_delete_confirm_dialog_message_day">日</string>
+    <string name="list_delete_confirm_dialog_message">の日記を削除してもよろしいでしょうか。</string>
+    <string name="list_delete_confirm_dialog_btn_ok">はい</string>
+    <string name="list_delete_confirm_dialog_btn_ng">いいえ</string>
+
+    <string name="row_list_year">年</string>
+    <string name="row_list_month">月</string>
+
+    <string name="show_diary_toolbar_title">0000年00月00日(月)</string>
+    <string name="show_diary_toolbar_option_edit_diary">日記編集</string>
+    <string name="show_diary_title">タイトル</string>
+    <string name="show_diary_condition">気分：</string>
+    <string name="show_diary_selected_condition">良</string>
+    <string name="show_diary_weather">天気：</string>
+    <string name="show_diary_weather1_selected">晴</string>
+    <string name="show_diary_weather_slush">／</string>
+    <string name="show_diary_weather2_selected">雲</string>
+    <string name="show_diary_item_1">項目1</string>
+    <string name="show_diary_content_1">内容1</string>
+    <string name="show_diary_item_2">項目2</string>
+    <string name="show_diary_content_2">内容2</string>
+    <string name="show_diary_item_3">項目3</string>
+    <string name="show_diary_content_3">内容3</string>
+    <string name="show_diary_item_4">項目4</string>
+    <string name="show_diary_content_4">内容4</string>
+    <string name="show_diary_item_5">項目5</string>
+    <string name="show_diary_content_5">内容5</string>
+    <string name="show_diary_last_updated">最終更新日時</string>
+    <string name="show_diary_last_updated_value">0000/00/00 00:00:00</string>
+
+    <string name="edit_diary_toolbar_title">新規作成／編集中</string>
+    <string name="edit_diary_toolbar_option_save_diary">日記保存</string>
+    <string name="edit_diary_date_hint">0000/00/00(月)</string>
+    <string name="edit_diary_title">タイトル</string>
+    <string name="edit_diary_title_hint">無題</string>
+    <string name="edit_diary_num_of_char">0/0</string>
+    <string name="edit_diary_condition">気分：</string>
+    <string-array name="edit_diary_condition_selection">
+        <item>--</item>
+        <item>HAPPY</item>
+        <item>GOOD</item>
+        <item>AVERAGE</item>
+        <item>POOR</item>
+        <item>BAD</item>
+    </string-array>
+    <string name="edit_diary_weather">天気：</string>
+    <string-array name="edit_diary_weather_selection">
+        <item>--</item>
+        <item>晴</item>
+        <item>雲</item>
+        <item>雨</item>
+        <item>雪</item>
+    </string-array>
+    <string name="edit_diary_weather_slush">／</string>
+    <string name="edit_diary_item_1">項目1</string>
+    <string name="edit_diary_item_2">項目2</string>
+    <string name="edit_diary_item_3">項目3</string>
+    <string name="edit_diary_item_4">項目4</string>
+    <string name="edit_diary_item_5">項目5</string>
+    <string name="edit_diary_item_hint">未選択</string>
+    <string name="edit_diary_content_hint">○○をした。</string>
+
+    <string name="edit_diary_select_item_toolbar_title">項目選択</string>
+    <string name="edit_diary_select_item_new_item">新規項目</string>
+    <string name="edit_diary_select_item_new_item_hint">未入力</string>
+    <string name="edit_diary_select_item_num_of_char">0/0</string>
+    <string name="edit_diary_select_item_select_new_item_button">新規選択</string>
+    <string name="edit_diary_select_item_selection_history">選択履歴</string>
+
+    <string name="edit_diary_delete_confirm_dialog_title">削除確認</string>
+    <string name="edit_diary_delete_confirm_dialog_message_item">項目</string>
+    <string name="edit_diary_delete_confirm_dialog_message">を削除してもよろしいでしょうか。</string>
+    <string name="edit_diary_delete_confirm_dialog_btn_ok">はい</string>
+    <string name="edit_diary_delete_confirm_dialog_btn_ng">いいえ</string>
+
+    <string name="edit_diary_exists_diary_dialog_title">警告</string>
+    <string name="edit_diary_exists_diary_dialog_message_item">項目</string>
+    <string name="edit_diary_exists_diary_dialog_message">の日記は既に保存されています。保存された日記を読み込みますか。</string>
+    <string name="edit_diary_exists_diary_dialog_btn_ok">はい</string>
+    <string name="edit_diary_exists_diary_dialog_btn_ng">いいえ</string>
+
+    <string name="edit_diary_update_diary_dialog_title">警告</string>
+    <string name="edit_diary_update_diary_dialog_message_item">項目</string>
+    <string name="edit_diary_update_diary_dialog_message">の日記は既に保存されています。保存された日記を上書きしますか。</string>
+    <string name="edit_diary_update_diary_dialog_btn_ok">はい</string>
+    <string name="edit_diary_update_diary_dialog_btn_ng">いいえ</string>
+
+
+    <string name="edit_diary_select_item_title_confirm_delete_dialog_title">削除確認</string>
+    <string name="edit_diary_select_item_title_confirm_delete_dialog_first_message">”</string>
+    <string name="edit_diary_select_item_title_confirm_delete_dialog_second_message">”を削除しますか。</string>
+    <string name="edit_diary_select_item_title_confirm_delete_dialog_btn_ok">はい</string>
+    <string name="edit_diary_select_item_title_confirm_delete_dialog_btn_ng">いいえ</string>
+
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+
+</resources>

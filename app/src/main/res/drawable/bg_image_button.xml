@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 参照：https://team-bluecode.hatenablog.com/entry/2019/02/04/034624 -->
+<!-- タップ時にoval型の#FFFFFF色の波紋を出すレイアウト(デフォルト透明) -->
+<ripple xmlns:android="http://schemas.android.com/apk/res/android"
+    android:color="?android:attr/colorControlHighlight">
+    <!-- デフォルト色がtransparentの場合はmask指定が必要 -->
+    <item android:id="@android:id/mask">
+        <shape android:shape="oval">
+            <!-- ここのcolorは指定が必要だが反映はされない -->
+            <solid android:color="@android:color/white" />
+        </shape>
+    </item>
+    <!-- デフォルト状態の背景 -->
+    <item>
+        <shape android:shape="oval">
+            <solid android:color="@android:color/transparent" />
+        </shape>
+    </item>
+</ripple>
