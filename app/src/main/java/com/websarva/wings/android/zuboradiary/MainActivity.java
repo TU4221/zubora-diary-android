@@ -21,7 +21,10 @@ import androidx.navigation.ui.NavigationUI;
 
 import com.google.android.material.navigation.NavigationBarView;
 import com.websarva.wings.android.zuboradiary.databinding.ActivityMainBinding;
+import com.websarva.wings.android.zuboradiary.ui.calendar.CalendarFragment;
 import com.websarva.wings.android.zuboradiary.ui.list.ListFragment;
+
+//  MEMO:GitHubトークン(有効期限20240408から30日後)_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
 
 public class MainActivity extends AppCompatActivity {
 
@@ -58,17 +61,22 @@ public class MainActivity extends AppCompatActivity {
         public void onNavigationItemReselected(MenuItem item) {
             Log.d("ボトムナビゲーションタップ確認", item.toString());
 
-            //WEBから転載したが用途不明のためコメントアウト
-            //FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-            //transaction.add(R.id.nav_host_fragment_activity_main, new ListFragment(), "navigation_home");
-
             //NavHostFragmentを取得し、そこからListFragmentを取得
             Fragment navHostFragment = getSupportFragmentManager()
                     .findFragmentById(R.id.nav_host_fragment_activity_main);
             Fragment fragment = navHostFragment.getChildFragmentManager().getFragments().get(0);
+
             if (item.toString().equals(getString(R.string.title_list))) {
                 if (fragment != null && fragment instanceof ListFragment) {
-                    ((ListFragment) fragment).diaryListScrollToFirstPosition();
+                    ListFragment listFragment = (ListFragment) fragment;
+                    listFragment.diaryListScrollToFirstPosition();
+                }
+            }
+
+            if (item.toString().equals(getString(R.string.title_calendar))) {
+                if (fragment != null && fragment instanceof CalendarFragment) {
+                    CalendarFragment calendarFragment = (CalendarFragment) fragment;
+                    calendarFragment.onNavigationItemReselected();
                 }
             }
         }

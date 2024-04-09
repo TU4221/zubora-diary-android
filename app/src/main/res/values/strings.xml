@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">ズボラ日記</string>
     <string name="title_list">List</string>
-    <string name="title_dashboard">Calender</string>
+    <string name="title_calendar">Calender</string>
     <string name="title_notifications">Notifications</string>
 
     <string name="list_toolbar_title">ズボラ日記</string>

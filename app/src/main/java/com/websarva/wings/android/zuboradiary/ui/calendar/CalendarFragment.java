@@ -12,10 +12,12 @@ import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.widget.NestedScrollView;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.kizitonwose.calendar.core.CalendarDay;
 import com.kizitonwose.calendar.core.CalendarMonth;
 import com.kizitonwose.calendar.core.DayPosition;
@@ -53,7 +55,6 @@ public class CalendarFragment extends Fragment {
 
 
     public void onCreate(Bundle savedInstanceState) {
-        Log.d("フラグメントライフサイクル確認", "onCreate()処理");
         super.onCreate(savedInstanceState);
 
         // ViewModel設定
@@ -120,54 +121,29 @@ public class CalendarFragment extends Fragment {
         // 20240403_新Calendar
         CalendarView calendarView1 = this.binding.calendar;
 
-        /*calendarView1.setMonthScrollListener(calendarMonth -> {
-            // TODO:年月表示View用意
-            selectDate(calendarMonth.getYearMonth().atDay(1));
-            return null;
-        });*/
-
-
-
         List<DayOfWeek> daysOfWeek = daysOfWeek();
         YearMonth currentMonth = YearMonth.now();
-        YearMonth startMonth = currentMonth.minusMonths(50);
-        YearMonth endMonth = currentMonth.plusMonths(50);
+        YearMonth startMonth = currentMonth.minusMonths(60); //現在から過去5年分
+        YearMonth endMonth = currentMonth.plusMonths(60); //現在から未来5年分
+        LocalDate selectedDate = calendarViewModel.getSelectedDate();
 
         configureCalendarBinders(daysOfWeek);
 
         calendarView1.setup(startMonth,endMonth,daysOfWeek.get(0));
-        calendarView1.scrollToMonth(currentMonth);
-
-        selectDate(today);
 
 
+        if (selectedDate != null) {
+            YearMonth selectedMonth =
+                    YearMonth.of(selectedDate.getYear(), selectedDate.getMonthValue());
 
-        // 日記表示
-        // 20240403_旧Calendar
-        /*int year = -1;
-        int month = -1;
-        int dayOfMonth = -1;
-        if (calendarViewModel.getBackupCalendarDate() >= 0L) {
-            long backupCalendarDate = calendarViewModel.getBackupCalendarDate();
-            calendarView.setDate(backupCalendarDate);
-
-            Calendar backupCalendar = loadCalender(backupCalendarDate);
-            year = backupCalendar.get(Calendar.YEAR);
-            month = backupCalendar.get(Calendar.MONTH) + 1; // 月の値がひと月小さい 例:1月 -> 0
-            dayOfMonth = backupCalendar.get(Calendar.DAY_OF_MONTH);
+            firstSelectDate(selectedDate);
+            calendarView1.scrollToMonth(selectedMonth);
 
         } else {
-            Calendar currentDateCalendar = loadCurrentCalender();
-            year = currentDateCalendar.get(Calendar.YEAR);
-            month = currentDateCalendar.get(Calendar.MONTH) + 1; // 月の値がひと月小さい 例:1月 -> 0
-            dayOfMonth = currentDateCalendar.get(Calendar.DAY_OF_MONTH);
+            firstSelectDate(today);
+            calendarView1.scrollToMonth(currentMonth);
 
-            calendarViewModel.setBackupCalendarDate(currentDateCalendar.getTimeInMillis());
-
-        }*/
-
-        // 20240403_Calendar
-        //showSelectedDiary(year, month, dayOfMonth);
+        }
 
 
         // 天気表示欄設定
@@ -220,6 +196,31 @@ public class CalendarFragment extends Fragment {
             }
         });
 
+
+        // FAB設定
+        FloatingActionButton floatActionButtonEditDiary = binding.floatActionButtonEditDiary;
+        floatActionButtonEditDiary.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // TODO:下記プログラムはテスト用。後で修正。
+                calendarView1.scrollToMonth(currentMonth.plusYears(1));
+            }
+        });
+
+
+        CalendarFragment.this.onDestroyView();
+
+
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+
+        // MEMO:CalendarViewはRecyclerViewを元に作成されている。
+        //      Bind済みの年月、又は既存ホルダーから溢れたを年月を確認する方法が無い。
+        //      既存日記日付リストの不要な年月のリストを都度クリアするタイミングがない為、ここでまとめてクリアする。
+        calendarViewModel.clearExistedDiaryDateLog();
     }
 
     // CalendarViewを元にCalendarクラスのインスタンスを取得
@@ -257,22 +258,7 @@ public class CalendarFragment extends Fragment {
 
         }
 
-        // アクションバー表示日付更新。
-        ActionBar actionBar = ((AppCompatActivity)getActivity()).getSupportActionBar();
-        String stringDate = DateConverter.toStringLocalDate(year, month, dayOfMonth);
-        actionBar.setTitle(stringDate);
-
     }
-
-
-
-
-
-
-
-
-
-
 
     private List<DayOfWeek> daysOfWeek() {
         DayOfWeek firstDayOfWeek = WeekFields.of(Locale.getDefault()).getFirstDayOfWeek();
@@ -293,7 +279,7 @@ public class CalendarFragment extends Fragment {
                 .collect(Collectors.toList());
     }
 
-    // カレンダー設定
+    // カレンダーBind設定
     private void configureCalendarBinders(List<DayOfWeek> daysOfWeek) {
         CalendarView calendar = binding.calendar;
 
@@ -314,14 +300,9 @@ public class CalendarFragment extends Fragment {
                 // 数値設定
                 String day = String.valueOf(calendarDay.getDate().getDayOfMonth());
                 textCalendarDay.setText(day);
+                Log.d("20240408", String.valueOf(calendarDay.getDate().getMonthValue())+ "月" + day + "日");
 
-                // 数値色設定
-                // TODO:色が変わらない。xmlで直接変更しても黒色のまま。原因調査する。
-                DayOfWeek dayOfWeek = calendarDay.getDate().getDayOfWeek();
-                int color = dayColor(dayOfWeek);
-                textCalendarDay.setTextColor(color);
-
-                // 日にちマス状態設定
+                // 日にちマス状態(可視、数値色、背景色、ドット有無)設定
                 if (calendarDay.getPosition() == DayPosition.MonthDate) {
                     textCalendarDay.setVisibility(View.VISIBLE);
 
@@ -335,7 +316,7 @@ public class CalendarFragment extends Fragment {
                         //viewCalendarDayDot.setVisibility(View.INVISIBLE);
 
                     // 選択中の日にちマス
-                    } else if (calendarDay.getDate().isEqual(selectedDate)) {
+                    } else if (calendarDay.getDate().isEqual(calendarViewModel.getSelectedDate())) {
                         textCalendarDay.setTextColor(
                                 getResources()
                                         .getColor(R.color.md_theme_light_onPrimaryContainer)
@@ -345,17 +326,19 @@ public class CalendarFragment extends Fragment {
 
                     // それ以外の日にちマス
                     } else {
-                        textCalendarDay.setTextColor(
-                                getResources()
-                                        .getColor(R.color.black)
-                        );
+                        // TODO:祝日判定は手間がかかりそうなので保留
+                        DayOfWeek dayOfWeek = calendarDay.getDate().getDayOfWeek();
+                        int color = dayColor(dayOfWeek);
+                        textCalendarDay.setTextColor(color);
                         textCalendarDay.setBackground(null);
                         //viewCalendarDayDot.setVisibility(View.INVISIBLE); // TODO:日記ありなしで切り替える
 
                     }
 
+                    // ドット有無設定
                     LocalDate localDate = calendarDay.getDate();
-                    if (diaryViewModel.hasDiary(
+                    //if (diaryViewModel.hasDiary(
+                    if (calendarViewModel.existsDiary(
                             localDate.getYear(),
                             localDate.getMonthValue(),
                             localDate.getDayOfMonth()
@@ -384,9 +367,13 @@ public class CalendarFragment extends Fragment {
             @Override
             public void bind(@NonNull MonthViewContainer container, CalendarMonth calendarMonth) {
                 // カレンダーの年月表示設定
-                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy年M月");
-                String showYearMonth = calendarMonth.getYearMonth().format(formatter);
-                container.textYearMonth.setText(showYearMonth);
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy年MM月");
+                String stringYearMonth = calendarMonth.getYearMonth().format(formatter);
+                container.textYearMonth.setText(stringYearMonth);
+                Log.d("20240408", stringYearMonth + "作成");
+
+                // 対象年月の既存日記確認リスト格納
+                calendarViewModel.updateExistedDiaryDateLog(stringYearMonth);
 
                 // カレンダーの曜日設定(未設定アイテムのみ設定)
                 if (container.legendLayout.getTag() == null) {
@@ -449,19 +436,64 @@ public class CalendarFragment extends Fragment {
         }
     }
 
+    private void firstSelectDate(LocalDate date) {
+        CalendarView calendar = binding.calendar;
+
+        calendarViewModel.setSelectedDate(date);
+        calendar.notifyDateChanged(date);
+        showSelectedDiary(date.getYear(), date.getMonthValue(), date.getDayOfMonth());
+        updateActionBarDate(date.getYear(), date.getMonthValue(), date.getDayOfMonth());
+    }
+
     private void selectDate(LocalDate date) {
+        CalendarView calendar = binding.calendar;
+        LocalDate selectedDate = calendarViewModel.getSelectedDate();
+
         if (selectedDate != date) {
             LocalDate oldDate = selectedDate;
-            selectedDate = date;
+
+            calendarViewModel.setSelectedDate(date);
+
             if (oldDate != null) {
-                binding.calendar.notifyDateChanged(oldDate);
+                Log.d("20240408", "notifyDateChanged(oldDate)");
+                calendar.notifyDateChanged(oldDate);
             }
-            binding.calendar.notifyDateChanged(date);
+            calendar.notifyDateChanged(date);
             showSelectedDiary(
                     date.getYear(),
                     date.getMonthValue(),
                     date.getDayOfMonth()
             );
+
+            updateActionBarDate(date.getYear(), date.getMonthValue(), date.getDayOfMonth());
+
         }
+    }
+
+    // アクションバー表示日付更新。
+    private void updateActionBarDate(int year, int month, int dayOfMonth) {
+        ActionBar actionBar = ((AppCompatActivity)getActivity()).getSupportActionBar();
+        String stringDate = DateConverter.toStringLocalDate(year, month, dayOfMonth);
+        actionBar.setTitle(stringDate);
+    }
+
+    public void onNavigationItemReselected() {
+        NestedScrollView nestedScrollFullScreen = this.binding.nestedScrollFullScreen;
+        CalendarView calendar = this.binding.calendar;
+        if (nestedScrollFullScreen.canScrollVertically(-1)) {
+            scrollToTop();
+        } else {
+            calendar.scrollToMonth(YearMonth.now());
+            selectDate(today);
+        }
+
+
+    }
+
+    private void scrollToTop() {
+        NestedScrollView nestedScrollFullScreen = this.binding.nestedScrollFullScreen;
+        //nestedScrollFullScreen.scrollTo(0, 0);
+        nestedScrollFullScreen.smoothScrollTo(0, 0);
+        //nestedScrollFullScreen.smoothScrollBy(0, 0);
     }
 }

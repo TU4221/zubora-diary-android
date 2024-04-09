@@ -28,6 +28,9 @@ public interface DiaryDAO {
     @Query("SELECT date, title, imagePath FROM diaries WHERE date < :startDate ORDER BY date DESC LIMIT :num OFFSET :offset")
     public ListenableFuture<List<ListItemDiary>> selectDiaryList(int num, int offset , String startDate);
 
+    @Query("SELECT date FROM diaries WHERE date Like :dateYearMonth || '%'") // ||：文字連結
+    public ListenableFuture<List<String>> selectDiaryDateList(String dateYearMonth);
+
     @Insert
     public ListenableFuture<Long> insertDiary(Diary diary);
 
