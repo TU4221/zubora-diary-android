@@ -12,23 +12,15 @@
             type="com.websarva.wings.android.zuboradiary.ui.editdiary.EditDiaryViewModel" />
     </data>
 
-    <androidx.coordinatorlayout.widget.CoordinatorLayout
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        tools:context=".ui.calendar.CalendarFragment">
+        android:layout_height="match_parent">
 
-        <com.google.android.material.appbar.AppBarLayout
-            android:id="@+id/app_bar_layout"
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:elevation="10dp">
-
-            <!--<CalendarView
-                android:id="@+id/calendar"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="?attr/colorSurface"
-                app:layout_scrollFlags="scroll|enterAlways" />-->
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            tools:context=".ui.calendar.CalendarFragment">
 
             <com.kizitonwose.calendar.view.CalendarView
                 android:id="@+id/calendar"
@@ -36,37 +28,37 @@
                 android:layout_height="wrap_content"
                 app:cv_dayViewResource="@layout/calendar_day"
                 app:cv_monthHeaderResource="@layout/calendar_header"
-                android:background="?attr/colorSurface"
-                app:layout_scrollFlags="scroll|enterAlways" />
+                android:background="?attr/colorSurface" />
 
-        </com.google.android.material.appbar.AppBarLayout>
-
-        <androidx.core.widget.NestedScrollView
-            android:id="@+id/nested_scroll_full_screen"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            app:layout_behavior="@string/appbar_scrolling_view_behavior">
-
-            <FrameLayout
+            <androidx.core.widget.NestedScrollView
+                android:id="@+id/nested_scroll_full_screen"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="match_parent" >
 
-                <include
-                    layout="@layout/layout_show_diary_original"
-                    app:diaryViewModel="@{diaryViewModel}" />
 
-                <TextView
-                    android:id="@+id/text_no_diary"
+                <FrameLayout
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:background="?attr/colorSurface"
-                    android:text="日記がありません。"
-                    android:gravity="center_horizontal|top"
-                    android:paddingTop="16dp"/>
+                    android:layout_height="match_parent">
 
-            </FrameLayout>
+                    <include
+                        android:id="@+id/include_showing_diary"
+                        layout="@layout/layout_show_diary_original"
+                        app:diaryViewModel="@{diaryViewModel}" />
 
-        </androidx.core.widget.NestedScrollView>
+                    <TextView
+                        android:id="@+id/text_no_diary"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:background="?attr/colorSurface"
+                        android:text="日記がありません。"
+                        android:gravity="center_horizontal|top"
+                        android:paddingTop="16dp"/>
+
+                </FrameLayout>
+
+            </androidx.core.widget.NestedScrollView>
+
+        </LinearLayout>
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/float_action_button_edit_diary"
@@ -77,8 +69,9 @@
             android:layout_gravity="bottom|end"
             android:src="@android:drawable/ic_menu_edit" />
 
+    </FrameLayout>
 
-    </androidx.coordinatorlayout.widget.CoordinatorLayout>
+
 </layout>
 
 
