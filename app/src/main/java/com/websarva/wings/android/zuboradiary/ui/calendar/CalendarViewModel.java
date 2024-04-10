@@ -16,7 +16,6 @@ import java.util.Map;
 
 public class CalendarViewModel extends AndroidViewModel {
 
-    private long backupCalendarDate = -1;
     private CalendarRepository calendarRepository;
     private Map<String, List<String>> existedDiaryDateLog = new HashMap<>();
     private LocalDate selectedDate;
@@ -40,9 +39,8 @@ public class CalendarViewModel extends AndroidViewModel {
 
     }
 
-    public boolean existsDiary(int year, int month, int dayOfMonth) {
-        String targetDateYearMonth = DateConverter.toStringLocalDateYearMonth(year, month);
-        String targetDate = DateConverter.toStringLocalDate(year, month, dayOfMonth);
+    public boolean existsDiary(String targetDate) {
+        String targetDateYearMonth = DateConverter.toStringLocalDateYearMonth(targetDate);
 
         if (existedDiaryDateLog.containsKey(targetDateYearMonth)) {
             List<String> list = existedDiaryDateLog.get(targetDateYearMonth);
@@ -63,10 +61,4 @@ public class CalendarViewModel extends AndroidViewModel {
         this.selectedDate = selectedDate;
     }
 
-    public long getBackupCalendarDate() {
-        return this.backupCalendarDate;
-    }
-    public void setBackupCalendarDate(long backupCalendarDate) {
-        this.backupCalendarDate = backupCalendarDate;
-    }
 }

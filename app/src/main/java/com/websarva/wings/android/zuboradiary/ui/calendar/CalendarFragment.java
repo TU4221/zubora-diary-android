@@ -337,12 +337,8 @@ public class CalendarFragment extends Fragment {
 
                     // ドット有無設定
                     LocalDate localDate = calendarDay.getDate();
-                    //if (diaryViewModel.hasDiary(
-                    if (calendarViewModel.existsDiary(
-                            localDate.getYear(),
-                            localDate.getMonthValue(),
-                            localDate.getDayOfMonth()
-                    )) {
+                    String date = DateConverter.toStringLocalDate(localDate);
+                    if (calendarViewModel.existsDiary(date)) {
                         viewCalendarDayDot.setVisibility(View.VISIBLE);
                     } else {
                         viewCalendarDayDot.setVisibility(View.INVISIBLE);
@@ -399,6 +395,7 @@ public class CalendarFragment extends Fragment {
 
     }
 
+    // カレンダー日にち、曜日の色取得
     private int dayColor(DayOfWeek dayOfWeek) {
         int color = getResources().getColor(R.color.black);
         if (dayOfWeek == DayOfWeek.SUNDAY) {
@@ -409,6 +406,7 @@ public class CalendarFragment extends Fragment {
         return color;
     }
 
+    // カレンダー日単位コンテナ
     class DayViewContainer extends ViewContainer {
         CalendarDay calendarDay;
         CalendarDayBinding binding;
@@ -426,6 +424,7 @@ public class CalendarFragment extends Fragment {
         }
     }
 
+    // カレンダー月単位コンテナ
     class MonthViewContainer extends ViewContainer {
         TextView textYearMonth;
         LinearLayout legendLayout;
@@ -445,6 +444,7 @@ public class CalendarFragment extends Fragment {
         updateActionBarDate(date.getYear(), date.getMonthValue(), date.getDayOfMonth());
     }
 
+    // カレンダー日付選択時処理
     private void selectDate(LocalDate date) {
         CalendarView calendar = binding.calendar;
         LocalDate selectedDate = calendarViewModel.getSelectedDate();
@@ -477,23 +477,53 @@ public class CalendarFragment extends Fragment {
         actionBar.setTitle(stringDate);
     }
 
+    // ボタムナビゲーションタップ時処理
     public void onNavigationItemReselected() {
         NestedScrollView nestedScrollFullScreen = this.binding.nestedScrollFullScreen;
-        CalendarView calendar = this.binding.calendar;
         if (nestedScrollFullScreen.canScrollVertically(-1)) {
             scrollToTop();
         } else {
-            calendar.scrollToMonth(YearMonth.now());
-            selectDate(today);
+            scrollCalendarToToday();
         }
 
 
     }
 
+    // 先頭へ自動スクロール
     private void scrollToTop() {
         NestedScrollView nestedScrollFullScreen = this.binding.nestedScrollFullScreen;
-        //nestedScrollFullScreen.scrollTo(0, 0);
         nestedScrollFullScreen.smoothScrollTo(0, 0);
-        //nestedScrollFullScreen.smoothScrollBy(0, 0);
+    }
+
+    // カレンダーを今日の日付へ自動スクロール
+    // TODO:scrollとsmoothScrollを連続で処理するとかくつくので実機で確認。(PCが重いせいかもしれない)
+    private void scrollCalendarToToday() {
+        CalendarView calendar = this.binding.calendar;
+        YearMonth thisMonth = YearMonth.of(today.getYear(), today.getMonthValue());
+        YearMonth showedCalendarMonth = calendar.findFirstVisibleMonth().getYearMonth();
+
+        // カレンダーが今日の日付月から遠い月を表示していたらsmoothScrollの処理時間が延びるので、
+        // 手前にScroll処理を入れる。
+        if (showedCalendarMonth.isAfter(thisMonth)) {
+            YearMonth addedThisMonth  = thisMonth.plusMonths(6);
+            YearMonth subtractedCalendarMonth  = showedCalendarMonth.minusMonths(3);
+
+            if (showedCalendarMonth.isAfter(addedThisMonth)) {
+                calendar.smoothScrollToMonth(subtractedCalendarMonth);
+                calendar.scrollToMonth(addedThisMonth);
+            }
+
+        } else if (showedCalendarMonth.isBefore(thisMonth)) {
+            YearMonth subtractedThisMonth  = thisMonth.minusMonths(6);
+            YearMonth addedCalendarMonth  = showedCalendarMonth.plusMonths(3);
+
+            if (showedCalendarMonth.isBefore(subtractedThisMonth)) {
+                calendar.smoothScrollToMonth(addedCalendarMonth);
+                calendar.scrollToMonth(subtractedThisMonth);
+            }
+        }
+
+        calendar.smoothScrollToMonth(YearMonth.now());
+        selectDate(today);
     }
 }
