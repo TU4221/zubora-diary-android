@@ -5,6 +5,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -208,9 +209,26 @@ public class CalendarFragment extends Fragment {
         });
 
 
-        CalendarFragment.this.onDestroyView();
+        // 表示日記の下余白設定(FABが日記と重なるのを防ぐため)
+        // MEMO:FABのレイアウト高さは"wrap_content"を使用しているため、
+        //      レイアウト後に機能するviewTreeObserver#addOnGlobalLayoutListenerを使用して取得する。
+        View viewShowDiaryBottomMargin = binding.viewShowDiaryBottomMargin;
+        ViewTreeObserver viewTreeObserver = viewShowDiaryBottomMargin.getViewTreeObserver();
+        viewTreeObserver.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            @Override
+            public void onGlobalLayout() {
+                ViewGroup.MarginLayoutParams viewMarginLayoutParams =
+                        (ViewGroup.MarginLayoutParams) viewShowDiaryBottomMargin.getLayoutParams();
+                ViewGroup.MarginLayoutParams buttonMarginLayoutParams =
+                        (ViewGroup.MarginLayoutParams) floatActionButtonEditDiary.getLayoutParams();
 
+                viewMarginLayoutParams.height = floatActionButtonEditDiary.getHeight()
+                        + (buttonMarginLayoutParams.bottomMargin * 2);
+                viewShowDiaryBottomMargin.setLayoutParams(viewMarginLayoutParams);
 
+                viewTreeObserver.removeOnGlobalLayoutListener(this);
+            }
+        });
     }
 
     @Override
@@ -250,9 +268,11 @@ public class CalendarFragment extends Fragment {
             // ViewModelの読込日記の日付をセット
             diaryViewModel.updateLoadingDate(year, month, dayOfMonth);
             diaryViewModel.prepareShowDiary();
-            binding.textNoDiary.setVisibility(View.INVISIBLE);
+            binding.linearLayoutShowDiary.setVisibility(View.VISIBLE);
+            binding.textNoDiary.setVisibility(View.GONE);
 
         } else {
+            binding.linearLayoutShowDiary.setVisibility(View.GONE);
             binding.textNoDiary.setVisibility(View.VISIBLE);
             diaryViewModel.clear();
 
