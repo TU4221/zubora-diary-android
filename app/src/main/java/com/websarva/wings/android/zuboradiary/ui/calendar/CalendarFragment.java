@@ -3,18 +3,27 @@ package com.websarva.wings.android.zuboradiary.ui.calendar;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.view.MenuHost;
+import androidx.core.view.MenuProvider;
 import androidx.core.widget.NestedScrollView;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentResultListener;
+import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
@@ -29,10 +38,14 @@ import com.websarva.wings.android.zuboradiary.R;
 import com.websarva.wings.android.zuboradiary.databinding.CalendarDayBinding;
 import com.websarva.wings.android.zuboradiary.databinding.CalendarHeaderBinding;
 import com.websarva.wings.android.zuboradiary.databinding.FragmentCalendarBinding;
+import com.websarva.wings.android.zuboradiary.databinding.LayoutShowDiaryOriginalBinding;
+import com.websarva.wings.android.zuboradiary.ui.ChangeFragment;
 import com.websarva.wings.android.zuboradiary.ui.DateConverter;
+import com.websarva.wings.android.zuboradiary.ui.editdiary.EditDiaryFragment;
 import com.websarva.wings.android.zuboradiary.ui.editdiary.EditDiaryViewModel;
 
 import com.kizitonwose.calendar.view.CalendarView;
+import com.websarva.wings.android.zuboradiary.ui.list.DatePickerDialogFragment;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
@@ -53,6 +66,7 @@ public class CalendarFragment extends Fragment {
     private EditDiaryViewModel diaryViewModel;
     private LocalDate today = LocalDate.now();
     private LocalDate selectedDate;
+    private calendarMenuProvider calendarMenuProvider = new calendarMenuProvider();
 
 
     public void onCreate(Bundle savedInstanceState) {
@@ -70,6 +84,33 @@ public class CalendarFragment extends Fragment {
                     @Override
                     public void handleOnBackPressed() {
                         // 処理なし(無効化)
+
+                    }
+                }
+        );
+
+
+        // EditDiaryFragmentからのデータ受取、受取後の処理
+        getActivity().getSupportFragmentManager().setFragmentResultListener(
+                "ToCalendarFragment_EditDiaryFragmentRequestKey",
+                this,
+                new FragmentResultListener() {
+                    @Override
+                    public void onFragmentResult(@NonNull String requestKey, @NonNull Bundle result) {
+                        createMenu();
+
+                    }
+                }
+        );
+
+        // ShowDiaryFragmentからのデータ受取、受取後の処理
+        getActivity().getSupportFragmentManager().setFragmentResultListener(
+                "ToCalendarFragment_ShowDiaryFragmentRequestKey",
+                this,
+                new FragmentResultListener() {
+                    @Override
+                    public void onFragmentResult(@NonNull String requestKey, @NonNull Bundle result) {
+                        createMenu();
 
                     }
                 }
@@ -95,32 +136,16 @@ public class CalendarFragment extends Fragment {
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        // アクションバー表示日付更新。
-        // showSelectedDiary()メソッド内で処理(後記述)
+
+        int i = requireActivity().getSupportFragmentManager().getBackStackEntryCount();
+        Log.d("20240412", String.valueOf(i));
+
+        // アクションバーのメニュー作成
+        createMenu();
 
 
-        // カレンダー日付切り替えリスナ設定
-        // 20240403_旧Calendar
-        /*CalendarView calendarView = this.binding.calendar;
-        calendarView.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
-            @Override
-            public void onSelectedDayChange(@NonNull CalendarView view, int year, int month, int dayOfMonth) {
-                Log.d("20240328", "onSelectedDayChange");
-                int _month = month + 1; // 引数の月の値がひと月小さい 例:1月 -> 0
-
-                showSelectedDiary(year, _month, dayOfMonth);
-
-                // 選択日付を保存(ボトムナビケージョン切り替え時復元用)
-                Calendar selectedDateCalendar = loadCalender(year, month, dayOfMonth);
-                calendarView.setDate(selectedDateCalendar.getTimeInMillis());
-                calendarViewModel.setBackupCalendarDate(selectedDateCalendar.getTimeInMillis());
-
-            }
-        });*/
-
-
-        // 20240403_新Calendar
-        CalendarView calendarView1 = this.binding.calendar;
+        // カレンダー設定
+        CalendarView calendar = this.binding.calendar;
 
         List<DayOfWeek> daysOfWeek = daysOfWeek();
         YearMonth currentMonth = YearMonth.now();
@@ -130,7 +155,7 @@ public class CalendarFragment extends Fragment {
 
         configureCalendarBinders(daysOfWeek);
 
-        calendarView1.setup(startMonth,endMonth,daysOfWeek.get(0));
+        calendar.setup(startMonth,endMonth,daysOfWeek.get(0));
 
 
         if (selectedDate != null) {
@@ -138,11 +163,11 @@ public class CalendarFragment extends Fragment {
                     YearMonth.of(selectedDate.getYear(), selectedDate.getMonthValue());
 
             firstSelectDate(selectedDate);
-            calendarView1.scrollToMonth(selectedMonth);
+            calendar.scrollToMonth(selectedMonth);
 
         } else {
             firstSelectDate(today);
-            calendarView1.scrollToMonth(currentMonth);
+            calendar.scrollToMonth(currentMonth);
 
         }
 
@@ -150,9 +175,9 @@ public class CalendarFragment extends Fragment {
         // 天気表示欄設定
         // MEMO:ShowDiaryFragmentの中身を一つのレイアウトとして独立させた。
         //      bindingで中身のViewを取得できなくなった為、findViewById()メソッドを使用してViewを取得。
-        TextView textWeatherSlush = getActivity().findViewById(R.id.text_weather_slush);
-        TextView textWeather2Selected =
-                getActivity().findViewById(R.id.text_weather_2_selected);
+        TextView textWeatherSlush = binding.includeShowDiary.textWeatherSlush;
+        TextView textWeather2Selected = binding.includeShowDiary.textWeather2Selected;
+
         diaryViewModel.getLiveIntWeather2().observe(getViewLifecycleOwner(), new Observer<Integer>() {
             @Override
             public void onChanged(Integer integer) {
@@ -204,7 +229,34 @@ public class CalendarFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 // TODO:下記プログラムはテスト用。後で修正。
-                calendarView1.scrollToMonth(currentMonth.plusYears(1));
+
+                // DiaryViewModel へデータセット
+                LocalDate selectedDate = calendarViewModel.getSelectedDate();
+                String stringDate = DateConverter.toStringLocalDate(selectedDate);
+                diaryViewModel.setLiveLoadingDate(stringDate);
+
+                Boolean existsSelectedDiary =
+                        diaryViewModel.hasDiary(
+                                selectedDate.getYear(),
+                                selectedDate.getMonthValue(),
+                                selectedDate.getDayOfMonth()
+                        );
+                if (existsSelectedDiary) {
+                    diaryViewModel.setIsNewEditDiary(false);
+                } else {
+                    diaryViewModel.setIsNewEditDiary(true);
+                }
+
+
+
+                FragmentManager fragmentManager = requireActivity().getSupportFragmentManager();
+                ChangeFragment.replaceFragment(
+                        fragmentManager,
+                        true,
+                        R.id.front_fragmentContainerView_activity_main,
+                        EditDiaryFragment.class,
+                        null
+                );
             }
         });
 
@@ -226,7 +278,10 @@ public class CalendarFragment extends Fragment {
                         + (buttonMarginLayoutParams.bottomMargin * 2);
                 viewShowDiaryBottomMargin.setLayoutParams(viewMarginLayoutParams);
 
-                viewTreeObserver.removeOnGlobalLayoutListener(this);
+                // MEMO:例外で再度取得するように促される為、下記対応。
+                ViewTreeObserver _viewTreeObserver =
+                        viewShowDiaryBottomMargin.getViewTreeObserver();
+                _viewTreeObserver.removeOnGlobalLayoutListener(this);
             }
         });
     }
@@ -239,6 +294,49 @@ public class CalendarFragment extends Fragment {
         //      Bind済みの年月、又は既存ホルダーから溢れたを年月を確認する方法が無い。
         //      既存日記日付リストの不要な年月のリストを都度クリアするタイミングがない為、ここでまとめてクリアする。
         calendarViewModel.clearExistedDiaryDateLog();
+    }
+
+    //アクションバーオプションメニュー更新
+    private void createMenu() {
+        MenuHost menuHost = requireActivity();
+        menuHost.addMenuProvider(this.calendarMenuProvider, getViewLifecycleOwner(), Lifecycle.State.RESUMED);
+    }
+
+
+    private class calendarMenuProvider implements MenuProvider {
+
+        //アクションバーオプションメニュー設定。
+        @Override
+        public void onCreateMenu(@NonNull Menu menu, @NonNull MenuInflater menuInflater) {
+
+            // メニューなし
+            //menuInflater.inflate(R.menu.?????, menu);
+
+            ActionBar actionBar = ((AppCompatActivity)requireActivity()).getSupportActionBar();
+            actionBar.setDisplayHomeAsUpEnabled(false);
+
+            updateActionBarDate();
+        }
+
+        //アクションバーメニュー選択処理設定。
+        @Override
+        public boolean onMenuItemSelected(@NonNull MenuItem menuItem) {
+
+            // メニュー無しの為処理不要
+            /*if (menuItem.getItemId() == R.id.?????) {
+                // 処理内容
+                return true;
+
+            } else if (menuItem.getItemId() == android.R.id.home) {
+                // 処理内容
+                return true;
+
+            } else {
+                return false;
+            }*/
+
+            return false;
+        }
     }
 
     // CalendarViewを元にCalendarクラスのインスタンスを取得
@@ -263,7 +361,13 @@ public class CalendarFragment extends Fragment {
     }
 
     // CalendarViewで選択された日付の日記を表示
-    private void showSelectedDiary(int year, int month, int dayOfMonth) {
+    private void showSelectedDiary() {
+
+        LocalDate selectedDate = calendarViewModel.getSelectedDate();
+        int year = selectedDate.getYear();
+        int month = selectedDate.getMonthValue();
+        int dayOfMonth = selectedDate.getDayOfMonth();
+
         if (diaryViewModel.hasDiary(year, month, dayOfMonth)) {
             // ViewModelの読込日記の日付をセット
             diaryViewModel.updateLoadingDate(year, month, dayOfMonth);
@@ -460,8 +564,10 @@ public class CalendarFragment extends Fragment {
 
         calendarViewModel.setSelectedDate(date);
         calendar.notifyDateChanged(date);
-        showSelectedDiary(date.getYear(), date.getMonthValue(), date.getDayOfMonth());
-        updateActionBarDate(date.getYear(), date.getMonthValue(), date.getDayOfMonth());
+        showSelectedDiary();
+
+        // アプリ初回起動時では、onViewCreatedの時点でアクションバーが確立していないため例外となる。
+        //updateActionBarDate();
     }
 
     // カレンダー日付選択時処理
@@ -479,21 +585,18 @@ public class CalendarFragment extends Fragment {
                 calendar.notifyDateChanged(oldDate);
             }
             calendar.notifyDateChanged(date);
-            showSelectedDiary(
-                    date.getYear(),
-                    date.getMonthValue(),
-                    date.getDayOfMonth()
-            );
 
-            updateActionBarDate(date.getYear(), date.getMonthValue(), date.getDayOfMonth());
+            updateActionBarDate();
+            showSelectedDiary();
 
         }
     }
 
     // アクションバー表示日付更新。
-    private void updateActionBarDate(int year, int month, int dayOfMonth) {
+    private void updateActionBarDate() {
         ActionBar actionBar = ((AppCompatActivity)getActivity()).getSupportActionBar();
-        String stringDate = DateConverter.toStringLocalDate(year, month, dayOfMonth);
+        LocalDate selectedDate = calendarViewModel.getSelectedDate();
+        String stringDate = DateConverter.toStringLocalDate(selectedDate);
         actionBar.setTitle(stringDate);
     }
 

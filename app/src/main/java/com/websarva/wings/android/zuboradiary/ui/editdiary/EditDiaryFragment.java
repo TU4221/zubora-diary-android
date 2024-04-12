@@ -43,6 +43,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.websarva.wings.android.zuboradiary.databinding.FragmentEditDiaryBinding;
+import com.websarva.wings.android.zuboradiary.ui.ChangeFragment;
+import com.websarva.wings.android.zuboradiary.ui.calendar.CalendarFragment;
 import com.websarva.wings.android.zuboradiary.ui.diary.showdiary.ShowDiaryFragment;
 import com.websarva.wings.android.zuboradiary.R;
 import com.websarva.wings.android.zuboradiary.ui.editdiaryselectitemtitle.EditDiarySelectItemTitleFragment;
@@ -691,39 +693,49 @@ public class EditDiaryFragment extends Fragment {
         Toast.makeText(getView().getContext(), "戻る", Toast.LENGTH_SHORT).show();
         FragmentManager parentFragmentManager = getParentFragmentManager();
 
-        // EditDiaryが新規作成中の時の処理
-        if (diaryViewModel.getIsNewEditDiary() || diaryViewModel.getWasNewEditDiary()) {
 
-            // ナビフラグメント取得
-            FragmentManager activityFragmentManager = requireActivity().getSupportFragmentManager();
-            Fragment navFragment = activityFragmentManager
-                    .findFragmentById(R.id.nav_host_fragment_activity_main);
-            Fragment navChildFragment = navFragment.getChildFragmentManager().getFragments().get(0);
+        // ナビフラグメント取得
+        FragmentManager activityFragmentManager = requireActivity().getSupportFragmentManager();
+        Fragment navFragment = activityFragmentManager
+                .findFragmentById(R.id.nav_host_fragment_activity_main);
+        Fragment navChildFragment = navFragment.getChildFragmentManager().getFragments().get(0);
 
-            //ナビフラグメントがリストフラグメントの時、メニューバー更新。
-            // HACK:EditDiaryFragmentからListFragmentを表示した時、
-            //      ListFragmentとEditDiaryFragmentのメニューバーが混在する。
-            //      ListFragmentResultListenerでメニューバーの更新を設定しているが、
-            //      ListFragmentがonResume状態で背面に存在するしたいるため、
-            //      EditDiaryFragmentがonPause状態になる前に、
-            //      ListFragmentResultListenerが起動して一時的に混在すると思われる。
-            //      対策として下記コードを記述する。
-            MenuHost menuHost = requireActivity();
-            menuHost.removeMenuProvider(editDiaryMenuProvider);
+        // HACK:EditDiaryFragmentからListFragment(NavFragment)を表示した時、
+        //      ListFragmentとEditDiaryFragmentのメニューバーが混在する。
+        //      ListFragmentResultListenerでメニューバーの更新を設定しているが、
+        //      ListFragmentがonResume状態で背面に存在するため、
+        //      EditDiaryFragmentがonPause状態になる前に、
+        //      ListFragmentResultListenerが起動して一時的に混在すると思われる。
+        //      対策として下記コードを記述する。
+        MenuHost menuHost = requireActivity();
+        menuHost.removeMenuProvider(editDiaryMenuProvider);
 
-            if (navChildFragment instanceof ListFragment) {
+        if (navChildFragment instanceof ListFragment) {
+            // EditDiaryが新規作成中時の処理
+            if (diaryViewModel.getIsNewEditDiary() || diaryViewModel.getWasNewEditDiary()) {
+
                 Bundle result = new Bundle();
                 parentFragmentManager.setFragmentResult(
                         "ToListFragment_EditDiaryFragmentRequestKey", result);
 
+                // TODO:EditDiaryを起動す時に処理するか、閉じるときに処理するか保留。
+                diaryViewModel.clear();
+
             }
+        }
+
+        if (navChildFragment instanceof CalendarFragment) {
+            // EditDiaryが新規作成中の時の処理
+            Bundle result = new Bundle();
+            parentFragmentManager.setFragmentResult(
+                    "ToCalendarFragment_EditDiaryFragmentRequestKey", result);
 
             // TODO:EditDiaryを起動す時に処理するか、閉じるときに処理するか保留。
             diaryViewModel.clear();
 
         }
 
-        parentFragmentManager.popBackStack();
+        ChangeFragment.popBackStackOnFrontFragment(parentFragmentManager);
 
     }
 

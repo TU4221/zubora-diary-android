@@ -87,7 +87,13 @@ public class EditDiaryViewModel extends AndroidViewModel {
                 this.date.setValue(stringDate);
             }
         } else {
-            loadDiary();
+            String stringLoadingDate = this.loadingDate.getValue();
+            if (hasDiary(stringLoadingDate)) {
+                loadDiary();
+            } else {
+                this.date.setValue(stringLoadingDate);
+                this.loadingDate.setValue("");
+            }
         }
     }
 

@@ -53,6 +53,7 @@
                         android:orientation="vertical">
 
                         <include
+                            android:id="@+id/include_show_diary"
                             layout="@layout/layout_show_diary_original"
                             app:diaryViewModel="@{diaryViewModel}" />
 

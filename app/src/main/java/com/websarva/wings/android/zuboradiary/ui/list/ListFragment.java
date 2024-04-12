@@ -166,7 +166,10 @@ public class ListFragment extends Fragment {
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        // ツールバーのメニュー作成
+        int i = requireActivity().getSupportFragmentManager().getBackStackEntryCount();
+        Log.d("20240412", String.valueOf(i));
+
+        // アクションバーのメニュー作成
         createMenu();
 
         // 新規作成FAB設定
@@ -624,7 +627,7 @@ public class ListFragment extends Fragment {
     }
 
 
-    public void createMenu() {
+    private void createMenu() {
         //アクションバーオプションメニュー更新
         //https://qiita.com/Nabe1216/items/b26b03cbc750ac70a842
         MenuHost menuHost = requireActivity();
@@ -632,9 +635,7 @@ public class ListFragment extends Fragment {
     }
 
 
-
-    //前面フラグメントへ自フラグメントインスタンスを渡すために、匿名クラスではなくインナークラス作成。
-    public class ListMenuProvider implements MenuProvider {
+    private class ListMenuProvider implements MenuProvider {
 
         //アクションバーオプションメニュー設定。
         @Override
