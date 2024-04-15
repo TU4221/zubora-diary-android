@@ -682,7 +682,7 @@ public class EditDiaryFragment extends Fragment {
         FragmentManager parentFragmentManager = getParentFragmentManager();
         FragmentTransaction fragmentTransaction = parentFragmentManager.beginTransaction();
         fragmentTransaction.setReorderingAllowed(true);
-        //fragmentTransaction.addToBackStack(null); // ShowDiaryFragmentから戻る必要が無い為削除。
+        fragmentTransaction.addToBackStack(null);
         fragmentTransaction.replace(
                 R.id.front_fragmentContainerView_activity_main, ShowDiaryFragment.class, null);
         fragmentTransaction.commit();
@@ -717,10 +717,6 @@ public class EditDiaryFragment extends Fragment {
                 Bundle result = new Bundle();
                 parentFragmentManager.setFragmentResult(
                         "ToListFragment_EditDiaryFragmentRequestKey", result);
-
-                // TODO:EditDiaryを起動す時に処理するか、閉じるときに処理するか保留。
-                diaryViewModel.clear();
-
             }
         }
 
@@ -730,12 +726,11 @@ public class EditDiaryFragment extends Fragment {
             parentFragmentManager.setFragmentResult(
                     "ToCalendarFragment_EditDiaryFragmentRequestKey", result);
 
-            // TODO:EditDiaryを起動す時に処理するか、閉じるときに処理するか保留。
-            diaryViewModel.clear();
-
         }
 
-        ChangeFragment.popBackStackOnFrontFragment(parentFragmentManager);
+        Log.d("20240415", "edit" + parentFragmentManager.getBackStackEntryCount());
+
+        ChangeFragment.popBackStackOnFrontFragment(parentFragmentManager, false);
 
     }
 

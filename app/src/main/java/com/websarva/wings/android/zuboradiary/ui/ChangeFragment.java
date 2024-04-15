@@ -68,7 +68,7 @@ public class ChangeFragment {
     //      app:defaultNavHost="false"にするだけで解決するかと思ったが、
     //      その場合、NavHostFragmentのバックスタック対象のpopBackStackが機能しなかった(しっかり検証してない)ので、
     //      暫定として下記対応をとった。
-    public static void popBackStackOnFrontFragment(@NonNull FragmentManager manager) {
+    public static void popBackStackOnFrontFragment(@NonNull FragmentManager manager, Boolean popAllBackStack) {
         FragmentTransaction firstTransaction = manager.beginTransaction();
         firstTransaction.setPrimaryNavigationFragment(
                 manager.findFragmentById(R.id.front_fragmentContainerView_activity_main)
@@ -76,7 +76,30 @@ public class ChangeFragment {
         firstTransaction.commit();
         manager.executePendingTransactions();
 
-        manager.popBackStack();
+        // MEMO:全てのバックスタックをポップする場合は、
+        //      それまでのフラグメント処理(add,replace,remove)をバックスタックに追加する必要あり。
+        if (popAllBackStack) {
+            manager.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+        } else {
+            manager.popBackStack();
+        }
+
+        FragmentTransaction secondTransaction = manager.beginTransaction();
+        secondTransaction.setPrimaryNavigationFragment(
+                manager.findFragmentById(R.id.nav_host_fragment_activity_main)
+        );
+        secondTransaction.commit();
+    }
+
+    public static void popAllBackStackOnFrontFragment(@NonNull FragmentManager manager) {
+        FragmentTransaction firstTransaction = manager.beginTransaction();
+        firstTransaction.setPrimaryNavigationFragment(
+                manager.findFragmentById(R.id.front_fragmentContainerView_activity_main)
+        );
+        firstTransaction.commit();
+        manager.executePendingTransactions();
+
+        manager.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
 
         FragmentTransaction secondTransaction = manager.beginTransaction();
 

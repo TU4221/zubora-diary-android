@@ -184,10 +184,11 @@ public class ListFragment extends Fragment {
                 menuHost.removeMenuProvider(listmenuProvider);
 
                 // ViewModel へデータセット
+                diaryViewModel.clear();
                 diaryViewModel.setLiveLoadingDate("");
                 diaryViewModel.setIsNewEditDiary(true);
 
-                //日記編集(新規作成)フラグメント起動。
+                // 日記編集(新規作成)フラグメント起動。
                 FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
                 FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
                 fragmentTransaction.setReorderingAllowed(true);
@@ -458,6 +459,7 @@ public class ListFragment extends Fragment {
                     menuHost.removeMenuProvider(listmenuProvider);
 
                     // ViewModel へデータセット
+                    diaryViewModel.clear();
                     diaryViewModel.setLiveLoadingDate((String) item.get("Date"));
 
                     //日記表示フラグメント起動。

@@ -65,7 +65,6 @@ public class CalendarFragment extends Fragment {
     private CalendarViewModel calendarViewModel;
     private EditDiaryViewModel diaryViewModel;
     private LocalDate today = LocalDate.now();
-    private LocalDate selectedDate;
     private calendarMenuProvider calendarMenuProvider = new calendarMenuProvider();
 
 
@@ -76,6 +75,7 @@ public class CalendarFragment extends Fragment {
         ViewModelProvider provider = new ViewModelProvider(requireActivity());
         this.calendarViewModel = provider.get(CalendarViewModel.class);
         this.diaryViewModel = provider.get(EditDiaryViewModel.class);
+        this.diaryViewModel.clear(); // ここでクリアする理由はFABリスナ設定コードに記載
 
         // 戻るボタン押下時の処理
         requireActivity().getOnBackPressedDispatcher().addCallback(
@@ -84,7 +84,6 @@ public class CalendarFragment extends Fragment {
                     @Override
                     public void handleOnBackPressed() {
                         // 処理なし(無効化)
-
                     }
                 }
         );
@@ -97,7 +96,12 @@ public class CalendarFragment extends Fragment {
                 new FragmentResultListener() {
                     @Override
                     public void onFragmentResult(@NonNull String requestKey, @NonNull Bundle result) {
+                        Log.d("20240415", "ToCalendarFragment_EditDiaryFragmentRequestKey");
                         createMenu();
+                        LocalDate selectedDate =
+                                CalendarFragment.this.calendarViewModel.getSelectedDate();
+                        CalendarFragment.this.diaryViewModel.clear();
+                        selectDate(selectedDate);
 
                     }
                 }
@@ -110,7 +114,16 @@ public class CalendarFragment extends Fragment {
                 new FragmentResultListener() {
                     @Override
                     public void onFragmentResult(@NonNull String requestKey, @NonNull Bundle result) {
+                        Log.d("20240415", "ToCalendarFragment_ShowDiaryFragmentRequestKey");
                         createMenu();
+
+                        CalendarView calendarView = CalendarFragment.this.binding.calendar;
+                        calendarView.notifyCalendarChanged();
+                        String stringDate =
+                                CalendarFragment.this.diaryViewModel.getLiveDate().getValue();
+                        LocalDate localDate = DateConverter.toLocalDate(stringDate);
+                        CalendarFragment.this.diaryViewModel.clear();
+                        selectDate(localDate);
 
                     }
                 }
@@ -120,7 +133,6 @@ public class CalendarFragment extends Fragment {
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-
         // データバインディング設定
         this.binding = FragmentCalendarBinding.inflate(inflater, container, false);
         View root = this.binding.getRoot();
@@ -228,9 +240,12 @@ public class CalendarFragment extends Fragment {
         floatActionButtonEditDiary.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // TODO:下記プログラムはテスト用。後で修正。
-
                 // DiaryViewModel へデータセット
+                // MEMO:カレンダーフラグメント起動(OnCreate)時にクリアする。
+                //      下記タイミングでクリアするとクリア状態が一瞬商事される。
+                //      DiaryViewModelの表示される変数は日付選択時に更新され、
+                //      それ以外の変数は更新されないので"OnCreate"時のみクリアを行えば良いと判断。
+                //diaryViewModel.clear();
                 LocalDate selectedDate = calendarViewModel.getSelectedDate();
                 String stringDate = DateConverter.toStringLocalDate(selectedDate);
                 diaryViewModel.setLiveLoadingDate(stringDate);
@@ -247,8 +262,7 @@ public class CalendarFragment extends Fragment {
                     diaryViewModel.setIsNewEditDiary(true);
                 }
 
-
-
+                // 日記編集(新規作成)フラグメント起動。
                 FragmentManager fragmentManager = requireActivity().getSupportFragmentManager();
                 ChangeFragment.replaceFragment(
                         fragmentManager,
@@ -587,9 +601,11 @@ public class CalendarFragment extends Fragment {
             calendar.notifyDateChanged(date);
 
             updateActionBarDate();
-            showSelectedDiary();
 
         }
+
+        showSelectedDiary();
+
     }
 
     // アクションバー表示日付更新。

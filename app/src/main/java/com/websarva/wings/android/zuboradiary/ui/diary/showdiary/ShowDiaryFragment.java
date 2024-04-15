@@ -29,6 +29,8 @@ import android.widget.Toast;
 
 import com.websarva.wings.android.zuboradiary.R;
 import com.websarva.wings.android.zuboradiary.databinding.FragmentShowDiaryBinding;
+import com.websarva.wings.android.zuboradiary.ui.ChangeFragment;
+import com.websarva.wings.android.zuboradiary.ui.calendar.CalendarFragment;
 import com.websarva.wings.android.zuboradiary.ui.editdiary.EditDiaryFragment;
 import com.websarva.wings.android.zuboradiary.ui.editdiary.EditDiaryViewModel;
 import com.websarva.wings.android.zuboradiary.ui.list.ListFragment;
@@ -212,7 +214,7 @@ public class ShowDiaryFragment extends Fragment {
         MenuHost menuHost = requireActivity();
         menuHost.removeMenuProvider(showDiaryMenuProvider);
 
-        //ナビフラグメントがリストフラグメントの時、リスト更新。
+        // ナビフラグメントがリストフラグメントの時、リスト更新。
         if (navChildFragment instanceof ListFragment) {
             Bundle result = new Bundle();
             parentFragmentManager.setFragmentResult(
@@ -220,13 +222,16 @@ public class ShowDiaryFragment extends Fragment {
 
         }
 
-        // TODO:EditDiaryを起動す時に処理するか、閉じるときに処理するか保留。
-        diaryViewModel.clear();
+        // ナビフラグメントがカレンダーフラグメントの時、カレンダー更新。
+        if (navChildFragment instanceof CalendarFragment) {
+            Bundle result = new Bundle();
+            parentFragmentManager.setFragmentResult(
+                    "ToCalendarFragment_ShowDiaryFragmentRequestKey", result);
 
-        FragmentTransaction fragmentTransaction = parentFragmentManager.beginTransaction();
-        fragmentTransaction.setReorderingAllowed(true);
-        fragmentTransaction.remove(ShowDiaryFragment.this);
-        fragmentTransaction.commit();
+        }
+
+        ChangeFragment.popBackStackOnFrontFragment(parentFragmentManager, true);
+
     }
 
 }
