@@ -416,8 +416,8 @@ public class ListFragment extends Fragment {
         public String date;
         public DiaryListDayViewHolder(View itemView) {
             super(itemView);
-            _tvRowDiaryListDay_DayOfWeek = itemView.findViewById(R.id.tvRowDiaryListDay_DayOfWeek);
-            _tvRowDiaryListDay_Day = itemView.findViewById(R.id.tvRowDiaryListDay_Day);
+            _tvRowDiaryListDay_DayOfWeek = itemView.findViewById(R.id.text_day_of_week);
+            _tvRowDiaryListDay_Day = itemView.findViewById(R.id.text_day_of_month);
             _tvRowDiaryListDay_Title = itemView.findViewById(R.id.tvRowDiaryListDay_Title);
         }
     }
