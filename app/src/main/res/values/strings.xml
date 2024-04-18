@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">ズボラ日記</string>
     <string name="title_list">List</string>
+    <string name="title_word_search">WordSearch</string>
     <string name="title_calendar">Calender</string>
     <string name="title_notifications">Notifications</string>
 
@@ -18,6 +19,8 @@
 
     <string name="row_list_year">年</string>
     <string name="row_list_month">月</string>
+
+    <string name="word_search_toolbar_menu_search">ワード検索</string>
 
     <string name="show_diary_toolbar_title">0000年00月00日(月)</string>
     <string name="show_diary_toolbar_option_edit_diary">日記編集</string>

@@ -43,7 +43,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.websarva.wings.android.zuboradiary.databinding.FragmentEditDiaryBinding;
-import com.websarva.wings.android.zuboradiary.ui.ChangeFragment;
+import com.websarva.wings.android.zuboradiary.ChangeFragment;
 import com.websarva.wings.android.zuboradiary.ui.calendar.CalendarFragment;
 import com.websarva.wings.android.zuboradiary.ui.diary.showdiary.ShowDiaryFragment;
 import com.websarva.wings.android.zuboradiary.R;

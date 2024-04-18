@@ -37,23 +37,29 @@ public class MainActivity extends AppCompatActivity {
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
+        // Keyboardクラス設定
+        Keyboard.setInputMethodManager(this);
+
 
         //MainActivityでアクションバーを使用したくないので、空のツールバーをセット。
         Toolbar mainToolbar = binding.mtbMainToolbar;
         setSupportActionBar(mainToolbar);
 
-
-        BottomNavigationView navView = findViewById(R.id.nav_view);
-        // Passing each menu ID as a set of Ids because each
-        // menu should be considered as top level destinations.
+        BottomNavigationView navView = binding.navView;
         navView.setOnItemReselectedListener(new NavViewOnTabSelectedListener());
 
-        AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(
-                R.id.navigation_list, R.id.navigation_calendar, R.id.navigation_notifications)
-                .build();
-        NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_activity_main);
-        NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
-        NavigationUI.setupWithNavController(binding.navView, navController);
+        NavController navController =
+                Navigation.findNavController(this, R.id.nav_host_fragment_activity_main);
+        // Passing each menu ID as a set of Ids because each
+        // menu should be considered as top level destinations.
+        // HACK:ナビゲーションによるアクションバータイトル更新不要。
+        //      デフォルトで記述してあり、現時点では他に機能しているか判断できないためコメントアウトで機能停止。
+        /*AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(
+                R.id.navigation_list, R.id.navigation_calendar,
+                R.id.navigation_notifications
+        ).build();
+        NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);*/
+        NavigationUI.setupWithNavController(navView, navController);
     }
 
     public class NavViewOnTabSelectedListener implements NavigationBarView.OnItemReselectedListener {

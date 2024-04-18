@@ -9,7 +9,6 @@ import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.view.MenuHost;
 import androidx.core.view.MenuProvider;
-import androidx.core.widget.NestedScrollView;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
@@ -17,7 +16,6 @@ import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -29,13 +27,11 @@ import android.widget.Toast;
 
 import com.websarva.wings.android.zuboradiary.R;
 import com.websarva.wings.android.zuboradiary.databinding.FragmentShowDiaryBinding;
-import com.websarva.wings.android.zuboradiary.ui.ChangeFragment;
+import com.websarva.wings.android.zuboradiary.ChangeFragment;
 import com.websarva.wings.android.zuboradiary.ui.calendar.CalendarFragment;
 import com.websarva.wings.android.zuboradiary.ui.editdiary.EditDiaryFragment;
 import com.websarva.wings.android.zuboradiary.ui.editdiary.EditDiaryViewModel;
 import com.websarva.wings.android.zuboradiary.ui.list.ListFragment;
-
-import org.w3c.dom.Text;
 
 public class ShowDiaryFragment extends Fragment {
 

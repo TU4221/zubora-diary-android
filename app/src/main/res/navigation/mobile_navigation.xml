@@ -3,13 +3,25 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/mobile_navigation"
-    app:startDestination="@+id/navigation_calendar">
+    app:startDestination="@+id/navigation_list">
 
     <fragment
         android:id="@+id/navigation_list"
         android:name="com.websarva.wings.android.zuboradiary.ui.list.ListFragment"
         android:label="@string/title_list"
-        tools:layout="@layout/fragment_list" />
+        tools:layout="@layout/fragment_list" >
+
+        <action
+            android:id="@+id/action_navigation_list_to_navigation_word_search"
+            app:destination="@id/navigation_word_search"/>
+
+    </fragment>
+
+    <fragment
+        android:id="@+id/navigation_word_search"
+        android:name="com.websarva.wings.android.zuboradiary.ui.list.wordsearch.WordSearchFragment"
+        android:label="@string/title_word_search"
+        tools:layout="@layout/fragment_word_search" />
 
     <fragment
         android:id="@+id/navigation_calendar"

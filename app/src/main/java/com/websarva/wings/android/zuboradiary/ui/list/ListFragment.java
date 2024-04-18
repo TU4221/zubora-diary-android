@@ -11,7 +11,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
@@ -24,9 +23,10 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentResultListener;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.Lifecycle;
-import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.NavController;
+import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.LinearSmoothScroller;
@@ -38,7 +38,6 @@ import com.websarva.wings.android.zuboradiary.ui.editdiary.EditDiaryFragment;
 import com.websarva.wings.android.zuboradiary.R;
 import com.websarva.wings.android.zuboradiary.databinding.FragmentListBinding;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -672,10 +671,9 @@ public class ListFragment extends Fragment {
 
             //ワード検索フラグメント起動
             if (menuItem.getItemId() == R.id.listToolbarOptionWordSearch) {
-                // **********注意**********
-                // TODO:ここにワード検索フラグメント起動プログラム作成(後回し)
-                // 下記プログラムはテスト
-                Toast.makeText(getContext(), menuItem.toString(), Toast.LENGTH_SHORT).show();
+                NavHostFragment navHostFragment = (NavHostFragment) getParentFragment();
+                NavController navController = navHostFragment.getNavController();
+                navController.navigate(R.id.action_navigation_list_to_navigation_word_search);
                 return true;
 
             //リスト先頭年月切り替えダイアログ起動

@@ -1,15 +1,13 @@
 package com.websarva.wings.android.zuboradiary.ui.calendar;
 
 import android.app.Application;
-import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 
-import com.websarva.wings.android.zuboradiary.ui.DateConverter;
+import com.websarva.wings.android.zuboradiary.DateConverter;
 
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;

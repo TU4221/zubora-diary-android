@@ -11,7 +11,6 @@ import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
@@ -38,14 +37,12 @@ import com.websarva.wings.android.zuboradiary.R;
 import com.websarva.wings.android.zuboradiary.databinding.CalendarDayBinding;
 import com.websarva.wings.android.zuboradiary.databinding.CalendarHeaderBinding;
 import com.websarva.wings.android.zuboradiary.databinding.FragmentCalendarBinding;
-import com.websarva.wings.android.zuboradiary.databinding.LayoutShowDiaryOriginalBinding;
-import com.websarva.wings.android.zuboradiary.ui.ChangeFragment;
-import com.websarva.wings.android.zuboradiary.ui.DateConverter;
+import com.websarva.wings.android.zuboradiary.ChangeFragment;
+import com.websarva.wings.android.zuboradiary.DateConverter;
 import com.websarva.wings.android.zuboradiary.ui.editdiary.EditDiaryFragment;
 import com.websarva.wings.android.zuboradiary.ui.editdiary.EditDiaryViewModel;
 
 import com.kizitonwose.calendar.view.CalendarView;
-import com.websarva.wings.android.zuboradiary.ui.list.DatePickerDialogFragment;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;

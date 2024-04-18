@@ -22,7 +22,7 @@ public class ListViewModel extends AndroidViewModel {
             = new MutableLiveData<>(new ArrayList<>());
     private MutableLiveData<Boolean> isVisibleHeaderSectionBar = new MutableLiveData<>(false);
     private MutableLiveData<Boolean> isLoading = new MutableLiveData<>(false);
-    private final int LOAD_ITEM_NUM = 10;
+    private final int LOAD_ITEM_NUM = 15; // TODO:仮数値の為、最後に設定
     private int loadItemOffset = 0;
     private String sortConditionDate = "";
 
