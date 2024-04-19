@@ -19,4 +19,19 @@ public class Keyboard {
                         InputMethodManager.HIDE_NOT_ALWAYS
                 );
     }
+    /*public static void show(View focusView) {
+        inputMethodManager
+                .showSoftInput(
+                focusView,
+                InputMethodManager.SHOW_IMPLICIT
+                );
+    }*/
+    public static void show() {
+
+        inputMethodManager
+                .toggleSoftInput(
+                        InputMethodManager.SHOW_FORCED,
+                        InputMethodManager.HIDE_NOT_ALWAYS
+                );
+    }
 }

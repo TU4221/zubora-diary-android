@@ -9,6 +9,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.SearchView;
 import androidx.core.view.MenuHost;
 import androidx.core.view.MenuProvider;
 import androidx.fragment.app.Fragment;
@@ -29,7 +30,6 @@ import android.view.ViewTreeObserver;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
-import android.widget.SearchView;
 
 import com.google.android.material.transition.MaterialSharedAxis;
 import com.websarva.wings.android.zuboradiary.Keyboard;
@@ -106,6 +106,7 @@ public class WordSearchFragment extends Fragment {
                         search.setIconifiedByDefault(false); // "false"でバー状態を常時表示
                         int color = getResources().getColor(R.color.white);
                         search.setBackgroundColor(color);
+
                         search.setOnQueryTextFocusChangeListener(new View.OnFocusChangeListener() {
                             @Override
                             public void onFocusChange(View v, boolean hasFocus) {
@@ -125,6 +126,11 @@ public class WordSearchFragment extends Fragment {
                                 );
                             }
                         });
+
+                        // TODO:20240419上手くいかない
+                        //search.requestFocus();
+                        search.requestFocusFromTouch();
+                        Keyboard.show();
 
                         search.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
                             @Override

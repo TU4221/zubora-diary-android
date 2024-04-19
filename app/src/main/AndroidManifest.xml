@@ -12,10 +12,12 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.ZuboraDiary"
         tools:targetApi="31">
+        <!--MEMO:"android:windowSoftInputMode"は"BottomNavigationView"をキーボードの上に表示させない為の設定-->
         <activity
             android:name=".MainActivity"
             android:exported="true"
-            android:label="@string/app_name">
+            android:label="@string/app_name"
+            android:windowSoftInputMode="adjustPan">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
