@@ -50,6 +50,7 @@ import com.websarva.wings.android.zuboradiary.R;
 import com.websarva.wings.android.zuboradiary.ui.editdiaryselectitemtitle.EditDiarySelectItemTitleFragment;
 import com.websarva.wings.android.zuboradiary.ui.editdiaryselectitemtitle.EditDiarySelectItemTitleViewModel;
 import com.websarva.wings.android.zuboradiary.ui.list.ListFragment;
+import com.websarva.wings.android.zuboradiary.ui.list.wordsearch.WordSearchFragment;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -677,6 +678,12 @@ public class EditDiaryFragment extends Fragment {
         if (navChildFragment instanceof ListFragment) {
             ListFragment listFragment = (ListFragment) navChildFragment;
             listFragment.updateList();
+        }
+
+        //ナビフラグメントがリストフラグメントの時、リスト更新。
+        if (navChildFragment instanceof WordSearchFragment) {
+            WordSearchFragment wordSearchFragment = (WordSearchFragment) navChildFragment;
+            wordSearchFragment.updateList();
         }
 
         FragmentManager parentFragmentManager = getParentFragmentManager();

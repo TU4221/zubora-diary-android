@@ -227,7 +227,9 @@ public class EditDiaryViewModel extends AndroidViewModel {
         diary.setCondition(this.strCondition.getValue());
         diary.setTitle(this.title.getValue().trim());
         diary.setItem1Title(this.items[0].title.getValue().trim());
+        Log.d("20240424", this.items[0].title.getValue().trim());
         diary.setItem1Comment(this.items[0].comment.getValue().trim());
+        Log.d("20240424", this.items[0].comment.getValue().trim());
         diary.setItem2Title(this.items[1].title.getValue().trim());
         diary.setItem2Comment(this.items[1].comment.getValue().trim());
         diary.setItem3Title(this.items[2].title.getValue().trim());

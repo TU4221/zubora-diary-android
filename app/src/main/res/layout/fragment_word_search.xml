@@ -1,33 +1,76 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/frame_layout_background"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@color/gray"
-    tools:context=".ui.list.wordsearch.WordSearchFragment">
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
 
-    <TextView
-        android:id="@+id/text_no_word_search_results"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+    <data>
+        <import type="android.view.View" />
+        <variable
+            name="word_search_view_model"
+            type="com.websarva.wings.android.zuboradiary.ui.list.wordsearch.WordSearchViewModel" />
 
-    <LinearLayout
-        android:id="@+id/liner_layout_word_search_results"
+    </data>
+
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical">
+        tools:context=".ui.list.wordsearch.WordSearchFragment">
 
         <TextView
-            android:id="@+id/text_word_search_results"
+            android:id="@+id/text_word_search_no_results"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
+            android:layout_height="match_parent"
+            android:visibility="@{word_search_view_model.isVisibleNoResultMessage ? View.VISIBLE : View.GONE}"
+            android:text="@string/word_search_no_results_comment"
+            android:gravity="center_horizontal"
+            android:paddingTop="100dp" />
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/recycler_word_search_results"
+        <LinearLayout
+            android:id="@+id/liner_layout_word_search_results"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:visibility="@{word_search_view_model.isVisibleResults ? View.VISIBLE : View.GONE}">
+
+            <TextView
+                android:id="@+id/text_word_search_results"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@{Integer.toString(word_search_view_model.resultNum) + @string/word_search_results_num_comment}"
+                android:paddingHorizontal="8dp"
+                android:paddingVertical="8dp"/>
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/recycler_word_search_results"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:scrollbars="none" />
+
+                <TextView
+                    android:id="@+id/text_header_section_bar"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="0000年00月"
+                    android:background="?attr/colorPrimaryContainer" />
+
+            </FrameLayout>
+
+            <ProgressBar
+                android:id="@+id/progress_bar_word_search_results"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="?attr/colorSurface"
+                android:visibility="@{word_search_view_model.isLoading ? View.VISIBLE : View.GONE}" />
+
+        </LinearLayout>
+
+        <View
+            android:id="@+id/view_for_hiding_keyboard"
             android:layout_width="match_parent"
             android:layout_height="match_parent"/>
 
-    </LinearLayout>
-
-</FrameLayout>
+    </FrameLayout>
+</layout>

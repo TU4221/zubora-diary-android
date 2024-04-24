@@ -32,6 +32,7 @@ import com.websarva.wings.android.zuboradiary.ui.calendar.CalendarFragment;
 import com.websarva.wings.android.zuboradiary.ui.editdiary.EditDiaryFragment;
 import com.websarva.wings.android.zuboradiary.ui.editdiary.EditDiaryViewModel;
 import com.websarva.wings.android.zuboradiary.ui.list.ListFragment;
+import com.websarva.wings.android.zuboradiary.ui.list.wordsearch.WordSearchFragment;
 
 public class ShowDiaryFragment extends Fragment {
 
@@ -215,6 +216,14 @@ public class ShowDiaryFragment extends Fragment {
             Bundle result = new Bundle();
             parentFragmentManager.setFragmentResult(
                     "ToListFragment_ShowDiaryFragmentRequestKey", result);
+
+        }
+
+        // ナビフラグメントがワード検索フラグメントの時、リスト更新。
+        if (navChildFragment instanceof WordSearchFragment) {
+            Bundle result = new Bundle();
+            parentFragmentManager.setFragmentResult(
+                    "ToWordSearchFragment_ShowDiaryFragmentRequestKey", result);
 
         }
 

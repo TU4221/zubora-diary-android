@@ -7,6 +7,7 @@ import androidx.room.Update;
 
 import com.google.common.util.concurrent.ListenableFuture;
 import com.websarva.wings.android.zuboradiary.ui.list.ListItemDiary;
+import com.websarva.wings.android.zuboradiary.ui.list.wordsearch.WordSearchResultListItemDiary;
 
 import java.util.List;
 
@@ -28,7 +29,42 @@ public interface DiaryDAO {
     @Query("SELECT date, title, imagePath FROM diaries WHERE date < :startDate ORDER BY date DESC LIMIT :num OFFSET :offset")
     public ListenableFuture<List<ListItemDiary>> selectDiaryList(int num, int offset , String startDate);
 
-    @Query("SELECT date FROM diaries WHERE date Like :dateYearMonth || '%'") // ||：文字連結
+    @Query("SELECT COUNT(*) " +
+            "FROM diaries " +
+            "WHERE title LIKE '%' || :word || '%' " +
+            "OR item_1_title LIKE '%' || :word || '%'" +
+            "OR item_1_comment LIKE '%' || :word || '%'" +
+            "OR item_2_title LIKE '%' || :word || '%'" +
+            "OR item_2_comment LIKE '%' || :word || '%'" +
+            "OR item_3_title LIKE '%' || :word || '%'" +
+            "OR item_3_comment LIKE '%' || :word || '%'" +
+            "OR item_4_title LIKE '%' || :word || '%'" +
+            "OR item_4_comment LIKE '%' || :word || '%'" +
+            "OR item_5_title LIKE '%' || :word || '%'" +
+            "OR item_5_comment LIKE '%' || :word || '%'")
+    public ListenableFuture<Integer> countWordSearchResults(String word);
+
+    @Query("SELECT date, title, item_1_title, item_1_comment, " +
+                "item_2_title, item_2_comment " +
+                "item_3_title, item_3_comment " +
+                "item_4_title, item_4_comment " +
+                "item_5_title, item_5_comment " +
+            "FROM diaries " +
+            "WHERE title LIKE '%' || :word || '%' " +
+                "OR item_1_title LIKE '%' || :word || '%'" +
+                "OR item_1_comment LIKE '%' || :word || '%'" +
+                "OR item_2_title LIKE '%' || :word || '%'" +
+                "OR item_2_comment LIKE '%' || :word || '%'" +
+                "OR item_3_title LIKE '%' || :word || '%'" +
+                "OR item_3_comment LIKE '%' || :word || '%'" +
+                "OR item_4_title LIKE '%' || :word || '%'" +
+                "OR item_4_comment LIKE '%' || :word || '%'" +
+                "OR item_5_title LIKE '%' || :word || '%'" +
+                "OR item_5_comment LIKE '%' || :word || '%'" +
+            "ORDER BY date DESC LIMIT :num OFFSET :offset")
+    public ListenableFuture<List<WordSearchResultListItemDiary>> selectWordSearchResultList(int num, int offset, String word);
+
+    @Query("SELECT date FROM diaries WHERE date LIKE :dateYearMonth || '%'") // ||：文字連結
     public ListenableFuture<List<String>> selectDiaryDateList(String dateYearMonth);
 
     @Insert

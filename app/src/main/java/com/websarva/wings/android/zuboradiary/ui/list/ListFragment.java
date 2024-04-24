@@ -44,11 +44,13 @@ import java.util.List;
 import java.util.Map;
 
 import com.websarva.wings.android.zuboradiary.ui.editdiary.EditDiaryViewModel;
+import com.websarva.wings.android.zuboradiary.ui.list.wordsearch.WordSearchViewModel;
 
 public class ListFragment extends Fragment {
 
     private ListViewModel listViewModel;
     private EditDiaryViewModel diaryViewModel;
+    private WordSearchViewModel wordSearchViewModel;
     private FragmentListBinding binding;
     private ListMenuProvider listmenuProvider = new ListMenuProvider();
     private TextView textListHeaderSectionBar;
@@ -65,6 +67,7 @@ public class ListFragment extends Fragment {
         ViewModelProvider provider = new ViewModelProvider(requireActivity());
         this.listViewModel = provider.get(ListViewModel.class);
         this.diaryViewModel = provider.get(EditDiaryViewModel.class);
+        this.wordSearchViewModel = provider.get(WordSearchViewModel.class);
 
         // 戻るボタン押下時の処理
         requireActivity().getOnBackPressedDispatcher().addCallback(
@@ -497,7 +500,7 @@ public class ListFragment extends Fragment {
 
     //日記リスト(年月)リサイクルビューアダプタクラス
 
-    //private class DiaryListYearMonthAdapter extends RecyclerView.Adapter<DiaryListYearMonthViewHolder> {
+    //private class WordSearchResultYearMonthListAdapter extends RecyclerView.Adapter<DiaryListYearMonthViewHolder> {
     public class DiaryListYearMonthAdapter extends RecyclerView.Adapter<DiaryListYearMonthViewHolder> {
         private List<Map<String, Object>> _diaryListYearMonth = new ArrayList<>();
         private CustomSimpleCallback simpleCallback;
@@ -651,7 +654,7 @@ public class ListFragment extends Fragment {
 
             /*
             //メモ
-            //下記不具合が発生する為、 DiaryListYearMonthAdapter#onBindViewHolder() でアクションバーのタイトルをセットする。
+            //下記不具合が発生する為、 WordSearchResultYearMonthListAdapter#onBindViewHolder() でアクションバーのタイトルをセットする。
             //初めのフラグメント表示時は下記プログラムは問題ないが、
             //子フラグメントでこのフラグメントを隠して、子フラグメントを閉じるときに下記プログラムを処理させると、
             //ViewHolder が null で返されるため、テキストを取得しようとすると例外が発生する。
@@ -671,6 +674,8 @@ public class ListFragment extends Fragment {
 
             //ワード検索フラグメント起動
             if (menuItem.getItemId() == R.id.listToolbarOptionWordSearch) {
+                ListFragment.this.wordSearchViewModel.initialize();
+
                 NavHostFragment navHostFragment = (NavHostFragment) getParentFragment();
                 NavController navController = navHostFragment.getNavController();
                 navController.navigate(R.id.action_navigation_list_to_navigation_word_search);
