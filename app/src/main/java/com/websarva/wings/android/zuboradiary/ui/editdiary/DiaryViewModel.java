@@ -14,7 +14,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
-public class EditDiaryViewModel extends AndroidViewModel {
+public class DiaryViewModel extends AndroidViewModel {
 
     public class Item {
         public MutableLiveData<Boolean> isVisible = new MutableLiveData<>(false);
@@ -50,7 +50,7 @@ public class EditDiaryViewModel extends AndroidViewModel {
     public Item[] items = new Item[MAX_ITEM_NUM];
 
 
-    public EditDiaryViewModel(@NonNull Application application) {
+    public DiaryViewModel(@NonNull Application application) {
         super(application);
         diaryRepository = new DiaryRepository(getApplication());
         for (int i = 0; i < items.length; i++) {

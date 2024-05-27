@@ -9,7 +9,7 @@
                   https://qiita.com/nanoyatsu/items/afad39a63d42d6fa3ac8 -->
         <variable
             name="diaryViewModel"
-            type="com.websarva.wings.android.zuboradiary.ui.editdiary.EditDiaryViewModel" />
+            type="com.websarva.wings.android.zuboradiary.ui.editdiary.DiaryViewModel" />
     </data>
 
     <FrameLayout

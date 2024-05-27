@@ -17,8 +17,8 @@ import java.util.List;
 
 public class ListViewModel extends AndroidViewModel {
 
-    private ListRepository listRepository;
-    private MutableLiveData<List<ListItemDiary>> loadedListItemDiaries
+    private DiaryListRepository diaryListRepository;
+    private MutableLiveData<List<DiaryListItem>> loadedListItemDiaries
             = new MutableLiveData<>(new ArrayList<>());
     private MutableLiveData<Boolean> isVisibleHeaderSectionBar = new MutableLiveData<>(false);
     private MutableLiveData<Boolean> isLoading = new MutableLiveData<>(false);
@@ -29,7 +29,7 @@ public class ListViewModel extends AndroidViewModel {
 
     public ListViewModel(@NonNull Application application) {
         super(application);
-        listRepository = new ListRepository(getApplication());
+        diaryListRepository = new DiaryListRepository(getApplication());
     }
 
     public enum LoadType {
@@ -37,7 +37,7 @@ public class ListViewModel extends AndroidViewModel {
     }
     public void loadList(LoadType loadType) {
         Log.d("リスト読込確認", "起動");
-        List<ListItemDiary> loadedData = new ArrayList<>();
+        List<DiaryListItem> loadedData = new ArrayList<>();
         int loadItemNum;
         if (loadType == LoadType.NEW) {
             loadItemNum = this.LOAD_ITEM_NUM;
@@ -52,7 +52,7 @@ public class ListViewModel extends AndroidViewModel {
 
         if (this.sortConditionDate.equals("")) {
             loadedData.addAll(
-                    this.listRepository.getListItemDiaries(
+                    this.diaryListRepository.getListItemDiaries(
                             loadItemNum,
                             this.loadItemOffset,
                             null
@@ -60,7 +60,7 @@ public class ListViewModel extends AndroidViewModel {
             );
         } else {
             loadedData.addAll(
-                    this.listRepository.getListItemDiaries(
+                    this.diaryListRepository.getListItemDiaries(
                             loadItemNum,
                             this.loadItemOffset,
                             this.sortConditionDate
@@ -72,13 +72,13 @@ public class ListViewModel extends AndroidViewModel {
         this.loadedListItemDiaries.setValue(loadedData);
     }
 
-    public void updateSortConditionDate(int year, int month ,int dayOfMonth) {
+    public void updateSortConditionDate(int year, int month) {
         // 日付データ作成。
         // https://qiita.com/hanaaaa/items/8555aaabc6b949ec507d
         // https://nainaistar.hatenablog.com/entry/2021/05/13/120000
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
             LocalDate lastDayOfMonthDate = LocalDate
-                    .of(year, month, dayOfMonth)
+                    .of(year, month, 1)
                     .with(TemporalAdjusters.lastDayOfMonth());
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy年MM月dd日");
             this.sortConditionDate= lastDayOfMonthDate.format(formatter);
@@ -86,13 +86,12 @@ public class ListViewModel extends AndroidViewModel {
     }
 
     public void deleteDiary(String date) {
-        // TODO:テスト中の為コメントアウト。終了次第戻す。
-        //listRepository.deleteDiary(date);
+        diaryListRepository.deleteDiary(date);
 
-        List<ListItemDiary> loadedData = this.loadedListItemDiaries.getValue();
-        Iterator<ListItemDiary> iterator = loadedData.iterator();
+        List<DiaryListItem> loadedData = this.loadedListItemDiaries.getValue();
+        Iterator<DiaryListItem> iterator = loadedData.iterator();
         while (iterator.hasNext()) {
-            ListItemDiary item = iterator.next();
+            DiaryListItem item = iterator.next();
             if (item.getDate().equals(date)) {
                 iterator.remove();
                 // break;
@@ -102,11 +101,11 @@ public class ListViewModel extends AndroidViewModel {
     }
 
     public int countDiaries() {
-        return this.listRepository.countDiaries();
+        return this.diaryListRepository.countDiaries();
     }
 
 
-    public LiveData<List<ListItemDiary>> getLoadedListItemDiaries() {
+    public LiveData<List<DiaryListItem>> getLoadedListItemDiaries() {
         return this.loadedListItemDiaries;
     }
 

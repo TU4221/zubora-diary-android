@@ -1,6 +1,12 @@
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
+
+    // Navigation SafeArgs 機能追加
+    // MEMO:下記追加同期後、Gradleの他の箇所を変更してから同期するとDirectionsクラスがエラーになる。(Buildは通る)
+    //      下記削除同期後、再度追加同期を行えばエラーは消える。
+    //      この解決策を発見する前にキャッシュクリア、再起動を行ったが関係なさそう。
+    id("androidx.navigation.safeargs")
 }
 
 android {
@@ -63,6 +69,8 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.2")
     implementation("androidx.navigation:navigation-fragment:2.7.5")
     implementation("androidx.navigation:navigation-ui:2.7.5")
+    implementation("androidx.navigation:navigation-fragment-ktx:2.7.7")
+    implementation("androidx.navigation:navigation-ui-ktx:2.7.7")
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")

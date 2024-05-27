@@ -3,35 +3,188 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/mobile_navigation"
-    app:startDestination="@+id/navigation_list">
+    app:startDestination="@+id/nested_navigation_list">
+
+    <navigation
+        android:id="@+id/nested_navigation_list"
+        app:startDestination="@+id/navigation_diary_list_fragment">
+        <fragment
+            android:id="@+id/navigation_diary_list_fragment"
+            android:name="com.websarva.wings.android.zuboradiary.ui.list.DiaryListFragment"
+            tools:layout="@layout/fragment_diary_list"
+            android:label="@string/title_list" >
+            <action
+                android:id="@+id/action_navigation_diary_list_fragment_to_word_search_fragment"
+                app:destination="@id/navigation_word_search_fragment"/>
+            <action
+                android:id="@+id/action_navigation_diary_list_fragment_to_show_diary_fragment"
+                app:destination="@id/navigation_show_diary_fragment"/>
+            <action
+                android:id="@+id/action_navigation_diary_list_fragment_to_edit_diary_fragment"
+                app:destination="@id/nested_navigation_edit_diary">
+                <argument
+                    android:name="isStartDiaryFragment"
+                    app:argType="boolean" />
+            </action>
+            <action
+                android:id="@+id/action_diary_list_fragment_to_date_picker_dialog"
+                app:destination="@id/navigation_date_picker_dialog_for_diary_list_fragment"/>
+            <action
+                android:id="@+id/action_diary_list_fragment_to_delete_confirmation_dialog"
+                app:destination="@id/navigation_delete_confirmation_dialog_for_diary_list_fragment"/>
+        </fragment>
+        <dialog
+            android:id="@+id/navigation_date_picker_dialog_for_diary_list_fragment"
+            android:name="com.websarva.wings.android.zuboradiary.ui.list.DatePickerDialogFragment"/>
+        <dialog
+            android:id="@+id/navigation_delete_confirmation_dialog_for_diary_list_fragment"
+            android:name="com.websarva.wings.android.zuboradiary.ui.list.DeleteConfirmationDialogFragment">
+            <argument
+                android:name="DeleteDiaryDate"
+                app:argType="string" />
+        </dialog>
+        <fragment
+            android:id="@+id/navigation_word_search_fragment"
+            android:name="com.websarva.wings.android.zuboradiary.ui.list.wordsearch.WordSearchFragment"
+            tools:layout="@layout/fragment_word_search" >
+            <action
+                android:id="@+id/action_navigation_word_search_fragment_to_show_diary_fragment"
+                app:destination="@id/navigation_show_diary_fragment"/>
+        </fragment>
+    </navigation>
+
+    <navigation
+        android:id="@+id/nested_navigation_calendar"
+        app:startDestination="@+id/navigation_calendar_fragment">
+        <fragment
+            android:id="@+id/navigation_calendar_fragment"
+            android:name="com.websarva.wings.android.zuboradiary.ui.calendar.CalendarFragment"
+            tools:layout="@layout/fragment_calendar"
+            android:label="@string/title_calendar" >
+            <action
+                android:id="@+id/action_navigation_calendar_fragment_to_edit_diary_fragment"
+                app:destination="@id/nested_navigation_edit_diary">
+                <argument
+                    android:name="isStartDiaryFragment"
+                    app:argType="boolean" />
+            </action>
+        </fragment>
+    </navigation>
+
+    <navigation
+        android:id="@+id/nested_navigation_notifications"
+        app:startDestination="@+id/navigation_notifications_fragment">
+        <fragment
+            android:id="@+id/navigation_notifications_fragment"
+            android:name="com.websarva.wings.android.zuboradiary.ui.notifications.NotificationsFragment"
+            tools:layout="@layout/fragment_notifications" />
+    </navigation>
 
     <fragment
-        android:id="@+id/navigation_list"
-        android:name="com.websarva.wings.android.zuboradiary.ui.list.ListFragment"
-        android:label="@string/title_list"
-        tools:layout="@layout/fragment_list" >
-
+        android:id="@+id/navigation_show_diary_fragment"
+        android:name="com.websarva.wings.android.zuboradiary.ui.diary.showdiary.ShowDiaryFragment"
+        tools:layout="@layout/fragment_show_diary" >
         <action
-            android:id="@+id/action_navigation_list_to_navigation_word_search"
-            app:destination="@id/navigation_word_search"/>
-
+            android:id="@+id/action_navigation_show_diary_fragment_to_edit_diary_fragment"
+            app:destination="@id/nested_navigation_edit_diary">
+            <argument
+                android:name="isStartDiaryFragment"
+                app:argType="boolean" />
+        </action>
     </fragment>
 
-    <fragment
-        android:id="@+id/navigation_word_search"
-        android:name="com.websarva.wings.android.zuboradiary.ui.list.wordsearch.WordSearchFragment"
-        android:label="@string/title_word_search"
-        tools:layout="@layout/fragment_word_search" />
+    <navigation
+        android:id="@+id/nested_navigation_edit_diary"
+        app:startDestination="@+id/navigation_edit_diary_fragment">
+        <fragment
+            android:id="@+id/navigation_edit_diary_fragment"
+            android:name="com.websarva.wings.android.zuboradiary.ui.editdiary.EditDiaryFragment"
+            tools:layout="@layout/fragment_edit_diary"
+            android:label="@string/title_notifications" >
+            <action
+                android:id="@+id/action_edit_diary_fragment_to_select_item_title_fragment"
+                app:destination="@id/navigation_edit_diary_select_item_title_fragment"/>
+            <action
+                android:id="@+id/action_edit_diary_fragment_to_show_diary_fragment_pattern_1"
+                app:destination="@id/navigation_show_diary_fragment"
+                app:popUpTo="@id/navigation_show_diary_fragment"
+                app:popUpToInclusive="true"/>
+            <action
+                android:id="@+id/action_edit_diary_fragment_to_show_diary_fragment_pattern_2"
+                app:destination="@id/navigation_show_diary_fragment"
+                app:popUpTo="@id/navigation_edit_diary_fragment"
+                app:popUpToInclusive="true"/>
+            <action
+                android:id="@+id/action_edit_diary_fragment_to_date_picker_dialog"
+                app:destination="@id/navigation_date_picker_dialog_for_edit_diary_fragment"/>
+            <action
+                android:id="@+id/action_edit_diary_fragment_to_delete_confirmation_dialog"
+                app:destination="@id/navigation_delete_confirmation_dialog_for_edit_diary_fragment"/>
+            <action
+                android:id="@+id/action_edit_diary_fragment_to_load_existing_diary_dialog"
+                app:destination="@id/navigation_load_existing_diary_dialog_for_edit_diary_fragment"/>
+            <action
+                android:id="@+id/action_edit_diary_fragment_to_update_existing_diary_dialog"
+                app:destination="@id/navigation_update_existing_diary_dialog_for_edit_diary_fragment"/>
+            <argument
+                android:name="isStartDiaryFragment"
+                app:argType="boolean" />
+        </fragment>
+        <dialog
+            android:id="@+id/navigation_date_picker_dialog_for_edit_diary_fragment"
+            android:name="com.websarva.wings.android.zuboradiary.ui.editdiary.DatePickerDialogFragment"/>
+        <dialog
+            android:id="@+id/navigation_delete_confirmation_dialog_for_edit_diary_fragment"
+            android:name="com.websarva.wings.android.zuboradiary.ui.editdiary.DeleteConfirmationDialogFragment">
+            <argument
+                android:name="DeleteItemNumber"
+                app:argType="integer" />
+        </dialog>
+        <dialog
+            android:id="@+id/navigation_load_existing_diary_dialog_for_edit_diary_fragment"
+            android:name="com.websarva.wings.android.zuboradiary.ui.editdiary.LoadExistingDiaryDialogFragment">
+            <argument
+                android:name="LoadDiaryDate"
+                app:argType="string" />
+        </dialog>
+        <dialog
+            android:id="@+id/navigation_update_existing_diary_dialog_for_edit_diary_fragment"
+            android:name="com.websarva.wings.android.zuboradiary.ui.editdiary.UpdateExistingDiaryDialogFragment">
+            <argument
+                android:name="UpdateDiaryDate"
+                app:argType="string" />
+        </dialog>
 
-    <fragment
-        android:id="@+id/navigation_calendar"
-        android:name="com.websarva.wings.android.zuboradiary.ui.calendar.CalendarFragment"
-        android:label="@string/title_calendar"
-        tools:layout="@layout/fragment_calendar" />
+        <fragment
+            android:id="@+id/navigation_edit_diary_select_item_title_fragment"
+            android:name="com.websarva.wings.android.zuboradiary.ui.editdiaryselectitemtitle.EditDiarySelectItemTitleFragment"
+            tools:layout="@layout/fragment_edit_diary_select_item_title" >
+            <action
+                android:id="@+id/action_select_item_title_fragment_to_edit_diary_fragment"
+                app:popUpTo="@id/navigation_edit_diary_fragment"
+                app:popUpToInclusive="false"/>
+            <action
+                android:id="@+id/action_edit_diary_select_item_title_fragment_to_delete_confirmation_dialog"
+                app:destination="@id/navigation_delete_confirmation_dialog_for_edit_diary_select_item_title_fragment"/>
+            <argument
+                android:name="TargetItemNumber"
+                app:argType="integer" />
+            <argument
+                android:name="TargetItemTitle"
+                app:argType="string" />
+        </fragment>
+        <dialog
+            android:id="@+id/navigation_delete_confirmation_dialog_for_edit_diary_select_item_title_fragment"
+            android:name="com.websarva.wings.android.zuboradiary.ui.editdiaryselectitemtitle.DeleteConfirmationDialogFragment">
+            <argument
+                android:name="DeleteListItemPosition"
+                app:argType="integer" />
+            <argument
+                android:name="DeleteItemTitle"
+                app:argType="string" />
+        </dialog>
+    </navigation>
 
-    <fragment
-        android:id="@+id/navigation_notifications"
-        android:name="com.websarva.wings.android.zuboradiary.ui.notifications.NotificationsFragment"
-        android:label="@string/title_notifications"
-        tools:layout="@layout/fragment_notifications" />
+
+
 </navigation>

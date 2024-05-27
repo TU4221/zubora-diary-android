@@ -1,16 +1,12 @@
 package com.websarva.wings.android.zuboradiary.ui.list;
 
-import android.content.Context;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.recyclerview.widget.ItemTouchHelper;
-import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.websarva.wings.android.zuboradiary.R;
@@ -116,7 +112,7 @@ public class DayListCreator {
             super(itemView);
             _tvRowDiaryListDay_DayOfWeek = itemView.findViewById(R.id.text_day_of_week);
             _tvRowDiaryListDay_Day = itemView.findViewById(R.id.text_day_of_month);
-            _tvRowDiaryListDay_Title = itemView.findViewById(R.id.tvRowDiaryListDay_Title);
+            _tvRowDiaryListDay_Title = itemView.findViewById(R.id.text_row_diary_list_day_title);
         }
     }
 
@@ -132,7 +128,7 @@ public class DayListCreator {
         @Override
         public DiaryListDayViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
             LayoutInflater inflater = LayoutInflater.from(parent.getContext());
-            View view = inflater.inflate(R.layout.row_diary_list_day, parent, false);
+            View view = inflater.inflate(R.layout.row_diary_day_list, parent, false);
             DiaryListDayViewHolder holder = new DiaryListDayViewHolder(view);
             return holder;
         }
@@ -179,7 +175,7 @@ public class DayListCreator {
 
         //日記リスト(日)の選択アイテム削除メソッド
         public void deleteItem(int position) {
-            //ListFragment.DiaryListDayItemDecorationクラスは、最後尾のアイテムのデコレーションをが他のデコレーションと異なる為、
+            //DiaryListFragment.DiaryListDayItemDecorationクラスは、最後尾のアイテムのデコレーションをが他のデコレーションと異なる為、
             //最後尾のアイテムを削除した時は表示に関して違和感が生じる。
             //その為、最後尾のアイテムを削除する時は notifyItemChanged メソッドを使用して違和感をなくす。
             if (position == (getItemCount() - 1)) {

@@ -11,23 +11,23 @@ import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 
-import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.core.view.MenuHost;
 import androidx.core.view.MenuProvider;
-import androidx.core.widget.NestedScrollView;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentResultListener;
-import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.Lifecycle;
+import androidx.lifecycle.LifecycleEventObserver;
+import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.Observer;
+import androidx.lifecycle.SavedStateHandle;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.NavBackStackEntry;
+import androidx.navigation.NavController;
+import androidx.navigation.NavDirections;
+import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -36,8 +36,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.text.Editable;
 import android.text.InputFilter;
 import android.text.TextWatcher;
-import android.util.Log;
-import android.util.Printer;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -46,40 +44,36 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewParent;
-import android.view.ViewTreeObserver;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.Button;
 import android.widget.EditText;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.websarva.wings.android.zuboradiary.R;
 import com.websarva.wings.android.zuboradiary.databinding.FragmentEditDiarySelectItemTitleBinding;
-import com.websarva.wings.android.zuboradiary.ui.editdiary.EditDiaryFragment;
-import com.websarva.wings.android.zuboradiary.ui.editdiary.EditDiaryViewModel;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class EditDiarySelectItemTitleFragment extends Fragment {
 
+    // View関係
     private FragmentEditDiarySelectItemTitleBinding binding;
+
+    // Navigation関係
+    private NavController navController;
+
+    private static final String fromClassName = "From" + EditDiarySelectItemTitleFragment.class.getName();
+    public static final String KEY_UPDATE_ITEM_NUMBER = "UpdateItemNumber" + fromClassName;
+    public static final String KEY_NEW_ITEM_TITLE = "NewItemTitle" + fromClassName;
+
+    // ViewModel
+    private EditDiarySelectItemTitleViewModel editDiarySelectItemTitleViewModel;
+    private int targetItemNumber;
+    private String targetItemTitle;
+
+    // キーボード関係
     private InputMethodManager inputMethodManager;
 
-    private EditDiarySelectItemTitleViewModel editDiarySelectItemTitleViewModel;
-    private EditDiaryViewModel diaryViewModel;
-    private int selectItemNo;
-    private ConstraintLayout constraintLayoutFullScreen;
-    private EditText editTextNewItemTitle;
-    private TextView textNewItemTitleLength;
-    private Button buttonSelectNewItemTitle;
-    private TextView textItemTitleHistory;
-    private RecyclerView recyclerSelectedItemTitleHistory;
-
-    public EditDiarySelectItemTitleFragment() {
-        // Required empty public constructor
-    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -87,91 +81,96 @@ public class EditDiarySelectItemTitleFragment extends Fragment {
 
         // ViewModel設定
         ViewModelProvider provider = new ViewModelProvider(requireActivity());
-        editDiarySelectItemTitleViewModel = provider.get(EditDiarySelectItemTitleViewModel.class);
-        diaryViewModel = provider.get(EditDiaryViewModel.class);
+        this.editDiarySelectItemTitleViewModel =
+                provider.get(EditDiarySelectItemTitleViewModel.class);
 
-        // 戻るボタンを推した時の処理
-        requireActivity().getOnBackPressedDispatcher().addCallback(
-                this,
-                new OnBackPressedCallback(true) {
-                    @Override
-                    public void handleOnBackPressed() {
-                        backFragment();
-
-                    }
-                }
-        );
-
-        // ConfirmDeleteDialogFragmentからのデータ受取、受取後の処理
-        getChildFragmentManager().setFragmentResultListener(
-                "ToEditDiarySelectItemTitleFragment_ConfirmDeleteDialogFragmentRequestKey",
-                this,
-                new FragmentResultListener() {
-                    @Override
-                    public void onFragmentResult(
-                            @NonNull String requestKey,
-                            @NonNull Bundle result
-                    ) {
-                        int selectedButtonResult = result.getInt("SelectedButtonResult");
-                        int selectedItemTitlePos = result.getInt("SelectedItemTitlePos");
-
-                        switch (selectedButtonResult) {
-                            case DialogInterface.BUTTON_POSITIVE:
-                                editDiarySelectItemTitleViewModel
-                                        .deleteSelectedItemTitle(selectedItemTitlePos);
-                                break;
-
-                            case DialogInterface.BUTTON_NEGATIVE:
-                            default:
-                                SelectedItemTitleHistoryAdapter adapter =
-                                        (SelectedItemTitleHistoryAdapter)
-                                                EditDiarySelectItemTitleFragment
-                                                        .this.recyclerSelectedItemTitleHistory
-                                                                                    .getAdapter();
-                                adapter.notifyItemChanged(selectedItemTitlePos);
-                                break;
-
-                        }
-                    }
-                }
-        );
+        // Navigation設定
+        this.navController = NavHostFragment.findNavController(this);
 
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(
+            @NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        super.onCreateView(inflater,container,savedInstanceState);
 
         // データバインディング設定
         this.binding =
-                FragmentEditDiarySelectItemTitleBinding.inflate(inflater, container, false);
-        View root = this.binding.getRoot();
+                FragmentEditDiarySelectItemTitleBinding
+                        .inflate(inflater, container, false);
 
-        // 双方向データバインディング設定
-        this.binding.setLifecycleOwner(EditDiarySelectItemTitleFragment.this);
-        this.binding.setEditDiaryViewModel(diaryViewModel);
-
-        // クラスフィールド初期化
-        this.constraintLayoutFullScreen = this.binding.constraintLayoutFullScreen;
-        this.editTextNewItemTitle = this.binding.editTextNewItemTitle;
-        this.textNewItemTitleLength = this.binding.textNewItemTitleLength;
-        this.buttonSelectNewItemTitle = this.binding.buttonSelectNewItemTitle;
-        this.textItemTitleHistory = this.binding.textItemTitleHistory;
-        this.recyclerSelectedItemTitleHistory = this.binding.recyclerSelectedItemTitleHistory;
-
+        // キーボード設定
         this.inputMethodManager =
                 (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
 
-        return root;
+        return this.binding.getRoot();
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
 
-        //他フラグメントからの受取データ。
-        Bundle extras = getArguments();
-        this.selectItemNo = extras.getInt("SelectItemNo");
+        // 遷移元からデータ受取
+        this.targetItemNumber =
+                EditDiarySelectItemTitleFragmentArgs.fromBundle(getArguments()).getTargetItemNumber();
+        this.targetItemTitle =
+                EditDiarySelectItemTitleFragmentArgs.fromBundle(getArguments()).getTargetItemTitle();
 
+        // ダイアログフラグメントからの結果受取設定
+        NavBackStackEntry navBackStackEntry =
+                this.navController
+                        .getBackStackEntry(R.id.navigation_edit_diary_select_item_title_fragment);
+        LifecycleEventObserver lifecycleEventObserver = new LifecycleEventObserver() {
+            @Override
+            public void onStateChanged(
+                    @NonNull LifecycleOwner lifecycleOwner, @NonNull Lifecycle.Event event) {
+                SavedStateHandle savedStateHandle = navBackStackEntry.getSavedStateHandle();
+                // 履歴項目削除確認ダイアログからの結果受取
+                boolean containsConfirmDeleteDialogFragmentResults =
+                        savedStateHandle
+                                .contains(DeleteConfirmationDialogFragment.KEY_SELECTED_BUTTON)
+                        && savedStateHandle
+                                .contains(DeleteConfirmationDialogFragment.KEY_DELETE_LIST_ITEM_POSITION);
+                if (event.equals(Lifecycle.Event.ON_RESUME)
+                        && containsConfirmDeleteDialogFragmentResults) {
+                    Integer selectedButton =
+                            savedStateHandle
+                                    .get(DeleteConfirmationDialogFragment.KEY_SELECTED_BUTTON);
+                    Integer deleteListItemPosition =
+                            savedStateHandle
+                                    .get(DeleteConfirmationDialogFragment.KEY_DELETE_LIST_ITEM_POSITION);
+                    if (selectedButton == DialogInterface.BUTTON_POSITIVE) {
+                        EditDiarySelectItemTitleFragment.this.editDiarySelectItemTitleViewModel
+                                .deleteSelectedItemTitle(deleteListItemPosition);
+                    } else {
+                        SelectedItemTitleHistoryAdapter adapter =
+                                (SelectedItemTitleHistoryAdapter)
+                                        EditDiarySelectItemTitleFragment.this.binding
+                                                .recyclerSelectedItemTitleHistory
+                                                .getAdapter();
+                        adapter.notifyItemChanged(deleteListItemPosition);
+                    }
+                }
+            }
+        };
+        navBackStackEntry.getLifecycle().addObserver(lifecycleEventObserver);
+        getViewLifecycleOwner().getLifecycle().addObserver(new LifecycleEventObserver() {
+            @Override
+            public void onStateChanged(
+                    @NonNull LifecycleOwner source, @NonNull Lifecycle.Event event) {
+                if (event.equals(Lifecycle.Event.ON_DESTROY)) {
+                    // MEMO:removeで削除しないとこのFragmentを閉じてもResult内容が残ってしまう。
+                    //      その為、このFragmentを再表示した時にObserverがResultの内容で処理してしまう。
+                    SavedStateHandle savedStateHandle = navBackStackEntry.getSavedStateHandle();
+                    savedStateHandle.remove(DeleteConfirmationDialogFragment.KEY_SELECTED_BUTTON);
+                    savedStateHandle.remove(DeleteConfirmationDialogFragment.KEY_DELETE_LIST_ITEM_POSITION);
+                    navBackStackEntry.getLifecycle().removeObserver(lifecycleEventObserver);
+                }
+            }
+        });
+
+
+        // TODO:削除予定
         //アクションバーオプションメニュー更新。
         MenuHost menuHost = requireActivity();
         menuHost.addMenuProvider(
@@ -180,8 +179,8 @@ public class EditDiarySelectItemTitleFragment extends Fragment {
                     public void onCreateMenu(
                             @NonNull Menu menu, @NonNull MenuInflater menuInflater) {
 
-                        ActionBar actionBar = ((AppCompatActivity) getActivity())
-                                                                .getSupportActionBar();
+                        ActionBar actionBar =
+                                ((AppCompatActivity) getActivity()).getSupportActionBar();
                         actionBar.setDisplayHomeAsUpEnabled(true);
                         actionBar.setHomeAsUpIndicator(null);
                     }
@@ -190,7 +189,7 @@ public class EditDiarySelectItemTitleFragment extends Fragment {
                     public boolean onMenuItemSelected(@NonNull MenuItem menuItem) {
 
                         if (menuItem.getItemId() == android.R.id.home) {
-                            backFragment();
+                            EditDiarySelectItemTitleFragment.this.navController.navigateUp();
                             return true;
                         }
                         return false;
@@ -201,57 +200,43 @@ public class EditDiarySelectItemTitleFragment extends Fragment {
         );
 
         // 新規項目入力欄設定
-        // キーボード不要Viewをまとめ、
+        // キーボード入力不要View
         List<View> noKeyboardViews = new ArrayList<>();
-        noKeyboardViews.add(this.buttonSelectNewItemTitle);
-        noKeyboardViews.add(this.recyclerSelectedItemTitleHistory);
+        noKeyboardViews.add(this.binding.buttonSelectNewItemTitle);
+        noKeyboardViews.add(this.binding.recyclerSelectedItemTitleHistory);
         setupEditText(
-                editTextNewItemTitle,
-                textNewItemTitleLength,
+                this.binding.editTextNewItemTitle,
+                this.binding.textNewItemTitleLength,
                 15,
-                inputMethodManager,
-                constraintLayoutFullScreen,
+                this.inputMethodManager,
+                this.binding.constraintLayoutFullScreen, // 背景View
                 noKeyboardViews
         );
 
-        switch (selectItemNo) {
-            case 1:
-                this.editTextNewItemTitle.setText(diaryViewModel.getLiveItem1Title().getValue());
-                break;
-            case 2:
-                this.editTextNewItemTitle.setText(diaryViewModel.getLiveItem2Title().getValue());
-                break;
-            case 3:
-                this.editTextNewItemTitle.setText(diaryViewModel.getLiveItem3Title().getValue());
-                break;
-            case 4:
-                this.editTextNewItemTitle.setText(diaryViewModel.getLiveItem4Title().getValue());
-                break;
-            case 5:
-                this.editTextNewItemTitle.setText(diaryViewModel.getLiveItem5Title().getValue());
-                break;
-            default:
-                this.editTextNewItemTitle.setText("");
-        }
+        this.binding.editTextNewItemTitle.setText(this.targetItemTitle);
 
 
 
-        this.buttonSelectNewItemTitle.setOnClickListener(new View.OnClickListener() {
+        this.binding.buttonSelectNewItemTitle.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String title = editTextNewItemTitle.getText().toString();
+                String title =
+                        EditDiarySelectItemTitleFragment
+                                .this.binding.editTextNewItemTitle.getText().toString();
                 // 入力タイトルの先頭が空白文字以外(\\S)ならアイテムタイトル更新
                 if (title.matches("\\S+.*")) {
                     updateItemTitle(title);
-                    closeEditFragment();
+                    closeThisFragment(title);
 
                 } else {
                     // 入力タイトルの先頭が空白文字(\\s)ならエラー表示
                     if (title.matches("\\s+.*")) {
-                        editTextNewItemTitle.setError("先頭文字は空白文字以外を入力してください");
+                        EditDiarySelectItemTitleFragment.this.binding.editTextNewItemTitle
+                                .setError("先頭文字は空白文字以外を入力してください");
                     // それ以外(未入力)ならエラー表示
                     } else {
-                        editTextNewItemTitle.setError("1文字以上の文字を入力してください");
+                        EditDiarySelectItemTitleFragment.this.binding.editTextNewItemTitle
+                                .setError("1文字以上の文字を入力してください");
                     }
 
                 }
@@ -259,6 +244,8 @@ public class EditDiarySelectItemTitleFragment extends Fragment {
         });
 
         // 選択履歴リストアイテム設定
+        RecyclerView recyclerSelectedItemTitleHistory =
+                this.binding.recyclerSelectedItemTitleHistory;
         recyclerSelectedItemTitleHistory.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerSelectedItemTitleHistory.addItemDecoration(
                 new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL)
@@ -273,8 +260,8 @@ public class EditDiarySelectItemTitleFragment extends Fragment {
         itemTouchHelper.attachToRecyclerView(recyclerSelectedItemTitleHistory);
 
         // 選択履歴読込・表示
-        editDiarySelectItemTitleViewModel.loadSelectedItemTitleHistory();
-        editDiarySelectItemTitleViewModel.getLiveSelectedItemTitleHistory()
+        this.editDiarySelectItemTitleViewModel.loadSelectedItemTitleHistory();
+        this.editDiarySelectItemTitleViewModel.getLiveSelectedItemTitleHistory()
                 .observe(getViewLifecycleOwner(), new Observer<List<DiaryItemTitle>>() {
                     @Override
                     public void onChanged(List<DiaryItemTitle> diaryItemTitles) {
@@ -285,7 +272,7 @@ public class EditDiarySelectItemTitleFragment extends Fragment {
 
                         SelectedItemTitleHistoryAdapter adapter =
                                 (SelectedItemTitleHistoryAdapter)
-                                        EditDiarySelectItemTitleFragment.this
+                                        EditDiarySelectItemTitleFragment.this.binding
                                                 .recyclerSelectedItemTitleHistory.getAdapter();
 
                         adapter.changeItem(list);
@@ -322,7 +309,7 @@ public class EditDiarySelectItemTitleFragment extends Fragment {
 
             @Override
             public void afterTextChanged(Editable s) {
-                // 未使用。
+                // 未使用
             }
         });
 
@@ -361,15 +348,14 @@ public class EditDiarySelectItemTitleFragment extends Fragment {
         });
 
 
-
         // 入力欄エンターキー押下時の処理。
         editText.setOnKeyListener(new View.OnKeyListener() {
             @Override
             public boolean onKey(View v, int keyCode, KeyEvent event) {
                 if((event.getAction() == KeyEvent.ACTION_DOWN) && (keyCode == KeyEvent.KEYCODE_ENTER)){
-                    if (editText.getInputType() == (TYPE_TEXT_FLAG_MULTI_LINE + 1)) { // set と get でなぜか 1 ズレている。(公式のリファレンスでもズレあり。)
-                        // 処理なし(改行)
-                    } else {
+                    // HACK:InputTypeの値が何故か1ズレている。(公式のリファレンスでもズレあり。)
+                    //      (setとgetを駆使してLogで確認確認済み)
+                    if (editText.getInputType() != (TYPE_TEXT_FLAG_MULTI_LINE + 1)) {
                         // キーボードを隠す。
                         hideKeyboard(inputMethodManager, viewBackground);
                         // 自テキストフォーカスクリア。
@@ -377,17 +363,18 @@ public class EditDiarySelectItemTitleFragment extends Fragment {
                     }
                 }
 
-                // return true だとバックスペースが機能しなくなり入力文字を削除できなくなる。
+                // MEMO:”return true” だとバックスペースが機能しなくなり入力文字を削除できなくなる。
                 return false;
             }
         });
-
     }
 
 
     //// キーボードを隠す。
     private void hideKeyboard(InputMethodManager inputMethodManager, View touchView) {
-        inputMethodManager.hideSoftInputFromWindow(touchView.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
+        inputMethodManager
+                .hideSoftInputFromWindow(
+                        touchView.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
     }
 
 
@@ -408,37 +395,35 @@ public class EditDiarySelectItemTitleFragment extends Fragment {
 
     // アイテムタイトル選択履歴ViewHolder
     private class SelectedItemTitleHistoryViewHolder extends RecyclerView.ViewHolder {
-        public TextView textView;
+        public TextView textSelectedItemTitle;
 
         public SelectedItemTitleHistoryViewHolder(View itemView) {
             super(itemView);
-            textView = itemView.findViewById(R.id.text_selected_item_title);
+            textSelectedItemTitle = itemView.findViewById(R.id.text_selected_item_title);
         }
     }
 
     private class SelectedItemTitleHistoryAdapter
             extends RecyclerView.Adapter<SelectedItemTitleHistoryViewHolder> {
-        private List<String> list;
-        public SelectedItemTitleHistoryAdapter() {
-        }
+        private List<String> selectedItemTitleList;
 
+        @NonNull
         @Override
-        public SelectedItemTitleHistoryViewHolder onCreateViewHolder(ViewGroup parent,
-                                                                     int viewType) {
+        public SelectedItemTitleHistoryViewHolder onCreateViewHolder(
+                ViewGroup parent, int viewType) {
             LayoutInflater inflater = LayoutInflater.from(parent.getContext());
-            View view = inflater.inflate(R.layout.row_selected_item_title_history,
-                                         parent,
-                              false);
+            View view =
+                    inflater.inflate(
+                            R.layout.row_selected_item_title_history, parent, false);
             SelectedItemTitleHistoryViewHolder holder =
                     new SelectedItemTitleHistoryViewHolder(view);
 
             holder.itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    String selectedItemTitle = holder.textView.getText().toString();
+                    String selectedItemTitle = holder.textSelectedItemTitle.getText().toString();
                     updateItemTitle(selectedItemTitle);
-                    closeEditFragment();
-
+                    closeThisFragment(selectedItemTitle);
                 }
             });
 
@@ -447,18 +432,17 @@ public class EditDiarySelectItemTitleFragment extends Fragment {
 
         @Override
         public void onBindViewHolder(SelectedItemTitleHistoryViewHolder holder, int position) {
-            String selectedItemTitle = list.get(position);
-
-            holder.textView.setText(selectedItemTitle);
+            String selectedItemTitle = this.selectedItemTitleList.get(position);
+            holder.textSelectedItemTitle.setText(selectedItemTitle);
         }
 
         @Override
         public int getItemCount() {
-            return list.size();
+            return this.selectedItemTitleList.size();
         }
 
         public void changeItem(List<String> list) {
-            this.list = list;
+            this.selectedItemTitleList = list;
             notifyDataSetChanged();
         }
 
@@ -466,8 +450,7 @@ public class EditDiarySelectItemTitleFragment extends Fragment {
 
     // 参考：https://appdev-room.com/android-recyclerview-swipe-action
     private class SelectedItemTitleHistorySimpleCallBack extends ItemTouchHelper.SimpleCallback {
-        public SelectedItemTitleHistorySimpleCallBack(int dragDirs,
-                                                      int swipeDirs) {
+        public SelectedItemTitleHistorySimpleCallBack(int dragDirs, int swipeDirs) {
             super(dragDirs, swipeDirs);
         }
 
@@ -482,15 +465,16 @@ public class EditDiarySelectItemTitleFragment extends Fragment {
         public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
             SelectedItemTitleHistoryViewHolder selectedItemTitleHistoryViewHolder =
                                                     (SelectedItemTitleHistoryViewHolder) viewHolder;
-            Bundle bundle = new Bundle();
-            bundle.putString("SelectedItemTitle",
-                             selectedItemTitleHistoryViewHolder.textView.getText().toString());
-            bundle.putInt("SelectedItemTitlePos", viewHolder.getAdapterPosition());
-            ConfirmDeleteDialogFragment dialogFragment = new ConfirmDeleteDialogFragment();
-            dialogFragment.setArguments(bundle);
-            dialogFragment.show(getChildFragmentManager(), "ConfirmDeleteDialogFragment");
 
-
+            // TODO:getAdapterPositionの代替を検討する
+            int itemPos = viewHolder.getAdapterPosition();
+            String itemTitle =
+                    selectedItemTitleHistoryViewHolder.textSelectedItemTitle.getText().toString();
+            NavDirections action =
+                    EditDiarySelectItemTitleFragmentDirections
+                            .actionEditDiarySelectItemTitleFragmentToDeleteConfirmationDialog(
+                                    itemPos, itemTitle);
+            EditDiarySelectItemTitleFragment.this.navController.navigate(action);
         }
 
         @Override
@@ -522,14 +506,23 @@ public class EditDiarySelectItemTitleFragment extends Fragment {
                 int absDx = Math.abs((int) dX);
                 int switchingPoint = itemView.getRight() - iconLeft;
 
-                backgroundColor.setBounds(itemView.getRight() - absDx, itemView.getTop(), iconRight, iconBottom);
+                backgroundColor
+                        .setBounds(
+                                itemView.getRight() - absDx,
+                                itemView.getTop(),
+                                iconRight,
+                                iconBottom
+                        );
 
                 if (absDx >= switchingPoint) {
                     icon.setBounds(iconLeft, iconTop, iconRight, iconBottom);
 
                 } else {
-                    icon.setBounds(defaultIconLeft - absDx, iconTop, defaultIconRight - absDx, iconBottom);
-
+                    icon.setBounds(
+                            defaultIconLeft - absDx, iconTop,
+                            defaultIconRight - absDx,
+                            iconBottom
+                    );
                 }
 
             } else {
@@ -540,56 +533,24 @@ public class EditDiarySelectItemTitleFragment extends Fragment {
 
             backgroundColor.draw(c);
             icon.draw(c);
-
         }
     }
 
     private void updateItemTitle(String title) {
         this.editDiarySelectItemTitleViewModel
-                .updateSavingDiaryItemTitle(this.selectItemNo, title);
-
-        switch (this.selectItemNo) {
-            case 1:
-                this.diaryViewModel.setLiveItem1Title(title);
-                break;
-            case 2:
-                this.diaryViewModel.setLiveItem2Title(title);
-                break;
-            case 3:
-                this.diaryViewModel.setLiveItem3Title(title);
-                break;
-            case 4:
-                this.diaryViewModel.setLiveItem4Title(title);
-                break;
-            case 5:
-                this.diaryViewModel.setLiveItem5Title(title);
-                break;
-            default:
-        }
+                .updateSavingDiaryItemTitle(this.targetItemNumber, title);
     }
 
     // EditDiarySelectItemTitleFragmentを閉じる
-    private void closeEditFragment() {
-        FragmentManager fragmentManager = getParentFragmentManager();
-        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-        fragmentTransaction.setReorderingAllowed(true);
-        fragmentTransaction.remove(EditDiarySelectItemTitleFragment.this);
-        fragmentTransaction.commit();
+    private void closeThisFragment(String newItemTitle) {
+        SavedStateHandle savedStateHandle =
+                this.navController.getPreviousBackStackEntry().getSavedStateHandle();
+        savedStateHandle.set(KEY_UPDATE_ITEM_NUMBER, this.targetItemNumber);
+        savedStateHandle.set(KEY_NEW_ITEM_TITLE, newItemTitle);
 
-        Bundle result = new Bundle();
-        fragmentManager.setFragmentResult(
-                "ToEditDiaryFragment_EditDiarySelectItemTitleFragmentRequestKey", result);
+        NavDirections action =
+                EditDiarySelectItemTitleFragmentDirections
+                        .actionSelectItemTitleFragmentToEditDiaryFragment();
+        this.navController.navigate(action);
     }
-
-    // 一つ前のフラグメント(EDitDiaryFragment)を表示
-    private void backFragment() {
-        FragmentManager fragmentManager = getParentFragmentManager();
-        fragmentManager.popBackStack();
-
-        // EDitDiaryのツールバーのメニュー作成
-        Bundle result = new Bundle();
-        fragmentManager.setFragmentResult(
-                "ToEditDiaryFragment_EditDiarySelectItemTitleFragmentRequestKey", result);
-    }
-
 }

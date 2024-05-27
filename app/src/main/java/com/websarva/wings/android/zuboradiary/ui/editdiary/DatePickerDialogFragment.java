@@ -7,30 +7,42 @@ import android.os.Bundle;
 import android.widget.DatePicker;
 
 import androidx.fragment.app.DialogFragment;
+import androidx.lifecycle.SavedStateHandle;
+import androidx.navigation.NavController;
+import androidx.navigation.fragment.NavHostFragment;
 
 import java.util.Calendar;
 
-public class DatePickerDialogFragment extends DialogFragment implements DatePickerDialog.OnDateSetListener {
+public class DatePickerDialogFragment extends DialogFragment{
+    private static final String fromClassName = "From" + DatePickerDialogFragment.class.getName();
+    public static final String KEY_SELECTED_YEAR = "SelectedYear" + fromClassName;
+    public static final String KEY_SELECTED_MONTH = "SelectedMonth" + fromClassName;
+    public static final String KEY_SELECTED_DAY_OF_MONTH = "SelectedDayOfMonth" + fromClassName;
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
-        // Use the current date as the default date in the picker
         final Calendar c = Calendar.getInstance();
         int year = c.get(Calendar.YEAR);
         int month = c.get(Calendar.MONTH);
         int day = c.get(Calendar.DAY_OF_MONTH);
-
-        // Create a new instance of DatePickerDialog and return it
-        return new DatePickerDialog(getActivity(), this, year, month, day);
+        return new DatePickerDialog(
+                requireActivity(),
+                new DatePickerDialog.OnDateSetListener() {
+                    @Override
+                    public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
+                        NavController navController =
+                                NavHostFragment.findNavController(
+                                        DatePickerDialogFragment.this);
+                        SavedStateHandle savedStateHandle =
+                                navController.getPreviousBackStackEntry().getSavedStateHandle();
+                        savedStateHandle.set(KEY_SELECTED_YEAR, year);
+                        savedStateHandle.set(KEY_SELECTED_MONTH, month + 1);
+                        savedStateHandle.set(KEY_SELECTED_DAY_OF_MONTH, dayOfMonth);
+                    }
+                },
+                year,
+                month,
+                day
+        );
     }
-
-    @Override
-    public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
-        Bundle result = new Bundle();
-        result.putInt("SelectYear", year);
-        result.putInt("SelectMonth", month);
-        result.putInt("SelectDayOfMonth", dayOfMonth);
-        getParentFragmentManager().setFragmentResult("DatePickerDialogRequestKey", result);
-    }
-
 }

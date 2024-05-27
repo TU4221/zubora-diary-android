@@ -8,10 +8,16 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
+import androidx.lifecycle.SavedStateHandle;
+import androidx.navigation.NavController;
+import androidx.navigation.fragment.NavHostFragment;
 
 import com.websarva.wings.android.zuboradiary.R;
 
-public class ConfirmDeleteDialogFragment extends DialogFragment {
+public class DeleteConfirmationDialogFragment extends DialogFragment {
+    private static final String fromClassName =
+            "From" + DeleteConfirmationDialogFragment.class.getName();
+    public static final String KEY_DELETE_DIARY_DATE = "DeleteDiaryDate" + fromClassName;
 
     @NonNull
     @Override
@@ -19,9 +25,10 @@ public class ConfirmDeleteDialogFragment extends DialogFragment {
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         builder.setTitle(R.string.list_delete_confirm_dialog_title);
-
-        String message
-                = requireArguments().getString("DeleteDate") + getString(R.string.list_delete_confirm_dialog_message);
+        String message =
+                DeleteConfirmationDialogFragmentArgs.fromBundle(requireArguments())
+                        .getDeleteDiaryDate()
+                        + getString(R.string.list_delete_confirm_dialog_message);
 
         builder.setMessage(message);
         builder.setPositiveButton(R.string.list_delete_confirm_dialog_btn_ok, new DialogButtonClickListener());
@@ -35,18 +42,19 @@ public class ConfirmDeleteDialogFragment extends DialogFragment {
         public void onClick(DialogInterface dialogInterface, int which) {
             switch (which) {
                 case DialogInterface.BUTTON_POSITIVE:
-                    Bundle result = null;
-                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-                        result = requireArguments().deepCopy();
-                    }
-                    getParentFragmentManager().setFragmentResult(
-                            "ToListFragment_ConfirmDeleteDialogFragmentRequestKey",
-                            result
-                    );
-
+                    NavController navController =
+                            NavHostFragment
+                                    .findNavController(DeleteConfirmationDialogFragment.this);
+                    SavedStateHandle savedStateHandle =
+                            navController.getPreviousBackStackEntry().getSavedStateHandle();
+                    String deleteDiaryDate =
+                            DeleteConfirmationDialogFragmentArgs.fromBundle(requireArguments())
+                                    .getDeleteDiaryDate();
+                    savedStateHandle.set(KEY_DELETE_DIARY_DATE, deleteDiaryDate);
                     break;
+
                 case DialogInterface.BUTTON_NEGATIVE:
-                    //処理なし。
+                    // 処理なし
                     break;
             }
         }

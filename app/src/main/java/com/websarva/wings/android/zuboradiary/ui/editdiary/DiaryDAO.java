@@ -6,7 +6,7 @@ import androidx.room.Query;
 import androidx.room.Update;
 
 import com.google.common.util.concurrent.ListenableFuture;
-import com.websarva.wings.android.zuboradiary.ui.list.ListItemDiary;
+import com.websarva.wings.android.zuboradiary.ui.list.DiaryListItem;
 import com.websarva.wings.android.zuboradiary.ui.list.wordsearch.WordSearchResultListItemDiary;
 
 import java.util.List;
@@ -24,10 +24,10 @@ public interface DiaryDAO {
     public ListenableFuture<Diary> selectDiary(String date);
 
     @Query("SELECT date, title, imagePath FROM diaries ORDER BY date DESC LIMIT :num OFFSET :offset")
-    public ListenableFuture<List<ListItemDiary>> selectDiaryList(int num, int offset);
+    public ListenableFuture<List<DiaryListItem>> selectDiaryList(int num, int offset);
 
     @Query("SELECT date, title, imagePath FROM diaries WHERE date < :startDate ORDER BY date DESC LIMIT :num OFFSET :offset")
-    public ListenableFuture<List<ListItemDiary>> selectDiaryList(int num, int offset , String startDate);
+    public ListenableFuture<List<DiaryListItem>> selectDiaryList(int num, int offset , String startDate);
 
     @Query("SELECT COUNT(*) " +
             "FROM diaries " +

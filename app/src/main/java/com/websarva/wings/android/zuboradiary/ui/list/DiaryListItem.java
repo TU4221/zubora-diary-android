@@ -1,16 +1,13 @@
 package com.websarva.wings.android.zuboradiary.ui.list;
 
 import androidx.annotation.NonNull;
-import androidx.room.ColumnInfo;
-import androidx.room.Entity;
-import androidx.room.PrimaryKey;
 
-public class ListItemDiary {
+public class DiaryListItem {
     @NonNull
     private String date;
     @NonNull
     private String title;
-    private String imagePath;
+    private String picturePath;
 
     public String getDate() {
         return this.date;
@@ -28,11 +25,11 @@ public class ListItemDiary {
         this.title = title;
     }
 
-    public String getImagePath() {
-        return imagePath;
+    public String getPicturePath() {
+        return picturePath;
     }
 
-    public void setImagePath(String imagePath) {
-        this.imagePath = imagePath;
+    public void setPicturePath(String picturePath) {
+        this.picturePath = picturePath;
     }
 }

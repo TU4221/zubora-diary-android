@@ -6,7 +6,7 @@
         <import type="android.view.View" />
         <variable
             name="diaryViewModel"
-            type="com.websarva.wings.android.zuboradiary.ui.editdiary.EditDiaryViewModel" />
+            type="com.websarva.wings.android.zuboradiary.ui.editdiary.DiaryViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout

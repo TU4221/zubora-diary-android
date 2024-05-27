@@ -12,11 +12,11 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
-public class ListRepository {
+public class DiaryListRepository {
     private DiaryDatabase diaryDatabase;
     private DiaryDAO diaryDAO;
 
-    public ListRepository(Application application) {
+    public DiaryListRepository(Application application) {
         this.diaryDatabase = DiaryDatabase.getDatabase(application);
         this.diaryDAO = diaryDatabase.createDiaryDAO();
     }
@@ -36,14 +36,14 @@ public class ListRepository {
         return result;
     }
 
-    public List<ListItemDiary> getListItemDiaries(int num, int offset, @Nullable String date) {
-        ListenableFuture<List<ListItemDiary>> listenableFutureResults;
+    public List<DiaryListItem> getListItemDiaries(int num, int offset, @Nullable String date) {
+        ListenableFuture<List<DiaryListItem>> listenableFutureResults;
         if (!(date == null)) {
             listenableFutureResults = diaryDAO.selectDiaryList(num, offset, date);
         } else {
             listenableFutureResults = diaryDAO.selectDiaryList(num, offset);
         }
-        List<ListItemDiary> results = null;
+        List<DiaryListItem> results = null;
         try {
             results = listenableFutureResults.get();
         }

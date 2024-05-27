@@ -11,7 +11,7 @@
                   https://qiita.com/nanoyatsu/items/afad39a63d42d6fa3ac8 -->
         <variable
             name="diaryViewModel"
-            type="com.websarva.wings.android.zuboradiary.ui.editdiary.EditDiaryViewModel" />
+            type="com.websarva.wings.android.zuboradiary.ui.editdiary.DiaryViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -29,9 +29,10 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
 
-            <include layout="@layout/layout_show_diary_original"
+            <include
+                android:id="@+id/include_show_diary"
+                layout="@layout/layout_show_diary_original"
                 app:diaryViewModel="@{diaryViewModel}" />
-
 
         </androidx.core.widget.NestedScrollView>
     </androidx.constraintlayout.widget.ConstraintLayout>

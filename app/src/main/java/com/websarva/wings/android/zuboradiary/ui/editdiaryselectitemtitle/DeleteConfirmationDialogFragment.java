@@ -1,6 +1,5 @@
 package com.websarva.wings.android.zuboradiary.ui.editdiaryselectitemtitle;
 
-import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
@@ -10,20 +9,27 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
+import androidx.lifecycle.SavedStateHandle;
+import androidx.navigation.NavController;
+import androidx.navigation.fragment.NavHostFragment;
 
 import com.websarva.wings.android.zuboradiary.R;
 
-public class ConfirmDeleteDialogFragment extends DialogFragment {
+public class DeleteConfirmationDialogFragment extends DialogFragment {
+    private static final String fromClassName =
+            "From" + DeleteConfirmationDialogFragment.class.getName();
+    public static final String KEY_SELECTED_BUTTON = "SelectedButton" + fromClassName;
+    public static final String KEY_DELETE_LIST_ITEM_POSITION = "DeleteItemPosition" + fromClassName;
+
     @NonNull
     @Override
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         builder.setTitle(R.string.edit_diary_select_item_title_confirm_delete_dialog_title);
 
-        String message =
-                getString(R.string.edit_diary_select_item_title_confirm_delete_dialog_first_message)
-                + requireArguments().getString("SelectedItemTitle")
-                + getString(
+        String deleteItemTitle =
+                DeleteConfirmationDialogFragmentArgs.fromBundle(requireArguments()).getDeleteItemTitle();
+        String message = getString(R.string.edit_diary_select_item_title_confirm_delete_dialog_first_message) + deleteItemTitle + getString(
                         R.string.edit_diary_select_item_title_confirm_delete_dialog_second_message);
 
         builder.setMessage(message);
@@ -32,7 +38,7 @@ public class ConfirmDeleteDialogFragment extends DialogFragment {
                 new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        repairFragmentResult(DialogInterface.BUTTON_POSITIVE);
+                        processResults(DialogInterface.BUTTON_POSITIVE);
                     }
                 }
         );
@@ -41,12 +47,13 @@ public class ConfirmDeleteDialogFragment extends DialogFragment {
                 new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        repairFragmentResult(DialogInterface.BUTTON_NEGATIVE);
+                        processResults(DialogInterface.BUTTON_NEGATIVE);
                     }
                 }
         );
         AlertDialog dialog = builder.create();
 
+        // TODO:コメントが理解できないので動作を確認してコメント修正
         // MEMO:ダイアログフラグメントのCANCEL・DISMISS 処理について、
         //      このクラスのような、DialogFragmentにAlertDialogを作成する場合、
         //      CANCEL・DISMISSの処理内容はDialogFragmentのonCancel/onDismissをオーバーライドする必要がある。
@@ -61,30 +68,26 @@ public class ConfirmDeleteDialogFragment extends DialogFragment {
         return dialog;
     }
 
+    // ダイアログ枠外タッチ、popBackStack時に処理
     @Override
     public void onCancel (DialogInterface dialog) {
-        Log.d("20240321", "cancel");
         super.onCancel(dialog);
-        repairFragmentResult(DialogInterface.BUTTON_NEGATIVE);
+        processResults(DialogInterface.BUTTON_NEGATIVE);
     }
 
+    // ダイアログ消失時に処理
     @Override
     public void onDismiss (DialogInterface dialog) {
         super.onDismiss(dialog);
-        Log.d("20240321", "dismiss");
     }
 
-    private void repairFragmentResult(int status) {
-        Bundle result = null;
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-            result = requireArguments().deepCopy();
-        }
-
-        result.putInt("SelectedButtonResult", status);
-
-        getParentFragmentManager().setFragmentResult(
-                "ToEditDiarySelectItemTitleFragment_ConfirmDeleteDialogFragmentRequestKey",
-                result
-        );
+    private void processResults(int status) {
+        NavController navController = NavHostFragment.findNavController(this);
+        SavedStateHandle savedStateHandle =
+                navController.getPreviousBackStackEntry().getSavedStateHandle();
+        savedStateHandle.set(KEY_SELECTED_BUTTON, status);
+        int deleteListItemPosition =
+                DeleteConfirmationDialogFragmentArgs.fromBundle(getArguments()).getDeleteListItemPosition();
+        savedStateHandle.set(KEY_DELETE_LIST_ITEM_POSITION, deleteListItemPosition);
     }
 }

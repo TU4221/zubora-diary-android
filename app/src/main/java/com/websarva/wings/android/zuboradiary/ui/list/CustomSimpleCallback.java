@@ -17,7 +17,13 @@ import android.view.MotionEvent;
 import android.view.View;
 
 import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
+import androidx.navigation.NavController;
+import androidx.navigation.NavDirections;
+import androidx.navigation.Navigation;
+import androidx.navigation.fragment.NavHostFragment;
+import androidx.navigation.ui.NavigationUI;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -80,10 +86,11 @@ public class CustomSimpleCallback extends ItemTouchHelper.SimpleCallback {
 
     //ダイアログ表示等に使用するクラス
     private FragmentManager fragmentManager;
+    private NavController navController;
 
     //親リサイクルビュー
     private RecyclerView parentRecyclerView;
-    private ListFragment.DiaryListYearMonthAdapter parentRecyclerViewAdapter;
+    private DiaryListFragment.DiaryYearMonthListAdapter parentRecyclerViewAdapter;
 
     //ジェスチャー機能を使用した時に処理されるリスナ
     private GestureDetector.SimpleOnGestureListener gestureListener = new GestureDetector.SimpleOnGestureListener() {
@@ -150,7 +157,7 @@ public class CustomSimpleCallback extends ItemTouchHelper.SimpleCallback {
         }
     };
 
-    public CustomSimpleCallback(int dragDirs, int swipeDirs, RecyclerView recyclerView, Context context, float scale, FragmentManager fragmentManager, RecyclerView parentRecyclerView) {
+    public CustomSimpleCallback(int dragDirs, int swipeDirs, RecyclerView recyclerView, Context context, float scale, FragmentManager fragmentManager, NavController navController, RecyclerView parentRecyclerView) {
         super(dragDirs, swipeDirs);
         this.recyclerView = recyclerView;
         this.recyclerView.setOnTouchListener(onTouchListener);
@@ -170,8 +177,9 @@ public class CustomSimpleCallback extends ItemTouchHelper.SimpleCallback {
             }
         };
         this.fragmentManager = fragmentManager;
+        this.navController = navController;
         this.parentRecyclerView = parentRecyclerView;
-        this.parentRecyclerViewAdapter = (ListFragment.DiaryListYearMonthAdapter) parentRecyclerView.getAdapter();
+        this.parentRecyclerViewAdapter = (DiaryListFragment.DiaryYearMonthListAdapter) parentRecyclerView.getAdapter();
     }
 
     //ドラッグされたとみなされる閾値を返す。
@@ -311,8 +319,8 @@ public class CustomSimpleCallback extends ItemTouchHelper.SimpleCallback {
                         // 背面ボタン(削除)の処理内容
 
                         //削除確認ダイアログ起動
-                        ListFragment.DiaryDayListAdapter diaryDayListAdapter = (ListFragment.DiaryDayListAdapter) CustomSimpleCallback.this.recyclerView.getAdapter();
-                        ListFragment.DiaryListDayViewHolder diaryListDayViewHolder = (ListFragment.DiaryListDayViewHolder) holder;
+                        DiaryListFragment.DiaryDayListAdapter diaryDayListAdapter = (DiaryListFragment.DiaryDayListAdapter) CustomSimpleCallback.this.recyclerView.getAdapter();
+                        DiaryListFragment.DiaryDayListViewHolder diaryListDayViewHolder = (DiaryListFragment.DiaryDayListViewHolder) holder;
 
                         // 削除確認ダイアログ起動前に対象のアイテムの状態をスワイプ前の状態に戻す。
                         // (ダイアログクラスからCustomSimpleCallbackのインスタンスを参照できないため、ダイアログ起動前に状態を戻す)
@@ -327,14 +335,13 @@ public class CustomSimpleCallback extends ItemTouchHelper.SimpleCallback {
                         recoverSwipeItem();
                         diaryDayListAdapter.notifyDataSetChanged();
 
-
-                        Bundle bundle = new Bundle();
-                        bundle.putString("DeleteDate", diaryListDayViewHolder.date);
-                        ConfirmDeleteDialogFragment dialogFragment = new ConfirmDeleteDialogFragment();
-                        dialogFragment.setArguments(bundle);
-                        dialogFragment.show(fragmentManager, "DeleteConfirmDialogFragment");
-
-                        //CustomSimpleCallback.this.recyclerView.getAdapter().notifyDataSetChanged();
+                        String deleteDiaryDate = diaryListDayViewHolder.date;
+                        NavDirections action =
+                                DiaryListFragmentDirections
+                                        .actionDiaryListFragmentToDeleteConfirmationDialog(
+                                                deleteDiaryDate
+                                        );
+                        CustomSimpleCallback.this.navController.navigate(action);
                     }
                 }
         ));
