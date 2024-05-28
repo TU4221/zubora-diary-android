@@ -11,6 +11,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.MenuHost;
 import androidx.core.view.MenuProvider;
 import androidx.core.widget.NestedScrollView;
@@ -48,6 +49,8 @@ import android.widget.TextView;
 
 import com.websarva.wings.android.zuboradiary.databinding.FragmentEditDiaryBinding;
 import com.websarva.wings.android.zuboradiary.R;
+import com.websarva.wings.android.zuboradiary.ui.diary.showdiary.ShowDiaryFragment;
+import com.websarva.wings.android.zuboradiary.ui.diary.showdiary.ShowDiaryFragmentDirections;
 import com.websarva.wings.android.zuboradiary.ui.editdiaryselectitemtitle.EditDiarySelectItemTitleFragment;
 import com.websarva.wings.android.zuboradiary.ui.editdiaryselectitemtitle.EditDiarySelectItemTitleViewModel;
 
@@ -69,10 +72,6 @@ public class EditDiaryFragment extends Fragment {
 
     // キーボード関係
     private InputMethodManager inputMethodManager;
-
-    // TODO:削除予定
-    // Menu関係
-    private MenuProvider editDiaryMenuProvider = new EditDiaryMenuProvider();
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -246,9 +245,67 @@ public class EditDiaryFragment extends Fragment {
             }
         });
 
-        // TODO:削除予定
-        //アクションバーオプションメニュー更新。
-        createMenu();
+
+        // ツールバー設定
+        if (diaryViewModel.getIsNewEditDiary()) {
+            this.binding.materialToolbarTopAppBar.setTitle("新規作成");
+        } else {
+            this.binding.materialToolbarTopAppBar.setTitle("編集中");
+        }
+        this.binding.materialToolbarTopAppBar
+                .setNavigationOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        //戻る。
+                        EditDiaryFragment.this.navController.navigateUp();
+                    }
+                });
+        this.binding.materialToolbarTopAppBar
+                .setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
+                    @Override
+                    public boolean onMenuItemClick(MenuItem item) {
+                        //日記保存(日記表示フラグメント起動)。
+                        if (item.getItemId() == R.id.editDiaryToolbarOptionSaveDiary) {
+                            boolean isNewDiary =
+                                    EditDiaryFragment.this.diaryViewModel.getIsNewEditDiary();
+                            String loadingDate =
+                                    EditDiaryFragment.this.diaryViewModel.getLiveLoadingDate().getValue();
+                            String savingDate =
+                                    EditDiaryFragment.this.diaryViewModel.getLiveDate().getValue();
+                            if (isNewDiary) {
+                                if (EditDiaryFragment.this.diaryViewModel.hasDiary(savingDate)) {
+                                    Log.d("保存形式確認", "新規上書き保存");
+                                    startUpdateExistingDiaryDialogFragment(savingDate);
+                                } else {
+                                    Log.d("保存形式確認", "新規保存");
+                                    EditDiaryFragment.this.diaryViewModel.saveNewDiary();
+                                    changeToShowDiaryFragment();
+                                }
+                            } else {
+                                if (loadingDate.equals(savingDate)) {
+                                    Log.d("保存形式確認", "上書き保存");
+                                    EditDiaryFragment.this.diaryViewModel.updateExistingDiary();
+                                    changeToShowDiaryFragment();
+                                } else {
+                                    if(EditDiaryFragment.this.diaryViewModel.hasDiary(savingDate)) {
+                                        Log.d("保存形式確認", "日付変更上書き保存");
+                                        startUpdateExistingDiaryDialogFragment(savingDate);
+                                    } else {
+                                        Log.d("保存形式確認", "日付変更新規保存");
+                                        EditDiaryFragment.this.diaryViewModel
+                                                .deleteExistingDiaryAndSaveNewDiary();
+                                        changeToShowDiaryFragment();
+                                    }
+                                }
+                            }
+                            EditDiaryFragment.this.editDiarySelectItemTitleViewModel
+                                    .updateSelectedItemTitleHistory();
+
+                            return true;
+                        }
+                        return false;
+                    }
+                });
 
 
         // 画面表示データ準備
@@ -456,11 +513,6 @@ public class EditDiaryFragment extends Fragment {
                 public void onClick(View v) {
                     EditDiaryFragment.this.diaryViewModel.setRequiresPreparationDiary(false);
 
-
-                    // TODO:削除予定
-                    MenuHost menuHost = requireActivity();
-                    menuHost.removeMenuProvider(editDiaryMenuProvider);
-
                     // 項目タイトル入力フラグメント起動
                     String inputItemTitle;
                     switch (inputItemNo) {
@@ -531,90 +583,6 @@ public class EditDiaryFragment extends Fragment {
         }
     }
 
-    // TODO:削除予定
-    private void createMenu() {
-        MenuHost menuHost = requireActivity();
-        menuHost.addMenuProvider(
-                editDiaryMenuProvider,
-                getViewLifecycleOwner(),
-                Lifecycle.State.RESUMED
-        );
-    }
-
-    // TODO:削除予定
-    private class EditDiaryMenuProvider implements MenuProvider {
-        //アクションバーオプションメニュー設定。
-        @Override
-        public void onCreateMenu(@NonNull Menu menu, @NonNull MenuInflater menuInflater) {
-
-            menuInflater.inflate(R.menu.edit_diary_toolbar_menu, menu);
-
-            ActionBar actionBar = ((AppCompatActivity)getActivity()).getSupportActionBar();
-            actionBar.setDisplayHomeAsUpEnabled(true);
-            actionBar.setHomeAsUpIndicator(null);
-
-            if (diaryViewModel.getIsNewEditDiary()) {
-                actionBar.setTitle("新規作成");
-            } else {
-                actionBar.setTitle("編集中");
-            }
-
-        }
-
-        //アクションバーメニュー選択処理設定。
-        @Override
-        public boolean onMenuItemSelected(@NonNull MenuItem menuItem) {
-
-            //日記保存(日記表示フラグメント起動)。
-            if (menuItem.getItemId() == R.id.editDiaryToolbarOptionSaveDiary) {
-                boolean isNewDiary =
-                        EditDiaryFragment.this.diaryViewModel.getIsNewEditDiary();
-                String loadingDate =
-                        EditDiaryFragment.this.diaryViewModel.getLiveLoadingDate().getValue();
-                String savingDate =
-                        EditDiaryFragment.this.diaryViewModel.getLiveDate().getValue();
-                if (isNewDiary) {
-                    if (EditDiaryFragment.this.diaryViewModel.hasDiary(savingDate)) {
-                        Log.d("保存形式確認", "新規上書き保存");
-                        startUpdateExistingDiaryDialogFragment(savingDate);
-                    } else {
-                        Log.d("保存形式確認", "新規保存");
-                        EditDiaryFragment.this.diaryViewModel.saveNewDiary();
-                        changeToShowDiaryFragment();
-                    }
-                } else {
-                    if (loadingDate.equals(savingDate)) {
-                        Log.d("保存形式確認", "上書き保存");
-                        EditDiaryFragment.this.diaryViewModel.updateExistingDiary();
-                        changeToShowDiaryFragment();
-                    } else {
-                        if(EditDiaryFragment.this.diaryViewModel.hasDiary(savingDate)) {
-                            Log.d("保存形式確認", "日付変更上書き保存");
-                            startUpdateExistingDiaryDialogFragment(savingDate);
-                        } else {
-                            Log.d("保存形式確認", "日付変更新規保存");
-                            EditDiaryFragment.this.diaryViewModel
-                                    .deleteExistingDiaryAndSaveNewDiary();
-                            changeToShowDiaryFragment();
-                        }
-                    }
-                }
-
-                EditDiaryFragment.this.editDiarySelectItemTitleViewModel
-                        .updateSelectedItemTitleHistory();
-
-                return true;
-
-                //戻る。
-            } else if (menuItem.getItemId() == android.R.id.home) {
-                EditDiaryFragment.this.navController.navigateUp();
-                return true;
-
-            } else {
-                return false;
-            }
-        }
-    }
 
     //EditText 設定メソッド
     @SuppressLint("ClickableViewAccessibility")
@@ -750,18 +718,6 @@ public class EditDiaryFragment extends Fragment {
             action = EditDiaryFragmentDirections.actionEditDiaryFragmentToShowDiaryFragmentPattern1();
         }
         this.navController.navigate(action);
-    }
-
-    // 一つ前のフラグメント(EDitDiaryFragment)を表示
-    public void backFragment(boolean isNavigateUp) {
-
-
-        if (isNavigateUp) {
-            this.navController.navigateUp();
-        } else {
-            this.navController.popBackStack();
-        }
-
     }
 
 }

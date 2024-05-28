@@ -20,6 +20,22 @@
         android:background="?attr/colorSurface"
         tools:context=".ui.diary.showdiary.ShowDiaryFragment">
 
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/material_toolbar_top_app_bar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="?attr/colorPrimary"
+            android:gravity="center"
+            android:minHeight="?attr/actionBarSize"
+            android:theme="?attr/actionBarTheme"
+            app:menu="@menu/display_diary_toolbar_menu"
+            app:navigationIcon="@drawable/ic_arrow_back_24px"
+            app:title="----年--月--日"
+            app:titleCentered="true"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
         <androidx.core.widget.NestedScrollView
             android:id="@+id/nested_scroll_show_diary"
             android:layout_width="0dp"
@@ -27,7 +43,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
+            app:layout_constraintTop_toBottomOf="@+id/material_toolbar_top_app_bar">
 
             <include
                 android:id="@+id/include_show_diary"

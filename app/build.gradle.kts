@@ -75,6 +75,9 @@ dependencies {
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
 
+    // Material3追加
+    implementation("androidx.compose.material3:material3:1.2.1")
+
 
     // 下記は公式より
     // kapt, ksp は公式通りプラグイン等を変更したがエラーのままで機能しなかった
@@ -114,8 +117,5 @@ dependencies {
     implementation("com.kizitonwose.calendar:view:$calendar_version")
     // The compose calendar library
     implementation("com.kizitonwose.calendar:compose:$calendar_version")
-
-
-    // implementation("androidx.compose.material3:material3:$material3_version")
 
 }

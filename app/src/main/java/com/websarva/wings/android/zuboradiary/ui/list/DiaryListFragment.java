@@ -16,6 +16,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.MenuHost;
 import androidx.core.view.MenuProvider;
 import androidx.fragment.app.Fragment;
@@ -28,7 +29,6 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavBackStackEntry;
 import androidx.navigation.NavController;
 import androidx.navigation.NavDirections;
-import androidx.navigation.Navigation;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -59,10 +59,6 @@ public class DiaryListFragment extends Fragment {
     private ListViewModel listViewModel;
     private DiaryViewModel diaryViewModel;
     private WordSearchViewModel wordSearchViewModel;
-
-    // TODO:削除予定
-    // Menu関係
-    private ListMenuProvider listmenuProvider = new ListMenuProvider();
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -163,9 +159,37 @@ public class DiaryListFragment extends Fragment {
             }
         });
 
-        // TODO:削除予定
-        // アクションバー設定
-        createMenu();
+
+        // ツールバー設定
+        this.binding.materialToolbarTopAppBar
+                .setNavigationOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        // リスト先頭年月切り替えダイアログ起動
+                        NavDirections action =
+                                DiaryListFragmentDirections.actionDiaryListFragmentToDatePickerDialog();
+                        DiaryListFragment.this.navController.navigate(action);
+                    }
+                });
+        this.binding.materialToolbarTopAppBar
+                .setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
+                    @Override
+                    public boolean onMenuItemClick(MenuItem item) {
+                        // ワード検索フラグメント起動
+                        if (item.getItemId() == R.id.listToolbarOptionWordSearch) {
+                            DiaryListFragment.this.wordSearchViewModel.initialize();
+
+                            NavDirections action =
+                                    DiaryListFragmentDirections
+                                            .actionNavigationDiaryListFragmentToWordSearchFragment();
+                            DiaryListFragment.this.navController.navigate(action);
+                            return true;
+
+                        }
+                        return false;
+                    }
+                });
+
 
         // 新規作成FAB設定
         this.binding.fabEditDiary.setOnClickListener(new View.OnClickListener() {
@@ -613,12 +637,13 @@ public class DiaryListFragment extends Fragment {
     }
 
 
+    // TODO:Sampleアプリへ移行
     private void createMenu() {
         //アクションバーオプションメニュー更新
         //https://qiita.com/Nabe1216/items/b26b03cbc750ac70a842
-        MenuHost menuHost = requireActivity();
+        /*MenuHost menuHost = requireActivity();
         menuHost.addMenuProvider(
-                this.listmenuProvider, getViewLifecycleOwner(), Lifecycle.State.RESUMED);
+                this.listmenuProvider, getViewLifecycleOwner(), Lifecycle.State.RESUMED);*/
     }
 
 
@@ -628,7 +653,7 @@ public class DiaryListFragment extends Fragment {
         @Override
         public void onCreateMenu(@NonNull Menu menu, @NonNull MenuInflater menuInflater) {
 
-            menuInflater.inflate(R.menu.list_toolbar_menu, menu);
+            menuInflater.inflate(R.menu.diary_list_toolbar_menu, menu);
 
             ActionBar actionBar = ((AppCompatActivity)getActivity()).getSupportActionBar();
             actionBar.setTitle(getString(R.string.app_name));

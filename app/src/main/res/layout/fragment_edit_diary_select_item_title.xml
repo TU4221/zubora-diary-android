@@ -9,6 +9,21 @@
     android:clickable="true"
     tools:context=".ui.editdiaryselectitemtitle.EditDiarySelectItemTitleFragment">
 
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/material_toolbar_top_app_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?attr/colorPrimary"
+        android:gravity="center"
+        android:minHeight="?attr/actionBarSize"
+        android:theme="?attr/actionBarTheme"
+        app:navigationIcon="@drawable/ic_arrow_back_24px"
+        app:title="項目1タイトル編集中"
+        app:titleCentered="true"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <TextView
         android:id="@+id/text_item_new_title"
         android:layout_width="wrap_content"
@@ -18,7 +33,7 @@
         android:text="@string/edit_diary_select_item_new_item"
         android:textSize="16sp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@id/material_toolbar_top_app_bar" />
 
     <EditText
         android:id="@+id/edit_text_new_item_title"

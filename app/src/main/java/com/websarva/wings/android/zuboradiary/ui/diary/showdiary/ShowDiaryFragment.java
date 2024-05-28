@@ -7,6 +7,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.MenuHost;
 import androidx.core.view.MenuProvider;
 import androidx.fragment.app.Fragment;
@@ -32,6 +33,8 @@ import com.websarva.wings.android.zuboradiary.databinding.FragmentShowDiaryBindi
 import com.websarva.wings.android.zuboradiary.ui.calendar.CalendarFragmentDirections;
 import com.websarva.wings.android.zuboradiary.ui.editdiary.DiaryViewModel;
 import com.websarva.wings.android.zuboradiary.ui.editdiaryselectitemtitle.EditDiarySelectItemTitleFragment;
+import com.websarva.wings.android.zuboradiary.ui.list.DiaryListFragment;
+import com.websarva.wings.android.zuboradiary.ui.list.DiaryListFragmentDirections;
 
 public class ShowDiaryFragment extends Fragment {
 
@@ -45,10 +48,6 @@ public class ShowDiaryFragment extends Fragment {
 
     // ViewModel
     private DiaryViewModel diaryViewModel;
-
-    // TODO:削除予定
-    // Menu関係
-    private MenuProvider showDiaryMenuProvider = new ShowDiaryMenuProvider();
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -94,12 +93,34 @@ public class ShowDiaryFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        // TODO:削除予定
-        // アクションバーオプションメニュー更新。
-        MenuHost menuHost = requireActivity();
-        menuHost.addMenuProvider(
-                showDiaryMenuProvider, getViewLifecycleOwner(), Lifecycle.State.RESUMED);
-
+        // ツールバー設定
+        this.binding.materialToolbarTopAppBar
+                .setTitle(this.diaryViewModel.getLiveDate().getValue());
+        this.binding.materialToolbarTopAppBar
+                .setNavigationOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        //戻る(ナビフラグメント表示(日記表示フラグメント削除))。
+                        backFragment(true);
+                    }
+                });
+        this.binding.materialToolbarTopAppBar
+                .setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
+                    @Override
+                    public boolean onMenuItemClick(MenuItem item) {
+                        //日記編集フラグメント起動。
+                        if (item.getItemId() == R.id.displayDiaryToolbarOptionEditDiary) {
+                            NavDirections action =
+                                    ShowDiaryFragmentDirections
+                                            .actionNavigationShowDiaryFragmentToEditDiaryFragment(
+                                                    false
+                                            );
+                            ShowDiaryFragment.this.navController.navigate(action);
+                            return true;
+                        }
+                        return false;
+                    }
+                });
 
 
         // 画面表示データ準備

@@ -15,6 +15,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.MenuHost;
 import androidx.core.view.MenuProvider;
 import androidx.fragment.app.Fragment;
@@ -50,6 +51,8 @@ import android.widget.TextView;
 
 import com.websarva.wings.android.zuboradiary.R;
 import com.websarva.wings.android.zuboradiary.databinding.FragmentEditDiarySelectItemTitleBinding;
+import com.websarva.wings.android.zuboradiary.ui.list.DiaryListFragment;
+import com.websarva.wings.android.zuboradiary.ui.list.DiaryListFragmentDirections;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -170,34 +173,17 @@ public class EditDiarySelectItemTitleFragment extends Fragment {
         });
 
 
-        // TODO:削除予定
-        //アクションバーオプションメニュー更新。
-        MenuHost menuHost = requireActivity();
-        menuHost.addMenuProvider(
-                new MenuProvider() {
+        // ツールバー設定
+        String title = "項目" + String.valueOf(targetItemNumber) + "タイトル編集中";
+        this.binding.materialToolbarTopAppBar.setTitle(title);
+        this.binding.materialToolbarTopAppBar
+                .setNavigationOnClickListener(new View.OnClickListener() {
                     @Override
-                    public void onCreateMenu(
-                            @NonNull Menu menu, @NonNull MenuInflater menuInflater) {
-
-                        ActionBar actionBar =
-                                ((AppCompatActivity) getActivity()).getSupportActionBar();
-                        actionBar.setDisplayHomeAsUpEnabled(true);
-                        actionBar.setHomeAsUpIndicator(null);
+                    public void onClick(View v) {
+                        EditDiarySelectItemTitleFragment.this.navController.navigateUp();
                     }
+                });
 
-                    @Override
-                    public boolean onMenuItemSelected(@NonNull MenuItem menuItem) {
-
-                        if (menuItem.getItemId() == android.R.id.home) {
-                            EditDiarySelectItemTitleFragment.this.navController.navigateUp();
-                            return true;
-                        }
-                        return false;
-                    }
-                },
-                getViewLifecycleOwner(),
-                Lifecycle.State.RESUMED
-        );
 
         // 新規項目入力欄設定
         // キーボード入力不要View

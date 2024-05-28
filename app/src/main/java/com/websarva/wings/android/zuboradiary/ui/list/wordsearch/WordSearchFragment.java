@@ -43,6 +43,7 @@ import com.websarva.wings.android.zuboradiary.R;
 import com.websarva.wings.android.zuboradiary.UnitConverter;
 import com.websarva.wings.android.zuboradiary.databinding.FragmentWordSearchBinding;
 import com.websarva.wings.android.zuboradiary.ui.editdiary.DiaryViewModel;
+import com.websarva.wings.android.zuboradiary.ui.editdiaryselectitemtitle.EditDiarySelectItemTitleFragment;
 import com.websarva.wings.android.zuboradiary.ui.list.CustomSimpleCallback;
 
 import java.util.ArrayList;
@@ -61,10 +62,6 @@ public class WordSearchFragment extends Fragment {
     // ViewModel
     private WordSearchViewModel wordSearchViewModel;
     private DiaryViewModel diaryViewModel;
-
-    // TODO:削除予定
-    // Menu関係
-    private WordSearchMenuProvider wordSearchMenuProvider = new WordSearchMenuProvider();
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -89,19 +86,6 @@ public class WordSearchFragment extends Fragment {
                 }
         );
 
-        // TODO:Navigationに置換
-        // ShowDiaryFragmentからのデータ受取、受取後の処理
-        getActivity().getSupportFragmentManager().setFragmentResultListener(
-                "ToWordSearchFragment_ShowDiaryFragmentRequestKey",
-                this,
-                new FragmentResultListener() {
-                    @Override
-                    public void onFragmentResult(@NonNull String requestKey, @NonNull Bundle result) {
-                        createMenu();
-                        updateListHeaderSectionBarDate();
-                    }
-                }
-        );
     }
 
     @Override
@@ -125,9 +109,15 @@ public class WordSearchFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        // TODO:削除予定
-        // アクションバー設定
-        createMenu();
+        // ツールバー設定
+        this.binding.materialToolbarTopAppBar
+                .setNavigationOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        backFragment(true);
+                    }
+                });
+
 
         // データベースから読み込んだ日記リストをリサクラービューに反映
         LiveData<List<WordSearchResultListItemDiary>> loadedWordSearchResultList =
@@ -362,18 +352,6 @@ public class WordSearchFragment extends Fragment {
     }
 
 
-    private void createMenu() {
-        //アクションバーオプションメニュー更新
-        //https://qiita.com/Nabe1216/items/b26b03cbc750ac70a842
-        MenuHost menuHost = requireActivity();
-        menuHost.addMenuProvider(
-                this.wordSearchMenuProvider,
-                getViewLifecycleOwner(),
-                Lifecycle.State.RESUMED
-        );
-    }
-
-
     private class WordSearchMenuProvider implements MenuProvider {
         @Override
         public void onCreateMenu(@NonNull Menu menu, @NonNull MenuInflater menuInflater) {
@@ -569,13 +547,6 @@ public class WordSearchFragment extends Fragment {
             holder.itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    //アクションバーのメニューを削除
-                    //ナビフラグメントを閉じない状態(ナビフラグメントのライフサイクルがonResume状態)で前面フラグメントを起動する為、
-                    //ナビフラグメントで追加したメニューが残る。下記はその為の処理。
-                    // TODO:削除予定
-                    MenuHost menuHost = requireActivity();
-                    menuHost.removeMenuProvider(WordSearchFragment.this.wordSearchMenuProvider);
-
                     // ViewModel へデータセット
                     WordSearchFragment.this.diaryViewModel.clear();
                     WordSearchFragment.this.diaryViewModel
