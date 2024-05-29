@@ -15,6 +15,8 @@ import androidx.core.view.MenuProvider;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentResultListener;
 import androidx.lifecycle.Lifecycle;
+import androidx.lifecycle.LifecycleEventObserver;
+import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
@@ -24,8 +26,10 @@ import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.text.Editable;
 import android.text.SpannableString;
 import android.text.Spanned;
+import android.text.TextWatcher;
 import android.text.style.BackgroundColorSpan;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -117,6 +121,66 @@ public class WordSearchFragment extends Fragment {
                         backFragment(true);
                     }
                 });
+
+        // キーワード検索欄設定
+        this.binding.editTextKeyWordSearch.requestFocus();
+        Keyboard.show(this.binding.editTextKeyWordSearch);
+        this.binding.editTextKeyWordSearch.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                // 処理なし
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                WordSearchFragment.this.wordSearchViewModel
+                        .setSearchWord(s.toString());
+                if (s.toString().isEmpty()) {
+                    WordSearchFragment.this.binding.imageButtonKeyWordClear
+                            .setVisibility(View.INVISIBLE);
+                    WordSearchFragment.this.wordSearchViewModel
+                            .prepareBeforeWordSearchShowing();
+                } else {
+                    WordSearchFragment.this.binding.imageButtonKeyWordClear
+                            .setVisibility(View.VISIBLE);
+                    WordSearchFragment.this.wordSearchViewModel
+                            .loadWordSearchResultList(
+                                    WordSearchViewModel.LoadType.NEW
+                            );
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                // 処理なし
+            }
+        });
+        this.binding.editTextKeyWordSearch.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                View viewForHidingKeyboard =
+                        WordSearchFragment.this.binding.viewForHidingKeyboard;
+                if (hasFocus) {
+                    viewForHidingKeyboard.setOnTouchListener(new View.OnTouchListener() {
+                        @Override
+                        public boolean onTouch(View v, MotionEvent event) {
+                            Keyboard.hide(v);
+                            WordSearchFragment.this.binding.editTextKeyWordSearch.clearFocus();
+                            return false;
+                        }
+                    });
+                } else {
+                    viewForHidingKeyboard.setOnTouchListener(null);
+                }
+            }
+        });
+        this.binding.imageButtonKeyWordClear.setVisibility(View.INVISIBLE);
+        this.binding.imageButtonKeyWordClear.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                WordSearchFragment.this.binding.editTextKeyWordSearch.setText("");
+            }
+        });
 
 
         // データベースから読み込んだ日記リストをリサクラービューに反映
@@ -460,6 +524,9 @@ public class WordSearchFragment extends Fragment {
                                 );
                     }
 
+
+
+
                     return false;
                 }
             });
@@ -708,12 +775,8 @@ public class WordSearchFragment extends Fragment {
 
     }
 
-    // TODO:Fragment切り替えをNavigationに切り替え後削除
-    public void updateList() {
-        WordSearchFragment.this.wordSearchViewModel
-                .loadWordSearchResultList(WordSearchViewModel.LoadType.UPDATE);
-    }
 
+    // 対象ワードをマーキング
     private SpannableString createSpannableString(String string, String targetWord) {
         SpannableString spannableString = new SpannableString(string);
         BackgroundColorSpan backgroundColorSpan =

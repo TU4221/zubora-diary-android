@@ -93,9 +93,13 @@ public class ShowDiaryFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        // 画面表示データ準備
+        this.diaryViewModel.prepareShowDiary();
+
+
         // ツールバー設定
         this.binding.materialToolbarTopAppBar
-                .setTitle(this.diaryViewModel.getLiveDate().getValue());
+                .setTitle(this.diaryViewModel.getLiveLoadingDate().getValue());
         this.binding.materialToolbarTopAppBar
                 .setNavigationOnClickListener(new View.OnClickListener() {
                     @Override
@@ -121,10 +125,6 @@ public class ShowDiaryFragment extends Fragment {
                         return false;
                     }
                 });
-
-
-        // 画面表示データ準備
-        this.diaryViewModel.prepareShowDiary();
 
 
         // 天気入力欄設定

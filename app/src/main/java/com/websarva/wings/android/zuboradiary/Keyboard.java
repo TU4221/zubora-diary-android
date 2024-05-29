@@ -22,22 +22,13 @@ public class Keyboard {
                         InputMethodManager.HIDE_NOT_ALWAYS
                 );
     }
-    /*public static void show(View focusView) {
+    public static void show(View focusView) {
+        InputMethodManager inputMethodManager =
+                (InputMethodManager) activity.getSystemService(Context.INPUT_METHOD_SERVICE);
         inputMethodManager
                 .showSoftInput(
                 focusView,
-                InputMethodManager.SHOW_IMPLICIT
+                InputMethodManager.RESULT_UNCHANGED_SHOWN
                 );
-    }*/
-    public static void show() {
-
-        /*inputMethodManager
-                .toggleSoftInput(
-                        InputMethodManager.SHOW_FORCED,
-                        InputMethodManager.HIDE_NOT_ALWAYS
-                );*/
-
-        activity.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
-
     }
 }
