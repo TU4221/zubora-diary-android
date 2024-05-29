@@ -168,44 +168,6 @@ public class ShowDiaryFragment extends Fragment {
                 });
     }
 
-    // TODO:削除予定
-    private class ShowDiaryMenuProvider implements MenuProvider {
-            //アクションバーオプションメニュー設定。
-            @Override
-            public void onCreateMenu(@NonNull Menu menu, @NonNull MenuInflater menuInflater) {
-
-                //ツールバーオプションメニュー設定
-                menuInflater.inflate(R.menu.display_diary_toolbar_menu, menu);
-
-                ActionBar actionBar = ((AppCompatActivity)getActivity()).getSupportActionBar();
-                actionBar.setDisplayHomeAsUpEnabled(true);
-                actionBar.setHomeAsUpIndicator(null);
-
-                actionBar.setTitle(diaryViewModel.getLiveDate().getValue());
-            }
-
-            //アクションバーメニュー選択処理設定。
-            @Override
-            public boolean onMenuItemSelected(@NonNull MenuItem menuItem) {
-
-                //日記編集フラグメント起動。
-                if (menuItem.getItemId() == R.id.displayDiaryToolbarOptionEditDiary) {
-                    NavDirections action =
-                            ShowDiaryFragmentDirections
-                                    .actionNavigationShowDiaryFragmentToEditDiaryFragment(false);
-                    ShowDiaryFragment.this.navController.navigate(action);
-                    return true;
-
-                    //戻る(ナビフラグメント表示(日記表示フラグメント削除))。
-                } else if (menuItem.getItemId() == android.R.id.home) {
-                    backFragment(true);
-                    return true;
-
-                } else {
-                    return false;
-                }
-            }
-    }
 
     // 一つ前のフラグメント(EDitDiaryFragment)を表示
     private void backFragment(boolean isNavigateUp) {

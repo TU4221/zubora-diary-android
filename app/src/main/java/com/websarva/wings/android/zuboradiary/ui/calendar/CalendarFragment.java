@@ -75,10 +75,6 @@ public class CalendarFragment extends Fragment {
     private CalendarViewModel calendarViewModel;
     private DiaryViewModel diaryViewModel;
 
-    // TODO:削除予定
-    // Menu関係
-    private calendarMenuProvider calendarMenuProvider = new calendarMenuProvider();
-
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
@@ -127,10 +123,6 @@ public class CalendarFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
-        // TODO:削除予定
-        // アクションバーのメニュー作成
-        createMenu();
 
         // 項目タイトル入力フラグメントからデータ受取
         SavedStateHandle savedStateHandle =
@@ -276,49 +268,6 @@ public class CalendarFragment extends Fragment {
         this.calendarViewModel.clearExistedDiaryDateLog();
     }
 
-    // TODO:削除予定
-    //アクションバーオプションメニュー更新
-    private void createMenu() {
-        MenuHost menuHost = requireActivity();
-        menuHost.addMenuProvider(this.calendarMenuProvider, getViewLifecycleOwner(), Lifecycle.State.RESUMED);
-    }
-
-    // TODO:削除予定
-    private class calendarMenuProvider implements MenuProvider {
-
-        //アクションバーオプションメニュー設定。
-        @Override
-        public void onCreateMenu(@NonNull Menu menu, @NonNull MenuInflater menuInflater) {
-
-            // メニューなし
-            //menuInflater.inflate(R.menu.?????, menu);
-
-            ActionBar actionBar = ((AppCompatActivity)requireActivity()).getSupportActionBar();
-            actionBar.setDisplayHomeAsUpEnabled(false);
-
-            updateActionBarDate();
-        }
-
-        //アクションバーメニュー選択処理設定。
-        @Override
-        public boolean onMenuItemSelected(@NonNull MenuItem menuItem) {
-
-            // メニュー無しの為処理不要
-            /*if (menuItem.getItemId() == R.id.?????) {
-                // 処理内容
-                return true;
-
-            } else if (menuItem.getItemId() == android.R.id.home) {
-                // 処理内容
-                return true;
-
-            } else {
-                return false;
-            }*/
-
-            return false;
-        }
-    }
 
     // CalendarViewで選択された日付の日記を表示
     private void showSelectedDiary() {
@@ -383,7 +332,6 @@ public class CalendarFragment extends Fragment {
                 // 数値設定
                 String day = String.valueOf(calendarDay.getDate().getDayOfMonth());
                 textCalendarDay.setText(day);
-                Log.d("20240408", String.valueOf(calendarDay.getDate().getMonthValue())+ "月" + day + "日");
 
                 // 日にちマス状態(可視、数値色、背景色、ドット有無)設定
                 if (calendarDay.getPosition() == DayPosition.MonthDate) {
@@ -396,7 +344,6 @@ public class CalendarFragment extends Fragment {
                                         .getColor(R.color.md_theme_light_onSecondaryContainer)
                         );
                         textCalendarDay.setBackgroundResource(R.drawable.calendar_today_bg);
-                        //viewCalendarDayDot.setVisibility(View.INVISIBLE);
 
                     // 選択中の日にちマス
                     } else if (calendarDay.getDate()
@@ -406,7 +353,6 @@ public class CalendarFragment extends Fragment {
                                         .getColor(R.color.md_theme_light_onPrimaryContainer)
                         );
                         textCalendarDay.setBackgroundResource(R.drawable.calendar_selected_day_bg);
-                        //viewCalendarDayDot.setVisibility(View.INVISIBLE);
 
                     // それ以外の日にちマス
                     } else {
@@ -415,7 +361,6 @@ public class CalendarFragment extends Fragment {
                         int color = dayColor(dayOfWeek);
                         textCalendarDay.setTextColor(color);
                         textCalendarDay.setBackground(null);
-                        //viewCalendarDayDot.setVisibility(View.INVISIBLE); // TODO:日記ありなしで切り替える
 
                     }
 
@@ -521,6 +466,7 @@ public class CalendarFragment extends Fragment {
     private void firstSelectDate(LocalDate date) {
         this.calendarViewModel.setSelectedDate(date);
         this.binding.calendar.notifyDateChanged(date);
+        updateActionBarDate();
         showSelectedDiary();
 
         // MEMO:アプリ初回起動時では、onViewCreatedの時点でアクションバーが確立していないため例外となる。
@@ -545,14 +491,14 @@ public class CalendarFragment extends Fragment {
         showSelectedDiary();
     }
 
-    // TODO:Navigation置換後アクションバーからFragment内ToolBarに変更
+
     // アクションバー表示日付更新。
     private void updateActionBarDate() {
-        ActionBar actionBar = ((AppCompatActivity)getActivity()).getSupportActionBar();
         LocalDate selectedDate = this.calendarViewModel.getSelectedDate();
         String stringDate = DateConverter.toStringLocalDate(selectedDate);
-        actionBar.setTitle(stringDate);
+        this.binding.materialToolbarTopAppBar.setTitle(stringDate);
     }
+
 
     // 選択中ボトムナビゲーションタブを再選択時の処理
     public void onNavigationItemReselected() {
@@ -564,11 +510,13 @@ public class CalendarFragment extends Fragment {
         }
     }
 
+
     // 先頭へ自動スクロール
     private void scrollToTop() {
         NestedScrollView nestedScrollFullScreen = this.binding.nestedScrollFullScreen;
         nestedScrollFullScreen.smoothScrollTo(0, 0);
     }
+
 
     // カレンダーを今日の日付へ自動スクロール
     // TODO:scrollとsmoothScrollを連続で処理するとかくつくので実機で確認。(PCが重いせいかもしれない)

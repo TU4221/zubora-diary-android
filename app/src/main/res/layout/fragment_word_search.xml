@@ -43,8 +43,9 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
                     android:paddingVertical="8dp"
-                    android:paddingHorizontal="24dp"
+                    android:paddingHorizontal="16dp"
                     android:inputType="text"
+                    android:text="@={word_search_view_model.searchWord}"
                     android:hint="キーワード検索"
                     android:background="@null"
                     android:textSize="16sp"/>
@@ -53,9 +54,10 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_vertical|end"
-                    android:paddingEnd="8dp"
+                    android:paddingHorizontal="8dp"
                     android:src="@drawable/ic_cancel_24px"
-                    android:background="@null"/>
+                    android:background="@null"
+                    android:visibility="@{word_search_view_model.isVisibleSearchWordClearButton ? View.VISIBLE : View.INVISIBLE}"/>
             </LinearLayout>
 
         </FrameLayout>

@@ -1,22 +1,11 @@
 package com.websarva.wings.android.zuboradiary.ui.list.wordsearch;
 
-import android.annotation.SuppressLint;
 import android.graphics.Rect;
 import android.os.Bundle;
 
-import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.SearchView;
-import androidx.core.view.MenuHost;
-import androidx.core.view.MenuProvider;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentResultListener;
-import androidx.lifecycle.Lifecycle;
-import androidx.lifecycle.LifecycleEventObserver;
-import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
@@ -26,29 +15,20 @@ import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.text.Editable;
 import android.text.SpannableString;
 import android.text.Spanned;
-import android.text.TextWatcher;
 import android.text.style.BackgroundColorSpan;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewTreeObserver;
 import android.widget.TextView;
 
 import com.websarva.wings.android.zuboradiary.Keyboard;
 import com.websarva.wings.android.zuboradiary.R;
-import com.websarva.wings.android.zuboradiary.UnitConverter;
 import com.websarva.wings.android.zuboradiary.databinding.FragmentWordSearchBinding;
 import com.websarva.wings.android.zuboradiary.ui.editdiary.DiaryViewModel;
-import com.websarva.wings.android.zuboradiary.ui.editdiaryselectitemtitle.EditDiarySelectItemTitleFragment;
-import com.websarva.wings.android.zuboradiary.ui.list.CustomSimpleCallback;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -79,17 +59,6 @@ public class WordSearchFragment extends Fragment {
         // Navigation設定
         this.navController = NavHostFragment.findNavController(this);
 
-        // 戻るボタン押下時の処理
-        requireActivity().getOnBackPressedDispatcher().addCallback(
-                this,
-                new OnBackPressedCallback(true) {
-                    @Override
-                    public void handleOnBackPressed() {
-                        backFragment(false);
-                    }
-                }
-        );
-
     }
 
     @Override
@@ -118,43 +87,33 @@ public class WordSearchFragment extends Fragment {
                 .setNavigationOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        backFragment(true);
+                        WordSearchFragment.this.navController.navigateUp();
                     }
                 });
+
 
         // キーワード検索欄設定
         this.binding.editTextKeyWordSearch.requestFocus();
         Keyboard.show(this.binding.editTextKeyWordSearch);
-        this.binding.editTextKeyWordSearch.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-                // 処理なし
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                WordSearchFragment.this.wordSearchViewModel
-                        .setSearchWord(s.toString());
-                if (s.toString().isEmpty()) {
-                    WordSearchFragment.this.binding.imageButtonKeyWordClear
-                            .setVisibility(View.INVISIBLE);
-                    WordSearchFragment.this.wordSearchViewModel
-                            .prepareBeforeWordSearchShowing();
-                } else {
-                    WordSearchFragment.this.binding.imageButtonKeyWordClear
-                            .setVisibility(View.VISIBLE);
-                    WordSearchFragment.this.wordSearchViewModel
-                            .loadWordSearchResultList(
-                                    WordSearchViewModel.LoadType.NEW
-                            );
-                }
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-                // 処理なし
-            }
-        });
+        this.wordSearchViewModel.getSearchWord()
+                .observe(getViewLifecycleOwner(), new Observer<String>() {
+                    @Override
+                    public void onChanged(String s) {
+                        if (s.toString().isEmpty()) {
+                            WordSearchFragment.this.wordSearchViewModel
+                                    .setIsVisibleSearchWordClearButton(false);
+                            WordSearchFragment.this.wordSearchViewModel
+                                    .prepareBeforeWordSearchShowing();
+                        } else {
+                            WordSearchFragment.this.wordSearchViewModel
+                                    .setIsVisibleSearchWordClearButton(true);
+                            WordSearchFragment.this.wordSearchViewModel
+                                    .loadWordSearchResultList(
+                                            WordSearchViewModel.LoadType.NEW
+                                    );
+                        }
+                    }
+                });
         this.binding.editTextKeyWordSearch.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
             public void onFocusChange(View v, boolean hasFocus) {
@@ -174,11 +133,11 @@ public class WordSearchFragment extends Fragment {
                 }
             }
         });
-        this.binding.imageButtonKeyWordClear.setVisibility(View.INVISIBLE);
+        this.wordSearchViewModel.setIsVisibleSearchWordClearButton(false);
         this.binding.imageButtonKeyWordClear.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                WordSearchFragment.this.binding.editTextKeyWordSearch.setText("");
+                WordSearchFragment.this.wordSearchViewModel.clearSearchWord();
             }
         });
 
@@ -193,8 +152,9 @@ public class WordSearchFragment extends Fragment {
                     public void onChanged(List<WordSearchResultListItemDiary> list) {
                         Log.d("20240424", "loadedWordSearchResultList onChanged起動");
                         String searchWord =
-                                WordSearchFragment.this.wordSearchViewModel.getSearchWord();
-                        if (searchWord.equals("")) {
+                                WordSearchFragment.this.wordSearchViewModel
+                                        .getSearchWord().getValue();
+                        if (searchWord.isEmpty()) {
                             return;
                         }
                         if (loadedWordSearchResultList.getValue().isEmpty()) {
@@ -405,141 +365,14 @@ public class WordSearchFragment extends Fragment {
                 // 日記リスト追加読込
                 // https://android.suzu-sd.com/2021/05/recyclerview_item_scroll/#i-5
                 if (!recyclerView.canScrollVertically(1)) {
-                    WordSearchFragment.this.wordSearchViewModel.setLiveIsLoading(true);
+                    WordSearchFragment.this.wordSearchViewModel.setIsLoading(true);
                     WordSearchFragment.this.wordSearchViewModel
                             .loadWordSearchResultList(WordSearchViewModel.LoadType.ADD);
-                    WordSearchFragment.this.wordSearchViewModel.setLiveIsLoading(false);
+                    WordSearchFragment.this.wordSearchViewModel.setIsLoading(false);
                 }
             }
         });
 
-    }
-
-
-    private class WordSearchMenuProvider implements MenuProvider {
-        @Override
-        public void onCreateMenu(@NonNull Menu menu, @NonNull MenuInflater menuInflater) {
-            menuInflater.inflate(R.menu.word_search_toolbar_menu, menu);
-
-            ActionBar actionBar = ((AppCompatActivity) requireActivity())
-                    .getSupportActionBar();
-            actionBar.setTitle(null);
-            actionBar.setDisplayHomeAsUpEnabled(true);
-            actionBar.setHomeAsUpIndicator(null);
-
-            // 検索欄設定
-            MenuItem menuItem = menu.findItem(R.id.word_search_toolbar_menu_search);
-            SearchView search = (SearchView) menuItem.getActionView();
-            search.setIconifiedByDefault(false); // "false"でバー状態を常時表示
-            int color = getResources().getColor(R.color.white);
-            search.setBackgroundColor(color);
-
-            search.setOnQueryTextFocusChangeListener(new View.OnFocusChangeListener() {
-                @SuppressLint("ClickableViewAccessibility")
-                @Override
-                public void onFocusChange(View v, boolean hasFocus) {
-                    Log.d("20240418", "Focus");
-
-                    View viewForHidingKeyboard =
-                            WordSearchFragment.this.binding.viewForHidingKeyboard;
-                    viewForHidingKeyboard.setOnTouchListener(new View.OnTouchListener() {
-                        @Override
-                        public boolean onTouch(View v, MotionEvent event) {
-                            Keyboard.hide(v);
-                            search.clearFocus();
-
-                            return false;
-                        }
-                    });
-                }
-            });
-
-            // TODO:起動時即フォーカス、キーボード表示が上手くいかない
-            //search.requestFocus();
-            //search.requestFocusFromTouch();
-            //Keyboard.show();
-
-            // 検索欄横幅変更
-            // HACK:アクションバーのメニューアイコンはLayoutParamsのMarginを変更しても
-            //      変化しないのでX位置を変更して右余白を作成。)
-            //      代わりにアイコン本体が変更した分見切れてしまう。
-            //      その為検索欄をアクションバーの水平中央に移動させようとすると、おおきく見切れてしまう
-            //      ので右余白を作成した状態で検索欄の横幅を大きくして対応。
-            //      検索欄をアクションバー上に常時表示させようとすると、本来は個別でアクションバーに
-            //      依存しないツールバーを用意する必要があるのかもしれない。
-            ViewTreeObserver viewTreeObserver = search.getViewTreeObserver();
-            viewTreeObserver.addOnGlobalLayoutListener(
-                    new ViewTreeObserver.OnGlobalLayoutListener() {
-                        @Override
-                        public void onGlobalLayout() {
-                            ViewGroup.LayoutParams searchLayoutParams =
-                                    search.getLayoutParams();
-                            ViewGroup.MarginLayoutParams marginLayoutParams =
-                                    (ViewGroup.MarginLayoutParams) searchLayoutParams;
-
-                            //検索欄右余白設定
-                            float rightMargin =
-                                    UnitConverter.convertPx(16, getContext());
-                            search.setX(- rightMargin); //初期位置が基準の為、"-"とする。
-
-                            //検索欄横幅設定
-                            marginLayoutParams.width = (int) (
-                                    //画面横幅
-                                    getView().getWidth()
-                                            //戻るボタン横幅
-                                            - UnitConverter.convertPx(48, getContext())
-                                            //検索欄右余白
-                                            - UnitConverter.convertPx(16, getContext())
-                            );
-                            search.setLayoutParams(marginLayoutParams);
-
-                            ViewTreeObserver _viewTreeObserver =
-                                    search.getViewTreeObserver();
-                            _viewTreeObserver.removeOnGlobalLayoutListener(this);
-
-                        }
-                    }
-            );
-            String initialQuery =
-                    WordSearchFragment.this.wordSearchViewModel.getSearchWord();
-            search.setQuery(initialQuery, false);
-            search.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-                @Override
-                public boolean onQueryTextSubmit(String query) {
-                    return false;
-                }
-
-                @Override
-                public boolean onQueryTextChange(String newText) {
-                    Log.d("20240424", "onQueryTextChange起動");
-                    WordSearchFragment.this.wordSearchViewModel
-                            .setSearchWord(newText);
-                    if (newText.equals("")) {
-                        WordSearchFragment.this.wordSearchViewModel
-                                .prepareBeforeWordSearchShowing();
-                    } else {
-                        WordSearchFragment.this.wordSearchViewModel
-                                .loadWordSearchResultList(
-                                        WordSearchViewModel.LoadType.NEW
-                                );
-                    }
-
-
-
-
-                    return false;
-                }
-            });
-        }
-
-        @Override
-        public boolean onMenuItemSelected(@NonNull MenuItem menuItem) {
-            if (menuItem.getItemId() == android.R.id.home) {
-                backFragment(true);
-                return true;
-            }
-            return false;
-        }
     }
 
 
@@ -655,7 +488,6 @@ public class WordSearchFragment extends Fragment {
     //日記リスト(年月)リサイクルビューアダプタクラス
     public class WordSearchResultYearMonthListAdapter extends RecyclerView.Adapter<WordSearchResultYearMonthListViewHolder> {
         private List<Map<String, Object>> diaryListYearMonth = new ArrayList<>();
-        private List<CustomSimpleCallback> simpleCallbacks = new ArrayList<>();
         public static final String KEY_YEAR = "Year";
         public static final String KEY_MONTH = "Month";
         public static final String KEY_ADAPTER = "Adapter";
@@ -756,23 +588,6 @@ public class WordSearchFragment extends Fragment {
             String showedDate = diaryListFirstYearMonthViewHolder.textSectionBar.getText().toString();
             this.binding.textHeaderSectionBar.setText(showedDate);
         }
-    }
-
-
-    public void backFragment(boolean isNavigateUp) {
-        // TODO:前フラグメントへの処理有無後回し
-
-        // HACK:キーボード表示状態で戻るボタンを押下すると、キーボドが表示したまま戻ってしまう。
-        //      SearchView用キーボードだから？
-        Keyboard.hide(requireView()); // とりあえずフラグメントのレイアウトルートビューを代入
-
-
-        if (isNavigateUp) {
-            this.navController.navigateUp();
-        } else {
-            this.navController.popBackStack();
-        }
-
     }
 
 
