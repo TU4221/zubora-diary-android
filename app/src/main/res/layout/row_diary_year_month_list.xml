@@ -6,16 +6,6 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
-    <TextView
-        android:id="@+id/text_section_bar"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:hint="0000年00月"
-        android:background="?attr/colorPrimaryContainer"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recycler_day_list"
         android:layout_width="0dp"
@@ -27,4 +17,15 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/text_section_bar"
         app:layout_constraintVertical_bias="1.0" />
+
+    <TextView
+        android:id="@+id/text_section_bar"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:hint="0000年00月"
+        android:background="?attr/colorPrimaryContainer"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -100,13 +100,6 @@
                         android:layout_height="match_parent"
                         android:scrollbars="none" />
 
-                    <TextView
-                        android:id="@+id/text_header_section_bar"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:hint="0000年00月"
-                        android:background="?attr/colorPrimaryContainer" />
-
                 </FrameLayout>
 
                 <ProgressBar

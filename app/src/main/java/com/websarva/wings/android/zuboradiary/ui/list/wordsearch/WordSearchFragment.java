@@ -25,10 +25,16 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.google.android.material.transition.platform.MaterialFadeThrough;
+import com.google.android.material.transition.platform.MaterialSharedAxis;
 import com.websarva.wings.android.zuboradiary.Keyboard;
+import com.websarva.wings.android.zuboradiary.MainActivity;
 import com.websarva.wings.android.zuboradiary.R;
 import com.websarva.wings.android.zuboradiary.databinding.FragmentWordSearchBinding;
 import com.websarva.wings.android.zuboradiary.ui.editdiary.DiaryViewModel;
+import com.websarva.wings.android.zuboradiary.ui.list.DiaryListFragment;
+import com.websarva.wings.android.zuboradiary.ui.list.DiaryListSetting;
+import com.websarva.wings.android.zuboradiary.ui.list.DiaryYearMonthListViewHolder;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -39,6 +45,9 @@ public class WordSearchFragment extends Fragment {
 
     // View関係
     private FragmentWordSearchBinding binding;
+    private final int DIARY_DAY_LIST_ITEM_MARGIN_VERTICAL = 16;
+    private final int DIARY_DAY_LIST_ITEM_MARGIN_HORIZONTAL = 32;
+    private DiaryListSetting<DiaryListFragment._DiaryYearMonthListViewHolder> diaryListSetting;
 
     // Navigation関係
     private NavController navController;
@@ -59,6 +68,8 @@ public class WordSearchFragment extends Fragment {
         // Navigation設定
         this.navController = NavHostFragment.findNavController(this);
 
+        // 日記リスト設定クラスインスタンス化
+        this.diaryListSetting = new DiaryListSetting<>();
     }
 
     @Override
@@ -73,6 +84,28 @@ public class WordSearchFragment extends Fragment {
         // 双方向データバインディング設定
         this.binding.setLifecycleOwner(this);
         this.binding.setWordSearchViewModel(this.wordSearchViewModel);
+
+        // 画面遷移時のアニメーション設定
+        // FROM:遷移元 TO:遷移先
+        // FROM - TO の TO として現れるアニメーション
+        MainActivity mainActivity = (MainActivity) requireActivity();
+        if (mainActivity.getTabWasSelected()) {
+            setEnterTransition(new MaterialFadeThrough());
+            mainActivity.resetTabWasSelected();
+        } else {
+            setEnterTransition(new MaterialSharedAxis(MaterialSharedAxis.X, true));
+        }
+        // FROM - TO の FROM として消えるアニメーション
+        setExitTransition(new MaterialSharedAxis(MaterialSharedAxis.X, true));
+        // TO - FROM の FROM として現れるアニメーション
+        /*if (switchesReenterTransition != null && switchesReenterTransition) {
+            setReenterTransition(new MaterialSharedAxis(MaterialSharedAxis.Z, false));
+        } else {
+            setReenterTransition(new MaterialSharedAxis(MaterialSharedAxis.X, false));
+        }*/
+        setReenterTransition(new MaterialSharedAxis(MaterialSharedAxis.X, false));
+        // TO - FROM の TO として消えるアニメーション
+        setReturnTransition(new MaterialSharedAxis(MaterialSharedAxis.X, false));
 
         return this.binding.getRoot();
 
@@ -334,33 +367,12 @@ public class WordSearchFragment extends Fragment {
             public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
                 super.onScrolled(recyclerView, dx, dy);
 
-                // ListHeaderSectionBarの年月更新
-                updateListHeaderSectionBarDate();
-
-                // 画面に表示されている日記リスト(年月)の2番目のアイテムのセクションバーが
-                // ヘッダーセクションバーを押し出す動作
-                View secondViewHolder =
-                        WordSearchFragment.this.binding.recyclerWordSearchResults
-                                .getLayoutManager().getChildAt(1);
-                TextView textHeaderSectionBar =
-                        WordSearchFragment.this.binding.textHeaderSectionBar;
-
-                if (secondViewHolder != null) {
-                    float secondViewHolderPointY = secondViewHolder.getY();
-                    Log.d("スクロール位置確認", String.valueOf(secondViewHolderPointY));
-
-                    if (secondViewHolderPointY
-                            <= (recyclerView.getY() + textHeaderSectionBar.getHeight())) {
-                        Float Y = secondViewHolderPointY
-                                - (recyclerView.getY() + textHeaderSectionBar.getHeight());
-                        textHeaderSectionBar.setY(Y);
-                    } else {
-                        textHeaderSectionBar.setY(recyclerView.getY());
-                    }
-
-                } else {
-                    textHeaderSectionBar.setY(recyclerView.getY());
-                }
+                // 日記リスト先頭アイテムセクションバー位置更新
+                WordSearchFragment.this.diaryListSetting
+                        .updateFirstVisibleSectionBarPosition(
+                                recyclerView,
+                                WordSearchFragment.this.DIARY_DAY_LIST_ITEM_MARGIN_VERTICAL
+                        );
 
                 // 日記リスト追加読込
                 // https://android.suzu-sd.com/2021/05/recyclerview_item_scroll/#i-5
@@ -370,6 +382,19 @@ public class WordSearchFragment extends Fragment {
                             .loadWordSearchResultList(WordSearchViewModel.LoadType.ADD);
                     WordSearchFragment.this.wordSearchViewModel.setIsLoading(false);
                 }
+            }
+        });
+        recyclerWordSearchResults.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
+            @Override
+            public void onLayoutChange(
+                    View v, int left, int top, int right, int bottom,
+                    int oldLeft, int oldTop, int oldRight, int oldBottom) {
+                // 日記追加読込後RecyclerView更新時、セクションバーが元の位置に戻るので再度位置更新
+                WordSearchFragment.this.diaryListSetting
+                        .updateFirstVisibleSectionBarPosition(
+                                recyclerWordSearchResults,
+                                WordSearchFragment.this.DIARY_DAY_LIST_ITEM_MARGIN_VERTICAL
+                        );
             }
         });
 
@@ -474,14 +499,13 @@ public class WordSearchFragment extends Fragment {
 
 
     //日記リスト(年月)リサイクルビューホルダークラス
-    private class WordSearchResultYearMonthListViewHolder extends RecyclerView.ViewHolder {
-        public TextView textSectionBar;
+    private class WordSearchResultYearMonthListViewHolder extends DiaryYearMonthListViewHolder {
         public RecyclerView recyclerDayList;
 
         public WordSearchResultYearMonthListViewHolder(View itemView) {
             super(itemView);
-            textSectionBar = itemView.findViewById(R.id.text_section_bar);
-            recyclerDayList = itemView.findViewById(R.id.recycler_day_list);
+            this.textSectionBar = itemView.findViewById(R.id.text_section_bar);
+            this.recyclerDayList = itemView.findViewById(R.id.recycler_day_list);
         }
     }
 
@@ -514,14 +538,14 @@ public class WordSearchFragment extends Fragment {
                         @NonNull RecyclerView.State state) {
                     Log.d("リスト装飾確認","getItemOffsets()呼び出し");
                     super.getItemOffsets(outRect, view, parent, state);
-                    outRect.top = 16;
-                    outRect.left = 32;
-                    outRect.right = 32;
+                    outRect.top = WordSearchFragment.this.DIARY_DAY_LIST_ITEM_MARGIN_VERTICAL;
+                    outRect.left = WordSearchFragment.this.DIARY_DAY_LIST_ITEM_MARGIN_HORIZONTAL;
+                    outRect.right = WordSearchFragment.this.DIARY_DAY_LIST_ITEM_MARGIN_HORIZONTAL;
 
                     // TODO:Fragment切り替え方法をNavigationへの置換後、代替メソッド検討
                     Log.d("リスト装飾確認",Integer.toString(parent.findContainingViewHolder(view).getAdapterPosition()));
                     if (parent.findContainingViewHolder(view).getAdapterPosition() == (parent.getAdapter().getItemCount() - 1)) {
-                        outRect.bottom = 16;
+                        outRect.bottom = WordSearchFragment.this.DIARY_DAY_LIST_ITEM_MARGIN_VERTICAL;
                     }
                 }
             });
@@ -548,7 +572,8 @@ public class WordSearchFragment extends Fragment {
             holder.textSectionBar.setText(diaryDate);
 
             // 日記リスト(日)設定
-            // MEMO:日記リスト(年月)のLinearLayoutManagerとは併用できないので、日記リスト(日)用のLinearLayoutManagerをインスタンス化する。
+            // MEMO:日記リスト(年月)のLinearLayoutManagerとは併用できないので、
+            //      日記リスト(日)用のLinearLayoutManagerをインスタンス化する。
             holder.recyclerDayList.setLayoutManager(new LinearLayoutManager(getContext()));
             holder.recyclerDayList.setAdapter(diaryDayListAdapter);
 
@@ -567,26 +592,6 @@ public class WordSearchFragment extends Fragment {
             // TODO:下記ページにエラー回避方法が記載されてる。後日修正。
             // https://qiita.com/toastkidjp/items/f6fffc44acbf4d3690fd
             notifyDataSetChanged();
-        }
-    }
-
-    // 日記リストヘッダーセクションバーのテキスト更新
-    private void updateListHeaderSectionBarDate() {
-        Log.d("アクションバー日付更新確認", "更新");
-        //日記リスト(年月)の画面表示中先頭アイテムのビューホルダーを取得
-        LinearLayoutManager linearLayoutManager =
-                (LinearLayoutManager) this.binding.recyclerWordSearchResults.getLayoutManager();
-        int DiaryListFirstPosition = linearLayoutManager.findFirstVisibleItemPosition();
-        RecyclerView.ViewHolder diaryListFirstViewHolder =
-                this.binding.recyclerWordSearchResults
-                        .findViewHolderForAdapterPosition(DiaryListFirstPosition);
-        if (diaryListFirstViewHolder != null) {
-            WordSearchResultYearMonthListViewHolder diaryListFirstYearMonthViewHolder =
-                    (WordSearchResultYearMonthListViewHolder) diaryListFirstViewHolder;
-
-            // 日記リスト先頭ビューホルダーの年月情報を取得・リストヘッダーセクションバーへ表示
-            String showedDate = diaryListFirstYearMonthViewHolder.textSectionBar.getText().toString();
-            this.binding.textHeaderSectionBar.setText(showedDate);
         }
     }
 
