@@ -1,65 +1,83 @@
 package com.websarva.wings.android.zuboradiary.ui.list;
 
-import android.app.AlertDialog;
-import android.app.DatePickerDialog;
-import android.app.Dialog;
-import android.content.res.Resources;
-import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
-import android.widget.DatePicker;
 
-import androidx.fragment.app.DialogFragment;
-import androidx.fragment.app.Fragment;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.lifecycle.SavedStateHandle;
 import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
 
-import com.websarva.wings.android.zuboradiary.R;
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
+import com.websarva.wings.android.zuboradiary.databinding.DialogFragmentDatePickerBinding;
 
-import java.util.Calendar;
+import java.time.LocalDate;
 
-public class DatePickerDialogFragment extends DialogFragment {
+public class DatePickerDialogFragment extends BottomSheetDialogFragment {
     private static final String fromClassName = "From" + DatePickerDialogFragment.class.getName();
     public static final String KEY_SELECTED_YEAR = "SelectedYear" + fromClassName;
     public static final String KEY_SELECTED_MONTH = "SelectedMonth" + fromClassName;
 
+    // View関係
+    private DialogFragmentDatePickerBinding binding;
+
+    // Navigation関係
+    private NavController navController;
+
+
+
     @Override
-    public Dialog onCreateDialog(Bundle savedInstanceState) {
-        Log.d("20240527", DatePickerDialogFragment.class.getName());
-        final Calendar c = Calendar.getInstance();
-        int year = c.get(Calendar.YEAR);
-        int month = c.get(Calendar.MONTH);
-        int day = c.get(Calendar.DAY_OF_MONTH);
+    public View onCreateView(
+            @NonNull android.view.LayoutInflater inflater,
+            @Nullable android.view.ViewGroup container,
+            @Nullable android.os.Bundle savedInstanceState) {
+        super.onCreateView(inflater, container, savedInstanceState);
 
-        // Create a new instance of DatePickerDialog and return it
-        // android.R.style.Theme_Holo_Dialog でドラムロールに変更。
-        DatePickerDialog datePickerDialog = new DatePickerDialog(
-                requireActivity(),
-                android.R.style.Theme_Holo_Dialog,
-                new DatePickerDialog.OnDateSetListener() {
-                    @Override
-                    public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
-                        NavController navController =
-                                NavHostFragment
-                                        .findNavController(DatePickerDialogFragment.this);
-                        SavedStateHandle savedStateHandle =
-                                navController.getPreviousBackStackEntry().getSavedStateHandle();
-                        savedStateHandle.set(KEY_SELECTED_YEAR, year);
-                        savedStateHandle.set(KEY_SELECTED_MONTH, month + 1);
-                    }
-                },
-                year,
-                month,
-                day
-        );
-        // 日付選択ダイアログの日付選択インスタンスを取得。
-        DatePicker datePicker = datePickerDialog.getDatePicker();
+        // Navigation設定
+        this.navController = NavHostFragment.findNavController(this);
 
-        // 日付選択インスタンスから年月日の日選択を削除。
-        int datePickerId
-                = Resources.getSystem().getIdentifier("day", "id", "android");
-        datePicker.findViewById(datePickerId).setVisibility(View.GONE);
-        return datePickerDialog;
+        // データバインディング設定
+        this.binding =
+                DialogFragmentDatePickerBinding.inflate(inflater, container, false);
+
+        // View設定
+        LocalDate today = LocalDate.now();
+        int yearMaxValue =
+                DatePickerDialogFragmentArgs.fromBundle(requireArguments()).getYearMaxValue();
+        int yearMinValue =
+                DatePickerDialogFragmentArgs.fromBundle(requireArguments()).getYearMinValue();
+        this.binding.numberPickerYear.setMaxValue(yearMaxValue);
+        this.binding.numberPickerYear.setMinValue(yearMinValue);
+        this.binding.numberPickerYear.setValue(today.getYear());
+        this.binding.numberPickerYear.setWrapSelectorWheel(false);
+        this.binding.numberPickerMonth.setMaxValue(12);
+        this.binding.numberPickerMonth.setMinValue(1);
+        this.binding.numberPickerMonth.setValue(today.getMonthValue());
+        this.binding.numberPickerMonth.setWrapSelectorWheel(false);
+
+        this.binding.buttonDecision.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                int selectedYear =
+                        DatePickerDialogFragment.this.binding.numberPickerYear.getValue();
+                int selectedMonth =
+                        DatePickerDialogFragment.this.binding.numberPickerMonth.getValue();
+                SavedStateHandle savedStateHandle =
+                        DatePickerDialogFragment.this.navController
+                                .getPreviousBackStackEntry().getSavedStateHandle();
+                savedStateHandle.set(KEY_SELECTED_YEAR, selectedYear);
+                savedStateHandle.set(KEY_SELECTED_MONTH, selectedMonth);
+                DatePickerDialogFragment.this.navController.navigateUp();
+            }
+        });
+
+        this.binding.buttonCancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                DatePickerDialogFragment.this.navController.navigateUp();
+            }
+        });
+
+        return this.binding.getRoot();
     }
 }

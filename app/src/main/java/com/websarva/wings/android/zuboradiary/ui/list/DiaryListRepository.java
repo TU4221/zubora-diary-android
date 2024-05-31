@@ -4,6 +4,7 @@ import android.app.Application;
 import android.util.Log;
 
 import com.google.common.util.concurrent.ListenableFuture;
+import com.websarva.wings.android.zuboradiary.ui.editdiary.Diary;
 import com.websarva.wings.android.zuboradiary.ui.editdiary.DiaryDAO;
 import com.websarva.wings.android.zuboradiary.ui.editdiary.DiaryDatabase;
 
@@ -68,5 +69,37 @@ public class DiaryListRepository {
         catch (InterruptedException ex) {
             Log.d("ROOM通信エラー", "InterruptedException");
         }
+    }
+
+    public Diary selectNewestDiary() {
+        ListenableFuture<Diary> listenableFutureResult = diaryDAO.selectNewestDiary();
+
+        Diary result = null;
+        try {
+            result = listenableFutureResult.get();
+        }
+        catch (ExecutionException ex) {
+            Log.d("ROOM通信エラー", "ExecutionException");
+        }
+        catch (InterruptedException ex) {
+            Log.d("ROOM通信エラー", "InterruptedException");
+        }
+        return result;
+    }
+
+    public Diary selectOldestDiary() {
+        ListenableFuture<Diary> listenableFutureResult = diaryDAO.selectOldestDiary();
+
+        Diary result = null;
+        try {
+            result = listenableFutureResult.get();
+        }
+        catch (ExecutionException ex) {
+            Log.d("ROOM通信エラー", "ExecutionException");
+        }
+        catch (InterruptedException ex) {
+            Log.d("ROOM通信エラー", "InterruptedException");
+        }
+        return result;
     }
 }

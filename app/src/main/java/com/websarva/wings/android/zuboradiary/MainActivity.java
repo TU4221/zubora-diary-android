@@ -1,10 +1,12 @@
 package com.websarva.wings.android.zuboradiary;
 
 import android.animation.ValueAnimator;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.view.ViewGroup;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -212,6 +214,12 @@ public class MainActivity extends AppCompatActivity {
                                              @Nullable Bundle bundle) {
                 if (isNoBottomNavigationFragment(navDestination)) {
                     if (!MainActivity.this.bottomNavigationIsHided) {
+                        if (true) {
+                            MainActivity.this.binding.navView.setTransitionVisibility(View.GONE);
+                            //MainActivity.this.binding.navView.setVisibility(View.GONE);
+                            MainActivity.this.bottomNavigationIsHided = true;
+                            return;
+                        }
                         ValueAnimator anim= ValueAnimator
                                 .ofInt(
                                         MainActivity.this.bottomNavigationDefaultHigh,
@@ -234,6 +242,12 @@ public class MainActivity extends AppCompatActivity {
 
                 } else {
                     if (MainActivity.this.bottomNavigationIsHided) {
+                        if (true) {
+                            MainActivity.this.binding.navView.setTransitionVisibility(View.VISIBLE);
+                            //MainActivity.this.binding.navView.setVisibility(View.VISIBLE);
+                            MainActivity.this.bottomNavigationIsHided = false;
+                            return;
+                        }
                         ValueAnimator anim= ValueAnimator
                                 .ofInt(0, MainActivity.this.bottomNavigationDefaultHigh);
                         anim.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {

@@ -35,7 +35,14 @@
         </fragment>
         <dialog
             android:id="@+id/navigation_date_picker_dialog_for_diary_list_fragment"
-            android:name="com.websarva.wings.android.zuboradiary.ui.list.DatePickerDialogFragment"/>
+            android:name="com.websarva.wings.android.zuboradiary.ui.list.DatePickerDialogFragment">
+            <argument
+                android:name="YearMaxValue"
+                app:argType="integer" />
+            <argument
+                android:name="YearMinValue"
+                app:argType="integer" />
+        </dialog>
         <dialog
             android:id="@+id/navigation_delete_confirmation_dialog_for_diary_list_fragment"
             android:name="com.websarva.wings.android.zuboradiary.ui.list.DeleteConfirmationDialogFragment">

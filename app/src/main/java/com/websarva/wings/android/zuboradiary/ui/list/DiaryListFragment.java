@@ -36,6 +36,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.transition.platform.MaterialFadeThrough;
 import com.google.android.material.transition.platform.MaterialSharedAxis;
+import com.websarva.wings.android.zuboradiary.DateConverter;
 import com.websarva.wings.android.zuboradiary.MainActivity;
 import com.websarva.wings.android.zuboradiary.R;
 
@@ -177,7 +178,9 @@ public class DiaryListFragment extends Fragment {
                     // MEMO:removeで削除しないとこのFragmentを閉じてもResult内容が残ってしまう。
                     //      その為、このFragmentを再表示した時にObserverがResultの内容で処理してしまう。
                     SavedStateHandle savedStateHandle = navBackStackEntry.getSavedStateHandle();
-                    savedStateHandle.remove(com.websarva.wings.android.zuboradiary.ui.editdiary.DatePickerDialogFragment.KEY_SELECTED_YEAR);
+                    savedStateHandle.remove(DatePickerDialogFragment.KEY_SELECTED_YEAR);
+                    savedStateHandle.remove(DatePickerDialogFragment.KEY_SELECTED_MONTH);
+                    savedStateHandle.remove(DeleteConfirmationDialogFragment.KEY_DELETE_DIARY_DATE);
                     navBackStackEntry.getLifecycle().removeObserver(lifecycleEventObserver);
                 }
             }
@@ -190,8 +193,13 @@ public class DiaryListFragment extends Fragment {
                     @Override
                     public void onClick(View v) {
                         // リスト先頭年月切り替えダイアログ起動
+                        String newestDate = DiaryListFragment.this.listViewModel.loadNewestDiary().getDate();
+                        String oldestDate = DiaryListFragment.this.listViewModel.loadOldestDiary().getDate();
+                        int newestYear = DateConverter.toLocalDate(newestDate).getYear();
+                        int oldestYear = DateConverter.toLocalDate(oldestDate).getYear();
                         NavDirections action =
-                                DiaryListFragmentDirections.actionDiaryListFragmentToDatePickerDialog();
+                                DiaryListFragmentDirections
+                                        .actionDiaryListFragmentToDatePickerDialog(newestYear, oldestYear);
                         DiaryListFragment.this.navController.navigate(action);
                     }
                 });
@@ -294,6 +302,13 @@ public class DiaryListFragment extends Fragment {
                         if (list != null && list.isEmpty()) {
                             DiaryListFragment.this.listViewModel
                                     .setLiveIsVisibleHeaderSectionBar(false);
+                            DiaryYearMonthListAdapter diaryYearMonthListAdapter =
+                                    (DiaryYearMonthListAdapter)
+                                            DiaryListFragment
+                                                    .this.binding.recyclerDiaryYearMonthList
+                                                    .getAdapter();
+                            List<Map<String, Object>> emptyList = new ArrayList<>();
+                            diaryYearMonthListAdapter.changeItem(emptyList);
                         } else {
                             // 型変換:List<DiaryListItem> -> List<Map<String, Object>>
                             List<Map<String, Object>> dayList = new ArrayList<>();
@@ -686,9 +701,14 @@ public class DiaryListFragment extends Fragment {
 
             // リスト先頭年月切り替えダイアログ起動
             } else if (menuItem.getItemId() == android.R.id.home) {
+
+                String newestDate = DiaryListFragment.this.listViewModel.loadNewestDiary().getDate();
+                String oldestDate = DiaryListFragment.this.listViewModel.loadOldestDiary().getDate();
+                int newestYear = DateConverter.toLocalDate(newestDate).getYear();
+                int oldestYear = DateConverter.toLocalDate(oldestDate).getYear();
                 NavDirections action =
-                        DiaryListFragmentDirections.actionDiaryListFragmentToDatePickerDialog();
-                DiaryListFragment.this.navController.navigate(action);
+                        DiaryListFragmentDirections
+                                .actionDiaryListFragmentToDatePickerDialog(newestYear, oldestYear);
                 return true;
 
             } else {

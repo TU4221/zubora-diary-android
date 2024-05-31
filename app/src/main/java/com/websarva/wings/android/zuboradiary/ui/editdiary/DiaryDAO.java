@@ -23,6 +23,12 @@ public interface DiaryDAO {
     @Query("SELECT * FROM diaries WHERE date = :date")
     public ListenableFuture<Diary> selectDiary(String date);
 
+    @Query("SELECT * FROM diaries ORDER BY date DESC LIMIT 1 OFFSET 0")
+    public ListenableFuture<Diary> selectNewestDiary();
+
+    @Query("SELECT * FROM diaries ORDER BY date ASC LIMIT 1 OFFSET 0")
+    public ListenableFuture<Diary> selectOldestDiary();
+
     @Query("SELECT date, title, imagePath FROM diaries ORDER BY date DESC LIMIT :num OFFSET :offset")
     public ListenableFuture<List<DiaryListItem>> selectDiaryList(int num, int offset);
 

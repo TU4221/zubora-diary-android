@@ -8,6 +8,10 @@ import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
+import com.websarva.wings.android.zuboradiary.ui.editdiary.Diary;
+
+import org.checkerframework.common.value.qual.StringVal;
+
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAdjusters;
@@ -116,6 +120,14 @@ public class ListViewModel extends AndroidViewModel {
 
     public void setLiveIsVisibleHeaderSectionBar(boolean bool) {
         this.isVisibleHeaderSectionBar.setValue(bool);
+    }
+
+    public Diary loadNewestDiary() {
+        return this.diaryListRepository.selectNewestDiary();
+    }
+
+    public Diary loadOldestDiary() {
+        return this.diaryListRepository.selectOldestDiary();
     }
 
     // 単一・双方向データバインディング用メソッド
