@@ -17,9 +17,42 @@ import java.time.format.DateTimeFormatter;
 public class DiaryViewModel extends AndroidViewModel {
 
     public class Item {
+        public MutableLiveData<Integer> itemNumber = new MutableLiveData<>(1);
         public MutableLiveData<Boolean> isVisible = new MutableLiveData<>(false);
         public MutableLiveData<String> title = new MutableLiveData<>("");
         public MutableLiveData<String> comment = new MutableLiveData<>("");
+
+        public Item(int itemNumber) {
+            setLiveItemNumber(itemNumber);
+        }
+
+        public LiveData<Integer> getLiveItemNumber() {
+            return this.itemNumber;
+        }
+        public void setLiveItemNumber(int itemNumber) {
+            this.itemNumber.setValue(itemNumber);
+        }
+
+        public LiveData<Boolean> getLiveIsVisible() {
+            return this.isVisible;
+        }
+        public void setLiveIsVisible(Boolean bool) {
+            this.isVisible.setValue(bool);
+        }
+
+        public LiveData<String> getLiveTitle() {
+            return this.title;
+        }
+        public void setLiveTitle(String title) {
+            this.title.setValue(title);
+        }
+
+        public LiveData<String> getLiveComment() {
+            return this.comment;
+        }
+        public void setLiveComment(String comment) {
+            this.comment.setValue(comment);
+        }
     }
     
 
@@ -54,7 +87,8 @@ public class DiaryViewModel extends AndroidViewModel {
         super(application);
         diaryRepository = new DiaryRepository(getApplication());
         for (int i = 0; i < items.length; i++) {
-            items[i] = new Item();
+            int itemNumber = i + 1;
+            items[i] = new Item(itemNumber);
         }
         this.items[0].isVisible.setValue(true);
     }
@@ -414,18 +448,6 @@ public class DiaryViewModel extends AndroidViewModel {
             }
         }
         if (showItemNum > 1) {
-            switch (showItemNum) {
-                case 2:
-                    this.items[1].isVisible.setValue(false);
-                case 3:
-                    this.items[2].isVisible.setValue(false);
-                case 4:
-                    this.items[3].isVisible.setValue(false);
-                case 5:
-                    this.items[4].isVisible.setValue(false);
-                default:
-                    this.items[0].isVisible.setValue(true);
-            }
             showItemNum -= 1;
         }
     }
@@ -554,6 +576,11 @@ public class DiaryViewModel extends AndroidViewModel {
 
     public LiveData<String> getLiveItem5Comment() {
         return this.items[4].comment;
+    }
+
+    public Item getItem(int itemNumber) {
+        int arrayNumber = itemNumber - 1;
+        return this.items[arrayNumber];
     }
 
 }

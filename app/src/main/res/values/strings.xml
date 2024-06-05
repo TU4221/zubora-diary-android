@@ -69,7 +69,7 @@
         <item>雪</item>
     </string-array>
     <string name="edit_diary_weather_slush">／</string>
-    <string name="edit_diary_item_1">項目1</string>
+    <string name="edit_diary_item">項目</string>
     <string name="edit_diary_item_2">項目2</string>
     <string name="edit_diary_item_3">項目3</string>
     <string name="edit_diary_item_4">項目4</string>

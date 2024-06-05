@@ -6,14 +6,12 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.Bundle;
 
-import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-import androidx.core.view.MenuHost;
-import androidx.core.view.MenuProvider;
+import androidx.constraintlayout.motion.widget.MotionLayout;
 import androidx.core.widget.NestedScrollView;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Lifecycle;
@@ -26,7 +24,6 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavBackStackEntry;
 import androidx.navigation.NavController;
 import androidx.navigation.NavDirections;
-import androidx.navigation.Navigation;
 import androidx.navigation.fragment.NavHostFragment;
 
 import android.text.Editable;
@@ -35,8 +32,6 @@ import android.text.TextWatcher;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
@@ -49,8 +44,6 @@ import android.widget.TextView;
 
 import com.websarva.wings.android.zuboradiary.databinding.FragmentEditDiaryBinding;
 import com.websarva.wings.android.zuboradiary.R;
-import com.websarva.wings.android.zuboradiary.ui.diary.showdiary.ShowDiaryFragment;
-import com.websarva.wings.android.zuboradiary.ui.diary.showdiary.ShowDiaryFragmentDirections;
 import com.websarva.wings.android.zuboradiary.ui.editdiaryselectitemtitle.EditDiarySelectItemTitleFragment;
 import com.websarva.wings.android.zuboradiary.ui.editdiaryselectitemtitle.EditDiarySelectItemTitleViewModel;
 
@@ -62,6 +55,7 @@ public class EditDiaryFragment extends Fragment {
     // View関係
     private FragmentEditDiaryBinding binding;
     private final int MAX_ITEM_NUM = 5; // 項目入力欄最大数
+    private boolean isDeletingItemTransition = false;
 
     // Navigation関係
     private NavController navController;
@@ -216,9 +210,16 @@ public class EditDiaryFragment extends Fragment {
                     if (containsDeleteConfirmDialogFragmentDialogFragmentResult) {
                         Integer deleteItemNumber = savedStateHandle
                                 .get(DeleteConfirmationDialogFragment.KEY_DELETE_ITEM_NUMBER);
-                        EditDiaryFragment.this.diaryViewModel.deleteItem(deleteItemNumber);
-                        EditDiaryFragment.this.editDiarySelectItemTitleViewModel
-                                .deleteSavingDiaryItemTitle(deleteItemNumber);
+
+                        if (deleteItemNumber == 1
+                                && EditDiaryFragment.this.diaryViewModel.showItemNum == deleteItemNumber) {
+                            EditDiaryFragment.this.diaryViewModel.deleteItem(deleteItemNumber);
+                            EditDiaryFragment.this.editDiarySelectItemTitleViewModel
+                                    .deleteSavingDiaryItemTitle(deleteItemNumber);
+                        } else {
+                            EditDiaryFragment.this.isDeletingItemTransition = true;
+                            hideItem(deleteItemNumber, false);
+                        }
                         savedStateHandle.remove(DeleteConfirmationDialogFragment.KEY_DELETE_ITEM_NUMBER);
                     }
 
@@ -324,40 +325,40 @@ public class EditDiaryFragment extends Fragment {
         TextView[] textItemsCommentLength = new TextView[MAX_ITEM_NUM];
         ImageButton[] imageButtonItemsDelete = new ImageButton[MAX_ITEM_NUM];
 
-        textItems[0] = this.binding.textItem1;
-        editTextItemsTitle[0] = this.binding.editTextItem1Title;
-        nestedScrollItemsComment[0] = this.binding.nestedScrollItem1Comment;
-        editTextItemsComment[0] = this.binding.editTextItem1Comment;
-        textItemsCommentLength[0] = this.binding.textItem1CommentLength;
-        imageButtonItemsDelete[0] = this.binding.imageButtonItem1Delete;
+        textItems[0] = this.binding.includeItem1.textItemNumber;
+        editTextItemsTitle[0] = this.binding.includeItem1.editTextItemTitle;
+        nestedScrollItemsComment[0] = this.binding.includeItem1.nestedScrollItemComment;
+        editTextItemsComment[0] = this.binding.includeItem1.editTextItemComment;
+        textItemsCommentLength[0] = this.binding.includeItem1.textItemCommentLength;
+        imageButtonItemsDelete[0] = this.binding.includeItem1.imageButtonItemDelete;
 
-        textItems[1] = this.binding.textItem2;
-        editTextItemsTitle[1] = this.binding.editTextItem2Title;
-        nestedScrollItemsComment[1] = this.binding.nestedScrollItem2Comment;
-        editTextItemsComment[1] = this.binding.editTextItem2Comment;
-        textItemsCommentLength[1] = this.binding.textItem2CommentLength;
-        imageButtonItemsDelete[1] = this.binding.imageButtonItem2Delete;
+        textItems[1] = this.binding.includeItem2.textItemNumber;
+        editTextItemsTitle[1] = this.binding.includeItem2.editTextItemTitle;
+        nestedScrollItemsComment[1] = this.binding.includeItem2.nestedScrollItemComment;
+        editTextItemsComment[1] = this.binding.includeItem2.editTextItemComment;
+        textItemsCommentLength[1] = this.binding.includeItem2.textItemCommentLength;
+        imageButtonItemsDelete[1] = this.binding.includeItem2.imageButtonItemDelete;
 
-        textItems[2] = this.binding.textItem3;
-        editTextItemsTitle[2] = this.binding.editTextItem3Title;
-        nestedScrollItemsComment[2] = this.binding.nestedScrollItem3Comment;
-        editTextItemsComment[2] = this.binding.editTextItem3Comment;
-        textItemsCommentLength[2] = this.binding.textItem3CommentLength;
-        imageButtonItemsDelete[2] = this.binding.imageButtonItem3Delete;
+        textItems[2] = this.binding.includeItem3.textItemNumber;
+        editTextItemsTitle[2] = this.binding.includeItem3.editTextItemTitle;
+        nestedScrollItemsComment[2] = this.binding.includeItem3.nestedScrollItemComment;
+        editTextItemsComment[2] = this.binding.includeItem3.editTextItemComment;
+        textItemsCommentLength[2] = this.binding.includeItem3.textItemCommentLength;
+        imageButtonItemsDelete[2] = this.binding.includeItem3.imageButtonItemDelete;
 
-        textItems[3] = this.binding.textItem4;
-        editTextItemsTitle[3] = this.binding.editTextItem4Title;
-        nestedScrollItemsComment[3] = this.binding.nestedScrollItem4Comment;
-        editTextItemsComment[3] = this.binding.editTextItem4Comment;
-        textItemsCommentLength[3] = this.binding.textItem4CommentLength;
-        imageButtonItemsDelete[3] = this.binding.imageButtonItem4Delete;
+        textItems[3] = this.binding.includeItem4.textItemNumber;
+        editTextItemsTitle[3] = this.binding.includeItem4.editTextItemTitle;
+        nestedScrollItemsComment[3] = this.binding.includeItem4.nestedScrollItemComment;
+        editTextItemsComment[3] = this.binding.includeItem4.editTextItemComment;
+        textItemsCommentLength[3] = this.binding.includeItem4.textItemCommentLength;
+        imageButtonItemsDelete[3] = this.binding.includeItem4.imageButtonItemDelete;
 
-        textItems[4] = this.binding.textItem5;
-        editTextItemsTitle[4] = this.binding.editTextItem5Title;
-        nestedScrollItemsComment[4] = this.binding.nestedScrollItem5Comment;
-        editTextItemsComment[4] = this.binding.editTextItem5Comment;
-        textItemsCommentLength[4] = this.binding.textItem5CommentLength;
-        imageButtonItemsDelete[4] = this.binding.imageButtonItem5Delete;
+        textItems[4] = this.binding.includeItem5.textItemNumber;
+        editTextItemsTitle[4] = this.binding.includeItem5.editTextItemTitle;
+        nestedScrollItemsComment[4] = this.binding.includeItem5.nestedScrollItemComment;
+        editTextItemsComment[4] = this.binding.includeItem5.editTextItemComment;
+        textItemsCommentLength[4] = this.binding.includeItem5.textItemCommentLength;
+        imageButtonItemsDelete[4] = this.binding.includeItem5.imageButtonItemDelete;
 
         // キーボード入力不要View
         List<View> noKeyboardViews = new ArrayList<>();
@@ -565,8 +566,6 @@ public class EditDiaryFragment extends Fragment {
             );
         }
 
-        // 項目追加ボタン設定
-        // ViewModel にて処理
 
         // 項目削除ボタン設定
         for (int i = 0; i < this.MAX_ITEM_NUM; i++) {
@@ -581,6 +580,69 @@ public class EditDiaryFragment extends Fragment {
                 }
             });
         }
+
+
+        // 項目追加ボタン設定
+        this.binding.imageButtonAddItem.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                EditDiaryFragment.this.binding.imageButtonAddItem.setEnabled(false);
+                int visibleItemsCount = EditDiaryFragment.this.diaryViewModel.showItemNum;
+                int addItemNumber = visibleItemsCount + 1;
+                showItem(addItemNumber, false);
+                EditDiaryFragment.this.diaryViewModel.showItemNum += 1;
+            }
+        });
+        for (int i = 0; i < this.MAX_ITEM_NUM; i++) {
+            int itemNumber = i + 1;
+            MotionLayout itemMotionLayout = selectItemMotionLayout(itemNumber);
+            itemMotionLayout.setTransitionListener(new MotionLayout.TransitionListener() {
+                @Override
+                public void onTransitionStarted(MotionLayout motionLayout, int startId, int endId) {
+                    // 処理なし
+                }
+
+                @Override
+                public void onTransitionChange(
+                        MotionLayout motionLayout, int startId, int endId, float progress) {
+                    // 処理なし
+                }
+
+                @Override
+                public void onTransitionCompleted(MotionLayout motionLayout, int currentId) {
+                    Log.d("20240605", "Item" + String.valueOf(itemNumber) + " onTransitionCompleted");
+                    // 対象項目欄を閉じた後の処理
+                    if (currentId == R.id.motion_scene_edit_diary_item_hided_state) {
+                        Log.d("20240605", "currentId:Start");
+                        if (EditDiaryFragment.this.isDeletingItemTransition) {
+                            EditDiaryFragment.this.diaryViewModel.deleteItem(itemNumber);
+                            EditDiaryFragment.this.editDiarySelectItemTitleViewModel
+                                    .deleteSavingDiaryItemTitle(itemNumber);
+                            EditDiaryFragment.this.isDeletingItemTransition = false;
+                            setupItemLayout();
+                        }
+                        EditDiaryFragment.this.binding
+                                .imageButtonAddItem.setVisibility(View.VISIBLE);
+                    } else if (currentId == R.id.motion_scene_edit_diary_item_showed_state) {
+                        Log.d("20240605", "currentId:End");
+                        EditDiaryFragment.this.binding.imageButtonAddItem.setEnabled(true);
+                        if (EditDiaryFragment.this.diaryViewModel.showItemNum
+                                == EditDiaryFragment.this.MAX_ITEM_NUM ) {
+                            EditDiaryFragment.this.binding
+                                    .imageButtonAddItem.setVisibility(View.INVISIBLE);
+                        }
+                    }
+                }
+
+                @Override
+                public void onTransitionTrigger(MotionLayout motionLayout, int triggerId, boolean positive, float progress) {
+                    // 処理なし
+                }
+            });
+        }
+
+        setupItemLayout();
+
     }
 
 
@@ -718,6 +780,69 @@ public class EditDiaryFragment extends Fragment {
             action = EditDiaryFragmentDirections.actionEditDiaryFragmentToShowDiaryFragmentPattern1();
         }
         this.navController.navigate(action);
+    }
+
+
+    private MotionLayout selectItemMotionLayout(int itemNumber) {
+        MotionLayout itemMotionLayout = null;
+        switch (itemNumber) {
+            case 1:
+                itemMotionLayout = this.binding.includeItem1.motionLayoutEditDiaryItem;
+                break;
+            case 2:
+                itemMotionLayout = this.binding.includeItem2.motionLayoutEditDiaryItem;
+                break;
+            case 3:
+                itemMotionLayout = this.binding.includeItem3.motionLayoutEditDiaryItem;
+                break;
+            case 4:
+                itemMotionLayout = this.binding.includeItem4.motionLayoutEditDiaryItem;
+                break;
+            case 5:
+                itemMotionLayout = this.binding.includeItem5.motionLayoutEditDiaryItem;
+                break;
+        }
+        return itemMotionLayout;
+    }
+
+    private void setupItemLayout() {
+        int visibleItemsCount = this.diaryViewModel.showItemNum;
+        Log.d("20240605", String.valueOf(visibleItemsCount));
+        for (int i = 0; i < MAX_ITEM_NUM; i++) {
+            int itemNumber = i + 1;
+            if (itemNumber <= visibleItemsCount) {
+                showItem(itemNumber, true);
+            } else {
+                hideItem(itemNumber, true);
+            }
+        }
+    }
+
+
+    private void hideItem(int itemNumber, boolean isJump) {
+        MotionLayout itemMotionLayout = selectItemMotionLayout(itemNumber);
+        if (itemMotionLayout != null) {
+            Log.d("20240605", "hideItem(" + String.valueOf(itemNumber) + ")");
+            if (isJump) {
+                itemMotionLayout
+                        .transitionToState(R.id.motion_scene_edit_diary_item_hided_state, 1);
+            } else {
+                itemMotionLayout.transitionToState(R.id.motion_scene_edit_diary_item_hided_state);
+            }
+        }
+    }
+
+    private void showItem(int itemNumber, boolean isJump) {
+        MotionLayout itemMotionLayout = selectItemMotionLayout(itemNumber);
+        if (itemMotionLayout != null) {
+            Log.d("20240605", "showItem(" + String.valueOf(itemNumber) + ")");
+            if (isJump) {
+                itemMotionLayout
+                        .transitionToState(R.id.motion_scene_edit_diary_item_showed_state, 1);
+            } else {
+                itemMotionLayout.transitionToState(R.id.motion_scene_edit_diary_item_showed_state);
+            }
+        }
     }
 
 }
