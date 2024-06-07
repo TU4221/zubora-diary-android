@@ -8,8 +8,6 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.constraintlayout.motion.widget.MotionLayout;
 import androidx.core.widget.NestedScrollView;
@@ -46,6 +44,7 @@ import com.websarva.wings.android.zuboradiary.databinding.FragmentEditDiaryBindi
 import com.websarva.wings.android.zuboradiary.R;
 import com.websarva.wings.android.zuboradiary.ui.editdiaryselectitemtitle.EditDiarySelectItemTitleFragment;
 import com.websarva.wings.android.zuboradiary.ui.editdiaryselectitemtitle.EditDiarySelectItemTitleViewModel;
+import com.websarva.wings.android.zuboradiary.ui.list.DiaryListFragment;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -54,8 +53,10 @@ public class EditDiaryFragment extends Fragment {
 
     // View関係
     private FragmentEditDiaryBinding binding;
-    private final int MAX_ITEM_NUM = 5; // 項目入力欄最大数
+    private final int MAX_ITEMS_COUNT = DiaryViewModel.MAX_ITEMS_COUNT; // 項目入力欄最大数
     private boolean isDeletingItemTransition = false;
+    private final String TOOL_BAR_TITLE_NEW = "新規作成";
+    private final String TOOL_BAR_TITLE_EDIT = "編集中";
 
     // Navigation関係
     private NavController navController;
@@ -92,7 +93,7 @@ public class EditDiaryFragment extends Fragment {
 
         // 双方向データバインディング設定
         this.binding.setLifecycleOwner(EditDiaryFragment.this);
-        this.binding.setEditDiaryViewModel(diaryViewModel);
+        this.binding.setDiaryViewModel(diaryViewModel);
 
         // キーボード設定
         this.inputMethodManager =
@@ -116,24 +117,7 @@ public class EditDiaryFragment extends Fragment {
             public void onChanged(String string) {
                 int itemNumber =
                         savedStateHandle.get(EditDiarySelectItemTitleFragment.KEY_UPDATE_ITEM_NUMBER);
-                switch (itemNumber) {
-                    case 1:
-                        EditDiaryFragment.this.diaryViewModel.setLiveItem1Title(string);
-                        break;
-                    case 2:
-                        EditDiaryFragment.this.diaryViewModel.setLiveItem2Title(string);
-                        break;
-                    case 3:
-                        EditDiaryFragment.this.diaryViewModel.setLiveItem3Title(string);
-                        break;
-                    case 4:
-                        EditDiaryFragment.this.diaryViewModel.setLiveItem4Title(string);
-                        break;
-                    case 5:
-                        EditDiaryFragment.this.diaryViewModel.setLiveItem5Title(string);
-                        break;
-                    default:
-                }
+                EditDiaryFragment.this.diaryViewModel.getItem(itemNumber).setTitle(string);
                 savedStateHandle.remove(EditDiarySelectItemTitleFragment.KEY_UPDATE_ITEM_NUMBER);
                 savedStateHandle.remove(EditDiarySelectItemTitleFragment.KEY_NEW_ITEM_TITLE);
             }
@@ -177,7 +161,7 @@ public class EditDiaryFragment extends Fragment {
                         String loadDiaryDate =
                                 savedStateHandle.get(LoadExistingDiaryDialogFragment.KEY_LOAD_DIARY_DATE);
                         DiaryViewModel _diaryViewModel = EditDiaryFragment.this.diaryViewModel;
-                        _diaryViewModel.setLiveLoadingDate(loadDiaryDate);
+                        _diaryViewModel.setLoadingDate(loadDiaryDate);
                         _diaryViewModel.prepareEditDiary();
                         Integer weather1 = _diaryViewModel.getLiveIntWeather1().getValue();
                         EditDiaryFragment.this.binding.spinnerWeather1.setSelection(weather1);
@@ -185,10 +169,8 @@ public class EditDiaryFragment extends Fragment {
                         EditDiaryFragment.this.binding.spinnerWeather2.setSelection(weather2);
                         Integer condition = _diaryViewModel.getLiveIntCondition().getValue();
                         EditDiaryFragment.this.binding.spinnerCondition.setSelection(condition);
-                        ActionBar actionBar =
-                                ((AppCompatActivity) getActivity()).getSupportActionBar();
-                        actionBar.setTitle("編集中");
-                        _diaryViewModel.setWasNewEditDiary(true);
+                        EditDiaryFragment.this.binding
+                                .materialToolbarTopAppBar.setTitle(TOOL_BAR_TITLE_EDIT);
                         savedStateHandle.remove(LoadExistingDiaryDialogFragment.KEY_LOAD_DIARY_DATE);
                     }
 
@@ -212,7 +194,8 @@ public class EditDiaryFragment extends Fragment {
                                 .get(DeleteConfirmationDialogFragment.KEY_DELETE_ITEM_NUMBER);
 
                         if (deleteItemNumber == 1
-                                && EditDiaryFragment.this.diaryViewModel.showItemNum == deleteItemNumber) {
+                                && EditDiaryFragment.this.diaryViewModel.getVisibleItemsCount()
+                                                                            == deleteItemNumber) {
                             EditDiaryFragment.this.diaryViewModel.deleteItem(deleteItemNumber);
                             EditDiaryFragment.this.editDiarySelectItemTitleViewModel
                                     .deleteSavingDiaryItemTitle(deleteItemNumber);
@@ -247,11 +230,29 @@ public class EditDiaryFragment extends Fragment {
         });
 
 
+        // 画面表示データ準備
+        boolean isStartDiaryFragment =
+                EditDiaryFragmentArgs.fromBundle(requireArguments()).getIsStartDiaryFragment();
+        String editDiaryDate =
+                EditDiaryFragmentArgs.fromBundle(requireArguments()).getEditDiaryDate();
+        if (isStartDiaryFragment) {
+            if (this.diaryViewModel.getRequiresPreparationDiary()) {
+                this.diaryViewModel.initialize();
+                if (editDiaryDate.isEmpty()) {
+                    this.diaryViewModel.setIsNewEditDiary(true);
+                }
+                this.diaryViewModel.setLoadingDate(editDiaryDate);
+                this.diaryViewModel.prepareEditDiary();
+                this.diaryViewModel.setRequiresPreparationDiary(false);
+            }
+        }
+
+
         // ツールバー設定
         if (diaryViewModel.getIsNewEditDiary()) {
-            this.binding.materialToolbarTopAppBar.setTitle("新規作成");
+            this.binding.materialToolbarTopAppBar.setTitle(TOOL_BAR_TITLE_NEW);
         } else {
-            this.binding.materialToolbarTopAppBar.setTitle("編集中");
+            this.binding.materialToolbarTopAppBar.setTitle(TOOL_BAR_TITLE_EDIT);
         }
         this.binding.materialToolbarTopAppBar
                 .setNavigationOnClickListener(new View.OnClickListener() {
@@ -309,21 +310,13 @@ public class EditDiaryFragment extends Fragment {
                 });
 
 
-        // 画面表示データ準備
-        if (this.diaryViewModel.getRequiresPreparationDiary()) {
-            this.diaryViewModel.prepareEditDiary();
-        } else {
-            this.diaryViewModel.setRequiresPreparationDiary(true);
-        }
-
-
         // 項目入力欄関係Viewを配列に格納
-        TextView[] textItems = new TextView[MAX_ITEM_NUM];
-        EditText[] editTextItemsTitle = new EditText[MAX_ITEM_NUM];
-        NestedScrollView[] nestedScrollItemsComment = new NestedScrollView[MAX_ITEM_NUM];
-        EditText[] editTextItemsComment = new EditText[MAX_ITEM_NUM];
-        TextView[] textItemsCommentLength = new TextView[MAX_ITEM_NUM];
-        ImageButton[] imageButtonItemsDelete = new ImageButton[MAX_ITEM_NUM];
+        TextView[] textItems = new TextView[MAX_ITEMS_COUNT];
+        EditText[] editTextItemsTitle = new EditText[MAX_ITEMS_COUNT];
+        NestedScrollView[] nestedScrollItemsComment = new NestedScrollView[MAX_ITEMS_COUNT];
+        EditText[] editTextItemsComment = new EditText[MAX_ITEMS_COUNT];
+        TextView[] textItemsCommentLength = new TextView[MAX_ITEMS_COUNT];
+        ImageButton[] imageButtonItemsDelete = new ImageButton[MAX_ITEMS_COUNT];
 
         textItems[0] = this.binding.includeItem1.textItemNumber;
         editTextItemsTitle[0] = this.binding.includeItem1.editTextItemTitle;
@@ -366,7 +359,7 @@ public class EditDiaryFragment extends Fragment {
         noKeyboardViews.add(this.binding.spinnerWeather1);
         noKeyboardViews.add(this.binding.spinnerWeather2);
         noKeyboardViews.add(this.binding.spinnerCondition);
-        for (int i = 0; i < MAX_ITEM_NUM; i++) {
+        for (int i = 0; i < MAX_ITEMS_COUNT; i++) {
             noKeyboardViews.add(editTextItemsTitle[i]);
             noKeyboardViews.add(imageButtonItemsDelete[i]);
         }
@@ -389,9 +382,9 @@ public class EditDiaryFragment extends Fragment {
             public void onChanged(String s) {
                 if (EditDiaryFragment.this.diaryViewModel.hasDiary(s)) {
                     String loadingDate =
-                            EditDiaryFragment.this.diaryViewModel.loadingDate.getValue();
+                            EditDiaryFragment.this.diaryViewModel.getLiveLoadingDate().getValue();
                     String inputDate =
-                            EditDiaryFragment.this.diaryViewModel.date.getValue();
+                            EditDiaryFragment.this.diaryViewModel.getLiveDate().getValue();
                     if (!loadingDate.equals(inputDate)) {
                         NavDirections action =
                                 EditDiaryFragmentDirections
@@ -417,7 +410,7 @@ public class EditDiaryFragment extends Fragment {
                     @Override
                     public void onItemSelected(
                             AdapterView<?> parent, View view, int position, long id) {
-                        EditDiaryFragment.this.diaryViewModel.setLiveIntWeather1(position);
+                        EditDiaryFragment.this.diaryViewModel.setIntWeather1(position);
                     }
 
                     @Override
@@ -434,7 +427,7 @@ public class EditDiaryFragment extends Fragment {
                     @Override
                     public void onItemSelected(
                             AdapterView<?> parent, View view, int position, long id) {
-                        EditDiaryFragment.this.diaryViewModel.setLiveIntWeather2(position);
+                        EditDiaryFragment.this.diaryViewModel.setIntWeather2(position);
                     }
 
                     @Override
@@ -452,7 +445,7 @@ public class EditDiaryFragment extends Fragment {
                             EditDiaryFragment.this.binding.spinnerWeather2.setEnabled(true);
                         } else {
                             EditDiaryFragment.this.binding.spinnerWeather2.setEnabled(false);
-                            EditDiaryFragment.this.diaryViewModel.setLiveIntWeather2(0);
+                            EditDiaryFragment.this.diaryViewModel.setIntWeather2(0);
                             EditDiaryFragment.this.binding.spinnerWeather2.setSelection(0);
                         }
                     }
@@ -476,7 +469,7 @@ public class EditDiaryFragment extends Fragment {
                     @Override
                     public void onItemSelected(
                             AdapterView<?> parent, View view, int position, long id) {
-                        EditDiaryFragment.this.diaryViewModel.setLiveIntCondition(position);
+                        EditDiaryFragment.this.diaryViewModel.setIntCondition(position);
                     }
 
                     @Override
@@ -505,95 +498,9 @@ public class EditDiaryFragment extends Fragment {
         );
 
 
-        // 項目設定
-        // 項目タイトル入力欄設定
-        for (int i = 0; i < editTextItemsTitle.length; i++) {
-            int inputItemNo =  i + 1;
-            editTextItemsTitle[i].setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    EditDiaryFragment.this.diaryViewModel.setRequiresPreparationDiary(false);
-
-                    // 項目タイトル入力フラグメント起動
-                    String inputItemTitle;
-                    switch (inputItemNo) {
-                        case 1:
-                            inputItemTitle =
-                                    EditDiaryFragment.this.diaryViewModel
-                                            .getLiveItem1Title().getValue();
-                            break;
-                        case 2:
-                            inputItemTitle =
-                                    EditDiaryFragment.this.diaryViewModel
-                                            .getLiveItem2Title().getValue();
-                            break;
-                        case 3:
-                            inputItemTitle =
-                                    EditDiaryFragment.this.diaryViewModel
-                                            .getLiveItem3Title().getValue();
-                            break;
-                        case 4:
-                            inputItemTitle =
-                                    EditDiaryFragment.this.diaryViewModel
-                                            .getLiveItem4Title().getValue();
-                            break;
-                        case 5:
-                            inputItemTitle =
-                                    EditDiaryFragment.this.diaryViewModel
-                                            .getLiveItem5Title().getValue();
-                            break;
-                        default:
-                            inputItemTitle = "";
-                    }
-                    NavDirections action =
-                            EditDiaryFragmentDirections
-                                    .actionEditDiaryFragmentToSelectItemTitleFragment(
-                                            inputItemNo, inputItemTitle);
-                    EditDiaryFragment.this.navController.navigate(action);
-                }
-            });
-        }
-
-        // 項目コメント入力欄設定。
-        for (int i = 0; i < this.MAX_ITEM_NUM; i++) {
-            setupEditText(
-                    editTextItemsComment[i],
-                    textItemsCommentLength[i],
-                    50,
-                    inputMethodManager,
-                    binding.nestedScrollFullScreen, // 背景View,
-                    noKeyboardViews
-            );
-        }
-
-
-        // 項目削除ボタン設定
-        for (int i = 0; i < this.MAX_ITEM_NUM; i++) {
-            int deleteItemNumber = i + 1;
-            imageButtonItemsDelete[i].setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    NavDirections action =
-                            EditDiaryFragmentDirections
-                                    .actionEditDiaryFragmentToDeleteConfirmationDialog(deleteItemNumber);
-                    EditDiaryFragment.this.navController.navigate(action);
-                }
-            });
-        }
-
-
-        // 項目追加ボタン設定
-        this.binding.imageButtonAddItem.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                EditDiaryFragment.this.binding.imageButtonAddItem.setEnabled(false);
-                int visibleItemsCount = EditDiaryFragment.this.diaryViewModel.showItemNum;
-                int addItemNumber = visibleItemsCount + 1;
-                showItem(addItemNumber, false);
-                EditDiaryFragment.this.diaryViewModel.showItemNum += 1;
-            }
-        });
-        for (int i = 0; i < this.MAX_ITEM_NUM; i++) {
+        // 項目欄設定
+        // 項目欄MotionLayout設定
+        for (int i = 0; i < this.MAX_ITEMS_COUNT; i++) {
             int itemNumber = i + 1;
             MotionLayout itemMotionLayout = selectItemMotionLayout(itemNumber);
             itemMotionLayout.setTransitionListener(new MotionLayout.TransitionListener() {
@@ -626,8 +533,8 @@ public class EditDiaryFragment extends Fragment {
                     } else if (currentId == R.id.motion_scene_edit_diary_item_showed_state) {
                         Log.d("20240605", "currentId:End");
                         EditDiaryFragment.this.binding.imageButtonAddItem.setEnabled(true);
-                        if (EditDiaryFragment.this.diaryViewModel.showItemNum
-                                == EditDiaryFragment.this.MAX_ITEM_NUM ) {
+                        if (EditDiaryFragment.this.diaryViewModel.getVisibleItemsCount()
+                                == EditDiaryFragment.this.MAX_ITEMS_COUNT) {
                             EditDiaryFragment.this.binding
                                     .imageButtonAddItem.setVisibility(View.INVISIBLE);
                         }
@@ -639,9 +546,70 @@ public class EditDiaryFragment extends Fragment {
                     // 処理なし
                 }
             });
+
+        }
+        setupItemLayout(); //必要数の項目欄表示
+
+        // 項目タイトル入力欄設定
+        for (int i = 0; i < editTextItemsTitle.length; i++) {
+            int inputItemNo =  i + 1;
+            editTextItemsTitle[i].setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    EditDiaryFragment.this.diaryViewModel.setRequiresPreparationDiary(false);
+
+                    // 項目タイトル入力フラグメント起動
+                    String inputItemTitle =
+                            EditDiaryFragment.this.diaryViewModel
+                                    .getItem(inputItemNo).getLiveTitle().getValue();
+                    NavDirections action =
+                            EditDiaryFragmentDirections
+                                    .actionEditDiaryFragmentToSelectItemTitleFragment(
+                                            inputItemNo, inputItemTitle);
+                    EditDiaryFragment.this.navController.navigate(action);
+                }
+            });
         }
 
-        setupItemLayout();
+        // 項目コメント入力欄設定。
+        for (int i = 0; i < this.MAX_ITEMS_COUNT; i++) {
+            setupEditText(
+                    editTextItemsComment[i],
+                    textItemsCommentLength[i],
+                    50,
+                    inputMethodManager,
+                    binding.nestedScrollFullScreen, // 背景View,
+                    noKeyboardViews
+            );
+        }
+
+
+        // 項目削除ボタン設定
+        for (int i = 0; i < this.MAX_ITEMS_COUNT; i++) {
+            int deleteItemNumber = i + 1;
+            imageButtonItemsDelete[i].setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    NavDirections action =
+                            EditDiaryFragmentDirections
+                                    .actionEditDiaryFragmentToDeleteConfirmationDialog(deleteItemNumber);
+                    EditDiaryFragment.this.navController.navigate(action);
+                }
+            });
+        }
+
+
+        // 項目追加ボタン設定
+        this.binding.imageButtonAddItem.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                EditDiaryFragment.this.binding.imageButtonAddItem.setEnabled(false);
+                int visibleItemsCount = EditDiaryFragment.this.diaryViewModel.getVisibleItemsCount();
+                int addItemNumber = visibleItemsCount + 1;
+                showItem(addItemNumber, false);
+                EditDiaryFragment.this.diaryViewModel.countUpShowedItem();
+            }
+        });
 
     }
 
@@ -774,10 +742,13 @@ public class EditDiaryFragment extends Fragment {
                 EditDiaryFragmentArgs.fromBundle(requireArguments()).getIsStartDiaryFragment();
         NavDirections action;
         // 循環型画面遷移を成立させるためにPopup対象Fragmentが異なるactionを切り替える。
+        String showDiaryDate = this.diaryViewModel.getLiveDate().getValue();
         if (isStartDiaryFragment) {
-            action = EditDiaryFragmentDirections.actionEditDiaryFragmentToShowDiaryFragmentPattern2();
+            action = EditDiaryFragmentDirections
+                    .actionEditDiaryFragmentToShowDiaryFragmentPattern2(showDiaryDate);
         } else {
-            action = EditDiaryFragmentDirections.actionEditDiaryFragmentToShowDiaryFragmentPattern1();
+            action = EditDiaryFragmentDirections
+                    .actionEditDiaryFragmentToShowDiaryFragmentPattern1(showDiaryDate);
         }
         this.navController.navigate(action);
     }
@@ -806,9 +777,9 @@ public class EditDiaryFragment extends Fragment {
     }
 
     private void setupItemLayout() {
-        int visibleItemsCount = this.diaryViewModel.showItemNum;
+        int visibleItemsCount = this.diaryViewModel.getVisibleItemsCount();
         Log.d("20240605", String.valueOf(visibleItemsCount));
-        for (int i = 0; i < MAX_ITEM_NUM; i++) {
+        for (int i = 0; i < this.MAX_ITEMS_COUNT; i++) {
             int itemNumber = i + 1;
             if (itemNumber <= visibleItemsCount) {
                 showItem(itemNumber, true);

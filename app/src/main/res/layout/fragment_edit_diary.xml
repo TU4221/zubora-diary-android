@@ -5,7 +5,7 @@
     <data>
         <import type="android.view.View" />
         <variable
-            name="edit_diary_view_model"
+            name="diaryViewModel"
             type="com.websarva.wings.android.zuboradiary.ui.editdiary.DiaryViewModel" />
     </data>
 
@@ -44,8 +44,8 @@
                      日付入力欄はダイアログフラグメントを使用して入力する為、android:text は「@」の「1.」を記述する。
                      「2.」の双方向データバイディングを記述した場合、ダイアログで変数値を変更した時に Ovservr が2回起動する。
 
-                     1. android:text="@{edit_diary_view_model.date}"
-                     2. android:text="@={edit_diary_view_model.date}"
+                     1. android:text="@{diaryViewModel.date}"
+                     2. android:text="@={diaryViewModel.date}"
                       -->
                 <EditText
                     android:id="@+id/edit_text_date"
@@ -55,7 +55,7 @@
                     android:focusable="false"
                     android:hint="@string/edit_diary_date_hint"
                     android:lines="1"
-                    android:text="@{edit_diary_view_model.date}"
+                    android:text="@{diaryViewModel.liveDate}"
                     android:textSize="20sp" />
 
                 <LinearLayout
@@ -129,7 +129,7 @@
                     android:hint="@string/edit_diary_title_hint"
                     android:inputType="text"
                     android:lines="1"
-                    android:text="@={edit_diary_view_model.title}"
+                    android:text="@={diaryViewModel.mutableLiveTitle}"
                     android:textSize="20sp" />
 
                 <TextView
@@ -142,23 +142,23 @@
 
                 <include layout="@layout/layout_edit_diary_item"
                     android:id="@+id/include_item_1"
-                    android:item="@{edit_diary_view_model.items[0]}"/>
+                    android:item="@{diaryViewModel.item1}"/>
 
                 <include layout="@layout/layout_edit_diary_item"
                     android:id="@+id/include_item_2"
-                    android:item="@{edit_diary_view_model.items[1]}"/>
+                    android:item="@{diaryViewModel.item2}"/>
 
                 <include layout="@layout/layout_edit_diary_item"
                     android:id="@+id/include_item_3"
-                    android:item="@{edit_diary_view_model.items[2]}"/>
+                    android:item="@{diaryViewModel.item3}"/>
 
                 <include layout="@layout/layout_edit_diary_item"
                     android:id="@+id/include_item_4"
-                    android:item="@{edit_diary_view_model.items[3]}"/>
+                    android:item="@{diaryViewModel.item4}"/>
 
                 <include layout="@layout/layout_edit_diary_item"
                     android:id="@+id/include_item_5"
-                    android:item="@{edit_diary_view_model.items[4]}"/>
+                    android:item="@{diaryViewModel.item5}"/>
 
                 <ImageButton
                     android:id="@+id/image_button_add_item"

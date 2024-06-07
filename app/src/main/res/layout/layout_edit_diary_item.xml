@@ -3,7 +3,6 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <data>
-        <import type="android.view.View" />
         <variable
             name="item"
             type="com.websarva.wings.android.zuboradiary.ui.editdiary.DiaryViewModel.Item" />
@@ -40,7 +39,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="16dp"
-                    android:text="@{@string/edit_diary_item + String.valueOf(item.itemNumber)}"
+                    android:text="@{@string/edit_diary_item + String.valueOf(item.liveNumber)}"
                     android:textSize="16sp"/>
 
                 <ImageButton
@@ -62,7 +61,7 @@
                 android:layout_marginTop="16dp"
                 android:focusable="false"
                 android:hint="@string/edit_diary_item_hint"
-                android:text="@{item.title}"
+                android:text="@{item.liveTitle}"
                 android:textSize="16sp" />
 
             <androidx.core.widget.NestedScrollView
@@ -89,7 +88,7 @@
                     android:hint="@string/edit_diary_content_hint"
                     android:inputType="textMultiLine"
                     android:minLines="5"
-                    android:text="@={item.comment}"
+                    android:text="@={item.mutableLiveComment}"
                     android:textSize="16sp" />
 
             </androidx.core.widget.NestedScrollView>

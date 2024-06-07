@@ -25,6 +25,9 @@
                 <argument
                     android:name="isStartDiaryFragment"
                     app:argType="boolean" />
+                <argument
+                    android:name="edit_diary_date"
+                    app:argType="string" />
             </action>
             <action
                 android:id="@+id/action_diary_list_fragment_to_date_picker_dialog"
@@ -74,6 +77,9 @@
                 <argument
                     android:name="isStartDiaryFragment"
                     app:argType="boolean" />
+                <argument
+                    android:name="edit_diary_date"
+                    app:argType="string" />
             </action>
         </fragment>
     </navigation>
@@ -97,7 +103,13 @@
             <argument
                 android:name="isStartDiaryFragment"
                 app:argType="boolean" />
+            <argument
+                android:name="edit_diary_date"
+                app:argType="string" />
         </action>
+        <argument
+            android:name="show_diary_date"
+            app:argType="string" />
     </fragment>
 
     <navigation
@@ -136,6 +148,9 @@
             <argument
                 android:name="isStartDiaryFragment"
                 app:argType="boolean" />
+            <argument
+                android:name="edit_diary_date"
+                app:argType="string" />
         </fragment>
         <dialog
             android:id="@+id/navigation_date_picker_dialog_for_edit_diary_fragment"

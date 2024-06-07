@@ -227,15 +227,13 @@ public class DiaryListFragment extends Fragment {
         this.binding.fabEditDiary.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // ViewModel へデータセット
-                DiaryListFragment.this.diaryViewModel.clear();
-                DiaryListFragment.this.diaryViewModel.setLiveLoadingDate("");
-                DiaryListFragment.this.diaryViewModel.setIsNewEditDiary(true);
-
                 // 日記編集(新規作成)フラグメント起動。
                 NavDirections action =
                         DiaryListFragmentDirections
-                                .actionNavigationDiaryListFragmentToEditDiaryFragment(true);
+                                .actionNavigationDiaryListFragmentToEditDiaryFragment(
+                                        true,
+                                        ""
+                                );
                 DiaryListFragment.this.navController.navigate(action);
             }
         });
@@ -464,17 +462,12 @@ public class DiaryListFragment extends Fragment {
             holder.itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    // ViewModelへデータセット
-                    DiaryListFragment.this.diaryViewModel.clear();
-                    DiaryListFragment.this.diaryViewModel
-                            .setLiveLoadingDate(
-                                    (String) item.get(KEY_DATE)
-                            );
-
                     // 日記表示フラグメント起動。
                     NavDirections action =
                             DiaryListFragmentDirections
-                                    .actionNavigationDiaryListFragmentToShowDiaryFragment();
+                                    .actionNavigationDiaryListFragmentToShowDiaryFragment(
+                                            (String) item.get(KEY_DATE)
+                                    );
                     DiaryListFragment.this.navController.navigate(action);
                 }
             });

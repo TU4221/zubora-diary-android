@@ -472,17 +472,12 @@ public class WordSearchFragment extends Fragment {
             holder.itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    // ViewModel へデータセット
-                    WordSearchFragment.this.diaryViewModel.clear();
-                    WordSearchFragment.this.diaryViewModel
-                            .setLiveLoadingDate(
-                                    (String) item.get(KEY_DATE)
-                            );
-
                     //日記表示フラグメント起動。
                     NavDirections action =
                             WordSearchFragmentDirections
-                                    .actionNavigationWordSearchFragmentToShowDiaryFragment();
+                                    .actionNavigationWordSearchFragmentToShowDiaryFragment(
+                                            (String) item.get(KEY_DATE)
+                                    );
                     WordSearchFragment.this.navController.navigate(action);
                 }
             });

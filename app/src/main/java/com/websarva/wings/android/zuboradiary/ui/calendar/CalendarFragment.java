@@ -3,9 +3,6 @@ package com.websarva.wings.android.zuboradiary.ui.calendar;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
@@ -13,14 +10,9 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.view.MenuHost;
-import androidx.core.view.MenuProvider;
+import androidx.constraintlayout.motion.widget.MotionLayout;
 import androidx.core.widget.NestedScrollView;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentResultListener;
-import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.SavedStateHandle;
@@ -48,8 +40,6 @@ import com.websarva.wings.android.zuboradiary.ui.diary.showdiary.ShowDiaryFragme
 import com.websarva.wings.android.zuboradiary.ui.editdiary.DiaryViewModel;
 
 import com.kizitonwose.calendar.view.CalendarView;
-import com.websarva.wings.android.zuboradiary.ui.editdiary.EditDiaryFragment;
-import com.websarva.wings.android.zuboradiary.ui.editdiaryselectitemtitle.EditDiarySelectItemTitleFragment;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
@@ -67,6 +57,7 @@ public class CalendarFragment extends Fragment {
     // View関係
     private FragmentCalendarBinding binding;
     private final LocalDate today = LocalDate.now();
+    private final int MAX_ITEMS_COUNT = DiaryViewModel.MAX_ITEMS_COUNT; // 項目入力欄最大数
 
     // Navigation関係
     private NavController navController;
@@ -82,7 +73,6 @@ public class CalendarFragment extends Fragment {
         ViewModelProvider provider = new ViewModelProvider(requireActivity());
         this.calendarViewModel = provider.get(CalendarViewModel.class);
         this.diaryViewModel = provider.get(DiaryViewModel.class);
-        this.diaryViewModel.clear(); // ここでクリアする理由はFABリスナ設定コードに記載
 
         // Navigation設定
         this.navController = NavHostFragment.findNavController(this);
@@ -133,7 +123,7 @@ public class CalendarFragment extends Fragment {
             @Override
             public void onChanged(String string) {
                 LocalDate localDate = DateConverter.toLocalDate(string);
-                CalendarFragment.this.diaryViewModel.clear();
+                CalendarFragment.this.diaryViewModel.initialize();
                 YearMonth selectedMonth =
                         YearMonth.of(localDate.getYear(), localDate.getMonthValue());
                 selectDate(localDate);
@@ -206,28 +196,15 @@ public class CalendarFragment extends Fragment {
         this.binding.floatActionButtonEditDiary.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // DiaryViewModel へデータセット
-                // MEMO:カレンダーフラグメント起動(OnCreate)時にクリアする。
-                //      下記タイミングでクリアするとクリア状態が一瞬商事される。
-                //      DiaryViewModelの表示される変数は日付選択時に更新され、
-                //      それ以外の変数は更新されないので"OnCreate"時のみクリアを行えば良いと判断。
-                //diaryViewModel.clear();
-                LocalDate selectedDate = CalendarFragment.this.calendarViewModel.getSelectedDate();
-                String stringDate = DateConverter.toStringLocalDate(selectedDate);
-                CalendarFragment.this.diaryViewModel.setLiveLoadingDate(stringDate);
-
-                boolean existsSelectedDiary =
-                        CalendarFragment.this.diaryViewModel.hasDiary(
-                                selectedDate.getYear(),
-                                selectedDate.getMonthValue(),
-                                selectedDate.getDayOfMonth()
-                        );
-                CalendarFragment.this.diaryViewModel.setIsNewEditDiary(!existsSelectedDiary);
-
                 // 日記編集(新規作成)フラグメント起動。
+                LocalDate selectedDate = CalendarFragment.this.calendarViewModel.getSelectedDate();
+                String editDiaryDate = DateConverter.toStringLocalDate(selectedDate);
                 NavDirections action =
                         CalendarFragmentDirections
-                                .actionNavigationCalendarFragmentToEditDiaryFragment(true);
+                                .actionNavigationCalendarFragmentToEditDiaryFragment(
+                                        true,
+                                        editDiaryDate
+                                );
                 CalendarFragment.this.navController.navigate(action);
             }
         });
@@ -279,16 +256,53 @@ public class CalendarFragment extends Fragment {
 
         if (this.diaryViewModel.hasDiary(year, month, dayOfMonth)) {
             // ViewModelの読込日記の日付をセット
+            this.diaryViewModel.initialize();
             this.diaryViewModel.updateLoadingDate(year, month, dayOfMonth);
             this.diaryViewModel.prepareShowDiary();
+            setupItemLayout(); // 必要数の項目欄表示
             this.binding.linearLayoutShowDiary.setVisibility(View.VISIBLE);
             this.binding.textNoDiary.setVisibility(View.GONE);
         } else {
             this.binding.linearLayoutShowDiary.setVisibility(View.GONE);
             this.binding.textNoDiary.setVisibility(View.VISIBLE);
-            this.diaryViewModel.clear();
+            this.diaryViewModel.initialize();
         }
+    }
 
+
+    private MotionLayout selectItemMotionLayout(int itemNumber) {
+        switch (itemNumber) {
+            case 1:
+                return this.binding.includeShowDiary.includeItem1.motionLayoutShowDiaryItem;
+            case 2:
+                return this.binding.includeShowDiary.includeItem2.motionLayoutShowDiaryItem;
+
+            case 3:
+                return this.binding.includeShowDiary.includeItem3.motionLayoutShowDiaryItem;
+
+            case 4:
+                return this.binding.includeShowDiary.includeItem4.motionLayoutShowDiaryItem;
+
+            case 5:
+                return this.binding.includeShowDiary.includeItem5.motionLayoutShowDiaryItem;
+            default:
+                return null;
+        }
+    }
+
+    private void setupItemLayout() {
+        int visibleItemsCount = this.diaryViewModel.getVisibleItemsCount();
+        for (int i = 0; i < this.MAX_ITEMS_COUNT; i++) {
+            int itemNumber = i + 1;
+            MotionLayout itemMotionLayout = selectItemMotionLayout(itemNumber);
+            if (itemNumber <= visibleItemsCount) {
+                itemMotionLayout
+                        .transitionToState(R.id.motion_scene_show_diary_item_showed_state, 1);
+            } else {
+                itemMotionLayout
+                        .transitionToState(R.id.motion_scene_show_diary_item_hided_state, 1);
+            }
+        }
     }
 
     // 曜日リスト取得

@@ -2,8 +2,6 @@ package com.websarva.wings.android.zuboradiary.ui.editdiary;
 
 import android.app.Application;
 import android.util.Log;
-import android.view.View;
-import android.widget.AdapterView;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
@@ -17,103 +15,98 @@ import java.time.format.DateTimeFormatter;
 public class DiaryViewModel extends AndroidViewModel {
 
     public class Item {
-        public MutableLiveData<Integer> itemNumber = new MutableLiveData<>(1);
-        public MutableLiveData<Boolean> isVisible = new MutableLiveData<>(false);
-        public MutableLiveData<String> title = new MutableLiveData<>("");
-        public MutableLiveData<String> comment = new MutableLiveData<>("");
+        private MutableLiveData<Integer> number = new MutableLiveData<>(1);
+        private MutableLiveData<String> title = new MutableLiveData<>("");
+        private MutableLiveData<String> comment = new MutableLiveData<>("");
 
         public Item(int itemNumber) {
-            setLiveItemNumber(itemNumber);
+            setNumber(itemNumber);
         }
 
-        public LiveData<Integer> getLiveItemNumber() {
-            return this.itemNumber;
+        public LiveData<Integer> getLiveNumber() {
+            return this.number;
         }
-        public void setLiveItemNumber(int itemNumber) {
-            this.itemNumber.setValue(itemNumber);
-        }
-
-        public LiveData<Boolean> getLiveIsVisible() {
-            return this.isVisible;
-        }
-        public void setLiveIsVisible(Boolean bool) {
-            this.isVisible.setValue(bool);
+        public void setNumber(int number) {
+            this.number.setValue(number);
         }
 
         public LiveData<String> getLiveTitle() {
             return this.title;
         }
-        public void setLiveTitle(String title) {
+        public void setTitle(String title) {
             this.title.setValue(title);
         }
 
         public LiveData<String> getLiveComment() {
             return this.comment;
         }
-        public void setLiveComment(String comment) {
+        public MutableLiveData<String> getMutableLiveComment() {
+            return this.comment;
+        }
+        public void setComment(String comment) {
             this.comment.setValue(comment);
         }
     }
     
 
     private DiaryRepository diaryRepository;
-    private boolean isNewEditDiary = false;
-    private boolean wasNewEditDiary = false;
-    private boolean requiresPreparationDiary = true;
-    public MutableLiveData<String> loadingDate = new MutableLiveData<>("");
-    public MutableLiveData<String> date = new MutableLiveData<>("");
-    public MutableLiveData<String> log = new MutableLiveData<>("");
+    private boolean isNewEditDiary; // TODO:削除保留(Navigationで遷移元からのデータ受取で判断できると思う)
+    private boolean requiresPreparationDiary; // TODO:削除保留(Navigationで遷移元からのデータ受取で判断できると思う)
+    private MutableLiveData<String> loadingDate = new MutableLiveData<>();
+    private MutableLiveData<String> date = new MutableLiveData<>();
     // メモ
     // 下記配列をデータバインディングでスピナーに割り当てたが、スピナーの setSection メソッド(オフセット操作)が機能しなかった。
     // その為、string.xml ファイルに配列を用意し、それを layout.xml に割り当てたら、 setSection メソッドが機能した。
     // 下記配列は str ↔ int 変換で使用するため削除しない。
     // 配列 conditions も同様。
     public String[] weathers = {"--", "晴", "曇", "雨", "雪"};
-    public MutableLiveData<Integer> intWeather1 = new MutableLiveData<>(0);
-    public MutableLiveData<String> strWeather1 = new MutableLiveData<>("--");
-    public MutableLiveData<Integer> intWeather2 = new MutableLiveData<>(0);
-    public MutableLiveData<String> strWeather2 = new MutableLiveData<>("--");
-    public String[] conditions = {"--", "HAPPY", "GOOD", "AVERAGE", "POOR", "BAD"};
-    public MutableLiveData<Integer> intCondition = new MutableLiveData<>(0);
-    public MutableLiveData<String> strCondition = new MutableLiveData<>("--");
-    public MutableLiveData<String> title = new MutableLiveData<>("");
-    public int showItemNum = 1;
-    private final int MAX_ITEM_NUM = 5;
+    private MutableLiveData<Integer> intWeather1 = new MutableLiveData<>();
+    private MutableLiveData<String> strWeather1 = new MutableLiveData<>();
+    private MutableLiveData<Integer> intWeather2 = new MutableLiveData<>();
+    private MutableLiveData<String> strWeather2 = new MutableLiveData<>();
+    private String[] conditions = {"--", "HAPPY", "GOOD", "AVERAGE", "POOR", "BAD"};
+    private MutableLiveData<Integer> intCondition = new MutableLiveData<>();
+    private MutableLiveData<String> strCondition = new MutableLiveData<>();
+    private MutableLiveData<String> title = new MutableLiveData<>();
+    private int visibleItemsCount;
+    public final static int MAX_ITEMS_COUNT = 5;
 
-    public Item[] items = new Item[MAX_ITEM_NUM];
+    private Item[] items = new Item[MAX_ITEMS_COUNT];
+    private MutableLiveData<String> log = new MutableLiveData<>();
 
 
     public DiaryViewModel(@NonNull Application application) {
         super(application);
-        diaryRepository = new DiaryRepository(getApplication());
-        for (int i = 0; i < items.length; i++) {
+        this.diaryRepository = new DiaryRepository(getApplication());
+        for (int i = 0; i < this.items.length; i++) {
             int itemNumber = i + 1;
-            items[i] = new Item(itemNumber);
+            this.items[i] = new Item(itemNumber);
         }
-        this.items[0].isVisible.setValue(true);
+        initialize();
     }
 
-    public void clear() {
+    public void initialize() {
         this.isNewEditDiary = false;
-        this.wasNewEditDiary = false;
         this.requiresPreparationDiary = true;
         this.loadingDate.setValue("");
         this.date.setValue("");
-        this.log.setValue("");
         this.intWeather1.setValue(0);
+        this.strWeather1.setValue("--");
         this.intWeather2.setValue(0);
+        this.strWeather2.setValue("--");
         this.intCondition.setValue(0);
+        this.strCondition.setValue("--");
         this.title.setValue("");
+        this.visibleItemsCount = 1;
         for (Item item: this.items) {
-            item.isVisible.setValue(false);
             item.title.setValue("");
             item.comment.setValue("");
         }
-        this.items[0].isVisible.setValue(true);
+        this.log.setValue("");
     }
 
     public void prepareEditDiary() {
-        if (this.loadingDate.getValue().equals("")) {
+        if (this.loadingDate.getValue().isEmpty()) {
             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
                 LocalDate localDate = LocalDate.now();
                 DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy年MM月dd日(E)");
@@ -136,8 +129,6 @@ public class DiaryViewModel extends AndroidViewModel {
     }
 
     private void loadDiary() {
-        Log.d("20240328", "loadDiary");
-        Log.d("20240328", this.loadingDate.getValue());
         Diary diary = diaryRepository.selectDiary(this.loadingDate.getValue());
         this.date.setValue(diary.getDate());
         this.log.setValue(diary.getLog());
@@ -156,48 +147,23 @@ public class DiaryViewModel extends AndroidViewModel {
         this.items[4].title.setValue(diary.getItem5Title());
         this.items[4].comment.setValue(diary.getItem5Comment());
 
-        showItemNum = 5;
-        if (((this.items[4].title.getValue() == null) || (this.items[4].title.getValue().equals("")))
-                && ((this.items[4].comment.getValue() == null) || (this.items[4].comment.getValue().equals("")))) {
-            this.items[4].isVisible.setValue(false);
-            showItemNum--;
-
-            if (((this.items[3].title.getValue() == null) || (this.items[3].title.getValue().equals("")))
-                    && ((this.items[3].comment.getValue() == null) || (this.items[3].comment.getValue().equals("")))) {
-                this.items[3].isVisible.setValue(false);
-                showItemNum--;
-
-                if (((this.items[2].title.getValue() == null) || (this.items[2].title.getValue().equals("")))
-                        && ((this.items[2].comment.getValue() == null) || (this.items[2].comment.getValue().equals("")))) {
-                    this.items[2].isVisible.setValue(false);
-                    showItemNum--;
-
-                    if (((this.items[1].title.getValue() == null) || (this.items[1].title.getValue().equals("")))
-                            && ((this.items[1].comment.getValue() == null) || (this.items[1].comment.getValue().equals("")))) {
-                        this.items[1].isVisible.setValue(false);
-                        showItemNum--;
-                    } else {
-                        this.items[1].isVisible.setValue(true);
-                    }
+        this.visibleItemsCount = MAX_ITEMS_COUNT;
+        for (int i = MAX_ITEMS_COUNT; i > 1; i--) {
+            int arrayNumber = i - 1;
+            if (this.items[arrayNumber].title.getValue() == null
+                    || this.items[arrayNumber].title.getValue().isEmpty()) {
+                if (this.items[arrayNumber].comment.getValue() == null
+                        || this.items[arrayNumber].comment.getValue().isEmpty()) {
+                    this.visibleItemsCount--;
                 } else {
-                    this.items[1].isVisible.setValue(true);
-                    this.items[2].isVisible.setValue(true);
+                    break;
                 }
             } else {
-                this.items[1].isVisible.setValue(true);
-                this.items[2].isVisible.setValue(true);
-                this.items[3].isVisible.setValue(true);
+                break;
             }
-        } else {
-            this.items[1].isVisible.setValue(true);
-            this.items[2].isVisible.setValue(true);
-            this.items[3].isVisible.setValue(true);
-            this.items[4].isVisible.setValue(true);
         }
-        this.items[0].isVisible.setValue(true);
 
         this.isNewEditDiary = false;
-        this.wasNewEditDiary = false;
     }
 
     public boolean hasDiary(String date) {
@@ -220,7 +186,6 @@ public class DiaryViewModel extends AndroidViewModel {
         this.diaryRepository.insertDiary(diary);
         this.loadingDate.setValue(this.date.getValue());
         this.isNewEditDiary = false;
-        this.wasNewEditDiary = false;
     }
 
     public void deleteExistingDiaryAndSaveNewDiary() {
@@ -228,7 +193,6 @@ public class DiaryViewModel extends AndroidViewModel {
         this.diaryRepository.deleteAndInsertDiary(this.loadingDate.getValue(), diary);
         this.loadingDate.setValue(this.date.getValue());
         this.isNewEditDiary = false;
-        this.wasNewEditDiary = false;
     }
 
     public void updateExistingDiary() {
@@ -236,7 +200,6 @@ public class DiaryViewModel extends AndroidViewModel {
         this.diaryRepository.updateDiary(diary);
         this.loadingDate.setValue(this.date.getValue());
         this.isNewEditDiary = false;
-        this.wasNewEditDiary = false;
     }
 
     public void deleteExistingDiaryAndUpdateExistingDiary() {
@@ -244,7 +207,6 @@ public class DiaryViewModel extends AndroidViewModel {
         this.diaryRepository.deleteAndUpdateDiary(this.loadingDate.getValue(), diary);
         this.loadingDate.setValue(this.date.getValue());
         this.isNewEditDiary = false;
-        this.wasNewEditDiary = false;
     }
 
     public void deleteDiary(String date) {
@@ -255,15 +217,12 @@ public class DiaryViewModel extends AndroidViewModel {
         updateLog();
         Diary diary = new Diary();
         diary.setDate(this.date.getValue());
-        diary.setLog(this.log.getValue());
         diary.setWeather1(this.strWeather1.getValue());
         diary.setWeather2(this.strWeather2.getValue());
         diary.setCondition(this.strCondition.getValue());
         diary.setTitle(this.title.getValue().trim());
         diary.setItem1Title(this.items[0].title.getValue().trim());
-        Log.d("20240424", this.items[0].title.getValue().trim());
         diary.setItem1Comment(this.items[0].comment.getValue().trim());
-        Log.d("20240424", this.items[0].comment.getValue().trim());
         diary.setItem2Title(this.items[1].title.getValue().trim());
         diary.setItem2Comment(this.items[1].comment.getValue().trim());
         diary.setItem3Title(this.items[2].title.getValue().trim());
@@ -272,6 +231,7 @@ public class DiaryViewModel extends AndroidViewModel {
         diary.setItem4Comment(this.items[3].comment.getValue().trim());
         diary.setItem5Title(this.items[4].title.getValue().trim());
         diary.setItem5Comment(this.items[4].comment.getValue().trim());
+        diary.setLog(this.log.getValue());
         return diary;
     }
 
@@ -310,56 +270,26 @@ public class DiaryViewModel extends AndroidViewModel {
         this.strWeather1.setValue(toStringWeather(intWeather1.getValue()));
     }
 
-    public void onItemSelectedWeather2(AdapterView<?> parent, View view, int position, long id) {
-        this.intWeather2.setValue(position);
-    }
-
     public void updateStrWeather2() {
         this.strWeather2.setValue(toStringWeather(intWeather2.getValue()));
     }
 
     public String toStringWeather(int intWeather) {
-        String strWeather = "";
-        switch (intWeather) {
-            case 0:
-                strWeather = weathers[0];
-                break;
-            case 1:
-                strWeather = weathers[1];
-                break;
-            case 2:
-                strWeather = weathers[2];
-                break;
-            case 3:
-                strWeather = weathers[3];
-                break;
-            case 4:
-                strWeather = weathers[4];
-                break;
-            default:
+        for (int i = 0; i < weathers.length; i++) {
+            if (i == intWeather) {
+                return weathers[i];
+            }
         }
-        return strWeather;
+        return weathers[0];
     }
 
     public int toIntegerWeather(String strWeather) {
-        int intWeather = 0;
-        switch (strWeather) {
-            case "晴":
-                intWeather = 1;
-                break;
-            case "曇":
-                intWeather = 2;
-                break;
-            case "雨":
-                intWeather = 3;
-                break;
-            case "雪":
-                intWeather = 4;
-                break;
-            default:
-                intWeather = 0;
+        for (int i = 0; i < weathers.length; i++) {
+            if (weathers[i].equals(strWeather)) {
+                return i;
+            }
         }
-        return intWeather;
+        return 0;
     }
 
     public void updateStrCondition() {
@@ -367,79 +297,35 @@ public class DiaryViewModel extends AndroidViewModel {
     }
 
     private String toStringCondition(int intCondition) {
-        String strCondition = "";
-        switch (intCondition) {
-            case 0:
-                strCondition = conditions[0];
-                break;
-            case 1:
-                strCondition = conditions[1];
-                break;
-            case 2:
-                strCondition = conditions[2];
-                break;
-            case 3:
-                strCondition = conditions[3];
-                break;
-            case 4:
-                strCondition = conditions[4];
-                break;
-            case 5:
-                strCondition = conditions[5];
-                break;
-            default:
+        for (int i = 0; i < conditions.length; i++) {
+            if (i == intCondition) {
+                return conditions[i];
+            }
         }
-        return strCondition;
+        return conditions[0];
     }
 
     public int toIntegerCondition(String strCondition) {
-        int intCondition = 0;
-        switch (strCondition) {
-            case "HAPPY":
-                intCondition = 1;
-                break;
-            case "GOOD":
-                intCondition = 2;
-                break;
-            case "AVERAGE":
-                intCondition = 3;
-                break;
-            case "POOR":
-                intCondition = 4;
-                break;
-            case "BAD":
-                intCondition = 5;
-                break;
-            default:
-                intCondition = 0;
+        for (int i = 0; i < conditions.length; i++) {
+            if (weathers[i].equals(strCondition)) {
+                return i;
+            }
         }
-        return intCondition;
+        return 0;
     }
 
-    public void onClickAddItemButton(View v) {
-        showItemNum += 1;
-        switch (showItemNum) {
-            case 5:
-                this.items[4].isVisible.setValue(true);
-            case 4:
-                this.items[3].isVisible.setValue(true);
-            case 3:
-                this.items[2].isVisible.setValue(true);
-            case 2:
-                this.items[1].isVisible.setValue(true);
-            default:
-                this.items[0].isVisible.setValue(true);
-        }
+    public void countUpShowedItem() {
+        this.visibleItemsCount++;
     }
 
-    public void deleteItem(int itemNo) {
-        int deleteArrayNo = itemNo - 1;
+    public void deleteItem(int itemNumber) {
+        int deleteArrayNo = itemNumber - 1;
         this.items[deleteArrayNo].title.setValue("");
         this.items[deleteArrayNo].comment.setValue("");
 
-        if (itemNo < showItemNum) {
+        if (itemNumber < visibleItemsCount) {
             int nextArrayNo = -1;
-            for (int arrayNo = deleteArrayNo; arrayNo < (showItemNum - 1); arrayNo++) {
+            for (int arrayNo = deleteArrayNo; arrayNo < (visibleItemsCount - 1); arrayNo++) {
                 nextArrayNo = arrayNo + 1;
                 this.items[arrayNo].title.setValue(this.items[nextArrayNo].title.getValue());
                 this.items[arrayNo].comment.setValue(this.items[nextArrayNo].comment.getValue());
@@ -447,35 +333,23 @@ public class DiaryViewModel extends AndroidViewModel {
                 this.items[nextArrayNo].comment.setValue("");
             }
         }
-        if (showItemNum > 1) {
-            showItemNum -= 1;
+        if (visibleItemsCount > 1) {
+            visibleItemsCount -= 1;
         }
     }
 
 
-    // 注意) データバインディングを使用する時、セッター/ゲッターのメソッド名を「set/get変数名」にするとビルドが上手く行われない。
-    //      その為、メソッド名に「Live」を追加して回避。
-
+    // Getter/Setter
     public Boolean getIsNewEditDiary() {
         return this.isNewEditDiary;
     }
-
     public void setIsNewEditDiary(Boolean bool) {
         this.isNewEditDiary = bool;
-    }
-
-    public Boolean getWasNewEditDiary() {
-        return this.wasNewEditDiary;
-    }
-
-    public void setWasNewEditDiary(Boolean bool) {
-        this.wasNewEditDiary = bool;
     }
 
     public Boolean getRequiresPreparationDiary() {
         return this.requiresPreparationDiary;
     }
-
     public void setRequiresPreparationDiary(Boolean bool) {
         this.requiresPreparationDiary = bool;
     }
@@ -483,104 +357,107 @@ public class DiaryViewModel extends AndroidViewModel {
     public LiveData<String> getLiveLoadingDate() {
         return this.loadingDate;
     }
-    public void setLiveLoadingDate(String loadingDate) {
+    public void setLoadingDate(String loadingDate) {
         this.loadingDate.setValue(loadingDate);
     }
+
     public LiveData<String> getLiveDate() {
         return this.date;
+    }
+    public void setDate(String date) {
+        this.date.setValue(date);
     }
 
     public LiveData<Integer> getLiveIntWeather1() {
         return this.intWeather1;
     }
-
-    public void setLiveIntWeather1(int intWeather) {
+    public void setIntWeather1(int intWeather) {
         this.intWeather1.setValue(intWeather);
+    }
+
+    public LiveData<String> getLiveStrWeather1() {
+        return this.strWeather1;
+    }
+    public void setStrWeather1(String strWeather) {
+        this.strWeather1.setValue(strWeather);
     }
 
     public LiveData<Integer> getLiveIntWeather2() {
         return this.intWeather2;
     }
-
-    public void setLiveIntWeather2(int intWeather) {
+    public void setIntWeather2(int intWeather) {
         this.intWeather2.setValue(intWeather);
+    }
+
+    public LiveData<String> getLiveStrWeather2() {
+        return this.strWeather2;
+    }
+    public void setStrWeather2(String strWeather) {
+        this.strWeather2.setValue(strWeather);
     }
 
     public LiveData<Integer> getLiveIntCondition() {
         return this.intCondition;
     }
-
-    public void setLiveIntCondition(int intCondition) {
+    public void setIntCondition(int intCondition) {
         this.intCondition.setValue(intCondition);
+    }
+
+    public LiveData<String> getLiveStrCondition() {
+        return this.strCondition;
+    }
+    public void setStrCondition(String strCondition) {
+        this.strCondition.setValue(strCondition);
     }
 
     public LiveData<String> getLiveTitle() {
         return this.title;
     }
-
-    public LiveData<String> getLiveItem1Title() {
-        return this.items[0].title;
+    public MutableLiveData<String> getMutableLiveTitle() {
+        return this.title;
+    }
+    public void setTitle(String title) {
+        this.title.setValue(title);
     }
 
-    public void setLiveItem1Title(String title) {
-        this.items[0].title.setValue(title);
+    public int getVisibleItemsCount() {
+        return this.visibleItemsCount;
     }
-
-    public LiveData<String> getLiveItem1Comment() {
-        return this.items[0].comment;
-    }
-
-    public LiveData<String> getLiveItem2Title() {
-        return this.items[1].title;
-    }
-
-    public void setLiveItem2Title(String title) {
-        this.items[1].title.setValue(title);
-    }
-
-    public LiveData<String> getLiveItem2Comment() {
-        return this.items[1].comment;
-    }
-
-    public LiveData<String> getLiveItem3Title() {
-        return this.items[2].title;
-    }
-
-    public void setLiveItem3Title(String title) {
-        this.items[2].title.setValue(title);
-    }
-
-    public LiveData<String> getLiveItem3Comment() {
-        return this.items[2].comment;
-    }
-
-    public LiveData<String> getLiveItem4Title() {
-        return this.items[3].title;
-    }
-
-    public void setLiveItem4Title(String title) {
-        this.items[3].title.setValue(title);
-    }
-
-    public LiveData<String> getLiveItem4Comment() {
-        return this.items[3].comment;
-    }
-
-    public LiveData<String> getLiveItem5Title() {
-        return this.items[4].title;
-    }
-
-    public void setLiveItem5Title(String title) {
-        this.items[4].title.setValue(title);
-    }
-
-    public LiveData<String> getLiveItem5Comment() {
-        return this.items[4].comment;
+    private void setVisibleItemsCount(int itemNumber) {
+        this.visibleItemsCount = itemNumber;
     }
 
     public Item getItem(int itemNumber) {
         int arrayNumber = itemNumber - 1;
         return this.items[arrayNumber];
     }
+    // MEMO:getItemメソッドではDataBindingで使用できなかった為、getItem1～5メソッド用意。
+    //      (引数？ or return以外の処理？がある為、例外が発生)
+    public Item getItem1() {
+        return this.items[0];
+    }
+    public Item getItem2() {
+        return this.items[1];
+    }
+    public Item getItem3() {
+        return this.items[2];
+    }
+    public Item getItem4() {
+        return this.items[3];
+    }
+    public Item getItem5() {
+        return this.items[4];
+    }
+
+    public LiveData<String> getLiveLog() {
+        return this.log;
+    }
+    public void setLog(String log) {
+        this.log.setValue(log);
+    }
+
+
+
+
 
 }

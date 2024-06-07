@@ -32,8 +32,8 @@
     <string name="show_diary_weather1_selected">晴</string>
     <string name="show_diary_weather_slush">／</string>
     <string name="show_diary_weather2_selected">雲</string>
-    <string name="show_diary_item_1">項目1</string>
-    <string name="show_diary_content_1">内容1</string>
+    <string name="show_diary_item_1">無題</string>
+    <string name="show_diary_content_1">コメントなし</string>
     <string name="show_diary_item_2">項目2</string>
     <string name="show_diary_content_2">内容2</string>
     <string name="show_diary_item_3">項目3</string>

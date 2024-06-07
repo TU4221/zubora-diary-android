@@ -5,13 +5,9 @@ import android.os.Bundle;
 import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-import androidx.core.view.MenuHost;
-import androidx.core.view.MenuProvider;
+import androidx.constraintlayout.motion.widget.MotionLayout;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.SavedStateHandle;
 import androidx.lifecycle.ViewModelProvider;
@@ -20,9 +16,8 @@ import androidx.navigation.NavController;
 import androidx.navigation.NavDirections;
 import androidx.navigation.fragment.NavHostFragment;
 
+import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -30,16 +25,15 @@ import android.widget.TextView;
 
 import com.websarva.wings.android.zuboradiary.R;
 import com.websarva.wings.android.zuboradiary.databinding.FragmentShowDiaryBinding;
-import com.websarva.wings.android.zuboradiary.ui.calendar.CalendarFragmentDirections;
 import com.websarva.wings.android.zuboradiary.ui.editdiary.DiaryViewModel;
-import com.websarva.wings.android.zuboradiary.ui.editdiaryselectitemtitle.EditDiarySelectItemTitleFragment;
+import com.websarva.wings.android.zuboradiary.ui.editdiary.EditDiaryFragment;
 import com.websarva.wings.android.zuboradiary.ui.list.DiaryListFragment;
-import com.websarva.wings.android.zuboradiary.ui.list.DiaryListFragmentDirections;
 
 public class ShowDiaryFragment extends Fragment {
 
     // View関係
     private FragmentShowDiaryBinding binding;
+    private final int MAX_ITEMS_COUNT = DiaryViewModel.MAX_ITEMS_COUNT; // 項目入力欄最大数
 
     // Navigation関係
     private NavController navController;
@@ -94,6 +88,10 @@ public class ShowDiaryFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         // 画面表示データ準備
+        this.diaryViewModel.initialize();
+        String showDiaryDate =
+                ShowDiaryFragmentArgs.fromBundle(requireArguments()).getShowDiaryDate();
+        this.diaryViewModel.setLoadingDate(showDiaryDate);
         this.diaryViewModel.prepareShowDiary();
 
 
@@ -114,10 +112,14 @@ public class ShowDiaryFragment extends Fragment {
                     public boolean onMenuItemClick(MenuItem item) {
                         //日記編集フラグメント起動。
                         if (item.getItemId() == R.id.displayDiaryToolbarOptionEditDiary) {
+                            String editDiaryDate =
+                                    ShowDiaryFragmentArgs.fromBundle(requireArguments())
+                                            .getShowDiaryDate();
                             NavDirections action =
                                     ShowDiaryFragmentDirections
                                             .actionNavigationShowDiaryFragmentToEditDiaryFragment(
-                                                    false
+                                                    false,
+                                                    editDiaryDate
                                             );
                             ShowDiaryFragment.this.navController.navigate(action);
                             return true;
@@ -166,6 +168,46 @@ public class ShowDiaryFragment extends Fragment {
                         ShowDiaryFragment.this.diaryViewModel.updateStrCondition();
                     }
                 });
+
+
+        // 必要数の項目欄表示
+        setupItemLayout();
+    }
+
+
+    private MotionLayout selectItemMotionLayout(int itemNumber) {
+        switch (itemNumber) {
+            case 1:
+                return this.binding.includeShowDiary.includeItem1.motionLayoutShowDiaryItem;
+            case 2:
+                return this.binding.includeShowDiary.includeItem2.motionLayoutShowDiaryItem;
+
+            case 3:
+                return this.binding.includeShowDiary.includeItem3.motionLayoutShowDiaryItem;
+
+            case 4:
+                return this.binding.includeShowDiary.includeItem4.motionLayoutShowDiaryItem;
+
+            case 5:
+                return this.binding.includeShowDiary.includeItem5.motionLayoutShowDiaryItem;
+            default:
+                return null;
+        }
+    }
+
+    private void setupItemLayout() {
+        int visibleItemsCount = this.diaryViewModel.getVisibleItemsCount();
+        for (int i = 0; i < this.MAX_ITEMS_COUNT; i++) {
+            int itemNumber = i + 1;
+            MotionLayout itemMotionLayout = selectItemMotionLayout(itemNumber);
+            if (itemNumber <= visibleItemsCount) {
+                itemMotionLayout
+                        .transitionToState(R.id.motion_scene_show_diary_item_showed_state, 1);
+            } else {
+                itemMotionLayout
+                        .transitionToState(R.id.motion_scene_show_diary_item_hided_state, 1);
+            }
+        }
     }
 
 

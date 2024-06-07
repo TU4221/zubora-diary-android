@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+        <variable
+            name="item"
+            type="com.websarva.wings.android.zuboradiary.ui.editdiary.DiaryViewModel.Item" />
+    </data>
+
+    <androidx.constraintlayout.motion.widget.MotionLayout
+        android:id="@+id/motion_layout_show_diary_item"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layoutDescription="@xml/layout_show_diary_item_scene">
+
+        <LinearLayout
+            android:id="@+id/liner_layout_show_diary_item"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
+            <!--
+                android:visibility="@{item.isVisible ? View.VISIBLE : View.GONE}"
+           MEMO:Visibilityを操作すると対象Viewの下にあるViewがちらつくので使用しない。
+                背景が無色かつ、Transitionで高さを最小値にすれば、Visibility使用せずとも対象Viewを
+                非表示にすることができるので今回はこれで対応。
+            -->
+
+            <TextView
+                android:id="@+id/text_item_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="@{item.liveTitle}"
+                android:hint="@string/show_diary_item_1" />
+
+            <View
+                android:id="@+id/view_item_1_divider"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginTop="4dp"
+                android:background="?android:attr/listDivider" />
+
+            <TextView
+                android:id="@+id/text_item_comment"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:text="@{item.liveComment}"
+                android:hint="@string/show_diary_content_1" />
+
+        </LinearLayout>
+
+    </androidx.constraintlayout.motion.widget.MotionLayout>
+</layout>
