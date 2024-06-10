@@ -1,12 +1,14 @@
 package com.websarva.wings.android.zuboradiary.ui.editdiary;
 
 import android.app.Application;
-import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.ViewModel;
+
+import com.websarva.wings.android.zuboradiary.DateConverter;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -14,7 +16,7 @@ import java.time.format.DateTimeFormatter;
 
 public class DiaryViewModel extends AndroidViewModel {
 
-    public class Item {
+    public class Item extends ViewModel {
         private MutableLiveData<Integer> number = new MutableLiveData<>(1);
         private MutableLiveData<String> title = new MutableLiveData<>("");
         private MutableLiveData<String> comment = new MutableLiveData<>("");
@@ -50,9 +52,8 @@ public class DiaryViewModel extends AndroidViewModel {
     
 
     private DiaryRepository diaryRepository;
-    private boolean isNewEditDiary; // TODO:削除保留(Navigationで遷移元からのデータ受取で判断できると思う)
-    private boolean requiresPreparationDiary; // TODO:削除保留(Navigationで遷移元からのデータ受取で判断できると思う)
-    private MutableLiveData<String> loadingDate = new MutableLiveData<>();
+    private boolean hasPreparedDiary;
+    private String loadedDate;
     private MutableLiveData<String> date = new MutableLiveData<>();
     // メモ
     // 下記配列をデータバインディングでスピナーに割り当てたが、スピナーの setSection メソッド(オフセット操作)が機能しなかった。
@@ -86,9 +87,8 @@ public class DiaryViewModel extends AndroidViewModel {
     }
 
     public void initialize() {
-        this.isNewEditDiary = false;
-        this.requiresPreparationDiary = true;
-        this.loadingDate.setValue("");
+        this.hasPreparedDiary = false;
+        this.loadedDate = "";
         this.date.setValue("");
         this.intWeather1.setValue(0);
         this.strWeather1.setValue("--");
@@ -105,36 +105,34 @@ public class DiaryViewModel extends AndroidViewModel {
         this.log.setValue("");
     }
 
-    public void prepareEditDiary() {
-        if (this.loadingDate.getValue().isEmpty()) {
-            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-                LocalDate localDate = LocalDate.now();
-                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy年MM月dd日(E)");
-                String stringDate = localDate.format(formatter);
-                this.date.setValue(stringDate);
-            }
-        } else {
-            String stringLoadingDate = this.loadingDate.getValue();
-            if (hasDiary(stringLoadingDate)) {
-                loadDiary();
-            } else {
-                this.date.setValue(stringLoadingDate);
-                this.loadingDate.setValue("");
-            }
-        }
+    public void prepareDiary(int year, int month, int dayOfMonth, boolean isLoading) {
+        String stringDate = DateConverter.toStringLocalDate(year, month, dayOfMonth);
+        prepareDiary(stringDate, isLoading);
     }
 
-    public void prepareShowDiary() {
-        loadDiary();
+    public void prepareDiary(String date, boolean isLoading) {
+        this.date.setValue(date);
+        if (isLoading && hasDiary(date)) {
+            loadDiary();
+        }
+        this.hasPreparedDiary = true;
     }
+
+    public void prepareNewDiary(int year, int month, int dayOfMonth) {
+
+    }
+
 
     private void loadDiary() {
-        Diary diary = diaryRepository.selectDiary(this.loadingDate.getValue());
+        Diary diary = diaryRepository.selectDiary(this.date.getValue());
         this.date.setValue(diary.getDate());
         this.log.setValue(diary.getLog());
         this.intWeather1.setValue(toIntegerWeather(diary.getWeather1()));
+        this.strWeather1.setValue(diary.getWeather1());
         this.intWeather2.setValue(toIntegerWeather(diary.getWeather2()));
+        this.strWeather2.setValue(diary.getWeather2());
         this.intCondition.setValue(toIntegerCondition(diary.getCondition()));
+        this.strCondition.setValue(diary.getCondition());
         this.title.setValue(diary.getTitle());
         this.items[0].title.setValue(diary.getItem1Title());
         this.items[0].comment.setValue(diary.getItem1Comment());
@@ -162,55 +160,43 @@ public class DiaryViewModel extends AndroidViewModel {
                 break;
             }
         }
-
-        this.isNewEditDiary = false;
+        this.loadedDate = this.date.getValue();
     }
 
     public boolean hasDiary(String date) {
         return diaryRepository.hasDiary(date);
     }
     public boolean hasDiary(int year, int month, int dayOfMonth) {
-        // 日付データ作成。
-        // https://qiita.com/hanaaaa/items/8555aaabc6b949ec507d
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-            LocalDate localDate = LocalDate.of(year, month, dayOfMonth);
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy年MM月dd日(E)");
-            String stringDate = localDate.format(formatter);
-            return diaryRepository.hasDiary(stringDate);
-        }
-        return false;
+        String stringDate = DateConverter.toStringLocalDate(year, month, dayOfMonth);
+        return diaryRepository.hasDiary(stringDate);
     }
 
     public void saveNewDiary() {
         Diary diary = createDiary();
         this.diaryRepository.insertDiary(diary);
-        this.loadingDate.setValue(this.date.getValue());
-        this.isNewEditDiary = false;
+        this.loadedDate = this.date.getValue();
     }
 
     public void deleteExistingDiaryAndSaveNewDiary() {
         Diary diary = createDiary();
-        this.diaryRepository.deleteAndInsertDiary(this.loadingDate.getValue(), diary);
-        this.loadingDate.setValue(this.date.getValue());
-        this.isNewEditDiary = false;
+        this.diaryRepository.deleteAndInsertDiary(this.loadedDate, diary);
+        this.loadedDate = this.date.getValue();
     }
 
     public void updateExistingDiary() {
         Diary diary = createDiary();
         this.diaryRepository.updateDiary(diary);
-        this.loadingDate.setValue(this.date.getValue());
-        this.isNewEditDiary = false;
+        this.loadedDate = this.date.getValue();
     }
 
     public void deleteExistingDiaryAndUpdateExistingDiary() {
         Diary diary = createDiary();
-        this.diaryRepository.deleteAndUpdateDiary(this.loadingDate.getValue(), diary);
-        this.loadingDate.setValue(this.date.getValue());
-        this.isNewEditDiary = false;
+        this.diaryRepository.deleteAndUpdateDiary(this.loadedDate, diary);
+        this.loadedDate = this.date.getValue();
     }
 
     public void deleteDiary(String date) {
-        diaryRepository.deleteDiary(date);
+        this.diaryRepository.deleteDiary(date);
     }
 
     private Diary createDiary() {
@@ -235,43 +221,14 @@ public class DiaryViewModel extends AndroidViewModel {
         return diary;
     }
 
-    public void updateLoadingDate(int year, int month, int dayOfMonth) {
-        // 日付データ作成。
-        // https://qiita.com/hanaaaa/items/8555aaabc6b949ec507d
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-            LocalDate localDate = LocalDate.of(year, month, dayOfMonth);
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy年MM月dd日(E)");
-            String stringDate = localDate.format(formatter);
-            this.loadingDate.setValue(stringDate);
-        }
-    }
     public void updateDate(int year, int month, int dayOfMonth) {
-        // 日付データ作成。
-        // https://qiita.com/hanaaaa/items/8555aaabc6b949ec507d
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-            LocalDate localDate = LocalDate.of(year, month, dayOfMonth);
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy年MM月dd日(E)");
-            String stringDate = localDate.format(formatter);
-            this.date.setValue(stringDate);
-        }
+        String stringDate = DateConverter.toStringLocalDate(year, month, dayOfMonth);
+        this.date.setValue(stringDate);
     }
 
     private void updateLog() {
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-            LocalDateTime localDateTime = LocalDateTime.now();
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy年MM月dd日(E) HH:mm:ss");
-            String stringDate = localDateTime.format(formatter);
-            this.log.setValue(stringDate);
-        }
-    }
-
-
-    public void updateStrWeather1() {
-        this.strWeather1.setValue(toStringWeather(intWeather1.getValue()));
-    }
-
-    public void updateStrWeather2() {
-        this.strWeather2.setValue(toStringWeather(intWeather2.getValue()));
+        String stringDate = DateConverter.toStringLocalDateTimeNow();
+        this.log.setValue(stringDate);
     }
 
     public String toStringWeather(int intWeather) {
@@ -292,10 +249,6 @@ public class DiaryViewModel extends AndroidViewModel {
         return 0;
     }
 
-    public void updateStrCondition() {
-        this.strCondition.setValue(toStringCondition(intCondition.getValue()));
-    }
-
     private String toStringCondition(int intCondition) {
         for (int i = 0; i < conditions.length; i++) {
             if (i == intCondition) {
@@ -307,14 +260,14 @@ public class DiaryViewModel extends AndroidViewModel {
 
     public int toIntegerCondition(String strCondition) {
         for (int i = 0; i < conditions.length; i++) {
-            if (weathers[i].equals(strCondition)) {
+            if (conditions[i].equals(strCondition)) {
                 return i;
             }
         }
         return 0;
     }
 
-    public void countUpShowedItem() {
+    public void incrementVisibleItemsCount() {
         this.visibleItemsCount++;
     }
 
@@ -340,25 +293,18 @@ public class DiaryViewModel extends AndroidViewModel {
 
 
     // Getter/Setter
-    public Boolean getIsNewEditDiary() {
-        return this.isNewEditDiary;
+    public Boolean getHasPreparedDiary() {
+        return this.hasPreparedDiary;
     }
-    public void setIsNewEditDiary(Boolean bool) {
-        this.isNewEditDiary = bool;
-    }
-
-    public Boolean getRequiresPreparationDiary() {
-        return this.requiresPreparationDiary;
-    }
-    public void setRequiresPreparationDiary(Boolean bool) {
-        this.requiresPreparationDiary = bool;
+    public void setHasPreparedDiary(Boolean bool) {
+        this.hasPreparedDiary = bool;
     }
 
-    public LiveData<String> getLiveLoadingDate() {
-        return this.loadingDate;
+    public String getLoadedDate() {
+        return this.loadedDate;
     }
-    public void setLoadingDate(String loadingDate) {
-        this.loadingDate.setValue(loadingDate);
+    public void setLoadedDate(String loadedDate) {
+        this.loadedDate = loadedDate;
     }
 
     public LiveData<String> getLiveDate() {
@@ -373,12 +319,13 @@ public class DiaryViewModel extends AndroidViewModel {
     }
     public void setIntWeather1(int intWeather) {
         this.intWeather1.setValue(intWeather);
+        this.strWeather1.setValue(toStringWeather(intWeather));
     }
 
     public LiveData<String> getLiveStrWeather1() {
         return this.strWeather1;
     }
-    public void setStrWeather1(String strWeather) {
+    private void setStrWeather1(String strWeather) {
         this.strWeather1.setValue(strWeather);
     }
 
@@ -387,12 +334,13 @@ public class DiaryViewModel extends AndroidViewModel {
     }
     public void setIntWeather2(int intWeather) {
         this.intWeather2.setValue(intWeather);
+        this.strWeather2.setValue(toStringWeather(intWeather));
     }
 
     public LiveData<String> getLiveStrWeather2() {
         return this.strWeather2;
     }
-    public void setStrWeather2(String strWeather) {
+    private void setStrWeather2(String strWeather) {
         this.strWeather2.setValue(strWeather);
     }
 
@@ -401,12 +349,13 @@ public class DiaryViewModel extends AndroidViewModel {
     }
     public void setIntCondition(int intCondition) {
         this.intCondition.setValue(intCondition);
+        this.strCondition.setValue(toStringCondition(intCondition));
     }
 
     public LiveData<String> getLiveStrCondition() {
         return this.strCondition;
     }
-    public void setStrCondition(String strCondition) {
+    private void setStrCondition(String strCondition) {
         this.strCondition.setValue(strCondition);
     }
 
@@ -455,9 +404,4 @@ public class DiaryViewModel extends AndroidViewModel {
     public void setLog(String log) {
         this.log.setValue(log);
     }
-
-
-
-
-
 }

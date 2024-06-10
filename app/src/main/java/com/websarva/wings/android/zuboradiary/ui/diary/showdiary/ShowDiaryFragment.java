@@ -25,6 +25,7 @@ import android.widget.TextView;
 
 import com.websarva.wings.android.zuboradiary.R;
 import com.websarva.wings.android.zuboradiary.databinding.FragmentShowDiaryBinding;
+import com.websarva.wings.android.zuboradiary.ui.ShowDiaryLayout;
 import com.websarva.wings.android.zuboradiary.ui.editdiary.DiaryViewModel;
 import com.websarva.wings.android.zuboradiary.ui.editdiary.EditDiaryFragment;
 import com.websarva.wings.android.zuboradiary.ui.list.DiaryListFragment;
@@ -50,6 +51,7 @@ public class ShowDiaryFragment extends Fragment {
         // ViewModel設定
         ViewModelProvider provider = new ViewModelProvider(requireActivity());
         this.diaryViewModel = provider.get(DiaryViewModel.class);
+        this.diaryViewModel.initialize();
 
         // Navigation設定
         this.navController = NavHostFragment.findNavController(this);
@@ -88,16 +90,19 @@ public class ShowDiaryFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         // 画面表示データ準備
-        this.diaryViewModel.initialize();
-        String showDiaryDate =
-                ShowDiaryFragmentArgs.fromBundle(requireArguments()).getShowDiaryDate();
-        this.diaryViewModel.setLoadingDate(showDiaryDate);
-        this.diaryViewModel.prepareShowDiary();
+        int showDiaryDateYear =
+                ShowDiaryFragmentArgs.fromBundle(requireArguments()).getShowDiaryDateYear();
+        int showDiaryDateMonth =
+                ShowDiaryFragmentArgs.fromBundle(requireArguments()).getShowDiaryDateMonth();
+        int showDiaryDateDayOfMonth =
+                ShowDiaryFragmentArgs.fromBundle(requireArguments()).getShowDiaryDateDayOfMonth();
+        this.diaryViewModel.prepareDiary(
+                showDiaryDateYear, showDiaryDateMonth, showDiaryDateDayOfMonth, true);
 
 
         // ツールバー設定
         this.binding.materialToolbarTopAppBar
-                .setTitle(this.diaryViewModel.getLiveLoadingDate().getValue());
+                .setTitle(this.diaryViewModel.getLiveDate().getValue());
         this.binding.materialToolbarTopAppBar
                 .setNavigationOnClickListener(new View.OnClickListener() {
                     @Override
@@ -112,14 +117,23 @@ public class ShowDiaryFragment extends Fragment {
                     public boolean onMenuItemClick(MenuItem item) {
                         //日記編集フラグメント起動。
                         if (item.getItemId() == R.id.displayDiaryToolbarOptionEditDiary) {
-                            String editDiaryDate =
+                            int editDiaryDateYear =
                                     ShowDiaryFragmentArgs.fromBundle(requireArguments())
-                                            .getShowDiaryDate();
+                                            .getShowDiaryDateYear();
+                            int editDiaryDateMonth =
+                                    ShowDiaryFragmentArgs.fromBundle(requireArguments())
+                                            .getShowDiaryDateMonth();
+                            int editDiaryDateDayOfMonth =
+                                    ShowDiaryFragmentArgs.fromBundle(requireArguments())
+                                            .getShowDiaryDateDayOfMonth();
                             NavDirections action =
                                     ShowDiaryFragmentDirections
                                             .actionNavigationShowDiaryFragmentToEditDiaryFragment(
                                                     false,
-                                                    editDiaryDate
+                                                    false,
+                                                    editDiaryDateYear,
+                                                    editDiaryDateMonth,
+                                                    editDiaryDateDayOfMonth
                                             );
                             ShowDiaryFragment.this.navController.navigate(action);
                             return true;
@@ -129,45 +143,14 @@ public class ShowDiaryFragment extends Fragment {
                 });
 
 
-        // 天気入力欄設定
-        // MEMO:ShowDiaryFragmentの中身を一つのレイアウトとして独立させた。
-        //      bindingで中身のViewを取得できなくなった為、findViewById()メソッドを使用してViewを取得。
-        this.diaryViewModel.getLiveIntWeather1()
-                .observe(getViewLifecycleOwner(), new Observer<Integer>() {
-                    @Override
-                    public void onChanged(Integer integer) {
-                        ShowDiaryFragment.this.diaryViewModel.updateStrWeather1();
-                    }
-                });
-
-        this.diaryViewModel.getLiveIntWeather2()
-                .observe(getViewLifecycleOwner(), new Observer<Integer>() {
-                    @Override
-                    public void onChanged(Integer integer) {
-                        TextView textWeatherSlush =
-                                ShowDiaryFragment.this.binding.includeShowDiary.textWeatherSlush;
-                        TextView textWeather2Selected =
-                                ShowDiaryFragment.this.binding.includeShowDiary.textWeather2Selected;
-                        if (integer != 0) {
-                            textWeatherSlush.setVisibility(View.VISIBLE);
-                            textWeather2Selected.setVisibility(View.VISIBLE);
-                            ShowDiaryFragment.this.diaryViewModel.updateStrWeather2();
-                        } else {
-                            textWeatherSlush.setVisibility(View.GONE);
-                            textWeather2Selected.setVisibility(View.GONE);
-                        }
-                    }
-                });
-
-
-        // 気分入力欄設定
-        this.diaryViewModel.getLiveIntCondition()
-                .observe(getViewLifecycleOwner(), new Observer<Integer>() {
-                    @Override
-                    public void onChanged(Integer integer) {
-                        ShowDiaryFragment.this.diaryViewModel.updateStrCondition();
-                    }
-                });
+        // 天気表示欄設定
+        // MEMO:日記の中身を表示するレイアウトをShowDiaryFragmentとCalendarFragment共有させるため、
+        //      別レイアウトに作成。各Fragmentにて設定が重複するため、下記クラス、メソッドを作成して使用。
+        ShowDiaryLayout.setupVisibleWeather2Observer(
+                this.diaryViewModel, getViewLifecycleOwner(),
+                this.binding.includeShowDiary.textWeatherSlush,
+                this.binding.includeShowDiary.textWeather2Selected
+        );
 
 
         // 必要数の項目欄表示

@@ -36,6 +36,7 @@ import com.websarva.wings.android.zuboradiary.databinding.CalendarDayBinding;
 import com.websarva.wings.android.zuboradiary.databinding.CalendarHeaderBinding;
 import com.websarva.wings.android.zuboradiary.databinding.FragmentCalendarBinding;
 import com.websarva.wings.android.zuboradiary.DateConverter;
+import com.websarva.wings.android.zuboradiary.ui.ShowDiaryLayout;
 import com.websarva.wings.android.zuboradiary.ui.diary.showdiary.ShowDiaryFragment;
 import com.websarva.wings.android.zuboradiary.ui.editdiary.DiaryViewModel;
 
@@ -154,42 +155,11 @@ public class CalendarFragment extends Fragment {
         }
 
         // 天気表示欄設定
-        this.diaryViewModel.getLiveIntWeather1()
-                .observe(getViewLifecycleOwner(), new Observer<Integer>() {
-                    @Override
-                    public void onChanged(Integer integer) {
-                        CalendarFragment.this.diaryViewModel.updateStrWeather1();
-                    }
-                });
-
-        this.diaryViewModel.getLiveIntWeather2()
-                .observe(getViewLifecycleOwner(), new Observer<Integer>() {
-                    @Override
-                    public void onChanged(Integer integer) {
-                        TextView textWeatherSlush =
-                                CalendarFragment.this.binding.includeShowDiary.textWeatherSlush;
-                        TextView textWeather2Selected =
-                                CalendarFragment.this.binding.includeShowDiary.textWeather2Selected;
-                        if (integer != 0) {
-                            textWeatherSlush.setVisibility(View.VISIBLE);
-                            textWeather2Selected.setVisibility(View.VISIBLE);
-                            CalendarFragment.this.diaryViewModel.updateStrWeather2();
-                        } else {
-                            textWeatherSlush.setVisibility(View.GONE);
-                            textWeather2Selected.setVisibility(View.GONE);
-                        }
-                    }
-                });
-
-
-        // 気分表示欄設定
-        this.diaryViewModel.getLiveIntCondition()
-                .observe(getViewLifecycleOwner(), new Observer<Integer>() {
-                    @Override
-                    public void onChanged(Integer integer) {
-                        diaryViewModel.updateStrCondition();
-                    }
-                });
+        ShowDiaryLayout.setupVisibleWeather2Observer(
+                this.diaryViewModel, getViewLifecycleOwner(),
+                this.binding.includeShowDiary.textWeatherSlush,
+                this.binding.includeShowDiary.textWeather2Selected
+        );
 
 
         // FAB設定
@@ -198,12 +168,14 @@ public class CalendarFragment extends Fragment {
             public void onClick(View v) {
                 // 日記編集(新規作成)フラグメント起動。
                 LocalDate selectedDate = CalendarFragment.this.calendarViewModel.getSelectedDate();
-                String editDiaryDate = DateConverter.toStringLocalDate(selectedDate);
                 NavDirections action =
                         CalendarFragmentDirections
                                 .actionNavigationCalendarFragmentToEditDiaryFragment(
                                         true,
-                                        editDiaryDate
+                                        true,
+                                        selectedDate.getYear(),
+                                        selectedDate.getMonthValue(),
+                                        selectedDate.getDayOfMonth()
                                 );
                 CalendarFragment.this.navController.navigate(action);
             }
@@ -257,8 +229,7 @@ public class CalendarFragment extends Fragment {
         if (this.diaryViewModel.hasDiary(year, month, dayOfMonth)) {
             // ViewModelの読込日記の日付をセット
             this.diaryViewModel.initialize();
-            this.diaryViewModel.updateLoadingDate(year, month, dayOfMonth);
-            this.diaryViewModel.prepareShowDiary();
+            this.diaryViewModel.prepareDiary(year, month, dayOfMonth, true);
             setupItemLayout(); // 必要数の項目欄表示
             this.binding.linearLayoutShowDiary.setVisibility(View.VISIBLE);
             this.binding.textNoDiary.setVisibility(View.GONE);

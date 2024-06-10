@@ -40,6 +40,7 @@ import com.websarva.wings.android.zuboradiary.DateConverter;
 import com.websarva.wings.android.zuboradiary.MainActivity;
 import com.websarva.wings.android.zuboradiary.R;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -228,11 +229,15 @@ public class DiaryListFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 // 日記編集(新規作成)フラグメント起動。
+                LocalDate localDate = LocalDate.now();
                 NavDirections action =
                         DiaryListFragmentDirections
                                 .actionNavigationDiaryListFragmentToEditDiaryFragment(
                                         true,
-                                        ""
+                                        false,
+                                        localDate.getYear(),
+                                        localDate.getMonthValue(),
+                                        localDate.getDayOfMonth()
                                 );
                 DiaryListFragment.this.navController.navigate(action);
             }
@@ -319,8 +324,8 @@ public class DiaryListFragment extends Fragment {
                             String dayOfMonth;
                             String dayOfWeek;
                             final String KEY_DATE = DiaryDayListAdapter.KEY_DATE;
-                            final String KEY_YEAR = DiaryYearMonthListAdapter.KEY_YEAR;
-                            final String KEY_MONTH = DiaryYearMonthListAdapter.KEY_MONTH;
+                            final String KEY_YEAR = DiaryDayListAdapter.KEY_YEAR;
+                            final String KEY_MONTH = DiaryDayListAdapter.KEY_MONTH;
                             final String KEY_DAY_OF_MONTH = DiaryDayListAdapter.KEY_DAY_OF_MONTH;
                             final String KEY_DAY_OF_WEEK = DiaryDayListAdapter.KEY_DAY_OF_WEEK;
                             final String KEY_TITLE = DiaryDayListAdapter.KEY_TITLE;
@@ -431,8 +436,10 @@ public class DiaryListFragment extends Fragment {
     //日記リスト(日)リサイクルビューアダプタクラス
     public class DiaryDayListAdapter extends RecyclerView.Adapter<DiaryDayListViewHolder> {
         private List<Map<String, Object>> DiaryDayList;
-        public static final String KEY_DAY_OF_WEEK = "DayOfWeek";
+        public static final String KEY_YEAR = "Year";
+        public static final String KEY_MONTH = "Month";
         public static final String KEY_DAY_OF_MONTH = "DayOfMonth";
+        public static final String KEY_DAY_OF_WEEK = "DayOfWeek";
         public static final String KEY_TITLE = "Title";
         public static final String KEY_PICTURE_PATH = "PicturePath";
         public static final String KEY_DATE = "Date";
@@ -466,7 +473,9 @@ public class DiaryListFragment extends Fragment {
                     NavDirections action =
                             DiaryListFragmentDirections
                                     .actionNavigationDiaryListFragmentToShowDiaryFragment(
-                                            (String) item.get(KEY_DATE)
+                                            Integer.parseInt((String) item.get(KEY_YEAR)),
+                                            Integer.parseInt((String) item.get(KEY_MONTH)),
+                                            Integer.parseInt((String) item.get(KEY_DAY_OF_MONTH))
                                     );
                     DiaryListFragment.this.navController.navigate(action);
                 }
@@ -496,8 +505,8 @@ public class DiaryListFragment extends Fragment {
             extends RecyclerView.Adapter<_DiaryYearMonthListViewHolder> {
         private List<Map<String, Object>> diaryYearMonthList = new ArrayList<>();
         private List<CustomSimpleCallback> simpleCallbacks = new ArrayList<>();
-        public static final String KEY_YEAR = "Year";
-        public static final String KEY_MONTH = "Month";
+        public static final String KEY_YEAR = DiaryDayListAdapter.KEY_YEAR;
+        public static final String KEY_MONTH = DiaryDayListAdapter.KEY_MONTH;
         public static final String KEY_ADAPTER = "Adapter";
 
         public DiaryYearMonthListAdapter(){

@@ -26,8 +26,17 @@
                     android:name="isStartDiaryFragment"
                     app:argType="boolean" />
                 <argument
-                    android:name="edit_diary_date"
-                    app:argType="string" />
+                    android:name="isLoadingDiary"
+                    app:argType="boolean" />
+                <argument
+                    android:name="edit_diary_date_year"
+                    app:argType="integer" />
+                <argument
+                    android:name="edit_diary_date_month"
+                    app:argType="integer" />
+                <argument
+                    android:name="edit_diary_date_day_of_month"
+                    app:argType="integer" />
             </action>
             <action
                 android:id="@+id/action_diary_list_fragment_to_date_picker_dialog"
@@ -78,8 +87,17 @@
                     android:name="isStartDiaryFragment"
                     app:argType="boolean" />
                 <argument
-                    android:name="edit_diary_date"
-                    app:argType="string" />
+                    android:name="isLoadingDiary"
+                    app:argType="boolean" />
+                <argument
+                    android:name="edit_diary_date_year"
+                    app:argType="integer" />
+                <argument
+                    android:name="edit_diary_date_month"
+                    app:argType="integer" />
+                <argument
+                    android:name="edit_diary_date_day_of_month"
+                    app:argType="integer" />
             </action>
         </fragment>
     </navigation>
@@ -104,12 +122,27 @@
                 android:name="isStartDiaryFragment"
                 app:argType="boolean" />
             <argument
-                android:name="edit_diary_date"
-                app:argType="string" />
+                android:name="isLoadingDiary"
+                app:argType="boolean" />
+            <argument
+                android:name="edit_diary_date_year"
+                app:argType="integer" />
+            <argument
+                android:name="edit_diary_date_month"
+                app:argType="integer" />
+            <argument
+                android:name="edit_diary_date_day_of_month"
+                app:argType="integer" />
         </action>
         <argument
-            android:name="show_diary_date"
-            app:argType="string" />
+            android:name="show__diary_date_year"
+            app:argType="integer" />
+        <argument
+            android:name="show__diary_date_month"
+            app:argType="integer" />
+        <argument
+            android:name="show__diary_date_day_of_month"
+            app:argType="integer" />
     </fragment>
 
     <navigation
@@ -149,8 +182,17 @@
                 android:name="isStartDiaryFragment"
                 app:argType="boolean" />
             <argument
-                android:name="edit_diary_date"
-                app:argType="string" />
+                android:name="isLoadingDiary"
+                app:argType="boolean" />
+            <argument
+                android:name="edit_diary_date_year"
+                app:argType="integer" />
+            <argument
+                android:name="edit_diary_date_month"
+                app:argType="integer" />
+            <argument
+                android:name="edit_diary_date_day_of_month"
+                app:argType="integer" />
         </fragment>
         <dialog
             android:id="@+id/navigation_date_picker_dialog_for_edit_diary_fragment"

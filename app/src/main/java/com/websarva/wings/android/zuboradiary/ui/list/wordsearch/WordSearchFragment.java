@@ -211,8 +211,8 @@ public class WordSearchFragment extends Fragment {
                             SpannableString itemTitle;
                             SpannableString itemComment;
                             final String KEY_DATE = WordSearchResultDayListAdapter.KEY_DATE;
-                            final String KEY_YEAR = WordSearchResultYearMonthListAdapter.KEY_YEAR;
-                            final String KEY_MONTH = WordSearchResultYearMonthListAdapter.KEY_MONTH;
+                            final String KEY_YEAR = WordSearchResultDayListAdapter.KEY_YEAR;
+                            final String KEY_MONTH = WordSearchResultDayListAdapter.KEY_MONTH;
                             final String KEY_DAY_OF_MONTH =
                                     WordSearchResultDayListAdapter.KEY_DAY_OF_MONTH;
                             final String KEY_DAY_OF_WEEK =
@@ -430,8 +430,10 @@ public class WordSearchFragment extends Fragment {
     public class WordSearchResultDayListAdapter
             extends RecyclerView.Adapter<WordSearchResultDayViewHolder> {
         private List<Map<String, Object>> DiaryDayList;
-        public static final String KEY_DAY_OF_WEEK = "DayOfWeek";
+        public static final String KEY_YEAR = "Year";
+        public static final String KEY_MONTH = "Month";
         public static final String KEY_DAY_OF_MONTH = "DayOfMonth";
+        public static final String KEY_DAY_OF_WEEK = "DayOfWeek";
         public static final String KEY_TITLE = "Title";
         public static final String KEY_ITEM_NUMBER = "ItemNumber";
         public static final String KEY_ITEM_TITLE = "ItemTitle";
@@ -476,7 +478,9 @@ public class WordSearchFragment extends Fragment {
                     NavDirections action =
                             WordSearchFragmentDirections
                                     .actionNavigationWordSearchFragmentToShowDiaryFragment(
-                                            (String) item.get(KEY_DATE)
+                                            Integer.parseInt((String) item.get(KEY_YEAR)),
+                                            Integer.parseInt((String) item.get(KEY_MONTH)),
+                                            Integer.parseInt((String) item.get(KEY_DAY_OF_MONTH))
                                     );
                     WordSearchFragment.this.navController.navigate(action);
                 }
@@ -507,8 +511,8 @@ public class WordSearchFragment extends Fragment {
     //日記リスト(年月)リサイクルビューアダプタクラス
     public class WordSearchResultYearMonthListAdapter extends RecyclerView.Adapter<WordSearchResultYearMonthListViewHolder> {
         private List<Map<String, Object>> diaryListYearMonth = new ArrayList<>();
-        public static final String KEY_YEAR = "Year";
-        public static final String KEY_MONTH = "Month";
+        public static final String KEY_YEAR = WordSearchResultDayListAdapter.KEY_YEAR;
+        public static final String KEY_MONTH = WordSearchResultDayListAdapter.KEY_MONTH;
         public static final String KEY_ADAPTER = "Adapter";
 
         public WordSearchResultYearMonthListAdapter(){
