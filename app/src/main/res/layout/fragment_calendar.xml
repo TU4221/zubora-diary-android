@@ -9,7 +9,7 @@
                   https://qiita.com/nanoyatsu/items/afad39a63d42d6fa3ac8 -->
         <variable
             name="diaryViewModel"
-            type="com.websarva.wings.android.zuboradiary.ui.editdiary.DiaryViewModel" />
+            type="com.websarva.wings.android.zuboradiary.ui.diary.DiaryViewModel" />
     </data>
 
     <LinearLayout
@@ -31,7 +31,8 @@
 
         <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent" >
+            android:layout_height="match_parent"
+            android:layout_margin="8dp">
 
             <androidx.core.widget.NestedScrollView
                 android:id="@+id/nested_scroll_full_screen"

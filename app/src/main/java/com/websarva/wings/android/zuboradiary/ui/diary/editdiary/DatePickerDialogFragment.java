@@ -1,4 +1,4 @@
-package com.websarva.wings.android.zuboradiary.ui.editdiary;
+package com.websarva.wings.android.zuboradiary.ui.diary.editdiary;
 
 
 import android.app.DatePickerDialog;

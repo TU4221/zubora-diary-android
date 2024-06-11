@@ -38,7 +38,7 @@ import com.websarva.wings.android.zuboradiary.databinding.FragmentCalendarBindin
 import com.websarva.wings.android.zuboradiary.DateConverter;
 import com.websarva.wings.android.zuboradiary.ui.ShowDiaryLayout;
 import com.websarva.wings.android.zuboradiary.ui.diary.showdiary.ShowDiaryFragment;
-import com.websarva.wings.android.zuboradiary.ui.editdiary.DiaryViewModel;
+import com.websarva.wings.android.zuboradiary.ui.diary.DiaryViewModel;
 
 import com.kizitonwose.calendar.view.CalendarView;
 

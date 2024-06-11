@@ -8,6 +8,10 @@ import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
+import com.google.common.util.concurrent.FutureCallback;
+import com.google.common.util.concurrent.Futures;
+import com.google.common.util.concurrent.ListenableFuture;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -47,7 +51,7 @@ public class WordSearchViewModel extends AndroidViewModel {
         NEW, UPDATE, ADD
     }
     public void loadWordSearchResultList(LoadType loadType) {
-        Log.d("リスト読込確認", "起動");
+        Log.d("20240611", "リスト読込開始");
         List<WordSearchResultListItemDiary> loadedList = new ArrayList<>();
         int loadItemNum;
         if (loadType == LoadType.NEW) {
@@ -67,26 +71,56 @@ public class WordSearchViewModel extends AndroidViewModel {
             loadedList = this.loadedWordSearchResultList.getValue();
         }
 
+        ListenableFuture<List<WordSearchResultListItemDiary>> listListenableFuture = null;
         if (this.searchWord.getValue().isEmpty()) {
-            loadedList.addAll(
+            /*loadedList.addAll(
                     this.wordSearchRepository.selectWordSearchResultList(
                             loadItemNum,
                             this.loadItemOffset,
                             null
                     )
-            );
+            );*/
+            listListenableFuture =
+            this.wordSearchRepository.selectWordSearchResultList(
+                    loadItemNum,
+                    this.loadItemOffset,
+                    null);
         } else {
-            loadedList.addAll(
+            /*loadedList.addAll(
                     this.wordSearchRepository.selectWordSearchResultList(
                             loadItemNum,
                             this.loadItemOffset,
                             this.searchWord.getValue()
                     )
-            );
+            );*/
+            listListenableFuture =
+            this.wordSearchRepository.selectWordSearchResultList(
+                    loadItemNum,
+                    this.loadItemOffset,
+                    this.searchWord.getValue());
         }
 
-        this.loadItemOffset += loadItemNum;
-        this.loadedWordSearchResultList.setValue(loadedList);
+        //this.loadItemOffset += loadItemNum;
+        //this.loadedWordSearchResultList.setValue(loadedList);
+        Futures.addCallback(
+                listListenableFuture,
+                new FutureCallback<List<WordSearchResultListItemDiary>>() {
+                    @Override
+                    public void onSuccess(List<WordSearchResultListItemDiary> result) {
+                        for (int i = 0; i < 1000000000;) {
+                            i++;
+                        }
+                        WordSearchViewModel.this.loadItemOffset += loadItemNum;
+                        Log.d("20240611", "setValue");
+                        WordSearchViewModel.this.loadedWordSearchResultList.setValue(result);
+                    }
+
+                    @Override
+                    public void onFailure(Throwable t) {
+
+                    }
+                },
+                getApplication().getMainExecutor());
     }
 
     public void clearSearchWord() {

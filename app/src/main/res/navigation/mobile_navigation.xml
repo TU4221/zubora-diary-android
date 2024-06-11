@@ -150,7 +150,7 @@
         app:startDestination="@+id/navigation_edit_diary_fragment">
         <fragment
             android:id="@+id/navigation_edit_diary_fragment"
-            android:name="com.websarva.wings.android.zuboradiary.ui.editdiary.EditDiaryFragment"
+            android:name="com.websarva.wings.android.zuboradiary.ui.diary.editdiary.EditDiaryFragment"
             tools:layout="@layout/fragment_edit_diary"
             android:label="@string/title_notifications" >
             <action
@@ -196,24 +196,24 @@
         </fragment>
         <dialog
             android:id="@+id/navigation_date_picker_dialog_for_edit_diary_fragment"
-            android:name="com.websarva.wings.android.zuboradiary.ui.editdiary.DatePickerDialogFragment"/>
+            android:name="com.websarva.wings.android.zuboradiary.ui.diary.editdiary.DatePickerDialogFragment"/>
         <dialog
             android:id="@+id/navigation_delete_confirmation_dialog_for_edit_diary_fragment"
-            android:name="com.websarva.wings.android.zuboradiary.ui.editdiary.DeleteConfirmationDialogFragment">
+            android:name="com.websarva.wings.android.zuboradiary.ui.diary.editdiary.DeleteConfirmationDialogFragment">
             <argument
                 android:name="DeleteItemNumber"
                 app:argType="integer" />
         </dialog>
         <dialog
             android:id="@+id/navigation_load_existing_diary_dialog_for_edit_diary_fragment"
-            android:name="com.websarva.wings.android.zuboradiary.ui.editdiary.LoadExistingDiaryDialogFragment">
+            android:name="com.websarva.wings.android.zuboradiary.ui.diary.editdiary.LoadExistingDiaryDialogFragment">
             <argument
                 android:name="LoadDiaryDate"
                 app:argType="string" />
         </dialog>
         <dialog
             android:id="@+id/navigation_update_existing_diary_dialog_for_edit_diary_fragment"
-            android:name="com.websarva.wings.android.zuboradiary.ui.editdiary.UpdateExistingDiaryDialogFragment">
+            android:name="com.websarva.wings.android.zuboradiary.ui.diary.editdiary.UpdateExistingDiaryDialogFragment">
             <argument
                 android:name="UpdateDiaryDate"
                 app:argType="string" />
@@ -221,7 +221,7 @@
 
         <fragment
             android:id="@+id/navigation_edit_diary_select_item_title_fragment"
-            android:name="com.websarva.wings.android.zuboradiary.ui.editdiaryselectitemtitle.EditDiarySelectItemTitleFragment"
+            android:name="com.websarva.wings.android.zuboradiary.ui.diary.editdiaryselectitemtitle.EditDiarySelectItemTitleFragment"
             tools:layout="@layout/fragment_edit_diary_select_item_title" >
             <action
                 android:id="@+id/action_select_item_title_fragment_to_edit_diary_fragment"
@@ -239,7 +239,7 @@
         </fragment>
         <dialog
             android:id="@+id/navigation_delete_confirmation_dialog_for_edit_diary_select_item_title_fragment"
-            android:name="com.websarva.wings.android.zuboradiary.ui.editdiaryselectitemtitle.DeleteConfirmationDialogFragment">
+            android:name="com.websarva.wings.android.zuboradiary.ui.diary.editdiaryselectitemtitle.DeleteConfirmationDialogFragment">
             <argument
                 android:name="DeleteListItemPosition"
                 app:argType="integer" />

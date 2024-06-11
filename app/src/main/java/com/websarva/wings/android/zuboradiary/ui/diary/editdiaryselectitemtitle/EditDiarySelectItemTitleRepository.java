@@ -1,4 +1,4 @@
-package com.websarva.wings.android.zuboradiary.ui.editdiaryselectitemtitle;
+package com.websarva.wings.android.zuboradiary.ui.diary.editdiaryselectitemtitle;
 
 import android.app.Application;
 import android.util.Log;

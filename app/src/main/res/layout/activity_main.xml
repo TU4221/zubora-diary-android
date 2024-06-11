@@ -39,10 +39,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="?attr/colorPrimary"
-                android:gravity="center"
                 android:minHeight="?attr/actionBarSize"
                 android:theme="?attr/actionBarTheme"
-                app:title="@string/list_toolbar_title"
                 app:titleCentered="true" />
 
         </com.google.android.material.appbar.AppBarLayout>

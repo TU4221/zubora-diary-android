@@ -5,7 +5,7 @@
     <data>
         <variable
             name="item"
-            type="com.websarva.wings.android.zuboradiary.ui.editdiary.DiaryViewModel.Item" />
+            type="com.websarva.wings.android.zuboradiary.ui.diary.DiaryViewModel.Item" />
     </data>
 
     <androidx.constraintlayout.motion.widget.MotionLayout

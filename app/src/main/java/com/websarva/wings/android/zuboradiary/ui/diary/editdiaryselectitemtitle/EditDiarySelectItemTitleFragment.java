@@ -1,4 +1,4 @@
-package com.websarva.wings.android.zuboradiary.ui.editdiaryselectitemtitle;
+package com.websarva.wings.android.zuboradiary.ui.diary.editdiaryselectitemtitle;
 
 import static android.text.InputType.TYPE_TEXT_FLAG_MULTI_LINE;
 
@@ -13,11 +13,6 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-import androidx.core.view.MenuHost;
-import androidx.core.view.MenuProvider;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.LifecycleEventObserver;
@@ -39,9 +34,6 @@ import android.text.InputFilter;
 import android.text.TextWatcher;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -51,8 +43,8 @@ import android.widget.TextView;
 
 import com.websarva.wings.android.zuboradiary.R;
 import com.websarva.wings.android.zuboradiary.databinding.FragmentEditDiarySelectItemTitleBinding;
-import com.websarva.wings.android.zuboradiary.ui.list.DiaryListFragment;
-import com.websarva.wings.android.zuboradiary.ui.list.DiaryListFragmentDirections;
+import com.websarva.wings.android.zuboradiary.ui.diary.editdiaryselectitemtitle.EditDiarySelectItemTitleFragmentArgs;
+import com.websarva.wings.android.zuboradiary.ui.diary.editdiaryselectitemtitle.EditDiarySelectItemTitleFragmentDirections;
 
 import java.util.ArrayList;
 import java.util.List;

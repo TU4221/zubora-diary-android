@@ -58,7 +58,7 @@ public class MainActivity extends AppCompatActivity {
         Keyboard.setInputMethodManager(this);
 
         //アクションバー設定
-        setSupportActionBar(this.binding.mtbMainToolbar);
+        //setSupportActionBar(this.binding.mtbMainToolbar);
 
         // Navigation設定
         // 参考:https://inside.luchegroup.com/entry/2023/05/08/113236

@@ -47,7 +47,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.websarva.wings.android.zuboradiary.databinding.FragmentDiaryListBinding;
-import com.websarva.wings.android.zuboradiary.ui.editdiary.DiaryViewModel;
+import com.websarva.wings.android.zuboradiary.ui.diary.DiaryViewModel;
 import com.websarva.wings.android.zuboradiary.ui.list.wordsearch.WordSearchViewModel;
 
 public class DiaryListFragment extends Fragment {

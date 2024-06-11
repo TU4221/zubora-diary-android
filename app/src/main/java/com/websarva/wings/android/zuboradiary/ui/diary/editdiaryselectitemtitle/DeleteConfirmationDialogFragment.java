@@ -1,10 +1,9 @@
-package com.websarva.wings.android.zuboradiary.ui.editdiaryselectitemtitle;
+package com.websarva.wings.android.zuboradiary.ui.diary.editdiaryselectitemtitle;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
-import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -14,6 +13,7 @@ import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
 
 import com.websarva.wings.android.zuboradiary.R;
+import com.websarva.wings.android.zuboradiary.ui.diary.editdiaryselectitemtitle.DeleteConfirmationDialogFragmentArgs;
 
 public class DeleteConfirmationDialogFragment extends DialogFragment {
     private static final String fromClassName =

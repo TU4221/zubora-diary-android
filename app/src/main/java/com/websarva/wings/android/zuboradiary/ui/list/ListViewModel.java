@@ -8,9 +8,7 @@ import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
-import com.websarva.wings.android.zuboradiary.ui.editdiary.Diary;
-
-import org.checkerframework.common.value.qual.StringVal;
+import com.websarva.wings.android.zuboradiary.ui.diary.Diary;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;

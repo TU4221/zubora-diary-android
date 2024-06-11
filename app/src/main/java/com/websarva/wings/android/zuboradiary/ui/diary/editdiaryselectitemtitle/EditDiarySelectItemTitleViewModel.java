@@ -1,18 +1,15 @@
-package com.websarva.wings.android.zuboradiary.ui.editdiaryselectitemtitle;
+package com.websarva.wings.android.zuboradiary.ui.diary.editdiaryselectitemtitle;
 
 import android.app.Application;
-import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class EditDiarySelectItemTitleViewModel extends AndroidViewModel {

@@ -11,12 +11,13 @@
                   https://qiita.com/nanoyatsu/items/afad39a63d42d6fa3ac8 -->
         <variable
             name="diaryViewModel"
-            type="com.websarva.wings.android.zuboradiary.ui.editdiary.DiaryViewModel" />
+            type="com.websarva.wings.android.zuboradiary.ui.diary.DiaryViewModel" />
     </data>
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:orientation="vertical"
         android:background="?attr/colorSurface"
         tools:context=".ui.diary.showdiary.ShowDiaryFragment">
 
@@ -31,27 +32,27 @@
             app:menu="@menu/display_diary_toolbar_menu"
             app:navigationIcon="@drawable/ic_arrow_back_24px"
             app:title="----年--月--日"
-            app:titleCentered="true"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:titleCentered="true" />
 
         <androidx.core.widget.NestedScrollView
             android:id="@+id/nested_scroll_show_diary"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/material_toolbar_top_app_bar">
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
 
-            <include
-                android:id="@+id/include_show_diary"
-                layout="@layout/layout_show_diary_original"
-                app:diaryViewModel="@{diaryViewModel}" />
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="8dp">
+
+                <include
+                    android:id="@+id/include_show_diary"
+                    layout="@layout/layout_show_diary_original"
+                    app:diaryViewModel="@{diaryViewModel}" />
+
+            </FrameLayout>
 
         </androidx.core.widget.NestedScrollView>
-    </androidx.constraintlayout.widget.ConstraintLayout>
+    </LinearLayout>
 </layout>
 
 

@@ -15,8 +15,10 @@ import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.text.Editable;
 import android.text.SpannableString;
 import android.text.Spanned;
+import android.text.TextWatcher;
 import android.text.style.BackgroundColorSpan;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -31,7 +33,7 @@ import com.websarva.wings.android.zuboradiary.Keyboard;
 import com.websarva.wings.android.zuboradiary.MainActivity;
 import com.websarva.wings.android.zuboradiary.R;
 import com.websarva.wings.android.zuboradiary.databinding.FragmentWordSearchBinding;
-import com.websarva.wings.android.zuboradiary.ui.editdiary.DiaryViewModel;
+import com.websarva.wings.android.zuboradiary.ui.diary.DiaryViewModel;
 import com.websarva.wings.android.zuboradiary.ui.list.DiaryListFragment;
 import com.websarva.wings.android.zuboradiary.ui.list.DiaryListSetting;
 import com.websarva.wings.android.zuboradiary.ui.list.DiaryYearMonthListViewHolder;
@@ -41,6 +43,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import io.reactivex.subjects.PublishSubject;
+
 public class WordSearchFragment extends Fragment {
 
     // View関係
@@ -48,6 +52,7 @@ public class WordSearchFragment extends Fragment {
     private final int DIARY_DAY_LIST_ITEM_MARGIN_VERTICAL = 16;
     private final int DIARY_DAY_LIST_ITEM_MARGIN_HORIZONTAL = 32;
     private DiaryListSetting<DiaryListFragment._DiaryYearMonthListViewHolder> diaryListSetting;
+    private String beforeText = "";
 
     // Navigation関係
     private NavController navController;
@@ -128,11 +133,15 @@ public class WordSearchFragment extends Fragment {
         // キーワード検索欄設定
         this.binding.editTextKeyWordSearch.requestFocus();
         Keyboard.show(this.binding.editTextKeyWordSearch);
+        PublishSubject<String> publishSubject = PublishSubject.create();
         this.wordSearchViewModel.getSearchWord()
                 .observe(getViewLifecycleOwner(), new Observer<String>() {
                     @Override
                     public void onChanged(String s) {
-                        if (s.toString().isEmpty()) {
+                        if (s.equals(WordSearchFragment.this.beforeText)) {
+                            return;
+                        }
+                        if (s.isEmpty()) {
                             WordSearchFragment.this.wordSearchViewModel
                                     .setIsVisibleSearchWordClearButton(false);
                             WordSearchFragment.this.wordSearchViewModel
@@ -145,6 +154,7 @@ public class WordSearchFragment extends Fragment {
                                             WordSearchViewModel.LoadType.NEW
                                     );
                         }
+                        WordSearchFragment.this.beforeText = s;
                     }
                 });
         this.binding.editTextKeyWordSearch.setOnFocusChangeListener(new View.OnFocusChangeListener() {
@@ -376,7 +386,7 @@ public class WordSearchFragment extends Fragment {
 
                 // 日記リスト追加読込
                 // https://android.suzu-sd.com/2021/05/recyclerview_item_scroll/#i-5
-                if (!recyclerView.canScrollVertically(1)) {
+                if (!recyclerView.canScrollVertically(1) && dy != 0) {
                     WordSearchFragment.this.wordSearchViewModel.setIsLoading(true);
                     WordSearchFragment.this.wordSearchViewModel
                             .loadWordSearchResultList(WordSearchViewModel.LoadType.ADD);

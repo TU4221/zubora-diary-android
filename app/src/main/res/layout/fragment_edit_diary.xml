@@ -6,7 +6,7 @@
         <import type="android.view.View" />
         <variable
             name="diaryViewModel"
-            type="com.websarva.wings.android.zuboradiary.ui.editdiary.DiaryViewModel" />
+            type="com.websarva.wings.android.zuboradiary.ui.diary.DiaryViewModel" />
     </data>
 
     <LinearLayout
@@ -14,7 +14,7 @@
         android:layout_height="match_parent"
         android:orientation="vertical"
         android:background="?attr/colorSurface"
-        tools:context=".ui.editdiary.EditDiaryFragment">
+        tools:context=".ui.diary.editdiary.EditDiaryFragment">
 
         <com.google.android.material.appbar.MaterialToolbar
             android:id="@+id/material_toolbar_top_app_bar"

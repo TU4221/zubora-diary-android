@@ -1,4 +1,4 @@
-package com.websarva.wings.android.zuboradiary.ui.editdiary;
+package com.websarva.wings.android.zuboradiary.ui.diary.editdiary;
 
 import static android.text.InputType.TYPE_TEXT_FLAG_MULTI_LINE;
 
@@ -43,9 +43,11 @@ import android.widget.TextView;
 import com.websarva.wings.android.zuboradiary.DateConverter;
 import com.websarva.wings.android.zuboradiary.databinding.FragmentEditDiaryBinding;
 import com.websarva.wings.android.zuboradiary.R;
-import com.websarva.wings.android.zuboradiary.ui.diary.showdiary.ShowDiaryFragmentArgs;
-import com.websarva.wings.android.zuboradiary.ui.editdiaryselectitemtitle.EditDiarySelectItemTitleFragment;
-import com.websarva.wings.android.zuboradiary.ui.editdiaryselectitemtitle.EditDiarySelectItemTitleViewModel;
+import com.websarva.wings.android.zuboradiary.ui.diary.DiaryViewModel;
+import com.websarva.wings.android.zuboradiary.ui.diary.editdiary.EditDiaryFragmentArgs;
+import com.websarva.wings.android.zuboradiary.ui.diary.editdiary.EditDiaryFragmentDirections;
+import com.websarva.wings.android.zuboradiary.ui.diary.editdiaryselectitemtitle.EditDiarySelectItemTitleFragment;
+import com.websarva.wings.android.zuboradiary.ui.diary.editdiaryselectitemtitle.EditDiarySelectItemTitleViewModel;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -237,7 +239,7 @@ public class EditDiaryFragment extends Fragment {
         // 画面表示データ準備
         boolean isStartDiaryFragment =
                 EditDiaryFragmentArgs.fromBundle(requireArguments()).getIsStartDiaryFragment();
-        boolean isLoadingDiary =
+        boolean isLoadingExistingDiary =
                 EditDiaryFragmentArgs.fromBundle(requireArguments()).getIsLoadingDiary();
         int editDiaryDateYear =
                 EditDiaryFragmentArgs.fromBundle(requireArguments()).getEditDiaryDateYear();
@@ -251,7 +253,7 @@ public class EditDiaryFragment extends Fragment {
                         editDiaryDateYear,
                         editDiaryDateMonth,
                         editDiaryDateDayOfMonth,
-                        isLoadingDiary
+                        isLoadingExistingDiary
                 );
             }
         }

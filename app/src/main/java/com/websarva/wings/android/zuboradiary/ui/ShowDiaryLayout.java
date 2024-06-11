@@ -6,8 +6,7 @@ import android.widget.TextView;
 import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.Observer;
 
-import com.websarva.wings.android.zuboradiary.ui.diary.showdiary.ShowDiaryFragment;
-import com.websarva.wings.android.zuboradiary.ui.editdiary.DiaryViewModel;
+import com.websarva.wings.android.zuboradiary.ui.diary.DiaryViewModel;
 
 public class ShowDiaryLayout {
     public static void setupVisibleWeather2Observer(

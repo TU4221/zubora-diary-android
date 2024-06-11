@@ -7,7 +7,7 @@
     android:layout_height="match_parent"
     android:background="?attr/colorSurface"
     android:clickable="true"
-    tools:context=".ui.editdiaryselectitemtitle.EditDiarySelectItemTitleFragment">
+    tools:context=".ui.diary.editdiaryselectitemtitle.EditDiarySelectItemTitleFragment">
 
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/material_toolbar_top_app_bar"
@@ -83,7 +83,7 @@
         android:id="@+id/recycler_selected_item_title_history"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:nestedScrollingEnabled="false"
+        android:transitionGroup="true"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

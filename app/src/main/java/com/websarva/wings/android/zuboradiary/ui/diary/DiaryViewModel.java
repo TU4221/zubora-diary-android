@@ -1,4 +1,4 @@
-package com.websarva.wings.android.zuboradiary.ui.editdiary;
+package com.websarva.wings.android.zuboradiary.ui.diary;
 
 import android.app.Application;
 
@@ -9,10 +9,8 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 import com.websarva.wings.android.zuboradiary.DateConverter;
-
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
+import com.websarva.wings.android.zuboradiary.ui.diary.Diary;
+import com.websarva.wings.android.zuboradiary.ui.diary.DiaryRepository;
 
 public class DiaryViewModel extends AndroidViewModel {
 
