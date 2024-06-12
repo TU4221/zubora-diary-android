@@ -386,6 +386,8 @@ public class WordSearchFragment extends Fragment {
 
                 // 日記リスト追加読込
                 // https://android.suzu-sd.com/2021/05/recyclerview_item_scroll/#i-5
+                // MEMO:下記条件"dy != 0"は検索結果リストが更新されたときに
+                //      "RecyclerView.OnScrollListener#onScrolled"が起動するための対策。
                 if (!recyclerView.canScrollVertically(1) && dy != 0) {
                     WordSearchFragment.this.wordSearchViewModel.setIsLoading(true);
                     WordSearchFragment.this.wordSearchViewModel
