@@ -37,23 +37,12 @@
             android:layout_height="0dp"
             android:scrollbars="none"
             android:transitionGroup="true"
-            app:layout_constraintBottom_toTopOf="@+id/progress_bar_diary_list"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/material_toolbar_top_app_bar"
             app:layout_constraintVertical_chainStyle="packed" />
-
-        <ProgressBar
-            android:id="@+id/progress_bar_diary_list"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:background="?attr/colorSurface"
-            android:visibility="@{list_view_model.isLoading ? View.VISIBLE : View.GONE}"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintStart_toStartOf="parent" />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/fab_edit_diary"

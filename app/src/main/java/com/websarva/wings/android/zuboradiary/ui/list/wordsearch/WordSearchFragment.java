@@ -15,10 +15,8 @@ import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.text.Editable;
 import android.text.SpannableString;
 import android.text.Spanned;
-import android.text.TextWatcher;
 import android.text.style.BackgroundColorSpan;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -36,7 +34,7 @@ import com.websarva.wings.android.zuboradiary.databinding.FragmentWordSearchBind
 import com.websarva.wings.android.zuboradiary.ui.diary.DiaryViewModel;
 import com.websarva.wings.android.zuboradiary.ui.list.DiaryListFragment;
 import com.websarva.wings.android.zuboradiary.ui.list.DiaryListSetting;
-import com.websarva.wings.android.zuboradiary.ui.list.DiaryYearMonthListViewHolder;
+import com.websarva.wings.android.zuboradiary.ui.list.DiaryYearMonthListBaseViewHolder;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -51,7 +49,7 @@ public class WordSearchFragment extends Fragment {
     private FragmentWordSearchBinding binding;
     private final int DIARY_DAY_LIST_ITEM_MARGIN_VERTICAL = 16;
     private final int DIARY_DAY_LIST_ITEM_MARGIN_HORIZONTAL = 32;
-    private DiaryListSetting<DiaryListFragment._DiaryYearMonthListViewHolder> diaryListSetting;
+    private DiaryListSetting<DiaryListFragment.DiaryYearMonthListViewHolder> diaryListSetting;
     private String beforeText = "";
 
     // Navigation関係
@@ -510,10 +508,10 @@ public class WordSearchFragment extends Fragment {
 
 
     //日記リスト(年月)リサイクルビューホルダークラス
-    private class WordSearchResultYearMonthListViewHolder extends DiaryYearMonthListViewHolder {
+    private class WordSearchResultYearMonthListBaseViewHolder extends DiaryYearMonthListBaseViewHolder {
         public RecyclerView recyclerDayList;
 
-        public WordSearchResultYearMonthListViewHolder(View itemView) {
+        public WordSearchResultYearMonthListBaseViewHolder(View itemView) {
             super(itemView);
             this.textSectionBar = itemView.findViewById(R.id.text_section_bar);
             this.recyclerDayList = itemView.findViewById(R.id.recycler_day_list);
@@ -521,7 +519,7 @@ public class WordSearchFragment extends Fragment {
     }
 
     //日記リスト(年月)リサイクルビューアダプタクラス
-    public class WordSearchResultYearMonthListAdapter extends RecyclerView.Adapter<WordSearchResultYearMonthListViewHolder> {
+    public class WordSearchResultYearMonthListAdapter extends RecyclerView.Adapter<WordSearchResultYearMonthListBaseViewHolder> {
         private List<Map<String, Object>> diaryListYearMonth = new ArrayList<>();
         public static final String KEY_YEAR = WordSearchResultDayListAdapter.KEY_YEAR;
         public static final String KEY_MONTH = WordSearchResultDayListAdapter.KEY_MONTH;
@@ -532,11 +530,11 @@ public class WordSearchFragment extends Fragment {
 
         //日記リスト(年月)のホルダーと日記リスト(年月)のアイテムレイアウトを紐づける。
         @Override
-        public WordSearchResultYearMonthListViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        public WordSearchResultYearMonthListBaseViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
             Log.d("onCreateViewHolder確認", "起動");
             LayoutInflater inflater = LayoutInflater.from(parent.getContext());
             View view = inflater.inflate(R.layout.row_diary_year_month_list, parent, false);
-            WordSearchResultYearMonthListViewHolder holder = new WordSearchResultYearMonthListViewHolder(view);
+            WordSearchResultYearMonthListBaseViewHolder holder = new WordSearchResultYearMonthListBaseViewHolder(view);
 
             //ホルダー内の日記リスト(日)のアイテム装飾の設定。
             //(onBindViewHolder で設定すると、設定内容が重複してアイテムが小さくなる為、onCreateViewHolder で設定)
@@ -566,7 +564,7 @@ public class WordSearchFragment extends Fragment {
 
         //日記リスト(年月)の各行アイテム(ホルダー)情報を設定。
         @Override
-        public void onBindViewHolder(WordSearchResultYearMonthListViewHolder holder, int position) {
+        public void onBindViewHolder(WordSearchResultYearMonthListBaseViewHolder holder, int position) {
             Log.d("リスト表示確認","onBindViewHolder呼び出し");
 
             // 対象行の情報を取得

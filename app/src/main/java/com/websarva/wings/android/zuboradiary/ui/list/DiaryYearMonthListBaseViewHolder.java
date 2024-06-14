@@ -8,10 +8,10 @@ import androidx.recyclerview.widget.RecyclerView;
 
 // DiaryListSettingクラスで使用するフィールドをここで追加する。
 // 注意)layout(xml)のViewとの紐づけを忘れないこと!
-public abstract class DiaryYearMonthListViewHolder extends RecyclerView.ViewHolder {
+public abstract class DiaryYearMonthListBaseViewHolder extends RecyclerView.ViewHolder {
     public TextView textSectionBar;
 
-    public DiaryYearMonthListViewHolder(@NonNull View itemView) {
+    public DiaryYearMonthListBaseViewHolder(@NonNull View itemView) {
         super(itemView);
     }
 }

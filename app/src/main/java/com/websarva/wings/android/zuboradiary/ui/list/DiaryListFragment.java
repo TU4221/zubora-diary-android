@@ -2,6 +2,7 @@ package com.websarva.wings.android.zuboradiary.ui.list;
 
 import android.content.Context;
 import android.graphics.Rect;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -10,6 +11,8 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
+import android.view.animation.Animation;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -29,9 +32,12 @@ import androidx.navigation.NavBackStackEntry;
 import androidx.navigation.NavController;
 import androidx.navigation.NavDirections;
 import androidx.navigation.fragment.NavHostFragment;
+import androidx.recyclerview.widget.DefaultItemAnimator;
+import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.LinearSmoothScroller;
+import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.transition.platform.MaterialFadeThrough;
@@ -45,6 +51,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Executors;
 
 import com.websarva.wings.android.zuboradiary.databinding.FragmentDiaryListBinding;
 import com.websarva.wings.android.zuboradiary.ui.diary.DiaryViewModel;
@@ -57,7 +64,9 @@ public class DiaryListFragment extends Fragment {
     private CustomLinearLayoutManager diaryListYearMonthLinearLayoutManager;
     private final int DIARY_DAY_LIST_ITEM_MARGIN_VERTICAL = 16;
     private final int DIARY_DAY_LIST_ITEM_MARGIN_HORIZONTAL = 32;
-    private DiaryListSetting<_DiaryYearMonthListViewHolder> diaryListSetting;
+    private DiaryListSetting<DiaryYearMonthListViewHolder> diaryListSetting;
+    private boolean isLoading = false;
+    private DiaryYearMonthListAdapter diaryYearMonthListAdapter;
 
     // Navigation関係
     private NavController navController;
@@ -247,11 +256,18 @@ public class DiaryListFragment extends Fragment {
         RecyclerView recyclerDiaryYearMonthList = this.binding.recyclerDiaryYearMonthList;
         recyclerDiaryYearMonthList
                 .setLayoutManager(this.diaryListYearMonthLinearLayoutManager);
-        recyclerDiaryYearMonthList.setAdapter(new DiaryYearMonthListAdapter());
+        this.diaryYearMonthListAdapter =
+                new DiaryYearMonthListAdapter(new DiaryYearMonthListDiffUtilItemCallback());
+        recyclerDiaryYearMonthList.setAdapter(diaryYearMonthListAdapter);
+        // TODO:下記別の方法を検討(問題1アイテム変更時もやがかかる。問題2最終アイテムまで到達し、ProgressBarが消えた後にセクションバーがその分ずれる)
+        recyclerDiaryYearMonthList.setItemAnimator(null);
         recyclerDiaryYearMonthList.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
                 super.onScrolled(recyclerView, dx, dy);
+                DiaryListFragment.this.listViewModel.setScrollPointY(recyclerView.getScrollY());
+
+
                 // 日記リスト先頭アイテムセクションバー位置更新
                 DiaryListFragment.this.diaryListSetting
                         .updateFirstVisibleSectionBarPosition(
@@ -261,12 +277,21 @@ public class DiaryListFragment extends Fragment {
 
 
                 // 日記リスト追加読込
-                // https://android.suzu-sd.com/2021/05/recyclerview_item_scroll/#i-5
-                if (!recyclerView.canScrollVertically(1)) {
-                    DiaryListFragment.this.listViewModel.setLiveIsLoading(true);
+                int firstVisibleItem =
+                        DiaryListFragment.this.diaryListYearMonthLinearLayoutManager
+                                .findFirstVisibleItemPosition();
+                int visibleItemCount = recyclerView.getChildCount();
+                int totalItemCount =
+                        DiaryListFragment.this.diaryListYearMonthLinearLayoutManager.getItemCount();
+                // MEMO:下記条件"dy > 0"は検索結果リストが更新されたときに
+                //      "RecyclerView.OnScrollListener#onScrolled"が起動するための対策。
+                if (!isLoading
+                        && (firstVisibleItem + visibleItemCount) >= totalItemCount
+                        && dy > 0) {
+                    isLoading = true;
                     DiaryListFragment.this.listViewModel.loadList(ListViewModel.LoadType.ADD);
-                    DiaryListFragment.this.listViewModel.setLiveIsLoading(false);
                 }
+
             }
         });
         recyclerDiaryYearMonthList.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
@@ -285,7 +310,7 @@ public class DiaryListFragment extends Fragment {
 
 
         // 日記リスト読込
-        if (this.listViewModel.getLoadedListItemDiaries().getValue().isEmpty()) {
+        if (this.listViewModel.getLiveDataDiaryList().getValue().isEmpty()) {
             if (this.listViewModel.countDiaries() >= 1) {
                 this.listViewModel.loadList(ListViewModel.LoadType.NEW);
             }
@@ -293,121 +318,24 @@ public class DiaryListFragment extends Fragment {
             this.listViewModel.loadList(ListViewModel.LoadType.UPDATE);
         }
 
-        // データベースから読み込んだ日記リストをリサクラービューに反映
-        this.listViewModel.getLoadedListItemDiaries().observe(
+        this.listViewModel.getLiveDataDiaryList().observe(
                 getViewLifecycleOwner(),
-                new Observer<List<DiaryListItem>>() {
+                new Observer<List<DiaryYearMonthListItem>>() {
                     @Override
-                    public void onChanged(List<DiaryListItem> listItemDiaries) {
-                        List<DiaryListItem> list =
-                                DiaryListFragment.this.listViewModel
-                                        .getLoadedListItemDiaries().getValue();
-                        if (list != null && list.isEmpty()) {
-                            DiaryListFragment.this.listViewModel
-                                    .setLiveIsVisibleHeaderSectionBar(false);
-                            DiaryYearMonthListAdapter diaryYearMonthListAdapter =
-                                    (DiaryYearMonthListAdapter)
-                                            DiaryListFragment
-                                                    .this.binding.recyclerDiaryYearMonthList
-                                                    .getAdapter();
-                            List<Map<String, Object>> emptyList = new ArrayList<>();
-                            diaryYearMonthListAdapter.changeItem(emptyList);
+                    public void onChanged(List<DiaryYearMonthListItem> diaryListItems) {
+                        DiaryYearMonthListAdapter diaryYearMonthListAdapter =
+                                (DiaryYearMonthListAdapter)
+                                        DiaryListFragment.this.binding
+                                                .recyclerDiaryYearMonthList.getAdapter();
+                        diaryYearMonthListAdapter.submitList(diaryListItems);
+                        if (diaryListItems.isEmpty()) {
+                            isLoading = false;
                         } else {
-                            // 型変換:List<DiaryListItem> -> List<Map<String, Object>>
-                            List<Map<String, Object>> dayList = new ArrayList<>();
-                            Map<String, Object> map;
-                            String date;
-                            String title;
-                            String picturePath;
-                            String year;
-                            String month;
-                            String dayOfMonth;
-                            String dayOfWeek;
-                            final String KEY_DATE = DiaryDayListAdapter.KEY_DATE;
-                            final String KEY_YEAR = DiaryDayListAdapter.KEY_YEAR;
-                            final String KEY_MONTH = DiaryDayListAdapter.KEY_MONTH;
-                            final String KEY_DAY_OF_MONTH = DiaryDayListAdapter.KEY_DAY_OF_MONTH;
-                            final String KEY_DAY_OF_WEEK = DiaryDayListAdapter.KEY_DAY_OF_WEEK;
-                            final String KEY_TITLE = DiaryDayListAdapter.KEY_TITLE;
-                            final String KEY_PICTURE_PATH = DiaryDayListAdapter.KEY_PICTURE_PATH;
-                            final String KEY_ADAPTER = DiaryYearMonthListAdapter.KEY_ADAPTER;
-                            int startIndex;
-                            int endIndex;
-                            for (DiaryListItem diaryListItem : listItemDiaries) {
-                                date = diaryListItem.getDate();
-                                title = diaryListItem.getTitle();
-                                picturePath = diaryListItem.getPicturePath();
-                                startIndex = 0;
-                                endIndex = date.indexOf("年");
-                                year = date.substring(startIndex, endIndex);
-                                startIndex = endIndex + 1;
-                                endIndex = date.indexOf("月");
-                                month = date.substring(startIndex, endIndex);
-                                startIndex = endIndex + 1;
-                                endIndex = date.indexOf("日");
-                                dayOfMonth = date.substring(startIndex, endIndex);
-                                startIndex = date.indexOf("(") + 1;
-                                endIndex = date.indexOf(")");
-                                dayOfWeek = date.substring(startIndex, endIndex);
-                                map = new HashMap<>();
-                                map.put(KEY_DATE, date);
-                                map.put(KEY_YEAR, year);
-                                map.put(KEY_MONTH, month);
-                                map.put(KEY_DAY_OF_MONTH, dayOfMonth);
-                                map.put(KEY_DAY_OF_WEEK, dayOfWeek);
-                                map.put(KEY_TITLE, title);
-                                map.put(KEY_PICTURE_PATH, picturePath);
-                                dayList.add(map);
+                            int lastItemPosition = diaryListItems.size() - 1;
+                            int lastItemViewType = diaryListItems.get(lastItemPosition).getViewType();
+                            if (lastItemViewType == DiaryYearMonthListAdapter.VIEW_TYPE_DIARY) {
+                                isLoading = false;
                             }
-
-                            // 日記リストを月別に振り分ける
-                            List<Map<String, Object>> sortingList= new ArrayList<>();
-                            DiaryDayListAdapter dayListAdapter;
-                            Map<String, Object> monthListItem = new HashMap<>();
-                            List<Map<String, Object>> monthList = new ArrayList<>();
-                            String sortingYear = "";
-                            String sortingMonth = "";
-
-                            for (Map<String, Object> day: dayList) {
-
-                                String _year = (String) day.get(KEY_YEAR);
-                                String _Month = (String) day.get(KEY_MONTH);
-                                if (!(_year.equals(sortingYear))
-                                        || !(_Month.equals(sortingMonth))) {
-
-                                    if (!(sortingYear.equals("")) && !(sortingMonth.equals(""))) {
-                                        dayListAdapter = new DiaryDayListAdapter(sortingList);
-                                        monthListItem.put(KEY_YEAR, sortingYear);
-                                        monthListItem.put(KEY_MONTH, sortingMonth);
-                                        monthListItem.put(KEY_ADAPTER, dayListAdapter);
-                                        monthList.add(monthListItem);
-                                        monthListItem = new HashMap<>();
-                                    }
-
-                                    sortingYear = (String) day.get(KEY_YEAR);
-                                    sortingMonth = (String) day.get(KEY_MONTH);
-                                    sortingList = new ArrayList<>();
-                                }
-
-                                sortingList.add(day);
-                            }
-
-                            dayListAdapter = new DiaryDayListAdapter(sortingList);
-                            monthListItem.put(KEY_YEAR, sortingYear);
-                            monthListItem.put(KEY_MONTH, sortingMonth);
-                            monthListItem.put(KEY_ADAPTER, dayListAdapter);
-                            monthList.add(monthListItem);
-                            monthListItem = new HashMap<>();
-
-                            DiaryYearMonthListAdapter diaryYearMonthListAdapter =
-                                    (DiaryYearMonthListAdapter)
-                                            DiaryListFragment
-                                                    .this.binding.recyclerDiaryYearMonthList
-                                                    .getAdapter();
-                            diaryYearMonthListAdapter.changeItem(monthList);
-
-                            DiaryListFragment
-                                    .this.listViewModel.setLiveIsVisibleHeaderSectionBar(true);
                         }
                     }
                 }
@@ -434,18 +362,10 @@ public class DiaryListFragment extends Fragment {
     }
 
     //日記リスト(日)リサイクルビューアダプタクラス
-    public class DiaryDayListAdapter extends RecyclerView.Adapter<DiaryDayListViewHolder> {
-        private List<Map<String, Object>> DiaryDayList;
-        public static final String KEY_YEAR = "Year";
-        public static final String KEY_MONTH = "Month";
-        public static final String KEY_DAY_OF_MONTH = "DayOfMonth";
-        public static final String KEY_DAY_OF_WEEK = "DayOfWeek";
-        public static final String KEY_TITLE = "Title";
-        public static final String KEY_PICTURE_PATH = "PicturePath";
-        public static final String KEY_DATE = "Date";
+    public class DiaryDayListAdapter extends ListAdapter<DiaryDayListItem, DiaryDayListViewHolder> {
 
-        public DiaryDayListAdapter(List<Map<String, Object>> DiaryDayList){
-            this.DiaryDayList = DiaryDayList;
+        public DiaryDayListAdapter(@NonNull DiffUtil.ItemCallback<DiaryDayListItem> diffCallback){
+            super(diffCallback);
         }
 
         @NonNull
@@ -458,13 +378,15 @@ public class DiaryListFragment extends Fragment {
 
         @Override
         public void onBindViewHolder(DiaryDayListViewHolder holder, int position) {
-            Map<String, Object> item = this.DiaryDayList.get(position);
-            String dayOfWeek = (String) item.get(KEY_DAY_OF_WEEK);
-            String dayOfMonth = (String) item.get(KEY_DAY_OF_MONTH);
-            String title = (String) item.get(KEY_TITLE);
-            holder.date = (String) item.get(KEY_DATE); // ホルダー毎に日記の日付情報一式付与
+            DiaryDayListItem item = getItem(position);
+            int year = item.getYear();
+            int month = item.getMonth();
+            int dayOfMonth = item.getDayOfMonth();
+            String dayOfWeek = item.getDayOfWeek();
+            String title = item.getTitle();
+            holder.date = DateConverter.toStringLocalDate(year, month, dayOfMonth); // ホルダー毎に日記の日付情報一式付与
             holder.textDayOfWeek.setText(dayOfWeek);
-            holder.textDayOfMonth.setText(dayOfMonth);
+            holder.textDayOfMonth.setText(String.valueOf(dayOfMonth));
             holder.textTitle.setText(title);
             holder.itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -473,127 +395,143 @@ public class DiaryListFragment extends Fragment {
                     NavDirections action =
                             DiaryListFragmentDirections
                                     .actionNavigationDiaryListFragmentToShowDiaryFragment(
-                                            Integer.parseInt((String) item.get(KEY_YEAR)),
-                                            Integer.parseInt((String) item.get(KEY_MONTH)),
-                                            Integer.parseInt((String) item.get(KEY_DAY_OF_MONTH))
-                                    );
+                                            year, month, dayOfMonth);
                     DiaryListFragment.this.navController.navigate(action);
                 }
             });
         }
+    }
+
+    public class DiaryDayListDiffUtilItemCallback extends DiffUtil.ItemCallback<DiaryDayListItem> {
+        @Override
+        public boolean areItemsTheSame(@NonNull DiaryDayListItem oldItem, @NonNull DiaryDayListItem newItem) {
+            return oldItem.getId().equals(newItem.getId());
+        }
 
         @Override
-        public int getItemCount() {
-            return this.DiaryDayList.size();
+        public boolean areContentsTheSame(@NonNull DiaryDayListItem oldItem, @NonNull DiaryDayListItem newItem) {
+            return oldItem.getId().equals(newItem.getId());
         }
     }
 
 
     //日記リスト(年月)リサイクルビューホルダークラス
-    public class _DiaryYearMonthListViewHolder extends DiaryYearMonthListViewHolder {
+    public class DiaryYearMonthListViewHolder extends DiaryYearMonthListBaseViewHolder {
         public RecyclerView recyclerDayList;
 
-        public _DiaryYearMonthListViewHolder(View itemView) {
+        public DiaryYearMonthListViewHolder(View itemView) {
             super(itemView);
             this.textSectionBar = itemView.findViewById(R.id.text_section_bar);
             this.recyclerDayList = itemView.findViewById(R.id.recycler_day_list);
         }
     }
 
-    // 日記リスト(年月)リサイクルビューアダプタクラス
     public class DiaryYearMonthListAdapter
-            extends RecyclerView.Adapter<_DiaryYearMonthListViewHolder> {
+            extends ListAdapter<DiaryYearMonthListItem, RecyclerView.ViewHolder> {
         private List<Map<String, Object>> diaryYearMonthList = new ArrayList<>();
         private List<CustomSimpleCallback> simpleCallbacks = new ArrayList<>();
-        public static final String KEY_YEAR = DiaryDayListAdapter.KEY_YEAR;
-        public static final String KEY_MONTH = DiaryDayListAdapter.KEY_MONTH;
-        public static final String KEY_ADAPTER = "Adapter";
+        public static final int VIEW_TYPE_DIARY = 0;
+        public static final int VIEW_TYPE_PROGRESS_BAR = 1;
 
-        public DiaryYearMonthListAdapter(){
+        public DiaryYearMonthListAdapter(@NonNull DiffUtil.ItemCallback<DiaryYearMonthListItem> diffCallback){
+            super(diffCallback);
         }
 
         @Override
-        public _DiaryYearMonthListViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
             Log.d("20240530", "onCreateViewHolder()");
             LayoutInflater inflater = LayoutInflater.from(parent.getContext());
-            View view =
-                    inflater.inflate(R.layout.row_diary_year_month_list, parent, false);
-            _DiaryYearMonthListViewHolder holder = new _DiaryYearMonthListViewHolder(view);
+            if (viewType == VIEW_TYPE_DIARY) {
+                View view =
+                        inflater.inflate(R.layout.row_diary_year_month_list, parent, false);
+                DiaryYearMonthListViewHolder holder = new DiaryYearMonthListViewHolder(view);
 
-            // ホルダー内の日記リスト(日)のアイテム装飾設定
-            // MEMO:onBindViewHolder で設定すると、設定内容が重複してアイテムが小さくなる為、
-            //      onCreateViewHolder で設定。
-            holder.recyclerDayList.addItemDecoration(new RecyclerView.ItemDecoration() {
-                @Override
-                public void getItemOffsets(
-                        @NonNull Rect outRect,
-                        @NonNull View view,
-                        @NonNull RecyclerView parent,
-                        @NonNull RecyclerView.State state) {
-                    Log.d("リスト装飾確認","getItemOffsets()呼び出し");
-                    super.getItemOffsets(outRect, view, parent, state);
-                    outRect.top = DiaryListFragment.this.DIARY_DAY_LIST_ITEM_MARGIN_VERTICAL;
-                    outRect.left = DiaryListFragment.this.DIARY_DAY_LIST_ITEM_MARGIN_HORIZONTAL;
-                    outRect.right = DiaryListFragment.this.DIARY_DAY_LIST_ITEM_MARGIN_HORIZONTAL;
+                // ホルダー内の日記リスト(日)のアイテム装飾設定
+                // MEMO:onBindViewHolder で設定すると、設定内容が重複してアイテムが小さくなる為、
+                //      onCreateViewHolder で設定。
+                holder.recyclerDayList.addItemDecoration(new RecyclerView.ItemDecoration() {
+                    @Override
+                    public void getItemOffsets(
+                            @NonNull Rect outRect,
+                            @NonNull View view,
+                            @NonNull RecyclerView parent,
+                            @NonNull RecyclerView.State state) {
+                        Log.d("リスト装飾確認","getItemOffsets()呼び出し");
+                        super.getItemOffsets(outRect, view, parent, state);
+                        outRect.top = DiaryListFragment.this.DIARY_DAY_LIST_ITEM_MARGIN_VERTICAL;
+                        outRect.left = DiaryListFragment.this.DIARY_DAY_LIST_ITEM_MARGIN_HORIZONTAL;
+                        outRect.right = DiaryListFragment.this.DIARY_DAY_LIST_ITEM_MARGIN_HORIZONTAL;
 
-                    // TODO:Fragment切り替え方法をNavigationへの置換後、代替メソッド検討
-                    Log.d("リスト装飾確認",
-                            Integer.toString(
-                                    parent.findContainingViewHolder(view).getAdapterPosition()));
-                    if (parent.findContainingViewHolder(view).getAdapterPosition()
-                            == (parent.getAdapter().getItemCount() - 1)) {
-                        outRect.bottom = DiaryListFragment.this.DIARY_DAY_LIST_ITEM_MARGIN_VERTICAL;
+                        // TODO:Fragment切り替え方法をNavigationへの置換後、代替メソッド検討
+                        Log.d("リスト装飾確認",
+                                Integer.toString(
+                                        parent.findContainingViewHolder(view).getAdapterPosition()));
+                        if (parent.findContainingViewHolder(view).getAdapterPosition()
+                                == (parent.getAdapter().getItemCount() - 1)) {
+                            outRect.bottom = DiaryListFragment.this.DIARY_DAY_LIST_ITEM_MARGIN_VERTICAL;
+                        }
                     }
-                }
-            });
+                });
 
-            // ホルダー内の日記リスト(日)のアイテムにスワイプ機能(背面ボタン表示)を設定。
-            // MEMO:スワイプでの背面ボタン表示機能はAndroidには存在しないので、
-            //      ItemTouchHelper.Callback を継承して作成。
-            CustomSimpleCallback simpleCallback = new CustomSimpleCallback(
-                    ItemTouchHelper.UP | ItemTouchHelper.DOWN, ItemTouchHelper.LEFT,
-                    holder.recyclerDayList,
-                    getContext(),
-                    getResources().getDisplayMetrics().density,
-                    getChildFragmentManager(), // TODO:左記不要確認後削除
-                    DiaryListFragment.this.navController,
-                    DiaryListFragment.this.binding.recyclerDiaryYearMonthList);
-            this.simpleCallbacks.add(simpleCallback);
-            ItemTouchHelper itemTouchHelper = new ItemTouchHelper(simpleCallback);
-            itemTouchHelper.attachToRecyclerView(holder.recyclerDayList);
-
-            return holder;
+                // ホルダー内の日記リスト(日)のアイテムにスワイプ機能(背面ボタン表示)を設定。
+                // MEMO:スワイプでの背面ボタン表示機能はAndroidには存在しないので、
+                //      ItemTouchHelper.Callback を継承して作成。
+                CustomSimpleCallback simpleCallback = new CustomSimpleCallback(
+                        ItemTouchHelper.UP | ItemTouchHelper.DOWN, ItemTouchHelper.LEFT,
+                        holder.recyclerDayList,
+                        getContext(),
+                        getResources().getDisplayMetrics().density,
+                        getChildFragmentManager(), // TODO:左記不要確認後削除
+                        DiaryListFragment.this.navController,
+                        DiaryListFragment.this.binding.recyclerDiaryYearMonthList);
+                this.simpleCallbacks.add(simpleCallback);
+                ItemTouchHelper itemTouchHelper = new ItemTouchHelper(simpleCallback);
+                itemTouchHelper.attachToRecyclerView(holder.recyclerDayList);
+                return holder;
+            } else {
+                Log.d("20240612","progressBarViewHolder 追加");
+                View view =
+                        inflater.inflate(R.layout.row_progress_bar, parent, false);
+                return new ProgressBarViewHolder(view);
+            }
         }
 
         @Override
-        public void onBindViewHolder(_DiaryYearMonthListViewHolder holder, int position) {
+        public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
             Log.d("20240530", "onBindViewHolder()");
 
-            // 対象行の情報を取得
-            Map<String, Object> item = diaryYearMonthList.get(position);
-            String diaryYear = (String) item.get(KEY_YEAR);
-            String diaryMonth = (String) item.get(KEY_MONTH);
-            DiaryDayListAdapter diaryDayListAdapter =
-                    (DiaryDayListAdapter) item.get(KEY_ADAPTER);
+            if (holder instanceof DiaryYearMonthListViewHolder) {
+                DiaryYearMonthListViewHolder _holder = (DiaryYearMonthListViewHolder) holder;
+                // 対象行の情報を取得
+                DiaryYearMonthListItem item = getItem(position);
+                int diaryYear = item.getYear();
+                int diaryMonth = item.getMonth();
+                List<DiaryDayListItem> diaryDayListItemList = item.getDiaryDayListItemList();
 
-            // セクションバー設定
-            // 左端に余白を持たせる為、最初にスペースを入力。
-            String diaryDate = "  " + diaryYear + getString(R.string.row_list_year)
-                    + diaryMonth + getString(R.string.row_list_month);
-            holder.textSectionBar.setText(diaryDate);
-            // 日記リストスクロール時に移動させているので、バインディング時に位置リセット
-            holder.textSectionBar.setY(0);
+                // セクションバー設定
+                // 左端に余白を持たせる為、最初にスペースを入力。
+                String diaryDate = "  " + diaryYear + getString(R.string.row_list_year)
+                        + diaryMonth + getString(R.string.row_list_month);
+                _holder.textSectionBar.setText(diaryDate);
+                // 日記リストスクロール時に移動させているので、バインディング時に位置リセット
+                _holder.textSectionBar.setY(0);
 
-            // 日記リスト(日)設定
-            // MEMO:日記リスト(年月)のLinearLayoutManagerとは併用できないので、
-            //      日記リスト(日)用のLinearLayoutManagerをインスタンス化する。
-            holder.recyclerDayList.setLayoutManager(new LinearLayoutManager(getContext()));
-            holder.recyclerDayList.setAdapter(diaryDayListAdapter);
+                // 日記リスト(日)設定
+                // MEMO:日記リスト(年月)のLinearLayoutManagerとは併用できないので、
+                //      日記リスト(日)用のLinearLayoutManagerをインスタンス化する。
+                _holder.recyclerDayList.setLayoutManager(new LinearLayoutManager(getContext()));
+                DiaryDayListAdapter diaryDayListAdapter =
+                        new DiaryDayListAdapter(new DiaryDayListDiffUtilItemCallback());
+                _holder.recyclerDayList.setAdapter(diaryDayListAdapter);
+                diaryDayListAdapter.submitList(diaryDayListItemList);
+            }
+
         }
 
         @Override
-        public int getItemCount() {
-            return this.diaryYearMonthList.size();
+        public int getItemViewType(int position ) {
+            DiaryYearMonthListItem item = getItem(position);
+            return item.getViewType();
         }
 
         // 日記リスト(年月)の指定したアイテムを削除。
@@ -611,14 +549,39 @@ public class DiaryListFragment extends Fragment {
                 }
             }
         }
+    }
 
-        // 日記リスト更新
-        public void changeItem(List<Map<String, Object>> list) {
-            this.diaryYearMonthList = list;
+    public class DiaryYearMonthListDiffUtilItemCallback
+            extends DiffUtil.ItemCallback<DiaryYearMonthListItem> {
+        @Override
+        public boolean areItemsTheSame(@NonNull DiaryYearMonthListItem oldItem, @NonNull DiaryYearMonthListItem newItem) {
+            Log.d("20240613_1", "areItemsTheSame");
+            return oldItem.getId().equals(newItem.getId());
+        }
 
-            // TODO:下記ページにエラー回避方法が記載されてる。後日修正。
-            // https://qiita.com/toastkidjp/items/f6fffc44acbf4d3690fd
-            notifyDataSetChanged();
+        @Override
+        public boolean areContentsTheSame(@NonNull DiaryYearMonthListItem oldItem, @NonNull DiaryYearMonthListItem newItem) {
+            Log.d("20240613_1", "areContentsTheSame");
+            if (oldItem.getId().equals(newItem.getId())) {
+                return false;
+            }
+
+            int oldChildListSize = oldItem.getDiaryDayListItemList().size();
+            int newChildListSize = newItem.getDiaryDayListItemList().size();
+            if (oldChildListSize != newChildListSize) {
+                return false;
+            }
+
+            int maxSize = Math.max(oldChildListSize, newChildListSize);
+            for (int i = 0; i < maxSize; i++) {
+                String oldChildListItemId = oldItem.getDiaryDayListItemList().get(i).getId();
+                String newChildListItemId = newItem.getDiaryDayListItemList().get(i).getId();
+                if (oldChildListItemId != newChildListItemId) {
+                    return false;
+                }
+            }
+
+            return true;
         }
     }
 
@@ -681,7 +644,7 @@ public class DiaryListFragment extends Fragment {
             //findViewHolderForAdapterPosition()が処理するため null が戻ってくる。
 
             int pos = diaryListYearMonthLinearLayoutManager.findFirstVisibleItemPosition();
-            _DiaryYearMonthListViewHolder viewHolder = (_DiaryYearMonthListViewHolder) diaryListYearMonthRecyclerView.findViewHolderForAdapterPosition(pos);
+            DiaryYearMonthListViewHolder viewHolder = (DiaryYearMonthListViewHolder) diaryListYearMonthRecyclerView.findViewHolderForAdapterPosition(pos);
             actionBar.setTitle(viewHolder._tvRowDiaryListYearMonth_Year.getText() + "年" + viewHolder._tvRowDiaryListYearMonth_Month.getText() + "月");
 
              */
