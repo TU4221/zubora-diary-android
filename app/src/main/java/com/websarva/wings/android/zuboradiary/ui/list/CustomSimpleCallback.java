@@ -25,7 +25,10 @@ import androidx.navigation.Navigation;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.navigation.ui.NavigationUI;
 import androidx.recyclerview.widget.ItemTouchHelper;
+import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.websarva.wings.android.zuboradiary.R;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -240,7 +243,7 @@ public class CustomSimpleCallback extends ItemTouchHelper.SimpleCallback {
     //タッチ中常時呼び出される。
     @Override
     public void onChildDraw(Canvas c, RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, float dX, float dY, int actionState, boolean isCurrentlyActive) {
-        Log.d("スワイプ処理確認", "onChildDraw：呼び出し");
+        /*Log.d("スワイプ処理確認", "onChildDraw：呼び出し");
         int pos = viewHolder.getAdapterPosition();
         Log.d("スワイプ処理確認", "onChildDraw：pos " + pos);
 
@@ -255,14 +258,14 @@ public class CustomSimpleCallback extends ItemTouchHelper.SimpleCallback {
         //アイテムスライド後、他のアイテムをスライドすると、前回スライドしたアイテムに対して onChildDraw が起動する。
         //その為、swipedPosに現在のスライドの位置ではなく、前回のスライド位置情報が格納され、
         //onTouch() メソッド内の recoverSwipedItem() メソッドが何回も起動し、アイテムの表示がちらついてしまう。
-        /*
+        *//*
         if (swipedPos < 0){
             swipedPos = pos;
             Log.d("スワイプ処理確認", "onChildDraw：swipedPosセット確認");
             return;
         }
 
-         */
+         *//*
 
         if(actionState == ItemTouchHelper.ACTION_STATE_SWIPE){
             Log.d("スワイプ処理確認", "onChildDraw：スワイプ確認");
@@ -304,7 +307,12 @@ public class CustomSimpleCallback extends ItemTouchHelper.SimpleCallback {
                 buttons.clear();
             }
         }
-        super.onChildDraw(c, recyclerView, viewHolder, translationX, dY, actionState, isCurrentlyActive);
+        super.onChildDraw(c, recyclerView, viewHolder, translationX, dY, actionState, isCurrentlyActive);*/
+        super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
+        DiaryListFragment.DiaryDayListViewHolder viewHolder1 = (DiaryListFragment.DiaryDayListViewHolder) viewHolder;
+        View itemView = viewHolder.itemView;
+        getDefaultUIUtil().onDraw(c, recyclerView, itemView.findViewById(R.id.frame_layout_row_diary_day_list), 0, 0, actionState, isCurrentlyActive);
+        getDefaultUIUtil().onDraw(c, recyclerView, itemView.findViewById(R.id.liner_layout_front), dX, dY, actionState, isCurrentlyActive);
     }
 
     //ボタンをインスタンス化
@@ -348,6 +356,17 @@ public class CustomSimpleCallback extends ItemTouchHelper.SimpleCallback {
         //背面ボタンが複数の場合は上記同様に追加すること。
     }
 
+    @Override
+    public void clearView(     @NonNull androidx.recyclerview.widget.RecyclerView recyclerView,
+                               @NonNull androidx.recyclerview.widget.RecyclerView.ViewHolder viewHolder ) {
+        super.clearView(recyclerView, viewHolder);
+        Log.d("スワイプ処理確認", "clear");
+        View itemView = viewHolder.itemView;
+        getDefaultUIUtil().clearView(itemView.findViewById(R.id.frame_layout_row_diary_day_list));
+        getDefaultUIUtil().clearView(itemView.findViewById(R.id.liner_layout_front));
+    }
+
+
     //対象のアイテムの状態をスワイプ前の状態に戻すクラス
     private synchronized void recoverSwipedItem(){
         Log.d("スワイプ処理確認", "recoverSwipedItem：スワイプリセット処理確認");
@@ -356,7 +375,13 @@ public class CustomSimpleCallback extends ItemTouchHelper.SimpleCallback {
             int pos = recoverQueue.poll();
             if (pos > -1) {
                 //対象のアイテムの表示を更新する。(アイテムの状態をスワイプ前の状態に戻す)
-                this.recyclerView.getAdapter().notifyItemChanged(pos);
+                /*DiaryListFragment.DiaryDayListAdapter listAdapter =
+                        (DiaryListFragment.DiaryDayListAdapter) this.recyclerView.getAdapter();
+                listAdapter.submitList(listAdapter.getCurrentList());*/
+                Log.d("20240619", "recover");
+                View itemView = this.recyclerView.findViewHolderForAdapterPosition(pos).itemView;
+                getDefaultUIUtil().clearView(itemView.findViewById(R.id.frame_layout_row_diary_day_list));
+                getDefaultUIUtil().clearView(itemView.findViewById(R.id.liner_layout_front));
             }
         }
     }

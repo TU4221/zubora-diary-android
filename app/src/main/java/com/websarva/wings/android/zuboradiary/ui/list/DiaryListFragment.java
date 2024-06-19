@@ -1,6 +1,8 @@
 package com.websarva.wings.android.zuboradiary.ui.list;
 
 import android.content.Context;
+import android.graphics.Canvas;
+import android.graphics.Paint;
 import android.graphics.Rect;
 import android.os.Build;
 import android.os.Bundle;
@@ -54,6 +56,7 @@ import java.util.Map;
 import java.util.concurrent.Executors;
 
 import com.websarva.wings.android.zuboradiary.databinding.FragmentDiaryListBinding;
+import com.websarva.wings.android.zuboradiary.databinding.RowDiaryDayListBinding;
 import com.websarva.wings.android.zuboradiary.ui.diary.DiaryViewModel;
 import com.websarva.wings.android.zuboradiary.ui.list.wordsearch.WordSearchViewModel;
 
@@ -249,6 +252,7 @@ public class DiaryListFragment extends Fragment {
                                         localDate.getDayOfMonth()
                                 );
                 DiaryListFragment.this.navController.navigate(action);
+
             }
         });
 
@@ -259,15 +263,17 @@ public class DiaryListFragment extends Fragment {
         this.diaryYearMonthListAdapter =
                 new DiaryYearMonthListAdapter(new DiaryYearMonthListDiffUtilItemCallback());
         recyclerDiaryYearMonthList.setAdapter(diaryYearMonthListAdapter);
-        // TODO:下記別の方法を検討(問題1アイテム変更時もやがかかる。問題2最終アイテムまで到達し、ProgressBarが消えた後にセクションバーがその分ずれる)
+        // HACK:下記問題が発生する為アイテムアニメーションを無効化
+        //      問題1.アイテム追加時もやがかかる。今回の構成(親Recycler:年月、子Recycler:日)上、
+        //           既に表示されている年月に日のアイテムを追加すると、年月のアイテムに変更アニメーションが発生してしまう。
+        //           これに対して、日のアイテムに追加アニメーションを発生させようとすると、
+        //           年月のアイテムのサイズ変更にアニメーションが発生せず全体的に違和感となるアニメーションになってしまう。
+        //      問題2.最終アイテムまで到達し、ProgressBarが消えた後にセクションバーがその分ずれる)
         recyclerDiaryYearMonthList.setItemAnimator(null);
         recyclerDiaryYearMonthList.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
                 super.onScrolled(recyclerView, dx, dy);
-                DiaryListFragment.this.listViewModel.setScrollPointY(recyclerView.getScrollY());
-
-
                 // 日記リスト先頭アイテムセクションバー位置更新
                 DiaryListFragment.this.diaryListSetting
                         .updateFirstVisibleSectionBarPosition(
@@ -283,11 +289,15 @@ public class DiaryListFragment extends Fragment {
                 int visibleItemCount = recyclerView.getChildCount();
                 int totalItemCount =
                         DiaryListFragment.this.diaryListYearMonthLinearLayoutManager.getItemCount();
+                List<DiaryYearMonthListItem> diaryList = DiaryListFragment.this.listViewModel.getLiveDataDiaryList().getValue();
+                int lastItemPosition = diaryList.size() - 1;
+                int lastItemViewType = diaryList.get(lastItemPosition).getViewType();
                 // MEMO:下記条件"dy > 0"は検索結果リストが更新されたときに
                 //      "RecyclerView.OnScrollListener#onScrolled"が起動するための対策。
                 if (!isLoading
                         && (firstVisibleItem + visibleItemCount) >= totalItemCount
-                        && dy > 0) {
+                        && dy > 0
+                        && lastItemViewType == DiaryYearMonthListAdapter.VIEW_TYPE_DIARY) {
                     isLoading = true;
                     DiaryListFragment.this.listViewModel.loadList(ListViewModel.LoadType.ADD);
                 }
@@ -333,7 +343,8 @@ public class DiaryListFragment extends Fragment {
                         } else {
                             int lastItemPosition = diaryListItems.size() - 1;
                             int lastItemViewType = diaryListItems.get(lastItemPosition).getViewType();
-                            if (lastItemViewType == DiaryYearMonthListAdapter.VIEW_TYPE_DIARY) {
+                            if (lastItemViewType == DiaryYearMonthListAdapter.VIEW_TYPE_DIARY
+                                    || lastItemViewType == DiaryYearMonthListAdapter.VIEW_TYPE_NO_DIARY_MESSAGE) {
                                 isLoading = false;
                             }
                         }
@@ -405,12 +416,24 @@ public class DiaryListFragment extends Fragment {
     public class DiaryDayListDiffUtilItemCallback extends DiffUtil.ItemCallback<DiaryDayListItem> {
         @Override
         public boolean areItemsTheSame(@NonNull DiaryDayListItem oldItem, @NonNull DiaryDayListItem newItem) {
-            return oldItem.getId().equals(newItem.getId());
+            if (oldItem.getDayOfMonth() != newItem.getDayOfMonth()) {
+                return false;
+            }
+            if (oldItem.getDayOfWeek().equals(newItem.getDayOfWeek())) {
+                return false;
+            }
+            if (oldItem.getTitle().equals(newItem.getTitle())) {
+                return false;
+            }
+            if (oldItem.getPicturePath().equals(newItem.getPicturePath())) {
+                return false;
+            }
+            return true;
         }
 
         @Override
         public boolean areContentsTheSame(@NonNull DiaryDayListItem oldItem, @NonNull DiaryDayListItem newItem) {
-            return oldItem.getId().equals(newItem.getId());
+            return true;
         }
     }
 
@@ -432,6 +455,7 @@ public class DiaryListFragment extends Fragment {
         private List<CustomSimpleCallback> simpleCallbacks = new ArrayList<>();
         public static final int VIEW_TYPE_DIARY = 0;
         public static final int VIEW_TYPE_PROGRESS_BAR = 1;
+        public static final int VIEW_TYPE_NO_DIARY_MESSAGE = 2;
 
         public DiaryYearMonthListAdapter(@NonNull DiffUtil.ItemCallback<DiaryYearMonthListItem> diffCallback){
             super(diffCallback);
@@ -439,12 +463,14 @@ public class DiaryListFragment extends Fragment {
 
         @Override
         public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-            Log.d("20240530", "onCreateViewHolder()");
             LayoutInflater inflater = LayoutInflater.from(parent.getContext());
             if (viewType == VIEW_TYPE_DIARY) {
                 View view =
                         inflater.inflate(R.layout.row_diary_year_month_list, parent, false);
                 DiaryYearMonthListViewHolder holder = new DiaryYearMonthListViewHolder(view);
+
+                // ホルダーアイテムアニメーション設定(理由は年月RecyclerView設定コード付近にコメントで記載)
+                holder.recyclerDayList.setItemAnimator(null);
 
                 // ホルダー内の日記リスト(日)のアイテム装飾設定
                 // MEMO:onBindViewHolder で設定すると、設定内容が重複してアイテムが小さくなる為、
@@ -477,7 +503,7 @@ public class DiaryListFragment extends Fragment {
                 // MEMO:スワイプでの背面ボタン表示機能はAndroidには存在しないので、
                 //      ItemTouchHelper.Callback を継承して作成。
                 CustomSimpleCallback simpleCallback = new CustomSimpleCallback(
-                        ItemTouchHelper.UP | ItemTouchHelper.DOWN, ItemTouchHelper.LEFT,
+                        ItemTouchHelper.ACTION_STATE_IDLE, ItemTouchHelper.LEFT,
                         holder.recyclerDayList,
                         getContext(),
                         getResources().getDisplayMetrics().density,
@@ -488,18 +514,19 @@ public class DiaryListFragment extends Fragment {
                 ItemTouchHelper itemTouchHelper = new ItemTouchHelper(simpleCallback);
                 itemTouchHelper.attachToRecyclerView(holder.recyclerDayList);
                 return holder;
-            } else {
-                Log.d("20240612","progressBarViewHolder 追加");
+            } else if (viewType == VIEW_TYPE_PROGRESS_BAR) {
                 View view =
                         inflater.inflate(R.layout.row_progress_bar, parent, false);
                 return new ProgressBarViewHolder(view);
+            } else {
+                View view =
+                        inflater.inflate(R.layout.row_no_diary_message, parent, false);
+                return new NoDiaryMessageViewHolder(view);
             }
         }
 
         @Override
         public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
-            Log.d("20240530", "onBindViewHolder()");
-
             if (holder instanceof DiaryYearMonthListViewHolder) {
                 DiaryYearMonthListViewHolder _holder = (DiaryYearMonthListViewHolder) holder;
                 // 対象行の情報を取得
@@ -555,17 +582,20 @@ public class DiaryListFragment extends Fragment {
             extends DiffUtil.ItemCallback<DiaryYearMonthListItem> {
         @Override
         public boolean areItemsTheSame(@NonNull DiaryYearMonthListItem oldItem, @NonNull DiaryYearMonthListItem newItem) {
-            Log.d("20240613_1", "areItemsTheSame");
-            return oldItem.getId().equals(newItem.getId());
+            if (oldItem.getYear() != newItem.getYear()) {
+                return false;
+            }
+            if (oldItem.getMonth() != newItem.getMonth()) {
+                return false;
+            }
+            if (oldItem.getViewType() != newItem.getViewType()) {
+                return false;
+            }
+            return true;
         }
 
         @Override
         public boolean areContentsTheSame(@NonNull DiaryYearMonthListItem oldItem, @NonNull DiaryYearMonthListItem newItem) {
-            Log.d("20240613_1", "areContentsTheSame");
-            if (oldItem.getId().equals(newItem.getId())) {
-                return false;
-            }
-
             int oldChildListSize = oldItem.getDiaryDayListItemList().size();
             int newChildListSize = newItem.getDiaryDayListItemList().size();
             if (oldChildListSize != newChildListSize) {
@@ -574,9 +604,18 @@ public class DiaryListFragment extends Fragment {
 
             int maxSize = Math.max(oldChildListSize, newChildListSize);
             for (int i = 0; i < maxSize; i++) {
-                String oldChildListItemId = oldItem.getDiaryDayListItemList().get(i).getId();
-                String newChildListItemId = newItem.getDiaryDayListItemList().get(i).getId();
-                if (oldChildListItemId != newChildListItemId) {
+                DiaryDayListItem oldChildListItem = oldItem.getDiaryDayListItemList().get(i);
+                DiaryDayListItem newChildListItem = newItem.getDiaryDayListItemList().get(i);
+                if (oldChildListItem.getDayOfMonth() != newChildListItem.getDayOfMonth()) {
+                    return false;
+                }
+                if (oldChildListItem.getDayOfWeek().equals(newChildListItem.getDayOfWeek())) {
+                    return false;
+                }
+                if (oldChildListItem.getTitle().equals(newChildListItem.getTitle())) {
+                    return false;
+                }
+                if (oldChildListItem.getPicturePath().equals(newChildListItem.getPicturePath())) {
                     return false;
                 }
             }

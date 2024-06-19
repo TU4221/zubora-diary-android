@@ -1,28 +1,21 @@
 package com.websarva.wings.android.zuboradiary.ui.list;
 
 import android.app.Application;
-import android.os.Handler;
-import android.os.Looper;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
-import androidx.core.os.HandlerCompat;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
 import com.websarva.wings.android.zuboradiary.DateConverter;
 import com.websarva.wings.android.zuboradiary.ui.diary.Diary;
-import com.websarva.wings.android.zuboradiary.ui.list.DiaryListFragment.DiaryDayListAdapter;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAdjusters;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -31,13 +24,9 @@ public class ListViewModel extends AndroidViewModel {
     private DiaryListRepository diaryListRepository;
     private MutableLiveData<List<DiaryYearMonthListItem>> diaryList =
             new MutableLiveData<>(new ArrayList<>());
-    private MutableLiveData<List<DiaryListItem>> loadedListItemDiaries
-            = new MutableLiveData<>(new ArrayList<>());
-    private List<DiaryListItem> previousLoadedListItemDiaries = new ArrayList<>();
-    private final int LOAD_ITEM_NUM = 50; // TODO:仮数値の為、最後に設定
+    private final int LOAD_ITEM_NUM = 10; // TODO:仮数値の為、最後に設定
     private int loadItemOffset = 0;
     private String sortConditionDate = "";
-    private int scrollPointY = 0;
 
 
     public ListViewModel(@NonNull Application application) {
@@ -50,14 +39,9 @@ public class ListViewModel extends AndroidViewModel {
     }
 
     public void loadList(LoadType loadType) {
-        if (loadType == LoadType.UPDATE) {
-        } else if (loadType == LoadType.ADD) {
-        } else {
+        if (loadType == LoadType.NEW) {
             ListViewModel.this.diaryList.setValue(new ArrayList<>());
         }
-
-
-        Handler handler = HandlerCompat.createAsync(Looper.getMainLooper());
         ExecutorService executorService = Executors.newSingleThreadExecutor();
         executorService.submit(new Runnable() {
             @Override
@@ -91,13 +75,13 @@ public class ListViewModel extends AndroidViewModel {
 
                 // TODO:ProgressBarを表示させる為に仮で記述
                 try {
-                    Thread.sleep(0);
+                    Thread.sleep(1000);
                 } catch (InterruptedException e) {
                     throw new RuntimeException(e);
                 }
 
                 // データ読込
-                List<DiaryListItem> loadedData = null;
+                List<DiaryListItem> loadedData = new ArrayList<>();
                 if (ListViewModel.this.sortConditionDate.equals("")) {
                     loadedData =
                             ListViewModel.this.diaryListRepository.getListItemDiaries(
@@ -114,16 +98,23 @@ public class ListViewModel extends AndroidViewModel {
                             );
                 }
 
+                // 更新用リスト準備
+                List<DiaryYearMonthListItem> updateDiaryList = new ArrayList<>();
+
                 // 読込データ空確認
                 if (loadedData.isEmpty()) {
-                    ListViewModel.this.diaryList.postValue(previousDiaryList);
+                    updateDiaryList.addAll(previousDiaryList);
+                    DiaryYearMonthListItem noDiaryMessage = new DiaryYearMonthListItem();
+                    noDiaryMessage.setViewType(
+                            DiaryListFragment.DiaryYearMonthListAdapter.VIEW_TYPE_NO_DIARY_MESSAGE);
+                    updateDiaryList.add(noDiaryMessage);
+                    ListViewModel.this.diaryList.postValue(updateDiaryList);
                     return;
                 }
 
                 // 読込データを日記リストへ追加
                 ListViewModel.this.loadItemOffset += loadItemNum;
-                List<DiaryYearMonthListItem> convertedList = toRecyclerViewFormat(loadedData);
-                List<DiaryYearMonthListItem> newDiaryList = new ArrayList<>();
+                List<DiaryYearMonthListItem> convertedList = toDiaryYearMonthListFormat(loadedData);
                 if (loadType == LoadType.ADD) {
                     // 前回の読込リストの最終アイテムの年月取得
                     int previousDiaryListLastItemPosition = previousDiaryList.size() - 1;
@@ -154,21 +145,29 @@ public class ListViewModel extends AndroidViewModel {
                         convertedList.remove(0);
                     }
 
-                    newDiaryList.addAll(previousDiaryList);
-                    newDiaryList.addAll(convertedList);
-                    ListViewModel.this.diaryList.postValue(newDiaryList);
-                    Log.d("20240613", "Add");
+                    updateDiaryList.addAll(previousDiaryList);
+                    updateDiaryList.addAll(convertedList);
+                    ListViewModel.this.diaryList.postValue(updateDiaryList);
                 } else {
-                    newDiaryList.addAll(convertedList);
-                    ListViewModel.this.diaryList.postValue(convertedList);
-                    Log.d("20240613", "New or Update");
+                    updateDiaryList.addAll(convertedList);
+                    ListViewModel.this.diaryList.postValue(updateDiaryList);
                 }
+
+                // TODO:DiaryRepositoryをまとめてから残日記を確認するメソッドを下記条件にあてはめる。
+                if (false) {
+                    DiaryYearMonthListItem noDiaryMessage = new DiaryYearMonthListItem();
+                    noDiaryMessage.setViewType(
+                            DiaryListFragment.DiaryYearMonthListAdapter.VIEW_TYPE_NO_DIARY_MESSAGE);
+                    updateDiaryList.add(noDiaryMessage);
+                }
+
+                ListViewModel.this.diaryList.postValue(updateDiaryList);
             }
         });
 
     }
 
-    private List<DiaryYearMonthListItem> toRecyclerViewFormat(List<DiaryListItem> beforeList) {
+    private List<DiaryYearMonthListItem> toDiaryYearMonthListFormat(List<DiaryListItem> beforeList) {
         // 型変換:List<DiaryListItem> -> List<Map<String, Object>>
         List<DiaryDayListItem> diaryDayListItemList = new ArrayList<>();
         DiaryDayListItem diaryDayListItem;
@@ -267,12 +266,12 @@ public class ListViewModel extends AndroidViewModel {
         List<DiaryYearMonthListItem> updateDiaryList = new ArrayList<>();
         List<DiaryYearMonthListItem> currentDiaryList = ListViewModel.this.diaryList.getValue();
 
-        DiaryYearMonthListItem targetYearMonth = new DiaryYearMonthListItem();
+        DiaryYearMonthListItem targetYearMonthListItem = new DiaryYearMonthListItem();
         List<DiaryDayListItem> targetDayList = new ArrayList<>();
         for (DiaryYearMonthListItem item: currentDiaryList) {
             if (item.getYear() == deleteDiaryDate.getYear()
                     && item.getMonth() == deleteDiaryDate.getMonthValue()) {
-                targetYearMonth = item;
+                targetYearMonthListItem = item;
                 targetDayList = item.getDiaryDayListItemList();
                 break;
             }
@@ -282,7 +281,7 @@ public class ListViewModel extends AndroidViewModel {
             if (item.getDayOfMonth() == deleteDiaryDate.getDayOfMonth()) {
                 targetDayList.remove(item);
                 if (targetDayList.isEmpty()) {
-                    currentDiaryList.remove(targetYearMonth);
+                    currentDiaryList.remove(targetYearMonthListItem);
                 }
                 break;
             }
@@ -298,8 +297,13 @@ public class ListViewModel extends AndroidViewModel {
     }
 
 
+    public Diary loadNewestDiary() {
+        return this.diaryListRepository.selectNewestDiary();
+    }
 
-
+    public Diary loadOldestDiary() {
+        return this.diaryListRepository.selectOldestDiary();
+    }
 
 
     // Getter/Setter
@@ -308,35 +312,5 @@ public class ListViewModel extends AndroidViewModel {
     }
     public void setLiveDataDiaryList(List<DiaryYearMonthListItem> list) {
         this.diaryList.setValue(list);
-    }
-
-    public LiveData<List<DiaryListItem>> getLiveDataLoadedListItemDiaries() {
-        return this.loadedListItemDiaries;
-    }
-    public void setLoadedListItemDiaries(List<DiaryListItem> list) {
-        this.loadedListItemDiaries.setValue(list);
-    }
-
-    public List<DiaryListItem> getPreviousLoadedListItemDiaries() {
-        return this.previousLoadedListItemDiaries;
-    }
-    public void setPreviousLoadedListItemDiaries(List<DiaryListItem> list) {
-        this.previousLoadedListItemDiaries = list;
-    }
-
-    public int getScrollPointY() {
-        return scrollPointY;
-    }
-
-    public void setScrollPointY(int scrollPointY) {
-        this.scrollPointY = scrollPointY;
-    }
-
-    public Diary loadNewestDiary() {
-        return this.diaryListRepository.selectNewestDiary();
-    }
-
-    public Diary loadOldestDiary() {
-        return this.diaryListRepository.selectOldestDiary();
     }
 }
