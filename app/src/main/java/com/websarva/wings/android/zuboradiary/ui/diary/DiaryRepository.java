@@ -4,7 +4,12 @@ import android.app.Application;
 import android.util.Log;
 
 import com.google.common.util.concurrent.ListenableFuture;
+import com.websarva.wings.android.zuboradiary.ui.list.DiaryListItem;
+import com.websarva.wings.android.zuboradiary.ui.list.wordsearch.WordSearchResultListItemDiary;
 
+import org.jetbrains.annotations.Nullable;
+
+import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -20,6 +25,21 @@ public class DiaryRepository {
     public DiaryRepository(Application application) {
         diaryDatabase = DiaryDatabase.getDatabase(application);
         diaryDAO = diaryDatabase.createDiaryDAO();
+    }
+
+    public int countDiaries() {
+        ListenableFuture<Integer> listenableFutureResults = this.diaryDAO.countDiaries();
+        Integer result = 0;
+        try {
+            result = listenableFutureResults.get();
+        }
+        catch (ExecutionException ex) {
+            Log.d("ROOM通信エラー", "ExecutionException");
+        }
+        catch (InterruptedException ex) {
+            Log.d("ROOM通信エラー", "InterruptedException");
+        }
+        return result;
     }
 
     public boolean hasDiary(String date) {
@@ -64,9 +84,116 @@ public class DiaryRepository {
         return diary;
     }
 
+    public Diary selectNewestDiary() {
+        ListenableFuture<Diary> listenableFutureResult = diaryDAO.selectNewestDiary();
+
+        Diary result = null;
+        try {
+            result = listenableFutureResult.get();
+        }
+        catch (ExecutionException ex) {
+            Log.d("ROOM通信エラー", "ExecutionException");
+        }
+        catch (InterruptedException ex) {
+            Log.d("ROOM通信エラー", "InterruptedException");
+        }
+        return result;
+    }
+
+    public Diary selectOldestDiary() {
+        ListenableFuture<Diary> listenableFutureResult = diaryDAO.selectOldestDiary();
+
+        Diary result = null;
+        try {
+            result = listenableFutureResult.get();
+        }
+        catch (ExecutionException ex) {
+            Log.d("ROOM通信エラー", "ExecutionException");
+        }
+        catch (InterruptedException ex) {
+            Log.d("ROOM通信エラー", "InterruptedException");
+        }
+        return result;
+    }
+
+    public List<DiaryListItem> selectDiaryList(int num, int offset, @Nullable String date) {
+        ListenableFuture<List<DiaryListItem>> listenableFutureResults;
+        if (!(date == null)) {
+            listenableFutureResults = diaryDAO.selectDiaryList(num, offset, date);
+        } else {
+            listenableFutureResults = diaryDAO.selectDiaryList(num, offset);
+        }
+        List<DiaryListItem> results = null;
+        try {
+            results = listenableFutureResults.get();
+        }
+        catch (ExecutionException ex) {
+            Log.d("ROOM通信エラー", "ExecutionException");
+        }
+        catch (InterruptedException ex) {
+            Log.d("ROOM通信エラー", "InterruptedException");
+        }
+        return results;
+    }
+
+    public int countWordSearchResults(String searchWord) {
+        ListenableFuture<Integer> listenableFutureResult;
+        listenableFutureResult = diaryDAO.countWordSearchResults(searchWord);
+        Integer result = 0;
+        try {
+            result = listenableFutureResult.get();
+        }
+        catch (ExecutionException ex) {
+            Log.d("ROOM通信エラー", "ExecutionException");
+        }
+        catch (InterruptedException ex) {
+            Log.d("ROOM通信エラー", "InterruptedException");
+        }
+        return result;
+    }
+
+    public ListenableFuture<List<WordSearchResultListItemDiary>> selectWordSearchResultList(
+            int num, int offset, String searchWord) {
+
+        Log.d("20240611", "selectWordSearchResultList");
+        return diaryDAO.selectWordSearchResultList(num, offset, searchWord);
+
+    }
+
+    public List<String> selectDiaryDateList(String dateYearMonth) {
+        ListenableFuture<List<String>> listenableFutureResults;
+        listenableFutureResults = diaryDAO.selectDiaryDateList(dateYearMonth);
+        List<String> results = null;
+        try {
+            results = listenableFutureResults.get();
+        }
+        catch (ExecutionException ex) {
+            Log.d("ROOM通信エラー", "ExecutionException");
+        }
+        catch (InterruptedException ex) {
+            Log.d("ROOM通信エラー", "InterruptedException");
+        }
+        return results;
+    }
+
     public void insertDiary(Diary diary) {
 
         ListenableFuture<Long> diaryListenableFuture = diaryDAO.insertDiary(diary);
+
+        try {
+            diaryListenableFuture.get();
+        }
+        catch (ExecutionException ex) {
+            Log.d("ROOM通信エラー", "ExecutionException");
+        }
+        catch (InterruptedException ex) {
+            Log.d("ROOM通信エラー", "InterruptedException");
+        }
+    }
+
+    public void updateDiary(Diary diary) {
+
+        ListenableFuture<Integer> diaryListenableFuture = diaryDAO.updateDiary(diary);
 
         try {
             diaryListenableFuture.get();
@@ -108,21 +235,6 @@ public class DiaryRepository {
             Log.d("ROOM通信エラー", "InterruptedException");
         }
 
-    }
-
-    public void updateDiary(Diary diary) {
-
-        ListenableFuture<Integer> diaryListenableFuture = diaryDAO.updateDiary(diary);
-
-        try {
-            diaryListenableFuture.get();
-        }
-        catch (ExecutionException ex) {
-            Log.d("ROOM通信エラー", "ExecutionException");
-        }
-        catch (InterruptedException ex) {
-            Log.d("ROOM通信エラー", "InterruptedException");
-        }
     }
 
     public void deleteAndUpdateDiary(String deleteDiaryDate, Diary createDiary) {

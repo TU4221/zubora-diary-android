@@ -31,21 +31,7 @@ public class WordSearchRepository {
         this.application = application;
     }
 
-    public int countWordSearchResults(String searchWord) {
-        ListenableFuture<Integer> listenableFutureResult;
-        listenableFutureResult = diaryDAO.countWordSearchResults(searchWord);
-        Integer result = 0;
-        try {
-            result = listenableFutureResult.get();
-        }
-        catch (ExecutionException ex) {
-            Log.d("ROOM通信エラー", "ExecutionException");
-        }
-        catch (InterruptedException ex) {
-            Log.d("ROOM通信エラー", "InterruptedException");
-        }
-        return result;
-    }
+
 
     /*public List<WordSearchResultListItemDiary> selectWordSearchResultList(
                                                         int num, int offset, String searchWord) {
@@ -65,12 +51,6 @@ public class WordSearchRepository {
 
     }*/
 
-    public ListenableFuture<List<WordSearchResultListItemDiary>> selectWordSearchResultList(
-            int num, int offset, String searchWord) {
 
-        Log.d("20240611", "selectWordSearchResultList");
-        return diaryDAO.selectWordSearchResultList(num, offset, searchWord);
-
-    }
 
 }

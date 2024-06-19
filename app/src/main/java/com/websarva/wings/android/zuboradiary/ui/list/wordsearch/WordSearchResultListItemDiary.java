@@ -6,7 +6,6 @@ import androidx.room.ColumnInfo;
 public class WordSearchResultListItemDiary {
     @NonNull
     private String date;
-    private String log;
     @NonNull
     private String title;
     @ColumnInfo(name = "item_1_title")
@@ -36,14 +35,6 @@ public class WordSearchResultListItemDiary {
 
     public void setDate(String date) {
         this.date = date;
-    }
-
-    public String getLog() {
-        return log;
-    }
-
-    public void setLog(String log) {
-        this.log = log;
     }
 
     public String getTitle() {

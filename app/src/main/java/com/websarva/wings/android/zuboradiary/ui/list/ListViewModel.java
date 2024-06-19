@@ -10,6 +10,7 @@ import androidx.lifecycle.MutableLiveData;
 
 import com.websarva.wings.android.zuboradiary.DateConverter;
 import com.websarva.wings.android.zuboradiary.ui.diary.Diary;
+import com.websarva.wings.android.zuboradiary.ui.diary.DiaryRepository;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -21,7 +22,7 @@ import java.util.concurrent.Executors;
 
 public class ListViewModel extends AndroidViewModel {
 
-    private DiaryListRepository diaryListRepository;
+    private DiaryRepository diaryRepository;
     private MutableLiveData<List<DiaryYearMonthListItem>> diaryList =
             new MutableLiveData<>(new ArrayList<>());
     private final int LOAD_ITEM_NUM = 10; // TODO:仮数値の為、最後に設定
@@ -31,7 +32,7 @@ public class ListViewModel extends AndroidViewModel {
 
     public ListViewModel(@NonNull Application application) {
         super(application);
-        diaryListRepository = new DiaryListRepository(getApplication());
+        diaryRepository = new DiaryRepository(getApplication());
     }
 
     public enum LoadType {
@@ -84,14 +85,14 @@ public class ListViewModel extends AndroidViewModel {
                 List<DiaryListItem> loadedData = new ArrayList<>();
                 if (ListViewModel.this.sortConditionDate.equals("")) {
                     loadedData =
-                            ListViewModel.this.diaryListRepository.getListItemDiaries(
+                            ListViewModel.this.diaryRepository.selectDiaryList(
                                     loadItemNum,
                                     ListViewModel.this.loadItemOffset,
                                     null
                             );
                 } else {
                     loadedData =
-                            ListViewModel.this.diaryListRepository.getListItemDiaries(
+                            ListViewModel.this.diaryRepository.selectDiaryList(
                                     loadItemNum,
                                     ListViewModel.this.loadItemOffset,
                                     ListViewModel.this.sortConditionDate
@@ -258,7 +259,7 @@ public class ListViewModel extends AndroidViewModel {
     }
 
     public void deleteDiary(String date) {
-        diaryListRepository.deleteDiary(date);
+        diaryRepository.deleteDiary(date);
         this.loadItemOffset--;
 
         LocalDate deleteDiaryDate = DateConverter.toLocalDate(date);
@@ -293,16 +294,16 @@ public class ListViewModel extends AndroidViewModel {
     }
 
     public int countDiaries() {
-        return this.diaryListRepository.countDiaries();
+        return this.diaryRepository.countDiaries();
     }
 
 
     public Diary loadNewestDiary() {
-        return this.diaryListRepository.selectNewestDiary();
+        return this.diaryRepository.selectNewestDiary();
     }
 
     public Diary loadOldestDiary() {
-        return this.diaryListRepository.selectOldestDiary();
+        return this.diaryRepository.selectOldestDiary();
     }
 
 

@@ -11,13 +11,14 @@ import androidx.lifecycle.MutableLiveData;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
+import com.websarva.wings.android.zuboradiary.ui.diary.DiaryRepository;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class WordSearchViewModel extends AndroidViewModel {
 
-    private WordSearchRepository wordSearchRepository;
+    private DiaryRepository DiaryRepository;
     private MutableLiveData<String> searchWord = new MutableLiveData<>();
     private MutableLiveData<Boolean> isVisibleSearchWordClearButton = new MutableLiveData<>();
     private MutableLiveData<List<WordSearchResultListItemDiary>> loadedWordSearchResultList
@@ -32,7 +33,7 @@ public class WordSearchViewModel extends AndroidViewModel {
 
     public WordSearchViewModel(@NonNull Application application) {
         super(application);
-        wordSearchRepository = new WordSearchRepository(getApplication());
+        DiaryRepository = new DiaryRepository(getApplication());
         initialize();
     }
 
@@ -58,13 +59,13 @@ public class WordSearchViewModel extends AndroidViewModel {
             loadItemNum = this.LOAD_ITEM_NUM;
             this.loadItemOffset = 0;
             this.resultNum.setValue(
-                    this.wordSearchRepository.countWordSearchResults(this.searchWord.getValue())
+                    this.DiaryRepository.countWordSearchResults(this.searchWord.getValue())
             );
         } else if(loadType == LoadType.UPDATE) {
             loadItemNum = this.loadItemOffset;
             this.loadItemOffset = 0;
             this.resultNum.setValue(
-                    this.wordSearchRepository.countWordSearchResults(this.searchWord.getValue())
+                    this.DiaryRepository.countWordSearchResults(this.searchWord.getValue())
             );
         } else {
             loadItemNum = this.LOAD_ITEM_NUM;
@@ -81,7 +82,7 @@ public class WordSearchViewModel extends AndroidViewModel {
                     )
             );*/
             listListenableFuture =
-            this.wordSearchRepository.selectWordSearchResultList(
+            this.DiaryRepository.selectWordSearchResultList(
                     loadItemNum,
                     this.loadItemOffset,
                     null);
@@ -94,7 +95,7 @@ public class WordSearchViewModel extends AndroidViewModel {
                     )
             );*/
             listListenableFuture =
-            this.wordSearchRepository.selectWordSearchResultList(
+            this.DiaryRepository.selectWordSearchResultList(
                     loadItemNum,
                     this.loadItemOffset,
                     this.searchWord.getValue());

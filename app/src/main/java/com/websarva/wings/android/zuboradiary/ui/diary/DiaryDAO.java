@@ -16,24 +16,24 @@ public interface DiaryDAO {
     // @Query使用方法下記参照
     // https://developer.android.com/reference/kotlin/androidx/room/Query
     @Query("SELECT COUNT(*) FROM diaries")
-    public ListenableFuture<Integer> countDiaries();
+    ListenableFuture<Integer> countDiaries();
     @Query("SELECT EXISTS (SELECT 1 FROM diaries WHERE date = :date)")
-    public ListenableFuture<Boolean> hasDiary(String date);
+    ListenableFuture<Boolean> hasDiary(String date);
 
     @Query("SELECT * FROM diaries WHERE date = :date")
-    public ListenableFuture<Diary> selectDiary(String date);
+    ListenableFuture<Diary> selectDiary(String date);
 
     @Query("SELECT * FROM diaries ORDER BY date DESC LIMIT 1 OFFSET 0")
-    public ListenableFuture<Diary> selectNewestDiary();
+    ListenableFuture<Diary> selectNewestDiary();
 
     @Query("SELECT * FROM diaries ORDER BY date ASC LIMIT 1 OFFSET 0")
-    public ListenableFuture<Diary> selectOldestDiary();
+    ListenableFuture<Diary> selectOldestDiary();
 
-    @Query("SELECT date, title, imagePath FROM diaries ORDER BY date DESC LIMIT :num OFFSET :offset")
-    public ListenableFuture<List<DiaryListItem>> selectDiaryList(int num, int offset);
+    @Query("SELECT date, title, picturePath FROM diaries ORDER BY date DESC LIMIT :num OFFSET :offset")
+    ListenableFuture<List<DiaryListItem>> selectDiaryList(int num, int offset);
 
-    @Query("SELECT date, title, imagePath FROM diaries WHERE date < :startDate ORDER BY date DESC LIMIT :num OFFSET :offset")
-    public ListenableFuture<List<DiaryListItem>> selectDiaryList(int num, int offset , String startDate);
+    @Query("SELECT date, title, picturePath FROM diaries WHERE date < :startDate ORDER BY date DESC LIMIT :num OFFSET :offset")
+    ListenableFuture<List<DiaryListItem>> selectDiaryList(int num, int offset , String startDate);
 
     @Query("SELECT COUNT(*) " +
             "FROM diaries " +
@@ -48,12 +48,12 @@ public interface DiaryDAO {
             "OR item_4_comment LIKE '%' || :word || '%'" +
             "OR item_5_title LIKE '%' || :word || '%'" +
             "OR item_5_comment LIKE '%' || :word || '%'")
-    public ListenableFuture<Integer> countWordSearchResults(String word);
+    ListenableFuture<Integer> countWordSearchResults(String word);
 
     @Query("SELECT date, title, item_1_title, item_1_comment, " +
-                "item_2_title, item_2_comment " +
-                "item_3_title, item_3_comment " +
-                "item_4_title, item_4_comment " +
+                "item_2_title, item_2_comment, " +
+                "item_3_title, item_3_comment, " +
+                "item_4_title, item_4_comment, " +
                 "item_5_title, item_5_comment " +
             "FROM diaries " +
             "WHERE title LIKE '%' || :word || '%' " +
@@ -68,18 +68,18 @@ public interface DiaryDAO {
                 "OR item_5_title LIKE '%' || :word || '%'" +
                 "OR item_5_comment LIKE '%' || :word || '%'" +
             "ORDER BY date DESC LIMIT :num OFFSET :offset")
-    public ListenableFuture<List<WordSearchResultListItemDiary>> selectWordSearchResultList(int num, int offset, String word);
+    ListenableFuture<List<WordSearchResultListItemDiary>> selectWordSearchResultList(int num, int offset, String word);
 
     @Query("SELECT date FROM diaries WHERE date LIKE :dateYearMonth || '%'") // ||：文字連結
-    public ListenableFuture<List<String>> selectDiaryDateList(String dateYearMonth);
+    ListenableFuture<List<String>> selectDiaryDateList(String dateYearMonth);
 
     @Insert
-    public ListenableFuture<Long> insertDiary(Diary diary);
+    ListenableFuture<Long> insertDiary(Diary diary);
 
     @Update
-    public ListenableFuture<Integer> updateDiary(Diary diary);
+    ListenableFuture<Integer> updateDiary(Diary diary);
 
     @Query("DELETE FROM diaries WHERE date = :date")
-    public ListenableFuture<Integer> deleteDiary(String date);
+    ListenableFuture<Integer> deleteDiary(String date);
 
 }

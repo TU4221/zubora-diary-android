@@ -19,19 +19,5 @@ public class CalendarRepository {
         this.diaryDAO = this.diaryDatabase.createDiaryDAO();
     }
 
-    public List<String> selectDiaryDateList(String dateYearMonth) {
-        ListenableFuture<List<String>> listenableFutureResults;
-        listenableFutureResults = diaryDAO.selectDiaryDateList(dateYearMonth);
-        List<String> results = null;
-        try {
-            results = listenableFutureResults.get();
-        }
-        catch (ExecutionException ex) {
-            Log.d("ROOM通信エラー", "ExecutionException");
-        }
-        catch (InterruptedException ex) {
-            Log.d("ROOM通信エラー", "InterruptedException");
-        }
-        return results;
-    }
+
 }

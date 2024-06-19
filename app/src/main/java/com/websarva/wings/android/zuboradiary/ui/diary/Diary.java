@@ -5,8 +5,6 @@ import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
-import java.time.Instant;
-
 @Entity(tableName = "diaries")
 public class Diary {
     @PrimaryKey
@@ -40,7 +38,7 @@ public class Diary {
     private String item5Title;
     @ColumnInfo(name = "item_5_comment")
     private String item5Comment;
-    private String imagePath;
+    private String picturePath;
 
     public String getDate() {
         return this.date;
@@ -170,11 +168,11 @@ public class Diary {
         this.item5Comment = item5Comment;
     }
 
-    public String getImagePath() {
-        return imagePath;
+    public String getPicturePath() {
+        return picturePath;
     }
 
-    public void setImagePath(String imagePath) {
-        this.imagePath = imagePath;
+    public void setPicturePath(String picturePath) {
+        this.picturePath = picturePath;
     }
 }

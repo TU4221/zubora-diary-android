@@ -6,6 +6,8 @@ import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 
 import com.websarva.wings.android.zuboradiary.DateConverter;
+import com.websarva.wings.android.zuboradiary.ui.diary.Diary;
+import com.websarva.wings.android.zuboradiary.ui.diary.DiaryRepository;
 
 import java.time.LocalDate;
 import java.util.HashMap;
@@ -14,20 +16,20 @@ import java.util.Map;
 
 public class CalendarViewModel extends AndroidViewModel {
 
-    private CalendarRepository calendarRepository;
+    private DiaryRepository diaryRepository;
     private Map<String, List<String>> existedDiaryDateLog = new HashMap<>();
     private LocalDate selectedDate;
 
     public CalendarViewModel(@NonNull Application application) {
         super(application);
 
-        calendarRepository = new CalendarRepository(getApplication());
+        diaryRepository = new DiaryRepository(getApplication());
     }
 
     //既存日記の日付格納
     public void updateExistedDiaryDateLog(String dateYearMonth) {
         List<String> existedDiaryDateListForOneMonth =
-                calendarRepository.selectDiaryDateList(dateYearMonth);
+                diaryRepository.selectDiaryDateList(dateYearMonth);
         existedDiaryDateLog.put(dateYearMonth, existedDiaryDateListForOneMonth);
 
     }

@@ -7,6 +7,9 @@ plugins {
     //      下記削除同期後、再度追加同期を行えばエラーは消える。
     //      この解決策を発見する前にキャッシュクリア、再起動を行ったが関係なさそう。
     id("androidx.navigation.safeargs")
+
+    // RoomのSchemaエクスポート機能を使用する為に追加
+    id("androidx.room")
 }
 
 android {
@@ -57,6 +60,10 @@ android {
         jvmTarget = "1.8"
     }
 
+    // RoomのSchemaエクスポート機能を使用する為に追加
+    room {
+        schemaDirectory("$projectDir/schemas")
+    }
 }
 
 
