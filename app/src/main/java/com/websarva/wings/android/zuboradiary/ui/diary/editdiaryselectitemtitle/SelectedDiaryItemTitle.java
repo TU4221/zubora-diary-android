@@ -1,12 +1,11 @@
 package com.websarva.wings.android.zuboradiary.ui.diary.editdiaryselectitemtitle;
 
 import androidx.annotation.NonNull;
-import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
 @Entity(tableName = "diary_item_title_history")
-public class DiaryItemTitle {
+public class SelectedDiaryItemTitle {
     @PrimaryKey
     @NonNull
     private String title = "";

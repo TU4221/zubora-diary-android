@@ -1,6 +1,7 @@
 package com.websarva.wings.android.zuboradiary.ui.diary;
 
 import android.app.Application;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
@@ -9,8 +10,10 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 import com.websarva.wings.android.zuboradiary.DateConverter;
-import com.websarva.wings.android.zuboradiary.ui.diary.Diary;
-import com.websarva.wings.android.zuboradiary.ui.diary.DiaryRepository;
+import com.websarva.wings.android.zuboradiary.ui.diary.editdiaryselectitemtitle.SelectedDiaryItemTitle;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class DiaryViewModel extends AndroidViewModel {
 
@@ -18,6 +21,7 @@ public class DiaryViewModel extends AndroidViewModel {
         private MutableLiveData<Integer> number = new MutableLiveData<>(1);
         private MutableLiveData<String> title = new MutableLiveData<>("");
         private MutableLiveData<String> comment = new MutableLiveData<>("");
+        private String titleUpdateLog = "";
 
         public Item(int itemNumber) {
             setNumber(itemNumber);
@@ -35,6 +39,7 @@ public class DiaryViewModel extends AndroidViewModel {
         }
         public void setTitle(String title) {
             this.title.setValue(title);
+            this.titleUpdateLog = DateConverter.toStringLocalDateTimeNow();
         }
 
         public LiveData<String> getLiveComment() {
@@ -45,6 +50,12 @@ public class DiaryViewModel extends AndroidViewModel {
         }
         public void setComment(String comment) {
             this.comment.setValue(comment);
+        }
+        public String getTitleUpdateLog() {
+            return titleUpdateLog;
+        }
+        public void setTitleUpdateLog(String titleUpdateLog) {
+            this.titleUpdateLog = titleUpdateLog;
         }
     }
     
@@ -68,9 +79,9 @@ public class DiaryViewModel extends AndroidViewModel {
     private MutableLiveData<String> strCondition = new MutableLiveData<>();
     private MutableLiveData<String> title = new MutableLiveData<>();
     private int visibleItemsCount;
-    public final static int MAX_ITEMS_COUNT = 5;
+    public final static int MAX_ITEMS = 5;
 
-    private Item[] items = new Item[MAX_ITEMS_COUNT];
+    private Item[] items = new Item[MAX_ITEMS];
     private MutableLiveData<String> log = new MutableLiveData<>();
 
 
@@ -143,8 +154,8 @@ public class DiaryViewModel extends AndroidViewModel {
         this.items[4].title.setValue(diary.getItem5Title());
         this.items[4].comment.setValue(diary.getItem5Comment());
 
-        this.visibleItemsCount = MAX_ITEMS_COUNT;
-        for (int i = MAX_ITEMS_COUNT; i > 1; i--) {
+        this.visibleItemsCount = MAX_ITEMS;
+        for (int i = MAX_ITEMS; i > 1; i--) {
             int arrayNumber = i - 1;
             if (this.items[arrayNumber].title.getValue() == null
                     || this.items[arrayNumber].title.getValue().isEmpty()) {
@@ -171,25 +182,29 @@ public class DiaryViewModel extends AndroidViewModel {
 
     public void saveNewDiary() {
         Diary diary = createDiary();
-        this.diaryRepository.insertDiary(diary);
+        List<SelectedDiaryItemTitle> selectedDiaryItemTitleList = createSelectedDiaryItemTitleList();
+        this.diaryRepository.insertDiary(diary, selectedDiaryItemTitleList);
         this.loadedDate = this.date.getValue();
     }
 
     public void deleteExistingDiaryAndSaveNewDiary() {
         Diary diary = createDiary();
-        this.diaryRepository.deleteAndInsertDiary(this.loadedDate, diary);
+        List<SelectedDiaryItemTitle> selectedDiaryItemTitleList = createSelectedDiaryItemTitleList();
+        this.diaryRepository.deleteAndInsertDiary(this.loadedDate, diary, selectedDiaryItemTitleList);
         this.loadedDate = this.date.getValue();
     }
 
     public void updateExistingDiary() {
         Diary diary = createDiary();
-        this.diaryRepository.updateDiary(diary);
+        List<SelectedDiaryItemTitle> selectedDiaryItemTitleList = createSelectedDiaryItemTitleList();
+        this.diaryRepository.updateDiary(diary, selectedDiaryItemTitleList);
         this.loadedDate = this.date.getValue();
     }
 
     public void deleteExistingDiaryAndUpdateExistingDiary() {
         Diary diary = createDiary();
-        this.diaryRepository.deleteAndUpdateDiary(this.loadedDate, diary);
+        List<SelectedDiaryItemTitle> selectedDiaryItemTitleList = createSelectedDiaryItemTitleList();
+        this.diaryRepository.deleteAndUpdateDiary(this.loadedDate, diary, selectedDiaryItemTitleList);
         this.loadedDate = this.date.getValue();
     }
 
@@ -273,6 +288,7 @@ public class DiaryViewModel extends AndroidViewModel {
         int deleteArrayNo = itemNumber - 1;
         this.items[deleteArrayNo].title.setValue("");
         this.items[deleteArrayNo].comment.setValue("");
+        this.items[deleteArrayNo].titleUpdateLog = "";
 
         if (itemNumber < visibleItemsCount) {
             int nextArrayNo = -1;
@@ -280,13 +296,31 @@ public class DiaryViewModel extends AndroidViewModel {
                 nextArrayNo = arrayNo + 1;
                 this.items[arrayNo].title.setValue(this.items[nextArrayNo].title.getValue());
                 this.items[arrayNo].comment.setValue(this.items[nextArrayNo].comment.getValue());
+                this.items[arrayNo].titleUpdateLog = this.items[nextArrayNo].titleUpdateLog;
                 this.items[nextArrayNo].title.setValue("");
                 this.items[nextArrayNo].comment.setValue("");
+                this.items[nextArrayNo].titleUpdateLog = "";
             }
         }
         if (visibleItemsCount > 1) {
             visibleItemsCount -= 1;
         }
+    }
+
+    private List<SelectedDiaryItemTitle> createSelectedDiaryItemTitleList() {
+        List<SelectedDiaryItemTitle> list = new ArrayList<>();
+        SelectedDiaryItemTitle selectedDiaryItemTitle = new SelectedDiaryItemTitle();
+        for (int i = 0; i < MAX_ITEMS; i++) {
+            if (this.items[i].title.getValue().matches("\\S+.*")
+                    && !this.items[i].titleUpdateLog.isEmpty()) {
+                selectedDiaryItemTitle.setTitle(this.items[i].title.getValue());
+                selectedDiaryItemTitle.setLog(this.items[i].titleUpdateLog);
+                Log.d("20240620", this.items[i].title.getValue() + ":" + this.items[i].titleUpdateLog);
+                list.add(selectedDiaryItemTitle);
+                selectedDiaryItemTitle = new SelectedDiaryItemTitle();
+            }
+        }
+        return list;
     }
 
 

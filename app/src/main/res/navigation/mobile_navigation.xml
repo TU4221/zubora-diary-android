@@ -230,6 +230,16 @@
             <action
                 android:id="@+id/action_edit_diary_select_item_title_fragment_to_delete_confirmation_dialog"
                 app:destination="@id/navigation_delete_confirmation_dialog_for_edit_diary_select_item_title_fragment"/>
+            <action
+                android:id="@+id/action_edit_diary_select_item_title_fragment_to_message_dialog"
+                app:destination="@id/navigation_message_dialog">
+                <argument
+                    android:name="Title"
+                    app:argType="string" />
+                <argument
+                    android:name="Message"
+                    app:argType="string" />
+            </action>
             <argument
                 android:name="TargetItemNumber"
                 app:argType="integer" />
@@ -248,6 +258,17 @@
                 app:argType="string" />
         </dialog>
     </navigation>
+
+    <dialog
+        android:id="@+id/navigation_message_dialog"
+        android:name="com.websarva.wings.android.zuboradiary.ui.MessageDialogFragment">
+        <argument
+            android:name="Title"
+            app:argType="string" />
+        <argument
+            android:name="Message"
+            app:argType="string" />
+    </dialog>
 
 
 

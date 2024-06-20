@@ -29,7 +29,7 @@ public class ShowDiaryFragment extends Fragment {
 
     // View関係
     private FragmentShowDiaryBinding binding;
-    private final int MAX_ITEMS_COUNT = DiaryViewModel.MAX_ITEMS_COUNT; // 項目入力欄最大数
+    private final int MAX_ITEMS_COUNT = DiaryViewModel.MAX_ITEMS; // 項目入力欄最大数
 
     // Navigation関係
     private NavController navController;

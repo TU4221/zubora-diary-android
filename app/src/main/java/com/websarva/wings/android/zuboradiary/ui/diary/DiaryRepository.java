@@ -4,6 +4,8 @@ import android.app.Application;
 import android.util.Log;
 
 import com.google.common.util.concurrent.ListenableFuture;
+import com.websarva.wings.android.zuboradiary.ui.diary.editdiaryselectitemtitle.SelectedDiaryItemTitle;
+import com.websarva.wings.android.zuboradiary.ui.diary.editdiaryselectitemtitle.SelectedItemTitlesHistoryDAO;
 import com.websarva.wings.android.zuboradiary.ui.list.DiaryListItem;
 import com.websarva.wings.android.zuboradiary.ui.list.wordsearch.WordSearchResultListItemDiary;
 
@@ -17,14 +19,17 @@ import java.util.concurrent.Future;
 public class DiaryRepository {
     private DiaryDatabase diaryDatabase;
     DiaryDAO diaryDAO;
+    SelectedItemTitlesHistoryDAO selectedItemTitlesHistoryDAO;
 
     private ListenableFuture<Long> insertDiaryListenableFutureForTransaction;
     private ListenableFuture<Integer> updateDiaryListenableFutureForTransaction;
     private ListenableFuture<Integer> deleteDiaryListenableFutureForTransaction;
+    private ListenableFuture<List<Long>> updateSelectedDiaryItemTitleHistoryListenableFutureForTransaction;
 
     public DiaryRepository(Application application) {
         diaryDatabase = DiaryDatabase.getDatabase(application);
         diaryDAO = diaryDatabase.createDiaryDAO();
+        selectedItemTitlesHistoryDAO = diaryDatabase.createSelectedItemTitlesHistoryDAO();
     }
 
     public int countDiaries() {
@@ -176,12 +181,27 @@ public class DiaryRepository {
         return results;
     }
 
-    public void insertDiary(Diary diary) {
-
-        ListenableFuture<Long> diaryListenableFuture = diaryDAO.insertDiary(diary);
+    public void insertDiary(Diary diary, List<SelectedDiaryItemTitle> updateTitleList) {
+        Future<Void> future = DiaryDatabase.EXECUTOR_SERVICE.submit(new Callable<Void>() {
+            @Override
+            public Void call() throws Exception {
+                Future<Void> future = diaryDatabase.runInTransaction(new Callable<Future<Void>>() {
+                    @Override
+                    public Future<Void> call() throws Exception {
+                        insertDiaryListenableFutureForTransaction = diaryDAO.insertDiary(diary);
+                        updateSelectedDiaryItemTitleHistoryListenableFutureForTransaction =
+                                selectedItemTitlesHistoryDAO.insertSelectedDiaryItemTitles(updateTitleList);
+                        return null;
+                    }
+                });
+                return null;
+            }
+        });
 
         try {
-            diaryListenableFuture.get();
+            future.get();
+            insertDiaryListenableFutureForTransaction.get();
+            updateSelectedDiaryItemTitleHistoryListenableFutureForTransaction.get();
         }
         catch (ExecutionException ex) {
             Log.d("ROOM通信エラー", "ExecutionException");
@@ -191,12 +211,28 @@ public class DiaryRepository {
         }
     }
 
-    public void updateDiary(Diary diary) {
+    public void updateDiary(Diary diary, List<SelectedDiaryItemTitle> updateTitleList) {
 
-        ListenableFuture<Integer> diaryListenableFuture = diaryDAO.updateDiary(diary);
+        Future<Void> future = DiaryDatabase.EXECUTOR_SERVICE.submit(new Callable<Void>() {
+            @Override
+            public Void call() throws Exception {
+                Future<Void> future = diaryDatabase.runInTransaction(new Callable<Future<Void>>() {
+                    @Override
+                    public Future<Void> call() throws Exception {
+                        updateDiaryListenableFutureForTransaction = diaryDAO.updateDiary(diary);
+                        updateSelectedDiaryItemTitleHistoryListenableFutureForTransaction =
+                                selectedItemTitlesHistoryDAO.insertSelectedDiaryItemTitles(updateTitleList);
+                        return null;
+                    }
+                });
+                return null;
+            }
+        });
 
         try {
-            diaryListenableFuture.get();
+            future.get();
+            updateDiaryListenableFutureForTransaction.get();
+            updateSelectedDiaryItemTitleHistoryListenableFutureForTransaction.get();
         }
         catch (ExecutionException ex) {
             Log.d("ROOM通信エラー", "ExecutionException");
@@ -206,7 +242,8 @@ public class DiaryRepository {
         }
     }
 
-    public void deleteAndInsertDiary(String deleteDiaryDate, Diary createDiary) {
+    public void deleteAndInsertDiary(
+            String deleteDiaryDate, Diary createDiary, List<SelectedDiaryItemTitle> updateTitleList) {
 
         Future<Void> future = DiaryDatabase.EXECUTOR_SERVICE.submit(new Callable<Void>() {
             @Override
@@ -216,6 +253,8 @@ public class DiaryRepository {
                     public Future<Void> call() throws Exception {
                         deleteDiaryListenableFutureForTransaction = diaryDAO.deleteDiary(deleteDiaryDate);
                         insertDiaryListenableFutureForTransaction = diaryDAO.insertDiary(createDiary);
+                        updateSelectedDiaryItemTitleHistoryListenableFutureForTransaction =
+                                selectedItemTitlesHistoryDAO.insertSelectedDiaryItemTitles(updateTitleList);
                         return null;
                     }
                 });
@@ -227,6 +266,7 @@ public class DiaryRepository {
             future.get();
             deleteDiaryListenableFutureForTransaction.get();
             insertDiaryListenableFutureForTransaction.get();
+            updateSelectedDiaryItemTitleHistoryListenableFutureForTransaction.get();
         }
         catch (ExecutionException ex) {
             Log.d("ROOM通信エラー", "ExecutionException");
@@ -237,7 +277,8 @@ public class DiaryRepository {
 
     }
 
-    public void deleteAndUpdateDiary(String deleteDiaryDate, Diary createDiary) {
+    public void deleteAndUpdateDiary(
+            String deleteDiaryDate, Diary createDiary, List<SelectedDiaryItemTitle> updateTitleList) {
 
         Future<Void> future = DiaryDatabase.EXECUTOR_SERVICE.submit(new Callable<Void>() {
             @Override
@@ -247,6 +288,8 @@ public class DiaryRepository {
                     public Future<Void> call() throws Exception {
                         deleteDiaryListenableFutureForTransaction = diaryDAO.deleteDiary(deleteDiaryDate);
                         updateDiaryListenableFutureForTransaction = diaryDAO.updateDiary(createDiary);
+                        updateSelectedDiaryItemTitleHistoryListenableFutureForTransaction =
+                                selectedItemTitlesHistoryDAO.insertSelectedDiaryItemTitles(updateTitleList);
                         return null;
                     }
                 });
@@ -258,6 +301,7 @@ public class DiaryRepository {
             future.get();
             deleteDiaryListenableFutureForTransaction.get();
             updateDiaryListenableFutureForTransaction.get();
+            updateSelectedDiaryItemTitleHistoryListenableFutureForTransaction.get();
         }
         catch (ExecutionException ex) {
             Log.d("ROOM通信エラー", "ExecutionException");

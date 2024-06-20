@@ -1,96 +1,43 @@
 package com.websarva.wings.android.zuboradiary.ui.diary.editdiaryselectitemtitle;
 
 import android.app.Application;
-import android.util.Log;
 
 import com.google.common.util.concurrent.ListenableFuture;
+import com.websarva.wings.android.zuboradiary.ui.diary.DiaryDatabase;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 
 public class EditDiarySelectItemTitleRepository {
-    private SelectedItemTitlesHistoryDatabase selectedItemTitlesHistoryDatabase;
+    private DiaryDatabase selectedItemTitlesHistoryDatabase;
     private SelectedItemTitlesHistoryDAO selectedItemTitlesHistoryDAO;
 
     public EditDiarySelectItemTitleRepository(Application application) {
-        this.selectedItemTitlesHistoryDatabase = SelectedItemTitlesHistoryDatabase.getDatabase(application);
-        this.selectedItemTitlesHistoryDAO = selectedItemTitlesHistoryDatabase.createSelectedItemTitlesHistoryDAO();
+        this.selectedItemTitlesHistoryDatabase = DiaryDatabase.getDatabase(application);
+        this.selectedItemTitlesHistoryDAO =
+                selectedItemTitlesHistoryDatabase.createSelectedItemTitlesHistoryDAO();
     }
 
-    public int countSelectedItemTitles() {
-        ListenableFuture<Integer> listenableFutureResult = this.selectedItemTitlesHistoryDAO.countSelectedItemTitles();
-        Integer result = 0;
-        try {
-            result = listenableFutureResult.get();
-        }
-        catch (ExecutionException ex) {
-            Log.d("ROOM通信エラー", "ExecutionException");
-        }
-        catch (InterruptedException ex) {
-            Log.d("ROOM通信エラー", "InterruptedException");
-        }
-        return result;
+    public List<SelectedDiaryItemTitle> loadSelectedDiaryItemTitles(int numTitles, int offset) throws Exception {
+        ListenableFuture<List<SelectedDiaryItemTitle>> listenableFutureResults
+                = this.selectedItemTitlesHistoryDAO.selectSelectedDiaryItemTitles(numTitles, offset);
+        return listenableFutureResults.get();
     }
 
-    public List<DiaryItemTitle> selectSelectedItemTitles(int num) {
-        ListenableFuture<List<DiaryItemTitle>> listenableFutureResults
-                = this.selectedItemTitlesHistoryDAO.selectSelectedItemTitles(num);
-        List<DiaryItemTitle> results = new ArrayList<>();
-        try {
-            results = listenableFutureResults.get();
-        }
-        catch (ExecutionException ex) {
-            Log.d("ROOM通信エラー", "ExecutionException");
-        }
-        catch (InterruptedException ex) {
-            Log.d("ROOM通信エラー", "InterruptedException");
-        }
-        return results;
-    }
-
-    public void insertSelectedItemTitles(List<DiaryItemTitle> list) {
+    public List<Long> saveSelectedItemTitles(List<SelectedDiaryItemTitle> list) throws Exception {
         ListenableFuture<List<Long>> listenableFutureResults =
-                selectedItemTitlesHistoryDAO.insertSelectedItemTitles(list);
-
-        try {
-            listenableFutureResults.get();
-        }
-        catch (ExecutionException ex) {
-            Log.d("ROOM通信エラー", "ExecutionException");
-        }
-        catch (InterruptedException ex) {
-            Log.d("ROOM通信エラー", "InterruptedException");
-        }
+                selectedItemTitlesHistoryDAO.insertSelectedDiaryItemTitles(list);
+        return listenableFutureResults.get();
     }
 
-    public void deleteSelectedItemTitle(DiaryItemTitle title) {
+    public Integer deleteSelectedDiaryItemTitle(SelectedDiaryItemTitle title) throws Exception {
         ListenableFuture<Integer> listenableFutureResult =
-                selectedItemTitlesHistoryDAO.deleteSelectedItemTitle(title);
-
-        try {
-            listenableFutureResult.get();
-        }
-        catch (ExecutionException ex) {
-            Log.d("ROOM通信エラー", "ExecutionException");
-        }
-        catch (InterruptedException ex) {
-            Log.d("ROOM通信エラー", "InterruptedException");
-        }
+                selectedItemTitlesHistoryDAO.deleteSelectedDiaryItemTitle(title);
+        return listenableFutureResult.get();
     }
 
-    public void deleteOldSelectedItemTitles() {
+    public Integer deleteOldSelectedItemTitles() throws Exception {
         ListenableFuture<Integer> listenableFutureResult =
-                selectedItemTitlesHistoryDAO.deleteOldSelectedItemTitles();
-
-        try {
-            listenableFutureResult.get();
-        }
-        catch (ExecutionException ex) {
-            Log.d("ROOM通信エラー", "ExecutionException");
-        }
-        catch (InterruptedException ex) {
-            Log.d("ROOM通信エラー", "InterruptedException");
-        }
+                selectedItemTitlesHistoryDAO.deleteOldSelectedDiaryItemTitles();
+        return listenableFutureResult.get();
     }
 }

@@ -44,8 +44,6 @@ import com.websarva.wings.android.zuboradiary.DateConverter;
 import com.websarva.wings.android.zuboradiary.databinding.FragmentEditDiaryBinding;
 import com.websarva.wings.android.zuboradiary.R;
 import com.websarva.wings.android.zuboradiary.ui.diary.DiaryViewModel;
-import com.websarva.wings.android.zuboradiary.ui.diary.editdiary.EditDiaryFragmentArgs;
-import com.websarva.wings.android.zuboradiary.ui.diary.editdiary.EditDiaryFragmentDirections;
 import com.websarva.wings.android.zuboradiary.ui.diary.editdiaryselectitemtitle.EditDiarySelectItemTitleFragment;
 import com.websarva.wings.android.zuboradiary.ui.diary.editdiaryselectitemtitle.EditDiarySelectItemTitleViewModel;
 
@@ -57,7 +55,7 @@ public class EditDiaryFragment extends Fragment {
 
     // View関係
     private FragmentEditDiaryBinding binding;
-    private final int MAX_ITEMS_COUNT = DiaryViewModel.MAX_ITEMS_COUNT; // 項目入力欄最大数
+    private final int MAX_ITEMS_COUNT = DiaryViewModel.MAX_ITEMS; // 項目入力欄最大数
     private boolean isDeletingItemTransition = false;
     private final String TOOL_BAR_TITLE_NEW = "新規作成";
     private final String TOOL_BAR_TITLE_EDIT = "編集中";
@@ -203,8 +201,6 @@ public class EditDiaryFragment extends Fragment {
                                 && EditDiaryFragment.this.diaryViewModel.getVisibleItemsCount()
                                                                             == deleteItemNumber) {
                             EditDiaryFragment.this.diaryViewModel.deleteItem(deleteItemNumber);
-                            EditDiaryFragment.this.editDiarySelectItemTitleViewModel
-                                    .deleteSavingDiaryItemTitle(deleteItemNumber);
                         } else {
                             EditDiaryFragment.this.isDeletingItemTransition = true;
                             hideItem(deleteItemNumber, false);
@@ -313,8 +309,6 @@ public class EditDiaryFragment extends Fragment {
                                     }
                                 }
                             }
-                            EditDiaryFragment.this.editDiarySelectItemTitleViewModel
-                                    .updateSelectedItemTitleHistory();
 
                             return true;
                         }
@@ -511,8 +505,6 @@ public class EditDiaryFragment extends Fragment {
                         Log.d("20240605", "currentId:Start");
                         if (EditDiaryFragment.this.isDeletingItemTransition) {
                             EditDiaryFragment.this.diaryViewModel.deleteItem(itemNumber);
-                            EditDiaryFragment.this.editDiarySelectItemTitleViewModel
-                                    .deleteSavingDiaryItemTitle(itemNumber);
                             EditDiaryFragment.this.isDeletingItemTransition = false;
                             setupItemLayout();
                         }

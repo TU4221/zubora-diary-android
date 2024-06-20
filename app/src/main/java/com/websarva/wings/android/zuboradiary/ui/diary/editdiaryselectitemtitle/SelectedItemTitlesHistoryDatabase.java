@@ -9,7 +9,7 @@ import androidx.room.RoomDatabase;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 //.createFromAsset("database/myapp.db")
-@Database(entities = {DiaryItemTitle.class}, version = 2, exportSchema = false)
+@Database(entities = {SelectedDiaryItemTitle.class}, version = 2, exportSchema = false)
 public abstract class SelectedItemTitlesHistoryDatabase extends RoomDatabase {
     private static SelectedItemTitlesHistoryDatabase _instance;
     public static final ExecutorService EXECUTOR_SERVICE = Executors.newSingleThreadExecutor();

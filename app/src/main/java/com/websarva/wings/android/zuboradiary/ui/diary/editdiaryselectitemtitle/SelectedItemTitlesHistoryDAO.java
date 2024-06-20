@@ -15,31 +15,21 @@ import java.util.List;
 public interface SelectedItemTitlesHistoryDAO {
     // @Query使用方法下記参照
     // https://developer.android.com/reference/kotlin/androidx/room/Query
-    @Query("SELECT COUNT(*) FROM diary_item_title_history")
-    public ListenableFuture<Integer> countSelectedItemTitles();
 
-    @Query("SELECT * FROM diary_item_title_history ORDER BY log DESC LIMIT :num")
-    public ListenableFuture<List<DiaryItemTitle>> selectSelectedItemTitles(int num);
+    @Query("SELECT * FROM diary_item_title_history ORDER BY log DESC LIMIT :numTitles OFFSET :offset")
+    ListenableFuture<List<SelectedDiaryItemTitle>> selectSelectedDiaryItemTitles(int numTitles, int offset);
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    public ListenableFuture<Long> insertSelectedItemTitles(
-            DiaryItemTitle diaryItemTitle);
-
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    public ListenableFuture<List<Long>> insertSelectedItemTitles(
-                                                            List<DiaryItemTitle> diaryItemTitles);
-
-    @Update
-    public ListenableFuture<Integer> updateSelectedItemTitles(
-                                                            List<DiaryItemTitle> diaryItemTitles);
+    ListenableFuture<List<Long>> insertSelectedDiaryItemTitles(
+            List<SelectedDiaryItemTitle> selectedDiaryItemTitles);
 
     @Delete
-    public ListenableFuture<Integer> deleteSelectedItemTitle(DiaryItemTitle diaryItemTitle);
+    ListenableFuture<Integer> deleteSelectedDiaryItemTitle(SelectedDiaryItemTitle selectedDiaryItemTitle);
 
     // MEMO:SQLITEはDELETE ORDER BYが使用できない。
     /*@Query("DELETE FROM diary_item_title_history ORDER BY log DESC LIMIT ((SELECT COUNT(*) FROM diary_item_title_history) - 50) OFFSET 50")*/
     @Query("DELETE FROM diary_item_title_history WHERE title " +
         "NOT IN (SELECT title FROM diary_item_title_history ORDER BY log DESC LIMIT 50 OFFSET 0)")
-    public ListenableFuture<Integer> deleteOldSelectedItemTitles();
+    ListenableFuture<Integer> deleteOldSelectedDiaryItemTitles();
 
 }

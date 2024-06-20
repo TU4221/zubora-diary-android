@@ -43,8 +43,6 @@ import android.widget.TextView;
 
 import com.websarva.wings.android.zuboradiary.R;
 import com.websarva.wings.android.zuboradiary.databinding.FragmentEditDiarySelectItemTitleBinding;
-import com.websarva.wings.android.zuboradiary.ui.diary.editdiaryselectitemtitle.EditDiarySelectItemTitleFragmentArgs;
-import com.websarva.wings.android.zuboradiary.ui.diary.editdiaryselectitemtitle.EditDiarySelectItemTitleFragmentDirections;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -135,8 +133,20 @@ public class EditDiarySelectItemTitleFragment extends Fragment {
                             savedStateHandle
                                     .get(DeleteConfirmationDialogFragment.KEY_DELETE_LIST_ITEM_POSITION);
                     if (selectedButton == DialogInterface.BUTTON_POSITIVE) {
-                        EditDiarySelectItemTitleFragment.this.editDiarySelectItemTitleViewModel
-                                .deleteSelectedItemTitle(deleteListItemPosition);
+                        try {
+                            EditDiarySelectItemTitleFragment.this.editDiarySelectItemTitleViewModel
+                                    .deleteSelectedItemTitleHistoryItem(deleteListItemPosition);
+                        } catch (Exception e) {
+                            String title = "通信エラー";
+                            String message = "削除に失敗しました。";
+                            navigateMessageDialog(title, message);
+                            SelectedItemTitleHistoryAdapter adapter =
+                                    (SelectedItemTitleHistoryAdapter)
+                                            EditDiarySelectItemTitleFragment.this.binding
+                                                    .recyclerSelectedItemTitleHistory
+                                                    .getAdapter();
+                            adapter.notifyItemChanged(deleteListItemPosition);
+                        }
                     } else {
                         SelectedItemTitleHistoryAdapter adapter =
                                 (SelectedItemTitleHistoryAdapter)
@@ -166,8 +176,8 @@ public class EditDiarySelectItemTitleFragment extends Fragment {
 
 
         // ツールバー設定
-        String title = "項目" + String.valueOf(targetItemNumber) + "タイトル編集中";
-        this.binding.materialToolbarTopAppBar.setTitle(title);
+        String toolBarTitle = "項目" + String.valueOf(targetItemNumber) + "タイトル編集中";
+        this.binding.materialToolbarTopAppBar.setTitle(toolBarTitle);
         this.binding.materialToolbarTopAppBar
                 .setNavigationOnClickListener(new View.OnClickListener() {
                     @Override
@@ -203,7 +213,6 @@ public class EditDiarySelectItemTitleFragment extends Fragment {
                                 .this.binding.editTextNewItemTitle.getText().toString();
                 // 入力タイトルの先頭が空白文字以外(\\S)ならアイテムタイトル更新
                 if (title.matches("\\S+.*")) {
-                    updateItemTitle(title);
                     closeThisFragment(title);
 
                 } else {
@@ -238,14 +247,21 @@ public class EditDiarySelectItemTitleFragment extends Fragment {
         itemTouchHelper.attachToRecyclerView(recyclerSelectedItemTitleHistory);
 
         // 選択履歴読込・表示
-        this.editDiarySelectItemTitleViewModel.loadSelectedItemTitleHistory();
+        try {
+            this.editDiarySelectItemTitleViewModel.loadSelectedItemTitleHistory();
+        } catch (Exception e) {
+            String messageTitle = "通信エラー";
+            String message = "項目タイトル選択履歴の読込に失敗しました。";
+            navigateMessageDialog(messageTitle, message);
+        }
+
         this.editDiarySelectItemTitleViewModel.getLiveSelectedItemTitleHistory()
-                .observe(getViewLifecycleOwner(), new Observer<List<DiaryItemTitle>>() {
+                .observe(getViewLifecycleOwner(), new Observer<List<SelectedDiaryItemTitle>>() {
                     @Override
-                    public void onChanged(List<DiaryItemTitle> diaryItemTitles) {
+                    public void onChanged(List<SelectedDiaryItemTitle> selectedDiaryItemTitles) {
                         List<String> list = new ArrayList<>();
-                        for (DiaryItemTitle diaryItemTitle: diaryItemTitles) {
-                            list.add(diaryItemTitle.getTitle());
+                        for (SelectedDiaryItemTitle selectedDiaryItemTitle : selectedDiaryItemTitles) {
+                            list.add(selectedDiaryItemTitle.getTitle());
                         }
 
                         SelectedItemTitleHistoryAdapter adapter =
@@ -400,7 +416,6 @@ public class EditDiarySelectItemTitleFragment extends Fragment {
                 @Override
                 public void onClick(View v) {
                     String selectedItemTitle = holder.textSelectedItemTitle.getText().toString();
-                    updateItemTitle(selectedItemTitle);
                     closeThisFragment(selectedItemTitle);
                 }
             });
@@ -421,7 +436,7 @@ public class EditDiarySelectItemTitleFragment extends Fragment {
 
         public void changeItem(List<String> list) {
             this.selectedItemTitleList = list;
-            notifyDataSetChanged();
+            notifyDataSetChanged();notifyItemChanged();
         }
 
     }
@@ -514,11 +529,6 @@ public class EditDiarySelectItemTitleFragment extends Fragment {
         }
     }
 
-    private void updateItemTitle(String title) {
-        this.editDiarySelectItemTitleViewModel
-                .updateSavingDiaryItemTitle(this.targetItemNumber, title);
-    }
-
     // EditDiarySelectItemTitleFragmentを閉じる
     private void closeThisFragment(String newItemTitle) {
         SavedStateHandle savedStateHandle =
@@ -530,5 +540,13 @@ public class EditDiarySelectItemTitleFragment extends Fragment {
                 EditDiarySelectItemTitleFragmentDirections
                         .actionSelectItemTitleFragmentToEditDiaryFragment();
         this.navController.navigate(action);
+    }
+
+    private void navigateMessageDialog(String title, String message) {
+        NavDirections action =
+                EditDiarySelectItemTitleFragmentDirections
+                        .actionEditDiarySelectItemTitleFragmentToMessageDialog(
+                                title, message);
+        EditDiarySelectItemTitleFragment.this.navController.navigate(action);
     }
 }
