@@ -51,7 +51,9 @@ public class WordSearchViewModel extends AndroidViewModel {
     public enum LoadType {
         NEW, UPDATE, ADD
     }
-    public void loadWordSearchResultList(LoadType loadType) {
+
+    // TODO:処理内容確認(調整時のコード、コメントが残っている)
+    public void loadWordSearchResultList(LoadType loadType) throws Exception {
         Log.d("20240611", "リスト読込開始");
         List<WordSearchResultListItemDiary> loadedList = new ArrayList<>();
         int loadItemNum;

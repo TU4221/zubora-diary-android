@@ -4,6 +4,7 @@ import android.app.Application;
 import android.util.Log;
 
 import com.google.common.util.concurrent.ListenableFuture;
+import com.websarva.wings.android.zuboradiary.DateConverter;
 import com.websarva.wings.android.zuboradiary.ui.diary.editdiaryselectitemtitle.SelectedDiaryItemTitle;
 import com.websarva.wings.android.zuboradiary.ui.diary.editdiaryselectitemtitle.SelectedItemTitlesHistoryDAO;
 import com.websarva.wings.android.zuboradiary.ui.list.DiaryListItem;
@@ -32,297 +33,143 @@ public class DiaryRepository {
         selectedItemTitlesHistoryDAO = diaryDatabase.createSelectedItemTitlesHistoryDAO();
     }
 
-    public int countDiaries() {
+    public int countDiaries() throws Exception {
         ListenableFuture<Integer> listenableFutureResults = this.diaryDAO.countDiaries();
-        Integer result = 0;
-        try {
-            result = listenableFutureResults.get();
-        }
-        catch (ExecutionException ex) {
-            Log.d("ROOM通信エラー", "ExecutionException");
-        }
-        catch (InterruptedException ex) {
-            Log.d("ROOM通信エラー", "InterruptedException");
-        }
-        return result;
+        return listenableFutureResults.get();
     }
 
-    public boolean hasDiary(String date) {
-        Log.d("20240328",date);
-
-        ListenableFuture<Boolean> existDiaryListenableFuture = diaryDAO.hasDiary(date);
-
-        Boolean hasDiary = false;
-        try {
-            hasDiary = existDiaryListenableFuture.get();
-        }
-        catch (ExecutionException ex) {
-            Log.d("ROOM通信エラー", "ExecutionException");
-        }
-        catch (InterruptedException ex) {
-            Log.d("ROOM通信エラー", "InterruptedException");
-        }
-        Log.d("20240328","hasDiary:" + String.valueOf(hasDiary));
-
-        return hasDiary;
+    public boolean hasDiary(int year, int month, int dayOfMonth) throws Exception {
+        String stringDate = DateConverter.toStringLocalDate(year, month, dayOfMonth);
+        ListenableFuture<Boolean> existDiaryListenableFuture = diaryDAO.hasDiary(stringDate);
+        return existDiaryListenableFuture.get();
     }
 
-    public Diary selectDiary(String date) {
-        Log.d("20240328",date);
-
+    public Diary selectDiary(String date) throws Exception {
         ListenableFuture<Diary> diaryListenableFuture = diaryDAO.selectDiary(date);
-
-        Diary diary = null;
-        try {
-            diary = diaryListenableFuture.get();
-        }
-        catch (ExecutionException ex) {
-            Log.d("ROOM通信エラー", "ExecutionException");
-        }
-        catch (InterruptedException ex) {
-            Log.d("ROOM通信エラー", "InterruptedException");
-        }
-        if (diary == null){
-            Log.d("20240328","Diary = null");
-        }
-
-        return diary;
+        return  diaryListenableFuture.get();
     }
 
-    public Diary selectNewestDiary() {
+    public Diary selectNewestDiary() throws Exception {
         ListenableFuture<Diary> listenableFutureResult = diaryDAO.selectNewestDiary();
-
-        Diary result = null;
-        try {
-            result = listenableFutureResult.get();
-        }
-        catch (ExecutionException ex) {
-            Log.d("ROOM通信エラー", "ExecutionException");
-        }
-        catch (InterruptedException ex) {
-            Log.d("ROOM通信エラー", "InterruptedException");
-        }
-        return result;
+        return listenableFutureResult.get();
     }
 
-    public Diary selectOldestDiary() {
+    public Diary selectOldestDiary() throws Exception {
         ListenableFuture<Diary> listenableFutureResult = diaryDAO.selectOldestDiary();
-
-        Diary result = null;
-        try {
-            result = listenableFutureResult.get();
-        }
-        catch (ExecutionException ex) {
-            Log.d("ROOM通信エラー", "ExecutionException");
-        }
-        catch (InterruptedException ex) {
-            Log.d("ROOM通信エラー", "InterruptedException");
-        }
-        return result;
+        return listenableFutureResult.get();
     }
 
-    public List<DiaryListItem> selectDiaryList(int num, int offset, @Nullable String date) {
+    public List<DiaryListItem> selectDiaryList(int num, int offset, @Nullable String date) throws Exception {
         ListenableFuture<List<DiaryListItem>> listenableFutureResults;
         if (!(date == null)) {
             listenableFutureResults = diaryDAO.selectDiaryList(num, offset, date);
         } else {
             listenableFutureResults = diaryDAO.selectDiaryList(num, offset);
         }
-        List<DiaryListItem> results = null;
-        try {
-            results = listenableFutureResults.get();
-        }
-        catch (ExecutionException ex) {
-            Log.d("ROOM通信エラー", "ExecutionException");
-        }
-        catch (InterruptedException ex) {
-            Log.d("ROOM通信エラー", "InterruptedException");
-        }
-        return results;
+        return listenableFutureResults.get();
     }
 
-    public int countWordSearchResults(String searchWord) {
-        ListenableFuture<Integer> listenableFutureResult;
-        listenableFutureResult = diaryDAO.countWordSearchResults(searchWord);
-        Integer result = 0;
-        try {
-            result = listenableFutureResult.get();
-        }
-        catch (ExecutionException ex) {
-            Log.d("ROOM通信エラー", "ExecutionException");
-        }
-        catch (InterruptedException ex) {
-            Log.d("ROOM通信エラー", "InterruptedException");
-        }
-        return result;
+    public int countWordSearchResults(String searchWord) throws Exception {
+        ListenableFuture<Integer> listenableFutureResult =
+                diaryDAO.countWordSearchResults(searchWord);
+        return listenableFutureResult.get();
     }
 
+    // TODO:下記戻り値である必要があるのか検討
     public ListenableFuture<List<WordSearchResultListItemDiary>> selectWordSearchResultList(
             int num, int offset, String searchWord) {
-
-        Log.d("20240611", "selectWordSearchResultList");
         return diaryDAO.selectWordSearchResultList(num, offset, searchWord);
 
     }
 
-    public List<String> selectDiaryDateList(String dateYearMonth) {
-        ListenableFuture<List<String>> listenableFutureResults;
-        listenableFutureResults = diaryDAO.selectDiaryDateList(dateYearMonth);
-        List<String> results = null;
-        try {
-            results = listenableFutureResults.get();
-        }
-        catch (ExecutionException ex) {
-            Log.d("ROOM通信エラー", "ExecutionException");
-        }
-        catch (InterruptedException ex) {
-            Log.d("ROOM通信エラー", "InterruptedException");
-        }
-        return results;
+    public List<String> selectDiaryDateList(String dateYearMonth) throws Exception {
+        ListenableFuture<List<String>> listenableFutureResults =
+                diaryDAO.selectDiaryDateList(dateYearMonth);
+        return listenableFutureResults.get();
     }
 
-    public void insertDiary(Diary diary, List<SelectedDiaryItemTitle> updateTitleList) {
+    public void insertDiary(Diary diary, List<SelectedDiaryItemTitle> updateTitleList) throws Exception {
         Future<Void> future = DiaryDatabase.EXECUTOR_SERVICE.submit(new Callable<Void>() {
             @Override
-            public Void call() throws Exception {
-                Future<Void> future = diaryDatabase.runInTransaction(new Callable<Future<Void>>() {
+            public Void call(){
+                diaryDatabase.runInTransaction(new Callable<Future<Void>>() {
                     @Override
-                    public Future<Void> call() throws Exception {
-                        insertDiaryListenableFutureForTransaction = diaryDAO.insertDiary(diary);
-                        updateSelectedDiaryItemTitleHistoryListenableFutureForTransaction =
-                                selectedItemTitlesHistoryDAO.insertSelectedDiaryItemTitles(updateTitleList);
+                    public Future<Void> call(){
+                        diaryDAO.insertDiary(diary);
+                        selectedItemTitlesHistoryDAO.insertSelectedDiaryItemTitles(updateTitleList);
                         return null;
                     }
                 });
                 return null;
             }
         });
-
-        try {
-            future.get();
-            insertDiaryListenableFutureForTransaction.get();
-            updateSelectedDiaryItemTitleHistoryListenableFutureForTransaction.get();
-        }
-        catch (ExecutionException ex) {
-            Log.d("ROOM通信エラー", "ExecutionException");
-        }
-        catch (InterruptedException ex) {
-            Log.d("ROOM通信エラー", "InterruptedException");
-        }
+        future.get();
     }
 
-    public void updateDiary(Diary diary, List<SelectedDiaryItemTitle> updateTitleList) {
-
+    public void updateDiary(Diary diary, List<SelectedDiaryItemTitle> updateTitleList) throws Exception {
         Future<Void> future = DiaryDatabase.EXECUTOR_SERVICE.submit(new Callable<Void>() {
             @Override
-            public Void call() throws Exception {
-                Future<Void> future = diaryDatabase.runInTransaction(new Callable<Future<Void>>() {
+            public Void call(){
+                diaryDatabase.runInTransaction(new Callable<Future<Void>>() {
                     @Override
-                    public Future<Void> call() throws Exception {
-                        updateDiaryListenableFutureForTransaction = diaryDAO.updateDiary(diary);
-                        updateSelectedDiaryItemTitleHistoryListenableFutureForTransaction =
-                                selectedItemTitlesHistoryDAO.insertSelectedDiaryItemTitles(updateTitleList);
+                    public Future<Void> call(){
+                        diaryDAO.updateDiary(diary);
+                        selectedItemTitlesHistoryDAO.insertSelectedDiaryItemTitles(updateTitleList);
                         return null;
                     }
                 });
                 return null;
             }
         });
-
-        try {
-            future.get();
-            updateDiaryListenableFutureForTransaction.get();
-            updateSelectedDiaryItemTitleHistoryListenableFutureForTransaction.get();
-        }
-        catch (ExecutionException ex) {
-            Log.d("ROOM通信エラー", "ExecutionException");
-        }
-        catch (InterruptedException ex) {
-            Log.d("ROOM通信エラー", "InterruptedException");
-        }
+        future.get();
     }
 
     public void deleteAndInsertDiary(
-            String deleteDiaryDate, Diary createDiary, List<SelectedDiaryItemTitle> updateTitleList) {
-
+            String deleteDiaryDate, Diary createDiary, List<SelectedDiaryItemTitle> updateTitleList)
+            throws Exception {
         Future<Void> future = DiaryDatabase.EXECUTOR_SERVICE.submit(new Callable<Void>() {
             @Override
-            public Void call() throws Exception {
-                Future<Void> future = diaryDatabase.runInTransaction(new Callable<Future<Void>>() {
+            public Void call(){
+                diaryDatabase.runInTransaction(new Callable<Future<Void>>() {
                     @Override
-                    public Future<Void> call() throws Exception {
-                        deleteDiaryListenableFutureForTransaction = diaryDAO.deleteDiary(deleteDiaryDate);
-                        insertDiaryListenableFutureForTransaction = diaryDAO.insertDiary(createDiary);
-                        updateSelectedDiaryItemTitleHistoryListenableFutureForTransaction =
-                                selectedItemTitlesHistoryDAO.insertSelectedDiaryItemTitles(updateTitleList);
+                    public Future<Void> call(){
+                        diaryDAO.deleteDiary(deleteDiaryDate);
+                        diaryDAO.insertDiary(createDiary);
+                        selectedItemTitlesHistoryDAO
+                                .insertSelectedDiaryItemTitles(updateTitleList);
                         return null;
                     }
                 });
                 return null;
             }
         });
-
-        try {
-            future.get();
-            deleteDiaryListenableFutureForTransaction.get();
-            insertDiaryListenableFutureForTransaction.get();
-            updateSelectedDiaryItemTitleHistoryListenableFutureForTransaction.get();
-        }
-        catch (ExecutionException ex) {
-            Log.d("ROOM通信エラー", "ExecutionException");
-        }
-        catch (InterruptedException ex) {
-            Log.d("ROOM通信エラー", "InterruptedException");
-        }
-
+        future.get();
     }
 
     public void deleteAndUpdateDiary(
-            String deleteDiaryDate, Diary createDiary, List<SelectedDiaryItemTitle> updateTitleList) {
-
+            String deleteDiaryDate, Diary createDiary, List<SelectedDiaryItemTitle> updateTitleList)
+            throws Exception {
         Future<Void> future = DiaryDatabase.EXECUTOR_SERVICE.submit(new Callable<Void>() {
             @Override
-            public Void call() throws Exception {
-                Future<Void> future = diaryDatabase.runInTransaction(new Callable<Future<Void>>() {
+            public Void call(){
+                diaryDatabase.runInTransaction(new Callable<Future<Void>>() {
                     @Override
-                    public Future<Void> call() throws Exception {
-                        deleteDiaryListenableFutureForTransaction = diaryDAO.deleteDiary(deleteDiaryDate);
-                        updateDiaryListenableFutureForTransaction = diaryDAO.updateDiary(createDiary);
-                        updateSelectedDiaryItemTitleHistoryListenableFutureForTransaction =
-                                selectedItemTitlesHistoryDAO.insertSelectedDiaryItemTitles(updateTitleList);
+                    public Future<Void> call(){
+                        diaryDAO.deleteDiary(deleteDiaryDate);
+                        diaryDAO.updateDiary(createDiary);
+                        selectedItemTitlesHistoryDAO
+                                .insertSelectedDiaryItemTitles(updateTitleList);
                         return null;
                     }
                 });
                 return null;
             }
         });
-
-        try {
-            future.get();
-            deleteDiaryListenableFutureForTransaction.get();
-            updateDiaryListenableFutureForTransaction.get();
-            updateSelectedDiaryItemTitleHistoryListenableFutureForTransaction.get();
-        }
-        catch (ExecutionException ex) {
-            Log.d("ROOM通信エラー", "ExecutionException");
-        }
-        catch (InterruptedException ex) {
-            Log.d("ROOM通信エラー", "InterruptedException");
-        }
+        future.get();
     }
 
-    public void deleteDiary(String date) {
-
+    public void deleteDiary(String date) throws Exception {
         ListenableFuture<Integer> diaryListenableFuture = diaryDAO.deleteDiary(date);
-
-        try {
-            diaryListenableFuture.get();
-        }
-        catch (ExecutionException ex) {
-            Log.d("ROOM通信エラー", "ExecutionException");
-        }
-        catch (InterruptedException ex) {
-            Log.d("ROOM通信エラー", "InterruptedException");
-        }
+        diaryListenableFuture.get();
     }
 }

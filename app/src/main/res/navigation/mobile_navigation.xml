@@ -44,6 +44,16 @@
             <action
                 android:id="@+id/action_diary_list_fragment_to_delete_confirmation_dialog"
                 app:destination="@id/navigation_delete_confirmation_dialog_for_diary_list_fragment"/>
+            <action
+                android:id="@+id/action_diary_list_fragment_to_message_dialog"
+                app:destination="@id/navigation_message_dialog">
+            <argument
+                android:name="Title"
+                app:argType="string" />
+            <argument
+                android:name="Message"
+                app:argType="string" />
+            </action>
         </fragment>
         <dialog
             android:id="@+id/navigation_date_picker_dialog_for_diary_list_fragment"
@@ -69,6 +79,16 @@
             <action
                 android:id="@+id/action_navigation_word_search_fragment_to_show_diary_fragment"
                 app:destination="@id/navigation_show_diary_fragment"/>
+            <action
+                android:id="@+id/action_word_search_fragment_to_message_dialog"
+                app:destination="@id/navigation_message_dialog">
+                <argument
+                    android:name="Title"
+                    app:argType="string" />
+                <argument
+                    android:name="Message"
+                    app:argType="string" />
+            </action>
         </fragment>
     </navigation>
 
@@ -98,6 +118,16 @@
                 <argument
                     android:name="edit_diary_date_day_of_month"
                     app:argType="integer" />
+            </action>
+            <action
+                android:id="@+id/action_calendar_fragment_to_message_dialog"
+                app:destination="@id/navigation_message_dialog">
+                <argument
+                    android:name="Title"
+                    app:argType="string" />
+                <argument
+                    android:name="Message"
+                    app:argType="string" />
             </action>
         </fragment>
     </navigation>
@@ -134,14 +164,24 @@
                 android:name="edit_diary_date_day_of_month"
                 app:argType="integer" />
         </action>
+        <action
+            android:id="@+id/action_show_diary_fragment_to_message_dialog"
+            app:destination="@id/navigation_message_dialog">
+            <argument
+                android:name="Title"
+                app:argType="string" />
+            <argument
+                android:name="Message"
+                app:argType="string" />
+        </action>
         <argument
-            android:name="show__diary_date_year"
+            android:name="show_diary_date_year"
             app:argType="integer" />
         <argument
-            android:name="show__diary_date_month"
+            android:name="show_diary_date_month"
             app:argType="integer" />
         <argument
-            android:name="show__diary_date_day_of_month"
+            android:name="show_diary_date_day_of_month"
             app:argType="integer" />
     </fragment>
 
@@ -178,6 +218,16 @@
             <action
                 android:id="@+id/action_edit_diary_fragment_to_update_existing_diary_dialog"
                 app:destination="@id/navigation_update_existing_diary_dialog_for_edit_diary_fragment"/>
+            <action
+                android:id="@+id/action_edit_diary_fragment_to_message_dialog"
+                app:destination="@id/navigation_message_dialog">
+                <argument
+                    android:name="Title"
+                    app:argType="string" />
+                <argument
+                    android:name="Message"
+                    app:argType="string" />
+            </action>
             <argument
                 android:name="isStartDiaryFragment"
                 app:argType="boolean" />

@@ -32,6 +32,8 @@ import com.websarva.wings.android.zuboradiary.MainActivity;
 import com.websarva.wings.android.zuboradiary.R;
 import com.websarva.wings.android.zuboradiary.databinding.FragmentWordSearchBinding;
 import com.websarva.wings.android.zuboradiary.ui.diary.DiaryViewModel;
+import com.websarva.wings.android.zuboradiary.ui.diary.editdiary.EditDiaryFragment;
+import com.websarva.wings.android.zuboradiary.ui.diary.editdiary.EditDiaryFragmentDirections;
 import com.websarva.wings.android.zuboradiary.ui.list.DiaryListFragment;
 import com.websarva.wings.android.zuboradiary.ui.list.DiaryListSetting;
 import com.websarva.wings.android.zuboradiary.ui.list.DiaryYearMonthListBaseViewHolder;
@@ -147,10 +149,17 @@ public class WordSearchFragment extends Fragment {
                         } else {
                             WordSearchFragment.this.wordSearchViewModel
                                     .setIsVisibleSearchWordClearButton(true);
-                            WordSearchFragment.this.wordSearchViewModel
-                                    .loadWordSearchResultList(
-                                            WordSearchViewModel.LoadType.NEW
-                                    );
+                            try {
+                                WordSearchFragment.this.wordSearchViewModel
+                                        .loadWordSearchResultList(
+                                                WordSearchViewModel.LoadType.NEW
+                                        );
+                            } catch (Exception e) {
+                                String messageTitle = "通信エラー";
+                                String message = "日記の読込に失敗しました。";
+                                navigateMessageDialog(messageTitle, message);
+                            }
+
                         }
                         WordSearchFragment.this.beforeText = s;
                     }
@@ -388,8 +397,14 @@ public class WordSearchFragment extends Fragment {
                 //      "RecyclerView.OnScrollListener#onScrolled"が起動するための対策。
                 if (!recyclerView.canScrollVertically(1) && dy != 0) {
                     WordSearchFragment.this.wordSearchViewModel.setIsLoading(true);
-                    WordSearchFragment.this.wordSearchViewModel
-                            .loadWordSearchResultList(WordSearchViewModel.LoadType.ADD);
+                    try {
+                        WordSearchFragment.this.wordSearchViewModel
+                                .loadWordSearchResultList(WordSearchViewModel.LoadType.ADD);
+                    } catch (Exception e) {
+                        String messageTitle = "通信エラー";
+                        String message = "日記の読込に失敗しました。";
+                        navigateMessageDialog(messageTitle, message);
+                    }
                     WordSearchFragment.this.wordSearchViewModel.setIsLoading(false);
                 }
             }
@@ -625,5 +640,13 @@ public class WordSearchFragment extends Fragment {
             fromIndex = end;
         }
         return spannableString;
+    }
+
+    private void navigateMessageDialog(String title, String message) {
+        NavDirections action =
+                WordSearchFragmentDirections
+                        .actionWordSearchFragmentToMessageDialog(
+                                title, message);
+        WordSearchFragment.this.navController.navigate(action);
     }
 }

@@ -8,16 +8,16 @@ import java.time.format.DateTimeFormatter;
 
 public class DateConverter {
 
-    static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy年MM月dd日(E)");
-    static final DateTimeFormatter DATE_TIME_FORMATTER =
+    public static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy年MM月dd日(E)");
+    public static final DateTimeFormatter DATE_TIME_FORMATTER =
             DateTimeFormatter.ofPattern("yyyy年MM月dd日(E) HH:mm:ss");
-    static final DateTimeFormatter DATE_YEAR_MONTH_FORMATTER = DateTimeFormatter.ofPattern("yyyy年MM月");
-    static final int MAX_YEAR = LocalDate.MAX.getYear();
-    static final int MIN_YEAR = LocalDate.MIN.getYear();
-    static final int MAX_MONTH = LocalDate.MAX.getMonthValue();
-    static final int MIN_MONTH = LocalDate.MIN.getMonthValue();
-    static final int MAX_DAY_OF_MONTH = LocalDate.MAX.getDayOfMonth();
-    static final int MIN_DAY_OF_MONTH = LocalDate.MIN.getDayOfMonth();
+    public static final DateTimeFormatter DATE_YEAR_MONTH_FORMATTER = DateTimeFormatter.ofPattern("yyyy年MM月");
+    public static final int MAX_YEAR = LocalDate.MAX.getYear();
+    public static final int MIN_YEAR = LocalDate.MIN.getYear();
+    public static final int MAX_MONTH = LocalDate.MAX.getMonthValue();
+    public static final int MIN_MONTH = LocalDate.MIN.getMonthValue();
+    public static final int MAX_DAY_OF_MONTH = LocalDate.MAX.getDayOfMonth();
+    public static final int MIN_DAY_OF_MONTH = LocalDate.MIN.getDayOfMonth();
 
     public static String toStringLocalDate(long longDate) {
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {

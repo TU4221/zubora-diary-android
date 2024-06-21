@@ -27,7 +27,7 @@ public class CalendarViewModel extends AndroidViewModel {
     }
 
     //既存日記の日付格納
-    public void updateExistedDiaryDateLog(String dateYearMonth) {
+    public void updateExistedDiaryDateLog(String dateYearMonth) throws Exception {
         List<String> existedDiaryDateListForOneMonth =
                 diaryRepository.selectDiaryDateList(dateYearMonth);
         existedDiaryDateLog.put(dateYearMonth, existedDiaryDateListForOneMonth);

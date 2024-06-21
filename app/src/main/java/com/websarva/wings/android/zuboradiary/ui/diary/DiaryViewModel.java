@@ -114,14 +114,10 @@ public class DiaryViewModel extends AndroidViewModel {
         this.log.setValue("");
     }
 
-    public void prepareDiary(int year, int month, int dayOfMonth, boolean isLoading) {
+    public void prepareDiary(int year, int month, int dayOfMonth, boolean isLoading) throws Exception {
         String stringDate = DateConverter.toStringLocalDate(year, month, dayOfMonth);
-        prepareDiary(stringDate, isLoading);
-    }
-
-    public void prepareDiary(String date, boolean isLoading) {
-        this.date.setValue(date);
-        if (isLoading && hasDiary(date)) {
+        this.date.setValue(stringDate);
+        if (isLoading && hasDiary(year, month, dayOfMonth)) {
             loadDiary();
         }
         this.hasPreparedDiary = true;
@@ -132,7 +128,7 @@ public class DiaryViewModel extends AndroidViewModel {
     }
 
 
-    private void loadDiary() {
+    private void loadDiary() throws Exception {
         Diary diary = diaryRepository.selectDiary(this.date.getValue());
         this.date.setValue(diary.getDate());
         this.log.setValue(diary.getLog());
@@ -172,43 +168,39 @@ public class DiaryViewModel extends AndroidViewModel {
         this.loadedDate = this.date.getValue();
     }
 
-    public boolean hasDiary(String date) {
-        return diaryRepository.hasDiary(date);
-    }
-    public boolean hasDiary(int year, int month, int dayOfMonth) {
-        String stringDate = DateConverter.toStringLocalDate(year, month, dayOfMonth);
-        return diaryRepository.hasDiary(stringDate);
+    public boolean hasDiary(int year, int month, int dayOfMonth) throws Exception {
+        return diaryRepository.hasDiary(year, month, dayOfMonth);
     }
 
-    public void saveNewDiary() {
+    public void saveNewDiary() throws Exception {
         Diary diary = createDiary();
         List<SelectedDiaryItemTitle> selectedDiaryItemTitleList = createSelectedDiaryItemTitleList();
         this.diaryRepository.insertDiary(diary, selectedDiaryItemTitleList);
         this.loadedDate = this.date.getValue();
     }
 
-    public void deleteExistingDiaryAndSaveNewDiary() {
+    public void deleteExistingDiaryAndSaveNewDiary() throws Exception {
         Diary diary = createDiary();
         List<SelectedDiaryItemTitle> selectedDiaryItemTitleList = createSelectedDiaryItemTitleList();
         this.diaryRepository.deleteAndInsertDiary(this.loadedDate, diary, selectedDiaryItemTitleList);
         this.loadedDate = this.date.getValue();
     }
 
-    public void updateExistingDiary() {
+    public void updateExistingDiary() throws Exception {
         Diary diary = createDiary();
         List<SelectedDiaryItemTitle> selectedDiaryItemTitleList = createSelectedDiaryItemTitleList();
         this.diaryRepository.updateDiary(diary, selectedDiaryItemTitleList);
         this.loadedDate = this.date.getValue();
     }
 
-    public void deleteExistingDiaryAndUpdateExistingDiary() {
+    public void deleteExistingDiaryAndUpdateExistingDiary() throws Exception {
         Diary diary = createDiary();
         List<SelectedDiaryItemTitle> selectedDiaryItemTitleList = createSelectedDiaryItemTitleList();
         this.diaryRepository.deleteAndUpdateDiary(this.loadedDate, diary, selectedDiaryItemTitleList);
         this.loadedDate = this.date.getValue();
     }
 
-    public void deleteDiary(String date) {
+    public void deleteDiary(String date) throws Exception {
         this.diaryRepository.deleteDiary(date);
     }
 

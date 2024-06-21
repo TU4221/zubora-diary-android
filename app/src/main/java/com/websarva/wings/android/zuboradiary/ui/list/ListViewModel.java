@@ -83,21 +83,29 @@ public class ListViewModel extends AndroidViewModel {
 
                 // データ読込
                 List<DiaryListItem> loadedData = new ArrayList<>();
-                if (ListViewModel.this.sortConditionDate.equals("")) {
-                    loadedData =
-                            ListViewModel.this.diaryRepository.selectDiaryList(
-                                    loadItemNum,
-                                    ListViewModel.this.loadItemOffset,
-                                    null
-                            );
-                } else {
-                    loadedData =
-                            ListViewModel.this.diaryRepository.selectDiaryList(
-                                    loadItemNum,
-                                    ListViewModel.this.loadItemOffset,
-                                    ListViewModel.this.sortConditionDate
-                            );
+                try {
+                    if (ListViewModel.this.sortConditionDate.equals("")) {
+                        loadedData =
+                                ListViewModel.this.diaryRepository.selectDiaryList(
+                                        loadItemNum,
+                                        ListViewModel.this.loadItemOffset,
+                                        null
+                                );
+                    } else {
+                        loadedData =
+                                ListViewModel.this.diaryRepository.selectDiaryList(
+                                        loadItemNum,
+                                        ListViewModel.this.loadItemOffset,
+                                        ListViewModel.this.sortConditionDate
+                                );
+                    }
+                } catch (Exception e) {
+                    // TODO:メインスレッドで処理するようにする。
+                    /*String messageTitle = "通信エラー";
+                    String message = "日記の読込に失敗しました。";
+                    navigateMessageDialog(messageTitle, message);*/
                 }
+
 
                 // 更新用リスト準備
                 List<DiaryYearMonthListItem> updateDiaryList = new ArrayList<>();
@@ -260,7 +268,7 @@ public class ListViewModel extends AndroidViewModel {
         }
     }
 
-    public void deleteDiary(String date) {
+    public void deleteDiary(String date) throws Exception {
         diaryRepository.deleteDiary(date);
         this.loadItemOffset--;
 
@@ -295,16 +303,16 @@ public class ListViewModel extends AndroidViewModel {
 
     }
 
-    public int countDiaries() {
+    public int countDiaries() throws Exception {
         return this.diaryRepository.countDiaries();
     }
 
 
-    public Diary loadNewestDiary() {
+    public Diary loadNewestDiary() throws Exception {
         return this.diaryRepository.selectNewestDiary();
     }
 
-    public Diary loadOldestDiary() {
+    public Diary loadOldestDiary() throws Exception {
         return this.diaryRepository.selectOldestDiary();
     }
 

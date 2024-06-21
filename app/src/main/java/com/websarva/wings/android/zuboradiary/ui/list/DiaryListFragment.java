@@ -58,6 +58,8 @@ import java.util.concurrent.Executors;
 import com.websarva.wings.android.zuboradiary.databinding.FragmentDiaryListBinding;
 import com.websarva.wings.android.zuboradiary.databinding.RowDiaryDayListBinding;
 import com.websarva.wings.android.zuboradiary.ui.diary.DiaryViewModel;
+import com.websarva.wings.android.zuboradiary.ui.diary.editdiaryselectitemtitle.EditDiarySelectItemTitleFragment;
+import com.websarva.wings.android.zuboradiary.ui.diary.editdiaryselectitemtitle.EditDiarySelectItemTitleFragmentDirections;
 import com.websarva.wings.android.zuboradiary.ui.list.wordsearch.WordSearchViewModel;
 
 public class DiaryListFragment extends Fragment {
@@ -166,7 +168,13 @@ public class DiaryListFragment extends Fragment {
                                 selectedMonth
                         );
                         DiaryListFragment.this.diaryListScrollToFirstPosition();
-                        DiaryListFragment.this.listViewModel.loadList(ListViewModel.LoadType.NEW);
+                        try {
+                            DiaryListFragment.this.listViewModel.loadList(ListViewModel.LoadType.NEW);
+                        } catch (Exception e) {
+                            String messageTitle = "通信エラー";
+                            String message = "日記リストの読込に失敗しました。";
+                            navigateMessageDialog(messageTitle, message);
+                        }
                         savedStateHandle.remove(DatePickerDialogFragment.KEY_SELECTED_YEAR);
                         savedStateHandle.remove(DatePickerDialogFragment.KEY_SELECTED_MONTH);
                     }
@@ -177,7 +185,13 @@ public class DiaryListFragment extends Fragment {
                     if (ConfirmDeleteDialogFragmentFragmentResults) {
                         String deleteDiaryDate =
                                 savedStateHandle.get(DeleteConfirmationDialogFragment.KEY_DELETE_DIARY_DATE);
-                        DiaryListFragment.this.listViewModel.deleteDiary(deleteDiaryDate);
+                        try {
+                            DiaryListFragment.this.listViewModel.deleteDiary(deleteDiaryDate);
+                        } catch (Exception e) {
+                            String messageTitle = "通信エラー";
+                            String message = "日記の削除に失敗しました。";
+                            navigateMessageDialog(messageTitle, message);
+                        }
                         savedStateHandle.remove(DeleteConfirmationDialogFragment.KEY_DELETE_DIARY_DATE);
                     }
                 }
@@ -207,14 +221,20 @@ public class DiaryListFragment extends Fragment {
                     @Override
                     public void onClick(View v) {
                         // リスト先頭年月切り替えダイアログ起動
-                        String newestDate = DiaryListFragment.this.listViewModel.loadNewestDiary().getDate();
-                        String oldestDate = DiaryListFragment.this.listViewModel.loadOldestDiary().getDate();
-                        int newestYear = DateConverter.toLocalDate(newestDate).getYear();
-                        int oldestYear = DateConverter.toLocalDate(oldestDate).getYear();
-                        NavDirections action =
-                                DiaryListFragmentDirections
-                                        .actionDiaryListFragmentToDatePickerDialog(newestYear, oldestYear);
-                        DiaryListFragment.this.navController.navigate(action);
+                        try {
+                            String newestDate = DiaryListFragment.this.listViewModel.loadNewestDiary().getDate();
+                            String oldestDate = DiaryListFragment.this.listViewModel.loadOldestDiary().getDate();
+                            int newestYear = DateConverter.toLocalDate(newestDate).getYear();
+                            int oldestYear = DateConverter.toLocalDate(oldestDate).getYear();
+                            NavDirections action =
+                                    DiaryListFragmentDirections
+                                            .actionDiaryListFragmentToDatePickerDialog(newestYear, oldestYear);
+                            DiaryListFragment.this.navController.navigate(action);
+                        } catch (Exception e) {
+                            String messageTitle = "通信エラー";
+                            String message = "日記情報の読込に失敗しました。";
+                            navigateMessageDialog(messageTitle, message);
+                        }
                     }
                 });
         this.binding.materialToolbarTopAppBar
@@ -295,12 +315,19 @@ public class DiaryListFragment extends Fragment {
                 int lastItemViewType = diaryList.get(lastItemPosition).getViewType();
                 // MEMO:下記条件"dy > 0"は検索結果リストが更新されたときに
                 //      "RecyclerView.OnScrollListener#onScrolled"が起動するための対策。
-                if (!isLoading
+                if (!DiaryListFragment.this.isLoading
                         && (firstVisibleItem + visibleItemCount) >= totalItemCount
                         && dy > 0
                         && lastItemViewType == DiaryYearMonthListAdapter.VIEW_TYPE_DIARY) {
-                    isLoading = true;
-                    DiaryListFragment.this.listViewModel.loadList(ListViewModel.LoadType.ADD);
+                    DiaryListFragment.this.isLoading = true;
+                    try {
+                        DiaryListFragment.this.listViewModel.loadList(ListViewModel.LoadType.ADD);
+                    } catch (Exception e) {
+                        String messageTitle = "通信エラー";
+                        String message = "日記リストの読込に失敗しました。";
+                        navigateMessageDialog(messageTitle, message);
+                        DiaryListFragment.this.isLoading = false;
+                    }
                 }
 
             }
@@ -321,13 +348,21 @@ public class DiaryListFragment extends Fragment {
 
 
         // 日記リスト読込
-        if (this.listViewModel.getLiveDataDiaryList().getValue().isEmpty()) {
-            if (this.listViewModel.countDiaries() >= 1) {
-                this.listViewModel.loadList(ListViewModel.LoadType.NEW);
+        try {
+            if (this.listViewModel.getLiveDataDiaryList().getValue().isEmpty()) {
+                int numSavedDiaries = 0;
+                numSavedDiaries = this.listViewModel.countDiaries();
+                if (numSavedDiaries >= 1) {
+                    this.listViewModel.loadList(ListViewModel.LoadType.NEW);
+                }
+            } else {
+                this.isUpdating = true;
+                this.listViewModel.loadList(ListViewModel.LoadType.UPDATE);
             }
-        } else {
-            this.isUpdating = true;
-            this.listViewModel.loadList(ListViewModel.LoadType.UPDATE);
+        } catch (Exception e) {
+            String messageTitle = "通信エラー";
+            String message = "日記リストの読込に失敗しました。";
+            navigateMessageDialog(messageTitle, message);
         }
 
         this.listViewModel.getLiveDataDiaryList().observe(
@@ -726,14 +761,19 @@ public class DiaryListFragment extends Fragment {
 
             // リスト先頭年月切り替えダイアログ起動
             } else if (menuItem.getItemId() == android.R.id.home) {
-
-                String newestDate = DiaryListFragment.this.listViewModel.loadNewestDiary().getDate();
-                String oldestDate = DiaryListFragment.this.listViewModel.loadOldestDiary().getDate();
-                int newestYear = DateConverter.toLocalDate(newestDate).getYear();
-                int oldestYear = DateConverter.toLocalDate(oldestDate).getYear();
-                NavDirections action =
-                        DiaryListFragmentDirections
-                                .actionDiaryListFragmentToDatePickerDialog(newestYear, oldestYear);
+                try {
+                    String newestDate = DiaryListFragment.this.listViewModel.loadNewestDiary().getDate();
+                    String oldestDate = DiaryListFragment.this.listViewModel.loadOldestDiary().getDate();
+                    int newestYear = DateConverter.toLocalDate(newestDate).getYear();
+                    int oldestYear = DateConverter.toLocalDate(oldestDate).getYear();
+                    NavDirections action =
+                            DiaryListFragmentDirections
+                                    .actionDiaryListFragmentToDatePickerDialog(newestYear, oldestYear);
+                } catch (Exception e) {
+                    String messageTitle = "通信エラー";
+                    String message = "日記情報の読込に失敗しました。";
+                    navigateMessageDialog(messageTitle, message);
+                }
                 return true;
 
             } else {
@@ -764,6 +804,14 @@ public class DiaryListFragment extends Fragment {
 
         Log.d("スクロール動作確認", "smoothScrollToPosition()呼出");
         this.binding.recyclerDiaryYearMonthList.smoothScrollToPosition(0);
+    }
+
+    private void navigateMessageDialog(String title, String message) {
+        NavDirections action =
+                DiaryListFragmentDirections
+                        .actionDiaryListFragmentToMessageDialog(
+                                title, message);
+        DiaryListFragment.this.navController.navigate(action);
     }
 
 }

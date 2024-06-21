@@ -24,6 +24,8 @@ import com.websarva.wings.android.zuboradiary.R;
 import com.websarva.wings.android.zuboradiary.databinding.FragmentShowDiaryBinding;
 import com.websarva.wings.android.zuboradiary.ui.ShowDiaryLayout;
 import com.websarva.wings.android.zuboradiary.ui.diary.DiaryViewModel;
+import com.websarva.wings.android.zuboradiary.ui.diary.editdiary.EditDiaryFragment;
+import com.websarva.wings.android.zuboradiary.ui.diary.editdiary.EditDiaryFragmentDirections;
 
 public class ShowDiaryFragment extends Fragment {
 
@@ -91,8 +93,14 @@ public class ShowDiaryFragment extends Fragment {
                 ShowDiaryFragmentArgs.fromBundle(requireArguments()).getShowDiaryDateMonth();
         int showDiaryDateDayOfMonth =
                 ShowDiaryFragmentArgs.fromBundle(requireArguments()).getShowDiaryDateDayOfMonth();
-        this.diaryViewModel.prepareDiary(
-                showDiaryDateYear, showDiaryDateMonth, showDiaryDateDayOfMonth, true);
+        try {
+            this.diaryViewModel.prepareDiary(
+                    showDiaryDateYear, showDiaryDateMonth, showDiaryDateDayOfMonth, true);
+        } catch (Exception e) {
+            String messageTitle = "通信エラー";
+            String message = "日記の読込に失敗しました。";
+            navigateMessageDialog(messageTitle, message);
+        }
 
 
         // ツールバー設定
@@ -205,6 +213,14 @@ public class ShowDiaryFragment extends Fragment {
         } else {
             this.navController.popBackStack();
         }
+    }
+
+    private void navigateMessageDialog(String title, String message) {
+        NavDirections action =
+                ShowDiaryFragmentDirections
+                        .actionShowDiaryFragmentToMessageDialog(
+                                title, message);
+        ShowDiaryFragment.this.navController.navigate(action);
     }
 
 }

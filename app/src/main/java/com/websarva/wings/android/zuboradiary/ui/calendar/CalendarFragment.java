@@ -41,6 +41,8 @@ import com.websarva.wings.android.zuboradiary.ui.diary.showdiary.ShowDiaryFragme
 import com.websarva.wings.android.zuboradiary.ui.diary.DiaryViewModel;
 
 import com.kizitonwose.calendar.view.CalendarView;
+import com.websarva.wings.android.zuboradiary.ui.list.DiaryListFragment;
+import com.websarva.wings.android.zuboradiary.ui.list.DiaryListFragmentDirections;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
@@ -115,7 +117,7 @@ public class CalendarFragment extends Fragment {
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        // 項目タイトル入力フラグメントからデータ受取
+        // 日記表示フラグメントからデータ受取
         SavedStateHandle savedStateHandle =
                 this.navController.getCurrentBackStackEntry().getSavedStateHandle();
         MutableLiveData<String> liveDataShowedDiaryDate =
@@ -127,9 +129,15 @@ public class CalendarFragment extends Fragment {
                 CalendarFragment.this.diaryViewModel.initialize();
                 YearMonth selectedMonth =
                         YearMonth.of(localDate.getYear(), localDate.getMonthValue());
-                selectDate(localDate);
                 CalendarView calendar = CalendarFragment.this.binding.calendar;
                 calendar.scrollToMonth(selectedMonth);
+                try {
+                    selectDate(localDate);
+                } catch (Exception e) {
+                    String messageTitle = "通信エラー";
+                    String message = "日記の読込に失敗しました。";
+                    navigateMessageDialog(messageTitle, message);
+                }
                 savedStateHandle.remove(ShowDiaryFragment.KEY_SHOWED_DIARY_DATE);
             }
         });
@@ -144,14 +152,20 @@ public class CalendarFragment extends Fragment {
         LocalDate selectedDate = this.calendarViewModel.getSelectedDate();
         configureCalendarBinders(daysOfWeek);
         calendar.setup(startMonth,endMonth,daysOfWeek.get(0));
-        if (selectedDate != null) {
-            YearMonth selectedMonth =
-                    YearMonth.of(selectedDate.getYear(), selectedDate.getMonthValue());
-            firstSelectDate(selectedDate);
-            calendar.scrollToMonth(selectedMonth);
-        } else {
-            firstSelectDate(this.today);
-            calendar.scrollToMonth(currentMonth);
+        try {
+            if (selectedDate != null) {
+                YearMonth selectedMonth =
+                        YearMonth.of(selectedDate.getYear(), selectedDate.getMonthValue());
+                calendar.scrollToMonth(selectedMonth);
+                firstSelectDate(selectedDate);
+            } else {
+                calendar.scrollToMonth(currentMonth);
+                firstSelectDate(this.today);
+            }
+        } catch (Exception e) {
+            String messageTitle = "通信エラー";
+            String message = "日記の読込に失敗しました。";
+            navigateMessageDialog(messageTitle, message);
         }
 
         // 天気表示欄設定
@@ -219,7 +233,7 @@ public class CalendarFragment extends Fragment {
 
 
     // CalendarViewで選択された日付の日記を表示
-    private void showSelectedDiary() {
+    private void showSelectedDiary() throws Exception {
 
         LocalDate selectedDate = this.calendarViewModel.getSelectedDate();
         int year = selectedDate.getYear();
@@ -383,7 +397,13 @@ public class CalendarFragment extends Fragment {
                 Log.d("20240408", stringYearMonth + "作成");
 
                 // 対象年月の既存日記確認リスト格納
-                CalendarFragment.this.calendarViewModel.updateExistedDiaryDateLog(stringYearMonth);
+                try {
+                    CalendarFragment.this.calendarViewModel.updateExistedDiaryDateLog(stringYearMonth);
+                } catch (Exception e) {
+                    String messageTitle = "通信エラー";
+                    String message = "日記情報の読込に失敗しました。";
+                    navigateMessageDialog(messageTitle, message);
+                }
 
                 // カレンダーの曜日設定(未設定アイテムのみ設定)
                 if (container.legendLayout.getTag() == null) {
@@ -430,7 +450,13 @@ public class CalendarFragment extends Fragment {
                 @Override
                 public void onClick(View v) {
                     if (calendarDay.getPosition() == DayPosition.MonthDate) {
-                        selectDate(calendarDay.getDate());
+                        try {
+                            selectDate(calendarDay.getDate());
+                        } catch (Exception e) {
+                            String messageTitle = "通信エラー";
+                            String message = "日記の読込に失敗しました。";
+                            navigateMessageDialog(messageTitle, message);
+                        }
                     }
                 }
             });
@@ -448,7 +474,7 @@ public class CalendarFragment extends Fragment {
         }
     }
 
-    private void firstSelectDate(LocalDate date) {
+    private void firstSelectDate(LocalDate date) throws Exception {
         this.calendarViewModel.setSelectedDate(date);
         this.binding.calendar.notifyDateChanged(date);
         updateActionBarDate();
@@ -459,7 +485,7 @@ public class CalendarFragment extends Fragment {
     }
 
     // カレンダー日付選択時処理
-    private void selectDate(LocalDate date) {
+    private void selectDate(LocalDate date) throws Exception {
         CalendarView calendar = this.binding.calendar;
         LocalDate selectedDate = this.calendarViewModel.getSelectedDate();
 
@@ -532,6 +558,20 @@ public class CalendarFragment extends Fragment {
         }
 
         calendar.smoothScrollToMonth(YearMonth.now());
-        selectDate(this.today);
+        try {
+            selectDate(this.today);
+        } catch (Exception e) {
+            String messageTitle = "通信エラー";
+            String message = "日記の読込に失敗しました。";
+            navigateMessageDialog(messageTitle, message);
+        }
+    }
+
+    private void navigateMessageDialog(String title, String message) {
+        NavDirections action =
+                CalendarFragmentDirections
+                        .actionCalendarFragmentToMessageDialog(
+                                title, message);
+        CalendarFragment.this.navController.navigate(action);
     }
 }
