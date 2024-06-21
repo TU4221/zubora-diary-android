@@ -198,13 +198,15 @@ public class ListViewModel extends AndroidViewModel {
             startIndex = date.indexOf("(") + 1;
             endIndex = date.indexOf(")");
             dayOfWeek = date.substring(startIndex, endIndex);
-            diaryDayListItem = new DiaryDayListItem();
-            diaryDayListItem.setYear(Integer.parseInt(year));
-            diaryDayListItem.setMonth(Integer.parseInt(month));
-            diaryDayListItem.setDayOfMonth(Integer.parseInt(dayOfMonth));
-            diaryDayListItem.setDayOfWeek(dayOfWeek);
-            diaryDayListItem.setTitle(title);
-            diaryDayListItem.setPicturePath(picturePath);
+            diaryDayListItem =
+                    new DiaryDayListItem(
+                            Integer.parseInt(year),
+                            Integer.parseInt(month),
+                            Integer.parseInt(dayOfMonth),
+                            dayOfWeek,
+                            title,
+                            picturePath
+                    );
             diaryDayListItemList.add(diaryDayListItem);
         }
 

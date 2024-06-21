@@ -69,6 +69,7 @@ public class DiaryListFragment extends Fragment {
     private final int DIARY_DAY_LIST_ITEM_MARGIN_HORIZONTAL = 32;
     private DiaryListSetting<DiaryYearMonthListViewHolder> diaryListSetting;
     private boolean isLoading = false;
+    private boolean isUpdating = false;
     private DiaryYearMonthListAdapter diaryYearMonthListAdapter;
 
     // Navigation関係
@@ -325,6 +326,7 @@ public class DiaryListFragment extends Fragment {
                 this.listViewModel.loadList(ListViewModel.LoadType.NEW);
             }
         } else {
+            this.isUpdating = true;
             this.listViewModel.loadList(ListViewModel.LoadType.UPDATE);
         }
 
@@ -416,23 +418,30 @@ public class DiaryListFragment extends Fragment {
     public class DiaryDayListDiffUtilItemCallback extends DiffUtil.ItemCallback<DiaryDayListItem> {
         @Override
         public boolean areItemsTheSame(@NonNull DiaryDayListItem oldItem, @NonNull DiaryDayListItem newItem) {
-            if (oldItem.getDayOfMonth() != newItem.getDayOfMonth()) {
-                return false;
-            }
-            if (oldItem.getDayOfWeek().equals(newItem.getDayOfWeek())) {
-                return false;
-            }
-            if (oldItem.getTitle().equals(newItem.getTitle())) {
-                return false;
-            }
-            if (oldItem.getPicturePath().equals(newItem.getPicturePath())) {
-                return false;
-            }
-            return true;
+            return oldItem.getId().equals(newItem.getId());
+            // return true;
         }
 
         @Override
         public boolean areContentsTheSame(@NonNull DiaryDayListItem oldItem, @NonNull DiaryDayListItem newItem) {
+            if (oldItem.getDayOfMonth() != newItem.getDayOfMonth()) {
+                return false;
+            }
+            if (oldItem.getDayOfWeek() != null
+                    && newItem.getDayOfWeek() != null
+                    && !oldItem.getDayOfWeek().equals(newItem.getDayOfWeek())) {
+                return false;
+            }
+            if (oldItem.getTitle() != null
+                    && newItem.getTitle() != null
+                    && !oldItem.getTitle().equals(newItem.getTitle())) {
+                return false;
+            }
+            if (oldItem.getPicturePath() != null
+                    && newItem.getPicturePath() != null
+                    && !oldItem.getPicturePath().equals(newItem.getPicturePath())) {
+                return false;
+            }
             return true;
         }
     }
@@ -582,6 +591,15 @@ public class DiaryListFragment extends Fragment {
             extends DiffUtil.ItemCallback<DiaryYearMonthListItem> {
         @Override
         public boolean areItemsTheSame(@NonNull DiaryYearMonthListItem oldItem, @NonNull DiaryYearMonthListItem newItem) {
+            // MEMO:更新時はリストアイテムを再インスタンス化する為、IDが異なり全アイテムfalseとなり、
+            //      更新時リストが最上部へスクロールされてしまう。これを防ぐために下記処理を記述。
+            // return oldItem.getId().equals(newItem.getId());
+            return true;
+        }
+
+        @Override
+        public boolean areContentsTheSame(@NonNull DiaryYearMonthListItem oldItem, @NonNull DiaryYearMonthListItem newItem) {
+            // 年月
             if (oldItem.getYear() != newItem.getYear()) {
                 return false;
             }
@@ -591,11 +609,8 @@ public class DiaryListFragment extends Fragment {
             if (oldItem.getViewType() != newItem.getViewType()) {
                 return false;
             }
-            return true;
-        }
 
-        @Override
-        public boolean areContentsTheSame(@NonNull DiaryYearMonthListItem oldItem, @NonNull DiaryYearMonthListItem newItem) {
+            // 日
             int oldChildListSize = oldItem.getDiaryDayListItemList().size();
             int newChildListSize = newItem.getDiaryDayListItemList().size();
             if (oldChildListSize != newChildListSize) {
@@ -609,13 +624,19 @@ public class DiaryListFragment extends Fragment {
                 if (oldChildListItem.getDayOfMonth() != newChildListItem.getDayOfMonth()) {
                     return false;
                 }
-                if (oldChildListItem.getDayOfWeek().equals(newChildListItem.getDayOfWeek())) {
+                if (oldChildListItem.getDayOfWeek() != null
+                        && newChildListItem.getDayOfWeek() != null
+                        && !oldChildListItem.getDayOfWeek().equals(newChildListItem.getDayOfWeek())) {
                     return false;
                 }
-                if (oldChildListItem.getTitle().equals(newChildListItem.getTitle())) {
+                if (oldChildListItem.getTitle() != null
+                        && newChildListItem.getTitle() != null
+                        && !oldChildListItem.getTitle().equals(newChildListItem.getTitle())) {
                     return false;
                 }
-                if (oldChildListItem.getPicturePath().equals(newChildListItem.getPicturePath())) {
+                if (oldChildListItem.getPicturePath() != null
+                        && newChildListItem.getPicturePath() != null
+                        && !oldChildListItem.getPicturePath().equals(newChildListItem.getPicturePath())) {
                     return false;
                 }
             }

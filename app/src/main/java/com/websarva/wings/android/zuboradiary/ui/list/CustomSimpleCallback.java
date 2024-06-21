@@ -119,6 +119,7 @@ public class CustomSimpleCallback extends ItemTouchHelper.SimpleCallback {
         @Override
         public boolean onTouch(View view, MotionEvent e) {
             Log.d("スワイプ処理確認", "onTouch：アイテムタッチ");
+            parentRecyclerViewAdapter.recoverOtherSwipedItem(CustomSimpleCallback.this);
             //リサイクルビューに対して初回のスワイプかの確認。
             //swipedPosは初回は -1 。次回以降は基本1つ前のアイテム Pos 。
             if (swipedPos < 0) return false;
@@ -153,7 +154,7 @@ public class CustomSimpleCallback extends ItemTouchHelper.SimpleCallback {
                     swipedPos = -1;
                     //recoverQueue内のスワイプアイテムの履歴を全削除(前回スワイプしたアイテムの状態を更新(スワイプ前の状態に戻す))
                     recoverSwipedItem();
-                    parentRecyclerViewAdapter.recoverOtherSwipedItem(CustomSimpleCallback.this);
+
                 }
             }
             return false;
@@ -234,9 +235,6 @@ public class CustomSimpleCallback extends ItemTouchHelper.SimpleCallback {
         }
         buttonsBuffer.clear();
         swipeThreshold = 0.5f * buttons.size() * BUTTON_WIDTH_DP;
-        //recoverQueue内のスワイプアイテムの履歴を全削除(前回スワイプしたアイテムの状態を更新(スワイプ前の状態に戻す))
-        recoverSwipedItem();
-        parentRecyclerViewAdapter.recoverOtherSwipedItem(CustomSimpleCallback.this);
     }
 
     //アイテムスワイプ後に表示するボタンを作成
@@ -375,13 +373,16 @@ public class CustomSimpleCallback extends ItemTouchHelper.SimpleCallback {
             int pos = recoverQueue.poll();
             if (pos > -1) {
                 //対象のアイテムの表示を更新する。(アイテムの状態をスワイプ前の状態に戻す)
-                /*DiaryListFragment.DiaryDayListAdapter listAdapter =
+                DiaryListFragment.DiaryDayListAdapter listAdapter =
                         (DiaryListFragment.DiaryDayListAdapter) this.recyclerView.getAdapter();
-                listAdapter.submitList(listAdapter.getCurrentList());*/
+                List<DiaryDayListItem> currentList = listAdapter.getCurrentList();
+                DiaryDayListItem currentItem = currentList.get(pos);
+                List<DiaryDayListItem> newList = new ArrayList<>(currentList);
+                DiaryDayListItem newItem = new DiaryDayListItem(currentItem);
+                newList.remove(pos);
+                newList.add(pos, newItem);
+                listAdapter.submitList(newList);
                 Log.d("20240619", "recover");
-                View itemView = this.recyclerView.findViewHolderForAdapterPosition(pos).itemView;
-                getDefaultUIUtil().clearView(itemView.findViewById(R.id.frame_layout_row_diary_day_list));
-                getDefaultUIUtil().clearView(itemView.findViewById(R.id.liner_layout_front));
             }
         }
     }

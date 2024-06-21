@@ -436,7 +436,7 @@ public class EditDiarySelectItemTitleFragment extends Fragment {
 
         public void changeItem(List<String> list) {
             this.selectedItemTitleList = list;
-            notifyDataSetChanged();notifyItemChanged();
+            notifyDataSetChanged();
         }
 
     }
