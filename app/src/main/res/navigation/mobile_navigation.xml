@@ -267,6 +267,9 @@
             <argument
                 android:name="UpdateDiaryDate"
                 app:argType="string" />
+            <argument
+                android:name="UpdateType"
+                app:argType="integer" />
         </dialog>
 
         <fragment

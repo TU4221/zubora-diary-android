@@ -45,9 +45,6 @@ import com.websarva.wings.android.zuboradiary.databinding.FragmentEditDiaryBindi
 import com.websarva.wings.android.zuboradiary.R;
 import com.websarva.wings.android.zuboradiary.ui.diary.DiaryViewModel;
 import com.websarva.wings.android.zuboradiary.ui.diary.editdiaryselectitemtitle.EditDiarySelectItemTitleFragment;
-import com.websarva.wings.android.zuboradiary.ui.diary.editdiaryselectitemtitle.EditDiarySelectItemTitleViewModel;
-import com.websarva.wings.android.zuboradiary.ui.list.DiaryListFragment;
-import com.websarva.wings.android.zuboradiary.ui.list.DiaryListFragmentDirections;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -68,10 +65,13 @@ public class EditDiaryFragment extends Fragment {
 
     // ViewModel
     private DiaryViewModel diaryViewModel;
-    private EditDiarySelectItemTitleViewModel editDiarySelectItemTitleViewModel;
 
     // キーボード関係
     private InputMethodManager inputMethodManager;
+
+    // 上書保存方法
+    public static final int UPDATE_TYPE_UPDATE_ONLY = 0;
+    public static final int UPDATE_TYPE_DELETE_AND_UPDATE = 1;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -80,8 +80,6 @@ public class EditDiaryFragment extends Fragment {
         // ViewModel設定
         ViewModelProvider provider = new ViewModelProvider(requireActivity());
         this.diaryViewModel = provider.get(DiaryViewModel.class);
-        this.editDiarySelectItemTitleViewModel =
-                provider.get(EditDiarySelectItemTitleViewModel.class);
         boolean isStartDiaryFragment =
                 EditDiaryFragmentArgs.fromBundle(requireArguments()).getIsStartDiaryFragment();
         if (isStartDiaryFragment) {
@@ -195,22 +193,37 @@ public class EditDiaryFragment extends Fragment {
                     }
 
                     // 既存日記上書きダイアログフラグメントから結果受取
-                    boolean containsUpdateExistingDiaryDialogFragmentResult =
+                    boolean containsUpdateExistingDiaryDialogFragmentResults =
                             savedStateHandle
-                                    .contains(UpdateExistingDiaryDialogFragment.KEY_SELECTED_BUTTON);
-                    if (containsUpdateExistingDiaryDialogFragmentResult) {
+                                    .contains(UpdateExistingDiaryDialogFragment.KEY_SELECTED_BUTTON)
+                            && savedStateHandle
+                                    .contains(UpdateExistingDiaryDialogFragment.KEY_UPDATE_TYPE);
+                    if (containsUpdateExistingDiaryDialogFragmentResults) {
+                        int updateType =
+                                savedStateHandle.get(UpdateExistingDiaryDialogFragment.KEY_UPDATE_TYPE);
                         try {
-                            EditDiaryFragment.this.diaryViewModel
-                                    .deleteExistingDiaryAndUpdateExistingDiary();
+                            switch (updateType) {
+                                case UPDATE_TYPE_DELETE_AND_UPDATE:
+                                    Log.d("保存形式確認", "日付変更上書保存");
+                                    EditDiaryFragment.this.diaryViewModel
+                                            .deleteExistingDiaryAndSaveDiary();
+                                    break;
+                                case UPDATE_TYPE_UPDATE_ONLY:
+                                default:
+                                    Log.d("保存形式確認", "上書保存");
+                                    EditDiaryFragment.this.diaryViewModel
+                                            .saveDiary();
+                                    break;
+                            }
+                            changeToShowDiaryFragment();
                         } catch (Exception e) {
                             e.printStackTrace();
                             String messageTitle = "通信エラー";
                             String message = "日記の保存に失敗しました。";
                             navigateMessageDialog(messageTitle, message);
                         }
-
-                        changeToShowDiaryFragment();
                         savedStateHandle.remove(UpdateExistingDiaryDialogFragment.KEY_SELECTED_BUTTON);
+                        savedStateHandle.remove(UpdateExistingDiaryDialogFragment.KEY_UPDATE_TYPE);
                     }
 
                     // 項目削除確認ダイアログフラグメントから結果受取
@@ -249,6 +262,7 @@ public class EditDiaryFragment extends Fragment {
                     savedStateHandle.remove(DatePickerDialogFragment.KEY_SELECTED_DAY_OF_MONTH);
                     savedStateHandle.remove(LoadExistingDiaryDialogFragment.KEY_LOAD_DIARY_DATE);
                     savedStateHandle.remove(UpdateExistingDiaryDialogFragment.KEY_SELECTED_BUTTON);
+                    savedStateHandle.remove(UpdateExistingDiaryDialogFragment.KEY_UPDATE_TYPE);
                     savedStateHandle.remove(DeleteConfirmationDialogFragment.KEY_DELETE_ITEM_NUMBER);
                     navBackStackEntry.getLifecycle().removeObserver(lifecycleEventObserver);
                 }
@@ -314,35 +328,44 @@ public class EditDiaryFragment extends Fragment {
                                     EditDiaryFragment.this.diaryViewModel.getLoadedDate();
                             String stringSavingDate =
                                     EditDiaryFragment.this.diaryViewModel.getLiveDate().getValue();
+                            boolean isMatchedDate =
+                                    stringLoadedDate.equals(stringSavingDate);
                             LocalDate savingDate = DateConverter.toLocalDate(stringSavingDate);
+
                             try {
-                                if (isNewDiary) {
-                                    if (EditDiaryFragment.this.diaryViewModel
-                                            .hasDiary(savingDate.getYear(), savingDate.getMonthValue(), savingDate.getDayOfMonth())) {
-                                        Log.d("保存形式確認", "新規上書き保存");
-                                        startUpdateExistingDiaryDialogFragment(stringSavingDate);
-                                    } else {
-                                        Log.d("保存形式確認", "新規保存");
-                                        EditDiaryFragment.this.diaryViewModel.saveNewDiary();
+                                boolean isUpdateDiary =
+                                        EditDiaryFragment.this.diaryViewModel
+                                                .hasDiary(
+                                                        savingDate.getYear(),
+                                                        savingDate.getMonthValue(),
+                                                        savingDate.getDayOfMonth()
+                                                );
+                                if (isUpdateDiary) {
+                                    int updateType;
+                                    if (isMatchedDate) {
+                                        Log.d("保存形式確認", "上書保存");
+                                        EditDiaryFragment.this.diaryViewModel.saveDiary();
                                         changeToShowDiaryFragment();
+                                    } else {
+                                        if (isNewDiary) {
+                                            updateType = UPDATE_TYPE_UPDATE_ONLY;
+                                        } else {
+                                            updateType = UPDATE_TYPE_DELETE_AND_UPDATE;
+                                        }
+                                        startUpdateExistingDiaryDialogFragment(
+                                                stringSavingDate,
+                                                updateType);
                                     }
                                 } else {
-                                    if (stringLoadedDate.equals(stringSavingDate)) {
-                                        Log.d("保存形式確認", "上書き保存");
-                                        EditDiaryFragment.this.diaryViewModel.updateExistingDiary();
-                                        changeToShowDiaryFragment();
+                                    if (isNewDiary) {
+                                        Log.d("保存形式確認", "新規保存");
+                                        EditDiaryFragment.this.diaryViewModel.saveDiary();
                                     } else {
-                                        if(EditDiaryFragment.this.diaryViewModel
-                                                .hasDiary(savingDate.getYear(), savingDate.getMonthValue(), savingDate.getDayOfMonth())) {
-                                            Log.d("保存形式確認", "日付変更上書き保存");
-                                            startUpdateExistingDiaryDialogFragment(stringSavingDate);
-                                        } else {
-                                            Log.d("保存形式確認", "日付変更新規保存");
-                                            EditDiaryFragment.this.diaryViewModel
-                                                    .deleteExistingDiaryAndSaveNewDiary();
-                                            changeToShowDiaryFragment();
-                                        }
+                                        Log.d("保存形式確認", "日付変更新規保存");
+                                        EditDiaryFragment.this.diaryViewModel
+                                                .deleteExistingDiaryAndSaveDiary();
                                     }
+                                    changeToShowDiaryFragment();
                                 }
                             } catch (Exception e) {
                                 e.printStackTrace();
@@ -350,8 +373,6 @@ public class EditDiaryFragment extends Fragment {
                                 String message = "日記の保存に失敗しました。";
                                 navigateMessageDialog(messageTitle, message);
                             }
-
-
                             return true;
                         }
                         return false;
@@ -762,10 +783,10 @@ public class EditDiaryFragment extends Fragment {
     }
 
 
-    public void startUpdateExistingDiaryDialogFragment(String savingDate) {
+    public void startUpdateExistingDiaryDialogFragment(String savingDate, int updateType) {
         NavDirections action =
                 EditDiaryFragmentDirections
-                        .actionEditDiaryFragmentToUpdateExistingDiaryDialog(savingDate);
+                        .actionEditDiaryFragmentToUpdateExistingDiaryDialog(savingDate, updateType);
         this.navController.navigate(action);
     }
 

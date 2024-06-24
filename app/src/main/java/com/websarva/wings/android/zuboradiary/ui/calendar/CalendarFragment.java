@@ -41,8 +41,6 @@ import com.websarva.wings.android.zuboradiary.ui.diary.showdiary.ShowDiaryFragme
 import com.websarva.wings.android.zuboradiary.ui.diary.DiaryViewModel;
 
 import com.kizitonwose.calendar.view.CalendarView;
-import com.websarva.wings.android.zuboradiary.ui.list.DiaryListFragment;
-import com.websarva.wings.android.zuboradiary.ui.list.DiaryListFragmentDirections;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
@@ -227,8 +225,10 @@ public class CalendarFragment extends Fragment {
 
         // MEMO:CalendarViewはRecyclerViewを元に作成されている。
         //      Bind済みの年月、又は既存ホルダーから溢れたを年月を確認する方法が無い。
+        //      ViewModelはMainActivityが消失しない限り持続。
+        //      その為、どこかでクリアをしなければExistedDiaryDateMapの中身が増加していく一方。
         //      既存日記日付リストの不要な年月のリストを都度クリアするタイミングがない為、ここでまとめてクリアする。
-        this.calendarViewModel.clearExistedDiaryDateLog();
+        this.calendarViewModel.clearExistedDiaryDateMap();
     }
 
 
@@ -365,8 +365,10 @@ public class CalendarFragment extends Fragment {
 
                     // ドット有無設定
                     LocalDate localDate = calendarDay.getDate();
-                    String date = DateConverter.toStringLocalDate(localDate);
-                    if (CalendarFragment.this.calendarViewModel.existsDiary(date)) {
+                    int year = localDate.getYear();
+                    int month = localDate.getMonthValue();
+                    int dayOfMonth = localDate.getDayOfMonth();
+                    if (CalendarFragment.this.calendarViewModel.existsDiary(year, month, dayOfMonth)) {
                         viewCalendarDayDot.setVisibility(View.VISIBLE);
                     } else {
                         viewCalendarDayDot.setVisibility(View.INVISIBLE);
@@ -393,12 +395,13 @@ public class CalendarFragment extends Fragment {
                 // カレンダーの年月表示設定
                 DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy年MM月");
                 String stringYearMonth = calendarMonth.getYearMonth().format(formatter);
+                int year = calendarMonth.getYearMonth().getYear();
+                int month = calendarMonth.getYearMonth().getMonthValue();
                 container.textYearMonth.setText(stringYearMonth);
-                Log.d("20240408", stringYearMonth + "作成");
 
                 // 対象年月の既存日記確認リスト格納
                 try {
-                    CalendarFragment.this.calendarViewModel.updateExistedDiaryDateLog(stringYearMonth);
+                    CalendarFragment.this.calendarViewModel.updateExistedDiaryDateLog(year, month);
                 } catch (Exception e) {
                     String messageTitle = "通信エラー";
                     String message = "日記情報の読込に失敗しました。";

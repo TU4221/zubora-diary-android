@@ -19,6 +19,7 @@ public class UpdateExistingDiaryDialogFragment extends DialogFragment {
     private static final String fromClassName =
             "From" + UpdateExistingDiaryDialogFragment.class.getName();
     public static final String KEY_SELECTED_BUTTON = "SelectedButton" + fromClassName;
+    public static final String KEY_UPDATE_TYPE = "UpdateType" + fromClassName;
     private String updateDiaryDate;
 
     @NonNull
@@ -42,6 +43,11 @@ public class UpdateExistingDiaryDialogFragment extends DialogFragment {
                 SavedStateHandle savedStateHandle =
                         navController.getPreviousBackStackEntry().getSavedStateHandle();
                 savedStateHandle.set(KEY_SELECTED_BUTTON, DialogInterface.BUTTON_POSITIVE);
+
+                int updateType =
+                        UpdateExistingDiaryDialogFragmentArgs.fromBundle(requireArguments())
+                                .getUpdateType();
+                savedStateHandle.set(KEY_UPDATE_TYPE, updateType);
             }
         });
         builder.setNegativeButton(R.string.edit_diary_update_diary_dialog_btn_ng, null);

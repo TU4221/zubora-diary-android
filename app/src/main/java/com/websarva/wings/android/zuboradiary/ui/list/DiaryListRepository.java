@@ -4,13 +4,9 @@ import android.app.Application;
 import android.util.Log;
 
 import com.google.common.util.concurrent.ListenableFuture;
-import com.websarva.wings.android.zuboradiary.ui.diary.Diary;
 import com.websarva.wings.android.zuboradiary.ui.diary.DiaryDAO;
 import com.websarva.wings.android.zuboradiary.ui.diary.DiaryDatabase;
 
-import org.jetbrains.annotations.Nullable;
-
-import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 public class DiaryListRepository {
@@ -27,7 +23,7 @@ public class DiaryListRepository {
 
 
     public void deleteDiary(String date) {
-        ListenableFuture<Integer> listenableFutureResult = diaryDAO.deleteDiary(date);
+        ListenableFuture<Integer> listenableFutureResult = diaryDAO.deleteDiaryAsync(date);
 
         try {
             listenableFutureResult.get();

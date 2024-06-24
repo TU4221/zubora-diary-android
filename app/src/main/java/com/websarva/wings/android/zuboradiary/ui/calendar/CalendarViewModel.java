@@ -5,8 +5,6 @@ import android.app.Application;
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 
-import com.websarva.wings.android.zuboradiary.DateConverter;
-import com.websarva.wings.android.zuboradiary.ui.diary.Diary;
 import com.websarva.wings.android.zuboradiary.ui.diary.DiaryRepository;
 
 import java.time.LocalDate;
@@ -17,7 +15,7 @@ import java.util.Map;
 public class CalendarViewModel extends AndroidViewModel {
 
     private DiaryRepository diaryRepository;
-    private Map<String, List<String>> existedDiaryDateLog = new HashMap<>();
+    private Map<Integer, Map<Integer, List<Integer>>> existedDiaryDateMap = new HashMap<>();
     private LocalDate selectedDate;
 
     public CalendarViewModel(@NonNull Application application) {
@@ -27,25 +25,32 @@ public class CalendarViewModel extends AndroidViewModel {
     }
 
     //既存日記の日付格納
-    public void updateExistedDiaryDateLog(String dateYearMonth) throws Exception {
-        List<String> existedDiaryDateListForOneMonth =
-                diaryRepository.selectDiaryDateList(dateYearMonth);
-        existedDiaryDateLog.put(dateYearMonth, existedDiaryDateListForOneMonth);
+    public void updateExistedDiaryDateLog(int year, int month) throws Exception {
+        List<Integer> _existedDiaryDateListForOneMonth =
+                diaryRepository.selectDiaryDateList(year, month);
+        if (this.existedDiaryDateMap.containsKey(year)) {
+            Map<Integer, List<Integer>> existedDiaryDateMonthMap =
+                    this.existedDiaryDateMap.get(year);
+            existedDiaryDateMonthMap.put(month, _existedDiaryDateListForOneMonth);
+        } else {
+            Map<Integer, List<Integer>> existedDiaryDateMonthMap = new HashMap<>();
+            existedDiaryDateMonthMap.put(month, _existedDiaryDateListForOneMonth);
+            this.existedDiaryDateMap.put(year, existedDiaryDateMonthMap);
+        }
+    }
+
+    public void clearExistedDiaryDateMap() {
+        this.existedDiaryDateMap.clear();
 
     }
 
-    public void clearExistedDiaryDateLog() {
-        existedDiaryDateLog.clear();
-
-    }
-
-    public boolean existsDiary(String targetDate) {
-        String targetDateYearMonth = DateConverter.toStringLocalDateYearMonth(targetDate);
-
-        if (existedDiaryDateLog.containsKey(targetDateYearMonth)) {
-            List<String> list = existedDiaryDateLog.get(targetDateYearMonth);
-            for (String existedDiaryDate: list) {
-                if (targetDate.equals(existedDiaryDate)) {
+    public boolean existsDiary(int year, int month, int dayOfMonth) {
+        if (this.existedDiaryDateMap.containsKey(year)) {
+            Map<Integer, List<Integer>> existedDiaryDateMonthMap =
+                    this.existedDiaryDateMap.get(year);
+            List<Integer> existedDiaryDateDayOfMonthList = existedDiaryDateMonthMap.get(month);
+            for (int number: existedDiaryDateDayOfMonthList) {
+                if (number == dayOfMonth) {
                     return true;
                 }
             }

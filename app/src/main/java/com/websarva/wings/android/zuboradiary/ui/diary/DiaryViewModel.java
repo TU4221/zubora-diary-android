@@ -123,11 +123,6 @@ public class DiaryViewModel extends AndroidViewModel {
         this.hasPreparedDiary = true;
     }
 
-    public void prepareNewDiary(int year, int month, int dayOfMonth) {
-
-    }
-
-
     private void loadDiary() throws Exception {
         Diary diary = diaryRepository.selectDiary(this.date.getValue());
         this.date.setValue(diary.getDate());
@@ -172,36 +167,18 @@ public class DiaryViewModel extends AndroidViewModel {
         return diaryRepository.hasDiary(year, month, dayOfMonth);
     }
 
-    public void saveNewDiary() throws Exception {
+    public void saveDiary() throws Exception {
         Diary diary = createDiary();
         List<SelectedDiaryItemTitle> selectedDiaryItemTitleList = createSelectedDiaryItemTitleList();
         this.diaryRepository.insertDiary(diary, selectedDiaryItemTitleList);
         this.loadedDate = this.date.getValue();
     }
 
-    public void deleteExistingDiaryAndSaveNewDiary() throws Exception {
+    public void deleteExistingDiaryAndSaveDiary() throws Exception {
         Diary diary = createDiary();
         List<SelectedDiaryItemTitle> selectedDiaryItemTitleList = createSelectedDiaryItemTitleList();
         this.diaryRepository.deleteAndInsertDiary(this.loadedDate, diary, selectedDiaryItemTitleList);
         this.loadedDate = this.date.getValue();
-    }
-
-    public void updateExistingDiary() throws Exception {
-        Diary diary = createDiary();
-        List<SelectedDiaryItemTitle> selectedDiaryItemTitleList = createSelectedDiaryItemTitleList();
-        this.diaryRepository.updateDiary(diary, selectedDiaryItemTitleList);
-        this.loadedDate = this.date.getValue();
-    }
-
-    public void deleteExistingDiaryAndUpdateExistingDiary() throws Exception {
-        Diary diary = createDiary();
-        List<SelectedDiaryItemTitle> selectedDiaryItemTitleList = createSelectedDiaryItemTitleList();
-        this.diaryRepository.deleteAndUpdateDiary(this.loadedDate, diary, selectedDiaryItemTitleList);
-        this.loadedDate = this.date.getValue();
-    }
-
-    public void deleteDiary(String date) throws Exception {
-        this.diaryRepository.deleteDiary(date);
     }
 
     private Diary createDiary() {
@@ -224,6 +201,25 @@ public class DiaryViewModel extends AndroidViewModel {
         diary.setItem5Comment(this.items[4].comment.getValue().trim());
         diary.setLog(this.log.getValue());
         return diary;
+    }
+
+    private List<SelectedDiaryItemTitle> createSelectedDiaryItemTitleList() {
+        List<SelectedDiaryItemTitle> list = new ArrayList<>();
+        SelectedDiaryItemTitle selectedDiaryItemTitle = new SelectedDiaryItemTitle();
+        for (int i = 0; i < MAX_ITEMS; i++) {
+            if (this.items[i].title.getValue().matches("\\S+.*")
+                    && !this.items[i].titleUpdateLog.isEmpty()) {
+                selectedDiaryItemTitle.setTitle(this.items[i].title.getValue());
+                selectedDiaryItemTitle.setLog(this.items[i].titleUpdateLog);
+                list.add(selectedDiaryItemTitle);
+                selectedDiaryItemTitle = new SelectedDiaryItemTitle();
+            }
+        }
+        return list;
+    }
+
+    public void deleteDiary(String date) throws Exception {
+        this.diaryRepository.deleteDiary(date);
     }
 
     public void updateDate(int year, int month, int dayOfMonth) {
@@ -299,21 +295,7 @@ public class DiaryViewModel extends AndroidViewModel {
         }
     }
 
-    private List<SelectedDiaryItemTitle> createSelectedDiaryItemTitleList() {
-        List<SelectedDiaryItemTitle> list = new ArrayList<>();
-        SelectedDiaryItemTitle selectedDiaryItemTitle = new SelectedDiaryItemTitle();
-        for (int i = 0; i < MAX_ITEMS; i++) {
-            if (this.items[i].title.getValue().matches("\\S+.*")
-                    && !this.items[i].titleUpdateLog.isEmpty()) {
-                selectedDiaryItemTitle.setTitle(this.items[i].title.getValue());
-                selectedDiaryItemTitle.setLog(this.items[i].titleUpdateLog);
-                Log.d("20240620", this.items[i].title.getValue() + ":" + this.items[i].titleUpdateLog);
-                list.add(selectedDiaryItemTitle);
-                selectedDiaryItemTitle = new SelectedDiaryItemTitle();
-            }
-        }
-        return list;
-    }
+
 
 
     // Getter/Setter
