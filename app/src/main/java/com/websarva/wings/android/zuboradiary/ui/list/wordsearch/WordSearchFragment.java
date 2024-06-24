@@ -52,7 +52,7 @@ public class WordSearchFragment extends Fragment {
     private final int DIARY_DAY_LIST_ITEM_MARGIN_VERTICAL = 16;
     private final int DIARY_DAY_LIST_ITEM_MARGIN_HORIZONTAL = 32;
     private DiaryListSetting<DiaryListFragment.DiaryYearMonthListViewHolder> diaryListSetting;
-    private String beforeText = "";
+    private String beforeText = ""; // 二重検索防止用
 
     // Navigation関係
     private NavController navController;
@@ -138,6 +138,8 @@ public class WordSearchFragment extends Fragment {
                 .observe(getViewLifecycleOwner(), new Observer<String>() {
                     @Override
                     public void onChanged(String s) {
+                        // HACK:キーワードの入力時と確定時に検索Observerが起動してしまい
+                        //      同じキーワードで二重に検索してしまう。防止策として下記条件追加。
                         if (s.equals(WordSearchFragment.this.beforeText)) {
                             return;
                         }
@@ -183,7 +185,6 @@ public class WordSearchFragment extends Fragment {
                 }
             }
         });
-        this.wordSearchViewModel.setIsVisibleSearchWordClearButton(false);
         this.binding.imageButtonKeyWordClear.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
