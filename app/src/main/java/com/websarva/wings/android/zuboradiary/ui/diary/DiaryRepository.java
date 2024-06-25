@@ -33,8 +33,13 @@ public class DiaryRepository {
         selectedItemTitlesHistoryDAO = diaryDatabase.createSelectedItemTitlesHistoryDAO();
     }
 
-    public int countDiaries() throws Exception {
-        ListenableFuture<Integer> listenableFutureResults = this.diaryDAO.countDiariesAsync();
+    public int countDiaries(@Nullable String date) throws Exception {
+        ListenableFuture<Integer> listenableFutureResults;
+        if (!(date == null)) {
+            listenableFutureResults = this.diaryDAO.countDiariesAsync(date);
+        } else {
+            listenableFutureResults = this.diaryDAO.countDiariesAsync();
+        }
         return listenableFutureResults.get();
     }
 

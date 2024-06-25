@@ -25,14 +25,25 @@ public class ListViewModel extends AndroidViewModel {
     private DiaryRepository diaryRepository;
     private MutableLiveData<List<DiaryYearMonthListItem>> diaryList =
             new MutableLiveData<>(new ArrayList<>());
+    private boolean isLoading;
+    private MutableLiveData<Boolean> isVisibleUpdateProgressBar = new MutableLiveData<>();
     private final int LOAD_ITEM_NUM = 10; // TODO:仮数値の為、最後に設定
     private int loadItemOffset = 0;
     private String sortConditionDate = "";
+    private ExecutorService executorService;
+    private int Count = 0;
 
 
     public ListViewModel(@NonNull Application application) {
         super(application);
-        diaryRepository = new DiaryRepository(getApplication());
+        this.diaryRepository = new DiaryRepository(getApplication());
+        this.executorService = Executors.newSingleThreadExecutor();
+        initialize();
+    }
+
+    public void initialize() {
+        this.isLoading = false;
+        this.isVisibleUpdateProgressBar.setValue(false);
     }
 
     public enum LoadType {
@@ -40,14 +51,14 @@ public class ListViewModel extends AndroidViewModel {
     }
 
     public void loadList(LoadType loadType) {
-        if (loadType == LoadType.NEW) {
-            ListViewModel.this.diaryList.setValue(new ArrayList<>());
-        }
-        ExecutorService executorService = Executors.newSingleThreadExecutor();
+        ListViewModel.this.isLoading = true;
         executorService.submit(new Runnable() {
             @Override
             public void run() {
+                Log.d("20240625", loadType.toString());
+                Log.d("20240625", String.valueOf(++Count));
                 Log.d("リスト読込確認", "起動");
+                ListViewModel.this.isLoading = true;
                 int loadItemNum;
                 if (loadType == LoadType.UPDATE) {
                     loadItemNum = ListViewModel.this.loadItemOffset;
@@ -58,25 +69,32 @@ public class ListViewModel extends AndroidViewModel {
                     // LoadType.NEW
                     loadItemNum = ListViewModel.this.LOAD_ITEM_NUM;
                     ListViewModel.this.loadItemOffset = 0;
-                    ListViewModel.this.diaryList.postValue(new ArrayList<>());
                 }
 
                 // 現時点のDiaryListを保持
-                List<DiaryYearMonthListItem> previousDiaryList =
-                        ListViewModel.this.diaryList.getValue();
+                List<DiaryYearMonthListItem> previousDiaryList;
+                if (loadType == LoadType.NEW) {
+                    previousDiaryList = new ArrayList<>();
+                } else {
+                    previousDiaryList = new ArrayList<>(ListViewModel.this.diaryList.getValue());
+                }
 
                 // ProgressBar追加
                 List<DiaryYearMonthListItem> diaryListContainingProgressBar = new ArrayList<>();
-                DiaryYearMonthListItem progressBar = new DiaryYearMonthListItem();
-                progressBar.setViewType(
-                        DiaryListFragment.DiaryYearMonthListAdapter.VIEW_TYPE_PROGRESS_BAR);
                 diaryListContainingProgressBar.addAll(previousDiaryList);
-                diaryListContainingProgressBar.add(progressBar);
+                if (loadType == LoadType.UPDATE) {
+                    ListViewModel.this.isVisibleUpdateProgressBar.postValue(true);
+                } else {
+                    DiaryYearMonthListItem progressBar = new DiaryYearMonthListItem();
+                    progressBar.setViewType(
+                            DiaryListFragment.DiaryYearMonthListAdapter.VIEW_TYPE_PROGRESS_BAR);
+                    diaryListContainingProgressBar.add(progressBar);
+                }
                 ListViewModel.this.diaryList.postValue(diaryListContainingProgressBar);
 
                 // TODO:ProgressBarを表示させる為に仮で記述
                 try {
-                    Thread.sleep(1000);
+                    Thread.sleep(3000);
                 } catch (InterruptedException e) {
                     throw new RuntimeException(e);
                 }
@@ -105,6 +123,7 @@ public class ListViewModel extends AndroidViewModel {
                     String message = "日記の読込に失敗しました。";
                     navigateMessageDialog(messageTitle, message);*/
                 }
+                Log.d("20240625", "読込数(変換前)：" + String.valueOf(loadedData.size()));
 
 
                 // 更新用リスト準備
@@ -122,7 +141,7 @@ public class ListViewModel extends AndroidViewModel {
                 }
 
                 // 読込データを日記リストへ追加
-                ListViewModel.this.loadItemOffset += loadItemNum;
+                ListViewModel.this.loadItemOffset += loadedData.size();
                 List<DiaryYearMonthListItem> convertedList = toDiaryYearMonthListFormat(loadedData);
                 if (loadType == LoadType.ADD) {
                     // 前回の読込リストの最終アイテムの年月取得
@@ -146,24 +165,44 @@ public class ListViewModel extends AndroidViewModel {
                     // そこにDiaryDayListItemを足し込む
                     if (previousDiaryYearMonthListLastItemYear == additionalDiaryListFirstItemYear
                             && previousDiaryYearMonthListLastItemMonth == additionalDiaryListFirstItemMonth) {
+
                         List<DiaryDayListItem> previousDiaryDayListItemList =
-                                previousDiaryYearMonthListLastItem.getDiaryDayListItemList();
+                                new ArrayList<>(previousDiaryYearMonthListLastItem.getDiaryDayListItemList());
                         List<DiaryDayListItem> additionalDiaryDayListItemList =
                                 additionalDiaryListFirstItem.getDiaryDayListItemList();
+
                         previousDiaryDayListItemList.addAll(additionalDiaryDayListItemList);
+                        DiaryYearMonthListItem newDiaryYearMonthListItem =
+                                new DiaryYearMonthListItem(previousDiaryList.get(previousDiaryListLastItemPosition));
+                        newDiaryYearMonthListItem.setDiaryDayListItemList(previousDiaryDayListItemList);
+                        previousDiaryList.remove(previousDiaryListLastItemPosition);
+                        previousDiaryList.add(previousDiaryListLastItemPosition, newDiaryYearMonthListItem);
                         convertedList.remove(0);
                     }
 
                     updateDiaryList.addAll(previousDiaryList);
                     updateDiaryList.addAll(convertedList);
-                    ListViewModel.this.diaryList.postValue(updateDiaryList);
                 } else {
                     updateDiaryList.addAll(convertedList);
-                    ListViewModel.this.diaryList.postValue(updateDiaryList);
                 }
+                Log.d("20240625", "読込数(変換後)：" + String.valueOf(convertedList.size()));
 
-                // TODO:DiaryRepositoryをまとめてから残日記を確認するメソッドを下記条件にあてはめる。
-                if (false) {
+
+                // 次回読み込む日記あり確認
+                int numExistingDiaries = 0;
+                String date = null;
+                if (!ListViewModel.this.sortConditionDate.isEmpty()) {
+                    date = ListViewModel.this.sortConditionDate;
+                }
+                try {
+                    numExistingDiaries =
+                            ListViewModel.this.diaryRepository
+                                    .countDiaries(date);
+                } catch (Exception e) {
+                    // TODO:例外処理方法検討
+                }
+                boolean existsDiaries = ListViewModel.this.loadItemOffset < numExistingDiaries;
+                if (!existsDiaries) {
                     DiaryYearMonthListItem noDiaryMessage = new DiaryYearMonthListItem();
                     noDiaryMessage.setViewType(
                             DiaryListFragment.DiaryYearMonthListAdapter.VIEW_TYPE_NO_DIARY_MESSAGE);
@@ -171,6 +210,8 @@ public class ListViewModel extends AndroidViewModel {
                 }
 
                 ListViewModel.this.diaryList.postValue(updateDiaryList);
+                ListViewModel.this.isVisibleUpdateProgressBar.postValue(false);
+                ListViewModel.this.isLoading = false;
             }
         });
 
@@ -253,6 +294,10 @@ public class ListViewModel extends AndroidViewModel {
         diaryYearMonthListItem.setDiaryDayListItemList(sortingList);
         diaryYearMonthListItem.setViewType(VIEW_TYPE_DIARY);
         diaryYearMonthListItemList.add(diaryYearMonthListItem);
+        for(DiaryDayListItem item :sortingList) {
+            String date = DateConverter.toStringLocalDate(item.getYear(), item.getMonth(), item.getDayOfMonth());
+            Log.d("20240625", date);
+        }
     }
 
     public void updateSortConditionDate(int year, int month) {
@@ -304,7 +349,7 @@ public class ListViewModel extends AndroidViewModel {
     }
 
     public int countDiaries() throws Exception {
-        return this.diaryRepository.countDiaries();
+        return this.diaryRepository.countDiaries(null);
     }
 
 
@@ -323,5 +368,13 @@ public class ListViewModel extends AndroidViewModel {
     }
     public void setLiveDataDiaryList(List<DiaryYearMonthListItem> list) {
         this.diaryList.setValue(list);
+    }
+
+    public boolean getIsLoading() {
+        return this.isLoading;
+    }
+
+    public LiveData<Boolean> getLiveIsVisibleUpdateProgressBar() {
+        return this.isVisibleUpdateProgressBar;
     }
 }

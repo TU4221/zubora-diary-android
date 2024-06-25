@@ -10,9 +10,10 @@
             type="com.websarva.wings.android.zuboradiary.ui.list.ListViewModel" />
     </data>
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:orientation="vertical"
         tools:context=".ui.list.DiaryListFragment">
 
         <com.google.android.material.appbar.MaterialToolbar
@@ -26,34 +27,48 @@
             app:menu="@menu/diary_list_toolbar_menu"
             app:navigationIcon="@drawable/ic_calendar_month_24"
             app:title="@string/app_name"
-            app:titleCentered="true"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:titleCentered="true"/>
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/recycler_diary_year_month_list"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:scrollbars="none"
-            android:transitionGroup="true"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/material_toolbar_top_app_bar"
-            app:layout_constraintVertical_chainStyle="packed" />
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
 
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/fab_edit_diary"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="16dp"
-            android:layout_marginBottom="16dp"
-            android:clickable="true"
-            android:src="@android:drawable/ic_menu_edit"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent" />
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recycler_diary_year_month_list"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scrollbars="none"
+                android:transitionGroup="true"/>
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:visibility="@{list_view_model.liveIsVisibleUpdateProgressBar ? View.VISIBLE : View.INVISIBLE}">
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@color/gray"
+                    android:alpha="0.5"/>
+
+                <ProgressBar
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center" />
+
+            </FrameLayout>
+
+
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:id="@+id/fab_edit_diary"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom|right"
+                android:layout_marginEnd="16dp"
+                android:layout_marginBottom="16dp"
+                android:clickable="true"
+                android:src="@android:drawable/ic_menu_edit" />
+
+        </FrameLayout>
+    </LinearLayout>
 </layout>

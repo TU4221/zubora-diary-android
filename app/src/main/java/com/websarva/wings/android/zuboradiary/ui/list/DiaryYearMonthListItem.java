@@ -1,5 +1,9 @@
 package com.websarva.wings.android.zuboradiary.ui.list;
 
+import android.os.Build;
+
+import androidx.annotation.NonNull;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -10,6 +14,41 @@ public class DiaryYearMonthListItem {
     private int month;
     private List<DiaryDayListItem> diaryDayListItemList = new ArrayList<>();
     private int viewType;
+
+    public DiaryYearMonthListItem() {
+    }
+
+    public DiaryYearMonthListItem(
+            int year, int month, List<DiaryDayListItem> diaryDayListItemList, int viewType) {
+        this.year = year;
+        this.month = month;
+        this.diaryDayListItemList = diaryDayListItemList;
+        this.viewType = viewType;
+    }
+
+    public DiaryYearMonthListItem(DiaryYearMonthListItem diaryYearMonthListItem) {
+        this.year = diaryYearMonthListItem.year;
+        this.month = diaryYearMonthListItem.month;
+        this.diaryDayListItemList = diaryYearMonthListItem.diaryDayListItemList;
+        this.viewType = diaryYearMonthListItem.viewType;
+    }
+
+    // Object#clone例外処理:https://yujisoftware.hatenablog.com/entry/CloneNotSupportedException
+    @NonNull
+    @Override
+    public DiaryYearMonthListItem clone() {
+        DiaryYearMonthListItem clone = null;
+        try {
+            clone = (DiaryYearMonthListItem) super.clone();
+        } catch (CloneNotSupportedException e) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                throw new InternalError(e);
+            } else {
+                throw new RuntimeException(e.getMessage());
+            }
+        }
+        return clone;
+    }
 
     public String getId() {
         return id;

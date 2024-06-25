@@ -71,7 +71,6 @@ public class DiaryListFragment extends Fragment {
     private final int DIARY_DAY_LIST_ITEM_MARGIN_HORIZONTAL = 32;
     private DiaryListSetting<DiaryYearMonthListViewHolder> diaryListSetting;
     private boolean isLoading = false;
-    private boolean isUpdating = false;
     private DiaryYearMonthListAdapter diaryYearMonthListAdapter;
 
     // Navigation関係
@@ -79,7 +78,6 @@ public class DiaryListFragment extends Fragment {
 
     // ViewModel
     private ListViewModel listViewModel;
-    private DiaryViewModel diaryViewModel;
     private WordSearchViewModel wordSearchViewModel;
 
     @Override
@@ -90,7 +88,6 @@ public class DiaryListFragment extends Fragment {
         // ViewModel設定
         ViewModelProvider provider = new ViewModelProvider(requireActivity());
         this.listViewModel = provider.get(ListViewModel.class);
-        this.diaryViewModel = provider.get(DiaryViewModel.class);
         this.wordSearchViewModel = provider.get(WordSearchViewModel.class);
 
         // Navigation設定
@@ -168,6 +165,7 @@ public class DiaryListFragment extends Fragment {
                                 selectedMonth
                         );
                         DiaryListFragment.this.diaryListScrollToFirstPosition();
+
                         try {
                             DiaryListFragment.this.listViewModel.loadList(ListViewModel.LoadType.NEW);
                         } catch (Exception e) {
@@ -315,18 +313,16 @@ public class DiaryListFragment extends Fragment {
                 int lastItemViewType = diaryList.get(lastItemPosition).getViewType();
                 // MEMO:下記条件"dy > 0"は検索結果リストが更新されたときに
                 //      "RecyclerView.OnScrollListener#onScrolled"が起動するための対策。
-                if (!DiaryListFragment.this.isLoading
+                if (!DiaryListFragment.this.listViewModel.getIsLoading()
                         && (firstVisibleItem + visibleItemCount) >= totalItemCount
                         && dy > 0
                         && lastItemViewType == DiaryYearMonthListAdapter.VIEW_TYPE_DIARY) {
-                    DiaryListFragment.this.isLoading = true;
                     try {
                         DiaryListFragment.this.listViewModel.loadList(ListViewModel.LoadType.ADD);
                     } catch (Exception e) {
                         String messageTitle = "通信エラー";
                         String message = "日記リストの読込に失敗しました。";
                         navigateMessageDialog(messageTitle, message);
-                        DiaryListFragment.this.isLoading = false;
                     }
                 }
 
@@ -356,7 +352,6 @@ public class DiaryListFragment extends Fragment {
                     this.listViewModel.loadList(ListViewModel.LoadType.NEW);
                 }
             } else {
-                this.isUpdating = true;
                 this.listViewModel.loadList(ListViewModel.LoadType.UPDATE);
             }
         } catch (Exception e) {
@@ -375,16 +370,6 @@ public class DiaryListFragment extends Fragment {
                                         DiaryListFragment.this.binding
                                                 .recyclerDiaryYearMonthList.getAdapter();
                         diaryYearMonthListAdapter.submitList(diaryListItems);
-                        if (diaryListItems.isEmpty()) {
-                            isLoading = false;
-                        } else {
-                            int lastItemPosition = diaryListItems.size() - 1;
-                            int lastItemViewType = diaryListItems.get(lastItemPosition).getViewType();
-                            if (lastItemViewType == DiaryYearMonthListAdapter.VIEW_TYPE_DIARY
-                                    || lastItemViewType == DiaryYearMonthListAdapter.VIEW_TYPE_NO_DIARY_MESSAGE) {
-                                isLoading = false;
-                            }
-                        }
                     }
                 }
         );
@@ -648,6 +633,8 @@ public class DiaryListFragment extends Fragment {
             // 日
             int oldChildListSize = oldItem.getDiaryDayListItemList().size();
             int newChildListSize = newItem.getDiaryDayListItemList().size();
+            Log.d("20240625", "oldChildListSize:" + String.valueOf(oldChildListSize));
+            Log.d("20240625", "newChildListSize:" + String.valueOf(newChildListSize));
             if (oldChildListSize != newChildListSize) {
                 return false;
             }

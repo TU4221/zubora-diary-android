@@ -17,6 +17,8 @@ public interface DiaryDAO {
     // https://developer.android.com/reference/kotlin/androidx/room/Query
     @Query("SELECT COUNT(*) FROM diaries")
     ListenableFuture<Integer> countDiariesAsync();
+    @Query("SELECT COUNT(*) FROM diaries WHERE date < :startDate")
+    ListenableFuture<Integer> countDiariesAsync(String startDate);
     @Query("SELECT EXISTS (SELECT 1 FROM diaries WHERE date = :date)")
     ListenableFuture<Boolean> hasDiaryAsync(String date);
 
