@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-public class DiaryYearMonthListItem {
+public class DiaryYearMonthListItem implements Cloneable {
     private final String id = UUID.randomUUID().toString();
     private int year;
     private int month;
@@ -40,6 +40,12 @@ public class DiaryYearMonthListItem {
         DiaryYearMonthListItem clone = null;
         try {
             clone = (DiaryYearMonthListItem) super.clone();
+            List<DiaryDayListItem> cloneDiaryDayList = new ArrayList<>();
+            for (DiaryDayListItem item : this.diaryDayListItemList) {
+                DiaryDayListItem cloneItem = item.clone();
+                cloneDiaryDayList.add(cloneItem);
+            }
+            clone.diaryDayListItemList = cloneDiaryDayList;
         } catch (CloneNotSupportedException e) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                 throw new InternalError(e);

@@ -11,6 +11,7 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
@@ -70,7 +71,6 @@ public class DiaryListFragment extends Fragment {
     private final int DIARY_DAY_LIST_ITEM_MARGIN_VERTICAL = 16;
     private final int DIARY_DAY_LIST_ITEM_MARGIN_HORIZONTAL = 32;
     private DiaryListSetting<DiaryYearMonthListViewHolder> diaryListSetting;
-    private boolean isLoading = false;
     private DiaryYearMonthListAdapter diaryYearMonthListAdapter;
 
     // Navigation関係
@@ -166,13 +166,17 @@ public class DiaryListFragment extends Fragment {
                         );
                         DiaryListFragment.this.diaryListScrollToFirstPosition();
 
-                        try {
-                            DiaryListFragment.this.listViewModel.loadList(ListViewModel.LoadType.NEW);
-                        } catch (Exception e) {
-                            String messageTitle = "通信エラー";
-                            String message = "日記リストの読込に失敗しました。";
-                            navigateMessageDialog(messageTitle, message);
-                        }
+                        DiaryListFragment.this.listViewModel.loadList(
+                                ListViewModel.LoadType.NEW,
+                                new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        String messageTitle = "通信エラー";
+                                        String message = "日記リストの読込に失敗しました。";
+                                        navigateMessageDialog(messageTitle, message);
+                                    }
+                                });
+
                         savedStateHandle.remove(DatePickerDialogFragment.KEY_SELECTED_YEAR);
                         savedStateHandle.remove(DatePickerDialogFragment.KEY_SELECTED_MONTH);
                     }
@@ -317,13 +321,18 @@ public class DiaryListFragment extends Fragment {
                         && (firstVisibleItem + visibleItemCount) >= totalItemCount
                         && dy > 0
                         && lastItemViewType == DiaryYearMonthListAdapter.VIEW_TYPE_DIARY) {
-                    try {
-                        DiaryListFragment.this.listViewModel.loadList(ListViewModel.LoadType.ADD);
-                    } catch (Exception e) {
-                        String messageTitle = "通信エラー";
-                        String message = "日記リストの読込に失敗しました。";
-                        navigateMessageDialog(messageTitle, message);
-                    }
+                    DiaryListFragment.this.listViewModel
+                            .loadList(
+                                    ListViewModel.LoadType.ADD,
+                                    new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            String messageTitle = "通信エラー";
+                                            String message = "日記リストの読込に失敗しました。";
+                                            navigateMessageDialog(messageTitle, message);
+                                        }
+                                    }
+                            );
                 }
 
             }
@@ -344,20 +353,42 @@ public class DiaryListFragment extends Fragment {
 
 
         // 日記リスト読込
-        try {
-            if (this.listViewModel.getLiveDataDiaryList().getValue().isEmpty()) {
-                int numSavedDiaries = 0;
+        if (this.listViewModel.getLiveDataDiaryList().getValue().isEmpty()) {
+            int numSavedDiaries = 0;
+            try {
                 numSavedDiaries = this.listViewModel.countDiaries();
-                if (numSavedDiaries >= 1) {
-                    this.listViewModel.loadList(ListViewModel.LoadType.NEW);
-                }
-            } else {
-                this.listViewModel.loadList(ListViewModel.LoadType.UPDATE);
+            } catch (Exception e) {
+                String messageTitle = "通信エラー";
+                String message = "日記リストの読込に失敗しました。";
+                navigateMessageDialog(messageTitle, message);
             }
-        } catch (Exception e) {
-            String messageTitle = "通信エラー";
-            String message = "日記リストの読込に失敗しました。";
-            navigateMessageDialog(messageTitle, message);
+            if (numSavedDiaries >= 1) {
+                this.listViewModel
+                        .loadList(
+                                ListViewModel.LoadType.NEW,
+                                new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        String messageTitle = "通信エラー";
+                                        String message = "日記リストの読込に失敗しました。";
+                                        navigateMessageDialog(messageTitle, message);
+                                    }
+                                }
+                        );
+            }
+        } else {
+            this.listViewModel
+                    .loadList(
+                            ListViewModel.LoadType.UPDATE,
+                            new Runnable() {
+                                @Override
+                                public void run() {
+                                    String messageTitle = "通信エラー";
+                                    String message = "日記リストの読込に失敗しました。";
+                                    navigateMessageDialog(messageTitle, message);
+                                }
+                            }
+                    );
         }
 
         this.listViewModel.getLiveDataDiaryList().observe(
@@ -373,6 +404,14 @@ public class DiaryListFragment extends Fragment {
                     }
                 }
         );
+
+        this.binding.viewDiaryListProgressBar.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                v.performClick();
+                return true;
+            }
+        });
     }
 
 
@@ -439,7 +478,6 @@ public class DiaryListFragment extends Fragment {
         @Override
         public boolean areItemsTheSame(@NonNull DiaryDayListItem oldItem, @NonNull DiaryDayListItem newItem) {
             return oldItem.getId().equals(newItem.getId());
-            // return true;
         }
 
         @Override

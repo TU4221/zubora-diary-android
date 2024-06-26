@@ -33,11 +33,19 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:visibility="@{list_view_model.liveIsVisibleDiaryList ? View.INVISIBLE : View.VISIBLE}"
+                android:gravity="center"
+                android:text="保存されている日記がありません。"/>
+
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/recycler_diary_year_month_list"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:scrollbars="none"
+                android:visibility="@{list_view_model.liveIsVisibleDiaryList ? View.VISIBLE : View.INVISIBLE}"
                 android:transitionGroup="true"/>
 
             <FrameLayout
@@ -46,6 +54,7 @@
                 android:visibility="@{list_view_model.liveIsVisibleUpdateProgressBar ? View.VISIBLE : View.INVISIBLE}">
 
                 <View
+                    android:id="@+id/view_diary_list_progress_bar"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:background="@color/gray"
