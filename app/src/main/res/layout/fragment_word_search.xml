@@ -79,38 +79,45 @@
                 android:id="@+id/liner_layout_word_search_results"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:orientation="vertical"
-                android:visibility="@{word_search_view_model.isVisibleResults ? View.VISIBLE : View.GONE}">
+                android:orientation="vertical" >
 
                 <TextView
                     android:id="@+id/text_word_search_results"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="@{Integer.toString(word_search_view_model.resultNum) + @string/word_search_results_num_comment}"
+                    android:text="@{Integer.toString(word_search_view_model.numWordSearchResults) + @string/word_search_results_num_comment}"
                     android:paddingHorizontal="8dp"
-                    android:paddingVertical="8dp"/>
+                    android:paddingVertical="8dp"
+                    android:visibility="@{word_search_view_model.isVisibleNumWordSearchResults ? View.VISIBLE : View.GONE}" />
 
-                <FrameLayout
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/recycler_word_search_results"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
-
-                    <androidx.recyclerview.widget.RecyclerView
-                        android:id="@+id/recycler_word_search_results"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:scrollbars="none"
-                        android:transitionGroup="true" />
-
-                </FrameLayout>
-
-                <ProgressBar
-                    android:id="@+id/progress_bar_word_search_results"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:background="?attr/colorSurface"
-                    android:visibility="@{word_search_view_model.isLoading ? View.VISIBLE : View.GONE}" />
+                    android:layout_height="match_parent"
+                    android:scrollbars="none"
+                    android:transitionGroup="true"
+                    android:visibility="@{word_search_view_model.isVisibleResultList ? View.VISIBLE : View.INVISIBLE}"/>
 
             </LinearLayout>
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:visibility="@{word_search_view_model.isVisibleUpdateProgressBar ? View.VISIBLE : View.INVISIBLE}">
+
+                <View
+                    android:id="@+id/view_diary_list_progress_bar"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@color/gray"
+                    android:alpha="0.5"/>
+
+                <ProgressBar
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center" />
+
+            </FrameLayout>
 
             <View
                 android:id="@+id/view_for_hiding_keyboard"

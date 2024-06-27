@@ -71,7 +71,6 @@ public class DiaryListFragment extends Fragment {
     private final int DIARY_DAY_LIST_ITEM_MARGIN_VERTICAL = 16;
     private final int DIARY_DAY_LIST_ITEM_MARGIN_HORIZONTAL = 32;
     private DiaryListSetting<DiaryYearMonthListViewHolder> diaryListSetting;
-    private DiaryYearMonthListAdapter diaryYearMonthListAdapter;
 
     // Navigation関係
     private NavController navController;
@@ -283,7 +282,7 @@ public class DiaryListFragment extends Fragment {
         RecyclerView recyclerDiaryYearMonthList = this.binding.recyclerDiaryYearMonthList;
         recyclerDiaryYearMonthList
                 .setLayoutManager(this.diaryListYearMonthLinearLayoutManager);
-        this.diaryYearMonthListAdapter =
+        DiaryYearMonthListAdapter diaryYearMonthListAdapter =
                 new DiaryYearMonthListAdapter(new DiaryYearMonthListDiffUtilItemCallback());
         recyclerDiaryYearMonthList.setAdapter(diaryYearMonthListAdapter);
         // HACK:下記問題が発生する為アイテムアニメーションを無効化
@@ -306,15 +305,13 @@ public class DiaryListFragment extends Fragment {
 
 
                 // 日記リスト追加読込
-                int firstVisibleItem =
-                        DiaryListFragment.this.diaryListYearMonthLinearLayoutManager
-                                .findFirstVisibleItemPosition();
+                LinearLayoutManager layoutManager =
+                        (LinearLayoutManager) recyclerView.getLayoutManager();
+                int firstVisibleItem = layoutManager.findFirstVisibleItemPosition();
                 int visibleItemCount = recyclerView.getChildCount();
-                int totalItemCount =
-                        DiaryListFragment.this.diaryListYearMonthLinearLayoutManager.getItemCount();
-                List<DiaryYearMonthListItem> diaryList = DiaryListFragment.this.listViewModel.getLiveDataDiaryList().getValue();
-                int lastItemPosition = diaryList.size() - 1;
-                int lastItemViewType = diaryList.get(lastItemPosition).getViewType();
+                int totalItemCount = layoutManager.getItemCount();
+                int lastItemPosition = totalItemCount - 1;
+                int lastItemViewType = recyclerView.getAdapter().getItemViewType(lastItemPosition);
                 // MEMO:下記条件"dy > 0"は検索結果リストが更新されたときに
                 //      "RecyclerView.OnScrollListener#onScrolled"が起動するための対策。
                 if (!DiaryListFragment.this.listViewModel.getIsLoading()
@@ -600,7 +597,7 @@ public class DiaryListFragment extends Fragment {
                 DiaryYearMonthListItem item = getItem(position);
                 int diaryYear = item.getYear();
                 int diaryMonth = item.getMonth();
-                List<DiaryDayListItem> diaryDayListItemList = item.getDiaryDayListItemList();
+                List<DiaryDayListItem> diaryDayList = item.getDiaryDayListItemList();
 
                 // セクションバー設定
                 // 左端に余白を持たせる為、最初にスペースを入力。
@@ -617,7 +614,7 @@ public class DiaryListFragment extends Fragment {
                 DiaryDayListAdapter diaryDayListAdapter =
                         new DiaryDayListAdapter(new DiaryDayListDiffUtilItemCallback());
                 _holder.recyclerDayList.setAdapter(diaryDayListAdapter);
-                diaryDayListAdapter.submitList(diaryDayListItemList);
+                diaryDayListAdapter.submitList(diaryDayList);
             }
 
         }
@@ -629,6 +626,7 @@ public class DiaryListFragment extends Fragment {
         }
 
         // 日記リスト(年月)の指定したアイテムを削除。
+        // TODO:スワイプ機能搭載後不要か判断
         public void deleteItem(int position) {
             this.diaryYearMonthList.remove(position);
             notifyItemRemoved(position);

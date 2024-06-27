@@ -1,16 +1,24 @@
 package com.websarva.wings.android.zuboradiary.ui.diary;
 
+import static com.websarva.wings.android.zuboradiary.ui.list.wordsearch.WordSearchFragment.WordSearchResultYearMonthListAdapter.VIEW_TYPE_DIARY;
+
 import android.app.Application;
+import android.text.SpannableString;
+import android.text.Spanned;
+import android.text.style.BackgroundColorSpan;
 
 import com.google.common.util.concurrent.ListenableFuture;
 import com.websarva.wings.android.zuboradiary.DateConverter;
+import com.websarva.wings.android.zuboradiary.R;
 import com.websarva.wings.android.zuboradiary.ui.diary.editdiaryselectitemtitle.SelectedDiaryItemTitle;
 import com.websarva.wings.android.zuboradiary.ui.diary.editdiaryselectitemtitle.SelectedItemTitlesHistoryDAO;
 import com.websarva.wings.android.zuboradiary.ui.list.DiaryDayListItem;
 import com.websarva.wings.android.zuboradiary.ui.list.DiaryListFragment;
 import com.websarva.wings.android.zuboradiary.ui.list.DiaryListItem;
 import com.websarva.wings.android.zuboradiary.ui.list.DiaryYearMonthListItem;
+import com.websarva.wings.android.zuboradiary.ui.list.wordsearch.WordSearchResultDayListItem;
 import com.websarva.wings.android.zuboradiary.ui.list.wordsearch.WordSearchResultListItemDiary;
+import com.websarva.wings.android.zuboradiary.ui.list.wordsearch.WordSearchResultYearMonthListItem;
 
 import org.jetbrains.annotations.Nullable;
 
@@ -21,11 +29,13 @@ import java.util.concurrent.Future;
 import java.util.function.Consumer;
 
 public class DiaryRepository {
+    Application application;
     private DiaryDatabase diaryDatabase;
     DiaryDAO diaryDAO;
     SelectedItemTitlesHistoryDAO selectedItemTitlesHistoryDAO;
 
     public DiaryRepository(Application application) {
+        this.application = application;
         diaryDatabase = DiaryDatabase.getDatabase(application);
         diaryDAO = diaryDatabase.createDiaryDAO();
         selectedItemTitlesHistoryDAO = diaryDatabase.createSelectedItemTitlesHistoryDAO();
@@ -33,7 +43,7 @@ public class DiaryRepository {
 
     public int countDiaries(@Nullable String date) throws Exception {
         ListenableFuture<Integer> listenableFutureResults;
-        if (!(date == null)) {
+        if (date != null && !date.isEmpty()) {
             listenableFutureResults = this.diaryDAO.countDiariesAsync(date);
         } else {
             listenableFutureResults = this.diaryDAO.countDiariesAsync();
@@ -78,8 +88,7 @@ public class DiaryRepository {
     }
 
     private List<DiaryYearMonthListItem> toDiaryYearMonthListFormat(List<DiaryListItem> beforeList) {
-        // 型変換:List<DiaryListItem> -> List<Map<String, Object>>
-        List<DiaryDayListItem> diaryDayListItemList = new ArrayList<>();
+        List<DiaryDayListItem> diaryDayList = new ArrayList<>();
         DiaryDayListItem diaryDayListItem;
         String date;
         String title;
@@ -116,22 +125,22 @@ public class DiaryRepository {
                             title,
                             picturePath
                     );
-            diaryDayListItemList.add(diaryDayListItem);
+            diaryDayList.add(diaryDayListItem);
         }
 
         // 日記リストを月別に振り分ける
         List<DiaryDayListItem> sortingList= new ArrayList<>();
-        List<DiaryYearMonthListItem> diaryYearMonthListItemList = new ArrayList<>();
+        List<DiaryYearMonthListItem> diaryYearMonthList = new ArrayList<>();
         int sortingYear = 0;
         int sortingMonth = 0;
 
-        for (DiaryDayListItem day: diaryDayListItemList) {
+        for (DiaryDayListItem day: diaryDayList) {
             int _year = day.getYear();
             int _Month = day.getMonth();
 
             if (sortingYear != 0 && sortingMonth != 0
                     && (_year != sortingYear || _Month != sortingMonth)) {
-                diaryYearMonthListItemList.add(
+                diaryYearMonthList.add(
                         new DiaryYearMonthListItem(sortingYear, sortingMonth, sortingList, VIEW_TYPE_DIARY)
                 );
                 sortingList= new ArrayList<>();
@@ -140,11 +149,11 @@ public class DiaryRepository {
             sortingYear = _year;
             sortingMonth = _Month;
         }
-        diaryYearMonthListItemList.add(
+        diaryYearMonthList.add(
                 new DiaryYearMonthListItem(sortingYear, sortingMonth, sortingList, VIEW_TYPE_DIARY)
         );
 
-        return diaryYearMonthListItemList;
+        return diaryYearMonthList;
     }
 
     public int countWordSearchResults(String searchWord) throws Exception {
@@ -153,11 +162,160 @@ public class DiaryRepository {
         return listenableFutureResult.get();
     }
 
-    // TODO:下記戻り値である必要があるのか検討
-    public ListenableFuture<List<WordSearchResultListItemDiary>> selectWordSearchResultList(
-            int num, int offset, String searchWord) {
-        return diaryDAO.selectWordSearchResultListAsync(num, offset, searchWord);
+    public List<WordSearchResultYearMonthListItem> selectWordSearchResultList(
+            int num, int offset, String searchWord) throws Exception {
+        ListenableFuture<List<WordSearchResultListItemDiary>> listenableFutureResults =
+                diaryDAO.selectWordSearchResultListAsync(num, offset, searchWord);
+        List<WordSearchResultListItemDiary> loadedData = listenableFutureResults.get();
+        List<WordSearchResultYearMonthListItem> convertedList = new ArrayList<>();
+        if (!loadedData.isEmpty()) {
+            convertedList = toWordSearchResultYearMonthListFormat(loadedData, searchWord);
+        }
+        return convertedList;
+    }
 
+    private List<WordSearchResultYearMonthListItem> toWordSearchResultYearMonthListFormat(
+            List<WordSearchResultListItemDiary> beforeList, String searchWord) {
+        List<WordSearchResultDayListItem> dayList = new ArrayList<>();
+        WordSearchResultDayListItem dayListItem;
+        String date;
+        String year;
+        String month;
+        String dayOfMonth;
+        String dayOfWeek;
+        SpannableString title;
+        int itemNumber;
+        SpannableString itemTitle;
+        SpannableString itemComment;
+
+        int startIndex;
+        int endIndex;
+        for (WordSearchResultListItemDiary item: beforeList) {
+            date = item.getDate();
+            startIndex = 0;
+            endIndex = date.indexOf("年");
+            year = date.substring(startIndex, endIndex);
+            startIndex = endIndex + 1;
+            endIndex = date.indexOf("月");
+            month = date.substring(startIndex, endIndex);
+            startIndex = endIndex + 1;
+            endIndex = date.indexOf("日");
+            dayOfMonth = date.substring(startIndex, endIndex);
+            startIndex = date.indexOf("(") + 1;
+            endIndex = date.indexOf(")");
+            dayOfWeek = date.substring(startIndex, endIndex);
+
+            title = createSpannableString(item.getTitle(), searchWord);
+
+            String regex = ".*" + searchWord + ".*";
+            String[] itemTitles = {
+                    item.getItem1Title(),
+                    item.getItem2Title(),
+                    item.getItem3Title(),
+                    item.getItem4Title(),
+                    item.getItem5Title(),
+            };
+            String[] itemComments = {
+                    item.getItem1Comment(),
+                    item.getItem2Comment(),
+                    item.getItem3Comment(),
+                    item.getItem4Comment(),
+                    item.getItem5Comment(),
+            };
+            itemNumber = 0;
+            itemTitle = new SpannableString("");
+            itemComment = new SpannableString("");
+            for (int i = 0; i < itemTitles.length; i++) {
+                // HACK:タイトル、コメントは未入力の場合空文字("")が代入されるはずだが、
+                //      nullの項目が存在する為、下記対策をとる。
+                //      (例外：項目1のみ入力の場合は、2以降はnullとなる)
+                if (itemTitles[i] == null) {
+                    itemTitles[i] = "";
+                }
+                if (itemComments[i] == null) {
+                    itemComments[i] = "";
+                }
+                if (itemTitles[i].matches(regex)
+                        || itemComments[i].matches(regex)) {
+                    itemNumber = i + 1;
+                    itemTitle =
+                            createSpannableString(itemTitles[i], searchWord);
+                    itemComment =
+                            createSpannableString(itemComments[i], searchWord);
+                    break;
+                }
+                if (i == (itemTitles.length - 1)) {
+                    itemNumber = 1;
+                    itemTitle =
+                            createSpannableString(itemTitles[0], searchWord);
+                    itemComment =
+                            createSpannableString(itemComments[0], searchWord);
+                }
+            }
+
+            dayListItem =
+                    new WordSearchResultDayListItem(
+                            Integer.parseInt(year),
+                            Integer.parseInt(month),
+                            Integer.parseInt(dayOfMonth),
+                            dayOfWeek,
+                            title,
+                            itemNumber,
+                            itemTitle,
+                            itemComment
+                    );
+            dayList.add(dayListItem);
+        }
+
+        // 日記リストを月別に振り分ける
+        List<WordSearchResultDayListItem> sortingList= new ArrayList<>();
+        WordSearchResultYearMonthListItem monthListItem =
+                new WordSearchResultYearMonthListItem();
+        List<WordSearchResultYearMonthListItem> monthList = new ArrayList<>();
+        int sortingYear = 0;
+        int sortingMonth = 0;
+
+        for (WordSearchResultDayListItem day: dayList) {
+            int _year = day.getYear();
+            int _Month = day.getMonth();
+
+            if (sortingYear != 0 && sortingMonth != 0
+                    && (_year != sortingYear || _Month != sortingMonth)) {
+                monthList.add(
+                        new WordSearchResultYearMonthListItem(sortingYear, sortingMonth, sortingList, VIEW_TYPE_DIARY));
+                sortingList= new ArrayList<>();
+            }
+            sortingList.add(day);
+            sortingYear = _year;
+            sortingMonth = _Month;
+        }
+
+        monthList.add(
+                new WordSearchResultYearMonthListItem(sortingYear, sortingMonth, sortingList, VIEW_TYPE_DIARY));
+
+        return monthList;
+    }
+
+    // 対象ワードをマーキング
+    private SpannableString createSpannableString(String string, String targetWord) {
+        SpannableString spannableString = new SpannableString(string);
+        BackgroundColorSpan backgroundColorSpan =
+                new BackgroundColorSpan(
+                        application.getResources().getColor(R.color.gray)
+                );
+        int fromIndex = 0;
+        while (string.indexOf(targetWord, fromIndex) != -1) {
+            int start = string.indexOf(targetWord, fromIndex);
+            int end = start + targetWord.length();
+            spannableString.setSpan(
+                    backgroundColorSpan,
+                    start,
+                    end,
+                    Spanned.SPAN_INCLUSIVE_INCLUSIVE
+            );
+            fromIndex = end;
+        }
+        return spannableString;
     }
 
     public List<Integer> selectDiaryDateList(int year, int month) throws Exception {

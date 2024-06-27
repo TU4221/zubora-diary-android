@@ -25,14 +25,12 @@ import java.util.concurrent.Executors;
 public class ListViewModel extends AndroidViewModel {
 
     private DiaryRepository diaryRepository;
-    private MutableLiveData<List<DiaryYearMonthListItem>> diaryList =
-            new MutableLiveData<>(new ArrayList<>());
+    private MutableLiveData<List<DiaryYearMonthListItem>> diaryList = new MutableLiveData<>();
     private boolean isLoading;
     private  MutableLiveData<Boolean> isVisibleDiaryList = new MutableLiveData<>();
     private MutableLiveData<Boolean> isVisibleUpdateProgressBar = new MutableLiveData<>();
     private final int LOAD_ITEM_NUM = 10; // TODO:仮数値の為、最後に設定
-    private int loadItemOffset = 0;
-    private String sortConditionDate = "";
+    private String sortConditionDate;
     private ExecutorService executorService;
 
 
@@ -44,9 +42,11 @@ public class ListViewModel extends AndroidViewModel {
     }
 
     public void initialize() {
+        this.diaryList.setValue(new ArrayList<>());
         this.isLoading = false;
         this.isVisibleUpdateProgressBar.setValue(false);
         this.isVisibleUpdateProgressBar.setValue(false);
+        this.sortConditionDate = "";
     }
 
     public enum LoadType {
@@ -54,7 +54,6 @@ public class ListViewModel extends AndroidViewModel {
     }
 
     public void loadList(LoadType loadType, Runnable runnable) {
-        ListViewModel.this.isLoading = true;
         Handler handler = HandlerCompat.createAsync(Looper.getMainLooper());
 
         executorService.submit(new Runnable() {
@@ -186,14 +185,10 @@ public class ListViewModel extends AndroidViewModel {
 
                 // 次回読み込む日記あり確認
                 int numExistingDiaries = 0;
-                String date = null;
-                if (!ListViewModel.this.sortConditionDate.isEmpty()) {
-                    date = ListViewModel.this.sortConditionDate;
-                }
                 try {
                     numExistingDiaries =
                             ListViewModel.this.diaryRepository
-                                    .countDiaries(date);
+                                    .countDiaries(ListViewModel.this.sortConditionDate);
                 } catch (Exception e) {
                     ListViewModel.this.diaryList.postValue(previousDiaryList);
                     ListViewModel.this.isVisibleUpdateProgressBar.postValue(false);

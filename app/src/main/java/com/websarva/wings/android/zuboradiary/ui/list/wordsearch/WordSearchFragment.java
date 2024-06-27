@@ -1,5 +1,7 @@
 package com.websarva.wings.android.zuboradiary.ui.list.wordsearch;
 
+import static com.websarva.wings.android.zuboradiary.ui.list.wordsearch.WordSearchFragment.WordSearchResultYearMonthListAdapter.VIEW_TYPE_DIARY;
+
 import android.graphics.Rect;
 import android.os.Bundle;
 
@@ -12,7 +14,9 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.NavDirections;
 import androidx.navigation.fragment.NavHostFragment;
+import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.text.SpannableString;
@@ -27,23 +31,21 @@ import android.widget.TextView;
 
 import com.google.android.material.transition.platform.MaterialFadeThrough;
 import com.google.android.material.transition.platform.MaterialSharedAxis;
+import com.websarva.wings.android.zuboradiary.DateConverter;
 import com.websarva.wings.android.zuboradiary.Keyboard;
 import com.websarva.wings.android.zuboradiary.MainActivity;
 import com.websarva.wings.android.zuboradiary.R;
 import com.websarva.wings.android.zuboradiary.databinding.FragmentWordSearchBinding;
 import com.websarva.wings.android.zuboradiary.ui.diary.DiaryViewModel;
-import com.websarva.wings.android.zuboradiary.ui.diary.editdiary.EditDiaryFragment;
-import com.websarva.wings.android.zuboradiary.ui.diary.editdiary.EditDiaryFragmentDirections;
 import com.websarva.wings.android.zuboradiary.ui.list.DiaryListFragment;
 import com.websarva.wings.android.zuboradiary.ui.list.DiaryListSetting;
 import com.websarva.wings.android.zuboradiary.ui.list.DiaryYearMonthListBaseViewHolder;
+import com.websarva.wings.android.zuboradiary.ui.list.NoDiaryMessageViewHolder;
+import com.websarva.wings.android.zuboradiary.ui.list.ProgressBarViewHolder;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import io.reactivex.subjects.PublishSubject;
 
 public class WordSearchFragment extends Fragment {
 
@@ -133,7 +135,6 @@ public class WordSearchFragment extends Fragment {
         // キーワード検索欄設定
         this.binding.editTextKeyWordSearch.requestFocus();
         Keyboard.show(this.binding.editTextKeyWordSearch);
-        PublishSubject<String> publishSubject = PublishSubject.create();
         this.wordSearchViewModel.getSearchWord()
                 .observe(getViewLifecycleOwner(), new Observer<String>() {
                     @Override
@@ -151,17 +152,18 @@ public class WordSearchFragment extends Fragment {
                         } else {
                             WordSearchFragment.this.wordSearchViewModel
                                     .setIsVisibleSearchWordClearButton(true);
-                            try {
-                                WordSearchFragment.this.wordSearchViewModel
-                                        .loadWordSearchResultList(
-                                                WordSearchViewModel.LoadType.NEW
-                                        );
-                            } catch (Exception e) {
-                                String messageTitle = "通信エラー";
-                                String message = "日記の読込に失敗しました。";
-                                navigateMessageDialog(messageTitle, message);
-                            }
-
+                            WordSearchFragment.this.wordSearchViewModel
+                                    .loadWordSearchResultList(
+                                            WordSearchViewModel.LoadType.NEW,
+                                            new Runnable() {
+                                                @Override
+                                                public void run() {
+                                                    String messageTitle = "通信エラー";
+                                                    String message = "日記の読込に失敗しました。";
+                                                    navigateMessageDialog(messageTitle, message);
+                                                }
+                                            }
+                                    );
                         }
                         WordSearchFragment.this.beforeText = s;
                     }
@@ -175,6 +177,7 @@ public class WordSearchFragment extends Fragment {
                     viewForHidingKeyboard.setOnTouchListener(new View.OnTouchListener() {
                         @Override
                         public boolean onTouch(View v, MotionEvent event) {
+                            v.performClick();
                             Keyboard.hide(v);
                             WordSearchFragment.this.binding.editTextKeyWordSearch.clearFocus();
                             return false;
@@ -194,7 +197,7 @@ public class WordSearchFragment extends Fragment {
 
 
         // データベースから読み込んだ日記リストをリサクラービューに反映
-        LiveData<List<WordSearchResultListItemDiary>> loadedWordSearchResultList =
+        /*LiveData<List<WordSearchResultListItemDiary>> loadedWordSearchResultList =
                                         this.wordSearchViewModel.getLoadedWordSearchResultList();
         loadedWordSearchResultList.observe(
                 getViewLifecycleOwner(),
@@ -217,174 +220,35 @@ public class WordSearchFragment extends Fragment {
                             WordSearchFragment.this.wordSearchViewModel
                                     .prepareWordSearchResultShowing();
                             // 型変換:List<WordSearchResultListItemDiary> -> List<Map<String, Object>>
-                            List<Map<String, Object>> dayList = new ArrayList<>();
-                            Map<String, Object> map;
-                            String date;
-                            String year;
-                            String month;
-                            String dayOfMonth;
-                            String dayOfWeek;
-                            SpannableString title;
-                            String itemNumber;
-                            SpannableString itemTitle;
-                            SpannableString itemComment;
-                            final String KEY_DATE = WordSearchResultDayListAdapter.KEY_DATE;
-                            final String KEY_YEAR = WordSearchResultDayListAdapter.KEY_YEAR;
-                            final String KEY_MONTH = WordSearchResultDayListAdapter.KEY_MONTH;
-                            final String KEY_DAY_OF_MONTH =
-                                    WordSearchResultDayListAdapter.KEY_DAY_OF_MONTH;
-                            final String KEY_DAY_OF_WEEK =
-                                    WordSearchResultDayListAdapter.KEY_DAY_OF_WEEK;
-                            final String KEY_TITLE = WordSearchResultDayListAdapter.KEY_TITLE;
-                            final String KEY_ITEM_NUMBER =
-                                    WordSearchResultDayListAdapter.KEY_ITEM_NUMBER;
-                            final String KEY_ITEM_TITLE =
-                                    WordSearchResultDayListAdapter.KEY_ITEM_TITLE;
-                            final String KEY_ITEM_COMMENT =
-                                    WordSearchResultDayListAdapter.KEY_ITEM_COMMENT;
-                            final String KEY_ADAPTER =
-                                    WordSearchResultYearMonthListAdapter.KEY_ADAPTER;
-                            int startIndex;
-                            int endIndex;
-                            for (WordSearchResultListItemDiary item: list) {
-                                date = item.getDate();
-                                startIndex = 0;
-                                endIndex = date.indexOf("年");
-                                year = date.substring(startIndex, endIndex);
-                                startIndex = endIndex + 1;
-                                endIndex = date.indexOf("月");
-                                month = date.substring(startIndex, endIndex);
-                                startIndex = endIndex + 1;
-                                endIndex = date.indexOf("日");
-                                dayOfMonth = date.substring(startIndex, endIndex);
-                                startIndex = date.indexOf("(") + 1;
-                                endIndex = date.indexOf(")");
-                                dayOfWeek = date.substring(startIndex, endIndex);
 
-                                title = createSpannableString(item.getTitle(), searchWord);
-
-                                String regex = ".*" + searchWord + ".*";
-                                String[] itemTitles = {
-                                        item.getItem1Title(),
-                                        item.getItem2Title(),
-                                        item.getItem3Title(),
-                                        item.getItem4Title(),
-                                        item.getItem5Title(),
-                                        };
-                                String[] itemComments = {
-                                        item.getItem1Comment(),
-                                        item.getItem2Comment(),
-                                        item.getItem3Comment(),
-                                        item.getItem4Comment(),
-                                        item.getItem5Comment(),
-                                };
-                                itemNumber = "";
-                                itemTitle = new SpannableString("");
-                                itemComment = new SpannableString("");
-                                for (int i = 0; i < itemTitles.length; i++) {
-                                    // HACK:タイトル、コメントは未入力の場合空文字("")が代入されるはずだが、
-                                    //      nullの項目が存在する為、下記対策をとる。
-                                    //      (例外：項目1のみ入力の場合は、2以降はnullとなる)
-                                    if (itemTitles[i] == null) {
-                                        itemTitles[i] = "";
-                                    }
-                                    if (itemComments[i] == null) {
-                                        itemComments[i] = "";
-                                    }
-                                    if (itemTitles[i].matches(regex)
-                                            || itemComments[i].matches(regex)) {
-                                        itemNumber = "項目" + (i + 1);
-                                        itemTitle =
-                                                createSpannableString(itemTitles[i], searchWord);
-                                        itemComment =
-                                                createSpannableString(itemComments[i], searchWord);
-                                        break;
-                                    }
-                                    if (i == (itemTitles.length - 1)) {
-                                        itemNumber = "項目1";
-                                        itemTitle =
-                                                createSpannableString(itemTitles[0], searchWord);
-                                        itemComment =
-                                                createSpannableString(itemComments[0], searchWord);
-                                    }
-                                }
-
-                                map = new HashMap<>();
-                                map.put(KEY_DATE, date);
-                                map.put(KEY_YEAR, year);
-                                map.put(KEY_MONTH, month);
-                                map.put(KEY_DAY_OF_MONTH, dayOfMonth);
-                                map.put(KEY_DAY_OF_WEEK, dayOfWeek);
-                                map.put(KEY_TITLE, title);
-                                map.put(KEY_ITEM_NUMBER, itemNumber);
-                                map.put(KEY_ITEM_TITLE, itemTitle);
-                                map.put(KEY_ITEM_COMMENT, itemComment);
-                                dayList.add(map);
-                            }
-
-
-                            // 日記リストを月別に振り分ける
-                            List<Map<String, Object>> sortingList= new ArrayList<>();
-                            WordSearchResultDayListAdapter dayListAdapter;
-                            Map<String, Object> monthListItem = new HashMap<>();
-                            List<Map<String, Object>> monthList = new ArrayList<>();
-                            String sortingYear = "";
-                            String sortingMonth = "";
-
-                            for (Map<String, Object> day: dayList) {
-
-                                if (!(((String) day.get(KEY_YEAR)).equals(sortingYear))
-                                        || !(((String) day.get(KEY_MONTH)).equals(sortingMonth))) {
-
-                                    if (!(sortingYear.equals("")) && !(sortingMonth.equals(""))) {
-                                        dayListAdapter =
-                                                new WordSearchResultDayListAdapter(sortingList);
-                                        monthListItem.put(KEY_YEAR, sortingYear);
-                                        monthListItem.put(KEY_MONTH, sortingMonth);
-                                        monthListItem.put(KEY_ADAPTER, dayListAdapter);
-                                        monthList.add(monthListItem);
-                                        monthListItem = new HashMap<>();
-                                    }
-
-                                    sortingYear = (String) day.get(KEY_YEAR);
-                                    sortingMonth = (String) day.get(KEY_MONTH);
-                                    sortingList = new ArrayList<>();
-                                }
-
-                                sortingList.add(day);
-                            }
-
-                            dayListAdapter = new WordSearchResultDayListAdapter(sortingList);
-                            monthListItem
-                                    .put(KEY_YEAR, sortingYear);
-                            monthListItem
-                                    .put(KEY_MONTH, sortingMonth);
-                            monthListItem
-                                    .put(KEY_ADAPTER, dayListAdapter);
-                            monthList.add(monthListItem);
-
-                            RecyclerView recyclerWordSearchResults =
-                                    WordSearchFragment.this.binding.recyclerWordSearchResults;
-
-                            WordSearchResultYearMonthListAdapter
-                                    wordSearchResultYearMonthListAdapter =
-                                    (WordSearchResultYearMonthListAdapter)
-                                            recyclerWordSearchResults.getAdapter();
-                            wordSearchResultYearMonthListAdapter.changeItem(monthList);
 
                         }
                     }
                 }
-        );
+        );*/
+        this.wordSearchViewModel.getLiveDataWordSearchResultList().observe(
+                getViewLifecycleOwner(), new Observer<List<WordSearchResultYearMonthListItem>>() {
+                    @Override
+                    public void onChanged(
+                            List<WordSearchResultYearMonthListItem> wordSearchResultYearMonthListItems) {
+                        WordSearchResultYearMonthListAdapter wordSearchResultYearMonthListAdapter =
+                                (WordSearchResultYearMonthListAdapter)
+                                        WordSearchFragment.this.binding.recyclerWordSearchResults.getAdapter();
+                        wordSearchResultYearMonthListAdapter.submitList(wordSearchResultYearMonthListItems);
+                    }
+        });
 
         RecyclerView recyclerWordSearchResults = this.binding.recyclerWordSearchResults;
         recyclerWordSearchResults.setLayoutManager(new LinearLayoutManager(requireContext()));
-        recyclerWordSearchResults.setAdapter(new WordSearchResultYearMonthListAdapter());
+        WordSearchResultYearMonthListAdapter wordSearchResultYearMonthListAdapter =
+                new WordSearchResultYearMonthListAdapter(
+                        new WordSearchResultYearMonthListDiffUtilItemCallback()
+                );
+        recyclerWordSearchResults.setAdapter(wordSearchResultYearMonthListAdapter);
         recyclerWordSearchResults.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
                 super.onScrolled(recyclerView, dx, dy);
-
                 // 日記リスト先頭アイテムセクションバー位置更新
                 WordSearchFragment.this.diaryListSetting
                         .updateFirstVisibleSectionBarPosition(
@@ -393,20 +257,31 @@ public class WordSearchFragment extends Fragment {
                         );
 
                 // 日記リスト追加読込
-                // https://android.suzu-sd.com/2021/05/recyclerview_item_scroll/#i-5
-                // MEMO:下記条件"dy != 0"は検索結果リストが更新されたときに
+                LinearLayoutManager layoutManager =
+                        (LinearLayoutManager) recyclerView.getLayoutManager();
+                int firstVisibleItem = layoutManager.findFirstVisibleItemPosition();
+                int visibleItemCount = recyclerView.getChildCount();
+                int totalItemCount = layoutManager.getItemCount();
+                int lastItemPosition = totalItemCount - 1;
+                int lastItemViewType = recyclerView.getAdapter().getItemViewType(lastItemPosition);
+                // MEMO:下記条件"dy > 0"は検索結果リストが更新されたときに
                 //      "RecyclerView.OnScrollListener#onScrolled"が起動するための対策。
-                if (!recyclerView.canScrollVertically(1) && dy != 0) {
-                    WordSearchFragment.this.wordSearchViewModel.setIsLoading(true);
-                    try {
-                        WordSearchFragment.this.wordSearchViewModel
-                                .loadWordSearchResultList(WordSearchViewModel.LoadType.ADD);
-                    } catch (Exception e) {
-                        String messageTitle = "通信エラー";
-                        String message = "日記の読込に失敗しました。";
-                        navigateMessageDialog(messageTitle, message);
-                    }
-                    WordSearchFragment.this.wordSearchViewModel.setIsLoading(false);
+                if (!WordSearchFragment.this.wordSearchViewModel.getIsLoading()
+                        && (firstVisibleItem + visibleItemCount) >= totalItemCount
+                        && dy > 0
+                        && lastItemViewType == DiaryListFragment.DiaryYearMonthListAdapter.VIEW_TYPE_DIARY) {
+                    WordSearchFragment.this.wordSearchViewModel
+                            .loadWordSearchResultList(
+                                    WordSearchViewModel.LoadType.ADD,
+                                    new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            String messageTitle = "通信エラー";
+                                            String message = "日記リストの読込に失敗しました。";
+                                            navigateMessageDialog(messageTitle, message);
+                                        }
+                                    }
+                            );
                 }
             }
         });
@@ -454,21 +329,11 @@ public class WordSearchFragment extends Fragment {
 
     //日記リスト(日)リサイクルビューアダプタクラス
     public class WordSearchResultDayListAdapter
-            extends RecyclerView.Adapter<WordSearchResultDayViewHolder> {
-        private List<Map<String, Object>> DiaryDayList;
-        public static final String KEY_YEAR = "Year";
-        public static final String KEY_MONTH = "Month";
-        public static final String KEY_DAY_OF_MONTH = "DayOfMonth";
-        public static final String KEY_DAY_OF_WEEK = "DayOfWeek";
-        public static final String KEY_TITLE = "Title";
-        public static final String KEY_ITEM_NUMBER = "ItemNumber";
-        public static final String KEY_ITEM_TITLE = "ItemTitle";
-        public static final String KEY_ITEM_COMMENT = "ItemComment";
-        public static final String KEY_DATE = "Date";
+            extends ListAdapter<WordSearchResultDayListItem, WordSearchResultDayViewHolder> {
 
-
-        public WordSearchResultDayListAdapter(List<Map<String, Object>> DiaryDayList){
-            this.DiaryDayList = DiaryDayList;
+        public WordSearchResultDayListAdapter(
+                @NonNull DiffUtil.ItemCallback<WordSearchResultDayListItem> diffCallback){
+            super(diffCallback);
         }
 
         //日記リスト(日)のホルダーと日記リスト(日)のアイテムレイアウトを紐づける。
@@ -483,18 +348,21 @@ public class WordSearchFragment extends Fragment {
         //日記リスト(日)の各行アイテム(ホルダー)情報を設定。
         @Override
         public void onBindViewHolder(WordSearchResultDayViewHolder holder, int position) {
-            Map<String, Object> item = DiaryDayList.get(position);
-            String dayOfWeek = (String) item.get(KEY_DAY_OF_WEEK);
-            String dayOfMonth = (String) item.get(KEY_DAY_OF_MONTH);
-            SpannableString title = (SpannableString) item.get(KEY_TITLE);
-            String itemNumber = (String) item.get(KEY_ITEM_NUMBER);
-            SpannableString itemTitle = (SpannableString) item.get(KEY_ITEM_TITLE);
-            SpannableString itemComment = (SpannableString) item.get(KEY_ITEM_COMMENT);
-            holder.date = (String) item.get(KEY_DATE); // ホルダー毎に日記の日付情報一式付与
+            WordSearchResultDayListItem item = getItem(position);
+            int year = item.getYear();
+            int month = item.getMonth();
+            int dayOfMonth = item.getDayOfMonth();
+            String dayOfWeek = item.getDayOfWeek();
+            SpannableString title = item.getTitle();
+            int itemNumber = item.getItemNumber();
+            SpannableString itemTitle = item.getItemTitle();
+            SpannableString itemComment = item.getItemComment();
+            holder.date = DateConverter.toStringLocalDate(year, month, dayOfMonth); // ホルダー毎に日記の日付情報一式付与
             holder.textDayOfMonth.setText(dayOfWeek);
-            holder.textDayOfMonth.setText(dayOfMonth);
+            holder.textDayOfMonth.setText(String.valueOf(dayOfMonth));
             holder.textWordSearchResultTitle.setText(title);
-            holder.textWordSearchResultItemNumber.setText(itemNumber);
+            String stringItemNumber = "項目" + String.valueOf(itemNumber);
+            holder.textWordSearchResultItemNumber.setText(stringItemNumber);
             holder.textWordSearchResultItemTitle.setText(itemTitle);
             holder.textWordSearchResultItemComment.setText(itemComment);
             holder.itemView.setOnClickListener(new View.OnClickListener() {
@@ -504,21 +372,50 @@ public class WordSearchFragment extends Fragment {
                     NavDirections action =
                             WordSearchFragmentDirections
                                     .actionNavigationWordSearchFragmentToShowDiaryFragment(
-                                            Integer.parseInt((String) item.get(KEY_YEAR)),
-                                            Integer.parseInt((String) item.get(KEY_MONTH)),
-                                            Integer.parseInt((String) item.get(KEY_DAY_OF_MONTH))
-                                    );
+                                            year, month, dayOfMonth);
                     WordSearchFragment.this.navController.navigate(action);
                 }
             });
-
-
         }
 
-        //日記リスト(日)のアイテム数を戻すメソッド
+    }
+
+    public class WordSearchResultDayListDiffUtilItemCallback
+            extends DiffUtil.ItemCallback<WordSearchResultDayListItem> {
         @Override
-        public int getItemCount() {
-            return this.DiaryDayList.size();
+        public boolean areItemsTheSame(@NonNull WordSearchResultDayListItem oldItem, @NonNull WordSearchResultDayListItem newItem) {
+            return oldItem.getId().equals(newItem.getId());
+        }
+
+        @Override
+        public boolean areContentsTheSame(@NonNull WordSearchResultDayListItem oldItem, @NonNull WordSearchResultDayListItem newItem) {
+            if (oldItem.getDayOfMonth() != newItem.getDayOfMonth()) {
+                return false;
+            }
+            if (oldItem.getDayOfWeek() != null
+                    && newItem.getDayOfWeek() != null
+                    && !oldItem.getDayOfWeek().equals(newItem.getDayOfWeek())) {
+                return false;
+            }
+            if (oldItem.getTitle() != null
+                    && newItem.getTitle() != null
+                    && !oldItem.getTitle().equals(newItem.getTitle())) {
+                return false;
+            }
+            if (oldItem.getItemNumber() != newItem.getItemNumber()) {
+                return false;
+            }
+            if (oldItem.getItemTitle() != null
+                    && newItem.getItemTitle() != null
+                    && !oldItem.getItemTitle().equals(newItem.getItemTitle())) {
+                return false;
+            }
+            if (oldItem.getItemComment() != null
+                    && newItem.getItemComment() != null
+                    && !oldItem.getItemComment().equals(newItem.getItemComment())) {
+                return false;
+            }
+            return true;
         }
     }
 
@@ -535,112 +432,167 @@ public class WordSearchFragment extends Fragment {
     }
 
     //日記リスト(年月)リサイクルビューアダプタクラス
-    public class WordSearchResultYearMonthListAdapter extends RecyclerView.Adapter<WordSearchResultYearMonthListBaseViewHolder> {
-        private List<Map<String, Object>> diaryListYearMonth = new ArrayList<>();
-        public static final String KEY_YEAR = WordSearchResultDayListAdapter.KEY_YEAR;
-        public static final String KEY_MONTH = WordSearchResultDayListAdapter.KEY_MONTH;
-        public static final String KEY_ADAPTER = "Adapter";
+    public class WordSearchResultYearMonthListAdapter
+            extends ListAdapter<WordSearchResultYearMonthListItem, RecyclerView.ViewHolder> {
+        public static final int VIEW_TYPE_DIARY = 0;
+        public static final int VIEW_TYPE_PROGRESS_BAR = 1;
+        public static final int VIEW_TYPE_NO_DIARY_MESSAGE = 2;
 
-        public WordSearchResultYearMonthListAdapter(){
+        public WordSearchResultYearMonthListAdapter(
+                @NonNull DiffUtil.ItemCallback<WordSearchResultYearMonthListItem> diffCallback){
+            super(diffCallback);
         }
 
         //日記リスト(年月)のホルダーと日記リスト(年月)のアイテムレイアウトを紐づける。
         @Override
-        public WordSearchResultYearMonthListBaseViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-            Log.d("onCreateViewHolder確認", "起動");
+        public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
             LayoutInflater inflater = LayoutInflater.from(parent.getContext());
-            View view = inflater.inflate(R.layout.row_diary_year_month_list, parent, false);
-            WordSearchResultYearMonthListBaseViewHolder holder = new WordSearchResultYearMonthListBaseViewHolder(view);
+            if (viewType == VIEW_TYPE_DIARY) {
+                View view = inflater.inflate(R.layout.row_diary_year_month_list, parent, false);
+                WordSearchResultYearMonthListBaseViewHolder holder = new WordSearchResultYearMonthListBaseViewHolder(view);
 
-            //ホルダー内の日記リスト(日)のアイテム装飾の設定。
-            //(onBindViewHolder で設定すると、設定内容が重複してアイテムが小さくなる為、onCreateViewHolder で設定)
-            holder.recyclerDayList.addItemDecoration(new RecyclerView.ItemDecoration() {
-                @Override
-                public void getItemOffsets(
-                        @NonNull Rect outRect,
-                        @NonNull View view,
-                        @NonNull RecyclerView parent,
-                        @NonNull RecyclerView.State state) {
-                    Log.d("リスト装飾確認","getItemOffsets()呼び出し");
-                    super.getItemOffsets(outRect, view, parent, state);
-                    outRect.top = WordSearchFragment.this.DIARY_DAY_LIST_ITEM_MARGIN_VERTICAL;
-                    outRect.left = WordSearchFragment.this.DIARY_DAY_LIST_ITEM_MARGIN_HORIZONTAL;
-                    outRect.right = WordSearchFragment.this.DIARY_DAY_LIST_ITEM_MARGIN_HORIZONTAL;
+                //ホルダー内の日記リスト(日)のアイテム装飾の設定。
+                //(onBindViewHolder で設定すると、設定内容が重複してアイテムが小さくなる為、onCreateViewHolder で設定)
+                holder.recyclerDayList.addItemDecoration(new RecyclerView.ItemDecoration() {
+                    @Override
+                    public void getItemOffsets(
+                            @NonNull Rect outRect,
+                            @NonNull View view,
+                            @NonNull RecyclerView parent,
+                            @NonNull RecyclerView.State state) {
+                        super.getItemOffsets(outRect, view, parent, state);
+                        outRect.top = WordSearchFragment.this.DIARY_DAY_LIST_ITEM_MARGIN_VERTICAL;
+                        outRect.left = WordSearchFragment.this.DIARY_DAY_LIST_ITEM_MARGIN_HORIZONTAL;
+                        outRect.right = WordSearchFragment.this.DIARY_DAY_LIST_ITEM_MARGIN_HORIZONTAL;
 
-                    // TODO:Fragment切り替え方法をNavigationへの置換後、代替メソッド検討
-                    Log.d("リスト装飾確認",Integer.toString(parent.findContainingViewHolder(view).getAdapterPosition()));
-                    if (parent.findContainingViewHolder(view).getAdapterPosition() == (parent.getAdapter().getItemCount() - 1)) {
-                        outRect.bottom = WordSearchFragment.this.DIARY_DAY_LIST_ITEM_MARGIN_VERTICAL;
+                        // TODO:Fragment切り替え方法をNavigationへの置換後、代替メソッド検討
+                        Log.d("リスト装飾確認",Integer.toString(parent.findContainingViewHolder(view).getAdapterPosition()));
+                        if (parent.findContainingViewHolder(view).getAdapterPosition() == (parent.getAdapter().getItemCount() - 1)) {
+                            outRect.bottom = WordSearchFragment.this.DIARY_DAY_LIST_ITEM_MARGIN_VERTICAL;
+                        }
                     }
-                }
-            });
-
-            return holder;
+                });
+                return holder;
+            } else if (viewType == VIEW_TYPE_PROGRESS_BAR) {
+                View view =
+                        inflater.inflate(R.layout.row_progress_bar, parent, false);
+                return new ProgressBarViewHolder(view);
+            } else {
+                View view =
+                        inflater.inflate(R.layout.row_no_diary_message, parent, false);
+                return new NoDiaryMessageViewHolder(view);
+            }
         }
 
         //日記リスト(年月)の各行アイテム(ホルダー)情報を設定。
         @Override
-        public void onBindViewHolder(WordSearchResultYearMonthListBaseViewHolder holder, int position) {
-            Log.d("リスト表示確認","onBindViewHolder呼び出し");
+        public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
+            if (holder instanceof WordSearchResultYearMonthListBaseViewHolder) {
+                WordSearchResultYearMonthListBaseViewHolder _holder =
+                        (WordSearchResultYearMonthListBaseViewHolder) holder;
+                // 対象行の情報を取得
+                WordSearchResultYearMonthListItem item = getItem(position);
+                int diaryYear = item.getYear();
+                int diaryMonth = item.getMonth();
+                List<WordSearchResultDayListItem> wordSearchResultDayList =
+                        item.getWordSearchResultDayList();
 
-            // 対象行の情報を取得
-            Map<String, Object> item = diaryListYearMonth.get(position);
-            String diaryYear = (String) item.get(KEY_YEAR);
-            String diaryMonth = (String) item.get(KEY_MONTH);
-            WordSearchResultDayListAdapter diaryDayListAdapter =
-                    (WordSearchResultDayListAdapter) item.get(KEY_ADAPTER);
+                // セクションバー設定
+                // 左端に余白を持たせる為、最初にスペースを入力。
+                String diaryDate = "  " + diaryYear + getString(R.string.row_list_year)
+                        + diaryMonth + getString(R.string.row_list_month);
+                _holder.textSectionBar.setText(diaryDate);
+                // 日記リストスクロール時に移動させているので、バインディング時に位置リセット
+                _holder.textSectionBar.setY(0);
 
-            // セクションバー設定
-            // 左端に余白を持たせる為、最初にスペースを入力。
-            String diaryDate = "  " + diaryYear + getString(R.string.row_list_year)
-                    + diaryMonth + getString(R.string.row_list_month);
-            holder.textSectionBar.setText(diaryDate);
-
-            // 日記リスト(日)設定
-            // MEMO:日記リスト(年月)のLinearLayoutManagerとは併用できないので、
-            //      日記リスト(日)用のLinearLayoutManagerをインスタンス化する。
-            holder.recyclerDayList.setLayoutManager(new LinearLayoutManager(getContext()));
-            holder.recyclerDayList.setAdapter(diaryDayListAdapter);
-
+                // 日記リスト(日)設定
+                // MEMO:日記リスト(年月)のLinearLayoutManagerとは併用できないので、
+                //      日記リスト(日)用のLinearLayoutManagerをインスタンス化する。
+                _holder.recyclerDayList.setLayoutManager(new LinearLayoutManager(getContext()));
+                WordSearchResultDayListAdapter wordSearchResultDayListAdapter =
+                        new WordSearchResultDayListAdapter(new WordSearchResultDayListDiffUtilItemCallback());
+                _holder.recyclerDayList.setAdapter(wordSearchResultDayListAdapter);
+                wordSearchResultDayListAdapter.submitList(wordSearchResultDayList);
+            }
         }
 
-        //日記リスト(年月)のアイテム数を戻す。
         @Override
-        public int getItemCount() {
-            return this.diaryListYearMonth.size();
-        }
-
-        // 日記リスト更新
-        public void changeItem(List<Map<String, Object>> list) {
-            this.diaryListYearMonth =list;
-
-            // TODO:下記ページにエラー回避方法が記載されてる。後日修正。
-            // https://qiita.com/toastkidjp/items/f6fffc44acbf4d3690fd
-            notifyDataSetChanged();
+        public int getItemViewType(int position ) {
+            WordSearchResultYearMonthListItem item = getItem(position);
+            return item.getViewType();
         }
     }
 
-
-    // 対象ワードをマーキング
-    private SpannableString createSpannableString(String string, String targetWord) {
-        SpannableString spannableString = new SpannableString(string);
-        BackgroundColorSpan backgroundColorSpan =
-                new BackgroundColorSpan(
-                        getResources().getColor(R.color.gray)
-                );
-        int fromIndex = 0;
-        while (string.indexOf(targetWord, fromIndex) != -1) {
-            int start = string.indexOf(targetWord, fromIndex);
-            int end = start + targetWord.length();
-            spannableString.setSpan(
-                    backgroundColorSpan,
-                    start,
-                    end,
-                    Spanned.SPAN_INCLUSIVE_INCLUSIVE
-            );
-            fromIndex = end;
+    public class WordSearchResultYearMonthListDiffUtilItemCallback
+            extends DiffUtil.ItemCallback<WordSearchResultYearMonthListItem> {
+        @Override
+        public boolean areItemsTheSame(
+                @NonNull WordSearchResultYearMonthListItem oldItem,
+                @NonNull WordSearchResultYearMonthListItem newItem) {
+            // MEMO:更新時はリストアイテムを再インスタンス化する為、IDが異なり全アイテムfalseとなり、
+            //      更新時リストが最上部へスクロールされてしまう。これを防ぐために下記処理を記述。
+            // return oldItem.getId().equals(newItem.getId());
+            return true;
         }
-        return spannableString;
+
+        @Override
+        public boolean areContentsTheSame(
+                @NonNull WordSearchResultYearMonthListItem oldItem,
+                @NonNull WordSearchResultYearMonthListItem newItem) {
+            // 年月
+            if (oldItem.getYear() != newItem.getYear()) {
+                return false;
+            }
+            if (oldItem.getMonth() != newItem.getMonth()) {
+                return false;
+            }
+            if (oldItem.getViewType() != newItem.getViewType()) {
+                return false;
+            }
+
+            // 日
+            int oldChildListSize = oldItem.getWordSearchResultDayList().size();
+            int newChildListSize = newItem.getWordSearchResultDayList().size();
+            if (oldChildListSize != newChildListSize) {
+                return false;
+            }
+
+            int maxSize = Math.max(oldChildListSize, newChildListSize);
+            for (int i = 0; i < maxSize; i++) {
+                WordSearchResultDayListItem oldChildListItem =
+                        oldItem.getWordSearchResultDayList().get(i);
+                WordSearchResultDayListItem newChildListItem =
+                        newItem.getWordSearchResultDayList().get(i);
+                if (oldChildListItem.getDayOfMonth() != newChildListItem.getDayOfMonth()) {
+                    return false;
+                }
+                if (oldChildListItem.getDayOfWeek() != null
+                        && newChildListItem.getDayOfWeek() != null
+                        && !oldChildListItem.getDayOfWeek().equals(newChildListItem.getDayOfWeek())) {
+                    return false;
+                }
+                if (oldChildListItem.getTitle() != null
+                        && newChildListItem.getTitle() != null
+                        && !oldChildListItem.getTitle().equals(newChildListItem.getTitle())) {
+                    return false;
+                }
+                if (oldChildListItem.getItemNumber() != newChildListItem.getItemNumber()) {
+                    return false;
+                }
+                if (oldChildListItem.getItemTitle() != null
+                        && newChildListItem.getItemTitle() != null
+                        && !oldChildListItem.getItemTitle().equals(newChildListItem.getItemTitle())) {
+                    return false;
+                }
+                if (oldChildListItem.getItemComment() != null
+                        && newChildListItem.getItemComment() != null
+                        && !oldChildListItem.getItemComment().equals(newChildListItem.getItemComment())) {
+                    return false;
+                }
+            }
+
+            return true;
+        }
     }
 
     private void navigateMessageDialog(String title, String message) {
