@@ -88,7 +88,7 @@
                     android:text="@{Integer.toString(word_search_view_model.numWordSearchResults) + @string/word_search_results_num_comment}"
                     android:paddingHorizontal="8dp"
                     android:paddingVertical="8dp"
-                    android:visibility="@{word_search_view_model.isVisibleNumWordSearchResults ? View.VISIBLE : View.GONE}" />
+                    android:visibility="@{word_search_view_model.isVisibleNumWordSearchResults ? View.VISIBLE : View.INVISIBLE}" />
 
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/recycler_word_search_results"
@@ -106,7 +106,7 @@
                 android:visibility="@{word_search_view_model.isVisibleUpdateProgressBar ? View.VISIBLE : View.INVISIBLE}">
 
                 <View
-                    android:id="@+id/view_diary_list_progress_bar"
+                    android:id="@+id/view_word_search_result_list_progress_bar"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:background="@color/gray"

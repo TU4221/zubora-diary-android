@@ -13,6 +13,7 @@ import androidx.lifecycle.MutableLiveData;
 import com.websarva.wings.android.zuboradiary.DateConverter;
 import com.websarva.wings.android.zuboradiary.ui.diary.Diary;
 import com.websarva.wings.android.zuboradiary.ui.diary.DiaryRepository;
+import com.websarva.wings.android.zuboradiary.ui.list.wordsearch.WordSearchViewModel;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -21,10 +22,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 public class ListViewModel extends AndroidViewModel {
 
     private DiaryRepository diaryRepository;
+    private Future<?> LoadingDiaryListFuture;
     private MutableLiveData<List<DiaryYearMonthListItem>> diaryList = new MutableLiveData<>();
     private boolean isLoading;
     private  MutableLiveData<Boolean> isVisibleDiaryList = new MutableLiveData<>();
@@ -53,16 +56,22 @@ public class ListViewModel extends AndroidViewModel {
         NEW, UPDATE, ADD
     }
 
-    public void loadList(LoadType loadType, Runnable runnable) {
+    public void loadList(LoadType loadType, Runnable exceptionHandling) {
+        if (this.LoadingDiaryListFuture != null && !this.LoadingDiaryListFuture.isDone()) {
+            this.LoadingDiaryListFuture.cancel(true);
+        }
         Handler handler = HandlerCompat.createAsync(Looper.getMainLooper());
-
-        executorService.submit(new Runnable() {
+        this.LoadingDiaryListFuture = executorService.submit(new Runnable() {
             @Override
             public void run() {
+                // 日記リスト読込準備
                 ListViewModel.this.isLoading = true;
                 ListViewModel.this.isVisibleDiaryList.postValue(true);
-
-                // 日記リスト読込準備
+                if (loadType == LoadType.UPDATE) {
+                    ListViewModel.this.isVisibleUpdateProgressBar.postValue(true);
+                } else {
+                    ListViewModel.this.isVisibleUpdateProgressBar.postValue(false);
+                }
                 int numLoadingItems;
                 int loadingOffset;
                 if (loadType == LoadType.UPDATE) {
@@ -93,9 +102,7 @@ public class ListViewModel extends AndroidViewModel {
                 if (loadType != LoadType.NEW) {
                     diaryListContainingProgressBar.addAll(previousDiaryList);
                 }
-                if (loadType == LoadType.UPDATE) {
-                    ListViewModel.this.isVisibleUpdateProgressBar.postValue(true);
-                } else {
+                if (loadType != LoadType.UPDATE) {
                     DiaryYearMonthListItem progressBar = new DiaryYearMonthListItem();
                     progressBar.setViewType(
                             DiaryListFragment.DiaryYearMonthListAdapter.VIEW_TYPE_PROGRESS_BAR);
@@ -105,16 +112,20 @@ public class ListViewModel extends AndroidViewModel {
 
                 // TODO:ProgressBarを表示させる為に仮で記述
                 try {
-                    Thread.sleep(1000);
-
+                    Thread.sleep(2000);
                 } catch (InterruptedException e) {
+                    ListViewModel.this.diaryList.postValue(previousDiaryList);
                     throw new RuntimeException(e);
                 }
 
                 // 日記リスト読込
-                List<DiaryYearMonthListItem> loadedData = new ArrayList<>();
+                int numExistingDiaries;
+                List<DiaryYearMonthListItem> loadedData;
                 try {
-                    if (ListViewModel.this.sortConditionDate.equals("")) {
+                    numExistingDiaries =
+                            ListViewModel.this.diaryRepository
+                                    .countDiaries(ListViewModel.this.sortConditionDate);
+                    if (ListViewModel.this.sortConditionDate.isEmpty()) {
                         loadedData =
                                 ListViewModel.this.diaryRepository.loadDiaryList(
                                         numLoadingItems,
@@ -129,11 +140,14 @@ public class ListViewModel extends AndroidViewModel {
                                         ListViewModel.this.sortConditionDate
                                 );
                     }
+                } catch (InterruptedException e) {
+                    ListViewModel.this.diaryList.postValue(previousDiaryList);
+                    return;
                 } catch (Exception e) {
                     ListViewModel.this.diaryList.postValue(previousDiaryList);
                     ListViewModel.this.isVisibleUpdateProgressBar.postValue(false);
                     ListViewModel.this.isLoading = false;
-                    handler.post(runnable);
+                    handler.post(exceptionHandling);
                     return;
                 }
 
@@ -184,18 +198,6 @@ public class ListViewModel extends AndroidViewModel {
 
 
                 // 次回読み込む日記あり確認
-                int numExistingDiaries = 0;
-                try {
-                    numExistingDiaries =
-                            ListViewModel.this.diaryRepository
-                                    .countDiaries(ListViewModel.this.sortConditionDate);
-                } catch (Exception e) {
-                    ListViewModel.this.diaryList.postValue(previousDiaryList);
-                    ListViewModel.this.isVisibleUpdateProgressBar.postValue(false);
-                    ListViewModel.this.isLoading = false;
-                    handler.post(runnable);
-                    return;
-                }
                 boolean existsUnloadedDiaries =
                         countDiaryListDayItem(updateDiaryList) < numExistingDiaries;
                 if (numExistingDiaries > 0 && !existsUnloadedDiaries) {
@@ -303,5 +305,11 @@ public class ListViewModel extends AndroidViewModel {
 
     public LiveData<Boolean> getLiveIsVisibleDiaryList() {
         return this.isVisibleDiaryList;
+    }
+
+    @Override
+    protected void onCleared() {
+        super.onCleared();
+        this.executorService.shutdown();
     }
 }

@@ -310,6 +310,9 @@ public class DiaryListFragment extends Fragment {
                 int firstVisibleItem = layoutManager.findFirstVisibleItemPosition();
                 int visibleItemCount = recyclerView.getChildCount();
                 int totalItemCount = layoutManager.getItemCount();
+                if (totalItemCount == 0) {
+                    return; // Adapter#getItemViewType()例外対策
+                }
                 int lastItemPosition = totalItemCount - 1;
                 int lastItemViewType = recyclerView.getAdapter().getItemViewType(lastItemPosition);
                 // MEMO:下記条件"dy > 0"は検索結果リストが更新されたときに

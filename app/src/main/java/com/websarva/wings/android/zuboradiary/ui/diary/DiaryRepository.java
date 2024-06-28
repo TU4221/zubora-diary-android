@@ -6,6 +6,7 @@ import android.app.Application;
 import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.style.BackgroundColorSpan;
+import android.util.Log;
 
 import com.google.common.util.concurrent.ListenableFuture;
 import com.websarva.wings.android.zuboradiary.DateConverter;
@@ -48,6 +49,13 @@ public class DiaryRepository {
         } else {
             listenableFutureResults = this.diaryDAO.countDiariesAsync();
         }
+        // 日付が変更された時、カウントキャンセル
+        while (!listenableFutureResults.isDone()) {
+            if (Thread.currentThread().isInterrupted()) {
+                listenableFutureResults.cancel(true);
+                throw new InterruptedException();
+            }
+        }
         return listenableFutureResults.get();
     }
 
@@ -78,6 +86,13 @@ public class DiaryRepository {
             listenableFutureResults = diaryDAO.selectDiaryListAsync(num, offset, date);
         } else {
             listenableFutureResults = diaryDAO.selectDiaryListAsync(num, offset);
+        }
+        // 日付が変更された時、リスト読込キャンセル
+        while (!listenableFutureResults.isDone()) {
+            if (Thread.currentThread().isInterrupted()) {
+                listenableFutureResults.cancel(true);
+                throw new InterruptedException();
+            }
         }
         List<DiaryListItem> loadedData = listenableFutureResults.get();
         List<DiaryYearMonthListItem> convertedList = new ArrayList<>();
@@ -159,6 +174,13 @@ public class DiaryRepository {
     public int countWordSearchResults(String searchWord) throws Exception {
         ListenableFuture<Integer> listenableFutureResult =
                 diaryDAO.countWordSearchResultsAsync(searchWord);
+        // 検索文字が変更された時、カウントキャンセル
+        while (!listenableFutureResult.isDone()) {
+            if (Thread.currentThread().isInterrupted()) {
+                listenableFutureResult.cancel(true);
+                throw new InterruptedException();
+            }
+        }
         return listenableFutureResult.get();
     }
 
@@ -166,6 +188,13 @@ public class DiaryRepository {
             int num, int offset, String searchWord) throws Exception {
         ListenableFuture<List<WordSearchResultListItemDiary>> listenableFutureResults =
                 diaryDAO.selectWordSearchResultListAsync(num, offset, searchWord);
+        // 検索文字が変更された時、リスト読込キャンセル
+        while (!listenableFutureResults.isDone()) {
+            if (Thread.currentThread().isInterrupted()) {
+                listenableFutureResults.cancel(true);
+                throw new InterruptedException();
+            }
+        }
         List<WordSearchResultListItemDiary> loadedData = listenableFutureResults.get();
         List<WordSearchResultYearMonthListItem> convertedList = new ArrayList<>();
         if (!loadedData.isEmpty()) {
