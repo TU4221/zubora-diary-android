@@ -418,18 +418,14 @@ public class DiaryListFragment extends Fragment {
     // TODO:public -> なし or private に変更しても良いか検証する
     //日記リスト(日)リサイクルビューホルダークラス
     public class DiaryDayListViewHolder extends RecyclerView.ViewHolder {
-        public TextView textDayOfWeek;
-        public TextView textDayOfMonth;
-        public TextView textTitle;
-        public ImageView imagePicture;
-
-        public String date;
-        public DiaryDayListViewHolder(View itemView) {
-            super(itemView);
-            this.textDayOfWeek = itemView.findViewById(R.id.text_day_of_week);
-            this.textDayOfMonth = itemView.findViewById(R.id.text_day_of_month);
-            this.textTitle = itemView.findViewById(R.id.text_row_diary_list_day_title);
-            this.imagePicture = itemView.findViewById(R.id.image_row_diary_list_day_picture);
+        RowDiaryDayListBinding binding;
+        public String date; // TODO:最終的に削除
+        int year;
+        int month;
+        int dayOfMonth;
+        public DiaryDayListViewHolder(RowDiaryDayListBinding binding) {
+            super(binding.getRoot());
+            this.binding = binding;
         }
     }
 
@@ -443,9 +439,14 @@ public class DiaryListFragment extends Fragment {
         @NonNull
         @Override
         public DiaryDayListViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-            LayoutInflater inflater = LayoutInflater.from(parent.getContext());
-            View view = inflater.inflate(R.layout.row_diary_day_list, parent, false);
-            return new DiaryDayListViewHolder(view);
+            // TODO:確認後削除
+            /*LayoutInflater inflater = LayoutInflater.from(parent.getContext());
+            View view = inflater.inflate(R.layout.row_diary_day_list, parent, false);*/
+
+            RowDiaryDayListBinding binding =
+                    RowDiaryDayListBinding
+                            .inflate(LayoutInflater.from(parent.getContext()), parent, false);
+            return new DiaryDayListViewHolder(binding);
         }
 
         @Override
@@ -457,10 +458,13 @@ public class DiaryListFragment extends Fragment {
             String dayOfWeek = item.getDayOfWeek();
             String title = item.getTitle();
             holder.date = DateConverter.toStringLocalDate(year, month, dayOfMonth); // ホルダー毎に日記の日付情報一式付与
-            holder.textDayOfWeek.setText(dayOfWeek);
-            holder.textDayOfMonth.setText(String.valueOf(dayOfMonth));
-            holder.textTitle.setText(title);
-            holder.itemView.setOnClickListener(new View.OnClickListener() {
+            holder.year = year;
+            holder.month = month;
+            holder.dayOfMonth = dayOfMonth;
+            holder.binding.includeDay.textDayOfWeek.setText(dayOfWeek);
+            holder.binding.includeDay.textDayOfMonth.setText(String.valueOf(dayOfMonth));
+            holder.binding.textRowDiaryListDayTitle.setText(title);
+            holder.binding.frameLayoutRowDiaryDayList.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     // 日記表示フラグメント起動。
@@ -468,6 +472,17 @@ public class DiaryListFragment extends Fragment {
                             DiaryListFragmentDirections
                                     .actionNavigationDiaryListFragmentToShowDiaryFragment(
                                             year, month, dayOfMonth);
+                    DiaryListFragment.this.navController.navigate(action);
+                }
+            });
+            holder.binding.textDeleteDiary.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    // 日記表示フラグメント起動。
+                    NavDirections action =
+                            DiaryListFragmentDirections
+                                    .actionDiaryListFragmentToDeleteConfirmationDialog(
+                                            holder.date.toString());
                     DiaryListFragment.this.navController.navigate(action);
                 }
             });
@@ -578,7 +593,14 @@ public class DiaryListFragment extends Fragment {
                         DiaryListFragment.this.navController,
                         DiaryListFragment.this.binding.recyclerDiaryYearMonthList);
                 this.simpleCallbacks.add(simpleCallback);
-                ItemTouchHelper itemTouchHelper = new ItemTouchHelper(simpleCallback);
+                DiaryDayListSimpleCallBack simpleCallBack =
+                        new DiaryDayListSimpleCallBack(
+                                ItemTouchHelper.ACTION_STATE_IDLE,
+                                ItemTouchHelper.LEFT,
+                                new SwipedDiaryDate()
+                        );
+                //ItemTouchHelper itemTouchHelper = new ItemTouchHelper(simpleCallback);
+                ItemTouchHelper itemTouchHelper = new ItemTouchHelper(simpleCallBack);
                 itemTouchHelper.attachToRecyclerView(holder.recyclerDayList);
                 return holder;
             } else if (viewType == VIEW_TYPE_PROGRESS_BAR) {
@@ -728,6 +750,107 @@ public class DiaryListFragment extends Fragment {
             };
             linearSmoothScroller.setTargetPosition(position);
             startSmoothScroll(linearSmoothScroller);
+        }
+    }
+
+    // TODO:上手くいかないので保留
+    private class DiaryDayListSimpleCallBack extends ItemTouchHelper.SimpleCallback {
+        SwipedDiaryDate swipedDate;
+        public DiaryDayListSimpleCallBack(int dragDirs, int swipeDirs, SwipedDiaryDate swipedDate) {
+            super(dragDirs, swipeDirs);
+            this.swipedDate = swipedDate;
+        }
+
+        @Override
+        public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
+            return false;
+        }
+
+        @Override
+        public float getSwipeThreshold(RecyclerView.ViewHolder viewHolder) {
+            return 0.5F;
+        }
+
+        @Override
+        public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
+            DiaryDayListViewHolder diaryDayListViewHolder = (DiaryDayListViewHolder) viewHolder;
+            this.swipedDate.setYear(diaryDayListViewHolder.year);
+            this.swipedDate.setMonth(diaryDayListViewHolder.month);
+            this.swipedDate.setDayOfMonth(diaryDayListViewHolder.dayOfMonth);
+            Log.d("20240701_1", "onSwiped");
+        }
+
+        @Override
+        public void onChildDraw(@NonNull Canvas c,
+                                @NonNull RecyclerView recyclerView,
+                                @NonNull RecyclerView.ViewHolder viewHolder,
+                                float dX,
+                                float dY,
+                                int actionState,
+                                boolean isCurrentlyActive) {
+            Log.d("20240701", "dX:" + dX);
+            Log.d("20240701", "viewHolderWidth:" + viewHolder.itemView.getWidth());
+
+            View itemView = viewHolder.itemView;
+            float transitionX =  dX;
+            float absTransitionX =  Math.abs(dX);
+            if (absTransitionX > itemView.getWidth()) {
+                transitionX = -((float) itemView.getWidth() / 4);
+            }
+
+            super.onChildDraw(c, recyclerView, viewHolder, transitionX, dY, actionState, isCurrentlyActive);
+            DiaryDayListViewHolder diaryDayListViewHolder = (DiaryDayListViewHolder) viewHolder;
+            getDefaultUIUtil()
+                    .onDraw(
+                            c, recyclerView, diaryDayListViewHolder.binding.frameLayoutRowDiaryDayList,
+                            0, 0, actionState, isCurrentlyActive
+                    );
+
+            /*if (actionState == ItemTouchHelper.ACTION_STATE_SWIPE && isCurrentlyActive) {
+                DiaryDayListViewHolder diaryDayListViewHolder = (DiaryDayListViewHolder) viewHolder;
+                diaryDayListViewHolder.binding.linerLayoutFront.setTranslationX(dX);
+            }*/
+
+            /*super.onChildDraw(c, recyclerView, viewHolder, transitionX, dY, actionState, isCurrentlyActive);
+            DiaryDayListViewHolder diaryDayListViewHolder = (DiaryDayListViewHolder) viewHolder;
+            getDefaultUIUtil()
+                    .onDraw(
+                            c, recyclerView, diaryDayListViewHolder.binding.frameLayoutRowDiaryDayList,
+                            0, 0, actionState, isCurrentlyActive
+                    );
+            getDefaultUIUtil()
+                    .onDraw(
+                            c, recyclerView, diaryDayListViewHolder.binding.linerLayoutFront,
+                            transitionX, dY, actionState, isCurrentlyActive
+                    );*/
+
+
+            /*View itemView = viewHolder.itemView;
+            float transitionX =  dX;
+            float absTransitionX =  Math.abs(dX);
+            if (absTransitionX > itemView.getWidth()) {
+                transitionX = -((float) itemView.getWidth() / 4);
+            }
+            super.onChildDraw(c, recyclerView, viewHolder, transitionX, dY, actionState, isCurrentlyActive);
+
+            DiaryDayListViewHolder diaryDayListViewHolder = (DiaryDayListViewHolder) viewHolder;
+            getDefaultUIUtil()
+                    .onDraw(
+                            c, recyclerView, diaryDayListViewHolder.binding.textDeleteDiary,
+                            0, 0, actionState, isCurrentlyActive
+                    );
+            getDefaultUIUtil()
+                    .onDraw(
+                            c, recyclerView, diaryDayListViewHolder.binding.linerLayoutFront,
+                            dX, dY, actionState, isCurrentlyActive
+                    );*/
+        }
+
+        @Override
+        public void clearView(     @NonNull androidx.recyclerview.widget.RecyclerView recyclerView,
+                                   @NonNull androidx.recyclerview.widget.RecyclerView.ViewHolder viewHolder ) {
+            super.clearView(recyclerView, viewHolder);
+            Log.d("20240701_1", "clearView");
         }
     }
 

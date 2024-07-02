@@ -3,6 +3,7 @@ package com.websarva.wings.android.zuboradiary.ui.list.wordsearch;
 import android.app.Application;
 import android.os.Handler;
 import android.os.Looper;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.core.os.HandlerCompat;
@@ -10,10 +11,12 @@ import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
+import com.google.common.util.concurrent.Futures;
 import com.websarva.wings.android.zuboradiary.ui.diary.DiaryRepository;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -69,6 +72,7 @@ public class WordSearchViewModel extends AndroidViewModel {
             return;
         }
         Handler handler = HandlerCompat.createAsync(Looper.getMainLooper());
+        List<WordSearchResultYearMonthListItem> currentList = this.wordSearchResultList.getValue();
         Runnable loadWordSearchResultList =
                 new loadWordSearchResultList(loadType, word, handler, exceptionHandling);
         this.LoadingWordSearchResultListFuture = this.executorService.submit(loadWordSearchResultList);

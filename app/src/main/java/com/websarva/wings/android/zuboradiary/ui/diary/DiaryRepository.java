@@ -20,6 +20,7 @@ import com.websarva.wings.android.zuboradiary.ui.list.DiaryYearMonthListItem;
 import com.websarva.wings.android.zuboradiary.ui.list.wordsearch.WordSearchResultDayListItem;
 import com.websarva.wings.android.zuboradiary.ui.list.wordsearch.WordSearchResultListItemDiary;
 import com.websarva.wings.android.zuboradiary.ui.list.wordsearch.WordSearchResultYearMonthListItem;
+import com.websarva.wings.android.zuboradiary.ui.list.wordsearch.WordSearchViewModel;
 
 import org.jetbrains.annotations.Nullable;
 
