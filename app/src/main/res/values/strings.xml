@@ -110,7 +110,55 @@
     <string name="edit_diary_select_item_title_confirm_delete_dialog_btn_ng">いいえ</string>
 
 
+    <!-- fragment_settings -->
+    <string name="fragment_settings_item_value_not_set">未設定</string>
+    <string name="fragment_settings_section_title_design">デザイン</string>
+    <string name="fragment_settings_item_title_theme_color">テーマカラー</string>
+
+    <string name="fragment_settings_section_title_setting">設定</string>
+    <string name="fragment_settings_item_title_calendar_start_day">カレンダーの開始曜日</string>
+    <string name="fragment_settings_item_title_reminder_notification">リマインダーの通知</string>
+    <string name="fragment_settings_item_title_passcode_lock">パスコードロック</string>
+    <string name="fragment_settings_item_title_getting_weather_information">天気情報取得</string>
+
+    <!-- dialog_fragment_number_picker -->
+    <string name="dialog_fragment_number_picker_cancel">キャンセル</string>
+    <string name="dialog_fragment_number_picker_decision">決定</string>
+
+    <!-- dialog_fragment_number_picker (ThemeColorPickerDialogFragment) -->
+    <string name="dialog_fragment_number_picker_theme_color_white">ホワイト</string>
+    <string name="dialog_fragment_number_picker_theme_color_black">ブラック</string>
+    <string name="dialog_fragment_number_picker_theme_color_red">レッド</string>
+    <string name="dialog_fragment_number_picker_theme_color_blue">ブルー</string>
+    <string name="dialog_fragment_number_picker_theme_color_green">グリーン</string>
+    <string name="dialog_fragment_number_picker_theme_color_yellow">イエロー</string>
+
+    <!-- dialog_fragment_number_picker (DayOfWeekPickerDialogFragment) -->
+    <string name="dialog_fragment_number_picker_sunday">日曜</string>
+    <string name="dialog_fragment_number_picker_monday">月曜</string>
+    <string name="dialog_fragment_number_picker_tuesday">火曜</string>
+    <string name="dialog_fragment_number_picker_wednesday">水曜</string>
+    <string name="dialog_fragment_number_picker_thursday">木曜</string>
+    <string name="dialog_fragment_number_picker_friday">金曜</string>
+    <string name="dialog_fragment_number_picker_saturday">土曜</string>
+
+
+
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <!-- Preference Titles -->
+    <string name="messages_header">Messages</string>
+    <string name="sync_header">Sync</string>
+
+    <!-- Messages UserPreferences -->
+    <string name="signature_title">Your signature</string>
+    <string name="reply_title">Default reply action</string>
+
+    <!-- Sync UserPreferences -->
+    <string name="sync_title">Sync email periodically</string>
+    <string name="attachment_title">Download incoming attachments</string>
+    <string name="attachment_summary_on">Automatically download attachments for incoming emails
+    </string>
+    <string name="attachment_summary_off">Only download attachments when manually requested</string>
 
 </resources>

@@ -8,56 +8,53 @@
     <LinearLayout
         android:id="@+id/liner_layout_date_picker_bottom_sheet"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:orientation="vertical">
 
         <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/gray">
+            android:background="@color/dialog_fragment_number_picker_button_background">
 
             <Button
                 android:id="@+id/button_cancel"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="キャンセル"
-                android:textColor="@color/black"
+                android:text="@string/dialog_fragment_number_picker_cancel"
+                android:textColor="@color/dialog_fragment_number_picker_button_text"
                 android:background="@drawable/bg_clear_button"/>
 
             <Button
                 android:id="@+id/button_decision"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="right"
-                android:text="決定"
-                android:textColor="@color/black"
+                android:layout_gravity="end"
+                android:text="@string/dialog_fragment_number_picker_decision"
+                android:textColor="@color/dialog_fragment_number_picker_button_text"
                 android:background="@drawable/bg_clear_button"/>
         </FrameLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center">
+            android:orientation="horizontal">
 
             <NumberPicker
-                android:id="@+id/number_picker_year"
-                android:layout_width="wrap_content"
+                android:id="@+id/number_picker_first"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:layout_marginHorizontal="24dp"
-                android:scaleX="1.2"
-                android:scaleY="1.2"
+                android:layout_marginHorizontal="@dimen/dialog_fragment_number_picker_layout_margin_horizontal"
+                android:layout_marginVertical="@dimen/dialog_fragment_number_picker_layout_margin_vertical"
                 android:descendantFocusability="blocksDescendants"/>
 
             <NumberPicker
-                android:id="@+id/number_picker_month"
-                android:layout_width="wrap_content"
+                android:id="@+id/number_picker_second"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:layout_marginHorizontal="24dp"
-                android:scaleX="1.2"
-                android:scaleY="1.2"
+                android:layout_marginHorizontal="@dimen/dialog_fragment_number_picker_layout_margin_horizontal"
+                android:layout_marginVertical="@dimen/dialog_fragment_number_picker_layout_margin_vertical"
                 android:descendantFocusability="blocksDescendants"/>
 
         </LinearLayout>

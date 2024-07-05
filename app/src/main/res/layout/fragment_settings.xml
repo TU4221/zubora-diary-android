@@ -1,0 +1,234 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+        <variable
+            name="settingsViewModel"
+            type="com.websarva.wings.android.zuboradiary.ui.settings.SettingsViewModel" />
+    </data>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            tools:context=".ui.settings.SettingsFragment"
+            android:orientation="vertical">
+
+            <com.google.android.material.appbar.MaterialToolbar
+                android:id="@+id/material_toolbar_top_app_bar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="?attr/colorPrimary"
+                android:gravity="center"
+                android:minHeight="?attr/actionBarSize"
+                android:theme="?attr/actionBarTheme"
+                app:title="設定"
+                app:titleCentered="true" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/fragment_settings_section_layout_height"
+                android:paddingHorizontal="@dimen/fragment_settings_item_padding_horizontal"
+                android:paddingVertical="@dimen/fragment_settings_item_padding_vertical"
+                android:text="@string/fragment_settings_section_title_design"
+                android:textSize="@dimen/fragment_settings_section_text_size"
+                android:background="@color/fragment_settings_section_background" />
+
+            <com.google.android.material.divider.MaterialDivider
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <FrameLayout
+                android:id="@+id/frame_layout_theme_color_setting"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" >
+
+                <TextView
+                    android:id="@+id/text_theme_color_setting_title"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/fragment_settings_item_layout_height"
+                    android:paddingHorizontal="@dimen/fragment_settings_item_padding_horizontal"
+                    android:paddingVertical="@dimen/fragment_settings_item_padding_vertical"
+                    android:drawablePadding="@dimen/fragment_settings_item_drawable_padding"
+                    android:text="@string/fragment_settings_item_title_theme_color"
+                    android:textSize="@dimen/fragment_settings_item_title_text_size"
+                    android:gravity="center_vertical"
+                    app:drawableStartCompat="@drawable/ic_palette_24px" />
+
+                <TextView
+                    android:id="@+id/text_theme_color_setting_value"
+                    android:layout_width="wrap_content"
+                    android:layout_height="@dimen/fragment_settings_item_layout_height"
+                    android:paddingHorizontal="@dimen/fragment_settings_item_padding_horizontal"
+                    android:paddingVertical="@dimen/fragment_settings_item_padding_vertical"
+                    android:layout_gravity="center_vertical|end"
+                    android:text="@{settingsViewModel.liveDataThemeColor}"
+                    android:hint="@string/fragment_settings_item_value_not_set"
+                    android:textSize="@dimen/fragment_settings_item_value_text_size"
+                    android:gravity="center_vertical|end"/>
+
+            </FrameLayout>
+
+            <com.google.android.material.divider.MaterialDivider
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/fragment_settings_section_layout_height"
+                android:paddingHorizontal="@dimen/fragment_settings_item_padding_horizontal"
+                android:paddingVertical="@dimen/fragment_settings_item_padding_vertical"
+                android:text="@string/fragment_settings_section_title_setting"
+                android:textSize="@dimen/fragment_settings_section_text_size"
+                android:background="@color/fragment_settings_section_background" />
+
+            <com.google.android.material.divider.MaterialDivider
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <FrameLayout
+                android:id="@+id/frame_layout_calendar_start_day_setting"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" >
+
+                <TextView
+                    android:id="@+id/text_calendar_start_day_setting_title"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/fragment_settings_item_layout_height"
+                    android:paddingHorizontal="@dimen/fragment_settings_item_padding_horizontal"
+                    android:paddingVertical="@dimen/fragment_settings_item_padding_vertical"
+                    android:drawablePadding="@dimen/fragment_settings_item_drawable_padding"
+                    android:text="@string/fragment_settings_item_title_calendar_start_day"
+                    android:textSize="@dimen/fragment_settings_item_title_text_size"
+                    android:gravity="center_vertical"
+                    app:drawableStartCompat="@drawable/ic_calendar_month_24" />
+
+                <TextView
+                    android:id="@+id/text_calendar_start_day_setting_value"
+                    android:layout_width="wrap_content"
+                    android:layout_height="@dimen/fragment_settings_item_layout_height"
+                    android:paddingHorizontal="@dimen/fragment_settings_item_padding_horizontal"
+                    android:paddingVertical="@dimen/fragment_settings_item_padding_vertical"
+                    android:layout_gravity="center_vertical|end"
+                    android:text="@{settingsViewModel.liveDataCalendarStartDayOfWeek}"
+                    android:hint="@string/fragment_settings_item_value_not_set"
+                    android:textSize="@dimen/fragment_settings_item_value_text_size"
+                    android:gravity="center_vertical|end"/>
+
+            </FrameLayout>
+
+            <com.google.android.material.divider.MaterialDivider
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <FrameLayout
+                android:id="@+id/frame_layout_reminder_notification_setting"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" >
+
+                <TextView
+                    android:id="@+id/text_reminder_notification_setting_title"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/fragment_settings_item_layout_height"
+                    android:paddingHorizontal="@dimen/fragment_settings_item_padding_horizontal"
+                    android:paddingVertical="@dimen/fragment_settings_item_padding_vertical"
+                    android:drawablePadding="@dimen/fragment_settings_item_drawable_padding"
+                    android:text="@string/fragment_settings_item_title_reminder_notification"
+                    android:textSize="@dimen/fragment_settings_item_title_text_size"
+                    android:gravity="center_vertical"
+                    app:drawableStartCompat="@drawable/ic_notifications_24px" />
+
+                <com.google.android.material.materialswitch.MaterialSwitch
+                    android:id="@+id/switch_reminder_notification_value"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical|end"
+                    android:paddingHorizontal="@dimen/fragment_settings_item_padding_horizontal"
+                    android:paddingVertical="@dimen/fragment_settings_item_padding_vertical"/>
+
+            </FrameLayout>
+
+            <com.google.android.material.divider.MaterialDivider
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <FrameLayout
+                android:id="@+id/frame_layout_passcode_lock_setting"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" >
+
+                <TextView
+                    android:id="@+id/text_passcode_lock_setting_title"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/fragment_settings_item_layout_height"
+                    android:paddingHorizontal="@dimen/fragment_settings_item_padding_horizontal"
+                    android:paddingVertical="@dimen/fragment_settings_item_padding_vertical"
+                    android:drawablePadding="@dimen/fragment_settings_item_drawable_padding"
+                    android:text="@string/fragment_settings_item_title_passcode_lock"
+                    android:textSize="@dimen/fragment_settings_item_title_text_size"
+                    android:gravity="center_vertical"
+                    app:drawableStartCompat="@drawable/ic_lock_24px" />
+
+                <com.google.android.material.materialswitch.MaterialSwitch
+                    android:id="@+id/switch_passcode_lock_value"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical|end"
+                    android:paddingHorizontal="@dimen/fragment_settings_item_padding_horizontal"
+                    android:paddingVertical="@dimen/fragment_settings_item_padding_vertical"/>
+
+            </FrameLayout>
+
+            <com.google.android.material.divider.MaterialDivider
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <FrameLayout
+                android:id="@+id/frame_layout_getting_weather_information_setting"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" >
+
+                <TextView
+                    android:id="@+id/text_getting_weather_information_setting_title"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/fragment_settings_item_layout_height"
+                    android:paddingHorizontal="@dimen/fragment_settings_item_padding_horizontal"
+                    android:paddingVertical="@dimen/fragment_settings_item_padding_vertical"
+                    android:drawablePadding="@dimen/fragment_settings_item_drawable_padding"
+                    android:text="@string/fragment_settings_item_title_getting_weather_information"
+                    android:textSize="@dimen/fragment_settings_item_title_text_size"
+                    android:gravity="center_vertical"
+                    app:drawableStartCompat="@drawable/ic_sunny_24px" />
+
+                <com.google.android.material.materialswitch.MaterialSwitch
+                    android:id="@+id/switch_getting_weather_information_value"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical|end"
+                    android:paddingHorizontal="@dimen/fragment_settings_item_padding_horizontal"
+                    android:paddingVertical="@dimen/fragment_settings_item_padding_vertical"/>
+
+            </FrameLayout>
+
+            <com.google.android.material.divider.MaterialDivider
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:paddingHorizontal="@dimen/fragment_settings_item_padding_horizontal"
+                android:paddingVertical="@dimen/fragment_settings_item_padding_vertical"
+                android:textSize="@dimen/fragment_settings_section_text_size"
+                android:background="@color/fragment_settings_section_background" />
+
+        </LinearLayout>
+
+    </ScrollView>
+
+</layout>

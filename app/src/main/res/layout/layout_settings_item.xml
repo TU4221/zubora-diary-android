@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <data>
+        <variable
+            name="settingIcon"
+            type="int" />
+        <variable
+            name="settingTitle"
+            type="String" />
+        <variable
+            name="settingValue"
+            type="androidx.lifecycle.LiveData&lt;String>" />
+
+    </data>
+
+    <LinearLayout
+        android:id="@+id/liner_layout_theme_color_setting"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:paddingHorizontal="8dp"
+        android:paddingVertical="8dp">
+
+        <TextView
+            android:id="@+id/text_theme_color_setting_title"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="8"
+            android:drawableStart="@{settingIcon}"
+            android:drawablePadding="8dp"
+            android:text="@{settingTitle}"
+            android:textSize="20sp" />
+
+        <TextView
+            android:id="@+id/text_theme_color_setting_value"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="2"
+            android:gravity="end"
+            android:text="@{settingValue}"
+            android:hint="白"
+            android:textSize="20sp" />
+    </LinearLayout>
+</layout>
+

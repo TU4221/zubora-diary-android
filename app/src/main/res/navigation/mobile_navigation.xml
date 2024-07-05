@@ -133,12 +133,33 @@
     </navigation>
 
     <navigation
-        android:id="@+id/nested_navigation_notifications"
-        app:startDestination="@+id/navigation_notifications_fragment">
+        android:id="@+id/nested_navigation_settings"
+        app:startDestination="@+id/navigation_settings_fragment">
         <fragment
-            android:id="@+id/navigation_notifications_fragment"
-            android:name="com.websarva.wings.android.zuboradiary.ui.notifications.NotificationsFragment"
-            tools:layout="@layout/fragment_notifications" />
+            android:id="@+id/navigation_settings_fragment"
+            android:name="com.websarva.wings.android.zuboradiary.ui.settings.SettingsFragment"
+            tools:layout="@layout/fragment_settings" >
+            <action
+                android:id="@+id/action_navigation_settings_fragment_to_theme_color_picker_dialog"
+                app:destination="@id/navigation_theme_color_picker_dialog"/>
+            <action
+                android:id="@+id/action_navigation_settings_fragment_to_day_of_week_picker_dialog"
+                app:destination="@id/navigation_day_of_week_picker_dialog"/>
+        </fragment>
+        <dialog
+            android:id="@+id/navigation_theme_color_picker_dialog"
+            android:name="com.websarva.wings.android.zuboradiary.ui.settings.ThemeColorPickerDialogFragment">
+            <argument
+                android:name="currentThemeColor"
+                app:argType="com.websarva.wings.android.zuboradiary.ui.settings.ThemeColors" />
+        </dialog>
+        <dialog
+            android:id="@+id/navigation_day_of_week_picker_dialog"
+            android:name="com.websarva.wings.android.zuboradiary.ui.settings.DayOfWeekPickerDialogFragment">
+            <argument
+                android:name="currentCalendarStartDayOfWeek"
+                app:argType="java.time.DayOfWeek" />
+        </dialog>
     </navigation>
 
     <fragment

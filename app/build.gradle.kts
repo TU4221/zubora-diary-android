@@ -125,4 +125,12 @@ dependencies {
     // The compose calendar library
     implementation("com.kizitonwose.calendar:compose:$calendar_version")
 
+
+    // Preference,PreferencesDataStore 追加
+    implementation("androidx.preference:preference:1.2.0")
+    implementation("androidx.datastore:datastore-preferences:1.1.1")
+    // optional - RxJava2 support
+    implementation("androidx.datastore:datastore-preferences-rxjava2:1.1.1")
+    // optional - RxJava3 support
+    implementation("androidx.datastore:datastore-preferences-rxjava3:1.1.1")
 }

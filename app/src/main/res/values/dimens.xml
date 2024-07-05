@@ -2,4 +2,26 @@
     <!-- Default screen margins, per the Android Design guidelines. -->
     <dimen name="activity_horizontal_margin">16dp</dimen>
     <dimen name="activity_vertical_margin">16dp</dimen>
+
+    <!-- fragment_settings -->
+    <dimen name="fragment_settings_section_layout_height">56dp</dimen>
+    <dimen name="fragment_settings_section_padding_horizontal">16dp</dimen>
+    <dimen name="fragment_settings_section_padding_vertical">8dp</dimen>
+    <dimen name="fragment_settings_section_text_size">18dp</dimen> <!-- "height"固定の為、"sp"ではなく"dp"使用 -->
+
+    <dimen name="fragment_settings_item_layout_height">56dp</dimen>
+    <dimen name="fragment_settings_item_padding_horizontal">16dp</dimen>
+    <dimen name="fragment_settings_item_padding_vertical">8dp</dimen>
+    <dimen name="fragment_settings_item_drawable_padding">16dp</dimen>
+    <dimen name="fragment_settings_item_title_text_size">18dp</dimen> <!-- "height"固定の為、"sp"ではなく"dp"使用 -->
+    <dimen name="fragment_settings_item_value_text_size">18dp</dimen> <!-- "height"固定の為、"sp"ではなく"dp"使用 -->
+
+
+    <!-- dialog_fragment_number_picker -->
+    <dimen name="dialog_fragment_number_picker_layout_margin_horizontal">16dp</dimen>
+    <dimen name="dialog_fragment_number_picker_layout_margin_vertical">8dp</dimen>
+
+
+
+
 </resources>

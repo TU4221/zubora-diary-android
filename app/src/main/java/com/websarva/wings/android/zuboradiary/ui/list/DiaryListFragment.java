@@ -106,7 +106,7 @@ public class DiaryListFragment extends Fragment {
         // データバインディング設定
         this.binding = FragmentDiaryListBinding.inflate(inflater, container, false);
 
-        // 双方向データバインディング設定
+        // データバインディング設定
         this.binding.setLifecycleOwner(this);
         this.binding.setListViewModel(this.listViewModel);
 
