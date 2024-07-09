@@ -1,6 +1,5 @@
 package com.websarva.wings.android.zuboradiary.ui.settings;
 
-import android.util.Log;
 import android.view.View;
 
 import androidx.annotation.NonNull;
@@ -10,6 +9,7 @@ import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
 
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
+import com.websarva.wings.android.zuboradiary.data.settings.DayOfWeekNameResIdGetter;
 import com.websarva.wings.android.zuboradiary.databinding.DialogFragmentNumberPickerBinding;
 
 import java.time.DayOfWeek;

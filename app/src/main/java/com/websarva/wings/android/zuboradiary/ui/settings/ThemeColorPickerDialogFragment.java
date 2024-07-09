@@ -1,6 +1,5 @@
 package com.websarva.wings.android.zuboradiary.ui.settings;
 
-import android.util.Log;
 import android.view.View;
 
 import androidx.annotation.NonNull;
@@ -10,6 +9,7 @@ import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
 
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
+import com.websarva.wings.android.zuboradiary.data.settings.ThemeColors;
 import com.websarva.wings.android.zuboradiary.databinding.DialogFragmentNumberPickerBinding;
 
 public class ThemeColorPickerDialogFragment extends BottomSheetDialogFragment {

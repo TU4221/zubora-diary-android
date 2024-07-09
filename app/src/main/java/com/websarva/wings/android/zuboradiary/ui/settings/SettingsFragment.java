@@ -5,6 +5,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CompoundButton;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -12,6 +14,7 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.LifecycleEventObserver;
 import androidx.lifecycle.LifecycleOwner;
+import androidx.lifecycle.Observer;
 import androidx.lifecycle.SavedStateHandle;
 import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
@@ -20,9 +23,13 @@ import androidx.navigation.NavController;
 import androidx.navigation.NavDirections;
 import androidx.navigation.fragment.NavHostFragment;
 
+import com.google.android.material.materialswitch.MaterialSwitch;
 import com.websarva.wings.android.zuboradiary.R;
+import com.websarva.wings.android.zuboradiary.data.settings.DayOfWeekNameResIdGetter;
+import com.websarva.wings.android.zuboradiary.data.settings.ThemeColors;
 import com.websarva.wings.android.zuboradiary.databinding.FragmentSettingsBinding;
-import com.websarva.wings.android.zuboradiary.SettingsRepository;
+import com.websarva.wings.android.zuboradiary.data.settings.SettingsRepository;
+import com.websarva.wings.android.zuboradiary.ui.ThemeColorSwitcher;
 
 import java.time.DayOfWeek;
 
@@ -96,6 +103,45 @@ public class SettingsFragment extends Fragment {
         this.binding.textCalendarStartDaySettingTitle.setOnClickListener(
                 new OnClickListenerOfCalendarStartDayOfWeekSetting(this.navController, this.settingsViewModel)
         );
+        this.binding.switchReminderNotificationValue.setOnCheckedChangeListener(
+                new OnCheckedChangeListenerOfReminderNotificationSetting(this.navController, this.settingsViewModel)
+        );
+        this.binding.switchPasscodeLockValue.setOnCheckedChangeListener(
+                new OnCheckedChangeListenerOfPasscodeLockSetting(this.navController, this.settingsViewModel)
+        );
+        this.binding.switchGettingWeatherInformationValue.setOnCheckedChangeListener(
+                new OnCheckedChangeListenerOfGettingWeatherInformationSetting(this.navController, this.settingsViewModel)
+        );
+
+        this.settingsViewModel.getLiveDataThemeColor().observe(getViewLifecycleOwner(), new Observer<String>() {
+            @Override
+            public void onChanged(String string) {
+                ThemeColorSwitcher switcher = new ThemeColorSwitcher(getResources(), requireContext());
+                ThemeColors themeColor = ThemeColors.values()[0]; // デフォルトテーマ
+                TextView[] sections = {
+                        binding.textSettingsSectionDesign,
+                        binding.textSettingsSectionSettings,
+                        binding.textSettingsSectionEnd};
+                TextView[] icons = {
+                        binding.textThemeColorSettingTitle,
+                        binding.textCalendarStartDaySettingTitle,
+                        binding.textReminderNotificationSettingTitle,
+                        binding.textGettingWeatherInformationSettingTitle};
+                MaterialSwitch[] switches = {
+                        binding.switchReminderNotificationValue,
+                        binding.switchPasscodeLockValue,
+                        binding.switchGettingWeatherInformationValue};
+                if (string.equals(getString(ThemeColors.WHITE.getThemeColorNameResId()))) {
+                    themeColor = ThemeColors.WHITE;
+                }
+                if (string.equals(getString(ThemeColors.BLACK.getThemeColorNameResId()))) {
+                    themeColor = ThemeColors.BLACK;
+                }
+                switcher.switchSectionView(themeColor, sections);
+                switcher.switchTextIcon(themeColor, icons);
+                switcher.switchSwitch(themeColor, switches);
+            }
+        });
     }
 
     @Override
@@ -228,6 +274,52 @@ public class SettingsFragment extends Fragment {
             }
         }
         return null;
+    }
+
+    private class OnCheckedChangeListenerOfReminderNotificationSetting
+            implements CompoundButton.OnCheckedChangeListener {
+        private NavController navController;
+        private SettingsViewModel settingsViewModel;
+        public OnCheckedChangeListenerOfReminderNotificationSetting(
+                NavController navController, SettingsViewModel settingsViewModel) {
+            this.navController = navController;
+            this.settingsViewModel = settingsViewModel;
+        }
+        @Override
+        public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+            Log.d("20240708", "onCheckedChanged");
+            this.settingsViewModel.saveIsReminderNotification(isChecked);
+        }
+    }
+
+    private class OnCheckedChangeListenerOfPasscodeLockSetting
+            implements CompoundButton.OnCheckedChangeListener {
+        private NavController navController;
+        private SettingsViewModel settingsViewModel;
+        public OnCheckedChangeListenerOfPasscodeLockSetting(
+                NavController navController, SettingsViewModel settingsViewModel) {
+            this.navController = navController;
+            this.settingsViewModel = settingsViewModel;
+        }
+        @Override
+        public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+            this.settingsViewModel.saveIsPasscodeLock(isChecked);
+        }
+    }
+
+    private class OnCheckedChangeListenerOfGettingWeatherInformationSetting
+            implements CompoundButton.OnCheckedChangeListener {
+        private NavController navController;
+        private SettingsViewModel settingsViewModel;
+        public OnCheckedChangeListenerOfGettingWeatherInformationSetting(
+                NavController navController, SettingsViewModel settingsViewModel) {
+            this.navController = navController;
+            this.settingsViewModel = settingsViewModel;
+        }
+        @Override
+        public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+            this.settingsViewModel.saveIsGettingWeatherInformation(isChecked);
+        }
     }
 
 }

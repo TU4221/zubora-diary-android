@@ -1,4 +1,4 @@
-package com.websarva.wings.android.zuboradiary.ui.settings;
+package com.websarva.wings.android.zuboradiary.data.settings;
 
 import com.websarva.wings.android.zuboradiary.R;
 

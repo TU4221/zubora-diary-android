@@ -3,6 +3,7 @@ package com.websarva.wings.android.zuboradiary;
 import java.time.DateTimeException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 
@@ -12,6 +13,8 @@ public class DateConverter {
     public static final DateTimeFormatter DATE_TIME_FORMATTER =
             DateTimeFormatter.ofPattern("yyyy年MM月dd日(E) HH:mm:ss");
     public static final DateTimeFormatter DATE_YEAR_MONTH_FORMATTER = DateTimeFormatter.ofPattern("yyyy年MM月");
+
+    public static final DateTimeFormatter TIME_HOUR_MINUTE_FORMATTER = DateTimeFormatter.ofPattern("HH:mm");
     public static final int MAX_YEAR = LocalDate.MAX.getYear();
     public static final int MIN_YEAR = LocalDate.MIN.getYear();
     public static final int MAX_MONTH = LocalDate.MAX.getMonthValue();
@@ -88,6 +91,11 @@ public class DateConverter {
             return LocalDate.parse(date, DATE_FORMATTER);
         }
         return LocalDate.now();
+
     }
 
+    public static String toStringTimeHourMinute(int hour, int minute) {
+        LocalTime localTime = LocalTime.of(hour, minute);
+        return  localTime.format(TIME_HOUR_MINUTE_FORMATTER);
+    }
 }

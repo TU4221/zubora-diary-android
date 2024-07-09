@@ -10,7 +10,7 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.ZuboraDiary"
+        android:theme="@style/AppThemeColorWhite"
         tools:targetApi="31">
         <!--MEMO:"android:windowSoftInputMode"は"BottomNavigationView"をキーボードの上に表示させない為の設定-->
         <activity
