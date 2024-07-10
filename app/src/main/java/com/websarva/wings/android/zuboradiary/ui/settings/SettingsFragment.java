@@ -1,8 +1,10 @@
 package com.websarva.wings.android.zuboradiary.ui.settings;
 
+import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CompoundButton;
@@ -37,6 +39,10 @@ public class SettingsFragment extends Fragment {
 
     // View関係
     private FragmentSettingsBinding binding;
+
+    private boolean isTouchedReminderNotificationSwitch = false;
+    private boolean isTouchedPasscodeLockSwitch = false;
+    private boolean isTouchedGettingWeatherInformationSwitch = false;
 
     // Navigation関係
     private NavController navController;
@@ -73,6 +79,7 @@ public class SettingsFragment extends Fragment {
         return this.binding.getRoot();
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         // ダイアログフラグメントからの結果受取設定
@@ -91,6 +98,8 @@ public class SettingsFragment extends Fragment {
                     SavedStateHandle savedStateHandle = navBackStackEntry.getSavedStateHandle();
                     savedStateHandle.remove(ThemeColorPickerDialogFragment.KEY_SELECTED_THEME_COLOR);
                     savedStateHandle.remove(DayOfWeekPickerDialogFragment.KEY_SELECTED_DAY_OF_WEEK);
+                    savedStateHandle.remove(TimePickerDialogFragment.KEY_SELECTED_HOUR);
+                    savedStateHandle.remove(TimePickerDialogFragment.KEY_SELECTED_MINUTE);
                     navBackStackEntry.getLifecycle().removeObserver(lifecycleEventObserver);
                 }
             }
@@ -103,12 +112,39 @@ public class SettingsFragment extends Fragment {
         this.binding.textCalendarStartDaySettingTitle.setOnClickListener(
                 new OnClickListenerOfCalendarStartDayOfWeekSetting(this.navController, this.settingsViewModel)
         );
+        binding.switchReminderNotificationValue.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                if (event.getAction() == MotionEvent.ACTION_DOWN){
+                    isTouchedReminderNotificationSwitch = true;
+                }
+                return false;
+            }
+        });
         this.binding.switchReminderNotificationValue.setOnCheckedChangeListener(
                 new OnCheckedChangeListenerOfReminderNotificationSetting(this.navController, this.settingsViewModel)
         );
+        this.binding.switchPasscodeLockValue.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                if (event.getAction() == MotionEvent.ACTION_DOWN){
+                    isTouchedPasscodeLockSwitch = true;
+                }
+                return false;
+            }
+        });
         this.binding.switchPasscodeLockValue.setOnCheckedChangeListener(
                 new OnCheckedChangeListenerOfPasscodeLockSetting(this.navController, this.settingsViewModel)
         );
+        this.binding.switchGettingWeatherInformationValue.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                if (event.getAction() == MotionEvent.ACTION_DOWN){
+                    isTouchedGettingWeatherInformationSwitch = true;
+                }
+                return false;
+            }
+        });
         this.binding.switchGettingWeatherInformationValue.setOnCheckedChangeListener(
                 new OnCheckedChangeListenerOfGettingWeatherInformationSetting(this.navController, this.settingsViewModel)
         );
@@ -190,7 +226,7 @@ public class SettingsFragment extends Fragment {
                     savedStateHandle.remove(ThemeColorPickerDialogFragment.KEY_SELECTED_THEME_COLOR);
                 }
 
-                // テーマカラー設定ダイアログフラグメントから結果受取
+                // カレンダー開始曜日設定ダイアログフラグメントから結果受取
                 boolean containsDayOfWeekPickerDialogFragmentResults =
                         savedStateHandle.contains(DayOfWeekPickerDialogFragment.KEY_SELECTED_DAY_OF_WEEK);
                 if (containsDayOfWeekPickerDialogFragmentResults) {
@@ -198,6 +234,25 @@ public class SettingsFragment extends Fragment {
                             savedStateHandle.get(DayOfWeekPickerDialogFragment.KEY_SELECTED_DAY_OF_WEEK);
                     this.settingsViewModel.saveCalendarStartDayOfWeek(selectedDayOfWeek);
                     savedStateHandle.remove(DayOfWeekPickerDialogFragment.KEY_SELECTED_DAY_OF_WEEK);
+                }
+
+                // リマインダー通知時間設定ダイアログフラグメントから結果受取
+                boolean containsTimePickerDialogFragmentResults =
+                        savedStateHandle.contains(TimePickerDialogFragment.KEY_SELECTED_HOUR)
+                        && savedStateHandle.contains(TimePickerDialogFragment.KEY_SELECTED_MINUTE);
+                Log.d("20240710", String.valueOf(containsTimePickerDialogFragmentResults));
+                if (containsTimePickerDialogFragmentResults) {
+                    Integer selectedHour =
+                            savedStateHandle.get(TimePickerDialogFragment.KEY_SELECTED_HOUR);
+                    Integer selectedMinute =
+                            savedStateHandle.get(TimePickerDialogFragment.KEY_SELECTED_MINUTE);
+                    if (selectedHour == null || selectedMinute == null) {
+                        binding.switchReminderNotificationValue.setChecked(false);
+                    } else {
+                        settingsViewModel.saveIsReminderNotification(true);
+                    }
+                    savedStateHandle.remove(TimePickerDialogFragment.KEY_SELECTED_HOUR);
+                    savedStateHandle.remove(TimePickerDialogFragment.KEY_SELECTED_MINUTE);
                 }
             }
         }
@@ -287,8 +342,18 @@ public class SettingsFragment extends Fragment {
         }
         @Override
         public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-            Log.d("20240708", "onCheckedChanged");
-            this.settingsViewModel.saveIsReminderNotification(isChecked);
+            if (isTouchedReminderNotificationSwitch) {
+                if (isChecked) {
+                    Log.d("20240710", "onCheckedChanged:true");
+                    NavDirections action = SettingsFragmentDirections
+                            .actionNavigationSettingsFragmentToTimePickerDialog();
+                    navController.navigate(action);
+                } else {
+                    Log.d("20240710", "onCheckedChanged:false");
+                    settingsViewModel.saveIsReminderNotification(false);
+                }
+                isTouchedReminderNotificationSwitch = false;
+            }
         }
     }
 

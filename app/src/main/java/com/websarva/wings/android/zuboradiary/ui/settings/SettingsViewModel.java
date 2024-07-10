@@ -98,6 +98,10 @@ public class SettingsViewModel extends ViewModel {
         return this.repository.saveIsGettingWeatherInformation(value);
     }
 
+    public void registerReminderNotificationWorker() {
+
+    }
+
     // Getter/Setter
     public LiveData<String> getLiveDataThemeColor() {
         return this.themeColor;

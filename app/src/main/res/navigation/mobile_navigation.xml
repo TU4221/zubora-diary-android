@@ -145,6 +145,9 @@
             <action
                 android:id="@+id/action_navigation_settings_fragment_to_day_of_week_picker_dialog"
                 app:destination="@id/navigation_day_of_week_picker_dialog"/>
+            <action
+                android:id="@+id/action_navigation_settings_fragment_to_time_picker_dialog"
+                app:destination="@id/navigation_time_picker_dialog"/>
         </fragment>
         <dialog
             android:id="@+id/navigation_theme_color_picker_dialog"
@@ -159,6 +162,10 @@
             <argument
                 android:name="currentCalendarStartDayOfWeek"
                 app:argType="java.time.DayOfWeek" />
+        </dialog>
+        <dialog
+            android:id="@+id/navigation_time_picker_dialog"
+            android:name="com.websarva.wings.android.zuboradiary.ui.settings.TimePickerDialogFragment">
         </dialog>
     </navigation>
 
