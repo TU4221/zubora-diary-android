@@ -5,14 +5,21 @@ import android.app.Activity;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
+import androidx.navigation.NavDeepLinkBuilder;
 import androidx.work.Worker;
 import androidx.work.WorkerParameters;
+
+import com.websarva.wings.android.zuboradiary.R;
 
 public class ReminderNotificationWorker extends Worker {
     private final NotificationManager notificationManager;
@@ -30,25 +37,47 @@ public class ReminderNotificationWorker extends Worker {
         // TODO:Ver.対策を考える。
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
             NotificationChannel channel =
-                    new NotificationChannel(CHANNEL_ID, CHANNEL_NAME, NotificationManager.IMPORTANCE_DEFAULT);
+                    new NotificationChannel(CHANNEL_ID, CHANNEL_NAME, NotificationManager.IMPORTANCE_HIGH);
             channel.setDescription(CHANNEL_DESCRIPTION);
+            channel.setLockscreenVisibility(Notification.VISIBILITY_PUBLIC);
+            channel.enableVibration(true);
+            channel.setShowBadge(true);
             notificationManager.createNotificationChannel(channel);
         }
     }
     @NonNull
     @Override
     public Result doWork() {
+        NotificationCompat.Builder builder;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            builder = new NotificationCompat.Builder(getApplicationContext(), CHANNEL_ID);
+        } else {
+            builder = new NotificationCompat.Builder(getApplicationContext());
+        }
+
+        PendingIntent pendingIntent =
+                new NavDeepLinkBuilder(getApplicationContext())
+                        .setGraph(R.navigation.mobile_navigation)
+                        .setDestination(R.id.navigation_diary_list_fragment)
+                        .createPendingIntent();
+
         Notification notification =
-                new NotificationCompat.Builder(getApplicationContext(), CHANNEL_ID)
-                        .setSmallIcon()
+                builder.setSmallIcon(R.drawable.ic_notifications_24px)
                         .setContentTitle("お疲れ様です") // TODO:string.xmlへ置換
                         .setContentText("今日の出来事を日記に書きましょう。") // TODO:string.xmlへ置換
+                        .setPriority(NotificationCompat.PRIORITY_MAX)
+                        .setDefaults(Notification.DEFAULT_ALL)
+                        .setContentIntent(pendingIntent)
+                        .setAutoCancel(true)
                         .build();
         boolean isPermission =
                 ActivityCompat.checkSelfPermission(
                         getApplicationContext(), Manifest.permission.POST_NOTIFICATIONS)
                         == PackageManager.PERMISSION_GRANTED;
+        Log.d("20240711", "NotificationIsPermission:" + String.valueOf(isPermission));
         if (isPermission) {
+            NotificationManagerCompat notificationManager =
+                    NotificationManagerCompat.from(this.getApplicationContext());
             notificationManager.notify(NOTIFY_ID, notification);
             return Result.success();
         } else {

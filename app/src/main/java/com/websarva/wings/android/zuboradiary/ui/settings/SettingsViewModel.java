@@ -1,5 +1,7 @@
 package com.websarva.wings.android.zuboradiary.ui.settings;
 
+import android.app.Application;
+import android.content.Context;
 import android.util.Log;
 
 import androidx.datastore.preferences.core.Preferences;
@@ -9,16 +11,18 @@ import androidx.lifecycle.ViewModel;
 
 import com.websarva.wings.android.zuboradiary.data.settings.SettingsRepository;
 import com.websarva.wings.android.zuboradiary.data.settings.ThemeColors;
+import com.websarva.wings.android.zuboradiary.data.worker.WorkerRepository;
 
 import java.time.DayOfWeek;
+import java.time.LocalTime;
 
 import io.reactivex.rxjava3.core.Flowable;
 import io.reactivex.rxjava3.core.Single;
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
 
 public class SettingsViewModel extends ViewModel {
-
-    private SettingsRepository repository;
+    private SettingsRepository settingsRepository;
+    private WorkerRepository workerRepository;
     private final CompositeDisposable disposables = new CompositeDisposable();
     private final MutableLiveData<String> themeColor = new MutableLiveData<>();
     private final MutableLiveData<String> calendarStartDayOfWeek = new MutableLiveData<>();
@@ -26,10 +30,11 @@ public class SettingsViewModel extends ViewModel {
     private final MutableLiveData<Boolean> isPasscodeLock = new MutableLiveData<>();
     private final MutableLiveData<Boolean> isGettingWeatherInformation = new MutableLiveData<>();
 
-    public SettingsViewModel(SettingsRepository repository) {
-        this.repository = repository;
+    public SettingsViewModel(Context context, Application application) {
+        this.settingsRepository = new SettingsRepository(context);
+        this.workerRepository = new WorkerRepository(application);
 
-        Flowable<String> themeColorNameFlowable = this.repository.loadThemeColorName();
+        Flowable<String> themeColorNameFlowable = this.settingsRepository.loadThemeColorName();
         this.disposables.add(themeColorNameFlowable
                 .subscribe(this.themeColor::postValue, throwable -> {
                     throw throwable;
@@ -37,7 +42,7 @@ public class SettingsViewModel extends ViewModel {
         );
 
         Flowable<String> calendarStartDayOfWeekNameFlowable =
-                this.repository.loadCalendarStartDayOfWeekName();
+                this.settingsRepository.loadCalendarStartDayOfWeekName();
         this.disposables.add(calendarStartDayOfWeekNameFlowable
                 .subscribe(this.calendarStartDayOfWeek::postValue, throwable -> {
                     throw throwable;
@@ -45,7 +50,7 @@ public class SettingsViewModel extends ViewModel {
         );
 
         Flowable<Boolean> isReminderNotificationFlowable =
-                this.repository.loadIsReminderNotification();
+                this.settingsRepository.loadIsReminderNotification();
         this.disposables.add(isReminderNotificationFlowable
                 .subscribe(value -> {
                     Log.d("20240708", String.valueOf(value));
@@ -56,7 +61,7 @@ public class SettingsViewModel extends ViewModel {
         );
 
         Flowable<Boolean> isPasscodeLockFlowable =
-                this.repository.loadIsPasscodeLock();
+                this.settingsRepository.loadIsPasscodeLock();
         this.disposables.add(isPasscodeLockFlowable
                 .subscribe(this.isPasscodeLock::postValue, throwable -> {
                     throw throwable;
@@ -64,7 +69,7 @@ public class SettingsViewModel extends ViewModel {
         );
 
         Flowable<Boolean> isGettingWeatherInformationFlowable =
-                this.repository.loadIsGettingWeatherInformation();
+                this.settingsRepository.loadIsGettingWeatherInformation();
         this.disposables.add(isGettingWeatherInformationFlowable
                 .subscribe(this.isGettingWeatherInformation::postValue, throwable -> {
                     throw throwable;
@@ -79,27 +84,31 @@ public class SettingsViewModel extends ViewModel {
     }
 
     public Single<Preferences> saveThemeColor(ThemeColors value) {
-        return this.repository.saveThemeColor(value);
+        return this.settingsRepository.saveThemeColor(value);
     }
 
     public Single<Preferences> saveCalendarStartDayOfWeek(DayOfWeek value) {
-        return this.repository.saveCalendarStartDayOfWeek(value);
+        return this.settingsRepository.saveCalendarStartDayOfWeek(value);
     }
 
     public Single<Preferences> saveIsReminderNotification(boolean value) {
-        return this.repository.saveIsReminderNotification(value);
+        return this.settingsRepository.saveIsReminderNotification(value);
     }
 
     public Single<Preferences> saveIsPasscodeLock(boolean value) {
-        return this.repository.saveIsPasscodeLock(value);
+        return this.settingsRepository.saveIsPasscodeLock(value);
     }
 
     public Single<Preferences> saveIsGettingWeatherInformation(boolean value) {
-        return this.repository.saveIsGettingWeatherInformation(value);
+        return this.settingsRepository.saveIsGettingWeatherInformation(value);
     }
 
-    public void registerReminderNotificationWorker() {
+    public void registerReminderNotificationWorker(LocalTime settingTime) {
+        workerRepository.registerReminderNotificationWorker(settingTime);
+    }
 
+    public void cancelReminderNotificationWorker() {
+        workerRepository.cancelReminderNotificationWorker();
     }
 
     // Getter/Setter

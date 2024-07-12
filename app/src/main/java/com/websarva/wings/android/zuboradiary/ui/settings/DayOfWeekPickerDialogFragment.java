@@ -15,8 +15,8 @@ import com.websarva.wings.android.zuboradiary.databinding.DialogFragmentNumberPi
 import java.time.DayOfWeek;
 
 public class DayOfWeekPickerDialogFragment extends BottomSheetDialogFragment {
-    private static final String fromClassName = "From" + DayOfWeekPickerDialogFragment.class.getName();
-    public static final String KEY_SELECTED_DAY_OF_WEEK = "SelectedDayOfWeek" + fromClassName;
+    private static final String FROM_CLASS_NAME = "From" + DayOfWeekPickerDialogFragment.class.getName();
+    public static final String KEY_SELECTED_DAY_OF_WEEK = "SelectedDayOfWeek" + FROM_CLASS_NAME;
 
     // View関係
     private DialogFragmentNumberPickerBinding binding;

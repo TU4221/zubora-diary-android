@@ -148,6 +148,10 @@
             <action
                 android:id="@+id/action_navigation_settings_fragment_to_time_picker_dialog"
                 app:destination="@id/navigation_time_picker_dialog"/>
+            <action
+                android:id="@+id/action_settings_fragment_to_notification_permission_dialog"
+                app:destination="@id/navigation_notification_permission_dialog">
+            </action>
         </fragment>
         <dialog
             android:id="@+id/navigation_theme_color_picker_dialog"
@@ -165,8 +169,10 @@
         </dialog>
         <dialog
             android:id="@+id/navigation_time_picker_dialog"
-            android:name="com.websarva.wings.android.zuboradiary.ui.settings.TimePickerDialogFragment">
-        </dialog>
+            android:name="com.websarva.wings.android.zuboradiary.ui.settings.TimePickerDialogFragment"/>
+        <dialog
+            android:id="@+id/navigation_notification_permission_dialog"
+            android:name="com.websarva.wings.android.zuboradiary.ui.settings.NotificationPermissionDialogFragment"/>
     </navigation>
 
     <fragment

@@ -1,6 +1,7 @@
 package com.websarva.wings.android.zuboradiary;
 
 import android.animation.ValueAnimator;
+import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
@@ -270,6 +271,14 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
+
+    /*@Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        NavController navController =
+                Navigation.findNavController(this, R.id.nav_host_fragment_activity_main);
+        navController.handleDeepLink(intent);
+    }*/
 
     public boolean getTabWasSelected() {
         return this.tabWasSelected;

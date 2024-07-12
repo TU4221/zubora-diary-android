@@ -1,8 +1,13 @@
 package com.websarva.wings.android.zuboradiary.ui.settings;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.Dialog;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Bundle;
-import android.util.Log;
+import android.provider.Settings;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -10,15 +15,18 @@ import android.view.ViewGroup;
 import android.widget.CompoundButton;
 import android.widget.TextView;
 
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.LifecycleEventObserver;
 import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.SavedStateHandle;
-import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavBackStackEntry;
 import androidx.navigation.NavController;
@@ -30,10 +38,13 @@ import com.websarva.wings.android.zuboradiary.R;
 import com.websarva.wings.android.zuboradiary.data.settings.DayOfWeekNameResIdGetter;
 import com.websarva.wings.android.zuboradiary.data.settings.ThemeColors;
 import com.websarva.wings.android.zuboradiary.databinding.FragmentSettingsBinding;
-import com.websarva.wings.android.zuboradiary.data.settings.SettingsRepository;
 import com.websarva.wings.android.zuboradiary.ui.ThemeColorSwitcher;
+import com.websarva.wings.android.zuboradiary.ui.ViewModelFactory;
+import com.websarva.wings.android.zuboradiary.ui.calendar.CalendarFragment;
+import com.websarva.wings.android.zuboradiary.ui.calendar.CalendarFragmentDirections;
 
 import java.time.DayOfWeek;
+import java.time.LocalTime;
 
 public class SettingsFragment extends Fragment {
 
@@ -50,18 +61,43 @@ public class SettingsFragment extends Fragment {
     // ViewModel
     private SettingsViewModel settingsViewModel;
 
+    //
+    private ActivityResultLauncher<String> requestPostNotificationsPermissionLauncher;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         // ViewModel設定
-        SettingsRepository settingsRepository = new SettingsRepository(requireContext());
-        SettingsViewModelFactory factory = new SettingsViewModelFactory(settingsRepository);
+        ViewModelFactory factory =
+                new ViewModelFactory(requireContext(), requireActivity().getApplication());
         ViewModelProvider provider = new ViewModelProvider(this, factory);
         this.settingsViewModel = provider.get(SettingsViewModel.class);
 
         // Navigation設定
         this.navController = NavHostFragment.findNavController(this);
+
+        //
+
+        requestPostNotificationsPermissionLauncher =
+                registerForActivityResult(
+                        new ActivityResultContracts.RequestPermission(),
+                        new ActivityResultCallback<Boolean>() {
+                            @Override
+                            public void onActivityResult(Boolean isGranted) {
+                                if (isGranted) {
+                                    boolean isPermission = isPermissionPostNotifications();;
+                                    if (isPermission) {
+                                        NavDirections action = SettingsFragmentDirections
+                                                .actionNavigationSettingsFragmentToTimePickerDialog();
+                                        navController.navigate(action);
+                                    }
+                                } else {
+                                    binding.switchReminderNotificationValue.setChecked(false);
+                                }
+                            }
+
+        });
 
     }
 
@@ -100,6 +136,7 @@ public class SettingsFragment extends Fragment {
                     savedStateHandle.remove(DayOfWeekPickerDialogFragment.KEY_SELECTED_DAY_OF_WEEK);
                     savedStateHandle.remove(TimePickerDialogFragment.KEY_SELECTED_HOUR);
                     savedStateHandle.remove(TimePickerDialogFragment.KEY_SELECTED_MINUTE);
+                    savedStateHandle.remove(NotificationPermissionDialogFragment.KEY_SELECTED_BUTTON);
                     navBackStackEntry.getLifecycle().removeObserver(lifecycleEventObserver);
                 }
             }
@@ -186,22 +223,7 @@ public class SettingsFragment extends Fragment {
         this.binding = null;
     }
 
-    private class SettingsViewModelFactory implements ViewModelProvider.Factory {
-        private SettingsRepository repository;
 
-        private SettingsViewModelFactory(SettingsRepository repository) {
-            this.repository = repository;
-        }
-
-        @NonNull
-        @Override
-        public <T extends ViewModel> T create(Class<T> modelClass) {
-            if (modelClass.isAssignableFrom(SettingsViewModel.class)) {
-                return (T) new SettingsViewModel(this.repository);
-            }
-            throw new IllegalArgumentException("Unknown ViewModel class");
-        };
-    }
 
     private class SettingsFragmentLifecycleEventObserver implements LifecycleEventObserver {
         private NavBackStackEntry navBackStackEntry;
@@ -240,7 +262,6 @@ public class SettingsFragment extends Fragment {
                 boolean containsTimePickerDialogFragmentResults =
                         savedStateHandle.contains(TimePickerDialogFragment.KEY_SELECTED_HOUR)
                         && savedStateHandle.contains(TimePickerDialogFragment.KEY_SELECTED_MINUTE);
-                Log.d("20240710", String.valueOf(containsTimePickerDialogFragmentResults));
                 if (containsTimePickerDialogFragmentResults) {
                     Integer selectedHour =
                             savedStateHandle.get(TimePickerDialogFragment.KEY_SELECTED_HOUR);
@@ -249,10 +270,27 @@ public class SettingsFragment extends Fragment {
                     if (selectedHour == null || selectedMinute == null) {
                         binding.switchReminderNotificationValue.setChecked(false);
                     } else {
+                        LocalTime settingTime = LocalTime.of(selectedHour, selectedMinute);
+                        settingsViewModel.registerReminderNotificationWorker(settingTime);
                         settingsViewModel.saveIsReminderNotification(true);
                     }
                     savedStateHandle.remove(TimePickerDialogFragment.KEY_SELECTED_HOUR);
                     savedStateHandle.remove(TimePickerDialogFragment.KEY_SELECTED_MINUTE);
+                }
+
+                // リマインダー通知時間設定ダイアログフラグメントから結果受取
+                boolean containsNotificationPermissionDialogFragmentResult =
+                        savedStateHandle.contains(NotificationPermissionDialogFragment.KEY_SELECTED_BUTTON);
+                if (containsNotificationPermissionDialogFragmentResult) {
+                    Integer selectedButton =
+                            savedStateHandle.get(NotificationPermissionDialogFragment.KEY_SELECTED_BUTTON);
+                    if (selectedButton != null && selectedButton == Dialog.BUTTON_POSITIVE) {
+                        Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+                        Uri uri = Uri.fromParts("package", requireActivity().getPackageName(), null);
+                        intent.setData(uri);
+                        startActivity(intent);
+                    }
+                    savedStateHandle.remove(NotificationPermissionDialogFragment.KEY_SELECTED_BUTTON);
                 }
             }
         }
@@ -344,12 +382,29 @@ public class SettingsFragment extends Fragment {
         public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
             if (isTouchedReminderNotificationSwitch) {
                 if (isChecked) {
-                    Log.d("20240710", "onCheckedChanged:true");
-                    NavDirections action = SettingsFragmentDirections
-                            .actionNavigationSettingsFragmentToTimePickerDialog();
-                    navController.navigate(action);
+
+                    boolean isPermission = isPermissionPostNotifications();
+                    if (isPermission) {
+                        NavDirections action = SettingsFragmentDirections
+                                .actionNavigationSettingsFragmentToTimePickerDialog();
+                        navController.navigate(action);
+                    } else {
+                        boolean shouldShowRequestPermissionRationale =
+                                ActivityCompat.shouldShowRequestPermissionRationale(
+                                        requireActivity(), Manifest.permission.POST_NOTIFICATIONS);
+                        if (shouldShowRequestPermissionRationale) {
+                            requestPostNotificationsPermissionLauncher
+                                    .launch(Manifest.permission.POST_NOTIFICATIONS);
+                        } else {
+                            binding.switchReminderNotificationValue.setChecked(false);
+                            NavDirections action =
+                                    SettingsFragmentDirections
+                                            .actionSettingsFragmentToNotificationPermissionDialog();
+                            navController.navigate(action);
+                        }
+                    }
                 } else {
-                    Log.d("20240710", "onCheckedChanged:false");
+                    settingsViewModel.cancelReminderNotificationWorker();
                     settingsViewModel.saveIsReminderNotification(false);
                 }
                 isTouchedReminderNotificationSwitch = false;
@@ -387,4 +442,9 @@ public class SettingsFragment extends Fragment {
         }
     }
 
+    private boolean isPermissionPostNotifications() {
+        return ActivityCompat.checkSelfPermission(
+                requireActivity(), Manifest.permission.POST_NOTIFICATIONS)
+                == PackageManager.PERMISSION_GRANTED;
+    }
 }
