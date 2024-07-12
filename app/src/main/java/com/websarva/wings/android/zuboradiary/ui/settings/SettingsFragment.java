@@ -40,17 +40,16 @@ import com.websarva.wings.android.zuboradiary.data.settings.ThemeColors;
 import com.websarva.wings.android.zuboradiary.databinding.FragmentSettingsBinding;
 import com.websarva.wings.android.zuboradiary.ui.ThemeColorSwitcher;
 import com.websarva.wings.android.zuboradiary.ui.ViewModelFactory;
-import com.websarva.wings.android.zuboradiary.ui.calendar.CalendarFragment;
 import com.websarva.wings.android.zuboradiary.ui.calendar.CalendarFragmentDirections;
 
 import java.time.DayOfWeek;
 import java.time.LocalTime;
+import java.util.Map;
 
 public class SettingsFragment extends Fragment {
 
     // View関係
     private FragmentSettingsBinding binding;
-
     private boolean isTouchedReminderNotificationSwitch = false;
     private boolean isTouchedPasscodeLockSwitch = false;
     private boolean isTouchedGettingWeatherInformationSwitch = false;
@@ -58,11 +57,12 @@ public class SettingsFragment extends Fragment {
     // Navigation関係
     private NavController navController;
 
-    // ViewModel
+    // ViewModel関係
     private SettingsViewModel settingsViewModel;
 
-    //
+    // ActivityResultLauncher関係
     private ActivityResultLauncher<String> requestPostNotificationsPermissionLauncher;
+    private ActivityResultLauncher<String[]> requestAccessLocationPermissionLauncher;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -77,27 +77,48 @@ public class SettingsFragment extends Fragment {
         // Navigation設定
         this.navController = NavHostFragment.findNavController(this);
 
-        //
-
+        // ActivityResultLauncher設定
         requestPostNotificationsPermissionLauncher =
                 registerForActivityResult(
                         new ActivityResultContracts.RequestPermission(),
                         new ActivityResultCallback<Boolean>() {
                             @Override
                             public void onActivityResult(Boolean isGranted) {
-                                if (isGranted) {
-                                    boolean isPermission = isPermissionPostNotifications();;
-                                    if (isPermission) {
-                                        NavDirections action = SettingsFragmentDirections
-                                                .actionNavigationSettingsFragmentToTimePickerDialog();
-                                        navController.navigate(action);
-                                    }
+                                if (isGranted && isGrantedPostNotifications()/*再確認*/) {
+                                    NavDirections action = SettingsFragmentDirections
+                                            .actionNavigationSettingsFragmentToTimePickerDialog();
+                                    navController.navigate(action);
                                 } else {
                                     binding.switchReminderNotificationValue.setChecked(false);
                                 }
                             }
+                        }
+                );
 
-        });
+        requestAccessLocationPermissionLauncher =
+                registerForActivityResult(
+                        new ActivityResultContracts.RequestMultiplePermissions(),
+                        new ActivityResultCallback<Map<String, Boolean>>() {
+                            @Override
+                            public void onActivityResult(Map<String, Boolean> o) {
+                                Boolean isGrantedAccessFineLocation =
+                                        o.get(Manifest.permission.ACCESS_FINE_LOCATION);
+                                Boolean isGrantedAccessCoarseLocation =
+                                        o.get(Manifest.permission.ACCESS_COARSE_LOCATION);
+                                boolean isGrantedAll =
+                                        isGrantedAccessFineLocation != null
+                                                && isGrantedAccessFineLocation
+                                                && isGrantedAccessCoarseLocation != null
+                                                && isGrantedAccessCoarseLocation;
+                                if (isGrantedAll && isGrantedAccessLocation()/*再確認*/) {
+                                    settingsViewModel.saveIsGettingWeatherInformation(true);
+                                } else {
+                                    binding.switchGettingWeatherInformationValue.setChecked(false);
+                                }
+                            }
+                        }
+                );
+
 
     }
 
@@ -137,6 +158,7 @@ public class SettingsFragment extends Fragment {
                     savedStateHandle.remove(TimePickerDialogFragment.KEY_SELECTED_HOUR);
                     savedStateHandle.remove(TimePickerDialogFragment.KEY_SELECTED_MINUTE);
                     savedStateHandle.remove(NotificationPermissionDialogFragment.KEY_SELECTED_BUTTON);
+                    savedStateHandle.remove(AccessLocationPermissionDialogFragment.KEY_SELECTED_BUTTON);
                     navBackStackEntry.getLifecycle().removeObserver(lifecycleEventObserver);
                 }
             }
@@ -285,12 +307,20 @@ public class SettingsFragment extends Fragment {
                     Integer selectedButton =
                             savedStateHandle.get(NotificationPermissionDialogFragment.KEY_SELECTED_BUTTON);
                     if (selectedButton != null && selectedButton == Dialog.BUTTON_POSITIVE) {
-                        Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
-                        Uri uri = Uri.fromParts("package", requireActivity().getPackageName(), null);
-                        intent.setData(uri);
-                        startActivity(intent);
+                        actionApplicationDetailsSettings();
                     }
                     savedStateHandle.remove(NotificationPermissionDialogFragment.KEY_SELECTED_BUTTON);
+                }
+
+                boolean containsAccessLocationPermissionDialogFragmentResult =
+                        savedStateHandle.contains(AccessLocationPermissionDialogFragment.KEY_SELECTED_BUTTON);
+                if (containsAccessLocationPermissionDialogFragmentResult) {
+                    Integer selectedButton =
+                            savedStateHandle.get(AccessLocationPermissionDialogFragment.KEY_SELECTED_BUTTON);
+                    if (selectedButton != null && selectedButton == Dialog.BUTTON_POSITIVE) {
+                        actionApplicationDetailsSettings();
+                    }
+                    savedStateHandle.remove(AccessLocationPermissionDialogFragment.KEY_SELECTED_BUTTON);
                 }
             }
         }
@@ -382,9 +412,7 @@ public class SettingsFragment extends Fragment {
         public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
             if (isTouchedReminderNotificationSwitch) {
                 if (isChecked) {
-
-                    boolean isPermission = isPermissionPostNotifications();
-                    if (isPermission) {
+                    if (isGrantedPostNotifications()) {
                         NavDirections action = SettingsFragmentDirections
                                 .actionNavigationSettingsFragmentToTimePickerDialog();
                         navController.navigate(action);
@@ -438,13 +466,59 @@ public class SettingsFragment extends Fragment {
         }
         @Override
         public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-            this.settingsViewModel.saveIsGettingWeatherInformation(isChecked);
+            if (isTouchedGettingWeatherInformationSwitch) {
+                if (isChecked) {
+                    if (isGrantedAccessLocation()) {
+                        settingsViewModel.saveIsGettingWeatherInformation(true);
+                    } else {
+                        boolean shouldShowRequestPermissionRationale =
+                                ActivityCompat.shouldShowRequestPermissionRationale(
+                                        requireActivity(), Manifest.permission.ACCESS_FINE_LOCATION)
+                                && ActivityCompat.shouldShowRequestPermissionRationale(
+                                        requireActivity(), Manifest.permission.ACCESS_COARSE_LOCATION);
+                        if (shouldShowRequestPermissionRationale) {
+                            String[] requestPermissions =
+                                    {Manifest.permission.ACCESS_FINE_LOCATION,
+                                            Manifest.permission.ACCESS_COARSE_LOCATION};
+                            requestAccessLocationPermissionLauncher.launch(requestPermissions);
+                        } else {
+                            binding.switchGettingWeatherInformationValue.setChecked(false);
+                            NavDirections action =
+                                    SettingsFragmentDirections
+                                            .actionSettingsFragmentToAccessLocationPermissionDialog();
+                            navController.navigate(action);
+                        }
+                    }
+                } else {
+                    settingsViewModel.saveIsGettingWeatherInformation(false);
+                }
+            }
+            isTouchedGettingWeatherInformationSwitch = false;
         }
     }
 
-    private boolean isPermissionPostNotifications() {
+    private boolean isGrantedPostNotifications() {
         return ActivityCompat.checkSelfPermission(
                 requireActivity(), Manifest.permission.POST_NOTIFICATIONS)
                 == PackageManager.PERMISSION_GRANTED;
+    }
+
+    private boolean isGrantedAccessLocation() {
+        boolean isGrantedAccessFineLocation =
+                ActivityCompat.checkSelfPermission(
+                        requireActivity(), Manifest.permission.ACCESS_FINE_LOCATION)
+                        == PackageManager.PERMISSION_GRANTED;
+        boolean isGrantedAccessCoarseLocation =
+                ActivityCompat.checkSelfPermission(
+                        requireActivity(), Manifest.permission.ACCESS_COARSE_LOCATION)
+                        == PackageManager.PERMISSION_GRANTED;
+        return isGrantedAccessFineLocation && isGrantedAccessCoarseLocation;
+    }
+
+    private void actionApplicationDetailsSettings() {
+        Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+        Uri uri = Uri.fromParts("package", requireActivity().getPackageName(), null);
+        intent.setData(uri);
+        startActivity(intent);
     }
 }
