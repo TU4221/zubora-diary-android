@@ -74,8 +74,7 @@
                     <Spinner
                         android:id="@+id/spinner_Weather_1"
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:entries="@array/edit_diary_weather_selection" />
+                        android:layout_height="wrap_content" />
 
                     <TextView
                         android:id="@+id/text_weather_slush"
@@ -87,8 +86,7 @@
                     <Spinner
                         android:id="@+id/spinner_Weather_2"
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:entries="@array/edit_diary_weather_selection" />
+                        android:layout_height="wrap_content" />
 
                 </LinearLayout>
 

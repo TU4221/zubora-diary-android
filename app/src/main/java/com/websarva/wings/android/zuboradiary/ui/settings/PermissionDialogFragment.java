@@ -12,7 +12,7 @@ import androidx.lifecycle.SavedStateHandle;
 import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
 
-public class AccessLocationPermissionDialogFragment extends DialogFragment {
+public class PermissionDialogFragment extends DialogFragment {
     private static final String FROM_CLASS_NAME = "From" + DayOfWeekPickerDialogFragment.class.getName();
     public static final String KEY_SELECTED_BUTTON = "SelectedButton" + FROM_CLASS_NAME;
     @NonNull
@@ -23,8 +23,10 @@ public class AccessLocationPermissionDialogFragment extends DialogFragment {
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         builder.setTitle("権限が必要です");
-        builder.setMessage(
-                "この機能を正常に動作させるためには位置情報利用権限が必要です。設定画面で権限を有効にしてください。");
+        String firstMessage = "この機能を正常に動作させるためには";
+        String secondMessage = PermissionDialogFragmentArgs.fromBundle(requireArguments()).getPermissionName();
+        String thirdMessage = "権限が必要です。設定画面で権限を有効にしてください。";
+        builder.setMessage(firstMessage + secondMessage + thirdMessage);
         builder.setPositiveButton(
                 "設定画面を開く", new DialogInterface.OnClickListener() {
                     @Override

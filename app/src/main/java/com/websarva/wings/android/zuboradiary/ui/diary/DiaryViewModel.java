@@ -10,10 +10,24 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 import com.websarva.wings.android.zuboradiary.DateConverter;
+import com.websarva.wings.android.zuboradiary.data.WeatherCodeConverter;
+import com.websarva.wings.android.zuboradiary.data.diary.Weathers;
+import com.websarva.wings.android.zuboradiary.data.network.WeatherApiRepository;
+import com.websarva.wings.android.zuboradiary.data.network.WeatherApiResponse;
+import com.websarva.wings.android.zuboradiary.data.settings.SettingsRepository;
 import com.websarva.wings.android.zuboradiary.ui.diary.editdiaryselectitemtitle.SelectedDiaryItemTitle;
 
+import java.io.IOException;
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
+
+import io.reactivex.rxjava3.core.Flowable;
+import io.reactivex.rxjava3.disposables.CompositeDisposable;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class DiaryViewModel extends AndroidViewModel {
 
@@ -61,8 +75,11 @@ public class DiaryViewModel extends AndroidViewModel {
     
 
     private DiaryRepository diaryRepository;
+    private WeatherApiRepository weatherApiRepository;
+    private SettingsRepository settingsRepository;
+    private final CompositeDisposable disposables = new CompositeDisposable();
     private boolean hasPreparedDiary;
-    private String loadedDate;
+    private MutableLiveData<String> loadedDate = new MutableLiveData<>();
     private MutableLiveData<String> date = new MutableLiveData<>();
     // メモ
     // 下記配列をデータバインディングでスピナーに割り当てたが、スピナーの setSection メソッド(オフセット操作)が機能しなかった。
@@ -84,6 +101,15 @@ public class DiaryViewModel extends AndroidViewModel {
     private Item[] items = new Item[MAX_ITEMS];
     private MutableLiveData<String> log = new MutableLiveData<>();
 
+    private final MutableLiveData<Boolean> shouldGetWeatherInformation = new MutableLiveData<>();
+    private Call<WeatherApiResponse> weatherApiResponseCall;
+    private boolean isCancelWeatherApiResponseCall;
+    private MutableLiveData<Boolean> isDiarySavingError = new MutableLiveData<>();
+    private MutableLiveData<Boolean> isDiaryLoadingError = new MutableLiveData<>();
+    private MutableLiveData<Boolean> isDiaryDeleteError = new MutableLiveData<>();
+    private MutableLiveData<Boolean> isWeatherLoadingError = new MutableLiveData<>();
+    private MutableLiveData<Boolean> isSettingLoadingError = new MutableLiveData<>();
+
 
     public DiaryViewModel(@NonNull Application application) {
         super(application);
@@ -92,19 +118,26 @@ public class DiaryViewModel extends AndroidViewModel {
             int itemNumber = i + 1;
             this.items[i] = new Item(itemNumber);
         }
+        weatherApiRepository = new WeatherApiRepository();
+        settingsRepository = new SettingsRepository(getApplication());
         initialize();
+
+        Flowable<Boolean> isGettingWeatherInformationFlowable =
+                settingsRepository.loadIsGettingWeatherInformation();
+        disposables.add(isGettingWeatherInformationFlowable
+                .subscribe(shouldGetWeatherInformation::postValue, throwable -> {
+                    isSettingLoadingError.postValue(true);
+                })
+        );
     }
 
     public void initialize() {
         this.hasPreparedDiary = false;
-        this.loadedDate = "";
+        this.loadedDate.setValue("");
         this.date.setValue("");
         this.intWeather1.setValue(0);
-        this.strWeather1.setValue("--");
         this.intWeather2.setValue(0);
-        this.strWeather2.setValue("--");
         this.intCondition.setValue(0);
-        this.strCondition.setValue("--");
         this.title.setValue("");
         this.visibleItemsCount = 1;
         for (Item item: this.items) {
@@ -112,26 +145,34 @@ public class DiaryViewModel extends AndroidViewModel {
             item.comment.setValue("");
         }
         this.log.setValue("");
+        isDiarySavingError.setValue(false);
+        isDiaryLoadingError.setValue(false);
+        isDiaryDeleteError.setValue(false);
+        isWeatherLoadingError.setValue(false);
+        isSettingLoadingError.setValue(false);
     }
 
-    public void prepareDiary(int year, int month, int dayOfMonth, boolean isLoading) throws Exception {
+    public void prepareDiary(int year, int month, int dayOfMonth, boolean isLoadingDiary) {
         String stringDate = DateConverter.toStringLocalDate(year, month, dayOfMonth);
-        this.date.setValue(stringDate);
-        if (isLoading && hasDiary(year, month, dayOfMonth)) {
-            loadDiary();
+        if (isLoadingDiary && hasDiary(year, month, dayOfMonth)) {
+            try {
+                loadDiary(stringDate);
+            } catch (Exception e) {
+                isDiaryLoadingError.setValue(true);
+                return;
+            }
+        } else {
+            this.date.setValue(stringDate);
         }
         this.hasPreparedDiary = true;
     }
 
-    private void loadDiary() throws Exception {
-        Diary diary = diaryRepository.selectDiary(this.date.getValue());
+    private void loadDiary(String date) throws Exception {
+        Diary diary = diaryRepository.selectDiary(date);
         this.date.setValue(diary.getDate());
         this.log.setValue(diary.getLog());
-        this.intWeather1.setValue(toIntegerWeather(diary.getWeather1()));
         this.strWeather1.setValue(diary.getWeather1());
-        this.intWeather2.setValue(toIntegerWeather(diary.getWeather2()));
         this.strWeather2.setValue(diary.getWeather2());
-        this.intCondition.setValue(toIntegerCondition(diary.getCondition()));
         this.strCondition.setValue(diary.getCondition());
         this.title.setValue(diary.getTitle());
         this.items[0].title.setValue(diary.getItem1Title());
@@ -160,25 +201,126 @@ public class DiaryViewModel extends AndroidViewModel {
                 break;
             }
         }
-        this.loadedDate = this.date.getValue();
+        loadedDate.setValue(date);
     }
 
-    public boolean hasDiary(int year, int month, int dayOfMonth) throws Exception {
-        return diaryRepository.hasDiary(year, month, dayOfMonth);
+    public boolean hasDiary(int year, int month, int dayOfMonth) {
+        try {
+            return diaryRepository.hasDiary(year, month, dayOfMonth);
+        } catch (Exception e) {
+            isDiaryLoadingError.postValue(true);
+            return false; // TODO:例外時はnullを返した方が良い？
+        }
     }
 
-    public void saveDiary() throws Exception {
+    public void prepareWeatherSelection(int year, int month, int dayOfMonth, double latitude, double longitude) {
+        LocalDate diaryDate = LocalDate.of(year, month, dayOfMonth);
+        LocalDate currentDate = LocalDate.now();
+        Log.d("20240717", "isAfter:" + String.valueOf(diaryDate.isAfter(currentDate)));
+        if (diaryDate.isAfter(currentDate)) {
+            return;
+        }
+        long betweenDays = ChronoUnit.DAYS.between(diaryDate, currentDate);
+        Log.d("20240717", "betweenDays:" + String.valueOf(betweenDays));
+        if (betweenDays > 92) { //過去天気情報取得可能
+            return;
+        }
+        if (betweenDays == 0) {
+            weatherApiResponseCall = weatherApiRepository.getTodayWeather(latitude, longitude);
+        } else {
+            weatherApiResponseCall =
+                    weatherApiRepository.getPastDayWeather(latitude, longitude, (int) betweenDays);
+        }
+        weatherApiResponseCall.enqueue(new Callback<WeatherApiResponse>() {
+            @Override
+            public void onResponse(@NonNull Call<WeatherApiResponse> call, @NonNull Response<WeatherApiResponse> response) {
+                Log.d("WeatherApi", "response.code():" + String.valueOf(response.code()));
+                Log.d("WeatherApi", "response.message():" + String.valueOf(response.message()));
+                Log.d("WeatherApi", "response.body():" + String.valueOf(response.body()));
+                WeatherApiResponse weatherApiResponse = response.body();
+                if (response.isSuccessful() && weatherApiResponse != null) {
+                    Weathers weather =
+                            findWeatherInformation(weatherApiResponse);
+                    intWeather1.postValue(weather.toWeatherNumber());
+                } else {
+                    isWeatherLoadingError.postValue(true);
+                    Log.d("WeatherApi", "response.code():" + String.valueOf(response.code()));
+                    Log.d("WeatherApi", "response.message():" + String.valueOf(response.message()));
+                    try {
+                        Log.d("WeatherApi", "response.errorBody():" + String.valueOf(response.errorBody().string()));
+                    } catch (IOException e) {
+                        Log.d("WeatherApi", "Exception:" + String.valueOf(e));
+                    }
+                }
+                resetAfterWeatherApiCompletion();
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<WeatherApiResponse> call, @NonNull Throwable t) {
+                Log.d("WeatherApi", "onFailure()");
+                if (!isCancelWeatherApiResponseCall) {
+                    isWeatherLoadingError.postValue(true);
+                }
+                resetAfterWeatherApiCompletion();
+            }
+        });
+        weatherApiResponseCall.cancel();
+    }
+
+    private Weathers findWeatherInformation(
+            @NonNull WeatherApiResponse weatherApiResponse) {
+        Log.d("20240719", String.valueOf(weatherApiResponse.getLatitude()));
+        Log.d("20240719", String.valueOf(weatherApiResponse.getLongitude()));
+        int[] weatherCodes =
+                weatherApiResponse.getDaily().getWeatherCodes();
+        for (String s: weatherApiResponse.getDaily().getTimes()) {
+            Log.d("20240719", s);
+        }
+        for (int i: weatherApiResponse.getDaily().getWeatherCodes()) {
+            Log.d("20240719", String.valueOf(i));
+        }
+        int weatherCode = weatherCodes[0];
+        Log.d("20240717", "weatherCode:" + String.valueOf(weatherCode));
+        WeatherCodeConverter converter = new WeatherCodeConverter();
+        return converter.convertWeathers(weatherCode);
+    }
+
+    private void resetAfterWeatherApiCompletion() {
+        isCancelWeatherApiResponseCall = false;
+        weatherApiResponseCall = null;
+    }
+
+    public void cancelWeatherSelectionPreparation() {
+        if (weatherApiResponseCall != null) {
+            isCancelWeatherApiResponseCall = true;
+            weatherApiResponseCall.cancel();
+        }
+    }
+
+    public boolean saveDiary() {
         Diary diary = createDiary();
         List<SelectedDiaryItemTitle> selectedDiaryItemTitleList = createSelectedDiaryItemTitleList();
-        this.diaryRepository.insertDiary(diary, selectedDiaryItemTitleList);
-        this.loadedDate = this.date.getValue();
+        try {
+            diaryRepository.insertDiary(diary, selectedDiaryItemTitleList);
+        } catch (Exception e) {
+            isDiarySavingError.setValue(true);
+            return false;
+        }
+        loadedDate.setValue(date.getValue());
+        return true;
     }
 
-    public void deleteExistingDiaryAndSaveDiary() throws Exception {
+    public boolean deleteExistingDiaryAndSaveDiary() {
         Diary diary = createDiary();
         List<SelectedDiaryItemTitle> selectedDiaryItemTitleList = createSelectedDiaryItemTitleList();
-        this.diaryRepository.deleteAndInsertDiary(this.loadedDate, diary, selectedDiaryItemTitleList);
-        this.loadedDate = this.date.getValue();
+        try {
+            diaryRepository.deleteAndInsertDiary(loadedDate.getValue(), diary, selectedDiaryItemTitleList);
+        } catch (Exception e) {
+            isDiarySavingError.setValue(true);
+            return false;
+        }
+        loadedDate.setValue(date.getValue());
+        return true;
     }
 
     private Diary createDiary() {
@@ -218,8 +360,14 @@ public class DiaryViewModel extends AndroidViewModel {
         return list;
     }
 
-    public void deleteDiary(String date) throws Exception {
-        this.diaryRepository.deleteDiary(date);
+    public boolean deleteDiary(String date) {
+        try {
+            diaryRepository.deleteDiary(date);
+        } catch (Exception e) {
+            isDiaryDeleteError.setValue(true);
+            return false;
+        }
+        return true;
     }
 
     public void updateDate(int year, int month, int dayOfMonth) {
@@ -230,42 +378,6 @@ public class DiaryViewModel extends AndroidViewModel {
     private void updateLog() {
         String stringDate = DateConverter.toStringLocalDateTimeNow();
         this.log.setValue(stringDate);
-    }
-
-    public String toStringWeather(int intWeather) {
-        for (int i = 0; i < weathers.length; i++) {
-            if (i == intWeather) {
-                return weathers[i];
-            }
-        }
-        return weathers[0];
-    }
-
-    public int toIntegerWeather(String strWeather) {
-        for (int i = 0; i < weathers.length; i++) {
-            if (weathers[i].equals(strWeather)) {
-                return i;
-            }
-        }
-        return 0;
-    }
-
-    private String toStringCondition(int intCondition) {
-        for (int i = 0; i < conditions.length; i++) {
-            if (i == intCondition) {
-                return conditions[i];
-            }
-        }
-        return conditions[0];
-    }
-
-    public int toIntegerCondition(String strCondition) {
-        for (int i = 0; i < conditions.length; i++) {
-            if (conditions[i].equals(strCondition)) {
-                return i;
-            }
-        }
-        return 0;
     }
 
     public void incrementVisibleItemsCount() {
@@ -306,11 +418,12 @@ public class DiaryViewModel extends AndroidViewModel {
         this.hasPreparedDiary = bool;
     }
 
-    public String getLoadedDate() {
-        return this.loadedDate;
+    public LiveData<String> getLoadedDateLiveData() {
+        return loadedDate;
     }
-    public void setLoadedDate(String loadedDate) {
-        this.loadedDate = loadedDate;
+
+    public void setLoadedDateLiveData(String loadedDate) {
+        this.loadedDate.setValue(loadedDate);
     }
 
     public LiveData<String> getLiveDate() {
@@ -325,13 +438,12 @@ public class DiaryViewModel extends AndroidViewModel {
     }
     public void setIntWeather1(int intWeather) {
         this.intWeather1.setValue(intWeather);
-        this.strWeather1.setValue(toStringWeather(intWeather));
     }
 
     public LiveData<String> getLiveStrWeather1() {
         return this.strWeather1;
     }
-    private void setStrWeather1(String strWeather) {
+    public void setStrWeather1(String strWeather) {
         this.strWeather1.setValue(strWeather);
     }
 
@@ -340,13 +452,12 @@ public class DiaryViewModel extends AndroidViewModel {
     }
     public void setIntWeather2(int intWeather) {
         this.intWeather2.setValue(intWeather);
-        this.strWeather2.setValue(toStringWeather(intWeather));
     }
 
     public LiveData<String> getLiveStrWeather2() {
         return this.strWeather2;
     }
-    private void setStrWeather2(String strWeather) {
+    public void setStrWeather2(String strWeather) {
         this.strWeather2.setValue(strWeather);
     }
 
@@ -355,13 +466,12 @@ public class DiaryViewModel extends AndroidViewModel {
     }
     public void setIntCondition(int intCondition) {
         this.intCondition.setValue(intCondition);
-        this.strCondition.setValue(toStringCondition(intCondition));
     }
 
     public LiveData<String> getLiveStrCondition() {
         return this.strCondition;
     }
-    private void setStrCondition(String strCondition) {
+    public void setStrCondition(String strCondition) {
         this.strCondition.setValue(strCondition);
     }
 
@@ -409,5 +519,51 @@ public class DiaryViewModel extends AndroidViewModel {
     }
     public void setLog(String log) {
         this.log.setValue(log);
+    }
+
+    public LiveData<Boolean> getShouldGetWeatherInformationLiveData() {
+        return shouldGetWeatherInformation;
+    }
+
+    public LiveData<Boolean> getIsDiarySavingErrorLiveData() {
+        return isDiarySavingError;
+    }
+
+    public void setIsDiarySavingErrorLiveData(boolean bool) {
+        isDiarySavingError.setValue(bool);
+    }
+
+    public LiveData<Boolean> getIsDiaryLoadingErrorLiveData() {
+        return isDiaryLoadingError;
+    }
+
+    public void setIsDiaryLoadingErrorLiveData(boolean bool) {
+        isDiaryLoadingError.setValue(bool);
+    }
+
+    public LiveData<Boolean> getIsDiaryDeleteErrorLiveData() {
+        return isDiaryDeleteError;
+    }
+
+    public void setIsDiaryDeleteErrorLiveData(boolean bool) {
+        isDiaryDeleteError.setValue(bool);
+    }
+
+
+    public LiveData<Boolean> getIsWeatherLoadingErrorLiveData() {
+        return isWeatherLoadingError;
+    }
+
+    public void setIsWeatherLoadingErrorLiveData(boolean bool) {
+        isWeatherLoadingError.setValue(bool);
+    }
+
+
+    public LiveData<Boolean> getIsSettingLoadingErrorLiveData() {
+        return isSettingLoadingError;
+    }
+
+    public void setIsSettingLoadingErrorLiveData(boolean bool) {
+        isSettingLoadingError.setValue(bool);
     }
 }

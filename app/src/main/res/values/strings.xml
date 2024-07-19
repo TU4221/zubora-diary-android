@@ -142,6 +142,20 @@
     <string name="dialog_fragment_number_picker_friday">金曜</string>
     <string name="dialog_fragment_number_picker_saturday">土曜</string>
 
+    <!-- enum_weathers -->
+    <string name="enum_weather_unknown">--</string>
+    <string name="enum_weather_sunny">晴</string>
+    <string name="enum_weather_cloudy">曇</string>
+    <string name="enum_weather_rainy">雨</string>
+    <string name="enum_weather_snowy">雪</string>
+
+    <!-- enum_conditions -->
+    <string name="enum_conditions_unknown">--</string>
+    <string name="enum_conditions_happy">HAPPY</string>
+    <string name="enum_conditions_good">GOOD</string>
+    <string name="enum_conditions_average">AVERAGE</string>
+    <string name="enum_conditions_poor">POOR</string>
+    <string name="enum_conditions_bad">BAD</string>
 
 
     <!-- TODO: Remove or change this placeholder text -->

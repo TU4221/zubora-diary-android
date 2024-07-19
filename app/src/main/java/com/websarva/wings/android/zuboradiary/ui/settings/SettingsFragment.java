@@ -8,6 +8,7 @@ import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.Settings;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -40,7 +41,6 @@ import com.websarva.wings.android.zuboradiary.data.settings.ThemeColors;
 import com.websarva.wings.android.zuboradiary.databinding.FragmentSettingsBinding;
 import com.websarva.wings.android.zuboradiary.ui.ThemeColorSwitcher;
 import com.websarva.wings.android.zuboradiary.ui.ViewModelFactory;
-import com.websarva.wings.android.zuboradiary.ui.calendar.CalendarFragmentDirections;
 
 import java.time.DayOfWeek;
 import java.time.LocalTime;
@@ -78,6 +78,7 @@ public class SettingsFragment extends Fragment {
         this.navController = NavHostFragment.findNavController(this);
 
         // ActivityResultLauncher設定
+        // 通知権限取得結果処理
         requestPostNotificationsPermissionLauncher =
                 registerForActivityResult(
                         new ActivityResultContracts.RequestPermission(),
@@ -95,6 +96,7 @@ public class SettingsFragment extends Fragment {
                         }
                 );
 
+        // 位置情報利用権限取得結果処理
         requestAccessLocationPermissionLauncher =
                 registerForActivityResult(
                         new ActivityResultContracts.RequestMultiplePermissions(),
@@ -142,27 +144,12 @@ public class SettingsFragment extends Fragment {
         // ダイアログフラグメントからの結果受取設定
         NavBackStackEntry navBackStackEntry =
                 this.navController.getBackStackEntry(R.id.navigation_settings_fragment);
-        SettingsFragmentLifecycleEventObserver lifecycleEventObserver =
-                new SettingsFragmentLifecycleEventObserver(navBackStackEntry, this.settingsViewModel);
-        navBackStackEntry.getLifecycle().addObserver(lifecycleEventObserver);
-        getViewLifecycleOwner().getLifecycle().addObserver(new LifecycleEventObserver() {
-            @Override
-            public void onStateChanged(
-                    @NonNull LifecycleOwner source, @NonNull Lifecycle.Event event) {
-                if (event.equals(Lifecycle.Event.ON_DESTROY)) {
-                    // MEMO:removeで削除しないとこのFragmentを閉じてもResult内容が残ってしまう。
-                    //      その為、このFragmentを再表示した時にObserverがResultの内容で処理してしまう。
-                    SavedStateHandle savedStateHandle = navBackStackEntry.getSavedStateHandle();
-                    savedStateHandle.remove(ThemeColorPickerDialogFragment.KEY_SELECTED_THEME_COLOR);
-                    savedStateHandle.remove(DayOfWeekPickerDialogFragment.KEY_SELECTED_DAY_OF_WEEK);
-                    savedStateHandle.remove(TimePickerDialogFragment.KEY_SELECTED_HOUR);
-                    savedStateHandle.remove(TimePickerDialogFragment.KEY_SELECTED_MINUTE);
-                    savedStateHandle.remove(NotificationPermissionDialogFragment.KEY_SELECTED_BUTTON);
-                    savedStateHandle.remove(AccessLocationPermissionDialogFragment.KEY_SELECTED_BUTTON);
-                    navBackStackEntry.getLifecycle().removeObserver(lifecycleEventObserver);
-                }
-            }
-        });
+        NaviBackStackEntryLifecycleEventObserver naviBackStackEntryLifecycleEventObserver =
+                new NaviBackStackEntryLifecycleEventObserver(navBackStackEntry);
+        navBackStackEntry.getLifecycle().addObserver(naviBackStackEntryLifecycleEventObserver);
+        viewLifecycleEventObserver viewLifecycleEventObserver =
+                new viewLifecycleEventObserver(navBackStackEntry, naviBackStackEntryLifecycleEventObserver);
+        getViewLifecycleOwner().getLifecycle().addObserver(viewLifecycleEventObserver);
 
 
         this.binding.textThemeColorSettingTitle.setOnClickListener(
@@ -208,7 +195,7 @@ public class SettingsFragment extends Fragment {
                 new OnCheckedChangeListenerOfGettingWeatherInformationSetting(this.navController, this.settingsViewModel)
         );
 
-        this.settingsViewModel.getLiveDataThemeColor().observe(getViewLifecycleOwner(), new Observer<String>() {
+        this.settingsViewModel.getThemeColorLiveData().observe(getViewLifecycleOwner(), new Observer<String>() {
             @Override
             public void onChanged(String string) {
                 ThemeColorSwitcher switcher = new ThemeColorSwitcher(getResources(), requireContext());
@@ -247,13 +234,10 @@ public class SettingsFragment extends Fragment {
 
 
 
-    private class SettingsFragmentLifecycleEventObserver implements LifecycleEventObserver {
+    private class NaviBackStackEntryLifecycleEventObserver implements LifecycleEventObserver {
         private NavBackStackEntry navBackStackEntry;
-        private SettingsViewModel settingsViewModel;
-        public SettingsFragmentLifecycleEventObserver(
-                NavBackStackEntry navBackStackEntry, SettingsViewModel settingsViewModel) {
+        public NaviBackStackEntryLifecycleEventObserver(NavBackStackEntry navBackStackEntry) {
             this.navBackStackEntry = navBackStackEntry;
-            this.settingsViewModel = settingsViewModel;
         }
         @Override
         public void onStateChanged(
@@ -266,7 +250,7 @@ public class SettingsFragment extends Fragment {
                 if (containsThemeColorPickerDialogFragmentResults) {
                     ThemeColors selectedThemeColor =
                             savedStateHandle.get(ThemeColorPickerDialogFragment.KEY_SELECTED_THEME_COLOR);
-                    this.settingsViewModel.saveThemeColor(selectedThemeColor);
+                    settingsViewModel.saveThemeColor(selectedThemeColor);
                     savedStateHandle.remove(ThemeColorPickerDialogFragment.KEY_SELECTED_THEME_COLOR);
                 }
 
@@ -276,7 +260,7 @@ public class SettingsFragment extends Fragment {
                 if (containsDayOfWeekPickerDialogFragmentResults) {
                     DayOfWeek selectedDayOfWeek =
                             savedStateHandle.get(DayOfWeekPickerDialogFragment.KEY_SELECTED_DAY_OF_WEEK);
-                    this.settingsViewModel.saveCalendarStartDayOfWeek(selectedDayOfWeek);
+                    settingsViewModel.saveCalendarStartDayOfWeek(selectedDayOfWeek);
                     savedStateHandle.remove(DayOfWeekPickerDialogFragment.KEY_SELECTED_DAY_OF_WEEK);
                 }
 
@@ -300,28 +284,43 @@ public class SettingsFragment extends Fragment {
                     savedStateHandle.remove(TimePickerDialogFragment.KEY_SELECTED_MINUTE);
                 }
 
-                // リマインダー通知時間設定ダイアログフラグメントから結果受取
-                boolean containsNotificationPermissionDialogFragmentResult =
-                        savedStateHandle.contains(NotificationPermissionDialogFragment.KEY_SELECTED_BUTTON);
-                if (containsNotificationPermissionDialogFragmentResult) {
+                // 権限催促ダイアログフラグメントから結果受取
+                boolean containsPermissionDialogFragmentResult =
+                        savedStateHandle.contains(PermissionDialogFragment.KEY_SELECTED_BUTTON);
+                if (containsPermissionDialogFragmentResult) {
                     Integer selectedButton =
-                            savedStateHandle.get(NotificationPermissionDialogFragment.KEY_SELECTED_BUTTON);
+                            savedStateHandle.get(PermissionDialogFragment.KEY_SELECTED_BUTTON);
                     if (selectedButton != null && selectedButton == Dialog.BUTTON_POSITIVE) {
                         actionApplicationDetailsSettings();
                     }
-                    savedStateHandle.remove(NotificationPermissionDialogFragment.KEY_SELECTED_BUTTON);
+                    savedStateHandle.remove(PermissionDialogFragment.KEY_SELECTED_BUTTON);
                 }
+            }
+        }
+    }
 
-                boolean containsAccessLocationPermissionDialogFragmentResult =
-                        savedStateHandle.contains(AccessLocationPermissionDialogFragment.KEY_SELECTED_BUTTON);
-                if (containsAccessLocationPermissionDialogFragmentResult) {
-                    Integer selectedButton =
-                            savedStateHandle.get(AccessLocationPermissionDialogFragment.KEY_SELECTED_BUTTON);
-                    if (selectedButton != null && selectedButton == Dialog.BUTTON_POSITIVE) {
-                        actionApplicationDetailsSettings();
-                    }
-                    savedStateHandle.remove(AccessLocationPermissionDialogFragment.KEY_SELECTED_BUTTON);
-                }
+    private class viewLifecycleEventObserver implements LifecycleEventObserver {
+        private NavBackStackEntry navBackStackEntry;
+        private NaviBackStackEntryLifecycleEventObserver naviBackStackEntryLifecycleEventObserver;
+        public viewLifecycleEventObserver(
+                NavBackStackEntry navBackStackEntry,
+                NaviBackStackEntryLifecycleEventObserver naviBackStackEntryLifecycleEventObserver) {
+            this.navBackStackEntry = navBackStackEntry;
+            this.naviBackStackEntryLifecycleEventObserver = naviBackStackEntryLifecycleEventObserver;
+        }
+        @Override
+        public void onStateChanged(
+                @NonNull LifecycleOwner source, @NonNull Lifecycle.Event event) {
+            if (event.equals(Lifecycle.Event.ON_DESTROY)) {
+                // MEMO:removeで削除しないとこのFragmentを閉じてもResult内容が残ってしまう。
+                //      その為、このFragmentを再表示した時にObserverがResultの内容で処理してしまう。
+                SavedStateHandle savedStateHandle = navBackStackEntry.getSavedStateHandle();
+                savedStateHandle.remove(ThemeColorPickerDialogFragment.KEY_SELECTED_THEME_COLOR);
+                savedStateHandle.remove(DayOfWeekPickerDialogFragment.KEY_SELECTED_DAY_OF_WEEK);
+                savedStateHandle.remove(TimePickerDialogFragment.KEY_SELECTED_HOUR);
+                savedStateHandle.remove(TimePickerDialogFragment.KEY_SELECTED_MINUTE);
+                savedStateHandle.remove(PermissionDialogFragment.KEY_SELECTED_BUTTON);
+                navBackStackEntry.getLifecycle().removeObserver(naviBackStackEntryLifecycleEventObserver);
             }
         }
     }
@@ -337,7 +336,7 @@ public class SettingsFragment extends Fragment {
         @Override
         public void onClick(View v) {
             String currentThemeColorName =
-                    this.settingsViewModel.getLiveDataThemeColor().getValue();
+                    this.settingsViewModel.getThemeColorLiveData().getValue();
             ThemeColors currentThemeColor = toThemeColors(currentThemeColorName);
             if (currentThemeColor == null) {
                 currentThemeColor = ThemeColors.values()[0];
@@ -373,7 +372,7 @@ public class SettingsFragment extends Fragment {
         @Override
         public void onClick(View v) {
             String currentCalendarStartDayOfWeekName =
-                    this.settingsViewModel.getLiveDataCalendarStartDayOfWeek().getValue();
+                    this.settingsViewModel.getCalendarStartDayOfWeekLiveData().getValue();
             DayOfWeek currentCalendarStartDayOfWeek = toDayOfWeek(currentCalendarStartDayOfWeekName);
             if (currentCalendarStartDayOfWeek == null) {
                 currentCalendarStartDayOfWeek = DayOfWeek.SUNDAY;
@@ -410,33 +409,35 @@ public class SettingsFragment extends Fragment {
         }
         @Override
         public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-            if (isTouchedReminderNotificationSwitch) {
-                if (isChecked) {
-                    if (isGrantedPostNotifications()) {
-                        NavDirections action = SettingsFragmentDirections
-                                .actionNavigationSettingsFragmentToTimePickerDialog();
-                        navController.navigate(action);
-                    } else {
-                        boolean shouldShowRequestPermissionRationale =
-                                ActivityCompat.shouldShowRequestPermissionRationale(
-                                        requireActivity(), Manifest.permission.POST_NOTIFICATIONS);
-                        if (shouldShowRequestPermissionRationale) {
-                            requestPostNotificationsPermissionLauncher
-                                    .launch(Manifest.permission.POST_NOTIFICATIONS);
-                        } else {
-                            binding.switchReminderNotificationValue.setChecked(false);
-                            NavDirections action =
-                                    SettingsFragmentDirections
-                                            .actionSettingsFragmentToNotificationPermissionDialog();
-                            navController.navigate(action);
-                        }
-                    }
-                } else {
-                    settingsViewModel.cancelReminderNotificationWorker();
-                    settingsViewModel.saveIsReminderNotification(false);
-                }
-                isTouchedReminderNotificationSwitch = false;
+            if (!isTouchedReminderNotificationSwitch) {
+                return;
             }
+            if (isChecked) {
+                if (isGrantedPostNotifications()) {
+                    NavDirections action = SettingsFragmentDirections
+                            .actionNavigationSettingsFragmentToTimePickerDialog();
+                    navController.navigate(action);
+                } else {
+                    boolean shouldShowRequestPermissionRationale =
+                            ActivityCompat.shouldShowRequestPermissionRationale(
+                                    requireActivity(), Manifest.permission.POST_NOTIFICATIONS);
+                    if (shouldShowRequestPermissionRationale) {
+                        requestPostNotificationsPermissionLauncher
+                                .launch(Manifest.permission.POST_NOTIFICATIONS);
+                    } else {
+                        binding.switchReminderNotificationValue.setChecked(false);
+                        String permissionName = "通知";
+                        NavDirections action =
+                                SettingsFragmentDirections
+                                        .actionSettingsFragmentToPermissionDialog(permissionName);
+                        navController.navigate(action);
+                    }
+                }
+            } else {
+                settingsViewModel.cancelReminderNotificationWorker();
+                settingsViewModel.saveIsReminderNotification(false);
+            }
+            isTouchedReminderNotificationSwitch = false;
         }
     }
 
@@ -466,32 +467,34 @@ public class SettingsFragment extends Fragment {
         }
         @Override
         public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-            if (isTouchedGettingWeatherInformationSwitch) {
-                if (isChecked) {
-                    if (isGrantedAccessLocation()) {
-                        settingsViewModel.saveIsGettingWeatherInformation(true);
-                    } else {
-                        boolean shouldShowRequestPermissionRationale =
-                                ActivityCompat.shouldShowRequestPermissionRationale(
-                                        requireActivity(), Manifest.permission.ACCESS_FINE_LOCATION)
-                                && ActivityCompat.shouldShowRequestPermissionRationale(
-                                        requireActivity(), Manifest.permission.ACCESS_COARSE_LOCATION);
-                        if (shouldShowRequestPermissionRationale) {
-                            String[] requestPermissions =
-                                    {Manifest.permission.ACCESS_FINE_LOCATION,
-                                            Manifest.permission.ACCESS_COARSE_LOCATION};
-                            requestAccessLocationPermissionLauncher.launch(requestPermissions);
-                        } else {
-                            binding.switchGettingWeatherInformationValue.setChecked(false);
-                            NavDirections action =
-                                    SettingsFragmentDirections
-                                            .actionSettingsFragmentToAccessLocationPermissionDialog();
-                            navController.navigate(action);
-                        }
-                    }
+            if (!isTouchedGettingWeatherInformationSwitch) {
+                return;
+            }
+            if (isChecked) {
+                if (isGrantedAccessLocation()) {
+                    settingsViewModel.saveIsGettingWeatherInformation(true);
                 } else {
-                    settingsViewModel.saveIsGettingWeatherInformation(false);
+                    boolean shouldShowRequestPermissionRationale =
+                            ActivityCompat.shouldShowRequestPermissionRationale(
+                                    requireActivity(), Manifest.permission.ACCESS_FINE_LOCATION)
+                                    && ActivityCompat.shouldShowRequestPermissionRationale(
+                                    requireActivity(), Manifest.permission.ACCESS_COARSE_LOCATION);
+                    if (shouldShowRequestPermissionRationale) {
+                        String[] requestPermissions =
+                                {Manifest.permission.ACCESS_FINE_LOCATION,
+                                        Manifest.permission.ACCESS_COARSE_LOCATION};
+                        requestAccessLocationPermissionLauncher.launch(requestPermissions);
+                    } else {
+                        binding.switchGettingWeatherInformationValue.setChecked(false);
+                        String permissionName = "位置情報利用";
+                        NavDirections action =
+                                SettingsFragmentDirections
+                                        .actionSettingsFragmentToPermissionDialog(permissionName);
+                        navController.navigate(action);
+                    }
                 }
+            } else {
+                settingsViewModel.saveIsGettingWeatherInformation(false);
             }
             isTouchedGettingWeatherInformationSwitch = false;
         }

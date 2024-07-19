@@ -86,6 +86,7 @@ public class DateConverter {
         return "";
     }
 
+    // TODO:now()ではなく例外を投げる
     public static LocalDate toLocalDate(String date) {
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
             return LocalDate.parse(date, DATE_FORMATTER);
