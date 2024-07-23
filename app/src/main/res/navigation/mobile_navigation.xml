@@ -256,6 +256,9 @@
                 android:id="@+id/action_edit_diary_fragment_to_update_existing_diary_dialog"
                 app:destination="@id/navigation_update_existing_diary_dialog_for_edit_diary_fragment"/>
             <action
+                android:id="@+id/action_edit_diary_fragment_to_weather_information_dialog"
+                app:destination="@id/navigation_weather_information_dialog"/>
+            <action
                 android:id="@+id/action_edit_diary_fragment_to_message_dialog"
                 app:destination="@id/navigation_message_dialog">
                 <argument
@@ -307,6 +310,13 @@
             <argument
                 android:name="UpdateType"
                 app:argType="integer" />
+        </dialog>
+        <dialog
+            android:id="@+id/navigation_weather_information_dialog"
+            android:name="com.websarva.wings.android.zuboradiary.ui.diary.editdiary.WeatherInformationDialogFragment">
+            <argument
+                android:name="TargetDiaryDate"
+                app:argType="string" />
         </dialog>
 
         <fragment

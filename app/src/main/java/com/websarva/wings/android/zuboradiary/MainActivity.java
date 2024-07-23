@@ -1,26 +1,35 @@
 package com.websarva.wings.android.zuboradiary;
 
+import android.Manifest;
 import android.animation.ValueAnimator;
-import android.content.Intent;
-import android.os.Build;
+import android.content.pm.PackageManager;
+import android.location.Location;
 import android.os.Bundle;
+import android.os.Looper;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationListener;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.Priority;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentOnAttachListener;
 import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.LifecycleEventObserver;
 import androidx.lifecycle.LifecycleOwner;
+import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.NavDestination;
@@ -31,8 +40,10 @@ import androidx.navigation.ui.NavigationUI;
 import com.google.android.material.navigation.NavigationBarView;
 import com.google.android.material.transition.platform.MaterialFadeThrough;
 import com.websarva.wings.android.zuboradiary.databinding.ActivityMainBinding;
+import com.websarva.wings.android.zuboradiary.ui.ViewModelFactory;
 import com.websarva.wings.android.zuboradiary.ui.calendar.CalendarFragment;
 import com.websarva.wings.android.zuboradiary.ui.list.DiaryListFragment;
+import com.websarva.wings.android.zuboradiary.ui.settings.SettingsViewModel;
 
 //  MEMO:GitHubトークン(有効期限20240408から30日後)_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
 
@@ -49,12 +60,22 @@ public class MainActivity extends AppCompatActivity {
     private int bottomNavigationDefaultHigh;
     private boolean bottomNavigationIsHided = false;
 
+    // ViewModel
+    private SettingsViewModel settingsViewModel;
+
+    // 位置情報取得
+    private FusedLocationProviderClient fusedLocationProviderClient;
+    private LocationRequest locationRequest;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         this.binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(this.binding.getRoot());
+
+        setUpViewModel();
+        setUpLocationInformation();
 
         // Keyboardクラス設定
         Keyboard.setInputMethodManager(this);
@@ -272,13 +293,48 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    /*@Override
-    protected void onNewIntent(Intent intent) {
-        super.onNewIntent(intent);
-        NavController navController =
-                Navigation.findNavController(this, R.id.nav_host_fragment_activity_main);
-        navController.handleDeepLink(intent);
-    }*/
+    private void setUpViewModel() {
+        ViewModelFactory factory =
+                new ViewModelFactory(this);
+        ViewModelProvider provider = new ViewModelProvider(this, factory);
+        settingsViewModel = provider.get(SettingsViewModel.class);
+    }
+
+    private void setUpLocationInformation() {
+        LocationRequest.Builder builder =
+                new LocationRequest.Builder(Priority.PRIORITY_BALANCED_POWER_ACCURACY, 5000);
+        locationRequest = builder.build();
+        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
+        settingsViewModel.getIsCheckedGettingWeatherInformationLiveData()
+                .observe(this, new Observer<Boolean>() {
+                    @Override
+                    public void onChanged(Boolean aBoolean) {
+                        if (aBoolean) {
+                            updateLocationInformation();
+                        } else {
+                            settingsViewModel.clearLocationInformation();
+                        }
+                    }
+                });
+    }
+
+    public boolean updateLocationInformation() {
+        if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED
+                && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED) {
+            return false;
+        }
+        fusedLocationProviderClient.requestLocationUpdates(locationRequest, new LocationListener() {
+            @Override
+            public void onLocationChanged(@NonNull Location location) {
+                // アプリ起動時に一回だけ取得
+                settingsViewModel.updateLocationInformation(location.getLatitude(), location.getLongitude());
+                fusedLocationProviderClient.removeLocationUpdates(this);
+            }
+        }, Looper.getMainLooper());
+        return true;
+    }
 
     public boolean getTabWasSelected() {
         return this.tabWasSelected;

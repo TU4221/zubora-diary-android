@@ -19,6 +19,7 @@ import androidx.navigation.NavDeepLinkBuilder;
 import androidx.work.Worker;
 import androidx.work.WorkerParameters;
 
+import com.websarva.wings.android.zuboradiary.CustomApplication;
 import com.websarva.wings.android.zuboradiary.R;
 
 public class ReminderNotificationWorker extends Worker {
@@ -48,6 +49,20 @@ public class ReminderNotificationWorker extends Worker {
     @NonNull
     @Override
     public Result doWork() {
+        CustomApplication application = null;
+        if (getApplicationContext() instanceof CustomApplication) {
+            Log.d("20240723", "application != null");
+            application = (CustomApplication) getApplicationContext();
+        } else {
+            return Result.failure();
+        }
+
+        if (application != null && application.getIsAppInForeground()) {
+            Log.d("20240723", "isAppInForeground == true");
+            return Result.failure();
+        }
+        Log.d("20240723", "isAppInForeground == false");
+
         NotificationCompat.Builder builder;
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
             builder = new NotificationCompat.Builder(getApplicationContext(), CHANNEL_ID);

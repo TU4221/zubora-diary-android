@@ -2,19 +2,15 @@ package com.websarva.wings.android.zuboradiary.ui.diary.editdiary;
 
 import static android.text.InputType.TYPE_TEXT_FLAG_MULTI_LINE;
 
-import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.pm.PackageManager;
-import android.location.Location;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.Toolbar;
 import androidx.constraintlayout.motion.widget.MotionLayout;
-import androidx.core.app.ActivityCompat;
 import androidx.core.widget.NestedScrollView;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Lifecycle;
@@ -30,7 +26,6 @@ import androidx.navigation.NavDestination;
 import androidx.navigation.NavDirections;
 import androidx.navigation.fragment.NavHostFragment;
 
-import android.os.Looper;
 import android.text.Editable;
 import android.text.InputFilter;
 import android.text.TextWatcher;
@@ -48,11 +43,6 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
-import com.google.android.gms.location.FusedLocationProviderClient;
-import com.google.android.gms.location.LocationListener;
-import com.google.android.gms.location.LocationRequest;
-import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.location.Priority;
 import com.websarva.wings.android.zuboradiary.DateConverter;
 import com.websarva.wings.android.zuboradiary.data.diary.ConditionConverter;
 import com.websarva.wings.android.zuboradiary.data.diary.Conditions;
@@ -60,8 +50,10 @@ import com.websarva.wings.android.zuboradiary.data.diary.WeatherConverter;
 import com.websarva.wings.android.zuboradiary.data.diary.Weathers;
 import com.websarva.wings.android.zuboradiary.databinding.FragmentEditDiaryBinding;
 import com.websarva.wings.android.zuboradiary.R;
+import com.websarva.wings.android.zuboradiary.ui.ViewModelFactory;
 import com.websarva.wings.android.zuboradiary.ui.diary.DiaryViewModel;
 import com.websarva.wings.android.zuboradiary.ui.diary.editdiaryselectitemtitle.EditDiarySelectItemTitleFragment;
+import com.websarva.wings.android.zuboradiary.ui.settings.SettingsViewModel;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -83,11 +75,11 @@ public class EditDiaryFragment extends Fragment {
     private boolean shouldShowDiaryLoadingErrorDialog;
     private boolean shouldShowDiaryDeleteErrorDialog;
     private boolean shouldShowWeatherLoadingErrorDialog;
-    private boolean shouldShowSettingLoadingErrorDialog;
 
 
     // ViewModel
     private DiaryViewModel diaryViewModel;
+    private SettingsViewModel settingsViewModel;
 
     // キーボード関係
     private InputMethodManager inputMethodManager;
@@ -95,8 +87,6 @@ public class EditDiaryFragment extends Fragment {
     // 位置情報
     private double latitude = -1;
     private double longitude = -1;
-    private FusedLocationProviderClient fusedLocationProviderClient;
-    private LocationRequest locationRequest;
     private boolean shouldPrepareWeatherSelection = false;
 
     // 上書保存方法
@@ -108,23 +98,18 @@ public class EditDiaryFragment extends Fragment {
         super.onCreate(savedInstanceState);
 
         // ViewModel設定
-        ViewModelProvider provider = new ViewModelProvider(requireActivity());
-        this.diaryViewModel = provider.get(DiaryViewModel.class);
+        ViewModelFactory factory = new ViewModelFactory(requireContext());
+        ViewModelProvider provider = new ViewModelProvider(requireActivity(), factory);
+        diaryViewModel = provider.get(DiaryViewModel.class);
+        settingsViewModel = provider.get(SettingsViewModel.class);
         boolean isStartDiaryFragment =
                 EditDiaryFragmentArgs.fromBundle(requireArguments()).getIsStartDiaryFragment();
         if (isStartDiaryFragment) {
-            this.diaryViewModel.initialize();
+            diaryViewModel.initialize();
         }
 
         // Navigation設定
         this.navController = NavHostFragment.findNavController(this);
-
-        // Location設定
-        fusedLocationProviderClient =
-                LocationServices.getFusedLocationProviderClient(requireActivity());
-        LocationRequest.Builder builder =
-                new LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, 500);
-        locationRequest = builder.build();
     }
 
     @Override
@@ -218,8 +203,10 @@ public class EditDiaryFragment extends Fragment {
                                         );
                             } else {
                                 String loadedDate = diaryViewModel.getLoadedDateLiveData().getValue();
-                                if (loadedDate.isEmpty()) {
-                                    prepareWeatherSelectionOnDateChanged(date);
+                                Boolean isChecked =
+                                        settingsViewModel.getIsCheckedGettingWeatherInformationLiveData().getValue();
+                                if (loadedDate != null && loadedDate.isEmpty() && isChecked != null && isChecked) {
+                                    prepareWeatherSelection(date);
                                 }
                             }
                         }
@@ -279,6 +266,30 @@ public class EditDiaryFragment extends Fragment {
                         retryErrorDialogShow();
                     }
 
+                    // 天気情報読込ダイアログフラグメントから結果受取
+                    boolean containsWeatherInformationDialogFragmentResult =
+                            savedStateHandle.contains(WeatherInformationDialogFragment.KEY_SELECTED_BUTTON);
+                    if (containsWeatherInformationDialogFragmentResult) {
+                        String date = diaryViewModel.getLiveDate().getValue();
+                        Integer selectedButton =
+                                savedStateHandle.get(WeatherInformationDialogFragment.KEY_SELECTED_BUTTON);
+                        if (selectedButton != null) {
+                            if (selectedButton == DialogInterface.BUTTON_POSITIVE) {
+                                LocalDate loadDiaryDate = DateConverter.toLocalDate(date);
+                                diaryViewModel.prepareWeatherSelection(
+                                        loadDiaryDate.getYear(),
+                                        loadDiaryDate.getMonthValue(),
+                                        loadDiaryDate.getDayOfMonth(),
+                                        settingsViewModel.getLatitude(),
+                                        settingsViewModel.getLongitude()
+                                );
+                            }
+                        }
+                        savedStateHandle.remove(WeatherInformationDialogFragment.KEY_SELECTED_BUTTON);
+
+
+                    }
+
                 }
             }
         };
@@ -298,6 +309,7 @@ public class EditDiaryFragment extends Fragment {
                     savedStateHandle.remove(UpdateExistingDiaryDialogFragment.KEY_SELECTED_BUTTON);
                     savedStateHandle.remove(UpdateExistingDiaryDialogFragment.KEY_UPDATE_TYPE);
                     savedStateHandle.remove(DeleteConfirmationDialogFragment.KEY_DELETE_ITEM_NUMBER);
+                    savedStateHandle.remove(WeatherInformationDialogFragment.KEY_SELECTED_BUTTON);
                     navBackStackEntry.getLifecycle().removeObserver(lifecycleEventObserver);
                 }
             }
@@ -485,12 +497,13 @@ public class EditDiaryFragment extends Fragment {
                 Log.d("20240719", "TextDate:" + s);
                 Log.d("20240719", "lastTextDate:" + lastTextDate);
                 if (!s.isEmpty()) {
-                    boolean isStarting = startLoadingExistingDiaryDialogFragmentOnDateChanged(s);
+                    boolean isShowing = showLoadingExistingDiaryDialogFragmentOnDateChanged(s);
+                    Boolean isChecked = settingsViewModel.getIsCheckedGettingWeatherInformationLiveData().getValue();
                     // 読込確認Dialog表示時は、確認後下記処理を行う。
-                    if (!isStarting) {
+                    if (!isShowing && isChecked != null && isChecked) {
                         String loadedDate = diaryViewModel.getLoadedDateLiveData().getValue();
                         if (loadedDate.isEmpty() && !s.equals(lastTextDate)) {
-                            prepareWeatherSelectionOnDateChanged(s);
+                            prepareWeatherSelection(s);
                         }
                     }
                     // HACK:日記読込時、読込前に一度リセットする為、空の文字列が代入される。
@@ -615,14 +628,14 @@ public class EditDiaryFragment extends Fragment {
                         }
                     }
                 });
-        diaryViewModel.getShouldGetWeatherInformationLiveData()
+        settingsViewModel.getHasUpdatedLocationLiveData()
                 .observe(getViewLifecycleOwner(), new Observer<Boolean>() {
                     @Override
                     public void onChanged(Boolean aBoolean) {
-                        if (!aBoolean) {
-                            return;
+                        if (aBoolean && shouldPrepareWeatherSelection) {
+                            String date = diaryViewModel.getLiveDate().getValue();
+                            prepareWeatherSelection(date);
                         }
-                        initializeLocation();
                     }
                 });
 
@@ -857,19 +870,6 @@ public class EditDiaryFragment extends Fragment {
                 }
             }
         });
-        diaryViewModel.getIsSettingLoadingErrorLiveData().observe(getViewLifecycleOwner(), new Observer<Boolean>() {
-            @Override
-            public void onChanged(Boolean aBoolean) {
-                if (aBoolean) {
-                    if (canShowDialog()) {
-                        showSettingLoadingErrorDialog();
-                    } else {
-                        shouldShowSettingLoadingErrorDialog = true;
-                    }
-                    diaryViewModel.setIsSettingLoadingErrorLiveData(false);
-                }
-            }
-        });
 
     }
 
@@ -1022,7 +1022,7 @@ public class EditDiaryFragment extends Fragment {
         this.navController.navigate(action);
     }
 
-    private boolean startLoadingExistingDiaryDialogFragmentOnDateChanged(String changedDate) {
+    private boolean showLoadingExistingDiaryDialogFragmentOnDateChanged(String changedDate) {
         LocalDate localDate = DateConverter.toLocalDate(changedDate);
         if (changedDate.equals(lastTextDate)) {
             return false;
@@ -1041,29 +1041,23 @@ public class EditDiaryFragment extends Fragment {
         return false;
     }
 
-    private void prepareWeatherSelectionOnDateChanged(String date) {
+    private void prepareWeatherSelection(String date) {
         LocalDate localDate = DateConverter.toLocalDate(date);
         // HACK:EditFragment起動時、設定値を参照してから位置情報を取得する為、タイムラグが発生する。
         //      対策として記憶boolean変数を用意し、true時は位置情報取得処理コードにて天気情報も取得する。
-        if (hasInitializedLocation()) {
+        Boolean hasUpdatedLocation = settingsViewModel.getHasUpdatedLocationLiveData().getValue();
+        if (hasUpdatedLocation != null && hasUpdatedLocation) {
             Log.d("20240719", "onTextChanged:prepareWeatherSelection");
             if (lastTextDate.isEmpty()) {
                 diaryViewModel.prepareWeatherSelection(
                         localDate.getYear(),
                         localDate.getMonthValue(),
                         localDate.getDayOfMonth(),
-                        latitude,
-                        longitude
+                        settingsViewModel.getLatitude(),
+                        settingsViewModel.getLongitude()
                 );
             } else {
-                // TODO:ダイアログ表示
-                diaryViewModel.prepareWeatherSelection(
-                        localDate.getYear(),
-                        localDate.getMonthValue(),
-                        localDate.getDayOfMonth(),
-                        latitude,
-                        longitude
-                );
+                showWeatherInformationDialog(date);
             }
         } else {
             shouldPrepareWeatherSelection = true;
@@ -1129,51 +1123,19 @@ public class EditDiaryFragment extends Fragment {
         }
     }
 
-    private void navigateMessageDialog(String title, String message) {
+    private void showWeatherInformationDialog(String date) {
+        NavDirections action =
+                EditDiaryFragmentDirections
+                        .actionEditDiaryFragmentToWeatherInformationDialog(date);
+        EditDiaryFragment.this.navController.navigate(action);
+    }
+
+    private void showMessageDialog(String title, String message) {
         NavDirections action =
                 EditDiaryFragmentDirections
                         .actionEditDiaryFragmentToMessageDialog(
                                 title, message);
         EditDiaryFragment.this.navController.navigate(action);
-    }
-
-    private boolean hasInitializedLocation() {
-        return latitude != -1 && longitude != -1;
-    }
-
-    private void initializeLocation() {
-        if (ActivityCompat.checkSelfPermission(requireActivity(), Manifest.permission.ACCESS_FINE_LOCATION)
-                != PackageManager.PERMISSION_GRANTED
-                && ActivityCompat.checkSelfPermission(requireActivity(), Manifest.permission.ACCESS_COARSE_LOCATION)
-                != PackageManager.PERMISSION_GRANTED) {
-            return;
-        }
-
-        fusedLocationProviderClient.requestLocationUpdates(locationRequest, new LocationListener() {
-            @Override
-            public void onLocationChanged(@NonNull Location location) {
-                latitude = location.getLatitude();
-                longitude = location.getLongitude();
-                if (!shouldPrepareWeatherSelection || latitude == -1 || longitude == -1 ) {
-                    return;
-                }
-                String strDate = diaryViewModel.getLiveDate().getValue();
-                if (strDate == null || strDate.isEmpty()) {
-                    return;
-                }
-                LocalDate localDate = DateConverter.toLocalDate(strDate);
-                Log.d("20240719", "onLocationChanged:prepareWeatherSelection");
-                diaryViewModel.prepareWeatherSelection(
-                        localDate.getYear(),
-                        localDate.getMonthValue(),
-                        localDate.getDayOfMonth(),
-                        latitude,
-                        longitude
-                );
-                shouldPrepareWeatherSelection = false;
-                fusedLocationProviderClient.removeLocationUpdates(this);
-            }
-        }, Looper.getMainLooper());
     }
 
     private boolean canShowDialog() {
@@ -1206,30 +1168,25 @@ public class EditDiaryFragment extends Fragment {
             shouldShowWeatherLoadingErrorDialog = false;
             return;
         }
-        if (shouldShowSettingLoadingErrorDialog) {
-            showSettingLoadingErrorDialog();
-            shouldShowSettingLoadingErrorDialog = false;
-            return;
-        }
     }
 
     private void showDiarySavingErrorDialog() {
-        navigateMessageDialog("通信エラー", "日記の保存に失敗しました。");
+        showMessageDialog("通信エラー", "日記の保存に失敗しました。");
     }
 
     private void showDiaryLoadingErrorDialog() {
-        navigateMessageDialog("通信エラー", "日記の読込に失敗しました。");
+        showMessageDialog("通信エラー", "日記の読込に失敗しました。");
     }
 
     private void showDiaryDeleteErrorDialog() {
-        navigateMessageDialog("通信エラー", "日記の削除に失敗しました。");
+        showMessageDialog("通信エラー", "日記の削除に失敗しました。");
     }
 
     private void showWeatherLoadingErrorDialog() {
-        navigateMessageDialog("通信エラー", "天気情報の読込に失敗しました。");
+        showMessageDialog("通信エラー", "天気情報の読込に失敗しました。");
     }
 
     private void showSettingLoadingErrorDialog() {
-        navigateMessageDialog("通信エラー", "設定情報の読込に失敗しました。");
+        showMessageDialog("通信エラー", "設定情報の読込に失敗しました。");
     }
 }

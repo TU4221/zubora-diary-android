@@ -1,12 +1,15 @@
 package com.websarva.wings.android.zuboradiary.data.worker;
 
 import android.app.Application;
+import android.content.Context;
 import android.util.Log;
 
 import androidx.work.ExistingPeriodicWorkPolicy;
 import androidx.work.PeriodicWorkRequest;
 import androidx.work.WorkManager;
 
+import com.google.android.gms.common.internal.ConnectionTelemetryConfiguration;
+import com.websarva.wings.android.zuboradiary.CustomApplication;
 import com.websarva.wings.android.zuboradiary.worker.ReminderNotificationWorker;
 
 import java.time.LocalTime;
@@ -17,8 +20,8 @@ public class WorkerRepository {
     private WorkManager workManager;
     private final String WORK_TAG_REMINDER_NOTIFICATION = "ReminderNotification";
     private final String UNIQUE_WORK_NAME_REMINDER_NOTIFICATION = WORK_TAG_REMINDER_NOTIFICATION;
-    public WorkerRepository(Application application) {
-        workManager = WorkManager.getInstance(application.getApplicationContext());
+    public WorkerRepository(Context context) {
+        workManager = WorkManager.getInstance(context.getApplicationContext());
     }
 
     public void registerReminderNotificationWorker(LocalTime settingTime) {

@@ -25,7 +25,7 @@ public class WeatherApiResponseDairy {
         return weatherCodes;
     }
 
-    public void setWeatherCode(int[] weatherCodes) {
+    public void setWeatherCodes(int[] weatherCodes) {
         this.weatherCodes = weatherCodes;
     }
 }

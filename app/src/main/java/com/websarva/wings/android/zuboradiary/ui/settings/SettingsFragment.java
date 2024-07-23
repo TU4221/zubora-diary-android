@@ -35,6 +35,7 @@ import androidx.navigation.NavDirections;
 import androidx.navigation.fragment.NavHostFragment;
 
 import com.google.android.material.materialswitch.MaterialSwitch;
+import com.websarva.wings.android.zuboradiary.MainActivity;
 import com.websarva.wings.android.zuboradiary.R;
 import com.websarva.wings.android.zuboradiary.data.settings.DayOfWeekNameResIdGetter;
 import com.websarva.wings.android.zuboradiary.data.settings.ThemeColors;
@@ -69,9 +70,8 @@ public class SettingsFragment extends Fragment {
         super.onCreate(savedInstanceState);
 
         // ViewModel設定
-        ViewModelFactory factory =
-                new ViewModelFactory(requireContext(), requireActivity().getApplication());
-        ViewModelProvider provider = new ViewModelProvider(this, factory);
+        ViewModelFactory factory = new ViewModelFactory(requireContext());
+        ViewModelProvider provider = new ViewModelProvider(requireActivity(), factory);
         this.settingsViewModel = provider.get(SettingsViewModel.class);
 
         // Navigation設定

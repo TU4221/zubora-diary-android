@@ -1,9 +1,9 @@
 package com.websarva.wings.android.zuboradiary.ui.settings;
 
-import android.app.Application;
 import android.content.Context;
 import android.util.Log;
 
+import androidx.annotation.FloatRange;
 import androidx.datastore.preferences.core.Preferences;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
@@ -30,10 +30,15 @@ public class SettingsViewModel extends ViewModel {
     private final MutableLiveData<Boolean> isCheckedReminderNotification = new MutableLiveData<>();
     private final MutableLiveData<Boolean> isCheckedPasscodeLock = new MutableLiveData<>();
     private final MutableLiveData<Boolean> isCheckedGettingWeatherInformation = new MutableLiveData<>();
+    private final MutableLiveData<Boolean> hasUpdatedLocation = new MutableLiveData<>(false);
+    @FloatRange(from = -90.0, to = 90.0)
+    private double latitude = 0;
+    @FloatRange(from = -180.0, to = 180.0)
+    private double longitude = 0;
 
-    public SettingsViewModel(Context context, Application application) {
+    public SettingsViewModel(Context context) {
         this.settingsRepository = new SettingsRepository(context);
-        this.workerRepository = new WorkerRepository(application);
+        this.workerRepository = new WorkerRepository(context);
 
         Flowable<String> themeColorNameFlowable = this.settingsRepository.loadThemeColorName();
         this.disposables.add(themeColorNameFlowable
@@ -112,6 +117,18 @@ public class SettingsViewModel extends ViewModel {
         workerRepository.cancelReminderNotificationWorker();
     }
 
+    public void updateLocationInformation(double latitude, double longitude) {
+        this.latitude = latitude;
+        this.longitude = longitude;
+        hasUpdatedLocation.setValue(true);
+    }
+
+    public void clearLocationInformation() {
+        hasUpdatedLocation.setValue(false);
+        latitude = 0;
+        longitude = 0;
+    }
+
     // Getter/Setter
     public LiveData<String> getThemeColorLiveData() {
         return this.themeColor;
@@ -133,5 +150,23 @@ public class SettingsViewModel extends ViewModel {
         return this.isCheckedGettingWeatherInformation;
     }
 
+    public LiveData<Boolean> getHasUpdatedLocationLiveData() {
+        return hasUpdatedLocation;
+    }
 
+    public double getLatitude() {
+        return latitude;
+    }
+
+    public void setLatitude(double latitude) {
+        this.latitude = latitude;
+    }
+
+    public double getLongitude() {
+        return longitude;
+    }
+
+    public void setLongitude(double longitude) {
+        this.longitude = longitude;
+    }
 }

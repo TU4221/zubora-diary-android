@@ -3,10 +3,10 @@ package com.websarva.wings.android.zuboradiary.ui.diary;
 import static com.websarva.wings.android.zuboradiary.ui.list.wordsearch.WordSearchFragment.WordSearchResultYearMonthListAdapter.VIEW_TYPE_DIARY;
 
 import android.app.Application;
+import android.content.Context;
 import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.style.BackgroundColorSpan;
-import android.util.Log;
 
 import com.google.common.util.concurrent.ListenableFuture;
 import com.websarva.wings.android.zuboradiary.DateConverter;
@@ -20,7 +20,6 @@ import com.websarva.wings.android.zuboradiary.ui.list.DiaryYearMonthListItem;
 import com.websarva.wings.android.zuboradiary.ui.list.wordsearch.WordSearchResultDayListItem;
 import com.websarva.wings.android.zuboradiary.ui.list.wordsearch.WordSearchResultListItemDiary;
 import com.websarva.wings.android.zuboradiary.ui.list.wordsearch.WordSearchResultYearMonthListItem;
-import com.websarva.wings.android.zuboradiary.ui.list.wordsearch.WordSearchViewModel;
 
 import org.jetbrains.annotations.Nullable;
 
@@ -31,14 +30,14 @@ import java.util.concurrent.Future;
 import java.util.function.Consumer;
 
 public class DiaryRepository {
-    Application application;
+    Context context;
     private DiaryDatabase diaryDatabase;
     DiaryDAO diaryDAO;
     SelectedItemTitlesHistoryDAO selectedItemTitlesHistoryDAO;
 
-    public DiaryRepository(Application application) {
-        this.application = application;
-        diaryDatabase = DiaryDatabase.getDatabase(application);
+    public DiaryRepository(Context context) {
+        this.context = context;
+        diaryDatabase = DiaryDatabase.getDatabase(context);
         diaryDAO = diaryDatabase.createDiaryDAO();
         selectedItemTitlesHistoryDAO = diaryDatabase.createSelectedItemTitlesHistoryDAO();
     }
@@ -331,7 +330,7 @@ public class DiaryRepository {
         SpannableString spannableString = new SpannableString(string);
         BackgroundColorSpan backgroundColorSpan =
                 new BackgroundColorSpan(
-                        application.getResources().getColor(R.color.gray)
+                        context.getResources().getColor(R.color.gray)
                 );
         int fromIndex = 0;
         while (string.indexOf(targetWord, fromIndex) != -1) {

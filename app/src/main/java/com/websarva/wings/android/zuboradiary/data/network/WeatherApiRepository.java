@@ -2,6 +2,9 @@ package com.websarva.wings.android.zuboradiary.data.network;
 
 import android.util.Log;
 
+import androidx.annotation.FloatRange;
+import androidx.annotation.IntRange;
+
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -18,10 +21,8 @@ public class WeatherApiRepository {
     }
 
     public Call<WeatherApiResponse> getTodayWeather(
-            double latitude, double longitude) throws IllegalArgumentException {
-        if (latitude < 0 || longitude < 0) {
-            throw new IllegalArgumentException();
-        }
+            @FloatRange(from = -90.0, to = 90.0) double latitude,
+            @FloatRange(from = -180.0, to = 180.0) double longitude) {
         return service.getWeather(
                 String.valueOf(latitude),
                 String.valueOf(longitude),
@@ -32,10 +33,9 @@ public class WeatherApiRepository {
     }
 
     public Call<WeatherApiResponse> getPastDayWeather(
-            double latitude, double longitude, int numPastDays) throws IllegalArgumentException {
-        if (latitude < 0 || longitude < 0 || numPastDays > 92 || numPastDays < 1) {
-            throw new IllegalArgumentException();
-        }
+            @FloatRange(from = -90.0, to = 90.0) double latitude,
+            @FloatRange(from = -180.0, to = 180.0) double longitude,
+            @IntRange(from = 1, to = 92) int numPastDays) {
         Log.d("20240717", "getPastDayWeather");
         return service.getWeather(
                 String.valueOf(latitude),

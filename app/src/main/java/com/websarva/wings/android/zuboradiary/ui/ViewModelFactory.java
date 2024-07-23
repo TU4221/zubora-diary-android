@@ -7,22 +7,24 @@ import androidx.annotation.NonNull;
 import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.websarva.wings.android.zuboradiary.ui.diary.DiaryViewModel;
 import com.websarva.wings.android.zuboradiary.ui.settings.SettingsViewModel;
 
 public class ViewModelFactory implements ViewModelProvider.Factory {
     private Context context;
-    private Application application;
 
-    public ViewModelFactory(@NonNull Context context, @NonNull Application application) {
+    public ViewModelFactory(@NonNull Context context) {
         this.context = context;
-        this.application = application;
     }
 
     @NonNull
     @Override
     public <T extends ViewModel> T create(Class<T> modelClass) {
+        if (modelClass.isAssignableFrom(DiaryViewModel.class)) {
+            return (T) new DiaryViewModel(context);
+        }
         if (modelClass.isAssignableFrom(SettingsViewModel.class)) {
-            return (T) new SettingsViewModel(context, application);
+            return (T) new SettingsViewModel(context);
         }
         throw new IllegalArgumentException("Unknown ViewModel class");
     }
