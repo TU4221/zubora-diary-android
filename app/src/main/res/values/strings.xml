@@ -109,6 +109,11 @@
     <string name="edit_diary_select_item_title_confirm_delete_dialog_btn_ok">はい</string>
     <string name="edit_diary_select_item_title_confirm_delete_dialog_btn_ng">いいえ</string>
 
+    <!-- fragment_calendar -->
+    <string name="fragment_calendar_month_header_format">yyyy年MM月</string>
+    <string name="fragment_calendar_message_dialog_title_communication_error">通信エラー</string>
+    <string name="fragment_calendar_message_dialog_message_diary_loading_error">日記の読込に失敗しました。</string>
+
 
     <!-- fragment_settings -->
     <string name="fragment_settings_item_value_not_set">未設定</string>

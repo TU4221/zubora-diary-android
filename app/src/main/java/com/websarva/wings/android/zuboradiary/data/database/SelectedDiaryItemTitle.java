@@ -1,4 +1,4 @@
-package com.websarva.wings.android.zuboradiary.ui.diary.editdiaryselectitemtitle;
+package com.websarva.wings.android.zuboradiary.data.database;
 
 import androidx.annotation.NonNull;
 import androidx.room.Entity;

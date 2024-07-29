@@ -8,8 +8,8 @@ import androidx.lifecycle.Observer;
 
 import com.websarva.wings.android.zuboradiary.ui.diary.DiaryViewModel;
 
-public class ShowDiaryLayout {
-    public static void setupVisibleWeather2Observer(
+public class ShowDiaryLayoutInitializer {
+    public void setUpVisibleWeather2Observer(
             DiaryViewModel diaryViewModel, LifecycleOwner lifecycleOwner, TextView slush, TextView weather2) {
         diaryViewModel.getLiveIntWeather2()
                 .observe(lifecycleOwner, new Observer<Integer>() {

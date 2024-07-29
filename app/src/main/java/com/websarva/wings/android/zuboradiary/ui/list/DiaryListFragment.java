@@ -2,9 +2,7 @@ package com.websarva.wings.android.zuboradiary.ui.list;
 
 import android.content.Context;
 import android.graphics.Canvas;
-import android.graphics.Paint;
 import android.graphics.Rect;
-import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -14,10 +12,6 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewTreeObserver;
-import android.view.animation.Animation;
-import android.widget.ImageView;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
@@ -35,7 +29,6 @@ import androidx.navigation.NavBackStackEntry;
 import androidx.navigation.NavController;
 import androidx.navigation.NavDirections;
 import androidx.navigation.fragment.NavHostFragment;
-import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -45,24 +38,22 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.transition.platform.MaterialFadeThrough;
 import com.google.android.material.transition.platform.MaterialSharedAxis;
-import com.websarva.wings.android.zuboradiary.DateConverter;
+import com.websarva.wings.android.zuboradiary.data.DateConverter;
 import com.websarva.wings.android.zuboradiary.MainActivity;
 import com.websarva.wings.android.zuboradiary.R;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.Executors;
 
 import com.websarva.wings.android.zuboradiary.databinding.FragmentDiaryListBinding;
 import com.websarva.wings.android.zuboradiary.databinding.RowDiaryDayListBinding;
-import com.websarva.wings.android.zuboradiary.ui.diary.DiaryViewModel;
-import com.websarva.wings.android.zuboradiary.ui.diary.editdiaryselectitemtitle.EditDiarySelectItemTitleFragment;
-import com.websarva.wings.android.zuboradiary.ui.diary.editdiaryselectitemtitle.EditDiarySelectItemTitleFragmentDirections;
 import com.websarva.wings.android.zuboradiary.ui.list.wordsearch.WordSearchViewModel;
 
+import dagger.hilt.android.AndroidEntryPoint;
+
+@AndroidEntryPoint
 public class DiaryListFragment extends Fragment {
 
     // View関係
@@ -76,7 +67,7 @@ public class DiaryListFragment extends Fragment {
     private NavController navController;
 
     // ViewModel
-    private ListViewModel listViewModel;
+    private DiaryListViewModel diaryListViewModel;
     private WordSearchViewModel wordSearchViewModel;
 
     @Override
@@ -86,7 +77,7 @@ public class DiaryListFragment extends Fragment {
 
         // ViewModel設定
         ViewModelProvider provider = new ViewModelProvider(requireActivity());
-        this.listViewModel = provider.get(ListViewModel.class);
+        this.diaryListViewModel = provider.get(DiaryListViewModel.class);
         this.wordSearchViewModel = provider.get(WordSearchViewModel.class);
 
         // Navigation設定
@@ -108,7 +99,7 @@ public class DiaryListFragment extends Fragment {
 
         // データバインディング設定
         this.binding.setLifecycleOwner(this);
-        this.binding.setListViewModel(this.listViewModel);
+        this.binding.setListViewModel(this.diaryListViewModel);
 
         // フィールド初期化
         // MEMO:クラスフィールド上でインスタンス化すると、ボトムナビゲーションのフラグメント切り替え時に例外発生。
@@ -140,7 +131,14 @@ public class DiaryListFragment extends Fragment {
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        // ダイアログフラグメントからの結果受取設定
+        setUpDialogResultReceiver();
+        setUpToolBar();
+        setUpFloatActionButton();
+        setUpDiaryList();
+    }
+
+    // ダイアログフラグメントからの結果受取設定
+    private void setUpDialogResultReceiver() {
         NavBackStackEntry navBackStackEntry =
                 this.navController.getBackStackEntry(R.id.navigation_diary_list_fragment);
         LifecycleEventObserver lifecycleEventObserver = new LifecycleEventObserver() {
@@ -149,52 +147,8 @@ public class DiaryListFragment extends Fragment {
                     @NonNull LifecycleOwner lifecycleOwner, @NonNull Lifecycle.Event event) {
                 SavedStateHandle savedStateHandle = navBackStackEntry.getSavedStateHandle();
                 if (event.equals(Lifecycle.Event.ON_RESUME)) {
-                    // 日付入力ダイアログフラグメントから結果受取
-                    boolean containsDatePickerDialogFragmentResults =
-                            savedStateHandle.contains(DatePickerDialogFragment.KEY_SELECTED_YEAR)
-                                    && savedStateHandle
-                                    .contains(DatePickerDialogFragment.KEY_SELECTED_MONTH);
-                    if (containsDatePickerDialogFragmentResults) {
-                        Integer selectedYear =
-                                savedStateHandle.get(DatePickerDialogFragment.KEY_SELECTED_YEAR);
-                        Integer selectedMonth =
-                                savedStateHandle.get(DatePickerDialogFragment.KEY_SELECTED_MONTH);
-                        DiaryListFragment.this.listViewModel.updateSortConditionDate(
-                                selectedYear,
-                                selectedMonth
-                        );
-                        DiaryListFragment.this.diaryListScrollToFirstPosition();
-
-                        DiaryListFragment.this.listViewModel.loadList(
-                                ListViewModel.LoadType.NEW,
-                                new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        String messageTitle = "通信エラー";
-                                        String message = "日記リストの読込に失敗しました。";
-                                        navigateMessageDialog(messageTitle, message);
-                                    }
-                                });
-
-                        savedStateHandle.remove(DatePickerDialogFragment.KEY_SELECTED_YEAR);
-                        savedStateHandle.remove(DatePickerDialogFragment.KEY_SELECTED_MONTH);
-                    }
-
-                    // 日記削除ダイアログフラグメントから結果受取
-                    boolean ConfirmDeleteDialogFragmentFragmentResults =
-                            savedStateHandle.contains(DeleteConfirmationDialogFragment.KEY_DELETE_DIARY_DATE);
-                    if (ConfirmDeleteDialogFragmentFragmentResults) {
-                        String deleteDiaryDate =
-                                savedStateHandle.get(DeleteConfirmationDialogFragment.KEY_DELETE_DIARY_DATE);
-                        try {
-                            DiaryListFragment.this.listViewModel.deleteDiary(deleteDiaryDate);
-                        } catch (Exception e) {
-                            String messageTitle = "通信エラー";
-                            String message = "日記の削除に失敗しました。";
-                            navigateMessageDialog(messageTitle, message);
-                        }
-                        savedStateHandle.remove(DeleteConfirmationDialogFragment.KEY_DELETE_DIARY_DATE);
-                    }
+                    receiveDatePickerDialogResults(savedStateHandle);
+                    receiveConfirmDeleteDialogResults(savedStateHandle);
                 }
             }
         };
@@ -214,23 +168,71 @@ public class DiaryListFragment extends Fragment {
                 }
             }
         });
+    }
 
+    // 日付入力ダイアログフラグメントから結果受取
+    private void receiveDatePickerDialogResults(SavedStateHandle savedStateHandle) {
+        boolean containsDatePickerDialogFragmentResults =
+                savedStateHandle.contains(DatePickerDialogFragment.KEY_SELECTED_YEAR)
+                        && savedStateHandle
+                        .contains(DatePickerDialogFragment.KEY_SELECTED_MONTH);
+        if (containsDatePickerDialogFragmentResults) {
+            Integer selectedYear =
+                    savedStateHandle.get(DatePickerDialogFragment.KEY_SELECTED_YEAR);
+            Integer selectedMonth =
+                    savedStateHandle.get(DatePickerDialogFragment.KEY_SELECTED_MONTH);
+            diaryListViewModel.updateSortConditionDate(selectedYear, selectedMonth);
+            diaryListScrollToFirstPosition();
+            diaryListViewModel.loadList(
+                    DiaryListViewModel.LoadType.NEW,
+                    new Runnable() {
+                        @Override
+                        public void run() {
+                            String messageTitle = "通信エラー";
+                            String message = "日記リストの読込に失敗しました。";
+                            navigateMessageDialog(messageTitle, message);
+                        }
+                    });
+        }
+        savedStateHandle.remove(DatePickerDialogFragment.KEY_SELECTED_YEAR);
+        savedStateHandle.remove(DatePickerDialogFragment.KEY_SELECTED_MONTH);
+    }
 
-        // ツールバー設定
-        this.binding.materialToolbarTopAppBar
+    //
+    private void receiveConfirmDeleteDialogResults(SavedStateHandle savedStateHandle) {
+        // 日記削除ダイアログフラグメントから結果受取
+        boolean ConfirmDeleteDialogFragmentFragmentResults =
+                savedStateHandle.contains(DeleteConfirmationDialogFragment.KEY_DELETE_DIARY_DATE);
+        if (ConfirmDeleteDialogFragmentFragmentResults) {
+            String deleteDiaryDate =
+                    savedStateHandle.get(DeleteConfirmationDialogFragment.KEY_DELETE_DIARY_DATE);
+            try {
+                DiaryListFragment.this.diaryListViewModel.deleteDiary(deleteDiaryDate);
+            } catch (Exception e) {
+                String messageTitle = "通信エラー";
+                String message = "日記の削除に失敗しました。";
+                navigateMessageDialog(messageTitle, message);
+            }
+        }
+        savedStateHandle.remove(DeleteConfirmationDialogFragment.KEY_DELETE_DIARY_DATE);
+    }
+
+    // ツールバー設定
+    private void setUpToolBar() {
+        binding.materialToolbarTopAppBar
                 .setNavigationOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         // リスト先頭年月切り替えダイアログ起動
                         try {
-                            String newestDate = DiaryListFragment.this.listViewModel.loadNewestDiary().getDate();
-                            String oldestDate = DiaryListFragment.this.listViewModel.loadOldestDiary().getDate();
+                            String newestDate = diaryListViewModel.loadNewestDiary().getDate();
+                            String oldestDate = diaryListViewModel.loadOldestDiary().getDate();
                             int newestYear = DateConverter.toLocalDate(newestDate).getYear();
                             int oldestYear = DateConverter.toLocalDate(oldestDate).getYear();
                             NavDirections action =
                                     DiaryListFragmentDirections
                                             .actionDiaryListFragmentToDatePickerDialog(newestYear, oldestYear);
-                            DiaryListFragment.this.navController.navigate(action);
+                            navController.navigate(action);
                         } catch (Exception e) {
                             String messageTitle = "通信エラー";
                             String message = "日記情報の読込に失敗しました。";
@@ -238,27 +240,28 @@ public class DiaryListFragment extends Fragment {
                         }
                     }
                 });
-        this.binding.materialToolbarTopAppBar
+        binding.materialToolbarTopAppBar
                 .setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
                     @Override
                     public boolean onMenuItemClick(MenuItem item) {
                         // ワード検索フラグメント起動
                         if (item.getItemId() == R.id.listToolbarOptionWordSearch) {
-                            DiaryListFragment.this.wordSearchViewModel.initialize();
+                            wordSearchViewModel.initialize();
 
                             NavDirections action =
                                     DiaryListFragmentDirections
                                             .actionNavigationDiaryListFragmentToWordSearchFragment();
-                            DiaryListFragment.this.navController.navigate(action);
+                            navController.navigate(action);
                             return true;
 
                         }
                         return false;
                     }
                 });
+    }
 
-
-        // 新規作成FAB設定
+    // 新規作成FAB設定
+    private void setUpFloatActionButton() {
         this.binding.fabEditDiary.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -277,11 +280,13 @@ public class DiaryListFragment extends Fragment {
 
             }
         });
+    }
 
-        // 日記リスト(年月)設定
-        RecyclerView recyclerDiaryYearMonthList = this.binding.recyclerDiaryYearMonthList;
+    // 日記リスト(年月)設定
+    private void setUpDiaryList() {
+        RecyclerView recyclerDiaryYearMonthList = binding.recyclerDiaryYearMonthList;
         recyclerDiaryYearMonthList
-                .setLayoutManager(this.diaryListYearMonthLinearLayoutManager);
+                .setLayoutManager(diaryListYearMonthLinearLayoutManager);
         DiaryYearMonthListAdapter diaryYearMonthListAdapter =
                 new DiaryYearMonthListAdapter(new DiaryYearMonthListDiffUtilItemCallback());
         recyclerDiaryYearMonthList.setAdapter(diaryYearMonthListAdapter);
@@ -317,13 +322,13 @@ public class DiaryListFragment extends Fragment {
                 int lastItemViewType = recyclerView.getAdapter().getItemViewType(lastItemPosition);
                 // MEMO:下記条件"dy > 0"は検索結果リストが更新されたときに
                 //      "RecyclerView.OnScrollListener#onScrolled"が起動するための対策。
-                if (!DiaryListFragment.this.listViewModel.getIsLoading()
+                if (!DiaryListFragment.this.diaryListViewModel.getIsLoading()
                         && (firstVisibleItem + visibleItemCount) >= totalItemCount
                         && dy > 0
                         && lastItemViewType == DiaryYearMonthListAdapter.VIEW_TYPE_DIARY) {
-                    DiaryListFragment.this.listViewModel
+                    DiaryListFragment.this.diaryListViewModel
                             .loadList(
-                                    ListViewModel.LoadType.ADD,
+                                    DiaryListViewModel.LoadType.ADD,
                                     new Runnable() {
                                         @Override
                                         public void run() {
@@ -353,19 +358,20 @@ public class DiaryListFragment extends Fragment {
 
 
         // 日記リスト読込
-        if (this.listViewModel.getLiveDataDiaryList().getValue().isEmpty()) {
+        if (this.diaryListViewModel.getLiveDataDiaryList().getValue().isEmpty()) {
             int numSavedDiaries = 0;
             try {
-                numSavedDiaries = this.listViewModel.countDiaries();
+                numSavedDiaries = this.diaryListViewModel.countDiaries();
+                Log.d("20240724", "numSavedDiaries:" + String.valueOf(numSavedDiaries));
             } catch (Exception e) {
                 String messageTitle = "通信エラー";
                 String message = "日記リストの読込に失敗しました。";
                 navigateMessageDialog(messageTitle, message);
             }
             if (numSavedDiaries >= 1) {
-                this.listViewModel
+                this.diaryListViewModel
                         .loadList(
-                                ListViewModel.LoadType.NEW,
+                                DiaryListViewModel.LoadType.NEW,
                                 new Runnable() {
                                     @Override
                                     public void run() {
@@ -377,9 +383,9 @@ public class DiaryListFragment extends Fragment {
                         );
             }
         } else {
-            this.listViewModel
+            this.diaryListViewModel
                     .loadList(
-                            ListViewModel.LoadType.UPDATE,
+                            DiaryListViewModel.LoadType.UPDATE,
                             new Runnable() {
                                 @Override
                                 public void run() {
@@ -391,7 +397,7 @@ public class DiaryListFragment extends Fragment {
                     );
         }
 
-        this.listViewModel.getLiveDataDiaryList().observe(
+        this.diaryListViewModel.getLiveDataDiaryList().observe(
                 getViewLifecycleOwner(),
                 new Observer<List<DiaryYearMonthListItem>>() {
                     @Override
@@ -911,8 +917,8 @@ public class DiaryListFragment extends Fragment {
             // リスト先頭年月切り替えダイアログ起動
             } else if (menuItem.getItemId() == android.R.id.home) {
                 try {
-                    String newestDate = DiaryListFragment.this.listViewModel.loadNewestDiary().getDate();
-                    String oldestDate = DiaryListFragment.this.listViewModel.loadOldestDiary().getDate();
+                    String newestDate = DiaryListFragment.this.diaryListViewModel.loadNewestDiary().getDate();
+                    String oldestDate = DiaryListFragment.this.diaryListViewModel.loadOldestDiary().getDate();
                     int newestYear = DateConverter.toLocalDate(newestDate).getYear();
                     int oldestYear = DateConverter.toLocalDate(oldestDate).getYear();
                     NavDirections action =

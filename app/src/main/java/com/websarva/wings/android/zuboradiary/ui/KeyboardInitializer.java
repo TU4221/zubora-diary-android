@@ -1,19 +1,13 @@
-package com.websarva.wings.android.zuboradiary;
+package com.websarva.wings.android.zuboradiary.ui;
 
 import android.app.Activity;
 import android.content.Context;
 import android.view.View;
-import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 
-public class Keyboard {
-    private static Activity activity;
+public class KeyboardInitializer {
 
-    public static void setInputMethodManager(Activity a) {
-        activity = a;
-
-    }
-    public static void hide(View focusView) {
+    public void hide(Activity activity, View focusView) {
         InputMethodManager inputMethodManager =
                 (InputMethodManager) activity.getSystemService(Context.INPUT_METHOD_SERVICE);
         inputMethodManager
@@ -22,7 +16,8 @@ public class Keyboard {
                         InputMethodManager.HIDE_NOT_ALWAYS
                 );
     }
-    public static void show(View focusView) {
+
+    public void show(Activity activity, View focusView) {
         InputMethodManager inputMethodManager =
                 (InputMethodManager) activity.getSystemService(Context.INPUT_METHOD_SERVICE);
         inputMethodManager

@@ -1,56 +1,71 @@
 package com.websarva.wings.android.zuboradiary.ui.calendar;
 
-import android.app.Application;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.ViewModel;
 
-import androidx.annotation.NonNull;
-import androidx.lifecycle.AndroidViewModel;
-
-import com.websarva.wings.android.zuboradiary.ui.diary.DiaryRepository;
+import com.websarva.wings.android.zuboradiary.data.database.DiaryRepository;
 
 import java.time.LocalDate;
+import java.time.YearMonth;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 
-public class CalendarViewModel extends AndroidViewModel {
+import javax.inject.Inject;
 
-    private DiaryRepository diaryRepository;
-    private Map<Integer, Map<Integer, List<Integer>>> existedDiaryDateMap = new HashMap<>();
+import dagger.hilt.android.lifecycle.HiltViewModel;
+
+@HiltViewModel
+public class CalendarViewModel extends ViewModel {
+
+    private final DiaryRepository diaryRepository;
+    private final Map<Integer, Map<Integer, List<Integer>>> existedDiaryDateMap = new HashMap<>();
     private LocalDate selectedDate;
+    private final MutableLiveData<Boolean> isDiaryLoadingError = new MutableLiveData<>();
 
-    public CalendarViewModel(@NonNull Application application) {
-        super(application);
-
-        diaryRepository = new DiaryRepository(getApplication());
+    @Inject
+    public CalendarViewModel(DiaryRepository diaryRepository) {
+        this.diaryRepository = diaryRepository;
     }
 
     //既存日記の日付格納
-    public void updateExistedDiaryDateLog(int year, int month) throws Exception {
-        List<Integer> _existedDiaryDateListForOneMonth =
-                diaryRepository.selectDiaryDateList(year, month);
+    public boolean updateExistedDiaryDateLog(YearMonth yearMonth) {
+        int year = yearMonth.getYear();
+        int month = yearMonth.getMonthValue();
+        List<Integer> existedDiaryDateDayList;
+        try {
+            existedDiaryDateDayList =
+                    diaryRepository.selectDiaryDateDayList(yearMonth);
+        } catch (ExecutionException | InterruptedException e) {
+            isDiaryLoadingError.setValue(true);
+            return false;
+        }
         if (this.existedDiaryDateMap.containsKey(year)) {
             Map<Integer, List<Integer>> existedDiaryDateMonthMap =
                     this.existedDiaryDateMap.get(year);
-            existedDiaryDateMonthMap.put(month, _existedDiaryDateListForOneMonth);
+            existedDiaryDateMonthMap.put(month, existedDiaryDateDayList);
         } else {
             Map<Integer, List<Integer>> existedDiaryDateMonthMap = new HashMap<>();
-            existedDiaryDateMonthMap.put(month, _existedDiaryDateListForOneMonth);
+            existedDiaryDateMonthMap.put(month, existedDiaryDateDayList);
             this.existedDiaryDateMap.put(year, existedDiaryDateMonthMap);
         }
+        return true;
     }
 
     public void clearExistedDiaryDateMap() {
-        this.existedDiaryDateMap.clear();
-
+        existedDiaryDateMap.clear();
     }
 
-    public boolean existsDiary(int year, int month, int dayOfMonth) {
-        if (this.existedDiaryDateMap.containsKey(year)) {
+    public boolean existsDiary(LocalDate localDate) {
+        if (existedDiaryDateMap.containsKey(localDate.getYear())) {
             Map<Integer, List<Integer>> existedDiaryDateMonthMap =
-                    this.existedDiaryDateMap.get(year);
-            List<Integer> existedDiaryDateDayOfMonthList = existedDiaryDateMonthMap.get(month);
+                                                    existedDiaryDateMap.get(localDate.getYear());
+            List<Integer> existedDiaryDateDayOfMonthList =
+                    existedDiaryDateMonthMap.get(localDate.getMonthValue());
             for (int number: existedDiaryDateDayOfMonthList) {
-                if (number == dayOfMonth) {
+                if (number == localDate.getDayOfMonth()) {
                     return true;
                 }
             }
@@ -58,12 +73,21 @@ public class CalendarViewModel extends AndroidViewModel {
         return false;
     }
 
+    // Getter/Setter
     public LocalDate getSelectedDate() {
         return this.selectedDate;
     }
 
     public void setSelectedDate(LocalDate selectedDate) {
         this.selectedDate = selectedDate;
+    }
+
+    public LiveData<Boolean> getIsDiaryLoadingErrorLiveData() {
+        return isDiaryLoadingError;
+    }
+
+    public void setIsDiaryLoadingErrorLiveData(boolean bool) {
+        isDiaryLoadingError.setValue(bool);
     }
 
 }

@@ -40,13 +40,16 @@ import androidx.navigation.ui.NavigationUI;
 import com.google.android.material.navigation.NavigationBarView;
 import com.google.android.material.transition.platform.MaterialFadeThrough;
 import com.websarva.wings.android.zuboradiary.databinding.ActivityMainBinding;
-import com.websarva.wings.android.zuboradiary.ui.ViewModelFactory;
+import com.websarva.wings.android.zuboradiary.ui.KeyboardInitializer;
 import com.websarva.wings.android.zuboradiary.ui.calendar.CalendarFragment;
 import com.websarva.wings.android.zuboradiary.ui.list.DiaryListFragment;
 import com.websarva.wings.android.zuboradiary.ui.settings.SettingsViewModel;
 
+import dagger.hilt.android.AndroidEntryPoint;
+
 //  MEMO:GitHubトークン(有効期限20240408から30日後)_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
 
+@AndroidEntryPoint
 public class MainActivity extends AppCompatActivity {
 
     private ActivityMainBinding binding;
@@ -76,9 +79,6 @@ public class MainActivity extends AppCompatActivity {
 
         setUpViewModel();
         setUpLocationInformation();
-
-        // Keyboardクラス設定
-        Keyboard.setInputMethodManager(this);
 
         //アクションバー設定
         //setSupportActionBar(this.binding.mtbMainToolbar);
@@ -294,9 +294,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void setUpViewModel() {
-        ViewModelFactory factory =
-                new ViewModelFactory(this);
-        ViewModelProvider provider = new ViewModelProvider(this, factory);
+        ViewModelProvider provider = new ViewModelProvider(this);
         settingsViewModel = provider.get(SettingsViewModel.class);
     }
 

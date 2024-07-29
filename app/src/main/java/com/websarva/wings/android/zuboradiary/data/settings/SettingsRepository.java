@@ -1,7 +1,5 @@
 package com.websarva.wings.android.zuboradiary.data.settings;
 
-import android.content.Context;
-
 import androidx.datastore.preferences.core.Preferences;
 
 import java.time.DayOfWeek;
@@ -10,68 +8,72 @@ import io.reactivex.rxjava3.core.Flowable;
 import io.reactivex.rxjava3.core.Single;
 
 public class SettingsRepository {
-    private UserPreferences preferences;
-    public SettingsRepository(Context context) {
-        this.preferences = UserPreferences.getInstance(context);
+    private UserPreferences userPreferences;
+    public SettingsRepository(UserPreferences userPreferences) {
+        this.userPreferences = userPreferences;
     }
 
     public Flowable<Integer> loadThemeColorNumber() {
-        return this.preferences.loadThemeColorNumber();
+        return this.userPreferences.loadThemeColorNumber();
     }
 
     public Flowable<String> loadThemeColorName() {
-        return this.preferences.loadThemeColorName();
+        return this.userPreferences.loadThemeColorName();
     }
 
     public Single<Preferences> saveThemeColor(ThemeColors value) {
-        return this.preferences.saveThemeColor(value);
+        return this.userPreferences.saveThemeColor(value);
     }
 
     public Flowable<String> loadCalendarStartDayOfWeekName() {
-        return this.preferences.loadCalendarStartDayOfWeekName();
+        return this.userPreferences.loadCalendarStartDayOfWeekName();
+    }
+
+    public Flowable<Integer> loadCalendarStartDayOfWeekNumber() {
+        return this.userPreferences.loadCalendarStartDayOfWeekNumber();
     }
 
     public Single<Preferences> saveCalendarStartDayOfWeek(DayOfWeek value) {
-        return this.preferences.saveCalendarStartDayOfWeek(value);
+        return this.userPreferences.saveCalendarStartDayOfWeek(value);
     }
 
     public Flowable<Boolean> loadIsReminderNotification() {
-        return this.preferences.loadIsReminderNotification();
+        return this.userPreferences.loadIsReminderNotification();
     }
 
     public Single<Preferences> saveIsReminderNotification(boolean value) {
-        return this.preferences.saveIsReminderNotification(value);
+        return this.userPreferences.saveIsReminderNotification(value);
     }
 
     public Flowable<String> loadReminderNotificationTime() {
-        return this.preferences.loadReminderNotificationTime();
+        return this.userPreferences.loadReminderNotificationTime();
     }
 
     public Single<Preferences> saveReminderNotificationTime(int hourValue, int minuteValue) {
-        return this.preferences.saveReminderNotificationTime(hourValue, minuteValue);
+        return this.userPreferences.saveReminderNotificationTime(hourValue, minuteValue);
     }
 
     public Flowable<Boolean> loadIsPasscodeLock() {
-        return this.preferences.loadIsPasscodeLock();
+        return this.userPreferences.loadIsPasscodeLock();
     }
 
     public Single<Preferences> saveIsPasscodeLock(boolean value) {
-        return this.preferences.saveIsPasscodeLock(value);
+        return this.userPreferences.saveIsPasscodeLock(value);
     }
 
     public Flowable<Integer> loadPasscode() {
-        return this.preferences.loadPasscode();
+        return this.userPreferences.loadPasscode();
     }
 
     public Single<Preferences> savePasscode(int value) {
-        return this.preferences.savePasscode(value);
+        return this.userPreferences.savePasscode(value);
     }
 
     public Flowable<Boolean> loadIsGettingWeatherInformation() {
-        return this.preferences.loadIsGettingWeatherInformation();
+        return this.userPreferences.loadIsGettingWeatherInformation();
     }
 
     public Single<Preferences> saveIsGettingWeatherInformation(boolean value) {
-        return this.preferences.saveIsGettingWeatherInformation(value);
+        return this.userPreferences.saveIsGettingWeatherInformation(value);
     }
 }

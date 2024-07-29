@@ -6,21 +6,30 @@ import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.ViewModel;
+
+import com.websarva.wings.android.zuboradiary.data.database.EditDiarySelectItemTitleRepository;
+import com.websarva.wings.android.zuboradiary.data.database.SelectedDiaryItemTitle;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class EditDiarySelectItemTitleViewModel extends AndroidViewModel {
+import javax.inject.Inject;
+
+import dagger.hilt.android.lifecycle.HiltViewModel;
+
+@HiltViewModel
+public class EditDiarySelectItemTitleViewModel extends ViewModel {
 
     private EditDiarySelectItemTitleRepository editDiarySelectItemTitleRepository;
     private MutableLiveData<List<SelectedDiaryItemTitle>> selectedItemTitleHistory =
             new MutableLiveData<>(new ArrayList<>());
     private final int MAX_LOADED_ITEM_TITLES = 50;
 
-    public EditDiarySelectItemTitleViewModel(@NonNull Application application) {
-        super(application);
-        editDiarySelectItemTitleRepository =
-                new EditDiarySelectItemTitleRepository(getApplication());
+    @Inject
+    public EditDiarySelectItemTitleViewModel(
+            EditDiarySelectItemTitleRepository editDiarySelectItemTitleRepository) {
+        this.editDiarySelectItemTitleRepository = editDiarySelectItemTitleRepository;
     }
 
     public void loadSelectedItemTitleHistory() throws Exception {

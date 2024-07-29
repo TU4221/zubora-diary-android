@@ -41,12 +41,14 @@ import com.websarva.wings.android.zuboradiary.data.settings.DayOfWeekNameResIdGe
 import com.websarva.wings.android.zuboradiary.data.settings.ThemeColors;
 import com.websarva.wings.android.zuboradiary.databinding.FragmentSettingsBinding;
 import com.websarva.wings.android.zuboradiary.ui.ThemeColorSwitcher;
-import com.websarva.wings.android.zuboradiary.ui.ViewModelFactory;
 
 import java.time.DayOfWeek;
 import java.time.LocalTime;
 import java.util.Map;
 
+import dagger.hilt.android.AndroidEntryPoint;
+
+@AndroidEntryPoint
 public class SettingsFragment extends Fragment {
 
     // View関係
@@ -70,8 +72,7 @@ public class SettingsFragment extends Fragment {
         super.onCreate(savedInstanceState);
 
         // ViewModel設定
-        ViewModelFactory factory = new ViewModelFactory(requireContext());
-        ViewModelProvider provider = new ViewModelProvider(requireActivity(), factory);
+        ViewModelProvider provider = new ViewModelProvider(requireActivity());
         this.settingsViewModel = provider.get(SettingsViewModel.class);
 
         // Navigation設定

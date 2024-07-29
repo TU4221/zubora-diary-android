@@ -1,21 +1,21 @@
-package com.websarva.wings.android.zuboradiary.ui.list;
+package com.websarva.wings.android.zuboradiary.data.database;
 
-import android.app.Application;
 import android.util.Log;
 
 import com.google.common.util.concurrent.ListenableFuture;
-import com.websarva.wings.android.zuboradiary.ui.diary.DiaryDAO;
-import com.websarva.wings.android.zuboradiary.ui.diary.DiaryDatabase;
 
 import java.util.concurrent.ExecutionException;
+
+import javax.inject.Inject;
+
 
 public class DiaryListRepository {
     private DiaryDatabase diaryDatabase;
     private DiaryDAO diaryDAO;
 
-    public DiaryListRepository(Application application) {
-        this.diaryDatabase = DiaryDatabase.getDatabase(application);
-        this.diaryDAO = diaryDatabase.createDiaryDAO();
+    @Inject
+    public DiaryListRepository(DiaryDAO diaryDAO) {
+        this.diaryDAO = diaryDAO;
     }
 
 

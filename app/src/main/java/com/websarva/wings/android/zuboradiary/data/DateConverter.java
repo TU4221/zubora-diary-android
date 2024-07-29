@@ -1,4 +1,4 @@
-package com.websarva.wings.android.zuboradiary;
+package com.websarva.wings.android.zuboradiary.data;
 
 import java.time.DateTimeException;
 import java.time.LocalDate;
@@ -69,9 +69,10 @@ public class DateConverter {
         return "";
     }
 
-    public static String toStringLocalDateYearMonth(int year, int month) {
+    public static String toStringLocalDateYearMonth(YearMonth yearMonth) {
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-            LocalDate localDate = YearMonth.of(year, month).atDay(1);
+            LocalDate localDate =
+                    YearMonth.of(yearMonth.getYear(), yearMonth.getMonthValue()).atDay(1);
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy年MM月");
             return localDate.format(formatter);
         }

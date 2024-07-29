@@ -1,6 +1,5 @@
 package com.websarva.wings.android.zuboradiary.ui.settings;
 
-import android.content.Context;
 import android.util.Log;
 
 import androidx.annotation.FloatRange;
@@ -16,10 +15,14 @@ import com.websarva.wings.android.zuboradiary.data.worker.WorkerRepository;
 import java.time.DayOfWeek;
 import java.time.LocalTime;
 
+import javax.inject.Inject;
+
+import dagger.hilt.android.lifecycle.HiltViewModel;
 import io.reactivex.rxjava3.core.Flowable;
 import io.reactivex.rxjava3.core.Single;
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
 
+@HiltViewModel
 public class SettingsViewModel extends ViewModel {
     private SettingsRepository settingsRepository;
     private WorkerRepository workerRepository;
@@ -27,6 +30,7 @@ public class SettingsViewModel extends ViewModel {
     // TODO:変数名を統一する。selected～、isChecked～。
     private final MutableLiveData<String> themeColor = new MutableLiveData<>();
     private final MutableLiveData<String> calendarStartDayOfWeek = new MutableLiveData<>();
+    private final MutableLiveData<Integer> calendarStartDayOfWeekNumber = new MutableLiveData<>();
     private final MutableLiveData<Boolean> isCheckedReminderNotification = new MutableLiveData<>();
     private final MutableLiveData<Boolean> isCheckedPasscodeLock = new MutableLiveData<>();
     private final MutableLiveData<Boolean> isCheckedGettingWeatherInformation = new MutableLiveData<>();
@@ -36,9 +40,10 @@ public class SettingsViewModel extends ViewModel {
     @FloatRange(from = -180.0, to = 180.0)
     private double longitude = 0;
 
-    public SettingsViewModel(Context context) {
-        this.settingsRepository = new SettingsRepository(context);
-        this.workerRepository = new WorkerRepository(context);
+    @Inject
+    public SettingsViewModel(SettingsRepository settingsRepository, WorkerRepository workerRepository) {
+        this.settingsRepository = settingsRepository;
+        this.workerRepository = workerRepository;
 
         Flowable<String> themeColorNameFlowable = this.settingsRepository.loadThemeColorName();
         this.disposables.add(themeColorNameFlowable
@@ -51,6 +56,14 @@ public class SettingsViewModel extends ViewModel {
                 this.settingsRepository.loadCalendarStartDayOfWeekName();
         this.disposables.add(calendarStartDayOfWeekNameFlowable
                 .subscribe(this.calendarStartDayOfWeek::postValue, throwable -> {
+                    throw throwable;
+                })
+        );
+
+        Flowable<Integer> calendarStartDayOfWeekNumberFlowable =
+                this.settingsRepository.loadCalendarStartDayOfWeekNumber();
+        this.disposables.add(calendarStartDayOfWeekNumberFlowable
+                .subscribe(this.calendarStartDayOfWeekNumber::postValue, throwable -> {
                     throw throwable;
                 })
         );
@@ -136,6 +149,10 @@ public class SettingsViewModel extends ViewModel {
 
     public LiveData<String> getCalendarStartDayOfWeekLiveData() {
         return this.calendarStartDayOfWeek;
+    }
+
+    public LiveData<Integer> getCalendarStartDayOfWeekNumberLiveData() {
+        return this.calendarStartDayOfWeekNumber;
     }
 
     public LiveData<Boolean> getIsCheckedReminderNotificationLiveData() {

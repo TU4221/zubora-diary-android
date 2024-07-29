@@ -42,11 +42,15 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.websarva.wings.android.zuboradiary.R;
+import com.websarva.wings.android.zuboradiary.data.database.SelectedDiaryItemTitle;
 import com.websarva.wings.android.zuboradiary.databinding.FragmentEditDiarySelectItemTitleBinding;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import dagger.hilt.android.AndroidEntryPoint;
+
+@AndroidEntryPoint
 public class EditDiarySelectItemTitleFragment extends Fragment {
 
     // View関係

@@ -1,20 +1,17 @@
-package com.websarva.wings.android.zuboradiary.ui.diary.editdiaryselectitemtitle;
-
-import android.app.Application;
+package com.websarva.wings.android.zuboradiary.data.database;
 
 import com.google.common.util.concurrent.ListenableFuture;
-import com.websarva.wings.android.zuboradiary.ui.diary.DiaryDatabase;
 
 import java.util.List;
 
+import javax.inject.Inject;
+
 public class EditDiarySelectItemTitleRepository {
-    private DiaryDatabase selectedItemTitlesHistoryDatabase;
     private SelectedItemTitlesHistoryDAO selectedItemTitlesHistoryDAO;
 
-    public EditDiarySelectItemTitleRepository(Application application) {
-        this.selectedItemTitlesHistoryDatabase = DiaryDatabase.getDatabase(application);
-        this.selectedItemTitlesHistoryDAO =
-                selectedItemTitlesHistoryDatabase.createSelectedItemTitlesHistoryDAO();
+    @Inject
+    public EditDiarySelectItemTitleRepository(SelectedItemTitlesHistoryDAO selectedItemTitlesHistoryDAO) {
+        this.selectedItemTitlesHistoryDAO = selectedItemTitlesHistoryDAO;
     }
 
     public List<SelectedDiaryItemTitle> loadSelectedDiaryItemTitles(int numTitles, int offset) throws Exception {

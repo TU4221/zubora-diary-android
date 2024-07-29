@@ -3,27 +3,29 @@ package com.websarva.wings.android.zuboradiary.ui.list.wordsearch;
 import android.app.Application;
 import android.os.Handler;
 import android.os.Looper;
-import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.core.os.HandlerCompat;
-import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.ViewModel;
 
-import com.google.common.util.concurrent.Futures;
-import com.websarva.wings.android.zuboradiary.ui.diary.DiaryRepository;
+import com.websarva.wings.android.zuboradiary.data.database.DiaryRepository;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
-public class WordSearchViewModel extends AndroidViewModel {
+import javax.inject.Inject;
 
-    private DiaryRepository DiaryRepository;
+import dagger.hilt.android.lifecycle.HiltViewModel;
+
+@HiltViewModel
+public class WordSearchViewModel extends ViewModel {
+
+    private DiaryRepository diaryRepository;
     private MutableLiveData<String> searchWord = new MutableLiveData<>();
     private MutableLiveData<Boolean> isVisibleSearchWordClearButton = new MutableLiveData<>();
     private Future<?> LoadingWordSearchResultListFuture;
@@ -39,9 +41,9 @@ public class WordSearchViewModel extends AndroidViewModel {
     private ExecutorService executorService;
 
 
-    public WordSearchViewModel(@NonNull Application application) {
-        super(application);
-        DiaryRepository = new DiaryRepository(getApplication());
+    @Inject
+    public WordSearchViewModel(DiaryRepository diaryRepository) {
+        this.diaryRepository = diaryRepository;
         this.executorService = Executors.newSingleThreadExecutor();
         initialize();
     }
@@ -150,14 +152,14 @@ public class WordSearchViewModel extends AndroidViewModel {
             try {
                 if (loadType == LoadType.NEW || loadType == LoadType.UPDATE) {
                     numWordSearchResults =
-                            WordSearchViewModel.this.DiaryRepository.countWordSearchResults(searchWord);
+                            WordSearchViewModel.this.diaryRepository.countWordSearchResults(searchWord);
                 } else {
                     // loadType == LoadType.ADD
                     numWordSearchResults =
                             WordSearchViewModel.this.numWordSearchResults.getValue();
                 }
                 loadedData =
-                        WordSearchViewModel.this.DiaryRepository.selectWordSearchResultList(
+                        WordSearchViewModel.this.diaryRepository.selectWordSearchResultList(
                                 numLoadingItems,
                                 loadingOffset,
                                 searchWord

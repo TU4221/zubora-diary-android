@@ -5,18 +5,18 @@ import android.content.Context;
 import androidx.datastore.preferences.core.MutablePreferences;
 import androidx.datastore.preferences.core.Preferences;
 import androidx.datastore.preferences.core.PreferencesKeys;
-import androidx.datastore.preferences.rxjava3.RxPreferenceDataStoreBuilder;
 import androidx.datastore.rxjava3.RxDataStore;
 
-import com.websarva.wings.android.zuboradiary.DateConverter;
+import com.websarva.wings.android.zuboradiary.data.DateConverter;
 
 import java.time.DayOfWeek;
+
+import javax.inject.Inject;
 
 import io.reactivex.rxjava3.core.Flowable;
 import io.reactivex.rxjava3.core.Single;
 
 public class UserPreferences {
-    private static UserPreferences instance;
     private Context context;
     private RxDataStore<Preferences> dataStore;
     private final Preferences.Key<Integer> KEY_THEME_COLOR = PreferencesKeys.intKey("theme_color");
@@ -31,16 +31,10 @@ public class UserPreferences {
     private final Preferences.Key<Integer> KEY_PASSCODE = PreferencesKeys.intKey("passcode");
     private final Preferences.Key<Boolean> KEY_IS_GETTING_WEATHER_INFORMATION =
                                     PreferencesKeys.booleanKey("is_getting_weather_information");
-    private UserPreferences(Context context) {
+    @Inject
+    public UserPreferences(Context context, RxDataStore<Preferences> preferencesRxDataStore) {
         this.context = context;
-        this.dataStore = new RxPreferenceDataStoreBuilder(context, "settings").build();
-    }
-
-    public static UserPreferences getInstance(Context context) {
-        if (instance == null) {
-            instance = new UserPreferences(context);
-        }
-        return  instance;
+        this.dataStore = preferencesRxDataStore;
     }
 
     public Flowable<Integer> loadThemeColorNumber() {
@@ -90,6 +84,12 @@ public class UserPreferences {
                         dayOfWeekNameResIdGetter.getResId(DayOfWeek.SUNDAY);
             }
             return this.context.getString(savedCalendarStartDayOfWeekNameResId);
+        });
+    }
+
+    public Flowable<Integer> loadCalendarStartDayOfWeekNumber() {
+        return this.dataStore.data().map(preferences -> {
+            return preferences.get(KEY_CALENDAR_START_DAY_OF_WEEK);
         });
     }
 

@@ -1,4 +1,4 @@
-package com.websarva.wings.android.zuboradiary.ui.diary;
+package com.websarva.wings.android.zuboradiary.data.database;
 
 import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;
@@ -10,13 +10,13 @@ public class Diary {
     @PrimaryKey
     @NonNull
     private String date;
+    @NonNull
     private String log;
     @ColumnInfo(name = "weather_1")
     private String weather1;
     @ColumnInfo(name = "weather_2")
     private String weather2;
     private String condition;
-    @NonNull
     private String title;
     @ColumnInfo(name = "item_1_title")
     private String item1Title;
@@ -84,7 +84,7 @@ public class Diary {
         return title;
     }
 
-    public void setTitle(@NonNull String title) {
+    public void setTitle(String title) {
         this.title = title;
     }
 

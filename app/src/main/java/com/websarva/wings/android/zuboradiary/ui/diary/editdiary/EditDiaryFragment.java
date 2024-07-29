@@ -43,14 +43,13 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
-import com.websarva.wings.android.zuboradiary.DateConverter;
+import com.websarva.wings.android.zuboradiary.data.DateConverter;
 import com.websarva.wings.android.zuboradiary.data.diary.ConditionConverter;
 import com.websarva.wings.android.zuboradiary.data.diary.Conditions;
 import com.websarva.wings.android.zuboradiary.data.diary.WeatherConverter;
 import com.websarva.wings.android.zuboradiary.data.diary.Weathers;
 import com.websarva.wings.android.zuboradiary.databinding.FragmentEditDiaryBinding;
 import com.websarva.wings.android.zuboradiary.R;
-import com.websarva.wings.android.zuboradiary.ui.ViewModelFactory;
 import com.websarva.wings.android.zuboradiary.ui.diary.DiaryViewModel;
 import com.websarva.wings.android.zuboradiary.ui.diary.editdiaryselectitemtitle.EditDiarySelectItemTitleFragment;
 import com.websarva.wings.android.zuboradiary.ui.settings.SettingsViewModel;
@@ -59,6 +58,9 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+import dagger.hilt.android.AndroidEntryPoint;
+
+@AndroidEntryPoint
 public class EditDiaryFragment extends Fragment {
 
     // View関係
@@ -98,8 +100,7 @@ public class EditDiaryFragment extends Fragment {
         super.onCreate(savedInstanceState);
 
         // ViewModel設定
-        ViewModelFactory factory = new ViewModelFactory(requireContext());
-        ViewModelProvider provider = new ViewModelProvider(requireActivity(), factory);
+        ViewModelProvider provider = new ViewModelProvider(requireActivity());
         diaryViewModel = provider.get(DiaryViewModel.class);
         settingsViewModel = provider.get(SettingsViewModel.class);
         boolean isStartDiaryFragment =
@@ -1147,6 +1148,7 @@ public class EditDiaryFragment extends Fragment {
         return currentDestinationId == R.id.navigation_edit_diary_fragment;
     }
 
+    // 他のダイアログで表示できなかったダイアログを表示
     private void retryErrorDialogShow() {
         if (shouldShowDiarySavingErrorDialog) {
             showDiarySavingErrorDialog();

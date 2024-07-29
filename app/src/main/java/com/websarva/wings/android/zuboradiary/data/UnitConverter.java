@@ -1,4 +1,4 @@
-package com.websarva.wings.android.zuboradiary;
+package com.websarva.wings.android.zuboradiary.data;
 
 import android.content.Context;
 import android.util.DisplayMetrics;

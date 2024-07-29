@@ -13,6 +13,8 @@ import androidx.navigation.fragment.NavHostFragment;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import com.websarva.wings.android.zuboradiary.databinding.DialogFragmentTwoNumberPickersBinding;
 
+import java.time.LocalTime;
+
 public class TimePickerDialogFragment extends BottomSheetDialogFragment {
     private static final String fromClassName = "From" + TimePickerDialogFragment.class.getName();
     public static final String KEY_SELECTED_HOUR = "SelectedHour" + fromClassName;
@@ -39,14 +41,17 @@ public class TimePickerDialogFragment extends BottomSheetDialogFragment {
                 DialogFragmentTwoNumberPickersBinding.inflate(inflater, container, false);
 
         // View設定
+        LocalTime localTime = LocalTime.now();
         this.binding.numberPickerFirst.setMaxValue(23);
         this.binding.numberPickerFirst.setMinValue(0);
         this.binding.numberPickerFirst.setFormatter(new valueFormatter());
         this.binding.numberPickerFirst.setWrapSelectorWheel(false);
+        this.binding.numberPickerFirst.setValue(localTime.getHour());
         this.binding.numberPickerSecond.setMaxValue(59);
         this.binding.numberPickerSecond.setMinValue(0);
         this.binding.numberPickerSecond.setFormatter(new valueFormatter());
         this.binding.numberPickerSecond.setWrapSelectorWheel(false);
+        this.binding.numberPickerSecond.setValue(localTime.getMinute());
 
         this.binding.buttonDecision.setOnClickListener(new View.OnClickListener() {
             @Override

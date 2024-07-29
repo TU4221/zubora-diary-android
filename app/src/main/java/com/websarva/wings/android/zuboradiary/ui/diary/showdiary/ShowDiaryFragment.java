@@ -21,12 +21,16 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.websarva.wings.android.zuboradiary.R;
+import com.websarva.wings.android.zuboradiary.data.DateConverter;
 import com.websarva.wings.android.zuboradiary.databinding.FragmentShowDiaryBinding;
-import com.websarva.wings.android.zuboradiary.ui.ShowDiaryLayout;
+import com.websarva.wings.android.zuboradiary.ui.ShowDiaryLayoutInitializer;
 import com.websarva.wings.android.zuboradiary.ui.diary.DiaryViewModel;
-import com.websarva.wings.android.zuboradiary.ui.diary.editdiary.EditDiaryFragment;
-import com.websarva.wings.android.zuboradiary.ui.diary.editdiary.EditDiaryFragmentDirections;
 
+import java.time.LocalDate;
+
+import dagger.hilt.android.AndroidEntryPoint;
+
+@AndroidEntryPoint
 public class ShowDiaryFragment extends Fragment {
 
     // View関係
@@ -149,7 +153,8 @@ public class ShowDiaryFragment extends Fragment {
         // 天気表示欄設定
         // MEMO:日記の中身を表示するレイアウトをShowDiaryFragmentとCalendarFragment共有させるため、
         //      別レイアウトに作成。各Fragmentにて設定が重複するため、下記クラス、メソッドを作成して使用。
-        ShowDiaryLayout.setupVisibleWeather2Observer(
+        ShowDiaryLayoutInitializer showDiaryLayoutInitializer = new ShowDiaryLayoutInitializer();
+        showDiaryLayoutInitializer.setUpVisibleWeather2Observer(
                 this.diaryViewModel, getViewLifecycleOwner(),
                 this.binding.includeShowDiary.textWeatherSlush,
                 this.binding.includeShowDiary.textWeather2Selected
@@ -205,7 +210,8 @@ public class ShowDiaryFragment extends Fragment {
             SavedStateHandle savedStateHandle =
                     this.navController.getPreviousBackStackEntry().getSavedStateHandle();
             String showedDiaryDate = this.diaryViewModel.getLiveDate().getValue();
-            savedStateHandle.set(KEY_SHOWED_DIARY_DATE, showedDiaryDate);
+            LocalDate showedDiaryLocalDate = DateConverter.toLocalDate( showedDiaryDate);
+            savedStateHandle.set(KEY_SHOWED_DIARY_DATE, showedDiaryLocalDate);
         }
 
         if (isNavigateUp) {

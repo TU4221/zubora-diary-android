@@ -1,4 +1,4 @@
-package com.websarva.wings.android.zuboradiary.ui.diary;
+package com.websarva.wings.android.zuboradiary.data.database;
 
 import androidx.room.Dao;
 import androidx.room.Insert;

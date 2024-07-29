@@ -28,8 +28,8 @@ import android.widget.TextView;
 
 import com.google.android.material.transition.platform.MaterialFadeThrough;
 import com.google.android.material.transition.platform.MaterialSharedAxis;
-import com.websarva.wings.android.zuboradiary.DateConverter;
-import com.websarva.wings.android.zuboradiary.Keyboard;
+import com.websarva.wings.android.zuboradiary.data.DateConverter;
+import com.websarva.wings.android.zuboradiary.ui.KeyboardInitializer;
 import com.websarva.wings.android.zuboradiary.MainActivity;
 import com.websarva.wings.android.zuboradiary.R;
 import com.websarva.wings.android.zuboradiary.databinding.FragmentWordSearchBinding;
@@ -128,9 +128,10 @@ public class WordSearchFragment extends Fragment {
 
 
         // キーワード検索欄設定
-        if (this.wordSearchViewModel.getSearchWord().getValue().isEmpty()) {
-            this.binding.editTextKeyWordSearch.requestFocus();
-            Keyboard.show(this.binding.editTextKeyWordSearch);
+        if (wordSearchViewModel.getSearchWord().getValue().isEmpty()) {
+            binding.editTextKeyWordSearch.requestFocus();
+            KeyboardInitializer keyboardInitializer = new KeyboardInitializer();
+            keyboardInitializer.show(requireActivity(), binding.editTextKeyWordSearch);
         }
         this.wordSearchViewModel.getSearchWord()
                 .observe(getViewLifecycleOwner(), new Observer<String>() {
@@ -168,8 +169,8 @@ public class WordSearchFragment extends Fragment {
                     viewForHidingKeyboard.setOnTouchListener(new View.OnTouchListener() {
                         @Override
                         public boolean onTouch(View v, MotionEvent event) {
-                            v.performClick();
-                            Keyboard.hide(v);
+                            KeyboardInitializer keyboardInitializer = new KeyboardInitializer();
+                            keyboardInitializer.hide(requireActivity(), v);
                             WordSearchFragment.this.binding.editTextKeyWordSearch.clearFocus();
                             return false;
                         }
@@ -190,7 +191,8 @@ public class WordSearchFragment extends Fragment {
                 if (actionId == EditorInfo.IME_ACTION_DONE
                         || (event != null && event.getAction() == KeyEvent.KEYCODE_ENTER
                                                 && event.getAction() == KeyEvent.ACTION_DOWN)) {
-                    Keyboard.hide(v);
+                    KeyboardInitializer keyboardInitializer = new KeyboardInitializer();
+                    keyboardInitializer.hide(requireActivity(), v);
                     v.clearFocus();
                     return true;
                 }
@@ -200,9 +202,10 @@ public class WordSearchFragment extends Fragment {
         this.binding.imageButtonKeyWordClear.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                WordSearchFragment.this.wordSearchViewModel.clearSearchWord();
-                WordSearchFragment.this.binding.editTextKeyWordSearch.requestFocus();
-                Keyboard.show(WordSearchFragment.this.binding.editTextKeyWordSearch);
+                wordSearchViewModel.clearSearchWord();
+                binding.editTextKeyWordSearch.requestFocus();
+                KeyboardInitializer keyboardInitializer = new KeyboardInitializer();
+                keyboardInitializer.show(requireActivity(), binding.editTextKeyWordSearch);
             }
         });
 

@@ -1,6 +1,5 @@
 package com.websarva.wings.android.zuboradiary.ui.diary;
 
-import android.content.Context;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -8,13 +7,15 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
-import com.websarva.wings.android.zuboradiary.DateConverter;
+import com.websarva.wings.android.zuboradiary.data.DateConverter;
 import com.websarva.wings.android.zuboradiary.data.WeatherCodeConverter;
+import com.websarva.wings.android.zuboradiary.data.database.DiaryRepository;
 import com.websarva.wings.android.zuboradiary.data.diary.Weathers;
 import com.websarva.wings.android.zuboradiary.data.network.WeatherApiRepository;
 import com.websarva.wings.android.zuboradiary.data.network.WeatherApiResponse;
+import com.websarva.wings.android.zuboradiary.data.database.Diary;
 import com.websarva.wings.android.zuboradiary.data.settings.SettingsRepository;
-import com.websarva.wings.android.zuboradiary.ui.diary.editdiaryselectitemtitle.SelectedDiaryItemTitle;
+import com.websarva.wings.android.zuboradiary.data.database.SelectedDiaryItemTitle;
 
 import java.io.IOException;
 import java.time.LocalDate;
@@ -27,13 +28,16 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
+import javax.inject.Inject;
+
+import dagger.hilt.android.lifecycle.HiltViewModel;
 import retrofit2.Call;
-import retrofit2.Callback;
 import retrofit2.Response;
 
+@HiltViewModel
 public class DiaryViewModel extends ViewModel {
 
-    public class Item {
+    public static class Item {
         private MutableLiveData<Integer> number = new MutableLiveData<>(1);
         private MutableLiveData<String> title = new MutableLiveData<>("");
         private MutableLiveData<String> comment = new MutableLiveData<>("");
@@ -87,12 +91,10 @@ public class DiaryViewModel extends ViewModel {
     // その為、string.xml ファイルに配列を用意し、それを layout.xml に割り当てたら、 setSection メソッドが機能した。
     // 下記配列は str ↔ int 変換で使用するため削除しない。
     // 配列 conditions も同様。
-    public String[] weathers = {"--", "晴", "曇", "雨", "雪"};
     private MutableLiveData<Integer> intWeather1 = new MutableLiveData<>();
     private MutableLiveData<String> strWeather1 = new MutableLiveData<>();
     private MutableLiveData<Integer> intWeather2 = new MutableLiveData<>();
     private MutableLiveData<String> strWeather2 = new MutableLiveData<>();
-    private String[] conditions = {"--", "HAPPY", "GOOD", "AVERAGE", "POOR", "BAD"};
     private MutableLiveData<Integer> intCondition = new MutableLiveData<>();
     private MutableLiveData<String> strCondition = new MutableLiveData<>();
     private MutableLiveData<String> title = new MutableLiveData<>();
@@ -108,15 +110,18 @@ public class DiaryViewModel extends ViewModel {
     private MutableLiveData<Boolean> isDiaryDeleteError = new MutableLiveData<>();
     private MutableLiveData<Boolean> isWeatherLoadingError = new MutableLiveData<>();
 
-
-    public DiaryViewModel(@NonNull Context context) {
-        this.diaryRepository = new DiaryRepository(context);
+    @Inject
+    public DiaryViewModel(
+            DiaryRepository diaryRepository,
+            WeatherApiRepository weatherApiRepository,
+            SettingsRepository settingsRepository) {
+        this.diaryRepository = diaryRepository;
         for (int i = 0; i < this.items.length; i++) {
             int itemNumber = i + 1;
             this.items[i] = new Item(itemNumber);
         }
-        weatherApiRepository = new WeatherApiRepository();
-        settingsRepository = new SettingsRepository(context);
+        this.weatherApiRepository = weatherApiRepository;
+        this.settingsRepository = settingsRepository;
         initialize();
     }
 
@@ -143,6 +148,21 @@ public class DiaryViewModel extends ViewModel {
     public void prepareDiary(int year, int month, int dayOfMonth, boolean isLoadingDiary) {
         String stringDate = DateConverter.toStringLocalDate(year, month, dayOfMonth);
         if (isLoadingDiary && hasDiary(year, month, dayOfMonth)) {
+            try {
+                loadDiary(stringDate);
+            } catch (Exception e) {
+                isDiaryLoadingError.setValue(true);
+                return;
+            }
+        } else {
+            this.date.setValue(stringDate);
+        }
+        this.hasPreparedDiary = true;
+    }
+
+    public void prepareDiary(LocalDate localDate, boolean isLoadingDiary) {
+        String stringDate = DateConverter.toStringLocalDate(localDate);
+        if (isLoadingDiary && hasDiary(localDate)) {
             try {
                 loadDiary(stringDate);
             } catch (Exception e) {
@@ -196,8 +216,17 @@ public class DiaryViewModel extends ViewModel {
         try {
             return diaryRepository.hasDiary(year, month, dayOfMonth);
         } catch (Exception e) {
-            isDiaryLoadingError.postValue(true);
-            return false; // TODO:例外時はnullを返した方が良い？
+            isDiaryLoadingError.postValue(true); // TODO:postValue?setValue?
+            return false;
+        }
+    }
+
+    public boolean hasDiary(LocalDate localDate) {
+        try {
+            return diaryRepository.hasDiary(localDate);
+        } catch (ExecutionException | InterruptedException e) {
+            isDiaryLoadingError.postValue(true); // TODO:postValue?setValue?
+            return false;
         }
     }
 
@@ -357,22 +386,38 @@ public class DiaryViewModel extends ViewModel {
     private Diary createDiary() {
         updateLog();
         Diary diary = new Diary();
-        diary.setDate(this.date.getValue());
-        diary.setWeather1(this.strWeather1.getValue());
-        diary.setWeather2(this.strWeather2.getValue());
-        diary.setCondition(this.strCondition.getValue());
-        diary.setTitle(this.title.getValue().trim());
-        diary.setItem1Title(this.items[0].title.getValue().trim());
-        diary.setItem1Comment(this.items[0].comment.getValue().trim());
-        diary.setItem2Title(this.items[1].title.getValue().trim());
-        diary.setItem2Comment(this.items[1].comment.getValue().trim());
-        diary.setItem3Title(this.items[2].title.getValue().trim());
-        diary.setItem3Comment(this.items[2].comment.getValue().trim());
-        diary.setItem4Title(this.items[3].title.getValue().trim());
-        diary.setItem4Comment(this.items[3].comment.getValue().trim());
-        diary.setItem5Title(this.items[4].title.getValue().trim());
-        diary.setItem5Comment(this.items[4].comment.getValue().trim());
-        diary.setLog(this.log.getValue());
+        diary.setDate(date.getValue());
+        if (strWeather1.getValue() == null || strWeather1.getValue().isEmpty()) {
+            diary.setWeather1(null);
+        } else {
+            diary.setWeather1(this.strWeather1.getValue());
+        }
+        if (strWeather2.getValue() == null || strWeather1.getValue().isEmpty()) {
+            diary.setWeather2(null);
+        } else {
+            diary.setWeather2(strWeather2.getValue());
+        }
+        if (strCondition.getValue() == null || strCondition.getValue().isEmpty()) {
+            diary.setCondition(null);
+        } else {
+            diary.setCondition(strCondition.getValue());
+        }
+        if (title.getValue() == null || title.getValue().isEmpty()) {
+            diary.setTitle(null);
+        } else {
+            diary.setTitle(title.getValue().trim());
+        }
+        diary.setItem1Title(items[0].title.getValue().trim());
+        diary.setItem1Comment(items[0].comment.getValue().trim());
+        diary.setItem2Title(items[1].title.getValue().trim());
+        diary.setItem2Comment(items[1].comment.getValue().trim());
+        diary.setItem3Title(items[2].title.getValue().trim());
+        diary.setItem3Comment(items[2].comment.getValue().trim());
+        diary.setItem4Title(items[3].title.getValue().trim());
+        diary.setItem4Comment(items[3].comment.getValue().trim());
+        diary.setItem5Title(items[4].title.getValue().trim());
+        diary.setItem5Comment(items[4].comment.getValue().trim());
+        diary.setLog(log.getValue());
         return diary;
     }
 
