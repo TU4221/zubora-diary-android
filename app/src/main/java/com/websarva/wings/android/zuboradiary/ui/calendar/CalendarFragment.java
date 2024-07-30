@@ -1,6 +1,7 @@
 package com.websarva.wings.android.zuboradiary.ui.calendar;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,6 +24,7 @@ import androidx.navigation.fragment.NavHostFragment;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.transition.platform.MaterialFadeThrough;
 import com.google.android.material.transition.platform.MaterialSharedAxis;
+import com.google.common.util.concurrent.FutureCallback;
 import com.kizitonwose.calendar.core.CalendarDay;
 import com.kizitonwose.calendar.core.CalendarMonth;
 import com.kizitonwose.calendar.core.DayPosition;
@@ -60,7 +62,6 @@ public class CalendarFragment extends Fragment {
 
     // View関係
     private FragmentCalendarBinding binding;
-    private final LocalDate today = LocalDate.now();
 
     // Navigation関係
     private NavController navController;
@@ -182,14 +183,13 @@ public class CalendarFragment extends Fragment {
             YearMonth selectedMonth =
                     YearMonth.of(selectedDate.getYear(), selectedDate.getMonthValue());
             calendar.scrollToMonth(selectedMonth);
-            firstSelectDate(selectedDate);
+            selectDateFirst(selectedDate);
         } else {
             calendar.scrollToMonth(currentMonth);
-            firstSelectDate(today);
+            selectDateFirst(LocalDate.now());
         }
     }
 
-    // 曜日リスト取得
     private List<DayOfWeek> createDayOfWeekList() {
         Integer calendarStartDayOfWeekNumber =
                 settingsViewModel.getCalendarStartDayOfWeekNumberLiveData().getValue();
@@ -240,39 +240,48 @@ public class CalendarFragment extends Fragment {
                     textCalendarDay.setVisibility(View.VISIBLE);
 
                     // 今日の日にちマス
-                    if (calendarDay.getDate().isEqual(today)) {
-                        textCalendarDay.setTextColor(
-                                getResources()
-                                        .getColor(R.color.md_theme_light_onSecondaryContainer)
-                        );
+                    if (calendarDay.getDate().isEqual(LocalDate.now())) {
+                        textCalendarDay
+                                .setTextColor(
+                                        getResources().getColor(R.color.md_theme_light_onSecondaryContainer)
+                                );
                         textCalendarDay.setBackgroundResource(R.drawable.calendar_today_bg);
 
                         // 選択中の日にちマス
-                    } else if (calendarDay.getDate()
-                            .isEqual(calendarViewModel.getSelectedDate())) {
-                        textCalendarDay.setTextColor(
-                                getResources()
-                                        .getColor(R.color.md_theme_light_onPrimaryContainer)
-                        );
+                    } else if (calendarDay.getDate().isEqual(calendarViewModel.getSelectedDate())) {
+                        textCalendarDay
+                                .setTextColor(
+                                        getResources().getColor(R.color.md_theme_light_onPrimaryContainer)
+                                );
                         textCalendarDay.setBackgroundResource(R.drawable.calendar_selected_day_bg);
 
                         // それ以外の日にちマス
                     } else {
                         // TODO:祝日判定は手間がかかりそうなので保留
                         DayOfWeek dayOfWeek = calendarDay.getDate().getDayOfWeek();
-                        int color = dayColor(dayOfWeek);
+                        int color = selectDayColor(dayOfWeek);
                         textCalendarDay.setTextColor(color);
                         textCalendarDay.setBackground(null);
-
                     }
 
                     // ドット有無設定
                     LocalDate localDate = calendarDay.getDate();
-                    if (calendarViewModel.existsDiary(localDate)) {
-                        viewCalendarDayDot.setVisibility(View.VISIBLE);
-                    } else {
-                        viewCalendarDayDot.setVisibility(View.INVISIBLE);
-                    }
+                    calendarViewModel.hasDiary(localDate, new FutureCallback<Boolean>() {
+                        @Override
+                        public void onSuccess(Boolean result) {
+                            if (result) {
+                                viewCalendarDayDot.setVisibility(View.VISIBLE);
+                            } else {
+                                viewCalendarDayDot.setVisibility(View.INVISIBLE);
+                            }
+                        }
+
+                        @Override
+                        public void onFailure(@NonNull Throwable t) {
+                            // 例外はViewModelクラス内で例外用リスナーを追加して対応
+                            viewCalendarDayDot.setVisibility(View.INVISIBLE);
+                        }
+                    });
 
                 } else {
                     textCalendarDay.setVisibility(View.INVISIBLE);
@@ -298,9 +307,6 @@ public class CalendarFragment extends Fragment {
                 String stringYearMonth = calendarMonth.getYearMonth().format(formatter);
                 container.textYearMonth.setText(stringYearMonth);
 
-                // 対象年月の既存日記確認リスト格納
-                calendarViewModel.updateExistedDiaryDateLog(calendarMonth.getYearMonth());
-
                 // カレンダーの曜日設定(未設定アイテムのみ設定)
                 if (container.legendLayout.getTag() == null) {
                     container.legendLayout.setTag(calendarMonth.getYearMonth());
@@ -314,7 +320,7 @@ public class CalendarFragment extends Fragment {
 
                         childTextView.setText(dayOfWeek.name().substring(0,3));
 
-                        int color = dayColor(dayOfWeek);
+                        int color = selectDayColor(dayOfWeek);
                         childTextView.setTextColor(color);
 
                     }
@@ -325,7 +331,7 @@ public class CalendarFragment extends Fragment {
     }
 
     // カレンダー日にち、曜日の色取得
-    private int dayColor(DayOfWeek dayOfWeek) {
+    private int selectDayColor(DayOfWeek dayOfWeek) {
         int color = getResources().getColor(R.color.black);
         if (dayOfWeek == DayOfWeek.SUNDAY) {
             color = getResources().getColor(R.color.red);
@@ -354,7 +360,7 @@ public class CalendarFragment extends Fragment {
     }
 
     // カレンダー月単位コンテナ
-    static class MonthViewContainer extends ViewContainer {
+    public static class MonthViewContainer extends ViewContainer {
         TextView textYearMonth;
         LinearLayout legendLayout;
         public MonthViewContainer(View view) {
@@ -364,7 +370,7 @@ public class CalendarFragment extends Fragment {
         }
     }
 
-    private void firstSelectDate(LocalDate date) {
+    private void selectDateFirst(LocalDate date) {
         calendarViewModel.setSelectedDate(date);
         binding.calendar.notifyDateChanged(date);
         updateToolBarDate();
@@ -381,7 +387,11 @@ public class CalendarFragment extends Fragment {
 
         if (selectedDate != date) {
             calendarViewModel.setSelectedDate(date);
-            calendar.notifyDateChanged(date);
+            if (selectedDate != null) {
+                Log.d("20240730", "notifyDateChanged(selectedDate)");
+                calendar.notifyDateChanged(selectedDate); // 前回選択日付更新
+            }
+            calendar.notifyDateChanged(date); // 今回選択日付更新
             updateToolBarDate();
         }
 
@@ -395,81 +405,34 @@ public class CalendarFragment extends Fragment {
         binding.materialToolbarTopAppBar.setTitle(stringDate);
     }
 
-    private void setUpShowDiary() {
-        // 天気表示欄設定
-        ShowDiaryLayoutInitializer showDiaryLayoutInitializer = new ShowDiaryLayoutInitializer();
-        showDiaryLayoutInitializer.setUpVisibleWeather2Observer(
-                diaryViewModel,
-                getViewLifecycleOwner(),
-                binding.includeShowDiary.textWeatherSlush,
-                binding.includeShowDiary.textWeather2Selected
-        );
-    }
-
-    private void setUpFloatActionButton() {
-        binding.floatActionButtonEditDiary.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                LocalDate selectedDate = calendarViewModel.getSelectedDate();
-                showEditDiaryFragment(selectedDate);
-            }
-        });
-    }
-
-    private void setUpLayout() {
-        // 表示日記の下余白設定(FABが日記と重なるのを防ぐため)
-        // MEMO:FABのレイアウト高さは"wrap_content"を使用しているため、
-        //      レイアウト後に機能するviewTreeObserver#addOnGlobalLayoutListenerを使用して取得する。
-        View viewShowDiaryBottomMargin = binding.viewShowDiaryBottomMargin;
-        FloatingActionButton fabEditDiary = binding.floatActionButtonEditDiary;
-        ViewTreeObserver viewTreeObserver = viewShowDiaryBottomMargin.getViewTreeObserver();
-        viewTreeObserver.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-            @Override
-            public void onGlobalLayout() {
-                ViewGroup.MarginLayoutParams viewMarginLayoutParams =
-                        (ViewGroup.MarginLayoutParams) viewShowDiaryBottomMargin.getLayoutParams();
-                ViewGroup.MarginLayoutParams buttonMarginLayoutParams =
-                        (ViewGroup.MarginLayoutParams) fabEditDiary.getLayoutParams();
-
-                viewMarginLayoutParams.height = fabEditDiary.getHeight()
-                        + (buttonMarginLayoutParams.bottomMargin * 2);
-                viewShowDiaryBottomMargin.setLayoutParams(viewMarginLayoutParams);
-
-                // MEMO:例外で再度取得するように促される為、下記対応。
-                viewShowDiaryBottomMargin.getViewTreeObserver()
-                        .removeOnGlobalLayoutListener(this);
-            }
-        });
-    }
-
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-
-        // MEMO:CalendarViewはRecyclerViewを元に作成されている。
-        //      Bind済みの年月、又は既存ホルダーから溢れたを年月を確認する方法が無い。
-        //      ViewModelはMainActivityが消失しない限り持続。
-        //      その為、どこかでクリアをしなければExistedDiaryDateMapの中身が増加していく一方。
-        //      既存日記日付リストの不要な年月のリストを都度クリアするタイミングがない為、ここでまとめてクリアする。
-        calendarViewModel.clearExistedDiaryDateMap();
-    }
-
-
     // CalendarViewで選択された日付の日記を表示
     private void showSelectedDiary() {
         LocalDate selectedDate = calendarViewModel.getSelectedDate();
-        if (diaryViewModel.hasDiary(selectedDate)) {
-            // ViewModelの読込日記の日付をセット
-            diaryViewModel.initialize();
-            diaryViewModel.prepareDiary(selectedDate, true);
-            setUpItemLayout(); // 必要数の項目欄表示
-            binding.linearLayoutShowDiary.setVisibility(View.VISIBLE);
-            binding.textNoDiary.setVisibility(View.GONE);
-        } else {
-            binding.linearLayoutShowDiary.setVisibility(View.GONE);
-            binding.textNoDiary.setVisibility(View.VISIBLE);
-            diaryViewModel.initialize();
-        }
+        calendarViewModel.hasDiary(selectedDate, new FutureCallback<Boolean>() {
+            @Override
+            public void onSuccess(Boolean result) {
+                if (result) {
+                    // ViewModelの読込日記の日付をセット
+                    diaryViewModel.initialize();
+                    diaryViewModel.prepareDiary(selectedDate, true);
+                    setUpItemLayout(); // 必要数の項目欄表示
+                    binding.linearLayoutShowDiary.setVisibility(View.VISIBLE);
+                    binding.textNoDiary.setVisibility(View.GONE);
+                } else {
+                    binding.linearLayoutShowDiary.setVisibility(View.GONE);
+                    binding.textNoDiary.setVisibility(View.VISIBLE);
+                    diaryViewModel.initialize();
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Throwable t) {
+                // 例外はViewModelクラス内で例外用リスナーを追加して対応
+                binding.linearLayoutShowDiary.setVisibility(View.GONE);
+                binding.textNoDiary.setVisibility(View.VISIBLE);
+                diaryViewModel.initialize();
+            }
+        });
     }
 
     private void setUpItemLayout() {
@@ -511,6 +474,58 @@ public class CalendarFragment extends Fragment {
         }
     }
 
+    private void setUpShowDiary() {
+        // 天気表示欄設定
+        ShowDiaryLayoutInitializer showDiaryLayoutInitializer = new ShowDiaryLayoutInitializer();
+        showDiaryLayoutInitializer.setUpVisibleWeather2Observer(
+                diaryViewModel,
+                getViewLifecycleOwner(),
+                binding.includeShowDiary.textWeatherSlush,
+                binding.includeShowDiary.textWeather2Selected
+        );
+    }
+
+    private void setUpFloatActionButton() {
+        binding.floatActionButtonEditDiary.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                LocalDate selectedDate = calendarViewModel.getSelectedDate();
+                showEditDiaryFragment(selectedDate);
+            }
+        });
+    }
+
+    // 表示日記の下余白設定(FABが日記と重なるのを防ぐため)
+    // MEMO:FABのレイアウト高さは"wrap_content"を使用しているため、
+    //      レイアウト後に機能するviewTreeObserver#addOnGlobalLayoutListenerを使用して取得する。
+    private void setUpLayout() {
+        View viewShowDiaryBottomMargin = binding.viewShowDiaryBottomMargin;
+        FloatingActionButton fabEditDiary = binding.floatActionButtonEditDiary;
+        ViewTreeObserver viewTreeObserver = viewShowDiaryBottomMargin.getViewTreeObserver();
+        viewTreeObserver.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            @Override
+            public void onGlobalLayout() {
+                ViewGroup.MarginLayoutParams viewMarginLayoutParams =
+                        (ViewGroup.MarginLayoutParams) viewShowDiaryBottomMargin.getLayoutParams();
+                ViewGroup.MarginLayoutParams buttonMarginLayoutParams =
+                        (ViewGroup.MarginLayoutParams) fabEditDiary.getLayoutParams();
+
+                viewMarginLayoutParams.height = fabEditDiary.getHeight()
+                        + (buttonMarginLayoutParams.bottomMargin * 2);
+                viewShowDiaryBottomMargin.setLayoutParams(viewMarginLayoutParams);
+
+                // MEMO:例外で再度取得するように促される為、下記対応。
+                viewShowDiaryBottomMargin.getViewTreeObserver()
+                        .removeOnGlobalLayoutListener(this);
+            }
+        });
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+    }
+
     // 選択中ボトムナビゲーションタブを再選択時の処理
     public void onNavigationItemReselected() {
         if (binding.nestedScrollFullScreen.canScrollVertically(-1)) {
@@ -527,38 +542,34 @@ public class CalendarFragment extends Fragment {
     }
 
     // カレンダーを今日の日付へ自動スクロール
-    // TODO:scrollとsmoothScrollを連続で処理するとかくつくので実機で確認。(PCが重いせいかもしれない)
     private void scrollCalendarToToday() {
+        LocalDate today = LocalDate.now();
         YearMonth thisMonth = YearMonth.of(today.getYear(), today.getMonthValue());
         CalendarMonth calendarMonth = binding.calendar.findFirstVisibleMonth();
         if (calendarMonth == null) {
             return;
         }
-        YearMonth showedCalendarMonth = calendarMonth.getYearMonth();
+        YearMonth showedMonth = calendarMonth.getYearMonth();
 
-        // カレンダーが今日の日付月から遠い月を表示していたらsmoothScrollの処理時間が延びるので、
-        // 手前にScroll処理を入れる。
-        if (showedCalendarMonth.isAfter(thisMonth)) {
-            YearMonth addedThisMonth  = thisMonth.plusMonths(6);
-            YearMonth subtractedCalendarMonth  = showedCalendarMonth.minusMonths(3);
-
-            if (showedCalendarMonth.isAfter(addedThisMonth)) {
-                binding.calendar.smoothScrollToMonth(subtractedCalendarMonth);
-                binding.calendar.scrollToMonth(addedThisMonth);
+        // MEMO:カレンダーが今日の日付月から遠い月を表示していたらsmoothScrollの処理時間が延びるので、
+        //      間にScroll処理を入れる。
+        if (showedMonth.isAfter(thisMonth)) {
+            YearMonth firstSwitchPoint  = showedMonth.minusMonths(3);
+            YearMonth secondSwitchPoint  = thisMonth.plusMonths(6);
+            if (showedMonth.isAfter(secondSwitchPoint)) {
+                binding.calendar.smoothScrollToMonth(firstSwitchPoint);
+                binding.calendar.scrollToMonth(secondSwitchPoint);
             }
-
-        } else if (showedCalendarMonth.isBefore(thisMonth)) {
-            YearMonth subtractedThisMonth  = thisMonth.minusMonths(6);
-            YearMonth addedCalendarMonth  = showedCalendarMonth.plusMonths(3);
-
-            if (showedCalendarMonth.isBefore(subtractedThisMonth)) {
-                binding.calendar.smoothScrollToMonth(addedCalendarMonth);
-                binding.calendar.scrollToMonth(subtractedThisMonth);
+        } else if (showedMonth.isBefore(thisMonth)) {
+            YearMonth firstSwitchPoint  = showedMonth.plusMonths(3);
+            YearMonth secondSwitchPoint  = thisMonth.minusMonths(6);
+            if (showedMonth.isBefore(secondSwitchPoint)) {
+                binding.calendar.smoothScrollToMonth(firstSwitchPoint);
+                binding.calendar.scrollToMonth(secondSwitchPoint);
             }
         }
-
         binding.calendar.smoothScrollToMonth(YearMonth.now());
-        selectDate(today);
+        selectDate(LocalDate.now());
     }
 
     private void showEditDiaryFragment(LocalDate localDate) {

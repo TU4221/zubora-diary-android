@@ -8,6 +8,7 @@ import androidx.lifecycle.Observer;
 
 import com.websarva.wings.android.zuboradiary.ui.diary.DiaryViewModel;
 
+// TODO:このクラスが最終的に必要か判断すること。
 public class ShowDiaryLayoutInitializer {
     public void setUpVisibleWeather2Observer(
             DiaryViewModel diaryViewModel, LifecycleOwner lifecycleOwner, TextView slush, TextView weather2) {

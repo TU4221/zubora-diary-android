@@ -70,10 +70,9 @@ public class DiaryRepository {
         return existDiaryListenableFuture.get();
     }
 
-    public boolean hasDiary(LocalDate localDate) throws ExecutionException, InterruptedException {
+    public ListenableFuture<Boolean> hasDiary(LocalDate localDate) {
         String stringDate = DateConverter.toStringLocalDate(localDate);
-        ListenableFuture<Boolean> existDiaryListenableFuture = diaryDAO.hasDiaryAsync(stringDate);
-        return existDiaryListenableFuture.get();
+        return diaryDAO.hasDiaryAsync(stringDate);
     }
 
     public Diary selectDiary(String date) throws Exception {

@@ -1,9 +1,17 @@
 package com.websarva.wings.android.zuboradiary.ui.calendar;
 
+import android.os.Handler;
+import android.os.Looper;
+import android.util.Log;
+import android.view.View;
+
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
+import com.google.common.util.concurrent.FutureCallback;
+import com.google.common.util.concurrent.Futures;
+import com.google.common.util.concurrent.ListenableFuture;
 import com.websarva.wings.android.zuboradiary.data.database.DiaryRepository;
 
 import java.time.LocalDate;
@@ -12,6 +20,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executor;
 
 import javax.inject.Inject;
 
@@ -21,7 +30,6 @@ import dagger.hilt.android.lifecycle.HiltViewModel;
 public class CalendarViewModel extends ViewModel {
 
     private final DiaryRepository diaryRepository;
-    private final Map<Integer, Map<Integer, List<Integer>>> existedDiaryDateMap = new HashMap<>();
     private LocalDate selectedDate;
     private final MutableLiveData<Boolean> isDiaryLoadingError = new MutableLiveData<>();
 
@@ -30,47 +38,28 @@ public class CalendarViewModel extends ViewModel {
         this.diaryRepository = diaryRepository;
     }
 
-    //既存日記の日付格納
-    public boolean updateExistedDiaryDateLog(YearMonth yearMonth) {
-        int year = yearMonth.getYear();
-        int month = yearMonth.getMonthValue();
-        List<Integer> existedDiaryDateDayList;
-        try {
-            existedDiaryDateDayList =
-                    diaryRepository.selectDiaryDateDayList(yearMonth);
-        } catch (ExecutionException | InterruptedException e) {
-            isDiaryLoadingError.setValue(true);
-            return false;
+    private static class MainThreadExecutor implements Executor {
+        private final Handler handler = new Handler(Looper.getMainLooper());
+
+        @Override
+        public void execute(Runnable command) {
+            handler.post(command);
         }
-        if (this.existedDiaryDateMap.containsKey(year)) {
-            Map<Integer, List<Integer>> existedDiaryDateMonthMap =
-                    this.existedDiaryDateMap.get(year);
-            existedDiaryDateMonthMap.put(month, existedDiaryDateDayList);
-        } else {
-            Map<Integer, List<Integer>> existedDiaryDateMonthMap = new HashMap<>();
-            existedDiaryDateMonthMap.put(month, existedDiaryDateDayList);
-            this.existedDiaryDateMap.put(year, existedDiaryDateMonthMap);
-        }
-        return true;
     }
 
-    public void clearExistedDiaryDateMap() {
-        existedDiaryDateMap.clear();
-    }
-
-    public boolean existsDiary(LocalDate localDate) {
-        if (existedDiaryDateMap.containsKey(localDate.getYear())) {
-            Map<Integer, List<Integer>> existedDiaryDateMonthMap =
-                                                    existedDiaryDateMap.get(localDate.getYear());
-            List<Integer> existedDiaryDateDayOfMonthList =
-                    existedDiaryDateMonthMap.get(localDate.getMonthValue());
-            for (int number: existedDiaryDateDayOfMonthList) {
-                if (number == localDate.getDayOfMonth()) {
-                    return true;
-                }
+    public void hasDiary(LocalDate date, FutureCallback<Boolean> futureCallback) {
+        ListenableFuture<Boolean> hasDiaryListenableFuture = diaryRepository.hasDiary(date);
+        Futures.addCallback(hasDiaryListenableFuture, futureCallback, new MainThreadExecutor());
+        Futures.addCallback(hasDiaryListenableFuture, new FutureCallback<Boolean>() {
+            @Override
+            public void onSuccess(Boolean result) {
             }
-        }
-        return false;
+
+            @Override
+            public void onFailure(Throwable t) {
+                isDiaryLoadingError.setValue(true);
+            }
+        }, new MainThreadExecutor());
     }
 
     // Getter/Setter

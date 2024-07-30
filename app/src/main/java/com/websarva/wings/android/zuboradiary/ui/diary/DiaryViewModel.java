@@ -27,6 +27,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.function.Consumer;
 
 import javax.inject.Inject;
 
@@ -223,7 +224,7 @@ public class DiaryViewModel extends ViewModel {
 
     public boolean hasDiary(LocalDate localDate) {
         try {
-            return diaryRepository.hasDiary(localDate);
+            return diaryRepository.hasDiary(localDate).get();
         } catch (ExecutionException | InterruptedException e) {
             isDiaryLoadingError.postValue(true); // TODO:postValue?setValue?
             return false;
@@ -386,39 +387,31 @@ public class DiaryViewModel extends ViewModel {
     private Diary createDiary() {
         updateLog();
         Diary diary = new Diary();
-        diary.setDate(date.getValue());
-        if (strWeather1.getValue() == null || strWeather1.getValue().isEmpty()) {
-            diary.setWeather1(null);
-        } else {
-            diary.setWeather1(this.strWeather1.getValue());
-        }
-        if (strWeather2.getValue() == null || strWeather1.getValue().isEmpty()) {
-            diary.setWeather2(null);
-        } else {
-            diary.setWeather2(strWeather2.getValue());
-        }
-        if (strCondition.getValue() == null || strCondition.getValue().isEmpty()) {
-            diary.setCondition(null);
-        } else {
-            diary.setCondition(strCondition.getValue());
-        }
-        if (title.getValue() == null || title.getValue().isEmpty()) {
-            diary.setTitle(null);
-        } else {
-            diary.setTitle(title.getValue().trim());
-        }
-        diary.setItem1Title(items[0].title.getValue().trim());
-        diary.setItem1Comment(items[0].comment.getValue().trim());
-        diary.setItem2Title(items[1].title.getValue().trim());
-        diary.setItem2Comment(items[1].comment.getValue().trim());
-        diary.setItem3Title(items[2].title.getValue().trim());
-        diary.setItem3Comment(items[2].comment.getValue().trim());
-        diary.setItem4Title(items[3].title.getValue().trim());
-        diary.setItem4Comment(items[3].comment.getValue().trim());
-        diary.setItem5Title(items[4].title.getValue().trim());
-        diary.setItem5Comment(items[4].comment.getValue().trim());
-        diary.setLog(log.getValue());
+        createDiaryStringData(diary::setDate, date.getValue());
+        createDiaryStringData(diary::setWeather1, strWeather1.getValue());
+        createDiaryStringData(diary::setWeather2, strWeather2.getValue());
+        createDiaryStringData(diary::setCondition, strCondition.getValue());
+        createDiaryStringData(diary::setTitle, title.getValue());
+        createDiaryStringData(diary::setItem1Title, items[0].title.getValue());
+        createDiaryStringData(diary::setItem1Comment, items[0].comment.getValue());
+        createDiaryStringData(diary::setItem2Title, items[1].title.getValue());
+        createDiaryStringData(diary::setItem2Comment, items[1].comment.getValue());
+        createDiaryStringData(diary::setItem3Title, items[2].title.getValue());
+        createDiaryStringData(diary::setItem3Comment, items[2].comment.getValue());
+        createDiaryStringData(diary::setItem4Title, items[3].title.getValue());
+        createDiaryStringData(diary::setItem4Comment, items[3].comment.getValue());
+        createDiaryStringData(diary::setItem5Title, items[4].title.getValue());
+        createDiaryStringData(diary::setItem5Comment, items[4].comment.getValue());
+        createDiaryStringData(diary::setLog, log.getValue());
         return diary;
+    }
+
+    private void createDiaryStringData(Consumer<String> func, String s) {
+        if (s == null || s.isEmpty()) {
+            func.accept(null);
+        } else {
+            func.accept(s.trim());
+        }
     }
 
     private List<SelectedDiaryItemTitle> createSelectedDiaryItemTitleList() {

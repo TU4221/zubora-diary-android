@@ -38,7 +38,13 @@ public class UserPreferences {
     }
 
     public Flowable<Integer> loadThemeColorNumber() {
-        return this.dataStore.data().map(preferences -> preferences.get(KEY_THEME_COLOR));
+        return this.dataStore.data().cache().map(preferences -> {
+            Integer savedThemeColorNumber = preferences.get(KEY_THEME_COLOR);
+            if (savedThemeColorNumber == null) {
+                savedThemeColorNumber = ThemeColors.WHITE.getThemeColorNumber();
+            }
+            return savedThemeColorNumber;
+        });
     }
 
     public Flowable<String> loadThemeColorName() {
@@ -89,7 +95,11 @@ public class UserPreferences {
 
     public Flowable<Integer> loadCalendarStartDayOfWeekNumber() {
         return this.dataStore.data().map(preferences -> {
-            return preferences.get(KEY_CALENDAR_START_DAY_OF_WEEK);
+            Integer savedCalendarStartDayOfWeekNumber = preferences.get(KEY_CALENDAR_START_DAY_OF_WEEK);
+            if (savedCalendarStartDayOfWeekNumber == null) {
+                savedCalendarStartDayOfWeekNumber = DayOfWeek.SUNDAY.getValue();
+            }
+            return savedCalendarStartDayOfWeekNumber;
         });
     }
 

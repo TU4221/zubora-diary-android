@@ -9,14 +9,14 @@ import androidx.room.PrimaryKey;
 public class Diary {
     @PrimaryKey
     @NonNull
-    private String date;
+    private String date; // TODO:曜日を含めないようにする。
     @NonNull
-    private String log;
+    private String log; // TODO:曜日を含めないようにする。
     @ColumnInfo(name = "weather_1")
-    private String weather1;
+    private String weather1; // TODO:数字管理に変更。
     @ColumnInfo(name = "weather_2")
-    private String weather2;
-    private String condition;
+    private String weather2; // TODO:数字管理に変更。
+    private String condition; // TODO:数字管理に変更。
     private String title;
     @ColumnInfo(name = "item_1_title")
     private String item1Title;
