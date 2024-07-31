@@ -6,10 +6,13 @@ import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 
 public class KeyboardInitializer {
-
-    public void hide(Activity activity, View focusView) {
-        InputMethodManager inputMethodManager =
+    InputMethodManager inputMethodManager;
+    public KeyboardInitializer(Activity activity) {
+        inputMethodManager =
                 (InputMethodManager) activity.getSystemService(Context.INPUT_METHOD_SERVICE);
+    }
+
+    public void hide(View focusView) {
         inputMethodManager
                 .hideSoftInputFromWindow(
                         focusView.getWindowToken(),
@@ -17,9 +20,7 @@ public class KeyboardInitializer {
                 );
     }
 
-    public void show(Activity activity, View focusView) {
-        InputMethodManager inputMethodManager =
-                (InputMethodManager) activity.getSystemService(Context.INPUT_METHOD_SERVICE);
+    public void show(View focusView) {
         inputMethodManager
                 .showSoftInput(
                 focusView,

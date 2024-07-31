@@ -231,14 +231,13 @@ public class DiaryViewModel extends ViewModel {
         }
     }
 
-    public void prepareWeatherSelection(int year, int month, int dayOfMonth, double latitude, double longitude) {
-        LocalDate diaryDate = LocalDate.of(year, month, dayOfMonth);
+    public void prepareWeatherSelection(LocalDate date, double latitude, double longitude) {
         LocalDate currentDate = LocalDate.now();
-        Log.d("20240717", "isAfter:" + String.valueOf(diaryDate.isAfter(currentDate)));
-        if (diaryDate.isAfter(currentDate)) {
+        Log.d("20240717", "isAfter:" + String.valueOf(date.isAfter(currentDate)));
+        if (date.isAfter(currentDate)) {
             return;
         }
-        long betweenDays = ChronoUnit.DAYS.between(diaryDate, currentDate);
+        long betweenDays = ChronoUnit.DAYS.between(date, currentDate);
         Log.d("20240717", "betweenDays:" + String.valueOf(betweenDays));
         if (betweenDays > 92) { //過去天気情報取得可能
             return;
@@ -439,8 +438,8 @@ public class DiaryViewModel extends ViewModel {
         return true;
     }
 
-    public void updateDate(int year, int month, int dayOfMonth) {
-        String stringDate = DateConverter.toStringLocalDate(year, month, dayOfMonth);
+    public void updateDate(LocalDate date) {
+        String stringDate = DateConverter.toStringLocalDate(date);
         this.date.setValue(stringDate);
     }
 
@@ -474,6 +473,11 @@ public class DiaryViewModel extends ViewModel {
         if (visibleItemsCount > 1) {
             visibleItemsCount -= 1;
         }
+    }
+
+    public void updateItemTitle(int itemNumber, String title) {
+        int arrayNumber = itemNumber - 1;
+        items[arrayNumber].setTitle(title);
     }
 
 

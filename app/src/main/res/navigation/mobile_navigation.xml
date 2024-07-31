@@ -275,8 +275,8 @@
                 android:name="isLoadingDiary"
                 app:argType="boolean" />
             <argument
-                android:name="edit_diary_date_year"
-                app:argType="integer" />
+                android:name="edit_diary_date"
+                app:argType="java.time.LocalDate" />
             <argument
                 android:name="edit_diary_date_month"
                 app:argType="integer" />
@@ -286,7 +286,11 @@
         </fragment>
         <dialog
             android:id="@+id/navigation_date_picker_dialog_for_edit_diary_fragment"
-            android:name="com.websarva.wings.android.zuboradiary.ui.diary.editdiary.DatePickerDialogFragment"/>
+            android:name="com.websarva.wings.android.zuboradiary.ui.diary.editdiary.DatePickerDialogFragment">
+            <argument
+                android:name="currentDate"
+                app:argType="java.time.LocalDate" />
+        </dialog>
         <dialog
             android:id="@+id/navigation_delete_confirmation_dialog_for_edit_diary_fragment"
             android:name="com.websarva.wings.android.zuboradiary.ui.diary.editdiary.DeleteConfirmationDialogFragment">
@@ -299,14 +303,14 @@
             android:name="com.websarva.wings.android.zuboradiary.ui.diary.editdiary.LoadExistingDiaryDialogFragment">
             <argument
                 android:name="LoadDiaryDate"
-                app:argType="string" />
+                app:argType="java.time.LocalDate" />
         </dialog>
         <dialog
             android:id="@+id/navigation_update_existing_diary_dialog_for_edit_diary_fragment"
             android:name="com.websarva.wings.android.zuboradiary.ui.diary.editdiary.UpdateExistingDiaryDialogFragment">
             <argument
                 android:name="UpdateDiaryDate"
-                app:argType="string" />
+                app:argType="java.time.LocalDate" />
             <argument
                 android:name="UpdateType"
                 app:argType="integer" />
@@ -316,7 +320,7 @@
             android:name="com.websarva.wings.android.zuboradiary.ui.diary.editdiary.WeatherInformationDialogFragment">
             <argument
                 android:name="TargetDiaryDate"
-                app:argType="string" />
+                app:argType="java.time.LocalDate" />
         </dialog>
 
         <fragment

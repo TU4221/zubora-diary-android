@@ -28,6 +28,7 @@ public class SettingsViewModel extends ViewModel {
     private WorkerRepository workerRepository;
     private final CompositeDisposable disposables = new CompositeDisposable();
     // TODO:変数名を統一する。selected～、isChecked～。
+    // TODO:エラー変数を用意。Activityフラグメントで管理？
     private final MutableLiveData<String> themeColor = new MutableLiveData<>();
     private final MutableLiveData<String> calendarStartDayOfWeek = new MutableLiveData<>();
     private final MutableLiveData<Integer> calendarStartDayOfWeekNumber = new MutableLiveData<>();

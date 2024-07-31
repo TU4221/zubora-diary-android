@@ -130,8 +130,8 @@ public class WordSearchFragment extends Fragment {
         // キーワード検索欄設定
         if (wordSearchViewModel.getSearchWord().getValue().isEmpty()) {
             binding.editTextKeyWordSearch.requestFocus();
-            KeyboardInitializer keyboardInitializer = new KeyboardInitializer();
-            keyboardInitializer.show(requireActivity(), binding.editTextKeyWordSearch);
+            KeyboardInitializer keyboardInitializer = new KeyboardInitializer(requireActivity());
+            keyboardInitializer.show(binding.editTextKeyWordSearch);
         }
         this.wordSearchViewModel.getSearchWord()
                 .observe(getViewLifecycleOwner(), new Observer<String>() {
@@ -169,8 +169,9 @@ public class WordSearchFragment extends Fragment {
                     viewForHidingKeyboard.setOnTouchListener(new View.OnTouchListener() {
                         @Override
                         public boolean onTouch(View v, MotionEvent event) {
-                            KeyboardInitializer keyboardInitializer = new KeyboardInitializer();
-                            keyboardInitializer.hide(requireActivity(), v);
+                            KeyboardInitializer keyboardInitializer =
+                                    new KeyboardInitializer(requireActivity());
+                            keyboardInitializer.hide(v);
                             WordSearchFragment.this.binding.editTextKeyWordSearch.clearFocus();
                             return false;
                         }
@@ -191,8 +192,9 @@ public class WordSearchFragment extends Fragment {
                 if (actionId == EditorInfo.IME_ACTION_DONE
                         || (event != null && event.getAction() == KeyEvent.KEYCODE_ENTER
                                                 && event.getAction() == KeyEvent.ACTION_DOWN)) {
-                    KeyboardInitializer keyboardInitializer = new KeyboardInitializer();
-                    keyboardInitializer.hide(requireActivity(), v);
+                    KeyboardInitializer keyboardInitializer =
+                            new KeyboardInitializer(requireActivity());
+                    keyboardInitializer.hide(v);
                     v.clearFocus();
                     return true;
                 }
@@ -204,8 +206,8 @@ public class WordSearchFragment extends Fragment {
             public void onClick(View v) {
                 wordSearchViewModel.clearSearchWord();
                 binding.editTextKeyWordSearch.requestFocus();
-                KeyboardInitializer keyboardInitializer = new KeyboardInitializer();
-                keyboardInitializer.show(requireActivity(), binding.editTextKeyWordSearch);
+                KeyboardInitializer keyboardInitializer = new KeyboardInitializer(requireActivity());
+                keyboardInitializer.show(binding.editTextKeyWordSearch);
             }
         });
 

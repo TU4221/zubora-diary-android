@@ -2,8 +2,6 @@ package com.websarva.wings.android.zuboradiary.ui.calendar;
 
 import android.os.Handler;
 import android.os.Looper;
-import android.util.Log;
-import android.view.View;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
@@ -15,11 +13,6 @@ import com.google.common.util.concurrent.ListenableFuture;
 import com.websarva.wings.android.zuboradiary.data.database.DiaryRepository;
 
 import java.time.LocalDate;
-import java.time.YearMonth;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
 
 import javax.inject.Inject;
@@ -30,7 +23,8 @@ import dagger.hilt.android.lifecycle.HiltViewModel;
 public class CalendarViewModel extends ViewModel {
 
     private final DiaryRepository diaryRepository;
-    private LocalDate selectedDate;
+    private final MutableLiveData<LocalDate> selectedDate = new MutableLiveData<>();
+    private final MutableLiveData<LocalDate> lastSelectedDate = new MutableLiveData<>();
     private final MutableLiveData<Boolean> isDiaryLoadingError = new MutableLiveData<>();
 
     @Inject
@@ -62,21 +56,27 @@ public class CalendarViewModel extends ViewModel {
         }, new MainThreadExecutor());
     }
 
-    // Getter/Setter
-    public LocalDate getSelectedDate() {
-        return this.selectedDate;
+    public void updateSelectedDate(LocalDate date) {
+        lastSelectedDate.setValue(selectedDate.getValue());
+        selectedDate.setValue(date);
     }
 
-    public void setSelectedDate(LocalDate selectedDate) {
-        this.selectedDate = selectedDate;
+    public void clearDiaryLoadingError() {
+        isDiaryLoadingError.setValue(false);
+    }
+
+    public LiveData<LocalDate> getSelectedDateLiveData() {
+        return selectedDate;
+    }
+
+    public LiveData<LocalDate> getLastSelectedDateLiveData() {
+        return lastSelectedDate;
     }
 
     public LiveData<Boolean> getIsDiaryLoadingErrorLiveData() {
         return isDiaryLoadingError;
     }
 
-    public void setIsDiaryLoadingErrorLiveData(boolean bool) {
-        isDiaryLoadingError.setValue(bool);
-    }
+
 
 }

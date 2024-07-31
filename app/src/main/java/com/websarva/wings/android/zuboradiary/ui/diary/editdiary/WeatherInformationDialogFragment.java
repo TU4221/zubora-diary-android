@@ -9,10 +9,14 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
 import androidx.lifecycle.SavedStateHandle;
+import androidx.navigation.NavBackStackEntry;
 import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
 
 import com.websarva.wings.android.zuboradiary.R;
+import com.websarva.wings.android.zuboradiary.data.DateConverter;
+
+import java.time.LocalDate;
 
 public class WeatherInformationDialogFragment extends DialogFragment {
     private static final String fromClassName =
@@ -26,9 +30,10 @@ public class WeatherInformationDialogFragment extends DialogFragment {
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         builder.setTitle("確認");
 
-        String loadDiaryDate =
+        LocalDate loadDiaryDate =
                 WeatherInformationDialogFragmentArgs.fromBundle(requireArguments()).getTargetDiaryDate();
-        String message = loadDiaryDate + "の天気情報を取得しますか。";
+        String stringDate = DateConverter.toStringLocalDate(loadDiaryDate);
+        String message = stringDate + "の天気情報を取得しますか。";
 
         builder.setMessage(message);
         builder.setPositiveButton(R.string.edit_diary_exists_diary_dialog_btn_ok, new custumOnClickListener());
@@ -43,9 +48,11 @@ public class WeatherInformationDialogFragment extends DialogFragment {
             NavController navController =
                     NavHostFragment
                             .findNavController(WeatherInformationDialogFragment.this);
-            SavedStateHandle savedStateHandle =
-                    navController.getPreviousBackStackEntry().getSavedStateHandle();
-            savedStateHandle.set(KEY_SELECTED_BUTTON, which);
+            NavBackStackEntry navBackStackEntry = navController.getPreviousBackStackEntry();
+            if (navBackStackEntry != null) {
+                SavedStateHandle savedStateHandle = navBackStackEntry.getSavedStateHandle();
+                savedStateHandle.set(KEY_SELECTED_BUTTON, which);
+            }
         }
     }
 }

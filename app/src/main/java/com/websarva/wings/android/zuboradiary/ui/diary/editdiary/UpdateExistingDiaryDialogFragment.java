@@ -9,18 +9,21 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
 import androidx.lifecycle.SavedStateHandle;
+import androidx.navigation.NavBackStackEntry;
 import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
 
 import com.websarva.wings.android.zuboradiary.R;
+import com.websarva.wings.android.zuboradiary.data.DateConverter;
 import com.websarva.wings.android.zuboradiary.ui.diary.editdiary.UpdateExistingDiaryDialogFragmentArgs;
+
+import java.time.LocalDate;
 
 public class UpdateExistingDiaryDialogFragment extends DialogFragment {
     private static final String fromClassName =
             "From" + UpdateExistingDiaryDialogFragment.class.getName();
     public static final String KEY_SELECTED_BUTTON = "SelectedButton" + fromClassName;
     public static final String KEY_UPDATE_TYPE = "UpdateType" + fromClassName;
-    private String updateDiaryDate;
 
     @NonNull
     @Override
@@ -29,9 +32,10 @@ public class UpdateExistingDiaryDialogFragment extends DialogFragment {
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         builder.setTitle(R.string.edit_diary_update_diary_dialog_title);
 
-        this.updateDiaryDate =
+        LocalDate updateDiaryDate =
                 UpdateExistingDiaryDialogFragmentArgs.fromBundle(requireArguments()).getUpdateDiaryDate();
-        String message = this.updateDiaryDate + getString(R.string.edit_diary_update_diary_dialog_message);
+        String stringUpdateDiaryDate = DateConverter.toStringLocalDate(updateDiaryDate);
+        String message = stringUpdateDiaryDate + getString(R.string.edit_diary_update_diary_dialog_message);
 
         builder.setMessage(message);
         builder.setPositiveButton(R.string.edit_diary_update_diary_dialog_btn_ok, new DialogInterface.OnClickListener() {
@@ -40,18 +44,18 @@ public class UpdateExistingDiaryDialogFragment extends DialogFragment {
                 NavController navController =
                         NavHostFragment
                                 .findNavController(UpdateExistingDiaryDialogFragment.this);
-                SavedStateHandle savedStateHandle =
-                        navController.getPreviousBackStackEntry().getSavedStateHandle();
-                savedStateHandle.set(KEY_SELECTED_BUTTON, DialogInterface.BUTTON_POSITIVE);
-
-                int updateType =
-                        UpdateExistingDiaryDialogFragmentArgs.fromBundle(requireArguments())
-                                .getUpdateType();
-                savedStateHandle.set(KEY_UPDATE_TYPE, updateType);
+                NavBackStackEntry navBackStackEntry = navController.getPreviousBackStackEntry();
+                if (navBackStackEntry != null) {
+                    SavedStateHandle savedStateHandle = navBackStackEntry.getSavedStateHandle();
+                    savedStateHandle.set(KEY_SELECTED_BUTTON, DialogInterface.BUTTON_POSITIVE);
+                    int updateType =
+                            UpdateExistingDiaryDialogFragmentArgs.fromBundle(requireArguments())
+                                    .getUpdateType();
+                    savedStateHandle.set(KEY_UPDATE_TYPE, updateType);
+                }
             }
         });
         builder.setNegativeButton(R.string.edit_diary_update_diary_dialog_btn_ng, null);
-        AlertDialog dialog = builder.create();
-        return dialog;
+        return builder.create();
     }
 }
