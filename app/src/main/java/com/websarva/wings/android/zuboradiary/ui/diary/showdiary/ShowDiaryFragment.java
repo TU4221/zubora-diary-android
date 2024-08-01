@@ -21,7 +21,6 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.websarva.wings.android.zuboradiary.R;
-import com.websarva.wings.android.zuboradiary.data.DateConverter;
 import com.websarva.wings.android.zuboradiary.databinding.FragmentShowDiaryBinding;
 import com.websarva.wings.android.zuboradiary.ui.ShowDiaryLayoutInitializer;
 import com.websarva.wings.android.zuboradiary.ui.diary.DiaryViewModel;
@@ -91,15 +90,10 @@ public class ShowDiaryFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         // 画面表示データ準備
-        int showDiaryDateYear =
-                ShowDiaryFragmentArgs.fromBundle(requireArguments()).getShowDiaryDateYear();
-        int showDiaryDateMonth =
-                ShowDiaryFragmentArgs.fromBundle(requireArguments()).getShowDiaryDateMonth();
-        int showDiaryDateDayOfMonth =
-                ShowDiaryFragmentArgs.fromBundle(requireArguments()).getShowDiaryDateDayOfMonth();
+        LocalDate showDiaryDate =
+                ShowDiaryFragmentArgs.fromBundle(requireArguments()).getShowDiaryDate();
         try {
-            this.diaryViewModel.prepareDiary(
-                    showDiaryDateYear, showDiaryDateMonth, showDiaryDateDayOfMonth, true);
+            this.diaryViewModel.prepareDiary(showDiaryDate, true);
         } catch (Exception e) {
             String messageTitle = "通信エラー";
             String message = "日記の読込に失敗しました。";
@@ -108,8 +102,7 @@ public class ShowDiaryFragment extends Fragment {
 
 
         // ツールバー設定
-        this.binding.materialToolbarTopAppBar
-                .setTitle(this.diaryViewModel.getLiveDate().getValue());
+        this.binding.materialToolbarTopAppBar.setTitle(diaryViewModel.getDateLiveData().getValue());
         this.binding.materialToolbarTopAppBar
                 .setNavigationOnClickListener(new View.OnClickListener() {
                     @Override
@@ -187,11 +180,17 @@ public class ShowDiaryFragment extends Fragment {
     }
 
     private void setupItemLayout() {
-        int visibleItemsCount = this.diaryViewModel.getVisibleItemsCount();
+        Integer numVisibleItems = this.diaryViewModel.getNumVisibleItemsLiveData().getValue();
+        if (numVisibleItems == null) {
+            return;
+        }
         for (int i = 0; i < this.MAX_ITEMS_COUNT; i++) {
             int itemNumber = i + 1;
             MotionLayout itemMotionLayout = selectItemMotionLayout(itemNumber);
-            if (itemNumber <= visibleItemsCount) {
+            if (itemMotionLayout == null) {
+                return;
+            }
+            if (itemNumber <= numVisibleItems) {
                 itemMotionLayout
                         .transitionToState(R.id.motion_scene_show_diary_item_showed_state, 1);
             } else {
@@ -209,8 +208,7 @@ public class ShowDiaryFragment extends Fragment {
         if (destinationId == R.id.navigation_calendar_fragment) {
             SavedStateHandle savedStateHandle =
                     this.navController.getPreviousBackStackEntry().getSavedStateHandle();
-            String showedDiaryDate = this.diaryViewModel.getLiveDate().getValue();
-            LocalDate showedDiaryLocalDate = DateConverter.toLocalDate( showedDiaryDate);
+            LocalDate showedDiaryLocalDate = diaryViewModel.getDateLocalDate();;
             savedStateHandle.set(KEY_SHOWED_DIARY_DATE, showedDiaryLocalDate);
         }
 

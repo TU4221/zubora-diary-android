@@ -5,7 +5,7 @@
     <data>
         <variable
             name="item"
-            type="com.websarva.wings.android.zuboradiary.ui.diary.DiaryViewModel.Item" />
+            type="com.websarva.wings.android.zuboradiary.ui.diary.DiaryViewModel.ItemLiveData" />
     </data>
 
     <androidx.constraintlayout.motion.widget.MotionLayout
@@ -34,7 +34,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
-                android:text="@{item.liveTitle}"
+                android:text="@{item.titleLiveData}"
                 android:hint="@string/show_diary_item_1" />
 
             <View
@@ -49,7 +49,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
-                android:text="@{item.liveComment}"
+                android:text="@{item.commentLiveData}"
                 android:hint="@string/show_diary_content_1" />
 
         </LinearLayout>

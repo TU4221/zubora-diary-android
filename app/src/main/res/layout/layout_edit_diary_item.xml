@@ -5,7 +5,7 @@
     <data>
         <variable
             name="item"
-            type="com.websarva.wings.android.zuboradiary.ui.diary.DiaryViewModel.Item" />
+            type="com.websarva.wings.android.zuboradiary.ui.diary.DiaryViewModel.ItemLiveData" />
     </data>
 
     <androidx.constraintlayout.motion.widget.MotionLayout
@@ -61,7 +61,7 @@
                 android:layout_marginTop="16dp"
                 android:focusable="false"
                 android:hint="@string/edit_diary_item_hint"
-                android:text="@{item.liveTitle}"
+                android:text="@{item.titleLiveData}"
                 android:textSize="16sp" />
 
             <androidx.core.widget.NestedScrollView
@@ -88,7 +88,7 @@
                     android:hint="@string/edit_diary_content_hint"
                     android:inputType="textMultiLine"
                     android:minLines="5"
-                    android:text="@={item.mutableLiveComment}"
+                    android:text="@={item.commentLiveData}"
                     android:textSize="16sp" />
 
             </androidx.core.widget.NestedScrollView>

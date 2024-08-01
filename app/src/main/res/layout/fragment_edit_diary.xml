@@ -55,7 +55,7 @@
                     android:focusable="false"
                     android:hint="@string/edit_diary_date_hint"
                     android:lines="1"
-                    android:text="@{diaryViewModel.liveDate}"
+                    android:text="@{diaryViewModel.dateLiveData}"
                     android:textSize="20sp" />
 
                 <LinearLayout

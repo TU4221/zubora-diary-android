@@ -278,7 +278,10 @@ public class CalendarFragment extends Fragment {
     }
 
     private void setUpItemLayout() {
-        int visibleItemsCount = diaryViewModel.getVisibleItemsCount();
+        Integer numVisibleItems = diaryViewModel.getNumVisibleItemsLiveData().getValue();
+        if (numVisibleItems == null) {
+            return;
+        }
         int maxItems = DiaryViewModel.MAX_ITEMS; // 項目入力欄最大数
         for (int i = 0; i < maxItems; i++) {
             int itemNumber = i + 1;
@@ -286,7 +289,7 @@ public class CalendarFragment extends Fragment {
             if (itemMotionLayout == null) {
                 return;
             }
-            if (itemNumber <= visibleItemsCount) {
+            if (itemNumber <= numVisibleItems) {
                 itemMotionLayout
                         .transitionToState(R.id.motion_scene_show_diary_item_showed_state, 1);
             } else {
