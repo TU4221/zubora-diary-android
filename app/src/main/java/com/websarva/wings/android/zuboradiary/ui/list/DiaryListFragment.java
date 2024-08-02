@@ -477,7 +477,7 @@ public class DiaryListFragment extends Fragment {
                     NavDirections action =
                             DiaryListFragmentDirections
                                     .actionNavigationDiaryListFragmentToShowDiaryFragment(
-                                            year, month, dayOfMonth);
+                                            LocalDate.of(year, month, dayOfMonth));
                     DiaryListFragment.this.navController.navigate(action);
                 }
             });

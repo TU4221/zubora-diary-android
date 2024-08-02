@@ -30,7 +30,7 @@
                 android:id="@+id/text_weather_1_selected"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@{diaryViewModel.liveStrWeather1}"
+                android:text="@{diaryViewModel.strWeather1LiveData}"
                 android:hint="@string/show_diary_weather1_selected" />
 
             <TextView
@@ -44,7 +44,7 @@
                 android:id="@+id/text_weather_2_selected"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@{diaryViewModel.liveStrWeather2}"
+                android:text="@{diaryViewModel.strWeather2LiveData}"
                 android:hint="@string/show_diary_weather2_selected" />
 
         </LinearLayout>
@@ -65,7 +65,7 @@
                 android:id="@+id/text_condition_selected"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@{diaryViewModel.liveStrCondition}"
+                android:text="@{diaryViewModel.strConditionLiveData}"
                 android:hint="@string/show_diary_selected_condition" />
 
         </LinearLayout>
@@ -75,7 +75,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            android:text="@{diaryViewModel.liveTitle}"
+            android:text="@{diaryViewModel.titleLiveData}"
             android:hint="@string/show_diary_title"
             android:textSize="20sp" />
 
@@ -120,7 +120,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="end"
-            android:text="@{diaryViewModel.liveLog}"
+            android:text="@{diaryViewModel.logLiveData}"
             android:hint="@string/show_diary_last_updated_value"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/image_attached" />

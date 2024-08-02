@@ -12,9 +12,10 @@ import java.util.concurrent.Executors;
 //      https://qiita.com/kazuma_f/items/8c15e7087623e8f6706b
 /*@Database(entities =  {Diary.class, SelectedDiaryItemTitle.class}, version = 4, exportSchema = true,
         autoMigrations = {@AutoMigration(from = 3, to = 4, spec = DiaryDatabase.MyAutoMigration.class)})*/
-@Database(entities =  {Diary.class, SelectedDiaryItemTitle.class}, version = 2, exportSchema = false)
+@Database(entities =  {Diary.class, SelectedDiaryItemTitle.class}, version = 3, exportSchema = false/*,
+        autoMigrations = {@AutoMigration(from = 2, to = 3, spec = DiaryDatabase.MyAutoMigration.class)}*/)
 public abstract class DiaryDatabase extends RoomDatabase {
-    static class MyAutoMigration implements AutoMigrationSpec{}
+    //static class MyAutoMigration implements AutoMigrationSpec{}
     public static final ExecutorService EXECUTOR_SERVICE = Executors.newSingleThreadExecutor(); // TODO:必要？
     public abstract DiaryDAO createDiaryDAO();
     public abstract SelectedItemTitlesHistoryDAO createSelectedItemTitlesHistoryDAO();

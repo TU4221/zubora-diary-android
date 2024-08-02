@@ -39,7 +39,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="16dp"
-                    android:text="@{@string/edit_diary_item + String.valueOf(item.liveNumber)}"
+                    android:text="@{@string/edit_diary_item + String.valueOf(item.itemNumber)}"
                     android:textSize="16sp"/>
 
                 <ImageButton
@@ -88,7 +88,7 @@
                     android:hint="@string/edit_diary_content_hint"
                     android:inputType="textMultiLine"
                     android:minLines="5"
-                    android:text="@={item.commentLiveData}"
+                    android:text="@={item.commentMutableLiveData}"
                     android:textSize="16sp" />
 
             </androidx.core.widget.NestedScrollView>

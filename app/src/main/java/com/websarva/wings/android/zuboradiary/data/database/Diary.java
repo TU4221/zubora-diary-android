@@ -13,10 +13,10 @@ public class Diary {
     @NonNull
     private String log; // TODO:曜日を含めないようにする。
     @ColumnInfo(name = "weather_1")
-    private String weather1; // TODO:数字管理に変更。
+    private Integer weather1;
     @ColumnInfo(name = "weather_2")
-    private String weather2; // TODO:数字管理に変更。
-    private String condition; // TODO:数字管理に変更。
+    private Integer weather2;
+    private Integer condition;
     private String title;
     @ColumnInfo(name = "item_1_title")
     private String item1Title;
@@ -56,27 +56,27 @@ public class Diary {
         this.log = log;
     }
 
-    public String getWeather1() {
+    public Integer getWeather1() {
         return this.weather1;
     }
 
-    public void setWeather1(String weather1) {
+    public void setWeather1(Integer weather1) {
         this.weather1 = weather1;
     }
 
-    public String getWeather2() {
+    public Integer getWeather2() {
         return this.weather2;
     }
 
-    public void setWeather2(String weather2) {
+    public void setWeather2(Integer weather2) {
         this.weather2 = weather2;
     }
 
-    public String getCondition() {
+    public Integer getCondition() {
         return condition;
     }
 
-    public void setCondition(String condition) {
+    public void setCondition(Integer condition) {
         this.condition = condition;
     }
 

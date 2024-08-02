@@ -40,6 +40,7 @@ import com.websarva.wings.android.zuboradiary.ui.list.DiaryYearMonthListBaseView
 import com.websarva.wings.android.zuboradiary.ui.list.NoDiaryMessageViewHolder;
 import com.websarva.wings.android.zuboradiary.ui.list.ProgressBarViewHolder;
 
+import java.time.LocalDate;
 import java.util.List;
 
 public class WordSearchFragment extends Fragment {
@@ -394,7 +395,7 @@ public class WordSearchFragment extends Fragment {
                     NavDirections action =
                             WordSearchFragmentDirections
                                     .actionNavigationWordSearchFragmentToShowDiaryFragment(
-                                            year, month, dayOfMonth);
+                                            LocalDate.of(year, month, dayOfMonth));
                     WordSearchFragment.this.navController.navigate(action);
                 }
             });

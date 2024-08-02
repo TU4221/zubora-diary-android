@@ -13,7 +13,10 @@ import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
 
 import com.websarva.wings.android.zuboradiary.R;
+import com.websarva.wings.android.zuboradiary.data.DateConverter;
 import com.websarva.wings.android.zuboradiary.ui.diary.editdiary.LoadExistingDiaryDialogFragmentArgs;
+
+import java.time.LocalDate;
 
 public class LoadExistingDiaryDialogFragment extends DialogFragment {
     private static final String fromClassName =
@@ -27,9 +30,10 @@ public class LoadExistingDiaryDialogFragment extends DialogFragment {
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         builder.setTitle(R.string.edit_diary_exists_diary_dialog_title);
 
-        String loadDiaryDate =
+        LocalDate loadDiaryDate =
                 LoadExistingDiaryDialogFragmentArgs.fromBundle(requireArguments()).getLoadDiaryDate();
-        String message = loadDiaryDate + getString(R.string.edit_diary_exists_diary_dialog_message);
+        String stringLoadDiaryDate = DateConverter.toStringLocalDate(loadDiaryDate);
+        String message = stringLoadDiaryDate + getString(R.string.edit_diary_exists_diary_dialog_message);
 
         builder.setMessage(message);
         builder.setPositiveButton(R.string.edit_diary_exists_diary_dialog_btn_ok, new custumOnClickListener());
