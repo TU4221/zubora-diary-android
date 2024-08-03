@@ -41,7 +41,6 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
-import com.websarva.wings.android.zuboradiary.data.DateConverter;
 import com.websarva.wings.android.zuboradiary.data.diary.ConditionConverter;
 import com.websarva.wings.android.zuboradiary.data.diary.Conditions;
 import com.websarva.wings.android.zuboradiary.data.diary.WeatherConverter;
@@ -526,7 +525,7 @@ public class EditDiaryFragment extends Fragment {
                     @Override
                     public void onItemSelected(
                             AdapterView<?> parent, View view, int position, long id) {
-                        diaryViewModel.updateIntWeather1(position);
+                        diaryViewModel.updateWeather1(position);
                     }
 
                     @Override
@@ -534,7 +533,7 @@ public class EditDiaryFragment extends Fragment {
                         // 処理なし
                     }
                 });
-        diaryViewModel.getIntWeather1LiveData()
+        diaryViewModel.getWeather1LiveData()
                 .observe(getViewLifecycleOwner(), new Observer<Integer>() {
                     @Override
                     public void onChanged(Integer integer) {
@@ -563,7 +562,7 @@ public class EditDiaryFragment extends Fragment {
                             binding.spinnerWeather2.setEnabled(true);
                         } else {
                             binding.spinnerWeather2.setEnabled(false);
-                            diaryViewModel.updateIntWeather2(0);
+                            diaryViewModel.updateWeather2(0);
                             binding.spinnerWeather2.setAdapter(weatherArrayAdapter);
                             binding.spinnerWeather2.setSelection(0);
                         }
@@ -575,7 +574,7 @@ public class EditDiaryFragment extends Fragment {
                     @Override
                     public void onItemSelected(
                             AdapterView<?> parent, View view, int position, long id) {
-                        diaryViewModel.updateIntWeather2(position);
+                        diaryViewModel.updateWeather2(position);
                     }
 
                     @Override
@@ -584,7 +583,7 @@ public class EditDiaryFragment extends Fragment {
                     }
                 });
 
-        diaryViewModel.getIntWeather2LiveData()
+        diaryViewModel.getWeather2LiveData()
                 .observe(getViewLifecycleOwner(), new Observer<Integer>() {
                     @Override
                     public void onChanged(Integer integer) {
@@ -660,7 +659,7 @@ public class EditDiaryFragment extends Fragment {
                     @Override
                     public void onItemSelected(
                             AdapterView<?> parent, View view, int position, long id) {
-                        diaryViewModel.updateIntCondition(position);
+                        diaryViewModel.updateCondition(position);
                     }
 
                     @Override
@@ -668,7 +667,7 @@ public class EditDiaryFragment extends Fragment {
                         // 処理なし
                     }
                 });
-        diaryViewModel.getIntConditionLiveData()
+        diaryViewModel.getConditionLiveData()
                 .observe(getViewLifecycleOwner(), new Observer<Integer>() {
                     @Override
                     public void onChanged(Integer integer) {

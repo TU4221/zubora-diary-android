@@ -192,7 +192,7 @@ public class ShowDiaryFragment extends Fragment {
 
     // 天気表示欄設定
     private void setUpWeatherLayout() {
-        diaryViewModel.getIntWeather1LiveData()
+        diaryViewModel.getWeather1LiveData()
                 .observe(getViewLifecycleOwner(), new Observer<Integer>() {
                     @Override
                     public void onChanged(Integer integer) {
@@ -209,7 +209,7 @@ public class ShowDiaryFragment extends Fragment {
                     }
                 });
 
-        diaryViewModel.getIntWeather2LiveData()
+        diaryViewModel.getWeather2LiveData()
                 .observe(getViewLifecycleOwner(), new Observer<Integer>() {
                     @Override
                     public void onChanged(Integer integer) {
@@ -226,7 +226,7 @@ public class ShowDiaryFragment extends Fragment {
                     }
                 });
 
-        diaryViewModel.getIntWeather2LiveData()
+        diaryViewModel.getWeather2LiveData()
                 .observe(
                         getViewLifecycleOwner(),
                         new ShowDiaryWeather2Observer(
@@ -237,7 +237,7 @@ public class ShowDiaryFragment extends Fragment {
     }
 
     private void setUpConditionLayout() {
-        diaryViewModel.getIntConditionLiveData()
+        diaryViewModel.getConditionLiveData()
                 .observe(getViewLifecycleOwner(), new Observer<Integer>() {
                     @Override
                     public void onChanged(Integer integer) {

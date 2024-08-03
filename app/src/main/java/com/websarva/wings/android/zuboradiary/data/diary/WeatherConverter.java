@@ -2,9 +2,14 @@ package com.websarva.wings.android.zuboradiary.data.diary;
 
 import android.content.Context;
 
+import androidx.annotation.Nullable;
+
 public class WeatherConverter {
     public WeatherConverter() {}
-    public Weathers toWeather(int weatherCode) {
+    public Weathers toWeather(@Nullable Integer weatherCode) {
+        if (weatherCode == null) {
+            return Weathers.UNKNOWN;
+        }
         for (Weathers weather: Weathers.values()) {
             if (weatherCode == weather.toWeatherNumber()) {
                 return weather;

@@ -1,5 +1,6 @@
 package com.websarva.wings.android.zuboradiary.ui.observer;
 
+import android.content.Context;
 import android.view.View;
 import android.widget.TextView;
 
@@ -7,26 +8,27 @@ import androidx.lifecycle.Observer;
 
 import com.websarva.wings.android.zuboradiary.data.diary.Weathers;
 
-public class ShowDiaryWeather2Observer implements Observer<Integer> {
+public class ShowDiaryWeather2Observer implements Observer<Weathers> {
+    Context context;
     TextView slush;
-    TextView weather2;
+    TextView textWeather;
 
-    public ShowDiaryWeather2Observer(TextView slush, TextView weather2) {
+    public ShowDiaryWeather2Observer(Context context, TextView slush, TextView textWeather) {
+        this.context = context;
         this.slush = slush;
-        this.weather2 = weather2;
+        this.textWeather = textWeather;
     }
 
     @Override
-    public void onChanged(Integer integer) {
-        if (integer == null) {
-            return;
-        }
-        if (integer > 0 && integer <= Weathers.values().length - 1) {
-            slush.setVisibility(View.VISIBLE);
-            weather2.setVisibility(View.VISIBLE);
-        } else {
+    public void onChanged(Weathers weather) {
+        if (weather == null || weather == Weathers.UNKNOWN) {
             slush.setVisibility(View.GONE);
-            weather2.setVisibility(View.GONE);
+            textWeather.setVisibility(View.GONE);
+            textWeather.setText(Weathers.UNKNOWN.toString(context));
+        } else {
+            slush.setVisibility(View.VISIBLE);
+            textWeather.setVisibility(View.VISIBLE);
+            textWeather.setText(weather.toString(context));
         }
     }
 }

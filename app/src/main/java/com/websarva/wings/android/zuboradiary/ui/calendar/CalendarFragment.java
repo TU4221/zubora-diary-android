@@ -36,10 +36,6 @@ import com.kizitonwose.calendar.view.MonthHeaderFooterBinder;
 import com.kizitonwose.calendar.view.ViewContainer;
 import com.websarva.wings.android.zuboradiary.MainActivity;
 import com.websarva.wings.android.zuboradiary.R;
-import com.websarva.wings.android.zuboradiary.data.diary.ConditionConverter;
-import com.websarva.wings.android.zuboradiary.data.diary.Conditions;
-import com.websarva.wings.android.zuboradiary.data.diary.WeatherConverter;
-import com.websarva.wings.android.zuboradiary.data.diary.Weathers;
 import com.websarva.wings.android.zuboradiary.databinding.CalendarDayBinding;
 import com.websarva.wings.android.zuboradiary.databinding.CalendarHeaderBinding;
 import com.websarva.wings.android.zuboradiary.databinding.FragmentCalendarBinding;
@@ -48,7 +44,9 @@ import com.websarva.wings.android.zuboradiary.ui.diary.showdiary.ShowDiaryFragme
 import com.websarva.wings.android.zuboradiary.ui.diary.DiaryViewModel;
 
 import com.kizitonwose.calendar.view.CalendarView;
+import com.websarva.wings.android.zuboradiary.ui.observer.ShowDiaryConditionObserver;
 import com.websarva.wings.android.zuboradiary.ui.observer.ShowDiaryNumVisibleItemsObserver;
+import com.websarva.wings.android.zuboradiary.ui.observer.ShowDiaryWeather1Observer;
 import com.websarva.wings.android.zuboradiary.ui.observer.ShowDiaryWeather2Observer;
 import com.websarva.wings.android.zuboradiary.ui.settings.SettingsViewModel;
 
@@ -537,66 +535,33 @@ public class CalendarFragment extends Fragment {
     }*/
 
     private void setUpShowDiary() {
-        // 天気表示欄設定
-        diaryViewModel.getIntWeather1LiveData()
-                .observe(getViewLifecycleOwner(), new Observer<Integer>() {
-                    @Override
-                    public void onChanged(Integer integer) {
-                        if (integer == null) {
-                            return;
-                        }
-                        // StringWeather1LiveDataへ反映
-                        WeatherConverter converter = new WeatherConverter();
-                        Weathers weather = converter.toWeather(integer);
-                        String strWeather = diaryViewModel.getStrWeather1LiveData().getValue();
-                        if (strWeather == null || !weather.toString(requireContext()).equals(strWeather)) {
-                            diaryViewModel.updateStrWeather1(weather.toString(requireContext()));
-                        }
-                    }
-                });
+        diaryViewModel.getWeather1LiveData()
+                .observe(
+                        getViewLifecycleOwner(),
+                        new ShowDiaryWeather1Observer(
+                                requireContext(),
+                                binding.includeShowDiary.textWeather1Selected
+                        )
+                );
 
-        diaryViewModel.getIntWeather2LiveData()
-                .observe(getViewLifecycleOwner(), new Observer<Integer>() {
-                    @Override
-                    public void onChanged(Integer integer) {
-                        if (integer == null) {
-                            return;
-                        }
-                        // StringWeather2LiveDataへ反映
-                        WeatherConverter converter = new WeatherConverter();
-                        Weathers weather = converter.toWeather(integer);
-                        String strWeather = diaryViewModel.getStrWeather1LiveData().getValue();
-                        if (strWeather == null || !weather.toString(requireContext()).equals(strWeather)) {
-                            diaryViewModel.updateStrWeather2(weather.toString(requireContext()));
-                        }
-                    }
-                });
-
-        diaryViewModel.getIntWeather2LiveData()
+        diaryViewModel.getWeather2LiveData()
                 .observe(
                         getViewLifecycleOwner(),
                         new ShowDiaryWeather2Observer(
+                                requireContext(),
                                 binding.includeShowDiary.textWeatherSlush,
                                 binding.includeShowDiary.textWeather2Selected
                         )
                 );
 
-        diaryViewModel.getIntConditionLiveData()
-                .observe(getViewLifecycleOwner(), new Observer<Integer>() {
-                    @Override
-                    public void onChanged(Integer integer) {
-                        if (integer == null) {
-                            return;
-                        }
-                        // StringConditionLiveDataへ反映
-                        ConditionConverter converter = new ConditionConverter();
-                        Conditions condition = converter.toCondition(integer);
-                        String strCondition = diaryViewModel.getStrConditionLiveData().getValue();
-                        if (strCondition == null || !condition.toString(requireContext()).equals(strCondition)) {
-                            diaryViewModel.updateStrCondition(condition.toString(requireContext()));
-                        }
-                    }
-                });
+        diaryViewModel.getConditionLiveData()
+                .observe(
+                        getViewLifecycleOwner(),
+                        new ShowDiaryConditionObserver(
+                                requireContext(),
+                                binding.includeShowDiary.textConditionSelected
+                        )
+                );
 
         // 項目レイアウト設定
         View[] itemLayouts = new View[DiaryViewModel.MAX_ITEMS];

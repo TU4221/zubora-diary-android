@@ -10,7 +10,9 @@ import androidx.lifecycle.ViewModel;
 import com.websarva.wings.android.zuboradiary.data.DateConverter;
 import com.websarva.wings.android.zuboradiary.data.WeatherCodeConverter;
 import com.websarva.wings.android.zuboradiary.data.database.DiaryRepository;
+import com.websarva.wings.android.zuboradiary.data.diary.ConditionConverter;
 import com.websarva.wings.android.zuboradiary.data.diary.Conditions;
+import com.websarva.wings.android.zuboradiary.data.diary.WeatherConverter;
 import com.websarva.wings.android.zuboradiary.data.diary.Weathers;
 import com.websarva.wings.android.zuboradiary.data.network.WeatherApiRepository;
 import com.websarva.wings.android.zuboradiary.data.network.WeatherApiResponse;
@@ -47,31 +49,25 @@ public class DiaryViewModel extends ViewModel {
     private boolean hasPreparedDiary;
     private final MutableLiveData<LocalDate> loadedDate = new MutableLiveData<>();
     private final MutableLiveData<LocalDate> date = new MutableLiveData<>();
-    private final MutableLiveData<String> strDate = new MutableLiveData<>();
     // メモ
     // 下記配列をデータバインディングでスピナーに割り当てたが、スピナーの setSection メソッド(オフセット操作)が機能しなかった。
     // その為、string.xml ファイルに配列を用意し、それを layout.xml に割り当てたら、 setSection メソッドが機能した。
     // 下記配列は str ↔ int 変換で使用するため削除しない。
     // 配列 conditions も同様。
     private final MutableLiveData<Weathers> weather1 = new MutableLiveData<>();
-    private final MutableLiveData<String> strWeather1 = new MutableLiveData<>();
     private final MutableLiveData<Weathers> weather2 = new MutableLiveData<>();
-    private final MutableLiveData<String> strWeather2 = new MutableLiveData<>();
     private final MutableLiveData<Conditions> condition = new MutableLiveData<>();
-    private final MutableLiveData<String> strCondition = new MutableLiveData<>();
     private final MutableLiveData<String> title = new MutableLiveData<>();
     private final MutableLiveData<Integer> numVisibleItems = new MutableLiveData<>();
     public static final int MAX_ITEMS = 5;
     private final ItemLiveData[] items = new ItemLiveData[MAX_ITEMS];
     private final MutableLiveData<LocalDateTime> log = new MutableLiveData<>();
-    private final MutableLiveData<String> strLog = new MutableLiveData<>();
 
     public static class ItemLiveData {
         private final int itemNumber;
         private final MutableLiveData<String> title = new MutableLiveData<>();
         private final MutableLiveData<String> comment = new MutableLiveData<>();
         private final MutableLiveData<LocalDateTime> titleUpdateLog = new MutableLiveData<>();
-        private final MutableLiveData<String> strTitleUpdateLog = new MutableLiveData<>();
 
         public ItemLiveData(int itemNumber) {
             this.itemNumber = itemNumber;
@@ -82,17 +78,11 @@ public class DiaryViewModel extends ViewModel {
             title.setValue("");
             comment.setValue("");
             titleUpdateLog.setValue(null);
-            strTitleUpdateLog.setValue("");
         }
 
         public void updateTitle(String title) {
             this.title.setValue(title);
-            updateTitleUpdateLog(LocalDateTime.now());
-        }
-
-        private void updateTitleUpdateLog(LocalDateTime titleUpdateLog) {
-            this.titleUpdateLog.setValue(titleUpdateLog);
-            strTitleUpdateLog.setValue(DateConverter.toStringLocalDateTime(titleUpdateLog));
+            this.titleUpdateLog.setValue(LocalDateTime.now());
         }
 
         public void updateComment(String comment) {
@@ -102,7 +92,7 @@ public class DiaryViewModel extends ViewModel {
         public void updateAll(String title, String comment, LocalDateTime titleUpdateLog) {
             this.title.setValue(title);
             this.comment.setValue(comment);
-            updateTitleUpdateLog(titleUpdateLog);
+            this.titleUpdateLog.setValue(titleUpdateLog);
         }
 
         public int getItemNumber() {
@@ -123,10 +113,6 @@ public class DiaryViewModel extends ViewModel {
 
         public LiveData<LocalDateTime> getTitleUpdateLogLiveData() {
             return titleUpdateLog;
-        }
-
-        public LiveData<String> getStrTitleUpdateLogLiveData() {
-            return strTitleUpdateLog;
         }
     }
 
@@ -160,20 +146,15 @@ public class DiaryViewModel extends ViewModel {
         hasPreparedDiary = false;
         loadedDate.setValue(null);
         date.setValue(null);
-        strDate.setValue("");
         weather1.setValue(Weathers.UNKNOWN);
-        strWeather1.setValue("");
         weather2.setValue(Weathers.UNKNOWN);
-        strWeather2.setValue("");
         condition.setValue(Conditions.UNKNOWN);
-        strCondition.setValue("");
         title.setValue("");
         numVisibleItems.setValue(1);
         for (ItemLiveData item: items) {
             item.initialize();
         }
         log.setValue(null);
-        strLog.setValue("");
         isDiarySavingError.setValue(false);
         isDiaryLoadingError.setValue(false);
         isDiaryDeleteError.setValue(false);
@@ -199,9 +180,11 @@ public class DiaryViewModel extends ViewModel {
         String stringDate = DateConverter.toStringLocalDate(date);
         Diary diary = diaryRepository.selectDiary(stringDate);
         updateDate(LocalDate.parse(diary.getDate()));
-        weather1.setValue(diary.getWeather1()); // Fragmentに記述したObserverよりintWeather1更新
-        weather2.setValue(diary.getWeather2()); // Fragmentに記述したObserverよりintWeather2更新
-        condition.setValue(diary.getCondition()); // Fragmentに記述したObserverよりintCondition更新
+        WeatherConverter weatherConverter = new WeatherConverter();
+        weather1.setValue(weatherConverter.toWeather(diary.getWeather1())); // Fragmentに記述したObserverよりintWeather1更新
+        weather2.setValue(weatherConverter.toWeather(diary.getWeather2())); // Fragmentに記述したObserverよりintWeather2更新
+        ConditionConverter conditionConverter = new ConditionConverter();
+        condition.setValue(conditionConverter.toCondition(diary.getCondition())); // Fragmentに記述したObserverよりintCondition更新
         title.setValue(diary.getTitle());
         items[0].updateTitle(diary.getItem1Title());
         items[0].updateComment(diary.getItem1Comment());
@@ -260,7 +243,7 @@ public class DiaryViewModel extends ViewModel {
         Diary diary = createDiary();
         List<SelectedDiaryItemTitle> selectedDiaryItemTitleList = createSelectedDiaryItemTitleList();
         try {
-            diaryRepository.deleteAndInsertDiary(loadedDate.getValue(), diary, selectedDiaryItemTitleList);
+            diaryRepository.deleteAndInsertDiary(toStringOrNull(loadedDate.getValue()), diary, selectedDiaryItemTitleList);
         } catch (Exception e) {
             isDiarySavingError.setValue(true);
             return false;
@@ -373,38 +356,26 @@ public class DiaryViewModel extends ViewModel {
     public void updateDate(LocalDate date) {
         this.date.setValue(date);
         String strDate = DateConverter.toStringLocalDate(date);
-        this.strDate.setValue(strDate);
     }
 
     private void updateLog(LocalDateTime log) {
         this.log.setValue(log);
         String strLog = DateConverter.toStringLocalDateTime(log);
-        this.strLog.setValue(strLog);
     }
 
     // 天気、体調関係
-    public void updateIntWeather1(int intWeather) {
-        weather1.setValue(intWeather);
+    // MEMO:Weathers、Conditionsから文字列に変換するにはContextが必要なため、
+    //      Fragment上のLivedDateObserverにて変換した値を受け取る。
+    public void updateWeather1(Weathers weather) {
+        weather1.setValue(weather);
     }
 
-    public void updateStrWeather1(String strWeather) {
-        strWeather1.setValue(strWeather);
+    public void updateWeather2(Weathers weather) {
+        weather2.setValue(weather);
     }
 
-    public void updateIntWeather2(int intWeather) {
-        weather2.setValue(intWeather);
-    }
-
-    public void updateStrWeather2(String strWeather) {
-        strWeather2.setValue(strWeather);
-    }
-
-    public void updateIntCondition(int intCondition) {
-        this.condition.setValue(intCondition);
-    }
-
-    public void updateStrCondition(String strCondition) {
-        this.strCondition.setValue(strCondition);
+    public void updateCondition(Conditions condition) {
+        this.condition.setValue(condition);
     }
 
     // 天気情報関係
@@ -482,7 +453,7 @@ public class DiaryViewModel extends ViewModel {
                     if (response.isSuccessful() && weatherApiResponse != null) {
                         Weathers weather =
                                 findWeatherInformation(weatherApiResponse);
-                        weather1.postValue(weather.toWeatherNumber());
+                        weather1.postValue(weather);
                     } else {
                         isWeatherLoadingError.postValue(true);
                         Log.d("WeatherApi", "response.code():" + response.code());
@@ -607,32 +578,16 @@ public class DiaryViewModel extends ViewModel {
         return date;
     }
 
-    public LiveData<String> getStrDateLiveData() {
-        return strDate;
-    }
-
-    public LiveData<Integer> getIntWeather1LiveData() {
+    public LiveData<Weathers> getWeather1LiveData() {
         return weather1;
     }
 
-    public LiveData<String> getStrWeather1LiveData() {
-        return strWeather1;
-    }
-
-    public LiveData<Integer> getIntWeather2LiveData() {
+    public LiveData<Weathers> getWeather2LiveData() {
         return weather2;
     }
 
-    public LiveData<String> getStrWeather2LiveData() {
-        return strWeather2;
-    }
-
-    public LiveData<Integer> getIntConditionLiveData() {
+    public LiveData<Conditions> getConditionLiveData() {
         return condition;
-    }
-
-    public LiveData<String> getStrConditionLiveData() {
-        return strCondition;
     }
 
     public LiveData<String> getTitleLiveData() {
@@ -667,10 +622,6 @@ public class DiaryViewModel extends ViewModel {
     }
     public ItemLiveData getItem5() {
         return items[4];
-    }
-
-    public LiveData<String> getLogLiveData() {
-        return strLog;
     }
 
     public LiveData<Boolean> getIsDiarySavingErrorLiveData() {

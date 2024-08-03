@@ -2,8 +2,13 @@ package com.websarva.wings.android.zuboradiary.data.diary;
 
 import android.content.Context;
 
+import androidx.annotation.Nullable;
+
 public class ConditionConverter {
-    public Conditions toCondition(int conditionCode) {
+    public Conditions toCondition(@Nullable Integer conditionCode) {
+        if (conditionCode == null) {
+            return Conditions.UNKNOWN;
+        }
         for (Conditions condition: Conditions.values()) {
             if (conditionCode == condition.toConditionNumber()) {
                 return condition;
