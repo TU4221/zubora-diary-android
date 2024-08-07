@@ -1,67 +1,74 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <LinearLayout
-        android:id="@+id/liner_layout_date_picker_bottom_sheet"
+    <data>
+
+    </data>
+
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical">
-
-        <FrameLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@color/dialog_fragment_number_picker_button_background">
-
-            <Button
-                android:id="@+id/button_cancel"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/dialog_fragment_number_picker_cancel"
-                android:textColor="@color/dialog_fragment_number_picker_button_text"
-                android:background="@drawable/bg_clear_button"/>
-
-            <Button
-                android:id="@+id/button_decision"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="end"
-                android:text="@string/dialog_fragment_number_picker_decision"
-                android:textColor="@color/dialog_fragment_number_picker_button_text"
-                android:background="@drawable/bg_clear_button"/>
-        </FrameLayout>
+        android:layout_height="match_parent">
 
         <LinearLayout
+            android:id="@+id/liner_layout_date_picker_bottom_sheet"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:orientation="vertical">
 
-            <NumberPicker
-                android:id="@+id/number_picker_first"
-                android:layout_width="0dp"
+            <FrameLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:layout_marginHorizontal="@dimen/dialog_fragment_number_picker_layout_margin_horizontal"
-                android:layout_marginVertical="@dimen/dialog_fragment_number_picker_layout_margin_vertical"
-                android:descendantFocusability="blocksDescendants"/>
+                android:background="@color/dialog_fragment_number_picker_button_background">
 
-            <NumberPicker
-                android:id="@+id/number_picker_second"
-                android:layout_width="0dp"
+                <Button
+                    android:id="@+id/button_cancel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/dialog_fragment_number_picker_cancel"
+                    android:textColor="@color/dialog_fragment_number_picker_button_text"
+                    android:background="@drawable/bg_clear_button" />
+
+                <Button
+                    android:id="@+id/button_decision"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="end"
+                    android:text="@string/dialog_fragment_number_picker_decision"
+                    android:textColor="@color/dialog_fragment_number_picker_button_text"
+                    android:background="@drawable/bg_clear_button" />
+            </FrameLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:layout_marginHorizontal="@dimen/dialog_fragment_number_picker_layout_margin_horizontal"
-                android:layout_marginVertical="@dimen/dialog_fragment_number_picker_layout_margin_vertical"
-                android:descendantFocusability="blocksDescendants"/>
+                android:orientation="horizontal">
+
+                <NumberPicker
+                    android:id="@+id/number_picker_first"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginHorizontal="@dimen/dialog_fragment_number_picker_layout_margin_horizontal"
+                    android:layout_marginVertical="@dimen/dialog_fragment_number_picker_layout_margin_vertical"
+                    android:descendantFocusability="blocksDescendants" />
+
+                <NumberPicker
+                    android:id="@+id/number_picker_second"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginHorizontal="@dimen/dialog_fragment_number_picker_layout_margin_horizontal"
+                    android:layout_marginVertical="@dimen/dialog_fragment_number_picker_layout_margin_vertical"
+                    android:descendantFocusability="blocksDescendants" />
+
+            </LinearLayout>
 
         </LinearLayout>
 
-    </LinearLayout>
-
-</androidx.coordinatorlayout.widget.CoordinatorLayout>
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
+</layout>
 
 <!--
 

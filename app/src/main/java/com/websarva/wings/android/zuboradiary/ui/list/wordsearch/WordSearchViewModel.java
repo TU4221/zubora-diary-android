@@ -10,6 +10,7 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
+import com.google.common.util.concurrent.ListenableFuture;
 import com.websarva.wings.android.zuboradiary.data.database.DiaryRepository;
 
 import java.util.ArrayList;
@@ -147,12 +148,21 @@ public class WordSearchViewModel extends ViewModel {
             }
 
             // 日記リスト読込
-            int numWordSearchResults;
+            Integer numWordSearchResults;
             List<WordSearchResultYearMonthListItem> loadedData;
             try {
                 if (loadType == LoadType.NEW || loadType == LoadType.UPDATE) {
-                    numWordSearchResults =
-                            WordSearchViewModel.this.diaryRepository.countWordSearchResults(searchWord);
+                    ListenableFuture<Integer> listenableFutureResult =
+                            diaryRepository.countWordSearchResults(searchWord);
+                    // 検索文字が変更された時、カウントキャンセル
+                    // TODO:下記while意味ある？
+                    while (!listenableFutureResult.isDone()) {
+                        if (Thread.currentThread().isInterrupted()) {
+                            listenableFutureResult.cancel(true);
+                            throw new InterruptedException();
+                        }
+                    }
+                    numWordSearchResults = listenableFutureResult.get();
                 } else {
                     // loadType == LoadType.ADD
                     numWordSearchResults =

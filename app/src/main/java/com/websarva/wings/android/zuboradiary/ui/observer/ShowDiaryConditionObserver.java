@@ -6,7 +6,6 @@ import android.widget.TextView;
 import androidx.lifecycle.Observer;
 
 import com.websarva.wings.android.zuboradiary.data.diary.Conditions;
-import com.websarva.wings.android.zuboradiary.ui.diary.DiaryViewModel;
 
 public class ShowDiaryConditionObserver implements Observer<Conditions> {
     Context context;

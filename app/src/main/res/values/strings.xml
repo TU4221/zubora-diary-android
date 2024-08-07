@@ -45,38 +45,6 @@
     <string name="show_diary_last_updated">最終更新日時</string>
     <string name="show_diary_last_updated_value">0000/00/00 00:00:00</string>
 
-    <string name="edit_diary_toolbar_title">新規作成／編集中</string>
-    <string name="edit_diary_toolbar_option_save_diary">日記保存</string>
-    <string name="edit_diary_date_hint">0000/00/00(月)</string>
-    <string name="edit_diary_title">タイトル</string>
-    <string name="edit_diary_title_hint">無題</string>
-    <string name="edit_diary_num_of_char">0/0</string>
-    <string name="edit_diary_condition">気分：</string>
-    <string-array name="edit_diary_condition_selection">
-        <item>--</item>
-        <item>HAPPY</item>
-        <item>GOOD</item>
-        <item>AVERAGE</item>
-        <item>POOR</item>
-        <item>BAD</item>
-    </string-array>
-    <string name="edit_diary_weather">天気：</string>
-    <string-array name="edit_diary_weather_selection">
-        <item>--</item>
-        <item>晴</item>
-        <item>雲</item>
-        <item>雨</item>
-        <item>雪</item>
-    </string-array>
-    <string name="edit_diary_weather_slush">／</string>
-    <string name="edit_diary_item">項目</string>
-    <string name="edit_diary_item_2">項目2</string>
-    <string name="edit_diary_item_3">項目3</string>
-    <string name="edit_diary_item_4">項目4</string>
-    <string name="edit_diary_item_5">項目5</string>
-    <string name="edit_diary_item_hint">未選択</string>
-    <string name="edit_diary_content_hint">○○をした。</string>
-
     <string name="edit_diary_select_item_toolbar_title">項目選択</string>
     <string name="edit_diary_select_item_new_item">新規項目</string>
     <string name="edit_diary_select_item_new_item_hint">未入力</string>
@@ -108,6 +76,28 @@
     <string name="edit_diary_select_item_title_confirm_delete_dialog_second_message">”を削除しますか。</string>
     <string name="edit_diary_select_item_title_confirm_delete_dialog_btn_ok">はい</string>
     <string name="edit_diary_select_item_title_confirm_delete_dialog_btn_ng">いいえ</string>
+
+    <!-- fragment_edit_diary -->
+
+    <string name="fragment_edit_diary_toolbar_title_hint">新規作成／編集中</string>
+
+    <string name="fragment_edit_diary_toolbar_option_save_diary">日記保存</string>
+    <string name="fragment_edit_diary_toolbar_option_delete_diary">日記削除</string>
+
+    <string name="fragment_edit_diary_date_hint">0000/00/00(月)</string>
+    <string name="fragment_edit_diary_weather">天気：</string>
+    <string name="fragment_edit_diary_weather_slush">／</string>
+    <string name="fragment_edit_diary_condition">気分：</string>
+    <string name="fragment_edit_diary_title">タイトル</string>
+    <string name="fragment_edit_diary_title_hint">無題</string>
+    <string name="fragment_edit_diary_num_of_char_hint">0/0</string>
+    <string name="fragment_edit_diary_item_1">項目1</string>
+    <string name="fragment_edit_diary_item_2">項目2</string>
+    <string name="fragment_edit_diary_item_3">項目3</string>
+    <string name="fragment_edit_diary_item_4">項目4</string>
+    <string name="fragment_edit_diary_item_5">項目5</string>
+    <string name="fragment_edit_diary_item_hint">未選択</string>
+    <string name="fragment_edit_diary_content_hint">○○をした。</string>
 
     <!-- fragment_calendar -->
     <string name="fragment_calendar_month_header_format">yyyy年MM月</string>

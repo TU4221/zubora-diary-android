@@ -40,11 +40,13 @@ import com.websarva.wings.android.zuboradiary.databinding.CalendarDayBinding;
 import com.websarva.wings.android.zuboradiary.databinding.CalendarHeaderBinding;
 import com.websarva.wings.android.zuboradiary.databinding.FragmentCalendarBinding;
 import com.websarva.wings.android.zuboradiary.data.DateConverter;
+import com.websarva.wings.android.zuboradiary.ui.diary.DiaryLiveData;
 import com.websarva.wings.android.zuboradiary.ui.diary.showdiary.ShowDiaryFragment;
-import com.websarva.wings.android.zuboradiary.ui.diary.DiaryViewModel;
 
 import com.kizitonwose.calendar.view.CalendarView;
+import com.websarva.wings.android.zuboradiary.ui.diary.showdiary.ShowDiaryViewModel;
 import com.websarva.wings.android.zuboradiary.ui.observer.ShowDiaryConditionObserver;
+import com.websarva.wings.android.zuboradiary.ui.observer.ShowDiaryLogObserver;
 import com.websarva.wings.android.zuboradiary.ui.observer.ShowDiaryNumVisibleItemsObserver;
 import com.websarva.wings.android.zuboradiary.ui.observer.ShowDiaryWeather1Observer;
 import com.websarva.wings.android.zuboradiary.ui.observer.ShowDiaryWeather2Observer;
@@ -75,7 +77,7 @@ public class CalendarFragment extends Fragment {
 
     // ViewModel
     private CalendarViewModel calendarViewModel;
-    private DiaryViewModel diaryViewModel; // TODO:diaryViewModelの使用要素をcalendarViewModelに含めるか検討(DiaryFragment修正後)
+    private ShowDiaryViewModel diaryViewModel; // TODO:diaryViewModelの使用要素をcalendarViewModelに含めるか検討(DiaryFragment修正後)
     private SettingsViewModel settingsViewModel;
 
     public void onCreate(Bundle savedInstanceState) {
@@ -84,7 +86,7 @@ public class CalendarFragment extends Fragment {
         // ViewModel設定
         ViewModelProvider provider = new ViewModelProvider(requireActivity());
         calendarViewModel = provider.get(CalendarViewModel.class);
-        diaryViewModel = provider.get(DiaryViewModel.class);
+        diaryViewModel = provider.get(ShowDiaryViewModel.class);
         settingsViewModel = provider.get(SettingsViewModel.class);
 
         // Navigation設定
@@ -101,7 +103,7 @@ public class CalendarFragment extends Fragment {
 
         // 双方向データバインディング設定
         binding.setLifecycleOwner(this);
-        binding.setDiaryViewModel(diaryViewModel);
+        binding.setShowDiaryViewModel(diaryViewModel);
 
         // 画面遷移時のアニメーション設定
         // FROM:遷移元 TO:遷移先
@@ -168,9 +170,7 @@ public class CalendarFragment extends Fragment {
                 //      Dialog非表示中:Lifecycle.Event.ON_RESUME
                 Log.d("LifecycleEventObserver", "CalendarFragment_NavBackStackEntry_event:" + event);
                 if (event.equals(Lifecycle.Event.ON_RESUME)) {
-                    if (canShowDialog()) {
-                        retryErrorDialogShow();
-                    }
+                    retryErrorDialogShow();
                 }
             }
         };
@@ -322,6 +322,7 @@ public class CalendarFragment extends Fragment {
                     calendarViewModel.hasDiary(localDate, new FutureCallback<Boolean>() {
                         @Override
                         public void onSuccess(Boolean result) {
+                            Log.d("20240806", "hasDiary()_onSuccess:" + result) ;
                             if (result) {
                                 viewCalendarDayDot.setVisibility(View.VISIBLE);
                             } else {
@@ -331,6 +332,7 @@ public class CalendarFragment extends Fragment {
 
                         @Override
                         public void onFailure(@NonNull Throwable t) {
+                            Log.d("20240806", "hasDiary()_onFailure") ;
                             // 例外はViewModelクラス内で例外用リスナーを追加して対応
                             viewCalendarDayDot.setVisibility(View.INVISIBLE);
                         }
@@ -419,6 +421,7 @@ public class CalendarFragment extends Fragment {
         public MonthViewContainer(View view) {
             super(view);
             textYearMonth = CalendarHeaderBinding.bind(view).textYearMonth;
+            // TODO:下記LinearLayoutをDataBindingで参照できなかったのでViewBindingで対応。原因を調査する。
             legendLayout = CalendarHeaderBinding.bind(view).legendLayout.getRoot();
         }
     }
@@ -470,7 +473,6 @@ public class CalendarFragment extends Fragment {
                     // ViewModelの読込日記の日付をセット
                     diaryViewModel.initialize();
                     diaryViewModel.prepareDiary(date, true);
-                    //setUpItemLayout(); // 必要数の項目欄表示 // TODO:不要確認後削除
                     binding.linearLayoutShowDiary.setVisibility(View.VISIBLE);
                     binding.textNoDiary.setVisibility(View.GONE);
                 } else {
@@ -489,50 +491,6 @@ public class CalendarFragment extends Fragment {
             }
         });
     }
-
-    // TODO:不要確認後削除
-    /*private void setUpItemLayout() {
-        Integer numVisibleItems = diaryViewModel.getNumVisibleItemsLiveData().getValue();
-        if (numVisibleItems == null) {
-            return;
-        }
-        int maxItems = DiaryViewModel.MAX_ITEMS; // 項目入力欄最大数
-        for (int i = 0; i < maxItems; i++) {
-            int itemNumber = i + 1;
-            MotionLayout itemMotionLayout = selectItemMotionLayout(itemNumber);
-            if (itemMotionLayout == null) {
-                return;
-            }
-            if (itemNumber <= numVisibleItems) {
-                itemMotionLayout
-                        .transitionToState(R.id.motion_scene_show_diary_item_showed_state, 1);
-            } else {
-                itemMotionLayout
-                        .transitionToState(R.id.motion_scene_show_diary_item_hided_state, 1);
-            }
-        }
-    }*/
-
-    // TODO:不要確認後削除
-    /*private MotionLayout selectItemMotionLayout(int itemNumber) {
-        switch (itemNumber) {
-            case 1:
-                return binding.includeShowDiary.includeItem1.motionLayoutShowDiaryItem;
-            case 2:
-                return binding.includeShowDiary.includeItem2.motionLayoutShowDiaryItem;
-
-            case 3:
-                return binding.includeShowDiary.includeItem3.motionLayoutShowDiaryItem;
-
-            case 4:
-                return binding.includeShowDiary.includeItem4.motionLayoutShowDiaryItem;
-
-            case 5:
-                return binding.includeShowDiary.includeItem5.motionLayoutShowDiaryItem;
-            default:
-                return null;
-        }
-    }*/
 
     private void setUpShowDiary() {
         diaryViewModel.getWeather1LiveData()
@@ -564,7 +522,7 @@ public class CalendarFragment extends Fragment {
                 );
 
         // 項目レイアウト設定
-        View[] itemLayouts = new View[DiaryViewModel.MAX_ITEMS];
+        View[] itemLayouts = new View[DiaryLiveData.MAX_ITEMS];
         itemLayouts[0] = binding.includeShowDiary.includeItem1.linerLayoutShowDiaryItem;
         itemLayouts[1] = binding.includeShowDiary.includeItem2.linerLayoutShowDiaryItem;
         itemLayouts[2] = binding.includeShowDiary.includeItem3.linerLayoutShowDiaryItem;
@@ -572,6 +530,12 @@ public class CalendarFragment extends Fragment {
         itemLayouts[4] = binding.includeShowDiary.includeItem5.linerLayoutShowDiaryItem;
         diaryViewModel.getNumVisibleItemsLiveData()
                 .observe(getViewLifecycleOwner(), new ShowDiaryNumVisibleItemsObserver(itemLayouts));
+
+        diaryViewModel.getLogLiveData()
+                .observe(
+                        getViewLifecycleOwner(),
+                        new ShowDiaryLogObserver(binding.includeShowDiary.textLogValue)
+                );
     }
 
 
@@ -583,6 +547,7 @@ public class CalendarFragment extends Fragment {
                 LocalDate selectedDate = calendarViewModel.getSelectedDateLiveData().getValue();
                 if (selectedDate == null) {
                     selectedDate = LocalDate.now();
+                    // TODO:assert検討
                 }
                 showEditDiaryFragment(selectedDate);
             }

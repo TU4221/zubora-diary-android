@@ -8,7 +8,6 @@ import android.text.Spanned;
 import android.text.style.BackgroundColorSpan;
 
 import com.google.common.util.concurrent.ListenableFuture;
-import com.websarva.wings.android.zuboradiary.data.DateConverter;
 import com.websarva.wings.android.zuboradiary.R;
 import com.websarva.wings.android.zuboradiary.ui.list.DiaryDayListItem;
 import com.websarva.wings.android.zuboradiary.ui.list.DiaryListFragment;
@@ -21,83 +20,64 @@ import com.websarva.wings.android.zuboradiary.ui.list.wordsearch.WordSearchResul
 import org.jetbrains.annotations.Nullable;
 
 import java.time.LocalDate;
-import java.time.YearMonth;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
-import java.util.function.Consumer;
 
 import javax.inject.Inject;
 
 public class DiaryRepository {
-    Context context;
-    private DiaryDatabase diaryDatabase;
-    DiaryDAO diaryDAO;
-    SelectedItemTitlesHistoryDAO selectedItemTitlesHistoryDAO;
+    private final Context context;
+    private final DiaryDatabase diaryDatabase;
+    private final DiaryDAO diaryDAO;
+    private final DiaryItemTitleSelectionHistoryDAO diaryItemTitleSelectionHistoryDAO;
 
     @Inject
-    public DiaryRepository(Context context, DiaryDatabase diaryDatabase, DiaryDAO diaryDAO) {
+    public DiaryRepository(
+            Context context, DiaryDatabase diaryDatabase,
+            DiaryDAO diaryDAO, DiaryItemTitleSelectionHistoryDAO diaryItemTitleSelectionHistoryDAO) {
         this.context = context;
-        //diaryDatabase = DiaryDatabase.getDatabase(context);
-        //diaryDAO = diaryDatabase.createDiaryDAO();
         this.diaryDatabase = diaryDatabase;
         this.diaryDAO = diaryDAO;
-        selectedItemTitlesHistoryDAO = diaryDatabase.createSelectedItemTitlesHistoryDAO();
+        this.diaryItemTitleSelectionHistoryDAO = diaryItemTitleSelectionHistoryDAO;
     }
 
-    public int countDiaries(@Nullable String date) throws Exception {
+    public ListenableFuture<Integer> countDiaries(@Nullable LocalDate date){
         ListenableFuture<Integer> listenableFutureResults;
-        if (date != null && !date.isEmpty()) {
-            listenableFutureResults = this.diaryDAO.countDiariesAsync(date);
-        } else {
+        if (date == null) {
             listenableFutureResults = this.diaryDAO.countDiariesAsync();
+        } else {
+            listenableFutureResults = this.diaryDAO.countDiariesAsync(date.toString());
         }
-        // 日付が変更された時、カウントキャンセル
-        while (!listenableFutureResults.isDone()) {
-            if (Thread.currentThread().isInterrupted()) {
-                listenableFutureResults.cancel(true);
-                throw new InterruptedException();
-            }
-        }
-        return listenableFutureResults.get();
+        return listenableFutureResults;
     }
 
-    public boolean hasDiary(int year, int month, int dayOfMonth) throws ExecutionException, InterruptedException {
-        String stringDate = DateConverter.toStringLocalDate(year, month, dayOfMonth);
-        ListenableFuture<Boolean> existDiaryListenableFuture = diaryDAO.hasDiaryAsync(stringDate);
-        return existDiaryListenableFuture.get();
+    public ListenableFuture<Boolean> hasDiary(LocalDate date) {
+        return diaryDAO.hasDiaryAsync(date.toString());
     }
 
-    public ListenableFuture<Boolean> hasDiary(LocalDate localDate) {
-        String stringDate = DateConverter.toStringLocalDate(localDate);
-        return diaryDAO.hasDiaryAsync(stringDate);
+    public ListenableFuture<Diary> selectDiary(LocalDate date) {
+        return  diaryDAO.selectDiaryAsync(date.toString());
     }
 
-    public Diary selectDiary(String date) throws Exception {
-        ListenableFuture<Diary> diaryListenableFuture = diaryDAO.selectDiaryAsync(date);
-        return  diaryListenableFuture.get();
+    public ListenableFuture<Diary> selectNewestDiary() {
+        return diaryDAO.selectNewestDiaryAsync();
     }
 
-    public Diary selectNewestDiary() throws Exception {
-        ListenableFuture<Diary> listenableFutureResult = diaryDAO.selectNewestDiaryAsync();
-        return listenableFutureResult.get();
+    public ListenableFuture<Diary> selectOldestDiary() {
+        return diaryDAO.selectOldestDiaryAsync();
     }
 
-    public Diary selectOldestDiary() throws Exception {
-        ListenableFuture<Diary> listenableFutureResult = diaryDAO.selectOldestDiaryAsync();
-        return listenableFutureResult.get();
-    }
-
-    public List<DiaryYearMonthListItem> loadDiaryList(int num, int offset, @Nullable String date) throws Exception {
+    public List<DiaryYearMonthListItem> loadDiaryList(int num, int offset, @Nullable LocalDate date) throws Exception {
         ListenableFuture<List<DiaryListItem>> listenableFutureResults;
         if (!(date == null)) {
-            listenableFutureResults = diaryDAO.selectDiaryListAsync(num, offset, date);
+            listenableFutureResults = diaryDAO.selectDiaryListAsync(num, offset, date.toString());
         } else {
             listenableFutureResults = diaryDAO.selectDiaryListAsync(num, offset);
         }
         // 日付が変更された時、リスト読込キャンセル
+        // TODO:下記while意味ある？
         while (!listenableFutureResults.isDone()) {
             if (Thread.currentThread().isInterrupted()) {
                 listenableFutureResults.cancel(true);
@@ -181,17 +161,8 @@ public class DiaryRepository {
         return diaryYearMonthList;
     }
 
-    public int countWordSearchResults(String searchWord) throws Exception {
-        ListenableFuture<Integer> listenableFutureResult =
-                diaryDAO.countWordSearchResultsAsync(searchWord);
-        // 検索文字が変更された時、カウントキャンセル
-        while (!listenableFutureResult.isDone()) {
-            if (Thread.currentThread().isInterrupted()) {
-                listenableFutureResult.cancel(true);
-                throw new InterruptedException();
-            }
-        }
-        return listenableFutureResult.get();
+    public ListenableFuture<Integer> countWordSearchResults(String searchWord) {
+        return diaryDAO.countWordSearchResultsAsync(searchWord);
     }
 
     public List<WordSearchResultYearMonthListItem> selectWordSearchResultList(
@@ -357,67 +328,48 @@ public class DiaryRepository {
         return spannableString;
     }
 
-    public List<Integer> selectDiaryDateDayList(YearMonth yearMonth) throws ExecutionException, InterruptedException {
-        String stringDateYearMonth = DateConverter.toStringLocalDateYearMonth(yearMonth);
-        ListenableFuture<List<String>> listenableFutureResults =
-                diaryDAO.selectDiaryDateListAsync(stringDateYearMonth);
-        List<String> beforeList = listenableFutureResults.get();
-        List<Integer> afterList = new ArrayList<>();
-        beforeList.stream().forEach(new Consumer<String>() {
+    public Future<Void> insertDiary(Diary diary, List<DiaryItemTitleSelectionHistoryItem> updateTitleList) {
+        return DiaryDatabase.EXECUTOR_SERVICE.submit(new Callable<Void>() {
             @Override
-            public void accept(String s) {
-                int startIndex = s.indexOf("月") + 1;
-                int endIndex = s.indexOf("日");
-                String dayOfMonth = s.substring(startIndex, endIndex);
-                afterList.add(Integer.parseInt(dayOfMonth));
-            }
-        });
-        return afterList;
-    }
-
-    public void insertDiary(Diary diary, List<SelectedDiaryItemTitle> updateTitleList) throws Exception {
-        Future<Void> future = DiaryDatabase.EXECUTOR_SERVICE.submit(new Callable<Void>() {
-            @Override
-            public Void call() throws Exception{
+            public Void call() {
                 diaryDatabase.runInTransaction(new Callable<Future<Void>>() {
                     @Override
-                    public Future<Void> call() throws Exception{
+                    public Future<Void> call() {
                         diaryDAO.insertDiaryAsync(diary);
-                        selectedItemTitlesHistoryDAO
+                        diaryItemTitleSelectionHistoryDAO
                                 .insertSelectedDiaryItemTitles(updateTitleList);
+                        diaryItemTitleSelectionHistoryDAO.deleteOldSelectedDiaryItemTitles();
                         return null;
                     }
                 });
                 return null;
             }
         });
-        future.get();
     }
 
-    public void deleteAndInsertDiary(
-            String deleteDiaryDate, Diary createDiary, List<SelectedDiaryItemTitle> updateTitleList)
-            throws Exception {
-        Future<Void> future = DiaryDatabase.EXECUTOR_SERVICE.submit(new Callable<Void>() {
+    public Future<Void> deleteAndInsertDiary(
+            LocalDate deleteDiaryDate, Diary createDiary, List<DiaryItemTitleSelectionHistoryItem> updateTitleList)
+             {
+        return DiaryDatabase.EXECUTOR_SERVICE.submit(new Callable<Void>() {
             @Override
-            public Void call() throws Exception {
+            public Void call() {
                 diaryDatabase.runInTransaction(new Callable<Future<Void>>() {
                     @Override
-                    public Future<Void> call() throws Exception {
-                        diaryDAO.deleteDiaryAsync(deleteDiaryDate);
+                    public Future<Void> call() {
+                        diaryDAO.deleteDiaryAsync(deleteDiaryDate.toString());
                         diaryDAO.insertDiaryAsync(createDiary);
-                        selectedItemTitlesHistoryDAO
+                        diaryItemTitleSelectionHistoryDAO
                                 .insertSelectedDiaryItemTitles(updateTitleList);
+                        diaryItemTitleSelectionHistoryDAO.deleteOldSelectedDiaryItemTitles();
                         return null;
                     }
                 });
                 return null;
             }
         });
-        future.get();
     }
 
-    public void deleteDiary(String date) throws Exception {
-        ListenableFuture<Integer> diaryListenableFuture = diaryDAO.deleteDiaryAsync(date);
-        diaryListenableFuture.get();
+    public ListenableFuture<Integer> deleteDiary(LocalDate date) throws Exception {
+        return diaryDAO.deleteDiaryAsync(date.toString());
     }
 }

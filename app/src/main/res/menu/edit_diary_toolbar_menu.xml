@@ -5,7 +5,7 @@
     <item
         android:id="@+id/editDiaryToolbarOptionSaveDiary"
         android:icon="@drawable/ic_save_24"
-        android:title="@string/edit_diary_toolbar_option_save_diary"
+        android:title="@string/fragment_edit_diary_toolbar_option_save_diary"
         app:showAsAction="always" />
 
 </menu>

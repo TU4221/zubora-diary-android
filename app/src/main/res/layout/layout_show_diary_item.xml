@@ -4,8 +4,11 @@
 
     <data>
         <variable
-            name="item"
-            type="com.websarva.wings.android.zuboradiary.ui.diary.DiaryViewModel.ItemLiveData" />
+            name="titleLiveData"
+            type="androidx.lifecycle.LiveData&lt;String>" />
+        <variable
+            name="commentLiveData"
+            type="androidx.lifecycle.LiveData&lt;String>" />
     </data>
 
     <LinearLayout
@@ -28,7 +31,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            android:text="@{item.titleLiveData}"
+            android:text="@{titleLiveData}"
             android:hint="@string/show_diary_item_1" />
 
         <View
@@ -43,7 +46,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
-            android:text="@{item.commentLiveData}"
+            android:text="@{commentLiveData}"
             android:hint="@string/show_diary_content_1" />
 
     </LinearLayout>

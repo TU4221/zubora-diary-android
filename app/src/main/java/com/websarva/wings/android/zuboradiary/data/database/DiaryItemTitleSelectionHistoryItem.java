@@ -4,8 +4,8 @@ import androidx.annotation.NonNull;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
-@Entity(tableName = "diary_item_title_history")
-public class SelectedDiaryItemTitle {
+@Entity(tableName = "diary_item_title_selection_history")
+public class DiaryItemTitleSelectionHistoryItem {
     @PrimaryKey
     @NonNull
     private String title = "";

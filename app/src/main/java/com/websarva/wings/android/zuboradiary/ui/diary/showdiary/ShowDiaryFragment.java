@@ -1,5 +1,6 @@
 package com.websarva.wings.android.zuboradiary.ui.diary.showdiary;
 
+import android.app.Dialog;
 import android.os.Bundle;
 
 import androidx.activity.OnBackPressedCallback;
@@ -26,13 +27,14 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.websarva.wings.android.zuboradiary.R;
-import com.websarva.wings.android.zuboradiary.data.diary.ConditionConverter;
-import com.websarva.wings.android.zuboradiary.data.diary.Conditions;
-import com.websarva.wings.android.zuboradiary.data.diary.WeatherConverter;
-import com.websarva.wings.android.zuboradiary.data.diary.Weathers;
+import com.websarva.wings.android.zuboradiary.data.DateConverter;
 import com.websarva.wings.android.zuboradiary.databinding.FragmentShowDiaryBinding;
-import com.websarva.wings.android.zuboradiary.ui.diary.DiaryViewModel;
+import com.websarva.wings.android.zuboradiary.ui.diary.DiaryLiveData;
+import com.websarva.wings.android.zuboradiary.ui.diary.editdiary.DatePickerDialogFragment;
+import com.websarva.wings.android.zuboradiary.ui.observer.ShowDiaryConditionObserver;
+import com.websarva.wings.android.zuboradiary.ui.observer.ShowDiaryLogObserver;
 import com.websarva.wings.android.zuboradiary.ui.observer.ShowDiaryNumVisibleItemsObserver;
+import com.websarva.wings.android.zuboradiary.ui.observer.ShowDiaryWeather1Observer;
 import com.websarva.wings.android.zuboradiary.ui.observer.ShowDiaryWeather2Observer;
 
 import java.time.LocalDate;
@@ -53,16 +55,15 @@ public class ShowDiaryFragment extends Fragment {
     private boolean shouldShowDiaryDeleteErrorDialog;
 
     // ViewModel
-    private DiaryViewModel diaryViewModel;
+    private ShowDiaryViewModel showDiaryViewModel;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         // ViewModel設定
-        ViewModelProvider provider = new ViewModelProvider(requireActivity());
-        diaryViewModel = provider.get(DiaryViewModel.class);
-        diaryViewModel.initialize();
+        ViewModelProvider provider = new ViewModelProvider(this);
+        showDiaryViewModel = provider.get(ShowDiaryViewModel.class);
 
         // Navigation設定
         navController = NavHostFragment.findNavController(this);
@@ -89,7 +90,7 @@ public class ShowDiaryFragment extends Fragment {
 
         // 双方向データバインディング設定
         binding.setLifecycleOwner(this);
-        binding.setDiaryViewModel(diaryViewModel);
+        binding.setShowDiaryViewModel(showDiaryViewModel);
 
         return binding.getRoot();
     }
@@ -103,7 +104,8 @@ public class ShowDiaryFragment extends Fragment {
         setUpToolBar();
         setUpWeatherLayout();
         setUpConditionLayout();
-        setupItemLayout();
+        setUpItemLayout();
+        setUpLogShowLayout();
         setUpErrorObserver();
     }
 
@@ -120,9 +122,9 @@ public class ShowDiaryFragment extends Fragment {
                 //      Dialog非表示中:Lifecycle.Event.ON_RESUME
                 Log.d("LifecycleEventObserver", "CalendarFragment_NavBackStackEntry_event:" + event);
                 if (event.equals(Lifecycle.Event.ON_RESUME)) {
-                    if (canShowDialog()) {
-                        retryErrorDialogShow();
-                    }
+                    SavedStateHandle savedStateHandle = navBackStackEntry.getSavedStateHandle();
+                    receiveDeleteConfirmationDialogResult(savedStateHandle);
+                    retryErrorDialogShow();
                 }
             }
         };
@@ -132,6 +134,10 @@ public class ShowDiaryFragment extends Fragment {
             public void onStateChanged(@NonNull LifecycleOwner lifecycleOwner, @NonNull Lifecycle.Event event) {
                 Log.d("LifecycleEventObserver", "CalendarFragment_ViewLifecycleOwner_event:" + event);
                 if (event.equals(Lifecycle.Event.ON_DESTROY)) {
+                    // MEMO:removeで削除しないとこのFragmentを閉じてもResult内容が残ってしまう。
+                    //      その為、このFragmentを再表示した時にObserverがResultの内容で処理してしまう。
+                    SavedStateHandle savedStateHandle = navBackStackEntry.getSavedStateHandle();
+                    removeResults(savedStateHandle);
                     // TODO:下記コード意味あるか検証。コメントアウトしてFragment切替後の状態を確認したがObserverが重複することはなかった。
                     navBackStackEntry.getLifecycle().removeObserver(lifecycleEventObserver);
                 }
@@ -139,11 +145,33 @@ public class ShowDiaryFragment extends Fragment {
         });
     }
 
+    private void removeResults(SavedStateHandle savedStateHandle) {
+        savedStateHandle.remove(DeleteConfirmationDialogFragment.KEY_SELECTED_BUTTON);
+    }
+
+    // 日記削除確認ダイアログフラグメントからデータ受取
+    private void receiveDeleteConfirmationDialogResult(SavedStateHandle savedStateHandle) {
+        boolean containsDialogResult =
+                savedStateHandle.contains(DeleteConfirmationDialogFragment.KEY_SELECTED_BUTTON);
+        if (containsDialogResult) {
+            Integer selectedButton =
+                    savedStateHandle.get(DeleteConfirmationDialogFragment.KEY_SELECTED_BUTTON);
+            if (selectedButton == null) {
+                return;
+            }
+            if (selectedButton == Dialog.BUTTON_POSITIVE) {
+                showDiaryViewModel.deleteDiary();
+                backFragment(true);
+            }
+        }
+    }
+
     // 画面表示データ準備
     private void setUpDiaryData() {
+        showDiaryViewModel.initialize();
         LocalDate showDiaryDate =
                 ShowDiaryFragmentArgs.fromBundle(requireArguments()).getShowDiaryDate();
-        diaryViewModel.prepareDiary(showDiaryDate, true);
+        showDiaryViewModel.loadDiary(showDiaryDate);
     }
 
     private void setUpToolBar() {
@@ -160,7 +188,7 @@ public class ShowDiaryFragment extends Fragment {
                     @Override
                     public boolean onMenuItemClick(MenuItem item) {
                         // 日記編集フラグメント起動
-                        if (item.getItemId() == R.id.displayDiaryToolbarOptionEditDiary) {
+                        if (item.getItemId() == R.id.showDiaryToolbarOptionEditDiary) {
                             LocalDate editDiaryDate =
                                     ShowDiaryFragmentArgs.fromBundle(requireArguments())
                                             .getShowDiaryDate();
@@ -173,63 +201,42 @@ public class ShowDiaryFragment extends Fragment {
                                             );
                             navController.navigate(action);
                             return true;
+                        } else if (item.getItemId() == R.id.showDiaryToolbarOptionDeleteDiary) {
+                            showDiaryDeleteConfirmationDialog();
                         }
                         return false;
                     }
                 });
 
-        diaryViewModel.getLoadedDateLiveData()
-                .observe(getViewLifecycleOwner(), new Observer<String>() {
+        showDiaryViewModel.getDateLiveData()
+                .observe(getViewLifecycleOwner(), new Observer<LocalDate>() {
                     @Override
-                    public void onChanged(String s) {
-                        if (s == null) {
+                    public void onChanged(LocalDate date) {
+                        if (date == null) {
                             return;
                         }
-                        binding.materialToolbarTopAppBar.setTitle(s);
+                        String stringDate = DateConverter.toStringLocalDate(date);
+                        binding.materialToolbarTopAppBar.setTitle(stringDate);
                     }
                 });
     }
 
     // 天気表示欄設定
     private void setUpWeatherLayout() {
-        diaryViewModel.getWeather1LiveData()
-                .observe(getViewLifecycleOwner(), new Observer<Integer>() {
-                    @Override
-                    public void onChanged(Integer integer) {
-                        if (integer == null) {
-                            return;
-                        }
-                        // StringWeather1LiveDataへ反映
-                        WeatherConverter converter = new WeatherConverter();
-                        Weathers weather = converter.toWeather(integer);
-                        String strWeather = diaryViewModel.getStrWeather1LiveData().getValue();
-                        if (strWeather == null || !weather.toString(requireContext()).equals(strWeather)) {
-                            diaryViewModel.updateStrWeather1(weather.toString(requireContext()));
-                        }
-                    }
-                });
+        showDiaryViewModel.getWeather1LiveData()
+                .observe(
+                        getViewLifecycleOwner(),
+                        new ShowDiaryWeather1Observer(
+                                requireContext(),
+                                binding.includeShowDiary.textWeather1Selected
+                        )
+                );
 
-        diaryViewModel.getWeather2LiveData()
-                .observe(getViewLifecycleOwner(), new Observer<Integer>() {
-                    @Override
-                    public void onChanged(Integer integer) {
-                        if (integer == null) {
-                            return;
-                        }
-                        // StringWeather2LiveDataへ反映
-                        WeatherConverter converter = new WeatherConverter();
-                        Weathers weather = converter.toWeather(integer);
-                        String strWeather = diaryViewModel.getStrWeather1LiveData().getValue();
-                        if (strWeather == null || !weather.toString(requireContext()).equals(strWeather)) {
-                            diaryViewModel.updateStrWeather2(weather.toString(requireContext()));
-                        }
-                    }
-                });
-
-        diaryViewModel.getWeather2LiveData()
+        showDiaryViewModel.getWeather2LiveData()
                 .observe(
                         getViewLifecycleOwner(),
                         new ShowDiaryWeather2Observer(
+                                requireContext(),
                                 binding.includeShowDiary.textWeatherSlush,
                                 binding.includeShowDiary.textWeather2Selected
                         )
@@ -237,22 +244,14 @@ public class ShowDiaryFragment extends Fragment {
     }
 
     private void setUpConditionLayout() {
-        diaryViewModel.getConditionLiveData()
-                .observe(getViewLifecycleOwner(), new Observer<Integer>() {
-                    @Override
-                    public void onChanged(Integer integer) {
-                        if (integer == null) {
-                            return;
-                        }
-                        // StringConditionLiveDataへ反映
-                        ConditionConverter converter = new ConditionConverter();
-                        Conditions condition = converter.toCondition(integer);
-                        String strCondition = diaryViewModel.getStrConditionLiveData().getValue();
-                        if (strCondition == null || !condition.toString(requireContext()).equals(strCondition)) {
-                            diaryViewModel.updateStrCondition(condition.toString(requireContext()));
-                        }
-                    }
-                });
+        showDiaryViewModel.getConditionLiveData()
+                .observe(
+                        getViewLifecycleOwner(),
+                        new ShowDiaryConditionObserver(
+                                requireContext(),
+                                binding.includeShowDiary.textConditionSelected
+                        )
+                );
     }
 
     // TODO:不要確認後削除
@@ -282,7 +281,7 @@ public class ShowDiaryFragment extends Fragment {
         if (numVisibleItems == null) {
             return;
         }
-        for (int i = 0; i < DiaryViewModel.MAX_ITEMS; i++) {
+        for (int i = 0; i < EditDiaryViewModel.MAX_ITEMS; i++) {
             int itemNumber = i + 1;
             MotionLayout itemMotionLayout = selectItemMotionLayout(itemNumber);
             if (itemMotionLayout == null) {
@@ -298,34 +297,42 @@ public class ShowDiaryFragment extends Fragment {
         }
     }*/
 
-    private void setupItemLayout() {
-        View[] itemLayouts = new View[DiaryViewModel.MAX_ITEMS];
+    private void setUpItemLayout() {
+        View[] itemLayouts = new View[DiaryLiveData.MAX_ITEMS];
         itemLayouts[0] = binding.includeShowDiary.includeItem1.linerLayoutShowDiaryItem;
         itemLayouts[1] = binding.includeShowDiary.includeItem2.linerLayoutShowDiaryItem;
         itemLayouts[2] = binding.includeShowDiary.includeItem3.linerLayoutShowDiaryItem;
         itemLayouts[3] = binding.includeShowDiary.includeItem4.linerLayoutShowDiaryItem;
         itemLayouts[4] = binding.includeShowDiary.includeItem5.linerLayoutShowDiaryItem;
-        diaryViewModel.getNumVisibleItemsLiveData()
+        showDiaryViewModel.getNumVisibleItemsLiveData()
                 .observe(getViewLifecycleOwner(), new ShowDiaryNumVisibleItemsObserver(itemLayouts));
+    }
+
+    private void setUpLogShowLayout() {
+        showDiaryViewModel.getLogLiveData()
+                .observe(
+                        getViewLifecycleOwner(),
+                        new ShowDiaryLogObserver(binding.includeShowDiary.textLogValue)
+                );
     }
 
     private void setUpErrorObserver() {
         // エラー表示
-        diaryViewModel.getIsDiaryLoadingErrorLiveData().observe(getViewLifecycleOwner(), new Observer<Boolean>() {
+        showDiaryViewModel.getIsDiaryLoadingErrorLiveData().observe(getViewLifecycleOwner(), new Observer<Boolean>() {
             @Override
             public void onChanged(Boolean aBoolean) {
                 if (aBoolean) {
                     showDiaryLoadingErrorDialog();
-                    diaryViewModel.clearDiaryLoadingError(false);
+                    showDiaryViewModel.clearDiaryLoadingError();
                 }
             }
         });
-        diaryViewModel.getIsDiaryDeleteErrorLiveData().observe(getViewLifecycleOwner(), new Observer<Boolean>() {
+        showDiaryViewModel.getIsDiaryDeleteErrorLiveData().observe(getViewLifecycleOwner(), new Observer<Boolean>() {
             @Override
             public void onChanged(Boolean aBoolean) {
                 if (aBoolean) {
                     showDiaryDeleteErrorDialog();
-                    diaryViewModel.clearDiaryDeleteError(false);
+                    showDiaryViewModel.clearDiaryDeleteError();
                 }
             }
         });
@@ -337,7 +344,19 @@ public class ShowDiaryFragment extends Fragment {
             return false;
         }
         int currentDestinationId = navController.getCurrentDestination().getId();
-        return currentDestinationId == R.id.navigation_edit_diary_fragment;
+        return currentDestinationId == R.id.navigation_show_diary_fragment;
+    }
+
+    private void showDiaryDeleteConfirmationDialog() {
+        if (canShowDialog()) {
+            LocalDate date = showDiaryViewModel.getDateLiveData().getValue();
+            if (date == null) {
+                return;
+            }
+            NavDirections action =
+                    ShowDiaryFragmentDirections.actionShowDiaryFragmentToDeleteConfirmationDialog(date);
+            navController.navigate(action);
+        }
     }
 
     // 他のダイアログで表示できなかったダイアログを表示
@@ -386,7 +405,7 @@ public class ShowDiaryFragment extends Fragment {
             if (destinationId == R.id.navigation_calendar_fragment) {
                 SavedStateHandle savedStateHandle =
                         navController.getPreviousBackStackEntry().getSavedStateHandle();
-                LocalDate showedDiaryLocalDate = diaryViewModel.getDateLiveData().getValue();
+                LocalDate showedDiaryLocalDate = showDiaryViewModel.getDateLiveData().getValue();
                 savedStateHandle.set(KEY_SHOWED_DIARY_DATE, showedDiaryLocalDate);
             }
         }

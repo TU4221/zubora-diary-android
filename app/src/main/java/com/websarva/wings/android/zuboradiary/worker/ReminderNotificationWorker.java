@@ -18,6 +18,7 @@ import androidx.navigation.NavDeepLinkBuilder;
 import androidx.work.Worker;
 import androidx.work.WorkerParameters;
 
+import com.google.common.util.concurrent.ListenableFuture;
 import com.websarva.wings.android.zuboradiary.CustomApplication;
 import com.websarva.wings.android.zuboradiary.R;
 import com.websarva.wings.android.zuboradiary.data.database.DiaryRepository;
@@ -85,23 +86,25 @@ public class ReminderNotificationWorker extends Worker {
         }
     }
 
-    private Boolean isAppInForeground() {
+    private boolean isAppInForeground() {
         CustomApplication application = null;
         if (getApplicationContext() instanceof CustomApplication) {
             Log.d("NotificationWorker", "isAppInForeground()_isCustomApplication:" + String.valueOf(true));
             application = (CustomApplication) getApplicationContext();
         } else {
             Log.d("NotificationWorker", "isAppInForeground()_isCustomApplication:" + String.valueOf(false));
-            return null;
+            return false;
         }
         Log.d("NotificationWorker", "isAppInForeground()_isAppInForeground:" + String.valueOf(application.getIsAppInForeground()));
         return application.getIsAppInForeground();
     }
 
     private boolean hasWriteTodayDiary() throws Exception{
-        LocalDate today = LocalDate.now();
-        boolean result =
-                diaryRepository.hasDiary(today.getYear(), today.getMonthValue(), today.getDayOfMonth());
+        ListenableFuture<Boolean> listenableFuture = diaryRepository.hasDiary(LocalDate.now());
+        Boolean result = listenableFuture.get();
+        if (result == null) {
+            return false;
+        }
         Log.d("NotificationWorker", "hasWriteTodayDiary():" + String.valueOf(result));
         return result;
     }

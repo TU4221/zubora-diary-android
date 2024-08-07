@@ -13,7 +13,7 @@ import androidx.sqlite.db.SupportSQLiteDatabase;
 
 import com.websarva.wings.android.zuboradiary.data.database.DiaryDAO;
 import com.websarva.wings.android.zuboradiary.data.database.DiaryDatabase;
-import com.websarva.wings.android.zuboradiary.data.database.SelectedItemTitlesHistoryDAO;
+import com.websarva.wings.android.zuboradiary.data.database.DiaryItemTitleSelectionHistoryDAO;
 import com.websarva.wings.android.zuboradiary.data.diary.ConditionConverter;
 import com.websarva.wings.android.zuboradiary.data.diary.Conditions;
 import com.websarva.wings.android.zuboradiary.data.diary.WeatherConverter;
@@ -79,9 +79,9 @@ public class DatabaseModule {
                 .databaseBuilder(context, DiaryDatabase.class, "diary_db")
                 // MEMO:データベース初期化
                 //      https://www.bedroomcomputing.com/2020/06/2020-0627-db-prepopulate/
-                .createFromAsset("database/diary_db.db")
+                //.createFromAsset("database/diary_db.db")
                 //.addMigrations(migration_2_3)
-                .fallbackToDestructiveMigration()
+                //.fallbackToDestructiveMigration()
                 .build();
     }
 
@@ -93,7 +93,7 @@ public class DatabaseModule {
 
     @Singleton
     @Provides
-    public static SelectedItemTitlesHistoryDAO provideSelectedItemTitlesHistoryDAO(DiaryDatabase diaryDatabase) {
+    public static DiaryItemTitleSelectionHistoryDAO provideSelectedItemTitlesHistoryDAO(DiaryDatabase diaryDatabase) {
         return diaryDatabase.createSelectedItemTitlesHistoryDAO();
     }
 }

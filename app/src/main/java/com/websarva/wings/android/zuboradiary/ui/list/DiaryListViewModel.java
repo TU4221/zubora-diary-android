@@ -8,6 +8,7 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
+import com.google.common.util.concurrent.ListenableFuture;
 import com.websarva.wings.android.zuboradiary.data.DateConverter;
 import com.websarva.wings.android.zuboradiary.data.database.Diary;
 import com.websarva.wings.android.zuboradiary.data.database.DiaryRepository;
@@ -16,6 +17,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAdjusters;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -124,9 +126,18 @@ public class DiaryListViewModel extends ViewModel {
                 int numExistingDiaries;
                 List<DiaryYearMonthListItem> loadedData;
                 try {
-                    numExistingDiaries =
-                            DiaryListViewModel.this.diaryRepository
-                                    .countDiaries(DiaryListViewModel.this.sortConditionDate);
+                    LocalDate date = DateConverter.toLocalDate(sortConditionDate);
+                    ListenableFuture<Integer> listenableFuture =
+                            diaryRepository.countDiaries(date);
+                    // 日付が変更された時、カウントキャンセル
+                    // TODO:下記while意味ある？
+                    while (!listenableFuture.isDone()) {
+                        if (Thread.currentThread().isInterrupted()) {
+                            listenableFuture.cancel(true);
+                            throw new InterruptedException();
+                        }
+                    }
+                    numExistingDiaries = listenableFuture.get();
                     if (DiaryListViewModel.this.sortConditionDate.isEmpty()) {
                         loadedData =
                                 DiaryListViewModel.this.diaryRepository.loadDiaryList(
@@ -139,7 +150,7 @@ public class DiaryListViewModel extends ViewModel {
                                 DiaryListViewModel.this.diaryRepository.loadDiaryList(
                                         numLoadingItems,
                                         loadingOffset,
-                                        DiaryListViewModel.this.sortConditionDate
+                                        DateConverter.toLocalDate(sortConditionDate)
                                 );
                     }
                 } catch (InterruptedException e) {
@@ -241,19 +252,31 @@ public class DiaryListViewModel extends ViewModel {
         }
     }
 
-    public void deleteDiary(String date) throws Exception {
-        diaryRepository.deleteDiary(date);
-
-        LocalDate deleteDiaryDate = DateConverter.toLocalDate(date);
-
+    public void deleteDiary(LocalDate date) {
+        Integer result;
+        try {
+            result = diaryRepository.deleteDiary(date).get();
+        } catch (Exception e) {
+            // TODO:ERROR
+            return;
+        }
+        if (result == null) {
+            return;
+            // TODO:assert
+        }
+        // TODO:resultの成功値確認
+        if (result != 0) {
+            return;
+            // TODO:ERROR
+        }
         List<DiaryYearMonthListItem> updateDiaryList = new ArrayList<>();
         List<DiaryYearMonthListItem> currentDiaryList = DiaryListViewModel.this.diaryList.getValue();
 
         DiaryYearMonthListItem targetYearMonthListItem = new DiaryYearMonthListItem();
         List<DiaryDayListItem> targetDayList = new ArrayList<>();
         for (DiaryYearMonthListItem item: currentDiaryList) {
-            if (item.getYear() == deleteDiaryDate.getYear()
-                    && item.getMonth() == deleteDiaryDate.getMonthValue()) {
+            if (item.getYear() == date.getYear()
+                    && item.getMonth() == date.getMonthValue()) {
                 targetYearMonthListItem = item;
                 targetDayList = item.getDiaryDayListItemList();
                 break;
@@ -261,7 +284,7 @@ public class DiaryListViewModel extends ViewModel {
         }
 
         for (DiaryDayListItem item: targetDayList) {
-            if (item.getDayOfMonth() == deleteDiaryDate.getDayOfMonth()) {
+            if (item.getDayOfMonth() == date.getDayOfMonth()) {
                 targetDayList.remove(item);
                 if (targetDayList.isEmpty()) {
                     currentDiaryList.remove(targetYearMonthListItem);
@@ -276,16 +299,16 @@ public class DiaryListViewModel extends ViewModel {
     }
 
     public int countDiaries() throws Exception {
-        return this.diaryRepository.countDiaries(null);
+        return this.diaryRepository.countDiaries(null).get();
     }
 
 
     public Diary loadNewestDiary() throws Exception {
-        return this.diaryRepository.selectNewestDiary();
+        return this.diaryRepository.selectNewestDiary().get();
     }
 
     public Diary loadOldestDiary() throws Exception {
-        return this.diaryRepository.selectOldestDiary();
+        return this.diaryRepository.selectOldestDiary().get();
     }
 
 

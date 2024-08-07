@@ -1,4 +1,4 @@
-package com.websarva.wings.android.zuboradiary.ui.list;
+package com.websarva.wings.android.zuboradiary.ui.diary.showdiary;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -21,7 +21,7 @@ import java.time.LocalDate;
 public class DeleteConfirmationDialogFragment extends DialogFragment {
     private static final String fromClassName =
             "From" + DeleteConfirmationDialogFragment.class.getName();
-    public static final String KEY_DELETE_DIARY_DATE = "DeleteDiaryDate" + fromClassName;
+    public static final String KEY_SELECTED_BUTTON = "SelectedButton" + fromClassName;
 
     @NonNull
     @Override
@@ -37,8 +37,7 @@ public class DeleteConfirmationDialogFragment extends DialogFragment {
         builder.setMessage(message);
         builder.setPositiveButton(R.string.list_delete_confirm_dialog_btn_ok, new DialogButtonClickListener());
         builder.setNegativeButton(R.string.list_delete_confirm_dialog_btn_ng, new DialogButtonClickListener());
-        AlertDialog dialog = builder.create();
-        return dialog;
+        return builder.create();
     }
 
     private class DialogButtonClickListener implements DialogInterface.OnClickListener {
@@ -54,10 +53,7 @@ public class DeleteConfirmationDialogFragment extends DialogFragment {
                         return;
                     }
                     SavedStateHandle savedStateHandle = navBackStackEntry.getSavedStateHandle();
-                    LocalDate deleteDiaryDate =
-                            DeleteConfirmationDialogFragmentArgs.fromBundle(requireArguments())
-                                    .getDeleteDiaryDate();
-                    savedStateHandle.set(KEY_DELETE_DIARY_DATE, deleteDiaryDate);
+                    savedStateHandle.set(KEY_SELECTED_BUTTON, DialogInterface.BUTTON_POSITIVE);
                     break;
 
                 case DialogInterface.BUTTON_NEGATIVE:

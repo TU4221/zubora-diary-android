@@ -1,4 +1,13 @@
+<!--<layout xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <data>
+
+    </data>
+
+
+</layout>-->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/liner_layout_calendar_day_legend_container"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:weightSum="7"

@@ -4,8 +4,14 @@
 
     <data>
         <variable
-            name="item"
-            type="com.websarva.wings.android.zuboradiary.ui.diary.DiaryViewModel.ItemLiveData" />
+            name="itemNumber"
+            type="java.lang.String" />
+        <variable
+            name="titleLiveData"
+            type="androidx.lifecycle.LiveData&lt;String>" />
+        <variable
+            name="commentMutableLiveData"
+            type="androidx.lifecycle.MutableLiveData&lt;String>" />
     </data>
 
     <androidx.constraintlayout.motion.widget.MotionLayout
@@ -39,7 +45,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="16dp"
-                    android:text="@{@string/edit_diary_item + String.valueOf(item.itemNumber)}"
+                    android:text="@{itemNumber}"
                     android:textSize="16sp"/>
 
                 <ImageButton
@@ -60,8 +66,8 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
                 android:focusable="false"
-                android:hint="@string/edit_diary_item_hint"
-                android:text="@{item.titleLiveData}"
+                android:hint="@string/fragment_edit_diary_item_hint"
+                android:text="@{titleLiveData}"
                 android:textSize="16sp" />
 
             <androidx.core.widget.NestedScrollView
@@ -85,10 +91,10 @@
                     android:background="@null"
                     android:ems="10"
                     android:gravity="start|top"
-                    android:hint="@string/edit_diary_content_hint"
+                    android:hint="@string/fragment_edit_diary_content_hint"
                     android:inputType="textMultiLine"
                     android:minLines="5"
-                    android:text="@={item.commentMutableLiveData}"
+                    android:text="@={commentMutableLiveData}"
                     android:textSize="16sp" />
 
             </androidx.core.widget.NestedScrollView>
@@ -98,7 +104,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="end"
-                android:text="@string/edit_diary_num_of_char"
+                android:hint="@string/fragment_edit_diary_num_of_char_hint"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/nested_scroll_item_comment" />
 

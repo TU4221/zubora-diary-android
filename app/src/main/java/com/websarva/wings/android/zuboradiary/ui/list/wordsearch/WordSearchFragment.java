@@ -33,7 +33,6 @@ import com.websarva.wings.android.zuboradiary.ui.KeyboardInitializer;
 import com.websarva.wings.android.zuboradiary.MainActivity;
 import com.websarva.wings.android.zuboradiary.R;
 import com.websarva.wings.android.zuboradiary.databinding.FragmentWordSearchBinding;
-import com.websarva.wings.android.zuboradiary.ui.diary.DiaryViewModel;
 import com.websarva.wings.android.zuboradiary.ui.list.DiaryListFragment;
 import com.websarva.wings.android.zuboradiary.ui.list.DiaryListSetting;
 import com.websarva.wings.android.zuboradiary.ui.list.DiaryYearMonthListBaseViewHolder;
@@ -57,7 +56,6 @@ public class WordSearchFragment extends Fragment {
 
     // ViewModel
     private WordSearchViewModel wordSearchViewModel;
-    private DiaryViewModel diaryViewModel;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -66,7 +64,6 @@ public class WordSearchFragment extends Fragment {
         // ViewModel設定
         ViewModelProvider provider = new ViewModelProvider(requireActivity());
         this.wordSearchViewModel = provider.get(WordSearchViewModel.class);
-        this.diaryViewModel = provider.get(DiaryViewModel.class);
 
         // Navigation設定
         this.navController = NavHostFragment.findNavController(this);

@@ -204,7 +204,7 @@ public class DiaryListFragment extends Fragment {
         boolean ConfirmDeleteDialogFragmentFragmentResults =
                 savedStateHandle.contains(DeleteConfirmationDialogFragment.KEY_DELETE_DIARY_DATE);
         if (ConfirmDeleteDialogFragmentFragmentResults) {
-            String deleteDiaryDate =
+            LocalDate deleteDiaryDate =
                     savedStateHandle.get(DeleteConfirmationDialogFragment.KEY_DELETE_DIARY_DATE);
             try {
                 DiaryListFragment.this.diaryListViewModel.deleteDiary(deleteDiaryDate);
@@ -488,7 +488,7 @@ public class DiaryListFragment extends Fragment {
                     NavDirections action =
                             DiaryListFragmentDirections
                                     .actionDiaryListFragmentToDeleteConfirmationDialog(
-                                            holder.date.toString());
+                                            DateConverter.toLocalDate(holder.date));
                     DiaryListFragment.this.navController.navigate(action);
                 }
             });

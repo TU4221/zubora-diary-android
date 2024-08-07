@@ -29,6 +29,7 @@ import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.websarva.wings.android.zuboradiary.R;
+import com.websarva.wings.android.zuboradiary.data.DateConverter;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -345,7 +346,7 @@ public class CustomSimpleCallback extends ItemTouchHelper.SimpleCallback {
                         NavDirections action =
                                 DiaryListFragmentDirections
                                         .actionDiaryListFragmentToDeleteConfirmationDialog(
-                                                deleteDiaryDate
+                                                DateConverter.toLocalDate(deleteDiaryDate)
                                         );
                         CustomSimpleCallback.this.navController.navigate(action);
                     }

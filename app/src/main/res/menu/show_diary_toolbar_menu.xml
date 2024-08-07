@@ -3,7 +3,13 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
-        android:id="@+id/displayDiaryToolbarOptionEditDiary"
+        android:id="@+id/showDiaryToolbarOptionDeleteDiary"
+        android:icon="@drawable/ic_delete_forever_24"
+        android:title="@string/fragment_edit_diary_toolbar_option_delete_diary"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/showDiaryToolbarOptionEditDiary"
         android:icon="@android:drawable/ic_menu_edit"
         android:title="@string/show_diary_toolbar_option_edit_diary"
         app:showAsAction="always" />

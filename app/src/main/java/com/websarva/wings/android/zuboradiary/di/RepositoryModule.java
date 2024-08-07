@@ -6,9 +6,9 @@ import androidx.work.WorkManager;
 
 import com.websarva.wings.android.zuboradiary.data.database.DiaryDAO;
 import com.websarva.wings.android.zuboradiary.data.database.DiaryDatabase;
+import com.websarva.wings.android.zuboradiary.data.database.DiaryItemTitleSelectionHistoryRepository;
 import com.websarva.wings.android.zuboradiary.data.database.DiaryRepository;
-import com.websarva.wings.android.zuboradiary.data.database.EditDiarySelectItemTitleRepository;
-import com.websarva.wings.android.zuboradiary.data.database.SelectedItemTitlesHistoryDAO;
+import com.websarva.wings.android.zuboradiary.data.database.DiaryItemTitleSelectionHistoryDAO;
 import com.websarva.wings.android.zuboradiary.data.network.WeatherApiRepository;
 import com.websarva.wings.android.zuboradiary.data.network.WeatherApiService;
 import com.websarva.wings.android.zuboradiary.data.settings.SettingsRepository;
@@ -29,15 +29,16 @@ public class RepositoryModule {
     @Singleton
     @Provides
     public static DiaryRepository provideDiaryRepository(
-            @ApplicationContext Context context, DiaryDatabase diaryDatabase, DiaryDAO diaryDAO) {
-        return new DiaryRepository(context, diaryDatabase, diaryDAO);
+            @ApplicationContext Context context, DiaryDatabase diaryDatabase,
+            DiaryDAO diaryDAO, DiaryItemTitleSelectionHistoryDAO diaryItemTitleSelectionHistoryDAO) {
+        return new DiaryRepository(context, diaryDatabase, diaryDAO, diaryItemTitleSelectionHistoryDAO);
     }
 
     @Singleton
     @Provides
-    public static EditDiarySelectItemTitleRepository provideEditDiarySelectItemTitleRepository(
-            SelectedItemTitlesHistoryDAO selectedItemTitlesHistoryDAO) {
-        return new EditDiarySelectItemTitleRepository(selectedItemTitlesHistoryDAO);
+    public static DiaryItemTitleSelectionHistoryRepository provideEditDiarySelectItemTitleRepository(
+            DiaryItemTitleSelectionHistoryDAO diaryItemTitleSelectionHistoryDAO) {
+        return new DiaryItemTitleSelectionHistoryRepository(diaryItemTitleSelectionHistoryDAO);
     }
 
     @Singleton
