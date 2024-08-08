@@ -9,10 +9,9 @@ import android.text.style.BackgroundColorSpan;
 
 import com.google.common.util.concurrent.ListenableFuture;
 import com.websarva.wings.android.zuboradiary.R;
-import com.websarva.wings.android.zuboradiary.ui.list.DiaryDayListItem;
-import com.websarva.wings.android.zuboradiary.ui.list.DiaryListFragment;
-import com.websarva.wings.android.zuboradiary.ui.list.DiaryListItem;
-import com.websarva.wings.android.zuboradiary.ui.list.DiaryYearMonthListItem;
+import com.websarva.wings.android.zuboradiary.ui.list.diarylist.DiaryDayListItem;
+import com.websarva.wings.android.zuboradiary.ui.list.diarylist.DiaryListFragment;
+import com.websarva.wings.android.zuboradiary.ui.list.diarylist.DiaryYearMonthListItem;
 import com.websarva.wings.android.zuboradiary.ui.list.wordsearch.WordSearchResultDayListItem;
 import com.websarva.wings.android.zuboradiary.ui.list.wordsearch.WordSearchResultListItemDiary;
 import com.websarva.wings.android.zuboradiary.ui.list.wordsearch.WordSearchResultYearMonthListItem;
@@ -20,6 +19,7 @@ import com.websarva.wings.android.zuboradiary.ui.list.wordsearch.WordSearchResul
 import org.jetbrains.annotations.Nullable;
 
 import java.time.LocalDate;
+import java.time.YearMonth;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -69,96 +69,13 @@ public class DiaryRepository {
         return diaryDAO.selectOldestDiaryAsync();
     }
 
-    public List<DiaryYearMonthListItem> loadDiaryList(int num, int offset, @Nullable LocalDate date) throws Exception {
-        ListenableFuture<List<DiaryListItem>> listenableFutureResults;
-        if (!(date == null)) {
-            listenableFutureResults = diaryDAO.selectDiaryListAsync(num, offset, date.toString());
+    public ListenableFuture<List<DiaryListItem>> loadDiaryList(
+            int num, int offset, @Nullable LocalDate date) {
+        if (date == null) {
+            return diaryDAO.selectDiaryListAsync(num, offset);
         } else {
-            listenableFutureResults = diaryDAO.selectDiaryListAsync(num, offset);
+            return diaryDAO.selectDiaryListAsync(num, offset, date.toString());
         }
-        // 日付が変更された時、リスト読込キャンセル
-        // TODO:下記while意味ある？
-        while (!listenableFutureResults.isDone()) {
-            if (Thread.currentThread().isInterrupted()) {
-                listenableFutureResults.cancel(true);
-                throw new InterruptedException();
-            }
-        }
-        List<DiaryListItem> loadedData = listenableFutureResults.get();
-        List<DiaryYearMonthListItem> convertedList = new ArrayList<>();
-        if (!loadedData.isEmpty()) {
-            convertedList = toDiaryYearMonthListFormat(loadedData);
-        }
-        return convertedList;
-    }
-
-    private List<DiaryYearMonthListItem> toDiaryYearMonthListFormat(List<DiaryListItem> beforeList) {
-        List<DiaryDayListItem> diaryDayList = new ArrayList<>();
-        DiaryDayListItem diaryDayListItem;
-        String date;
-        String title;
-        String picturePath;
-        String year;
-        String month;
-        String dayOfMonth;
-        String dayOfWeek;
-        final int VIEW_TYPE_DIARY = DiaryListFragment.DiaryYearMonthListAdapter.VIEW_TYPE_DIARY;
-        int startIndex;
-        int endIndex;
-        for (DiaryListItem diaryListItem : beforeList) {
-            date = diaryListItem.getDate();
-            title = diaryListItem.getTitle();
-            picturePath = diaryListItem.getPicturePath();
-            startIndex = 0;
-            endIndex = date.indexOf("年");
-            year = date.substring(startIndex, endIndex);
-            startIndex = endIndex + 1;
-            endIndex = date.indexOf("月");
-            month = date.substring(startIndex, endIndex);
-            startIndex = endIndex + 1;
-            endIndex = date.indexOf("日");
-            dayOfMonth = date.substring(startIndex, endIndex);
-            startIndex = date.indexOf("(") + 1;
-            endIndex = date.indexOf(")");
-            dayOfWeek = date.substring(startIndex, endIndex);
-            diaryDayListItem =
-                    new DiaryDayListItem(
-                            Integer.parseInt(year),
-                            Integer.parseInt(month),
-                            Integer.parseInt(dayOfMonth),
-                            dayOfWeek,
-                            title,
-                            picturePath
-                    );
-            diaryDayList.add(diaryDayListItem);
-        }
-
-        // 日記リストを月別に振り分ける
-        List<DiaryDayListItem> sortingList= new ArrayList<>();
-        List<DiaryYearMonthListItem> diaryYearMonthList = new ArrayList<>();
-        int sortingYear = 0;
-        int sortingMonth = 0;
-
-        for (DiaryDayListItem day: diaryDayList) {
-            int _year = day.getYear();
-            int _Month = day.getMonth();
-
-            if (sortingYear != 0 && sortingMonth != 0
-                    && (_year != sortingYear || _Month != sortingMonth)) {
-                diaryYearMonthList.add(
-                        new DiaryYearMonthListItem(sortingYear, sortingMonth, sortingList, VIEW_TYPE_DIARY)
-                );
-                sortingList= new ArrayList<>();
-            }
-            sortingList.add(day);
-            sortingYear = _year;
-            sortingMonth = _Month;
-        }
-        diaryYearMonthList.add(
-                new DiaryYearMonthListItem(sortingYear, sortingMonth, sortingList, VIEW_TYPE_DIARY)
-        );
-
-        return diaryYearMonthList;
     }
 
     public ListenableFuture<Integer> countWordSearchResults(String searchWord) {

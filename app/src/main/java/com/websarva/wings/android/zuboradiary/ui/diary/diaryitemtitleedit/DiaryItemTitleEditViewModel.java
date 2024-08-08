@@ -18,6 +18,8 @@ import dagger.hilt.android.lifecycle.HiltViewModel;
 public class DiaryItemTitleEditViewModel extends ViewModel {
 
     private final DiaryItemTitleSelectionHistoryRepository diaryItemTitleSelectionHistoryRepository;
+    private MutableLiveData<Integer> itemNumber = new MutableLiveData<>();
+    private MutableLiveData<String> itemTitle = new MutableLiveData<>();
     private final MutableLiveData<List<DiaryItemTitleSelectionHistoryItem>> itemTitleSelectionHistory =
             new MutableLiveData<>();
     private final int MAX_LOADED_ITEM_TITLES = 50;
@@ -30,9 +32,16 @@ public class DiaryItemTitleEditViewModel extends ViewModel {
     public DiaryItemTitleEditViewModel(
             DiaryItemTitleSelectionHistoryRepository diaryItemTitleSelectionHistoryRepository) {
         this.diaryItemTitleSelectionHistoryRepository = diaryItemTitleSelectionHistoryRepository;
+        itemNumber.setValue(0);
+        itemTitle.setValue("");
         itemTitleSelectionHistory.setValue(new ArrayList<>());
         isItemTitleSelectionHistoryLoadingError.setValue(false);
         isItemTitleSelectionHistoryItemDeleteError.setValue(false);
+    }
+
+    public void updateItemTitle(int itemNumber, String itemTitle) {
+        this.itemNumber.setValue(itemNumber);
+        this.itemTitle.setValue(itemTitle);
     }
 
     public void loadSelectedItemTitleHistory() {
@@ -75,6 +84,14 @@ public class DiaryItemTitleEditViewModel extends ViewModel {
     }
 
     // LiveDataGetter
+    public LiveData<Integer> getItemNumberLiveData() {
+        return itemNumber;
+    }
+
+    public LiveData<String> getItemTitleLiveData() {
+        return itemTitle;
+    }
+
     public LiveData<List<DiaryItemTitleSelectionHistoryItem>> getItemTitleSelectionHistoryLiveData() {
         return itemTitleSelectionHistory;
     }

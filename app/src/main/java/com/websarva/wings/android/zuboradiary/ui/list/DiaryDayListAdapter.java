@@ -1,0 +1,107 @@
+package com.websarva.wings.android.zuboradiary.ui.list;
+
+import android.content.Context;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.DiffUtil;
+import androidx.recyclerview.widget.ListAdapter;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.websarva.wings.android.zuboradiary.data.DayOfWeekNameResIdGetter;
+import com.websarva.wings.android.zuboradiary.databinding.RowDiaryDayListBinding;
+import com.websarva.wings.android.zuboradiary.ui.list.diarylist.DiaryDayListItem;
+
+import java.time.LocalDate;
+
+public class DiaryDayListAdapter extends ListAdapter<DiaryDayListItem, DiaryDayListAdapter.DiaryDayListViewHolder> {
+
+    private Context context;
+
+    public DiaryDayListAdapter(Context context) {
+        super(new DiaryDayListDiffUtilItemCallback());
+        this.context = context;
+    }
+
+    @NonNull
+    @Override
+    public DiaryDayListViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        // TODO:確認後削除
+            /*LayoutInflater inflater = LayoutInflater.from(parent.getContext());
+            View view = inflater.inflate(R.layout.row_diary_day_list, parent, false);*/
+
+        RowDiaryDayListBinding binding =
+                RowDiaryDayListBinding
+                        .inflate(LayoutInflater.from(parent.getContext()), parent, false);
+        return new DiaryDayListViewHolder(binding);
+    }
+
+    @Override
+    public void onBindViewHolder(DiaryDayListViewHolder holder, int position) {
+        DiaryDayListItem item = getItem(position);
+        LocalDate date = item.getDate();
+        String title = item.getTitle();
+        String picturePath = item.getPicturePath();
+
+        holder.date = date; // ホルダー毎に日記の日付情報一式付与
+
+        DayOfWeekNameResIdGetter dayOfWeekNameResIdGetter = new DayOfWeekNameResIdGetter();
+        int dayOfWeekNameResId = dayOfWeekNameResIdGetter.getResId(date.getDayOfWeek());
+        String strDayOfWeek = context.getString(dayOfWeekNameResId);
+        holder.binding.includeDay.textDayOfWeek.setText(strDayOfWeek);
+
+        holder.binding.includeDay.textDayOfMonth.setText(String.valueOf(date.getDayOfMonth()));
+        holder.binding.textRowDiaryListDayTitle.setText(title);
+        // TODO:picturePath
+
+        holder.binding.frameLayoutRowDiaryDayList.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showShowDiary(date);
+            }
+        });
+
+        // TODO:背面削除ボタン処理保留
+            /*holder.binding.textDeleteDiary.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    NavDirections action =
+                            DiaryListFragmentDirections
+                                    .actionDiaryListFragmentToDeleteConfirmationDialog(date);
+                    navController.navigate(action);
+                }
+            });*/
+    }
+
+    public static class DiaryDayListViewHolder extends RecyclerView.ViewHolder {
+        RowDiaryDayListBinding binding;
+        LocalDate date;
+        public DiaryDayListViewHolder(RowDiaryDayListBinding binding) {
+            super(binding.getRoot());
+            this.binding = binding;
+        }
+    }
+
+    public static class DiaryDayListDiffUtilItemCallback extends DiffUtil.ItemCallback<DiaryDayListItem> {
+        @Override
+        public boolean areItemsTheSame(@NonNull DiaryDayListItem oldItem, @NonNull DiaryDayListItem newItem) {
+            return oldItem.getId().equals(newItem.getId());
+        }
+
+        @Override
+        public boolean areContentsTheSame(@NonNull DiaryDayListItem oldItem, @NonNull DiaryDayListItem newItem) {
+            if (!oldItem.getDate().equals(newItem.getDate())) {
+                return false;
+            }
+            if (!oldItem.getTitle().equals(newItem.getTitle())) {
+                return false;
+            }
+            if (!oldItem.getPicturePath().equals(newItem.getPicturePath())) {
+                return false;
+            }
+            return true;
+        }
+    }
+}

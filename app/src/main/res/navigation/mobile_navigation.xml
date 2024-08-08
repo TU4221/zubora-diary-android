@@ -10,7 +10,7 @@
         app:startDestination="@+id/navigation_diary_list_fragment">
         <fragment
             android:id="@+id/navigation_diary_list_fragment"
-            android:name="com.websarva.wings.android.zuboradiary.ui.list.DiaryListFragment"
+            android:name="com.websarva.wings.android.zuboradiary.ui.list.diarylist.DiaryListFragment"
             tools:layout="@layout/fragment_diary_list"
             android:label="@string/title_list" >
             <action
@@ -33,14 +33,8 @@
                     android:name="isLoadingDiary"
                     app:argType="boolean" />
                 <argument
-                    android:name="edit_diary_date_year"
-                    app:argType="integer" />
-                <argument
-                    android:name="edit_diary_date_month"
-                    app:argType="integer" />
-                <argument
-                    android:name="edit_diary_date_day_of_month"
-                    app:argType="integer" />
+                    android:name="edit_diary_date"
+                    app:argType="java.time.LocalDate" />
             </action>
             <action
                 android:id="@+id/action_diary_list_fragment_to_date_picker_dialog"
@@ -61,17 +55,17 @@
         </fragment>
         <dialog
             android:id="@+id/navigation_date_picker_dialog_for_diary_list_fragment"
-            android:name="com.websarva.wings.android.zuboradiary.ui.list.DatePickerDialogFragment">
+            android:name="com.websarva.wings.android.zuboradiary.ui.list.diarylist.DatePickerDialogFragment">
             <argument
                 android:name="YearMaxValue"
-                app:argType="integer" />
+                app:argType="java.time.Year" />
             <argument
                 android:name="YearMinValue"
-                app:argType="integer" />
+                app:argType="java.time.Year" />
         </dialog>
         <dialog
             android:id="@+id/navigation_delete_confirmation_dialog_for_diary_list_fragment"
-            android:name="com.websarva.wings.android.zuboradiary.ui.list.DeleteConfirmationDialogFragment">
+            android:name="com.websarva.wings.android.zuboradiary.ui.list.diarylist.DeleteConfirmationDialogFragment">
             <argument
                 android:name="DeleteDiaryDate"
                 app:argType="java.time.LocalDate" />

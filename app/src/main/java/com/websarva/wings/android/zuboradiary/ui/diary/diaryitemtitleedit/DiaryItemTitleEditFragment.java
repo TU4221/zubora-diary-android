@@ -68,8 +68,6 @@ public class DiaryItemTitleEditFragment extends Fragment {
 
     // ViewModel
     private DiaryItemTitleEditViewModel diaryItemTitleEditViewModel;
-    private int targetItemNumber;
-    private String targetItemTitle;
 
 
     @Override
@@ -101,17 +99,21 @@ public class DiaryItemTitleEditFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        // 遷移元からデータ受取
-        targetItemNumber =
-                DiaryItemTitleEditFragmentArgs.fromBundle(getArguments()).getTargetItemNumber();
-        targetItemTitle =
-                DiaryItemTitleEditFragmentArgs.fromBundle(getArguments()).getTargetItemTitle();
-
+        setUpTargetItemInformation();
         setUpDialogResultReceiver();
         setUpToolBar();
         setUpItemTitleInputField();
         setUpItemTitleSelectionHistory();
         setUpErrorObserver();
+    }
+
+    private void setUpTargetItemInformation() {
+        // EditDiaryFragmentからデータ受取
+        int targetItemNumber =
+                DiaryItemTitleEditFragmentArgs.fromBundle(getArguments()).getTargetItemNumber();
+        String targetItemTitle =
+                DiaryItemTitleEditFragmentArgs.fromBundle(getArguments()).getTargetItemTitle();
+        diaryItemTitleEditViewModel.updateItemTitle(targetItemNumber, targetItemTitle);
     }
 
     private void setUpDialogResultReceiver() {
@@ -127,6 +129,7 @@ public class DiaryItemTitleEditFragment extends Fragment {
                 if (event.equals(Lifecycle.Event.ON_RESUME)) {
                     SavedStateHandle savedStateHandle = navBackStackEntry.getSavedStateHandle();
                     receiveDeleteConfirmationDialogResult(savedStateHandle);
+                    removeDialogResults(savedStateHandle);
                     retryErrorDialogShow();
                 }
             }
@@ -140,26 +143,26 @@ public class DiaryItemTitleEditFragment extends Fragment {
                     // MEMO:removeで削除しないとこのFragmentを閉じてもResult内容が残ってしまう。
                     //      その為、このFragmentを再表示した時にObserverがResultの内容で処理してしまう。
                     SavedStateHandle savedStateHandle = navBackStackEntry.getSavedStateHandle();
-                    removeResults(savedStateHandle);
+                    removeDialogResults(savedStateHandle);
                     navBackStackEntry.getLifecycle().removeObserver(lifecycleEventObserver);
                 }
             }
         });
     }
 
-    private void removeResults(SavedStateHandle savedStateHandle) {
+    private void removeDialogResults(SavedStateHandle savedStateHandle) {
         savedStateHandle.remove(DeleteConfirmationDialogFragment.KEY_SELECTED_BUTTON);
         savedStateHandle.remove(DeleteConfirmationDialogFragment.KEY_DELETE_LIST_ITEM_POSITION);
     }
 
     private void receiveDeleteConfirmationDialogResult(SavedStateHandle savedStateHandle) {
         // 履歴項目削除確認ダイアログからの結果受取
-        boolean containsConfirmDeleteDialogFragmentResults =
+        boolean containsDialogResults =
                 savedStateHandle
                         .contains(DeleteConfirmationDialogFragment.KEY_SELECTED_BUTTON)
                         && savedStateHandle
                         .contains(DeleteConfirmationDialogFragment.KEY_DELETE_LIST_ITEM_POSITION);
-        if (containsConfirmDeleteDialogFragmentResults) {
+        if (containsDialogResults) {
             Integer selectedButton =
                     savedStateHandle
                             .get(DeleteConfirmationDialogFragment.KEY_SELECTED_BUTTON);
@@ -189,7 +192,12 @@ public class DiaryItemTitleEditFragment extends Fragment {
     }
 
     private void setUpToolBar() {
-        String toolBarTitle = "項目" + targetItemNumber + "タイトル編集中";
+        Integer targetItemNumber = diaryItemTitleEditViewModel.getItemNumberLiveData().getValue();
+        if (targetItemNumber == null) {
+            // TODO:assert
+            return;
+        }
+        String toolBarTitle = "項目" + targetItemNumber + " タイトル編集中";
         binding.materialToolbarTopAppBar.setTitle(toolBarTitle);
         binding.materialToolbarTopAppBar
                 .setNavigationOnClickListener(new View.OnClickListener() {
@@ -214,7 +222,17 @@ public class DiaryItemTitleEditFragment extends Fragment {
                 noKeyboardViews
         );
 
-        binding.editTextNewItemTitle.setText(targetItemTitle);
+        diaryItemTitleEditViewModel.getItemTitleLiveData()
+                .observe(getViewLifecycleOwner(), new Observer<String>() {
+                    @Override
+                    public void onChanged(String s) {
+                        if (s == null) {
+                            // TODO:assert
+                            return;
+                        }
+                        binding.editTextNewItemTitle.setText(s);
+                    }
+                });
 
         binding.buttonSelectNewItemTitle.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -557,6 +575,11 @@ public class DiaryItemTitleEditFragment extends Fragment {
             return;
         }
         SavedStateHandle savedStateHandle = navBackStackEntry.getSavedStateHandle();
+        Integer targetItemNumber = diaryItemTitleEditViewModel.getItemNumberLiveData().getValue();
+        if (targetItemNumber == null) {
+            // TODO:assert
+            return;
+        }
         savedStateHandle.set(KEY_UPDATE_ITEM_NUMBER, targetItemNumber);
         savedStateHandle.set(KEY_NEW_ITEM_TITLE, newItemTitle);
         showEditDiaryFragment();
@@ -577,15 +600,6 @@ public class DiaryItemTitleEditFragment extends Fragment {
         navController.navigate(action);
     }
 
-    private boolean canShowDialog() {
-        NavDestination navDestination = navController.getCurrentDestination();
-        if (navDestination == null) {
-            return false;
-        }
-        int currentDestinationId = navController.getCurrentDestination().getId();
-        return currentDestinationId == R.id.navigation_edit_diary_select_item_title_fragment;
-    }
-
     // 他のダイアログで表示できなかったダイアログを表示
     private void retryErrorDialogShow() {
         if (shouldShowItemTitleSelectionHistoryLoadingErrorDialog) {
@@ -594,7 +608,6 @@ public class DiaryItemTitleEditFragment extends Fragment {
         }
         if (shouldShowItemTitleSelectionHistoryItemDeleteErrorDialog) {
             showItemTitleSelectionHistoryItemDeleteErrorDialog();
-            return;
         }
     }
 
@@ -621,5 +634,14 @@ public class DiaryItemTitleEditFragment extends Fragment {
                 DiaryItemTitleEditFragmentDirections
                         .actionEditDiarySelectItemTitleFragmentToMessageDialog(title, message);
         navController.navigate(action);
+    }
+
+    private boolean canShowDialog() {
+        NavDestination navDestination = navController.getCurrentDestination();
+        if (navDestination == null) {
+            return false;
+        }
+        int currentDestinationId = navController.getCurrentDestination().getId();
+        return currentDestinationId == R.id.navigation_edit_diary_select_item_title_fragment;
     }
 }

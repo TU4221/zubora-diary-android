@@ -1,4 +1,4 @@
-package com.websarva.wings.android.zuboradiary.ui.list;
+package com.websarva.wings.android.zuboradiary.ui.list.diarylist;
 
 //リサイクルビューのアイテムにスワイプ機能、背面ボタンを追加するためのクラス。
 //参考：https://ameblo.jp/highcommunicate/entry-12651319381.html
@@ -10,26 +10,20 @@ import android.graphics.Paint;
 import android.graphics.Point;
 import android.graphics.Rect;
 import android.graphics.RectF;
-import android.os.Bundle;
 import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
 
 import androidx.annotation.NonNull;
-import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.navigation.NavController;
 import androidx.navigation.NavDirections;
-import androidx.navigation.Navigation;
-import androidx.navigation.fragment.NavHostFragment;
-import androidx.navigation.ui.NavigationUI;
 import androidx.recyclerview.widget.ItemTouchHelper;
-import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.websarva.wings.android.zuboradiary.R;
-import com.websarva.wings.android.zuboradiary.data.DateConverter;
+import com.websarva.wings.android.zuboradiary.ui.list.DiaryYearMonthListAdapter;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -94,7 +88,7 @@ public class CustomSimpleCallback extends ItemTouchHelper.SimpleCallback {
 
     //親リサイクルビュー
     private RecyclerView parentRecyclerView;
-    private DiaryListFragment.DiaryYearMonthListAdapter parentRecyclerViewAdapter;
+    private DiaryYearMonthListAdapter parentRecyclerViewAdapter;
 
     //ジェスチャー機能を使用した時に処理されるリスナ
     private GestureDetector.SimpleOnGestureListener gestureListener = new GestureDetector.SimpleOnGestureListener() {
@@ -184,7 +178,7 @@ public class CustomSimpleCallback extends ItemTouchHelper.SimpleCallback {
         this.fragmentManager = fragmentManager;
         this.navController = navController;
         this.parentRecyclerView = parentRecyclerView;
-        this.parentRecyclerViewAdapter = (DiaryListFragment.DiaryYearMonthListAdapter) parentRecyclerView.getAdapter();
+        this.parentRecyclerViewAdapter = (DiaryYearMonthListAdapter) parentRecyclerView.getAdapter();
     }
 
     //ドラッグされたとみなされる閾値を返す。
@@ -342,11 +336,10 @@ public class CustomSimpleCallback extends ItemTouchHelper.SimpleCallback {
                         recoverSwipeItem();
                         diaryDayListAdapter.notifyDataSetChanged();
 
-                        String deleteDiaryDate = diaryListDayViewHolder.date;
                         NavDirections action =
                                 DiaryListFragmentDirections
                                         .actionDiaryListFragmentToDeleteConfirmationDialog(
-                                                DateConverter.toLocalDate(deleteDiaryDate)
+                                                diaryListDayViewHolder.date
                                         );
                         CustomSimpleCallback.this.navController.navigate(action);
                     }

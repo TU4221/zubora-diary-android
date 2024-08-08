@@ -184,7 +184,7 @@ public class EditDiaryFragment extends Fragment {
                     receiveUpdateExistingDiaryDialogResult(savedStateHandle);
                     receiveDeleteConfirmDialogResult(savedStateHandle);
                     receiveWeatherInformationDialogResult(savedStateHandle);
-                    removeResults(savedStateHandle);
+                    removeDialogResults(savedStateHandle);
                     retryErrorDialogShow();
                 }
             }
@@ -198,14 +198,14 @@ public class EditDiaryFragment extends Fragment {
                     // MEMO:removeで削除しないとこのFragmentを閉じてもResult内容が残ってしまう。
                     //      その為、このFragmentを再表示した時にObserverがResultの内容で処理してしまう。
                     SavedStateHandle savedStateHandle = navBackStackEntry.getSavedStateHandle();
-                    removeResults(savedStateHandle);
+                    removeDialogResults(savedStateHandle);
                     navBackStackEntry.getLifecycle().removeObserver(lifecycleEventObserver);
                 }
             }
         });
     }
 
-    private void removeResults(SavedStateHandle savedStateHandle) {
+    private void removeDialogResults(SavedStateHandle savedStateHandle) {
         savedStateHandle.remove(DatePickerDialogFragment.KEY_SELECTED_DATE);
         savedStateHandle.remove(LoadExistingDiaryDialogFragment.KEY_SELECTED_BUTTON);
         savedStateHandle.remove(UpdateExistingDiaryDialogFragment.KEY_SELECTED_BUTTON);

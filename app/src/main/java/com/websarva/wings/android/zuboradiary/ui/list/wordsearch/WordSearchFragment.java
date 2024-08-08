@@ -33,7 +33,8 @@ import com.websarva.wings.android.zuboradiary.ui.KeyboardInitializer;
 import com.websarva.wings.android.zuboradiary.MainActivity;
 import com.websarva.wings.android.zuboradiary.R;
 import com.websarva.wings.android.zuboradiary.databinding.FragmentWordSearchBinding;
-import com.websarva.wings.android.zuboradiary.ui.list.DiaryListFragment;
+import com.websarva.wings.android.zuboradiary.ui.list.DiaryYearMonthListAdapter;
+import com.websarva.wings.android.zuboradiary.ui.list.diarylist.DiaryListFragment;
 import com.websarva.wings.android.zuboradiary.ui.list.DiaryListSetting;
 import com.websarva.wings.android.zuboradiary.ui.list.DiaryYearMonthListBaseViewHolder;
 import com.websarva.wings.android.zuboradiary.ui.list.NoDiaryMessageViewHolder;
@@ -46,13 +47,14 @@ public class WordSearchFragment extends Fragment {
 
     // View関係
     private FragmentWordSearchBinding binding;
-    private final int DIARY_DAY_LIST_ITEM_MARGIN_VERTICAL = 16;
-    private final int DIARY_DAY_LIST_ITEM_MARGIN_HORIZONTAL = 32;
-    private DiaryListSetting<DiaryListFragment.DiaryYearMonthListViewHolder> diaryListSetting;
-    private String beforeText = ""; // 二重検索防止用
+    private static final int DIARY_DAY_LIST_ITEM_MARGIN_VERTICAL = 16;
+    private static final int DIARY_DAY_LIST_ITEM_MARGIN_HORIZONTAL = 32;
+    private DiaryListSetting<DiaryYearMonthListAdapter.DiaryYearMonthListViewHolder> diaryListSetting;
+    private String lastText = ""; // 二重検索防止用
 
     // Navigation関係
     private NavController navController;
+    private boolean shouldShowDiaryListLoadingErrorDialog;
 
     // ViewModel
     private WordSearchViewModel wordSearchViewModel;
@@ -63,13 +65,13 @@ public class WordSearchFragment extends Fragment {
 
         // ViewModel設定
         ViewModelProvider provider = new ViewModelProvider(requireActivity());
-        this.wordSearchViewModel = provider.get(WordSearchViewModel.class);
+        wordSearchViewModel = provider.get(WordSearchViewModel.class);
 
         // Navigation設定
-        this.navController = NavHostFragment.findNavController(this);
+        navController = NavHostFragment.findNavController(this);
 
         // 日記リスト設定クラスインスタンス化
-        this.diaryListSetting = new DiaryListSetting<>();
+        diaryListSetting = new DiaryListSetting<>();
     }
 
     @Override
@@ -78,12 +80,11 @@ public class WordSearchFragment extends Fragment {
         super.onCreateView(inflater,container,savedInstanceState);
 
         // データバインディング設定
-        this.binding =
-                FragmentWordSearchBinding.inflate(inflater, container, false);
+        binding = FragmentWordSearchBinding.inflate(inflater, container, false);
 
         // 双方向データバインディング設定
-        this.binding.setLifecycleOwner(this);
-        this.binding.setWordSearchViewModel(this.wordSearchViewModel);
+        binding.setLifecycleOwner(this);
+        binding.setWordSearchViewModel(wordSearchViewModel);
 
         // 画面遷移時のアニメーション設定
         // FROM:遷移元 TO:遷移先
@@ -107,7 +108,7 @@ public class WordSearchFragment extends Fragment {
         // TO - FROM の TO として消えるアニメーション
         setReturnTransition(new MaterialSharedAxis(MaterialSharedAxis.X, false));
 
-        return this.binding.getRoot();
+        return binding.getRoot();
 
     }
 
@@ -115,54 +116,55 @@ public class WordSearchFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        // ツールバー設定
-        this.binding.materialToolbarTopAppBar
+        setUpToolBar();
+        setUpWordSearchView();
+        setUpWordSearchResultList();
+    }
+
+    private void setUpToolBar() {
+        binding.materialToolbarTopAppBar
                 .setNavigationOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        WordSearchFragment.this.navController.navigateUp();
+                        navController.navigateUp();
                     }
                 });
+    }
 
-
-        // キーワード検索欄設定
+    private void setUpWordSearchView() {
         if (wordSearchViewModel.getSearchWord().getValue().isEmpty()) {
             binding.editTextKeyWordSearch.requestFocus();
             KeyboardInitializer keyboardInitializer = new KeyboardInitializer(requireActivity());
             keyboardInitializer.show(binding.editTextKeyWordSearch);
         }
-        this.wordSearchViewModel.getSearchWord()
+        wordSearchViewModel.getSearchWord()
                 .observe(getViewLifecycleOwner(), new Observer<String>() {
                     @Override
                     public void onChanged(String s) {
-                        // HACK:キーワードの入力時と確定時に検索Observerが起動してしまい
-                        //      同じキーワードで二重に検索してしまう。防止策として下記条件追加。
-                        if (s.equals(WordSearchFragment.this.beforeText)) {
+                        if (s == null) {
+                            // TODO:assert
                             return;
                         }
-                        WordSearchFragment.this.wordSearchViewModel
+                        // HACK:キーワードの入力時と確定時に検索Observerが起動してしまい
+                        //      同じキーワードで二重に検索してしまう。防止策として下記条件追加。
+                        if (s.equals(lastText)) {
+                            return;
+                        }
+                        wordSearchViewModel
                                 .setIsVisibleSearchWordClearButton(!s.isEmpty());
-                        WordSearchFragment.this.wordSearchViewModel
+                        wordSearchViewModel
                                 .loadWordSearchResultListAsync(
                                         WordSearchViewModel.LoadType.NEW,
-                                        s,
-                                        new Runnable() {
-                                            @Override
-                                            public void run() {
-                                                String messageTitle = "通信エラー";
-                                                String message = "日記の読込に失敗しました。";
-                                                navigateMessageDialog(messageTitle, message);
-                                            }
-                                        }
+                                        s
                                 );
-                        WordSearchFragment.this.beforeText = s;
+                        lastText = s;
                     }
                 });
-        this.binding.editTextKeyWordSearch.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+
+        binding.editTextKeyWordSearch.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
             public void onFocusChange(View v, boolean hasFocus) {
-                View viewForHidingKeyboard =
-                        WordSearchFragment.this.binding.viewForHidingKeyboard;
+                View viewForHidingKeyboard = binding.viewForHidingKeyboard;
                 if (hasFocus) {
                     viewForHidingKeyboard.setOnTouchListener(new View.OnTouchListener() {
                         @Override
@@ -170,7 +172,7 @@ public class WordSearchFragment extends Fragment {
                             KeyboardInitializer keyboardInitializer =
                                     new KeyboardInitializer(requireActivity());
                             keyboardInitializer.hide(v);
-                            WordSearchFragment.this.binding.editTextKeyWordSearch.clearFocus();
+                            binding.editTextKeyWordSearch.clearFocus();
                             return false;
                         }
                     });
@@ -179,17 +181,18 @@ public class WordSearchFragment extends Fragment {
                 }
             }
         });
+
         // エンターキー押下時の処理
         // HACK:setImeOptions()メソッドを使用しなくても、onEditorAction()のactionIdはIME_ACTION_DONEとなるが、
         //      一応設定しておく。onEditorAction()のeventは常時nullとなっている。(ハードキーボードなら返ってくる？)
         //      https://vividcode.hatenablog.com/entry/android-app/oneditoractionlistener-practice
-        this.binding.editTextKeyWordSearch.setImeOptions(EditorInfo.IME_ACTION_DONE);
-        this.binding.editTextKeyWordSearch.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+        binding.editTextKeyWordSearch.setImeOptions(EditorInfo.IME_ACTION_DONE);
+        binding.editTextKeyWordSearch.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
                 if (actionId == EditorInfo.IME_ACTION_DONE
                         || (event != null && event.getAction() == KeyEvent.KEYCODE_ENTER
-                                                && event.getAction() == KeyEvent.ACTION_DOWN)) {
+                        && event.getAction() == KeyEvent.ACTION_DOWN)) {
                     KeyboardInitializer keyboardInitializer =
                             new KeyboardInitializer(requireActivity());
                     keyboardInitializer.hide(v);
@@ -199,7 +202,8 @@ public class WordSearchFragment extends Fragment {
                 return false;
             }
         });
-        this.binding.imageButtonKeyWordClear.setOnClickListener(new View.OnClickListener() {
+
+        binding.imageButtonKeyWordClear.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 wordSearchViewModel.clearSearchWord();
@@ -208,22 +212,10 @@ public class WordSearchFragment extends Fragment {
                 keyboardInitializer.show(binding.editTextKeyWordSearch);
             }
         });
+    }
 
-
-        // データベースから読み込んだ日記リストをリサクラービューに反映
-        this.wordSearchViewModel.getLiveDataWordSearchResultList().observe(
-                getViewLifecycleOwner(), new Observer<List<WordSearchResultYearMonthListItem>>() {
-                    @Override
-                    public void onChanged(
-                            List<WordSearchResultYearMonthListItem> wordSearchResultYearMonthListItems) {
-                        WordSearchResultYearMonthListAdapter wordSearchResultYearMonthListAdapter =
-                                (WordSearchResultYearMonthListAdapter)
-                                        WordSearchFragment.this.binding.recyclerWordSearchResults.getAdapter();
-                        wordSearchResultYearMonthListAdapter.submitList(wordSearchResultYearMonthListItems);
-                    }
-        });
-
-        RecyclerView recyclerWordSearchResults = this.binding.recyclerWordSearchResults;
+    private void setUpWordSearchResultList() {
+        RecyclerView recyclerWordSearchResults = binding.recyclerWordSearchResults;
         recyclerWordSearchResults.setLayoutManager(new LinearLayoutManager(requireContext()));
         WordSearchResultYearMonthListAdapter wordSearchResultYearMonthListAdapter =
                 new WordSearchResultYearMonthListAdapter(
@@ -242,10 +234,10 @@ public class WordSearchFragment extends Fragment {
             public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
                 super.onScrolled(recyclerView, dx, dy);
                 // 日記リスト先頭アイテムセクションバー位置更新
-                WordSearchFragment.this.diaryListSetting
+                diaryListSetting
                         .updateFirstVisibleSectionBarPosition(
                                 recyclerView,
-                                WordSearchFragment.this.DIARY_DAY_LIST_ITEM_MARGIN_VERTICAL
+                                DIARY_DAY_LIST_ITEM_MARGIN_VERTICAL
                         );
 
                 // 日記リスト追加読込
@@ -261,14 +253,14 @@ public class WordSearchFragment extends Fragment {
                 int lastItemViewType = recyclerView.getAdapter().getItemViewType(lastItemPosition);
                 // MEMO:下記条件"dy > 0"は検索結果リストが更新されたときに
                 //      "RecyclerView.OnScrollListener#onScrolled"が起動するための対策。
-                if (!WordSearchFragment.this.wordSearchViewModel.getIsLoading()
+                if (!wordSearchViewModel.getIsLoading()
                         && (firstVisibleItem + visibleItemCount) >= totalItemCount
                         && dy > 0
-                        && lastItemViewType == DiaryListFragment.DiaryYearMonthListAdapter.VIEW_TYPE_DIARY) {
-                    WordSearchFragment.this.wordSearchViewModel
+                        && lastItemViewType == DiaryYearMonthListAdapter.VIEW_TYPE_DIARY) {
+                    wordSearchViewModel
                             .loadWordSearchResultListAsync(
                                     WordSearchViewModel.LoadType.ADD,
-                                    WordSearchFragment.this.wordSearchViewModel.getSearchWord().getValue(),
+                                    wordSearchViewModel.getSearchWord().getValue(),
                                     new Runnable() {
                                         @Override
                                         public void run() {
@@ -287,20 +279,39 @@ public class WordSearchFragment extends Fragment {
                     View v, int left, int top, int right, int bottom,
                     int oldLeft, int oldTop, int oldRight, int oldBottom) {
                 // 日記追加読込後RecyclerView更新時、セクションバーが元の位置に戻るので再度位置更新
-                WordSearchFragment.this.diaryListSetting
+                diaryListSetting
                         .updateFirstVisibleSectionBarPosition(
                                 recyclerWordSearchResults,
-                                WordSearchFragment.this.DIARY_DAY_LIST_ITEM_MARGIN_VERTICAL
+                                DIARY_DAY_LIST_ITEM_MARGIN_VERTICAL
                         );
             }
         });
 
+        // データベースから読み込んだ日記リストをリサクラービューに反映
+        wordSearchViewModel.getLiveDataWordSearchResultList()
+                .observe(getViewLifecycleOwner(), new Observer<List<WordSearchResultYearMonthListItem>>() {
+                    @Override
+                    public void onChanged(
+                            List<WordSearchResultYearMonthListItem> wordSearchResultYearMonthListItems) {
+                        if (wordSearchResultYearMonthListItems == null) {
+                            return;
+                        }
+                        WordSearchResultYearMonthListAdapter wordSearchResultYearMonthListAdapter =
+                                (WordSearchResultYearMonthListAdapter)
+                                        binding.recyclerWordSearchResults.getAdapter();
+                        if (wordSearchResultYearMonthListAdapter == null) {
+                            return;
+                        }
+                        wordSearchResultYearMonthListAdapter.submitList(wordSearchResultYearMonthListItems);
+                    }
+                });
+
         // 検索結果リスト更新
-        if (!this.wordSearchViewModel.getLiveDataWordSearchResultList().getValue().isEmpty()) {
-            WordSearchFragment.this.wordSearchViewModel
+        if (!wordSearchViewModel.getLiveDataWordSearchResultList().getValue().isEmpty()) {
+            wordSearchViewModel
                     .loadWordSearchResultListAsync(
                             WordSearchViewModel.LoadType.UPDATE,
-                            WordSearchFragment.this.wordSearchViewModel.getSearchWord().getValue(),
+                            wordSearchViewModel.getSearchWord().getValue(),
                             new Runnable() {
                                 @Override
                                 public void run() {
@@ -312,7 +323,7 @@ public class WordSearchFragment extends Fragment {
                     );
         }
 
-        this.binding.viewWordSearchResultListProgressBar.setOnTouchListener(new View.OnTouchListener() {
+        binding.viewWordSearchResultListProgressBar.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
                 v.performClick();
@@ -321,9 +332,8 @@ public class WordSearchFragment extends Fragment {
         });
     }
 
-
     //日記リスト(日)リサイクルビューホルダークラス
-    public class WordSearchResultDayViewHolder extends RecyclerView.ViewHolder {
+    public static class WordSearchResultDayViewHolder extends RecyclerView.ViewHolder {
         public TextView textDayOfWeek;
         public TextView textDayOfMonth;
         public TextView textWordSearchResultTitle;
@@ -393,7 +403,7 @@ public class WordSearchFragment extends Fragment {
                             WordSearchFragmentDirections
                                     .actionNavigationWordSearchFragmentToShowDiaryFragment(
                                             LocalDate.of(year, month, dayOfMonth));
-                    WordSearchFragment.this.navController.navigate(action);
+                    navController.navigate(action);
                 }
             });
         }
@@ -446,8 +456,8 @@ public class WordSearchFragment extends Fragment {
 
         public WordSearchResultYearMonthListBaseViewHolder(View itemView) {
             super(itemView);
-            this.textSectionBar = itemView.findViewById(R.id.text_section_bar);
-            this.recyclerDayList = itemView.findViewById(R.id.recycler_day_list);
+            textSectionBar = itemView.findViewById(R.id.text_section_bar);
+            recyclerDayList = itemView.findViewById(R.id.recycler_day_list);
         }
     }
 
@@ -481,14 +491,14 @@ public class WordSearchFragment extends Fragment {
                             @NonNull RecyclerView parent,
                             @NonNull RecyclerView.State state) {
                         super.getItemOffsets(outRect, view, parent, state);
-                        outRect.top = WordSearchFragment.this.DIARY_DAY_LIST_ITEM_MARGIN_VERTICAL;
-                        outRect.left = WordSearchFragment.this.DIARY_DAY_LIST_ITEM_MARGIN_HORIZONTAL;
-                        outRect.right = WordSearchFragment.this.DIARY_DAY_LIST_ITEM_MARGIN_HORIZONTAL;
+                        outRect.top = DIARY_DAY_LIST_ITEM_MARGIN_VERTICAL;
+                        outRect.left = DIARY_DAY_LIST_ITEM_MARGIN_HORIZONTAL;
+                        outRect.right = DIARY_DAY_LIST_ITEM_MARGIN_HORIZONTAL;
 
                         // TODO:Fragment切り替え方法をNavigationへの置換後、代替メソッド検討
                         Log.d("リスト装飾確認",Integer.toString(parent.findContainingViewHolder(view).getAdapterPosition()));
                         if (parent.findContainingViewHolder(view).getAdapterPosition() == (parent.getAdapter().getItemCount() - 1)) {
-                            outRect.bottom = WordSearchFragment.this.DIARY_DAY_LIST_ITEM_MARGIN_VERTICAL;
+                            outRect.bottom = DIARY_DAY_LIST_ITEM_MARGIN_VERTICAL;
                         }
                     }
                 });
@@ -620,6 +630,6 @@ public class WordSearchFragment extends Fragment {
                 WordSearchFragmentDirections
                         .actionWordSearchFragmentToMessageDialog(
                                 title, message);
-        WordSearchFragment.this.navController.navigate(action);
+        navController.navigate(action);
     }
 }

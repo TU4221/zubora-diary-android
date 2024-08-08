@@ -1,39 +1,31 @@
-package com.websarva.wings.android.zuboradiary.ui.list;
+package com.websarva.wings.android.zuboradiary.ui.list.diarylist;
 
 import android.os.Build;
 
 import androidx.annotation.NonNull;
 
+import java.time.LocalDate;
 import java.util.UUID;
 
 public class DiaryDayListItem implements Cloneable {
     private final String id = UUID.randomUUID().toString();
-    private int year;
-    private int month;
-    private int dayOfMonth;
-    private String dayOfWeek = "";
-    private String title = "";
-    private String picturePath = "";
+    private LocalDate date;
+    private String title;
+    private String picturePath;
 
     public DiaryDayListItem() {
     }
 
-    public DiaryDayListItem(int year, int month, int dayOfMonth, @NonNull String dayOfWeek,
+    public DiaryDayListItem(@NonNull LocalDate date,
                             @NonNull String title , @NonNull String picturePath) {
-        this.year = year;
-        this.month = month;
-        this.dayOfMonth = dayOfMonth;
-        this.dayOfWeek = dayOfWeek;
+        this.date = date;
         this.title = title;
         this.picturePath = picturePath;
     }
 
     // MEMO:ID以外同じインスタンスを作成(cloneはIDも同じになるため)
     public DiaryDayListItem(DiaryDayListItem diaryDayListItem) {
-        this.year = diaryDayListItem.year;
-        this.month = diaryDayListItem.month;
-        this.dayOfMonth = diaryDayListItem.dayOfMonth;
-        this.dayOfWeek = diaryDayListItem.dayOfWeek;
+        this.date = diaryDayListItem.date;
         this.title = diaryDayListItem.title;
         this.picturePath = diaryDayListItem.picturePath;
     }
@@ -42,7 +34,7 @@ public class DiaryDayListItem implements Cloneable {
     @NonNull
     @Override
     public DiaryDayListItem clone() {
-        DiaryDayListItem clone = null;
+        DiaryDayListItem clone;
         try {
             clone = (DiaryDayListItem) super.clone();
         } catch (CloneNotSupportedException e) {
@@ -58,38 +50,17 @@ public class DiaryDayListItem implements Cloneable {
     public String getId() {
         return id;
     }
-    public int getYear() {
-        return year;
+
+    @NonNull
+    public LocalDate getDate() {
+        return date;
     }
 
-    public void setYear(int year) {
-        this.year = year;
+    public void setDate(LocalDate date) {
+        this.date = date;
     }
 
-    public int getMonth() {
-        return this.month;
-    }
-
-    public void setMonth(int month) {
-        this.month = month;
-    }
-
-    public int getDayOfMonth() {
-        return this.dayOfMonth;
-    }
-
-    public void setDayOfMonth(int dayOfMonth) {
-        this.dayOfMonth = dayOfMonth;
-    }
-
-    public String getDayOfWeek() {
-        return this.dayOfWeek;
-    }
-
-    public void setDayOfWeek(String dayOfWeek) {
-        this.dayOfWeek = dayOfWeek;
-    }
-
+    @NonNull
     public String getTitle() {
         return this.title;
     }
@@ -98,6 +69,7 @@ public class DiaryDayListItem implements Cloneable {
         this.title = title;
     }
 
+    @NonNull
     public String getPicturePath() {
         return this.picturePath;
     }

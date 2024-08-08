@@ -1,16 +1,10 @@
 package com.websarva.wings.android.zuboradiary.ui.list;
 
-import android.os.Handler;
-import android.os.Looper;
 import android.util.Log;
 import android.view.View;
 
-import androidx.core.os.HandlerCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 // 日記リストとワード検索結果リストの共通設定をここにまとめる。
 public class DiaryListSetting<E extends DiaryYearMonthListBaseViewHolder> {
@@ -66,11 +60,5 @@ public class DiaryListSetting<E extends DiaryYearMonthListBaseViewHolder> {
                     (DiaryYearMonthListBaseViewHolder) secondVisibleViewHolder;
             _secondVisibleViewHolder.textSectionBar.setY(0); // ズレ防止
         }
-
-
-
-
-
-
     }
 }

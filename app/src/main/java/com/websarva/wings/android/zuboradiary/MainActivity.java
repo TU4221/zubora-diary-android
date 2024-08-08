@@ -40,9 +40,8 @@ import androidx.navigation.ui.NavigationUI;
 import com.google.android.material.navigation.NavigationBarView;
 import com.google.android.material.transition.platform.MaterialFadeThrough;
 import com.websarva.wings.android.zuboradiary.databinding.ActivityMainBinding;
-import com.websarva.wings.android.zuboradiary.ui.KeyboardInitializer;
 import com.websarva.wings.android.zuboradiary.ui.calendar.CalendarFragment;
-import com.websarva.wings.android.zuboradiary.ui.list.DiaryListFragment;
+import com.websarva.wings.android.zuboradiary.ui.list.diarylist.DiaryListFragment;
 import com.websarva.wings.android.zuboradiary.ui.settings.SettingsViewModel;
 
 import dagger.hilt.android.AndroidEntryPoint;
