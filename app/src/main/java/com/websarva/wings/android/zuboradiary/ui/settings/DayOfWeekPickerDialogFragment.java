@@ -9,7 +9,7 @@ import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
 
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
-import com.websarva.wings.android.zuboradiary.data.settings.DayOfWeekNameResIdGetter;
+import com.websarva.wings.android.zuboradiary.data.DayOfWeekNameResIdGetter;
 import com.websarva.wings.android.zuboradiary.databinding.DialogFragmentNumberPickerBinding;
 
 import java.time.DayOfWeek;

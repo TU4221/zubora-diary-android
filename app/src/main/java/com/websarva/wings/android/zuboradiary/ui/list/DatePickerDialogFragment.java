@@ -5,6 +5,7 @@ import android.view.View;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.lifecycle.SavedStateHandle;
+import androidx.navigation.NavBackStackEntry;
 import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
 
@@ -12,19 +13,18 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import com.websarva.wings.android.zuboradiary.databinding.DialogFragmentTwoNumberPickersBinding;
 
 import java.time.LocalDate;
+import java.time.Year;
+import java.time.YearMonth;
 
 public class DatePickerDialogFragment extends BottomSheetDialogFragment {
     private static final String fromClassName = "From" + DatePickerDialogFragment.class.getName();
-    public static final String KEY_SELECTED_YEAR = "SelectedYear" + fromClassName;
-    public static final String KEY_SELECTED_MONTH = "SelectedMonth" + fromClassName;
+    public static final String KEY_SELECTED_YEAR_MONTH = "SelectedYearMonth" + fromClassName;
 
     // View関係
     private DialogFragmentTwoNumberPickersBinding binding;
 
     // Navigation関係
     private NavController navController;
-
-
 
     @Override
     public View onCreateView(
@@ -34,50 +34,54 @@ public class DatePickerDialogFragment extends BottomSheetDialogFragment {
         super.onCreateView(inflater, container, savedInstanceState);
 
         // Navigation設定
-        this.navController = NavHostFragment.findNavController(this);
+        navController = NavHostFragment.findNavController(this);
 
         // データバインディング設定
-        this.binding =
+        binding =
                 DialogFragmentTwoNumberPickersBinding.inflate(inflater, container, false);
 
         // View設定
         LocalDate today = LocalDate.now();
-        int yearMaxValue =
+        Year maxYear =
                 DatePickerDialogFragmentArgs.fromBundle(requireArguments()).getYearMaxValue();
-        int yearMinValue =
+        Year minYear =
                 DatePickerDialogFragmentArgs.fromBundle(requireArguments()).getYearMinValue();
-        this.binding.numberPickerFirst.setMaxValue(yearMaxValue);
-        this.binding.numberPickerFirst.setMinValue(yearMinValue);
-        this.binding.numberPickerFirst.setValue(today.getYear());
-        this.binding.numberPickerFirst.setWrapSelectorWheel(false);
-        this.binding.numberPickerSecond.setMaxValue(12);
-        this.binding.numberPickerSecond.setMinValue(1);
-        this.binding.numberPickerSecond.setValue(today.getMonthValue());
-        this.binding.numberPickerSecond.setWrapSelectorWheel(false);
+        binding.numberPickerFirst.setMaxValue(maxYear.getValue());
+        binding.numberPickerFirst.setMinValue(minYear.getValue());
+        binding.numberPickerFirst.setValue(today.getYear());
+        binding.numberPickerFirst.setWrapSelectorWheel(false);
+        binding.numberPickerSecond.setMaxValue(12);
+        binding.numberPickerSecond.setMinValue(1);
+        binding.numberPickerSecond.setValue(today.getMonthValue());
+        binding.numberPickerSecond.setWrapSelectorWheel(false);
 
-        this.binding.buttonDecision.setOnClickListener(new View.OnClickListener() {
+        binding.buttonDecision.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                int selectedYear =
-                        DatePickerDialogFragment.this.binding.numberPickerFirst.getValue();
-                int selectedMonth =
-                        DatePickerDialogFragment.this.binding.numberPickerSecond.getValue();
+                NavBackStackEntry navBackStackEntry = navController.getPreviousBackStackEntry();
+                if (navBackStackEntry == null) {
+                    // TODO:assert
+                    return;
+                }
                 SavedStateHandle savedStateHandle =
-                        DatePickerDialogFragment.this.navController
-                                .getPreviousBackStackEntry().getSavedStateHandle();
-                savedStateHandle.set(KEY_SELECTED_YEAR, selectedYear);
-                savedStateHandle.set(KEY_SELECTED_MONTH, selectedMonth);
-                DatePickerDialogFragment.this.navController.navigateUp();
+                        navController.getPreviousBackStackEntry().getSavedStateHandle();
+                int selectedYear =
+                        binding.numberPickerFirst.getValue();
+                int selectedMonth =
+                        binding.numberPickerSecond.getValue();
+                YearMonth selectedYearMonth = YearMonth.of(selectedYear, selectedMonth);
+                savedStateHandle.set(KEY_SELECTED_YEAR_MONTH, selectedYearMonth);
+                navController.navigateUp();
             }
         });
 
-        this.binding.buttonCancel.setOnClickListener(new View.OnClickListener() {
+        binding.buttonCancel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                DatePickerDialogFragment.this.navController.navigateUp();
+                navController.navigateUp();
             }
         });
 
-        return this.binding.getRoot();
+        return binding.getRoot();
     }
 }

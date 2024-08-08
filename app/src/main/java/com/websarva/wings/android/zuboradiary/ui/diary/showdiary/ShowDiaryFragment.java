@@ -30,7 +30,6 @@ import com.websarva.wings.android.zuboradiary.R;
 import com.websarva.wings.android.zuboradiary.data.DateConverter;
 import com.websarva.wings.android.zuboradiary.databinding.FragmentShowDiaryBinding;
 import com.websarva.wings.android.zuboradiary.ui.diary.DiaryLiveData;
-import com.websarva.wings.android.zuboradiary.ui.diary.editdiary.DatePickerDialogFragment;
 import com.websarva.wings.android.zuboradiary.ui.observer.ShowDiaryConditionObserver;
 import com.websarva.wings.android.zuboradiary.ui.observer.ShowDiaryLogObserver;
 import com.websarva.wings.android.zuboradiary.ui.observer.ShowDiaryNumVisibleItemsObserver;
@@ -124,6 +123,7 @@ public class ShowDiaryFragment extends Fragment {
                 if (event.equals(Lifecycle.Event.ON_RESUME)) {
                     SavedStateHandle savedStateHandle = navBackStackEntry.getSavedStateHandle();
                     receiveDeleteConfirmationDialogResult(savedStateHandle);
+                    removeDialogResults(savedStateHandle);
                     retryErrorDialogShow();
                 }
             }
@@ -137,7 +137,7 @@ public class ShowDiaryFragment extends Fragment {
                     // MEMO:removeで削除しないとこのFragmentを閉じてもResult内容が残ってしまう。
                     //      その為、このFragmentを再表示した時にObserverがResultの内容で処理してしまう。
                     SavedStateHandle savedStateHandle = navBackStackEntry.getSavedStateHandle();
-                    removeResults(savedStateHandle);
+                    removeDialogResults(savedStateHandle);
                     // TODO:下記コード意味あるか検証。コメントアウトしてFragment切替後の状態を確認したがObserverが重複することはなかった。
                     navBackStackEntry.getLifecycle().removeObserver(lifecycleEventObserver);
                 }
@@ -145,7 +145,7 @@ public class ShowDiaryFragment extends Fragment {
         });
     }
 
-    private void removeResults(SavedStateHandle savedStateHandle) {
+    private void removeDialogResults(SavedStateHandle savedStateHandle) {
         savedStateHandle.remove(DeleteConfirmationDialogFragment.KEY_SELECTED_BUTTON);
     }
 

@@ -1,31 +1,15 @@
 package com.websarva.wings.android.zuboradiary.ui.list;
 
+import java.time.LocalDate;
+
 public class SwipedDiaryDate {
-    private int year;
-    private int month;
-    private int dayOfMonth;
+    private LocalDate date;
 
-    public int getYear() {
-        return this.year;
+    public LocalDate getDate() {
+        return this.date;
     }
 
-    public void setYear(int year) {
-        this.year = year;
-    }
-
-    public int getMonth() {
-        return this.month;
-    }
-
-    public void setMonth(int month) {
-        this.month = month;
-    }
-
-    public int getDayOfMonth() {
-        return this.dayOfMonth;
-    }
-
-    public void setDayOfMonth(int dayOfMonth) {
-        this.dayOfMonth = dayOfMonth;
+    public void setDate(LocalDate date) {
+        this.date = date;
     }
 }

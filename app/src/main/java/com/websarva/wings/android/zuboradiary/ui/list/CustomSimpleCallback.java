@@ -342,11 +342,10 @@ public class CustomSimpleCallback extends ItemTouchHelper.SimpleCallback {
                         recoverSwipeItem();
                         diaryDayListAdapter.notifyDataSetChanged();
 
-                        String deleteDiaryDate = diaryListDayViewHolder.date;
                         NavDirections action =
                                 DiaryListFragmentDirections
                                         .actionDiaryListFragmentToDeleteConfirmationDialog(
-                                                DateConverter.toLocalDate(deleteDiaryDate)
+                                                diaryListDayViewHolder.date
                                         );
                         CustomSimpleCallback.this.navController.navigate(action);
                     }

@@ -20,6 +20,7 @@ import com.websarva.wings.android.zuboradiary.ui.list.wordsearch.WordSearchResul
 import org.jetbrains.annotations.Nullable;
 
 import java.time.LocalDate;
+import java.time.YearMonth;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -95,7 +96,8 @@ public class DiaryRepository {
     private List<DiaryYearMonthListItem> toDiaryYearMonthListFormat(List<DiaryListItem> beforeList) {
         List<DiaryDayListItem> diaryDayList = new ArrayList<>();
         DiaryDayListItem diaryDayListItem;
-        String date;
+        String strDate;
+        LocalDate date;
         String title;
         String picturePath;
         String year;
@@ -106,56 +108,47 @@ public class DiaryRepository {
         int startIndex;
         int endIndex;
         for (DiaryListItem diaryListItem : beforeList) {
-            date = diaryListItem.getDate();
+            strDate = diaryListItem.getDate();
+            date = LocalDate.parse(strDate);
             title = diaryListItem.getTitle();
             picturePath = diaryListItem.getPicturePath();
-            startIndex = 0;
-            endIndex = date.indexOf("年");
-            year = date.substring(startIndex, endIndex);
+            // TODO:不要確認後削除
+            /*startIndex = 0;
+            endIndex = strDate.indexOf("年");
+            year = strDate.substring(startIndex, endIndex);
             startIndex = endIndex + 1;
-            endIndex = date.indexOf("月");
-            month = date.substring(startIndex, endIndex);
+            endIndex = strDate.indexOf("月");
+            month = strDate.substring(startIndex, endIndex);
             startIndex = endIndex + 1;
-            endIndex = date.indexOf("日");
-            dayOfMonth = date.substring(startIndex, endIndex);
-            startIndex = date.indexOf("(") + 1;
-            endIndex = date.indexOf(")");
-            dayOfWeek = date.substring(startIndex, endIndex);
-            diaryDayListItem =
-                    new DiaryDayListItem(
-                            Integer.parseInt(year),
-                            Integer.parseInt(month),
-                            Integer.parseInt(dayOfMonth),
-                            dayOfWeek,
-                            title,
-                            picturePath
-                    );
+            endIndex = strDate.indexOf("日");
+            dayOfMonth = strDate.substring(startIndex, endIndex);
+            startIndex = strDate.indexOf("(") + 1;
+            endIndex = strDate.indexOf(")");
+            dayOfWeek = strDate.substring(startIndex, endIndex);*/
+            diaryDayListItem = new DiaryDayListItem(date, title, picturePath);
             diaryDayList.add(diaryDayListItem);
         }
 
         // 日記リストを月別に振り分ける
         List<DiaryDayListItem> sortingList= new ArrayList<>();
         List<DiaryYearMonthListItem> diaryYearMonthList = new ArrayList<>();
-        int sortingYear = 0;
-        int sortingMonth = 0;
+        YearMonth sortingYearMonth = null;
 
         for (DiaryDayListItem day: diaryDayList) {
-            int _year = day.getYear();
-            int _Month = day.getMonth();
+            LocalDate _date = day.getDate();
+            YearMonth _yearMonth = YearMonth.of(_date.getYear(), _date.getMonth());
 
-            if (sortingYear != 0 && sortingMonth != 0
-                    && (_year != sortingYear || _Month != sortingMonth)) {
+            if (sortingYearMonth != null && _yearMonth != sortingYearMonth) {
                 diaryYearMonthList.add(
-                        new DiaryYearMonthListItem(sortingYear, sortingMonth, sortingList, VIEW_TYPE_DIARY)
+                        new DiaryYearMonthListItem(sortingYearMonth, sortingList, VIEW_TYPE_DIARY)
                 );
                 sortingList= new ArrayList<>();
             }
             sortingList.add(day);
-            sortingYear = _year;
-            sortingMonth = _Month;
+            sortingYearMonth = _yearMonth;
         }
         diaryYearMonthList.add(
-                new DiaryYearMonthListItem(sortingYear, sortingMonth, sortingList, VIEW_TYPE_DIARY)
+                new DiaryYearMonthListItem(sortingYearMonth, sortingList, VIEW_TYPE_DIARY)
         );
 
         return diaryYearMonthList;

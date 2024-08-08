@@ -4,33 +4,30 @@ import android.os.Build;
 
 import androidx.annotation.NonNull;
 
+import java.time.Year;
+import java.time.YearMonth;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
 public class DiaryYearMonthListItem implements Cloneable {
     private final String id = UUID.randomUUID().toString();
-    private int year;
-    private int month;
-    private List<DiaryDayListItem> diaryDayListItemList = new ArrayList<>();
+    private YearMonth yearMonth;
+    private List<DiaryDayListItem> diaryDayListItemList;
     private int viewType;
 
-    public DiaryYearMonthListItem() {
-    }
-
-    public DiaryYearMonthListItem(
-            int year, int month, List<DiaryDayListItem> diaryDayListItemList, int viewType) {
-        this.year = year;
-        this.month = month;
-        this.diaryDayListItemList = diaryDayListItemList;
+    public DiaryYearMonthListItem(int viewType) {
+        yearMonth = null;
+        diaryDayListItemList = new ArrayList<>();
         this.viewType = viewType;
     }
 
-    public DiaryYearMonthListItem(DiaryYearMonthListItem diaryYearMonthListItem) {
-        this.year = diaryYearMonthListItem.year;
-        this.month = diaryYearMonthListItem.month;
-        this.diaryDayListItemList = diaryYearMonthListItem.diaryDayListItemList;
-        this.viewType = diaryYearMonthListItem.viewType;
+    public DiaryYearMonthListItem(
+            @NonNull YearMonth yearMonth,
+            @NonNull List<DiaryDayListItem> diaryDayListItemList, int viewType) {
+        this.yearMonth = yearMonth;
+        this.diaryDayListItemList = diaryDayListItemList;
+        this.viewType = viewType;
     }
 
     // Object#clone例外処理:https://yujisoftware.hatenablog.com/entry/CloneNotSupportedException
@@ -60,20 +57,12 @@ public class DiaryYearMonthListItem implements Cloneable {
         return id;
     }
 
-    public int getYear() {
-        return year;
+    public YearMonth getYearMonth() {
+        return this.yearMonth;
     }
 
-    public void setYear(int year) {
-        this.year = year;
-    }
-
-    public int getMonth() {
-        return this.month;
-    }
-
-    public void setMonth(int month) {
-        this.month = month;
+    public void setYearMonth(YearMonth yearMonth) {
+        this.yearMonth = yearMonth;
     }
 
     public List<DiaryDayListItem> getDiaryDayListItemList() {

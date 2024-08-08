@@ -1,11 +1,7 @@
 package com.websarva.wings.android.zuboradiary.ui.list;
 
-import androidx.annotation.NonNull;
-
 public class DiaryListItem {
-    @NonNull
     private String date;
-    @NonNull
     private String title;
     private String picturePath;
 
@@ -21,7 +17,7 @@ public class DiaryListItem {
         return title;
     }
 
-    public void setTitle(@NonNull String title) {
+    public void setTitle(String title) {
         this.title = title;
     }
 
