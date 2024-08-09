@@ -23,6 +23,7 @@ import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.websarva.wings.android.zuboradiary.R;
+import com.websarva.wings.android.zuboradiary.ui.list.DiaryDayListAdapter;
 import com.websarva.wings.android.zuboradiary.ui.list.DiaryYearMonthListAdapter;
 
 import java.util.ArrayList;
@@ -302,7 +303,7 @@ public class CustomSimpleCallback extends ItemTouchHelper.SimpleCallback {
         }
         super.onChildDraw(c, recyclerView, viewHolder, translationX, dY, actionState, isCurrentlyActive);*/
         super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
-        DiaryListFragment.DiaryDayListViewHolder viewHolder1 = (DiaryListFragment.DiaryDayListViewHolder) viewHolder;
+        DiaryDayListAdapter.DiaryDayListViewHolder viewHolder1 = (DiaryDayListAdapter.DiaryDayListViewHolder) viewHolder;
         View itemView = viewHolder.itemView;
         getDefaultUIUtil().onDraw(c, recyclerView, itemView.findViewById(R.id.frame_layout_row_diary_day_list), 0, 0, actionState, isCurrentlyActive);
         getDefaultUIUtil().onDraw(c, recyclerView, itemView.findViewById(R.id.liner_layout_front), dX, dY, actionState, isCurrentlyActive);
@@ -320,8 +321,8 @@ public class CustomSimpleCallback extends ItemTouchHelper.SimpleCallback {
                         // 背面ボタン(削除)の処理内容
 
                         //削除確認ダイアログ起動
-                        DiaryListFragment.DiaryDayListAdapter diaryDayListAdapter = (DiaryListFragment.DiaryDayListAdapter) CustomSimpleCallback.this.recyclerView.getAdapter();
-                        DiaryListFragment.DiaryDayListViewHolder diaryListDayViewHolder = (DiaryListFragment.DiaryDayListViewHolder) holder;
+                        DiaryDayListAdapter diaryDayListAdapter = (DiaryDayListAdapter) CustomSimpleCallback.this.recyclerView.getAdapter();
+                       DiaryDayListAdapter.DiaryDayListViewHolder diaryListDayViewHolder = (DiaryDayListAdapter.DiaryDayListViewHolder) holder;
 
                         // 削除確認ダイアログ起動前に対象のアイテムの状態をスワイプ前の状態に戻す。
                         // (ダイアログクラスからCustomSimpleCallbackのインスタンスを参照できないため、ダイアログ起動前に状態を戻す)
@@ -339,7 +340,7 @@ public class CustomSimpleCallback extends ItemTouchHelper.SimpleCallback {
                         NavDirections action =
                                 DiaryListFragmentDirections
                                         .actionDiaryListFragmentToDeleteConfirmationDialog(
-                                                diaryListDayViewHolder.date
+                                                diaryListDayViewHolder.getDate()
                                         );
                         CustomSimpleCallback.this.navController.navigate(action);
                     }
@@ -367,8 +368,8 @@ public class CustomSimpleCallback extends ItemTouchHelper.SimpleCallback {
             int pos = recoverQueue.poll();
             if (pos > -1) {
                 //対象のアイテムの表示を更新する。(アイテムの状態をスワイプ前の状態に戻す)
-                DiaryListFragment.DiaryDayListAdapter listAdapter =
-                        (DiaryListFragment.DiaryDayListAdapter) this.recyclerView.getAdapter();
+                DiaryDayListAdapter listAdapter =
+                        (DiaryDayListAdapter) this.recyclerView.getAdapter();
                 List<DiaryDayListItem> currentList = listAdapter.getCurrentList();
                 DiaryDayListItem currentItem = currentList.get(pos);
                 List<DiaryDayListItem> newList = new ArrayList<>(currentList);

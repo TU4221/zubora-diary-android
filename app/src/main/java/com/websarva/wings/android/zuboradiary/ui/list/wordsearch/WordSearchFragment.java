@@ -1,6 +1,5 @@
 package com.websarva.wings.android.zuboradiary.ui.list.wordsearch;
 
-import android.graphics.Rect;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -17,7 +16,6 @@ import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.text.SpannableString;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -29,18 +27,16 @@ import android.widget.TextView;
 import com.google.android.material.transition.platform.MaterialFadeThrough;
 import com.google.android.material.transition.platform.MaterialSharedAxis;
 import com.websarva.wings.android.zuboradiary.data.DateConverter;
+import com.websarva.wings.android.zuboradiary.ui.DiaryYearMonthListItemBase;
 import com.websarva.wings.android.zuboradiary.ui.KeyboardInitializer;
 import com.websarva.wings.android.zuboradiary.MainActivity;
 import com.websarva.wings.android.zuboradiary.R;
 import com.websarva.wings.android.zuboradiary.databinding.FragmentWordSearchBinding;
 import com.websarva.wings.android.zuboradiary.ui.list.DiaryYearMonthListAdapter;
-import com.websarva.wings.android.zuboradiary.ui.list.diarylist.DiaryListFragment;
 import com.websarva.wings.android.zuboradiary.ui.list.DiaryListSetting;
-import com.websarva.wings.android.zuboradiary.ui.list.DiaryYearMonthListBaseViewHolder;
-import com.websarva.wings.android.zuboradiary.ui.list.NoDiaryMessageViewHolder;
-import com.websarva.wings.android.zuboradiary.ui.list.ProgressBarViewHolder;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 public class WordSearchFragment extends Fragment {
@@ -217,10 +213,8 @@ public class WordSearchFragment extends Fragment {
     private void setUpWordSearchResultList() {
         RecyclerView recyclerWordSearchResults = binding.recyclerWordSearchResults;
         recyclerWordSearchResults.setLayoutManager(new LinearLayoutManager(requireContext()));
-        WordSearchResultYearMonthListAdapter wordSearchResultYearMonthListAdapter =
-                new WordSearchResultYearMonthListAdapter(
-                        new WordSearchResultYearMonthListDiffUtilItemCallback()
-                );
+        DiaryYearMonthListAdapter wordSearchResultYearMonthListAdapter =
+                new DiaryYearMonthListAdapter(requireContext(), this::showShowDiaryFragment, false);
         recyclerWordSearchResults.setAdapter(wordSearchResultYearMonthListAdapter);
         // HACK:下記問題が発生する為アイテムアニメーションを無効化
         //      問題1.アイテム追加時もやがかかる。今回の構成(親Recycler:年月、子Recycler:日)上、
@@ -266,7 +260,7 @@ public class WordSearchFragment extends Fragment {
                                         public void run() {
                                             String messageTitle = "通信エラー";
                                             String message = "日記リストの読込に失敗しました。";
-                                            navigateMessageDialog(messageTitle, message);
+                                            showMessageDialog(messageTitle, message);
                                         }
                                     }
                             );
@@ -296,13 +290,15 @@ public class WordSearchFragment extends Fragment {
                         if (wordSearchResultYearMonthListItems == null) {
                             return;
                         }
-                        WordSearchResultYearMonthListAdapter wordSearchResultYearMonthListAdapter =
-                                (WordSearchResultYearMonthListAdapter)
+                        DiaryYearMonthListAdapter wordSearchResultYearMonthListAdapter =
+                                (DiaryYearMonthListAdapter)
                                         binding.recyclerWordSearchResults.getAdapter();
                         if (wordSearchResultYearMonthListAdapter == null) {
                             return;
                         }
-                        wordSearchResultYearMonthListAdapter.submitList(wordSearchResultYearMonthListItems);
+                        List<DiaryYearMonthListItemBase> convertedList =
+                                new ArrayList<>(wordSearchResultYearMonthListItems);
+                        wordSearchResultYearMonthListAdapter.submitList(convertedList);
                     }
                 });
 
@@ -317,7 +313,7 @@ public class WordSearchFragment extends Fragment {
                                 public void run() {
                                     String messageTitle = "通信エラー";
                                     String message = "日記リストの読込に失敗しました。";
-                                    navigateMessageDialog(messageTitle, message);
+                                    showMessageDialog(messageTitle, message);
                                 }
                             }
                     );
@@ -333,7 +329,7 @@ public class WordSearchFragment extends Fragment {
     }
 
     //日記リスト(日)リサイクルビューホルダークラス
-    public static class WordSearchResultDayViewHolder extends RecyclerView.ViewHolder {
+    /*public static class WordSearchResultDayViewHolder extends RecyclerView.ViewHolder {
         public TextView textDayOfWeek;
         public TextView textDayOfMonth;
         public TextView textWordSearchResultTitle;
@@ -355,10 +351,10 @@ public class WordSearchFragment extends Fragment {
                     itemView.findViewById(R.id.text_word_search_result_item_comment);
 
         }
-    }
+    }*/
 
     //日記リスト(日)リサイクルビューアダプタクラス
-    public class WordSearchResultDayListAdapter
+    /*public class WordSearchResultDayListAdapter
             extends ListAdapter<WordSearchResultDayListItem, WordSearchResultDayViewHolder> {
 
         public WordSearchResultDayListAdapter(
@@ -408,9 +404,9 @@ public class WordSearchFragment extends Fragment {
             });
         }
 
-    }
+    }*/
 
-    public class WordSearchResultDayListDiffUtilItemCallback
+    /*public static class WordSearchResultDayListDiffUtilItemCallback
             extends DiffUtil.ItemCallback<WordSearchResultDayListItem> {
         @Override
         public boolean areItemsTheSame(@NonNull WordSearchResultDayListItem oldItem, @NonNull WordSearchResultDayListItem newItem) {
@@ -447,11 +443,12 @@ public class WordSearchFragment extends Fragment {
             }
             return true;
         }
-    }
+    }*/
 
 
+    // TODO:確認後削除
     //日記リスト(年月)リサイクルビューホルダークラス
-    private class WordSearchResultYearMonthListBaseViewHolder extends DiaryYearMonthListBaseViewHolder {
+    /*private class WordSearchResultYearMonthListBaseViewHolder extends DiaryYearMonthListBaseViewHolder {
         public RecyclerView recyclerDayList;
 
         public WordSearchResultYearMonthListBaseViewHolder(View itemView) {
@@ -459,10 +456,10 @@ public class WordSearchFragment extends Fragment {
             textSectionBar = itemView.findViewById(R.id.text_section_bar);
             recyclerDayList = itemView.findViewById(R.id.recycler_day_list);
         }
-    }
+    }*/
 
     //日記リスト(年月)リサイクルビューアダプタクラス
-    public class WordSearchResultYearMonthListAdapter
+    /*public class WordSearchResultYearMonthListAdapter
             extends ListAdapter<WordSearchResultYearMonthListItem, RecyclerView.ViewHolder> {
         public static final int VIEW_TYPE_DIARY = 0;
         public static final int VIEW_TYPE_PROGRESS_BAR = 1;
@@ -551,9 +548,9 @@ public class WordSearchFragment extends Fragment {
             WordSearchResultYearMonthListItem item = getItem(position);
             return item.getViewType();
         }
-    }
+    }*/
 
-    public class WordSearchResultYearMonthListDiffUtilItemCallback
+    /*public class WordSearchResultYearMonthListDiffUtilItemCallback
             extends DiffUtil.ItemCallback<WordSearchResultYearMonthListItem> {
         @Override
         public boolean areItemsTheSame(
@@ -623,9 +620,9 @@ public class WordSearchFragment extends Fragment {
 
             return true;
         }
-    }
+    }*/
 
-    private void navigateMessageDialog(String title, String message) {
+    private void showMessageDialog(String title, String message) {
         NavDirections action =
                 WordSearchFragmentDirections
                         .actionWordSearchFragmentToMessageDialog(

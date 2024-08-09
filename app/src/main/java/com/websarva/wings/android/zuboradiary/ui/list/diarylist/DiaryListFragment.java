@@ -2,7 +2,6 @@ package com.websarva.wings.android.zuboradiary.ui.list.diarylist;
 
 import android.content.Context;
 import android.graphics.Canvas;
-import android.graphics.Rect;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -25,11 +24,9 @@ import androidx.navigation.NavController;
 import androidx.navigation.NavDestination;
 import androidx.navigation.NavDirections;
 import androidx.navigation.fragment.NavHostFragment;
-import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.LinearSmoothScroller;
-import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.transition.platform.MaterialFadeThrough;
@@ -42,18 +39,13 @@ import java.time.Year;
 import java.time.YearMonth;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
-import com.websarva.wings.android.zuboradiary.data.DayOfWeekNameResIdGetter;
 import com.websarva.wings.android.zuboradiary.data.database.Diary;
 import com.websarva.wings.android.zuboradiary.databinding.FragmentDiaryListBinding;
-import com.websarva.wings.android.zuboradiary.databinding.RowDiaryDayListBinding;
 import com.websarva.wings.android.zuboradiary.ui.DiaryYearMonthListItemBase;
+import com.websarva.wings.android.zuboradiary.ui.list.DiaryDayListAdapter;
 import com.websarva.wings.android.zuboradiary.ui.list.DiaryListSetting;
 import com.websarva.wings.android.zuboradiary.ui.list.DiaryYearMonthListAdapter;
-import com.websarva.wings.android.zuboradiary.ui.list.DiaryYearMonthListBaseViewHolder;
-import com.websarva.wings.android.zuboradiary.ui.list.NoDiaryMessageViewHolder;
-import com.websarva.wings.android.zuboradiary.ui.list.ProgressBarViewHolder;
 import com.websarva.wings.android.zuboradiary.ui.list.wordsearch.WordSearchViewModel;
 
 import dagger.hilt.android.AndroidEntryPoint;
@@ -263,7 +255,7 @@ public class DiaryListFragment extends Fragment {
         recyclerDiaryYearMonthList
                 .setLayoutManager(diaryListYearMonthLinearLayoutManager);
         DiaryYearMonthListAdapter diaryYearMonthListAdapter =
-                new DiaryYearMonthListAdapter(requireContext());
+                new DiaryYearMonthListAdapter(requireContext(), this::showShowDiaryFragment, true);
         recyclerDiaryYearMonthList.setAdapter(diaryYearMonthListAdapter);
         // HACK:下記問題が発生する為アイテムアニメーションを無効化
         //      問題1.アイテム追加時もやがかかる。今回の構成(親Recycler:年月、子Recycler:日)上、
@@ -385,17 +377,17 @@ public class DiaryListFragment extends Fragment {
 
     // TODO:public -> なし or private に変更しても良いか検証する
     //日記リスト(日)リサイクルビューホルダークラス
-    public static class DiaryDayListViewHolder extends RecyclerView.ViewHolder {
+    /*public static class DiaryDayListViewHolder extends RecyclerView.ViewHolder {
         RowDiaryDayListBinding binding;
         LocalDate date;
         public DiaryDayListViewHolder(RowDiaryDayListBinding binding) {
             super(binding.getRoot());
             this.binding = binding;
         }
-    }
+    }*/
 
     //日記リスト(日)リサイクルビューアダプタクラス
-    public class DiaryDayListAdapter extends ListAdapter<DiaryDayListItem, DiaryDayListViewHolder> {
+    /*public class DiaryDayListAdapter extends ListAdapter<DiaryDayListItem, DiaryDayListViewHolder> {
 
         public DiaryDayListAdapter(@NonNull DiffUtil.ItemCallback<DiaryDayListItem> diffCallback){
             super(diffCallback);
@@ -405,8 +397,8 @@ public class DiaryListFragment extends Fragment {
         @Override
         public DiaryDayListViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
             // TODO:確認後削除
-            /*LayoutInflater inflater = LayoutInflater.from(parent.getContext());
-            View view = inflater.inflate(R.layout.row_diary_day_list, parent, false);*/
+            *//*LayoutInflater inflater = LayoutInflater.from(parent.getContext());
+            View view = inflater.inflate(R.layout.row_diary_day_list, parent, false);*//*
 
             RowDiaryDayListBinding binding =
                     RowDiaryDayListBinding
@@ -440,7 +432,7 @@ public class DiaryListFragment extends Fragment {
             });
 
             // TODO:背面削除ボタン処理保留
-            /*holder.binding.textDeleteDiary.setOnClickListener(new View.OnClickListener() {
+            *//*holder.binding.textDeleteDiary.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     NavDirections action =
@@ -448,11 +440,11 @@ public class DiaryListFragment extends Fragment {
                                     .actionDiaryListFragmentToDeleteConfirmationDialog(date);
                     navController.navigate(action);
                 }
-            });*/
+            });*//*
         }
-    }
+    }*/
 
-    public static class DiaryDayListDiffUtilItemCallback extends DiffUtil.ItemCallback<DiaryDayListItem> {
+    /*public static class DiaryDayListDiffUtilItemCallback extends DiffUtil.ItemCallback<DiaryDayListItem> {
         @Override
         public boolean areItemsTheSame(@NonNull DiaryDayListItem oldItem, @NonNull DiaryDayListItem newItem) {
             return oldItem.getId().equals(newItem.getId());
@@ -471,7 +463,7 @@ public class DiaryListFragment extends Fragment {
             }
             return true;
         }
-    }
+    }*/
 
 
     // TODO:確認後削除
@@ -726,8 +718,9 @@ public class DiaryListFragment extends Fragment {
 
         @Override
         public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
-            DiaryDayListViewHolder diaryDayListViewHolder = (DiaryDayListViewHolder) viewHolder;
-            swipedDate.setDate(diaryDayListViewHolder.date);
+            DiaryDayListAdapter.DiaryDayListViewHolder diaryDayListViewHolder =
+                    (DiaryDayListAdapter.DiaryDayListViewHolder) viewHolder;
+            swipedDate.setDate(diaryDayListViewHolder.getDate());
             Log.d("20240701_1", "onSwiped");
         }
 
@@ -750,10 +743,11 @@ public class DiaryListFragment extends Fragment {
             }
 
             super.onChildDraw(c, recyclerView, viewHolder, transitionX, dY, actionState, isCurrentlyActive);
-            DiaryDayListViewHolder diaryDayListViewHolder = (DiaryDayListViewHolder) viewHolder;
+            DiaryDayListAdapter.DiaryDayListViewHolder diaryDayListViewHolder =
+                    (DiaryDayListAdapter.DiaryDayListViewHolder) viewHolder;
             getDefaultUIUtil()
                     .onDraw(
-                            c, recyclerView, diaryDayListViewHolder.binding.frameLayoutRowDiaryDayList,
+                            c, recyclerView, diaryDayListViewHolder.getBinding().frameLayoutRowDiaryDayList,
                             0, 0, actionState, isCurrentlyActive
                     );
 
@@ -951,7 +945,7 @@ public class DiaryListFragment extends Fragment {
         navController.navigate(action);
     }
 
-    private void showShowDiary(LocalDate date) {
+    private void showShowDiaryFragment(LocalDate date) {
         NavDirections action =
                 DiaryListFragmentDirections
                         .actionNavigationDiaryListFragmentToShowDiaryFragment(date);

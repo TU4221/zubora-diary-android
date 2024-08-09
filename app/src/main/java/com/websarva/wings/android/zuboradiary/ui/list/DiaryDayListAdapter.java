@@ -15,23 +15,22 @@ import com.websarva.wings.android.zuboradiary.databinding.RowDiaryDayListBinding
 import com.websarva.wings.android.zuboradiary.ui.list.diarylist.DiaryDayListItem;
 
 import java.time.LocalDate;
+import java.util.function.Consumer;
 
 public class DiaryDayListAdapter extends ListAdapter<DiaryDayListItem, DiaryDayListAdapter.DiaryDayListViewHolder> {
 
-    private Context context;
+    private final Context context;
+    private final Consumer<LocalDate> processOnClick;
 
-    public DiaryDayListAdapter(Context context) {
+    public DiaryDayListAdapter(Context context, Consumer<LocalDate> processOnClick) {
         super(new DiaryDayListDiffUtilItemCallback());
         this.context = context;
+        this.processOnClick = processOnClick;
     }
 
     @NonNull
     @Override
     public DiaryDayListViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        // TODO:確認後削除
-            /*LayoutInflater inflater = LayoutInflater.from(parent.getContext());
-            View view = inflater.inflate(R.layout.row_diary_day_list, parent, false);*/
-
         RowDiaryDayListBinding binding =
                 RowDiaryDayListBinding
                         .inflate(LayoutInflater.from(parent.getContext()), parent, false);
@@ -59,7 +58,7 @@ public class DiaryDayListAdapter extends ListAdapter<DiaryDayListItem, DiaryDayL
         holder.binding.frameLayoutRowDiaryDayList.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                showShowDiary(date);
+                processOnClick.accept(date);
             }
         });
 
@@ -76,11 +75,19 @@ public class DiaryDayListAdapter extends ListAdapter<DiaryDayListItem, DiaryDayL
     }
 
     public static class DiaryDayListViewHolder extends RecyclerView.ViewHolder {
-        RowDiaryDayListBinding binding;
-        LocalDate date;
+        private final RowDiaryDayListBinding binding;
+        private LocalDate date;
         public DiaryDayListViewHolder(RowDiaryDayListBinding binding) {
             super(binding.getRoot());
             this.binding = binding;
+        }
+
+        public RowDiaryDayListBinding getBinding() {
+            return binding;
+        }
+
+        public LocalDate getDate() {
+            return date;
         }
     }
 

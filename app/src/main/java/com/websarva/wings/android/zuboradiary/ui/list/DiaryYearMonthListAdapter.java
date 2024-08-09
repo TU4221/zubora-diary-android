@@ -22,15 +22,20 @@ import com.websarva.wings.android.zuboradiary.ui.list.diarylist.CustomSimpleCall
 import com.websarva.wings.android.zuboradiary.ui.list.diarylist.DiaryDayListItem;
 import com.websarva.wings.android.zuboradiary.ui.list.diarylist.DiaryListFragment;
 import com.websarva.wings.android.zuboradiary.ui.list.diarylist.DiaryYearMonthListItem;
+import com.websarva.wings.android.zuboradiary.ui.list.wordsearch.WordSearchResultDayListItem;
 import com.websarva.wings.android.zuboradiary.ui.list.wordsearch.WordSearchResultYearMonthListItem;
 
+import java.time.LocalDate;
 import java.time.YearMonth;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 
 public class DiaryYearMonthListAdapter extends ListAdapter<DiaryYearMonthListItemBase, RecyclerView.ViewHolder> {
-    private Context context;
+    private final Context context;
+    private final Consumer<LocalDate> processOnChildItemClick;
+    private final boolean canSwipeItem;
     private static final int DIARY_DAY_LIST_ITEM_MARGIN_VERTICAL = 16;
     private static final int DIARY_DAY_LIST_ITEM_MARGIN_HORIZONTAL = 32;
     private final List<Map<String, Object>> diaryYearMonthList = new ArrayList<>(); // TODO:不要確認後削除
@@ -39,9 +44,12 @@ public class DiaryYearMonthListAdapter extends ListAdapter<DiaryYearMonthListIte
     public static final int VIEW_TYPE_PROGRESS_BAR = 1;
     public static final int VIEW_TYPE_NO_DIARY_MESSAGE = 2;
 
-    public DiaryYearMonthListAdapter(Context context){
+    public DiaryYearMonthListAdapter(
+            Context context, Consumer<LocalDate> processOnChildItemClick, boolean canSwipeItem){
         super(new DiaryYearMonthListDiffUtilItemCallback());
         this.context = context;
+        this.processOnChildItemClick = processOnChildItemClick;
+        this.canSwipeItem = canSwipeItem;
     }
 
     @NonNull
@@ -49,9 +57,10 @@ public class DiaryYearMonthListAdapter extends ListAdapter<DiaryYearMonthListIte
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
         if (viewType == VIEW_TYPE_DIARY) {
-            View view =
-                    inflater.inflate(R.layout.row_diary_year_month_list, parent, false);
-            DiaryYearMonthListViewHolder holder = new DiaryYearMonthListViewHolder(view);
+            RowDiaryYearMonthListBinding binding =
+                    RowDiaryYearMonthListBinding
+                            .inflate(LayoutInflater.from(parent.getContext()), parent, false);
+            DiaryYearMonthListViewHolder holder = new DiaryYearMonthListViewHolder(binding);
 
             // ホルダーアイテムアニメーション設定(理由は年月RecyclerView設定コード付近にコメントで記載)
             holder.binding.recyclerDayList.setItemAnimator(null);
@@ -82,21 +91,18 @@ public class DiaryYearMonthListAdapter extends ListAdapter<DiaryYearMonthListIte
                         // TODO:assert
                         return;
                     }
-                    Log.d("リスト装飾確認",
-                            Integer.toString(
-                                    viewHolder.getBindingAdapterPosition()));
-                    if (viewHolder.getBindingAdapterPosition()
-                            == (adapter.getItemCount() - 1)) {
+                    Log.d("リスト装飾確認", Integer.toString(viewHolder.getBindingAdapterPosition()));
+                    if (viewHolder.getBindingAdapterPosition() == (adapter.getItemCount() - 1)) {
                         outRect.bottom = DIARY_DAY_LIST_ITEM_MARGIN_VERTICAL;
                     }
                 }
             });
 
-            setUpChildRecyclerViewItemTouchHelper(holder.binding.recyclerDayList);
-            // TODO:上手くいかないので保留
-            // ホルダー内の日記リスト(日)のアイテムにスワイプ機能(背面ボタン表示)を設定。
-            // MEMO:スワイプでの背面ボタン表示機能はAndroidには存在しないので、
-            //      ItemTouchHelper.Callback を継承して作成。
+            if (canSwipeItem) {
+                // TODO:上手くいかないので保留
+                // ホルダー内の日記リスト(日)のアイテムにスワイプ機能(背面ボタン表示)を設定。
+                // MEMO:スワイプでの背面ボタン表示機能はAndroidには存在しないので、
+                //      ItemTouchHelper.Callback を継承して作成。
             /*CustomSimpleCallback simpleCallback = new CustomSimpleCallback(
                     ItemTouchHelper.ACTION_STATE_IDLE, ItemTouchHelper.LEFT,
                     holder.binding.recyclerDayList,
@@ -115,6 +121,8 @@ public class DiaryYearMonthListAdapter extends ListAdapter<DiaryYearMonthListIte
 
                 ItemTouchHelper itemTouchHelper = new ItemTouchHelper(simpleCallBack);
                 itemTouchHelper.attachToRecyclerView(holder.binding.recyclerDayList);*/
+            }
+
             return holder;
         } else if (viewType == VIEW_TYPE_PROGRESS_BAR) {
             View view =
@@ -152,8 +160,7 @@ public class DiaryYearMonthListAdapter extends ListAdapter<DiaryYearMonthListIte
             if (item instanceof DiaryYearMonthListItem) {
                 DiaryYearMonthListItem _item = (DiaryYearMonthListItem) item;
                 List<DiaryDayListItem> diaryDayList = _item.getDiaryDayListItemList();
-                DiaryListFragment.DiaryDayListAdapter diaryDayListAdapter =
-                        new DiaryListFragment.DiaryDayListAdapter(new DiaryListFragment.DiaryDayListDiffUtilItemCallback());
+                DiaryDayListAdapter diaryDayListAdapter = new DiaryDayListAdapter(context, processOnChildItemClick);
                 _holder.binding.recyclerDayList.setAdapter(diaryDayListAdapter);
                 diaryDayListAdapter.submitList(diaryDayList);
             } else if (item instanceof WordSearchResultYearMonthListItem) {
@@ -185,12 +192,6 @@ public class DiaryYearMonthListAdapter extends ListAdapter<DiaryYearMonthListIte
             }
         }
     }
-
-    public interface a {
-        public abstract void setUpChildRecyclerViewItemTouchHelper(RecyclerView recyclerView);
-    }
-
-
 
     public static class DiaryYearMonthListViewHolder extends DiaryYearMonthListBaseViewHolder {
         RowDiaryYearMonthListBinding binding;
@@ -234,10 +235,10 @@ public class DiaryYearMonthListAdapter extends ListAdapter<DiaryYearMonthListIte
                 return false;
             }
 
+            // 日
             if (oldItem instanceof DiaryYearMonthListItem && newItem instanceof DiaryYearMonthListItem) {
                 DiaryYearMonthListItem _oldItem = (DiaryYearMonthListItem) oldItem;
                 DiaryYearMonthListItem _newItem = (DiaryYearMonthListItem) newItem;
-                // 日
                 int _oldChildListSize = _oldItem.getDiaryDayListItemList().size();
                 int _newChildListSize = _newItem.getDiaryDayListItemList().size();
                 Log.d("DiaryList", "_oldChildListSize:" + _oldChildListSize);
@@ -263,11 +264,46 @@ public class DiaryYearMonthListAdapter extends ListAdapter<DiaryYearMonthListIte
                             && newItem instanceof WordSearchResultYearMonthListItem) {
                 WordSearchResultYearMonthListItem _oldItem = (WordSearchResultYearMonthListItem) oldItem;
                 WordSearchResultYearMonthListItem _newItem = (WordSearchResultYearMonthListItem) newItem;
-            }
+                int oldChildListSize = _oldItem.getWordSearchResultDayList().size();
+                int newChildListSize = _newItem.getWordSearchResultDayList().size();
+                if (oldChildListSize != newChildListSize) {
+                    return false;
+                }
 
+                for (int i = 0; i < oldChildListSize; i++) {
+                    WordSearchResultDayListItem oldChildListItem =
+                            _oldItem.getWordSearchResultDayList().get(i);
+                    WordSearchResultDayListItem newChildListItem =
+                            _newItem.getWordSearchResultDayList().get(i);
+                    if (oldChildListItem.getDayOfMonth() != newChildListItem.getDayOfMonth()) {
+                        return false;
+                    }
+                    if (oldChildListItem.getDayOfWeek() != null
+                            && newChildListItem.getDayOfWeek() != null
+                            && !oldChildListItem.getDayOfWeek().equals(newChildListItem.getDayOfWeek())) {
+                        return false;
+                    }
+                    if (oldChildListItem.getTitle() != null
+                            && newChildListItem.getTitle() != null
+                            && !oldChildListItem.getTitle().equals(newChildListItem.getTitle())) {
+                        return false;
+                    }
+                    if (oldChildListItem.getItemNumber() != newChildListItem.getItemNumber()) {
+                        return false;
+                    }
+                    if (oldChildListItem.getItemTitle() != null
+                            && newChildListItem.getItemTitle() != null
+                            && !oldChildListItem.getItemTitle().equals(newChildListItem.getItemTitle())) {
+                        return false;
+                    }
+                    if (oldChildListItem.getItemComment() != null
+                            && newChildListItem.getItemComment() != null
+                            && !oldChildListItem.getItemComment().equals(newChildListItem.getItemComment())) {
+                        return false;
+                    }
+                }
+            }
             return true;
         }
-
-
     }
 }
