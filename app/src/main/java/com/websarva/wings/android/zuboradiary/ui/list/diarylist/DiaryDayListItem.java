@@ -47,6 +47,7 @@ public class DiaryDayListItem implements Cloneable {
         return clone;
     }
 
+    @NonNull
     public String getId() {
         return id;
     }
@@ -56,7 +57,7 @@ public class DiaryDayListItem implements Cloneable {
         return date;
     }
 
-    public void setDate(LocalDate date) {
+    public void setDate(@NonNull LocalDate date) {
         this.date = date;
     }
 
@@ -65,7 +66,7 @@ public class DiaryDayListItem implements Cloneable {
         return this.title;
     }
 
-    public void setTitle(String title) {
+    public void setTitle(@NonNull String title) {
         this.title = title;
     }
 
@@ -74,7 +75,7 @@ public class DiaryDayListItem implements Cloneable {
         return this.picturePath;
     }
 
-    public void setPicturePath(String picturePath) {
+    public void setPicturePath(@NonNull String picturePath) {
         this.picturePath = picturePath;
     }
 

@@ -39,11 +39,7 @@ public class WordSearchResultDayListAdapter
     //日記リスト(日)のホルダーと日記リスト(日)のアイテムレイアウトを紐づける。
     @NonNull
     @Override
-    public WordSearchResultDayViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        LayoutInflater inflater = LayoutInflater.from(parent.getContext());
-        View view = inflater.inflate(R.layout.row_word_search_result, parent, false);
-        return new WordSearchResultDayViewHolder(view);
-
+    public WordSearchResultDayViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         RowWordSearchResultBinding binding =
                 RowWordSearchResultBinding
                         .inflate(LayoutInflater.from(parent.getContext()), parent, false);

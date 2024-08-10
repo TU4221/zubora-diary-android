@@ -29,9 +29,9 @@ public class RepositoryModule {
     @Singleton
     @Provides
     public static DiaryRepository provideDiaryRepository(
-            @ApplicationContext Context context, DiaryDatabase diaryDatabase,
+            DiaryDatabase diaryDatabase,
             DiaryDAO diaryDAO, DiaryItemTitleSelectionHistoryDAO diaryItemTitleSelectionHistoryDAO) {
-        return new DiaryRepository(context, diaryDatabase, diaryDAO, diaryItemTitleSelectionHistoryDAO);
+        return new DiaryRepository(diaryDatabase, diaryDAO, diaryItemTitleSelectionHistoryDAO);
     }
 
     @Singleton

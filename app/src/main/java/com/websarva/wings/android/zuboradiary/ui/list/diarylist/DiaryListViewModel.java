@@ -97,7 +97,8 @@ public class DiaryListViewModel extends ViewModel {
                     } else if (loadType == LoadType.ADD) {
                         numLoadingItems = LOAD_ITEM_NUM;
                         if (currentDiaryList == null || currentDiaryList.isEmpty()) {
-                            loadingOffset = 0;
+                            // TODO:assert
+                            return;
                         } else {
                             loadingOffset = countDiaryListDayItem(currentDiaryList);
                         }
@@ -109,7 +110,7 @@ public class DiaryListViewModel extends ViewModel {
 
                     // 現時点のDiaryListをCloneで生成
                     if (loadType != LoadType.NEW) {
-                        if (currentDiaryList != null) {
+                        if (currentDiaryList != null && !currentDiaryList.isEmpty()) {
                             for (DiaryYearMonthListItem item : currentDiaryList) {
                                 DiaryYearMonthListItem cloneItem = item.clone();
                                 previousDiaryList.add(cloneItem);
@@ -136,7 +137,7 @@ public class DiaryListViewModel extends ViewModel {
 
                     // 日記リスト読込
                     Log.d("DiaryListLoading", "startLoading");
-                    int numExistingDiaries;
+                    Integer numExistingDiaries;
                     List<DiaryYearMonthListItem> convertedLoadingData = new ArrayList<>();
                     ListenableFuture<Integer> listenableFuture =
                             diaryRepository.countDiaries(sortConditionDate);

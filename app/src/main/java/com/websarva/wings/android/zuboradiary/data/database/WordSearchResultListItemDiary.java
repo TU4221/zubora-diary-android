@@ -1,12 +1,10 @@
-package com.websarva.wings.android.zuboradiary.ui.list.wordsearch;
+package com.websarva.wings.android.zuboradiary.data.database;
 
 import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;
 
 public class WordSearchResultListItemDiary {
-    @NonNull
     private String date;
-    @NonNull
     private String title;
     @ColumnInfo(name = "item_1_title")
     private String item1Title;
@@ -29,6 +27,7 @@ public class WordSearchResultListItemDiary {
     @ColumnInfo(name = "item_5_comment")
     private String item5Comment;
 
+    @NonNull
     public String getDate() {
         return this.date;
     }

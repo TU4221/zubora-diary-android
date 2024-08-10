@@ -1,10 +1,13 @@
 package com.websarva.wings.android.zuboradiary.data.database;
 
+import androidx.annotation.NonNull;
+
 public class DiaryListItem {
     private String date;
     private String title;
     private String picturePath;
 
+    @NonNull
     public String getDate() {
         return this.date;
     }

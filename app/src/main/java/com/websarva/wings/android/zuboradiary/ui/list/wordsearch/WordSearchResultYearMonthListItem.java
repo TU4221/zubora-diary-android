@@ -15,10 +15,6 @@ import java.util.UUID;
 public class WordSearchResultYearMonthListItem extends DiaryYearMonthListItemBase {
     private List<WordSearchResultDayListItem> WordSearchResultDayList = new ArrayList<>();
 
-    // TODO:引数無しコンストラクト必要か確認
-    public WordSearchResultYearMonthListItem() {
-    }
-
     public WordSearchResultYearMonthListItem(int viewType) {
         super(viewType);
         WordSearchResultDayList = new ArrayList<>();

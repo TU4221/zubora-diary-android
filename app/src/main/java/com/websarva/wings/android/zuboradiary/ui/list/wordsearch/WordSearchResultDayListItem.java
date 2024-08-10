@@ -5,14 +5,12 @@ import android.text.SpannableString;
 
 import androidx.annotation.NonNull;
 
+import java.time.LocalDate;
 import java.util.UUID;
 
 public class WordSearchResultDayListItem implements Cloneable {
     private final String id = UUID.randomUUID().toString();
-    private int year;
-    private int month;
-    private int dayOfMonth;
-    private String dayOfWeek = "";
+    private LocalDate date;
     private SpannableString title = new SpannableString("");
     private int itemNumber;
     private SpannableString itemTitle = new SpannableString("");
@@ -21,13 +19,10 @@ public class WordSearchResultDayListItem implements Cloneable {
     public WordSearchResultDayListItem() {
     }
 
-    public WordSearchResultDayListItem(int year, int month, int dayOfMonth, @NonNull String dayOfWeek,
+    public WordSearchResultDayListItem(@NonNull LocalDate date,
                                        @NonNull SpannableString title , int itemNo,
                                        @NonNull SpannableString itemTitle, @NonNull SpannableString itemComment) {
-        this.year = year;
-        this.month = month;
-        this.dayOfMonth = dayOfMonth;
-        this.dayOfWeek = dayOfWeek;
+        this.date = date;
         this.title = title;
         this.itemNumber = itemNo;
         this.itemTitle = itemTitle;
@@ -36,10 +31,7 @@ public class WordSearchResultDayListItem implements Cloneable {
 
     // MEMO:ID以外同じインスタンスを作成(cloneはIDも同じになるため)
     public WordSearchResultDayListItem(WordSearchResultDayListItem item) {
-        this.year = item.year;
-        this.month = item.month;
-        this.dayOfMonth = item.dayOfMonth;
-        this.dayOfWeek = item.dayOfWeek;
+        this.date = item.date;
         this.title = item.title;
         this.itemNumber = item.itemNumber;
         this.itemTitle = item.title;
@@ -50,7 +42,7 @@ public class WordSearchResultDayListItem implements Cloneable {
     @NonNull
     @Override
     public WordSearchResultDayListItem clone() {
-        WordSearchResultDayListItem clone = null;
+        WordSearchResultDayListItem clone;
         try {
             clone = (WordSearchResultDayListItem) super.clone();
         } catch (CloneNotSupportedException e) {
@@ -66,43 +58,22 @@ public class WordSearchResultDayListItem implements Cloneable {
     public String getId() {
         return id;
     }
-    public int getYear() {
-        return year;
+
+    @NonNull
+    public LocalDate getDate() {
+        return date;
     }
 
-    public void setYear(int year) {
-        this.year = year;
+    public void setDate(@NonNull LocalDate date) {
+        this.date = date;
     }
 
-    public int getMonth() {
-        return this.month;
-    }
-
-    public void setMonth(int month) {
-        this.month = month;
-    }
-
-    public int getDayOfMonth() {
-        return this.dayOfMonth;
-    }
-
-    public void setDayOfMonth(int dayOfMonth) {
-        this.dayOfMonth = dayOfMonth;
-    }
-
-    public String getDayOfWeek() {
-        return this.dayOfWeek;
-    }
-
-    public void setDayOfWeek(String dayOfWeek) {
-        this.dayOfWeek = dayOfWeek;
-    }
-
+    @NonNull
     public SpannableString getTitle() {
         return this.title;
     }
 
-    public void setTitle(SpannableString title) {
+    public void setTitle(@NonNull SpannableString title) {
         this.title = title;
     }
 
@@ -114,19 +85,21 @@ public class WordSearchResultDayListItem implements Cloneable {
         this.itemNumber = itemNumber;
     }
 
+    @NonNull
     public SpannableString getItemTitle() {
         return itemTitle;
     }
 
-    public void setItemTitle(SpannableString itemTitle) {
+    public void setItemTitle(@NonNull SpannableString itemTitle) {
         this.itemTitle = itemTitle;
     }
 
+    @NonNull
     public SpannableString getItemComment() {
         return itemComment;
     }
 
-    public void setItemComment(SpannableString itemComment) {
+    public void setItemComment(@NonNull SpannableString itemComment) {
         this.itemComment = itemComment;
     }
 }
