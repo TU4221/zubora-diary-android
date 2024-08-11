@@ -68,7 +68,7 @@ public interface DiaryDAO {
                 "OR item_5_title LIKE '%' || :word || '%'" +
                 "OR item_5_comment LIKE '%' || :word || '%'" +
             "ORDER BY date DESC LIMIT :num OFFSET :offset")
-    ListenableFuture<List<WordSearchResultListItemDiary>> selectWordSearchResultListAsync(int num, int offset, String word);
+    ListenableFuture<List<WordSearchResultListItem>> selectWordSearchResultListAsync(int num, int offset, String word);
 
     @Query("SELECT date FROM diaries WHERE date LIKE :dateYearMonth || '%'") // ||：文字連結
     ListenableFuture<List<String>> selectDiaryDateListAsync(String dateYearMonth);

@@ -321,6 +321,9 @@ public class ShowDiaryFragment extends Fragment {
         showDiaryViewModel.getIsDiaryLoadingErrorLiveData().observe(getViewLifecycleOwner(), new Observer<Boolean>() {
             @Override
             public void onChanged(Boolean aBoolean) {
+                if (aBoolean == null) {
+                    return;
+                }
                 if (aBoolean) {
                     showDiaryLoadingErrorDialog();
                     showDiaryViewModel.clearDiaryLoadingError();
@@ -330,6 +333,9 @@ public class ShowDiaryFragment extends Fragment {
         showDiaryViewModel.getIsDiaryDeleteErrorLiveData().observe(getViewLifecycleOwner(), new Observer<Boolean>() {
             @Override
             public void onChanged(Boolean aBoolean) {
+                if (aBoolean == null) {
+                    return;
+                }
                 if (aBoolean) {
                     showDiaryDeleteErrorDialog();
                     showDiaryViewModel.clearDiaryDeleteError();

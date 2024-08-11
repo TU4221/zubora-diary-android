@@ -380,7 +380,7 @@ public class DiaryListViewModel extends ViewModel {
         try {
             return diaryRepository.selectOldestDiary().get();
         } catch (Exception e) {
-            isDiaryListLoadingError.setValue(true);
+            isDiaryInformationLoadingError.setValue(true);
             return null;
         }
     }

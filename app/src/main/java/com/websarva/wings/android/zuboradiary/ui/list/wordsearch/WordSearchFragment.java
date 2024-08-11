@@ -5,17 +5,20 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Lifecycle;
+import androidx.lifecycle.LifecycleEventObserver;
+import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.Observer;
+import androidx.lifecycle.SavedStateHandle;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.NavBackStackEntry;
 import androidx.navigation.NavController;
+import androidx.navigation.NavDestination;
 import androidx.navigation.NavDirections;
 import androidx.navigation.fragment.NavHostFragment;
-import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.text.SpannableString;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -26,7 +29,6 @@ import android.widget.TextView;
 
 import com.google.android.material.transition.platform.MaterialFadeThrough;
 import com.google.android.material.transition.platform.MaterialSharedAxis;
-import com.websarva.wings.android.zuboradiary.data.DateConverter;
 import com.websarva.wings.android.zuboradiary.ui.DiaryYearMonthListItemBase;
 import com.websarva.wings.android.zuboradiary.ui.KeyboardInitializer;
 import com.websarva.wings.android.zuboradiary.MainActivity;
@@ -34,6 +36,9 @@ import com.websarva.wings.android.zuboradiary.R;
 import com.websarva.wings.android.zuboradiary.databinding.FragmentWordSearchBinding;
 import com.websarva.wings.android.zuboradiary.ui.list.DiaryYearMonthListAdapter;
 import com.websarva.wings.android.zuboradiary.ui.list.DiaryListSetting;
+import com.websarva.wings.android.zuboradiary.ui.list.diarylist.DatePickerDialogFragment;
+import com.websarva.wings.android.zuboradiary.ui.list.diarylist.DeleteConfirmationDialogFragment;
+import com.websarva.wings.android.zuboradiary.ui.list.diarylist.DiaryListFragmentDirections;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -112,9 +117,45 @@ public class WordSearchFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        setUpDialogResultReceiver();
         setUpToolBar();
         setUpWordSearchView();
         setUpWordSearchResultList();
+        setUpErrorObserver();
+    }
+
+    // ダイアログフラグメントからの結果受取設定
+    private void setUpDialogResultReceiver() {
+        NavBackStackEntry navBackStackEntry =
+                navController.getBackStackEntry(R.id.navigation_diary_list_fragment);
+        LifecycleEventObserver lifecycleEventObserver = new LifecycleEventObserver() {
+            @Override
+            public void onStateChanged(
+                    @NonNull LifecycleOwner lifecycleOwner, @NonNull Lifecycle.Event event) {
+                SavedStateHandle savedStateHandle = navBackStackEntry.getSavedStateHandle();
+                if (event.equals(Lifecycle.Event.ON_RESUME)) {
+                    removeDialogResults(savedStateHandle);
+                    retryErrorDialogShow();
+                }
+            }
+        };
+        navBackStackEntry.getLifecycle().addObserver(lifecycleEventObserver);
+        getViewLifecycleOwner().getLifecycle().addObserver(new LifecycleEventObserver() {
+            @Override
+            public void onStateChanged(
+                    @NonNull LifecycleOwner source, @NonNull Lifecycle.Event event) {
+                if (event.equals(Lifecycle.Event.ON_DESTROY)) {
+                    // MEMO:removeで削除しないとこのFragmentを閉じてもResult内容が残ってしまう。
+                    //      その為、このFragmentを再表示した時にObserverがResultの内容で処理してしまう。
+                    SavedStateHandle savedStateHandle = navBackStackEntry.getSavedStateHandle();
+                    removeDialogResults(savedStateHandle);
+                    navBackStackEntry.getLifecycle().removeObserver(lifecycleEventObserver);
+                }
+            }
+        });
+    }
+
+    private void removeDialogResults(SavedStateHandle savedStateHandle) {
     }
 
     private void setUpToolBar() {
@@ -128,12 +169,12 @@ public class WordSearchFragment extends Fragment {
     }
 
     private void setUpWordSearchView() {
-        if (wordSearchViewModel.getSearchWord().getValue().isEmpty()) {
+        if (wordSearchViewModel.getSearchWordMutableLiveData().getValue().isEmpty()) {
             binding.editTextKeyWordSearch.requestFocus();
             KeyboardInitializer keyboardInitializer = new KeyboardInitializer(requireActivity());
             keyboardInitializer.show(binding.editTextKeyWordSearch);
         }
-        wordSearchViewModel.getSearchWord()
+        wordSearchViewModel.getSearchWordMutableLiveData()
                 .observe(getViewLifecycleOwner(), new Observer<String>() {
                     @Override
                     public void onChanged(String s) {
@@ -151,7 +192,8 @@ public class WordSearchFragment extends Fragment {
                         wordSearchViewModel
                                 .loadWordSearchResultListAsync(
                                         WordSearchViewModel.LoadType.NEW,
-                                        s
+                                        s,
+                                        getResources().getColor(R.color.gray) // TODO:テーマカラーで切替
                                 );
                         lastText = s;
                     }
@@ -254,15 +296,8 @@ public class WordSearchFragment extends Fragment {
                     wordSearchViewModel
                             .loadWordSearchResultListAsync(
                                     WordSearchViewModel.LoadType.ADD,
-                                    wordSearchViewModel.getSearchWord().getValue(),
-                                    new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            String messageTitle = "通信エラー";
-                                            String message = "日記リストの読込に失敗しました。";
-                                            showMessageDialog(messageTitle, message);
-                                        }
-                                    }
+                                    wordSearchViewModel.getSearchWordMutableLiveData().getValue(),
+                                    getResources().getColor(R.color.gray) // TODO:テーマカラーで切替
                             );
                 }
             }
@@ -282,7 +317,7 @@ public class WordSearchFragment extends Fragment {
         });
 
         // データベースから読み込んだ日記リストをリサクラービューに反映
-        wordSearchViewModel.getLiveDataWordSearchResultList()
+        wordSearchViewModel.getWordSearchResultListLiveData()
                 .observe(getViewLifecycleOwner(), new Observer<List<WordSearchResultYearMonthListItem>>() {
                     @Override
                     public void onChanged(
@@ -303,19 +338,12 @@ public class WordSearchFragment extends Fragment {
                 });
 
         // 検索結果リスト更新
-        if (!wordSearchViewModel.getLiveDataWordSearchResultList().getValue().isEmpty()) {
+        if (!wordSearchViewModel.getWordSearchResultListLiveData().getValue().isEmpty()) {
             wordSearchViewModel
                     .loadWordSearchResultListAsync(
                             WordSearchViewModel.LoadType.UPDATE,
-                            wordSearchViewModel.getSearchWord().getValue(),
-                            new Runnable() {
-                                @Override
-                                public void run() {
-                                    String messageTitle = "通信エラー";
-                                    String message = "日記リストの読込に失敗しました。";
-                                    showMessageDialog(messageTitle, message);
-                                }
-                            }
+                            wordSearchViewModel.getSearchWordMutableLiveData().getValue(),
+                            getResources().getColor(R.color.gray) // TODO:テーマカラーで切替
                     );
         }
 
@@ -326,6 +354,23 @@ public class WordSearchFragment extends Fragment {
                 return true;
             }
         });
+    }
+
+    private void setUpErrorObserver() {
+        // エラー表示
+        wordSearchViewModel.getIsDiaryListLoadingErrorLiveData()
+                .observe(getViewLifecycleOwner(), new Observer<Boolean>() {
+                    @Override
+                    public void onChanged(Boolean aBoolean) {
+                        if (aBoolean == null) {
+                            return;
+                        }
+                        if (aBoolean) {
+                            showDiaryListLoadingErrorDialog();
+                            wordSearchViewModel.clearIsDiaryListLoadingError();
+                        }
+                    }
+                });
     }
 
     //日記リスト(日)リサイクルビューホルダークラス
@@ -622,11 +667,43 @@ public class WordSearchFragment extends Fragment {
         }
     }*/
 
+    private void showShowDiaryFragment(LocalDate date) {
+        NavDirections action =
+                WordSearchFragmentDirections
+                        .actionNavigationWordSearchFragmentToShowDiaryFragment(date);
+        navController.navigate(action);
+    }
+
+    // 他のダイアログで表示できなかったダイアログを表示
+    private void retryErrorDialogShow() {
+        if (shouldShowDiaryListLoadingErrorDialog) {
+            showDiaryListLoadingErrorDialog();
+        }
+    }
+
+    private void showDiaryListLoadingErrorDialog() {
+        if (canShowDialog()) {
+            showMessageDialog("通信エラー", "日記リストの読込に失敗しました。");
+            shouldShowDiaryListLoadingErrorDialog = false;
+        } else {
+            shouldShowDiaryListLoadingErrorDialog = true;
+        }
+    }
+
     private void showMessageDialog(String title, String message) {
         NavDirections action =
                 WordSearchFragmentDirections
                         .actionWordSearchFragmentToMessageDialog(
                                 title, message);
         navController.navigate(action);
+    }
+
+    private boolean canShowDialog() {
+        NavDestination navDestination = navController.getCurrentDestination();
+        if (navDestination == null) {
+            return false;
+        }
+        int currentDestinationId = navController.getCurrentDestination().getId();
+        return currentDestinationId == R.id.navigation_word_search_fragment;
     }
 }

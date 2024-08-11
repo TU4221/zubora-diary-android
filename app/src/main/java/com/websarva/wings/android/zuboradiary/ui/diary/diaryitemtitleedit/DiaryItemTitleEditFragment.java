@@ -298,6 +298,9 @@ public class DiaryItemTitleEditFragment extends Fragment {
                 .observe(getViewLifecycleOwner(), new Observer<Boolean>() {
                     @Override
                     public void onChanged(Boolean aBoolean) {
+                        if (aBoolean == null) {
+                            return;
+                        }
                         if (aBoolean) {
                             showItemTitleSelectionHistoryLoadingErrorDialog();
                             diaryItemTitleEditViewModel.clearSelectedItemTitleListLoadingError();
@@ -309,6 +312,9 @@ public class DiaryItemTitleEditFragment extends Fragment {
                 .observe(getViewLifecycleOwner(), new Observer<Boolean>() {
                     @Override
                     public void onChanged(Boolean aBoolean) {
+                        if (aBoolean == null) {
+                            return;
+                        }
                         if (aBoolean) {
                             showItemTitleSelectionHistoryItemDeleteErrorDialog();
                             diaryItemTitleEditViewModel.clearSelectedItemTitleDeleteError();

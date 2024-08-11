@@ -1,26 +1,22 @@
 package com.websarva.wings.android.zuboradiary.ui.list.wordsearch;
 
-import android.app.Application;
 import android.os.Handler;
 import android.os.Looper;
 import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.style.BackgroundColorSpan;
 
-import androidx.annotation.NonNull;
 import androidx.core.os.HandlerCompat;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 import com.google.common.util.concurrent.ListenableFuture;
-import com.websarva.wings.android.zuboradiary.R;
 import com.websarva.wings.android.zuboradiary.data.database.DiaryRepository;
-import com.websarva.wings.android.zuboradiary.data.database.WordSearchResultListItemDiary;
+import com.websarva.wings.android.zuboradiary.data.database.WordSearchResultListItem;
 import com.websarva.wings.android.zuboradiary.ui.list.DiaryYearMonthListAdapter;
 
 import java.time.LocalDate;
-import java.time.Year;
 import java.time.YearMonth;
 import java.util.ArrayList;
 import java.util.List;
@@ -35,20 +31,23 @@ import dagger.hilt.android.lifecycle.HiltViewModel;
 @HiltViewModel
 public class WordSearchViewModel extends ViewModel {
 
-    private DiaryRepository diaryRepository;
-    private MutableLiveData<String> searchWord = new MutableLiveData<>();
-    private MutableLiveData<Boolean> isVisibleSearchWordClearButton = new MutableLiveData<>();
-    private Future<?> LoadingWordSearchResultListFuture;
-    private MutableLiveData<List<WordSearchResultYearMonthListItem>> wordSearchResultList =
+    private final DiaryRepository diaryRepository;
+    private final MutableLiveData<String> searchWord = new MutableLiveData<>();
+    private final MutableLiveData<Boolean> isVisibleSearchWordClearButton = new MutableLiveData<>();
+    private Future<?> LoadingWordSearchResultListFuture; // キャンセル用
+    private final MutableLiveData<List<WordSearchResultYearMonthListItem>> wordSearchResultList =
             new MutableLiveData<>();
     private boolean isLoading;
-    private MutableLiveData<Boolean> isVisibleNumWordSearchResults = new MutableLiveData<>();
-    private MutableLiveData<Integer> numWordSearchResults = new MutableLiveData<>();
-    private MutableLiveData<Boolean> isVisibleResultList = new MutableLiveData<>();
-    private MutableLiveData<Boolean> isVisibleUpdateProgressBar = new MutableLiveData<>();
-    private MutableLiveData<Boolean> isVisibleNoResultMessage = new MutableLiveData<>();
-    private final int LOAD_ITEM_NUM = 10; // TODO:仮数値の為、最後に設定
-    private ExecutorService executorService;
+    private final MutableLiveData<Boolean> isVisibleNumWordSearchResults = new MutableLiveData<>();
+    private final MutableLiveData<Integer> numWordSearchResults = new MutableLiveData<>();
+    private final MutableLiveData<Boolean> isVisibleResultList = new MutableLiveData<>();
+    private final MutableLiveData<Boolean> isVisibleUpdateProgressBar = new MutableLiveData<>();
+    private final MutableLiveData<Boolean> isVisibleNoResultMessage = new MutableLiveData<>();
+    private static final int LOAD_ITEM_NUM = 10; // TODO:仮数値の為、最後に設定
+    private final ExecutorService executorService;
+
+    // エラー関係
+    private final MutableLiveData<Boolean> isDiaryListLoadingError = new MutableLiveData<>();
 
 
     @Inject
@@ -59,48 +58,48 @@ public class WordSearchViewModel extends ViewModel {
     }
 
     public void initialize() {
-        this.searchWord.setValue("");
-        this.isVisibleSearchWordClearButton.setValue(false);
-        this.wordSearchResultList.setValue(new ArrayList<>());
-        this.isVisibleNumWordSearchResults.setValue(false);
-        this.numWordSearchResults.setValue(0);
-        this.isVisibleResultList.setValue(false);
-        this.isVisibleUpdateProgressBar.setValue(false);
-        this.isVisibleNoResultMessage.setValue(false);
-        this.isLoading = false;
+        searchWord.setValue("");
+        isVisibleSearchWordClearButton.setValue(false);
+        wordSearchResultList.setValue(new ArrayList<>());
+        isVisibleNumWordSearchResults.setValue(false);
+        numWordSearchResults.setValue(0);
+        isVisibleResultList.setValue(false);
+        isVisibleUpdateProgressBar.setValue(false);
+        isVisibleNoResultMessage.setValue(false);
+        isLoading = false;
+        isDiaryListLoadingError.setValue(false);
     }
 
     public enum LoadType {
         NEW, UPDATE, ADD
     }
 
-    public void loadWordSearchResultListAsync(LoadType loadType, String word, Runnable exceptionHandling){
-        if (this.LoadingWordSearchResultListFuture != null && !this.LoadingWordSearchResultListFuture.isDone()) {
+    public void loadWordSearchResultListAsync(
+            LoadType loadType, String searchWord, int spannableStringBackGroundColor){
+        if (LoadingWordSearchResultListFuture != null && !LoadingWordSearchResultListFuture.isDone()) {
             LoadingWordSearchResultListFuture.cancel(true);
         }
         if (this.searchWord.getValue().isEmpty()) {
             setupVisibilityBeforeWordSearch();
-            this.wordSearchResultList.setValue(new ArrayList<>());
+            wordSearchResultList.setValue(new ArrayList<>());
             return;
         }
-        Handler handler = HandlerCompat.createAsync(Looper.getMainLooper());
-        List<WordSearchResultYearMonthListItem> currentList = this.wordSearchResultList.getValue();
         Runnable loadWordSearchResultList =
-                new loadWordSearchResultList(loadType, word, handler, exceptionHandling);
-        this.LoadingWordSearchResultListFuture = this.executorService.submit(loadWordSearchResultList);
+                new loadWordSearchResultList(loadType, searchWord, spannableStringBackGroundColor);
+        LoadingWordSearchResultListFuture = executorService.submit(loadWordSearchResultList);
     }
 
     private class loadWordSearchResultList implements Runnable {
         LoadType loadType;
         String searchWord;
-        Handler handler;
-        Runnable exceptionHandling;
+        int spannableStringBackGroundColor;
+
         public loadWordSearchResultList(
-                LoadType loadType, String searchWord, Handler handler, Runnable exceptionHandling) {
+                LoadType loadType, String searchWord, int spannableStringBackGroundColor) {
+            // TODO:非同期処理中に値が変わらないようにしたい
             this.loadType = loadType;
             this.searchWord = searchWord;
-            this.handler = handler;
-            this.exceptionHandling = exceptionHandling;
+            this.spannableStringBackGroundColor = spannableStringBackGroundColor;
         }
         @Override
         public void run() {
@@ -158,7 +157,7 @@ public class WordSearchViewModel extends ViewModel {
                 wordSearchResultList.postValue(resultListContainingProgressBar);
 
                 // TODO:ProgressBarを表示させる為に仮で記述
-                Thread.sleep(2000);
+                Thread.sleep(1000);
 
                 // 日記リスト読込
                 Integer numWordSearchResults;
@@ -177,11 +176,15 @@ public class WordSearchViewModel extends ViewModel {
                     }
                     numWordSearchResults = listenableFutureResult.get();
                 } else {
-                    //
                     // loadType == LoadType.ADD
                     numWordSearchResults = WordSearchViewModel.this.numWordSearchResults.getValue();
+                    if (numWordSearchResults == null) {
+                        ListenableFuture<Integer> listenableFutureResult =
+                                diaryRepository.countWordSearchResults(searchWord);
+                        numWordSearchResults = listenableFutureResult.get();
+                    }
                 }
-                ListenableFuture<List<WordSearchResultListItemDiary>> listenableFutureResults =
+                ListenableFuture<List<WordSearchResultListItem>> listenableFutureResults =
                         diaryRepository.selectWordSearchResultList(
                                 numLoadingItems,
                                 loadingOffset,
@@ -196,9 +199,9 @@ public class WordSearchViewModel extends ViewModel {
                         throw new InterruptedException();
                     }
                 }
-                List<WordSearchResultListItemDiary> loadingData = listenableFutureResults.get();
+                List<WordSearchResultListItem> loadingData = listenableFutureResults.get();
                 if (!loadingData.isEmpty()) {
-                    convertedLoadingData = toWordSearchResultYearMonthListFormat(loadingData, searchWord);
+                    convertedLoadingData = toWordSearchResultYearMonthListFormat(loadingData, searchWord, spannableStringBackGroundColor);
                 }
 
 
@@ -259,7 +262,7 @@ public class WordSearchViewModel extends ViewModel {
             } catch (Exception e) {
                 e.printStackTrace();
                 wordSearchResultList.postValue(previousResultList);
-                handler.post(exceptionHandling);
+                isDiaryListLoadingError.postValue(true);
             } finally {
                 isVisibleUpdateProgressBar.postValue(false);
                 isLoading = false;
@@ -277,12 +280,22 @@ public class WordSearchViewModel extends ViewModel {
     }
 
     private List<WordSearchResultYearMonthListItem> toWordSearchResultYearMonthListFormat(
-            List<WordSearchResultListItemDiary> beforeList, String searchWord) {
+            List<WordSearchResultListItem> beforeList,
+            String searchWord, int spannableStringBackGroundColor) {
+        List<WordSearchResultDayListItem> wordSearchResultDayList =
+                toWordSearchResultDayList(beforeList, searchWord, spannableStringBackGroundColor);
+        return toWordSearchResultYearMonthList(wordSearchResultDayList);
+    }
+
+    private List<WordSearchResultDayListItem> toWordSearchResultDayList(
+            List<WordSearchResultListItem> beforeList,
+            String searchWord, int spannableStringBackGroundColor) {
         List<WordSearchResultDayListItem> dayList = new ArrayList<>();
-        for (WordSearchResultListItemDiary item: beforeList) {
+        for (WordSearchResultListItem item: beforeList) {
             String strDate = item.getDate();
             LocalDate date = LocalDate.parse(strDate);
-            SpannableString title = createSpannableString(item.getTitle(), searchWord);
+            SpannableString title =
+                    toSpannableString(item.getTitle(), searchWord, spannableStringBackGroundColor);
 
             String regex = ".*" + searchWord + ".*";
             String[] itemTitles = {
@@ -315,14 +328,14 @@ public class WordSearchViewModel extends ViewModel {
                 if (itemTitles[i].matches(regex)
                         || itemComments[i].matches(regex)) {
                     itemNumber = i + 1;
-                    itemTitle = createSpannableString(itemTitles[i], searchWord);
-                    itemComment = createSpannableString(itemComments[i], searchWord);
+                    itemTitle = toSpannableString(itemTitles[i], searchWord, spannableStringBackGroundColor);
+                    itemComment = toSpannableString(itemComments[i], searchWord, spannableStringBackGroundColor);
                     break;
                 }
                 if (i == (itemTitles.length - 1)) {
                     itemNumber = 1;
-                    itemTitle = createSpannableString(itemTitles[0], searchWord);
-                    itemComment = createSpannableString(itemComments[0], searchWord);
+                    itemTitle = toSpannableString(itemTitles[0], searchWord, spannableStringBackGroundColor);
+                    itemComment = toSpannableString(itemComments[0], searchWord, spannableStringBackGroundColor);
                 }
             }
 
@@ -330,7 +343,30 @@ public class WordSearchViewModel extends ViewModel {
                     new WordSearchResultDayListItem(date, title, itemNumber, itemTitle, itemComment);
             dayList.add(dayListItem);
         }
+        return dayList;
+    }
 
+    // 対象ワードをマーキング
+    private SpannableString toSpannableString(String string, String targetWord, int backgroundColor) {
+        SpannableString spannableString = new SpannableString(string);
+        BackgroundColorSpan backgroundColorSpan = new BackgroundColorSpan(backgroundColor);
+        int fromIndex = 0;
+        while (string.indexOf(targetWord, fromIndex) != -1) {
+            int start = string.indexOf(targetWord, fromIndex);
+            int end = start + targetWord.length();
+            spannableString.setSpan(
+                    backgroundColorSpan,
+                    start,
+                    end,
+                    Spanned.SPAN_INCLUSIVE_INCLUSIVE
+            );
+            fromIndex = end;
+        }
+        return spannableString;
+    }
+
+    private List<WordSearchResultYearMonthListItem> toWordSearchResultYearMonthList(
+            List<WordSearchResultDayListItem> beforeList) {
         // 日記リストを月別に振り分ける
         final int VIEW_TYPE_DIARY = DiaryYearMonthListAdapter.VIEW_TYPE_DIARY;
         List<WordSearchResultDayListItem> sortingList= new ArrayList<>();
@@ -338,7 +374,7 @@ public class WordSearchViewModel extends ViewModel {
         WordSearchResultYearMonthListItem  wordSearchResultMonthListItem;
         YearMonth sortingYearMonth = null;
 
-        for (WordSearchResultDayListItem day: dayList) {
+        for (WordSearchResultDayListItem day: beforeList) {
             LocalDate date = day.getDate();
             YearMonth yearMonth = YearMonth.of(date.getYear(), date.getMonth());
 
@@ -363,33 +399,11 @@ public class WordSearchViewModel extends ViewModel {
         return wordSearchResultYearMonthList;
     }
 
-    // 対象ワードをマーキング
-    private SpannableString createSpannableString(String string, String targetWord) {
-        SpannableString spannableString = new SpannableString(string);
-        BackgroundColorSpan backgroundColorSpan =
-                new BackgroundColorSpan(
-                        context.getResources().getColor(R.color.gray)
-                );
-        int fromIndex = 0;
-        while (string.indexOf(targetWord, fromIndex) != -1) {
-            int start = string.indexOf(targetWord, fromIndex);
-            int end = start + targetWord.length();
-            spannableString.setSpan(
-                    backgroundColorSpan,
-                    start,
-                    end,
-                    Spanned.SPAN_INCLUSIVE_INCLUSIVE
-            );
-            fromIndex = end;
-        }
-        return spannableString;
-    }
-
     private void setupVisibilityBeforeWordSearch() {
-        this.isVisibleNumWordSearchResults.setValue(false);
-        this.isVisibleResultList.setValue(false);
-        this.isVisibleUpdateProgressBar.setValue(false);
-        this.isVisibleNoResultMessage.setValue(false);
+        isVisibleNumWordSearchResults.setValue(false);
+        isVisibleResultList.setValue(false);
+        isVisibleUpdateProgressBar.setValue(false);
+        isVisibleNoResultMessage.setValue(false);
     }
 
     private void setupVisibilityBeforeLoadingSearchResultListAsync(LoadType loadType) {
@@ -427,59 +441,69 @@ public class WordSearchViewModel extends ViewModel {
     }
 
     public void clearSearchWord() {
-        this.searchWord.setValue("");
+        searchWord.setValue("");
     }
 
     public void setIsVisibleSearchWordClearButton(boolean bool) {
-        this.isVisibleSearchWordClearButton.setValue(bool);
+        isVisibleSearchWordClearButton.setValue(bool);
     }
 
-    public LiveData<List<WordSearchResultYearMonthListItem>> getLiveDataWordSearchResultList() {
-        return this.wordSearchResultList;
+    // エラー関係
+    public void clearIsDiaryListLoadingError() {
+        isDiaryListLoadingError.setValue(false);
     }
 
+    // Getter
     public boolean getIsLoading() {
-        return this.isLoading;
+        return isLoading;
     }
 
-    public void setIsLoading(boolean bool) {
-        this.isLoading = bool;
+    // LiveDataGetter
+    // MEMO:単一データバインディングの場合、ゲッターの戻り値はLiveData<>にすること。
+    //      双方向データバインディングの場合、ゲッターの戻り値はMutableLiveData<>にすること。
+    public LiveData<String> getSearchWordLiveData() {
+        return searchWord;
     }
 
-    // 単一・双方向データバインディング用メソッド
-    // MEMO:単一の場合、ゲッターの戻り値はLiveData<>にすること。
-    //      双方向の場合、ゲッターの戻り値はMutableLiveData<>にすること。
-    public MutableLiveData<String> getSearchWord() {
-        return this.searchWord;
+    public MutableLiveData<String> getSearchWordMutableLiveData() {
+        return searchWord;
     }
 
-    public LiveData<Boolean> getIsVisibleSearchWordClearButton() {
-        return this.isVisibleSearchWordClearButton;
+    public LiveData<Boolean> getIsVisibleSearchWordClearButtonLiveData() {
+        return isVisibleSearchWordClearButton;
     }
 
-    public LiveData<Boolean> getIsVisibleNumWordSearchResults() {
-        return this.isVisibleNumWordSearchResults;
+    public LiveData<List<WordSearchResultYearMonthListItem>> getWordSearchResultListLiveData() {
+        return wordSearchResultList;
     }
 
-    public LiveData<Boolean> getIsVisibleResultList() {
-        return this.isVisibleResultList;
-    }
-
-    public LiveData<Boolean> getIsVisibleUpdateProgressBar() {
-        return this.isVisibleUpdateProgressBar;
-    }
-    public LiveData<Boolean> getIsVisibleNoResultMessage() {
-        return this.isVisibleNoResultMessage;
+    public LiveData<Boolean> getIsVisibleNumWordSearchResultsLiveData() {
+        return isVisibleNumWordSearchResults;
     }
 
     public LiveData<Integer> getNumWordSearchResults() {
-        return this.numWordSearchResults;
+        return numWordSearchResults;
+    }
+
+    public LiveData<Boolean> getIsVisibleResultListLiveData() {
+        return isVisibleResultList;
+    }
+
+    public LiveData<Boolean> getIsVisibleUpdateProgressBarLiveData() {
+        return isVisibleUpdateProgressBar;
+    }
+    public LiveData<Boolean> getIsVisibleNoResultMessageLiveData() {
+        return isVisibleNoResultMessage;
+    }
+
+    public LiveData<Boolean> getIsDiaryListLoadingErrorLiveData() {
+        return isDiaryListLoadingError;
     }
 
     @Override
     protected void onCleared() {
         super.onCleared();
-        this.executorService.shutdown();
+        executorService.shutdown();
     }
 
 }

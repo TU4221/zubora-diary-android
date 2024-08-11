@@ -3,7 +3,7 @@ package com.websarva.wings.android.zuboradiary.data.database;
 import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;
 
-public class WordSearchResultListItemDiary {
+public class WordSearchResultListItem {
     private String date;
     private String title;
     @ColumnInfo(name = "item_1_title")

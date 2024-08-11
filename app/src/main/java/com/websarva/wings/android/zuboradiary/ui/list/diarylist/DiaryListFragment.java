@@ -881,6 +881,9 @@ public class DiaryListFragment extends Fragment {
                 .observe(getViewLifecycleOwner(), new Observer<Boolean>() {
                     @Override
                     public void onChanged(Boolean aBoolean) {
+                        if (aBoolean == null) {
+                            return;
+                        }
                         if (aBoolean) {
                             showDiaryListLoadingErrorDialog();
                             diaryListViewModel.clearIsDiaryListLoadingError();
@@ -892,6 +895,9 @@ public class DiaryListFragment extends Fragment {
                 .observe(getViewLifecycleOwner(), new Observer<Boolean>() {
                     @Override
                     public void onChanged(Boolean aBoolean) {
+                        if (aBoolean == null) {
+                            return;
+                        }
                         if (aBoolean) {
                             showDiaryInformationLoadingErrorDialog();
                             diaryListViewModel.clearIsDiaryInformationLoadingError();
@@ -903,6 +909,9 @@ public class DiaryListFragment extends Fragment {
                 .observe(getViewLifecycleOwner(), new Observer<Boolean>() {
                     @Override
                     public void onChanged(Boolean aBoolean) {
+                        if (aBoolean == null) {
+                            return;
+                        }
                         if (aBoolean) {
                             showDiaryDeleteErrorDialog();
                             diaryListViewModel.clearIsDiaryDeleteError();

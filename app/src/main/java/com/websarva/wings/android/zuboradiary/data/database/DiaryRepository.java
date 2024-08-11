@@ -66,7 +66,7 @@ public class DiaryRepository {
         return diaryDAO.countWordSearchResultsAsync(searchWord);
     }
 
-    public ListenableFuture<List<WordSearchResultListItemDiary>> selectWordSearchResultList(
+    public ListenableFuture<List<WordSearchResultListItem>> selectWordSearchResultList(
             int num, int offset, String searchWord) {
         return diaryDAO.selectWordSearchResultListAsync(num, offset, searchWord);
     }

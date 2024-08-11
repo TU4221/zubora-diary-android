@@ -200,6 +200,9 @@ public class CalendarFragment extends Fragment {
 
         @Override
         public void onChanged(Boolean aBoolean) {
+            if (aBoolean == null) {
+                return;
+            }
             if (aBoolean) {
                 showDiaryLoadingErrorDialog();
                 calendarViewModel.clearDiaryLoadingError();

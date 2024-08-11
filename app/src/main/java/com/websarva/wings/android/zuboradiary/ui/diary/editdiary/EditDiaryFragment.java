@@ -926,6 +926,9 @@ public class EditDiaryFragment extends Fragment {
         editDiaryViewModel.getIsDiarySavingErrorLiveData().observe(getViewLifecycleOwner(), new Observer<Boolean>() {
             @Override
             public void onChanged(Boolean aBoolean) {
+                if (aBoolean == null) {
+                    return;
+                }
                 if (aBoolean) {
                     showDiarySavingErrorDialog();
                     editDiaryViewModel.clearDiarySavingError();
@@ -935,6 +938,9 @@ public class EditDiaryFragment extends Fragment {
         editDiaryViewModel.getIsDiaryLoadingErrorLiveData().observe(getViewLifecycleOwner(), new Observer<Boolean>() {
             @Override
             public void onChanged(Boolean aBoolean) {
+                if (aBoolean == null) {
+                    return;
+                }
                 if (aBoolean) {
                     showDiaryLoadingErrorDialog();
                     editDiaryViewModel.clearDiaryLoadingError();
@@ -944,6 +950,9 @@ public class EditDiaryFragment extends Fragment {
         editDiaryViewModel.getIsDiaryDeleteErrorLiveData().observe(getViewLifecycleOwner(), new Observer<Boolean>() {
             @Override
             public void onChanged(Boolean aBoolean) {
+                if (aBoolean == null) {
+                    return;
+                }
                 if (aBoolean) {
                     showDiaryDeleteErrorDialog();
                     editDiaryViewModel.clearDiaryDeleteError();
@@ -953,6 +962,9 @@ public class EditDiaryFragment extends Fragment {
         editDiaryViewModel.getIsWeatherLoadingErrorLiveData().observe(getViewLifecycleOwner(), new Observer<Boolean>() {
             @Override
             public void onChanged(Boolean aBoolean) {
+                if (aBoolean == null) {
+                    return;
+                }
                 if (aBoolean) {
                     showWeatherLoadingErrorDialog();
                     editDiaryViewModel.clearWeatherLoadingError();
