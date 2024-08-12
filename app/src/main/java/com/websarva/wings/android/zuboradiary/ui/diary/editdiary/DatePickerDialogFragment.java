@@ -40,7 +40,7 @@ public class DatePickerDialogFragment extends DialogFragment{
                     }
                 },
                 currentDate.getYear(),
-                currentDate.getMonthValue(),
+                currentDate.getMonthValue() - 1,
                 currentDate.getDayOfMonth()
         );
     }

@@ -2,6 +2,8 @@ package com.websarva.wings.android.zuboradiary.data.database;
 
 
 
+import android.util.Log;
+
 import com.google.common.util.concurrent.ListenableFuture;
 
 import org.jetbrains.annotations.Nullable;
@@ -55,6 +57,7 @@ public class DiaryRepository {
 
     public ListenableFuture<List<DiaryListItem>> loadDiaryList(
             int num, int offset, @Nullable LocalDate date) {
+        Log.d("DiaryRepository", "loadDiaryList(num = " + num + ", offset = " + offset + ", date = " + date + ")");
         if (date == null) {
             return diaryDAO.selectDiaryListAsync(num, offset);
         } else {

@@ -43,7 +43,7 @@ import java.util.List;
 import com.websarva.wings.android.zuboradiary.data.database.Diary;
 import com.websarva.wings.android.zuboradiary.databinding.FragmentDiaryListBinding;
 import com.websarva.wings.android.zuboradiary.ui.DiaryYearMonthListItemBase;
-import com.websarva.wings.android.zuboradiary.ui.list.DiaryDayListAdapter;
+import com.websarva.wings.android.zuboradiary.ui.list.DiaryListListenerSetting;
 import com.websarva.wings.android.zuboradiary.ui.list.DiaryListSetting;
 import com.websarva.wings.android.zuboradiary.ui.list.DiaryYearMonthListAdapter;
 import com.websarva.wings.android.zuboradiary.ui.list.wordsearch.WordSearchViewModel;
@@ -58,7 +58,7 @@ public class DiaryListFragment extends Fragment {
     private CustomLinearLayoutManager diaryListYearMonthLinearLayoutManager;
     private static final int DIARY_DAY_LIST_ITEM_MARGIN_VERTICAL = 16;
     private static final int DIARY_DAY_LIST_ITEM_MARGIN_HORIZONTAL = 32;
-    private DiaryListSetting<DiaryYearMonthListAdapter.DiaryYearMonthListViewHolder> diaryListSetting;
+    private DiaryListSetting diaryListSetting;
 
     // Navigation関係
     private NavController navController;
@@ -84,7 +84,7 @@ public class DiaryListFragment extends Fragment {
         navController = NavHostFragment.findNavController(this);
 
         // 日記リスト設定クラスインスタンス化
-        diaryListSetting = new DiaryListSetting<>(); // TODO:他の方法がないか検討
+        diaryListSetting = new DiaryListSetting(); // TODO:他の方法がないか検討
     }
 
 
@@ -252,8 +252,7 @@ public class DiaryListFragment extends Fragment {
     private void setUpDiaryList() {
         RecyclerView recyclerDiaryYearMonthList = binding.recyclerDiaryYearMonthList;
         diaryListYearMonthLinearLayoutManager = new CustomLinearLayoutManager(getContext());
-        recyclerDiaryYearMonthList
-                .setLayoutManager(diaryListYearMonthLinearLayoutManager);
+        recyclerDiaryYearMonthList.setLayoutManager(diaryListYearMonthLinearLayoutManager);
         DiaryYearMonthListAdapter diaryYearMonthListAdapter =
                 new DiaryYearMonthListAdapter(requireContext(), this::showShowDiaryFragment, true);
         recyclerDiaryYearMonthList.setAdapter(diaryYearMonthListAdapter);
@@ -264,10 +263,10 @@ public class DiaryListFragment extends Fragment {
         //           年月のアイテムのサイズ変更にアニメーションが発生せず全体的に違和感となるアニメーションになってしまう。
         //      問題2.最終アイテムまで到達し、ProgressBarが消えた後にセクションバーがその分ずれる)
         recyclerDiaryYearMonthList.setItemAnimator(null);
-        recyclerDiaryYearMonthList
-                .addOnScrollListener(new updateFirstVisibleSectionBarPositionOnScrollListener());
-        recyclerDiaryYearMonthList
-                .addOnScrollListener(new addDiaryListOnScrollListener());
+        /*recyclerDiaryYearMonthList.addOnScrollListener(
+                new CustomDiaryListOnScrollListener(
+                        DIARY_DAY_LIST_ITEM_MARGIN_VERTICAL, diaryListViewModel.getIsLoading())
+        );
         recyclerDiaryYearMonthList.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
             @Override
             public void onLayoutChange(
@@ -280,7 +279,19 @@ public class DiaryListFragment extends Fragment {
                                 DIARY_DAY_LIST_ITEM_MARGIN_VERTICAL
                         );
             }
-        });
+        });*/
+        DiaryListListenerSetting diaryListListenerSetting = new DiaryListListenerSetting() {
+            @Override
+            public boolean isLoadingDiaryList() {
+                return diaryListViewModel.getIsLoading();
+            }
+
+            @Override
+            public void loadDiaryList() {
+                diaryListViewModel.loadList(DiaryListViewModel.LoadType.ADD);
+            }
+        };
+        diaryListListenerSetting.setUp(recyclerDiaryYearMonthList, DIARY_DAY_LIST_ITEM_MARGIN_VERTICAL);
 
         diaryListViewModel.getDiaryListLiveData().observe(
                 getViewLifecycleOwner(),
@@ -297,6 +308,8 @@ public class DiaryListFragment extends Fragment {
                             return;
                         }
                         List<DiaryYearMonthListItemBase> convertedList = new ArrayList<>(diaryListItems);
+                        Log.d("20240812", "diaryListItems_size:" + diaryListItems.size());
+                        Log.d("20240812", "convertedList_size:" + convertedList.size());
                         diaryYearMonthListAdapter.submitList(convertedList);
                     }
                 }

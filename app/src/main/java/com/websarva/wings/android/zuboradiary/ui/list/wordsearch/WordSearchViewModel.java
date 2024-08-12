@@ -1,12 +1,9 @@
 package com.websarva.wings.android.zuboradiary.ui.list.wordsearch;
 
-import android.os.Handler;
-import android.os.Looper;
 import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.style.BackgroundColorSpan;
 
-import androidx.core.os.HandlerCompat;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
@@ -31,6 +28,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel;
 @HiltViewModel
 public class WordSearchViewModel extends ViewModel {
 
+    // TODO:Visible変数を削除してFragment上で制御できるか検討
     private final DiaryRepository diaryRepository;
     private final MutableLiveData<String> searchWord = new MutableLiveData<>();
     private final MutableLiveData<Boolean> isVisibleSearchWordClearButton = new MutableLiveData<>();
@@ -43,7 +41,7 @@ public class WordSearchViewModel extends ViewModel {
     private final MutableLiveData<Boolean> isVisibleResultList = new MutableLiveData<>();
     private final MutableLiveData<Boolean> isVisibleUpdateProgressBar = new MutableLiveData<>();
     private final MutableLiveData<Boolean> isVisibleNoResultMessage = new MutableLiveData<>();
-    private static final int LOAD_ITEM_NUM = 10; // TODO:仮数値の為、最後に設定
+    private static final int NUM_LOADING_ITEMS = 10; //リストが画面全体に表示される値にすること。 // TODO:仮数値の為、最後に設定
     private final ExecutorService executorService;
 
     // エラー関係
@@ -74,12 +72,13 @@ public class WordSearchViewModel extends ViewModel {
         NEW, UPDATE, ADD
     }
 
-    public void loadWordSearchResultListAsync(
-            LoadType loadType, String searchWord, int spannableStringBackGroundColor){
+    public void loadWordSearchResultList(
+            LoadType loadType, int spannableStringBackGroundColor){
         if (LoadingWordSearchResultListFuture != null && !LoadingWordSearchResultListFuture.isDone()) {
             LoadingWordSearchResultListFuture.cancel(true);
         }
-        if (this.searchWord.getValue().isEmpty()) {
+        String searchWord = this.searchWord.getValue();
+        if (searchWord == null || searchWord.isEmpty()) {
             setupVisibilityBeforeWordSearch();
             wordSearchResultList.setValue(new ArrayList<>());
             return;
@@ -117,9 +116,12 @@ public class WordSearchViewModel extends ViewModel {
                         return;
                     }
                     numLoadingItems = countDiaryListDayItem(currentResultList);
+                    if (numLoadingItems < NUM_LOADING_ITEMS) {
+                        numLoadingItems = NUM_LOADING_ITEMS;
+                    }
                     loadingOffset = 0;
                 } else if (loadType == LoadType.ADD) {
-                    numLoadingItems = LOAD_ITEM_NUM;
+                    numLoadingItems = NUM_LOADING_ITEMS;
                     if (currentResultList == null || currentResultList.isEmpty()) {
                         // TODO:assert
                         return;
@@ -128,7 +130,7 @@ public class WordSearchViewModel extends ViewModel {
                     }
                 } else {
                     // LoadType.NEW
-                    numLoadingItems = LOAD_ITEM_NUM;
+                    numLoadingItems = NUM_LOADING_ITEMS;
                     loadingOffset = 0;
                 }
 
@@ -378,7 +380,7 @@ public class WordSearchViewModel extends ViewModel {
             LocalDate date = day.getDate();
             YearMonth yearMonth = YearMonth.of(date.getYear(), date.getMonth());
 
-            if (sortingYearMonth != null && yearMonth != sortingYearMonth) {
+            if (sortingYearMonth != null &&  !yearMonth.equals(sortingYearMonth)) {
                 wordSearchResultMonthListItem =
                         new WordSearchResultYearMonthListItem(sortingYearMonth, sortingList, VIEW_TYPE_DIARY);
                 wordSearchResultYearMonthList.add( wordSearchResultMonthListItem);

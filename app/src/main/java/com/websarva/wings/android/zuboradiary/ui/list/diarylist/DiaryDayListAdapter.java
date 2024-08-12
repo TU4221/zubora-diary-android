@@ -1,4 +1,4 @@
-package com.websarva.wings.android.zuboradiary.ui.list;
+package com.websarva.wings.android.zuboradiary.ui.list.diarylist;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -12,7 +12,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.websarva.wings.android.zuboradiary.data.DayOfWeekNameResIdGetter;
 import com.websarva.wings.android.zuboradiary.databinding.RowDiaryDayListBinding;
-import com.websarva.wings.android.zuboradiary.ui.list.diarylist.DiaryDayListItem;
 
 import java.time.LocalDate;
 import java.util.function.Consumer;

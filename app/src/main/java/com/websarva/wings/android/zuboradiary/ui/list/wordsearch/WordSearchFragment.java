@@ -19,6 +19,7 @@ import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -34,11 +35,10 @@ import com.websarva.wings.android.zuboradiary.ui.KeyboardInitializer;
 import com.websarva.wings.android.zuboradiary.MainActivity;
 import com.websarva.wings.android.zuboradiary.R;
 import com.websarva.wings.android.zuboradiary.databinding.FragmentWordSearchBinding;
+import com.websarva.wings.android.zuboradiary.ui.list.DiaryListListenerSetting;
 import com.websarva.wings.android.zuboradiary.ui.list.DiaryYearMonthListAdapter;
 import com.websarva.wings.android.zuboradiary.ui.list.DiaryListSetting;
-import com.websarva.wings.android.zuboradiary.ui.list.diarylist.DatePickerDialogFragment;
-import com.websarva.wings.android.zuboradiary.ui.list.diarylist.DeleteConfirmationDialogFragment;
-import com.websarva.wings.android.zuboradiary.ui.list.diarylist.DiaryListFragmentDirections;
+import com.websarva.wings.android.zuboradiary.ui.list.diarylist.DiaryListViewModel;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -50,7 +50,7 @@ public class WordSearchFragment extends Fragment {
     private FragmentWordSearchBinding binding;
     private static final int DIARY_DAY_LIST_ITEM_MARGIN_VERTICAL = 16;
     private static final int DIARY_DAY_LIST_ITEM_MARGIN_HORIZONTAL = 32;
-    private DiaryListSetting<DiaryYearMonthListAdapter.DiaryYearMonthListViewHolder> diaryListSetting;
+    private DiaryListSetting diaryListSetting;
     private String lastText = ""; // 二重検索防止用
 
     // Navigation関係
@@ -72,7 +72,7 @@ public class WordSearchFragment extends Fragment {
         navController = NavHostFragment.findNavController(this);
 
         // 日記リスト設定クラスインスタンス化
-        diaryListSetting = new DiaryListSetting<>();
+        diaryListSetting = new DiaryListSetting();
     }
 
     @Override
@@ -190,9 +190,8 @@ public class WordSearchFragment extends Fragment {
                         wordSearchViewModel
                                 .setIsVisibleSearchWordClearButton(!s.isEmpty());
                         wordSearchViewModel
-                                .loadWordSearchResultListAsync(
+                                .loadWordSearchResultList(
                                         WordSearchViewModel.LoadType.NEW,
-                                        s,
                                         getResources().getColor(R.color.gray) // TODO:テーマカラーで切替
                                 );
                         lastText = s;
@@ -265,7 +264,7 @@ public class WordSearchFragment extends Fragment {
         //           年月のアイテムのサイズ変更にアニメーションが発生せず全体的に違和感となるアニメーションになってしまう。
         //      問題2.最終アイテムまで到達し、ProgressBarが消えた後にセクションバーがその分ずれる)
         recyclerWordSearchResults.setItemAnimator(null);
-        recyclerWordSearchResults.addOnScrollListener(new RecyclerView.OnScrollListener() {
+        /*recyclerWordSearchResults.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
                 super.onScrolled(recyclerView, dx, dy);
@@ -314,7 +313,24 @@ public class WordSearchFragment extends Fragment {
                                 DIARY_DAY_LIST_ITEM_MARGIN_VERTICAL
                         );
             }
-        });
+        });*/
+
+        DiaryListListenerSetting diaryListListenerSetting = new DiaryListListenerSetting() {
+            @Override
+            public boolean isLoadingDiaryList() {
+                return wordSearchViewModel.getIsLoading();
+            }
+
+            @Override
+            public void loadDiaryList() {
+                wordSearchViewModel
+                        .loadWordSearchResultList(
+                                WordSearchViewModel.LoadType.ADD,
+                                getResources().getColor(R.color.gray) // TODO:テーマカラーで切替
+                        );
+            }
+        };
+        diaryListListenerSetting.setUp(recyclerWordSearchResults, DIARY_DAY_LIST_ITEM_MARGIN_VERTICAL);
 
         // データベースから読み込んだ日記リストをリサクラービューに反映
         wordSearchViewModel.getWordSearchResultListLiveData()
@@ -333,6 +349,8 @@ public class WordSearchFragment extends Fragment {
                         }
                         List<DiaryYearMonthListItemBase> convertedList =
                                 new ArrayList<>(wordSearchResultYearMonthListItems);
+                        Log.d("20240812", "wordSearchResultYearMonthListItems_size:" + wordSearchResultYearMonthListItems.size());
+                        Log.d("20240812", "convertedList_size:" + convertedList.size());
                         wordSearchResultYearMonthListAdapter.submitList(convertedList);
                     }
                 });
@@ -340,9 +358,8 @@ public class WordSearchFragment extends Fragment {
         // 検索結果リスト更新
         if (!wordSearchViewModel.getWordSearchResultListLiveData().getValue().isEmpty()) {
             wordSearchViewModel
-                    .loadWordSearchResultListAsync(
+                    .loadWordSearchResultList(
                             WordSearchViewModel.LoadType.UPDATE,
-                            wordSearchViewModel.getSearchWordMutableLiveData().getValue(),
                             getResources().getColor(R.color.gray) // TODO:テーマカラーで切替
                     );
         }

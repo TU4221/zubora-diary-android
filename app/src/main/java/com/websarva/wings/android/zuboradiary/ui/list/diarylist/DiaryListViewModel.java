@@ -29,13 +29,14 @@ import dagger.hilt.android.lifecycle.HiltViewModel;
 @HiltViewModel
 public class DiaryListViewModel extends ViewModel {
 
+    // TODO:Visible変数を削除してFragment上で制御できるか検討
     private final DiaryRepository diaryRepository;
     private Future<?> loadingDiaryListFuture; // キャンセル用
     private final MutableLiveData<List<DiaryYearMonthListItem>> diaryList = new MutableLiveData<>();
     private boolean isLoading;
     private final MutableLiveData<Boolean> isVisibleDiaryList = new MutableLiveData<>();
     private final MutableLiveData<Boolean> isVisibleUpdateProgressBar = new MutableLiveData<>();
-    private static final int LOAD_ITEM_NUM = 10; // TODO:仮数値の為、最後に設定
+    private static final int NUM_LOADING_ITEMS = 10; //リストが画面全体に表示される値にすること。 // TODO:仮数値の為、最後に設定
     private LocalDate sortConditionDate;
     private final ExecutorService executorService;
 
@@ -93,9 +94,15 @@ public class DiaryListViewModel extends ViewModel {
                             return;
                         }
                         numLoadingItems = countDiaryListDayItem(currentDiaryList);
+                        // HACK:画面全体にリストアイテムが存在しない状態で日記を追加した後にリスト画面に戻ると、
+                        //      日記追加前のアイテム数しか表示されない状態となる。また、スクロール更新もできない。
+                        //      対策として下記コードを記述。
+                        if (numLoadingItems < NUM_LOADING_ITEMS) {
+                            numLoadingItems = NUM_LOADING_ITEMS;
+                        }
                         loadingOffset = 0;
                     } else if (loadType == LoadType.ADD) {
-                        numLoadingItems = LOAD_ITEM_NUM;
+                        numLoadingItems = NUM_LOADING_ITEMS;
                         if (currentDiaryList == null || currentDiaryList.isEmpty()) {
                             // TODO:assert
                             return;
@@ -104,7 +111,7 @@ public class DiaryListViewModel extends ViewModel {
                         }
                     } else {
                         // LoadType.NEW
-                        numLoadingItems = LOAD_ITEM_NUM;
+                        numLoadingItems = NUM_LOADING_ITEMS;
                         loadingOffset = 0;
                     }
 
@@ -156,6 +163,7 @@ public class DiaryListViewModel extends ViewModel {
                                     loadingOffset,
                                     sortConditionDate
                             );
+
                     // 日付が変更された時、リスト読込キャンセル
                     // TODO:下記while意味ある？
                     while (!listListenableFuture.isDone()) {
@@ -279,7 +287,7 @@ public class DiaryListViewModel extends ViewModel {
             LocalDate date = day.getDate();
             YearMonth yearMonth = YearMonth.of(date.getYear(), date.getMonth());
 
-            if (sortingYearMonth != null && yearMonth != sortingYearMonth) {
+            if (sortingYearMonth != null && !yearMonth.equals(sortingYearMonth)) {
                 diaryYearMonthListItem =
                         new DiaryYearMonthListItem(sortingYearMonth, sortingList, VIEW_TYPE_DIARY);
                 diaryYearMonthList.add(diaryYearMonthListItem);

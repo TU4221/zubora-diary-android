@@ -9,19 +9,18 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.DiffUtil;
-import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.websarva.wings.android.zuboradiary.R;
-import com.websarva.wings.android.zuboradiary.databinding.RowDiaryDayListBinding;
 import com.websarva.wings.android.zuboradiary.databinding.RowDiaryYearMonthListBinding;
 import com.websarva.wings.android.zuboradiary.ui.DiaryYearMonthListItemBase;
 import com.websarva.wings.android.zuboradiary.ui.list.diarylist.CustomSimpleCallback;
+import com.websarva.wings.android.zuboradiary.ui.list.diarylist.DiaryDayListAdapter;
 import com.websarva.wings.android.zuboradiary.ui.list.diarylist.DiaryDayListItem;
-import com.websarva.wings.android.zuboradiary.ui.list.diarylist.DiaryListFragment;
 import com.websarva.wings.android.zuboradiary.ui.list.diarylist.DiaryYearMonthListItem;
+import com.websarva.wings.android.zuboradiary.ui.list.wordsearch.WordSearchResultDayListAdapter;
 import com.websarva.wings.android.zuboradiary.ui.list.wordsearch.WordSearchResultDayListItem;
 import com.websarva.wings.android.zuboradiary.ui.list.wordsearch.WordSearchResultYearMonthListItem;
 
@@ -165,7 +164,11 @@ public class DiaryYearMonthListAdapter extends ListAdapter<DiaryYearMonthListIte
                 diaryDayListAdapter.submitList(diaryDayList);
             } else if (item instanceof WordSearchResultYearMonthListItem) {
                 WordSearchResultYearMonthListItem _item = (WordSearchResultYearMonthListItem) item;
-                // TODO:保留
+                List<WordSearchResultDayListItem> wordSearchResultDayList = _item.getWordSearchResultDayList();
+                WordSearchResultDayListAdapter wordSearchResultDayListAdapter =
+                        new WordSearchResultDayListAdapter(context, processOnChildItemClick);
+                _holder.binding.recyclerDayList.setAdapter(wordSearchResultDayListAdapter);
+                wordSearchResultDayListAdapter.submitList(wordSearchResultDayList);
             }
         }
     }
@@ -193,7 +196,7 @@ public class DiaryYearMonthListAdapter extends ListAdapter<DiaryYearMonthListIte
         }
     }
 
-    public static class DiaryYearMonthListViewHolder extends DiaryYearMonthListBaseViewHolder {
+    public static class DiaryYearMonthListViewHolder extends RecyclerView.ViewHolder {
         RowDiaryYearMonthListBinding binding;
 
         public DiaryYearMonthListViewHolder(RowDiaryYearMonthListBinding binding) {
@@ -275,30 +278,19 @@ public class DiaryYearMonthListAdapter extends ListAdapter<DiaryYearMonthListIte
                             _oldItem.getWordSearchResultDayList().get(i);
                     WordSearchResultDayListItem newChildListItem =
                             _newItem.getWordSearchResultDayList().get(i);
-                    if (oldChildListItem.getDayOfMonth() != newChildListItem.getDayOfMonth()) {
+                    if (!oldChildListItem.getDate().equals(newChildListItem.getDate())) {
                         return false;
                     }
-                    if (oldChildListItem.getDayOfWeek() != null
-                            && newChildListItem.getDayOfWeek() != null
-                            && !oldChildListItem.getDayOfWeek().equals(newChildListItem.getDayOfWeek())) {
-                        return false;
-                    }
-                    if (oldChildListItem.getTitle() != null
-                            && newChildListItem.getTitle() != null
-                            && !oldChildListItem.getTitle().equals(newChildListItem.getTitle())) {
+                    if (!oldChildListItem.getTitle().equals(newChildListItem.getTitle())) {
                         return false;
                     }
                     if (oldChildListItem.getItemNumber() != newChildListItem.getItemNumber()) {
                         return false;
                     }
-                    if (oldChildListItem.getItemTitle() != null
-                            && newChildListItem.getItemTitle() != null
-                            && !oldChildListItem.getItemTitle().equals(newChildListItem.getItemTitle())) {
+                    if (!oldChildListItem.getItemTitle().equals(newChildListItem.getItemTitle())) {
                         return false;
                     }
-                    if (oldChildListItem.getItemComment() != null
-                            && newChildListItem.getItemComment() != null
-                            && !oldChildListItem.getItemComment().equals(newChildListItem.getItemComment())) {
+                    if (!oldChildListItem.getItemComment().equals(newChildListItem.getItemComment())) {
                         return false;
                     }
                 }

@@ -45,8 +45,6 @@ import com.websarva.wings.android.zuboradiary.ui.diary.showdiary.ShowDiaryFragme
 
 import com.kizitonwose.calendar.view.CalendarView;
 import com.websarva.wings.android.zuboradiary.ui.diary.showdiary.ShowDiaryViewModel;
-import com.websarva.wings.android.zuboradiary.ui.list.DatePickerDialogFragment;
-import com.websarva.wings.android.zuboradiary.ui.list.DeleteConfirmationDialogFragment;
 import com.websarva.wings.android.zuboradiary.ui.observer.ShowDiaryConditionObserver;
 import com.websarva.wings.android.zuboradiary.ui.observer.ShowDiaryLogObserver;
 import com.websarva.wings.android.zuboradiary.ui.observer.ShowDiaryNumVisibleItemsObserver;
