@@ -46,7 +46,7 @@
                     android:paddingHorizontal="16dp"
                     android:inputType="text"
                     android:text="@={word_search_view_model.searchWordMutableLiveData}"
-                    android:hint="キーワード検索"
+                    android:hint="@string/fragment_word_search_input_field_hint"
                     android:background="@null"
                     android:textSize="16sp" />
                 <ImageButton
@@ -71,7 +71,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:visibility="@{word_search_view_model.isVisibleNoResultMessageLiveData ? View.VISIBLE : View.GONE}"
-                android:text="@string/word_search_no_results_comment"
+                android:text="@string/word_search_no_results_message"
                 android:gravity="center_horizontal"
                 android:paddingTop="100dp" />
 
@@ -85,7 +85,7 @@
                     android:id="@+id/text_word_search_results"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="@{Integer.toString(word_search_view_model.numWordSearchResults) + @string/word_search_results_num_comment}"
+                    android:text="@{Integer.toString(word_search_view_model.numWordSearchResults) + @string/word_search_num_results_message}"
                     android:paddingHorizontal="8dp"
                     android:paddingVertical="8dp"
                     android:visibility="@{word_search_view_model.isVisibleNumWordSearchResultsLiveData ? View.VISIBLE : View.INVISIBLE}" />

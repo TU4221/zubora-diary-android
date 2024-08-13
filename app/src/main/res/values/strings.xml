@@ -14,9 +14,6 @@
     <string name="list_delete_confirm_dialog_btn_ok">はい</string>
     <string name="list_delete_confirm_dialog_btn_ng">いいえ</string>
 
-    <string name="word_search_toolbar_menu_search">ワード検索</string>
-    <string name="word_search_no_results_comment">一致するものが見つかりません。</string>
-    <string name="word_search_results_num_comment">件見つかりました。</string>
 
     <string name="show_diary_toolbar_title">0000年00月00日(月)</string>
     <string name="show_diary_toolbar_option_edit_diary">日記編集</string>
@@ -79,7 +76,10 @@
     <string name="fragment_diary_list_fab_new_diary_creation">新規作成</string>
 
     <!-- fragment_word_search -->
-    <string name="fragment_word_search_result_item">ワード検索</string>
+    <string name="fragment_word_search_input_field_hint">ワード検索</string>
+    <string name="word_search_no_results_message">一致するものが見つかりません。</string>
+    <string name="word_search_num_results_message">件見つかりました。</string>
+    <string name="fragment_word_search_result_item">項目</string>
 
 
     <!-- row_diary_year_month_list -->
