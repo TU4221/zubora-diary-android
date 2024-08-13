@@ -1,5 +1,6 @@
 package com.websarva.wings.android.zuboradiary.ui.settings;
 
+import android.view.ContentInfo;
 import android.view.View;
 
 import androidx.annotation.NonNull;
@@ -9,7 +10,7 @@ import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
 
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
-import com.websarva.wings.android.zuboradiary.data.DayOfWeekNameResIdGetter;
+import com.websarva.wings.android.zuboradiary.data.DayOfWeekConverter;
 import com.websarva.wings.android.zuboradiary.databinding.DialogFragmentNumberPickerBinding;
 
 import java.time.DayOfWeek;
@@ -62,9 +63,8 @@ public class DayOfWeekPickerDialogFragment extends BottomSheetDialogFragment {
             } else {
                 dayOfWeekNumber = dayOfWeek.getValue();
             }
-            DayOfWeekNameResIdGetter dayOfWeekNameResIdGetter = new DayOfWeekNameResIdGetter();
-            Integer resId = dayOfWeekNameResIdGetter.getResId(dayOfWeek);
-            dayOfWeekList[dayOfWeekNumber] = getString(resId);
+            DayOfWeekConverter dayOfWeekConverter = new DayOfWeekConverter(requireContext());
+            dayOfWeekList[dayOfWeekNumber] = dayOfWeekConverter.toStringName(dayOfWeek);
         }
         this.binding.numberPicker.setDisplayedValues(dayOfWeekList);
 

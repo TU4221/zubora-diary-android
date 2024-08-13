@@ -8,7 +8,7 @@ import androidx.datastore.preferences.core.PreferencesKeys;
 import androidx.datastore.rxjava3.RxDataStore;
 
 import com.websarva.wings.android.zuboradiary.data.DateConverter;
-import com.websarva.wings.android.zuboradiary.data.DayOfWeekNameResIdGetter;
+import com.websarva.wings.android.zuboradiary.data.DayOfWeekConverter;
 
 import java.time.DayOfWeek;
 
@@ -77,20 +77,15 @@ public class UserPreferences {
     public Flowable<String> loadCalendarStartDayOfWeekName() {
         return this.dataStore.data().map(preferences -> {
             Integer savedCalendarStartDayOfWeekNumber = preferences.get(KEY_CALENDAR_START_DAY_OF_WEEK);
-            DayOfWeekNameResIdGetter dayOfWeekNameResIdGetter = new DayOfWeekNameResIdGetter();
-            int savedCalendarStartDayOfWeekNameResId = -1;
+            DayOfWeekConverter dayOfWeekConverter = new DayOfWeekConverter(context);
             if (savedCalendarStartDayOfWeekNumber != null) {
                 for (DayOfWeek dayOfWeek: DayOfWeek.values()) {
                     if (dayOfWeek.getValue() == savedCalendarStartDayOfWeekNumber) {
-                        savedCalendarStartDayOfWeekNameResId =
-                                dayOfWeekNameResIdGetter.getResId(dayOfWeek);
+                        return dayOfWeekConverter.toStringName(dayOfWeek);
                     }
                 }
-            } else {
-                savedCalendarStartDayOfWeekNameResId =
-                        dayOfWeekNameResIdGetter.getResId(DayOfWeek.SUNDAY);
             }
-            return this.context.getString(savedCalendarStartDayOfWeekNameResId);
+            return dayOfWeekConverter.toStringName(DayOfWeek.SUNDAY);
         });
     }
 

@@ -10,7 +10,7 @@ import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.websarva.wings.android.zuboradiary.data.DayOfWeekNameResIdGetter;
+import com.websarva.wings.android.zuboradiary.data.DayOfWeekConverter;
 import com.websarva.wings.android.zuboradiary.databinding.RowDiaryDayListBinding;
 
 import java.time.LocalDate;
@@ -45,9 +45,8 @@ public class DiaryDayListAdapter extends ListAdapter<DiaryDayListItem, DiaryDayL
 
         holder.date = date; // ホルダー毎に日記の日付情報一式付与
 
-        DayOfWeekNameResIdGetter dayOfWeekNameResIdGetter = new DayOfWeekNameResIdGetter();
-        int dayOfWeekNameResId = dayOfWeekNameResIdGetter.getResId(date.getDayOfWeek());
-        String strDayOfWeek = context.getString(dayOfWeekNameResId);
+        DayOfWeekConverter dayOfWeekConverter = new DayOfWeekConverter(context);
+        String strDayOfWeek = dayOfWeekConverter.toStringShortName(date.getDayOfWeek());
         holder.binding.includeDay.textDayOfWeek.setText(strDayOfWeek);
 
         holder.binding.includeDay.textDayOfMonth.setText(String.valueOf(date.getDayOfMonth()));
@@ -74,19 +73,11 @@ public class DiaryDayListAdapter extends ListAdapter<DiaryDayListItem, DiaryDayL
     }
 
     public static class DiaryDayListViewHolder extends RecyclerView.ViewHolder {
-        private final RowDiaryDayListBinding binding;
-        private LocalDate date;
+        public RowDiaryDayListBinding binding;
+        public LocalDate date;
         public DiaryDayListViewHolder(RowDiaryDayListBinding binding) {
             super(binding.getRoot());
             this.binding = binding;
-        }
-
-        public RowDiaryDayListBinding getBinding() {
-            return binding;
-        }
-
-        public LocalDate getDate() {
-            return date;
         }
     }
 

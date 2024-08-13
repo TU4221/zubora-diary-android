@@ -35,7 +35,7 @@ import androidx.navigation.fragment.NavHostFragment;
 
 import com.google.android.material.materialswitch.MaterialSwitch;
 import com.websarva.wings.android.zuboradiary.R;
-import com.websarva.wings.android.zuboradiary.data.DayOfWeekNameResIdGetter;
+import com.websarva.wings.android.zuboradiary.data.DayOfWeekConverter;
 import com.websarva.wings.android.zuboradiary.data.settings.ThemeColors;
 import com.websarva.wings.android.zuboradiary.databinding.FragmentSettingsBinding;
 import com.websarva.wings.android.zuboradiary.ui.ThemeColorSwitcher;
@@ -387,9 +387,8 @@ public class SettingsFragment extends Fragment {
             return null;
         }
         for (DayOfWeek dayOfWeek: DayOfWeek.values()) {
-            DayOfWeekNameResIdGetter dayOfWeekNameResIdGetter = new DayOfWeekNameResIdGetter();
-            int dayOfWeekNameResId = dayOfWeekNameResIdGetter.getResId(dayOfWeek);
-            String _dayOfWeekName = getString(dayOfWeekNameResId);
+            DayOfWeekConverter dayOfWeekConverter = new DayOfWeekConverter(requireContext());
+            String _dayOfWeekName = dayOfWeekConverter.toStringName(dayOfWeek);
             if (dayOfWeekName.equals(_dayOfWeekName)) {
                 return dayOfWeek;
             }

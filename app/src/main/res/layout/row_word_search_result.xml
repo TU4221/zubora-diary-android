@@ -10,7 +10,7 @@
     android:baselineAligned="false">
 
     <include
-        android:id="@+id/text_word_search_result_day"
+        android:id="@+id/include_day"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"

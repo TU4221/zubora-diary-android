@@ -119,7 +119,7 @@ public class ShowDiaryFragment extends Fragment {
                     @NonNull LifecycleOwner lifecycleOwner, @NonNull Lifecycle.Event event) {
                 // MEMO:Dialog表示中:Lifecycle.Event.ON_PAUSE
                 //      Dialog非表示中:Lifecycle.Event.ON_RESUME
-                Log.d("LifecycleEventObserver", "CalendarFragment_NavBackStackEntry_event:" + event);
+                Log.d("LifecycleEventObserver", "ShowDiaryFragment_NavBackStackEntry_event:" + event);
                 if (event.equals(Lifecycle.Event.ON_RESUME)) {
                     SavedStateHandle savedStateHandle = navBackStackEntry.getSavedStateHandle();
                     receiveDeleteConfirmationDialogResult(savedStateHandle);
@@ -132,7 +132,7 @@ public class ShowDiaryFragment extends Fragment {
         getViewLifecycleOwner().getLifecycle().addObserver(new LifecycleEventObserver() {
             @Override
             public void onStateChanged(@NonNull LifecycleOwner lifecycleOwner, @NonNull Lifecycle.Event event) {
-                Log.d("LifecycleEventObserver", "CalendarFragment_ViewLifecycleOwner_event:" + event);
+                Log.d("LifecycleEventObserver", "ShowDiaryFragment_ViewLifecycleOwner_event:" + event);
                 if (event.equals(Lifecycle.Event.ON_DESTROY)) {
                     // MEMO:removeで削除しないとこのFragmentを閉じてもResult内容が残ってしまう。
                     //      その為、このFragmentを再表示した時にObserverがResultの内容で処理してしまう。
@@ -189,17 +189,12 @@ public class ShowDiaryFragment extends Fragment {
                     public boolean onMenuItemClick(MenuItem item) {
                         // 日記編集フラグメント起動
                         if (item.getItemId() == R.id.showDiaryToolbarOptionEditDiary) {
-                            LocalDate editDiaryDate =
-                                    ShowDiaryFragmentArgs.fromBundle(requireArguments())
-                                            .getShowDiaryDate();
-                            NavDirections action =
-                                    ShowDiaryFragmentDirections
-                                            .actionNavigationShowDiaryFragmentToEditDiaryFragment(
-                                                    false,
-                                                    false,
-                                                    editDiaryDate
-                                            );
-                            navController.navigate(action);
+                            LocalDate editDiaryDate = showDiaryViewModel.getDateLiveData().getValue();
+                            if (editDiaryDate == null) {
+                                // TODO:assert
+                                return false;
+                            }
+                            showEditDiary(editDiaryDate);
                             return true;
                         } else if (item.getItemId() == R.id.showDiaryToolbarOptionDeleteDiary) {
                             showDiaryDeleteConfirmationDialog();
@@ -342,6 +337,17 @@ public class ShowDiaryFragment extends Fragment {
                 }
             }
         });
+    }
+
+    private void showEditDiary(@NonNull LocalDate date) {
+        NavDirections action =
+                ShowDiaryFragmentDirections
+                        .actionNavigationShowDiaryFragmentToEditDiaryFragment(
+                                false,
+                                true,
+                                date
+                        );
+        navController.navigate(action);
     }
 
     private boolean canShowDialog() {

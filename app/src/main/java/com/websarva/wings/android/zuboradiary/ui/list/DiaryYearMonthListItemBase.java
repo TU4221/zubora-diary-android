@@ -1,15 +1,10 @@
-package com.websarva.wings.android.zuboradiary.ui;
+package com.websarva.wings.android.zuboradiary.ui.list;
 
 import android.os.Build;
 
 import androidx.annotation.NonNull;
 
-import com.websarva.wings.android.zuboradiary.ui.list.diarylist.DiaryDayListItem;
-import com.websarva.wings.android.zuboradiary.ui.list.diarylist.DiaryYearMonthListItem;
-
 import java.time.YearMonth;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 
 public abstract class DiaryYearMonthListItemBase implements Cloneable {

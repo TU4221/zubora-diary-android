@@ -13,9 +13,6 @@ public class DiaryDayListItem implements Cloneable {
     private String title;
     private String picturePath;
 
-    public DiaryDayListItem() {
-    }
-
     public DiaryDayListItem(@NonNull LocalDate date,
                             @NonNull String title , @NonNull String picturePath) {
         this.date = date;

@@ -206,7 +206,7 @@ public class DiaryListViewModel extends ViewModel {
                             // 前回の読込リストに今回の読込リストの年月が含まれていたら,
                             // そこにDiaryDayListItemを足し込む
                             if (previousDiaryYearMonthListLastItemYearMonth
-                                    == additionalDiaryListFirstItemYearMonth) {
+                                    .equals(additionalDiaryListFirstItemYearMonth)) {
                                 List<DiaryDayListItem> additionalDiaryDayListItemList =
                                         additionalDiaryListFirstItem.getDiaryDayListItemList();
                                 updateDiaryList.get(previousDiaryListLastItemPosition)

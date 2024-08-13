@@ -24,12 +24,7 @@ public abstract class DiaryListListenerSetting {
         public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
             super.onScrolled(recyclerView, dx, dy);
 
-            DiaryListSetting diaryListSetting = new DiaryListSetting();
-            diaryListSetting
-                    .updateFirstVisibleSectionBarPosition(
-                            recyclerView,
-                            listItemMarginVertical
-                    );
+            updateFirstVisibleSectionBarPosition(recyclerView, listItemMarginVertical);
 
             LinearLayoutManager layoutManager =
                     (LinearLayoutManager) recyclerView.getLayoutManager();
@@ -60,11 +55,64 @@ public abstract class DiaryListListenerSetting {
         }
     }
 
+    private void updateFirstVisibleSectionBarPosition(
+            RecyclerView recyclerView, int itemMarginVertical) {
+        RecyclerView.LayoutManager _layoutManager = recyclerView.getLayoutManager();
+        LinearLayoutManager layoutManager;
+        if (_layoutManager instanceof LinearLayoutManager) {
+            layoutManager = (LinearLayoutManager) _layoutManager;
+        } else {
+            return;
+        }
+        int firstVisibleItemPosition =
+                layoutManager.findFirstVisibleItemPosition();
+
+        RecyclerView.ViewHolder firstVisibleViewHolder =
+                recyclerView.findViewHolderForAdapterPosition(firstVisibleItemPosition);
+        RecyclerView.ViewHolder secondVisibleViewHolder =
+                recyclerView.findViewHolderForAdapterPosition(firstVisibleItemPosition + 1);
+
+        if (firstVisibleViewHolder instanceof DiaryYearMonthListAdapter.DiaryYearMonthListViewHolder) {
+            DiaryYearMonthListAdapter.DiaryYearMonthListViewHolder _firstVisibleViewHolder =
+                    (DiaryYearMonthListAdapter.DiaryYearMonthListViewHolder) firstVisibleViewHolder;
+            View firstVisibleItemView =
+                    layoutManager.getChildAt(0);
+            View secondVisibleItemView =
+                    layoutManager.getChildAt(1);
+            if (firstVisibleItemView != null) {
+                float firstVisibleItemViewPositionY = firstVisibleItemView.getY();
+                if (secondVisibleItemView != null) {
+                    int sectionBarHeight = _firstVisibleViewHolder.binding.textSectionBar.getHeight();
+                    float secondVisibleItemViewPositionY = secondVisibleItemView.getY();
+                    int border = sectionBarHeight + itemMarginVertical;
+                    if (secondVisibleItemViewPositionY >= border) {
+                        _firstVisibleViewHolder.binding.textSectionBar.setY(-(firstVisibleItemViewPositionY));
+                    } else {
+                        if (secondVisibleItemViewPositionY < itemMarginVertical) {
+                            _firstVisibleViewHolder.binding.textSectionBar.setY(0);
+                        } else if (_firstVisibleViewHolder.binding.textSectionBar.getY() == 0) {
+                            _firstVisibleViewHolder.binding.textSectionBar.setY(
+                                    -(firstVisibleItemViewPositionY) - sectionBarHeight
+                            );
+                        }
+                    }
+                } else {
+                    _firstVisibleViewHolder.binding.textSectionBar.setY(-(firstVisibleItemViewPositionY));
+                }
+            }
+        }
+        if (secondVisibleViewHolder instanceof DiaryYearMonthListAdapter.DiaryYearMonthListViewHolder) {
+            DiaryYearMonthListAdapter.DiaryYearMonthListViewHolder _secondVisibleViewHolder =
+                    (DiaryYearMonthListAdapter.DiaryYearMonthListViewHolder) secondVisibleViewHolder;
+            _secondVisibleViewHolder.binding.textSectionBar.setY(0); // ズレ防止
+        }
+    }
+
     public abstract boolean isLoadingDiaryList();
 
     public abstract void loadDiaryList();
 
-    private static class DiaryListOnLayoutChangeListener implements View.OnLayoutChangeListener {
+    private class DiaryListOnLayoutChangeListener implements View.OnLayoutChangeListener {
 
         RecyclerView recyclerView;
         int listItemMarginVertical;
@@ -78,9 +126,7 @@ public abstract class DiaryListListenerSetting {
         public void onLayoutChange(
                 View v, int left, int top, int right, int bottom,
                 int oldLeft, int oldTop, int oldRight, int oldBottom) {
-            DiaryListSetting diaryListSetting = new DiaryListSetting();
-            diaryListSetting
-                    .updateFirstVisibleSectionBarPosition(recyclerView, listItemMarginVertical);
+            updateFirstVisibleSectionBarPosition(recyclerView, listItemMarginVertical);
         }
     }
 }

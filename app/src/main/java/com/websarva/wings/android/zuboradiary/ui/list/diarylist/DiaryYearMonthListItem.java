@@ -1,15 +1,12 @@
 package com.websarva.wings.android.zuboradiary.ui.list.diarylist;
 
-import android.os.Build;
-
 import androidx.annotation.NonNull;
 
-import com.websarva.wings.android.zuboradiary.ui.DiaryYearMonthListItemBase;
+import com.websarva.wings.android.zuboradiary.ui.list.DiaryYearMonthListItemBase;
 
 import java.time.YearMonth;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 public class DiaryYearMonthListItem extends DiaryYearMonthListItemBase {
     private List<DiaryDayListItem> diaryDayListItemList;
@@ -44,7 +41,7 @@ public class DiaryYearMonthListItem extends DiaryYearMonthListItemBase {
         return diaryDayListItemList;
     }
 
-    public void setDiaryDayListItemList(List<DiaryDayListItem> diaryDayListItemList) {
+    public void setDiaryDayListItemList(@NonNull List<DiaryDayListItem> diaryDayListItemList) {
         this.diaryDayListItemList = diaryDayListItemList;
     }
 }

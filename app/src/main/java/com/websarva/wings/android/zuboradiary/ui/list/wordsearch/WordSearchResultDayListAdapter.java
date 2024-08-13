@@ -11,8 +11,8 @@ import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.websarva.wings.android.zuboradiary.data.DateConverter;
-import com.websarva.wings.android.zuboradiary.data.DayOfWeekNameResIdGetter;
+import com.websarva.wings.android.zuboradiary.R;
+import com.websarva.wings.android.zuboradiary.data.DayOfWeekConverter;
 import com.websarva.wings.android.zuboradiary.databinding.RowWordSearchResultBinding;
 
 import java.time.LocalDate;
@@ -45,18 +45,17 @@ public class WordSearchResultDayListAdapter
     public void onBindViewHolder(WordSearchResultDayViewHolder holder, int position) {
         WordSearchResultDayListItem item = getItem(position);
         LocalDate date = item.getDate();
-        DayOfWeekNameResIdGetter dayOfWeekNameResIdGetter = new DayOfWeekNameResIdGetter();
-        int dayOfWeekNameResId = dayOfWeekNameResIdGetter.getResId(date.getDayOfWeek());
-        String strDayOfWeek = context.getString(dayOfWeekNameResId);
+        DayOfWeekConverter dayOfWeekConverter = new DayOfWeekConverter(context);
+        String strDayOfWeek = dayOfWeekConverter.toStringShortName(date.getDayOfWeek());
         SpannableString title = item.getTitle();
         int itemNumber = item.getItemNumber();
         SpannableString itemTitle = item.getItemTitle();
         SpannableString itemComment = item.getItemComment();
         holder.date = date; // ホルダー毎に日記の日付情報一式付与
-        holder.binding.textWordSearchResultDay.textDayOfMonth.setText(strDayOfWeek);
-        holder.binding.textWordSearchResultDay.textDayOfMonth.setText(String.valueOf(date.getDayOfMonth()));
+        holder.binding.includeDay.textDayOfWeek.setText(strDayOfWeek);
+        holder.binding.includeDay.textDayOfMonth.setText(String.valueOf(date.getDayOfMonth()));
         holder.binding.textWordSearchResultTitle.setText(title);
-        String strItemNumber = "項目" + String.valueOf(itemNumber); // TODO:string.xmlより
+        String strItemNumber = context.getString(R.string.fragment_word_search_result_item) + itemNumber;
         holder.binding.textWordSearchResultItemNumber.setText(strItemNumber);
         holder.binding.textWordSearchResultItemTitle.setText(itemTitle);
         holder.binding.textWordSearchResultItemComment.setText(itemComment);
@@ -70,8 +69,8 @@ public class WordSearchResultDayListAdapter
 
     public static class WordSearchResultDayViewHolder extends RecyclerView.ViewHolder {
 
-        private final RowWordSearchResultBinding binding;
-        private LocalDate date;
+        public RowWordSearchResultBinding binding;
+        public LocalDate date;
 
         public WordSearchResultDayViewHolder(RowWordSearchResultBinding binding) {
             super(binding.getRoot());

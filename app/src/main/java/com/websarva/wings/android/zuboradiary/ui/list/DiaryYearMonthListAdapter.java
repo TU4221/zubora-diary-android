@@ -15,7 +15,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.websarva.wings.android.zuboradiary.R;
 import com.websarva.wings.android.zuboradiary.databinding.RowDiaryYearMonthListBinding;
-import com.websarva.wings.android.zuboradiary.ui.DiaryYearMonthListItemBase;
 import com.websarva.wings.android.zuboradiary.ui.list.diarylist.CustomSimpleCallback;
 import com.websarva.wings.android.zuboradiary.ui.list.diarylist.DiaryDayListAdapter;
 import com.websarva.wings.android.zuboradiary.ui.list.diarylist.DiaryDayListItem;
@@ -35,8 +34,8 @@ public class DiaryYearMonthListAdapter extends ListAdapter<DiaryYearMonthListIte
     private final Context context;
     private final Consumer<LocalDate> processOnChildItemClick;
     private final boolean canSwipeItem;
-    private static final int DIARY_DAY_LIST_ITEM_MARGIN_VERTICAL = 16;
-    private static final int DIARY_DAY_LIST_ITEM_MARGIN_HORIZONTAL = 32;
+    public static final int DIARY_DAY_LIST_ITEM_MARGIN_VERTICAL = 16;
+    public static final int DIARY_DAY_LIST_ITEM_MARGIN_HORIZONTAL = 32;
     private final List<Map<String, Object>> diaryYearMonthList = new ArrayList<>(); // TODO:不要確認後削除
     private final List<CustomSimpleCallback> simpleCallbacks = new ArrayList<>();
     public static final int VIEW_TYPE_DIARY = 0;
@@ -145,8 +144,8 @@ public class DiaryYearMonthListAdapter extends ListAdapter<DiaryYearMonthListIte
 
             // セクションバー設定
             // 左端に余白を持たせる為、最初にスペースを入力。
-            String diaryDate = "  " + diaryYearMonth.getYear() + context.getString(R.string.row_list_year)
-                    + diaryYearMonth.getMonthValue() + context.getString(R.string.row_list_month);
+            String diaryDate = "  " + diaryYearMonth.getYear() + context.getString(R.string.row_diary_year_month_list_section_bar_year)
+                    + diaryYearMonth.getMonthValue() + context.getString(R.string.row_diary_year_month_list_section_bar_month);
             _holder.binding.textSectionBar.setText(diaryDate);
             // 日記リストスクロール時に移動させているので、バインディング時に位置リセット
             _holder.binding.textSectionBar.setY(0);
@@ -197,7 +196,7 @@ public class DiaryYearMonthListAdapter extends ListAdapter<DiaryYearMonthListIte
     }
 
     public static class DiaryYearMonthListViewHolder extends RecyclerView.ViewHolder {
-        RowDiaryYearMonthListBinding binding;
+        public RowDiaryYearMonthListBinding binding;
 
         public DiaryYearMonthListViewHolder(RowDiaryYearMonthListBinding binding) {
             super(binding.getRoot());

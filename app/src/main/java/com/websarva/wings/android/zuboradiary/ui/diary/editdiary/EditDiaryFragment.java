@@ -97,14 +97,8 @@ public class EditDiaryFragment extends Fragment {
         // ViewModel設定
         ViewModelProvider provider = new ViewModelProvider(requireActivity());
         editDiaryViewModel = provider.get(EditDiaryViewModel.class);
+        editDiaryViewModel.initialize();
         settingsViewModel = provider.get(SettingsViewModel.class);
-        // DiaryViewModel初期化
-        // TODO:下記検討する
-        boolean isStartDiaryFragment =
-                EditDiaryFragmentArgs.fromBundle(requireArguments()).getIsStartDiaryFragment();
-        if (isStartDiaryFragment) {
-            editDiaryViewModel.initialize();
-        }
 
         // Navigation設定
         navController = NavHostFragment.findNavController(this);
@@ -339,13 +333,11 @@ public class EditDiaryFragment extends Fragment {
 
     private void setUpDiaryData() {
         // 画面表示データ準備
-        boolean isStartDiaryFragment =
-                EditDiaryFragmentArgs.fromBundle(requireArguments()).getIsStartDiaryFragment();
         boolean isLoadingExistingDiary =
                 EditDiaryFragmentArgs.fromBundle(requireArguments()).getIsLoadingDiary();
         LocalDate editDiaryDate =
                 EditDiaryFragmentArgs.fromBundle(requireArguments()).getEditDiaryDate();
-        if (isStartDiaryFragment && !editDiaryViewModel.getHasPreparedDiary()) {
+        if (!editDiaryViewModel.getHasPreparedDiary()) {
             editDiaryViewModel.prepareDiary(editDiaryDate, isLoadingExistingDiary);
         }
 
@@ -495,13 +487,17 @@ public class EditDiaryFragment extends Fragment {
 
     private boolean shouldShowLoadingExistingDiaryDialogOnDateChanged(@NonNull LocalDate changedDate) {
         if (changedDate.equals(lastSelectedDate)) {
+            Log.d("EditFragment", "shouldShowLoadingExistingDiaryDialogOnDateChanged:changedDate.equals(lastSelectedDate) = true");
             return false;
         }
         LocalDate loadedDate = editDiaryViewModel.getLoadedDateLiveData().getValue();
         if (changedDate.equals(loadedDate)) {
+            Log.d("EditFragment", "shouldShowLoadingExistingDiaryDialogOnDateChanged:changedDate.equals(loadedDate) = true");
             return false;
         }
-        return editDiaryViewModel.hasDiary(changedDate);
+        boolean hasDiary = editDiaryViewModel.hasDiary(changedDate);
+        Log.d("EditFragment", "shouldShowLoadingExistingDiaryDialogOnDateChanged:hasDiary(changedDate) = " + hasDiary);
+        return hasDiary;
     }
 
     // 天気入力欄。

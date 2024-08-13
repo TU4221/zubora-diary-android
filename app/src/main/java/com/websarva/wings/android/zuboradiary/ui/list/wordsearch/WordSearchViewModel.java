@@ -235,7 +235,7 @@ public class WordSearchViewModel extends ViewModel {
                         // 前回の読込リストに今回の読込リストの年月が含まれていたら,
                         // そこにDiaryDayListItemを足し込む
                         if (previousResultYearMonthListLastItemYearMonth
-                                == additionalResultListFirstItemYearMonth) {
+                                .equals(additionalResultListFirstItemYearMonth)) {
                             List<WordSearchResultDayListItem> additionalDiaryDayListItemList =
                                     additionalResultListFirstItem.getWordSearchResultDayList();
                             updateResultList.get(previousResultListLastItemPosition)

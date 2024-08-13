@@ -339,7 +339,7 @@ public class CustomSimpleCallback extends ItemTouchHelper.SimpleCallback {
                         NavDirections action =
                                 DiaryListFragmentDirections
                                         .actionDiaryListFragmentToDeleteConfirmationDialog(
-                                                diaryListDayViewHolder.getDate()
+                                                diaryListDayViewHolder.date
                                         );
                         CustomSimpleCallback.this.navController.navigate(action);
                     }

@@ -11,13 +11,10 @@ import java.util.UUID;
 public class WordSearchResultDayListItem implements Cloneable {
     private final String id = UUID.randomUUID().toString();
     private LocalDate date;
-    private SpannableString title = new SpannableString("");
+    private SpannableString title;
     private int itemNumber;
-    private SpannableString itemTitle = new SpannableString("");
-    private SpannableString itemComment = new SpannableString("");
-
-    public WordSearchResultDayListItem() {
-    }
+    private SpannableString itemTitle;
+    private SpannableString itemComment;
 
     public WordSearchResultDayListItem(@NonNull LocalDate date,
                                        @NonNull SpannableString title , int itemNo,

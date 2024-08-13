@@ -28,7 +28,7 @@ public class DatePickerDialogFragment extends DialogFragment{
                 new DatePickerDialog.OnDateSetListener() {
                     @Override
                     public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
-                        LocalDate selectedDate = LocalDate.of(year, month, dayOfMonth);
+                        LocalDate selectedDate = LocalDate.of(year, month + 1, dayOfMonth);
                         NavController navController =
                                 NavHostFragment.findNavController(
                                         DatePickerDialogFragment.this);

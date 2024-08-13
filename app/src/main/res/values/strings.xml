@@ -5,8 +5,6 @@
     <string name="title_notifications">Notifications</string>
 
     <string name="list_toolbar_title">ズボラ日記</string>
-    <string name="list_toolbar_option_word_search">ワード検索</string>
-    <string name="list_toolbar_option_set_year_month">先頭表示年月設定</string>
 
     <string name="list_delete_confirm_dialog_title">削除確認</string>
     <string name="list_delete_confirm_dialog_message_year">年</string>
@@ -15,9 +13,6 @@
     <string name="list_delete_confirm_dialog_message">の日記を削除してもよろしいでしょうか。</string>
     <string name="list_delete_confirm_dialog_btn_ok">はい</string>
     <string name="list_delete_confirm_dialog_btn_ng">いいえ</string>
-
-    <string name="row_list_year">年</string>
-    <string name="row_list_month">月</string>
 
     <string name="word_search_toolbar_menu_search">ワード検索</string>
     <string name="word_search_no_results_comment">一致するものが見つかりません。</string>
@@ -77,8 +72,22 @@
     <string name="edit_diary_select_item_title_confirm_delete_dialog_btn_ok">はい</string>
     <string name="edit_diary_select_item_title_confirm_delete_dialog_btn_ng">いいえ</string>
 
-    <!-- fragment_edit_diary -->
+    <!-- fragment_diary_list -->
+    <string name="fragment_diary_list_toolbar_option_word_search">ワード検索</string>
+    <string name="fragment_diary_list_toolbar_navigation_top_year_month_switching">先頭年月切替</string>
+    <string name="fragment_diary_list_no_saved_diary_message">保存されている日記がありません。</string>
+    <string name="fragment_diary_list_fab_new_diary_creation">新規作成</string>
 
+    <!-- fragment_word_search -->
+    <string name="fragment_word_search_result_item">ワード検索</string>
+
+
+    <!-- row_diary_year_month_list -->
+    <string name="row_diary_year_month_list_section_bar_year">年</string>
+    <string name="row_diary_year_month_list_section_bar_month">月</string>
+
+
+    <!-- fragment_edit_diary -->
     <string name="fragment_edit_diary_toolbar_title_hint">新規作成／編集中</string>
 
     <string name="fragment_edit_diary_toolbar_option_save_diary">日記保存</string>
@@ -128,14 +137,22 @@
     <string name="dialog_fragment_number_picker_theme_color_green">グリーン</string>
     <string name="dialog_fragment_number_picker_theme_color_yellow">イエロー</string>
 
-    <!-- dialog_fragment_number_picker (DayOfWeekPickerDialogFragment) -->
-    <string name="dialog_fragment_number_picker_sunday">日曜</string>
-    <string name="dialog_fragment_number_picker_monday">月曜</string>
-    <string name="dialog_fragment_number_picker_tuesday">火曜</string>
-    <string name="dialog_fragment_number_picker_wednesday">水曜</string>
-    <string name="dialog_fragment_number_picker_thursday">木曜</string>
-    <string name="dialog_fragment_number_picker_friday">金曜</string>
-    <string name="dialog_fragment_number_picker_saturday">土曜</string>
+    <!-- DayOfWeekConverter -->
+    <string name="day_of_week_name_sunday">日曜</string>
+    <string name="day_of_week_name_monday">月曜</string>
+    <string name="day_of_week_name_tuesday">火曜</string>
+    <string name="day_of_week_name_wednesday">水曜</string>
+    <string name="day_of_week_name_thursday">木曜</string>
+    <string name="day_of_week_name_friday">金曜</string>
+    <string name="day_of_week_name_saturday">土曜</string>
+
+    <string name="day_of_week_short_name_sunday">日</string>
+    <string name="day_of_week_short_name_monday">月</string>
+    <string name="day_of_week_short_name_tuesday">火</string>
+    <string name="day_of_week_short_name_wednesday">水</string>
+    <string name="day_of_week_short_name_thursday">木</string>
+    <string name="day_of_week_short_name_friday">金</string>
+    <string name="day_of_week_short_name_saturday">土</string>
 
     <!-- enum_weathers -->
     <string name="enum_weather_unknown">--</string>
