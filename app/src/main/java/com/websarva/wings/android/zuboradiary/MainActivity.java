@@ -359,13 +359,13 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private boolean isNoBottomNavigationFragment(@NonNull NavDestination navDestination) {
-        return navDestination.getId() == R.id.navigation_show_diary_fragment
-                || navDestination.getId() == R.id.navigation_edit_diary_fragment
-                || navDestination.getId() == R.id.navigation_date_picker_dialog_for_edit_diary_fragment
-                || navDestination.getId() == R.id.navigation_delete_confirmation_dialog_for_edit_diary_fragment
-                || navDestination.getId() == R.id.navigation_load_existing_diary_dialog_for_edit_diary_fragment
-                || navDestination.getId() == R.id.navigation_update_existing_diary_dialog_for_edit_diary_fragment
-                || navDestination.getId() == R.id.navigation_edit_diary_select_item_title_fragment
-                || navDestination.getId() == R.id.navigation_delete_confirmation_dialog_for_edit_diary_select_item_title_fragment;
+        return navDestination.getId() == R.id.navigation_diary_show_fragment
+                || navDestination.getId() == R.id.navigation_diary_edit_fragment
+                || navDestination.getId() == R.id.navigation_date_picker_dialog_for_diary_edit_fragment
+                || navDestination.getId() == R.id.navigation_diary_item_delete_confirmation_dialog
+                || navDestination.getId() == R.id.navigation_load_existing_diary_dialog_for_diary_edit_fragment
+                || navDestination.getId() == R.id.navigation_update_existing_diary_dialog_for_diary_edit_fragment
+                || navDestination.getId() == R.id.navigation_diary_item_title_edit_fragment
+                || navDestination.getId() == R.id.navigation_diary_item_title_delete_confirmation_dialog;
     }
 }

@@ -12,7 +12,7 @@
     </data>
 
     <LinearLayout
-        android:id="@+id/liner_layout_show_diary_item"
+        android:id="@+id/liner_layout_diary_show_item"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
@@ -32,7 +32,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
             android:text="@{titleLiveData}"
-            android:hint="@string/show_diary_item_1" />
+            android:hint="@string/layout_diary_show_item_title_hint" />
 
         <View
             android:id="@+id/view_item_1_divider"
@@ -47,18 +47,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
             android:text="@{commentLiveData}"
-            android:hint="@string/show_diary_content_1" />
+            android:hint="@string/layout_diary_show_item_comment_hint" />
 
     </LinearLayout>
-
-    <!-- TODO:不要確認後削除 -->
-    <!--<androidx.constraintlayout.motion.widget.MotionLayout
-        android:id="@+id/motion_layout_show_diary_item"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:layoutDescription="@xml/layout_show_diary_item_scene">
-
-
-
-    </androidx.constraintlayout.motion.widget.MotionLayout>-->
 </layout>

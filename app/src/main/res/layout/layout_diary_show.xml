@@ -5,8 +5,8 @@
     <data>
         <import type="android.view.View" />
         <variable
-            name="showDiaryViewModel"
-            type="com.websarva.wings.android.zuboradiary.ui.diary.showdiary.ShowDiaryViewModel" />
+            name="diaryShowViewModel"
+            type="com.websarva.wings.android.zuboradiary.ui.diary.diaryshow.DiaryShowViewModel" />
     </data>
 
     <LinearLayout
@@ -24,26 +24,26 @@
                 android:id="@+id/text_weather"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/show_diary_weather" />
+                android:text="@string/layout_diary_show_weather" />
 
             <TextView
                 android:id="@+id/text_weather_1_selected"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:hint="@string/show_diary_weather1_selected" />
+                tools:text="@string/layout_diary_show_weather1_tools_value" />
 
             <TextView
                 android:id="@+id/text_weather_slush"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/show_diary_weather_slush"
+                android:text="@string/layout_diary_show_weather_slush"
                 android:textSize="16sp" />
 
             <TextView
                 android:id="@+id/text_weather_2_selected"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:hint="@string/show_diary_weather2_selected" />
+                tools:text="@string/layout_diary_show_weather2_tools_value" />
 
         </LinearLayout>
 
@@ -57,13 +57,13 @@
                 android:id="@+id/text_condition"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/show_diary_condition" />
+                android:text="@string/layout_diary_show_condition" />
 
             <TextView
                 android:id="@+id/text_condition_selected"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:hint="@string/show_diary_selected_condition" />
+                tools:text="@string/layout_diary_show_condition_tools_value" />
 
         </LinearLayout>
 
@@ -72,37 +72,37 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            android:text="@{showDiaryViewModel.titleLiveData}"
-            android:hint="@string/show_diary_title"
+            android:text="@{diaryShowViewModel.titleLiveData}"
+            android:hint="@string/layout_diary_show_title_hint"
             android:textSize="20sp" />
 
-        <include layout="@layout/layout_show_diary_item"
+        <include layout="@layout/layout_diary_show_item"
             android:id="@+id/include_item_1"
-            android:titleLiveData="@{showDiaryViewModel.item1TitleLiveData}"
-            android:commentLiveData="@{showDiaryViewModel.item1CommentLiveData}"/>
+            android:titleLiveData="@{diaryShowViewModel.item1TitleLiveData}"
+            android:commentLiveData="@{diaryShowViewModel.item1CommentLiveData}"/>
 
-        <include layout="@layout/layout_show_diary_item"
+        <include layout="@layout/layout_diary_show_item"
             android:id="@+id/include_item_2"
-            android:titleLiveData="@{showDiaryViewModel.item2TitleLiveData}"
-            android:commentLiveData="@{showDiaryViewModel.item2CommentLiveData}"/>
+            android:titleLiveData="@{diaryShowViewModel.item2TitleLiveData}"
+            android:commentLiveData="@{diaryShowViewModel.item2CommentLiveData}"/>
 
-        <include layout="@layout/layout_show_diary_item"
+        <include layout="@layout/layout_diary_show_item"
             android:id="@+id/include_item_3"
-            android:titleLiveData="@{showDiaryViewModel.item3TitleLiveData}"
-            android:commentLiveData="@{showDiaryViewModel.item3CommentLiveData}"/>
+            android:titleLiveData="@{diaryShowViewModel.item3TitleLiveData}"
+            android:commentLiveData="@{diaryShowViewModel.item3CommentLiveData}"/>
 
-        <include layout="@layout/layout_show_diary_item"
+        <include layout="@layout/layout_diary_show_item"
             android:id="@+id/include_item_4"
-            android:titleLiveData="@{showDiaryViewModel.item4TitleLiveData}"
-            android:commentLiveData="@{showDiaryViewModel.item4CommentLiveData}"/>
+            android:titleLiveData="@{diaryShowViewModel.item4TitleLiveData}"
+            android:commentLiveData="@{diaryShowViewModel.item4CommentLiveData}"/>
 
-        <include layout="@layout/layout_show_diary_item"
+        <include layout="@layout/layout_diary_show_item"
             android:id="@+id/include_item_5"
-            android:titleLiveData="@{showDiaryViewModel.item5TitleLiveData}"
-            android:commentLiveData="@{showDiaryViewModel.item5CommentLiveData}"/>
+            android:titleLiveData="@{diaryShowViewModel.item5TitleLiveData}"
+            android:commentLiveData="@{diaryShowViewModel.item5CommentLiveData}"/>
 
         <ImageView
-            android:id="@+id/image_attached"
+            android:id="@+id/image_attached_picture"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
@@ -113,7 +113,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="end"
-            android:text="@string/show_diary_last_updated"
+            android:text="@string/layout_diary_show_last_update"
             app:layout_constraintBaseline_toBaselineOf="@+id/text_log_value"
             app:layout_constraintEnd_toStartOf="@+id/text_log_value" />
 
@@ -122,9 +122,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="end"
-            android:hint="@string/show_diary_last_updated_value"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/image_attached" />
+            app:layout_constraintTop_toBottomOf="@+id/image_attached_picture"
+            tools:text="@string/layout_diary_show_last_update_tools_value" />
 
     </LinearLayout>
 

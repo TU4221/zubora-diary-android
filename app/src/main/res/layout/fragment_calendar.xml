@@ -8,8 +8,8 @@
                   上手くビルド(クラス生成)がされない不具合が発生する。
                   https://qiita.com/nanoyatsu/items/afad39a63d42d6fa3ac8 -->
         <variable
-            name="showDiaryViewModel"
-            type="com.websarva.wings.android.zuboradiary.ui.diary.showdiary.ShowDiaryViewModel" />
+            name="diaryShowViewModel"
+            type="com.websarva.wings.android.zuboradiary.ui.diary.diaryshow.DiaryShowViewModel" />
     </data>
 
     <LinearLayout
@@ -70,9 +70,9 @@
                             android:orientation="vertical">
 
                             <include
-                                android:id="@+id/include_show_diary"
-                                layout="@layout/layout_show_diary_original"
-                                app:showDiaryViewModel="@{showDiaryViewModel}" />
+                                android:id="@+id/include_diary_show"
+                                layout="@layout/layout_diary_show"
+                                app:diaryShowViewModel="@{diaryShowViewModel}" />
 
                             <View
                                 android:id="@+id/view_show_diary_bottom_margin"

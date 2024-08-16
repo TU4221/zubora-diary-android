@@ -8,12 +8,12 @@ import androidx.lifecycle.Observer;
 
 import com.websarva.wings.android.zuboradiary.data.diary.Weathers;
 
-public class ShowDiaryWeather2Observer implements Observer<Weathers> {
+public class DiaryShowWeather2Observer implements Observer<Weathers> {
     Context context;
     TextView slush;
     TextView textWeather;
 
-    public ShowDiaryWeather2Observer(Context context, TextView slush, TextView textWeather) {
+    public DiaryShowWeather2Observer(Context context, TextView slush, TextView textWeather) {
         this.context = context;
         this.slush = slush;
         this.textWeather = textWeather;

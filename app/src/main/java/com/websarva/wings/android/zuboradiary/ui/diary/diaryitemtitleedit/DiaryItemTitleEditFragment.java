@@ -43,7 +43,7 @@ import android.widget.TextView;
 
 import com.websarva.wings.android.zuboradiary.R;
 import com.websarva.wings.android.zuboradiary.data.database.DiaryItemTitleSelectionHistoryItem;
-import com.websarva.wings.android.zuboradiary.databinding.FragmentEditDiarySelectItemTitleBinding;
+import com.websarva.wings.android.zuboradiary.databinding.FragmentDiaryItemTitleEditBinding;
 import com.websarva.wings.android.zuboradiary.ui.KeyboardInitializer;
 
 import java.util.ArrayList;
@@ -55,7 +55,7 @@ import dagger.hilt.android.AndroidEntryPoint;
 public class DiaryItemTitleEditFragment extends Fragment {
 
     // View関係
-    private FragmentEditDiarySelectItemTitleBinding binding;
+    private FragmentDiaryItemTitleEditBinding binding;
 
     // Navigation関係
     private NavController navController;
@@ -90,7 +90,7 @@ public class DiaryItemTitleEditFragment extends Fragment {
         super.onCreateView(inflater,container,savedInstanceState);
 
         // データバインディング設定
-        binding = FragmentEditDiarySelectItemTitleBinding.inflate(inflater, container, false);
+        binding = FragmentDiaryItemTitleEditBinding.inflate(inflater, container, false);
 
         return binding.getRoot();
     }
@@ -151,24 +151,24 @@ public class DiaryItemTitleEditFragment extends Fragment {
     }
 
     private void removeDialogResults(SavedStateHandle savedStateHandle) {
-        savedStateHandle.remove(DeleteConfirmationDialogFragment.KEY_SELECTED_BUTTON);
-        savedStateHandle.remove(DeleteConfirmationDialogFragment.KEY_DELETE_LIST_ITEM_POSITION);
+        savedStateHandle.remove(DiaryItemTitleDeleteConfirmationDialogFragment.KEY_SELECTED_BUTTON);
+        savedStateHandle.remove(DiaryItemTitleDeleteConfirmationDialogFragment.KEY_DELETE_LIST_ITEM_POSITION);
     }
 
     private void receiveDeleteConfirmationDialogResult(SavedStateHandle savedStateHandle) {
         // 履歴項目削除確認ダイアログからの結果受取
         boolean containsDialogResults =
                 savedStateHandle
-                        .contains(DeleteConfirmationDialogFragment.KEY_SELECTED_BUTTON)
+                        .contains(DiaryItemTitleDeleteConfirmationDialogFragment.KEY_SELECTED_BUTTON)
                         && savedStateHandle
-                        .contains(DeleteConfirmationDialogFragment.KEY_DELETE_LIST_ITEM_POSITION);
+                        .contains(DiaryItemTitleDeleteConfirmationDialogFragment.KEY_DELETE_LIST_ITEM_POSITION);
         if (containsDialogResults) {
             Integer selectedButton =
                     savedStateHandle
-                            .get(DeleteConfirmationDialogFragment.KEY_SELECTED_BUTTON);
+                            .get(DiaryItemTitleDeleteConfirmationDialogFragment.KEY_SELECTED_BUTTON);
             Integer deleteListItemPosition =
                     savedStateHandle
-                            .get(DeleteConfirmationDialogFragment.KEY_DELETE_LIST_ITEM_POSITION);
+                            .get(DiaryItemTitleDeleteConfirmationDialogFragment.KEY_DELETE_LIST_ITEM_POSITION);
             if (selectedButton == null) {
                 return;
             }
@@ -197,7 +197,7 @@ public class DiaryItemTitleEditFragment extends Fragment {
             // TODO:assert
             return;
         }
-        String toolBarTitle = "項目" + targetItemNumber + " タイトル編集中";
+        String toolBarTitle = getString(R.string.fragment_diary_item_title_edit_toolbar_first_title) + targetItemNumber + getString(R.string.fragment_diary_item_title_edit_toolbar_second_title);
         binding.materialToolbarTopAppBar.setTitle(toolBarTitle);
         binding.materialToolbarTopAppBar
                 .setNavigationOnClickListener(new View.OnClickListener() {
@@ -244,10 +244,10 @@ public class DiaryItemTitleEditFragment extends Fragment {
                 } else {
                     // 入力タイトルの先頭が空白文字(\\s)ならエラー表示
                     if (title.matches("\\s+.*")) {
-                        binding.editTextNewItemTitle.setError("先頭文字は空白文字以外を入力してください");
+                        binding.editTextNewItemTitle.setError(getString(R.string.fragment_diary_item_title_edit_new_item_title_input_field_error_message_initial_char_unmatched));
                         // それ以外(未入力)ならエラー表示
                     } else {
-                        binding.editTextNewItemTitle.setError("1文字以上の文字を入力してください");
+                        binding.editTextNewItemTitle.setError(getString(R.string.fragment_diary_item_title_edit_new_item_title_input_field_error_message_empty));
                     }
                 }
             }
@@ -433,6 +433,7 @@ public class DiaryItemTitleEditFragment extends Fragment {
     }
 
     // アイテムタイトル選択履歴ViewHolder
+    // TODO:ListAdapterに変更&独立クラスへ
     private static class SelectedItemTitleHistoryViewHolder extends RecyclerView.ViewHolder {
         public TextView textSelectedItemTitle;
 
@@ -588,20 +589,20 @@ public class DiaryItemTitleEditFragment extends Fragment {
         }
         savedStateHandle.set(KEY_UPDATE_ITEM_NUMBER, targetItemNumber);
         savedStateHandle.set(KEY_NEW_ITEM_TITLE, newItemTitle);
-        showEditDiaryFragment();
+        showDiaryEditFragment();
     }
 
-    private void showEditDiaryFragment() {
+    private void showDiaryEditFragment() {
         NavDirections action =
                 DiaryItemTitleEditFragmentDirections
-                        .actionSelectItemTitleFragmentToEditDiaryFragment();
+                        .actionDiaryItemTitleEditFragmentToDiaryEditFragment();
         navController.navigate(action);
     }
 
     private void showDeleteConfirmationDialog(int itemPosition, String itemTitle) {
         NavDirections action =
                 DiaryItemTitleEditFragmentDirections
-                        .actionEditDiarySelectItemTitleFragmentToDeleteConfirmationDialog(
+                        .actionDiaryItemTitleEditFragmentToDiaryItemTitleDeleteConfirmationDialog(
                                 itemPosition, itemTitle);
         navController.navigate(action);
     }
@@ -638,7 +639,7 @@ public class DiaryItemTitleEditFragment extends Fragment {
     private void showMessageDialog(String title, String message) {
         NavDirections action =
                 DiaryItemTitleEditFragmentDirections
-                        .actionEditDiarySelectItemTitleFragmentToMessageDialog(title, message);
+                        .actionDiaryItemTitleEditFragmentToMessageDialog(title, message);
         navController.navigate(action);
     }
 
@@ -648,6 +649,6 @@ public class DiaryItemTitleEditFragment extends Fragment {
             return false;
         }
         int currentDestinationId = navController.getCurrentDestination().getId();
-        return currentDestinationId == R.id.navigation_edit_diary_select_item_title_fragment;
+        return currentDestinationId == R.id.navigation_diary_item_title_edit_fragment;
     }
 }

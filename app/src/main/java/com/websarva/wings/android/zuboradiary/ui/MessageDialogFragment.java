@@ -23,7 +23,7 @@ public class MessageDialogFragment extends DialogFragment {
                 MessageDialogFragmentArgs.fromBundle(requireArguments()).getMessage();
         builder.setMessage(message);
         builder.setPositiveButton(
-                R.string.edit_diary_select_item_title_confirm_delete_dialog_btn_ok, null);
+                R.string.dialog_diary_item_title_delete_confirmation_yes, null);
 
         AlertDialog dialog = builder.create();
 

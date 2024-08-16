@@ -1,4 +1,4 @@
-package com.websarva.wings.android.zuboradiary.ui.diary.showdiary;
+package com.websarva.wings.android.zuboradiary.ui.diary.diaryshow;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
@@ -21,7 +21,7 @@ import javax.inject.Inject;
 import dagger.hilt.android.lifecycle.HiltViewModel;
 
 @HiltViewModel
-public class ShowDiaryViewModel extends ViewModel {
+public class DiaryShowViewModel extends ViewModel {
     private final DiaryRepository diaryRepository;
     private final SettingsRepository settingsRepository;
 
@@ -33,7 +33,7 @@ public class ShowDiaryViewModel extends ViewModel {
     private final MutableLiveData<Boolean> isDiaryDeleteError = new MutableLiveData<>();
 
     @Inject
-    public ShowDiaryViewModel(DiaryRepository diaryRepository, SettingsRepository settingsRepository) {
+    public DiaryShowViewModel(DiaryRepository diaryRepository, SettingsRepository settingsRepository) {
         this.diaryRepository = diaryRepository;
         this.settingsRepository = settingsRepository;
         diaryLiveData = new DiaryLiveData();

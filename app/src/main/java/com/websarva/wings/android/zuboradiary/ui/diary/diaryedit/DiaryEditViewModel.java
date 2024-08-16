@@ -1,4 +1,4 @@
-package com.websarva.wings.android.zuboradiary.ui.diary.editdiary;
+package com.websarva.wings.android.zuboradiary.ui.diary.diaryedit;
 
 import android.util.Log;
 
@@ -40,7 +40,7 @@ import retrofit2.Call;
 import retrofit2.Response;
 
 @HiltViewModel
-public class EditDiaryViewModel extends ViewModel {
+public class DiaryEditViewModel extends ViewModel {
     private final DiaryRepository diaryRepository;
     private final WeatherApiRepository weatherApiRepository;
     private final SettingsRepository settingsRepository;
@@ -61,7 +61,7 @@ public class EditDiaryViewModel extends ViewModel {
     private final MutableLiveData<Boolean> isWeatherLoadingError = new MutableLiveData<>();
 
     @Inject
-    public EditDiaryViewModel(
+    public DiaryEditViewModel(
             DiaryRepository diaryRepository,
             WeatherApiRepository weatherApiRepository,
             SettingsRepository settingsRepository) {

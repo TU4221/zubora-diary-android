@@ -7,11 +7,11 @@ import androidx.lifecycle.Observer;
 
 import com.websarva.wings.android.zuboradiary.data.diary.Conditions;
 
-public class ShowDiaryConditionObserver implements Observer<Conditions> {
+public class DiaryShowConditionObserver implements Observer<Conditions> {
     Context context;
     TextView textCondition;
 
-    public ShowDiaryConditionObserver(Context context, TextView textCondition) {
+    public DiaryShowConditionObserver(Context context, TextView textCondition) {
         this.context = context;
         this.textCondition = textCondition;
     }

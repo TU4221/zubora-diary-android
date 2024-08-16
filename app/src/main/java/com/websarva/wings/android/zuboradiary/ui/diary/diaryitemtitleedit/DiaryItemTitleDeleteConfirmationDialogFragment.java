@@ -14,9 +14,9 @@ import androidx.navigation.fragment.NavHostFragment;
 
 import com.websarva.wings.android.zuboradiary.R;
 
-public class DeleteConfirmationDialogFragment extends DialogFragment {
+public class DiaryItemTitleDeleteConfirmationDialogFragment extends DialogFragment {
     private static final String fromClassName =
-            "From" + DeleteConfirmationDialogFragment.class.getName();
+            "From" + DiaryItemTitleDeleteConfirmationDialogFragment.class.getName();
     public static final String KEY_SELECTED_BUTTON = "SelectedButton" + fromClassName;
     public static final String KEY_DELETE_LIST_ITEM_POSITION = "DeleteItemPosition" + fromClassName;
 
@@ -24,16 +24,17 @@ public class DeleteConfirmationDialogFragment extends DialogFragment {
     @Override
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-        builder.setTitle(R.string.edit_diary_select_item_title_confirm_delete_dialog_title);
+        builder.setTitle(R.string.dialog_diary_item_title_delete_confirmation_title);
 
         String deleteItemTitle =
-                DeleteConfirmationDialogFragmentArgs.fromBundle(requireArguments()).getDeleteItemTitle();
-        String message = getString(R.string.edit_diary_select_item_title_confirm_delete_dialog_first_message) + deleteItemTitle + getString(
-                        R.string.edit_diary_select_item_title_confirm_delete_dialog_second_message);
+                DiaryItemTitleDeleteConfirmationDialogFragmentArgs
+                        .fromBundle(requireArguments()).getDeleteItemTitle();
+        String message = getString(R.string.dialog_diary_item_title_delete_confirmation_first_message) + deleteItemTitle + getString(
+                        R.string.dialog_diary_item_title_delete_confirmation_second_message);
 
         builder.setMessage(message);
         builder.setPositiveButton(
-                R.string.edit_diary_select_item_title_confirm_delete_dialog_btn_ok,
+                R.string.dialog_diary_item_title_delete_confirmation_yes,
                 new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
@@ -42,7 +43,7 @@ public class DeleteConfirmationDialogFragment extends DialogFragment {
                 }
         );
         builder.setNegativeButton(
-                R.string.edit_diary_select_item_title_confirm_delete_dialog_btn_ng,
+                R.string.dialog_diary_item_title_delete_confirmation_no,
                 new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {

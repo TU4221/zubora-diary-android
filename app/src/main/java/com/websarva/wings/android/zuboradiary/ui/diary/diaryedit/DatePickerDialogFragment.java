@@ -1,4 +1,4 @@
-package com.websarva.wings.android.zuboradiary.ui.diary.editdiary;
+package com.websarva.wings.android.zuboradiary.ui.diary.diaryedit;
 
 
 import android.app.DatePickerDialog;
@@ -13,7 +13,6 @@ import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
 
 import java.time.LocalDate;
-import java.util.Calendar;
 
 public class DatePickerDialogFragment extends DialogFragment{
     private static final String fromClassName = "From" + DatePickerDialogFragment.class.getName();

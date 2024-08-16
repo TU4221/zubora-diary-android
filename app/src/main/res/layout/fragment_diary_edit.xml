@@ -5,8 +5,8 @@
     <data>
         <import type="android.view.View" />
         <variable
-            name="editDiaryViewModel"
-            type="com.websarva.wings.android.zuboradiary.ui.diary.editdiary.EditDiaryViewModel" />
+            name="diaryEditViewModel"
+            type="com.websarva.wings.android.zuboradiary.ui.diary.diaryedit.DiaryEditViewModel" />
     </data>
 
     <LinearLayout
@@ -14,7 +14,7 @@
         android:layout_height="match_parent"
         android:orientation="vertical"
         android:background="?attr/colorSurface"
-        tools:context=".ui.diary.editdiary.EditDiaryFragment">
+        tools:context=".ui.diary.diaryedit.DiaryEditFragment">
 
         <com.google.android.material.appbar.MaterialToolbar
             android:id="@+id/material_toolbar_top_app_bar"
@@ -24,10 +24,10 @@
             android:gravity="center"
             android:minHeight="?attr/actionBarSize"
             android:theme="?attr/actionBarTheme"
-            app:menu="@menu/edit_diary_toolbar_menu"
+            app:menu="@menu/diary_edit_toolbar_menu"
             app:navigationIcon="@drawable/ic_arrow_back_24px"
-            app:title="@string/fragment_edit_diary_toolbar_title_hint"
-            app:titleCentered="true" />
+            app:titleCentered="true"
+            tools:title="@string/fragment_diary_edit_toolbar_title_tools_value"/>
 
         <androidx.core.widget.NestedScrollView
             android:id="@+id/nested_scroll_full_screen"
@@ -44,8 +44,8 @@
                      日付入力欄はダイアログフラグメントを使用して入力する為、android:text は「@」の「1.」を記述する。
                      「2.」の双方向データバイディングを記述した場合、ダイアログで変数値を変更した時に Ovservr が2回起動する。
 
-                     1. android:text="@{editDiaryViewModel.date}"
-                     2. android:text="@={editDiaryViewModel.date}"
+                     1. android:text="@{diaryEditViewModel.date}"
+                     2. android:text="@={diaryEditViewModel.date}"
                       -->
                 <EditText
                     android:id="@+id/edit_text_date"
@@ -53,9 +53,9 @@
                     android:layout_height="wrap_content"
                     android:ems="10"
                     android:focusable="false"
-                    android:hint="@string/fragment_edit_diary_date_hint"
                     android:lines="1"
-                    android:textSize="20sp" />
+                    android:textSize="20sp"
+                    tools:text="@string/fragment_diary_edit_date_tools_value" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -67,7 +67,7 @@
                         android:id="@+id/text_weather"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/fragment_edit_diary_weather"
+                        android:text="@string/fragment_diary_edit_weather"
                         android:textSize="16sp" />
 
                     <Spinner
@@ -79,7 +79,7 @@
                         android:id="@+id/text_weather_slush"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/fragment_edit_diary_weather_slush"
+                        android:text="@string/fragment_diary_edit_weather_slush"
                         android:textSize="16sp" />
 
                     <Spinner
@@ -99,7 +99,7 @@
                          android:id="@+id/text_condition"
                          android:layout_width="wrap_content"
                          android:layout_height="wrap_content"
-                         android:text="@string/fragment_edit_diary_condition"
+                         android:text="@string/fragment_diary_edit_condition"
                          android:textSize="16sp" />
 
                      <Spinner
@@ -114,7 +114,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="16dp"
-                    android:text="@string/fragment_edit_diary_title"
+                    android:text="@string/fragment_diary_edit_title"
                     android:textSize="16sp" />
 
                 <EditText
@@ -124,8 +124,8 @@
                     android:ems="10"
                     android:inputType="text"
                     android:lines="1"
-                    android:text="@={editDiaryViewModel.titleMutableLiveData}"
-                    android:hint="@string/fragment_edit_diary_title_hint"
+                    android:text="@={diaryEditViewModel.titleMutableLiveData}"
+                    android:hint="@string/fragment_diary_edit_title_hint"
                     android:textSize="20sp" />
 
                 <TextView
@@ -136,35 +136,35 @@
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/edit_text_title" />
 
-                <include layout="@layout/layout_edit_diary_item"
+                <include layout="@layout/layout_diary_edit_item"
                     android:id="@+id/include_item_1"
-                    android:itemNumber="@{@string/fragment_edit_diary_item_1}"
-                    android:titleLiveData="@{editDiaryViewModel.item1TitleLiveData}"
-                    android:commentMutableLiveData="@{editDiaryViewModel.item1CommentMutableLiveData}"/>
+                    android:itemNumber="@{@string/fragment_diary_edit_item_1}"
+                    android:titleLiveData="@{diaryEditViewModel.item1TitleLiveData}"
+                    android:commentMutableLiveData="@{diaryEditViewModel.item1CommentMutableLiveData}"/>
 
-                <include layout="@layout/layout_edit_diary_item"
+                <include layout="@layout/layout_diary_edit_item"
                     android:id="@+id/include_item_2"
-                    android:itemNumber="@{@string/fragment_edit_diary_item_2}"
-                    android:titleLiveData="@{editDiaryViewModel.item2TitleLiveData}"
-                    android:commentMutableLiveData="@{editDiaryViewModel.item2CommentMutableLiveData}"/>
+                    android:itemNumber="@{@string/fragment_diary_edit_item_2}"
+                    android:titleLiveData="@{diaryEditViewModel.item2TitleLiveData}"
+                    android:commentMutableLiveData="@{diaryEditViewModel.item2CommentMutableLiveData}"/>
 
-                <include layout="@layout/layout_edit_diary_item"
+                <include layout="@layout/layout_diary_edit_item"
                     android:id="@+id/include_item_3"
-                    android:itemNumber="@{@string/fragment_edit_diary_item_3}"
-                    android:titleLiveData="@{editDiaryViewModel.item3TitleLiveData}"
-                    android:commentMutableLiveData="@{editDiaryViewModel.item3CommentMutableLiveData}"/>
+                    android:itemNumber="@{@string/fragment_diary_edit_item_3}"
+                    android:titleLiveData="@{diaryEditViewModel.item3TitleLiveData}"
+                    android:commentMutableLiveData="@{diaryEditViewModel.item3CommentMutableLiveData}"/>
 
-                <include layout="@layout/layout_edit_diary_item"
+                <include layout="@layout/layout_diary_edit_item"
                     android:id="@+id/include_item_4"
-                    android:itemNumber="@{@string/fragment_edit_diary_item_4}"
-                    android:titleLiveData="@{editDiaryViewModel.item4TitleLiveData}"
-                    android:commentMutableLiveData="@{editDiaryViewModel.item4CommentMutableLiveData}"/>
+                    android:itemNumber="@{@string/fragment_diary_edit_item_4}"
+                    android:titleLiveData="@{diaryEditViewModel.item4TitleLiveData}"
+                    android:commentMutableLiveData="@{diaryEditViewModel.item4CommentMutableLiveData}"/>
 
-                <include layout="@layout/layout_edit_diary_item"
+                <include layout="@layout/layout_diary_edit_item"
                     android:id="@+id/include_item_5"
-                    android:itemNumber="@{@string/fragment_edit_diary_item_5}"
-                    android:titleLiveData="@{editDiaryViewModel.item5TitleLiveData}"
-                    android:commentMutableLiveData="@{editDiaryViewModel.item5CommentMutableLiveData}"/>
+                    android:itemNumber="@{@string/fragment_diary_edit_item_5}"
+                    android:titleLiveData="@{diaryEditViewModel.item5TitleLiveData}"
+                    android:commentMutableLiveData="@{diaryEditViewModel.item5CommentMutableLiveData}"/>
 
                 <ImageButton
                     android:id="@+id/image_button_add_item"

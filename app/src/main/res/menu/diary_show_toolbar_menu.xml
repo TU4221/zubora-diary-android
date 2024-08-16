@@ -3,15 +3,15 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
-        android:id="@+id/showDiaryToolbarOptionDeleteDiary"
+        android:id="@+id/diaryShowToolbarOptionDeleteDiary"
         android:icon="@drawable/ic_delete_forever_24"
-        android:title="@string/fragment_edit_diary_toolbar_option_delete_diary"
+        android:title="@string/fragment_diary_edit_toolbar_option_delete_diary"
         app:showAsAction="never" />
 
     <item
-        android:id="@+id/showDiaryToolbarOptionEditDiary"
+        android:id="@+id/diaryShowToolbarOptionEditDiary"
         android:icon="@android:drawable/ic_menu_edit"
-        android:title="@string/show_diary_toolbar_option_edit_diary"
+        android:title="@string/fragment_diary_show_toolbar_option_edit_diary"
         app:showAsAction="ifRoom" />
 
 </menu>

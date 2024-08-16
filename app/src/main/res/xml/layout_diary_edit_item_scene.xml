@@ -10,7 +10,7 @@
 
     <ConstraintSet android:id="@+id/motion_scene_edit_diary_item_hided_state">
         <Constraint
-            android:id="@+id/liner_layout_edit_diary_item"
+            android:id="@+id/liner_layout_diary_edit_item"
             android:layout_width="match_parent"
             android:layout_height="0.1dp"
             motion:visibilityMode="ignore"/>
@@ -18,7 +18,7 @@
 
     <ConstraintSet android:id="@+id/motion_scene_edit_diary_item_showed_state">
         <Constraint
-            android:id="@+id/liner_layout_edit_diary_item"
+            android:id="@+id/liner_layout_diary_edit_item"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             motion:visibilityMode="ignore"/>

@@ -4,10 +4,10 @@ import android.view.View;
 
 import androidx.lifecycle.Observer;
 
-public class ShowDiaryNumVisibleItemsObserver implements Observer<Integer> {
+public class DiaryShowNumVisibleItemsObserver implements Observer<Integer> {
     View[] itemLayouts;
 
-    public ShowDiaryNumVisibleItemsObserver(View[] itemLayouts) {
+    public DiaryShowNumVisibleItemsObserver(View[] itemLayouts) {
         this.itemLayouts = itemLayouts;
     }
 

@@ -1,4 +1,4 @@
-package com.websarva.wings.android.zuboradiary.ui.diary.editdiary;
+package com.websarva.wings.android.zuboradiary.ui.diary.diaryedit;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -14,7 +14,6 @@ import androidx.navigation.fragment.NavHostFragment;
 
 import com.websarva.wings.android.zuboradiary.R;
 import com.websarva.wings.android.zuboradiary.data.DateConverter;
-import com.websarva.wings.android.zuboradiary.ui.diary.editdiary.LoadExistingDiaryDialogFragmentArgs;
 
 import java.time.LocalDate;
 
@@ -28,16 +27,16 @@ public class LoadExistingDiaryDialogFragment extends DialogFragment {
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-        builder.setTitle(R.string.edit_diary_exists_diary_dialog_title);
+        builder.setTitle(R.string.dialog_load_Existing_diary_title);
 
         LocalDate loadDiaryDate =
                 LoadExistingDiaryDialogFragmentArgs.fromBundle(requireArguments()).getLoadDiaryDate();
         String stringLoadDiaryDate = DateConverter.toStringLocalDate(loadDiaryDate);
-        String message = stringLoadDiaryDate + getString(R.string.edit_diary_exists_diary_dialog_message);
+        String message = stringLoadDiaryDate + getString(R.string.dialog_load_Existing_diary_message);
 
         builder.setMessage(message);
-        builder.setPositiveButton(R.string.edit_diary_exists_diary_dialog_btn_ok, new custumOnClickListener());
-        builder.setNegativeButton(R.string.edit_diary_exists_diary_dialog_btn_ng, new custumOnClickListener());
+        builder.setPositiveButton(R.string.dialog_load_Existing_diary_yes, new custumOnClickListener());
+        builder.setNegativeButton(R.string.dialog_load_Existing_diary_no, new custumOnClickListener());
         return builder.create();
     }
 

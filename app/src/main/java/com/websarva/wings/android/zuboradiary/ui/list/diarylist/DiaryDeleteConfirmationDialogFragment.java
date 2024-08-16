@@ -1,4 +1,4 @@
-package com.websarva.wings.android.zuboradiary.ui.diary.showdiary;
+package com.websarva.wings.android.zuboradiary.ui.list.diarylist;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -18,25 +18,25 @@ import com.websarva.wings.android.zuboradiary.data.DateConverter;
 
 import java.time.LocalDate;
 
-public class DeleteConfirmationDialogFragment extends DialogFragment {
+public class DiaryDeleteConfirmationDialogFragment extends DialogFragment {
     private static final String fromClassName =
-            "From" + DeleteConfirmationDialogFragment.class.getName();
-    public static final String KEY_SELECTED_BUTTON = "SelectedButton" + fromClassName;
+            "From" + DiaryDeleteConfirmationDialogFragment.class.getName();
+    public static final String KEY_DELETE_DIARY_DATE = "DeleteDiaryDate" + fromClassName;
 
     @NonNull
     @Override
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-        builder.setTitle(R.string.list_delete_confirm_dialog_title);
+        builder.setTitle(R.string.dialog_diary_delete_confirmation_title);
         LocalDate date =
-                DeleteConfirmationDialogFragmentArgs.fromBundle(requireArguments()).getDeleteDiaryDate();
+                DiaryDeleteConfirmationDialogFragmentArgs.fromBundle(requireArguments()).getDeleteDiaryDate();
         String strDate = DateConverter.toStringLocalDate(date);
-        String message = strDate + getString(R.string.list_delete_confirm_dialog_message);
+        String message = strDate + getString(R.string.dialog_diary_delete_confirmation_message);
 
         builder.setMessage(message);
-        builder.setPositiveButton(R.string.list_delete_confirm_dialog_btn_ok, new DialogButtonClickListener());
-        builder.setNegativeButton(R.string.list_delete_confirm_dialog_btn_ng, new DialogButtonClickListener());
+        builder.setPositiveButton(R.string.dialog_diary_delete_confirmation_yes, new DialogButtonClickListener());
+        builder.setNegativeButton(R.string.dialog_diary_delete_confirmation_no, new DialogButtonClickListener());
         return builder.create();
     }
 
@@ -47,13 +47,16 @@ public class DeleteConfirmationDialogFragment extends DialogFragment {
                 case DialogInterface.BUTTON_POSITIVE:
                     NavController navController =
                             NavHostFragment
-                                    .findNavController(DeleteConfirmationDialogFragment.this);
+                                    .findNavController(DiaryDeleteConfirmationDialogFragment.this);
                     NavBackStackEntry navBackStackEntry = navController.getPreviousBackStackEntry();
                     if (navBackStackEntry == null) {
                         return;
                     }
                     SavedStateHandle savedStateHandle = navBackStackEntry.getSavedStateHandle();
-                    savedStateHandle.set(KEY_SELECTED_BUTTON, DialogInterface.BUTTON_POSITIVE);
+                    LocalDate deleteDiaryDate =
+                            DeleteConfirmationDialogFragmentArgs.fromBundle(requireArguments())
+                                    .getDeleteDiaryDate();
+                    savedStateHandle.set(KEY_DELETE_DIARY_DATE, deleteDiaryDate);
                     break;
 
                 case DialogInterface.BUTTON_NEGATIVE:

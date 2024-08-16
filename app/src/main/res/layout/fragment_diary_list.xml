@@ -27,7 +27,7 @@
             app:menu="@menu/diary_list_toolbar_menu"
             app:navigationIcon="@drawable/ic_calendar_month_24"
             app:navigationContentDescription="@string/fragment_diary_list_toolbar_navigation_top_year_month_switching"
-            app:title="@string/app_name"
+            app:title="@string/fragment_diary_list_toolbar_title"
             app:titleCentered="true"/>
 
         <FrameLayout

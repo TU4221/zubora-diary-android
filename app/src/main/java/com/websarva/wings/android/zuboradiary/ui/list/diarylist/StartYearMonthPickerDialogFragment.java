@@ -16,8 +16,8 @@ import java.time.LocalDate;
 import java.time.Year;
 import java.time.YearMonth;
 
-public class DatePickerDialogFragment extends BottomSheetDialogFragment {
-    private static final String fromClassName = "From" + DatePickerDialogFragment.class.getName();
+public class StartYearMonthPickerDialogFragment extends BottomSheetDialogFragment {
+    private static final String fromClassName = "From" + StartYearMonthPickerDialogFragment.class.getName();
     public static final String KEY_SELECTED_YEAR_MONTH = "SelectedYearMonth" + fromClassName;
 
     // View関係
@@ -43,9 +43,9 @@ public class DatePickerDialogFragment extends BottomSheetDialogFragment {
         // View設定
         LocalDate today = LocalDate.now();
         Year maxYear =
-                DatePickerDialogFragmentArgs.fromBundle(requireArguments()).getYearMaxValue();
+                StartYearMonthPickerDialogFragmentArgs.fromBundle(requireArguments()).getYearMaxValue();
         Year minYear =
-                DatePickerDialogFragmentArgs.fromBundle(requireArguments()).getYearMinValue();
+                StartYearMonthPickerDialogFragmentArgs.fromBundle(requireArguments()).getYearMinValue();
         binding.numberPickerFirst.setMaxValue(maxYear.getValue());
         binding.numberPickerFirst.setMinValue(minYear.getValue());
         binding.numberPickerFirst.setValue(today.getYear());

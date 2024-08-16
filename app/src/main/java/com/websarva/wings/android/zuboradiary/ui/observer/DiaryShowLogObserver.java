@@ -8,10 +8,10 @@ import com.websarva.wings.android.zuboradiary.data.DateConverter;
 
 import java.time.LocalDateTime;
 
-public class ShowDiaryLogObserver implements Observer<LocalDateTime> {
+public class DiaryShowLogObserver implements Observer<LocalDateTime> {
     TextView textLog;
 
-    public ShowDiaryLogObserver(TextView textLog) {
+    public DiaryShowLogObserver(TextView textLog) {
         this.textLog = textLog;
     }
 

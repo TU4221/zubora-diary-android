@@ -41,15 +41,15 @@ import com.websarva.wings.android.zuboradiary.databinding.CalendarHeaderBinding;
 import com.websarva.wings.android.zuboradiary.databinding.FragmentCalendarBinding;
 import com.websarva.wings.android.zuboradiary.data.DateConverter;
 import com.websarva.wings.android.zuboradiary.ui.diary.DiaryLiveData;
-import com.websarva.wings.android.zuboradiary.ui.diary.showdiary.ShowDiaryFragment;
+import com.websarva.wings.android.zuboradiary.ui.diary.diaryshow.DiaryShowFragment;
 
 import com.kizitonwose.calendar.view.CalendarView;
-import com.websarva.wings.android.zuboradiary.ui.diary.showdiary.ShowDiaryViewModel;
-import com.websarva.wings.android.zuboradiary.ui.observer.ShowDiaryConditionObserver;
-import com.websarva.wings.android.zuboradiary.ui.observer.ShowDiaryLogObserver;
-import com.websarva.wings.android.zuboradiary.ui.observer.ShowDiaryNumVisibleItemsObserver;
-import com.websarva.wings.android.zuboradiary.ui.observer.ShowDiaryWeather1Observer;
-import com.websarva.wings.android.zuboradiary.ui.observer.ShowDiaryWeather2Observer;
+import com.websarva.wings.android.zuboradiary.ui.diary.diaryshow.DiaryShowViewModel;
+import com.websarva.wings.android.zuboradiary.ui.observer.DiaryShowConditionObserver;
+import com.websarva.wings.android.zuboradiary.ui.observer.DiaryShowLogObserver;
+import com.websarva.wings.android.zuboradiary.ui.observer.DiaryShowNumVisibleItemsObserver;
+import com.websarva.wings.android.zuboradiary.ui.observer.DiaryShowWeather1Observer;
+import com.websarva.wings.android.zuboradiary.ui.observer.DiaryShowWeather2Observer;
 import com.websarva.wings.android.zuboradiary.ui.settings.SettingsViewModel;
 
 import java.time.DayOfWeek;
@@ -77,7 +77,7 @@ public class CalendarFragment extends Fragment {
 
     // ViewModel
     private CalendarViewModel calendarViewModel;
-    private ShowDiaryViewModel diaryViewModel; // TODO:diaryViewModelの使用要素をcalendarViewModelに含めるか検討(DiaryFragment修正後)
+    private DiaryShowViewModel diaryViewModel; // TODO:diaryViewModelの使用要素をcalendarViewModelに含めるか検討(DiaryFragment修正後)
     private SettingsViewModel settingsViewModel;
 
     public void onCreate(Bundle savedInstanceState) {
@@ -86,7 +86,7 @@ public class CalendarFragment extends Fragment {
         // ViewModel設定
         ViewModelProvider provider = new ViewModelProvider(requireActivity());
         calendarViewModel = provider.get(CalendarViewModel.class);
-        diaryViewModel = provider.get(ShowDiaryViewModel.class);
+        diaryViewModel = provider.get(DiaryShowViewModel.class);
         settingsViewModel = provider.get(SettingsViewModel.class);
 
         // Navigation設定
@@ -147,12 +147,12 @@ public class CalendarFragment extends Fragment {
         SavedStateHandle savedStateHandle =
                 navController.getCurrentBackStackEntry().getSavedStateHandle();
         MutableLiveData<LocalDate> _showedDiaryDateLiveData =
-                savedStateHandle.getLiveData(ShowDiaryFragment.KEY_SHOWED_DIARY_DATE);
+                savedStateHandle.getLiveData(DiaryShowFragment.KEY_SHOWED_DIARY_DATE);
         _showedDiaryDateLiveData.observe(getViewLifecycleOwner(), new Observer<LocalDate>() {
             @Override
             public void onChanged(LocalDate localDate) {
                 calendarViewModel.updateSelectedDate(localDate);
-                savedStateHandle.remove(ShowDiaryFragment.KEY_SHOWED_DIARY_DATE);
+                savedStateHandle.remove(DiaryShowFragment.KEY_SHOWED_DIARY_DATE);
             }
         });
     }
@@ -499,7 +499,7 @@ public class CalendarFragment extends Fragment {
         diaryViewModel.getWeather1LiveData()
                 .observe(
                         getViewLifecycleOwner(),
-                        new ShowDiaryWeather1Observer(
+                        new DiaryShowWeather1Observer(
                                 requireContext(),
                                 binding.includeShowDiary.textWeather1Selected
                         )
@@ -508,7 +508,7 @@ public class CalendarFragment extends Fragment {
         diaryViewModel.getWeather2LiveData()
                 .observe(
                         getViewLifecycleOwner(),
-                        new ShowDiaryWeather2Observer(
+                        new DiaryShowWeather2Observer(
                                 requireContext(),
                                 binding.includeShowDiary.textWeatherSlush,
                                 binding.includeShowDiary.textWeather2Selected
@@ -518,7 +518,7 @@ public class CalendarFragment extends Fragment {
         diaryViewModel.getConditionLiveData()
                 .observe(
                         getViewLifecycleOwner(),
-                        new ShowDiaryConditionObserver(
+                        new DiaryShowConditionObserver(
                                 requireContext(),
                                 binding.includeShowDiary.textConditionSelected
                         )
@@ -532,12 +532,12 @@ public class CalendarFragment extends Fragment {
         itemLayouts[3] = binding.includeShowDiary.includeItem4.linerLayoutShowDiaryItem;
         itemLayouts[4] = binding.includeShowDiary.includeItem5.linerLayoutShowDiaryItem;
         diaryViewModel.getNumVisibleItemsLiveData()
-                .observe(getViewLifecycleOwner(), new ShowDiaryNumVisibleItemsObserver(itemLayouts));
+                .observe(getViewLifecycleOwner(), new DiaryShowNumVisibleItemsObserver(itemLayouts));
 
         diaryViewModel.getLogLiveData()
                 .observe(
                         getViewLifecycleOwner(),
-                        new ShowDiaryLogObserver(binding.includeShowDiary.textLogValue)
+                        new DiaryShowLogObserver(binding.includeShowDiary.textLogValue)
                 );
     }
 
@@ -624,8 +624,8 @@ public class CalendarFragment extends Fragment {
     private void showDiaryLoadingErrorDialog() {
         if (canShowDialog()) {
             showMessageDialog(
-                    getString(R.string.fragment_calendar_message_dialog_title_communication_error),
-                    getString(R.string.fragment_calendar_message_dialog_message_diary_loading_error)
+                    getString(R.string.dialog_message_title_communication_error),
+                    getString(R.string.dialog_message_comment_diary_loading_error)
             );
             shouldShowDiaryLoadingErrorDialog = false;
         } else {

@@ -157,17 +157,17 @@ public class DiaryListFragment extends Fragment {
     }
 
     private void removeDialogResults(SavedStateHandle savedStateHandle) {
-        savedStateHandle.remove(DatePickerDialogFragment.KEY_SELECTED_YEAR_MONTH);
-        savedStateHandle.remove(DeleteConfirmationDialogFragment.KEY_DELETE_DIARY_DATE);
+        savedStateHandle.remove(StartYearMonthPickerDialogFragment.KEY_SELECTED_YEAR_MONTH);
+        savedStateHandle.remove(DiaryDeleteConfirmationDialogFragment.KEY_DELETE_DIARY_DATE);
     }
 
     // 日付入力ダイアログフラグメントから結果受取
     private void receiveDatePickerDialogResults(SavedStateHandle savedStateHandle) {
         boolean containsDialogResult =
-                savedStateHandle.contains(DatePickerDialogFragment.KEY_SELECTED_YEAR_MONTH);
+                savedStateHandle.contains(StartYearMonthPickerDialogFragment.KEY_SELECTED_YEAR_MONTH);
         if (containsDialogResult) {
             YearMonth selectedYearMonth =
-                    savedStateHandle.get(DatePickerDialogFragment.KEY_SELECTED_YEAR_MONTH);
+                    savedStateHandle.get(StartYearMonthPickerDialogFragment.KEY_SELECTED_YEAR_MONTH);
             if (selectedYearMonth == null) {
                 return;
             }
@@ -180,10 +180,10 @@ public class DiaryListFragment extends Fragment {
     // 日記削除ダイアログフラグメントから結果受取
     private void receiveConfirmDeleteDialogResults(SavedStateHandle savedStateHandle) {
         boolean containsDialogResult =
-                savedStateHandle.contains(DeleteConfirmationDialogFragment.KEY_DELETE_DIARY_DATE);
+                savedStateHandle.contains(DiaryDeleteConfirmationDialogFragment.KEY_DELETE_DIARY_DATE);
         if (containsDialogResult) {
             LocalDate deleteDiaryDate =
-                    savedStateHandle.get(DeleteConfirmationDialogFragment.KEY_DELETE_DIARY_DATE);
+                    savedStateHandle.get(DiaryDeleteConfirmationDialogFragment.KEY_DELETE_DIARY_DATE);
             if (deleteDiaryDate == null) {
                 return;
             }
@@ -210,7 +210,7 @@ public class DiaryListFragment extends Fragment {
                         }
                         Year newestYear = Year.of(LocalDate.parse(newestDate).getYear());
                         Year oldestYear = Year.of(LocalDate.parse(oldestDate).getYear());
-                        showDatePickerDialog(newestYear, oldestYear);
+                        showStartYearMonthPickerDialog(newestYear, oldestYear);
                     }
                 });
 
@@ -219,7 +219,7 @@ public class DiaryListFragment extends Fragment {
                     @Override
                     public boolean onMenuItemClick(MenuItem item) {
                         // ワード検索フラグメント起動
-                        if (item.getItemId() == R.id.listToolbarOptionWordSearch) {
+                        if (item.getItemId() == R.id.diaryListToolbarOptionWordSearch) {
                             showWordSearchFragment();
                             return true;
                         }
@@ -513,7 +513,7 @@ public class DiaryListFragment extends Fragment {
     private void showEditDiary() {
         NavDirections action =
                 DiaryListFragmentDirections
-                        .actionNavigationDiaryListFragmentToEditDiaryFragment(
+                        .actionNavigationDiaryListFragmentToDiaryEditFragment(
                                 true,
                                 false,
                                 LocalDate.now()
@@ -524,7 +524,7 @@ public class DiaryListFragment extends Fragment {
     private void showShowDiaryFragment(LocalDate date) {
         NavDirections action =
                 DiaryListFragmentDirections
-                        .actionNavigationDiaryListFragmentToShowDiaryFragment(date);
+                        .actionNavigationDiaryListFragmentToDiaryShowFragment(date);
         navController.navigate(action);
     }
 
@@ -535,10 +535,10 @@ public class DiaryListFragment extends Fragment {
         navController.navigate(action);
     }
 
-    private void showDatePickerDialog(Year newestYear, Year oldestYear) {
+    private void showStartYearMonthPickerDialog(Year newestYear, Year oldestYear) {
         NavDirections action =
                 DiaryListFragmentDirections
-                        .actionDiaryListFragmentToDatePickerDialog(newestYear, oldestYear);
+                        .actionDiaryListFragmentToStartYearMonthPickerDialog(newestYear, oldestYear);
         navController.navigate(action);
     }
 

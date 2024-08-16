@@ -1,4 +1,4 @@
-package com.websarva.wings.android.zuboradiary.ui.diary.editdiary;
+package com.websarva.wings.android.zuboradiary.ui.diary.diaryedit;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -15,7 +15,6 @@ import androidx.navigation.fragment.NavHostFragment;
 
 import com.websarva.wings.android.zuboradiary.R;
 import com.websarva.wings.android.zuboradiary.data.DateConverter;
-import com.websarva.wings.android.zuboradiary.ui.diary.editdiary.UpdateExistingDiaryDialogFragmentArgs;
 
 import java.time.LocalDate;
 
@@ -30,15 +29,15 @@ public class UpdateExistingDiaryDialogFragment extends DialogFragment {
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-        builder.setTitle(R.string.edit_diary_update_diary_dialog_title);
+        builder.setTitle(R.string.dialog_update_Existing_diary_title);
 
         LocalDate updateDiaryDate =
                 UpdateExistingDiaryDialogFragmentArgs.fromBundle(requireArguments()).getUpdateDiaryDate();
         String stringUpdateDiaryDate = DateConverter.toStringLocalDate(updateDiaryDate);
-        String message = stringUpdateDiaryDate + getString(R.string.edit_diary_update_diary_dialog_message);
+        String message = stringUpdateDiaryDate + getString(R.string.dialog_update_Existing_diary_message);
 
         builder.setMessage(message);
-        builder.setPositiveButton(R.string.edit_diary_update_diary_dialog_btn_ok, new DialogInterface.OnClickListener() {
+        builder.setPositiveButton(R.string.dialog_update_Existing_diary_yes, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 NavController navController =
@@ -55,7 +54,7 @@ public class UpdateExistingDiaryDialogFragment extends DialogFragment {
                 }
             }
         });
-        builder.setNegativeButton(R.string.edit_diary_update_diary_dialog_btn_ng, null);
+        builder.setNegativeButton(R.string.dialog_update_Existing_diary_no, null);
         return builder.create();
     }
 }

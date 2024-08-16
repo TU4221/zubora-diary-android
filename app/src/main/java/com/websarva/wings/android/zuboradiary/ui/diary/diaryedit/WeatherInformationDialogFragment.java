@@ -1,4 +1,4 @@
-package com.websarva.wings.android.zuboradiary.ui.diary.editdiary;
+package com.websarva.wings.android.zuboradiary.ui.diary.diaryedit;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -36,8 +36,8 @@ public class WeatherInformationDialogFragment extends DialogFragment {
         String message = stringDate + "の天気情報を取得しますか。";
 
         builder.setMessage(message);
-        builder.setPositiveButton(R.string.edit_diary_exists_diary_dialog_btn_ok, new custumOnClickListener());
-        builder.setNegativeButton(R.string.edit_diary_exists_diary_dialog_btn_ng, new custumOnClickListener());
+        builder.setPositiveButton(R.string.dialog_load_Existing_diary_yes, new custumOnClickListener());
+        builder.setNegativeButton(R.string.dialog_load_Existing_diary_no, new custumOnClickListener());
         return builder.create();
     }
 

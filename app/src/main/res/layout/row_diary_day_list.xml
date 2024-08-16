@@ -12,6 +12,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
+        <!-- TODO:includeにする -->
         <TextView
             android:id="@+id/text_delete_diary"
             android:layout_width="match_parent"
@@ -43,7 +44,7 @@
                 android:layout_height="match_parent"
                 android:layout_weight="2"
                 android:gravity="center_vertical"
-                android:hint="無題"
+                android:hint="@string/row_diary_day_list_title_hint"
                 android:textColor="?attr/colorOnSecondaryContainer"
                 android:textSize="20sp" />
 
@@ -54,7 +55,7 @@
                 android:layout_weight="1"
                 android:paddingHorizontal="16dp"
                 android:paddingVertical="8dp"
-                android:contentDescription="写真"
+                android:contentDescription="@string/row_diary_day_list_picture_description"
                 app:srcCompat="@android:drawable/ic_menu_gallery" />
 
         </LinearLayout>
