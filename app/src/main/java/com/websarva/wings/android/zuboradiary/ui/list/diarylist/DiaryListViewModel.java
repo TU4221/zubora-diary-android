@@ -158,7 +158,7 @@ public class DiaryListViewModel extends ViewModel {
                     }
                     numExistingDiaries = listenableFuture.get();
                     ListenableFuture<List<DiaryListItem>> listListenableFuture =
-                            diaryRepository.loadDiaryList(
+                            diaryRepository.selectDiaryListOrderByDateDesc(
                                     numLoadingItems,
                                     loadingOffset,
                                     sortConditionDate

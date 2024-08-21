@@ -32,7 +32,8 @@ public class WeatherInformationDialogFragment extends DialogFragment {
 
         LocalDate loadDiaryDate =
                 WeatherInformationDialogFragmentArgs.fromBundle(requireArguments()).getTargetDiaryDate();
-        String stringDate = DateConverter.toStringLocalDate(loadDiaryDate);
+        DateConverter dateConverter = new DateConverter();
+        String stringDate = dateConverter.toStringLocalDate(loadDiaryDate);
         String message = stringDate + "の天気情報を取得しますか。";
 
         builder.setMessage(message);

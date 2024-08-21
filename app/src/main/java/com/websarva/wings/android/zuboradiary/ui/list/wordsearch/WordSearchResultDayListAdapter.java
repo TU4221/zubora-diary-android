@@ -13,7 +13,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.websarva.wings.android.zuboradiary.R;
 import com.websarva.wings.android.zuboradiary.data.DayOfWeekConverter;
-import com.websarva.wings.android.zuboradiary.databinding.RowWordSearchResultBinding;
+import com.websarva.wings.android.zuboradiary.databinding.RowWordSearchResultListBinding;
 
 import java.time.LocalDate;
 import java.util.function.Consumer;
@@ -34,8 +34,8 @@ public class WordSearchResultDayListAdapter
     @NonNull
     @Override
     public WordSearchResultDayViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        RowWordSearchResultBinding binding =
-                RowWordSearchResultBinding
+        RowWordSearchResultListBinding binding =
+                RowWordSearchResultListBinding
                         .inflate(LayoutInflater.from(parent.getContext()), parent, false);
         return new WordSearchResultDayViewHolder(binding);
     }
@@ -69,10 +69,10 @@ public class WordSearchResultDayListAdapter
 
     public static class WordSearchResultDayViewHolder extends RecyclerView.ViewHolder {
 
-        public RowWordSearchResultBinding binding;
+        public RowWordSearchResultListBinding binding;
         public LocalDate date;
 
-        public WordSearchResultDayViewHolder(RowWordSearchResultBinding binding) {
+        public WordSearchResultDayViewHolder(RowWordSearchResultListBinding binding) {
             super(binding.getRoot());
             this.binding = binding;
         }

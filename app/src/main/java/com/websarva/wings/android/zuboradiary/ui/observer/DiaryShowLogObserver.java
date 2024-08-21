@@ -20,7 +20,8 @@ public class DiaryShowLogObserver implements Observer<LocalDateTime> {
         if (localDateTime == null) {
             return;
         }
-        String strDate = DateConverter.toStringLocalDateTime(localDateTime);
+        DateConverter dateConverter = new DateConverter();
+        String strDate = dateConverter.toStringLocalDateTime(localDateTime);
         textLog.setText(strDate);
     }
 }

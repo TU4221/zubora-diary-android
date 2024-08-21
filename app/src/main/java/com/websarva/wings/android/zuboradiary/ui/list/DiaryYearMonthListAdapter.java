@@ -19,6 +19,7 @@ import com.websarva.wings.android.zuboradiary.ui.list.diarylist.CustomSimpleCall
 import com.websarva.wings.android.zuboradiary.ui.list.diarylist.DiaryDayListAdapter;
 import com.websarva.wings.android.zuboradiary.ui.list.diarylist.DiaryDayListItem;
 import com.websarva.wings.android.zuboradiary.ui.list.diarylist.DiaryYearMonthListItem;
+import com.websarva.wings.android.zuboradiary.ui.list.diarylist.LeftSwipingSimpleCallBack;
 import com.websarva.wings.android.zuboradiary.ui.list.wordsearch.WordSearchResultDayListAdapter;
 import com.websarva.wings.android.zuboradiary.ui.list.wordsearch.WordSearchResultDayListItem;
 import com.websarva.wings.android.zuboradiary.ui.list.wordsearch.WordSearchResultYearMonthListItem;
@@ -119,6 +120,11 @@ public class DiaryYearMonthListAdapter extends ListAdapter<DiaryYearMonthListIte
 
                 ItemTouchHelper itemTouchHelper = new ItemTouchHelper(simpleCallBack);
                 itemTouchHelper.attachToRecyclerView(holder.binding.recyclerDayList);*/
+
+
+                LeftSwipingSimpleCallBack leftSwipingSimpleCallBack =
+                        new LeftSwipingSimpleCallBack(holder.binding.recyclerDayList);
+                leftSwipingSimpleCallBack.build();
             }
 
             return holder;

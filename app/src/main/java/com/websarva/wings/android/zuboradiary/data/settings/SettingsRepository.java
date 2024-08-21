@@ -1,8 +1,10 @@
 package com.websarva.wings.android.zuboradiary.data.settings;
 
+import androidx.annotation.NonNull;
 import androidx.datastore.preferences.core.Preferences;
 
 import java.time.DayOfWeek;
+import java.time.LocalTime;
 
 import io.reactivex.rxjava3.core.Flowable;
 import io.reactivex.rxjava3.core.Single;
@@ -49,8 +51,8 @@ public class SettingsRepository {
         return this.userPreferences.loadReminderNotificationTime();
     }
 
-    public Single<Preferences> saveReminderNotificationTime(int hourValue, int minuteValue) {
-        return this.userPreferences.saveReminderNotificationTime(hourValue, minuteValue);
+    public Single<Preferences> saveReminderNotificationTime(@NonNull LocalTime localTime) {
+        return this.userPreferences.saveReminderNotificationTime(localTime);
     }
 
     public Flowable<Boolean> loadIsPasscodeLock() {

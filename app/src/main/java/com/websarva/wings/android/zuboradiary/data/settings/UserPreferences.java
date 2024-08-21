@@ -2,6 +2,7 @@ package com.websarva.wings.android.zuboradiary.data.settings;
 
 import android.content.Context;
 
+import androidx.annotation.NonNull;
 import androidx.datastore.preferences.core.MutablePreferences;
 import androidx.datastore.preferences.core.Preferences;
 import androidx.datastore.preferences.core.PreferencesKeys;
@@ -11,6 +12,7 @@ import com.websarva.wings.android.zuboradiary.data.DateConverter;
 import com.websarva.wings.android.zuboradiary.data.DayOfWeekConverter;
 
 import java.time.DayOfWeek;
+import java.time.LocalTime;
 
 import javax.inject.Inject;
 
@@ -135,10 +137,11 @@ public class UserPreferences {
         });
     }
 
-    public Single<Preferences> saveReminderNotificationTime(int hourValue, int minuteValue) {
+    public Single<Preferences> saveReminderNotificationTime(@NonNull LocalTime localTime) {
         return this.dataStore.updateDataAsync(preferences -> {
             MutablePreferences mutablePreferences = preferences.toMutablePreferences();
-            String timeValue = DateConverter.toStringTimeHourMinute(hourValue, minuteValue);
+            DateConverter dateConverter = new DateConverter();
+            String timeValue = dateConverter.toStringTimeHourMinute(localTime);
             mutablePreferences.set(KEY_REMINDER_NOTIFICATION_TIME, timeValue);
             return Single.just(mutablePreferences);
         });

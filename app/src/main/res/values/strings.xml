@@ -149,9 +149,16 @@
 
 
     <!-- MessageDialog -->
-    <!--TODO-->
     <string name="dialog_message_title_communication_error">通信エラー</string>
-    <string name="dialog_message_comment_diary_loading_error">日記の読込に失敗しました。</string>
+    <string name="dialog_message_message_diary_list_loading_error">日記リストの読込に失敗しました。</string>
+    <string name="dialog_message_message_diary_information_loading_error">日記情報の読込に失敗しました。</string>
+    <string name="dialog_message_message_diary_word_search_error">ワード検索に失敗しました。</string>
+    <string name="dialog_message_message_diary_loading_error">日記の読込に失敗しました。</string>
+    <string name="dialog_message_message_diary_saving_error">日記の保存に失敗しました。</string>
+    <string name="dialog_message_message_diary_delete_error">日記の削除に失敗しました。</string>
+    <string name="dialog_message_message_weather_information_loading_error">天気情報の読込に失敗しました。</string>
+    <string name="dialog_message_message_item_title_selection_history_loading_error">選択履歴の読込に失敗しました。</string>
+    <string name="dialog_message_message_item_title_selection_history_item_delete_error">削除に失敗しました。</string>
 
 
     <!-- DayOfWeekConverter -->

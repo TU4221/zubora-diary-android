@@ -55,13 +55,13 @@ public class DiaryRepository {
         return diaryDAO.selectOldestDiaryAsync();
     }
 
-    public ListenableFuture<List<DiaryListItem>> loadDiaryList(
+    public ListenableFuture<List<DiaryListItem>> selectDiaryListOrderByDateDesc(
             int num, int offset, @Nullable LocalDate date) {
         Log.d("DiaryRepository", "loadDiaryList(num = " + num + ", offset = " + offset + ", date = " + date + ")");
         if (date == null) {
-            return diaryDAO.selectDiaryListAsync(num, offset);
+            return diaryDAO.selectDiaryListOrderByDateDescAsync(num, offset);
         } else {
-            return diaryDAO.selectDiaryListAsync(num, offset, date.toString());
+            return diaryDAO.selectDiaryListOrderByDateDescAsync(num, offset, date.toString());
         }
     }
 
@@ -69,9 +69,9 @@ public class DiaryRepository {
         return diaryDAO.countWordSearchResultsAsync(searchWord);
     }
 
-    public ListenableFuture<List<WordSearchResultListItem>> selectWordSearchResultList(
+    public ListenableFuture<List<WordSearchResultListItem>> selectWordSearchResultListOrderByDateDesc(
             int num, int offset, String searchWord) {
-        return diaryDAO.selectWordSearchResultListAsync(num, offset, searchWord);
+        return diaryDAO.selectWordSearchResultListOrderByDateDescAsync(num, offset, searchWord);
     }
 
     public Future<Void> insertDiary(Diary diary, List<DiaryItemTitleSelectionHistoryItem> updateTitleList) {

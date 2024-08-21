@@ -467,7 +467,8 @@ public class DiaryEditFragment extends Fragment {
                 if (date == null) {
                     return;
                 }
-                binding.editTextDate.setText(DateConverter.toStringLocalDate(date));
+                DateConverter dateConverter = new DateConverter();
+                binding.editTextDate.setText(dateConverter.toStringLocalDate(date));
                 Log.d("DiaryEditInputDate", "SelectedDate:" + date);
                 Log.d("DiaryEditInputDate", "lastSelectedDate:" + lastSelectedDate);
                 boolean shouldShowDialog = shouldShowLoadingExistingDiaryDialogOnDateChanged(date);
@@ -962,7 +963,7 @@ public class DiaryEditFragment extends Fragment {
                     return;
                 }
                 if (aBoolean) {
-                    showWeatherLoadingErrorDialog();
+                    showWeatherInformationLoadingErrorDialog();
                     diaryEditViewModel.clearWeatherLoadingError();
                 }
             }
@@ -1189,14 +1190,14 @@ public class DiaryEditFragment extends Fragment {
             return;
         }
         if (shouldShowWeatherLoadingErrorDialog) {
-            showWeatherLoadingErrorDialog();
+            showWeatherInformationLoadingErrorDialog();
             return;
         }
     }
 
     private void showDiarySavingErrorDialog() {
         if (canShowDialog()) {
-            showMessageDialog("通信エラー", "日記の保存に失敗しました。");
+            showMessageDialog(getString(R.string.dialog_message_title_communication_error), getString(R.string.dialog_message_message_diary_saving_error));
             shouldShowDiarySavingErrorDialog = false;
         } else {
             shouldShowDiarySavingErrorDialog = true;
@@ -1205,7 +1206,7 @@ public class DiaryEditFragment extends Fragment {
 
     private void showDiaryLoadingErrorDialog() {
         if (canShowDialog()) {
-            showMessageDialog("通信エラー", "日記の読込に失敗しました。");
+            showMessageDialog(getString(R.string.dialog_message_title_communication_error), getString(R.string.dialog_message_message_diary_loading_error));
             shouldShowDiaryLoadingErrorDialog = false;
         } else {
             shouldShowDiaryLoadingErrorDialog = true;
@@ -1214,16 +1215,16 @@ public class DiaryEditFragment extends Fragment {
 
     private void showDiaryDeleteErrorDialog() {
         if (canShowDialog()) {
-            showMessageDialog("通信エラー", "日記の削除に失敗しました。");
+            showMessageDialog(getString(R.string.dialog_message_title_communication_error), getString(R.string.dialog_message_message_diary_delete_error));
             shouldShowDiaryDeleteErrorDialog = false;
         } else {
             shouldShowDiaryDeleteErrorDialog = true;
         }
     }
 
-    private void showWeatherLoadingErrorDialog() {
+    private void showWeatherInformationLoadingErrorDialog() {
         if (canShowDialog()) {
-            showMessageDialog("通信エラー", "天気情報の読込に失敗しました。");
+            showMessageDialog(getString(R.string.dialog_message_title_communication_error), getString(R.string.dialog_message_message_weather_information_loading_error));
             shouldShowWeatherLoadingErrorDialog = false;
         } else {
             shouldShowWeatherLoadingErrorDialog = true;

@@ -33,7 +33,8 @@ public class UpdateExistingDiaryDialogFragment extends DialogFragment {
 
         LocalDate updateDiaryDate =
                 UpdateExistingDiaryDialogFragmentArgs.fromBundle(requireArguments()).getUpdateDiaryDate();
-        String stringUpdateDiaryDate = DateConverter.toStringLocalDate(updateDiaryDate);
+        DateConverter dateConverter = new DateConverter();
+        String stringUpdateDiaryDate = dateConverter.toStringLocalDate(updateDiaryDate);
         String message = stringUpdateDiaryDate + getString(R.string.dialog_update_Existing_diary_message);
 
         builder.setMessage(message);

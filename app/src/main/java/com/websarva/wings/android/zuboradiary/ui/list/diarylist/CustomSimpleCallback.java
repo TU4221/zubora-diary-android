@@ -305,7 +305,7 @@ public class CustomSimpleCallback extends ItemTouchHelper.SimpleCallback {
         DiaryDayListAdapter.DiaryDayListViewHolder viewHolder1 = (DiaryDayListAdapter.DiaryDayListViewHolder) viewHolder;
         View itemView = viewHolder.itemView;
         getDefaultUIUtil().onDraw(c, recyclerView, itemView.findViewById(R.id.frame_layout_row_diary_day_list), 0, 0, actionState, isCurrentlyActive);
-        getDefaultUIUtil().onDraw(c, recyclerView, itemView.findViewById(R.id.liner_layout_front), dX, dY, actionState, isCurrentlyActive);
+        getDefaultUIUtil().onDraw(c, recyclerView, itemView.findViewById(R.id.liner_layout_foreground), dX, dY, actionState, isCurrentlyActive);
     }
 
     //ボタンをインスタンス化
@@ -338,7 +338,7 @@ public class CustomSimpleCallback extends ItemTouchHelper.SimpleCallback {
 
                         NavDirections action =
                                 DiaryListFragmentDirections
-                                        .actionDiaryListFragmentToDeleteConfirmationDialog(
+                                        .actionDiaryListFragmentToDiaryDeleteConfirmationDialog(
                                                 diaryListDayViewHolder.date
                                         );
                         CustomSimpleCallback.this.navController.navigate(action);
@@ -355,7 +355,7 @@ public class CustomSimpleCallback extends ItemTouchHelper.SimpleCallback {
         Log.d("スワイプ処理確認", "clear");
         View itemView = viewHolder.itemView;
         getDefaultUIUtil().clearView(itemView.findViewById(R.id.frame_layout_row_diary_day_list));
-        getDefaultUIUtil().clearView(itemView.findViewById(R.id.liner_layout_front));
+        getDefaultUIUtil().clearView(itemView.findViewById(R.id.liner_layout_foreground));
     }
 
 

@@ -187,7 +187,7 @@ public class WordSearchViewModel extends ViewModel {
                     }
                 }
                 ListenableFuture<List<WordSearchResultListItem>> listenableFutureResults =
-                        diaryRepository.selectWordSearchResultList(
+                        diaryRepository.selectWordSearchResultListOrderByDateDesc(
                                 numLoadingItems,
                                 loadingOffset,
                                 searchWord

@@ -18,11 +18,11 @@ import dagger.hilt.android.lifecycle.HiltViewModel;
 public class DiaryItemTitleEditViewModel extends ViewModel {
 
     private final DiaryItemTitleSelectionHistoryRepository diaryItemTitleSelectionHistoryRepository;
-    private MutableLiveData<Integer> itemNumber = new MutableLiveData<>();
-    private MutableLiveData<String> itemTitle = new MutableLiveData<>();
+    private final MutableLiveData<Integer> itemNumber = new MutableLiveData<>();
+    private final MutableLiveData<String> itemTitle = new MutableLiveData<>();
     private final MutableLiveData<List<DiaryItemTitleSelectionHistoryItem>> itemTitleSelectionHistory =
             new MutableLiveData<>();
-    private final int MAX_LOADED_ITEM_TITLES = 50;
+    private static final int MAX_LOADED_ITEM_TITLES = 50;
 
     // エラー関係
     private final MutableLiveData<Boolean> isItemTitleSelectionHistoryLoadingError = new MutableLiveData<>();
@@ -44,12 +44,12 @@ public class DiaryItemTitleEditViewModel extends ViewModel {
         this.itemTitle.setValue(itemTitle);
     }
 
-    public void loadSelectedItemTitleHistory() {
+    public void loadItemTitleSelectionHistory() {
         List<DiaryItemTitleSelectionHistoryItem> loadedList;
         try {
             loadedList =
                     diaryItemTitleSelectionHistoryRepository
-                            .loadSelectedDiaryItemTitles(MAX_LOADED_ITEM_TITLES,0).get();
+                            .selectHistoryOrderByLogDesc(MAX_LOADED_ITEM_TITLES,0).get();
         } catch (Exception e) {
             isItemTitleSelectionHistoryLoadingError.setValue(true);
             return;
@@ -65,7 +65,7 @@ public class DiaryItemTitleEditViewModel extends ViewModel {
         }
         DiaryItemTitleSelectionHistoryItem diaryItemTitleSelectionHistoryItem = currentList.get(deletePosition);
         try {
-            diaryItemTitleSelectionHistoryRepository.deleteSelectedDiaryItemTitle(diaryItemTitleSelectionHistoryItem).get();
+            diaryItemTitleSelectionHistoryRepository.deleteHistoryItem(diaryItemTitleSelectionHistoryItem).get();
         } catch (Exception e) {
             isItemTitleSelectionHistoryItemDeleteError.setValue(true);
             return;
@@ -75,11 +75,11 @@ public class DiaryItemTitleEditViewModel extends ViewModel {
     }
 
     // Error関係
-    public void clearSelectedItemTitleListLoadingError() {
+    public void clearItemTitleSelectionHistoryLoadingError() {
         isItemTitleSelectionHistoryLoadingError.setValue(false);
     }
 
-    public void clearSelectedItemTitleDeleteError() {
+    public void clearItemTitleSelectionHistoryItemDeleteError() {
         isItemTitleSelectionHistoryItemDeleteError.setValue(false);
     }
 

@@ -197,7 +197,8 @@ public class DiaryShowFragment extends Fragment {
                             showDiaryEdit(editDiaryDate);
                             return true;
                         } else if (item.getItemId() == R.id.diaryShowToolbarOptionDeleteDiary) {
-                            showDiaryDeleteConfirmationDialog();
+                            LocalDate deleteDiaryDate = diaryShowViewModel.getDateLiveData().getValue();
+                            showDiaryDeleteConfirmationDialog(deleteDiaryDate);
                         }
                         return false;
                     }
@@ -210,7 +211,8 @@ public class DiaryShowFragment extends Fragment {
                         if (date == null) {
                             return;
                         }
-                        String stringDate = DateConverter.toStringLocalDate(date);
+                        DateConverter dateConverter = new DateConverter();
+                        String stringDate = dateConverter.toStringLocalDate(date);
                         binding.materialToolbarTopAppBar.setTitle(stringDate);
                     }
                 });
@@ -316,9 +318,8 @@ public class DiaryShowFragment extends Fragment {
         return currentDestinationId == R.id.navigation_diary_show_fragment;
     }
 
-    private void showDiaryDeleteConfirmationDialog() {
+    private void showDiaryDeleteConfirmationDialog(LocalDate date) {
         if (canShowDialog()) {
-            LocalDate date = diaryShowViewModel.getDateLiveData().getValue();
             if (date == null) {
                 return;
             }
@@ -341,7 +342,7 @@ public class DiaryShowFragment extends Fragment {
 
     private void showDiaryLoadingErrorDialog() {
         if (canShowDialog()) {
-            showMessageDialog("通信エラー", "日記の読込に失敗しました。");
+            showMessageDialog(getString(R.string.dialog_message_title_communication_error), getString(R.string.dialog_message_message_diary_loading_error));
             shouldShowDiaryLoadingErrorDialog = false;
         } else {
             shouldShowDiaryLoadingErrorDialog = true;
@@ -350,7 +351,7 @@ public class DiaryShowFragment extends Fragment {
 
     private void showDiaryDeleteErrorDialog() {
         if (canShowDialog()) {
-            showMessageDialog("通信エラー", "日記の削除に失敗しました。");
+            showMessageDialog(getString(R.string.dialog_message_title_communication_error), getString(R.string.dialog_message_message_diary_delete_error));
             shouldShowDiaryDeleteErrorDialog = false;
         } else {
             shouldShowDiaryDeleteErrorDialog = true;

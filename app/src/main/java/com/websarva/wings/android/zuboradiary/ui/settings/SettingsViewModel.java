@@ -3,6 +3,7 @@ package com.websarva.wings.android.zuboradiary.ui.settings;
 import android.util.Log;
 
 import androidx.annotation.FloatRange;
+import androidx.annotation.NonNull;
 import androidx.datastore.preferences.core.Preferences;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
@@ -33,6 +34,7 @@ public class SettingsViewModel extends ViewModel {
     private final MutableLiveData<String> calendarStartDayOfWeek = new MutableLiveData<>();
     private final MutableLiveData<Integer> calendarStartDayOfWeekNumber = new MutableLiveData<>();
     private final MutableLiveData<Boolean> isCheckedReminderNotification = new MutableLiveData<>();
+    private final MutableLiveData<String> reminderNotificationTime = new MutableLiveData<>();
     private final MutableLiveData<Boolean> isCheckedPasscodeLock = new MutableLiveData<>();
     private final MutableLiveData<Boolean> isCheckedGettingWeatherInformation = new MutableLiveData<>();
     private final MutableLiveData<Boolean> hasUpdatedLocation = new MutableLiveData<>(false);
@@ -46,52 +48,60 @@ public class SettingsViewModel extends ViewModel {
         this.settingsRepository = settingsRepository;
         this.workerRepository = workerRepository;
 
-        Flowable<String> themeColorNameFlowable = this.settingsRepository.loadThemeColorName();
-        this.disposables.add(themeColorNameFlowable
-                .subscribe(this.themeColor::postValue, throwable -> {
+        Flowable<String> themeColorNameFlowable = settingsRepository.loadThemeColorName();
+        disposables.add(themeColorNameFlowable
+                .subscribe(themeColor::postValue, throwable -> {
                     throw throwable;
                 })
         );
 
         Flowable<String> calendarStartDayOfWeekNameFlowable =
-                this.settingsRepository.loadCalendarStartDayOfWeekName();
-        this.disposables.add(calendarStartDayOfWeekNameFlowable
-                .subscribe(this.calendarStartDayOfWeek::postValue, throwable -> {
+                settingsRepository.loadCalendarStartDayOfWeekName();
+        disposables.add(calendarStartDayOfWeekNameFlowable
+                .subscribe(calendarStartDayOfWeek::postValue, throwable -> {
                     throw throwable;
                 })
         );
 
         Flowable<Integer> calendarStartDayOfWeekNumberFlowable =
-                this.settingsRepository.loadCalendarStartDayOfWeekNumber();
-        this.disposables.add(calendarStartDayOfWeekNumberFlowable
-                .subscribe(this.calendarStartDayOfWeekNumber::postValue, throwable -> {
+                settingsRepository.loadCalendarStartDayOfWeekNumber();
+        disposables.add(calendarStartDayOfWeekNumberFlowable
+                .subscribe(calendarStartDayOfWeekNumber::postValue, throwable -> {
                     throw throwable;
                 })
         );
 
         Flowable<Boolean> isReminderNotificationFlowable =
-                this.settingsRepository.loadIsReminderNotification();
-        this.disposables.add(isReminderNotificationFlowable
+                settingsRepository.loadIsReminderNotification();
+        disposables.add(isReminderNotificationFlowable
                 .subscribe(value -> {
                     Log.d("20240708", String.valueOf(value));
-                    this.isCheckedReminderNotification.postValue(value);
+                    isCheckedReminderNotification.postValue(value);
                 }, throwable -> {
                     throw throwable;
                 })
         );
 
+        Flowable<String> reminderNotificationTimeFlowable =
+                settingsRepository.loadReminderNotificationTime();
+        disposables.add(reminderNotificationTimeFlowable
+                .subscribe(reminderNotificationTime::postValue, throwable -> {
+                    throw throwable;
+                })
+        );
+
         Flowable<Boolean> isPasscodeLockFlowable =
-                this.settingsRepository.loadIsPasscodeLock();
-        this.disposables.add(isPasscodeLockFlowable
-                .subscribe(this.isCheckedPasscodeLock::postValue, throwable -> {
+                settingsRepository.loadIsPasscodeLock();
+        disposables.add(isPasscodeLockFlowable
+                .subscribe(isCheckedPasscodeLock::postValue, throwable -> {
                     throw throwable;
                 })
         );
 
         Flowable<Boolean> isGettingWeatherInformationFlowable =
-                this.settingsRepository.loadIsGettingWeatherInformation();
-        this.disposables.add(isGettingWeatherInformationFlowable
-                .subscribe(this.isCheckedGettingWeatherInformation::postValue, throwable -> {
+                settingsRepository.loadIsGettingWeatherInformation();
+        disposables.add(isGettingWeatherInformationFlowable
+                .subscribe(isCheckedGettingWeatherInformation::postValue, throwable -> {
                     throw throwable;
                 })
         );
@@ -104,27 +114,32 @@ public class SettingsViewModel extends ViewModel {
     }
 
     public Single<Preferences> saveThemeColor(ThemeColors value) {
-        return this.settingsRepository.saveThemeColor(value);
+        return settingsRepository.saveThemeColor(value);
     }
 
     public Single<Preferences> saveCalendarStartDayOfWeek(DayOfWeek value) {
-        return this.settingsRepository.saveCalendarStartDayOfWeek(value);
+        return settingsRepository.saveCalendarStartDayOfWeek(value);
     }
 
     public Single<Preferences> saveIsReminderNotification(boolean value) {
-        return this.settingsRepository.saveIsReminderNotification(value);
+        return settingsRepository.saveIsReminderNotification(value);
+    }
+
+    public Single<Preferences> saveReminderNotificationTime(@NonNull LocalTime settingTime) {
+        return settingsRepository.saveReminderNotificationTime(settingTime);
     }
 
     public Single<Preferences> saveIsPasscodeLock(boolean value) {
-        return this.settingsRepository.saveIsPasscodeLock(value);
+        return settingsRepository.saveIsPasscodeLock(value);
     }
 
     public Single<Preferences> saveIsGettingWeatherInformation(boolean value) {
-        return this.settingsRepository.saveIsGettingWeatherInformation(value);
+        return settingsRepository.saveIsGettingWeatherInformation(value);
     }
 
-    public void registerReminderNotificationWorker(LocalTime settingTime) {
+    public void registerReminderNotificationWorker(@NonNull LocalTime settingTime) {
         workerRepository.registerReminderNotificationWorker(settingTime);
+        settingsRepository.saveReminderNotificationTime(settingTime);
     }
 
     public void cancelReminderNotificationWorker() {
@@ -145,27 +160,27 @@ public class SettingsViewModel extends ViewModel {
 
     // Getter/Setter
     public LiveData<String> getThemeColorLiveData() {
-        return this.themeColor;
+        return themeColor;
     }
 
     public LiveData<String> getCalendarStartDayOfWeekLiveData() {
-        return this.calendarStartDayOfWeek;
+        return calendarStartDayOfWeek;
     }
 
     public LiveData<Integer> getCalendarStartDayOfWeekNumberLiveData() {
-        return this.calendarStartDayOfWeekNumber;
+        return calendarStartDayOfWeekNumber;
     }
 
     public LiveData<Boolean> getIsCheckedReminderNotificationLiveData() {
-        return this.isCheckedReminderNotification;
+        return isCheckedReminderNotification;
     }
 
     public LiveData<Boolean> getIsCheckedPasscodeLockLiveData() {
-        return this.isCheckedPasscodeLock;
+        return isCheckedPasscodeLock;
     }
 
     public LiveData<Boolean> getIsCheckedGettingWeatherInformationLiveData() {
-        return this.isCheckedGettingWeatherInformation;
+        return isCheckedGettingWeatherInformation;
     }
 
     public LiveData<Boolean> getHasUpdatedLocationLiveData() {

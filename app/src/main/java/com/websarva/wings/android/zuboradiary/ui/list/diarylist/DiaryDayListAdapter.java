@@ -4,9 +4,11 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.DiffUtil;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -53,7 +55,7 @@ public class DiaryDayListAdapter extends ListAdapter<DiaryDayListItem, DiaryDayL
         holder.binding.textRowDiaryListDayTitle.setText(title);
         // TODO:picturePath
 
-        holder.binding.frameLayoutRowDiaryDayList.setOnClickListener(new View.OnClickListener() {
+        holder.binding.linerLayoutForeground.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 processOnClick.accept(date);
@@ -70,6 +72,13 @@ public class DiaryDayListAdapter extends ListAdapter<DiaryDayListItem, DiaryDayL
                     navController.navigate(action);
                 }
             });*/
+        holder.binding.includeBackground.textDeleteButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(context, "削除", Toast.LENGTH_LONG).show();
+            }
+        });
+
     }
 
     public static class DiaryDayListViewHolder extends RecyclerView.ViewHolder {
@@ -78,6 +87,7 @@ public class DiaryDayListAdapter extends ListAdapter<DiaryDayListItem, DiaryDayL
         public DiaryDayListViewHolder(RowDiaryDayListBinding binding) {
             super(binding.getRoot());
             this.binding = binding;
+            this.binding.linerLayoutForeground.setClickable(true);
         }
     }
 

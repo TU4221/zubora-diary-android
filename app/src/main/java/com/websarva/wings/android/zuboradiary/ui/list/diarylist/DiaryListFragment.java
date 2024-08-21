@@ -364,7 +364,7 @@ public class DiaryListFragment extends Fragment {
             DiaryDayListAdapter.DiaryDayListViewHolder diaryDayListViewHolder =
                     (DiaryDayListAdapter.DiaryDayListViewHolder) viewHolder;
             swipedDate.setDate(diaryDayListViewHolder.date);
-            Log.d("20240701_1", "onSwiped");
+            Log.d("DiaryListSwipe", "onSwiped");
         }
 
         @Override
@@ -559,7 +559,7 @@ public class DiaryListFragment extends Fragment {
 
     private void showDiaryListLoadingErrorDialog() {
         if (canShowDialog()) {
-            showMessageDialog("通信エラー", "日記リストの読込に失敗しました。");
+            showMessageDialog(getString(R.string.dialog_message_title_communication_error), getString(R.string.dialog_message_message_diary_list_loading_error));
             shouldShowDiaryListLoadingErrorDialog = false;
         } else {
             shouldShowDiaryListLoadingErrorDialog = true;
@@ -568,7 +568,7 @@ public class DiaryListFragment extends Fragment {
 
     private void showDiaryInformationLoadingErrorDialog() {
         if (canShowDialog()) {
-            showMessageDialog("通信エラー", "日記情報の読込に失敗しました。");
+            showMessageDialog(getString(R.string.dialog_message_title_communication_error), getString(R.string.dialog_message_message_diary_information_loading_error));
             shouldShowDiaryInformationLoadingErrorDialog = false;
         } else {
             shouldShowDiaryInformationLoadingErrorDialog = true;

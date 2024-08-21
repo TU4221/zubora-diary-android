@@ -342,7 +342,7 @@ public class WordSearchFragment extends Fragment {
     private void showShowDiaryFragment(LocalDate date) {
         NavDirections action =
                 WordSearchFragmentDirections
-                        .actionNavigationWordSearchFragmentToShowDiaryFragment(date);
+                        .actionNavigationWordSearchFragmentToDiaryShowFragment(date);
         navController.navigate(action);
     }
 
@@ -355,7 +355,7 @@ public class WordSearchFragment extends Fragment {
 
     private void showDiaryListLoadingErrorDialog() {
         if (canShowDialog()) {
-            showMessageDialog("通信エラー", "日記リストの読込に失敗しました。");
+            showMessageDialog(getString(R.string.dialog_message_title_communication_error), getString(R.string.dialog_message_message_diary_word_search_error));
             shouldShowDiaryListLoadingErrorDialog = false;
         } else {
             shouldShowDiaryListLoadingErrorDialog = true;

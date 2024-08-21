@@ -103,7 +103,7 @@ public class CalendarFragment extends Fragment {
 
         // 双方向データバインディング設定
         binding.setLifecycleOwner(this);
-        binding.setShowDiaryViewModel(diaryViewModel);
+        binding.setDiaryShowViewModel(diaryViewModel);
 
         // 画面遷移時のアニメーション設定
         // FROM:遷移元 TO:遷移先
@@ -129,17 +129,17 @@ public class CalendarFragment extends Fragment {
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        setUpShowDiaryFragmentResultReceiver();
+        setUpDiaryShowFragmentResultReceiver();
         setUpDialogResultReceiver();
         setUpErrorObserver();
         setUpCalendar();
-        setUpShowDiary();
+        setUpDiaryShow();
         setUpFloatActionButton();
         setUpBottomLayout();
     }
 
     // 日記表示フラグメントからデータ受取設定
-    private void setUpShowDiaryFragmentResultReceiver() {
+    private void setUpDiaryShowFragmentResultReceiver() {
         NavBackStackEntry navBackStackEntry = navController.getCurrentBackStackEntry();
         if (navBackStackEntry == null) {
             return;
@@ -463,7 +463,8 @@ public class CalendarFragment extends Fragment {
 
     // ツールバー表示日付更新。
     private void updateToolBarDate(LocalDate date) {
-        String stringDate = DateConverter.toStringLocalDate(date);
+        DateConverter dateConverter = new DateConverter();
+        String stringDate = dateConverter.toStringLocalDate(date);
         binding.materialToolbarTopAppBar.setTitle(stringDate);
     }
 
@@ -476,10 +477,10 @@ public class CalendarFragment extends Fragment {
                     // ViewModelの読込日記の日付をセット
                     diaryViewModel.initialize();
                     diaryViewModel.prepareDiary(date, true);
-                    binding.linearLayoutShowDiary.setVisibility(View.VISIBLE);
+                    binding.linearLayoutDiaryShow.setVisibility(View.VISIBLE);
                     binding.textNoDiary.setVisibility(View.GONE);
                 } else {
-                    binding.linearLayoutShowDiary.setVisibility(View.GONE);
+                    binding.linearLayoutDiaryShow.setVisibility(View.GONE);
                     binding.textNoDiary.setVisibility(View.VISIBLE);
                     diaryViewModel.initialize();
                 }
@@ -488,20 +489,20 @@ public class CalendarFragment extends Fragment {
             @Override
             public void onFailure(@NonNull Throwable t) {
                 // 例外はViewModelクラス内で例外用リスナーを追加して対応
-                binding.linearLayoutShowDiary.setVisibility(View.GONE);
+                binding.linearLayoutDiaryShow.setVisibility(View.GONE);
                 binding.textNoDiary.setVisibility(View.VISIBLE);
                 diaryViewModel.initialize();
             }
         });
     }
 
-    private void setUpShowDiary() {
+    private void setUpDiaryShow() {
         diaryViewModel.getWeather1LiveData()
                 .observe(
                         getViewLifecycleOwner(),
                         new DiaryShowWeather1Observer(
                                 requireContext(),
-                                binding.includeShowDiary.textWeather1Selected
+                                binding.includeDiaryShow.textWeather1Selected
                         )
                 );
 
@@ -510,8 +511,8 @@ public class CalendarFragment extends Fragment {
                         getViewLifecycleOwner(),
                         new DiaryShowWeather2Observer(
                                 requireContext(),
-                                binding.includeShowDiary.textWeatherSlush,
-                                binding.includeShowDiary.textWeather2Selected
+                                binding.includeDiaryShow.textWeatherSlush,
+                                binding.includeDiaryShow.textWeather2Selected
                         )
                 );
 
@@ -520,31 +521,31 @@ public class CalendarFragment extends Fragment {
                         getViewLifecycleOwner(),
                         new DiaryShowConditionObserver(
                                 requireContext(),
-                                binding.includeShowDiary.textConditionSelected
+                                binding.includeDiaryShow.textConditionSelected
                         )
                 );
 
         // 項目レイアウト設定
         View[] itemLayouts = new View[DiaryLiveData.MAX_ITEMS];
-        itemLayouts[0] = binding.includeShowDiary.includeItem1.linerLayoutShowDiaryItem;
-        itemLayouts[1] = binding.includeShowDiary.includeItem2.linerLayoutShowDiaryItem;
-        itemLayouts[2] = binding.includeShowDiary.includeItem3.linerLayoutShowDiaryItem;
-        itemLayouts[3] = binding.includeShowDiary.includeItem4.linerLayoutShowDiaryItem;
-        itemLayouts[4] = binding.includeShowDiary.includeItem5.linerLayoutShowDiaryItem;
+        itemLayouts[0] = binding.includeDiaryShow.includeItem1.linerLayoutDiaryShowItem;
+        itemLayouts[1] = binding.includeDiaryShow.includeItem2.linerLayoutDiaryShowItem;
+        itemLayouts[2] = binding.includeDiaryShow.includeItem3.linerLayoutDiaryShowItem;
+        itemLayouts[3] = binding.includeDiaryShow.includeItem4.linerLayoutDiaryShowItem;
+        itemLayouts[4] = binding.includeDiaryShow.includeItem5.linerLayoutDiaryShowItem;
         diaryViewModel.getNumVisibleItemsLiveData()
                 .observe(getViewLifecycleOwner(), new DiaryShowNumVisibleItemsObserver(itemLayouts));
 
         diaryViewModel.getLogLiveData()
                 .observe(
                         getViewLifecycleOwner(),
-                        new DiaryShowLogObserver(binding.includeShowDiary.textLogValue)
+                        new DiaryShowLogObserver(binding.includeDiaryShow.textLogValue)
                 );
     }
 
 
 
     private void setUpFloatActionButton() {
-        binding.floatActionButtonEditDiary.setOnClickListener(new View.OnClickListener() {
+        binding.floatActionButtonDiaryEdit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 LocalDate selectedDate = calendarViewModel.getSelectedDateLiveData().getValue();
@@ -552,7 +553,7 @@ public class CalendarFragment extends Fragment {
                     selectedDate = LocalDate.now();
                     // TODO:assert検討
                 }
-                showEditDiaryFragment(selectedDate);
+                showDiaryEditFragment(selectedDate);
             }
         });
     }
@@ -561,23 +562,23 @@ public class CalendarFragment extends Fragment {
     // MEMO:FABのレイアウト高さは"wrap_content"を使用しているため、
     //      レイアウト後に機能するviewTreeObserver#addOnGlobalLayoutListenerを使用して取得する。
     private void setUpBottomLayout() {
-        View viewShowDiaryBottomMargin = binding.viewShowDiaryBottomMargin;
-        FloatingActionButton fabEditDiary = binding.floatActionButtonEditDiary;
-        ViewTreeObserver viewTreeObserver = viewShowDiaryBottomMargin.getViewTreeObserver();
+        View viewDiaryShowBottomMargin = binding.viewDiaryShowBottomMargin;
+        FloatingActionButton fabDiaryEdit = binding.floatActionButtonDiaryEdit;
+        ViewTreeObserver viewTreeObserver = viewDiaryShowBottomMargin.getViewTreeObserver();
         viewTreeObserver.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
             @Override
             public void onGlobalLayout() {
                 ViewGroup.MarginLayoutParams viewMarginLayoutParams =
-                        (ViewGroup.MarginLayoutParams) viewShowDiaryBottomMargin.getLayoutParams();
+                        (ViewGroup.MarginLayoutParams) viewDiaryShowBottomMargin.getLayoutParams();
                 ViewGroup.MarginLayoutParams buttonMarginLayoutParams =
-                        (ViewGroup.MarginLayoutParams) fabEditDiary.getLayoutParams();
+                        (ViewGroup.MarginLayoutParams) fabDiaryEdit.getLayoutParams();
 
-                viewMarginLayoutParams.height = fabEditDiary.getHeight()
+                viewMarginLayoutParams.height = fabDiaryEdit.getHeight()
                         + (buttonMarginLayoutParams.bottomMargin * 2);
-                viewShowDiaryBottomMargin.setLayoutParams(viewMarginLayoutParams);
+                viewDiaryShowBottomMargin.setLayoutParams(viewMarginLayoutParams);
 
                 // MEMO:例外で再度取得するように促される為、下記対応。
-                viewShowDiaryBottomMargin.getViewTreeObserver()
+                viewDiaryShowBottomMargin.getViewTreeObserver()
                         .removeOnGlobalLayoutListener(this);
             }
         });
@@ -603,10 +604,10 @@ public class CalendarFragment extends Fragment {
         binding.nestedScrollFullScreen.smoothScrollTo(0, 0);
     }
 
-    private void showEditDiaryFragment(LocalDate localDate) {
+    private void showDiaryEditFragment(LocalDate localDate) {
         NavDirections action =
                 CalendarFragmentDirections
-                        .actionNavigationCalendarFragmentToEditDiaryFragment(
+                        .actionNavigationCalendarFragmentToDiaryEditFragment(
                                 true,
                                 true,
                                 localDate
@@ -625,7 +626,7 @@ public class CalendarFragment extends Fragment {
         if (canShowDialog()) {
             showMessageDialog(
                     getString(R.string.dialog_message_title_communication_error),
-                    getString(R.string.dialog_message_comment_diary_loading_error)
+                    getString(R.string.dialog_message_message_diary_loading_error)
             );
             shouldShowDiaryLoadingErrorDialog = false;
         } else {

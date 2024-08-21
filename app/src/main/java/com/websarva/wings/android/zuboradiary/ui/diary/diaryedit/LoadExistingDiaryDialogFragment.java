@@ -31,7 +31,8 @@ public class LoadExistingDiaryDialogFragment extends DialogFragment {
 
         LocalDate loadDiaryDate =
                 LoadExistingDiaryDialogFragmentArgs.fromBundle(requireArguments()).getLoadDiaryDate();
-        String stringLoadDiaryDate = DateConverter.toStringLocalDate(loadDiaryDate);
+        DateConverter dateConverter = new DateConverter();
+        String stringLoadDiaryDate = dateConverter.toStringLocalDate(loadDiaryDate);
         String message = stringLoadDiaryDate + getString(R.string.dialog_load_Existing_diary_message);
 
         builder.setMessage(message);

@@ -16,10 +16,10 @@ public interface DiaryItemTitleSelectionHistoryDAO {
     // https://developer.android.com/reference/kotlin/androidx/room/Query
 
     @Query("SELECT * FROM diary_item_title_selection_history ORDER BY log DESC LIMIT :numTitles OFFSET :offset")
-    ListenableFuture<List<DiaryItemTitleSelectionHistoryItem>> selectSelectedDiaryItemTitlesAsync(int numTitles, int offset);
+    ListenableFuture<List<DiaryItemTitleSelectionHistoryItem>> selectHistoryOrderByLogDescAsync(int numTitles, int offset);
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    ListenableFuture<List<Long>> insertSelectedDiaryItemTitlesAsync(
+    ListenableFuture<List<Long>> insertHistoryItemAsync(
             List<DiaryItemTitleSelectionHistoryItem> diaryItemTitleSelectionHistoryItems);
 
     // 他DAO(他テーブルへの書き込み処理)メソッドと同じタイミング(Transaction)で処理する時に使用
@@ -28,7 +28,7 @@ public interface DiaryItemTitleSelectionHistoryDAO {
             List<DiaryItemTitleSelectionHistoryItem> diaryItemTitleSelectionHistoryItems);
 
     @Delete
-    ListenableFuture<Integer> deleteSelectedDiaryItemTitleAsync(DiaryItemTitleSelectionHistoryItem diaryItemTitleSelectionHistoryItem);
+    ListenableFuture<Integer> deleteHistoryItemAsync(DiaryItemTitleSelectionHistoryItem diaryItemTitleSelectionHistoryItem);
 
     // MEMO:SQLITEはDELETE ORDER BYが使用できない。
     /*@Query("DELETE FROM diary_item_title_history ORDER BY log DESC LIMIT ((SELECT COUNT(*) FROM diary_item_title_history) - 50) OFFSET 50")*/

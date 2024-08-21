@@ -31,7 +31,8 @@ public class DiaryDeleteConfirmationDialogFragment extends DialogFragment {
         builder.setTitle(R.string.dialog_diary_delete_confirmation_title);
         LocalDate date =
                 DiaryDeleteConfirmationDialogFragmentArgs.fromBundle(requireArguments()).getDeleteDiaryDate();
-        String strDate = DateConverter.toStringLocalDate(date);
+        DateConverter dateConverter = new DateConverter();
+        String strDate = dateConverter.toStringLocalDate(date);
         String message = strDate + getString(R.string.dialog_diary_delete_confirmation_message);
 
         builder.setMessage(message);
@@ -54,7 +55,7 @@ public class DiaryDeleteConfirmationDialogFragment extends DialogFragment {
                     }
                     SavedStateHandle savedStateHandle = navBackStackEntry.getSavedStateHandle();
                     LocalDate deleteDiaryDate =
-                            DeleteConfirmationDialogFragmentArgs.fromBundle(requireArguments())
+                            DiaryDeleteConfirmationDialogFragmentArgs.fromBundle(requireArguments())
                                     .getDeleteDiaryDate();
                     savedStateHandle.set(KEY_DELETE_DIARY_DATE, deleteDiaryDate);
                     break;

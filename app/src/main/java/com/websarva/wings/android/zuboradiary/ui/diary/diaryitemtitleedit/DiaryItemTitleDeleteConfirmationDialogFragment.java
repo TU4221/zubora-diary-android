@@ -87,7 +87,8 @@ public class DiaryItemTitleDeleteConfirmationDialogFragment extends DialogFragme
                 navController.getPreviousBackStackEntry().getSavedStateHandle();
         savedStateHandle.set(KEY_SELECTED_BUTTON, status);
         int deleteListItemPosition =
-                DeleteConfirmationDialogFragmentArgs.fromBundle(getArguments()).getDeleteListItemPosition();
+                DiaryItemTitleDeleteConfirmationDialogFragmentArgs
+                        .fromBundle(getArguments()).getDeleteListItemPosition();
         savedStateHandle.set(KEY_DELETE_LIST_ITEM_POSITION, deleteListItemPosition);
     }
 }

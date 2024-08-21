@@ -179,9 +179,9 @@ public class DiaryItemTitleEditFragment extends Fragment {
                 diaryItemTitleEditViewModel
                         .deleteSelectedItemTitleHistoryItem(deleteListItemPosition);
             } else {
-                SelectedItemTitleHistoryAdapter adapter =
-                        (SelectedItemTitleHistoryAdapter)
-                                binding.recyclerSelectedItemTitleHistory.getAdapter();
+                ItemTitleSelectionHistoryAdapter adapter =
+                        (ItemTitleSelectionHistoryAdapter)
+                                binding.recyclerItemTitleSelectionHistory.getAdapter();
                 if (adapter == null) {
                     // TODO:assert
                     return;
@@ -213,7 +213,7 @@ public class DiaryItemTitleEditFragment extends Fragment {
         // キーボード入力不要View
         List<View> noKeyboardViews = new ArrayList<>();
         noKeyboardViews.add(binding.buttonSelectNewItemTitle);
-        noKeyboardViews.add(binding.recyclerSelectedItemTitleHistory);
+        noKeyboardViews.add(binding.recyclerItemTitleSelectionHistory);
         setupEditText(
                 binding.editTextNewItemTitle,
                 binding.textNewItemTitleLength,
@@ -256,14 +256,14 @@ public class DiaryItemTitleEditFragment extends Fragment {
 
     private void setUpItemTitleSelectionHistory() {
         // 選択履歴リストアイテム設定
-        RecyclerView recyclerItemTitleSelectionHistory = binding.recyclerSelectedItemTitleHistory;
+        RecyclerView recyclerItemTitleSelectionHistory = binding.recyclerItemTitleSelectionHistory;
         recyclerItemTitleSelectionHistory.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerItemTitleSelectionHistory.addItemDecoration(
                 new DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL)
         );
-        recyclerItemTitleSelectionHistory.setAdapter(new SelectedItemTitleHistoryAdapter());
-        SelectedItemTitleHistorySimpleCallBack simpleCallBack =
-                new SelectedItemTitleHistorySimpleCallBack(
+        recyclerItemTitleSelectionHistory.setAdapter(new ItemTitleSelectionHistoryAdapter());
+        ItemTitleSelectionHistorySimpleCallBack simpleCallBack =
+                new ItemTitleSelectionHistorySimpleCallBack(
                         ItemTouchHelper.ACTION_STATE_IDLE,
                         ItemTouchHelper.LEFT
                 );
@@ -271,7 +271,7 @@ public class DiaryItemTitleEditFragment extends Fragment {
         itemTouchHelper.attachToRecyclerView(recyclerItemTitleSelectionHistory);
 
         // 選択履歴読込・表示
-        diaryItemTitleEditViewModel.loadSelectedItemTitleHistory();
+        diaryItemTitleEditViewModel.loadItemTitleSelectionHistory();
         diaryItemTitleEditViewModel.getItemTitleSelectionHistoryLiveData()
                 .observe(getViewLifecycleOwner(), new Observer<List<DiaryItemTitleSelectionHistoryItem>>() {
                     @Override
@@ -281,9 +281,9 @@ public class DiaryItemTitleEditFragment extends Fragment {
                             list.add(diaryItemTitleSelectionHistoryItem.getTitle());
                         }
 
-                        SelectedItemTitleHistoryAdapter adapter =
-                                (SelectedItemTitleHistoryAdapter)
-                                        binding.recyclerSelectedItemTitleHistory.getAdapter();
+                        ItemTitleSelectionHistoryAdapter adapter =
+                                (ItemTitleSelectionHistoryAdapter)
+                                        binding.recyclerItemTitleSelectionHistory.getAdapter();
                         if (adapter == null) {
                             return;
                         }
@@ -303,7 +303,7 @@ public class DiaryItemTitleEditFragment extends Fragment {
                         }
                         if (aBoolean) {
                             showItemTitleSelectionHistoryLoadingErrorDialog();
-                            diaryItemTitleEditViewModel.clearSelectedItemTitleListLoadingError();
+                            diaryItemTitleEditViewModel.clearItemTitleSelectionHistoryLoadingError();
                         }
                     }
                 });
@@ -317,7 +317,7 @@ public class DiaryItemTitleEditFragment extends Fragment {
                         }
                         if (aBoolean) {
                             showItemTitleSelectionHistoryItemDeleteErrorDialog();
-                            diaryItemTitleEditViewModel.clearSelectedItemTitleDeleteError();
+                            diaryItemTitleEditViewModel.clearItemTitleSelectionHistoryItemDeleteError();
                         }
                     }
                 });
@@ -434,34 +434,34 @@ public class DiaryItemTitleEditFragment extends Fragment {
 
     // アイテムタイトル選択履歴ViewHolder
     // TODO:ListAdapterに変更&独立クラスへ
-    private static class SelectedItemTitleHistoryViewHolder extends RecyclerView.ViewHolder {
-        public TextView textSelectedItemTitle;
+    private static class ItemTitleSelectionHistoryViewHolder extends RecyclerView.ViewHolder {
+        public TextView textItemTitle;
 
-        public SelectedItemTitleHistoryViewHolder(View itemView) {
+        public ItemTitleSelectionHistoryViewHolder(View itemView) {
             super(itemView);
-            textSelectedItemTitle = itemView.findViewById(R.id.text_selected_item_title);
+            textItemTitle = itemView.findViewById(R.id.text_item_title);
         }
     }
 
-    private class SelectedItemTitleHistoryAdapter
-            extends RecyclerView.Adapter<SelectedItemTitleHistoryViewHolder> {
-        private List<String> selectedItemTitleList;
+    private class ItemTitleSelectionHistoryAdapter
+            extends RecyclerView.Adapter<ItemTitleSelectionHistoryViewHolder> {
+        private List<String> ItemTitleSelectionHistory;
 
         @NonNull
         @Override
-        public SelectedItemTitleHistoryViewHolder onCreateViewHolder(
+        public ItemTitleSelectionHistoryViewHolder onCreateViewHolder(
                 ViewGroup parent, int viewType) {
             LayoutInflater inflater = LayoutInflater.from(parent.getContext());
             View view =
                     inflater.inflate(
-                            R.layout.row_selected_item_title_history, parent, false);
-            SelectedItemTitleHistoryViewHolder holder =
-                    new SelectedItemTitleHistoryViewHolder(view);
+                            R.layout.row_item_title_selection_history, parent, false);
+            ItemTitleSelectionHistoryViewHolder holder =
+                    new ItemTitleSelectionHistoryViewHolder(view);
 
             holder.itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    String selectedItemTitle = holder.textSelectedItemTitle.getText().toString();
+                    String selectedItemTitle = holder.textItemTitle.getText().toString();
                     completeItemTitleEdit(selectedItemTitle);
                 }
             });
@@ -470,26 +470,26 @@ public class DiaryItemTitleEditFragment extends Fragment {
         }
 
         @Override
-        public void onBindViewHolder(SelectedItemTitleHistoryViewHolder holder, int position) {
-            String selectedItemTitle = selectedItemTitleList.get(position);
-            holder.textSelectedItemTitle.setText(selectedItemTitle);
+        public void onBindViewHolder(ItemTitleSelectionHistoryViewHolder holder, int position) {
+            String itemTitle = ItemTitleSelectionHistory.get(position);
+            holder.textItemTitle.setText(itemTitle);
         }
 
         @Override
         public int getItemCount() {
-            return selectedItemTitleList.size();
+            return ItemTitleSelectionHistory.size();
         }
 
         public void changeItem(List<String> list) {
-            selectedItemTitleList = list;
+            ItemTitleSelectionHistory = list;
             notifyDataSetChanged();
         }
 
     }
 
     // 参考：https://appdev-room.com/android-recyclerview-swipe-action
-    private class SelectedItemTitleHistorySimpleCallBack extends ItemTouchHelper.SimpleCallback {
-        public SelectedItemTitleHistorySimpleCallBack(int dragDirs, int swipeDirs) {
+    private class ItemTitleSelectionHistorySimpleCallBack extends ItemTouchHelper.SimpleCallback {
+        public ItemTitleSelectionHistorySimpleCallBack(int dragDirs, int swipeDirs) {
             super(dragDirs, swipeDirs);
         }
 
@@ -502,12 +502,12 @@ public class DiaryItemTitleEditFragment extends Fragment {
 
         @Override
         public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
-            SelectedItemTitleHistoryViewHolder selectedItemTitleHistoryViewHolder =
-                                                    (SelectedItemTitleHistoryViewHolder) viewHolder;
+            ItemTitleSelectionHistoryViewHolder itemTitleSelectionHistoryViewHolder =
+                                                    (ItemTitleSelectionHistoryViewHolder) viewHolder;
 
             int itemPos = viewHolder.getBindingAdapterPosition();
             String itemTitle =
-                    selectedItemTitleHistoryViewHolder.textSelectedItemTitle.getText().toString();
+                    itemTitleSelectionHistoryViewHolder.textItemTitle.getText().toString();
             showDeleteConfirmationDialog(itemPos, itemTitle);
         }
 
@@ -620,7 +620,7 @@ public class DiaryItemTitleEditFragment extends Fragment {
 
     private void showItemTitleSelectionHistoryLoadingErrorDialog() {
         if (canShowDialog()) {
-            showMessageDialog("通信エラー", "選択履歴の読込に失敗しました。");
+            showMessageDialog(getString(R.string.dialog_message_title_communication_error), getString(R.string.dialog_message_message_item_title_selection_history_loading_error));
             shouldShowItemTitleSelectionHistoryLoadingErrorDialog = false;
         } else {
             shouldShowItemTitleSelectionHistoryLoadingErrorDialog = true;
@@ -629,7 +629,7 @@ public class DiaryItemTitleEditFragment extends Fragment {
 
     private void showItemTitleSelectionHistoryItemDeleteErrorDialog() {
         if (canShowDialog()) {
-            showMessageDialog("通信エラー", "削除に失敗しました。");
+            showMessageDialog(getString(R.string.dialog_message_title_communication_error), getString(R.string.dialog_message_message_item_title_selection_history_item_delete_error));
             shouldShowItemTitleSelectionHistoryItemDeleteErrorDialog = false;
         } else {
             shouldShowItemTitleSelectionHistoryItemDeleteErrorDialog = true;
