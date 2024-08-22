@@ -244,7 +244,12 @@ public class DiaryListFragment extends Fragment {
         diaryListYearMonthLinearLayoutManager = new CustomLinearLayoutManager(getContext());
         recyclerDiaryYearMonthList.setLayoutManager(diaryListYearMonthLinearLayoutManager);
         DiaryYearMonthListAdapter diaryYearMonthListAdapter =
-                new DiaryYearMonthListAdapter(requireContext(), this::showShowDiaryFragment, true);
+                new DiaryYearMonthListAdapter(
+                        requireContext(),
+                        recyclerDiaryYearMonthList,
+                        this::showShowDiaryFragment,
+                        true
+                );
         recyclerDiaryYearMonthList.setAdapter(diaryYearMonthListAdapter);
         // HACK:下記問題が発生する為アイテムアニメーションを無効化
         //      問題1.アイテム追加時もやがかかる。今回の構成(親Recycler:年月、子Recycler:日)上、

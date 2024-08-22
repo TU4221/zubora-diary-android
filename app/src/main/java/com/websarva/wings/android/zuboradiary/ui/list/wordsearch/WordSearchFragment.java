@@ -250,7 +250,12 @@ public class WordSearchFragment extends Fragment {
         RecyclerView recyclerWordSearchResults = binding.recyclerWordSearchResults;
         recyclerWordSearchResults.setLayoutManager(new LinearLayoutManager(requireContext()));
         DiaryYearMonthListAdapter wordSearchResultYearMonthListAdapter =
-                new DiaryYearMonthListAdapter(requireContext(), this::showShowDiaryFragment, false);
+                new DiaryYearMonthListAdapter(
+                        requireContext(),
+                        recyclerWordSearchResults,
+                        this::showShowDiaryFragment,
+                        false
+                );
         recyclerWordSearchResults.setAdapter(wordSearchResultYearMonthListAdapter);
         // HACK:下記問題が発生する為アイテムアニメーションを無効化
         //      問題1.アイテム追加時もやがかかる。今回の構成(親Recycler:年月、子Recycler:日)上、

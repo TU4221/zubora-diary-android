@@ -7,10 +7,9 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.databinding.ViewDataBinding;
 import androidx.recyclerview.widget.DiffUtil;
-import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.ListAdapter;
-import androidx.recyclerview.widget.RecyclerView;
 
 import com.websarva.wings.android.zuboradiary.data.DayOfWeekConverter;
 import com.websarva.wings.android.zuboradiary.databinding.RowDiaryDayListBinding;
@@ -62,16 +61,6 @@ public class DiaryDayListAdapter extends ListAdapter<DiaryDayListItem, DiaryDayL
             }
         });
 
-        // TODO:背面削除ボタン処理保留
-            /*holder.binding.textDeleteDiary.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    NavDirections action =
-                            DiaryListFragmentDirections
-                                    .actionDiaryListFragmentToDeleteConfirmationDialog(date);
-                    navController.navigate(action);
-                }
-            });*/
         holder.binding.includeBackground.textDeleteButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -81,13 +70,22 @@ public class DiaryDayListAdapter extends ListAdapter<DiaryDayListItem, DiaryDayL
 
     }
 
-    public static class DiaryDayListViewHolder extends RecyclerView.ViewHolder {
+    public static class DiaryDayListViewHolder extends DiaryListSimpleCallback.LeftSwipeViewHolder {
         public RowDiaryDayListBinding binding;
         public LocalDate date;
-        public DiaryDayListViewHolder(RowDiaryDayListBinding binding) {
-            super(binding.getRoot());
+        public DiaryDayListViewHolder(@NonNull RowDiaryDayListBinding binding) {
+            super(binding);
             this.binding = binding;
-            this.binding.linerLayoutForeground.setClickable(true);
+        }
+
+        @Override
+        void setUpView(@NonNull ViewDataBinding binding) {
+            RowDiaryDayListBinding rowDiaryDayListBinding;
+            if (binding instanceof RowDiaryDayListBinding) {
+                rowDiaryDayListBinding = (RowDiaryDayListBinding) binding;
+                foregroundView = rowDiaryDayListBinding.linerLayoutForeground;
+                backgroundButtonView = rowDiaryDayListBinding.includeBackground.textDeleteButton;
+            }
         }
     }
 

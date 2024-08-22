@@ -8,6 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.ListAdapter;
@@ -19,7 +20,7 @@ import com.websarva.wings.android.zuboradiary.ui.list.diarylist.CustomSimpleCall
 import com.websarva.wings.android.zuboradiary.ui.list.diarylist.DiaryDayListAdapter;
 import com.websarva.wings.android.zuboradiary.ui.list.diarylist.DiaryDayListItem;
 import com.websarva.wings.android.zuboradiary.ui.list.diarylist.DiaryYearMonthListItem;
-import com.websarva.wings.android.zuboradiary.ui.list.diarylist.LeftSwipingSimpleCallBack;
+import com.websarva.wings.android.zuboradiary.ui.list.diarylist.DiaryListSimpleCallback;
 import com.websarva.wings.android.zuboradiary.ui.list.wordsearch.WordSearchResultDayListAdapter;
 import com.websarva.wings.android.zuboradiary.ui.list.wordsearch.WordSearchResultDayListItem;
 import com.websarva.wings.android.zuboradiary.ui.list.wordsearch.WordSearchResultYearMonthListItem;
@@ -33,23 +34,40 @@ import java.util.function.Consumer;
 
 public class DiaryYearMonthListAdapter extends ListAdapter<DiaryYearMonthListItemBase, RecyclerView.ViewHolder> {
     private final Context context;
+    private final RecyclerView recyclerView;
     private final Consumer<LocalDate> processOnChildItemClick;
     private final boolean canSwipeItem;
     public static final int DIARY_DAY_LIST_ITEM_MARGIN_VERTICAL = 16;
     public static final int DIARY_DAY_LIST_ITEM_MARGIN_HORIZONTAL = 32;
     private final List<Map<String, Object>> diaryYearMonthList = new ArrayList<>(); // TODO:不要確認後削除
     private final List<CustomSimpleCallback> simpleCallbacks = new ArrayList<>();
+    private final List<DiaryListSimpleCallback> simpleCallbackList = new ArrayList<>();
     public static final int VIEW_TYPE_DIARY = 0;
     public static final int VIEW_TYPE_PROGRESS_BAR = 1;
     public static final int VIEW_TYPE_NO_DIARY_MESSAGE = 2;
 
     public DiaryYearMonthListAdapter(
-            Context context, Consumer<LocalDate> processOnChildItemClick, boolean canSwipeItem){
+            Context context,RecyclerView recyclerView, Consumer<LocalDate> processOnChildItemClick, boolean canSwipeItem){
         super(new DiaryYearMonthListDiffUtilItemCallback());
         this.context = context;
+        this.recyclerView = recyclerView;
         this.processOnChildItemClick = processOnChildItemClick;
         this.canSwipeItem = canSwipeItem;
+
+        // TODO:build()を作成する。
+        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
+                super.onScrollStateChanged(recyclerView, newState);
+                if (newState == RecyclerView.SCROLL_STATE_DRAGGING) {
+                    // スクロール時スワイプ閉
+                    closeSwipedItemOtherDayList(null);
+                }
+            }
+        });
     }
+
+
 
     @NonNull
     @Override
@@ -98,33 +116,10 @@ public class DiaryYearMonthListAdapter extends ListAdapter<DiaryYearMonthListIte
             });
 
             if (canSwipeItem) {
-                // TODO:上手くいかないので保留
-                // ホルダー内の日記リスト(日)のアイテムにスワイプ機能(背面ボタン表示)を設定。
-                // MEMO:スワイプでの背面ボタン表示機能はAndroidには存在しないので、
-                //      ItemTouchHelper.Callback を継承して作成。
-            /*CustomSimpleCallback simpleCallback = new CustomSimpleCallback(
-                    ItemTouchHelper.ACTION_STATE_IDLE, ItemTouchHelper.LEFT,
-                    holder.binding.recyclerDayList,
-                    getContext(),
-                    getResources().getDisplayMetrics().density,
-                    getChildFragmentManager(), // TODO:左記不要確認後削除
-                    navController,
-                    binding.recyclerDiaryYearMonthList);
-            simpleCallbacks.add(simpleCallback);
-            DiaryDayListSimpleCallBack simpleCallBack =
-                    new DiaryDayListSimpleCallBack(
-                            ItemTouchHelper.ACTION_STATE_IDLE,
-                            ItemTouchHelper.LEFT,
-                            new SwipedDiaryDate()
-                    );
-
-                ItemTouchHelper itemTouchHelper = new ItemTouchHelper(simpleCallBack);
-                itemTouchHelper.attachToRecyclerView(holder.binding.recyclerDayList);*/
-
-
-                LeftSwipingSimpleCallBack leftSwipingSimpleCallBack =
-                        new LeftSwipingSimpleCallBack(holder.binding.recyclerDayList);
-                leftSwipingSimpleCallBack.build();
+                DiaryListSimpleCallback diaryListSimpleCallBack =
+                        new DiaryListSimpleCallback(recyclerView, holder.binding.recyclerDayList);
+                diaryListSimpleCallBack.build();
+                simpleCallbackList.add(diaryListSimpleCallBack);
             }
 
             return holder;
@@ -197,6 +192,20 @@ public class DiaryYearMonthListAdapter extends ListAdapter<DiaryYearMonthListIte
         for (int i = 0; i < simpleCallbacks.size(); i++) {
             if (customSimpleCallback != simpleCallbacks.get(i)) {
                 simpleCallbacks.get(i).recoverSwipeItem();
+            }
+        }
+    }
+
+    public void closeSwipedItemOtherDayList(@Nullable DiaryListSimpleCallback simpleCallback) {
+        if (simpleCallback == null) {
+            for (DiaryListSimpleCallback _simpleCallback: simpleCallbackList) {
+                _simpleCallback.closeSwipedItem();
+            }
+        } else {
+            for (int i = 0; i < simpleCallbackList.size(); i++) {
+                if (simpleCallbackList.get(i) != simpleCallback) {
+                    simpleCallbackList.get(i).closeSwipedItem();
+                }
             }
         }
     }
