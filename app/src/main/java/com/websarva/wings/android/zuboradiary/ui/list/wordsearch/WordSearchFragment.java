@@ -34,7 +34,6 @@ import com.websarva.wings.android.zuboradiary.ui.KeyboardInitializer;
 import com.websarva.wings.android.zuboradiary.MainActivity;
 import com.websarva.wings.android.zuboradiary.R;
 import com.websarva.wings.android.zuboradiary.databinding.FragmentWordSearchBinding;
-import com.websarva.wings.android.zuboradiary.ui.list.DiaryListListenerSetting;
 import com.websarva.wings.android.zuboradiary.ui.list.DiaryYearMonthListAdapter;
 
 import java.time.LocalDate;
@@ -247,44 +246,36 @@ public class WordSearchFragment extends Fragment {
     }
 
     private void setUpWordSearchResultList() {
-        RecyclerView recyclerWordSearchResults = binding.recyclerWordSearchResults;
-        recyclerWordSearchResults.setLayoutManager(new LinearLayoutManager(requireContext()));
         DiaryYearMonthListAdapter wordSearchResultYearMonthListAdapter =
                 new DiaryYearMonthListAdapter(
                         requireContext(),
-                        recyclerWordSearchResults,
-                        this::showShowDiaryFragment,
-                        false
+                        binding.recyclerWordSearchResultList,
+                        new DiaryYearMonthListAdapter.OnScrollEndItemLoadingListener() {
+                            @Override
+                            public void Load() {
+                                wordSearchViewModel
+                                        .loadWordSearchResultList(
+                                                WordSearchViewModel.LoadType.ADD,
+                                                getResources().getColor(R.color.gray) // TODO:テーマカラーで切替
+                                        );
+                            }
+                        },
+                        new DiaryYearMonthListAdapter.OnScrollLoadingConfirmationListener() {
+                            @Override
+                            public boolean isLoading() {
+                                return wordSearchViewModel.getIsLoading();
+                            }
+                        },
+                        new DiaryYearMonthListAdapter.OnClickChildItemListener() {
+                            @Override
+                            public void onClick(LocalDate date) {
+                                showShowDiaryFragment(date);
+                            }
+                        },
+                        false,
+                        null
                 );
-        recyclerWordSearchResults.setAdapter(wordSearchResultYearMonthListAdapter);
-        // HACK:下記問題が発生する為アイテムアニメーションを無効化
-        //      問題1.アイテム追加時もやがかかる。今回の構成(親Recycler:年月、子Recycler:日)上、
-        //           既に表示されている年月に日のアイテムを追加すると、年月のアイテムに変更アニメーションが発生してしまう。
-        //           これに対して、日のアイテムに追加アニメーションを発生させようとすると、
-        //           年月のアイテムのサイズ変更にアニメーションが発生せず全体的に違和感となるアニメーションになってしまう。
-        //      問題2.最終アイテムまで到達し、ProgressBarが消えた後にセクションバーがその分ずれる)
-        recyclerWordSearchResults.setItemAnimator(null);
-
-        DiaryListListenerSetting diaryListListenerSetting = new DiaryListListenerSetting() {
-            @Override
-            public boolean isLoadingDiaryList() {
-                return wordSearchViewModel.getIsLoading();
-            }
-
-            @Override
-            public void loadDiaryList() {
-                wordSearchViewModel
-                        .loadWordSearchResultList(
-                                WordSearchViewModel.LoadType.ADD,
-                                getResources().getColor(R.color.gray) // TODO:テーマカラーで切替
-                        );
-            }
-        };
-        diaryListListenerSetting
-                .setUp(
-                        recyclerWordSearchResults,
-                        DiaryYearMonthListAdapter.DIARY_DAY_LIST_ITEM_MARGIN_VERTICAL
-                );
+        wordSearchResultYearMonthListAdapter.build();
 
         // データベースから読み込んだ日記リストをリサクラービューに反映
         wordSearchViewModel.getWordSearchResultListLiveData()
@@ -297,7 +288,7 @@ public class WordSearchFragment extends Fragment {
                         }
                         DiaryYearMonthListAdapter wordSearchResultYearMonthListAdapter =
                                 (DiaryYearMonthListAdapter)
-                                        binding.recyclerWordSearchResults.getAdapter();
+                                        binding.recyclerWordSearchResultList.getAdapter();
                         if (wordSearchResultYearMonthListAdapter == null) {
                             return;
                         }
@@ -382,5 +373,23 @@ public class WordSearchFragment extends Fragment {
         }
         int currentDestinationId = navController.getCurrentDestination().getId();
         return currentDestinationId == R.id.navigation_word_search_fragment;
+    }
+
+    // 選択中ボトムナビゲーションタブを再選択時の処理
+    public void processOnReselectNavigationItem() {
+        if (binding.recyclerWordSearchResultList.canScrollVertically(-1)) {
+            resultListScrollToFirstPosition();
+        } else {
+            navController.navigateUp();
+        }
+    }
+
+    //日記リスト(年月)を自動でトップへスクロールさせるメソッド。
+    public void resultListScrollToFirstPosition() {
+        RecyclerView.Adapter<?> adapter = binding.recyclerWordSearchResultList.getAdapter();
+        if (adapter instanceof DiaryYearMonthListAdapter) {
+            DiaryYearMonthListAdapter diaryYearMonthListAdapter = (DiaryYearMonthListAdapter) adapter;
+            diaryYearMonthListAdapter.scrollToFirstPosition();
+        }
     }
 }

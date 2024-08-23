@@ -170,7 +170,6 @@ public class DiaryEditViewModel extends ViewModel {
             isDiarySavingError.setValue(true);
             return false;
         }
-        loadedDate.setValue(diaryLiveData.getDate().getValue());
         return true;
     }
 
@@ -185,7 +184,6 @@ public class DiaryEditViewModel extends ViewModel {
             isDiarySavingError.setValue(true);
             return false;
         }
-        loadedDate.setValue(diaryLiveData.getDate().getValue());
         return true;
     }
 

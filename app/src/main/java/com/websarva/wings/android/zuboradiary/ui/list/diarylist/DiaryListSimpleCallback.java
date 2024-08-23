@@ -168,7 +168,7 @@ public class DiaryListSimpleCallback extends ItemTouchHelper.SimpleCallback {
         animateSwipingView(
                 position,
                 viewHolder,
-                200,
+                300,
                 0f,
                 new AnimationAction() {
                     @Override
@@ -288,7 +288,7 @@ public class DiaryListSimpleCallback extends ItemTouchHelper.SimpleCallback {
             if (swipedAdapterPosition != viewHolder.getBindingAdapterPosition()) {
                 closeForAdapterPosition(swipedAdapterPosition);
             }
-            RecyclerView.Adapter adapter = parentRecyclerView.getAdapter();
+            RecyclerView.Adapter<?> adapter = parentRecyclerView.getAdapter();
             if (adapter instanceof DiaryYearMonthListAdapter) {
                 DiaryYearMonthListAdapter diaryYearMonthListAdapter = (DiaryYearMonthListAdapter) adapter;
                 diaryYearMonthListAdapter.closeSwipedItemOtherDayList(this);

@@ -16,18 +16,24 @@ import com.websarva.wings.android.zuboradiary.data.DayOfWeekConverter;
 import com.websarva.wings.android.zuboradiary.databinding.RowWordSearchResultListBinding;
 
 import java.time.LocalDate;
-import java.util.function.Consumer;
 
 public class WordSearchResultDayListAdapter
         extends ListAdapter<WordSearchResultDayListItem, WordSearchResultDayListAdapter.WordSearchResultDayViewHolder> {
 
     private final Context context;
-    private final Consumer<LocalDate> processOnClick;
+    private final RecyclerView recyclerView;
+    private final OnClickItemListener onClickItemListener;
 
-    public WordSearchResultDayListAdapter(Context context, Consumer<LocalDate> processOnClick){
+    public WordSearchResultDayListAdapter(
+            Context context, RecyclerView recyclerView, OnClickItemListener onClickItemListener){
         super(new WordSearchResultDayListDiffUtilItemCallback());
         this.context = context;
-        this.processOnClick = processOnClick;
+        this.recyclerView = recyclerView;
+        this.onClickItemListener = onClickItemListener;
+    }
+
+    public void build() {
+        recyclerView.setAdapter(this);
     }
 
     //日記リスト(日)のホルダーと日記リスト(日)のアイテムレイアウトを紐づける。
@@ -62,9 +68,14 @@ public class WordSearchResultDayListAdapter
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                processOnClick.accept(date);
+                onClickItemListener.onClick(date);
             }
         });
+    }
+
+    @FunctionalInterface
+    public interface OnClickItemListener {
+        void onClick(LocalDate date);
     }
 
     public static class WordSearchResultDayViewHolder extends RecyclerView.ViewHolder {

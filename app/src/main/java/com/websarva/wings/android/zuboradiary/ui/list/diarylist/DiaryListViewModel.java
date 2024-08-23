@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 
@@ -140,7 +141,7 @@ public class DiaryListViewModel extends ViewModel {
                     diaryList.postValue(diaryListContainingProgressBar);
 
                     // TODO:ProgressBarを表示させる為に仮で記述
-                    Thread.sleep(1000);
+                    Thread.sleep(500);
 
                     // 日記リスト読込
                     Log.d("DiaryListLoading", "startLoading");
@@ -323,43 +324,13 @@ public class DiaryListViewModel extends ViewModel {
             return;
             // TODO:assert
         }
-        // TODO:resultの成功値確認
-        if (result != 0) {
+        // 削除件数 = 1が正常
+        if (result != 1) {
             isDiaryDeleteError.setValue(true);
             return;
         }
 
-        List<DiaryYearMonthListItem> currentDiaryList = diaryList.getValue();
-        if (currentDiaryList == null) {
-            // TODO:assert
-            return;
-        }
-        DiaryYearMonthListItem targetYearMonthListItem =
-                new DiaryYearMonthListItem(DiaryYearMonthListAdapter.VIEW_TYPE_NO_DIARY_MESSAGE);
-        List<DiaryDayListItem> targetDayList = new ArrayList<>();
-
-        for (DiaryYearMonthListItem item: currentDiaryList) {
-            YearMonth deleteDiaryYearMonth = YearMonth.of(date.getYear(), date.getMonthValue());
-            if (item.getYearMonth().equals(deleteDiaryYearMonth)) {
-                targetYearMonthListItem = item;
-                targetDayList = item.getDiaryDayListItemList();
-                break;
-            }
-        }
-
-        for (DiaryDayListItem item: targetDayList) {
-            if (item.getDate().equals(date)) {
-                targetDayList.remove(item);
-                if (targetDayList.isEmpty()) {
-                    currentDiaryList.remove(targetYearMonthListItem);
-                }
-                break;
-            }
-        }
-
-        List<DiaryYearMonthListItem> updateDiaryList = new ArrayList<>(currentDiaryList);
-        diaryList.postValue(updateDiaryList);
-
+        loadList(LoadType.UPDATE);
     }
 
     @Nullable

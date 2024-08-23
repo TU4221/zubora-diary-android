@@ -42,6 +42,7 @@ import com.google.android.material.transition.platform.MaterialFadeThrough;
 import com.websarva.wings.android.zuboradiary.databinding.ActivityMainBinding;
 import com.websarva.wings.android.zuboradiary.ui.calendar.CalendarFragment;
 import com.websarva.wings.android.zuboradiary.ui.list.diarylist.DiaryListFragment;
+import com.websarva.wings.android.zuboradiary.ui.list.wordsearch.WordSearchFragment;
 import com.websarva.wings.android.zuboradiary.ui.settings.SettingsViewModel;
 
 import dagger.hilt.android.AndroidEntryPoint;
@@ -207,6 +208,9 @@ public class MainActivity extends AppCompatActivity {
                     if (fragment instanceof DiaryListFragment) {
                         DiaryListFragment diaryListFragment = (DiaryListFragment) fragment;
                         diaryListFragment.diaryListScrollToFirstPosition();
+                    } else if (fragment instanceof WordSearchFragment) {
+                        WordSearchFragment wordSearchFragment = (WordSearchFragment) fragment;
+                        wordSearchFragment.processOnReselectNavigationItem();
                     }
                 }
 

@@ -91,7 +91,7 @@
                     android:visibility="@{word_search_view_model.isVisibleNumWordSearchResultsLiveData ? View.VISIBLE : View.INVISIBLE}" />
 
                 <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/recycler_word_search_results"
+                    android:id="@+id/recycler_word_search_result_list"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:scrollbars="none"

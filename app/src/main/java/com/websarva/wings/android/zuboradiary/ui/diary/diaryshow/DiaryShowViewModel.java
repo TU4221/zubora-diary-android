@@ -15,6 +15,7 @@ import com.websarva.wings.android.zuboradiary.ui.diary.DiaryLiveData;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.concurrent.ExecutionException;
 
 import javax.inject.Inject;
 
@@ -44,6 +45,15 @@ public class DiaryShowViewModel extends ViewModel {
         diaryLiveData.initialize();
         isDiaryLoadingError.setValue(false);
         isDiaryDeleteError.setValue(false);
+    }
+
+    public boolean hasDiary(LocalDate localDate) {
+        try {
+            return diaryRepository.hasDiary(localDate).get();
+        } catch (ExecutionException | InterruptedException e) {
+            isDiaryLoadingError.setValue(true);
+            return false;
+        }
     }
 
     public void prepareDiary(LocalDate date, boolean isLoadingDiary) {

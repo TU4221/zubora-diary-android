@@ -77,7 +77,7 @@ public class CalendarFragment extends Fragment {
 
     // ViewModel
     private CalendarViewModel calendarViewModel;
-    private DiaryShowViewModel diaryViewModel; // TODO:diaryViewModelの使用要素をcalendarViewModelに含めるか検討(DiaryFragment修正後)
+    private DiaryShowViewModel diaryShowViewModel; // TODO:diaryViewModelの使用要素をcalendarViewModelに含めるか検討(DiaryFragment修正後)
     private SettingsViewModel settingsViewModel;
 
     public void onCreate(Bundle savedInstanceState) {
@@ -86,7 +86,7 @@ public class CalendarFragment extends Fragment {
         // ViewModel設定
         ViewModelProvider provider = new ViewModelProvider(requireActivity());
         calendarViewModel = provider.get(CalendarViewModel.class);
-        diaryViewModel = provider.get(DiaryShowViewModel.class);
+        diaryShowViewModel = provider.get(DiaryShowViewModel.class);
         settingsViewModel = provider.get(SettingsViewModel.class);
 
         // Navigation設定
@@ -103,7 +103,7 @@ public class CalendarFragment extends Fragment {
 
         // 双方向データバインディング設定
         binding.setLifecycleOwner(this);
-        binding.setDiaryShowViewModel(diaryViewModel);
+        binding.setDiaryShowViewModel(diaryShowViewModel);
 
         // 画面遷移時のアニメーション設定
         // FROM:遷移元 TO:遷移先
@@ -190,7 +190,7 @@ public class CalendarFragment extends Fragment {
     private void setUpErrorObserver() {
         calendarViewModel.getIsDiaryLoadingErrorLiveData()
                 .observe(getViewLifecycleOwner(), new IsDiaryLoadingErrorObserver());
-        diaryViewModel.getIsDiaryLoadingErrorLiveData()
+        diaryShowViewModel.getIsDiaryLoadingErrorLiveData()
                 .observe(getViewLifecycleOwner(), new IsDiaryLoadingErrorObserver());
     }
 
@@ -475,14 +475,14 @@ public class CalendarFragment extends Fragment {
             public void onSuccess(Boolean result) {
                 if (result) {
                     // ViewModelの読込日記の日付をセット
-                    diaryViewModel.initialize();
-                    diaryViewModel.prepareDiary(date, true);
+                    diaryShowViewModel.initialize();
+                    diaryShowViewModel.loadDiary(date);
                     binding.linearLayoutDiaryShow.setVisibility(View.VISIBLE);
                     binding.textNoDiary.setVisibility(View.GONE);
                 } else {
                     binding.linearLayoutDiaryShow.setVisibility(View.GONE);
                     binding.textNoDiary.setVisibility(View.VISIBLE);
-                    diaryViewModel.initialize();
+                    diaryShowViewModel.initialize();
                 }
             }
 
@@ -491,13 +491,13 @@ public class CalendarFragment extends Fragment {
                 // 例外はViewModelクラス内で例外用リスナーを追加して対応
                 binding.linearLayoutDiaryShow.setVisibility(View.GONE);
                 binding.textNoDiary.setVisibility(View.VISIBLE);
-                diaryViewModel.initialize();
+                diaryShowViewModel.initialize();
             }
         });
     }
 
     private void setUpDiaryShow() {
-        diaryViewModel.getWeather1LiveData()
+        diaryShowViewModel.getWeather1LiveData()
                 .observe(
                         getViewLifecycleOwner(),
                         new DiaryShowWeather1Observer(
@@ -506,7 +506,7 @@ public class CalendarFragment extends Fragment {
                         )
                 );
 
-        diaryViewModel.getWeather2LiveData()
+        diaryShowViewModel.getWeather2LiveData()
                 .observe(
                         getViewLifecycleOwner(),
                         new DiaryShowWeather2Observer(
@@ -516,7 +516,7 @@ public class CalendarFragment extends Fragment {
                         )
                 );
 
-        diaryViewModel.getConditionLiveData()
+        diaryShowViewModel.getConditionLiveData()
                 .observe(
                         getViewLifecycleOwner(),
                         new DiaryShowConditionObserver(
@@ -532,10 +532,10 @@ public class CalendarFragment extends Fragment {
         itemLayouts[2] = binding.includeDiaryShow.includeItem3.linerLayoutDiaryShowItem;
         itemLayouts[3] = binding.includeDiaryShow.includeItem4.linerLayoutDiaryShowItem;
         itemLayouts[4] = binding.includeDiaryShow.includeItem5.linerLayoutDiaryShowItem;
-        diaryViewModel.getNumVisibleItemsLiveData()
+        diaryShowViewModel.getNumVisibleItemsLiveData()
                 .observe(getViewLifecycleOwner(), new DiaryShowNumVisibleItemsObserver(itemLayouts));
 
-        diaryViewModel.getLogLiveData()
+        diaryShowViewModel.getLogLiveData()
                 .observe(
                         getViewLifecycleOwner(),
                         new DiaryShowLogObserver(binding.includeDiaryShow.textLogValue)

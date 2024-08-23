@@ -40,6 +40,7 @@
     <!-- fragment_show_diary -->
     <string name="fragment_diary_show_toolbar_title">0000年00月00日(月)</string>
     <string name="fragment_diary_show_toolbar_option_edit_diary">日記編集</string>
+    <string name="fragment_diary_show_toolbar_option_delete_diary">日記削除</string>
 
     <!-- layout_show_diary -->
     <string name="layout_diary_show_title_hint">無題</string>

@@ -16,7 +16,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.websarva.wings.android.zuboradiary.R;
 import com.websarva.wings.android.zuboradiary.databinding.RowDiaryYearMonthListBinding;
-import com.websarva.wings.android.zuboradiary.ui.list.diarylist.CustomSimpleCallback;
 import com.websarva.wings.android.zuboradiary.ui.list.diarylist.DiaryDayListAdapter;
 import com.websarva.wings.android.zuboradiary.ui.list.diarylist.DiaryDayListItem;
 import com.websarva.wings.android.zuboradiary.ui.list.diarylist.DiaryYearMonthListItem;
@@ -29,45 +28,68 @@ import java.time.LocalDate;
 import java.time.YearMonth;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.function.Consumer;
 
 public class DiaryYearMonthListAdapter extends ListAdapter<DiaryYearMonthListItemBase, RecyclerView.ViewHolder> {
+
     private final Context context;
     private final RecyclerView recyclerView;
-    private final Consumer<LocalDate> processOnChildItemClick;
+    private final OnScrollEndItemLoadingListener onScrollEndItemLoadingListener;
+    private final OnScrollLoadingConfirmationListener onScrollLoadingConfirmationListener;
+    private final OnClickChildItemListener onClickChildItemListener;
+    private final OnClickChildItemBackgroundButtonListener onClickChildItemBackgroundButtonListener;
     private final boolean canSwipeItem;
     public static final int DIARY_DAY_LIST_ITEM_MARGIN_VERTICAL = 16;
     public static final int DIARY_DAY_LIST_ITEM_MARGIN_HORIZONTAL = 32;
-    private final List<Map<String, Object>> diaryYearMonthList = new ArrayList<>(); // TODO:不要確認後削除
-    private final List<CustomSimpleCallback> simpleCallbacks = new ArrayList<>();
     private final List<DiaryListSimpleCallback> simpleCallbackList = new ArrayList<>();
     public static final int VIEW_TYPE_DIARY = 0;
     public static final int VIEW_TYPE_PROGRESS_BAR = 1;
     public static final int VIEW_TYPE_NO_DIARY_MESSAGE = 2;
 
     public DiaryYearMonthListAdapter(
-            Context context,RecyclerView recyclerView, Consumer<LocalDate> processOnChildItemClick, boolean canSwipeItem){
+            Context context,
+            RecyclerView recyclerView,
+            OnScrollEndItemLoadingListener onScrollEndItemLoadingListener,
+            OnScrollLoadingConfirmationListener onScrollLoadingConfirmationListener,
+            OnClickChildItemListener onClickChildItemListener,
+            boolean canSwipeItem,
+            @Nullable OnClickChildItemBackgroundButtonListener onClickChildItemBackgroundButtonListener){
         super(new DiaryYearMonthListDiffUtilItemCallback());
         this.context = context;
         this.recyclerView = recyclerView;
-        this.processOnChildItemClick = processOnChildItemClick;
+        this.onScrollEndItemLoadingListener = onScrollEndItemLoadingListener;
+        this.onScrollLoadingConfirmationListener = onScrollLoadingConfirmationListener;
+        this.onClickChildItemListener = onClickChildItemListener;
         this.canSwipeItem = canSwipeItem;
+        this.onClickChildItemBackgroundButtonListener = onClickChildItemBackgroundButtonListener;
+    }
 
-        // TODO:build()を作成する。
+    public void build() {
+        recyclerView.setAdapter(this);
+        recyclerView.setLayoutManager(new LinearLayoutManager(context));
         recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
                 super.onScrollStateChanged(recyclerView, newState);
                 if (newState == RecyclerView.SCROLL_STATE_DRAGGING) {
                     // スクロール時スワイプ閉
-                    closeSwipedItemOtherDayList(null);
+                    if (canSwipeItem) {
+                        closeSwipedItemOtherDayList(null);
+                    }
                 }
             }
         });
+
+        // HACK:下記問題が発生する為アイテムアニメーションを無効化
+        //      問題1.アイテム追加時もやがかかる。今回の構成(親Recycler:年月、子Recycler:日)上、
+        //           既に表示されている年月に日のアイテムを追加すると、年月のアイテムに変更アニメーションが発生してしまう。
+        //           これに対して、日のアイテムに追加アニメーションを発生させようとすると、
+        //           年月のアイテムのサイズ変更にアニメーションが発生せず全体的に違和感となるアニメーションになってしまう。
+        //      問題2.最終アイテムまで到達し、ProgressBarが消えた後にセクションバーがその分ずれる)
+        recyclerView.setItemAnimator(null);
+        recyclerView.addOnScrollListener(new ListAdditonalLoadingOnScrollListener());
+        recyclerView.addOnScrollListener(new SectionBarTranslationOnScrollListener());
+        recyclerView.addOnLayoutChangeListener(new SectionBarInitializationOnLayoutChangeListener());
     }
-
-
 
     @NonNull
     @Override
@@ -159,15 +181,42 @@ public class DiaryYearMonthListAdapter extends ListAdapter<DiaryYearMonthListIte
             if (item instanceof DiaryYearMonthListItem) {
                 DiaryYearMonthListItem _item = (DiaryYearMonthListItem) item;
                 List<DiaryDayListItem> diaryDayList = _item.getDiaryDayListItemList();
-                DiaryDayListAdapter diaryDayListAdapter = new DiaryDayListAdapter(context, processOnChildItemClick);
-                _holder.binding.recyclerDayList.setAdapter(diaryDayListAdapter);
+                DiaryDayListAdapter diaryDayListAdapter =
+                        new DiaryDayListAdapter(
+                                context,
+                                _holder.binding.recyclerDayList,
+                                new DiaryDayListAdapter.OnClickItemListener() {
+                                    @Override
+                                    public void onClick(LocalDate date) {
+                                        onClickChildItemListener.onClick(date);
+                                    }
+                                },
+                                new DiaryDayListAdapter.OnClickDeleteButtonListener() {
+                                    @Override
+                                    public void onClick(LocalDate date) {
+                                        if (onClickChildItemBackgroundButtonListener == null) {
+                                            return;
+                                        }
+                                        onClickChildItemBackgroundButtonListener.onClick(date);
+                                    }
+                                });
+                diaryDayListAdapter.build();
                 diaryDayListAdapter.submitList(diaryDayList);
+
             } else if (item instanceof WordSearchResultYearMonthListItem) {
                 WordSearchResultYearMonthListItem _item = (WordSearchResultYearMonthListItem) item;
                 List<WordSearchResultDayListItem> wordSearchResultDayList = _item.getWordSearchResultDayList();
                 WordSearchResultDayListAdapter wordSearchResultDayListAdapter =
-                        new WordSearchResultDayListAdapter(context, processOnChildItemClick);
-                _holder.binding.recyclerDayList.setAdapter(wordSearchResultDayListAdapter);
+                        new WordSearchResultDayListAdapter(
+                                context,
+                                _holder.binding.recyclerDayList,
+                                new WordSearchResultDayListAdapter.OnClickItemListener() {
+                                    @Override
+                                    public void onClick(LocalDate date) {
+                                        onClickChildItemListener.onClick(date);
+                                    }
+                                });
+                wordSearchResultDayListAdapter.build();
                 wordSearchResultDayListAdapter.submitList(wordSearchResultDayList);
             }
         }
@@ -177,23 +226,6 @@ public class DiaryYearMonthListAdapter extends ListAdapter<DiaryYearMonthListIte
     public int getItemViewType(int position ) {
         DiaryYearMonthListItemBase item = getItem(position);
         return item.getViewType();
-    }
-
-    // 日記リスト(年月)の指定したアイテムを削除。
-    // TODO:スワイプ機能搭載後不要か判断
-    public void deleteItem(int position) {
-        diaryYearMonthList.remove(position);
-        notifyItemRemoved(position);
-    }
-
-    // 日記リスト(年月)の一つのアイテム内の日記リスト(日)アイテムをスワイプした時、
-    // 他の日記リスト(年月)のアイテム内の日記リスト(日)の全アイテムをスワイプ前の状態に戻す。
-    public void recoverOtherSwipedItem(CustomSimpleCallback customSimpleCallback) {
-        for (int i = 0; i < simpleCallbacks.size(); i++) {
-            if (customSimpleCallback != simpleCallbacks.get(i)) {
-                simpleCallbacks.get(i).recoverSwipeItem();
-            }
-        }
     }
 
     public void closeSwipedItemOtherDayList(@Nullable DiaryListSimpleCallback simpleCallback) {
@@ -208,6 +240,16 @@ public class DiaryYearMonthListAdapter extends ListAdapter<DiaryYearMonthListIte
                 }
             }
         }
+    }
+
+    @FunctionalInterface
+    public interface OnClickChildItemListener {
+        void onClick(LocalDate date);
+    }
+
+    @FunctionalInterface
+    public interface OnClickChildItemBackgroundButtonListener {
+        void onClick(LocalDate date);
     }
 
     public static class DiaryYearMonthListViewHolder extends RecyclerView.ViewHolder {
@@ -311,5 +353,149 @@ public class DiaryYearMonthListAdapter extends ListAdapter<DiaryYearMonthListIte
             }
             return true;
         }
+    }
+
+    @FunctionalInterface
+    public interface OnScrollEndItemLoadingListener {
+        void Load();
+    }
+
+    @FunctionalInterface
+    public interface OnScrollLoadingConfirmationListener {
+        boolean isLoading();
+    }
+
+    private class ListAdditonalLoadingOnScrollListener extends RecyclerView.OnScrollListener {
+
+        @Override
+        public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
+            super.onScrolled(recyclerView, dx, dy);
+
+            LinearLayoutManager layoutManager =
+                    (LinearLayoutManager) recyclerView.getLayoutManager();
+            if (layoutManager == null) {
+                // TODO:assert
+                return;
+            }
+            int firstVisibleItem = layoutManager.findFirstVisibleItemPosition();
+            int visibleItemCount = recyclerView.getChildCount();
+            int totalItemCount = layoutManager.getItemCount();
+            if (totalItemCount <= 0) {
+                // TODO:assert
+                return;
+            }
+            int lastItemPosition = totalItemCount - 1;
+            RecyclerView.Adapter<?> recyclerViewAdapter = recyclerView.getAdapter();
+            if (recyclerViewAdapter == null) {
+                return;
+            }
+            int lastItemViewType = recyclerViewAdapter.getItemViewType(lastItemPosition);
+            // MEMO:下記条件"dy > 0"は検索結果リストが更新されたときに
+            //      "RecyclerView.OnScrollListener#onScrolled"が起動するための対策。
+            if (!onScrollLoadingConfirmationListener.isLoading()
+                    && (firstVisibleItem + visibleItemCount) >= totalItemCount
+                    && dy > 0
+                    && lastItemViewType == DiaryYearMonthListAdapter.VIEW_TYPE_DIARY) {
+                onScrollEndItemLoadingListener.Load();
+            }
+        }
+    }
+
+    private class SectionBarTranslationOnScrollListener extends RecyclerView.OnScrollListener {
+
+        @Override
+        public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
+            super.onScrolled(recyclerView, dx, dy);
+
+            updateFirstVisibleSectionBarPosition();
+        }
+    }
+
+    private class SectionBarInitializationOnLayoutChangeListener implements View.OnLayoutChangeListener {
+
+        @Override
+        public void onLayoutChange(
+                View v, int left, int top, int right, int bottom,
+                int oldLeft, int oldTop, int oldRight, int oldBottom) {
+            updateFirstVisibleSectionBarPosition();
+        }
+    }
+
+    private void updateFirstVisibleSectionBarPosition() {
+        RecyclerView.LayoutManager _layoutManager = recyclerView.getLayoutManager();
+        LinearLayoutManager layoutManager;
+        if (_layoutManager instanceof LinearLayoutManager) {
+            layoutManager = (LinearLayoutManager) _layoutManager;
+        } else {
+            return;
+        }
+        int firstVisibleItemPosition =
+                layoutManager.findFirstVisibleItemPosition();
+
+        RecyclerView.ViewHolder firstVisibleViewHolder =
+                recyclerView.findViewHolderForAdapterPosition(firstVisibleItemPosition);
+        RecyclerView.ViewHolder secondVisibleViewHolder =
+                recyclerView.findViewHolderForAdapterPosition(firstVisibleItemPosition + 1);
+
+        if (firstVisibleViewHolder instanceof DiaryYearMonthListAdapter.DiaryYearMonthListViewHolder) {
+            DiaryYearMonthListAdapter.DiaryYearMonthListViewHolder _firstVisibleViewHolder =
+                    (DiaryYearMonthListAdapter.DiaryYearMonthListViewHolder) firstVisibleViewHolder;
+            View firstVisibleItemView =
+                    layoutManager.getChildAt(0);
+            View secondVisibleItemView =
+                    layoutManager.getChildAt(1);
+            if (firstVisibleItemView != null) {
+                float firstVisibleItemViewPositionY = firstVisibleItemView.getY();
+                if (secondVisibleItemView != null) {
+                    int sectionBarHeight = _firstVisibleViewHolder.binding.textSectionBar.getHeight();
+                    float secondVisibleItemViewPositionY = secondVisibleItemView.getY();
+                    int border = sectionBarHeight + DIARY_DAY_LIST_ITEM_MARGIN_VERTICAL;
+                    if (secondVisibleItemViewPositionY >= border) {
+                        _firstVisibleViewHolder.binding.textSectionBar.setY(-(firstVisibleItemViewPositionY));
+                    } else {
+                        if (secondVisibleItemViewPositionY < DIARY_DAY_LIST_ITEM_MARGIN_VERTICAL) {
+                            _firstVisibleViewHolder.binding.textSectionBar.setY(0);
+                        } else if (_firstVisibleViewHolder.binding.textSectionBar.getY() == 0) {
+                            _firstVisibleViewHolder.binding.textSectionBar.setY(
+                                    -(firstVisibleItemViewPositionY) - sectionBarHeight
+                            );
+                        }
+                    }
+                } else {
+                    _firstVisibleViewHolder.binding.textSectionBar.setY(-(firstVisibleItemViewPositionY));
+                }
+            }
+        }
+        if (secondVisibleViewHolder instanceof DiaryYearMonthListAdapter.DiaryYearMonthListViewHolder) {
+            DiaryYearMonthListAdapter.DiaryYearMonthListViewHolder _secondVisibleViewHolder =
+                    (DiaryYearMonthListAdapter.DiaryYearMonthListViewHolder) secondVisibleViewHolder;
+            _secondVisibleViewHolder.binding.textSectionBar.setY(0); // ズレ防止
+        }
+    }
+
+    public void scrollToFirstPosition() {
+        Log.d("ボトムナビゲーションタップ確認", "scrollToFirstPosition()呼び出し");
+        RecyclerView.LayoutManager layoutManager = recyclerView.getLayoutManager();
+        LinearLayoutManager linearLayoutManager = null;
+        if (layoutManager instanceof LinearLayoutManager) {
+            linearLayoutManager = (LinearLayoutManager) layoutManager;
+        }
+        if (linearLayoutManager != null) {
+            int firstVisibleItemPosition = linearLayoutManager.findFirstVisibleItemPosition();
+            Log.d("スクロール動作確認", "firstVisibleItemPosition：" + firstVisibleItemPosition);
+
+            // HACK:日記リスト(年月)のアイテム数が多い場合、
+            //      ユーザーが数多くのアイテムをスクロールした状態でsmoothScrollToPosition(0)を起動すると先頭にたどり着くのに時間がかかる。
+            //      その時間を回避する為に先頭付近へジャンプ(scrollToPosition())してからsmoothScrollToPosition()を起動させたかったが、
+            //      エミュレーターでは処理落ちで上手く確認できなかった。(プログラムの可能性もある)
+            int jumpPosition = 2;
+            if (firstVisibleItemPosition >= jumpPosition) {
+                Log.d("スクロール動作確認", "scrollToPosition()呼出");
+                recyclerView.scrollToPosition(jumpPosition);
+            }
+        }
+
+        Log.d("スクロール動作確認", "smoothScrollToPosition()呼出");
+        recyclerView.smoothScrollToPosition(0);
     }
 }

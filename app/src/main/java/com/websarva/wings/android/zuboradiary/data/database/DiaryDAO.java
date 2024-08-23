@@ -85,6 +85,6 @@ public interface DiaryDAO {
 
     // 他DAO(他テーブルへの書き込み処理)メソッドと同じタイミング(Transaction)で処理する時に使用
     @Query("DELETE FROM diaries WHERE date = :date")
-    void deleteDiary(String date);
+    Integer deleteDiary(String date);
 
 }

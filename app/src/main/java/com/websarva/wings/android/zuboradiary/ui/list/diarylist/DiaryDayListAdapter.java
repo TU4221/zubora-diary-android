@@ -1,6 +1,7 @@
 package com.websarva.wings.android.zuboradiary.ui.list.diarylist;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,23 +10,36 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.databinding.ViewDataBinding;
 import androidx.recyclerview.widget.DiffUtil;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.ListAdapter;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.websarva.wings.android.zuboradiary.data.DayOfWeekConverter;
 import com.websarva.wings.android.zuboradiary.databinding.RowDiaryDayListBinding;
 
 import java.time.LocalDate;
-import java.util.function.Consumer;
 
 public class DiaryDayListAdapter extends ListAdapter<DiaryDayListItem, DiaryDayListAdapter.DiaryDayListViewHolder> {
 
     private final Context context;
-    private final Consumer<LocalDate> processOnClick;
+    private final RecyclerView recyclerView;
+    private final OnClickItemListener onClickItemListener;
+    private final OnClickDeleteButtonListener onClickDeleteButtonListener;
 
-    public DiaryDayListAdapter(Context context, Consumer<LocalDate> processOnClick) {
+    public DiaryDayListAdapter(
+            Context context,
+            RecyclerView recyclerView,
+            OnClickItemListener onClickItemListener,
+            OnClickDeleteButtonListener onClickDeleteButtonListener) {
         super(new DiaryDayListDiffUtilItemCallback());
         this.context = context;
-        this.processOnClick = processOnClick;
+        this.recyclerView = recyclerView;
+        this.onClickItemListener = onClickItemListener;
+        this.onClickDeleteButtonListener = onClickDeleteButtonListener;
+    }
+
+    public void build() {
+        recyclerView.setAdapter(this);
     }
 
     @NonNull
@@ -57,14 +71,14 @@ public class DiaryDayListAdapter extends ListAdapter<DiaryDayListItem, DiaryDayL
         holder.binding.linerLayoutForeground.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                processOnClick.accept(date);
+                onClickItemListener.onClick(date);
             }
         });
 
         holder.binding.includeBackground.textDeleteButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(context, "削除", Toast.LENGTH_LONG).show();
+                onClickDeleteButtonListener.onClick(date);
             }
         });
 
@@ -87,6 +101,16 @@ public class DiaryDayListAdapter extends ListAdapter<DiaryDayListItem, DiaryDayL
                 backgroundButtonView = rowDiaryDayListBinding.includeBackground.textDeleteButton;
             }
         }
+    }
+
+    @FunctionalInterface
+    public interface OnClickItemListener {
+        void onClick(LocalDate date);
+    }
+
+    @FunctionalInterface
+    public interface OnClickDeleteButtonListener {
+        void onClick(LocalDate date);
     }
 
     public static class DiaryDayListDiffUtilItemCallback extends DiffUtil.ItemCallback<DiaryDayListItem> {

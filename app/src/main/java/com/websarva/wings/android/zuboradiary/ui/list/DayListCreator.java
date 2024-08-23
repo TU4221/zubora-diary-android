@@ -10,7 +10,6 @@ import android.widget.Toast;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.websarva.wings.android.zuboradiary.R;
-import com.websarva.wings.android.zuboradiary.ui.list.diarylist.CustomSimpleCallback;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -108,7 +107,6 @@ public class DayListCreator {
         public int diaryInfo_Day;
         public String diaryInfo_DayOfWeek;
         public String diaryInfo_Title;
-        public CustomSimpleCallback diaryInfo_SimpleCallback;
         public DiaryListDayViewHolder(View itemView) {
             super(itemView);
             _tvRowDiaryListDay_DayOfWeek = itemView.findViewById(R.id.text_day_of_week);

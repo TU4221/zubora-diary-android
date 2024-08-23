@@ -31,6 +31,7 @@ import android.text.TextWatcher;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
@@ -49,6 +50,7 @@ import com.websarva.wings.android.zuboradiary.data.diary.Weathers;
 import com.websarva.wings.android.zuboradiary.databinding.FragmentDiaryEditBinding;
 import com.websarva.wings.android.zuboradiary.R;
 import com.websarva.wings.android.zuboradiary.ui.KeyboardInitializer;
+import com.websarva.wings.android.zuboradiary.ui.TestDiariesSaver;
 import com.websarva.wings.android.zuboradiary.ui.diary.DiaryLiveData;
 import com.websarva.wings.android.zuboradiary.ui.diary.diaryitemtitleedit.DiaryItemTitleEditFragment;
 import com.websarva.wings.android.zuboradiary.ui.settings.SettingsViewModel;
@@ -135,6 +137,16 @@ public class DiaryEditFragment extends Fragment {
         setUpItemInputField();
         setUpPictureInputField();
         setUpErrorObserver();
+
+        // TODO:最終的に削除
+        binding.fabTest.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.d("20240823", "OnClick");
+                TestDiariesSaver testDiariesSaver = new TestDiariesSaver(diaryEditViewModel);
+                testDiariesSaver.save(28);
+            }
+        });
     }
 
     // 項目タイトル入力フラグメントからデータ受取
@@ -344,13 +356,6 @@ public class DiaryEditFragment extends Fragment {
     }
 
     private void setUpToolBar() {
-        // TODO:下記コメントアウトコードはobserverで管理(確認後削除)
-        /*boolean isNewDiary = diaryEditViewModel.getLoadedDateLiveData().getValue().isEmpty();
-        if (isNewDiary) {
-            binding.materialToolbarTopAppBar.setTitle(TOOL_BAR_TITLE_NEW);
-        } else {
-            binding.materialToolbarTopAppBar.setTitle(TOOL_BAR_TITLE_EDIT);
-        }*/
         binding.materialToolbarTopAppBar
                 .setNavigationOnClickListener(new View.OnClickListener() {
                     @Override
@@ -408,8 +413,11 @@ public class DiaryEditFragment extends Fragment {
                                 }
                             }
                             return true;
-                        } else if (item.getItemId() == R.id.diaryShowToolbarOptionDeleteDiary) {
-                            diaryEditViewModel.deleteDiary();
+                        } else if (item.getItemId() == R.id.diaryEditToolbarOptionDeleteDiary) {
+                            boolean isSuccessful = diaryEditViewModel.deleteDiary();
+                            if (isSuccessful) {
+                                navController.navigateUp();
+                            }
                         }
                         return false;
                     }
@@ -419,10 +427,14 @@ public class DiaryEditFragment extends Fragment {
                 .observe(getViewLifecycleOwner(), new Observer<LocalDate>() {
                     @Override
                     public void onChanged(LocalDate date) {
+                        Menu menu = binding.materialToolbarTopAppBar.getMenu();
+                        MenuItem deleteMenuItem = menu.findItem(R.id.diaryEditToolbarOptionDeleteDiary);
                         if (date == null) {
                             binding.materialToolbarTopAppBar.setTitle(TOOL_BAR_TITLE_NEW);
+                            deleteMenuItem.setEnabled(false);
                         } else {
                             binding.materialToolbarTopAppBar.setTitle(TOOL_BAR_TITLE_EDIT);
+                            deleteMenuItem.setEnabled(true);
                         }
                     }
                 });

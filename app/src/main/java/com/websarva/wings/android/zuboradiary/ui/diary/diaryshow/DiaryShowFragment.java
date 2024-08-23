@@ -171,6 +171,13 @@ public class DiaryShowFragment extends Fragment {
         diaryShowViewModel.initialize();
         LocalDate diaryDate =
                 DiaryShowFragmentArgs.fromBundle(requireArguments()).getShowDiaryDate();
+
+        // 日記編集Fragmentで日記を削除して日記表示Fragmentに戻って来た時は更に一つ前のFragmentへ戻る。
+        if (!diaryShowViewModel.hasDiary(diaryDate)) {
+            navController.navigateUp();
+            return;
+        }
+
         diaryShowViewModel.loadDiary(diaryDate);
     }
 
