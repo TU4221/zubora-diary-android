@@ -29,6 +29,7 @@ import android.view.ViewGroup;
 import com.websarva.wings.android.zuboradiary.R;
 import com.websarva.wings.android.zuboradiary.data.DateConverter;
 import com.websarva.wings.android.zuboradiary.databinding.FragmentDiaryShowBinding;
+import com.websarva.wings.android.zuboradiary.ui.CustomFragment;
 import com.websarva.wings.android.zuboradiary.ui.diary.DiaryLiveData;
 import com.websarva.wings.android.zuboradiary.ui.observer.DiaryShowConditionObserver;
 import com.websarva.wings.android.zuboradiary.ui.observer.DiaryShowLogObserver;
@@ -41,7 +42,7 @@ import java.time.LocalDate;
 import dagger.hilt.android.AndroidEntryPoint;
 
 @AndroidEntryPoint
-public class DiaryShowFragment extends Fragment {
+public class DiaryShowFragment extends CustomFragment {
 
     // View関係
     private FragmentDiaryShowBinding binding;// 項目入力欄最大数

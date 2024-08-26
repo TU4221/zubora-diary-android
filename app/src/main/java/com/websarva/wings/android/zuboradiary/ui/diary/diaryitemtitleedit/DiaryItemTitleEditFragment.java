@@ -45,6 +45,7 @@ import android.widget.TextView;
 import com.websarva.wings.android.zuboradiary.R;
 import com.websarva.wings.android.zuboradiary.data.database.DiaryItemTitleSelectionHistoryItem;
 import com.websarva.wings.android.zuboradiary.databinding.FragmentDiaryItemTitleEditBinding;
+import com.websarva.wings.android.zuboradiary.ui.CustomFragment;
 import com.websarva.wings.android.zuboradiary.ui.KeyboardInitializer;
 
 import java.util.ArrayList;
@@ -53,7 +54,7 @@ import java.util.List;
 import dagger.hilt.android.AndroidEntryPoint;
 
 @AndroidEntryPoint
-public class DiaryItemTitleEditFragment extends Fragment {
+public class DiaryItemTitleEditFragment extends CustomFragment {
 
     // View関係
     private FragmentDiaryItemTitleEditBinding binding;

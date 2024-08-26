@@ -38,6 +38,7 @@ import com.websarva.wings.android.zuboradiary.R;
 import com.websarva.wings.android.zuboradiary.data.DayOfWeekConverter;
 import com.websarva.wings.android.zuboradiary.data.settings.ThemeColors;
 import com.websarva.wings.android.zuboradiary.databinding.FragmentSettingsBinding;
+import com.websarva.wings.android.zuboradiary.ui.CustomFragment;
 import com.websarva.wings.android.zuboradiary.ui.ThemeColorSwitcher;
 
 import java.time.DayOfWeek;
@@ -47,7 +48,7 @@ import java.util.Map;
 import dagger.hilt.android.AndroidEntryPoint;
 
 @AndroidEntryPoint
-public class SettingsFragment extends Fragment {
+public class SettingsFragment extends CustomFragment {
 
     // View関係
     private FragmentSettingsBinding binding;

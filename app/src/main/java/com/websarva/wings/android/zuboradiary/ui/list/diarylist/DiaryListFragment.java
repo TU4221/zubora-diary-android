@@ -40,13 +40,14 @@ import java.util.List;
 
 import com.websarva.wings.android.zuboradiary.data.database.Diary;
 import com.websarva.wings.android.zuboradiary.databinding.FragmentDiaryListBinding;
+import com.websarva.wings.android.zuboradiary.ui.CustomFragment;
 import com.websarva.wings.android.zuboradiary.ui.list.DiaryYearMonthListItemBase;
 import com.websarva.wings.android.zuboradiary.ui.list.DiaryYearMonthListAdapter;
 
 import dagger.hilt.android.AndroidEntryPoint;
 
 @AndroidEntryPoint
-public class DiaryListFragment extends Fragment {
+public class DiaryListFragment extends CustomFragment {
 
     // View関係
     private FragmentDiaryListBinding binding;
@@ -62,7 +63,6 @@ public class DiaryListFragment extends Fragment {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        Log.d("フラグメントライフサイクル確認", "onCreate()処理");
         super.onCreate(savedInstanceState);
 
         // ViewModel設定
@@ -77,7 +77,6 @@ public class DiaryListFragment extends Fragment {
     @Override
     public View onCreateView(
             @NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        Log.d("フラグメントライフサイクル確認", "onCreateView()処理");
         super.onCreateView(inflater,container,savedInstanceState);
 
         // データバインディング設定
@@ -460,7 +459,7 @@ public class DiaryListFragment extends Fragment {
     }
 
     //日記リスト(年月)を自動でトップへスクロールさせるメソッド。
-    public void diaryListScrollToFirstPosition() {
+    private void diaryListScrollToFirstPosition() {
         RecyclerView.Adapter<?> adapter = binding.recyclerDiaryYearMonthList.getAdapter();
         if (adapter instanceof DiaryYearMonthListAdapter) {
             DiaryYearMonthListAdapter diaryYearMonthListAdapter = (DiaryYearMonthListAdapter) adapter;

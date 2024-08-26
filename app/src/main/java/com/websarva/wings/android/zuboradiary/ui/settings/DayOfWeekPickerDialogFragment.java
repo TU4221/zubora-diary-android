@@ -1,7 +1,10 @@
 package com.websarva.wings.android.zuboradiary.ui.settings;
 
+import android.os.Bundle;
 import android.view.ContentInfo;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -27,9 +30,9 @@ public class DayOfWeekPickerDialogFragment extends BottomSheetDialogFragment {
 
     @Override
     public View onCreateView(
-            @NonNull android.view.LayoutInflater inflater,
-            @Nullable android.view.ViewGroup container,
-            @Nullable android.os.Bundle savedInstanceState) {
+            @NonNull LayoutInflater inflater,
+            @Nullable ViewGroup container,
+            @Nullable Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
 
         // Navigation設定
