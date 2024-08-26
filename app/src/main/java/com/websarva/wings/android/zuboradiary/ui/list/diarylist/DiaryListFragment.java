@@ -455,6 +455,10 @@ public class DiaryListFragment extends Fragment {
         return currentDestinationId == R.id.navigation_diary_list_fragment;
     }
 
+    public void processOnReSelectNavigationItem(){
+        diaryListScrollToFirstPosition();
+    }
+
     //日記リスト(年月)を自動でトップへスクロールさせるメソッド。
     public void diaryListScrollToFirstPosition() {
         RecyclerView.Adapter<?> adapter = binding.recyclerDiaryYearMonthList.getAdapter();

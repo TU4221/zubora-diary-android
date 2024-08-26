@@ -207,7 +207,7 @@ public class MainActivity extends AppCompatActivity {
                 if (menuItem.toString().equals(getString(R.string.title_list))) {
                     if (fragment instanceof DiaryListFragment) {
                         DiaryListFragment diaryListFragment = (DiaryListFragment) fragment;
-                        diaryListFragment.diaryListScrollToFirstPosition();
+                        diaryListFragment.processOnReSelectNavigationItem();
                     } else if (fragment instanceof WordSearchFragment) {
                         WordSearchFragment wordSearchFragment = (WordSearchFragment) fragment;
                         wordSearchFragment.processOnReselectNavigationItem();
@@ -217,7 +217,7 @@ public class MainActivity extends AppCompatActivity {
                 if (menuItem.toString().equals(getString(R.string.title_calendar))) {
                     if (fragment instanceof CalendarFragment) {
                         CalendarFragment calendarFragment = (CalendarFragment) fragment;
-                        calendarFragment.onNavigationItemReselected();
+                        calendarFragment.processOnReselectNavigationItem();
                     }
                 }
 

@@ -590,7 +590,7 @@ public class CalendarFragment extends Fragment {
     }
 
     // 選択中ボトムナビゲーションタブを再選択時の処理
-    public void onNavigationItemReselected() {
+    public void processOnReselectNavigationItem() {
         if (binding.nestedScrollFullScreen.canScrollVertically(-1)) {
             scrollToTop();
         } else {
