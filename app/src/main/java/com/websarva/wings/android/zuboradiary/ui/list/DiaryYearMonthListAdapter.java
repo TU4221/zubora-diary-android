@@ -29,6 +29,8 @@ import java.time.YearMonth;
 import java.util.ArrayList;
 import java.util.List;
 
+// DiaryFragment、WordSearchFragmentの親RecyclerViewのListAdapter。
+// 親RecyclerViewを同じ構成にする為、一つのクラスで両方の子RecyclerViewに対応できるように作成。
 public class DiaryYearMonthListAdapter extends ListAdapter<DiaryYearMonthListItemBase, RecyclerView.ViewHolder> {
 
     private final Context context;
@@ -101,12 +103,13 @@ public class DiaryYearMonthListAdapter extends ListAdapter<DiaryYearMonthListIte
                             .inflate(LayoutInflater.from(parent.getContext()), parent, false);
             DiaryYearMonthListViewHolder holder = new DiaryYearMonthListViewHolder(binding);
 
-            // ホルダーアイテムアニメーション設定(理由は年月RecyclerView設定コード付近にコメントで記載)
+            // ホルダーアイテムアニメーション設定(build()メソッド内にて理由記載)
+            // MEMO:子RecyclerViewのアニメーションを共通にする為、親Adapterクラス内で実装。
             holder.binding.recyclerDayList.setItemAnimator(null);
 
             // ホルダー内の日記リスト(日)のアイテム装飾設定
-            // MEMO:onBindViewHolder で設定すると、設定内容が重複してアイテムが小さくなる為、
-            //      onCreateViewHolder で設定。
+            // MEMO:onBindViewHolder()で設定すると、設定内容が重複してアイテムが小さくなる為、onCreateViewHolderで設定。
+            // MEMO:子RecyclerViewの装飾を共通にする為、親Adapterクラス内で実装。
             holder.binding.recyclerDayList.addItemDecoration(new RecyclerView.ItemDecoration() {
                 @Override
                 public void getItemOffsets(
@@ -137,12 +140,12 @@ public class DiaryYearMonthListAdapter extends ListAdapter<DiaryYearMonthListIte
                 }
             });
 
+            // MEMO:子RecyclerViewに実装したSimpleCallbackクラスを親RecyclerViewで管理する為、親Adapterクラス内で実装。
             if (canSwipeItem) {
-                // TODO:DiaryDayListAdapterに移動
-                DiaryListSimpleCallback diaryListSimpleCallBack =
+                DiaryListSimpleCallback diaryListSimpleCallback =
                         new DiaryListSimpleCallback(recyclerView, holder.binding.recyclerDayList);
-                diaryListSimpleCallBack.build();
-                simpleCallbackList.add(diaryListSimpleCallBack);
+                diaryListSimpleCallback.build();
+                simpleCallbackList.add(diaryListSimpleCallback);
             }
 
             return holder;
@@ -181,46 +184,58 @@ public class DiaryYearMonthListAdapter extends ListAdapter<DiaryYearMonthListIte
 
             if (item instanceof DiaryYearMonthListItem) {
                 DiaryYearMonthListItem _item = (DiaryYearMonthListItem) item;
+                DiaryDayListAdapter diaryDayListAdapter = createDiaryDayListAdapter(_holder);
                 List<DiaryDayListItem> diaryDayList = _item.getDiaryDayListItemList();
-                DiaryDayListAdapter diaryDayListAdapter =
-                        new DiaryDayListAdapter(
-                                context,
-                                _holder.binding.recyclerDayList,
-                                new DiaryDayListAdapter.OnClickItemListener() {
-                                    @Override
-                                    public void onClick(LocalDate date) {
-                                        onClickChildItemListener.onClick(date);
-                                    }
-                                },
-                                new DiaryDayListAdapter.OnClickDeleteButtonListener() {
-                                    @Override
-                                    public void onClick(LocalDate date) {
-                                        if (onClickChildItemBackgroundButtonListener == null) {
-                                            return;
-                                        }
-                                        onClickChildItemBackgroundButtonListener.onClick(date);
-                                    }
-                                });
-                diaryDayListAdapter.build();
                 diaryDayListAdapter.submitList(diaryDayList);
 
             } else if (item instanceof WordSearchResultYearMonthListItem) {
                 WordSearchResultYearMonthListItem _item = (WordSearchResultYearMonthListItem) item;
-                List<WordSearchResultDayListItem> wordSearchResultDayList = _item.getWordSearchResultDayList();
                 WordSearchResultDayListAdapter wordSearchResultDayListAdapter =
-                        new WordSearchResultDayListAdapter(
-                                context,
-                                _holder.binding.recyclerDayList,
-                                new WordSearchResultDayListAdapter.OnClickItemListener() {
-                                    @Override
-                                    public void onClick(LocalDate date) {
-                                        onClickChildItemListener.onClick(date);
-                                    }
-                                });
-                wordSearchResultDayListAdapter.build();
+                                                    createWordSearchResultDayListAdapter(_holder);
+                List<WordSearchResultDayListItem> wordSearchResultDayList =
+                                                                _item.getWordSearchResultDayList();
                 wordSearchResultDayListAdapter.submitList(wordSearchResultDayList);
             }
         }
+    }
+
+    private @NonNull DiaryDayListAdapter createDiaryDayListAdapter(DiaryYearMonthListViewHolder _holder) {
+        DiaryDayListAdapter diaryDayListAdapter =
+                new DiaryDayListAdapter(
+                        context,
+                        _holder.binding.recyclerDayList,
+                        new DiaryDayListAdapter.OnClickItemListener() {
+                            @Override
+                            public void onClick(LocalDate date) {
+                                onClickChildItemListener.onClick(date);
+                            }
+                        },
+                        new DiaryDayListAdapter.OnClickDeleteButtonListener() {
+                            @Override
+                            public void onClick(LocalDate date) {
+                                if (onClickChildItemBackgroundButtonListener == null) {
+                                    return;
+                                }
+                                onClickChildItemBackgroundButtonListener.onClick(date);
+                            }
+                        });
+        diaryDayListAdapter.build();
+        return diaryDayListAdapter;
+    }
+
+    private @NonNull WordSearchResultDayListAdapter createWordSearchResultDayListAdapter(DiaryYearMonthListViewHolder _holder) {
+        WordSearchResultDayListAdapter wordSearchResultDayListAdapter =
+                new WordSearchResultDayListAdapter(
+                        context,
+                        _holder.binding.recyclerDayList,
+                        new WordSearchResultDayListAdapter.OnClickItemListener() {
+                            @Override
+                            public void onClick(LocalDate date) {
+                                onClickChildItemListener.onClick(date);
+                            }
+                        });
+        wordSearchResultDayListAdapter.build();
+        return wordSearchResultDayListAdapter;
     }
 
     @Override
