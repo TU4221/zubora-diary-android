@@ -32,6 +32,9 @@
     <string name="row_word_search_result_list_item_title_hint">無題</string>
     <string name="row_word_search_result_list_item_comment_hint">コメントなし</string>
 
+    <!-- row_background_delete_button -->
+    <string name="row_background_delete_button_delete">削除</string>
+
 
     <!-- fragment_calendar -->
     <string name="fragment_calendar_month_header_format">yyyy年MM月</string>

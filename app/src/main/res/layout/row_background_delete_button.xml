@@ -8,29 +8,24 @@
     <LinearLayout
         android:id="@+id/liner_layout"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:orientation="horizontal"
-        android:background="@color/red"
-        android:gravity="end">
+        android:background="@color/red">
 
         <View
             android:id="@+id/view_blank"
             android:layout_weight="5"
             android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_gravity="center"/>
+            android:layout_height="match_parent"/>
 
-        <TextView
-            android:id="@+id/text_delete_button"
+        <ImageButton
+            android:id="@+id/image_button_delete"
+            android:contentDescription="@string/row_background_delete_button_delete"
             android:layout_width="0dp"
             android:layout_weight="1"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:background="@color/red"
-            android:text="削除"
-            android:gravity="center"
-            android:paddingHorizontal="16dp"
-            android:paddingVertical="24dp"/>
+            android:layout_height="match_parent"
+            android:src="@drawable/ic_delete_forever_24"
+            android:background="@drawable/bg_image_button"/>
 
     </LinearLayout>
 </layout>

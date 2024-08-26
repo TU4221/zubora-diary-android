@@ -432,7 +432,7 @@ public class DiaryListFragment extends Fragment {
 
     private void showDiaryDeleteErrorDialog() {
         if (canShowDialog()) {
-            showMessageDialog("通信エラー", "日記の削除に失敗しました。");
+            showMessageDialog(getString(R.string.dialog_message_title_communication_error), getString(R.string.dialog_message_message_diary_delete_error));
             shouldShowDiaryDeleteErrorDialog = false;
         } else {
             shouldShowDiaryDeleteErrorDialog = true;

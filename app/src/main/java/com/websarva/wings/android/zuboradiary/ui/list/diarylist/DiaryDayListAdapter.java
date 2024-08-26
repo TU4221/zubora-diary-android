@@ -75,7 +75,7 @@ public class DiaryDayListAdapter extends ListAdapter<DiaryDayListItem, DiaryDayL
             }
         });
 
-        holder.binding.includeBackground.textDeleteButton.setOnClickListener(new View.OnClickListener() {
+        holder.binding.includeBackground.imageButtonDelete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 onClickDeleteButtonListener.onClick(date);
@@ -98,7 +98,7 @@ public class DiaryDayListAdapter extends ListAdapter<DiaryDayListItem, DiaryDayL
             if (binding instanceof RowDiaryDayListBinding) {
                 rowDiaryDayListBinding = (RowDiaryDayListBinding) binding;
                 foregroundView = rowDiaryDayListBinding.linerLayoutForeground;
-                backgroundButtonView = rowDiaryDayListBinding.includeBackground.textDeleteButton;
+                backgroundButtonView = rowDiaryDayListBinding.includeBackground.imageButtonDelete;
             }
         }
     }

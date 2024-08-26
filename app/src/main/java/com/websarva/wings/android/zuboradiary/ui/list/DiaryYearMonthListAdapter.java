@@ -138,6 +138,7 @@ public class DiaryYearMonthListAdapter extends ListAdapter<DiaryYearMonthListIte
             });
 
             if (canSwipeItem) {
+                // TODO:DiaryDayListAdapterに移動
                 DiaryListSimpleCallback diaryListSimpleCallBack =
                         new DiaryListSimpleCallback(recyclerView, holder.binding.recyclerDayList);
                 diaryListSimpleCallBack.build();

@@ -33,6 +33,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.text.Editable;
 import android.text.InputFilter;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -179,14 +180,13 @@ public class DiaryItemTitleEditFragment extends Fragment {
                 diaryItemTitleEditViewModel
                         .deleteSelectedItemTitleHistoryItem(deleteListItemPosition);
             } else {
-                ItemTitleSelectionHistoryAdapter adapter =
-                        (ItemTitleSelectionHistoryAdapter)
+                ItemTitleSelectionHistoryListAdapter adapter =
+                        (ItemTitleSelectionHistoryListAdapter)
                                 binding.recyclerItemTitleSelectionHistory.getAdapter();
                 if (adapter == null) {
-                    // TODO:assert
                     return;
                 }
-                adapter.notifyItemChanged(deleteListItemPosition);
+                adapter.closeSwipedItem();
             }
         }
     }
@@ -256,19 +256,24 @@ public class DiaryItemTitleEditFragment extends Fragment {
 
     private void setUpItemTitleSelectionHistory() {
         // 選択履歴リストアイテム設定
-        RecyclerView recyclerItemTitleSelectionHistory = binding.recyclerItemTitleSelectionHistory;
-        recyclerItemTitleSelectionHistory.setLayoutManager(new LinearLayoutManager(getContext()));
-        recyclerItemTitleSelectionHistory.addItemDecoration(
-                new DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL)
-        );
-        recyclerItemTitleSelectionHistory.setAdapter(new ItemTitleSelectionHistoryAdapter());
-        ItemTitleSelectionHistorySimpleCallBack simpleCallBack =
-                new ItemTitleSelectionHistorySimpleCallBack(
-                        ItemTouchHelper.ACTION_STATE_IDLE,
-                        ItemTouchHelper.LEFT
-                );
-        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(simpleCallBack);
-        itemTouchHelper.attachToRecyclerView(recyclerItemTitleSelectionHistory);
+        // TODO:下記必要か判断
+        ItemTitleSelectionHistoryListAdapter itemTitleSelectionHistoryListAdapter =
+                new ItemTitleSelectionHistoryListAdapter(
+                        requireContext(),
+                        binding.recyclerItemTitleSelectionHistory,
+                        new ItemTitleSelectionHistoryListAdapter.OnClickItemListener() {
+                            @Override
+                            public void onClick(String title) {
+                                completeItemTitleEdit(title);
+                            }
+                        },
+                        new ItemTitleSelectionHistoryListAdapter.OnClickDeleteButtonListener() {
+                            @Override
+                            public void onClick(int position, String title) {
+                                showDeleteConfirmationDialog(position, title);
+                            }
+                        });
+        itemTitleSelectionHistoryListAdapter.build();
 
         // 選択履歴読込・表示
         diaryItemTitleEditViewModel.loadItemTitleSelectionHistory();
@@ -276,18 +281,18 @@ public class DiaryItemTitleEditFragment extends Fragment {
                 .observe(getViewLifecycleOwner(), new Observer<List<DiaryItemTitleSelectionHistoryItem>>() {
                     @Override
                     public void onChanged(List<DiaryItemTitleSelectionHistoryItem> diaryItemTitleSelectionHistoryItems) {
-                        List<String> list = new ArrayList<>();
-                        for (DiaryItemTitleSelectionHistoryItem diaryItemTitleSelectionHistoryItem : diaryItemTitleSelectionHistoryItems) {
-                            list.add(diaryItemTitleSelectionHistoryItem.getTitle());
+                        if (diaryItemTitleSelectionHistoryItems == null) {
+                            return;
                         }
 
-                        ItemTitleSelectionHistoryAdapter adapter =
-                                (ItemTitleSelectionHistoryAdapter)
+                        ItemTitleSelectionHistoryListAdapter adapter =
+                                (ItemTitleSelectionHistoryListAdapter)
                                         binding.recyclerItemTitleSelectionHistory.getAdapter();
                         if (adapter == null) {
                             return;
                         }
-                        adapter.changeItem(list);
+                        Log.d("20240826","ItemTitleSelectionHistoryLiveDataObserver");
+                        adapter.submitList(diaryItemTitleSelectionHistoryItems);
                     }
                 });
     }
@@ -430,148 +435,6 @@ public class DiaryItemTitleEditFragment extends Fragment {
         }
         String showLength = inputLength + "/" + inputMaxLength;
         textLength.setText(showLength);
-    }
-
-    // アイテムタイトル選択履歴ViewHolder
-    // TODO:ListAdapterに変更&独立クラスへ
-    private static class ItemTitleSelectionHistoryViewHolder extends RecyclerView.ViewHolder {
-        public TextView textItemTitle;
-
-        public ItemTitleSelectionHistoryViewHolder(View itemView) {
-            super(itemView);
-            textItemTitle = itemView.findViewById(R.id.text_item_title);
-        }
-    }
-
-    private class ItemTitleSelectionHistoryAdapter
-            extends RecyclerView.Adapter<ItemTitleSelectionHistoryViewHolder> {
-        private List<String> ItemTitleSelectionHistory;
-
-        @NonNull
-        @Override
-        public ItemTitleSelectionHistoryViewHolder onCreateViewHolder(
-                ViewGroup parent, int viewType) {
-            LayoutInflater inflater = LayoutInflater.from(parent.getContext());
-            View view =
-                    inflater.inflate(
-                            R.layout.row_item_title_selection_history, parent, false);
-            ItemTitleSelectionHistoryViewHolder holder =
-                    new ItemTitleSelectionHistoryViewHolder(view);
-
-            holder.itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    String selectedItemTitle = holder.textItemTitle.getText().toString();
-                    completeItemTitleEdit(selectedItemTitle);
-                }
-            });
-
-            return holder;
-        }
-
-        @Override
-        public void onBindViewHolder(ItemTitleSelectionHistoryViewHolder holder, int position) {
-            String itemTitle = ItemTitleSelectionHistory.get(position);
-            holder.textItemTitle.setText(itemTitle);
-        }
-
-        @Override
-        public int getItemCount() {
-            return ItemTitleSelectionHistory.size();
-        }
-
-        public void changeItem(List<String> list) {
-            ItemTitleSelectionHistory = list;
-            notifyDataSetChanged();
-        }
-
-    }
-
-    // 参考：https://appdev-room.com/android-recyclerview-swipe-action
-    private class ItemTitleSelectionHistorySimpleCallBack extends ItemTouchHelper.SimpleCallback {
-        public ItemTitleSelectionHistorySimpleCallBack(int dragDirs, int swipeDirs) {
-            super(dragDirs, swipeDirs);
-        }
-
-        @Override
-        public boolean onMove(@NonNull RecyclerView recyclerView,
-                              @NonNull RecyclerView.ViewHolder viewHolder,
-                              @NonNull RecyclerView.ViewHolder target) {
-            return false;
-        }
-
-        @Override
-        public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
-            ItemTitleSelectionHistoryViewHolder itemTitleSelectionHistoryViewHolder =
-                                                    (ItemTitleSelectionHistoryViewHolder) viewHolder;
-
-            int itemPos = viewHolder.getBindingAdapterPosition();
-            String itemTitle =
-                    itemTitleSelectionHistoryViewHolder.textItemTitle.getText().toString();
-            showDeleteConfirmationDialog(itemPos, itemTitle);
-        }
-
-        @Override
-        public void onChildDraw(
-                @NonNull Canvas c,
-                @NonNull RecyclerView recyclerView,
-                @NonNull RecyclerView.ViewHolder viewHolder,
-                float dX,
-                float dY,
-                int actionState,
-                boolean isCurrentlyActive
-        ) {
-            super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
-
-            ColorDrawable backgroundColor = new ColorDrawable(Color.RED);
-            Drawable icon =
-                    AppCompatResources.getDrawable(requireContext(), R.drawable.ic_delete_forever_24);
-            if (icon == null) {
-                // TODO:assert
-                return;
-            }
-            View itemView = viewHolder.itemView;
-            int iconMargin = (itemView.getHeight() - icon.getIntrinsicHeight()) / 2;
-            int iconLeft = itemView.getRight() - icon.getIntrinsicWidth() - iconMargin * 2;
-            int iconTop = itemView.getTop() + iconMargin;
-            int iconRight = itemView.getRight() - iconMargin;
-            int iconBottom = itemView.getBottom() - iconMargin;
-
-            int defaultIconLeft = itemView.getRight();
-            int defaultIconRight = itemView.getRight() + icon.getIntrinsicWidth();
-
-            if (dX < 0 ) {
-                int absDx = Math.abs((int) dX);
-                int switchingPoint = itemView.getRight() - iconLeft;
-
-                backgroundColor
-                        .setBounds(
-                                itemView.getRight() - absDx,
-                                itemView.getTop(),
-                                iconRight,
-                                iconBottom
-                        );
-
-                if (absDx >= switchingPoint) {
-                    icon.setBounds(iconLeft, iconTop, iconRight, iconBottom);
-
-                } else {
-                    icon.setBounds(
-                            defaultIconLeft - absDx, iconTop,
-                            defaultIconRight - absDx,
-                            iconBottom
-                    );
-                }
-
-            } else {
-                backgroundColor.setBounds(0, 0, 0, 0);
-                icon.setBounds(0, 0, 0, 0);
-
-            }
-
-            backgroundColor.draw(c);
-            icon.draw(c);
-        }
     }
 
     // DiaryItemTitleEditFragmentを閉じる

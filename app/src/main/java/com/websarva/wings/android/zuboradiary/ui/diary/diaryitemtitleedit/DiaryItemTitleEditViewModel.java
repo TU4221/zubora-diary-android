@@ -1,5 +1,7 @@
 package com.websarva.wings.android.zuboradiary.ui.diary.diaryitemtitleedit;
 
+import android.util.Log;
+
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
@@ -70,8 +72,13 @@ public class DiaryItemTitleEditViewModel extends ViewModel {
             isItemTitleSelectionHistoryItemDeleteError.setValue(true);
             return;
         }
-        currentList.remove(deletePosition);
-        itemTitleSelectionHistory.setValue(currentList);
+
+        List<DiaryItemTitleSelectionHistoryItem> cloneList = new ArrayList<>();
+        for (DiaryItemTitleSelectionHistoryItem i: currentList) {
+            cloneList.add(i.clone());
+        }
+        cloneList.remove(deletePosition);
+        itemTitleSelectionHistory.setValue(cloneList);
     }
 
     // Error関係
