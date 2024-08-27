@@ -172,16 +172,22 @@ public class WordSearchFragment extends CustomFragment {
                     @Override
                     public void onChanged(String s) {
                         if (s == null) {
-                            // TODO:assert
                             return;
+                        }
+
+                        if (s.isEmpty()) {
+                            binding.imageButtonKeyWordClear.setVisibility(View.INVISIBLE);
+                            binding.textWordSearchNoResults.setVisibility(View.INVISIBLE);
+                            binding.linerLayoutWordSearchResults.setVisibility(View.INVISIBLE);
+                        } else {
+                            // 検索結果表示Viewは別Observerにて表示
+                            binding.imageButtonKeyWordClear.setVisibility(View.VISIBLE);
                         }
                         // HACK:キーワードの入力時と確定時に検索Observerが起動してしまい
                         //      同じキーワードで二重に検索してしまう。防止策として下記条件追加。
                         if (s.equals(lastText)) {
                             return;
                         }
-                        wordSearchViewModel
-                                .setIsVisibleSearchWordClearButton(!s.isEmpty());
                         wordSearchViewModel
                                 .loadWordSearchResultList(
                                         WordSearchViewModel.LoadType.NEW,
@@ -292,9 +298,39 @@ public class WordSearchFragment extends CustomFragment {
                         if (wordSearchResultYearMonthListAdapter == null) {
                             return;
                         }
+
+                        String searchWord = wordSearchViewModel.getSearchWordLiveData().getValue();
+                        if (searchWord == null || searchWord.isEmpty()) {
+                            binding.textWordSearchNoResults.setVisibility(View.INVISIBLE);
+                            binding.linerLayoutWordSearchResults.setVisibility(View.INVISIBLE);
+                        } else if (wordSearchResultYearMonthListItems.isEmpty()) {
+                            binding.textWordSearchNoResults.setVisibility(View.VISIBLE);
+                            binding.linerLayoutWordSearchResults.setVisibility(View.INVISIBLE);
+                        } else {
+                            binding.textWordSearchNoResults.setVisibility(View.INVISIBLE);
+                            binding.linerLayoutWordSearchResults.setVisibility(View.VISIBLE);
+                        }
+                        //binding.frameLayoutFullScreenProgresBar.setVisibility(View.INVISIBLE);
+
                         List<DiaryYearMonthListItemBase> convertedList =
                                 new ArrayList<>(wordSearchResultYearMonthListItems);
                         wordSearchResultYearMonthListAdapter.submitList(convertedList);
+                    }
+                });
+
+        wordSearchViewModel.getNumWordSearchResults()
+                .observe(getViewLifecycleOwner(), new Observer<Integer>() {
+                    @Override
+                    public void onChanged(Integer integer) {
+                        if (integer == null) {
+                            return;
+                        }
+
+                        if (integer > 0) {
+                            binding.textWordSearchResults.setVisibility(View.VISIBLE);
+                        } else {
+                            binding.textWordSearchResults.setVisibility(View.INVISIBLE);
+                        }
                     }
                 });
 

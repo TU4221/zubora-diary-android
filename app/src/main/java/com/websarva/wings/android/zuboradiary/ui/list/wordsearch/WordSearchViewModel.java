@@ -1,5 +1,6 @@
 package com.websarva.wings.android.zuboradiary.ui.list.wordsearch;
 
+import android.renderscript.ScriptGroup;
 import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.style.BackgroundColorSpan;
@@ -28,19 +29,15 @@ import dagger.hilt.android.lifecycle.HiltViewModel;
 @HiltViewModel
 public class WordSearchViewModel extends ViewModel {
 
-    // TODO:Visible変数を削除してFragment上で制御できるか検討
     private final DiaryRepository diaryRepository;
     private final MutableLiveData<String> searchWord = new MutableLiveData<>();
-    private final MutableLiveData<Boolean> isVisibleSearchWordClearButton = new MutableLiveData<>();
-    private Future<?> LoadingWordSearchResultListFuture; // キャンセル用
+    private Future<?> loadingWordSearchResultListFuture; // キャンセル用
     private final MutableLiveData<List<WordSearchResultYearMonthListItem>> wordSearchResultList =
             new MutableLiveData<>();
     private boolean isLoading;
-    private final MutableLiveData<Boolean> isVisibleNumWordSearchResults = new MutableLiveData<>();
     private final MutableLiveData<Integer> numWordSearchResults = new MutableLiveData<>();
-    private final MutableLiveData<Boolean> isVisibleResultList = new MutableLiveData<>();
+    // TODO:Visible変数を削除してFragment上で制御できるか検討(UpdateはViewModelの方が簡潔に制御できる？)
     private final MutableLiveData<Boolean> isVisibleUpdateProgressBar = new MutableLiveData<>();
-    private final MutableLiveData<Boolean> isVisibleNoResultMessage = new MutableLiveData<>();
     private static final int NUM_LOADING_ITEMS = 10; //リストが画面全体に表示される値にすること。 // TODO:仮数値の為、最後に設定
     private final ExecutorService executorService;
 
@@ -57,13 +54,9 @@ public class WordSearchViewModel extends ViewModel {
 
     public void initialize() {
         searchWord.setValue("");
-        isVisibleSearchWordClearButton.setValue(false);
         wordSearchResultList.setValue(new ArrayList<>());
-        isVisibleNumWordSearchResults.setValue(false);
         numWordSearchResults.setValue(0);
-        isVisibleResultList.setValue(false);
         isVisibleUpdateProgressBar.setValue(false);
-        isVisibleNoResultMessage.setValue(false);
         isLoading = false;
         isDiaryListLoadingError.setValue(false);
     }
@@ -72,20 +65,19 @@ public class WordSearchViewModel extends ViewModel {
         NEW, UPDATE, ADD
     }
 
-    public void loadWordSearchResultList(
-            LoadType loadType, int spannableStringBackGroundColor){
-        if (LoadingWordSearchResultListFuture != null && !LoadingWordSearchResultListFuture.isDone()) {
-            LoadingWordSearchResultListFuture.cancel(true);
+    public void loadWordSearchResultList(LoadType loadType, int spannableStringBackGroundColor){
+        if (loadingWordSearchResultListFuture != null && !loadingWordSearchResultListFuture.isDone()) {
+            loadingWordSearchResultListFuture.cancel(true);
         }
         String searchWord = this.searchWord.getValue();
         if (searchWord == null || searchWord.isEmpty()) {
-            setupVisibilityBeforeWordSearch();
+            isVisibleUpdateProgressBar.setValue(false);
             wordSearchResultList.setValue(new ArrayList<>());
             return;
         }
         Runnable loadWordSearchResultList =
                 new loadWordSearchResultList(loadType, searchWord, spannableStringBackGroundColor);
-        LoadingWordSearchResultListFuture = executorService.submit(loadWordSearchResultList);
+        loadingWordSearchResultListFuture = executorService.submit(loadWordSearchResultList);
     }
 
     private class loadWordSearchResultList implements Runnable {
@@ -108,10 +100,10 @@ public class WordSearchViewModel extends ViewModel {
                 List<WordSearchResultYearMonthListItem> currentResultList =
                                                                 wordSearchResultList.getValue();
                 isLoading = true;
-                setupVisibilityBeforeLoadingSearchResultListAsync(loadType);
                 int numLoadingItems;
                 int loadingOffset;
                 if (loadType == LoadType.UPDATE) {
+                    isVisibleUpdateProgressBar.postValue(true);
                     if (currentResultList == null || currentResultList.isEmpty()) {
                         return;
                     }
@@ -121,6 +113,7 @@ public class WordSearchViewModel extends ViewModel {
                     }
                     loadingOffset = 0;
                 } else if (loadType == LoadType.ADD) {
+                    isVisibleUpdateProgressBar.postValue(false);
                     numLoadingItems = NUM_LOADING_ITEMS;
                     if (currentResultList == null || currentResultList.isEmpty()) {
                         // TODO:assert
@@ -130,6 +123,7 @@ public class WordSearchViewModel extends ViewModel {
                     }
                 } else {
                     // LoadType.NEW
+                    isVisibleUpdateProgressBar.postValue(false);
                     numLoadingItems = NUM_LOADING_ITEMS;
                     loadingOffset = 0;
                 }
@@ -157,6 +151,7 @@ public class WordSearchViewModel extends ViewModel {
                     resultListContainingProgressBar.add(progressBar);
                 }
                 wordSearchResultList.postValue(resultListContainingProgressBar);
+                numWordSearchResults.postValue(0);
 
                 // TODO:ProgressBarを表示させる為に仮で記述
                 Thread.sleep(1000);
@@ -258,7 +253,6 @@ public class WordSearchViewModel extends ViewModel {
                 }
 
                 // 日記リスト読込完了処理
-                setupVisibilityAfterLoadingSearchResultListAsync(updateResultList.isEmpty());
                 WordSearchViewModel.this.numWordSearchResults.postValue(numWordSearchResults);
                 wordSearchResultList.postValue(updateResultList);
             } catch (Exception e) {
@@ -401,53 +395,8 @@ public class WordSearchViewModel extends ViewModel {
         return wordSearchResultYearMonthList;
     }
 
-    private void setupVisibilityBeforeWordSearch() {
-        isVisibleNumWordSearchResults.setValue(false);
-        isVisibleResultList.setValue(false);
-        isVisibleUpdateProgressBar.setValue(false);
-        isVisibleNoResultMessage.setValue(false);
-    }
-
-    private void setupVisibilityBeforeLoadingSearchResultListAsync(LoadType loadType) {
-        if (loadType == LoadType.UPDATE) {
-            isVisibleNumWordSearchResults.postValue(true);
-            isVisibleResultList.postValue(true);
-            isVisibleUpdateProgressBar.postValue(true);
-            isVisibleNoResultMessage.postValue(false);
-        } else if (loadType == LoadType.ADD) {
-            isVisibleNumWordSearchResults.postValue(true);
-            isVisibleResultList.postValue(true);
-            isVisibleUpdateProgressBar.postValue(false);
-            isVisibleNoResultMessage.postValue(false);
-        } else {
-            // LoadType.NEW
-            isVisibleNumWordSearchResults.postValue(false);
-            isVisibleResultList.postValue(true);
-            isVisibleUpdateProgressBar.postValue(false);
-            isVisibleNoResultMessage.postValue(false);
-        }
-    }
-
-    private void setupVisibilityAfterLoadingSearchResultListAsync(Boolean resultListIsEmpty) {
-        if (resultListIsEmpty) {
-            isVisibleNumWordSearchResults.postValue(false);
-            isVisibleResultList.postValue(false);
-            isVisibleUpdateProgressBar.postValue(false);
-            isVisibleNoResultMessage.postValue(true);
-        } else {
-            isVisibleNumWordSearchResults.postValue(true);
-            isVisibleResultList.postValue(true);
-            isVisibleUpdateProgressBar.postValue(false);
-            isVisibleNoResultMessage.postValue(false);
-        }
-    }
-
     public void clearSearchWord() {
         searchWord.setValue("");
-    }
-
-    public void setIsVisibleSearchWordClearButton(boolean bool) {
-        isVisibleSearchWordClearButton.setValue(bool);
     }
 
     // エラー関係
@@ -471,31 +420,16 @@ public class WordSearchViewModel extends ViewModel {
         return searchWord;
     }
 
-    public LiveData<Boolean> getIsVisibleSearchWordClearButtonLiveData() {
-        return isVisibleSearchWordClearButton;
-    }
-
     public LiveData<List<WordSearchResultYearMonthListItem>> getWordSearchResultListLiveData() {
         return wordSearchResultList;
-    }
-
-    public LiveData<Boolean> getIsVisibleNumWordSearchResultsLiveData() {
-        return isVisibleNumWordSearchResults;
     }
 
     public LiveData<Integer> getNumWordSearchResults() {
         return numWordSearchResults;
     }
 
-    public LiveData<Boolean> getIsVisibleResultListLiveData() {
-        return isVisibleResultList;
-    }
-
     public LiveData<Boolean> getIsVisibleUpdateProgressBarLiveData() {
         return isVisibleUpdateProgressBar;
-    }
-    public LiveData<Boolean> getIsVisibleNoResultMessageLiveData() {
-        return isVisibleNoResultMessage;
     }
 
     public LiveData<Boolean> getIsDiaryListLoadingErrorLiveData() {

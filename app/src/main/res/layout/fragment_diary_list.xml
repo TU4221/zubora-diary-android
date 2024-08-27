@@ -35,9 +35,9 @@
             android:layout_height="match_parent">
 
             <TextView
+                android:id="@+id/text_diary_list_no_diary_message"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:visibility="@{list_view_model.isVisibleDiaryListLiveData ? View.INVISIBLE : View.VISIBLE}"
                 android:gravity="center"
                 android:text="@string/fragment_diary_list_no_saved_diary_message"/>
 
@@ -46,7 +46,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:scrollbars="none"
-                android:visibility="@{list_view_model.isVisibleDiaryListLiveData ? View.VISIBLE : View.INVISIBLE}"
                 android:transitionGroup="true"/>
 
             <FrameLayout
@@ -68,8 +67,6 @@
 
             </FrameLayout>
 
-
-            <!-- TODO:最終的に削除 -->
             <com.google.android.material.floatingactionbutton.FloatingActionButton
                 android:id="@+id/fab_edit_diary"
                 android:layout_width="wrap_content"

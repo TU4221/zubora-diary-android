@@ -281,6 +281,15 @@ public class DiaryListFragment extends CustomFragment {
                         if (diaryYearMonthListAdapter == null) {
                             return;
                         }
+
+                        if (diaryListItems.isEmpty()) {
+                            binding.textDiaryListNoDiaryMessage.setVisibility(View.VISIBLE);
+                            binding.recyclerDiaryYearMonthList.setVisibility(View.INVISIBLE);
+                        } else {
+                            binding.textDiaryListNoDiaryMessage.setVisibility(View.INVISIBLE);
+                            binding.recyclerDiaryYearMonthList.setVisibility(View.VISIBLE);
+                        }
+
                         List<DiaryYearMonthListItemBase> convertedList = new ArrayList<>(diaryListItems);
                         diaryYearMonthListAdapter.submitList(convertedList);
                     }

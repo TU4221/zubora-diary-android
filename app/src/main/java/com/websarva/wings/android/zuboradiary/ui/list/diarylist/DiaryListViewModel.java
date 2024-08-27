@@ -30,12 +30,11 @@ import dagger.hilt.android.lifecycle.HiltViewModel;
 @HiltViewModel
 public class DiaryListViewModel extends ViewModel {
 
-    // TODO:Visible変数を削除してFragment上で制御できるか検討
     private final DiaryRepository diaryRepository;
     private Future<?> loadingDiaryListFuture; // キャンセル用
     private final MutableLiveData<List<DiaryYearMonthListItem>> diaryList = new MutableLiveData<>();
     private boolean isLoading;
-    private final MutableLiveData<Boolean> isVisibleDiaryList = new MutableLiveData<>();
+    // TODO:Visible変数を削除してFragment上で制御できるか検討(UpdateはViewModelの方が簡潔に制御できる？)
     private final MutableLiveData<Boolean> isVisibleUpdateProgressBar = new MutableLiveData<>();
     private static final int NUM_LOADING_ITEMS = 10; //リストが画面全体に表示される値にすること。 // TODO:仮数値の為、最後に設定
     private LocalDate sortConditionDate;
@@ -82,7 +81,6 @@ public class DiaryListViewModel extends ViewModel {
                     Log.d("DiaryListLoading", "prepare");
                     List<DiaryYearMonthListItem> currentDiaryList = diaryList.getValue();
                     isLoading = true;
-                    isVisibleDiaryList.postValue(true);
                     if (loadType == LoadType.UPDATE) {
                         isVisibleUpdateProgressBar.postValue(true);
                     } else {
@@ -141,7 +139,7 @@ public class DiaryListViewModel extends ViewModel {
                     diaryList.postValue(diaryListContainingProgressBar);
 
                     // TODO:ProgressBarを表示させる為に仮で記述
-                    Thread.sleep(500);
+                    Thread.sleep(1000);
 
                     // 日記リスト読込
                     Log.d("DiaryListLoading", "startLoading");
@@ -230,15 +228,9 @@ public class DiaryListViewModel extends ViewModel {
                     }
 
                     // 日記リスト読込完了処理
-                    if (updateDiaryList.isEmpty()) {
-                        isVisibleDiaryList.postValue(false);
-                    }
                     diaryList.postValue(updateDiaryList);
                 } catch (Exception e) {
                     e.printStackTrace();
-                    if (previousDiaryList.isEmpty()) {
-                        isVisibleDiaryList.postValue(false);
-                    }
                     diaryList.postValue(previousDiaryList);
                     isDiaryListLoadingError.postValue(true);
                 } finally {
@@ -389,10 +381,6 @@ public class DiaryListViewModel extends ViewModel {
 
     public LiveData<Boolean> getIsVisibleUpdateProgressBarLiveData() {
         return isVisibleUpdateProgressBar;
-    }
-
-    public LiveData<Boolean> getIsVisibleDiaryListLiveData() {
-        return isVisibleDiaryList;
     }
 
     public LiveData<Boolean> getIsDiaryListLoadingErrorLiveData() {
