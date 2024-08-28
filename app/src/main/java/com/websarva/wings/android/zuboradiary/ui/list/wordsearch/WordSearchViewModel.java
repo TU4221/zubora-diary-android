@@ -126,6 +126,7 @@ public class WordSearchViewModel extends ViewModel {
                     isVisibleUpdateProgressBar.postValue(false);
                     numLoadingItems = NUM_LOADING_ITEMS;
                     loadingOffset = 0;
+                    numWordSearchResults.postValue(0);
                 }
 
                 // 現時点のDiaryListをCloneで生成
@@ -151,7 +152,6 @@ public class WordSearchViewModel extends ViewModel {
                     resultListContainingProgressBar.add(progressBar);
                 }
                 wordSearchResultList.postValue(resultListContainingProgressBar);
-                numWordSearchResults.postValue(0);
 
                 // TODO:ProgressBarを表示させる為に仮で記述
                 Thread.sleep(1000);

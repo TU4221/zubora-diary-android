@@ -293,32 +293,41 @@ public class DiaryYearMonthListAdapter extends ListAdapter<DiaryYearMonthListIte
             extends DiffUtil.ItemCallback<DiaryYearMonthListItemBase> {
         @Override
         public boolean areItemsTheSame(@NonNull DiaryYearMonthListItemBase oldItem, @NonNull DiaryYearMonthListItemBase newItem) {
-            // MEMO:更新時はリストアイテムを再インスタンス化する為、IDが異なり全アイテムfalseとなり、
-            //      更新時リストが最上部へスクロールされてしまう。これを防ぐために下記処理を記述。
-            // return oldItem.getId().equals(newItem.getId());
+            Log.d("DiaryYearMonthList", "DiffUtil.ItemCallback_areItemsTheSame()");
+            Log.d("DiaryYearMonthList", "oldItem_YearMonth:" + oldItem.getYearMonth());
+            Log.d("DiaryYearMonthList", "newItem_YearMonth:" + newItem.getYearMonth());
+
+            // ViewType
+            if (oldItem.getViewType() != newItem.getViewType()) {
+                Log.d("DiaryYearMonthList", "ViewType不一致");
+                return false;
+            }
+
+            // 年月
+            if (oldItem.getYearMonth() != null && newItem.getYearMonth() != null
+                    && !oldItem.getYearMonth().equals(newItem.getYearMonth())) {
+                Log.d("DiaryYearMonthList", "YearMonth不一致");
+                return false;
+            }
+            Log.d("DiaryYearMonthList", "一致");
             return true;
         }
 
         @Override
         public boolean areContentsTheSame(@NonNull DiaryYearMonthListItemBase oldItem, @NonNull DiaryYearMonthListItemBase newItem) {
-            // 年月
-            if (oldItem.getYearMonth() != null && newItem.getYearMonth() != null
-                    && !oldItem.getYearMonth().equals(newItem.getYearMonth())) {
-                return false;
-            }
-            if (oldItem.getViewType() != newItem.getViewType()) {
-                return false;
-            }
-
+            Log.d("DiaryYearMonthList", "DiffUtil.ItemCallback_areContentsTheSame()");
+            Log.d("DiaryYearMonthList", "oldItem_YearMonth:" + oldItem.getYearMonth());
+            Log.d("DiaryYearMonthList", "newItem_YearMonth:" + newItem.getYearMonth());
             // 日
             if (oldItem instanceof DiaryYearMonthListItem && newItem instanceof DiaryYearMonthListItem) {
+                Log.d("DiaryYearMonthList", "DiaryYearMonthListItem");
                 DiaryYearMonthListItem _oldItem = (DiaryYearMonthListItem) oldItem;
                 DiaryYearMonthListItem _newItem = (DiaryYearMonthListItem) newItem;
+
                 int _oldChildListSize = _oldItem.getDiaryDayListItemList().size();
                 int _newChildListSize = _newItem.getDiaryDayListItemList().size();
-                Log.d("DiaryList", "_oldChildListSize:" + _oldChildListSize);
-                Log.d("DiaryList", "_newChildListSize:" + _newChildListSize);
                 if (_oldChildListSize != _newChildListSize) {
+                    Log.d("DiaryYearMonthList", "ChildList_Size不一致");
                     return false;
                 }
 
@@ -326,22 +335,27 @@ public class DiaryYearMonthListAdapter extends ListAdapter<DiaryYearMonthListIte
                     DiaryDayListItem oldChildListItem = _oldItem.getDiaryDayListItemList().get(i);
                     DiaryDayListItem newChildListItem = _newItem.getDiaryDayListItemList().get(i);
                     if (!oldChildListItem.getDate().equals(newChildListItem.getDate())) {
+                        Log.d("DiaryYearMonthList", "ChildListItem_Date不一致");
                         return false;
                     }
                     if (!oldChildListItem.getTitle().equals(newChildListItem.getTitle())) {
+                        Log.d("DiaryYearMonthList", "ChildListItem_Title不一致");
                         return false;
                     }
                     if (!oldChildListItem.getPicturePath().equals(newChildListItem.getPicturePath())) {
+                        Log.d("DiaryYearMonthList", "ChildListItem_PicturePath不一致");
                         return false;
                     }
                 }
             } else if (oldItem instanceof WordSearchResultYearMonthListItem
-                            && newItem instanceof WordSearchResultYearMonthListItem) {
+                    && newItem instanceof WordSearchResultYearMonthListItem) {
+                Log.d("DiaryYearMonthList", "WordSearchResultYearMonthListItem");
                 WordSearchResultYearMonthListItem _oldItem = (WordSearchResultYearMonthListItem) oldItem;
                 WordSearchResultYearMonthListItem _newItem = (WordSearchResultYearMonthListItem) newItem;
                 int oldChildListSize = _oldItem.getWordSearchResultDayList().size();
                 int newChildListSize = _newItem.getWordSearchResultDayList().size();
                 if (oldChildListSize != newChildListSize) {
+                    Log.d("DiaryYearMonthList", "ChildList_Size不一致");
                     return false;
                 }
 
@@ -350,23 +364,32 @@ public class DiaryYearMonthListAdapter extends ListAdapter<DiaryYearMonthListIte
                             _oldItem.getWordSearchResultDayList().get(i);
                     WordSearchResultDayListItem newChildListItem =
                             _newItem.getWordSearchResultDayList().get(i);
+                    Log.d("DiaryYearMonthList", "oldChildListItem_Date:" + oldChildListItem.getDate());
+                    Log.d("DiaryYearMonthList", "newChildListItem_Date:" + newChildListItem.getDate());
+
                     if (!oldChildListItem.getDate().equals(newChildListItem.getDate())) {
+                        Log.d("DiaryYearMonthList", "ChildListItem_Date不一致");
                         return false;
                     }
                     if (!oldChildListItem.getTitle().equals(newChildListItem.getTitle())) {
+                        Log.d("DiaryYearMonthList", "ChildListItem_Title不一致");
                         return false;
                     }
                     if (oldChildListItem.getItemNumber() != newChildListItem.getItemNumber()) {
+                        Log.d("DiaryYearMonthList", "ChildListItem_ItemNumber不一致");
                         return false;
                     }
                     if (!oldChildListItem.getItemTitle().equals(newChildListItem.getItemTitle())) {
+                        Log.d("DiaryYearMonthList", "ChildListItem_ItemTitle不一致");
                         return false;
                     }
                     if (!oldChildListItem.getItemComment().equals(newChildListItem.getItemComment())) {
+                        Log.d("DiaryYearMonthList", "ChildListItem_ItemComment不一致");
                         return false;
                     }
                 }
             }
+            Log.d("DiaryYearMonthList", "一致");
             return true;
         }
     }

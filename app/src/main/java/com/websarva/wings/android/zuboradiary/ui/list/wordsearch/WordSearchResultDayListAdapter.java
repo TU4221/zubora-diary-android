@@ -2,6 +2,7 @@ package com.websarva.wings.android.zuboradiary.ui.list.wordsearch;
 
 import android.content.Context;
 import android.text.SpannableString;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -93,24 +94,29 @@ public class WordSearchResultDayListAdapter
             extends DiffUtil.ItemCallback<WordSearchResultDayListItem> {
         @Override
         public boolean areItemsTheSame(@NonNull WordSearchResultDayListItem oldItem, @NonNull WordSearchResultDayListItem newItem) {
-            return oldItem.getId().equals(newItem.getId());
+            Log.d("WordSearchResultDayList", "DiffUtil.ItemCallback_areItemsTheSame()");
+            Log.d("WordSearchResultDayList", "oldItem_Date:" + oldItem.getDate());
+            Log.d("WordSearchResultDayList", "newItem_Date:" + newItem.getDate());
+            return oldItem.getDate().equals(newItem.getDate());
         }
 
         @Override
         public boolean areContentsTheSame(@NonNull WordSearchResultDayListItem oldItem, @NonNull WordSearchResultDayListItem newItem) {
-            if (!oldItem.getDate().equals(newItem.getDate())) {
-                return false;
-            }
+            Log.d("WordSearchResultDayList", "DiffUtil.ItemCallback_areContentsTheSame()");
             if (!oldItem.getTitle().equals(newItem.getTitle())) {
+                Log.d("WordSearchResultDayList", "Title不一致");
                 return false;
             }
             if (oldItem.getItemNumber() != newItem.getItemNumber()) {
+                Log.d("WordSearchResultDayList", "ItemNumber不一致");
                 return false;
             }
             if (!oldItem.getItemTitle().equals(newItem.getItemTitle())) {
+                Log.d("WordSearchResultDayList", "ItemTitle不一致");
                 return false;
             }
             if (!oldItem.getItemComment().equals(newItem.getItemComment())) {
+                Log.d("WordSearchResultDayList", "ItemComment不一致");
                 return false;
             }
             return true;

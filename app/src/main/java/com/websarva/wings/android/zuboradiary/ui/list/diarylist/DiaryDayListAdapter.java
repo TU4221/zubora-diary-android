@@ -116,18 +116,21 @@ public class DiaryDayListAdapter extends ListAdapter<DiaryDayListItem, DiaryDayL
     public static class DiaryDayListDiffUtilItemCallback extends DiffUtil.ItemCallback<DiaryDayListItem> {
         @Override
         public boolean areItemsTheSame(@NonNull DiaryDayListItem oldItem, @NonNull DiaryDayListItem newItem) {
-            return oldItem.getId().equals(newItem.getId());
+            Log.d("DiaryDayList", "DiffUtil.ItemCallback_areItemsTheSame()");
+            Log.d("DiaryDayList", "oldItem_Date:" + oldItem.getDate());
+            Log.d("DiaryDayList", "newItem_Date:" + newItem.getDate());
+            return oldItem.getDate().equals(newItem.getDate());
         }
 
         @Override
         public boolean areContentsTheSame(@NonNull DiaryDayListItem oldItem, @NonNull DiaryDayListItem newItem) {
-            if (!oldItem.getDate().equals(newItem.getDate())) {
-                return false;
-            }
+            Log.d("DiaryDayList", "DiffUtil.ItemCallback_areContentsTheSame()");
             if (!oldItem.getTitle().equals(newItem.getTitle())) {
+                Log.d("DiaryDayList", "Title不一致");
                 return false;
             }
             if (!oldItem.getPicturePath().equals(newItem.getPicturePath())) {
+                Log.d("DiaryDayList", "PicturePath不一致");
                 return false;
             }
             return true;

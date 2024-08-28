@@ -18,6 +18,7 @@ import androidx.navigation.NavDirections;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -37,6 +38,7 @@ import com.websarva.wings.android.zuboradiary.databinding.FragmentWordSearchBind
 import com.websarva.wings.android.zuboradiary.ui.list.DiaryYearMonthListAdapter;
 
 import java.time.LocalDate;
+import java.time.YearMonth;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -310,10 +312,20 @@ public class WordSearchFragment extends CustomFragment {
                             binding.textWordSearchNoResults.setVisibility(View.INVISIBLE);
                             binding.linerLayoutWordSearchResults.setVisibility(View.VISIBLE);
                         }
-                        //binding.frameLayoutFullScreenProgresBar.setVisibility(View.INVISIBLE);
 
                         List<DiaryYearMonthListItemBase> convertedList =
                                 new ArrayList<>(wordSearchResultYearMonthListItems);
+                        Log.d("WordSearchList", "submitList前");
+                        for (DiaryYearMonthListItemBase i: convertedList) {
+                            YearMonth  yearMonth = i.getYearMonth();
+                            if (yearMonth == null) {
+                                Log.d("WordSearchList", "null");
+                            } else {
+                                Log.d("WordSearchList", yearMonth.toString());
+                            }
+                        }
+                        Log.d("WordSearchList", "submitList");
+                        Log.d("ListAdapterTest", "submitList");
                         wordSearchResultYearMonthListAdapter.submitList(convertedList);
                     }
                 });

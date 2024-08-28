@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class WordSearchResultYearMonthListItem extends DiaryYearMonthListItemBase {
-    private List<WordSearchResultDayListItem> WordSearchResultDayList = new ArrayList<>();
+    private List<WordSearchResultDayListItem> WordSearchResultDayList;
 
     public WordSearchResultYearMonthListItem(int viewType) {
         super(viewType);

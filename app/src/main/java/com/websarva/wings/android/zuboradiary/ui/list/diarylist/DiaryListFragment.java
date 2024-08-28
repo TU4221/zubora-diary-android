@@ -291,6 +291,18 @@ public class DiaryListFragment extends CustomFragment {
                         }
 
                         List<DiaryYearMonthListItemBase> convertedList = new ArrayList<>(diaryListItems);
+
+                        Log.d("DiaryList", "submitList前");
+                        for (DiaryYearMonthListItemBase i: convertedList) {
+                            YearMonth  yearMonth = i.getYearMonth();
+                            if (yearMonth == null) {
+                                Log.d("DiaryList", "null");
+                            } else {
+                                Log.d("DiaryList", yearMonth.toString());
+                            }
+                        }
+                        Log.d("DiaryList", "submitList");
+                        Log.d("ListAdapterTest", "submitList");
                         diaryYearMonthListAdapter.submitList(convertedList);
                     }
                 }
