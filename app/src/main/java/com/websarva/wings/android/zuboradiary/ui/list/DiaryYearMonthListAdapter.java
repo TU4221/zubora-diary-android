@@ -31,14 +31,12 @@ import java.util.List;
 
 // DiaryFragment、WordSearchFragmentの親RecyclerViewのListAdapter。
 // 親RecyclerViewを同じ構成にする為、一つのクラスで両方の子RecyclerViewに対応できるように作成。
-public class DiaryYearMonthListAdapter extends ListAdapter<DiaryYearMonthListItemBase, RecyclerView.ViewHolder> {
+public abstract class DiaryYearMonthListAdapter extends ListAdapter<DiaryYearMonthListItemBase, RecyclerView.ViewHolder> {
 
     private final Context context;
     private final RecyclerView recyclerView;
-    private final OnScrollEndItemLoadingListener onScrollEndItemLoadingListener;
-    private final OnScrollLoadingConfirmationListener onScrollLoadingConfirmationListener;
-    private final OnClickChildItemListener onClickChildItemListener;
-    private final OnClickChildItemBackgroundButtonListener onClickChildItemBackgroundButtonListener;
+    private OnClickChildItemListener onClickChildItemListener;
+    private OnClickChildItemBackgroundButtonListener onClickChildItemBackgroundButtonListener;
     private final boolean canSwipeItem;
     public static final int DIARY_DAY_LIST_ITEM_MARGIN_VERTICAL = 16;
     public static final int DIARY_DAY_LIST_ITEM_MARGIN_HORIZONTAL = 32;
@@ -46,23 +44,16 @@ public class DiaryYearMonthListAdapter extends ListAdapter<DiaryYearMonthListIte
     public static final int VIEW_TYPE_DIARY = 0;
     public static final int VIEW_TYPE_PROGRESS_BAR = 1;
     public static final int VIEW_TYPE_NO_DIARY_MESSAGE = 2;
+    private boolean isLoadingListOnScrolled;
 
     public DiaryYearMonthListAdapter(
             Context context,
             RecyclerView recyclerView,
-            OnScrollEndItemLoadingListener onScrollEndItemLoadingListener,
-            OnScrollLoadingConfirmationListener onScrollLoadingConfirmationListener,
-            OnClickChildItemListener onClickChildItemListener,
-            boolean canSwipeItem,
-            @Nullable OnClickChildItemBackgroundButtonListener onClickChildItemBackgroundButtonListener){
+            boolean canSwipeItem) {
         super(new DiaryYearMonthListDiffUtilItemCallback());
         this.context = context;
         this.recyclerView = recyclerView;
-        this.onScrollEndItemLoadingListener = onScrollEndItemLoadingListener;
-        this.onScrollLoadingConfirmationListener = onScrollLoadingConfirmationListener;
-        this.onClickChildItemListener = onClickChildItemListener;
         this.canSwipeItem = canSwipeItem;
-        this.onClickChildItemBackgroundButtonListener = onClickChildItemBackgroundButtonListener;
     }
 
     public void build() {
@@ -88,9 +79,12 @@ public class DiaryYearMonthListAdapter extends ListAdapter<DiaryYearMonthListIte
         //           年月のアイテムのサイズ変更にアニメーションが発生せず全体的に違和感となるアニメーションになってしまう。
         //      問題2.最終アイテムまで到達し、ProgressBarが消えた後にセクションバーがその分ずれる)
         recyclerView.setItemAnimator(null);
-        recyclerView.addOnScrollListener(new ListAdditonalLoadingOnScrollListener());
         recyclerView.addOnScrollListener(new SectionBarTranslationOnScrollListener());
         recyclerView.addOnLayoutChangeListener(new SectionBarInitializationOnLayoutChangeListener());
+
+
+        recyclerView.addOnScrollListener(new ListAdditonalLoadingOnScrollListener());
+        this.registerAdapterDataObserver(new ListLoadingCompleteNotificationAdapterDataObserver());
     }
 
     @NonNull
@@ -199,42 +193,63 @@ public class DiaryYearMonthListAdapter extends ListAdapter<DiaryYearMonthListIte
         }
     }
 
+    @FunctionalInterface
+    public interface OnClickChildItemListener {
+        void onClick(LocalDate date);
+    }
+
+    public void setOnClickChildItemListener(OnClickChildItemListener onClickChildItemListener) {
+        this.onClickChildItemListener = onClickChildItemListener;
+    }
+
+    @FunctionalInterface
+    public interface OnClickChildItemBackgroundButtonListener {
+        void onClick(LocalDate date);
+    }
+
+    public void setOnClickChildItemBackgroundButtonListener(
+            OnClickChildItemBackgroundButtonListener onClickChildItemBackgroundButtonListener) {
+        this.onClickChildItemBackgroundButtonListener = onClickChildItemBackgroundButtonListener;
+    }
+
     private @NonNull DiaryDayListAdapter createDiaryDayListAdapter(DiaryYearMonthListViewHolder _holder) {
         DiaryDayListAdapter diaryDayListAdapter =
-                new DiaryDayListAdapter(
-                        context,
-                        _holder.binding.recyclerDayList,
-                        new DiaryDayListAdapter.OnClickItemListener() {
-                            @Override
-                            public void onClick(LocalDate date) {
-                                onClickChildItemListener.onClick(date);
-                            }
-                        },
-                        new DiaryDayListAdapter.OnClickDeleteButtonListener() {
-                            @Override
-                            public void onClick(LocalDate date) {
-                                if (onClickChildItemBackgroundButtonListener == null) {
-                                    return;
-                                }
-                                onClickChildItemBackgroundButtonListener.onClick(date);
-                            }
-                        });
+                new DiaryDayListAdapter(context, _holder.binding.recyclerDayList);
         diaryDayListAdapter.build();
+        diaryDayListAdapter.setOnClickItemListener(new DiaryDayListAdapter.OnClickItemListener() {
+            @Override
+            public void onClick(LocalDate date) {
+                if (onClickChildItemListener == null) {
+                    return;
+                }
+                onClickChildItemListener.onClick(date);
+            }
+        });
+        diaryDayListAdapter.setOnClickDeleteButtonListener(new DiaryDayListAdapter.OnClickDeleteButtonListener() {
+            @Override
+            public void onClick(LocalDate date) {
+                if (onClickChildItemBackgroundButtonListener == null) {
+                    return;
+                }
+                onClickChildItemBackgroundButtonListener.onClick(date);
+            }
+        });
         return diaryDayListAdapter;
     }
 
     private @NonNull WordSearchResultDayListAdapter createWordSearchResultDayListAdapter(DiaryYearMonthListViewHolder _holder) {
         WordSearchResultDayListAdapter wordSearchResultDayListAdapter =
-                new WordSearchResultDayListAdapter(
-                        context,
-                        _holder.binding.recyclerDayList,
-                        new WordSearchResultDayListAdapter.OnClickItemListener() {
-                            @Override
-                            public void onClick(LocalDate date) {
-                                onClickChildItemListener.onClick(date);
-                            }
-                        });
+                new WordSearchResultDayListAdapter(context, _holder.binding.recyclerDayList);
         wordSearchResultDayListAdapter.build();
+        wordSearchResultDayListAdapter.setOnClickItemListener(new WordSearchResultDayListAdapter.OnClickItemListener() {
+            @Override
+            public void onClick(LocalDate date) {
+                if (onClickChildItemListener == null) {
+                    return;
+                }
+                onClickChildItemListener.onClick(date);
+            }
+        });
         return wordSearchResultDayListAdapter;
     }
 
@@ -256,16 +271,6 @@ public class DiaryYearMonthListAdapter extends ListAdapter<DiaryYearMonthListIte
                 }
             }
         }
-    }
-
-    @FunctionalInterface
-    public interface OnClickChildItemListener {
-        void onClick(LocalDate date);
-    }
-
-    @FunctionalInterface
-    public interface OnClickChildItemBackgroundButtonListener {
-        void onClick(LocalDate date);
     }
 
     public static class DiaryYearMonthListViewHolder extends RecyclerView.ViewHolder {
@@ -302,6 +307,15 @@ public class DiaryYearMonthListAdapter extends ListAdapter<DiaryYearMonthListIte
                 Log.d("DiaryYearMonthList", "ViewType不一致");
                 return false;
             }
+            // HACK:RecyclerViewの初回アイテム表示時にスクロール初期位置がズレる事がある。
+            //      原因はプログレスバーの存在。最初にアイテムを表示する時、読込中の意味を込めてプログレスバーのみを表示させている。
+            //      スクロール読込機能の仕様により、読込データをRecyclerViewに表示する際、アイテムリスト末尾にプログレスバーを追加している。
+            //      これにより、初回読込中プログレスバーとアイテムリスト末尾のプログレスバーが同一アイテムと認識するため、
+            //      ListAdapterクラスの仕様により表示されていたプログレスバーが更新後も表示されるようにスクロール位置がズレた。
+            //      プログレスバー同士が同一アイテムと認識されないようにするために、下記条件を追加して対策。
+            if (oldItem.getViewType() == VIEW_TYPE_PROGRESS_BAR) {
+                return false;
+            }
 
             // 年月
             if (oldItem.getYearMonth() != null && newItem.getYearMonth() != null
@@ -309,6 +323,7 @@ public class DiaryYearMonthListAdapter extends ListAdapter<DiaryYearMonthListIte
                 Log.d("DiaryYearMonthList", "YearMonth不一致");
                 return false;
             }
+
             Log.d("DiaryYearMonthList", "一致");
             return true;
         }
@@ -394,21 +409,42 @@ public class DiaryYearMonthListAdapter extends ListAdapter<DiaryYearMonthListIte
         }
     }
 
-    @FunctionalInterface
-    public interface OnScrollEndItemLoadingListener {
-        void Load();
-    }
+    /**
+     * RecyclerViewを最終端までスクロールした時にリストアイテムを追加読込するコードを記述すること。
+     */
+    public abstract void loadListOnScrollEnd();
 
-    @FunctionalInterface
-    public interface OnScrollLoadingConfirmationListener {
-        boolean isLoading();
-    }
+    /**
+     * RecyclerViewを最終端までスクロールした時にリストアイテムを追加読込可能か確認するコードを記述すること。
+     */
+    public abstract boolean canLoadList();
+
+    // MEMO:読込スクロールをスムーズに処理できるように下記項目を考慮してクラス作成
+    //      1. リスト最終アイテムまで見え始める所までスクロールした時に、アイテム追加読込中の目印として最終アイテムの下に
+    //         プログレスバーを追加する予定だったが、プログレスバーが追加される前にスクロールしきってしまい、
+    //         プログレスバーが表示される前にスクロールが止まってしまうことがあった。
+    //         これを解消する為、あらかじめにリスト最終アイテムにプログレスバーを追加するようにして、
+    //         読込中はプログレスバーまでスクロールできるようにした。
+    //      2. スクロール読込開始条件として、データベースの読込処理状態を監視していたが、読込完了からRecyclerViewへ
+    //         反映されるまでの間にタイムラグがあるため、その間にスクロール読込開始条件が揃って読込処理が重複してしまう。
+    //         これを解消するために独自のフラグを用意した。
 
     private class ListAdditonalLoadingOnScrollListener extends RecyclerView.OnScrollListener {
 
         @Override
         public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
             super.onScrolled(recyclerView, dx, dy);
+            if (isLoadingListOnScrolled) {
+                return;
+            }
+
+            if (!canLoadList()) {
+                return;
+            }
+
+            if (dy <= 0) {
+                return;
+            }
 
             LinearLayoutManager layoutManager =
                     (LinearLayoutManager) recyclerView.getLayoutManager();
@@ -416,27 +452,88 @@ public class DiaryYearMonthListAdapter extends ListAdapter<DiaryYearMonthListIte
                 // TODO:assert
                 return;
             }
-            int firstVisibleItem = layoutManager.findFirstVisibleItemPosition();
-            int visibleItemCount = recyclerView.getChildCount();
+
+            int lastVisibleItemPosition = layoutManager.findLastVisibleItemPosition();
             int totalItemCount = layoutManager.getItemCount();
             if (totalItemCount <= 0) {
                 // TODO:assert
                 return;
             }
-            int lastItemPosition = totalItemCount - 1;
             RecyclerView.Adapter<?> recyclerViewAdapter = recyclerView.getAdapter();
             if (recyclerViewAdapter == null) {
                 return;
             }
-            int lastItemViewType = recyclerViewAdapter.getItemViewType(lastItemPosition);
-            // MEMO:下記条件"dy > 0"は検索結果リストが更新されたときに
-            //      "RecyclerView.OnScrollListener#onScrolled"が起動するための対策。
-            if (!onScrollLoadingConfirmationListener.isLoading()
-                    && (firstVisibleItem + visibleItemCount) >= totalItemCount
-                    && dy > 0
-                    && lastItemViewType == DiaryYearMonthListAdapter.VIEW_TYPE_DIARY) {
-                onScrollEndItemLoadingListener.Load();
+
+            int lastItemPosition = totalItemCount - 1;
+            if (lastVisibleItemPosition != lastItemPosition) {
+                return;
             }
+
+            int lastItemViewType = recyclerViewAdapter.getItemViewType(lastItemPosition);
+            if (lastItemViewType == VIEW_TYPE_PROGRESS_BAR) {
+                Log.d("OnScrollDiaryList", "DiaryListLoading");
+                loadListOnScrollEnd();
+                isLoadingListOnScrolled = true;
+            }
+        }
+    }
+
+    private class ListLoadingCompleteNotificationAdapterDataObserver extends RecyclerView.AdapterDataObserver {
+        @Override
+        public void onChanged() {
+            Log.d("OnScrollDiaryList", "RecyclerView_OnChanged()");
+            super.onChanged();
+            clearIsLoadingListOnScrolled();
+        }
+
+        @Override
+        public void onItemRangeChanged(int positionStart, int itemCount) {
+            Log.d("OnScrollDiaryList", "RecyclerView_onItemRangeChanged()");
+            super.onItemRangeChanged(positionStart, itemCount);
+            clearIsLoadingListOnScrolled();
+        }
+
+        @Override
+        public void onItemRangeChanged(int positionStart, int itemCount, @Nullable Object payload) {
+            Log.d("OnScrollDiaryList", "RecyclerView_onItemRangeChanged()");
+            super.onItemRangeChanged(positionStart, itemCount, payload);
+            clearIsLoadingListOnScrolled();
+        }
+
+        @Override
+        public void onItemRangeInserted(int positionStart, int itemCount) {
+            Log.d("OnScrollDiaryList", "RecyclerView_onItemRangeInserted()");
+            super.onItemRangeInserted(positionStart, itemCount);
+            clearIsLoadingListOnScrolled();
+        }
+
+        @Override
+        public void onItemRangeRemoved(int positionStart, int itemCount) {
+            Log.d("OnScrollDiaryList", "RecyclerView_onItemRangeRemoved()");
+            super.onItemRangeRemoved(positionStart, itemCount);
+            clearIsLoadingListOnScrolled();
+        }
+
+        @Override
+        public void onItemRangeMoved(int fromPosition, int toPosition, int itemCount) {
+            Log.d("OnScrollDiaryList", "RecyclerView_onItemRangeMoved()");
+            super.onItemRangeMoved(fromPosition, toPosition, itemCount);
+            clearIsLoadingListOnScrolled();
+        }
+
+        @Override
+        public void onStateRestorationPolicyChanged() {
+            Log.d("OnScrollDiaryList", "RecyclerView_onStateRestorationPolicyChanged()");
+            super.onStateRestorationPolicyChanged();
+        }
+    }
+
+    private void clearIsLoadingListOnScrolled() {
+        if (getItemCount() == 0) {
+            return;
+        }
+        if (getItemViewType(0) != DiaryYearMonthListAdapter.VIEW_TYPE_PROGRESS_BAR) {
+            isLoadingListOnScrolled = false;
         }
     }
 

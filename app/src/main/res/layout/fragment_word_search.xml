@@ -71,15 +71,18 @@
                 android:layout_height="match_parent"
                 android:text="@string/fragment_word_search_no_results_message"
                 android:gravity="center_horizontal"
-                android:paddingTop="100dp" />
-            <!--
-                android:visibility="@{word_search_view_model.isVisibleNoResultMessageLiveData ? View.VISIBLE : View.GONE}" -->
+                android:paddingTop="100dp"
+                android:visibility="invisible"
+                tools:visibility="visible"/>
 
             <LinearLayout
                 android:id="@+id/liner_layout_word_search_results"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:orientation="vertical" >
+                android:orientation="vertical"
+                android:visibility="invisible"
+                tools:visibility="visible"
+                >
 
                 <TextView
                     android:id="@+id/text_word_search_results"
@@ -87,9 +90,9 @@
                     android:layout_height="wrap_content"
                     android:text="@{Integer.toString(word_search_view_model.numWordSearchResults) + @string/fragment_word_search_num_results_message}"
                     android:paddingHorizontal="8dp"
-                    android:paddingVertical="8dp" />
-                <!--
-                    android:visibility="@{word_search_view_model.isVisibleNumWordSearchResultsLiveData ? View.VISIBLE : View.INVISIBLE}" -->
+                    android:paddingVertical="8dp"
+                    android:visibility="invisible"
+                    tools:visibility="visible" />
 
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/recycler_word_search_result_list"
@@ -97,8 +100,6 @@
                     android:layout_height="match_parent"
                     android:scrollbars="none"
                     android:transitionGroup="true"/>
-                <!--
-                    android:visibility="@{word_search_view_model.isVisibleResultListLiveData ? View.VISIBLE : View.INVISIBLE}" -->
 
             </LinearLayout>
 
@@ -106,7 +107,8 @@
                 android:id="@+id/frame_layout_full_screen_progress_bar"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:visibility="@{word_search_view_model.isVisibleUpdateProgressBarLiveData ? View.VISIBLE : View.INVISIBLE}" >
+                android:visibility="@{word_search_view_model.isVisibleUpdateProgressBarLiveData ? View.VISIBLE : View.INVISIBLE}"
+                tools:visibility="visible">
 
                 <View
                     android:id="@+id/view_word_search_result_list_progress_bar"

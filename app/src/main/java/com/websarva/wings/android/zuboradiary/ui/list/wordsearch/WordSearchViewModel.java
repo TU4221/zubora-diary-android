@@ -1,9 +1,9 @@
 package com.websarva.wings.android.zuboradiary.ui.list.wordsearch;
 
-import android.renderscript.ScriptGroup;
 import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.style.BackgroundColorSpan;
+import android.util.Log;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
@@ -18,6 +18,8 @@ import java.time.LocalDate;
 import java.time.YearMonth;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CancellationException;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -31,10 +33,9 @@ public class WordSearchViewModel extends ViewModel {
 
     private final DiaryRepository diaryRepository;
     private final MutableLiveData<String> searchWord = new MutableLiveData<>();
-    private Future<?> loadingWordSearchResultListFuture; // キャンセル用
+    private Future<?> wordSearchResultListLoadingFuture; // キャンセル用
     private final MutableLiveData<List<WordSearchResultYearMonthListItem>> wordSearchResultList =
             new MutableLiveData<>();
-    private boolean isLoading;
     private final MutableLiveData<Integer> numWordSearchResults = new MutableLiveData<>();
     // TODO:Visible変数を削除してFragment上で制御できるか検討(UpdateはViewModelの方が簡潔に制御できる？)
     private final MutableLiveData<Boolean> isVisibleUpdateProgressBar = new MutableLiveData<>();
@@ -57,7 +58,6 @@ public class WordSearchViewModel extends ViewModel {
         wordSearchResultList.setValue(new ArrayList<>());
         numWordSearchResults.setValue(0);
         isVisibleUpdateProgressBar.setValue(false);
-        isLoading = false;
         isDiaryListLoadingError.setValue(false);
     }
 
@@ -65,9 +65,19 @@ public class WordSearchViewModel extends ViewModel {
         NEW, UPDATE, ADD
     }
 
+    public boolean canLoadWordSearchResultList() {
+        Log.d("OnScrollDiaryList", "isLoadingDiaryList()");
+        if (wordSearchResultListLoadingFuture == null) {
+            Log.d("OnScrollDiaryList", "wordSearchResultListLoadingFuture == null");
+            return true;
+        }
+        return wordSearchResultListLoadingFuture.isDone();
+    }
+
     public void loadWordSearchResultList(LoadType loadType, int spannableStringBackGroundColor){
-        if (loadingWordSearchResultListFuture != null && !loadingWordSearchResultListFuture.isDone()) {
-            loadingWordSearchResultListFuture.cancel(true);
+        if (!canLoadWordSearchResultList()) {
+            Log.d("WordSearchLoading","Cancel");
+            wordSearchResultListLoadingFuture.cancel(true);
         }
         String searchWord = this.searchWord.getValue();
         if (searchWord == null || searchWord.isEmpty()) {
@@ -77,7 +87,7 @@ public class WordSearchViewModel extends ViewModel {
         }
         Runnable loadWordSearchResultList =
                 new loadWordSearchResultList(loadType, searchWord, spannableStringBackGroundColor);
-        loadingWordSearchResultListFuture = executorService.submit(loadWordSearchResultList);
+        wordSearchResultListLoadingFuture = executorService.submit(loadWordSearchResultList);
     }
 
     private class loadWordSearchResultList implements Runnable {
@@ -87,19 +97,19 @@ public class WordSearchViewModel extends ViewModel {
 
         public loadWordSearchResultList(
                 LoadType loadType, String searchWord, int spannableStringBackGroundColor) {
-            // TODO:非同期処理中に値が変わらないようにしたい
             this.loadType = loadType;
             this.searchWord = searchWord;
             this.spannableStringBackGroundColor = spannableStringBackGroundColor;
         }
         @Override
         public void run() {
+            boolean isValidityDelay = true;// TODO:調整用
+            Log.d("WordSearchLoading", "run()_start");
             List<WordSearchResultYearMonthListItem> previousResultList = new ArrayList<>();
             try {
                 // 日記リスト読込準備
                 List<WordSearchResultYearMonthListItem> currentResultList =
-                                                                wordSearchResultList.getValue();
-                isLoading = true;
+                        wordSearchResultList.getValue();
                 int numLoadingItems;
                 int loadingOffset;
                 if (loadType == LoadType.UPDATE) {
@@ -141,20 +151,19 @@ public class WordSearchViewModel extends ViewModel {
 
                 // ProgressBar表示
                 List<WordSearchResultYearMonthListItem> resultListContainingProgressBar = new ArrayList<>();
-                if (loadType != LoadType.NEW) {
-                    resultListContainingProgressBar.addAll(previousResultList);
-                }
-                if (loadType != LoadType.UPDATE) {
+                if (loadType == LoadType.NEW) {
                     WordSearchResultYearMonthListItem progressBar =
                             new WordSearchResultYearMonthListItem(
                                     DiaryYearMonthListAdapter.VIEW_TYPE_PROGRESS_BAR
                             );
                     resultListContainingProgressBar.add(progressBar);
+                    wordSearchResultList.postValue(resultListContainingProgressBar);
                 }
-                wordSearchResultList.postValue(resultListContainingProgressBar);
 
-                // TODO:ProgressBarを表示させる為に仮で記述
-                Thread.sleep(1000);
+                if (isValidityDelay) {
+                    // TODO:ProgressBarを表示させる為に仮で記述
+                    Thread.sleep(1000);
+                }
 
                 // 日記リスト読込
                 Integer numWordSearchResults;
@@ -163,14 +172,6 @@ public class WordSearchViewModel extends ViewModel {
                 if (loadType == LoadType.NEW || loadType == LoadType.UPDATE) {
                     ListenableFuture<Integer> listenableFutureResult =
                             diaryRepository.countWordSearchResults(searchWord);
-                    // 検索文字が変更された時、カウントキャンセル
-                    // TODO:下記while意味ある？
-                    while (!listenableFutureResult.isDone()) {
-                        if (Thread.currentThread().isInterrupted()) {
-                            listenableFutureResult.cancel(true);
-                            throw new InterruptedException();
-                        }
-                    }
                     numWordSearchResults = listenableFutureResult.get();
                 } else {
                     // loadType == LoadType.ADD
@@ -188,14 +189,6 @@ public class WordSearchViewModel extends ViewModel {
                                 searchWord
                         );
 
-                // 検索文字が変更された時、リスト読込キャンセル
-                // TODO:下記while意味ある？
-                while (!listenableFutureResults.isDone()) {
-                    if (Thread.currentThread().isInterrupted()) {
-                        listenableFutureResults.cancel(true);
-                        throw new InterruptedException();
-                    }
-                }
                 List<WordSearchResultListItem> loadingData = listenableFutureResults.get();
                 if (!loadingData.isEmpty()) {
                     convertedLoadingData = toWordSearchResultYearMonthListFormat(loadingData, searchWord, spannableStringBackGroundColor);
@@ -209,13 +202,20 @@ public class WordSearchViewModel extends ViewModel {
                         WordSearchResultYearMonthListItem cloneItem = item.clone();
                         updateResultList.add(cloneItem);
                     }
+                    int updateResultListLastItemPosition = updateResultList.size() - 1;
+                    WordSearchResultYearMonthListItem diaryYearMonthListItem =
+                            updateResultList.get(updateResultListLastItemPosition);
+                    if (diaryYearMonthListItem.getViewType() != DiaryYearMonthListAdapter.VIEW_TYPE_DIARY) {
+                        updateResultList.remove(updateResultListLastItemPosition);
+                    }
                 }
 
                 // 読込データを更新用日記リストへ追加
                 if (!convertedLoadingData.isEmpty()) {
                     if (loadType == LoadType.ADD) {
                         // 前回の読込リストの最終アイテムの年月取得
-                        int previousResultListLastItemPosition = previousResultList.size() - 1;
+                        int previousResultListProgressBar = previousResultList.size() - 1;
+                        int previousResultListLastItemPosition = previousResultListProgressBar - 1;
                         WordSearchResultYearMonthListItem previousResultYearMonthListLastItem =
                                 previousResultList.get(previousResultListLastItemPosition);
                         YearMonth previousResultYearMonthListLastItemYearMonth =
@@ -242,26 +242,50 @@ public class WordSearchViewModel extends ViewModel {
                 }
 
                 // 次回読み込む日記あり確認
-                boolean existsUnloadedResults =
-                        countDiaryListDayItem(updateResultList) < numWordSearchResults;
-                if (numWordSearchResults > 0 && !existsUnloadedResults) {
-                    WordSearchResultYearMonthListItem noDiaryMessage =
-                            new WordSearchResultYearMonthListItem(
-                                    DiaryYearMonthListAdapter.VIEW_TYPE_NO_DIARY_MESSAGE
-                            );
-                    updateResultList.add(noDiaryMessage);
+                if (!updateResultList.isEmpty()) {
+                    boolean existsUnloadedResults =
+                            countDiaryListDayItem(updateResultList) < numWordSearchResults;
+                    if (numWordSearchResults > 0 && !existsUnloadedResults) {
+                        WordSearchResultYearMonthListItem noDiaryMessage =
+                                new WordSearchResultYearMonthListItem(
+                                        DiaryYearMonthListAdapter.VIEW_TYPE_NO_DIARY_MESSAGE
+                                );
+                        updateResultList.add(noDiaryMessage);
+                    } else {
+                        WordSearchResultYearMonthListItem noDiaryMessage =
+                                new WordSearchResultYearMonthListItem(
+                                        DiaryYearMonthListAdapter.VIEW_TYPE_PROGRESS_BAR
+                                );
+                        updateResultList.add(noDiaryMessage);
+                    }
                 }
+
 
                 // 日記リスト読込完了処理
                 WordSearchViewModel.this.numWordSearchResults.postValue(numWordSearchResults);
                 wordSearchResultList.postValue(updateResultList);
-            } catch (Exception e) {
+            } catch (CancellationException e) {
+                Log.d("WordSearchLoading","Exception");
+                e.printStackTrace();
+                // 例外処理なし
+
+            } catch (ExecutionException e) {
                 e.printStackTrace();
                 wordSearchResultList.postValue(previousResultList);
                 isDiaryListLoadingError.postValue(true);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+                if (!isValidityDelay) {
+                    // TODO:ProgressBarを表示させる為に仮で記述
+                    wordSearchResultList.postValue(previousResultList);
+                    isDiaryListLoadingError.postValue(true);
+                }
             } finally {
                 isVisibleUpdateProgressBar.postValue(false);
-                isLoading = false;
+                Log.d("WordSearchLoading","run()_end");
+                Log.d("WordSearchLoading","LoadType:" + loadType);
+                Log.d("WordSearchLoading","SearchWord:" + searchWord);
+                Log.d("WordSearchLoading","SpannableStringBackGroundColor:" + spannableStringBackGroundColor);
             }
 
         }
@@ -402,11 +426,6 @@ public class WordSearchViewModel extends ViewModel {
     // エラー関係
     public void clearIsDiaryListLoadingError() {
         isDiaryListLoadingError.setValue(false);
-    }
-
-    // Getter
-    public boolean getIsLoading() {
-        return isLoading;
     }
 
     // LiveDataGetter

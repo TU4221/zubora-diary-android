@@ -2,7 +2,6 @@ package com.websarva.wings.android.zuboradiary.ui.list.diarylist;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
@@ -11,7 +10,6 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.widget.Toolbar;
-import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.LifecycleEventObserver;
 import androidx.lifecycle.LifecycleOwner;
@@ -23,8 +21,6 @@ import androidx.navigation.NavController;
 import androidx.navigation.NavDestination;
 import androidx.navigation.NavDirections;
 import androidx.navigation.fragment.NavHostFragment;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.LinearSmoothScroller;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.transition.platform.MaterialFadeThrough;
@@ -235,37 +231,25 @@ public class DiaryListFragment extends CustomFragment {
 
     // 日記リスト(年月)設定
     private void setUpDiaryList() {
-        DiaryYearMonthListAdapter diaryYearMonthListAdapter =
-                new DiaryYearMonthListAdapter(
+        DiaryListAdapter diaryListAdapter =
+                new DiaryListAdapter(
                         requireContext(),
                         binding.recyclerDiaryYearMonthList,
-                        new DiaryYearMonthListAdapter.OnScrollEndItemLoadingListener() {
-                            @Override
-                            public void Load() {
-                                diaryListViewModel.loadList(DiaryListViewModel.LoadType.ADD);
-                            }
-                        },
-                        new DiaryYearMonthListAdapter.OnScrollLoadingConfirmationListener() {
-                            @Override
-                            public boolean isLoading() {
-                                return diaryListViewModel.getIsLoading();
-                            }
-                        },
-                        new DiaryYearMonthListAdapter.OnClickChildItemListener() {
-                            @Override
-                            public void onClick(LocalDate date) {
-                                showShowDiaryFragment(date);
-                            }
-                        },
-                        true,
-                        new DiaryYearMonthListAdapter.OnClickChildItemBackgroundButtonListener() {
-                            @Override
-                            public void onClick(LocalDate date) {
-                                showDiaryDeleteConfirmationDialog(date);
-                            }
-                        }
+                        true
                 );
-        diaryYearMonthListAdapter.build();
+        diaryListAdapter.build();
+        diaryListAdapter.setOnClickChildItemListener(new DiaryYearMonthListAdapter.OnClickChildItemListener() {
+            @Override
+            public void onClick(LocalDate date) {
+                showShowDiaryFragment(date);
+            }
+        });
+        diaryListAdapter.setOnClickChildItemBackgroundButtonListener(new DiaryYearMonthListAdapter.OnClickChildItemBackgroundButtonListener() {
+            @Override
+            public void onClick(LocalDate date) {
+                showDiaryDeleteConfirmationDialog(date);
+            }
+        });
 
         diaryListViewModel.getDiaryListLiveData().observe(
                 getViewLifecycleOwner(),
@@ -291,18 +275,6 @@ public class DiaryListFragment extends CustomFragment {
                         }
 
                         List<DiaryYearMonthListItemBase> convertedList = new ArrayList<>(diaryListItems);
-
-                        Log.d("DiaryList", "submitList前");
-                        for (DiaryYearMonthListItemBase i: convertedList) {
-                            YearMonth  yearMonth = i.getYearMonth();
-                            if (yearMonth == null) {
-                                Log.d("DiaryList", "null");
-                            } else {
-                                Log.d("DiaryList", yearMonth.toString());
-                            }
-                        }
-                        Log.d("DiaryList", "submitList");
-                        Log.d("ListAdapterTest", "submitList");
                         diaryYearMonthListAdapter.submitList(convertedList);
                     }
                 }
@@ -318,6 +290,23 @@ public class DiaryListFragment extends CustomFragment {
         });
 
         loadDiaryList();
+    }
+
+    private class DiaryListAdapter extends DiaryYearMonthListAdapter {
+
+        public DiaryListAdapter(Context context, RecyclerView recyclerView, boolean canSwipeItem) {
+            super(context, recyclerView, canSwipeItem);
+        }
+
+        @Override
+        public void loadListOnScrollEnd() {
+            diaryListViewModel.loadList(DiaryListViewModel.LoadType.ADD);
+        }
+
+        @Override
+        public boolean canLoadList() {
+            return diaryListViewModel.canLoadDiaryList();
+        }
     }
 
     private void loadDiaryList() {

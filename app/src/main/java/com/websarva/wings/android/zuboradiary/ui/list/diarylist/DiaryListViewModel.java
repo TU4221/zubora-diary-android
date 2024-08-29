@@ -18,10 +18,11 @@ import java.time.YearMonth;
 import java.time.temporal.TemporalAdjusters;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CancellationException;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 
@@ -31,9 +32,11 @@ import dagger.hilt.android.lifecycle.HiltViewModel;
 public class DiaryListViewModel extends ViewModel {
 
     private final DiaryRepository diaryRepository;
-    private Future<?> loadingDiaryListFuture; // キャンセル用
+    private Future<?> diaryListLoadingFuture; // キャンセル用
     private final MutableLiveData<List<DiaryYearMonthListItem>> diaryList = new MutableLiveData<>();
-    private boolean isLoading;
+    /**
+     * データベース読込からRecyclerViewへの反映までを true とする。
+     */
     // TODO:Visible変数を削除してFragment上で制御できるか検討(UpdateはViewModelの方が簡潔に制御できる？)
     private final MutableLiveData<Boolean> isVisibleUpdateProgressBar = new MutableLiveData<>();
     private static final int NUM_LOADING_ITEMS = 10; //リストが画面全体に表示される値にすること。 // TODO:仮数値の為、最後に設定
@@ -53,9 +56,8 @@ public class DiaryListViewModel extends ViewModel {
         initialize();
     }
 
-    public void initialize() {
+     private void initialize() {
         diaryList.setValue(new ArrayList<>());
-        isLoading = false;
         isVisibleUpdateProgressBar.setValue(false);
         isVisibleUpdateProgressBar.setValue(false);
         sortConditionDate = null;
@@ -68,19 +70,32 @@ public class DiaryListViewModel extends ViewModel {
         NEW, UPDATE, ADD
     }
 
-    public void loadList(LoadType loadType) {
-        if (loadingDiaryListFuture != null && !loadingDiaryListFuture.isDone()) {
-            loadingDiaryListFuture.cancel(true);
+    public boolean canLoadDiaryList() {
+        Log.d("OnScrollDiaryList", "isLoadingDiaryList()");
+        if (diaryListLoadingFuture == null) {
+            Log.d("OnScrollDiaryList", "diaryListLoadingFuture == null");
+            return true;
         }
-        loadingDiaryListFuture = executorService.submit(new Runnable() {
+        return diaryListLoadingFuture.isDone();
+    }
+
+    public void loadList(LoadType loadType) {
+        // 先頭年月切替で切替中に再度切り替えられた時に前回の読込処理キャンセル
+        if (!canLoadDiaryList()) {
+            diaryListLoadingFuture.cancel(true);
+        }
+        Log.d("OnScrollDiaryList", "loadList()_start");
+        diaryListLoadingFuture = executorService.submit(new Runnable() {
             @Override
             public void run() {
+                boolean isValidityDelay = true;// TODO:調整用
+                Log.d("DiaryListLoading", "run()_start");
                 List<DiaryYearMonthListItem> previousDiaryList = new ArrayList<>();
                 try {
                     // 日記リスト読込準備
                     Log.d("DiaryListLoading", "prepare");
                     List<DiaryYearMonthListItem> currentDiaryList = diaryList.getValue();
-                    isLoading = true;
+                    Log.d("DiaryListLoading", "currentDiaryListSize:" + currentDiaryList.size());
                     if (loadType == LoadType.UPDATE) {
                         isVisibleUpdateProgressBar.postValue(true);
                     } else {
@@ -126,20 +141,19 @@ public class DiaryListViewModel extends ViewModel {
 
                     // ProgressBar表示
                     List<DiaryYearMonthListItem> diaryListContainingProgressBar = new ArrayList<>();
-                    if (loadType != LoadType.NEW) {
-                        diaryListContainingProgressBar.addAll(previousDiaryList);
-                    }
-                    if (loadType != LoadType.UPDATE) {
+                    if (loadType == LoadType.NEW) {
                         DiaryYearMonthListItem progressBar =
                                 new DiaryYearMonthListItem(
                                         DiaryYearMonthListAdapter.VIEW_TYPE_PROGRESS_BAR
                                 );
                         diaryListContainingProgressBar.add(progressBar);
+                        diaryList.postValue(diaryListContainingProgressBar);
                     }
-                    diaryList.postValue(diaryListContainingProgressBar);
 
-                    // TODO:ProgressBarを表示させる為に仮で記述
-                    Thread.sleep(1000);
+                    if (isValidityDelay) {
+                        // TODO:ProgressBarを表示させる為に仮で記述
+                        Thread.sleep(1000);
+                    }
 
                     // 日記リスト読込
                     Log.d("DiaryListLoading", "startLoading");
@@ -147,15 +161,14 @@ public class DiaryListViewModel extends ViewModel {
                     List<DiaryYearMonthListItem> convertedLoadingData = new ArrayList<>();
                     ListenableFuture<Integer> listenableFuture =
                             diaryRepository.countDiaries(sortConditionDate);
-                    // 日付が変更された時、カウントキャンセル
-                    // TODO:下記while意味ある？
-                    while (!listenableFuture.isDone()) {
-                        if (Thread.currentThread().isInterrupted()) {
-                            listenableFuture.cancel(true);
-                            throw new InterruptedException();
-                        }
+                    if (sortConditionDate == null) {
+                        Log.d("DiaryListLoading", "NoUnloadedDiaries_sortConditionDate:null");
+                    } else {
+                        Log.d("DiaryListLoading", "NoUnloadedDiaries_sortConditionDate:nullでない");
                     }
                     numExistingDiaries = listenableFuture.get();
+                    Log.d("OnScrollDiaryList", " numLoadingItems:" +  numLoadingItems);
+                    Log.d("OnScrollDiaryList", " loadingOffset:" +  loadingOffset);
                     ListenableFuture<List<DiaryListItem>> listListenableFuture =
                             diaryRepository.selectDiaryListOrderByDateDesc(
                                     numLoadingItems,
@@ -164,13 +177,6 @@ public class DiaryListViewModel extends ViewModel {
                             );
 
                     // 日付が変更された時、リスト読込キャンセル
-                    // TODO:下記while意味ある？
-                    while (!listListenableFuture.isDone()) {
-                        if (Thread.currentThread().isInterrupted()) {
-                            listListenableFuture.cancel(true);
-                            throw new InterruptedException();
-                        }
-                    }
                     List<DiaryListItem> loadingData = listListenableFuture.get();
                     if (!loadingData.isEmpty()) {
                         convertedLoadingData = toDiaryYearMonthListFormat(loadingData);
@@ -183,6 +189,12 @@ public class DiaryListViewModel extends ViewModel {
                             DiaryYearMonthListItem cloneItem = item.clone();
                             updateDiaryList.add(cloneItem);
                         }
+                        int updateDiaryListLastItemPosition = updateDiaryList.size() - 1;
+                        DiaryYearMonthListItem diaryYearMonthListItem =
+                                updateDiaryList.get(updateDiaryListLastItemPosition);
+                        if (diaryYearMonthListItem.getViewType() != DiaryYearMonthListAdapter.VIEW_TYPE_DIARY) {
+                            updateDiaryList.remove(updateDiaryListLastItemPosition);
+                        }
                     }
 
                     // 読込データを更新用日記リストへ追加
@@ -190,7 +202,8 @@ public class DiaryListViewModel extends ViewModel {
                     if (!convertedLoadingData.isEmpty()) {
                         if (loadType == LoadType.ADD) {
                             // 前回の読込リストの最終アイテムの年月取得
-                            int previousDiaryListLastItemPosition = previousDiaryList.size() - 1;
+                            int previousDiaryListProgressBar = previousDiaryList.size() - 1;
+                            int previousDiaryListLastItemPosition = previousDiaryListProgressBar - 1;
                             DiaryYearMonthListItem previousDiaryYearMonthListLastItem =
                                     previousDiaryList.get(previousDiaryListLastItemPosition);
                             YearMonth previousDiaryYearMonthListLastItemYearMonth =
@@ -220,25 +233,45 @@ public class DiaryListViewModel extends ViewModel {
                     boolean existsUnloadedDiaries =
                             countDiaryListDayItem(updateDiaryList) < numExistingDiaries;
                     if (numExistingDiaries > 0 && !existsUnloadedDiaries) {
+                        Log.d("DiaryListLoading", "NoUnloadedDiaries");
+                        Log.d("DiaryListLoading", "NoUnloadedDiaries_count" + countDiaryListDayItem(updateDiaryList));
+                        Log.d("DiaryListLoading", "NoUnloadedDiaries_numExistingDiaries" + numExistingDiaries);
                         DiaryYearMonthListItem noDiaryMessage =
                                 new DiaryYearMonthListItem(
                                         DiaryYearMonthListAdapter.VIEW_TYPE_NO_DIARY_MESSAGE
+                                );
+                        updateDiaryList.add(noDiaryMessage);
+                    } else {
+                        DiaryYearMonthListItem noDiaryMessage =
+                                new DiaryYearMonthListItem(
+                                        DiaryYearMonthListAdapter.VIEW_TYPE_PROGRESS_BAR
                                 );
                         updateDiaryList.add(noDiaryMessage);
                     }
 
                     // 日記リスト読込完了処理
                     diaryList.postValue(updateDiaryList);
-                } catch (Exception e) {
+                } catch (CancellationException e) {
+                    e.printStackTrace();
+                    // 例外処理なし
+
+                } catch (ExecutionException e) {
                     e.printStackTrace();
                     diaryList.postValue(previousDiaryList);
                     isDiaryListLoadingError.postValue(true);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                    if (!isValidityDelay) {
+                        diaryList.postValue(previousDiaryList);
+                        isDiaryListLoadingError.postValue(true);
+                    }
                 } finally {
                     isVisibleUpdateProgressBar.postValue(false);
-                    isLoading = false;
+                    Log.d("DiaryListLoading", "run()_end");
                 }
             }
         });
+        Log.d("OnScrollDiaryList", "loadList()_end");
     }
 
     private int countDiaryListDayItem(List<DiaryYearMonthListItem> diaryList) {
@@ -367,11 +400,6 @@ public class DiaryListViewModel extends ViewModel {
 
     public void clearIsDiaryDeleteError() {
         isDiaryDeleteError.setValue(false);
-    }
-
-    // Getter
-    public boolean getIsLoading() {
-        return isLoading;
     }
 
     // LiveDataGetter

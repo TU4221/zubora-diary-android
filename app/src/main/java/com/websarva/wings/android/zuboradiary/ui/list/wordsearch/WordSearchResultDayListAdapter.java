@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.websarva.wings.android.zuboradiary.R;
 import com.websarva.wings.android.zuboradiary.data.DayOfWeekConverter;
 import com.websarva.wings.android.zuboradiary.databinding.RowWordSearchResultListBinding;
+import com.websarva.wings.android.zuboradiary.ui.list.diarylist.DiaryDayListAdapter;
 
 import java.time.LocalDate;
 
@@ -23,14 +24,12 @@ public class WordSearchResultDayListAdapter
 
     private final Context context;
     private final RecyclerView recyclerView;
-    private final OnClickItemListener onClickItemListener;
+    private OnClickItemListener onClickItemListener;
 
-    public WordSearchResultDayListAdapter(
-            Context context, RecyclerView recyclerView, OnClickItemListener onClickItemListener){
+    public WordSearchResultDayListAdapter(Context context, RecyclerView recyclerView){
         super(new WordSearchResultDayListDiffUtilItemCallback());
         this.context = context;
         this.recyclerView = recyclerView;
-        this.onClickItemListener = onClickItemListener;
     }
 
     public void build() {
@@ -69,6 +68,9 @@ public class WordSearchResultDayListAdapter
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if (onClickItemListener == null) {
+                    return;
+                }
                 onClickItemListener.onClick(date);
             }
         });
@@ -77,6 +79,10 @@ public class WordSearchResultDayListAdapter
     @FunctionalInterface
     public interface OnClickItemListener {
         void onClick(LocalDate date);
+    }
+
+    public void setOnClickItemListener(OnClickItemListener onClickItemListener) {
+        this.onClickItemListener = onClickItemListener;
     }
 
     public static class WordSearchResultDayViewHolder extends RecyclerView.ViewHolder {

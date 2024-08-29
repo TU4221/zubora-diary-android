@@ -39,19 +39,24 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:gravity="center"
-                android:text="@string/fragment_diary_list_no_saved_diary_message"/>
+                android:text="@string/fragment_diary_list_no_saved_diary_message"
+                android:visibility="invisible"
+                tools:visibility="visible"/>
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/recycler_diary_year_month_list"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:scrollbars="none"
-                android:transitionGroup="true"/>
+                android:transitionGroup="true"
+                android:visibility="invisible"
+                tools:visibility="visible"/>
 
             <FrameLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:visibility="@{list_view_model.isVisibleUpdateProgressBarLiveData ? View.VISIBLE : View.INVISIBLE}">
+                android:visibility="@{list_view_model.isVisibleUpdateProgressBarLiveData ? View.VISIBLE : View.INVISIBLE}"
+                tools:visibility="visible">
 
                 <View
                     android:id="@+id/view_diary_list_progress_bar"

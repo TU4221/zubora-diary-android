@@ -16,6 +16,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.websarva.wings.android.zuboradiary.data.DayOfWeekConverter;
 import com.websarva.wings.android.zuboradiary.databinding.RowDiaryDayListBinding;
+import com.websarva.wings.android.zuboradiary.ui.list.DiaryYearMonthListAdapter;
 
 import java.time.LocalDate;
 
@@ -23,19 +24,13 @@ public class DiaryDayListAdapter extends ListAdapter<DiaryDayListItem, DiaryDayL
 
     private final Context context;
     private final RecyclerView recyclerView;
-    private final OnClickItemListener onClickItemListener;
-    private final OnClickDeleteButtonListener onClickDeleteButtonListener;
+    private OnClickItemListener onClickItemListener;
+    private OnClickDeleteButtonListener onClickDeleteButtonListener;
 
-    public DiaryDayListAdapter(
-            Context context,
-            RecyclerView recyclerView,
-            OnClickItemListener onClickItemListener,
-            OnClickDeleteButtonListener onClickDeleteButtonListener) {
+    public DiaryDayListAdapter(Context context, RecyclerView recyclerView) {
         super(new DiaryDayListDiffUtilItemCallback());
         this.context = context;
         this.recyclerView = recyclerView;
-        this.onClickItemListener = onClickItemListener;
-        this.onClickDeleteButtonListener = onClickDeleteButtonListener;
     }
 
     public void build() {
@@ -71,6 +66,9 @@ public class DiaryDayListAdapter extends ListAdapter<DiaryDayListItem, DiaryDayL
         holder.binding.linerLayoutForeground.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if (onClickItemListener == null) {
+                    return;
+                }
                 onClickItemListener.onClick(date);
             }
         });
@@ -78,6 +76,9 @@ public class DiaryDayListAdapter extends ListAdapter<DiaryDayListItem, DiaryDayL
         holder.binding.includeBackground.imageButtonDelete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if (onClickDeleteButtonListener == null) {
+                    return;
+                }
                 onClickDeleteButtonListener.onClick(date);
             }
         });
@@ -108,9 +109,17 @@ public class DiaryDayListAdapter extends ListAdapter<DiaryDayListItem, DiaryDayL
         void onClick(LocalDate date);
     }
 
+    public void setOnClickItemListener(OnClickItemListener onClickItemListener) {
+        this.onClickItemListener = onClickItemListener;
+    }
+
     @FunctionalInterface
     public interface OnClickDeleteButtonListener {
         void onClick(LocalDate date);
+    }
+
+    public void setOnClickDeleteButtonListener(OnClickDeleteButtonListener onClickDeleteButtonListener) {
+        this.onClickDeleteButtonListener = onClickDeleteButtonListener;
     }
 
     public static class DiaryDayListDiffUtilItemCallback extends DiffUtil.ItemCallback<DiaryDayListItem> {

@@ -1,10 +1,10 @@
 package com.websarva.wings.android.zuboradiary.ui.list.wordsearch;
 
+import android.content.Context;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.LifecycleEventObserver;
 import androidx.lifecycle.LifecycleOwner;
@@ -254,36 +254,19 @@ public class WordSearchFragment extends CustomFragment {
     }
 
     private void setUpWordSearchResultList() {
-        DiaryYearMonthListAdapter wordSearchResultYearMonthListAdapter =
-                new DiaryYearMonthListAdapter(
+        WordSearchResultListAdapter wordSearchResultListAdapter =
+                new WordSearchResultListAdapter(
                         requireContext(),
                         binding.recyclerWordSearchResultList,
-                        new DiaryYearMonthListAdapter.OnScrollEndItemLoadingListener() {
-                            @Override
-                            public void Load() {
-                                wordSearchViewModel
-                                        .loadWordSearchResultList(
-                                                WordSearchViewModel.LoadType.ADD,
-                                                getResources().getColor(R.color.gray) // TODO:テーマカラーで切替
-                                        );
-                            }
-                        },
-                        new DiaryYearMonthListAdapter.OnScrollLoadingConfirmationListener() {
-                            @Override
-                            public boolean isLoading() {
-                                return wordSearchViewModel.getIsLoading();
-                            }
-                        },
-                        new DiaryYearMonthListAdapter.OnClickChildItemListener() {
-                            @Override
-                            public void onClick(LocalDate date) {
-                                showShowDiaryFragment(date);
-                            }
-                        },
-                        false,
-                        null
+                        false
                 );
-        wordSearchResultYearMonthListAdapter.build();
+        wordSearchResultListAdapter.build();
+        wordSearchResultListAdapter.setOnClickChildItemListener(new DiaryYearMonthListAdapter.OnClickChildItemListener() {
+            @Override
+            public void onClick(LocalDate date) {
+                showShowDiaryFragment(date);
+            }
+        });
 
         // データベースから読み込んだ日記リストをリサクラービューに反映
         wordSearchViewModel.getWordSearchResultListLiveData()
@@ -364,6 +347,27 @@ public class WordSearchFragment extends CustomFragment {
                 return true;
             }
         });
+    }
+
+    private class WordSearchResultListAdapter extends DiaryYearMonthListAdapter {
+
+        public WordSearchResultListAdapter(Context context, RecyclerView recyclerView, boolean canSwipeItem) {
+            super(context, recyclerView, canSwipeItem);
+        }
+
+        @Override
+        public void loadListOnScrollEnd() {
+            wordSearchViewModel
+                    .loadWordSearchResultList(
+                            WordSearchViewModel.LoadType.ADD,
+                            getResources().getColor(R.color.gray) // TODO:テーマカラーで切替
+                    );
+        }
+
+        @Override
+        public boolean canLoadList() {
+            return wordSearchViewModel.canLoadWordSearchResultList();
+        }
     }
 
     private void setUpErrorObserver() {
