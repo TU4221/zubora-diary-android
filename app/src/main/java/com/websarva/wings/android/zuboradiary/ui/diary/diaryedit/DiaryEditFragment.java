@@ -489,8 +489,7 @@ public class DiaryEditFragment extends CustomFragment {
                     showLoadingExistingDiaryDialog(date);
                 } else {
                     // 読込確認Dialog表示時は、確認後下記処理を行う。
-                    LocalDate loadedDate = diaryEditViewModel.getLoadedDateLiveData().getValue();
-                    if (loadedDate != null && !date.equals(lastSelectedDate)) {
+                    if (!date.equals(lastSelectedDate)) {
                         fetchWeatherInformation(date);
                     }
                 }
@@ -617,8 +616,11 @@ public class DiaryEditFragment extends CustomFragment {
                     @Override
                     public void onChanged(Boolean aBoolean) {
                         if (aBoolean == null) {
+                            Log.d("20240829", "getHasUpdatedLocationLiveData():null");
                             return;
                         }
+                        Log.d("20240829", "getHasUpdatedLocationLiveData():" + aBoolean);
+                        Log.d("20240829", "shouldPrepareWeatherSelection:" + shouldPrepareWeatherSelection);
                         if (aBoolean && shouldPrepareWeatherSelection) {
                             LocalDate date = diaryEditViewModel.getDateLiveData().getValue();
                             if (date == null) {
@@ -1173,6 +1175,11 @@ public class DiaryEditFragment extends CustomFragment {
     }
 
     private void showWeatherInformationDialog(LocalDate date) {
+        // 今日の日付以降は天気情報を取得できないためダイアログ表示不要
+        LocalDate currentDate = LocalDate.now();
+        if (date.isAfter(currentDate)) {
+            return;
+        }
         NavDirections action =
                 DiaryEditFragmentDirections
                         .actionDiaryEditFragmentToWeatherInformationDialog(date);
