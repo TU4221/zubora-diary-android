@@ -40,6 +40,7 @@ import com.websarva.wings.android.zuboradiary.databinding.CalendarDayBinding;
 import com.websarva.wings.android.zuboradiary.databinding.CalendarHeaderBinding;
 import com.websarva.wings.android.zuboradiary.databinding.FragmentCalendarBinding;
 import com.websarva.wings.android.zuboradiary.data.DateConverter;
+import com.websarva.wings.android.zuboradiary.ui.BaseFragment;
 import com.websarva.wings.android.zuboradiary.ui.CustomFragment;
 import com.websarva.wings.android.zuboradiary.ui.diary.DiaryLiveData;
 import com.websarva.wings.android.zuboradiary.ui.diary.diaryshow.DiaryShowFragment;
@@ -67,13 +68,12 @@ import java.util.stream.Stream;
 import dagger.hilt.android.AndroidEntryPoint;
 
 @AndroidEntryPoint
-public class CalendarFragment extends CustomFragment {
+public class CalendarFragment extends BaseFragment {
 
     // View関係
     private FragmentCalendarBinding binding;
 
     // Navigation関係
-    private NavController navController;
     private boolean shouldShowDiaryLoadingErrorDialog;
 
     // ViewModel
@@ -89,10 +89,6 @@ public class CalendarFragment extends CustomFragment {
         calendarViewModel = provider.get(CalendarViewModel.class);
         diaryShowViewModel = provider.get(DiaryShowViewModel.class);
         settingsViewModel = provider.get(SettingsViewModel.class);
-
-        // Navigation設定
-        navController = NavHostFragment.findNavController(this);
-
     }
 
     public View onCreateView(
@@ -130,8 +126,6 @@ public class CalendarFragment extends CustomFragment {
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        setUpDiaryShowFragmentResultReceiver();
-        setUpDialogResultReceiver();
         setUpErrorObserver();
         setUpCalendar();
         setUpDiaryShow();
@@ -139,17 +133,11 @@ public class CalendarFragment extends CustomFragment {
         setUpBottomLayout();
     }
 
-    // 日記表示フラグメントからデータ受取設定
-    private void setUpDiaryShowFragmentResultReceiver() {
-        NavBackStackEntry navBackStackEntry = navController.getCurrentBackStackEntry();
-        if (navBackStackEntry == null) {
-            return;
-        }
-        SavedStateHandle savedStateHandle =
-                navController.getCurrentBackStackEntry().getSavedStateHandle();
-        MutableLiveData<LocalDate> _showedDiaryDateLiveData =
+    @Override
+    protected void handleOnReceivedResultFromPreviousFragment(@NonNull SavedStateHandle savedStateHandle) {
+        MutableLiveData<LocalDate> showedDiaryDateLiveData =
                 savedStateHandle.getLiveData(DiaryShowFragment.KEY_SHOWED_DIARY_DATE);
-        _showedDiaryDateLiveData.observe(getViewLifecycleOwner(), new Observer<LocalDate>() {
+        showedDiaryDateLiveData.observe(getViewLifecycleOwner(), new Observer<LocalDate>() {
             @Override
             public void onChanged(LocalDate localDate) {
                 calendarViewModel.updateSelectedDate(localDate);
@@ -158,34 +146,14 @@ public class CalendarFragment extends CustomFragment {
         });
     }
 
-    private void setUpDialogResultReceiver() {
-        NavBackStackEntry navBackStackEntry = navController.getCurrentBackStackEntry();
-        if (navBackStackEntry == null) {
-            return;
-        }
-        LifecycleEventObserver lifecycleEventObserver = new LifecycleEventObserver() {
-            @Override
-            public void onStateChanged(
-                    @NonNull LifecycleOwner lifecycleOwner, @NonNull Lifecycle.Event event) {
-                // MEMO:Dialog表示中:Lifecycle.Event.ON_PAUSE
-                //      Dialog非表示中:Lifecycle.Event.ON_RESUME
-                Log.d("LifecycleEventObserver", "CalendarFragment_NavBackStackEntry_event:" + event);
-                if (event.equals(Lifecycle.Event.ON_RESUME)) {
-                    retryErrorDialogShow();
-                }
-            }
-        };
-        navBackStackEntry.getLifecycle().addObserver(lifecycleEventObserver);
-        getViewLifecycleOwner().getLifecycle().addObserver(new LifecycleEventObserver() {
-            @Override
-            public void onStateChanged(@NonNull LifecycleOwner lifecycleOwner, @NonNull Lifecycle.Event event) {
-                Log.d("LifecycleEventObserver", "CalendarFragment_ViewLifecycleOwner_event:" + event);
-                if (event.equals(Lifecycle.Event.ON_DESTROY)) {
-                    // TODO:下記コード意味あるか検証。コメントアウトしてFragment切替後の状態を確認したがObserverが重複することはなかった。
-                    navBackStackEntry.getLifecycle().removeObserver(lifecycleEventObserver);
-                }
-            }
-        });
+    @Override
+    protected void handleOnReceivedResulFromDialog(@NonNull SavedStateHandle savedStateHandle) {
+        retryErrorDialogShow();
+    }
+
+    @Override
+    protected void removeResulFromDialog(@NonNull SavedStateHandle savedStateHandle) {
+        // 処理なし
     }
 
     private void setUpErrorObserver() {

@@ -29,6 +29,7 @@ import android.widget.TextView;
 
 import com.google.android.material.transition.platform.MaterialFadeThrough;
 import com.google.android.material.transition.platform.MaterialSharedAxis;
+import com.websarva.wings.android.zuboradiary.ui.BaseFragment;
 import com.websarva.wings.android.zuboradiary.ui.CustomFragment;
 import com.websarva.wings.android.zuboradiary.ui.list.DiaryYearMonthListItemBase;
 import com.websarva.wings.android.zuboradiary.ui.KeyboardInitializer;
@@ -42,14 +43,13 @@ import java.time.YearMonth;
 import java.util.ArrayList;
 import java.util.List;
 
-public class WordSearchFragment extends CustomFragment {
+public class WordSearchFragment extends BaseFragment {
 
     // View関係
     private FragmentWordSearchBinding binding;
     private String lastText = ""; // 二重検索防止用
 
     // Navigation関係
-    private NavController navController;
     private boolean shouldShowDiaryListLoadingErrorDialog;
 
     // ViewModel
@@ -63,9 +63,6 @@ public class WordSearchFragment extends CustomFragment {
         ViewModelProvider provider = new ViewModelProvider(requireActivity());
         wordSearchViewModel = provider.get(WordSearchViewModel.class);
         wordSearchViewModel.initialize();
-
-        // Navigation設定
-        navController = NavHostFragment.findNavController(this);
     }
 
     @Override
@@ -110,45 +107,24 @@ public class WordSearchFragment extends CustomFragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        setUpDialogResultReceiver();
         setUpToolBar();
         setUpWordSearchView();
         setUpWordSearchResultList();
         setUpErrorObserver();
     }
 
-    // ダイアログフラグメントからの結果受取設定
-    private void setUpDialogResultReceiver() {
-        NavBackStackEntry navBackStackEntry =
-                navController.getBackStackEntry(R.id.navigation_diary_list_fragment);
-        LifecycleEventObserver lifecycleEventObserver = new LifecycleEventObserver() {
-            @Override
-            public void onStateChanged(
-                    @NonNull LifecycleOwner lifecycleOwner, @NonNull Lifecycle.Event event) {
-                SavedStateHandle savedStateHandle = navBackStackEntry.getSavedStateHandle();
-                if (event.equals(Lifecycle.Event.ON_RESUME)) {
-                    removeDialogResults(savedStateHandle);
-                    retryErrorDialogShow();
-                }
-            }
-        };
-        navBackStackEntry.getLifecycle().addObserver(lifecycleEventObserver);
-        getViewLifecycleOwner().getLifecycle().addObserver(new LifecycleEventObserver() {
-            @Override
-            public void onStateChanged(
-                    @NonNull LifecycleOwner source, @NonNull Lifecycle.Event event) {
-                if (event.equals(Lifecycle.Event.ON_DESTROY)) {
-                    // MEMO:removeで削除しないとこのFragmentを閉じてもResult内容が残ってしまう。
-                    //      その為、このFragmentを再表示した時にObserverがResultの内容で処理してしまう。
-                    SavedStateHandle savedStateHandle = navBackStackEntry.getSavedStateHandle();
-                    removeDialogResults(savedStateHandle);
-                    navBackStackEntry.getLifecycle().removeObserver(lifecycleEventObserver);
-                }
-            }
-        });
+    @Override
+    protected void handleOnReceivedResultFromPreviousFragment(@NonNull SavedStateHandle savedStateHandle) {
+        // 処理なし
     }
 
-    private void removeDialogResults(SavedStateHandle savedStateHandle) {
+    @Override
+    protected void handleOnReceivedResulFromDialog(@NonNull SavedStateHandle savedStateHandle) {
+        retryErrorDialogShow();
+    }
+
+    @Override
+    protected void removeResulFromDialog(@NonNull SavedStateHandle savedStateHandle) {
         // LifecycleEventObserverにダイアログからの結果受取処理コードを記述したら、ここに削除処理を記述する。
     }
 

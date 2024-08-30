@@ -36,6 +36,7 @@ import java.util.List;
 
 import com.websarva.wings.android.zuboradiary.data.database.Diary;
 import com.websarva.wings.android.zuboradiary.databinding.FragmentDiaryListBinding;
+import com.websarva.wings.android.zuboradiary.ui.BaseFragment;
 import com.websarva.wings.android.zuboradiary.ui.CustomFragment;
 import com.websarva.wings.android.zuboradiary.ui.list.DiaryYearMonthListItemBase;
 import com.websarva.wings.android.zuboradiary.ui.list.DiaryYearMonthListAdapter;
@@ -43,13 +44,12 @@ import com.websarva.wings.android.zuboradiary.ui.list.DiaryYearMonthListAdapter;
 import dagger.hilt.android.AndroidEntryPoint;
 
 @AndroidEntryPoint
-public class DiaryListFragment extends CustomFragment {
+public class DiaryListFragment extends BaseFragment {
 
     // View関係
     private FragmentDiaryListBinding binding;
 
     // Navigation関係
-    private NavController navController;
     private boolean shouldShowDiaryListLoadingErrorDialog;
     private boolean shouldShowDiaryInformationLoadingErrorDialog;
     private boolean shouldShowDiaryDeleteErrorDialog;
@@ -64,9 +64,6 @@ public class DiaryListFragment extends CustomFragment {
         // ViewModel設定
         ViewModelProvider provider = new ViewModelProvider(requireActivity());
         diaryListViewModel = provider.get(DiaryListViewModel.class);
-
-        // Navigation設定
-        navController = NavHostFragment.findNavController(this);
     }
 
 
@@ -107,79 +104,52 @@ public class DiaryListFragment extends CustomFragment {
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        setUpDialogResultReceiver();
         setUpToolBar();
         setUpFloatActionButton();
         setUpDiaryList();
         setUpErrorObserver();
     }
 
-    // ダイアログフラグメントからの結果受取設定
-    private void setUpDialogResultReceiver() {
-        NavBackStackEntry navBackStackEntry =
-                navController.getBackStackEntry(R.id.navigation_diary_list_fragment);
-        LifecycleEventObserver lifecycleEventObserver = new LifecycleEventObserver() {
-            @Override
-            public void onStateChanged(
-                    @NonNull LifecycleOwner lifecycleOwner, @NonNull Lifecycle.Event event) {
-                SavedStateHandle savedStateHandle = navBackStackEntry.getSavedStateHandle();
-                if (event.equals(Lifecycle.Event.ON_RESUME)) {
-                    receiveDatePickerDialogResults(savedStateHandle);
-                    receiveDiaryDeleteConfirmationDialogResults(savedStateHandle);
-                    removeDialogResults(savedStateHandle);
-                    retryErrorDialogShow();
-                }
-            }
-        };
-        navBackStackEntry.getLifecycle().addObserver(lifecycleEventObserver);
-        getViewLifecycleOwner().getLifecycle().addObserver(new LifecycleEventObserver() {
-            @Override
-            public void onStateChanged(
-                    @NonNull LifecycleOwner source, @NonNull Lifecycle.Event event) {
-                if (event.equals(Lifecycle.Event.ON_DESTROY)) {
-                    // MEMO:removeで削除しないとこのFragmentを閉じてもResult内容が残ってしまう。
-                    //      その為、このFragmentを再表示した時にObserverがResultの内容で処理してしまう。
-                    SavedStateHandle savedStateHandle = navBackStackEntry.getSavedStateHandle();
-                    removeDialogResults(savedStateHandle);
-                    navBackStackEntry.getLifecycle().removeObserver(lifecycleEventObserver);
-                }
-            }
-        });
+    @Override
+    protected void handleOnReceivedResultFromPreviousFragment(@NonNull SavedStateHandle savedStateHandle) {
+        // 処理なし
     }
 
-    private void removeDialogResults(SavedStateHandle savedStateHandle) {
+    @Override
+    protected void handleOnReceivedResulFromDialog(@NonNull SavedStateHandle savedStateHandle) {
+        receiveDatePickerDialogResults(savedStateHandle);
+        receiveDiaryDeleteConfirmationDialogResults(savedStateHandle);
+        retryErrorDialogShow();
+    }
+
+    @Override
+    protected void removeResulFromDialog(@NonNull SavedStateHandle savedStateHandle) {
         savedStateHandle.remove(StartYearMonthPickerDialogFragment.KEY_SELECTED_YEAR_MONTH);
         savedStateHandle.remove(DiaryDeleteConfirmationDialogFragment.KEY_DELETE_DIARY_DATE);
     }
 
     // 日付入力ダイアログフラグメントから結果受取
     private void receiveDatePickerDialogResults(SavedStateHandle savedStateHandle) {
-        boolean containsDialogResult =
-                savedStateHandle.contains(StartYearMonthPickerDialogFragment.KEY_SELECTED_YEAR_MONTH);
-        if (containsDialogResult) {
-            YearMonth selectedYearMonth =
-                    savedStateHandle.get(StartYearMonthPickerDialogFragment.KEY_SELECTED_YEAR_MONTH);
-            if (selectedYearMonth == null) {
-                return;
-            }
-            diaryListViewModel.updateSortConditionDate(selectedYearMonth);
-            diaryListScrollToFirstPosition();
-            diaryListViewModel.loadList(DiaryListViewModel.LoadType.NEW);
+        YearMonth selectedYearMonth =
+                receiveResulFromDialog(StartYearMonthPickerDialogFragment.KEY_SELECTED_YEAR_MONTH);
+        if (selectedYearMonth == null) {
+            return;
         }
+
+        diaryListViewModel.updateSortConditionDate(selectedYearMonth);
+        diaryListScrollToFirstPosition();
+        diaryListViewModel.loadList(DiaryListViewModel.LoadType.NEW);
     }
 
     // 日記削除ダイアログフラグメントから結果受取
     private void receiveDiaryDeleteConfirmationDialogResults(SavedStateHandle savedStateHandle) {
-        boolean containsDialogResult =
-                savedStateHandle.contains(DiaryDeleteConfirmationDialogFragment.KEY_DELETE_DIARY_DATE);
-        if (containsDialogResult) {
-            LocalDate deleteDiaryDate =
-                    savedStateHandle.get(DiaryDeleteConfirmationDialogFragment.KEY_DELETE_DIARY_DATE);
-            if (deleteDiaryDate == null) {
-                return;
-            }
-            diaryListViewModel.deleteDiary(deleteDiaryDate);
+        LocalDate deleteDiaryDate =
+                receiveResulFromDialog(DiaryDeleteConfirmationDialogFragment.KEY_DELETE_DIARY_DATE);
+        if (deleteDiaryDate == null) {
+            return;
         }
+
+        diaryListViewModel.deleteDiary(deleteDiaryDate);
     }
 
     // ツールバー設定

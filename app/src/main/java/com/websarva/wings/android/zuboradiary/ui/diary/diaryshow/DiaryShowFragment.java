@@ -29,6 +29,7 @@ import android.view.ViewGroup;
 import com.websarva.wings.android.zuboradiary.R;
 import com.websarva.wings.android.zuboradiary.data.DateConverter;
 import com.websarva.wings.android.zuboradiary.databinding.FragmentDiaryShowBinding;
+import com.websarva.wings.android.zuboradiary.ui.BaseFragment;
 import com.websarva.wings.android.zuboradiary.ui.CustomFragment;
 import com.websarva.wings.android.zuboradiary.ui.diary.DiaryLiveData;
 import com.websarva.wings.android.zuboradiary.ui.observer.DiaryShowConditionObserver;
@@ -42,13 +43,12 @@ import java.time.LocalDate;
 import dagger.hilt.android.AndroidEntryPoint;
 
 @AndroidEntryPoint
-public class DiaryShowFragment extends CustomFragment {
+public class DiaryShowFragment extends BaseFragment {
 
     // View関係
     private FragmentDiaryShowBinding binding;// 項目入力欄最大数
 
     // Navigation関係
-    private NavController navController;
     private static final String fromClassName = "From" + DiaryShowFragment.class.getName();
     public static final String KEY_SHOWED_DIARY_DATE = "ShowedDiaryDate" + fromClassName;
     private boolean shouldShowDiaryLoadingErrorDialog;
@@ -64,9 +64,6 @@ public class DiaryShowFragment extends CustomFragment {
         // ViewModel設定
         ViewModelProvider provider = new ViewModelProvider(this);
         diaryShowViewModel = provider.get(DiaryShowViewModel.class);
-
-        // Navigation設定
-        navController = NavHostFragment.findNavController(this);
 
         // 戻るボタン押下時の処理
         requireActivity().getOnBackPressedDispatcher().addCallback(
@@ -99,7 +96,6 @@ public class DiaryShowFragment extends CustomFragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        setUpDialogResultReceiver();
         setUpDiaryData();
         setUpToolBar();
         setUpWeatherLayout();
@@ -109,62 +105,35 @@ public class DiaryShowFragment extends CustomFragment {
         setUpErrorObserver();
     }
 
-    private void setUpDialogResultReceiver() {
-        NavBackStackEntry navBackStackEntry = navController.getCurrentBackStackEntry();
-        if (navBackStackEntry == null) {
-            return;
-        }
-        LifecycleEventObserver lifecycleEventObserver = new LifecycleEventObserver() {
-            @Override
-            public void onStateChanged(
-                    @NonNull LifecycleOwner lifecycleOwner, @NonNull Lifecycle.Event event) {
-                // MEMO:Dialog表示中:Lifecycle.Event.ON_PAUSE
-                //      Dialog非表示中:Lifecycle.Event.ON_RESUME
-                Log.d("LifecycleEventObserver", "DiaryShowFragment_NavBackStackEntry_event:" + event);
-                if (event.equals(Lifecycle.Event.ON_RESUME)) {
-                    SavedStateHandle savedStateHandle = navBackStackEntry.getSavedStateHandle();
-                    receiveDeleteConfirmationDialogResult(savedStateHandle);
-                    removeDialogResults(savedStateHandle);
-                    retryErrorDialogShow();
-                }
-            }
-        };
-        navBackStackEntry.getLifecycle().addObserver(lifecycleEventObserver);
-        getViewLifecycleOwner().getLifecycle().addObserver(new LifecycleEventObserver() {
-            @Override
-            public void onStateChanged(@NonNull LifecycleOwner lifecycleOwner, @NonNull Lifecycle.Event event) {
-                Log.d("LifecycleEventObserver", "DiaryShowFragment_ViewLifecycleOwner_event:" + event);
-                if (event.equals(Lifecycle.Event.ON_DESTROY)) {
-                    // MEMO:removeで削除しないとこのFragmentを閉じてもResult内容が残ってしまう。
-                    //      その為、このFragmentを再表示した時にObserverがResultの内容で処理してしまう。
-                    SavedStateHandle savedStateHandle = navBackStackEntry.getSavedStateHandle();
-                    removeDialogResults(savedStateHandle);
-                    // TODO:下記コード意味あるか検証。コメントアウトしてFragment切替後の状態を確認したがObserverが重複することはなかった。
-                    navBackStackEntry.getLifecycle().removeObserver(lifecycleEventObserver);
-                }
-            }
-        });
+    @Override
+    protected void handleOnReceivedResultFromPreviousFragment(@NonNull SavedStateHandle savedStateHandle) {
+        // 処理なし
     }
 
-    private void removeDialogResults(SavedStateHandle savedStateHandle) {
+    @Override
+    protected void handleOnReceivedResulFromDialog(@NonNull SavedStateHandle savedStateHandle) {
+        receiveDeleteConfirmationDialogResult(savedStateHandle);
+        retryErrorDialogShow();
+    }
+
+    @Override
+    protected void removeResulFromDialog(@NonNull SavedStateHandle savedStateHandle) {
         savedStateHandle.remove(DiaryDeleteConfirmationDialogFragment.KEY_SELECTED_BUTTON);
     }
 
     // 日記削除確認ダイアログフラグメントからデータ受取
     private void receiveDeleteConfirmationDialogResult(SavedStateHandle savedStateHandle) {
-        boolean containsDialogResult =
-                savedStateHandle.contains(DiaryDeleteConfirmationDialogFragment.KEY_SELECTED_BUTTON);
-        if (containsDialogResult) {
-            Integer selectedButton =
-                    savedStateHandle.get(DiaryDeleteConfirmationDialogFragment.KEY_SELECTED_BUTTON);
-            if (selectedButton == null) {
-                return;
-            }
-            if (selectedButton == Dialog.BUTTON_POSITIVE) {
-                diaryShowViewModel.deleteDiary();
-                backFragment(true);
-            }
+        Integer selectedButton =
+                receiveResulFromDialog(DiaryDeleteConfirmationDialogFragment.KEY_SELECTED_BUTTON);
+        if (selectedButton == null) {
+            return;
         }
+
+        if (selectedButton != Dialog.BUTTON_POSITIVE) {
+            return;
+        }
+        diaryShowViewModel.deleteDiary();
+        backFragment(true);
     }
 
     // 画面表示データ準備

@@ -21,7 +21,6 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
-import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.LifecycleEventObserver;
 import androidx.lifecycle.LifecycleOwner;
@@ -31,14 +30,12 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavBackStackEntry;
 import androidx.navigation.NavController;
 import androidx.navigation.NavDirections;
-import androidx.navigation.fragment.NavHostFragment;
 
 import com.google.android.material.materialswitch.MaterialSwitch;
-import com.websarva.wings.android.zuboradiary.R;
 import com.websarva.wings.android.zuboradiary.data.DayOfWeekConverter;
 import com.websarva.wings.android.zuboradiary.data.settings.ThemeColors;
 import com.websarva.wings.android.zuboradiary.databinding.FragmentSettingsBinding;
-import com.websarva.wings.android.zuboradiary.ui.CustomFragment;
+import com.websarva.wings.android.zuboradiary.ui.BaseFragment;
 import com.websarva.wings.android.zuboradiary.ui.ThemeColorSwitcher;
 
 import java.time.DayOfWeek;
@@ -48,16 +45,13 @@ import java.util.Map;
 import dagger.hilt.android.AndroidEntryPoint;
 
 @AndroidEntryPoint
-public class SettingsFragment extends CustomFragment {
+public class SettingsFragment extends BaseFragment {
 
     // View関係
     private FragmentSettingsBinding binding;
     private boolean isTouchedReminderNotificationSwitch = false;
     private boolean isTouchedPasscodeLockSwitch = false;
     private boolean isTouchedGettingWeatherInformationSwitch = false;
-
-    // Navigation関係
-    private NavController navController;
 
     // ViewModel関係
     private SettingsViewModel settingsViewModel;
@@ -72,10 +66,7 @@ public class SettingsFragment extends CustomFragment {
 
         // ViewModel設定
         ViewModelProvider provider = new ViewModelProvider(requireActivity());
-        this.settingsViewModel = provider.get(SettingsViewModel.class);
-
-        // Navigation設定
-        this.navController = NavHostFragment.findNavController(this);
+        settingsViewModel = provider.get(SettingsViewModel.class);
 
         // ActivityResultLauncher設定
         // 通知権限取得結果処理
@@ -120,43 +111,33 @@ public class SettingsFragment extends CustomFragment {
                             }
                         }
                 );
-
-
     }
 
     @Override
     public View onCreateView(
             @NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        super.onCreateView(inflater, container, savedInstanceState);
 
         // ビューバインディング設定
-        this.binding = FragmentSettingsBinding.inflate(inflater, container, false);
+        binding = FragmentSettingsBinding.inflate(inflater, container, false);
 
         // データバインディング設定
-        this.binding.setLifecycleOwner(this);
-        this.binding.setSettingsViewModel(this.settingsViewModel);
+        binding.setLifecycleOwner(this);
+        binding.setSettingsViewModel(settingsViewModel);
 
-        return this.binding.getRoot();
+        return binding.getRoot();
     }
 
     @SuppressLint("ClickableViewAccessibility")
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        // ダイアログフラグメントからの結果受取設定
-        NavBackStackEntry navBackStackEntry =
-                this.navController.getBackStackEntry(R.id.navigation_settings_fragment);
-        NaviBackStackEntryLifecycleEventObserver naviBackStackEntryLifecycleEventObserver =
-                new NaviBackStackEntryLifecycleEventObserver(navBackStackEntry);
-        navBackStackEntry.getLifecycle().addObserver(naviBackStackEntryLifecycleEventObserver);
-        viewLifecycleEventObserver viewLifecycleEventObserver =
-                new viewLifecycleEventObserver(navBackStackEntry, naviBackStackEntryLifecycleEventObserver);
-        getViewLifecycleOwner().getLifecycle().addObserver(viewLifecycleEventObserver);
+        super.onViewCreated(view, savedInstanceState);
 
-
-        this.binding.textThemeColorSettingTitle.setOnClickListener(
-                new OnClickListenerOfThemeColorSetting(this.navController, this.settingsViewModel)
+        binding.textThemeColorSettingTitle.setOnClickListener(
+                new OnClickListenerOfThemeColorSetting(navController, settingsViewModel)
         );
-        this.binding.textCalendarStartDaySettingTitle.setOnClickListener(
-                new OnClickListenerOfCalendarStartDayOfWeekSetting(this.navController, this.settingsViewModel)
+        binding.textCalendarStartDaySettingTitle.setOnClickListener(
+                new OnClickListenerOfCalendarStartDayOfWeekSetting(navController, settingsViewModel)
         );
         binding.switchReminderNotificationValue.setOnTouchListener(new View.OnTouchListener() {
             @Override
@@ -167,10 +148,10 @@ public class SettingsFragment extends CustomFragment {
                 return false;
             }
         });
-        this.binding.switchReminderNotificationValue.setOnCheckedChangeListener(
-                new OnCheckedChangeListenerOfReminderNotificationSetting(this.navController, this.settingsViewModel)
+        binding.switchReminderNotificationValue.setOnCheckedChangeListener(
+                new OnCheckedChangeListenerOfReminderNotificationSetting(navController, settingsViewModel)
         );
-        this.binding.switchPasscodeLockValue.setOnTouchListener(new View.OnTouchListener() {
+        binding.switchPasscodeLockValue.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
                 if (event.getAction() == MotionEvent.ACTION_DOWN){
@@ -179,10 +160,10 @@ public class SettingsFragment extends CustomFragment {
                 return false;
             }
         });
-        this.binding.switchPasscodeLockValue.setOnCheckedChangeListener(
-                new OnCheckedChangeListenerOfPasscodeLockSetting(this.navController, this.settingsViewModel)
+        binding.switchPasscodeLockValue.setOnCheckedChangeListener(
+                new OnCheckedChangeListenerOfPasscodeLockSetting(navController, settingsViewModel)
         );
-        this.binding.switchGettingWeatherInformationValue.setOnTouchListener(new View.OnTouchListener() {
+        binding.switchGettingWeatherInformationValue.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
                 if (event.getAction() == MotionEvent.ACTION_DOWN){
@@ -191,11 +172,11 @@ public class SettingsFragment extends CustomFragment {
                 return false;
             }
         });
-        this.binding.switchGettingWeatherInformationValue.setOnCheckedChangeListener(
-                new OnCheckedChangeListenerOfGettingWeatherInformationSetting(this.navController, this.settingsViewModel)
+        binding.switchGettingWeatherInformationValue.setOnCheckedChangeListener(
+                new OnCheckedChangeListenerOfGettingWeatherInformationSetting(navController, settingsViewModel)
         );
 
-        this.settingsViewModel.getThemeColorLiveData().observe(getViewLifecycleOwner(), new Observer<String>() {
+        settingsViewModel.getThemeColorLiveData().observe(getViewLifecycleOwner(), new Observer<String>() {
             @Override
             public void onChanged(String string) {
                 ThemeColorSwitcher switcher = new ThemeColorSwitcher(getResources(), requireContext());
@@ -227,102 +208,82 @@ public class SettingsFragment extends CustomFragment {
     }
 
     @Override
+    protected void handleOnReceivedResultFromPreviousFragment(@NonNull SavedStateHandle savedStateHandle) {
+        // 処理なし
+    }
+
+    @Override
+    protected void handleOnReceivedResulFromDialog(@NonNull SavedStateHandle savedStateHandle) {
+        receiveThemeColorPickerDialogResult(savedStateHandle);
+        receiveDayOfWeekPickerDialogResult(savedStateHandle);
+        receiveTimePickerDialogResult(savedStateHandle);
+        receivePermissionDialogResult(savedStateHandle);
+    }
+
+    @Override
+    protected void removeResulFromDialog(@NonNull SavedStateHandle savedStateHandle) {
+        savedStateHandle.remove(ThemeColorPickerDialogFragment.KEY_SELECTED_THEME_COLOR);
+        savedStateHandle.remove(DayOfWeekPickerDialogFragment.KEY_SELECTED_DAY_OF_WEEK);
+        savedStateHandle.remove(TimePickerDialogFragment.KEY_SELECTED_HOUR);
+        savedStateHandle.remove(TimePickerDialogFragment.KEY_SELECTED_MINUTE);
+        savedStateHandle.remove(PermissionDialogFragment.KEY_SELECTED_BUTTON);
+    }
+
+    // テーマカラー設定ダイアログフラグメントから結果受取
+    private void receiveThemeColorPickerDialogResult(SavedStateHandle savedStateHandle) {
+        ThemeColors selectedThemeColor =
+                receiveResulFromDialog(ThemeColorPickerDialogFragment.KEY_SELECTED_THEME_COLOR);
+        if (selectedThemeColor == null) {
+            return;
+        }
+
+        settingsViewModel.saveThemeColor(selectedThemeColor);
+    }
+
+    // カレンダー開始曜日設定ダイアログフラグメントから結果受取
+    private void receiveDayOfWeekPickerDialogResult(SavedStateHandle savedStateHandle) {
+        DayOfWeek selectedDayOfWeek =
+                receiveResulFromDialog(DayOfWeekPickerDialogFragment.KEY_SELECTED_DAY_OF_WEEK);
+        if (selectedDayOfWeek == null) {
+            return;
+        }
+
+        settingsViewModel.saveCalendarStartDayOfWeek(selectedDayOfWeek);
+    }
+
+    // リマインダー通知時間設定ダイアログフラグメントから結果受取
+    private void receiveTimePickerDialogResult(SavedStateHandle savedStateHandle) {
+        Integer selectedHour = receiveResulFromDialog(TimePickerDialogFragment.KEY_SELECTED_HOUR);
+        if (selectedHour == null) {
+            return;
+        }
+        Integer selectedMinute = receiveResulFromDialog(TimePickerDialogFragment.KEY_SELECTED_MINUTE);
+        if (selectedMinute == null) {
+            return;
+        }
+
+        LocalTime settingTime = LocalTime.of(selectedHour, selectedMinute);
+        settingsViewModel.registerReminderNotificationWorker(settingTime);
+        settingsViewModel.saveIsReminderNotification(true);
+    }
+
+    // 権限催促ダイアログフラグメントから結果受取
+    private void receivePermissionDialogResult(SavedStateHandle savedStateHandle) {
+        Integer selectedButton = receiveResulFromDialog(PermissionDialogFragment.KEY_SELECTED_BUTTON);
+        if (selectedButton == null) {
+            return;
+        }
+        if (selectedButton != Dialog.BUTTON_POSITIVE) {
+            return;
+        }
+
+        actionApplicationDetailsSettings();
+    }
+
+    @Override
     public void onDestroyView() {
         super.onDestroyView();
-        this.binding = null;
-    }
-
-
-
-    private class NaviBackStackEntryLifecycleEventObserver implements LifecycleEventObserver {
-        private NavBackStackEntry navBackStackEntry;
-        public NaviBackStackEntryLifecycleEventObserver(NavBackStackEntry navBackStackEntry) {
-            this.navBackStackEntry = navBackStackEntry;
-        }
-        @Override
-        public void onStateChanged(
-                @NonNull LifecycleOwner lifecycleOwner, @NonNull Lifecycle.Event event) {
-            SavedStateHandle savedStateHandle = this.navBackStackEntry.getSavedStateHandle();
-            if (event.equals(Lifecycle.Event.ON_RESUME)) {
-                // テーマカラー設定ダイアログフラグメントから結果受取
-                boolean containsThemeColorPickerDialogFragmentResults =
-                        savedStateHandle.contains(ThemeColorPickerDialogFragment.KEY_SELECTED_THEME_COLOR);
-                if (containsThemeColorPickerDialogFragmentResults) {
-                    ThemeColors selectedThemeColor =
-                            savedStateHandle.get(ThemeColorPickerDialogFragment.KEY_SELECTED_THEME_COLOR);
-                    settingsViewModel.saveThemeColor(selectedThemeColor);
-                    savedStateHandle.remove(ThemeColorPickerDialogFragment.KEY_SELECTED_THEME_COLOR);
-                }
-
-                // カレンダー開始曜日設定ダイアログフラグメントから結果受取
-                boolean containsDayOfWeekPickerDialogFragmentResults =
-                        savedStateHandle.contains(DayOfWeekPickerDialogFragment.KEY_SELECTED_DAY_OF_WEEK);
-                if (containsDayOfWeekPickerDialogFragmentResults) {
-                    DayOfWeek selectedDayOfWeek =
-                            savedStateHandle.get(DayOfWeekPickerDialogFragment.KEY_SELECTED_DAY_OF_WEEK);
-                    settingsViewModel.saveCalendarStartDayOfWeek(selectedDayOfWeek);
-                    savedStateHandle.remove(DayOfWeekPickerDialogFragment.KEY_SELECTED_DAY_OF_WEEK);
-                }
-
-                // リマインダー通知時間設定ダイアログフラグメントから結果受取
-                boolean containsTimePickerDialogFragmentResults =
-                        savedStateHandle.contains(TimePickerDialogFragment.KEY_SELECTED_HOUR)
-                        && savedStateHandle.contains(TimePickerDialogFragment.KEY_SELECTED_MINUTE);
-                if (containsTimePickerDialogFragmentResults) {
-                    Integer selectedHour =
-                            savedStateHandle.get(TimePickerDialogFragment.KEY_SELECTED_HOUR);
-                    Integer selectedMinute =
-                            savedStateHandle.get(TimePickerDialogFragment.KEY_SELECTED_MINUTE);
-                    if (selectedHour == null || selectedMinute == null) {
-                        binding.switchReminderNotificationValue.setChecked(false);
-                    } else {
-                        LocalTime settingTime = LocalTime.of(selectedHour, selectedMinute);
-                        settingsViewModel.registerReminderNotificationWorker(settingTime);
-                        settingsViewModel.saveIsReminderNotification(true);
-                    }
-                    savedStateHandle.remove(TimePickerDialogFragment.KEY_SELECTED_HOUR);
-                    savedStateHandle.remove(TimePickerDialogFragment.KEY_SELECTED_MINUTE);
-                }
-
-                // 権限催促ダイアログフラグメントから結果受取
-                boolean containsPermissionDialogFragmentResult =
-                        savedStateHandle.contains(PermissionDialogFragment.KEY_SELECTED_BUTTON);
-                if (containsPermissionDialogFragmentResult) {
-                    Integer selectedButton =
-                            savedStateHandle.get(PermissionDialogFragment.KEY_SELECTED_BUTTON);
-                    if (selectedButton != null && selectedButton == Dialog.BUTTON_POSITIVE) {
-                        actionApplicationDetailsSettings();
-                    }
-                    savedStateHandle.remove(PermissionDialogFragment.KEY_SELECTED_BUTTON);
-                }
-            }
-        }
-    }
-
-    private class viewLifecycleEventObserver implements LifecycleEventObserver {
-        private NavBackStackEntry navBackStackEntry;
-        private NaviBackStackEntryLifecycleEventObserver naviBackStackEntryLifecycleEventObserver;
-        public viewLifecycleEventObserver(
-                NavBackStackEntry navBackStackEntry,
-                NaviBackStackEntryLifecycleEventObserver naviBackStackEntryLifecycleEventObserver) {
-            this.navBackStackEntry = navBackStackEntry;
-            this.naviBackStackEntryLifecycleEventObserver = naviBackStackEntryLifecycleEventObserver;
-        }
-        @Override
-        public void onStateChanged(
-                @NonNull LifecycleOwner source, @NonNull Lifecycle.Event event) {
-            if (event.equals(Lifecycle.Event.ON_DESTROY)) {
-                // MEMO:removeで削除しないとこのFragmentを閉じてもResult内容が残ってしまう。
-                //      その為、このFragmentを再表示した時にObserverがResultの内容で処理してしまう。
-                SavedStateHandle savedStateHandle = navBackStackEntry.getSavedStateHandle();
-                savedStateHandle.remove(ThemeColorPickerDialogFragment.KEY_SELECTED_THEME_COLOR);
-                savedStateHandle.remove(DayOfWeekPickerDialogFragment.KEY_SELECTED_DAY_OF_WEEK);
-                savedStateHandle.remove(TimePickerDialogFragment.KEY_SELECTED_HOUR);
-                savedStateHandle.remove(TimePickerDialogFragment.KEY_SELECTED_MINUTE);
-                savedStateHandle.remove(PermissionDialogFragment.KEY_SELECTED_BUTTON);
-                navBackStackEntry.getLifecycle().removeObserver(naviBackStackEntryLifecycleEventObserver);
-            }
-        }
+        binding = null;
     }
 
     private class OnClickListenerOfThemeColorSetting implements View.OnClickListener {
@@ -336,14 +297,14 @@ public class SettingsFragment extends CustomFragment {
         @Override
         public void onClick(View v) {
             String currentThemeColorName =
-                    this.settingsViewModel.getThemeColorLiveData().getValue();
+                    settingsViewModel.getThemeColorLiveData().getValue();
             ThemeColors currentThemeColor = toThemeColors(currentThemeColorName);
             if (currentThemeColor == null) {
                 currentThemeColor = ThemeColors.values()[0];
             }
             NavDirections action = SettingsFragmentDirections
                     .actionNavigationSettingsFragmentToThemeColorPickerDialog(currentThemeColor);
-            this.navController.navigate(action);
+            navController.navigate(action);
         }
     }
 
@@ -372,14 +333,14 @@ public class SettingsFragment extends CustomFragment {
         @Override
         public void onClick(View v) {
             String currentCalendarStartDayOfWeekName =
-                    this.settingsViewModel.getCalendarStartDayOfWeekLiveData().getValue();
+                    settingsViewModel.getCalendarStartDayOfWeekLiveData().getValue();
             DayOfWeek currentCalendarStartDayOfWeek = toDayOfWeek(currentCalendarStartDayOfWeekName);
             if (currentCalendarStartDayOfWeek == null) {
                 currentCalendarStartDayOfWeek = DayOfWeek.SUNDAY;
             }
             NavDirections action = SettingsFragmentDirections
                     .actionNavigationSettingsFragmentToDayOfWeekPickerDialog(currentCalendarStartDayOfWeek);
-            this.navController.navigate(action);
+            navController.navigate(action);
         }
     }
 
@@ -451,7 +412,7 @@ public class SettingsFragment extends CustomFragment {
         }
         @Override
         public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-            this.settingsViewModel.saveIsPasscodeLock(isChecked);
+            settingsViewModel.saveIsPasscodeLock(isChecked);
         }
     }
 
