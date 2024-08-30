@@ -10,17 +10,11 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.widget.Toolbar;
-import androidx.lifecycle.Lifecycle;
-import androidx.lifecycle.LifecycleEventObserver;
-import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.SavedStateHandle;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.navigation.NavBackStackEntry;
-import androidx.navigation.NavController;
 import androidx.navigation.NavDestination;
 import androidx.navigation.NavDirections;
-import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.transition.platform.MaterialFadeThrough;
@@ -37,7 +31,6 @@ import java.util.List;
 import com.websarva.wings.android.zuboradiary.data.database.Diary;
 import com.websarva.wings.android.zuboradiary.databinding.FragmentDiaryListBinding;
 import com.websarva.wings.android.zuboradiary.ui.BaseFragment;
-import com.websarva.wings.android.zuboradiary.ui.CustomFragment;
 import com.websarva.wings.android.zuboradiary.ui.list.DiaryYearMonthListItemBase;
 import com.websarva.wings.android.zuboradiary.ui.list.DiaryYearMonthListAdapter;
 
@@ -393,7 +386,7 @@ public class DiaryListFragment extends BaseFragment {
 
     private void showDiaryListLoadingErrorDialog() {
         if (canShowDialog()) {
-            showMessageDialog(getString(R.string.dialog_message_title_communication_error), getString(R.string.dialog_message_message_diary_list_loading_error));
+            showMessageDialog(getString(R.string.dialog_message_title_access_error), getString(R.string.dialog_message_message_diary_list_loading_error));
             shouldShowDiaryListLoadingErrorDialog = false;
         } else {
             shouldShowDiaryListLoadingErrorDialog = true;
@@ -402,7 +395,7 @@ public class DiaryListFragment extends BaseFragment {
 
     private void showDiaryInformationLoadingErrorDialog() {
         if (canShowDialog()) {
-            showMessageDialog(getString(R.string.dialog_message_title_communication_error), getString(R.string.dialog_message_message_diary_information_loading_error));
+            showMessageDialog(getString(R.string.dialog_message_title_access_error), getString(R.string.dialog_message_message_diary_information_loading_error));
             shouldShowDiaryInformationLoadingErrorDialog = false;
         } else {
             shouldShowDiaryInformationLoadingErrorDialog = true;
@@ -411,7 +404,7 @@ public class DiaryListFragment extends BaseFragment {
 
     private void showDiaryDeleteErrorDialog() {
         if (canShowDialog()) {
-            showMessageDialog(getString(R.string.dialog_message_title_communication_error), getString(R.string.dialog_message_message_diary_delete_error));
+            showMessageDialog(getString(R.string.dialog_message_title_access_error), getString(R.string.dialog_message_message_diary_delete_error));
             shouldShowDiaryDeleteErrorDialog = false;
         } else {
             shouldShowDiaryDeleteErrorDialog = true;

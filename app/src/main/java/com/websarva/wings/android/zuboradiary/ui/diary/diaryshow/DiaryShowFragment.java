@@ -7,20 +7,13 @@ import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.Toolbar;
-import androidx.fragment.app.Fragment;
-import androidx.lifecycle.Lifecycle;
-import androidx.lifecycle.LifecycleEventObserver;
-import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.SavedStateHandle;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavBackStackEntry;
-import androidx.navigation.NavController;
 import androidx.navigation.NavDestination;
 import androidx.navigation.NavDirections;
-import androidx.navigation.fragment.NavHostFragment;
 
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -30,7 +23,6 @@ import com.websarva.wings.android.zuboradiary.R;
 import com.websarva.wings.android.zuboradiary.data.DateConverter;
 import com.websarva.wings.android.zuboradiary.databinding.FragmentDiaryShowBinding;
 import com.websarva.wings.android.zuboradiary.ui.BaseFragment;
-import com.websarva.wings.android.zuboradiary.ui.CustomFragment;
 import com.websarva.wings.android.zuboradiary.ui.diary.DiaryLiveData;
 import com.websarva.wings.android.zuboradiary.ui.observer.DiaryShowConditionObserver;
 import com.websarva.wings.android.zuboradiary.ui.observer.DiaryShowLogObserver;
@@ -319,7 +311,7 @@ public class DiaryShowFragment extends BaseFragment {
 
     private void showDiaryLoadingErrorDialog() {
         if (canShowDialog()) {
-            showMessageDialog(getString(R.string.dialog_message_title_communication_error), getString(R.string.dialog_message_message_diary_loading_error));
+            showMessageDialog(getString(R.string.dialog_message_title_access_error), getString(R.string.dialog_message_message_diary_loading_error));
             shouldShowDiaryLoadingErrorDialog = false;
         } else {
             shouldShowDiaryLoadingErrorDialog = true;
@@ -328,7 +320,7 @@ public class DiaryShowFragment extends BaseFragment {
 
     private void showDiaryDeleteErrorDialog() {
         if (canShowDialog()) {
-            showMessageDialog(getString(R.string.dialog_message_title_communication_error), getString(R.string.dialog_message_message_diary_delete_error));
+            showMessageDialog(getString(R.string.dialog_message_title_access_error), getString(R.string.dialog_message_message_diary_delete_error));
             shouldShowDiaryDeleteErrorDialog = false;
         } else {
             shouldShowDiaryDeleteErrorDialog = true;

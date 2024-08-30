@@ -5,17 +5,11 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.lifecycle.Lifecycle;
-import androidx.lifecycle.LifecycleEventObserver;
-import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.SavedStateHandle;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.navigation.NavBackStackEntry;
-import androidx.navigation.NavController;
 import androidx.navigation.NavDestination;
 import androidx.navigation.NavDirections;
-import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.util.Log;
@@ -30,7 +24,6 @@ import android.widget.TextView;
 import com.google.android.material.transition.platform.MaterialFadeThrough;
 import com.google.android.material.transition.platform.MaterialSharedAxis;
 import com.websarva.wings.android.zuboradiary.ui.BaseFragment;
-import com.websarva.wings.android.zuboradiary.ui.CustomFragment;
 import com.websarva.wings.android.zuboradiary.ui.list.DiaryYearMonthListItemBase;
 import com.websarva.wings.android.zuboradiary.ui.KeyboardInitializer;
 import com.websarva.wings.android.zuboradiary.MainActivity;
@@ -379,7 +372,7 @@ public class WordSearchFragment extends BaseFragment {
 
     private void showDiaryListLoadingErrorDialog() {
         if (canShowDialog()) {
-            showMessageDialog(getString(R.string.dialog_message_title_communication_error), getString(R.string.dialog_message_message_diary_word_search_error));
+            showMessageDialog(getString(R.string.dialog_message_title_access_error), getString(R.string.dialog_message_message_diary_word_search_error));
             shouldShowDiaryListLoadingErrorDialog = false;
         } else {
             shouldShowDiaryListLoadingErrorDialog = true;

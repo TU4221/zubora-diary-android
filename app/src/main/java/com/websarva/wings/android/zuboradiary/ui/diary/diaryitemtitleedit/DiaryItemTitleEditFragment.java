@@ -4,31 +4,16 @@ import static android.text.InputType.TYPE_TEXT_FLAG_MULTI_LINE;
 
 import android.annotation.SuppressLint;
 import android.content.DialogInterface;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.content.res.AppCompatResources;
-import androidx.fragment.app.Fragment;
-import androidx.lifecycle.Lifecycle;
-import androidx.lifecycle.LifecycleEventObserver;
-import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.SavedStateHandle;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavBackStackEntry;
-import androidx.navigation.NavController;
 import androidx.navigation.NavDestination;
 import androidx.navigation.NavDirections;
-import androidx.navigation.fragment.NavHostFragment;
-import androidx.recyclerview.widget.DividerItemDecoration;
-import androidx.recyclerview.widget.ItemTouchHelper;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
 import android.text.Editable;
 import android.text.InputFilter;
@@ -46,7 +31,6 @@ import com.websarva.wings.android.zuboradiary.R;
 import com.websarva.wings.android.zuboradiary.data.database.DiaryItemTitleSelectionHistoryItem;
 import com.websarva.wings.android.zuboradiary.databinding.FragmentDiaryItemTitleEditBinding;
 import com.websarva.wings.android.zuboradiary.ui.BaseFragment;
-import com.websarva.wings.android.zuboradiary.ui.CustomFragment;
 import com.websarva.wings.android.zuboradiary.ui.KeyboardInitializer;
 
 import java.util.ArrayList;
@@ -446,7 +430,7 @@ public class DiaryItemTitleEditFragment extends BaseFragment {
 
     private void showItemTitleSelectionHistoryLoadingErrorDialog() {
         if (canShowDialog()) {
-            showMessageDialog(getString(R.string.dialog_message_title_communication_error), getString(R.string.dialog_message_message_item_title_selection_history_loading_error));
+            showMessageDialog(getString(R.string.dialog_message_title_access_error), getString(R.string.dialog_message_message_item_title_selection_history_loading_error));
             shouldShowItemTitleSelectionHistoryLoadingErrorDialog = false;
         } else {
             shouldShowItemTitleSelectionHistoryLoadingErrorDialog = true;
@@ -455,7 +439,7 @@ public class DiaryItemTitleEditFragment extends BaseFragment {
 
     private void showItemTitleSelectionHistoryItemDeleteErrorDialog() {
         if (canShowDialog()) {
-            showMessageDialog(getString(R.string.dialog_message_title_communication_error), getString(R.string.dialog_message_message_item_title_selection_history_item_delete_error));
+            showMessageDialog(getString(R.string.dialog_message_title_access_error), getString(R.string.dialog_message_message_item_title_selection_history_item_delete_error));
             shouldShowItemTitleSelectionHistoryItemDeleteErrorDialog = false;
         } else {
             shouldShowItemTitleSelectionHistoryItemDeleteErrorDialog = true;

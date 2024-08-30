@@ -11,14 +11,10 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.widget.Toolbar;
 import androidx.constraintlayout.motion.widget.MotionLayout;
 import androidx.core.widget.NestedScrollView;
-import androidx.lifecycle.Lifecycle;
-import androidx.lifecycle.LifecycleEventObserver;
-import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.SavedStateHandle;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.navigation.NavBackStackEntry;
 import androidx.navigation.NavDestination;
 import androidx.navigation.NavDirections;
 
@@ -1175,7 +1171,7 @@ public class DiaryEditFragment extends BaseFragment {
 
     private void showDiarySavingErrorDialog() {
         if (canShowDialog()) {
-            showMessageDialog(getString(R.string.dialog_message_title_communication_error), getString(R.string.dialog_message_message_diary_saving_error));
+            showMessageDialog(getString(R.string.dialog_message_title_access_error), getString(R.string.dialog_message_message_diary_saving_error));
             shouldShowDiarySavingErrorDialog = false;
         } else {
             shouldShowDiarySavingErrorDialog = true;
@@ -1184,7 +1180,7 @@ public class DiaryEditFragment extends BaseFragment {
 
     private void showDiaryLoadingErrorDialog() {
         if (canShowDialog()) {
-            showMessageDialog(getString(R.string.dialog_message_title_communication_error), getString(R.string.dialog_message_message_diary_loading_error));
+            showMessageDialog(getString(R.string.dialog_message_title_access_error), getString(R.string.dialog_message_message_diary_loading_error));
             shouldShowDiaryLoadingErrorDialog = false;
         } else {
             shouldShowDiaryLoadingErrorDialog = true;
@@ -1193,7 +1189,7 @@ public class DiaryEditFragment extends BaseFragment {
 
     private void showDiaryDeleteErrorDialog() {
         if (canShowDialog()) {
-            showMessageDialog(getString(R.string.dialog_message_title_communication_error), getString(R.string.dialog_message_message_diary_delete_error));
+            showMessageDialog(getString(R.string.dialog_message_title_access_error), getString(R.string.dialog_message_message_diary_delete_error));
             shouldShowDiaryDeleteErrorDialog = false;
         } else {
             shouldShowDiaryDeleteErrorDialog = true;
@@ -1202,7 +1198,7 @@ public class DiaryEditFragment extends BaseFragment {
 
     private void showWeatherInformationLoadingErrorDialog() {
         if (canShowDialog()) {
-            showMessageDialog(getString(R.string.dialog_message_title_communication_error), getString(R.string.dialog_message_message_weather_information_loading_error));
+            showMessageDialog(getString(R.string.dialog_message_title_access_error), getString(R.string.dialog_message_message_weather_information_loading_error));
             shouldShowWeatherLoadingErrorDialog = false;
         } else {
             shouldShowWeatherLoadingErrorDialog = true;
