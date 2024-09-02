@@ -8,9 +8,11 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 import com.google.common.util.concurrent.ListenableFuture;
+import com.websarva.wings.android.zuboradiary.data.AppError;
 import com.websarva.wings.android.zuboradiary.data.database.Diary;
 import com.websarva.wings.android.zuboradiary.data.database.DiaryListItem;
 import com.websarva.wings.android.zuboradiary.data.database.DiaryRepository;
+import com.websarva.wings.android.zuboradiary.ui.BaseViewModel;
 import com.websarva.wings.android.zuboradiary.ui.list.DiaryYearMonthListAdapter;
 
 import java.time.LocalDate;
@@ -29,7 +31,7 @@ import javax.inject.Inject;
 import dagger.hilt.android.lifecycle.HiltViewModel;
 
 @HiltViewModel
-public class DiaryListViewModel extends ViewModel {
+public class DiaryListViewModel extends BaseViewModel {
 
     private final DiaryRepository diaryRepository;
     private Future<?> diaryListLoadingFuture; // キャンセル用
@@ -43,10 +45,6 @@ public class DiaryListViewModel extends ViewModel {
     private LocalDate sortConditionDate;
     private final ExecutorService executorService;
 
-    // エラー関係
-    private final MutableLiveData<Boolean> isDiaryListLoadingError = new MutableLiveData<>();
-    private final MutableLiveData<Boolean> isDiaryInformationLoadingError = new MutableLiveData<>();
-    private final MutableLiveData<Boolean> isDiaryDeleteError = new MutableLiveData<>();
 
 
     @Inject
@@ -56,14 +54,13 @@ public class DiaryListViewModel extends ViewModel {
         initialize();
     }
 
-     private void initialize() {
+    @Override
+    protected void initialize() {
+        super.initialize();
         diaryList.setValue(new ArrayList<>());
         isVisibleUpdateProgressBar.setValue(false);
         isVisibleUpdateProgressBar.setValue(false);
         sortConditionDate = null;
-        isDiaryListLoadingError.setValue(false);
-        isDiaryInformationLoadingError.setValue(false);
-        isDiaryDeleteError.setValue(false);
     }
 
     public enum LoadType {
@@ -258,12 +255,12 @@ public class DiaryListViewModel extends ViewModel {
                 } catch (ExecutionException e) {
                     e.printStackTrace();
                     diaryList.postValue(previousDiaryList);
-                    isDiaryListLoadingError.postValue(true);
+                    addAppError(AppError.DIARY_LOADING);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                     if (!isValidityDelay) {
                         diaryList.postValue(previousDiaryList);
-                        isDiaryListLoadingError.postValue(true);
+                        addAppError(AppError.DIARY_LOADING);
                     }
                 } finally {
                     isVisibleUpdateProgressBar.postValue(false);
@@ -342,7 +339,7 @@ public class DiaryListViewModel extends ViewModel {
         try {
             result = diaryRepository.deleteDiary(date).get();
         } catch (Exception e) {
-            isDiaryDeleteError.setValue(true);
+            addAppError(AppError.DIARY_DELETE);
             return;
         }
         if (result == null) {
@@ -351,7 +348,7 @@ public class DiaryListViewModel extends ViewModel {
         }
         // 削除件数 = 1が正常
         if (result != 1) {
-            isDiaryDeleteError.setValue(true);
+            addAppError(AppError.DIARY_DELETE);
             return;
         }
 
@@ -363,7 +360,7 @@ public class DiaryListViewModel extends ViewModel {
         try {
             return diaryRepository.countDiaries(null).get();
         } catch (Exception e) {
-            isDiaryInformationLoadingError.setValue(true);
+            addAppError(AppError.DIARY_INFORMATION_LOADING);
             return null;
         }
     }
@@ -374,7 +371,7 @@ public class DiaryListViewModel extends ViewModel {
         try {
             return diaryRepository.selectNewestDiary().get();
         } catch (Exception e) {
-            isDiaryInformationLoadingError.setValue(true);
+            addAppError(AppError.DIARY_INFORMATION_LOADING);
             return null;
         }
     }
@@ -384,22 +381,9 @@ public class DiaryListViewModel extends ViewModel {
         try {
             return diaryRepository.selectOldestDiary().get();
         } catch (Exception e) {
-            isDiaryInformationLoadingError.setValue(true);
+            addAppError(AppError.DIARY_INFORMATION_LOADING);
             return null;
         }
-    }
-
-    // エラー関係
-    public void clearIsDiaryListLoadingError() {
-        isDiaryListLoadingError.setValue(false);
-    }
-
-    public void clearIsDiaryInformationLoadingError() {
-        isDiaryInformationLoadingError.setValue(false);
-    }
-
-    public void clearIsDiaryDeleteError() {
-        isDiaryDeleteError.setValue(false);
     }
 
     // LiveDataGetter
@@ -409,18 +393,6 @@ public class DiaryListViewModel extends ViewModel {
 
     public LiveData<Boolean> getIsVisibleUpdateProgressBarLiveData() {
         return isVisibleUpdateProgressBar;
-    }
-
-    public LiveData<Boolean> getIsDiaryListLoadingErrorLiveData() {
-        return isDiaryListLoadingError;
-    }
-
-    public LiveData<Boolean> getIsDiaryInformationLoadingErrorLiveData() {
-        return isDiaryInformationLoadingError;
-    }
-
-    public LiveData<Boolean> getIsDiaryDeleteErrorLiveData() {
-        return isDiaryDeleteError;
     }
 
     @Override

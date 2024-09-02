@@ -28,7 +28,7 @@ public enum AppError {
     @NonNull
     public String getDialogTitle(Context context) {
         if (context == null) {
-            return "";
+            throw new NullPointerException();
         }
         return context.getString(this.DIALOG_TITLE_RES_ID);
     }
@@ -36,7 +36,7 @@ public enum AppError {
     @NonNull
     public String getDialogMessage(Context context) {
         if (context == null) {
-            return "";
+            throw new NullPointerException();
         }
         return context.getString(this.DIALOG_MESSAGE_RES_ID);
     }

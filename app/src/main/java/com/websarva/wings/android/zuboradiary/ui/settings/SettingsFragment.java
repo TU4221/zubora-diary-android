@@ -478,6 +478,11 @@ public class SettingsFragment extends BaseFragment {
         return isGrantedAccessFineLocation && isGrantedAccessCoarseLocation;
     }
 
+    @Override
+    protected void showMessageDialog(@NonNull String title, @NonNull String message) {
+
+    }
+
     private void actionApplicationDetailsSettings() {
         Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
         Uri uri = Uri.fromParts("package", requireActivity().getPackageName(), null);

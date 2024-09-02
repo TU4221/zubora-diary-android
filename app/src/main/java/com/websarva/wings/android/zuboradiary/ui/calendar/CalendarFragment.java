@@ -595,7 +595,8 @@ public class CalendarFragment extends BaseFragment {
         }
     }
 
-    private void showMessageDialog(String title, String message) {
+    @Override
+    protected void showMessageDialog(@NonNull String title, @NonNull String message) {
         NavDirections action =
                 CalendarFragmentDirections
                         .actionCalendarFragmentToMessageDialog(

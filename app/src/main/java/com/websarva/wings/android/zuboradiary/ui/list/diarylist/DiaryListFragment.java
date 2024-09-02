@@ -31,6 +31,7 @@ import java.util.List;
 import com.websarva.wings.android.zuboradiary.data.database.Diary;
 import com.websarva.wings.android.zuboradiary.databinding.FragmentDiaryListBinding;
 import com.websarva.wings.android.zuboradiary.ui.BaseFragment;
+import com.websarva.wings.android.zuboradiary.ui.BaseViewModel;
 import com.websarva.wings.android.zuboradiary.ui.list.DiaryYearMonthListItemBase;
 import com.websarva.wings.android.zuboradiary.ui.list.DiaryYearMonthListAdapter;
 
@@ -42,23 +43,20 @@ public class DiaryListFragment extends BaseFragment {
     // View関係
     private FragmentDiaryListBinding binding;
 
-    // Navigation関係
-    private boolean shouldShowDiaryListLoadingErrorDialog;
-    private boolean shouldShowDiaryInformationLoadingErrorDialog;
-    private boolean shouldShowDiaryDeleteErrorDialog;
-
     // ViewModel
     private DiaryListViewModel diaryListViewModel;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        // ViewModel設定
-        ViewModelProvider provider = new ViewModelProvider(requireActivity());
-        diaryListViewModel = provider.get(DiaryListViewModel.class);
     }
 
+    @Override
+    protected BaseViewModel initializeViewModelOnCreate() {
+        ViewModelProvider provider = new ViewModelProvider(requireActivity());
+        diaryListViewModel = provider.get(DiaryListViewModel.class);
+        return diaryListViewModel;
+    }
 
     @Override
     public View onCreateView(
@@ -100,7 +98,6 @@ public class DiaryListFragment extends BaseFragment {
         setUpToolBar();
         setUpFloatActionButton();
         setUpDiaryList();
-        setUpErrorObserver();
     }
 
     @Override
@@ -112,7 +109,6 @@ public class DiaryListFragment extends BaseFragment {
     protected void handleOnReceivedResulFromDialog(@NonNull SavedStateHandle savedStateHandle) {
         receiveDatePickerDialogResults(savedStateHandle);
         receiveDiaryDeleteConfirmationDialogResults(savedStateHandle);
-        retryErrorDialogShow();
     }
 
     @Override
@@ -285,51 +281,6 @@ public class DiaryListFragment extends BaseFragment {
         }
     }
 
-    private void setUpErrorObserver() {
-        // エラー表示
-        diaryListViewModel.getIsDiaryListLoadingErrorLiveData()
-                .observe(getViewLifecycleOwner(), new Observer<Boolean>() {
-                    @Override
-                    public void onChanged(Boolean aBoolean) {
-                        if (aBoolean == null) {
-                            return;
-                        }
-                        if (aBoolean) {
-                            showDiaryListLoadingErrorDialog();
-                            diaryListViewModel.clearIsDiaryListLoadingError();
-                        }
-                    }
-                });
-
-        diaryListViewModel.getIsDiaryInformationLoadingErrorLiveData()
-                .observe(getViewLifecycleOwner(), new Observer<Boolean>() {
-                    @Override
-                    public void onChanged(Boolean aBoolean) {
-                        if (aBoolean == null) {
-                            return;
-                        }
-                        if (aBoolean) {
-                            showDiaryInformationLoadingErrorDialog();
-                            diaryListViewModel.clearIsDiaryInformationLoadingError();
-                        }
-                    }
-                });
-
-        diaryListViewModel.getIsDiaryDeleteErrorLiveData()
-                .observe(getViewLifecycleOwner(), new Observer<Boolean>() {
-                    @Override
-                    public void onChanged(Boolean aBoolean) {
-                        if (aBoolean == null) {
-                            return;
-                        }
-                        if (aBoolean) {
-                            showDiaryDeleteErrorDialog();
-                            diaryListViewModel.clearIsDiaryDeleteError();
-                        }
-                    }
-                });
-    }
-
     private void showEditDiary() {
         NavDirections action =
                 DiaryListFragmentDirections
@@ -369,49 +320,8 @@ public class DiaryListFragment extends BaseFragment {
         navController.navigate(action);
     }
 
-    // 他のダイアログで表示できなかったダイアログを表示
-    private void retryErrorDialogShow() {
-        if (shouldShowDiaryListLoadingErrorDialog) {
-            showDiaryListLoadingErrorDialog();
-            return;
-        }
-        if (shouldShowDiaryInformationLoadingErrorDialog) {
-            showDiaryInformationLoadingErrorDialog();
-            return;
-        }
-        if (shouldShowDiaryDeleteErrorDialog) {
-            showDiaryDeleteErrorDialog();
-        }
-    }
-
-    private void showDiaryListLoadingErrorDialog() {
-        if (canShowDialog()) {
-            showMessageDialog(getString(R.string.dialog_message_title_access_error), getString(R.string.dialog_message_message_diary_list_loading_error));
-            shouldShowDiaryListLoadingErrorDialog = false;
-        } else {
-            shouldShowDiaryListLoadingErrorDialog = true;
-        }
-    }
-
-    private void showDiaryInformationLoadingErrorDialog() {
-        if (canShowDialog()) {
-            showMessageDialog(getString(R.string.dialog_message_title_access_error), getString(R.string.dialog_message_message_diary_information_loading_error));
-            shouldShowDiaryInformationLoadingErrorDialog = false;
-        } else {
-            shouldShowDiaryInformationLoadingErrorDialog = true;
-        }
-    }
-
-    private void showDiaryDeleteErrorDialog() {
-        if (canShowDialog()) {
-            showMessageDialog(getString(R.string.dialog_message_title_access_error), getString(R.string.dialog_message_message_diary_delete_error));
-            shouldShowDiaryDeleteErrorDialog = false;
-        } else {
-            shouldShowDiaryDeleteErrorDialog = true;
-        }
-    }
-
-    private void showMessageDialog(String title, String message) {
+    @Override
+    protected void showMessageDialog(@NonNull String title, @NonNull String message) {
         NavDirections action =
                 DiaryListFragmentDirections
                         .actionDiaryListFragmentToMessageDialog(title, message);

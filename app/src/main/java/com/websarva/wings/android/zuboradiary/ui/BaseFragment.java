@@ -1,40 +1,68 @@
 package com.websarva.wings.android.zuboradiary.ui;
 
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.LifecycleEventObserver;
 import androidx.lifecycle.LifecycleOwner;
+import androidx.lifecycle.Observer;
 import androidx.lifecycle.SavedStateHandle;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavBackStackEntry;
 import androidx.navigation.NavController;
+import androidx.navigation.NavDestination;
 import androidx.navigation.fragment.NavHostFragment;
+
+import com.websarva.wings.android.zuboradiary.data.AppError;
+import com.websarva.wings.android.zuboradiary.ui.list.diarylist.DiaryListViewModel;
+
+import java.util.List;
 
 
 public abstract class BaseFragment extends CustomFragment {
 
-    public NavController navController;
+    protected NavController navController;
+    protected int destinationId;
+    protected BaseViewModel baseViewModel;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        initializeNavController();
+        navController = NavHostFragment.findNavController(this);
+        destinationId = getCurrentDestinationId();
+
+        baseViewModel = initializeViewModelOnCreate();
     }
 
-    private void initializeNavController() {
-        navController = NavHostFragment.findNavController(this);
+    private int getCurrentDestinationId() {
+        NavDestination navDestination = navController.getCurrentDestination();
+        if (navDestination == null) {
+            throw new NullPointerException();
+        }
+        return navDestination.getId();
+    }
+
+    // TODO:この方法以外があるか検討する。
+    protected abstract BaseViewModel initializeViewModelOnCreate();
+
+    @Override
+    public View onCreateView(
+            @NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        return super.onCreateView(inflater, container, savedInstanceState);
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
         setUpPreviousFragmentResultReceiver();
         setUpDialogResultReceiver();
+        setUpErrorMessageDialog();
     }
 
     @Nullable
@@ -71,6 +99,7 @@ public abstract class BaseFragment extends CustomFragment {
                 if (event.equals(Lifecycle.Event.ON_RESUME)) {
                     SavedStateHandle savedStateHandle = navBackStackEntry.getSavedStateHandle();
                     handleOnReceivedResulFromDialog(savedStateHandle);
+                    retryErrorDialogShow();
                     removeResulFromDialog(savedStateHandle);
                 }
             }
@@ -108,5 +137,47 @@ public abstract class BaseFragment extends CustomFragment {
             return null;
         }
         return savedStateHandle.get(key);
+    }
+
+    private void setUpErrorMessageDialog() {
+        baseViewModel.getAppErrorBufferListLiveData()
+                .observe(getViewLifecycleOwner(), new Observer<List<AppError>>() {
+                    @Override
+                    public void onChanged(List<AppError> appErrors) {
+                        if (appErrors == null) {
+                            throw new NullPointerException();
+                        }
+                        if (appErrors.isEmpty()) {
+                            return;
+                        }
+                        AppError appError = appErrors.get(0);
+                        showErrorMessageDialog(appError);
+                    }
+                });
+    }
+
+    private void showErrorMessageDialog(AppError appError) {
+        if (appError == null) {
+            throw new NullPointerException();
+        }
+
+        if (!canShowOtherFragment()) {
+            return;
+        }
+
+        String dialogTitle = appError.getDialogTitle(requireContext());
+        String dialogMessage = appError.getDialogMessage(requireContext());
+        showMessageDialog(dialogTitle, dialogMessage);
+        baseViewModel.removeAppErrorBufferListFirstItem();
+    }
+
+    protected boolean canShowOtherFragment() {
+        return destinationId == getCurrentDestinationId();
+    }
+
+    protected abstract void showMessageDialog(@NonNull String title,@NonNull  String message);
+
+    private void retryErrorDialogShow() {
+        baseViewModel.triggerObserver();
     }
 }
