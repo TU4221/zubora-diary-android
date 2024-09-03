@@ -147,6 +147,16 @@
             <action
                 android:id="@+id/action_settings_fragment_to_permission_dialog"
                 app:destination="@id/navigation_permission_dialog"/>
+            <action
+                android:id="@+id/action_settings_fragment_to_message_dialog"
+                app:destination="@id/navigation_message_dialog">
+                <argument
+                    android:name="Title"
+                    app:argType="string" />
+                <argument
+                    android:name="Message"
+                    app:argType="string" />
+            </action>
         </fragment>
         <dialog
             android:id="@+id/navigation_theme_color_picker_dialog"

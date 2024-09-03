@@ -12,14 +12,12 @@ import androidx.lifecycle.LifecycleEventObserver;
 import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.SavedStateHandle;
-import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavBackStackEntry;
 import androidx.navigation.NavController;
 import androidx.navigation.NavDestination;
 import androidx.navigation.fragment.NavHostFragment;
 
 import com.websarva.wings.android.zuboradiary.data.AppError;
-import com.websarva.wings.android.zuboradiary.ui.list.diarylist.DiaryListViewModel;
 
 import java.util.List;
 
@@ -28,17 +26,18 @@ public abstract class BaseFragment extends CustomFragment {
 
     protected NavController navController;
     protected int destinationId;
-    protected BaseViewModel baseViewModel;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        initializeViewModel();
+
         navController = NavHostFragment.findNavController(this);
         destinationId = getCurrentDestinationId();
-
-        baseViewModel = initializeViewModelOnCreate();
     }
+
+    protected abstract void initializeViewModel();
 
     private int getCurrentDestinationId() {
         NavDestination navDestination = navController.getCurrentDestination();
@@ -48,14 +47,14 @@ public abstract class BaseFragment extends CustomFragment {
         return navDestination.getId();
     }
 
-    // TODO:この方法以外があるか検討する。
-    protected abstract BaseViewModel initializeViewModelOnCreate();
-
     @Override
     public View onCreateView(
             @NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        return super.onCreateView(inflater, container, savedInstanceState);
+        super.onCreateView(inflater, container, savedInstanceState);
+        return initializeDataBinding(inflater, container);
     }
+
+    protected abstract View initializeDataBinding(@NonNull LayoutInflater inflater, ViewGroup container);
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
@@ -79,10 +78,10 @@ public abstract class BaseFragment extends CustomFragment {
         if (savedStateHandle == null) {
             return;
         }
-        handleOnReceivedResultFromPreviousFragment(savedStateHandle);
+        handleOnReceivingResultFromPreviousFragment(savedStateHandle);
     }
 
-    protected abstract void handleOnReceivedResultFromPreviousFragment(@NonNull SavedStateHandle savedStateHandle);
+    protected abstract void handleOnReceivingResultFromPreviousFragment(@NonNull SavedStateHandle savedStateHandle);
 
     private void setUpDialogResultReceiver() {
         NavBackStackEntry navBackStackEntry = navController.getCurrentBackStackEntry();
@@ -98,9 +97,9 @@ public abstract class BaseFragment extends CustomFragment {
                 //      Dialog非表示中:Lifecycle.Event.ON_RESUME
                 if (event.equals(Lifecycle.Event.ON_RESUME)) {
                     SavedStateHandle savedStateHandle = navBackStackEntry.getSavedStateHandle();
-                    handleOnReceivedResulFromDialog(savedStateHandle);
+                    handleOnReceivingResulFromDialog(savedStateHandle);
                     retryErrorDialogShow();
-                    removeResulFromDialog(savedStateHandle);
+                    removeResultFromDialog(savedStateHandle);
                 }
             }
         };
@@ -114,7 +113,7 @@ public abstract class BaseFragment extends CustomFragment {
                     // MEMO:removeで削除しないとこのFragmentを閉じてもResult内容が残ってしまう。
                     //      その為、このFragmentを再表示した時にObserverがResultの内容で処理してしまう。
                     SavedStateHandle savedStateHandle = navBackStackEntry.getSavedStateHandle();
-                    removeResulFromDialog(savedStateHandle);
+                    removeResultFromDialog(savedStateHandle);
                     // TODO:下記コード意味あるか検証。コメントアウトしてFragment切替後の状態を確認したがObserverが重複することはなかった。
                     navBackStackEntry.getLifecycle().removeObserver(lifecycleEventObserver);
                 }
@@ -122,9 +121,9 @@ public abstract class BaseFragment extends CustomFragment {
         });
     }
 
-    protected abstract void handleOnReceivedResulFromDialog(@NonNull SavedStateHandle savedStateHandle);
+    protected abstract void handleOnReceivingResulFromDialog(@NonNull SavedStateHandle savedStateHandle);
 
-    protected abstract void removeResulFromDialog(@NonNull SavedStateHandle savedStateHandle);
+    protected abstract void removeResultFromDialog(@NonNull SavedStateHandle savedStateHandle);
 
     @Nullable
     public <T> T receiveResulFromDialog(String key) {
@@ -139,30 +138,38 @@ public abstract class BaseFragment extends CustomFragment {
         return savedStateHandle.get(key);
     }
 
-    private void setUpErrorMessageDialog() {
-        baseViewModel.getAppErrorBufferListLiveData()
-                .observe(getViewLifecycleOwner(), new Observer<List<AppError>>() {
-                    @Override
-                    public void onChanged(List<AppError> appErrors) {
-                        if (appErrors == null) {
-                            throw new NullPointerException();
-                        }
-                        if (appErrors.isEmpty()) {
-                            return;
-                        }
-                        AppError appError = appErrors.get(0);
-                        showErrorMessageDialog(appError);
-                    }
-                });
+    protected abstract void setUpErrorMessageDialog();
+
+    protected class AppErrorBufferListObserver implements Observer<List<AppError>> {
+
+        BaseViewModel baseViewModel;
+
+        public AppErrorBufferListObserver(BaseViewModel baseViewModel) {
+            this.baseViewModel = baseViewModel;
+        }
+
+        @Override
+        public void onChanged(List<AppError> appErrors) {
+            if (appErrors == null) {
+                throw new NullPointerException();
+            }
+            if (appErrors.isEmpty()) {
+                return;
+            }
+            AppError appError = appErrors.get(0);
+            showErrorMessageDialog(appError, baseViewModel);
+        }
     }
 
-    private void showErrorMessageDialog(AppError appError) {
+    private void showErrorMessageDialog(AppError appError, BaseViewModel baseViewModel) {
         if (appError == null) {
             throw new NullPointerException();
         }
-
         if (!canShowOtherFragment()) {
             return;
+        }
+        if (baseViewModel == null) {
+            throw new NullPointerException();
         }
 
         String dialogTitle = appError.getDialogTitle(requireContext());
@@ -177,7 +184,5 @@ public abstract class BaseFragment extends CustomFragment {
 
     protected abstract void showMessageDialog(@NonNull String title,@NonNull  String message);
 
-    private void retryErrorDialogShow() {
-        baseViewModel.triggerObserver();
-    }
+    protected abstract void retryErrorDialogShow();
 }

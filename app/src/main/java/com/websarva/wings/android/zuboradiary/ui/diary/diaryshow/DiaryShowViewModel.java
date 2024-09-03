@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
+import com.websarva.wings.android.zuboradiary.data.AppError;
 import com.websarva.wings.android.zuboradiary.data.database.Diary;
 import com.websarva.wings.android.zuboradiary.data.database.DiaryRepository;
 import com.websarva.wings.android.zuboradiary.data.diary.ConditionConverter;
@@ -11,6 +12,7 @@ import com.websarva.wings.android.zuboradiary.data.diary.Conditions;
 import com.websarva.wings.android.zuboradiary.data.diary.WeatherConverter;
 import com.websarva.wings.android.zuboradiary.data.diary.Weathers;
 import com.websarva.wings.android.zuboradiary.data.settings.SettingsRepository;
+import com.websarva.wings.android.zuboradiary.ui.BaseViewModel;
 import com.websarva.wings.android.zuboradiary.ui.diary.DiaryLiveData;
 
 import java.time.LocalDate;
@@ -22,16 +24,12 @@ import javax.inject.Inject;
 import dagger.hilt.android.lifecycle.HiltViewModel;
 
 @HiltViewModel
-public class DiaryShowViewModel extends ViewModel {
+public class DiaryShowViewModel extends BaseViewModel {
     private final DiaryRepository diaryRepository;
     private final SettingsRepository settingsRepository;
 
     // 日記データ関係
     DiaryLiveData diaryLiveData;
-
-    // エラー関係
-    private final MutableLiveData<Boolean> isDiaryLoadingError = new MutableLiveData<>();
-    private final MutableLiveData<Boolean> isDiaryDeleteError = new MutableLiveData<>();
 
     @Inject
     public DiaryShowViewModel(DiaryRepository diaryRepository, SettingsRepository settingsRepository) {
@@ -41,26 +39,18 @@ public class DiaryShowViewModel extends ViewModel {
         initialize();
     }
 
+    @Override
     public void initialize() {
+        super.initialize();
         diaryLiveData.initialize();
-        isDiaryLoadingError.setValue(false);
-        isDiaryDeleteError.setValue(false);
     }
 
     public boolean hasDiary(LocalDate localDate) {
         try {
             return diaryRepository.hasDiary(localDate).get();
         } catch (ExecutionException | InterruptedException e) {
-            isDiaryLoadingError.setValue(true);
+            addAppError(AppError.DIARY_INFORMATION_LOADING);
             return false;
-        }
-    }
-
-    public void prepareDiary(LocalDate date, boolean isLoadingDiary) {
-        try {
-            loadDiary(date);
-        } catch (Exception e) {
-            isDiaryLoadingError.setValue(true);
         }
     }
 
@@ -69,7 +59,7 @@ public class DiaryShowViewModel extends ViewModel {
         try {
              diary = diaryRepository.selectDiary(date).get();
         } catch (Exception e) {
-            isDiaryLoadingError.setValue(true);
+            addAppError(AppError.DIARY_LOADING);
             return;
         }
         diaryLiveData.getDate().setValue(LocalDate.parse(diary.getDate()));
@@ -133,19 +123,10 @@ public class DiaryShowViewModel extends ViewModel {
         try {
             diaryRepository.deleteDiary(deleteDate).get();
         } catch (Exception e) {
-            isDiaryDeleteError.setValue(true);
+            addAppError(AppError.DIARY_DELETE);
             return false;
         }
         return true;
-    }
-
-    // Error関係
-    public void clearDiaryLoadingError() {
-        isDiaryLoadingError.setValue(false);
-    }
-
-    public void clearDiaryDeleteError() {
-        isDiaryDeleteError.setValue(false);
     }
 
     // LiveDataGetter
@@ -223,13 +204,5 @@ public class DiaryShowViewModel extends ViewModel {
 
     public LiveData<LocalDateTime> getLogLiveData() {
         return diaryLiveData.getLog();
-    }
-
-    public LiveData<Boolean> getIsDiaryLoadingErrorLiveData() {
-        return isDiaryLoadingError;
-    }
-
-    public LiveData<Boolean> getIsDiaryDeleteErrorLiveData() {
-        return isDiaryDeleteError;
     }
 }

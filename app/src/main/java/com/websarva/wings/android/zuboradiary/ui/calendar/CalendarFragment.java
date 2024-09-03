@@ -75,8 +75,10 @@ public class CalendarFragment extends BaseFragment {
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+    }
 
-        // ViewModel設定
+    @Override
+    protected void initializeViewModel() {
         ViewModelProvider provider = new ViewModelProvider(requireActivity());
         calendarViewModel = provider.get(CalendarViewModel.class);
         diaryShowViewModel = provider.get(DiaryShowViewModel.class);
@@ -85,15 +87,6 @@ public class CalendarFragment extends BaseFragment {
 
     public View onCreateView(
             @NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        super.onCreateView(inflater,container,savedInstanceState);
-
-        // データバインディング設定
-        binding = FragmentCalendarBinding.inflate(inflater, container, false);
-
-        // 双方向データバインディング設定
-        binding.setLifecycleOwner(this);
-        binding.setDiaryShowViewModel(diaryShowViewModel);
-
         // 画面遷移時のアニメーション設定
         // FROM:遷移元 TO:遷移先
         // FROM - TO の TO として現れるアニメーション
@@ -111,6 +104,17 @@ public class CalendarFragment extends BaseFragment {
         // TO - FROM の TO として消えるアニメーション
         setReturnTransition(new MaterialSharedAxis(MaterialSharedAxis.X, false));
 
+        return super.onCreateView(inflater,container,savedInstanceState);
+    }
+
+    @Override
+    protected View initializeDataBinding(@NonNull LayoutInflater inflater, ViewGroup container) {
+        // データバインディング設定
+        binding = FragmentCalendarBinding.inflate(inflater, container, false);
+
+        // 双方向データバインディング設定
+        binding.setLifecycleOwner(this);
+        binding.setDiaryShowViewModel(diaryShowViewModel);
         return binding.getRoot();
     }
 
@@ -118,7 +122,6 @@ public class CalendarFragment extends BaseFragment {
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        setUpErrorObserver();
         setUpCalendar();
         setUpDiaryShow();
         setUpFloatActionButton();
@@ -126,7 +129,7 @@ public class CalendarFragment extends BaseFragment {
     }
 
     @Override
-    protected void handleOnReceivedResultFromPreviousFragment(@NonNull SavedStateHandle savedStateHandle) {
+    protected void handleOnReceivingResultFromPreviousFragment(@NonNull SavedStateHandle savedStateHandle) {
         MutableLiveData<LocalDate> showedDiaryDateLiveData =
                 savedStateHandle.getLiveData(DiaryShowFragment.KEY_SHOWED_DIARY_DATE);
         showedDiaryDateLiveData.observe(getViewLifecycleOwner(), new Observer<LocalDate>() {
@@ -139,34 +142,23 @@ public class CalendarFragment extends BaseFragment {
     }
 
     @Override
-    protected void handleOnReceivedResulFromDialog(@NonNull SavedStateHandle savedStateHandle) {
+    protected void handleOnReceivingResulFromDialog(@NonNull SavedStateHandle savedStateHandle) {
         retryErrorDialogShow();
     }
 
     @Override
-    protected void removeResulFromDialog(@NonNull SavedStateHandle savedStateHandle) {
+    protected void removeResultFromDialog(@NonNull SavedStateHandle savedStateHandle) {
         // 処理なし
     }
 
-    private void setUpErrorObserver() {
-        calendarViewModel.getIsDiaryLoadingErrorLiveData()
-                .observe(getViewLifecycleOwner(), new IsDiaryLoadingErrorObserver());
-        diaryShowViewModel.getIsDiaryLoadingErrorLiveData()
-                .observe(getViewLifecycleOwner(), new IsDiaryLoadingErrorObserver());
-    }
-
-    private class IsDiaryLoadingErrorObserver implements Observer<Boolean> {
-
-        @Override
-        public void onChanged(Boolean aBoolean) {
-            if (aBoolean == null) {
-                return;
-            }
-            if (aBoolean) {
-                showDiaryLoadingErrorDialog();
-                calendarViewModel.clearDiaryLoadingError();
-            }
-        }
+    @Override
+    protected void setUpErrorMessageDialog() {
+        calendarViewModel.getAppErrorBufferListLiveData()
+                .observe(getViewLifecycleOwner(), new AppErrorBufferListObserver(calendarViewModel));
+        diaryShowViewModel.getAppErrorBufferListLiveData()
+                .observe(getViewLifecycleOwner(), new AppErrorBufferListObserver(diaryShowViewModel));
+        settingsViewModel.getAppErrorBufferListLiveData()
+                .observe(getViewLifecycleOwner(), new AppErrorBufferListObserver(settingsViewModel));
     }
 
     private void setUpCalendar() {
@@ -510,10 +502,6 @@ public class CalendarFragment extends BaseFragment {
             @Override
             public void onClick(View v) {
                 LocalDate selectedDate = calendarViewModel.getSelectedDateLiveData().getValue();
-                if (selectedDate == null) {
-                    selectedDate = LocalDate.now();
-                    // TODO:assert検討
-                }
                 showDiaryEditFragment(selectedDate);
             }
         });
@@ -565,34 +553,22 @@ public class CalendarFragment extends BaseFragment {
         binding.nestedScrollFullScreen.smoothScrollTo(0, 0);
     }
 
-    private void showDiaryEditFragment(LocalDate localDate) {
+    private void showDiaryEditFragment(LocalDate date) {
+        if (date == null) {
+            throw new NullPointerException();
+        }
+        if (!canShowOtherFragment()) {
+            return;
+        }
+
         NavDirections action =
                 CalendarFragmentDirections
                         .actionNavigationCalendarFragmentToDiaryEditFragment(
                                 true,
                                 true,
-                                localDate
+                                date
                         );
         navController.navigate(action);
-    }
-
-    // 他のダイアログで表示できなかったダイアログを表示
-    private void retryErrorDialogShow() {
-        if (shouldShowDiaryLoadingErrorDialog) {
-            showDiaryLoadingErrorDialog();
-        }
-    }
-
-    private void showDiaryLoadingErrorDialog() {
-        if (canShowDialog()) {
-            showMessageDialog(
-                    getString(R.string.dialog_message_title_access_error),
-                    getString(R.string.dialog_message_message_diary_loading_error)
-            );
-            shouldShowDiaryLoadingErrorDialog = false;
-        } else {
-            shouldShowDiaryLoadingErrorDialog = true;
-        }
     }
 
     @Override
@@ -604,12 +580,10 @@ public class CalendarFragment extends BaseFragment {
         navController.navigate(action);
     }
 
-    private boolean canShowDialog() {
-        NavDestination navDestination = navController.getCurrentDestination();
-        if (navDestination == null) {
-            return false;
-        }
-        int currentDestinationId = navController.getCurrentDestination().getId();
-        return currentDestinationId == R.id.navigation_calendar_fragment;
+    @Override
+    protected void retryErrorDialogShow() {
+        calendarViewModel.triggerAppErrorBufferListObserver();
+        diaryShowViewModel.triggerAppErrorBufferListObserver();
+        settingsViewModel.triggerAppErrorBufferListObserver();
     }
 }

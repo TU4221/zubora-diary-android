@@ -37,6 +37,7 @@ import com.websarva.wings.android.zuboradiary.data.settings.ThemeColors;
 import com.websarva.wings.android.zuboradiary.databinding.FragmentSettingsBinding;
 import com.websarva.wings.android.zuboradiary.ui.BaseFragment;
 import com.websarva.wings.android.zuboradiary.ui.ThemeColorSwitcher;
+import com.websarva.wings.android.zuboradiary.ui.diary.diaryshow.DiaryShowFragmentDirections;
 
 import java.time.DayOfWeek;
 import java.time.LocalTime;
@@ -63,10 +64,6 @@ public class SettingsFragment extends BaseFragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        // ViewModel設定
-        ViewModelProvider provider = new ViewModelProvider(requireActivity());
-        settingsViewModel = provider.get(SettingsViewModel.class);
 
         // ActivityResultLauncher設定
         // 通知権限取得結果処理
@@ -114,17 +111,22 @@ public class SettingsFragment extends BaseFragment {
     }
 
     @Override
+    protected void initializeViewModel() {
+        ViewModelProvider provider = new ViewModelProvider(requireActivity());
+        settingsViewModel = provider.get(SettingsViewModel.class);
+    }
+
+    @Override
     public View onCreateView(
             @NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        super.onCreateView(inflater, container, savedInstanceState);
+        return super.onCreateView(inflater, container, savedInstanceState);
+    }
 
-        // ビューバインディング設定
+    @Override
+    protected View initializeDataBinding(@NonNull LayoutInflater inflater, ViewGroup container) {
         binding = FragmentSettingsBinding.inflate(inflater, container, false);
-
-        // データバインディング設定
         binding.setLifecycleOwner(this);
         binding.setSettingsViewModel(settingsViewModel);
-
         return binding.getRoot();
     }
 
@@ -208,12 +210,12 @@ public class SettingsFragment extends BaseFragment {
     }
 
     @Override
-    protected void handleOnReceivedResultFromPreviousFragment(@NonNull SavedStateHandle savedStateHandle) {
+    protected void handleOnReceivingResultFromPreviousFragment(@NonNull SavedStateHandle savedStateHandle) {
         // 処理なし
     }
 
     @Override
-    protected void handleOnReceivedResulFromDialog(@NonNull SavedStateHandle savedStateHandle) {
+    protected void handleOnReceivingResulFromDialog(@NonNull SavedStateHandle savedStateHandle) {
         receiveThemeColorPickerDialogResult(savedStateHandle);
         receiveDayOfWeekPickerDialogResult(savedStateHandle);
         receiveTimePickerDialogResult(savedStateHandle);
@@ -221,12 +223,18 @@ public class SettingsFragment extends BaseFragment {
     }
 
     @Override
-    protected void removeResulFromDialog(@NonNull SavedStateHandle savedStateHandle) {
+    protected void removeResultFromDialog(@NonNull SavedStateHandle savedStateHandle) {
         savedStateHandle.remove(ThemeColorPickerDialogFragment.KEY_SELECTED_THEME_COLOR);
         savedStateHandle.remove(DayOfWeekPickerDialogFragment.KEY_SELECTED_DAY_OF_WEEK);
         savedStateHandle.remove(TimePickerDialogFragment.KEY_SELECTED_HOUR);
         savedStateHandle.remove(TimePickerDialogFragment.KEY_SELECTED_MINUTE);
         savedStateHandle.remove(PermissionDialogFragment.KEY_SELECTED_BUTTON);
+    }
+
+    @Override
+    protected void setUpErrorMessageDialog() {
+        settingsViewModel.getAppErrorBufferListLiveData()
+                .observe(getViewLifecycleOwner(), new AppErrorBufferListObserver(settingsViewModel));
     }
 
     // テーマカラー設定ダイアログフラグメントから結果受取
@@ -480,7 +488,14 @@ public class SettingsFragment extends BaseFragment {
 
     @Override
     protected void showMessageDialog(@NonNull String title, @NonNull String message) {
+        NavDirections action =
+                SettingsFragmentDirections.actionSettingsFragmentToMessageDialog(title, message);
+        navController.navigate(action);
+    }
 
+    @Override
+    protected void retryErrorDialogShow() {
+        settingsViewModel.triggerAppErrorBufferListObserver();
     }
 
     private void actionApplicationDetailsSettings() {

@@ -53,10 +53,6 @@ public class DiaryShowFragment extends BaseFragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // ViewModel設定
-        ViewModelProvider provider = new ViewModelProvider(this);
-        diaryShowViewModel = provider.get(DiaryShowViewModel.class);
-
         // 戻るボタン押下時の処理
         requireActivity().getOnBackPressedDispatcher().addCallback(
                 this,
@@ -70,17 +66,22 @@ public class DiaryShowFragment extends BaseFragment {
     }
 
     @Override
+    protected void initializeViewModel() {
+        ViewModelProvider provider = new ViewModelProvider(this);
+        diaryShowViewModel = provider.get(DiaryShowViewModel.class);
+    }
+
+    @Override
     public View onCreateView(
             @NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        super.onCreateView(inflater,container,savedInstanceState);
+        return super.onCreateView(inflater,container,savedInstanceState);
+    }
 
-        // データバインディング設定
+    @Override
+    protected View initializeDataBinding(@NonNull LayoutInflater inflater, ViewGroup container) {
         binding = FragmentDiaryShowBinding.inflate(inflater, container, false);
-
-        // 双方向データバインディング設定
         binding.setLifecycleOwner(this);
         binding.setDiaryShowViewModel(diaryShowViewModel);
-
         return binding.getRoot();
     }
 
@@ -94,23 +95,28 @@ public class DiaryShowFragment extends BaseFragment {
         setUpConditionLayout();
         setUpItemLayout();
         setUpLogShowLayout();
-        setUpErrorObserver();
     }
 
     @Override
-    protected void handleOnReceivedResultFromPreviousFragment(@NonNull SavedStateHandle savedStateHandle) {
+    protected void handleOnReceivingResultFromPreviousFragment(@NonNull SavedStateHandle savedStateHandle) {
         // 処理なし
     }
 
     @Override
-    protected void handleOnReceivedResulFromDialog(@NonNull SavedStateHandle savedStateHandle) {
+    protected void handleOnReceivingResulFromDialog(@NonNull SavedStateHandle savedStateHandle) {
         receiveDeleteConfirmationDialogResult(savedStateHandle);
         retryErrorDialogShow();
     }
 
     @Override
-    protected void removeResulFromDialog(@NonNull SavedStateHandle savedStateHandle) {
+    protected void removeResultFromDialog(@NonNull SavedStateHandle savedStateHandle) {
         savedStateHandle.remove(DiaryDeleteConfirmationDialogFragment.KEY_SELECTED_BUTTON);
+    }
+
+    @Override
+    protected void setUpErrorMessageDialog() {
+        diaryShowViewModel.getAppErrorBufferListLiveData()
+                .observe(getViewLifecycleOwner(), new AppErrorBufferListObserver(diaryShowViewModel));
     }
 
     // 日記削除確認ダイアログフラグメントからデータ受取
@@ -159,15 +165,12 @@ public class DiaryShowFragment extends BaseFragment {
                         // 日記編集フラグメント起動
                         if (item.getItemId() == R.id.diaryShowToolbarOptionEditDiary) {
                             LocalDate editDiaryDate = diaryShowViewModel.getDateLiveData().getValue();
-                            if (editDiaryDate == null) {
-                                // TODO:assert
-                                return false;
-                            }
                             showDiaryEdit(editDiaryDate);
                             return true;
                         } else if (item.getItemId() == R.id.diaryShowToolbarOptionDeleteDiary) {
                             LocalDate deleteDiaryDate = diaryShowViewModel.getDateLiveData().getValue();
                             showDiaryDeleteConfirmationDialog(deleteDiaryDate);
+                            return true;
                         }
                         return false;
                     }
@@ -239,35 +242,14 @@ public class DiaryShowFragment extends BaseFragment {
                 );
     }
 
-    private void setUpErrorObserver() {
-        // エラー表示
-        diaryShowViewModel.getIsDiaryLoadingErrorLiveData().observe(getViewLifecycleOwner(), new Observer<Boolean>() {
-            @Override
-            public void onChanged(Boolean aBoolean) {
-                if (aBoolean == null) {
-                    return;
-                }
-                if (aBoolean) {
-                    showDiaryLoadingErrorDialog();
-                    diaryShowViewModel.clearDiaryLoadingError();
-                }
-            }
-        });
-        diaryShowViewModel.getIsDiaryDeleteErrorLiveData().observe(getViewLifecycleOwner(), new Observer<Boolean>() {
-            @Override
-            public void onChanged(Boolean aBoolean) {
-                if (aBoolean == null) {
-                    return;
-                }
-                if (aBoolean) {
-                    showDiaryDeleteErrorDialog();
-                    diaryShowViewModel.clearDiaryDeleteError();
-                }
-            }
-        });
-    }
+    private void showDiaryEdit(LocalDate date) {
+        if (date == null) {
+            throw new NullPointerException();
+        }
+        if (!canShowOtherFragment()) {
+            return;
+        }
 
-    private void showDiaryEdit(@NonNull LocalDate date) {
         NavDirections action =
                 DiaryShowFragmentDirections
                         .actionNavigationDiaryShowFragmentToDiaryEditFragment(
@@ -278,53 +260,17 @@ public class DiaryShowFragment extends BaseFragment {
         navController.navigate(action);
     }
 
-    private boolean canShowDialog() {
-        NavDestination navDestination = navController.getCurrentDestination();
-        if (navDestination == null) {
-            return false;
-        }
-        int currentDestinationId = navController.getCurrentDestination().getId();
-        return currentDestinationId == R.id.navigation_diary_show_fragment;
-    }
-
     private void showDiaryDeleteConfirmationDialog(LocalDate date) {
-        if (canShowDialog()) {
-            if (date == null) {
-                return;
-            }
-            NavDirections action =
-                    DiaryShowFragmentDirections.actionDiaryShowFragmentToDiaryDeleteConfirmationDialog(date);
-            navController.navigate(action);
+        if (date == null) {
+            throw new NullPointerException();
         }
-    }
-
-    // 他のダイアログで表示できなかったダイアログを表示
-    private void retryErrorDialogShow() {
-        if (shouldShowDiaryLoadingErrorDialog) {
-            showDiaryLoadingErrorDialog();
+        if (!canShowOtherFragment()) {
             return;
         }
-        if (shouldShowDiaryDeleteErrorDialog) {
-            showDiaryDeleteErrorDialog();
-        }
-    }
 
-    private void showDiaryLoadingErrorDialog() {
-        if (canShowDialog()) {
-            showMessageDialog(getString(R.string.dialog_message_title_access_error), getString(R.string.dialog_message_message_diary_loading_error));
-            shouldShowDiaryLoadingErrorDialog = false;
-        } else {
-            shouldShowDiaryLoadingErrorDialog = true;
-        }
-    }
-
-    private void showDiaryDeleteErrorDialog() {
-        if (canShowDialog()) {
-            showMessageDialog(getString(R.string.dialog_message_title_access_error), getString(R.string.dialog_message_message_diary_delete_error));
-            shouldShowDiaryDeleteErrorDialog = false;
-        } else {
-            shouldShowDiaryDeleteErrorDialog = true;
-        }
+        NavDirections action =
+                DiaryShowFragmentDirections.actionDiaryShowFragmentToDiaryDeleteConfirmationDialog(date);
+        navController.navigate(action);
     }
 
     @Override
@@ -332,6 +278,11 @@ public class DiaryShowFragment extends BaseFragment {
         NavDirections action =
                 DiaryShowFragmentDirections.actionDiaryShowFragmentToMessageDialog(title, message);
         navController.navigate(action);
+    }
+
+    @Override
+    protected void retryErrorDialogShow() {
+        diaryShowViewModel.triggerAppErrorBufferListObserver();
     }
 
     // 一つ前のフラグメントを表示

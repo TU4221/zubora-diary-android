@@ -10,8 +10,10 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 import com.google.common.util.concurrent.ListenableFuture;
+import com.websarva.wings.android.zuboradiary.data.AppError;
 import com.websarva.wings.android.zuboradiary.data.database.DiaryRepository;
 import com.websarva.wings.android.zuboradiary.data.database.WordSearchResultListItem;
+import com.websarva.wings.android.zuboradiary.ui.BaseViewModel;
 import com.websarva.wings.android.zuboradiary.ui.list.DiaryYearMonthListAdapter;
 
 import java.time.LocalDate;
@@ -29,7 +31,7 @@ import javax.inject.Inject;
 import dagger.hilt.android.lifecycle.HiltViewModel;
 
 @HiltViewModel
-public class WordSearchViewModel extends ViewModel {
+public class WordSearchViewModel extends BaseViewModel {
 
     private final DiaryRepository diaryRepository;
     private final MutableLiveData<String> searchWord = new MutableLiveData<>();
@@ -42,9 +44,6 @@ public class WordSearchViewModel extends ViewModel {
     private static final int NUM_LOADING_ITEMS = 10; //リストが画面全体に表示される値にすること。 // TODO:仮数値の為、最後に設定
     private final ExecutorService executorService;
 
-    // エラー関係
-    private final MutableLiveData<Boolean> isDiaryListLoadingError = new MutableLiveData<>();
-
 
     @Inject
     public WordSearchViewModel(DiaryRepository diaryRepository) {
@@ -53,12 +52,13 @@ public class WordSearchViewModel extends ViewModel {
         initialize();
     }
 
+    @Override
     public void initialize() {
+        super.initialize();
         searchWord.setValue("");
         wordSearchResultList.setValue(new ArrayList<>());
         numWordSearchResults.setValue(0);
         isVisibleUpdateProgressBar.setValue(false);
-        isDiaryListLoadingError.setValue(false);
     }
 
     public enum LoadType {
@@ -272,13 +272,13 @@ public class WordSearchViewModel extends ViewModel {
             } catch (ExecutionException e) {
                 e.printStackTrace();
                 wordSearchResultList.postValue(previousResultList);
-                isDiaryListLoadingError.postValue(true);
+                addAppError(AppError.DIARY_LOADING);
             } catch (InterruptedException e) {
                 e.printStackTrace();
                 if (!isValidityDelay) {
                     // TODO:ProgressBarを表示させる為に仮で記述
                     wordSearchResultList.postValue(previousResultList);
-                    isDiaryListLoadingError.postValue(true);
+                    addAppError(AppError.DIARY_LOADING);
                 }
             } finally {
                 isVisibleUpdateProgressBar.postValue(false);
@@ -423,11 +423,6 @@ public class WordSearchViewModel extends ViewModel {
         searchWord.setValue("");
     }
 
-    // エラー関係
-    public void clearIsDiaryListLoadingError() {
-        isDiaryListLoadingError.setValue(false);
-    }
-
     // LiveDataGetter
     // MEMO:単一データバインディングの場合、ゲッターの戻り値はLiveData<>にすること。
     //      双方向データバインディングの場合、ゲッターの戻り値はMutableLiveData<>にすること。
@@ -449,10 +444,6 @@ public class WordSearchViewModel extends ViewModel {
 
     public LiveData<Boolean> getIsVisibleUpdateProgressBarLiveData() {
         return isVisibleUpdateProgressBar;
-    }
-
-    public LiveData<Boolean> getIsDiaryListLoadingErrorLiveData() {
-        return isDiaryListLoadingError;
     }
 
     @Override

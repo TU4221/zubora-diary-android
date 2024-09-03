@@ -44,10 +44,6 @@ public class DiaryItemTitleEditFragment extends BaseFragment {
     // View関係
     private FragmentDiaryItemTitleEditBinding binding;
 
-    // Navigation関係
-    private boolean shouldShowItemTitleSelectionHistoryLoadingErrorDialog;
-    private boolean shouldShowItemTitleSelectionHistoryItemDeleteErrorDialog;
-
     private static final String fromClassName = "From" + DiaryItemTitleEditFragment.class.getName();
     public static final String KEY_UPDATE_ITEM_NUMBER = "UpdateItemNumber" + fromClassName;
     public static final String KEY_NEW_ITEM_TITLE = "NewItemTitle" + fromClassName;
@@ -59,21 +55,23 @@ public class DiaryItemTitleEditFragment extends BaseFragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+    }
 
-        // ViewModel設定
+    @Override
+    protected void initializeViewModel() {
         ViewModelProvider provider = new ViewModelProvider(requireActivity());
-        diaryItemTitleEditViewModel =
-                provider.get(DiaryItemTitleEditViewModel.class);
+        diaryItemTitleEditViewModel = provider.get(DiaryItemTitleEditViewModel.class);
     }
 
     @Override
     public View onCreateView(
             @NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        super.onCreateView(inflater,container,savedInstanceState);
+        return super.onCreateView(inflater,container,savedInstanceState);
+    }
 
-        // データバインディング設定
+    @Override
+    protected View initializeDataBinding(@NonNull LayoutInflater inflater, ViewGroup container) {
         binding = FragmentDiaryItemTitleEditBinding.inflate(inflater, container, false);
-
         return binding.getRoot();
     }
 
@@ -84,11 +82,10 @@ public class DiaryItemTitleEditFragment extends BaseFragment {
         setUpToolBar();
         setUpItemTitleInputField();
         setUpItemTitleSelectionHistory();
-        setUpErrorObserver();
     }
 
     @Override
-    protected void handleOnReceivedResultFromPreviousFragment(@NonNull SavedStateHandle savedStateHandle) {
+    protected void handleOnReceivingResultFromPreviousFragment(@NonNull SavedStateHandle savedStateHandle) {
         // EditDiaryFragmentからデータ受取
         int targetItemNumber =
                 DiaryItemTitleEditFragmentArgs.fromBundle(getArguments()).getTargetItemNumber();
@@ -98,15 +95,21 @@ public class DiaryItemTitleEditFragment extends BaseFragment {
     }
 
     @Override
-    protected void handleOnReceivedResulFromDialog(@NonNull SavedStateHandle savedStateHandle) {
+    protected void handleOnReceivingResulFromDialog(@NonNull SavedStateHandle savedStateHandle) {
         receiveDeleteConfirmationDialogResult(savedStateHandle);
         retryErrorDialogShow();
     }
 
     @Override
-    protected void removeResulFromDialog(@NonNull SavedStateHandle savedStateHandle) {
+    protected void removeResultFromDialog(@NonNull SavedStateHandle savedStateHandle) {
         savedStateHandle.remove(DiaryItemTitleDeleteConfirmationDialogFragment.KEY_SELECTED_BUTTON);
         savedStateHandle.remove(DiaryItemTitleDeleteConfirmationDialogFragment.KEY_DELETE_LIST_ITEM_POSITION);
+    }
+
+    @Override
+    protected void setUpErrorMessageDialog() {
+        diaryItemTitleEditViewModel.getAppErrorBufferListLiveData()
+                .observe(getViewLifecycleOwner(), new AppErrorBufferListObserver(diaryItemTitleEditViewModel));
     }
 
     // 履歴項目削除確認ダイアログからの結果受取
@@ -244,37 +247,6 @@ public class DiaryItemTitleEditFragment extends BaseFragment {
                 });
     }
 
-    private void setUpErrorObserver() {
-        // エラー表示
-        diaryItemTitleEditViewModel.getIsItemTitleSelectionHistoryLoadingErrorLiveData()
-                .observe(getViewLifecycleOwner(), new Observer<Boolean>() {
-                    @Override
-                    public void onChanged(Boolean aBoolean) {
-                        if (aBoolean == null) {
-                            return;
-                        }
-                        if (aBoolean) {
-                            showItemTitleSelectionHistoryLoadingErrorDialog();
-                            diaryItemTitleEditViewModel.clearItemTitleSelectionHistoryLoadingError();
-                        }
-                    }
-                });
-
-        diaryItemTitleEditViewModel.getIsItemTitleSelectionHistoryItemDeleteErrorLiveData()
-                .observe(getViewLifecycleOwner(), new Observer<Boolean>() {
-                    @Override
-                    public void onChanged(Boolean aBoolean) {
-                        if (aBoolean == null) {
-                            return;
-                        }
-                        if (aBoolean) {
-                            showItemTitleSelectionHistoryItemDeleteErrorDialog();
-                            diaryItemTitleEditViewModel.clearItemTitleSelectionHistoryItemDeleteError();
-                        }
-                    }
-                });
-    }
-
     //EditText 設定メソッド
     @SuppressLint("ClickableViewAccessibility")
     private void setupEditText(EditText editText,
@@ -403,6 +375,10 @@ public class DiaryItemTitleEditFragment extends BaseFragment {
     }
 
     private void showDiaryEditFragment() {
+        if (!canShowOtherFragment()) {
+            return;
+        }
+
         NavDirections action =
                 DiaryItemTitleEditFragmentDirections
                         .actionDiaryItemTitleEditFragmentToDiaryEditFragment();
@@ -410,40 +386,21 @@ public class DiaryItemTitleEditFragment extends BaseFragment {
     }
 
     private void showDeleteConfirmationDialog(int itemPosition, String itemTitle) {
+        if (itemPosition < 0) {
+            throw new IllegalArgumentException();
+        }
+        if (itemTitle == null) {
+            throw new NullPointerException();
+        }
+        if (!canShowOtherFragment()) {
+            return;
+        }
+
         NavDirections action =
                 DiaryItemTitleEditFragmentDirections
                         .actionDiaryItemTitleEditFragmentToDiaryItemTitleDeleteConfirmationDialog(
                                 itemPosition, itemTitle);
         navController.navigate(action);
-    }
-
-    // 他のダイアログで表示できなかったダイアログを表示
-    private void retryErrorDialogShow() {
-        if (shouldShowItemTitleSelectionHistoryLoadingErrorDialog) {
-            showItemTitleSelectionHistoryLoadingErrorDialog();
-            return;
-        }
-        if (shouldShowItemTitleSelectionHistoryItemDeleteErrorDialog) {
-            showItemTitleSelectionHistoryItemDeleteErrorDialog();
-        }
-    }
-
-    private void showItemTitleSelectionHistoryLoadingErrorDialog() {
-        if (canShowDialog()) {
-            showMessageDialog(getString(R.string.dialog_message_title_access_error), getString(R.string.dialog_message_message_item_title_selection_history_loading_error));
-            shouldShowItemTitleSelectionHistoryLoadingErrorDialog = false;
-        } else {
-            shouldShowItemTitleSelectionHistoryLoadingErrorDialog = true;
-        }
-    }
-
-    private void showItemTitleSelectionHistoryItemDeleteErrorDialog() {
-        if (canShowDialog()) {
-            showMessageDialog(getString(R.string.dialog_message_title_access_error), getString(R.string.dialog_message_message_item_title_selection_history_item_delete_error));
-            shouldShowItemTitleSelectionHistoryItemDeleteErrorDialog = false;
-        } else {
-            shouldShowItemTitleSelectionHistoryItemDeleteErrorDialog = true;
-        }
     }
 
     @Override
@@ -454,12 +411,8 @@ public class DiaryItemTitleEditFragment extends BaseFragment {
         navController.navigate(action);
     }
 
-    private boolean canShowDialog() {
-        NavDestination navDestination = navController.getCurrentDestination();
-        if (navDestination == null) {
-            return false;
-        }
-        int currentDestinationId = navController.getCurrentDestination().getId();
-        return currentDestinationId == R.id.navigation_diary_item_title_edit_fragment;
+    @Override
+    protected void retryErrorDialogShow() {
+        diaryItemTitleEditViewModel.triggerAppErrorBufferListObserver();
     }
 }

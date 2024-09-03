@@ -1,6 +1,9 @@
 package com.websarva.wings.android.zuboradiary.ui.settings;
 
 import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 
 import androidx.annotation.FloatRange;
 import androidx.annotation.NonNull;
@@ -9,9 +12,11 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
+import com.websarva.wings.android.zuboradiary.data.AppError;
 import com.websarva.wings.android.zuboradiary.data.settings.SettingsRepository;
 import com.websarva.wings.android.zuboradiary.data.settings.ThemeColors;
 import com.websarva.wings.android.zuboradiary.data.worker.WorkerRepository;
+import com.websarva.wings.android.zuboradiary.ui.BaseViewModel;
 
 import java.time.DayOfWeek;
 import java.time.LocalTime;
@@ -24,7 +29,7 @@ import io.reactivex.rxjava3.core.Single;
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
 
 @HiltViewModel
-public class SettingsViewModel extends ViewModel {
+public class SettingsViewModel extends BaseViewModel {
     private SettingsRepository settingsRepository;
     private WorkerRepository workerRepository;
     private final CompositeDisposable disposables = new CompositeDisposable();
@@ -48,10 +53,12 @@ public class SettingsViewModel extends ViewModel {
         this.settingsRepository = settingsRepository;
         this.workerRepository = workerRepository;
 
+        initialize();
+
         Flowable<String> themeColorNameFlowable = settingsRepository.loadThemeColorName();
         disposables.add(themeColorNameFlowable
                 .subscribe(themeColor::postValue, throwable -> {
-                    throw throwable;
+                    addSettingLoadingError();
                 })
         );
 
@@ -59,7 +66,7 @@ public class SettingsViewModel extends ViewModel {
                 settingsRepository.loadCalendarStartDayOfWeekName();
         disposables.add(calendarStartDayOfWeekNameFlowable
                 .subscribe(calendarStartDayOfWeek::postValue, throwable -> {
-                    throw throwable;
+                    addSettingLoadingError();
                 })
         );
 
@@ -67,7 +74,7 @@ public class SettingsViewModel extends ViewModel {
                 settingsRepository.loadCalendarStartDayOfWeekNumber();
         disposables.add(calendarStartDayOfWeekNumberFlowable
                 .subscribe(calendarStartDayOfWeekNumber::postValue, throwable -> {
-                    throw throwable;
+                    addSettingLoadingError();
                 })
         );
 
@@ -78,7 +85,7 @@ public class SettingsViewModel extends ViewModel {
                     Log.d("20240708", String.valueOf(value));
                     isCheckedReminderNotification.postValue(value);
                 }, throwable -> {
-                    throw throwable;
+                    addSettingLoadingError();
                 })
         );
 
@@ -86,7 +93,7 @@ public class SettingsViewModel extends ViewModel {
                 settingsRepository.loadReminderNotificationTime();
         disposables.add(reminderNotificationTimeFlowable
                 .subscribe(reminderNotificationTime::postValue, throwable -> {
-                    throw throwable;
+                    addSettingLoadingError();
                 })
         );
 
@@ -94,7 +101,7 @@ public class SettingsViewModel extends ViewModel {
                 settingsRepository.loadIsPasscodeLock();
         disposables.add(isPasscodeLockFlowable
                 .subscribe(isCheckedPasscodeLock::postValue, throwable -> {
-                    throw throwable;
+                    addSettingLoadingError();
                 })
         );
 
@@ -102,9 +109,17 @@ public class SettingsViewModel extends ViewModel {
                 settingsRepository.loadIsGettingWeatherInformation();
         disposables.add(isGettingWeatherInformationFlowable
                 .subscribe(isCheckedGettingWeatherInformation::postValue, throwable -> {
-                    throw throwable;
+                    addSettingLoadingError();
                 })
         );
+    }
+
+    private void addSettingLoadingError() {
+        AppError lastAppError = getAppErrorBufferListLastValue();
+        if (lastAppError == AppError.SETTING_LOADING) {
+            return;
+        }
+        addAppError(AppError.SETTING_LOADING);
     }
 
     @Override
@@ -113,6 +128,7 @@ public class SettingsViewModel extends ViewModel {
         disposables.clear();
     }
 
+    // TODO:失敗した時の例外は確認できない？
     public Single<Preferences> saveThemeColor(ThemeColors value) {
         return settingsRepository.saveThemeColor(value);
     }

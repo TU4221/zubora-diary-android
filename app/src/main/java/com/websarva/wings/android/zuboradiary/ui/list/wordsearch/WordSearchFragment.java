@@ -40,7 +40,7 @@ public class WordSearchFragment extends BaseFragment {
 
     // View関係
     private FragmentWordSearchBinding binding;
-    private String lastText = ""; // 二重検索防止用
+    private String previousText = ""; // 二重検索防止用
 
     // Navigation関係
     private boolean shouldShowDiaryListLoadingErrorDialog;
@@ -51,8 +51,10 @@ public class WordSearchFragment extends BaseFragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+    }
 
-        // ViewModel設定
+    @Override
+    protected void initializeViewModel() {
         ViewModelProvider provider = new ViewModelProvider(requireActivity());
         wordSearchViewModel = provider.get(WordSearchViewModel.class);
         wordSearchViewModel.initialize();
@@ -61,15 +63,6 @@ public class WordSearchFragment extends BaseFragment {
     @Override
     public View onCreateView(
             @NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        super.onCreateView(inflater,container,savedInstanceState);
-
-        // データバインディング設定
-        binding = FragmentWordSearchBinding.inflate(inflater, container, false);
-
-        // 双方向データバインディング設定
-        binding.setLifecycleOwner(this);
-        binding.setWordSearchViewModel(wordSearchViewModel);
-
         // 画面遷移時のアニメーション設定
         // FROM:遷移元 TO:遷移先
         // FROM - TO の TO として現れるアニメーション
@@ -92,8 +85,16 @@ public class WordSearchFragment extends BaseFragment {
         // TO - FROM の TO として消えるアニメーション
         setReturnTransition(new MaterialSharedAxis(MaterialSharedAxis.X, false));
 
-        return binding.getRoot();
 
+        return super.onCreateView(inflater,container,savedInstanceState);
+    }
+
+    @Override
+    protected View initializeDataBinding(@NonNull LayoutInflater inflater, ViewGroup container) {
+        binding = FragmentWordSearchBinding.inflate(inflater, container, false);
+        binding.setLifecycleOwner(this);
+        binding.setWordSearchViewModel(wordSearchViewModel);
+        return binding.getRoot();
     }
 
     @Override
@@ -103,22 +104,27 @@ public class WordSearchFragment extends BaseFragment {
         setUpToolBar();
         setUpWordSearchView();
         setUpWordSearchResultList();
-        setUpErrorObserver();
     }
 
     @Override
-    protected void handleOnReceivedResultFromPreviousFragment(@NonNull SavedStateHandle savedStateHandle) {
+    protected void handleOnReceivingResultFromPreviousFragment(@NonNull SavedStateHandle savedStateHandle) {
         // 処理なし
     }
 
     @Override
-    protected void handleOnReceivedResulFromDialog(@NonNull SavedStateHandle savedStateHandle) {
+    protected void handleOnReceivingResulFromDialog(@NonNull SavedStateHandle savedStateHandle) {
         retryErrorDialogShow();
     }
 
     @Override
-    protected void removeResulFromDialog(@NonNull SavedStateHandle savedStateHandle) {
+    protected void removeResultFromDialog(@NonNull SavedStateHandle savedStateHandle) {
         // LifecycleEventObserverにダイアログからの結果受取処理コードを記述したら、ここに削除処理を記述する。
+    }
+
+    @Override
+    protected void setUpErrorMessageDialog() {
+        wordSearchViewModel.getAppErrorBufferListLiveData()
+                .observe(getViewLifecycleOwner(), new AppErrorBufferListObserver(wordSearchViewModel));
     }
 
     private void setUpToolBar() {
@@ -156,7 +162,7 @@ public class WordSearchFragment extends BaseFragment {
                         }
                         // HACK:キーワードの入力時と確定時に検索Observerが起動してしまい
                         //      同じキーワードで二重に検索してしまう。防止策として下記条件追加。
-                        if (s.equals(lastText)) {
+                        if (s.equals(previousText)) {
                             return;
                         }
                         wordSearchViewModel
@@ -164,7 +170,7 @@ public class WordSearchFragment extends BaseFragment {
                                         WordSearchViewModel.LoadType.NEW,
                                         getResources().getColor(R.color.gray) // TODO:テーマカラーで切替
                                 );
-                        lastText = s;
+                        previousText = s;
                     }
                 });
 
@@ -339,44 +345,18 @@ public class WordSearchFragment extends BaseFragment {
         }
     }
 
-    private void setUpErrorObserver() {
-        // エラー表示
-        wordSearchViewModel.getIsDiaryListLoadingErrorLiveData()
-                .observe(getViewLifecycleOwner(), new Observer<Boolean>() {
-                    @Override
-                    public void onChanged(Boolean aBoolean) {
-                        if (aBoolean == null) {
-                            return;
-                        }
-                        if (aBoolean) {
-                            showDiaryListLoadingErrorDialog();
-                            wordSearchViewModel.clearIsDiaryListLoadingError();
-                        }
-                    }
-                });
-    }
-
     private void showShowDiaryFragment(LocalDate date) {
+        if (date == null) {
+            throw new NullPointerException();
+        }
+        if (!canShowOtherFragment()) {
+            return;
+        }
+
         NavDirections action =
                 WordSearchFragmentDirections
                         .actionNavigationWordSearchFragmentToDiaryShowFragment(date);
         navController.navigate(action);
-    }
-
-    // 他のダイアログで表示できなかったダイアログを表示
-    private void retryErrorDialogShow() {
-        if (shouldShowDiaryListLoadingErrorDialog) {
-            showDiaryListLoadingErrorDialog();
-        }
-    }
-
-    private void showDiaryListLoadingErrorDialog() {
-        if (canShowDialog()) {
-            showMessageDialog(getString(R.string.dialog_message_title_access_error), getString(R.string.dialog_message_message_diary_word_search_error));
-            shouldShowDiaryListLoadingErrorDialog = false;
-        } else {
-            shouldShowDiaryListLoadingErrorDialog = true;
-        }
     }
 
     @Override
@@ -388,13 +368,9 @@ public class WordSearchFragment extends BaseFragment {
         navController.navigate(action);
     }
 
-    private boolean canShowDialog() {
-        NavDestination navDestination = navController.getCurrentDestination();
-        if (navDestination == null) {
-            return false;
-        }
-        int currentDestinationId = navController.getCurrentDestination().getId();
-        return currentDestinationId == R.id.navigation_word_search_fragment;
+    @Override
+    protected void retryErrorDialogShow() {
+        wordSearchViewModel.triggerAppErrorBufferListObserver();
     }
 
     // 選択中ボトムナビゲーションタブを再選択時の処理

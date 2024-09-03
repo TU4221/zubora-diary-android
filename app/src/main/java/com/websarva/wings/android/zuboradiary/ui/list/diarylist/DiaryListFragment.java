@@ -31,7 +31,6 @@ import java.util.List;
 import com.websarva.wings.android.zuboradiary.data.database.Diary;
 import com.websarva.wings.android.zuboradiary.databinding.FragmentDiaryListBinding;
 import com.websarva.wings.android.zuboradiary.ui.BaseFragment;
-import com.websarva.wings.android.zuboradiary.ui.BaseViewModel;
 import com.websarva.wings.android.zuboradiary.ui.list.DiaryYearMonthListItemBase;
 import com.websarva.wings.android.zuboradiary.ui.list.DiaryYearMonthListAdapter;
 
@@ -52,24 +51,14 @@ public class DiaryListFragment extends BaseFragment {
     }
 
     @Override
-    protected BaseViewModel initializeViewModelOnCreate() {
+    protected void initializeViewModel() {
         ViewModelProvider provider = new ViewModelProvider(requireActivity());
         diaryListViewModel = provider.get(DiaryListViewModel.class);
-        return diaryListViewModel;
     }
 
     @Override
     public View onCreateView(
             @NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        super.onCreateView(inflater,container,savedInstanceState);
-
-        // データバインディング設定
-        binding = FragmentDiaryListBinding.inflate(inflater, container, false);
-
-        // データバインディング設定
-        binding.setLifecycleOwner(this);
-        binding.setListViewModel(diaryListViewModel);
-
         // 画面遷移時のアニメーション設定
         // FROM:遷移元 TO:遷移先
         // FROM - TO の TO として現れるアニメーション
@@ -87,6 +76,14 @@ public class DiaryListFragment extends BaseFragment {
         // TO - FROM の TO として消えるアニメーション
         setReturnTransition(new MaterialSharedAxis(MaterialSharedAxis.X, false));
 
+        return super.onCreateView(inflater,container,savedInstanceState);
+    }
+
+    @Override
+    protected View initializeDataBinding(@NonNull LayoutInflater inflater, ViewGroup container) {
+        binding = FragmentDiaryListBinding.inflate(inflater, container, false);
+        binding.setLifecycleOwner(this);
+        binding.setListViewModel(diaryListViewModel);
         return binding.getRoot();
     }
 
@@ -101,20 +98,26 @@ public class DiaryListFragment extends BaseFragment {
     }
 
     @Override
-    protected void handleOnReceivedResultFromPreviousFragment(@NonNull SavedStateHandle savedStateHandle) {
+    protected void handleOnReceivingResultFromPreviousFragment(@NonNull SavedStateHandle savedStateHandle) {
         // 処理なし
     }
 
     @Override
-    protected void handleOnReceivedResulFromDialog(@NonNull SavedStateHandle savedStateHandle) {
+    protected void handleOnReceivingResulFromDialog(@NonNull SavedStateHandle savedStateHandle) {
         receiveDatePickerDialogResults(savedStateHandle);
         receiveDiaryDeleteConfirmationDialogResults(savedStateHandle);
     }
 
     @Override
-    protected void removeResulFromDialog(@NonNull SavedStateHandle savedStateHandle) {
+    protected void removeResultFromDialog(@NonNull SavedStateHandle savedStateHandle) {
         savedStateHandle.remove(StartYearMonthPickerDialogFragment.KEY_SELECTED_YEAR_MONTH);
         savedStateHandle.remove(DiaryDeleteConfirmationDialogFragment.KEY_DELETE_DIARY_DATE);
+    }
+
+    @Override
+    protected void setUpErrorMessageDialog() {
+        diaryListViewModel.getAppErrorBufferListLiveData()
+                .observe(getViewLifecycleOwner(), new AppErrorBufferListObserver(diaryListViewModel));
     }
 
     // 日付入力ダイアログフラグメントから結果受取
@@ -150,14 +153,15 @@ public class DiaryListFragment extends BaseFragment {
                         // リスト先頭年月切り替えダイアログ起動
                         Diary newestDiary = diaryListViewModel.loadNewestDiary();
                         Diary oldestDiary = diaryListViewModel.loadOldestDiary();
-                        String newestDate;
-                        String oldestDate;
-                        if (newestDiary == null || oldestDiary == null) {
-                            return;
-                        } else {
-                            newestDate = newestDiary.getDate();
-                            oldestDate = oldestDiary.getDate();
+                        if (newestDiary == null) {
+                            throw new NullPointerException();
                         }
+                        if (oldestDiary == null) {
+                            throw new NullPointerException();
+                        }
+
+                        String newestDate = newestDiary.getDate();
+                        String oldestDate = oldestDiary.getDate();
                         Year newestYear = Year.of(LocalDate.parse(newestDate).getYear());
                         Year oldestYear = Year.of(LocalDate.parse(oldestDate).getYear());
                         showStartYearMonthPickerDialog(newestYear, oldestYear);
@@ -282,6 +286,10 @@ public class DiaryListFragment extends BaseFragment {
     }
 
     private void showEditDiary() {
+        if (!canShowOtherFragment()) {
+            return;
+        }
+
         NavDirections action =
                 DiaryListFragmentDirections
                         .actionNavigationDiaryListFragmentToDiaryEditFragment(
@@ -293,6 +301,13 @@ public class DiaryListFragment extends BaseFragment {
     }
 
     private void showShowDiaryFragment(LocalDate date) {
+        if (date == null) {
+            throw new NullPointerException();
+        }
+        if (!canShowOtherFragment()) {
+            return;
+        }
+
         NavDirections action =
                 DiaryListFragmentDirections
                         .actionNavigationDiaryListFragmentToDiaryShowFragment(date);
@@ -300,6 +315,10 @@ public class DiaryListFragment extends BaseFragment {
     }
 
     private void showWordSearchFragment() {
+        if (!canShowOtherFragment()) {
+            return;
+        }
+
         NavDirections action =
                 DiaryListFragmentDirections
                         .actionNavigationDiaryListFragmentToWordSearchFragment();
@@ -307,6 +326,16 @@ public class DiaryListFragment extends BaseFragment {
     }
 
     private void showStartYearMonthPickerDialog(Year newestYear, Year oldestYear) {
+        if (newestYear == null) {
+            throw new NullPointerException();
+        }
+        if (oldestYear == null) {
+            throw new NullPointerException();
+        }
+        if (!canShowOtherFragment()) {
+            return;
+        }
+
         NavDirections action =
                 DiaryListFragmentDirections
                         .actionDiaryListFragmentToStartYearMonthPickerDialog(newestYear, oldestYear);
@@ -314,6 +343,13 @@ public class DiaryListFragment extends BaseFragment {
     }
 
     private void showDiaryDeleteConfirmationDialog(LocalDate date) {
+        if (date == null) {
+            throw new NullPointerException();
+        }
+        if (!canShowOtherFragment()) {
+            return;
+        }
+
         NavDirections action =
                 DiaryListFragmentDirections
                         .actionDiaryListFragmentToDiaryDeleteConfirmationDialog(date);
@@ -326,6 +362,11 @@ public class DiaryListFragment extends BaseFragment {
                 DiaryListFragmentDirections
                         .actionDiaryListFragmentToMessageDialog(title, message);
         navController.navigate(action);
+    }
+
+    @Override
+    protected void retryErrorDialogShow() {
+        diaryListViewModel.triggerAppErrorBufferListObserver();
     }
 
     private boolean canShowDialog() {

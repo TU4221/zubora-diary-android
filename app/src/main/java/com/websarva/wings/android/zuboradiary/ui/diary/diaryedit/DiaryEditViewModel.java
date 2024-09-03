@@ -7,6 +7,7 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
+import com.websarva.wings.android.zuboradiary.data.AppError;
 import com.websarva.wings.android.zuboradiary.data.WeatherCodeConverter;
 import com.websarva.wings.android.zuboradiary.data.database.DiaryItemTitleSelectionHistoryItem;
 import com.websarva.wings.android.zuboradiary.data.database.DiaryRepository;
@@ -18,6 +19,7 @@ import com.websarva.wings.android.zuboradiary.data.network.WeatherApiRepository;
 import com.websarva.wings.android.zuboradiary.data.network.WeatherApiResponse;
 import com.websarva.wings.android.zuboradiary.data.database.Diary;
 import com.websarva.wings.android.zuboradiary.data.settings.SettingsRepository;
+import com.websarva.wings.android.zuboradiary.ui.BaseViewModel;
 import com.websarva.wings.android.zuboradiary.ui.diary.DiaryLiveData;
 
 import java.io.IOException;
@@ -40,7 +42,7 @@ import retrofit2.Call;
 import retrofit2.Response;
 
 @HiltViewModel
-public class DiaryEditViewModel extends ViewModel {
+public class DiaryEditViewModel extends BaseViewModel {
     private final DiaryRepository diaryRepository;
     private final WeatherApiRepository weatherApiRepository;
     private final SettingsRepository settingsRepository;
@@ -54,12 +56,6 @@ public class DiaryEditViewModel extends ViewModel {
     private Call<WeatherApiResponse> weatherApiResponseCall;
     private boolean isCancelWeatherApiResponseCall;
 
-    // エラー関係
-    private final MutableLiveData<Boolean> isDiarySavingError = new MutableLiveData<>();
-    private final MutableLiveData<Boolean> isDiaryLoadingError = new MutableLiveData<>();
-    private final MutableLiveData<Boolean> isDiaryDeleteError = new MutableLiveData<>();
-    private final MutableLiveData<Boolean> isWeatherLoadingError = new MutableLiveData<>();
-
     @Inject
     public DiaryEditViewModel(
             DiaryRepository diaryRepository,
@@ -72,14 +68,12 @@ public class DiaryEditViewModel extends ViewModel {
         initialize();
     }
 
+    @Override
     public void initialize() {
+        super.initialize();
         hasPreparedDiary = false;
         loadedDate.setValue(null);
         diaryLiveData.initialize();
-        isDiarySavingError.setValue(false);
-        isDiaryLoadingError.setValue(false);
-        isDiaryDeleteError.setValue(false);
-        isWeatherLoadingError.setValue(false);
     }
 
     public void prepareDiary(LocalDate date, boolean isLoadingDiary) {
@@ -87,7 +81,7 @@ public class DiaryEditViewModel extends ViewModel {
             try {
                 loadDiary(date);
             } catch (Exception e) {
-                isDiaryLoadingError.setValue(true);
+                addAppError(AppError.DIARY_LOADING);
                 return;
             }
         } else {
@@ -156,7 +150,7 @@ public class DiaryEditViewModel extends ViewModel {
         try {
             return diaryRepository.hasDiary(localDate).get();
         } catch (ExecutionException | InterruptedException e) {
-            isDiaryLoadingError.setValue(true);
+            addAppError(AppError.DIARY_LOADING);
             return false;
         }
     }
@@ -167,7 +161,7 @@ public class DiaryEditViewModel extends ViewModel {
         try {
             diaryRepository.insertDiary(diary, diaryItemTitleSelectionHistoryItemList).get();
         } catch (Exception e) {
-            isDiarySavingError.setValue(true);
+            addAppError(AppError.DIARY_SAVING);
             return false;
         }
         return true;
@@ -181,7 +175,7 @@ public class DiaryEditViewModel extends ViewModel {
                     .deleteAndInsertDiary(loadedDate.getValue(), diary, diaryItemTitleSelectionHistoryItemList)
                     .get();
         } catch (Exception e) {
-            isDiarySavingError.setValue(true);
+            addAppError(AppError.DIARY_SAVING);
             return false;
         }
         return true;
@@ -269,7 +263,7 @@ public class DiaryEditViewModel extends ViewModel {
         try {
             diaryRepository.deleteDiary(deleteDate).get();
         } catch (Exception e) {
-            isDiaryDeleteError.setValue(true);
+            addAppError(AppError.DIARY_DELETE);
             return false;
         }
         return true;
@@ -359,7 +353,7 @@ public class DiaryEditViewModel extends ViewModel {
                 try {
                     response = weatherApiResponseCall.execute();
                 } catch (IOException e) {
-                    isWeatherLoadingError.postValue(true);
+                    addAppError(AppError.WEATHER_INFORMATION_LOADING);
                     return false;
                 }
                 if (response.isSuccessful()) {
@@ -372,7 +366,7 @@ public class DiaryEditViewModel extends ViewModel {
                                 findWeatherInformation(weatherApiResponse);
                         diaryLiveData.getWeather1().postValue(weather);
                     } else {
-                        isWeatherLoadingError.postValue(true);
+                        addAppError(AppError.WEATHER_INFORMATION_LOADING);
                         Log.d("WeatherApi", "response.code():" + response.code());
                         Log.d("WeatherApi", "response.message():" + response.message());
                         try(ResponseBody errorBody = response.errorBody()) {
@@ -390,7 +384,7 @@ public class DiaryEditViewModel extends ViewModel {
         try {
             future.get();
         } catch (ExecutionException | InterruptedException e1) {
-            isWeatherLoadingError.setValue(true);
+            addAppError(AppError.WEATHER_INFORMATION_LOADING);
         }
     }
 
@@ -460,23 +454,6 @@ public class DiaryEditViewModel extends ViewModel {
     public void updateItemTitle(int itemNumber, String title) {
         diaryLiveData.getItem(itemNumber).getTitle().setValue(title);
         diaryLiveData.getItem(itemNumber).getTitleUpdateLog().setValue(LocalDateTime.now());
-    }
-
-    // Error関係
-    public void clearDiarySavingError() {
-        isDiarySavingError.setValue(false);
-    }
-
-    public void clearDiaryLoadingError() {
-        isDiaryLoadingError.setValue(false);
-    }
-
-    public void clearDiaryDeleteError() {
-        isDiaryDeleteError.setValue(false);
-    }
-
-    public void clearWeatherLoadingError() {
-        isWeatherLoadingError.setValue(false);
     }
 
     // Getter
@@ -587,21 +564,5 @@ public class DiaryEditViewModel extends ViewModel {
 
     public LiveData<LocalDateTime> getLogLiveData() {
         return diaryLiveData.getLog();
-    }
-
-    public LiveData<Boolean> getIsDiarySavingErrorLiveData() {
-        return isDiarySavingError;
-    }
-
-    public LiveData<Boolean> getIsDiaryLoadingErrorLiveData() {
-        return isDiaryLoadingError;
-    }
-
-    public LiveData<Boolean> getIsDiaryDeleteErrorLiveData() {
-        return isDiaryDeleteError;
-    }
-
-    public LiveData<Boolean> getIsWeatherLoadingErrorLiveData() {
-        return isWeatherLoadingError;
     }
 }

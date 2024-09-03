@@ -3,6 +3,7 @@ package com.websarva.wings.android.zuboradiary.ui;
 import android.os.Looper;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
@@ -18,6 +19,7 @@ public class BaseViewModel extends ViewModel {
     public BaseViewModel() {
     }
 
+    // TODO:override左記見直し(統一する)
     protected void initialize() {
         appErrorBufferList.setValue(new ArrayList<>());
     }
@@ -38,7 +40,7 @@ public class BaseViewModel extends ViewModel {
         }
     }
 
-    public final void triggerObserver() {
+    public final void triggerAppErrorBufferListObserver() {
         List<AppError> _appErrorBufferList = appErrorBufferList.getValue();
         appErrorBufferList.setValue(new ArrayList<>(_appErrorBufferList));
     }
@@ -62,7 +64,20 @@ public class BaseViewModel extends ViewModel {
         return appErrorBufferList;
     }
 
-    protected final LiveData<List<AppError>> getAppErrorBufferListLiveData() {
+    @Nullable
+    protected final AppError getAppErrorBufferListLastValue() {
+        List<AppError> appErrorBufferList = this.appErrorBufferList.getValue();
+        if (appErrorBufferList == null) {
+            throw new NullPointerException();
+        }
+        if (appErrorBufferList.isEmpty()) {
+            return null;
+        }
+        int lastIndex = appErrorBufferList.size() - 1;
+        return appErrorBufferList.get(lastIndex);
+    }
+
+    public final LiveData<List<AppError>> getAppErrorBufferListLiveData() {
         return appErrorBufferList;
     }
 }
