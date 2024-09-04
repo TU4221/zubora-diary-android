@@ -1,16 +1,12 @@
 package com.websarva.wings.android.zuboradiary.ui.settings;
 
 import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
 
 import androidx.annotation.FloatRange;
 import androidx.annotation.NonNull;
 import androidx.datastore.preferences.core.Preferences;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.ViewModel;
 
 import com.websarva.wings.android.zuboradiary.data.AppError;
 import com.websarva.wings.android.zuboradiary.data.settings.SettingsRepository;
@@ -27,7 +23,6 @@ import dagger.hilt.android.lifecycle.HiltViewModel;
 import io.reactivex.rxjava3.core.Flowable;
 import io.reactivex.rxjava3.core.Single;
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
-import io.reactivex.rxjava3.disposables.Disposable;
 import io.reactivex.rxjava3.functions.Consumer;
 
 @HiltViewModel
@@ -56,14 +51,38 @@ public class SettingsViewModel extends BaseViewModel {
         this.workerRepository = workerRepository;
 
         initialize();
+        setUpThemeColorValueLoading();
+        setUpStartDayOfWeekValueLoading();
+        setUpStartDayOfWeekNumberValueLoading();
+        setUpIsReminderNotificationValueLoading();
+        setUpReminderNotificationTimeValueLoading();
+        setUpIsPasscodeLockValueLoading();
+        setUpIsGettingWeatherInformationValueLoading();
 
+
+
+
+
+
+
+
+
+
+
+
+
+    }
+
+    private void setUpThemeColorValueLoading() {
         Flowable<String> themeColorNameFlowable = settingsRepository.loadThemeColorName();
         disposables.add(themeColorNameFlowable
                 .subscribe(themeColor::postValue, throwable -> {
                     addSettingLoadingError();
                 })
         );
+    }
 
+    private void setUpStartDayOfWeekValueLoading() {
         Flowable<String> calendarStartDayOfWeekNameFlowable =
                 settingsRepository.loadCalendarStartDayOfWeekName();
         disposables.add(calendarStartDayOfWeekNameFlowable
@@ -71,7 +90,10 @@ public class SettingsViewModel extends BaseViewModel {
                     addSettingLoadingError();
                 })
         );
+    }
 
+    // TODO:DayOfWeekNameとまとめる
+    private void setUpStartDayOfWeekNumberValueLoading() {
         Flowable<Integer> calendarStartDayOfWeekNumberFlowable =
                 settingsRepository.loadCalendarStartDayOfWeekNumber();
         disposables.add(calendarStartDayOfWeekNumberFlowable
@@ -79,7 +101,9 @@ public class SettingsViewModel extends BaseViewModel {
                     addSettingLoadingError();
                 })
         );
+    }
 
+    private void setUpIsReminderNotificationValueLoading() {
         Flowable<Boolean> isReminderNotificationFlowable =
                 settingsRepository.loadIsReminderNotification();
         disposables.add(isReminderNotificationFlowable
@@ -90,7 +114,9 @@ public class SettingsViewModel extends BaseViewModel {
                     addSettingLoadingError();
                 })
         );
+    }
 
+    private void setUpReminderNotificationTimeValueLoading() {
         Flowable<String> reminderNotificationTimeFlowable =
                 settingsRepository.loadReminderNotificationTime();
         disposables.add(reminderNotificationTimeFlowable
@@ -98,7 +124,9 @@ public class SettingsViewModel extends BaseViewModel {
                     addSettingLoadingError();
                 })
         );
+    }
 
+    private void setUpIsPasscodeLockValueLoading() {
         Flowable<Boolean> isPasscodeLockFlowable =
                 settingsRepository.loadIsPasscodeLock();
         disposables.add(isPasscodeLockFlowable
@@ -106,7 +134,9 @@ public class SettingsViewModel extends BaseViewModel {
                     addSettingLoadingError();
                 })
         );
+    }
 
+    private void setUpIsGettingWeatherInformationValueLoading() {
         Flowable<Boolean> isGettingWeatherInformationFlowable =
                 settingsRepository.loadIsGettingWeatherInformation();
         disposables.add(isGettingWeatherInformationFlowable
