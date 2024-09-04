@@ -27,6 +27,8 @@ import dagger.hilt.android.lifecycle.HiltViewModel;
 import io.reactivex.rxjava3.core.Flowable;
 import io.reactivex.rxjava3.core.Single;
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
+import io.reactivex.rxjava3.disposables.Disposable;
+import io.reactivex.rxjava3.functions.Consumer;
 
 @HiltViewModel
 public class SettingsViewModel extends BaseViewModel {
@@ -128,29 +130,52 @@ public class SettingsViewModel extends BaseViewModel {
         disposables.clear();
     }
 
-    // TODO:失敗した時の例外は確認できない？
-    public Single<Preferences> saveThemeColor(ThemeColors value) {
-        return settingsRepository.saveThemeColor(value);
+    public void saveThemeColor(ThemeColors value) {
+        Single<Preferences> result = settingsRepository.saveThemeColor(value);
+        setUpProcessCompletedUpdate(result);
     }
 
-    public Single<Preferences> saveCalendarStartDayOfWeek(DayOfWeek value) {
-        return settingsRepository.saveCalendarStartDayOfWeek(value);
+    public void saveCalendarStartDayOfWeek(DayOfWeek value) {
+        Single<Preferences> result = settingsRepository.saveCalendarStartDayOfWeek(value);
+        setUpProcessCompletedUpdate(result);
     }
 
-    public Single<Preferences> saveIsReminderNotification(boolean value) {
-        return settingsRepository.saveIsReminderNotification(value);
+    public void saveIsReminderNotification(boolean value) {
+        Single<Preferences> result = settingsRepository.saveIsReminderNotification(value);
+        setUpProcessCompletedUpdate(result);
     }
 
-    public Single<Preferences> saveReminderNotificationTime(@NonNull LocalTime settingTime) {
-        return settingsRepository.saveReminderNotificationTime(settingTime);
+    public void saveReminderNotificationTime(@NonNull LocalTime settingTime) {
+        Single<Preferences> result = settingsRepository.saveReminderNotificationTime(settingTime);
+        setUpProcessCompletedUpdate(result);
     }
 
-    public Single<Preferences> saveIsPasscodeLock(boolean value) {
-        return settingsRepository.saveIsPasscodeLock(value);
+    public void saveIsPasscodeLock(boolean value) {
+        Single<Preferences> result = settingsRepository.saveIsPasscodeLock(value);
+        setUpProcessCompletedUpdate(result);
     }
 
-    public Single<Preferences> saveIsGettingWeatherInformation(boolean value) {
-        return settingsRepository.saveIsGettingWeatherInformation(value);
+    public void saveIsGettingWeatherInformation(boolean value) {
+        Single<Preferences> result = settingsRepository.saveIsGettingWeatherInformation(value);
+        setUpProcessCompletedUpdate(result);
+    }
+
+    private void setUpProcessCompletedUpdate(Single<Preferences> result) {
+        disposables.add(result.subscribe(new Consumer<Preferences>() {
+            @Override
+            public void accept(Preferences preferences) throws Throwable {
+
+            }
+        }, new Consumer<Throwable>() {
+            @Override
+            public void accept(Throwable throwable) throws Throwable {
+                AppError lastAppError = getAppErrorBufferListLastValue();
+                if (lastAppError == AppError.SETTING_UPDATE) {
+                    return;
+                }
+                addAppError(AppError.SETTING_UPDATE);
+            }
+        }));
     }
 
     public void registerReminderNotificationWorker(@NonNull LocalTime settingTime) {
