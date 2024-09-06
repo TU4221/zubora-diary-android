@@ -133,6 +133,10 @@
     <string name="fragment_settings_item_title_passcode_lock">パスコードロック</string>
     <string name="fragment_settings_item_title_getting_weather_information">天気情報取得</string>
 
+    <!-- SettingsFragment -->
+    <string name="fragment_settings_permission_name_notification">通知</string>
+    <string name="fragment_settings_permission_name_location">位置情報利用</string>
+
     <!-- DiaryDeleteConfirmationDialog -->
     <string name="dialog_diary_delete_confirmation_title">削除確認</string>
     <string name="dialog_diary_delete_confirmation_message">の日記を削除してもよろしいでしょうか。</string>
@@ -165,11 +169,7 @@
     <string name="dialog_message_title_connection_error">接続エラー</string>
     <string name="dialog_message_message_weather_information_loading_error">天気情報の読込に失敗しました。</string>
 
-    <!-- TODO:削除 -->
-    <string name="dialog_message_message_diary_list_loading_error">日記リストの読込に失敗しました。</string>
-    <string name="dialog_message_message_diary_word_search_error">ワード検索に失敗しました。</string>
-
-    <!-- DayOfWeekConverter -->
+    <!-- DayOfWeekStringConverter -->
     <string name="day_of_week_name_sunday">日曜</string>
     <string name="day_of_week_name_monday">月曜</string>
     <string name="day_of_week_name_tuesday">火曜</string>

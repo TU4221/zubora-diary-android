@@ -369,15 +369,6 @@ public class DiaryListFragment extends BaseFragment {
         diaryListViewModel.triggerAppErrorBufferListObserver();
     }
 
-    private boolean canShowDialog() {
-        NavDestination navDestination = navController.getCurrentDestination();
-        if (navDestination == null) {
-            return false;
-        }
-        int currentDestinationId = navController.getCurrentDestination().getId();
-        return currentDestinationId == R.id.navigation_diary_list_fragment;
-    }
-
     public void processOnReSelectNavigationItem(){
         diaryListScrollToFirstPosition();
     }
@@ -389,5 +380,10 @@ public class DiaryListFragment extends BaseFragment {
             DiaryYearMonthListAdapter diaryYearMonthListAdapter = (DiaryYearMonthListAdapter) adapter;
             diaryYearMonthListAdapter.scrollToFirstPosition();
         }
+    }
+
+    @Override
+    protected void destroyBinding() {
+        binding = null;
     }
 }

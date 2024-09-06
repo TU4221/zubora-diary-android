@@ -73,7 +73,6 @@
                     android:paddingHorizontal="@dimen/fragment_settings_item_padding_horizontal"
                     android:paddingVertical="@dimen/fragment_settings_item_padding_vertical"
                     android:layout_gravity="center_vertical|end"
-                    android:text="@{settingsViewModel.themeColorLiveData}"
                     android:hint="@string/fragment_settings_item_value_not_set"
                     android:textSize="@dimen/fragment_settings_item_value_text_size"
                     android:gravity="center_vertical|end"/>
@@ -123,7 +122,6 @@
                     android:paddingHorizontal="@dimen/fragment_settings_item_padding_horizontal"
                     android:paddingVertical="@dimen/fragment_settings_item_padding_vertical"
                     android:layout_gravity="center_vertical|end"
-                    android:text="@{settingsViewModel.calendarStartDayOfWeekLiveData}"
                     android:hint="@string/fragment_settings_item_value_not_set"
                     android:textSize="@dimen/fragment_settings_item_value_text_size"
                     android:gravity="center_vertical|end"/>

@@ -5,7 +5,6 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.ViewModel;
 
 import com.websarva.wings.android.zuboradiary.data.AppError;
 import com.websarva.wings.android.zuboradiary.data.WeatherCodeConverter;
@@ -18,7 +17,7 @@ import com.websarva.wings.android.zuboradiary.data.diary.Weathers;
 import com.websarva.wings.android.zuboradiary.data.network.WeatherApiRepository;
 import com.websarva.wings.android.zuboradiary.data.network.WeatherApiResponse;
 import com.websarva.wings.android.zuboradiary.data.database.Diary;
-import com.websarva.wings.android.zuboradiary.data.settings.SettingsRepository;
+import com.websarva.wings.android.zuboradiary.data.preferences.SettingsRepository;
 import com.websarva.wings.android.zuboradiary.ui.BaseViewModel;
 import com.websarva.wings.android.zuboradiary.ui.diary.DiaryLiveData;
 

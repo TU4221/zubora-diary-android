@@ -5,11 +5,12 @@ import android.view.View;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.lifecycle.SavedStateHandle;
+import androidx.navigation.NavBackStackEntry;
 import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
 
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
-import com.websarva.wings.android.zuboradiary.data.settings.ThemeColors;
+import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor;
 import com.websarva.wings.android.zuboradiary.databinding.DialogFragmentNumberPickerBinding;
 
 public class ThemeColorPickerDialogFragment extends BottomSheetDialogFragment {
@@ -37,34 +38,38 @@ public class ThemeColorPickerDialogFragment extends BottomSheetDialogFragment {
                 DialogFragmentNumberPickerBinding.inflate(inflater, container, false);
 
         // View設定
-        ThemeColors currentThemeColor =
-                ThemeColorPickerDialogFragmentArgs.fromBundle(requireArguments()).getCurrentThemeColor();
-        int maxNumThemeColors = ThemeColors.values().length;
+        ThemeColor currentThemeColor =
+                ThemeColorPickerDialogFragmentArgs
+                        .fromBundle(requireArguments()).getCurrentThemeColor();
+        int maxNumThemeColors = ThemeColor.values().length;
         this.binding.numberPicker.setMaxValue(maxNumThemeColors - 1);
         this.binding.numberPicker.setMinValue(0);
         this.binding.numberPicker.setValue(currentThemeColor.ordinal()); // MEMO:最大最小値を設定してから設定すること。(0の位置が表示される)
         this.binding.numberPicker.setWrapSelectorWheel(false);
 
         String[] themeColorList = new String[maxNumThemeColors];
-        for (ThemeColors item: ThemeColors.values()) {
+        for (ThemeColor item: ThemeColor.values()) {
             int ordinal = item.ordinal();
-            int themeNameResId = item.getThemeColorNameResId();
-            themeColorList[ordinal] = getString(themeNameResId);
+            themeColorList[ordinal] = item.toSting(requireContext());
         }
         this.binding.numberPicker.setDisplayedValues(themeColorList);
 
         this.binding.buttonDecision.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                NavBackStackEntry navBackStackEntry =
+                        navController.getPreviousBackStackEntry();
+                if (navBackStackEntry == null) {
+                    throw new NullPointerException();
+                }
+                SavedStateHandle savedStateHandle = navBackStackEntry.getSavedStateHandle();
+
                 int selectedValue =
                         ThemeColorPickerDialogFragment.this.binding.numberPicker.getValue();
-                ThemeColors selectedThemeColor =
-                        ThemeColors.values()[selectedValue];
-                SavedStateHandle savedStateHandle =
-                        ThemeColorPickerDialogFragment.this.navController
-                                .getPreviousBackStackEntry().getSavedStateHandle();
+                ThemeColor selectedThemeColor = ThemeColor.values()[selectedValue];
+
                 savedStateHandle.set(KEY_SELECTED_THEME_COLOR, selectedThemeColor);
-                ThemeColorPickerDialogFragment.this.navController.navigateUp();
+                navController.navigateUp();
             }
         });
 

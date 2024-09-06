@@ -415,4 +415,9 @@ public class DiaryItemTitleEditFragment extends BaseFragment {
     protected void retryErrorDialogShow() {
         diaryItemTitleEditViewModel.triggerAppErrorBufferListObserver();
     }
+
+    @Override
+    protected void destroyBinding() {
+        binding = null;
+    }
 }

@@ -14,7 +14,7 @@ import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
 
 import com.websarva.wings.android.zuboradiary.R;
-import com.websarva.wings.android.zuboradiary.data.DateConverter;
+import com.websarva.wings.android.zuboradiary.data.DateTimeStringConverter;
 
 import java.time.LocalDate;
 
@@ -33,8 +33,8 @@ public class UpdateExistingDiaryDialogFragment extends DialogFragment {
 
         LocalDate updateDiaryDate =
                 UpdateExistingDiaryDialogFragmentArgs.fromBundle(requireArguments()).getUpdateDiaryDate();
-        DateConverter dateConverter = new DateConverter();
-        String stringUpdateDiaryDate = dateConverter.toStringLocalDate(updateDiaryDate);
+        DateTimeStringConverter dateTimeStringConverter = new DateTimeStringConverter();
+        String stringUpdateDiaryDate = dateTimeStringConverter.toStringDate(updateDiaryDate);
         String message = stringUpdateDiaryDate + getString(R.string.dialog_update_Existing_diary_message);
 
         builder.setMessage(message);

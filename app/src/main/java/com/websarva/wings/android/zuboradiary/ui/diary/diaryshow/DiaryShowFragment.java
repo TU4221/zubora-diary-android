@@ -11,7 +11,6 @@ import androidx.lifecycle.Observer;
 import androidx.lifecycle.SavedStateHandle;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavBackStackEntry;
-import androidx.navigation.NavDestination;
 import androidx.navigation.NavDirections;
 
 import android.view.LayoutInflater;
@@ -20,7 +19,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.websarva.wings.android.zuboradiary.R;
-import com.websarva.wings.android.zuboradiary.data.DateConverter;
+import com.websarva.wings.android.zuboradiary.data.DateTimeStringConverter;
 import com.websarva.wings.android.zuboradiary.databinding.FragmentDiaryShowBinding;
 import com.websarva.wings.android.zuboradiary.ui.BaseFragment;
 import com.websarva.wings.android.zuboradiary.ui.diary.DiaryLiveData;
@@ -183,8 +182,8 @@ public class DiaryShowFragment extends BaseFragment {
                         if (date == null) {
                             return;
                         }
-                        DateConverter dateConverter = new DateConverter();
-                        String stringDate = dateConverter.toStringLocalDate(date);
+                        DateTimeStringConverter dateTimeStringConverter = new DateTimeStringConverter();
+                        String stringDate = dateTimeStringConverter.toStringDate(date);
                         binding.materialToolbarTopAppBar.setTitle(stringDate);
                     }
                 });
@@ -308,4 +307,8 @@ public class DiaryShowFragment extends BaseFragment {
         }
     }
 
+    @Override
+    protected void destroyBinding() {
+        binding = null;
+    }
 }

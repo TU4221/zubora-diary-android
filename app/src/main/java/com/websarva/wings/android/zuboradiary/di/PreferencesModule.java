@@ -6,8 +6,7 @@ import androidx.datastore.preferences.core.Preferences;
 import androidx.datastore.preferences.rxjava3.RxPreferenceDataStoreBuilder;
 import androidx.datastore.rxjava3.RxDataStore;
 
-import com.websarva.wings.android.zuboradiary.data.settings.SettingsRepository;
-import com.websarva.wings.android.zuboradiary.data.settings.UserPreferences;
+import com.websarva.wings.android.zuboradiary.data.preferences.UserPreferences;
 
 import javax.inject.Singleton;
 
@@ -30,8 +29,7 @@ public class PreferencesModule {
 
     @Singleton
     @Provides
-    public static UserPreferences provideUserPreferences(
-            @ApplicationContext Context context, RxDataStore<Preferences> preferencesRxDataStore) {
-        return new UserPreferences(context, preferencesRxDataStore);
+    public static UserPreferences provideUserPreferences(RxDataStore<Preferences> preferencesRxDataStore) {
+        return new UserPreferences(preferencesRxDataStore);
     }
 }

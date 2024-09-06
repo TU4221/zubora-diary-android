@@ -163,7 +163,7 @@
             android:name="com.websarva.wings.android.zuboradiary.ui.settings.ThemeColorPickerDialogFragment">
             <argument
                 android:name="currentThemeColor"
-                app:argType="com.websarva.wings.android.zuboradiary.data.settings.ThemeColors" />
+                app:argType="com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor" />
         </dialog>
         <dialog
             android:id="@+id/navigation_day_of_week_picker_dialog"

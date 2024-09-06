@@ -4,7 +4,7 @@ import android.widget.TextView;
 
 import androidx.lifecycle.Observer;
 
-import com.websarva.wings.android.zuboradiary.data.DateConverter;
+import com.websarva.wings.android.zuboradiary.data.DateTimeStringConverter;
 
 import java.time.LocalDateTime;
 
@@ -20,8 +20,8 @@ public class DiaryShowLogObserver implements Observer<LocalDateTime> {
         if (localDateTime == null) {
             return;
         }
-        DateConverter dateConverter = new DateConverter();
-        String strDate = dateConverter.toStringLocalDateTime(localDateTime);
+        DateTimeStringConverter dateTimeStringConverter = new DateTimeStringConverter();
+        String strDate = dateTimeStringConverter.toStringDateTime(localDateTime);
         textLog.setText(strDate);
     }
 }

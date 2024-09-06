@@ -6,14 +6,18 @@ import com.websarva.wings.android.zuboradiary.R;
 
 import java.time.DayOfWeek;
 
-public class DayOfWeekConverter {
+/**
+ *
+ * Enum DayOfWeeK を用途に合わせた文字列に変換するクラス。
+ * */
+public class DayOfWeekStringConverter {
     private Context context;
 
-    public DayOfWeekConverter(Context context) {
+    public DayOfWeekStringConverter(Context context) {
         this.context = context;
     }
 
-    public String toStringName(DayOfWeek dayOfWeek) {
+    public String toCalendarStartDayOfWeek(DayOfWeek dayOfWeek) {
         int resId;
         switch (dayOfWeek) {
             case SUNDAY:
@@ -43,7 +47,7 @@ public class DayOfWeekConverter {
         return context.getString(resId);
     }
 
-    public String toStringShortName(DayOfWeek dayOfWeek) {
+    public String toDiaryListDayOfWeek(DayOfWeek dayOfWeek) {
         int resId;
         switch (dayOfWeek) {
             case SUNDAY:

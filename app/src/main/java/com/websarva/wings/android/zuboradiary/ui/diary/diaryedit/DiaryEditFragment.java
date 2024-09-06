@@ -34,7 +34,7 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
-import com.websarva.wings.android.zuboradiary.data.DateConverter;
+import com.websarva.wings.android.zuboradiary.data.DateTimeStringConverter;
 import com.websarva.wings.android.zuboradiary.data.diary.ConditionConverter;
 import com.websarva.wings.android.zuboradiary.data.diary.Conditions;
 import com.websarva.wings.android.zuboradiary.data.diary.WeatherConverter;
@@ -412,8 +412,8 @@ public class DiaryEditFragment extends BaseFragment {
                 if (date == null) {
                     return;
                 }
-                DateConverter dateConverter = new DateConverter();
-                binding.editTextDate.setText(dateConverter.toStringLocalDate(date));
+                DateTimeStringConverter dateTimeStringConverter = new DateTimeStringConverter();
+                binding.editTextDate.setText(dateTimeStringConverter.toStringDate(date));
                 Log.d("DiaryEditInputDate", "SelectedDate:" + date);
                 Log.d("DiaryEditInputDate", "lastSelectedDate:" + lastSelectedDate);
                 boolean shouldShowDialog = shouldShowLoadingExistingDiaryDialogOnDateChanged(date);
@@ -1132,8 +1132,14 @@ public class DiaryEditFragment extends BaseFragment {
         navController.navigate(action);
     }
 
+    @Override
     protected void retryErrorDialogShow() {
         diaryEditViewModel.triggerAppErrorBufferListObserver();
         settingsViewModel.triggerAppErrorBufferListObserver();
+    }
+
+    @Override
+    protected void destroyBinding() {
+        binding = null;
     }
 }

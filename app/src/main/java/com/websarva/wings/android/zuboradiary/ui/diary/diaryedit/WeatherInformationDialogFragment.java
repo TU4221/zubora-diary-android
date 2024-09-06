@@ -14,7 +14,7 @@ import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
 
 import com.websarva.wings.android.zuboradiary.R;
-import com.websarva.wings.android.zuboradiary.data.DateConverter;
+import com.websarva.wings.android.zuboradiary.data.DateTimeStringConverter;
 
 import java.time.LocalDate;
 
@@ -32,8 +32,8 @@ public class WeatherInformationDialogFragment extends DialogFragment {
 
         LocalDate loadDiaryDate =
                 WeatherInformationDialogFragmentArgs.fromBundle(requireArguments()).getTargetDiaryDate();
-        DateConverter dateConverter = new DateConverter();
-        String stringDate = dateConverter.toStringLocalDate(loadDiaryDate);
+        DateTimeStringConverter dateTimeStringConverter = new DateTimeStringConverter();
+        String stringDate = dateTimeStringConverter.toStringDate(loadDiaryDate);
         String message = stringDate + "の天気情報を取得しますか。";
 
         builder.setMessage(message);

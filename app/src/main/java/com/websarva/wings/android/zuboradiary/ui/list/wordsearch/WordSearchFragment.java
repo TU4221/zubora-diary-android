@@ -390,4 +390,9 @@ public class WordSearchFragment extends BaseFragment {
             diaryYearMonthListAdapter.scrollToFirstPosition();
         }
     }
+
+    @Override
+    protected void destroyBinding() {
+        binding = null;
+    }
 }

@@ -5,14 +5,13 @@ import android.os.Looper;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.ViewModel;
 
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.websarva.wings.android.zuboradiary.data.AppError;
 import com.websarva.wings.android.zuboradiary.data.database.DiaryRepository;
-import com.websarva.wings.android.zuboradiary.data.settings.SettingsRepository;
+import com.websarva.wings.android.zuboradiary.data.preferences.SettingsRepository;
 import com.websarva.wings.android.zuboradiary.ui.BaseViewModel;
 
 import java.time.LocalDate;

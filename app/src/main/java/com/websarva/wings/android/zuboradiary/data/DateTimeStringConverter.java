@@ -6,8 +6,13 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 
-public class DateConverter {
+/**
+ *
+ * Class LocalDate を用途に合わせたの文字列に変換するクラス。
+ * */
+public class DateTimeStringConverter {
 
     private static final String DATE_FORMAT = "yyyy年MM月dd日(E)";
     public static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern(DATE_FORMAT);
@@ -16,7 +21,7 @@ public class DateConverter {
     private static final String TIME_HOUR_MINUTE = "HH:mm";
     public static final DateTimeFormatter TIME_HOUR_MINUTE_FORMATTER = DateTimeFormatter.ofPattern(TIME_HOUR_MINUTE);
 
-    public String toStringLocalDate(@NonNull LocalDate localDate) {
+    public String toStringDate(@NonNull LocalDate localDate) {
         return localDate.format(DATE_FORMATTER);
         // TODO:下記最終的に削除(下記対応をとらなければ警告があったのに消えた・・・)
         /*if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
@@ -28,7 +33,7 @@ public class DateConverter {
         }*/
     }
 
-    public String toStringLocalDateTime(@NonNull LocalDateTime localDateTime) {
+    public String toStringDateTime(@NonNull LocalDateTime localDateTime) {
         return localDateTime.format(DATE_TIME_FORMATTER);
         // TODO:下記最終的に削除(下記対応をとらなければ警告があったのに消えた・・・)
         /*if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
@@ -40,7 +45,24 @@ public class DateConverter {
         }*/
     }
 
-    public String toStringTimeHourMinute(@NonNull LocalTime localTime) {
+
+    @NonNull
+    public String toStringTimeHourMinute(LocalTime localTime) {
         return localTime.format(TIME_HOUR_MINUTE_FORMATTER);
+    }
+
+    @NonNull
+    public LocalTime toLocalTimeTimeHourMinute(String time) {
+        return LocalTime.parse(time, TIME_HOUR_MINUTE_FORMATTER);
+    }
+
+    public boolean isFormatTimeHourMinute(String time) {
+        boolean isFormat = true;
+        try {
+            LocalTime.parse(time, TIME_HOUR_MINUTE_FORMATTER);
+        } catch (DateTimeParseException e) {
+            isFormat = false;
+        }
+        return isFormat;
     }
 }

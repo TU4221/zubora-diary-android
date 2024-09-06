@@ -13,9 +13,8 @@ import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.websarva.wings.android.zuboradiary.R;
-import com.websarva.wings.android.zuboradiary.data.DayOfWeekConverter;
+import com.websarva.wings.android.zuboradiary.data.DayOfWeekStringConverter;
 import com.websarva.wings.android.zuboradiary.databinding.RowWordSearchResultListBinding;
-import com.websarva.wings.android.zuboradiary.ui.list.diarylist.DiaryDayListAdapter;
 
 import java.time.LocalDate;
 
@@ -51,8 +50,8 @@ public class WordSearchResultDayListAdapter
     public void onBindViewHolder(WordSearchResultDayViewHolder holder, int position) {
         WordSearchResultDayListItem item = getItem(position);
         LocalDate date = item.getDate();
-        DayOfWeekConverter dayOfWeekConverter = new DayOfWeekConverter(context);
-        String strDayOfWeek = dayOfWeekConverter.toStringShortName(date.getDayOfWeek());
+        DayOfWeekStringConverter dayOfWeekStringConverter = new DayOfWeekStringConverter(context);
+        String strDayOfWeek = dayOfWeekStringConverter.toDiaryListDayOfWeek(date.getDayOfWeek());
         SpannableString title = item.getTitle();
         int itemNumber = item.getItemNumber();
         SpannableString itemTitle = item.getItemTitle();

@@ -5,18 +5,15 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.databinding.ViewDataBinding;
 import androidx.recyclerview.widget.DiffUtil;
-import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.websarva.wings.android.zuboradiary.data.DayOfWeekConverter;
+import com.websarva.wings.android.zuboradiary.data.DayOfWeekStringConverter;
 import com.websarva.wings.android.zuboradiary.databinding.RowDiaryDayListBinding;
-import com.websarva.wings.android.zuboradiary.ui.list.DiaryYearMonthListAdapter;
 
 import java.time.LocalDate;
 
@@ -55,8 +52,8 @@ public class DiaryDayListAdapter extends ListAdapter<DiaryDayListItem, DiaryDayL
 
         holder.date = date; // ホルダー毎に日記の日付情報一式付与
 
-        DayOfWeekConverter dayOfWeekConverter = new DayOfWeekConverter(context);
-        String strDayOfWeek = dayOfWeekConverter.toStringShortName(date.getDayOfWeek());
+        DayOfWeekStringConverter dayOfWeekStringConverter = new DayOfWeekStringConverter(context);
+        String strDayOfWeek = dayOfWeekStringConverter.toDiaryListDayOfWeek(date.getDayOfWeek());
         holder.binding.includeDay.textDayOfWeek.setText(strDayOfWeek);
 
         holder.binding.includeDay.textDayOfMonth.setText(String.valueOf(date.getDayOfMonth()));

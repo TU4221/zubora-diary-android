@@ -185,4 +185,17 @@ public abstract class BaseFragment extends CustomFragment {
     protected abstract void showMessageDialog(@NonNull String title,@NonNull  String message);
 
     protected abstract void retryErrorDialogShow();
+
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+
+        destroyBinding();
+    }
+
+    /**
+     * Bindingクラス変数のメモリリーク対策として変数にNullを代入すること。
+     * */
+    protected abstract void destroyBinding();
 }

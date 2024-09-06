@@ -14,7 +14,6 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.SavedStateHandle;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.navigation.NavDestination;
 import androidx.navigation.NavDirections;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -32,7 +31,7 @@ import com.websarva.wings.android.zuboradiary.R;
 import com.websarva.wings.android.zuboradiary.databinding.CalendarDayBinding;
 import com.websarva.wings.android.zuboradiary.databinding.CalendarHeaderBinding;
 import com.websarva.wings.android.zuboradiary.databinding.FragmentCalendarBinding;
-import com.websarva.wings.android.zuboradiary.data.DateConverter;
+import com.websarva.wings.android.zuboradiary.data.DateTimeStringConverter;
 import com.websarva.wings.android.zuboradiary.ui.BaseFragment;
 import com.websarva.wings.android.zuboradiary.ui.diary.DiaryLiveData;
 import com.websarva.wings.android.zuboradiary.ui.diary.diaryshow.DiaryShowFragment;
@@ -50,10 +49,8 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
-import java.time.temporal.WeekFields;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Locale;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -200,13 +197,10 @@ public class CalendarFragment extends BaseFragment {
     }
 
     private List<DayOfWeek> createDayOfWeekList() {
-        Integer calendarStartDayOfWeekNumber =
-                settingsViewModel.getCalendarStartDayOfWeekNumberLiveData().getValue();
-        DayOfWeek firstDayOfWeek;
-        if (calendarStartDayOfWeekNumber == null) {
-            firstDayOfWeek = WeekFields.of(Locale.getDefault()).getFirstDayOfWeek();
-        } else {
-            firstDayOfWeek = DayOfWeek.of(calendarStartDayOfWeekNumber);
+        DayOfWeek firstDayOfWeek =
+                settingsViewModel.getCalendarStartDayOfWeekLiveData().getValue();
+        if (firstDayOfWeek == null) {
+            throw new NullPointerException();
         }
         DayOfWeek[] daysOfWeek = DayOfWeek.values();
         int firstDayOfWeekListPos = firstDayOfWeek.getValue();
@@ -416,8 +410,8 @@ public class CalendarFragment extends BaseFragment {
 
     // ツールバー表示日付更新。
     private void updateToolBarDate(LocalDate date) {
-        DateConverter dateConverter = new DateConverter();
-        String stringDate = dateConverter.toStringLocalDate(date);
+        DateTimeStringConverter dateTimeStringConverter = new DateTimeStringConverter();
+        String stringDate = dateTimeStringConverter.toStringDate(date);
         binding.materialToolbarTopAppBar.setTitle(stringDate);
     }
 
@@ -585,5 +579,10 @@ public class CalendarFragment extends BaseFragment {
         calendarViewModel.triggerAppErrorBufferListObserver();
         diaryShowViewModel.triggerAppErrorBufferListObserver();
         settingsViewModel.triggerAppErrorBufferListObserver();
+    }
+
+    @Override
+    protected void destroyBinding() {
+        binding = null;
     }
 }

@@ -7,435 +7,95 @@ import android.graphics.drawable.Drawable;
 import android.view.View;
 import android.widget.TextView;
 
-import androidx.annotation.NonNull;
-import androidx.core.content.ContextCompat;
-import androidx.core.content.res.ResourcesCompat;
 import androidx.core.graphics.drawable.DrawableCompat;
 
 import com.google.android.material.materialswitch.MaterialSwitch;
-import com.websarva.wings.android.zuboradiary.R;
-import com.websarva.wings.android.zuboradiary.data.settings.ThemeColors;
+import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor;
 
 public class ThemeColorSwitcher {
     Resources resources;
     Context context;
 
-    public ThemeColorSwitcher(@NonNull Resources resources, Context context) {
+    public ThemeColorSwitcher(Resources resources, Context context) {
+        if (resources == null) {
+            throw new NullPointerException();
+        }
+        if (context == null) {
+            throw new NullPointerException();
+        }
+
         this.resources = resources;
         this.context = context;
     }
 
-    public void switchPrimaryColor(@NonNull ThemeColors themeColor,@NonNull View... views) {
-        int primaryColor = getPrimaryColor(resources, themeColor);
-        int onPrimaryColor = getOnPrimaryColor(resources, themeColor);
-        switchColor(primaryColor, onPrimaryColor, views);
-    }
-
-    public void switchSectionView(@NonNull ThemeColors themeColor,@NonNull TextView... textViews) {
-        int surfaceContainerColor = getSurfaceContainerColor(resources, themeColor);
-        int onSurfaceColor = getOnSurfaceColor(resources, themeColor);
-        switchTextAndBackground(surfaceContainerColor, onSurfaceColor, textViews);
-    }
-
-    public void switchTextIcon(@NonNull ThemeColors themeColor,@NonNull TextView... textViews) {
-        int primaryColor = getPrimaryColor(resources, themeColor);
-        switchTextIcon(primaryColor, textViews);
-    }
-
-    public void switchSwitch(@NonNull ThemeColors themeColor,@NonNull MaterialSwitch... materialSwitches) {
-        ColorStateList trackColorStateList = getSwitchTrackDrawable(context, themeColor);
-        switchSwitch(trackColorStateList, materialSwitches);
-    }
-
-    public void switchSurfaceColor(@NonNull ThemeColors themeColor,@NonNull View... views) {
-        int surfaceColor = getSurfaceColor(resources, themeColor);
-        int onSurfaceColor = getOnSurfaceColor(resources, themeColor);
-        switchColor(surfaceColor, onSurfaceColor, views);
-    }
-
-    public void switchSurfaceContainerLowColor(@NonNull ThemeColors themeColor, @NonNull View... views) {
-        int surfaceDimColor = getSurfaceContainerLowColor(resources, themeColor);
-        int onSurfaceColor = getOnSurfaceColor(resources, themeColor);
-        switchColor(surfaceDimColor, onSurfaceColor, views);
-    }
-
-    private int getPrimaryColor(@NonNull Resources resources,@NonNull ThemeColors themeColor) {
-        int colorResId = -1;
-        switch (themeColor) {
-            case WHITE:
-                colorResId = R.color.md_theme_primary_white;
-                break;
-            case BLACK:
-                colorResId = R.color.md_theme_primary_black;
-                break;
-            case RED:
-                colorResId = R.color.md_theme_primary_black;
-                break;
-            case BLUE:
-                colorResId = R.color.md_theme_primary_black;
-                break;
-            case GREEN:
-                colorResId = R.color.md_theme_primary_black;
-                break;
-            case YELLOW:
-                colorResId = R.color.md_theme_primary_black;
-                break;
+    public void switchPrimaryColor(ThemeColor themeColor, ColorSwitchingViewList<View> viewList) {
+        if (themeColor == null) {
+            throw new NullPointerException();
         }
-        return ResourcesCompat.getColor(resources, colorResId, null);
+
+        int primaryColor = themeColor.getPrimaryColor(resources);
+        int onPrimaryColor = themeColor.getOnPrimaryColor(resources);
+        switchColor(primaryColor, onPrimaryColor, viewList);
     }
 
-    private int getOnPrimaryColor(@NonNull Resources resources,@NonNull ThemeColors themeColor) {
-        int colorResId = -1;
-        switch (themeColor) {
-            case WHITE:
-                colorResId = R.color.md_theme_onPrimary_white;
-                break;
-            case BLACK:
-                colorResId = R.color.md_theme_onPrimary_black;
-                break;
-            case RED:
-                colorResId = R.color.md_theme_onPrimary_black;
-                break;
-            case BLUE:
-                colorResId = R.color.md_theme_onPrimary_black;
-                break;
-            case GREEN:
-                colorResId = R.color.md_theme_onPrimary_black;
-                break;
-            case YELLOW:
-                colorResId = R.color.md_theme_onPrimary_black;
-                break;
+    public void switchSectionView(ThemeColor themeColor, ColorSwitchingViewList<TextView> textViewList) {
+        if (themeColor == null) {
+            throw new NullPointerException();
         }
-        return ResourcesCompat.getColor(resources, colorResId, null);
+
+        int surfaceContainerColor = themeColor.getSurfaceContainerColor(resources);
+        int onSurfaceColor = themeColor.getOnSurfaceColor(resources);
+        switchTextAndBackground(surfaceContainerColor, onSurfaceColor, textViewList);
     }
 
-    private int getPrimaryContainerColor(@NonNull Resources resources,@NonNull ThemeColors themeColor) {
-        int colorResId = -1;
-        switch (themeColor) {
-            case WHITE:
-                colorResId = R.color.md_theme_primaryContainer_white;
-                break;
-            case BLACK:
-                colorResId = R.color.md_theme_primaryContainer_black;
-                break;
-            case RED:
-                colorResId = R.color.md_theme_primaryContainer_black;
-                break;
-            case BLUE:
-                colorResId = R.color.md_theme_primaryContainer_black;
-                break;
-            case GREEN:
-                colorResId = R.color.md_theme_primaryContainer_black;
-                break;
-            case YELLOW:
-                colorResId = R.color.md_theme_primaryContainer_black;
-                break;
+    public void switchTextIcon(ThemeColor themeColor, ColorSwitchingViewList<TextView> textViewList) {
+        if (themeColor == null) {
+            throw new NullPointerException();
         }
-        return ResourcesCompat.getColor(resources, colorResId, null);
+
+        int primaryColor = themeColor.getPrimaryColor(resources);
+        switchTextIcon(primaryColor, textViewList);
     }
 
-    private int getOnPrimaryContainerColor(@NonNull Resources resources,@NonNull ThemeColors themeColor) {
-        int colorResId = -1;
-        switch (themeColor) {
-            case WHITE:
-                colorResId = R.color.md_theme_onPrimaryContainer_white;
-                break;
-            case BLACK:
-                colorResId = R.color.md_theme_onPrimaryContainer_black;
-                break;
-            case RED:
-                colorResId = R.color.md_theme_onPrimaryContainer_black;
-                break;
-            case BLUE:
-                colorResId = R.color.md_theme_onPrimaryContainer_black;
-                break;
-            case GREEN:
-                colorResId = R.color.md_theme_onPrimaryContainer_black;
-                break;
-            case YELLOW:
-                colorResId = R.color.md_theme_onPrimaryContainer_black;
-                break;
+    public void switchSwitch(
+            ThemeColor themeColor, ColorSwitchingViewList<MaterialSwitch> materialSwitchList) {
+        if (themeColor == null) {
+            throw new NullPointerException();
         }
-        return ResourcesCompat.getColor(resources, colorResId, null);
+
+        ColorStateList trackColorStateList = themeColor.getSwitchTrackDrawable(context);
+        switchSwitch(trackColorStateList, materialSwitchList);
     }
 
-    private int getSecondaryColor(@NonNull Resources resources,@NonNull ThemeColors themeColor) {
-        int colorResId = -1;
-        switch (themeColor) {
-            case WHITE:
-                colorResId = R.color.md_theme_secondary_white;
-                break;
-            case BLACK:
-                colorResId = R.color.md_theme_secondary_black;
-                break;
-            case RED:
-                colorResId = R.color.md_theme_secondary_black;
-                break;
-            case BLUE:
-                colorResId = R.color.md_theme_secondary_black;
-                break;
-            case GREEN:
-                colorResId = R.color.md_theme_secondary_black;
-                break;
-            case YELLOW:
-                colorResId = R.color.md_theme_secondary_black;
-                break;
+    public void switchSurfaceColor(ThemeColor themeColor, ColorSwitchingViewList<View> viewList) {
+        if (themeColor == null) {
+            throw new NullPointerException();
         }
-        return ResourcesCompat.getColor(resources, colorResId, null);
+
+        int surfaceColor = themeColor.getSurfaceColor(resources);
+        int onSurfaceColor = themeColor.getOnSurfaceColor(resources);
+        switchColor(surfaceColor, onSurfaceColor, viewList);
     }
 
-    private int getOnSecondaryColor(@NonNull Resources resources,@NonNull ThemeColors themeColor) {
-        int colorResId = -1;
-        switch (themeColor) {
-            case WHITE:
-                colorResId = R.color.md_theme_onSecondary_white;
-                break;
-            case BLACK:
-                colorResId = R.color.md_theme_onSecondary_black;
-                break;
-            case RED:
-                colorResId = R.color.md_theme_onSecondary_black;
-                break;
-            case BLUE:
-                colorResId = R.color.md_theme_onSecondary_black;
-                break;
-            case GREEN:
-                colorResId = R.color.md_theme_onSecondary_black;
-                break;
-            case YELLOW:
-                colorResId = R.color.md_theme_onSecondary_black;
-                break;
+    public void switchSurfaceContainerLowColor(
+            ThemeColor themeColor, ColorSwitchingViewList<View> viewList) {
+        if (themeColor == null) {
+            throw new NullPointerException();
         }
-        return ResourcesCompat.getColor(resources, colorResId, null);
+
+        int surfaceDimColor = themeColor.getSurfaceContainerLowColor(resources);
+        int onSurfaceColor = themeColor.getOnSurfaceColor(resources);
+        switchColor(surfaceDimColor, onSurfaceColor, viewList);
     }
 
-    private int getSecondaryContainerColor(@NonNull Resources resources,@NonNull ThemeColors themeColor) {
-        int colorResId = -1;
-        switch (themeColor) {
-            case WHITE:
-                colorResId = R.color.md_theme_secondaryContainer_white;
-                break;
-            case BLACK:
-                colorResId = R.color.md_theme_secondaryContainer_black;
-                break;
-            case RED:
-                colorResId = R.color.md_theme_secondaryContainer_black;
-                break;
-            case BLUE:
-                colorResId = R.color.md_theme_secondaryContainer_black;
-                break;
-            case GREEN:
-                colorResId = R.color.md_theme_secondaryContainer_black;
-                break;
-            case YELLOW:
-                colorResId = R.color.md_theme_secondaryContainer_black;
-                break;
+
+
+    private void switchColor(int color,  int onColor, ColorSwitchingViewList<View> viewList) {
+        if (viewList == null) {
+            throw new NullPointerException();
         }
-        return ResourcesCompat.getColor(resources, colorResId, null);
-    }
 
-    private int getOnSecondaryContainerColor(@NonNull Resources resources,@NonNull ThemeColors themeColor) {
-        int colorResId = -1;
-        switch (themeColor) {
-            case WHITE:
-                colorResId = R.color.md_theme_onSecondaryContainer_white;
-                break;
-            case BLACK:
-                colorResId = R.color.md_theme_onSecondaryContainer_black;
-                break;
-            case RED:
-                colorResId = R.color.md_theme_onSecondaryContainer_black;
-                break;
-            case BLUE:
-                colorResId = R.color.md_theme_onSecondaryContainer_black;
-                break;
-            case GREEN:
-                colorResId = R.color.md_theme_onSecondaryContainer_black;
-                break;
-            case YELLOW:
-                colorResId = R.color.md_theme_onSecondaryContainer_black;
-                break;
-        }
-        return ResourcesCompat.getColor(resources, colorResId, null);
-    }
-
-    private int getSurfaceColor(@NonNull Resources resources,@NonNull ThemeColors themeColor) {
-        int colorResId = -1;
-        switch (themeColor) {
-            case WHITE:
-                colorResId = R.color.md_theme_surface_white;
-                break;
-            case BLACK:
-                colorResId = R.color.md_theme_surface_black;
-                break;
-            case RED:
-                colorResId = R.color.md_theme_surface_black;
-                break;
-            case BLUE:
-                colorResId = R.color.md_theme_surface_black;
-                break;
-            case GREEN:
-                colorResId = R.color.md_theme_surface_black;
-                break;
-            case YELLOW:
-                colorResId = R.color.md_theme_surface_black;
-                break;
-        }
-        return ResourcesCompat.getColor(resources, colorResId, null);
-    }
-
-    private int getSurfaceContainerLowColor(@NonNull Resources resources, @NonNull ThemeColors themeColor) {
-        int colorResId = -1;
-        switch (themeColor) {
-            case WHITE:
-                colorResId = R.color.md_theme_surfaceContainerLow_white;
-                break;
-            case BLACK:
-                colorResId = R.color.md_theme_surfaceContainerLow_black;
-                break;
-            case RED:
-                colorResId = R.color.md_theme_surfaceContainerLow_black;
-                break;
-            case BLUE:
-                colorResId = R.color.md_theme_surfaceContainerLow_black;
-                break;
-            case GREEN:
-                colorResId = R.color.md_theme_surfaceContainerLow_black;
-                break;
-            case YELLOW:
-                colorResId = R.color.md_theme_surfaceContainerLow_black;
-                break;
-        }
-        return ResourcesCompat.getColor(resources, colorResId, null);
-    }
-
-    private int getSurfaceContainerColor(@NonNull Resources resources, @NonNull ThemeColors themeColor) {
-        int colorResId = -1;
-        switch (themeColor) {
-            case WHITE:
-                colorResId = R.color.md_theme_surfaceContainer_white;
-                break;
-            case BLACK:
-                colorResId = R.color.md_theme_surfaceContainer_black;
-                break;
-            case RED:
-                colorResId = R.color.md_theme_surfaceContainer_black;
-                break;
-            case BLUE:
-                colorResId = R.color.md_theme_surfaceContainer_black;
-                break;
-            case GREEN:
-                colorResId = R.color.md_theme_surfaceContainer_black;
-                break;
-            case YELLOW:
-                colorResId = R.color.md_theme_surfaceContainer_black;
-                break;
-        }
-        return ResourcesCompat.getColor(resources, colorResId, null);
-    }
-
-    private int getSurfaceContainerHighColor(@NonNull Resources resources, @NonNull ThemeColors themeColor) {
-        int colorResId = -1;
-        switch (themeColor) {
-            case WHITE:
-                colorResId = R.color.md_theme_surfaceContainerHigh_white;
-                break;
-            case BLACK:
-                colorResId = R.color.md_theme_surfaceContainerHigh_black;
-                break;
-            case RED:
-                colorResId = R.color.md_theme_surfaceContainerHigh_black;
-                break;
-            case BLUE:
-                colorResId = R.color.md_theme_surfaceContainerHigh_black;
-                break;
-            case GREEN:
-                colorResId = R.color.md_theme_surfaceContainerHigh_black;
-                break;
-            case YELLOW:
-                colorResId = R.color.md_theme_surfaceContainerHigh_black;
-                break;
-        }
-        return ResourcesCompat.getColor(resources, colorResId, null);
-    }
-
-    private int getSurfaceContainerHighestColor(@NonNull Resources resources, @NonNull ThemeColors themeColor) {
-        int colorResId = -1;
-        switch (themeColor) {
-            case WHITE:
-                colorResId = R.color.md_theme_surfaceContainerHighest_white;
-                break;
-            case BLACK:
-                colorResId = R.color.md_theme_surfaceContainerHighest_black;
-                break;
-            case RED:
-                colorResId = R.color.md_theme_surfaceContainerHighest_black;
-                break;
-            case BLUE:
-                colorResId = R.color.md_theme_surfaceContainerHighest_black;
-                break;
-            case GREEN:
-                colorResId = R.color.md_theme_surfaceContainerHighest_black;
-                break;
-            case YELLOW:
-                colorResId = R.color.md_theme_surfaceContainerHighest_black;
-                break;
-        }
-        return ResourcesCompat.getColor(resources, colorResId, null);
-    }
-
-    private int getOnSurfaceColor(@NonNull Resources resources,@NonNull ThemeColors themeColor) {
-        int colorResId = -1;
-        switch (themeColor) {
-            case WHITE:
-                colorResId = R.color.md_theme_onSurface_white;
-                break;
-            case BLACK:
-                colorResId = R.color.md_theme_onSurface_black;
-                break;
-            case RED:
-                colorResId = R.color.md_theme_onSurface_black;
-                break;
-            case BLUE:
-                colorResId = R.color.md_theme_onSurface_black;
-                break;
-            case GREEN:
-                colorResId = R.color.md_theme_onSurface_black;
-                break;
-            case YELLOW:
-                colorResId = R.color.md_theme_onSurface_black;
-                break;
-        }
-        return ResourcesCompat.getColor(resources, colorResId, null);
-    }
-
-    private ColorStateList getSwitchTrackDrawable(@NonNull Context context,@NonNull ThemeColors themeColor) {
-        int drawableResId = -1;
-        switch (themeColor) {
-            case WHITE:
-                drawableResId = R.color.switch_track_white;
-                break;
-            case BLACK:
-                drawableResId = R.color.switch_track_black;
-                break;
-            case RED:
-                drawableResId = R.color.switch_track_black;
-                break;
-            case BLUE:
-                drawableResId = R.color.switch_track_black;
-                break;
-            case GREEN:
-                drawableResId = R.color.switch_track_black;
-                break;
-            case YELLOW:
-                drawableResId = R.color.switch_track_black;
-                break;
-        }
-        return ContextCompat.getColorStateList(context, drawableResId);
-    }
-
-    private void switchColor(@NonNull int color,  @NonNull int onColor, @NonNull View... views) {
-        for (View view: views) {
+        for (View view: viewList.getViewList()) {
             view.setBackgroundColor(color);
             if (view instanceof TextView) {
                 TextView textView = (TextView) view;
@@ -458,16 +118,23 @@ public class ThemeColorSwitcher {
     }
 
     private void switchTextAndBackground(
-            @NonNull int color,  @NonNull int onColor, @NonNull TextView... textViews) {
-        for (TextView textView: textViews) {
+            int color,  int onColor, ColorSwitchingViewList<TextView> textViewList) {
+        if (textViewList == null) {
+            throw new NullPointerException();
+        }
+
+        for (TextView textView: textViewList.getViewList()) {
             textView.setBackgroundColor(color);
             textView.setTextColor(onColor);
         }
     }
 
-    private void switchTextIcon(
-            @NonNull int color, @NonNull TextView... textViews) {
-        for (TextView textView: textViews) {
+    private void switchTextIcon(int color, ColorSwitchingViewList<TextView> textViewList) {
+        if (textViewList == null) {
+            throw new NullPointerException();
+        }
+
+        for (TextView textView: textViewList.getViewList()) {
             Drawable[] drawables = textView.getCompoundDrawablesRelative();
             Drawable[] wrappedDrawable = new Drawable[drawables.length];
             for (int i = 0; i < drawables.length; i++) {
@@ -483,14 +150,25 @@ public class ThemeColorSwitcher {
     }
 
     private void switchSwitch(
-            @NonNull ColorStateList trackColorStateList, @NonNull MaterialSwitch... materialSwitches) {
-        for (MaterialSwitch materialSwitch : materialSwitches) {
+            ColorStateList trackColorStateList, ColorSwitchingViewList<MaterialSwitch> materialSwitchList) {
+        if (trackColorStateList == null) {
+            throw new NullPointerException();
+        }
+        if (materialSwitchList == null) {
+            throw new NullPointerException();
+        }
+
+        for (MaterialSwitch materialSwitch : materialSwitchList.getViewList()) {
             materialSwitch.setTrackTintList(trackColorStateList);
         }
     }
 
-    private void switchBackGroundColor(@NonNull int color, @NonNull View... views) {
-        for (View view: views) {
+    private void switchBackGroundColor(int color, ColorSwitchingViewList<View> viewList) {
+        if (viewList == null) {
+            throw new NullPointerException();
+        }
+
+        for (View view: viewList.getViewList()) {
             view.setBackgroundColor(color);
         }
     }

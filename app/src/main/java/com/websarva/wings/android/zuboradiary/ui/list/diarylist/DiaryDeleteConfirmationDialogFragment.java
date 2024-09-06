@@ -14,7 +14,7 @@ import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
 
 import com.websarva.wings.android.zuboradiary.R;
-import com.websarva.wings.android.zuboradiary.data.DateConverter;
+import com.websarva.wings.android.zuboradiary.data.DateTimeStringConverter;
 
 import java.time.LocalDate;
 
@@ -31,8 +31,8 @@ public class DiaryDeleteConfirmationDialogFragment extends DialogFragment {
         builder.setTitle(R.string.dialog_diary_delete_confirmation_title);
         LocalDate date =
                 DiaryDeleteConfirmationDialogFragmentArgs.fromBundle(requireArguments()).getDeleteDiaryDate();
-        DateConverter dateConverter = new DateConverter();
-        String strDate = dateConverter.toStringLocalDate(date);
+        DateTimeStringConverter dateTimeStringConverter = new DateTimeStringConverter();
+        String strDate = dateTimeStringConverter.toStringDate(date);
         String message = strDate + getString(R.string.dialog_diary_delete_confirmation_message);
 
         builder.setMessage(message);
