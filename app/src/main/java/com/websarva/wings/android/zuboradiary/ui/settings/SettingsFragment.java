@@ -28,6 +28,7 @@ import androidx.navigation.NavDirections;
 
 import com.google.android.material.materialswitch.MaterialSwitch;
 import com.websarva.wings.android.zuboradiary.R;
+import com.websarva.wings.android.zuboradiary.data.DateTimeStringConverter;
 import com.websarva.wings.android.zuboradiary.data.DayOfWeekStringConverter;
 import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor;
 import com.websarva.wings.android.zuboradiary.databinding.FragmentSettingsBinding;
@@ -142,7 +143,7 @@ public class SettingsFragment extends BaseFragment {
     }
 
     @Override
-    protected void handleOnReceivingResulFromDialog(@NonNull SavedStateHandle savedStateHandle) {
+    protected void handleOnReceivingDialogResult(@NonNull SavedStateHandle savedStateHandle) {
         receiveThemeColorPickerDialogResult(savedStateHandle);
         receiveDayOfWeekPickerDialogResult(savedStateHandle);
         receiveTimePickerDialogResult(savedStateHandle);
@@ -150,7 +151,7 @@ public class SettingsFragment extends BaseFragment {
     }
 
     @Override
-    protected void removeResultFromDialog(@NonNull SavedStateHandle savedStateHandle) {
+    protected void removeDialogResult(@NonNull SavedStateHandle savedStateHandle) {
         savedStateHandle.remove(ThemeColorPickerDialogFragment.KEY_SELECTED_THEME_COLOR);
         savedStateHandle.remove(DayOfWeekPickerDialogFragment.KEY_SELECTED_DAY_OF_WEEK);
         savedStateHandle.remove(TimePickerDialogFragment.KEY_SELECTED_HOUR);
@@ -199,6 +200,11 @@ public class SettingsFragment extends BaseFragment {
 
         LocalTime settingTime = LocalTime.of(selectedHour, selectedMinute);
         settingsViewModel.saveReminderNotificationValid(settingTime);
+
+        DateTimeStringConverter converter = new DateTimeStringConverter();
+        String strSettingTime = converter.toStringTimeHourMinute(settingTime);
+        binding.textReminderNotificationTime.setText(strSettingTime);
+        binding.textReminderNotificationTime.setVisibility(View.VISIBLE);
     }
 
     // 権限催促ダイアログフラグメントから結果受取
@@ -335,6 +341,7 @@ public class SettingsFragment extends BaseFragment {
                 }
             } else {
                 settingsViewModel.saveReminderNotificationInvalid();
+                binding.textReminderNotificationTime.setVisibility(View.INVISIBLE);
             }
             isTouchedReminderNotificationSwitch = false;
         }
@@ -487,7 +494,6 @@ public class SettingsFragment extends BaseFragment {
     protected void retryErrorDialogShow() {
         settingsViewModel.triggerAppErrorBufferListObserver();
     }
-
 
     private void showApplicationDetailsSettings() {
         Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);

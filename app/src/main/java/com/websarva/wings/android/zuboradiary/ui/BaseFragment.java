@@ -97,9 +97,9 @@ public abstract class BaseFragment extends CustomFragment {
                 //      Dialog非表示中:Lifecycle.Event.ON_RESUME
                 if (event.equals(Lifecycle.Event.ON_RESUME)) {
                     SavedStateHandle savedStateHandle = navBackStackEntry.getSavedStateHandle();
-                    handleOnReceivingResulFromDialog(savedStateHandle);
+                    handleOnReceivingDialogResult(savedStateHandle);
                     retryErrorDialogShow();
-                    removeResultFromDialog(savedStateHandle);
+                    removeDialogResult(savedStateHandle);
                 }
             }
         };
@@ -113,7 +113,7 @@ public abstract class BaseFragment extends CustomFragment {
                     // MEMO:removeで削除しないとこのFragmentを閉じてもResult内容が残ってしまう。
                     //      その為、このFragmentを再表示した時にObserverがResultの内容で処理してしまう。
                     SavedStateHandle savedStateHandle = navBackStackEntry.getSavedStateHandle();
-                    removeResultFromDialog(savedStateHandle);
+                    removeDialogResult(savedStateHandle);
                     // TODO:下記コード意味あるか検証。コメントアウトしてFragment切替後の状態を確認したがObserverが重複することはなかった。
                     navBackStackEntry.getLifecycle().removeObserver(lifecycleEventObserver);
                 }
@@ -121,9 +121,9 @@ public abstract class BaseFragment extends CustomFragment {
         });
     }
 
-    protected abstract void handleOnReceivingResulFromDialog(@NonNull SavedStateHandle savedStateHandle);
+    protected abstract void handleOnReceivingDialogResult(@NonNull SavedStateHandle savedStateHandle);
 
-    protected abstract void removeResultFromDialog(@NonNull SavedStateHandle savedStateHandle);
+    protected abstract void removeDialogResult(@NonNull SavedStateHandle savedStateHandle);
 
     @Nullable
     public <T> T receiveResulFromDialog(String key) {
@@ -138,6 +138,9 @@ public abstract class BaseFragment extends CustomFragment {
         return savedStateHandle.get(key);
     }
 
+    /**
+     * BaseViewModelのAppErrorBufferListのObserverを設定する。
+     * */
     protected abstract void setUpErrorMessageDialog();
 
     protected class AppErrorBufferListObserver implements Observer<List<AppError>> {
@@ -145,6 +148,9 @@ public abstract class BaseFragment extends CustomFragment {
         BaseViewModel baseViewModel;
 
         public AppErrorBufferListObserver(BaseViewModel baseViewModel) {
+            if (baseViewModel == null) {
+                throw new NullPointerException();
+            }
             this.baseViewModel = baseViewModel;
         }
 
@@ -156,26 +162,25 @@ public abstract class BaseFragment extends CustomFragment {
             if (appErrors.isEmpty()) {
                 return;
             }
+
             AppError appError = appErrors.get(0);
-            showErrorMessageDialog(appError, baseViewModel);
+            showErrorMessageDialog(appError);
+            baseViewModel.removeAppErrorBufferListFirstItem();
         }
     }
 
-    private void showErrorMessageDialog(AppError appError, BaseViewModel baseViewModel) {
+    private void showErrorMessageDialog(AppError appError) {
         if (appError == null) {
             throw new NullPointerException();
         }
         if (!canShowOtherFragment()) {
             return;
         }
-        if (baseViewModel == null) {
-            throw new NullPointerException();
-        }
 
         String dialogTitle = appError.getDialogTitle(requireContext());
         String dialogMessage = appError.getDialogMessage(requireContext());
         showMessageDialog(dialogTitle, dialogMessage);
-        baseViewModel.removeAppErrorBufferListFirstItem();
+
     }
 
     protected boolean canShowOtherFragment() {
@@ -185,7 +190,6 @@ public abstract class BaseFragment extends CustomFragment {
     protected abstract void showMessageDialog(@NonNull String title,@NonNull  String message);
 
     protected abstract void retryErrorDialogShow();
-
 
     @Override
     public void onDestroyView() {

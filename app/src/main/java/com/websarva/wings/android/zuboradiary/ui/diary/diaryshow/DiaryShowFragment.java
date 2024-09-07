@@ -102,13 +102,13 @@ public class DiaryShowFragment extends BaseFragment {
     }
 
     @Override
-    protected void handleOnReceivingResulFromDialog(@NonNull SavedStateHandle savedStateHandle) {
+    protected void handleOnReceivingDialogResult(@NonNull SavedStateHandle savedStateHandle) {
         receiveDeleteConfirmationDialogResult(savedStateHandle);
         retryErrorDialogShow();
     }
 
     @Override
-    protected void removeResultFromDialog(@NonNull SavedStateHandle savedStateHandle) {
+    protected void removeDialogResult(@NonNull SavedStateHandle savedStateHandle) {
         savedStateHandle.remove(DiaryDeleteConfirmationDialogFragment.KEY_SELECTED_BUTTON);
     }
 
