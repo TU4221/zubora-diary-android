@@ -200,11 +200,6 @@ public class SettingsFragment extends BaseFragment {
 
         LocalTime settingTime = LocalTime.of(selectedHour, selectedMinute);
         settingsViewModel.saveReminderNotificationValid(settingTime);
-
-        DateTimeStringConverter converter = new DateTimeStringConverter();
-        String strSettingTime = converter.toStringTimeHourMinute(settingTime);
-        binding.textReminderNotificationTime.setText(strSettingTime);
-        binding.textReminderNotificationTime.setVisibility(View.VISIBLE);
     }
 
     // 権限催促ダイアログフラグメントから結果受取
@@ -314,6 +309,37 @@ public class SettingsFragment extends BaseFragment {
                 .setOnCheckedChangeListener(
                         new ReminderNotificationCheckedChangeListener()
                 );
+
+        settingsViewModel.getIsCheckedReminderNotificationLiveData()
+                .observe(getViewLifecycleOwner(), new Observer<Boolean>() {
+                    @Override
+                    public void onChanged(Boolean aBoolean) {
+                        if (aBoolean == null) {
+                            return;
+                        }
+
+                        if (aBoolean) {
+                            binding.textReminderNotificationTime.setVisibility(View.VISIBLE);
+                        } else {
+                            binding.textReminderNotificationTime.setVisibility(View.INVISIBLE);
+                        }
+                    }
+                });
+
+        settingsViewModel.getReminderNotificationTime()
+                .observe(getViewLifecycleOwner(), new Observer<LocalTime>() {
+                    @Override
+                    public void onChanged(LocalTime time) {
+                        if (time == null) {
+                            binding.textReminderNotificationTime.setText("");
+                            return;
+                        }
+
+                        DateTimeStringConverter converter = new DateTimeStringConverter();
+                        String strTime = converter.toStringTimeHourMinute(time);
+                        binding.textReminderNotificationTime.setText(strTime);
+                    }
+                });
     }
 
     private class ReminderNotificationCheckedChangeListener
@@ -341,7 +367,6 @@ public class SettingsFragment extends BaseFragment {
                 }
             } else {
                 settingsViewModel.saveReminderNotificationInvalid();
-                binding.textReminderNotificationTime.setVisibility(View.INVISIBLE);
             }
             isTouchedReminderNotificationSwitch = false;
         }

@@ -1,5 +1,7 @@
 package com.websarva.wings.android.zuboradiary.data.preferences;
 
+import android.util.Log;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.WindowDecorActionBar;
@@ -7,6 +9,7 @@ import androidx.appcompat.app.WindowDecorActionBar;
 import com.websarva.wings.android.zuboradiary.data.DateTimeStringConverter;
 
 import java.time.LocalTime;
+import java.time.format.DateTimeParseException;
 
 public class ReminderNotificationPreferenceValue {
     private final boolean isChecked;
@@ -28,8 +31,7 @@ public class ReminderNotificationPreferenceValue {
             this.notificationTime = "";
             return;
         }
-        DateTimeStringConverter dateTimeStringConverter = new DateTimeStringConverter();
-        this.notificationTime = dateTimeStringConverter.toStringTimeHourMinute(notificationTime);
+        this.notificationTime = notificationTime.toString();
     }
 
     public ReminderNotificationPreferenceValue(Boolean isChecked, String notificationTime) {
@@ -39,8 +41,14 @@ public class ReminderNotificationPreferenceValue {
         if (notificationTime == null) {
             throw new NullPointerException();
         }
-        DateTimeStringConverter converter = new DateTimeStringConverter();
-        if (isChecked && (notificationTime.isEmpty() || !converter.isFormatTimeHourMinute(notificationTime))) {
+        boolean isFormat;
+        try {
+            LocalTime.parse(notificationTime);
+            isFormat = true;
+        } catch (DateTimeParseException e) {
+            isFormat = false;
+        }
+        if (isChecked && (notificationTime.isEmpty() || !isFormat)) {
             throw new IllegalArgumentException();
         }
         if (!isChecked && !notificationTime.isEmpty()) {
@@ -64,7 +72,7 @@ public class ReminderNotificationPreferenceValue {
         if (!isChecked) {
             return null;
         }
-        DateTimeStringConverter converter = new DateTimeStringConverter();
-        return converter.toLocalTimeTimeHourMinute(notificationTime);
+
+        return LocalTime.parse(notificationTime);
     }
 }

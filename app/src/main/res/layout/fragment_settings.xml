@@ -152,8 +152,6 @@
                 <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:paddingHorizontal="@dimen/fragment_settings_item_padding_horizontal"
-                    android:paddingVertical="@dimen/fragment_settings_item_padding_vertical"
                     android:layout_gravity="center_vertical|end"
                     android:orientation="horizontal">
 
@@ -161,7 +159,8 @@
                         android:id="@+id/text_reminder_notification_time"
                         android:layout_width="wrap_content"
                         android:layout_height="@dimen/fragment_settings_item_layout_height"
-                        android:paddingEnd="@dimen/fragment_settings_item_padding_horizontal_between_items"
+                        android:paddingVertical="@dimen/fragment_settings_item_padding_vertical"
+                        android:paddingHorizontal="@dimen/fragment_settings_item_padding_horizontal_between_items"
                         tools:text="00:00"
                         android:textSize="@dimen/fragment_settings_item_value_text_size"
                         android:gravity="center_vertical|end"/>
@@ -170,6 +169,8 @@
                         android:id="@+id/switch_reminder_notification_value"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:paddingStart="@dimen/fragment_settings_item_padding_horizontal_between_items"
+                        android:paddingEnd="@dimen/fragment_settings_item_padding_horizontal"
                         android:checked="@{settingsViewModel.isCheckedReminderNotificationLiveData}"/>
 
                 </LinearLayout>

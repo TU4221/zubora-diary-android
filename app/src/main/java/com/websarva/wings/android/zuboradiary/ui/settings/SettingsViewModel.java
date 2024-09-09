@@ -1,5 +1,7 @@
 package com.websarva.wings.android.zuboradiary.ui.settings;
 
+import android.util.Log;
+
 import androidx.annotation.FloatRange;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -66,8 +68,11 @@ public class SettingsViewModel extends BaseViewModel {
                 settingsRepository.loadThemeColorSettingValue();
         disposables.add(
                 preferenceValueFlowable.subscribe(
-                        value -> {this.themeColor.postValue(value.getThemeColor());},
-                        throwable -> {addSettingLoadingError();}
+                        value -> this.themeColor.postValue(value.getThemeColor()),
+                        throwable -> {
+                            throwable.printStackTrace();
+                            addSettingLoadingError();
+                        }
                 )
         );
     }
@@ -81,7 +86,10 @@ public class SettingsViewModel extends BaseViewModel {
                             DayOfWeek calendarStartDayOfWeek = value.toDayOfWeek();
                             this.calendarStartDayOfWeek.postValue(calendarStartDayOfWeek);
                             },
-                        throwable -> {addSettingLoadingError();}
+                        throwable -> {
+                            throwable.printStackTrace();
+                            addSettingLoadingError();
+                        }
                 )
         );
     }
@@ -92,10 +100,15 @@ public class SettingsViewModel extends BaseViewModel {
         disposables.add(
                 preferenceValueFlowable.subscribe(
                         value -> {
+                            Log.d("20240909", "getIsChecked():" + value.getIsChecked());
+                            Log.d("20240909", "getNotificationLocalTime():" + value.getNotificationTimeString());
                             isCheckedReminderNotification.postValue(value.getIsChecked());
                             reminderNotificationTime.postValue(value.getNotificationLocalTime());
                             },
-                        throwable -> {addSettingLoadingError();}
+                        throwable -> {
+                            throwable.printStackTrace();
+                            addSettingLoadingError();
+                        }
                 )
         );
     }
@@ -106,7 +119,10 @@ public class SettingsViewModel extends BaseViewModel {
         disposables.add(
                 preferenceValueFlowable.subscribe(
                         value -> isCheckedPasscodeLock.postValue(value.getIsChecked()),
-                        throwable -> {addSettingLoadingError();}
+                        throwable -> {
+                            throwable.printStackTrace();
+                            addSettingLoadingError();
+                        }
                 )
         );
     }
@@ -117,7 +133,10 @@ public class SettingsViewModel extends BaseViewModel {
         disposables.add(
                 preferenceValueFlowable.subscribe(
                         value -> isCheckedGettingWeatherInformation.postValue(value.getIsChecked()),
-                        throwable -> {addSettingLoadingError();}
+                        throwable -> {
+                            throwable.printStackTrace();
+                            addSettingLoadingError();
+                        }
                 )
         );
     }
@@ -151,6 +170,7 @@ public class SettingsViewModel extends BaseViewModel {
     }
 
     public void saveReminderNotificationValid(LocalTime time) {
+        Log.d("20240909", "saveReminderNotificationValid()");
         ReminderNotificationPreferenceValue preferenceValue = new ReminderNotificationPreferenceValue(true, time);
         Single<Preferences> result = settingsRepository.saveReminderNotificationPreferenceValue(preferenceValue);
         setUpProcessOnSaved(result, new OnSettingsSavedCallback() {
@@ -196,6 +216,7 @@ public class SettingsViewModel extends BaseViewModel {
         disposables.add(result.subscribe(new Consumer<Preferences>() {
             @Override
             public void accept(Preferences preferences) throws Throwable {
+                Log.d("20240909", "saveReminderNotificationValid()_success");
                 if (callback == null) {
                     return;
                 }
@@ -204,6 +225,7 @@ public class SettingsViewModel extends BaseViewModel {
         }, new Consumer<Throwable>() {
             @Override
             public void accept(Throwable throwable) throws Throwable {
+                Log.d("20240909", "saveReminderNotificationValid()_error");
                 AppError lastAppError = getAppErrorBufferListLastValue();
                 if (lastAppError == AppError.SETTING_UPDATE) {
                     return;
@@ -244,6 +266,10 @@ public class SettingsViewModel extends BaseViewModel {
 
     public LiveData<Boolean> getIsCheckedReminderNotificationLiveData() {
         return isCheckedReminderNotification;
+    }
+
+    public LiveData<LocalTime> getReminderNotificationTime() {
+        return reminderNotificationTime;
     }
 
     public LiveData<Boolean> getIsCheckedPasscodeLockLiveData() {
