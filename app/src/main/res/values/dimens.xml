@@ -11,6 +11,7 @@
 
     <dimen name="fragment_settings_item_layout_height">56dp</dimen>
     <dimen name="fragment_settings_item_padding_horizontal">16dp</dimen>
+    <dimen name="fragment_settings_item_padding_horizontal_between_items">8dp</dimen>
     <dimen name="fragment_settings_item_padding_vertical">8dp</dimen>
     <dimen name="fragment_settings_item_drawable_padding">16dp</dimen>
     <dimen name="fragment_settings_item_title_text_size">18dp</dimen> <!-- "height"固定の為、"sp"ではなく"dp"使用 -->

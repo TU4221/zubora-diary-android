@@ -42,9 +42,6 @@ public class WordSearchFragment extends BaseFragment {
     private FragmentWordSearchBinding binding;
     private String previousText = ""; // 二重検索防止用
 
-    // Navigation関係
-    private boolean shouldShowDiaryListLoadingErrorDialog;
-
     // ViewModel
     private WordSearchViewModel wordSearchViewModel;
 
@@ -63,29 +60,6 @@ public class WordSearchFragment extends BaseFragment {
     @Override
     public View onCreateView(
             @NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        // 画面遷移時のアニメーション設定
-        // FROM:遷移元 TO:遷移先
-        // FROM - TO の TO として現れるアニメーション
-        MainActivity mainActivity = (MainActivity) requireActivity();
-        if (mainActivity.getTabWasSelected()) {
-            setEnterTransition(new MaterialFadeThrough());
-            mainActivity.resetTabWasSelected();
-        } else {
-            setEnterTransition(new MaterialSharedAxis(MaterialSharedAxis.X, true));
-        }
-        // FROM - TO の FROM として消えるアニメーション
-        setExitTransition(new MaterialSharedAxis(MaterialSharedAxis.X, true));
-        // TO - FROM の FROM として現れるアニメーション
-        /*if (switchesReenterTransition != null && switchesReenterTransition) {
-            setReenterTransition(new MaterialSharedAxis(MaterialSharedAxis.Z, false));
-        } else {
-            setReenterTransition(new MaterialSharedAxis(MaterialSharedAxis.X, false));
-        }*/
-        setReenterTransition(new MaterialSharedAxis(MaterialSharedAxis.X, false));
-        // TO - FROM の TO として消えるアニメーション
-        setReturnTransition(new MaterialSharedAxis(MaterialSharedAxis.X, false));
-
-
         return super.onCreateView(inflater,container,savedInstanceState);
     }
 

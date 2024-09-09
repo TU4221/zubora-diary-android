@@ -42,8 +42,6 @@ public class DiaryShowFragment extends BaseFragment {
     // Navigation関係
     private static final String fromClassName = "From" + DiaryShowFragment.class.getName();
     public static final String KEY_SHOWED_DIARY_DATE = "ShowedDiaryDate" + fromClassName;
-    private boolean shouldShowDiaryLoadingErrorDialog;
-    private boolean shouldShowDiaryDeleteErrorDialog;
 
     // ViewModel
     private DiaryShowViewModel diaryShowViewModel;

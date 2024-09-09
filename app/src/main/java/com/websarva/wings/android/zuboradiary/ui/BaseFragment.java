@@ -17,6 +17,9 @@ import androidx.navigation.NavController;
 import androidx.navigation.NavDestination;
 import androidx.navigation.fragment.NavHostFragment;
 
+import com.google.android.material.transition.platform.MaterialFadeThrough;
+import com.google.android.material.transition.platform.MaterialSharedAxis;
+import com.websarva.wings.android.zuboradiary.MainActivity;
 import com.websarva.wings.android.zuboradiary.data.AppError;
 
 import java.util.List;
@@ -51,10 +54,41 @@ public abstract class BaseFragment extends CustomFragment {
     public View onCreateView(
             @NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
+        setUpFragmentTransitionEffect();
         return initializeDataBinding(inflater, container);
     }
 
     protected abstract View initializeDataBinding(@NonNull LayoutInflater inflater, ViewGroup container);
+
+    private void setUpFragmentTransitionEffect() {
+        // FROM:遷移元 TO:遷移先
+        // FROM - TO の TO として現れるアニメーション
+
+        // HACK:ボトムナビゲーションタブでFragment切替時はEnterTransitionで設定されるエフェクトを変更する。
+        //      NavigationStartFragment(DiaryListFragment)はReenterTransitionで設定されたエフェクトが処理される。
+        //      遷移元FragmentのエフェクトはMainActivityクラスにて設定。
+        MainActivity mainActivity = (MainActivity) requireActivity();
+        if (mainActivity.getTabWasSelected()) {
+            setEnterTransition(new MaterialFadeThrough());
+        } else {
+            setEnterTransition(new MaterialSharedAxis(MaterialSharedAxis.X, true));
+        }
+
+        // FROM - TO の FROM として消えるアニメーション
+        setExitTransition(new MaterialSharedAxis(MaterialSharedAxis.X, true));
+
+        // TO - FROM の FROM として現れるアニメーション
+        if (mainActivity.getTabWasSelected()) {
+            setReenterTransition(new MaterialFadeThrough());
+        } else {
+            setReenterTransition(new MaterialSharedAxis(MaterialSharedAxis.X, false));
+        }
+
+        // TO - FROM の TO として消えるアニメーション
+        setReturnTransition(new MaterialSharedAxis(MaterialSharedAxis.X, false));
+
+        mainActivity.resetTabWasSelected();
+    }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {

@@ -62,9 +62,6 @@ public class CalendarFragment extends BaseFragment {
     // View関係
     private FragmentCalendarBinding binding;
 
-    // Navigation関係
-    private boolean shouldShowDiaryLoadingErrorDialog;
-
     // ViewModel
     private CalendarViewModel calendarViewModel;
     private DiaryShowViewModel diaryShowViewModel; // TODO:diaryViewModelの使用要素をcalendarViewModelに含めるか検討(DiaryFragment修正後)
@@ -84,23 +81,6 @@ public class CalendarFragment extends BaseFragment {
 
     public View onCreateView(
             @NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        // 画面遷移時のアニメーション設定
-        // FROM:遷移元 TO:遷移先
-        // FROM - TO の TO として現れるアニメーション
-        MainActivity mainActivity = (MainActivity) requireActivity();
-        if (mainActivity.getTabWasSelected()) {
-            setEnterTransition(new MaterialFadeThrough());
-            mainActivity.resetTabWasSelected();
-        } else {
-            setEnterTransition(new MaterialSharedAxis(MaterialSharedAxis.X, true));
-        }
-        // FROM - TO の FROM として消えるアニメーション
-        setExitTransition(new MaterialSharedAxis(MaterialSharedAxis.X, true));
-        // TO - FROM の FROM として現れるアニメーション
-        setReenterTransition(new MaterialSharedAxis(MaterialSharedAxis.X, false));
-        // TO - FROM の TO として消えるアニメーション
-        setReturnTransition(new MaterialSharedAxis(MaterialSharedAxis.X, false));
-
         return super.onCreateView(inflater,container,savedInstanceState);
     }
 

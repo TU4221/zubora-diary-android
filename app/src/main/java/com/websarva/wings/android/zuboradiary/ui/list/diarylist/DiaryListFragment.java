@@ -59,23 +59,6 @@ public class DiaryListFragment extends BaseFragment {
     @Override
     public View onCreateView(
             @NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        // 画面遷移時のアニメーション設定
-        // FROM:遷移元 TO:遷移先
-        // FROM - TO の TO として現れるアニメーション
-        setEnterTransition(new MaterialSharedAxis(MaterialSharedAxis.X, true));
-        // FROM - TO の FROM として消えるアニメーション
-        setExitTransition(new MaterialSharedAxis(MaterialSharedAxis.X, true));
-        // TO - FROM の FROM として現れるアニメーション
-        MainActivity mainActivity = (MainActivity) requireActivity();
-        if (mainActivity.getTabWasSelected()) {
-            setReenterTransition(new MaterialFadeThrough());
-            mainActivity.resetTabWasSelected();
-        } else {
-            setReenterTransition(new MaterialSharedAxis(MaterialSharedAxis.X, false));
-        }
-        // TO - FROM の TO として消えるアニメーション
-        setReturnTransition(new MaterialSharedAxis(MaterialSharedAxis.X, false));
-
         return super.onCreateView(inflater,container,savedInstanceState);
     }
 
