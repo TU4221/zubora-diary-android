@@ -17,17 +17,25 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.TextView;
 
+import com.google.android.material.materialswitch.MaterialSwitch;
 import com.websarva.wings.android.zuboradiary.R;
 import com.websarva.wings.android.zuboradiary.data.DateTimeStringConverter;
+import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor;
 import com.websarva.wings.android.zuboradiary.databinding.FragmentDiaryShowBinding;
 import com.websarva.wings.android.zuboradiary.ui.BaseFragment;
+import com.websarva.wings.android.zuboradiary.ui.ColorSwitchingViewList;
+import com.websarva.wings.android.zuboradiary.ui.BaseThemeColorSwitcher;
 import com.websarva.wings.android.zuboradiary.ui.diary.DiaryLiveData;
+import com.websarva.wings.android.zuboradiary.ui.diary.DiaryThemeColorSwitcher;
 import com.websarva.wings.android.zuboradiary.ui.observer.DiaryShowConditionObserver;
 import com.websarva.wings.android.zuboradiary.ui.observer.DiaryShowLogObserver;
 import com.websarva.wings.android.zuboradiary.ui.observer.DiaryShowNumVisibleItemsObserver;
 import com.websarva.wings.android.zuboradiary.ui.observer.DiaryShowWeather1Observer;
 import com.websarva.wings.android.zuboradiary.ui.observer.DiaryShowWeather2Observer;
+import com.websarva.wings.android.zuboradiary.ui.settings.SettingsViewModel;
 
 import java.time.LocalDate;
 
@@ -45,6 +53,7 @@ public class DiaryShowFragment extends BaseFragment {
 
     // ViewModel
     private DiaryShowViewModel diaryShowViewModel;
+    private SettingsViewModel settingsViewModel;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -66,6 +75,9 @@ public class DiaryShowFragment extends BaseFragment {
     protected void initializeViewModel() {
         ViewModelProvider provider = new ViewModelProvider(this);
         diaryShowViewModel = provider.get(DiaryShowViewModel.class);
+
+        ViewModelProvider activityScopeProvider = new ViewModelProvider(requireActivity());
+        settingsViewModel = activityScopeProvider.get(SettingsViewModel.class);
     }
 
     @Override
@@ -92,6 +104,48 @@ public class DiaryShowFragment extends BaseFragment {
         setUpConditionLayout();
         setUpItemLayout();
         setUpLogShowLayout();
+    }
+
+    @Override
+    protected void setUpThemeColor() {
+        settingsViewModel.getThemeColorSettingValueLiveData()
+                .observe(getViewLifecycleOwner(), new Observer<ThemeColor>() {
+                    @Override
+                    public void onChanged(ThemeColor themeColor) {
+                        if (themeColor == null) {
+                            return;
+                        }
+
+                        DiaryThemeColorSwitcher switcher =
+                                new DiaryThemeColorSwitcher(requireContext(), themeColor);
+
+                        switcher.switchToolbarColor(binding.materialToolbarTopAppBar);
+
+                        ColorSwitchingViewList<TextView> textViewList =
+                                new ColorSwitchingViewList<>(
+                                        binding.includeDiaryShow.textWeather,
+                                        binding.includeDiaryShow.textWeather1Selected,
+                                        binding.includeDiaryShow.textWeatherSlush,
+                                        binding.includeDiaryShow.textWeather2Selected,
+                                        binding.includeDiaryShow.textCondition,
+                                        binding.includeDiaryShow.textConditionSelected,
+                                        binding.includeDiaryShow.textTitle,
+                                        binding.includeDiaryShow.includeItem1.textItemTitle,
+                                        binding.includeDiaryShow.includeItem1.textItemComment,
+                                        binding.includeDiaryShow.includeItem2.textItemTitle,
+                                        binding.includeDiaryShow.includeItem2.textItemComment,
+                                        binding.includeDiaryShow.includeItem3.textItemTitle,
+                                        binding.includeDiaryShow.includeItem3.textItemComment,
+                                        binding.includeDiaryShow.includeItem4.textItemTitle,
+                                        binding.includeDiaryShow.includeItem4.textItemComment,
+                                        binding.includeDiaryShow.includeItem5.textItemTitle,
+                                        binding.includeDiaryShow.includeItem5.textItemComment,
+                                        binding.includeDiaryShow.textLog,
+                                        binding.includeDiaryShow.textLogValue
+                                );
+                        switcher.switchTextColorOnBackground(textViewList);
+                    }
+                });
     }
 
     @Override

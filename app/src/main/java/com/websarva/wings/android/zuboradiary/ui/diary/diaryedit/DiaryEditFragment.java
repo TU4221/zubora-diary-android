@@ -4,6 +4,7 @@ import static android.text.InputType.TYPE_TEXT_FLAG_MULTI_LINE;
 
 import android.annotation.SuppressLint;
 import android.content.DialogInterface;
+import android.graphics.Color;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -16,6 +17,7 @@ import androidx.lifecycle.Observer;
 import androidx.lifecycle.SavedStateHandle;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavDirections;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.text.Editable;
 import android.text.InputFilter;
@@ -32,20 +34,29 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.google.android.material.appbar.MaterialToolbar;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.materialswitch.MaterialSwitch;
 import com.websarva.wings.android.zuboradiary.data.DateTimeStringConverter;
 import com.websarva.wings.android.zuboradiary.data.diary.ConditionConverter;
 import com.websarva.wings.android.zuboradiary.data.diary.Conditions;
 import com.websarva.wings.android.zuboradiary.data.diary.WeatherConverter;
 import com.websarva.wings.android.zuboradiary.data.diary.Weathers;
+import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor;
 import com.websarva.wings.android.zuboradiary.databinding.FragmentDiaryEditBinding;
 import com.websarva.wings.android.zuboradiary.R;
 import com.websarva.wings.android.zuboradiary.ui.BaseFragment;
+import com.websarva.wings.android.zuboradiary.ui.ColorSwitchingViewList;
 import com.websarva.wings.android.zuboradiary.ui.KeyboardInitializer;
 import com.websarva.wings.android.zuboradiary.ui.TestDiariesSaver;
+import com.websarva.wings.android.zuboradiary.ui.BaseThemeColorSwitcher;
 import com.websarva.wings.android.zuboradiary.ui.diary.DiaryLiveData;
+import com.websarva.wings.android.zuboradiary.ui.diary.DiaryThemeColorSwitcher;
 import com.websarva.wings.android.zuboradiary.ui.diary.diaryitemtitleedit.DiaryItemTitleEditFragment;
+import com.websarva.wings.android.zuboradiary.ui.list.ListThemeColorSwitcher;
 import com.websarva.wings.android.zuboradiary.ui.settings.SettingsViewModel;
 
 import java.time.LocalDate;
@@ -134,6 +145,67 @@ public class DiaryEditFragment extends BaseFragment {
         });
     }
 
+    @Override
+    protected void setUpThemeColor() {
+        settingsViewModel.getThemeColorSettingValueLiveData()
+                .observe(getViewLifecycleOwner(), new Observer<ThemeColor>() {
+                    @Override
+                    public void onChanged(ThemeColor themeColor) {
+                        if (themeColor == null) {
+                            return;
+                        }
+
+                        DiaryThemeColorSwitcher switcher =
+                                new DiaryThemeColorSwitcher(requireContext(), themeColor);
+
+                        switcher.switchToolbarColor(binding.materialToolbarTopAppBar);
+
+                        ColorSwitchingViewList<TextView> textViewList =
+                                new ColorSwitchingViewList<>(
+                                        binding.editTextDate,
+                                        binding.editTextDate,
+                                        binding.textWeather,
+                                        binding.textWeatherSlush,
+                                        binding.textCondition,
+                                        binding.textTitle,
+                                        binding.editTextTitle,
+                                        binding.textTitleLength,
+                                        binding.includeItem1.textItemNumber,
+                                        binding.includeItem1.editTextItemTitle,
+                                        binding.includeItem1.editTextItemComment,
+                                        binding.includeItem1.textItemCommentLength,
+                                        binding.includeItem2.textItemNumber,
+                                        binding.includeItem2.editTextItemTitle,
+                                        binding.includeItem2.editTextItemComment,
+                                        binding.includeItem2.textItemCommentLength,
+                                        binding.includeItem3.textItemNumber,
+                                        binding.includeItem3.editTextItemTitle,
+                                        binding.includeItem3.editTextItemComment,
+                                        binding.includeItem3.textItemCommentLength,
+                                        binding.includeItem4.textItemNumber,
+                                        binding.includeItem4.editTextItemTitle,
+                                        binding.includeItem4.editTextItemComment,
+                                        binding.includeItem4.textItemCommentLength,
+                                        binding.includeItem5.textItemNumber,
+                                        binding.includeItem5.editTextItemTitle,
+                                        binding.includeItem5.editTextItemComment,
+                                        binding.includeItem5.textItemCommentLength
+                                );
+                        switcher.switchTextColorOnBackground(textViewList);
+
+                        ColorSwitchingViewList<ImageButton> imageButtonList =
+                                new ColorSwitchingViewList<>(
+                                        binding.includeItem1.imageButtonItemDelete,
+                                        binding.includeItem2.imageButtonItemDelete,
+                                        binding.includeItem3.imageButtonItemDelete,
+                                        binding.includeItem4.imageButtonItemDelete,
+                                        binding.includeItem5.imageButtonItemDelete,
+                                        binding.imageButtonAddItem
+                                );
+                        switcher.switchImageButton(imageButtonList);
+                    }
+                });
+    }
 
     @Override
     protected void handleOnReceivingResultFromPreviousFragment(@NonNull SavedStateHandle savedStateHandle) {
@@ -571,7 +643,23 @@ public class DiaryEditFragment extends BaseFragment {
                 weatherItemList.add(weather.toString(requireContext()));
             }
         }
-        return new ArrayAdapter<>(requireContext(), android.R.layout.simple_list_item_1 , weatherItemList);
+        return new ArrayAdapter<String>(requireContext(), android.R.layout.simple_list_item_1 , weatherItemList) {
+            @NonNull
+            @Override
+            public View getView(int position, View convertView, @NonNull ViewGroup parent) {
+                // 通常時の文字の色を設定
+                TextView textView = (TextView) super.getView(position, convertView, parent);
+                ThemeColor themeColor = settingsViewModel.getThemeColorSettingValueLiveData().getValue();
+                if (themeColor == null) {
+                    throw new NullPointerException();
+                }
+                DiaryThemeColorSwitcher switcher =
+                        new DiaryThemeColorSwitcher(requireContext(), themeColor);
+                ColorSwitchingViewList<TextView> textViewList = new ColorSwitchingViewList<>(textView);
+                switcher.switchTextColorOnBackground(textViewList);
+                return textView;
+            }
+        };
     }
 
     private boolean isExcludedWeather(Weathers weather, @Nullable Weathers... excludedWeathers) {
@@ -593,7 +681,23 @@ public class DiaryEditFragment extends BaseFragment {
             conditonItemList.add(weather.toString(requireContext()));
         }
         ArrayAdapter<String> conditionArrayAdapter =
-                new ArrayAdapter<>(requireContext(), android.R.layout.simple_list_item_1 , conditonItemList);
+                new ArrayAdapter<String>(requireContext(), android.R.layout.simple_list_item_1 , conditonItemList) {
+                    @NonNull
+                    @Override
+                    public View getView(int position, View convertView, @NonNull ViewGroup parent) {
+                        // 通常時の文字の色を設定
+                        TextView textView = (TextView) super.getView(position, convertView, parent);
+                        ThemeColor themeColor = settingsViewModel.getThemeColorSettingValueLiveData().getValue();
+                        if (themeColor == null) {
+                            throw new NullPointerException();
+                        }
+                        DiaryThemeColorSwitcher switcher =
+                                new DiaryThemeColorSwitcher(requireContext(), themeColor);
+                        ColorSwitchingViewList<TextView> textViewList = new ColorSwitchingViewList<>(textView);
+                        switcher.switchTextColorOnBackground(textViewList);
+                        return textView;
+                    }
+                };;
         binding.spinnerCondition.setAdapter(conditionArrayAdapter);
 
         binding.spinnerCondition

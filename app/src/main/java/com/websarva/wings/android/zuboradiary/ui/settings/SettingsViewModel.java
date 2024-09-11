@@ -64,7 +64,7 @@ public class SettingsViewModel extends BaseViewModel {
     }
 
     // TODO:PreferenceValue読込エラーが発生した時、再読み込みさせるにはメソッドを再び呼び出す必要がある。現時点で考えれる対策を下記にまとめる。
-    //      1.各FragmentからSettingViewModelを参照する時にエラーフラグ(未作成)を確認して都度初期化する。
+    //      1.各FragmentからSettingViewModelを参照する時に必要設定値の読み出しエラーフラグ(未作成)を確認して都度初期化する。
     //        (対象Fragmentに不必要な設定がエラーの時でも処理が必要となる)
     //      2.各FragmentがもつViewModelに都度PreferenceValueを読みこませる。(読込までのラグが発生してしまう。)
     private void setUpLoadingThemeColorPreferenceValue() {

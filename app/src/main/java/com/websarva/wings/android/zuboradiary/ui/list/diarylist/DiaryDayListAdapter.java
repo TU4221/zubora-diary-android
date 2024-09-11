@@ -1,10 +1,12 @@
 package com.websarva.wings.android.zuboradiary.ui.list.diarylist;
 
 import android.content.Context;
+import android.content.res.Resources;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.databinding.ViewDataBinding;
@@ -13,7 +15,10 @@ import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.websarva.wings.android.zuboradiary.data.DayOfWeekStringConverter;
+import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor;
 import com.websarva.wings.android.zuboradiary.databinding.RowDiaryDayListBinding;
+import com.websarva.wings.android.zuboradiary.ui.ColorSwitchingViewList;
+import com.websarva.wings.android.zuboradiary.ui.list.ListThemeColorSwitcher;
 
 import java.time.LocalDate;
 
@@ -21,13 +26,26 @@ public class DiaryDayListAdapter extends ListAdapter<DiaryDayListItem, DiaryDayL
 
     private final Context context;
     private final RecyclerView recyclerView;
+    private final ThemeColor themeColor;
     private OnClickItemListener onClickItemListener;
     private OnClickDeleteButtonListener onClickDeleteButtonListener;
 
-    public DiaryDayListAdapter(Context context, RecyclerView recyclerView) {
+    public DiaryDayListAdapter(Context context, RecyclerView recyclerView, ThemeColor themeColor) {
         super(new DiaryDayListDiffUtilItemCallback());
+
+        if (context == null) {
+            throw new NullPointerException();
+        }
+        if (recyclerView == null) {
+            throw new NullPointerException();
+        }
+        if (themeColor == null) {
+            throw new NullPointerException();
+        }
+
         this.context = context;
         this.recyclerView = recyclerView;
+        this.themeColor = themeColor;
     }
 
     public void build() {
@@ -82,12 +100,25 @@ public class DiaryDayListAdapter extends ListAdapter<DiaryDayListItem, DiaryDayL
 
     }
 
-    public static class DiaryDayListViewHolder extends DiaryListSimpleCallback.LeftSwipeViewHolder {
+    public class DiaryDayListViewHolder extends DiaryListSimpleCallback.LeftSwipeViewHolder {
         public RowDiaryDayListBinding binding;
         public LocalDate date;
         public DiaryDayListViewHolder(@NonNull RowDiaryDayListBinding binding) {
             super(binding);
             this.binding = binding;
+
+            ListThemeColorSwitcher switcher =
+                    new ListThemeColorSwitcher(context, themeColor);
+
+            ColorSwitchingViewList<TextView> textViewList =
+                    new ColorSwitchingViewList<>(
+                            binding.includeDay.textDayOfMonth,
+                            binding.includeDay.textDayOfWeek,
+                            binding.textRowDiaryListDayTitle
+                    );
+            switcher.switchTextColorOnListItemBackground(textViewList);
+
+            switcher.switchListItemBackgroundColor(binding.linerLayoutForeground);
         }
 
         @Override

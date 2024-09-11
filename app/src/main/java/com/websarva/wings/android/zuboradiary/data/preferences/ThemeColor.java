@@ -3,6 +3,7 @@ package com.websarva.wings.android.zuboradiary.data.preferences;
 import android.content.Context;
 import android.content.res.ColorStateList;
 import android.content.res.Resources;
+import android.media.tv.TableRequest;
 
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
@@ -48,6 +49,13 @@ public enum ThemeColor {
         return context.getString(this.stringResId);
     }
 
+    public boolean requestsSwitchingAppearanceLightStatusBars() {
+        if (this == WHITE || this == BLACK) {
+            return true;
+        }
+        return false;
+    }
+
     // TODO:colorResIdをコンストラクタで初期化するか検討(膨大な良の為可読性を考慮してこのままとしても良いかも)
     public int getPrimaryColor(Resources resources) {
         if (resources == null) {
@@ -57,22 +65,22 @@ public enum ThemeColor {
         int colorResId = -1;
         switch (this) {
             case WHITE:
-                colorResId = R.color.md_theme_primary_white;
+                colorResId = R.color.md_theme_color_white_primary;
                 break;
             case BLACK:
-                colorResId = R.color.md_theme_primary_black;
+                colorResId = R.color.md_theme_color_black_primary;
                 break;
             case RED:
-                colorResId = R.color.md_theme_primary_black;
+                colorResId = R.color.md_theme_color_red_primary;
                 break;
             case BLUE:
-                colorResId = R.color.md_theme_primary_black;
+                colorResId = R.color.md_theme_color_blue_primary;
                 break;
             case GREEN:
-                colorResId = R.color.md_theme_primary_black;
+                colorResId = R.color.md_theme_color_green_primary;
                 break;
             case YELLOW:
-                colorResId = R.color.md_theme_primary_black;
+                colorResId = R.color.md_theme_color_yellow_primary;
                 break;
         }
         return ResourcesCompat.getColor(resources, colorResId, null);
@@ -86,22 +94,22 @@ public enum ThemeColor {
         int colorResId = -1;
         switch (this) {
             case WHITE:
-                colorResId = R.color.md_theme_onPrimary_white;
+                colorResId = R.color.md_theme_color_white_onPrimary;
                 break;
             case BLACK:
-                colorResId = R.color.md_theme_onPrimary_black;
+                colorResId = R.color.md_theme_color_black_onPrimary;
                 break;
             case RED:
-                colorResId = R.color.md_theme_onPrimary_black;
+                colorResId = R.color.md_theme_color_red_onPrimary;
                 break;
             case BLUE:
-                colorResId = R.color.md_theme_onPrimary_black;
+                colorResId = R.color.md_theme_color_blue_onPrimary;
                 break;
             case GREEN:
-                colorResId = R.color.md_theme_onPrimary_black;
+                colorResId = R.color.md_theme_color_green_onPrimary;
                 break;
             case YELLOW:
-                colorResId = R.color.md_theme_onPrimary_black;
+                colorResId = R.color.md_theme_color_yellow_onPrimary;
                 break;
         }
         return ResourcesCompat.getColor(resources, colorResId, null);
@@ -115,22 +123,22 @@ public enum ThemeColor {
         int colorResId = -1;
         switch (this) {
             case WHITE:
-                colorResId = R.color.md_theme_primaryContainer_white;
+                colorResId = R.color.md_theme_color_white_primaryContainer;
                 break;
             case BLACK:
-                colorResId = R.color.md_theme_primaryContainer_black;
+                colorResId = R.color.md_theme_color_black_primaryContainer;
                 break;
             case RED:
-                colorResId = R.color.md_theme_primaryContainer_black;
+                colorResId = R.color.md_theme_color_red_primaryContainer;
                 break;
             case BLUE:
-                colorResId = R.color.md_theme_primaryContainer_black;
+                colorResId = R.color.md_theme_color_blue_primaryContainer;
                 break;
             case GREEN:
-                colorResId = R.color.md_theme_primaryContainer_black;
+                colorResId = R.color.md_theme_color_green_primaryContainer;
                 break;
             case YELLOW:
-                colorResId = R.color.md_theme_primaryContainer_black;
+                colorResId = R.color.md_theme_color_yellow_primaryContainer;
                 break;
         }
         return ResourcesCompat.getColor(resources, colorResId, null);
@@ -144,22 +152,22 @@ public enum ThemeColor {
         int colorResId = -1;
         switch (this) {
             case WHITE:
-                colorResId = R.color.md_theme_onPrimaryContainer_white;
+                colorResId = R.color.md_theme_color_white_onPrimaryContainer;
                 break;
             case BLACK:
-                colorResId = R.color.md_theme_onPrimaryContainer_black;
+                colorResId = R.color.md_theme_color_black_onPrimaryContainer;
                 break;
             case RED:
-                colorResId = R.color.md_theme_onPrimaryContainer_black;
+                colorResId = R.color.md_theme_color_red_onPrimaryContainer;
                 break;
             case BLUE:
-                colorResId = R.color.md_theme_onPrimaryContainer_black;
+                colorResId = R.color.md_theme_color_blue_onPrimaryContainer;
                 break;
             case GREEN:
-                colorResId = R.color.md_theme_onPrimaryContainer_black;
+                colorResId = R.color.md_theme_color_green_onPrimaryContainer;
                 break;
             case YELLOW:
-                colorResId = R.color.md_theme_onPrimaryContainer_black;
+                colorResId = R.color.md_theme_color_yellow_onPrimaryContainer;
                 break;
         }
         return ResourcesCompat.getColor(resources, colorResId, null);
@@ -173,22 +181,22 @@ public enum ThemeColor {
         int colorResId = -1;
         switch (this) {
             case WHITE:
-                colorResId = R.color.md_theme_secondary_white;
+                colorResId = R.color.md_theme_color_white_secondary;
                 break;
             case BLACK:
-                colorResId = R.color.md_theme_secondary_black;
+                colorResId = R.color.md_theme_color_black_secondary;
                 break;
             case RED:
-                colorResId = R.color.md_theme_secondary_black;
+                colorResId = R.color.md_theme_color_red_secondary;
                 break;
             case BLUE:
-                colorResId = R.color.md_theme_secondary_black;
+                colorResId = R.color.md_theme_color_blue_secondary;
                 break;
             case GREEN:
-                colorResId = R.color.md_theme_secondary_black;
+                colorResId = R.color.md_theme_color_green_secondary;
                 break;
             case YELLOW:
-                colorResId = R.color.md_theme_secondary_black;
+                colorResId = R.color.md_theme_color_yellow_secondary;
                 break;
         }
         return ResourcesCompat.getColor(resources, colorResId, null);
@@ -202,22 +210,22 @@ public enum ThemeColor {
         int colorResId = -1;
         switch (this) {
             case WHITE:
-                colorResId = R.color.md_theme_onSecondary_white;
+                colorResId = R.color.md_theme_color_white_onSecondary;
                 break;
             case BLACK:
-                colorResId = R.color.md_theme_onSecondary_black;
+                colorResId = R.color.md_theme_color_black_onSecondary;
                 break;
             case RED:
-                colorResId = R.color.md_theme_onSecondary_black;
+                colorResId = R.color.md_theme_color_red_onSecondary;
                 break;
             case BLUE:
-                colorResId = R.color.md_theme_onSecondary_black;
+                colorResId = R.color.md_theme_color_blue_onSecondary;
                 break;
             case GREEN:
-                colorResId = R.color.md_theme_onSecondary_black;
+                colorResId = R.color.md_theme_color_green_onSecondary;
                 break;
             case YELLOW:
-                colorResId = R.color.md_theme_onSecondary_black;
+                colorResId = R.color.md_theme_color_yellow_onSecondary;
                 break;
         }
         return ResourcesCompat.getColor(resources, colorResId, null);
@@ -231,22 +239,22 @@ public enum ThemeColor {
         int colorResId = -1;
         switch (this) {
             case WHITE:
-                colorResId = R.color.md_theme_secondaryContainer_white;
+                colorResId = R.color.md_theme_color_white_secondaryContainer;
                 break;
             case BLACK:
-                colorResId = R.color.md_theme_secondaryContainer_black;
+                colorResId = R.color.md_theme_color_black_secondaryContainer;
                 break;
             case RED:
-                colorResId = R.color.md_theme_secondaryContainer_black;
+                colorResId = R.color.md_theme_color_red_secondaryContainer;
                 break;
             case BLUE:
-                colorResId = R.color.md_theme_secondaryContainer_black;
+                colorResId = R.color.md_theme_color_blue_secondaryContainer;
                 break;
             case GREEN:
-                colorResId = R.color.md_theme_secondaryContainer_black;
+                colorResId = R.color.md_theme_color_green_secondaryContainer;
                 break;
             case YELLOW:
-                colorResId = R.color.md_theme_secondaryContainer_black;
+                colorResId = R.color.md_theme_color_yellow_secondaryContainer;
                 break;
         }
         return ResourcesCompat.getColor(resources, colorResId, null);
@@ -260,22 +268,22 @@ public enum ThemeColor {
         int colorResId = -1;
         switch (this) {
             case WHITE:
-                colorResId = R.color.md_theme_onSecondaryContainer_white;
+                colorResId = R.color.md_theme_color_white_onSecondaryContainer;
                 break;
             case BLACK:
-                colorResId = R.color.md_theme_onSecondaryContainer_black;
+                colorResId = R.color.md_theme_color_black_onSecondaryContainer;
                 break;
             case RED:
-                colorResId = R.color.md_theme_onSecondaryContainer_black;
+                colorResId = R.color.md_theme_color_red_onSecondaryContainer;
                 break;
             case BLUE:
-                colorResId = R.color.md_theme_onSecondaryContainer_black;
+                colorResId = R.color.md_theme_color_blue_onSecondaryContainer;
                 break;
             case GREEN:
-                colorResId = R.color.md_theme_onSecondaryContainer_black;
+                colorResId = R.color.md_theme_color_green_onSecondaryContainer;
                 break;
             case YELLOW:
-                colorResId = R.color.md_theme_onSecondaryContainer_black;
+                colorResId = R.color.md_theme_color_yellow_onSecondaryContainer;
                 break;
         }
         return ResourcesCompat.getColor(resources, colorResId, null);
@@ -289,22 +297,22 @@ public enum ThemeColor {
         int colorResId = -1;
         switch (this) {
             case WHITE:
-                colorResId = R.color.md_theme_surface_white;
+                colorResId = R.color.md_theme_color_white_surface;
                 break;
             case BLACK:
-                colorResId = R.color.md_theme_surface_black;
+                colorResId = R.color.md_theme_color_black_surface;
                 break;
             case RED:
-                colorResId = R.color.md_theme_surface_black;
+                colorResId = R.color.md_theme_color_red_surface;
                 break;
             case BLUE:
-                colorResId = R.color.md_theme_surface_black;
+                colorResId = R.color.md_theme_color_blue_surface;
                 break;
             case GREEN:
-                colorResId = R.color.md_theme_surface_black;
+                colorResId = R.color.md_theme_color_green_surface;
                 break;
             case YELLOW:
-                colorResId = R.color.md_theme_surface_black;
+                colorResId = R.color.md_theme_color_yellow_surface;
                 break;
         }
         return ResourcesCompat.getColor(resources, colorResId, null);
@@ -318,22 +326,22 @@ public enum ThemeColor {
         int colorResId = -1;
         switch (this) {
             case WHITE:
-                colorResId = R.color.md_theme_surfaceContainerLow_white;
+                colorResId = R.color.md_theme_color_white_surfaceContainerLow;
                 break;
             case BLACK:
-                colorResId = R.color.md_theme_surfaceContainerLow_black;
+                colorResId = R.color.md_theme_color_black_surfaceContainerLow;
                 break;
             case RED:
-                colorResId = R.color.md_theme_surfaceContainerLow_black;
+                colorResId = R.color.md_theme_color_red_surfaceContainerLow;
                 break;
             case BLUE:
-                colorResId = R.color.md_theme_surfaceContainerLow_black;
+                colorResId = R.color.md_theme_color_blue_surfaceContainerLow;
                 break;
             case GREEN:
-                colorResId = R.color.md_theme_surfaceContainerLow_black;
+                colorResId = R.color.md_theme_color_green_surfaceContainerLow;
                 break;
             case YELLOW:
-                colorResId = R.color.md_theme_surfaceContainerLow_black;
+                colorResId = R.color.md_theme_color_yellow_surfaceContainerLow;
                 break;
         }
         return ResourcesCompat.getColor(resources, colorResId, null);
@@ -347,22 +355,22 @@ public enum ThemeColor {
         int colorResId = -1;
         switch (this) {
             case WHITE:
-                colorResId = R.color.md_theme_surfaceContainer_white;
+                colorResId = R.color.md_theme_color_white_surfaceContainer;
                 break;
             case BLACK:
-                colorResId = R.color.md_theme_surfaceContainer_black;
+                colorResId = R.color.md_theme_color_black_surfaceContainer;
                 break;
             case RED:
-                colorResId = R.color.md_theme_surfaceContainer_black;
+                colorResId = R.color.md_theme_color_red_surfaceContainer;
                 break;
             case BLUE:
-                colorResId = R.color.md_theme_surfaceContainer_black;
+                colorResId = R.color.md_theme_color_blue_surfaceContainer;
                 break;
             case GREEN:
-                colorResId = R.color.md_theme_surfaceContainer_black;
+                colorResId = R.color.md_theme_color_green_surfaceContainer;
                 break;
             case YELLOW:
-                colorResId = R.color.md_theme_surfaceContainer_black;
+                colorResId = R.color.md_theme_color_yellow_surfaceContainer;
                 break;
         }
         return ResourcesCompat.getColor(resources, colorResId, null);
@@ -376,22 +384,22 @@ public enum ThemeColor {
         int colorResId = -1;
         switch (this) {
             case WHITE:
-                colorResId = R.color.md_theme_surfaceContainerHigh_white;
+                colorResId = R.color.md_theme_color_white_surfaceContainerHigh;
                 break;
             case BLACK:
-                colorResId = R.color.md_theme_surfaceContainerHigh_black;
+                colorResId = R.color.md_theme_color_black_surfaceContainerHigh;
                 break;
             case RED:
-                colorResId = R.color.md_theme_surfaceContainerHigh_black;
+                colorResId = R.color.md_theme_color_red_surfaceContainerHigh;
                 break;
             case BLUE:
-                colorResId = R.color.md_theme_surfaceContainerHigh_black;
+                colorResId = R.color.md_theme_color_blue_surfaceContainerHigh;
                 break;
             case GREEN:
-                colorResId = R.color.md_theme_surfaceContainerHigh_black;
+                colorResId = R.color.md_theme_color_green_surfaceContainerHigh;
                 break;
             case YELLOW:
-                colorResId = R.color.md_theme_surfaceContainerHigh_black;
+                colorResId = R.color.md_theme_color_yellow_surfaceContainerHigh;
                 break;
         }
         return ResourcesCompat.getColor(resources, colorResId, null);
@@ -405,22 +413,22 @@ public enum ThemeColor {
         int colorResId = -1;
         switch (this) {
             case WHITE:
-                colorResId = R.color.md_theme_surfaceContainerHighest_white;
+                colorResId = R.color.md_theme_color_white_surfaceContainerHighest;
                 break;
             case BLACK:
-                colorResId = R.color.md_theme_surfaceContainerHighest_black;
+                colorResId = R.color.md_theme_color_black_surfaceContainerHighest;
                 break;
             case RED:
-                colorResId = R.color.md_theme_surfaceContainerHighest_black;
+                colorResId = R.color.md_theme_color_red_surfaceContainerHighest;
                 break;
             case BLUE:
-                colorResId = R.color.md_theme_surfaceContainerHighest_black;
+                colorResId = R.color.md_theme_color_blue_surfaceContainerHighest;
                 break;
             case GREEN:
-                colorResId = R.color.md_theme_surfaceContainerHighest_black;
+                colorResId = R.color.md_theme_color_green_surfaceContainerHighest;
                 break;
             case YELLOW:
-                colorResId = R.color.md_theme_surfaceContainerHighest_black;
+                colorResId = R.color.md_theme_color_yellow_surfaceContainerHighest;
                 break;
         }
         return ResourcesCompat.getColor(resources, colorResId, null);
@@ -434,53 +442,24 @@ public enum ThemeColor {
         int colorResId = -1;
         switch (this) {
             case WHITE:
-                colorResId = R.color.md_theme_onSurface_white;
+                colorResId = R.color.md_theme_color_white_onSurface;
                 break;
             case BLACK:
-                colorResId = R.color.md_theme_onSurface_black;
+                colorResId = R.color.md_theme_color_black_onSurface;
                 break;
             case RED:
-                colorResId = R.color.md_theme_onSurface_black;
+                colorResId = R.color.md_theme_color_red_onSurface;
                 break;
             case BLUE:
-                colorResId = R.color.md_theme_onSurface_black;
+                colorResId = R.color.md_theme_color_blue_onSurface;
                 break;
             case GREEN:
-                colorResId = R.color.md_theme_onSurface_black;
+                colorResId = R.color.md_theme_color_green_onSurface;
                 break;
             case YELLOW:
-                colorResId = R.color.md_theme_onSurface_black;
+                colorResId = R.color.md_theme_color_yellow_onSurface;
                 break;
         }
         return ResourcesCompat.getColor(resources, colorResId, null);
-    }
-
-    public  ColorStateList getSwitchTrackDrawable(Context context) {
-        if (context == null) {
-            throw new NullPointerException();
-        }
-
-        int drawableResId = -1;
-        switch (this) {
-            case WHITE:
-                drawableResId = R.color.switch_track_white;
-                break;
-            case BLACK:
-                drawableResId = R.color.switch_track_black;
-                break;
-            case RED:
-                drawableResId = R.color.switch_track_black;
-                break;
-            case BLUE:
-                drawableResId = R.color.switch_track_black;
-                break;
-            case GREEN:
-                drawableResId = R.color.switch_track_black;
-                break;
-            case YELLOW:
-                drawableResId = R.color.switch_track_black;
-                break;
-        }
-        return ContextCompat.getColorStateList(context, drawableResId);
     }
 }

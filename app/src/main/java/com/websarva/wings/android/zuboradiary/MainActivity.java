@@ -39,7 +39,10 @@ import androidx.navigation.ui.NavigationUI;
 
 import com.google.android.material.navigation.NavigationBarView;
 import com.google.android.material.transition.platform.MaterialFadeThrough;
+import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor;
 import com.websarva.wings.android.zuboradiary.databinding.ActivityMainBinding;
+import com.websarva.wings.android.zuboradiary.ui.BaseFragment;
+import com.websarva.wings.android.zuboradiary.ui.BaseThemeColorSwitcher;
 import com.websarva.wings.android.zuboradiary.ui.calendar.CalendarFragment;
 import com.websarva.wings.android.zuboradiary.ui.list.diarylist.DiaryListFragment;
 import com.websarva.wings.android.zuboradiary.ui.list.wordsearch.WordSearchFragment;
@@ -79,6 +82,7 @@ public class MainActivity extends AppCompatActivity {
 
         setUpViewModel();
         setUpLocationInformation();
+        setUpBackgroundColor();
 
         //アクションバー設定
         //setSupportActionBar(this.binding.mtbMainToolbar);
@@ -335,6 +339,26 @@ public class MainActivity extends AppCompatActivity {
             }
         }, Looper.getMainLooper());
         return true;
+    }
+
+    private void setUpBackgroundColor() {
+        settingsViewModel.getThemeColorSettingValueLiveData()
+                .observe(this, new Observer<ThemeColor>() {
+                    @Override
+                    public void onChanged(ThemeColor themeColor) {
+                        if (themeColor == null) {
+                            return;
+                        }
+                        BaseThemeColorSwitcher switcher =
+                                new BaseThemeColorSwitcher(getApplicationContext(), themeColor);
+
+                        switcher.switchStatusBarColor(getWindow());
+
+                        switcher.switchToolbarColor(binding.mtbMainToolbar);
+
+                        switcher.switchBackgroundColor(binding.layoutBackground);
+                    }
+                });
     }
 
     public boolean getTabWasSelected() {

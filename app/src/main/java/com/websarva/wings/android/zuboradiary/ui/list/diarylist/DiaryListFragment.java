@@ -2,24 +2,23 @@ package com.websarva.wings.android.zuboradiary.ui.list.diarylist;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.widget.Toolbar;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.SavedStateHandle;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.navigation.NavDestination;
 import androidx.navigation.NavDirections;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.android.material.transition.platform.MaterialFadeThrough;
-import com.google.android.material.transition.platform.MaterialSharedAxis;
-import com.websarva.wings.android.zuboradiary.MainActivity;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.websarva.wings.android.zuboradiary.R;
 
 import java.time.LocalDate;
@@ -29,10 +28,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.websarva.wings.android.zuboradiary.data.database.Diary;
+import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor;
 import com.websarva.wings.android.zuboradiary.databinding.FragmentDiaryListBinding;
 import com.websarva.wings.android.zuboradiary.ui.BaseFragment;
+import com.websarva.wings.android.zuboradiary.ui.ColorSwitchingViewList;
 import com.websarva.wings.android.zuboradiary.ui.list.DiaryYearMonthListItemBase;
 import com.websarva.wings.android.zuboradiary.ui.list.DiaryYearMonthListAdapter;
+import com.websarva.wings.android.zuboradiary.ui.list.ListThemeColorSwitcher;
+import com.websarva.wings.android.zuboradiary.ui.settings.SettingsViewModel;
 
 import dagger.hilt.android.AndroidEntryPoint;
 
@@ -44,6 +47,7 @@ public class DiaryListFragment extends BaseFragment {
 
     // ViewModel
     private DiaryListViewModel diaryListViewModel;
+    private SettingsViewModel settingsViewModel;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -54,6 +58,7 @@ public class DiaryListFragment extends BaseFragment {
     protected void initializeViewModel() {
         ViewModelProvider provider = new ViewModelProvider(requireActivity());
         diaryListViewModel = provider.get(DiaryListViewModel.class);
+        settingsViewModel = provider.get(SettingsViewModel.class);
     }
 
     @Override
@@ -77,7 +82,37 @@ public class DiaryListFragment extends BaseFragment {
 
         setUpToolBar();
         setUpFloatActionButton();
-        setUpDiaryList();
+    }
+
+    @Override
+    protected void setUpThemeColor() {
+        settingsViewModel.getThemeColorSettingValueLiveData()
+                .observe(getViewLifecycleOwner(), new Observer<ThemeColor>() {
+                    @Override
+                    public void onChanged(ThemeColor themeColor) {
+                        if (themeColor == null) {
+                            return;
+                        }
+
+                        // MEMO:RecyclerViewにThemeColorを適応させるため、
+                        //      ViewModelのThemeColorValueに値が格納されてから処理すること。
+                        //      RecyclerView設定後、色を変更するにはそれなりの工数がかかると判断。
+                        setUpDiaryList(themeColor);
+
+                        ListThemeColorSwitcher switcher =
+                                new ListThemeColorSwitcher(requireContext(), themeColor);
+
+                        switcher.switchToolbarColor(binding.materialToolbarTopAppBar);
+
+                        ColorSwitchingViewList<FloatingActionButton> floatingActionButtonList =
+                                new ColorSwitchingViewList<>(binding.fabEditDiary);
+                        switcher.switchFloatingActionButtonColor(floatingActionButtonList);
+
+                        ColorSwitchingViewList<ProgressBar> progressBarList =
+                                new ColorSwitchingViewList<>(binding.progressBarDiaryListFullScreen);
+                        switcher.switchCircularProgressBarColor(progressBarList);
+                    }
+                });
     }
 
     @Override
@@ -176,11 +211,16 @@ public class DiaryListFragment extends BaseFragment {
     }
 
     // 日記リスト(年月)設定
-    private void setUpDiaryList() {
+    private void setUpDiaryList(ThemeColor themeColor) {
+        if (themeColor == null) {
+            throw new NullPointerException();
+        }
+
         DiaryListAdapter diaryListAdapter =
                 new DiaryListAdapter(
                         requireContext(),
                         binding.recyclerDiaryYearMonthList,
+                        themeColor,
                         true
                 );
         diaryListAdapter.build();
@@ -240,8 +280,8 @@ public class DiaryListFragment extends BaseFragment {
 
     private class DiaryListAdapter extends DiaryYearMonthListAdapter {
 
-        public DiaryListAdapter(Context context, RecyclerView recyclerView, boolean canSwipeItem) {
-            super(context, recyclerView, canSwipeItem);
+        public DiaryListAdapter(Context context, RecyclerView recyclerView, ThemeColor themeColor, boolean canSwipeItem) {
+            super(context, recyclerView, themeColor, canSwipeItem);
         }
 
         @Override

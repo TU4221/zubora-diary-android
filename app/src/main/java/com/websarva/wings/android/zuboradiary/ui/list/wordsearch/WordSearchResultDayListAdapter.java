@@ -1,11 +1,13 @@
 package com.websarva.wings.android.zuboradiary.ui.list.wordsearch;
 
 import android.content.Context;
+import android.content.res.Resources;
 import android.text.SpannableString;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.DiffUtil;
@@ -14,7 +16,10 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.websarva.wings.android.zuboradiary.R;
 import com.websarva.wings.android.zuboradiary.data.DayOfWeekStringConverter;
+import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor;
 import com.websarva.wings.android.zuboradiary.databinding.RowWordSearchResultListBinding;
+import com.websarva.wings.android.zuboradiary.ui.ColorSwitchingViewList;
+import com.websarva.wings.android.zuboradiary.ui.list.ListThemeColorSwitcher;
 
 import java.time.LocalDate;
 
@@ -23,12 +28,25 @@ public class WordSearchResultDayListAdapter
 
     private final Context context;
     private final RecyclerView recyclerView;
+    private final ThemeColor themeColor;
     private OnClickItemListener onClickItemListener;
 
-    public WordSearchResultDayListAdapter(Context context, RecyclerView recyclerView){
+    public WordSearchResultDayListAdapter(Context context, RecyclerView recyclerView, ThemeColor themeColor){
         super(new WordSearchResultDayListDiffUtilItemCallback());
+
+        if (context == null) {
+            throw new NullPointerException();
+        }
+        if (recyclerView == null) {
+            throw new NullPointerException();
+        }
+        if (themeColor == null) {
+            throw new NullPointerException();
+        }
+
         this.context = context;
         this.recyclerView = recyclerView;
+        this.themeColor = themeColor;
     }
 
     public void build() {
@@ -84,7 +102,7 @@ public class WordSearchResultDayListAdapter
         this.onClickItemListener = onClickItemListener;
     }
 
-    public static class WordSearchResultDayViewHolder extends RecyclerView.ViewHolder {
+    public class WordSearchResultDayViewHolder extends RecyclerView.ViewHolder {
 
         public RowWordSearchResultListBinding binding;
         public LocalDate date;
@@ -92,6 +110,21 @@ public class WordSearchResultDayListAdapter
         public WordSearchResultDayViewHolder(RowWordSearchResultListBinding binding) {
             super(binding.getRoot());
             this.binding = binding;
+
+            ListThemeColorSwitcher switcher =
+                    new ListThemeColorSwitcher(context, themeColor);
+            ColorSwitchingViewList<TextView> textViewList =
+                    new ColorSwitchingViewList<>(
+                            binding.includeDay.textDayOfMonth,
+                            binding.includeDay.textDayOfWeek,
+                            binding.textWordSearchResultTitle,
+                            binding.textWordSearchResultItemNumber,
+                            binding.textWordSearchResultItemTitle,
+                            binding.textWordSearchResultItemComment
+                    );
+            switcher.switchTextColorOnListItemBackground(textViewList);
+
+            switcher.switchListItemBackgroundColor(binding.linerLayoutBackground);
         }
     }
 

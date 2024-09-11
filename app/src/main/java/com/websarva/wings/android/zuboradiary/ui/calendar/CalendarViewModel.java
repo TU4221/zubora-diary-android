@@ -26,7 +26,7 @@ public class CalendarViewModel extends BaseViewModel {
 
     private final DiaryRepository diaryRepository;
     private final MutableLiveData<LocalDate> selectedDate = new MutableLiveData<>();
-    private final MutableLiveData<LocalDate> lastSelectedDate = new MutableLiveData<>();
+    private final MutableLiveData<LocalDate> previousSelectedDate = new MutableLiveData<>();
 
     // TODO:SettingsRepository不要確認後削除
     @Inject
@@ -67,7 +67,7 @@ public class CalendarViewModel extends BaseViewModel {
     }
 
     public void updateSelectedDate(LocalDate date) {
-        lastSelectedDate.setValue(selectedDate.getValue());
+        previousSelectedDate.setValue(selectedDate.getValue());
         selectedDate.setValue(date);
     }
 
@@ -75,8 +75,8 @@ public class CalendarViewModel extends BaseViewModel {
         return selectedDate;
     }
 
-    public LiveData<LocalDate> getLastSelectedDateLiveData() {
-        return lastSelectedDate;
+    public LiveData<LocalDate> getPreviousSelectedDateLiveData() {
+        return previousSelectedDate;
     }
 
 

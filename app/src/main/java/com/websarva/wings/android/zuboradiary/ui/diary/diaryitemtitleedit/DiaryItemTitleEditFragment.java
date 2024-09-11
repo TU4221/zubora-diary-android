@@ -12,7 +12,6 @@ import androidx.lifecycle.Observer;
 import androidx.lifecycle.SavedStateHandle;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavBackStackEntry;
-import androidx.navigation.NavDestination;
 import androidx.navigation.NavDirections;
 
 import android.text.Editable;
@@ -24,14 +23,22 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
+import com.google.android.material.materialswitch.MaterialSwitch;
 import com.websarva.wings.android.zuboradiary.R;
 import com.websarva.wings.android.zuboradiary.data.database.DiaryItemTitleSelectionHistoryItem;
+import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor;
 import com.websarva.wings.android.zuboradiary.databinding.FragmentDiaryItemTitleEditBinding;
 import com.websarva.wings.android.zuboradiary.ui.BaseFragment;
+import com.websarva.wings.android.zuboradiary.ui.ColorSwitchingViewList;
 import com.websarva.wings.android.zuboradiary.ui.KeyboardInitializer;
+import com.websarva.wings.android.zuboradiary.ui.BaseThemeColorSwitcher;
+import com.websarva.wings.android.zuboradiary.ui.diary.DiaryThemeColorSwitcher;
+import com.websarva.wings.android.zuboradiary.ui.settings.SettingsViewModel;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -50,6 +57,7 @@ public class DiaryItemTitleEditFragment extends BaseFragment {
 
     // ViewModel
     private DiaryItemTitleEditViewModel diaryItemTitleEditViewModel;
+    private SettingsViewModel settingsViewModel;
 
 
     @Override
@@ -59,8 +67,12 @@ public class DiaryItemTitleEditFragment extends BaseFragment {
 
     @Override
     protected void initializeViewModel() {
+        // TODO:スコープ自Fragmentで良いのでは？
         ViewModelProvider provider = new ViewModelProvider(requireActivity());
         diaryItemTitleEditViewModel = provider.get(DiaryItemTitleEditViewModel.class);
+
+        ViewModelProvider activityScopeProvider = new ViewModelProvider(requireActivity());
+        settingsViewModel = activityScopeProvider.get(SettingsViewModel.class);
     }
 
     @Override
@@ -82,6 +94,39 @@ public class DiaryItemTitleEditFragment extends BaseFragment {
         setUpToolBar();
         setUpItemTitleInputField();
         setUpItemTitleSelectionHistory();
+    }
+
+    @Override
+    protected void setUpThemeColor() {
+        settingsViewModel.getThemeColorSettingValueLiveData()
+                .observe(getViewLifecycleOwner(), new Observer<ThemeColor>() {
+                    @Override
+                    public void onChanged(ThemeColor themeColor) {
+                        if (themeColor == null) {
+                            return;
+                        }
+
+                        DiaryThemeColorSwitcher switcher =
+                                new DiaryThemeColorSwitcher(requireContext(), themeColor);
+
+                        switcher.switchToolbarColor(binding.materialToolbarTopAppBar);
+
+                        ColorSwitchingViewList<TextView> textViewList =
+                                new ColorSwitchingViewList<>(
+                                        binding.textItemNewTitle,
+                                        binding.editTextNewItemTitle,
+                                        binding.textNewItemTitleLength,
+                                        binding.textItemTitleHistory
+                                );
+                        switcher.switchTextColorOnBackground(textViewList);
+
+                        ColorSwitchingViewList<Button> buttonList =
+                                new ColorSwitchingViewList<>(
+                                        binding.buttonSelectNewItemTitle
+                                );
+                        switcher.switchButton(buttonList);
+                    }
+                });
     }
 
     @Override

@@ -93,10 +93,13 @@ public abstract class BaseFragment extends CustomFragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        setUpThemeColor();
         setUpPreviousFragmentResultReceiver();
         setUpDialogResultReceiver();
         setUpErrorMessageDialog();
     }
+
+    protected abstract void setUpThemeColor();
 
     @Nullable
     private SavedStateHandle getNavBackStackEntrySavedStateHandle() {

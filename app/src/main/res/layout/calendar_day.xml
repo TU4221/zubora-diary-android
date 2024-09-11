@@ -28,6 +28,6 @@
             android:layout_height="3dp"
             android:layout_marginBottom="10dp"
             android:layout_gravity="bottom|center_horizontal"
-            android:background="@color/gray" />
+            tools:background="@color/gray" />
     </FrameLayout>
 </layout>

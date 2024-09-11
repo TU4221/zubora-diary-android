@@ -8,7 +8,6 @@ import androidx.annotation.Nullable;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.SavedStateHandle;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.navigation.NavDestination;
 import androidx.navigation.NavDirections;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -19,17 +18,19 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.google.android.material.transition.platform.MaterialFadeThrough;
-import com.google.android.material.transition.platform.MaterialSharedAxis;
+import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor;
 import com.websarva.wings.android.zuboradiary.ui.BaseFragment;
+import com.websarva.wings.android.zuboradiary.ui.ColorSwitchingViewList;
 import com.websarva.wings.android.zuboradiary.ui.list.DiaryYearMonthListItemBase;
 import com.websarva.wings.android.zuboradiary.ui.KeyboardInitializer;
-import com.websarva.wings.android.zuboradiary.MainActivity;
 import com.websarva.wings.android.zuboradiary.R;
 import com.websarva.wings.android.zuboradiary.databinding.FragmentWordSearchBinding;
 import com.websarva.wings.android.zuboradiary.ui.list.DiaryYearMonthListAdapter;
+import com.websarva.wings.android.zuboradiary.ui.list.ListThemeColorSwitcher;
+import com.websarva.wings.android.zuboradiary.ui.settings.SettingsViewModel;
 
 import java.time.LocalDate;
 import java.time.YearMonth;
@@ -44,6 +45,7 @@ public class WordSearchFragment extends BaseFragment {
 
     // ViewModel
     private WordSearchViewModel wordSearchViewModel;
+    private SettingsViewModel settingsViewModel;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -55,6 +57,7 @@ public class WordSearchFragment extends BaseFragment {
         ViewModelProvider provider = new ViewModelProvider(requireActivity());
         wordSearchViewModel = provider.get(WordSearchViewModel.class);
         wordSearchViewModel.initialize();
+        settingsViewModel = provider.get(SettingsViewModel.class);
     }
 
     @Override
@@ -77,7 +80,34 @@ public class WordSearchFragment extends BaseFragment {
 
         setUpToolBar();
         setUpWordSearchView();
-        setUpWordSearchResultList();
+    }
+
+    @Override
+    protected void setUpThemeColor() {
+        settingsViewModel.getThemeColorSettingValueLiveData()
+                .observe(getViewLifecycleOwner(), new Observer<ThemeColor>() {
+                    @Override
+                    public void onChanged(ThemeColor themeColor) {
+                        if (themeColor == null) {
+                            return;
+                        }
+
+                        // MEMO:RecyclerViewにThemeColorを適応させるため、
+                        //      ViewModelのThemeColorValueに値が格納されてから処理すること。
+                        //      RecyclerView設定後、色を変更するにはそれなりの工数がかかると判断。
+                        setUpWordSearchResultList(themeColor);
+
+
+                        ListThemeColorSwitcher switcher =
+                                new ListThemeColorSwitcher(requireContext(), themeColor);
+
+                        switcher.switchToolbarColor(binding.materialToolbarTopAppBar);
+
+                        ColorSwitchingViewList<ProgressBar> progressBarList =
+                                new ColorSwitchingViewList<>(binding.progressBarWordSearchFullScreen);
+                        switcher.switchCircularProgressBarColor(progressBarList);
+                    }
+                });
     }
 
     @Override
@@ -202,11 +232,16 @@ public class WordSearchFragment extends BaseFragment {
         });
     }
 
-    private void setUpWordSearchResultList() {
+    private void setUpWordSearchResultList(ThemeColor themeColor) {
+        if (themeColor == null) {
+            throw new NullPointerException();
+        }
+
         WordSearchResultListAdapter wordSearchResultListAdapter =
                 new WordSearchResultListAdapter(
                         requireContext(),
                         binding.recyclerWordSearchResultList,
+                        themeColor,
                         false
                 );
         wordSearchResultListAdapter.build();
@@ -300,8 +335,8 @@ public class WordSearchFragment extends BaseFragment {
 
     private class WordSearchResultListAdapter extends DiaryYearMonthListAdapter {
 
-        public WordSearchResultListAdapter(Context context, RecyclerView recyclerView, boolean canSwipeItem) {
-            super(context, recyclerView, canSwipeItem);
+        public WordSearchResultListAdapter(Context context, RecyclerView recyclerView, ThemeColor themeColor, boolean canSwipeItem) {
+            super(context, recyclerView, themeColor, canSwipeItem);
         }
 
         @Override

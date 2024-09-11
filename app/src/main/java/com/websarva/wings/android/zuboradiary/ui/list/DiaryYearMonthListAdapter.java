@@ -1,11 +1,14 @@
 package com.websarva.wings.android.zuboradiary.ui.list;
 
 import android.content.Context;
+import android.content.res.Resources;
 import android.graphics.Rect;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -15,7 +18,11 @@ import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.websarva.wings.android.zuboradiary.R;
+import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor;
 import com.websarva.wings.android.zuboradiary.databinding.RowDiaryYearMonthListBinding;
+import com.websarva.wings.android.zuboradiary.databinding.RowNoDiaryMessageBinding;
+import com.websarva.wings.android.zuboradiary.databinding.RowProgressBarBinding;
+import com.websarva.wings.android.zuboradiary.ui.ColorSwitchingViewList;
 import com.websarva.wings.android.zuboradiary.ui.list.diarylist.DiaryDayListAdapter;
 import com.websarva.wings.android.zuboradiary.ui.list.diarylist.DiaryDayListItem;
 import com.websarva.wings.android.zuboradiary.ui.list.diarylist.DiaryYearMonthListItem;
@@ -35,6 +42,7 @@ public abstract class DiaryYearMonthListAdapter extends ListAdapter<DiaryYearMon
 
     private final Context context;
     private final RecyclerView recyclerView;
+    private final ThemeColor themeColor;
     private OnClickChildItemListener onClickChildItemListener;
     private OnClickChildItemBackgroundButtonListener onClickChildItemBackgroundButtonListener;
     private final boolean canSwipeItem;
@@ -49,10 +57,23 @@ public abstract class DiaryYearMonthListAdapter extends ListAdapter<DiaryYearMon
     public DiaryYearMonthListAdapter(
             Context context,
             RecyclerView recyclerView,
+            ThemeColor themeColor,
             boolean canSwipeItem) {
         super(new DiaryYearMonthListDiffUtilItemCallback());
+
+        if (context == null) {
+            throw new NullPointerException();
+        }
+        if (recyclerView == null) {
+            throw new NullPointerException();
+        }
+        if (themeColor == null) {
+            throw new NullPointerException();
+        }
+
         this.context = context;
         this.recyclerView = recyclerView;
+        this.themeColor = themeColor;
         this.canSwipeItem = canSwipeItem;
     }
 
@@ -101,6 +122,7 @@ public abstract class DiaryYearMonthListAdapter extends ListAdapter<DiaryYearMon
             // MEMO:子RecyclerViewのアニメーションを共通にする為、親Adapterクラス内で実装。
             holder.binding.recyclerDayList.setItemAnimator(null);
 
+            // TODO:layout.xmlで反映したい
             // ホルダー内の日記リスト(日)のアイテム装飾設定
             // MEMO:onBindViewHolder()で設定すると、設定内容が重複してアイテムが小さくなる為、onCreateViewHolderで設定。
             // MEMO:子RecyclerViewの装飾を共通にする為、親Adapterクラス内で実装。
@@ -144,13 +166,15 @@ public abstract class DiaryYearMonthListAdapter extends ListAdapter<DiaryYearMon
 
             return holder;
         } else if (viewType == VIEW_TYPE_PROGRESS_BAR) {
-            View view =
-                    inflater.inflate(R.layout.row_progress_bar, parent, false);
-            return new ProgressBarViewHolder(view);
+            RowProgressBarBinding binding =
+                    RowProgressBarBinding
+                            .inflate(LayoutInflater.from(parent.getContext()), parent, false);
+            return new ProgressBarViewHolder(binding);
         } else {
-            View view =
-                    inflater.inflate(R.layout.row_no_diary_message, parent, false);
-            return new NoDiaryMessageViewHolder(view);
+            RowNoDiaryMessageBinding binding =
+                    RowNoDiaryMessageBinding
+                            .inflate(LayoutInflater.from(parent.getContext()), parent, false);
+            return new NoDiaryMessageViewHolder(binding);
         }
     }
 
@@ -214,7 +238,7 @@ public abstract class DiaryYearMonthListAdapter extends ListAdapter<DiaryYearMon
 
     private @NonNull DiaryDayListAdapter createDiaryDayListAdapter(DiaryYearMonthListViewHolder _holder) {
         DiaryDayListAdapter diaryDayListAdapter =
-                new DiaryDayListAdapter(context, _holder.binding.recyclerDayList);
+                new DiaryDayListAdapter(context, _holder.binding.recyclerDayList, themeColor);
         diaryDayListAdapter.build();
         diaryDayListAdapter.setOnClickItemListener(new DiaryDayListAdapter.OnClickItemListener() {
             @Override
@@ -239,7 +263,7 @@ public abstract class DiaryYearMonthListAdapter extends ListAdapter<DiaryYearMon
 
     private @NonNull WordSearchResultDayListAdapter createWordSearchResultDayListAdapter(DiaryYearMonthListViewHolder _holder) {
         WordSearchResultDayListAdapter wordSearchResultDayListAdapter =
-                new WordSearchResultDayListAdapter(context, _holder.binding.recyclerDayList);
+                new WordSearchResultDayListAdapter(context, _holder.binding.recyclerDayList, themeColor);
         wordSearchResultDayListAdapter.build();
         wordSearchResultDayListAdapter.setOnClickItemListener(new WordSearchResultDayListAdapter.OnClickItemListener() {
             @Override
@@ -273,24 +297,39 @@ public abstract class DiaryYearMonthListAdapter extends ListAdapter<DiaryYearMon
         }
     }
 
-    public static class DiaryYearMonthListViewHolder extends RecyclerView.ViewHolder {
+    public class DiaryYearMonthListViewHolder extends RecyclerView.ViewHolder {
         public RowDiaryYearMonthListBinding binding;
 
         public DiaryYearMonthListViewHolder(RowDiaryYearMonthListBinding binding) {
             super(binding.getRoot());
             this.binding = binding;
+
+            ListThemeColorSwitcher switcher = new ListThemeColorSwitcher(context, themeColor);
+            ColorSwitchingViewList<TextView> textViewList =
+                    new ColorSwitchingViewList<>(binding.textSectionBar);
+            switcher.switchListSectionBarColor(textViewList);
         }
     }
 
-    public static class NoDiaryMessageViewHolder extends RecyclerView.ViewHolder {
-        public NoDiaryMessageViewHolder(@NonNull View itemView) {
-            super(itemView);
+    public class NoDiaryMessageViewHolder extends RecyclerView.ViewHolder {
+        public NoDiaryMessageViewHolder(RowNoDiaryMessageBinding binding) {
+            super(binding.getRoot());
+
+            ListThemeColorSwitcher switcher = new ListThemeColorSwitcher(context, themeColor);
+            ColorSwitchingViewList<TextView> textViewList =
+                    new ColorSwitchingViewList<>(binding.textNoDiaryMessage);
+            switcher.switchTextColorOnListItemBackground(textViewList);
         }
     }
 
-    public static class ProgressBarViewHolder extends RecyclerView.ViewHolder {
-        public ProgressBarViewHolder(@NonNull View itemView) {
-            super(itemView);
+    public class ProgressBarViewHolder extends RecyclerView.ViewHolder {
+        public ProgressBarViewHolder(RowProgressBarBinding binding) {
+            super(binding.getRoot());
+
+            ListThemeColorSwitcher switcher = new ListThemeColorSwitcher(context, themeColor);
+            ColorSwitchingViewList<ProgressBar> progressBarList =
+                    new ColorSwitchingViewList<>(binding.progressBarListItemLoading);
+            switcher.switchCircularProgressBarColor(progressBarList);
         }
     }
 

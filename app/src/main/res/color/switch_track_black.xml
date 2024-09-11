@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<selector xmlns:android="http://schemas.android.com/apk/res/android">
-    <!-- ONの状態 -->
-    <item android:color="@color/md_theme_primary_black" android:state_checked="true" />
-    <!-- OFFの状態 -->
-    <item android:color="?attr/colorSurfaceContainerHighest" android:state_checked="false" />
-</selector>

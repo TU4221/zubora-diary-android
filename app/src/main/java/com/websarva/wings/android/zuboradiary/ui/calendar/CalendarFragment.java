@@ -17,8 +17,6 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavDirections;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.transition.platform.MaterialFadeThrough;
-import com.google.android.material.transition.platform.MaterialSharedAxis;
 import com.google.common.util.concurrent.FutureCallback;
 import com.kizitonwose.calendar.core.CalendarDay;
 import com.kizitonwose.calendar.core.CalendarMonth;
@@ -26,13 +24,14 @@ import com.kizitonwose.calendar.core.DayPosition;
 import com.kizitonwose.calendar.view.MonthDayBinder;
 import com.kizitonwose.calendar.view.MonthHeaderFooterBinder;
 import com.kizitonwose.calendar.view.ViewContainer;
-import com.websarva.wings.android.zuboradiary.MainActivity;
 import com.websarva.wings.android.zuboradiary.R;
+import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor;
 import com.websarva.wings.android.zuboradiary.databinding.CalendarDayBinding;
 import com.websarva.wings.android.zuboradiary.databinding.CalendarHeaderBinding;
 import com.websarva.wings.android.zuboradiary.databinding.FragmentCalendarBinding;
 import com.websarva.wings.android.zuboradiary.data.DateTimeStringConverter;
 import com.websarva.wings.android.zuboradiary.ui.BaseFragment;
+import com.websarva.wings.android.zuboradiary.ui.ColorSwitchingViewList;
 import com.websarva.wings.android.zuboradiary.ui.diary.DiaryLiveData;
 import com.websarva.wings.android.zuboradiary.ui.diary.diaryshow.DiaryShowFragment;
 
@@ -99,10 +98,60 @@ public class CalendarFragment extends BaseFragment {
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        setUpCalendar();
         setUpDiaryShow();
         setUpFloatActionButton();
         setUpBottomLayout();
+    }
+
+    @Override
+    protected void setUpThemeColor() {
+        settingsViewModel.getThemeColorSettingValueLiveData()
+                .observe(getViewLifecycleOwner(), new Observer<ThemeColor>() {
+                    @Override
+                    public void onChanged(ThemeColor themeColor) {
+                        if (themeColor == null) {
+                            return;
+                        }
+
+                        // MEMO:RecyclerViewにThemeColorを適応させるため、
+                        //      ViewModelのThemeColorValueに値が格納されてから処理すること。
+                        //      RecyclerView設定後、色を変更するにはそれなりの工数がかかると判断。
+                        setUpCalendar(themeColor);
+
+                        CalendarThemeColorSwitcher switcher =
+                                new CalendarThemeColorSwitcher(requireContext(), themeColor);
+
+                        switcher.switchToolbarColor(binding.materialToolbarTopAppBar);
+
+                        ColorSwitchingViewList<FloatingActionButton> floatingActionButtonList =
+                                new ColorSwitchingViewList<>(binding.floatActionButtonDiaryEdit);
+                        switcher.switchFloatingActionButtonColor(floatingActionButtonList);
+
+                        ColorSwitchingViewList<TextView> textViewList =
+                                new ColorSwitchingViewList<>(
+                                        binding.includeDiaryShow.textWeather,
+                                        binding.includeDiaryShow.textWeather1Selected,
+                                        binding.includeDiaryShow.textWeatherSlush,
+                                        binding.includeDiaryShow.textWeather2Selected,
+                                        binding.includeDiaryShow.textCondition,
+                                        binding.includeDiaryShow.textConditionSelected,
+                                        binding.includeDiaryShow.textTitle,
+                                        binding.includeDiaryShow.includeItem1.textItemTitle,
+                                        binding.includeDiaryShow.includeItem1.textItemComment,
+                                        binding.includeDiaryShow.includeItem2.textItemTitle,
+                                        binding.includeDiaryShow.includeItem2.textItemComment,
+                                        binding.includeDiaryShow.includeItem3.textItemTitle,
+                                        binding.includeDiaryShow.includeItem3.textItemComment,
+                                        binding.includeDiaryShow.includeItem4.textItemTitle,
+                                        binding.includeDiaryShow.includeItem4.textItemComment,
+                                        binding.includeDiaryShow.includeItem5.textItemTitle,
+                                        binding.includeDiaryShow.includeItem5.textItemComment,
+                                        binding.includeDiaryShow.textLog,
+                                        binding.includeDiaryShow.textLogValue
+                                );
+                        switcher.switchTextColorOnBackground(textViewList);
+                    }
+                });
     }
 
     @Override
@@ -138,13 +187,13 @@ public class CalendarFragment extends BaseFragment {
                 .observe(getViewLifecycleOwner(), new AppErrorBufferListObserver(settingsViewModel));
     }
 
-    private void setUpCalendar() {
+    private void setUpCalendar(ThemeColor themeColor) {
         CalendarView calendar = binding.calendar;
         List<DayOfWeek> daysOfWeek = createDayOfWeekList(); // 曜日リスト取得
         YearMonth currentMonth = YearMonth.now();
         YearMonth startMonth = currentMonth.minusMonths(60); //現在から過去5年分
         YearMonth endMonth = currentMonth.plusMonths(60); //現在から未来5年分
-        configureCalendarBinders(daysOfWeek);
+        configureCalendarBinders(daysOfWeek, themeColor);
         calendar.setup(startMonth,endMonth,daysOfWeek.get(0));
         if (calendarViewModel.getSelectedDateLiveData().getValue() == null) {
             calendarViewModel.updateSelectedDate(LocalDate.now());
@@ -164,7 +213,7 @@ public class CalendarFragment extends BaseFragment {
                     }
                 });
 
-        calendarViewModel.getLastSelectedDateLiveData()
+        calendarViewModel.getPreviousSelectedDateLiveData()
                 .observe(getViewLifecycleOwner(), new Observer<LocalDate>() {
                     @Override
                     public void onChanged(LocalDate localDate) {
@@ -199,7 +248,11 @@ public class CalendarFragment extends BaseFragment {
     }
 
     // カレンダーBind設定
-    private void configureCalendarBinders(List<DayOfWeek> daysOfWeek) {
+    private void configureCalendarBinders(List<DayOfWeek> daysOfWeek, ThemeColor themeColor) {
+        if (themeColor == null) {
+            throw new NullPointerException();
+        }
+
         // カレンダーの日にち設定
         binding.calendar.setDayBinder(new MonthDayBinder<DayViewContainer>() {
             @NonNull
@@ -222,29 +275,28 @@ public class CalendarFragment extends BaseFragment {
                 if (calendarDay.getPosition() == DayPosition.MonthDate) {
                     textCalendarDay.setVisibility(View.VISIBLE);
 
-                    // 今日の日にちマス
-                    if (calendarDay.getDate().isEqual(LocalDate.now())) {
-                        textCalendarDay
-                                .setTextColor(
-                                        getResources().getColor(R.color.md_theme_light_onSecondaryContainer)
-                                );
-                        textCalendarDay.setBackgroundResource(R.drawable.calendar_today_bg);
+                    CalendarThemeColorSwitcher themeColorSwitcher =
+                            new CalendarThemeColorSwitcher(requireContext(), themeColor);
 
-                        // 選択中の日にちマス
-                    } else if (calendarDay.getDate().isEqual(calendarViewModel.getSelectedDateLiveData().getValue())) {
-                        textCalendarDay
-                                .setTextColor(
-                                        getResources().getColor(R.color.md_theme_light_onPrimaryContainer)
-                                );
-                        textCalendarDay.setBackgroundResource(R.drawable.calendar_selected_day_bg);
+                    // 選択中の日にちマス
+                    if (calendarDay.getDate().isEqual(calendarViewModel.getSelectedDateLiveData().getValue())) {
+                        themeColorSwitcher.switchCalendarSelectedDayColor(textCalendarDay, viewCalendarDayDot);
+
+                        // 今日の日にちマス
+                    } else if (calendarDay.getDate().isEqual(LocalDate.now())) {
+                        themeColorSwitcher.switchCalendarTodayColor(textCalendarDay, viewCalendarDayDot);
 
                         // それ以外の日にちマス
                     } else {
+                        themeColorSwitcher.switchCalendarNormalDayColor(textCalendarDay, viewCalendarDayDot);
+
                         // TODO:祝日判定は手間がかかりそうなので保留
                         DayOfWeek dayOfWeek = calendarDay.getDate().getDayOfWeek();
-                        int color = selectDayColor(dayOfWeek);
-                        textCalendarDay.setTextColor(color);
-                        textCalendarDay.setBackground(null);
+                        if (dayOfWeek == DayOfWeek.SUNDAY || dayOfWeek == DayOfWeek.SATURDAY) {
+                            int color = selectDayColor(dayOfWeek);
+                            textCalendarDay.setTextColor(color);
+                            viewCalendarDayDot.setBackgroundColor(color);
+                        }
                     }
 
                     // ドット有無設定
@@ -305,8 +357,15 @@ public class CalendarFragment extends BaseFragment {
 
                         childTextView.setText(dayOfWeek.name().substring(0,3));
 
-                        int color = selectDayColor(dayOfWeek);
-                        childTextView.setTextColor(color);
+                        CalendarThemeColorSwitcher themeColorSwitcher =
+                                new CalendarThemeColorSwitcher(requireContext(), themeColor);
+                        themeColorSwitcher.switchCalendarDayOfWeekColor(childTextView);
+
+                        if (dayOfWeek == DayOfWeek.SUNDAY || dayOfWeek == DayOfWeek.SATURDAY) {
+                            int color = selectDayColor(dayOfWeek);
+                            childTextView.setTextColor(color);
+                        }
+
 
                     }
                 }
