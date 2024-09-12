@@ -23,7 +23,7 @@
                 android:id="@+id/material_toolbar_top_app_bar"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="?attr/colorSurfaceContainer"
+                tools:background="?attr/colorSurfaceContainer"
                 android:gravity="center"
                 android:minHeight="?attr/actionBarSize"
                 android:theme="?attr/actionBarTheme"
@@ -42,8 +42,8 @@
                 android:paddingVertical="@dimen/fragment_settings_item_padding_vertical"
                 android:text="@string/fragment_settings_section_title_design"
                 android:textSize="@dimen/fragment_settings_section_text_size"
-                android:textColor="?attr/colorOnSurface"
-                android:background="?attr/colorSurfaceContainer" />
+                tools:textColor="?attr/colorOnSurface"
+                tools:background="?attr/colorSurfaceContainer" />
 
             <com.google.android.material.divider.MaterialDivider
                 android:layout_width="match_parent"
@@ -91,8 +91,8 @@
                 android:paddingVertical="@dimen/fragment_settings_item_padding_vertical"
                 android:text="@string/fragment_settings_section_title_setting"
                 android:textSize="@dimen/fragment_settings_section_text_size"
-                android:textColor="?attr/colorOnSurface"
-                android:background="?attr/colorSurfaceContainer" />
+                tools:textColor="?attr/colorOnSurface"
+                tools:background="?attr/colorSurfaceContainer" />
 
             <com.google.android.material.divider.MaterialDivider
                 android:layout_width="match_parent"
@@ -253,8 +253,8 @@
                 android:paddingHorizontal="@dimen/fragment_settings_item_padding_horizontal"
                 android:paddingVertical="@dimen/fragment_settings_item_padding_vertical"
                 android:textSize="@dimen/fragment_settings_section_text_size"
-                android:textColor="?attr/colorOnSurface"
-                android:background="?attr/colorSurfaceContainer" />
+                tools:textColor="?attr/colorOnSurface"
+                tools:background="?attr/colorSurfaceContainer" />
 
         </LinearLayout>
 

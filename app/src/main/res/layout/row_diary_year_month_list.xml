@@ -15,7 +15,6 @@
             android:id="@+id/recycler_day_list"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:background="?attr/colorSurface"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
@@ -28,7 +27,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:hint="0000年00月"
-            android:background="?attr/colorPrimaryContainer"
+            tools:background="?attr/colorPrimaryContainer"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />

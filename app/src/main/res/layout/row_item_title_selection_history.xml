@@ -25,7 +25,7 @@
             android:paddingHorizontal="8dp"
             android:paddingVertical="4dp"
             tools:text="item title"
-            android:background="?attr/colorSurface" />
+            tools:background="?attr/colorSurface" />
 
     </FrameLayout>
 </layout>

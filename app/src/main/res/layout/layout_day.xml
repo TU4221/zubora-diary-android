@@ -17,7 +17,7 @@
             android:layout_height="wrap_content"
             android:gravity="center"
             android:text="金"
-            android:textColor="?attr/colorOnSecondaryContainer"
+            tools:textColor="?attr/colorOnSecondaryContainer"
             android:textSize="14sp"
             android:paddingTop="8dp"
             app:layout_constraintEnd_toEndOf="parent"
