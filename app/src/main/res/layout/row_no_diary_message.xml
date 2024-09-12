@@ -12,7 +12,8 @@
         <!-- ProgressBar高さサイズ確保用(表示不要) -->
         <ProgressBar
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:visibility="invisible"/>
 
         <TextView
             android:id="@+id/text_no_diary_message"

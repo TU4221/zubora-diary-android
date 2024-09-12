@@ -1,6 +1,7 @@
 package com.websarva.wings.android.zuboradiary.ui.list.wordsearch;
 
 import android.content.Context;
+import android.content.res.Resources;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -26,7 +27,6 @@ import com.websarva.wings.android.zuboradiary.ui.BaseFragment;
 import com.websarva.wings.android.zuboradiary.ui.ColorSwitchingViewList;
 import com.websarva.wings.android.zuboradiary.ui.list.DiaryYearMonthListItemBase;
 import com.websarva.wings.android.zuboradiary.ui.KeyboardInitializer;
-import com.websarva.wings.android.zuboradiary.R;
 import com.websarva.wings.android.zuboradiary.databinding.FragmentWordSearchBinding;
 import com.websarva.wings.android.zuboradiary.ui.list.DiaryYearMonthListAdapter;
 import com.websarva.wings.android.zuboradiary.ui.list.ListThemeColorSwitcher;
@@ -42,6 +42,9 @@ public class WordSearchFragment extends BaseFragment {
     // View関係
     private FragmentWordSearchBinding binding;
     private String previousText = ""; // 二重検索防止用
+
+    int resultWordColor = -1; // 検索結果ワード色
+    int resultWordBackgroundColor = -1; // 検索結果ワードマーカー色
 
     // ViewModel
     private WordSearchViewModel wordSearchViewModel;
@@ -92,6 +95,9 @@ public class WordSearchFragment extends BaseFragment {
                             return;
                         }
 
+                        resultWordColor = themeColor.getOnTertiaryContainerColor(getResources());
+                        resultWordBackgroundColor = themeColor.getTertiaryContainerColor(getResources());
+
                         // MEMO:RecyclerViewにThemeColorを適応させるため、
                         //      ViewModelのThemeColorValueに値が格納されてから処理すること。
                         //      RecyclerView設定後、色を変更するにはそれなりの工数がかかると判断。
@@ -102,6 +108,10 @@ public class WordSearchFragment extends BaseFragment {
                                 new ListThemeColorSwitcher(requireContext(), themeColor);
 
                         switcher.switchToolbarColor(binding.materialToolbarTopAppBar);
+
+                        switcher.switchKeyWordSearchBackgroundColor(
+                                binding.linerLayoutKeyWordSearchBackground);
+                        switcher.switchKeyWordSearchTextColor(binding.editTextKeyWordSearch);
 
                         ColorSwitchingViewList<ProgressBar> progressBarList =
                                 new ColorSwitchingViewList<>(binding.progressBarWordSearchFullScreen);
@@ -169,10 +179,16 @@ public class WordSearchFragment extends BaseFragment {
                         if (s.equals(previousText)) {
                             return;
                         }
+                        ThemeColor themeColor = settingsViewModel.getThemeColorSettingValueLiveData().getValue();
+                        if (themeColor == null) {
+                            throw new NullPointerException();
+                        }
+
                         wordSearchViewModel
                                 .loadWordSearchResultList(
                                         WordSearchViewModel.LoadType.NEW,
-                                        getResources().getColor(R.color.gray) // TODO:テーマカラーで切替
+                                        resultWordColor,
+                                        resultWordBackgroundColor
                                 );
                         previousText = s;
                     }
@@ -320,7 +336,8 @@ public class WordSearchFragment extends BaseFragment {
             wordSearchViewModel
                     .loadWordSearchResultList(
                             WordSearchViewModel.LoadType.UPDATE,
-                            getResources().getColor(R.color.gray) // TODO:テーマカラーで切替
+                            resultWordColor,
+                            resultWordBackgroundColor
                     );
         }
 
@@ -341,10 +358,16 @@ public class WordSearchFragment extends BaseFragment {
 
         @Override
         public void loadListOnScrollEnd() {
+            ThemeColor themeColor = settingsViewModel.getThemeColorSettingValueLiveData().getValue();
+            if (themeColor == null) {
+                throw new NullPointerException();
+            }
+
             wordSearchViewModel
                     .loadWordSearchResultList(
                             WordSearchViewModel.LoadType.ADD,
-                            getResources().getColor(R.color.gray) // TODO:テーマカラーで切替
+                            resultWordColor,
+                            resultWordBackgroundColor
                     );
         }
 

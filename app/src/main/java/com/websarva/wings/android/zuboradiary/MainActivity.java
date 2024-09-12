@@ -41,7 +41,6 @@ import com.google.android.material.navigation.NavigationBarView;
 import com.google.android.material.transition.platform.MaterialFadeThrough;
 import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor;
 import com.websarva.wings.android.zuboradiary.databinding.ActivityMainBinding;
-import com.websarva.wings.android.zuboradiary.ui.BaseFragment;
 import com.websarva.wings.android.zuboradiary.ui.BaseThemeColorSwitcher;
 import com.websarva.wings.android.zuboradiary.ui.calendar.CalendarFragment;
 import com.websarva.wings.android.zuboradiary.ui.list.diarylist.DiaryListFragment;
@@ -82,7 +81,7 @@ public class MainActivity extends AppCompatActivity {
 
         setUpViewModel();
         setUpLocationInformation();
-        setUpBackgroundColor();
+        setUpThemeColor();
 
         //アクションバー設定
         //setSupportActionBar(this.binding.mtbMainToolbar);
@@ -341,7 +340,7 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
-    private void setUpBackgroundColor() {
+    private void setUpThemeColor() {
         settingsViewModel.getThemeColorSettingValueLiveData()
                 .observe(this, new Observer<ThemeColor>() {
                     @Override
@@ -354,9 +353,11 @@ public class MainActivity extends AppCompatActivity {
 
                         switcher.switchStatusBarColor(getWindow());
 
+                        switcher.switchBackgroundColor(binding.layoutBackground);
+
                         switcher.switchToolbarColor(binding.mtbMainToolbar);
 
-                        switcher.switchBackgroundColor(binding.layoutBackground);
+                        switcher.switchBottomNavigationColor(binding.navView);
                     }
                 });
     }

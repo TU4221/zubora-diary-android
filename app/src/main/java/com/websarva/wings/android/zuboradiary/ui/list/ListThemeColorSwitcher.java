@@ -1,12 +1,12 @@
 package com.websarva.wings.android.zuboradiary.ui.list;
 
 import android.content.Context;
-import android.content.res.Resources;
+import android.content.res.ColorStateList;
+import android.graphics.drawable.Drawable;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-
-import androidx.recyclerview.widget.RecyclerView;
 
 import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor;
 import com.websarva.wings.android.zuboradiary.ui.BaseThemeColorSwitcher;
@@ -46,6 +46,17 @@ public class ListThemeColorSwitcher extends BaseThemeColorSwitcher {
         switchTextViewColorOnlyText(onSecondaryContainerColor, textViewList);
     }
 
+    public void switchImageViewColorOnListItemBackground(ImageView imageView) {
+        if (imageView == null) {
+            throw new NullPointerException();
+        }
+
+        int secondaryColor = themeColor.getSecondaryColor(resources);
+        Drawable drawable = imageView.getDrawable();
+        drawable.setTint(secondaryColor);
+        imageView.setImageDrawable(drawable);
+    }
+
     public void switchCircularProgressBarColor(ColorSwitchingViewList<ProgressBar> progressBarList) {
         if (progressBarList == null) {
             throw new NullPointerException();
@@ -56,5 +67,23 @@ public class ListThemeColorSwitcher extends BaseThemeColorSwitcher {
                 .forEach(x -> x.getIndeterminateDrawable().setTint(primaryContainerColor));
     }
 
+    public void switchKeyWordSearchBackgroundColor(View background) {
+        if (background == null) {
+            throw new NullPointerException();
+        }
+
+        int surfaceDimColor = themeColor.getSurfaceDimColor(resources);
+        background.setBackgroundTintList(ColorStateList.valueOf(surfaceDimColor));
+    }
+
+    public void switchKeyWordSearchTextColor(TextView textView) {
+        if (textView == null) {
+            throw new NullPointerException();
+        }
+
+        int onSurfaceColor = themeColor.getOnSurfaceColor(resources);
+        ColorSwitchingViewList<TextView> textViewList = new ColorSwitchingViewList<>(textView);
+        switchTextViewColorOnlyText(onSurfaceColor, textViewList);
+    }
 
 }

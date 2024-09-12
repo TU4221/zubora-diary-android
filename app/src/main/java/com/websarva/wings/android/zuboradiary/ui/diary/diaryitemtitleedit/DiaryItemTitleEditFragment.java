@@ -25,10 +25,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageButton;
 import android.widget.TextView;
 
-import com.google.android.material.materialswitch.MaterialSwitch;
 import com.websarva.wings.android.zuboradiary.R;
 import com.websarva.wings.android.zuboradiary.data.database.DiaryItemTitleSelectionHistoryItem;
 import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor;
@@ -36,7 +34,6 @@ import com.websarva.wings.android.zuboradiary.databinding.FragmentDiaryItemTitle
 import com.websarva.wings.android.zuboradiary.ui.BaseFragment;
 import com.websarva.wings.android.zuboradiary.ui.ColorSwitchingViewList;
 import com.websarva.wings.android.zuboradiary.ui.KeyboardInitializer;
-import com.websarva.wings.android.zuboradiary.ui.BaseThemeColorSwitcher;
 import com.websarva.wings.android.zuboradiary.ui.diary.DiaryThemeColorSwitcher;
 import com.websarva.wings.android.zuboradiary.ui.settings.SettingsViewModel;
 
@@ -93,7 +90,6 @@ public class DiaryItemTitleEditFragment extends BaseFragment {
 
         setUpToolBar();
         setUpItemTitleInputField();
-        setUpItemTitleSelectionHistory();
     }
 
     @Override
@@ -105,6 +101,8 @@ public class DiaryItemTitleEditFragment extends BaseFragment {
                         if (themeColor == null) {
                             return;
                         }
+
+                        setUpItemTitleSelectionHistory(themeColor);
 
                         DiaryThemeColorSwitcher switcher =
                                 new DiaryThemeColorSwitcher(requireContext(), themeColor);
@@ -124,7 +122,7 @@ public class DiaryItemTitleEditFragment extends BaseFragment {
                                 new ColorSwitchingViewList<>(
                                         binding.buttonSelectNewItemTitle
                                 );
-                        switcher.switchButton(buttonList);
+                        switcher.switchButtonColor(buttonList);
                     }
                 });
     }
@@ -249,13 +247,14 @@ public class DiaryItemTitleEditFragment extends BaseFragment {
         });
     }
 
-    private void setUpItemTitleSelectionHistory() {
+    private void setUpItemTitleSelectionHistory(ThemeColor themeColor) {
         // 選択履歴リストアイテム設定
         // TODO:下記必要か判断
         ItemTitleSelectionHistoryListAdapter itemTitleSelectionHistoryListAdapter =
                 new ItemTitleSelectionHistoryListAdapter(
                         requireContext(),
                         binding.recyclerItemTitleSelectionHistory,
+                        themeColor,
                         new ItemTitleSelectionHistoryListAdapter.OnClickItemListener() {
                             @Override
                             public void onClick(String title) {

@@ -14,7 +14,9 @@ import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.websarva.wings.android.zuboradiary.data.database.DiaryItemTitleSelectionHistoryItem;
+import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor;
 import com.websarva.wings.android.zuboradiary.databinding.RowItemTitleSelectionHistoryBinding;
+import com.websarva.wings.android.zuboradiary.ui.diary.DiaryThemeColorSwitcher;
 
 public class ItemTitleSelectionHistoryListAdapter
         extends ListAdapter<DiaryItemTitleSelectionHistoryItem,
@@ -22,6 +24,7 @@ public class ItemTitleSelectionHistoryListAdapter
 
     private final Context context;
     private final RecyclerView recyclerView;
+    private final ThemeColor themeColor;
     private final OnClickItemListener onClickItemListener;
     private final OnClickDeleteButtonListener onClickDeleteButtonListener;
 
@@ -30,11 +33,13 @@ public class ItemTitleSelectionHistoryListAdapter
     public ItemTitleSelectionHistoryListAdapter(
             Context context,
             RecyclerView recyclerView,
+            ThemeColor themeColor,
             OnClickItemListener onClickItemListener,
             OnClickDeleteButtonListener onClickDeleteButtonListener){
         super(new DiaryItemTitleSelectionHistoryDiffUtilItemCallback());
         this.context = context;
         this.recyclerView = recyclerView;
+        this.themeColor = themeColor;
         this.onClickItemListener = onClickItemListener;
         this.onClickDeleteButtonListener = onClickDeleteButtonListener;
     }
@@ -89,13 +94,16 @@ public class ItemTitleSelectionHistoryListAdapter
         void onClick(int position, String title);
     }
 
-    public static class ItemTitleSelectionHistoryViewHolder
+    public class ItemTitleSelectionHistoryViewHolder
             extends ItemTitleSelectionHistorySimpleCallback.LeftSwipeViewHolder {
         public RowItemTitleSelectionHistoryBinding binding;
 
         public ItemTitleSelectionHistoryViewHolder(RowItemTitleSelectionHistoryBinding binding) {
             super(binding);
             this.binding = binding;
+
+            DiaryThemeColorSwitcher switcher = new DiaryThemeColorSwitcher(context, themeColor);
+            switcher.switchHistoryItemTextColor(binding.textItemTitle);
         }
 
         @Override

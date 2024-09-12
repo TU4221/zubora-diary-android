@@ -3,6 +3,7 @@ package com.websarva.wings.android.zuboradiary.ui.list.wordsearch;
 import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.style.BackgroundColorSpan;
+import android.text.style.ForegroundColorSpan;
 import android.util.Log;
 
 import androidx.lifecycle.LiveData;
@@ -74,7 +75,8 @@ public class WordSearchViewModel extends BaseViewModel {
         return wordSearchResultListLoadingFuture.isDone();
     }
 
-    public void loadWordSearchResultList(LoadType loadType, int spannableStringBackGroundColor){
+    public void loadWordSearchResultList(
+            LoadType loadType, int spannableStringColor, int spannableStringBackGroundColor){
         if (!canLoadWordSearchResultList()) {
             Log.d("WordSearchLoading","Cancel");
             wordSearchResultListLoadingFuture.cancel(true);
@@ -86,19 +88,22 @@ public class WordSearchViewModel extends BaseViewModel {
             return;
         }
         Runnable loadWordSearchResultList =
-                new loadWordSearchResultList(loadType, searchWord, spannableStringBackGroundColor);
+                new loadWordSearchResultList(
+                        loadType, searchWord, spannableStringColor, spannableStringBackGroundColor);
         wordSearchResultListLoadingFuture = executorService.submit(loadWordSearchResultList);
     }
 
     private class loadWordSearchResultList implements Runnable {
         LoadType loadType;
         String searchWord;
+        int spannableStringColor;
         int spannableStringBackGroundColor;
 
         public loadWordSearchResultList(
-                LoadType loadType, String searchWord, int spannableStringBackGroundColor) {
+                LoadType loadType, String searchWord, int spannableStringColor, int spannableStringBackGroundColor) {
             this.loadType = loadType;
             this.searchWord = searchWord;
+            this.spannableStringColor = spannableStringColor;
             this.spannableStringBackGroundColor = spannableStringBackGroundColor;
         }
         @Override
@@ -191,7 +196,9 @@ public class WordSearchViewModel extends BaseViewModel {
 
                 List<WordSearchResultListItem> loadingData = listenableFutureResults.get();
                 if (!loadingData.isEmpty()) {
-                    convertedLoadingData = toWordSearchResultYearMonthListFormat(loadingData, searchWord, spannableStringBackGroundColor);
+                    convertedLoadingData =
+                            toWordSearchResultYearMonthListFormat(
+                                    loadingData, searchWord, spannableStringColor, spannableStringBackGroundColor);
                 }
 
 
@@ -301,21 +308,22 @@ public class WordSearchViewModel extends BaseViewModel {
 
     private List<WordSearchResultYearMonthListItem> toWordSearchResultYearMonthListFormat(
             List<WordSearchResultListItem> beforeList,
-            String searchWord, int spannableStringBackGroundColor) {
+            String searchWord, int spannableStringColor, int spannableStringBackGroundColor) {
         List<WordSearchResultDayListItem> wordSearchResultDayList =
-                toWordSearchResultDayList(beforeList, searchWord, spannableStringBackGroundColor);
+                toWordSearchResultDayList(beforeList, searchWord,spannableStringColor, spannableStringBackGroundColor);
         return toWordSearchResultYearMonthList(wordSearchResultDayList);
     }
 
     private List<WordSearchResultDayListItem> toWordSearchResultDayList(
             List<WordSearchResultListItem> beforeList,
-            String searchWord, int spannableStringBackGroundColor) {
+            String searchWord, int spannableStringColor, int spannableStringBackGroundColor) {
         List<WordSearchResultDayListItem> dayList = new ArrayList<>();
         for (WordSearchResultListItem item: beforeList) {
             String strDate = item.getDate();
             LocalDate date = LocalDate.parse(strDate);
             SpannableString title =
-                    toSpannableString(item.getTitle(), searchWord, spannableStringBackGroundColor);
+                    toSpannableString(
+                            item.getTitle(), searchWord, spannableStringColor, spannableStringBackGroundColor);
 
             String regex = ".*" + searchWord + ".*";
             String[] itemTitles = {
@@ -348,14 +356,18 @@ public class WordSearchViewModel extends BaseViewModel {
                 if (itemTitles[i].matches(regex)
                         || itemComments[i].matches(regex)) {
                     itemNumber = i + 1;
-                    itemTitle = toSpannableString(itemTitles[i], searchWord, spannableStringBackGroundColor);
-                    itemComment = toSpannableString(itemComments[i], searchWord, spannableStringBackGroundColor);
+                    itemTitle = toSpannableString(
+                            itemTitles[i], searchWord, spannableStringColor, spannableStringBackGroundColor);
+                    itemComment = toSpannableString(
+                            itemComments[i], searchWord, spannableStringColor, spannableStringBackGroundColor);
                     break;
                 }
                 if (i == (itemTitles.length - 1)) {
                     itemNumber = 1;
-                    itemTitle = toSpannableString(itemTitles[0], searchWord, spannableStringBackGroundColor);
-                    itemComment = toSpannableString(itemComments[0], searchWord, spannableStringBackGroundColor);
+                    itemTitle = toSpannableString(
+                            itemTitles[0], searchWord, spannableStringColor, spannableStringBackGroundColor);
+                    itemComment = toSpannableString(
+                            itemComments[0], searchWord, spannableStringColor, spannableStringBackGroundColor);
                 }
             }
 
@@ -367,15 +379,22 @@ public class WordSearchViewModel extends BaseViewModel {
     }
 
     // 対象ワードをマーキング
-    private SpannableString toSpannableString(String string, String targetWord, int backgroundColor) {
+    private SpannableString toSpannableString(String string, String targetWord, int textColor, int backgroundColor) {
         SpannableString spannableString = new SpannableString(string);
-        BackgroundColorSpan backgroundColorSpan = new BackgroundColorSpan(backgroundColor);
         int fromIndex = 0;
         while (string.indexOf(targetWord, fromIndex) != -1) {
+            BackgroundColorSpan backgroundColorSpan = new BackgroundColorSpan(backgroundColor);
+            ForegroundColorSpan foregroundColorSpan = new ForegroundColorSpan(textColor);
             int start = string.indexOf(targetWord, fromIndex);
             int end = start + targetWord.length();
             spannableString.setSpan(
                     backgroundColorSpan,
+                    start,
+                    end,
+                    Spanned.SPAN_INCLUSIVE_INCLUSIVE
+            );
+            spannableString.setSpan(
+                    foregroundColorSpan,
                     start,
                     end,
                     Spanned.SPAN_INCLUSIVE_INCLUSIVE

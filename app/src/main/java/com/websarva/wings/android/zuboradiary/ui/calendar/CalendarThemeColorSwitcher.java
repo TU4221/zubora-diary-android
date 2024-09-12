@@ -62,7 +62,7 @@ class CalendarThemeColorSwitcher extends BaseThemeColorSwitcher {
     private void switchCalendarDayColor(int color, int onColor, TextView textDay, View viewDot) {
         Drawable drawable =
                 ResourcesCompat.getDrawable(
-                        context.getResources(), R.drawable.bg_calendar_day, null);
+                        resources, R.drawable.bg_calendar_day, null);
         if (drawable == null) {
             throw new NullPointerException();
         }

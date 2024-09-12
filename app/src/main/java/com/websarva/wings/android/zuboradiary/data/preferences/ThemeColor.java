@@ -1,12 +1,9 @@
 package com.websarva.wings.android.zuboradiary.data.preferences;
 
 import android.content.Context;
-import android.content.res.ColorStateList;
 import android.content.res.Resources;
-import android.media.tv.TableRequest;
 
 import androidx.annotation.NonNull;
-import androidx.core.content.ContextCompat;
 import androidx.core.content.res.ResourcesCompat;
 
 import com.websarva.wings.android.zuboradiary.R;
@@ -50,10 +47,7 @@ public enum ThemeColor {
     }
 
     public boolean requestsSwitchingAppearanceLightStatusBars() {
-        if (this == WHITE || this == BLACK) {
-            return true;
-        }
-        return false;
+        return true;
     }
 
     // TODO:colorResIdをコンストラクタで初期化するか検討(膨大な良の為可読性を考慮してこのままとしても良いかも)
@@ -289,6 +283,122 @@ public enum ThemeColor {
         return ResourcesCompat.getColor(resources, colorResId, null);
     }
 
+    public  int getTertiaryColor(Resources resources) {
+        if (resources == null) {
+            throw new NullPointerException();
+        }
+
+        int colorResId = -1;
+        switch (this) {
+            case WHITE:
+                colorResId = R.color.md_theme_color_white_tertiary;
+                break;
+            case BLACK:
+                colorResId = R.color.md_theme_color_black_tertiary;
+                break;
+            case RED:
+                colorResId = R.color.md_theme_color_red_tertiary;
+                break;
+            case BLUE:
+                colorResId = R.color.md_theme_color_blue_tertiary;
+                break;
+            case GREEN:
+                colorResId = R.color.md_theme_color_green_tertiary;
+                break;
+            case YELLOW:
+                colorResId = R.color.md_theme_color_yellow_tertiary;
+                break;
+        }
+        return ResourcesCompat.getColor(resources, colorResId, null);
+    }
+
+    public  int getOnTertiaryColor(Resources resources) {
+        if (resources == null) {
+            throw new NullPointerException();
+        }
+
+        int colorResId = -1;
+        switch (this) {
+            case WHITE:
+                colorResId = R.color.md_theme_color_white_onTertiary;
+                break;
+            case BLACK:
+                colorResId = R.color.md_theme_color_black_onTertiary;
+                break;
+            case RED:
+                colorResId = R.color.md_theme_color_red_onTertiary;
+                break;
+            case BLUE:
+                colorResId = R.color.md_theme_color_blue_onTertiary;
+                break;
+            case GREEN:
+                colorResId = R.color.md_theme_color_green_onTertiary;
+                break;
+            case YELLOW:
+                colorResId = R.color.md_theme_color_yellow_onTertiary;
+                break;
+        }
+        return ResourcesCompat.getColor(resources, colorResId, null);
+    }
+
+    public  int getTertiaryContainerColor(Resources resources) {
+        if (resources == null) {
+            throw new NullPointerException();
+        }
+
+        int colorResId = -1;
+        switch (this) {
+            case WHITE:
+                colorResId = R.color.md_theme_color_white_tertiaryContainer;
+                break;
+            case BLACK:
+                colorResId = R.color.md_theme_color_black_tertiaryContainer;
+                break;
+            case RED:
+                colorResId = R.color.md_theme_color_red_tertiaryContainer;
+                break;
+            case BLUE:
+                colorResId = R.color.md_theme_color_blue_tertiaryContainer;
+                break;
+            case GREEN:
+                colorResId = R.color.md_theme_color_green_tertiaryContainer;
+                break;
+            case YELLOW:
+                colorResId = R.color.md_theme_color_yellow_tertiaryContainer;
+                break;
+        }
+        return ResourcesCompat.getColor(resources, colorResId, null);
+    }
+
+    public  int getOnTertiaryContainerColor(Resources resources) {
+        if (resources == null) {
+            throw new NullPointerException();
+        }
+
+        int colorResId = -1;
+        switch (this) {
+            case WHITE:
+                colorResId = R.color.md_theme_color_white_onTertiaryContainer;
+                break;
+            case BLACK:
+                colorResId = R.color.md_theme_color_black_onTertiaryContainer;
+                break;
+            case RED:
+                colorResId = R.color.md_theme_color_red_onTertiaryContainer;
+                break;
+            case BLUE:
+                colorResId = R.color.md_theme_color_blue_onTertiaryContainer;
+                break;
+            case GREEN:
+                colorResId = R.color.md_theme_color_green_onTertiaryContainer;
+                break;
+            case YELLOW:
+                colorResId = R.color.md_theme_color_yellow_onTertiaryContainer;
+                break;
+        }
+        return ResourcesCompat.getColor(resources, colorResId, null);
+    }
+
     public  int getSurfaceColor(Resources resources) {
         if (resources == null) {
             throw new NullPointerException();
@@ -458,6 +568,122 @@ public enum ThemeColor {
                 break;
             case YELLOW:
                 colorResId = R.color.md_theme_color_yellow_onSurface;
+                break;
+        }
+        return ResourcesCompat.getColor(resources, colorResId, null);
+    }
+
+    public  int getSurfaceDimColor(Resources resources) {
+        if (resources == null) {
+            throw new NullPointerException();
+        }
+
+        int colorResId = -1;
+        switch (this) {
+            case WHITE:
+                colorResId = R.color.md_theme_color_white_surfaceDim;
+                break;
+            case BLACK:
+                colorResId = R.color.md_theme_color_black_surfaceDim;
+                break;
+            case RED:
+                colorResId = R.color.md_theme_color_red_surfaceDim;
+                break;
+            case BLUE:
+                colorResId = R.color.md_theme_color_blue_surfaceDim;
+                break;
+            case GREEN:
+                colorResId = R.color.md_theme_color_green_surfaceDim;
+                break;
+            case YELLOW:
+                colorResId = R.color.md_theme_color_yellow_surfaceDim;
+                break;
+        }
+        return ResourcesCompat.getColor(resources, colorResId, null);
+    }
+
+    public int getSurfaceVariantColor(Resources resources) {
+        if (resources == null) {
+            throw new NullPointerException();
+        }
+
+        int colorResId = -1;
+        switch (this) {
+            case WHITE:
+                colorResId = R.color.md_theme_color_white_surfaceVariant;
+                break;
+            case BLACK:
+                colorResId = R.color.md_theme_color_black_surfaceVariant;
+                break;
+            case RED:
+                colorResId = R.color.md_theme_color_red_surfaceVariant;
+                break;
+            case BLUE:
+                colorResId = R.color.md_theme_color_blue_surfaceVariant;
+                break;
+            case GREEN:
+                colorResId = R.color.md_theme_color_green_surfaceVariant;
+                break;
+            case YELLOW:
+                colorResId = R.color.md_theme_color_yellow_surfaceVariant;
+                break;
+        }
+        return ResourcesCompat.getColor(resources, colorResId, null);
+    }
+
+    public int getOnSurfaceVariantColor(Resources resources) {
+        if (resources == null) {
+            throw new NullPointerException();
+        }
+
+        int colorResId = -1;
+        switch (this) {
+            case WHITE:
+                colorResId = R.color.md_theme_color_white_onSurfaceVariant;
+                break;
+            case BLACK:
+                colorResId = R.color.md_theme_color_black_onSurfaceVariant;
+                break;
+            case RED:
+                colorResId = R.color.md_theme_color_red_onSurfaceVariant;
+                break;
+            case BLUE:
+                colorResId = R.color.md_theme_color_blue_onSurfaceVariant;
+                break;
+            case GREEN:
+                colorResId = R.color.md_theme_color_green_onSurfaceVariant;
+                break;
+            case YELLOW:
+                colorResId = R.color.md_theme_color_yellow_onSurfaceVariant;
+                break;
+        }
+        return ResourcesCompat.getColor(resources, colorResId, null);
+    }
+
+    public  int getOutlineColor(Resources resources) {
+        if (resources == null) {
+            throw new NullPointerException();
+        }
+
+        int colorResId = -1;
+        switch (this) {
+            case WHITE:
+                colorResId = R.color.md_theme_color_white_outline;
+                break;
+            case BLACK:
+                colorResId = R.color.md_theme_color_black_outline;
+                break;
+            case RED:
+                colorResId = R.color.md_theme_color_red_outline;
+                break;
+            case BLUE:
+                colorResId = R.color.md_theme_color_blue_outline;
+                break;
+            case GREEN:
+                colorResId = R.color.md_theme_color_green_outline;
+                break;
+            case YELLOW:
+                colorResId = R.color.md_theme_color_yellow_outline;
                 break;
         }
         return ResourcesCompat.getColor(resources, colorResId, null);

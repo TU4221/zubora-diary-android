@@ -4,7 +4,6 @@ import static android.text.InputType.TYPE_TEXT_FLAG_MULTI_LINE;
 
 import android.annotation.SuppressLint;
 import android.content.DialogInterface;
-import android.graphics.Color;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -17,7 +16,6 @@ import androidx.lifecycle.Observer;
 import androidx.lifecycle.SavedStateHandle;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavDirections;
-import androidx.recyclerview.widget.RecyclerView;
 
 import android.text.Editable;
 import android.text.InputFilter;
@@ -34,12 +32,8 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.google.android.material.appbar.MaterialToolbar;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.materialswitch.MaterialSwitch;
 import com.websarva.wings.android.zuboradiary.data.DateTimeStringConverter;
 import com.websarva.wings.android.zuboradiary.data.diary.ConditionConverter;
 import com.websarva.wings.android.zuboradiary.data.diary.Conditions;
@@ -52,11 +46,9 @@ import com.websarva.wings.android.zuboradiary.ui.BaseFragment;
 import com.websarva.wings.android.zuboradiary.ui.ColorSwitchingViewList;
 import com.websarva.wings.android.zuboradiary.ui.KeyboardInitializer;
 import com.websarva.wings.android.zuboradiary.ui.TestDiariesSaver;
-import com.websarva.wings.android.zuboradiary.ui.BaseThemeColorSwitcher;
 import com.websarva.wings.android.zuboradiary.ui.diary.DiaryLiveData;
 import com.websarva.wings.android.zuboradiary.ui.diary.DiaryThemeColorSwitcher;
 import com.websarva.wings.android.zuboradiary.ui.diary.diaryitemtitleedit.DiaryItemTitleEditFragment;
-import com.websarva.wings.android.zuboradiary.ui.list.ListThemeColorSwitcher;
 import com.websarva.wings.android.zuboradiary.ui.settings.SettingsViewModel;
 
 import java.time.LocalDate;
@@ -128,8 +120,6 @@ public class DiaryEditFragment extends BaseFragment {
         setUpToolBar();
         setUpNoKeyBoardViews();
         setUpDateInputField();
-        setUpWeatherInputField();
-        setUpConditionInputField();
         setUpTitleInputField();
         setUpItemInputField();
         setUpPictureInputField();
@@ -154,6 +144,9 @@ public class DiaryEditFragment extends BaseFragment {
                         if (themeColor == null) {
                             return;
                         }
+
+                        setUpWeatherInputField(themeColor);
+                        setUpConditionInputField(themeColor);
 
                         DiaryThemeColorSwitcher switcher =
                                 new DiaryThemeColorSwitcher(requireContext(), themeColor);
@@ -202,7 +195,9 @@ public class DiaryEditFragment extends BaseFragment {
                                         binding.includeItem5.imageButtonItemDelete,
                                         binding.imageButtonAddItem
                                 );
-                        switcher.switchImageButton(imageButtonList);
+                        switcher.switchImageButtonColor(imageButtonList);
+
+                        switcher.switchAttachedPictureImageViewColor(binding.imageAttach);
                     }
                 });
     }
@@ -518,15 +513,15 @@ public class DiaryEditFragment extends BaseFragment {
     }
 
     // 天気入力欄。
-    private void setUpWeatherInputField() {
+    private void setUpWeatherInputField(ThemeColor themeColor) {
         // TODO:下記MEMOの意味が理解できないので後で確認ご文章を修正する
         // MEMO:下記 onItemSelected は DataBinding を使用して ViewModel 内にメソッドを用意していたが、
         //      画面作成処理時に onItemSelected が処理される為、初期値設定する為の setSelection メソッドの処理タイミングの兼合いで、
         //      DataBinding での使用を取りやめ、ここにまとめて記載することにした。
         //      他スピナーも同様。
-        ArrayAdapter<String> weatherArrayAdapter = createWeatherSpinnerAdapter();
+        ArrayAdapter<String> weatherArrayAdapter = createWeatherSpinnerAdapter(themeColor);
         binding.spinnerWeather1.setAdapter(weatherArrayAdapter);
-        weather2ArrayAdapter = createWeatherSpinnerAdapter();
+        weather2ArrayAdapter = createWeatherSpinnerAdapter(themeColor);
         binding.spinnerWeather2.setAdapter(weather2ArrayAdapter);
 
         // TODO:天気情報取得が同期処理なら不要
@@ -575,7 +570,7 @@ public class DiaryEditFragment extends BaseFragment {
                             binding.spinnerWeather2.setAdapter(weatherArrayAdapter);
                             binding.spinnerWeather2.setSelection(0);
                         } else {
-                            weather2ArrayAdapter = createWeatherSpinnerAdapter(weather);
+                            weather2ArrayAdapter = createWeatherSpinnerAdapter(themeColor, weather);
                             binding.spinnerWeather2.setAdapter(weather2ArrayAdapter);
                             binding.spinnerWeather2.setEnabled(true);
                             // HACK:AdapterをセットするとSpinnerの選択アイテムがデフォルト値になるため下記対応。
@@ -636,7 +631,11 @@ public class DiaryEditFragment extends BaseFragment {
                 });
     }
 
-    private ArrayAdapter<String> createWeatherSpinnerAdapter(@Nullable Weathers... excludedWeathers) {
+    private ArrayAdapter<String> createWeatherSpinnerAdapter(ThemeColor themeColor, @Nullable Weathers... excludedWeathers) {
+        if (themeColor == null) {
+            throw new NullPointerException();
+        }
+
         List<String> weatherItemList = new ArrayList<>();
         for (Weathers weather: Weathers.values()) {
             if (!isExcludedWeather(weather, excludedWeathers)) {
@@ -649,14 +648,19 @@ public class DiaryEditFragment extends BaseFragment {
             public View getView(int position, View convertView, @NonNull ViewGroup parent) {
                 // 通常時の文字の色を設定
                 TextView textView = (TextView) super.getView(position, convertView, parent);
-                ThemeColor themeColor = settingsViewModel.getThemeColorSettingValueLiveData().getValue();
-                if (themeColor == null) {
-                    throw new NullPointerException();
-                }
                 DiaryThemeColorSwitcher switcher =
                         new DiaryThemeColorSwitcher(requireContext(), themeColor);
                 ColorSwitchingViewList<TextView> textViewList = new ColorSwitchingViewList<>(textView);
                 switcher.switchTextColorOnBackground(textViewList);
+                return textView;
+            }
+
+            @Override
+            public View getDropDownView(int position, View convertView, @NonNull ViewGroup parent) {
+                TextView textView = (TextView) super.getView(position, convertView, parent);
+                DiaryThemeColorSwitcher switcher =
+                        new DiaryThemeColorSwitcher(requireContext(), themeColor);
+                switcher.switchSpinnerDropDownTextColor(textView);
                 return textView;
             }
         };
@@ -675,7 +679,11 @@ public class DiaryEditFragment extends BaseFragment {
     }
 
     // 気分入力欄。
-    private void setUpConditionInputField() {
+    private void setUpConditionInputField(ThemeColor themeColor) {
+        if (themeColor == null) {
+            throw new NullPointerException();
+        }
+
         List<String> conditonItemList = new ArrayList<>();
         for (Conditions weather: Conditions.values()) {
             conditonItemList.add(weather.toString(requireContext()));
@@ -687,17 +695,22 @@ public class DiaryEditFragment extends BaseFragment {
                     public View getView(int position, View convertView, @NonNull ViewGroup parent) {
                         // 通常時の文字の色を設定
                         TextView textView = (TextView) super.getView(position, convertView, parent);
-                        ThemeColor themeColor = settingsViewModel.getThemeColorSettingValueLiveData().getValue();
-                        if (themeColor == null) {
-                            throw new NullPointerException();
-                        }
                         DiaryThemeColorSwitcher switcher =
                                 new DiaryThemeColorSwitcher(requireContext(), themeColor);
                         ColorSwitchingViewList<TextView> textViewList = new ColorSwitchingViewList<>(textView);
                         switcher.switchTextColorOnBackground(textViewList);
                         return textView;
                     }
-                };;
+
+                    @Override
+                    public View getDropDownView(int position, View convertView, @NonNull ViewGroup parent) {
+                        TextView textView = (TextView) super.getView(position, convertView, parent);
+                        DiaryThemeColorSwitcher switcher =
+                                new DiaryThemeColorSwitcher(requireContext(), themeColor);
+                        switcher.switchSpinnerDropDownTextColor(textView);
+                        return textView;
+                    }
+                };
         binding.spinnerCondition.setAdapter(conditionArrayAdapter);
 
         binding.spinnerCondition

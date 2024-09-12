@@ -156,7 +156,7 @@
                     android:orientation="horizontal">
 
                     <TextView
-                        android:id="@+id/text_reminder_notification_time"
+                        android:id="@+id/text_reminder_notification_setting_time"
                         android:layout_width="wrap_content"
                         android:layout_height="@dimen/fragment_settings_item_layout_height"
                         android:paddingVertical="@dimen/fragment_settings_item_padding_vertical"

@@ -118,6 +118,8 @@ public class DiaryDayListAdapter extends ListAdapter<DiaryDayListItem, DiaryDayL
                     );
             switcher.switchTextColorOnListItemBackground(textViewList);
 
+            switcher.switchImageViewColorOnListItemBackground(binding.imageRowDiaryListDayPicture);
+
             switcher.switchListItemBackgroundColor(binding.linerLayoutForeground);
         }
 

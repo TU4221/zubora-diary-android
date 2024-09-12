@@ -34,7 +34,6 @@ import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor;
 import com.websarva.wings.android.zuboradiary.databinding.FragmentSettingsBinding;
 import com.websarva.wings.android.zuboradiary.ui.BaseFragment;
 import com.websarva.wings.android.zuboradiary.ui.ColorSwitchingViewList;
-import com.websarva.wings.android.zuboradiary.ui.BaseThemeColorSwitcher;
 
 import java.time.DayOfWeek;
 import java.time.LocalTime;
@@ -165,9 +164,23 @@ public class SettingsFragment extends BaseFragment {
                                         binding.textThemeColorSettingTitle,
                                         binding.textCalendarStartDaySettingTitle,
                                         binding.textReminderNotificationSettingTitle,
+                                        binding.textPasscodeLockSettingTitle,
                                         binding.textGettingWeatherInformationSettingTitle
                                 );
                         switcher.switchSettingItemIconColor(iconList);
+
+                        ColorSwitchingViewList<TextView> textList =
+                                new ColorSwitchingViewList<>(
+                                        binding.textThemeColorSettingTitle,
+                                        binding.textThemeColorSettingValue,
+                                        binding.textCalendarStartDaySettingTitle,
+                                        binding.textCalendarStartDaySettingValue,
+                                        binding.textReminderNotificationSettingTitle,
+                                        binding.textReminderNotificationSettingTime,
+                                        binding.textPasscodeLockSettingTitle,
+                                        binding.textGettingWeatherInformationSettingTitle
+                                );
+                        switcher.switchTextColorOnBackground(textList);
 
                         ColorSwitchingViewList<MaterialSwitch> switchList =
                                 new ColorSwitchingViewList<>(
@@ -338,9 +351,9 @@ public class SettingsFragment extends BaseFragment {
                         }
 
                         if (aBoolean) {
-                            binding.textReminderNotificationTime.setVisibility(View.VISIBLE);
+                            binding.textReminderNotificationSettingTime.setVisibility(View.VISIBLE);
                         } else {
-                            binding.textReminderNotificationTime.setVisibility(View.INVISIBLE);
+                            binding.textReminderNotificationSettingTime.setVisibility(View.INVISIBLE);
                         }
                     }
                 });
@@ -350,13 +363,13 @@ public class SettingsFragment extends BaseFragment {
                     @Override
                     public void onChanged(LocalTime time) {
                         if (time == null) {
-                            binding.textReminderNotificationTime.setText("");
+                            binding.textReminderNotificationSettingTime.setText("");
                             return;
                         }
 
                         DateTimeStringConverter converter = new DateTimeStringConverter();
                         String strTime = converter.toStringTimeHourMinute(time);
-                        binding.textReminderNotificationTime.setText(strTime);
+                        binding.textReminderNotificationSettingTime.setText(strTime);
                     }
                 });
     }

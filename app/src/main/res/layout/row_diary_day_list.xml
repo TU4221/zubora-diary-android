@@ -51,7 +51,7 @@
                 android:paddingHorizontal="16dp"
                 android:paddingVertical="8dp"
                 android:contentDescription="@string/row_diary_day_list_picture_description"
-                app:srcCompat="@android:drawable/ic_menu_gallery" />
+                app:srcCompat="@drawable/ic_image_24px" />
 
         </LinearLayout>
 
