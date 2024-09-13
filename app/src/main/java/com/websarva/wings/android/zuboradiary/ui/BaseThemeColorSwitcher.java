@@ -4,13 +4,16 @@ import android.content.Context;
 import android.content.res.ColorStateList;
 import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
+import android.view.Menu;
 import android.view.View;
 import android.view.Window;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.core.graphics.drawable.DrawableCompat;
 import androidx.core.view.WindowInsetsControllerCompat;
 
@@ -20,119 +23,169 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.materialswitch.MaterialSwitch;
 import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor;
 
+import dagger.internal.Preconditions;
+
+/**
+ * Enum ThemeColorをもとにViewの色を変更するクラス。
+ * Activity、各Fragment共通処理を本クラスにまとめる。
+ * 各Fragment固有のViewに対しては本クラスを継承して継承クラスにメソッドを追加する。
+ * 本クラスに記述されている各Viewの色はアプリ背景色(SurfaceColor)を考慮して選定。
+ * */
 public class BaseThemeColorSwitcher {
     protected final Resources resources;
     protected final Context context;
     protected final ThemeColor themeColor;
 
     public BaseThemeColorSwitcher(Context context, ThemeColor themeColor) {
-        if (context == null) {
-            throw new NullPointerException();
-        }
-        if (themeColor == null) {
-            throw new NullPointerException();
-        }
+        Preconditions.checkNotNull(context);
+        Preconditions.checkNotNull(themeColor);
 
         resources = context.getResources();
-        if (resources == null) {
-            throw new NullPointerException();
-        }
+        Preconditions.checkNotNull(resources);
 
         this.context = context;
         this.themeColor = themeColor;
     }
 
+    public final void switchBackgroundColor(View view) {
+        Preconditions.checkNotNull(view);
+
+        int surfaceColor = themeColor.getSurfaceColor(resources);
+        switchViewColor(view, surfaceColor);
+    }
+
+    public final void switchTextColorOnBackground(ColorSwitchingViewList<TextView> viewList) {
+        Preconditions.checkNotNull(viewList);
+
+        int onSurfaceColor = themeColor.getOnSurfaceColor(resources);
+        switchTextViewsColorOnlyText(viewList, onSurfaceColor);
+    }
+
     public final void switchStatusBarColor(Window window) {
-        if (window == null) {
-            throw new NullPointerException();
-        }
+        Preconditions.checkNotNull(window);
 
         int surfaceColor = themeColor.getSurfaceColor(resources);
         window.setStatusBarColor(surfaceColor);
 
-        // ステータスバーのアイコンの色を変更(白 or Gray)
+        // ステータスバーのアイコンの色を変更(白 or 灰)
         boolean requests = themeColor.requestsSwitchingAppearanceLightStatusBars();
         new WindowInsetsControllerCompat(window, window.getDecorView()).setAppearanceLightStatusBars(requests);
     }
 
     public final void switchBottomNavigationColor(BottomNavigationView view) {
-        if (view == null) {
-            throw new NullPointerException();
-        }
+        Preconditions.checkNotNull(view);
+
+        switchBottomNavigationBackgroundColor(view);
+        switchBottomNavigationItemRippleColor(view);
+        switchBottomNavigationItemTextColor(view);
+        switchBottomNavigationItemIconColor(view);
+        switchBottomNavigationActiveIndicatorColor(view);
+    }
+
+    private void switchBottomNavigationBackgroundColor (BottomNavigationView view) {
+        Preconditions.checkNotNull(view);
 
         int surfaceContainerColor = themeColor.getSurfaceContainerColor(resources);
         view.setBackgroundTintList(ColorStateList.valueOf(surfaceContainerColor));
+    }
 
-        int[][] states = new int[][] {
-                new int[] { android.R.attr.state_checked },  // アクティブ状態
-                new int[] { -android.R.attr.state_checked }  // 非アクティブ状態
-        };
-        int[] ItemRippleColors = new int[] {
-                themeColor.getPrimaryColor(resources),  // アクティブ状態の色
-                themeColor.getOnSurfaceVariantColor(resources) // 非アクティブ状態の色
-        };
-        view.setItemRippleColor(new ColorStateList(states, ItemRippleColors));
+    private void switchBottomNavigationItemRippleColor(BottomNavigationView view) {
+        Preconditions.checkNotNull(view);
 
-        int[] ItemTextColors = new int[] {
-                themeColor.getOnSurfaceColor(resources),  // アクティブ状態の色
-                themeColor.getOnSurfaceVariantColor(resources) // 非アクティブ状態の色
-        };
-        view.setItemTextColor(new ColorStateList(states, ItemTextColors));
+        int checkedColor = themeColor.getPrimaryColor(resources);
+        int unCheckedColor = themeColor.getOnSurfaceVariantColor(resources);
+        ColorStateList colorStateList = createCheckedColorStateList(checkedColor, unCheckedColor);
+        view.setItemRippleColor(colorStateList);
+    }
 
-        int[] ItemIconColors = new int[] {
-                themeColor.getOnSecondaryContainerColor(resources),  // アクティブ状態の色
-                themeColor.getOnSurfaceVariantColor(resources) // 非アクティブ状態の色
-        };
-        view.setItemIconTintList(new ColorStateList(states, ItemIconColors));
+    private void switchBottomNavigationItemTextColor(BottomNavigationView view) {
+        Preconditions.checkNotNull(view);
+
+        int checkedColor = themeColor.getOnSurfaceColor(resources);
+        int unCheckedColor = themeColor.getOnSurfaceVariantColor(resources);
+        ColorStateList colorStateList = createCheckedColorStateList(checkedColor, unCheckedColor);
+        view.setItemTextColor(colorStateList);
+    }
+
+    private void switchBottomNavigationItemIconColor(BottomNavigationView view) {
+        Preconditions.checkNotNull(view);
+
+        int checkedColor = themeColor.getOnSecondaryContainerColor(resources);
+        int unCheckedColor = themeColor.getOnSurfaceVariantColor(resources);
+        ColorStateList colorStateList = createCheckedColorStateList(checkedColor, unCheckedColor);
+        view.setItemIconTintList(colorStateList);
+    }
+
+    private void switchBottomNavigationActiveIndicatorColor(BottomNavigationView view) {
+        Preconditions.checkNotNull(view);
 
         int secondaryContainerColor = themeColor.getSecondaryContainerColor(resources);
         view.setItemActiveIndicatorColor(ColorStateList.valueOf(secondaryContainerColor));
     }
 
-    public final void switchBackgroundColor(View view) {
-        if (view == null) {
-            throw new NullPointerException();
-        }
-
-        int surfaceColor = themeColor.getSurfaceColor(resources);
-        ColorSwitchingViewList<View> viewList = new ColorSwitchingViewList<>(view);
-        switchViewColor(surfaceColor, viewList);
-    }
-
-    public final void switchTextColorOnBackground(ColorSwitchingViewList<TextView> viewList) {
-        if (viewList == null) {
-            throw new NullPointerException();
-        }
-
-        int onSurfaceColor = themeColor.getOnSurfaceColor(resources);
-        switchTextViewColorOnlyText(onSurfaceColor, viewList);
-    }
-
     public final void switchToolbarColor(MaterialToolbar toolbar) {
-        if (toolbar == null) {
-            throw new NullPointerException();
-        }
+        Preconditions.checkNotNull(toolbar);
 
         int surfaceColor = themeColor.getSurfaceColor(resources);
         int onSurfaceColor = themeColor.getOnSurfaceColor(resources);
         toolbar.setBackgroundColor(surfaceColor);
         toolbar.setTitleTextColor(onSurfaceColor);
 
+        switchToolbarNavigationIconColor(toolbar, onSurfaceColor);
+        switchToolbarMenuColor(toolbar, onSurfaceColor);
+
+    }
+
+    private void switchToolbarNavigationIconColor(MaterialToolbar toolbar, int color) {
+        Preconditions.checkNotNull(toolbar);
+
         Drawable navigationIcon = toolbar.getNavigationIcon();
-        if (navigationIcon != null) {
-            navigationIcon.setTint(onSurfaceColor);
+        if (navigationIcon == null) {
+            return;
         }
+
+        navigationIcon.setTint(color);
+    }
+
+    private void switchToolbarMenuColor(MaterialToolbar toolbar, int color) {
+        Preconditions.checkNotNull(toolbar);
 
         Drawable menuIcon = toolbar.getOverflowIcon();
         if (menuIcon != null) {
-            menuIcon.setTint(onSurfaceColor);
+            menuIcon.setTint(color);
+        }
+
+        Drawable collapseIcon = toolbar.getCollapseIcon();
+        if (collapseIcon != null) {
+            collapseIcon.setTint(color);
+        }
+
+        switchToolbarMenuIconColor(toolbar, color);
+    }
+
+    private void switchToolbarMenuIconColor(MaterialToolbar toolbar, int color) {
+        Preconditions.checkNotNull(toolbar);
+
+        Menu menu = toolbar.getMenu();
+        if (menu == null) {
+            return;
+        }
+
+        int numMenuIcons = menu.size();
+        if (numMenuIcons <= 0) {
+            return;
+        }
+
+        for (int i = 0; i < numMenuIcons; i++) {
+            Drawable icon = menu.getItem(i).getIcon();
+            if (icon != null) {
+                icon.setTint(color);
+            }
         }
     }
 
     public final void switchFloatingActionButtonColor(ColorSwitchingViewList<FloatingActionButton> fabList) {
-        if (fabList == null) {
-            throw new NullPointerException();
-        }
+        Preconditions.checkNotNull(fabList);
 
         int primaryContainerColor = themeColor.getPrimaryContainerColor(resources);
         int onPrimaryContainerColor = themeColor.getOnPrimaryContainerColor(resources);
@@ -143,130 +196,159 @@ public class BaseThemeColorSwitcher {
     }
 
     public final void switchSwitchColor(ColorSwitchingViewList<MaterialSwitch> switchList) {
-        if (switchList == null) {
-            throw new NullPointerException();
-        }
+        Preconditions.checkNotNull(switchList);
 
+        switchSwitchThumbColor(switchList);
+        switchSwitchThumbIconColor(switchList);
+        switchSwitchTrackColor(switchList);
+    }
 
+    private void switchSwitchThumbColor(ColorSwitchingViewList<MaterialSwitch> switchList) {
+        Preconditions.checkNotNull(switchList);
 
-        // 状態ごとの色を定義する
-        int[][] states = new int[][]{
-                new int[]{android.R.attr.state_checked},  // ONの状態
-                new int[]{-android.R.attr.state_checked}  // OFFの状態
-        };
+        int checkedColor = themeColor.getOnPrimaryColor(resources);
+        int unCheckedColor = themeColor.getOutlineColor(resources);
+        ColorStateList thumbColorStateList = createCheckedColorStateList(checkedColor, unCheckedColor);
+        switchList.getViewList().stream().forEach(x -> x.setThumbTintList(thumbColorStateList));
+    }
 
-        // 各状態に応じた色を定義する
-        int onPrimaryColor = themeColor.getOnPrimaryColor(resources);
-        int outLineColor = themeColor.getOutlineColor(resources);
-        int[] thumbColors = new int[]{
-                onPrimaryColor,  // ONの状態の色
-                outLineColor   // OFFの状態の色
-        };
-        ColorStateList thumbColorStateList = new ColorStateList(states, thumbColors);
+    private void switchSwitchThumbIconColor(ColorSwitchingViewList<MaterialSwitch> switchList) {
+        Preconditions.checkNotNull(switchList);
 
+        int checkedColor = themeColor.getOnPrimaryContainerColor(resources);
+        int unCheckedColor = themeColor.getSurfaceContainerHighestColor(resources);
+        ColorStateList thumbIconColorStateList = createCheckedColorStateList(checkedColor, unCheckedColor);
+        switchList.getViewList().stream().forEach(x -> x.setThumbIconTintList(thumbIconColorStateList));
+    }
 
-        int onPrimaryContainerColor = themeColor.getOnPrimaryContainerColor(resources);
-        int surfaceContainerHighestColor = themeColor.getSurfaceContainerHighestColor(resources);
-        int[] thumbIconColors = new int[]{
-                onPrimaryContainerColor,  // ONの状態の色
-                surfaceContainerHighestColor   // OFFの状態の色
-        };
-        ColorStateList thumbIconColorStateList = new ColorStateList(states, thumbIconColors);
+    private void switchSwitchTrackColor(ColorSwitchingViewList<MaterialSwitch> switchList) {
+        Preconditions.checkNotNull(switchList);
 
-        int primaryColor = themeColor.getPrimaryColor(resources);
-        int[] trackColors = new int[]{
-                primaryColor,  // ONの状態の色
-                surfaceContainerHighestColor   // OFFの状態の色
-        };
-        ColorStateList trackColorStateList = new ColorStateList(states, trackColors);
-
-        switchList.getViewList().stream().forEach(x -> {
-            x.setThumbTintList(thumbColorStateList);
-            x.setThumbIconTintList(thumbIconColorStateList);
-            x.setTrackTintList(trackColorStateList);
-        });
+        int checkedColor = themeColor.getPrimaryColor(resources);
+        int unCheckedColor = themeColor.getSurfaceContainerHighestColor(resources);
+        ColorStateList trackColorStateList = createCheckedColorStateList(checkedColor, unCheckedColor);
+        switchList.getViewList().stream().forEach(x -> x.setTrackTintList(trackColorStateList));
     }
 
     public final void switchButtonColor(ColorSwitchingViewList<Button> buttonList) {
-        if (buttonList == null) {
-            throw new NullPointerException();
-        }
+        Preconditions.checkNotNull(buttonList);
 
-        int primaryColor = themeColor.getPrimaryColor(resources);
-        int onPrimaryColor = themeColor.getOnPrimaryColor(resources);
+        int color = themeColor.getPrimaryColor(resources);
+        int onColor = themeColor.getOnPrimaryColor(resources);
         buttonList.getViewList().stream()
                 .forEach(x -> {
-                    x.setBackgroundColor(primaryColor);
-                    x.setTextColor(onPrimaryColor);
+                    x.setBackgroundColor(color);
+                    x.setTextColor(onColor);
                 });
     }
 
     public final void switchImageButtonColor(ColorSwitchingViewList<ImageButton> imageButtonList) {
-        if (imageButtonList == null) {
-            throw new NullPointerException();
-        }
+        Preconditions.checkNotNull(imageButtonList);
 
-        int primaryColor = themeColor.getPrimaryColor(resources);
+        int color = themeColor.getPrimaryColor(resources);
         imageButtonList.getViewList().stream()
-                .forEach(x -> x.setImageTintList(ColorStateList.valueOf(primaryColor)));
+                .forEach(x -> x.setImageTintList(ColorStateList.valueOf(color)));
     }
 
-    public void switchImageViewColor(ImageView imageView) {
-        if (imageView == null) {
-            throw new NullPointerException();
-        }
+    public void switchImageViewColor(ColorSwitchingViewList<ImageView> imageViewList) {
+        Preconditions.checkNotNull(imageViewList);
 
-        int secondaryColor = themeColor.getSecondaryColor(resources);
-        Drawable drawable = imageView.getDrawable();
-        drawable.setTint(secondaryColor);
-        imageView.setImageDrawable(drawable);
+        int color = themeColor.getSecondaryColor(resources);
+        imageViewList.getViewList().stream().forEach(x -> switchImageView(x, color));
+    }
+
+    public void switchCircularProgressBarColor(ProgressBar progressBar) {
+        Preconditions.checkNotNull(progressBar);
+
+        int color = themeColor.getPrimaryContainerColor(resources);
+        progressBar.getIndeterminateDrawable().setTint(color);
     }
 
     // 共通処理
-    protected final void switchViewColor(int color, ColorSwitchingViewList<View> viewList) {
-        if (viewList == null) {
-            throw new NullPointerException();
-        }
+    protected final void switchViewsColor(ColorSwitchingViewList<View> viewList, int color) {
+        Preconditions.checkNotNull(viewList);
 
-        viewList.getViewList().stream().forEach(x -> x.setBackgroundColor(color));
+        viewList.getViewList().stream().forEach(x -> switchViewColor(x, color));
     }
 
-    protected final void switchTextViewColor(int color, int onColor, ColorSwitchingViewList<TextView> viewList) {
-        if (viewList == null) {
-            throw new NullPointerException();
-        }
+    protected final void switchViewColor(View view, int color) {
+        Preconditions.checkNotNull(view);
 
-        viewList.getViewList().stream().forEach(x -> {
-            x.setBackgroundColor(color);
-            x.setTextColor(onColor);
-        });
+        view.setBackgroundColor(color);
     }
 
-    protected final void switchTextViewColorOnlyText(int onColor, ColorSwitchingViewList<TextView> viewList) {
-        if (viewList == null) {
-            throw new NullPointerException();
-        }
+    protected final void switchTextViewsColor(ColorSwitchingViewList<TextView> viewList, int color, int onColor) {
+        Preconditions.checkNotNull(viewList);
 
-        viewList.getViewList().stream().forEach(x -> x.setTextColor(onColor));
+        viewList.getViewList().stream().forEach(x -> switchTextViewColor(x, color, onColor));
     }
 
-    protected final void switchTextViewColorOnlyIcon(int color, ColorSwitchingViewList<TextView> textViewList) {
-        if (textViewList == null) {
-            throw new NullPointerException();
-        }
+    protected final void switchTextViewColor(TextView view, int color, int onColor) {
+        Preconditions.checkNotNull(view);
 
-        for (TextView textView: textViewList.getViewList()) {
-            Drawable[] drawables = textView.getCompoundDrawablesRelative();
-            Drawable[] wrappedDrawable = new Drawable[drawables.length];
-            for (int i = 0; i < drawables.length; i++) {
-                Drawable drawable = drawables[i];
-                if (drawable != null) {
-                    wrappedDrawable[i] = DrawableCompat.wrap(drawable);
-                    DrawableCompat.setTint(wrappedDrawable[i], color);
-                }
+        view.setBackgroundColor(color);
+        view.setTextColor(onColor);
+    }
+
+    protected final void switchTextViewsColorOnlyText(ColorSwitchingViewList<TextView> viewList, int onColor) {
+        Preconditions.checkNotNull(viewList);
+
+        viewList.getViewList().stream().forEach(x -> switchTextViewColorOnlyText(x, onColor));
+    }
+
+    protected final void switchTextViewColorOnlyText(TextView view, int color) {
+        Preconditions.checkNotNull(view);
+
+        view.setTextColor(color);
+    }
+
+    protected final void switchTextViewsColorOnlyIcon(ColorSwitchingViewList<TextView> viewList, int color) {
+        Preconditions.checkNotNull(viewList);
+
+        viewList.getViewList().stream().forEach(x -> switchTextViewColorOnlyIcon(x, color));
+    }
+
+    protected final void switchTextViewColorOnlyIcon(TextView view, int color) {
+        Preconditions.checkNotNull(view);
+
+        Drawable[] drawables = view.getCompoundDrawablesRelative();
+        Drawable[] wrappedDrawable = new Drawable[drawables.length];
+
+        for (int i = 0; i < drawables.length; i++) {
+            Drawable drawable = drawables[i];
+            if (drawable != null) {
+                wrappedDrawable[i] = DrawableCompat.wrap(drawable);
+                DrawableCompat.setTint(wrappedDrawable[i], color);
             }
-            textView.setCompoundDrawablesRelativeWithIntrinsicBounds(
-                    wrappedDrawable[0], wrappedDrawable[1], wrappedDrawable[2], wrappedDrawable[3]);
         }
+        view.setCompoundDrawablesRelativeWithIntrinsicBounds(
+                wrappedDrawable[0], wrappedDrawable[1], wrappedDrawable[2], wrappedDrawable[3]);
+    }
+
+    protected final void switchImageView(ImageView imageView, int color) {
+        Preconditions.checkNotNull(imageView);
+
+        Drawable drawable = imageView.getDrawable();
+        switchDrawableColor(drawable, color);
+    }
+
+    protected final void switchDrawableColor(Drawable drawable, int color) {
+        Preconditions.checkNotNull(drawable);
+
+        drawable.setTint(color);
+    }
+
+    @NonNull
+    protected final ColorStateList createCheckedColorStateList(int checkedColor, int unCheckedColor) {
+        int[][] states = new int[][] {
+                new int[] { android.R.attr.state_checked },  // ON状態
+                new int[] { -android.R.attr.state_checked }  // OFF状態
+        };
+        int[] colors = new int[] {
+                checkedColor,
+                unCheckedColor
+        };
+
+        return new ColorStateList(states, colors);
     }
 }

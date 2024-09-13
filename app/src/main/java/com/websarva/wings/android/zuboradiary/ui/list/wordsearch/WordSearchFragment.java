@@ -113,9 +113,7 @@ public class WordSearchFragment extends BaseFragment {
                                 binding.linerLayoutKeyWordSearchBackground);
                         switcher.switchKeyWordSearchTextColor(binding.editTextKeyWordSearch);
 
-                        ColorSwitchingViewList<ProgressBar> progressBarList =
-                                new ColorSwitchingViewList<>(binding.progressBarWordSearchFullScreen);
-                        switcher.switchCircularProgressBarColor(progressBarList);
+                        switcher.switchCircularProgressBarColor(binding.progressBarWordSearchFullScreen);
                     }
                 });
     }

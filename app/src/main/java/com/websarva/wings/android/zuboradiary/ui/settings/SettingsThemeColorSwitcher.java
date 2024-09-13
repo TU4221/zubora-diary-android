@@ -1,13 +1,13 @@
 package com.websarva.wings.android.zuboradiary.ui.settings;
 
 import android.content.Context;
-import android.content.res.Resources;
-import android.view.View;
 import android.widget.TextView;
 
 import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor;
 import com.websarva.wings.android.zuboradiary.ui.BaseThemeColorSwitcher;
 import com.websarva.wings.android.zuboradiary.ui.ColorSwitchingViewList;
+
+import dagger.internal.Preconditions;
 
 class SettingsThemeColorSwitcher extends BaseThemeColorSwitcher {
     SettingsThemeColorSwitcher(Context context, ThemeColor themeColor) {
@@ -15,21 +15,17 @@ class SettingsThemeColorSwitcher extends BaseThemeColorSwitcher {
     }
 
     void switchSettingItemSectionColor(ColorSwitchingViewList<TextView> textViewList) {
-        if (textViewList == null) {
-            throw new NullPointerException();
-        }
+        Preconditions.checkNotNull(textViewList);
 
-        int surfaceContainerColor = themeColor.getSurfaceContainerColor(resources);
-        int onSurfaceColor = themeColor.getOnSurfaceColor(resources);
-        switchTextViewColor(surfaceContainerColor, onSurfaceColor, textViewList);
+        int color = themeColor.getSurfaceContainerColor(resources);
+        int onColor = themeColor.getOnSurfaceColor(resources);
+        switchTextViewsColor(textViewList, color, onColor);
     }
 
     void switchSettingItemIconColor(ColorSwitchingViewList<TextView> textViewList) {
-        if (textViewList == null) {
-            throw new NullPointerException();
-        }
+        Preconditions.checkNotNull(textViewList);
 
-        int primaryColor = themeColor.getPrimaryColor(resources);
-        switchTextViewColorOnlyIcon(primaryColor, textViewList);
+        int color = themeColor.getPrimaryColor(resources);
+        switchTextViewsColorOnlyIcon(textViewList, color);
     }
 }

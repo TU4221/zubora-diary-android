@@ -1,89 +1,64 @@
 package com.websarva.wings.android.zuboradiary.ui.list;
 
 import android.content.Context;
-import android.content.res.ColorStateList;
 import android.graphics.drawable.Drawable;
 import android.view.View;
 import android.widget.ImageView;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor;
 import com.websarva.wings.android.zuboradiary.ui.BaseThemeColorSwitcher;
 import com.websarva.wings.android.zuboradiary.ui.ColorSwitchingViewList;
 
+import dagger.internal.Preconditions;
+
 public class ListThemeColorSwitcher extends BaseThemeColorSwitcher {
     public ListThemeColorSwitcher(Context context, ThemeColor themeColor) {
         super(context, themeColor);
     }
 
-    public void switchListSectionBarColor(ColorSwitchingViewList<TextView> viewList) {
-        if (viewList == null) {
-            throw new NullPointerException();
-        }
+    public void switchListSectionBarColor(TextView textView) {
+        Preconditions.checkNotNull(textView);
 
-        int secondaryColor = themeColor.getSecondaryColor(resources);
-        int onSecondaryColor = themeColor.getOnSecondaryColor(resources);
-        switchTextViewColor(secondaryColor, onSecondaryColor, viewList);
+        int color = themeColor.getSecondaryColor(resources);
+        int onColor = themeColor.getOnSecondaryColor(resources);
+        switchTextViewColor(textView, color, onColor);
     }
 
-    public void switchListItemBackgroundColor(View recyclerBackgroundView) {
-        if (recyclerBackgroundView == null) {
-            throw new NullPointerException();
-        }
+    public void switchListItemBackgroundColor(View view) {
+        Preconditions.checkNotNull(view);
 
-        int secondaryContainerColor = themeColor.getSecondaryContainerColor(resources);
-        ColorSwitchingViewList<View> recyclerBackgroundViewList = new ColorSwitchingViewList<>(recyclerBackgroundView);
-        switchViewColor(secondaryContainerColor, recyclerBackgroundViewList);
+        int color = themeColor.getSecondaryContainerColor(resources);
+        switchViewColor(view, color);
     }
 
     public void switchTextColorOnListItemBackground(ColorSwitchingViewList<TextView> textViewList) {
-        if (textViewList == null) {
-            throw new NullPointerException();
-        }
+        Preconditions.checkNotNull(textViewList);
 
-        int onSecondaryContainerColor = themeColor.getOnSecondaryContainerColor(resources);
-        switchTextViewColorOnlyText(onSecondaryContainerColor, textViewList);
+        int color = themeColor.getOnSecondaryContainerColor(resources);
+        switchTextViewsColorOnlyText(textViewList, color);
     }
 
     public void switchImageViewColorOnListItemBackground(ImageView imageView) {
-        if (imageView == null) {
-            throw new NullPointerException();
-        }
+        Preconditions.checkNotNull(imageView);
 
-        int secondaryColor = themeColor.getSecondaryColor(resources);
-        Drawable drawable = imageView.getDrawable();
-        drawable.setTint(secondaryColor);
-        imageView.setImageDrawable(drawable);
+        int color = themeColor.getSecondaryColor(resources);
+        switchImageView(imageView, color);
     }
 
-    public void switchCircularProgressBarColor(ColorSwitchingViewList<ProgressBar> progressBarList) {
-        if (progressBarList == null) {
-            throw new NullPointerException();
-        }
+    public void switchKeyWordSearchBackgroundColor(View view) {
+        Preconditions.checkNotNull(view);
 
-        int primaryContainerColor = themeColor.getPrimaryContainerColor(resources);
-        progressBarList.getViewList().stream()
-                .forEach(x -> x.getIndeterminateDrawable().setTint(primaryContainerColor));
-    }
-
-    public void switchKeyWordSearchBackgroundColor(View background) {
-        if (background == null) {
-            throw new NullPointerException();
-        }
-
-        int surfaceDimColor = themeColor.getSurfaceDimColor(resources);
-        background.setBackgroundTintList(ColorStateList.valueOf(surfaceDimColor));
+        int color = themeColor.getSurfaceDimColor(resources);
+        Drawable background = view.getBackground();
+        switchDrawableColor(background, color);
     }
 
     public void switchKeyWordSearchTextColor(TextView textView) {
-        if (textView == null) {
-            throw new NullPointerException();
-        }
+        Preconditions.checkNotNull(textView);
 
-        int onSurfaceColor = themeColor.getOnSurfaceColor(resources);
-        ColorSwitchingViewList<TextView> textViewList = new ColorSwitchingViewList<>(textView);
-        switchTextViewColorOnlyText(onSurfaceColor, textViewList);
+        int color = themeColor.getOnSurfaceColor(resources);
+        switchTextViewColorOnlyText(textView, color);
     }
 
 }

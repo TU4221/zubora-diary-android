@@ -307,7 +307,7 @@ public abstract class DiaryYearMonthListAdapter extends ListAdapter<DiaryYearMon
             ListThemeColorSwitcher switcher = new ListThemeColorSwitcher(context, themeColor);
             ColorSwitchingViewList<TextView> textViewList =
                     new ColorSwitchingViewList<>(binding.textSectionBar);
-            switcher.switchListSectionBarColor(textViewList);
+            switcher.switchListSectionBarColor(binding.textSectionBar);
         }
     }
 
@@ -327,9 +327,7 @@ public abstract class DiaryYearMonthListAdapter extends ListAdapter<DiaryYearMon
             super(binding.getRoot());
 
             ListThemeColorSwitcher switcher = new ListThemeColorSwitcher(context, themeColor);
-            ColorSwitchingViewList<ProgressBar> progressBarList =
-                    new ColorSwitchingViewList<>(binding.progressBarListItemLoading);
-            switcher.switchCircularProgressBarColor(progressBarList);
+            switcher.switchCircularProgressBarColor(binding.progressBarListItemLoading);
         }
     }
 

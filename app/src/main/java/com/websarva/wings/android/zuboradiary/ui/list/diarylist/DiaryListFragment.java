@@ -108,9 +108,7 @@ public class DiaryListFragment extends BaseFragment {
                                 new ColorSwitchingViewList<>(binding.fabEditDiary);
                         switcher.switchFloatingActionButtonColor(floatingActionButtonList);
 
-                        ColorSwitchingViewList<ProgressBar> progressBarList =
-                                new ColorSwitchingViewList<>(binding.progressBarDiaryListFullScreen);
-                        switcher.switchCircularProgressBarColor(progressBarList);
+                        switcher.switchCircularProgressBarColor(binding.progressBarDiaryListFullScreen);
                     }
                 });
     }

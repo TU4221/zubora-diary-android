@@ -3,13 +3,13 @@ package com.websarva.wings.android.zuboradiary.ui.diary;
 import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
-import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor;
 import com.websarva.wings.android.zuboradiary.ui.BaseThemeColorSwitcher;
-import com.websarva.wings.android.zuboradiary.ui.ColorSwitchingViewList;
+
+import dagger.internal.Preconditions;
 
 public class DiaryThemeColorSwitcher extends BaseThemeColorSwitcher {
     public DiaryThemeColorSwitcher(Context context, ThemeColor themeColor) {
@@ -17,44 +17,34 @@ public class DiaryThemeColorSwitcher extends BaseThemeColorSwitcher {
     }
 
     public void switchSpinnerDropDownTextColor(TextView textView) {
-        if (textView == null) {
-            throw new NullPointerException();
-        }
+        Preconditions.checkNotNull(textView);
 
-        int surfaceColor = themeColor.getSurfaceColor(resources);
-        int onSurfaceColor = themeColor.getOnSurfaceColor(resources);
-        ColorSwitchingViewList<TextView> textViewList = new ColorSwitchingViewList<>(textView);
-        switchTextViewColor(surfaceColor, onSurfaceColor, textViewList);
+        int color = themeColor.getSurfaceColor(resources);
+        int onColor = themeColor.getOnSurfaceColor(resources);
+        switchTextViewColor(textView, color, onColor);
     }
 
     public void switchAttachedPictureImageViewColor(ImageView imageView) {
-        if (imageView == null) {
-            throw new NullPointerException();
-        }
+        Preconditions.checkNotNull(imageView);
 
-        int secondaryContainerColor = themeColor.getSecondaryContainerColor(resources);
-        Drawable drawable = imageView.getDrawable();
-        drawable.setTint(secondaryContainerColor);
-        imageView.setImageDrawable(drawable);
+        int color = themeColor.getSecondaryContainerColor(resources);
+        switchImageView(imageView, color);
 
         Drawable background = imageView.getBackground();
         if (background instanceof GradientDrawable) {
             GradientDrawable _background = (GradientDrawable) background;
-            _background.setStroke(2, secondaryContainerColor);
+            _background.setStroke(2, color);
             imageView.setBackground(_background);
         } else {
             throw new ClassCastException();
         }
     }
 
-    public void switchHistoryItemTextColor(TextView recyclerItemView) {
-        if (recyclerItemView == null) {
-            throw new NullPointerException();
-        }
+    public void switchHistoryItemTextColor(TextView textView) {
+        Preconditions.checkNotNull(textView);
 
-        int surfaceColor = themeColor.getSurfaceColor(resources);
-        int onSurfaceColor = themeColor.getOnSurfaceColor(resources);
-        ColorSwitchingViewList<TextView> recyclerItemViewList = new ColorSwitchingViewList<>(recyclerItemView);
-        switchTextViewColor(surfaceColor, onSurfaceColor, recyclerItemViewList);
+        int color = themeColor.getSurfaceColor(resources);
+        int onColor = themeColor.getOnSurfaceColor(resources);
+        switchTextViewColor(textView, color, onColor);
     }
 }
