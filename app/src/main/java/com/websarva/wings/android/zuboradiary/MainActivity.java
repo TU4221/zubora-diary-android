@@ -72,6 +72,9 @@ public class MainActivity extends AppCompatActivity {
     private FusedLocationProviderClient fusedLocationProviderClient;
     private LocationRequest locationRequest;
 
+    // Dialog用ThemeColor
+    private ThemeColor dialogThemeColor = ThemeColor.WHITE;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -348,6 +351,9 @@ public class MainActivity extends AppCompatActivity {
                         if (themeColor == null) {
                             return;
                         }
+
+                        MainActivity.this.dialogThemeColor = themeColor;
+
                         BaseThemeColorSwitcher switcher =
                                 new BaseThemeColorSwitcher(getApplicationContext(), themeColor);
 
@@ -396,5 +402,13 @@ public class MainActivity extends AppCompatActivity {
                 || navDestination.getId() == R.id.navigation_update_existing_diary_dialog_for_diary_edit_fragment
                 || navDestination.getId() == R.id.navigation_diary_item_title_edit_fragment
                 || navDestination.getId() == R.id.navigation_diary_item_title_delete_confirmation_dialog;
+    }
+
+    /**
+     * DialogFragment用メソッド
+     * */
+    // HACK:各FragmentからDialogへThemeColorを渡すのは冗長になるため。
+    public ThemeColor getDialogThemeColor() {
+        return dialogThemeColor;
     }
 }
