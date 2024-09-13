@@ -4,6 +4,7 @@ import android.app.Application;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatDelegate;
 import androidx.hilt.work.HiltWorkerFactory;
 import androidx.lifecycle.DefaultLifecycleObserver;
 import androidx.lifecycle.LifecycleOwner;
@@ -25,6 +26,9 @@ public class CustomApplication extends Application implements DefaultLifecycleOb
         Log.d("ApplicationLifeCycle", "onCreate()");
         super.onCreate();
         ProcessLifecycleOwner.get().getLifecycle().addObserver(this);
+
+        // ナイトモード無効化(ライトモード常に有効)
+        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
     }
 
     @Override
