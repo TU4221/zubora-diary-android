@@ -133,12 +133,4 @@
         <item name="colorSurfaceContainerHighest">@color/md_theme_color_black_surfaceContainerHighest</item>
     </style>
 
-    <style name="TestColorWhite">
-        <item name="android:background">@color/md_theme_color_white_primary</item>
-        <item name="android:textSize">10dp</item>
-    </style>
-    <style name="TestColorBlack">
-        <item name="android:background">@color/md_theme_color_black_primary</item>
-        <item name="android:textSize">20dp</item>
-    </style>
 </resources>
