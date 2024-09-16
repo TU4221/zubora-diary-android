@@ -48,6 +48,7 @@ import com.websarva.wings.android.zuboradiary.ui.list.wordsearch.WordSearchFragm
 import com.websarva.wings.android.zuboradiary.ui.settings.SettingsViewModel;
 
 import dagger.hilt.android.AndroidEntryPoint;
+import dagger.internal.Preconditions;
 
 //  MEMO:GitHubトークン(有効期限20240408から30日後)_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
 
@@ -408,7 +409,9 @@ public class MainActivity extends AppCompatActivity {
      * DialogFragment用メソッド
      * */
     // HACK:各FragmentからDialogへThemeColorを渡すのは冗長になるため。
+    @NonNull
     public ThemeColor getDialogThemeColor() {
+        Preconditions.checkNotNull(dialogThemeColor);
         return dialogThemeColor;
     }
 }
