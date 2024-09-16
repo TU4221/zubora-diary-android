@@ -706,4 +706,22 @@ public enum ThemeColor {
         }
         throw new IllegalStateException();
     }
+
+    public int getAlertDialogThemeResId() {
+        switch (this) {
+            case WHITE:
+                return R.style.MaterialAlertDialogThemeColorWhite;
+            case BLACK:
+                return R.style.MaterialAlertDialogThemeColorBlack;
+            case RED:
+                return R.style.MaterialAlertDialogThemeColorRed;
+            case BLUE:
+                return R.style.MaterialAlertDialogThemeColorBlue;
+            case GREEN:
+                return R.style.MaterialAlertDialogThemeColorGreen;
+            case YELLOW:
+                return R.style.MaterialAlertDialogThemeColorYellow;
+        }
+        throw new IllegalStateException();
+    }
 }

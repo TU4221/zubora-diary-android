@@ -19,4 +19,24 @@
     <style name="MaterialCalendarThemeColorYellow" parent="ThemeOverlay.Material3.MaterialCalendar">
         <item name="theme">@style/ThemeColorYellow</item>
     </style>
+
+    <!-- MaterialDatePicker用Theme -->
+    <style name="MaterialAlertDialogThemeColorWhite" parent="ThemeOverlay.Material3.MaterialAlertDialog">
+        <item name="theme">@style/ThemeColorWhite</item>
+    </style>
+    <style name="MaterialAlertDialogThemeColorBlack" parent="ThemeOverlay.Material3.MaterialAlertDialog">
+        <item name="theme">@style/ThemeColorBlack</item>
+    </style>
+    <style name="MaterialAlertDialogThemeColorRed" parent="ThemeOverlay.Material3.MaterialAlertDialog">
+        <item name="theme">@style/ThemeColorRed</item>
+    </style>
+    <style name="MaterialAlertDialogThemeColorBlue" parent="ThemeOverlay.Material3.MaterialAlertDialog">
+        <item name="theme">@style/ThemeColorBlue</item>
+    </style>
+    <style name="MaterialAlertDialogThemeColorGreen" parent="ThemeOverlay.Material3.MaterialAlertDialog">
+        <item name="theme">@style/ThemeColorGreen</item>
+    </style>
+    <style name="MaterialAlertDialogThemeColorYellow" parent="ThemeOverlay.Material3.MaterialAlertDialog">
+        <item name="theme">@style/ThemeColorYellow</item>
+    </style>
 </resources>
