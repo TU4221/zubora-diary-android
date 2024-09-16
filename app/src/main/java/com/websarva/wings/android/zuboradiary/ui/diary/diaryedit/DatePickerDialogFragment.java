@@ -52,7 +52,7 @@ public class DatePickerDialogFragment extends DialogFragment{
         } else {
             throw new ClassCastException();
         }
-        int theme = mainActivity.getDialogThemeColor().getDatePickerDialogTheme();
+        int theme = mainActivity.requireDialogThemeColor().getDatePickerDialogTheme();
 
         // MEMO:MaterialDatePickerはDialogクラスを作成できないのでダミーDialogを作成して戻り値として返し
         //      MaterialDatePicker#show()でDatePickerDialogを表示する。ダミーDialogも重なって表示されるので、
