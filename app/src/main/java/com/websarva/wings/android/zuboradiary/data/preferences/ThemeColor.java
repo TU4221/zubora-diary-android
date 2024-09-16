@@ -689,7 +689,7 @@ public enum ThemeColor {
         return ResourcesCompat.getColor(resources, colorResId, null);
     }
 
-    public int getDatePickerDialogTheme() {
+    public int getDatePickerDialogThemeResId() {
         switch (this) {
             case WHITE:
                 return R.style.MaterialCalendarThemeColorWhite;

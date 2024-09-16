@@ -2,14 +2,10 @@ package com.websarva.wings.android.zuboradiary.ui.diary.diaryedit;
 
 
 import android.app.Activity;
-import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
-import android.content.res.TypedArray;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
-import android.widget.DatePicker;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.DialogFragment;
@@ -20,18 +16,11 @@ import androidx.navigation.fragment.NavHostFragment;
 
 import com.google.android.material.datepicker.MaterialDatePicker;
 import com.google.android.material.datepicker.MaterialPickerOnPositiveButtonClickListener;
-import com.squareup.moshi.ToJson;
 import com.websarva.wings.android.zuboradiary.MainActivity;
-import com.websarva.wings.android.zuboradiary.R;
 
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
-import java.time.ZonedDateTime;
-import java.util.Date;
-import java.util.Objects;
-
-import dagger.internal.Preconditions;
 
 public class DatePickerDialogFragment extends DialogFragment{
     private static final String fromClassName = "From" + DatePickerDialogFragment.class.getName();
@@ -52,7 +41,7 @@ public class DatePickerDialogFragment extends DialogFragment{
         } else {
             throw new ClassCastException();
         }
-        int theme = mainActivity.requireDialogThemeColor().getDatePickerDialogTheme();
+        int theme = mainActivity.requireDialogThemeColor().getDatePickerDialogThemeResId();
 
         // MEMO:MaterialDatePickerはDialogクラスを作成できないのでダミーDialogを作成して戻り値として返し
         //      MaterialDatePicker#show()でDatePickerDialogを表示する。ダミーDialogも重なって表示されるので、
