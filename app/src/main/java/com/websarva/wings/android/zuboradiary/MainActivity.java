@@ -410,7 +410,7 @@ public class MainActivity extends AppCompatActivity {
      * */
     // HACK:各FragmentからDialogへThemeColorを渡すのは冗長になるため。
     @NonNull
-    public ThemeColor getDialogThemeColor() {
+    public ThemeColor requireDialogThemeColor() {
         Preconditions.checkNotNull(dialogThemeColor);
         return dialogThemeColor;
     }
