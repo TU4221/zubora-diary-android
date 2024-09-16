@@ -1,5 +1,6 @@
 package com.websarva.wings.android.zuboradiary.ui.diary.diaryedit;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
@@ -12,6 +13,8 @@ import androidx.lifecycle.SavedStateHandle;
 import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
 
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import com.websarva.wings.android.zuboradiary.MainActivity;
 import com.websarva.wings.android.zuboradiary.R;
 
 public class DiaryItemDeleteConfirmationDialogFragment extends DialogFragment {
@@ -26,7 +29,15 @@ public class DiaryItemDeleteConfirmationDialogFragment extends DialogFragment {
         this.deleteItemNumber =
                 DiaryItemDeleteConfirmationDialogFragmentArgs.fromBundle(requireArguments()).getDeleteItemNumber();
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        Activity activity = requireActivity();
+        MainActivity mainActivity;
+        if (activity instanceof MainActivity) {
+            mainActivity = (MainActivity) activity;
+        } else {
+            throw new ClassCastException();
+        }
+        int themeResId = mainActivity.requireDialogThemeColor().getAlertDialogThemeResId();
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(requireContext(), themeResId);
         builder.setTitle(R.string.dialog_diary_item_delete_confirmation_title);
         String message = getString(R.string.dialog_diary_item_delete_confirmation_first_message) + deleteItemNumber + getString(R.string.dialog_diary_item_delete_confirmation_second_message);
         builder.setMessage(message);
@@ -43,7 +54,7 @@ public class DiaryItemDeleteConfirmationDialogFragment extends DialogFragment {
             }
         });
         builder.setNegativeButton(R.string.dialog_diary_item_delete_confirmation_no, null);
-        AlertDialog dialog = builder.create();
-        return dialog;
+
+        return builder.create();
     }
 }
