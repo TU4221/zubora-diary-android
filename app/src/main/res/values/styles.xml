@@ -1,3 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- MaterialDatePicker用Theme -->
+    <style name="MaterialCalendarThemeColorWhite" parent="ThemeOverlay.Material3.MaterialCalendar">
+        <item name="theme">@style/ThemeColorWhite</item>
+    </style>
+    <style name="MaterialCalendarThemeColorBlack" parent="ThemeOverlay.Material3.MaterialCalendar">
+        <item name="theme">@style/ThemeColorBlack</item>
+    </style>
+    <style name="MaterialCalendarThemeColorRed" parent="ThemeOverlay.Material3.MaterialCalendar">
+        <item name="theme">@style/ThemeColorRed</item>
+    </style>
+    <style name="MaterialCalendarThemeColorBlue" parent="ThemeOverlay.Material3.MaterialCalendar">
+        <item name="theme">@style/ThemeColorBlue</item>
+    </style>
+    <style name="MaterialCalendarThemeColorGreen" parent="ThemeOverlay.Material3.MaterialCalendar">
+        <item name="theme">@style/ThemeColorGreen</item>
+    </style>
+    <style name="MaterialCalendarThemeColorYellow" parent="ThemeOverlay.Material3.MaterialCalendar">
+        <item name="theme">@style/ThemeColorYellow</item>
+    </style>
 </resources>
