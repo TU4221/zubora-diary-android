@@ -55,6 +55,11 @@ public class UpdateExistingDiaryDialogFragment extends BaseAlertDialogFragment {
     }
 
     @Override
+    public boolean isCancelable() {
+        return true;
+    }
+
+    @Override
     protected void handleCancel(@NonNull DialogInterface dialog) {
         // 処理なし
     }

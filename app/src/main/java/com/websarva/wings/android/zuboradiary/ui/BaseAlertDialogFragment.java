@@ -7,6 +7,7 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.DialogFragment;
 import androidx.lifecycle.SavedStateHandle;
 import androidx.navigation.NavBackStackEntry;
@@ -23,7 +24,7 @@ public abstract class BaseAlertDialogFragment extends DialogFragment {
 
     @NonNull
     @Override
-    public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
+    public final Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
         Activity activity = requireActivity();
         MainActivity mainActivity;
         if (activity instanceof MainActivity) {
@@ -61,10 +62,21 @@ public abstract class BaseAlertDialogFragment extends DialogFragment {
             }
         });
 
-        return builder.create();
+        AlertDialog alertDialog = builder.create();
+
+        // MEMO:UIに表示されているダイアログ外の部分をタッチしてダイアログを閉じる(キャンセルする)ことができるが、
+        //      これを無効にするには、AlertDialog#setCanceledOnTouchOutsideを設定する必要あり。
+        //      またスマホ等の戻るボタンでもダイアログを閉じる(キャンセルする)ことは可能だが、
+        //      これを無効にするには、DialogFragment#setCancelableを設定する必要あり。
+        if (!isCancelable()) {
+            alertDialog.setCanceledOnTouchOutside(false);
+            this.setCancelable(false);
+        }
+
+        return alertDialog;
     }
 
-    protected void setResult(String resultKey, Object result) {
+    protected final void setResult(String resultKey, Object result) {
         Preconditions.checkNotNull(resultKey);
         Preconditions.checkNotNull(result);
 
@@ -76,14 +88,19 @@ public abstract class BaseAlertDialogFragment extends DialogFragment {
         savedStateHandle.set(resultKey, result);
     }
 
+    // ダイアログ枠外タッチ、popBackStack時に処理
+    // MEMO:ダイアログフラグメントのCANCEL・DISMISS 処理について、
+    //      このクラスのような、DialogFragmentにAlertDialogを作成する場合、
+    //      CANCEL・DISMISSの処理内容はDialogFragmentのonCancel/onDismissをオーバーライドする必要がある。
+    //      DialogFragment、AlertDialogのリスナセットメソッドを使用して処理内容を記述きても処理はされない。
     @Override
-    public void onCancel(@NonNull DialogInterface dialog) {
+    public final void onCancel(@NonNull DialogInterface dialog) {
         handleCancel(dialog);
         super.onCancel(dialog);
     }
 
     @Override
-    public void dismiss() {
+    public final void dismiss() {
         handleDismiss();
         super.dismiss();
     }
@@ -95,6 +112,11 @@ public abstract class BaseAlertDialogFragment extends DialogFragment {
     protected abstract void handlePositiveButton(@NonNull DialogInterface dialog, int which);
 
     protected abstract void handleNegativeButton(@NonNull DialogInterface dialog, int which);
+
+    /**
+     * 戻り値をtrueにすると、ダイアログ枠外、戻るボタンタッチ時にダイアログをキャンセルすることを可能にする。
+     * */
+    public abstract boolean isCancelable();
 
     protected abstract void handleCancel(@NonNull DialogInterface dialog);
 
