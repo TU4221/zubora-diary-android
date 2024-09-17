@@ -61,24 +61,26 @@
     <string name="layout_diary_show_item_comment_hint">コメントなし</string>
 
 
+    <!-- BaseAlertDialogFragment -->
+    <string name="dialog_base_alert_yes">はい</string>
+    <string name="dialog_base_alert_no">いいえ</string>
+
     <!-- DiaryItemDeleteConfirmationDialog -->
     <string name="dialog_diary_item_delete_confirmation_title">削除確認</string>
     <string name="dialog_diary_item_delete_confirmation_first_message">項目</string>
     <string name="dialog_diary_item_delete_confirmation_second_message">を削除してもよろしいでしょうか。</string>
-    <string name="dialog_diary_item_delete_confirmation_yes">はい</string>
-    <string name="dialog_diary_item_delete_confirmation_no">いいえ</string>
 
     <!-- LoadExistingDiaryDialog -->
     <string name="dialog_load_Existing_diary_title">警告</string>
     <string name="dialog_load_Existing_diary_message">の日記は既に保存されています。保存された日記を読み込みますか。</string>
-    <string name="dialog_load_Existing_diary_yes">はい</string>
-    <string name="dialog_load_Existing_diary_no">いいえ</string>
 
     <!-- UpdateExistingDiaryDialog -->
     <string name="dialog_update_Existing_diary_title">警告</string>
     <string name="dialog_update_Existing_diary_message">の日記は既に保存されています。保存された日記を上書きしますか。</string>
-    <string name="dialog_update_Existing_diary_yes">はい</string>
-    <string name="dialog_update_Existing_diary_no">いいえ</string>
+
+    <!-- WeatherInformationDialog -->
+    <string name="dialog_weather_information_title">確認</string>
+    <string name="dialog_weather_information_message">の天気情報を取得しますか。</string>
 
 
     <!-- fragment_diary_edit -->

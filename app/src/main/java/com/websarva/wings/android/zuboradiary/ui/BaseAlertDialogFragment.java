@@ -17,8 +17,6 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.websarva.wings.android.zuboradiary.MainActivity;
 import com.websarva.wings.android.zuboradiary.R;
 
-import java.util.HashMap;
-
 import dagger.internal.Preconditions;
 
 public abstract class BaseAlertDialogFragment extends DialogFragment {
@@ -45,7 +43,7 @@ public abstract class BaseAlertDialogFragment extends DialogFragment {
         Preconditions.checkNotNull(message);
         builder.setMessage(message);
 
-        builder.setPositiveButton(R.string.dialog_diary_item_delete_confirmation_yes, new DialogInterface.OnClickListener() {
+        builder.setPositiveButton(R.string.dialog_base_alert_yes, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 Preconditions.checkNotNull(dialog);
@@ -54,7 +52,7 @@ public abstract class BaseAlertDialogFragment extends DialogFragment {
             }
         });
 
-        builder.setNegativeButton(R.string.dialog_diary_item_delete_confirmation_no, new DialogInterface.OnClickListener() {
+        builder.setNegativeButton(R.string.dialog_base_alert_no, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 Preconditions.checkNotNull(dialog);
