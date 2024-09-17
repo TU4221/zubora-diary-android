@@ -120,8 +120,6 @@
     <string name="dialog_diary_item_title_delete_confirmation_title">削除確認</string>
     <string name="dialog_diary_item_title_delete_confirmation_first_message">”</string>
     <string name="dialog_diary_item_title_delete_confirmation_second_message">”を削除しますか。</string>
-    <string name="dialog_diary_item_title_delete_confirmation_yes">はい</string>
-    <string name="dialog_diary_item_title_delete_confirmation_no">いいえ</string>
 
 
     <!-- fragment_settings -->
@@ -147,8 +145,6 @@
     <!-- DiaryDeleteConfirmationDialog -->
     <string name="dialog_diary_delete_confirmation_title">削除確認</string>
     <string name="dialog_diary_delete_confirmation_message">の日記を削除してもよろしいでしょうか。</string>
-    <string name="dialog_diary_delete_confirmation_yes">はい</string>
-    <string name="dialog_diary_delete_confirmation_no">いいえ</string>
 
     <!-- dialog_fragment_number_picker -->
     <string name="dialog_fragment_number_picker_cancel">キャンセル</string>
