@@ -139,6 +139,11 @@
     <string name="fragment_settings_permission_name_notification">通知</string>
     <string name="fragment_settings_permission_name_location">位置情報利用</string>
 
+    <!-- PermissionDialogFragment -->
+    <string name="dialog_permission_title">権限が必要です</string>
+    <string name="dialog_permission_first_message">この機能を正常に動作させるためには</string>
+    <string name="dialog_permission_third_message">権限が必要です。設定画面で権限を有効にしてください。</string>
+
     <!-- DiaryDeleteConfirmationDialog -->
     <string name="dialog_diary_delete_confirmation_title">削除確認</string>
     <string name="dialog_diary_delete_confirmation_message">の日記を削除してもよろしいでしょうか。</string>

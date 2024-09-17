@@ -12,6 +12,7 @@ import androidx.lifecycle.SavedStateHandle;
 import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
 
+import com.websarva.wings.android.zuboradiary.R;
 import com.websarva.wings.android.zuboradiary.ui.BaseAlertDialogFragment;
 
 public class PermissionDialogFragment extends BaseAlertDialogFragment {
@@ -21,14 +22,14 @@ public class PermissionDialogFragment extends BaseAlertDialogFragment {
 
     @Override
     protected String createTitle() {
-        return "権限が必要です";
+        return getString(R.string.dialog_permission_title);
     }
 
     @Override
     protected String createMessage() {
-        String firstMessage = "この機能を正常に動作させるためには";
+        String firstMessage = getString(R.string.dialog_permission_first_message);
         String secondMessage = PermissionDialogFragmentArgs.fromBundle(requireArguments()).getPermissionName();
-        String thirdMessage = "権限が必要です。設定画面で権限を有効にしてください。";
+        String thirdMessage = getString(R.string.dialog_permission_third_message);
         return firstMessage + secondMessage + thirdMessage;
     }
 
