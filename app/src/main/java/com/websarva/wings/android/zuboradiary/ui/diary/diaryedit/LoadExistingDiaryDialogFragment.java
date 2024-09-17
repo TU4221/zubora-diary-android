@@ -14,47 +14,46 @@ import androidx.navigation.fragment.NavHostFragment;
 
 import com.websarva.wings.android.zuboradiary.R;
 import com.websarva.wings.android.zuboradiary.data.DateTimeStringConverter;
+import com.websarva.wings.android.zuboradiary.ui.BaseAlertDialogFragment;
 
 import java.time.LocalDate;
 
-public class LoadExistingDiaryDialogFragment extends DialogFragment {
+public class LoadExistingDiaryDialogFragment extends BaseAlertDialogFragment {
     private static final String fromClassName =
             "From" + LoadExistingDiaryDialogFragment.class.getName();
     public static final String KEY_SELECTED_BUTTON = "SelectedButton" + fromClassName;
 
-    @NonNull
     @Override
-    public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
+    protected String createTitle() {
+        return getString(R.string.dialog_load_Existing_diary_title);
+    }
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-        builder.setTitle(R.string.dialog_load_Existing_diary_title);
-
+    @Override
+    protected String createMessage() {
         LocalDate loadDiaryDate =
                 LoadExistingDiaryDialogFragmentArgs.fromBundle(requireArguments()).getLoadDiaryDate();
         DateTimeStringConverter dateTimeStringConverter = new DateTimeStringConverter();
         String stringLoadDiaryDate = dateTimeStringConverter.toStringDate(loadDiaryDate);
-        String message = stringLoadDiaryDate + getString(R.string.dialog_load_Existing_diary_message);
-
-        builder.setMessage(message);
-        builder.setPositiveButton(R.string.dialog_load_Existing_diary_yes, new custumOnClickListener());
-        builder.setNegativeButton(R.string.dialog_load_Existing_diary_no, new custumOnClickListener());
-        return builder.create();
+        return stringLoadDiaryDate + getString(R.string.dialog_load_Existing_diary_message);
     }
 
-    private class custumOnClickListener implements DialogInterface.OnClickListener {
+    @Override
+    protected void handlePositiveButton(@NonNull DialogInterface dialog, int which) {
+        setResult(KEY_SELECTED_BUTTON, DialogInterface.BUTTON_POSITIVE);
+    }
 
-        @Override
-        public void onClick(DialogInterface dialog, int which) {
-            NavController navController =
-                    NavHostFragment
-                            .findNavController(LoadExistingDiaryDialogFragment.this);
-            SavedStateHandle savedStateHandle =
-                    navController.getPreviousBackStackEntry().getSavedStateHandle();
-            savedStateHandle
-                    .set(
-                            KEY_SELECTED_BUTTON,
-                            which
-                    );
-        }
+    @Override
+    protected void handleNegativeButton(@NonNull DialogInterface dialog, int which) {
+        // 処理なし
+    }
+
+    @Override
+    protected void handleCancel(@NonNull DialogInterface dialog) {
+        // 処理なし
+    }
+
+    @Override
+    protected void handleDismiss() {
+        // 処理なし
     }
 }

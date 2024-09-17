@@ -15,45 +15,47 @@ import androidx.navigation.fragment.NavHostFragment;
 
 import com.websarva.wings.android.zuboradiary.R;
 import com.websarva.wings.android.zuboradiary.data.DateTimeStringConverter;
+import com.websarva.wings.android.zuboradiary.ui.BaseAlertDialogFragment;
 
 import java.time.LocalDate;
 
-public class WeatherInformationDialogFragment extends DialogFragment {
+public class WeatherInformationDialogFragment extends BaseAlertDialogFragment {
+
     private static final String fromClassName =
             "From" + WeatherInformationDialogFragment.class.getName();
     public static final String KEY_SELECTED_BUTTON = "SelectedButton" + fromClassName;
 
-    @NonNull
     @Override
-    public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
+    protected String createTitle() {
+        return "確認";
+    }
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-        builder.setTitle("確認");
-
+    @Override
+    protected String createMessage() {
         LocalDate loadDiaryDate =
                 WeatherInformationDialogFragmentArgs.fromBundle(requireArguments()).getTargetDiaryDate();
         DateTimeStringConverter dateTimeStringConverter = new DateTimeStringConverter();
         String stringDate = dateTimeStringConverter.toStringDate(loadDiaryDate);
-        String message = stringDate + "の天気情報を取得しますか。";
-
-        builder.setMessage(message);
-        builder.setPositiveButton(R.string.dialog_load_Existing_diary_yes, new custumOnClickListener());
-        builder.setNegativeButton(R.string.dialog_load_Existing_diary_no, new custumOnClickListener());
-        return builder.create();
+        return stringDate + "の天気情報を取得しますか。";
     }
 
-    private class custumOnClickListener implements DialogInterface.OnClickListener {
+    @Override
+    protected void handlePositiveButton(@NonNull DialogInterface dialog, int which) {
+        setResult(KEY_SELECTED_BUTTON, DialogInterface.BUTTON_POSITIVE);
+    }
 
-        @Override
-        public void onClick(DialogInterface dialog, int which) {
-            NavController navController =
-                    NavHostFragment
-                            .findNavController(WeatherInformationDialogFragment.this);
-            NavBackStackEntry navBackStackEntry = navController.getPreviousBackStackEntry();
-            if (navBackStackEntry != null) {
-                SavedStateHandle savedStateHandle = navBackStackEntry.getSavedStateHandle();
-                savedStateHandle.set(KEY_SELECTED_BUTTON, which);
-            }
-        }
+    @Override
+    protected void handleNegativeButton(@NonNull DialogInterface dialog, int which) {
+        // 処理なし
+    }
+
+    @Override
+    protected void handleCancel(@NonNull DialogInterface dialog) {
+        // 処理なし
+    }
+
+    @Override
+    protected void handleDismiss() {
+        // 処理なし
     }
 }

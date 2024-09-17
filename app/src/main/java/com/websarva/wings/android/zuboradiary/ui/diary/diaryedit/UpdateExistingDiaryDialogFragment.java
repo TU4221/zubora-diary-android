@@ -15,47 +15,52 @@ import androidx.navigation.fragment.NavHostFragment;
 
 import com.websarva.wings.android.zuboradiary.R;
 import com.websarva.wings.android.zuboradiary.data.DateTimeStringConverter;
+import com.websarva.wings.android.zuboradiary.ui.BaseAlertDialogFragment;
 
 import java.time.LocalDate;
 
-public class UpdateExistingDiaryDialogFragment extends DialogFragment {
+public class UpdateExistingDiaryDialogFragment extends BaseAlertDialogFragment {
+
     private static final String fromClassName =
             "From" + UpdateExistingDiaryDialogFragment.class.getName();
     public static final String KEY_SELECTED_BUTTON = "SelectedButton" + fromClassName;
     public static final String KEY_UPDATE_TYPE = "UpdateType" + fromClassName;
 
-    @NonNull
     @Override
-    public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
+    protected String createTitle() {
+        return getString(R.string.dialog_update_Existing_diary_title);
+    }
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-        builder.setTitle(R.string.dialog_update_Existing_diary_title);
-
+    @Override
+    protected String createMessage() {
         LocalDate updateDiaryDate =
                 UpdateExistingDiaryDialogFragmentArgs.fromBundle(requireArguments()).getUpdateDiaryDate();
         DateTimeStringConverter dateTimeStringConverter = new DateTimeStringConverter();
         String stringUpdateDiaryDate = dateTimeStringConverter.toStringDate(updateDiaryDate);
-        String message = stringUpdateDiaryDate + getString(R.string.dialog_update_Existing_diary_message);
+        return stringUpdateDiaryDate + getString(R.string.dialog_update_Existing_diary_message);
+    }
 
-        builder.setMessage(message);
-        builder.setPositiveButton(R.string.dialog_update_Existing_diary_yes, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                NavController navController =
-                        NavHostFragment
-                                .findNavController(UpdateExistingDiaryDialogFragment.this);
-                NavBackStackEntry navBackStackEntry = navController.getPreviousBackStackEntry();
-                if (navBackStackEntry != null) {
-                    SavedStateHandle savedStateHandle = navBackStackEntry.getSavedStateHandle();
-                    savedStateHandle.set(KEY_SELECTED_BUTTON, DialogInterface.BUTTON_POSITIVE);
-                    int updateType =
-                            UpdateExistingDiaryDialogFragmentArgs.fromBundle(requireArguments())
-                                    .getUpdateType();
-                    savedStateHandle.set(KEY_UPDATE_TYPE, updateType);
-                }
-            }
-        });
-        builder.setNegativeButton(R.string.dialog_update_Existing_diary_no, null);
-        return builder.create();
+    @Override
+    protected void handlePositiveButton(@NonNull DialogInterface dialog, int which) {
+        setResult(KEY_SELECTED_BUTTON, DialogInterface.BUTTON_POSITIVE);
+
+        int updateType =
+                UpdateExistingDiaryDialogFragmentArgs.fromBundle(requireArguments()).getUpdateType();
+        setResult(KEY_UPDATE_TYPE, updateType);
+    }
+
+    @Override
+    protected void handleNegativeButton(@NonNull DialogInterface dialog, int which) {
+        // 処理なし
+    }
+
+    @Override
+    protected void handleCancel(@NonNull DialogInterface dialog) {
+        // 処理なし
+    }
+
+    @Override
+    protected void handleDismiss() {
+        // 処理なし
     }
 }
