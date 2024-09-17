@@ -12,38 +12,48 @@ import androidx.lifecycle.SavedStateHandle;
 import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
 
-public class PermissionDialogFragment extends DialogFragment {
+import com.websarva.wings.android.zuboradiary.ui.BaseAlertDialogFragment;
+
+public class PermissionDialogFragment extends BaseAlertDialogFragment {
+
     private static final String FROM_CLASS_NAME = "From" + DayOfWeekPickerDialogFragment.class.getName();
     public static final String KEY_SELECTED_BUTTON = "SelectedButton" + FROM_CLASS_NAME;
-    @NonNull
-    @Override
-    public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
-        // Navigation設定
-        NavController navController = NavHostFragment.findNavController(this);
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-        builder.setTitle("権限が必要です");
+    @Override
+    protected String createTitle() {
+        return "権限が必要です";
+    }
+
+    @Override
+    protected String createMessage() {
         String firstMessage = "この機能を正常に動作させるためには";
         String secondMessage = PermissionDialogFragmentArgs.fromBundle(requireArguments()).getPermissionName();
         String thirdMessage = "権限が必要です。設定画面で権限を有効にしてください。";
-        builder.setMessage(firstMessage + secondMessage + thirdMessage);
-        builder.setPositiveButton(
-                "設定画面を開く", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        SavedStateHandle savedStateHandle =
-                                navController.getPreviousBackStackEntry().getSavedStateHandle();
-                        savedStateHandle.set(KEY_SELECTED_BUTTON, which);
-                        navController.navigateUp();
-                    }
-                });
-        builder.setNegativeButton(
-                "いいえ", null);
+        return firstMessage + secondMessage + thirdMessage;
+    }
 
-        AlertDialog dialog = builder.create();
-        dialog.setCanceledOnTouchOutside(true);
-        setCancelable(true);
+    @Override
+    protected void handlePositiveButton(@NonNull DialogInterface dialog, int which) {
+        setResult(KEY_SELECTED_BUTTON, DialogInterface.BUTTON_POSITIVE);
+    }
 
-        return dialog;
+    @Override
+    protected void handleNegativeButton(@NonNull DialogInterface dialog, int which) {
+        // 処理なし
+    }
+
+    @Override
+    public boolean isCancelable() {
+        return true;
+    }
+
+    @Override
+    protected void handleCancel(@NonNull DialogInterface dialog) {
+        // 処理なし
+    }
+
+    @Override
+    protected void handleDismiss() {
+        // 処理なし
     }
 }
