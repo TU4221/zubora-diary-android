@@ -1,60 +1,45 @@
 package com.websarva.wings.android.zuboradiary.ui.diary.diaryedit;
 
-import android.app.Activity;
-import android.app.AlertDialog;
-import android.app.Dialog;
-import android.content.DialogInterface;
-import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.DialogFragment;
-import androidx.lifecycle.SavedStateHandle;
-import androidx.navigation.NavController;
-import androidx.navigation.fragment.NavHostFragment;
-
-import com.google.android.material.dialog.MaterialAlertDialogBuilder;
-import com.websarva.wings.android.zuboradiary.MainActivity;
 import com.websarva.wings.android.zuboradiary.R;
+import com.websarva.wings.android.zuboradiary.ui.BaseAlertDialogFragment;
 
-public class DiaryItemDeleteConfirmationDialogFragment extends DialogFragment {
+public class DiaryItemDeleteConfirmationDialogFragment extends BaseAlertDialogFragment {
+
     private static final String fromClassName =
             "From" + DiaryItemDeleteConfirmationDialogFragment.class.getName();
     public static final String KEY_DELETE_ITEM_NUMBER = "DeleteItemNumber" + fromClassName;
-    private int deleteItemNumber;
 
-    @NonNull
     @Override
-    public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
-        this.deleteItemNumber =
+    protected String createTitle() {
+        return getString(R.string.dialog_diary_item_delete_confirmation_title);
+    }
+
+    @Override
+    protected String createMessage() {
+        int deleteItemNumber =
                 DiaryItemDeleteConfirmationDialogFragmentArgs.fromBundle(requireArguments()).getDeleteItemNumber();
+        return getString(R.string.dialog_diary_item_delete_confirmation_first_message) + deleteItemNumber + getString(R.string.dialog_diary_item_delete_confirmation_second_message);
+    }
 
-        Activity activity = requireActivity();
-        MainActivity mainActivity;
-        if (activity instanceof MainActivity) {
-            mainActivity = (MainActivity) activity;
-        } else {
-            throw new ClassCastException();
-        }
-        int themeResId = mainActivity.requireDialogThemeColor().getAlertDialogThemeResId();
-        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(requireContext(), themeResId);
-        builder.setTitle(R.string.dialog_diary_item_delete_confirmation_title);
-        String message = getString(R.string.dialog_diary_item_delete_confirmation_first_message) + deleteItemNumber + getString(R.string.dialog_diary_item_delete_confirmation_second_message);
-        builder.setMessage(message);
-        builder.setPositiveButton(R.string.dialog_diary_item_delete_confirmation_yes, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int which) {
-                NavController navController =
-                        NavHostFragment
-                                .findNavController(DiaryItemDeleteConfirmationDialogFragment.this);
-                SavedStateHandle savedStateHandle =
-                        navController.getPreviousBackStackEntry().getSavedStateHandle();
-                savedStateHandle
-                        .set(KEY_DELETE_ITEM_NUMBER, DiaryItemDeleteConfirmationDialogFragment.this.deleteItemNumber);
-            }
-        });
-        builder.setNegativeButton(R.string.dialog_diary_item_delete_confirmation_no, null);
+    @Override
+    protected void handlePositiveButton() {
+        int deleteItemNumber =
+                DiaryItemDeleteConfirmationDialogFragmentArgs.fromBundle(requireArguments()).getDeleteItemNumber();
+        setResult(KEY_DELETE_ITEM_NUMBER, deleteItemNumber);
+    }
 
-        return builder.create();
+    @Override
+    protected void handleNegativeButton() {
+        // 処理なし
+    }
+
+    @Override
+    protected void handleCancel() {
+        // 処理なし
+    }
+
+    @Override
+    protected void handleDismiss() {
+        // 処理なし
     }
 }
