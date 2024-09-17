@@ -48,7 +48,7 @@ public class LoadExistingDiaryDialogFragment extends BaseAlertDialogFragment {
     }
 
     @Override
-    public boolean isCancelable() {
+    public boolean isCancelableOtherThanPressingButton() {
         return true;
     }
 

@@ -68,7 +68,7 @@ public abstract class BaseAlertDialogFragment extends DialogFragment {
         //      これを無効にするには、AlertDialog#setCanceledOnTouchOutsideを設定する必要あり。
         //      またスマホ等の戻るボタンでもダイアログを閉じる(キャンセルする)ことは可能だが、
         //      これを無効にするには、DialogFragment#setCancelableを設定する必要あり。
-        if (!isCancelable()) {
+        if (!isCancelableOtherThanPressingButton()) {
             alertDialog.setCanceledOnTouchOutside(false);
             this.setCancelable(false);
         }
@@ -116,7 +116,7 @@ public abstract class BaseAlertDialogFragment extends DialogFragment {
     /**
      * 戻り値をtrueにすると、ダイアログ枠外、戻るボタンタッチ時にダイアログをキャンセルすることを可能にする。
      * */
-    public abstract boolean isCancelable();
+    public abstract boolean isCancelableOtherThanPressingButton();
 
     protected abstract void handleCancel(@NonNull DialogInterface dialog);
 

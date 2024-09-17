@@ -48,7 +48,7 @@ public class DiaryItemTitleDeleteConfirmationDialogFragment extends BaseAlertDia
     }
 
     @Override
-    public boolean isCancelable() {
+    public boolean isCancelableOtherThanPressingButton() {
         return true;
     }
 
