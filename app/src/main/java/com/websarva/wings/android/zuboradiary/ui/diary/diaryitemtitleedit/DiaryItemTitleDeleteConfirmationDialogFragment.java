@@ -68,6 +68,6 @@ public class DiaryItemTitleDeleteConfirmationDialogFragment extends BaseAlertDia
 
     @Override
     protected void handleDismiss() {
-
+        // 処理なし
     }
 }
