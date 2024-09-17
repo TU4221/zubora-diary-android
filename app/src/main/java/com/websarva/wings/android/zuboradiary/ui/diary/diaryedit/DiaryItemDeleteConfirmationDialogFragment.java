@@ -1,5 +1,9 @@
 package com.websarva.wings.android.zuboradiary.ui.diary.diaryedit;
 
+import android.content.DialogInterface;
+
+import androidx.annotation.NonNull;
+
 import com.websarva.wings.android.zuboradiary.R;
 import com.websarva.wings.android.zuboradiary.ui.BaseAlertDialogFragment;
 
@@ -22,19 +26,19 @@ public class DiaryItemDeleteConfirmationDialogFragment extends BaseAlertDialogFr
     }
 
     @Override
-    protected void handlePositiveButton() {
+    protected void handlePositiveButton(@NonNull DialogInterface dialog, int which) {
         int deleteItemNumber =
                 DiaryItemDeleteConfirmationDialogFragmentArgs.fromBundle(requireArguments()).getDeleteItemNumber();
         setResult(KEY_DELETE_ITEM_NUMBER, deleteItemNumber);
     }
 
     @Override
-    protected void handleNegativeButton() {
+    protected void handleNegativeButton(@NonNull DialogInterface dialog, int which) {
         // 処理なし
     }
 
     @Override
-    protected void handleCancel() {
+    protected void handleCancel(@NonNull DialogInterface dialog) {
         // 処理なし
     }
 

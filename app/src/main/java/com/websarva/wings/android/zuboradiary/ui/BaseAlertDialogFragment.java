@@ -39,14 +39,14 @@ public abstract class BaseAlertDialogFragment extends DialogFragment {
         builder.setMessage(createMessage());
         builder.setPositiveButton(R.string.dialog_diary_item_delete_confirmation_yes, new DialogInterface.OnClickListener() {
             @Override
-            public void onClick(DialogInterface dialogInterface, int which) {
-                handlePositiveButton();
+            public void onClick(DialogInterface dialog, int which) {
+                handlePositiveButton(dialog, which);
             }
         });
         builder.setNegativeButton(R.string.dialog_diary_item_delete_confirmation_no, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                handleNegativeButton();
+                handleNegativeButton(dialog, which);
             }
         });
 
@@ -67,7 +67,7 @@ public abstract class BaseAlertDialogFragment extends DialogFragment {
 
     @Override
     public void onCancel(@NonNull DialogInterface dialog) {
-        handleCancel();
+        handleCancel(dialog);
     }
 
     @Override
@@ -77,8 +77,8 @@ public abstract class BaseAlertDialogFragment extends DialogFragment {
 
     protected abstract String createTitle();
     protected abstract String createMessage();
-    protected abstract void handlePositiveButton();
-    protected abstract void handleNegativeButton();
-    protected abstract void handleCancel();
+    protected abstract void handlePositiveButton(@NonNull DialogInterface dialog, int which);
+    protected abstract void handleNegativeButton(@NonNull DialogInterface dialog, int which);
+    protected abstract void handleCancel(@NonNull DialogInterface dialog);
     protected abstract void handleDismiss();
 }
