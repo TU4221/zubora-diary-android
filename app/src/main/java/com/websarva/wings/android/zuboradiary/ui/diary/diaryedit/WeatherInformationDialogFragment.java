@@ -27,7 +27,7 @@ public class WeatherInformationDialogFragment extends BaseAlertDialogFragment {
 
     @Override
     protected String createTitle() {
-        return "確認";
+        return getString(R.string.dialog_weather_information_title);
     }
 
     @Override
@@ -36,7 +36,7 @@ public class WeatherInformationDialogFragment extends BaseAlertDialogFragment {
                 WeatherInformationDialogFragmentArgs.fromBundle(requireArguments()).getTargetDiaryDate();
         DateTimeStringConverter dateTimeStringConverter = new DateTimeStringConverter();
         String stringDate = dateTimeStringConverter.toStringDate(loadDiaryDate);
-        return stringDate + "の天気情報を取得しますか。";
+        return stringDate + getString(R.string.dialog_weather_information_message);
     }
 
     @Override
