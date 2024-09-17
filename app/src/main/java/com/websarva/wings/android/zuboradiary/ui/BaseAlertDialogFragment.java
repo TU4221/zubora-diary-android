@@ -79,11 +79,13 @@ public abstract class BaseAlertDialogFragment extends DialogFragment {
     @Override
     public void onCancel(@NonNull DialogInterface dialog) {
         handleCancel(dialog);
+        super.onCancel(dialog);
     }
 
     @Override
     public void dismiss() {
         handleDismiss();
+        super.dismiss();
     }
 
     protected abstract String createTitle();
