@@ -15,55 +15,53 @@ import androidx.navigation.fragment.NavHostFragment;
 
 import com.websarva.wings.android.zuboradiary.R;
 import com.websarva.wings.android.zuboradiary.data.DateTimeStringConverter;
+import com.websarva.wings.android.zuboradiary.ui.BaseAlertDialogFragment;
 
 import java.time.LocalDate;
 
-public class DiaryDeleteConfirmationDialogFragment extends DialogFragment {
+public class DiaryDeleteConfirmationDialogFragment extends BaseAlertDialogFragment {
     private static final String fromClassName =
             "From" + DiaryDeleteConfirmationDialogFragment.class.getName();
     public static final String KEY_DELETE_DIARY_DATE = "DeleteDiaryDate" + fromClassName;
 
-    @NonNull
     @Override
-    public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
+    protected String createTitle() {
+        return getString(R.string.dialog_diary_delete_confirmation_title);
+    }
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-        builder.setTitle(R.string.dialog_diary_delete_confirmation_title);
+    @Override
+    protected String createMessage() {
         LocalDate date =
                 DiaryDeleteConfirmationDialogFragmentArgs.fromBundle(requireArguments()).getDeleteDiaryDate();
         DateTimeStringConverter dateTimeStringConverter = new DateTimeStringConverter();
         String strDate = dateTimeStringConverter.toStringDate(date);
-        String message = strDate + getString(R.string.dialog_diary_delete_confirmation_message);
-
-        builder.setMessage(message);
-        builder.setPositiveButton(R.string.dialog_diary_delete_confirmation_yes, new DialogButtonClickListener());
-        builder.setNegativeButton(R.string.dialog_diary_delete_confirmation_no, new DialogButtonClickListener());
-        return builder.create();
+        return strDate + getString(R.string.dialog_diary_delete_confirmation_message);
     }
 
-    private class DialogButtonClickListener implements DialogInterface.OnClickListener {
-        @Override
-        public void onClick(DialogInterface dialogInterface, int which) {
-            switch (which) {
-                case DialogInterface.BUTTON_POSITIVE:
-                    NavController navController =
-                            NavHostFragment
-                                    .findNavController(DiaryDeleteConfirmationDialogFragment.this);
-                    NavBackStackEntry navBackStackEntry = navController.getPreviousBackStackEntry();
-                    if (navBackStackEntry == null) {
-                        return;
-                    }
-                    SavedStateHandle savedStateHandle = navBackStackEntry.getSavedStateHandle();
-                    LocalDate deleteDiaryDate =
-                            DiaryDeleteConfirmationDialogFragmentArgs.fromBundle(requireArguments())
-                                    .getDeleteDiaryDate();
-                    savedStateHandle.set(KEY_DELETE_DIARY_DATE, deleteDiaryDate);
-                    break;
+    @Override
+    protected void handlePositiveButton(@NonNull DialogInterface dialog, int which) {
+        LocalDate deleteDiaryDate =
+                DiaryDeleteConfirmationDialogFragmentArgs.fromBundle(requireArguments()).getDeleteDiaryDate();
+        setResult(KEY_DELETE_DIARY_DATE, deleteDiaryDate);
+    }
 
-                case DialogInterface.BUTTON_NEGATIVE:
-                    // 処理なし
-                    break;
-            }
-        }
+    @Override
+    protected void handleNegativeButton(@NonNull DialogInterface dialog, int which) {
+        // 処理なし
+    }
+
+    @Override
+    public boolean isCancelable() {
+        return true;
+    }
+
+    @Override
+    protected void handleCancel(@NonNull DialogInterface dialog) {
+        // 処理なし
+    }
+
+    @Override
+    protected void handleDismiss() {
+        // 処理なし
     }
 }
