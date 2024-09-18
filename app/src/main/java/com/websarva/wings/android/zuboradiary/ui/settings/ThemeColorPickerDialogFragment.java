@@ -43,25 +43,25 @@ public class ThemeColorPickerDialogFragment extends BaseNumberPickersBottomSheet
     }
 
     @Override
-    protected void setUpNumberPickers(DialogFragmentNumberPickersBinding binding) {
+    protected void setUpNumberPickers() {
         int maxNumThemeColors = ThemeColor.values().length;
         binding.numberPickerFirst.setMaxValue(maxNumThemeColors - 1);
         binding.numberPickerFirst.setMinValue(0);
-        setUpInitialValue(binding);
-        setUpDisplayedValues(binding);
+        setUpInitialValue();
+        setUpDisplayedValues();
         binding.numberPickerFirst.setWrapSelectorWheel(false);
         binding.numberPickerSecond.setVisibility(View.GONE);
         binding.numberPickerThird.setVisibility(View.GONE);
     }
 
-    private void setUpInitialValue(DialogFragmentNumberPickersBinding binding) {
+    private void setUpInitialValue() {
         ThemeColor currentThemeColor =
                 ThemeColorPickerDialogFragmentArgs
                         .fromBundle(requireArguments()).getCurrentThemeColor();
         binding.numberPickerFirst.setValue(currentThemeColor.ordinal()); // MEMO:最大最小値を設定してから設定すること。(0の位置が表示される)
     }
 
-    private void setUpDisplayedValues(DialogFragmentNumberPickersBinding binding) {
+    private void setUpDisplayedValues() {
         int maxNumThemeColors = ThemeColor.values().length;
         String[] themeColorList = new String[maxNumThemeColors];
         for (ThemeColor item: ThemeColor.values()) {

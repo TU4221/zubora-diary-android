@@ -31,7 +31,7 @@ public abstract class BaseNumberPickersBottomSheetDialogFragment extends BaseBot
         binding = createBinding(inflater, container, savedInstanceState);
         binding.buttonDecision.setOnClickListener(new PositiveButtonClickListener());
         binding.buttonCancel.setOnClickListener(new NegativeButtonClickListener());
-        setUpNumberPickers(binding);
+        setUpNumberPickers();
         return binding.getRoot();
     }
 
@@ -65,7 +65,7 @@ public abstract class BaseNumberPickersBottomSheetDialogFragment extends BaseBot
         }
     }
 
-    protected abstract void setUpNumberPickers(DialogFragmentNumberPickersBinding binding);
+    protected abstract void setUpNumberPickers();
 
     protected final void setResult(String key, Object value) {
         Preconditions.checkNotNull(key);

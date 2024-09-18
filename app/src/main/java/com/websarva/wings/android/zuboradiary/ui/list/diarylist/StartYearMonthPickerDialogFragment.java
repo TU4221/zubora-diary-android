@@ -5,7 +5,6 @@ import android.view.View;
 
 import androidx.annotation.NonNull;
 
-import com.websarva.wings.android.zuboradiary.databinding.DialogFragmentNumberPickersBinding;
 import com.websarva.wings.android.zuboradiary.ui.BaseNumberPickersBottomSheetDialogFragment;
 
 import java.time.LocalDate;
@@ -18,7 +17,7 @@ public class StartYearMonthPickerDialogFragment extends BaseNumberPickersBottomS
     public static final String KEY_SELECTED_YEAR_MONTH = "SelectedYearMonth" + fromClassName;
 
     @Override
-    protected void setUpNumberPickers(DialogFragmentNumberPickersBinding binding) {
+    protected void setUpNumberPickers() {
         LocalDate today = LocalDate.now();
         Year maxYear =
                 StartYearMonthPickerDialogFragmentArgs.fromBundle(requireArguments()).getYearMaxValue();

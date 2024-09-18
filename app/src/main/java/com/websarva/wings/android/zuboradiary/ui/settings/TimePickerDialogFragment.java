@@ -6,7 +6,6 @@ import android.widget.NumberPicker;
 
 import androidx.annotation.NonNull;
 
-import com.websarva.wings.android.zuboradiary.databinding.DialogFragmentNumberPickersBinding;
 import com.websarva.wings.android.zuboradiary.ui.BaseNumberPickersBottomSheetDialogFragment;
 
 import java.time.LocalTime;
@@ -54,7 +53,7 @@ public class TimePickerDialogFragment extends BaseNumberPickersBottomSheetDialog
     }
 
     @Override
-    protected void setUpNumberPickers(DialogFragmentNumberPickersBinding binding) {
+    protected void setUpNumberPickers() {
         LocalTime localTime = LocalTime.now();
         binding.numberPickerFirst.setMaxValue(23);
         binding.numberPickerFirst.setMinValue(0);

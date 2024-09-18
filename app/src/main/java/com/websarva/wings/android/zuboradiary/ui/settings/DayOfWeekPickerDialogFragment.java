@@ -50,7 +50,7 @@ public class DayOfWeekPickerDialogFragment extends BaseNumberPickersBottomSheetD
     }
 
     @Override
-    protected void setUpNumberPickers(DialogFragmentNumberPickersBinding binding) {
+    protected void setUpNumberPickers() {
         int maxNumDaysOfWeek = DayOfWeek.values().length;
         binding.numberPickerFirst.setMaxValue(maxNumDaysOfWeek - 1);
         binding.numberPickerFirst.setMinValue(0);
