@@ -2,6 +2,7 @@ package com.websarva.wings.android.zuboradiary.data.preferences;
 
 import android.content.Context;
 import android.content.res.Resources;
+import android.os.Build;
 
 import androidx.annotation.NonNull;
 import androidx.core.content.res.ResourcesCompat;
@@ -703,6 +704,52 @@ public enum ThemeColor {
                 return R.style.MaterialCalendarThemeColorGreen;
             case YELLOW:
                 return R.style.MaterialCalendarThemeColorYellow;
+        }
+        throw new IllegalStateException();
+    }
+
+    public int getThemeResId() {
+        switch (this) {
+            case WHITE:
+                return R.style.AppThemeColorWhite;
+            case BLACK:
+                return R.style.AppThemeColorBlack;
+            case RED:
+                return R.style.AppThemeColorRed;
+            case BLUE:
+                return R.style.AppThemeColorBlue;
+            case GREEN:
+                return R.style.AppThemeColorGreen;
+            case YELLOW:
+                return R.style.AppThemeColorYellow;
+        }
+        throw new IllegalStateException();
+    }
+
+    /**
+     * NumberPickerを含むBottomSheetDialogのViewをInflateする時のThemeResIdを取得する。
+     * */
+    public int getNumberPickerBottomSheetDialogThemeResId() {
+        // HACK:下記理由から、ApiLevel29未満かつThemeColorBlackの時はNumberPickerBottomSheetDialogのThemeColorをWhiteにする。
+        //      ・NumberPickerの値はThemeが適用されず、TextColorはApiLevel29以上からしか変更できない。
+        //      ・ThemeColorBlackの時は背景が黒となり、NumberPickerの値が見えない。
+        switch (this) {
+            case WHITE:
+                return R.style.AppThemeColorWhite;
+            case BLACK:
+                if (Build.VERSION.SDK_INT >= 29) {
+                    return R.style.AppThemeColorBlack;
+                } else {
+                    return R.style.AppThemeColorWhite;
+                }
+            case RED:
+                return R.style.AppThemeColorRed;
+            case BLUE:
+                return R.style.AppThemeColorBlue;
+            case GREEN:
+                return R.style.AppThemeColorGreen;
+            case YELLOW:
+                return R.style.AppThemeColorYellow;
         }
         throw new IllegalStateException();
     }

@@ -30,6 +30,30 @@
         <item name="colorPrimaryInverse">@color/md_theme_light_inversePrimary</item>
     </style>
 
+    <style name="AppThemeColorWhite" parent="Theme.Material3.Light.NoActionBar">
+        <item name="theme">@style/ThemeColorWhite</item>
+    </style>
+
+    <style name="AppThemeColorBlack" parent="Theme.Material3.Light.NoActionBar">
+        <item name="theme">@style/ThemeColorBlack</item>
+    </style>
+
+    <style name="AppThemeColorRed" parent="Theme.Material3.Light.NoActionBar">
+        <item name="theme">@style/ThemeColorRed</item>
+    </style>
+
+    <style name="AppThemeColorBlue" parent="Theme.Material3.Light.NoActionBar">
+        <item name="theme">@style/ThemeColorBlue</item>
+    </style>
+
+    <style name="AppThemeColorGreen" parent="Theme.Material3.Light.NoActionBar">
+        <item name="theme">@style/ThemeColorGreen</item>
+    </style>
+
+    <style name="AppThemeColorYellow" parent="Theme.Material3.Light.NoActionBar">
+        <item name="theme">@style/ThemeColorYellow</item>
+    </style>
+
 
     <!-- ThemeColorWhite -->
     <!-- MEMO:ThemeColor(下記style)はView等に利用するため、
