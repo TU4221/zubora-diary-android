@@ -1,85 +1,73 @@
 package com.websarva.wings.android.zuboradiary.ui.settings;
 
+import android.content.DialogInterface;
 import android.view.View;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.lifecycle.SavedStateHandle;
-import androidx.navigation.NavBackStackEntry;
-import androidx.navigation.NavController;
-import androidx.navigation.fragment.NavHostFragment;
 
-import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor;
-import com.websarva.wings.android.zuboradiary.databinding.DialogFragmentNumberPickerBinding;
+import com.websarva.wings.android.zuboradiary.databinding.DialogFragmentThreeNumberPickersBinding;
+import com.websarva.wings.android.zuboradiary.ui.BaseThreeNumberPickersBottomSheetDialogFragment;
 
-public class ThemeColorPickerDialogFragment extends BottomSheetDialogFragment {
+public class ThemeColorPickerDialogFragment extends BaseThreeNumberPickersBottomSheetDialogFragment {
+
     private static final String fromClassName = "From" + ThemeColorPickerDialogFragment.class.getName();
     public static final String KEY_SELECTED_THEME_COLOR = "SelectedThemeColor" + fromClassName;
 
-    // View関係
-    private DialogFragmentNumberPickerBinding binding;
-
-    // Navigation関係
-    private NavController navController;
+    @Override
+    public boolean isCancelableOtherThanPressingButton() {
+        return true;
+    }
 
     @Override
-    public View onCreateView(
-            @NonNull android.view.LayoutInflater inflater,
-            @Nullable android.view.ViewGroup container,
-            @Nullable android.os.Bundle savedInstanceState) {
-        super.onCreateView(inflater, container, savedInstanceState);
+    protected void handlePositiveButton(@NonNull View v) {
+        int selectedValue = binding.numberPickerFirst.getValue();
+        ThemeColor selectedThemeColor = ThemeColor.values()[selectedValue];
 
-        // Navigation設定
-        this.navController = NavHostFragment.findNavController(this);
+        setResult(KEY_SELECTED_THEME_COLOR, selectedThemeColor);
+    }
 
-        // データバインディング設定
-        this.binding =
-                DialogFragmentNumberPickerBinding.inflate(inflater, container, false);
+    @Override
+    protected void handleNegativeButton(@NonNull View v) {
+        // 処理なし
+    }
 
-        // View設定
+    @Override
+    protected void handleCancel(@NonNull DialogInterface dialog) {
+        // 処理なし
+    }
+
+    @Override
+    protected void handleDismiss() {
+
+    }
+
+    @Override
+    protected void setUpNumberPickers(DialogFragmentThreeNumberPickersBinding binding) {
+        int maxNumThemeColors = ThemeColor.values().length;
+        binding.numberPickerFirst.setMaxValue(maxNumThemeColors - 1);
+        binding.numberPickerFirst.setMinValue(0);
+        setUpInitialValue(binding);
+        setUpDisplayedValues(binding);
+        binding.numberPickerFirst.setWrapSelectorWheel(false);
+        binding.numberPickerSecond.setVisibility(View.GONE);
+        binding.numberPickerThird.setVisibility(View.GONE);
+    }
+
+    private void setUpInitialValue(DialogFragmentThreeNumberPickersBinding binding) {
         ThemeColor currentThemeColor =
                 ThemeColorPickerDialogFragmentArgs
                         .fromBundle(requireArguments()).getCurrentThemeColor();
-        int maxNumThemeColors = ThemeColor.values().length;
-        this.binding.numberPicker.setMaxValue(maxNumThemeColors - 1);
-        this.binding.numberPicker.setMinValue(0);
-        this.binding.numberPicker.setValue(currentThemeColor.ordinal()); // MEMO:最大最小値を設定してから設定すること。(0の位置が表示される)
-        this.binding.numberPicker.setWrapSelectorWheel(false);
+        binding.numberPickerFirst.setValue(currentThemeColor.ordinal()); // MEMO:最大最小値を設定してから設定すること。(0の位置が表示される)
+    }
 
+    private void setUpDisplayedValues(DialogFragmentThreeNumberPickersBinding binding) {
+        int maxNumThemeColors = ThemeColor.values().length;
         String[] themeColorList = new String[maxNumThemeColors];
         for (ThemeColor item: ThemeColor.values()) {
             int ordinal = item.ordinal();
             themeColorList[ordinal] = item.toSting(requireContext());
         }
-        this.binding.numberPicker.setDisplayedValues(themeColorList);
-
-        this.binding.buttonDecision.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                NavBackStackEntry navBackStackEntry =
-                        navController.getPreviousBackStackEntry();
-                if (navBackStackEntry == null) {
-                    throw new NullPointerException();
-                }
-                SavedStateHandle savedStateHandle = navBackStackEntry.getSavedStateHandle();
-
-                int selectedValue =
-                        ThemeColorPickerDialogFragment.this.binding.numberPicker.getValue();
-                ThemeColor selectedThemeColor = ThemeColor.values()[selectedValue];
-
-                savedStateHandle.set(KEY_SELECTED_THEME_COLOR, selectedThemeColor);
-                navController.navigateUp();
-            }
-        });
-
-        this.binding.buttonCancel.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                ThemeColorPickerDialogFragment.this.navController.navigateUp();
-            }
-        });
-
-        return this.binding.getRoot();
+        binding.numberPickerFirst.setDisplayedValues(themeColorList);
     }
 }
