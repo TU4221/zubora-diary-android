@@ -16,15 +16,13 @@ import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
 
 import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor;
-import com.websarva.wings.android.zuboradiary.databinding.DialogFragmentTwoNumberPickersBinding;
-
-import java.time.YearMonth;
+import com.websarva.wings.android.zuboradiary.databinding.DialogFragmentThreeNumberPickersBinding;
 
 import dagger.internal.Preconditions;
 
-public abstract class BaseTwoNumberPickersBottomSheetDialogFragment extends BaseBottomSheetDialogFragment {
+public abstract class BaseThreeNumberPickersBottomSheetDialogFragment extends BaseBottomSheetDialogFragment {
     // View関係
-    private DialogFragmentTwoNumberPickersBinding binding;
+    protected DialogFragmentThreeNumberPickersBinding binding;
 
     @Override
     protected final View createDialogView(
@@ -37,7 +35,7 @@ public abstract class BaseTwoNumberPickersBottomSheetDialogFragment extends Base
         return binding.getRoot();
     }
 
-    private DialogFragmentTwoNumberPickersBinding createBinding(
+    private DialogFragmentThreeNumberPickersBinding createBinding(
             @NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 
         // HACK:下記理由から、ThemeColor#getNumberPickerBottomSheetDialogThemeResId()から
@@ -49,39 +47,34 @@ public abstract class BaseTwoNumberPickersBottomSheetDialogFragment extends Base
         Context contextWithTheme = new ContextThemeWrapper(requireActivity(), themeResId);
         LayoutInflater _inflater = inflater.cloneInContext(contextWithTheme);
 
-        DialogFragmentTwoNumberPickersBinding binding =
-                DialogFragmentTwoNumberPickersBinding.inflate(_inflater, container, false);
+        DialogFragmentThreeNumberPickersBinding binding =
+                DialogFragmentThreeNumberPickersBinding.inflate(_inflater, container, false);
 
         setUpNumberPickerTextColor(binding);
 
         return binding;
     }
 
-    private void setUpNumberPickerTextColor(DialogFragmentTwoNumberPickersBinding binding) {
+    private void setUpNumberPickerTextColor(DialogFragmentThreeNumberPickersBinding binding) {
         if (Build.VERSION.SDK_INT >= 29) {
             ThemeColor themeColor = getThemeResId();
             int onSurfaceVariantColor = themeColor.getOnSurfaceVariantColor(getResources());
             binding.numberPickerFirst.setTextColor(onSurfaceVariantColor);
             binding.numberPickerSecond.setTextColor(onSurfaceVariantColor);
+            binding.numberPickerThird.setTextColor(onSurfaceVariantColor);
         }
     }
 
-    protected abstract void setUpNumberPickers(DialogFragmentTwoNumberPickersBinding binding);
+    protected abstract void setUpNumberPickers(DialogFragmentThreeNumberPickersBinding binding);
 
-    protected final void setResultSelectedYearMonth(String resultKey) {
-        Preconditions.checkNotNull(resultKey);
+    protected final void setResult(String key, Object value) {
+        Preconditions.checkNotNull(key);
+        Preconditions.checkNotNull(value);
 
         NavController navController = NavHostFragment.findNavController(this);
         NavBackStackEntry navBackStackEntry = navController.getPreviousBackStackEntry();
         Preconditions.checkNotNull(navBackStackEntry);
         SavedStateHandle savedStateHandle = navBackStackEntry.getSavedStateHandle();
-
-        int selectedYear =
-                binding.numberPickerFirst.getValue();
-        int selectedMonth =
-                binding.numberPickerSecond.getValue();
-        YearMonth selectedYearMonth = YearMonth.of(selectedYear, selectedMonth);
-
-        savedStateHandle.set(resultKey, selectedYearMonth);
+        savedStateHandle.set(key, value);
     }
 }

@@ -5,19 +5,20 @@ import android.view.View;
 
 import androidx.annotation.NonNull;
 
-import com.websarva.wings.android.zuboradiary.databinding.DialogFragmentTwoNumberPickersBinding;
-import com.websarva.wings.android.zuboradiary.ui.BaseTwoNumberPickersBottomSheetDialogFragment;
+import com.websarva.wings.android.zuboradiary.databinding.DialogFragmentThreeNumberPickersBinding;
+import com.websarva.wings.android.zuboradiary.ui.BaseThreeNumberPickersBottomSheetDialogFragment;
 
 import java.time.LocalDate;
 import java.time.Year;
+import java.time.YearMonth;
 
-public class StartYearMonthPickerDialogFragment extends BaseTwoNumberPickersBottomSheetDialogFragment {
+public class StartYearMonthPickerDialogFragment extends BaseThreeNumberPickersBottomSheetDialogFragment {
 
     private static final String fromClassName = "From" + StartYearMonthPickerDialogFragment.class.getName();
     public static final String KEY_SELECTED_YEAR_MONTH = "SelectedYearMonth" + fromClassName;
 
     @Override
-    protected void setUpNumberPickers(DialogFragmentTwoNumberPickersBinding binding) {
+    protected void setUpNumberPickers(DialogFragmentThreeNumberPickersBinding binding) {
         LocalDate today = LocalDate.now();
         Year maxYear =
                 StartYearMonthPickerDialogFragmentArgs.fromBundle(requireArguments()).getYearMaxValue();
@@ -31,11 +32,22 @@ public class StartYearMonthPickerDialogFragment extends BaseTwoNumberPickersBott
         binding.numberPickerSecond.setMinValue(1);
         binding.numberPickerSecond.setValue(today.getMonthValue());
         binding.numberPickerSecond.setWrapSelectorWheel(false);
+        binding.numberPickerThird.setVisibility(View.GONE);
     }
 
     @Override
     protected void handlePositiveButton(@NonNull View v) {
-        setResultSelectedYearMonth(KEY_SELECTED_YEAR_MONTH);
+        setResultSelectedYearMonth();
+    }
+
+    private void setResultSelectedYearMonth() {
+        int selectedYear =
+                binding.numberPickerFirst.getValue();
+        int selectedMonth =
+                binding.numberPickerSecond.getValue();
+        YearMonth selectedYearMonth = YearMonth.of(selectedYear, selectedMonth);
+
+        setResult(KEY_SELECTED_YEAR_MONTH, selectedYearMonth);
     }
 
     @Override

@@ -19,17 +19,10 @@ import androidx.navigation.fragment.NavHostFragment;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import com.websarva.wings.android.zuboradiary.MainActivity;
 import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor;
-import com.websarva.wings.android.zuboradiary.databinding.DialogFragmentTwoNumberPickersBinding;
-
-import java.time.LocalDate;
-import java.time.Year;
-import java.time.YearMonth;
 
 import dagger.internal.Preconditions;
 
 public abstract class BaseBottomSheetDialogFragment extends BottomSheetDialogFragment {
-    // View関係
-    private DialogFragmentTwoNumberPickersBinding binding;
 
     @Override
     public View onCreateView(

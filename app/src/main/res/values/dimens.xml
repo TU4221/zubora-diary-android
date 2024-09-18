@@ -20,6 +20,7 @@
 
     <!-- dialog_fragment_number_picker -->
     <dimen name="dialog_fragment_number_picker_layout_margin_horizontal">16dp</dimen>
+    <dimen name="dialog_fragment_number_picker_layout_margin_horizontal_between_items">8dp</dimen>
     <dimen name="dialog_fragment_number_picker_layout_margin_vertical">8dp</dimen>
 
 

@@ -11,7 +11,7 @@ import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
 
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
-import com.websarva.wings.android.zuboradiary.databinding.DialogFragmentTwoNumberPickersBinding;
+import com.websarva.wings.android.zuboradiary.databinding.DialogFragmentThreeNumberPickersBinding;
 
 import java.time.LocalTime;
 
@@ -21,7 +21,7 @@ public class TimePickerDialogFragment extends BottomSheetDialogFragment {
     public static final String KEY_SELECTED_MINUTE = "SelectedMinute" + fromClassName;
 
     // View関係
-    private DialogFragmentTwoNumberPickersBinding binding;
+    private DialogFragmentThreeNumberPickersBinding binding;
 
     // Navigation関係
     private NavController navController;
@@ -38,7 +38,7 @@ public class TimePickerDialogFragment extends BottomSheetDialogFragment {
 
         // データバインディング設定
         this.binding =
-                DialogFragmentTwoNumberPickersBinding.inflate(inflater, container, false);
+                DialogFragmentThreeNumberPickersBinding.inflate(inflater, container, false);
 
         // View設定
         LocalTime localTime = LocalTime.now();
