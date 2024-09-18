@@ -16,13 +16,13 @@ import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
 
 import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor;
-import com.websarva.wings.android.zuboradiary.databinding.DialogFragmentThreeNumberPickersBinding;
+import com.websarva.wings.android.zuboradiary.databinding.DialogFragmentNumberPickersBinding;
 
 import dagger.internal.Preconditions;
 
-public abstract class BaseThreeNumberPickersBottomSheetDialogFragment extends BaseBottomSheetDialogFragment {
+public abstract class BaseNumberPickersBottomSheetDialogFragment extends BaseBottomSheetDialogFragment {
     // View関係
-    protected DialogFragmentThreeNumberPickersBinding binding;
+    protected DialogFragmentNumberPickersBinding binding;
 
     @Override
     protected final View createDialogView(
@@ -35,7 +35,7 @@ public abstract class BaseThreeNumberPickersBottomSheetDialogFragment extends Ba
         return binding.getRoot();
     }
 
-    private DialogFragmentThreeNumberPickersBinding createBinding(
+    private DialogFragmentNumberPickersBinding createBinding(
             @NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 
         // HACK:下記理由から、ThemeColor#getNumberPickerBottomSheetDialogThemeResId()から
@@ -47,15 +47,15 @@ public abstract class BaseThreeNumberPickersBottomSheetDialogFragment extends Ba
         Context contextWithTheme = new ContextThemeWrapper(requireActivity(), themeResId);
         LayoutInflater _inflater = inflater.cloneInContext(contextWithTheme);
 
-        DialogFragmentThreeNumberPickersBinding binding =
-                DialogFragmentThreeNumberPickersBinding.inflate(_inflater, container, false);
+        DialogFragmentNumberPickersBinding binding =
+                DialogFragmentNumberPickersBinding.inflate(_inflater, container, false);
 
         setUpNumberPickerTextColor(binding);
 
         return binding;
     }
 
-    private void setUpNumberPickerTextColor(DialogFragmentThreeNumberPickersBinding binding) {
+    private void setUpNumberPickerTextColor(DialogFragmentNumberPickersBinding binding) {
         if (Build.VERSION.SDK_INT >= 29) {
             ThemeColor themeColor = getThemeResId();
             int onSurfaceVariantColor = themeColor.getOnSurfaceVariantColor(getResources());
@@ -65,7 +65,7 @@ public abstract class BaseThreeNumberPickersBottomSheetDialogFragment extends Ba
         }
     }
 
-    protected abstract void setUpNumberPickers(DialogFragmentThreeNumberPickersBinding binding);
+    protected abstract void setUpNumberPickers(DialogFragmentNumberPickersBinding binding);
 
     protected final void setResult(String key, Object value) {
         Preconditions.checkNotNull(key);

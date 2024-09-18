@@ -6,10 +6,10 @@ import android.view.View;
 import androidx.annotation.NonNull;
 
 import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor;
-import com.websarva.wings.android.zuboradiary.databinding.DialogFragmentThreeNumberPickersBinding;
-import com.websarva.wings.android.zuboradiary.ui.BaseThreeNumberPickersBottomSheetDialogFragment;
+import com.websarva.wings.android.zuboradiary.databinding.DialogFragmentNumberPickersBinding;
+import com.websarva.wings.android.zuboradiary.ui.BaseNumberPickersBottomSheetDialogFragment;
 
-public class ThemeColorPickerDialogFragment extends BaseThreeNumberPickersBottomSheetDialogFragment {
+public class ThemeColorPickerDialogFragment extends BaseNumberPickersBottomSheetDialogFragment {
 
     private static final String fromClassName = "From" + ThemeColorPickerDialogFragment.class.getName();
     public static final String KEY_SELECTED_THEME_COLOR = "SelectedThemeColor" + fromClassName;
@@ -43,7 +43,7 @@ public class ThemeColorPickerDialogFragment extends BaseThreeNumberPickersBottom
     }
 
     @Override
-    protected void setUpNumberPickers(DialogFragmentThreeNumberPickersBinding binding) {
+    protected void setUpNumberPickers(DialogFragmentNumberPickersBinding binding) {
         int maxNumThemeColors = ThemeColor.values().length;
         binding.numberPickerFirst.setMaxValue(maxNumThemeColors - 1);
         binding.numberPickerFirst.setMinValue(0);
@@ -54,14 +54,14 @@ public class ThemeColorPickerDialogFragment extends BaseThreeNumberPickersBottom
         binding.numberPickerThird.setVisibility(View.GONE);
     }
 
-    private void setUpInitialValue(DialogFragmentThreeNumberPickersBinding binding) {
+    private void setUpInitialValue(DialogFragmentNumberPickersBinding binding) {
         ThemeColor currentThemeColor =
                 ThemeColorPickerDialogFragmentArgs
                         .fromBundle(requireArguments()).getCurrentThemeColor();
         binding.numberPickerFirst.setValue(currentThemeColor.ordinal()); // MEMO:最大最小値を設定してから設定すること。(0の位置が表示される)
     }
 
-    private void setUpDisplayedValues(DialogFragmentThreeNumberPickersBinding binding) {
+    private void setUpDisplayedValues(DialogFragmentNumberPickersBinding binding) {
         int maxNumThemeColors = ThemeColor.values().length;
         String[] themeColorList = new String[maxNumThemeColors];
         for (ThemeColor item: ThemeColor.values()) {

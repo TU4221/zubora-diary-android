@@ -5,20 +5,20 @@ import android.view.View;
 
 import androidx.annotation.NonNull;
 
-import com.websarva.wings.android.zuboradiary.databinding.DialogFragmentThreeNumberPickersBinding;
-import com.websarva.wings.android.zuboradiary.ui.BaseThreeNumberPickersBottomSheetDialogFragment;
+import com.websarva.wings.android.zuboradiary.databinding.DialogFragmentNumberPickersBinding;
+import com.websarva.wings.android.zuboradiary.ui.BaseNumberPickersBottomSheetDialogFragment;
 
 import java.time.LocalDate;
 import java.time.Year;
 import java.time.YearMonth;
 
-public class StartYearMonthPickerDialogFragment extends BaseThreeNumberPickersBottomSheetDialogFragment {
+public class StartYearMonthPickerDialogFragment extends BaseNumberPickersBottomSheetDialogFragment {
 
     private static final String fromClassName = "From" + StartYearMonthPickerDialogFragment.class.getName();
     public static final String KEY_SELECTED_YEAR_MONTH = "SelectedYearMonth" + fromClassName;
 
     @Override
-    protected void setUpNumberPickers(DialogFragmentThreeNumberPickersBinding binding) {
+    protected void setUpNumberPickers(DialogFragmentNumberPickersBinding binding) {
         LocalDate today = LocalDate.now();
         Year maxYear =
                 StartYearMonthPickerDialogFragmentArgs.fromBundle(requireArguments()).getYearMaxValue();

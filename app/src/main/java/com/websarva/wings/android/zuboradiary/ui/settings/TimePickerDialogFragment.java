@@ -6,13 +6,13 @@ import android.widget.NumberPicker;
 
 import androidx.annotation.NonNull;
 
-import com.websarva.wings.android.zuboradiary.databinding.DialogFragmentThreeNumberPickersBinding;
-import com.websarva.wings.android.zuboradiary.ui.BaseThreeNumberPickersBottomSheetDialogFragment;
+import com.websarva.wings.android.zuboradiary.databinding.DialogFragmentNumberPickersBinding;
+import com.websarva.wings.android.zuboradiary.ui.BaseNumberPickersBottomSheetDialogFragment;
 
 import java.time.LocalTime;
 
 // TODO:MaterialTimePickerに置き換える？
-public class TimePickerDialogFragment extends BaseThreeNumberPickersBottomSheetDialogFragment {
+public class TimePickerDialogFragment extends BaseNumberPickersBottomSheetDialogFragment {
 
     private static final String fromClassName = "From" + TimePickerDialogFragment.class.getName();
     public static final String KEY_SELECTED_HOUR = "SelectedHour" + fromClassName;
@@ -54,7 +54,7 @@ public class TimePickerDialogFragment extends BaseThreeNumberPickersBottomSheetD
     }
 
     @Override
-    protected void setUpNumberPickers(DialogFragmentThreeNumberPickersBinding binding) {
+    protected void setUpNumberPickers(DialogFragmentNumberPickersBinding binding) {
         LocalTime localTime = LocalTime.now();
         binding.numberPickerFirst.setMaxValue(23);
         binding.numberPickerFirst.setMinValue(0);

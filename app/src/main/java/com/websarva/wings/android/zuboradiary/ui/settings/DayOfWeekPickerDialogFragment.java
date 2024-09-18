@@ -6,12 +6,12 @@ import android.view.View;
 import androidx.annotation.NonNull;
 
 import com.websarva.wings.android.zuboradiary.data.DayOfWeekStringConverter;
-import com.websarva.wings.android.zuboradiary.databinding.DialogFragmentThreeNumberPickersBinding;
-import com.websarva.wings.android.zuboradiary.ui.BaseThreeNumberPickersBottomSheetDialogFragment;
+import com.websarva.wings.android.zuboradiary.databinding.DialogFragmentNumberPickersBinding;
+import com.websarva.wings.android.zuboradiary.ui.BaseNumberPickersBottomSheetDialogFragment;
 
 import java.time.DayOfWeek;
 
-public class DayOfWeekPickerDialogFragment extends BaseThreeNumberPickersBottomSheetDialogFragment {
+public class DayOfWeekPickerDialogFragment extends BaseNumberPickersBottomSheetDialogFragment {
 
     private static final String FROM_CLASS_NAME = "From" + DayOfWeekPickerDialogFragment.class.getName();
     public static final String KEY_SELECTED_DAY_OF_WEEK = "SelectedDayOfWeek" + FROM_CLASS_NAME;
@@ -50,7 +50,7 @@ public class DayOfWeekPickerDialogFragment extends BaseThreeNumberPickersBottomS
     }
 
     @Override
-    protected void setUpNumberPickers(DialogFragmentThreeNumberPickersBinding binding) {
+    protected void setUpNumberPickers(DialogFragmentNumberPickersBinding binding) {
         int maxNumDaysOfWeek = DayOfWeek.values().length;
         binding.numberPickerFirst.setMaxValue(maxNumDaysOfWeek - 1);
         binding.numberPickerFirst.setMinValue(0);
@@ -61,7 +61,7 @@ public class DayOfWeekPickerDialogFragment extends BaseThreeNumberPickersBottomS
         binding.numberPickerThird.setVisibility(View.GONE);
     }
 
-    private void setUpInitialValue(DialogFragmentThreeNumberPickersBinding binding) {
+    private void setUpInitialValue(DialogFragmentNumberPickersBinding binding) {
         DayOfWeek currentCalendarStartDayOfWeek =
                 DayOfWeekPickerDialogFragmentArgs
                         .fromBundle(requireArguments()).getCurrentCalendarStartDayOfWeek();
@@ -75,7 +75,7 @@ public class DayOfWeekPickerDialogFragment extends BaseThreeNumberPickersBottomS
         binding.numberPickerFirst.setValue(initialValue); // MEMO:最大最小値を設定してから設定すること。(0の位置が表示される)
     }
 
-    private void setUpDisplayedValues(DialogFragmentThreeNumberPickersBinding binding) {
+    private void setUpDisplayedValues(DialogFragmentNumberPickersBinding binding) {
         int maxNumDaysOfWeek = DayOfWeek.values().length;
         String[] dayOfWeekList = new String[maxNumDaysOfWeek];
         for (DayOfWeek dayOfWeek: DayOfWeek.values()) {
