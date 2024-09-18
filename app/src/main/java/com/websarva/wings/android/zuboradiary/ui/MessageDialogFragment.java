@@ -1,15 +1,8 @@
 package com.websarva.wings.android.zuboradiary.ui;
 
-import android.app.AlertDialog;
-import android.app.Dialog;
 import android.content.DialogInterface;
-import android.os.Bundle;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.DialogFragment;
-
-import com.websarva.wings.android.zuboradiary.R;
 
 public class MessageDialogFragment extends BaseAlertDialogFragment {
 
@@ -34,7 +27,7 @@ public class MessageDialogFragment extends BaseAlertDialogFragment {
     }
 
     @Override
-    public boolean isCancelableOtherThanPressingButton() {
+    protected boolean isCancelableOtherThanPressingButton() {
         return true;
     }
 

@@ -44,7 +44,7 @@ public class PermissionDialogFragment extends BaseAlertDialogFragment {
     }
 
     @Override
-    public boolean isCancelableOtherThanPressingButton() {
+    protected boolean isCancelableOtherThanPressingButton() {
         return true;
     }
 

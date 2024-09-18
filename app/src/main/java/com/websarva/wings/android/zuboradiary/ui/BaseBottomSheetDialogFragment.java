@@ -31,7 +31,7 @@ public abstract class BaseBottomSheetDialogFragment extends BottomSheetDialogFra
 
         setUpDialogCancelFunction();
 
-        ThemeColor themeColor = getThemeResId();
+        ThemeColor themeColor = getActivityThemeColor();
         LayoutInflater themeColorInflater = createThemeColorInflater(inflater, themeColor);
         return createDialogView(themeColorInflater, container, savedInstanceState);
     }
@@ -48,9 +48,9 @@ public abstract class BaseBottomSheetDialogFragment extends BottomSheetDialogFra
     /**
      * 戻り値をtrueにすると、ダイアログ枠外、戻るボタンタッチ時にダイアログをキャンセルすることを可能にする。
      * */
-    public abstract boolean isCancelableOtherThanPressingButton();
+    protected abstract boolean isCancelableOtherThanPressingButton();
 
-    protected ThemeColor getThemeResId() {
+    protected final ThemeColor getActivityThemeColor() {
         Activity activity = requireActivity();
         MainActivity mainActivity;
         if (activity instanceof MainActivity) {
@@ -62,7 +62,7 @@ public abstract class BaseBottomSheetDialogFragment extends BottomSheetDialogFra
     }
 
     // ThemeColorに合わせたインフレーター作成
-    protected LayoutInflater createThemeColorInflater(LayoutInflater inflater, ThemeColor themeColor) {
+    protected final LayoutInflater createThemeColorInflater(LayoutInflater inflater, ThemeColor themeColor) {
         Preconditions.checkNotNull(inflater);
         Preconditions.checkNotNull(themeColor);
 

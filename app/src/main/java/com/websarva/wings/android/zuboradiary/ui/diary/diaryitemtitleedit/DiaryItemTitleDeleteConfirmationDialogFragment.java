@@ -1,18 +1,9 @@
 package com.websarva.wings.android.zuboradiary.ui.diary.diaryitemtitleedit;
 
-import android.app.AlertDialog;
-import android.app.Dialog;
 import android.content.DialogInterface;
-import android.os.Bundle;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.DialogFragment;
-import androidx.lifecycle.SavedStateHandle;
-import androidx.navigation.NavController;
-import androidx.navigation.fragment.NavHostFragment;
 
-import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.websarva.wings.android.zuboradiary.R;
 import com.websarva.wings.android.zuboradiary.ui.BaseAlertDialogFragment;
 
@@ -48,7 +39,7 @@ public class DiaryItemTitleDeleteConfirmationDialogFragment extends BaseAlertDia
     }
 
     @Override
-    public boolean isCancelableOtherThanPressingButton() {
+    protected boolean isCancelableOtherThanPressingButton() {
         return true;
     }
 

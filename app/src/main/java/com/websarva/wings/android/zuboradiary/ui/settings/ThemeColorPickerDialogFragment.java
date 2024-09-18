@@ -6,7 +6,6 @@ import android.view.View;
 import androidx.annotation.NonNull;
 
 import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor;
-import com.websarva.wings.android.zuboradiary.databinding.DialogFragmentNumberPickersBinding;
 import com.websarva.wings.android.zuboradiary.ui.BaseNumberPickersBottomSheetDialogFragment;
 
 public class ThemeColorPickerDialogFragment extends BaseNumberPickersBottomSheetDialogFragment {
@@ -21,6 +20,10 @@ public class ThemeColorPickerDialogFragment extends BaseNumberPickersBottomSheet
 
     @Override
     protected void handlePositiveButton(@NonNull View v) {
+        setResultSelectedThemeColor();
+    }
+
+    private void setResultSelectedThemeColor() {
         int selectedValue = binding.numberPickerFirst.getValue();
         ThemeColor selectedThemeColor = ThemeColor.values()[selectedValue];
 

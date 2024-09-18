@@ -23,6 +23,10 @@ public class DayOfWeekPickerDialogFragment extends BaseNumberPickersBottomSheetD
 
     @Override
     protected void handlePositiveButton(@NonNull View v) {
+        setResultSelectedDayOfWeek();
+    }
+
+    private void setResultSelectedDayOfWeek() {
         int selectedValue = binding.numberPickerFirst.getValue();
         // MEMO:DayOfWeekはMonday～Sundayの値が1～7となる。Sundayを先頭に表示させたいため、下記コード記述。
         DayOfWeek selectedDayOfWeek;

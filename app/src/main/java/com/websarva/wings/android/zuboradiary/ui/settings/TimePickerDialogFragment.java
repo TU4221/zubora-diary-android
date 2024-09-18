@@ -9,6 +9,7 @@ import androidx.annotation.NonNull;
 import com.websarva.wings.android.zuboradiary.ui.BaseNumberPickersBottomSheetDialogFragment;
 
 import java.time.LocalTime;
+import java.util.Locale;
 
 // TODO:MaterialTimePickerに置き換える？
 public class TimePickerDialogFragment extends BaseNumberPickersBottomSheetDialogFragment {
@@ -24,6 +25,10 @@ public class TimePickerDialogFragment extends BaseNumberPickersBottomSheetDialog
 
     @Override
     protected void handlePositiveButton(@NonNull View v) {
+        setResultSelectedYearMonth();
+    }
+
+    private void setResultSelectedYearMonth() {
         // TODO:LocalTimeクラスを代入する方が良いかも・・・
         int selectedHourValue = binding.numberPickerFirst.getValue();
         setResult(KEY_SELECTED_HOUR, selectedHourValue);
@@ -47,11 +52,6 @@ public class TimePickerDialogFragment extends BaseNumberPickersBottomSheetDialog
         // 処理なし
     }
 
-    private void setResults(Integer hour, Integer minute) {
-        setResult(KEY_SELECTED_HOUR, hour);
-        setResult(KEY_SELECTED_MINUTE, minute);
-    }
-
     @Override
     protected void setUpNumberPickers() {
         LocalTime localTime = LocalTime.now();
@@ -71,7 +71,7 @@ public class TimePickerDialogFragment extends BaseNumberPickersBottomSheetDialog
     private static class valueFormatter implements NumberPicker.Formatter {
         @Override
         public String format(int value) {
-            return String.format("%02d", value);
+            return String.format(Locale.getDefault(),"%02d", value);
         }
     }
 }

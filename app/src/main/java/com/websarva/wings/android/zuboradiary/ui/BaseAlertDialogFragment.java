@@ -17,6 +17,7 @@ import androidx.navigation.fragment.NavHostFragment;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.websarva.wings.android.zuboradiary.MainActivity;
 import com.websarva.wings.android.zuboradiary.R;
+import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor;
 
 import dagger.internal.Preconditions;
 
@@ -25,14 +26,10 @@ public abstract class BaseAlertDialogFragment extends DialogFragment {
     @NonNull
     @Override
     public final Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
-        Activity activity = requireActivity();
-        MainActivity mainActivity;
-        if (activity instanceof MainActivity) {
-            mainActivity = (MainActivity) activity;
-        } else {
-            throw new ClassCastException();
-        }
-        int themeResId = mainActivity.requireDialogThemeColor().getAlertDialogThemeResId();
+        super.onCreateDialog(savedInstanceState);
+
+        ThemeColor themeColor = getActivityThemeColor();
+        int themeResId = themeColor.getAlertDialogThemeResId();
 
         MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(requireContext(), themeResId);
 
@@ -48,7 +45,6 @@ public abstract class BaseAlertDialogFragment extends DialogFragment {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 Preconditions.checkNotNull(dialog);
-
                 handlePositiveButton(dialog, which);
             }
         });
@@ -57,52 +53,36 @@ public abstract class BaseAlertDialogFragment extends DialogFragment {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 Preconditions.checkNotNull(dialog);
-
                 handleNegativeButton(dialog, which);
             }
         });
 
         AlertDialog alertDialog = builder.create();
 
-        // MEMO:UIに表示されているダイアログ外の部分をタッチしてダイアログを閉じる(キャンセルする)ことができるが、
-        //      これを無効にするには、AlertDialog#setCanceledOnTouchOutsideを設定する必要あり。
-        //      またスマホ等の戻るボタンでもダイアログを閉じる(キャンセルする)ことは可能だが、
-        //      これを無効にするには、DialogFragment#setCancelableを設定する必要あり。
-        if (!isCancelableOtherThanPressingButton()) {
-            alertDialog.setCanceledOnTouchOutside(false);
-            this.setCancelable(false);
-        }
+        setUpDialogCancelFunction(alertDialog);
 
         return alertDialog;
     }
 
-    protected final void setResult(String resultKey, Object result) {
-        Preconditions.checkNotNull(resultKey);
-        Preconditions.checkNotNull(result);
-
-        NavController navController = NavHostFragment.findNavController(this);
-        NavBackStackEntry navBackStackEntry = navController.getPreviousBackStackEntry();
-        Preconditions.checkNotNull(navBackStackEntry);
-        SavedStateHandle savedStateHandle = navBackStackEntry.getSavedStateHandle();
-
-        savedStateHandle.set(resultKey, result);
+    protected final ThemeColor getActivityThemeColor() {
+        Activity activity = requireActivity();
+        MainActivity mainActivity;
+        if (activity instanceof MainActivity) {
+            mainActivity = (MainActivity) activity;
+        } else {
+            throw new ClassCastException();
+        }
+        return mainActivity.requireDialogThemeColor();
     }
 
-    // ダイアログ枠外タッチ、popBackStack時に処理
-    // MEMO:ダイアログフラグメントのCANCEL・DISMISS 処理について、
-    //      このクラスのような、DialogFragmentにAlertDialogを作成する場合、
-    //      CANCEL・DISMISSの処理内容はDialogFragmentのonCancel/onDismissをオーバーライドする必要がある。
-    //      DialogFragment、AlertDialogのリスナセットメソッドを使用して処理内容を記述きても処理はされない。
-    @Override
-    public final void onCancel(@NonNull DialogInterface dialog) {
-        handleCancel(dialog);
-        super.onCancel(dialog);
-    }
-
-    @Override
-    public final void dismiss() {
-        handleDismiss();
-        super.dismiss();
+    private void setUpDialogCancelFunction(AlertDialog alertDialog) {
+        // MEMO:下記機能を無効にするにはAlertDialog#setCanceledOnTouchOutside、DialogFragment#setCancelableを設定する必要あり。
+        //      ・UIに表示されているダイアログ外の部分をタッチしてダイアログを閉じる(キャンセル)(AlertDialog#setCanceledOnTouchOutside)
+        //      ・端末の戻るボタンでダイアログを閉じる(キャンセルする)(DialogFragment#setCancelable)
+        if (!isCancelableOtherThanPressingButton()) {
+            alertDialog.setCanceledOnTouchOutside(false);
+            this.setCancelable(false);
+        }
     }
 
     protected abstract String createTitle();
@@ -116,9 +96,38 @@ public abstract class BaseAlertDialogFragment extends DialogFragment {
     /**
      * 戻り値をtrueにすると、ダイアログ枠外、戻るボタンタッチ時にダイアログをキャンセルすることを可能にする。
      * */
-    public abstract boolean isCancelableOtherThanPressingButton();
+    protected abstract boolean isCancelableOtherThanPressingButton();
+
+    // ダイアログ枠外タッチ、popBackStack時に処理
+    // MEMO:ダイアログフラグメントのCANCEL・DISMISS 処理について、
+    //      このクラスのような、DialogFragmentにAlertDialogを作成する場合、
+    //      CANCEL・DISMISSの処理内容はDialogFragmentのonCancel/onDismissをオーバーライドする必要がある。
+    //      DialogFragment、AlertDialogのリスナセットメソッドを使用して処理内容を記述きても処理はされない。
+    @Override
+    public final void onCancel(@NonNull DialogInterface dialog) {
+        handleCancel(dialog);
+        super.onCancel(dialog);
+    }
 
     protected abstract void handleCancel(@NonNull DialogInterface dialog);
 
+    @Override
+    public final void dismiss() {
+        handleDismiss();
+        super.dismiss();
+    }
+
     protected abstract void handleDismiss();
+
+    protected final void setResult(String resultKey, Object result) {
+        Preconditions.checkNotNull(resultKey);
+        Preconditions.checkNotNull(result);
+
+        NavController navController = NavHostFragment.findNavController(this);
+        NavBackStackEntry navBackStackEntry = navController.getPreviousBackStackEntry();
+        Preconditions.checkNotNull(navBackStackEntry);
+        SavedStateHandle savedStateHandle = navBackStackEntry.getSavedStateHandle();
+
+        savedStateHandle.set(resultKey, result);
+    }
 }

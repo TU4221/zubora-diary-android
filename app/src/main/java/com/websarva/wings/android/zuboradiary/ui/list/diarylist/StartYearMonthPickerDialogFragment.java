@@ -17,21 +17,8 @@ public class StartYearMonthPickerDialogFragment extends BaseNumberPickersBottomS
     public static final String KEY_SELECTED_YEAR_MONTH = "SelectedYearMonth" + fromClassName;
 
     @Override
-    protected void setUpNumberPickers() {
-        LocalDate today = LocalDate.now();
-        Year maxYear =
-                StartYearMonthPickerDialogFragmentArgs.fromBundle(requireArguments()).getYearMaxValue();
-        Year minYear =
-                StartYearMonthPickerDialogFragmentArgs.fromBundle(requireArguments()).getYearMinValue();
-        binding.numberPickerFirst.setMaxValue(maxYear.getValue());
-        binding.numberPickerFirst.setMinValue(minYear.getValue());
-        binding.numberPickerFirst.setValue(today.getYear());
-        binding.numberPickerFirst.setWrapSelectorWheel(false);
-        binding.numberPickerSecond.setMaxValue(12);
-        binding.numberPickerSecond.setMinValue(1);
-        binding.numberPickerSecond.setValue(today.getMonthValue());
-        binding.numberPickerSecond.setWrapSelectorWheel(false);
-        binding.numberPickerThird.setVisibility(View.GONE);
+    public boolean isCancelableOtherThanPressingButton() {
+        return true;
     }
 
     @Override
@@ -55,11 +42,6 @@ public class StartYearMonthPickerDialogFragment extends BaseNumberPickersBottomS
     }
 
     @Override
-    public boolean isCancelableOtherThanPressingButton() {
-        return true;
-    }
-
-    @Override
     protected void handleCancel(@NonNull DialogInterface dialog) {
         // 処理なし
     }
@@ -67,5 +49,23 @@ public class StartYearMonthPickerDialogFragment extends BaseNumberPickersBottomS
     @Override
     protected void handleDismiss() {
         // 処理なし
+    }
+
+    @Override
+    protected void setUpNumberPickers() {
+        LocalDate today = LocalDate.now();
+        Year maxYear =
+                StartYearMonthPickerDialogFragmentArgs.fromBundle(requireArguments()).getYearMaxValue();
+        Year minYear =
+                StartYearMonthPickerDialogFragmentArgs.fromBundle(requireArguments()).getYearMinValue();
+        binding.numberPickerFirst.setMaxValue(maxYear.getValue());
+        binding.numberPickerFirst.setMinValue(minYear.getValue());
+        binding.numberPickerFirst.setValue(today.getYear());
+        binding.numberPickerFirst.setWrapSelectorWheel(false);
+        binding.numberPickerSecond.setMaxValue(12);
+        binding.numberPickerSecond.setMinValue(1);
+        binding.numberPickerSecond.setValue(today.getMonthValue());
+        binding.numberPickerSecond.setWrapSelectorWheel(false);
+        binding.numberPickerThird.setVisibility(View.GONE);
     }
 }
