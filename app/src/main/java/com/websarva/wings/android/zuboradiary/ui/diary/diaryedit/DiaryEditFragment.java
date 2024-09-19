@@ -11,6 +11,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.widget.Toolbar;
 import androidx.constraintlayout.motion.widget.MotionLayout;
 import androidx.core.widget.NestedScrollView;
+import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.SavedStateHandle;
@@ -56,6 +57,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import dagger.hilt.android.AndroidEntryPoint;
+import dagger.internal.Preconditions;
 
 @AndroidEntryPoint
 public class DiaryEditFragment extends BaseFragment {
@@ -836,14 +838,7 @@ public class DiaryEditFragment extends BaseFragment {
             @Override
             public void onClick(View v) {
                 binding.imageButtonAddItem.setEnabled(false);
-
-                // TODO:Observerへ移行
-                Integer NumVisibleItems = diaryEditViewModel.getNumVisibleItemsLiveData().getValue();
-                if (NumVisibleItems != null) {
-                    int addItemNumber = NumVisibleItems + 1;
-                    showItem(addItemNumber, false);
-                    diaryEditViewModel.incrementVisibleItemsCount();
-                }
+                diaryEditViewModel.incrementVisibleItemsCount();
             }
         });
 
@@ -876,24 +871,20 @@ public class DiaryEditFragment extends BaseFragment {
 
                 @Override
                 public void onTransitionCompleted(MotionLayout motionLayout, int currentId) {
-                    Log.d("20240605", "ItemLiveData" + String.valueOf(itemNumber) + " onTransitionCompleted");
-                    // 対象項目欄を閉じた後の処理
+                    Log.d("MotionLayout", "ItemLiveData" + itemNumber + " onTransitionCompleted");
+                    // 対象項目欄削除後の処理
                     if (currentId == R.id.motion_scene_edit_diary_item_hided_state) {
-                        Log.d("20240605", "currentId:hided_state");
+                        Log.d("MotionLayout", "currentId:hided_state");
                         if (isDeletingItemTransition) {
                             diaryEditViewModel.deleteItem(itemNumber);
                             isDeletingItemTransition = false;
-                            setUpItemsLayout(); // TODO:必要？
                         }
                         binding.imageButtonAddItem.setVisibility(View.VISIBLE);
+
+                    // 対象項目欄追加後の処理
                     } else if (currentId == R.id.motion_scene_edit_diary_item_showed_state) {
-                        Log.d("20240605", "currentId:showed_state");
+                        Log.d("MotionLayout", "currentId:showed_state");
                         binding.imageButtonAddItem.setEnabled(true);
-                        // TODO:Observerへ移行
-                        Integer numVisibleItems = diaryEditViewModel.getNumVisibleItemsLiveData().getValue();
-                        if (numVisibleItems != null && numVisibleItems == MAX_ITEMS) {
-                            binding.imageButtonAddItem.setVisibility(View.INVISIBLE);
-                        }
                     }
                 }
 
@@ -909,11 +900,19 @@ public class DiaryEditFragment extends BaseFragment {
                         .observe(getViewLifecycleOwner(), new Observer<Integer>() {
                             @Override
                             public void onChanged(Integer integer) {
-                                // TODO:保留
+                                if (integer == null) {
+                                    return;
+                                }
+
+                                // 項目欄追加ボタン表示切替
+                                // TODO:使用不可時はボタンをぼかすように変更する。
+                                if (integer == MAX_ITEMS) {
+                                    binding.imageButtonAddItem.setVisibility(View.INVISIBLE);
+                                }
+
+                                setUpItemsLayout(integer);
                             }
                         });
-
-        setUpItemsLayout(); //必要数の項目欄表示
     }
 
     private MotionLayout selectItemMotionLayout(int itemNumber) {
@@ -935,17 +934,35 @@ public class DiaryEditFragment extends BaseFragment {
                 itemMotionLayout = binding.includeItem5.motionLayoutDiaryEditItem;
                 break;
         }
+
+        if (itemMotionLayout == null) {
+            throw new IllegalArgumentException();
+        }
+
         return itemMotionLayout;
     }
 
-    private void setUpItemsLayout() {
-        Integer numVisibleItems = diaryEditViewModel.getNumVisibleItemsLiveData().getValue();
-        if (numVisibleItems == null) {
-            return;
+    private void setUpItemsLayout(Integer numItems) {
+        Preconditions.checkNotNull(numItems);
+        if (numItems < 1) {
+            throw new IllegalArgumentException();
         }
+        if (numItems > DiaryLiveData.MAX_ITEMS) {
+            throw new IllegalArgumentException();
+        }
+
+        if (getViewLifecycleOwner().getLifecycle().getCurrentState() == Lifecycle.State.RESUMED) {
+            int numShowedItems = countShowedItems();
+            int differenceValue = numItems - numShowedItems;
+            if (numItems > numShowedItems && differenceValue == 1) {
+                showItem(numItems, false);
+                return;
+            }
+        }
+
         for (int i = 0; i < DiaryLiveData.MAX_ITEMS; i++) {
             int itemNumber = i + 1;
-            if (itemNumber <= numVisibleItems) {
+            if (itemNumber <= numItems) {
                 showItem(itemNumber, true);
             } else {
                 hideItem(itemNumber, true);
@@ -953,29 +970,37 @@ public class DiaryEditFragment extends BaseFragment {
         }
     }
 
-
     private void hideItem(int itemNumber, boolean isJump) {
         MotionLayout itemMotionLayout = selectItemMotionLayout(itemNumber);
-        if (itemMotionLayout != null) {
-            if (isJump) {
-                itemMotionLayout
-                        .transitionToState(R.id.motion_scene_edit_diary_item_hided_state, 1);
-            } else {
-                itemMotionLayout.transitionToState(R.id.motion_scene_edit_diary_item_hided_state);
-            }
+        if (isJump) {
+            itemMotionLayout
+                    .transitionToState(R.id.motion_scene_edit_diary_item_hided_state, 1);
+        } else {
+            itemMotionLayout.transitionToState(R.id.motion_scene_edit_diary_item_hided_state);
         }
     }
 
     private void showItem(int itemNumber, boolean isJump) {
         MotionLayout itemMotionLayout = selectItemMotionLayout(itemNumber);
-        if (itemMotionLayout != null) {
-            if (isJump) {
-                itemMotionLayout
-                        .transitionToState(R.id.motion_scene_edit_diary_item_showed_state, 1);
-            } else {
-                itemMotionLayout.transitionToState(R.id.motion_scene_edit_diary_item_showed_state);
-            }
+        if (isJump) {
+            itemMotionLayout
+                    .transitionToState(R.id.motion_scene_edit_diary_item_showed_state, 1);
+        } else {
+            itemMotionLayout.transitionToState(R.id.motion_scene_edit_diary_item_showed_state);
         }
+    }
+
+    private int countShowedItems() {
+        int numShowwdItems = 0;
+        for (int i = 0; i < DiaryLiveData.MAX_ITEMS; i++) {
+            int itemNumber = i + 1;
+            MotionLayout motionLayout = selectItemMotionLayout(itemNumber);
+            if (motionLayout.getCurrentState() != R.id.motion_scene_edit_diary_item_showed_state) {
+                continue;
+            }
+            numShowwdItems++;
+        }
+        return numShowwdItems;
     }
 
     private void setUpPictureInputField() {
