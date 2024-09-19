@@ -951,6 +951,8 @@ public class DiaryEditFragment extends BaseFragment {
             throw new IllegalArgumentException();
         }
 
+        // MEMO:LifeCycleがResumedの時のみ項目欄のモーション追加処理を行う。
+        //      削除処理はObserverで適当なモーション削除処理を行うのは難しいのでここでは処理せず、削除ダイアログから処理する。
         if (getViewLifecycleOwner().getLifecycle().getCurrentState() == Lifecycle.State.RESUMED) {
             int numShowedItems = countShowedItems();
             int differenceValue = numItems - numShowedItems;
