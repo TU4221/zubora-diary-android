@@ -1,6 +1,7 @@
 package com.websarva.wings.android.zuboradiary.ui;
 
 import android.os.Bundle;
+import android.transition.Transition;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,6 +24,7 @@ import com.websarva.wings.android.zuboradiary.MainActivity;
 import com.websarva.wings.android.zuboradiary.data.AppError;
 
 import java.util.List;
+import java.util.Objects;
 
 
 public abstract class BaseFragment extends CustomFragment {
@@ -88,6 +90,24 @@ public abstract class BaseFragment extends CustomFragment {
         setReturnTransition(new MaterialSharedAxis(MaterialSharedAxis.X, false));
 
         mainActivity.resetTabWasSelected();
+    }
+
+    protected void addTransitionListener(Transition.TransitionListener listener) {
+        MaterialSharedAxis enterTransition = (MaterialSharedAxis) getEnterTransition();
+        Objects.requireNonNull(enterTransition);
+        enterTransition.addListener(listener);
+
+        MaterialSharedAxis exitTransition = (MaterialSharedAxis) getExitTransition();
+        Objects.requireNonNull(exitTransition);
+        exitTransition.addListener(listener);
+
+        MaterialSharedAxis reenterTransition = (MaterialSharedAxis) getReenterTransition();
+        Objects.requireNonNull(reenterTransition);
+        reenterTransition.addListener(listener);
+
+        MaterialSharedAxis returnTransition = (MaterialSharedAxis) getReturnTransition();
+        Objects.requireNonNull(returnTransition);
+        returnTransition.addListener(listener);
     }
 
     @Override

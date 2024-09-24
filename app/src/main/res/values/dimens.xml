@@ -3,6 +3,16 @@
     <dimen name="activity_horizontal_margin">16dp</dimen>
     <dimen name="activity_vertical_margin">16dp</dimen>
 
+    <!-- fragment_diary_edit -->
+    <dimen name="fragment_diary_edit_text_size">18sp</dimen>
+    <dimen name="fragment_diary_edit_margin_start">8dp</dimen>
+    <dimen name="fragment_diary_edit_margin_top">16dp</dimen>
+
+    <!-- layout_diary_edit_item -->
+    <dimen name="layout_diary_edit_item_text_size">@dimen/fragment_diary_edit_text_size</dimen>
+    <dimen name="layout_diary_edit_item_margin_start">@dimen/fragment_diary_edit_margin_start</dimen>
+    <dimen name="layout_diary_edit_item_margin_top">@dimen/fragment_diary_edit_margin_top</dimen>
+
     <!-- fragment_settings -->
     <dimen name="fragment_settings_section_layout_height">56dp</dimen>
     <dimen name="fragment_settings_section_padding_horizontal">16dp</dimen>

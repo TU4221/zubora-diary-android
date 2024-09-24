@@ -84,24 +84,28 @@
 
 
     <!-- fragment_diary_edit -->
-    <string name="fragment_diary_edit_toolbar_title_tools_value">新規作成／編集中</string>
+    <string name="fragment_diary_edit_toolbar_title_value_tools">新規作成／編集中</string>
     <string name="fragment_diary_edit_toolbar_option_save_diary">日記保存</string>
     <string name="fragment_diary_edit_toolbar_option_delete_diary">日記削除</string>
-    <string name="fragment_diary_edit_date_tools_value">0000/00/00(月)</string>
-    <string name="fragment_diary_edit_weather">天気：</string>
+    <string name="fragment_diary_edit_date">日付</string>
+    <string name="fragment_diary_edit_date_value_tools">2012/12/12(日)</string>
+    <string name="fragment_diary_edit_weather">天気</string>
     <string name="fragment_diary_edit_weather_slush">／</string>
-    <string name="fragment_diary_edit_condition">気分：</string>
+    <string name="fragment_diary_edit_condition">気分</string>
     <string name="fragment_diary_edit_title">タイトル</string>
     <string name="fragment_diary_edit_title_hint">無題</string>
-    <string name="fragment_diary_edit_num_of_char_hint">0/0</string>
     <string name="fragment_diary_edit_item_1">項目1</string>
     <string name="fragment_diary_edit_item_2">項目2</string>
     <string name="fragment_diary_edit_item_3">項目3</string>
     <string name="fragment_diary_edit_item_4">項目4</string>
     <string name="fragment_diary_edit_item_5">項目5</string>
-    <string name="fragment_diary_edit_item_hint">未選択</string>
-    <string name="fragment_diary_edit_content_hint">○○をした。</string>
 
+    <!-- layout_diary_edit_item -->
+    <string name="layout_diary_edit_item_1_tools">項目*</string>
+    <string name="layout_diary_edit_item_title">タイトル</string>
+    <string name="layout_diary_edit_item_title_hint">未選択</string>
+    <string name="layout_diary_edit_item_comment">コメント</string>
+    <string name="layout_diary_edit_item_comment_hint">○○をした。</string>
 
     <!-- fragment_diary_item_title_edit -->
     <string name="fragment_diary_item_title_edit_toolbar_title_tools_value">項目1タイトル編集中</string>

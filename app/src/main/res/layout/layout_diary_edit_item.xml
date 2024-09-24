@@ -1,14 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <data>
         <variable
             name="itemNumber"
             type="java.lang.String" />
         <variable
-            name="titleLiveData"
-            type="androidx.lifecycle.LiveData&lt;String>" />
+            name="titleMutableLiveData"
+            type="androidx.lifecycle.MutableLiveData&lt;String>" />
         <variable
             name="commentMutableLiveData"
             type="androidx.lifecycle.MutableLiveData&lt;String>" />
@@ -38,75 +39,77 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/layout_diary_edit_item_margin_top"
                 android:orientation="horizontal">
 
                 <TextView
                     android:id="@+id/text_item_number"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
                     android:text="@{itemNumber}"
-                    android:textSize="16sp"/>
+                    android:textSize="@dimen/layout_diary_edit_item_text_size"
+                    tools:text="@string/layout_diary_edit_item_1_tools"/>
 
                 <ImageButton
                     android:id="@+id/image_button_item_delete"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
-                    android:layout_marginTop="16dp"
+                    android:layout_marginStart="@dimen/layout_diary_edit_item_margin_start"
                     android:background="@drawable/bg_image_button"
                     android:src="@drawable/ic_delete_forever_24" />
 
             </LinearLayout>
 
             <!-- 下記 EditText は項目タイトル入力フラグメントから入力する為、android:text は単一方向データバインディングとする。 -->
-            <EditText
-                android:id="@+id/edit_text_item_title"
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/textInputLayout_item_title"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:focusable="false"
-                android:hint="@string/fragment_diary_edit_item_hint"
-                android:text="@{titleLiveData}"
-                android:textSize="16sp" />
+                android:layout_marginTop="@dimen/layout_diary_edit_item_margin_top"
+                android:hint="@string/layout_diary_edit_item_title"
+                app:expandedHintEnabled="false"
+                app:counterEnabled="true"
+                app:counterMaxLength="@integer/layout_diary_edit_item_title_max_length">
 
-            <androidx.core.widget.NestedScrollView
-                android:id="@+id/nested_scroll_item_comment"
-                android:layout_width="match_parent"
-                android:layout_height="108dp"
-                android:layout_marginTop="4dp"
-                android:background="@drawable/border_gray"
-                android:scrollbarDefaultDelayBeforeFade="3000"
-                android:scrollbarFadeDuration="500"
-                android:scrollbarSize="10dp"
-                android:scrollbarStyle="insideInset"
-                android:scrollbarThumbVertical="@android:color/darker_gray"
-                android:scrollbars="vertical" >
-
-                <EditText
-                    android:id="@+id/edit_text_item_comment"
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/textInputEditText_item_title"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:background="@null"
-                    android:ems="10"
-                    android:gravity="start|top"
-                    android:hint="@string/fragment_diary_edit_content_hint"
-                    android:inputType="textMultiLine"
-                    android:minLines="5"
-                    android:text="@={commentMutableLiveData}"
-                    android:textSize="16sp" />
+                    android:text="@={titleMutableLiveData}"
+                    android:textSize="@dimen/layout_diary_edit_item_text_size"
+                    android:hint="@string/layout_diary_edit_item_title_hint"
+                    android:inputType="none"
+                    android:cursorVisible="false"
+                    android:maxLength="@integer/layout_diary_edit_item_title_max_length" />
 
-            </androidx.core.widget.NestedScrollView>
+            </com.google.android.material.textfield.TextInputLayout>
 
-            <TextView
-                android:id="@+id/text_item_comment_length"
-                android:layout_width="wrap_content"
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/textInputLayout_item_comment"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_gravity="end"
-                android:hint="@string/fragment_diary_edit_num_of_char_hint"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/nested_scroll_item_comment" />
+                android:layout_marginTop="@dimen/layout_diary_edit_item_margin_top"
+                android:hint="@string/layout_diary_edit_item_comment"
+                app:expandedHintEnabled="false"
+                app:counterEnabled="true"
+                app:counterMaxLength="@integer/layout_diary_edit_item_comment_max_length">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/textInputEditText_item_comment"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@={commentMutableLiveData}"
+                    android:textSize="@dimen/layout_diary_edit_item_text_size"
+                    android:hint="@string/layout_diary_edit_item_comment_hint"
+                    android:inputType="textMultiLine"
+                    android:maxLength="@integer/layout_diary_edit_item_comment_max_length"
+                    android:minLines="@integer/layout_diary_edit_item_comment_min_lines"
+                    android:lines="@integer/layout_diary_edit_item_comment_min_lines"
+                    android:gravity="top"
+                    android:scrollbars="vertical"
+                    android:overScrollMode="ifContentScrolls"/>
+
+            </com.google.android.material.textfield.TextInputLayout>
 
         </LinearLayout>
 

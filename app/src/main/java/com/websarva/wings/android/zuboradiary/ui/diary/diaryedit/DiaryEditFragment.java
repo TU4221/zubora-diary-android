@@ -10,7 +10,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.Toolbar;
 import androidx.constraintlayout.motion.widget.MotionLayout;
-import androidx.core.widget.NestedScrollView;
 import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Observer;
@@ -19,8 +18,8 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavDirections;
 
 import android.text.Editable;
-import android.text.InputFilter;
 import android.text.TextWatcher;
+import android.transition.Transition;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -29,12 +28,16 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.EditorInfo;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
+import com.google.android.material.textfield.TextInputEditText;
+import com.google.android.material.textfield.TextInputLayout;
+import com.google.android.material.transition.platform.MaterialSharedAxis;
 import com.websarva.wings.android.zuboradiary.data.DateTimeStringConverter;
 import com.websarva.wings.android.zuboradiary.data.diary.ConditionConverter;
 import com.websarva.wings.android.zuboradiary.data.diary.Conditions;
@@ -55,6 +58,8 @@ import com.websarva.wings.android.zuboradiary.ui.settings.SettingsViewModel;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.PrimitiveIterator;
 
 import dagger.hilt.android.AndroidEntryPoint;
 import dagger.internal.Preconditions;
@@ -68,8 +73,9 @@ public class DiaryEditFragment extends BaseFragment {
     private final String TOOL_BAR_TITLE_NEW = "新規作成";
     private final String TOOL_BAR_TITLE_EDIT = "編集中";
     private LocalDate lastSelectedDate;
-    private final List<View> noKeyboardViews = new ArrayList<>();
-    ArrayAdapter<String> weather2ArrayAdapter;
+    private ArrayAdapter<String> weather2ArrayAdapter;
+    private boolean isReceivedItemTitleEditResult;
+    private int receivedItemTitleEditResultItemNumber;
 
     // ViewModel
     private DiaryEditViewModel diaryEditViewModel;
@@ -120,11 +126,11 @@ public class DiaryEditFragment extends BaseFragment {
 
         setUpDiaryData();
         setUpToolBar();
-        setUpNoKeyBoardViews();
         setUpDateInputField();
         setUpTitleInputField();
         setUpItemInputField();
         setUpPictureInputField();
+        setupEditText();
 
         // TODO:最終的に削除
         binding.fabTest.setOnClickListener(new View.OnClickListener() {
@@ -139,6 +145,7 @@ public class DiaryEditFragment extends BaseFragment {
 
     @Override
     protected void setUpThemeColor() {
+        // TODO:保留(ThemeColorを適用したinflaterでinflateする方向に変更？)
         settingsViewModel.getThemeColorSettingValueLiveData()
                 .observe(getViewLifecycleOwner(), new Observer<ThemeColor>() {
                     @Override
@@ -157,34 +164,33 @@ public class DiaryEditFragment extends BaseFragment {
 
                         ColorSwitchingViewList<TextView> textViewList =
                                 new ColorSwitchingViewList<>(
-                                        binding.editTextDate,
-                                        binding.editTextDate,
+                                        //binding.editTextDate,
                                         binding.textWeather,
                                         binding.textWeatherSlush,
                                         binding.textCondition,
-                                        binding.textTitle,
-                                        binding.editTextTitle,
-                                        binding.textTitleLength,
+                                        //binding.textTitle,
+                                        /*binding.editTextTitle,*/ //20240919:修正
+                                        //binding.textTitleLength,
                                         binding.includeItem1.textItemNumber,
-                                        binding.includeItem1.editTextItemTitle,
-                                        binding.includeItem1.editTextItemComment,
-                                        binding.includeItem1.textItemCommentLength,
+                                        //binding.includeItem1.editTextItemTitle,
+                                        //binding.includeItem1.editTextItemComment,
+                                        //binding.includeItem1.textItemCommentLength,
                                         binding.includeItem2.textItemNumber,
-                                        binding.includeItem2.editTextItemTitle,
-                                        binding.includeItem2.editTextItemComment,
-                                        binding.includeItem2.textItemCommentLength,
+                                        //binding.includeItem2.editTextItemTitle,
+                                        //binding.includeItem2.editTextItemComment,
+                                        //binding.includeItem2.textItemCommentLength,
                                         binding.includeItem3.textItemNumber,
-                                        binding.includeItem3.editTextItemTitle,
-                                        binding.includeItem3.editTextItemComment,
-                                        binding.includeItem3.textItemCommentLength,
+                                        //binding.includeItem3.editTextItemTitle,
+                                        //binding.includeItem3.editTextItemComment,
+                                        //binding.includeItem3.textItemCommentLength,
                                         binding.includeItem4.textItemNumber,
-                                        binding.includeItem4.editTextItemTitle,
-                                        binding.includeItem4.editTextItemComment,
-                                        binding.includeItem4.textItemCommentLength,
-                                        binding.includeItem5.textItemNumber,
-                                        binding.includeItem5.editTextItemTitle,
-                                        binding.includeItem5.editTextItemComment,
-                                        binding.includeItem5.textItemCommentLength
+                                        //binding.includeItem4.editTextItemTitle,
+                                        //binding.includeItem4.editTextItemComment,
+                                        //binding.includeItem4.textItemCommentLength,
+                                        binding.includeItem5.textItemNumber
+                                        //binding.includeItem5.editTextItemTitle
+                                        //binding.includeItem5.editTextItemComment,
+                                        //binding.includeItem5.textItemCommentLength
                                 );
                         switcher.switchTextColorOnBackground(textViewList);
 
@@ -211,11 +217,16 @@ public class DiaryEditFragment extends BaseFragment {
         newItemTitleLiveData.observe(getViewLifecycleOwner(), new Observer<String>() {
             @Override
             public void onChanged(String string) {
+                // MEMO:結果がない場合もあるので"return"で返す。
+                if (string == null) return;
+
                 Integer itemNumber =
                         savedStateHandle.get(DiaryItemTitleEditFragment.KEY_UPDATE_ITEM_NUMBER);
-                if (itemNumber != null) {
-                    diaryEditViewModel.updateItemTitle(itemNumber, string);
-                }
+                // MEMO:この時点で結果がない場合異常なので例外を発生させる。。
+                Objects.requireNonNull(itemNumber);
+
+                diaryEditViewModel.updateItemTitle(itemNumber, string);
+
                 savedStateHandle.remove(DiaryItemTitleEditFragment.KEY_UPDATE_ITEM_NUMBER);
                 savedStateHandle.remove(DiaryItemTitleEditFragment.KEY_NEW_ITEM_TITLE);
             }
@@ -230,6 +241,7 @@ public class DiaryEditFragment extends BaseFragment {
         receiveDeleteConfirmDialogResult(savedStateHandle);
         receiveWeatherInformationDialogResult(savedStateHandle);
         retryErrorDialogShow();
+        clearFocusAllEditText();
     }
 
     @Override
@@ -310,7 +322,6 @@ public class DiaryEditFragment extends BaseFragment {
 
     // 項目削除確認ダイアログフラグメントから結果受取
     private void receiveDeleteConfirmDialogResult(SavedStateHandle savedStateHandle) {
-        // TODO:Observerへ移行
         Integer deleteItemNumber =
                 receiveResulFromDialog(DiaryItemDeleteConfirmationDialogFragment.KEY_DELETE_ITEM_NUMBER);
         if (deleteItemNumber == null) {
@@ -445,33 +456,21 @@ public class DiaryEditFragment extends BaseFragment {
                 });
     }
 
-    // キーボード入力不要View作成
-    private void setUpNoKeyBoardViews() {
-        noKeyboardViews.add(binding.editTextDate);
-        noKeyboardViews.add(binding.spinnerWeather1);
-        noKeyboardViews.add(binding.spinnerWeather2);
-        noKeyboardViews.add(binding.spinnerCondition);
-        noKeyboardViews.add(binding.includeItem1.editTextItemTitle);
-        noKeyboardViews.add(binding.includeItem1.imageButtonItemDelete);
-        noKeyboardViews.add(binding.includeItem2.editTextItemTitle);
-        noKeyboardViews.add(binding.includeItem2.imageButtonItemDelete);
-        noKeyboardViews.add(binding.includeItem3.editTextItemTitle);
-        noKeyboardViews.add(binding.includeItem3.imageButtonItemDelete);
-        noKeyboardViews.add(binding.includeItem4.editTextItemTitle);
-        noKeyboardViews.add(binding.includeItem4.imageButtonItemDelete);
-        noKeyboardViews.add(binding.includeItem5.editTextItemTitle);
-        noKeyboardViews.add(binding.includeItem5.imageButtonItemDelete);
-        noKeyboardViews.add(binding.imageButtonAddItem);
-    }
-
     // 日付入力欄設定
     private void setUpDateInputField() {
-        binding.editTextDate.setFocusable(true);
-        binding.editTextDate.setOnClickListener(new View.OnClickListener() {
+        binding.textInputEditTextDate.setInputType(EditorInfo.TYPE_NULL); //キーボード非表示設定
+        binding.textInputEditTextDate.setOnTouchListener(new View.OnTouchListener() {
             @Override
-            public void onClick(View v) {
+            public boolean onTouch(View v, MotionEvent event) {
+                Objects.requireNonNull(v);
+
+                if (event.getAction() != MotionEvent.ACTION_UP) return false;
+
+                hideKeyboard(v);
+
                 LocalDate date = diaryEditViewModel.getDateLiveData().getValue();
                 showDatePickerDialog(date);
+                return false;
             }
         });
 
@@ -481,8 +480,9 @@ public class DiaryEditFragment extends BaseFragment {
                 if (date == null) {
                     return;
                 }
+
                 DateTimeStringConverter dateTimeStringConverter = new DateTimeStringConverter();
-                binding.editTextDate.setText(dateTimeStringConverter.toStringDate(date));
+                binding.textInputEditTextDate.setText(dateTimeStringConverter.toStringDate(date));
                 Log.d("DiaryEditInputDate", "SelectedDate:" + date);
                 Log.d("DiaryEditInputDate", "lastSelectedDate:" + lastSelectedDate);
                 boolean shouldShowDialog = shouldShowLoadingExistingDiaryDialogOnDateChanged(date);
@@ -516,18 +516,13 @@ public class DiaryEditFragment extends BaseFragment {
 
     // 天気入力欄。
     private void setUpWeatherInputField(ThemeColor themeColor) {
-        // TODO:下記MEMOの意味が理解できないので後で確認ご文章を修正する
-        // MEMO:下記 onItemSelected は DataBinding を使用して ViewModel 内にメソッドを用意していたが、
-        //      画面作成処理時に onItemSelected が処理される為、初期値設定する為の setSelection メソッドの処理タイミングの兼合いで、
-        //      DataBinding での使用を取りやめ、ここにまとめて記載することにした。
-        //      他スピナーも同様。
         ArrayAdapter<String> weatherArrayAdapter = createWeatherSpinnerAdapter(themeColor);
-        binding.spinnerWeather1.setAdapter(weatherArrayAdapter);
+        binding.autoCompleteTextWeather1.setAdapter(weatherArrayAdapter);
         weather2ArrayAdapter = createWeatherSpinnerAdapter(themeColor);
-        binding.spinnerWeather2.setAdapter(weather2ArrayAdapter);
+        binding.autoCompleteTextWeather2.setAdapter(weather2ArrayAdapter);
 
         // TODO:天気情報取得が同期処理なら不要
-        binding.spinnerWeather1.setOnTouchListener(new View.OnTouchListener() {
+        /*binding.autoCompleteTextWeather1.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
                 if (event.getAction() == MotionEvent.ACTION_DOWN) {
@@ -535,80 +530,65 @@ public class DiaryEditFragment extends BaseFragment {
                 }
                 return false;
             }
-        });
-        binding.spinnerWeather1
-                .setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                    @Override
-                    public void onItemSelected(
-                            AdapterView<?> parent, View view, int position, long id) {
-                        WeatherConverter weatherConverter = new WeatherConverter();
-                        Weathers weather = weatherConverter.toWeather(position);
-                        diaryEditViewModel.updateWeather1(weather);
-                    }
+        });*/
 
-                    @Override
-                    public void onNothingSelected(AdapterView<?> parent) {
-                        // 処理なし
-                    }
-                });
+        binding.autoCompleteTextWeather1.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                String strWeather = weatherArrayAdapter.getItem(position);
+                WeatherConverter weatherConverter = new WeatherConverter();
+                Weathers weather = weatherConverter.toWeather(requireContext(), strWeather);
+                diaryEditViewModel.updateWeather1(weather);
+                binding.autoCompleteTextWeather1.clearFocus();
+            }
+        });
+
         diaryEditViewModel.getWeather1LiveData()
                 .observe(getViewLifecycleOwner(), new Observer<Weathers>() {
                     @Override
                     public void onChanged(Weathers weather) {
-                        int weatherNumber;
-                        if (weather == null) {
-                            weatherNumber = 0;
-                        } else {
-                            weatherNumber = weather.toWeatherNumber();
-                        }
-                        if (weatherNumber != binding.spinnerWeather1.getSelectedItemPosition()) {
-                            binding.spinnerWeather1.setSelection(weatherNumber);
-                        }
+                        if (weather == null) return;
+
+                        String strWeather = weather.toString(requireContext());
+                        binding.autoCompleteTextWeather1.setText(strWeather, false);
 
                         // Weather2 Spinner有効無効切替
-                        if (weather == Weathers.UNKNOWN) {
-                            // TODO:下記アダプター作成コード確認
-                            binding.spinnerWeather2.setEnabled(false);
-                            binding.spinnerWeather2.setAdapter(weatherArrayAdapter);
-                            binding.spinnerWeather2.setSelection(0);
+                        if (weather == Weathers.UNKNOWN || diaryEditViewModel.isEqualWeathers()) {
+                            binding.textInputLayoutWeather2.setEnabled(false);
+                            binding.autoCompleteTextWeather2.setEnabled(false);
+                            binding.autoCompleteTextWeather2.setAdapter(weatherArrayAdapter);
+                            String defaultText = Weathers.UNKNOWN.toString(requireContext());
+                            binding.autoCompleteTextWeather2.setText(defaultText, false);
                         } else {
                             weather2ArrayAdapter = createWeatherSpinnerAdapter(themeColor, weather);
-                            binding.spinnerWeather2.setAdapter(weather2ArrayAdapter);
-                            binding.spinnerWeather2.setEnabled(true);
+                            binding.autoCompleteTextWeather2.setAdapter(weather2ArrayAdapter);
+                            binding.textInputLayoutWeather2.setEnabled(true);
+                            binding.autoCompleteTextWeather2.setEnabled(true);
                             // HACK:AdapterをセットするとSpinnerの選択アイテムがデフォルト値になるため下記対応。
-                            diaryEditViewModel.updateWeather2(diaryEditViewModel.getWeather2LiveData().getValue());
+                            //diaryEditViewModel.updateWeather2(diaryEditViewModel.getWeather2LiveData().getValue());
                         }
                     }
                 });
 
-        binding.spinnerWeather2
-                .setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                    @Override
-                    public void onItemSelected(
-                            AdapterView<?> parent, View view, int position, long id) {
-                        String strWeather = weather2ArrayAdapter.getItem(position);
-                        WeatherConverter weatherConverter = new WeatherConverter();
-                        Weathers weather = weatherConverter.toWeather(requireContext(), strWeather);
-                        diaryEditViewModel.updateWeather2(weather);
-                    }
-
-                    @Override
-                    public void onNothingSelected(AdapterView<?> parent) {
-                        // 処理なし
-                    }
-                });
+        binding.autoCompleteTextWeather2.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                String strWeather = weather2ArrayAdapter.getItem(position);
+                WeatherConverter weatherConverter = new WeatherConverter();
+                Weathers weather = weatherConverter.toWeather(requireContext(), strWeather);
+                diaryEditViewModel.updateWeather2(weather);
+                binding.autoCompleteTextWeather2.clearFocus();
+            }
+        });
 
         diaryEditViewModel.getWeather2LiveData()
                 .observe(getViewLifecycleOwner(), new Observer<Weathers>() {
                     @Override
                     public void onChanged(Weathers weather) {
-                        Weathers _weather = weather;
-                        if (weather == null) {
-                            _weather = Weathers.UNKNOWN;
-                        }
-                        String strWeather = _weather.toString(requireContext());
-                        int position = weather2ArrayAdapter.getPosition(strWeather);
-                        binding.spinnerWeather2.setSelection(position);
+                        if (weather == null) return;
+
+                        String strWeather = weather.toString(requireContext());
+                        binding.autoCompleteTextWeather2.setText(strWeather, false);
                     }
                 });
 
@@ -686,9 +666,10 @@ public class DiaryEditFragment extends BaseFragment {
             throw new NullPointerException();
         }
 
+        // Adapter作成
         List<String> conditonItemList = new ArrayList<>();
-        for (Conditions weather: Conditions.values()) {
-            conditonItemList.add(weather.toString(requireContext()));
+        for (Conditions condition: Conditions.values()) {
+            conditonItemList.add(condition.toString(requireContext()));
         }
         ArrayAdapter<String> conditionArrayAdapter =
                 new ArrayAdapter<String>(requireContext(), android.R.layout.simple_list_item_1 , conditonItemList) {
@@ -713,124 +694,95 @@ public class DiaryEditFragment extends BaseFragment {
                         return textView;
                     }
                 };
-        binding.spinnerCondition.setAdapter(conditionArrayAdapter);
 
-        binding.spinnerCondition
-                .setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                    @Override
-                    public void onItemSelected(
-                            AdapterView<?> parent, View view, int position, long id) {
-                        ConditionConverter conditionConverter = new ConditionConverter();
-                        Conditions condition = conditionConverter.toCondition(position);
-                        diaryEditViewModel.updateCondition(condition);
-                    }
+        // ドロップダウン設定
+        binding.autoCompleteTextCondition.setAdapter(conditionArrayAdapter);
+        binding.autoCompleteTextCondition.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                String strCondition = conditionArrayAdapter.getItem(position);
+                ConditionConverter converter = new ConditionConverter();
+                Conditions condition = converter.toCondition(requireContext(), strCondition);
+                diaryEditViewModel.updateCondition(condition);
+                binding.autoCompleteTextCondition.clearFocus();
+            }
+        });
 
-                    @Override
-                    public void onNothingSelected(AdapterView<?> parent) {
-                        // 処理なし
-                    }
-                });
         diaryEditViewModel.getConditionLiveData()
                 .observe(getViewLifecycleOwner(), new Observer<Conditions>() {
                     @Override
                     public void onChanged(Conditions condition) {
-                        int conditionNumber;
-                        if (condition == null) {
-                            conditionNumber = 0;
-                        } else {
-                            conditionNumber = condition.toConditionNumber();
-                        }
-                        if (conditionNumber != binding.spinnerCondition.getSelectedItemPosition()) {
-                            binding.spinnerCondition.setSelection(conditionNumber);
-                        }
+                        if (condition == null) return;
+
+                        String strCondition = condition.toString(requireContext());
+                        binding.autoCompleteTextCondition.setText(strCondition, false);
                     }
                 });
     }
 
     private void setUpTitleInputField() {
-        // タイトル入力欄設定
-        setupEditText(
-                binding.editTextTitle,
-                binding.textTitleLength,
-                15,
-                binding.nestedScrollFullScreen, // 背景View
-                noKeyboardViews
-        );
+        // 処理なし
     }
 
     private void setUpItemInputField() {
         // 項目入力欄関係Viewを配列に格納
         final int MAX_ITEMS = DiaryLiveData.MAX_ITEMS;
         TextView[] textItems = new TextView[MAX_ITEMS];
-        EditText[] editTextItemsTitle = new EditText[MAX_ITEMS];
-        NestedScrollView[] nestedScrollItemsComment = new NestedScrollView[MAX_ITEMS];
-        EditText[] editTextItemsComment = new EditText[MAX_ITEMS];
-        TextView[] textItemsCommentLength = new TextView[MAX_ITEMS];
+        TextInputLayout[] textInputLayoutItemsTitle = new TextInputLayout[MAX_ITEMS];
+        TextInputEditText[] textInputEditTextItemsTitle = new TextInputEditText[MAX_ITEMS];
+        TextInputEditText[] textInputEditTextItemsComment = new TextInputEditText[MAX_ITEMS];
         ImageButton[] imageButtonItemsDelete = new ImageButton[MAX_ITEMS];
 
         textItems[0] = binding.includeItem1.textItemNumber;
-        editTextItemsTitle[0] = binding.includeItem1.editTextItemTitle;
-        nestedScrollItemsComment[0] = binding.includeItem1.nestedScrollItemComment;
-        editTextItemsComment[0] = binding.includeItem1.editTextItemComment;
-        textItemsCommentLength[0] = binding.includeItem1.textItemCommentLength;
+        textInputLayoutItemsTitle[0] = binding.includeItem1.textInputLayoutItemTitle;
+        textInputEditTextItemsTitle[0] = binding.includeItem1.textInputEditTextItemTitle;
+        textInputEditTextItemsComment[0] = binding.includeItem1.textInputEditTextItemComment;
         imageButtonItemsDelete[0] = binding.includeItem1.imageButtonItemDelete;
 
         textItems[1] = binding.includeItem2.textItemNumber;
-        editTextItemsTitle[1] = binding.includeItem2.editTextItemTitle;
-        nestedScrollItemsComment[1] = binding.includeItem2.nestedScrollItemComment;
-        editTextItemsComment[1] = binding.includeItem2.editTextItemComment;
-        textItemsCommentLength[1] = binding.includeItem2.textItemCommentLength;
+        textInputLayoutItemsTitle[1] = binding.includeItem2.textInputLayoutItemTitle;
+        textInputEditTextItemsTitle[1] = binding.includeItem2.textInputEditTextItemTitle;
+        textInputEditTextItemsComment[1] = binding.includeItem2.textInputEditTextItemComment;
         imageButtonItemsDelete[1] = binding.includeItem2.imageButtonItemDelete;
 
         textItems[2] = binding.includeItem3.textItemNumber;
-        editTextItemsTitle[2] = binding.includeItem3.editTextItemTitle;
-        nestedScrollItemsComment[2] = binding.includeItem3.nestedScrollItemComment;
-        editTextItemsComment[2] = binding.includeItem3.editTextItemComment;
-        textItemsCommentLength[2] = binding.includeItem3.textItemCommentLength;
+        textInputLayoutItemsTitle[2] = binding.includeItem3.textInputLayoutItemTitle;
+        textInputEditTextItemsTitle[2] = binding.includeItem3.textInputEditTextItemTitle;
+        textInputEditTextItemsComment[2] = binding.includeItem3.textInputEditTextItemComment;
         imageButtonItemsDelete[2] = binding.includeItem3.imageButtonItemDelete;
 
         textItems[3] = binding.includeItem4.textItemNumber;
-        editTextItemsTitle[3] = binding.includeItem4.editTextItemTitle;
-        nestedScrollItemsComment[3] = binding.includeItem4.nestedScrollItemComment;
-        editTextItemsComment[3] = binding.includeItem4.editTextItemComment;
-        textItemsCommentLength[3] = binding.includeItem4.textItemCommentLength;
+        textInputLayoutItemsTitle[3] = binding.includeItem4.textInputLayoutItemTitle;
+        textInputEditTextItemsTitle[3] = binding.includeItem4.textInputEditTextItemTitle;
+        textInputEditTextItemsComment[3] = binding.includeItem4.textInputEditTextItemComment;
         imageButtonItemsDelete[3] = binding.includeItem4.imageButtonItemDelete;
 
         textItems[4] = binding.includeItem5.textItemNumber;
-        editTextItemsTitle[4] = binding.includeItem5.editTextItemTitle;
-        nestedScrollItemsComment[4] = binding.includeItem5.nestedScrollItemComment;
-        editTextItemsComment[4] = binding.includeItem5.editTextItemComment;
-        textItemsCommentLength[4] = binding.includeItem5.textItemCommentLength;
+        textInputLayoutItemsTitle[4] = binding.includeItem5.textInputLayoutItemTitle;
+        textInputEditTextItemsTitle[4] = binding.includeItem5.textInputEditTextItemTitle;
+        textInputEditTextItemsComment[4] = binding.includeItem5.textInputEditTextItemComment;
         imageButtonItemsDelete[4] = binding.includeItem5.imageButtonItemDelete;
 
         // 項目欄設定
         // 項目タイトル入力欄設定
-        for (int i = 0; i < editTextItemsTitle.length; i++) {
-            int inputItemNo =  i + 1;
-            editTextItemsTitle[i].setOnClickListener(new View.OnClickListener() {
+        for (int i = 0; i < textInputEditTextItemsTitle.length; i++) {
+            int inputItemNumber =  i + 1;
+            textInputEditTextItemsTitle[i].setInputType(EditorInfo.TYPE_NULL); //キーボード非表示設定
+            textInputEditTextItemsTitle[i].setOnTouchListener(new View.OnTouchListener() {
                 @Override
-                public void onClick(View v) {
+                public boolean onTouch(View v, MotionEvent event) {
+                    Objects.requireNonNull(v);
+                    if (event.getAction() != MotionEvent.ACTION_UP) return false;
+
+                    hideKeyboard(v);
+
                     // 項目タイトル入力フラグメント起動
                     String inputItemTitle =
-                            diaryEditViewModel.getItemTitleLiveData(inputItemNo).getValue();
-                    NavDirections action =
-                            DiaryEditFragmentDirections
-                                    .actionDiaryEditFragmentToSelectItemTitleFragment(
-                                            inputItemNo, inputItemTitle);
-                    navController.navigate(action);
+                            diaryEditViewModel.getItemTitleLiveData(inputItemNumber).getValue();
+                    showDiaryItemTitleEditFragment(inputItemNumber, inputItemTitle);
+                    return false;
                 }
             });
-        }
-
-        // 項目コメント入力欄設定。
-        for (int i = 0; i < MAX_ITEMS; i++) {
-            setupEditText(
-                    editTextItemsComment[i],
-                    textItemsCommentLength[i],
-                    50,
-                    binding.nestedScrollFullScreen, // 背景View,
-                    noKeyboardViews
-            );
         }
 
         // 項目追加ボタン設定
@@ -1009,118 +961,232 @@ public class DiaryEditFragment extends BaseFragment {
         // TODO
     }
 
-    // TODO:マテリアルインプットフィールドに置換
-    //EditText 設定メソッド
-    @SuppressLint("ClickableViewAccessibility")
-    private void setupEditText(EditText editText,
-                               TextView textShowLength,
-                               int maxLength,
-                               View viewBackground,
-                               List<View> otherViewList) {
+    private void setupEditText() {
+        List<EditText> editTextList = createEditTextList();
 
-        // 入力文字数制限
-        InputFilter[] inputFilters = new InputFilter[1];
-        inputFilters[0] = new InputFilter.LengthFilter(maxLength);
-        editText.setFilters(inputFilters);
+        for (EditText editText: editTextList) {
+            // 入力欄フォーカス時の処理。
+            editText.setOnFocusChangeListener(
+                    new SetUpEditTextOnFocusChangeListener()
+            );
 
-        // 入力文字数表示
-        showTextLength(editText, textShowLength);
-        editText.addTextChangedListener(new TextWatcher() {
+            // 入力欄エンターキー押下時の処理。
+            editText.setOnKeyListener(new View.OnKeyListener() {
+                @Override
+                public boolean onKey(View v, int keyCode, KeyEvent event) {
+                    if (event.getAction() != KeyEvent.ACTION_DOWN) return false;
+                    if (keyCode != KeyEvent.KEYCODE_ENTER) return false;
+
+                    // HACK:InputTypeの値が何故か1ズレている。(公式のリファレンスでもズレあり。)
+                    //      (setとgetを駆使してLogで確認確認済み)
+                    if (editText.getInputType() == (TYPE_TEXT_FLAG_MULTI_LINE + 1)) return false;
+
+                    // キーボードを隠す。
+                    KeyboardInitializer keyboardInitializer =
+                            new KeyboardInitializer(requireActivity());
+                    keyboardInitializer.hide(v);
+                    // 自テキストフォーカスクリア。
+                    editText.clearFocus();
+
+                    // MEMO:”return true” だとバックスペースが機能しなくなり入力文字を削除できなくなる。
+                    return false;
+                }
+            });
+        }
+
+        binding.viewFullScreenBackground.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Objects.requireNonNull(v);
+
+                hideKeyboard(v);
+                clearFocusAllEditText();
+            }
+        });
+
+        setUpEditTextClearButton();
+    }
+
+
+    // HACK:xmlファイルでTextInputLayoutのEndIconを設定した状態でFragmentのTransitionを処理させると、
+    //      hintラベルがずれる不具合が発生。これはTransitionとラベルのアニメーションが干渉している事が原因らしい。
+    //      対策としてTransition完了後にEndIconを設定するようにコードを記述した。
+    private void setUpEditTextClearButton() {
+        EditTextClearButtonSetupTransitionListener clearButtonSetupTransitionListener =
+                new EditTextClearButtonSetupTransitionListener(
+                        binding.textInputLayoutTitle,
+                        binding.includeItem1.textInputLayoutItemTitle,
+                        binding.includeItem2.textInputLayoutItemTitle,
+                        binding.includeItem3.textInputLayoutItemTitle,
+                        binding.includeItem4.textInputLayoutItemTitle,
+                        binding.includeItem5.textInputLayoutItemTitle
+                );
+        addTransitionListener(clearButtonSetupTransitionListener);
+    }
+
+    private static class EditTextClearButtonSetupTransitionListener implements Transition.TransitionListener {
+
+        private final List<TextInputLayout> textInputLayoutList;
+
+        EditTextClearButtonSetupTransitionListener(TextInputLayout...  textInputLayouts) {
+            Objects.requireNonNull(textInputLayouts);
+            for (TextInputLayout textInputLayout: textInputLayouts) {
+                Objects.requireNonNull(textInputLayout);
+            }
+
+            textInputLayoutList = List.of(textInputLayouts);
+        }
+
+        @Override
+        public void onTransitionStart(Transition transition) {
+            // 処理なし
+        }
+
+        @Override
+        public void onTransitionEnd(Transition transition) {
+            for (TextInputLayout textInputLayout: textInputLayoutList) {
+                setUpClearButton(textInputLayout);
+            }
+        }
+
+        @Override
+        public void onTransitionCancel(Transition transition) {
+            // 処理なし
+        }
+
+        @Override
+        public void onTransitionPause(Transition transition) {
+            // 処理なし
+        }
+
+        @Override
+        public void onTransitionResume(Transition transition) {
+            // 処理なし
+        }
+
+        // HACK:クリアボタンはEND_ICON_CLEAR_BUTTONで容易にクリアボタンを実装できるが、
+        //      下記の理由でにEND_ICON_CUSTOMを通して設定している。
+        //      ・コードからEditTextの文字列を設定してもクリアボタンが表示されない。
+        //      ・FragmentのTransition完了後にEndIconを設定しても一度画面からEditTextのTextを編集すると、
+        //        フォーカスしない限りクリアボタンが表示されなくなる。
+        private void setUpClearButton(TextInputLayout textInputLayout) {
+            Objects.requireNonNull(textInputLayout);
+
+            textInputLayout.setEndIconMode(TextInputLayout.END_ICON_CUSTOM);
+            textInputLayout.setEndIconDrawable(R.drawable.ic_cancel_24px);
+            EditText editText = textInputLayout.getEditText();
+            Objects.requireNonNull(editText);
+            boolean isVisible = !editText.getText().toString().isEmpty();
+            textInputLayout.setEndIconVisible(isVisible);
+            textInputLayout.setEndIconOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    editText.setText("");
+                }
+            });
+            ClearButtonVisibleSwitchingTextWatcher textWatcher =
+                    new ClearButtonVisibleSwitchingTextWatcher(textInputLayout);
+            editText.addTextChangedListener(textWatcher);
+        }
+
+        private static class ClearButtonVisibleSwitchingTextWatcher implements TextWatcher {
+
+            private final TextInputLayout textInputLayout;
+
+            ClearButtonVisibleSwitchingTextWatcher(TextInputLayout textInputLayout) {
+                this.textInputLayout = textInputLayout;
+            }
+
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-                // 未使用
+                // 処理なし
             }
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                showTextLength(editText, textShowLength);
+                boolean isVisible = !s.toString().isEmpty();
+                textInputLayout.setEndIconVisible(isVisible);
             }
 
             @Override
             public void afterTextChanged(Editable s) {
-                // 未使用。
-            }
-        });
-
-        // 入力欄フォーカス時の処理。
-        editText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-            @Override
-            public void onFocusChange(View v, boolean hasFocus) {
-                // 入力欄フォーカス外しリスナをスクロールビューに実装。
-                // 参考：https://cpoint-lab.co.jp/article/202202/22053/
-                viewBackground.setOnTouchListener(new View.OnTouchListener() {
-                    @Override
-                    public boolean onTouch(View v, MotionEvent event) {
-                        // キーボードを隠す。
-                        KeyboardInitializer keyboardInitializer =
-                                new KeyboardInitializer(requireActivity());
-                        keyboardInitializer.hide(viewBackground);
-                        // 自テキストフォーカスクリア。
-                        editText.clearFocus();
-                        // 他のタッチ、クリックリスナを継続させる為にfalseを戻す。
-                        return false;
-                    }
-                });
-
-                for (View otherView: otherViewList) {
-                    otherView.setOnTouchListener(new View.OnTouchListener() {
-                        @Override
-                        public boolean onTouch(View v, MotionEvent event) {
-                            // キーボードを隠す。
-                            KeyboardInitializer keyboardInitializer =
-                                    new KeyboardInitializer(requireActivity());
-                            keyboardInitializer.hide(viewBackground);
-                            // 自テキストフォーカスクリア。
-                            editText.clearFocus();
-                            // 他のタッチ、クリックリスナを継続させる為にfalseを戻す。
-                            return false;
-                        }
-                    });
-                }
-            }
-        });
-
-
-
-        // 入力欄エンターキー押下時の処理。
-        editText.setOnKeyListener(new View.OnKeyListener() {
-            @Override
-            public boolean onKey(View v, int keyCode, KeyEvent event) {
-                if((event.getAction() == KeyEvent.ACTION_DOWN) && (keyCode == KeyEvent.KEYCODE_ENTER)){
-                    // HACK:InputTypeの値が何故か1ズレている。(公式のリファレンスでもズレあり。)
-                    //      (setとgetを駆使してLogで確認確認済み)
-                    if (editText.getInputType() != (TYPE_TEXT_FLAG_MULTI_LINE + 1)) {
-                        // キーボードを隠す。
-                        KeyboardInitializer keyboardInitializer =
-                                new KeyboardInitializer(requireActivity());
-                        keyboardInitializer.hide(viewBackground);
-                        // 自テキストフォーカスクリア。
-                        editText.clearFocus();
-                    }
-                }
-
-                // MEMO:”return true” だとバックスペースが機能しなくなり入力文字を削除できなくなる。
-                return false;
-            }
-        });
-
-    }
-
-    // TODO:マテリアルインプットフィールドに置換
-    // テキスト入力文字数表示メソッド
-    private void showTextLength(TextView textView, TextView textLength) {
-        int inputLength = textView.getText().length();
-        InputFilter[] inputFilters = textView.getFilters();
-        int inputMaxLength = -1;
-        for (InputFilter inputFilter: inputFilters) {
-            if (inputFilter instanceof InputFilter.LengthFilter) {
-                InputFilter.LengthFilter lengthFilter = (InputFilter.LengthFilter) inputFilter;
-                inputMaxLength = lengthFilter.getMax();
+                // 処理なし
             }
         }
-        String showLength = inputLength + "/" + inputMaxLength;
-        textLength.setText(showLength);
     }
+
+    private void clearFocusAllEditText() {
+        Log.d("20240921", "clearFocus");
+        List<EditText> editTextList = createEditTextList();
+        editTextList.stream().forEach(EditText::clearFocus);
+    }
+
+    private List<EditText> createEditTextList() {
+        return List.of(
+                binding.textInputEditTextDate,
+                binding.autoCompleteTextWeather1,
+                binding.autoCompleteTextWeather2,
+                binding.autoCompleteTextCondition,
+                binding.textInputEditTextTitle,
+                binding.includeItem1.textInputEditTextItemTitle,
+                binding.includeItem1.textInputEditTextItemComment,
+                binding.includeItem2.textInputEditTextItemTitle,
+                binding.includeItem2.textInputEditTextItemComment,
+                binding.includeItem3.textInputEditTextItemTitle,
+                binding.includeItem3.textInputEditTextItemComment,
+                binding.includeItem4.textInputEditTextItemTitle,
+                binding.includeItem4.textInputEditTextItemComment,
+                binding.includeItem5.textInputEditTextItemTitle,
+                binding.includeItem5.textInputEditTextItemComment
+        );
+    }
+
+    private static class SetUpEditTextOnFocusChangeListener implements View.OnFocusChangeListener {
+
+        @Override
+        public void onFocusChange(View v, boolean hasFocus) {
+            if (hasFocus) {
+                setUpEditTextScrollable(v);
+            } else {
+                resetEditTextScrollable(v);
+            }
+        }
+
+        private void setUpEditTextScrollable(View focusedView) {
+            if (focusedView instanceof TextInputEditText) {
+                TextInputEditText a = (TextInputEditText) focusedView;
+                if (a.getMinLines() > 1) {
+                    focusedView.setOnTouchListener(new ScrollableTextOnTouchListener());
+                }
+            }
+        }
+
+        private void resetEditTextScrollable(View focusedView) {
+            if (focusedView instanceof TextInputEditText) {
+                TextInputEditText a = (TextInputEditText) focusedView;
+                if (a.getMinLines() > 1) {
+                    focusedView.setOnTouchListener(null);
+                }
+            }
+        }
+
+        private static class ScrollableTextOnTouchListener implements View.OnTouchListener {
+
+            @SuppressLint("ClickableViewAccessibility")
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                if (!v.canScrollVertically(1) && !v.canScrollVertically(-1)) return false;
+
+                v.getParent().requestDisallowInterceptTouchEvent(true);
+                if ((event.getAction() & MotionEvent.ACTION_MASK) == MotionEvent.ACTION_UP) {
+                    v.getParent().requestDisallowInterceptTouchEvent(false);
+                }
+                return false;
+            }
+        }
+    }
+
+
 
     private boolean fetchWeatherInformation(LocalDate date) {
         if (date == null) {
@@ -1177,6 +1243,18 @@ public class DiaryEditFragment extends BaseFragment {
             action = DiaryEditFragmentDirections
                     .actionDiaryEditFragmentToDiaryShowFragmentPattern1(date);
         }
+        navController.navigate(action);
+    }
+
+    private void showDiaryItemTitleEditFragment(int inputItemNumber, String inputItemTitle) {
+        if (inputItemNumber < 1) throw new IllegalArgumentException();
+        if (inputItemNumber > DiaryLiveData.MAX_ITEMS) throw new IllegalArgumentException();
+        Objects.requireNonNull(inputItemTitle);
+        if (!canShowOtherFragment()) return;
+
+        NavDirections action =
+                DiaryEditFragmentDirections
+                        .actionDiaryEditFragmentToSelectItemTitleFragment(inputItemNumber, inputItemTitle);
         navController.navigate(action);
     }
 
@@ -1280,6 +1358,13 @@ public class DiaryEditFragment extends BaseFragment {
     protected void retryErrorDialogShow() {
         diaryEditViewModel.triggerAppErrorBufferListObserver();
         settingsViewModel.triggerAppErrorBufferListObserver();
+    }
+
+    private void hideKeyboard(View view) {
+        // キーボードを隠す。
+        KeyboardInitializer keyboardInitializer =
+                new KeyboardInitializer(requireActivity());
+        keyboardInitializer.hide(view);
     }
 
     @Override

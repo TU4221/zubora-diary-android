@@ -27,6 +27,7 @@ import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -284,6 +285,15 @@ public class DiaryEditViewModel extends BaseViewModel {
         diaryLiveData.getWeather2().setValue(weather);
     }
 
+    boolean isEqualWeathers() {
+        Weathers weather1 = diaryLiveData.getWeather1().getValue();
+        Weathers weather2 = diaryLiveData.getWeather2().getValue();
+        Objects.requireNonNull(weather1);
+        Objects.requireNonNull(weather2);
+
+        return weather1.equals(weather2);
+    }
+
     public void updateCondition(Conditions condition) {
         diaryLiveData.getCondition().setValue(condition);
     }
@@ -501,7 +511,15 @@ public class DiaryEditViewModel extends BaseViewModel {
         return diaryLiveData.getItem(1).getTitle();
     }
 
+    public MutableLiveData<String> getItem1TitleMutableLiveData() {
+        return diaryLiveData.getItem(1).getTitle();
+    }
+
     public LiveData<String> getItem2TitleLiveData() {
+        return diaryLiveData.getItem(2).getTitle();
+    }
+
+    public MutableLiveData<String> getItem2TitleMutableLiveData() {
         return diaryLiveData.getItem(2).getTitle();
     }
 
@@ -509,11 +527,23 @@ public class DiaryEditViewModel extends BaseViewModel {
         return diaryLiveData.getItem(3).getTitle();
     }
 
+    public MutableLiveData<String> getItem3TitleMutableLiveData() {
+        return diaryLiveData.getItem(3).getTitle();
+    }
+
     public LiveData<String> getItem4TitleLiveData() {
         return diaryLiveData.getItem(4).getTitle();
     }
 
+    public MutableLiveData<String> getItem4TitleMutableLiveData() {
+        return diaryLiveData.getItem(4).getTitle();
+    }
+
     public LiveData<String> getItem5TitleLiveData() {
+        return diaryLiveData.getItem(5).getTitle();
+    }
+
+    public MutableLiveData<String> getItem5TitleMutableLiveData() {
         return diaryLiveData.getItem(5).getTitle();
     }
 
