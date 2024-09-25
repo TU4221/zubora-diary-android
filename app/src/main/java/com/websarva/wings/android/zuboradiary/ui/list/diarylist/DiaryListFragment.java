@@ -243,6 +243,7 @@ public class DiaryListFragment extends BaseFragment {
                         if (diaryListItems == null) {
                             return;
                         }
+                        if (diaryListItems.isEmpty()) return;
                         DiaryYearMonthListAdapter diaryYearMonthListAdapter =
                                 (DiaryYearMonthListAdapter)
                                         binding.recyclerDiaryYearMonthList.getAdapter();
@@ -250,7 +251,9 @@ public class DiaryListFragment extends BaseFragment {
                             return;
                         }
 
-                        if (diaryListItems.isEmpty()) {
+                        boolean isNoDiary =
+                                diaryListItems.get(0).getViewType() == DiaryYearMonthListAdapter.VIEW_TYPE_NO_DIARY_MESSAGE;
+                        if (isNoDiary) {
                             binding.textDiaryListNoDiaryMessage.setVisibility(View.VISIBLE);
                             binding.recyclerDiaryYearMonthList.setVisibility(View.INVISIBLE);
                         } else {
