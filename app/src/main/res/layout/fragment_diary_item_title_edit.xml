@@ -4,95 +4,98 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
-
+        <variable
+            name="diaryItemTitleEditViewModel"
+            type="com.websarva.wings.android.zuboradiary.ui.diary.diaryitemtitleedit.DiaryItemTitleEditViewModel" />
     </data>
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/constraint_layout_full_screen"
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:clickable="true"
-        tools:context=".ui.diary.diaryitemtitleedit.DiaryItemTitleEditFragment">
+        android:layout_height="match_parent">
 
-        <com.google.android.material.appbar.MaterialToolbar
-            android:id="@+id/material_toolbar_top_app_bar"
+        <View
+            android:id="@+id/view_full_screen_background"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            tools:background="?attr/colorPrimary"
-            android:gravity="center"
-            android:minHeight="?attr/actionBarSize"
-            android:theme="?attr/actionBarTheme"
-            app:navigationIcon="@drawable/ic_arrow_back_24px"
-            app:titleCentered="true"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            tools:title="@string/fragment_diary_item_title_edit_toolbar_title_tools_value" />
+            android:layout_height="match_parent"/>
 
-        <TextView
-            android:id="@+id/text_item_new_title"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="8dp"
-            android:text="@string/fragment_diary_item_title_edit_new_item_title"
-            android:textSize="16sp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/material_toolbar_top_app_bar" />
+        <LinearLayout
+            android:id="@+id/constraint_layout_full_screen"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            tools:context=".ui.diary.diaryitemtitleedit.DiaryItemTitleEditFragment">
 
-        <EditText
-            android:id="@+id/edit_text_new_item_title"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_marginEnd="8dp"
-            android:ems="10"
-            android:hint="@string/fragment_diary_item_title_edit_new_item_title_hint"
-            android:inputType="text"
-            android:textSize="20sp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/text_item_new_title" />
+            <com.google.android.material.appbar.MaterialToolbar
+                android:id="@+id/material_toolbar_top_app_bar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                tools:background="?attr/colorPrimary"
+                android:gravity="center"
+                android:minHeight="?attr/actionBarSize"
+                android:theme="?attr/actionBarTheme"
+                app:navigationIcon="@drawable/ic_arrow_back_24px"
+                app:titleCentered="true"
+                tools:title="@string/fragment_diary_item_title_edit_toolbar_title_tools_value" />
 
-        <TextView
-            android:id="@+id/text_new_item_title_length"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="8dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/edit_text_new_item_title"
-            tools:text="@string/fragment_diary_item_title_edit_num_of_char_tools_value" />
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/fragment_horizontal_margin"
+                android:layout_marginTop="@dimen/fragment_vertical_margin"
+                android:orientation="vertical">
 
-        <Button
-            android:id="@+id/button_select_new_item_title"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/fragment_diary_item_title_edit_new_item_title_selection_button"
-            android:textSize="16sp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/text_new_item_title_length" />
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/textInputLayout_new_item_title"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/fragment_diary_item_title_edit_margin_top"
+                    android:hint="@string/fragment_diary_item_title_edit_new_item_title"
+                    app:counterEnabled="true"
+                    app:counterMaxLength="@integer/fragment_diary_item_title_edit_item_title_max_length"
+                    app:expandedHintEnabled="false"
+                    app:errorEnabled="true">
 
-        <TextView
-            android:id="@+id/text_item_title_history"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="16dp"
-            android:text="@string/fragment_diary_item_title_edit_title_selection_history"
-            android:textSize="16sp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/button_select_new_item_title" />
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/textInputEditText_new_item_title"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="@string/fragment_diary_item_title_edit_new_item_title_hint"
+                        android:inputType="text"
+                        android:maxLength="@integer/fragment_diary_item_title_edit_item_title_max_length"
+                        android:text="@={diaryItemTitleEditViewModel.itemTitleMutableLiveData}"
+                        android:textSize="@dimen/fragment_diary_item_title_edit_text_size" />
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/recycler_item_title_selection_history"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:transitionGroup="true"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/text_item_title_history" />
+                </com.google.android.material.textfield.TextInputLayout>
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+                <Button
+                    android:id="@+id/button_select_new_item_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/fragment_diary_item_title_edit_margin_top"
+                    android:layout_gravity="center_horizontal"
+                    android:text="@string/fragment_diary_item_title_edit_new_item_title_selection_button"
+                    android:textSize="@dimen/fragment_diary_item_title_edit_text_size" />
+
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/text_item_title_history"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/fragment_diary_item_title_edit_margin_start"
+                android:layout_marginTop="@dimen/fragment_diary_item_title_edit_margin_top"
+                android:text="@string/fragment_diary_item_title_edit_title_selection_history"
+                android:textSize="@dimen/fragment_diary_item_title_edit_text_size" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recycler_item_title_selection_history"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginTop="@dimen/fragment_diary_item_title_edit_margin_top"
+                android:transitionGroup="true" />
+        </LinearLayout>
+
+    </FrameLayout>
+
+
 </layout>

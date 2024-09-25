@@ -1,7 +1,5 @@
 package com.websarva.wings.android.zuboradiary.ui.diary.diaryedit;
 
-import static android.text.InputType.TYPE_TEXT_FLAG_MULTI_LINE;
-
 import android.annotation.SuppressLint;
 import android.content.DialogInterface;
 import android.os.Bundle;
@@ -21,7 +19,6 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.transition.Transition;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -37,7 +34,6 @@ import android.widget.TextView;
 
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
-import com.google.android.material.transition.platform.MaterialSharedAxis;
 import com.websarva.wings.android.zuboradiary.data.DateTimeStringConverter;
 import com.websarva.wings.android.zuboradiary.data.diary.ConditionConverter;
 import com.websarva.wings.android.zuboradiary.data.diary.Conditions;
@@ -50,6 +46,7 @@ import com.websarva.wings.android.zuboradiary.ui.BaseFragment;
 import com.websarva.wings.android.zuboradiary.ui.ColorSwitchingViewList;
 import com.websarva.wings.android.zuboradiary.ui.KeyboardInitializer;
 import com.websarva.wings.android.zuboradiary.ui.TestDiariesSaver;
+import com.websarva.wings.android.zuboradiary.ui.TextInputSetup;
 import com.websarva.wings.android.zuboradiary.ui.diary.DiaryLiveData;
 import com.websarva.wings.android.zuboradiary.ui.diary.DiaryThemeColorSwitcher;
 import com.websarva.wings.android.zuboradiary.ui.diary.diaryitemtitleedit.DiaryItemTitleEditFragment;
@@ -59,7 +56,6 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.PrimitiveIterator;
 
 import dagger.hilt.android.AndroidEntryPoint;
 import dagger.internal.Preconditions;
@@ -962,161 +958,52 @@ public class DiaryEditFragment extends BaseFragment {
     }
 
     private void setupEditText() {
-        List<EditText> editTextList = createEditTextList();
+        TextInputSetup textInputSetup = new TextInputSetup(requireActivity());
 
-        for (EditText editText: editTextList) {
-            // 入力欄フォーカス時の処理。
-            editText.setOnFocusChangeListener(
-                    new SetUpEditTextOnFocusChangeListener()
-            );
+        TextInputLayout[] allTextInputLayouts = {
+                binding.textInputLayoutDate,
+                binding.textInputLayoutTitle,
+                binding.textInputLayoutWeather1,
+                binding.textInputLayoutWeather2,
+                binding.textInputLayoutCondition,
+                binding.includeItem1.textInputLayoutItemTitle,
+                binding.includeItem1.textInputLayoutItemComment,
+                binding.includeItem2.textInputLayoutItemTitle,
+                binding.includeItem2.textInputLayoutItemComment,
+                binding.includeItem3.textInputLayoutItemTitle,
+                binding.includeItem3.textInputLayoutItemComment,
+                binding.includeItem4.textInputLayoutItemTitle,
+                binding.includeItem4.textInputLayoutItemComment,
+                binding.includeItem5.textInputLayoutItemTitle,
+                binding.includeItem5.textInputLayoutItemComment,
+        };
+        textInputSetup.setUpFocusClearOnClickBackground(binding.viewFullScreenBackground, allTextInputLayouts);
 
-            // 入力欄エンターキー押下時の処理。
-            editText.setOnKeyListener(new View.OnKeyListener() {
-                @Override
-                public boolean onKey(View v, int keyCode, KeyEvent event) {
-                    if (event.getAction() != KeyEvent.ACTION_DOWN) return false;
-                    if (keyCode != KeyEvent.KEYCODE_ENTER) return false;
+        textInputSetup.setUpKeyboardCloseOnEnter(binding.textInputLayoutTitle);
 
-                    // HACK:InputTypeの値が何故か1ズレている。(公式のリファレンスでもズレあり。)
-                    //      (setとgetを駆使してLogで確認確認済み)
-                    if (editText.getInputType() == (TYPE_TEXT_FLAG_MULTI_LINE + 1)) return false;
+        TextInputLayout[] scrollableTextInputLayouts = {
+                binding.includeItem1.textInputLayoutItemComment,
+                binding.includeItem2.textInputLayoutItemComment,
+                binding.includeItem3.textInputLayoutItemComment,
+                binding.includeItem4.textInputLayoutItemComment,
+                binding.includeItem5.textInputLayoutItemComment,
+        };
+        textInputSetup.setUpScrollable(scrollableTextInputLayouts);
 
-                    // キーボードを隠す。
-                    KeyboardInitializer keyboardInitializer =
-                            new KeyboardInitializer(requireActivity());
-                    keyboardInitializer.hide(v);
-                    // 自テキストフォーカスクリア。
-                    editText.clearFocus();
-
-                    // MEMO:”return true” だとバックスペースが機能しなくなり入力文字を削除できなくなる。
-                    return false;
-                }
-            });
-        }
-
-        binding.viewFullScreenBackground.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Objects.requireNonNull(v);
-
-                hideKeyboard(v);
-                clearFocusAllEditText();
-            }
-        });
-
-        setUpEditTextClearButton();
-    }
-
-
-    // HACK:xmlファイルでTextInputLayoutのEndIconを設定した状態でFragmentのTransitionを処理させると、
-    //      hintラベルがずれる不具合が発生。これはTransitionとラベルのアニメーションが干渉している事が原因らしい。
-    //      対策としてTransition完了後にEndIconを設定するようにコードを記述した。
-    private void setUpEditTextClearButton() {
-        EditTextClearButtonSetupTransitionListener clearButtonSetupTransitionListener =
-                new EditTextClearButtonSetupTransitionListener(
-                        binding.textInputLayoutTitle,
-                        binding.includeItem1.textInputLayoutItemTitle,
-                        binding.includeItem2.textInputLayoutItemTitle,
-                        binding.includeItem3.textInputLayoutItemTitle,
-                        binding.includeItem4.textInputLayoutItemTitle,
-                        binding.includeItem5.textInputLayoutItemTitle
-                );
-        addTransitionListener(clearButtonSetupTransitionListener);
-    }
-
-    private static class EditTextClearButtonSetupTransitionListener implements Transition.TransitionListener {
-
-        private final List<TextInputLayout> textInputLayoutList;
-
-        EditTextClearButtonSetupTransitionListener(TextInputLayout...  textInputLayouts) {
-            Objects.requireNonNull(textInputLayouts);
-            for (TextInputLayout textInputLayout: textInputLayouts) {
-                Objects.requireNonNull(textInputLayout);
-            }
-
-            textInputLayoutList = List.of(textInputLayouts);
-        }
-
-        @Override
-        public void onTransitionStart(Transition transition) {
-            // 処理なし
-        }
-
-        @Override
-        public void onTransitionEnd(Transition transition) {
-            for (TextInputLayout textInputLayout: textInputLayoutList) {
-                setUpClearButton(textInputLayout);
-            }
-        }
-
-        @Override
-        public void onTransitionCancel(Transition transition) {
-            // 処理なし
-        }
-
-        @Override
-        public void onTransitionPause(Transition transition) {
-            // 処理なし
-        }
-
-        @Override
-        public void onTransitionResume(Transition transition) {
-            // 処理なし
-        }
-
-        // HACK:クリアボタンはEND_ICON_CLEAR_BUTTONで容易にクリアボタンを実装できるが、
-        //      下記の理由でにEND_ICON_CUSTOMを通して設定している。
-        //      ・コードからEditTextの文字列を設定してもクリアボタンが表示されない。
-        //      ・FragmentのTransition完了後にEndIconを設定しても一度画面からEditTextのTextを編集すると、
-        //        フォーカスしない限りクリアボタンが表示されなくなる。
-        private void setUpClearButton(TextInputLayout textInputLayout) {
-            Objects.requireNonNull(textInputLayout);
-
-            textInputLayout.setEndIconMode(TextInputLayout.END_ICON_CUSTOM);
-            textInputLayout.setEndIconDrawable(R.drawable.ic_cancel_24px);
-            EditText editText = textInputLayout.getEditText();
-            Objects.requireNonNull(editText);
-            boolean isVisible = !editText.getText().toString().isEmpty();
-            textInputLayout.setEndIconVisible(isVisible);
-            textInputLayout.setEndIconOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    editText.setText("");
-                }
-            });
-            ClearButtonVisibleSwitchingTextWatcher textWatcher =
-                    new ClearButtonVisibleSwitchingTextWatcher(textInputLayout);
-            editText.addTextChangedListener(textWatcher);
-        }
-
-        private static class ClearButtonVisibleSwitchingTextWatcher implements TextWatcher {
-
-            private final TextInputLayout textInputLayout;
-
-            ClearButtonVisibleSwitchingTextWatcher(TextInputLayout textInputLayout) {
-                this.textInputLayout = textInputLayout;
-            }
-
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-                // 処理なし
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                boolean isVisible = !s.toString().isEmpty();
-                textInputLayout.setEndIconVisible(isVisible);
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-                // 処理なし
-            }
-        }
+        TextInputLayout[] clearableTextInputLayouts = {
+                binding.textInputLayoutTitle,
+                binding.includeItem1.textInputLayoutItemTitle,
+                binding.includeItem2.textInputLayoutItemTitle,
+                binding.includeItem3.textInputLayoutItemTitle,
+                binding.includeItem4.textInputLayoutItemTitle,
+                binding.includeItem5.textInputLayoutItemTitle,
+        };
+        TextInputSetup.ClearButtonSetUpTransitionListener transitionListener =
+                textInputSetup.createClearButtonSetupTransitionListener(clearableTextInputLayouts);
+        addTransitionListener(transitionListener);
     }
 
     private void clearFocusAllEditText() {
-        Log.d("20240921", "clearFocus");
         List<EditText> editTextList = createEditTextList();
         editTextList.stream().forEach(EditText::clearFocus);
     }
@@ -1140,53 +1027,6 @@ public class DiaryEditFragment extends BaseFragment {
                 binding.includeItem5.textInputEditTextItemComment
         );
     }
-
-    private static class SetUpEditTextOnFocusChangeListener implements View.OnFocusChangeListener {
-
-        @Override
-        public void onFocusChange(View v, boolean hasFocus) {
-            if (hasFocus) {
-                setUpEditTextScrollable(v);
-            } else {
-                resetEditTextScrollable(v);
-            }
-        }
-
-        private void setUpEditTextScrollable(View focusedView) {
-            if (focusedView instanceof TextInputEditText) {
-                TextInputEditText a = (TextInputEditText) focusedView;
-                if (a.getMinLines() > 1) {
-                    focusedView.setOnTouchListener(new ScrollableTextOnTouchListener());
-                }
-            }
-        }
-
-        private void resetEditTextScrollable(View focusedView) {
-            if (focusedView instanceof TextInputEditText) {
-                TextInputEditText a = (TextInputEditText) focusedView;
-                if (a.getMinLines() > 1) {
-                    focusedView.setOnTouchListener(null);
-                }
-            }
-        }
-
-        private static class ScrollableTextOnTouchListener implements View.OnTouchListener {
-
-            @SuppressLint("ClickableViewAccessibility")
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                if (!v.canScrollVertically(1) && !v.canScrollVertically(-1)) return false;
-
-                v.getParent().requestDisallowInterceptTouchEvent(true);
-                if ((event.getAction() & MotionEvent.ACTION_MASK) == MotionEvent.ACTION_UP) {
-                    v.getParent().requestDisallowInterceptTouchEvent(false);
-                }
-                return false;
-            }
-        }
-    }
-
-
 
     private boolean fetchWeatherInformation(LocalDate date) {
         if (date == null) {

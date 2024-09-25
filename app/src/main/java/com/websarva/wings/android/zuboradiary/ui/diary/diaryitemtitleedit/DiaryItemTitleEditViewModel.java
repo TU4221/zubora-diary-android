@@ -92,6 +92,10 @@ public class DiaryItemTitleEditViewModel extends BaseViewModel {
         return itemTitle;
     }
 
+    public MutableLiveData<String> getItemTitleMutableLiveData() {
+        return itemTitle;
+    }
+
     public LiveData<List<DiaryItemTitleSelectionHistoryItem>> getItemTitleSelectionHistoryLiveData() {
         return itemTitleSelectionHistory;
     }

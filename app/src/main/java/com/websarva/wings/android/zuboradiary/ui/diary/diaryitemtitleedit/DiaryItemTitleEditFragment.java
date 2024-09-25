@@ -1,8 +1,5 @@
 package com.websarva.wings.android.zuboradiary.ui.diary.diaryitemtitleedit;
 
-import static android.text.InputType.TYPE_TEXT_FLAG_MULTI_LINE;
-
-import android.annotation.SuppressLint;
 import android.content.DialogInterface;
 import android.os.Bundle;
 
@@ -15,30 +12,28 @@ import androidx.navigation.NavBackStackEntry;
 import androidx.navigation.NavDirections;
 
 import android.text.Editable;
-import android.text.InputFilter;
 import android.text.TextWatcher;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.google.android.material.textfield.TextInputLayout;
 import com.websarva.wings.android.zuboradiary.R;
 import com.websarva.wings.android.zuboradiary.data.database.DiaryItemTitleSelectionHistoryItem;
 import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor;
 import com.websarva.wings.android.zuboradiary.databinding.FragmentDiaryItemTitleEditBinding;
 import com.websarva.wings.android.zuboradiary.ui.BaseFragment;
 import com.websarva.wings.android.zuboradiary.ui.ColorSwitchingViewList;
-import com.websarva.wings.android.zuboradiary.ui.KeyboardInitializer;
+import com.websarva.wings.android.zuboradiary.ui.TextInputSetup;
 import com.websarva.wings.android.zuboradiary.ui.diary.DiaryThemeColorSwitcher;
 import com.websarva.wings.android.zuboradiary.ui.settings.SettingsViewModel;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import dagger.hilt.android.AndroidEntryPoint;
 
@@ -81,6 +76,8 @@ public class DiaryItemTitleEditFragment extends BaseFragment {
     @Override
     protected View initializeDataBinding(@NonNull LayoutInflater inflater, ViewGroup container) {
         binding = FragmentDiaryItemTitleEditBinding.inflate(inflater, container, false);
+        binding.setLifecycleOwner(this);
+        binding.setDiaryItemTitleEditViewModel(diaryItemTitleEditViewModel);
         return binding.getRoot();
     }
 
@@ -111,9 +108,9 @@ public class DiaryItemTitleEditFragment extends BaseFragment {
 
                         ColorSwitchingViewList<TextView> textViewList =
                                 new ColorSwitchingViewList<>(
-                                        binding.textItemNewTitle,
-                                        binding.editTextNewItemTitle,
-                                        binding.textNewItemTitleLength,
+                                        //binding.textItemNewTitle,
+                                        //binding.editTextNewItemTitle,
+                                        //binding.textNewItemTitleLength,
                                         binding.textItemTitleHistory
                                 );
                         switcher.switchTextColorOnBackground(textViewList);
@@ -202,49 +199,58 @@ public class DiaryItemTitleEditFragment extends BaseFragment {
     }
 
     private void setUpItemTitleInputField() {
-        // 新規項目入力欄設定
-        // キーボード入力不要View
-        List<View> noKeyboardViews = new ArrayList<>();
-        noKeyboardViews.add(binding.buttonSelectNewItemTitle);
-        noKeyboardViews.add(binding.recyclerItemTitleSelectionHistory);
-        setupEditText(
-                binding.editTextNewItemTitle,
-                binding.textNewItemTitleLength,
-                15,
-                binding.constraintLayoutFullScreen, // 背景View
-                noKeyboardViews
-        );
-
-        diaryItemTitleEditViewModel.getItemTitleLiveData()
-                .observe(getViewLifecycleOwner(), new Observer<String>() {
-                    @Override
-                    public void onChanged(String s) {
-                        if (s == null) {
-                            // TODO:assert
-                            return;
-                        }
-                        binding.editTextNewItemTitle.setText(s);
-                    }
-                });
-
+        TextInputSetup textInputSetup = new TextInputSetup(requireActivity());
+        TextInputLayout[] textInputLayouts = {binding.textInputLayoutNewItemTitle};
+        textInputSetup.setUpKeyboardCloseOnEnter(textInputLayouts);
+        textInputSetup.setUpFocusClearOnClickBackground(binding.viewFullScreenBackground, textInputLayouts);
+        TextInputSetup.ClearButtonSetUpTransitionListener transitionListener =
+                textInputSetup.createClearButtonSetupTransitionListener(textInputLayouts);
+        addTransitionListener(transitionListener);
+        EditText editText = binding.textInputLayoutNewItemTitle.getEditText();
+        Objects.requireNonNull(editText);
+        editText.addTextChangedListener(new InputItemTitleErrorWatcher());
         binding.buttonSelectNewItemTitle.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String title = binding.editTextNewItemTitle.getText().toString();
-                // 入力タイトルの先頭が空白文字以外(\\S)ならアイテムタイトル更新
-                if (title.matches("\\S+.*")) {
-                    completeItemTitleEdit(title);
-                } else {
-                    // 入力タイトルの先頭が空白文字(\\s)ならエラー表示
-                    if (title.matches("\\s+.*")) {
-                        binding.editTextNewItemTitle.setError(getString(R.string.fragment_diary_item_title_edit_new_item_title_input_field_error_message_initial_char_unmatched));
-                        // それ以外(未入力)ならエラー表示
-                    } else {
-                        binding.editTextNewItemTitle.setError(getString(R.string.fragment_diary_item_title_edit_new_item_title_input_field_error_message_empty));
-                    }
-                }
+                Objects.requireNonNull(v);
+                boolean isError = Objects.nonNull(binding.textInputLayoutNewItemTitle.getError());
+                if (isError) return;
+
+                String title = diaryItemTitleEditViewModel.getItemTitleLiveData().getValue();
+                Objects.requireNonNull(title);
+                completeItemTitleEdit(title);
             }
         });
+    }
+
+    private class InputItemTitleErrorWatcher implements TextWatcher {
+
+        @Override
+        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            // 処理なし
+        }
+
+        @Override
+        public void onTextChanged(CharSequence s, int start, int before, int count) {
+            Objects.requireNonNull(s);
+
+            String title = s.toString();
+            if (title.isEmpty()) {
+                binding.textInputLayoutNewItemTitle.setError(getString(R.string.fragment_diary_item_title_edit_new_item_title_input_field_error_message_empty));
+                return;
+            }
+            // 先頭が空白文字(\\s)
+            if (title.matches("\\s+.*")) {
+                binding.textInputLayoutNewItemTitle.setError(getString(R.string.fragment_diary_item_title_edit_new_item_title_input_field_error_message_initial_char_unmatched));
+                return;
+            }
+            binding.textInputLayoutNewItemTitle.setError(null);
+        }
+
+        @Override
+        public void afterTextChanged(Editable s) {
+            // 処理なし
+        }
     }
 
     private void setUpItemTitleSelectionHistory(ThemeColor themeColor) {
@@ -289,115 +295,6 @@ public class DiaryItemTitleEditFragment extends BaseFragment {
                         adapter.submitList(diaryItemTitleSelectionHistoryItems);
                     }
                 });
-    }
-
-    //EditText 設定メソッド
-    @SuppressLint("ClickableViewAccessibility")
-    private void setupEditText(EditText editText,
-                               TextView textShowLength,
-                               int maxLength,
-                               View viewBackground,
-                               List<View> otherViewList) {
-
-        // 入力文字数制限
-        InputFilter[] inputFilters = new InputFilter[1];
-        inputFilters[0] = new InputFilter.LengthFilter(maxLength);
-        editText.setFilters(inputFilters);
-
-        // 入力文字数表示
-        showTextLength(editText, textShowLength);
-        editText.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-                // 未使用
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                showTextLength(editText, textShowLength);
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-                // 未使用
-            }
-        });
-
-        // 入力欄フォーカス時の処理。
-        editText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-            @Override
-            public void onFocusChange(View v, boolean hasFocus) {
-                // 入力欄フォーカス外しリスナをスクロールビューに実装。
-                // 参考：https://cpoint-lab.co.jp/article/202202/22053/
-                viewBackground.setOnTouchListener(new View.OnTouchListener() {
-                    @Override
-                    public boolean onTouch(View v, MotionEvent event) {
-                        // キーボードを隠す。
-                        KeyboardInitializer keyboardInitializer =
-                                new KeyboardInitializer(requireActivity());
-                        keyboardInitializer.hide(viewBackground);
-                        // 自テキストフォーカスクリア。
-                        editText.clearFocus();
-                        // 他のタッチ、クリックリスナを継続させる為にfalseを戻す。
-                        return false;
-                    }
-                });
-
-                for (View otherView: otherViewList) {
-                    otherView.setOnTouchListener(new View.OnTouchListener() {
-                        @Override
-                        public boolean onTouch(View v, MotionEvent event) {
-                            // キーボードを隠す。
-                            KeyboardInitializer keyboardInitializer =
-                                    new KeyboardInitializer(requireActivity());
-                            keyboardInitializer.hide(viewBackground);
-                            // 自テキストフォーカスクリア。
-                            editText.clearFocus();
-                            // 他のタッチ、クリックリスナを継続させる為にfalseを戻す。
-                            return false;
-                        }
-                    });
-                }
-            }
-        });
-
-
-        // 入力欄エンターキー押下時の処理。
-        editText.setOnKeyListener(new View.OnKeyListener() {
-            @Override
-            public boolean onKey(View v, int keyCode, KeyEvent event) {
-                if((event.getAction() == KeyEvent.ACTION_DOWN) && (keyCode == KeyEvent.KEYCODE_ENTER)){
-                    // HACK:InputTypeの値が何故か1ズレている。(公式のリファレンスでもズレあり。)
-                    //      (setとgetを駆使してLogで確認確認済み)
-                    if (editText.getInputType() != (TYPE_TEXT_FLAG_MULTI_LINE + 1)) {
-                        // キーボードを隠す。
-                        KeyboardInitializer keyboardInitializer =
-                                new KeyboardInitializer(requireActivity());
-                        keyboardInitializer.hide(viewBackground);
-                        // 自テキストフォーカスクリア。
-                        editText.clearFocus();
-                    }
-                }
-
-                // MEMO:”return true” だとバックスペースが機能しなくなり入力文字を削除できなくなる。
-                return false;
-            }
-        });
-    }
-
-    // テキスト入力文字数表示メソッド
-    private void showTextLength(TextView textView, TextView textLength) {
-        int inputLength = textView.getText().length();
-        InputFilter[] inputFilters = textView.getFilters();
-        int inputMaxLength = -1;
-        for (InputFilter inputFilter: inputFilters) {
-            if (inputFilter instanceof InputFilter.LengthFilter) {
-                InputFilter.LengthFilter lengthFilter = (InputFilter.LengthFilter) inputFilter;
-                inputMaxLength = lengthFilter.getMax();
-            }
-        }
-        String showLength = inputLength + "/" + inputMaxLength;
-        textLength.setText(showLength);
     }
 
     // DiaryItemTitleEditFragmentを閉じる
