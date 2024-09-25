@@ -59,8 +59,7 @@ public class DiaryItemTitleEditFragment extends BaseFragment {
 
     @Override
     protected void initializeViewModel() {
-        // TODO:スコープ自Fragmentで良いのでは？
-        ViewModelProvider provider = new ViewModelProvider(requireActivity());
+        ViewModelProvider provider = new ViewModelProvider(this);
         diaryItemTitleEditViewModel = provider.get(DiaryItemTitleEditViewModel.class);
 
         ViewModelProvider activityScopeProvider = new ViewModelProvider(requireActivity());
