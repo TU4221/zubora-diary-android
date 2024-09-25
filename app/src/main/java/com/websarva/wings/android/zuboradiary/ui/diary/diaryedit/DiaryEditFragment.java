@@ -1,6 +1,5 @@
 package com.websarva.wings.android.zuboradiary.ui.diary.diaryedit;
 
-import android.annotation.SuppressLint;
 import android.content.DialogInterface;
 import android.os.Bundle;
 
@@ -15,9 +14,6 @@ import androidx.lifecycle.SavedStateHandle;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavDirections;
 
-import android.text.Editable;
-import android.text.TextWatcher;
-import android.transition.Transition;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -960,23 +956,7 @@ public class DiaryEditFragment extends BaseFragment {
     private void setupEditText() {
         TextInputSetup textInputSetup = new TextInputSetup(requireActivity());
 
-        TextInputLayout[] allTextInputLayouts = {
-                binding.textInputLayoutDate,
-                binding.textInputLayoutTitle,
-                binding.textInputLayoutWeather1,
-                binding.textInputLayoutWeather2,
-                binding.textInputLayoutCondition,
-                binding.includeItem1.textInputLayoutItemTitle,
-                binding.includeItem1.textInputLayoutItemComment,
-                binding.includeItem2.textInputLayoutItemTitle,
-                binding.includeItem2.textInputLayoutItemComment,
-                binding.includeItem3.textInputLayoutItemTitle,
-                binding.includeItem3.textInputLayoutItemComment,
-                binding.includeItem4.textInputLayoutItemTitle,
-                binding.includeItem4.textInputLayoutItemComment,
-                binding.includeItem5.textInputLayoutItemTitle,
-                binding.includeItem5.textInputLayoutItemComment,
-        };
+        TextInputLayout[] allTextInputLayouts = createAllTextInputLayoutList().toArray(new TextInputLayout[0]);
         textInputSetup.setUpFocusClearOnClickBackground(binding.viewFullScreenBackground, allTextInputLayouts);
 
         textInputSetup.setUpKeyboardCloseOnEnter(binding.textInputLayoutTitle);
@@ -1004,27 +984,33 @@ public class DiaryEditFragment extends BaseFragment {
     }
 
     private void clearFocusAllEditText() {
-        List<EditText> editTextList = createEditTextList();
-        editTextList.stream().forEach(EditText::clearFocus);
+        List<TextInputLayout> textInputLayoutList = createAllTextInputLayoutList();
+        textInputLayoutList.stream().forEach(x -> {
+            Objects.requireNonNull(x);
+
+            EditText editText = x.getEditText();
+            Objects.requireNonNull(editText);
+            editText.clearFocus();
+        });
     }
 
-    private List<EditText> createEditTextList() {
+    private List<TextInputLayout> createAllTextInputLayoutList() {
         return List.of(
-                binding.textInputEditTextDate,
-                binding.autoCompleteTextWeather1,
-                binding.autoCompleteTextWeather2,
-                binding.autoCompleteTextCondition,
-                binding.textInputEditTextTitle,
-                binding.includeItem1.textInputEditTextItemTitle,
-                binding.includeItem1.textInputEditTextItemComment,
-                binding.includeItem2.textInputEditTextItemTitle,
-                binding.includeItem2.textInputEditTextItemComment,
-                binding.includeItem3.textInputEditTextItemTitle,
-                binding.includeItem3.textInputEditTextItemComment,
-                binding.includeItem4.textInputEditTextItemTitle,
-                binding.includeItem4.textInputEditTextItemComment,
-                binding.includeItem5.textInputEditTextItemTitle,
-                binding.includeItem5.textInputEditTextItemComment
+                binding.textInputLayoutDate,
+                binding.textInputLayoutWeather1,
+                binding.textInputLayoutWeather2,
+                binding.textInputLayoutCondition,
+                binding.textInputLayoutTitle,
+                binding.includeItem1.textInputLayoutItemTitle,
+                binding.includeItem1.textInputLayoutItemComment,
+                binding.includeItem2.textInputLayoutItemTitle,
+                binding.includeItem2.textInputLayoutItemComment,
+                binding.includeItem3.textInputLayoutItemTitle,
+                binding.includeItem3.textInputLayoutItemComment,
+                binding.includeItem4.textInputLayoutItemTitle,
+                binding.includeItem4.textInputLayoutItemComment,
+                binding.includeItem5.textInputLayoutItemTitle,
+                binding.includeItem5.textInputLayoutItemComment
         );
     }
 
