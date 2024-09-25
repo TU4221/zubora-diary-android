@@ -9,48 +9,48 @@
             type="com.websarva.wings.android.zuboradiary.ui.diary.diaryedit.DiaryEditViewModel" />
     </data>
 
-    <FrameLayout
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        tools:context=".ui.diary.diaryedit.DiaryEditFragment">
 
-        <View
-            android:id="@+id/view_full_screen_background"
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/material_toolbar_top_app_bar"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"/>
+            android:layout_height="wrap_content"
+            tools:background="?attr/colorPrimary"
+            android:gravity="center"
+            android:minHeight="?attr/actionBarSize"
+            android:theme="?attr/actionBarTheme"
+            app:menu="@menu/diary_edit_toolbar_menu"
+            app:navigationIcon="@drawable/ic_arrow_back_24px"
+            app:titleCentered="true"
+            tools:title="@string/fragment_diary_edit_toolbar_title_value_tools"/>
 
-        <LinearLayout
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/fab_test"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="16dp"
+            android:src="@android:drawable/ic_menu_edit"
+            android:contentDescription="TEST"/>
+
+        <androidx.core.widget.NestedScrollView
+            android:id="@+id/nested_scroll_full_screen"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical"
-            tools:context=".ui.diary.diaryedit.DiaryEditFragment">
+            android:layout_height="match_parent">
 
-            <com.google.android.material.appbar.MaterialToolbar
-                android:id="@+id/material_toolbar_top_app_bar"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                tools:background="?attr/colorPrimary"
-                android:gravity="center"
-                android:minHeight="?attr/actionBarSize"
-                android:theme="?attr/actionBarTheme"
-                app:menu="@menu/diary_edit_toolbar_menu"
-                app:navigationIcon="@drawable/ic_arrow_back_24px"
-                app:titleCentered="true"
-                tools:title="@string/fragment_diary_edit_toolbar_title_value_tools"/>
-
-            <com.google.android.material.floatingactionbutton.FloatingActionButton
-                android:id="@+id/fab_test"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="end"
-                android:layout_marginEnd="16dp"
-                android:layout_marginBottom="16dp"
-                android:src="@android:drawable/ic_menu_edit"
-                android:contentDescription="TEST"/>
-
-            <androidx.core.widget.NestedScrollView
-                android:id="@+id/nested_scroll_full_screen"
+            <FrameLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
+
+                <View
+                    android:id="@+id/view_full_screen_background"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"/>
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -253,10 +253,10 @@
 
                 </LinearLayout>
 
-            </androidx.core.widget.NestedScrollView>
+            </FrameLayout>
 
-        </LinearLayout>
+        </androidx.core.widget.NestedScrollView>
 
-    </FrameLayout>
+    </LinearLayout>
 
 </layout>
