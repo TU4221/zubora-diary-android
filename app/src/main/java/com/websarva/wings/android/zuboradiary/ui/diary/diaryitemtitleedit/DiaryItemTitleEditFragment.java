@@ -254,7 +254,6 @@ public class DiaryItemTitleEditFragment extends BaseFragment {
 
     private void setUpItemTitleSelectionHistory(ThemeColor themeColor) {
         // 選択履歴リストアイテム設定
-        // TODO:下記必要か判断
         ItemTitleSelectionHistoryListAdapter itemTitleSelectionHistoryListAdapter =
                 new ItemTitleSelectionHistoryListAdapter(
                         requireContext(),
