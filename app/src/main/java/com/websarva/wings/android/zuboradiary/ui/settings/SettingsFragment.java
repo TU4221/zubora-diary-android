@@ -28,7 +28,6 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavDirections;
 
 import com.google.android.material.materialswitch.MaterialSwitch;
-import com.websarva.wings.android.zuboradiary.MainActivity;
 import com.websarva.wings.android.zuboradiary.R;
 import com.websarva.wings.android.zuboradiary.data.DateTimeStringConverter;
 import com.websarva.wings.android.zuboradiary.data.DayOfWeekStringConverter;
@@ -63,17 +62,12 @@ public class SettingsFragment extends BaseFragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // 戻るボタン押下時の処理
-        requireActivity().getOnBackPressedDispatcher().addCallback(
-                this,
-                new OnBackPressedCallback(true) {
-                    @Override
-                    public void handleOnBackPressed() {
-                        MainActivity mainActivity = (MainActivity) requireActivity();
-                        mainActivity.popBackStackToStartDestination();
-                    }
-                }
-        );
+        addOnBackPressedCallback(new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                requireMainActivity().popBackStackToStartDestination();
+            }
+        });
 
         // ActivityResultLauncher設定
         // 通知権限取得結果処理

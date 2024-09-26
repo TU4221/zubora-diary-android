@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.lifecycle.Lifecycle;
@@ -32,6 +33,10 @@ public abstract class BaseFragment extends CustomFragment {
     protected NavController navController;
     protected int destinationId;
 
+    protected MainActivity requireMainActivity() {
+        return (MainActivity) requireActivity();
+    }
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -50,6 +55,13 @@ public abstract class BaseFragment extends CustomFragment {
             throw new NullPointerException();
         }
         return navDestination.getId();
+    }
+
+    /**
+     * 戻るボタン押下時の処理。
+     * */
+    protected void addOnBackPressedCallback(OnBackPressedCallback callback) {
+        requireActivity().getOnBackPressedDispatcher().addCallback(this, callback);
     }
 
     @Override
