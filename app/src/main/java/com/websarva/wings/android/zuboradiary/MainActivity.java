@@ -329,6 +329,10 @@ public class MainActivity extends AppCompatActivity {
         this.previousItemSelected = this.startItem;
     }
 
+    public void popBackStackToStartDestination() {
+        binding.navView.setSelectedItemId(startItem.getItemId());
+    }
+
     private void switchEnabledBottomNavigation(boolean isEnabled) {
         Menu menu = binding.navView.getMenu();
         int size = menu.size();

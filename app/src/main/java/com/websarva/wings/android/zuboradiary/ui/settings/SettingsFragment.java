@@ -15,6 +15,7 @@ import android.view.ViewGroup;
 import android.widget.CompoundButton;
 import android.widget.TextView;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
@@ -27,6 +28,7 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavDirections;
 
 import com.google.android.material.materialswitch.MaterialSwitch;
+import com.websarva.wings.android.zuboradiary.MainActivity;
 import com.websarva.wings.android.zuboradiary.R;
 import com.websarva.wings.android.zuboradiary.data.DateTimeStringConverter;
 import com.websarva.wings.android.zuboradiary.data.DayOfWeekStringConverter;
@@ -60,6 +62,18 @@ public class SettingsFragment extends BaseFragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // 戻るボタン押下時の処理
+        requireActivity().getOnBackPressedDispatcher().addCallback(
+                this,
+                new OnBackPressedCallback(true) {
+                    @Override
+                    public void handleOnBackPressed() {
+                        MainActivity mainActivity = (MainActivity) requireActivity();
+                        mainActivity.popBackStackToStartDestination();
+                    }
+                }
+        );
 
         // ActivityResultLauncher設定
         // 通知権限取得結果処理

@@ -9,6 +9,7 @@ import android.view.ViewTreeObserver;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Observer;
@@ -24,6 +25,7 @@ import com.kizitonwose.calendar.core.DayPosition;
 import com.kizitonwose.calendar.view.MonthDayBinder;
 import com.kizitonwose.calendar.view.MonthHeaderFooterBinder;
 import com.kizitonwose.calendar.view.ViewContainer;
+import com.websarva.wings.android.zuboradiary.MainActivity;
 import com.websarva.wings.android.zuboradiary.R;
 import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor;
 import com.websarva.wings.android.zuboradiary.databinding.CalendarDayBinding;
@@ -68,6 +70,18 @@ public class CalendarFragment extends BaseFragment {
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // 戻るボタン押下時の処理
+        requireActivity().getOnBackPressedDispatcher().addCallback(
+                this,
+                new OnBackPressedCallback(true) {
+                    @Override
+                    public void handleOnBackPressed() {
+                        MainActivity mainActivity = (MainActivity) requireActivity();
+                        mainActivity.popBackStackToStartDestination();
+                    }
+                }
+        );
     }
 
     @Override
