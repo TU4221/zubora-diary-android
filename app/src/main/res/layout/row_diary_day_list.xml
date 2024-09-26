@@ -24,7 +24,7 @@
             android:layout_height="wrap_content"
             android:minHeight="72dp"
             android:orientation="horizontal"
-            tools:background="?attr/colorSecondaryContainer">
+            android:background="?attr/colorSecondaryContainer">
 
             <include
                 android:id="@+id/include_day"
@@ -41,6 +41,8 @@
                 android:gravity="center_vertical"
                 android:hint="@string/row_diary_day_list_title_hint"
                 android:textColor="?attr/colorOnSecondaryContainer"
+                android:textColorHint="?attr/colorOnSurfaceVariant"
+                android:background="?attr/colorSecondaryContainer"
                 android:textSize="20sp" />
 
             <ImageView
@@ -51,7 +53,9 @@
                 android:paddingHorizontal="16dp"
                 android:paddingVertical="8dp"
                 android:contentDescription="@string/row_diary_day_list_picture_description"
-                app:srcCompat="@drawable/ic_image_24px" />
+                android:background="?attr/colorSecondaryContainer"
+                app:srcCompat="@drawable/ic_image_24px"
+                app:tint="?attr/colorSecondary" />
 
         </LinearLayout>
 

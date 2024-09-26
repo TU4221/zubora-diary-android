@@ -12,6 +12,7 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.view.ContextThemeWrapper;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.ListAdapter;
@@ -112,10 +113,14 @@ public abstract class DiaryYearMonthListAdapter extends ListAdapter<DiaryYearMon
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
+        int themeResId = themeColor.getThemeResId();
+        Context contextWithTheme = new ContextThemeWrapper(context, themeResId);
+        LayoutInflater themeColorInflater = inflater.cloneInContext(contextWithTheme);
+
         if (viewType == VIEW_TYPE_DIARY) {
             RowDiaryYearMonthListBinding binding =
                     RowDiaryYearMonthListBinding
-                            .inflate(LayoutInflater.from(parent.getContext()), parent, false);
+                            .inflate(themeColorInflater, parent, false);
             DiaryYearMonthListViewHolder holder = new DiaryYearMonthListViewHolder(binding);
 
             // ホルダーアイテムアニメーション設定(build()メソッド内にて理由記載)
@@ -168,12 +173,12 @@ public abstract class DiaryYearMonthListAdapter extends ListAdapter<DiaryYearMon
         } else if (viewType == VIEW_TYPE_PROGRESS_BAR) {
             RowProgressBarBinding binding =
                     RowProgressBarBinding
-                            .inflate(LayoutInflater.from(parent.getContext()), parent, false);
+                            .inflate(themeColorInflater, parent, false);
             return new ProgressBarViewHolder(binding);
         } else {
             RowNoDiaryMessageBinding binding =
                     RowNoDiaryMessageBinding
-                            .inflate(LayoutInflater.from(parent.getContext()), parent, false);
+                            .inflate(themeColorInflater, parent, false);
             return new NoDiaryMessageViewHolder(binding);
         }
     }
@@ -297,17 +302,12 @@ public abstract class DiaryYearMonthListAdapter extends ListAdapter<DiaryYearMon
         }
     }
 
-    public class DiaryYearMonthListViewHolder extends RecyclerView.ViewHolder {
+    public static class DiaryYearMonthListViewHolder extends RecyclerView.ViewHolder {
         public RowDiaryYearMonthListBinding binding;
 
         public DiaryYearMonthListViewHolder(RowDiaryYearMonthListBinding binding) {
             super(binding.getRoot());
             this.binding = binding;
-
-            ListThemeColorSwitcher switcher = new ListThemeColorSwitcher(context, themeColor);
-            ColorSwitchingViewList<TextView> textViewList =
-                    new ColorSwitchingViewList<>(binding.textSectionBar);
-            switcher.switchListSectionBarColor(binding.textSectionBar);
         }
     }
 

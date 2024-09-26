@@ -1,5 +1,6 @@
 package com.websarva.wings.android.zuboradiary.ui;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.transition.Transition;
 import android.view.LayoutInflater;
@@ -9,6 +10,7 @@ import android.view.ViewGroup;
 import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.view.ContextThemeWrapper;
 import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.LifecycleEventObserver;
 import androidx.lifecycle.LifecycleOwner;
@@ -23,9 +25,12 @@ import com.google.android.material.transition.platform.MaterialFadeThrough;
 import com.google.android.material.transition.platform.MaterialSharedAxis;
 import com.websarva.wings.android.zuboradiary.MainActivity;
 import com.websarva.wings.android.zuboradiary.data.AppError;
+import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor;
 
 import java.util.List;
 import java.util.Objects;
+
+import dagger.internal.Preconditions;
 
 
 public abstract class BaseFragment extends CustomFragment {
@@ -74,6 +79,17 @@ public abstract class BaseFragment extends CustomFragment {
 
     // TODO:戻り値Bindingクラスの方が良き
     protected abstract View initializeDataBinding(@NonNull LayoutInflater inflater, ViewGroup container);
+
+    // ThemeColorに合わせたインフレーター作成
+    @NonNull
+    protected final LayoutInflater createThemeColorInflater(LayoutInflater inflater, ThemeColor themeColor) {
+        Preconditions.checkNotNull(inflater);
+        Preconditions.checkNotNull(themeColor);
+
+        int themeResId = themeColor.getThemeResId();
+        Context contextWithTheme = new ContextThemeWrapper(requireActivity(), themeResId);
+        return inflater.cloneInContext(contextWithTheme);
+    }
 
     private void setUpFragmentTransitionEffect() {
         // FROM:遷移元 TO:遷移先

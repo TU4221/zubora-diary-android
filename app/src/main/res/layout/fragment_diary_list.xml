@@ -10,80 +10,94 @@
             type="com.websarva.wings.android.zuboradiary.ui.list.diarylist.DiaryListViewModel" />
     </data>
 
-    <LinearLayout
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical"
-        tools:context=".ui.list.diarylist.DiaryListFragment">
+        android:layout_height="match_parent">
 
-        <com.google.android.material.appbar.MaterialToolbar
-            android:id="@+id/material_toolbar_top_app_bar"
+        <View
+            android:id="@+id/view_full_screen_background"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            tools:background="?attr/colorPrimary"
-            android:gravity="center"
-            android:minHeight="?attr/actionBarSize"
-            android:theme="?attr/actionBarTheme"
-            app:menu="@menu/diary_list_toolbar_menu"
-            app:navigationIcon="@drawable/ic_calendar_month_24"
-            app:navigationContentDescription="@string/fragment_diary_list_toolbar_navigation_top_year_month_switching"
-            app:title="@string/fragment_diary_list_toolbar_title"
-            app:titleCentered="true"/>
+            android:layout_height="match_parent"
+            android:background="?colorSurface"/>
 
-        <FrameLayout
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            android:orientation="vertical">
 
-            <TextView
-                android:id="@+id/text_diary_list_no_diary_message"
+            <com.google.android.material.appbar.MaterialToolbar
+                android:id="@+id/material_toolbar_top_app_bar"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:gravity="center"
-                android:text="@string/fragment_diary_list_no_saved_diary_message"
-                android:visibility="invisible"
-                tools:visibility="visible"/>
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/recycler_diary_year_month_list"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:scrollbars="none"
-                android:transitionGroup="true"
-                android:visibility="invisible"
-                tools:visibility="visible"/>
+                android:minHeight="?attr/actionBarSize"
+                app:menu="@menu/diary_list_toolbar_menu"
+                app:navigationIcon="@drawable/ic_calendar_month_24"
+                app:navigationContentDescription="@string/fragment_diary_list_toolbar_navigation_top_year_month_switching"
+                app:title="@string/fragment_diary_list_toolbar_title"
+                app:titleTextColor="?attr/colorOnSurface"
+                app:titleCentered="true"
+                app:navigationIconTint="?attr/colorOnSurfaceVariant"/>
 
             <FrameLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:visibility="@{list_view_model.isVisibleUpdateProgressBarLiveData ? View.VISIBLE : View.INVISIBLE}"
-                tools:visibility="visible">
+                android:layout_height="match_parent">
 
-                <View
-                    android:id="@+id/view_diary_list_progress_bar"
+                <TextView
+                    android:id="@+id/text_diary_list_no_diary_message"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:background="@color/gray"
-                    android:alpha="0.5"/>
+                    android:gravity="center"
+                    android:text="@string/fragment_diary_list_no_saved_diary_message"
+                    android:visibility="invisible"
+                    tools:visibility="visible"/>
 
-                <ProgressBar
-                    android:id="@+id/progress_bar_diary_list_full_screen"
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/recycler_diary_year_month_list"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:scrollbars="none"
+                    android:transitionGroup="true"
+                    android:visibility="invisible"
+                    tools:visibility="visible"/>
+
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:visibility="@{list_view_model.isVisibleUpdateProgressBarLiveData ? View.VISIBLE : View.INVISIBLE}"
+                    tools:visibility="visible">
+
+                    <View
+                        android:id="@+id/view_diary_list_progress_bar"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:background="?attr/colorSecondaryContainer"
+                        android:alpha="0.5"/>
+                    <!--android:background="@color/common_progress_indicator_background"-->
+
+                    <ProgressBar
+                        android:id="@+id/progress_bar_diary_list_full_screen"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center" />
+
+                </FrameLayout>
+
+                <com.google.android.material.floatingactionbutton.FloatingActionButton
+                    android:id="@+id/fab_edit_diary"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="center" />
+                    android:layout_gravity="bottom|right"
+                    android:layout_marginEnd="16dp"
+                    android:layout_marginBottom="16dp"
+                    android:clickable="true"
+                    android:src="@drawable/ic_edit_24px"
+                    android:contentDescription="@string/fragment_diary_list_fab_new_diary_creation"/>
 
             </FrameLayout>
+        </LinearLayout>
 
-            <com.google.android.material.floatingactionbutton.FloatingActionButton
-                android:id="@+id/fab_edit_diary"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="bottom|right"
-                android:layout_marginEnd="16dp"
-                android:layout_marginBottom="16dp"
-                android:clickable="true"
-                android:src="@android:drawable/ic_menu_edit"
-                android:contentDescription="@string/fragment_diary_list_fab_new_diary_creation"/>
+    </FrameLayout>
 
-        </FrameLayout>
-    </LinearLayout>
+
 </layout>

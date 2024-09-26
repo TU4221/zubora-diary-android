@@ -26,11 +26,12 @@
             android:id="@+id/text_section_bar"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:hint="0000年00月"
-            tools:background="?attr/colorPrimaryContainer"
+            android:textColor="?attr/colorOnSecondary"
+            android:background="?attr/colorSecondary"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            tools:hint="0000年00月" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

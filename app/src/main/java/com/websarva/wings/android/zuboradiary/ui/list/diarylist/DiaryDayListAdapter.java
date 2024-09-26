@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.view.ContextThemeWrapper;
 import androidx.databinding.ViewDataBinding;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.ListAdapter;
@@ -55,9 +56,14 @@ public class DiaryDayListAdapter extends ListAdapter<DiaryDayListItem, DiaryDayL
     @NonNull
     @Override
     public DiaryDayListViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        LayoutInflater inflater = LayoutInflater.from(parent.getContext());
+        int themeResId = themeColor.getThemeResId();
+        Context contextWithTheme = new ContextThemeWrapper(context, themeResId);
+        LayoutInflater themeColorInflater = inflater.cloneInContext(contextWithTheme);
+
         RowDiaryDayListBinding binding =
                 RowDiaryDayListBinding
-                        .inflate(LayoutInflater.from(parent.getContext()), parent, false);
+                        .inflate(themeColorInflater, parent, false);
         return new DiaryDayListViewHolder(binding);
     }
 
@@ -100,27 +106,12 @@ public class DiaryDayListAdapter extends ListAdapter<DiaryDayListItem, DiaryDayL
 
     }
 
-    public class DiaryDayListViewHolder extends DiaryListSimpleCallback.LeftSwipeViewHolder {
+    public static class DiaryDayListViewHolder extends DiaryListSimpleCallback.LeftSwipeViewHolder {
         public RowDiaryDayListBinding binding;
         public LocalDate date;
         public DiaryDayListViewHolder(@NonNull RowDiaryDayListBinding binding) {
             super(binding);
             this.binding = binding;
-
-            ListThemeColorSwitcher switcher =
-                    new ListThemeColorSwitcher(context, themeColor);
-
-            ColorSwitchingViewList<TextView> textViewList =
-                    new ColorSwitchingViewList<>(
-                            binding.includeDay.textDayOfMonth,
-                            binding.includeDay.textDayOfWeek,
-                            binding.textRowDiaryListDayTitle
-                    );
-            switcher.switchTextColorOnListItemBackground(textViewList);
-
-            switcher.switchImageViewColorOnListItemBackground(binding.imageRowDiaryListDayPicture);
-
-            switcher.switchListItemBackgroundColor(binding.linerLayoutForeground);
         }
 
         @Override

@@ -69,7 +69,9 @@ public class DiaryListFragment extends BaseFragment {
 
     @Override
     protected View initializeDataBinding(@NonNull LayoutInflater inflater, ViewGroup container) {
-        binding = FragmentDiaryListBinding.inflate(inflater, container, false);
+        ThemeColor themeColor = settingsViewModel.loadThemeColorSettingValue();
+        LayoutInflater themeColorInflater = createThemeColorInflater(inflater, themeColor);
+        binding = FragmentDiaryListBinding.inflate(themeColorInflater, container, false);
         binding.setLifecycleOwner(this);
         binding.setListViewModel(diaryListViewModel);
         return binding.getRoot();
@@ -82,35 +84,12 @@ public class DiaryListFragment extends BaseFragment {
 
         setUpToolBar();
         setUpFloatActionButton();
+        setUpDiaryList();
     }
 
     @Override
     protected void setUpThemeColor() {
-        settingsViewModel.getThemeColorSettingValueLiveData()
-                .observe(getViewLifecycleOwner(), new Observer<ThemeColor>() {
-                    @Override
-                    public void onChanged(ThemeColor themeColor) {
-                        if (themeColor == null) {
-                            return;
-                        }
-
-                        // MEMO:RecyclerViewにThemeColorを適応させるため、
-                        //      ViewModelのThemeColorValueに値が格納されてから処理すること。
-                        //      RecyclerView設定後、色を変更するにはそれなりの工数がかかると判断。
-                        setUpDiaryList(themeColor);
-
-                        ListThemeColorSwitcher switcher =
-                                new ListThemeColorSwitcher(requireContext(), themeColor);
-
-                        switcher.switchToolbarColor(binding.materialToolbarTopAppBar);
-
-                        ColorSwitchingViewList<FloatingActionButton> floatingActionButtonList =
-                                new ColorSwitchingViewList<>(binding.fabEditDiary);
-                        switcher.switchFloatingActionButtonColor(floatingActionButtonList);
-
-                        switcher.switchCircularProgressBarColor(binding.progressBarDiaryListFullScreen);
-                    }
-                });
+        // 処理なし // TODO:BaseFragmentのメソッド削除
     }
 
     @Override
@@ -209,10 +188,8 @@ public class DiaryListFragment extends BaseFragment {
     }
 
     // 日記リスト(年月)設定
-    private void setUpDiaryList(ThemeColor themeColor) {
-        if (themeColor == null) {
-            throw new NullPointerException();
-        }
+    private void setUpDiaryList() {
+        ThemeColor themeColor = settingsViewModel.loadThemeColorSettingValue();
 
         DiaryListAdapter diaryListAdapter =
                 new DiaryListAdapter(

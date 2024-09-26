@@ -72,6 +72,7 @@ public class BaseThemeColorSwitcher {
         new WindowInsetsControllerCompat(window, window.getDecorView()).setAppearanceLightStatusBars(requests);
     }
 
+    // TODO:ThemeResIdが設定できないためサイトで確認しながら個々設定できるようにする
     public final void switchBottomNavigationColor(BottomNavigationView view) {
         Preconditions.checkNotNull(view);
 
@@ -123,6 +124,7 @@ public class BaseThemeColorSwitcher {
         view.setItemActiveIndicatorColor(ColorStateList.valueOf(secondaryContainerColor));
     }
 
+    // TODO:ThemeResIdが設定できないためサイトで確認しながら個々設定できるようにする。
     public final void switchToolbarColor(MaterialToolbar toolbar) {
         Preconditions.checkNotNull(toolbar);
 
