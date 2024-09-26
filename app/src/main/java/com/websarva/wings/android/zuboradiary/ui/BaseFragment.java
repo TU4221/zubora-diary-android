@@ -72,6 +72,7 @@ public abstract class BaseFragment extends CustomFragment {
         return initializeDataBinding(inflater, container);
     }
 
+    // TODO:戻り値Bindingクラスの方が良き
     protected abstract View initializeDataBinding(@NonNull LayoutInflater inflater, ViewGroup container);
 
     private void setUpFragmentTransitionEffect() {
