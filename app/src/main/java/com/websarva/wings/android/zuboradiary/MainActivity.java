@@ -1,7 +1,6 @@
 package com.websarva.wings.android.zuboradiary;
 
 import android.Manifest;
-import android.animation.ValueAnimator;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
@@ -9,8 +8,6 @@ import android.os.Looper;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationListener;
@@ -22,7 +19,6 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.constraintlayout.motion.widget.MotionLayout;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
@@ -32,6 +28,7 @@ import androidx.lifecycle.LifecycleEventObserver;
 import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.NavBackStackEntry;
 import androidx.navigation.NavController;
 import androidx.navigation.NavDestination;
 import androidx.navigation.Navigation;
@@ -47,6 +44,8 @@ import com.websarva.wings.android.zuboradiary.ui.calendar.CalendarFragment;
 import com.websarva.wings.android.zuboradiary.ui.list.diarylist.DiaryListFragment;
 import com.websarva.wings.android.zuboradiary.ui.list.wordsearch.WordSearchFragment;
 import com.websarva.wings.android.zuboradiary.ui.settings.SettingsViewModel;
+
+import java.util.Objects;
 
 import dagger.hilt.android.AndroidEntryPoint;
 import dagger.internal.Preconditions;
@@ -243,10 +242,10 @@ public class MainActivity extends AppCompatActivity {
                                              @NonNull NavDestination navDestination,
                                              @Nullable Bundle bundle) {
                 int motionResId;
-                if (isNoBottomNavigationFragment(navDestination)) {
-                    motionResId = R.id.motion_scene_bottom_navigation_hided_state;
-                } else {
+                if (needsBottomNavigationView(navController, navDestination)) {
                     motionResId = R.id.motion_scene_bottom_navigation_showed_state;
+                } else {
+                    motionResId = R.id.motion_scene_bottom_navigation_hided_state;
                 }
                 binding.motionLayoutBottomNavigation.transitionToState(motionResId);
             }
@@ -344,15 +343,40 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private boolean isNoBottomNavigationFragment(@NonNull NavDestination navDestination) {
-        return navDestination.getId() == R.id.navigation_diary_show_fragment
-                || navDestination.getId() == R.id.navigation_diary_edit_fragment
-                || navDestination.getId() == R.id.navigation_date_picker_dialog_for_diary_edit_fragment
-                || navDestination.getId() == R.id.navigation_diary_item_delete_confirmation_dialog
-                || navDestination.getId() == R.id.navigation_load_existing_diary_dialog_for_diary_edit_fragment
-                || navDestination.getId() == R.id.navigation_update_existing_diary_dialog_for_diary_edit_fragment
-                || navDestination.getId() == R.id.navigation_diary_item_title_edit_fragment
-                || navDestination.getId() == R.id.navigation_diary_item_title_delete_confirmation_dialog;
+    private boolean needsBottomNavigationView(NavController navController, NavDestination navDestination) {
+        Objects.requireNonNull(navDestination);
+
+        if (isFragment(navDestination)) {
+            return (isBottomNavigationFragment(navDestination));
+        }
+
+        // Fragment以外(Dialog)表示中は一つ前のFragmentを元に判断
+        NavBackStackEntry previousNavBackStackEntry = navController.getPreviousBackStackEntry();
+        Objects.requireNonNull(previousNavBackStackEntry);
+        NavDestination previousNavDestination = previousNavBackStackEntry.getDestination();
+        return isBottomNavigationFragment(previousNavDestination);
+    }
+
+    private boolean isFragment(NavDestination navDestination) {
+        Objects.requireNonNull(navDestination);
+
+        int navDestinationId = navDestination.getId();
+        if (navDestinationId == R.id.navigation_diary_list_fragment) return true;
+        if (navDestinationId == R.id.navigation_calendar_fragment) return true;
+        if (navDestinationId == R.id.navigation_settings_fragment) return true;
+        if (navDestinationId == R.id.navigation_word_search_fragment) return true;
+        if (navDestinationId == R.id.navigation_diary_show_fragment) return true;
+        if (navDestinationId == R.id.navigation_diary_edit_fragment) return true;
+        return navDestinationId == R.id.navigation_diary_item_title_edit_fragment;
+    }
+
+    private boolean isBottomNavigationFragment(NavDestination navDestination) {
+        Objects.requireNonNull(navDestination);
+
+        int navDestinationId = navDestination.getId();
+        if (navDestinationId == R.id.navigation_diary_list_fragment) return true;
+        if (navDestinationId == R.id.navigation_calendar_fragment) return true;
+        return navDestinationId == R.id.navigation_settings_fragment;
     }
 
     /**
