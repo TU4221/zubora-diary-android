@@ -62,10 +62,6 @@ public class MainActivity extends AppCompatActivity {
     private MenuItem startItem;
     private MenuItem previousItemSelected;
 
-    // BottomNavigationView表示/非表示切り替え関係
-    private int bottomNavigationDefaultHigh;
-    private boolean bottomNavigationIsHided = false;
-
     // ViewModel
     private SettingsViewModel settingsViewModel;
 
@@ -228,14 +224,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        // BottomNavigationView表示/非表示切り替え設定
-        this.binding.navView.post(new Runnable() {
-            @Override
-            public void run() {
-                MainActivity.this.bottomNavigationDefaultHigh =
-                        MainActivity.this.binding.navView.getHeight();
-            }
-        });
         navController.addOnDestinationChangedListener(new NavController.OnDestinationChangedListener() {
             @Override
             public void onDestinationChanged(@NonNull NavController navController,
