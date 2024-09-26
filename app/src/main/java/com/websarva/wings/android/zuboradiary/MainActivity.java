@@ -22,6 +22,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.motion.widget.MotionLayout;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
@@ -159,11 +160,7 @@ public class MainActivity extends AppCompatActivity {
                     //      (何も表示されない状態)
                     //      これを回避するために、遷移先のFragmentが表示しきるまで、タブ選択できないようにした。
                     //      Fragment A → B → A
-                    Menu menu = navView.getMenu();
-                    int size = menu.size();
-                    for (int i = 0; i < size; i++) {
-                        menu.getItem(i).setEnabled(false);
-                    }
+                    switchEnabledBottomNavigation(false);
                 }
                 return true;
             }
@@ -180,7 +177,7 @@ public class MainActivity extends AppCompatActivity {
                     public void onStateChanged(@NonNull LifecycleOwner lifecycleOwner,
                                                @NonNull Lifecycle.Event event) {
                         if (event == Lifecycle.Event.ON_RESUME) {
-                            enableBottomBottomNavigation();
+                            switchEnabledBottomNavigation(true);
                         }
                     }
                 });
@@ -193,7 +190,7 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onStateChanged(@NonNull LifecycleOwner lifecycleOwner,
                                                @NonNull Lifecycle.Event event) {
-                        enableBottomBottomNavigation();
+                        switchEnabledBottomNavigation(true);
                     }
                 });
             }
@@ -245,60 +242,13 @@ public class MainActivity extends AppCompatActivity {
             public void onDestinationChanged(@NonNull NavController navController,
                                              @NonNull NavDestination navDestination,
                                              @Nullable Bundle bundle) {
+                int motionResId;
                 if (isNoBottomNavigationFragment(navDestination)) {
-                    if (!MainActivity.this.bottomNavigationIsHided) {
-                        if (true) {
-                            MainActivity.this.binding.navView.setTransitionVisibility(View.GONE);
-                            //MainActivity.this.binding.navView.setVisibility(View.GONE);
-                            MainActivity.this.bottomNavigationIsHided = true;
-                            return;
-                        }
-                        ValueAnimator anim= ValueAnimator
-                                .ofInt(
-                                        MainActivity.this.bottomNavigationDefaultHigh,
-                                        0
-                                );
-                        anim.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-                            @Override
-                            public void onAnimationUpdate(@NonNull ValueAnimator animation) {
-                                ViewGroup.LayoutParams layoutParams =
-                                        MainActivity.this.binding.navView.getLayoutParams();
-                                layoutParams.height = (int) animation.getAnimatedValue();
-                                MainActivity.this.binding.navView.setLayoutParams(layoutParams);
-                            }
-                        });
-                        anim.setDuration(300); // 画面遷移時のDuration値
-                        anim.start();
-                        //MainActivity.this.binding.navView.setVisibility(View.GONE);
-                        MainActivity.this.bottomNavigationIsHided = true;
-                    }
-
+                    motionResId = R.id.motion_scene_bottom_navigation_hided_state;
                 } else {
-                    if (MainActivity.this.bottomNavigationIsHided) {
-                        if (true) {
-                            MainActivity.this.binding.navView.setTransitionVisibility(View.VISIBLE);
-                            //MainActivity.this.binding.navView.setVisibility(View.VISIBLE);
-                            MainActivity.this.bottomNavigationIsHided = false;
-                            return;
-                        }
-                        ValueAnimator anim= ValueAnimator
-                                .ofInt(0, MainActivity.this.bottomNavigationDefaultHigh);
-                        anim.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-                            @Override
-                            public void onAnimationUpdate(@NonNull ValueAnimator animation) {
-                                ViewGroup.LayoutParams layoutParams =
-                                        MainActivity.this.binding.navView.getLayoutParams();
-                                layoutParams.height = (int) animation.getAnimatedValue();
-                                MainActivity.this.binding.navView.setLayoutParams(layoutParams);
-
-                            }
-                        });
-                        anim.setDuration(300); // 画面遷移時のDuration値
-                        anim.start();
-                        //MainActivity.this.binding.navView.setVisibility(View.VISIBLE);
-                        MainActivity.this.bottomNavigationIsHided = false;
-                    }
+                    motionResId = R.id.motion_scene_bottom_navigation_showed_state;
                 }
+                binding.motionLayoutBottomNavigation.transitionToState(motionResId);
             }
         });
     }
@@ -386,11 +336,11 @@ public class MainActivity extends AppCompatActivity {
         this.previousItemSelected = this.startItem;
     }
 
-    private void enableBottomBottomNavigation() {
-        Menu menu = this.binding.navView.getMenu();
+    private void switchEnabledBottomNavigation(boolean isEnabled) {
+        Menu menu = binding.navView.getMenu();
         int size = menu.size();
         for (int i = 0; i < size; i++) {
-            menu.getItem(i).setEnabled(true);
+            menu.getItem(i).setEnabled(isEnabled);
         }
     }
 

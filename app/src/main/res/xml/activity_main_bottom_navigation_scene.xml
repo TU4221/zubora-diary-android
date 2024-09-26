@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<MotionScene 
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:motion="http://schemas.android.com/apk/res-auto">
+
+    <Transition
+        motion:constraintSetEnd="@id/motion_scene_bottom_navigation_hided_state"
+        motion:constraintSetStart="@id/motion_scene_bottom_navigation_showed_state"
+        motion:duration="500"/>
+
+    <ConstraintSet android:id="@+id/motion_scene_bottom_navigation_showed_state">
+        <Constraint
+            android:id="@+id/frameLayout_bottom_navigation"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            motion:visibilityMode="ignore"/>
+    </ConstraintSet>
+
+    <ConstraintSet android:id="@+id/motion_scene_bottom_navigation_hided_state">
+        <Constraint
+            android:id="@+id/frameLayout_bottom_navigation"
+            android:layout_width="match_parent"
+            android:layout_height="0.1dp"
+            motion:visibilityMode="ignore"/>
+    </ConstraintSet>
+</MotionScene>
