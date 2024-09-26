@@ -86,6 +86,76 @@ public class MainActivity extends AppCompatActivity {
         //アクションバー設定
         //setSupportActionBar(this.binding.mtbMainToolbar);
 
+        setUpNavigation();
+    }
+
+    private void setUpViewModel() {
+        ViewModelProvider provider = new ViewModelProvider(this);
+        settingsViewModel = provider.get(SettingsViewModel.class);
+    }
+
+    private void setUpLocationInformation() {
+        LocationRequest.Builder builder =
+                new LocationRequest.Builder(Priority.PRIORITY_BALANCED_POWER_ACCURACY, 5000);
+        locationRequest = builder.build();
+        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
+        settingsViewModel.getIsCheckedGettingWeatherInformationLiveData()
+                .observe(this, new Observer<Boolean>() {
+                    @Override
+                    public void onChanged(Boolean aBoolean) {
+                        if (aBoolean) {
+                            updateLocationInformation();
+                        } else {
+                            settingsViewModel.clearLocationInformation();
+                        }
+                    }
+                });
+    }
+
+    public boolean updateLocationInformation() {
+        if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED
+                && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED) {
+            return false;
+        }
+        fusedLocationProviderClient.requestLocationUpdates(locationRequest, new LocationListener() {
+            @Override
+            public void onLocationChanged(@NonNull Location location) {
+                // アプリ起動時に一回だけ取得
+                settingsViewModel.updateLocationInformation(location.getLatitude(), location.getLongitude());
+                fusedLocationProviderClient.removeLocationUpdates(this);
+            }
+        }, Looper.getMainLooper());
+        return true;
+    }
+
+    private void setUpThemeColor() {
+        settingsViewModel.getThemeColorSettingValueLiveData()
+                .observe(this, new Observer<ThemeColor>() {
+                    @Override
+                    public void onChanged(ThemeColor themeColor) {
+                        if (themeColor == null) {
+                            return;
+                        }
+
+                        MainActivity.this.dialogThemeColor = themeColor;
+
+                        BaseThemeColorSwitcher switcher =
+                                new BaseThemeColorSwitcher(getApplicationContext(), themeColor);
+
+                        switcher.switchStatusBarColor(getWindow());
+
+                        switcher.switchBackgroundColor(binding.layoutBackground);
+
+                        switcher.switchToolbarColor(binding.mtbMainToolbar);
+
+                        switcher.switchBottomNavigationColor(binding.navView);
+                    }
+                });
+    }
+
+    private void setUpNavigation() {
         // Navigation設定
         // 参考:https://inside.luchegroup.com/entry/2023/05/08/113236
         BottomNavigationView navView = this.binding.navView;
@@ -240,71 +310,7 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    private void setUpViewModel() {
-        ViewModelProvider provider = new ViewModelProvider(this);
-        settingsViewModel = provider.get(SettingsViewModel.class);
-    }
 
-    private void setUpLocationInformation() {
-        LocationRequest.Builder builder =
-                new LocationRequest.Builder(Priority.PRIORITY_BALANCED_POWER_ACCURACY, 5000);
-        locationRequest = builder.build();
-        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
-        settingsViewModel.getIsCheckedGettingWeatherInformationLiveData()
-                .observe(this, new Observer<Boolean>() {
-                    @Override
-                    public void onChanged(Boolean aBoolean) {
-                        if (aBoolean) {
-                            updateLocationInformation();
-                        } else {
-                            settingsViewModel.clearLocationInformation();
-                        }
-                    }
-                });
-    }
-
-    public boolean updateLocationInformation() {
-        if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION)
-                != PackageManager.PERMISSION_GRANTED
-                && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)
-                != PackageManager.PERMISSION_GRANTED) {
-            return false;
-        }
-        fusedLocationProviderClient.requestLocationUpdates(locationRequest, new LocationListener() {
-            @Override
-            public void onLocationChanged(@NonNull Location location) {
-                // アプリ起動時に一回だけ取得
-                settingsViewModel.updateLocationInformation(location.getLatitude(), location.getLongitude());
-                fusedLocationProviderClient.removeLocationUpdates(this);
-            }
-        }, Looper.getMainLooper());
-        return true;
-    }
-
-    private void setUpThemeColor() {
-        settingsViewModel.getThemeColorSettingValueLiveData()
-                .observe(this, new Observer<ThemeColor>() {
-                    @Override
-                    public void onChanged(ThemeColor themeColor) {
-                        if (themeColor == null) {
-                            return;
-                        }
-
-                        MainActivity.this.dialogThemeColor = themeColor;
-
-                        BaseThemeColorSwitcher switcher =
-                                new BaseThemeColorSwitcher(getApplicationContext(), themeColor);
-
-                        switcher.switchStatusBarColor(getWindow());
-
-                        switcher.switchBackgroundColor(binding.layoutBackground);
-
-                        switcher.switchToolbarColor(binding.mtbMainToolbar);
-
-                        switcher.switchBottomNavigationColor(binding.navView);
-                    }
-                });
-    }
 
     public boolean getTabWasSelected() {
         return this.tabWasSelected;
