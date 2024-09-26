@@ -11,7 +11,7 @@
         android:id="@+id/layout_background"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:background="?attr/colorSurface">
+        android:background="?attr/colorSurface">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
@@ -29,9 +29,7 @@
                     android:id="@+id/mtbMainToolbar"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    tools:background="?attr/colorPrimary"
                     android:minHeight="?attr/actionBarSize"
-                    android:theme="?attr/actionBarTheme"
                     app:titleCentered="true" />
 
             </com.google.android.material.appbar.AppBarLayout>
@@ -71,7 +69,6 @@
                         android:id="@+id/nav_view"
                         android:layout_width="match_parent"
                         android:layout_height="80dp"
-                        tools:background="?android:attr/windowBackground"
                         app:menu="@menu/bottom_nav_menu" />
 
                 </LinearLayout>

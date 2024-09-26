@@ -1,11 +1,13 @@
 package com.websarva.wings.android.zuboradiary;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.Looper;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -19,6 +21,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.view.ContextThemeWrapper;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
@@ -76,10 +79,8 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        this.binding = ActivityMainBinding.inflate(getLayoutInflater());
-        setContentView(this.binding.getRoot());
-
         setUpViewModel();
+        setUpBinding();
         setUpLocationInformation();
         setUpThemeColor();
 
@@ -92,6 +93,23 @@ public class MainActivity extends AppCompatActivity {
     private void setUpViewModel() {
         ViewModelProvider provider = new ViewModelProvider(this);
         settingsViewModel = provider.get(SettingsViewModel.class);
+    }
+
+    private void setUpBinding() {
+        ThemeColor themeColor = settingsViewModel.loadThemeColorSettingValue();
+        LayoutInflater themeColorInflater = createThemeColorInflater(getLayoutInflater(), themeColor);
+        binding = ActivityMainBinding.inflate(themeColorInflater);
+        setContentView(binding.getRoot());
+    }
+
+    // ThemeColorに合わせたインフレーター作成
+    protected final LayoutInflater createThemeColorInflater(LayoutInflater inflater, ThemeColor themeColor) {
+        Preconditions.checkNotNull(inflater);
+        Preconditions.checkNotNull(themeColor);
+
+        int themeResId = themeColor.getThemeResId();
+        Context contextWithTheme = new ContextThemeWrapper(this, themeResId);
+        return inflater.cloneInContext(contextWithTheme);
     }
 
     private void setUpLocationInformation() {
@@ -131,28 +149,31 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void setUpThemeColor() {
+        ThemeColor themeColor = settingsViewModel.loadThemeColorSettingValue();
+        switchThemeColor(themeColor);
+
         settingsViewModel.getThemeColorSettingValueLiveData()
                 .observe(this, new Observer<ThemeColor>() {
                     @Override
                     public void onChanged(ThemeColor themeColor) {
-                        if (themeColor == null) {
-                            return;
-                        }
+                        if (themeColor == null) return;
 
-                        MainActivity.this.dialogThemeColor = themeColor;
-
-                        BaseThemeColorSwitcher switcher =
-                                new BaseThemeColorSwitcher(getApplicationContext(), themeColor);
-
-                        switcher.switchStatusBarColor(getWindow());
-
-                        switcher.switchBackgroundColor(binding.layoutBackground);
-
-                        switcher.switchToolbarColor(binding.mtbMainToolbar);
-
-                        switcher.switchBottomNavigationColor(binding.navView);
+                        switchThemeColor(themeColor);
                     }
                 });
+    }
+
+    private void switchThemeColor(ThemeColor themeColor) {
+        Objects.requireNonNull(themeColor);
+
+        MainActivity.this.dialogThemeColor = themeColor;
+
+        BaseThemeColorSwitcher switcher =
+                new BaseThemeColorSwitcher(getApplicationContext(), themeColor);
+        switcher.switchStatusBarColor(getWindow());
+        switcher.switchBackgroundColor(binding.layoutBackground);
+        switcher.switchToolbarColor(binding.mtbMainToolbar);
+        switcher.switchBottomNavigationColor(binding.navView);
     }
 
     private void setUpNavigation() {

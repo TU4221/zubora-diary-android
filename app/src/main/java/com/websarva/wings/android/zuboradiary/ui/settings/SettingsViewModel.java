@@ -22,6 +22,10 @@ import com.websarva.wings.android.zuboradiary.ui.BaseViewModel;
 
 import java.time.DayOfWeek;
 import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.inject.Inject;
 
@@ -49,6 +53,8 @@ public class SettingsViewModel extends BaseViewModel {
     private double latitude = 0;
     @FloatRange(from = -180.0, to = 180.0)
     private double longitude = 0;
+    List<Flowable<?>> prefelencesFlowableList = new ArrayList<>();
+    Flowable<ThemeColorPreferenceValue> themeColorPreferenceValueFlowable;
 
     @Inject
     public SettingsViewModel(SettingsRepository settingsRepository, WorkerRepository workerRepository) {
@@ -79,6 +85,15 @@ public class SettingsViewModel extends BaseViewModel {
                         }
                 )
         );
+        themeColorPreferenceValueFlowable = preferenceValueFlowable;
+        prefelencesFlowableList.add(preferenceValueFlowable);
+    }
+
+    @NonNull
+    public ThemeColor loadThemeColorSettingValue() {
+        ThemeColor themeColorValue = themeColor.getValue();
+        if (themeColorValue != null) return themeColorValue;
+        return themeColorPreferenceValueFlowable.blockingFirst().getThemeColor();
     }
 
     private void setUpLoadingCalendarStartDayOfWeekPreferenceValue() {
@@ -96,6 +111,7 @@ public class SettingsViewModel extends BaseViewModel {
                         }
                 )
         );
+        prefelencesFlowableList.add(preferenceValueFlowable);
     }
 
     private void setUpLoadingReminderNotificationPreferenceValue() {
@@ -115,6 +131,7 @@ public class SettingsViewModel extends BaseViewModel {
                         }
                 )
         );
+        prefelencesFlowableList.add(preferenceValueFlowable);
     }
 
     private void setUpLoadingPasscodeLockPreferenceValue() {
@@ -129,6 +146,7 @@ public class SettingsViewModel extends BaseViewModel {
                         }
                 )
         );
+        prefelencesFlowableList.add(preferenceValueFlowable);
     }
 
     private void setUpLoadingGettingWeatherInformationPreferenceValue() {
@@ -143,6 +161,7 @@ public class SettingsViewModel extends BaseViewModel {
                         }
                 )
         );
+        prefelencesFlowableList.add(preferenceValueFlowable);
     }
 
     private void addSettingLoadingError() {
