@@ -371,6 +371,12 @@ public class MainActivity extends AppCompatActivity {
     private boolean isBottomNavigationFragment(NavDestination navDestination) {
         Objects.requireNonNull(navDestination);
 
+        // MEMO:下記理由より、対象FragmentはBottomNavigationViewの各タブ先頭のFragmentのみとする。
+        //      ・標準のNavigation機能は各タブ毎にFragment状態を保存しない為。
+        //        例)WordSearchFragment
+        //              -> CalendarFragment
+        //              -> WordSearchFragment(onCreate()から処理)
+        //              ViewModelが初期化される為検索状態が保持されない。保持することも出来るが複雑になるため避ける。
         int navDestinationId = navDestination.getId();
         if (navDestinationId == R.id.navigation_diary_list_fragment) return true;
         if (navDestinationId == R.id.navigation_calendar_fragment) return true;
