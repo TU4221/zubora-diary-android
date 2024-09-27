@@ -19,6 +19,7 @@ import com.websarva.wings.android.zuboradiary.data.DayOfWeekStringConverter;
 import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor;
 import com.websarva.wings.android.zuboradiary.databinding.RowDiaryDayListBinding;
 import com.websarva.wings.android.zuboradiary.ui.ColorSwitchingViewList;
+import com.websarva.wings.android.zuboradiary.ui.ThemeColorInflaterCreator;
 import com.websarva.wings.android.zuboradiary.ui.list.ListThemeColorSwitcher;
 
 import java.time.LocalDate;
@@ -57,9 +58,9 @@ public class DiaryDayListAdapter extends ListAdapter<DiaryDayListItem, DiaryDayL
     @Override
     public DiaryDayListViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
-        int themeResId = themeColor.getThemeResId();
-        Context contextWithTheme = new ContextThemeWrapper(context, themeResId);
-        LayoutInflater themeColorInflater = inflater.cloneInContext(contextWithTheme);
+        ThemeColorInflaterCreator creator =
+                new ThemeColorInflaterCreator(context, inflater, themeColor);
+        LayoutInflater themeColorInflater = creator.create();
 
         RowDiaryDayListBinding binding =
                 RowDiaryDayListBinding

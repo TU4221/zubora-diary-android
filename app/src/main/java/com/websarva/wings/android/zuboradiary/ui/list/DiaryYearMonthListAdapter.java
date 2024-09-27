@@ -24,6 +24,7 @@ import com.websarva.wings.android.zuboradiary.databinding.RowDiaryYearMonthListB
 import com.websarva.wings.android.zuboradiary.databinding.RowNoDiaryMessageBinding;
 import com.websarva.wings.android.zuboradiary.databinding.RowProgressBarBinding;
 import com.websarva.wings.android.zuboradiary.ui.ColorSwitchingViewList;
+import com.websarva.wings.android.zuboradiary.ui.ThemeColorInflaterCreator;
 import com.websarva.wings.android.zuboradiary.ui.list.diarylist.DiaryDayListAdapter;
 import com.websarva.wings.android.zuboradiary.ui.list.diarylist.DiaryDayListItem;
 import com.websarva.wings.android.zuboradiary.ui.list.diarylist.DiaryYearMonthListItem;
@@ -113,9 +114,9 @@ public abstract class DiaryYearMonthListAdapter extends ListAdapter<DiaryYearMon
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
-        int themeResId = themeColor.getThemeResId();
-        Context contextWithTheme = new ContextThemeWrapper(context, themeResId);
-        LayoutInflater themeColorInflater = inflater.cloneInContext(contextWithTheme);
+        ThemeColorInflaterCreator creator =
+                new ThemeColorInflaterCreator(context, inflater, themeColor);
+        LayoutInflater themeColorInflater = creator.create();
 
         if (viewType == VIEW_TYPE_DIARY) {
             RowDiaryYearMonthListBinding binding =

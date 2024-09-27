@@ -86,9 +86,9 @@ public abstract class BaseFragment extends CustomFragment {
         Preconditions.checkNotNull(inflater);
         Preconditions.checkNotNull(themeColor);
 
-        int themeResId = themeColor.getThemeResId();
-        Context contextWithTheme = new ContextThemeWrapper(requireActivity(), themeResId);
-        return inflater.cloneInContext(contextWithTheme);
+        ThemeColorInflaterCreator creator =
+                new ThemeColorInflaterCreator(requireContext(), inflater, themeColor);
+        return creator.create();
     }
 
     private void setUpFragmentTransitionEffect() {

@@ -43,6 +43,7 @@ import com.google.android.material.transition.platform.MaterialFadeThrough;
 import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor;
 import com.websarva.wings.android.zuboradiary.databinding.ActivityMainBinding;
 import com.websarva.wings.android.zuboradiary.ui.BaseThemeColorSwitcher;
+import com.websarva.wings.android.zuboradiary.ui.ThemeColorInflaterCreator;
 import com.websarva.wings.android.zuboradiary.ui.calendar.CalendarFragment;
 import com.websarva.wings.android.zuboradiary.ui.list.diarylist.DiaryListFragment;
 import com.websarva.wings.android.zuboradiary.ui.list.wordsearch.WordSearchFragment;
@@ -97,19 +98,11 @@ public class MainActivity extends AppCompatActivity {
 
     private void setUpBinding() {
         ThemeColor themeColor = settingsViewModel.loadThemeColorSettingValue();
-        LayoutInflater themeColorInflater = createThemeColorInflater(getLayoutInflater(), themeColor);
+        ThemeColorInflaterCreator creator =
+                new ThemeColorInflaterCreator(this, getLayoutInflater(), themeColor);
+        LayoutInflater themeColorInflater = creator.create();
         binding = ActivityMainBinding.inflate(themeColorInflater);
         setContentView(binding.getRoot());
-    }
-
-    // ThemeColorに合わせたインフレーター作成
-    protected final LayoutInflater createThemeColorInflater(LayoutInflater inflater, ThemeColor themeColor) {
-        Preconditions.checkNotNull(inflater);
-        Preconditions.checkNotNull(themeColor);
-
-        int themeResId = themeColor.getThemeResId();
-        Context contextWithTheme = new ContextThemeWrapper(this, themeResId);
-        return inflater.cloneInContext(contextWithTheme);
     }
 
     private void setUpLocationInformation() {

@@ -66,9 +66,9 @@ public abstract class BaseBottomSheetDialogFragment extends BottomSheetDialogFra
         Preconditions.checkNotNull(inflater);
         Preconditions.checkNotNull(themeColor);
 
-        int themeResId = themeColor.getThemeResId();
-        Context contextWithTheme = new ContextThemeWrapper(requireActivity(), themeResId);
-        return inflater.cloneInContext(contextWithTheme);
+        ThemeColorInflaterCreator creator =
+                new ThemeColorInflaterCreator(requireContext(), inflater, themeColor);
+        return creator.create();
     }
 
     protected abstract View createDialogView(
