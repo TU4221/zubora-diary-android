@@ -125,7 +125,7 @@
         <item name="colorOnError">@color/md_theme_color_black_onError</item>
         <item name="colorErrorContainer">@color/md_theme_color_black_errorContainer</item>
         <item name="colorOnErrorContainer">@color/md_theme_color_black_onErrorContainer</item>
-        <item name="android:background">@color/md_theme_color_black_background</item>
+        <item name="android:colorBackground">@color/md_theme_color_black_background</item>
         <item name="colorOnBackground">@color/md_theme_color_black_onBackground</item>
         <item name="colorSurface">@color/md_theme_color_black_surface</item>
         <item name="colorOnSurface">@color/md_theme_color_black_onSurface</item>
@@ -175,7 +175,7 @@
         <item name="colorOnError">@color/md_theme_color_red_onError</item>
         <item name="colorErrorContainer">@color/md_theme_color_red_errorContainer</item>
         <item name="colorOnErrorContainer">@color/md_theme_color_red_onErrorContainer</item>
-        <item name="android:background">@color/md_theme_color_red_background</item>
+        <item name="android:colorBackground">@color/md_theme_color_red_background</item>
         <item name="colorOnBackground">@color/md_theme_color_red_onBackground</item>
         <item name="colorSurface">@color/md_theme_color_red_surface</item>
         <item name="colorOnSurface">@color/md_theme_color_red_onSurface</item>
@@ -225,7 +225,7 @@
         <item name="colorOnError">@color/md_theme_color_blue_onError</item>
         <item name="colorErrorContainer">@color/md_theme_color_blue_errorContainer</item>
         <item name="colorOnErrorContainer">@color/md_theme_color_blue_onErrorContainer</item>
-        <item name="android:background">@color/md_theme_color_blue_background</item>
+        <item name="android:colorBackground">@color/md_theme_color_blue_background</item>
         <item name="colorOnBackground">@color/md_theme_color_blue_onBackground</item>
         <item name="colorSurface">@color/md_theme_color_blue_surface</item>
         <item name="colorOnSurface">@color/md_theme_color_blue_onSurface</item>
@@ -275,7 +275,7 @@
         <item name="colorOnError">@color/md_theme_color_green_onError</item>
         <item name="colorErrorContainer">@color/md_theme_color_green_errorContainer</item>
         <item name="colorOnErrorContainer">@color/md_theme_color_green_onErrorContainer</item>
-        <item name="android:background">@color/md_theme_color_green_background</item>
+        <item name="android:colorBackground">@color/md_theme_color_green_background</item>
         <item name="colorOnBackground">@color/md_theme_color_green_onBackground</item>
         <item name="colorSurface">@color/md_theme_color_green_surface</item>
         <item name="colorOnSurface">@color/md_theme_color_green_onSurface</item>
@@ -325,7 +325,7 @@
         <item name="colorOnError">@color/md_theme_color_yellow_onError</item>
         <item name="colorErrorContainer">@color/md_theme_color_yellow_errorContainer</item>
         <item name="colorOnErrorContainer">@color/md_theme_color_yellow_onErrorContainer</item>
-        <item name="android:background">@color/md_theme_color_yellow_background</item>
+        <item name="android:colorBackground">@color/md_theme_color_yellow_background</item>
         <item name="colorOnBackground">@color/md_theme_color_yellow_onBackground</item>
         <item name="colorSurface">@color/md_theme_color_yellow_surface</item>
         <item name="colorOnSurface">@color/md_theme_color_yellow_onSurface</item>
