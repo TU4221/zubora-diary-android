@@ -1,3 +1,4 @@
+<!-- HACK:menu.xmlではappLevel26以上でないと色(tint)を変更できなかったのでメニューアイコン専用drawable.xml作成 -->
 <vector android:height="24dp" android:tint="?attr/colorOnSurface"
     android:viewportHeight="24" android:viewportWidth="24"
     android:width="24dp" xmlns:android="http://schemas.android.com/apk/res/android">

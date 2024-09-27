@@ -16,9 +16,7 @@
 
         <View
             android:id="@+id/view_full_screen_background"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="?colorSurface"/>
+            style="@style/BackgroundView" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -27,17 +25,11 @@
 
             <com.google.android.material.appbar.MaterialToolbar
                 android:id="@+id/material_toolbar_top_app_bar"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:minHeight="?attr/actionBarSize"
                 app:menu="@menu/diary_list_toolbar_menu"
                 app:navigationIcon="@drawable/ic_calendar_month_24"
                 app:navigationContentDescription="@string/fragment_diary_list_toolbar_navigation_top_year_month_switching"
                 app:title="@string/fragment_diary_list_toolbar_title"
-                app:titleTextColor="?attr/colorOnSurface"
-                app:titleCentered="true"
-                app:navigationIconTint="?attr/colorOnSurfaceVariant"/>
+                style="@style/Toolbar" />
 
             <FrameLayout
                 android:layout_width="match_parent"
@@ -61,27 +53,10 @@
                     android:visibility="invisible"
                     tools:visibility="visible"/>
 
-                <FrameLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:visibility="@{list_view_model.isVisibleUpdateProgressBarLiveData ? View.VISIBLE : View.INVISIBLE}"
-                    tools:visibility="visible">
-
-                    <View
-                        android:id="@+id/view_diary_list_progress_bar"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:background="?attr/colorSecondaryContainer"
-                        android:alpha="0.5"/>
-                    <!--android:background="@color/common_progress_indicator_background"-->
-
-                    <ProgressBar
-                        android:id="@+id/progress_bar_diary_list_full_screen"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center" />
-
-                </FrameLayout>
+                <include
+                    android:id="@+id/include_progress_indicator"
+                    layout="@layout/layout_full_screen_circular_progress_indicator"
+                    android:isVisibleLiveData="@{list_view_model.isVisibleUpdateProgressBarLiveData}" />
 
                 <com.google.android.material.floatingactionbutton.FloatingActionButton
                     android:id="@+id/fab_edit_diary"

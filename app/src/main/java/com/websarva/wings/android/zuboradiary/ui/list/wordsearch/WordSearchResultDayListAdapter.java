@@ -19,6 +19,7 @@ import com.websarva.wings.android.zuboradiary.data.DayOfWeekStringConverter;
 import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor;
 import com.websarva.wings.android.zuboradiary.databinding.RowWordSearchResultListBinding;
 import com.websarva.wings.android.zuboradiary.ui.ColorSwitchingViewList;
+import com.websarva.wings.android.zuboradiary.ui.ThemeColorInflaterCreator;
 import com.websarva.wings.android.zuboradiary.ui.list.ListThemeColorSwitcher;
 
 import java.time.LocalDate;
@@ -57,9 +58,12 @@ public class WordSearchResultDayListAdapter
     @NonNull
     @Override
     public WordSearchResultDayViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        LayoutInflater inflater = LayoutInflater.from(parent.getContext());
+        ThemeColorInflaterCreator creator =
+                new ThemeColorInflaterCreator(context, inflater, themeColor);
+        LayoutInflater themeColorInflater = creator.create();
         RowWordSearchResultListBinding binding =
-                RowWordSearchResultListBinding
-                        .inflate(LayoutInflater.from(parent.getContext()), parent, false);
+                RowWordSearchResultListBinding.inflate(themeColorInflater, parent, false);
         return new WordSearchResultDayViewHolder(binding);
     }
 
@@ -102,7 +106,7 @@ public class WordSearchResultDayListAdapter
         this.onClickItemListener = onClickItemListener;
     }
 
-    public class WordSearchResultDayViewHolder extends RecyclerView.ViewHolder {
+    public static class WordSearchResultDayViewHolder extends RecyclerView.ViewHolder {
 
         public RowWordSearchResultListBinding binding;
         public LocalDate date;
@@ -110,21 +114,6 @@ public class WordSearchResultDayListAdapter
         public WordSearchResultDayViewHolder(RowWordSearchResultListBinding binding) {
             super(binding.getRoot());
             this.binding = binding;
-
-            ListThemeColorSwitcher switcher =
-                    new ListThemeColorSwitcher(context, themeColor);
-            ColorSwitchingViewList<TextView> textViewList =
-                    new ColorSwitchingViewList<>(
-                            binding.includeDay.textDayOfMonth,
-                            binding.includeDay.textDayOfWeek,
-                            binding.textWordSearchResultTitle,
-                            binding.textWordSearchResultItemNumber,
-                            binding.textWordSearchResultItemTitle,
-                            binding.textWordSearchResultItemComment
-                    );
-            switcher.switchTextColorOnListItemBackground(textViewList);
-
-            switcher.switchListItemBackgroundColor(binding.linerLayoutBackground);
         }
     }
 

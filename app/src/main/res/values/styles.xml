@@ -1,5 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- Common -->
+    <style name="BackgroundView">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">match_parent</item>
+        <item name="android:background">?attr/colorSurface</item>
+    </style>
+    <style name="Toolbar" parent="Widget.Material3.Toolbar">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:gravity">center</item>
+        <item name="android:minHeight">?attr/actionBarSize</item>
+        <item name="titleTextColor">?attr/colorOnSurface</item>
+        <item name="titleCentered">true</item>
+        <item name="navigationIconTint">?attr/colorOnSurfaceVariant</item>
+    </style>
+
+    <!-- DiaryListItem -->
+    <style name="DiaryListDay">
+        <item name="android:textColor">?attr/colorOnSecondaryContainer</item>
+        <item name="android:textColorHint">?attr/colorOnSurfaceVariant</item>
+        <item name="android:background">?attr/colorSecondaryContainer</item>
+        <item name="tint">?attr/colorSecondary</item>
+    </style>
+
     <!-- MaterialDatePicker用Theme -->
     <style name="MaterialCalendarThemeColorWhite" parent="ThemeOverlay.Material3.MaterialCalendar">
         <item name="theme">@style/ThemeColorWhite</item>

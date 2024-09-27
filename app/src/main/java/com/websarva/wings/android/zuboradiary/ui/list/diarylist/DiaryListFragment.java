@@ -245,7 +245,7 @@ public class DiaryListFragment extends BaseFragment {
         );
 
         // 画面全体ProgressBar表示中はタッチ無効化
-        binding.viewDiaryListProgressBar.setOnTouchListener(new View.OnTouchListener() {
+        binding.includeProgressIndicator.viewBackground.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
                 v.performClick();

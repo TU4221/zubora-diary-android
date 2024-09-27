@@ -8,7 +8,7 @@
     android:minHeight="88dp"
     android:orientation="horizontal"
     android:baselineAligned="false"
-    tools:background="?attr/colorSecondaryContainer">
+    style="@style/DiaryListDay">
 
     <include
         android:id="@+id/include_day"
@@ -20,7 +20,8 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_weight="3">
+        android:layout_weight="3"
+        style="@style/DiaryListDay">
 
         <TextView
             android:id="@+id/text_word_search_result_title"
@@ -28,11 +29,11 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:hint="@string/row_word_search_result_list_title_hint"
-            android:textColor="?attr/colorOnSecondaryContainer"
             android:textSize="20sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            style="@style/DiaryListDay" />
 
         <TextView
             android:id="@+id/text_word_search_result_item_number"
@@ -40,10 +41,10 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:hint="@string/row_word_search_result_list_item_hint"
-            android:textColor="?attr/colorOnSecondaryContainer"
             android:textSize="16sp"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/text_word_search_result_title" />
+            app:layout_constraintTop_toBottomOf="@+id/text_word_search_result_title"
+            style="@style/DiaryListDay" />
 
         <TextView
             android:id="@+id/text_word_search_result_item_title"
@@ -52,11 +53,11 @@
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
             android:hint="@string/row_word_search_result_list_item_title_hint"
-            android:textColor="?attr/colorOnSecondaryContainer"
             android:textSize="16sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/text_word_search_result_item_number"
-            app:layout_constraintTop_toBottomOf="@+id/text_word_search_result_title" />
+            app:layout_constraintTop_toBottomOf="@+id/text_word_search_result_title"
+            style="@style/DiaryListDay" />
 
         <TextView
             android:id="@+id/text_word_search_result_item_comment"
@@ -67,11 +68,11 @@
             android:maxLines="4"
             android:ellipsize="end"
             android:hint="@string/row_word_search_result_list_item_comment_hint"
-            android:textColor="?attr/colorOnSecondaryContainer"
             android:textSize="14sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/text_word_search_result_item_number"
-            app:layout_constraintTop_toBottomOf="@+id/text_word_search_result_item_title" />
+            app:layout_constraintTop_toBottomOf="@+id/text_word_search_result_item_title"
+            style="@style/DiaryListDay" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

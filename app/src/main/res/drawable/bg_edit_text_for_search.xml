@@ -4,6 +4,6 @@
     <corners
         android:radius="250dp"/>
     <solid
-        android:color="@color/white"/>
+        android:color="?attr/colorSecondaryContainer"/>
 
 </shape>

@@ -71,7 +71,9 @@ public class WordSearchFragment extends BaseFragment {
 
     @Override
     protected View initializeDataBinding(@NonNull LayoutInflater inflater, ViewGroup container) {
-        binding = FragmentWordSearchBinding.inflate(inflater, container, false);
+        ThemeColor themeColor = settingsViewModel.loadThemeColorSettingValue();
+        LayoutInflater themeColorInflater = createThemeColorInflater(inflater, themeColor);
+        binding = FragmentWordSearchBinding.inflate(themeColorInflater, container, false);
         binding.setLifecycleOwner(this);
         binding.setWordSearchViewModel(wordSearchViewModel);
         return binding.getRoot();
@@ -83,39 +85,14 @@ public class WordSearchFragment extends BaseFragment {
 
         setUpToolBar();
         setUpWordSearchView();
+        setUpWordSearchResultList();
     }
 
     @Override
     protected void setUpThemeColor() {
-        settingsViewModel.getThemeColorSettingValueLiveData()
-                .observe(getViewLifecycleOwner(), new Observer<ThemeColor>() {
-                    @Override
-                    public void onChanged(ThemeColor themeColor) {
-                        if (themeColor == null) {
-                            return;
-                        }
-
-                        resultWordColor = themeColor.getOnTertiaryContainerColor(getResources());
-                        resultWordBackgroundColor = themeColor.getTertiaryContainerColor(getResources());
-
-                        // MEMO:RecyclerViewにThemeColorを適応させるため、
-                        //      ViewModelのThemeColorValueに値が格納されてから処理すること。
-                        //      RecyclerView設定後、色を変更するにはそれなりの工数がかかると判断。
-                        setUpWordSearchResultList(themeColor);
-
-
-                        ListThemeColorSwitcher switcher =
-                                new ListThemeColorSwitcher(requireContext(), themeColor);
-
-                        switcher.switchToolbarColor(binding.materialToolbarTopAppBar);
-
-                        switcher.switchKeyWordSearchBackgroundColor(
-                                binding.linerLayoutKeyWordSearchBackground);
-                        switcher.switchKeyWordSearchTextColor(binding.editTextKeyWordSearch);
-
-                        switcher.switchCircularProgressBarColor(binding.progressBarWordSearchFullScreen);
-                    }
-                });
+        ThemeColor themeColor = settingsViewModel.loadThemeColorSettingValue();
+        resultWordColor = themeColor.getOnTertiaryContainerColor(getResources());
+        resultWordBackgroundColor = themeColor.getTertiaryContainerColor(getResources());
     }
 
     @Override
@@ -192,6 +169,7 @@ public class WordSearchFragment extends BaseFragment {
                     }
                 });
 
+        // TODO:TextInputSetUpクラスを改良して下記コードと置き換える。
         binding.editTextKeyWordSearch.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
             public void onFocusChange(View v, boolean hasFocus) {
@@ -235,6 +213,8 @@ public class WordSearchFragment extends BaseFragment {
             }
         });
 
+
+
         binding.imageButtonKeyWordClear.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -246,11 +226,8 @@ public class WordSearchFragment extends BaseFragment {
         });
     }
 
-    private void setUpWordSearchResultList(ThemeColor themeColor) {
-        if (themeColor == null) {
-            throw new NullPointerException();
-        }
-
+    private void setUpWordSearchResultList() {
+        ThemeColor themeColor = settingsViewModel.loadThemeColorSettingValue();
         WordSearchResultListAdapter wordSearchResultListAdapter =
                 new WordSearchResultListAdapter(
                         requireContext(),
@@ -339,7 +316,7 @@ public class WordSearchFragment extends BaseFragment {
                     );
         }
 
-        binding.viewWordSearchResultListProgressBar.setOnTouchListener(new View.OnTouchListener() {
+        binding.includeProgressIndicator.viewBackground.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
                 v.performClick();

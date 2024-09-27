@@ -4,7 +4,7 @@
 
     <item
         android:id="@+id/diaryListToolbarOptionWordSearch"
-        android:icon="@drawable/ic_search_24"
+        android:icon="@drawable/toolbar_menu_ic_search_24"
         android:title="@string/fragment_diary_list_toolbar_option_word_search"
         app:showAsAction="always" />
 

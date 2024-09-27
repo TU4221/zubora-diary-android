@@ -11,128 +11,117 @@
 
     </data>
 
-    <LinearLayout
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical"
-        tools:context=".ui.list.wordsearch.WordSearchFragment">
+        android:layout_height="match_parent">
 
-        <FrameLayout
+        <View
+            android:id="@+id/view_full_screen_background"
+            style="@style/BackgroundView" />
+
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <com.google.android.material.appbar.MaterialToolbar
-                android:id="@+id/material_toolbar_top_app_bar"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                tools:background="?attr/colorPrimary"
-                android:gravity="center"
-                android:minHeight="?attr/actionBarSize"
-                android:theme="?attr/actionBarTheme"
-                app:navigationIcon="@drawable/ic_arrow_back_24px"/>
-
-            <LinearLayout
-                android:id="@+id/liner_layout_key_word_search_background"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:orientation="horizontal"
-                android:background="@drawable/bg_edit_text_for_search">
-                <EditText
-                    android:id="@+id/edit_text_key_word_search"
-                    android:layout_width="250dp"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:paddingVertical="8dp"
-                    android:paddingHorizontal="16dp"
-                    android:inputType="text"
-                    android:text="@={word_search_view_model.searchWordMutableLiveData}"
-                    android:hint="@string/fragment_word_search_input_field_hint"
-                    android:background="@null"
-                    android:textSize="16sp" />
-                <ImageButton
-                    android:id="@+id/image_button_key_word_clear"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical|end"
-                    android:layout_marginHorizontal="8dp"
-                    android:src="@drawable/ic_cancel_24px"
-                    android:background="@drawable/bg_image_button" />
-            </LinearLayout>
-
-        </FrameLayout>
-
-        <FrameLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
-
-            <TextView
-                android:id="@+id/text_word_search_no_results"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:text="@string/fragment_word_search_no_results_message"
-                android:gravity="center_horizontal"
-                android:paddingTop="100dp"
-                android:visibility="invisible"
-                tools:visibility="visible"/>
-
-            <LinearLayout
-                android:id="@+id/liner_layout_word_search_results"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="vertical"
-                android:visibility="invisible"
-                tools:visibility="visible"
-                >
-
-                <TextView
-                    android:id="@+id/text_word_search_results"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="@{Integer.toString(word_search_view_model.numWordSearchResults) + @string/fragment_word_search_num_results_message}"
-                    android:paddingHorizontal="8dp"
-                    android:paddingVertical="8dp"
-                    android:visibility="invisible"
-                    tools:visibility="visible" />
-
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/recycler_word_search_result_list"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:scrollbars="none"
-                    android:transitionGroup="true"/>
-
-            </LinearLayout>
+            android:layout_height="match_parent"
+            android:orientation="vertical">
 
             <FrameLayout
-                android:id="@+id/frame_layout_full_screen_progress_bar"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:visibility="@{word_search_view_model.isVisibleUpdateProgressBarLiveData ? View.VISIBLE : View.INVISIBLE}"
-                tools:visibility="visible">
+                android:layout_height="wrap_content">
 
-                <View
-                    android:id="@+id/view_word_search_result_list_progress_bar"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:background="@color/gray"
-                    android:alpha="0.5"/>
+                <com.google.android.material.appbar.MaterialToolbar
+                    android:id="@+id/material_toolbar_top_app_bar"
+                    app:navigationIcon="@drawable/ic_arrow_back_24px"
+                    style="@style/Toolbar" />
 
-                <ProgressBar
-                    android:id="@+id/progress_bar_word_search_full_screen"
+                <LinearLayout
+                    android:id="@+id/liner_layout_key_word_search_background"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="center" />
+                    android:layout_gravity="center"
+                    android:orientation="horizontal"
+                    android:background="@drawable/bg_edit_text_for_search">
+                    <EditText
+                        android:id="@+id/edit_text_key_word_search"
+                        android:layout_width="250dp"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:paddingVertical="8dp"
+                        android:paddingHorizontal="16dp"
+                        android:inputType="text"
+                        android:text="@={word_search_view_model.searchWordMutableLiveData}"
+                        android:textColor="?attr/colorOnSecondaryContainer"
+                        android:hint="@string/fragment_word_search_input_field_hint"
+                        android:background="@null"
+                        android:textSize="16sp" />
+                    <ImageButton
+                        android:id="@+id/image_button_key_word_clear"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical|end"
+                        android:layout_marginHorizontal="8dp"
+                        android:src="@drawable/ic_cancel_24px"
+                        android:background="@drawable/bg_image_button"
+                        app:tint="?attr/colorOnSecondaryContainer" />
+                </LinearLayout>
 
             </FrameLayout>
 
-            <View
-                android:id="@+id/view_for_hiding_keyboard"
+            <FrameLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"/>
+                android:layout_height="match_parent">
 
-        </FrameLayout>
+                <TextView
+                    android:id="@+id/text_word_search_no_results"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:text="@string/fragment_word_search_no_results_message"
+                    android:gravity="center_horizontal"
+                    android:paddingTop="100dp"
+                    android:visibility="invisible"
+                    tools:visibility="visible"/>
 
-    </LinearLayout>
+                <LinearLayout
+                    android:id="@+id/liner_layout_word_search_results"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical"
+                    android:visibility="invisible"
+                    tools:visibility="visible" >
+
+                    <TextView
+                        android:id="@+id/text_word_search_results"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@{Integer.toString(word_search_view_model.numWordSearchResults) + @string/fragment_word_search_num_results_message}"
+                        android:paddingHorizontal="8dp"
+                        android:paddingVertical="8dp"
+                        android:visibility="invisible"
+                        tools:visibility="visible" />
+
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/recycler_word_search_result_list"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:scrollbars="none"
+                        android:transitionGroup="true"/>
+
+                </LinearLayout>
+
+                <include
+                    android:id="@+id/include_progress_indicator"
+                    layout="@layout/layout_full_screen_circular_progress_indicator"
+                    android:isVisibleLiveData="@{word_search_view_model.isVisibleUpdateProgressBarLiveData}" />
+
+                <!-- RecyclerViewが前面にあり、最背面Viewをタッチする事ができないため、下記Viewを最前面に用意 -->
+                <View
+                    android:id="@+id/view_for_hiding_keyboard"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"/>
+
+            </FrameLayout>
+
+        </LinearLayout>
+
+    </FrameLayout>
 
 </layout>
