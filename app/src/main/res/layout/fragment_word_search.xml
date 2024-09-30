@@ -112,12 +112,6 @@
                     layout="@layout/layout_full_screen_circular_progress_indicator"
                     android:isVisibleLiveData="@{word_search_view_model.isVisibleUpdateProgressBarLiveData}" />
 
-                <!-- RecyclerViewが前面にあり、最背面Viewをタッチする事ができないため、下記Viewを最前面に用意 -->
-                <View
-                    android:id="@+id/view_for_hiding_keyboard"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"/>
-
             </FrameLayout>
 
         </LinearLayout>

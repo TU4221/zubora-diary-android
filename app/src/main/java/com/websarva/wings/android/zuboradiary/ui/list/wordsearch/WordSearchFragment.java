@@ -25,6 +25,7 @@ import android.widget.TextView;
 import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor;
 import com.websarva.wings.android.zuboradiary.ui.BaseFragment;
 import com.websarva.wings.android.zuboradiary.ui.ColorSwitchingViewList;
+import com.websarva.wings.android.zuboradiary.ui.EditTextSetup;
 import com.websarva.wings.android.zuboradiary.ui.list.DiaryYearMonthListItemBase;
 import com.websarva.wings.android.zuboradiary.ui.KeyboardInitializer;
 import com.websarva.wings.android.zuboradiary.databinding.FragmentWordSearchBinding;
@@ -133,6 +134,7 @@ public class WordSearchFragment extends BaseFragment {
             KeyboardInitializer keyboardInitializer = new KeyboardInitializer(requireActivity());
             keyboardInitializer.show(binding.editTextKeyWordSearch);
         }
+
         wordSearchViewModel.getSearchWordMutableLiveData()
                 .observe(getViewLifecycleOwner(), new Observer<String>() {
                     @Override
@@ -141,13 +143,10 @@ public class WordSearchFragment extends BaseFragment {
                             return;
                         }
 
+                        // 検索結果表示Viewは別Observerにて表示
                         if (s.isEmpty()) {
-                            binding.imageButtonKeyWordClear.setVisibility(View.INVISIBLE);
                             binding.textWordSearchNoResults.setVisibility(View.INVISIBLE);
                             binding.linerLayoutWordSearchResults.setVisibility(View.INVISIBLE);
-                        } else {
-                            // 検索結果表示Viewは別Observerにて表示
-                            binding.imageButtonKeyWordClear.setVisibility(View.VISIBLE);
                         }
                         // HACK:キーワードの入力時と確定時に検索Observerが起動してしまい
                         //      同じキーワードで二重に検索してしまう。防止策として下記条件追加。
@@ -169,61 +168,10 @@ public class WordSearchFragment extends BaseFragment {
                     }
                 });
 
-        // TODO:TextInputSetUpクラスを改良して下記コードと置き換える。
-        binding.editTextKeyWordSearch.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-            @Override
-            public void onFocusChange(View v, boolean hasFocus) {
-                View viewForHidingKeyboard = binding.viewForHidingKeyboard;
-                if (hasFocus) {
-                    viewForHidingKeyboard.setOnTouchListener(new View.OnTouchListener() {
-                        @Override
-                        public boolean onTouch(View v, MotionEvent event) {
-                            v.performClick();
-                            KeyboardInitializer keyboardInitializer =
-                                    new KeyboardInitializer(requireActivity());
-                            keyboardInitializer.hide(v);
-                            binding.editTextKeyWordSearch.clearFocus();
-                            return false;
-                        }
-                    });
-                } else {
-                    viewForHidingKeyboard.setOnTouchListener(null);
-                }
-            }
-        });
-
-        // エンターキー押下時の処理
-        // HACK:setImeOptions()メソッドを使用しなくても、onEditorAction()のactionIdはIME_ACTION_DONEとなるが、
-        //      一応設定しておく。onEditorAction()のeventは常時nullとなっている。(ハードキーボードなら返ってくる？)
-        //      https://vividcode.hatenablog.com/entry/android-app/oneditoractionlistener-practice
-        binding.editTextKeyWordSearch.setImeOptions(EditorInfo.IME_ACTION_DONE);
-        binding.editTextKeyWordSearch.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-            @Override
-            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-                if (actionId == EditorInfo.IME_ACTION_DONE
-                        || (event != null && event.getAction() == KeyEvent.KEYCODE_ENTER
-                        && event.getAction() == KeyEvent.ACTION_DOWN)) {
-                    KeyboardInitializer keyboardInitializer =
-                            new KeyboardInitializer(requireActivity());
-                    keyboardInitializer.hide(v);
-                    v.clearFocus();
-                    return true;
-                }
-                return false;
-            }
-        });
-
-
-
-        binding.imageButtonKeyWordClear.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                wordSearchViewModel.clearSearchWord();
-                binding.editTextKeyWordSearch.requestFocus();
-                KeyboardInitializer keyboardInitializer = new KeyboardInitializer(requireActivity());
-                keyboardInitializer.show(binding.editTextKeyWordSearch);
-            }
-        });
+        EditTextSetup editTextSetup = new EditTextSetup(requireActivity());
+        editTextSetup.setUpFocusClearOnClickBackground(binding.viewFullScreenBackground, binding.editTextKeyWordSearch);
+        editTextSetup.setUpKeyboardCloseOnEnter(binding.editTextKeyWordSearch);
+        editTextSetup.setUpClearButton(binding.editTextKeyWordSearch, binding.imageButtonKeyWordClear);
     }
 
     private void setUpWordSearchResultList() {
