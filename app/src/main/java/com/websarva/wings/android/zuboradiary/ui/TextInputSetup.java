@@ -7,6 +7,7 @@ import android.app.Activity;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.transition.Transition;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
@@ -18,7 +19,9 @@ import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 import com.websarva.wings.android.zuboradiary.R;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
 
 public class TextInputSetup extends EditTextSetup {
@@ -62,10 +65,13 @@ public class TextInputSetup extends EditTextSetup {
         Objects.requireNonNull(textInputLayouts);
         Arrays.stream(textInputLayouts).forEach(Objects::requireNonNull);
 
+        List<EditText> editTextList = new ArrayList<>();
         Arrays.stream(textInputLayouts).forEach(x -> {
             EditText editText = getTextInputEditTextNonNull(x);
-            setUpFocusClearOnClickBackground(background, editText);
+            editTextList.add(editText);
         });
+        EditText[] editTexts = editTextList.toArray(new EditText[0]);
+        setUpFocusClearOnClickBackground(background, editTexts);
     }
 
     /**

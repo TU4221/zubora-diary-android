@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android">
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <data>
 
@@ -10,7 +11,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="horizontal"
-        android:background="@color/red">
+        android:background="?attr/colorError">
 
         <View
             android:id="@+id/view_blank"
@@ -24,8 +25,9 @@
             android:layout_width="0dp"
             android:layout_weight="1"
             android:layout_height="match_parent"
+            android:background="?attr/colorError"
             android:src="@drawable/ic_delete_forever_24"
-            android:background="@drawable/bg_image_button"/>
+            app:tint="?attr/colorOnError"/>
 
     </LinearLayout>
 </layout>

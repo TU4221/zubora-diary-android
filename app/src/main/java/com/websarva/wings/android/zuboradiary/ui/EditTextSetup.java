@@ -7,6 +7,7 @@ import android.app.Activity;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.transition.Transition;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
@@ -32,7 +33,7 @@ public class EditTextSetup {
         this.activity = activity;
     }
 
-    private void hideKeyboard(View view) {
+    protected void hideKeyboard(View view) {
         KeyboardInitializer keyboardInitializer = new KeyboardInitializer(activity);
         keyboardInitializer.hide(view);
     }
@@ -149,23 +150,7 @@ public class EditTextSetup {
                 Objects.requireNonNull(v);
 
                 hideKeyboard(v);
-                Arrays.stream(editTexts)
-                        .forEach(x -> setUpFocusClearOnClickBackground(background, x));
-            }
-        });
-    }
-
-    protected void setUpFocusClearOnClickBackground(View background, EditText editText) {
-        Objects.requireNonNull(background);
-        Objects.requireNonNull(editText);
-
-        background.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Objects.requireNonNull(v);
-
-                hideKeyboard(v);
-                editText.clearFocus();
+                Arrays.stream(editTexts).forEach(EditText::clearFocus);
             }
         });
     }

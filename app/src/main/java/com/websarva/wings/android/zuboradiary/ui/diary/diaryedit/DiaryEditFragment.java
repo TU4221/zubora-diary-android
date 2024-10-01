@@ -26,6 +26,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ListAdapter;
 import android.widget.TextView;
 
 import com.google.android.material.textfield.TextInputEditText;
@@ -66,8 +67,6 @@ public class DiaryEditFragment extends BaseFragment {
     private final String TOOL_BAR_TITLE_EDIT = "編集中";
     private LocalDate lastSelectedDate;
     private ArrayAdapter<String> weather2ArrayAdapter;
-    private boolean isReceivedItemTitleEditResult;
-    private int receivedItemTitleEditResultItemNumber;
 
     // ViewModel
     private DiaryEditViewModel diaryEditViewModel;
@@ -106,7 +105,9 @@ public class DiaryEditFragment extends BaseFragment {
 
     @Override
     protected View initializeDataBinding(@NonNull LayoutInflater inflater, ViewGroup container) {
-        binding = FragmentDiaryEditBinding.inflate(inflater, container, false);
+        ThemeColor themeColor = settingsViewModel.loadThemeColorSettingValue();
+        LayoutInflater themeColorInflater = createThemeColorInflater(inflater, themeColor);
+        binding = FragmentDiaryEditBinding.inflate(themeColorInflater, container, false);
         binding.setLifecycleOwner(this);
         binding.setDiaryEditViewModel(diaryEditViewModel);
         return binding.getRoot();
@@ -119,6 +120,8 @@ public class DiaryEditFragment extends BaseFragment {
         setUpDiaryData();
         setUpToolBar();
         setUpDateInputField();
+        setUpWeatherInputField();
+        setUpConditionInputField();
         setUpTitleInputField();
         setUpItemInputField();
         setUpPictureInputField();
@@ -137,69 +140,7 @@ public class DiaryEditFragment extends BaseFragment {
 
     @Override
     protected void setUpThemeColor() {
-        // TODO:保留(ThemeColorを適用したinflaterでinflateする方向に変更？)
-        settingsViewModel.getThemeColorSettingValueLiveData()
-                .observe(getViewLifecycleOwner(), new Observer<ThemeColor>() {
-                    @Override
-                    public void onChanged(ThemeColor themeColor) {
-                        if (themeColor == null) {
-                            return;
-                        }
-
-                        setUpWeatherInputField(themeColor);
-                        setUpConditionInputField(themeColor);
-
-                        DiaryThemeColorSwitcher switcher =
-                                new DiaryThemeColorSwitcher(requireContext(), themeColor);
-
-                        switcher.switchToolbarColor(binding.materialToolbarTopAppBar);
-
-                        ColorSwitchingViewList<TextView> textViewList =
-                                new ColorSwitchingViewList<>(
-                                        //binding.editTextDate,
-                                        binding.textWeather,
-                                        binding.textWeatherSlush,
-                                        binding.textCondition,
-                                        //binding.textTitle,
-                                        /*binding.editTextTitle,*/ //20240919:修正
-                                        //binding.textTitleLength,
-                                        binding.includeItem1.textItemNumber,
-                                        //binding.includeItem1.editTextItemTitle,
-                                        //binding.includeItem1.editTextItemComment,
-                                        //binding.includeItem1.textItemCommentLength,
-                                        binding.includeItem2.textItemNumber,
-                                        //binding.includeItem2.editTextItemTitle,
-                                        //binding.includeItem2.editTextItemComment,
-                                        //binding.includeItem2.textItemCommentLength,
-                                        binding.includeItem3.textItemNumber,
-                                        //binding.includeItem3.editTextItemTitle,
-                                        //binding.includeItem3.editTextItemComment,
-                                        //binding.includeItem3.textItemCommentLength,
-                                        binding.includeItem4.textItemNumber,
-                                        //binding.includeItem4.editTextItemTitle,
-                                        //binding.includeItem4.editTextItemComment,
-                                        //binding.includeItem4.textItemCommentLength,
-                                        binding.includeItem5.textItemNumber
-                                        //binding.includeItem5.editTextItemTitle
-                                        //binding.includeItem5.editTextItemComment,
-                                        //binding.includeItem5.textItemCommentLength
-                                );
-                        switcher.switchTextColorOnBackground(textViewList);
-
-                        ColorSwitchingViewList<ImageButton> imageButtonList =
-                                new ColorSwitchingViewList<>(
-                                        binding.includeItem1.imageButtonItemDelete,
-                                        binding.includeItem2.imageButtonItemDelete,
-                                        binding.includeItem3.imageButtonItemDelete,
-                                        binding.includeItem4.imageButtonItemDelete,
-                                        binding.includeItem5.imageButtonItemDelete,
-                                        binding.imageButtonAddItem
-                                );
-                        switcher.switchImageButtonColor(imageButtonList);
-
-                        switcher.switchAttachedPictureImageViewColor(binding.imageAttach);
-                    }
-                });
+        // 処理なし
     }
 
     @Override
@@ -507,10 +448,10 @@ public class DiaryEditFragment extends BaseFragment {
     }
 
     // 天気入力欄。
-    private void setUpWeatherInputField(ThemeColor themeColor) {
-        ArrayAdapter<String> weatherArrayAdapter = createWeatherSpinnerAdapter(themeColor);
+    private void setUpWeatherInputField(/*ThemeColor themeColor*/) {
+        ArrayAdapter<String> weatherArrayAdapter = createWeatherSpinnerAdapter(/*themeColor*/);
         binding.autoCompleteTextWeather1.setAdapter(weatherArrayAdapter);
-        weather2ArrayAdapter = createWeatherSpinnerAdapter(themeColor);
+        weather2ArrayAdapter = createWeatherSpinnerAdapter(/*themeColor*/);
         binding.autoCompleteTextWeather2.setAdapter(weather2ArrayAdapter);
 
         // TODO:天気情報取得が同期処理なら不要
@@ -527,7 +468,14 @@ public class DiaryEditFragment extends BaseFragment {
         binding.autoCompleteTextWeather1.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                String strWeather = weatherArrayAdapter.getItem(position);
+                ListAdapter listAdapter = binding.autoCompleteTextWeather1.getAdapter();
+                ArrayAdapter<?> arrayAdapter;
+                if (listAdapter instanceof ArrayAdapter) {
+                    arrayAdapter = (ArrayAdapter<?>) listAdapter;
+                } else {
+                    throw new ClassCastException();
+                }
+                String strWeather = (String) arrayAdapter.getItem(position);
                 WeatherConverter weatherConverter = new WeatherConverter();
                 Weathers weather = weatherConverter.toWeather(requireContext(), strWeather);
                 diaryEditViewModel.updateWeather1(weather);
@@ -549,15 +497,12 @@ public class DiaryEditFragment extends BaseFragment {
                             binding.textInputLayoutWeather2.setEnabled(false);
                             binding.autoCompleteTextWeather2.setEnabled(false);
                             binding.autoCompleteTextWeather2.setAdapter(weatherArrayAdapter);
-                            String defaultText = Weathers.UNKNOWN.toString(requireContext());
-                            binding.autoCompleteTextWeather2.setText(defaultText, false);
+                            diaryEditViewModel.updateWeather2(Weathers.UNKNOWN);
                         } else {
-                            weather2ArrayAdapter = createWeatherSpinnerAdapter(themeColor, weather);
+                            weather2ArrayAdapter = createWeatherSpinnerAdapter(/*themeColor,*/ weather);
                             binding.autoCompleteTextWeather2.setAdapter(weather2ArrayAdapter);
                             binding.textInputLayoutWeather2.setEnabled(true);
                             binding.autoCompleteTextWeather2.setEnabled(true);
-                            // HACK:AdapterをセットするとSpinnerの選択アイテムがデフォルト値になるため下記対応。
-                            //diaryEditViewModel.updateWeather2(diaryEditViewModel.getWeather2LiveData().getValue());
                         }
                     }
                 });
@@ -565,7 +510,14 @@ public class DiaryEditFragment extends BaseFragment {
         binding.autoCompleteTextWeather2.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                String strWeather = weather2ArrayAdapter.getItem(position);
+                ListAdapter listAdapter = binding.autoCompleteTextWeather2.getAdapter();
+                ArrayAdapter<?> arrayAdapter;
+                if (listAdapter instanceof ArrayAdapter) {
+                    arrayAdapter = (ArrayAdapter<?>) listAdapter;
+                } else {
+                    throw new ClassCastException();
+                }
+                String strWeather = (String) arrayAdapter.getItem(position);
                 WeatherConverter weatherConverter = new WeatherConverter();
                 Weathers weather = weatherConverter.toWeather(requireContext(), strWeather);
                 diaryEditViewModel.updateWeather2(weather);
@@ -605,10 +557,12 @@ public class DiaryEditFragment extends BaseFragment {
                 });
     }
 
-    private ArrayAdapter<String> createWeatherSpinnerAdapter(ThemeColor themeColor, @Nullable Weathers... excludedWeathers) {
-        if (themeColor == null) {
+    // TODO:Theme機能削除保留(スピナー選択肢テキストの色を変える必要があるか調べる)
+    @NonNull
+    private ArrayAdapter<String> createWeatherSpinnerAdapter(/*ThemeColor themeColor,*/ @Nullable Weathers... excludedWeathers) {
+        /*if (themeColor == null) {
             throw new NullPointerException();
-        }
+        }*/
 
         List<String> weatherItemList = new ArrayList<>();
         for (Weathers weather: Weathers.values()) {
@@ -616,7 +570,7 @@ public class DiaryEditFragment extends BaseFragment {
                 weatherItemList.add(weather.toString(requireContext()));
             }
         }
-        return new ArrayAdapter<String>(requireContext(), android.R.layout.simple_list_item_1 , weatherItemList) {
+        return new ArrayAdapter<String>(requireContext(), android.R.layout.simple_list_item_1 , weatherItemList)/* {
             @NonNull
             @Override
             public View getView(int position, View convertView, @NonNull ViewGroup parent) {
@@ -637,7 +591,7 @@ public class DiaryEditFragment extends BaseFragment {
                 switcher.switchSpinnerDropDownTextColor(textView);
                 return textView;
             }
-        };
+        }*/;
     }
 
     private boolean isExcludedWeather(Weathers weather, @Nullable Weathers... excludedWeathers) {
@@ -653,18 +607,51 @@ public class DiaryEditFragment extends BaseFragment {
     }
 
     // 気分入力欄。
-    private void setUpConditionInputField(ThemeColor themeColor) {
-        if (themeColor == null) {
+    private void setUpConditionInputField(/*ThemeColor themeColor*/) {
+        /*if (themeColor == null) {
             throw new NullPointerException();
-        }
+        }*/
 
-        // Adapter作成
+        // ドロップダウン設定
+        ArrayAdapter<String> conditionArrayAdapter = createConditionSpinnerAdapter();
+        binding.autoCompleteTextCondition.setAdapter(conditionArrayAdapter);
+        binding.autoCompleteTextCondition.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                ListAdapter listAdapter = binding.autoCompleteTextCondition.getAdapter();
+                ArrayAdapter<?> arrayAdapter;
+                if (listAdapter instanceof ArrayAdapter) {
+                    arrayAdapter = (ArrayAdapter<?>) listAdapter;
+                } else {
+                    throw new ClassCastException();
+                }
+                String strCondition = (String) arrayAdapter.getItem(position);
+                ConditionConverter converter = new ConditionConverter();
+                Conditions condition = converter.toCondition(requireContext(), strCondition);
+                diaryEditViewModel.updateCondition(condition);
+                binding.autoCompleteTextCondition.clearFocus();
+            }
+        });
+
+        diaryEditViewModel.getConditionLiveData()
+                .observe(getViewLifecycleOwner(), new Observer<Conditions>() {
+                    @Override
+                    public void onChanged(Conditions condition) {
+                        if (condition == null) return;
+
+                        String strCondition = condition.toString(requireContext());
+                        binding.autoCompleteTextCondition.setText(strCondition, false);
+                    }
+                });
+    }
+
+    @NonNull
+    private ArrayAdapter<String> createConditionSpinnerAdapter(/*ThemeColor themeColor,*/) {
         List<String> conditonItemList = new ArrayList<>();
         for (Conditions condition: Conditions.values()) {
             conditonItemList.add(condition.toString(requireContext()));
         }
-        ArrayAdapter<String> conditionArrayAdapter =
-                new ArrayAdapter<String>(requireContext(), android.R.layout.simple_list_item_1 , conditonItemList) {
+        return new ArrayAdapter<String>(requireContext(), android.R.layout.simple_list_item_1 , conditonItemList)/* {
                     @NonNull
                     @Override
                     public View getView(int position, View convertView, @NonNull ViewGroup parent) {
@@ -685,31 +672,7 @@ public class DiaryEditFragment extends BaseFragment {
                         switcher.switchSpinnerDropDownTextColor(textView);
                         return textView;
                     }
-                };
-
-        // ドロップダウン設定
-        binding.autoCompleteTextCondition.setAdapter(conditionArrayAdapter);
-        binding.autoCompleteTextCondition.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                String strCondition = conditionArrayAdapter.getItem(position);
-                ConditionConverter converter = new ConditionConverter();
-                Conditions condition = converter.toCondition(requireContext(), strCondition);
-                diaryEditViewModel.updateCondition(condition);
-                binding.autoCompleteTextCondition.clearFocus();
-            }
-        });
-
-        diaryEditViewModel.getConditionLiveData()
-                .observe(getViewLifecycleOwner(), new Observer<Conditions>() {
-                    @Override
-                    public void onChanged(Conditions condition) {
-                        if (condition == null) return;
-
-                        String strCondition = condition.toString(requireContext());
-                        binding.autoCompleteTextCondition.setText(strCondition, false);
-                    }
-                });
+                }*/;
     }
 
     private void setUpTitleInputField() {
@@ -1191,6 +1154,21 @@ public class DiaryEditFragment extends BaseFragment {
         KeyboardInitializer keyboardInitializer =
                 new KeyboardInitializer(requireActivity());
         keyboardInitializer.hide(view);
+        onResume();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        // HACK:DiaryItemTitleEditFragmentから本Fragmentへ画面遷移(戻る)した時、
+        //      スピナーのアダプターが選択中アイテムのみで構成されたアダプターに更新されてしまうので
+        //      onResume()メソッドにて再度アダプターを設定して対策。
+        //      (Weather2はWeather1のObserver内で設定している為不要)
+        ArrayAdapter<String> weatherArrayAdapter = createWeatherSpinnerAdapter(/*themeColor*/);
+        binding.autoCompleteTextWeather1.setAdapter(weatherArrayAdapter);
+        ArrayAdapter<String> conditionArrayAdapter = createConditionSpinnerAdapter(/*themeColor*/);
+        binding.autoCompleteTextCondition.setAdapter(conditionArrayAdapter);
     }
 
     @Override

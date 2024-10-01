@@ -74,7 +74,9 @@ public class DiaryItemTitleEditFragment extends BaseFragment {
 
     @Override
     protected View initializeDataBinding(@NonNull LayoutInflater inflater, ViewGroup container) {
-        binding = FragmentDiaryItemTitleEditBinding.inflate(inflater, container, false);
+        ThemeColor themeColor = settingsViewModel.loadThemeColorSettingValue();
+        LayoutInflater themeColorInflater = createThemeColorInflater(inflater, themeColor);
+        binding = FragmentDiaryItemTitleEditBinding.inflate(themeColorInflater, container, false);
         binding.setLifecycleOwner(this);
         binding.setDiaryItemTitleEditViewModel(diaryItemTitleEditViewModel);
         return binding.getRoot();
@@ -86,41 +88,12 @@ public class DiaryItemTitleEditFragment extends BaseFragment {
 
         setUpToolBar();
         setUpItemTitleInputField();
+        setUpItemTitleSelectionHistory();
     }
 
     @Override
     protected void setUpThemeColor() {
-        settingsViewModel.getThemeColorSettingValueLiveData()
-                .observe(getViewLifecycleOwner(), new Observer<ThemeColor>() {
-                    @Override
-                    public void onChanged(ThemeColor themeColor) {
-                        if (themeColor == null) {
-                            return;
-                        }
-
-                        setUpItemTitleSelectionHistory(themeColor);
-
-                        DiaryThemeColorSwitcher switcher =
-                                new DiaryThemeColorSwitcher(requireContext(), themeColor);
-
-                        switcher.switchToolbarColor(binding.materialToolbarTopAppBar);
-
-                        ColorSwitchingViewList<TextView> textViewList =
-                                new ColorSwitchingViewList<>(
-                                        //binding.textItemNewTitle,
-                                        //binding.editTextNewItemTitle,
-                                        //binding.textNewItemTitleLength,
-                                        binding.textItemTitleHistory
-                                );
-                        switcher.switchTextColorOnBackground(textViewList);
-
-                        ColorSwitchingViewList<Button> buttonList =
-                                new ColorSwitchingViewList<>(
-                                        binding.buttonSelectNewItemTitle
-                                );
-                        switcher.switchButtonColor(buttonList);
-                    }
-                });
+        // 処理なし
     }
 
     @Override
@@ -220,6 +193,8 @@ public class DiaryItemTitleEditFragment extends BaseFragment {
                 completeItemTitleEdit(title);
             }
         });
+        boolean isEnabled = !editText.getText().toString().isEmpty();
+        binding.buttonSelectNewItemTitle.setEnabled(isEnabled);
     }
 
     private class InputItemTitleErrorWatcher implements TextWatcher {
@@ -236,14 +211,17 @@ public class DiaryItemTitleEditFragment extends BaseFragment {
             String title = s.toString();
             if (title.isEmpty()) {
                 binding.textInputLayoutNewItemTitle.setError(getString(R.string.fragment_diary_item_title_edit_new_item_title_input_field_error_message_empty));
+                binding.buttonSelectNewItemTitle.setEnabled(false);
                 return;
             }
             // 先頭が空白文字(\\s)
             if (title.matches("\\s+.*")) {
                 binding.textInputLayoutNewItemTitle.setError(getString(R.string.fragment_diary_item_title_edit_new_item_title_input_field_error_message_initial_char_unmatched));
+                binding.buttonSelectNewItemTitle.setEnabled(false);
                 return;
             }
             binding.textInputLayoutNewItemTitle.setError(null);
+            binding.buttonSelectNewItemTitle.setEnabled(true);
         }
 
         @Override
@@ -252,8 +230,8 @@ public class DiaryItemTitleEditFragment extends BaseFragment {
         }
     }
 
-    private void setUpItemTitleSelectionHistory(ThemeColor themeColor) {
-        // 選択履歴リストアイテム設定
+    private void setUpItemTitleSelectionHistory() {
+        ThemeColor themeColor = settingsViewModel.loadThemeColorSettingValue();
         ItemTitleSelectionHistoryListAdapter itemTitleSelectionHistoryListAdapter =
                 new ItemTitleSelectionHistoryListAdapter(
                         requireContext(),

@@ -53,7 +53,8 @@
                     app:counterEnabled="true"
                     app:counterMaxLength="@integer/fragment_diary_item_title_edit_item_title_max_length"
                     app:expandedHintEnabled="false"
-                    app:errorEnabled="true">
+                    app:errorEnabled="true"
+                    app:endIconTint="?attr/colorOnSurfaceVariant">
 
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/textInputEditText_new_item_title"

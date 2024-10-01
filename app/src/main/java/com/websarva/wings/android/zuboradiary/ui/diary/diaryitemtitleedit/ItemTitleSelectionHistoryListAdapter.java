@@ -16,6 +16,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.websarva.wings.android.zuboradiary.data.database.DiaryItemTitleSelectionHistoryItem;
 import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor;
 import com.websarva.wings.android.zuboradiary.databinding.RowItemTitleSelectionHistoryBinding;
+import com.websarva.wings.android.zuboradiary.ui.ThemeColorInflaterCreator;
 import com.websarva.wings.android.zuboradiary.ui.diary.DiaryThemeColorSwitcher;
 
 public class ItemTitleSelectionHistoryListAdapter
@@ -58,9 +59,11 @@ public class ItemTitleSelectionHistoryListAdapter
     @NonNull
     @Override
     public ItemTitleSelectionHistoryViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        LayoutInflater inflater = LayoutInflater.from(parent.getContext());
+        ThemeColorInflaterCreator creator = new ThemeColorInflaterCreator(context, inflater, themeColor);
+        LayoutInflater themeColorInflater = creator.create();
         RowItemTitleSelectionHistoryBinding binding =
-                RowItemTitleSelectionHistoryBinding
-                        .inflate(LayoutInflater.from(parent.getContext()), parent, false);
+                RowItemTitleSelectionHistoryBinding.inflate(themeColorInflater, parent, false);
        return new ItemTitleSelectionHistoryViewHolder(binding);
     }
 
@@ -94,16 +97,13 @@ public class ItemTitleSelectionHistoryListAdapter
         void onClick(int position, String title);
     }
 
-    public class ItemTitleSelectionHistoryViewHolder
+    public static class ItemTitleSelectionHistoryViewHolder
             extends ItemTitleSelectionHistorySimpleCallback.LeftSwipeViewHolder {
         public RowItemTitleSelectionHistoryBinding binding;
 
         public ItemTitleSelectionHistoryViewHolder(RowItemTitleSelectionHistoryBinding binding) {
             super(binding);
             this.binding = binding;
-
-            DiaryThemeColorSwitcher switcher = new DiaryThemeColorSwitcher(context, themeColor);
-            switcher.switchHistoryItemTextColor(binding.textItemTitle);
         }
 
         @Override

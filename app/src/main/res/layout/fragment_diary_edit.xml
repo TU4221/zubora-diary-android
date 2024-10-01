@@ -12,21 +12,14 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical"
-        tools:context=".ui.diary.diaryedit.DiaryEditFragment">
+        android:orientation="vertical">
 
         <com.google.android.material.appbar.MaterialToolbar
             android:id="@+id/material_toolbar_top_app_bar"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            tools:background="?attr/colorPrimary"
-            android:gravity="center"
-            android:minHeight="?attr/actionBarSize"
-            android:theme="?attr/actionBarTheme"
             app:menu="@menu/diary_edit_toolbar_menu"
             app:navigationIcon="@drawable/ic_arrow_back_24px"
-            app:titleCentered="true"
-            tools:title="@string/fragment_diary_edit_toolbar_title_value_tools"/>
+            tools:title="@string/fragment_diary_edit_toolbar_title_value_tools"
+            style="@style/Toolbar" />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/fab_test"
@@ -184,7 +177,8 @@
                         android:hint="@string/fragment_diary_edit_title"
                         app:counterEnabled="true"
                         app:counterMaxLength="@integer/fragment_diary_edit_title_max_length"
-                        app:expandedHintEnabled="false">
+                        app:expandedHintEnabled="false"
+                        app:endIconTint="?attr/colorOnSurfaceVariant">
 
                         <com.google.android.material.textfield.TextInputEditText
                             android:id="@+id/textInputEditText_title"
@@ -240,7 +234,8 @@
                         android:layout_gravity="end"
                         android:layout_marginTop="@dimen/fragment_diary_edit_margin_top"
                         android:background="@drawable/bg_image_button"
-                        android:src="@drawable/ic_add_circle_outline_24" />
+                        android:src="@drawable/ic_add_circle_outline_24"
+                        app:tint="?attr/colorOnSurfaceVariant"/>
 
                     <ImageView
                         android:id="@+id/image_attach"
@@ -248,15 +243,19 @@
                         android:layout_height="360dp"
                         android:layout_gravity="center"
                         android:layout_marginTop="@dimen/fragment_diary_edit_margin_top"
-                        android:background="@drawable/bg_rounded_rectangle"
-                        android:src="@drawable/ic_photo_library_24px" />
+                        android:background="@drawable/image_bg_rounded_rectangle"
+                        android:src="@drawable/ic_photo_library_24px"
+                        app:tint="?attr/colorOnSurfaceVariant" />
 
                 </LinearLayout>
 
             </FrameLayout>
 
+
         </androidx.core.widget.NestedScrollView>
 
     </LinearLayout>
+
+
 
 </layout>

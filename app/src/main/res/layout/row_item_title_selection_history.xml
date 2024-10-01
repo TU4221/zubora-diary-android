@@ -21,11 +21,12 @@
         <TextView
             android:id="@+id/text_item_title"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="40dp"
+            android:gravity="center_vertical"
             android:paddingHorizontal="8dp"
             android:paddingVertical="4dp"
-            tools:text="item title"
-            tools:background="?attr/colorSurface" />
+            android:background="?attr/colorSurface"
+            tools:text="item title" />
 
     </FrameLayout>
 </layout>
