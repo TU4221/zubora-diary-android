@@ -22,20 +22,13 @@
             android:id="@+id/constraint_layout_full_screen"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:orientation="vertical"
-            tools:context=".ui.diary.diaryitemtitleedit.DiaryItemTitleEditFragment">
+            android:orientation="vertical">
 
             <com.google.android.material.appbar.MaterialToolbar
                 android:id="@+id/material_toolbar_top_app_bar"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                tools:background="?attr/colorPrimary"
-                android:gravity="center"
-                android:minHeight="?attr/actionBarSize"
-                android:theme="?attr/actionBarTheme"
                 app:navigationIcon="@drawable/ic_arrow_back_24px"
-                app:titleCentered="true"
-                tools:title="@string/fragment_diary_item_title_edit_toolbar_title_tools_value" />
+                tools:title="@string/fragment_diary_item_title_edit_toolbar_title_tools_value"
+                style="@style/Toolbar"/>
 
             <LinearLayout
                 android:layout_width="match_parent"
