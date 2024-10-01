@@ -22,6 +22,7 @@ import android.widget.TextView;
 import com.websarva.wings.android.zuboradiary.R;
 import com.websarva.wings.android.zuboradiary.data.DateTimeStringConverter;
 import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor;
+import com.websarva.wings.android.zuboradiary.databinding.FragmentCalendarBinding;
 import com.websarva.wings.android.zuboradiary.databinding.FragmentDiaryShowBinding;
 import com.websarva.wings.android.zuboradiary.ui.BaseFragment;
 import com.websarva.wings.android.zuboradiary.ui.ColorSwitchingViewList;
@@ -81,7 +82,9 @@ public class DiaryShowFragment extends BaseFragment {
 
     @Override
     protected View initializeDataBinding(@NonNull LayoutInflater inflater, ViewGroup container) {
-        binding = FragmentDiaryShowBinding.inflate(inflater, container, false);
+        ThemeColor themeColor = settingsViewModel.loadThemeColorSettingValue();
+        LayoutInflater themeColorInflater = createThemeColorInflater(inflater, themeColor);
+        binding = FragmentDiaryShowBinding.inflate(themeColorInflater, container, false);
         binding.setLifecycleOwner(this);
         binding.setDiaryShowViewModel(diaryShowViewModel);
         return binding.getRoot();
@@ -101,44 +104,7 @@ public class DiaryShowFragment extends BaseFragment {
 
     @Override
     protected void setUpThemeColor() {
-        settingsViewModel.getThemeColorSettingValueLiveData()
-                .observe(getViewLifecycleOwner(), new Observer<ThemeColor>() {
-                    @Override
-                    public void onChanged(ThemeColor themeColor) {
-                        if (themeColor == null) {
-                            return;
-                        }
-
-                        DiaryThemeColorSwitcher switcher =
-                                new DiaryThemeColorSwitcher(requireContext(), themeColor);
-
-                        switcher.switchToolbarColor(binding.materialToolbarTopAppBar);
-
-                        ColorSwitchingViewList<TextView> textViewList =
-                                new ColorSwitchingViewList<>(
-                                        binding.includeDiaryShow.textWeather,
-                                        binding.includeDiaryShow.textWeather1Selected,
-                                        binding.includeDiaryShow.textWeatherSlush,
-                                        binding.includeDiaryShow.textWeather2Selected,
-                                        binding.includeDiaryShow.textCondition,
-                                        binding.includeDiaryShow.textConditionSelected,
-                                        binding.includeDiaryShow.textTitle,
-                                        binding.includeDiaryShow.includeItem1.textItemTitle,
-                                        binding.includeDiaryShow.includeItem1.textItemComment,
-                                        binding.includeDiaryShow.includeItem2.textItemTitle,
-                                        binding.includeDiaryShow.includeItem2.textItemComment,
-                                        binding.includeDiaryShow.includeItem3.textItemTitle,
-                                        binding.includeDiaryShow.includeItem3.textItemComment,
-                                        binding.includeDiaryShow.includeItem4.textItemTitle,
-                                        binding.includeDiaryShow.includeItem4.textItemComment,
-                                        binding.includeDiaryShow.includeItem5.textItemTitle,
-                                        binding.includeDiaryShow.includeItem5.textItemComment,
-                                        binding.includeDiaryShow.textLog,
-                                        binding.includeDiaryShow.textLogValue
-                                );
-                        switcher.switchTextColorOnBackground(textViewList);
-                    }
-                });
+        // 処理なし
     }
 
     @Override

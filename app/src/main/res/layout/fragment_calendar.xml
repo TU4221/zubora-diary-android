@@ -12,27 +12,23 @@
             type="com.websarva.wings.android.zuboradiary.ui.diary.diaryshow.DiaryShowViewModel" />
     </data>
 
-    <LinearLayout
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical"
-        tools:context=".ui.calendar.CalendarFragment">
+        android:layout_height="match_parent">
 
-        <com.google.android.material.appbar.MaterialToolbar
-            android:id="@+id/material_toolbar_top_app_bar"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            tools:background="?attr/colorPrimary"
-            android:gravity="center"
-            android:minHeight="?attr/actionBarSize"
-            android:theme="?attr/actionBarTheme"
-            app:title="----年--月--日"
-            app:titleCentered="true" />
+        <View
+            android:id="@+id/view_full_screen_background"
+            style="@style/BackgroundView" />
 
-        <FrameLayout
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_margin="8dp">
+            android:orientation="vertical">
+
+            <com.google.android.material.appbar.MaterialToolbar
+                android:id="@+id/material_toolbar_top_app_bar"
+                tools:title="@string/fragment_calendar_month_header_tools_value"
+                style="@style/Toolbar"/>
 
             <androidx.core.widget.NestedScrollView
                 android:id="@+id/nested_scroll_full_screen"
@@ -42,23 +38,27 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
+                    android:layout_marginHorizontal="@dimen/fragment_horizontal_margin"
                     android:orientation="vertical">
 
                     <com.kizitonwose.calendar.view.CalendarView
                         android:id="@+id/calendar"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/fragment_calendar_margin_top"
                         app:cv_dayViewResource="@layout/calendar_day"
                         app:cv_monthHeaderResource="@layout/calendar_header" />
 
                     <com.google.android.material.divider.MaterialDivider
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content" />
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/fragment_calendar_margin_top"/>
 
                     <!-- 日記ありなしでFrameLayout内のViewを表示切替 -->
                     <FrameLayout
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent">
+                        android:layout_height="match_parent"
+                        android:layout_marginTop="@dimen/fragment_calendar_margin_top">
 
                         <LinearLayout
                             android:id="@+id/linear_layout_diary_show"
@@ -71,18 +71,13 @@
                                 layout="@layout/layout_diary_show"
                                 app:diaryShowViewModel="@{diaryShowViewModel}" />
 
-                            <View
-                                android:id="@+id/view_diary_show_bottom_margin"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"/>
-
                         </LinearLayout>
 
                         <TextView
                             android:id="@+id/text_no_diary"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
-                            android:text="日記がありません。"
+                            android:text="@string/fragment_calendar_no_diary_message"
                             android:gravity="center_horizontal|top"
                             android:paddingTop="16dp"/>
 
@@ -92,33 +87,14 @@
 
             </androidx.core.widget.NestedScrollView>
 
-            <com.google.android.material.floatingactionbutton.FloatingActionButton
-                android:id="@+id/float_action_button_diary_edit"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="16dp"
-                android:layout_marginBottom="16dp"
-                android:layout_gravity="bottom|end"
-                android:src="@android:drawable/ic_menu_edit"
-                android:contentDescription="日記編集" />
+        </LinearLayout>
 
-        </FrameLayout>
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/float_action_button_diary_edit"
+            android:src="@drawable/ic_edit_24px"
+            android:contentDescription="@string/fragment_calendar_fab_content_description"
+            style="@style/FloatingActionButton"/>
 
-    </LinearLayout>
-
-
-
+    </FrameLayout>
 
 </layout>
-
-
-
-
-<!--<androidx.fragment.app.FragmentContainerView
-android:id="@+id/fragment_container_show_diary"
-android:layout_width="match_parent"
-android:layout_height="match_parent"
-app:layout_constraintBottom_toBottomOf="parent"
-app:layout_constraintEnd_toEndOf="parent"
-app:layout_constraintStart_toStartOf="parent"
-app:layout_constraintTop_toTopOf="parent" />-->

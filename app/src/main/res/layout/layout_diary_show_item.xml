@@ -1,8 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <data>
+        <variable
+            name="itemNumber"
+            type="java.lang.String" />
         <variable
             name="titleLiveData"
             type="androidx.lifecycle.LiveData&lt;String>" />
@@ -15,35 +19,38 @@
         android:id="@+id/liner_layout_diary_show_item"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
-        <!--
-            android:visibility="@{item.isVisible ? View.VISIBLE : View.GONE}"
-       MEMO:Visibilityを操作すると対象Viewの下にあるViewがちらつくので使用しない。
-            背景が無色かつ、Transitionで高さを最小値にすれば、Visibility使用せずとも対象Viewを
-            非表示にすることができるので今回はこれで対応。
-        -->
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/text_item_number"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/layout_diary_show_item_margin_top"
+            android:text="@{itemNumber}"
+            android:textSize="@dimen/layout_diary_show_small_text_size"
+            tools:text="@string/layout_diary_show_item_tools"/>
 
         <TextView
             android:id="@+id/text_item_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
+            android:layout_marginTop="@dimen/layout_diary_show_item_small_margin_top"
             android:text="@{titleLiveData}"
+            android:textSize="@dimen/layout_diary_show_item_text_size"
             android:hint="@string/layout_diary_show_item_title_hint" />
 
         <com.google.android.material.divider.MaterialDivider
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/layout_diary_show_item_small_margin_top" />
 
         <TextView
             android:id="@+id/text_item_comment"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
+            android:layout_marginTop="@dimen/layout_diary_show_item_small_margin_top"
             android:text="@{commentLiveData}"
+            android:textSize="@dimen/layout_diary_show_item_text_size"
             android:hint="@string/layout_diary_show_item_comment_hint" />
 
     </LinearLayout>

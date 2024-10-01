@@ -58,19 +58,14 @@
                     layout="@layout/layout_full_screen_circular_progress_indicator"
                     android:isVisibleLiveData="@{list_view_model.isVisibleUpdateProgressBarLiveData}" />
 
-                <com.google.android.material.floatingactionbutton.FloatingActionButton
-                    android:id="@+id/fab_edit_diary"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="bottom|right"
-                    android:layout_marginEnd="16dp"
-                    android:layout_marginBottom="16dp"
-                    android:clickable="true"
-                    android:src="@drawable/ic_edit_24px"
-                    android:contentDescription="@string/fragment_diary_list_fab_new_diary_creation"/>
-
             </FrameLayout>
         </LinearLayout>
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/fab_edit_diary"
+            android:src="@drawable/ic_edit_24px"
+            android:contentDescription="@string/fragment_diary_list_fab_new_diary_creation"
+            style="@style/FloatingActionButton" />
 
     </FrameLayout>
 

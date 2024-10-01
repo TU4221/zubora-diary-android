@@ -2,6 +2,7 @@ package com.websarva.wings.android.zuboradiary.ui.calendar;
 
 import android.os.Bundle;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -93,10 +94,9 @@ public class CalendarFragment extends BaseFragment {
 
     @Override
     protected View initializeDataBinding(@NonNull LayoutInflater inflater, ViewGroup container) {
-        // データバインディング設定
-        binding = FragmentCalendarBinding.inflate(inflater, container, false);
-
-        // 双方向データバインディング設定
+        ThemeColor themeColor = settingsViewModel.loadThemeColorSettingValue();
+        LayoutInflater themeColorInflater = createThemeColorInflater(inflater, themeColor);
+        binding = FragmentCalendarBinding.inflate(themeColorInflater, container, false);
         binding.setLifecycleOwner(this);
         binding.setDiaryShowViewModel(diaryShowViewModel);
         return binding.getRoot();
@@ -106,60 +106,14 @@ public class CalendarFragment extends BaseFragment {
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        setUpCalendar();
         setUpDiaryShow();
         setUpFloatActionButton();
-        setUpBottomLayout();
     }
 
     @Override
     protected void setUpThemeColor() {
-        settingsViewModel.getThemeColorSettingValueLiveData()
-                .observe(getViewLifecycleOwner(), new Observer<ThemeColor>() {
-                    @Override
-                    public void onChanged(ThemeColor themeColor) {
-                        if (themeColor == null) {
-                            return;
-                        }
-
-                        // MEMO:RecyclerViewにThemeColorを適応させるため、
-                        //      ViewModelのThemeColorValueに値が格納されてから処理すること。
-                        //      RecyclerView設定後、色を変更するにはそれなりの工数がかかると判断。
-                        setUpCalendar(themeColor);
-
-                        CalendarThemeColorSwitcher switcher =
-                                new CalendarThemeColorSwitcher(requireContext(), themeColor);
-
-                        switcher.switchToolbarColor(binding.materialToolbarTopAppBar);
-
-                        ColorSwitchingViewList<FloatingActionButton> floatingActionButtonList =
-                                new ColorSwitchingViewList<>(binding.floatActionButtonDiaryEdit);
-                        switcher.switchFloatingActionButtonColor(floatingActionButtonList);
-
-                        ColorSwitchingViewList<TextView> textViewList =
-                                new ColorSwitchingViewList<>(
-                                        binding.includeDiaryShow.textWeather,
-                                        binding.includeDiaryShow.textWeather1Selected,
-                                        binding.includeDiaryShow.textWeatherSlush,
-                                        binding.includeDiaryShow.textWeather2Selected,
-                                        binding.includeDiaryShow.textCondition,
-                                        binding.includeDiaryShow.textConditionSelected,
-                                        binding.includeDiaryShow.textTitle,
-                                        binding.includeDiaryShow.includeItem1.textItemTitle,
-                                        binding.includeDiaryShow.includeItem1.textItemComment,
-                                        binding.includeDiaryShow.includeItem2.textItemTitle,
-                                        binding.includeDiaryShow.includeItem2.textItemComment,
-                                        binding.includeDiaryShow.includeItem3.textItemTitle,
-                                        binding.includeDiaryShow.includeItem3.textItemComment,
-                                        binding.includeDiaryShow.includeItem4.textItemTitle,
-                                        binding.includeDiaryShow.includeItem4.textItemComment,
-                                        binding.includeDiaryShow.includeItem5.textItemTitle,
-                                        binding.includeDiaryShow.includeItem5.textItemComment,
-                                        binding.includeDiaryShow.textLog,
-                                        binding.includeDiaryShow.textLogValue
-                                );
-                        switcher.switchTextColorOnBackground(textViewList);
-                    }
-                });
+        // 処理なし
     }
 
     @Override
@@ -195,12 +149,13 @@ public class CalendarFragment extends BaseFragment {
                 .observe(getViewLifecycleOwner(), new AppErrorBufferListObserver(settingsViewModel));
     }
 
-    private void setUpCalendar(ThemeColor themeColor) {
+    private void setUpCalendar(/*ThemeColor themeColor*/) {
         CalendarView calendar = binding.calendar;
         List<DayOfWeek> daysOfWeek = createDayOfWeekList(); // 曜日リスト取得
         YearMonth currentMonth = YearMonth.now();
         YearMonth startMonth = currentMonth.minusMonths(60); //現在から過去5年分
         YearMonth endMonth = currentMonth.plusMonths(60); //現在から未来5年分
+        ThemeColor themeColor = settingsViewModel.loadThemeColorSettingValue();
         configureCalendarBinders(daysOfWeek, themeColor);
         calendar.setup(startMonth,endMonth,daysOfWeek.get(0));
         if (calendarViewModel.getSelectedDateLiveData().getValue() == null) {
@@ -384,13 +339,15 @@ public class CalendarFragment extends BaseFragment {
 
     // カレンダー日にち、曜日の色取得
     private int selectDayColor(DayOfWeek dayOfWeek) {
-        int color = getResources().getColor(R.color.black);
+        int colorResId;
         if (dayOfWeek == DayOfWeek.SUNDAY) {
-            color = getResources().getColor(R.color.red);
+            colorResId = R.color.red;
         } else if (dayOfWeek == DayOfWeek.SATURDAY) {
-            color = getResources().getColor(R.color.blue);
+            colorResId = R.color.blue;
+        } else {
+            colorResId = R.color.black;
         }
-        return color;
+        return getResources().getColor(colorResId);
     }
 
     // カレンダー日単位コンテナ
@@ -544,32 +501,6 @@ public class CalendarFragment extends BaseFragment {
             public void onClick(View v) {
                 LocalDate selectedDate = calendarViewModel.getSelectedDateLiveData().getValue();
                 showDiaryEditFragment(selectedDate);
-            }
-        });
-    }
-
-    // 表示日記の下余白設定(FABが日記と重なるのを防ぐため)
-    // MEMO:FABのレイアウト高さは"wrap_content"を使用しているため、
-    //      レイアウト後に機能するviewTreeObserver#addOnGlobalLayoutListenerを使用して取得する。
-    private void setUpBottomLayout() {
-        View viewDiaryShowBottomMargin = binding.viewDiaryShowBottomMargin;
-        FloatingActionButton fabDiaryEdit = binding.floatActionButtonDiaryEdit;
-        ViewTreeObserver viewTreeObserver = viewDiaryShowBottomMargin.getViewTreeObserver();
-        viewTreeObserver.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-            @Override
-            public void onGlobalLayout() {
-                ViewGroup.MarginLayoutParams viewMarginLayoutParams =
-                        (ViewGroup.MarginLayoutParams) viewDiaryShowBottomMargin.getLayoutParams();
-                ViewGroup.MarginLayoutParams buttonMarginLayoutParams =
-                        (ViewGroup.MarginLayoutParams) fabDiaryEdit.getLayoutParams();
-
-                viewMarginLayoutParams.height = fabDiaryEdit.getHeight()
-                        + (buttonMarginLayoutParams.bottomMargin * 2);
-                viewDiaryShowBottomMargin.setLayoutParams(viewMarginLayoutParams);
-
-                // MEMO:例外で再度取得するように促される為、下記対応。
-                viewDiaryShowBottomMargin.getViewTreeObserver()
-                        .removeOnGlobalLayoutListener(this);
             }
         });
     }

@@ -7,6 +7,25 @@
     <dimen name="fragment_horizontal_margin">16dp</dimen>
     <dimen name="fragment_vertical_margin">16dp</dimen>
 
+    <!-- fragment_calendar -->
+    <dimen name="fragment_calendar_text_size">18sp</dimen>
+    <dimen name="fragment_calendar_margin_start">8dp</dimen>
+    <dimen name="fragment_calendar_margin_top">16dp</dimen>
+
+    <!-- layout_diary_show -->
+    <dimen name="layout_diary_show_text_size">18sp</dimen>
+    <dimen name="layout_diary_show_small_text_size">14sp</dimen>
+    <dimen name="layout_diary_show_margin_start">8dp</dimen>
+    <dimen name="layout_diary_show_margin_top">18dp</dimen>
+    <dimen name="layout_diary_show_small_margin_top">4dp</dimen>
+
+    <!-- layout_diary_show_item -->
+    <dimen name="layout_diary_show_item_text_size">@dimen/layout_diary_show_text_size</dimen>
+    <dimen name="layout_diary_show_text_item_small_size">@dimen/layout_diary_show_small_text_size</dimen>
+    <dimen name="layout_diary_show_item_margin_start">@dimen/layout_diary_show_margin_start</dimen>
+    <dimen name="layout_diary_show_item_margin_top">@dimen/layout_diary_show_margin_top</dimen>
+    <dimen name="layout_diary_show_item_small_margin_top">@dimen/layout_diary_show_small_margin_top</dimen>
+
     <!-- fragment_diary_edit -->
     <dimen name="fragment_diary_edit_text_size">18sp</dimen>
     <dimen name="fragment_diary_edit_margin_start">8dp</dimen>

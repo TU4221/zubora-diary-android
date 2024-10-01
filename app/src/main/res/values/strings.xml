@@ -38,6 +38,9 @@
 
     <!-- fragment_calendar -->
     <string name="fragment_calendar_month_header_format">yyyy年MM月</string>
+    <string name="fragment_calendar_month_header_tools_value">0000年00月00日</string>
+    <string name="fragment_calendar_no_diary_message">日記がありません。</string>
+    <string name="fragment_calendar_fab_content_description">日記編集</string>
 
 
     <!-- fragment_show_diary -->
@@ -46,17 +49,24 @@
     <string name="fragment_diary_show_toolbar_option_delete_diary">日記削除</string>
 
     <!-- layout_show_diary -->
-    <string name="layout_diary_show_title_hint">無題</string>
-    <string name="layout_diary_show_condition">気分：</string>
-    <string name="layout_diary_show_condition_tools_value">良</string>
     <string name="layout_diary_show_weather">天気：</string>
     <string name="layout_diary_show_weather1_tools_value">晴</string>
     <string name="layout_diary_show_weather_slush">／</string>
     <string name="layout_diary_show_weather2_tools_value">雲</string>
+    <string name="layout_diary_show_condition">気分：</string>
+    <string name="layout_diary_show_condition_tools_value">良</string>
+    <string name="layout_diary_show_title">タイトル</string>
+    <string name="layout_diary_show_title_hint">無題</string>
+    <string name="layout_diary_show_item_1">項目1</string>
+    <string name="layout_diary_show_item_2">項目2</string>
+    <string name="layout_diary_show_item_3">項目3</string>
+    <string name="layout_diary_show_item_4">項目4</string>
+    <string name="layout_diary_show_item_5">項目5</string>
     <string name="layout_diary_show_last_update">最終更新日時</string>
     <string name="layout_diary_show_last_update_tools_value">0000/00/00 00:00:00</string>
 
     <!-- layout_diary_show_item -->
+    <string name="layout_diary_show_item_tools">項目*</string>
     <string name="layout_diary_show_item_title_hint">無題</string>
     <string name="layout_diary_show_item_comment_hint">コメントなし</string>
 

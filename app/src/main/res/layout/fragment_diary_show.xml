@@ -14,42 +14,49 @@
             type="com.websarva.wings.android.zuboradiary.ui.diary.diaryshow.DiaryShowViewModel" />
     </data>
 
-    <LinearLayout
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical"
-        tools:context=".ui.diary.diaryshow.DiaryShowFragment">
+        android:layout_height="match_parent">
 
-        <com.google.android.material.appbar.MaterialToolbar
-            android:id="@+id/material_toolbar_top_app_bar"
+        <View
+            android:id="@+id/view_full_screen_background"
+            style="@style/BackgroundView" />
+
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            tools:background="?attr/colorPrimary"
-            android:gravity="center"
-            android:minHeight="?attr/actionBarSize"
-            android:theme="?attr/actionBarTheme"
-            app:menu="@menu/diary_show_toolbar_menu"
-            app:navigationIcon="@drawable/ic_arrow_back_24px"
-            app:titleCentered="true"
-            tools:title="@string/fragment_diary_show_toolbar_title"/>
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            tools:context=".ui.diary.diaryshow.DiaryShowFragment">
 
-        <androidx.core.widget.NestedScrollView
-            android:id="@+id/nested_scroll_diary_show"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            <com.google.android.material.appbar.MaterialToolbar
+                android:id="@+id/material_toolbar_top_app_bar"
+                app:menu="@menu/diary_show_toolbar_menu"
+                app:navigationIcon="@drawable/ic_arrow_back_24px"
+                tools:title="@string/fragment_diary_show_toolbar_title"
+                style="@style/Toolbar"/>
 
-            <FrameLayout
+            <androidx.core.widget.NestedScrollView
+                android:id="@+id/nested_scroll_diary_show"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="8dp">
+                android:layout_height="match_parent">
 
-                <include
-                    android:id="@+id/include_diary_show"
-                    layout="@layout/layout_diary_show"
-                    app:diaryShowViewModel="@{diaryShowViewModel}" />
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="@dimen/fragment_horizontal_margin"
+                    android:layout_marginVertical="@dimen/fragment_vertical_margin" >
 
-            </FrameLayout>
+                    <include
+                        android:id="@+id/include_diary_show"
+                        layout="@layout/layout_diary_show"
+                        app:diaryShowViewModel="@{diaryShowViewModel}" />
 
-        </androidx.core.widget.NestedScrollView>
-    </LinearLayout>
+                </FrameLayout>
+
+            </androidx.core.widget.NestedScrollView>
+
+        </LinearLayout>
+
+    </FrameLayout>
+
 </layout>
