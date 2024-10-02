@@ -8,38 +8,42 @@
 
     </data>
 
-    <androidx.coordinatorlayout.widget.CoordinatorLayout
+    <LinearLayout
+        android:id="@+id/liner_layout_date_picker_bottom_sheet"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
 
-        <LinearLayout
-            android:id="@+id/liner_layout_date_picker_bottom_sheet"
+        <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:background="?colorSecondaryContainer">
 
-            <FrameLayout
-                android:layout_width="match_parent"
+            <Button
+                android:id="@+id/button_cancel"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:background="?colorSecondary">
+                android:text="@string/dialog_fragment_number_picker_cancel"
+                android:textColor="?colorOnSecondaryContainer"
+                android:background="@drawable/bg_clear_button" />
 
-                <Button
-                    android:id="@+id/button_cancel"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/dialog_fragment_number_picker_cancel"
-                    android:textColor="?colorOnSecondary"
-                    android:background="@drawable/bg_clear_button" />
+            <Button
+                android:id="@+id/button_decision"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end"
+                android:text="@string/dialog_fragment_number_picker_decision"
+                android:textColor="?colorOnSecondaryContainer"
+                android:background="@drawable/bg_clear_button" />
+        </FrameLayout>
 
-                <Button
-                    android:id="@+id/button_decision"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="end"
-                    android:text="@string/dialog_fragment_number_picker_decision"
-                    android:textColor="?colorOnSecondary"
-                    android:background="@drawable/bg_clear_button" />
-            </FrameLayout>
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <View
+                android:id="@+id/view_full_screen_background"
+                style="@style/BottomSheetBackgroundView" />
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -50,30 +54,21 @@
 
                 <NumberPicker
                     android:id="@+id/number_picker_first"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:descendantFocusability="blocksDescendants" />
+                    style="@style/BottomSheetNumberPicker" />
 
                 <NumberPicker
                     android:id="@+id/number_picker_second"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
                     android:layout_marginStart="@dimen/dialog_fragment_number_picker_layout_margin_horizontal_between_items"
-                    android:descendantFocusability="blocksDescendants" />
+                    style="@style/BottomSheetNumberPicker" />
 
                 <NumberPicker
                     android:id="@+id/number_picker_third"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
                     android:layout_marginStart="@dimen/dialog_fragment_number_picker_layout_margin_horizontal_between_items"
-                    android:descendantFocusability="blocksDescendants" />
+                    style="@style/BottomSheetNumberPicker"/>
 
             </LinearLayout>
 
-        </LinearLayout>
+        </FrameLayout>
 
-    </androidx.coordinatorlayout.widget.CoordinatorLayout>
+    </LinearLayout>
 </layout>
