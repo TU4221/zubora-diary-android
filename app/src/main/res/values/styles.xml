@@ -24,7 +24,6 @@
     <!-- DiaryListItem -->
     <style name="DiaryListDay">
         <item name="android:textColor">?attr/colorOnSecondaryContainer</item>
-        <item name="android:textColorHint">?attr/colorOnSurfaceVariant</item>
         <item name="android:background">?attr/colorSecondaryContainer</item>
         <item name="tint">?attr/colorSecondary</item>
     </style>
