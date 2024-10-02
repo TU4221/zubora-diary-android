@@ -28,6 +28,55 @@
         <item name="tint">?attr/colorSecondary</item>
     </style>
 
+    <!-- SettingsItemBaseTextView -->
+    <style name="SettingsItemBaseTextView" >
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">@dimen/fragment_settings_section_layout_height</item>
+        <item name="android:paddingStart">@dimen/fragment_settings_item_padding_horizontal</item>
+        <item name="android:paddingEnd">@dimen/fragment_settings_item_padding_horizontal</item>
+        <item name="android:paddingTop">@dimen/fragment_settings_item_padding_vertical</item>
+        <item name="android:paddingBottom">@dimen/fragment_settings_item_padding_vertical</item>
+        <item name="android:textSize">@dimen/fragment_settings_section_text_size</item>
+    </style>
+
+    <!-- SettingsItemTextView -->
+    <style name="SettingsItemTextView" parent="SettingsItemBaseTextView">
+        <item name="android:drawablePadding">@dimen/fragment_settings_item_drawable_padding</item>
+        <item name="android:gravity">center_vertical</item>
+    </style>
+
+    <!-- SettingsSectionTextView -->
+    <style name="SettingsSectionTextView" parent="SettingsItemBaseTextView">
+        <item name="android:gravity">bottom</item>
+        <item name="android:textColor">?attr/colorOnSecondaryContainer</item>
+        <item name="android:background">?attr/colorSecondaryContainer</item>
+    </style>
+
+    <!-- SettingsItemValueTextView -->
+    <style name="SettingsItemValueTextView" parent="Widget.MaterialComponents.TextView">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">@dimen/fragment_settings_item_layout_height</item>
+        <item name="android:layout_gravity">center_vertical|end</item>
+        <item name="android:paddingStart">@dimen/fragment_settings_item_padding_horizontal</item>
+        <item name="android:paddingEnd">@dimen/fragment_settings_item_padding_horizontal</item>
+        <item name="android:paddingTop">@dimen/fragment_settings_item_padding_vertical</item>
+        <item name="android:paddingBottom">@dimen/fragment_settings_item_padding_vertical</item>
+        <item name="android:textSize">@dimen/fragment_settings_item_value_text_size</item>
+        <item name="android:gravity">center_vertical|end</item>
+        <item name="android:hint">@string/fragment_settings_item_value_not_set</item>
+    </style>
+
+    <!-- SettingsItemValueSwitch -->
+    <style name="SettingsItemValueSwitch" parent="Widget.Material3.CompoundButton.MaterialSwitch">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_gravity">center_vertical|end</item>
+        <item name="android:paddingStart">@dimen/fragment_settings_item_padding_horizontal</item>
+        <item name="android:paddingEnd">@dimen/fragment_settings_item_padding_horizontal</item>
+        <item name="android:paddingTop">@dimen/fragment_settings_item_padding_vertical</item>
+        <item name="android:paddingBottom">@dimen/fragment_settings_item_padding_vertical</item>
+    </style>
+
     <!-- MaterialDatePicker用Theme -->
     <style name="MaterialCalendarThemeColorWhite" parent="ThemeOverlay.Material3.MaterialCalendar">
         <item name="theme">@style/ThemeColorWhite</item>

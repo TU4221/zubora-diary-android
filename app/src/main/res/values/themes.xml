@@ -31,6 +31,7 @@
         <item name="colorPrimaryInverse">@color/md_theme_light_inversePrimary</item>
 
         <item name="android:textColor">@color/md_theme_light_onSurface</item>
+        <item name="drawableTint">@color/md_theme_light_onSurfaceVariant</item>
         <item name="android:textColorHint">@color/md_theme_light_textHint</item>
         <item name="titleTextColor">@color/md_theme_light_onSurface</item>
         <item name="navigationIconTint">@color/md_theme_light_onSurfaceVariant</item>
@@ -113,6 +114,7 @@
         <item name="colorSurfaceContainerHighest">@color/md_theme_color_white_surfaceContainerHighest</item>
 
         <item name="android:textColor">@color/md_theme_color_white_onSurface</item>
+        <item name="drawableTint">@color/md_theme_color_white_onSurfaceVariant</item>
         <item name="android:textColorHint">@color/md_theme_color_white_textHint</item>
         <item name="titleTextColor">@color/md_theme_color_white_onSurface</item>
         <item name="navigationIconTint">@color/md_theme_color_white_onSurfaceVariant</item>
@@ -168,6 +170,7 @@
         <item name="colorSurfaceContainerHighest">@color/md_theme_color_black_surfaceContainerHighest</item>
 
         <item name="android:textColor">@color/md_theme_color_black_onSurface</item>
+        <item name="drawableTint">@color/md_theme_color_black_onSurfaceVariant</item>
         <item name="android:textColorHint">@color/md_theme_color_black_textHint</item>
         <item name="titleTextColor">@color/md_theme_color_black_onSurface</item>
         <item name="navigationIconTint">@color/md_theme_color_black_onSurfaceVariant</item>
@@ -223,6 +226,7 @@
         <item name="colorSurfaceContainerHighest">@color/md_theme_color_red_surfaceContainerHighest</item>
 
         <item name="android:textColor">@color/md_theme_color_red_onSurface</item>
+        <item name="drawableTint">@color/md_theme_color_red_onSurfaceVariant</item>
         <item name="android:textColorHint">@color/md_theme_color_red_textHint</item>
         <item name="titleTextColor">@color/md_theme_color_red_onSurface</item>
         <item name="navigationIconTint">@color/md_theme_color_red_onSurfaceVariant</item>
@@ -278,6 +282,7 @@
         <item name="colorSurfaceContainerHighest">@color/md_theme_color_blue_surfaceContainerHighest</item>
 
         <item name="android:textColor">@color/md_theme_color_blue_onSurface</item>
+        <item name="drawableTint">@color/md_theme_color_blue_onSurfaceVariant</item>
         <item name="android:textColorHint">@color/md_theme_color_blue_textHint</item>
         <item name="titleTextColor">@color/md_theme_color_blue_onSurface</item>
         <item name="navigationIconTint">@color/md_theme_color_blue_onSurfaceVariant</item>
@@ -333,6 +338,7 @@
         <item name="colorSurfaceContainerHighest">@color/md_theme_color_green_surfaceContainerHighest</item>
 
         <item name="android:textColor">@color/md_theme_color_green_onSurface</item>
+        <item name="drawableTint">@color/md_theme_color_green_onSurfaceVariant</item>
         <item name="android:textColorHint">@color/md_theme_color_green_textHint</item>
         <item name="titleTextColor">@color/md_theme_color_green_onSurface</item>
         <item name="navigationIconTint">@color/md_theme_color_green_onSurfaceVariant</item>
@@ -388,6 +394,7 @@
         <item name="colorSurfaceContainerHighest">@color/md_theme_color_yellow_surfaceContainerHighest</item>
 
         <item name="android:textColor">@color/md_theme_color_yellow_onSurface</item>
+        <item name="drawableTint">@color/md_theme_color_yellow_onSurfaceVariant</item>
         <item name="android:textColorHint">@color/md_theme_color_yellow_textHint</item>
         <item name="titleTextColor">@color/md_theme_color_yellow_onSurface</item>
         <item name="navigationIconTint">@color/md_theme_color_yellow_onSurfaceVariant</item>

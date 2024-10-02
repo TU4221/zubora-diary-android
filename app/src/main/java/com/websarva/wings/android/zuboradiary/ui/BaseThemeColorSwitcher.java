@@ -19,6 +19,7 @@ import androidx.core.view.WindowInsetsControllerCompat;
 
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.material.divider.MaterialDivider;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.materialswitch.MaterialSwitch;
 import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor;
@@ -124,18 +125,16 @@ public class BaseThemeColorSwitcher {
         view.setItemActiveIndicatorColor(ColorStateList.valueOf(secondaryContainerColor));
     }
 
-    // TODO:ThemeResIdが設定できないためサイトで確認しながら個々設定できるようにする。
     public final void switchToolbarColor(MaterialToolbar toolbar) {
         Preconditions.checkNotNull(toolbar);
 
         int surfaceColor = themeColor.getSurfaceColor(resources);
         int onSurfaceColor = themeColor.getOnSurfaceColor(resources);
+        int onSurfaceVariantColor = themeColor.getOnSurfaceVariantColor(resources);
         toolbar.setBackgroundColor(surfaceColor);
         toolbar.setTitleTextColor(onSurfaceColor);
-
-        switchToolbarNavigationIconColor(toolbar, onSurfaceColor);
         switchToolbarMenuColor(toolbar, onSurfaceColor);
-
+        switchToolbarNavigationIconColor(toolbar, onSurfaceVariantColor);
     }
 
     private void switchToolbarNavigationIconColor(MaterialToolbar toolbar, int color) {
@@ -264,6 +263,13 @@ public class BaseThemeColorSwitcher {
 
         int color = themeColor.getPrimaryContainerColor(resources);
         progressBar.getIndeterminateDrawable().setTint(color);
+    }
+
+    public void switchDividerColor(ColorSwitchingViewList<MaterialDivider> divider) {
+        Preconditions.checkNotNull(divider);
+
+        int color = themeColor.getOutlineVariantColor(resources);
+        divider.getViewList().stream().forEach(x -> x.setDividerColor(color));
     }
 
     // 共通処理

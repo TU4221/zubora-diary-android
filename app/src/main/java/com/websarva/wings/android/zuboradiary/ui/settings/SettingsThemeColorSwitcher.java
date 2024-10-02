@@ -17,15 +17,15 @@ class SettingsThemeColorSwitcher extends BaseThemeColorSwitcher {
     void switchSettingItemSectionColor(ColorSwitchingViewList<TextView> textViewList) {
         Preconditions.checkNotNull(textViewList);
 
-        int color = themeColor.getSurfaceContainerColor(resources);
-        int onColor = themeColor.getOnSurfaceColor(resources);
+        int color = themeColor.getSecondaryContainerColor(resources);
+        int onColor = themeColor.getOnSecondaryContainerColor(resources);
         switchTextViewsColor(textViewList, color, onColor);
     }
 
     void switchSettingItemIconColor(ColorSwitchingViewList<TextView> textViewList) {
         Preconditions.checkNotNull(textViewList);
 
-        int color = themeColor.getPrimaryColor(resources);
+        int color = themeColor.getOnSurfaceVariantColor(resources);
         switchTextViewsColorOnlyIcon(textViewList, color);
     }
 }

@@ -27,6 +27,7 @@ import androidx.lifecycle.SavedStateHandle;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavDirections;
 
+import com.google.android.material.divider.MaterialDivider;
 import com.google.android.material.materialswitch.MaterialSwitch;
 import com.websarva.wings.android.zuboradiary.R;
 import com.websarva.wings.android.zuboradiary.data.DateTimeStringConverter;
@@ -39,6 +40,7 @@ import com.websarva.wings.android.zuboradiary.ui.ColorSwitchingViewList;
 import java.time.DayOfWeek;
 import java.time.LocalTime;
 import java.util.Map;
+import java.util.Objects;
 
 import dagger.hilt.android.AndroidEntryPoint;
 
@@ -127,7 +129,9 @@ public class SettingsFragment extends BaseFragment {
 
     @Override
     protected View initializeDataBinding(@NonNull LayoutInflater inflater, ViewGroup container) {
-        binding = FragmentSettingsBinding.inflate(inflater, container, false);
+        ThemeColor themeColor = settingsViewModel.loadThemeColorSettingValue();
+        LayoutInflater themeColorInflater = createThemeColorInflater(inflater, themeColor);
+        binding = FragmentSettingsBinding.inflate(themeColorInflater, container, false);
         binding.setLifecycleOwner(this);
         binding.setSettingsViewModel(settingsViewModel);
         return binding.getRoot();
@@ -146,59 +150,7 @@ public class SettingsFragment extends BaseFragment {
 
     @Override
     protected void setUpThemeColor() {
-        settingsViewModel.getThemeColorSettingValueLiveData()
-                .observe(getViewLifecycleOwner(), new Observer<ThemeColor>() {
-                    @Override
-                    public void onChanged(ThemeColor themeColor) {
-                        if (themeColor == null) {
-                            return;
-                        }
-
-                        SettingsThemeColorSwitcher switcher =
-                                new SettingsThemeColorSwitcher(requireContext(), themeColor);
-
-                        switcher.switchToolbarColor(binding.materialToolbarTopAppBar);
-
-                        ColorSwitchingViewList<TextView> sectionList =
-                                new ColorSwitchingViewList<>(
-                                        binding.textSettingsSectionDesign,
-                                        binding.textSettingsSectionSettings,
-                                        binding.textSettingsSectionEnd
-                                );
-                        switcher.switchSettingItemSectionColor(sectionList);
-
-                        ColorSwitchingViewList<TextView> iconList =
-                                new ColorSwitchingViewList<>(
-                                        binding.textThemeColorSettingTitle,
-                                        binding.textCalendarStartDaySettingTitle,
-                                        binding.textReminderNotificationSettingTitle,
-                                        binding.textPasscodeLockSettingTitle,
-                                        binding.textGettingWeatherInformationSettingTitle
-                                );
-                        switcher.switchSettingItemIconColor(iconList);
-
-                        ColorSwitchingViewList<TextView> textList =
-                                new ColorSwitchingViewList<>(
-                                        binding.textThemeColorSettingTitle,
-                                        binding.textThemeColorSettingValue,
-                                        binding.textCalendarStartDaySettingTitle,
-                                        binding.textCalendarStartDaySettingValue,
-                                        binding.textReminderNotificationSettingTitle,
-                                        binding.textReminderNotificationSettingTime,
-                                        binding.textPasscodeLockSettingTitle,
-                                        binding.textGettingWeatherInformationSettingTitle
-                                );
-                        switcher.switchTextColorOnBackground(textList);
-
-                        ColorSwitchingViewList<MaterialSwitch> switchList =
-                                new ColorSwitchingViewList<>(
-                                        binding.switchReminderNotificationValue,
-                                        binding.switchPasscodeLockValue,
-                                        binding.switchGettingWeatherInformationValue
-                                );
-                        switcher.switchSwitchColor(switchList);
-                    }
-                });
+        // 処理なし
     }
 
     @Override
@@ -299,8 +251,72 @@ public class SettingsFragment extends BaseFragment {
 
                         String strThemeColor = themeColor.toSting(requireContext());
                         binding.textThemeColorSettingValue.setText(strThemeColor);
+
+                        switchViewColor(themeColor);
                     }
                 });
+    }
+
+    private void switchViewColor(ThemeColor themeColor) {
+        Objects.requireNonNull(themeColor);
+
+        SettingsThemeColorSwitcher switcher =
+                new SettingsThemeColorSwitcher(requireContext(), themeColor);
+
+        switcher.switchBackgroundColor(binding.viewFullScreenBackground);
+        switcher.switchToolbarColor(binding.materialToolbarTopAppBar);
+
+        ColorSwitchingViewList<TextView> sectionList =
+                new ColorSwitchingViewList<>(
+                        binding.textSettingsSectionDesign,
+                        binding.textSettingsSectionSettings,
+                        binding.textSettingsSectionEnd
+                );
+        switcher.switchSettingItemSectionColor(sectionList);
+
+        ColorSwitchingViewList<TextView> iconList =
+                new ColorSwitchingViewList<>(
+                        binding.textThemeColorSettingTitle,
+                        binding.textCalendarStartDaySettingTitle,
+                        binding.textReminderNotificationSettingTitle,
+                        binding.textPasscodeLockSettingTitle,
+                        binding.textGettingWeatherInformationSettingTitle
+                );
+        switcher.switchSettingItemIconColor(iconList);
+
+        ColorSwitchingViewList<TextView> textList =
+                new ColorSwitchingViewList<>(
+                        binding.textThemeColorSettingTitle,
+                        binding.textThemeColorSettingValue,
+                        binding.textCalendarStartDaySettingTitle,
+                        binding.textCalendarStartDaySettingValue,
+                        binding.textReminderNotificationSettingTitle,
+                        binding.textReminderNotificationSettingTime,
+                        binding.textPasscodeLockSettingTitle,
+                        binding.textGettingWeatherInformationSettingTitle
+                );
+        switcher.switchTextColorOnBackground(textList);
+
+        ColorSwitchingViewList<MaterialSwitch> switchList =
+                new ColorSwitchingViewList<>(
+                        binding.switchReminderNotificationValue,
+                        binding.switchPasscodeLockValue,
+                        binding.switchGettingWeatherInformationValue
+                );
+        switcher.switchSwitchColor(switchList);
+
+        ColorSwitchingViewList<MaterialDivider> dividerList =
+                new ColorSwitchingViewList<>(
+                        binding.materialDividerToolbar,
+                        binding.materialDividerThemeColorSetting,
+                        binding.materialDividerSectionSetting,
+                        binding.materialDividerCalendarStartDaySetting,
+                        binding.materialDividerReminderNotificationSetting,
+                        binding.materialDividerPasscodeLockSetting,
+                        binding.materialDividerGettingWeatherInformationSetting,
+                        binding.materialDividerSectionEnd
+                );
+        switcher.switchDividerColor(dividerList);
     }
 
     private void setUpCalendarStartDaySettingItem() {
