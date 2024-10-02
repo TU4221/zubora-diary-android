@@ -31,6 +31,7 @@
     <color name="md_theme_light_onSurface">#1C1B1E</color>
     <color name="md_theme_light_surfaceVariant">#E7E0EC</color>
     <color name="md_theme_light_onSurfaceVariant">#49454E</color>
+    <color name="md_theme_light_textHint">#8049454E</color> <!-- MEMO:追加 -->
     <color name="md_theme_light_outline">#7A757F</color>
     <color name="md_theme_light_inverseOnSurface">#F4EFF4</color>
     <color name="md_theme_light_inverseSurface">#313033</color>
@@ -98,6 +99,7 @@
     <color name="md_theme_color_white_onSurface">#1C1B1B</color>
     <color name="md_theme_color_white_surfaceVariant">#E0E3E3</color>
     <color name="md_theme_color_white_onSurfaceVariant">#444748</color>
+    <color name="md_theme_color_white_textHint">#80444748</color> <!-- MEMO:追加 -->
     <color name="md_theme_color_white_outline">#747878</color>
     <color name="md_theme_color_white_outlineVariant">#C4C7C8</color>
     <color name="md_theme_color_white_scrim">#000000</color>
@@ -242,6 +244,7 @@
     <color name="md_theme_color_black_onSurface">#E5E2E1</color>
     <color name="md_theme_color_black_surfaceVariant">#444748</color>
     <color name="md_theme_color_black_onSurfaceVariant">#C4C7C8</color>
+    <color name="md_theme_color_black_textHint">#80C4C7C8</color> <!-- MEMO:追加 -->
     <color name="md_theme_color_black_outline">#8E9192</color>
     <color name="md_theme_color_black_outlineVariant">#444748</color>
     <color name="md_theme_color_black_scrim">#000000</color>
@@ -385,6 +388,7 @@
     <color name="md_theme_color_red_onSurface">#231917</color>
     <color name="md_theme_color_red_surfaceVariant">#F5DED8</color>
     <color name="md_theme_color_red_onSurfaceVariant">#53433F</color>
+    <color name="md_theme_color_red_textHint">#8053433F</color> <!-- MEMO:追加 -->
     <color name="md_theme_color_red_outline">#85736E</color>
     <color name="md_theme_color_red_outlineVariant">#D8C2BC</color>
     <color name="md_theme_color_red_scrim">#000000</color>
@@ -529,6 +533,7 @@
     <color name="md_theme_color_blue_onSurface">#191C20</color>
     <color name="md_theme_color_blue_surfaceVariant">#E0E2EC</color>
     <color name="md_theme_color_blue_onSurfaceVariant">#44474E</color>
+    <color name="md_theme_color_blue_textHint">#8044474E</color> <!-- MEMO:追加 -->
     <color name="md_theme_color_blue_outline">#74777F</color>
     <color name="md_theme_color_blue_outlineVariant">#C4C6D0</color>
     <color name="md_theme_color_blue_scrim">#000000</color>
@@ -673,6 +678,7 @@
     <color name="md_theme_color_green_onSurface">#1A1C16</color>
     <color name="md_theme_color_green_surfaceVariant">#E1E4D5</color>
     <color name="md_theme_color_green_onSurfaceVariant">#44483D</color>
+    <color name="md_theme_color_green_textHint">#8044483D</color> <!-- MEMO:追加 -->
     <color name="md_theme_color_green_outline">#75796C</color>
     <color name="md_theme_color_green_outlineVariant">#C5C8BA</color>
     <color name="md_theme_color_green_scrim">#000000</color>
@@ -817,6 +823,7 @@
     <color name="md_theme_color_yellow_onSurface">#1E1B13</color>
     <color name="md_theme_color_yellow_surfaceVariant">#EAE2D0</color>
     <color name="md_theme_color_yellow_onSurfaceVariant">#4B4739</color>
+    <color name="md_theme_color_yellow_textHint">#804B4739</color> <!-- MEMO:追加 -->
     <color name="md_theme_color_yellow_outline">#7C7767</color>
     <color name="md_theme_color_yellow_outlineVariant">#CDC6B4</color>
     <color name="md_theme_color_yellow_scrim">#000000</color>

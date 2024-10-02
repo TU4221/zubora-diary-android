@@ -43,8 +43,9 @@
                 <FrameLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginHorizontal="@dimen/fragment_horizontal_margin"
-                    android:layout_marginVertical="@dimen/fragment_vertical_margin" >
+                    android:layout_marginHorizontal="@dimen/fragment_margin_horizontal"
+                    android:layout_marginTop="@dimen/fragment_margin_vertical"
+                    android:layout_marginBottom="@dimen/fragment_margin_bottom" >
 
                     <include
                         android:id="@+id/include_diary_show"

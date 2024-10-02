@@ -4,13 +4,13 @@
 
     <item
         android:id="@+id/diaryEditToolbarOptionDeleteDiary"
-        android:icon="@drawable/ic_delete_forever_24"
+        android:icon="@drawable/toolbar_menu_ic_delete_forever_24"
         android:title="@string/fragment_diary_edit_toolbar_option_delete_diary"
         app:showAsAction="never" />
 
     <item
         android:id="@+id/diaryEditToolbarOptionSaveDiary"
-        android:icon="@drawable/ic_save_24"
+        android:icon="@drawable/toolbar_menu_ic_save_24"
         android:title="@string/fragment_diary_edit_toolbar_option_save_diary"
         app:showAsAction="ifRoom" />
 
