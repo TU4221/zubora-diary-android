@@ -1,10 +1,12 @@
 package com.websarva.wings.android.zuboradiary.ui.diary.diaryedit;
 
+import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.view.ContextThemeWrapper;
 import androidx.appcompat.widget.Toolbar;
 import androidx.constraintlayout.motion.widget.MotionLayout;
 import androidx.lifecycle.Lifecycle;
@@ -21,6 +23,7 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.contentcapture.ContentCaptureCondition;
 import android.view.inputmethod.EditorInfo;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -29,6 +32,7 @@ import android.widget.ImageButton;
 import android.widget.ListAdapter;
 import android.widget.TextView;
 
+import com.google.android.material.textfield.MaterialAutoCompleteTextView;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 import com.websarva.wings.android.zuboradiary.data.DateTimeStringConverter;
@@ -557,12 +561,11 @@ public class DiaryEditFragment extends BaseFragment {
                 });
     }
 
-    // TODO:Theme機能削除保留(スピナー選択肢テキストの色を変える必要があるか調べる)
     @NonNull
-    private ArrayAdapter<String> createWeatherSpinnerAdapter(/*ThemeColor themeColor,*/ @Nullable Weathers... excludedWeathers) {
-        /*if (themeColor == null) {
-            throw new NullPointerException();
-        }*/
+    private ArrayAdapter<String> createWeatherSpinnerAdapter(@Nullable Weathers... excludedWeathers) {
+        ThemeColor themeColor = settingsViewModel.loadThemeColorSettingValue();
+        int themeResId = themeColor.getThemeResId();
+        Context contextWithTheme = new ContextThemeWrapper(requireContext(), themeResId);
 
         List<String> weatherItemList = new ArrayList<>();
         for (Weathers weather: Weathers.values()) {
@@ -570,28 +573,8 @@ public class DiaryEditFragment extends BaseFragment {
                 weatherItemList.add(weather.toString(requireContext()));
             }
         }
-        return new ArrayAdapter<String>(requireContext(), android.R.layout.simple_list_item_1 , weatherItemList)/* {
-            @NonNull
-            @Override
-            public View getView(int position, View convertView, @NonNull ViewGroup parent) {
-                // 通常時の文字の色を設定
-                TextView textView = (TextView) super.getView(position, convertView, parent);
-                DiaryThemeColorSwitcher switcher =
-                        new DiaryThemeColorSwitcher(requireContext(), themeColor);
-                ColorSwitchingViewList<TextView> textViewList = new ColorSwitchingViewList<>(textView);
-                switcher.switchTextColorOnBackground(textViewList);
-                return textView;
-            }
 
-            @Override
-            public View getDropDownView(int position, View convertView, @NonNull ViewGroup parent) {
-                TextView textView = (TextView) super.getView(position, convertView, parent);
-                DiaryThemeColorSwitcher switcher =
-                        new DiaryThemeColorSwitcher(requireContext(), themeColor);
-                switcher.switchSpinnerDropDownTextColor(textView);
-                return textView;
-            }
-        }*/;
+        return new ArrayAdapter<>(contextWithTheme, android.R.layout.simple_list_item_1, weatherItemList);
     }
 
     private boolean isExcludedWeather(Weathers weather, @Nullable Weathers... excludedWeathers) {
@@ -607,11 +590,7 @@ public class DiaryEditFragment extends BaseFragment {
     }
 
     // 気分入力欄。
-    private void setUpConditionInputField(/*ThemeColor themeColor*/) {
-        /*if (themeColor == null) {
-            throw new NullPointerException();
-        }*/
-
+    private void setUpConditionInputField() {
         // ドロップダウン設定
         ArrayAdapter<String> conditionArrayAdapter = createConditionSpinnerAdapter();
         binding.autoCompleteTextCondition.setAdapter(conditionArrayAdapter);
@@ -647,32 +626,16 @@ public class DiaryEditFragment extends BaseFragment {
 
     @NonNull
     private ArrayAdapter<String> createConditionSpinnerAdapter(/*ThemeColor themeColor,*/) {
+        ThemeColor themeColor = settingsViewModel.loadThemeColorSettingValue();
+        int themeResId = themeColor.getThemeResId();
+        Context contextWithTheme = new ContextThemeWrapper(requireContext(), themeResId);
+
         List<String> conditonItemList = new ArrayList<>();
         for (Conditions condition: Conditions.values()) {
             conditonItemList.add(condition.toString(requireContext()));
         }
-        return new ArrayAdapter<String>(requireContext(), android.R.layout.simple_list_item_1 , conditonItemList)/* {
-                    @NonNull
-                    @Override
-                    public View getView(int position, View convertView, @NonNull ViewGroup parent) {
-                        // 通常時の文字の色を設定
-                        TextView textView = (TextView) super.getView(position, convertView, parent);
-                        DiaryThemeColorSwitcher switcher =
-                                new DiaryThemeColorSwitcher(requireContext(), themeColor);
-                        ColorSwitchingViewList<TextView> textViewList = new ColorSwitchingViewList<>(textView);
-                        switcher.switchTextColorOnBackground(textViewList);
-                        return textView;
-                    }
 
-                    @Override
-                    public View getDropDownView(int position, View convertView, @NonNull ViewGroup parent) {
-                        TextView textView = (TextView) super.getView(position, convertView, parent);
-                        DiaryThemeColorSwitcher switcher =
-                                new DiaryThemeColorSwitcher(requireContext(), themeColor);
-                        switcher.switchSpinnerDropDownTextColor(textView);
-                        return textView;
-                    }
-                }*/;
+        return new ArrayAdapter<>(contextWithTheme, android.R.layout.simple_list_item_1, conditonItemList);
     }
 
     private void setUpTitleInputField() {

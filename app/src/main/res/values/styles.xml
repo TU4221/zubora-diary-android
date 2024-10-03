@@ -4,10 +4,22 @@
     <style name="FragmentBackgroundViewStyle" parent="Widget.AppCompat.TextView">
         <item name="android:background">?attr/colorSurface</item>
     </style>
+
     <style name="ToolbarStyle" parent="Widget.Material3.Toolbar">
         <item name="android:gravity">center</item>
         <item name="android:minHeight">?attr/actionBarSize</item>
         <item name="titleCentered">true</item>
+    </style>
+
+    <style name="DropDownStyle" parent="ThemeOverlay.Material3.AutoCompleteTextView">
+        <item name="android:cursorVisible">false</item>
+        <item name="android:inputType">none</item>
+    </style>
+    <style name="DropDownTextAppearance" parent="TextAppearance.Material3.BodyMedium">
+        <item name="android:textSize">@dimen/fragment_diary_edit_text_size</item>
+        <!-- HACK:下記属性を指定しないとThemeColorInflaterでInflateしても色が反映されないので記述したが、
+                  styleを通して設定しても反映されないのでlayoutに記述。 -->
+        <!--<item name="android:textColor">?attr/colorOnSurface</item>-->
     </style>
 
     <!-- DiaryListItem -->

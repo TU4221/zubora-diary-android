@@ -104,12 +104,13 @@
                             android:layout_weight="1">
 
                             <AutoCompleteTextView
+                                style="@style/DropDownStyle"
                                 android:id="@+id/autoCompleteText_weather_1"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:cursorVisible="false"
-                                android:inputType="none"
-                                android:textSize="@dimen/fragment_diary_edit_text_size" />
+                                android:textAppearance="@style/DropDownTextAppearance"
+                                android:textColor="?attr/colorOnSurface"
+                                tools:text="@string/fragment_diary_edit_weather_value_tools" />
 
                         </com.google.android.material.textfield.TextInputLayout>
 
@@ -130,12 +131,13 @@
                             android:layout_weight="1">
 
                             <AutoCompleteTextView
+                                style="@style/DropDownStyle"
                                 android:id="@+id/autoCompleteText_weather_2"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:cursorVisible="false"
-                                android:inputType="none"
-                                android:textSize="@dimen/fragment_diary_edit_text_size" />
+                                android:textAppearance="@style/DropDownTextAppearance"
+                                android:textColor="?attr/colorOnSurface"
+                                tools:text="@string/fragment_diary_edit_weather_value_tools" />
 
                         </com.google.android.material.textfield.TextInputLayout>
 
@@ -162,12 +164,13 @@
                             android:layout_marginStart="@dimen/fragment_diary_edit_margin_start">
 
                             <AutoCompleteTextView
+                                style="@style/DropDownStyle"
                                 android:id="@+id/autoCompleteText_condition"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:cursorVisible="false"
-                                android:inputType="none"
-                                android:textSize="@dimen/fragment_diary_edit_text_size" />
+                                android:textAppearance="@style/DropDownTextAppearance"
+                                android:textColor="?attr/colorOnSurface"
+                                tools:text="@string/fragment_diary_edit_condition_value_tools"/>
 
                         </com.google.android.material.textfield.TextInputLayout>
 

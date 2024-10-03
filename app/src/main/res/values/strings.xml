@@ -101,7 +101,9 @@
     <string name="fragment_diary_edit_date_value_tools">2012/12/12(日)</string>
     <string name="fragment_diary_edit_weather">天気</string>
     <string name="fragment_diary_edit_weather_slush">／</string>
+    <string name="fragment_diary_edit_weather_value_tools">--</string>
     <string name="fragment_diary_edit_condition">気分</string>
+    <string name="fragment_diary_edit_condition_value_tools">--</string>
     <string name="fragment_diary_edit_title">タイトル</string>
     <string name="fragment_diary_edit_title_hint">無題</string>
     <string name="fragment_diary_edit_item_1">項目1</string>
