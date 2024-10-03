@@ -20,7 +20,9 @@
 
         <View
             android:id="@+id/view_full_screen_background"
-            style="@style/BackgroundView" />
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            style="@style/FragmentBackgroundViewStyle" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -30,10 +32,12 @@
 
             <com.google.android.material.appbar.MaterialToolbar
                 android:id="@+id/material_toolbar_top_app_bar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
                 app:menu="@menu/diary_show_toolbar_menu"
                 app:navigationIcon="@drawable/ic_arrow_back_24px"
                 tools:title="@string/fragment_diary_show_toolbar_title"
-                style="@style/Toolbar"/>
+                style="@style/ToolbarStyle"/>
 
             <androidx.core.widget.NestedScrollView
                 android:id="@+id/nested_scroll_diary_show"

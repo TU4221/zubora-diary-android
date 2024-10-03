@@ -18,7 +18,9 @@
 
         <View
             android:id="@+id/view_full_screen_background"
-            style="@style/BackgroundView" />
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            style="@style/FragmentBackgroundViewStyle" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -27,8 +29,10 @@
 
             <com.google.android.material.appbar.MaterialToolbar
                 android:id="@+id/material_toolbar_top_app_bar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
                 tools:title="@string/fragment_calendar_month_header_tools_value"
-                style="@style/Toolbar"/>
+                style="@style/ToolbarStyle"/>
 
             <androidx.core.widget.NestedScrollView
                 android:id="@+id/nested_scroll_full_screen"
@@ -93,9 +97,13 @@
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/float_action_button_diary_edit"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end|bottom"
+            android:layout_marginEnd="@dimen/fab_margin_end"
+            android:layout_marginBottom="@dimen/fab_margin_bottom"
             android:src="@drawable/ic_edit_24px"
-            android:contentDescription="@string/fragment_calendar_fab_content_description"
-            style="@style/FloatingActionButton"/>
+            android:contentDescription="@string/fragment_calendar_fab_content_description"/>
 
     </FrameLayout>
 

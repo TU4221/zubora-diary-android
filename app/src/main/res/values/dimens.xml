@@ -7,6 +7,8 @@
     <dimen name="fragment_margin_horizontal">16dp</dimen>
     <dimen name="fragment_margin_vertical">16dp</dimen>
     <dimen name="fragment_margin_bottom">96dp</dimen>
+    <dimen name="fab_margin_end">16dp</dimen>
+    <dimen name="fab_margin_bottom">16dp</dimen>
 
     <!-- fragment_calendar -->
     <dimen name="fragment_calendar_text_size">18sp</dimen>

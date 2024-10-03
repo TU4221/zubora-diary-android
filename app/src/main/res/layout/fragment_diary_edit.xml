@@ -16,10 +16,12 @@
 
         <com.google.android.material.appbar.MaterialToolbar
             android:id="@+id/material_toolbar_top_app_bar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             app:menu="@menu/diary_edit_toolbar_menu"
             app:navigationIcon="@drawable/ic_arrow_back_24px"
             tools:title="@string/fragment_diary_edit_toolbar_title_value_tools"
-            style="@style/Toolbar" />
+            style="@style/ToolbarStyle" />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/fab_test"
@@ -42,7 +44,9 @@
 
                 <View
                     android:id="@+id/view_full_screen_background"
-                    style="@style/BackgroundView"/>
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    style="@style/FragmentBackgroundViewStyle"/>
 
                 <LinearLayout
                     android:layout_width="match_parent"

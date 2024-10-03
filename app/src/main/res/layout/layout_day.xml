@@ -22,20 +22,20 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             tools:text="金"
-            style="@style/DiaryListDay" />
+            style="@style/DiaryListDayTextAppearance" />
 
         <TextView
             android:id="@+id/text_day_of_month"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center_horizontal"
-            android:textSize="24sp"
             android:paddingVertical="8dp"
+            android:textAppearance="@style/DiaryListDayTextAppearance"
+            android:textSize="24sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/text_day_of_week"
-            tools:text="00"
-            style="@style/DiaryListDay" />
+            tools:text="00" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

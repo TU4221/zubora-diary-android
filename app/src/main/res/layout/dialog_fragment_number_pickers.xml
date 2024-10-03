@@ -43,7 +43,9 @@
 
             <View
                 android:id="@+id/view_full_screen_background"
-                style="@style/BottomSheetBackgroundView" />
+                android:layout_width="match_parent"
+                android:layout_height="200dp"
+                style="@style/FragmentBackgroundViewStyle" />
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -54,17 +56,26 @@
 
                 <NumberPicker
                     android:id="@+id/number_picker_first"
-                    style="@style/BottomSheetNumberPicker" />
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:descendantFocusability="blocksDescendants" />
 
                 <NumberPicker
                     android:id="@+id/number_picker_second"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
                     android:layout_marginStart="@dimen/dialog_fragment_number_picker_layout_margin_horizontal_between_items"
-                    style="@style/BottomSheetNumberPicker" />
+                    android:descendantFocusability="blocksDescendants" />
 
                 <NumberPicker
                     android:id="@+id/number_picker_third"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
                     android:layout_marginStart="@dimen/dialog_fragment_number_picker_layout_margin_horizontal_between_items"
-                    style="@style/BottomSheetNumberPicker"/>
+                    android:descendantFocusability="blocksDescendants"/>
 
             </LinearLayout>
 

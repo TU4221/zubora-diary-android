@@ -1,83 +1,66 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- Common -->
-    <style name="BackgroundView">
-        <item name="android:layout_width">match_parent</item>
-        <item name="android:layout_height">match_parent</item>
+    <style name="FragmentBackgroundViewStyle" parent="Widget.AppCompat.TextView">
         <item name="android:background">?attr/colorSurface</item>
     </style>
-    <style name="BottomSheetBackgroundView" parent="BackgroundView">
-        <item name="android:layout_height">200dp</item>
-    </style>
-    <style name="Toolbar" parent="Widget.Material3.Toolbar">
-        <item name="android:layout_width">match_parent</item>
-        <item name="android:layout_height">wrap_content</item>
+    <style name="ToolbarStyle" parent="Widget.Material3.Toolbar">
         <item name="android:gravity">center</item>
         <item name="android:minHeight">?attr/actionBarSize</item>
         <item name="titleCentered">true</item>
     </style>
-    <style name="FloatingActionButton" parent="Widget.Material3.FloatingActionButton.Primary">
-        <item name="android:layout_width">wrap_content</item>
-        <item name="android:layout_height">wrap_content</item>
-        <item name="android:layout_gravity">bottom|end</item>
-        <item name="android:layout_marginEnd">16dp</item>
-        <item name="android:layout_marginBottom">16dp</item>
-    </style>
 
     <!-- DiaryListItem -->
-    <style name="DiaryListDay">
-        <item name="android:textColor">?attr/colorOnSecondaryContainer</item>
+    <style name="DiaryListDayStyle" parent="Widget.AppCompat.TextView">
         <item name="android:background">?attr/colorSecondaryContainer</item>
         <item name="tint">?attr/colorSecondary</item>
     </style>
+    <style name="DiaryListDayTextAppearance" parent="TextAppearance.AppCompat.Body1">
+        <item name="android:textColor">?attr/colorOnSecondaryContainer</item>
+    </style>
 
     <!-- SettingsFragment -->
-    <style name="SettingsItemBaseTextView" >
-        <item name="android:layout_width">match_parent</item>
-        <item name="android:layout_height">@dimen/fragment_settings_section_layout_height</item>
+    <style name="SettingsItemBaseTextViewStyle" parent="Widget.AppCompat.TextView">
         <item name="android:paddingStart">@dimen/fragment_settings_item_padding_horizontal</item>
         <item name="android:paddingEnd">@dimen/fragment_settings_item_padding_horizontal</item>
         <item name="android:paddingTop">@dimen/fragment_settings_item_padding_vertical</item>
         <item name="android:paddingBottom">@dimen/fragment_settings_item_padding_vertical</item>
+    </style>
+    <style name="SettingsItemBaseTextAppearance" parent="TextAppearance.AppCompat.Body1">
         <item name="android:textSize">@dimen/fragment_settings_section_text_size</item>
     </style>
-    <style name="SettingsItemTextView" parent="SettingsItemBaseTextView">
+
+    <style name="SettingsItemTextViewStyle" parent="SettingsItemBaseTextViewStyle">
         <item name="android:drawablePadding">@dimen/fragment_settings_item_drawable_padding</item>
         <item name="android:gravity">center_vertical</item>
     </style>
-    <style name="SettingsSectionTextView" parent="SettingsItemBaseTextView">
+    <style name="SettingsItemTextAppearance" parent="SettingsItemBaseTextAppearance"/>
+
+    <style name="SettingsSectionTextViewStyle" parent="SettingsItemBaseTextViewStyle">
         <item name="android:gravity">bottom</item>
-        <item name="android:textColor">?attr/colorOnSecondaryContainer</item>
         <item name="android:background">?attr/colorSecondaryContainer</item>
     </style>
-    <style name="SettingsItemValueTextView" parent="Widget.MaterialComponents.TextView">
-        <item name="android:layout_width">wrap_content</item>
-        <item name="android:layout_height">@dimen/fragment_settings_item_layout_height</item>
-        <item name="android:layout_gravity">center_vertical|end</item>
-        <item name="android:paddingStart">@dimen/fragment_settings_item_padding_horizontal</item>
-        <item name="android:paddingEnd">@dimen/fragment_settings_item_padding_horizontal</item>
-        <item name="android:paddingTop">@dimen/fragment_settings_item_padding_vertical</item>
-        <item name="android:paddingBottom">@dimen/fragment_settings_item_padding_vertical</item>
-        <item name="android:textSize">@dimen/fragment_settings_item_value_text_size</item>
-        <item name="android:gravity">center_vertical|end</item>
-        <item name="android:hint">@string/fragment_settings_item_value_not_set</item>
-    </style>
-    <style name="SettingsItemValueSwitch" parent="Widget.Material3.CompoundButton.MaterialSwitch">
-        <item name="android:layout_width">wrap_content</item>
-        <item name="android:layout_height">wrap_content</item>
-        <item name="android:layout_gravity">center_vertical|end</item>
-        <item name="android:paddingStart">@dimen/fragment_settings_item_padding_horizontal</item>
-        <item name="android:paddingEnd">@dimen/fragment_settings_item_padding_horizontal</item>
-        <item name="android:paddingTop">@dimen/fragment_settings_item_padding_vertical</item>
-        <item name="android:paddingBottom">@dimen/fragment_settings_item_padding_vertical</item>
+    <style name="SettingsSectionTextAppearance" parent="SettingsItemBaseTextAppearance">
+        <item name="android:textColor">?attr/colorOnSecondaryContainer</item>
     </style>
 
-    <!-- NumberPickersDialogFragment -->
-    <style name="BottomSheetNumberPicker" parent="Theme.Material3.Light.NoActionBar">
-        <item name="android:layout_width">0dp</item>
-        <item name="android:layout_height">wrap_content</item>
-        <item name="android:layout_weight">1</item>
-        <item name="android:descendantFocusability">blocksDescendants</item>
+    <style name="SettingsItemValueTextViewStyle" parent="Widget.MaterialComponents.TextView">
+        <item name="android:paddingStart">@dimen/fragment_settings_item_padding_horizontal</item>
+        <item name="android:paddingEnd">@dimen/fragment_settings_item_padding_horizontal</item>
+        <item name="android:paddingTop">@dimen/fragment_settings_item_padding_vertical</item>
+        <item name="android:paddingBottom">@dimen/fragment_settings_item_padding_vertical</item>
+        <item name="android:gravity">center_vertical|end</item>
+    </style>
+    <style name="SettingsItemValueTextAppearance" parent="TextAppearance.AppCompat.Body1">
+        <item name="android:textSize">@dimen/fragment_settings_item_value_text_size</item>
+        <item name="android:hint">@string/fragment_settings_item_value_not_set</item>
+    </style>
+
+    <style name="SettingsItemValueSwitchStyle" parent="Widget.Material3.CompoundButton.MaterialSwitch">
+        <item name="android:paddingStart">@dimen/fragment_settings_item_padding_horizontal</item>
+        <item name="android:paddingEnd">@dimen/fragment_settings_item_padding_horizontal</item>
+        <item name="android:paddingTop">@dimen/fragment_settings_item_padding_vertical</item>
+        <item name="android:paddingBottom">@dimen/fragment_settings_item_padding_vertical</item>
     </style>
 
     <!-- MaterialDatePicker用Theme -->
