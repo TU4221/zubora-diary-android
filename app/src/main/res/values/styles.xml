@@ -63,43 +63,59 @@
         <item name="android:paddingBottom">@dimen/fragment_settings_item_padding_vertical</item>
     </style>
 
-    <!-- MaterialDatePicker用Theme -->
+    <!-- MaterialCalendarDialog用Theme -->
     <style name="MaterialCalendarThemeColorWhite" parent="ThemeOverlay.Material3.MaterialCalendar">
         <item name="theme">@style/ThemeColorWhite</item>
+        <!-- HACK:theme属性で指定しているstyleに"colorSurfaceContainerHigh"は含まれているが、反映されないので下記コードを記述して対応。
+                  Material記事に記載されているapp:backgroundTintを設定しても反映されなかった。 -->
+        <item name="colorSurfaceContainerHigh">@color/md_theme_color_white_surfaceContainerHigh</item>
     </style>
     <style name="MaterialCalendarThemeColorBlack" parent="ThemeOverlay.Material3.MaterialCalendar">
         <item name="theme">@style/ThemeColorBlack</item>
+        <item name="colorSurfaceContainerHigh">@color/md_theme_color_black_surfaceContainerHigh</item>
     </style>
     <style name="MaterialCalendarThemeColorRed" parent="ThemeOverlay.Material3.MaterialCalendar">
         <item name="theme">@style/ThemeColorRed</item>
+        <item name="colorSurfaceContainerHigh">@color/md_theme_color_red_surfaceContainerHigh</item>
     </style>
     <style name="MaterialCalendarThemeColorBlue" parent="ThemeOverlay.Material3.MaterialCalendar">
         <item name="theme">@style/ThemeColorBlue</item>
+        <item name="colorSurfaceContainerHigh">@color/md_theme_color_blue_surfaceContainerHigh</item>
     </style>
     <style name="MaterialCalendarThemeColorGreen" parent="ThemeOverlay.Material3.MaterialCalendar">
         <item name="theme">@style/ThemeColorGreen</item>
+        <item name="colorSurfaceContainerHigh">@color/md_theme_color_green_surfaceContainerHigh</item>
     </style>
     <style name="MaterialCalendarThemeColorYellow" parent="ThemeOverlay.Material3.MaterialCalendar">
         <item name="theme">@style/ThemeColorYellow</item>
+        <item name="colorSurfaceContainerHigh">@color/md_theme_color_yellow_surfaceContainerHigh</item>
     </style>
 
-    <!-- MaterialDatePicker用Theme -->
+    <!-- MaterialAlertDialog用Theme -->
     <style name="MaterialAlertDialogThemeColorWhite" parent="ThemeOverlay.Material3.MaterialAlertDialog">
         <item name="theme">@style/ThemeColorWhite</item>
+        <!-- HACK:theme属性で指定しているstyleに"colorSurfaceContainerHigh"は含まれているが、反映されないので下記コードを記述して対応。
+                  Material記事に記載されているapp:backgroundTintを設定しても反映されなかった。 -->
+        <item name="colorSurfaceContainerHigh">@color/md_theme_color_white_surfaceContainerHigh</item>
     </style>
     <style name="MaterialAlertDialogThemeColorBlack" parent="ThemeOverlay.Material3.MaterialAlertDialog">
         <item name="theme">@style/ThemeColorBlack</item>
+        <item name="colorSurfaceContainerHigh">@color/md_theme_color_black_surfaceContainerHigh</item>
     </style>
     <style name="MaterialAlertDialogThemeColorRed" parent="ThemeOverlay.Material3.MaterialAlertDialog">
         <item name="theme">@style/ThemeColorRed</item>
+        <item name="colorSurfaceContainerHigh">@color/md_theme_color_red_surfaceContainerHigh</item>
     </style>
     <style name="MaterialAlertDialogThemeColorBlue" parent="ThemeOverlay.Material3.MaterialAlertDialog">
         <item name="theme">@style/ThemeColorBlue</item>
+        <item name="colorSurfaceContainerHigh">@color/md_theme_color_blue_surfaceContainerHigh</item>
     </style>
     <style name="MaterialAlertDialogThemeColorGreen" parent="ThemeOverlay.Material3.MaterialAlertDialog">
         <item name="theme">@style/ThemeColorGreen</item>
+        <item name="colorSurfaceContainerHigh">@color/md_theme_color_green_surfaceContainerHigh</item>
     </style>
     <style name="MaterialAlertDialogThemeColorYellow" parent="ThemeOverlay.Material3.MaterialAlertDialog">
         <item name="theme">@style/ThemeColorYellow</item>
+        <item name="colorSurfaceContainerHigh">@color/md_theme_color_yellow_surfaceContainerHigh</item>
     </style>
 </resources>
