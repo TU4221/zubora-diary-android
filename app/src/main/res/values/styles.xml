@@ -17,9 +17,6 @@
     </style>
     <style name="DropDownTextAppearance" parent="TextAppearance.Material3.BodyMedium">
         <item name="android:textSize">@dimen/fragment_diary_edit_text_size</item>
-        <!-- HACK:下記属性を指定しないとThemeColorInflaterでInflateしても色が反映されないので記述したが、
-                  styleを通して設定しても反映されないのでlayoutに記述。 -->
-        <!--<item name="android:textColor">?attr/colorOnSurface</item>-->
     </style>
 
     <!-- DiaryListItem -->

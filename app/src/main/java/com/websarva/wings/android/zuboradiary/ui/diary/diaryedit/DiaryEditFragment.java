@@ -452,10 +452,10 @@ public class DiaryEditFragment extends BaseFragment {
     }
 
     // 天気入力欄。
-    private void setUpWeatherInputField(/*ThemeColor themeColor*/) {
-        ArrayAdapter<String> weatherArrayAdapter = createWeatherSpinnerAdapter(/*themeColor*/);
+    private void setUpWeatherInputField() {
+        ArrayAdapter<String> weatherArrayAdapter = createWeatherSpinnerAdapter();
         binding.autoCompleteTextWeather1.setAdapter(weatherArrayAdapter);
-        weather2ArrayAdapter = createWeatherSpinnerAdapter(/*themeColor*/);
+        weather2ArrayAdapter = createWeatherSpinnerAdapter();
         binding.autoCompleteTextWeather2.setAdapter(weather2ArrayAdapter);
 
         // TODO:天気情報取得が同期処理なら不要
@@ -497,16 +497,16 @@ public class DiaryEditFragment extends BaseFragment {
                         binding.autoCompleteTextWeather1.setText(strWeather, false);
 
                         // Weather2 Spinner有効無効切替
+                        boolean isEnabled = (weather != Weathers.UNKNOWN);
+                        binding.textInputLayoutWeather2.setEnabled(isEnabled);
+                        binding.autoCompleteTextWeather2.setEnabled(isEnabled);
+
                         if (weather == Weathers.UNKNOWN || diaryEditViewModel.isEqualWeathers()) {
-                            binding.textInputLayoutWeather2.setEnabled(false);
-                            binding.autoCompleteTextWeather2.setEnabled(false);
                             binding.autoCompleteTextWeather2.setAdapter(weatherArrayAdapter);
                             diaryEditViewModel.updateWeather2(Weathers.UNKNOWN);
                         } else {
-                            weather2ArrayAdapter = createWeatherSpinnerAdapter(/*themeColor,*/ weather);
+                            weather2ArrayAdapter = createWeatherSpinnerAdapter(weather);
                             binding.autoCompleteTextWeather2.setAdapter(weather2ArrayAdapter);
-                            binding.textInputLayoutWeather2.setEnabled(true);
-                            binding.autoCompleteTextWeather2.setEnabled(true);
                         }
                     }
                 });

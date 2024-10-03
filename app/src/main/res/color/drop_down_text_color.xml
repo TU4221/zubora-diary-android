@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- MEMO:AutoCompleteTextViewはThemeColorInflaterでInflateしても色が反映されない。
+          "android:textColor"を指定するとAutoCompleteTextView#setEnabledで無効化した時のTextが有効状態と同じ
+          TextColorとなる。これを解決する為に下記コード記述-->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:color="?attr/colorOnSurface" android:state_enabled="true" />
+    <item android:color="?android:textColorHint" android:state_enabled="false" />
+</selector>

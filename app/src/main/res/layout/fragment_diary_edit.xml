@@ -109,7 +109,7 @@
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:textAppearance="@style/DropDownTextAppearance"
-                                android:textColor="?attr/colorOnSurface"
+                                android:textColor="@color/drop_down_text_color"
                                 tools:text="@string/fragment_diary_edit_weather_value_tools" />
 
                         </com.google.android.material.textfield.TextInputLayout>
@@ -136,7 +136,7 @@
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:textAppearance="@style/DropDownTextAppearance"
-                                android:textColor="?attr/colorOnSurface"
+                                android:textColor="@color/drop_down_text_color"
                                 tools:text="@string/fragment_diary_edit_weather_value_tools" />
 
                         </com.google.android.material.textfield.TextInputLayout>
@@ -169,7 +169,7 @@
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:textAppearance="@style/DropDownTextAppearance"
-                                android:textColor="?attr/colorOnSurface"
+                                android:textColor="@color/drop_down_text_color"
                                 tools:text="@string/fragment_diary_edit_condition_value_tools"/>
 
                         </com.google.android.material.textfield.TextInputLayout>
