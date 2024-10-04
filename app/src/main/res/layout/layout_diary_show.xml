@@ -25,6 +25,7 @@
                 android:id="@+id/text_weather"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:textAppearance="@style/TextViewTextAppearance"
                 android:text="@string/layout_diary_show_weather"
                 android:textSize="@dimen/layout_diary_show_small_text_size" />
 
@@ -32,6 +33,7 @@
                 android:id="@+id/text_weather_1_selected"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:textAppearance="@style/TextViewTextAppearance"
                 tools:text="@string/layout_diary_show_weather1_tools_value"
                 android:textSize="@dimen/layout_diary_show_text_size" />
 
@@ -39,6 +41,7 @@
                 android:id="@+id/text_weather_slush"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:textAppearance="@style/TextViewTextAppearance"
                 android:text="@string/layout_diary_show_weather_slush"
                 android:textSize="@dimen/layout_diary_show_text_size" />
 
@@ -46,6 +49,7 @@
                 android:id="@+id/text_weather_2_selected"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:textAppearance="@style/TextViewTextAppearance"
                 tools:text="@string/layout_diary_show_weather2_tools_value"
                 android:textSize="@dimen/layout_diary_show_text_size" />
 
@@ -61,6 +65,7 @@
                 android:id="@+id/text_condition"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:textAppearance="@style/TextViewTextAppearance"
                 android:text="@string/layout_diary_show_condition"
                 android:textSize="@dimen/layout_diary_show_small_text_size" />
 
@@ -68,6 +73,7 @@
                 android:id="@+id/text_condition_selected"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:textAppearance="@style/TextViewTextAppearance"
                 tools:text="@string/layout_diary_show_condition_tools_value"
                 android:textSize="@dimen/layout_diary_show_text_size" />
 
@@ -78,6 +84,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/layout_diary_show_margin_top"
+            android:textAppearance="@style/TextViewTextAppearance"
             android:text="@string/layout_diary_show_title"
             android:textSize="@dimen/layout_diary_show_small_text_size" />
 
@@ -86,6 +93,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/layout_diary_show_small_margin_top"
+            android:textAppearance="@style/TextViewTextAppearance"
             android:text="@{diaryShowViewModel.titleLiveData}"
             android:hint="@string/layout_diary_show_title_hint"
             android:textSize="@dimen/layout_diary_show_text_size" />
@@ -133,6 +141,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/layout_diary_show_large_margin_top"
             android:layout_gravity="end"
+            android:textAppearance="@style/TextViewTextAppearance"
             android:text="@string/layout_diary_show_last_update"
             android:textSize="@dimen/layout_diary_show_small_text_size" />
 
@@ -141,6 +150,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="end"
+            android:textAppearance="@style/TextViewTextAppearance"
             tools:text="@string/layout_diary_show_last_update_tools_value"
             android:textSize="@dimen/layout_diary_show_small_text_size" />
 

@@ -9,14 +9,35 @@
         <item name="android:gravity">center</item>
         <item name="android:minHeight">?attr/actionBarSize</item>
         <item name="titleCentered">true</item>
+        <item name="titleTextColor">?attr/colorOnSurface</item>
+        <item name="navigationIconTint">?attr/colorOnSurfaceVariant</item>
     </style>
 
-    <style name="DropDownStyle" parent="ThemeOverlay.Material3.AutoCompleteTextView">
+    <style name="TextViewTextAppearance" parent="TextAppearance.AppCompat.Small">
+        <item name="android:textColor">@color/text_color_on_background</item>
+        <item name="android:textColorHint">@color/text_hint_color_on_background</item>
+    </style>
+
+    <style name="TextInputEditTextStyle" parent="Widget.AppCompat.EditText">
+        <!-- HACK:下記属性はTextAppearanceでは反映されない為、Styleに記述 -->
+        <item name="android:textColor">@color/text_color_on_background</item>
+        <item name="android:textColorHint">@color/text_hint_color_on_background</item>
+    </style>
+    <style name="TextInputEditTextTextAppearance" parent="TextAppearance.AppCompat.Medium.Inverse">
+    </style>
+
+    <style name="AutoCompleteTextViewDropDownStyle" parent="ThemeOverlay.Material3.AutoCompleteTextView">
         <item name="android:cursorVisible">false</item>
         <item name="android:inputType">none</item>
     </style>
-    <style name="DropDownTextAppearance" parent="TextAppearance.Material3.BodyMedium">
+    <style name="AutoCompleteTextViewDropDownTextAppearance" parent="TextAppearance.AppCompat.Medium.Inverse">
         <item name="android:textSize">@dimen/fragment_diary_edit_text_size</item>
+        <!-- HACK:"android:textColor"、"android:textColorHint"はStyle、TextAppearanceでは反映されない為、layoutに記述 -->
+    </style>
+
+    <!-- DropDownListItemLayout -->
+    <style name="DropDownListItemTextAppearance" parent="TextAppearance.Material3.TitleMedium">
+        <item name="android:textColor">?attr/colorOnSurfaceVariant</item>
     </style>
 
     <!-- DiaryListItem -->

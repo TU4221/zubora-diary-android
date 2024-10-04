@@ -574,7 +574,7 @@ public class DiaryEditFragment extends BaseFragment {
             }
         }
 
-        return new ArrayAdapter<>(contextWithTheme, android.R.layout.simple_list_item_1, weatherItemList);
+        return new ArrayAdapter<>(contextWithTheme, R.layout.layout_drop_down_list_item, weatherItemList);
     }
 
     private boolean isExcludedWeather(Weathers weather, @Nullable Weathers... excludedWeathers) {
@@ -625,7 +625,7 @@ public class DiaryEditFragment extends BaseFragment {
     }
 
     @NonNull
-    private ArrayAdapter<String> createConditionSpinnerAdapter(/*ThemeColor themeColor,*/) {
+    private ArrayAdapter<String> createConditionSpinnerAdapter() {
         ThemeColor themeColor = settingsViewModel.loadThemeColorSettingValue();
         int themeResId = themeColor.getThemeResId();
         Context contextWithTheme = new ContextThemeWrapper(requireContext(), themeResId);
@@ -635,7 +635,7 @@ public class DiaryEditFragment extends BaseFragment {
             conditonItemList.add(condition.toString(requireContext()));
         }
 
-        return new ArrayAdapter<>(contextWithTheme, android.R.layout.simple_list_item_1, conditonItemList);
+        return new ArrayAdapter<>(contextWithTheme, R.layout.layout_drop_down_list_item, conditonItemList);
     }
 
     private void setUpTitleInputField() {

@@ -26,6 +26,7 @@
             android:paddingHorizontal="8dp"
             android:paddingVertical="4dp"
             android:background="?attr/colorSurface"
+            android:textAppearance="@style/TextViewTextAppearance"
             tools:text="item title" />
 
     </FrameLayout>

@@ -30,34 +30,37 @@
         <item name="colorSurfaceInverse">@color/md_theme_light_inverseSurface</item>
         <item name="colorPrimaryInverse">@color/md_theme_light_inversePrimary</item>
 
-        <item name="android:textColor">@color/md_theme_light_onSurface</item>
-        <item name="drawableTint">@color/md_theme_light_onSurfaceVariant</item>
-        <item name="android:textColorHint">@color/md_theme_light_textHint</item>
-        <item name="titleTextColor">@color/md_theme_light_onSurface</item>
-        <item name="navigationIconTint">@color/md_theme_light_onSurfaceVariant</item>
+        <!-- TODO:ここで設定するとセレクターで切り換えてるtextが無効となるので検討する -->
+        <!--<item name="drawableTint">?attr/colorOnSurfaceVariant</item>
+        <item name="android:textColor">@color/text_color_on_background</item>
+        <item name="android:textColorHint">@color/text_hint_color_on_background</item>-->
     </style>
 
-    <style name="AppThemeColorWhite" parent="Theme.Material3.Light.NoActionBar">
+
+
+
+
+    <style name="AppThemeColorWhite" parent="Theme.ZuboraDiary">
         <item name="theme">@style/ThemeColorWhite</item>
     </style>
 
-    <style name="AppThemeColorBlack" parent="Theme.Material3.Light.NoActionBar">
+    <style name="AppThemeColorBlack" parent="Theme.ZuboraDiary">
         <item name="theme">@style/ThemeColorBlack</item>
     </style>
 
-    <style name="AppThemeColorRed" parent="Theme.Material3.Light.NoActionBar">
+    <style name="AppThemeColorRed" parent="Theme.ZuboraDiary">
         <item name="theme">@style/ThemeColorRed</item>
     </style>
 
-    <style name="AppThemeColorBlue" parent="Theme.Material3.Light.NoActionBar">
+    <style name="AppThemeColorBlue" parent="Theme.ZuboraDiary">
         <item name="theme">@style/ThemeColorBlue</item>
     </style>
 
-    <style name="AppThemeColorGreen" parent="Theme.Material3.Light.NoActionBar">
+    <style name="AppThemeColorGreen" parent="Theme.ZuboraDiary">
         <item name="theme">@style/ThemeColorGreen</item>
     </style>
 
-    <style name="AppThemeColorYellow" parent="Theme.Material3.Light.NoActionBar">
+    <style name="AppThemeColorYellow" parent="Theme.ZuboraDiary">
         <item name="theme">@style/ThemeColorYellow</item>
     </style>
 
@@ -113,11 +116,13 @@
         <item name="colorSurfaceContainerHigh">@color/md_theme_color_white_surfaceContainerHigh</item>
         <item name="colorSurfaceContainerHighest">@color/md_theme_color_white_surfaceContainerHighest</item>
 
-        <item name="android:textColor">@color/md_theme_color_white_onSurface</item>
+
+        <!-- TextViewのデフォルトTextColor-->
+        <!--<item name="android:textColorTertiary">?attr/colorOnSurface</item>
+        <item name="android:textColorHint">@color/md_theme_color_white_textHint</item>--><!--
         <item name="drawableTint">@color/md_theme_color_white_onSurfaceVariant</item>
-        <item name="android:textColorHint">@color/md_theme_color_white_textHint</item>
         <item name="titleTextColor">@color/md_theme_color_white_onSurface</item>
-        <item name="navigationIconTint">@color/md_theme_color_white_onSurfaceVariant</item>
+        <item name="navigationIconTint">@color/md_theme_color_white_onSurfaceVariant</item>-->
     </style>
 
     <!-- ThemeColorBlack -->
@@ -169,11 +174,13 @@
         <item name="colorSurfaceContainerHigh">@color/md_theme_color_black_surfaceContainerHigh</item>
         <item name="colorSurfaceContainerHighest">@color/md_theme_color_black_surfaceContainerHighest</item>
 
-        <item name="android:textColor">@color/md_theme_color_black_onSurface</item>
-        <item name="drawableTint">@color/md_theme_color_black_onSurfaceVariant</item>
+
+        <!-- TextViewのデフォルトTextColor--><!--
+        <item name="android:textColor">?attr/colorOnSurface</item>
         <item name="android:textColorHint">@color/md_theme_color_black_textHint</item>
+        <item name="drawableTint">@color/md_theme_color_black_onSurfaceVariant</item>
         <item name="titleTextColor">@color/md_theme_color_black_onSurface</item>
-        <item name="navigationIconTint">@color/md_theme_color_black_onSurfaceVariant</item>
+        <item name="navigationIconTint">@color/md_theme_color_black_onSurfaceVariant</item>-->
     </style>
 
     <!-- ThemeColorRed -->

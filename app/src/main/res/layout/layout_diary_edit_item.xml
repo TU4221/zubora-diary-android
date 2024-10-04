@@ -46,6 +46,7 @@
                     android:id="@+id/text_item_number"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:textAppearance="@style/TextViewTextAppearance"
                     android:text="@{itemNumber}"
                     android:textSize="@dimen/layout_diary_edit_item_text_size"
                     tools:text="@string/layout_diary_edit_item_1_tools"/>
@@ -74,6 +75,7 @@
                 app:endIconTint="?attr/colorOnSurfaceVariant">
 
                 <com.google.android.material.textfield.TextInputEditText
+                    style="@style/TextInputEditTextStyle"
                     android:id="@+id/textInputEditText_item_title"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -97,6 +99,7 @@
                 app:counterMaxLength="@integer/layout_diary_edit_item_comment_max_length">
 
                 <com.google.android.material.textfield.TextInputEditText
+                    style="@style/TextInputEditTextStyle"
                     android:id="@+id/textInputEditText_item_comment"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"

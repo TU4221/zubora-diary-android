@@ -53,6 +53,7 @@
                     app:endIconTint="?attr/colorOnSurfaceVariant">
 
                     <com.google.android.material.textfield.TextInputEditText
+                        style="@style/TextInputEditTextStyle"
                         android:id="@+id/textInputEditText_new_item_title"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -81,6 +82,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/fragment_diary_item_title_edit_margin_start"
                 android:layout_marginTop="@dimen/fragment_diary_item_title_edit_margin_top"
+                android:textAppearance="@style/TextViewTextAppearance"
                 android:text="@string/fragment_diary_item_title_edit_title_selection_history"
                 android:textSize="@dimen/fragment_diary_item_title_edit_text_size" />
 

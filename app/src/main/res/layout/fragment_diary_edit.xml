@@ -72,6 +72,7 @@
                         app:expandedHintEnabled="false">
 
                         <com.google.android.material.textfield.TextInputEditText
+                            style="@style/TextInputEditTextStyle"
                             android:id="@+id/textInputEditText_date"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
@@ -92,6 +93,7 @@
                             android:id="@+id/text_weather"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:textAppearance="@style/TextViewTextAppearance"
                             android:text="@string/fragment_diary_edit_weather"
                             android:textSize="@dimen/fragment_diary_edit_text_size" />
 
@@ -104,12 +106,12 @@
                             android:layout_weight="1">
 
                             <AutoCompleteTextView
-                                style="@style/DropDownStyle"
+                                style="@style/AutoCompleteTextViewDropDownStyle"
                                 android:id="@+id/autoCompleteText_weather_1"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:textAppearance="@style/DropDownTextAppearance"
-                                android:textColor="@color/drop_down_text_color"
+                                android:textAppearance="@style/AutoCompleteTextViewDropDownTextAppearance"
+                                android:textColor="@color/text_color_on_background"
                                 tools:text="@string/fragment_diary_edit_weather_value_tools" />
 
                         </com.google.android.material.textfield.TextInputLayout>
@@ -119,6 +121,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="@dimen/fragment_diary_edit_margin_start"
+                            android:textAppearance="@style/TextViewTextAppearance"
                             android:text="@string/fragment_diary_edit_weather_slush"
                             android:textSize="@dimen/fragment_diary_edit_text_size" />
 
@@ -131,12 +134,12 @@
                             android:layout_weight="1">
 
                             <AutoCompleteTextView
-                                style="@style/DropDownStyle"
+                                style="@style/AutoCompleteTextViewDropDownStyle"
                                 android:id="@+id/autoCompleteText_weather_2"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:textAppearance="@style/DropDownTextAppearance"
-                                android:textColor="@color/drop_down_text_color"
+                                android:textAppearance="@style/AutoCompleteTextViewDropDownTextAppearance"
+                                android:textColor="@color/text_color_on_background"
                                 tools:text="@string/fragment_diary_edit_weather_value_tools" />
 
                         </com.google.android.material.textfield.TextInputLayout>
@@ -153,23 +156,24 @@
                             android:id="@+id/text_condition"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:textAppearance="@style/TextViewTextAppearance"
                             android:text="@string/fragment_diary_edit_condition"
                             android:textSize="@dimen/fragment_diary_edit_text_size" />
 
                         <com.google.android.material.textfield.TextInputLayout
-                            android:id="@+id/textInputLayout_condition"
                             style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+                            android:id="@+id/textInputLayout_condition"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="@dimen/fragment_diary_edit_margin_start">
 
                             <AutoCompleteTextView
-                                style="@style/DropDownStyle"
+                                style="@style/AutoCompleteTextViewDropDownStyle"
                                 android:id="@+id/autoCompleteText_condition"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:textAppearance="@style/DropDownTextAppearance"
-                                android:textColor="@color/drop_down_text_color"
+                                android:textAppearance="@style/AutoCompleteTextViewDropDownTextAppearance"
+                                android:textColor="@color/text_color_on_background"
                                 tools:text="@string/fragment_diary_edit_condition_value_tools"/>
 
                         </com.google.android.material.textfield.TextInputLayout>
@@ -188,6 +192,7 @@
                         app:endIconTint="?attr/colorOnSurfaceVariant">
 
                         <com.google.android.material.textfield.TextInputEditText
+                            style="@style/TextInputEditTextStyle"
                             android:id="@+id/textInputEditText_title"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
