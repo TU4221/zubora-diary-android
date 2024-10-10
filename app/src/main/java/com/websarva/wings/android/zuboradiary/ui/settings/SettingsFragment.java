@@ -82,7 +82,8 @@ public class SettingsFragment extends BaseFragment {
                                 if (isGranted && isGrantedPostNotifications()/*再確認*/) {
                                     showTimePickerDialog();
                                 } else {
-                                    binding.switchReminderNotificationValue.setChecked(false);
+                                    binding.includeReminderNotificationSetting
+                                            .materialSwitchSettingValue.setChecked(false);
                                 }
                             }
                         }
@@ -108,7 +109,8 @@ public class SettingsFragment extends BaseFragment {
                                 if (isGrantedAll && isGrantedAccessLocation()/*再確認*/) {
                                     settingsViewModel.saveGettingWeatherInformation(true);
                                 } else {
-                                    binding.switchGettingWeatherInformationValue.setChecked(false);
+                                    binding.includeGettingWeatherInformationSetting
+                                            .materialSwitchSettingValue.setChecked(false);
                                 }
                             }
                         }
@@ -232,7 +234,7 @@ public class SettingsFragment extends BaseFragment {
     }
 
     private void setUpThemeColorSettingItem() {
-        binding.textThemeColorSettingTitle.setOnClickListener(new View.OnClickListener() {
+        binding.includeThemeColorSetting.textSettingTitle.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 ThemeColor currentThemeColor =
@@ -250,7 +252,7 @@ public class SettingsFragment extends BaseFragment {
                         }
 
                         String strThemeColor = themeColor.toSting(requireContext());
-                        binding.textThemeColorSettingValue.setText(strThemeColor);
+                        binding.includeThemeColorSetting.textSettingValue.setText(strThemeColor);
 
                         switchViewColor(themeColor);
                     }
@@ -276,32 +278,32 @@ public class SettingsFragment extends BaseFragment {
 
         ColorSwitchingViewList<TextView> iconList =
                 new ColorSwitchingViewList<>(
-                        binding.textThemeColorSettingTitle,
-                        binding.textCalendarStartDaySettingTitle,
-                        binding.textReminderNotificationSettingTitle,
-                        binding.textPasscodeLockSettingTitle,
-                        binding.textGettingWeatherInformationSettingTitle
+                        binding.includeThemeColorSetting.textSettingTitle,
+                        binding.includeCalendarStartDaySetting.textSettingTitle,
+                        binding.includeReminderNotificationSetting.textSettingTitle,
+                        binding.includePasscodeLockSetting.textSettingTitle,
+                        binding.includeGettingWeatherInformationSetting.textSettingTitle
                 );
         switcher.switchSettingItemIconColor(iconList);
 
         ColorSwitchingViewList<TextView> textList =
                 new ColorSwitchingViewList<>(
-                        binding.textThemeColorSettingTitle,
-                        binding.textThemeColorSettingValue,
-                        binding.textCalendarStartDaySettingTitle,
-                        binding.textCalendarStartDaySettingValue,
-                        binding.textReminderNotificationSettingTitle,
-                        binding.textReminderNotificationSettingTime,
-                        binding.textPasscodeLockSettingTitle,
-                        binding.textGettingWeatherInformationSettingTitle
+                        binding.includeThemeColorSetting.textSettingTitle,
+                        binding.includeThemeColorSetting.textSettingValue,
+                        binding.includeCalendarStartDaySetting.textSettingTitle,
+                        binding.includeCalendarStartDaySetting.textSettingValue,
+                        binding.includeReminderNotificationSetting.textSettingTitle,
+                        binding.includeReminderNotificationSetting.textSettingValue,
+                        binding.includePasscodeLockSetting.textSettingTitle,
+                        binding.includeGettingWeatherInformationSetting.textSettingTitle
                 );
         switcher.switchTextColorOnBackground(textList);
 
         ColorSwitchingViewList<MaterialSwitch> switchList =
                 new ColorSwitchingViewList<>(
-                        binding.switchReminderNotificationValue,
-                        binding.switchPasscodeLockValue,
-                        binding.switchGettingWeatherInformationValue
+                        binding.includeReminderNotificationSetting.materialSwitchSettingValue,
+                        binding.includePasscodeLockSetting.materialSwitchSettingValue,
+                        binding.includeGettingWeatherInformationSetting.materialSwitchSettingValue
                 );
         switcher.switchSwitchColor(switchList);
 
@@ -320,7 +322,7 @@ public class SettingsFragment extends BaseFragment {
     }
 
     private void setUpCalendarStartDaySettingItem() {
-        binding.textCalendarStartDaySettingTitle.setOnClickListener(new View.OnClickListener() {
+        binding.includeCalendarStartDaySetting.textSettingTitle.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 DayOfWeek currentCalendarStartDayOfWeek =
@@ -345,23 +347,24 @@ public class SettingsFragment extends BaseFragment {
                                 new DayOfWeekStringConverter(requireContext());
                         String strDayOfWeek =
                                 stringConverter.toCalendarStartDayOfWeek(dayOfWeek);
-                        binding.textCalendarStartDaySettingValue.setText(strDayOfWeek);
+                        binding.includeCalendarStartDaySetting.textSettingValue.setText(strDayOfWeek);
                     }
                 });
     }
 
     @SuppressLint("ClickableViewAccessibility")
     private void setUpReminderNotificationSettingItem() {
-        binding.switchReminderNotificationValue.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                if (event.getAction() == MotionEvent.ACTION_DOWN){
-                    isTouchedReminderNotificationSwitch = true;
-                }
-                return false;
-            }
-        });
-        binding.switchReminderNotificationValue
+        binding.includeReminderNotificationSetting.materialSwitchSettingValue
+                .setOnTouchListener(new View.OnTouchListener() {
+                    @Override
+                    public boolean onTouch(View v, MotionEvent event) {
+                        if (event.getAction() == MotionEvent.ACTION_DOWN){
+                            isTouchedReminderNotificationSwitch = true;
+                        }
+                        return false;
+                    }
+                });
+        binding.includeReminderNotificationSetting.materialSwitchSettingValue
                 .setOnCheckedChangeListener(
                         new ReminderNotificationCheckedChangeListener()
                 );
@@ -375,9 +378,11 @@ public class SettingsFragment extends BaseFragment {
                         }
 
                         if (aBoolean) {
-                            binding.textReminderNotificationSettingTime.setVisibility(View.VISIBLE);
+                            binding.includeReminderNotificationSetting
+                                    .textSettingValue.setVisibility(View.VISIBLE);
                         } else {
-                            binding.textReminderNotificationSettingTime.setVisibility(View.INVISIBLE);
+                            binding.includeReminderNotificationSetting
+                                    .textSettingValue.setVisibility(View.INVISIBLE);
                         }
                     }
                 });
@@ -387,13 +392,13 @@ public class SettingsFragment extends BaseFragment {
                     @Override
                     public void onChanged(LocalTime time) {
                         if (time == null) {
-                            binding.textReminderNotificationSettingTime.setText("");
+                            binding.includeReminderNotificationSetting.textSettingValue.setText("");
                             return;
                         }
 
                         DateTimeStringConverter converter = new DateTimeStringConverter();
                         String strTime = converter.toStringTimeHourMinute(time);
-                        binding.textReminderNotificationSettingTime.setText(strTime);
+                        binding.includeReminderNotificationSetting.textSettingValue.setText(strTime);
                     }
                 });
     }
@@ -416,7 +421,8 @@ public class SettingsFragment extends BaseFragment {
                         requestPostNotificationsPermissionLauncher
                                 .launch(Manifest.permission.POST_NOTIFICATIONS);
                     } else {
-                        binding.switchReminderNotificationValue.setChecked(false);
+                        binding.includeReminderNotificationSetting
+                                .materialSwitchSettingValue.setChecked(false);
                         String permissionName = getString(R.string.fragment_settings_permission_name_notification);
                         showPermissionDialog(permissionName);
                     }
@@ -430,35 +436,38 @@ public class SettingsFragment extends BaseFragment {
 
     @SuppressLint("ClickableViewAccessibility")
     private void setUpPasscodeLockSettingItem() {
-        binding.switchPasscodeLockValue.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                if (event.getAction() == MotionEvent.ACTION_DOWN){
-                    isTouchedPasscodeLockSwitch = true;
-                }
-                return false;
-            }
-        });
-        binding.switchPasscodeLockValue.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                settingsViewModel.savePasscodeLock(isChecked);
-            }
-        });
+        binding.includePasscodeLockSetting.materialSwitchSettingValue
+                .setOnTouchListener(new View.OnTouchListener() {
+                    @Override
+                    public boolean onTouch(View v, MotionEvent event) {
+                        if (event.getAction() == MotionEvent.ACTION_DOWN){
+                            isTouchedPasscodeLockSwitch = true;
+                        }
+                        return false;
+                    }
+                });
+        binding.includePasscodeLockSetting.materialSwitchSettingValue
+                .setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                    @Override
+                    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                        settingsViewModel.savePasscodeLock(isChecked);
+                    }
+                });
     }
 
     @SuppressLint("ClickableViewAccessibility")
     private void setUpGettingWeatherInformationSettingItem() {
-        binding.switchGettingWeatherInformationValue.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                if (event.getAction() == MotionEvent.ACTION_DOWN){
-                    isTouchedGettingWeatherInformationSwitch = true;
-                }
-                return false;
-            }
-        });
-        binding.switchGettingWeatherInformationValue
+        binding.includeGettingWeatherInformationSetting.materialSwitchSettingValue
+                .setOnTouchListener(new View.OnTouchListener() {
+                    @Override
+                    public boolean onTouch(View v, MotionEvent event) {
+                        if (event.getAction() == MotionEvent.ACTION_DOWN){
+                            isTouchedGettingWeatherInformationSwitch = true;
+                        }
+                        return false;
+                    }
+                });
+        binding.includeGettingWeatherInformationSetting.materialSwitchSettingValue
                 .setOnCheckedChangeListener(
                         new GettingWeatherInformationCheckedChangeListener()
                 );
@@ -487,7 +496,8 @@ public class SettingsFragment extends BaseFragment {
                                         Manifest.permission.ACCESS_COARSE_LOCATION};
                         requestAccessLocationPermissionLauncher.launch(requestPermissions);
                     } else {
-                        binding.switchGettingWeatherInformationValue.setChecked(false);
+                        binding.includeGettingWeatherInformationSetting
+                                .materialSwitchSettingValue.setChecked(false);
                         String permissionName = getString(R.string.fragment_settings_permission_name_location);
                         showPermissionDialog(permissionName);
                     }

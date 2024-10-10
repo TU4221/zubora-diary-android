@@ -9,10 +9,12 @@
 </layout>-->
 <TextView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    style="@style/TextViewStyle"
     android:id="@+id/text_day_legend"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:layout_weight="1"
-    android:gravity="center"
+    android:textAppearance="@style/TextViewTextAppearance"
     android:textSize="14sp"
+    android:gravity="center"
     tools:text="SUN" />

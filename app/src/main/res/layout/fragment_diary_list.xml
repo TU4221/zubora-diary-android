@@ -15,10 +15,10 @@
         android:layout_height="match_parent">
 
         <View
+            style="@style/FragmentBackgroundViewStyle"
             android:id="@+id/view_full_screen_background"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            style="@style/FragmentBackgroundViewStyle" />
+            android:layout_height="match_parent" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -26,34 +26,35 @@
             android:orientation="vertical">
 
             <com.google.android.material.appbar.MaterialToolbar
+                style="@style/ToolbarStyle"
                 android:id="@+id/material_toolbar_top_app_bar"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:menu="@menu/diary_list_toolbar_menu"
                 app:navigationIcon="@drawable/ic_calendar_month_24"
                 app:navigationContentDescription="@string/fragment_diary_list_toolbar_navigation_top_year_month_switching"
-                app:title="@string/fragment_diary_list_toolbar_title"
-                style="@style/ToolbarStyle" />
+                app:title="@string/fragment_diary_list_toolbar_title"/>
 
             <FrameLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
 
                 <TextView
+                    style="@style/TextViewStyle"
                     android:id="@+id/text_diary_list_no_diary_message"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:gravity="center"
+                    android:textAppearance="@style/TextViewTextAppearance"
                     android:text="@string/fragment_diary_list_no_saved_diary_message"
+                    android:gravity="center"
                     android:visibility="invisible"
                     tools:visibility="visible"/>
 
                 <androidx.recyclerview.widget.RecyclerView
+                    style="@style/DiaryListRecyclerViewStyle"
                     android:id="@+id/recycler_diary_year_month_list"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:scrollbars="none"
-                    android:transitionGroup="true"
                     android:visibility="invisible"
                     tools:visibility="visible"/>
 

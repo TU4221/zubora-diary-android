@@ -43,6 +43,7 @@
                 android:orientation="horizontal">
 
                 <TextView
+                    style="@style/TextViewStyle"
                     android:id="@+id/text_item_number"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -52,24 +53,23 @@
                     tools:text="@string/layout_diary_edit_item_1_tools"/>
 
                 <ImageButton
+                    style="@style/ImageButtonStyle"
                     android:id="@+id/image_button_item_delete"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="@dimen/layout_diary_edit_item_margin_start"
-                    android:background="@drawable/bg_image_button"
-                    android:src="@drawable/ic_delete_forever_24"
-                    app:tint="?attr/colorOnSurfaceVariant" />
+                    android:src="@drawable/ic_delete_forever_24" />
 
             </LinearLayout>
 
             <!-- 下記 EditText は項目タイトル入力フラグメントから入力する為、android:text は単一方向データバインディングとする。 -->
             <com.google.android.material.textfield.TextInputLayout
+                style="@style/TextInputLayoutOutlinedBoxStyle"
                 android:id="@+id/textInputLayout_item_title"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/layout_diary_edit_item_margin_top"
                 android:hint="@string/layout_diary_edit_item_title"
-                app:expandedHintEnabled="false"
                 app:counterEnabled="true"
                 app:counterMaxLength="@integer/layout_diary_edit_item_title_max_length"
                 app:endIconTint="?attr/colorOnSurfaceVariant">
@@ -79,6 +79,7 @@
                     android:id="@+id/textInputEditText_item_title"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:textAppearance="@style/TextInputEditTextTextAppearance"
                     android:text="@={titleMutableLiveData}"
                     android:textSize="@dimen/layout_diary_edit_item_text_size"
                     android:hint="@string/layout_diary_edit_item_title_hint"
@@ -89,12 +90,12 @@
             </com.google.android.material.textfield.TextInputLayout>
 
             <com.google.android.material.textfield.TextInputLayout
+                style="@style/TextInputLayoutOutlinedBoxStyle"
                 android:id="@+id/textInputLayout_item_comment"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/layout_diary_edit_item_margin_top"
                 android:hint="@string/layout_diary_edit_item_comment"
-                app:expandedHintEnabled="false"
                 app:counterEnabled="true"
                 app:counterMaxLength="@integer/layout_diary_edit_item_comment_max_length">
 
@@ -103,6 +104,7 @@
                     android:id="@+id/textInputEditText_item_comment"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:textAppearance="@style/TextInputEditTextTextAppearance"
                     android:text="@={commentMutableLiveData}"
                     android:textSize="@dimen/layout_diary_edit_item_text_size"
                     android:hint="@string/layout_diary_edit_item_comment_hint"

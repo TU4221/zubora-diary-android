@@ -16,10 +16,10 @@
         android:layout_height="match_parent">
 
         <View
+            style="@style/FragmentBackgroundViewStyle"
             android:id="@+id/view_full_screen_background"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            style="@style/FragmentBackgroundViewStyle" />
+            android:layout_height="match_parent" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -31,11 +31,11 @@
                 android:layout_height="wrap_content">
 
                 <com.google.android.material.appbar.MaterialToolbar
+                    style="@style/ToolbarStyle"
                     android:id="@+id/material_toolbar_top_app_bar"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    app:navigationIcon="@drawable/ic_arrow_back_24px"
-                    style="@style/ToolbarStyle" />
+                    app:navigationIcon="@drawable/ic_arrow_back_24px" />
 
                 <LinearLayout
                     android:id="@+id/liner_layout_key_word_search_background"
@@ -44,6 +44,7 @@
                     android:layout_gravity="center"
                     android:orientation="horizontal"
                     android:background="@drawable/bg_edit_text_for_search">
+
                     <EditText
                         android:id="@+id/edit_text_key_word_search"
                         android:layout_width="250dp"
@@ -57,15 +58,15 @@
                         android:hint="@string/fragment_word_search_input_field_hint"
                         android:background="@null"
                         android:textSize="16sp" />
+
                     <ImageButton
+                        style="@style/ImageButtonStyle"
                         android:id="@+id/image_button_key_word_clear"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_vertical|end"
                         android:layout_marginHorizontal="8dp"
-                        android:src="@drawable/ic_cancel_24px"
-                        android:background="@drawable/bg_image_button"
-                        app:tint="?attr/colorOnSecondaryContainer" />
+                        android:src="@drawable/ic_cancel_24px" />
                 </LinearLayout>
 
             </FrameLayout>
@@ -75,9 +76,11 @@
                 android:layout_height="match_parent">
 
                 <TextView
+                    style="@style/TextViewStyle"
                     android:id="@+id/text_word_search_no_results"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
+                    android:textAppearance="@style/TextViewTextAppearance"
                     android:text="@string/fragment_word_search_no_results_message"
                     android:gravity="center_horizontal"
                     android:paddingTop="100dp"
@@ -93,9 +96,11 @@
                     tools:visibility="visible" >
 
                     <TextView
+                        style="@style/TextViewStyle"
                         android:id="@+id/text_word_search_results"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:textAppearance="@style/TextViewTextAppearance"
                         android:text="@{Integer.toString(word_search_view_model.numWordSearchResults) + @string/fragment_word_search_num_results_message}"
                         android:paddingHorizontal="8dp"
                         android:paddingVertical="8dp"
@@ -103,11 +108,10 @@
                         tools:visibility="visible" />
 
                     <androidx.recyclerview.widget.RecyclerView
+                        style="@style/DiaryListRecyclerViewStyle"
                         android:id="@+id/recycler_word_search_result_list"
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:scrollbars="none"
-                        android:transitionGroup="true"/>
+                        android:layout_height="match_parent"/>
 
                 </LinearLayout>
 

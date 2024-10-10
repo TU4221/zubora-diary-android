@@ -22,6 +22,7 @@
         android:orientation="vertical">
 
         <TextView
+            style="@style/TextViewStyle"
             android:id="@+id/text_item_number"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -32,6 +33,7 @@
             tools:text="@string/layout_diary_show_item_tools"/>
 
         <TextView
+            style="@style/TextViewStyle"
             android:id="@+id/text_item_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -47,6 +49,7 @@
             android:layout_marginTop="@dimen/layout_diary_show_item_small_margin_top" />
 
         <TextView
+            style="@style/TextViewStyle"
             android:id="@+id/text_item_comment"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

@@ -35,6 +35,9 @@
     <!-- row_background_delete_button -->
     <string name="row_background_delete_button_delete">削除</string>
 
+    <!-- row_no_diary_message -->
+    <string name="row_no_diary_message_message">上記以前の日記はありません。</string>
+
 
     <!-- fragment_calendar -->
     <string name="fragment_calendar_month_header_format">yyyy年MM月</string>
@@ -148,6 +151,9 @@
     <string name="fragment_settings_item_title_reminder_notification">リマインダーの通知</string>
     <string name="fragment_settings_item_title_passcode_lock">パスコードロック</string>
     <string name="fragment_settings_item_title_getting_weather_information">天気情報取得</string>
+
+    <!-- layout_settings_item -->
+    <string name="layout_settings_item_title_tools_value">設定項目</string>
 
     <!-- SettingsFragment -->
     <string name="fragment_settings_permission_name_notification">通知</string>

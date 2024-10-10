@@ -24,11 +24,11 @@
             android:alpha="0.5"/>
 
         <com.google.android.material.progressindicator.CircularProgressIndicator
+            style="@style/CircularProgressIndicatorStyle"
             android:id="@+id/circularProgressIndicator"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:indeterminate="true" />
+            android:layout_gravity="center" />
 
     </FrameLayout>
 </layout>

@@ -9,265 +9,277 @@
             type="com.websarva.wings.android.zuboradiary.ui.diary.diaryedit.DiaryEditViewModel" />
     </data>
 
-    <LinearLayout
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:layout_height="match_parent">
 
-        <com.google.android.material.appbar.MaterialToolbar
-            android:id="@+id/material_toolbar_top_app_bar"
+        <View
+            style="@style/FragmentBackgroundViewStyle"
+            android:id="@+id/view_full_screen_background"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:menu="@menu/diary_edit_toolbar_menu"
-            app:navigationIcon="@drawable/ic_arrow_back_24px"
-            tools:title="@string/fragment_diary_edit_toolbar_title_value_tools"
-            style="@style/ToolbarStyle" />
+            android:layout_height="match_parent"/>
 
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/fab_test"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="end"
-            android:layout_marginEnd="16dp"
-            android:layout_marginBottom="16dp"
-            android:src="@android:drawable/ic_menu_edit"
-            android:contentDescription="TEST"/>
-
-        <androidx.core.widget.NestedScrollView
-            android:id="@+id/nested_scroll_full_screen"
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            android:orientation="vertical">
 
-            <FrameLayout
+            <com.google.android.material.appbar.MaterialToolbar
+                style="@style/ToolbarStyle"
+                android:id="@+id/material_toolbar_top_app_bar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:menu="@menu/diary_edit_toolbar_menu"
+                app:navigationIcon="@drawable/ic_arrow_back_24px"
+                tools:title="@string/fragment_diary_edit_toolbar_title_value_tools" />
+
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:id="@+id/fab_test"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end"
+                android:layout_marginEnd="16dp"
+                android:layout_marginBottom="16dp"
+                android:src="@android:drawable/ic_menu_edit"
+                android:contentDescription="TEST"/>
+
+            <androidx.core.widget.NestedScrollView
+                android:id="@+id/nested_scroll_full_screen"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
 
-                <View
-                    android:id="@+id/view_full_screen_background"
+                <FrameLayout
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    style="@style/FragmentBackgroundViewStyle"/>
+                    android:layout_height="match_parent">
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginHorizontal="@dimen/fragment_margin_horizontal"
-                    android:layout_marginTop="@dimen/fragment_margin_vertical"
-                    android:layout_marginBottom="@dimen/fragment_margin_bottom"
-                    android:orientation="vertical">
-
-                    <!-- 注意
-                         日付入力欄はダイアログフラグメントを使用して入力する為、android:text は「@」の「1.」を記述する。
-                         「2.」の双方向データバイディングを記述した場合、ダイアログで変数値を変更した時に Ovservr が2回起動する。
-
-                         1. android:text="@{diaryEditViewModel.date}"
-                         2. android:text="@={diaryEditViewModel.date}"
-                          -->
-                    <com.google.android.material.textfield.TextInputLayout
-                        android:id="@+id/textInputLayout_date"
+                    <View
+                        android:id="@+id/view_nested_scroll_background"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="@dimen/fragment_diary_edit_margin_top"
-                        android:hint="@string/fragment_diary_edit_date"
-                        app:expandedHintEnabled="false">
-
-                        <com.google.android.material.textfield.TextInputEditText
-                            style="@style/TextInputEditTextStyle"
-                            android:id="@+id/textInputEditText_date"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:cursorVisible="false"
-                            android:inputType="none"
-                            android:textSize="@dimen/fragment_diary_edit_text_size"
-                            tools:text="@string/fragment_diary_edit_date_value_tools" />
-
-                    </com.google.android.material.textfield.TextInputLayout>
+                        android:layout_height="match_parent"/>
 
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="@dimen/fragment_diary_edit_margin_top"
-                        android:orientation="horizontal">
+                        android:layout_marginHorizontal="@dimen/fragment_margin_horizontal"
+                        android:layout_marginTop="@dimen/fragment_margin_vertical"
+                        android:layout_marginBottom="@dimen/fragment_margin_bottom"
+                        android:orientation="vertical">
 
-                        <TextView
-                            android:id="@+id/text_weather"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:textAppearance="@style/TextViewTextAppearance"
-                            android:text="@string/fragment_diary_edit_weather"
-                            android:textSize="@dimen/fragment_diary_edit_text_size" />
+                        <!-- 注意
+                             日付入力欄はダイアログフラグメントを使用して入力する為、android:text は「@」の「1.」を記述する。
+                             「2.」の双方向データバイディングを記述した場合、ダイアログで変数値を変更した時に Ovservr が2回起動する。
 
+                             1. android:text="@{diaryEditViewModel.date}"
+                             2. android:text="@={diaryEditViewModel.date}"
+                              -->
                         <com.google.android.material.textfield.TextInputLayout
-                            android:id="@+id/textInputLayout_weather_1"
-                            style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
-                            android:layout_width="0dp"
+                            android:id="@+id/textInputLayout_date"
+                            style="@style/TextInputLayoutOutlinedBoxStyle"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_marginStart="@dimen/fragment_diary_edit_margin_start"
-                            android:layout_weight="1">
+                            android:layout_marginTop="@dimen/fragment_diary_edit_margin_top"
+                            android:hint="@string/fragment_diary_edit_date">
 
-                            <AutoCompleteTextView
-                                style="@style/AutoCompleteTextViewDropDownStyle"
-                                android:id="@+id/autoCompleteText_weather_1"
+                            <com.google.android.material.textfield.TextInputEditText
+                                android:id="@+id/textInputEditText_date"
+                                style="@style/TextInputEditTextStyle"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:textAppearance="@style/AutoCompleteTextViewDropDownTextAppearance"
-                                android:textColor="@color/text_color_on_background"
-                                tools:text="@string/fragment_diary_edit_weather_value_tools" />
+                                android:cursorVisible="false"
+                                android:inputType="none"
+                                android:textAppearance="@style/TextInputEditTextTextAppearance"
+                                android:textSize="@dimen/fragment_diary_edit_text_size"
+                                tools:text="@string/fragment_diary_edit_date_value_tools" />
 
                         </com.google.android.material.textfield.TextInputLayout>
 
-                        <TextView
-                            android:id="@+id/text_weather_slush"
-                            android:layout_width="wrap_content"
+                        <LinearLayout
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_marginStart="@dimen/fragment_diary_edit_margin_start"
-                            android:textAppearance="@style/TextViewTextAppearance"
-                            android:text="@string/fragment_diary_edit_weather_slush"
-                            android:textSize="@dimen/fragment_diary_edit_text_size" />
+                            android:layout_marginTop="@dimen/fragment_diary_edit_margin_top"
+                            android:orientation="horizontal">
 
-                        <com.google.android.material.textfield.TextInputLayout
-                            android:id="@+id/textInputLayout_weather_2"
-                            style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
-                            android:layout_width="0dp"
+                            <TextView
+                                android:id="@+id/text_weather"
+                                style="@style/TextViewStyle"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/fragment_diary_edit_weather"
+                                android:textAppearance="@style/TextViewTextAppearance"
+                                android:textSize="@dimen/fragment_diary_edit_text_size" />
+
+                            <com.google.android.material.textfield.TextInputLayout
+                                android:id="@+id/textInputLayout_weather_1"
+                                style="@style/TextInputLayoutDropdownMenuStyle"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="@dimen/fragment_diary_edit_margin_start"
+                                android:layout_weight="1">
+
+                                <AutoCompleteTextView
+                                    android:id="@+id/autoCompleteText_weather_1"
+                                    style="@style/AutoCompleteTextViewDropDownStyle"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:textAppearance="@style/AutoCompleteTextViewDropDownTextAppearance"
+                                    android:textColor="@color/text_color_on_background"
+                                    tools:text="@string/fragment_diary_edit_weather_value_tools" />
+
+                            </com.google.android.material.textfield.TextInputLayout>
+
+                            <TextView
+                                android:id="@+id/text_weather_slush"
+                                style="@style/TextViewStyle"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="@dimen/fragment_diary_edit_margin_start"
+                                android:text="@string/fragment_diary_edit_weather_slush"
+                                android:textAppearance="@style/TextViewTextAppearance"
+                                android:textSize="@dimen/fragment_diary_edit_text_size" />
+
+                            <com.google.android.material.textfield.TextInputLayout
+                                android:id="@+id/textInputLayout_weather_2"
+                                style="@style/TextInputLayoutDropdownMenuStyle"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="@dimen/fragment_diary_edit_margin_start"
+                                android:layout_weight="1">
+
+                                <AutoCompleteTextView
+                                    android:id="@+id/autoCompleteText_weather_2"
+                                    style="@style/AutoCompleteTextViewDropDownStyle"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:textAppearance="@style/AutoCompleteTextViewDropDownTextAppearance"
+                                    android:textColor="@color/text_color_on_background"
+                                    tools:text="@string/fragment_diary_edit_weather_value_tools" />
+
+                            </com.google.android.material.textfield.TextInputLayout>
+
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_marginStart="@dimen/fragment_diary_edit_margin_start"
-                            android:layout_weight="1">
+                            android:layout_marginTop="@dimen/fragment_diary_edit_margin_top"
+                            android:orientation="horizontal">
 
-                            <AutoCompleteTextView
-                                style="@style/AutoCompleteTextViewDropDownStyle"
-                                android:id="@+id/autoCompleteText_weather_2"
+                            <TextView
+                                android:id="@+id/text_condition"
+                                style="@style/TextViewStyle"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/fragment_diary_edit_condition"
+                                android:textAppearance="@style/TextViewTextAppearance"
+                                android:textSize="@dimen/fragment_diary_edit_text_size" />
+
+                            <com.google.android.material.textfield.TextInputLayout
+                                android:id="@+id/textInputLayout_condition"
+                                style="@style/TextInputLayoutDropdownMenuStyle"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:textAppearance="@style/AutoCompleteTextViewDropDownTextAppearance"
-                                android:textColor="@color/text_color_on_background"
-                                tools:text="@string/fragment_diary_edit_weather_value_tools" />
+                                android:layout_marginStart="@dimen/fragment_diary_edit_margin_start">
+
+                                <AutoCompleteTextView
+                                    android:id="@+id/autoCompleteText_condition"
+                                    style="@style/AutoCompleteTextViewDropDownStyle"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:textAppearance="@style/AutoCompleteTextViewDropDownTextAppearance"
+                                    android:textColor="@color/text_color_on_background"
+                                    tools:text="@string/fragment_diary_edit_condition_value_tools" />
+
+                            </com.google.android.material.textfield.TextInputLayout>
+
+                        </LinearLayout>
+
+                        <com.google.android.material.textfield.TextInputLayout
+                            android:id="@+id/textInputLayout_title"
+                            style="@style/TextInputLayoutOutlinedBoxStyle"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/fragment_diary_edit_margin_top"
+                            android:hint="@string/fragment_diary_edit_title"
+                            app:counterEnabled="true"
+                            app:counterMaxLength="@integer/fragment_diary_edit_title_max_length"
+                            app:endIconTint="?attr/colorOnSurfaceVariant">
+
+                            <com.google.android.material.textfield.TextInputEditText
+                                android:id="@+id/textInputEditText_title"
+                                style="@style/TextInputEditTextStyle"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:hint="@string/fragment_diary_edit_title_hint"
+                                android:inputType="text"
+                                android:maxLength="@integer/fragment_diary_edit_title_max_length"
+                                android:text="@={diaryEditViewModel.titleMutableLiveData}"
+                                android:textAppearance="@style/TextInputEditTextTextAppearance"
+                                android:textSize="@dimen/fragment_diary_edit_text_size" />
 
                         </com.google.android.material.textfield.TextInputLayout>
+
+                        <include
+                            android:id="@+id/include_item_1"
+                            layout="@layout/layout_diary_edit_item"
+                            app:commentMutableLiveData="@{diaryEditViewModel.item1CommentMutableLiveData}"
+                            app:itemNumber="@{@string/fragment_diary_edit_item_1}"
+                            app:titleMutableLiveData="@{diaryEditViewModel.item1TitleMutableLiveData}" />
+
+                        <include
+                            android:id="@+id/include_item_2"
+                            layout="@layout/layout_diary_edit_item"
+                            app:commentMutableLiveData="@{diaryEditViewModel.item2CommentMutableLiveData}"
+                            app:itemNumber="@{@string/fragment_diary_edit_item_2}"
+                            app:titleMutableLiveData="@{diaryEditViewModel.item2TitleMutableLiveData}" />
+
+                        <include
+                            android:id="@+id/include_item_3"
+                            layout="@layout/layout_diary_edit_item"
+                            app:commentMutableLiveData="@{diaryEditViewModel.item3CommentMutableLiveData}"
+                            app:itemNumber="@{@string/fragment_diary_edit_item_3}"
+                            app:titleMutableLiveData="@{diaryEditViewModel.item3TitleMutableLiveData}" />
+
+                        <include
+                            android:id="@+id/include_item_4"
+                            layout="@layout/layout_diary_edit_item"
+                            app:commentMutableLiveData="@{diaryEditViewModel.item4CommentMutableLiveData}"
+                            app:itemNumber="@{@string/fragment_diary_edit_item_4}"
+                            app:titleMutableLiveData="@{diaryEditViewModel.item4TitleMutableLiveData}" />
+
+                        <include
+                            android:id="@+id/include_item_5"
+                            layout="@layout/layout_diary_edit_item"
+                            app:commentMutableLiveData="@{diaryEditViewModel.item5CommentMutableLiveData}"
+                            app:itemNumber="@{@string/fragment_diary_edit_item_5}"
+                            app:titleMutableLiveData="@{diaryEditViewModel.item5TitleMutableLiveData}" />
+
+                        <ImageButton
+                            android:id="@+id/image_button_add_item"
+                            style="@style/ImageButtonStyle"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="end"
+                            android:layout_marginTop="@dimen/fragment_diary_edit_margin_top"
+                            android:src="@drawable/ic_add_circle_outline_24" />
+
+                        <ImageView
+                            android:id="@+id/image_attach"
+                            style="@style/ImageViewStyle"
+                            android:layout_width="match_parent"
+                            android:layout_height="360dp"
+                            android:layout_gravity="center"
+                            android:layout_marginTop="@dimen/fragment_diary_edit_margin_top"
+                            android:background="@drawable/image_bg_rounded_rectangle"
+                            android:src="@drawable/ic_photo_library_24px" />
 
                     </LinearLayout>
 
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="@dimen/fragment_diary_edit_margin_top"
-                        android:orientation="horizontal">
+                </FrameLayout>
 
-                        <TextView
-                            android:id="@+id/text_condition"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:textAppearance="@style/TextViewTextAppearance"
-                            android:text="@string/fragment_diary_edit_condition"
-                            android:textSize="@dimen/fragment_diary_edit_text_size" />
+            </androidx.core.widget.NestedScrollView>
 
-                        <com.google.android.material.textfield.TextInputLayout
-                            style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
-                            android:id="@+id/textInputLayout_condition"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginStart="@dimen/fragment_diary_edit_margin_start">
+        </LinearLayout>
 
-                            <AutoCompleteTextView
-                                style="@style/AutoCompleteTextViewDropDownStyle"
-                                android:id="@+id/autoCompleteText_condition"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:textAppearance="@style/AutoCompleteTextViewDropDownTextAppearance"
-                                android:textColor="@color/text_color_on_background"
-                                tools:text="@string/fragment_diary_edit_condition_value_tools"/>
-
-                        </com.google.android.material.textfield.TextInputLayout>
-
-                    </LinearLayout>
-
-                    <com.google.android.material.textfield.TextInputLayout
-                        android:id="@+id/textInputLayout_title"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="@dimen/fragment_diary_edit_margin_top"
-                        android:hint="@string/fragment_diary_edit_title"
-                        app:counterEnabled="true"
-                        app:counterMaxLength="@integer/fragment_diary_edit_title_max_length"
-                        app:expandedHintEnabled="false"
-                        app:endIconTint="?attr/colorOnSurfaceVariant">
-
-                        <com.google.android.material.textfield.TextInputEditText
-                            style="@style/TextInputEditTextStyle"
-                            android:id="@+id/textInputEditText_title"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:hint="@string/fragment_diary_edit_title_hint"
-                            android:inputType="text"
-                            android:maxLength="@integer/fragment_diary_edit_title_max_length"
-                            android:text="@={diaryEditViewModel.titleMutableLiveData}"
-                            android:textSize="@dimen/fragment_diary_edit_text_size" />
-
-                    </com.google.android.material.textfield.TextInputLayout>
-
-                    <include
-                        android:id="@+id/include_item_1"
-                        layout="@layout/layout_diary_edit_item"
-                        android:itemNumber="@{@string/fragment_diary_edit_item_1}"
-                        android:titleMutableLiveData="@{diaryEditViewModel.item1TitleMutableLiveData}"
-                        android:commentMutableLiveData="@{diaryEditViewModel.item1CommentMutableLiveData}" />
-
-                    <include
-                        android:id="@+id/include_item_2"
-                        layout="@layout/layout_diary_edit_item"
-                        android:itemNumber="@{@string/fragment_diary_edit_item_2}"
-                        android:titleMutableLiveData="@{diaryEditViewModel.item2TitleMutableLiveData}"
-                        android:commentMutableLiveData="@{diaryEditViewModel.item2CommentMutableLiveData}" />
-
-                    <include
-                        android:id="@+id/include_item_3"
-                        layout="@layout/layout_diary_edit_item"
-                        android:itemNumber="@{@string/fragment_diary_edit_item_3}"
-                        android:titleMutableLiveData="@{diaryEditViewModel.item3TitleMutableLiveData}"
-                        android:commentMutableLiveData="@{diaryEditViewModel.item3CommentMutableLiveData}" />
-
-                    <include
-                        android:id="@+id/include_item_4"
-                        layout="@layout/layout_diary_edit_item"
-                        android:itemNumber="@{@string/fragment_diary_edit_item_4}"
-                        android:titleMutableLiveData="@{diaryEditViewModel.item4TitleMutableLiveData}"
-                        android:commentMutableLiveData="@{diaryEditViewModel.item4CommentMutableLiveData}" />
-
-                    <include
-                        android:id="@+id/include_item_5"
-                        layout="@layout/layout_diary_edit_item"
-                        android:itemNumber="@{@string/fragment_diary_edit_item_5}"
-                        android:titleMutableLiveData="@{diaryEditViewModel.item5TitleMutableLiveData}"
-                        android:commentMutableLiveData="@{diaryEditViewModel.item5CommentMutableLiveData}" />
-
-                    <ImageButton
-                        android:id="@+id/image_button_add_item"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="end"
-                        android:layout_marginTop="@dimen/fragment_diary_edit_margin_top"
-                        android:background="@drawable/bg_image_button"
-                        android:src="@drawable/ic_add_circle_outline_24"
-                        app:tint="?attr/colorOnSurfaceVariant"/>
-
-                    <ImageView
-                        android:id="@+id/image_attach"
-                        android:layout_width="match_parent"
-                        android:layout_height="360dp"
-                        android:layout_gravity="center"
-                        android:layout_marginTop="@dimen/fragment_diary_edit_margin_top"
-                        android:background="@drawable/image_bg_rounded_rectangle"
-                        android:src="@drawable/ic_photo_library_24px"
-                        app:tint="?attr/colorOnSurfaceVariant" />
-
-                </LinearLayout>
-
-            </FrameLayout>
-
-
-        </androidx.core.widget.NestedScrollView>
-
-    </LinearLayout>
-
-
+    </FrameLayout>
 
 </layout>

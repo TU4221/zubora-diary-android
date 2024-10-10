@@ -20,18 +20,18 @@
 
         <LinearLayout
             android:id="@+id/liner_layout_foreground"
+            style="@style/DiaryListDayStyle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:minHeight="72dp"
-            android:orientation="horizontal"
-            style="@style/DiaryListDayStyle">
+            android:orientation="horizontal">
 
             <include
                 android:id="@+id/include_day"
+                layout="@layout/layout_diary_list_item_day"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_weight="1"
-                layout="@layout/layout_day" />
+                android:layout_weight="1" />
 
             <TextView
                 android:id="@+id/text_row_diary_list_day_title"
@@ -39,21 +39,20 @@
                 android:layout_height="match_parent"
                 android:layout_weight="2"
                 android:gravity="center_vertical"
-                android:textAppearance="@style/DiaryListDayTextAppearance"
                 android:hint="@string/row_diary_day_list_title_hint"
-                android:textSize="20sp"/>
+                android:textAppearance="@style/DiaryListDayTextAppearance"
+                android:textSize="20sp" />
 
             <ImageView
                 android:id="@+id/image_row_diary_list_day_picture"
+                style="@style/DiaryListDayStyle"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
+                android:contentDescription="@string/row_diary_day_list_picture_description"
                 android:paddingHorizontal="16dp"
                 android:paddingVertical="8dp"
-                android:contentDescription="@string/row_diary_day_list_picture_description"
-                android:background="?attr/colorSecondaryContainer"
-                app:srcCompat="@drawable/ic_image_24px"
-                style="@style/DiaryListDayStyle" />
+                app:srcCompat="@drawable/ic_image_24px" />
 
         </LinearLayout>
 

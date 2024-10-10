@@ -87,8 +87,8 @@ public class BaseThemeColorSwitcher {
     private void switchBottomNavigationBackgroundColor (BottomNavigationView view) {
         Preconditions.checkNotNull(view);
 
-        int surfaceContainerColor = themeColor.getSurfaceContainerColor(resources);
-        view.setBackgroundTintList(ColorStateList.valueOf(surfaceContainerColor));
+        int color = themeColor.getSurfaceContainerColor(resources);
+        view.setBackgroundTintList(ColorStateList.valueOf(color));
     }
 
     private void switchBottomNavigationItemRippleColor(BottomNavigationView view) {

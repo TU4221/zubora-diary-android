@@ -14,10 +14,10 @@
         android:layout_height="match_parent">
 
         <View
+            style="@style/FragmentBackgroundViewStyle"
             android:id="@+id/view_full_screen_background"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            style="@style/FragmentBackgroundViewStyle" />
+            android:layout_height="match_parent" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -25,15 +25,11 @@
             android:orientation="vertical">
 
             <com.google.android.material.appbar.MaterialToolbar
+                style="@style/ToolbarStyle"
                 android:id="@+id/material_toolbar_top_app_bar"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                tools:background="?attr/colorSurfaceContainer"
-                android:gravity="center"
-                android:minHeight="?attr/actionBarSize"
-                android:theme="?attr/actionBarTheme"
-                app:title="設定"
-                app:titleCentered="true" />
+                app:title="設定" />
 
             <com.google.android.material.divider.MaterialDivider
                 android:id="@+id/materialDivider_toolbar"
@@ -44,215 +40,107 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
 
-                <FrameLayout
+                <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
 
-                    <LinearLayout
+                    <TextView
+                        style="@style/SettingsSectionTextViewStyle"
+                        android:id="@+id/text_settings_section_design"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical">
+                        android:layout_height="@dimen/fragment_settings_section_layout_height"
+                        android:textAppearance="@style/SettingsSectionTextViewTextAppearance"
+                        android:text="@string/fragment_settings_section_title_design"/>
 
-                        <TextView
-                            android:id="@+id/text_settings_section_design"
-                            android:layout_width="match_parent"
-                            android:layout_height="@dimen/fragment_settings_section_layout_height"
-                            android:textAppearance="@style/SettingsSectionTextAppearance"
-                            android:text="@string/fragment_settings_section_title_design"
-                            style="@style/SettingsSectionTextViewStyle"/>
+                    <com.google.android.material.divider.MaterialDivider
+                        android:id="@+id/materialDivider_theme_color_setting"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content" />
 
-                        <com.google.android.material.divider.MaterialDivider
-                            android:id="@+id/materialDivider_theme_color_setting"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content" />
+                    <include
+                        layout="@layout/layout_settings_item"
+                        android:id="@+id/include_theme_color_setting"
+                        app:settingIcon="@{@drawable/ic_palette_24px}"
+                        app:settingTitle="@{@string/fragment_settings_item_title_theme_color}" />
 
-                        <FrameLayout
-                            android:id="@+id/frame_layout_theme_color_setting"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content" >
+                    <com.google.android.material.divider.MaterialDivider
+                        android:id="@+id/materialDivider_section_setting"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content" />
 
-                            <TextView
-                                android:id="@+id/text_theme_color_setting_title"
-                                android:layout_width="match_parent"
-                                android:layout_height="@dimen/fragment_settings_section_layout_height"
-                                android:textAppearance="@style/SettingsItemTextAppearance"
-                                android:text="@string/fragment_settings_item_title_theme_color"
-                                app:drawableStartCompat="@drawable/ic_palette_24px"
-                                style="@style/SettingsItemTextViewStyle" />
+                    <TextView
+                        style="@style/SettingsSectionTextViewStyle"
+                        android:id="@+id/text_settings_section_settings"
+                        android:layout_width="match_parent"
+                        android:layout_height="@dimen/fragment_settings_section_layout_height"
+                        android:textAppearance="@style/SettingsSectionTextViewTextAppearance"
+                        android:text="@string/fragment_settings_section_title_setting" />
 
-                            <TextView
-                                android:id="@+id/text_theme_color_setting_value"
-                                android:layout_width="match_parent"
-                                android:layout_height="@dimen/fragment_settings_item_layout_height"
-                                android:layout_gravity="end|center_vertical"
-                                android:textAppearance="@style/SettingsItemValueTextAppearance"
-                                style="@style/SettingsItemValueTextViewStyle" />
+                    <com.google.android.material.divider.MaterialDivider
+                        android:id="@+id/materialDivider_calendar_start_day_setting"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content" />
 
-                        </FrameLayout>
+                    <include
+                        layout="@layout/layout_settings_item"
+                        android:id="@+id/include_calendar_start_day_setting"
+                        app:settingIcon="@{@drawable/ic_calendar_month_24}"
+                        app:settingTitle="@{@string/fragment_settings_item_title_calendar_start_day}" />
 
-                        <com.google.android.material.divider.MaterialDivider
-                            android:id="@+id/materialDivider_section_setting"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content" />
+                    <com.google.android.material.divider.MaterialDivider
+                        android:id="@+id/materialDivider_reminder_notification_setting"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content" />
 
-                        <TextView
-                            android:id="@+id/text_settings_section_settings"
-                            android:layout_width="match_parent"
-                            android:layout_height="@dimen/fragment_settings_section_layout_height"
-                            android:textAppearance="@style/SettingsSectionTextAppearance"
-                            android:text="@string/fragment_settings_section_title_setting"
-                            style="@style/SettingsSectionTextViewStyle" />
+                    <include
+                        layout="@layout/layout_settings_item_switch"
+                        android:id="@+id/include_reminder_notification_setting"
+                        app:settingIcon="@{@drawable/ic_notifications_24px}"
+                        app:settingTitle="@{@string/fragment_settings_item_title_reminder_notification}"
+                        app:isVisibleSettingValue="@{true}"
+                        app:settingValueSwitch="@{settingsViewModel.isCheckedReminderNotificationLiveData}" />
 
-                        <com.google.android.material.divider.MaterialDivider
-                            android:id="@+id/materialDivider_calendar_start_day_setting"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content" />
+                    <com.google.android.material.divider.MaterialDivider
+                        android:visibility="invisible"
+                        android:id="@+id/materialDivider_passcode_lock_setting"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content" />
 
-                        <FrameLayout
-                            android:id="@+id/frame_layout_calendar_start_day_setting"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content" >
+                    <include
+                        layout="@layout/layout_settings_item_switch"
+                        android:id="@+id/include_passcode_lock_setting"
+                        app:settingIcon="@{@drawable/ic_lock_24px}"
+                        app:settingTitle="@{@string/fragment_settings_item_title_passcode_lock}"
+                        app:isVisibleSettingValue="@{false}"
+                        app:settingValueSwitch="@{settingsViewModel.isCheckedPasscodeLockLiveData}" />
 
-                            <TextView
-                                android:id="@+id/text_calendar_start_day_setting_title"
-                                android:layout_width="match_parent"
-                                android:layout_height="@dimen/fragment_settings_section_layout_height"
-                                android:textAppearance="@style/SettingsItemTextAppearance"
-                                android:text="@string/fragment_settings_item_title_calendar_start_day"
-                                app:drawableStartCompat="@drawable/ic_calendar_month_24"
-                                style="@style/SettingsItemTextViewStyle" />
+                    <com.google.android.material.divider.MaterialDivider
+                        android:id="@+id/materialDivider_getting_weather_information_setting"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content" />
 
-                            <TextView
-                                android:id="@+id/text_calendar_start_day_setting_value"
-                                android:layout_width="match_parent"
-                                android:layout_height="@dimen/fragment_settings_item_layout_height"
-                                android:layout_gravity="end|center_vertical"
-                                android:textAppearance="@style/SettingsItemValueTextAppearance"
-                                style="@style/SettingsItemValueTextViewStyle" />
+                    <include
+                        layout="@layout/layout_settings_item_switch"
+                        android:id="@+id/include_getting_weather_information_setting"
+                        app:settingIcon="@{@drawable/ic_sunny_24px}"
+                        app:settingTitle="@{@string/fragment_settings_item_title_getting_weather_information}"
+                        app:isVisibleSettingValue="@{false}"
+                        app:settingValueSwitch="@{settingsViewModel.isCheckedGettingWeatherInformationLiveData}" />
 
-                        </FrameLayout>
+                    <com.google.android.material.divider.MaterialDivider
+                        android:id="@+id/materialDivider_section_end"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content" />
 
-                        <com.google.android.material.divider.MaterialDivider
-                            android:id="@+id/materialDivider_reminder_notification_setting"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content" />
+                    <TextView
+                        style="@style/SettingsSectionTextViewStyle"
+                        android:id="@+id/text_settings_section_end"
+                        android:layout_width="match_parent"
+                        android:layout_height="@dimen/fragment_settings_section_layout_height"
+                        android:textAppearance="@style/SettingsSectionTextViewTextAppearance" />
 
-                        <FrameLayout
-                            android:id="@+id/frame_layout_reminder_notification_setting"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content" >
-
-                            <TextView
-                                android:id="@+id/text_reminder_notification_setting_title"
-                                android:layout_width="match_parent"
-                                android:layout_height="@dimen/fragment_settings_section_layout_height"
-                                android:textAppearance="@style/SettingsItemTextAppearance"
-                                android:text="@string/fragment_settings_item_title_reminder_notification"
-                                app:drawableStartCompat="@drawable/ic_notifications_24px"
-                                style="@style/SettingsItemTextViewStyle" />
-
-                            <LinearLayout
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_gravity="center_vertical|end"
-                                android:orientation="horizontal">
-
-                                <TextView
-                                    android:id="@+id/text_reminder_notification_setting_time"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="@dimen/fragment_settings_item_layout_height"
-                                    android:paddingVertical="@dimen/fragment_settings_item_padding_vertical"
-                                    android:paddingHorizontal="@dimen/fragment_settings_item_padding_horizontal_between_items"
-                                    tools:text="00:00"
-                                    android:textSize="@dimen/fragment_settings_item_value_text_size"
-                                    android:gravity="center_vertical|end"/>
-
-                                <com.google.android.material.materialswitch.MaterialSwitch
-                                    android:id="@+id/switch_reminder_notification_value"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:layout_gravity="end|center_vertical"
-                                    android:checked="@{settingsViewModel.isCheckedReminderNotificationLiveData}"
-                                    style="@style/SettingsItemValueSwitchStyle" />
-
-                            </LinearLayout>
-
-
-                        </FrameLayout>
-
-                        <com.google.android.material.divider.MaterialDivider
-                            android:id="@+id/materialDivider_passcode_lock_setting"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content" />
-
-                        <FrameLayout
-                            android:id="@+id/frame_layout_passcode_lock_setting"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content" >
-
-                            <TextView
-                                android:id="@+id/text_passcode_lock_setting_title"
-                                android:layout_width="match_parent"
-                                android:layout_height="@dimen/fragment_settings_section_layout_height"
-                                android:textAppearance="@style/SettingsItemTextAppearance"
-                                android:text="@string/fragment_settings_item_title_passcode_lock"
-                                app:drawableStartCompat="@drawable/ic_lock_24px"
-                                style="@style/SettingsItemTextViewStyle" />
-
-                            <com.google.android.material.materialswitch.MaterialSwitch
-                                android:id="@+id/switch_passcode_lock_value"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_gravity="end|center_vertical"
-                                android:checked="@{settingsViewModel.isCheckedPasscodeLockLiveData}"
-                                style="@style/SettingsItemValueSwitchStyle" />
-
-                        </FrameLayout>
-
-                        <com.google.android.material.divider.MaterialDivider
-                            android:id="@+id/materialDivider_getting_weather_information_setting"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content" />
-
-                        <FrameLayout
-                            android:id="@+id/frame_layout_getting_weather_information_setting"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content" >
-
-                            <TextView
-                                android:id="@+id/text_getting_weather_information_setting_title"
-                                android:layout_width="match_parent"
-                                android:layout_height="@dimen/fragment_settings_section_layout_height"
-                                android:textAppearance="@style/SettingsItemTextAppearance"
-                                android:text="@string/fragment_settings_item_title_getting_weather_information"
-                                app:drawableStartCompat="@drawable/ic_sunny_24px"
-                                style="@style/SettingsItemTextViewStyle" />
-
-                            <com.google.android.material.materialswitch.MaterialSwitch
-                                android:id="@+id/switch_getting_weather_information_value"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_gravity="end|center_vertical"
-                                android:checked="@{settingsViewModel.isCheckedGettingWeatherInformationLiveData}"
-                                style="@style/SettingsItemValueSwitchStyle" />
-
-                        </FrameLayout>
-
-                        <com.google.android.material.divider.MaterialDivider
-                            android:id="@+id/materialDivider_section_end"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content" />
-
-                        <TextView
-                            android:id="@+id/text_settings_section_end"
-                            android:layout_width="match_parent"
-                            android:layout_height="@dimen/fragment_settings_section_layout_height"
-                            android:textAppearance="@style/SettingsSectionTextAppearance"
-                            style="@style/SettingsSectionTextViewStyle" />
-
-                    </LinearLayout>
-
-                </FrameLayout>
+                </LinearLayout>
 
             </ScrollView>
 

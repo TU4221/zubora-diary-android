@@ -10,8 +10,7 @@
     <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:id="@+id/layout_background"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="?attr/colorSurface">
+        android:layout_height="match_parent">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
@@ -26,11 +25,10 @@
                 app:layout_constraintTop_toTopOf="parent">
 
                 <com.google.android.material.appbar.MaterialToolbar
+                    style="@style/ToolbarStyle"
                     android:id="@+id/mtbMainToolbar"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:minHeight="?attr/actionBarSize"
-                    app:titleCentered="true" />
+                    android:layout_height="wrap_content" />
 
             </com.google.android.material.appbar.AppBarLayout>
 

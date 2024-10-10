@@ -17,10 +17,10 @@
         android:layout_height="match_parent">
 
         <View
+            style="@style/FragmentBackgroundViewStyle"
             android:id="@+id/view_full_screen_background"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            style="@style/FragmentBackgroundViewStyle" />
+            android:layout_height="match_parent" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -28,11 +28,11 @@
             android:orientation="vertical">
 
             <com.google.android.material.appbar.MaterialToolbar
+                style="@style/ToolbarStyle"
                 android:id="@+id/material_toolbar_top_app_bar"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                tools:title="@string/fragment_calendar_month_header_tools_value"
-                style="@style/ToolbarStyle"/>
+                tools:title="@string/fragment_calendar_month_header_tools_value"/>
 
             <androidx.core.widget.NestedScrollView
                 android:id="@+id/nested_scroll_full_screen"
@@ -66,6 +66,7 @@
                         android:layout_height="match_parent"
                         android:layout_marginTop="@dimen/fragment_calendar_margin_top">
 
+                        <!-- MEMO:コードからはincludeのVisibilityを操作できないので下記LinerLayoutを使用して操作する。 -->
                         <LinearLayout
                             android:id="@+id/linear_layout_diary_show"
                             android:layout_width="match_parent"
@@ -73,16 +74,18 @@
                             android:orientation="vertical">
 
                             <include
-                                android:id="@+id/include_diary_show"
                                 layout="@layout/layout_diary_show"
+                                android:id="@+id/include_diary_show"
                                 app:diaryShowViewModel="@{diaryShowViewModel}" />
 
                         </LinearLayout>
 
                         <TextView
+                            style="@style/TextViewStyle"
                             android:id="@+id/text_no_diary"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
+                            android:textAppearance="@style/TextViewTextAppearance"
                             android:text="@string/fragment_calendar_no_diary_message"
                             android:gravity="center_horizontal|top"
                             android:paddingTop="16dp"/>

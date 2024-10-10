@@ -7,12 +7,24 @@
         <variable
             name="settingIcon"
             type="android.graphics.drawable.Drawable" />
+
         <variable
             name="settingTitle"
             type="String" />
+
+        <import type="android.view.View" />
+
+        <variable
+            name="isVisibleSettingValue"
+            type="boolean" />
+
         <variable
             name="settingValue"
             type="androidx.lifecycle.LiveData&lt;String>" />
+
+        <variable
+            name="settingValueSwitch"
+            type="androidx.lifecycle.LiveData&lt;Boolean>" />
 
     </data>
 
@@ -35,14 +47,37 @@
             tools:text="@string/layout_settings_item_title_tools_value"
             tools:drawableStart="@drawable/ic_settings_24px" />
 
-        <TextView
-            style="@style/SettingsItemValueTextViewStyle"
-            android:id="@+id/text_setting_value"
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/fragment_settings_item_layout_height"
-            android:layout_gravity="end|center_vertical"
-            android:textAppearance="@style/SettingsItemValueTextViewTextAppearance"
-            android:text="@{settingValue}"/>
+
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical|end"
+            android:orientation="horizontal">
+
+            <TextView
+                style="@style/SettingsItemValueTextViewStyle"
+                android:id="@+id/text_setting_value"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/fragment_settings_item_layout_height"
+                android:layout_gravity="end|center_vertical"
+                android:textAppearance="@style/SettingsItemValueTextViewTextAppearance"
+                android:text="@{settingValue}"
+                android:paddingStart="0dp"
+                android:paddingEnd="0dp"
+                android:visibility="@{isVisibleSettingValue ? View.VISIBLE : View.GONE}"/>
+
+            <com.google.android.material.materialswitch.MaterialSwitch
+                style="@style/SettingsItemValueSwitchStyle"
+                android:id="@+id/materialSwitch_setting_value"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end|center_vertical"
+                android:checked="@{settingValueSwitch}" />
+
+        </LinearLayout>
+
     </FrameLayout>
+
 </layout>
 

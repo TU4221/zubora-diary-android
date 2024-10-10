@@ -19,14 +19,15 @@
             android:layout_height="match_parent"/>
 
         <TextView
+            style="@style/TextViewStyle"
             android:id="@+id/text_item_title"
             android:layout_width="match_parent"
             android:layout_height="40dp"
+            android:textAppearance="@style/TextViewTextAppearance"
             android:gravity="center_vertical"
             android:paddingHorizontal="8dp"
             android:paddingVertical="4dp"
             android:background="?attr/colorSurface"
-            android:textAppearance="@style/TextViewTextAppearance"
             tools:text="item title" />
 
     </FrameLayout>

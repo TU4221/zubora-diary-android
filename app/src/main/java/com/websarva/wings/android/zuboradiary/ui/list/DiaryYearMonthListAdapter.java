@@ -312,23 +312,15 @@ public abstract class DiaryYearMonthListAdapter extends ListAdapter<DiaryYearMon
         }
     }
 
-    public class NoDiaryMessageViewHolder extends RecyclerView.ViewHolder {
+    public static class NoDiaryMessageViewHolder extends RecyclerView.ViewHolder {
         public NoDiaryMessageViewHolder(RowNoDiaryMessageBinding binding) {
             super(binding.getRoot());
-
-            ListThemeColorSwitcher switcher = new ListThemeColorSwitcher(context, themeColor);
-            ColorSwitchingViewList<TextView> textViewList =
-                    new ColorSwitchingViewList<>(binding.textNoDiaryMessage);
-            switcher.switchTextColorOnListItemBackground(textViewList);
         }
     }
 
-    public class ProgressBarViewHolder extends RecyclerView.ViewHolder {
+    public static class ProgressBarViewHolder extends RecyclerView.ViewHolder {
         public ProgressBarViewHolder(RowProgressBarBinding binding) {
             super(binding.getRoot());
-
-            ListThemeColorSwitcher switcher = new ListThemeColorSwitcher(context, themeColor);
-            switcher.switchCircularProgressBarColor(binding.progressBarListItemLoading);
         }
     }
 

@@ -20,6 +20,7 @@
             android:layout_height="match_parent"/>
 
         <ImageButton
+            style="@style/ImageButtonStyle"
             android:id="@+id/image_button_delete"
             android:contentDescription="@string/row_background_delete_button_delete"
             android:layout_width="0dp"

@@ -29,17 +29,9 @@
         <item name="colorOnSurfaceInverse">@color/md_theme_light_inverseOnSurface</item>
         <item name="colorSurfaceInverse">@color/md_theme_light_inverseSurface</item>
         <item name="colorPrimaryInverse">@color/md_theme_light_inversePrimary</item>
-
-        <!-- TODO:ここで設定するとセレクターで切り換えてるtextが無効となるので検討する -->
-        <!--<item name="drawableTint">?attr/colorOnSurfaceVariant</item>
-        <item name="android:textColor">@color/text_color_on_background</item>
-        <item name="android:textColorHint">@color/text_hint_color_on_background</item>-->
     </style>
 
-
-
-
-
+    <!-- TODO:RippleとToolTipsの色を変更できるようになったら、下記Style(6色分)の親を統一する。 -->
     <style name="AppThemeColorWhite" parent="Theme.ZuboraDiary">
         <item name="theme">@style/ThemeColorWhite</item>
     </style>
@@ -115,14 +107,6 @@
         <item name="colorSurfaceContainer">@color/md_theme_color_white_surfaceContainer</item>
         <item name="colorSurfaceContainerHigh">@color/md_theme_color_white_surfaceContainerHigh</item>
         <item name="colorSurfaceContainerHighest">@color/md_theme_color_white_surfaceContainerHighest</item>
-
-
-        <!-- TextViewのデフォルトTextColor-->
-        <!--<item name="android:textColorTertiary">?attr/colorOnSurface</item>
-        <item name="android:textColorHint">@color/md_theme_color_white_textHint</item>--><!--
-        <item name="drawableTint">@color/md_theme_color_white_onSurfaceVariant</item>
-        <item name="titleTextColor">@color/md_theme_color_white_onSurface</item>
-        <item name="navigationIconTint">@color/md_theme_color_white_onSurfaceVariant</item>-->
     </style>
 
     <!-- ThemeColorBlack -->
@@ -173,14 +157,6 @@
         <item name="colorSurfaceContainer">@color/md_theme_color_black_surfaceContainer</item>
         <item name="colorSurfaceContainerHigh">@color/md_theme_color_black_surfaceContainerHigh</item>
         <item name="colorSurfaceContainerHighest">@color/md_theme_color_black_surfaceContainerHighest</item>
-
-
-        <!-- TextViewのデフォルトTextColor--><!--
-        <item name="android:textColor">?attr/colorOnSurface</item>
-        <item name="android:textColorHint">@color/md_theme_color_black_textHint</item>
-        <item name="drawableTint">@color/md_theme_color_black_onSurfaceVariant</item>
-        <item name="titleTextColor">@color/md_theme_color_black_onSurface</item>
-        <item name="navigationIconTint">@color/md_theme_color_black_onSurfaceVariant</item>-->
     </style>
 
     <!-- ThemeColorRed -->
@@ -231,12 +207,6 @@
         <item name="colorSurfaceContainer">@color/md_theme_color_red_surfaceContainer</item>
         <item name="colorSurfaceContainerHigh">@color/md_theme_color_red_surfaceContainerHigh</item>
         <item name="colorSurfaceContainerHighest">@color/md_theme_color_red_surfaceContainerHighest</item>
-
-        <item name="android:textColor">@color/md_theme_color_red_onSurface</item>
-        <item name="drawableTint">@color/md_theme_color_red_onSurfaceVariant</item>
-        <item name="android:textColorHint">@color/md_theme_color_red_textHint</item>
-        <item name="titleTextColor">@color/md_theme_color_red_onSurface</item>
-        <item name="navigationIconTint">@color/md_theme_color_red_onSurfaceVariant</item>
     </style>
 
     <!-- ThemeColorBlue -->
@@ -287,12 +257,6 @@
         <item name="colorSurfaceContainer">@color/md_theme_color_blue_surfaceContainer</item>
         <item name="colorSurfaceContainerHigh">@color/md_theme_color_blue_surfaceContainerHigh</item>
         <item name="colorSurfaceContainerHighest">@color/md_theme_color_blue_surfaceContainerHighest</item>
-
-        <item name="android:textColor">@color/md_theme_color_blue_onSurface</item>
-        <item name="drawableTint">@color/md_theme_color_blue_onSurfaceVariant</item>
-        <item name="android:textColorHint">@color/md_theme_color_blue_textHint</item>
-        <item name="titleTextColor">@color/md_theme_color_blue_onSurface</item>
-        <item name="navigationIconTint">@color/md_theme_color_blue_onSurfaceVariant</item>
     </style>
 
     <!-- ThemeColorGreen -->
@@ -343,12 +307,6 @@
         <item name="colorSurfaceContainer">@color/md_theme_color_green_surfaceContainer</item>
         <item name="colorSurfaceContainerHigh">@color/md_theme_color_green_surfaceContainerHigh</item>
         <item name="colorSurfaceContainerHighest">@color/md_theme_color_green_surfaceContainerHighest</item>
-
-        <item name="android:textColor">@color/md_theme_color_green_onSurface</item>
-        <item name="drawableTint">@color/md_theme_color_green_onSurfaceVariant</item>
-        <item name="android:textColorHint">@color/md_theme_color_green_textHint</item>
-        <item name="titleTextColor">@color/md_theme_color_green_onSurface</item>
-        <item name="navigationIconTint">@color/md_theme_color_green_onSurfaceVariant</item>
     </style>
 
     <!-- ThemeColorYellow -->
@@ -399,12 +357,6 @@
         <item name="colorSurfaceContainer">@color/md_theme_color_yellow_surfaceContainer</item>
         <item name="colorSurfaceContainerHigh">@color/md_theme_color_yellow_surfaceContainerHigh</item>
         <item name="colorSurfaceContainerHighest">@color/md_theme_color_yellow_surfaceContainerHighest</item>
-
-        <item name="android:textColor">@color/md_theme_color_yellow_onSurface</item>
-        <item name="drawableTint">@color/md_theme_color_yellow_onSurfaceVariant</item>
-        <item name="android:textColorHint">@color/md_theme_color_yellow_textHint</item>
-        <item name="titleTextColor">@color/md_theme_color_yellow_onSurface</item>
-        <item name="navigationIconTint">@color/md_theme_color_yellow_onSurfaceVariant</item>
     </style>
 
 </resources>

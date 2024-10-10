@@ -13,21 +13,20 @@
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recycler_day_list"
-            android:layout_width="0dp"
+            style="@style/DiaryListRecyclerViewStyle"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/text_section_bar"
-            app:layout_constraintVertical_bias="1.0" />
+            app:layout_constraintTop_toBottomOf="@+id/text_section_bar" />
 
+        <!-- セクションバー(TextView)をリスト(RecyclerView)の前面に配置したい為、TextViewを下記に記載 -->
         <TextView
             android:id="@+id/text_section_bar"
-            android:layout_width="0dp"
+            style="@style/DiaryListYearMonthStyle"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textColor="?attr/colorOnSecondary"
-            android:background="?attr/colorSecondary"
+            android:textAppearance="@style/DiaryListYearMonthTextAppearance"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"

@@ -2,20 +2,20 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    style="@style/DiaryListDayStyle"
     android:id="@+id/liner_layout_background"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:minHeight="88dp"
     android:orientation="horizontal"
-    android:baselineAligned="false"
-    style="@style/DiaryListDayStyle">
+    android:baselineAligned="false">
 
     <include
         android:id="@+id/include_day"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
-        layout="@layout/layout_day"/>
+        layout="@layout/layout_diary_list_item_day"/>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="0dp"
@@ -28,8 +28,8 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:textAppearance="@style/DiaryListDayTextAppearance"
-            android:hint="@string/row_word_search_result_list_title_hint"
             android:textSize="20sp"
+            android:hint="@string/row_word_search_result_list_title_hint"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -40,8 +40,8 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:textAppearance="@style/DiaryListDayTextAppearance"
-            android:hint="@string/row_word_search_result_list_item_hint"
             android:textSize="16sp"
+            android:hint="@string/row_word_search_result_list_item_hint"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/text_word_search_result_title" />
 
@@ -52,8 +52,8 @@
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
             android:textAppearance="@style/DiaryListDayTextAppearance"
-            android:hint="@string/row_word_search_result_list_item_title_hint"
             android:textSize="16sp"
+            android:hint="@string/row_word_search_result_list_item_title_hint"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/text_word_search_result_item_number"
             app:layout_constraintTop_toBottomOf="@+id/text_word_search_result_title" />
@@ -67,8 +67,8 @@
             android:maxLines="4"
             android:ellipsize="end"
             android:textAppearance="@style/DiaryListDayTextAppearance"
-            android:hint="@string/row_word_search_result_list_item_comment_hint"
             android:textSize="14sp"
+            android:hint="@string/row_word_search_result_list_item_comment_hint"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/text_word_search_result_item_number"
             app:layout_constraintTop_toBottomOf="@+id/text_word_search_result_item_title" />

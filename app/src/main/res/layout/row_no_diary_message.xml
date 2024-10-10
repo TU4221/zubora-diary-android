@@ -10,16 +10,19 @@
         android:layout_height="wrap_content">
 
         <!-- ProgressBar高さサイズ確保用(表示不要) -->
-        <ProgressBar
+        <com.google.android.material.progressindicator.CircularProgressIndicator
+            style="@style/CircularProgressIndicatorStyle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_gravity="center"
             android:visibility="invisible"/>
 
         <TextView
             android:id="@+id/text_no_diary_message"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:text="上記以前の日記はありません。"
+            android:textAppearance="@style/DiaryListDayTextAppearance"
+            android:text="@string/row_no_diary_message_message"
             android:gravity="center" />
 
     </FrameLayout>

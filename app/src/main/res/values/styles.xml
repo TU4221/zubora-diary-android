@@ -1,10 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- Common -->
+    <!-- ******************************************************************************** -->
+    <!-- View -->
     <style name="FragmentBackgroundViewStyle" parent="Widget.AppCompat.TextView">
         <item name="android:background">?attr/colorSurface</item>
     </style>
 
+    <!-- Toolbar -->
     <style name="ToolbarStyle" parent="Widget.Material3.Toolbar">
         <item name="android:gravity">center</item>
         <item name="android:minHeight">?attr/actionBarSize</item>
@@ -13,11 +16,26 @@
         <item name="navigationIconTint">?attr/colorOnSurfaceVariant</item>
     </style>
 
-    <style name="TextViewTextAppearance" parent="TextAppearance.AppCompat.Small">
-        <item name="android:textColor">@color/text_color_on_background</item>
+    <!-- TextView -->
+    <style name="TextViewStyle" parent="Widget.AppCompat.TextView">
+        <!-- HACK:"android:textColorHint"はTextAppearanceでは反映されない為、Styleに記述 -->
         <item name="android:textColorHint">@color/text_hint_color_on_background</item>
     </style>
+    <style name="TextViewTextAppearance" parent="TextAppearance.AppCompat.Small">
+        <item name="android:textColor">@color/text_color_on_background</item>
+        <!--<item name="android:textColorHint">@color/text_hint_color_on_background</item>-->
+    </style>
 
+    <!-- TextInputLayout -->
+    <style name="TextInputLayoutOutlinedBoxStyle" parent="Widget.Material3.TextInputLayout.OutlinedBox">
+        <item name="expandedHintEnabled">false</item>
+    </style>
+
+    <style name="TextInputLayoutDropdownMenuStyle" parent="Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu">
+        <item name="expandedHintEnabled">false</item>
+    </style>
+
+    <!-- TextInputEditText -->
     <style name="TextInputEditTextStyle" parent="Widget.AppCompat.EditText">
         <!-- HACK:下記属性はTextAppearanceでは反映されない為、Styleに記述 -->
         <item name="android:textColor">@color/text_color_on_background</item>
@@ -26,6 +44,7 @@
     <style name="TextInputEditTextTextAppearance" parent="TextAppearance.AppCompat.Medium.Inverse">
     </style>
 
+    <!-- AutoCompleteTextView -->
     <style name="AutoCompleteTextViewDropDownStyle" parent="ThemeOverlay.Material3.AutoCompleteTextView">
         <item name="android:cursorVisible">false</item>
         <item name="android:inputType">none</item>
@@ -35,12 +54,39 @@
         <!-- HACK:"android:textColor"、"android:textColorHint"はStyle、TextAppearanceでは反映されない為、layoutに記述 -->
     </style>
 
-    <!-- DropDownListItemLayout -->
-    <style name="DropDownListItemTextAppearance" parent="TextAppearance.Material3.TitleMedium">
-        <item name="android:textColor">?attr/colorOnSurfaceVariant</item>
+    <!-- CircularProgressIndicator -->
+    <style name="CircularProgressIndicatorStyle" parent="Widget.Material3.CircularProgressIndicator.Medium">
+        <item name="android:indeterminate">true</item>
     </style>
 
-    <!-- DiaryListItem -->
+    <!-- ImageButton -->
+    <style name="ImageButtonStyle" parent="Widget.AppCompat.ImageButton">
+        <item name="android:background">@drawable/bg_image_button</item>
+        <item name="tint">?attr/colorOnSurfaceVariant</item>
+    </style>
+
+    <!-- ImageButton -->
+    <style name="ImageViewStyle">
+        <item name="tint">?attr/colorOnSurfaceVariant</item>
+    </style>
+    <!-- ******************************************************************************** -->
+
+
+    <!-- DiaryList、WordSearchFragment -->
+    <!-- ******************************************************************************** -->
+    <!-- MEMO:RecyclerViewのデフォルトスタイルなし -->
+    <style name="DiaryListRecyclerViewStyle">
+        <item name="android:scrollbars">none</item>
+        <item name="android:transitionGroup">true</item>
+    </style>
+
+    <style name="DiaryListYearMonthStyle" parent="Widget.AppCompat.TextView">
+        <item name="android:background">?attr/colorSecondary</item>
+    </style>
+    <style name="DiaryListYearMonthTextAppearance" parent="TextAppearance.AppCompat.Body1">
+        <item name="android:textColor">?attr/colorOnSecondary</item>
+    </style>
+
     <style name="DiaryListDayStyle" parent="Widget.AppCompat.TextView">
         <item name="android:background">?attr/colorSecondaryContainer</item>
         <item name="tint">?attr/colorSecondary</item>
@@ -48,52 +94,79 @@
     <style name="DiaryListDayTextAppearance" parent="TextAppearance.AppCompat.Body1">
         <item name="android:textColor">?attr/colorOnSecondaryContainer</item>
     </style>
+    <!-- ******************************************************************************** -->
+
 
     <!-- SettingsFragment -->
-    <style name="SettingsItemBaseTextViewStyle" parent="Widget.AppCompat.TextView">
+    <!-- ******************************************************************************** -->
+    <style name="SettingsItemBaseTextViewStyle" parent="TextViewStyle">
         <item name="android:paddingStart">@dimen/fragment_settings_item_padding_horizontal</item>
         <item name="android:paddingEnd">@dimen/fragment_settings_item_padding_horizontal</item>
         <item name="android:paddingTop">@dimen/fragment_settings_item_padding_vertical</item>
         <item name="android:paddingBottom">@dimen/fragment_settings_item_padding_vertical</item>
     </style>
-    <style name="SettingsItemBaseTextAppearance" parent="TextAppearance.AppCompat.Body1">
+    <style name="SettingsItemBaseTextViewTextAppearance" parent="TextViewTextAppearance">
         <item name="android:textSize">@dimen/fragment_settings_section_text_size</item>
     </style>
 
+    <!-- SettingsItemTextView -->
     <style name="SettingsItemTextViewStyle" parent="SettingsItemBaseTextViewStyle">
         <item name="android:drawablePadding">@dimen/fragment_settings_item_drawable_padding</item>
         <item name="android:gravity">center_vertical</item>
     </style>
-    <style name="SettingsItemTextAppearance" parent="SettingsItemBaseTextAppearance"/>
+    <style name="SettingsItemTextViewTextAppearance" parent="SettingsItemBaseTextViewTextAppearance"/>
 
+    <!-- SettingsSectionTextView -->
     <style name="SettingsSectionTextViewStyle" parent="SettingsItemBaseTextViewStyle">
         <item name="android:gravity">bottom</item>
         <item name="android:background">?attr/colorSecondaryContainer</item>
     </style>
-    <style name="SettingsSectionTextAppearance" parent="SettingsItemBaseTextAppearance">
+    <style name="SettingsSectionTextViewTextAppearance" parent="SettingsItemBaseTextViewTextAppearance">
         <item name="android:textColor">?attr/colorOnSecondaryContainer</item>
     </style>
 
-    <style name="SettingsItemValueTextViewStyle" parent="Widget.MaterialComponents.TextView">
+    <!-- SettingsItemValue -->
+    <style name="SettingsItemValueTextViewStyle" parent="TextViewStyle">
         <item name="android:paddingStart">@dimen/fragment_settings_item_padding_horizontal</item>
         <item name="android:paddingEnd">@dimen/fragment_settings_item_padding_horizontal</item>
         <item name="android:paddingTop">@dimen/fragment_settings_item_padding_vertical</item>
         <item name="android:paddingBottom">@dimen/fragment_settings_item_padding_vertical</item>
         <item name="android:gravity">center_vertical|end</item>
-    </style>
-    <style name="SettingsItemValueTextAppearance" parent="TextAppearance.AppCompat.Body1">
-        <item name="android:textSize">@dimen/fragment_settings_item_value_text_size</item>
         <item name="android:hint">@string/fragment_settings_item_value_not_set</item>
     </style>
+    <style name="SettingsItemValueTextViewTextAppearance" parent="TextViewTextAppearance">
+        <item name="android:textSize">@dimen/fragment_settings_item_value_text_size</item>
+    </style>
 
+    <!-- SettingsItemValueSwitch -->
     <style name="SettingsItemValueSwitchStyle" parent="Widget.Material3.CompoundButton.MaterialSwitch">
         <item name="android:paddingStart">@dimen/fragment_settings_item_padding_horizontal</item>
         <item name="android:paddingEnd">@dimen/fragment_settings_item_padding_horizontal</item>
         <item name="android:paddingTop">@dimen/fragment_settings_item_padding_vertical</item>
         <item name="android:paddingBottom">@dimen/fragment_settings_item_padding_vertical</item>
     </style>
+    <!-- ******************************************************************************** -->
+
+
+    <!-- NumberPickersDialogFragment -->
+    <!-- ******************************************************************************** -->
+    <style name="NumberPickerButtonStyle" parent="Widget.AppCompat.Button">
+        <item name="android:background">@drawable/bg_clear_button</item>
+
+        <!-- HACK:"android:textColor"はTextAppearanceでは反映されない為、Styleに記述 -->
+        <item name="android:textColor">?colorOnSecondaryContainer</item>
+    </style>
+    <style name="NumberPickerButtonTextAppearance" parent="TextAppearance.AppCompat.Widget.Button">
+    </style>
+
+    <!-- MEMO:NumberPickerのデフォルトスタイルなし -->
+    <style name="NumberPickerStyle" >
+        <item name="android:descendantFocusability">blocksDescendants</item>
+    </style>
+    <!-- ******************************************************************************** -->
 
     <!-- MaterialCalendarDialog用Theme -->
+    <!-- ******************************************************************************** -->
     <style name="MaterialCalendarThemeColorWhite" parent="ThemeOverlay.Material3.MaterialCalendar">
         <item name="theme">@style/ThemeColorWhite</item>
         <!-- HACK:theme属性で指定しているstyleに"colorSurfaceContainerHigh"は含まれているが、反映されないので下記コードを記述して対応。
@@ -120,8 +193,10 @@
         <item name="theme">@style/ThemeColorYellow</item>
         <item name="colorSurfaceContainerHigh">@color/md_theme_color_yellow_surfaceContainerHigh</item>
     </style>
+    <!-- ******************************************************************************** -->
 
     <!-- MaterialAlertDialog用Theme -->
+    <!-- ******************************************************************************** -->
     <style name="MaterialAlertDialogThemeColorWhite" parent="ThemeOverlay.Material3.MaterialAlertDialog">
         <item name="theme">@style/ThemeColorWhite</item>
         <!-- HACK:theme属性で指定しているstyleに"colorSurfaceContainerHigh"は含まれているが、反映されないので下記コードを記述して対応。
@@ -148,4 +223,5 @@
         <item name="theme">@style/ThemeColorYellow</item>
         <item name="colorSurfaceContainerHigh">@color/md_theme_color_yellow_surfaceContainerHigh</item>
     </style>
+    <!-- ******************************************************************************** -->
 </resources>

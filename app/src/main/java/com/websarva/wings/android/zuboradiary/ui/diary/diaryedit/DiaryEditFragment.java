@@ -883,7 +883,7 @@ public class DiaryEditFragment extends BaseFragment {
         TextInputSetup textInputSetup = new TextInputSetup(requireActivity());
 
         TextInputLayout[] allTextInputLayouts = createAllTextInputLayoutList().toArray(new TextInputLayout[0]);
-        textInputSetup.setUpFocusClearOnClickBackground(binding.viewFullScreenBackground, allTextInputLayouts);
+        textInputSetup.setUpFocusClearOnClickBackground(binding.viewNestedScrollBackground, allTextInputLayouts);
 
         textInputSetup.setUpKeyboardCloseOnEnter(binding.textInputLayoutTitle);
 

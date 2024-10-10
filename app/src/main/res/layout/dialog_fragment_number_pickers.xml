@@ -20,21 +20,21 @@
             android:background="?colorSecondaryContainer">
 
             <Button
+                style="@style/NumberPickerButtonStyle"
                 android:id="@+id/button_cancel"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/dialog_fragment_number_picker_cancel"
-                android:textColor="?colorOnSecondaryContainer"
-                android:background="@drawable/bg_clear_button" />
+                android:textAppearance="@style/NumberPickerButtonTextAppearance"
+                android:text="@string/dialog_fragment_number_picker_cancel" />
 
             <Button
+                style="@style/NumberPickerButtonStyle"
                 android:id="@+id/button_decision"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="end"
-                android:text="@string/dialog_fragment_number_picker_decision"
-                android:textColor="?colorOnSecondaryContainer"
-                android:background="@drawable/bg_clear_button" />
+                android:textAppearance="@style/NumberPickerButtonTextAppearance"
+                android:text="@string/dialog_fragment_number_picker_decision" />
         </FrameLayout>
 
         <FrameLayout
@@ -55,27 +55,26 @@
                 android:layout_marginVertical="@dimen/dialog_fragment_number_picker_layout_margin_vertical">
 
                 <NumberPicker
+                    style="@style/NumberPickerStyle"
                     android:id="@+id/number_picker_first"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:descendantFocusability="blocksDescendants" />
+                    android:layout_weight="1" />
 
                 <NumberPicker
+                    style="@style/NumberPickerStyle"
                     android:id="@+id/number_picker_second"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:layout_marginStart="@dimen/dialog_fragment_number_picker_layout_margin_horizontal_between_items"
-                    android:descendantFocusability="blocksDescendants" />
+                    android:layout_marginStart="@dimen/dialog_fragment_number_picker_layout_margin_horizontal_between_items" />
 
                 <NumberPicker
                     android:id="@+id/number_picker_third"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:layout_marginStart="@dimen/dialog_fragment_number_picker_layout_margin_horizontal_between_items"
-                    android:descendantFocusability="blocksDescendants"/>
+                    android:layout_marginStart="@dimen/dialog_fragment_number_picker_layout_margin_horizontal_between_items"/>
 
             </LinearLayout>
 
