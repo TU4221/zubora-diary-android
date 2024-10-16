@@ -57,7 +57,7 @@ public class DiaryListViewModel extends BaseViewModel {
     @Override
     protected void initialize() {
         super.initialize();
-        diaryList.setValue(new DiaryYearMonthList());
+        diaryList.setValue(new DiaryYearMonthList(false));
         isVisibleUpdateProgressBar.setValue(false);
         sortConditionDate = null;
     }
@@ -138,6 +138,8 @@ public class DiaryListViewModel extends BaseViewModel {
                 }
             } catch (Exception e) {
                 e.printStackTrace();
+                diaryList.postValue(previousDiaryList);
+                addAppError(AppError.DIARY_LOADING);
             }
         }
     }
@@ -154,7 +156,7 @@ public class DiaryListViewModel extends BaseViewModel {
         }
 
         private void showDiaryListFirstItemProgressIndicator() {
-            DiaryYearMonthList list = new DiaryYearMonthList();
+            DiaryYearMonthList list = new DiaryYearMonthList(false);
             diaryList.postValue(list);
         }
     }
@@ -220,6 +222,7 @@ public class DiaryListViewModel extends BaseViewModel {
                 );
 
         List<DiaryListItem> loadedDiaryList = listListenableFuture.get();
+        if (loadedDiaryList.isEmpty()) return new DiaryYearMonthList(true);
         List<DiaryDayListItem> diaryDayListItemList = new ArrayList<>();
         loadedDiaryList.stream().forEach(x -> diaryDayListItemList.add(new DiaryDayListItem(x)));
         DiaryDayList diaryDayList = new DiaryDayList(diaryDayListItemList);

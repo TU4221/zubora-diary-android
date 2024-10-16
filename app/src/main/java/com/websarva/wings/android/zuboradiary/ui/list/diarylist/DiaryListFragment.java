@@ -1,5 +1,7 @@
 package com.websarva.wings.android.zuboradiary.ui.list.diarylist;
 
+import static com.websarva.wings.android.zuboradiary.ui.list.DiaryYearMonthListAdapter.*;
+
 import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -29,6 +31,7 @@ import java.util.Objects;
 import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor;
 import com.websarva.wings.android.zuboradiary.databinding.FragmentDiaryListBinding;
 import com.websarva.wings.android.zuboradiary.ui.BaseFragment;
+import com.websarva.wings.android.zuboradiary.ui.list.DiaryYearMonthListAdapter.OnClickChildItemListener;
 import com.websarva.wings.android.zuboradiary.ui.list.DiaryYearMonthListItemBase;
 import com.websarva.wings.android.zuboradiary.ui.list.DiaryYearMonthListAdapter;
 import com.websarva.wings.android.zuboradiary.ui.settings.SettingsViewModel;
@@ -190,7 +193,7 @@ public class DiaryListFragment extends BaseFragment {
                         true
                 );
         diaryListAdapter.build();
-        diaryListAdapter.setOnClickChildItemListener(new DiaryYearMonthListAdapter.OnClickChildItemListener() {
+        diaryListAdapter.setOnClickChildItemListener(new OnClickChildItemListener() {
             @Override
             public void onClick(LocalDate date) {
                 Objects.requireNonNull(date);
@@ -198,7 +201,7 @@ public class DiaryListFragment extends BaseFragment {
                 showShowDiaryFragment(date);
             }
         });
-        diaryListAdapter.setOnClickChildItemBackgroundButtonListener(new DiaryYearMonthListAdapter.OnClickChildItemBackgroundButtonListener() {
+        diaryListAdapter.setOnClickChildItemBackgroundButtonListener(new OnClickChildItemBackgroundButtonListener() {
             @Override
             public void onClick(LocalDate date) {
                 Objects.requireNonNull(date);
@@ -246,7 +249,7 @@ public class DiaryListFragment extends BaseFragment {
         @Override
         public void onChanged(DiaryYearMonthList list) {
             Objects.requireNonNull(list);
-            if (list.getDiaryYearMonthListItemList().isEmpty()) return;
+            //if (list.getDiaryYearMonthListItemList().isEmpty()) return;
 
             setUpListViewVisibility(list);
             setUpList(list);

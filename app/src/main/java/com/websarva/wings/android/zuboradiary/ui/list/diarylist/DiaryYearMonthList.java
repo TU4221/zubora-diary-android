@@ -32,9 +32,9 @@ public class DiaryYearMonthList {
         this.diaryYearMonthListItemList = Collections.unmodifiableList(_itemList);
     }
 
-    public DiaryYearMonthList() {
+    public DiaryYearMonthList(boolean needsNoDiaryMessage) {
         List<DiaryYearMonthListItem> itemList = new ArrayList<>();
-        addLastItem(itemList, false);
+        addLastItem(itemList, needsNoDiaryMessage);
         this.diaryYearMonthListItemList = Collections.unmodifiableList(itemList);
     }
 
