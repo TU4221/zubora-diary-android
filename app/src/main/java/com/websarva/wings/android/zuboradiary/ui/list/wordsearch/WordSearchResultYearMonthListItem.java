@@ -1,7 +1,11 @@
 package com.websarva.wings.android.zuboradiary.ui.list.wordsearch;
 
+import android.view.View;
+
 import androidx.annotation.NonNull;
 
+import com.websarva.wings.android.zuboradiary.ui.list.DiaryYearMonthListAdapter;
+import com.websarva.wings.android.zuboradiary.ui.list.DiaryYearMonthListAdapter.ViewType;
 import com.websarva.wings.android.zuboradiary.ui.list.DiaryYearMonthListItemBase;
 
 import java.time.YearMonth;
@@ -11,14 +15,14 @@ import java.util.List;
 public class WordSearchResultYearMonthListItem extends DiaryYearMonthListItemBase {
     private List<WordSearchResultDayListItem> WordSearchResultDayList;
 
-    public WordSearchResultYearMonthListItem(int viewType) {
+    public WordSearchResultYearMonthListItem(ViewType viewType) {
         super(viewType);
         WordSearchResultDayList = new ArrayList<>();
     }
 
     public WordSearchResultYearMonthListItem(
             @NonNull YearMonth yearMonth,
-            @NonNull List<WordSearchResultDayListItem> wordSearchResultDayList, int viewType) {
+            @NonNull List<WordSearchResultDayListItem> wordSearchResultDayList, ViewType viewType) {
         super(yearMonth, viewType);
         this.WordSearchResultDayList = wordSearchResultDayList;
     }
@@ -27,7 +31,7 @@ public class WordSearchResultYearMonthListItem extends DiaryYearMonthListItemBas
     @NonNull
     @Override
     public WordSearchResultYearMonthListItem clone() {
-        WordSearchResultYearMonthListItem clone = (WordSearchResultYearMonthListItem) super.clone();
+        WordSearchResultYearMonthListItem clone = /*(WordSearchResultYearMonthListItem) super.clone()*/null;
         List<WordSearchResultDayListItem> cloneWordSearchResultDayList = new ArrayList<>();
         for (WordSearchResultDayListItem item : WordSearchResultDayList) {
             WordSearchResultDayListItem cloneItem = item.clone();

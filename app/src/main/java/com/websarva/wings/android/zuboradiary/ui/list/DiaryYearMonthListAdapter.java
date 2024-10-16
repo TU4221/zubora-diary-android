@@ -1,18 +1,14 @@
 package com.websarva.wings.android.zuboradiary.ui.list;
 
 import android.content.Context;
-import android.content.res.Resources;
 import android.graphics.Rect;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ProgressBar;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.view.ContextThemeWrapper;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.ListAdapter;
@@ -23,7 +19,6 @@ import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor;
 import com.websarva.wings.android.zuboradiary.databinding.RowDiaryYearMonthListBinding;
 import com.websarva.wings.android.zuboradiary.databinding.RowNoDiaryMessageBinding;
 import com.websarva.wings.android.zuboradiary.databinding.RowProgressBarBinding;
-import com.websarva.wings.android.zuboradiary.ui.ColorSwitchingViewList;
 import com.websarva.wings.android.zuboradiary.ui.ThemeColorInflaterCreator;
 import com.websarva.wings.android.zuboradiary.ui.list.diarylist.DiaryDayListAdapter;
 import com.websarva.wings.android.zuboradiary.ui.list.diarylist.DiaryDayListItem;
@@ -37,6 +32,7 @@ import java.time.LocalDate;
 import java.time.YearMonth;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 // DiaryFragment、WordSearchFragmentの親RecyclerViewのListAdapter。
 // 親RecyclerViewを同じ構成にする為、一つのクラスで両方の子RecyclerViewに対応できるように作成。
@@ -51,10 +47,22 @@ public abstract class DiaryYearMonthListAdapter extends ListAdapter<DiaryYearMon
     public static final int DIARY_DAY_LIST_ITEM_MARGIN_VERTICAL = 16;
     public static final int DIARY_DAY_LIST_ITEM_MARGIN_HORIZONTAL = 32;
     private final List<DiaryListSimpleCallback> simpleCallbackList = new ArrayList<>();
-    public static final int VIEW_TYPE_DIARY = 0;
-    public static final int VIEW_TYPE_PROGRESS_BAR = 1;
-    public static final int VIEW_TYPE_NO_DIARY_MESSAGE = 2;
     private boolean isLoadingListOnScrolled;
+
+    public enum ViewType {
+        DIARY(0),
+        PROGRESS_INDICATOR(1),
+        NO_DIARY_MESSAGE(2);
+
+        final int viewTypeNumber;
+        ViewType(int viewTypeNumber) {
+            this.viewTypeNumber = viewTypeNumber;
+        }
+
+        public int getViewTypeNumber() {
+            return viewTypeNumber;
+        }
+    }
 
     public DiaryYearMonthListAdapter(
             Context context,
@@ -63,15 +71,9 @@ public abstract class DiaryYearMonthListAdapter extends ListAdapter<DiaryYearMon
             boolean canSwipeItem) {
         super(new DiaryYearMonthListDiffUtilItemCallback());
 
-        if (context == null) {
-            throw new NullPointerException();
-        }
-        if (recyclerView == null) {
-            throw new NullPointerException();
-        }
-        if (themeColor == null) {
-            throw new NullPointerException();
-        }
+        Objects.requireNonNull(context);
+        Objects.requireNonNull(recyclerView);
+        Objects.requireNonNull(themeColor);
 
         this.context = context;
         this.recyclerView = recyclerView;
@@ -86,12 +88,10 @@ public abstract class DiaryYearMonthListAdapter extends ListAdapter<DiaryYearMon
             @Override
             public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
                 super.onScrollStateChanged(recyclerView, newState);
-                if (newState == RecyclerView.SCROLL_STATE_DRAGGING) {
-                    // スクロール時スワイプ閉
-                    if (canSwipeItem) {
-                        closeSwipedItemOtherDayList(null);
-                    }
-                }
+                if (newState != RecyclerView.SCROLL_STATE_DRAGGING) return;
+
+                // スクロール時スワイプ閉
+                if (canSwipeItem) closeSwipedItemOtherDayList(null);
             }
         });
 
@@ -113,12 +113,14 @@ public abstract class DiaryYearMonthListAdapter extends ListAdapter<DiaryYearMon
     @NonNull
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        Objects.requireNonNull(parent);
+
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
         ThemeColorInflaterCreator creator =
                 new ThemeColorInflaterCreator(context, inflater, themeColor);
         LayoutInflater themeColorInflater = creator.create();
 
-        if (viewType == VIEW_TYPE_DIARY) {
+        if (viewType == ViewType.DIARY.getViewTypeNumber()) {
             RowDiaryYearMonthListBinding binding =
                     RowDiaryYearMonthListBinding
                             .inflate(themeColorInflater, parent, false);
@@ -146,15 +148,11 @@ public abstract class DiaryYearMonthListAdapter extends ListAdapter<DiaryYearMon
                     outRect.right = DIARY_DAY_LIST_ITEM_MARGIN_HORIZONTAL;
 
                     RecyclerView.ViewHolder viewHolder = parent.findContainingViewHolder(view);
-                    if (viewHolder == null) {
-                        // TODO:assert
-                        return;
-                    }
+                    Objects.requireNonNull(viewHolder);
+
                     RecyclerView.Adapter<?> adapter = parent.getAdapter();
-                    if (adapter == null) {
-                        // TODO:assert
-                        return;
-                    }
+                    Objects.requireNonNull(adapter);
+
                     Log.d("リスト装飾確認", Integer.toString(viewHolder.getBindingAdapterPosition()));
                     if (viewHolder.getBindingAdapterPosition() == (adapter.getItemCount() - 1)) {
                         outRect.bottom = DIARY_DAY_LIST_ITEM_MARGIN_VERTICAL;
@@ -171,15 +169,13 @@ public abstract class DiaryYearMonthListAdapter extends ListAdapter<DiaryYearMon
             }
 
             return holder;
-        } else if (viewType == VIEW_TYPE_PROGRESS_BAR) {
+        } else if (viewType == ViewType.PROGRESS_INDICATOR.getViewTypeNumber()) {
             RowProgressBarBinding binding =
-                    RowProgressBarBinding
-                            .inflate(themeColorInflater, parent, false);
+                    RowProgressBarBinding.inflate(themeColorInflater, parent, false);
             return new ProgressBarViewHolder(binding);
         } else {
             RowNoDiaryMessageBinding binding =
-                    RowNoDiaryMessageBinding
-                            .inflate(themeColorInflater, parent, false);
+                    RowNoDiaryMessageBinding.inflate(themeColorInflater, parent, false);
             return new NoDiaryMessageViewHolder(binding);
         }
     }
@@ -209,7 +205,7 @@ public abstract class DiaryYearMonthListAdapter extends ListAdapter<DiaryYearMon
             if (item instanceof DiaryYearMonthListItem) {
                 DiaryYearMonthListItem _item = (DiaryYearMonthListItem) item;
                 DiaryDayListAdapter diaryDayListAdapter = createDiaryDayListAdapter(_holder);
-                List<DiaryDayListItem> diaryDayList = _item.getDiaryDayListItemList();
+                List<DiaryDayListItem> diaryDayList = _item.getDiaryDayList().getDiaryDayListItemList();
                 diaryDayListAdapter.submitList(diaryDayList);
 
             } else if (item instanceof WordSearchResultYearMonthListItem) {
@@ -228,7 +224,7 @@ public abstract class DiaryYearMonthListAdapter extends ListAdapter<DiaryYearMon
         void onClick(LocalDate date);
     }
 
-    public void setOnClickChildItemListener(OnClickChildItemListener onClickChildItemListener) {
+    public void setOnClickChildItemListener(@Nullable OnClickChildItemListener onClickChildItemListener) {
         this.onClickChildItemListener = onClickChildItemListener;
     }
 
@@ -238,45 +234,51 @@ public abstract class DiaryYearMonthListAdapter extends ListAdapter<DiaryYearMon
     }
 
     public void setOnClickChildItemBackgroundButtonListener(
-            OnClickChildItemBackgroundButtonListener onClickChildItemBackgroundButtonListener) {
+            @Nullable OnClickChildItemBackgroundButtonListener onClickChildItemBackgroundButtonListener) {
         this.onClickChildItemBackgroundButtonListener = onClickChildItemBackgroundButtonListener;
     }
 
-    private @NonNull DiaryDayListAdapter createDiaryDayListAdapter(DiaryYearMonthListViewHolder _holder) {
+    @NonNull
+    private DiaryDayListAdapter createDiaryDayListAdapter(DiaryYearMonthListViewHolder _holder) {
+        Objects.requireNonNull(_holder);
+
         DiaryDayListAdapter diaryDayListAdapter =
                 new DiaryDayListAdapter(context, _holder.binding.recyclerDayList, themeColor);
         diaryDayListAdapter.build();
         diaryDayListAdapter.setOnClickItemListener(new DiaryDayListAdapter.OnClickItemListener() {
             @Override
             public void onClick(LocalDate date) {
-                if (onClickChildItemListener == null) {
-                    return;
-                }
+                Objects.requireNonNull(date);
+                if (onClickChildItemListener == null) return;
+
                 onClickChildItemListener.onClick(date);
             }
         });
         diaryDayListAdapter.setOnClickDeleteButtonListener(new DiaryDayListAdapter.OnClickDeleteButtonListener() {
             @Override
             public void onClick(LocalDate date) {
-                if (onClickChildItemBackgroundButtonListener == null) {
-                    return;
-                }
+                Objects.requireNonNull(date);
+                if (onClickChildItemBackgroundButtonListener == null) return;
+
                 onClickChildItemBackgroundButtonListener.onClick(date);
             }
         });
         return diaryDayListAdapter;
     }
 
-    private @NonNull WordSearchResultDayListAdapter createWordSearchResultDayListAdapter(DiaryYearMonthListViewHolder _holder) {
+    @NonNull
+    private WordSearchResultDayListAdapter createWordSearchResultDayListAdapter(DiaryYearMonthListViewHolder _holder) {
+        Objects.requireNonNull(_holder);
+
         WordSearchResultDayListAdapter wordSearchResultDayListAdapter =
                 new WordSearchResultDayListAdapter(context, _holder.binding.recyclerDayList, themeColor);
         wordSearchResultDayListAdapter.build();
         wordSearchResultDayListAdapter.setOnClickItemListener(new WordSearchResultDayListAdapter.OnClickItemListener() {
             @Override
             public void onClick(LocalDate date) {
-                if (onClickChildItemListener == null) {
-                    return;
-                }
+                Objects.requireNonNull(date);
+                if (onClickChildItemListener == null) return;
+
                 onClickChildItemListener.onClick(date);
             }
         });
@@ -286,7 +288,7 @@ public abstract class DiaryYearMonthListAdapter extends ListAdapter<DiaryYearMon
     @Override
     public int getItemViewType(int position ) {
         DiaryYearMonthListItemBase item = getItem(position);
-        return item.getViewType();
+        return item.getViewType().getViewTypeNumber();
     }
 
     public void closeSwipedItemOtherDayList(@Nullable DiaryListSimpleCallback simpleCallback) {
@@ -333,7 +335,7 @@ public abstract class DiaryYearMonthListAdapter extends ListAdapter<DiaryYearMon
             Log.d("DiaryYearMonthList", "newItem_YearMonth:" + newItem.getYearMonth());
 
             // ViewType
-            if (oldItem.getViewType() != newItem.getViewType()) {
+            if (!oldItem.getViewType().equals(newItem.getViewType())) {
                 Log.d("DiaryYearMonthList", "ViewType不一致");
                 return false;
             }
@@ -343,13 +345,10 @@ public abstract class DiaryYearMonthListAdapter extends ListAdapter<DiaryYearMon
             //      これにより、初回読込中プログレスバーとアイテムリスト末尾のプログレスバーが同一アイテムと認識するため、
             //      ListAdapterクラスの仕様により表示されていたプログレスバーが更新後も表示されるようにスクロール位置がズレた。
             //      プログレスバー同士が同一アイテムと認識されないようにするために、下記条件を追加して対策。
-            if (oldItem.getViewType() == VIEW_TYPE_PROGRESS_BAR) {
-                return false;
-            }
+            if (oldItem.getViewType().equals(ViewType.PROGRESS_INDICATOR)) return false;
 
             // 年月
-            if (oldItem.getYearMonth() != null && newItem.getYearMonth() != null
-                    && !oldItem.getYearMonth().equals(newItem.getYearMonth())) {
+            if (!oldItem.getYearMonth().equals(newItem.getYearMonth())) {
                 Log.d("DiaryYearMonthList", "YearMonth不一致");
                 return false;
             }
@@ -369,16 +368,16 @@ public abstract class DiaryYearMonthListAdapter extends ListAdapter<DiaryYearMon
                 DiaryYearMonthListItem _oldItem = (DiaryYearMonthListItem) oldItem;
                 DiaryYearMonthListItem _newItem = (DiaryYearMonthListItem) newItem;
 
-                int _oldChildListSize = _oldItem.getDiaryDayListItemList().size();
-                int _newChildListSize = _newItem.getDiaryDayListItemList().size();
+                int _oldChildListSize = _oldItem.getDiaryDayList().getDiaryDayListItemList().size();
+                int _newChildListSize = _newItem.getDiaryDayList().getDiaryDayListItemList().size();
                 if (_oldChildListSize != _newChildListSize) {
                     Log.d("DiaryYearMonthList", "ChildList_Size不一致");
                     return false;
                 }
 
                 for (int i = 0; i < _oldChildListSize; i++) {
-                    DiaryDayListItem oldChildListItem = _oldItem.getDiaryDayListItemList().get(i);
-                    DiaryDayListItem newChildListItem = _newItem.getDiaryDayListItemList().get(i);
+                    DiaryDayListItem oldChildListItem = _oldItem.getDiaryDayList().getDiaryDayListItemList().get(i);
+                    DiaryDayListItem newChildListItem = _newItem.getDiaryDayList().getDiaryDayListItemList().get(i);
                     if (!oldChildListItem.getDate().equals(newChildListItem.getDate())) {
                         Log.d("DiaryYearMonthList", "ChildListItem_Date不一致");
                         return false;
@@ -464,43 +463,26 @@ public abstract class DiaryYearMonthListAdapter extends ListAdapter<DiaryYearMon
         @Override
         public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
             super.onScrolled(recyclerView, dx, dy);
-            if (isLoadingListOnScrolled) {
-                return;
-            }
-
-            if (!canLoadList()) {
-                return;
-            }
-
-            if (dy <= 0) {
-                return;
-            }
+            if (isLoadingListOnScrolled) return;
+            if (!canLoadList()) return;
+            if (dy <= 0) return;
 
             LinearLayoutManager layoutManager =
                     (LinearLayoutManager) recyclerView.getLayoutManager();
-            if (layoutManager == null) {
-                // TODO:assert
-                return;
-            }
+            Objects.requireNonNull(layoutManager);
 
             int lastVisibleItemPosition = layoutManager.findLastVisibleItemPosition();
             int totalItemCount = layoutManager.getItemCount();
-            if (totalItemCount <= 0) {
-                // TODO:assert
-                return;
-            }
+            if (totalItemCount <= 0) return;
+
             RecyclerView.Adapter<?> recyclerViewAdapter = recyclerView.getAdapter();
-            if (recyclerViewAdapter == null) {
-                return;
-            }
+            Objects.requireNonNull(recyclerViewAdapter);
 
             int lastItemPosition = totalItemCount - 1;
-            if (lastVisibleItemPosition != lastItemPosition) {
-                return;
-            }
+            if (lastVisibleItemPosition != lastItemPosition) return;
 
             int lastItemViewType = recyclerViewAdapter.getItemViewType(lastItemPosition);
-            if (lastItemViewType == VIEW_TYPE_PROGRESS_BAR) {
+            if (lastItemViewType == ViewType.PROGRESS_INDICATOR.getViewTypeNumber()) {
                 Log.d("OnScrollDiaryList", "DiaryListLoading");
                 loadListOnScrollEnd();
                 isLoadingListOnScrolled = true;
@@ -559,10 +541,8 @@ public abstract class DiaryYearMonthListAdapter extends ListAdapter<DiaryYearMon
     }
 
     private void clearIsLoadingListOnScrolled() {
-        if (getItemCount() == 0) {
-            return;
-        }
-        if (getItemViewType(0) != DiaryYearMonthListAdapter.VIEW_TYPE_PROGRESS_BAR) {
+        if (getItemCount() == 0) return;
+        if (getItemViewType(0) != ViewType.PROGRESS_INDICATOR.getViewTypeNumber()) {
             isLoadingListOnScrolled = false;
         }
     }
@@ -589,79 +569,85 @@ public abstract class DiaryYearMonthListAdapter extends ListAdapter<DiaryYearMon
 
     private void updateFirstVisibleSectionBarPosition() {
         RecyclerView.LayoutManager _layoutManager = recyclerView.getLayoutManager();
-        LinearLayoutManager layoutManager;
-        if (_layoutManager instanceof LinearLayoutManager) {
-            layoutManager = (LinearLayoutManager) _layoutManager;
-        } else {
-            return;
-        }
-        int firstVisibleItemPosition =
-                layoutManager.findFirstVisibleItemPosition();
+        Objects.requireNonNull(_layoutManager);
+        LinearLayoutManager layoutManager = (LinearLayoutManager) _layoutManager;
 
+        updateFirstVisibleSectionBarPosition(layoutManager);
+        updateSecondVisibleSectionBarPosition(layoutManager);
+    }
+
+    private void updateFirstVisibleSectionBarPosition(LinearLayoutManager layoutManager) {
+        Objects.requireNonNull(layoutManager);
+
+        int firstVisibleItemPosition = layoutManager.findFirstVisibleItemPosition();
         RecyclerView.ViewHolder firstVisibleViewHolder =
                 recyclerView.findViewHolderForAdapterPosition(firstVisibleItemPosition);
-        RecyclerView.ViewHolder secondVisibleViewHolder =
-                recyclerView.findViewHolderForAdapterPosition(firstVisibleItemPosition + 1);
+        Objects.requireNonNull(firstVisibleViewHolder);
+        if (!(firstVisibleViewHolder instanceof DiaryYearMonthListViewHolder)) return;
+        DiaryYearMonthListViewHolder _firstVisibleViewHolder =
+                (DiaryYearMonthListViewHolder) firstVisibleViewHolder;
 
-        if (firstVisibleViewHolder instanceof DiaryYearMonthListAdapter.DiaryYearMonthListViewHolder) {
-            DiaryYearMonthListAdapter.DiaryYearMonthListViewHolder _firstVisibleViewHolder =
-                    (DiaryYearMonthListAdapter.DiaryYearMonthListViewHolder) firstVisibleViewHolder;
-            View firstVisibleItemView =
-                    layoutManager.getChildAt(0);
-            View secondVisibleItemView =
-                    layoutManager.getChildAt(1);
-            if (firstVisibleItemView != null) {
-                float firstVisibleItemViewPositionY = firstVisibleItemView.getY();
-                if (secondVisibleItemView != null) {
-                    int sectionBarHeight = _firstVisibleViewHolder.binding.textSectionBar.getHeight();
-                    float secondVisibleItemViewPositionY = secondVisibleItemView.getY();
-                    int border = sectionBarHeight + DIARY_DAY_LIST_ITEM_MARGIN_VERTICAL;
-                    if (secondVisibleItemViewPositionY >= border) {
-                        _firstVisibleViewHolder.binding.textSectionBar.setY(-(firstVisibleItemViewPositionY));
-                    } else {
-                        if (secondVisibleItemViewPositionY < DIARY_DAY_LIST_ITEM_MARGIN_VERTICAL) {
-                            _firstVisibleViewHolder.binding.textSectionBar.setY(0);
-                        } else if (_firstVisibleViewHolder.binding.textSectionBar.getY() == 0) {
-                            _firstVisibleViewHolder.binding.textSectionBar.setY(
-                                    -(firstVisibleItemViewPositionY) - sectionBarHeight
-                            );
-                        }
-                    }
-                } else {
-                    _firstVisibleViewHolder.binding.textSectionBar.setY(-(firstVisibleItemViewPositionY));
-                }
-            }
+        View firstVisibleItemView = layoutManager.getChildAt(0);
+        Objects.requireNonNull(firstVisibleItemView);
+        View secondVisibleItemView = layoutManager.getChildAt(1);
+
+        float firstVisibleItemViewPositionY = firstVisibleItemView.getY();
+        if (secondVisibleItemView == null) {
+            _firstVisibleViewHolder.binding.textSectionBar.setY(-(firstVisibleItemViewPositionY));
+            return;
         }
-        if (secondVisibleViewHolder instanceof DiaryYearMonthListAdapter.DiaryYearMonthListViewHolder) {
-            DiaryYearMonthListAdapter.DiaryYearMonthListViewHolder _secondVisibleViewHolder =
-                    (DiaryYearMonthListAdapter.DiaryYearMonthListViewHolder) secondVisibleViewHolder;
-            _secondVisibleViewHolder.binding.textSectionBar.setY(0); // ズレ防止
+
+        int sectionBarHeight = _firstVisibleViewHolder.binding.textSectionBar.getHeight();
+        float secondVisibleItemViewPositionY = secondVisibleItemView.getY();
+        int border = sectionBarHeight + DIARY_DAY_LIST_ITEM_MARGIN_VERTICAL;
+        if (secondVisibleItemViewPositionY >= border) {
+            _firstVisibleViewHolder.binding.textSectionBar.setY(-(firstVisibleItemViewPositionY));
+        } else {
+            if (secondVisibleItemViewPositionY < DIARY_DAY_LIST_ITEM_MARGIN_VERTICAL) {
+                _firstVisibleViewHolder.binding.textSectionBar.setY(0);
+            } else if (_firstVisibleViewHolder.binding.textSectionBar.getY() == 0) {
+                _firstVisibleViewHolder.binding.textSectionBar.setY(
+                        -(firstVisibleItemViewPositionY) - sectionBarHeight
+                );
+            }
         }
     }
 
+    private void updateSecondVisibleSectionBarPosition(LinearLayoutManager layoutManager) {
+        Objects.requireNonNull(layoutManager);
+
+        int firstVisibleItemPosition = layoutManager.findFirstVisibleItemPosition();
+        RecyclerView.ViewHolder secondVisibleViewHolder =
+                recyclerView.findViewHolderForAdapterPosition(firstVisibleItemPosition + 1);
+        if (secondVisibleViewHolder == null) return;
+        if (!(secondVisibleViewHolder instanceof DiaryYearMonthListViewHolder)) return;
+        DiaryYearMonthListViewHolder _secondVisibleViewHolder =
+                (DiaryYearMonthListViewHolder) secondVisibleViewHolder;
+
+        _secondVisibleViewHolder.binding.textSectionBar.setY(0); // ズレ防止
+    }
+
     public void scrollToFirstPosition() {
-        Log.d("ボトムナビゲーションタップ確認", "scrollToFirstPosition()呼び出し");
         RecyclerView.LayoutManager layoutManager = recyclerView.getLayoutManager();
-        LinearLayoutManager linearLayoutManager = null;
-        if (layoutManager instanceof LinearLayoutManager) {
-            linearLayoutManager = (LinearLayoutManager) layoutManager;
-        }
-        if (linearLayoutManager != null) {
-            int firstVisibleItemPosition = linearLayoutManager.findFirstVisibleItemPosition();
-            Log.d("スクロール動作確認", "firstVisibleItemPosition：" + firstVisibleItemPosition);
+        Objects.requireNonNull(layoutManager);
+        LinearLayoutManager linearLayoutManager = (LinearLayoutManager) layoutManager;
 
-            // HACK:日記リスト(年月)のアイテム数が多い場合、
-            //      ユーザーが数多くのアイテムをスクロールした状態でsmoothScrollToPosition(0)を起動すると先頭にたどり着くのに時間がかかる。
-            //      その時間を回避する為に先頭付近へジャンプ(scrollToPosition())してからsmoothScrollToPosition()を起動させたかったが、
-            //      エミュレーターでは処理落ちで上手く確認できなかった。(プログラムの可能性もある)
-            int jumpPosition = 2;
-            if (firstVisibleItemPosition >= jumpPosition) {
-                Log.d("スクロール動作確認", "scrollToPosition()呼出");
-                recyclerView.scrollToPosition(jumpPosition);
-            }
+        int firstVisibleItemPosition = linearLayoutManager.findFirstVisibleItemPosition();
+        Log.d("スクロール動作確認", "firstVisibleItemPosition：" + firstVisibleItemPosition);
+
+        // HACK:日記リスト(年月)のアイテム数が多い場合、
+        //      ユーザーが数多くのアイテムをスクロールした状態でsmoothScrollToPosition(0)を起動すると先頭にたどり着くのに時間がかかる。
+        //      その時間を回避する為に先頭付近へジャンプ(scrollToPosition())してからsmoothScrollToPosition()を起動させたかったが、
+        //      エミュレーターでは処理落ちで上手く確認できなかった。(プログラムの可能性もある)
+        int jumpPosition = 2;
+        if (firstVisibleItemPosition >= jumpPosition) {
+            Log.d("スクロール動作確認", "scrollToPosition()呼出");
+            recyclerView.scrollToPosition(jumpPosition);
         }
 
-        Log.d("スクロール動作確認", "smoothScrollToPosition()呼出");
-        recyclerView.smoothScrollToPosition(0);
+        // MEMO:RecyclerViewの先頭アイテム(年月)の上部が表示されている状態でRecyclerView#.smoothScrollToPosition(0)を呼び出すと、
+        //      先頭アイテムの底部が表示されるようにスクロールしてしまう。対策として、下記条件追加。
+        boolean canScrollUp = recyclerView.canScrollVertically(-1);
+        if (canScrollUp) recyclerView.smoothScrollToPosition(0);
     }
 }

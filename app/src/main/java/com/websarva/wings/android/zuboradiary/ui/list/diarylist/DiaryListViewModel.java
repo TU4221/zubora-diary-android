@@ -2,10 +2,10 @@ package com.websarva.wings.android.zuboradiary.ui.list.diarylist;
 
 import android.util.Log;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.ViewModel;
 
 import com.google.common.util.concurrent.ListenableFuture;
 import com.websarva.wings.android.zuboradiary.data.AppError;
@@ -13,13 +13,13 @@ import com.websarva.wings.android.zuboradiary.data.database.Diary;
 import com.websarva.wings.android.zuboradiary.data.database.DiaryListItem;
 import com.websarva.wings.android.zuboradiary.data.database.DiaryRepository;
 import com.websarva.wings.android.zuboradiary.ui.BaseViewModel;
-import com.websarva.wings.android.zuboradiary.ui.list.DiaryYearMonthListAdapter;
 
 import java.time.LocalDate;
 import java.time.YearMonth;
 import java.time.temporal.TemporalAdjusters;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -35,7 +35,7 @@ public class DiaryListViewModel extends BaseViewModel {
 
     private final DiaryRepository diaryRepository;
     private Future<?> diaryListLoadingFuture; // キャンセル用
-    private final MutableLiveData<List<DiaryYearMonthListItem>> diaryList = new MutableLiveData<>();
+    private final MutableLiveData<DiaryYearMonthList> diaryList = new MutableLiveData<>();
     /**
      * データベース読込からRecyclerViewへの反映までを true とする。
      */
@@ -45,7 +45,7 @@ public class DiaryListViewModel extends BaseViewModel {
     private LocalDate sortConditionDate;
     private final ExecutorService executorService;
 
-
+    boolean isValidityDelay = true;// TODO:調整用
 
     @Inject
     public DiaryListViewModel(DiaryRepository diaryRepository) {
@@ -57,8 +57,7 @@ public class DiaryListViewModel extends BaseViewModel {
     @Override
     protected void initialize() {
         super.initialize();
-        diaryList.setValue(new ArrayList<>());
-        isVisibleUpdateProgressBar.setValue(false);
+        diaryList.setValue(new DiaryYearMonthList());
         isVisibleUpdateProgressBar.setValue(false);
         sortConditionDate = null;
     }
@@ -76,290 +75,200 @@ public class DiaryListViewModel extends BaseViewModel {
         return diaryListLoadingFuture.isDone();
     }
 
-    public void loadList(LoadType loadType) {
-        // 先頭年月切替で切替中に再度切り替えられた時に前回の読込処理キャンセル
+    void loadNewDiaryList() {
+        loadDiaryList(new NewDiaryListCreator());
+    }
+
+    void loadAdditionDiaryList() {
+        loadDiaryList(new AddedDiaryListCreator());
+    }
+
+    void updateDiaryList() {
+        loadDiaryList(new UpdateDiaryListCreator());
+    }
+
+    private void loadDiaryList(DiaryListCreator creator) {
+        Log.d("DiaryListLoading", "loadDiaryList()");
+        cancelPreviousLoading();
+        DiaryListLoadingRunnable runnable = new DiaryListLoadingRunnable(creator);
+        diaryListLoadingFuture = executorService.submit(runnable);
+    }
+
+    private void cancelPreviousLoading() {
         if (!canLoadDiaryList()) {
             diaryListLoadingFuture.cancel(true);
         }
-        Log.d("OnScrollDiaryList", "loadList()_start");
-        diaryListLoadingFuture = executorService.submit(new Runnable() {
-            @Override
-            public void run() {
-                boolean isValidityDelay = true;// TODO:調整用
-                Log.d("DiaryListLoading", "run()_start");
-                List<DiaryYearMonthListItem> previousDiaryList = new ArrayList<>();
-                try {
-                    // 日記リスト読込準備
-                    Log.d("DiaryListLoading", "prepare");
-                    List<DiaryYearMonthListItem> currentDiaryList = diaryList.getValue();
-                    Log.d("DiaryListLoading", "currentDiaryListSize:" + currentDiaryList.size());
-                    if (loadType == LoadType.UPDATE) {
-                        isVisibleUpdateProgressBar.postValue(true);
-                    } else {
-                        isVisibleUpdateProgressBar.postValue(false);
-                    }
-                    int numLoadingItems;
-                    int loadingOffset;
-                    if (loadType == LoadType.UPDATE) {
-                        if (currentDiaryList == null || currentDiaryList.isEmpty()) {
-                            return;
-                        }
-                        numLoadingItems = countDiaryListDayItem(currentDiaryList);
-                        // HACK:画面全体にリストアイテムが存在しない状態で日記を追加した後にリスト画面に戻ると、
-                        //      日記追加前のアイテム数しか表示されない状態となる。また、スクロール更新もできない。
-                        //      対策として下記コードを記述。
-                        if (numLoadingItems < NUM_LOADING_ITEMS) {
-                            numLoadingItems = NUM_LOADING_ITEMS;
-                        }
-                        loadingOffset = 0;
-                    } else if (loadType == LoadType.ADD) {
-                        numLoadingItems = NUM_LOADING_ITEMS;
-                        if (currentDiaryList == null || currentDiaryList.isEmpty()) {
-                            // TODO:assert
-                            return;
-                        } else {
-                            loadingOffset = countDiaryListDayItem(currentDiaryList);
-                        }
-                    } else {
-                        // LoadType.NEW
-                        numLoadingItems = NUM_LOADING_ITEMS;
-                        loadingOffset = 0;
-                    }
+    }
 
-                    // 現時点のDiaryListをCloneで生成
-                    if (loadType != LoadType.NEW) {
-                        if (currentDiaryList != null && !currentDiaryList.isEmpty()) {
-                            for (DiaryYearMonthListItem item : currentDiaryList) {
-                                DiaryYearMonthListItem cloneItem = item.clone();
-                                previousDiaryList.add(cloneItem);
-                            }
-                        }
-                    }
+    private interface DiaryListCreator {
 
-                    // ProgressBar表示
-                    List<DiaryYearMonthListItem> diaryListContainingProgressBar = new ArrayList<>();
-                    if (loadType == LoadType.NEW) {
-                        DiaryYearMonthListItem progressBar =
-                                new DiaryYearMonthListItem(
-                                        DiaryYearMonthListAdapter.VIEW_TYPE_PROGRESS_BAR
-                                );
-                        diaryListContainingProgressBar.add(progressBar);
-                        diaryList.postValue(diaryListContainingProgressBar);
-                    }
+        @NonNull
+        DiaryYearMonthList create() throws CancellationException, ExecutionException, InterruptedException;
+    }
 
-                    if (isValidityDelay) {
-                        // TODO:ProgressBarを表示させる為に仮で記述
-                        Thread.sleep(1000);
-                    }
+    private class DiaryListLoadingRunnable implements Runnable {
 
-                    // 日記リスト読込
-                    Log.d("DiaryListLoading", "startLoading");
-                    Integer numExistingDiaries;
-                    List<DiaryYearMonthListItem> convertedLoadingData = new ArrayList<>();
-                    ListenableFuture<Integer> listenableFuture =
-                            diaryRepository.countDiaries(sortConditionDate);
-                    if (sortConditionDate == null) {
-                        Log.d("DiaryListLoading", "NoUnloadedDiaries_sortConditionDate:null");
-                    } else {
-                        Log.d("DiaryListLoading", "NoUnloadedDiaries_sortConditionDate:nullでない");
-                    }
-                    numExistingDiaries = listenableFuture.get();
-                    Log.d("OnScrollDiaryList", " numLoadingItems:" +  numLoadingItems);
-                    Log.d("OnScrollDiaryList", " loadingOffset:" +  loadingOffset);
-                    ListenableFuture<List<DiaryListItem>> listListenableFuture =
-                            diaryRepository.selectDiaryListOrderByDateDesc(
-                                    numLoadingItems,
-                                    loadingOffset,
-                                    sortConditionDate
-                            );
+        DiaryListCreator diaryListCreator;
 
-                    // 日付が変更された時、リスト読込キャンセル
-                    List<DiaryListItem> loadingData = listListenableFuture.get();
-                    if (!loadingData.isEmpty()) {
-                        convertedLoadingData = toDiaryYearMonthListFormat(loadingData);
-                    }
+        DiaryListLoadingRunnable(DiaryListCreator diaryListCreator) {
+            this.diaryListCreator = diaryListCreator;
+        }
 
-                    // 更新用日記リスト準備
-                    List<DiaryYearMonthListItem> updateDiaryList = new ArrayList<>();
-                    if (loadType == LoadType.ADD) {
-                        for (DiaryYearMonthListItem item : previousDiaryList) {
-                            DiaryYearMonthListItem cloneItem = item.clone();
-                            updateDiaryList.add(cloneItem);
-                        }
-                        int updateDiaryListLastItemPosition = updateDiaryList.size() - 1;
-                        DiaryYearMonthListItem diaryYearMonthListItem =
-                                updateDiaryList.get(updateDiaryListLastItemPosition);
-                        if (diaryYearMonthListItem.getViewType() != DiaryYearMonthListAdapter.VIEW_TYPE_DIARY) {
-                            updateDiaryList.remove(updateDiaryListLastItemPosition);
-                        }
-                    }
-
-                    // 読込データを更新用日記リストへ追加
-                    Log.d("DiaryListLoading", "LoadedDataSize:" + convertedLoadingData.size());
-                    if (!convertedLoadingData.isEmpty()) {
-                        if (loadType == LoadType.ADD) {
-                            // 前回の読込リストの最終アイテムの年月取得
-                            int previousDiaryListProgressBar = previousDiaryList.size() - 1;
-                            int previousDiaryListLastItemPosition = previousDiaryListProgressBar - 1;
-                            DiaryYearMonthListItem previousDiaryYearMonthListLastItem =
-                                    previousDiaryList.get(previousDiaryListLastItemPosition);
-                            YearMonth previousDiaryYearMonthListLastItemYearMonth =
-                                    previousDiaryYearMonthListLastItem.getYearMonth();
-
-                            // 今回の読込リストの先頭アイテムの年月取得
-                            DiaryYearMonthListItem additionalDiaryListFirstItem =
-                                    convertedLoadingData.get(0);
-                            YearMonth additionalDiaryListFirstItemYearMonth =
-                                    additionalDiaryListFirstItem.getYearMonth();
-
-                            // 前回の読込リストに今回の読込リストの年月が含まれていたら,
-                            // そこにDiaryDayListItemを足し込む
-                            if (previousDiaryYearMonthListLastItemYearMonth
-                                    .equals(additionalDiaryListFirstItemYearMonth)) {
-                                List<DiaryDayListItem> additionalDiaryDayListItemList =
-                                        additionalDiaryListFirstItem.getDiaryDayListItemList();
-                                updateDiaryList.get(previousDiaryListLastItemPosition)
-                                        .getDiaryDayListItemList().addAll(additionalDiaryDayListItemList);
-                                convertedLoadingData.remove(0);
-                            }
-                        }
-                        updateDiaryList.addAll(convertedLoadingData);
-                    }
-
-                    // 次回読み込む日記あり確認
-                    boolean existsUnloadedDiaries =
-                            countDiaryListDayItem(updateDiaryList) < numExistingDiaries;
-                    if (numExistingDiaries > 0 && !existsUnloadedDiaries) {
-                        Log.d("DiaryListLoading", "NoUnloadedDiaries");
-                        Log.d("DiaryListLoading", "NoUnloadedDiaries_count" + countDiaryListDayItem(updateDiaryList));
-                        Log.d("DiaryListLoading", "NoUnloadedDiaries_numExistingDiaries" + numExistingDiaries);
-                        DiaryYearMonthListItem noDiaryMessage =
-                                new DiaryYearMonthListItem(
-                                        DiaryYearMonthListAdapter.VIEW_TYPE_NO_DIARY_MESSAGE
-                                );
-                        updateDiaryList.add(noDiaryMessage);
-                    } else {
-                        DiaryYearMonthListItem noDiaryMessage =
-                                new DiaryYearMonthListItem(
-                                        DiaryYearMonthListAdapter.VIEW_TYPE_PROGRESS_BAR
-                                );
-                        updateDiaryList.add(noDiaryMessage);
-                    }
-
-                    // 日記リスト読込完了処理
-                    diaryList.postValue(updateDiaryList);
-                } catch (CancellationException e) {
-                    e.printStackTrace();
-                    // 例外処理なし
-
-                } catch (ExecutionException e) {
-                    e.printStackTrace();
+        @Override
+        public void run() {
+            Log.d("DiaryListLoading", "DiaryListLoadingRunnable.run()");
+            DiaryYearMonthList previousDiaryList = diaryList.getValue();
+            Objects.requireNonNull(previousDiaryList);
+            try {
+                DiaryYearMonthList updateDiaryList = diaryListCreator.create();
+                Log.d("DiaryListLoading", "diaryList.postValue()");
+                diaryList.postValue(updateDiaryList);
+            } catch (CancellationException e) {
+                e.printStackTrace();
+                // 例外処理なし
+            } catch (ExecutionException e) {
+                e.printStackTrace();
+                diaryList.postValue(previousDiaryList);
+                addAppError(AppError.DIARY_LOADING);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+                if (!isValidityDelay) {
                     diaryList.postValue(previousDiaryList);
                     addAppError(AppError.DIARY_LOADING);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                    if (!isValidityDelay) {
-                        diaryList.postValue(previousDiaryList);
-                        addAppError(AppError.DIARY_LOADING);
-                    }
-                } finally {
-                    isVisibleUpdateProgressBar.postValue(false);
-                    Log.d("DiaryListLoading", "run()_end");
                 }
-            }
-        });
-        Log.d("OnScrollDiaryList", "loadList()_end");
-    }
-
-    private int countDiaryListDayItem(List<DiaryYearMonthListItem> diaryList) {
-        int count = 0;
-        for (DiaryYearMonthListItem item: diaryList) {
-            if (item.getViewType() == DiaryYearMonthListAdapter.VIEW_TYPE_DIARY) {
-                count += item.getDiaryDayListItemList().size();
+            } catch (Exception e) {
+                e.printStackTrace();
             }
         }
-        return count;
     }
 
-    private List<DiaryYearMonthListItem> toDiaryYearMonthListFormat(List<DiaryListItem> beforeList) {
-        List<DiaryDayListItem> diaryDayList = toDiaryDayList(beforeList);
-        return toDiaryYearMonthList(diaryDayList);
-    }
+    private class NewDiaryListCreator implements DiaryListCreator {
 
-    private List<DiaryDayListItem> toDiaryDayList(List<DiaryListItem> beforeList) {
-        List<DiaryDayListItem> diaryDayList = new ArrayList<>();
-        for (DiaryListItem diaryListItem : beforeList) {
-            String strDate = diaryListItem.getDate();
-            LocalDate date = LocalDate.parse(strDate);
-            String title = diaryListItem.getTitle();
-            String picturePath = diaryListItem.getPicturePath();
-            DiaryDayListItem diaryDayListItem = new DiaryDayListItem(date, title, picturePath);
-            diaryDayList.add(diaryDayListItem);
+        @Override
+        @NonNull
+        public DiaryYearMonthList create()
+                throws CancellationException, ExecutionException, InterruptedException {
+            showDiaryListFirstItemProgressIndicator();
+            if (isValidityDelay) Thread.sleep(1000);
+            return loadDiaryList(NUM_LOADING_ITEMS, 0);
         }
-        return diaryDayList;
+
+        private void showDiaryListFirstItemProgressIndicator() {
+            DiaryYearMonthList list = new DiaryYearMonthList();
+            diaryList.postValue(list);
+        }
     }
 
-    private List<DiaryYearMonthListItem> toDiaryYearMonthList(List<DiaryDayListItem> beforeList) {
-        final int VIEW_TYPE_DIARY = DiaryYearMonthListAdapter.VIEW_TYPE_DIARY;
-        List<DiaryDayListItem> sortingList= new ArrayList<>();
-        List<DiaryYearMonthListItem> diaryYearMonthList = new ArrayList<>();
-        DiaryYearMonthListItem diaryYearMonthListItem;
-        YearMonth sortingYearMonth = null;
+    private class AddedDiaryListCreator implements DiaryListCreator {
 
-        for (DiaryDayListItem day: beforeList) {
-            LocalDate date = day.getDate();
-            YearMonth yearMonth = YearMonth.of(date.getYear(), date.getMonth());
+        @Override
+        @NonNull
+        public DiaryYearMonthList create()
+                throws CancellationException, ExecutionException, InterruptedException {
+            DiaryYearMonthList currentDiaryList = diaryList.getValue();
+            Objects.requireNonNull(currentDiaryList);
+            if (currentDiaryList.getDiaryYearMonthListItemList().isEmpty()) throw new IllegalStateException();
 
-            if (sortingYearMonth != null && !yearMonth.equals(sortingYearMonth)) {
-                diaryYearMonthListItem =
-                        new DiaryYearMonthListItem(sortingYearMonth, sortingList, VIEW_TYPE_DIARY);
-                diaryYearMonthList.add(diaryYearMonthListItem);
-                sortingList= new ArrayList<>();
+            if (isValidityDelay) Thread.sleep(1000);
+            int loadingOffset = currentDiaryList.countDiaries();
+            DiaryYearMonthList loadedDiaryList = loadDiaryList(NUM_LOADING_ITEMS, loadingOffset);
+            int numLoadedDiaries = currentDiaryList.countDiaries() + loadedDiaryList.countDiaries();
+            boolean existsUnloadedDiaries = existsUnloadedDiaries(numLoadedDiaries);
+            return currentDiaryList.combineDiaryLists(loadedDiaryList, !existsUnloadedDiaries);
+        }
+    }
+
+    private class UpdateDiaryListCreator implements DiaryListCreator {
+
+        @Override
+        @NonNull
+        public DiaryYearMonthList create()
+                throws CancellationException, ExecutionException, InterruptedException {
+            DiaryYearMonthList currentDiaryList = diaryList.getValue();
+            Objects.requireNonNull(currentDiaryList);
+            if (currentDiaryList.getDiaryYearMonthListItemList().isEmpty()) throw new IllegalStateException();
+
+            isVisibleUpdateProgressBar.postValue(true);
+            try {
+                if (isValidityDelay) Thread.sleep(3000);
+                int numLoadingItems = currentDiaryList.countDiaries();
+                // HACK:画面全体にリストアイテムが存在しない状態で日記を追加した後にリスト画面に戻ると、
+                //      日記追加前のアイテム数しか表示されない状態となる。また、スクロール更新もできない。
+                //      対策として下記コードを記述。
+                if (numLoadingItems < NUM_LOADING_ITEMS) {
+                    numLoadingItems = NUM_LOADING_ITEMS;
+                }
+                return loadDiaryList(numLoadingItems, 0);
+            } finally {
+                isVisibleUpdateProgressBar.postValue(false);
             }
-            sortingList.add(day);
-            sortingYearMonth = yearMonth;
         }
-        if (sortingYearMonth != null) {
-            diaryYearMonthListItem =
-                    new DiaryYearMonthListItem(sortingYearMonth, sortingList, VIEW_TYPE_DIARY);
-            diaryYearMonthList.add(diaryYearMonthListItem);
-        } else {
-            // TODO:assert
-        }
+    }
 
-        return diaryYearMonthList;
+    @NonNull
+    private DiaryYearMonthList loadDiaryList(int numLoadingItems, int loadingOffset)
+            throws CancellationException, ExecutionException, InterruptedException {
+        if (numLoadingItems <= 0) throw new IllegalArgumentException();
+        if (loadingOffset < 0) throw new IllegalArgumentException();
+
+
+        ListenableFuture<List<DiaryListItem>> listListenableFuture =
+                diaryRepository.selectDiaryListOrderByDateDesc(
+                        numLoadingItems,
+                        loadingOffset,
+                        sortConditionDate
+                );
+
+        List<DiaryListItem> loadedDiaryList = listListenableFuture.get();
+        List<DiaryDayListItem> diaryDayListItemList = new ArrayList<>();
+        loadedDiaryList.stream().forEach(x -> diaryDayListItemList.add(new DiaryDayListItem(x)));
+        DiaryDayList diaryDayList = new DiaryDayList(diaryDayListItemList);
+        boolean existsUnloadedDiaries = existsUnloadedDiaries(diaryDayList.countDiaries());
+        return new DiaryYearMonthList(diaryDayList, !existsUnloadedDiaries);
+    }
+
+    private boolean existsUnloadedDiaries(int numLoadedDiaries)
+            throws CancellationException, ExecutionException, InterruptedException {
+
+        Integer numExistingDiaries = diaryRepository.countDiaries(sortConditionDate).get();
+        Objects.requireNonNull(numExistingDiaries);
+        if (numExistingDiaries <= 0) return false;
+
+        return numLoadedDiaries < numExistingDiaries;
     }
 
     public void updateSortConditionDate(YearMonth yearMonth) {
+        Objects.requireNonNull(yearMonth);
+
         sortConditionDate= yearMonth.atDay(1).with(TemporalAdjusters.lastDayOfMonth());
     }
 
     public void deleteDiary(LocalDate date) {
+        Objects.requireNonNull(date);
+
         Integer result;
         try {
             result = diaryRepository.deleteDiary(date).get();
-        } catch (Exception e) {
+        } catch (CancellationException | ExecutionException | InterruptedException e) {
             addAppError(AppError.DIARY_DELETE);
             return;
         }
-        if (result == null) {
-            return;
-            // TODO:assert
-        }
+        Objects.requireNonNull(result);
+
         // 削除件数 = 1が正常
         if (result != 1) {
             addAppError(AppError.DIARY_DELETE);
             return;
         }
 
-        loadList(LoadType.UPDATE);
+        updateDiaryList();
     }
 
     @Nullable
     public Integer countDiaries() {
         try {
             return diaryRepository.countDiaries(null).get();
-        } catch (Exception e) {
+        } catch (CancellationException | ExecutionException | InterruptedException e) {
             addAppError(AppError.DIARY_INFORMATION_LOADING);
             return null;
         }
@@ -367,9 +276,11 @@ public class DiaryListViewModel extends BaseViewModel {
 
 
     @Nullable
-    public Diary loadNewestDiary() {
+    public LocalDate loadNewestDiary() {
         try {
-            return diaryRepository.selectNewestDiary().get();
+            Diary diary = diaryRepository.selectNewestDiary().get();
+            String strDate = diary.getDate();
+            return LocalDate.parse(strDate);
         } catch (Exception e) {
             addAppError(AppError.DIARY_INFORMATION_LOADING);
             return null;
@@ -377,9 +288,11 @@ public class DiaryListViewModel extends BaseViewModel {
     }
 
     @Nullable
-    public Diary loadOldestDiary() {
+    public LocalDate loadOldestDiary() {
         try {
-            return diaryRepository.selectOldestDiary().get();
+            Diary diary = diaryRepository.selectOldestDiary().get();
+            String strDate = diary.getDate();
+            return LocalDate.parse(strDate);
         } catch (Exception e) {
             addAppError(AppError.DIARY_INFORMATION_LOADING);
             return null;
@@ -387,7 +300,7 @@ public class DiaryListViewModel extends BaseViewModel {
     }
 
     // LiveDataGetter
-    public LiveData<List<DiaryYearMonthListItem>> getDiaryListLiveData() {
+    public LiveData<DiaryYearMonthList> getDiaryListLiveData() {
         return diaryList;
     }
 

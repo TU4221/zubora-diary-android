@@ -2,23 +2,21 @@ package com.websarva.wings.android.zuboradiary.ui.list.diarylist;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ProgressBar;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.widget.Toolbar;
+import androidx.databinding.ViewDataBinding;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.SavedStateHandle;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavDirections;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.websarva.wings.android.zuboradiary.R;
 
 import java.time.LocalDate;
@@ -26,15 +24,13 @@ import java.time.Year;
 import java.time.YearMonth;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
-import com.websarva.wings.android.zuboradiary.data.database.Diary;
 import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor;
 import com.websarva.wings.android.zuboradiary.databinding.FragmentDiaryListBinding;
 import com.websarva.wings.android.zuboradiary.ui.BaseFragment;
-import com.websarva.wings.android.zuboradiary.ui.ColorSwitchingViewList;
 import com.websarva.wings.android.zuboradiary.ui.list.DiaryYearMonthListItemBase;
 import com.websarva.wings.android.zuboradiary.ui.list.DiaryYearMonthListAdapter;
-import com.websarva.wings.android.zuboradiary.ui.list.ListThemeColorSwitcher;
 import com.websarva.wings.android.zuboradiary.ui.settings.SettingsViewModel;
 
 import dagger.hilt.android.AndroidEntryPoint;
@@ -68,13 +64,13 @@ public class DiaryListFragment extends BaseFragment {
     }
 
     @Override
-    protected View initializeDataBinding(@NonNull LayoutInflater inflater, ViewGroup container) {
+    protected ViewDataBinding initializeDataBinding(@NonNull LayoutInflater inflater, @NonNull ViewGroup container) {
         ThemeColor themeColor = settingsViewModel.loadThemeColorSettingValue();
         LayoutInflater themeColorInflater = createThemeColorInflater(inflater, themeColor);
         binding = FragmentDiaryListBinding.inflate(themeColorInflater, container, false);
         binding.setLifecycleOwner(this);
         binding.setListViewModel(diaryListViewModel);
-        return binding.getRoot();
+        return binding;
     }
 
 
@@ -85,11 +81,6 @@ public class DiaryListFragment extends BaseFragment {
         setUpToolBar();
         setUpFloatActionButton();
         setUpDiaryList();
-    }
-
-    @Override
-    protected void setUpThemeColor() {
-        // 処理なし // TODO:BaseFragmentのメソッド削除
     }
 
     @Override
@@ -117,24 +108,24 @@ public class DiaryListFragment extends BaseFragment {
 
     // 日付入力ダイアログフラグメントから結果受取
     private void receiveDatePickerDialogResults(SavedStateHandle savedStateHandle) {
+        Objects.requireNonNull(savedStateHandle);
+
         YearMonth selectedYearMonth =
                 receiveResulFromDialog(StartYearMonthPickerDialogFragment.KEY_SELECTED_YEAR_MONTH);
-        if (selectedYearMonth == null) {
-            return;
-        }
+        if (selectedYearMonth == null) return;
 
         diaryListViewModel.updateSortConditionDate(selectedYearMonth);
-        diaryListScrollToFirstPosition();
-        diaryListViewModel.loadList(DiaryListViewModel.LoadType.NEW);
+        scrollDiaryListToFirstPosition();
+        diaryListViewModel.loadNewDiaryList();
     }
 
     // 日記削除ダイアログフラグメントから結果受取
     private void receiveDiaryDeleteConfirmationDialogResults(SavedStateHandle savedStateHandle) {
+        Objects.requireNonNull(savedStateHandle);
+
         LocalDate deleteDiaryDate =
                 receiveResulFromDialog(DiaryDeleteConfirmationDialogFragment.KEY_DELETE_DIARY_DATE);
-        if (deleteDiaryDate == null) {
-            return;
-        }
+        if (deleteDiaryDate == null) return;
 
         diaryListViewModel.deleteDiary(deleteDiaryDate);
     }
@@ -145,20 +136,16 @@ public class DiaryListFragment extends BaseFragment {
                 .setNavigationOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        // リスト先頭年月切り替えダイアログ起動
-                        Diary newestDiary = diaryListViewModel.loadNewestDiary();
-                        Diary oldestDiary = diaryListViewModel.loadOldestDiary();
-                        if (newestDiary == null) {
-                            throw new NullPointerException();
-                        }
-                        if (oldestDiary == null) {
-                            throw new NullPointerException();
-                        }
+                        Objects.requireNonNull(v);
 
-                        String newestDate = newestDiary.getDate();
-                        String oldestDate = oldestDiary.getDate();
-                        Year newestYear = Year.of(LocalDate.parse(newestDate).getYear());
-                        Year oldestYear = Year.of(LocalDate.parse(oldestDate).getYear());
+                        // リスト先頭年月切り替えダイアログ起動
+                        LocalDate newestDiaryDate = diaryListViewModel.loadNewestDiary();
+                        LocalDate oldestDiaryDate = diaryListViewModel.loadOldestDiary();
+                        if (newestDiaryDate == null) return;
+                        if (oldestDiaryDate == null) return;
+
+                        Year newestYear = Year.of(newestDiaryDate.getYear());
+                        Year oldestYear = Year.of(oldestDiaryDate.getYear());
                         showStartYearMonthPickerDialog(newestYear, oldestYear);
                     }
                 });
@@ -167,6 +154,8 @@ public class DiaryListFragment extends BaseFragment {
                 .setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
                     @Override
                     public boolean onMenuItemClick(MenuItem item) {
+                        Objects.requireNonNull(item);
+
                         // ワード検索フラグメント起動
                         if (item.getItemId() == R.id.diaryListToolbarOptionWordSearch) {
                             showWordSearchFragment();
@@ -182,6 +171,8 @@ public class DiaryListFragment extends BaseFragment {
         binding.fabEditDiary.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Objects.requireNonNull(v);
+
                 showEditDiary();
             }
         });
@@ -202,52 +193,29 @@ public class DiaryListFragment extends BaseFragment {
         diaryListAdapter.setOnClickChildItemListener(new DiaryYearMonthListAdapter.OnClickChildItemListener() {
             @Override
             public void onClick(LocalDate date) {
+                Objects.requireNonNull(date);
+
                 showShowDiaryFragment(date);
             }
         });
         diaryListAdapter.setOnClickChildItemBackgroundButtonListener(new DiaryYearMonthListAdapter.OnClickChildItemBackgroundButtonListener() {
             @Override
             public void onClick(LocalDate date) {
+                Objects.requireNonNull(date);
+
                 showDiaryDeleteConfirmationDialog(date);
             }
         });
 
-        diaryListViewModel.getDiaryListLiveData().observe(
-                getViewLifecycleOwner(),
-                new Observer<List<DiaryYearMonthListItem>>() {
-                    @Override
-                    public void onChanged(List<DiaryYearMonthListItem> diaryListItems) {
-                        if (diaryListItems == null) {
-                            return;
-                        }
-                        if (diaryListItems.isEmpty()) return;
-                        DiaryYearMonthListAdapter diaryYearMonthListAdapter =
-                                (DiaryYearMonthListAdapter)
-                                        binding.recyclerDiaryYearMonthList.getAdapter();
-                        if (diaryYearMonthListAdapter == null) {
-                            return;
-                        }
-
-                        boolean isNoDiary =
-                                diaryListItems.get(0).getViewType() == DiaryYearMonthListAdapter.VIEW_TYPE_NO_DIARY_MESSAGE;
-                        if (isNoDiary) {
-                            binding.textDiaryListNoDiaryMessage.setVisibility(View.VISIBLE);
-                            binding.recyclerDiaryYearMonthList.setVisibility(View.INVISIBLE);
-                        } else {
-                            binding.textDiaryListNoDiaryMessage.setVisibility(View.INVISIBLE);
-                            binding.recyclerDiaryYearMonthList.setVisibility(View.VISIBLE);
-                        }
-
-                        List<DiaryYearMonthListItemBase> convertedList = new ArrayList<>(diaryListItems);
-                        diaryYearMonthListAdapter.submitList(convertedList);
-                    }
-                }
-        );
+        diaryListViewModel.getDiaryListLiveData().observe(getViewLifecycleOwner(), new DiaryListObserver());
 
         // 画面全体ProgressBar表示中はタッチ無効化
         binding.includeProgressIndicator.viewBackground.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
+                Objects.requireNonNull(v);
+                Objects.requireNonNull(event);
+
                 v.performClick();
                 return true;
             }
@@ -264,7 +232,7 @@ public class DiaryListFragment extends BaseFragment {
 
         @Override
         public void loadListOnScrollEnd() {
-            diaryListViewModel.loadList(DiaryListViewModel.LoadType.ADD);
+            diaryListViewModel.loadAdditionDiaryList();
         }
 
         @Override
@@ -273,23 +241,60 @@ public class DiaryListFragment extends BaseFragment {
         }
     }
 
-    private void loadDiaryList() {
-        List<DiaryYearMonthListItem> diaryYearMonthList =
-                diaryListViewModel.getDiaryListLiveData().getValue();
-        if (diaryYearMonthList == null || diaryYearMonthList.isEmpty()) {
-            Integer numSavedDiaries = diaryListViewModel.countDiaries();
-            if (numSavedDiaries != null && numSavedDiaries >= 1) {
-                diaryListViewModel.loadList(DiaryListViewModel.LoadType.NEW);
+    private class DiaryListObserver implements Observer<DiaryYearMonthList> {
+
+        @Override
+        public void onChanged(DiaryYearMonthList list) {
+            Objects.requireNonNull(list);
+            if (list.getDiaryYearMonthListItemList().isEmpty()) return;
+
+            setUpListViewVisibility(list);
+            setUpList(list);
+        }
+
+        private void setUpListViewVisibility(DiaryYearMonthList list) {
+            Objects.requireNonNull(list);
+
+            boolean isNoDiary =
+                    list.getDiaryYearMonthListItemList().get(0).isNoDiaryMessageViewType();
+            if (isNoDiary) {
+                binding.textDiaryListNoDiaryMessage.setVisibility(View.VISIBLE);
+                binding.recyclerDiaryYearMonthList.setVisibility(View.INVISIBLE);
+            } else {
+                binding.textDiaryListNoDiaryMessage.setVisibility(View.INVISIBLE);
+                binding.recyclerDiaryYearMonthList.setVisibility(View.VISIBLE);
             }
+        }
+
+        private void setUpList(DiaryYearMonthList list) {
+            Objects.requireNonNull(list);
+
+            List<DiaryYearMonthListItemBase> convertedItemList =
+                    new ArrayList<>(list.getDiaryYearMonthListItemList());
+            DiaryYearMonthListAdapter listAdapter =
+                    (DiaryYearMonthListAdapter)
+                            binding.recyclerDiaryYearMonthList.getAdapter();
+            Objects.requireNonNull(listAdapter);
+            listAdapter.submitList(convertedItemList);
+        }
+    }
+
+    private void loadDiaryList() {
+        DiaryYearMonthList diaryList = diaryListViewModel.getDiaryListLiveData().getValue();
+        Objects.requireNonNull(diaryList);
+
+        if (diaryList.countDiaries() == 0) {
+            Integer numSavedDiaries = diaryListViewModel.countDiaries();
+            if (numSavedDiaries == null) return;
+
+            if (numSavedDiaries >= 1) diaryListViewModel.loadNewDiaryList();
         } else {
-            diaryListViewModel.loadList(DiaryListViewModel.LoadType.UPDATE);
+            diaryListViewModel.updateDiaryList();
         }
     }
 
     private void showEditDiary() {
-        if (!canShowOtherFragment()) {
-            return;
-        }
+        if (!canShowOtherFragment()) return;
 
         NavDirections action =
                 DiaryListFragmentDirections
@@ -302,12 +307,8 @@ public class DiaryListFragment extends BaseFragment {
     }
 
     private void showShowDiaryFragment(LocalDate date) {
-        if (date == null) {
-            throw new NullPointerException();
-        }
-        if (!canShowOtherFragment()) {
-            return;
-        }
+        Objects.requireNonNull(date);
+        if (!canShowOtherFragment()) return;
 
         NavDirections action =
                 DiaryListFragmentDirections
@@ -316,9 +317,7 @@ public class DiaryListFragment extends BaseFragment {
     }
 
     private void showWordSearchFragment() {
-        if (!canShowOtherFragment()) {
-            return;
-        }
+        if (!canShowOtherFragment()) return;
 
         NavDirections action =
                 DiaryListFragmentDirections
@@ -327,15 +326,9 @@ public class DiaryListFragment extends BaseFragment {
     }
 
     private void showStartYearMonthPickerDialog(Year newestYear, Year oldestYear) {
-        if (newestYear == null) {
-            throw new NullPointerException();
-        }
-        if (oldestYear == null) {
-            throw new NullPointerException();
-        }
-        if (!canShowOtherFragment()) {
-            return;
-        }
+        Objects.requireNonNull(newestYear);
+        Objects.requireNonNull(oldestYear);
+        if (!canShowOtherFragment()) return;
 
         NavDirections action =
                 DiaryListFragmentDirections
@@ -344,12 +337,8 @@ public class DiaryListFragment extends BaseFragment {
     }
 
     private void showDiaryDeleteConfirmationDialog(LocalDate date) {
-        if (date == null) {
-            throw new NullPointerException();
-        }
-        if (!canShowOtherFragment()) {
-            return;
-        }
+        Objects.requireNonNull(date);
+        if (!canShowOtherFragment()) return;
 
         NavDirections action =
                 DiaryListFragmentDirections
@@ -371,16 +360,16 @@ public class DiaryListFragment extends BaseFragment {
     }
 
     public void processOnReSelectNavigationItem(){
-        diaryListScrollToFirstPosition();
+        scrollDiaryListToFirstPosition();
     }
 
     //日記リスト(年月)を自動でトップへスクロールさせるメソッド。
-    private void diaryListScrollToFirstPosition() {
-        RecyclerView.Adapter<?> adapter = binding.recyclerDiaryYearMonthList.getAdapter();
-        if (adapter instanceof DiaryYearMonthListAdapter) {
-            DiaryYearMonthListAdapter diaryYearMonthListAdapter = (DiaryYearMonthListAdapter) adapter;
-            diaryYearMonthListAdapter.scrollToFirstPosition();
-        }
+    private void scrollDiaryListToFirstPosition() {
+        DiaryYearMonthListAdapter adapter =
+                (DiaryYearMonthListAdapter) binding.recyclerDiaryYearMonthList.getAdapter();
+        Objects.requireNonNull(adapter);
+
+        adapter.scrollToFirstPosition();
     }
 
     @Override

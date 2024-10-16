@@ -1,15 +1,12 @@
 package com.websarva.wings.android.zuboradiary.ui.list.diarylist;
 
 import android.content.Context;
-import android.content.res.Resources;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.view.ContextThemeWrapper;
 import androidx.databinding.ViewDataBinding;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.ListAdapter;
@@ -18,11 +15,10 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.websarva.wings.android.zuboradiary.data.DayOfWeekStringConverter;
 import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor;
 import com.websarva.wings.android.zuboradiary.databinding.RowDiaryDayListBinding;
-import com.websarva.wings.android.zuboradiary.ui.ColorSwitchingViewList;
 import com.websarva.wings.android.zuboradiary.ui.ThemeColorInflaterCreator;
-import com.websarva.wings.android.zuboradiary.ui.list.ListThemeColorSwitcher;
 
 import java.time.LocalDate;
+import java.util.Objects;
 
 public class DiaryDayListAdapter extends ListAdapter<DiaryDayListItem, DiaryDayListAdapter.DiaryDayListViewHolder> {
 
@@ -34,16 +30,9 @@ public class DiaryDayListAdapter extends ListAdapter<DiaryDayListItem, DiaryDayL
 
     public DiaryDayListAdapter(Context context, RecyclerView recyclerView, ThemeColor themeColor) {
         super(new DiaryDayListDiffUtilItemCallback());
-
-        if (context == null) {
-            throw new NullPointerException();
-        }
-        if (recyclerView == null) {
-            throw new NullPointerException();
-        }
-        if (themeColor == null) {
-            throw new NullPointerException();
-        }
+        Objects.requireNonNull(context);
+        Objects.requireNonNull(recyclerView);
+        Objects.requireNonNull(themeColor);
 
         this.context = context;
         this.recyclerView = recyclerView;
@@ -59,38 +48,65 @@ public class DiaryDayListAdapter extends ListAdapter<DiaryDayListItem, DiaryDayL
     public DiaryDayListViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
         ThemeColorInflaterCreator creator =
-                new ThemeColorInflaterCreator(context, inflater, themeColor);
+                new ThemeColorInflaterCreator(parent.getContext(), inflater, themeColor);
         LayoutInflater themeColorInflater = creator.create();
 
         RowDiaryDayListBinding binding =
-                RowDiaryDayListBinding
-                        .inflate(themeColorInflater, parent, false);
+                RowDiaryDayListBinding.inflate(themeColorInflater, parent, false);
         return new DiaryDayListViewHolder(binding);
     }
 
     @Override
-    public void onBindViewHolder(DiaryDayListViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull DiaryDayListViewHolder holder, int position) {
         DiaryDayListItem item = getItem(position);
-        LocalDate date = item.getDate();
-        String title = item.getTitle();
-        String picturePath = item.getPicturePath();
+        Objects.requireNonNull(item);
 
-        holder.date = date; // ホルダー毎に日記の日付情報一式付与
+        setUpDate(holder, item);
+        setUpTitle(holder, item);
+        setUpPicture(holder, item);
+        setUpClickListener(holder, item);
+    }
+
+    private void setUpDate(DiaryDayListViewHolder holder, DiaryDayListItem item) {
+        Objects.requireNonNull(holder);
+        Objects.requireNonNull(item);
+
+        LocalDate date = item.getDate();
 
         DayOfWeekStringConverter dayOfWeekStringConverter = new DayOfWeekStringConverter(context);
         String strDayOfWeek = dayOfWeekStringConverter.toDiaryListDayOfWeek(date.getDayOfWeek());
         holder.binding.includeDay.textDayOfWeek.setText(strDayOfWeek);
 
         holder.binding.includeDay.textDayOfMonth.setText(String.valueOf(date.getDayOfMonth()));
-        holder.binding.textRowDiaryListDayTitle.setText(title);
-        // TODO:picturePath
+    }
 
+    private void setUpTitle(DiaryDayListViewHolder holder, DiaryDayListItem item) {
+        Objects.requireNonNull(holder);
+        Objects.requireNonNull(item);
+
+        String title = item.getTitle();
+        holder.binding.textRowDiaryListDayTitle.setText(title);
+    }
+
+    private void setUpPicture(DiaryDayListViewHolder holder, DiaryDayListItem item) {
+        Objects.requireNonNull(holder);
+        Objects.requireNonNull(item);
+
+        String picturePath = item.getPicturePath();
+        // TODO:picturePath
+    }
+
+    private void setUpClickListener(DiaryDayListViewHolder holder, DiaryDayListItem item) {
+        Objects.requireNonNull(holder);
+        Objects.requireNonNull(item);
+
+        LocalDate date = item.getDate();
         holder.binding.linerLayoutForeground.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (onClickItemListener == null) {
-                    return;
-                }
+                Objects.requireNonNull(v);
+                if (onClickItemListener == null) return;
+
                 onClickItemListener.onClick(date);
             }
         });
@@ -98,18 +114,18 @@ public class DiaryDayListAdapter extends ListAdapter<DiaryDayListItem, DiaryDayL
         holder.binding.includeBackground.imageButtonDelete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (onClickDeleteButtonListener == null) {
-                    return;
-                }
+                Objects.requireNonNull(v);
+                if (onClickDeleteButtonListener == null) return;
+
                 onClickDeleteButtonListener.onClick(date);
             }
         });
-
     }
 
     public static class DiaryDayListViewHolder extends DiaryListSimpleCallback.LeftSwipeViewHolder {
-        public RowDiaryDayListBinding binding;
-        public LocalDate date;
+
+        public final RowDiaryDayListBinding binding;
+
         public DiaryDayListViewHolder(@NonNull RowDiaryDayListBinding binding) {
             super(binding);
             this.binding = binding;
@@ -132,6 +148,8 @@ public class DiaryDayListAdapter extends ListAdapter<DiaryDayListItem, DiaryDayL
     }
 
     public void setOnClickItemListener(OnClickItemListener onClickItemListener) {
+        Objects.requireNonNull(onClickItemListener);
+
         this.onClickItemListener = onClickItemListener;
     }
 
@@ -141,10 +159,12 @@ public class DiaryDayListAdapter extends ListAdapter<DiaryDayListItem, DiaryDayL
     }
 
     public void setOnClickDeleteButtonListener(OnClickDeleteButtonListener onClickDeleteButtonListener) {
+        Objects.requireNonNull(onClickDeleteButtonListener);
+
         this.onClickDeleteButtonListener = onClickDeleteButtonListener;
     }
 
-    public static class DiaryDayListDiffUtilItemCallback extends DiffUtil.ItemCallback<DiaryDayListItem> {
+    private static class DiaryDayListDiffUtilItemCallback extends DiffUtil.ItemCallback<DiaryDayListItem> {
         @Override
         public boolean areItemsTheSame(@NonNull DiaryDayListItem oldItem, @NonNull DiaryDayListItem newItem) {
             Log.d("DiaryDayList", "DiffUtil.ItemCallback_areItemsTheSame()");

@@ -11,6 +11,7 @@ import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.view.ContextThemeWrapper;
+import androidx.databinding.ViewDataBinding;
 import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.LifecycleEventObserver;
 import androidx.lifecycle.LifecycleOwner;
@@ -38,8 +39,9 @@ public abstract class BaseFragment extends CustomFragment {
     protected NavController navController;
     protected int destinationId;
 
+    @NonNull
     protected MainActivity requireMainActivity() {
-        return (MainActivity) requireActivity();
+        return Objects.requireNonNull((MainActivity) requireActivity());
     }
 
     @Override
@@ -56,9 +58,8 @@ public abstract class BaseFragment extends CustomFragment {
 
     private int getCurrentDestinationId() {
         NavDestination navDestination = navController.getCurrentDestination();
-        if (navDestination == null) {
-            throw new NullPointerException();
-        }
+        Objects.requireNonNull(navDestination);
+
         return navDestination.getId();
     }
 
@@ -66,19 +67,26 @@ public abstract class BaseFragment extends CustomFragment {
      * 戻るボタン押下時の処理。
      * */
     protected void addOnBackPressedCallback(OnBackPressedCallback callback) {
+        Objects.requireNonNull(callback);
+
         requireActivity().getOnBackPressedDispatcher().addCallback(this, callback);
     }
 
     @Override
     public View onCreateView(
             @NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        Objects.requireNonNull(container);
+
         super.onCreateView(inflater, container, savedInstanceState);
+
         setUpFragmentTransitionEffect();
-        return initializeDataBinding(inflater, container);
+
+        ViewDataBinding dataBinding = initializeDataBinding(inflater, container);
+        Objects.requireNonNull(dataBinding);
+        return dataBinding.getRoot();
     }
 
-    // TODO:戻り値Bindingクラスの方が良き
-    protected abstract View initializeDataBinding(@NonNull LayoutInflater inflater, ViewGroup container);
+    protected abstract ViewDataBinding initializeDataBinding(@NonNull LayoutInflater inflater, @NonNull ViewGroup container);
 
     // ThemeColorに合わせたインフレーター作成
     @NonNull
@@ -122,6 +130,8 @@ public abstract class BaseFragment extends CustomFragment {
     }
 
     protected void addTransitionListener(Transition.TransitionListener listener) {
+        Objects.requireNonNull(listener);
+
         MaterialSharedAxis enterTransition = (MaterialSharedAxis) getEnterTransition();
         Objects.requireNonNull(enterTransition);
         enterTransition.addListener(listener);
@@ -142,28 +152,23 @@ public abstract class BaseFragment extends CustomFragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        setUpThemeColor();
         setUpPreviousFragmentResultReceiver();
         setUpDialogResultReceiver();
         setUpErrorMessageDialog();
     }
 
-    protected abstract void setUpThemeColor();
-
     @Nullable
     private SavedStateHandle getNavBackStackEntrySavedStateHandle() {
         NavBackStackEntry navBackStackEntry = navController.getCurrentBackStackEntry();
-        if (navBackStackEntry == null) {
-            return null;
-        }
+        Objects.requireNonNull(navBackStackEntry);
+
         return navBackStackEntry.getSavedStateHandle();
     }
 
     private void setUpPreviousFragmentResultReceiver() {
         SavedStateHandle savedStateHandle = getNavBackStackEntrySavedStateHandle();
-        if (savedStateHandle == null) {
-            return;
-        }
+        Objects.requireNonNull(savedStateHandle);
+
         handleOnReceivingResultFromPreviousFragment(savedStateHandle);
     }
 
@@ -171,9 +176,7 @@ public abstract class BaseFragment extends CustomFragment {
 
     private void setUpDialogResultReceiver() {
         NavBackStackEntry navBackStackEntry = navController.getCurrentBackStackEntry();
-        if (navBackStackEntry == null) {
-            return;
-        }
+        Objects.requireNonNull(navBackStackEntry);
 
         LifecycleEventObserver lifecycleEventObserver = new LifecycleEventObserver() {
             @Override
@@ -213,14 +216,14 @@ public abstract class BaseFragment extends CustomFragment {
 
     @Nullable
     public <T> T receiveResulFromDialog(String key) {
+        Objects.requireNonNull(key);
+
         SavedStateHandle savedStateHandle = getNavBackStackEntrySavedStateHandle();
-        if (savedStateHandle == null) {
-            return null;
-        }
+        if (savedStateHandle == null) return null;
+
         boolean containsDialogResult = savedStateHandle.contains(key);
-        if (!containsDialogResult) {
-            return null;
-        }
+        if (!containsDialogResult) return null;
+
         return savedStateHandle.get(key);
     }
 
@@ -234,20 +237,16 @@ public abstract class BaseFragment extends CustomFragment {
         BaseViewModel baseViewModel;
 
         public AppErrorBufferListObserver(BaseViewModel baseViewModel) {
-            if (baseViewModel == null) {
-                throw new NullPointerException();
-            }
+            Objects.requireNonNull(baseViewModel);
+
             this.baseViewModel = baseViewModel;
         }
 
         @Override
         public void onChanged(List<AppError> appErrors) {
-            if (appErrors == null) {
-                throw new NullPointerException();
-            }
-            if (appErrors.isEmpty()) {
-                return;
-            }
+            Objects.requireNonNull(appErrors);
+            appErrors.stream().forEach(Objects::requireNonNull);
+            if (appErrors.isEmpty()) return;
 
             AppError appError = appErrors.get(0);
             showErrorMessageDialog(appError);
@@ -256,17 +255,12 @@ public abstract class BaseFragment extends CustomFragment {
     }
 
     private void showErrorMessageDialog(AppError appError) {
-        if (appError == null) {
-            throw new NullPointerException();
-        }
-        if (!canShowOtherFragment()) {
-            return;
-        }
+        Objects.requireNonNull(appError);
+        if (!canShowOtherFragment()) return;
 
         String dialogTitle = appError.getDialogTitle(requireContext());
         String dialogMessage = appError.getDialogMessage(requireContext());
         showMessageDialog(dialogTitle, dialogMessage);
-
     }
 
     protected boolean canShowOtherFragment() {

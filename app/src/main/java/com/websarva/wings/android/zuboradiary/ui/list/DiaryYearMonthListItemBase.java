@@ -1,61 +1,49 @@
 package com.websarva.wings.android.zuboradiary.ui.list;
 
-import android.os.Build;
-
 import androidx.annotation.NonNull;
 
+import com.websarva.wings.android.zuboradiary.ui.list.DiaryYearMonthListAdapter.ViewType;
+
 import java.time.YearMonth;
-import java.util.UUID;
+import java.util.Objects;
 
-public abstract class DiaryYearMonthListItemBase implements Cloneable {
-    private final String id = UUID.randomUUID().toString();
-    private YearMonth yearMonth;
-    private int viewType;
+public abstract class DiaryYearMonthListItemBase {
+    private final YearMonth yearMonth;
+    private final ViewType viewType;
 
-    public DiaryYearMonthListItemBase(int viewType) {
-        yearMonth = null;
+    public DiaryYearMonthListItemBase(ViewType viewType) {
+        Objects.requireNonNull(viewType);
+
+        yearMonth = YearMonth.now();
         this.viewType = viewType;
     }
 
-    public DiaryYearMonthListItemBase(@NonNull YearMonth yearMonth, int viewType) {
+    public DiaryYearMonthListItemBase(YearMonth yearMonth, ViewType viewType) {
+        Objects.requireNonNull(yearMonth);
+        Objects.requireNonNull(viewType);
+
         this.yearMonth = yearMonth;
         this.viewType = viewType;
     }
 
-    // Object#clone例外処理:https://yujisoftware.hatenablog.com/entry/CloneNotSupportedException
+    public boolean isDiaryViewType() {
+        return viewType.equals(ViewType.DIARY);
+    }
+
+    public boolean isProgressIndicatorViewType() {
+        return viewType.equals(ViewType.PROGRESS_INDICATOR);
+    }
+
+    public boolean isNoDiaryMessageViewType() {
+        return viewType.equals(ViewType.NO_DIARY_MESSAGE);
+    }
+
     @NonNull
-    @Override
-    public DiaryYearMonthListItemBase clone() {
-        DiaryYearMonthListItemBase clone = null;
-        try {
-            clone = (DiaryYearMonthListItemBase) super.clone();
-        } catch (CloneNotSupportedException e) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                throw new InternalError(e);
-            } else {
-                throw new RuntimeException(e.getMessage());
-            }
-        }
-        return clone;
-    }
-
-    public String getId() {
-        return id;
-    }
-
     public YearMonth getYearMonth() {
         return this.yearMonth;
     }
 
-    public void setYearMonth(YearMonth yearMonth) {
-        this.yearMonth = yearMonth;
-    }
-
-    public int getViewType() {
+    public ViewType getViewType() {
         return viewType;
-    }
-
-    public void setViewType(int viewType) {
-        this.viewType = viewType;
     }
 }

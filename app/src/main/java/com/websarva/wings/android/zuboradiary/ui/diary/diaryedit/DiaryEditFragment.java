@@ -9,6 +9,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.view.ContextThemeWrapper;
 import androidx.appcompat.widget.Toolbar;
 import androidx.constraintlayout.motion.widget.MotionLayout;
+import androidx.databinding.ViewDataBinding;
 import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Observer;
@@ -108,13 +109,13 @@ public class DiaryEditFragment extends BaseFragment {
     }
 
     @Override
-    protected View initializeDataBinding(@NonNull LayoutInflater inflater, ViewGroup container) {
+    protected ViewDataBinding initializeDataBinding(@NonNull LayoutInflater inflater, @NonNull ViewGroup container) {
         ThemeColor themeColor = settingsViewModel.loadThemeColorSettingValue();
         LayoutInflater themeColorInflater = createThemeColorInflater(inflater, themeColor);
         binding = FragmentDiaryEditBinding.inflate(themeColorInflater, container, false);
         binding.setLifecycleOwner(this);
         binding.setDiaryEditViewModel(diaryEditViewModel);
-        return binding.getRoot();
+        return binding;
     }
 
     @Override
@@ -140,11 +141,6 @@ public class DiaryEditFragment extends BaseFragment {
                 testDiariesSaver.save(28);
             }
         });
-    }
-
-    @Override
-    protected void setUpThemeColor() {
-        // 処理なし
     }
 
     @Override

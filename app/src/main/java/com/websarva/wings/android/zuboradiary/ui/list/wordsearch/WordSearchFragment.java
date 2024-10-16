@@ -6,6 +6,7 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.databinding.ViewDataBinding;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.SavedStateHandle;
 import androidx.lifecycle.ViewModelProvider;
@@ -30,7 +31,6 @@ import com.websarva.wings.android.zuboradiary.ui.list.DiaryYearMonthListItemBase
 import com.websarva.wings.android.zuboradiary.ui.KeyboardInitializer;
 import com.websarva.wings.android.zuboradiary.databinding.FragmentWordSearchBinding;
 import com.websarva.wings.android.zuboradiary.ui.list.DiaryYearMonthListAdapter;
-import com.websarva.wings.android.zuboradiary.ui.list.ListThemeColorSwitcher;
 import com.websarva.wings.android.zuboradiary.ui.settings.SettingsViewModel;
 
 import java.time.LocalDate;
@@ -71,26 +71,26 @@ public class WordSearchFragment extends BaseFragment {
     }
 
     @Override
-    protected View initializeDataBinding(@NonNull LayoutInflater inflater, ViewGroup container) {
+    protected ViewDataBinding initializeDataBinding(@NonNull LayoutInflater inflater, @NonNull ViewGroup container) {
         ThemeColor themeColor = settingsViewModel.loadThemeColorSettingValue();
         LayoutInflater themeColorInflater = createThemeColorInflater(inflater, themeColor);
         binding = FragmentWordSearchBinding.inflate(themeColorInflater, container, false);
         binding.setLifecycleOwner(this);
         binding.setWordSearchViewModel(wordSearchViewModel);
-        return binding.getRoot();
+        return binding;
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        setUpThemeColor();
         setUpToolBar();
         setUpWordSearchView();
         setUpWordSearchResultList();
     }
 
-    @Override
-    protected void setUpThemeColor() {
+    private void setUpThemeColor() {
         ThemeColor themeColor = settingsViewModel.loadThemeColorSettingValue();
         resultWordColor = themeColor.getOnTertiaryContainerColor(getResources());
         resultWordBackgroundColor = themeColor.getTertiaryContainerColor(getResources());

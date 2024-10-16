@@ -115,7 +115,7 @@ public class DiaryRepository {
         });
     }
 
-    public ListenableFuture<Integer> deleteDiary(LocalDate date) throws Exception {
+    public ListenableFuture<Integer> deleteDiary(LocalDate date) {
         return diaryDAO.deleteDiaryAsync(date.toString());
     }
 }

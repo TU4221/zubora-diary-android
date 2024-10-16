@@ -5,6 +5,7 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.databinding.ViewDataBinding;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.SavedStateHandle;
 import androidx.lifecycle.ViewModelProvider;
@@ -73,13 +74,13 @@ public class DiaryItemTitleEditFragment extends BaseFragment {
     }
 
     @Override
-    protected View initializeDataBinding(@NonNull LayoutInflater inflater, ViewGroup container) {
+    protected ViewDataBinding initializeDataBinding(@NonNull LayoutInflater inflater, @NonNull ViewGroup container) {
         ThemeColor themeColor = settingsViewModel.loadThemeColorSettingValue();
         LayoutInflater themeColorInflater = createThemeColorInflater(inflater, themeColor);
         binding = FragmentDiaryItemTitleEditBinding.inflate(themeColorInflater, container, false);
         binding.setLifecycleOwner(this);
         binding.setDiaryItemTitleEditViewModel(diaryItemTitleEditViewModel);
-        return binding.getRoot();
+        return binding;
     }
 
     @Override
@@ -89,11 +90,6 @@ public class DiaryItemTitleEditFragment extends BaseFragment {
         setUpToolBar();
         setUpItemTitleInputField();
         setUpItemTitleSelectionHistory();
-    }
-
-    @Override
-    protected void setUpThemeColor() {
-        // 処理なし
     }
 
     @Override

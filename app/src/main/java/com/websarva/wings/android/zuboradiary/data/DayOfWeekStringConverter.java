@@ -2,9 +2,12 @@ package com.websarva.wings.android.zuboradiary.data;
 
 import android.content.Context;
 
+import androidx.annotation.NonNull;
+
 import com.websarva.wings.android.zuboradiary.R;
 
 import java.time.DayOfWeek;
+import java.util.Objects;
 
 /**
  *
@@ -17,7 +20,10 @@ public class DayOfWeekStringConverter {
         this.context = context;
     }
 
+    @NonNull
     public String toCalendarStartDayOfWeek(DayOfWeek dayOfWeek) {
+        Objects.requireNonNull(dayOfWeek);
+
         int resId;
         switch (dayOfWeek) {
             case SUNDAY:
@@ -47,7 +53,10 @@ public class DayOfWeekStringConverter {
         return context.getString(resId);
     }
 
+    @NonNull
     public String toDiaryListDayOfWeek(DayOfWeek dayOfWeek) {
+        Objects.requireNonNull(dayOfWeek);
+
         int resId;
         switch (dayOfWeek) {
             case SUNDAY:

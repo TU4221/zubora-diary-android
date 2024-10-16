@@ -5,10 +5,10 @@ import android.text.Spanned;
 import android.text.style.BackgroundColorSpan;
 import android.text.style.ForegroundColorSpan;
 import android.util.Log;
+import android.view.View;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.ViewModel;
 
 import com.google.common.util.concurrent.ListenableFuture;
 import com.websarva.wings.android.zuboradiary.data.AppError;
@@ -16,6 +16,7 @@ import com.websarva.wings.android.zuboradiary.data.database.DiaryRepository;
 import com.websarva.wings.android.zuboradiary.data.database.WordSearchResultListItem;
 import com.websarva.wings.android.zuboradiary.ui.BaseViewModel;
 import com.websarva.wings.android.zuboradiary.ui.list.DiaryYearMonthListAdapter;
+import com.websarva.wings.android.zuboradiary.ui.list.DiaryYearMonthListAdapter.ViewType;
 
 import java.time.LocalDate;
 import java.time.YearMonth;
@@ -158,9 +159,7 @@ public class WordSearchViewModel extends BaseViewModel {
                 List<WordSearchResultYearMonthListItem> resultListContainingProgressBar = new ArrayList<>();
                 if (loadType == LoadType.NEW) {
                     WordSearchResultYearMonthListItem progressBar =
-                            new WordSearchResultYearMonthListItem(
-                                    DiaryYearMonthListAdapter.VIEW_TYPE_PROGRESS_BAR
-                            );
+                            new WordSearchResultYearMonthListItem(ViewType.PROGRESS_INDICATOR);
                     resultListContainingProgressBar.add(progressBar);
                     wordSearchResultList.postValue(resultListContainingProgressBar);
                 }
@@ -212,7 +211,7 @@ public class WordSearchViewModel extends BaseViewModel {
                     int updateResultListLastItemPosition = updateResultList.size() - 1;
                     WordSearchResultYearMonthListItem diaryYearMonthListItem =
                             updateResultList.get(updateResultListLastItemPosition);
-                    if (diaryYearMonthListItem.getViewType() != DiaryYearMonthListAdapter.VIEW_TYPE_DIARY) {
+                    if (!diaryYearMonthListItem.getViewType().equals(ViewType.DIARY)) {
                         updateResultList.remove(updateResultListLastItemPosition);
                     }
                 }
@@ -254,15 +253,11 @@ public class WordSearchViewModel extends BaseViewModel {
                             countDiaryListDayItem(updateResultList) < numWordSearchResults;
                     if (numWordSearchResults > 0 && !existsUnloadedResults) {
                         WordSearchResultYearMonthListItem noDiaryMessage =
-                                new WordSearchResultYearMonthListItem(
-                                        DiaryYearMonthListAdapter.VIEW_TYPE_NO_DIARY_MESSAGE
-                                );
+                                new WordSearchResultYearMonthListItem(ViewType.NO_DIARY_MESSAGE);
                         updateResultList.add(noDiaryMessage);
                     } else {
                         WordSearchResultYearMonthListItem noDiaryMessage =
-                                new WordSearchResultYearMonthListItem(
-                                        DiaryYearMonthListAdapter.VIEW_TYPE_PROGRESS_BAR
-                                );
+                                new WordSearchResultYearMonthListItem(ViewType.PROGRESS_INDICATOR);
                         updateResultList.add(noDiaryMessage);
                     }
                 }
@@ -407,7 +402,7 @@ public class WordSearchViewModel extends BaseViewModel {
     private List<WordSearchResultYearMonthListItem> toWordSearchResultYearMonthList(
             List<WordSearchResultDayListItem> beforeList) {
         // 日記リストを月別に振り分ける
-        final int VIEW_TYPE_DIARY = DiaryYearMonthListAdapter.VIEW_TYPE_DIARY;
+        final ViewType VIEW_TYPE_DIARY = ViewType.DIARY;
         List<WordSearchResultDayListItem> sortingList= new ArrayList<>();
         List<WordSearchResultYearMonthListItem> wordSearchResultYearMonthList = new ArrayList<>();
         WordSearchResultYearMonthListItem  wordSearchResultMonthListItem;

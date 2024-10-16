@@ -1,47 +1,30 @@
 package com.websarva.wings.android.zuboradiary.ui.list.diarylist;
 
-import androidx.annotation.NonNull;
-
+import com.websarva.wings.android.zuboradiary.ui.list.DiaryYearMonthListAdapter.ViewType;
 import com.websarva.wings.android.zuboradiary.ui.list.DiaryYearMonthListItemBase;
 
 import java.time.YearMonth;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Objects;
 
 public class DiaryYearMonthListItem extends DiaryYearMonthListItemBase {
-    private List<DiaryDayListItem> diaryDayListItemList;
+    private final DiaryDayList diaryDayList;
 
-    public DiaryYearMonthListItem(int viewType) {
+    public DiaryYearMonthListItem(ViewType viewType) {
         super(viewType);
-        diaryDayListItemList = new ArrayList<>();
+        diaryDayList = new DiaryDayList();
     }
 
     public DiaryYearMonthListItem(
-            @NonNull YearMonth yearMonth,
-            @NonNull List<DiaryDayListItem> diaryDayListItemList, int viewType) {
-        super(yearMonth, viewType);
-        this.diaryDayListItemList = diaryDayListItemList;
+            YearMonth yearMonth, DiaryDayList diaryDayList) {
+        super(yearMonth, ViewType.DIARY);
+
+        Objects.requireNonNull(diaryDayList);
+        if (diaryDayList.getDiaryDayListItemList().isEmpty()) throw new IllegalArgumentException();
+
+        this.diaryDayList = diaryDayList;
     }
 
-    // Object#clone例外処理:https://yujisoftware.hatenablog.com/entry/CloneNotSupportedException
-    @NonNull
-    @Override
-    public DiaryYearMonthListItem clone() {
-        DiaryYearMonthListItem clone = (DiaryYearMonthListItem) super.clone();
-        List<DiaryDayListItem> cloneDiaryDayList = new ArrayList<>();
-        for (DiaryDayListItem item : diaryDayListItemList) {
-            DiaryDayListItem cloneItem = item.clone();
-            cloneDiaryDayList.add(cloneItem);
-        }
-        clone.diaryDayListItemList = cloneDiaryDayList;
-        return clone;
-    }
-
-    public List<DiaryDayListItem> getDiaryDayListItemList() {
-        return diaryDayListItemList;
-    }
-
-    public void setDiaryDayListItemList(@NonNull List<DiaryDayListItem> diaryDayListItemList) {
-        this.diaryDayListItemList = diaryDayListItemList;
+    public DiaryDayList getDiaryDayList() {
+        return diaryDayList;
     }
 }
