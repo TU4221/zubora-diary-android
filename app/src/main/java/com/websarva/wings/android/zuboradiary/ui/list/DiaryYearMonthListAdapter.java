@@ -582,7 +582,7 @@ public abstract class DiaryYearMonthListAdapter extends ListAdapter<DiaryYearMon
         int firstVisibleItemPosition = layoutManager.findFirstVisibleItemPosition();
         RecyclerView.ViewHolder firstVisibleViewHolder =
                 recyclerView.findViewHolderForAdapterPosition(firstVisibleItemPosition);
-        Objects.requireNonNull(firstVisibleViewHolder);
+        if (firstVisibleViewHolder == null) return; // MEMO:RecyclerViewが空の時nullとなる。
         if (!(firstVisibleViewHolder instanceof DiaryYearMonthListViewHolder)) return;
         DiaryYearMonthListViewHolder _firstVisibleViewHolder =
                 (DiaryYearMonthListViewHolder) firstVisibleViewHolder;

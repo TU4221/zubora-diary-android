@@ -32,9 +32,18 @@ public class DiaryYearMonthList {
         this.diaryYearMonthListItemList = Collections.unmodifiableList(_itemList);
     }
 
+    /**
+     * true:日記なしメッセージのみのリスト作成<br>
+     * false:ProgressIndicatorのみのリスト作成
+     * */
     public DiaryYearMonthList(boolean needsNoDiaryMessage) {
         List<DiaryYearMonthListItem> itemList = new ArrayList<>();
         addLastItem(itemList, needsNoDiaryMessage);
+        this.diaryYearMonthListItemList = Collections.unmodifiableList(itemList);
+    }
+
+    public DiaryYearMonthList() {
+        List<DiaryYearMonthListItem> itemList = new ArrayList<>();
         this.diaryYearMonthListItemList = Collections.unmodifiableList(itemList);
     }
 

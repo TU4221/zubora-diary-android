@@ -249,7 +249,6 @@ public class DiaryListFragment extends BaseFragment {
         @Override
         public void onChanged(DiaryYearMonthList list) {
             Objects.requireNonNull(list);
-            //if (list.getDiaryYearMonthListItemList().isEmpty()) return;
 
             setUpListViewVisibility(list);
             setUpList(list);
@@ -258,8 +257,7 @@ public class DiaryListFragment extends BaseFragment {
         private void setUpListViewVisibility(DiaryYearMonthList list) {
             Objects.requireNonNull(list);
 
-            boolean isNoDiary =
-                    list.getDiaryYearMonthListItemList().get(0).isNoDiaryMessageViewType();
+            boolean isNoDiary = list.getDiaryYearMonthListItemList().isEmpty();
             if (isNoDiary) {
                 binding.textDiaryListNoDiaryMessage.setVisibility(View.VISIBLE);
                 binding.recyclerDiaryYearMonthList.setVisibility(View.INVISIBLE);
@@ -286,7 +284,7 @@ public class DiaryListFragment extends BaseFragment {
         DiaryYearMonthList diaryList = diaryListViewModel.getDiaryListLiveData().getValue();
         Objects.requireNonNull(diaryList);
 
-        if (diaryList.countDiaries() == 0) {
+        if (diaryList.getDiaryYearMonthListItemList().isEmpty()) {
             Integer numSavedDiaries = diaryListViewModel.countDiaries();
             if (numSavedDiaries == null) return;
 

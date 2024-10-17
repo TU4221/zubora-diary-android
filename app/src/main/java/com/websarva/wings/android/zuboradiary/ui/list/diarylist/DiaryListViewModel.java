@@ -57,7 +57,7 @@ public class DiaryListViewModel extends BaseViewModel {
     @Override
     protected void initialize() {
         super.initialize();
-        diaryList.setValue(new DiaryYearMonthList(false));
+        diaryList.setValue(new DiaryYearMonthList());
         isVisibleUpdateProgressBar.setValue(false);
         sortConditionDate = null;
     }
@@ -222,7 +222,7 @@ public class DiaryListViewModel extends BaseViewModel {
                 );
 
         List<DiaryListItem> loadedDiaryList = listListenableFuture.get();
-        if (loadedDiaryList.isEmpty()) return new DiaryYearMonthList(true);
+        if (loadedDiaryList.isEmpty()) return new DiaryYearMonthList();
         List<DiaryDayListItem> diaryDayListItemList = new ArrayList<>();
         loadedDiaryList.stream().forEach(x -> diaryDayListItemList.add(new DiaryDayListItem(x)));
         DiaryDayList diaryDayList = new DiaryDayList(diaryDayListItemList);
