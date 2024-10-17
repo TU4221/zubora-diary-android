@@ -14,8 +14,7 @@ public class DiaryYearMonthListItem extends DiaryYearMonthListItemBase {
         diaryDayList = new DiaryDayList();
     }
 
-    public DiaryYearMonthListItem(
-            YearMonth yearMonth, DiaryDayList diaryDayList) {
+    public DiaryYearMonthListItem(YearMonth yearMonth, DiaryDayList diaryDayList) {
         super(yearMonth, ViewType.DIARY);
 
         Objects.requireNonNull(diaryDayList);

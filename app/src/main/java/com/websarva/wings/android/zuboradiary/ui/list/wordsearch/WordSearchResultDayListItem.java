@@ -1,59 +1,135 @@
 package com.websarva.wings.android.zuboradiary.ui.list.wordsearch;
 
-import android.os.Build;
 import android.text.SpannableString;
+import android.text.Spanned;
+import android.text.style.BackgroundColorSpan;
+import android.text.style.ForegroundColorSpan;
 
 import androidx.annotation.NonNull;
 
+import com.websarva.wings.android.zuboradiary.data.database.WordSearchResultListItem;
+
 import java.time.LocalDate;
-import java.util.UUID;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
 
-public class WordSearchResultDayListItem implements Cloneable {
-    private final String id = UUID.randomUUID().toString();
-    private LocalDate date;
-    private SpannableString title;
-    private int itemNumber;
-    private SpannableString itemTitle;
-    private SpannableString itemComment;
+public class WordSearchResultDayListItem {
+    private final LocalDate date;
+    private final SpannableString title;
+    private final int itemNumber;
+    private final SpannableString itemTitle;
+    private final SpannableString itemComment;
 
-    public WordSearchResultDayListItem(@NonNull LocalDate date,
-                                       @NonNull SpannableString title , int itemNo,
-                                       @NonNull SpannableString itemTitle, @NonNull SpannableString itemComment) {
-        this.date = date;
-        this.title = title;
-        this.itemNumber = itemNo;
-        this.itemTitle = itemTitle;
-        this.itemComment = itemComment;
+    private final String KEY_ITEM_NUMBER = "ItemNumber";
+    private final String KEY_ITEM_TITLE = "ItemTitle";
+    private final String KEY_ITEM_COMMENT = "ItemComment";
+
+    WordSearchResultDayListItem(
+            WordSearchResultListItem wordSearchResultListItem, String searchWord, int textColor, int backgroundColor) {
+        Objects.requireNonNull(wordSearchResultListItem);
+
+        String strDate = wordSearchResultListItem.getDate();
+        this.date = LocalDate.parse(strDate);
+
+        String title = wordSearchResultListItem.getTitle();
+        this.title = toSpannableString(title, searchWord, textColor, backgroundColor);
+
+        Map<String, Object> diaryItem = extractTargetItem(wordSearchResultListItem, searchWord);
+        Integer itemNumber = (Integer) diaryItem.get(KEY_ITEM_NUMBER);
+        Objects.requireNonNull(itemNumber);
+        this.itemNumber = itemNumber;
+
+        String itemTitle = (String) diaryItem.get(KEY_ITEM_TITLE);
+        Objects.requireNonNull(itemTitle);
+        this.itemTitle = toSpannableString(itemTitle, searchWord, textColor, backgroundColor);
+
+        String itemComment = (String) diaryItem.get(KEY_ITEM_COMMENT);
+        Objects.requireNonNull(itemComment);
+        this.itemComment = toSpannableString(itemComment, searchWord, textColor, backgroundColor);
     }
 
-    // MEMO:ID以外同じインスタンスを作成(cloneはIDも同じになるため)
-    public WordSearchResultDayListItem(WordSearchResultDayListItem item) {
-        this.date = item.date;
-        this.title = item.title;
-        this.itemNumber = item.itemNumber;
-        this.itemTitle = item.title;
-        this.itemComment = item.itemComment;
-    }
-
-    // Object#clone例外処理:https://yujisoftware.hatenablog.com/entry/CloneNotSupportedException
+    // 対象ワードをマーキング
     @NonNull
-    @Override
-    public WordSearchResultDayListItem clone() {
-        WordSearchResultDayListItem clone;
-        try {
-            clone = (WordSearchResultDayListItem) super.clone();
-        } catch (CloneNotSupportedException e) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                throw new InternalError(e);
-            } else {
-                throw new RuntimeException(e.getMessage());
+    private SpannableString toSpannableString(String string, String targetWord, int textColor, int backgroundColor) {
+        Objects.requireNonNull(string);
+        Objects.requireNonNull(targetWord);
+
+        SpannableString spannableString = new SpannableString(string);
+        int fromIndex = 0;
+        while (string.indexOf(targetWord, fromIndex) != -1) {
+            BackgroundColorSpan backgroundColorSpan = new BackgroundColorSpan(backgroundColor);
+            ForegroundColorSpan foregroundColorSpan = new ForegroundColorSpan(textColor);
+            int start = string.indexOf(targetWord, fromIndex);
+            int end = start + targetWord.length();
+            spannableString.setSpan(
+                    backgroundColorSpan,
+                    start,
+                    end,
+                    Spanned.SPAN_INCLUSIVE_INCLUSIVE
+            );
+            spannableString.setSpan(
+                    foregroundColorSpan,
+                    start,
+                    end,
+                    Spanned.SPAN_INCLUSIVE_INCLUSIVE
+            );
+            fromIndex = end;
+        }
+        return spannableString;
+    }
+
+    @NonNull
+    private Map<String, Object> extractTargetItem(WordSearchResultListItem item, String searchWord) {
+        Objects.requireNonNull(item);
+        Objects.requireNonNull(searchWord);
+
+        String regex = ".*" + searchWord + ".*";
+        String[] itemTitles = {
+                item.getItem1Title(),
+                item.getItem2Title(),
+                item.getItem3Title(),
+                item.getItem4Title(),
+                item.getItem5Title(),
+        };
+        String[] itemComments = {
+                item.getItem1Comment(),
+                item.getItem2Comment(),
+                item.getItem3Comment(),
+                item.getItem4Comment(),
+                item.getItem5Comment(),
+        };
+        int itemNumber = 0;
+        String itemTitle = "";
+        String itemComment = "";
+        for (int i = 0; i < itemTitles.length; i++) {
+            // HACK:タイトル、コメントは未入力の場合空文字("")が代入されるはずだが、
+            //      nullの項目が存在する為、下記対策をとる。
+            //      (例外：項目1のみ入力の場合は、2以降はnullとなる)
+            if (itemTitles[i] == null) itemTitles[i] = "";
+            if (itemComments[i] == null) itemComments[i] = "";
+
+            if (itemTitles[i].matches(regex)
+                    || itemComments[i].matches(regex)) {
+                itemNumber = i + 1;
+                itemTitle = itemTitles[i];
+                itemComment = itemComments[i];
+                break;
+            }
+
+            // 対象アイテムが無かった場合、アイテムNo.1を抽出
+            if (i == (itemTitles.length - 1)) {
+                itemNumber = 1;
+                itemTitle = itemTitles[0];
+                itemComment = itemComments[0];
             }
         }
-        return clone;
-    }
 
-    public String getId() {
-        return id;
+        Map<String, Object> result = new HashMap<>();
+        result.put(KEY_ITEM_NUMBER, itemNumber);
+        result.put(KEY_ITEM_TITLE, itemTitle);
+        result.put(KEY_ITEM_COMMENT, itemComment);
+        return result;
     }
 
     @NonNull
@@ -61,25 +137,13 @@ public class WordSearchResultDayListItem implements Cloneable {
         return date;
     }
 
-    public void setDate(@NonNull LocalDate date) {
-        this.date = date;
-    }
-
     @NonNull
     public SpannableString getTitle() {
         return this.title;
     }
 
-    public void setTitle(@NonNull SpannableString title) {
-        this.title = title;
-    }
-
     public int getItemNumber() {
         return this.itemNumber;
-    }
-
-    public void setItemNumber(int itemNumber) {
-        this.itemNumber = itemNumber;
     }
 
     @NonNull
@@ -87,16 +151,8 @@ public class WordSearchResultDayListItem implements Cloneable {
         return itemTitle;
     }
 
-    public void setItemTitle(@NonNull SpannableString itemTitle) {
-        this.itemTitle = itemTitle;
-    }
-
     @NonNull
     public SpannableString getItemComment() {
         return itemComment;
-    }
-
-    public void setItemComment(@NonNull SpannableString itemComment) {
-        this.itemComment = itemComment;
     }
 }

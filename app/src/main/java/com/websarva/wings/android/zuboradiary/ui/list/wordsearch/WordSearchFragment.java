@@ -1,5 +1,7 @@
 package com.websarva.wings.android.zuboradiary.ui.list.wordsearch;
 
+import static com.websarva.wings.android.zuboradiary.ui.list.DiaryYearMonthListAdapter.*;
+
 import android.content.Context;
 import android.content.res.Resources;
 import android.os.Bundle;
@@ -14,18 +16,13 @@ import androidx.navigation.NavDirections;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.inputmethod.EditorInfo;
-import android.widget.ProgressBar;
-import android.widget.TextView;
 
 import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor;
 import com.websarva.wings.android.zuboradiary.ui.BaseFragment;
-import com.websarva.wings.android.zuboradiary.ui.ColorSwitchingViewList;
 import com.websarva.wings.android.zuboradiary.ui.EditTextSetup;
 import com.websarva.wings.android.zuboradiary.ui.list.DiaryYearMonthListItemBase;
 import com.websarva.wings.android.zuboradiary.ui.KeyboardInitializer;
@@ -34,9 +31,9 @@ import com.websarva.wings.android.zuboradiary.ui.list.DiaryYearMonthListAdapter;
 import com.websarva.wings.android.zuboradiary.ui.settings.SettingsViewModel;
 
 import java.time.LocalDate;
-import java.time.YearMonth;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class WordSearchFragment extends BaseFragment {
 
@@ -44,8 +41,8 @@ public class WordSearchFragment extends BaseFragment {
     private FragmentWordSearchBinding binding;
     private String previousText = ""; // 二重検索防止用
 
-    int resultWordColor = -1; // 検索結果ワード色
-    int resultWordBackgroundColor = -1; // 検索結果ワードマーカー色
+    private int resultWordColor = -1; // 検索結果ワード色
+    private int resultWordBackgroundColor = -1; // 検索結果ワードマーカー色
 
     // ViewModel
     private WordSearchViewModel wordSearchViewModel;
@@ -88,6 +85,7 @@ public class WordSearchFragment extends BaseFragment {
         setUpToolBar();
         setUpWordSearchView();
         setUpWordSearchResultList();
+        Log.d("20241017", "");
     }
 
     private void setUpThemeColor() {
@@ -122,6 +120,8 @@ public class WordSearchFragment extends BaseFragment {
                 .setNavigationOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
+                        Objects.requireNonNull(v);
+
                         navController.navigateUp();
                     }
                 });
@@ -129,7 +129,8 @@ public class WordSearchFragment extends BaseFragment {
 
     private void setUpWordSearchView() {
         String searchWord = wordSearchViewModel.getSearchWordMutableLiveData().getValue();
-        if (searchWord == null || searchWord.isEmpty()) {
+        Objects.requireNonNull(searchWord);
+        if (searchWord.isEmpty()) {
             binding.editTextKeyWordSearch.requestFocus();
             KeyboardInitializer keyboardInitializer = new KeyboardInitializer(requireActivity());
             keyboardInitializer.show(binding.editTextKeyWordSearch);
@@ -139,31 +140,21 @@ public class WordSearchFragment extends BaseFragment {
                 .observe(getViewLifecycleOwner(), new Observer<String>() {
                     @Override
                     public void onChanged(String s) {
-                        if (s == null) {
-                            return;
-                        }
+                        Objects.requireNonNull(s);
+                        // HACK:キーワードの入力時と確定時に検索Observerが起動してしまい
+                        //      同じキーワードで二重に検索してしまう。防止策として下記条件追加。
+                        if (s.equals(previousText)) return;
 
                         // 検索結果表示Viewは別Observerにて表示
                         if (s.isEmpty()) {
                             binding.textWordSearchNoResults.setVisibility(View.INVISIBLE);
                             binding.linerLayoutWordSearchResults.setVisibility(View.INVISIBLE);
-                        }
-                        // HACK:キーワードの入力時と確定時に検索Observerが起動してしまい
-                        //      同じキーワードで二重に検索してしまう。防止策として下記条件追加。
-                        if (s.equals(previousText)) {
-                            return;
-                        }
-                        ThemeColor themeColor = settingsViewModel.getThemeColorSettingValueLiveData().getValue();
-                        if (themeColor == null) {
-                            throw new NullPointerException();
-                        }
+                            wordSearchViewModel.initialize();
 
-                        wordSearchViewModel
-                                .loadWordSearchResultList(
-                                        WordSearchViewModel.LoadType.NEW,
-                                        resultWordColor,
-                                        resultWordBackgroundColor
-                                );
+                        } else  {
+                            wordSearchViewModel
+                                    .loadNewWordSearchResultList(resultWordColor, resultWordBackgroundColor);
+                        }
                         previousText = s;
                     }
                 });
@@ -184,114 +175,62 @@ public class WordSearchFragment extends BaseFragment {
                         false
                 );
         wordSearchResultListAdapter.build();
-        wordSearchResultListAdapter.setOnClickChildItemListener(new DiaryYearMonthListAdapter.OnClickChildItemListener() {
+        wordSearchResultListAdapter.setOnClickChildItemListener(new OnClickChildItemListener() {
             @Override
             public void onClick(LocalDate date) {
+                Objects.requireNonNull(date);
+
                 showShowDiaryFragment(date);
             }
         });
 
-        // データベースから読み込んだ日記リストをリサクラービューに反映
         wordSearchViewModel.getWordSearchResultListLiveData()
-                .observe(getViewLifecycleOwner(), new Observer<List<WordSearchResultYearMonthListItem>>() {
-                    @Override
-                    public void onChanged(
-                            List<WordSearchResultYearMonthListItem> wordSearchResultYearMonthListItems) {
-                        if (wordSearchResultYearMonthListItems == null) {
-                            return;
-                        }
-                        DiaryYearMonthListAdapter wordSearchResultYearMonthListAdapter =
-                                (DiaryYearMonthListAdapter)
-                                        binding.recyclerWordSearchResultList.getAdapter();
-                        if (wordSearchResultYearMonthListAdapter == null) {
-                            return;
-                        }
-
-                        String searchWord = wordSearchViewModel.getSearchWordLiveData().getValue();
-                        if (searchWord == null || searchWord.isEmpty()) {
-                            binding.textWordSearchNoResults.setVisibility(View.INVISIBLE);
-                            binding.linerLayoutWordSearchResults.setVisibility(View.INVISIBLE);
-                        } else if (wordSearchResultYearMonthListItems.isEmpty()) {
-                            binding.textWordSearchNoResults.setVisibility(View.VISIBLE);
-                            binding.linerLayoutWordSearchResults.setVisibility(View.INVISIBLE);
-                        } else {
-                            binding.textWordSearchNoResults.setVisibility(View.INVISIBLE);
-                            binding.linerLayoutWordSearchResults.setVisibility(View.VISIBLE);
-                        }
-
-                        List<DiaryYearMonthListItemBase> convertedList =
-                                new ArrayList<>(wordSearchResultYearMonthListItems);
-                        Log.d("WordSearchList", "submitList前");
-                        for (DiaryYearMonthListItemBase i: convertedList) {
-                            YearMonth  yearMonth = i.getYearMonth();
-                            if (yearMonth == null) {
-                                Log.d("WordSearchList", "null");
-                            } else {
-                                Log.d("WordSearchList", yearMonth.toString());
-                            }
-                        }
-                        Log.d("WordSearchList", "submitList");
-                        Log.d("ListAdapterTest", "submitList");
-                        wordSearchResultYearMonthListAdapter.submitList(convertedList);
-                    }
-                });
+                .observe(getViewLifecycleOwner(), new WordSearchResultListObserver());
 
         wordSearchViewModel.getNumWordSearchResults()
                 .observe(getViewLifecycleOwner(), new Observer<Integer>() {
                     @Override
                     public void onChanged(Integer integer) {
-                        if (integer == null) {
-                            return;
-                        }
+                        Objects.requireNonNull(integer);
 
+                        int visibility;
                         if (integer > 0) {
-                            binding.textWordSearchResults.setVisibility(View.VISIBLE);
+                            visibility = View.VISIBLE;
                         } else {
-                            binding.textWordSearchResults.setVisibility(View.INVISIBLE);
+                            visibility = View.INVISIBLE;
                         }
+                        binding.textWordSearchResults.setVisibility(visibility);
                     }
                 });
-
-        // 検索結果リスト更新
-        List<WordSearchResultYearMonthListItem> list =
-                wordSearchViewModel.getWordSearchResultListLiveData().getValue();
-        if (list != null && !list.isEmpty()) {
-            wordSearchViewModel
-                    .loadWordSearchResultList(
-                            WordSearchViewModel.LoadType.UPDATE,
-                            resultWordColor,
-                            resultWordBackgroundColor
-                    );
-        }
 
         binding.includeProgressIndicator.viewBackground.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
+                Objects.requireNonNull(v);
+                Objects.requireNonNull(event);
+
                 v.performClick();
                 return true;
             }
         });
+
+        updateWordSearchResultList();
     }
 
     private class WordSearchResultListAdapter extends DiaryYearMonthListAdapter {
 
-        public WordSearchResultListAdapter(Context context, RecyclerView recyclerView, ThemeColor themeColor, boolean canSwipeItem) {
+        private WordSearchResultListAdapter(
+                Context context, RecyclerView recyclerView, ThemeColor themeColor, boolean canSwipeItem) {
             super(context, recyclerView, themeColor, canSwipeItem);
         }
 
         @Override
         public void loadListOnScrollEnd() {
             ThemeColor themeColor = settingsViewModel.getThemeColorSettingValueLiveData().getValue();
-            if (themeColor == null) {
-                throw new NullPointerException();
-            }
+            Objects.requireNonNull(themeColor);
 
             wordSearchViewModel
-                    .loadWordSearchResultList(
-                            WordSearchViewModel.LoadType.ADD,
-                            resultWordColor,
-                            resultWordBackgroundColor
-                    );
+                    .loadAdditionWordSearchResultList(resultWordColor, resultWordBackgroundColor);
         }
 
         @Override
@@ -300,13 +239,51 @@ public class WordSearchFragment extends BaseFragment {
         }
     }
 
+    private class WordSearchResultListObserver implements Observer<WordSearchResultYearMonthList> {
+
+        @Override
+        public void onChanged(WordSearchResultYearMonthList wordSearchResultYearMonthList) {
+            Objects.requireNonNull(wordSearchResultYearMonthList);
+
+            DiaryYearMonthListAdapter wordSearchResultYearMonthListAdapter =
+                    (DiaryYearMonthListAdapter)
+                            binding.recyclerWordSearchResultList.getAdapter();
+            Objects.requireNonNull(wordSearchResultYearMonthListAdapter);
+
+            String searchWord = wordSearchViewModel.getSearchWordLiveData().getValue();
+            Objects.requireNonNull(searchWord);
+            if (searchWord.isEmpty()) {
+                binding.textWordSearchNoResults.setVisibility(View.INVISIBLE);
+                binding.linerLayoutWordSearchResults.setVisibility(View.INVISIBLE);
+            } else if (wordSearchResultYearMonthList.getWordSearchResultYearMonthListItemList().isEmpty()) {
+                binding.textWordSearchNoResults.setVisibility(View.VISIBLE);
+                binding.linerLayoutWordSearchResults.setVisibility(View.INVISIBLE);
+            } else {
+                binding.textWordSearchNoResults.setVisibility(View.INVISIBLE);
+                binding.linerLayoutWordSearchResults.setVisibility(View.VISIBLE);
+            }
+
+            List<DiaryYearMonthListItemBase> convertedList =
+                    new ArrayList<>(wordSearchResultYearMonthList.getWordSearchResultYearMonthListItemList());
+            Log.d("20241017", "convertedList.size():" + convertedList.size());
+            wordSearchResultYearMonthListAdapter.submitList(convertedList);
+        }
+    }
+
+    private void updateWordSearchResultList() {
+        WordSearchResultYearMonthList list =
+                wordSearchViewModel.getWordSearchResultListLiveData().getValue();
+        Objects.requireNonNull(list);
+
+        if (!list.getWordSearchResultYearMonthListItemList().isEmpty()) {
+            wordSearchViewModel
+                    .updateWordSearchResultList(resultWordColor, resultWordBackgroundColor);
+        }
+    }
+
     private void showShowDiaryFragment(LocalDate date) {
-        if (date == null) {
-            throw new NullPointerException();
-        }
-        if (!canShowOtherFragment()) {
-            return;
-        }
+        Objects.requireNonNull(date);
+        if (!canShowOtherFragment()) return;
 
         NavDirections action =
                 WordSearchFragmentDirections
@@ -328,22 +305,14 @@ public class WordSearchFragment extends BaseFragment {
         wordSearchViewModel.triggerAppErrorBufferListObserver();
     }
 
-    // 選択中ボトムナビゲーションタブを再選択時の処理
-    public void processOnReselectNavigationItem() {
-        if (binding.recyclerWordSearchResultList.canScrollVertically(-1)) {
-            resultListScrollToFirstPosition();
-        } else {
-            navController.navigateUp();
-        }
-    }
-
+    // TODO:FABのようなボタンを設けて下記メソッドを呼び出せるようにする。
     //日記リスト(年月)を自動でトップへスクロールさせるメソッド。
-    public void resultListScrollToFirstPosition() {
+    private void resultListScrollToFirstPosition() {
         RecyclerView.Adapter<?> adapter = binding.recyclerWordSearchResultList.getAdapter();
-        if (adapter instanceof DiaryYearMonthListAdapter) {
-            DiaryYearMonthListAdapter diaryYearMonthListAdapter = (DiaryYearMonthListAdapter) adapter;
-            diaryYearMonthListAdapter.scrollToFirstPosition();
-        }
+        Objects.requireNonNull(adapter);
+
+        DiaryYearMonthListAdapter diaryYearMonthListAdapter = (DiaryYearMonthListAdapter) adapter;
+        diaryYearMonthListAdapter.scrollToFirstPosition();
     }
 
     @Override

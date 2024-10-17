@@ -1,13 +1,11 @@
 package com.websarva.wings.android.zuboradiary.ui.list.wordsearch;
 
 import android.content.Context;
-import android.content.res.Resources;
 import android.text.SpannableString;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.DiffUtil;
@@ -115,7 +113,7 @@ public class WordSearchResultDayListAdapter
         }
     }
 
-    public static class WordSearchResultDayListDiffUtilItemCallback
+    private static class WordSearchResultDayListDiffUtilItemCallback
             extends DiffUtil.ItemCallback<WordSearchResultDayListItem> {
         @Override
         public boolean areItemsTheSame(@NonNull WordSearchResultDayListItem oldItem, @NonNull WordSearchResultDayListItem newItem) {

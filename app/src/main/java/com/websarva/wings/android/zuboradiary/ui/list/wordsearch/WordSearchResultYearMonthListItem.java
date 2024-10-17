@@ -1,52 +1,32 @@
 package com.websarva.wings.android.zuboradiary.ui.list.wordsearch;
 
-import android.view.View;
-
-import androidx.annotation.NonNull;
-
-import com.websarva.wings.android.zuboradiary.ui.list.DiaryYearMonthListAdapter;
 import com.websarva.wings.android.zuboradiary.ui.list.DiaryYearMonthListAdapter.ViewType;
 import com.websarva.wings.android.zuboradiary.ui.list.DiaryYearMonthListItemBase;
 
 import java.time.YearMonth;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Objects;
 
 public class WordSearchResultYearMonthListItem extends DiaryYearMonthListItemBase {
-    private List<WordSearchResultDayListItem> WordSearchResultDayList;
+    private final WordSearchResultDayList wordSearchResultDayList;
 
-    public WordSearchResultYearMonthListItem(ViewType viewType) {
+    WordSearchResultYearMonthListItem(ViewType viewType) {
         super(viewType);
-        WordSearchResultDayList = new ArrayList<>();
+        wordSearchResultDayList = new WordSearchResultDayList();
     }
 
-    public WordSearchResultYearMonthListItem(
-            @NonNull YearMonth yearMonth,
-            @NonNull List<WordSearchResultDayListItem> wordSearchResultDayList, ViewType viewType) {
-        super(yearMonth, viewType);
-        this.WordSearchResultDayList = wordSearchResultDayList;
-    }
+    WordSearchResultYearMonthListItem(
+            YearMonth yearMonth, WordSearchResultDayList wordSearchResultDayList) {
+        super(yearMonth, ViewType.DIARY);
 
-    // Object#clone例外処理:https://yujisoftware.hatenablog.com/entry/CloneNotSupportedException
-    @NonNull
-    @Override
-    public WordSearchResultYearMonthListItem clone() {
-        WordSearchResultYearMonthListItem clone = /*(WordSearchResultYearMonthListItem) super.clone()*/null;
-        List<WordSearchResultDayListItem> cloneWordSearchResultDayList = new ArrayList<>();
-        for (WordSearchResultDayListItem item : WordSearchResultDayList) {
-            WordSearchResultDayListItem cloneItem = item.clone();
-            cloneWordSearchResultDayList.add(cloneItem);
+        Objects.requireNonNull(wordSearchResultDayList);
+        if (wordSearchResultDayList.getWordSearchResultDayListItemList().isEmpty()) {
+            throw new IllegalArgumentException();
         }
-        clone.WordSearchResultDayList = cloneWordSearchResultDayList;
-        return clone;
+
+        this.wordSearchResultDayList = wordSearchResultDayList;
     }
 
-    public List<WordSearchResultDayListItem> getWordSearchResultDayList() {
-        return WordSearchResultDayList;
-    }
-
-    public void setWordSearchResultDayList(
-            @NonNull List<WordSearchResultDayListItem> wordSearchResultDayList) {
-        this.WordSearchResultDayList = wordSearchResultDayList;
+    public WordSearchResultDayList getWordSearchResultDayList() {
+        return wordSearchResultDayList;
     }
 }

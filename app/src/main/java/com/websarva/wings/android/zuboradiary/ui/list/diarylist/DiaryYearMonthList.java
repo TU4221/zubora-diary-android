@@ -1,5 +1,7 @@
 package com.websarva.wings.android.zuboradiary.ui.list.diarylist;
 
+import androidx.annotation.NonNull;
+
 import com.websarva.wings.android.zuboradiary.ui.list.DiaryYearMonthListAdapter.ViewType;
 
 import java.time.LocalDate;
@@ -47,6 +49,7 @@ public class DiaryYearMonthList {
         this.diaryYearMonthListItemList = Collections.unmodifiableList(itemList);
     }
 
+    @NonNull
     private List<DiaryYearMonthListItem> createDiaryYearMonthListItem(DiaryDayList diaryDayList) {
         Objects.requireNonNull(diaryDayList);
         if (diaryDayList.getDiaryDayListItemList().isEmpty()) throw new IllegalArgumentException();

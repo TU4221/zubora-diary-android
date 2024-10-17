@@ -112,7 +112,7 @@ public abstract class DiaryYearMonthListAdapter extends ListAdapter<DiaryYearMon
 
     @NonNull
     @Override
-    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         Objects.requireNonNull(parent);
 
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
@@ -213,7 +213,7 @@ public abstract class DiaryYearMonthListAdapter extends ListAdapter<DiaryYearMon
                 WordSearchResultDayListAdapter wordSearchResultDayListAdapter =
                                                     createWordSearchResultDayListAdapter(_holder);
                 List<WordSearchResultDayListItem> wordSearchResultDayList =
-                                                                _item.getWordSearchResultDayList();
+                        _item.getWordSearchResultDayList().getWordSearchResultDayListItemList();
                 wordSearchResultDayListAdapter.submitList(wordSearchResultDayList);
             }
         }
@@ -393,47 +393,49 @@ public abstract class DiaryYearMonthListAdapter extends ListAdapter<DiaryYearMon
                 }
             } else if (oldItem instanceof WordSearchResultYearMonthListItem
                     && newItem instanceof WordSearchResultYearMonthListItem) {
-                Log.d("DiaryYearMonthList", "WordSearchResultYearMonthListItem");
+                Log.d("WordSearchYearMonthList", "WordSearchResultYearMonthListItem");
                 WordSearchResultYearMonthListItem _oldItem = (WordSearchResultYearMonthListItem) oldItem;
                 WordSearchResultYearMonthListItem _newItem = (WordSearchResultYearMonthListItem) newItem;
-                int oldChildListSize = _oldItem.getWordSearchResultDayList().size();
-                int newChildListSize = _newItem.getWordSearchResultDayList().size();
+                int oldChildListSize =
+                        _oldItem.getWordSearchResultDayList().getWordSearchResultDayListItemList().size();
+                int newChildListSize =
+                        _newItem.getWordSearchResultDayList().getWordSearchResultDayListItemList().size();
                 if (oldChildListSize != newChildListSize) {
-                    Log.d("DiaryYearMonthList", "ChildList_Size不一致");
+                    Log.d("WordSearchYearMonthList", "ChildList_Size不一致");
                     return false;
                 }
 
                 for (int i = 0; i < oldChildListSize; i++) {
                     WordSearchResultDayListItem oldChildListItem =
-                            _oldItem.getWordSearchResultDayList().get(i);
+                            _oldItem.getWordSearchResultDayList().getWordSearchResultDayListItemList().get(i);
                     WordSearchResultDayListItem newChildListItem =
-                            _newItem.getWordSearchResultDayList().get(i);
-                    Log.d("DiaryYearMonthList", "oldChildListItem_Date:" + oldChildListItem.getDate());
-                    Log.d("DiaryYearMonthList", "newChildListItem_Date:" + newChildListItem.getDate());
+                            _newItem.getWordSearchResultDayList().getWordSearchResultDayListItemList().get(i);
+                    Log.d("WordSearchYearMonthList", "oldChildListItem_Date:" + oldChildListItem.getDate());
+                    Log.d("WordSearchYearMonthList", "newChildListItem_Date:" + newChildListItem.getDate());
 
                     if (!oldChildListItem.getDate().equals(newChildListItem.getDate())) {
-                        Log.d("DiaryYearMonthList", "ChildListItem_Date不一致");
+                        Log.d("WordSearchYearMonthList", "ChildListItem_Date不一致");
                         return false;
                     }
                     if (!oldChildListItem.getTitle().equals(newChildListItem.getTitle())) {
-                        Log.d("DiaryYearMonthList", "ChildListItem_Title不一致");
+                        Log.d("WordSearchYearMonthList", "ChildListItem_Title不一致");
                         return false;
                     }
                     if (oldChildListItem.getItemNumber() != newChildListItem.getItemNumber()) {
-                        Log.d("DiaryYearMonthList", "ChildListItem_ItemNumber不一致");
+                        Log.d("WordSearchYearMonthList", "ChildListItem_ItemNumber不一致");
                         return false;
                     }
                     if (!oldChildListItem.getItemTitle().equals(newChildListItem.getItemTitle())) {
-                        Log.d("DiaryYearMonthList", "ChildListItem_ItemTitle不一致");
+                        Log.d("WordSearchYearMonthList", "ChildListItem_ItemTitle不一致");
                         return false;
                     }
                     if (!oldChildListItem.getItemComment().equals(newChildListItem.getItemComment())) {
-                        Log.d("DiaryYearMonthList", "ChildListItem_ItemComment不一致");
+                        Log.d("WordSearchYearMonthList", "ChildListItem_ItemComment不一致");
                         return false;
                     }
                 }
             }
-            Log.d("DiaryYearMonthList", "一致");
+            Log.d("WordSearchYearMonthList", "一致");
             return true;
         }
     }

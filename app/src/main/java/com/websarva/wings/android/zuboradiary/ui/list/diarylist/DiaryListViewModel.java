@@ -62,10 +62,6 @@ public class DiaryListViewModel extends BaseViewModel {
         sortConditionDate = null;
     }
 
-    public enum LoadType {
-        NEW, UPDATE, ADD
-    }
-
     public boolean canLoadDiaryList() {
         Log.d("OnScrollDiaryList", "isLoadingDiaryList()");
         if (diaryListLoadingFuture == null) {

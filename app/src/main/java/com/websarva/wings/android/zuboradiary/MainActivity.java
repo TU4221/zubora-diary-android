@@ -291,9 +291,6 @@ public class MainActivity extends AppCompatActivity {
                     if (fragment instanceof DiaryListFragment) {
                         DiaryListFragment diaryListFragment = (DiaryListFragment) fragment;
                         diaryListFragment.processOnReSelectNavigationItem();
-                    } else if (fragment instanceof WordSearchFragment) {
-                        WordSearchFragment wordSearchFragment = (WordSearchFragment) fragment;
-                        wordSearchFragment.processOnReselectNavigationItem();
                     }
                 }
 
