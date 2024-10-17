@@ -47,7 +47,17 @@ public enum ThemeColor {
         return context.getString(this.stringResId);
     }
 
-    public boolean requestsSwitchingAppearanceLightStatusBars() {
+    public boolean isAppearanceLightStatusBars() {
+        switch (this) {
+            case BLACK:
+                return false;
+            case WHITE:
+            case RED:
+            case BLUE:
+            case GREEN:
+            case YELLOW:
+                return true;
+        }
         return true;
     }
 

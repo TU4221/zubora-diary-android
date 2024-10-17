@@ -69,11 +69,10 @@ public class BaseThemeColorSwitcher {
         window.setStatusBarColor(surfaceColor);
 
         // ステータスバーのアイコンの色を変更(白 or 灰)
-        boolean requests = themeColor.requestsSwitchingAppearanceLightStatusBars();
-        new WindowInsetsControllerCompat(window, window.getDecorView()).setAppearanceLightStatusBars(requests);
+        boolean isLight = themeColor.isAppearanceLightStatusBars();
+        new WindowInsetsControllerCompat(window, window.getDecorView()).setAppearanceLightStatusBars(isLight);
     }
 
-    // TODO:ThemeResIdが設定できないためサイトで確認しながら個々設定できるようにする
     public final void switchBottomNavigationColor(BottomNavigationView view) {
         Preconditions.checkNotNull(view);
 
