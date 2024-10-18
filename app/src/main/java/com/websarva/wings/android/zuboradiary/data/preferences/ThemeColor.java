@@ -729,6 +729,35 @@ public enum ThemeColor {
         return ResourcesCompat.getColor(resources, colorResId, null);
     }
 
+    public  int getErrorColor(Resources resources) {
+        if (resources == null) {
+            throw new NullPointerException();
+        }
+
+        int colorResId = -1;
+        switch (this) {
+            case WHITE:
+                colorResId = R.color.md_theme_color_white_error;
+                break;
+            case BLACK:
+                colorResId = R.color.md_theme_color_black_error;
+                break;
+            case RED:
+                colorResId = R.color.md_theme_color_red_error;
+                break;
+            case BLUE:
+                colorResId = R.color.md_theme_color_blue_error;
+                break;
+            case GREEN:
+                colorResId = R.color.md_theme_color_green_error;
+                break;
+            case YELLOW:
+                colorResId = R.color.md_theme_color_yellow_error;
+                break;
+        }
+        return ResourcesCompat.getColor(resources, colorResId, null);
+    }
+
     public int getDatePickerDialogThemeResId() {
         switch (this) {
             case WHITE:

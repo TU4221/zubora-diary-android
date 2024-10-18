@@ -38,10 +38,10 @@ public class WordSearchViewModel extends BaseViewModel {
     private static final int NUM_LOADING_ITEMS = 10; //リストが画面全体に表示される値にすること。 // TODO:仮数値の為、最後に設定
     private final ExecutorService executorService;
 
-    boolean isValidityDelay = true;// TODO:調整用
+    private final boolean isValidityDelay = true;// TODO:調整用
 
     @Inject
-    public WordSearchViewModel(DiaryRepository diaryRepository) {
+    WordSearchViewModel(DiaryRepository diaryRepository) {
         this.diaryRepository = diaryRepository;
         this.executorService = Executors.newSingleThreadExecutor();
         initialize();
@@ -109,11 +109,11 @@ public class WordSearchViewModel extends BaseViewModel {
 
     private class WordSearchResultListLoadingRunnable implements Runnable {
 
-        WordSearchResultListCreator resultListCreator;
-        int spannableStringColor;
-        int spannableStringBackGroundColor;
+        private final WordSearchResultListCreator resultListCreator;
+        private final int spannableStringColor;
+        private final int spannableStringBackGroundColor;
 
-        public WordSearchResultListLoadingRunnable(
+        private WordSearchResultListLoadingRunnable(
                 WordSearchResultListCreator resultListCreator,
                 int spannableStringColor, int spannableStringBackGroundColor) {
             Objects.requireNonNull(resultListCreator);
@@ -273,7 +273,7 @@ public class WordSearchViewModel extends BaseViewModel {
     // MEMO:単一データバインディングの場合、ゲッターの戻り値はLiveData<>にすること。
     //      双方向データバインディングの場合、ゲッターの戻り値はMutableLiveData<>にすること。
     @NonNull
-    public LiveData<String> getSearchWordLiveData() {
+    LiveData<String> getSearchWordLiveData() {
         return searchWord;
     }
 
@@ -283,7 +283,7 @@ public class WordSearchViewModel extends BaseViewModel {
     }
 
     @NonNull
-    public LiveData<WordSearchResultYearMonthList> getWordSearchResultListLiveData() {
+    LiveData<WordSearchResultYearMonthList> getWordSearchResultListLiveData() {
         return wordSearchResultList;
     }
 

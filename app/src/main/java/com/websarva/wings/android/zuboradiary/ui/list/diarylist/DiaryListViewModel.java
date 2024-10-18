@@ -45,10 +45,10 @@ public class DiaryListViewModel extends BaseViewModel {
     private LocalDate sortConditionDate;
     private final ExecutorService executorService;
 
-    boolean isValidityDelay = true;// TODO:調整用
+    private final boolean isValidityDelay = true;// TODO:調整用
 
     @Inject
-    public DiaryListViewModel(DiaryRepository diaryRepository) {
+    DiaryListViewModel(DiaryRepository diaryRepository) {
         this.diaryRepository = diaryRepository;
         executorService = Executors.newSingleThreadExecutor();
         initialize();
@@ -300,7 +300,7 @@ public class DiaryListViewModel extends BaseViewModel {
 
     // LiveDataGetter
     @NonNull
-    public LiveData<DiaryYearMonthList> getDiaryListLiveData() {
+    LiveData<DiaryYearMonthList> getDiaryListLiveData() {
         return diaryList;
     }
 
