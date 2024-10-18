@@ -9,12 +9,12 @@ import java.util.Objects;
 public class DiaryYearMonthListItem extends DiaryYearMonthListItemBase {
     private final DiaryDayList diaryDayList;
 
-    public DiaryYearMonthListItem(ViewType viewType) {
+    DiaryYearMonthListItem(ViewType viewType) {
         super(viewType);
         diaryDayList = new DiaryDayList();
     }
 
-    public DiaryYearMonthListItem(YearMonth yearMonth, DiaryDayList diaryDayList) {
+    DiaryYearMonthListItem(YearMonth yearMonth, DiaryDayList diaryDayList) {
         super(yearMonth, ViewType.DIARY);
 
         Objects.requireNonNull(diaryDayList);

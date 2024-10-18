@@ -12,7 +12,7 @@ public class DiaryDayListItem {
     private final String title;
     private final String picturePath;
 
-    public DiaryDayListItem(DiaryListItem diaryListItem) {
+    DiaryDayListItem(DiaryListItem diaryListItem) {
         Objects.requireNonNull(diaryListItem);
 
         String strDate = diaryListItem.getDate();

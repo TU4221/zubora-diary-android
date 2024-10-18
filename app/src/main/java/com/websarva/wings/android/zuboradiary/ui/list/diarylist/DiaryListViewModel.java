@@ -62,7 +62,7 @@ public class DiaryListViewModel extends BaseViewModel {
         sortConditionDate = null;
     }
 
-    public boolean canLoadDiaryList() {
+    boolean canLoadDiaryList() {
         Log.d("OnScrollDiaryList", "isLoadingDiaryList()");
         if (diaryListLoadingFuture == null) {
             Log.d("OnScrollDiaryList", "diaryListLoadingFuture == null");
@@ -236,13 +236,13 @@ public class DiaryListViewModel extends BaseViewModel {
         return numLoadedDiaries < numExistingDiaries;
     }
 
-    public void updateSortConditionDate(YearMonth yearMonth) {
+    void updateSortConditionDate(YearMonth yearMonth) {
         Objects.requireNonNull(yearMonth);
 
         sortConditionDate= yearMonth.atDay(1).with(TemporalAdjusters.lastDayOfMonth());
     }
 
-    public void deleteDiary(LocalDate date) {
+    void deleteDiary(LocalDate date) {
         Objects.requireNonNull(date);
 
         Integer result;
@@ -264,7 +264,7 @@ public class DiaryListViewModel extends BaseViewModel {
     }
 
     @Nullable
-    public Integer countDiaries() {
+    Integer countDiaries() {
         try {
             return diaryRepository.countDiaries(null).get();
         } catch (CancellationException | ExecutionException | InterruptedException e) {
@@ -275,7 +275,7 @@ public class DiaryListViewModel extends BaseViewModel {
 
 
     @Nullable
-    public LocalDate loadNewestDiary() {
+    LocalDate loadNewestDiary() {
         try {
             Diary diary = diaryRepository.selectNewestDiary().get();
             String strDate = diary.getDate();
@@ -287,7 +287,7 @@ public class DiaryListViewModel extends BaseViewModel {
     }
 
     @Nullable
-    public LocalDate loadOldestDiary() {
+    LocalDate loadOldestDiary() {
         try {
             Diary diary = diaryRepository.selectOldestDiary().get();
             String strDate = diary.getDate();

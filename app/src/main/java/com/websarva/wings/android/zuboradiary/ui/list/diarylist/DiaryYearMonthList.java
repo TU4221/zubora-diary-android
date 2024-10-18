@@ -15,7 +15,7 @@ public class DiaryYearMonthList {
 
     private final List<DiaryYearMonthListItem> diaryYearMonthListItemList;
 
-    public DiaryYearMonthList(DiaryDayList diaryDayList, boolean needsNoDiaryMessage) {
+    DiaryYearMonthList(DiaryDayList diaryDayList, boolean needsNoDiaryMessage) {
         Objects.requireNonNull(diaryDayList);
         if (diaryDayList.getDiaryDayListItemList().isEmpty()) throw new IllegalArgumentException();
 
@@ -24,7 +24,7 @@ public class DiaryYearMonthList {
         this.diaryYearMonthListItemList = Collections.unmodifiableList(diaryYearMonthListItemList);
     }
 
-    public DiaryYearMonthList(List<DiaryYearMonthListItem> itemList, boolean needsNoDiaryMessage) {
+    DiaryYearMonthList(List<DiaryYearMonthListItem> itemList, boolean needsNoDiaryMessage) {
         Objects.requireNonNull(itemList);
         if (itemList.isEmpty()) throw new IllegalArgumentException();
         itemList.stream().forEach(Objects::requireNonNull);
@@ -38,13 +38,13 @@ public class DiaryYearMonthList {
      * true:日記なしメッセージのみのリスト作成<br>
      * false:ProgressIndicatorのみのリスト作成
      * */
-    public DiaryYearMonthList(boolean needsNoDiaryMessage) {
+    DiaryYearMonthList(boolean needsNoDiaryMessage) {
         List<DiaryYearMonthListItem> itemList = new ArrayList<>();
         addLastItem(itemList, needsNoDiaryMessage);
         this.diaryYearMonthListItemList = Collections.unmodifiableList(itemList);
     }
 
-    public DiaryYearMonthList() {
+    DiaryYearMonthList() {
         List<DiaryYearMonthListItem> itemList = new ArrayList<>();
         this.diaryYearMonthListItemList = Collections.unmodifiableList(itemList);
     }
@@ -108,7 +108,7 @@ public class DiaryYearMonthList {
         itemList.add(new DiaryYearMonthListItem(ViewType.NO_DIARY_MESSAGE));
     }
 
-    public int countDiaries() {
+    int countDiaries() {
         int count = 0;
         for (DiaryYearMonthListItem item: diaryYearMonthListItemList) {
             if (item.getViewType().equals(ViewType.DIARY)) {
@@ -118,7 +118,7 @@ public class DiaryYearMonthList {
         return count;
     }
 
-    public DiaryYearMonthList combineDiaryLists(
+    DiaryYearMonthList combineDiaryLists(
             DiaryYearMonthList additionList, boolean needsNoDiaryMessage) {
         Objects.requireNonNull(additionList);
         if (additionList.getDiaryYearMonthListItemList().isEmpty()) throw new IllegalArgumentException();

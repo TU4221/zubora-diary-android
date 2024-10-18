@@ -9,7 +9,7 @@ public class DiaryDayList {
 
     private final List<DiaryDayListItem> diaryDayListItemList;
 
-    public DiaryDayList(List<DiaryDayListItem> itemList) {
+    DiaryDayList(List<DiaryDayListItem> itemList) {
         Objects.requireNonNull(itemList);
         if (itemList.isEmpty()) throw new IllegalArgumentException();
         itemList.stream().forEach(Objects::requireNonNull);
@@ -17,15 +17,15 @@ public class DiaryDayList {
         this.diaryDayListItemList = Collections.unmodifiableList(itemList);
     }
 
-    public DiaryDayList() {
+    DiaryDayList() {
         this.diaryDayListItemList = new ArrayList<>();
     }
 
-    public int countDiaries() {
+    int countDiaries() {
         return diaryDayListItemList.size();
     }
 
-    public DiaryDayList combineDiaryDayLists(DiaryDayList additionList) {
+    DiaryDayList combineDiaryDayLists(DiaryDayList additionList) {
         Objects.requireNonNull(additionList);
         if (additionList.diaryDayListItemList.isEmpty()) throw new IllegalArgumentException();
 
