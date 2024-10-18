@@ -85,7 +85,7 @@ public class WordSearchFragment extends BaseFragment {
         setUpToolBar();
         setUpWordSearchView();
         setUpWordSearchResultList();
-        Log.d("20241017", "");
+        setUpFloatingActionButton();
     }
 
     private void setUpThemeColor() {
@@ -281,6 +281,26 @@ public class WordSearchFragment extends BaseFragment {
         }
     }
 
+    private void setUpFloatingActionButton() {
+        binding.fabTopScroll.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Objects.requireNonNull(v);
+
+                resultListScrollToFirstPosition();
+            }
+        });
+    }
+
+    //日記リスト(年月)を自動でトップへスクロールさせるメソッド。
+    private void resultListScrollToFirstPosition() {
+        RecyclerView.Adapter<?> adapter = binding.recyclerWordSearchResultList.getAdapter();
+        Objects.requireNonNull(adapter);
+
+        DiaryYearMonthListAdapter diaryYearMonthListAdapter = (DiaryYearMonthListAdapter) adapter;
+        diaryYearMonthListAdapter.scrollToFirstPosition();
+    }
+
     private void showShowDiaryFragment(LocalDate date) {
         Objects.requireNonNull(date);
         if (!canShowOtherFragment()) return;
@@ -303,16 +323,6 @@ public class WordSearchFragment extends BaseFragment {
     @Override
     protected void retryErrorDialogShow() {
         wordSearchViewModel.triggerAppErrorBufferListObserver();
-    }
-
-    // TODO:FABのようなボタンを設けて下記メソッドを呼び出せるようにする。
-    //日記リスト(年月)を自動でトップへスクロールさせるメソッド。
-    private void resultListScrollToFirstPosition() {
-        RecyclerView.Adapter<?> adapter = binding.recyclerWordSearchResultList.getAdapter();
-        Objects.requireNonNull(adapter);
-
-        DiaryYearMonthListAdapter diaryYearMonthListAdapter = (DiaryYearMonthListAdapter) adapter;
-        diaryYearMonthListAdapter.scrollToFirstPosition();
     }
 
     @Override

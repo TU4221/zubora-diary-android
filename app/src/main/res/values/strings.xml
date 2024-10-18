@@ -17,6 +17,7 @@
     <string name="fragment_word_search_no_results_message">一致するものが見つかりません。</string>
     <string name="fragment_word_search_num_results_message">件見つかりました。</string>
     <string name="fragment_word_search_result_item">項目</string>
+    <string name="fragment_word_search_fab_top_scroll">先頭へスクロール</string>
 
     <!-- row_diary_year_month_list -->
     <string name="row_diary_year_month_list_section_bar_year">年</string>
