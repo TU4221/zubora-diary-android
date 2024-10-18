@@ -101,7 +101,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:textAppearance="@style/TextViewTextAppearance"
-                        android:text="@{Integer.toString(word_search_view_model.numWordSearchResults) + @string/fragment_word_search_num_results_message}"
+                        android:text="@{Integer.toString(word_search_view_model.numWordSearchResultsLiveData) + @string/fragment_word_search_num_results_message}"
                         android:paddingHorizontal="8dp"
                         android:paddingVertical="8dp"
                         android:visibility="invisible"

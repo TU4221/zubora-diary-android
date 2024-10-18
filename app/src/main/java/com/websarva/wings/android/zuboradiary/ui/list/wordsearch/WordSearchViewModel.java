@@ -272,22 +272,27 @@ public class WordSearchViewModel extends BaseViewModel {
     // LiveDataGetter
     // MEMO:単一データバインディングの場合、ゲッターの戻り値はLiveData<>にすること。
     //      双方向データバインディングの場合、ゲッターの戻り値はMutableLiveData<>にすること。
+    @NonNull
     public LiveData<String> getSearchWordLiveData() {
         return searchWord;
     }
 
+    @NonNull
     public MutableLiveData<String> getSearchWordMutableLiveData() {
         return searchWord;
     }
 
+    @NonNull
     public LiveData<WordSearchResultYearMonthList> getWordSearchResultListLiveData() {
         return wordSearchResultList;
     }
 
-    public LiveData<Integer> getNumWordSearchResults() {
+    @NonNull
+    public LiveData<Integer> getNumWordSearchResultsLiveData() {
         return numWordSearchResults;
     }
 
+    @NonNull
     public LiveData<Boolean> getIsVisibleUpdateProgressBarLiveData() {
         return isVisibleUpdateProgressBar;
     }

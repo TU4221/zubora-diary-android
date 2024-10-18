@@ -1,12 +1,9 @@
 package com.websarva.wings.android.zuboradiary.ui.calendar;
 
 import android.os.Bundle;
-import android.util.Log;
-import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewTreeObserver;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -19,7 +16,6 @@ import androidx.lifecycle.SavedStateHandle;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavDirections;
 
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.common.util.concurrent.FutureCallback;
 import com.kizitonwose.calendar.core.CalendarDay;
 import com.kizitonwose.calendar.core.CalendarMonth;
@@ -34,7 +30,6 @@ import com.websarva.wings.android.zuboradiary.databinding.CalendarHeaderBinding;
 import com.websarva.wings.android.zuboradiary.databinding.FragmentCalendarBinding;
 import com.websarva.wings.android.zuboradiary.data.DateTimeStringConverter;
 import com.websarva.wings.android.zuboradiary.ui.BaseFragment;
-import com.websarva.wings.android.zuboradiary.ui.ColorSwitchingViewList;
 import com.websarva.wings.android.zuboradiary.ui.diary.DiaryLiveData;
 import com.websarva.wings.android.zuboradiary.ui.diary.diaryshow.DiaryShowFragment;
 
@@ -53,6 +48,7 @@ import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -69,6 +65,7 @@ public class CalendarFragment extends BaseFragment {
     private DiaryShowViewModel diaryShowViewModel; // TODO:diaryViewModelの使用要素をcalendarViewModelに含めるか検討(DiaryFragment修正後)
     private SettingsViewModel settingsViewModel;
 
+    @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
@@ -88,6 +85,7 @@ public class CalendarFragment extends BaseFragment {
         settingsViewModel = provider.get(SettingsViewModel.class);
     }
 
+    @Override
     public View onCreateView(
             @NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         return super.onCreateView(inflater,container,savedInstanceState);
@@ -145,26 +143,28 @@ public class CalendarFragment extends BaseFragment {
                 .observe(getViewLifecycleOwner(), new AppErrorBufferListObserver(settingsViewModel));
     }
 
-    private void setUpCalendar(/*ThemeColor themeColor*/) {
+    private void setUpCalendar() {
         CalendarView calendar = binding.calendar;
+
         List<DayOfWeek> daysOfWeek = createDayOfWeekList(); // 曜日リスト取得
+        ThemeColor themeColor = settingsViewModel.loadThemeColorSettingValue();
+        configureCalendarBinders(daysOfWeek, themeColor);
+
         YearMonth currentMonth = YearMonth.now();
         YearMonth startMonth = currentMonth.minusMonths(60); //現在から過去5年分
         YearMonth endMonth = currentMonth.plusMonths(60); //現在から未来5年分
-        ThemeColor themeColor = settingsViewModel.loadThemeColorSettingValue();
-        configureCalendarBinders(daysOfWeek, themeColor);
         calendar.setup(startMonth,endMonth,daysOfWeek.get(0));
-        if (calendarViewModel.getSelectedDateLiveData().getValue() == null) {
-            calendarViewModel.updateSelectedDate(LocalDate.now());
-        }
+
+        LocalDate selectedDate = calendarViewModel.getSelectedDateLiveData().getValue();
+        Objects.requireNonNull(selectedDate);
+        calendarViewModel.updateSelectedDate(selectedDate);
 
         calendarViewModel.getSelectedDateLiveData()
                 .observe(getViewLifecycleOwner(), new Observer<LocalDate>() {
                     @Override
                     public void onChanged(LocalDate localDate) {
-                        if (localDate == null) {
-                            return;
-                        }
+                        Objects.requireNonNull(localDate);
+
                         binding.calendar.notifyDateChanged(localDate); // 今回選択日付更新
                         scrollCalendar(localDate);
                         updateToolBarDate(localDate);
@@ -176,218 +176,250 @@ public class CalendarFragment extends BaseFragment {
                 .observe(getViewLifecycleOwner(), new Observer<LocalDate>() {
                     @Override
                     public void onChanged(LocalDate localDate) {
-                        if (localDate == null) {
-                            return;
-                        }
+                        // MEMO:一度も日付選択をしていない場合はnullが代入されている。
+                        if (localDate == null) return;
+
                         binding.calendar.notifyDateChanged(localDate); // 前回選択日付更新
                     }
                 });
     }
 
     private List<DayOfWeek> createDayOfWeekList() {
-        DayOfWeek firstDayOfWeek =
-                settingsViewModel.getCalendarStartDayOfWeekLiveData().getValue();
-        if (firstDayOfWeek == null) {
-            throw new NullPointerException();
-        }
+        DayOfWeek firstDayOfWeek = settingsViewModel.getCalendarStartDayOfWeekLiveData().getValue();
+        Objects.requireNonNull(firstDayOfWeek);
+
         DayOfWeek[] daysOfWeek = DayOfWeek.values();
         int firstDayOfWeekListPos = firstDayOfWeek.getValue();
         // 開始曜日を先頭に並び替え
-        List<DayOfWeek> firstHalfList =
+        List<DayOfWeek> firstList =
                 Arrays.stream(daysOfWeek)
                         .skip(firstDayOfWeekListPos - 1)
                         .collect(Collectors.toList());
-        List<DayOfWeek> secondHalfList =
+        List<DayOfWeek> secondList =
                 Arrays.stream(daysOfWeek)
                         .limit(firstDayOfWeekListPos - 1)
                         .collect(Collectors.toList());
         return Stream
-                .concat(firstHalfList.stream(), secondHalfList.stream())
+                .concat(firstList.stream(), secondList.stream())
                 .collect(Collectors.toList());
     }
 
     // カレンダーBind設定
     private void configureCalendarBinders(List<DayOfWeek> daysOfWeek, ThemeColor themeColor) {
-        if (themeColor == null) {
-            throw new NullPointerException();
-        }
+        Objects.requireNonNull(daysOfWeek);
+        daysOfWeek.stream().forEach(Objects::requireNonNull);
+        Objects.requireNonNull(themeColor);
 
-        // カレンダーの日にち設定
-        binding.calendar.setDayBinder(new MonthDayBinder<DayViewContainer>() {
-            @NonNull
-            @Override
-            public DayViewContainer create(@NonNull View view) {
-                return new DayViewContainer(view);
-            }
-
-            @Override
-            public void bind(@NonNull DayViewContainer container, CalendarDay calendarDay) {
-                container.calendarDay = calendarDay;
-                TextView textCalendarDay = container.binding.textCalendarDay;
-                View viewCalendarDayDot = container.binding.viewCalendarDayDot;
-
-                // 数値設定
-                String day = String.valueOf(calendarDay.getDate().getDayOfMonth());
-                textCalendarDay.setText(day);
-
-                // 日にちマス状態(可視、数値色、背景色、ドット有無)設定
-                if (calendarDay.getPosition() == DayPosition.MonthDate) {
-                    textCalendarDay.setVisibility(View.VISIBLE);
-
-                    CalendarThemeColorSwitcher themeColorSwitcher =
-                            new CalendarThemeColorSwitcher(requireContext(), themeColor);
-
-                    // 選択中の日にちマス
-                    if (calendarDay.getDate().isEqual(calendarViewModel.getSelectedDateLiveData().getValue())) {
-                        themeColorSwitcher.switchCalendarSelectedDayColor(textCalendarDay, viewCalendarDayDot);
-
-                        // 今日の日にちマス
-                    } else if (calendarDay.getDate().isEqual(LocalDate.now())) {
-                        themeColorSwitcher.switchCalendarTodayColor(textCalendarDay, viewCalendarDayDot);
-
-                        // それ以外の日にちマス
-                    } else {
-                        themeColorSwitcher.switchCalendarNormalDayColor(textCalendarDay, viewCalendarDayDot);
-
-                        // TODO:祝日判定は手間がかかりそうなので保留
-                        DayOfWeek dayOfWeek = calendarDay.getDate().getDayOfWeek();
-                        if (dayOfWeek == DayOfWeek.SUNDAY || dayOfWeek == DayOfWeek.SATURDAY) {
-                            int color = selectDayColor(dayOfWeek);
-                            textCalendarDay.setTextColor(color);
-                            viewCalendarDayDot.setBackgroundColor(color);
-                        }
-                    }
-
-                    // ドット有無設定
-                    LocalDate localDate = calendarDay.getDate();
-                    calendarViewModel.hasDiary(localDate, new FutureCallback<Boolean>() {
-                        @Override
-                        public void onSuccess(Boolean result) {
-                            Log.d("20240806", "hasDiary()_onSuccess:" + result) ;
-                            if (result) {
-                                viewCalendarDayDot.setVisibility(View.VISIBLE);
-                            } else {
-                                viewCalendarDayDot.setVisibility(View.INVISIBLE);
-                            }
-                        }
-
-                        @Override
-                        public void onFailure(@NonNull Throwable t) {
-                            Log.d("20240806", "hasDiary()_onFailure") ;
-                            // 例外はViewModelクラス内で例外用リスナーを追加して対応
-                            viewCalendarDayDot.setVisibility(View.INVISIBLE);
-                        }
-                    });
-
-                } else {
-                    textCalendarDay.setVisibility(View.INVISIBLE);
-                    viewCalendarDayDot.setVisibility(View.INVISIBLE);
-                }
-
-            }
-        });
-
-        // カレンダーのヘッダー設定
-        binding.calendar.setMonthHeaderBinder(new MonthHeaderFooterBinder<MonthViewContainer>() {
-            @NonNull
-            @Override
-            public MonthViewContainer create(@NonNull View view) {
-                return new MonthViewContainer(view);
-            }
-
-            @Override
-            public void bind(@NonNull MonthViewContainer container, CalendarMonth calendarMonth) {
-                // カレンダーの年月表示設定
-                String format = getString(R.string.fragment_calendar_month_header_format);
-                DateTimeFormatter formatter = DateTimeFormatter.ofPattern(format);
-                String stringYearMonth = calendarMonth.getYearMonth().format(formatter);
-                container.textYearMonth.setText(stringYearMonth);
-
-                // カレンダーの曜日設定(未設定アイテムのみ設定)
-                if (container.legendLayout.getTag() == null) {
-                    container.legendLayout.setTag(calendarMonth.getYearMonth());
-
-                    // カレンダー曜日表示設定
-                    int max = container.legendLayout.getChildCount();
-                    for (int i = 0; i < max; i++) {
-                        View childView = container.legendLayout.getChildAt(i);
-                        TextView childTextView = (TextView) childView;
-                        DayOfWeek dayOfWeek = daysOfWeek.get(i);
-
-                        childTextView.setText(dayOfWeek.name().substring(0,3));
-
-                        CalendarThemeColorSwitcher themeColorSwitcher =
-                                new CalendarThemeColorSwitcher(requireContext(), themeColor);
-                        themeColorSwitcher.switchCalendarDayOfWeekColor(childTextView);
-
-                        if (dayOfWeek == DayOfWeek.SUNDAY || dayOfWeek == DayOfWeek.SATURDAY) {
-                            int color = selectDayColor(dayOfWeek);
-                            childTextView.setTextColor(color);
-                        }
-
-
-                    }
-                }
-
-            }
-        });
+        binding.calendar.setDayBinder(new CalendarMonthDayBinder(themeColor));
+        binding.calendar.setMonthHeaderBinder(new CalendarMonthHeaderFooterBinder(daysOfWeek, themeColor));
     }
 
-    // カレンダー日にち、曜日の色取得
-    private int selectDayColor(DayOfWeek dayOfWeek) {
-        int colorResId;
-        if (dayOfWeek == DayOfWeek.SUNDAY) {
-            colorResId = R.color.red;
-        } else if (dayOfWeek == DayOfWeek.SATURDAY) {
-            colorResId = R.color.blue;
-        } else {
-            colorResId = R.color.black;
-        }
-        return getResources().getColor(colorResId);
-    }
+    private class CalendarMonthDayBinder implements MonthDayBinder<DayViewContainer> {
 
-    // カレンダー日単位コンテナ
-    class DayViewContainer extends ViewContainer {
-        CalendarDay calendarDay;
-        CalendarDayBinding binding;
-        public DayViewContainer(View view) {
-            super(view);
-            binding = CalendarDayBinding.bind(view);
-            view.setOnClickListener(new View.OnClickListener() {
+        private final ThemeColor themeColor;
+
+        private CalendarMonthDayBinder(ThemeColor themeColor) {
+            Objects.requireNonNull(themeColor);
+
+            this.themeColor = themeColor;
+        }
+
+        @Override
+        public void bind(@NonNull DayViewContainer container, @NonNull CalendarDay calendarDay) {
+
+            TextView textCalendarDay = container.binding.textCalendarDay;
+            View viewCalendarDayDot = container.binding.viewCalendarDayDot;
+
+            textCalendarDay.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    Objects.requireNonNull(v);
+
                     if (calendarDay.getPosition() == DayPosition.MonthDate) {
                         calendarViewModel.updateSelectedDate(calendarDay.getDate());
                     }
                 }
             });
+
+            // 数値設定
+            String day = String.valueOf(calendarDay.getDate().getDayOfMonth());
+            textCalendarDay.setText(day);
+
+            // 日にちマス状態(可視、数値色、背景色、ドット有無)設定
+            if (calendarDay.getPosition() == DayPosition.MonthDate) {
+                textCalendarDay.setVisibility(View.VISIBLE);
+                setUpCalendarDayColor(calendarDay, textCalendarDay, viewCalendarDayDot);
+                setUpCalendarDayDotVisibility(calendarDay, viewCalendarDayDot);
+            } else {
+                textCalendarDay.setVisibility(View.INVISIBLE);
+                viewCalendarDayDot.setVisibility(View.INVISIBLE);
+            }
+        }
+
+        private void setUpCalendarDayColor(
+                @NonNull CalendarDay calendarDay, TextView textCalendarDay, View viewCalendarDayDot) {
+            Objects.requireNonNull(textCalendarDay);
+            Objects.requireNonNull(viewCalendarDayDot);
+
+            CalendarThemeColorSwitcher themeColorSwitcher =
+                    new CalendarThemeColorSwitcher(requireContext(), themeColor);
+
+            LocalDate selectedDate = calendarViewModel.getSelectedDateLiveData().getValue();
+            boolean isSelectedDay = calendarDay.getDate().isEqual(selectedDate);
+            boolean isToday = calendarDay.getDate().isEqual(LocalDate.now());
+
+            if (isSelectedDay) {
+                themeColorSwitcher.switchCalendarSelectedDayColor(textCalendarDay, viewCalendarDayDot);
+            } else if (isToday) {
+                themeColorSwitcher.switchCalendarTodayColor(textCalendarDay, viewCalendarDayDot);
+            } else {
+                // TODO:祝日判定は手間がかかりそうなので保留
+                DayOfWeek dayOfWeek = calendarDay.getDate().getDayOfWeek();
+                boolean isSaturday = dayOfWeek == DayOfWeek.SATURDAY;
+                boolean isSunday = dayOfWeek == DayOfWeek.SUNDAY;
+
+                if (isSaturday) {
+                    themeColorSwitcher.switchCalendarSaturdayColor(textCalendarDay, viewCalendarDayDot);
+                } else if (isSunday) {
+                    themeColorSwitcher.switchCalendarSundayColor(textCalendarDay, viewCalendarDayDot);
+                } else {
+                    themeColorSwitcher.switchCalendarWeekdaysColor(textCalendarDay, viewCalendarDayDot);
+                }
+            }
+        }
+
+        private void setUpCalendarDayDotVisibility(
+                @NonNull CalendarDay calendarDay, View viewCalendarDayDot) {
+            Objects.requireNonNull(viewCalendarDayDot);
+
+            LocalDate localDate = calendarDay.getDate();
+            calendarViewModel.hasDiary(localDate, new FutureCallback<Boolean>() {
+                @Override
+                public void onSuccess(Boolean result) {
+                    if (result) {
+                        viewCalendarDayDot.setVisibility(View.VISIBLE);
+                    } else {
+                        viewCalendarDayDot.setVisibility(View.INVISIBLE);
+                    }
+                }
+
+                @Override
+                public void onFailure(@NonNull Throwable t) {
+                    // 例外はViewModelクラス内で例外用リスナーを追加して対応
+                    viewCalendarDayDot.setVisibility(View.INVISIBLE);
+                }
+            });
+        }
+
+        @NonNull
+        @Override
+        public DayViewContainer create(@NonNull View view) {
+            return new DayViewContainer(view);
+        }
+    }
+
+    private class CalendarMonthHeaderFooterBinder implements MonthHeaderFooterBinder<MonthViewContainer> {
+
+        private final List<DayOfWeek> daysOfWeek;
+        private final ThemeColor themeColor;
+
+        private CalendarMonthHeaderFooterBinder(List<DayOfWeek> daysOfWeek, ThemeColor themeColor) {
+            Objects.requireNonNull(daysOfWeek);
+            daysOfWeek.stream().forEach(Objects::requireNonNull);
+            Objects.requireNonNull(themeColor);
+
+            this.daysOfWeek = daysOfWeek;
+            this.themeColor = themeColor;
+        }
+
+        @Override
+        public void bind(@NonNull MonthViewContainer container, @NonNull CalendarMonth calendarMonth) {
+            // カレンダーの年月表示設定
+            String format = getString(R.string.fragment_calendar_month_header_format);
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern(format);
+            String stringYearMonth = calendarMonth.getYearMonth().format(formatter);
+            container.binding.textYearMonth.setText(stringYearMonth);
+
+            // カレンダーの曜日設定(未設定アイテムのみ設定)
+            LinearLayout linearLayout = container.binding.legendLayout.getRoot();
+            if (linearLayout.getTag() != null) return;
+            linearLayout.setTag(calendarMonth.getYearMonth());
+
+            // カレンダー曜日表示設定
+            int max = linearLayout.getChildCount();
+            for (int i = 0; i < max; i++) {
+                View childView = linearLayout.getChildAt(i);
+                TextView childTextView = (TextView) childView;
+                DayOfWeek dayOfWeek = daysOfWeek.get(i);
+
+                childTextView.setText(dayOfWeek.name().substring(0,3));
+
+                setUpDayOfWeekColor(dayOfWeek, childTextView);
+            }
+        }
+
+        private void setUpDayOfWeekColor(DayOfWeek dayOfWeek, TextView dayOfWeekText) {
+            Objects.requireNonNull(dayOfWeek);
+            Objects.requireNonNull(dayOfWeekText);
+
+            CalendarThemeColorSwitcher themeColorSwitcher =
+                    new CalendarThemeColorSwitcher(requireContext(), themeColor);
+
+            boolean isSaturday = dayOfWeek == DayOfWeek.SATURDAY;
+            boolean isSunday = dayOfWeek == DayOfWeek.SUNDAY;
+
+            if (isSaturday) {
+                themeColorSwitcher.switchCalendarDayOfWeekSaturdayColor(dayOfWeekText);
+            } else if (isSunday) {
+                themeColorSwitcher.switchCalendarDayOfWeekSundayColor(dayOfWeekText);
+            } else {
+                themeColorSwitcher.switchCalendarDayOfWeekWeekdaysColor(dayOfWeekText);
+            }
+        }
+
+        @NonNull
+        @Override
+        public MonthViewContainer create(@NonNull View view) {
+            return new MonthViewContainer(view);
+        }
+    }
+
+    // カレンダー日単位コンテナ
+    private static class DayViewContainer extends ViewContainer {
+
+        private final CalendarDayBinding binding;
+
+        private DayViewContainer(View view) {
+            super(view);
+            binding = CalendarDayBinding.bind(view);
         }
     }
 
     // カレンダー月単位コンテナ
-    public static class MonthViewContainer extends ViewContainer {
-        TextView textYearMonth;
-        LinearLayout legendLayout;
-        public MonthViewContainer(View view) {
+    private static class MonthViewContainer extends ViewContainer {
+
+        private final CalendarHeaderBinding binding;
+
+        private MonthViewContainer(View view) {
             super(view);
-            textYearMonth = CalendarHeaderBinding.bind(view).textYearMonth;
-            // TODO:下記LinearLayoutをDataBindingで参照できなかったのでViewBindingで対応。原因を調査する。
-            legendLayout = CalendarHeaderBinding.bind(view).legendLayout.getRoot();
+            binding = CalendarHeaderBinding.bind(view);
         }
     }
 
     // カレンダーを指定した日付へ自動スクロール
     private void scrollCalendar(LocalDate date) {
+        Objects.requireNonNull(date);
+
         YearMonth targetYearMonth = YearMonth.of(date.getYear(), date.getMonthValue());
         CalendarMonth currentMonth = binding.calendar.findFirstVisibleMonth();
         if (currentMonth == null) {
             binding.calendar.scrollToMonth(targetYearMonth);
             return;
         }
+
         YearMonth currentYearMonth = currentMonth.getYearMonth();
-        if (targetYearMonth == currentYearMonth) {
-            return;
-        }
+        Objects.requireNonNull(currentYearMonth);
+
         // MEMO:カレンダーが今日の日付月から遠い月を表示していたらsmoothScrollの処理時間が延びるので、
         //      間にScroll処理を入れる。
         if (currentYearMonth.isAfter(targetYearMonth)) {
@@ -408,8 +440,9 @@ public class CalendarFragment extends BaseFragment {
         binding.calendar.smoothScrollToMonth(targetYearMonth);
     }
 
-    // ツールバー表示日付更新。
     private void updateToolBarDate(LocalDate date) {
+        Objects.requireNonNull(date);
+
         DateTimeStringConverter dateTimeStringConverter = new DateTimeStringConverter();
         String stringDate = dateTimeStringConverter.toStringDate(date);
         binding.materialToolbarTopAppBar.setTitle(stringDate);
@@ -417,30 +450,50 @@ public class CalendarFragment extends BaseFragment {
 
     // CalendarViewで選択された日付の日記を表示
     private void showSelectedDiary(LocalDate date) {
-        calendarViewModel.hasDiary(date, new FutureCallback<Boolean>() {
-            @Override
-            public void onSuccess(Boolean result) {
-                if (result) {
-                    // ViewModelの読込日記の日付をセット
-                    diaryShowViewModel.initialize();
-                    diaryShowViewModel.loadDiary(date);
-                    binding.linearLayoutDiaryShow.setVisibility(View.VISIBLE);
-                    binding.textNoDiary.setVisibility(View.GONE);
-                } else {
-                    binding.linearLayoutDiaryShow.setVisibility(View.GONE);
-                    binding.textNoDiary.setVisibility(View.VISIBLE);
-                    diaryShowViewModel.initialize();
-                }
-            }
+        Objects.requireNonNull(date);
 
-            @Override
-            public void onFailure(@NonNull Throwable t) {
-                // 例外はViewModelクラス内で例外用リスナーを追加して対応
-                binding.linearLayoutDiaryShow.setVisibility(View.GONE);
-                binding.textNoDiary.setVisibility(View.VISIBLE);
-                diaryShowViewModel.initialize();
+        calendarViewModel.hasDiary(date, new DiaryShowFutureCallback(date));
+    }
+
+    private class DiaryShowFutureCallback implements FutureCallback<Boolean> {
+
+        private final LocalDate date;
+
+        private DiaryShowFutureCallback(LocalDate date) {
+            Objects.requireNonNull(date);
+
+            this.date = date;
+        }
+
+        @Override
+        public void onSuccess(Boolean result) {
+            Objects.requireNonNull(result);
+
+            if (result) {
+                showDiary();
+            } else {
+                closeDiary();
             }
-        });
+        }
+
+        @Override
+        public void onFailure(@NonNull Throwable t) {
+            // 例外はViewModelクラス内で例外用リスナーを追加して対応
+            closeDiary();
+        }
+
+        private void showDiary() {
+            diaryShowViewModel.initialize();
+            diaryShowViewModel.loadDiary(date);
+            binding.linearLayoutDiaryShow.setVisibility(View.VISIBLE);
+            binding.textNoDiary.setVisibility(View.GONE);
+        }
+
+        private void closeDiary() {
+            binding.linearLayoutDiaryShow.setVisibility(View.GONE);
+            binding.textNoDiary.setVisibility(View.VISIBLE);
+            diaryShowViewModel.initialize();
+        }
     }
 
     private void setUpDiaryShow() {
@@ -489,21 +542,16 @@ public class CalendarFragment extends BaseFragment {
                 );
     }
 
-
-
     private void setUpFloatActionButton() {
         binding.floatActionButtonDiaryEdit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Objects.requireNonNull(v);
+
                 LocalDate selectedDate = calendarViewModel.getSelectedDateLiveData().getValue();
                 showDiaryEditFragment(selectedDate);
             }
         });
-    }
-
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
     }
 
     // 選択中ボトムナビゲーションタブを再選択時の処理
@@ -515,36 +563,26 @@ public class CalendarFragment extends BaseFragment {
         }
     }
 
-
     // 先頭へ自動スクロール
     private void scrollToTop() {
         binding.nestedScrollFullScreen.smoothScrollTo(0, 0);
     }
 
     private void showDiaryEditFragment(LocalDate date) {
-        if (date == null) {
-            throw new NullPointerException();
-        }
-        if (!canShowOtherFragment()) {
-            return;
-        }
+        Objects.requireNonNull(date);
+        if (!canShowOtherFragment()) return;
 
         NavDirections action =
                 CalendarFragmentDirections
                         .actionNavigationCalendarFragmentToDiaryEditFragment(
-                                true,
-                                true,
-                                date
-                        );
+                                true, true, date);
         navController.navigate(action);
     }
 
     @Override
     protected void showMessageDialog(@NonNull String title, @NonNull String message) {
         NavDirections action =
-                CalendarFragmentDirections
-                        .actionCalendarFragmentToMessageDialog(
-                                title, message);
+                CalendarFragmentDirections.actionCalendarFragmentToMessageDialog(title, message);
         navController.navigate(action);
     }
 

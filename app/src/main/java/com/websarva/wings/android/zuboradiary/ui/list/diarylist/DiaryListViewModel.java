@@ -299,10 +299,12 @@ public class DiaryListViewModel extends BaseViewModel {
     }
 
     // LiveDataGetter
+    @NonNull
     public LiveData<DiaryYearMonthList> getDiaryListLiveData() {
         return diaryList;
     }
 
+    @NonNull
     public LiveData<Boolean> getIsVisibleUpdateProgressBarLiveData() {
         return isVisibleUpdateProgressBar;
     }

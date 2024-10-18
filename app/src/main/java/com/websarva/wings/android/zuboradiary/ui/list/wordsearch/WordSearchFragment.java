@@ -3,7 +3,6 @@ package com.websarva.wings.android.zuboradiary.ui.list.wordsearch;
 import static com.websarva.wings.android.zuboradiary.ui.list.DiaryYearMonthListAdapter.*;
 
 import android.content.Context;
-import android.content.res.Resources;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -187,7 +186,7 @@ public class WordSearchFragment extends BaseFragment {
         wordSearchViewModel.getWordSearchResultListLiveData()
                 .observe(getViewLifecycleOwner(), new WordSearchResultListObserver());
 
-        wordSearchViewModel.getNumWordSearchResults()
+        wordSearchViewModel.getNumWordSearchResultsLiveData()
                 .observe(getViewLifecycleOwner(), new Observer<Integer>() {
                     @Override
                     public void onChanged(Integer integer) {
