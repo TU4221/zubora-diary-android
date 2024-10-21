@@ -12,11 +12,11 @@ import java.time.LocalTime;
 import java.util.Locale;
 
 // TODO:MaterialTimePickerに置き換える？
-public class TimePickerDialogFragment extends BaseNumberPickersBottomSheetDialogFragment {
+public class ReminderNotificationTimePickerDialogFragment extends BaseNumberPickersBottomSheetDialogFragment {
 
-    private static final String fromClassName = "From" + TimePickerDialogFragment.class.getName();
-    public static final String KEY_SELECTED_HOUR = "SelectedHour" + fromClassName;
-    public static final String KEY_SELECTED_MINUTE = "SelectedMinute" + fromClassName;
+    private static final String fromClassName = "From" + ReminderNotificationTimePickerDialogFragment.class.getName();
+    static final String KEY_SELECTED_BUTTON = "SelectedButton" + fromClassName;
+    static final String KEY_SELECTED_TIME = "SelectedTIME" + fromClassName;
 
     @Override
     public boolean isCancelableOtherThanPressingButton() {
@@ -29,22 +29,22 @@ public class TimePickerDialogFragment extends BaseNumberPickersBottomSheetDialog
     }
 
     private void setResultSelectedYearMonth() {
-        // TODO:LocalTimeクラスを代入する方が良いかも・・・
-        int selectedHourValue = binding.numberPickerFirst.getValue();
-        setResult(KEY_SELECTED_HOUR, selectedHourValue);
+        setResult(KEY_SELECTED_BUTTON, DialogInterface.BUTTON_POSITIVE);
 
+        int selectedHourValue = binding.numberPickerFirst.getValue();
         int selectedMinuteValue = binding.numberPickerSecond.getValue();
-        setResult(KEY_SELECTED_MINUTE,selectedMinuteValue);
+        LocalTime selectedTime = LocalTime.of(selectedHourValue, selectedMinuteValue);
+        setResult(KEY_SELECTED_TIME, selectedTime);
     }
 
     @Override
     protected void handleNegativeButton(@NonNull View v) {
-        // 処理なし
+        setResult(KEY_SELECTED_BUTTON, DialogInterface.BUTTON_NEGATIVE);
     }
 
     @Override
     protected void handleCancel(@NonNull DialogInterface dialog) {
-        // 処理なし
+        setResult(KEY_SELECTED_BUTTON, DialogInterface.BUTTON_NEGATIVE);
     }
 
     @Override

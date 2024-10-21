@@ -3,6 +3,7 @@ package com.websarva.wings.android.zuboradiary.ui.settings;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Dialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
@@ -52,7 +53,7 @@ public class SettingsFragment extends BaseFragment {
     private FragmentSettingsBinding binding;
     private boolean isTouchedReminderNotificationSwitch = false;
     private boolean isTouchedPasscodeLockSwitch = false;
-    private boolean isTouchedGettingWeatherInformationSwitch = false;
+    private boolean isTouchedWeatherInfoAcquisitionSwitch = false;
 
     // ViewModel関係
     private SettingsViewModel settingsViewModel;
@@ -81,7 +82,7 @@ public class SettingsFragment extends BaseFragment {
                             @Override
                             public void onActivityResult(Boolean isGranted) {
                                 if (isGranted && isGrantedPostNotifications()/*再確認*/) {
-                                    showTimePickerDialog();
+                                    showReminderNotificationTimePickerDialog();
                                 } else {
                                     binding.includeReminderNotificationSetting
                                             .materialSwitchSettingValue.setChecked(false);
@@ -108,9 +109,9 @@ public class SettingsFragment extends BaseFragment {
                                                 && isGrantedAccessCoarseLocation != null
                                                 && isGrantedAccessCoarseLocation;
                                 if (isGrantedAll && isGrantedAccessLocation()/*再確認*/) {
-                                    settingsViewModel.saveGettingWeatherInformation(true);
+                                    settingsViewModel.saveWeatherInfoAcquisition(true);
                                 } else {
-                                    binding.includeGettingWeatherInformationSetting
+                                    binding.includeWeatherInfoAcquisitionSetting
                                             .materialSwitchSettingValue.setChecked(false);
                                 }
                             }
@@ -148,7 +149,7 @@ public class SettingsFragment extends BaseFragment {
         setUpCalendarStartDaySettingItem();
         setUpReminderNotificationSettingItem();
         setUpPasscodeLockSettingItem();
-        setUpGettingWeatherInformationSettingItem();
+        setUpWeatherInfoAcquisitionSettingItem();
     }
 
     @Override
@@ -158,18 +159,18 @@ public class SettingsFragment extends BaseFragment {
 
     @Override
     protected void handleOnReceivingDialogResult(@NonNull SavedStateHandle savedStateHandle) {
-        receiveThemeColorPickerDialogResult(savedStateHandle);
-        receiveDayOfWeekPickerDialogResult(savedStateHandle);
-        receiveTimePickerDialogResult(savedStateHandle);
-        receivePermissionDialogResult(savedStateHandle);
+        receiveThemeColorPickerDialogResult();
+        receiveCalendarStartDayPickerDialogResult();
+        receiveReminderNotificationTimePickerDialogResult();
+        receivePermissionDialogResult();
     }
 
     @Override
     protected void removeDialogResult(@NonNull SavedStateHandle savedStateHandle) {
         savedStateHandle.remove(ThemeColorPickerDialogFragment.KEY_SELECTED_THEME_COLOR);
-        savedStateHandle.remove(DayOfWeekPickerDialogFragment.KEY_SELECTED_DAY_OF_WEEK);
-        savedStateHandle.remove(TimePickerDialogFragment.KEY_SELECTED_HOUR);
-        savedStateHandle.remove(TimePickerDialogFragment.KEY_SELECTED_MINUTE);
+        savedStateHandle.remove(CalendarStartDayPickerDialogFragment.KEY_SELECTED_DAY_OF_WEEK);
+        savedStateHandle.remove(ReminderNotificationTimePickerDialogFragment.KEY_SELECTED_BUTTON);
+        savedStateHandle.remove(ReminderNotificationTimePickerDialogFragment.KEY_SELECTED_TIME);
         savedStateHandle.remove(PermissionDialogFragment.KEY_SELECTED_BUTTON);
     }
 
@@ -180,51 +181,44 @@ public class SettingsFragment extends BaseFragment {
     }
 
     // テーマカラー設定ダイアログフラグメントから結果受取
-    private void receiveThemeColorPickerDialogResult(SavedStateHandle savedStateHandle) {
+    private void receiveThemeColorPickerDialogResult() {
         ThemeColor selectedThemeColor =
                 receiveResulFromDialog(ThemeColorPickerDialogFragment.KEY_SELECTED_THEME_COLOR);
-        if (selectedThemeColor == null) {
-            return;
-        }
+        if (selectedThemeColor == null) return;
 
         settingsViewModel.saveThemeColor(selectedThemeColor);
     }
 
     // カレンダー開始曜日設定ダイアログフラグメントから結果受取
-    private void receiveDayOfWeekPickerDialogResult(SavedStateHandle savedStateHandle) {
+    private void receiveCalendarStartDayPickerDialogResult() {
         DayOfWeek selectedDayOfWeek =
-                receiveResulFromDialog(DayOfWeekPickerDialogFragment.KEY_SELECTED_DAY_OF_WEEK);
-        if (selectedDayOfWeek == null) {
-            return;
-        }
+                receiveResulFromDialog(CalendarStartDayPickerDialogFragment.KEY_SELECTED_DAY_OF_WEEK);
+        if (selectedDayOfWeek == null) return;
 
         settingsViewModel.saveCalendarStartDayOfWeek(selectedDayOfWeek);
     }
 
     // リマインダー通知時間設定ダイアログフラグメントから結果受取
-    private void receiveTimePickerDialogResult(SavedStateHandle savedStateHandle) {
-        Integer selectedHour = receiveResulFromDialog(TimePickerDialogFragment.KEY_SELECTED_HOUR);
-        if (selectedHour == null) {
-            return;
-        }
-        Integer selectedMinute = receiveResulFromDialog(TimePickerDialogFragment.KEY_SELECTED_MINUTE);
-        if (selectedMinute == null) {
+    private void receiveReminderNotificationTimePickerDialogResult() {
+        Integer selectedButton =
+                receiveResulFromDialog(ReminderNotificationTimePickerDialogFragment.KEY_SELECTED_BUTTON);
+        if (selectedButton == null) return;
+        if (selectedButton != DialogInterface.BUTTON_POSITIVE) {
+            binding.includeReminderNotificationSetting.materialSwitchSettingValue.setChecked(false);
             return;
         }
 
-        LocalTime settingTime = LocalTime.of(selectedHour, selectedMinute);
-        settingsViewModel.saveReminderNotificationValid(settingTime);
+        LocalTime selectedTime =
+                receiveResulFromDialog(ReminderNotificationTimePickerDialogFragment.KEY_SELECTED_TIME);
+        Objects.requireNonNull(selectedTime);
+        settingsViewModel.saveReminderNotificationValid(selectedTime);
     }
 
     // 権限催促ダイアログフラグメントから結果受取
-    private void receivePermissionDialogResult(SavedStateHandle savedStateHandle) {
+    private void receivePermissionDialogResult() {
         Integer selectedButton = receiveResulFromDialog(PermissionDialogFragment.KEY_SELECTED_BUTTON);
-        if (selectedButton == null) {
-            return;
-        }
-        if (selectedButton != Dialog.BUTTON_POSITIVE) {
-            return;
-        }
+        if (selectedButton == null) return;
+        if (selectedButton != Dialog.BUTTON_POSITIVE) return;
 
         showApplicationDetailsSettings();
     }
@@ -243,13 +237,10 @@ public class SettingsFragment extends BaseFragment {
                 .observe(getViewLifecycleOwner(), new Observer<ThemeColor>() {
                     @Override
                     public void onChanged(ThemeColor themeColor) {
-                        if (themeColor == null) {
-                            return;
-                        }
+                        Objects.requireNonNull(themeColor);
 
                         String strThemeColor = themeColor.toSting(requireContext());
                         binding.includeThemeColorSetting.textSettingValue.setText(strThemeColor);
-
                         switchViewColor(themeColor);
                     }
                 });
@@ -278,7 +269,7 @@ public class SettingsFragment extends BaseFragment {
                         binding.includeCalendarStartDaySetting.textSettingTitle,
                         binding.includeReminderNotificationSetting.textSettingTitle,
                         binding.includePasscodeLockSetting.textSettingTitle,
-                        binding.includeGettingWeatherInformationSetting.textSettingTitle
+                        binding.includeWeatherInfoAcquisitionSetting.textSettingTitle
                 );
         switcher.switchSettingItemIconColor(iconList);
 
@@ -291,7 +282,7 @@ public class SettingsFragment extends BaseFragment {
                         binding.includeReminderNotificationSetting.textSettingTitle,
                         binding.includeReminderNotificationSetting.textSettingValue,
                         binding.includePasscodeLockSetting.textSettingTitle,
-                        binding.includeGettingWeatherInformationSetting.textSettingTitle
+                        binding.includeWeatherInfoAcquisitionSetting.textSettingTitle
                 );
         switcher.switchTextColorOnBackground(textList);
 
@@ -299,7 +290,7 @@ public class SettingsFragment extends BaseFragment {
                 new ColorSwitchingViewList<>(
                         binding.includeReminderNotificationSetting.materialSwitchSettingValue,
                         binding.includePasscodeLockSetting.materialSwitchSettingValue,
-                        binding.includeGettingWeatherInformationSetting.materialSwitchSettingValue
+                        binding.includeWeatherInfoAcquisitionSetting.materialSwitchSettingValue
                 );
         switcher.switchSwitchColor(switchList);
 
@@ -311,7 +302,7 @@ public class SettingsFragment extends BaseFragment {
                         binding.materialDividerCalendarStartDaySetting,
                         binding.materialDividerReminderNotificationSetting,
                         binding.materialDividerPasscodeLockSetting,
-                        binding.materialDividerGettingWeatherInformationSetting,
+                        binding.materialDividerWeatherInfoAcquisitionSetting,
                         binding.materialDividerSectionEnd
                 );
         switcher.switchDividerColor(dividerList);
@@ -321,13 +312,13 @@ public class SettingsFragment extends BaseFragment {
         binding.includeCalendarStartDaySetting.textSettingTitle.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                DayOfWeek currentCalendarStartDayOfWeek =
-                        settingsViewModel.getCalendarStartDayOfWeekLiveData().getValue();
-                if (currentCalendarStartDayOfWeek == null) {
-                    throw new NullPointerException();
-                }
+                Objects.requireNonNull(v);
 
-                showDayOfWeekPickerDialog(currentCalendarStartDayOfWeek);
+                DayOfWeek currentCalendarStartDayOfWeek =
+                        settingsViewModel.loadCalendarStartDaySettingValue();
+                Objects.requireNonNull(currentCalendarStartDayOfWeek);
+
+                showCalendarStartDayPickerDialog(currentCalendarStartDayOfWeek);
             }
         });
 
@@ -335,14 +326,15 @@ public class SettingsFragment extends BaseFragment {
                 .observe(getViewLifecycleOwner(), new Observer<DayOfWeek>() {
                     @Override
                     public void onChanged(DayOfWeek dayOfWeek) {
-                        if (dayOfWeek == null) {
-                            return;
+                        DayOfWeek settingValue = dayOfWeek;
+                        if (settingValue == null) {
+                            settingValue = settingsViewModel.loadCalendarStartDaySettingValue();
                         }
 
                         DayOfWeekStringConverter stringConverter =
                                 new DayOfWeekStringConverter(requireContext());
                         String strDayOfWeek =
-                                stringConverter.toCalendarStartDayOfWeek(dayOfWeek);
+                                stringConverter.toCalendarStartDayOfWeek(settingValue);
                         binding.includeCalendarStartDaySetting.textSettingValue.setText(strDayOfWeek);
                     }
                 });
@@ -354,6 +346,9 @@ public class SettingsFragment extends BaseFragment {
                 .setOnTouchListener(new View.OnTouchListener() {
                     @Override
                     public boolean onTouch(View v, MotionEvent event) {
+                        Objects.requireNonNull(v);
+                        Objects.requireNonNull(event);
+
                         if (event.getAction() == MotionEvent.ACTION_DOWN){
                             isTouchedReminderNotificationSwitch = true;
                         }
@@ -362,18 +357,19 @@ public class SettingsFragment extends BaseFragment {
                 });
         binding.includeReminderNotificationSetting.materialSwitchSettingValue
                 .setOnCheckedChangeListener(
-                        new ReminderNotificationCheckedChangeListener()
+                        new ReminderNotificationOnCheckedChangeListener()
                 );
 
         settingsViewModel.getIsCheckedReminderNotificationLiveData()
                 .observe(getViewLifecycleOwner(), new Observer<Boolean>() {
                     @Override
                     public void onChanged(Boolean aBoolean) {
-                        if (aBoolean == null) {
-                            return;
+                        Boolean settingValue = aBoolean;
+                        if (settingValue == null) {
+                            settingValue = settingsViewModel.isCheckedReminderNotificationSetting();
                         }
 
-                        if (aBoolean) {
+                        if (settingValue) {
                             binding.includeReminderNotificationSetting
                                     .textSettingValue.setVisibility(View.VISIBLE);
                         } else {
@@ -383,10 +379,13 @@ public class SettingsFragment extends BaseFragment {
                     }
                 });
 
-        settingsViewModel.getReminderNotificationTime()
+        settingsViewModel.getReminderNotificationTimeLiveData()
                 .observe(getViewLifecycleOwner(), new Observer<LocalTime>() {
                     @Override
-                    public void onChanged(LocalTime time) {
+                    public void onChanged(@Nullable LocalTime time) {
+                        // MEMO:未設定の場合nullが代入される。
+                        //      その為、nullはエラーではないので下記メソッドの処理は不要(処理するとループする)
+                        //      "SettingsViewModel#isCheckedReminderNotificationSetting()"
                         if (time == null) {
                             binding.includeReminderNotificationSetting.textSettingValue.setText("");
                             return;
@@ -399,16 +398,16 @@ public class SettingsFragment extends BaseFragment {
                 });
     }
 
-    private class ReminderNotificationCheckedChangeListener
+    private class ReminderNotificationOnCheckedChangeListener
             implements CompoundButton.OnCheckedChangeListener {
         @Override
         public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-            if (!isTouchedReminderNotificationSwitch) {
-                return;
-            }
+            Objects.requireNonNull(buttonView);
+            if (!isTouchedReminderNotificationSwitch) return;
+
             if (isChecked) {
                 if (isGrantedPostNotifications()) {
-                    showTimePickerDialog();
+                    showReminderNotificationTimePickerDialog();
                 } else {
                     boolean shouldShowRequestPermissionRationale =
                             ActivityCompat.shouldShowRequestPermissionRationale(
@@ -436,6 +435,9 @@ public class SettingsFragment extends BaseFragment {
                 .setOnTouchListener(new View.OnTouchListener() {
                     @Override
                     public boolean onTouch(View v, MotionEvent event) {
+                        Objects.requireNonNull(v);
+                        Objects.requireNonNull(event);
+
                         if (event.getAction() == MotionEvent.ACTION_DOWN){
                             isTouchedPasscodeLockSwitch = true;
                         }
@@ -446,40 +448,45 @@ public class SettingsFragment extends BaseFragment {
                 .setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                     @Override
                     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                        Objects.requireNonNull(buttonView);
+
                         settingsViewModel.savePasscodeLock(isChecked);
                     }
                 });
     }
 
     @SuppressLint("ClickableViewAccessibility")
-    private void setUpGettingWeatherInformationSettingItem() {
-        binding.includeGettingWeatherInformationSetting.materialSwitchSettingValue
+    private void setUpWeatherInfoAcquisitionSettingItem() {
+        binding.includeWeatherInfoAcquisitionSetting.materialSwitchSettingValue
                 .setOnTouchListener(new View.OnTouchListener() {
                     @Override
                     public boolean onTouch(View v, MotionEvent event) {
+                        Objects.requireNonNull(v);
+                        Objects.requireNonNull(event);
+
                         if (event.getAction() == MotionEvent.ACTION_DOWN){
-                            isTouchedGettingWeatherInformationSwitch = true;
+                            isTouchedWeatherInfoAcquisitionSwitch = true;
                         }
                         return false;
                     }
                 });
-        binding.includeGettingWeatherInformationSetting.materialSwitchSettingValue
+        binding.includeWeatherInfoAcquisitionSetting.materialSwitchSettingValue
                 .setOnCheckedChangeListener(
-                        new GettingWeatherInformationCheckedChangeListener()
+                        new WeatherInfoAcquisitionOnCheckedChangeListener()
                 );
     }
 
-    private class GettingWeatherInformationCheckedChangeListener
+    private class WeatherInfoAcquisitionOnCheckedChangeListener
             implements CompoundButton.OnCheckedChangeListener {
 
         @Override
         public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-            if (!isTouchedGettingWeatherInformationSwitch) {
-                return;
-            }
+            Objects.requireNonNull(buttonView);
+            if (!isTouchedWeatherInfoAcquisitionSwitch) return;
+
             if (isChecked) {
                 if (isGrantedAccessLocation()) {
-                    settingsViewModel.saveGettingWeatherInformation(true);
+                    settingsViewModel.saveWeatherInfoAcquisition(true);
                 } else {
                     boolean shouldShowRequestPermissionRationale =
                             ActivityCompat.shouldShowRequestPermissionRationale(
@@ -492,16 +499,16 @@ public class SettingsFragment extends BaseFragment {
                                         Manifest.permission.ACCESS_COARSE_LOCATION};
                         requestAccessLocationPermissionLauncher.launch(requestPermissions);
                     } else {
-                        binding.includeGettingWeatherInformationSetting
+                        binding.includeWeatherInfoAcquisitionSetting
                                 .materialSwitchSettingValue.setChecked(false);
                         String permissionName = getString(R.string.fragment_settings_permission_name_location);
                         showPermissionDialog(permissionName);
                     }
                 }
             } else {
-                settingsViewModel.saveGettingWeatherInformation(false);
+                settingsViewModel.saveWeatherInfoAcquisition(false);
             }
-            isTouchedGettingWeatherInformationSwitch = false;
+            isTouchedWeatherInfoAcquisitionSwitch = false;
         }
     }
 
@@ -524,45 +531,33 @@ public class SettingsFragment extends BaseFragment {
     }
 
     private void showThemeColorPickerDialog(ThemeColor themeColor) {
-        if (themeColor == null) {
-            throw new NullPointerException();
-        }
-        if (!canShowOtherFragment()) {
-            return;
-        }
+        Objects.requireNonNull(themeColor);
+        if (!canShowOtherFragment()) return;
 
         NavDirections action = SettingsFragmentDirections
                 .actionNavigationSettingsFragmentToThemeColorPickerDialog(themeColor);
         navController.navigate(action);
     }
 
-    private void showDayOfWeekPickerDialog(DayOfWeek dayOfWeek) {
-        if (dayOfWeek == null) {
-            throw new NullPointerException();
-        }
-        if (!canShowOtherFragment()) {
-            return;
-        }
+    private void showCalendarStartDayPickerDialog(DayOfWeek dayOfWeek) {
+        Objects.requireNonNull(dayOfWeek);
+        if (!canShowOtherFragment()) return;
 
         NavDirections action = SettingsFragmentDirections
-                .actionNavigationSettingsFragmentToDayOfWeekPickerDialog(dayOfWeek);
+                .actionNavigationSettingsFragmentToCalendarStartDayPickerDialog(dayOfWeek);
         navController.navigate(action);
     }
 
-    private void showTimePickerDialog() {
-        if (!canShowOtherFragment()) {
-            return;
-        }
+    private void showReminderNotificationTimePickerDialog() {
+        if (!canShowOtherFragment()) return;
 
         NavDirections action = SettingsFragmentDirections
-                .actionNavigationSettingsFragmentToTimePickerDialog();
+                .actionNavigationSettingsFragmentToReminderNotificationTimePickerDialog();
         navController.navigate(action);
     }
 
     private void showPermissionDialog(String permissionName) {
-        if (!canShowOtherFragment()) {
-            return;
-        }
+        if (!canShowOtherFragment()) return;
 
         NavDirections action =
                 SettingsFragmentDirections

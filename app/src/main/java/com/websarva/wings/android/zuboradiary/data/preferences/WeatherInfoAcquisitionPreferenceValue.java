@@ -1,11 +1,9 @@
 package com.websarva.wings.android.zuboradiary.data.preferences;
 
-import androidx.annotation.Nullable;
-
-public class GettingWeatherInformationPreferenceValue {
+public class WeatherInfoAcquisitionPreferenceValue {
     private final boolean isChecked;
 
-    public GettingWeatherInformationPreferenceValue(Boolean isChecked) {
+    public WeatherInfoAcquisitionPreferenceValue(Boolean isChecked) {
         if (isChecked == null) {
             throw new NullPointerException();
         }

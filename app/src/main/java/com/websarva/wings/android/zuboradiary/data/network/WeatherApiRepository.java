@@ -22,12 +22,10 @@ public class WeatherApiRepository {
         this.weatherApiService = weatherApiService;
     }
 
-    public Call<WeatherApiResponse> getTodayWeather(
-            @FloatRange(from = -90.0, to = 90.0) double latitude,
-            @FloatRange(from = -180.0, to = 180.0) double longitude) {
+    public Call<WeatherApiResponse> getTodayWeather(GeoCoordinates geoCoordinates) {
         return weatherApiService.getWeather(
-                String.valueOf(latitude),
-                String.valueOf(longitude),
+                String.valueOf(geoCoordinates.getLatitude()),
+                String.valueOf(geoCoordinates.getLongitude()),
                 QUERY_DAIRY_PARAMETER,
                 QUERY_TIME_ZONE_PARAMETER,
                 QUERY_PAST_DAYS_PARAMETER_NONE,
@@ -35,13 +33,10 @@ public class WeatherApiRepository {
     }
 
     public Call<WeatherApiResponse> getPastDayWeather(
-            @FloatRange(from = -90.0, to = 90.0) double latitude,
-            @FloatRange(from = -180.0, to = 180.0) double longitude,
-            @IntRange(from = 1, to = 92) int numPastDays) {
-        Log.d("20240717", "getPastDayWeather");
+            GeoCoordinates geoCoordinates, @IntRange(from = 1, to = 92) int numPastDays) {
         return weatherApiService.getWeather(
-                String.valueOf(latitude),
-                String.valueOf(longitude),
+                String.valueOf(geoCoordinates.getLatitude()),
+                String.valueOf(geoCoordinates.getLongitude()),
                 QUERY_DAIRY_PARAMETER,
                 QUERY_TIME_ZONE_PARAMETER,
                 String.valueOf(numPastDays),

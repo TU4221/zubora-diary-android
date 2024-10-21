@@ -151,7 +151,7 @@
     <string name="fragment_settings_item_title_calendar_start_day">カレンダーの開始曜日</string>
     <string name="fragment_settings_item_title_reminder_notification">リマインダーの通知</string>
     <string name="fragment_settings_item_title_passcode_lock">パスコードロック</string>
-    <string name="fragment_settings_item_title_getting_weather_information">天気情報取得</string>
+    <string name="fragment_settings_item_title_weather_info_acquisition">天気情報取得</string>
 
     <!-- layout_settings_item -->
     <string name="layout_settings_item_title_tools_value">設定項目</string>

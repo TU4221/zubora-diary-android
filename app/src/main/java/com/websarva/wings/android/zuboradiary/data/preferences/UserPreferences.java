@@ -112,17 +112,17 @@ public class UserPreferences {
         });
     }
 
-    public Flowable<GettingWeatherInformationPreferenceValue> loadGettingWeatherInformationPreferenceValue() {
+    public Flowable<WeatherInfoAcquisitionPreferenceValue> loadGettingWeatherInformationPreferenceValue() {
         return this.dataStore.data().map(preferences -> {
             Boolean savedIsGettingWeatherInformation = preferences.get(KEY_IS_GETTING_WEATHER_INFORMATION);
             if (savedIsGettingWeatherInformation == null) {
-                return new GettingWeatherInformationPreferenceValue(false);
+                return new WeatherInfoAcquisitionPreferenceValue(false);
             }
-            return new GettingWeatherInformationPreferenceValue(savedIsGettingWeatherInformation);
+            return new WeatherInfoAcquisitionPreferenceValue(savedIsGettingWeatherInformation);
         });
     }
 
-    public Single<Preferences> saveGettingWeatherInformationPreferenceValue(GettingWeatherInformationPreferenceValue value) {
+    public Single<Preferences> saveGettingWeatherInformationPreferenceValue(WeatherInfoAcquisitionPreferenceValue value) {
         return this.dataStore.updateDataAsync(preferences -> {
             MutablePreferences mutablePreferences = preferences.toMutablePreferences();
             mutablePreferences.set(KEY_IS_GETTING_WEATHER_INFORMATION, value.getIsChecked());

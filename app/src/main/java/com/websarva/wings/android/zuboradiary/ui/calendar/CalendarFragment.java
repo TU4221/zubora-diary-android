@@ -185,8 +185,7 @@ public class CalendarFragment extends BaseFragment {
     }
 
     private List<DayOfWeek> createDayOfWeekList() {
-        DayOfWeek firstDayOfWeek = settingsViewModel.getCalendarStartDayOfWeekLiveData().getValue();
-        Objects.requireNonNull(firstDayOfWeek);
+        DayOfWeek firstDayOfWeek = settingsViewModel.loadCalendarStartDaySettingValue();
 
         DayOfWeek[] daysOfWeek = DayOfWeek.values();
         int firstDayOfWeekListPos = firstDayOfWeek.getValue();

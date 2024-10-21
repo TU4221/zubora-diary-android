@@ -116,17 +116,17 @@
                         app:settingValueSwitch="@{settingsViewModel.isCheckedPasscodeLockLiveData}" />
 
                     <com.google.android.material.divider.MaterialDivider
-                        android:id="@+id/materialDivider_getting_weather_information_setting"
+                        android:id="@+id/materialDivider_weather_info_acquisition_setting"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content" />
 
                     <include
                         layout="@layout/layout_settings_item_switch"
-                        android:id="@+id/include_getting_weather_information_setting"
+                        android:id="@+id/include_weather_info_acquisition_setting"
                         app:settingIcon="@{@drawable/ic_sunny_24px}"
-                        app:settingTitle="@{@string/fragment_settings_item_title_getting_weather_information}"
+                        app:settingTitle="@{@string/fragment_settings_item_title_weather_info_acquisition}"
                         app:isVisibleSettingValue="@{false}"
-                        app:settingValueSwitch="@{settingsViewModel.isCheckedGettingWeatherInformationLiveData}" />
+                        app:settingValueSwitch="@{settingsViewModel.isCheckedWeatherInfoAcquisitionLiveData}" />
 
                     <com.google.android.material.divider.MaterialDivider
                         android:id="@+id/materialDivider_section_end"

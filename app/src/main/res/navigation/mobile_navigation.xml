@@ -139,11 +139,11 @@
                 android:id="@+id/action_navigation_settings_fragment_to_theme_color_picker_dialog"
                 app:destination="@id/navigation_theme_color_picker_dialog"/>
             <action
-                android:id="@+id/action_navigation_settings_fragment_to_day_of_week_picker_dialog"
-                app:destination="@id/navigation_day_of_week_picker_dialog"/>
+                android:id="@+id/action_navigation_settings_fragment_to_calendar_start_day_picker_dialog"
+                app:destination="@id/navigation_calendar_start_day_picker_dialog"/>
             <action
-                android:id="@+id/action_navigation_settings_fragment_to_time_picker_dialog"
-                app:destination="@id/navigation_time_picker_dialog"/>
+                android:id="@+id/action_navigation_settings_fragment_to_reminder_notification_time_picker_dialog"
+                app:destination="@id/navigation_reminder_notification_time_picker_dialog"/>
             <action
                 android:id="@+id/action_settings_fragment_to_permission_dialog"
                 app:destination="@id/navigation_permission_dialog"/>
@@ -166,15 +166,15 @@
                 app:argType="com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor" />
         </dialog>
         <dialog
-            android:id="@+id/navigation_day_of_week_picker_dialog"
-            android:name="com.websarva.wings.android.zuboradiary.ui.settings.DayOfWeekPickerDialogFragment">
+            android:id="@+id/navigation_calendar_start_day_picker_dialog"
+            android:name="com.websarva.wings.android.zuboradiary.ui.settings.CalendarStartDayPickerDialogFragment">
             <argument
                 android:name="currentCalendarStartDayOfWeek"
                 app:argType="java.time.DayOfWeek" />
         </dialog>
         <dialog
-            android:id="@+id/navigation_time_picker_dialog"
-            android:name="com.websarva.wings.android.zuboradiary.ui.settings.TimePickerDialogFragment"/>
+            android:id="@+id/navigation_reminder_notification_time_picker_dialog"
+            android:name="com.websarva.wings.android.zuboradiary.ui.settings.ReminderNotificationTimePickerDialogFragment"/>
         <dialog
             android:id="@+id/navigation_permission_dialog"
             android:name="com.websarva.wings.android.zuboradiary.ui.settings.PermissionDialogFragment">

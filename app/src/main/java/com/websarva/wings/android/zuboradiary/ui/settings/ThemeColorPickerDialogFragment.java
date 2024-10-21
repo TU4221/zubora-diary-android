@@ -11,7 +11,7 @@ import com.websarva.wings.android.zuboradiary.ui.BaseNumberPickersBottomSheetDia
 public class ThemeColorPickerDialogFragment extends BaseNumberPickersBottomSheetDialogFragment {
 
     private static final String fromClassName = "From" + ThemeColorPickerDialogFragment.class.getName();
-    public static final String KEY_SELECTED_THEME_COLOR = "SelectedThemeColor" + fromClassName;
+    static final String KEY_SELECTED_THEME_COLOR = "SelectedThemeColor" + fromClassName;
 
     @Override
     public boolean isCancelableOtherThanPressingButton() {

@@ -14,6 +14,7 @@ import com.websarva.wings.android.zuboradiary.data.diary.ConditionConverter;
 import com.websarva.wings.android.zuboradiary.data.diary.Conditions;
 import com.websarva.wings.android.zuboradiary.data.diary.WeatherConverter;
 import com.websarva.wings.android.zuboradiary.data.diary.Weathers;
+import com.websarva.wings.android.zuboradiary.data.network.GeoCoordinates;
 import com.websarva.wings.android.zuboradiary.data.network.WeatherApiRepository;
 import com.websarva.wings.android.zuboradiary.data.network.WeatherApiResponse;
 import com.websarva.wings.android.zuboradiary.data.database.Diary;
@@ -299,7 +300,8 @@ public class DiaryEditViewModel extends BaseViewModel {
     }
 
     // 天気情報関係
-    public void fetchWeatherInformation(@NonNull LocalDate date, double latitude, double longitude) {
+    // TODO:latitude、longitudeをGeoCoordinatesに置換
+    public void fetchWeatherInformation(@NonNull LocalDate date, GeoCoordinates geoCoordinates) {
         LocalDate currentDate = LocalDate.now();
         Log.d("fetchWeatherInformation", "isAfter:" + date.isAfter(currentDate));
         if (date.isAfter(currentDate)) {
@@ -311,10 +313,10 @@ public class DiaryEditViewModel extends BaseViewModel {
             return;
         }
         if (betweenDays == 0) {
-            weatherApiResponseCall = weatherApiRepository.getTodayWeather(latitude, longitude);
+            weatherApiResponseCall = weatherApiRepository.getTodayWeather(geoCoordinates);
         } else {
             weatherApiResponseCall =
-                    weatherApiRepository.getPastDayWeather(latitude, longitude, (int) betweenDays);
+                    weatherApiRepository.getPastDayWeather(geoCoordinates, (int) betweenDays);
         }
 
         // TODO:非同期処理不要(最終的に削除)

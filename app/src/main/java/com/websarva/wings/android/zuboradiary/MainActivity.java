@@ -1,7 +1,6 @@
 package com.websarva.wings.android.zuboradiary;
 
 import android.Manifest;
-import android.content.Context;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
@@ -21,7 +20,6 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.view.ContextThemeWrapper;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
@@ -46,7 +44,7 @@ import com.websarva.wings.android.zuboradiary.ui.BaseThemeColorSwitcher;
 import com.websarva.wings.android.zuboradiary.ui.ThemeColorInflaterCreator;
 import com.websarva.wings.android.zuboradiary.ui.calendar.CalendarFragment;
 import com.websarva.wings.android.zuboradiary.ui.list.diarylist.DiaryListFragment;
-import com.websarva.wings.android.zuboradiary.ui.list.wordsearch.WordSearchFragment;
+import com.websarva.wings.android.zuboradiary.data.network.GeoCoordinates;
 import com.websarva.wings.android.zuboradiary.ui.settings.SettingsViewModel;
 
 import java.util.Objects;
@@ -110,14 +108,20 @@ public class MainActivity extends AppCompatActivity {
                 new LocationRequest.Builder(Priority.PRIORITY_BALANCED_POWER_ACCURACY, 5000);
         locationRequest = builder.build();
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
-        settingsViewModel.getIsCheckedGettingWeatherInformationLiveData()
+        settingsViewModel.getIsCheckedWeatherInfoAcquisitionLiveData()
                 .observe(this, new Observer<Boolean>() {
                     @Override
                     public void onChanged(Boolean aBoolean) {
-                        if (aBoolean) {
+                        Log.d("20241021", "WeatherInfoAcquisitionObserver");
+                        Boolean settingValue = aBoolean;
+                        if (settingValue == null) {
+                            settingValue = settingsViewModel.isCheckedWeatherInfoAcquisitionSetting();
+                        }
+
+                        if (settingValue) {
                             updateLocationInformation();
                         } else {
-                            settingsViewModel.clearLocationInformation();
+                            settingsViewModel.clearGeoCoordinates();
                         }
                     }
                 });
@@ -134,7 +138,9 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onLocationChanged(@NonNull Location location) {
                 // アプリ起動時に一回だけ取得
-                settingsViewModel.updateLocationInformation(location.getLatitude(), location.getLongitude());
+                GeoCoordinates geoCoordinates =
+                        new GeoCoordinates(location.getLatitude(), location.getLongitude());
+                settingsViewModel.updateGeoCoordinates(geoCoordinates);
                 fusedLocationProviderClient.removeLocationUpdates(this);
             }
         }, Looper.getMainLooper());

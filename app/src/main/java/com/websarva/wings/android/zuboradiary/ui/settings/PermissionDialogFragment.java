@@ -1,24 +1,16 @@
 package com.websarva.wings.android.zuboradiary.ui.settings;
 
-import android.app.AlertDialog;
-import android.app.Dialog;
 import android.content.DialogInterface;
-import android.os.Bundle;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.DialogFragment;
-import androidx.lifecycle.SavedStateHandle;
-import androidx.navigation.NavController;
-import androidx.navigation.fragment.NavHostFragment;
 
 import com.websarva.wings.android.zuboradiary.R;
 import com.websarva.wings.android.zuboradiary.ui.BaseAlertDialogFragment;
 
 public class PermissionDialogFragment extends BaseAlertDialogFragment {
 
-    private static final String FROM_CLASS_NAME = "From" + DayOfWeekPickerDialogFragment.class.getName();
-    public static final String KEY_SELECTED_BUTTON = "SelectedButton" + FROM_CLASS_NAME;
+    private static final String FROM_CLASS_NAME = "From" + CalendarStartDayPickerDialogFragment.class.getName();
+    static final String KEY_SELECTED_BUTTON = "SelectedButton" + FROM_CLASS_NAME;
 
     @Override
     protected String createTitle() {

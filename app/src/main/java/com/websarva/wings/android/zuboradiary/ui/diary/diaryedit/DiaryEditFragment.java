@@ -24,7 +24,6 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.contentcapture.ContentCaptureCondition;
 import android.view.inputmethod.EditorInfo;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -33,7 +32,6 @@ import android.widget.ImageButton;
 import android.widget.ListAdapter;
 import android.widget.TextView;
 
-import com.google.android.material.textfield.MaterialAutoCompleteTextView;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 import com.websarva.wings.android.zuboradiary.data.DateTimeStringConverter;
@@ -45,13 +43,12 @@ import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor;
 import com.websarva.wings.android.zuboradiary.databinding.FragmentDiaryEditBinding;
 import com.websarva.wings.android.zuboradiary.R;
 import com.websarva.wings.android.zuboradiary.ui.BaseFragment;
-import com.websarva.wings.android.zuboradiary.ui.ColorSwitchingViewList;
 import com.websarva.wings.android.zuboradiary.ui.KeyboardInitializer;
 import com.websarva.wings.android.zuboradiary.ui.TestDiariesSaver;
 import com.websarva.wings.android.zuboradiary.ui.TextInputSetup;
 import com.websarva.wings.android.zuboradiary.ui.diary.DiaryLiveData;
-import com.websarva.wings.android.zuboradiary.ui.diary.DiaryThemeColorSwitcher;
 import com.websarva.wings.android.zuboradiary.ui.diary.diaryitemtitleedit.DiaryItemTitleEditFragment;
+import com.websarva.wings.android.zuboradiary.data.network.GeoCoordinates;
 import com.websarva.wings.android.zuboradiary.ui.settings.SettingsViewModel;
 
 import java.time.LocalDate;
@@ -286,11 +283,10 @@ public class DiaryEditFragment extends BaseFragment {
             if (loadDiaryDate == null) {
                 return;
             }
-            diaryEditViewModel.fetchWeatherInformation(
-                    loadDiaryDate,
-                    settingsViewModel.getLatitude(),
-                    settingsViewModel.getLongitude()
-            );
+            GeoCoordinates geoCoordinates =
+                    settingsViewModel.getGeoCoordinatesLiveData().getValue();
+            Objects.requireNonNull(geoCoordinates);
+            diaryEditViewModel.fetchWeatherInformation(loadDiaryDate, geoCoordinates);
         }
     }
 
@@ -536,17 +532,14 @@ public class DiaryEditFragment extends BaseFragment {
                     }
                 });
 
-        settingsViewModel.getHasUpdatedLocationLiveData()
-                .observe(getViewLifecycleOwner(), new Observer<Boolean>() {
+        settingsViewModel.getGeoCoordinatesLiveData()
+                .observe(getViewLifecycleOwner(), new Observer<GeoCoordinates>() {
                     @Override
-                    public void onChanged(Boolean aBoolean) {
-                        if (aBoolean == null) {
-                            Log.d("20240829", "getHasUpdatedLocationLiveData():null");
-                            return;
-                        }
-                        Log.d("20240829", "getHasUpdatedLocationLiveData():" + aBoolean);
+                    public void onChanged(GeoCoordinates geoCoordinates) {
+                        if (geoCoordinates == null) return;
+
                         Log.d("20240829", "shouldPrepareWeatherSelection:" + shouldPrepareWeatherSelection);
-                        if (aBoolean && shouldPrepareWeatherSelection) {
+                        if (shouldPrepareWeatherSelection) {
                             LocalDate date = diaryEditViewModel.getDateLiveData().getValue();
                             if (date == null) {
                                 throw new NullPointerException();
@@ -943,28 +936,25 @@ public class DiaryEditFragment extends BaseFragment {
 
         // HACK:EditFragment起動時、設定値を参照してから位置情報を取得する為、タイムラグが発生する。
         //      対策として記憶boolean変数を用意し、true時は位置情報取得処理コードにて天気情報も取得する。
+        // TODO:settingsViewModel.getIsCheckedWeatherInfoAcquisitionLiveData().getValue()を
+        //      settingsViewModel.isCheckedWeatherInfoAcquisitionSetting()に置換。
         Boolean isChecked =
-                settingsViewModel.getIsCheckedGettingWeatherInformationLiveData().getValue();
+                settingsViewModel.getIsCheckedWeatherInfoAcquisitionLiveData().getValue();
         if (isChecked == null) {
             shouldPrepareWeatherSelection = true;
             return false;
         } else if (!isChecked) {
             return false;
         }
-        Boolean hasUpdatedLocation = settingsViewModel.getHasUpdatedLocationLiveData().getValue();
-        if (hasUpdatedLocation == null) {
-            shouldPrepareWeatherSelection = true;
-            return false;
-        }
+        Boolean hasUpdatedLocation = settingsViewModel.hasUpdatedGeoCoordinates();
+        Objects.requireNonNull(hasUpdatedLocation);
         if (hasUpdatedLocation) {
             Log.d("20240719", "onTextChanged:prepareWeatherSelection");
             // 本フラグメント起動時のみダイアログなしで天気情報取得
             if (lastSelectedDate == null) {
-                diaryEditViewModel.fetchWeatherInformation(
-                        date,
-                        settingsViewModel.getLatitude(),
-                        settingsViewModel.getLongitude()
-                );
+                GeoCoordinates geoCoordinates = settingsViewModel.getGeoCoordinatesLiveData().getValue();
+                Objects.requireNonNull(geoCoordinates);
+                diaryEditViewModel.fetchWeatherInformation(date, geoCoordinates);
             } else {
                 showWeatherInformationDialog(date);
             }

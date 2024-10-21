@@ -1,8 +1,5 @@
 package com.websarva.wings.android.zuboradiary.ui.settings;
 
-import android.util.Log;
-
-import androidx.annotation.FloatRange;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.datastore.preferences.core.Preferences;
@@ -10,8 +7,9 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
 import com.websarva.wings.android.zuboradiary.data.AppError;
+import com.websarva.wings.android.zuboradiary.data.network.GeoCoordinates;
 import com.websarva.wings.android.zuboradiary.data.preferences.CalendarStartDayOfWeekPreferenceValue;
-import com.websarva.wings.android.zuboradiary.data.preferences.GettingWeatherInformationPreferenceValue;
+import com.websarva.wings.android.zuboradiary.data.preferences.WeatherInfoAcquisitionPreferenceValue;
 import com.websarva.wings.android.zuboradiary.data.preferences.PassCodeLockPreferenceValue;
 import com.websarva.wings.android.zuboradiary.data.preferences.ReminderNotificationPreferenceValue;
 import com.websarva.wings.android.zuboradiary.data.preferences.SettingsRepository;
@@ -22,10 +20,7 @@ import com.websarva.wings.android.zuboradiary.ui.BaseViewModel;
 
 import java.time.DayOfWeek;
 import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import java.util.Objects;
 
 import javax.inject.Inject;
 
@@ -40,21 +35,20 @@ public class SettingsViewModel extends BaseViewModel {
     private final SettingsRepository settingsRepository;
     private final WorkerRepository workerRepository;
     private final CompositeDisposable disposables = new CompositeDisposable();
-    // TODO:変数名を統一する。selected～、isChecked～。
-    // TODO:エラー変数を用意。Activityフラグメントで管理？
+
     private final MutableLiveData<ThemeColor> themeColor = new MutableLiveData<>();
     private final MutableLiveData<DayOfWeek> calendarStartDayOfWeek = new MutableLiveData<>();
     private final MutableLiveData<Boolean> isCheckedReminderNotification = new MutableLiveData<>();
     private final MutableLiveData<LocalTime> reminderNotificationTime = new MutableLiveData<>();
     private final MutableLiveData<Boolean> isCheckedPasscodeLock = new MutableLiveData<>();
-    private final MutableLiveData<Boolean> isCheckedGettingWeatherInformation = new MutableLiveData<>();
-    private final MutableLiveData<Boolean> hasUpdatedLocation = new MutableLiveData<>(false);
-    @FloatRange(from = -90.0, to = 90.0)
-    private double latitude = 0;
-    @FloatRange(from = -180.0, to = 180.0)
-    private double longitude = 0;
-    List<Flowable<?>> prefelencesFlowableList = new ArrayList<>();
-    Flowable<ThemeColorPreferenceValue> themeColorPreferenceValueFlowable;
+    private final MutableLiveData<Boolean> isCheckedWeatherInfoAcquisition = new MutableLiveData<>();
+
+    private final MutableLiveData<GeoCoordinates> geoCoordinates = new MutableLiveData<>();
+    private Flowable<ThemeColorPreferenceValue> themeColorPreferenceValueFlowable;
+    private Flowable<CalendarStartDayOfWeekPreferenceValue> calendarStartDayPreferenceValueFlowable;
+    private Flowable<ReminderNotificationPreferenceValue> reminderNotificationPreferenceValueFlowable;
+    private Flowable<PassCodeLockPreferenceValue> passCodeLockPreferenceValueFlowable;
+    private Flowable<WeatherInfoAcquisitionPreferenceValue> weatherInfoAcquisitionPreferenceValueFlowable;
 
     @Inject
     public SettingsViewModel(SettingsRepository settingsRepository, WorkerRepository workerRepository) {
@@ -62,45 +56,48 @@ public class SettingsViewModel extends BaseViewModel {
         this.workerRepository = workerRepository;
 
         initialize();
-        setUpLoadingThemeColorPreferenceValue();
-        setUpLoadingCalendarStartDayOfWeekPreferenceValue();
-        setUpLoadingReminderNotificationPreferenceValue();
-        setUpLoadingPasscodeLockPreferenceValue();
-        setUpLoadingGettingWeatherInformationPreferenceValue();
     }
 
-    // TODO:PreferenceValue読込エラーが発生した時、再読み込みさせるにはメソッドを再び呼び出す必要がある。現時点で考えれる対策を下記にまとめる。
-    //      1.各FragmentからSettingViewModelを参照する時に必要設定値の読み出しエラーフラグ(未作成)を確認して都度初期化する。
-    //        (対象Fragmentに不必要な設定がエラーの時でも処理が必要となる)
-    //      2.各FragmentがもつViewModelに都度PreferenceValueを読みこませる。(読込までのラグが発生してしまう。)
-    private void setUpLoadingThemeColorPreferenceValue() {
-        Flowable<ThemeColorPreferenceValue> preferenceValueFlowable =
-                settingsRepository.loadThemeColorSettingValue();
+    @Override
+    protected void initialize() {
+        super.initialize();
+
+        setUpThemeColorPreferenceValueLoading();
+        setUpCalendarStartDayOfWeekPreferenceValueLoading();
+        setUpReminderNotificationPreferenceValueLoading();
+        setUpPasscodeLockPreferenceValueLoading();
+        setUpWeatherInfoAcquisitionPreferenceValueLoading();
+    }
+
+    private void setUpThemeColorPreferenceValueLoading() {
+        themeColorPreferenceValueFlowable = settingsRepository.loadThemeColorSettingValue();
         disposables.add(
-                preferenceValueFlowable.subscribe(
-                        value -> this.themeColor.postValue(value.getThemeColor()),
+                themeColorPreferenceValueFlowable.subscribe(
+                        value -> {
+                            themeColor.postValue(value.getThemeColor());
+                        },
                         throwable -> {
                             throwable.printStackTrace();
                             addSettingLoadingError();
                         }
                 )
         );
-        themeColorPreferenceValueFlowable = preferenceValueFlowable;
-        prefelencesFlowableList.add(preferenceValueFlowable);
     }
 
     @NonNull
     public ThemeColor loadThemeColorSettingValue() {
         ThemeColor themeColorValue = themeColor.getValue();
         if (themeColorValue != null) return themeColorValue;
-        return themeColorPreferenceValueFlowable.blockingFirst().getThemeColor();
+        setUpThemeColorPreferenceValueLoading();
+        ThemeColorPreferenceValue defaultValue = new ThemeColorPreferenceValue(ThemeColor.WHITE);
+        return themeColorPreferenceValueFlowable.blockingFirst(defaultValue).getThemeColor();
     }
 
-    private void setUpLoadingCalendarStartDayOfWeekPreferenceValue() {
-        Flowable<CalendarStartDayOfWeekPreferenceValue> preferenceValueFlowable =
+    private void setUpCalendarStartDayOfWeekPreferenceValueLoading() {
+        calendarStartDayPreferenceValueFlowable =
                 settingsRepository.loadCalendarStartDayOfWeekPreferenceValue();
         disposables.add(
-                preferenceValueFlowable.subscribe(
+                calendarStartDayPreferenceValueFlowable.subscribe(
                         value -> {
                             DayOfWeek calendarStartDayOfWeek = value.toDayOfWeek();
                             this.calendarStartDayOfWeek.postValue(calendarStartDayOfWeek);
@@ -111,17 +108,24 @@ public class SettingsViewModel extends BaseViewModel {
                         }
                 )
         );
-        prefelencesFlowableList.add(preferenceValueFlowable);
     }
 
-    private void setUpLoadingReminderNotificationPreferenceValue() {
-        Flowable<ReminderNotificationPreferenceValue> preferenceValueFlowable =
+    @NonNull
+    public DayOfWeek loadCalendarStartDaySettingValue() {
+        DayOfWeek dayOfWeekValue = calendarStartDayOfWeek.getValue();
+        if (dayOfWeekValue != null) return dayOfWeekValue;
+        setUpCalendarStartDayOfWeekPreferenceValueLoading();
+        CalendarStartDayOfWeekPreferenceValue defaultValue =
+                new CalendarStartDayOfWeekPreferenceValue(DayOfWeek.SUNDAY);
+        return calendarStartDayPreferenceValueFlowable.blockingFirst(defaultValue).toDayOfWeek();
+    }
+
+    private void setUpReminderNotificationPreferenceValueLoading() {
+        reminderNotificationPreferenceValueFlowable =
                 settingsRepository.loadReminderNotificationPreferenceValue();
         disposables.add(
-                preferenceValueFlowable.subscribe(
+                reminderNotificationPreferenceValueFlowable.subscribe(
                         value -> {
-                            Log.d("20240909", "getIsChecked():" + value.getIsChecked());
-                            Log.d("20240909", "getNotificationLocalTime():" + value.getNotificationTimeString());
                             isCheckedReminderNotification.postValue(value.getIsChecked());
                             reminderNotificationTime.postValue(value.getNotificationLocalTime());
                             },
@@ -131,44 +135,71 @@ public class SettingsViewModel extends BaseViewModel {
                         }
                 )
         );
-        prefelencesFlowableList.add(preferenceValueFlowable);
     }
 
-    private void setUpLoadingPasscodeLockPreferenceValue() {
-        Flowable<PassCodeLockPreferenceValue> preferenceValueFlowable =
-                settingsRepository.loadPasscodeLockPreferenceValue();
+    public boolean isCheckedReminderNotificationSetting() {
+        Boolean value = isCheckedReminderNotification.getValue();
+        if (value != null) return value;
+        setUpReminderNotificationPreferenceValueLoading();
+        ReminderNotificationPreferenceValue defaultValue =
+                new ReminderNotificationPreferenceValue(false, "");
+        return reminderNotificationPreferenceValueFlowable.blockingFirst(defaultValue).getIsChecked();
+    }
+
+    @Nullable
+    public LocalTime loadReminderNotificationTimeSettingValue() {
+        LocalTime value = reminderNotificationTime.getValue();
+        if (value != null) return value;
+        setUpReminderNotificationPreferenceValueLoading();
+        ReminderNotificationPreferenceValue defaultValue =
+                new ReminderNotificationPreferenceValue(false, "");
+        return reminderNotificationPreferenceValueFlowable
+                .blockingFirst(defaultValue).getNotificationLocalTime();
+    }
+
+    private void setUpPasscodeLockPreferenceValueLoading() {
+        passCodeLockPreferenceValueFlowable = settingsRepository.loadPasscodeLockPreferenceValue();
         disposables.add(
-                preferenceValueFlowable.subscribe(
-                        value -> isCheckedPasscodeLock.postValue(value.getIsChecked()),
+                passCodeLockPreferenceValueFlowable.subscribe(
+                        value -> {
+                            isCheckedPasscodeLock.postValue(value.getIsChecked());
+                        },
                         throwable -> {
                             throwable.printStackTrace();
                             addSettingLoadingError();
                         }
                 )
         );
-        prefelencesFlowableList.add(preferenceValueFlowable);
     }
 
-    private void setUpLoadingGettingWeatherInformationPreferenceValue() {
-        Flowable<GettingWeatherInformationPreferenceValue> preferenceValueFlowable =
+    private void setUpWeatherInfoAcquisitionPreferenceValueLoading() {
+        weatherInfoAcquisitionPreferenceValueFlowable =
                 settingsRepository.loadGettingWeatherInformationPreferenceValue();
         disposables.add(
-                preferenceValueFlowable.subscribe(
-                        value -> isCheckedGettingWeatherInformation.postValue(value.getIsChecked()),
+                weatherInfoAcquisitionPreferenceValueFlowable.subscribe(
+                        value -> {
+                            isCheckedWeatherInfoAcquisition.postValue(value.getIsChecked());
+                        },
                         throwable -> {
                             throwable.printStackTrace();
                             addSettingLoadingError();
                         }
                 )
         );
-        prefelencesFlowableList.add(preferenceValueFlowable);
+    }
+
+    public boolean isCheckedWeatherInfoAcquisitionSetting() {
+        Boolean value = isCheckedWeatherInfoAcquisition.getValue();
+        if (value != null) return value;
+        setUpWeatherInfoAcquisitionPreferenceValueLoading();
+        WeatherInfoAcquisitionPreferenceValue defaultValue =
+                new WeatherInfoAcquisitionPreferenceValue(false);
+        return weatherInfoAcquisitionPreferenceValueFlowable.blockingFirst(defaultValue).getIsChecked();
     }
 
     private void addSettingLoadingError() {
         AppError lastAppError = getAppErrorBufferListLastValue();
-        if (lastAppError == AppError.SETTING_LOADING) {
-            return;
-        }
+        if (lastAppError == AppError.SETTING_LOADING) return;  // 設定更新エラー通知の重複防止
         addAppError(AppError.SETTING_LOADING);
     }
 
@@ -178,13 +209,17 @@ public class SettingsViewModel extends BaseViewModel {
         disposables.clear();
     }
 
-    public void saveThemeColor(ThemeColor value) {
+    void saveThemeColor(ThemeColor value) {
+        Objects.requireNonNull(value);
+
         ThemeColorPreferenceValue preferenceValue = new ThemeColorPreferenceValue(value);
         Single<Preferences> result = settingsRepository.saveThemeColorPreferenceValue(preferenceValue);
         setUpProcessOnSaved(result, null);
     }
 
-    public void saveCalendarStartDayOfWeek(DayOfWeek value) {
+    void saveCalendarStartDayOfWeek(DayOfWeek value) {
+        Objects.requireNonNull(value);
+
         CalendarStartDayOfWeekPreferenceValue preferenceValue =
                 new CalendarStartDayOfWeekPreferenceValue(value);
         Single<Preferences> result =
@@ -192,19 +227,20 @@ public class SettingsViewModel extends BaseViewModel {
         setUpProcessOnSaved(result, null);
     }
 
-    public void saveReminderNotificationValid(LocalTime time) {
-        Log.d("20240909", "saveReminderNotificationValid()");
-        ReminderNotificationPreferenceValue preferenceValue = new ReminderNotificationPreferenceValue(true, time);
+    void saveReminderNotificationValid(LocalTime value) {
+        Objects.requireNonNull(value);
+
+        ReminderNotificationPreferenceValue preferenceValue = new ReminderNotificationPreferenceValue(true, value);
         Single<Preferences> result = settingsRepository.saveReminderNotificationPreferenceValue(preferenceValue);
         setUpProcessOnSaved(result, new OnSettingsSavedCallback() {
             @Override
             public void onSettingsSaved() {
-                registerReminderNotificationWorker(time);
+                registerReminderNotificationWorker(value);
             }
         });
     }
 
-    public void saveReminderNotificationInvalid() {
+    void saveReminderNotificationInvalid() {
         ReminderNotificationPreferenceValue preferenceValue =
                 new ReminderNotificationPreferenceValue(false,(LocalTime) null);
         Single<Preferences> result = settingsRepository.saveReminderNotificationPreferenceValue(preferenceValue);
@@ -216,15 +252,15 @@ public class SettingsViewModel extends BaseViewModel {
         });
     }
 
-    public void savePasscodeLock(boolean bool) {
-        PassCodeLockPreferenceValue preferenceValue = new PassCodeLockPreferenceValue(bool, 0);
+    void savePasscodeLock(boolean value) {
+        PassCodeLockPreferenceValue preferenceValue = new PassCodeLockPreferenceValue(value, 0);
         Single<Preferences> result = settingsRepository.savePasscodeLockPreferenceValue(preferenceValue);
         setUpProcessOnSaved(result, null);
     }
 
-    public void saveGettingWeatherInformation(boolean value) {
-        GettingWeatherInformationPreferenceValue preferenceValue =
-                new GettingWeatherInformationPreferenceValue(value);
+    void saveWeatherInfoAcquisition(boolean value) {
+        WeatherInfoAcquisitionPreferenceValue preferenceValue =
+                new WeatherInfoAcquisitionPreferenceValue(value);
         Single<Preferences> result =
                 settingsRepository.saveGettingWeatherInformationPreferenceValue(preferenceValue);
         setUpProcessOnSaved(result, null);
@@ -238,44 +274,47 @@ public class SettingsViewModel extends BaseViewModel {
     private void setUpProcessOnSaved(Single<Preferences> result,@Nullable OnSettingsSavedCallback callback) {
         disposables.add(result.subscribe(new Consumer<Preferences>() {
             @Override
-            public void accept(Preferences preferences) throws Throwable {
-                Log.d("20240909", "saveReminderNotificationValid()_success");
-                if (callback == null) {
-                    return;
-                }
+            public void accept(Preferences preferences) {
+                Objects.requireNonNull(preferences);
+
+                if (callback == null) return;
                 callback.onSettingsSaved();
             }
         }, new Consumer<Throwable>() {
             @Override
-            public void accept(Throwable throwable) throws Throwable {
-                Log.d("20240909", "saveReminderNotificationValid()_error");
+            public void accept(Throwable throwable) {
+                Objects.requireNonNull(throwable);
+
                 AppError lastAppError = getAppErrorBufferListLastValue();
-                if (lastAppError == AppError.SETTING_UPDATE) {
-                    return;
-                }
+                if (lastAppError == AppError.SETTING_UPDATE) return; // 設定更新エラー通知の重複防止
                 addAppError(AppError.SETTING_UPDATE);
             }
         }));
     }
 
-    public void registerReminderNotificationWorker(LocalTime settingTime) {
+    void registerReminderNotificationWorker(LocalTime settingTime) {
+        Objects.requireNonNull(settingTime);
+
         workerRepository.registerReminderNotificationWorker(settingTime);
     }
 
-    public void cancelReminderNotificationWorker() {
+    void cancelReminderNotificationWorker() {
         workerRepository.cancelReminderNotificationWorker();
     }
 
-    public void updateLocationInformation(double latitude, double longitude) {
-        this.latitude = latitude;
-        this.longitude = longitude;
-        hasUpdatedLocation.setValue(true);
+    public void updateGeoCoordinates(GeoCoordinates geoCoordinates) {
+        Objects.requireNonNull(geoCoordinates);
+
+        this.geoCoordinates.setValue(geoCoordinates);
     }
 
-    public void clearLocationInformation() {
-        hasUpdatedLocation.setValue(false);
-        latitude = 0;
-        longitude = 0;
+    public void clearGeoCoordinates() {
+        geoCoordinates.setValue(null);
+    }
+
+    public boolean hasUpdatedGeoCoordinates() {
+        GeoCoordinates geoCoordinates = this.geoCoordinates.getValue();
+        return geoCoordinates != null;
     }
 
     // Getter/Setter
@@ -291,7 +330,7 @@ public class SettingsViewModel extends BaseViewModel {
         return isCheckedReminderNotification;
     }
 
-    public LiveData<LocalTime> getReminderNotificationTime() {
+    public LiveData<LocalTime> getReminderNotificationTimeLiveData() {
         return reminderNotificationTime;
     }
 
@@ -299,19 +338,11 @@ public class SettingsViewModel extends BaseViewModel {
         return isCheckedPasscodeLock;
     }
 
-    public LiveData<Boolean> getIsCheckedGettingWeatherInformationLiveData() {
-        return isCheckedGettingWeatherInformation;
+    public LiveData<Boolean> getIsCheckedWeatherInfoAcquisitionLiveData() {
+        return isCheckedWeatherInfoAcquisition;
     }
 
-    public LiveData<Boolean> getHasUpdatedLocationLiveData() {
-        return hasUpdatedLocation;
-    }
-
-    public double getLatitude() {
-        return latitude;
-    }
-
-    public double getLongitude() {
-        return longitude;
+    public LiveData<GeoCoordinates> getGeoCoordinatesLiveData() {
+        return geoCoordinates;
     }
 }

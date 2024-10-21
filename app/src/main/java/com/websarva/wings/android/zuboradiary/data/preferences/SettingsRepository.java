@@ -43,11 +43,11 @@ public class SettingsRepository {
         return this.userPreferences.savePasscodeLockPreferenceValue(value);
     }
 
-    public Flowable<GettingWeatherInformationPreferenceValue> loadGettingWeatherInformationPreferenceValue() {
+    public Flowable<WeatherInfoAcquisitionPreferenceValue> loadGettingWeatherInformationPreferenceValue() {
         return this.userPreferences.loadGettingWeatherInformationPreferenceValue();
     }
 
-    public Single<Preferences> saveGettingWeatherInformationPreferenceValue(GettingWeatherInformationPreferenceValue value) {
+    public Single<Preferences> saveGettingWeatherInformationPreferenceValue(WeatherInfoAcquisitionPreferenceValue value) {
         return this.userPreferences.saveGettingWeatherInformationPreferenceValue(value);
     }
 }
