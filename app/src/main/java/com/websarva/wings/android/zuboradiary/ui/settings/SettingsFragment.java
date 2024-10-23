@@ -7,6 +7,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.view.LayoutInflater;
@@ -22,6 +23,7 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.core.app.ActivityCompat;
 import androidx.databinding.ViewDataBinding;
 import androidx.lifecycle.Observer;
@@ -75,21 +77,25 @@ public class SettingsFragment extends BaseFragment {
 
         // ActivityResultLauncher設定
         // 通知権限取得結果処理
-        requestPostNotificationsPermissionLauncher =
-                registerForActivityResult(
-                        new ActivityResultContracts.RequestPermission(),
-                        new ActivityResultCallback<Boolean>() {
-                            @Override
-                            public void onActivityResult(Boolean isGranted) {
-                                if (isGranted && isGrantedPostNotifications()/*再確認*/) {
-                                    showReminderNotificationTimePickerDialog();
-                                } else {
-                                    binding.includeReminderNotificationSetting
-                                            .materialSwitchSettingValue.setChecked(false);
+        // MEMO:PostNotificationsはApiLevel33で導入されたPermission。33未満は許可取り不要。
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            requestPostNotificationsPermissionLauncher =
+                    registerForActivityResult(
+                            new ActivityResultContracts.RequestPermission(),
+                            new ActivityResultCallback<Boolean>() {
+                                @Override
+                                public void onActivityResult(Boolean isGranted) {
+                                    if (isGranted && isGrantedPostNotifications()/*再確認*/) {
+                                        showReminderNotificationTimePickerDialog();
+                                    } else {
+                                        binding.includeReminderNotificationSetting
+                                                .materialSwitchSettingValue.setChecked(false);
+                                    }
                                 }
                             }
-                        }
-                );
+                    );
+        }
+
 
         // 位置情報利用権限取得結果処理
         requestAccessLocationPermissionLauncher =
@@ -406,26 +412,36 @@ public class SettingsFragment extends BaseFragment {
             if (!isTouchedReminderNotificationSwitch) return;
 
             if (isChecked) {
-                if (isGrantedPostNotifications()) {
-                    showReminderNotificationTimePickerDialog();
+                // MEMO:PostNotificationsはApiLevel33で導入されたPermission。33未満は許可取り不要。
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    requestPostNotificationsPermission();
                 } else {
-                    boolean shouldShowRequestPermissionRationale =
-                            ActivityCompat.shouldShowRequestPermissionRationale(
-                                    requireActivity(), Manifest.permission.POST_NOTIFICATIONS);
-                    if (shouldShowRequestPermissionRationale) {
-                        requestPostNotificationsPermissionLauncher
-                                .launch(Manifest.permission.POST_NOTIFICATIONS);
-                    } else {
-                        binding.includeReminderNotificationSetting
-                                .materialSwitchSettingValue.setChecked(false);
-                        String permissionName = getString(R.string.fragment_settings_permission_name_notification);
-                        showPermissionDialog(permissionName);
-                    }
+                    showReminderNotificationTimePickerDialog();
                 }
             } else {
                 settingsViewModel.saveReminderNotificationInvalid();
             }
             isTouchedReminderNotificationSwitch = false;
+        }
+
+        @RequiresApi(api = Build.VERSION_CODES.TIRAMISU)
+        private void requestPostNotificationsPermission() {
+            if (isGrantedPostNotifications()) {
+                showReminderNotificationTimePickerDialog();
+            } else {
+                boolean shouldShowRequestPermissionRationale =
+                        ActivityCompat.shouldShowRequestPermissionRationale(
+                                requireActivity(), Manifest.permission.POST_NOTIFICATIONS);
+                if (shouldShowRequestPermissionRationale) {
+                    requestPostNotificationsPermissionLauncher
+                            .launch(Manifest.permission.POST_NOTIFICATIONS);
+                } else {
+                    binding.includeReminderNotificationSetting
+                            .materialSwitchSettingValue.setChecked(false);
+                    String permissionName = getString(R.string.fragment_settings_permission_name_notification);
+                    showPermissionDialog(permissionName);
+                }
+            }
         }
     }
 
@@ -512,6 +528,7 @@ public class SettingsFragment extends BaseFragment {
         }
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.TIRAMISU)
     private boolean isGrantedPostNotifications() {
         return ActivityCompat.checkSelfPermission(
                 requireActivity(), Manifest.permission.POST_NOTIFICATIONS)
