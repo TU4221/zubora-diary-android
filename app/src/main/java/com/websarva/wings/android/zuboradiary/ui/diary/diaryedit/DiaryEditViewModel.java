@@ -448,7 +448,7 @@ public class DiaryEditViewModel extends BaseViewModel {
             int nextItemNumber;
             for (int i = itemNumber; i < numVisibleItems; i++) {
                 nextItemNumber = i + 1;
-                diaryLiveData.getItem(i).updateAll(
+                diaryLiveData.getItem(i).update(
                         diaryLiveData.getItem(nextItemNumber).getTitle().getValue(),
                         diaryLiveData.getItem(nextItemNumber).getComment().getValue(),
                         diaryLiveData.getItem(nextItemNumber).getTitleUpdateLog().getValue()

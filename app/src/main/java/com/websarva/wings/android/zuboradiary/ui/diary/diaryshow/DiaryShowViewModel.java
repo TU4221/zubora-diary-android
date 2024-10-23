@@ -15,6 +15,8 @@ import com.websarva.wings.android.zuboradiary.ui.diary.DiaryLiveData;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Objects;
+import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 
 import javax.inject.Inject;
@@ -23,16 +25,15 @@ import dagger.hilt.android.lifecycle.HiltViewModel;
 
 @HiltViewModel
 public class DiaryShowViewModel extends BaseViewModel {
+
     private final DiaryRepository diaryRepository;
-    private final SettingsRepository settingsRepository;
 
     // 日記データ関係
-    DiaryLiveData diaryLiveData;
+    private final DiaryLiveData diaryLiveData;
 
     @Inject
-    public DiaryShowViewModel(DiaryRepository diaryRepository, SettingsRepository settingsRepository) {
+    public DiaryShowViewModel(DiaryRepository diaryRepository) {
         this.diaryRepository = diaryRepository;
-        this.settingsRepository = settingsRepository;
         diaryLiveData = new DiaryLiveData();
         initialize();
     }
@@ -43,9 +44,11 @@ public class DiaryShowViewModel extends BaseViewModel {
         diaryLiveData.initialize();
     }
 
-    public boolean hasDiary(LocalDate localDate) {
+    public boolean hasDiary(LocalDate date) {
+        Objects.requireNonNull(date);
+
         try {
-            return diaryRepository.hasDiary(localDate).get();
+            return diaryRepository.hasDiary(date).get();
         } catch (ExecutionException | InterruptedException e) {
             addAppError(AppError.DIARY_INFORMATION_LOADING);
             return false;
@@ -53,78 +56,25 @@ public class DiaryShowViewModel extends BaseViewModel {
     }
 
     public void loadDiary(LocalDate date) {
-        Diary diary;
+        Objects.requireNonNull(date);
+
         try {
-             diary = diaryRepository.selectDiary(date).get();
+            Diary diary = diaryRepository.selectDiary(date).get();
+            diaryLiveData.update(diary);
         } catch (Exception e) {
             addAppError(AppError.DIARY_LOADING);
-            return;
         }
-        diaryLiveData.getDate().setValue(LocalDate.parse(diary.getDate()));
-        WeatherConverter weatherConverter = new WeatherConverter();
-        Integer intWeather1 = getOrDefault(diary.getWeather1(), 0);
-        diaryLiveData.getWeather1().setValue(weatherConverter.toWeather(intWeather1)); // Fragmentに記述したObserverよりintWeather1更新
-        Integer intWeather2 = getOrDefault(diary.getWeather2(), 0);
-        diaryLiveData.getWeather2().setValue(weatherConverter.toWeather(intWeather2)); // Fragmentに記述したObserverよりintWeather2更新
-        ConditionConverter conditionConverter = new ConditionConverter();
-        Integer intCondition = getOrDefault(diary.getCondition(), 0);
-        diaryLiveData.getCondition().setValue(conditionConverter.toCondition(intCondition)); // Fragmentに記述したObserverよりintCondition更新
-        String title = getOrDefault(diary.getTitle(), "");
-        diaryLiveData.getTitle().setValue(title);
-        String item1Title = getOrDefault(diary.getItem1Title(), "");
-        diaryLiveData.getItem(1).getTitle().setValue(item1Title);
-        String item1Comment = getOrDefault(diary.getItem1Comment(), "");
-        diaryLiveData.getItem(1).getComment().setValue(item1Comment);
-        String item2Title = getOrDefault(diary.getItem2Title(), "");
-        diaryLiveData.getItem(2).getTitle().setValue(item2Title);
-        String item2Comment = getOrDefault(diary.getItem2Comment(), "");
-        diaryLiveData.getItem(2).getComment().setValue(item2Comment);
-        String item3Title = getOrDefault(diary.getItem3Title(), "");
-        diaryLiveData.getItem(3).getTitle().setValue(item3Title);
-        String item3Comment = getOrDefault(diary.getItem3Comment(), "");
-        diaryLiveData.getItem(3).getComment().setValue(item3Comment);
-        String item4Title = getOrDefault(diary.getItem4Title(), "");
-        diaryLiveData.getItem(4).getTitle().setValue(item4Title);
-        String item4Comment = getOrDefault(diary.getItem4Comment(), "");
-        diaryLiveData.getItem(4).getComment().setValue(item4Comment);
-        String item5Title = getOrDefault(diary.getItem5Title(), "");
-        diaryLiveData.getItem(5).getTitle().setValue(item5Title);
-        String item5Comment = getOrDefault(diary.getItem5Comment(), "");
-        diaryLiveData.getItem(5).getComment().setValue(item5Comment);
-        int numVisibleItems = DiaryLiveData.MAX_ITEMS;
-        for (int i = DiaryLiveData.MAX_ITEMS; i > 1; i--) {
-            String itemTitle = diaryLiveData.getItem(i).getTitle().getValue();
-            String itemComment = diaryLiveData.getItem(i).getComment().getValue();
-            if ((itemTitle == null || itemTitle.isEmpty())
-                    && (itemComment == null || itemComment.isEmpty())) {
-                numVisibleItems--;
-            } else {
-                break;
-            }
-        }
-        diaryLiveData.getNumVisibleItems().setValue(numVisibleItems);
-        diaryLiveData.getLog().setValue(LocalDateTime.parse(diary.getLog()));
     }
 
-    private <T> T getOrDefault(T value, T defaultValue) {
-        if (value == null) {
-            return defaultValue;
-        }
-        return value;
-    }
-
-    public boolean deleteDiary() {
+    public void deleteDiary() {
         LocalDate deleteDate = diaryLiveData.getDate().getValue();
-        if (deleteDate == null) {
-            return false;
-        }
+        Objects.requireNonNull(deleteDate);
+
         try {
             diaryRepository.deleteDiary(deleteDate).get();
-        } catch (Exception e) {
+        } catch (CancellationException | ExecutionException | InterruptedException  e) {
             addAppError(AppError.DIARY_DELETE);
-            return false;
         }
-        return true;
     }
 
     // LiveDataGetter

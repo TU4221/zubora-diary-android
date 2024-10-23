@@ -1,6 +1,7 @@
 package com.websarva.wings.android.zuboradiary.ui.diary.diaryshow;
 
 import android.app.Dialog;
+import android.content.Context;
 import android.os.Bundle;
 
 import androidx.activity.OnBackPressedCallback;
@@ -22,21 +23,18 @@ import android.widget.TextView;
 
 import com.websarva.wings.android.zuboradiary.R;
 import com.websarva.wings.android.zuboradiary.data.DateTimeStringConverter;
+import com.websarva.wings.android.zuboradiary.data.diary.Conditions;
+import com.websarva.wings.android.zuboradiary.data.diary.Weathers;
 import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor;
-import com.websarva.wings.android.zuboradiary.databinding.FragmentCalendarBinding;
 import com.websarva.wings.android.zuboradiary.databinding.FragmentDiaryShowBinding;
 import com.websarva.wings.android.zuboradiary.ui.BaseFragment;
-import com.websarva.wings.android.zuboradiary.ui.ColorSwitchingViewList;
 import com.websarva.wings.android.zuboradiary.ui.diary.DiaryLiveData;
-import com.websarva.wings.android.zuboradiary.ui.diary.DiaryThemeColorSwitcher;
-import com.websarva.wings.android.zuboradiary.ui.observer.DiaryShowConditionObserver;
-import com.websarva.wings.android.zuboradiary.ui.observer.DiaryShowLogObserver;
-import com.websarva.wings.android.zuboradiary.ui.observer.DiaryShowNumVisibleItemsObserver;
-import com.websarva.wings.android.zuboradiary.ui.observer.DiaryShowWeather1Observer;
-import com.websarva.wings.android.zuboradiary.ui.observer.DiaryShowWeather2Observer;
 import com.websarva.wings.android.zuboradiary.ui.settings.SettingsViewModel;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.Objects;
 
 import dagger.hilt.android.AndroidEntryPoint;
 
@@ -100,7 +98,7 @@ public class DiaryShowFragment extends BaseFragment {
         setUpWeatherLayout();
         setUpConditionLayout();
         setUpItemLayout();
-        setUpLogShowLayout();
+        setUpLogLayout();
     }
 
     @Override
@@ -129,13 +127,9 @@ public class DiaryShowFragment extends BaseFragment {
     private void receiveDeleteConfirmationDialogResult(SavedStateHandle savedStateHandle) {
         Integer selectedButton =
                 receiveResulFromDialog(DiaryDeleteConfirmationDialogFragment.KEY_SELECTED_BUTTON);
-        if (selectedButton == null) {
-            return;
-        }
+        if (selectedButton == null) return;
+        if (selectedButton != Dialog.BUTTON_POSITIVE) return;
 
-        if (selectedButton != Dialog.BUTTON_POSITIVE) {
-            return;
-        }
         diaryShowViewModel.deleteDiary();
         backFragment(true);
     }
@@ -160,6 +154,8 @@ public class DiaryShowFragment extends BaseFragment {
                 .setNavigationOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
+                        Objects.requireNonNull(v);
+
                         backFragment(true);
                     }
                 });
@@ -168,6 +164,8 @@ public class DiaryShowFragment extends BaseFragment {
                 .setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
                     @Override
                     public boolean onMenuItemClick(MenuItem item) {
+                        Objects.requireNonNull(item);
+
                         // 日記編集フラグメント起動
                         if (item.getItemId() == R.id.diaryShowToolbarOptionEditDiary) {
                             LocalDate editDiaryDate = diaryShowViewModel.getDateLiveData().getValue();
@@ -186,11 +184,11 @@ public class DiaryShowFragment extends BaseFragment {
                 .observe(getViewLifecycleOwner(), new Observer<LocalDate>() {
                     @Override
                     public void onChanged(LocalDate date) {
-                        if (date == null) {
-                            return;
-                        }
-                        DateTimeStringConverter dateTimeStringConverter = new DateTimeStringConverter();
-                        String stringDate = dateTimeStringConverter.toStringDate(date);
+                        // MEMO:DiaryViewModelを初期化するとDiaryDateにnullが代入されるため、下記"return"を処理。
+                        if (date == null) return;
+
+                        DateTimeStringConverter converter = new DateTimeStringConverter();
+                        String stringDate = converter.toStringDate(date);
                         binding.materialToolbarTopAppBar.setTitle(stringDate);
                     }
                 });
@@ -201,7 +199,7 @@ public class DiaryShowFragment extends BaseFragment {
         diaryShowViewModel.getWeather1LiveData()
                 .observe(
                         getViewLifecycleOwner(),
-                        new DiaryShowWeather1Observer(
+                        new Weather1Observer(
                                 requireContext(),
                                 binding.includeDiaryShow.textWeather1Selected
                         )
@@ -210,7 +208,7 @@ public class DiaryShowFragment extends BaseFragment {
         diaryShowViewModel.getWeather2LiveData()
                 .observe(
                         getViewLifecycleOwner(),
-                        new DiaryShowWeather2Observer(
+                        new Weather2Observer(
                                 requireContext(),
                                 binding.includeDiaryShow.textWeatherSlush,
                                 binding.includeDiaryShow.textWeather2Selected
@@ -218,15 +216,85 @@ public class DiaryShowFragment extends BaseFragment {
                 );
     }
 
+    public static class Weather1Observer implements Observer<Weathers> {
+        private final Context context;
+        private final TextView textWeather;
+
+        public Weather1Observer(Context context, TextView textWeather) {
+            Objects.requireNonNull(context);
+            Objects.requireNonNull(textWeather);
+
+            this.context = context;
+            this.textWeather = textWeather;
+        }
+
+        @Override
+        public void onChanged(Weathers weather) {
+            Objects.requireNonNull(weather);
+
+            textWeather.setText(weather.toString(context));
+        }
+    }
+
+    public static class Weather2Observer implements Observer<Weathers> {
+        private final Context context;
+        private final TextView slush;
+        private final TextView textWeather;
+
+        public Weather2Observer(Context context, TextView slush, TextView textWeather) {
+            Objects.requireNonNull(context);
+            Objects.requireNonNull(slush);
+            Objects.requireNonNull(textWeather);
+
+            this.context = context;
+            this.slush = slush;
+            this.textWeather = textWeather;
+        }
+
+        @Override
+        public void onChanged(Weathers weather) {
+            Objects.requireNonNull(weather);
+
+            if (weather == Weathers.UNKNOWN) {
+                slush.setVisibility(View.GONE);
+                textWeather.setVisibility(View.GONE);
+            } else {
+                slush.setVisibility(View.VISIBLE);
+                textWeather.setVisibility(View.VISIBLE);
+            }
+            textWeather.setText(weather.toString(context));
+        }
+    }
+
     private void setUpConditionLayout() {
         diaryShowViewModel.getConditionLiveData()
                 .observe(
                         getViewLifecycleOwner(),
-                        new DiaryShowConditionObserver(
+                        new ConditionObserver(
                                 requireContext(),
                                 binding.includeDiaryShow.textConditionSelected
                         )
                 );
+    }
+
+    public static class ConditionObserver implements Observer<Conditions> {
+        private final Context context;
+        private final TextView textCondition;
+
+        public ConditionObserver(Context context, TextView textCondition) {
+            Objects.requireNonNull(context);
+            Objects.requireNonNull(textCondition);
+
+            this.context = context;
+            this.textCondition = textCondition;
+        }
+
+        @Override
+        public void onChanged(Conditions condition) {
+            Objects.requireNonNull(condition);
+
+            textCondition.setText(condition.toString(context));
+        }
     }
 
     private void setUpItemLayout() {
@@ -237,24 +305,65 @@ public class DiaryShowFragment extends BaseFragment {
         itemLayouts[3] = binding.includeDiaryShow.includeItem4.linerLayoutDiaryShowItem;
         itemLayouts[4] = binding.includeDiaryShow.includeItem5.linerLayoutDiaryShowItem;
         diaryShowViewModel.getNumVisibleItemsLiveData()
-                .observe(getViewLifecycleOwner(), new DiaryShowNumVisibleItemsObserver(itemLayouts));
+                .observe(getViewLifecycleOwner(), new NumVisibleItemsObserver(itemLayouts));
     }
 
-    private void setUpLogShowLayout() {
+    public static class NumVisibleItemsObserver implements Observer<Integer> {
+        private final View[] itemLayouts;
+
+        public NumVisibleItemsObserver(View[] itemLayouts) {
+            Objects.requireNonNull(itemLayouts);
+            Arrays.stream(itemLayouts).forEach(Objects::requireNonNull);
+
+            this.itemLayouts = itemLayouts;
+        }
+
+        @Override
+        public void onChanged(Integer integer) {
+            Objects.requireNonNull(integer);
+            if (integer <= 0 || integer > itemLayouts.length) throw new IllegalArgumentException();
+
+            for (int i = 0; i < itemLayouts.length; i++) {
+                if (i < integer) {
+                    itemLayouts[i].setVisibility(View.VISIBLE);
+                } else {
+                    itemLayouts[i].setVisibility(View.GONE);
+                }
+            }
+        }
+    }
+
+    private void setUpLogLayout() {
         diaryShowViewModel.getLogLiveData()
                 .observe(
                         getViewLifecycleOwner(),
-                        new DiaryShowLogObserver(binding.includeDiaryShow.textLogValue)
+                        new LogObserver(binding.includeDiaryShow.textLogValue)
                 );
     }
 
+    public static class LogObserver implements Observer<LocalDateTime> {
+        private final TextView textLog;
+
+        public LogObserver(TextView textLog) {
+            Objects.requireNonNull(textLog);
+
+            this.textLog = textLog;
+        }
+
+        @Override
+        public void onChanged(LocalDateTime localDateTime) {
+            // MEMO:DiaryViewModelを初期化するとDiaryLogにnullが代入されるため、下記"return"を処理。
+            if (localDateTime == null) return;
+
+            DateTimeStringConverter dateTimeStringConverter = new DateTimeStringConverter();
+            String strDate = dateTimeStringConverter.toStringDateTime(localDateTime);
+            textLog.setText(strDate);
+        }
+    }
+
     private void showDiaryEdit(LocalDate date) {
-        if (date == null) {
-            throw new NullPointerException();
-        }
-        if (!canShowOtherFragment()) {
-            return;
-        }
+        Objects.requireNonNull(date);
+        if (!canShowOtherFragment()) return;
 
         NavDirections action =
                 DiaryShowFragmentDirections
@@ -267,12 +376,8 @@ public class DiaryShowFragment extends BaseFragment {
     }
 
     private void showDiaryDeleteConfirmationDialog(LocalDate date) {
-        if (date == null) {
-            throw new NullPointerException();
-        }
-        if (!canShowOtherFragment()) {
-            return;
-        }
+        Objects.requireNonNull(date);
+        if (!canShowOtherFragment()) return;
 
         NavDirections action =
                 DiaryShowFragmentDirections.actionDiaryShowFragmentToDiaryDeleteConfirmationDialog(date);
@@ -295,19 +400,19 @@ public class DiaryShowFragment extends BaseFragment {
     // MEMO:ツールバーの戻るボタンと端末の戻るボタンを区別している。
     //      ツールバーの戻るボタン:アプリ内でのみ戻る
     //      端末の戻るボタン:端末内で戻る(アプリ外から本アプリを起動した場合起動もとへ戻る)
-    private void backFragment(boolean isNavigateUp) {
+    private void backFragment(boolean requestsNavigateUp) {
         NavBackStackEntry navBackStackEntry = navController.getPreviousBackStackEntry();
-        if (navBackStackEntry != null) {
-            int destinationId = navBackStackEntry.getDestination().getId();
-            if (destinationId == R.id.navigation_calendar_fragment) {
-                SavedStateHandle savedStateHandle =
-                        navController.getPreviousBackStackEntry().getSavedStateHandle();
-                LocalDate showedDiaryLocalDate = diaryShowViewModel.getDateLiveData().getValue();
-                savedStateHandle.set(KEY_SHOWED_DIARY_DATE, showedDiaryLocalDate);
-            }
+        Objects.requireNonNull(navBackStackEntry);
+
+        int destinationId = navBackStackEntry.getDestination().getId();
+        if (destinationId == R.id.navigation_calendar_fragment) {
+            SavedStateHandle savedStateHandle =
+                    navController.getPreviousBackStackEntry().getSavedStateHandle();
+            LocalDate showedDiaryLocalDate = diaryShowViewModel.getDateLiveData().getValue();
+            savedStateHandle.set(KEY_SHOWED_DIARY_DATE, showedDiaryLocalDate);
         }
 
-        if (isNavigateUp) {
+        if (requestsNavigateUp) {
             navController.navigateUp();
         } else {
             navController.popBackStack();

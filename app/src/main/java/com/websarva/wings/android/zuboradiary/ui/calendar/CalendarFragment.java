@@ -35,11 +35,6 @@ import com.websarva.wings.android.zuboradiary.ui.diary.diaryshow.DiaryShowFragme
 
 import com.kizitonwose.calendar.view.CalendarView;
 import com.websarva.wings.android.zuboradiary.ui.diary.diaryshow.DiaryShowViewModel;
-import com.websarva.wings.android.zuboradiary.ui.observer.DiaryShowConditionObserver;
-import com.websarva.wings.android.zuboradiary.ui.observer.DiaryShowLogObserver;
-import com.websarva.wings.android.zuboradiary.ui.observer.DiaryShowNumVisibleItemsObserver;
-import com.websarva.wings.android.zuboradiary.ui.observer.DiaryShowWeather1Observer;
-import com.websarva.wings.android.zuboradiary.ui.observer.DiaryShowWeather2Observer;
 import com.websarva.wings.android.zuboradiary.ui.settings.SettingsViewModel;
 
 import java.time.DayOfWeek;
@@ -499,7 +494,7 @@ public class CalendarFragment extends BaseFragment {
         diaryShowViewModel.getWeather1LiveData()
                 .observe(
                         getViewLifecycleOwner(),
-                        new DiaryShowWeather1Observer(
+                        new DiaryShowFragment.Weather1Observer(
                                 requireContext(),
                                 binding.includeDiaryShow.textWeather1Selected
                         )
@@ -508,7 +503,7 @@ public class CalendarFragment extends BaseFragment {
         diaryShowViewModel.getWeather2LiveData()
                 .observe(
                         getViewLifecycleOwner(),
-                        new DiaryShowWeather2Observer(
+                        new DiaryShowFragment.Weather2Observer(
                                 requireContext(),
                                 binding.includeDiaryShow.textWeatherSlush,
                                 binding.includeDiaryShow.textWeather2Selected
@@ -518,7 +513,7 @@ public class CalendarFragment extends BaseFragment {
         diaryShowViewModel.getConditionLiveData()
                 .observe(
                         getViewLifecycleOwner(),
-                        new DiaryShowConditionObserver(
+                        new DiaryShowFragment.ConditionObserver(
                                 requireContext(),
                                 binding.includeDiaryShow.textConditionSelected
                         )
@@ -532,12 +527,12 @@ public class CalendarFragment extends BaseFragment {
         itemLayouts[3] = binding.includeDiaryShow.includeItem4.linerLayoutDiaryShowItem;
         itemLayouts[4] = binding.includeDiaryShow.includeItem5.linerLayoutDiaryShowItem;
         diaryShowViewModel.getNumVisibleItemsLiveData()
-                .observe(getViewLifecycleOwner(), new DiaryShowNumVisibleItemsObserver(itemLayouts));
+                .observe(getViewLifecycleOwner(), new DiaryShowFragment.NumVisibleItemsObserver(itemLayouts));
 
         diaryShowViewModel.getLogLiveData()
                 .observe(
                         getViewLifecycleOwner(),
-                        new DiaryShowLogObserver(binding.includeDiaryShow.textLogValue)
+                        new DiaryShowFragment.LogObserver(binding.includeDiaryShow.textLogValue)
                 );
     }
 
