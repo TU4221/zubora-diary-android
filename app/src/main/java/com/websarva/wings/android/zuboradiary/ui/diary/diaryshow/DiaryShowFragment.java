@@ -108,7 +108,7 @@ public class DiaryShowFragment extends BaseFragment {
 
     @Override
     protected void handleOnReceivingDialogResult(@NonNull SavedStateHandle savedStateHandle) {
-        receiveDeleteConfirmationDialogResult(savedStateHandle);
+        receiveDeleteConfirmationDialogResult();
         retryErrorDialogShow();
     }
 
@@ -124,7 +124,7 @@ public class DiaryShowFragment extends BaseFragment {
     }
 
     // 日記削除確認ダイアログフラグメントからデータ受取
-    private void receiveDeleteConfirmationDialogResult(SavedStateHandle savedStateHandle) {
+    private void receiveDeleteConfirmationDialogResult() {
         Integer selectedButton =
                 receiveResulFromDialog(DiaryDeleteConfirmationDialogFragment.KEY_SELECTED_BUTTON);
         if (selectedButton == null) return;

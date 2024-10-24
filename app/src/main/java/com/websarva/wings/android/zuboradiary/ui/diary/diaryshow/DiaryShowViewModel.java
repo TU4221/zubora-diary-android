@@ -5,11 +5,8 @@ import androidx.lifecycle.LiveData;
 import com.websarva.wings.android.zuboradiary.data.AppError;
 import com.websarva.wings.android.zuboradiary.data.database.Diary;
 import com.websarva.wings.android.zuboradiary.data.database.DiaryRepository;
-import com.websarva.wings.android.zuboradiary.data.diary.ConditionConverter;
 import com.websarva.wings.android.zuboradiary.data.diary.Conditions;
-import com.websarva.wings.android.zuboradiary.data.diary.WeatherConverter;
 import com.websarva.wings.android.zuboradiary.data.diary.Weathers;
-import com.websarva.wings.android.zuboradiary.data.preferences.SettingsRepository;
 import com.websarva.wings.android.zuboradiary.ui.BaseViewModel;
 import com.websarva.wings.android.zuboradiary.ui.diary.DiaryLiveData;
 
@@ -102,10 +99,6 @@ public class DiaryShowViewModel extends BaseViewModel {
         return diaryLiveData.getNumVisibleItems();
     }
 
-    public LiveData<String> getItemTitleLiveData(int itemNumber) {
-        return diaryLiveData.getItem(itemNumber).getTitle();
-    }
-
     public LiveData<String> getItem1TitleLiveData() {
         return diaryLiveData.getItem(1).getTitle();
     }
@@ -124,10 +117,6 @@ public class DiaryShowViewModel extends BaseViewModel {
 
     public LiveData<String> getItem5TitleLiveData() {
         return diaryLiveData.getItem(5).getTitle();
-    }
-
-    public LiveData<String> getItemCommentLiveData(int itemNumber) {
-        return diaryLiveData.getItem(itemNumber).getComment();
     }
 
     public LiveData<String> getItem1CommentLiveData() {
