@@ -61,6 +61,7 @@ public class DiaryEditViewModel extends BaseViewModel {
         previousDate.setValue(null);
         loadedDate.setValue(null);
         diaryLiveData.initialize();
+        isShowingItemTitleEditFragment = false;
     }
 
     void prepareDiary(LocalDate date, boolean requestsLoadingDiary) {

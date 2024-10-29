@@ -252,11 +252,11 @@ public class DiaryEditFragment extends BaseFragment {
 
     private void setUpDiaryData() {
         // 画面表示データ準備
-        boolean isLoadingExistingDiary =
-                DiaryEditFragmentArgs.fromBundle(requireArguments()).getIsLoadingDiary();
-        LocalDate diaryDate =
-                DiaryEditFragmentArgs.fromBundle(requireArguments()).getEditDiaryDate();
         if (!diaryEditViewModel.getHasPreparedDiary()) {
+            LocalDate diaryDate =
+                    DiaryEditFragmentArgs.fromBundle(requireArguments()).getEditDiaryDate();
+            boolean isLoadingExistingDiary =
+                    DiaryEditFragmentArgs.fromBundle(requireArguments()).getIsLoadingDiary();
             diaryEditViewModel.prepareDiary(diaryDate, isLoadingExistingDiary);
             if (!isLoadingExistingDiary) fetchWeatherInformation(diaryDate,false);
         }
