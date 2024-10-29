@@ -170,7 +170,7 @@ public class MainActivity extends AppCompatActivity {
         BaseThemeColorSwitcher switcher =
                 new BaseThemeColorSwitcher(getApplicationContext(), themeColor);
         switcher.switchStatusBarColor(getWindow());
-        switcher.switchBackgroundColor(binding.layoutBackground);
+        switcher.switchBackgroundColor(binding.viewFullScreenBackground);
         switcher.switchToolbarColor(binding.mtbMainToolbar);
         switcher.switchBottomNavigationColor(binding.navView);
     }

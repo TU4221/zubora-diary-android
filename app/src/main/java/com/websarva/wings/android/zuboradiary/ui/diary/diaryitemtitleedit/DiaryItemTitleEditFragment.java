@@ -18,9 +18,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.EditText;
-import android.widget.TextView;
 
 import com.google.android.material.textfield.TextInputLayout;
 import com.websarva.wings.android.zuboradiary.R;
@@ -28,9 +26,7 @@ import com.websarva.wings.android.zuboradiary.data.database.DiaryItemTitleSelect
 import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor;
 import com.websarva.wings.android.zuboradiary.databinding.FragmentDiaryItemTitleEditBinding;
 import com.websarva.wings.android.zuboradiary.ui.BaseFragment;
-import com.websarva.wings.android.zuboradiary.ui.ColorSwitchingViewList;
 import com.websarva.wings.android.zuboradiary.ui.TextInputSetup;
-import com.websarva.wings.android.zuboradiary.ui.diary.DiaryThemeColorSwitcher;
 import com.websarva.wings.android.zuboradiary.ui.settings.SettingsViewModel;
 
 import java.util.List;

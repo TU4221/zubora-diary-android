@@ -7,43 +7,39 @@
 
     </data>
 
-    <androidx.coordinatorlayout.widget.CoordinatorLayout
-        android:id="@+id/layout_background"
+    <!--<FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent" >
+
+        <View
+            style="@style/FragmentBackgroundViewStyle"
+            android:id="@+id/view_full_screen_background"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
-            <com.google.android.material.appbar.AppBarLayout
-                android:id="@+id/app_bar_layout"
+            <com.google.android.material.appbar.MaterialToolbar
+                android:id="@+id/mtbMainToolbar"
+                style="@style/ToolbarStyle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent">
-
-                <com.google.android.material.appbar.MaterialToolbar
-                    style="@style/ToolbarStyle"
-                    android:id="@+id/mtbMainToolbar"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
-
-            </com.google.android.material.appbar.AppBarLayout>
+                app:layout_constraintTop_toTopOf="parent" />
 
             <fragment
                 android:id="@+id/nav_host_fragment_activity_main"
                 android:name="androidx.navigation.fragment.NavHostFragment"
-                android:layout_width="0dp"
+                android:layout_width="match_parent"
                 android:layout_height="0dp"
                 app:defaultNavHost="true"
                 app:layout_constraintBottom_toTopOf="@id/motionLayout_bottom_navigation"
-                app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintRight_toRightOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintVertical_bias="0.0"
                 app:navGraph="@navigation/mobile_navigation" />
 
             <androidx.constraintlayout.motion.widget.MotionLayout
@@ -55,13 +51,62 @@
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintRight_toRightOf="parent">
 
+                <com.google.android.material.bottomnavigation.BottomNavigationView
+                    android:id="@+id/nav_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="80dp"
+                    app:menu="@menu/bottom_nav_menu" />
+
+            </androidx.constraintlayout.motion.widget.MotionLayout>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </FrameLayout>-->
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <View
+            style="@style/FragmentBackgroundViewStyle"
+            android:id="@+id/view_full_screen_background"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/mtbMainToolbar"
+            style="@style/ToolbarStyle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <fragment
+                android:id="@+id/nav_host_fragment_activity_main"
+                android:name="androidx.navigation.fragment.NavHostFragment"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                app:defaultNavHost="true"
+                app:navGraph="@navigation/mobile_navigation" />
+
+            <androidx.constraintlayout.motion.widget.MotionLayout
+                android:id="@+id/motionLayout_bottom_navigation"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layoutDescription="@xml/activity_main_bottom_navigation_scene">
+
+                <!-- MEMO:MotionLayoutタグ内にLayoutタグがないとMotionLayoutが機能しない。 -->
                 <LinearLayout
                     android:id="@+id/frameLayout_bottom_navigation"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintLeft_toLeftOf="parent"
-                    app:layout_constraintRight_toRightOf="parent">
+                    android:layout_height="wrap_content">
 
                     <com.google.android.material.bottomnavigation.BottomNavigationView
                         android:id="@+id/nav_view"
@@ -73,7 +118,8 @@
 
             </androidx.constraintlayout.motion.widget.MotionLayout>
 
-        </androidx.constraintlayout.widget.ConstraintLayout>
+        </LinearLayout>
 
-    </androidx.coordinatorlayout.widget.CoordinatorLayout>
+    </FrameLayout>
+
 </layout>

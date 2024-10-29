@@ -64,7 +64,7 @@ public class DiaryShowViewModel extends BaseViewModel {
     }
 
     public void deleteDiary() {
-        LocalDate deleteDate = diaryLiveData.getDate().getValue();
+        LocalDate deleteDate = diaryLiveData.getDateMutableLiveData().getValue();
         Objects.requireNonNull(deleteDate);
 
         try {
@@ -76,70 +76,70 @@ public class DiaryShowViewModel extends BaseViewModel {
 
     // LiveDataGetter
     public LiveData<LocalDate> getDateLiveData() {
-        return diaryLiveData.getDate();
+        return diaryLiveData.getDateMutableLiveData();
     }
 
     public LiveData<Weathers> getWeather1LiveData() {
-        return diaryLiveData.getWeather1();
+        return diaryLiveData.getWeather1MutableLiveData();
     }
 
     public LiveData<Weathers> getWeather2LiveData() {
-        return diaryLiveData.getWeather2();
+        return diaryLiveData.getWeather2MutableLiveData();
     }
 
     public LiveData<Conditions> getConditionLiveData() {
-        return diaryLiveData.getCondition();
+        return diaryLiveData.getConditionMutableLiveData();
     }
 
     public LiveData<String> getTitleLiveData() {
-        return diaryLiveData.getTitle();
+        return diaryLiveData.getTitleMutableLiveData();
     }
 
     public LiveData<Integer> getNumVisibleItemsLiveData() {
-        return diaryLiveData.getNumVisibleItems();
+        return diaryLiveData.getNumVisibleItemsMutableLiveData();
     }
 
     public LiveData<String> getItem1TitleLiveData() {
-        return diaryLiveData.getItem(1).getTitle();
+        return diaryLiveData.getItemLiveData(1).getTitleMutableLiveData();
     }
 
     public LiveData<String> getItem2TitleLiveData() {
-        return diaryLiveData.getItem(2).getTitle();
+        return diaryLiveData.getItemLiveData(2).getTitleMutableLiveData();
     }
 
     public LiveData<String> getItem3TitleLiveData() {
-        return diaryLiveData.getItem(3).getTitle();
+        return diaryLiveData.getItemLiveData(3).getTitleMutableLiveData();
     }
 
     public LiveData<String> getItem4TitleLiveData() {
-        return diaryLiveData.getItem(4).getTitle();
+        return diaryLiveData.getItemLiveData(4).getTitleMutableLiveData();
     }
 
     public LiveData<String> getItem5TitleLiveData() {
-        return diaryLiveData.getItem(5).getTitle();
+        return diaryLiveData.getItemLiveData(5).getTitleMutableLiveData();
     }
 
     public LiveData<String> getItem1CommentLiveData() {
-        return diaryLiveData.getItem(1).getComment();
+        return diaryLiveData.getItemLiveData(1).getCommentMutableLiveData();
     }
 
     public LiveData<String> getItem2CommentLiveData() {
-        return diaryLiveData.getItem(2).getComment();
+        return diaryLiveData.getItemLiveData(2).getCommentMutableLiveData();
     }
 
     public LiveData<String> getItem3CommentLiveData() {
-        return diaryLiveData.getItem(3).getComment();
+        return diaryLiveData.getItemLiveData(3).getCommentMutableLiveData();
     }
 
     public LiveData<String> getItem4CommentLiveData() {
-        return diaryLiveData.getItem(4).getComment();
+        return diaryLiveData.getItemLiveData(4).getCommentMutableLiveData();
     }
 
     public LiveData<String> getItem5CommentLiveData() {
-        return diaryLiveData.getItem(5).getComment();
+        return diaryLiveData.getItemLiveData(5).getCommentMutableLiveData();
     }
 
     public LiveData<LocalDateTime> getLogLiveData() {
-        return diaryLiveData.getLog();
+        return diaryLiveData.getLogMutableLiveData();
     }
 }

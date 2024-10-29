@@ -17,11 +17,12 @@ import com.websarva.wings.android.zuboradiary.data.DateTimeStringConverter;
 import com.websarva.wings.android.zuboradiary.ui.BaseAlertDialogFragment;
 
 import java.time.LocalDate;
+import java.util.Objects;
 
 public class LoadExistingDiaryDialogFragment extends BaseAlertDialogFragment {
     private static final String fromClassName =
             "From" + LoadExistingDiaryDialogFragment.class.getName();
-    public static final String KEY_SELECTED_BUTTON = "SelectedButton" + fromClassName;
+    static final String KEY_SELECTED_BUTTON = "SelectedButton" + fromClassName;
 
     @Override
     protected String createTitle() {
@@ -30,11 +31,13 @@ public class LoadExistingDiaryDialogFragment extends BaseAlertDialogFragment {
 
     @Override
     protected String createMessage() {
-        LocalDate loadDiaryDate =
+        LocalDate loadingDiaryDate =
                 LoadExistingDiaryDialogFragmentArgs.fromBundle(requireArguments()).getLoadDiaryDate();
-        DateTimeStringConverter dateTimeStringConverter = new DateTimeStringConverter();
-        String stringLoadDiaryDate = dateTimeStringConverter.toStringDate(loadDiaryDate);
-        return stringLoadDiaryDate + getString(R.string.dialog_load_Existing_diary_message);
+        Objects.requireNonNull(loadingDiaryDate);
+
+        DateTimeStringConverter converter = new DateTimeStringConverter();
+        String loadingDiaryDateString = converter.toStringDate(loadingDiaryDate);
+        return loadingDiaryDateString + getString(R.string.dialog_load_Existing_diary_message);
     }
 
     @Override
@@ -44,7 +47,7 @@ public class LoadExistingDiaryDialogFragment extends BaseAlertDialogFragment {
 
     @Override
     protected void handleNegativeButton(@NonNull DialogInterface dialog, int which) {
-        // 処理なし
+        setResult(KEY_SELECTED_BUTTON, DialogInterface.BUTTON_NEGATIVE);
     }
 
     @Override
@@ -54,7 +57,7 @@ public class LoadExistingDiaryDialogFragment extends BaseAlertDialogFragment {
 
     @Override
     protected void handleCancel(@NonNull DialogInterface dialog) {
-        // 処理なし
+        setResult(KEY_SELECTED_BUTTON, DialogInterface.BUTTON_NEGATIVE);
     }
 
     @Override

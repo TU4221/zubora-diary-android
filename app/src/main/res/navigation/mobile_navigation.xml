@@ -322,9 +322,6 @@
             <argument
                 android:name="UpdateDiaryDate"
                 app:argType="java.time.LocalDate" />
-            <argument
-                android:name="UpdateType"
-                app:argType="integer" />
         </dialog>
         <dialog
             android:id="@+id/navigation_weather_information_dialog"

@@ -18,12 +18,13 @@ import com.websarva.wings.android.zuboradiary.data.DateTimeStringConverter;
 import com.websarva.wings.android.zuboradiary.ui.BaseAlertDialogFragment;
 
 import java.time.LocalDate;
+import java.util.Objects;
 
 public class WeatherInformationDialogFragment extends BaseAlertDialogFragment {
 
     private static final String fromClassName =
             "From" + WeatherInformationDialogFragment.class.getName();
-    public static final String KEY_SELECTED_BUTTON = "SelectedButton" + fromClassName;
+    static final String KEY_SELECTED_BUTTON = "SelectedButton" + fromClassName;
 
     @Override
     protected String createTitle() {
@@ -32,11 +33,13 @@ public class WeatherInformationDialogFragment extends BaseAlertDialogFragment {
 
     @Override
     protected String createMessage() {
-        LocalDate loadDiaryDate =
+        LocalDate loadingDiaryDate =
                 WeatherInformationDialogFragmentArgs.fromBundle(requireArguments()).getTargetDiaryDate();
+        Objects.requireNonNull(loadingDiaryDate);
+
         DateTimeStringConverter dateTimeStringConverter = new DateTimeStringConverter();
-        String stringDate = dateTimeStringConverter.toStringDate(loadDiaryDate);
-        return stringDate + getString(R.string.dialog_weather_information_message);
+        String dateString = dateTimeStringConverter.toStringDate(loadingDiaryDate);
+        return dateString + getString(R.string.dialog_weather_information_message);
     }
 
     @Override

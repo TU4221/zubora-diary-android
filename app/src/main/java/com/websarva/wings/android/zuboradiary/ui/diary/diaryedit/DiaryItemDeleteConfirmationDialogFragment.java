@@ -11,7 +11,7 @@ public class DiaryItemDeleteConfirmationDialogFragment extends BaseAlertDialogFr
 
     private static final String fromClassName =
             "From" + DiaryItemDeleteConfirmationDialogFragment.class.getName();
-    public static final String KEY_DELETE_ITEM_NUMBER = "DeleteItemNumber" + fromClassName;
+    static final String KEY_DELETE_ITEM_NUMBER = "DeleteItemNumber" + fromClassName;
 
     @Override
     protected String createTitle() {

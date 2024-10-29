@@ -1,37 +1,92 @@
 package com.websarva.wings.android.zuboradiary.data.network;
 
+import android.util.Log;
+
+import androidx.annotation.NonNull;
+
+import com.squareup.moshi.Json;
+import com.websarva.wings.android.zuboradiary.data.diary.Weathers;
+
+import java.util.Arrays;
+import java.util.Objects;
+
 public class WeatherApiResponse {
+
     private float latitude;
     private float longitude;
     private WeatherApiResponseDairy daily;
 
-    public WeatherApiResponse(float latitude, float longitude, WeatherApiResponseDairy daily) {
-        this.latitude = latitude;
-        this.longitude = longitude;
-        this.daily = daily;
+    private WeatherApiResponse() {
+        // HACK:Retrofit2(Moshi)を使用して本クラスをインスタンス化する時、引数ありのコンストラクタは処理されない。
+        //      引数なしコンストラクタ処理時は、フィールド変数の値は未格納。
+        //      原因が明らかになるまで、フィールド変数参照時はNullチェック等を行う。
     }
 
-    public float getLatitude() {
-        return latitude;
+    @NonNull
+    public Weathers toWeatherInformation() {
+        new GeoCoordinates(latitude, longitude); // GeoCoordinatesのコンストラクタを使用してlatitude、longitudeの値チェック
+        Log.d("WeatherApi", String.valueOf(latitude));
+        Log.d("WeatherApi", String.valueOf(longitude));
+        Objects.requireNonNull(daily);
+        for (String s: daily.getTimes()) Log.d("WeatherApi", s);
+        for (int i: daily.getWeatherCodes()) Log.d("WeatherApi", String.valueOf(i));
+
+        int[] weatherCodes = daily.getWeatherCodes();
+        int weatherCode = weatherCodes[0];
+        return convertWeathers(weatherCode);
     }
 
-    public void setLatitude(float latitude) {
-        this.latitude = latitude;
+    // "apiWeatherCode"は下記ページの"WMO 気象解釈コード"
+    // https://open-meteo.com/en/docs
+    public Weathers convertWeathers(int apiWeatherCode) {
+        Log.d("WeatherApi", String.valueOf(apiWeatherCode));
+        switch (apiWeatherCode) {
+            case 0:
+            case 1:
+                return Weathers.SUNNY;
+            case 2: case 3:
+            case 45: case 48:
+                return Weathers.CLOUDY;
+            case 51: case 53: case 55:
+            case 56: case 57:
+            case 61: case 63: case 65:
+            case 66: case 67:
+            case 80: case 81: case 82:
+            case 95:
+            case 96: case 99:
+                return Weathers.RAINY;
+            case 71: case 73: case 75:
+            case 77:
+            case 85: case 86:
+                return Weathers.SNOWY;
+            default:
+                return Weathers.UNKNOWN;
+        }
     }
 
-    public float getLongitude() {
-        return longitude;
-    }
+    private static class WeatherApiResponseDairy {
+        @Json(name = "time")
+        private String[] times;
+        @Json(name = "weather_code")
+        private int[] weatherCodes;
 
-    public void setLongitude(float longitude) {
-        this.longitude = longitude;
-    }
+        private WeatherApiResponseDairy() {
+            // HACK:Retrofit2(Moshi)を使用して本クラスをインスタンス化する時、引数ありのコンストラクタは処理されない。
+            //      引数なしコンストラクタ処理時は、フィールド変数の値は未格納。
+            //      原因が明らかになるまで、フィールド変数参照時はNullチェック等を行う。
+        }
 
-    public WeatherApiResponseDairy getDaily() {
-        return daily;
-    }
+        private String[] getTimes() {
+            Objects.requireNonNull(times);
+            Arrays.stream(times).forEach(Objects::requireNonNull);
 
-    public void setDaily(WeatherApiResponseDairy daily) {
-        this.daily = daily;
+            return times;
+        }
+
+        private int[] getWeatherCodes() {
+            Objects.requireNonNull(weatherCodes);
+
+            return weatherCodes;
+        }
     }
 }

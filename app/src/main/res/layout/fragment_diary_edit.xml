@@ -110,7 +110,7 @@
 
                             <com.google.android.material.textfield.TextInputLayout
                                 android:id="@+id/textInputLayout_weather_1"
-                                style="@style/TextInputLayoutDropdownMenuStyle"
+                                style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
                                 android:layout_marginStart="@dimen/fragment_diary_edit_margin_start"

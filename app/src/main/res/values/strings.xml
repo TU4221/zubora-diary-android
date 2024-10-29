@@ -97,6 +97,10 @@
     <string name="dialog_weather_information_message">の天気情報を取得しますか。</string>
 
 
+    <!-- DiaryEditFragment -->
+    <string name="fragment_diary_edit_toolbar_title_create_new">新規作成</string>
+    <string name="fragment_diary_edit_toolbar_title_edit">編集中</string>
+
     <!-- fragment_diary_edit -->
     <string name="fragment_diary_edit_toolbar_title_value_tools">新規作成／編集中</string>
     <string name="fragment_diary_edit_toolbar_option_save_diary">日記保存</string>

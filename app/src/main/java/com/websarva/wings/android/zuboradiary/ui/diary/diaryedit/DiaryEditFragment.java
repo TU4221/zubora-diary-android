@@ -1,5 +1,6 @@
 package com.websarva.wings.android.zuboradiary.ui.diary.diaryedit;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
@@ -51,13 +52,15 @@ import com.websarva.wings.android.zuboradiary.ui.diary.diaryitemtitleedit.DiaryI
 import com.websarva.wings.android.zuboradiary.data.network.GeoCoordinates;
 import com.websarva.wings.android.zuboradiary.ui.settings.SettingsViewModel;
 
+import org.jetbrains.annotations.Unmodifiable;
+
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
 import dagger.hilt.android.AndroidEntryPoint;
-import dagger.internal.Preconditions;
 
 @AndroidEntryPoint
 public class DiaryEditFragment extends BaseFragment {
@@ -65,26 +68,12 @@ public class DiaryEditFragment extends BaseFragment {
     // View関係
     private FragmentDiaryEditBinding binding;
     private boolean isDeletingItemTransition = false;
-    private final String TOOL_BAR_TITLE_NEW = "新規作成";
-    private final String TOOL_BAR_TITLE_EDIT = "編集中";
-    private LocalDate lastSelectedDate;
     private ArrayAdapter<String> weather2ArrayAdapter;
 
     // ViewModel
     private DiaryEditViewModel diaryEditViewModel;
     private SettingsViewModel settingsViewModel;
 
-    // 位置情報
-    private boolean shouldPrepareWeatherSelection = false;
-
-    // 上書保存方法
-    public static final int UPDATE_TYPE_UPDATE_ONLY = 0;
-    public static final int UPDATE_TYPE_DELETE_AND_UPDATE = 1;
-    // TODO:上記を下記に変更
-    private enum UpdateType {
-        UPDATE_ONLY,
-        DELETE_AND_UPDATE;
-    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -146,13 +135,12 @@ public class DiaryEditFragment extends BaseFragment {
                 savedStateHandle.getLiveData(DiaryItemTitleEditFragment.KEY_NEW_ITEM_TITLE);
         newItemTitleLiveData.observe(getViewLifecycleOwner(), new Observer<String>() {
             @Override
-            public void onChanged(String string) {
+            public void onChanged(@Nullable String string) {
                 // MEMO:結果がない場合もあるので"return"で返す。
                 if (string == null) return;
 
                 Integer itemNumber =
                         savedStateHandle.get(DiaryItemTitleEditFragment.KEY_UPDATE_ITEM_NUMBER);
-                // MEMO:この時点で結果がない場合異常なので例外を発生させる。。
                 Objects.requireNonNull(itemNumber);
 
                 diaryEditViewModel.updateItemTitle(itemNumber, string);
@@ -165,11 +153,11 @@ public class DiaryEditFragment extends BaseFragment {
 
     @Override
     protected void handleOnReceivingDialogResult(@NonNull SavedStateHandle savedStateHandle) {
-        receiveDatePickerDialogResult(savedStateHandle);
-        receiveLoadExistingDiaryDialogResult(savedStateHandle);
-        receiveUpdateExistingDiaryDialogResult(savedStateHandle);
-        receiveDeleteConfirmDialogResult(savedStateHandle);
-        receiveWeatherInformationDialogResult(savedStateHandle);
+        receiveDatePickerDialogResult();
+        receiveLoadExistingDiaryDialogResult();
+        receiveUpdateExistingDiaryDialogResult();
+        receiveDeleteConfirmDialogResult();
+        receiveWeatherInformationDialogResult();
         retryErrorDialogShow();
         clearFocusAllEditText();
     }
@@ -179,7 +167,6 @@ public class DiaryEditFragment extends BaseFragment {
         savedStateHandle.remove(DatePickerDialogFragment.KEY_SELECTED_DATE);
         savedStateHandle.remove(LoadExistingDiaryDialogFragment.KEY_SELECTED_BUTTON);
         savedStateHandle.remove(UpdateExistingDiaryDialogFragment.KEY_SELECTED_BUTTON);
-        savedStateHandle.remove(UpdateExistingDiaryDialogFragment.KEY_UPDATE_TYPE);
         savedStateHandle.remove(DiaryItemDeleteConfirmationDialogFragment.KEY_DELETE_ITEM_NUMBER);
         savedStateHandle.remove(WeatherInformationDialogFragment.KEY_SELECTED_BUTTON);
     }
@@ -193,74 +180,53 @@ public class DiaryEditFragment extends BaseFragment {
     }
 
     // 日付入力ダイアログフラグメントからデータ受取
-    private void receiveDatePickerDialogResult(SavedStateHandle savedStateHandle) {
+    private void receiveDatePickerDialogResult() {
         LocalDate selectedDate = receiveResulFromDialog(DatePickerDialogFragment.KEY_SELECTED_DATE);
-        if (selectedDate == null) {
-            return;
-        }
+        if (selectedDate == null) return;
 
         diaryEditViewModel.updateDate(selectedDate);
     }
 
     // 既存日記読込ダイアログフラグメントから結果受取
-    private void receiveLoadExistingDiaryDialogResult(SavedStateHandle savedStateHandle) {
+    private void receiveLoadExistingDiaryDialogResult() {
         Integer selectedButton = receiveResulFromDialog(LoadExistingDiaryDialogFragment.KEY_SELECTED_BUTTON);
-        if (selectedButton == null) {
-            return;
-        }
+        if (selectedButton == null) return;
+
         LocalDate date = diaryEditViewModel.getDateLiveData().getValue();
-        if (date == null) {
-            return;
-        }
+        Objects.requireNonNull(date);
 
         if (selectedButton == DialogInterface.BUTTON_POSITIVE) {
             diaryEditViewModel.initialize();
             diaryEditViewModel.prepareDiary(date, true);
         } else {
-            LocalDate loadedDate = diaryEditViewModel.getLoadedDateLiveData().getValue();
-            if (loadedDate == null) {
-                return;
+            if (!diaryEditViewModel.isNewDiaryDefaultStatus()) {
+                fetchWeatherInformation(date, true);
             }
-            fetchWeatherInformation(date);
         }
     }
 
     // 既存日記上書きダイアログフラグメントから結果受取
-    private void receiveUpdateExistingDiaryDialogResult(SavedStateHandle savedStateHandle) {
-        Integer updateType = receiveResulFromDialog(UpdateExistingDiaryDialogFragment.KEY_UPDATE_TYPE);
-        if (updateType == null) {
-            return;
-        }
+    private void receiveUpdateExistingDiaryDialogResult() {
+        Integer selectedButton = receiveResulFromDialog(UpdateExistingDiaryDialogFragment.KEY_SELECTED_BUTTON);
+        if (selectedButton == null) return;
+        if (selectedButton != DialogInterface.BUTTON_POSITIVE) return;
 
-        boolean isSuccessful;
-        switch (updateType) {
-            case UPDATE_TYPE_DELETE_AND_UPDATE:
-                Log.d("保存形式確認", "日付変更上書保存");
-                isSuccessful = diaryEditViewModel.deleteExistingDiaryAndSaveDiary();
-                break;
-            case UPDATE_TYPE_UPDATE_ONLY:
-            default:
-                Log.d("保存形式確認", "上書保存");
-                isSuccessful = diaryEditViewModel.saveDiary();
-                break;
-        }
+        boolean isSuccessful = diaryEditViewModel.saveDiary();
         if (isSuccessful) {
             LocalDate date = diaryEditViewModel.getDateLiveData().getValue();
+            Objects.requireNonNull(date);
             showDiaryShowFragment(date);
         }
     }
 
     // 項目削除確認ダイアログフラグメントから結果受取
-    private void receiveDeleteConfirmDialogResult(SavedStateHandle savedStateHandle) {
+    private void receiveDeleteConfirmDialogResult() {
         Integer deleteItemNumber =
                 receiveResulFromDialog(DiaryItemDeleteConfirmationDialogFragment.KEY_DELETE_ITEM_NUMBER);
-        if (deleteItemNumber == null) {
-            return;
-        }
+        if (deleteItemNumber == null) return;
+
         Integer numVisibleItems = diaryEditViewModel.getNumVisibleItemsLiveData().getValue();
-        if (numVisibleItems == null) {
-            return;
-        }
+        Objects.requireNonNull(numVisibleItems);
 
         if (deleteItemNumber == 1 && numVisibleItems.equals(deleteItemNumber)) {
             diaryEditViewModel.deleteItem(deleteItemNumber);
@@ -270,24 +236,18 @@ public class DiaryEditFragment extends BaseFragment {
         }
     }
 
-    private void receiveWeatherInformationDialogResult(SavedStateHandle savedStateHandle) {
+    private void receiveWeatherInformationDialogResult() {
         // 天気情報読込ダイアログフラグメントから結果受取
         Integer selectedButton =
                 receiveResulFromDialog(WeatherInformationDialogFragment.KEY_SELECTED_BUTTON);
-        if (selectedButton == null) {
-            return;
-        }
+        if (selectedButton == null) return;
+        if (selectedButton != DialogInterface.BUTTON_POSITIVE) return;
 
-        if (selectedButton == DialogInterface.BUTTON_POSITIVE) {
-            LocalDate loadDiaryDate = diaryEditViewModel.getDateLiveData().getValue();
-            if (loadDiaryDate == null) {
-                return;
-            }
-            GeoCoordinates geoCoordinates =
-                    settingsViewModel.getGeoCoordinatesLiveData().getValue();
-            Objects.requireNonNull(geoCoordinates);
-            diaryEditViewModel.fetchWeatherInformation(loadDiaryDate, geoCoordinates);
-        }
+        LocalDate loadDiaryDate = diaryEditViewModel.getDateLiveData().getValue();
+        Objects.requireNonNull(loadDiaryDate);
+        GeoCoordinates geoCoordinates = settingsViewModel.getGeoCoordinatesLiveData().getValue();
+        Objects.requireNonNull(geoCoordinates);
+        diaryEditViewModel.fetchWeatherInformation(loadDiaryDate, geoCoordinates);
     }
 
     private void setUpDiaryData() {
@@ -298,8 +258,8 @@ public class DiaryEditFragment extends BaseFragment {
                 DiaryEditFragmentArgs.fromBundle(requireArguments()).getEditDiaryDate();
         if (!diaryEditViewModel.getHasPreparedDiary()) {
             diaryEditViewModel.prepareDiary(diaryDate, isLoadingExistingDiary);
+            if (!isLoadingExistingDiary) fetchWeatherInformation(diaryDate,false);
         }
-
     }
 
     private void setUpToolBar() {
@@ -307,6 +267,8 @@ public class DiaryEditFragment extends BaseFragment {
                 .setNavigationOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
+                        Objects.requireNonNull(v);
+
                         navController.navigateUp();
                     }
                 });
@@ -315,54 +277,22 @@ public class DiaryEditFragment extends BaseFragment {
                 .setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
                     @Override
                     public boolean onMenuItemClick(MenuItem item) {
+                        Objects.requireNonNull(item);
+
                         //日記保存(日記表示フラグメント起動)。
                         if (item.getItemId() == R.id.diaryEditToolbarOptionSaveDiary) {
-                            LocalDate loadedDate = diaryEditViewModel.getLoadedDateLiveData().getValue();
                             LocalDate savingDate = diaryEditViewModel.getDateLiveData().getValue();
-
-                            boolean isNewDiary = true;
-                            boolean isMatchedDate = false;
-                            if (loadedDate != null) {
-                                isNewDiary = false;
-                                isMatchedDate = loadedDate.equals(savingDate);
-                            }
-
-                            boolean isUpdateDiary = diaryEditViewModel.hasDiary(savingDate);
-                            if (isUpdateDiary) {
-                                int updateType;
-                                if (isMatchedDate) {
-                                    Log.d("保存形式確認", "上書保存");
-                                    boolean isSuccessful = diaryEditViewModel.saveDiary();
-                                    if (isSuccessful) {
-                                        showDiaryShowFragment(savingDate);
-                                    }
-                                } else {
-                                    if (isNewDiary) {
-                                        updateType = UPDATE_TYPE_UPDATE_ONLY;
-                                    } else {
-                                        updateType = UPDATE_TYPE_DELETE_AND_UPDATE;
-                                    }
-                                    showUpdateExistingDiaryDialog(savingDate, updateType);
-                                }
+                            Objects.requireNonNull(savingDate);
+                            if (diaryEditViewModel.shouldShowUpdateConfirmationDialog()) {
+                                showUpdateExistingDiaryDialog(savingDate);
                             } else {
-                                boolean isSuccessful;
-                                if (isNewDiary) {
-                                    Log.d("保存形式確認", "新規保存");
-                                    isSuccessful = diaryEditViewModel.saveDiary();
-                                } else {
-                                    Log.d("保存形式確認", "日付変更新規保存");
-                                    isSuccessful = diaryEditViewModel.deleteExistingDiaryAndSaveDiary();
-                                }
-                                if (isSuccessful) {
-                                    showDiaryShowFragment(savingDate);
-                                }
+                                boolean isSuccessful = diaryEditViewModel.saveDiary();
+                                if (isSuccessful) showDiaryShowFragment(savingDate);
                             }
                             return true;
                         } else if (item.getItemId() == R.id.diaryEditToolbarOptionDeleteDiary) {
                             boolean isSuccessful = diaryEditViewModel.deleteDiary();
-                            if (isSuccessful) {
-                                navController.navigateUp();
-                            }
+                            if (isSuccessful) navController.navigateUp();
                         }
                         return false;
                     }
@@ -371,16 +301,23 @@ public class DiaryEditFragment extends BaseFragment {
         diaryEditViewModel.getLoadedDateLiveData()
                 .observe(getViewLifecycleOwner(), new Observer<LocalDate>() {
                     @Override
-                    public void onChanged(LocalDate date) {
-                        Menu menu = binding.materialToolbarTopAppBar.getMenu();
-                        MenuItem deleteMenuItem = menu.findItem(R.id.diaryEditToolbarOptionDeleteDiary);
+                    public void onChanged(@Nullable LocalDate date) {
+                        String title;
+                        boolean enabledDelete;
                         if (date == null) {
-                            binding.materialToolbarTopAppBar.setTitle(TOOL_BAR_TITLE_NEW);
-                            deleteMenuItem.setEnabled(false);
+                            title = getString(R.string.fragment_diary_edit_toolbar_title_create_new);
+                            enabledDelete = false;
                         } else {
-                            binding.materialToolbarTopAppBar.setTitle(TOOL_BAR_TITLE_EDIT);
-                            deleteMenuItem.setEnabled(true);
+                            title = getString(R.string.fragment_diary_edit_toolbar_title_edit);
+                            enabledDelete = true;
                         }
+                        binding.materialToolbarTopAppBar.setTitle(title);
+
+                        Menu menu = binding.materialToolbarTopAppBar.getMenu();
+                        Objects.requireNonNull(menu);
+                        MenuItem deleteMenuItem = menu.findItem(R.id.diaryEditToolbarOptionDeleteDiary);
+                        Objects.requireNonNull(deleteMenuItem);
+                        deleteMenuItem.setEnabled(enabledDelete);
                     }
                 });
     }
@@ -389,58 +326,68 @@ public class DiaryEditFragment extends BaseFragment {
     private void setUpDateInputField() {
         binding.textInputEditTextDate.setInputType(EditorInfo.TYPE_NULL); //キーボード非表示設定
         binding.textInputEditTextDate.setOnTouchListener(new View.OnTouchListener() {
+
             @Override
             public boolean onTouch(View v, MotionEvent event) {
                 Objects.requireNonNull(v);
-
+                Objects.requireNonNull(event);
                 if (event.getAction() != MotionEvent.ACTION_UP) return false;
 
                 hideKeyboard(v);
-
                 LocalDate date = diaryEditViewModel.getDateLiveData().getValue();
+                Objects.requireNonNull(date);
                 showDatePickerDialog(date);
                 return false;
             }
         });
 
-        diaryEditViewModel.getDateLiveData().observe(getViewLifecycleOwner(), new Observer<LocalDate>() {
-            @Override
-            public void onChanged(LocalDate date) {
-                if (date == null) {
-                    return;
-                }
-
-                DateTimeStringConverter dateTimeStringConverter = new DateTimeStringConverter();
-                binding.textInputEditTextDate.setText(dateTimeStringConverter.toStringDate(date));
-                Log.d("DiaryEditInputDate", "SelectedDate:" + date);
-                Log.d("DiaryEditInputDate", "lastSelectedDate:" + lastSelectedDate);
-                boolean shouldShowDialog = shouldShowLoadingExistingDiaryDialogOnDateChanged(date);
-                if (shouldShowDialog) {
-                    showLoadingExistingDiaryDialog(date);
-                } else {
-                    // 読込確認Dialog表示時は、確認後下記処理を行う。
-                    if (!date.equals(lastSelectedDate)) {
-                        fetchWeatherInformation(date);
-                    }
-                }
-                lastSelectedDate = date;
-            }
-        });
+        diaryEditViewModel.getDateLiveData().observe(getViewLifecycleOwner(), new DateObserver());
     }
 
-    private boolean shouldShowLoadingExistingDiaryDialogOnDateChanged(@NonNull LocalDate changedDate) {
-        if (changedDate.equals(lastSelectedDate)) {
-            Log.d("EditFragment", "shouldShowLoadingExistingDiaryDialogOnDateChanged:changedDate.equals(lastSelectedDate) = true");
-            return false;
+    private class DateObserver implements Observer<LocalDate> {
+
+        @Override
+        public void onChanged(@Nullable LocalDate date) {
+            if (date == null) return;
+
+            DateTimeStringConverter dateTimeStringConverter = new DateTimeStringConverter();
+            binding.textInputEditTextDate.setText(dateTimeStringConverter.toStringDate(date));
+            Log.d("DiaryEditInputDate", "currentDate:" + date);
+            LocalDate loadedDate = diaryEditViewModel.getLoadedDateLiveData().getValue();
+            Log.d("DiaryEditInputDate", "loadedDate:" + loadedDate);
+            LocalDate previousDate = diaryEditViewModel.getPreviousDateLiveData().getValue();
+            Log.d("DiaryEditInputDate", "previousDate:" + previousDate);
+            boolean shouldShowDialog = shouldShowLoadingExistingDiaryDialog(date);
+            if (shouldShowDialog) {
+                showLoadingExistingDiaryDialog(date);
+            } else {
+                // 読込確認Dialog表示時は、確認後下記処理を行う。
+                if (requestsFetchingWeatherInformation(date)) {
+                    fetchWeatherInformation(date, true);
+                }
+            }
         }
-        LocalDate loadedDate = diaryEditViewModel.getLoadedDateLiveData().getValue();
-        if (changedDate.equals(loadedDate)) {
-            Log.d("EditFragment", "shouldShowLoadingExistingDiaryDialogOnDateChanged:changedDate.equals(loadedDate) = true");
-            return false;
+
+        private boolean shouldShowLoadingExistingDiaryDialog(LocalDate changedDate) {
+            Objects.requireNonNull(changedDate);
+
+            if (diaryEditViewModel.isNewDiaryDefaultStatus()) return diaryEditViewModel.hasDiary(changedDate);
+
+            LocalDate previousDate = diaryEditViewModel.getPreviousDateLiveData().getValue();
+            LocalDate loadedDate = diaryEditViewModel.getLoadedDateLiveData().getValue();
+
+            if (changedDate.equals(previousDate)) return false;
+            if (changedDate.equals(loadedDate)) return false;
+            return diaryEditViewModel.hasDiary(changedDate);
         }
-        boolean hasDiary = diaryEditViewModel.hasDiary(changedDate);
-        Log.d("EditFragment", "shouldShowLoadingExistingDiaryDialogOnDateChanged:hasDiary(changedDate) = " + hasDiary);
-        return hasDiary;
+
+        private boolean requestsFetchingWeatherInformation(LocalDate date) {
+            Objects.requireNonNull(date);
+
+            LocalDate previousDate = diaryEditViewModel.getPreviousDateLiveData().getValue();
+            if (previousDate == null) return false;
+            return !date.equals(previousDate);
+        }
     }
 
     // 天気入力欄。
@@ -450,28 +397,17 @@ public class DiaryEditFragment extends BaseFragment {
         weather2ArrayAdapter = createWeatherSpinnerAdapter();
         binding.autoCompleteTextWeather2.setAdapter(weather2ArrayAdapter);
 
-        // TODO:天気情報取得が同期処理なら不要
-        /*binding.autoCompleteTextWeather1.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                if (event.getAction() == MotionEvent.ACTION_DOWN) {
-                    diaryEditViewModel.cancelWeatherSelectionPreparation();
-                }
-                return false;
-            }
-        });*/
-
         binding.autoCompleteTextWeather1.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Objects.requireNonNull(parent);
+                Objects.requireNonNull(view);
+
                 ListAdapter listAdapter = binding.autoCompleteTextWeather1.getAdapter();
-                ArrayAdapter<?> arrayAdapter;
-                if (listAdapter instanceof ArrayAdapter) {
-                    arrayAdapter = (ArrayAdapter<?>) listAdapter;
-                } else {
-                    throw new ClassCastException();
-                }
+                Objects.requireNonNull(listAdapter);
+                ArrayAdapter<?> arrayAdapter = (ArrayAdapter<?>) listAdapter;
                 String strWeather = (String) arrayAdapter.getItem(position);
+                Objects.requireNonNull(strWeather);
                 WeatherConverter weatherConverter = new WeatherConverter();
                 Weathers weather = weatherConverter.toWeather(requireContext(), strWeather);
                 diaryEditViewModel.updateWeather1(weather);
@@ -483,7 +419,7 @@ public class DiaryEditFragment extends BaseFragment {
                 .observe(getViewLifecycleOwner(), new Observer<Weathers>() {
                     @Override
                     public void onChanged(Weathers weather) {
-                        if (weather == null) return;
+                        Objects.requireNonNull(weather);
 
                         String strWeather = weather.toString(requireContext());
                         binding.autoCompleteTextWeather1.setText(strWeather, false);
@@ -506,13 +442,11 @@ public class DiaryEditFragment extends BaseFragment {
         binding.autoCompleteTextWeather2.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Objects.requireNonNull(parent);
+                Objects.requireNonNull(view);
+
                 ListAdapter listAdapter = binding.autoCompleteTextWeather2.getAdapter();
-                ArrayAdapter<?> arrayAdapter;
-                if (listAdapter instanceof ArrayAdapter) {
-                    arrayAdapter = (ArrayAdapter<?>) listAdapter;
-                } else {
-                    throw new ClassCastException();
-                }
+                ArrayAdapter<?> arrayAdapter = (ArrayAdapter<?>) listAdapter;
                 String strWeather = (String) arrayAdapter.getItem(position);
                 WeatherConverter weatherConverter = new WeatherConverter();
                 Weathers weather = weatherConverter.toWeather(requireContext(), strWeather);
@@ -525,27 +459,10 @@ public class DiaryEditFragment extends BaseFragment {
                 .observe(getViewLifecycleOwner(), new Observer<Weathers>() {
                     @Override
                     public void onChanged(Weathers weather) {
-                        if (weather == null) return;
+                        Objects.requireNonNull(weather);
 
                         String strWeather = weather.toString(requireContext());
                         binding.autoCompleteTextWeather2.setText(strWeather, false);
-                    }
-                });
-
-        settingsViewModel.getGeoCoordinatesLiveData()
-                .observe(getViewLifecycleOwner(), new Observer<GeoCoordinates>() {
-                    @Override
-                    public void onChanged(GeoCoordinates geoCoordinates) {
-                        if (geoCoordinates == null) return;
-
-                        Log.d("20240829", "shouldPrepareWeatherSelection:" + shouldPrepareWeatherSelection);
-                        if (shouldPrepareWeatherSelection) {
-                            LocalDate date = diaryEditViewModel.getDateLiveData().getValue();
-                            if (date == null) {
-                                throw new NullPointerException();
-                            }
-                            fetchWeatherInformation(date);
-                        }
                     }
                 });
     }
@@ -557,23 +474,18 @@ public class DiaryEditFragment extends BaseFragment {
         Context contextWithTheme = new ContextThemeWrapper(requireContext(), themeResId);
 
         List<String> weatherItemList = new ArrayList<>();
-        for (Weathers weather: Weathers.values()) {
-            if (!isExcludedWeather(weather, excludedWeathers)) {
-                weatherItemList.add(weather.toString(requireContext()));
-            }
-        }
+        Arrays.stream(Weathers.values()).forEach(x -> {
+            boolean isIncluded = !isExcludedWeather(x, excludedWeathers);
+            if (isIncluded) weatherItemList.add(x.toString(requireContext()));
+        });
 
         return new ArrayAdapter<>(contextWithTheme, R.layout.layout_drop_down_list_item, weatherItemList);
     }
 
     private boolean isExcludedWeather(Weathers weather, @Nullable Weathers... excludedWeathers) {
-        if (excludedWeathers == null) {
-            return false;
-        }
+        if (excludedWeathers == null) return false;
         for(Weathers excludedWeather: excludedWeathers) {
-            if (weather == excludedWeather) {
-                return true;
-            }
+            if (weather == excludedWeather) return true;
         }
         return false;
     }
@@ -586,13 +498,11 @@ public class DiaryEditFragment extends BaseFragment {
         binding.autoCompleteTextCondition.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Objects.requireNonNull(parent);
+                Objects.requireNonNull(view);
+
                 ListAdapter listAdapter = binding.autoCompleteTextCondition.getAdapter();
-                ArrayAdapter<?> arrayAdapter;
-                if (listAdapter instanceof ArrayAdapter) {
-                    arrayAdapter = (ArrayAdapter<?>) listAdapter;
-                } else {
-                    throw new ClassCastException();
-                }
+                ArrayAdapter<?> arrayAdapter = (ArrayAdapter<?>) listAdapter;
                 String strCondition = (String) arrayAdapter.getItem(position);
                 ConditionConverter converter = new ConditionConverter();
                 Conditions condition = converter.toCondition(requireContext(), strCondition);
@@ -605,7 +515,7 @@ public class DiaryEditFragment extends BaseFragment {
                 .observe(getViewLifecycleOwner(), new Observer<Conditions>() {
                     @Override
                     public void onChanged(Conditions condition) {
-                        if (condition == null) return;
+                        Objects.requireNonNull(condition);
 
                         String strCondition = condition.toString(requireContext());
                         binding.autoCompleteTextCondition.setText(strCondition, false);
@@ -620,9 +530,8 @@ public class DiaryEditFragment extends BaseFragment {
         Context contextWithTheme = new ContextThemeWrapper(requireContext(), themeResId);
 
         List<String> conditonItemList = new ArrayList<>();
-        for (Conditions condition: Conditions.values()) {
-            conditonItemList.add(condition.toString(requireContext()));
-        }
+        Arrays.stream(Conditions.values())
+                .forEach(x -> conditonItemList.add(x.toString(requireContext())));
 
         return new ArrayAdapter<>(contextWithTheme, R.layout.layout_drop_down_list_item, conditonItemList);
     }
@@ -679,6 +588,7 @@ public class DiaryEditFragment extends BaseFragment {
                 @Override
                 public boolean onTouch(View v, MotionEvent event) {
                     Objects.requireNonNull(v);
+                    Objects.requireNonNull(event);
                     if (event.getAction() != MotionEvent.ACTION_UP) return false;
 
                     hideKeyboard(v);
@@ -696,6 +606,8 @@ public class DiaryEditFragment extends BaseFragment {
         binding.imageButtonAddItem.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Objects.requireNonNull(v);
+
                 binding.imageButtonAddItem.setEnabled(false);
                 diaryEditViewModel.incrementVisibleItemsCount();
             }
@@ -707,6 +619,8 @@ public class DiaryEditFragment extends BaseFragment {
             imageButtonItemsDelete[i].setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    Objects.requireNonNull(v);
+
                     showDiaryItemDeleteConfirmationDiaryDialog(deleteItemNumber);
                 }
             });
@@ -730,6 +644,8 @@ public class DiaryEditFragment extends BaseFragment {
 
                 @Override
                 public void onTransitionCompleted(MotionLayout motionLayout, int currentId) {
+                    Objects.requireNonNull(motionLayout);
+
                     Log.d("MotionLayout", "ItemLiveData" + itemNumber + " onTransitionCompleted");
                     // 対象項目欄削除後の処理
                     if (currentId == R.id.motion_scene_edit_diary_item_hided_state) {
@@ -756,77 +672,64 @@ public class DiaryEditFragment extends BaseFragment {
         }
 
         diaryEditViewModel.getNumVisibleItemsLiveData()
-                        .observe(getViewLifecycleOwner(), new Observer<Integer>() {
-                            @Override
-                            public void onChanged(Integer integer) {
-                                if (integer == null) {
-                                    return;
-                                }
-
-                                // 項目欄追加ボタン表示切替
-                                // TODO:使用不可時はボタンをぼかすように変更する。
-                                if (integer == MAX_ITEMS) {
-                                    binding.imageButtonAddItem.setVisibility(View.INVISIBLE);
-                                }
-
-                                setUpItemsLayout(integer);
-                            }
-                        });
+                        .observe(getViewLifecycleOwner(), new NumVisibleItemsObserver());
     }
 
+    @NonNull
     private MotionLayout selectItemMotionLayout(int itemNumber) {
-        MotionLayout itemMotionLayout = null;
         switch (itemNumber) {
             case 1:
-                itemMotionLayout = binding.includeItem1.motionLayoutDiaryEditItem;
-                break;
+                return binding.includeItem1.motionLayoutDiaryEditItem;
             case 2:
-                itemMotionLayout = binding.includeItem2.motionLayoutDiaryEditItem;
-                break;
+                return binding.includeItem2.motionLayoutDiaryEditItem;
             case 3:
-                itemMotionLayout = binding.includeItem3.motionLayoutDiaryEditItem;
-                break;
+                return binding.includeItem3.motionLayoutDiaryEditItem;
             case 4:
-                itemMotionLayout = binding.includeItem4.motionLayoutDiaryEditItem;
-                break;
+                return binding.includeItem4.motionLayoutDiaryEditItem;
             case 5:
-                itemMotionLayout = binding.includeItem5.motionLayoutDiaryEditItem;
-                break;
+                return binding.includeItem5.motionLayoutDiaryEditItem;
+            default:
+                throw new IllegalArgumentException();
         }
-
-        if (itemMotionLayout == null) {
-            throw new IllegalArgumentException();
-        }
-
-        return itemMotionLayout;
     }
 
-    private void setUpItemsLayout(Integer numItems) {
-        Preconditions.checkNotNull(numItems);
-        if (numItems < 1) {
-            throw new IllegalArgumentException();
-        }
-        if (numItems > DiaryLiveData.MAX_ITEMS) {
-            throw new IllegalArgumentException();
-        }
+    private class NumVisibleItemsObserver implements Observer<Integer> {
 
-        // MEMO:LifeCycleがResumedの時のみ項目欄のモーション追加処理を行う。
-        //      削除処理はObserverで適当なモーション削除処理を行うのは難しいのでここでは処理せず、削除ダイアログから処理する。
-        if (getViewLifecycleOwner().getLifecycle().getCurrentState() == Lifecycle.State.RESUMED) {
-            int numShowedItems = countShowedItems();
-            int differenceValue = numItems - numShowedItems;
-            if (numItems > numShowedItems && differenceValue == 1) {
-                showItem(numItems, false);
-                return;
+        @Override
+        public void onChanged(Integer integer) {
+            Objects.requireNonNull(integer);
+
+            // 項目欄追加ボタン表示切替
+            // TODO:使用不可時はボタンをぼかすように変更する。
+            if (integer == DiaryLiveData.MAX_ITEMS) {
+                binding.imageButtonAddItem.setVisibility(View.INVISIBLE);
             }
+
+            setUpItemsLayout(integer);
         }
 
-        for (int i = 0; i < DiaryLiveData.MAX_ITEMS; i++) {
-            int itemNumber = i + 1;
-            if (itemNumber <= numItems) {
-                showItem(itemNumber, true);
-            } else {
-                hideItem(itemNumber, true);
+        private void setUpItemsLayout(Integer numItems) {
+            Objects.requireNonNull(numItems);
+            if (numItems < 1 || numItems > DiaryLiveData.MAX_ITEMS) throw new IllegalArgumentException();
+
+            // MEMO:LifeCycleがResumedの時のみ項目欄のモーション追加処理を行う。
+            //      削除処理はObserverで適切なモーション削除処理を行うのは難しいのでここでは処理せず、削除ダイアログから処理する。
+            if (getViewLifecycleOwner().getLifecycle().getCurrentState() == Lifecycle.State.RESUMED) {
+                int numShowedItems = countShowedItems();
+                int differenceValue = numItems - numShowedItems;
+                if (numItems > numShowedItems && differenceValue == 1) {
+                    showItem(numItems, false);
+                    return;
+                }
+            }
+
+            for (int i = 0; i < DiaryLiveData.MAX_ITEMS; i++) {
+                int itemNumber = i + 1;
+                if (itemNumber <= numItems) {
+                    showItem(itemNumber, true);
+                } else {
+                    hideItem(itemNumber, true);
+                }
             }
         }
     }
@@ -835,7 +738,7 @@ public class DiaryEditFragment extends BaseFragment {
         MotionLayout itemMotionLayout = selectItemMotionLayout(itemNumber);
         if (isJump) {
             itemMotionLayout
-                    .transitionToState(R.id.motion_scene_edit_diary_item_hided_state, 1);
+                    .jumpToState(R.id.motion_scene_edit_diary_item_hided_state);
         } else {
             itemMotionLayout.transitionToState(R.id.motion_scene_edit_diary_item_hided_state);
         }
@@ -845,23 +748,29 @@ public class DiaryEditFragment extends BaseFragment {
         MotionLayout itemMotionLayout = selectItemMotionLayout(itemNumber);
         if (isJump) {
             itemMotionLayout
-                    .transitionToState(R.id.motion_scene_edit_diary_item_showed_state, 1);
+                    .jumpToState(R.id.motion_scene_edit_diary_item_showed_state);
         } else {
             itemMotionLayout.transitionToState(R.id.motion_scene_edit_diary_item_showed_state);
+            binding.nestedScrollFullScreen
+                    .smoothScrollBy(
+                            0,
+                            binding.includeItem1.linerLayoutDiaryEditItem.getHeight(),
+                            1400
+                    );
         }
     }
 
     private int countShowedItems() {
-        int numShowwdItems = 0;
+        int numShowedItems = 0;
         for (int i = 0; i < DiaryLiveData.MAX_ITEMS; i++) {
             int itemNumber = i + 1;
             MotionLayout motionLayout = selectItemMotionLayout(itemNumber);
             if (motionLayout.getCurrentState() != R.id.motion_scene_edit_diary_item_showed_state) {
                 continue;
             }
-            numShowwdItems++;
+            numShowedItems++;
         }
-        return numShowwdItems;
+        return numShowedItems;
     }
 
     private void setUpPictureInputField() {
@@ -896,6 +805,17 @@ public class DiaryEditFragment extends BaseFragment {
         TextInputSetup.ClearButtonSetUpTransitionListener transitionListener =
                 textInputSetup.createClearButtonSetupTransitionListener(clearableTextInputLayouts);
         addTransitionListener(transitionListener);
+
+        /*binding.includeItem1.textInputEditTextItemComment.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if (hasFocus) {
+                    int scrollAmount = v.get
+                    binding.nestedScrollFullScreen.smoothScrollBy(0, v.getHeight());
+                    binding.nestedScrollFullScreen.scroll
+                }
+            }
+        });*/
     }
 
     private void clearFocusAllEditText() {
@@ -909,6 +829,8 @@ public class DiaryEditFragment extends BaseFragment {
         });
     }
 
+    @NonNull
+    @Unmodifiable
     private List<TextInputLayout> createAllTextInputLayoutList() {
         return List.of(
                 binding.textInputLayoutDate,
@@ -929,46 +851,30 @@ public class DiaryEditFragment extends BaseFragment {
         );
     }
 
-    private boolean fetchWeatherInformation(LocalDate date) {
-        if (date == null) {
-            throw new NullPointerException();
-        }
+    private void fetchWeatherInformation(LocalDate date, boolean requestsShowingDialog) {
+        Objects.requireNonNull(date);
 
         // HACK:EditFragment起動時、設定値を参照してから位置情報を取得する為、タイムラグが発生する。
         //      対策として記憶boolean変数を用意し、true時は位置情報取得処理コードにて天気情報も取得する。
-        // TODO:settingsViewModel.getIsCheckedWeatherInfoAcquisitionLiveData().getValue()を
-        //      settingsViewModel.isCheckedWeatherInfoAcquisitionSetting()に置換。
-        Boolean isChecked =
-                settingsViewModel.getIsCheckedWeatherInfoAcquisitionLiveData().getValue();
-        if (isChecked == null) {
-            shouldPrepareWeatherSelection = true;
-            return false;
-        } else if (!isChecked) {
-            return false;
+        boolean isChecked = settingsViewModel.isCheckedWeatherInfoAcquisitionSetting();
+        if (!isChecked) return;
+
+        boolean hasUpdatedLocation = settingsViewModel.hasUpdatedGeoCoordinates();
+        if (!hasUpdatedLocation) return;
+
+        // 本フラグメント起動時のみダイアログなしで天気情報取得
+        if (requestsShowingDialog) {
+            showWeatherInformationDialog(date);
+        } else {
+            GeoCoordinates geoCoordinates = settingsViewModel.getGeoCoordinatesLiveData().getValue();
+            Objects.requireNonNull(geoCoordinates);
+            diaryEditViewModel.fetchWeatherInformation(date, geoCoordinates);
         }
-        Boolean hasUpdatedLocation = settingsViewModel.hasUpdatedGeoCoordinates();
-        Objects.requireNonNull(hasUpdatedLocation);
-        if (hasUpdatedLocation) {
-            Log.d("20240719", "onTextChanged:prepareWeatherSelection");
-            // 本フラグメント起動時のみダイアログなしで天気情報取得
-            if (lastSelectedDate == null) {
-                GeoCoordinates geoCoordinates = settingsViewModel.getGeoCoordinatesLiveData().getValue();
-                Objects.requireNonNull(geoCoordinates);
-                diaryEditViewModel.fetchWeatherInformation(date, geoCoordinates);
-            } else {
-                showWeatherInformationDialog(date);
-            }
-        }
-        return true;
     }
 
     public void showDiaryShowFragment(LocalDate date) {
-        if (date == null) {
-            throw new NullPointerException();
-        }
-        if (!canShowOtherFragment()) {
-            return;
-        }
+        Objects.requireNonNull(date);
+        if (!canShowOtherFragment()) return;
 
         boolean isStartDiaryFragment =
                 DiaryEditFragmentArgs.fromBundle(requireArguments()).getIsStartDiaryFragment();
@@ -997,47 +903,29 @@ public class DiaryEditFragment extends BaseFragment {
     }
 
     private void showDatePickerDialog(LocalDate date) {
-        if (date == null) {
-            throw new NullPointerException();
-        }
-        if (!canShowOtherFragment()) {
-            return;
-        }
+        Objects.requireNonNull(date);
+        if (!canShowOtherFragment()) return;
 
         NavDirections action =
                 DiaryEditFragmentDirections.actionDiaryEditFragmentToDatePickerDialog(date);
         navController.navigate(action);
     }
 
-    public void showUpdateExistingDiaryDialog(LocalDate date, int updateType) {
-        if (date == null) {
-            throw new NullPointerException();
-        }
-        if (updateType < 0) {
-            throw new IllegalArgumentException();
-        }
-        if (updateType > 1) {
-            throw new IllegalArgumentException();
-        }
-        if (!canShowOtherFragment()) {
-            return;
-        }
+    public void showUpdateExistingDiaryDialog(LocalDate date) {
+        Objects.requireNonNull(date);
+        if (!canShowOtherFragment()) return;
 
         NavDirections action =
                 DiaryEditFragmentDirections
-                        .actionDiaryEditFragmentToUpdateExistingDiaryDialog(date, updateType);
+                        .actionDiaryEditFragmentToUpdateExistingDiaryDialog(date);
         navController.navigate(action);
     }
 
 
 
     private void showLoadingExistingDiaryDialog(LocalDate date) {
-        if (date == null) {
-            throw new NullPointerException();
-        }
-        if (!canShowOtherFragment()) {
-            return;
-        }
+        Objects.requireNonNull(date);
+        if (!canShowOtherFragment()) return;
 
         NavDirections action =
                 DiaryEditFragmentDirections
@@ -1054,9 +942,7 @@ public class DiaryEditFragment extends BaseFragment {
             throw new IllegalArgumentException();
         }
 
-        if (!canShowOtherFragment()) {
-            return;
-        }
+        if (!canShowOtherFragment()) return;
 
         NavDirections action =
                 DiaryEditFragmentDirections
@@ -1065,18 +951,11 @@ public class DiaryEditFragment extends BaseFragment {
     }
 
     private void showWeatherInformationDialog(LocalDate date) {
-        if (date == null) {
-            throw new NullPointerException();
-        }
-        if (!canShowOtherFragment()) {
-            return;
-        }
+        Objects.requireNonNull(date);
+        if (!canShowOtherFragment()) return;
 
         // 今日の日付以降は天気情報を取得できないためダイアログ表示不要
-        LocalDate currentDate = LocalDate.now();
-        if (date.isAfter(currentDate)) {
-            return;
-        }
+        diaryEditViewModel.canFetchWeatherInformation(date);
 
         NavDirections action =
                 DiaryEditFragmentDirections
@@ -1098,10 +977,11 @@ public class DiaryEditFragment extends BaseFragment {
         settingsViewModel.triggerAppErrorBufferListObserver();
     }
 
+    @SuppressLint("UseRequireInsteadOfGet")
     private void hideKeyboard(View view) {
-        // キーボードを隠す。
-        KeyboardInitializer keyboardInitializer =
-                new KeyboardInitializer(requireActivity());
+        Objects.requireNonNull(view);
+
+        KeyboardInitializer keyboardInitializer = new KeyboardInitializer(requireActivity());
         keyboardInitializer.hide(view);
         onResume();
     }
@@ -1114,9 +994,9 @@ public class DiaryEditFragment extends BaseFragment {
         //      スピナーのアダプターが選択中アイテムのみで構成されたアダプターに更新されてしまうので
         //      onResume()メソッドにて再度アダプターを設定して対策。
         //      (Weather2はWeather1のObserver内で設定している為不要)
-        ArrayAdapter<String> weatherArrayAdapter = createWeatherSpinnerAdapter(/*themeColor*/);
+        ArrayAdapter<String> weatherArrayAdapter = createWeatherSpinnerAdapter();
         binding.autoCompleteTextWeather1.setAdapter(weatherArrayAdapter);
-        ArrayAdapter<String> conditionArrayAdapter = createConditionSpinnerAdapter(/*themeColor*/);
+        ArrayAdapter<String> conditionArrayAdapter = createConditionSpinnerAdapter();
         binding.autoCompleteTextCondition.setAdapter(conditionArrayAdapter);
     }
 

@@ -1,7 +1,6 @@
 package com.websarva.wings.android.zuboradiary.ui.diary.diaryedit;
 
 
-import android.app.Activity;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
@@ -21,26 +20,23 @@ import com.websarva.wings.android.zuboradiary.MainActivity;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.util.Objects;
 
 public class DatePickerDialogFragment extends DialogFragment{
     private static final String fromClassName = "From" + DatePickerDialogFragment.class.getName();
-    public static final String KEY_SELECTED_DATE = "SelectedDate" + fromClassName;
+    static final String KEY_SELECTED_DATE = "SelectedDate" + fromClassName;
 
     @NonNull
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         LocalDate currentDate =
                 DatePickerDialogFragmentArgs.fromBundle(requireArguments()).getCurrentDate();
+        Objects.requireNonNull(currentDate);
+
         long currentEpochMilli =
                 currentDate.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli();
 
-        Activity activity = requireActivity();
-        MainActivity mainActivity;
-        if (activity instanceof MainActivity) {
-            mainActivity = (MainActivity) activity;
-        } else {
-            throw new ClassCastException();
-        }
+        MainActivity mainActivity = (MainActivity) requireActivity();
         int theme = mainActivity.requireDialogThemeColor().getDatePickerDialogThemeResId();
 
         // MEMO:MaterialDatePickerはDialogクラスを作成できないのでダミーDialogを作成して戻り値として返し
@@ -52,6 +48,7 @@ public class DatePickerDialogFragment extends DialogFragment{
                 .setTheme(theme)
                 .setSelection(currentEpochMilli)
                 .build();
+
         datePicker.addOnPositiveButtonClickListener(new MaterialPickerOnPositiveButtonClickListener<Long>() {
             @Override
             public void onPositiveButtonClick(Long selection) {
@@ -62,34 +59,39 @@ public class DatePickerDialogFragment extends DialogFragment{
                 // 選択日付を返す
                 NavController navController =
                         NavHostFragment.findNavController(DatePickerDialogFragment.this);
+                Objects.requireNonNull(navController);
                 NavBackStackEntry navBackStackEntry = navController.getPreviousBackStackEntry();
-                if (navBackStackEntry != null) {
-                    SavedStateHandle savedStateHandle = navBackStackEntry.getSavedStateHandle();
-                    savedStateHandle.set(KEY_SELECTED_DATE, selectedDate);
-                }
+                Objects.requireNonNull(navBackStackEntry);
+                SavedStateHandle savedStateHandle = navBackStackEntry.getSavedStateHandle();
+                savedStateHandle.set(KEY_SELECTED_DATE, selectedDate);
 
                 dummyDialog.dismiss();
             }
         });
+
         datePicker.addOnNegativeButtonClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 dummyDialog.dismiss();
             }
         });
+
         datePicker.addOnCancelListener(new DialogInterface.OnCancelListener() {
             @Override
             public void onCancel(DialogInterface dialog) {
                 dummyDialog.dismiss();
             }
         });
+
         datePicker.addOnDismissListener(new DialogInterface.OnDismissListener() {
             @Override
             public void onDismiss(DialogInterface dialog) {
                 dummyDialog.dismiss();
             }
         });
+
         datePicker.show(getChildFragmentManager(),"");
+
         return dummyDialog;
     }
 }

@@ -1,16 +1,21 @@
 package com.websarva.wings.android.zuboradiary.ui.diary;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.lifecycle.MutableLiveData;
 
 import com.websarva.wings.android.zuboradiary.data.database.Diary;
+import com.websarva.wings.android.zuboradiary.data.database.DiaryItemTitleSelectionHistoryItem;
 import com.websarva.wings.android.zuboradiary.data.diary.ConditionConverter;
 import com.websarva.wings.android.zuboradiary.data.diary.Conditions;
+import com.websarva.wings.android.zuboradiary.data.diary.ItemNumber;
 import com.websarva.wings.android.zuboradiary.data.diary.WeatherConverter;
 import com.websarva.wings.android.zuboradiary.data.diary.Weathers;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 public class DiaryLiveData {
@@ -20,7 +25,7 @@ public class DiaryLiveData {
     private final MutableLiveData<Conditions> condition = new MutableLiveData<>();
     private final MutableLiveData<String> title = new MutableLiveData<>();
     private final MutableLiveData<Integer> numVisibleItems = new MutableLiveData<>();
-    public static final int MAX_ITEMS = 5;
+    public static final int MAX_ITEMS = ItemNumber.MAX_NUMBER;
     private final DiaryItemLiveData[] items = new DiaryItemLiveData[MAX_ITEMS];
     private final MutableLiveData<String> picturePath = new MutableLiveData<>();
     private final MutableLiveData<LocalDateTime> log = new MutableLiveData<>();
@@ -102,39 +107,142 @@ public class DiaryLiveData {
         return value;
     }
 
-    public MutableLiveData<LocalDate> getDate() {
+    @NonNull
+    public Diary createDiary() {
+        Diary diary = new Diary();
+        diary.setDate(toDateString(date.getValue()));
+        diary.setWeather1(toIntWeather(weather1.getValue()));
+        diary.setWeather2(toIntWeather(weather2.getValue()));
+        diary.setCondition(toIntCondition(condition.getValue()));
+        diary.setTitle(toTrimmedString(title.getValue()));
+        diary.setItem1Title(toTrimmedString(items[0].title.getValue()));
+        diary.setItem1Comment(toTrimmedString(items[0].comment.getValue()));
+        diary.setItem2Title(toTrimmedString(items[1].title.getValue()));
+        diary.setItem2Comment(toTrimmedString(items[1].comment.getValue()));
+        diary.setItem3Title(toTrimmedString(items[2].title.getValue()));
+        diary.setItem3Comment(toTrimmedString(items[2].comment.getValue()));
+        diary.setItem4Title(toTrimmedString(items[3].title.getValue()));
+        diary.setItem4Comment(toTrimmedString(items[3].comment.getValue()));
+        diary.setItem5Title(toTrimmedString(items[4].title.getValue()));
+        diary.setItem5Comment(toTrimmedString(items[4].comment.getValue()));
+        diary.setPicturePath(toTrimmedString(picturePath.getValue()));
+        diary.setLog(LocalDateTime.now().toString());
+        return diary;
+    }
+
+    @NonNull
+    private String toDateString(LocalDate date) {
+        Objects.requireNonNull(date);
+
+        return date.toString();
+    }
+
+    private int toIntWeather(Weathers weather) {
+        Objects.requireNonNull(weather);
+
+        return weather.toWeatherNumber();
+    }
+
+    private int toIntCondition(Conditions condition) {
+        Objects.requireNonNull(condition);
+
+        return condition.toConditionNumber();
+    }
+
+    @NonNull
+    private String toTrimmedString(String s) {
+        Objects.requireNonNull(s);
+
+        return s.trim();
+    }
+
+    @NonNull
+    public List<DiaryItemTitleSelectionHistoryItem> createDiaryItemTitleSelectionHistoryItemList() {
+        List<DiaryItemTitleSelectionHistoryItem> list = new ArrayList<>();
+        for (int i = 0; i < DiaryLiveData.MAX_ITEMS; i++) {
+            String itemTitle = items[i].title.getValue();
+            LocalDateTime itemTitleUpdateLog = items[i].titleUpdateLog.getValue();
+            Objects.requireNonNull(itemTitle);
+            if (itemTitleUpdateLog == null) continue;
+            if (itemTitle.matches("\\S+.*")) {
+                DiaryItemTitleSelectionHistoryItem item = new DiaryItemTitleSelectionHistoryItem();
+                item.setTitle(itemTitle);
+                item.setLog(itemTitleUpdateLog.toString());
+                list.add(item);
+            }
+        }
+        return list;
+    }
+
+    public void incrementVisibleItemsCount() {
+        Integer numVisibleItems = this.numVisibleItems.getValue();
+        Objects.requireNonNull(numVisibleItems);
+        Integer incrementedNumVisibleItems = numVisibleItems + 1;
+        this.numVisibleItems.setValue(incrementedNumVisibleItems);
+    }
+
+    public void deleteItem(int itemNumber) {
+        getItemLiveData(itemNumber).initialize();
+        Integer numVisibleItems = this.numVisibleItems.getValue();
+        Objects.requireNonNull(numVisibleItems);
+        if (itemNumber < numVisibleItems) {
+            int nextItemNumber;
+            for (int i = itemNumber; i < numVisibleItems; i++) {
+                nextItemNumber = i + 1;
+                getItemLiveData(i).update(
+                        getItemLiveData(nextItemNumber).title.getValue(),
+                        getItemLiveData(nextItemNumber).comment.getValue(),
+                        getItemLiveData(nextItemNumber).titleUpdateLog.getValue()
+                );
+                getItemLiveData(nextItemNumber).initialize();
+            }
+        }
+        if (numVisibleItems > 1) {
+            Integer decrementedNumVisibleItems = numVisibleItems - 1;
+            this.numVisibleItems.setValue(decrementedNumVisibleItems);
+        }
+    }
+
+    public void updateItemTitle(int itemNumber, String title) {
+        Objects.requireNonNull(title);
+
+        getItemLiveData(itemNumber).updateItemTitle(title);
+    }
+
+    public MutableLiveData<LocalDate> getDateMutableLiveData() {
         return date;
     }
 
-    public MutableLiveData<Weathers> getWeather1() {
+    public MutableLiveData<Weathers> getWeather1MutableLiveData() {
         return weather1;
     }
 
-    public MutableLiveData<Weathers> getWeather2() {
+    public MutableLiveData<Weathers> getWeather2MutableLiveData() {
         return weather2;
     }
 
-    public MutableLiveData<Conditions> getCondition() {
+    public MutableLiveData<Conditions> getConditionMutableLiveData() {
         return condition;
     }
 
-    public MutableLiveData<String> getTitle() {
+    public MutableLiveData<String> getTitleMutableLiveData() {
         return title;
     }
 
-    public MutableLiveData<Integer> getNumVisibleItems() {
+    public MutableLiveData<Integer> getNumVisibleItemsMutableLiveData() {
         return numVisibleItems;
     }
 
-    public DiaryItemLiveData getItem(int itemNumber) {
+    public DiaryItemLiveData getItemLiveData(int itemNumber) {
         int arrayNumber = itemNumber - 1;
         return items[arrayNumber];
     }
-    public MutableLiveData<String> getPicturePath() {
+
+    public MutableLiveData<String> getPicturePathMutableLiveData() {
         return picturePath;
     }
 
-    public MutableLiveData<LocalDateTime> getLog() {
+    public MutableLiveData<LocalDateTime> getLogMutableLiveData() {
         return log;
     }
 
@@ -143,10 +251,18 @@ public class DiaryLiveData {
         private final MutableLiveData<String> title = new MutableLiveData<>();
         private final MutableLiveData<String> comment = new MutableLiveData<>();
         private final MutableLiveData<LocalDateTime> titleUpdateLog = new MutableLiveData<>();
+        public static final int MIN_ITEM_NUMBER = 1;
+        public static final int MAX_ITEM_NUMBER = 5;
 
         private DiaryItemLiveData(int itemNumber) {
+            if (!isItemNumberInRange(itemNumber)) throw new IllegalArgumentException();
+
             this.itemNumber = itemNumber;
             initialize();
+        }
+
+        private boolean isItemNumberInRange(int itemNumber) {
+            return itemNumber >= MIN_ITEM_NUMBER && itemNumber <= MAX_ITEM_NUMBER;
         }
 
         public void initialize() {
@@ -164,6 +280,13 @@ public class DiaryLiveData {
             this.titleUpdateLog.setValue(titleUpdateLog);
         }
 
+        public void updateItemTitle(String title) {
+            Objects.requireNonNull(title);
+
+            this.title.setValue(title);
+            this.titleUpdateLog.setValue(LocalDateTime.now());
+        }
+
         public boolean isEmpty() {
             String title = this.title.getValue();
             Objects.requireNonNull(title);
@@ -177,15 +300,15 @@ public class DiaryLiveData {
             return itemNumber;
         }
 
-        public MutableLiveData<String> getTitle() {
+        public MutableLiveData<String> getTitleMutableLiveData() {
             return title;
         }
 
-        public MutableLiveData<String> getComment() {
+        public MutableLiveData<String> getCommentMutableLiveData() {
             return comment;
         }
 
-        public MutableLiveData<LocalDateTime> getTitleUpdateLog() {
+        public MutableLiveData<LocalDateTime> getTitleUpdateLogMutableLiveData() {
             return titleUpdateLog;
         }
     }

@@ -7,6 +7,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.util.Objects;
 
 /**
  *
@@ -21,7 +22,10 @@ public class DateTimeStringConverter {
     private static final String TIME_HOUR_MINUTE = "HH:mm";
     public static final DateTimeFormatter TIME_HOUR_MINUTE_FORMATTER = DateTimeFormatter.ofPattern(TIME_HOUR_MINUTE);
 
-    public String toStringDate(@NonNull LocalDate localDate) {
+    @NonNull
+    public String toStringDate(LocalDate localDate) {
+        Objects.requireNonNull(localDate);
+
         return localDate.format(DATE_FORMATTER);
         // TODO:下記最終的に削除(下記対応をとらなければ警告があったのに消えた・・・)
         /*if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
@@ -33,7 +37,10 @@ public class DateTimeStringConverter {
         }*/
     }
 
-    public String toStringDateTime(@NonNull LocalDateTime localDateTime) {
+    @NonNull
+    public String toStringDateTime(LocalDateTime localDateTime) {
+        Objects.requireNonNull(localDateTime);
+
         return localDateTime.format(DATE_TIME_FORMATTER);
         // TODO:下記最終的に削除(下記対応をとらなければ警告があったのに消えた・・・)
         /*if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
@@ -48,21 +55,8 @@ public class DateTimeStringConverter {
 
     @NonNull
     public String toStringTimeHourMinute(LocalTime localTime) {
+        Objects.requireNonNull(localTime);
+
         return localTime.format(TIME_HOUR_MINUTE_FORMATTER);
-    }
-
-    @NonNull
-    public LocalTime toLocalTimeTimeHourMinute(String time) {
-        return LocalTime.parse(time, TIME_HOUR_MINUTE_FORMATTER);
-    }
-
-    public boolean isFormatTimeHourMinute(String time) {
-        boolean isFormat = true;
-        try {
-            LocalTime.parse(time, TIME_HOUR_MINUTE_FORMATTER);
-        } catch (DateTimeParseException e) {
-            isFormat = false;
-        }
-        return isFormat;
     }
 }
