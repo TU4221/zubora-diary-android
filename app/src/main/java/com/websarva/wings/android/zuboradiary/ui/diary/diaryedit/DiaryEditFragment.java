@@ -38,6 +38,7 @@ import com.google.android.material.textfield.TextInputLayout;
 import com.websarva.wings.android.zuboradiary.data.DateTimeStringConverter;
 import com.websarva.wings.android.zuboradiary.data.diary.ConditionConverter;
 import com.websarva.wings.android.zuboradiary.data.diary.Conditions;
+import com.websarva.wings.android.zuboradiary.data.diary.ItemNumber;
 import com.websarva.wings.android.zuboradiary.data.diary.WeatherConverter;
 import com.websarva.wings.android.zuboradiary.data.diary.Weathers;
 import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor;
@@ -139,11 +140,11 @@ public class DiaryEditFragment extends BaseFragment {
                 // MEMO:結果がない場合もあるので"return"で返す。
                 if (string == null) return;
 
-                Integer itemNumber =
+                ItemNumber itemNumber =
                         savedStateHandle.get(DiaryItemTitleEditFragment.KEY_UPDATE_ITEM_NUMBER);
                 Objects.requireNonNull(itemNumber);
 
-                diaryEditViewModel.updateItemTitle(itemNumber, string);
+                diaryEditViewModel.updateItemTitle(itemNumber.getValue(), string);
 
                 savedStateHandle.remove(DiaryItemTitleEditFragment.KEY_UPDATE_ITEM_NUMBER);
                 savedStateHandle.remove(DiaryItemTitleEditFragment.KEY_NEW_ITEM_TITLE);
@@ -899,7 +900,7 @@ public class DiaryEditFragment extends BaseFragment {
 
         NavDirections action =
                 DiaryEditFragmentDirections
-                        .actionDiaryEditFragmentToSelectItemTitleFragment(inputItemNumber, inputItemTitle);
+                        .actionDiaryEditFragmentToSelectItemTitleFragment(new ItemNumber(inputItemNumber), inputItemTitle);
         navController.navigate(action);
         diaryEditViewModel.updateIsShowingItemTitleEditFragment(true);
     }

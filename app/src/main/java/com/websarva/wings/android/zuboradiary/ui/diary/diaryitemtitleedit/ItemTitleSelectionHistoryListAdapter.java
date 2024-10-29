@@ -17,7 +17,8 @@ import com.websarva.wings.android.zuboradiary.data.database.DiaryItemTitleSelect
 import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor;
 import com.websarva.wings.android.zuboradiary.databinding.RowItemTitleSelectionHistoryBinding;
 import com.websarva.wings.android.zuboradiary.ui.ThemeColorInflaterCreator;
-import com.websarva.wings.android.zuboradiary.ui.diary.DiaryThemeColorSwitcher;
+
+import java.util.Objects;
 
 public class ItemTitleSelectionHistoryListAdapter
         extends ListAdapter<DiaryItemTitleSelectionHistoryItem,
@@ -71,16 +72,22 @@ public class ItemTitleSelectionHistoryListAdapter
     public void onBindViewHolder(ItemTitleSelectionHistoryViewHolder holder, int position) {
         DiaryItemTitleSelectionHistoryItem item = getItem(position);
         String title = item.getTitle();
+        Objects.requireNonNull(title);
+
         holder.binding.textItemTitle.setText(title);
         holder.binding.textItemTitle.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Objects.requireNonNull(v);
+
                 onClickItemListener.onClick(title);
             }
         });
         holder.binding.includeBackground.imageButtonDelete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Objects.requireNonNull(v);
+
                 // MEMO:onBindViewHolder()の引数であるpositionを使用すると警告がでる。
                 onClickDeleteButtonListener.onClick(holder.getBindingAdapterPosition(), title);
             }
@@ -89,12 +96,12 @@ public class ItemTitleSelectionHistoryListAdapter
 
     @FunctionalInterface
     public interface OnClickItemListener {
-        void onClick(String title);
+        void onClick(@NonNull String title);
     }
 
     @FunctionalInterface
     public interface OnClickDeleteButtonListener {
-        void onClick(int position, String title);
+        void onClick(int position,@NonNull String title);
     }
 
     public static class ItemTitleSelectionHistoryViewHolder

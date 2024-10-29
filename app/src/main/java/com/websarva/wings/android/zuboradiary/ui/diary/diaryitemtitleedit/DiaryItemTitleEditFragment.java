@@ -1,5 +1,6 @@
 package com.websarva.wings.android.zuboradiary.ui.diary.diaryitemtitleedit;
 
+import android.content.ClipData;
 import android.content.DialogInterface;
 import android.os.Bundle;
 
@@ -23,6 +24,7 @@ import android.widget.EditText;
 import com.google.android.material.textfield.TextInputLayout;
 import com.websarva.wings.android.zuboradiary.R;
 import com.websarva.wings.android.zuboradiary.data.database.DiaryItemTitleSelectionHistoryItem;
+import com.websarva.wings.android.zuboradiary.data.diary.ItemNumber;
 import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor;
 import com.websarva.wings.android.zuboradiary.databinding.FragmentDiaryItemTitleEditBinding;
 import com.websarva.wings.android.zuboradiary.ui.BaseFragment;
@@ -91,7 +93,7 @@ public class DiaryItemTitleEditFragment extends BaseFragment {
     @Override
     protected void handleOnReceivingResultFromPreviousFragment(@NonNull SavedStateHandle savedStateHandle) {
         // EditDiaryFragmentからデータ受取
-        int targetItemNumber =
+        ItemNumber targetItemNumber =
                 DiaryItemTitleEditFragmentArgs.fromBundle(getArguments()).getTargetItemNumber();
         String targetItemTitle =
                 DiaryItemTitleEditFragmentArgs.fromBundle(getArguments()).getTargetItemTitle();
@@ -120,16 +122,12 @@ public class DiaryItemTitleEditFragment extends BaseFragment {
     private void receiveDeleteConfirmationDialogResult(SavedStateHandle savedStateHandle) {
         Integer selectedButton =
                 receiveResulFromDialog(DiaryItemTitleDeleteConfirmationDialogFragment.KEY_SELECTED_BUTTON);
-        if (selectedButton == null) {
-            return;
-        }
+        if (selectedButton == null) return;
 
         if (selectedButton == DialogInterface.BUTTON_POSITIVE) {
             Integer deleteListItemPosition =
                     receiveResulFromDialog(DiaryItemTitleDeleteConfirmationDialogFragment.KEY_DELETE_LIST_ITEM_POSITION);
-            if (deleteListItemPosition == null) {
-                return;
-            }
+            Objects.requireNonNull(deleteListItemPosition);
 
             diaryItemTitleEditViewModel
                     .deleteSelectedItemTitleHistoryItem(deleteListItemPosition);
@@ -137,26 +135,24 @@ public class DiaryItemTitleEditFragment extends BaseFragment {
             ItemTitleSelectionHistoryListAdapter adapter =
                     (ItemTitleSelectionHistoryListAdapter)
                             binding.recyclerItemTitleSelectionHistory.getAdapter();
-            if (adapter == null) {
-                return;
-            }
+            Objects.requireNonNull(adapter);
 
             adapter.closeSwipedItem();
         }
     }
 
     private void setUpToolBar() {
-        Integer targetItemNumber = diaryItemTitleEditViewModel.getItemNumberLiveData().getValue();
-        if (targetItemNumber == null) {
-            // TODO:assert
-            return;
-        }
+        ItemNumber targetItemNumber = diaryItemTitleEditViewModel.getItemNumberLiveData().getValue();
+        Objects.requireNonNull(targetItemNumber);
+
         String toolBarTitle = getString(R.string.fragment_diary_item_title_edit_toolbar_first_title) + targetItemNumber + getString(R.string.fragment_diary_item_title_edit_toolbar_second_title);
         binding.materialToolbarTopAppBar.setTitle(toolBarTitle);
         binding.materialToolbarTopAppBar
                 .setNavigationOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
+                        Objects.requireNonNull(v);
+
                         navController.navigateUp();
                     }
                 });
@@ -170,9 +166,11 @@ public class DiaryItemTitleEditFragment extends BaseFragment {
         TextInputSetup.ClearButtonSetUpTransitionListener transitionListener =
                 textInputSetup.createClearButtonSetupTransitionListener(textInputLayouts);
         addTransitionListener(transitionListener);
+
         EditText editText = binding.textInputLayoutNewItemTitle.getEditText();
         Objects.requireNonNull(editText);
         editText.addTextChangedListener(new InputItemTitleErrorWatcher());
+
         binding.buttonSelectNewItemTitle.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -185,6 +183,7 @@ public class DiaryItemTitleEditFragment extends BaseFragment {
                 completeItemTitleEdit(title);
             }
         });
+
         boolean isEnabled = !editText.getText().toString().isEmpty();
         binding.buttonSelectNewItemTitle.setEnabled(isEnabled);
     }
@@ -231,13 +230,13 @@ public class DiaryItemTitleEditFragment extends BaseFragment {
                         themeColor,
                         new ItemTitleSelectionHistoryListAdapter.OnClickItemListener() {
                             @Override
-                            public void onClick(String title) {
+                            public void onClick(@NonNull String title) {
                                 completeItemTitleEdit(title);
                             }
                         },
                         new ItemTitleSelectionHistoryListAdapter.OnClickDeleteButtonListener() {
                             @Override
-                            public void onClick(int position, String title) {
+                            public void onClick(int position, @NonNull String title) {
                                 showDeleteConfirmationDialog(position, title);
                             }
                         });
@@ -248,45 +247,36 @@ public class DiaryItemTitleEditFragment extends BaseFragment {
         diaryItemTitleEditViewModel.getItemTitleSelectionHistoryLiveData()
                 .observe(getViewLifecycleOwner(), new Observer<List<DiaryItemTitleSelectionHistoryItem>>() {
                     @Override
-                    public void onChanged(List<DiaryItemTitleSelectionHistoryItem> diaryItemTitleSelectionHistoryItems) {
-                        if (diaryItemTitleSelectionHistoryItems == null) {
-                            return;
-                        }
+                    public void onChanged(List<DiaryItemTitleSelectionHistoryItem> SelectionHistoryItemList) {
+                        Objects.requireNonNull(SelectionHistoryItemList);
 
                         ItemTitleSelectionHistoryListAdapter adapter =
                                 (ItemTitleSelectionHistoryListAdapter)
                                         binding.recyclerItemTitleSelectionHistory.getAdapter();
-                        if (adapter == null) {
-                            return;
-                        }
-                        Log.d("20240826","ItemTitleSelectionHistoryLiveDataObserver");
-                        adapter.submitList(diaryItemTitleSelectionHistoryItems);
+                        Objects.requireNonNull(adapter);
+                        adapter.submitList(SelectionHistoryItemList);
                     }
                 });
     }
 
     // DiaryItemTitleEditFragmentを閉じる
     private void completeItemTitleEdit(String newItemTitle) {
+        Objects.requireNonNull(newItemTitle);
+
+        ItemNumber targetItemNumber = diaryItemTitleEditViewModel.getItemNumberLiveData().getValue();
+        Objects.requireNonNull(targetItemNumber);
+
         NavBackStackEntry navBackStackEntry = navController.getPreviousBackStackEntry();
-        if (navBackStackEntry == null) {
-            // TODO:assert
-            return;
-        }
+        Objects.requireNonNull(navBackStackEntry);
         SavedStateHandle savedStateHandle = navBackStackEntry.getSavedStateHandle();
-        Integer targetItemNumber = diaryItemTitleEditViewModel.getItemNumberLiveData().getValue();
-        if (targetItemNumber == null) {
-            // TODO:assert
-            return;
-        }
         savedStateHandle.set(KEY_UPDATE_ITEM_NUMBER, targetItemNumber);
         savedStateHandle.set(KEY_NEW_ITEM_TITLE, newItemTitle);
+
         showDiaryEditFragment();
     }
 
     private void showDiaryEditFragment() {
-        if (!canShowOtherFragment()) {
-            return;
-        }
+        if (!canShowOtherFragment()) return;
 
         NavDirections action =
                 DiaryItemTitleEditFragmentDirections
@@ -295,15 +285,9 @@ public class DiaryItemTitleEditFragment extends BaseFragment {
     }
 
     private void showDeleteConfirmationDialog(int itemPosition, String itemTitle) {
-        if (itemPosition < 0) {
-            throw new IllegalArgumentException();
-        }
-        if (itemTitle == null) {
-            throw new NullPointerException();
-        }
-        if (!canShowOtherFragment()) {
-            return;
-        }
+        Objects.requireNonNull(itemTitle);
+        if (itemPosition < 0) throw new IllegalArgumentException();
+        if (!canShowOtherFragment()) return;
 
         NavDirections action =
                 DiaryItemTitleEditFragmentDirections

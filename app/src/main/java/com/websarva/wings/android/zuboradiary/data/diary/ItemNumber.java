@@ -1,7 +1,11 @@
 package com.websarva.wings.android.zuboradiary.data.diary;
 
+import androidx.annotation.NonNull;
+
+import java.io.Serializable;
+
 // TODO:保留。(使い勝手良いような悪いような・・・)
-public class ItemNumber {
+public class ItemNumber implements Serializable {
 
     private final int value;
     public static final int MIN_NUMBER = 1;
@@ -23,5 +27,11 @@ public class ItemNumber {
 
     public int getValue() {
         return value;
+    }
+
+    @NonNull
+    @Override
+    public String toString() {
+        return String.valueOf(value);
     }
 }

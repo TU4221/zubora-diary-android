@@ -354,7 +354,7 @@
             </action>
             <argument
                 android:name="TargetItemNumber"
-                app:argType="integer" />
+                app:argType="com.websarva.wings.android.zuboradiary.data.diary.ItemNumber" />
             <argument
                 android:name="TargetItemTitle"
                 app:argType="string" />

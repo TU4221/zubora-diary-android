@@ -1,18 +1,17 @@
 package com.websarva.wings.android.zuboradiary.ui.diary.diaryitemtitleedit;
 
-import android.util.Log;
-
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.ViewModel;
 
 import com.websarva.wings.android.zuboradiary.data.AppError;
 import com.websarva.wings.android.zuboradiary.data.database.DiaryItemTitleSelectionHistoryItem;
 import com.websarva.wings.android.zuboradiary.data.database.DiaryItemTitleSelectionHistoryRepository;
+import com.websarva.wings.android.zuboradiary.data.diary.ItemNumber;
 import com.websarva.wings.android.zuboradiary.ui.BaseViewModel;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import javax.inject.Inject;
 
@@ -22,7 +21,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel;
 public class DiaryItemTitleEditViewModel extends BaseViewModel {
 
     private final DiaryItemTitleSelectionHistoryRepository diaryItemTitleSelectionHistoryRepository;
-    private final MutableLiveData<Integer> itemNumber = new MutableLiveData<>();
+    private final MutableLiveData<ItemNumber> itemNumber = new MutableLiveData<>();
     private final MutableLiveData<String> itemTitle = new MutableLiveData<>();
     private final MutableLiveData<List<DiaryItemTitleSelectionHistoryItem>> itemTitleSelectionHistory =
             new MutableLiveData<>();
@@ -38,17 +37,20 @@ public class DiaryItemTitleEditViewModel extends BaseViewModel {
     @Override
     protected void initialize() {
         super.initialize();
-        itemNumber.setValue(0);
+        itemNumber.setValue(null);
         itemTitle.setValue("");
         itemTitleSelectionHistory.setValue(new ArrayList<>());
     }
 
-    public void updateItemTitle(int itemNumber, String itemTitle) {
+    void updateItemTitle(ItemNumber itemNumber, String itemTitle) {
+        Objects.requireNonNull(itemNumber);
+        Objects.requireNonNull(itemTitle);
+
         this.itemNumber.setValue(itemNumber);
         this.itemTitle.setValue(itemTitle);
     }
 
-    public void loadItemTitleSelectionHistory() {
+   void loadItemTitleSelectionHistory() {
         List<DiaryItemTitleSelectionHistoryItem> loadedList;
         try {
             loadedList =
@@ -61,12 +63,11 @@ public class DiaryItemTitleEditViewModel extends BaseViewModel {
         itemTitleSelectionHistory.setValue(loadedList);
     }
 
-    public void deleteSelectedItemTitleHistoryItem(int deletePosition) {
+    void deleteSelectedItemTitleHistoryItem(int deletePosition) {
         List<DiaryItemTitleSelectionHistoryItem> currentList = itemTitleSelectionHistory.getValue();
-        if (currentList == null) {
-            return;
-            // TODO:assert
-        }
+        Objects.requireNonNull(currentList);
+        currentList.stream().forEach(Objects::requireNonNull);
+
         DiaryItemTitleSelectionHistoryItem diaryItemTitleSelectionHistoryItem = currentList.get(deletePosition);
         try {
             diaryItemTitleSelectionHistoryRepository.deleteHistoryItem(diaryItemTitleSelectionHistoryItem).get();
@@ -84,11 +85,11 @@ public class DiaryItemTitleEditViewModel extends BaseViewModel {
     }
 
     // LiveDataGetter
-    public LiveData<Integer> getItemNumberLiveData() {
+    LiveData<ItemNumber> getItemNumberLiveData() {
         return itemNumber;
     }
 
-    public LiveData<String> getItemTitleLiveData() {
+    LiveData<String> getItemTitleLiveData() {
         return itemTitle;
     }
 
@@ -96,7 +97,7 @@ public class DiaryItemTitleEditViewModel extends BaseViewModel {
         return itemTitle;
     }
 
-    public LiveData<List<DiaryItemTitleSelectionHistoryItem>> getItemTitleSelectionHistoryLiveData() {
+    LiveData<List<DiaryItemTitleSelectionHistoryItem>> getItemTitleSelectionHistoryLiveData() {
         return itemTitleSelectionHistory;
     }
 }
