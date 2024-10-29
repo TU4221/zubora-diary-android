@@ -349,6 +349,7 @@ public class DiaryEditFragment extends BaseFragment {
         @Override
         public void onChanged(@Nullable LocalDate date) {
             if (date == null) return;
+            if (diaryEditViewModel.getIsShowingItemTitleEditFragment()) return;
 
             DateTimeStringConverter dateTimeStringConverter = new DateTimeStringConverter();
             binding.textInputEditTextDate.setText(dateTimeStringConverter.toStringDate(date));
@@ -900,6 +901,7 @@ public class DiaryEditFragment extends BaseFragment {
                 DiaryEditFragmentDirections
                         .actionDiaryEditFragmentToSelectItemTitleFragment(inputItemNumber, inputItemTitle);
         navController.navigate(action);
+        diaryEditViewModel.updateIsShowingItemTitleEditFragment(true);
     }
 
     private void showDatePickerDialog(LocalDate date) {
@@ -998,6 +1000,10 @@ public class DiaryEditFragment extends BaseFragment {
         binding.autoCompleteTextWeather1.setAdapter(weatherArrayAdapter);
         ArrayAdapter<String> conditionArrayAdapter = createConditionSpinnerAdapter();
         binding.autoCompleteTextCondition.setAdapter(conditionArrayAdapter);
+
+        // HACK:ItemTitleEditFragmentから戻ってきた時に処理させたく箇所を
+        //      変数(DiaryEditViewModel.IsShowingItemTitleEditFragment)で分岐させる。
+        diaryEditViewModel.updateIsShowingItemTitleEditFragment(false);
     }
 
     @Override

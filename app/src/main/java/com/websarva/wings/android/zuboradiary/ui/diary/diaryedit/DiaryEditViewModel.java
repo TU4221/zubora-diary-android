@@ -43,6 +43,9 @@ public class DiaryEditViewModel extends BaseViewModel {
     private final MutableLiveData<LocalDate> loadedDate = new MutableLiveData<>();
     private final DiaryLiveData diaryLiveData;
 
+    // Fragment切替記憶
+    private boolean isShowingItemTitleEditFragment;
+
     @Inject
     public DiaryEditViewModel(DiaryRepository diaryRepository, WeatherApiRepository weatherApiRepository) {
         this.diaryRepository = diaryRepository;
@@ -276,9 +279,18 @@ public class DiaryEditViewModel extends BaseViewModel {
         diaryLiveData.updateItemTitle(itemNumber, title);
     }
 
+    // Fragment切替記憶
+    void updateIsShowingItemTitleEditFragment(boolean isShowing) {
+        isShowingItemTitleEditFragment = isShowing;
+    }
+
     // Getter
     boolean getHasPreparedDiary() {
         return hasPreparedDiary;
+    }
+
+    boolean getIsShowingItemTitleEditFragment() {
+        return isShowingItemTitleEditFragment;
     }
 
     // LiveDataGetter
