@@ -327,7 +327,7 @@ public class DiaryShowFragment extends BaseFragment {
 
             for (int i = ItemNumber.MIN_NUMBER; i <= ItemNumber.MAX_NUMBER; i++) {
                 int itemArrayNumber = i - 1;
-                if (i < integer) {
+                if (i <= integer) {
                     itemLayouts[itemArrayNumber].setVisibility(View.VISIBLE);
                 } else {
                     itemLayouts[itemArrayNumber].setVisibility(View.GONE);
