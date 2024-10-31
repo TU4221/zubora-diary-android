@@ -27,8 +27,8 @@ public interface DiaryItemTitleSelectionHistoryDAO {
     void insertSelectedDiaryItemTitles(
             List<DiaryItemTitleSelectionHistoryItem> diaryItemTitleSelectionHistoryItems);
 
-    @Delete
-    ListenableFuture<Integer> deleteHistoryItemAsync(DiaryItemTitleSelectionHistoryItem diaryItemTitleSelectionHistoryItem);
+    @Query("DELETE FROM diary_item_title_selection_history WHERE title = :title")
+    ListenableFuture<Integer> deleteHistoryItemAsync(String title);
 
     // MEMO:SQLITEはDELETE ORDER BYが使用できない。
     /*@Query("DELETE FROM diary_item_title_history ORDER BY log DESC LIMIT ((SELECT COUNT(*) FROM diary_item_title_history) - 50) OFFSET 50")*/

@@ -245,16 +245,16 @@ public class DiaryItemTitleEditFragment extends BaseFragment {
         // 選択履歴読込・表示
         diaryItemTitleEditViewModel.loadItemTitleSelectionHistory();
         diaryItemTitleEditViewModel.getItemTitleSelectionHistoryLiveData()
-                .observe(getViewLifecycleOwner(), new Observer<List<DiaryItemTitleSelectionHistoryItem>>() {
+                .observe(getViewLifecycleOwner(), new Observer<SelectionHistoryList>() {
                     @Override
-                    public void onChanged(List<DiaryItemTitleSelectionHistoryItem> SelectionHistoryItemList) {
+                    public void onChanged(SelectionHistoryList SelectionHistoryItemList) {
                         Objects.requireNonNull(SelectionHistoryItemList);
 
                         ItemTitleSelectionHistoryListAdapter adapter =
                                 (ItemTitleSelectionHistoryListAdapter)
                                         binding.recyclerItemTitleSelectionHistory.getAdapter();
                         Objects.requireNonNull(adapter);
-                        adapter.submitList(SelectionHistoryItemList);
+                        adapter.submitList(SelectionHistoryItemList.getSelectionHistoryListItemList());
                     }
                 });
     }

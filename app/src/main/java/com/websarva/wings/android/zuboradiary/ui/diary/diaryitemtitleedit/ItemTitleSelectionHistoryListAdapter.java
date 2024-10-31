@@ -21,7 +21,7 @@ import com.websarva.wings.android.zuboradiary.ui.ThemeColorInflaterCreator;
 import java.util.Objects;
 
 public class ItemTitleSelectionHistoryListAdapter
-        extends ListAdapter<DiaryItemTitleSelectionHistoryItem,
+        extends ListAdapter<SelectionHistoryListItem,
                         ItemTitleSelectionHistoryListAdapter.ItemTitleSelectionHistoryViewHolder> {
 
     private final Context context;
@@ -69,11 +69,9 @@ public class ItemTitleSelectionHistoryListAdapter
     }
 
     @Override
-    public void onBindViewHolder(ItemTitleSelectionHistoryViewHolder holder, int position) {
-        DiaryItemTitleSelectionHistoryItem item = getItem(position);
+    public void onBindViewHolder(@NonNull ItemTitleSelectionHistoryViewHolder holder, int position) {
+        SelectionHistoryListItem item = getItem(position);
         String title = item.getTitle();
-        Objects.requireNonNull(title);
-
         holder.binding.textItemTitle.setText(title);
         holder.binding.textItemTitle.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -127,25 +125,16 @@ public class ItemTitleSelectionHistoryListAdapter
     }
 
     public static class DiaryItemTitleSelectionHistoryDiffUtilItemCallback
-            extends DiffUtil.ItemCallback<DiaryItemTitleSelectionHistoryItem> {
+            extends DiffUtil.ItemCallback<SelectionHistoryListItem> {
+
         @Override
-        public boolean areItemsTheSame(
-                @NonNull DiaryItemTitleSelectionHistoryItem oldItem,
-                @NonNull DiaryItemTitleSelectionHistoryItem newItem) {
-            return oldItem.getId().equals(newItem.getId());
+        public boolean areItemsTheSame(@NonNull SelectionHistoryListItem oldItem, @NonNull SelectionHistoryListItem newItem) {
+            return oldItem.getTitle().equals(newItem.getTitle());
         }
 
         @Override
-        public boolean areContentsTheSame(
-                @NonNull DiaryItemTitleSelectionHistoryItem oldItem,
-                @NonNull DiaryItemTitleSelectionHistoryItem newItem) {
-            if (!oldItem.getTitle().equals(newItem.getTitle())) {
-                return false;
-            }
-            if (oldItem.getLog().equals(newItem.getLog())) {
-                return false;
-            }
-            return true;
+        public boolean areContentsTheSame(@NonNull SelectionHistoryListItem oldItem, @NonNull SelectionHistoryListItem newItem) {
+            return false;
         }
     }
 

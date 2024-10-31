@@ -24,7 +24,7 @@ public class DiaryItemTitleSelectionHistoryRepository {
         return diaryItemTitleSelectionHistoryDAO.insertHistoryItemAsync(list);
     }
 
-    public ListenableFuture<Integer> deleteHistoryItem(DiaryItemTitleSelectionHistoryItem title) {
+    public ListenableFuture<Integer> deleteHistoryItem(String title) {
         return diaryItemTitleSelectionHistoryDAO.deleteHistoryItemAsync(title);
     }
 

@@ -1,5 +1,6 @@
 package com.websarva.wings.android.zuboradiary.ui.diary.diaryitemtitleedit;
 
+import androidx.annotation.NonNull;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
@@ -23,8 +24,7 @@ public class DiaryItemTitleEditViewModel extends BaseViewModel {
     private final DiaryItemTitleSelectionHistoryRepository diaryItemTitleSelectionHistoryRepository;
     private final MutableLiveData<ItemNumber> itemNumber = new MutableLiveData<>();
     private final MutableLiveData<String> itemTitle = new MutableLiveData<>();
-    private final MutableLiveData<List<DiaryItemTitleSelectionHistoryItem>> itemTitleSelectionHistory =
-            new MutableLiveData<>();
+    private final MutableLiveData<SelectionHistoryList> selectionHistoryList = new MutableLiveData<>();
     private static final int MAX_LOADED_ITEM_TITLES = 50;
 
     @Inject
@@ -39,7 +39,7 @@ public class DiaryItemTitleEditViewModel extends BaseViewModel {
         super.initialize();
         itemNumber.setValue(null);
         itemTitle.setValue("");
-        itemTitleSelectionHistory.setValue(new ArrayList<>());
+        selectionHistoryList.setValue(new SelectionHistoryList());
     }
 
     void updateItemTitle(ItemNumber itemNumber, String itemTitle) {
@@ -60,44 +60,52 @@ public class DiaryItemTitleEditViewModel extends BaseViewModel {
             addAppError(AppError.DIARY_ITEM_TITLE_HISTORY_LOADING);
             return;
         }
-        itemTitleSelectionHistory.setValue(loadedList);
+        List<SelectionHistoryListItem> itemList = new ArrayList<>();
+        loadedList.stream().forEach(x -> itemList.add(new SelectionHistoryListItem(x)));
+        SelectionHistoryList list = new SelectionHistoryList(itemList);
+        selectionHistoryList.setValue(list);
     }
 
     void deleteSelectedItemTitleHistoryItem(int deletePosition) {
-        List<DiaryItemTitleSelectionHistoryItem> currentList = itemTitleSelectionHistory.getValue();
-        Objects.requireNonNull(currentList);
-        currentList.stream().forEach(Objects::requireNonNull);
+        if (deletePosition < 0) throw new IllegalArgumentException();
 
-        DiaryItemTitleSelectionHistoryItem diaryItemTitleSelectionHistoryItem = currentList.get(deletePosition);
+        SelectionHistoryList currentList = selectionHistoryList.getValue();
+        Objects.requireNonNull(currentList);
+        int listSize = currentList.getSelectionHistoryListItemList().size();
+        if (deletePosition >= listSize) throw new IllegalArgumentException();
+
+        SelectionHistoryListItem deleteItem =
+                currentList.getSelectionHistoryListItemList().get(deletePosition);
+        String deleteTitle = deleteItem.getTitle();
         try {
-            diaryItemTitleSelectionHistoryRepository.deleteHistoryItem(diaryItemTitleSelectionHistoryItem).get();
+            diaryItemTitleSelectionHistoryRepository.deleteHistoryItem(deleteTitle).get();
         } catch (Exception e) {
             addAppError(AppError.DIARY_ITEM_TITLE_HISTORY_ITEM_DELETE);
             return;
         }
 
-        List<DiaryItemTitleSelectionHistoryItem> cloneList = new ArrayList<>();
-        for (DiaryItemTitleSelectionHistoryItem i: currentList) {
-            cloneList.add(i.clone());
-        }
-        cloneList.remove(deletePosition);
-        itemTitleSelectionHistory.setValue(cloneList);
+        selectionHistoryList.setValue(currentList.deleteItem(deletePosition));
     }
 
     // LiveDataGetter
+
+    @NonNull
     LiveData<ItemNumber> getItemNumberLiveData() {
         return itemNumber;
     }
 
+    @NonNull
     LiveData<String> getItemTitleLiveData() {
         return itemTitle;
     }
 
+    @NonNull
     public MutableLiveData<String> getItemTitleMutableLiveData() {
         return itemTitle;
     }
 
-    LiveData<List<DiaryItemTitleSelectionHistoryItem>> getItemTitleSelectionHistoryLiveData() {
-        return itemTitleSelectionHistory;
+    @NonNull
+    LiveData<SelectionHistoryList> getItemTitleSelectionHistoryLiveData() {
+        return selectionHistoryList;
     }
 }
