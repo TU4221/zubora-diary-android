@@ -227,20 +227,21 @@ public class DiaryItemTitleEditFragment extends BaseFragment {
                 new ItemTitleSelectionHistoryListAdapter(
                         requireContext(),
                         binding.recyclerItemTitleSelectionHistory,
-                        themeColor,
-                        new ItemTitleSelectionHistoryListAdapter.OnClickItemListener() {
-                            @Override
-                            public void onClick(@NonNull String title) {
-                                completeItemTitleEdit(title);
-                            }
-                        },
-                        new ItemTitleSelectionHistoryListAdapter.OnClickDeleteButtonListener() {
-                            @Override
-                            public void onClick(int position, @NonNull String title) {
-                                showDeleteConfirmationDialog(position, title);
-                            }
-                        });
+                        themeColor
+                );
         itemTitleSelectionHistoryListAdapter.build();
+        itemTitleSelectionHistoryListAdapter.setOnClickItemListener(new ItemTitleSelectionHistoryListAdapter.OnClickItemListener() {
+            @Override
+            public void onClick(@NonNull String title) {
+                completeItemTitleEdit(title);
+            }
+        });
+        itemTitleSelectionHistoryListAdapter.setOnClickDeleteButtonListener(new ItemTitleSelectionHistoryListAdapter.OnClickDeleteButtonListener() {
+            @Override
+            public void onClick(int position, @NonNull String title) {
+                showDeleteConfirmationDialog(position, title);
+            }
+        });
 
         // 選択履歴読込・表示
         diaryItemTitleEditViewModel.loadItemTitleSelectionHistory();

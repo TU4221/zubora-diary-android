@@ -7,7 +7,7 @@ import com.websarva.wings.android.zuboradiary.data.database.DiaryItemTitleSelect
 import java.time.LocalDateTime;
 import java.util.Objects;
 
-public class SelectionHistoryListItem {
+class SelectionHistoryListItem {
 
     private final String title;
     private final LocalDateTime log;

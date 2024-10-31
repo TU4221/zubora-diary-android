@@ -20,6 +20,7 @@ import com.websarva.wings.android.zuboradiary.databinding.RowWordSearchResultLis
 import com.websarva.wings.android.zuboradiary.ui.ThemeColorInflaterCreator;
 
 import java.time.LocalDate;
+import java.util.Objects;
 
 public class WordSearchResultDayListAdapter
         extends ListAdapter<WordSearchResultDayListItem, WordSearchResultDayListAdapter.WordSearchResultDayViewHolder> {
@@ -32,15 +33,9 @@ public class WordSearchResultDayListAdapter
     public WordSearchResultDayListAdapter(Context context, RecyclerView recyclerView, ThemeColor themeColor){
         super(new WordSearchResultDayListDiffUtilItemCallback());
 
-        if (context == null) {
-            throw new NullPointerException();
-        }
-        if (recyclerView == null) {
-            throw new NullPointerException();
-        }
-        if (themeColor == null) {
-            throw new NullPointerException();
-        }
+        Objects.requireNonNull(context);
+        Objects.requireNonNull(recyclerView);
+        Objects.requireNonNull(themeColor);
 
         this.context = context;
         this.recyclerView = recyclerView;

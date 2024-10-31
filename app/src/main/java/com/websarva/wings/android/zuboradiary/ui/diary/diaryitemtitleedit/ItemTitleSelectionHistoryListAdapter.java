@@ -6,6 +6,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.databinding.ViewDataBinding;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.DividerItemDecoration;
@@ -17,36 +18,31 @@ import com.websarva.wings.android.zuboradiary.data.database.DiaryItemTitleSelect
 import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor;
 import com.websarva.wings.android.zuboradiary.databinding.RowItemTitleSelectionHistoryBinding;
 import com.websarva.wings.android.zuboradiary.ui.ThemeColorInflaterCreator;
+import com.websarva.wings.android.zuboradiary.ui.list.DiaryYearMonthListAdapter;
 
 import java.util.Objects;
 
-public class ItemTitleSelectionHistoryListAdapter
+class ItemTitleSelectionHistoryListAdapter
         extends ListAdapter<SelectionHistoryListItem,
                         ItemTitleSelectionHistoryListAdapter.ItemTitleSelectionHistoryViewHolder> {
 
     private final Context context;
     private final RecyclerView recyclerView;
     private final ThemeColor themeColor;
-    private final OnClickItemListener onClickItemListener;
-    private final OnClickDeleteButtonListener onClickDeleteButtonListener;
+    private OnClickItemListener onClickItemListener;
+    private OnClickDeleteButtonListener onClickDeleteButtonListener;
 
     private ItemTitleSelectionHistorySimpleCallback itemTitleSelectionHistorySimpleCallback;
 
-    public ItemTitleSelectionHistoryListAdapter(
-            Context context,
-            RecyclerView recyclerView,
-            ThemeColor themeColor,
-            OnClickItemListener onClickItemListener,
-            OnClickDeleteButtonListener onClickDeleteButtonListener){
+    ItemTitleSelectionHistoryListAdapter(
+            Context context, RecyclerView recyclerView, ThemeColor themeColor) {
         super(new DiaryItemTitleSelectionHistoryDiffUtilItemCallback());
         this.context = context;
         this.recyclerView = recyclerView;
         this.themeColor = themeColor;
-        this.onClickItemListener = onClickItemListener;
-        this.onClickDeleteButtonListener = onClickDeleteButtonListener;
     }
 
-    public void build() {
+    void build() {
         recyclerView.setAdapter(this);
         recyclerView.setLayoutManager(new LinearLayoutManager(context));
         recyclerView.addItemDecoration(
@@ -77,6 +73,7 @@ public class ItemTitleSelectionHistoryListAdapter
             @Override
             public void onClick(View v) {
                 Objects.requireNonNull(v);
+                if (onClickItemListener == null) return;
 
                 onClickItemListener.onClick(title);
             }
@@ -85,6 +82,7 @@ public class ItemTitleSelectionHistoryListAdapter
             @Override
             public void onClick(View v) {
                 Objects.requireNonNull(v);
+                if (onClickDeleteButtonListener == null) return;
 
                 // MEMO:onBindViewHolder()の引数であるpositionを使用すると警告がでる。
                 onClickDeleteButtonListener.onClick(holder.getBindingAdapterPosition(), title);
@@ -93,38 +91,42 @@ public class ItemTitleSelectionHistoryListAdapter
     }
 
     @FunctionalInterface
-    public interface OnClickItemListener {
+    interface OnClickItemListener {
         void onClick(@NonNull String title);
     }
 
+    void setOnClickItemListener(@Nullable OnClickItemListener onClickItemListener) {
+        this.onClickItemListener = onClickItemListener;
+    }
+
     @FunctionalInterface
-    public interface OnClickDeleteButtonListener {
+    interface OnClickDeleteButtonListener {
         void onClick(int position,@NonNull String title);
     }
 
-    public static class ItemTitleSelectionHistoryViewHolder
+    void setOnClickDeleteButtonListener(@Nullable OnClickDeleteButtonListener onClickDeleteButtonListener) {
+        this.onClickDeleteButtonListener = onClickDeleteButtonListener;
+    }
+
+    static class ItemTitleSelectionHistoryViewHolder
             extends ItemTitleSelectionHistorySimpleCallback.LeftSwipeViewHolder {
         public RowItemTitleSelectionHistoryBinding binding;
 
-        public ItemTitleSelectionHistoryViewHolder(RowItemTitleSelectionHistoryBinding binding) {
+        ItemTitleSelectionHistoryViewHolder(RowItemTitleSelectionHistoryBinding binding) {
             super(binding);
             this.binding = binding;
         }
 
         @Override
         public void setUpView(@NonNull ViewDataBinding binding) {
-            RowItemTitleSelectionHistoryBinding rowItemTitleSelectionHistoryBinding;
-            if (binding instanceof RowItemTitleSelectionHistoryBinding) {
-                rowItemTitleSelectionHistoryBinding = (RowItemTitleSelectionHistoryBinding) binding;
-            } else {
-                return;
-            }
+            RowItemTitleSelectionHistoryBinding rowItemTitleSelectionHistoryBinding =
+                    (RowItemTitleSelectionHistoryBinding) binding;
             foregroundView = rowItemTitleSelectionHistoryBinding.textItemTitle;
             backgroundButtonView = rowItemTitleSelectionHistoryBinding.includeBackground.imageButtonDelete;
         }
     }
 
-    public static class DiaryItemTitleSelectionHistoryDiffUtilItemCallback
+    static class DiaryItemTitleSelectionHistoryDiffUtilItemCallback
             extends DiffUtil.ItemCallback<SelectionHistoryListItem> {
 
         @Override
@@ -138,7 +140,7 @@ public class ItemTitleSelectionHistoryListAdapter
         }
     }
 
-    public void closeSwipedItem() {
+    void closeSwipedItem() {
         itemTitleSelectionHistorySimpleCallback.closeSwipedItem();
     }
 }
