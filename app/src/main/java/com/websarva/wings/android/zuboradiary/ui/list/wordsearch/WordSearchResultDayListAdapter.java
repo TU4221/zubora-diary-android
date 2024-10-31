@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.websarva.wings.android.zuboradiary.R;
 import com.websarva.wings.android.zuboradiary.data.DayOfWeekStringConverter;
+import com.websarva.wings.android.zuboradiary.data.diary.ItemNumber;
 import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor;
 import com.websarva.wings.android.zuboradiary.databinding.RowWordSearchResultListBinding;
 import com.websarva.wings.android.zuboradiary.ui.ThemeColorInflaterCreator;
@@ -71,7 +72,7 @@ public class WordSearchResultDayListAdapter
         DayOfWeekStringConverter dayOfWeekStringConverter = new DayOfWeekStringConverter(context);
         String strDayOfWeek = dayOfWeekStringConverter.toDiaryListDayOfWeek(date.getDayOfWeek());
         SpannableString title = item.getTitle();
-        int itemNumber = item.getItemNumber();
+        ItemNumber itemNumber = item.getItemNumber();
         SpannableString itemTitle = item.getItemTitle();
         SpannableString itemComment = item.getItemComment();
         holder.date = date; // ホルダー毎に日記の日付情報一式付与

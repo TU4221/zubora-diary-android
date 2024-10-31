@@ -3,9 +3,9 @@ package com.websarva.wings.android.zuboradiary.data.diary;
 import androidx.annotation.NonNull;
 
 import java.io.Serializable;
+import java.util.Objects;
 
-// TODO:保留。(使い勝手良いような悪いような・・・)
-public class ItemNumber implements Serializable {
+public class ItemNumber implements Serializable, Comparable<ItemNumber> {
 
     private final int value;
     public static final int MIN_NUMBER = 1;
@@ -33,5 +33,19 @@ public class ItemNumber implements Serializable {
     @Override
     public String toString() {
         return String.valueOf(value);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) return false;
+        if (!(obj instanceof ItemNumber)) return false;
+        ItemNumber target = (ItemNumber) obj;
+        return this.getValue() == target.getValue();
+    }
+
+    @Override
+    public int compareTo(ItemNumber itemNumber) {
+        Objects.requireNonNull(itemNumber);
+        return Integer.compare(this.value, itemNumber.value);
     }
 }

@@ -24,11 +24,11 @@ import android.widget.TextView;
 import com.websarva.wings.android.zuboradiary.R;
 import com.websarva.wings.android.zuboradiary.data.DateTimeStringConverter;
 import com.websarva.wings.android.zuboradiary.data.diary.Conditions;
+import com.websarva.wings.android.zuboradiary.data.diary.ItemNumber;
 import com.websarva.wings.android.zuboradiary.data.diary.Weathers;
 import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor;
 import com.websarva.wings.android.zuboradiary.databinding.FragmentDiaryShowBinding;
 import com.websarva.wings.android.zuboradiary.ui.BaseFragment;
-import com.websarva.wings.android.zuboradiary.ui.diary.DiaryLiveData;
 import com.websarva.wings.android.zuboradiary.ui.settings.SettingsViewModel;
 
 import java.time.LocalDate;
@@ -298,7 +298,7 @@ public class DiaryShowFragment extends BaseFragment {
     }
 
     private void setUpItemLayout() {
-        View[] itemLayouts = new View[DiaryLiveData.MAX_ITEMS];
+        View[] itemLayouts = new View[ItemNumber.MAX_NUMBER];
         itemLayouts[0] = binding.includeDiaryShow.includeItem1.linerLayoutDiaryShowItem;
         itemLayouts[1] = binding.includeDiaryShow.includeItem2.linerLayoutDiaryShowItem;
         itemLayouts[2] = binding.includeDiaryShow.includeItem3.linerLayoutDiaryShowItem;
@@ -321,13 +321,16 @@ public class DiaryShowFragment extends BaseFragment {
         @Override
         public void onChanged(Integer integer) {
             Objects.requireNonNull(integer);
-            if (integer <= 0 || integer > itemLayouts.length) throw new IllegalArgumentException();
+            if (integer < ItemNumber.MIN_NUMBER || integer > ItemNumber.MAX_NUMBER) {
+                throw new IllegalArgumentException();
+            }
 
-            for (int i = 0; i < itemLayouts.length; i++) {
+            for (int i = ItemNumber.MIN_NUMBER; i <= ItemNumber.MAX_NUMBER; i++) {
+                int itemArrayNumber = i - 1;
                 if (i < integer) {
-                    itemLayouts[i].setVisibility(View.VISIBLE);
+                    itemLayouts[itemArrayNumber].setVisibility(View.VISIBLE);
                 } else {
-                    itemLayouts[i].setVisibility(View.GONE);
+                    itemLayouts[itemArrayNumber].setVisibility(View.GONE);
                 }
             }
         }

@@ -6,6 +6,7 @@ import com.websarva.wings.android.zuboradiary.data.AppError;
 import com.websarva.wings.android.zuboradiary.data.database.Diary;
 import com.websarva.wings.android.zuboradiary.data.database.DiaryRepository;
 import com.websarva.wings.android.zuboradiary.data.diary.Conditions;
+import com.websarva.wings.android.zuboradiary.data.diary.ItemNumber;
 import com.websarva.wings.android.zuboradiary.data.diary.Weathers;
 import com.websarva.wings.android.zuboradiary.ui.BaseViewModel;
 import com.websarva.wings.android.zuboradiary.ui.diary.DiaryLiveData;
@@ -100,43 +101,43 @@ public class DiaryShowViewModel extends BaseViewModel {
     }
 
     public LiveData<String> getItem1TitleLiveData() {
-        return diaryLiveData.getItemLiveData(1).getTitleMutableLiveData();
+        return diaryLiveData.getItemLiveData(new ItemNumber(1)).getTitleMutableLiveData();
     }
 
     public LiveData<String> getItem2TitleLiveData() {
-        return diaryLiveData.getItemLiveData(2).getTitleMutableLiveData();
+        return diaryLiveData.getItemLiveData(new ItemNumber(2)).getTitleMutableLiveData();
     }
 
     public LiveData<String> getItem3TitleLiveData() {
-        return diaryLiveData.getItemLiveData(3).getTitleMutableLiveData();
+        return diaryLiveData.getItemLiveData(new ItemNumber(3)).getTitleMutableLiveData();
     }
 
     public LiveData<String> getItem4TitleLiveData() {
-        return diaryLiveData.getItemLiveData(4).getTitleMutableLiveData();
+        return diaryLiveData.getItemLiveData(new ItemNumber(4)).getTitleMutableLiveData();
     }
 
     public LiveData<String> getItem5TitleLiveData() {
-        return diaryLiveData.getItemLiveData(5).getTitleMutableLiveData();
+        return diaryLiveData.getItemLiveData(new ItemNumber(5)).getTitleMutableLiveData();
     }
 
     public LiveData<String> getItem1CommentLiveData() {
-        return diaryLiveData.getItemLiveData(1).getCommentMutableLiveData();
+        return diaryLiveData.getItemLiveData(new ItemNumber(1)).getCommentMutableLiveData();
     }
 
     public LiveData<String> getItem2CommentLiveData() {
-        return diaryLiveData.getItemLiveData(2).getCommentMutableLiveData();
+        return diaryLiveData.getItemLiveData(new ItemNumber(2)).getCommentMutableLiveData();
     }
 
     public LiveData<String> getItem3CommentLiveData() {
-        return diaryLiveData.getItemLiveData(3).getCommentMutableLiveData();
+        return diaryLiveData.getItemLiveData(new ItemNumber(3)).getCommentMutableLiveData();
     }
 
     public LiveData<String> getItem4CommentLiveData() {
-        return diaryLiveData.getItemLiveData(4).getCommentMutableLiveData();
+        return diaryLiveData.getItemLiveData(new ItemNumber(4)).getCommentMutableLiveData();
     }
 
     public LiveData<String> getItem5CommentLiveData() {
-        return diaryLiveData.getItemLiveData(5).getCommentMutableLiveData();
+        return diaryLiveData.getItemLiveData(new ItemNumber(5)).getCommentMutableLiveData();
     }
 
     public LiveData<LocalDateTime> getLogLiveData() {

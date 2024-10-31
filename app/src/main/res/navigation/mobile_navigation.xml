@@ -307,7 +307,7 @@
             android:name="com.websarva.wings.android.zuboradiary.ui.diary.diaryedit.DiaryItemDeleteConfirmationDialogFragment">
             <argument
                 android:name="DeleteItemNumber"
-                app:argType="integer" />
+                app:argType="com.websarva.wings.android.zuboradiary.data.diary.ItemNumber" />
         </dialog>
         <dialog
             android:id="@+id/navigation_load_existing_diary_dialog_for_diary_edit_fragment"

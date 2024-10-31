@@ -144,7 +144,7 @@ public class DiaryEditFragment extends BaseFragment {
                         savedStateHandle.get(DiaryItemTitleEditFragment.KEY_UPDATE_ITEM_NUMBER);
                 Objects.requireNonNull(itemNumber);
 
-                diaryEditViewModel.updateItemTitle(itemNumber.getValue(), string);
+                diaryEditViewModel.updateItemTitle(itemNumber, string);
 
                 savedStateHandle.remove(DiaryItemTitleEditFragment.KEY_UPDATE_ITEM_NUMBER);
                 savedStateHandle.remove(DiaryItemTitleEditFragment.KEY_NEW_ITEM_TITLE);
@@ -222,14 +222,14 @@ public class DiaryEditFragment extends BaseFragment {
 
     // 項目削除確認ダイアログフラグメントから結果受取
     private void receiveDeleteConfirmDialogResult() {
-        Integer deleteItemNumber =
+        ItemNumber deleteItemNumber =
                 receiveResulFromDialog(DiaryItemDeleteConfirmationDialogFragment.KEY_DELETE_ITEM_NUMBER);
         if (deleteItemNumber == null) return;
 
         Integer numVisibleItems = diaryEditViewModel.getNumVisibleItemsLiveData().getValue();
         Objects.requireNonNull(numVisibleItems);
 
-        if (deleteItemNumber == 1 && numVisibleItems.equals(deleteItemNumber)) {
+        if (deleteItemNumber.getValue() == 1 && numVisibleItems.equals(deleteItemNumber.getValue())) {
             diaryEditViewModel.deleteItem(deleteItemNumber);
         } else {
             isDeletingItemTransition = true;
@@ -583,10 +583,11 @@ public class DiaryEditFragment extends BaseFragment {
 
         // 項目欄設定
         // 項目タイトル入力欄設定
-        for (int i = 0; i < textInputEditTextItemsTitle.length; i++) {
-            int inputItemNumber =  i + 1;
-            textInputEditTextItemsTitle[i].setInputType(EditorInfo.TYPE_NULL); //キーボード非表示設定
-            textInputEditTextItemsTitle[i].setOnTouchListener(new View.OnTouchListener() {
+        for (int i = ItemNumber.MIN_NUMBER; i <= ItemNumber.MAX_NUMBER; i++) {
+            ItemNumber inputItemNumber =  new ItemNumber(i);
+            int ItemArrayNumber = i - 1;
+            textInputEditTextItemsTitle[ItemArrayNumber].setInputType(EditorInfo.TYPE_NULL); //キーボード非表示設定
+            textInputEditTextItemsTitle[ItemArrayNumber].setOnTouchListener(new View.OnTouchListener() {
                 @Override
                 public boolean onTouch(View v, MotionEvent event) {
                     Objects.requireNonNull(v);
@@ -616,9 +617,10 @@ public class DiaryEditFragment extends BaseFragment {
         });
 
         // 項目削除ボタン設定
-        for (int i = 0; i < MAX_ITEMS; i++) {
-            int deleteItemNumber = i + 1;
-            imageButtonItemsDelete[i].setOnClickListener(new View.OnClickListener() {
+        for (int i = ItemNumber.MIN_NUMBER; i <= ItemNumber.MAX_NUMBER; i++) {
+            ItemNumber deleteItemNumber = new ItemNumber(i);
+            int itemArrayNumber = i - 1;
+            imageButtonItemsDelete[itemArrayNumber].setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     Objects.requireNonNull(v);
@@ -629,8 +631,8 @@ public class DiaryEditFragment extends BaseFragment {
         }
 
         // 項目欄MotionLayout設定
-        for (int i = 0; i < MAX_ITEMS; i++) {
-            int itemNumber = i + 1;
+        for (int i = ItemNumber.MIN_NUMBER; i <= ItemNumber.MAX_NUMBER; i++) {
+            ItemNumber itemNumber = new ItemNumber(i);
             MotionLayout itemMotionLayout = selectItemMotionLayout(itemNumber);
             itemMotionLayout.setTransitionListener(new MotionLayout.TransitionListener() {
                 @Override
@@ -678,8 +680,8 @@ public class DiaryEditFragment extends BaseFragment {
     }
 
     @NonNull
-    private MotionLayout selectItemMotionLayout(int itemNumber) {
-        switch (itemNumber) {
+    private MotionLayout selectItemMotionLayout(ItemNumber itemNumber) {
+        switch (itemNumber.getValue()) {
             case 1:
                 return binding.includeItem1.motionLayoutDiaryEditItem;
             case 2:
@@ -712,7 +714,9 @@ public class DiaryEditFragment extends BaseFragment {
 
         private void setUpItemsLayout(Integer numItems) {
             Objects.requireNonNull(numItems);
-            if (numItems < 1 || numItems > DiaryLiveData.MAX_ITEMS) throw new IllegalArgumentException();
+            if (numItems < ItemNumber.MIN_NUMBER || numItems > ItemNumber.MAX_NUMBER) {
+                throw new IllegalArgumentException();
+            }
 
             // MEMO:LifeCycleがResumedの時のみ項目欄のモーション追加処理を行う。
             //      削除処理はObserverで適切なモーション削除処理を行うのは難しいのでここでは処理せず、削除ダイアログから処理する。
@@ -720,14 +724,14 @@ public class DiaryEditFragment extends BaseFragment {
                 int numShowedItems = countShowedItems();
                 int differenceValue = numItems - numShowedItems;
                 if (numItems > numShowedItems && differenceValue == 1) {
-                    showItem(numItems, false);
+                    showItem(new ItemNumber(numItems), false);
                     return;
                 }
             }
 
-            for (int i = 0; i < DiaryLiveData.MAX_ITEMS; i++) {
-                int itemNumber = i + 1;
-                if (itemNumber <= numItems) {
+            for (int i = ItemNumber.MIN_NUMBER; i <= ItemNumber.MAX_NUMBER; i++) {
+                ItemNumber itemNumber = new ItemNumber(i);
+                if (itemNumber.getValue() <= numItems) {
                     showItem(itemNumber, true);
                 } else {
                     hideItem(itemNumber, true);
@@ -736,7 +740,7 @@ public class DiaryEditFragment extends BaseFragment {
         }
     }
 
-    private void hideItem(int itemNumber, boolean isJump) {
+    private void hideItem(ItemNumber itemNumber, boolean isJump) {
         MotionLayout itemMotionLayout = selectItemMotionLayout(itemNumber);
         if (isJump) {
             itemMotionLayout
@@ -746,7 +750,9 @@ public class DiaryEditFragment extends BaseFragment {
         }
     }
 
-    private void showItem(int itemNumber, boolean isJump) {
+    private void showItem(ItemNumber itemNumber, boolean isJump) {
+        Objects.requireNonNull(itemNumber);
+
         MotionLayout itemMotionLayout = selectItemMotionLayout(itemNumber);
         if (isJump) {
             itemMotionLayout
@@ -764,8 +770,8 @@ public class DiaryEditFragment extends BaseFragment {
 
     private int countShowedItems() {
         int numShowedItems = 0;
-        for (int i = 0; i < DiaryLiveData.MAX_ITEMS; i++) {
-            int itemNumber = i + 1;
+        for (int i = ItemNumber.MIN_NUMBER; i <= ItemNumber.MAX_NUMBER; i++) {
+            ItemNumber itemNumber = new ItemNumber(i);
             MotionLayout motionLayout = selectItemMotionLayout(itemNumber);
             if (motionLayout.getCurrentState() != R.id.motion_scene_edit_diary_item_showed_state) {
                 continue;
@@ -892,15 +898,14 @@ public class DiaryEditFragment extends BaseFragment {
         navController.navigate(action);
     }
 
-    private void showDiaryItemTitleEditFragment(int inputItemNumber, String inputItemTitle) {
-        if (inputItemNumber < 1) throw new IllegalArgumentException();
-        if (inputItemNumber > DiaryLiveData.MAX_ITEMS) throw new IllegalArgumentException();
+    private void showDiaryItemTitleEditFragment(ItemNumber inputItemNumber, String inputItemTitle) {
+        Objects.requireNonNull(inputItemNumber);
         Objects.requireNonNull(inputItemTitle);
         if (!canShowOtherFragment()) return;
 
         NavDirections action =
                 DiaryEditFragmentDirections
-                        .actionDiaryEditFragmentToSelectItemTitleFragment(new ItemNumber(inputItemNumber), inputItemTitle);
+                        .actionDiaryEditFragmentToSelectItemTitleFragment(inputItemNumber, inputItemTitle);
         navController.navigate(action);
         diaryEditViewModel.updateIsShowingItemTitleEditFragment(true);
     }
@@ -936,15 +941,8 @@ public class DiaryEditFragment extends BaseFragment {
         navController.navigate(action);
     }
 
-    private void showDiaryItemDeleteConfirmationDiaryDialog(int itemNumber) {
-        // TODO:int -> objectに変更してnullチェックにする
-        if (itemNumber < 1) {
-            throw new IllegalArgumentException();
-        }
-        if (itemNumber > 5) {
-            throw new IllegalArgumentException();
-        }
-
+    private void showDiaryItemDeleteConfirmationDiaryDialog(ItemNumber itemNumber) {
+        Objects.requireNonNull(itemNumber);
         if (!canShowOtherFragment()) return;
 
         NavDirections action =

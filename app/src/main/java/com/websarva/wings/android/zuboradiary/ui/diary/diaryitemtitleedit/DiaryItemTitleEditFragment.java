@@ -284,15 +284,15 @@ public class DiaryItemTitleEditFragment extends BaseFragment {
         navController.navigate(action);
     }
 
-    private void showDeleteConfirmationDialog(int itemPosition, String itemTitle) {
-        Objects.requireNonNull(itemTitle);
-        if (itemPosition < 0) throw new IllegalArgumentException();
+    private void showDeleteConfirmationDialog(int listItemPosition, String listItemTitle) {
+        Objects.requireNonNull(listItemTitle);
+        if (listItemPosition < 0) throw new IllegalArgumentException();
         if (!canShowOtherFragment()) return;
 
         NavDirections action =
                 DiaryItemTitleEditFragmentDirections
                         .actionDiaryItemTitleEditFragmentToDiaryItemTitleDeleteConfirmationDialog(
-                                itemPosition, itemTitle);
+                                listItemPosition, listItemTitle);
         navController.navigate(action);
     }
 

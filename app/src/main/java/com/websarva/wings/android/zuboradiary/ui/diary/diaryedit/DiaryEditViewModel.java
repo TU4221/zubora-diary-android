@@ -8,6 +8,7 @@ import com.websarva.wings.android.zuboradiary.data.AppError;
 import com.websarva.wings.android.zuboradiary.data.database.DiaryItemTitleSelectionHistoryItem;
 import com.websarva.wings.android.zuboradiary.data.database.DiaryRepository;
 import com.websarva.wings.android.zuboradiary.data.diary.Conditions;
+import com.websarva.wings.android.zuboradiary.data.diary.ItemNumber;
 import com.websarva.wings.android.zuboradiary.data.diary.Weathers;
 import com.websarva.wings.android.zuboradiary.data.network.GeoCoordinates;
 import com.websarva.wings.android.zuboradiary.data.network.WeatherApiCallable;
@@ -270,11 +271,13 @@ public class DiaryEditViewModel extends BaseViewModel {
         diaryLiveData.incrementVisibleItemsCount();
     }
 
-    void deleteItem(int itemNumber) {
+    void deleteItem(ItemNumber itemNumber) {
+        Objects.requireNonNull(itemNumber);
+
         diaryLiveData.deleteItem(itemNumber);
     }
 
-    void updateItemTitle(int itemNumber, String title) {
+    void updateItemTitle(ItemNumber itemNumber, String title) {
         Objects.requireNonNull(title);
 
         diaryLiveData.updateItemTitle(itemNumber, title);
@@ -336,59 +339,59 @@ public class DiaryEditViewModel extends BaseViewModel {
     }
 
     @NonNull
-    LiveData<String> getItemTitleLiveData(int itemNumber) {
+    LiveData<String> getItemTitleLiveData(ItemNumber itemNumber) {
         return diaryLiveData.getItemLiveData(itemNumber).getTitleMutableLiveData();
     }
 
     @NonNull
     public MutableLiveData<String> getItem1TitleMutableLiveData() {
-        return diaryLiveData.getItemLiveData(1).getTitleMutableLiveData();
+        return diaryLiveData.getItemLiveData(new ItemNumber(1)).getTitleMutableLiveData();
     }
 
     @NonNull
     public MutableLiveData<String> getItem2TitleMutableLiveData() {
-        return diaryLiveData.getItemLiveData(2).getTitleMutableLiveData();
+        return diaryLiveData.getItemLiveData(new ItemNumber(2)).getTitleMutableLiveData();
     }
 
 
     @NonNull
     public MutableLiveData<String> getItem3TitleMutableLiveData() {
-        return diaryLiveData.getItemLiveData(3).getTitleMutableLiveData();
+        return diaryLiveData.getItemLiveData(new ItemNumber(3)).getTitleMutableLiveData();
     }
 
     @NonNull
     public MutableLiveData<String> getItem4TitleMutableLiveData() {
-        return diaryLiveData.getItemLiveData(4).getTitleMutableLiveData();
+        return diaryLiveData.getItemLiveData(new ItemNumber(4)).getTitleMutableLiveData();
     }
 
     @NonNull
     public MutableLiveData<String> getItem5TitleMutableLiveData() {
-        return diaryLiveData.getItemLiveData(5).getTitleMutableLiveData();
+        return diaryLiveData.getItemLiveData(new ItemNumber(5)).getTitleMutableLiveData();
     }
 
     @NonNull
     public MutableLiveData<String> getItem1CommentMutableLiveData() {
-        return diaryLiveData.getItemLiveData(1).getCommentMutableLiveData();
+        return diaryLiveData.getItemLiveData(new ItemNumber(1)).getCommentMutableLiveData();
     }
 
     @NonNull
     public MutableLiveData<String> getItem2CommentMutableLiveData() {
-        return diaryLiveData.getItemLiveData(2).getCommentMutableLiveData();
+        return diaryLiveData.getItemLiveData(new ItemNumber(2)).getCommentMutableLiveData();
     }
 
     @NonNull
     public MutableLiveData<String> getItem3CommentMutableLiveData() {
-        return diaryLiveData.getItemLiveData(3).getCommentMutableLiveData();
+        return diaryLiveData.getItemLiveData(new ItemNumber(3)).getCommentMutableLiveData();
     }
 
     @NonNull
     public MutableLiveData<String> getItem4CommentMutableLiveData() {
-        return diaryLiveData.getItemLiveData(4).getCommentMutableLiveData();
+        return diaryLiveData.getItemLiveData(new ItemNumber(4)).getCommentMutableLiveData();
     }
 
     @NonNull
     public MutableLiveData<String> getItem5CommentMutableLiveData() {
-        return diaryLiveData.getItemLiveData(5).getCommentMutableLiveData();
+        return diaryLiveData.getItemLiveData(new ItemNumber(5)).getCommentMutableLiveData();
     }
 
 }

@@ -8,6 +8,7 @@ import android.text.style.ForegroundColorSpan;
 import androidx.annotation.NonNull;
 
 import com.websarva.wings.android.zuboradiary.data.database.WordSearchResultListItem;
+import com.websarva.wings.android.zuboradiary.data.diary.ItemNumber;
 
 import java.time.LocalDate;
 import java.util.HashMap;
@@ -17,7 +18,7 @@ import java.util.Objects;
 public class WordSearchResultDayListItem {
     private final LocalDate date;
     private final SpannableString title;
-    private final int itemNumber;
+    private final ItemNumber itemNumber;
     private final SpannableString itemTitle;
     private final SpannableString itemComment;
 
@@ -38,7 +39,7 @@ public class WordSearchResultDayListItem {
         Map<String, Object> diaryItem = extractTargetItem(wordSearchResultListItem, searchWord);
         Integer itemNumber = (Integer) diaryItem.get(KEY_ITEM_NUMBER);
         Objects.requireNonNull(itemNumber);
-        this.itemNumber = itemNumber;
+        this.itemNumber = new ItemNumber(itemNumber);
 
         String itemTitle = (String) diaryItem.get(KEY_ITEM_TITLE);
         Objects.requireNonNull(itemTitle);
@@ -142,7 +143,8 @@ public class WordSearchResultDayListItem {
         return this.title;
     }
 
-    public int getItemNumber() {
+    @NonNull
+    public ItemNumber getItemNumber() {
         return this.itemNumber;
     }
 

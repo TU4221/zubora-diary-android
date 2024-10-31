@@ -181,15 +181,16 @@ public class DiaryLiveData {
         this.numVisibleItems.setValue(incrementedNumVisibleItems);
     }
 
-    public void deleteItem(int itemNumber) {
+    public void deleteItem(ItemNumber itemNumber) {
         getItemLiveData(itemNumber).initialize();
         Integer numVisibleItems = this.numVisibleItems.getValue();
         Objects.requireNonNull(numVisibleItems);
-        if (itemNumber < numVisibleItems) {
-            int nextItemNumber;
-            for (int i = itemNumber; i < numVisibleItems; i++) {
-                nextItemNumber = i + 1;
-                getItemLiveData(i).update(
+
+        if (itemNumber.getValue() < numVisibleItems) {
+            for (int i = itemNumber.getValue(); i < numVisibleItems; i++) {
+                ItemNumber targetItemNumber = new ItemNumber(i);
+                ItemNumber nextItemNumber = new ItemNumber(i + 1);
+                getItemLiveData(targetItemNumber).update(
                         getItemLiveData(nextItemNumber).title.getValue(),
                         getItemLiveData(nextItemNumber).comment.getValue(),
                         getItemLiveData(nextItemNumber).titleUpdateLog.getValue()
@@ -197,13 +198,14 @@ public class DiaryLiveData {
                 getItemLiveData(nextItemNumber).initialize();
             }
         }
-        if (numVisibleItems > 1) {
+
+        if (numVisibleItems > ItemNumber.MIN_NUMBER) {
             Integer decrementedNumVisibleItems = numVisibleItems - 1;
             this.numVisibleItems.setValue(decrementedNumVisibleItems);
         }
     }
 
-    public void updateItemTitle(int itemNumber, String title) {
+    public void updateItemTitle(ItemNumber itemNumber, String title) {
         Objects.requireNonNull(title);
 
         getItemLiveData(itemNumber).updateItemTitle(title);
@@ -233,8 +235,10 @@ public class DiaryLiveData {
         return numVisibleItems;
     }
 
-    public DiaryItemLiveData getItemLiveData(int itemNumber) {
-        int arrayNumber = itemNumber - 1;
+    public DiaryItemLiveData getItemLiveData(ItemNumber itemNumber) {
+        Objects.requireNonNull(itemNumber);
+
+        int arrayNumber = itemNumber.getValue() - 1;
         return items[arrayNumber];
     }
 
