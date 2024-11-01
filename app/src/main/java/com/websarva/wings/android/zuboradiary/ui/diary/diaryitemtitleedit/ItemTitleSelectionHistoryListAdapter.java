@@ -14,11 +14,10 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.websarva.wings.android.zuboradiary.data.database.DiaryItemTitleSelectionHistoryItem;
 import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor;
 import com.websarva.wings.android.zuboradiary.databinding.RowItemTitleSelectionHistoryBinding;
+import com.websarva.wings.android.zuboradiary.ui.LeftSwipeSimpleCallback;
 import com.websarva.wings.android.zuboradiary.ui.ThemeColorInflaterCreator;
-import com.websarva.wings.android.zuboradiary.ui.list.DiaryYearMonthListAdapter;
 
 import java.util.Objects;
 
@@ -32,7 +31,7 @@ class ItemTitleSelectionHistoryListAdapter
     private OnClickItemListener onClickItemListener;
     private OnClickDeleteButtonListener onClickDeleteButtonListener;
 
-    private ItemTitleSelectionHistorySimpleCallback itemTitleSelectionHistorySimpleCallback;
+    private LeftSwipeSimpleCallback leftSwipeSimpleCallback;
 
     ItemTitleSelectionHistoryListAdapter(
             Context context, RecyclerView recyclerView, ThemeColor themeColor) {
@@ -48,9 +47,8 @@ class ItemTitleSelectionHistoryListAdapter
         recyclerView.addItemDecoration(
                 new DividerItemDecoration(context, DividerItemDecoration.VERTICAL)
         );
-        itemTitleSelectionHistorySimpleCallback =
-                new ItemTitleSelectionHistorySimpleCallback(recyclerView);
-        itemTitleSelectionHistorySimpleCallback.build();
+        leftSwipeSimpleCallback = new LeftSwipeSimpleCallback(recyclerView);
+        leftSwipeSimpleCallback.build();
     }
 
     @NonNull
@@ -109,7 +107,7 @@ class ItemTitleSelectionHistoryListAdapter
     }
 
     static class ItemTitleSelectionHistoryViewHolder
-            extends ItemTitleSelectionHistorySimpleCallback.LeftSwipeViewHolder {
+            extends LeftSwipeSimpleCallback.LeftSwipeViewHolder {
         public RowItemTitleSelectionHistoryBinding binding;
 
         ItemTitleSelectionHistoryViewHolder(RowItemTitleSelectionHistoryBinding binding) {
@@ -141,6 +139,6 @@ class ItemTitleSelectionHistoryListAdapter
     }
 
     void closeSwipedItem() {
-        itemTitleSelectionHistorySimpleCallback.closeSwipedItem();
+        leftSwipeSimpleCallback.closeSwipedItem();
     }
 }

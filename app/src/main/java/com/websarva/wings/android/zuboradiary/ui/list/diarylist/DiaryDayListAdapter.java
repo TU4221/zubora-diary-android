@@ -132,7 +132,7 @@ public class DiaryDayListAdapter extends ListAdapter<DiaryDayListItem, DiaryDayL
         }
 
         @Override
-        void setUpView(@NonNull ViewDataBinding binding) {
+        protected void setUpView(@NonNull ViewDataBinding binding) {
             RowDiaryDayListBinding rowDiaryDayListBinding;
             if (binding instanceof RowDiaryDayListBinding) {
                 rowDiaryDayListBinding = (RowDiaryDayListBinding) binding;
