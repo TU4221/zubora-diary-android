@@ -10,7 +10,7 @@ import com.websarva.wings.android.zuboradiary.ui.BaseAlertDialogFragment;
 
 import java.time.LocalDate;
 
-class DiaryDeleteConfirmationDialogFragment extends BaseAlertDialogFragment {
+public class DiaryDeleteConfirmationDialogFragment extends BaseAlertDialogFragment {
     private static final String fromClassName =
             "From" + DiaryDeleteConfirmationDialogFragment.class.getName();
     public static final String KEY_DELETE_DIARY_DATE = "DeleteDiaryDate" + fromClassName;

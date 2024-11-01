@@ -11,7 +11,7 @@ import java.time.LocalDate;
 import java.time.Year;
 import java.time.YearMonth;
 
-class StartYearMonthPickerDialogFragment extends BaseNumberPickersBottomSheetDialogFragment {
+public class StartYearMonthPickerDialogFragment extends BaseNumberPickersBottomSheetDialogFragment {
 
     private static final String fromClassName = "From" + StartYearMonthPickerDialogFragment.class.getName();
     static final String KEY_SELECTED_YEAR_MONTH = "SelectedYearMonth" + fromClassName;
