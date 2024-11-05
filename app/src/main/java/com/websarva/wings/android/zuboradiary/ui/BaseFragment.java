@@ -1,6 +1,5 @@
 package com.websarva.wings.android.zuboradiary.ui;
 
-import android.content.Context;
 import android.os.Bundle;
 import android.transition.Transition;
 import android.view.LayoutInflater;
@@ -10,7 +9,6 @@ import android.view.ViewGroup;
 import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.view.ContextThemeWrapper;
 import androidx.databinding.ViewDataBinding;
 import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.LifecycleEventObserver;
@@ -26,9 +24,9 @@ import com.google.android.material.transition.platform.MaterialFadeThrough;
 import com.google.android.material.transition.platform.MaterialSharedAxis;
 import com.websarva.wings.android.zuboradiary.MainActivity;
 import com.websarva.wings.android.zuboradiary.data.AppError;
+import com.websarva.wings.android.zuboradiary.data.AppErrorList;
 import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor;
 
-import java.util.List;
 import java.util.Objects;
 
 import dagger.internal.Preconditions;
@@ -40,7 +38,7 @@ public abstract class BaseFragment extends CustomFragment {
     protected int destinationId;
 
     @NonNull
-    protected MainActivity requireMainActivity() {
+    protected final MainActivity requireMainActivity() {
         return Objects.requireNonNull((MainActivity) requireActivity());
     }
 
@@ -54,6 +52,9 @@ public abstract class BaseFragment extends CustomFragment {
         destinationId = getCurrentDestinationId();
     }
 
+    /**
+     * BaseFragment#onCreate()で呼び出される。
+     * */
     protected abstract void initializeViewModel();
 
     private int getCurrentDestinationId() {
@@ -66,7 +67,7 @@ public abstract class BaseFragment extends CustomFragment {
     /**
      * 戻るボタン押下時の処理。
      * */
-    protected void addOnBackPressedCallback(OnBackPressedCallback callback) {
+    protected final void addOnBackPressedCallback(OnBackPressedCallback callback) {
         Objects.requireNonNull(callback);
 
         requireActivity().getOnBackPressedDispatcher().addCallback(this, callback);
@@ -86,6 +87,9 @@ public abstract class BaseFragment extends CustomFragment {
         return dataBinding.getRoot();
     }
 
+    /**
+     * BaseFragment#onCreateView()で呼び出される。
+     * */
     protected abstract ViewDataBinding initializeDataBinding(@NonNull LayoutInflater inflater, @NonNull ViewGroup container);
 
     // ThemeColorに合わせたインフレーター作成
@@ -129,7 +133,7 @@ public abstract class BaseFragment extends CustomFragment {
         mainActivity.resetTabWasSelected();
     }
 
-    protected void addTransitionListener(Transition.TransitionListener listener) {
+    protected final void addTransitionListener(Transition.TransitionListener listener) {
         Objects.requireNonNull(listener);
 
         MaterialSharedAxis enterTransition = (MaterialSharedAxis) getEnterTransition();
@@ -157,7 +161,7 @@ public abstract class BaseFragment extends CustomFragment {
         setUpErrorMessageDialog();
     }
 
-    @Nullable
+    @NonNull
     private SavedStateHandle getNavBackStackEntrySavedStateHandle() {
         NavBackStackEntry navBackStackEntry = navController.getCurrentBackStackEntry();
         Objects.requireNonNull(navBackStackEntry);
@@ -172,6 +176,10 @@ public abstract class BaseFragment extends CustomFragment {
         handleOnReceivingResultFromPreviousFragment(savedStateHandle);
     }
 
+
+    /**
+     * BaseFragment#setUpPreviousFragmentResultReceiver()で呼び出される。
+     * */
     protected abstract void handleOnReceivingResultFromPreviousFragment(@NonNull SavedStateHandle savedStateHandle);
 
     private void setUpDialogResultReceiver() {
@@ -188,7 +196,7 @@ public abstract class BaseFragment extends CustomFragment {
                     SavedStateHandle savedStateHandle = navBackStackEntry.getSavedStateHandle();
                     handleOnReceivingDialogResult(savedStateHandle);
                     retryErrorDialogShow();
-                    removeDialogResult(savedStateHandle);
+                    removeDialogResultOnDestroy(savedStateHandle);
                 }
             }
         };
@@ -202,7 +210,7 @@ public abstract class BaseFragment extends CustomFragment {
                     // MEMO:removeで削除しないとこのFragmentを閉じてもResult内容が残ってしまう。
                     //      その為、このFragmentを再表示した時にObserverがResultの内容で処理してしまう。
                     SavedStateHandle savedStateHandle = navBackStackEntry.getSavedStateHandle();
-                    removeDialogResult(savedStateHandle);
+                    removeDialogResultOnDestroy(savedStateHandle);
                     // TODO:下記コード意味あるか検証。コメントアウトしてFragment切替後の状態を確認したがObserverが重複することはなかった。
                     navBackStackEntry.getLifecycle().removeObserver(lifecycleEventObserver);
                 }
@@ -210,17 +218,21 @@ public abstract class BaseFragment extends CustomFragment {
         });
     }
 
+    /**
+     * BaseFragment#setUpDialogResultReceiver()で呼び出される。
+     * */
     protected abstract void handleOnReceivingDialogResult(@NonNull SavedStateHandle savedStateHandle);
 
-    protected abstract void removeDialogResult(@NonNull SavedStateHandle savedStateHandle);
+    /**
+     * BaseFragment#setUpDialogResultReceiver()で呼び出される。
+     * */
+    protected abstract void removeDialogResultOnDestroy(@NonNull SavedStateHandle savedStateHandle);
 
     @Nullable
     public <T> T receiveResulFromDialog(String key) {
         Objects.requireNonNull(key);
 
         SavedStateHandle savedStateHandle = getNavBackStackEntrySavedStateHandle();
-        if (savedStateHandle == null) return null;
-
         boolean containsDialogResult = savedStateHandle.contains(key);
         if (!containsDialogResult) return null;
 
@@ -228,11 +240,12 @@ public abstract class BaseFragment extends CustomFragment {
     }
 
     /**
+     * BaseFragment#setUpDialogResultReceiver()で呼び出される。
      * BaseViewModelのAppErrorBufferListのObserverを設定する。
      * */
     protected abstract void setUpErrorMessageDialog();
 
-    protected class AppErrorBufferListObserver implements Observer<List<AppError>> {
+    protected final class AppErrorBufferListObserver implements Observer<AppErrorList> {
 
         BaseViewModel baseViewModel;
 
@@ -243,13 +256,12 @@ public abstract class BaseFragment extends CustomFragment {
         }
 
         @Override
-        public void onChanged(List<AppError> appErrors) {
-            Objects.requireNonNull(appErrors);
-            appErrors.stream().forEach(Objects::requireNonNull);
-            if (appErrors.isEmpty()) return;
+        public void onChanged(AppErrorList appErrorList) {
+            Objects.requireNonNull(appErrorList);
+            if (appErrorList.isEmpty()) return;
 
-            AppError appError = appErrors.get(0);
-            showErrorMessageDialog(appError);
+            AppError firstAppError = appErrorList.findFirstAppError();
+            showErrorMessageDialog(firstAppError);
             baseViewModel.removeAppErrorBufferListFirstItem();
         }
     }
@@ -263,10 +275,13 @@ public abstract class BaseFragment extends CustomFragment {
         showMessageDialog(dialogTitle, dialogMessage);
     }
 
-    protected boolean canShowOtherFragment() {
+    protected final boolean canShowOtherFragment() {
         return destinationId == getCurrentDestinationId();
     }
 
+    /**
+     * BaseFragment#showErrorMessageDialog()で呼び出される。
+     * */
     protected abstract void showMessageDialog(@NonNull String title,@NonNull  String message);
 
     protected abstract void retryErrorDialogShow();

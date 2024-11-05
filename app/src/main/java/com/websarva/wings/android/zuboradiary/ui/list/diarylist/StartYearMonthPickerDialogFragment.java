@@ -5,6 +5,7 @@ import android.view.View;
 
 import androidx.annotation.NonNull;
 
+import com.websarva.wings.android.zuboradiary.databinding.DialogFragmentNumberPickersBinding;
 import com.websarva.wings.android.zuboradiary.ui.BaseNumberPickersBottomSheetDialogFragment;
 
 import java.time.LocalDate;
@@ -22,7 +23,7 @@ public class StartYearMonthPickerDialogFragment extends BaseNumberPickersBottomS
     }
 
     @Override
-    protected void handlePositiveButton(@NonNull View v) {
+    protected void handleOnClickPositiveButton(@NonNull View v) {
         setResultSelectedYearMonth();
     }
 
@@ -37,35 +38,35 @@ public class StartYearMonthPickerDialogFragment extends BaseNumberPickersBottomS
     }
 
     @Override
-    protected void handleNegativeButton(@NonNull View v) {
+    protected void handleOnClickNegativeButton(@NonNull View v) {
         // 処理なし
     }
 
     @Override
-    protected void handleCancel(@NonNull DialogInterface dialog) {
+    protected void handleOnCancel(@NonNull DialogInterface dialog) {
         // 処理なし
     }
 
     @Override
-    protected void handleDismiss() {
+    protected void handleOnDismiss() {
         // 処理なし
     }
 
     @Override
-    protected void setUpNumberPickers() {
+    protected void setUpNumberPickers(DialogFragmentNumberPickersBinding binding) {
         LocalDate today = LocalDate.now();
         Year maxYear =
                 StartYearMonthPickerDialogFragmentArgs.fromBundle(requireArguments()).getYearMaxValue();
         Year minYear =
                 StartYearMonthPickerDialogFragmentArgs.fromBundle(requireArguments()).getYearMinValue();
-        binding.numberPickerFirst.setMaxValue(maxYear.getValue());
-        binding.numberPickerFirst.setMinValue(minYear.getValue());
-        binding.numberPickerFirst.setValue(today.getYear());
-        binding.numberPickerFirst.setWrapSelectorWheel(false);
-        binding.numberPickerSecond.setMaxValue(12);
-        binding.numberPickerSecond.setMinValue(1);
-        binding.numberPickerSecond.setValue(today.getMonthValue());
-        binding.numberPickerSecond.setWrapSelectorWheel(false);
-        binding.numberPickerThird.setVisibility(View.GONE);
+        this.binding.numberPickerFirst.setMaxValue(maxYear.getValue());
+        this.binding.numberPickerFirst.setMinValue(minYear.getValue());
+        this.binding.numberPickerFirst.setValue(today.getYear());
+        this.binding.numberPickerFirst.setWrapSelectorWheel(false);
+        this.binding.numberPickerSecond.setMaxValue(12);
+        this.binding.numberPickerSecond.setMinValue(1);
+        this.binding.numberPickerSecond.setValue(today.getMonthValue());
+        this.binding.numberPickerSecond.setWrapSelectorWheel(false);
+        this.binding.numberPickerThird.setVisibility(View.GONE);
     }
 }

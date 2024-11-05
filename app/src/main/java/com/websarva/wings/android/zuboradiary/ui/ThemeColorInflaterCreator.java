@@ -7,19 +7,18 @@ import androidx.appcompat.view.ContextThemeWrapper;
 
 import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor;
 
-import java.util.zip.Inflater;
-
-import dagger.internal.Preconditions;
+import java.util.Objects;
 
 public class ThemeColorInflaterCreator {
 
-    Context context;
-    LayoutInflater inflater;
-    ThemeColor themeColor;
+    private final Context context;
+    private final LayoutInflater inflater;
+    private final ThemeColor themeColor;
 
     public ThemeColorInflaterCreator(Context context, LayoutInflater inflater, ThemeColor themeColor) {
-        Preconditions.checkNotNull(inflater);
-        Preconditions.checkNotNull(themeColor);
+        Objects.requireNonNull(context);
+        Objects.requireNonNull(inflater);
+        Objects.requireNonNull(themeColor);
 
         this.context = context;
         this.inflater = inflater;

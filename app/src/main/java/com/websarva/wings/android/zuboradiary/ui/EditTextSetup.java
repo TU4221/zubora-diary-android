@@ -6,19 +6,11 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.transition.Transition;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
-
-import androidx.annotation.NonNull;
-
-import com.google.android.material.textfield.TextInputEditText;
-import com.google.android.material.textfield.TextInputLayout;
-import com.websarva.wings.android.zuboradiary.R;
 
 import java.util.Arrays;
 import java.util.Objects;
@@ -67,27 +59,15 @@ public class EditTextSetup {
         private void setUpEditTextScrollable(View focusedView) {
             Objects.requireNonNull(focusedView);
 
-            if (focusedView instanceof EditText) {
-                EditText a = (EditText) focusedView;
-                if (a.getMinLines() > 1) {
-                    focusedView.setOnTouchListener(new ScrollableTextOnTouchListener());
-                }
-            } else {
-                throw new IllegalArgumentException();
-            }
+            EditText editText = (EditText) focusedView;
+            if (editText.getMinLines() > 1) focusedView.setOnTouchListener(new ScrollableTextOnTouchListener());
         }
 
         private void resetEditTextScrollable(View focusedView) {
             Objects.requireNonNull(focusedView);
 
-            if (focusedView instanceof EditText) {
-                EditText a = (EditText) focusedView;
-                if (a.getMinLines() > 1) {
-                    focusedView.setOnTouchListener(null);
-                }
-            } else {
-                throw new IllegalArgumentException();
-            }
+            EditText editText = (EditText) focusedView;
+            if (editText.getMinLines() > 1) focusedView.setOnTouchListener(null);
         }
 
         private static class ScrollableTextOnTouchListener implements View.OnTouchListener {

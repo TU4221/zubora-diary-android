@@ -104,7 +104,7 @@ public class WordSearchFragment extends BaseFragment {
     }
 
     @Override
-    protected void removeDialogResult(@NonNull SavedStateHandle savedStateHandle) {
+    protected void removeDialogResultOnDestroy(@NonNull SavedStateHandle savedStateHandle) {
         // LifecycleEventObserverにダイアログからの結果受取処理コードを記述したら、ここに削除処理を記述する。
     }
 

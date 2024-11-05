@@ -198,8 +198,7 @@ public class SettingsViewModel extends BaseViewModel {
     }
 
     private void addSettingLoadingError() {
-        AppError lastAppError = getAppErrorBufferListLastValue();
-        if (lastAppError == AppError.SETTING_LOADING) return;  // 設定更新エラー通知の重複防止
+        if (equalLastAppError(AppError.SETTING_LOADING)) return;  // 設定更新エラー通知の重複防止
         addAppError(AppError.SETTING_LOADING);
     }
 
@@ -285,8 +284,7 @@ public class SettingsViewModel extends BaseViewModel {
             public void accept(Throwable throwable) {
                 Objects.requireNonNull(throwable);
 
-                AppError lastAppError = getAppErrorBufferListLastValue();
-                if (lastAppError == AppError.SETTING_UPDATE) return; // 設定更新エラー通知の重複防止
+                if (equalLastAppError(AppError.SETTING_UPDATE)) return; // 設定更新エラー通知の重複防止
                 addAppError(AppError.SETTING_UPDATE);
             }
         }));

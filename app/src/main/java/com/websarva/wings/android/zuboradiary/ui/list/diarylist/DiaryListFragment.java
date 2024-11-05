@@ -98,7 +98,7 @@ public class DiaryListFragment extends BaseFragment {
     }
 
     @Override
-    protected void removeDialogResult(@NonNull SavedStateHandle savedStateHandle) {
+    protected void removeDialogResultOnDestroy(@NonNull SavedStateHandle savedStateHandle) {
         savedStateHandle.remove(StartYearMonthPickerDialogFragment.KEY_SELECTED_YEAR_MONTH);
         savedStateHandle.remove(DiaryDeleteConfirmationDialogFragment.KEY_DELETE_DIARY_DATE);
     }

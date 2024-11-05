@@ -24,7 +24,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.materialswitch.MaterialSwitch;
 import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor;
 
-import dagger.internal.Preconditions;
+import java.util.Objects;
 
 /**
  * Enum ThemeColorをもとにViewの色を変更するクラス。
@@ -38,32 +38,32 @@ public class BaseThemeColorSwitcher {
     protected final ThemeColor themeColor;
 
     public BaseThemeColorSwitcher(Context context, ThemeColor themeColor) {
-        Preconditions.checkNotNull(context);
-        Preconditions.checkNotNull(themeColor);
+        Objects.requireNonNull(context);
+        Objects.requireNonNull(themeColor);
 
         resources = context.getResources();
-        Preconditions.checkNotNull(resources);
+        Objects.requireNonNull(resources);
 
         this.context = context;
         this.themeColor = themeColor;
     }
 
     public final void switchBackgroundColor(View view) {
-        Preconditions.checkNotNull(view);
+        Objects.requireNonNull(view);
 
         int surfaceColor = themeColor.getSurfaceColor(resources);
         switchViewColor(view, surfaceColor);
     }
 
     public final void switchTextColorOnBackground(ColorSwitchingViewList<TextView> viewList) {
-        Preconditions.checkNotNull(viewList);
+        Objects.requireNonNull(viewList);
 
         int onSurfaceColor = themeColor.getOnSurfaceColor(resources);
         switchTextViewsColorOnlyText(viewList, onSurfaceColor);
     }
 
     public final void switchStatusBarColor(Window window) {
-        Preconditions.checkNotNull(window);
+        Objects.requireNonNull(window);
 
         int surfaceColor = themeColor.getSurfaceColor(resources);
         window.setStatusBarColor(surfaceColor);
@@ -74,7 +74,7 @@ public class BaseThemeColorSwitcher {
     }
 
     public final void switchBottomNavigationColor(BottomNavigationView view) {
-        Preconditions.checkNotNull(view);
+        Objects.requireNonNull(view);
 
         switchBottomNavigationBackgroundColor(view);
         switchBottomNavigationItemRippleColor(view);
@@ -84,14 +84,14 @@ public class BaseThemeColorSwitcher {
     }
 
     private void switchBottomNavigationBackgroundColor (BottomNavigationView view) {
-        Preconditions.checkNotNull(view);
+        Objects.requireNonNull(view);
 
         int color = themeColor.getSurfaceContainerColor(resources);
         view.setBackgroundTintList(ColorStateList.valueOf(color));
     }
 
     private void switchBottomNavigationItemRippleColor(BottomNavigationView view) {
-        Preconditions.checkNotNull(view);
+        Objects.requireNonNull(view);
 
         int checkedColor = themeColor.getPrimaryColor(resources);
         int unCheckedColor = themeColor.getOnSurfaceVariantColor(resources);
@@ -100,7 +100,7 @@ public class BaseThemeColorSwitcher {
     }
 
     private void switchBottomNavigationItemTextColor(BottomNavigationView view) {
-        Preconditions.checkNotNull(view);
+        Objects.requireNonNull(view);
 
         int checkedColor = themeColor.getOnSurfaceColor(resources);
         int unCheckedColor = themeColor.getOnSurfaceVariantColor(resources);
@@ -109,7 +109,7 @@ public class BaseThemeColorSwitcher {
     }
 
     private void switchBottomNavigationItemIconColor(BottomNavigationView view) {
-        Preconditions.checkNotNull(view);
+        Objects.requireNonNull(view);
 
         int checkedColor = themeColor.getOnSecondaryContainerColor(resources);
         int unCheckedColor = themeColor.getOnSurfaceVariantColor(resources);
@@ -118,14 +118,14 @@ public class BaseThemeColorSwitcher {
     }
 
     private void switchBottomNavigationActiveIndicatorColor(BottomNavigationView view) {
-        Preconditions.checkNotNull(view);
+        Objects.requireNonNull(view);
 
         int secondaryContainerColor = themeColor.getSecondaryContainerColor(resources);
         view.setItemActiveIndicatorColor(ColorStateList.valueOf(secondaryContainerColor));
     }
 
     public final void switchToolbarColor(MaterialToolbar toolbar) {
-        Preconditions.checkNotNull(toolbar);
+        Objects.requireNonNull(toolbar);
 
         int surfaceColor = themeColor.getSurfaceColor(resources);
         int onSurfaceColor = themeColor.getOnSurfaceColor(resources);
@@ -137,7 +137,7 @@ public class BaseThemeColorSwitcher {
     }
 
     private void switchToolbarNavigationIconColor(MaterialToolbar toolbar, int color) {
-        Preconditions.checkNotNull(toolbar);
+        Objects.requireNonNull(toolbar);
 
         Drawable navigationIcon = toolbar.getNavigationIcon();
         if (navigationIcon == null) {
@@ -148,7 +148,7 @@ public class BaseThemeColorSwitcher {
     }
 
     private void switchToolbarMenuColor(MaterialToolbar toolbar, int color) {
-        Preconditions.checkNotNull(toolbar);
+        Objects.requireNonNull(toolbar);
 
         Drawable menuIcon = toolbar.getOverflowIcon();
         if (menuIcon != null) {
@@ -164,7 +164,7 @@ public class BaseThemeColorSwitcher {
     }
 
     private void switchToolbarMenuIconColor(MaterialToolbar toolbar, int color) {
-        Preconditions.checkNotNull(toolbar);
+        Objects.requireNonNull(toolbar);
 
         Menu menu = toolbar.getMenu();
         if (menu == null) {
@@ -185,7 +185,7 @@ public class BaseThemeColorSwitcher {
     }
 
     public final void switchFloatingActionButtonColor(ColorSwitchingViewList<FloatingActionButton> fabList) {
-        Preconditions.checkNotNull(fabList);
+        Objects.requireNonNull(fabList);
 
         int primaryContainerColor = themeColor.getPrimaryContainerColor(resources);
         int onPrimaryContainerColor = themeColor.getOnPrimaryContainerColor(resources);
@@ -196,7 +196,7 @@ public class BaseThemeColorSwitcher {
     }
 
     public final void switchSwitchColor(ColorSwitchingViewList<MaterialSwitch> switchList) {
-        Preconditions.checkNotNull(switchList);
+        Objects.requireNonNull(switchList);
 
         switchSwitchThumbColor(switchList);
         switchSwitchThumbIconColor(switchList);
@@ -204,7 +204,7 @@ public class BaseThemeColorSwitcher {
     }
 
     private void switchSwitchThumbColor(ColorSwitchingViewList<MaterialSwitch> switchList) {
-        Preconditions.checkNotNull(switchList);
+        Objects.requireNonNull(switchList);
 
         int checkedColor = themeColor.getOnPrimaryColor(resources);
         int unCheckedColor = themeColor.getOutlineColor(resources);
@@ -213,7 +213,7 @@ public class BaseThemeColorSwitcher {
     }
 
     private void switchSwitchThumbIconColor(ColorSwitchingViewList<MaterialSwitch> switchList) {
-        Preconditions.checkNotNull(switchList);
+        Objects.requireNonNull(switchList);
 
         int checkedColor = themeColor.getOnPrimaryContainerColor(resources);
         int unCheckedColor = themeColor.getSurfaceContainerHighestColor(resources);
@@ -222,7 +222,7 @@ public class BaseThemeColorSwitcher {
     }
 
     private void switchSwitchTrackColor(ColorSwitchingViewList<MaterialSwitch> switchList) {
-        Preconditions.checkNotNull(switchList);
+        Objects.requireNonNull(switchList);
 
         int checkedColor = themeColor.getPrimaryColor(resources);
         int unCheckedColor = themeColor.getSurfaceContainerHighestColor(resources);
@@ -231,7 +231,7 @@ public class BaseThemeColorSwitcher {
     }
 
     public final void switchButtonColor(ColorSwitchingViewList<Button> buttonList) {
-        Preconditions.checkNotNull(buttonList);
+        Objects.requireNonNull(buttonList);
 
         int color = themeColor.getPrimaryColor(resources);
         int onColor = themeColor.getOnPrimaryColor(resources);
@@ -243,29 +243,29 @@ public class BaseThemeColorSwitcher {
     }
 
     public final void switchImageButtonColor(ColorSwitchingViewList<ImageButton> imageButtonList) {
-        Preconditions.checkNotNull(imageButtonList);
+        Objects.requireNonNull(imageButtonList);
 
         int color = themeColor.getPrimaryColor(resources);
         imageButtonList.getViewList().stream()
                 .forEach(x -> x.setImageTintList(ColorStateList.valueOf(color)));
     }
 
-    public void switchImageViewColor(ColorSwitchingViewList<ImageView> imageViewList) {
-        Preconditions.checkNotNull(imageViewList);
+    public final void switchImageViewColor(ColorSwitchingViewList<ImageView> imageViewList) {
+        Objects.requireNonNull(imageViewList);
 
         int color = themeColor.getSecondaryColor(resources);
         imageViewList.getViewList().stream().forEach(x -> switchImageView(x, color));
     }
 
-    public void switchCircularProgressBarColor(ProgressBar progressBar) {
-        Preconditions.checkNotNull(progressBar);
+    public final void switchCircularProgressBarColor(ProgressBar progressBar) {
+        Objects.requireNonNull(progressBar);
 
         int color = themeColor.getPrimaryContainerColor(resources);
         progressBar.getIndeterminateDrawable().setTint(color);
     }
 
-    public void switchDividerColor(ColorSwitchingViewList<MaterialDivider> divider) {
-        Preconditions.checkNotNull(divider);
+    public final void switchDividerColor(ColorSwitchingViewList<MaterialDivider> divider) {
+        Objects.requireNonNull(divider);
 
         int color = themeColor.getOutlineVariantColor(resources);
         divider.getViewList().stream().forEach(x -> x.setDividerColor(color));
@@ -273,50 +273,50 @@ public class BaseThemeColorSwitcher {
 
     // 共通処理
     protected final void switchViewsColor(ColorSwitchingViewList<View> viewList, int color) {
-        Preconditions.checkNotNull(viewList);
+        Objects.requireNonNull(viewList);
 
         viewList.getViewList().stream().forEach(x -> switchViewColor(x, color));
     }
 
     protected final void switchViewColor(View view, int color) {
-        Preconditions.checkNotNull(view);
+        Objects.requireNonNull(view);
 
         view.setBackgroundColor(color);
     }
 
     protected final void switchTextViewsColor(ColorSwitchingViewList<TextView> viewList, int color, int onColor) {
-        Preconditions.checkNotNull(viewList);
+        Objects.requireNonNull(viewList);
 
         viewList.getViewList().stream().forEach(x -> switchTextViewColor(x, color, onColor));
     }
 
     protected final void switchTextViewColor(TextView view, int color, int onColor) {
-        Preconditions.checkNotNull(view);
+        Objects.requireNonNull(view);
 
         view.setBackgroundColor(color);
         view.setTextColor(onColor);
     }
 
     protected final void switchTextViewsColorOnlyText(ColorSwitchingViewList<TextView> viewList, int onColor) {
-        Preconditions.checkNotNull(viewList);
+        Objects.requireNonNull(viewList);
 
         viewList.getViewList().stream().forEach(x -> switchTextViewColorOnlyText(x, onColor));
     }
 
     protected final void switchTextViewColorOnlyText(TextView view, int color) {
-        Preconditions.checkNotNull(view);
+        Objects.requireNonNull(view);
 
         view.setTextColor(color);
     }
 
     protected final void switchTextViewsColorOnlyIcon(ColorSwitchingViewList<TextView> viewList, int color) {
-        Preconditions.checkNotNull(viewList);
+        Objects.requireNonNull(viewList);
 
         viewList.getViewList().stream().forEach(x -> switchTextViewColorOnlyIcon(x, color));
     }
 
     protected final void switchTextViewColorOnlyIcon(TextView view, int color) {
-        Preconditions.checkNotNull(view);
+        Objects.requireNonNull(view);
 
         Drawable[] drawables = view.getCompoundDrawablesRelative();
         Drawable[] wrappedDrawable = new Drawable[drawables.length];
@@ -333,14 +333,14 @@ public class BaseThemeColorSwitcher {
     }
 
     protected final void switchImageView(ImageView imageView, int color) {
-        Preconditions.checkNotNull(imageView);
+        Objects.requireNonNull(imageView);
 
         Drawable drawable = imageView.getDrawable();
         switchDrawableColor(drawable, color);
     }
 
     protected final void switchDrawableColor(Drawable drawable, int color) {
-        Preconditions.checkNotNull(drawable);
+        Objects.requireNonNull(drawable);
 
         drawable.setTint(color);
     }

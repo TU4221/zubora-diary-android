@@ -113,7 +113,7 @@ public class DiaryShowFragment extends BaseFragment {
     }
 
     @Override
-    protected void removeDialogResult(@NonNull SavedStateHandle savedStateHandle) {
+    protected void removeDialogResultOnDestroy(@NonNull SavedStateHandle savedStateHandle) {
         savedStateHandle.remove(DiaryDeleteConfirmationDialogFragment.KEY_SELECTED_BUTTON);
     }
 

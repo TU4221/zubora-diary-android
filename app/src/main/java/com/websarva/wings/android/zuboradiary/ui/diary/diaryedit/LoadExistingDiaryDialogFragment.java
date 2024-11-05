@@ -41,12 +41,12 @@ public class LoadExistingDiaryDialogFragment extends BaseAlertDialogFragment {
     }
 
     @Override
-    protected void handlePositiveButton(@NonNull DialogInterface dialog, int which) {
+    protected void handleOnClickPositiveButton(@NonNull DialogInterface dialog, int which) {
         setResult(KEY_SELECTED_BUTTON, DialogInterface.BUTTON_POSITIVE);
     }
 
     @Override
-    protected void handleNegativeButton(@NonNull DialogInterface dialog, int which) {
+    protected void handleOnClickNegativeButton(@NonNull DialogInterface dialog, int which) {
         setResult(KEY_SELECTED_BUTTON, DialogInterface.BUTTON_NEGATIVE);
     }
 
@@ -56,12 +56,12 @@ public class LoadExistingDiaryDialogFragment extends BaseAlertDialogFragment {
     }
 
     @Override
-    protected void handleCancel(@NonNull DialogInterface dialog) {
+    protected void handleOnCancel(@NonNull DialogInterface dialog) {
         setResult(KEY_SELECTED_BUTTON, DialogInterface.BUTTON_NEGATIVE);
     }
 
     @Override
-    protected void handleDismiss() {
+    protected void handleOnDismiss() {
         // 処理なし
     }
 }

@@ -6,7 +6,6 @@ import android.view.View;
 import androidx.annotation.NonNull;
 
 import com.websarva.wings.android.zuboradiary.data.DayOfWeekStringConverter;
-import com.websarva.wings.android.zuboradiary.data.preferences.CalendarStartDayOfWeekPreferenceValue;
 import com.websarva.wings.android.zuboradiary.databinding.DialogFragmentNumberPickersBinding;
 import com.websarva.wings.android.zuboradiary.ui.BaseNumberPickersBottomSheetDialogFragment;
 
@@ -23,7 +22,7 @@ public class CalendarStartDayPickerDialogFragment extends BaseNumberPickersBotto
     }
 
     @Override
-    protected void handlePositiveButton(@NonNull View v) {
+    protected void handleOnClickPositiveButton(@NonNull View v) {
         setResultSelectedDayOfWeek();
     }
 
@@ -40,30 +39,30 @@ public class CalendarStartDayPickerDialogFragment extends BaseNumberPickersBotto
     }
 
     @Override
-    protected void handleNegativeButton(@NonNull View v) {
+    protected void handleOnClickNegativeButton(@NonNull View v) {
         // 処理なし
     }
 
     @Override
-    protected void handleCancel(@NonNull DialogInterface dialog) {
+    protected void handleOnCancel(@NonNull DialogInterface dialog) {
         // 処理なし
     }
 
     @Override
-    protected void handleDismiss() {
+    protected void handleOnDismiss() {
         // 処理なし
     }
 
     @Override
-    protected void setUpNumberPickers() {
+    protected void setUpNumberPickers(DialogFragmentNumberPickersBinding binding) {
         int maxNumDaysOfWeek = DayOfWeek.values().length;
-        binding.numberPickerFirst.setMaxValue(maxNumDaysOfWeek - 1);
-        binding.numberPickerFirst.setMinValue(0);
-        setUpInitialValue(binding);
-        setUpDisplayedValues(binding);
-        binding.numberPickerFirst.setWrapSelectorWheel(false);
-        binding.numberPickerSecond.setVisibility(View.GONE);
-        binding.numberPickerThird.setVisibility(View.GONE);
+        this.binding.numberPickerFirst.setMaxValue(maxNumDaysOfWeek - 1);
+        this.binding.numberPickerFirst.setMinValue(0);
+        setUpInitialValue(this.binding);
+        setUpDisplayedValues(this.binding);
+        this.binding.numberPickerFirst.setWrapSelectorWheel(false);
+        this.binding.numberPickerSecond.setVisibility(View.GONE);
+        this.binding.numberPickerThird.setVisibility(View.GONE);
     }
 
     private void setUpInitialValue(DialogFragmentNumberPickersBinding binding) {

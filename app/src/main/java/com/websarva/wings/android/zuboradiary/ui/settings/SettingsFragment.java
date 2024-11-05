@@ -172,7 +172,7 @@ public class SettingsFragment extends BaseFragment {
     }
 
     @Override
-    protected void removeDialogResult(@NonNull SavedStateHandle savedStateHandle) {
+    protected void removeDialogResultOnDestroy(@NonNull SavedStateHandle savedStateHandle) {
         savedStateHandle.remove(ThemeColorPickerDialogFragment.KEY_SELECTED_THEME_COLOR);
         savedStateHandle.remove(CalendarStartDayPickerDialogFragment.KEY_SELECTED_DAY_OF_WEEK);
         savedStateHandle.remove(ReminderNotificationTimePickerDialogFragment.KEY_SELECTED_BUTTON);

@@ -1,15 +1,9 @@
 package com.websarva.wings.android.zuboradiary.ui;
 
-import static android.text.InputType.TYPE_TEXT_FLAG_MULTI_LINE;
-
-import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.transition.Transition;
-import android.util.Log;
-import android.view.KeyEvent;
-import android.view.MotionEvent;
 import android.view.View;
 import android.widget.EditText;
 
@@ -92,7 +86,8 @@ public class TextInputSetup extends EditTextSetup {
 
     public static class ClearButtonSetUpTransitionListener implements Transition.TransitionListener {
 
-        TextInputLayout[] textInputLayouts;
+        private final TextInputLayout[] textInputLayouts;
+
         private ClearButtonSetUpTransitionListener(TextInputLayout... textInputLayouts) {
             Objects.requireNonNull(textInputLayouts);
             Arrays.stream(textInputLayouts).forEach(Objects::requireNonNull);
@@ -139,18 +134,24 @@ public class TextInputSetup extends EditTextSetup {
             Arrays.stream(textInputLayouts).forEach(x -> {
                 x.setEndIconMode(TextInputLayout.END_ICON_CUSTOM);
                 x.setEndIconDrawable(R.drawable.ic_cancel_24px);
+
                 TextInputEditText textInputEditText = (TextInputEditText) x.getEditText();
                 Objects.requireNonNull(textInputEditText);
+
                 Editable text = textInputEditText.getText();
                 Objects.requireNonNull(text);
+
                 boolean isVisible = !text.toString().isEmpty();
                 x.setEndIconVisible(isVisible);
                 x.setEndIconOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
+                        Objects.requireNonNull(v);
+
                         textInputEditText.setText("");
                     }
                 });
+
                 ClearButtonVisibleSwitchingTextWatcher textWatcher = new ClearButtonVisibleSwitchingTextWatcher(x);
                 textInputEditText.addTextChangedListener(textWatcher);
             });

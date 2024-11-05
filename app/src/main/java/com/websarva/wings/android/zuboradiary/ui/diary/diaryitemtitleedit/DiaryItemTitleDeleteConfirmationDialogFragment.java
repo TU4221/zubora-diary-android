@@ -29,12 +29,12 @@ public class DiaryItemTitleDeleteConfirmationDialogFragment extends BaseAlertDia
     }
 
     @Override
-    protected void handlePositiveButton(@NonNull DialogInterface dialog, int which) {
+    protected void handleOnClickPositiveButton(@NonNull DialogInterface dialog, int which) {
         processResults(DialogInterface.BUTTON_POSITIVE);
     }
 
     @Override
-    protected void handleNegativeButton(@NonNull DialogInterface dialog, int which) {
+    protected void handleOnClickNegativeButton(@NonNull DialogInterface dialog, int which) {
         processResults(DialogInterface.BUTTON_NEGATIVE);
     }
 
@@ -44,7 +44,7 @@ public class DiaryItemTitleDeleteConfirmationDialogFragment extends BaseAlertDia
     }
 
     @Override
-    protected void handleCancel(@NonNull DialogInterface dialog) {
+    protected void handleOnCancel(@NonNull DialogInterface dialog) {
         processResults(DialogInterface.BUTTON_NEGATIVE);
     }
 
@@ -58,7 +58,7 @@ public class DiaryItemTitleDeleteConfirmationDialogFragment extends BaseAlertDia
     }
 
     @Override
-    protected void handleDismiss() {
+    protected void handleOnDismiss() {
         // 処理なし
     }
 }

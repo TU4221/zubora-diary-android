@@ -4,6 +4,8 @@ import android.content.DialogInterface;
 
 import androidx.annotation.NonNull;
 
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+
 public class MessageDialogFragment extends BaseAlertDialogFragment {
 
     @Override
@@ -17,12 +19,12 @@ public class MessageDialogFragment extends BaseAlertDialogFragment {
     }
 
     @Override
-    protected void handlePositiveButton(@NonNull DialogInterface dialog, int which) {
+    protected void handleOnClickPositiveButton(@NonNull DialogInterface dialog, int which) {
         // 処理なし
     }
 
     @Override
-    protected void handleNegativeButton(@NonNull DialogInterface dialog, int which) {
+    protected void handleOnClickNegativeButton(@NonNull DialogInterface dialog, int which) {
         // 処理なし
     }
 
@@ -32,12 +34,18 @@ public class MessageDialogFragment extends BaseAlertDialogFragment {
     }
 
     @Override
-    protected void handleCancel(@NonNull DialogInterface dialog) {
+    protected void handleOnCancel(@NonNull DialogInterface dialog) {
         // 処理なし
     }
 
     @Override
-    protected void handleDismiss() {
+    protected void handleOnDismiss() {
         // 処理なし
+    }
+
+    @Override
+    protected void customizeDialog(MaterialAlertDialogBuilder builder) {
+        super.customizeDialog(builder);
+        builder.setNegativeButton("", null);
     }
 }

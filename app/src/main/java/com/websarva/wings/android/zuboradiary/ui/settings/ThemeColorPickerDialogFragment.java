@@ -6,6 +6,7 @@ import android.view.View;
 import androidx.annotation.NonNull;
 
 import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor;
+import com.websarva.wings.android.zuboradiary.databinding.DialogFragmentNumberPickersBinding;
 import com.websarva.wings.android.zuboradiary.ui.BaseNumberPickersBottomSheetDialogFragment;
 
 public class ThemeColorPickerDialogFragment extends BaseNumberPickersBottomSheetDialogFragment {
@@ -19,7 +20,7 @@ public class ThemeColorPickerDialogFragment extends BaseNumberPickersBottomSheet
     }
 
     @Override
-    protected void handlePositiveButton(@NonNull View v) {
+    protected void handleOnClickPositiveButton(@NonNull View v) {
         setResultSelectedThemeColor();
     }
 
@@ -31,30 +32,30 @@ public class ThemeColorPickerDialogFragment extends BaseNumberPickersBottomSheet
     }
 
     @Override
-    protected void handleNegativeButton(@NonNull View v) {
+    protected void handleOnClickNegativeButton(@NonNull View v) {
         // 処理なし
     }
 
     @Override
-    protected void handleCancel(@NonNull DialogInterface dialog) {
+    protected void handleOnCancel(@NonNull DialogInterface dialog) {
         // 処理なし
     }
 
     @Override
-    protected void handleDismiss() {
+    protected void handleOnDismiss() {
 
     }
 
     @Override
-    protected void setUpNumberPickers() {
+    protected void setUpNumberPickers(DialogFragmentNumberPickersBinding binding) {
         int maxNumThemeColors = ThemeColor.values().length;
-        binding.numberPickerFirst.setMaxValue(maxNumThemeColors - 1);
-        binding.numberPickerFirst.setMinValue(0);
+        this.binding.numberPickerFirst.setMaxValue(maxNumThemeColors - 1);
+        this.binding.numberPickerFirst.setMinValue(0);
         setUpInitialValue();
         setUpDisplayedValues();
-        binding.numberPickerFirst.setWrapSelectorWheel(false);
-        binding.numberPickerSecond.setVisibility(View.GONE);
-        binding.numberPickerThird.setVisibility(View.GONE);
+        this.binding.numberPickerFirst.setWrapSelectorWheel(false);
+        this.binding.numberPickerSecond.setVisibility(View.GONE);
+        this.binding.numberPickerThird.setVisibility(View.GONE);
     }
 
     private void setUpInitialValue() {

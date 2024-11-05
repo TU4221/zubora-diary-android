@@ -30,14 +30,14 @@ public class DiaryDeleteConfirmationDialogFragment extends BaseAlertDialogFragme
     }
 
     @Override
-    protected void handlePositiveButton(@NonNull DialogInterface dialog, int which) {
+    protected void handleOnClickPositiveButton(@NonNull DialogInterface dialog, int which) {
         LocalDate deleteDiaryDate =
                 DiaryDeleteConfirmationDialogFragmentArgs.fromBundle(requireArguments()).getDeleteDiaryDate();
         setResult(KEY_DELETE_DIARY_DATE, deleteDiaryDate);
     }
 
     @Override
-    protected void handleNegativeButton(@NonNull DialogInterface dialog, int which) {
+    protected void handleOnClickNegativeButton(@NonNull DialogInterface dialog, int which) {
         // 処理なし
     }
 
@@ -47,12 +47,12 @@ public class DiaryDeleteConfirmationDialogFragment extends BaseAlertDialogFragme
     }
 
     @Override
-    protected void handleCancel(@NonNull DialogInterface dialog) {
+    protected void handleOnCancel(@NonNull DialogInterface dialog) {
         // 処理なし
     }
 
     @Override
-    protected void handleDismiss() {
+    protected void handleOnDismiss() {
         // 処理なし
     }
 }

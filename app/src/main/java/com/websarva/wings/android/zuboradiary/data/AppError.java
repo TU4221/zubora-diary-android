@@ -6,6 +6,8 @@ import androidx.annotation.NonNull;
 
 import com.websarva.wings.android.zuboradiary.R;
 
+import java.util.Objects;
+
 public enum AppError {
     DIARY_LOADING(R.string.dialog_message_title_access_error, R.string.dialog_message_message_diary_loading_error),
     DIARY_SAVING(R.string.dialog_message_title_access_error, R.string.dialog_message_message_diary_saving_error),
@@ -20,24 +22,22 @@ public enum AppError {
     private final int DIALOG_TITLE_RES_ID;
     private final int DIALOG_MESSAGE_RES_ID;
 
-    AppError(final int DIALOG_TITLE_RES_ID, final int DIALOG_MESSAGE_RES_ID) {
+    AppError(int DIALOG_TITLE_RES_ID, int DIALOG_MESSAGE_RES_ID) {
         this.DIALOG_TITLE_RES_ID = DIALOG_TITLE_RES_ID;
         this.DIALOG_MESSAGE_RES_ID = DIALOG_MESSAGE_RES_ID;
     }
 
     @NonNull
     public String getDialogTitle(Context context) {
-        if (context == null) {
-            throw new NullPointerException();
-        }
+        Objects.requireNonNull(context);
+
         return context.getString(this.DIALOG_TITLE_RES_ID);
     }
 
     @NonNull
     public String getDialogMessage(Context context) {
-        if (context == null) {
-            throw new NullPointerException();
-        }
+        Objects.requireNonNull(context);
+
         return context.getString(this.DIALOG_MESSAGE_RES_ID);
     }
 }

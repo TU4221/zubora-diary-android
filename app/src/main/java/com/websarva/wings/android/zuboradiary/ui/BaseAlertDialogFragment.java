@@ -1,6 +1,5 @@
 package com.websarva.wings.android.zuboradiary.ui;
 
-import android.app.Activity;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
@@ -19,7 +18,7 @@ import com.websarva.wings.android.zuboradiary.MainActivity;
 import com.websarva.wings.android.zuboradiary.R;
 import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor;
 
-import dagger.internal.Preconditions;
+import java.util.Objects;
 
 public abstract class BaseAlertDialogFragment extends DialogFragment {
 
@@ -33,29 +32,7 @@ public abstract class BaseAlertDialogFragment extends DialogFragment {
 
         MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(requireContext(), themeResId);
 
-        String title = createTitle();
-        Preconditions.checkNotNull(title);
-        builder.setTitle(title);
-
-        String message = createMessage();
-        Preconditions.checkNotNull(message);
-        builder.setMessage(message);
-
-        builder.setPositiveButton(R.string.dialog_base_alert_yes, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                Preconditions.checkNotNull(dialog);
-                handlePositiveButton(dialog, which);
-            }
-        });
-
-        builder.setNegativeButton(R.string.dialog_base_alert_no, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                Preconditions.checkNotNull(dialog);
-                handleNegativeButton(dialog, which);
-            }
-        });
+        customizeDialog(builder);
 
         AlertDialog alertDialog = builder.create();
 
@@ -64,14 +41,36 @@ public abstract class BaseAlertDialogFragment extends DialogFragment {
         return alertDialog;
     }
 
+    protected void customizeDialog(MaterialAlertDialogBuilder builder) {
+        Objects.requireNonNull(builder);
+
+        String title = createTitle();
+        Objects.requireNonNull(title);
+        builder.setTitle(title);
+
+        String message = createMessage();
+        Objects.requireNonNull(message);
+        builder.setMessage(message);
+
+        builder.setPositiveButton(R.string.dialog_base_alert_yes, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                Objects.requireNonNull(dialog);
+                handleOnClickPositiveButton(dialog, which);
+            }
+        });
+
+        builder.setNegativeButton(R.string.dialog_base_alert_no, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                Objects.requireNonNull(dialog);
+                handleOnClickNegativeButton(dialog, which);
+            }
+        });
+    }
+
     protected final ThemeColor getActivityThemeColor() {
-        Activity activity = requireActivity();
-        MainActivity mainActivity;
-        if (activity instanceof MainActivity) {
-            mainActivity = (MainActivity) activity;
-        } else {
-            throw new ClassCastException();
-        }
+        MainActivity mainActivity = (MainActivity) requireActivity();
         return mainActivity.requireDialogThemeColor();
     }
 
@@ -85,13 +84,25 @@ public abstract class BaseAlertDialogFragment extends DialogFragment {
         }
     }
 
+    /**
+     * BaseAlertDialogFragment.customizeDialog()で呼び出される。
+     * */
     protected abstract String createTitle();
 
+    /**
+     * BaseAlertDialogFragment.customizeDialog()で呼び出される。
+     * */
     protected abstract String createMessage();
 
-    protected abstract void handlePositiveButton(@NonNull DialogInterface dialog, int which);
+    /**
+     * BaseAlertDialogFragment.customizeDialog()で呼び出される。
+     * */
+    protected abstract void handleOnClickPositiveButton(@NonNull DialogInterface dialog, int which);
 
-    protected abstract void handleNegativeButton(@NonNull DialogInterface dialog, int which);
+    /**
+     * BaseAlertDialogFragment.customizeDialog()で呼び出される。
+     * */
+    protected abstract void handleOnClickNegativeButton(@NonNull DialogInterface dialog, int which);
 
     /**
      * 戻り値をtrueにすると、ダイアログ枠外、戻るボタンタッチ時にダイアログをキャンセルすることを可能にする。
@@ -105,27 +116,33 @@ public abstract class BaseAlertDialogFragment extends DialogFragment {
     //      DialogFragment、AlertDialogのリスナセットメソッドを使用して処理内容を記述きても処理はされない。
     @Override
     public final void onCancel(@NonNull DialogInterface dialog) {
-        handleCancel(dialog);
+        handleOnCancel(dialog);
         super.onCancel(dialog);
     }
 
-    protected abstract void handleCancel(@NonNull DialogInterface dialog);
+    /**
+     * BaseAlertDialogFragment.onCancel()で呼び出される。
+     * */
+    protected abstract void handleOnCancel(@NonNull DialogInterface dialog);
 
     @Override
     public final void dismiss() {
-        handleDismiss();
+        handleOnDismiss();
         super.dismiss();
     }
 
-    protected abstract void handleDismiss();
+    /**
+     * BaseAlertDialogFragment.dismiss()で呼び出される。
+     * */
+    protected abstract void handleOnDismiss();
 
     protected final void setResult(String resultKey, Object result) {
-        Preconditions.checkNotNull(resultKey);
-        Preconditions.checkNotNull(result);
+        Objects.requireNonNull(resultKey);
+        Objects.requireNonNull(result);
 
         NavController navController = NavHostFragment.findNavController(this);
         NavBackStackEntry navBackStackEntry = navController.getPreviousBackStackEntry();
-        Preconditions.checkNotNull(navBackStackEntry);
+        Objects.requireNonNull(navBackStackEntry);
         SavedStateHandle savedStateHandle = navBackStackEntry.getSavedStateHandle();
 
         savedStateHandle.set(resultKey, result);

@@ -6,6 +6,7 @@ import android.widget.NumberPicker;
 
 import androidx.annotation.NonNull;
 
+import com.websarva.wings.android.zuboradiary.databinding.DialogFragmentNumberPickersBinding;
 import com.websarva.wings.android.zuboradiary.ui.BaseNumberPickersBottomSheetDialogFragment;
 
 import java.time.LocalTime;
@@ -24,7 +25,7 @@ public class ReminderNotificationTimePickerDialogFragment extends BaseNumberPick
     }
 
     @Override
-    protected void handlePositiveButton(@NonNull View v) {
+    protected void handleOnClickPositiveButton(@NonNull View v) {
         setResultSelectedYearMonth();
     }
 
@@ -38,34 +39,34 @@ public class ReminderNotificationTimePickerDialogFragment extends BaseNumberPick
     }
 
     @Override
-    protected void handleNegativeButton(@NonNull View v) {
+    protected void handleOnClickNegativeButton(@NonNull View v) {
         setResult(KEY_SELECTED_BUTTON, DialogInterface.BUTTON_NEGATIVE);
     }
 
     @Override
-    protected void handleCancel(@NonNull DialogInterface dialog) {
+    protected void handleOnCancel(@NonNull DialogInterface dialog) {
         setResult(KEY_SELECTED_BUTTON, DialogInterface.BUTTON_NEGATIVE);
     }
 
     @Override
-    protected void handleDismiss() {
+    protected void handleOnDismiss() {
         // 処理なし
     }
 
     @Override
-    protected void setUpNumberPickers() {
+    protected void setUpNumberPickers(DialogFragmentNumberPickersBinding binding) {
         LocalTime localTime = LocalTime.now();
-        binding.numberPickerFirst.setMaxValue(23);
-        binding.numberPickerFirst.setMinValue(0);
-        binding.numberPickerFirst.setFormatter(new valueFormatter());
-        binding.numberPickerFirst.setWrapSelectorWheel(false);
-        binding.numberPickerFirst.setValue(localTime.getHour());
-        binding.numberPickerSecond.setMaxValue(59);
-        binding.numberPickerSecond.setMinValue(0);
-        binding.numberPickerSecond.setFormatter(new valueFormatter());
-        binding.numberPickerSecond.setWrapSelectorWheel(false);
-        binding.numberPickerSecond.setValue(localTime.getMinute());
-        binding.numberPickerThird.setVisibility(View.GONE);
+        this.binding.numberPickerFirst.setMaxValue(23);
+        this.binding.numberPickerFirst.setMinValue(0);
+        this.binding.numberPickerFirst.setFormatter(new valueFormatter());
+        this.binding.numberPickerFirst.setWrapSelectorWheel(false);
+        this.binding.numberPickerFirst.setValue(localTime.getHour());
+        this.binding.numberPickerSecond.setMaxValue(59);
+        this.binding.numberPickerSecond.setMinValue(0);
+        this.binding.numberPickerSecond.setFormatter(new valueFormatter());
+        this.binding.numberPickerSecond.setWrapSelectorWheel(false);
+        this.binding.numberPickerSecond.setValue(localTime.getMinute());
+        this.binding.numberPickerThird.setVisibility(View.GONE);
     }
 
     private static class valueFormatter implements NumberPicker.Formatter {

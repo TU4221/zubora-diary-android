@@ -18,25 +18,27 @@ import androidx.navigation.fragment.NavHostFragment;
 import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor;
 import com.websarva.wings.android.zuboradiary.databinding.DialogFragmentNumberPickersBinding;
 
-import dagger.internal.Preconditions;
+import java.util.Objects;
 
 public abstract class BaseNumberPickersBottomSheetDialogFragment extends BaseBottomSheetDialogFragment {
     // View関係
     protected DialogFragmentNumberPickersBinding binding;
 
     @Override
+    @NonNull
     protected final View createDialogView(
             @NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 
-        binding = createBinding(inflater, container, savedInstanceState);
+        binding = createBinding(inflater, container);
         binding.buttonDecision.setOnClickListener(new PositiveButtonClickListener());
         binding.buttonCancel.setOnClickListener(new NegativeButtonClickListener());
-        setUpNumberPickers();
+        setUpNumberPickers(binding);
         return binding.getRoot();
     }
 
+    @NonNull
     private DialogFragmentNumberPickersBinding createBinding(
-            @NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+            @NonNull LayoutInflater inflater, @Nullable ViewGroup container) {
 
         // HACK:下記理由から、ThemeColor#getNumberPickerBottomSheetDialogThemeResId()から
         //      ThemeResIdを取得してInflaterを再作成。
@@ -56,6 +58,8 @@ public abstract class BaseNumberPickersBottomSheetDialogFragment extends BaseBot
     }
 
     private void setUpNumberPickerTextColor(DialogFragmentNumberPickersBinding binding) {
+        Objects.requireNonNull(binding);
+
         if (Build.VERSION.SDK_INT >= 29) {
             ThemeColor themeColor = getActivityThemeColor();
             int onSurfaceVariantColor = themeColor.getOnSurfaceVariantColor(getResources());
@@ -65,15 +69,18 @@ public abstract class BaseNumberPickersBottomSheetDialogFragment extends BaseBot
         }
     }
 
-    protected abstract void setUpNumberPickers();
+    /**
+     * BaseNumberPickersBottomSheetDialogFragment#createDialogView()で呼び出される。
+     * */
+    protected abstract void setUpNumberPickers(DialogFragmentNumberPickersBinding binding);
 
     protected final void setResult(String key, Object value) {
-        Preconditions.checkNotNull(key);
-        Preconditions.checkNotNull(value);
+        Objects.requireNonNull(key);
+        Objects.requireNonNull(value);
 
         NavController navController = NavHostFragment.findNavController(this);
         NavBackStackEntry navBackStackEntry = navController.getPreviousBackStackEntry();
-        Preconditions.checkNotNull(navBackStackEntry);
+        Objects.requireNonNull(navBackStackEntry);
         SavedStateHandle savedStateHandle = navBackStackEntry.getSavedStateHandle();
         savedStateHandle.set(key, value);
     }

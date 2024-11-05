@@ -68,8 +68,7 @@ class CalendarViewModel extends BaseViewModel {
             public void onFailure(@NonNull Throwable t) {
                 // MEMO:CalendarViewModel#hasDiary()はカレンダー日数分連続で処理する為、
                 //      エラーが連続で発生した場合、膨大なエラーを記録してしまう。これを回避する為に下記コードを記述。
-                AppError lastAppError = getAppErrorBufferListLastValue();
-                if (lastAppError == AppError.DIARY_INFORMATION_LOADING) return;
+                if (equalLastAppError(AppError.DIARY_INFORMATION_LOADING)) return;
 
                 addAppError(AppError.DIARY_INFORMATION_LOADING);
             }

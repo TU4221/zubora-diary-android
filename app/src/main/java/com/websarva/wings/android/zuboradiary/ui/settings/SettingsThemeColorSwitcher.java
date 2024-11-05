@@ -7,6 +7,8 @@ import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor;
 import com.websarva.wings.android.zuboradiary.ui.BaseThemeColorSwitcher;
 import com.websarva.wings.android.zuboradiary.ui.ColorSwitchingViewList;
 
+import java.util.Objects;
+
 import dagger.internal.Preconditions;
 
 class SettingsThemeColorSwitcher extends BaseThemeColorSwitcher {
@@ -15,7 +17,7 @@ class SettingsThemeColorSwitcher extends BaseThemeColorSwitcher {
     }
 
     void switchSettingItemSectionColor(ColorSwitchingViewList<TextView> textViewList) {
-        Preconditions.checkNotNull(textViewList);
+        Objects.requireNonNull(textViewList);
 
         int color = themeColor.getSecondaryContainerColor(resources);
         int onColor = themeColor.getOnSecondaryContainerColor(resources);
@@ -23,7 +25,7 @@ class SettingsThemeColorSwitcher extends BaseThemeColorSwitcher {
     }
 
     void switchSettingItemIconColor(ColorSwitchingViewList<TextView> textViewList) {
-        Preconditions.checkNotNull(textViewList);
+        Objects.requireNonNull(textViewList);
 
         int color = themeColor.getOnSurfaceVariantColor(resources);
         switchTextViewsColorOnlyIcon(textViewList, color);

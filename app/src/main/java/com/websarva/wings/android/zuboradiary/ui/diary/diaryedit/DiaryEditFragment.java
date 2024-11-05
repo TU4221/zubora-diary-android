@@ -164,7 +164,7 @@ public class DiaryEditFragment extends BaseFragment {
     }
 
     @Override
-    protected void removeDialogResult(@NonNull SavedStateHandle savedStateHandle) {
+    protected void removeDialogResultOnDestroy(@NonNull SavedStateHandle savedStateHandle) {
         savedStateHandle.remove(DatePickerDialogFragment.KEY_SELECTED_DATE);
         savedStateHandle.remove(LoadExistingDiaryDialogFragment.KEY_SELECTED_BUTTON);
         savedStateHandle.remove(UpdateExistingDiaryDialogFragment.KEY_SELECTED_BUTTON);
