@@ -32,12 +32,12 @@ import java.util.Objects;
  * 各Fragment固有のViewに対しては本クラスを継承して継承クラスにメソッドを追加する。
  * 本クラスに記述されている各Viewの色はアプリ背景色(SurfaceColor)を考慮して選定。
  * */
-public class BaseThemeColorSwitcher {
+public class ThemeColorSwitcher {
     protected final Resources resources;
     protected final Context context;
     protected final ThemeColor themeColor;
 
-    public BaseThemeColorSwitcher(Context context, ThemeColor themeColor) {
+    public ThemeColorSwitcher(Context context, ThemeColor themeColor) {
         Objects.requireNonNull(context);
         Objects.requireNonNull(themeColor);
 

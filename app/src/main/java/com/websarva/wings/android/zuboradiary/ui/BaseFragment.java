@@ -111,7 +111,7 @@ public abstract class BaseFragment extends CustomFragment {
         //      NavigationStartFragment(DiaryListFragment)はReenterTransitionで設定されたエフェクトが処理される。
         //      遷移元FragmentのエフェクトはMainActivityクラスにて設定。
         MainActivity mainActivity = (MainActivity) requireActivity();
-        if (mainActivity.getTabWasSelected()) {
+        if (mainActivity.getWasSelectedTab()) {
             setEnterTransition(new MaterialFadeThrough());
         } else {
             setEnterTransition(new MaterialSharedAxis(MaterialSharedAxis.X, true));
@@ -121,7 +121,7 @@ public abstract class BaseFragment extends CustomFragment {
         setExitTransition(new MaterialSharedAxis(MaterialSharedAxis.X, true));
 
         // TO - FROM の FROM として現れるアニメーション
-        if (mainActivity.getTabWasSelected()) {
+        if (mainActivity.getWasSelectedTab()) {
             setReenterTransition(new MaterialFadeThrough());
         } else {
             setReenterTransition(new MaterialSharedAxis(MaterialSharedAxis.X, false));
@@ -130,7 +130,7 @@ public abstract class BaseFragment extends CustomFragment {
         // TO - FROM の TO として消えるアニメーション
         setReturnTransition(new MaterialSharedAxis(MaterialSharedAxis.X, false));
 
-        mainActivity.resetTabWasSelected();
+        mainActivity.clearWasSelectedTab();
     }
 
     protected final void addTransitionListener(Transition.TransitionListener listener) {

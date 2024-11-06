@@ -4,14 +4,12 @@ import android.content.Context;
 import android.widget.TextView;
 
 import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor;
-import com.websarva.wings.android.zuboradiary.ui.BaseThemeColorSwitcher;
+import com.websarva.wings.android.zuboradiary.ui.ThemeColorSwitcher;
 import com.websarva.wings.android.zuboradiary.ui.ColorSwitchingViewList;
 
 import java.util.Objects;
 
-import dagger.internal.Preconditions;
-
-class SettingsThemeColorSwitcher extends BaseThemeColorSwitcher {
+class SettingsThemeColorSwitcher extends ThemeColorSwitcher {
     SettingsThemeColorSwitcher(Context context, ThemeColor themeColor) {
         super(context, themeColor);
     }

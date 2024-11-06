@@ -9,11 +9,11 @@ import androidx.core.content.res.ResourcesCompat;
 
 import com.websarva.wings.android.zuboradiary.R;
 import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor;
-import com.websarva.wings.android.zuboradiary.ui.BaseThemeColorSwitcher;
+import com.websarva.wings.android.zuboradiary.ui.ThemeColorSwitcher;
 
 import java.util.Objects;
 
-class CalendarThemeColorSwitcher extends BaseThemeColorSwitcher {
+class CalendarThemeColorSwitcher extends ThemeColorSwitcher {
 
     CalendarThemeColorSwitcher(Context context, ThemeColor themeColor) {
         super(context, themeColor);
