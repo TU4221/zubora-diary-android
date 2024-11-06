@@ -146,7 +146,7 @@ public class MainActivity extends AppCompatActivity {
                         ThemeColor settingValue = themeColor;
                         if (settingValue == null) {
                             settingValue = settingsViewModel.loadThemeColorSettingValue();
-                        };
+                        }
 
                         switchThemeColor(settingValue);
                     }
