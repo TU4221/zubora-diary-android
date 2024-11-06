@@ -171,8 +171,7 @@ public class MainActivity extends AppCompatActivity {
         NavHostFragment navHostFragment =
                 (NavHostFragment) getSupportFragmentManager()
                         .findFragmentById(R.id.nav_host_fragment_activity_main);
-        Objects.requireNonNull(navHostFragment);
-        return navHostFragment;
+        return Objects.requireNonNull(navHostFragment);
     }
 
     @NonNull
@@ -186,8 +185,7 @@ public class MainActivity extends AppCompatActivity {
         FragmentManager fragmentManager = findNavFragmentManager();
         List<Fragment> fragmentList  = fragmentManager.getFragments();
         Fragment fragment = fragmentList.get(0);
-        Objects.requireNonNull(fragment);
-        return fragment;
+        return Objects.requireNonNull(fragment);
     }
 
     @NonNull
