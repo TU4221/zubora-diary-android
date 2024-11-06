@@ -1,12 +1,14 @@
 package com.websarva.wings.android.zuboradiary.di;
 
+import androidx.annotation.NonNull;
+
 import com.squareup.moshi.Moshi;
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory;
-import com.websarva.wings.android.zuboradiary.data.network.WeatherApiRepository;
 import com.websarva.wings.android.zuboradiary.data.network.WeatherApiService;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
+import java.util.Objects;
 
 import javax.inject.Qualifier;
 import javax.inject.Singleton;
@@ -24,20 +26,29 @@ public class NetworkModule {
 
     @Singleton
     @Provides
+    @NonNull
     public static KotlinJsonAdapterFactory provideKotlinJsonAdapterFactory() {
         return new KotlinJsonAdapterFactory();
     }
 
     @Singleton
     @Provides
+    @NonNull
     public static Moshi provideMoshi(KotlinJsonAdapterFactory kotlinJsonAdapterFactory) {
-        return new Moshi.Builder().add(kotlinJsonAdapterFactory).build();
+        Objects.requireNonNull(kotlinJsonAdapterFactory);
+
+        Moshi moshi = new Moshi.Builder().add(kotlinJsonAdapterFactory).build();
+        return Objects.requireNonNull(moshi);
     }
 
     @Singleton
     @Provides
+    @NonNull
     public static MoshiConverterFactory provideMoshiConverterFactory(Moshi moshi) {
-        return MoshiConverterFactory.create(moshi);
+        Objects.requireNonNull(moshi);
+
+        MoshiConverterFactory factory = MoshiConverterFactory.create(moshi);
+        return Objects.requireNonNull(factory);
     }
 
     @Qualifier
@@ -47,16 +58,25 @@ public class NetworkModule {
     @WeatherApiRetrofit
     @Singleton
     @Provides
+    @NonNull
     public static Retrofit provideWeatherApiRetrofit(MoshiConverterFactory moshiConverterFactory) {
-        return new Retrofit.Builder()
+        Objects.requireNonNull(moshiConverterFactory);
+
+        Retrofit retrofit =
+                new Retrofit.Builder()
                 .baseUrl("https://api.open-meteo.com/v1/")
                 .addConverterFactory(moshiConverterFactory)
                 .build();
+        return Objects.requireNonNull(retrofit);
     }
 
     @Singleton
     @Provides
+    @NonNull
     public static WeatherApiService provideWeatherApiService(@WeatherApiRetrofit Retrofit retrofit) {
-        return retrofit.create(WeatherApiService.class);
+        Objects.requireNonNull(retrofit);
+
+        WeatherApiService weatherApiService = retrofit.create(WeatherApiService.class);
+        return Objects.requireNonNull(weatherApiService);
     }
 }

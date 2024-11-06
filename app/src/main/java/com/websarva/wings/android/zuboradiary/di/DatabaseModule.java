@@ -4,7 +4,6 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.room.Room;
@@ -19,6 +18,8 @@ import com.websarva.wings.android.zuboradiary.data.diary.Conditions;
 import com.websarva.wings.android.zuboradiary.data.diary.WeatherConverter;
 import com.websarva.wings.android.zuboradiary.data.diary.Weathers;
 
+import java.util.Objects;
+
 import javax.inject.Singleton;
 
 import dagger.Module;
@@ -32,7 +33,9 @@ import dagger.hilt.components.SingletonComponent;
 public class DatabaseModule {
     @Singleton
     @Provides
+    @NonNull
     public static DiaryDatabase provideDiaryDatabase(@ApplicationContext Context context) {
+        Objects.requireNonNull(context);
         // TODO:下記上手くいかなかったので余裕があれば調べる
         Migration migration_2_3 = new Migration(2, 3) {
 
@@ -73,27 +76,35 @@ public class DatabaseModule {
 
             }
         };
-
-        Log.d("DatabaseModule", "DatabaseModule#provideDiaryDatabase()");
-        return Room
-                .databaseBuilder(context, DiaryDatabase.class, "diary_db")
+        DiaryDatabase diaryDatabase =
+                Room.databaseBuilder(context, DiaryDatabase.class, "diary_db")
                 // MEMO:データベース初期化
                 //      https://www.bedroomcomputing.com/2020/06/2020-0627-db-prepopulate/
                 //.createFromAsset("database/diary_db.db")
                 //.addMigrations(migration_2_3)
                 //.fallbackToDestructiveMigration()
                 .build();
+
+        return Objects.requireNonNull(diaryDatabase);
     }
 
     @Singleton
     @Provides
+    @NonNull
     public static DiaryDAO provideDiaryDAO(DiaryDatabase diaryDatabase) {
-        return diaryDatabase.createDiaryDAO();
+        Objects.requireNonNull(diaryDatabase);
+
+        DiaryDAO dao = diaryDatabase.createDiaryDAO();
+        return Objects.requireNonNull(dao);
     }
 
     @Singleton
     @Provides
+    @NonNull
     public static DiaryItemTitleSelectionHistoryDAO provideSelectedItemTitlesHistoryDAO(DiaryDatabase diaryDatabase) {
-        return diaryDatabase.createSelectedItemTitlesHistoryDAO();
+        Objects.requireNonNull(diaryDatabase);
+
+        DiaryItemTitleSelectionHistoryDAO dao = diaryDatabase.createSelectedItemTitlesHistoryDAO();
+        return Objects.requireNonNull(dao);
     }
 }
