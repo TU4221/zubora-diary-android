@@ -10,6 +10,7 @@ import androidx.core.content.res.ResourcesCompat;
 import com.websarva.wings.android.zuboradiary.R;
 
 import java.util.Arrays;
+import java.util.Objects;
 
 // CAUTION:要素の追加、順序変更を行った時はThemeColorPickerDialogFragment、string.xmlを修正すること。
 public enum ThemeColor {
@@ -30,22 +31,26 @@ public enum ThemeColor {
 
     @NonNull
     public static ThemeColor of(int number) {
-        return Arrays.stream(ThemeColor.values())
-                .filter(x -> x.getNumber() == number)
-                .findFirst().get();
+        if (!Arrays.stream(ThemeColor.values()).anyMatch(x -> x.getNumber() == number)) {
+            throw new IllegalArgumentException();
+        }
+
+        return Arrays.stream(ThemeColor.values()).filter(x -> x.getNumber() == number).findFirst().get();
     }
 
     public int getNumber() {
-        return this.number;
+        return number;
     }
 
     public String toSting(Context context) {
-        if (context == null) {
-            throw new NullPointerException();
-        }
+        Objects.requireNonNull(context);
 
-        return context.getString(this.stringResId);
+        return context.getString(stringResId);
     }
+
+    // MEMO:下記以降はViewに関するカラー、リソース等を取得するメソッド。
+    //      Enumのコンストラクタからフィールド変数に代入するコードを記述すると膨大な数となり可読性を損ねるため、
+    //      メソッド毎にリソースを記述する方式を採用。
 
     public boolean isAppearanceLightStatusBars() {
         switch (this) {
@@ -57,17 +62,15 @@ public enum ThemeColor {
             case GREEN:
             case YELLOW:
                 return true;
+            default:
+                throw new IllegalStateException();
         }
-        return true;
     }
 
-    // TODO:colorResIdをコンストラクタで初期化するか検討(膨大な良の為可読性を考慮してこのままとしても良いかも)
     public int getPrimaryColor(Resources resources) {
-        if (resources == null) {
-            throw new NullPointerException();
-        }
+        Objects.requireNonNull(resources);
 
-        int colorResId = -1;
+        int colorResId;
         switch (this) {
             case WHITE:
                 colorResId = R.color.md_theme_color_white_primary;
@@ -87,16 +90,16 @@ public enum ThemeColor {
             case YELLOW:
                 colorResId = R.color.md_theme_color_yellow_primary;
                 break;
+            default:
+                throw new IllegalStateException();
         }
         return ResourcesCompat.getColor(resources, colorResId, null);
     }
 
     public  int getOnPrimaryColor(Resources resources) {
-        if (resources == null) {
-            throw new NullPointerException();
-        }
+        Objects.requireNonNull(resources);
 
-        int colorResId = -1;
+        int colorResId;
         switch (this) {
             case WHITE:
                 colorResId = R.color.md_theme_color_white_onPrimary;
@@ -116,16 +119,16 @@ public enum ThemeColor {
             case YELLOW:
                 colorResId = R.color.md_theme_color_yellow_onPrimary;
                 break;
+            default:
+                throw new IllegalStateException();
         }
         return ResourcesCompat.getColor(resources, colorResId, null);
     }
 
     public  int getPrimaryContainerColor(Resources resources) {
-        if (resources == null) {
-            throw new NullPointerException();
-        }
+        Objects.requireNonNull(resources);
 
-        int colorResId = -1;
+        int colorResId;
         switch (this) {
             case WHITE:
                 colorResId = R.color.md_theme_color_white_primaryContainer;
@@ -145,16 +148,16 @@ public enum ThemeColor {
             case YELLOW:
                 colorResId = R.color.md_theme_color_yellow_primaryContainer;
                 break;
+            default:
+                throw new IllegalStateException();
         }
         return ResourcesCompat.getColor(resources, colorResId, null);
     }
 
     public  int getOnPrimaryContainerColor(Resources resources) {
-        if (resources == null) {
-            throw new NullPointerException();
-        }
+        Objects.requireNonNull(resources);
 
-        int colorResId = -1;
+        int colorResId;
         switch (this) {
             case WHITE:
                 colorResId = R.color.md_theme_color_white_onPrimaryContainer;
@@ -174,16 +177,16 @@ public enum ThemeColor {
             case YELLOW:
                 colorResId = R.color.md_theme_color_yellow_onPrimaryContainer;
                 break;
+            default:
+                throw new IllegalStateException();
         }
         return ResourcesCompat.getColor(resources, colorResId, null);
     }
 
     public  int getSecondaryColor(Resources resources) {
-        if (resources == null) {
-            throw new NullPointerException();
-        }
+        Objects.requireNonNull(resources);
 
-        int colorResId = -1;
+        int colorResId;
         switch (this) {
             case WHITE:
                 colorResId = R.color.md_theme_color_white_secondary;
@@ -203,16 +206,16 @@ public enum ThemeColor {
             case YELLOW:
                 colorResId = R.color.md_theme_color_yellow_secondary;
                 break;
+            default:
+                throw new IllegalStateException();
         }
         return ResourcesCompat.getColor(resources, colorResId, null);
     }
 
     public  int getOnSecondaryColor(Resources resources) {
-        if (resources == null) {
-            throw new NullPointerException();
-        }
+        Objects.requireNonNull(resources);
 
-        int colorResId = -1;
+        int colorResId;
         switch (this) {
             case WHITE:
                 colorResId = R.color.md_theme_color_white_onSecondary;
@@ -232,16 +235,16 @@ public enum ThemeColor {
             case YELLOW:
                 colorResId = R.color.md_theme_color_yellow_onSecondary;
                 break;
+            default:
+                throw new IllegalStateException();
         }
         return ResourcesCompat.getColor(resources, colorResId, null);
     }
 
     public  int getSecondaryContainerColor(Resources resources) {
-        if (resources == null) {
-            throw new NullPointerException();
-        }
+        Objects.requireNonNull(resources);
 
-        int colorResId = -1;
+        int colorResId;
         switch (this) {
             case WHITE:
                 colorResId = R.color.md_theme_color_white_secondaryContainer;
@@ -261,16 +264,16 @@ public enum ThemeColor {
             case YELLOW:
                 colorResId = R.color.md_theme_color_yellow_secondaryContainer;
                 break;
+            default:
+                throw new IllegalStateException();
         }
         return ResourcesCompat.getColor(resources, colorResId, null);
     }
 
     public  int getOnSecondaryContainerColor(Resources resources) {
-        if (resources == null) {
-            throw new NullPointerException();
-        }
+        Objects.requireNonNull(resources);
 
-        int colorResId = -1;
+        int colorResId;
         switch (this) {
             case WHITE:
                 colorResId = R.color.md_theme_color_white_onSecondaryContainer;
@@ -290,16 +293,16 @@ public enum ThemeColor {
             case YELLOW:
                 colorResId = R.color.md_theme_color_yellow_onSecondaryContainer;
                 break;
+            default:
+                throw new IllegalStateException();
         }
         return ResourcesCompat.getColor(resources, colorResId, null);
     }
 
     public  int getTertiaryColor(Resources resources) {
-        if (resources == null) {
-            throw new NullPointerException();
-        }
+        Objects.requireNonNull(resources);
 
-        int colorResId = -1;
+        int colorResId;
         switch (this) {
             case WHITE:
                 colorResId = R.color.md_theme_color_white_tertiary;
@@ -319,16 +322,16 @@ public enum ThemeColor {
             case YELLOW:
                 colorResId = R.color.md_theme_color_yellow_tertiary;
                 break;
+            default:
+                throw new IllegalStateException();
         }
         return ResourcesCompat.getColor(resources, colorResId, null);
     }
 
     public  int getOnTertiaryColor(Resources resources) {
-        if (resources == null) {
-            throw new NullPointerException();
-        }
+        Objects.requireNonNull(resources);
 
-        int colorResId = -1;
+        int colorResId;
         switch (this) {
             case WHITE:
                 colorResId = R.color.md_theme_color_white_onTertiary;
@@ -348,16 +351,16 @@ public enum ThemeColor {
             case YELLOW:
                 colorResId = R.color.md_theme_color_yellow_onTertiary;
                 break;
+            default:
+                throw new IllegalStateException();
         }
         return ResourcesCompat.getColor(resources, colorResId, null);
     }
 
     public  int getTertiaryContainerColor(Resources resources) {
-        if (resources == null) {
-            throw new NullPointerException();
-        }
+        Objects.requireNonNull(resources);
 
-        int colorResId = -1;
+        int colorResId;
         switch (this) {
             case WHITE:
                 colorResId = R.color.md_theme_color_white_tertiaryContainer;
@@ -377,16 +380,16 @@ public enum ThemeColor {
             case YELLOW:
                 colorResId = R.color.md_theme_color_yellow_tertiaryContainer;
                 break;
+            default:
+                throw new IllegalStateException();
         }
         return ResourcesCompat.getColor(resources, colorResId, null);
     }
 
     public  int getOnTertiaryContainerColor(Resources resources) {
-        if (resources == null) {
-            throw new NullPointerException();
-        }
+        Objects.requireNonNull(resources);
 
-        int colorResId = -1;
+        int colorResId;
         switch (this) {
             case WHITE:
                 colorResId = R.color.md_theme_color_white_onTertiaryContainer;
@@ -406,16 +409,16 @@ public enum ThemeColor {
             case YELLOW:
                 colorResId = R.color.md_theme_color_yellow_onTertiaryContainer;
                 break;
+            default:
+                throw new IllegalStateException();
         }
         return ResourcesCompat.getColor(resources, colorResId, null);
     }
 
     public  int getSurfaceColor(Resources resources) {
-        if (resources == null) {
-            throw new NullPointerException();
-        }
+        Objects.requireNonNull(resources);
 
-        int colorResId = -1;
+        int colorResId;
         switch (this) {
             case WHITE:
                 colorResId = R.color.md_theme_color_white_surface;
@@ -435,16 +438,16 @@ public enum ThemeColor {
             case YELLOW:
                 colorResId = R.color.md_theme_color_yellow_surface;
                 break;
+            default:
+                throw new IllegalStateException();
         }
         return ResourcesCompat.getColor(resources, colorResId, null);
     }
 
     public  int getSurfaceContainerLowColor(Resources resources) {
-        if (resources == null) {
-            throw new NullPointerException();
-        }
+        Objects.requireNonNull(resources);
 
-        int colorResId = -1;
+        int colorResId;
         switch (this) {
             case WHITE:
                 colorResId = R.color.md_theme_color_white_surfaceContainerLow;
@@ -464,16 +467,16 @@ public enum ThemeColor {
             case YELLOW:
                 colorResId = R.color.md_theme_color_yellow_surfaceContainerLow;
                 break;
+            default:
+                throw new IllegalStateException();
         }
         return ResourcesCompat.getColor(resources, colorResId, null);
     }
 
     public  int getSurfaceContainerColor(Resources resources) {
-        if (resources == null) {
-            throw new NullPointerException();
-        }
+        Objects.requireNonNull(resources);
 
-        int colorResId = -1;
+        int colorResId;
         switch (this) {
             case WHITE:
                 colorResId = R.color.md_theme_color_white_surfaceContainer;
@@ -493,16 +496,16 @@ public enum ThemeColor {
             case YELLOW:
                 colorResId = R.color.md_theme_color_yellow_surfaceContainer;
                 break;
+            default:
+                throw new IllegalStateException();
         }
         return ResourcesCompat.getColor(resources, colorResId, null);
     }
 
     public  int getSurfaceContainerHighColor(Resources resources) {
-        if (resources == null) {
-            throw new NullPointerException();
-        }
+        Objects.requireNonNull(resources);
 
-        int colorResId = -1;
+        int colorResId;
         switch (this) {
             case WHITE:
                 colorResId = R.color.md_theme_color_white_surfaceContainerHigh;
@@ -522,16 +525,16 @@ public enum ThemeColor {
             case YELLOW:
                 colorResId = R.color.md_theme_color_yellow_surfaceContainerHigh;
                 break;
+            default:
+                throw new IllegalStateException();
         }
         return ResourcesCompat.getColor(resources, colorResId, null);
     }
 
     public  int getSurfaceContainerHighestColor(Resources resources) {
-        if (resources == null) {
-            throw new NullPointerException();
-        }
+        Objects.requireNonNull(resources);
 
-        int colorResId = -1;
+        int colorResId;
         switch (this) {
             case WHITE:
                 colorResId = R.color.md_theme_color_white_surfaceContainerHighest;
@@ -551,16 +554,16 @@ public enum ThemeColor {
             case YELLOW:
                 colorResId = R.color.md_theme_color_yellow_surfaceContainerHighest;
                 break;
+            default:
+                throw new IllegalStateException();
         }
         return ResourcesCompat.getColor(resources, colorResId, null);
     }
 
     public  int getOnSurfaceColor(Resources resources) {
-        if (resources == null) {
-            throw new NullPointerException();
-        }
+        Objects.requireNonNull(resources);
 
-        int colorResId = -1;
+        int colorResId;
         switch (this) {
             case WHITE:
                 colorResId = R.color.md_theme_color_white_onSurface;
@@ -580,16 +583,16 @@ public enum ThemeColor {
             case YELLOW:
                 colorResId = R.color.md_theme_color_yellow_onSurface;
                 break;
+            default:
+                throw new IllegalStateException();
         }
         return ResourcesCompat.getColor(resources, colorResId, null);
     }
 
     public  int getSurfaceDimColor(Resources resources) {
-        if (resources == null) {
-            throw new NullPointerException();
-        }
+        Objects.requireNonNull(resources);
 
-        int colorResId = -1;
+        int colorResId;
         switch (this) {
             case WHITE:
                 colorResId = R.color.md_theme_color_white_surfaceDim;
@@ -609,16 +612,16 @@ public enum ThemeColor {
             case YELLOW:
                 colorResId = R.color.md_theme_color_yellow_surfaceDim;
                 break;
+            default:
+                throw new IllegalStateException();
         }
         return ResourcesCompat.getColor(resources, colorResId, null);
     }
 
     public int getSurfaceVariantColor(Resources resources) {
-        if (resources == null) {
-            throw new NullPointerException();
-        }
+        Objects.requireNonNull(resources);
 
-        int colorResId = -1;
+        int colorResId;
         switch (this) {
             case WHITE:
                 colorResId = R.color.md_theme_color_white_surfaceVariant;
@@ -638,16 +641,16 @@ public enum ThemeColor {
             case YELLOW:
                 colorResId = R.color.md_theme_color_yellow_surfaceVariant;
                 break;
+            default:
+                throw new IllegalStateException();
         }
         return ResourcesCompat.getColor(resources, colorResId, null);
     }
 
     public int getOnSurfaceVariantColor(Resources resources) {
-        if (resources == null) {
-            throw new NullPointerException();
-        }
+        Objects.requireNonNull(resources);
 
-        int colorResId = -1;
+        int colorResId;
         switch (this) {
             case WHITE:
                 colorResId = R.color.md_theme_color_white_onSurfaceVariant;
@@ -667,16 +670,16 @@ public enum ThemeColor {
             case YELLOW:
                 colorResId = R.color.md_theme_color_yellow_onSurfaceVariant;
                 break;
+            default:
+                throw new IllegalStateException();
         }
         return ResourcesCompat.getColor(resources, colorResId, null);
     }
 
     public  int getOutlineColor(Resources resources) {
-        if (resources == null) {
-            throw new NullPointerException();
-        }
+        Objects.requireNonNull(resources);
 
-        int colorResId = -1;
+        int colorResId;
         switch (this) {
             case WHITE:
                 colorResId = R.color.md_theme_color_white_outline;
@@ -696,16 +699,16 @@ public enum ThemeColor {
             case YELLOW:
                 colorResId = R.color.md_theme_color_yellow_outline;
                 break;
+            default:
+                throw new IllegalStateException();
         }
         return ResourcesCompat.getColor(resources, colorResId, null);
     }
 
     public  int getOutlineVariantColor(Resources resources) {
-        if (resources == null) {
-            throw new NullPointerException();
-        }
+        Objects.requireNonNull(resources);
 
-        int colorResId = -1;
+        int colorResId;
         switch (this) {
             case WHITE:
                 colorResId = R.color.md_theme_color_white_outlineVariant;
@@ -725,16 +728,16 @@ public enum ThemeColor {
             case YELLOW:
                 colorResId = R.color.md_theme_color_yellow_outlineVariant;
                 break;
+            default:
+                throw new IllegalStateException();
         }
         return ResourcesCompat.getColor(resources, colorResId, null);
     }
 
     public  int getErrorColor(Resources resources) {
-        if (resources == null) {
-            throw new NullPointerException();
-        }
+        Objects.requireNonNull(resources);
 
-        int colorResId = -1;
+        int colorResId;
         switch (this) {
             case WHITE:
                 colorResId = R.color.md_theme_color_white_error;
@@ -754,6 +757,8 @@ public enum ThemeColor {
             case YELLOW:
                 colorResId = R.color.md_theme_color_yellow_error;
                 break;
+            default:
+                throw new IllegalStateException();
         }
         return ResourcesCompat.getColor(resources, colorResId, null);
     }

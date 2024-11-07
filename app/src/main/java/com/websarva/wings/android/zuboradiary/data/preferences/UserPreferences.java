@@ -6,6 +6,7 @@ import androidx.datastore.preferences.core.PreferencesKeys;
 import androidx.datastore.rxjava3.RxDataStore;
 
 import java.time.DayOfWeek;
+import java.util.Objects;
 
 import javax.inject.Inject;
 
@@ -13,28 +14,31 @@ import io.reactivex.rxjava3.core.Flowable;
 import io.reactivex.rxjava3.core.Single;
 
 public class UserPreferences {
-    // TODO:Key "is_~" ->"is_checked_~"に変更
-    // TODO:PASSCODEはStringの方が良いかも
+
     private final RxDataStore<Preferences> dataStore;
     private final Preferences.Key<Integer> KEY_THEME_COLOR = PreferencesKeys.intKey("theme_color");
     private final Preferences.Key<Integer> KEY_CALENDAR_START_DAY_OF_WEEK =
                                         PreferencesKeys.intKey("calendar_start_day_of_week");
-    private final Preferences.Key<Boolean> KEY_IS_REMINDER_NOTIFICATION =
-                                         PreferencesKeys.booleanKey("is_reminder_notification");
+    private final Preferences.Key<Boolean> KEY_IS_CHECKED_REMINDER_NOTIFICATION =
+                                         PreferencesKeys.booleanKey("is_checked_reminder_notification");
     private final Preferences.Key<String> KEY_REMINDER_NOTIFICATION_TIME =
                                     PreferencesKeys.stringKey("reminder_notification_time");
-    private final Preferences.Key<Boolean> KEY_IS_PASSCODE_LOCK =
-                                                PreferencesKeys.booleanKey("is_passcode_lock");
-    private final Preferences.Key<Integer> KEY_PASSCODE = PreferencesKeys.intKey("passcode");
-    private final Preferences.Key<Boolean> KEY_IS_GETTING_WEATHER_INFORMATION =
-                                    PreferencesKeys.booleanKey("is_getting_weather_information");
+    private final Preferences.Key<Boolean> KEY_IS_CHECKED_PASSCODE_LOCK =
+                                                PreferencesKeys.booleanKey("is_checked_passcode_lock");
+    private final Preferences.Key<String> KEY_PASSCODE = PreferencesKeys.stringKey("passcode");
+    private final Preferences.Key<Boolean> KEY_IS_CHECKED_WEATHER_INFO_ACQUISITION =
+                                    PreferencesKeys.booleanKey("is_checked_weather_info_acquisition");
+
     @Inject
     public UserPreferences(RxDataStore<Preferences> preferencesRxDataStore) {
+        Objects.requireNonNull(preferencesRxDataStore);
+
         this.dataStore = preferencesRxDataStore;
     }
 
+    // MEMO:初回読込は"null"が返ってくるので、その場合は初期値を返す。(他のPreferenceValueも同様)
     public Flowable<ThemeColorPreferenceValue> loadThemeColorPreferenceValue() {
-        return this.dataStore.data().cache().map(preferences -> {
+        return dataStore.data().cache().map(preferences -> {
             Integer savedThemeColorNumber = preferences.get(KEY_THEME_COLOR);
             if (savedThemeColorNumber == null) {
                 return new ThemeColorPreferenceValue(ThemeColor.values()[0].getNumber());
@@ -45,7 +49,9 @@ public class UserPreferences {
     }
 
     public Single<Preferences> saveThemeColorPreferenceValue(ThemeColorPreferenceValue value) {
-        return this.dataStore.updateDataAsync(preferences -> {
+        Objects.requireNonNull(value);
+
+        return dataStore.updateDataAsync(preferences -> {
             MutablePreferences mutablePreferences = preferences.toMutablePreferences();
             mutablePreferences.set(KEY_THEME_COLOR, value.getThemeColorNumber());
             return Single.just(mutablePreferences);
@@ -53,7 +59,7 @@ public class UserPreferences {
     }
 
     public Flowable<CalendarStartDayOfWeekPreferenceValue> loadCalendarStartDayOfWeekPreferenceValue() {
-        return this.dataStore.data().map(preferences -> {
+        return dataStore.data().map(preferences -> {
             Integer savedCalendarStartDayOfWeekNumber = preferences.get(KEY_CALENDAR_START_DAY_OF_WEEK);
             if (savedCalendarStartDayOfWeekNumber == null) {
                 return new CalendarStartDayOfWeekPreferenceValue(DayOfWeek.SUNDAY.getValue());
@@ -64,7 +70,9 @@ public class UserPreferences {
     }
 
     public Single<Preferences> saveCalendarStartDayOfWeekPreferenceValue(CalendarStartDayOfWeekPreferenceValue value) {
-        return this.dataStore.updateDataAsync(preferences -> {
+        Objects.requireNonNull(value);
+
+        return dataStore.updateDataAsync(preferences -> {
             MutablePreferences mutablePreferences = preferences.toMutablePreferences();
             mutablePreferences.set(KEY_CALENDAR_START_DAY_OF_WEEK, value.getDayOfWeekNumber());
             return Single.just(mutablePreferences);
@@ -72,11 +80,11 @@ public class UserPreferences {
     }
 
     public Flowable<ReminderNotificationPreferenceValue> loadReminderNotificationPreferenceValue() {
-        return this.dataStore.data().map(preferences -> {
-            Boolean savedIsReminderNotification = preferences.get(KEY_IS_REMINDER_NOTIFICATION);
+        return dataStore.data().map(preferences -> {
+            Boolean savedIsReminderNotification = preferences.get(KEY_IS_CHECKED_REMINDER_NOTIFICATION);
             String savedReminderNotificationTime = preferences.get(KEY_REMINDER_NOTIFICATION_TIME);
             if (savedIsReminderNotification == null || savedReminderNotificationTime == null) {
-                return new ReminderNotificationPreferenceValue(Boolean.FALSE, "");
+                return new ReminderNotificationPreferenceValue(false, "");
             }
 
             return new ReminderNotificationPreferenceValue(savedIsReminderNotification, savedReminderNotificationTime);
@@ -84,37 +92,41 @@ public class UserPreferences {
     }
 
     public Single<Preferences> saveReminderNotificationPreferenceValue(ReminderNotificationPreferenceValue value) {
-        return this.dataStore.updateDataAsync(preferences -> {
+        Objects.requireNonNull(value);
+
+        return dataStore.updateDataAsync(preferences -> {
             MutablePreferences mutablePreferences = preferences.toMutablePreferences();
-            mutablePreferences.set(KEY_IS_REMINDER_NOTIFICATION, value.getIsChecked());
+            mutablePreferences.set(KEY_IS_CHECKED_REMINDER_NOTIFICATION, value.getIsChecked());
             mutablePreferences.set(KEY_REMINDER_NOTIFICATION_TIME, value.getNotificationTimeString());
             return Single.just(mutablePreferences);
         });
     }
 
     public Flowable<PassCodeLockPreferenceValue> loadPasscodeLockPreferenceValue() {
-        return this.dataStore.data().map(preferences -> {
-            Boolean savedIsPasscodeLock = preferences.get(KEY_IS_PASSCODE_LOCK);
-            Integer savedPasscode = preferences.get(KEY_PASSCODE);
+        return dataStore.data().map(preferences -> {
+            Boolean savedIsPasscodeLock = preferences.get(KEY_IS_CHECKED_PASSCODE_LOCK);
+            String savedPasscode = preferences.get(KEY_PASSCODE);
             if (savedIsPasscodeLock == null || savedPasscode == null) {
-                return new PassCodeLockPreferenceValue(false, -1);
+                return new PassCodeLockPreferenceValue(false, "");
             }
             return new PassCodeLockPreferenceValue(savedIsPasscodeLock, savedPasscode);
         });
     }
 
     public Single<Preferences> savePasscodeLockPreferenceValue(PassCodeLockPreferenceValue value) {
-        return this.dataStore.updateDataAsync(preferences -> {
+        Objects.requireNonNull(value);
+
+        return dataStore.updateDataAsync(preferences -> {
             MutablePreferences mutablePreferences = preferences.toMutablePreferences();
-            mutablePreferences.set(KEY_IS_PASSCODE_LOCK, value.getIsChecked());
+            mutablePreferences.set(KEY_IS_CHECKED_PASSCODE_LOCK, value.getIsChecked());
             mutablePreferences.set(KEY_PASSCODE, value.getCode());
             return Single.just(mutablePreferences);
         });
     }
 
-    public Flowable<WeatherInfoAcquisitionPreferenceValue> loadGettingWeatherInformationPreferenceValue() {
-        return this.dataStore.data().map(preferences -> {
-            Boolean savedIsGettingWeatherInformation = preferences.get(KEY_IS_GETTING_WEATHER_INFORMATION);
+    public Flowable<WeatherInfoAcquisitionPreferenceValue> loadWeatherInfoAcquisitionPreferenceValue() {
+        return dataStore.data().map(preferences -> {
+            Boolean savedIsGettingWeatherInformation = preferences.get(KEY_IS_CHECKED_WEATHER_INFO_ACQUISITION);
             if (savedIsGettingWeatherInformation == null) {
                 return new WeatherInfoAcquisitionPreferenceValue(false);
             }
@@ -122,23 +134,13 @@ public class UserPreferences {
         });
     }
 
-    public Single<Preferences> saveGettingWeatherInformationPreferenceValue(WeatherInfoAcquisitionPreferenceValue value) {
-        return this.dataStore.updateDataAsync(preferences -> {
+    public Single<Preferences> saveWeatherInfoAcquisitionPreferenceValue(WeatherInfoAcquisitionPreferenceValue value) {
+        Objects.requireNonNull(value);
+
+        return dataStore.updateDataAsync(preferences -> {
             MutablePreferences mutablePreferences = preferences.toMutablePreferences();
-            mutablePreferences.set(KEY_IS_GETTING_WEATHER_INFORMATION, value.getIsChecked());
+            mutablePreferences.set(KEY_IS_CHECKED_WEATHER_INFO_ACQUISITION, value.getIsChecked());
             return Single.just(mutablePreferences);
         });
     }
-
-
-
-    // TODO:調整用(最終的に削除)
-    public Single<Preferences> removeCalendarStartDayOfWeek() {
-        return this.dataStore.updateDataAsync(preferences -> {
-            MutablePreferences mutablePreferences = preferences.toMutablePreferences();
-            mutablePreferences.remove(KEY_CALENDAR_START_DAY_OF_WEEK);
-            return Single.just(mutablePreferences);
-        });
-    }
-
 }

@@ -31,7 +31,7 @@ public class PreferencesModule {
         Objects.requireNonNull(context);
 
         RxDataStore<Preferences> rxDataStore =
-                new RxPreferenceDataStoreBuilder(context, "settings").build();
+                new RxPreferenceDataStoreBuilder(context, "user_preferences").build();
         return Objects.requireNonNull(rxDataStore);
     }
 

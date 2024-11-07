@@ -1,77 +1,62 @@
 package com.websarva.wings.android.zuboradiary.data.preferences;
 
-import android.util.Log;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.WindowDecorActionBar;
-
-import com.websarva.wings.android.zuboradiary.data.DateTimeStringConverter;
 
 import java.time.LocalTime;
 import java.time.format.DateTimeParseException;
+import java.util.Objects;
 
 public class ReminderNotificationPreferenceValue {
+
     private final boolean isChecked;
     private final String notificationTime;
 
-    public ReminderNotificationPreferenceValue(Boolean isChecked,@Nullable LocalTime notificationTime) {
-        if (isChecked == null) {
-            throw new NullPointerException();
-        }
-        if (isChecked && notificationTime == null) {
-            throw new IllegalArgumentException();
-        }
-        if (!isChecked && notificationTime != null) {
-            throw new IllegalArgumentException();
-        }
+    public ReminderNotificationPreferenceValue(boolean isChecked,@Nullable LocalTime notificationTime) {
+        if (isChecked) Objects.requireNonNull(notificationTime);
 
         this.isChecked = isChecked;
-        if (!isChecked) {
+        if (isChecked) {
+            this.notificationTime = notificationTime.toString();
+        } else {
             this.notificationTime = "";
-            return;
         }
-        this.notificationTime = notificationTime.toString();
     }
 
-    public ReminderNotificationPreferenceValue(Boolean isChecked, String notificationTime) {
-        if (isChecked == null) {
-            throw new NullPointerException();
-        }
-        if (notificationTime == null) {
-            throw new NullPointerException();
-        }
-        boolean isFormat;
-        try {
-            LocalTime.parse(notificationTime);
-            isFormat = true;
-        } catch (DateTimeParseException e) {
-            isFormat = false;
-        }
-        if (isChecked && (notificationTime.isEmpty() || !isFormat)) {
-            throw new IllegalArgumentException();
-        }
-        if (!isChecked && !notificationTime.isEmpty()) {
-            throw new IllegalArgumentException();
+    public ReminderNotificationPreferenceValue(boolean isChecked,@Nullable String notificationTime) {
+        String _notificationTime;
+        if (isChecked) {
+            Objects.requireNonNull(notificationTime);
+            boolean isFormat;
+            try {
+                LocalTime.parse(notificationTime);
+                isFormat = true;
+            } catch (DateTimeParseException e) {
+                isFormat = false;
+            }
+            if (notificationTime.isEmpty() || !isFormat) throw new IllegalArgumentException();
+
+            _notificationTime = notificationTime;
+        } else {
+            _notificationTime = "";
         }
 
         this.isChecked = isChecked;
-        this.notificationTime = notificationTime;
+        this.notificationTime = _notificationTime;
     }
 
     public boolean getIsChecked() {
         return isChecked;
     }
 
+    @NonNull
     public String getNotificationTimeString() {
         return notificationTime;
     }
 
     @Nullable
     public LocalTime getNotificationLocalTime() {
-        if (!isChecked) {
-            return null;
-        }
+        if (!isChecked) return null;
 
         return LocalTime.parse(notificationTime);
     }

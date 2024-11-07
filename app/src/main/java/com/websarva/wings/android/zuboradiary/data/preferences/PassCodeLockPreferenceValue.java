@@ -1,30 +1,25 @@
 package com.websarva.wings.android.zuboradiary.data.preferences;
 
-import android.net.ipsec.ike.IkeSaProposal;
-
 import androidx.annotation.Nullable;
+
+import java.util.Objects;
 
 public class PassCodeLockPreferenceValue {
 
     private final boolean isChecked;
-    private final int code;
+    private final String code;
 
-    public PassCodeLockPreferenceValue(Boolean isChecked,@Nullable Integer code) {
-        if (isChecked == null) {
-            throw new NullPointerException();
-        }
-        if (isChecked && code == null) {
-            throw new NullPointerException();
-        }
-        if (isChecked && code < 0 || code > 9999) {
-            throw new IllegalArgumentException();
+    public PassCodeLockPreferenceValue(boolean isChecked, @Nullable String code) {
+        if (isChecked) {
+            Objects.requireNonNull(code);
+            if (code.matches("|d{4}")) throw new IllegalArgumentException();
         }
 
         this.isChecked = isChecked;
         if (isChecked) {
             this.code = code;
         } else {
-            this.code = -1;
+            this.code = "";
         }
     }
 
@@ -32,7 +27,7 @@ public class PassCodeLockPreferenceValue {
         return isChecked;
     }
 
-    public int getCode() {
+    public String getCode() {
         return code;
     }
 }

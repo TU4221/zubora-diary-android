@@ -2,25 +2,22 @@ package com.websarva.wings.android.zuboradiary.data.preferences;
 
 
 import java.util.Arrays;
+import java.util.Objects;
 
 public class ThemeColorPreferenceValue {
+
     private final int themeColorNumber;
 
     public ThemeColorPreferenceValue(int themeColorNumber) {
         boolean contains =
                 Arrays.stream(ThemeColor.values()).anyMatch(x -> x.getNumber() == themeColorNumber);
-
-        if (!contains) {
-            throw new IllegalArgumentException();
-        }
+        if (!contains) throw new IllegalArgumentException();
 
         this.themeColorNumber = themeColorNumber;
     }
 
     public ThemeColorPreferenceValue(ThemeColor themeColor) {
-        if (themeColor == null) {
-            throw new NullPointerException();
-        }
+        Objects.requireNonNull(themeColor);
 
         this.themeColorNumber = themeColor.getNumber();
     }

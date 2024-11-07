@@ -223,7 +223,7 @@
     <string name="reminder_notification_worker_content_title">お疲れ様です</string>
     <string name="reminder_notification_worker_content_text">今日の出来事を日記に書きましょう。</string>
 
-    <!-- enum_weathers -->
+    <!-- enum_weather -->
     <string name="enum_weather_unknown">--</string>
     <string name="enum_weather_sunny">晴</string>
     <string name="enum_weather_cloudy">曇</string>

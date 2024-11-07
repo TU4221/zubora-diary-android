@@ -9,10 +9,10 @@ import androidx.lifecycle.MutableLiveData;
 import com.websarva.wings.android.zuboradiary.data.AppError;
 import com.websarva.wings.android.zuboradiary.data.network.GeoCoordinates;
 import com.websarva.wings.android.zuboradiary.data.preferences.CalendarStartDayOfWeekPreferenceValue;
+import com.websarva.wings.android.zuboradiary.data.preferences.UserPreferencesRepository;
 import com.websarva.wings.android.zuboradiary.data.preferences.WeatherInfoAcquisitionPreferenceValue;
 import com.websarva.wings.android.zuboradiary.data.preferences.PassCodeLockPreferenceValue;
 import com.websarva.wings.android.zuboradiary.data.preferences.ReminderNotificationPreferenceValue;
-import com.websarva.wings.android.zuboradiary.data.preferences.SettingsRepository;
 import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColorPreferenceValue;
 import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor;
 import com.websarva.wings.android.zuboradiary.data.worker.WorkerRepository;
@@ -32,7 +32,7 @@ import io.reactivex.rxjava3.functions.Consumer;
 
 @HiltViewModel
 public class SettingsViewModel extends BaseViewModel {
-    private final SettingsRepository settingsRepository;
+    private final UserPreferencesRepository userPreferencesRepository;
     private final WorkerRepository workerRepository;
     private final CompositeDisposable disposables = new CompositeDisposable();
 
@@ -51,8 +51,8 @@ public class SettingsViewModel extends BaseViewModel {
     private Flowable<WeatherInfoAcquisitionPreferenceValue> weatherInfoAcquisitionPreferenceValueFlowable;
 
     @Inject
-    public SettingsViewModel(SettingsRepository settingsRepository, WorkerRepository workerRepository) {
-        this.settingsRepository = settingsRepository;
+    public SettingsViewModel(UserPreferencesRepository userPreferencesRepository, WorkerRepository workerRepository) {
+        this.userPreferencesRepository = userPreferencesRepository;
         this.workerRepository = workerRepository;
 
         initialize();
@@ -70,7 +70,7 @@ public class SettingsViewModel extends BaseViewModel {
     }
 
     private void setUpThemeColorPreferenceValueLoading() {
-        themeColorPreferenceValueFlowable = settingsRepository.loadThemeColorSettingValue();
+        themeColorPreferenceValueFlowable = userPreferencesRepository.loadThemeColorSettingValue();
         disposables.add(
                 themeColorPreferenceValueFlowable.subscribe(
                         value -> {
@@ -95,7 +95,7 @@ public class SettingsViewModel extends BaseViewModel {
 
     private void setUpCalendarStartDayOfWeekPreferenceValueLoading() {
         calendarStartDayPreferenceValueFlowable =
-                settingsRepository.loadCalendarStartDayOfWeekPreferenceValue();
+                userPreferencesRepository.loadCalendarStartDayOfWeekPreferenceValue();
         disposables.add(
                 calendarStartDayPreferenceValueFlowable.subscribe(
                         value -> {
@@ -122,7 +122,7 @@ public class SettingsViewModel extends BaseViewModel {
 
     private void setUpReminderNotificationPreferenceValueLoading() {
         reminderNotificationPreferenceValueFlowable =
-                settingsRepository.loadReminderNotificationPreferenceValue();
+                userPreferencesRepository.loadReminderNotificationPreferenceValue();
         disposables.add(
                 reminderNotificationPreferenceValueFlowable.subscribe(
                         value -> {
@@ -158,7 +158,7 @@ public class SettingsViewModel extends BaseViewModel {
     }
 
     private void setUpPasscodeLockPreferenceValueLoading() {
-        passCodeLockPreferenceValueFlowable = settingsRepository.loadPasscodeLockPreferenceValue();
+        passCodeLockPreferenceValueFlowable = userPreferencesRepository.loadPasscodeLockPreferenceValue();
         disposables.add(
                 passCodeLockPreferenceValueFlowable.subscribe(
                         value -> {
@@ -174,7 +174,7 @@ public class SettingsViewModel extends BaseViewModel {
 
     private void setUpWeatherInfoAcquisitionPreferenceValueLoading() {
         weatherInfoAcquisitionPreferenceValueFlowable =
-                settingsRepository.loadGettingWeatherInformationPreferenceValue();
+                userPreferencesRepository.loadWeatherInfoAcquisitionPreferenceValue();
         disposables.add(
                 weatherInfoAcquisitionPreferenceValueFlowable.subscribe(
                         value -> {
@@ -212,7 +212,7 @@ public class SettingsViewModel extends BaseViewModel {
         Objects.requireNonNull(value);
 
         ThemeColorPreferenceValue preferenceValue = new ThemeColorPreferenceValue(value);
-        Single<Preferences> result = settingsRepository.saveThemeColorPreferenceValue(preferenceValue);
+        Single<Preferences> result = userPreferencesRepository.saveThemeColorPreferenceValue(preferenceValue);
         setUpProcessOnSaved(result, null);
     }
 
@@ -222,15 +222,16 @@ public class SettingsViewModel extends BaseViewModel {
         CalendarStartDayOfWeekPreferenceValue preferenceValue =
                 new CalendarStartDayOfWeekPreferenceValue(value);
         Single<Preferences> result =
-                settingsRepository.saveCalendarStartDayOfWeekPreferenceValue(preferenceValue);
+                userPreferencesRepository.saveCalendarStartDayOfWeekPreferenceValue(preferenceValue);
         setUpProcessOnSaved(result, null);
     }
 
     void saveReminderNotificationValid(LocalTime value) {
         Objects.requireNonNull(value);
 
-        ReminderNotificationPreferenceValue preferenceValue = new ReminderNotificationPreferenceValue(true, value);
-        Single<Preferences> result = settingsRepository.saveReminderNotificationPreferenceValue(preferenceValue);
+        ReminderNotificationPreferenceValue preferenceValue =
+                new ReminderNotificationPreferenceValue(true, value);
+        Single<Preferences> result = userPreferencesRepository.saveReminderNotificationPreferenceValue(preferenceValue);
         setUpProcessOnSaved(result, new OnSettingsSavedCallback() {
             @Override
             public void onSettingsSaved() {
@@ -242,7 +243,7 @@ public class SettingsViewModel extends BaseViewModel {
     void saveReminderNotificationInvalid() {
         ReminderNotificationPreferenceValue preferenceValue =
                 new ReminderNotificationPreferenceValue(false,(LocalTime) null);
-        Single<Preferences> result = settingsRepository.saveReminderNotificationPreferenceValue(preferenceValue);
+        Single<Preferences> result = userPreferencesRepository.saveReminderNotificationPreferenceValue(preferenceValue);
         setUpProcessOnSaved(result, new OnSettingsSavedCallback() {
             @Override
             public void onSettingsSaved() {
@@ -252,8 +253,15 @@ public class SettingsViewModel extends BaseViewModel {
     }
 
     void savePasscodeLock(boolean value) {
-        PassCodeLockPreferenceValue preferenceValue = new PassCodeLockPreferenceValue(value, 0);
-        Single<Preferences> result = settingsRepository.savePasscodeLockPreferenceValue(preferenceValue);
+        String passcode;
+        if (value) {
+            passcode = "0000"; // TODO:仮
+        } else {
+            passcode = "";
+        }
+
+        PassCodeLockPreferenceValue preferenceValue = new PassCodeLockPreferenceValue(value, passcode);
+        Single<Preferences> result = userPreferencesRepository.savePasscodeLockPreferenceValue(preferenceValue);
         setUpProcessOnSaved(result, null);
     }
 
@@ -261,7 +269,7 @@ public class SettingsViewModel extends BaseViewModel {
         WeatherInfoAcquisitionPreferenceValue preferenceValue =
                 new WeatherInfoAcquisitionPreferenceValue(value);
         Single<Preferences> result =
-                settingsRepository.saveGettingWeatherInformationPreferenceValue(preferenceValue);
+                userPreferencesRepository.saveWeatherInfoAcquisitionPreferenceValue(preferenceValue);
         setUpProcessOnSaved(result, null);
     }
 
