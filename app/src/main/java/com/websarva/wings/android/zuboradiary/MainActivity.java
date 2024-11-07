@@ -5,6 +5,7 @@ import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.Looper;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -44,6 +45,7 @@ import com.websarva.wings.android.zuboradiary.ui.ThemeColorInflaterCreator;
 import com.websarva.wings.android.zuboradiary.ui.calendar.CalendarFragment;
 import com.websarva.wings.android.zuboradiary.ui.list.diarylist.DiaryListFragment;
 import com.websarva.wings.android.zuboradiary.data.network.GeoCoordinates;
+import com.websarva.wings.android.zuboradiary.ui.settings.SettingsFragment;
 import com.websarva.wings.android.zuboradiary.ui.settings.SettingsViewModel;
 
 import java.util.List;
@@ -237,17 +239,30 @@ public class MainActivity extends AppCompatActivity {
             // StartDestinationFragment以外用ナビゲーション有効オブサーバー設定
             findNavFragmentManager().addFragmentOnAttachListener(new FragmentOnAttachListener() {
                 @Override
-                public void onAttachFragment(@NonNull FragmentManager fragmentManager,
-                                             @NonNull Fragment fragment) {
-                    fragment.getLifecycle().addObserver(new EnabledNavigationLifecycleEventObserver());
+                public void onAttachFragment(
+                        @NonNull FragmentManager fragmentManager, @NonNull Fragment fragment) {
+                    // MEMO:BottomNavigationタブに割り当てられているFragment以外は処理不要
+                    //      Dialogを表示した時は背面FragmentのLifecycleEventが"OnResume"のままとなるため、
+                    //      DialogにEnabledNavigationLifecycleEventObserverクラスをセットすると
+                    //      BottomNavigationが無効状態のままとなる。
+                    if (!(fragment instanceof DiaryListFragment)
+                            && !(fragment instanceof CalendarFragment)
+                            && !(fragment instanceof SettingsFragment)) {
+                        return;
+                    }
+
+                    fragment.getLifecycle()
+                            .addObserver(new EnabledNavigationLifecycleEventObserver());
                 }
             });
         }
         
         private class EnabledNavigationLifecycleEventObserver implements LifecycleEventObserver {
             @Override
-            public void onStateChanged(@NonNull LifecycleOwner lifecycleOwner,
-                    @NonNull Lifecycle.Event event) {
+            public void onStateChanged(
+                    @NonNull LifecycleOwner lifecycleOwner, @NonNull Lifecycle.Event event) {
+                Log.d("20241107", "LifecycleOwner" + lifecycleOwner);
+                Log.d("20241107", "LifecycleEvent" + event);
                 if (event != Lifecycle.Event.ON_RESUME) {
                     switchEnabledNavigation(false);
                     return;
