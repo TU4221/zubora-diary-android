@@ -7,6 +7,7 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.os.Build;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -24,24 +25,37 @@ import com.websarva.wings.android.zuboradiary.R;
 import com.websarva.wings.android.zuboradiary.data.database.DiaryRepository;
 
 import java.time.LocalDate;
+import java.util.Objects;
 
 import dagger.assisted.Assisted;
 import dagger.assisted.AssistedInject;
 
 @HiltWorker
 public class ReminderNotificationWorker extends Worker {
-    private NotificationManager notificationManager;
-    private final String CHANNEL_ID = "reminder_notification_worker";
-    private final String CHANNEL_NAME = "リマインダー通知"; // TODO:string.xmlへ置換
-    private final String CHANNEL_DESCRIPTION = "設定した時間に日記を書く事をお知らせします。"; // TODO:string.xmlへ置換
-    private final int NOTIFY_ID = 100;
+
+    private final String CHANNEL_ID;
+    private final String CHANNEL_NAME;
+    private final String CHANNEL_DESCRIPTION;
+    private final String CONTENT_TITLE;
+    private final String CONTENT_TEXT;
+    private final int NOTIFY_ID;
     private final DiaryRepository diaryRepository;
+
     @AssistedInject
     public ReminderNotificationWorker(
-            @Assisted /*@NonNull*/ Context context,
-            @Assisted /*@NonNull*/ WorkerParameters workerParams,
+            @Assisted Context context,
+            @Assisted WorkerParameters workerParams,
             DiaryRepository diaryRepository) {
         super(context, workerParams);
+        Objects.requireNonNull(diaryRepository);
+
+        CHANNEL_ID = context.getString(R.string.reminder_notification_worker_channel_id);
+        CHANNEL_NAME = context.getString(R.string.reminder_notification_worker_channel_name);
+        CHANNEL_DESCRIPTION = context.getString(R.string.reminder_notification_worker_channel_description);
+        CONTENT_TITLE = context.getString(R.string.reminder_notification_worker_content_title);
+        CONTENT_TEXT = context.getString(R.string.reminder_notification_worker_content_text);
+        NOTIFY_ID = 100;
+
         this.diaryRepository = diaryRepository;
         prepareNotificationManager();
     }
@@ -49,13 +63,10 @@ public class ReminderNotificationWorker extends Worker {
     @NonNull
     @Override
     public Result doWork() {
-        Boolean isAppInForeground = isAppInForeground();
-        if (isAppInForeground == null) {
-            return Result.failure();
-        }
-        if (isAppInForeground) {
-            return Result.success();
-        }
+        CustomApplication application = (CustomApplication) getApplicationContext();
+        boolean isAppInForeground = application.getIsAppInForeground();
+
+        if (isAppInForeground) return Result.success();
         boolean hasWriteTodayDiary;
         try {
             hasWriteTodayDiary = hasWriteTodayDiary();
@@ -63,14 +74,12 @@ public class ReminderNotificationWorker extends Worker {
             e.printStackTrace();
             return Result.failure();
         }
-        if (hasWriteTodayDiary) {
-            return Result.success();
-        }
+        if (hasWriteTodayDiary) return Result.success();
         return showHeadsUpNotification();
     }
 
     private void prepareNotificationManager() {
-        notificationManager =
+        NotificationManager notificationManager =
                 (NotificationManager)
                         getApplicationContext().getSystemService(Context.NOTIFICATION_SERVICE);
 
@@ -86,39 +95,27 @@ public class ReminderNotificationWorker extends Worker {
         }
     }
 
-    private boolean isAppInForeground() {
-        CustomApplication application = null;
-        if (getApplicationContext() instanceof CustomApplication) {
-            Log.d("NotificationWorker", "isAppInForeground()_isCustomApplication:" + String.valueOf(true));
-            application = (CustomApplication) getApplicationContext();
-        } else {
-            Log.d("NotificationWorker", "isAppInForeground()_isCustomApplication:" + String.valueOf(false));
-            return false;
-        }
-        Log.d("NotificationWorker", "isAppInForeground()_isAppInForeground:" + String.valueOf(application.getIsAppInForeground()));
-        return application.getIsAppInForeground();
-    }
-
     private boolean hasWriteTodayDiary() throws Exception{
         ListenableFuture<Boolean> listenableFuture = diaryRepository.hasDiary(LocalDate.now());
         Boolean result = listenableFuture.get();
-        if (result == null) {
-            return false;
-        }
-        Log.d("NotificationWorker", "hasWriteTodayDiary():" + String.valueOf(result));
+        if (result == null) return false;
+        Log.d("NotificationWorker", "hasWriteTodayDiary():" + result);
         return result;
     }
 
     private Result showHeadsUpNotification() {
-        boolean isPermission =
-                ActivityCompat.checkSelfPermission(
-                        getApplicationContext(), Manifest.permission.POST_NOTIFICATIONS)
-                        == PackageManager.PERMISSION_GRANTED;
-        Log.d("NotificationWorker", "showHeadsUpNotification()_NotificationIsPermission:" + String.valueOf(isPermission));
-
-        if (!isPermission) {
-            return Result.failure();
+        boolean isPermission;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            isPermission =
+                    ActivityCompat.checkSelfPermission(
+                            getApplicationContext(), Manifest.permission.POST_NOTIFICATIONS)
+                            == PackageManager.PERMISSION_GRANTED;
+        } else {
+            isPermission = true;
         }
+        Log.d("NotificationWorker", "showHeadsUpNotification()_NotificationIsPermission:" + isPermission);
+
+        if (!isPermission) return Result.failure();
 
         PendingIntent pendingIntent =
                 new NavDeepLinkBuilder(getApplicationContext())
@@ -126,16 +123,12 @@ public class ReminderNotificationWorker extends Worker {
                         .setDestination(R.id.navigation_diary_list_fragment)
                         .createPendingIntent();
 
-        NotificationCompat.Builder builder;
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-            builder = new NotificationCompat.Builder(getApplicationContext(), CHANNEL_ID);
-        } else {
-            builder = new NotificationCompat.Builder(getApplicationContext());
-        }
+        NotificationCompat.Builder builder =
+                new NotificationCompat.Builder(getApplicationContext(), CHANNEL_ID);
         Notification notification =
                 builder.setSmallIcon(R.drawable.ic_notifications_24px)
-                        .setContentTitle("お疲れ様です") // TODO:string.xmlへ置換
-                        .setContentText("今日の出来事を日記に書きましょう。") // TODO:string.xmlへ置換
+                        .setContentTitle(CONTENT_TITLE)
+                        .setContentText(CONTENT_TEXT)
                         .setPriority(NotificationCompat.PRIORITY_MAX)
                         .setDefaults(Notification.DEFAULT_ALL)
                         .setContentIntent(pendingIntent)
@@ -143,7 +136,7 @@ public class ReminderNotificationWorker extends Worker {
                         .build();
 
         NotificationManagerCompat notificationManager =
-                NotificationManagerCompat.from(this.getApplicationContext());
+                NotificationManagerCompat.from(getApplicationContext());
         notificationManager.notify(NOTIFY_ID, notification);
         return Result.success();
     }

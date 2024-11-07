@@ -216,6 +216,13 @@
     <string name="day_of_week_short_name_friday">金</string>
     <string name="day_of_week_short_name_saturday">土</string>
 
+    <!-- ReminderNotificationWorker -->
+    <string name="reminder_notification_worker_channel_id">reminder_notification_worker</string>
+    <string name="reminder_notification_worker_channel_name">リマインダー通知</string>
+    <string name="reminder_notification_worker_channel_description">設定した時間に日記を書く事をお知らせします。</string>
+    <string name="reminder_notification_worker_content_title">お疲れ様です</string>
+    <string name="reminder_notification_worker_content_text">今日の出来事を日記に書きましょう。</string>
+
     <!-- enum_weathers -->
     <string name="enum_weather_unknown">--</string>
     <string name="enum_weather_sunny">晴</string>
