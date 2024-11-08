@@ -398,7 +398,7 @@ public class SettingsFragment extends BaseFragment {
                         }
 
                         DateTimeStringConverter converter = new DateTimeStringConverter();
-                        String strTime = converter.toStringTimeHourMinute(time);
+                        String strTime = converter.toHourMinute(time);
                         binding.includeReminderNotificationSetting.textSettingValue.setText(strTime);
                     }
                 });

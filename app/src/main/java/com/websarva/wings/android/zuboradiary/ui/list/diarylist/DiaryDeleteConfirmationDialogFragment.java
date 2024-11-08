@@ -25,7 +25,7 @@ public class DiaryDeleteConfirmationDialogFragment extends BaseAlertDialogFragme
         LocalDate date =
                 DiaryDeleteConfirmationDialogFragmentArgs.fromBundle(requireArguments()).getDeleteDiaryDate();
         DateTimeStringConverter dateTimeStringConverter = new DateTimeStringConverter();
-        String strDate = dateTimeStringConverter.toStringDate(date);
+        String strDate = dateTimeStringConverter.toYearMonthDayWeek(date);
         return strDate + getString(R.string.dialog_diary_delete_confirmation_message);
     }
 

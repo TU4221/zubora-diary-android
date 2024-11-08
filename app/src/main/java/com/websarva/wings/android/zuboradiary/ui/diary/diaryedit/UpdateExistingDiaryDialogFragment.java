@@ -29,7 +29,7 @@ public class UpdateExistingDiaryDialogFragment extends BaseAlertDialogFragment {
         Objects.requireNonNull(updateDiaryDate);
 
         DateTimeStringConverter converter = new DateTimeStringConverter();
-        String updateDiaryDateString = converter.toStringDate(updateDiaryDate);
+        String updateDiaryDateString = converter.toYearMonthDayWeek(updateDiaryDate);
         return updateDiaryDateString + getString(R.string.dialog_update_Existing_diary_message);
     }
 

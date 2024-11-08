@@ -13,10 +13,8 @@ import androidx.sqlite.db.SupportSQLiteDatabase;
 import com.websarva.wings.android.zuboradiary.data.database.DiaryDAO;
 import com.websarva.wings.android.zuboradiary.data.database.DiaryDatabase;
 import com.websarva.wings.android.zuboradiary.data.database.DiaryItemTitleSelectionHistoryDAO;
-import com.websarva.wings.android.zuboradiary.data.diary.ConditionConverter;
-import com.websarva.wings.android.zuboradiary.data.diary.Conditions;
-import com.websarva.wings.android.zuboradiary.data.diary.WeatherConverter;
-import com.websarva.wings.android.zuboradiary.data.diary.Weathers;
+import com.websarva.wings.android.zuboradiary.data.diary.Condition;
+import com.websarva.wings.android.zuboradiary.data.diary.Weather;
 
 import java.util.Objects;
 
@@ -54,15 +52,13 @@ public class DatabaseModule {
                     String oldStringWeather2 = cursor.getString(cursor.getColumnIndex("weather_2") - 1);
                     String oldStringCondition = cursor.getString(cursor.getColumnIndex("condition") - 1);
 
-                    // Converterを使って変換
-                    WeatherConverter weatherConverter = new WeatherConverter();
-                    Weathers weather1 = weatherConverter.toWeather(context, oldStringWeather1);
-                    Integer intWeather1 = weather1.toWeatherNumber();
-                    Weathers weather2 = weatherConverter.toWeather(context, oldStringWeather2);
-                    Integer intWeather2 = weather2.toWeatherNumber();
-                    ConditionConverter conditionConverter = new ConditionConverter();
-                    Conditions condition = conditionConverter.toCondition(context, oldStringCondition);
-                    Integer intCondition = condition.toConditionNumber();
+                    // 変換
+                    Weather weather1 = Weather.of(context, oldStringWeather1);
+                    Integer intWeather1 = weather1.toNumber();
+                    Weather weather2 = Weather.of(context, oldStringWeather2);
+                    Integer intWeather2 = weather2.toNumber();
+                    Condition condition = Condition.of(context, oldStringCondition);
+                    Integer intCondition = condition.toNumber();
 
                     // 新しいカラムにデータを挿入
                     ContentValues contentValues = new ContentValues();

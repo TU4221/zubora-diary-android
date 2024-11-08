@@ -10,7 +10,7 @@ public class ThemeColorPreferenceValue {
 
     public ThemeColorPreferenceValue(int themeColorNumber) {
         boolean contains =
-                Arrays.stream(ThemeColor.values()).anyMatch(x -> x.getNumber() == themeColorNumber);
+                Arrays.stream(ThemeColor.values()).anyMatch(x -> x.toNumber() == themeColorNumber);
         if (!contains) throw new IllegalArgumentException();
 
         this.themeColorNumber = themeColorNumber;
@@ -19,7 +19,7 @@ public class ThemeColorPreferenceValue {
     public ThemeColorPreferenceValue(ThemeColor themeColor) {
         Objects.requireNonNull(themeColor);
 
-        this.themeColorNumber = themeColor.getNumber();
+        this.themeColorNumber = themeColor.toNumber();
     }
 
     public int getThemeColorNumber() {

@@ -23,9 +23,9 @@ import android.widget.TextView;
 
 import com.websarva.wings.android.zuboradiary.R;
 import com.websarva.wings.android.zuboradiary.data.DateTimeStringConverter;
-import com.websarva.wings.android.zuboradiary.data.diary.Conditions;
+import com.websarva.wings.android.zuboradiary.data.diary.Condition;
 import com.websarva.wings.android.zuboradiary.data.diary.ItemNumber;
-import com.websarva.wings.android.zuboradiary.data.diary.Weathers;
+import com.websarva.wings.android.zuboradiary.data.diary.Weather;
 import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor;
 import com.websarva.wings.android.zuboradiary.databinding.FragmentDiaryShowBinding;
 import com.websarva.wings.android.zuboradiary.ui.BaseFragment;
@@ -188,7 +188,7 @@ public class DiaryShowFragment extends BaseFragment {
                         if (date == null) return;
 
                         DateTimeStringConverter converter = new DateTimeStringConverter();
-                        String stringDate = converter.toStringDate(date);
+                        String stringDate = converter.toYearMonthDayWeek(date);
                         binding.materialToolbarTopAppBar.setTitle(stringDate);
                     }
                 });
@@ -216,7 +216,7 @@ public class DiaryShowFragment extends BaseFragment {
                 );
     }
 
-    public static class Weather1Observer implements Observer<Weathers> {
+    public static class Weather1Observer implements Observer<Weather> {
         private final Context context;
         private final TextView textWeather;
 
@@ -229,14 +229,14 @@ public class DiaryShowFragment extends BaseFragment {
         }
 
         @Override
-        public void onChanged(Weathers weather) {
+        public void onChanged(Weather weather) {
             Objects.requireNonNull(weather);
 
             textWeather.setText(weather.toString(context));
         }
     }
 
-    public static class Weather2Observer implements Observer<Weathers> {
+    public static class Weather2Observer implements Observer<Weather> {
         private final Context context;
         private final TextView slush;
         private final TextView textWeather;
@@ -252,10 +252,10 @@ public class DiaryShowFragment extends BaseFragment {
         }
 
         @Override
-        public void onChanged(Weathers weather) {
+        public void onChanged(Weather weather) {
             Objects.requireNonNull(weather);
 
-            if (weather == Weathers.UNKNOWN) {
+            if (weather == Weather.UNKNOWN) {
                 slush.setVisibility(View.GONE);
                 textWeather.setVisibility(View.GONE);
             } else {
@@ -277,7 +277,7 @@ public class DiaryShowFragment extends BaseFragment {
                 );
     }
 
-    public static class ConditionObserver implements Observer<Conditions> {
+    public static class ConditionObserver implements Observer<Condition> {
         private final Context context;
         private final TextView textCondition;
 
@@ -290,7 +290,7 @@ public class DiaryShowFragment extends BaseFragment {
         }
 
         @Override
-        public void onChanged(Conditions condition) {
+        public void onChanged(Condition condition) {
             Objects.requireNonNull(condition);
 
             textCondition.setText(condition.toString(context));
@@ -359,7 +359,7 @@ public class DiaryShowFragment extends BaseFragment {
             if (localDateTime == null) return;
 
             DateTimeStringConverter dateTimeStringConverter = new DateTimeStringConverter();
-            String strDate = dateTimeStringConverter.toStringDateTime(localDateTime);
+            String strDate = dateTimeStringConverter.toYearMonthDayWeekHourMinuteSeconds(localDateTime);
             textLog.setText(strDate);
         }
     }

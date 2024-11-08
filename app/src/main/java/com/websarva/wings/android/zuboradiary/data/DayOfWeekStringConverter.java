@@ -10,13 +10,14 @@ import java.time.DayOfWeek;
 import java.util.Objects;
 
 /**
- *
- * Enum DayOfWeeK を用途に合わせた文字列に変換するクラス。
+ * Enum java.time.DayOfWeeK を用途に合わせた文字列に変換するクラス。
  * */
 public class DayOfWeekStringConverter {
-    private Context context;
+    private final Context context;
 
     public DayOfWeekStringConverter(Context context) {
+        Objects.requireNonNull(context);
+
         this.context = context;
     }
 
@@ -48,7 +49,7 @@ public class DayOfWeekStringConverter {
                 resId = R.string.day_of_week_name_saturday;
                 break;
             default:
-                return "";
+                throw new IllegalStateException();
         }
         return context.getString(resId);
     }
@@ -81,7 +82,7 @@ public class DayOfWeekStringConverter {
                 resId = R.string.day_of_week_short_name_saturday;
                 break;
             default:
-                return "";
+                throw new IllegalStateException();
         }
         return context.getString(resId);
     }

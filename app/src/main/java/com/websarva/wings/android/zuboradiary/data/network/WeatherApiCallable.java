@@ -4,7 +4,7 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 
-import com.websarva.wings.android.zuboradiary.data.diary.Weathers;
+import com.websarva.wings.android.zuboradiary.data.diary.Weather;
 
 import java.util.Objects;
 import java.util.concurrent.Callable;
@@ -33,7 +33,7 @@ public abstract class WeatherApiCallable  implements Callable<Boolean> {
                 WeatherApiResponse weatherApiResponse = response.body();
                 Objects.requireNonNull(weatherApiResponse);
                 Log.d("WeatherApi", "response.body():" + response.body());
-                Weathers weather = weatherApiResponse.toWeatherInfo();
+                Weather weather = weatherApiResponse.toWeatherInfo();
                 onResponse(weather);
                 return true;
             } else {
@@ -53,7 +53,7 @@ public abstract class WeatherApiCallable  implements Callable<Boolean> {
 
     }
 
-    public abstract void onResponse(@NonNull Weathers weather);
+    public abstract void onResponse(@NonNull Weather weather);
 
     public abstract void onFailure();
 

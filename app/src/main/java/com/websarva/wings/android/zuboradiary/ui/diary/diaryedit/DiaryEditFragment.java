@@ -36,11 +36,9 @@ import android.widget.TextView;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 import com.websarva.wings.android.zuboradiary.data.DateTimeStringConverter;
-import com.websarva.wings.android.zuboradiary.data.diary.ConditionConverter;
-import com.websarva.wings.android.zuboradiary.data.diary.Conditions;
+import com.websarva.wings.android.zuboradiary.data.diary.Condition;
 import com.websarva.wings.android.zuboradiary.data.diary.ItemNumber;
-import com.websarva.wings.android.zuboradiary.data.diary.WeatherConverter;
-import com.websarva.wings.android.zuboradiary.data.diary.Weathers;
+import com.websarva.wings.android.zuboradiary.data.diary.Weather;
 import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor;
 import com.websarva.wings.android.zuboradiary.databinding.FragmentDiaryEditBinding;
 import com.websarva.wings.android.zuboradiary.R;
@@ -353,7 +351,7 @@ public class DiaryEditFragment extends BaseFragment {
             if (diaryEditViewModel.getIsShowingItemTitleEditFragment()) return;
 
             DateTimeStringConverter dateTimeStringConverter = new DateTimeStringConverter();
-            binding.textInputEditTextDate.setText(dateTimeStringConverter.toStringDate(date));
+            binding.textInputEditTextDate.setText(dateTimeStringConverter.toYearMonthDayWeek(date));
             Log.d("DiaryEditInputDate", "currentDate:" + date);
             LocalDate loadedDate = diaryEditViewModel.getLoadedDateLiveData().getValue();
             Log.d("DiaryEditInputDate", "loadedDate:" + loadedDate);
@@ -410,30 +408,29 @@ public class DiaryEditFragment extends BaseFragment {
                 ArrayAdapter<?> arrayAdapter = (ArrayAdapter<?>) listAdapter;
                 String strWeather = (String) arrayAdapter.getItem(position);
                 Objects.requireNonNull(strWeather);
-                WeatherConverter weatherConverter = new WeatherConverter();
-                Weathers weather = weatherConverter.toWeather(requireContext(), strWeather);
+                Weather weather = Weather.of(requireContext(), strWeather);
                 diaryEditViewModel.updateWeather1(weather);
                 binding.autoCompleteTextWeather1.clearFocus();
             }
         });
 
         diaryEditViewModel.getWeather1LiveData()
-                .observe(getViewLifecycleOwner(), new Observer<Weathers>() {
+                .observe(getViewLifecycleOwner(), new Observer<Weather>() {
                     @Override
-                    public void onChanged(Weathers weather) {
+                    public void onChanged(Weather weather) {
                         Objects.requireNonNull(weather);
 
                         String strWeather = weather.toString(requireContext());
                         binding.autoCompleteTextWeather1.setText(strWeather, false);
 
                         // Weather2 Spinner有効無効切替
-                        boolean isEnabled = (weather != Weathers.UNKNOWN);
+                        boolean isEnabled = (weather != Weather.UNKNOWN);
                         binding.textInputLayoutWeather2.setEnabled(isEnabled);
                         binding.autoCompleteTextWeather2.setEnabled(isEnabled);
 
-                        if (weather == Weathers.UNKNOWN || diaryEditViewModel.isEqualWeathers()) {
+                        if (weather == Weather.UNKNOWN || diaryEditViewModel.isEqualWeathers()) {
                             binding.autoCompleteTextWeather2.setAdapter(weatherArrayAdapter);
-                            diaryEditViewModel.updateWeather2(Weathers.UNKNOWN);
+                            diaryEditViewModel.updateWeather2(Weather.UNKNOWN);
                         } else {
                             weather2ArrayAdapter = createWeatherSpinnerAdapter(weather);
                             binding.autoCompleteTextWeather2.setAdapter(weather2ArrayAdapter);
@@ -450,17 +447,16 @@ public class DiaryEditFragment extends BaseFragment {
                 ListAdapter listAdapter = binding.autoCompleteTextWeather2.getAdapter();
                 ArrayAdapter<?> arrayAdapter = (ArrayAdapter<?>) listAdapter;
                 String strWeather = (String) arrayAdapter.getItem(position);
-                WeatherConverter weatherConverter = new WeatherConverter();
-                Weathers weather = weatherConverter.toWeather(requireContext(), strWeather);
+                Weather weather = Weather.of(requireContext(), strWeather);
                 diaryEditViewModel.updateWeather2(weather);
                 binding.autoCompleteTextWeather2.clearFocus();
             }
         });
 
         diaryEditViewModel.getWeather2LiveData()
-                .observe(getViewLifecycleOwner(), new Observer<Weathers>() {
+                .observe(getViewLifecycleOwner(), new Observer<Weather>() {
                     @Override
-                    public void onChanged(Weathers weather) {
+                    public void onChanged(Weather weather) {
                         Objects.requireNonNull(weather);
 
                         String strWeather = weather.toString(requireContext());
@@ -470,13 +466,13 @@ public class DiaryEditFragment extends BaseFragment {
     }
 
     @NonNull
-    private ArrayAdapter<String> createWeatherSpinnerAdapter(@Nullable Weathers... excludedWeathers) {
+    private ArrayAdapter<String> createWeatherSpinnerAdapter(@Nullable Weather... excludedWeathers) {
         ThemeColor themeColor = settingsViewModel.loadThemeColorSettingValue();
         int themeResId = themeColor.getThemeResId();
         Context contextWithTheme = new ContextThemeWrapper(requireContext(), themeResId);
 
         List<String> weatherItemList = new ArrayList<>();
-        Arrays.stream(Weathers.values()).forEach(x -> {
+        Arrays.stream(Weather.values()).forEach(x -> {
             boolean isIncluded = !isExcludedWeather(x, excludedWeathers);
             if (isIncluded) weatherItemList.add(x.toString(requireContext()));
         });
@@ -484,9 +480,9 @@ public class DiaryEditFragment extends BaseFragment {
         return new ArrayAdapter<>(contextWithTheme, R.layout.layout_drop_down_list_item, weatherItemList);
     }
 
-    private boolean isExcludedWeather(Weathers weather, @Nullable Weathers... excludedWeathers) {
+    private boolean isExcludedWeather(Weather weather, @Nullable Weather... excludedWeathers) {
         if (excludedWeathers == null) return false;
-        for(Weathers excludedWeather: excludedWeathers) {
+        for(Weather excludedWeather: excludedWeathers) {
             if (weather == excludedWeather) return true;
         }
         return false;
@@ -506,17 +502,16 @@ public class DiaryEditFragment extends BaseFragment {
                 ListAdapter listAdapter = binding.autoCompleteTextCondition.getAdapter();
                 ArrayAdapter<?> arrayAdapter = (ArrayAdapter<?>) listAdapter;
                 String strCondition = (String) arrayAdapter.getItem(position);
-                ConditionConverter converter = new ConditionConverter();
-                Conditions condition = converter.toCondition(requireContext(), strCondition);
+                Condition condition = Condition.of(requireContext(), strCondition);
                 diaryEditViewModel.updateCondition(condition);
                 binding.autoCompleteTextCondition.clearFocus();
             }
         });
 
         diaryEditViewModel.getConditionLiveData()
-                .observe(getViewLifecycleOwner(), new Observer<Conditions>() {
+                .observe(getViewLifecycleOwner(), new Observer<Condition>() {
                     @Override
-                    public void onChanged(Conditions condition) {
+                    public void onChanged(Condition condition) {
                         Objects.requireNonNull(condition);
 
                         String strCondition = condition.toString(requireContext());
@@ -532,7 +527,7 @@ public class DiaryEditFragment extends BaseFragment {
         Context contextWithTheme = new ContextThemeWrapper(requireContext(), themeResId);
 
         List<String> conditonItemList = new ArrayList<>();
-        Arrays.stream(Conditions.values())
+        Arrays.stream(Condition.values())
                 .forEach(x -> conditonItemList.add(x.toString(requireContext())));
 
         return new ArrayAdapter<>(contextWithTheme, R.layout.layout_drop_down_list_item, conditonItemList);

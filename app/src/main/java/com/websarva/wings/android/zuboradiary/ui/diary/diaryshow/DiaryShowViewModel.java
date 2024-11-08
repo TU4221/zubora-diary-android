@@ -5,9 +5,9 @@ import androidx.lifecycle.LiveData;
 import com.websarva.wings.android.zuboradiary.data.AppError;
 import com.websarva.wings.android.zuboradiary.data.database.Diary;
 import com.websarva.wings.android.zuboradiary.data.database.DiaryRepository;
-import com.websarva.wings.android.zuboradiary.data.diary.Conditions;
+import com.websarva.wings.android.zuboradiary.data.diary.Condition;
 import com.websarva.wings.android.zuboradiary.data.diary.ItemNumber;
-import com.websarva.wings.android.zuboradiary.data.diary.Weathers;
+import com.websarva.wings.android.zuboradiary.data.diary.Weather;
 import com.websarva.wings.android.zuboradiary.ui.BaseViewModel;
 import com.websarva.wings.android.zuboradiary.ui.diary.DiaryLiveData;
 
@@ -80,15 +80,15 @@ public class DiaryShowViewModel extends BaseViewModel {
         return diaryLiveData.getDateMutableLiveData();
     }
 
-    public LiveData<Weathers> getWeather1LiveData() {
+    public LiveData<Weather> getWeather1LiveData() {
         return diaryLiveData.getWeather1MutableLiveData();
     }
 
-    public LiveData<Weathers> getWeather2LiveData() {
+    public LiveData<Weather> getWeather2LiveData() {
         return diaryLiveData.getWeather2MutableLiveData();
     }
 
-    public LiveData<Conditions> getConditionLiveData() {
+    public LiveData<Condition> getConditionLiveData() {
         return diaryLiveData.getConditionMutableLiveData();
     }
 

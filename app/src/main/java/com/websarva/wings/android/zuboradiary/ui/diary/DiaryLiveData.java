@@ -6,11 +6,9 @@ import androidx.lifecycle.MutableLiveData;
 
 import com.websarva.wings.android.zuboradiary.data.database.Diary;
 import com.websarva.wings.android.zuboradiary.data.database.DiaryItemTitleSelectionHistoryItem;
-import com.websarva.wings.android.zuboradiary.data.diary.ConditionConverter;
-import com.websarva.wings.android.zuboradiary.data.diary.Conditions;
+import com.websarva.wings.android.zuboradiary.data.diary.Condition;
 import com.websarva.wings.android.zuboradiary.data.diary.ItemNumber;
-import com.websarva.wings.android.zuboradiary.data.diary.WeatherConverter;
-import com.websarva.wings.android.zuboradiary.data.diary.Weathers;
+import com.websarva.wings.android.zuboradiary.data.diary.Weather;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -20,9 +18,9 @@ import java.util.Objects;
 
 public class DiaryLiveData {
     private final MutableLiveData<LocalDate> date = new MutableLiveData<>();
-    private final MutableLiveData<Weathers> weather1 = new MutableLiveData<>();
-    private final MutableLiveData<Weathers> weather2 = new MutableLiveData<>();
-    private final MutableLiveData<Conditions> condition = new MutableLiveData<>();
+    private final MutableLiveData<Weather> weather1 = new MutableLiveData<>();
+    private final MutableLiveData<Weather> weather2 = new MutableLiveData<>();
+    private final MutableLiveData<Condition> condition = new MutableLiveData<>();
     private final MutableLiveData<String> title = new MutableLiveData<>();
     private final MutableLiveData<Integer> numVisibleItems = new MutableLiveData<>();
     public static final int MAX_ITEMS = ItemNumber.MAX_NUMBER;
@@ -40,9 +38,9 @@ public class DiaryLiveData {
 
     public void initialize() {
         date.setValue(null);
-        weather1.setValue(Weathers.UNKNOWN);
-        weather2.setValue(Weathers.UNKNOWN);
-        condition.setValue(Conditions.UNKNOWN);
+        weather1.setValue(Weather.UNKNOWN);
+        weather2.setValue(Weather.UNKNOWN);
+        condition.setValue(Condition.UNKNOWN);
         title.setValue("");
         numVisibleItems.setValue(1);
         for (DiaryItemLiveData item: items) {
@@ -56,14 +54,12 @@ public class DiaryLiveData {
         Objects.requireNonNull(diary);
 
         date.setValue(LocalDate.parse(diary.getDate()));
-        WeatherConverter weatherConverter = new WeatherConverter();
         Integer intWeather1 = getOrDefault(diary.getWeather1(), 0);
-        weather1.setValue(weatherConverter.toWeather(intWeather1));
+        weather1.setValue(Weather.of(intWeather1));
         Integer intWeather2 = getOrDefault(diary.getWeather2(), 0);
-        weather2.setValue(weatherConverter.toWeather(intWeather2));
-        ConditionConverter conditionConverter = new ConditionConverter();
+        weather2.setValue(Weather.of(intWeather2));
         Integer intCondition = getOrDefault(diary.getCondition(), 0);
-        condition.setValue(conditionConverter.toCondition(intCondition));
+        condition.setValue(Condition.of(intCondition));
         String title = getOrDefault(diary.getTitle(), "");
         this.title.setValue(title);
 
@@ -137,16 +133,16 @@ public class DiaryLiveData {
         return date.toString();
     }
 
-    private int toIntWeather(Weathers weather) {
+    private int toIntWeather(Weather weather) {
         Objects.requireNonNull(weather);
 
-        return weather.toWeatherNumber();
+        return weather.toNumber();
     }
 
-    private int toIntCondition(Conditions condition) {
+    private int toIntCondition(Condition condition) {
         Objects.requireNonNull(condition);
 
-        return condition.toConditionNumber();
+        return condition.toNumber();
     }
 
     @NonNull
@@ -215,15 +211,15 @@ public class DiaryLiveData {
         return date;
     }
 
-    public MutableLiveData<Weathers> getWeather1MutableLiveData() {
+    public MutableLiveData<Weather> getWeather1MutableLiveData() {
         return weather1;
     }
 
-    public MutableLiveData<Weathers> getWeather2MutableLiveData() {
+    public MutableLiveData<Weather> getWeather2MutableLiveData() {
         return weather2;
     }
 
-    public MutableLiveData<Conditions> getConditionMutableLiveData() {
+    public MutableLiveData<Condition> getConditionMutableLiveData() {
         return condition;
     }
 

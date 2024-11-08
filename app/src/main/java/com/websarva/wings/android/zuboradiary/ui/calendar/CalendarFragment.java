@@ -438,7 +438,7 @@ public class CalendarFragment extends BaseFragment {
         Objects.requireNonNull(date);
 
         DateTimeStringConverter dateTimeStringConverter = new DateTimeStringConverter();
-        String stringDate = dateTimeStringConverter.toStringDate(date);
+        String stringDate = dateTimeStringConverter.toYearMonthDayWeek(date);
         binding.materialToolbarTopAppBar.setTitle(stringDate);
     }
 

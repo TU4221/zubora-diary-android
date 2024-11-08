@@ -41,7 +41,7 @@ public class UserPreferences {
         return dataStore.data().cache().map(preferences -> {
             Integer savedThemeColorNumber = preferences.get(KEY_THEME_COLOR);
             if (savedThemeColorNumber == null) {
-                return new ThemeColorPreferenceValue(ThemeColor.values()[0].getNumber());
+                return new ThemeColorPreferenceValue(ThemeColor.values()[0].toNumber());
             }
 
             return new ThemeColorPreferenceValue(savedThemeColorNumber);

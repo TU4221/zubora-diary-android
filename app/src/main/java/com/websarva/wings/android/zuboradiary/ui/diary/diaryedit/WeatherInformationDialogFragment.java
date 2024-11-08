@@ -1,17 +1,8 @@
 package com.websarva.wings.android.zuboradiary.ui.diary.diaryedit;
 
-import android.app.AlertDialog;
-import android.app.Dialog;
 import android.content.DialogInterface;
-import android.os.Bundle;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.DialogFragment;
-import androidx.lifecycle.SavedStateHandle;
-import androidx.navigation.NavBackStackEntry;
-import androidx.navigation.NavController;
-import androidx.navigation.fragment.NavHostFragment;
 
 import com.websarva.wings.android.zuboradiary.R;
 import com.websarva.wings.android.zuboradiary.data.DateTimeStringConverter;
@@ -38,7 +29,7 @@ public class WeatherInformationDialogFragment extends BaseAlertDialogFragment {
         Objects.requireNonNull(loadingDiaryDate);
 
         DateTimeStringConverter dateTimeStringConverter = new DateTimeStringConverter();
-        String dateString = dateTimeStringConverter.toStringDate(loadingDiaryDate);
+        String dateString = dateTimeStringConverter.toYearMonthDayWeek(loadingDiaryDate);
         return dateString + getString(R.string.dialog_weather_information_message);
     }
 

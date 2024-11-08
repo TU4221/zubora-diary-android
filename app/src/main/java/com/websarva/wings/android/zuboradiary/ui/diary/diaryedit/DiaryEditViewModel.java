@@ -7,9 +7,9 @@ import androidx.lifecycle.MutableLiveData;
 import com.websarva.wings.android.zuboradiary.data.AppError;
 import com.websarva.wings.android.zuboradiary.data.database.DiaryItemTitleSelectionHistoryItem;
 import com.websarva.wings.android.zuboradiary.data.database.DiaryRepository;
-import com.websarva.wings.android.zuboradiary.data.diary.Conditions;
+import com.websarva.wings.android.zuboradiary.data.diary.Condition;
 import com.websarva.wings.android.zuboradiary.data.diary.ItemNumber;
-import com.websarva.wings.android.zuboradiary.data.diary.Weathers;
+import com.websarva.wings.android.zuboradiary.data.diary.Weather;
 import com.websarva.wings.android.zuboradiary.data.network.GeoCoordinates;
 import com.websarva.wings.android.zuboradiary.data.network.WeatherApiCallable;
 import com.websarva.wings.android.zuboradiary.data.network.WeatherApiRepository;
@@ -184,30 +184,30 @@ public class DiaryEditViewModel extends BaseViewModel {
     }
 
     // 天気、体調関係
-    // MEMO:Weathers、Conditionsから文字列に変換するにはContextが必要なため、
+    // MEMO:Weather、Conditionsから文字列に変換するにはContextが必要なため、
     //      Fragment上のLivedDateObserverにて変換した値を受け取る。
-    void updateWeather1(Weathers weather) {
+    void updateWeather1(Weather weather) {
         Objects.requireNonNull(weather);
 
         diaryLiveData.getWeather1MutableLiveData().setValue(weather);
     }
 
-    void updateWeather2(Weathers weather) {
+    void updateWeather2(Weather weather) {
         Objects.requireNonNull(weather);
 
         diaryLiveData.getWeather2MutableLiveData().setValue(weather);
     }
 
     boolean isEqualWeathers() {
-        Weathers weather1 = diaryLiveData.getWeather1MutableLiveData().getValue();
-        Weathers weather2 = diaryLiveData.getWeather2MutableLiveData().getValue();
+        Weather weather1 = diaryLiveData.getWeather1MutableLiveData().getValue();
+        Weather weather2 = diaryLiveData.getWeather2MutableLiveData().getValue();
         Objects.requireNonNull(weather1);
         Objects.requireNonNull(weather2);
 
         return weather1.equals(weather2);
     }
 
-    void updateCondition(Conditions condition) {
+    void updateCondition(Condition condition) {
         Objects.requireNonNull(condition);
 
         diaryLiveData.getConditionMutableLiveData().setValue(condition);
@@ -251,7 +251,7 @@ public class DiaryEditViewModel extends BaseViewModel {
         }
 
         @Override
-        public void onResponse(@NonNull Weathers weather) {
+        public void onResponse(@NonNull Weather weather) {
             diaryLiveData.getWeather1MutableLiveData().postValue(weather);
         }
 
@@ -314,17 +314,17 @@ public class DiaryEditViewModel extends BaseViewModel {
     }
 
     @NonNull
-    LiveData<Weathers> getWeather1LiveData() {
+    LiveData<Weather> getWeather1LiveData() {
         return diaryLiveData.getWeather1MutableLiveData();
     }
 
     @NonNull
-    LiveData<Weathers> getWeather2LiveData() {
+    LiveData<Weather> getWeather2LiveData() {
         return diaryLiveData.getWeather2MutableLiveData();
     }
 
     @NonNull
-    LiveData<Conditions> getConditionLiveData() {
+    LiveData<Condition> getConditionLiveData() {
         return diaryLiveData.getConditionMutableLiveData();
     }
 

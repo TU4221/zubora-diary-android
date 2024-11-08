@@ -5,7 +5,7 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 
 import com.squareup.moshi.Json;
-import com.websarva.wings.android.zuboradiary.data.diary.Weathers;
+import com.websarva.wings.android.zuboradiary.data.diary.Weather;
 
 import java.util.Arrays;
 import java.util.Objects;
@@ -24,7 +24,7 @@ public class WeatherApiResponse {
     }
 
     @NonNull
-    public Weathers toWeatherInfo() {
+    public Weather toWeatherInfo() {
         new GeoCoordinates(latitude, longitude); // GeoCoordinatesのコンストラクタを使用してlatitude、longitudeの値チェック
         Log.d("WeatherApi", "latitude:" + latitude);
         Log.d("WeatherApi", "longitude:" + longitude);
@@ -40,15 +40,15 @@ public class WeatherApiResponse {
     // "apiWeatherCode"は下記ページの"WMO 気象解釈コード"
     // https://open-meteo.com/en/docs
     @NonNull
-    private Weathers convertWeathers(int apiWeatherCode) {
+    private Weather convertWeathers(int apiWeatherCode) {
         Log.d("WeatherApi", String.valueOf(apiWeatherCode));
         switch (apiWeatherCode) {
             case 0:
             case 1:
-                return Weathers.SUNNY;
+                return Weather.SUNNY;
             case 2: case 3:
             case 45: case 48:
-                return Weathers.CLOUDY;
+                return Weather.CLOUDY;
             case 51: case 53: case 55:
             case 56: case 57:
             case 61: case 63: case 65:
@@ -56,13 +56,13 @@ public class WeatherApiResponse {
             case 80: case 81: case 82:
             case 95:
             case 96: case 99:
-                return Weathers.RAINY;
+                return Weather.RAINY;
             case 71: case 73: case 75:
             case 77:
             case 85: case 86:
-                return Weathers.SNOWY;
+                return Weather.SNOWY;
             default:
-                return Weathers.UNKNOWN;
+                return Weather.UNKNOWN;
         }
     }
 

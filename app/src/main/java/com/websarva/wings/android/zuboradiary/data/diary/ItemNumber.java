@@ -17,14 +17,6 @@ public class ItemNumber implements Serializable, Comparable<ItemNumber> {
         this.value = value;
     }
 
-    public ItemNumber incrementNumber() {
-        return new ItemNumber(value + 1);
-    }
-
-    public ItemNumber decrementNumber() {
-        return new ItemNumber(value - 1);
-    }
-
     public int getValue() {
         return value;
     }

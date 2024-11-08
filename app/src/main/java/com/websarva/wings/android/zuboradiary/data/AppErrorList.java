@@ -27,10 +27,6 @@ public class AppErrorList {
         return appErrorList.isEmpty();
     }
 
-    public int countError() {
-        return appErrorList.size();
-    }
-
     @NonNull
     public AppErrorList addAppError(AppError appError) {
         Objects.requireNonNull(appError);

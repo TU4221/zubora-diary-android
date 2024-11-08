@@ -14,6 +14,7 @@ import java.util.Objects;
 
 // CAUTION:要素の追加、順序変更を行った時はThemeColorPickerDialogFragment、string.xmlを修正すること。
 public enum ThemeColor {
+
     WHITE(0, R.string.dialog_fragment_number_picker_theme_color_white),
     BLACK(1, R.string.dialog_fragment_number_picker_theme_color_black),
     RED(2, R.string.dialog_fragment_number_picker_theme_color_red),
@@ -31,21 +32,18 @@ public enum ThemeColor {
 
     @NonNull
     public static ThemeColor of(int number) {
-        if (!Arrays.stream(ThemeColor.values()).anyMatch(x -> x.getNumber() == number)) {
-            throw new IllegalArgumentException();
-        }
-
-        return Arrays.stream(ThemeColor.values()).filter(x -> x.getNumber() == number).findFirst().get();
+        return Arrays.stream(ThemeColor.values()).filter(x -> x.toNumber() == number).findFirst().get();
     }
 
-    public int getNumber() {
+    public int toNumber() {
         return number;
     }
 
     public String toSting(Context context) {
         Objects.requireNonNull(context);
 
-        return context.getString(stringResId);
+        String string = context.getString(stringResId);
+        return Objects.requireNonNull(string);
     }
 
     // MEMO:下記以降はViewに関するカラー、リソース等を取得するメソッド。
