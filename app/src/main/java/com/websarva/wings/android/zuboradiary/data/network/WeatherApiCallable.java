@@ -2,13 +2,12 @@ package com.websarva.wings.android.zuboradiary.data.network;
 
 import android.util.Log;
 
-import com.websarva.wings.android.zuboradiary.data.AppError;
+import androidx.annotation.NonNull;
+
 import com.websarva.wings.android.zuboradiary.data.diary.Weathers;
 
-import java.io.IOException;
 import java.util.Objects;
 import java.util.concurrent.Callable;
-import java.util.concurrent.Future;
 
 import okhttp3.ResponseBody;
 import retrofit2.Call;
@@ -19,6 +18,8 @@ public abstract class WeatherApiCallable  implements Callable<Boolean> {
     private final Call<WeatherApiResponse> weatherApiResponseCall;
 
     public WeatherApiCallable(Call<WeatherApiResponse> weatherApiResponseCall) {
+        Objects.requireNonNull(weatherApiResponseCall);
+
         this.weatherApiResponseCall = weatherApiResponseCall;
     }
 
@@ -32,7 +33,7 @@ public abstract class WeatherApiCallable  implements Callable<Boolean> {
                 WeatherApiResponse weatherApiResponse = response.body();
                 Objects.requireNonNull(weatherApiResponse);
                 Log.d("WeatherApi", "response.body():" + response.body());
-                Weathers weather = weatherApiResponse.toWeatherInformation();
+                Weathers weather = weatherApiResponse.toWeatherInfo();
                 onResponse(weather);
                 return true;
             } else {
@@ -44,6 +45,7 @@ public abstract class WeatherApiCallable  implements Callable<Boolean> {
                 return false;
             }
         } catch (Exception e) {
+            Objects.requireNonNull(e);
             e.printStackTrace();
             onException(e);
             return false;
@@ -51,9 +53,9 @@ public abstract class WeatherApiCallable  implements Callable<Boolean> {
 
     }
 
-    public abstract void onResponse(Weathers weather);
+    public abstract void onResponse(@NonNull Weathers weather);
 
     public abstract void onFailure();
 
-    public abstract void onException(Exception e);
+    public abstract void onException(@NonNull Exception e);
 }

@@ -12,6 +12,7 @@ import java.util.Objects;
 
 public class WeatherApiResponse {
 
+    // MEMO:フィールド変数はRetrofit2(Moshi)にて代入。
     private float latitude;
     private float longitude;
     private WeatherApiResponseDairy daily;
@@ -23,13 +24,13 @@ public class WeatherApiResponse {
     }
 
     @NonNull
-    public Weathers toWeatherInformation() {
+    public Weathers toWeatherInfo() {
         new GeoCoordinates(latitude, longitude); // GeoCoordinatesのコンストラクタを使用してlatitude、longitudeの値チェック
-        Log.d("WeatherApi", String.valueOf(latitude));
-        Log.d("WeatherApi", String.valueOf(longitude));
+        Log.d("WeatherApi", "latitude:" + latitude);
+        Log.d("WeatherApi", "longitude:" + longitude);
         Objects.requireNonNull(daily);
-        for (String s: daily.getTimes()) Log.d("WeatherApi", s);
-        for (int i: daily.getWeatherCodes()) Log.d("WeatherApi", String.valueOf(i));
+        for (String s: daily.getTimes()) Log.d("WeatherApi", "time:" + s);
+        for (int i: daily.getWeatherCodes()) Log.d("WeatherApi", "weatherCode:" + i);
 
         int[] weatherCodes = daily.getWeatherCodes();
         int weatherCode = weatherCodes[0];
@@ -38,7 +39,8 @@ public class WeatherApiResponse {
 
     // "apiWeatherCode"は下記ページの"WMO 気象解釈コード"
     // https://open-meteo.com/en/docs
-    public Weathers convertWeathers(int apiWeatherCode) {
+    @NonNull
+    private Weathers convertWeathers(int apiWeatherCode) {
         Log.d("WeatherApi", String.valueOf(apiWeatherCode));
         switch (apiWeatherCode) {
             case 0:
@@ -65,6 +67,8 @@ public class WeatherApiResponse {
     }
 
     private static class WeatherApiResponseDairy {
+
+        // MEMO:フィールド変数はRetrofit2(Moshi)にて代入。
         @Json(name = "time")
         private String[] times;
         @Json(name = "weather_code")

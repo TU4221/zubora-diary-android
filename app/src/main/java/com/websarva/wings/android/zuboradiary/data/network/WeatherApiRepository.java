@@ -16,13 +16,13 @@ public class WeatherApiRepository {
     private final WeatherApiService weatherApiService;
     private final String QUERY_DAIRY_PARAMETER = "weather_code";
     private final String QUERY_TIME_ZONE_PARAMETER = "Asia/Tokyo";
-    private final String QUERY_FORECAST_DAYS_PARAMETER_ONLY_TODAY = "1";
-    private final String QUERY_FORECAST_DAYS_PARAMETER_NONE = "0";
-    private final String QUERY_PAST_DAYS_PARAMETER_NONE = "0";
-    private final int MAX_PAST_DAYS = 92; //過去天気情報取得可能日
+    private final int MIN_PAST_DAYS = 1; //過去天気情報取得可能最小日
+    private final int MAX_PAST_DAYS = 92; //過去天気情報取得可能最大日
 
     @Inject
     public WeatherApiRepository(WeatherApiService weatherApiService) {
+        Objects.requireNonNull(weatherApiService);
+
         this.weatherApiService = weatherApiService;
     }
 
@@ -32,6 +32,7 @@ public class WeatherApiRepository {
         LocalDate currentDate = LocalDate.now();
         Log.d("fetchWeatherInfo", "isAfter:" + date.isAfter(currentDate));
         if (date.isAfter(currentDate)) return false;
+
         long betweenDays = ChronoUnit.DAYS.between(date, currentDate);
         Log.d("fetchWeatherInfo", "betweenDays:" + betweenDays);
 
@@ -39,23 +40,28 @@ public class WeatherApiRepository {
     }
 
     public Call<WeatherApiResponse> fetchTodayWeatherInfo(GeoCoordinates geoCoordinates) {
+        Objects.requireNonNull(geoCoordinates);
+
         return weatherApiService.getWeather(
                 String.valueOf(geoCoordinates.getLatitude()),
                 String.valueOf(geoCoordinates.getLongitude()),
                 QUERY_DAIRY_PARAMETER,
                 QUERY_TIME_ZONE_PARAMETER,
-                QUERY_PAST_DAYS_PARAMETER_NONE,
-                QUERY_FORECAST_DAYS_PARAMETER_ONLY_TODAY);
+                "0" /*today*/,
+                "1" /*1日分*/);
     }
 
     public Call<WeatherApiResponse> fetchPastDayWeatherInfo(
-            GeoCoordinates geoCoordinates, @IntRange(from = 1, to = MAX_PAST_DAYS) int numPastDays) {
+            GeoCoordinates geoCoordinates, @IntRange(from = MIN_PAST_DAYS, to = MAX_PAST_DAYS) int numPastDays) {
+        Objects.requireNonNull(geoCoordinates);
+        if (numPastDays < MIN_PAST_DAYS || numPastDays > MAX_PAST_DAYS) throw new IllegalArgumentException();
+
         return weatherApiService.getWeather(
                 String.valueOf(geoCoordinates.getLatitude()),
                 String.valueOf(geoCoordinates.getLongitude()),
                 QUERY_DAIRY_PARAMETER,
                 QUERY_TIME_ZONE_PARAMETER,
                 String.valueOf(numPastDays),
-                QUERY_FORECAST_DAYS_PARAMETER_NONE);
+                "0" /*1日分(過去日から1日分取得する場合"0"を代入)*/);
     }
 }

@@ -251,7 +251,7 @@ public class DiaryEditViewModel extends BaseViewModel {
         }
 
         @Override
-        public void onResponse(Weathers weather) {
+        public void onResponse(@NonNull Weathers weather) {
             diaryLiveData.getWeather1MutableLiveData().postValue(weather);
         }
 
@@ -261,7 +261,7 @@ public class DiaryEditViewModel extends BaseViewModel {
         }
 
         @Override
-        public void onException(Exception e) {
+        public void onException(@NonNull Exception e) {
             addAppError(AppError.WEATHER_INFORMATION_LOADING);
         }
     }
