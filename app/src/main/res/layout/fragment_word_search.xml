@@ -118,7 +118,7 @@
                 <include
                     android:id="@+id/include_progress_indicator"
                     layout="@layout/layout_full_screen_circular_progress_indicator"
-                    android:isVisibleLiveData="@{word_search_view_model.isVisibleUpdateProgressBarLiveData}" />
+                    app:isVisibleLiveData="@{word_search_view_model.isVisibleUpdateProgressBarLiveData}" />
 
             </FrameLayout>
 
@@ -133,7 +133,8 @@
             android:layout_marginEnd="@dimen/fab_margin_end"
             android:layout_marginBottom="@dimen/fab_margin_bottom"
             android:src="@drawable/ic_arrow_upward_24px"
-            android:contentDescription="@string/fragment_word_search_fab_top_scroll" />
+            android:contentDescription="@string/fragment_word_search_fab_top_scroll"
+            android:enabled="@{!word_search_view_model.isVisibleUpdateProgressBarLiveData}"/>
 
     </FrameLayout>
 

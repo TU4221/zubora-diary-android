@@ -264,7 +264,6 @@ public class WordSearchFragment extends BaseFragment {
 
             List<DiaryYearMonthListItemBase> convertedList =
                     new ArrayList<>(wordSearchResultYearMonthList.getWordSearchResultYearMonthListItemList());
-            Log.d("20241017", "convertedList.size():" + convertedList.size());
             wordSearchResultYearMonthListAdapter.submitList(convertedList);
         }
     }
@@ -274,10 +273,9 @@ public class WordSearchFragment extends BaseFragment {
                 wordSearchViewModel.getWordSearchResultListLiveData().getValue();
         Objects.requireNonNull(list);
 
-        if (!list.getWordSearchResultYearMonthListItemList().isEmpty()) {
-            wordSearchViewModel
-                    .updateWordSearchResultList(resultWordColor, resultWordBackgroundColor);
-        }
+        if (list.getWordSearchResultYearMonthListItemList().isEmpty()) return;
+        wordSearchViewModel
+                .updateWordSearchResultList(resultWordColor, resultWordBackgroundColor);
     }
 
     private void setUpFloatingActionButton() {
@@ -287,6 +285,18 @@ public class WordSearchFragment extends BaseFragment {
                 Objects.requireNonNull(v);
 
                 resultListScrollToFirstPosition();
+            }
+        });
+        binding.recyclerWordSearchResultList.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+
+                if (recyclerView.canScrollVertically(-1)) {
+                    binding.fabTopScroll.show();
+                } else {
+                    binding.fabTopScroll.hide();
+                }
             }
         });
     }
