@@ -100,7 +100,7 @@ public class DatabaseModule {
     public static DiaryItemTitleSelectionHistoryDAO provideSelectedItemTitlesHistoryDAO(DiaryDatabase diaryDatabase) {
         Objects.requireNonNull(diaryDatabase);
 
-        DiaryItemTitleSelectionHistoryDAO dao = diaryDatabase.createSelectedItemTitlesHistoryDAO();
+        DiaryItemTitleSelectionHistoryDAO dao = diaryDatabase.createDiaryItemTitleSelectionHistoryDAO();
         return Objects.requireNonNull(dao);
     }
 }

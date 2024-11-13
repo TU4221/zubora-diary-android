@@ -2,8 +2,6 @@ package com.websarva.wings.android.zuboradiary.ui.diary.diaryitemtitleedit;
 
 import androidx.annotation.NonNull;
 
-import com.websarva.wings.android.zuboradiary.data.database.DiaryItemTitleSelectionHistoryItem;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;

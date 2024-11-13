@@ -56,4 +56,8 @@ public class UserPreferencesRepository {
     public Single<Preferences> saveWeatherInfoAcquisitionPreferenceValue(WeatherInfoAcquisitionPreferenceValue value) {
         return userPreferences.saveWeatherInfoAcquisitionPreferenceValue(value);
     }
+
+    public Single<Preferences> initializePreferences() {
+        return userPreferences.initialize();
+    }
 }

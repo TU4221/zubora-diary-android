@@ -1,6 +1,5 @@
 package com.websarva.wings.android.zuboradiary.ui.diary.diaryitemtitleedit;
 
-import android.content.ClipData;
 import android.content.DialogInterface;
 import android.os.Bundle;
 
@@ -15,7 +14,6 @@ import androidx.navigation.NavDirections;
 
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,7 +21,6 @@ import android.widget.EditText;
 
 import com.google.android.material.textfield.TextInputLayout;
 import com.websarva.wings.android.zuboradiary.R;
-import com.websarva.wings.android.zuboradiary.data.database.DiaryItemTitleSelectionHistoryItem;
 import com.websarva.wings.android.zuboradiary.data.diary.ItemNumber;
 import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor;
 import com.websarva.wings.android.zuboradiary.databinding.FragmentDiaryItemTitleEditBinding;
@@ -31,7 +28,6 @@ import com.websarva.wings.android.zuboradiary.ui.BaseFragment;
 import com.websarva.wings.android.zuboradiary.ui.TextInputSetup;
 import com.websarva.wings.android.zuboradiary.ui.settings.SettingsViewModel;
 
-import java.util.List;
 import java.util.Objects;
 
 import dagger.hilt.android.AndroidEntryPoint;
@@ -97,7 +93,7 @@ public class DiaryItemTitleEditFragment extends BaseFragment {
                 DiaryItemTitleEditFragmentArgs.fromBundle(getArguments()).getTargetItemNumber();
         String targetItemTitle =
                 DiaryItemTitleEditFragmentArgs.fromBundle(getArguments()).getTargetItemTitle();
-        diaryItemTitleEditViewModel.updateItemTitle(targetItemNumber, targetItemTitle);
+        diaryItemTitleEditViewModel.updateDiaryItemTitle(targetItemNumber, targetItemTitle);
     }
 
     @Override
@@ -130,7 +126,7 @@ public class DiaryItemTitleEditFragment extends BaseFragment {
             Objects.requireNonNull(deleteListItemPosition);
 
             diaryItemTitleEditViewModel
-                    .deleteSelectedItemTitleHistoryItem(deleteListItemPosition);
+                    .deleteDiaryItemTitleSelectionHistoryItem(deleteListItemPosition);
         } else {
             ItemTitleSelectionHistoryListAdapter adapter =
                     (ItemTitleSelectionHistoryListAdapter)
@@ -244,7 +240,7 @@ public class DiaryItemTitleEditFragment extends BaseFragment {
         });
 
         // 選択履歴読込・表示
-        diaryItemTitleEditViewModel.loadItemTitleSelectionHistory();
+        diaryItemTitleEditViewModel.loadDiaryItemTitleSelectionHistory();
         diaryItemTitleEditViewModel.getItemTitleSelectionHistoryLiveData()
                 .observe(getViewLifecycleOwner(), new Observer<SelectionHistoryList>() {
                     @Override

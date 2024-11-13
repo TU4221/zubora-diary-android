@@ -9,7 +9,7 @@ import androidx.lifecycle.MutableLiveData;
 
 import com.google.common.util.concurrent.ListenableFuture;
 import com.websarva.wings.android.zuboradiary.data.AppError;
-import com.websarva.wings.android.zuboradiary.data.database.Diary;
+import com.websarva.wings.android.zuboradiary.data.database.DiaryEntity;
 import com.websarva.wings.android.zuboradiary.data.database.DiaryListItem;
 import com.websarva.wings.android.zuboradiary.data.database.DiaryRepository;
 import com.websarva.wings.android.zuboradiary.ui.BaseViewModel;
@@ -72,18 +72,18 @@ public class DiaryListViewModel extends BaseViewModel {
     }
 
     void loadNewDiaryList() {
-        loadDiaryList(new NewDiaryListCreator());
+        loadSavedDiaryList(new NewDiaryListCreator());
     }
 
     void loadAdditionDiaryList() {
-        loadDiaryList(new AddedDiaryListCreator());
+        loadSavedDiaryList(new AddedDiaryListCreator());
     }
 
     void updateDiaryList() {
-        loadDiaryList(new UpdateDiaryListCreator());
+        loadSavedDiaryList(new UpdateDiaryListCreator());
     }
 
-    private void loadDiaryList(DiaryListCreator creator) {
+    private void loadSavedDiaryList(DiaryListCreator creator) {
         Log.d("DiaryListLoading", "loadDiaryList()");
         cancelPreviousLoading();
         DiaryListLoadingRunnable runnable = new DiaryListLoadingRunnable(creator);
@@ -148,7 +148,7 @@ public class DiaryListViewModel extends BaseViewModel {
                 throws CancellationException, ExecutionException, InterruptedException {
             showDiaryListFirstItemProgressIndicator();
             if (isValidityDelay) Thread.sleep(1000);
-            return loadDiaryList(NUM_LOADING_ITEMS, 0);
+            return loadSavedDiaryList(NUM_LOADING_ITEMS, 0);
         }
 
         private void showDiaryListFirstItemProgressIndicator() {
@@ -169,7 +169,7 @@ public class DiaryListViewModel extends BaseViewModel {
 
             if (isValidityDelay) Thread.sleep(1000);
             int loadingOffset = currentDiaryList.countDiaries();
-            DiaryYearMonthList loadedDiaryList = loadDiaryList(NUM_LOADING_ITEMS, loadingOffset);
+            DiaryYearMonthList loadedDiaryList = loadSavedDiaryList(NUM_LOADING_ITEMS, loadingOffset);
             int numLoadedDiaries = currentDiaryList.countDiaries() + loadedDiaryList.countDiaries();
             boolean existsUnloadedDiaries = existsUnloadedDiaries(numLoadedDiaries);
             return currentDiaryList.combineDiaryLists(loadedDiaryList, !existsUnloadedDiaries);
@@ -196,7 +196,7 @@ public class DiaryListViewModel extends BaseViewModel {
                 if (numLoadingItems < NUM_LOADING_ITEMS) {
                     numLoadingItems = NUM_LOADING_ITEMS;
                 }
-                return loadDiaryList(numLoadingItems, 0);
+                return loadSavedDiaryList(numLoadingItems, 0);
             } finally {
                 isVisibleUpdateProgressBar.postValue(false);
             }
@@ -204,14 +204,14 @@ public class DiaryListViewModel extends BaseViewModel {
     }
 
     @NonNull
-    private DiaryYearMonthList loadDiaryList(int numLoadingItems, int loadingOffset)
+    private DiaryYearMonthList loadSavedDiaryList(int numLoadingItems, int loadingOffset)
             throws CancellationException, ExecutionException, InterruptedException {
         if (numLoadingItems <= 0) throw new IllegalArgumentException();
         if (loadingOffset < 0) throw new IllegalArgumentException();
 
 
         ListenableFuture<List<DiaryListItem>> listListenableFuture =
-                diaryRepository.selectDiaryListOrderByDateDesc(
+                diaryRepository.loadDiaryList(
                         numLoadingItems,
                         loadingOffset,
                         sortConditionDate
@@ -229,7 +229,12 @@ public class DiaryListViewModel extends BaseViewModel {
     private boolean existsUnloadedDiaries(int numLoadedDiaries)
             throws CancellationException, ExecutionException, InterruptedException {
 
-        Integer numExistingDiaries = diaryRepository.countDiaries(sortConditionDate).get();
+        Integer numExistingDiaries;
+        if (sortConditionDate == null) {
+            numExistingDiaries = diaryRepository.countDiaries().get();
+        } else {
+            numExistingDiaries = diaryRepository.countDiaries(sortConditionDate).get();
+        }
         Objects.requireNonNull(numExistingDiaries);
         if (numExistingDiaries <= 0) return false;
 
@@ -264,9 +269,9 @@ public class DiaryListViewModel extends BaseViewModel {
     }
 
     @Nullable
-    Integer countDiaries() {
+    Integer countSavedDiaries() {
         try {
-            return diaryRepository.countDiaries(null).get();
+            return diaryRepository.countDiaries().get();
         } catch (CancellationException | ExecutionException | InterruptedException e) {
             addAppError(AppError.DIARY_INFORMATION_LOADING);
             return null;
@@ -275,10 +280,10 @@ public class DiaryListViewModel extends BaseViewModel {
 
 
     @Nullable
-    LocalDate loadNewestDiary() {
+    LocalDate loadNewestSavedDiary() {
         try {
-            Diary diary = diaryRepository.selectNewestDiary().get();
-            String strDate = diary.getDate();
+            DiaryEntity diaryEntity = diaryRepository.loadNewestDiary().get();
+            String strDate = diaryEntity.getDate();
             return LocalDate.parse(strDate);
         } catch (Exception e) {
             addAppError(AppError.DIARY_INFORMATION_LOADING);
@@ -287,10 +292,10 @@ public class DiaryListViewModel extends BaseViewModel {
     }
 
     @Nullable
-    LocalDate loadOldestDiary() {
+    LocalDate loadOldestSavedDiary() {
         try {
-            Diary diary = diaryRepository.selectOldestDiary().get();
-            String strDate = diary.getDate();
+            DiaryEntity diaryEntity = diaryRepository.loadOldestDiary().get();
+            String strDate = diaryEntity.getDate();
             return LocalDate.parse(strDate);
         } catch (Exception e) {
             addAppError(AppError.DIARY_INFORMATION_LOADING);

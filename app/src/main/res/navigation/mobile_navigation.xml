@@ -148,6 +148,15 @@
                 android:id="@+id/action_settings_fragment_to_permission_dialog"
                 app:destination="@id/navigation_permission_dialog"/>
             <action
+                android:id="@+id/action_settings_fragment_to_all_diaries_delete_confirmation_dialog"
+                app:destination="@id/navigation_all_diaries_delete_confirmation_dialog"/>
+            <action
+                android:id="@+id/action_settings_fragment_to_all_settings_initialization_confirmation_dialog"
+                app:destination="@id/navigation_all_settings_initialization_confirmation_dialog"/>
+            <action
+                android:id="@+id/action_settings_fragment_to_all_data_delete_confirmation_dialog"
+                app:destination="@id/navigation_all_data_delete_confirmation_dialog"/>
+            <action
                 android:id="@+id/action_settings_fragment_to_message_dialog"
                 app:destination="@id/navigation_message_dialog">
                 <argument
@@ -181,6 +190,18 @@
             <argument
                 android:name="permission_name"
                 app:argType="string" />
+        </dialog>
+        <dialog
+            android:id="@+id/navigation_all_diaries_delete_confirmation_dialog"
+            android:name="com.websarva.wings.android.zuboradiary.ui.settings.AllDiariesDeleteConfirmationDialogFragment">
+        </dialog>
+        <dialog
+            android:id="@+id/navigation_all_settings_initialization_confirmation_dialog"
+            android:name="com.websarva.wings.android.zuboradiary.ui.settings.AllSettingsInitializationConfirmationDialogFragment">
+        </dialog>
+        <dialog
+            android:id="@+id/navigation_all_data_delete_confirmation_dialog"
+            android:name="com.websarva.wings.android.zuboradiary.ui.settings.AllDataDeleteConfirmationDialogFragment">
         </dialog>
     </navigation>
 

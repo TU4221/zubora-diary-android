@@ -156,6 +156,9 @@ public class SettingsFragment extends BaseFragment {
         setUpReminderNotificationSettingItem();
         setUpPasscodeLockSettingItem();
         setUpWeatherInfoAcquisitionSettingItem();
+        setUpAllDiariesDeleteSettingItem();
+        setUpAllSettingsInitializationSettingItem();
+        setUpAllDataDeleteSettingItem();
     }
 
     @Override
@@ -169,6 +172,9 @@ public class SettingsFragment extends BaseFragment {
         receiveCalendarStartDayPickerDialogResult();
         receiveReminderNotificationTimePickerDialogResult();
         receivePermissionDialogResult();
+        receiveAllDiariesDeleteConfirmationDialogResult();
+        receiveAllSettingsInitializationConfirmationDialogResult();
+        receiveAllDataDeleteConfirmationDialogResult();
     }
 
     @Override
@@ -178,6 +184,9 @@ public class SettingsFragment extends BaseFragment {
         savedStateHandle.remove(ReminderNotificationTimePickerDialogFragment.KEY_SELECTED_BUTTON);
         savedStateHandle.remove(ReminderNotificationTimePickerDialogFragment.KEY_SELECTED_TIME);
         savedStateHandle.remove(PermissionDialogFragment.KEY_SELECTED_BUTTON);
+        savedStateHandle.remove(AllDiariesDeleteConfirmationDialogFragment.KEY_SELECTED_BUTTON);
+        savedStateHandle.remove(AllSettingsInitializationConfirmationDialogFragment.KEY_SELECTED_BUTTON);
+        savedStateHandle.remove(AllDataDeleteConfirmationDialogFragment.KEY_SELECTED_BUTTON);
     }
 
     @Override
@@ -229,6 +238,33 @@ public class SettingsFragment extends BaseFragment {
         showApplicationDetailsSettings();
     }
 
+    private void receiveAllDiariesDeleteConfirmationDialogResult() {
+        Integer selectedButton =
+                receiveResulFromDialog(AllDiariesDeleteConfirmationDialogFragment.KEY_SELECTED_BUTTON);
+        if (selectedButton == null) return;
+        if (selectedButton != Dialog.BUTTON_POSITIVE) return;
+
+        settingsViewModel.deleteAllDiaries();
+    }
+
+    private void receiveAllSettingsInitializationConfirmationDialogResult() {
+        Integer selectedButton =
+                receiveResulFromDialog(AllSettingsInitializationConfirmationDialogFragment.KEY_SELECTED_BUTTON);
+        if (selectedButton == null) return;
+        if (selectedButton != Dialog.BUTTON_POSITIVE) return;
+
+        settingsViewModel.deleteAllSettings();
+    }
+
+    private void receiveAllDataDeleteConfirmationDialogResult() {
+        Integer selectedButton =
+                receiveResulFromDialog(AllDataDeleteConfirmationDialogFragment.KEY_SELECTED_BUTTON);
+        if (selectedButton == null) return;
+        if (selectedButton != Dialog.BUTTON_POSITIVE) return;
+
+        settingsViewModel.deleteAllData();
+    }
+
     private void setUpThemeColorSettingItem() {
         binding.includeThemeColorSetting.textSettingTitle.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -264,8 +300,9 @@ public class SettingsFragment extends BaseFragment {
         ColorSwitchingViewList<TextView> sectionList =
                 new ColorSwitchingViewList<>(
                         binding.textSettingsSectionDesign,
-                        binding.textSettingsSectionSettings,
-                        binding.textSettingsSectionEnd
+                        binding.textSettingsSectionSetting,
+                        binding.textSettingsSectionEnd,
+                        binding.textSettingsSectionData
                 );
         switcher.switchSettingItemSectionColor(sectionList);
 
@@ -275,7 +312,10 @@ public class SettingsFragment extends BaseFragment {
                         binding.includeCalendarStartDaySetting.textSettingTitle,
                         binding.includeReminderNotificationSetting.textSettingTitle,
                         binding.includePasscodeLockSetting.textSettingTitle,
-                        binding.includeWeatherInfoAcquisitionSetting.textSettingTitle
+                        binding.includeWeatherInfoAcquisitionSetting.textSettingTitle,
+                        binding.includeAllDiariesDeleteSetting.textSettingTitle,
+                        binding.includeAllSettingsInitializationSetting.textSettingTitle,
+                        binding.includeAllDataDeleteSetting.textSettingTitle
                 );
         switcher.switchSettingItemIconColor(iconList);
 
@@ -288,7 +328,10 @@ public class SettingsFragment extends BaseFragment {
                         binding.includeReminderNotificationSetting.textSettingTitle,
                         binding.includeReminderNotificationSetting.textSettingValue,
                         binding.includePasscodeLockSetting.textSettingTitle,
-                        binding.includeWeatherInfoAcquisitionSetting.textSettingTitle
+                        binding.includeWeatherInfoAcquisitionSetting.textSettingTitle,
+                        binding.includeAllDiariesDeleteSetting.textSettingTitle,
+                        binding.includeAllSettingsInitializationSetting.textSettingTitle,
+                        binding.includeAllDataDeleteSetting.textSettingTitle
                 );
         switcher.switchTextColorOnBackground(textList);
 
@@ -309,6 +352,10 @@ public class SettingsFragment extends BaseFragment {
                         binding.materialDividerReminderNotificationSetting,
                         binding.materialDividerPasscodeLockSetting,
                         binding.materialDividerWeatherInfoAcquisitionSetting,
+                        binding.materialDividerSectionData,
+                        binding.materialDividerAllDiariesDeleteSetting,
+                        binding.materialDividerAllSettingsInitializationSetting,
+                        binding.materialDividerAllDataDeleteSetting,
                         binding.materialDividerSectionEnd
                 );
         switcher.switchDividerColor(dividerList);
@@ -528,6 +575,45 @@ public class SettingsFragment extends BaseFragment {
         }
     }
 
+    private void setUpAllDiariesDeleteSettingItem() {
+        binding.includeAllDiariesDeleteSetting.textSettingTitle.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Objects.requireNonNull(v);
+
+                showAllDiariesDeleteConfirmationDialog();
+            }
+        });
+
+        binding.includeAllDiariesDeleteSetting.textSettingValue.setVisibility(View.GONE);
+    }
+
+    private void setUpAllSettingsInitializationSettingItem() {
+        binding.includeAllSettingsInitializationSetting.textSettingTitle.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Objects.requireNonNull(v);
+
+                showAllSettingsInitializationConfirmationDialog();
+            }
+        });
+
+        binding.includeAllSettingsInitializationSetting.textSettingValue.setVisibility(View.GONE);
+    }
+
+    private void setUpAllDataDeleteSettingItem() {
+        binding.includeAllDataDeleteSetting.textSettingTitle.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Objects.requireNonNull(v);
+
+                showAllDataDeleteConfirmationDialog();
+            }
+        });
+
+        binding.includeAllDataDeleteSetting.textSettingValue.setVisibility(View.GONE);
+    }
+
     @RequiresApi(api = Build.VERSION_CODES.TIRAMISU)
     private boolean isGrantedPostNotifications() {
         return ActivityCompat.checkSelfPermission(
@@ -574,11 +660,39 @@ public class SettingsFragment extends BaseFragment {
     }
 
     private void showPermissionDialog(String permissionName) {
+        Objects.requireNonNull(permissionName);
         if (!canShowOtherFragment()) return;
 
         NavDirections action =
                 SettingsFragmentDirections
                         .actionSettingsFragmentToPermissionDialog(permissionName);
+        navController.navigate(action);
+    }
+
+    private void showAllDiariesDeleteConfirmationDialog() {
+        if (!canShowOtherFragment()) return;
+
+        NavDirections action =
+                SettingsFragmentDirections
+                        .actionSettingsFragmentToAllDiariesDeleteConfirmationDialog();
+        navController.navigate(action);
+    }
+
+    private void showAllSettingsInitializationConfirmationDialog() {
+        if (!canShowOtherFragment()) return;
+
+        NavDirections action =
+                SettingsFragmentDirections
+                        .actionSettingsFragmentToAllSettingsInitializationConfirmationDialog();
+        navController.navigate(action);
+    }
+
+    private void showAllDataDeleteConfirmationDialog() {
+        if (!canShowOtherFragment()) return;
+
+        NavDirections action =
+                SettingsFragmentDirections
+                        .actionSettingsFragmentToAllDataDeleteConfirmationDialog();
         navController.navigate(action);
     }
 

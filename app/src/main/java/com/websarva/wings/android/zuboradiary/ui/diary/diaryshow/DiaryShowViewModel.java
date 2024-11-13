@@ -3,7 +3,7 @@ package com.websarva.wings.android.zuboradiary.ui.diary.diaryshow;
 import androidx.lifecycle.LiveData;
 
 import com.websarva.wings.android.zuboradiary.data.AppError;
-import com.websarva.wings.android.zuboradiary.data.database.Diary;
+import com.websarva.wings.android.zuboradiary.data.database.DiaryEntity;
 import com.websarva.wings.android.zuboradiary.data.database.DiaryRepository;
 import com.websarva.wings.android.zuboradiary.data.diary.Condition;
 import com.websarva.wings.android.zuboradiary.data.diary.ItemNumber;
@@ -42,23 +42,23 @@ public class DiaryShowViewModel extends BaseViewModel {
         diaryLiveData.initialize();
     }
 
-    public boolean hasDiary(LocalDate date) {
+    public boolean existsSavedDiary(LocalDate date) {
         Objects.requireNonNull(date);
 
         try {
-            return diaryRepository.hasDiary(date).get();
+            return diaryRepository.existsDiary(date).get();
         } catch (ExecutionException | InterruptedException e) {
             addAppError(AppError.DIARY_INFORMATION_LOADING);
             return false;
         }
     }
 
-    public void loadDiary(LocalDate date) {
+    public void loadSavedDiary(LocalDate date) {
         Objects.requireNonNull(date);
 
         try {
-            Diary diary = diaryRepository.selectDiary(date).get();
-            diaryLiveData.update(diary);
+            DiaryEntity diaryEntity = diaryRepository.loadDiary(date).get();
+            diaryLiveData.update(diaryEntity);
         } catch (Exception e) {
             addAppError(AppError.DIARY_LOADING);
         }

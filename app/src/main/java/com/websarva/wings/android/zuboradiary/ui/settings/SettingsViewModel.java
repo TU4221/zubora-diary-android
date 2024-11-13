@@ -7,6 +7,8 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
 import com.websarva.wings.android.zuboradiary.data.AppError;
+import com.websarva.wings.android.zuboradiary.data.database.DiaryItemTitleSelectionHistoryRepository;
+import com.websarva.wings.android.zuboradiary.data.database.DiaryRepository;
 import com.websarva.wings.android.zuboradiary.data.network.GeoCoordinates;
 import com.websarva.wings.android.zuboradiary.data.preferences.CalendarStartDayOfWeekPreferenceValue;
 import com.websarva.wings.android.zuboradiary.data.preferences.UserPreferencesRepository;
@@ -21,6 +23,8 @@ import com.websarva.wings.android.zuboradiary.ui.BaseViewModel;
 import java.time.DayOfWeek;
 import java.time.LocalTime;
 import java.util.Objects;
+import java.util.concurrent.CancellationException;
+import java.util.concurrent.ExecutionException;
 
 import javax.inject.Inject;
 
@@ -34,6 +38,8 @@ import io.reactivex.rxjava3.functions.Consumer;
 public class SettingsViewModel extends BaseViewModel {
     private final UserPreferencesRepository userPreferencesRepository;
     private final WorkerRepository workerRepository;
+    private final DiaryRepository diaryRepository;
+    private final DiaryItemTitleSelectionHistoryRepository diaryItemTitleSelectionHistoryRepository;
     private final CompositeDisposable disposables = new CompositeDisposable();
 
     private final MutableLiveData<ThemeColor> themeColor = new MutableLiveData<>();
@@ -51,9 +57,15 @@ public class SettingsViewModel extends BaseViewModel {
     private Flowable<WeatherInfoAcquisitionPreferenceValue> weatherInfoAcquisitionPreferenceValueFlowable;
 
     @Inject
-    public SettingsViewModel(UserPreferencesRepository userPreferencesRepository, WorkerRepository workerRepository) {
+    public SettingsViewModel(
+            UserPreferencesRepository userPreferencesRepository,
+            WorkerRepository workerRepository,
+            DiaryRepository diaryRepository,
+            DiaryItemTitleSelectionHistoryRepository diaryItemTitleSelectionHistoryRepository) {
         this.userPreferencesRepository = userPreferencesRepository;
         this.workerRepository = workerRepository;
+        this.diaryRepository = diaryRepository;
+        this.diaryItemTitleSelectionHistoryRepository = diaryItemTitleSelectionHistoryRepository;
 
         initialize();
     }
@@ -89,7 +101,7 @@ public class SettingsViewModel extends BaseViewModel {
         ThemeColor themeColorValue = themeColor.getValue();
         if (themeColorValue != null) return themeColorValue;
         setUpThemeColorPreferenceValueLoading();
-        ThemeColorPreferenceValue defaultValue = new ThemeColorPreferenceValue(ThemeColor.WHITE);
+        ThemeColorPreferenceValue defaultValue = new ThemeColorPreferenceValue();
         return themeColorPreferenceValueFlowable.blockingFirst(defaultValue).getThemeColor();
     }
 
@@ -115,8 +127,7 @@ public class SettingsViewModel extends BaseViewModel {
         DayOfWeek dayOfWeekValue = calendarStartDayOfWeek.getValue();
         if (dayOfWeekValue != null) return dayOfWeekValue;
         setUpCalendarStartDayOfWeekPreferenceValueLoading();
-        CalendarStartDayOfWeekPreferenceValue defaultValue =
-                new CalendarStartDayOfWeekPreferenceValue(DayOfWeek.SUNDAY);
+        CalendarStartDayOfWeekPreferenceValue defaultValue = new CalendarStartDayOfWeekPreferenceValue();
         return calendarStartDayPreferenceValueFlowable.blockingFirst(defaultValue).toDayOfWeek();
     }
 
@@ -142,7 +153,7 @@ public class SettingsViewModel extends BaseViewModel {
         if (value != null) return value;
         setUpReminderNotificationPreferenceValueLoading();
         ReminderNotificationPreferenceValue defaultValue =
-                new ReminderNotificationPreferenceValue(false, "");
+                new ReminderNotificationPreferenceValue();
         return reminderNotificationPreferenceValueFlowable.blockingFirst(defaultValue).getIsChecked();
     }
 
@@ -152,7 +163,7 @@ public class SettingsViewModel extends BaseViewModel {
         if (value != null) return value;
         setUpReminderNotificationPreferenceValueLoading();
         ReminderNotificationPreferenceValue defaultValue =
-                new ReminderNotificationPreferenceValue(false, "");
+                new ReminderNotificationPreferenceValue();
         return reminderNotificationPreferenceValueFlowable
                 .blockingFirst(defaultValue).getNotificationLocalTime();
     }
@@ -193,7 +204,7 @@ public class SettingsViewModel extends BaseViewModel {
         if (value != null) return value;
         setUpWeatherInfoAcquisitionPreferenceValueLoading();
         WeatherInfoAcquisitionPreferenceValue defaultValue =
-                new WeatherInfoAcquisitionPreferenceValue(false);
+                new WeatherInfoAcquisitionPreferenceValue();
         return weatherInfoAcquisitionPreferenceValueFlowable.blockingFirst(defaultValue).getIsChecked();
     }
 
@@ -213,7 +224,7 @@ public class SettingsViewModel extends BaseViewModel {
 
         ThemeColorPreferenceValue preferenceValue = new ThemeColorPreferenceValue(value);
         Single<Preferences> result = userPreferencesRepository.saveThemeColorPreferenceValue(preferenceValue);
-        setUpProcessOnSaved(result, null);
+        setUpProcessOnUpdate(result, null);
     }
 
     void saveCalendarStartDayOfWeek(DayOfWeek value) {
@@ -223,7 +234,7 @@ public class SettingsViewModel extends BaseViewModel {
                 new CalendarStartDayOfWeekPreferenceValue(value);
         Single<Preferences> result =
                 userPreferencesRepository.saveCalendarStartDayOfWeekPreferenceValue(preferenceValue);
-        setUpProcessOnSaved(result, null);
+        setUpProcessOnUpdate(result, null);
     }
 
     void saveReminderNotificationValid(LocalTime value) {
@@ -232,9 +243,9 @@ public class SettingsViewModel extends BaseViewModel {
         ReminderNotificationPreferenceValue preferenceValue =
                 new ReminderNotificationPreferenceValue(true, value);
         Single<Preferences> result = userPreferencesRepository.saveReminderNotificationPreferenceValue(preferenceValue);
-        setUpProcessOnSaved(result, new OnSettingsSavedCallback() {
+        setUpProcessOnUpdate(result, new OnSettingsUpdateCallback() {
             @Override
-            public void onSettingsSaved() {
+            public void onUpdateSettings() {
                 registerReminderNotificationWorker(value);
             }
         });
@@ -244,9 +255,9 @@ public class SettingsViewModel extends BaseViewModel {
         ReminderNotificationPreferenceValue preferenceValue =
                 new ReminderNotificationPreferenceValue(false,(LocalTime) null);
         Single<Preferences> result = userPreferencesRepository.saveReminderNotificationPreferenceValue(preferenceValue);
-        setUpProcessOnSaved(result, new OnSettingsSavedCallback() {
+        setUpProcessOnUpdate(result, new OnSettingsUpdateCallback() {
             @Override
-            public void onSettingsSaved() {
+            public void onUpdateSettings() {
                 cancelReminderNotificationWorker();
             }
         });
@@ -262,7 +273,7 @@ public class SettingsViewModel extends BaseViewModel {
 
         PassCodeLockPreferenceValue preferenceValue = new PassCodeLockPreferenceValue(value, passcode);
         Single<Preferences> result = userPreferencesRepository.savePasscodeLockPreferenceValue(preferenceValue);
-        setUpProcessOnSaved(result, null);
+        setUpProcessOnUpdate(result, null);
     }
 
     void saveWeatherInfoAcquisition(boolean value) {
@@ -270,30 +281,33 @@ public class SettingsViewModel extends BaseViewModel {
                 new WeatherInfoAcquisitionPreferenceValue(value);
         Single<Preferences> result =
                 userPreferencesRepository.saveWeatherInfoAcquisitionPreferenceValue(preferenceValue);
-        setUpProcessOnSaved(result, null);
+        setUpProcessOnUpdate(result, null);
     }
 
     @FunctionalInterface
-    private interface OnSettingsSavedCallback {
-        void onSettingsSaved();
+    private interface OnSettingsUpdateCallback {
+        void onUpdateSettings();
     }
 
-    private void setUpProcessOnSaved(Single<Preferences> result,@Nullable OnSettingsSavedCallback callback) {
+    private void setUpProcessOnUpdate(Single<Preferences> result, @Nullable OnSettingsUpdateCallback callback) {
+        Objects.requireNonNull(result);
+
         disposables.add(result.subscribe(new Consumer<Preferences>() {
             @Override
             public void accept(Preferences preferences) {
                 Objects.requireNonNull(preferences);
 
                 if (callback == null) return;
-                callback.onSettingsSaved();
+                callback.onUpdateSettings();
             }
         }, new Consumer<Throwable>() {
             @Override
             public void accept(Throwable throwable) {
                 Objects.requireNonNull(throwable);
 
-                if (equalLastAppError(AppError.SETTING_UPDATE)) return; // 設定更新エラー通知の重複防止
-                addAppError(AppError.SETTING_UPDATE);
+                AppError appError = AppError.SETTING_UPDATE;
+                if (equalLastAppError(appError)) return; // 設定更新エラー通知の重複防止
+                addAppError(appError);
             }
         }));
     }
@@ -321,6 +335,28 @@ public class SettingsViewModel extends BaseViewModel {
     public boolean hasUpdatedGeoCoordinates() {
         GeoCoordinates geoCoordinates = this.geoCoordinates.getValue();
         return geoCoordinates != null;
+    }
+
+    void deleteAllDiaries() {
+        try {
+            diaryRepository.deleteAllDiaries().get();
+        } catch (CancellationException | ExecutionException | InterruptedException e) {
+            addAppError(AppError.DIARY_DELETE);
+        }
+    }
+
+    void deleteAllSettings() {
+        Single<Preferences> result = userPreferencesRepository.initializePreferences();
+        setUpProcessOnUpdate(result, null);
+    }
+
+    void deleteAllData() {
+        try {
+            diaryRepository.deleteAllData().get();
+        } catch (CancellationException | ExecutionException | InterruptedException e) {
+            addAppError(AppError.DIARY_DELETE);
+        }
+        deleteAllSettings();
     }
 
     // Getter/Setter

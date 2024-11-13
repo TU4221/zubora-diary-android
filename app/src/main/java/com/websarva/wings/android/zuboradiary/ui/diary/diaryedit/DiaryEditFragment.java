@@ -371,14 +371,14 @@ public class DiaryEditFragment extends BaseFragment {
         private boolean shouldShowLoadingExistingDiaryDialog(LocalDate changedDate) {
             Objects.requireNonNull(changedDate);
 
-            if (diaryEditViewModel.isNewDiaryDefaultStatus()) return diaryEditViewModel.hasDiary(changedDate);
+            if (diaryEditViewModel.isNewDiaryDefaultStatus()) return diaryEditViewModel.existsSavedDiary(changedDate);
 
             LocalDate previousDate = diaryEditViewModel.getPreviousDateLiveData().getValue();
             LocalDate loadedDate = diaryEditViewModel.getLoadedDateLiveData().getValue();
 
             if (changedDate.equals(previousDate)) return false;
             if (changedDate.equals(loadedDate)) return false;
-            return diaryEditViewModel.hasDiary(changedDate);
+            return diaryEditViewModel.existsSavedDiary(changedDate);
         }
 
         private boolean requestsFetchingWeatherInformation(LocalDate date) {

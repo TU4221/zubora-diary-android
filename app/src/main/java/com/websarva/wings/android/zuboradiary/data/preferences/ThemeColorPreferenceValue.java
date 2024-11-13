@@ -1,11 +1,17 @@
 package com.websarva.wings.android.zuboradiary.data.preferences;
 
 
+import androidx.datastore.preferences.core.MutablePreferences;
+import androidx.datastore.preferences.core.Preferences;
+import androidx.datastore.preferences.core.PreferencesKeys;
+
 import java.util.Arrays;
 import java.util.Objects;
 
 public class ThemeColorPreferenceValue {
 
+    static final Preferences.Key<Integer> PREFERENCES_KEY_COLOR =
+                                                        PreferencesKeys.intKey("theme_color");
     private final int themeColorNumber;
 
     public ThemeColorPreferenceValue(int themeColorNumber) {
@@ -20,6 +26,16 @@ public class ThemeColorPreferenceValue {
         Objects.requireNonNull(themeColor);
 
         this.themeColorNumber = themeColor.toNumber();
+    }
+
+    public ThemeColorPreferenceValue() {
+        this(ThemeColor.values()[0]);
+    }
+
+    void setUpPreferences(MutablePreferences mutablePreferences) {
+        Objects.requireNonNull(mutablePreferences);
+
+        mutablePreferences.set(PREFERENCES_KEY_COLOR, themeColorNumber);
     }
 
     public int getThemeColorNumber() {

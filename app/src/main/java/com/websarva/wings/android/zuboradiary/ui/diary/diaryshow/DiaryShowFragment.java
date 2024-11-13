@@ -141,12 +141,12 @@ public class DiaryShowFragment extends BaseFragment {
                 DiaryShowFragmentArgs.fromBundle(requireArguments()).getShowDiaryDate();
 
         // 日記編集Fragmentで日記を削除して日記表示Fragmentに戻って来た時は更に一つ前のFragmentへ戻る。
-        if (!diaryShowViewModel.hasDiary(diaryDate)) {
+        if (!diaryShowViewModel.existsSavedDiary(diaryDate)) {
             navController.navigateUp();
             return;
         }
 
-        diaryShowViewModel.loadDiary(diaryDate);
+        diaryShowViewModel.loadSavedDiary(diaryDate);
     }
 
     private void setUpToolBar() {

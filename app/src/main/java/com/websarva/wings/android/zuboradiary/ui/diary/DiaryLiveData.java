@@ -4,8 +4,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.lifecycle.MutableLiveData;
 
-import com.websarva.wings.android.zuboradiary.data.database.Diary;
-import com.websarva.wings.android.zuboradiary.data.database.DiaryItemTitleSelectionHistoryItem;
+import com.websarva.wings.android.zuboradiary.data.database.DiaryEntity;
+import com.websarva.wings.android.zuboradiary.data.database.DiaryItemTitleSelectionHistoryItemEntity;
 import com.websarva.wings.android.zuboradiary.data.diary.Condition;
 import com.websarva.wings.android.zuboradiary.data.diary.ItemNumber;
 import com.websarva.wings.android.zuboradiary.data.diary.Weather;
@@ -50,38 +50,38 @@ public class DiaryLiveData {
         log.setValue(null);
     }
 
-    public void update(Diary diary) {
-        Objects.requireNonNull(diary);
+    public void update(DiaryEntity diaryEntity) {
+        Objects.requireNonNull(diaryEntity);
 
-        date.setValue(LocalDate.parse(diary.getDate()));
-        Integer intWeather1 = getOrDefault(diary.getWeather1(), 0);
+        date.setValue(LocalDate.parse(diaryEntity.getDate()));
+        Integer intWeather1 = getOrDefault(diaryEntity.getWeather1(), 0);
         weather1.setValue(Weather.of(intWeather1));
-        Integer intWeather2 = getOrDefault(diary.getWeather2(), 0);
+        Integer intWeather2 = getOrDefault(diaryEntity.getWeather2(), 0);
         weather2.setValue(Weather.of(intWeather2));
-        Integer intCondition = getOrDefault(diary.getCondition(), 0);
+        Integer intCondition = getOrDefault(diaryEntity.getCondition(), 0);
         condition.setValue(Condition.of(intCondition));
-        String title = getOrDefault(diary.getTitle(), "");
+        String title = getOrDefault(diaryEntity.getTitle(), "");
         this.title.setValue(title);
 
         LocalDateTime nullDateTime = null;
-        String item1Title = getOrDefault(diary.getItem1Title(), "");
-        String item1Comment = getOrDefault(diary.getItem1Comment(), "");
+        String item1Title = getOrDefault(diaryEntity.getItem1Title(), "");
+        String item1Comment = getOrDefault(diaryEntity.getItem1Comment(), "");
         items[0].update(item1Title, item1Comment, nullDateTime);
 
-        String item2Title = getOrDefault(diary.getItem2Title(), "");
-        String item2Comment = getOrDefault(diary.getItem2Comment(), "");
+        String item2Title = getOrDefault(diaryEntity.getItem2Title(), "");
+        String item2Comment = getOrDefault(diaryEntity.getItem2Comment(), "");
         items[1].update(item2Title, item2Comment, nullDateTime);
 
-        String item3Title = getOrDefault(diary.getItem3Title(), "");
-        String item3Comment = getOrDefault(diary.getItem3Comment(), "");
+        String item3Title = getOrDefault(diaryEntity.getItem3Title(), "");
+        String item3Comment = getOrDefault(diaryEntity.getItem3Comment(), "");
         items[2].update(item3Title, item3Comment, nullDateTime);
 
-        String item4Title = getOrDefault(diary.getItem4Title(), "");
-        String item4Comment = getOrDefault(diary.getItem4Comment(), "");
+        String item4Title = getOrDefault(diaryEntity.getItem4Title(), "");
+        String item4Comment = getOrDefault(diaryEntity.getItem4Comment(), "");
         items[3].update(item4Title, item4Comment, nullDateTime);
 
-        String item5Title = getOrDefault(diary.getItem5Title(), "");
-        String item5Comment = getOrDefault(diary.getItem5Comment(), "");
+        String item5Title = getOrDefault(diaryEntity.getItem5Title(), "");
+        String item5Comment = getOrDefault(diaryEntity.getItem5Comment(), "");
         items[4].update(item5Title, item5Comment, nullDateTime);
 
         int numVisibleItems = items.length;
@@ -95,7 +95,7 @@ public class DiaryLiveData {
         }
         this.numVisibleItems.setValue(numVisibleItems);
 
-        log.setValue(LocalDateTime.parse(diary.getLog()));
+        log.setValue(LocalDateTime.parse(diaryEntity.getLog()));
     }
 
     private <T> T getOrDefault(T value, T defaultValue) {
@@ -104,26 +104,26 @@ public class DiaryLiveData {
     }
 
     @NonNull
-    public Diary createDiary() {
-        Diary diary = new Diary();
-        diary.setDate(toDateString(date.getValue()));
-        diary.setWeather1(toIntWeather(weather1.getValue()));
-        diary.setWeather2(toIntWeather(weather2.getValue()));
-        diary.setCondition(toIntCondition(condition.getValue()));
-        diary.setTitle(toTrimmedString(title.getValue()));
-        diary.setItem1Title(toTrimmedString(items[0].title.getValue()));
-        diary.setItem1Comment(toTrimmedString(items[0].comment.getValue()));
-        diary.setItem2Title(toTrimmedString(items[1].title.getValue()));
-        diary.setItem2Comment(toTrimmedString(items[1].comment.getValue()));
-        diary.setItem3Title(toTrimmedString(items[2].title.getValue()));
-        diary.setItem3Comment(toTrimmedString(items[2].comment.getValue()));
-        diary.setItem4Title(toTrimmedString(items[3].title.getValue()));
-        diary.setItem4Comment(toTrimmedString(items[3].comment.getValue()));
-        diary.setItem5Title(toTrimmedString(items[4].title.getValue()));
-        diary.setItem5Comment(toTrimmedString(items[4].comment.getValue()));
-        diary.setPicturePath(toTrimmedString(picturePath.getValue()));
-        diary.setLog(LocalDateTime.now().toString());
-        return diary;
+    public DiaryEntity createDiaryEntity() {
+        DiaryEntity diaryEntity = new DiaryEntity();
+        diaryEntity.setDate(toDateString(date.getValue()));
+        diaryEntity.setWeather1(toIntWeather(weather1.getValue()));
+        diaryEntity.setWeather2(toIntWeather(weather2.getValue()));
+        diaryEntity.setCondition(toIntCondition(condition.getValue()));
+        diaryEntity.setTitle(toTrimmedString(title.getValue()));
+        diaryEntity.setItem1Title(toTrimmedString(items[0].title.getValue()));
+        diaryEntity.setItem1Comment(toTrimmedString(items[0].comment.getValue()));
+        diaryEntity.setItem2Title(toTrimmedString(items[1].title.getValue()));
+        diaryEntity.setItem2Comment(toTrimmedString(items[1].comment.getValue()));
+        diaryEntity.setItem3Title(toTrimmedString(items[2].title.getValue()));
+        diaryEntity.setItem3Comment(toTrimmedString(items[2].comment.getValue()));
+        diaryEntity.setItem4Title(toTrimmedString(items[3].title.getValue()));
+        diaryEntity.setItem4Comment(toTrimmedString(items[3].comment.getValue()));
+        diaryEntity.setItem5Title(toTrimmedString(items[4].title.getValue()));
+        diaryEntity.setItem5Comment(toTrimmedString(items[4].comment.getValue()));
+        diaryEntity.setPicturePath(toTrimmedString(picturePath.getValue()));
+        diaryEntity.setLog(LocalDateTime.now().toString());
+        return diaryEntity;
     }
 
     @NonNull
@@ -153,15 +153,15 @@ public class DiaryLiveData {
     }
 
     @NonNull
-    public List<DiaryItemTitleSelectionHistoryItem> createDiaryItemTitleSelectionHistoryItemList() {
-        List<DiaryItemTitleSelectionHistoryItem> list = new ArrayList<>();
+    public List<DiaryItemTitleSelectionHistoryItemEntity> createDiaryItemTitleSelectionHistoryItemEntityList() {
+        List<DiaryItemTitleSelectionHistoryItemEntity> list = new ArrayList<>();
         for (int i = 0; i < DiaryLiveData.MAX_ITEMS; i++) {
             String itemTitle = items[i].title.getValue();
             LocalDateTime itemTitleUpdateLog = items[i].titleUpdateLog.getValue();
             Objects.requireNonNull(itemTitle);
             if (itemTitleUpdateLog == null) continue;
             if (itemTitle.matches("\\S+.*")) {
-                DiaryItemTitleSelectionHistoryItem item = new DiaryItemTitleSelectionHistoryItem();
+                DiaryItemTitleSelectionHistoryItemEntity item = new DiaryItemTitleSelectionHistoryItemEntity();
                 item.setTitle(itemTitle);
                 item.setLog(itemTitleUpdateLog.toString());
                 list.add(item);

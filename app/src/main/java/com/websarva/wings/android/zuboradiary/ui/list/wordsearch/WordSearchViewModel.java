@@ -68,21 +68,21 @@ public class WordSearchViewModel extends BaseViewModel {
     }
 
     void loadNewWordSearchResultList(int spannableStringColor, int spannableStringBackgroundColor) {
-        loadWordSearchResultList(
+        loadWordSearchResultDiaryList(
                 new NewWordSearchResultListCreator(), spannableStringColor, spannableStringBackgroundColor);
     }
 
     void loadAdditionWordSearchResultList(int spannableStringColor, int spannableStringBackgroundColor) {
-        loadWordSearchResultList(
+        loadWordSearchResultDiaryList(
                 new AddedWordSearchResultListCreator(), spannableStringColor, spannableStringBackgroundColor);
     }
 
     void updateWordSearchResultList(int spannableStringColor, int spannableStringBackgroundColor) {
-        loadWordSearchResultList(
+        loadWordSearchResultDiaryList(
                 new UpdateWordSearchResultListCreator(), spannableStringColor, spannableStringBackgroundColor);
     }
 
-    private void loadWordSearchResultList(
+    private void loadWordSearchResultDiaryList(
             WordSearchResultListCreator creator, int spannableStringColor, int spannableStringBackgroundColor){
         Objects.requireNonNull(creator);
 
@@ -164,7 +164,7 @@ public class WordSearchViewModel extends BaseViewModel {
                 throws CancellationException, ExecutionException, InterruptedException {
             showWordSearchResultListFirstItemProgressIndicator();
             if (isValidityDelay) Thread.sleep(1000);
-            return loadWordSearchResultList(
+            return loadWordSearchResultDiaryList(
                     NUM_LOADING_ITEMS, 0, spannableStringColor, spannableStringBackGroundColor);
         }
 
@@ -189,7 +189,7 @@ public class WordSearchViewModel extends BaseViewModel {
             if (isValidityDelay) Thread.sleep(1000);
             int loadingOffset = currentResultList.countDiaries();
             WordSearchResultYearMonthList loadedResultList =
-                    loadWordSearchResultList(
+                    loadWordSearchResultDiaryList(
                             NUM_LOADING_ITEMS, loadingOffset, spannableStringColor, spannableStringBackGroundColor);
             int numLoadedDiaries = currentResultList.countDiaries() + loadedResultList.countDiaries();
             boolean existsUnloadedDiaries = existsUnloadedDiaries(numLoadedDiaries);
@@ -217,7 +217,7 @@ public class WordSearchViewModel extends BaseViewModel {
                 if (numLoadingItems < NUM_LOADING_ITEMS) {
                     numLoadingItems = NUM_LOADING_ITEMS;
                 }
-                return loadWordSearchResultList(
+                return loadWordSearchResultDiaryList(
                         numLoadingItems, 0, spannableStringColor, spannableStringBackGroundColor);
             } finally {
                 isVisibleUpdateProgressBar.postValue(false);
@@ -226,7 +226,7 @@ public class WordSearchViewModel extends BaseViewModel {
     }
 
     @NonNull
-    private WordSearchResultYearMonthList loadWordSearchResultList(
+    private WordSearchResultYearMonthList loadWordSearchResultDiaryList(
             int numLoadingItems, int loadingOffset, int spannableStringColor, int spannableStringBackGroundColor)
             throws CancellationException, ExecutionException, InterruptedException {
         if (numLoadingItems <= 0) throw new IllegalArgumentException();
@@ -236,7 +236,7 @@ public class WordSearchViewModel extends BaseViewModel {
         Objects.requireNonNull(searchWord);
 
         ListenableFuture<List<WordSearchResultListItem>> listenableFutureResults =
-                diaryRepository.selectWordSearchResultListOrderByDateDesc(
+                diaryRepository.loadWordSearchResultDiaryList(
                         numLoadingItems, loadingOffset, searchWord
                 );
 
@@ -261,7 +261,7 @@ public class WordSearchViewModel extends BaseViewModel {
         String searchWord = this.searchWord.getValue();
         Objects.requireNonNull(searchWord);
 
-        Integer numExistingDiaries = diaryRepository.countWordSearchResults(searchWord).get();
+        Integer numExistingDiaries = diaryRepository.countWordSearchResultDiaries(searchWord).get();
         Objects.requireNonNull(numExistingDiaries);
         this.numWordSearchResults.postValue(numExistingDiaries);
         if (numExistingDiaries <= 0) return false;

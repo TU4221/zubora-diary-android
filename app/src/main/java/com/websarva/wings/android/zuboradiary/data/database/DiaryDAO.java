@@ -11,29 +11,31 @@ import java.util.List;
 
 @Dao
 public interface DiaryDAO {
-    // @Query使用方法下記参照
-    // https://developer.android.com/reference/kotlin/androidx/room/Query
+    // MEMO:@Query使用方法下記参照
+    //      https://developer.android.com/reference/kotlin/androidx/room/Query
     @Query("SELECT COUNT(*) FROM diaries")
-    ListenableFuture<Integer> countDiariesAsync();
+    ListenableFuture<Integer> countDiaries();
+
     @Query("SELECT COUNT(*) FROM diaries WHERE date < :startDate")
-    ListenableFuture<Integer> countDiariesAsync(String startDate);
+    ListenableFuture<Integer> countDiaries(String startDate);
+
     @Query("SELECT EXISTS (SELECT 1 FROM diaries WHERE date = :date)")
-    ListenableFuture<Boolean> hasDiaryAsync(String date);
+    ListenableFuture<Boolean> existsDiary(String date);
 
     @Query("SELECT * FROM diaries WHERE date = :date")
-    ListenableFuture<Diary> selectDiaryAsync(String date);
+    ListenableFuture<DiaryEntity> selectDiary(String date);
 
     @Query("SELECT * FROM diaries ORDER BY date DESC LIMIT 1 OFFSET 0")
-    ListenableFuture<Diary> selectNewestDiaryAsync();
+    ListenableFuture<DiaryEntity> selectNewestDiary();
 
     @Query("SELECT * FROM diaries ORDER BY date ASC LIMIT 1 OFFSET 0")
-    ListenableFuture<Diary> selectOldestDiaryAsync();
+    ListenableFuture<DiaryEntity> selectOldestDiary();
 
     @Query("SELECT date, title, picturePath FROM diaries ORDER BY date DESC LIMIT :num OFFSET :offset")
-    ListenableFuture<List<DiaryListItem>> selectDiaryListOrderByDateDescAsync(int num, int offset);
+    ListenableFuture<List<DiaryListItem>> selectDiaryListOrderByDateDesc(int num, int offset);
 
     @Query("SELECT date, title, picturePath FROM diaries WHERE date < :startDate ORDER BY date DESC LIMIT :num OFFSET :offset")
-    ListenableFuture<List<DiaryListItem>> selectDiaryListOrderByDateDescAsync(int num, int offset , String startDate);
+    ListenableFuture<List<DiaryListItem>> selectDiaryListOrderByDateDesc(int num, int offset , String startDate);
 
     @Query("SELECT COUNT(*) " +
             "FROM diaries " +
@@ -48,7 +50,7 @@ public interface DiaryDAO {
             "OR item_4_comment LIKE '%' || :word || '%'" +
             "OR item_5_title LIKE '%' || :word || '%'" +
             "OR item_5_comment LIKE '%' || :word || '%'")
-    ListenableFuture<Integer> countWordSearchResultsAsync(String word);
+    ListenableFuture<Integer> countWordSearchResults(String word);
 
     @Query("SELECT date, title, item_1_title, item_1_comment, " +
                 "item_2_title, item_2_comment, " +
@@ -68,23 +70,14 @@ public interface DiaryDAO {
                 "OR item_5_title LIKE '%' || :word || '%'" +
                 "OR item_5_comment LIKE '%' || :word || '%'" +
             "ORDER BY date DESC LIMIT :num OFFSET :offset")
-    ListenableFuture<List<WordSearchResultListItem>> selectWordSearchResultListOrderByDateDescAsync(int num, int offset, String word);
-
-    @Query("SELECT date FROM diaries WHERE date LIKE :dateYearMonth || '%'") // ||：文字連結
-    ListenableFuture<List<String>> selectDiaryDateListAsync(String dateYearMonth);
+    ListenableFuture<List<WordSearchResultListItem>> selectWordSearchResultListOrderByDateDesc(int num, int offset, String word);
 
     @Insert (onConflict = OnConflictStrategy.REPLACE)
-    ListenableFuture<Long> insertDiaryAsync(Diary diary);
-
-    // 他DAO(他テーブルへの書き込み処理)メソッドと同じタイミング(Transaction)で処理する時に使用
-    @Insert (onConflict = OnConflictStrategy.REPLACE)
-    void insertDiary(Diary diary);
+    ListenableFuture<Long> insertDiary(DiaryEntity diaryEntity);
 
     @Query("DELETE FROM diaries WHERE date = :date")
-    ListenableFuture<Integer> deleteDiaryAsync(String date);
+    ListenableFuture<Integer> deleteDiary(String date);
 
-    // 他DAO(他テーブルへの書き込み処理)メソッドと同じタイミング(Transaction)で処理する時に使用
-    @Query("DELETE FROM diaries WHERE date = :date")
-    Integer deleteDiary(String date);
-
+    @Query("DELETE FROM diaries")
+    ListenableFuture<Integer> deleteAllDiaries();
 }

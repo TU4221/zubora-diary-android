@@ -5,7 +5,7 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
 import com.websarva.wings.android.zuboradiary.data.AppError;
-import com.websarva.wings.android.zuboradiary.data.database.DiaryItemTitleSelectionHistoryItem;
+import com.websarva.wings.android.zuboradiary.data.database.DiaryItemTitleSelectionHistoryItemEntity;
 import com.websarva.wings.android.zuboradiary.data.database.DiaryItemTitleSelectionHistoryRepository;
 import com.websarva.wings.android.zuboradiary.data.diary.ItemNumber;
 import com.websarva.wings.android.zuboradiary.ui.BaseViewModel;
@@ -42,7 +42,7 @@ public class DiaryItemTitleEditViewModel extends BaseViewModel {
         selectionHistoryList.setValue(new SelectionHistoryList());
     }
 
-    void updateItemTitle(ItemNumber itemNumber, String itemTitle) {
+    void updateDiaryItemTitle(ItemNumber itemNumber, String itemTitle) {
         Objects.requireNonNull(itemNumber);
         Objects.requireNonNull(itemTitle);
 
@@ -50,12 +50,12 @@ public class DiaryItemTitleEditViewModel extends BaseViewModel {
         this.itemTitle.setValue(itemTitle);
     }
 
-   void loadItemTitleSelectionHistory() {
-        List<DiaryItemTitleSelectionHistoryItem> loadedList;
+   void loadDiaryItemTitleSelectionHistory() {
+        List<DiaryItemTitleSelectionHistoryItemEntity> loadedList;
         try {
             loadedList =
                     diaryItemTitleSelectionHistoryRepository
-                            .selectHistoryOrderByLogDesc(MAX_LOADED_ITEM_TITLES,0).get();
+                            .loadSelectionHistory(MAX_LOADED_ITEM_TITLES,0).get();
         } catch (Exception e) {
             addAppError(AppError.DIARY_ITEM_TITLE_HISTORY_LOADING);
             return;
@@ -66,7 +66,7 @@ public class DiaryItemTitleEditViewModel extends BaseViewModel {
         selectionHistoryList.setValue(list);
     }
 
-    void deleteSelectedItemTitleHistoryItem(int deletePosition) {
+    void deleteDiaryItemTitleSelectionHistoryItem(int deletePosition) {
         if (deletePosition < 0) throw new IllegalArgumentException();
 
         SelectionHistoryList currentList = selectionHistoryList.getValue();
@@ -78,7 +78,7 @@ public class DiaryItemTitleEditViewModel extends BaseViewModel {
                 currentList.getSelectionHistoryListItemList().get(deletePosition);
         String deleteTitle = deleteItem.getTitle();
         try {
-            diaryItemTitleSelectionHistoryRepository.deleteHistoryItem(deleteTitle).get();
+            diaryItemTitleSelectionHistoryRepository.deleteSelectionHistoryItem(deleteTitle).get();
         } catch (Exception e) {
             addAppError(AppError.DIARY_ITEM_TITLE_HISTORY_ITEM_DELETE);
             return;
@@ -88,7 +88,6 @@ public class DiaryItemTitleEditViewModel extends BaseViewModel {
     }
 
     // LiveDataGetter
-
     @NonNull
     LiveData<ItemNumber> getItemNumberLiveData() {
         return itemNumber;

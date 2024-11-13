@@ -2,6 +2,9 @@ package com.websarva.wings.android.zuboradiary.data.preferences;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.datastore.preferences.core.MutablePreferences;
+import androidx.datastore.preferences.core.Preferences;
+import androidx.datastore.preferences.core.PreferencesKeys;
 
 import java.time.LocalTime;
 import java.time.format.DateTimeParseException;
@@ -9,6 +12,10 @@ import java.util.Objects;
 
 public class ReminderNotificationPreferenceValue {
 
+    static final Preferences.Key<Boolean> PREFERENCES_KEY_IS_CHECKED =
+            PreferencesKeys.booleanKey("is_checked_reminder_notification");
+    static final Preferences.Key<String> PREFERENCES_KEY_TIME =
+            PreferencesKeys.stringKey("reminder_notification_time");
     private final boolean isChecked;
     private final String notificationTime;
 
@@ -43,6 +50,17 @@ public class ReminderNotificationPreferenceValue {
 
         this.isChecked = isChecked;
         this.notificationTime = _notificationTime;
+    }
+
+    public ReminderNotificationPreferenceValue() {
+        this(false, "");
+    }
+
+    void setUpPreferences(MutablePreferences mutablePreferences) {
+        Objects.requireNonNull(mutablePreferences);
+
+        mutablePreferences.set(PREFERENCES_KEY_IS_CHECKED, isChecked);
+        mutablePreferences.set(PREFERENCES_KEY_TIME, notificationTime);
     }
 
     public boolean getIsChecked() {

@@ -157,6 +157,11 @@
     <string name="fragment_settings_item_title_passcode_lock">パスコードロック</string>
     <string name="fragment_settings_item_title_weather_info_acquisition">天気情報取得</string>
 
+    <string name="fragment_settings_section_title_data">データ</string>
+    <string name="fragment_settings_item_title_all_diaries_delete">全日記削除</string>
+    <string name="fragment_settings_item_title_all_settings_initialization">全設定初期化</string>
+    <string name="fragment_settings_item_title_all_data_delete">全データ削除</string>
+
     <!-- layout_settings_item -->
     <string name="layout_settings_item_title_tools_value">設定項目</string>
 
@@ -168,6 +173,18 @@
     <string name="dialog_permission_title">権限が必要です</string>
     <string name="dialog_permission_first_message">この機能を正常に動作させるためには</string>
     <string name="dialog_permission_third_message">権限が必要です。設定画面で権限を有効にしてください。</string>
+
+    <!-- AllDiariesDeleteConfirmationDialogFragment -->
+    <string name="dialog_all_diaries_delete_confirmation_title">削除確認</string>
+    <string name="dialog_all_diaries_delete_confirmation_message">削除した日記は復元できませんがよろしいでしょうか。</string>
+
+    <!-- AllSettingsInitializationConfirmationDialogFragment -->
+    <string name="dialog_all_settings_initialization_confirmation_title">初期化確認</string>
+    <string name="dialog_all_settings_initialization_confirmation_message">全ての設定値を初期化してもよろしいでしょうか。</string>
+
+    <!-- AllDataDeleteConfirmationDialogFragment -->
+    <string name="dialog_all_data_delete_confirmation_title">削除確認</string>
+    <string name="dialog_all_data_delete_confirmation_message">削除したデータは復元できませんがよろしいでしょうか。</string>
 
     <!-- DiaryDeleteConfirmationDialog -->
     <string name="dialog_diary_delete_confirmation_title">削除確認</string>

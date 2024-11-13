@@ -142,8 +142,8 @@ public class DiaryListFragment extends BaseFragment {
                         Objects.requireNonNull(v);
 
                         // リスト先頭年月切り替えダイアログ起動
-                        LocalDate newestDiaryDate = diaryListViewModel.loadNewestDiary();
-                        LocalDate oldestDiaryDate = diaryListViewModel.loadOldestDiary();
+                        LocalDate newestDiaryDate = diaryListViewModel.loadNewestSavedDiary();
+                        LocalDate oldestDiaryDate = diaryListViewModel.loadOldestSavedDiary();
                         if (newestDiaryDate == null) return;
                         if (oldestDiaryDate == null) return;
 
@@ -285,7 +285,7 @@ public class DiaryListFragment extends BaseFragment {
         Objects.requireNonNull(diaryList);
 
         if (diaryList.getDiaryYearMonthListItemList().isEmpty()) {
-            Integer numSavedDiaries = diaryListViewModel.countDiaries();
+            Integer numSavedDiaries = diaryListViewModel.countSavedDiaries();
             if (numSavedDiaries == null) return;
 
             if (numSavedDiaries >= 1) diaryListViewModel.loadNewDiaryList();

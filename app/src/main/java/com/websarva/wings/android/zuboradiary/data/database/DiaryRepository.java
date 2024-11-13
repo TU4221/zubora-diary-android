@@ -4,18 +4,24 @@ package com.websarva.wings.android.zuboradiary.data.database;
 
 import android.util.Log;
 
+import androidx.annotation.NonNull;
+
 import com.google.common.util.concurrent.ListenableFuture;
 
 import org.jetbrains.annotations.Nullable;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.Callable;
+import java.util.concurrent.CancellationException;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
 import javax.inject.Inject;
 
 public class DiaryRepository {
+
     private final DiaryDatabase diaryDatabase;
     private final DiaryDAO diaryDAO;
     private final DiaryItemTitleSelectionHistoryDAO diaryItemTitleSelectionHistoryDAO;
@@ -24,98 +30,179 @@ public class DiaryRepository {
     public DiaryRepository(
             DiaryDatabase diaryDatabase, DiaryDAO diaryDAO,
             DiaryItemTitleSelectionHistoryDAO diaryItemTitleSelectionHistoryDAO) {
+        Objects.requireNonNull(diaryDatabase);
+        Objects.requireNonNull(diaryDAO);
+        Objects.requireNonNull(diaryItemTitleSelectionHistoryDAO);
+
         this.diaryDatabase = diaryDatabase;
         this.diaryDAO = diaryDAO;
         this.diaryItemTitleSelectionHistoryDAO = diaryItemTitleSelectionHistoryDAO;
     }
 
-    public ListenableFuture<Integer> countDiaries(@Nullable LocalDate date){
-        ListenableFuture<Integer> listenableFutureResults;
-        if (date == null) {
-            listenableFutureResults = this.diaryDAO.countDiariesAsync();
-        } else {
-            listenableFutureResults = this.diaryDAO.countDiariesAsync(date.toString());
-        }
-        return listenableFutureResults;
+    @NonNull
+    public ListenableFuture<Integer> countDiaries(){
+        ListenableFuture<Integer> future = diaryDAO.countDiaries();
+        return Objects.requireNonNull(future);
     }
 
-    public ListenableFuture<Boolean> hasDiary(LocalDate date) {
-        return diaryDAO.hasDiaryAsync(date.toString());
+    @NonNull
+    public ListenableFuture<Integer> countDiaries(LocalDate date){
+        Objects.requireNonNull(date);
+
+        ListenableFuture<Integer> future = diaryDAO.countDiaries(date.toString());
+        return Objects.requireNonNull(future);
     }
 
-    public ListenableFuture<Diary> selectDiary(LocalDate date) {
-        return  diaryDAO.selectDiaryAsync(date.toString());
+    @NonNull
+    public ListenableFuture<Boolean> existsDiary(LocalDate date) {
+        Objects.requireNonNull(date);
+
+        ListenableFuture<Boolean> future = diaryDAO.existsDiary(date.toString());
+        return Objects.requireNonNull(future);
     }
 
-    public ListenableFuture<Diary> selectNewestDiary() {
-        return diaryDAO.selectNewestDiaryAsync();
+    @NonNull
+    public ListenableFuture<DiaryEntity> loadDiary(LocalDate date) {
+        Objects.requireNonNull(date);
+
+        ListenableFuture<DiaryEntity> future = diaryDAO.selectDiary(date.toString());
+        return Objects.requireNonNull(future);
     }
 
-    public ListenableFuture<Diary> selectOldestDiary() {
-        return diaryDAO.selectOldestDiaryAsync();
+    @NonNull
+    public ListenableFuture<DiaryEntity> loadNewestDiary() {
+        ListenableFuture<DiaryEntity> future = diaryDAO.selectNewestDiary();
+        return Objects.requireNonNull(future);
     }
 
-    public ListenableFuture<List<DiaryListItem>> selectDiaryListOrderByDateDesc(
+    @NonNull
+    public ListenableFuture<DiaryEntity> loadOldestDiary() {
+        ListenableFuture<DiaryEntity> future = diaryDAO.selectOldestDiary();
+        return Objects.requireNonNull(future);
+    }
+
+    @NonNull
+    public ListenableFuture<List<DiaryListItem>> loadDiaryList(
             int num, int offset, @Nullable LocalDate date) {
+        if (num < 1) throw new IllegalArgumentException();
+        if (offset < 0) throw new IllegalArgumentException();
+
         Log.d("DiaryRepository", "loadDiaryList(num = " + num + ", offset = " + offset + ", date = " + date + ")");
+        ListenableFuture<List<DiaryListItem>> future;
         if (date == null) {
-            return diaryDAO.selectDiaryListOrderByDateDescAsync(num, offset);
+            future = diaryDAO.selectDiaryListOrderByDateDesc(num, offset);
         } else {
-            return diaryDAO.selectDiaryListOrderByDateDescAsync(num, offset, date.toString());
+            future = diaryDAO.selectDiaryListOrderByDateDesc(num, offset, date.toString());
         }
+        return Objects.requireNonNull(future);
     }
 
-    public ListenableFuture<Integer> countWordSearchResults(String searchWord) {
-        return diaryDAO.countWordSearchResultsAsync(searchWord);
+    @NonNull
+    public ListenableFuture<Integer> countWordSearchResultDiaries(String searchWord) {
+        Objects.requireNonNull(searchWord);
+
+        ListenableFuture<Integer> future = diaryDAO.countWordSearchResults(searchWord);
+        return Objects.requireNonNull(future);
     }
 
-    public ListenableFuture<List<WordSearchResultListItem>> selectWordSearchResultListOrderByDateDesc(
+    @NonNull
+    public ListenableFuture<List<WordSearchResultListItem>> loadWordSearchResultDiaryList(
             int num, int offset, String searchWord) {
-        return diaryDAO.selectWordSearchResultListOrderByDateDescAsync(num, offset, searchWord);
+        if (num < 1) throw new IllegalArgumentException();
+        if (offset < 0) throw new IllegalArgumentException();
+        Objects.requireNonNull(searchWord);
+
+        ListenableFuture<List<WordSearchResultListItem>> future =
+                diaryDAO.selectWordSearchResultListOrderByDateDesc(num, offset, searchWord);
+        return Objects.requireNonNull(future);
     }
 
-    public Future<Void> insertDiary(Diary diary, List<DiaryItemTitleSelectionHistoryItem> updateTitleList) {
-        return DiaryDatabase.EXECUTOR_SERVICE.submit(new Callable<Void>() {
-            @Override
-            public Void call() {
-                diaryDatabase.runInTransaction(new Callable<Future<Void>>() {
+    // TODO:例外を取得できない。(DAOのメソッドそ同期的(get())で例外を確認しようとすると無言停止してしまう)
+    @NonNull
+    public Future<Void> saveDiary(DiaryEntity diaryEntity, List<DiaryItemTitleSelectionHistoryItemEntity> updateTitleList) {
+        Objects.requireNonNull(diaryEntity);
+        Objects.requireNonNull(updateTitleList);
+        updateTitleList.stream().forEach(Objects::requireNonNull);
+
+        Future<Void> future =
+                DiaryDatabase.EXECUTOR_SERVICE.submit(new Callable<Void>() {
                     @Override
-                    public Future<Void> call() {
-                        diaryDAO.insertDiaryAsync(diary);
-                        diaryItemTitleSelectionHistoryDAO
-                                .insertSelectedDiaryItemTitles(updateTitleList);
-                        diaryItemTitleSelectionHistoryDAO.deleteOldSelectedDiaryItemTitles();
+                    public Void call() throws CancellationException, ExecutionException, InterruptedException {
+                        diaryDatabase.runInTransaction(new Callable<Future<Void>>() {
+                            @Override
+                            public Future<Void> call() throws CancellationException, ExecutionException, InterruptedException {
+                                diaryDAO.insertDiary(diaryEntity);
+                                diaryItemTitleSelectionHistoryDAO.insertHistoryItem(updateTitleList);
+                                diaryItemTitleSelectionHistoryDAO.deleteOldHistoryItem();
+                                return null;
+                            }
+                        });
                         return null;
                     }
                 });
-                return null;
-            }
-        });
+        return Objects.requireNonNull(future);
     }
 
-    public Future<Void> deleteAndInsertDiary(
-            LocalDate deleteDiaryDate, Diary createDiary, List<DiaryItemTitleSelectionHistoryItem> updateTitleList)
-             {
-        return DiaryDatabase.EXECUTOR_SERVICE.submit(new Callable<Void>() {
-            @Override
-            public Void call() {
-                diaryDatabase.runInTransaction(new Callable<Future<Void>>() {
+    @NonNull
+    public Future<Void> deleteAndSaveDiary(
+            LocalDate deleteDiaryDate, DiaryEntity createDiaryEntity,
+            List<DiaryItemTitleSelectionHistoryItemEntity> updateTitleList) {
+        Objects.requireNonNull(deleteDiaryDate);
+        Objects.requireNonNull(createDiaryEntity);
+        Objects.requireNonNull(updateTitleList);
+        updateTitleList.stream().forEach(Objects::requireNonNull);
+
+        Future<Void> future =
+                DiaryDatabase.EXECUTOR_SERVICE.submit(new Callable<Void>() {
                     @Override
-                    public Future<Void> call() {
-                        diaryDAO.deleteDiaryAsync(deleteDiaryDate.toString());
-                        diaryDAO.insertDiaryAsync(createDiary);
-                        diaryItemTitleSelectionHistoryDAO
-                                .insertSelectedDiaryItemTitles(updateTitleList);
-                        diaryItemTitleSelectionHistoryDAO.deleteOldSelectedDiaryItemTitles();
+                    public Void call() throws CancellationException, ExecutionException, InterruptedException {
+                        diaryDatabase.runInTransaction(new Callable<Future<Void>>() {
+                            @Override
+                            public Future<Void> call() throws CancellationException, ExecutionException, InterruptedException {
+                                diaryDAO.deleteDiary(deleteDiaryDate.toString());
+                                diaryDAO.insertDiary(createDiaryEntity);
+                                diaryItemTitleSelectionHistoryDAO.insertHistoryItem(updateTitleList);
+                                diaryItemTitleSelectionHistoryDAO.deleteOldHistoryItem();
+                                return null;
+                            }
+                        });
                         return null;
                     }
                 });
-                return null;
-            }
-        });
+        return Objects.requireNonNull(future);
     }
 
+    @NonNull
     public ListenableFuture<Integer> deleteDiary(LocalDate date) {
-        return diaryDAO.deleteDiaryAsync(date.toString());
+        Objects.requireNonNull(date);
+
+        ListenableFuture<Integer> future = diaryDAO.deleteDiary(date.toString());
+        return Objects.requireNonNull(future);
+    }
+
+    @NonNull
+    public ListenableFuture<Integer> deleteAllDiaries() {
+        ListenableFuture<Integer> future = diaryDAO.deleteAllDiaries();
+        return Objects.requireNonNull(future);
+    }
+
+    @NonNull
+    public Future<Void> deleteAllData() {
+        Future<Void> future =
+                DiaryDatabase.EXECUTOR_SERVICE.submit(new Callable<Void>() {
+                    @Override
+                    public Void call() throws CancellationException, ExecutionException, InterruptedException {
+                        diaryDatabase.runInTransaction(new Callable<Future<Void>>() {
+                            @Override
+                            public Future<Void> call() throws CancellationException, ExecutionException, InterruptedException {
+                                diaryDAO.deleteAllDiaries();
+                                diaryItemTitleSelectionHistoryDAO.deleteAllItem();
+                                return null;
+                            }
+                        });
+                        return null;
+                    }
+                });
+        return Objects.requireNonNull(future);
     }
 }

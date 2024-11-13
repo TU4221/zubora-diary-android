@@ -69,7 +69,7 @@ public class ReminderNotificationWorker extends Worker {
         if (isAppInForeground) return Result.success();
         boolean hasWriteTodayDiary;
         try {
-            hasWriteTodayDiary = hasWriteTodayDiary();
+            hasWriteTodayDiary = existsSavedTodayDiary();
         } catch (Exception e) {
             e.printStackTrace();
             return Result.failure();
@@ -95,8 +95,8 @@ public class ReminderNotificationWorker extends Worker {
         }
     }
 
-    private boolean hasWriteTodayDiary() throws Exception{
-        ListenableFuture<Boolean> listenableFuture = diaryRepository.hasDiary(LocalDate.now());
+    private boolean existsSavedTodayDiary() throws Exception{
+        ListenableFuture<Boolean> listenableFuture = diaryRepository.existsDiary(LocalDate.now());
         Boolean result = listenableFuture.get();
         if (result == null) return false;
         Log.d("NotificationWorker", "hasWriteTodayDiary():" + result);

@@ -287,7 +287,7 @@ public class CalendarFragment extends BaseFragment {
             Objects.requireNonNull(viewCalendarDayDot);
 
             LocalDate localDate = calendarDay.getDate();
-            calendarViewModel.hasDiary(localDate, new FutureCallback<Boolean>() {
+            calendarViewModel.existsSavedDiary(localDate, new FutureCallback<Boolean>() {
                 @Override
                 public void onSuccess(Boolean result) {
                     if (result) {
@@ -446,7 +446,7 @@ public class CalendarFragment extends BaseFragment {
     private void showSelectedDiary(LocalDate date) {
         Objects.requireNonNull(date);
 
-        calendarViewModel.hasDiary(date, new DiaryShowFutureCallback(date));
+        calendarViewModel.existsSavedDiary(date, new DiaryShowFutureCallback(date));
     }
 
     private class DiaryShowFutureCallback implements FutureCallback<Boolean> {
@@ -478,7 +478,7 @@ public class CalendarFragment extends BaseFragment {
 
         private void showDiary() {
             diaryShowViewModel.initialize();
-            diaryShowViewModel.loadDiary(date);
+            diaryShowViewModel.loadSavedDiary(date);
             binding.linearLayoutDiaryShow.setVisibility(View.VISIBLE);
             binding.textNoDiary.setVisibility(View.GONE);
         }

@@ -5,7 +5,8 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
 import com.websarva.wings.android.zuboradiary.data.AppError;
-import com.websarva.wings.android.zuboradiary.data.database.DiaryItemTitleSelectionHistoryItem;
+import com.websarva.wings.android.zuboradiary.data.database.DiaryEntity;
+import com.websarva.wings.android.zuboradiary.data.database.DiaryItemTitleSelectionHistoryItemEntity;
 import com.websarva.wings.android.zuboradiary.data.database.DiaryRepository;
 import com.websarva.wings.android.zuboradiary.data.diary.Condition;
 import com.websarva.wings.android.zuboradiary.data.diary.ItemNumber;
@@ -14,7 +15,6 @@ import com.websarva.wings.android.zuboradiary.data.network.GeoCoordinates;
 import com.websarva.wings.android.zuboradiary.data.network.WeatherApiCallable;
 import com.websarva.wings.android.zuboradiary.data.network.WeatherApiRepository;
 import com.websarva.wings.android.zuboradiary.data.network.WeatherApiResponse;
-import com.websarva.wings.android.zuboradiary.data.database.Diary;
 import com.websarva.wings.android.zuboradiary.ui.BaseViewModel;
 import com.websarva.wings.android.zuboradiary.ui.diary.DiaryLiveData;
 
@@ -70,7 +70,7 @@ public class DiaryEditViewModel extends BaseViewModel {
 
         if (requestsLoadingDiary) {
             try {
-                loadDiary(date);
+                loadSavedDiary(date);
             } catch (CancellationException | ExecutionException | InterruptedException | NoSuchElementException e) {
                 addAppError(AppError.DIARY_LOADING);
                 return;
@@ -81,18 +81,18 @@ public class DiaryEditViewModel extends BaseViewModel {
         hasPreparedDiary = true;
     }
 
-    private void loadDiary(LocalDate date)
+    private void loadSavedDiary(LocalDate date)
             throws CancellationException, ExecutionException, InterruptedException,NoSuchElementException {
         Objects.requireNonNull(date);
 
-        Diary diary = diaryRepository.selectDiary(date).get();
-        if (diary == null) throw new NoSuchElementException(); // TODO:DiaryRepositoryで例外をスローしたい（戻り値にListenableFutureをやめる？）
+        DiaryEntity diaryEntity = diaryRepository.loadDiary(date).get();
+        if (diaryEntity == null) throw new NoSuchElementException(); // TODO:DiaryRepositoryで例外をスローしたい（戻り値にListenableFutureをやめる？）
 
         // HACK:下記はDiaryLiveData#update()処理よりも前に処理すること。
         //      (後で処理するとDiaryLiveDataのDateのObserverがloadedDateの更新よりも先に処理される為)
         loadedDate.setValue(date);
 
-        diaryLiveData.update(diary);
+        diaryLiveData.update(diaryEntity);
     }
 
     boolean isNewDiaryDefaultStatus() {
@@ -102,9 +102,11 @@ public class DiaryEditViewModel extends BaseViewModel {
         return hasPreparedDiary && previousDate == null && loadedDate == null;
     }
 
-    boolean hasDiary(LocalDate localDate) {
+    boolean existsSavedDiary(LocalDate date) {
+        Objects.requireNonNull(date);
+
         try {
-            return diaryRepository.hasDiary(localDate).get();
+            return diaryRepository.existsDiary(date).get();
         } catch (ExecutionException | InterruptedException e) {
             addAppError(AppError.DIARY_LOADING);
             return false;
@@ -113,16 +115,16 @@ public class DiaryEditViewModel extends BaseViewModel {
 
     // TODO:TestDiariesSaverクラス削除後、public削除。
     public boolean saveDiary() {
-        Diary diary = diaryLiveData.createDiary();
-        List<DiaryItemTitleSelectionHistoryItem> diaryItemTitleSelectionHistoryItemList =
-                diaryLiveData.createDiaryItemTitleSelectionHistoryItemList();
+        DiaryEntity diaryEntity = diaryLiveData.createDiaryEntity();
+        List<DiaryItemTitleSelectionHistoryItemEntity> diaryItemTitleSelectionHistoryItemEntityList =
+                diaryLiveData.createDiaryItemTitleSelectionHistoryItemEntityList();
         try {
             if (shouldDeleteLoadedDateDiary()) {
                 diaryRepository
-                        .deleteAndInsertDiary(loadedDate.getValue(), diary, diaryItemTitleSelectionHistoryItemList)
+                        .deleteAndSaveDiary(loadedDate.getValue(), diaryEntity, diaryItemTitleSelectionHistoryItemEntityList)
                         .get();
             } else {
-                diaryRepository.insertDiary(diary, diaryItemTitleSelectionHistoryItemList).get();
+                diaryRepository.saveDiary(diaryEntity, diaryItemTitleSelectionHistoryItemEntityList).get();
             }
         } catch (CancellationException | ExecutionException | InterruptedException e) {
             addAppError(AppError.DIARY_SAVING);
@@ -145,7 +147,7 @@ public class DiaryEditViewModel extends BaseViewModel {
         if (isLoadedDateEqualToInputDate()) return false;
 
         LocalDate inputDate = diaryLiveData.getDateMutableLiveData().getValue();
-        return hasDiary(inputDate);
+        return existsSavedDiary(inputDate);
     }
 
     boolean isLoadedDateEqualToInputDate() {

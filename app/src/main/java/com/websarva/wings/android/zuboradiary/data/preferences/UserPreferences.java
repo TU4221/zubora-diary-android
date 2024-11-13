@@ -2,10 +2,8 @@ package com.websarva.wings.android.zuboradiary.data.preferences;
 
 import androidx.datastore.preferences.core.MutablePreferences;
 import androidx.datastore.preferences.core.Preferences;
-import androidx.datastore.preferences.core.PreferencesKeys;
 import androidx.datastore.rxjava3.RxDataStore;
 
-import java.time.DayOfWeek;
 import java.util.Objects;
 
 import javax.inject.Inject;
@@ -16,18 +14,6 @@ import io.reactivex.rxjava3.core.Single;
 public class UserPreferences {
 
     private final RxDataStore<Preferences> dataStore;
-    private final Preferences.Key<Integer> KEY_THEME_COLOR = PreferencesKeys.intKey("theme_color");
-    private final Preferences.Key<Integer> KEY_CALENDAR_START_DAY_OF_WEEK =
-                                        PreferencesKeys.intKey("calendar_start_day_of_week");
-    private final Preferences.Key<Boolean> KEY_IS_CHECKED_REMINDER_NOTIFICATION =
-                                         PreferencesKeys.booleanKey("is_checked_reminder_notification");
-    private final Preferences.Key<String> KEY_REMINDER_NOTIFICATION_TIME =
-                                    PreferencesKeys.stringKey("reminder_notification_time");
-    private final Preferences.Key<Boolean> KEY_IS_CHECKED_PASSCODE_LOCK =
-                                                PreferencesKeys.booleanKey("is_checked_passcode_lock");
-    private final Preferences.Key<String> KEY_PASSCODE = PreferencesKeys.stringKey("passcode");
-    private final Preferences.Key<Boolean> KEY_IS_CHECKED_WEATHER_INFO_ACQUISITION =
-                                    PreferencesKeys.booleanKey("is_checked_weather_info_acquisition");
 
     @Inject
     public UserPreferences(RxDataStore<Preferences> preferencesRxDataStore) {
@@ -39,10 +25,8 @@ public class UserPreferences {
     // MEMO:初回読込は"null"が返ってくるので、その場合は初期値を返す。(他のPreferenceValueも同様)
     public Flowable<ThemeColorPreferenceValue> loadThemeColorPreferenceValue() {
         return dataStore.data().cache().map(preferences -> {
-            Integer savedThemeColorNumber = preferences.get(KEY_THEME_COLOR);
-            if (savedThemeColorNumber == null) {
-                return new ThemeColorPreferenceValue(ThemeColor.values()[0].toNumber());
-            }
+            Integer savedThemeColorNumber = preferences.get(ThemeColorPreferenceValue.PREFERENCES_KEY_COLOR);
+            if (savedThemeColorNumber == null) return new ThemeColorPreferenceValue();
 
             return new ThemeColorPreferenceValue(savedThemeColorNumber);
         });
@@ -53,16 +37,17 @@ public class UserPreferences {
 
         return dataStore.updateDataAsync(preferences -> {
             MutablePreferences mutablePreferences = preferences.toMutablePreferences();
-            mutablePreferences.set(KEY_THEME_COLOR, value.getThemeColorNumber());
+            value.setUpPreferences(mutablePreferences);
             return Single.just(mutablePreferences);
         });
     }
 
     public Flowable<CalendarStartDayOfWeekPreferenceValue> loadCalendarStartDayOfWeekPreferenceValue() {
         return dataStore.data().map(preferences -> {
-            Integer savedCalendarStartDayOfWeekNumber = preferences.get(KEY_CALENDAR_START_DAY_OF_WEEK);
+            Integer savedCalendarStartDayOfWeekNumber =
+                    preferences.get(CalendarStartDayOfWeekPreferenceValue.PREFERENCES_KEY_DAY_OF_WEEK);
             if (savedCalendarStartDayOfWeekNumber == null) {
-                return new CalendarStartDayOfWeekPreferenceValue(DayOfWeek.SUNDAY.getValue());
+                return new CalendarStartDayOfWeekPreferenceValue();
             }
 
             return new CalendarStartDayOfWeekPreferenceValue(savedCalendarStartDayOfWeekNumber);
@@ -74,17 +59,19 @@ public class UserPreferences {
 
         return dataStore.updateDataAsync(preferences -> {
             MutablePreferences mutablePreferences = preferences.toMutablePreferences();
-            mutablePreferences.set(KEY_CALENDAR_START_DAY_OF_WEEK, value.getDayOfWeekNumber());
+            value.setUpPreferences(mutablePreferences);
             return Single.just(mutablePreferences);
         });
     }
 
     public Flowable<ReminderNotificationPreferenceValue> loadReminderNotificationPreferenceValue() {
         return dataStore.data().map(preferences -> {
-            Boolean savedIsReminderNotification = preferences.get(KEY_IS_CHECKED_REMINDER_NOTIFICATION);
-            String savedReminderNotificationTime = preferences.get(KEY_REMINDER_NOTIFICATION_TIME);
+            Boolean savedIsReminderNotification =
+                    preferences.get(ReminderNotificationPreferenceValue.PREFERENCES_KEY_IS_CHECKED);
+            String savedReminderNotificationTime =
+                    preferences.get(ReminderNotificationPreferenceValue.PREFERENCES_KEY_TIME);
             if (savedIsReminderNotification == null || savedReminderNotificationTime == null) {
-                return new ReminderNotificationPreferenceValue(false, "");
+                return new ReminderNotificationPreferenceValue();
             }
 
             return new ReminderNotificationPreferenceValue(savedIsReminderNotification, savedReminderNotificationTime);
@@ -96,19 +83,21 @@ public class UserPreferences {
 
         return dataStore.updateDataAsync(preferences -> {
             MutablePreferences mutablePreferences = preferences.toMutablePreferences();
-            mutablePreferences.set(KEY_IS_CHECKED_REMINDER_NOTIFICATION, value.getIsChecked());
-            mutablePreferences.set(KEY_REMINDER_NOTIFICATION_TIME, value.getNotificationTimeString());
+            value.setUpPreferences(mutablePreferences);
             return Single.just(mutablePreferences);
         });
     }
 
     public Flowable<PassCodeLockPreferenceValue> loadPasscodeLockPreferenceValue() {
         return dataStore.data().map(preferences -> {
-            Boolean savedIsPasscodeLock = preferences.get(KEY_IS_CHECKED_PASSCODE_LOCK);
-            String savedPasscode = preferences.get(KEY_PASSCODE);
+            Boolean savedIsPasscodeLock =
+                    preferences.get(PassCodeLockPreferenceValue.PREFERENCES_KEY_IS_CHECKED);
+            String savedPasscode =
+                    preferences.get(PassCodeLockPreferenceValue.PREFERENCES_KEY_PASSCODE);
             if (savedIsPasscodeLock == null || savedPasscode == null) {
-                return new PassCodeLockPreferenceValue(false, "");
+                return new PassCodeLockPreferenceValue();
             }
+
             return new PassCodeLockPreferenceValue(savedIsPasscodeLock, savedPasscode);
         });
     }
@@ -118,18 +107,19 @@ public class UserPreferences {
 
         return dataStore.updateDataAsync(preferences -> {
             MutablePreferences mutablePreferences = preferences.toMutablePreferences();
-            mutablePreferences.set(KEY_IS_CHECKED_PASSCODE_LOCK, value.getIsChecked());
-            mutablePreferences.set(KEY_PASSCODE, value.getCode());
+            value.setUpPreferences(mutablePreferences);
             return Single.just(mutablePreferences);
         });
     }
 
     public Flowable<WeatherInfoAcquisitionPreferenceValue> loadWeatherInfoAcquisitionPreferenceValue() {
         return dataStore.data().map(preferences -> {
-            Boolean savedIsGettingWeatherInformation = preferences.get(KEY_IS_CHECKED_WEATHER_INFO_ACQUISITION);
+            Boolean savedIsGettingWeatherInformation =
+                    preferences.get(WeatherInfoAcquisitionPreferenceValue.PREFERENCES_KEY_IS_CHECKED);
             if (savedIsGettingWeatherInformation == null) {
-                return new WeatherInfoAcquisitionPreferenceValue(false);
+                return new WeatherInfoAcquisitionPreferenceValue();
             }
+
             return new WeatherInfoAcquisitionPreferenceValue(savedIsGettingWeatherInformation);
         });
     }
@@ -139,7 +129,19 @@ public class UserPreferences {
 
         return dataStore.updateDataAsync(preferences -> {
             MutablePreferences mutablePreferences = preferences.toMutablePreferences();
-            mutablePreferences.set(KEY_IS_CHECKED_WEATHER_INFO_ACQUISITION, value.getIsChecked());
+            value.setUpPreferences(mutablePreferences);
+            return Single.just(mutablePreferences);
+        });
+    }
+
+    public Single<Preferences> initialize() {
+        return dataStore.updateDataAsync(preferences -> {
+            MutablePreferences mutablePreferences = preferences.toMutablePreferences();
+            new ThemeColorPreferenceValue().setUpPreferences(mutablePreferences);
+            new CalendarStartDayOfWeekPreferenceValue().setUpPreferences(mutablePreferences);
+            new ReminderNotificationPreferenceValue().setUpPreferences(mutablePreferences);
+            new PassCodeLockPreferenceValue().setUpPreferences(mutablePreferences);
+            new WeatherInfoAcquisitionPreferenceValue().setUpPreferences(mutablePreferences);
             return Single.just(mutablePreferences);
         });
     }

@@ -55,8 +55,11 @@ class CalendarViewModel extends BaseViewModel {
         }
     }
 
-    void hasDiary(LocalDate date, FutureCallback<Boolean> futureCallback) {
-        ListenableFuture<Boolean> hasDiaryListenableFuture = diaryRepository.hasDiary(date);
+    void existsSavedDiary(LocalDate date, FutureCallback<Boolean> futureCallback) {
+        Objects.requireNonNull(date);
+        Objects.requireNonNull(futureCallback);
+
+        ListenableFuture<Boolean> hasDiaryListenableFuture = diaryRepository.existsDiary(date);
         Futures.addCallback(hasDiaryListenableFuture, futureCallback, new MainThreadExecutor());
         Futures.addCallback(hasDiaryListenableFuture, new FutureCallback<Boolean>() {
             @Override
