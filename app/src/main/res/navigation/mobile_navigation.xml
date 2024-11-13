@@ -259,7 +259,7 @@
             android:id="@+id/navigation_diary_edit_fragment"
             android:name="com.websarva.wings.android.zuboradiary.ui.diary.diaryedit.DiaryEditFragment"
             tools:layout="@layout/fragment_diary_edit"
-            android:label="@string/title_notifications" >
+            android:label="@string/title_settings" >
             <action
                 android:id="@+id/action_diary_edit_fragment_to_select_item_title_fragment"
                 app:destination="@id/navigation_diary_item_title_edit_fragment"/>

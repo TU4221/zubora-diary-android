@@ -58,7 +58,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="@dimen/layout_diary_edit_item_margin_start"
-                    android:src="@drawable/ic_delete_forever_24" />
+                    android:src="@drawable/diary_edit_ic_delete_forever_24px" />
 
             </LinearLayout>
 
