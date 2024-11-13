@@ -328,12 +328,17 @@ public class SettingsFragment extends BaseFragment {
                         binding.includeReminderNotificationSetting.textSettingTitle,
                         binding.includeReminderNotificationSetting.textSettingValue,
                         binding.includePasscodeLockSetting.textSettingTitle,
-                        binding.includeWeatherInfoAcquisitionSetting.textSettingTitle,
+                        binding.includeWeatherInfoAcquisitionSetting.textSettingTitle
+                );
+        switcher.switchTextColorOnBackground(textList);
+
+        ColorSwitchingViewList<TextView> redTextList =
+                new ColorSwitchingViewList<>(
                         binding.includeAllDiariesDeleteSetting.textSettingTitle,
                         binding.includeAllSettingsInitializationSetting.textSettingTitle,
                         binding.includeAllDataDeleteSetting.textSettingTitle
                 );
-        switcher.switchTextColorOnBackground(textList);
+        switcher.switchRedTextColorOnBackground(redTextList);
 
         ColorSwitchingViewList<MaterialSwitch> switchList =
                 new ColorSwitchingViewList<>(

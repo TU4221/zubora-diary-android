@@ -62,6 +62,13 @@ public class ThemeColorSwitcher {
         switchTextViewsColorOnlyText(viewList, onSurfaceColor);
     }
 
+    public final void switchRedTextColorOnBackground(ColorSwitchingViewList<TextView> viewList) {
+        Objects.requireNonNull(viewList);
+
+        int onSurfaceColor = themeColor.getErrorColor(resources);
+        switchTextViewsColorOnlyText(viewList, onSurfaceColor);
+    }
+
     public final void switchStatusBarColor(Window window) {
         Objects.requireNonNull(window);
 
