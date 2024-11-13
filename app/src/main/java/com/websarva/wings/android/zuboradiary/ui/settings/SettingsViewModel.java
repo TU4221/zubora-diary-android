@@ -246,7 +246,7 @@ public class SettingsViewModel extends BaseViewModel {
         setUpProcessOnUpdate(result, new OnSettingsUpdateCallback() {
             @Override
             public void onUpdateSettings() {
-                registerReminderNotificationWorker(value);
+                workerRepository.registerReminderNotificationWorker(value);
             }
         });
     }
@@ -258,7 +258,7 @@ public class SettingsViewModel extends BaseViewModel {
         setUpProcessOnUpdate(result, new OnSettingsUpdateCallback() {
             @Override
             public void onUpdateSettings() {
-                cancelReminderNotificationWorker();
+                workerRepository.cancelReminderNotificationWorker();
             }
         });
     }
@@ -310,16 +310,6 @@ public class SettingsViewModel extends BaseViewModel {
                 addAppError(appError);
             }
         }));
-    }
-
-    void registerReminderNotificationWorker(LocalTime settingTime) {
-        Objects.requireNonNull(settingTime);
-
-        workerRepository.registerReminderNotificationWorker(settingTime);
-    }
-
-    void cancelReminderNotificationWorker() {
-        workerRepository.cancelReminderNotificationWorker();
     }
 
     public void updateGeoCoordinates(GeoCoordinates geoCoordinates) {
