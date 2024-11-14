@@ -6,17 +6,17 @@ import androidx.datastore.preferences.core.PreferencesKeys;
 
 import java.util.Objects;
 
-public class WeatherInfoAcquisitionPreferenceValue {
+public class WeatherInfoAcquisitionPreference {
 
     static final Preferences.Key<Boolean> PREFERENCES_KEY_IS_CHECKED =
             PreferencesKeys.booleanKey("is_checked_weather_info_acquisition");
     private final boolean isChecked;
 
-    public WeatherInfoAcquisitionPreferenceValue(boolean isChecked) {
+    public WeatherInfoAcquisitionPreference(boolean isChecked) {
         this.isChecked = isChecked;
     }
 
-    public WeatherInfoAcquisitionPreferenceValue() {
+    public WeatherInfoAcquisitionPreference() {
         this(false);
     }
 

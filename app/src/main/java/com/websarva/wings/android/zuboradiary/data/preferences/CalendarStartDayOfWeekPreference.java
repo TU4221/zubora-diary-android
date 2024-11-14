@@ -10,19 +10,19 @@ import java.time.DayOfWeek;
 import java.util.Arrays;
 import java.util.Objects;
 
-public class CalendarStartDayOfWeekPreferenceValue {
+public class CalendarStartDayOfWeekPreference {
 
     static final Preferences.Key<Integer> PREFERENCES_KEY_DAY_OF_WEEK =
             PreferencesKeys.intKey("calendar_start_day_of_week");
     private final int dayOfWeekNumber;
 
-    public CalendarStartDayOfWeekPreferenceValue(DayOfWeek dayOfWeek) {
+    public CalendarStartDayOfWeekPreference(DayOfWeek dayOfWeek) {
         Objects.requireNonNull(dayOfWeek);
 
         dayOfWeekNumber = dayOfWeek.getValue();
     }
 
-    public CalendarStartDayOfWeekPreferenceValue(int dayOfWeekNumber) {
+    public CalendarStartDayOfWeekPreference(int dayOfWeekNumber) {
         boolean contains =
                 Arrays.stream(DayOfWeek.values()).anyMatch(x -> x.getValue() == dayOfWeekNumber);
         if (!contains) throw new IllegalArgumentException();
@@ -30,7 +30,7 @@ public class CalendarStartDayOfWeekPreferenceValue {
         this.dayOfWeekNumber = dayOfWeekNumber;
     }
 
-    public CalendarStartDayOfWeekPreferenceValue() {
+    public CalendarStartDayOfWeekPreference() {
         this(DayOfWeek.SUNDAY);
     }
 

@@ -8,13 +8,13 @@ import androidx.datastore.preferences.core.PreferencesKeys;
 import java.util.Arrays;
 import java.util.Objects;
 
-public class ThemeColorPreferenceValue {
+public class ThemeColorPreference {
 
     static final Preferences.Key<Integer> PREFERENCES_KEY_COLOR =
                                                         PreferencesKeys.intKey("theme_color");
     private final int themeColorNumber;
 
-    public ThemeColorPreferenceValue(int themeColorNumber) {
+    public ThemeColorPreference(int themeColorNumber) {
         boolean contains =
                 Arrays.stream(ThemeColor.values()).anyMatch(x -> x.toNumber() == themeColorNumber);
         if (!contains) throw new IllegalArgumentException();
@@ -22,13 +22,13 @@ public class ThemeColorPreferenceValue {
         this.themeColorNumber = themeColorNumber;
     }
 
-    public ThemeColorPreferenceValue(ThemeColor themeColor) {
+    public ThemeColorPreference(ThemeColor themeColor) {
         Objects.requireNonNull(themeColor);
 
         this.themeColorNumber = themeColor.toNumber();
     }
 
-    public ThemeColorPreferenceValue() {
+    public ThemeColorPreference() {
         this(ThemeColor.values()[0]);
     }
 

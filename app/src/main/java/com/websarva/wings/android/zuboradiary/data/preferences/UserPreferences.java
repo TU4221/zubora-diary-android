@@ -23,16 +23,16 @@ public class UserPreferences {
     }
 
     // MEMO:初回読込は"null"が返ってくるので、その場合は初期値を返す。(他のPreferenceValueも同様)
-    public Flowable<ThemeColorPreferenceValue> loadThemeColorPreferenceValue() {
+    public Flowable<ThemeColorPreference> loadThemeColorPreference() {
         return dataStore.data().cache().map(preferences -> {
-            Integer savedThemeColorNumber = preferences.get(ThemeColorPreferenceValue.PREFERENCES_KEY_COLOR);
-            if (savedThemeColorNumber == null) return new ThemeColorPreferenceValue();
+            Integer savedThemeColorNumber = preferences.get(ThemeColorPreference.PREFERENCES_KEY_COLOR);
+            if (savedThemeColorNumber == null) return new ThemeColorPreference();
 
-            return new ThemeColorPreferenceValue(savedThemeColorNumber);
+            return new ThemeColorPreference(savedThemeColorNumber);
         });
     }
 
-    public Single<Preferences> saveThemeColorPreferenceValue(ThemeColorPreferenceValue value) {
+    public Single<Preferences> saveThemeColorPreference(ThemeColorPreference value) {
         Objects.requireNonNull(value);
 
         return dataStore.updateDataAsync(preferences -> {
@@ -42,19 +42,19 @@ public class UserPreferences {
         });
     }
 
-    public Flowable<CalendarStartDayOfWeekPreferenceValue> loadCalendarStartDayOfWeekPreferenceValue() {
+    public Flowable<CalendarStartDayOfWeekPreference> loadCalendarStartDayOfWeekPreference() {
         return dataStore.data().map(preferences -> {
             Integer savedCalendarStartDayOfWeekNumber =
-                    preferences.get(CalendarStartDayOfWeekPreferenceValue.PREFERENCES_KEY_DAY_OF_WEEK);
+                    preferences.get(CalendarStartDayOfWeekPreference.PREFERENCES_KEY_DAY_OF_WEEK);
             if (savedCalendarStartDayOfWeekNumber == null) {
-                return new CalendarStartDayOfWeekPreferenceValue();
+                return new CalendarStartDayOfWeekPreference();
             }
 
-            return new CalendarStartDayOfWeekPreferenceValue(savedCalendarStartDayOfWeekNumber);
+            return new CalendarStartDayOfWeekPreference(savedCalendarStartDayOfWeekNumber);
         });
     }
 
-    public Single<Preferences> saveCalendarStartDayOfWeekPreferenceValue(CalendarStartDayOfWeekPreferenceValue value) {
+    public Single<Preferences> saveCalendarStartDayOfWeekPreference(CalendarStartDayOfWeekPreference value) {
         Objects.requireNonNull(value);
 
         return dataStore.updateDataAsync(preferences -> {
@@ -64,21 +64,21 @@ public class UserPreferences {
         });
     }
 
-    public Flowable<ReminderNotificationPreferenceValue> loadReminderNotificationPreferenceValue() {
+    public Flowable<ReminderNotificationPreference> loadReminderNotificationPreference() {
         return dataStore.data().map(preferences -> {
             Boolean savedIsReminderNotification =
-                    preferences.get(ReminderNotificationPreferenceValue.PREFERENCES_KEY_IS_CHECKED);
+                    preferences.get(ReminderNotificationPreference.PREFERENCES_KEY_IS_CHECKED);
             String savedReminderNotificationTime =
-                    preferences.get(ReminderNotificationPreferenceValue.PREFERENCES_KEY_TIME);
+                    preferences.get(ReminderNotificationPreference.PREFERENCES_KEY_TIME);
             if (savedIsReminderNotification == null || savedReminderNotificationTime == null) {
-                return new ReminderNotificationPreferenceValue();
+                return new ReminderNotificationPreference();
             }
 
-            return new ReminderNotificationPreferenceValue(savedIsReminderNotification, savedReminderNotificationTime);
+            return new ReminderNotificationPreference(savedIsReminderNotification, savedReminderNotificationTime);
         });
     }
 
-    public Single<Preferences> saveReminderNotificationPreferenceValue(ReminderNotificationPreferenceValue value) {
+    public Single<Preferences> saveReminderNotificationPreference(ReminderNotificationPreference value) {
         Objects.requireNonNull(value);
 
         return dataStore.updateDataAsync(preferences -> {
@@ -88,21 +88,21 @@ public class UserPreferences {
         });
     }
 
-    public Flowable<PassCodeLockPreferenceValue> loadPasscodeLockPreferenceValue() {
+    public Flowable<PassCodeLockPreference> loadPasscodeLockPreference() {
         return dataStore.data().map(preferences -> {
             Boolean savedIsPasscodeLock =
-                    preferences.get(PassCodeLockPreferenceValue.PREFERENCES_KEY_IS_CHECKED);
+                    preferences.get(PassCodeLockPreference.PREFERENCES_KEY_IS_CHECKED);
             String savedPasscode =
-                    preferences.get(PassCodeLockPreferenceValue.PREFERENCES_KEY_PASSCODE);
+                    preferences.get(PassCodeLockPreference.PREFERENCES_KEY_PASSCODE);
             if (savedIsPasscodeLock == null || savedPasscode == null) {
-                return new PassCodeLockPreferenceValue();
+                return new PassCodeLockPreference();
             }
 
-            return new PassCodeLockPreferenceValue(savedIsPasscodeLock, savedPasscode);
+            return new PassCodeLockPreference(savedIsPasscodeLock, savedPasscode);
         });
     }
 
-    public Single<Preferences> savePasscodeLockPreferenceValue(PassCodeLockPreferenceValue value) {
+    public Single<Preferences> savePasscodeLockPreference(PassCodeLockPreference value) {
         Objects.requireNonNull(value);
 
         return dataStore.updateDataAsync(preferences -> {
@@ -112,19 +112,19 @@ public class UserPreferences {
         });
     }
 
-    public Flowable<WeatherInfoAcquisitionPreferenceValue> loadWeatherInfoAcquisitionPreferenceValue() {
+    public Flowable<WeatherInfoAcquisitionPreference> loadWeatherInfoAcquisitionPreference() {
         return dataStore.data().map(preferences -> {
             Boolean savedIsGettingWeatherInformation =
-                    preferences.get(WeatherInfoAcquisitionPreferenceValue.PREFERENCES_KEY_IS_CHECKED);
+                    preferences.get(WeatherInfoAcquisitionPreference.PREFERENCES_KEY_IS_CHECKED);
             if (savedIsGettingWeatherInformation == null) {
-                return new WeatherInfoAcquisitionPreferenceValue();
+                return new WeatherInfoAcquisitionPreference();
             }
 
-            return new WeatherInfoAcquisitionPreferenceValue(savedIsGettingWeatherInformation);
+            return new WeatherInfoAcquisitionPreference(savedIsGettingWeatherInformation);
         });
     }
 
-    public Single<Preferences> saveWeatherInfoAcquisitionPreferenceValue(WeatherInfoAcquisitionPreferenceValue value) {
+    public Single<Preferences> saveWeatherInfoAcquisitionPreference(WeatherInfoAcquisitionPreference value) {
         Objects.requireNonNull(value);
 
         return dataStore.updateDataAsync(preferences -> {
@@ -134,14 +134,14 @@ public class UserPreferences {
         });
     }
 
-    public Single<Preferences> initialize() {
+    public Single<Preferences> initializeAllPreferences() {
         return dataStore.updateDataAsync(preferences -> {
             MutablePreferences mutablePreferences = preferences.toMutablePreferences();
-            new ThemeColorPreferenceValue().setUpPreferences(mutablePreferences);
-            new CalendarStartDayOfWeekPreferenceValue().setUpPreferences(mutablePreferences);
-            new ReminderNotificationPreferenceValue().setUpPreferences(mutablePreferences);
-            new PassCodeLockPreferenceValue().setUpPreferences(mutablePreferences);
-            new WeatherInfoAcquisitionPreferenceValue().setUpPreferences(mutablePreferences);
+            new ThemeColorPreference().setUpPreferences(mutablePreferences);
+            new CalendarStartDayOfWeekPreference().setUpPreferences(mutablePreferences);
+            new ReminderNotificationPreference().setUpPreferences(mutablePreferences);
+            new PassCodeLockPreference().setUpPreferences(mutablePreferences);
+            new WeatherInfoAcquisitionPreference().setUpPreferences(mutablePreferences);
             return Single.just(mutablePreferences);
         });
     }

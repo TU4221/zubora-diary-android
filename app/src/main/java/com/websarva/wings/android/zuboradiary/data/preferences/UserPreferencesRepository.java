@@ -17,47 +17,47 @@ public class UserPreferencesRepository {
         this.userPreferences = userPreferences;
     }
 
-    public Flowable<ThemeColorPreferenceValue> loadThemeColorSettingValue() {
-        return userPreferences.loadThemeColorPreferenceValue();
+    public Flowable<ThemeColorPreference> loadThemeColorPreference() {
+        return userPreferences.loadThemeColorPreference();
     }
 
-    public Single<Preferences> saveThemeColorPreferenceValue(ThemeColorPreferenceValue value) {
-        return userPreferences.saveThemeColorPreferenceValue(value);
+    public Single<Preferences> saveThemeColorPreference(ThemeColorPreference preference) {
+        return userPreferences.saveThemeColorPreference(preference);
     }
 
-    public Flowable<CalendarStartDayOfWeekPreferenceValue> loadCalendarStartDayOfWeekPreferenceValue() {
-        return userPreferences.loadCalendarStartDayOfWeekPreferenceValue();
+    public Flowable<CalendarStartDayOfWeekPreference> loadCalendarStartDayOfWeekPreference() {
+        return userPreferences.loadCalendarStartDayOfWeekPreference();
     }
 
-    public Single<Preferences> saveCalendarStartDayOfWeekPreferenceValue(CalendarStartDayOfWeekPreferenceValue value) {
-        return userPreferences.saveCalendarStartDayOfWeekPreferenceValue(value);
+    public Single<Preferences> saveCalendarStartDayOfWeekPreference(CalendarStartDayOfWeekPreference preference) {
+        return userPreferences.saveCalendarStartDayOfWeekPreference(preference);
     }
 
-    public Flowable<ReminderNotificationPreferenceValue> loadReminderNotificationPreferenceValue() {
-        return userPreferences.loadReminderNotificationPreferenceValue();
+    public Flowable<ReminderNotificationPreference> loadReminderNotificationPreference() {
+        return userPreferences.loadReminderNotificationPreference();
     }
 
-    public Single<Preferences> saveReminderNotificationPreferenceValue(ReminderNotificationPreferenceValue value) {
-        return userPreferences.saveReminderNotificationPreferenceValue(value);
+    public Single<Preferences> saveReminderNotificationPreference(ReminderNotificationPreference preference) {
+        return userPreferences.saveReminderNotificationPreference(preference);
     }
 
-    public Flowable<PassCodeLockPreferenceValue> loadPasscodeLockPreferenceValue() {
-        return userPreferences.loadPasscodeLockPreferenceValue();
+    public Flowable<PassCodeLockPreference> loadPasscodeLockPreference() {
+        return userPreferences.loadPasscodeLockPreference();
     }
 
-    public Single<Preferences> savePasscodeLockPreferenceValue(PassCodeLockPreferenceValue value) {
-        return userPreferences.savePasscodeLockPreferenceValue(value);
+    public Single<Preferences> savePasscodeLockPreference(PassCodeLockPreference preference) {
+        return userPreferences.savePasscodeLockPreference(preference);
     }
 
-    public Flowable<WeatherInfoAcquisitionPreferenceValue> loadWeatherInfoAcquisitionPreferenceValue() {
-        return userPreferences.loadWeatherInfoAcquisitionPreferenceValue();
+    public Flowable<WeatherInfoAcquisitionPreference> loadWeatherInfoAcquisitionPreference() {
+        return userPreferences.loadWeatherInfoAcquisitionPreference();
     }
 
-    public Single<Preferences> saveWeatherInfoAcquisitionPreferenceValue(WeatherInfoAcquisitionPreferenceValue value) {
-        return userPreferences.saveWeatherInfoAcquisitionPreferenceValue(value);
+    public Single<Preferences> saveWeatherInfoAcquisitionPreference(WeatherInfoAcquisitionPreference preference) {
+        return userPreferences.saveWeatherInfoAcquisitionPreference(preference);
     }
 
-    public Single<Preferences> initializePreferences() {
-        return userPreferences.initialize();
+    public Single<Preferences> initializeAllPreferences() {
+        return userPreferences.initializeAllPreferences();
     }
 }

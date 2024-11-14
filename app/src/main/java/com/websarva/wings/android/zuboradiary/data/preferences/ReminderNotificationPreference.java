@@ -10,7 +10,7 @@ import java.time.LocalTime;
 import java.time.format.DateTimeParseException;
 import java.util.Objects;
 
-public class ReminderNotificationPreferenceValue {
+public class ReminderNotificationPreference {
 
     static final Preferences.Key<Boolean> PREFERENCES_KEY_IS_CHECKED =
             PreferencesKeys.booleanKey("is_checked_reminder_notification");
@@ -19,7 +19,7 @@ public class ReminderNotificationPreferenceValue {
     private final boolean isChecked;
     private final String notificationTime;
 
-    public ReminderNotificationPreferenceValue(boolean isChecked,@Nullable LocalTime notificationTime) {
+    public ReminderNotificationPreference(boolean isChecked, @Nullable LocalTime notificationTime) {
         if (isChecked) Objects.requireNonNull(notificationTime);
 
         this.isChecked = isChecked;
@@ -30,7 +30,7 @@ public class ReminderNotificationPreferenceValue {
         }
     }
 
-    public ReminderNotificationPreferenceValue(boolean isChecked,@Nullable String notificationTime) {
+    public ReminderNotificationPreference(boolean isChecked, @Nullable String notificationTime) {
         String _notificationTime;
         if (isChecked) {
             Objects.requireNonNull(notificationTime);
@@ -52,7 +52,7 @@ public class ReminderNotificationPreferenceValue {
         this.notificationTime = _notificationTime;
     }
 
-    public ReminderNotificationPreferenceValue() {
+    public ReminderNotificationPreference() {
         this(false, "");
     }
 

@@ -7,7 +7,7 @@ import androidx.datastore.preferences.core.PreferencesKeys;
 
 import java.util.Objects;
 
-public class PassCodeLockPreferenceValue {
+public class PassCodeLockPreference {
 
     static final Preferences.Key<Boolean> PREFERENCES_KEY_IS_CHECKED =
             PreferencesKeys.booleanKey("is_checked_passcode_lock");
@@ -15,7 +15,7 @@ public class PassCodeLockPreferenceValue {
     private final boolean isChecked;
     private final String passCode;
 
-    public PassCodeLockPreferenceValue(boolean isChecked, @Nullable String passCode) {
+    public PassCodeLockPreference(boolean isChecked, @Nullable String passCode) {
         if (isChecked) {
             Objects.requireNonNull(passCode);
             if (passCode.matches("|d{4}")) throw new IllegalArgumentException();
@@ -29,7 +29,7 @@ public class PassCodeLockPreferenceValue {
         }
     }
 
-    public PassCodeLockPreferenceValue() {
+    public PassCodeLockPreference() {
         this(false, "");
     }
 
