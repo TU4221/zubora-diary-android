@@ -7,7 +7,6 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
 import com.websarva.wings.android.zuboradiary.data.AppError;
-import com.websarva.wings.android.zuboradiary.data.database.DiaryItemTitleSelectionHistoryRepository;
 import com.websarva.wings.android.zuboradiary.data.database.DiaryRepository;
 import com.websarva.wings.android.zuboradiary.data.network.GeoCoordinates;
 import com.websarva.wings.android.zuboradiary.data.preferences.CalendarStartDayOfWeekPreference;
@@ -39,7 +38,6 @@ public class SettingsViewModel extends BaseViewModel {
     private final UserPreferencesRepository userPreferencesRepository;
     private final WorkerRepository workerRepository;
     private final DiaryRepository diaryRepository;
-    private final DiaryItemTitleSelectionHistoryRepository diaryItemTitleSelectionHistoryRepository;
     private final CompositeDisposable disposables = new CompositeDisposable();
 
     private final MutableLiveData<ThemeColor> themeColor = new MutableLiveData<>();
@@ -50,22 +48,20 @@ public class SettingsViewModel extends BaseViewModel {
     private final MutableLiveData<Boolean> isCheckedWeatherInfoAcquisition = new MutableLiveData<>();
 
     private final MutableLiveData<GeoCoordinates> geoCoordinates = new MutableLiveData<>();
-    private Flowable<ThemeColorPreference> themeColorPreferenceValueFlowable;
-    private Flowable<CalendarStartDayOfWeekPreference> calendarStartDayPreferenceValueFlowable;
-    private Flowable<ReminderNotificationPreference> reminderNotificationPreferenceValueFlowable;
-    private Flowable<PassCodeLockPreference> passCodeLockPreferenceValueFlowable;
-    private Flowable<WeatherInfoAcquisitionPreference> weatherInfoAcquisitionPreferenceValueFlowable;
+    private Flowable<ThemeColorPreference> themeColorPreferenceFlowable;
+    private Flowable<CalendarStartDayOfWeekPreference> calendarStartDayPreferenceFlowable;
+    private Flowable<ReminderNotificationPreference> reminderNotificationPreferenceFlowable;
+    private Flowable<PassCodeLockPreference> passCodeLockPreferenceFlowable;
+    private Flowable<WeatherInfoAcquisitionPreference> weatherInfoAcquisitionPreferenceFlowable;
 
     @Inject
     public SettingsViewModel(
             UserPreferencesRepository userPreferencesRepository,
             WorkerRepository workerRepository,
-            DiaryRepository diaryRepository,
-            DiaryItemTitleSelectionHistoryRepository diaryItemTitleSelectionHistoryRepository) {
+            DiaryRepository diaryRepository) {
         this.userPreferencesRepository = userPreferencesRepository;
         this.workerRepository = workerRepository;
         this.diaryRepository = diaryRepository;
-        this.diaryItemTitleSelectionHistoryRepository = diaryItemTitleSelectionHistoryRepository;
 
         initialize();
     }
@@ -82,11 +78,19 @@ public class SettingsViewModel extends BaseViewModel {
     }
 
     private void setUpThemeColorPreferenceValueLoading() {
-        themeColorPreferenceValueFlowable = userPreferencesRepository.loadThemeColorPreference();
+        themeColorPreferenceFlowable = userPreferencesRepository.loadThemeColorPreference();
         disposables.add(
-                themeColorPreferenceValueFlowable.subscribe(
+                themeColorPreferenceFlowable.subscribe(
                         value -> {
-                            themeColor.postValue(value.getThemeColor());
+                            // HACK:一つのDataStore(UserPreferencesクラス)からFlowableを生成している為、
+                            //      一つのPreferenceを更新すると他のPreferenceのFlowableにも通知される。
+                            //      結果的にObserverにも通知が行き、不必要な処理が発生してしまう。
+                            //      対策として下記コードを記述。(他PreferenceFlowableも同様)
+                            Objects.requireNonNull(value);
+                            ThemeColor themeColor = this.themeColor.getValue();
+                            if (themeColor != null && themeColor.equals(value.toThemeColor())) return;
+
+                            this.themeColor.postValue(value.toThemeColor());
                         },
                         throwable -> {
                             throwable.printStackTrace();
@@ -100,17 +104,20 @@ public class SettingsViewModel extends BaseViewModel {
     public ThemeColor loadThemeColorSettingValue() {
         ThemeColor themeColorValue = themeColor.getValue();
         if (themeColorValue != null) return themeColorValue;
-        setUpThemeColorPreferenceValueLoading();
         ThemeColorPreference defaultValue = new ThemeColorPreference();
-        return themeColorPreferenceValueFlowable.blockingFirst(defaultValue).getThemeColor();
+        return themeColorPreferenceFlowable.blockingFirst(defaultValue).toThemeColor();
     }
 
     private void setUpCalendarStartDayOfWeekPreferenceValueLoading() {
-        calendarStartDayPreferenceValueFlowable =
+        calendarStartDayPreferenceFlowable =
                 userPreferencesRepository.loadCalendarStartDayOfWeekPreference();
         disposables.add(
-                calendarStartDayPreferenceValueFlowable.subscribe(
+                calendarStartDayPreferenceFlowable.subscribe(
                         value -> {
+                            Objects.requireNonNull(value);
+                            DayOfWeek dayOfWeek = calendarStartDayOfWeek.getValue();
+                            if (dayOfWeek != null && dayOfWeek.equals(value.toDayOfWeek())) return;
+
                             DayOfWeek calendarStartDayOfWeek = value.toDayOfWeek();
                             this.calendarStartDayOfWeek.postValue(calendarStartDayOfWeek);
                             },
@@ -126,17 +133,20 @@ public class SettingsViewModel extends BaseViewModel {
     public DayOfWeek loadCalendarStartDaySettingValue() {
         DayOfWeek dayOfWeekValue = calendarStartDayOfWeek.getValue();
         if (dayOfWeekValue != null) return dayOfWeekValue;
-        setUpCalendarStartDayOfWeekPreferenceValueLoading();
         CalendarStartDayOfWeekPreference defaultValue = new CalendarStartDayOfWeekPreference();
-        return calendarStartDayPreferenceValueFlowable.blockingFirst(defaultValue).toDayOfWeek();
+        return calendarStartDayPreferenceFlowable.blockingFirst(defaultValue).toDayOfWeek();
     }
 
     private void setUpReminderNotificationPreferenceValueLoading() {
-        reminderNotificationPreferenceValueFlowable =
+        reminderNotificationPreferenceFlowable =
                 userPreferencesRepository.loadReminderNotificationPreference();
         disposables.add(
-                reminderNotificationPreferenceValueFlowable.subscribe(
+                reminderNotificationPreferenceFlowable.subscribe(
                         value -> {
+                            Objects.requireNonNull(value);
+                            Boolean isChecked = isCheckedReminderNotification.getValue();
+                            if (isChecked != null && isChecked == value.getIsChecked()) return;
+
                             isCheckedReminderNotification.postValue(value.getIsChecked());
                             reminderNotificationTime.postValue(value.getNotificationLocalTime());
                             },
@@ -151,28 +161,30 @@ public class SettingsViewModel extends BaseViewModel {
     public boolean isCheckedReminderNotificationSetting() {
         Boolean value = isCheckedReminderNotification.getValue();
         if (value != null) return value;
-        setUpReminderNotificationPreferenceValueLoading();
         ReminderNotificationPreference defaultValue =
                 new ReminderNotificationPreference();
-        return reminderNotificationPreferenceValueFlowable.blockingFirst(defaultValue).getIsChecked();
+        return reminderNotificationPreferenceFlowable.blockingFirst(defaultValue).getIsChecked();
     }
 
     @Nullable
     public LocalTime loadReminderNotificationTimeSettingValue() {
         LocalTime value = reminderNotificationTime.getValue();
         if (value != null) return value;
-        setUpReminderNotificationPreferenceValueLoading();
         ReminderNotificationPreference defaultValue =
                 new ReminderNotificationPreference();
-        return reminderNotificationPreferenceValueFlowable
+        return reminderNotificationPreferenceFlowable
                 .blockingFirst(defaultValue).getNotificationLocalTime();
     }
 
     private void setUpPasscodeLockPreferenceValueLoading() {
-        passCodeLockPreferenceValueFlowable = userPreferencesRepository.loadPasscodeLockPreference();
+        passCodeLockPreferenceFlowable = userPreferencesRepository.loadPasscodeLockPreference();
         disposables.add(
-                passCodeLockPreferenceValueFlowable.subscribe(
+                passCodeLockPreferenceFlowable.subscribe(
                         value -> {
+                            Objects.requireNonNull(value);
+                            Boolean isChecked = isCheckedPasscodeLock.getValue();
+                            if (isChecked != null && isChecked == value.getIsChecked()) return;
+
                             isCheckedPasscodeLock.postValue(value.getIsChecked());
                         },
                         throwable -> {
@@ -184,11 +196,15 @@ public class SettingsViewModel extends BaseViewModel {
     }
 
     private void setUpWeatherInfoAcquisitionPreferenceValueLoading() {
-        weatherInfoAcquisitionPreferenceValueFlowable =
+        weatherInfoAcquisitionPreferenceFlowable =
                 userPreferencesRepository.loadWeatherInfoAcquisitionPreference();
         disposables.add(
-                weatherInfoAcquisitionPreferenceValueFlowable.subscribe(
+                weatherInfoAcquisitionPreferenceFlowable.subscribe(
                         value -> {
+                            Objects.requireNonNull(value);
+                            Boolean isChecked = isCheckedWeatherInfoAcquisition.getValue();
+                            if (isChecked != null && isChecked == value.getIsChecked()) return;
+
                             isCheckedWeatherInfoAcquisition.postValue(value.getIsChecked());
                         },
                         throwable -> {
@@ -202,10 +218,9 @@ public class SettingsViewModel extends BaseViewModel {
     public boolean isCheckedWeatherInfoAcquisitionSetting() {
         Boolean value = isCheckedWeatherInfoAcquisition.getValue();
         if (value != null) return value;
-        setUpWeatherInfoAcquisitionPreferenceValueLoading();
         WeatherInfoAcquisitionPreference defaultValue =
                 new WeatherInfoAcquisitionPreference();
-        return weatherInfoAcquisitionPreferenceValueFlowable.blockingFirst(defaultValue).getIsChecked();
+        return weatherInfoAcquisitionPreferenceFlowable.blockingFirst(defaultValue).getIsChecked();
     }
 
     private void addSettingLoadingError() {

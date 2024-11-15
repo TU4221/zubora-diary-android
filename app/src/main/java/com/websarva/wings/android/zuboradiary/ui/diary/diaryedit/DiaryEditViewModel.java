@@ -1,5 +1,7 @@
 package com.websarva.wings.android.zuboradiary.ui.diary.diaryedit;
 
+import android.util.Log;
+
 import androidx.annotation.NonNull;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;

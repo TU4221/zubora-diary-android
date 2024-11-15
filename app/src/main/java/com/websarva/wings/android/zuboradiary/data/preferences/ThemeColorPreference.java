@@ -42,7 +42,7 @@ public class ThemeColorPreference {
         return themeColorNumber;
     }
 
-    public ThemeColor getThemeColor() {
+    public ThemeColor toThemeColor() {
         return ThemeColor.of(themeColorNumber);
     }
 }

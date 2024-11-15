@@ -88,8 +88,7 @@ public class SettingsFragment extends BaseFragment {
                                     if (isGranted && isGrantedPostNotifications()/*再確認*/) {
                                         showReminderNotificationTimePickerDialog();
                                     } else {
-                                        binding.includeReminderNotificationSetting
-                                                .materialSwitchSettingValue.setChecked(false);
+                                        settingsViewModel.saveReminderNotificationInvalid();
                                     }
                                 }
                             }
@@ -114,12 +113,8 @@ public class SettingsFragment extends BaseFragment {
                                                 && isGrantedAccessFineLocation
                                                 && isGrantedAccessCoarseLocation != null
                                                 && isGrantedAccessCoarseLocation;
-                                if (isGrantedAll && isGrantedAccessLocation()/*再確認*/) {
-                                    settingsViewModel.saveWeatherInfoAcquisition(true);
-                                } else {
-                                    binding.includeWeatherInfoAcquisitionSetting
-                                            .materialSwitchSettingValue.setChecked(false);
-                                }
+                                boolean isChecked = isGrantedAll && isGrantedAccessLocation()/*再確認*/;
+                                settingsViewModel.saveWeatherInfoAcquisition(isChecked);
                             }
                         }
                 );
@@ -219,7 +214,7 @@ public class SettingsFragment extends BaseFragment {
                 receiveResulFromDialog(ReminderNotificationTimePickerDialogFragment.KEY_SELECTED_BUTTON);
         if (selectedButton == null) return;
         if (selectedButton != DialogInterface.BUTTON_POSITIVE) {
-            binding.includeReminderNotificationSetting.materialSwitchSettingValue.setChecked(false);
+            settingsViewModel.saveReminderNotificationInvalid();
             return;
         }
 
@@ -488,8 +483,7 @@ public class SettingsFragment extends BaseFragment {
                     requestPostNotificationsPermissionLauncher
                             .launch(Manifest.permission.POST_NOTIFICATIONS);
                 } else {
-                    binding.includeReminderNotificationSetting
-                            .materialSwitchSettingValue.setChecked(false);
+                    settingsViewModel.saveReminderNotificationInvalid();
                     String permissionName = getString(R.string.fragment_settings_permission_name_notification);
                     showPermissionDialog(permissionName);
                 }
@@ -517,12 +511,27 @@ public class SettingsFragment extends BaseFragment {
                     @Override
                     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                         Objects.requireNonNull(buttonView);
+                        if (!isTouchedPasscodeLockSwitch) return;
 
                         settingsViewModel.savePasscodeLock(isChecked);
+                        isTouchedPasscodeLockSwitch = false;
+                    }
+                });
+
+        settingsViewModel.getIsCheckedPasscodeLockLiveData()
+                .observe(getViewLifecycleOwner(), new Observer<Boolean>() {
+                    @Override
+                    public void onChanged(Boolean aBoolean) {
                     }
                 });
     }
 
+    // HACK:WeatherInfoAcquisitionSettingのMaterialSwitchがOn状態(SettingViewModelのisCheckedLiveDataが"true")だと、
+    //      本Fragment起動時に他のMaterialSwitchのOnCheckedChangeListenerがOn状態("true")で起動してしまう。
+    //      (他のMaterialSwitchがOn状態でも本問題は起きない)
+    //      SettingViewModelの対象isCheckedLiveDataは"false"かつ、
+    //      OnCheckedChangeListenerはユーザーがタッチした時に限り処理されるよう条件が入っている為、問題は発生していない。
+    //      原因は不明。(Fragment、layout.xmlでのMaterialSwitchの設定に問題なし)
     @SuppressLint("ClickableViewAccessibility")
     private void setUpWeatherInfoAcquisitionSettingItem() {
         binding.includeWeatherInfoAcquisitionSetting.materialSwitchSettingValue
@@ -538,6 +547,7 @@ public class SettingsFragment extends BaseFragment {
                         return false;
                     }
                 });
+
         binding.includeWeatherInfoAcquisitionSetting.materialSwitchSettingValue
                 .setOnCheckedChangeListener(
                         new WeatherInfoAcquisitionOnCheckedChangeListener()
@@ -556,6 +566,7 @@ public class SettingsFragment extends BaseFragment {
                 if (isGrantedAccessLocation()) {
                     settingsViewModel.saveWeatherInfoAcquisition(true);
                 } else {
+                    settingsViewModel.saveWeatherInfoAcquisition(false);
                     boolean shouldShowRequestPermissionRationale =
                             ActivityCompat.shouldShowRequestPermissionRationale(
                                     requireActivity(), Manifest.permission.ACCESS_FINE_LOCATION)
@@ -567,8 +578,7 @@ public class SettingsFragment extends BaseFragment {
                                         Manifest.permission.ACCESS_COARSE_LOCATION};
                         requestAccessLocationPermissionLauncher.launch(requestPermissions);
                     } else {
-                        binding.includeWeatherInfoAcquisitionSetting
-                                .materialSwitchSettingValue.setChecked(false);
+                        settingsViewModel.saveWeatherInfoAcquisition(false);
                         String permissionName = getString(R.string.fragment_settings_permission_name_location);
                         showPermissionDialog(permissionName);
                     }

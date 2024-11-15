@@ -107,6 +107,7 @@ public class MainActivity extends AppCompatActivity {
                 .observe(this, new Observer<Boolean>() {
                     @Override
                     public void onChanged(@Nullable Boolean aBoolean) {
+                        Log.d("20241114", "IsCheckedWeatherInfoAcquisitionObserver:" + aBoolean);
                         Boolean settingValue = aBoolean;
                         if (settingValue == null) {
                             settingValue = settingsViewModel.isCheckedWeatherInfoAcquisitionSetting();
@@ -128,9 +129,13 @@ public class MainActivity extends AppCompatActivity {
                 != PackageManager.PERMISSION_GRANTED) {
             return;
         }
+        Log.d("20241114", "requestLocationUpdates");
+        Log.d("20241114", "fusedLocationProviderClient" + fusedLocationProviderClient);
+        Log.d("20241114", "locationRequest" + locationRequest);
         fusedLocationProviderClient.requestLocationUpdates(locationRequest, new LocationListener() {
             @Override
             public void onLocationChanged(@NonNull Location location) {
+                Log.d("20241114", "onLocationChanged");
                 // アプリ起動時に一回だけ取得
                 GeoCoordinates geoCoordinates =
                         new GeoCoordinates(location.getLatitude(), location.getLongitude());
