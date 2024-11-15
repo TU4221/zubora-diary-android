@@ -213,7 +213,7 @@
     <string name="dialog_message_message_item_title_selection_history_item_delete_error">削除に失敗しました。</string>
     <string name="dialog_message_message_setting_loading_error">設定の読込に失敗しました。</string>
     <string name="dialog_message_message_setting_update_error">設定の更新に失敗しました。</string>
-    <string name="dialog_message_title_connection_error">接続エラー</string>
+    <string name="dialog_message_title_connection_error">通信エラー</string>
     <string name="dialog_message_message_weather_information_loading_error">天気情報の読込に失敗しました。</string>
 
     <!-- DayOfWeekStringConverter -->

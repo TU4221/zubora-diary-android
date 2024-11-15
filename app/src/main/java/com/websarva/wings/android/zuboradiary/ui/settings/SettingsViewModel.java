@@ -266,7 +266,7 @@ public class SettingsViewModel extends BaseViewModel {
         });
     }
 
-    void saveReminderNotificationInvalid() {
+    public void saveReminderNotificationInvalid() {
         ReminderNotificationPreference preferenceValue =
                 new ReminderNotificationPreference(false,(LocalTime) null);
         Single<Preferences> result = userPreferencesRepository.saveReminderNotificationPreference(preferenceValue);
@@ -291,7 +291,7 @@ public class SettingsViewModel extends BaseViewModel {
         setUpProcessOnUpdate(result, null);
     }
 
-    void saveWeatherInfoAcquisition(boolean value) {
+    public void saveWeatherInfoAcquisition(boolean value) {
         WeatherInfoAcquisitionPreference preferenceValue =
                 new WeatherInfoAcquisitionPreference(value);
         Single<Preferences> result =

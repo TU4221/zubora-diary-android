@@ -292,6 +292,10 @@ public class DiaryEditViewModel extends BaseViewModel {
         isShowingItemTitleEditFragment = isShowing;
     }
 
+    void addWeatherInfoFetchError() {
+        addAppError(AppError.WEATHER_INFORMATION_LOADING);
+    }
+
     // Getter
     boolean getHasPreparedDiary() {
         return hasPreparedDiary;

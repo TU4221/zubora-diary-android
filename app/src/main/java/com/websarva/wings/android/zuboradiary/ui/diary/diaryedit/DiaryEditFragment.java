@@ -863,7 +863,10 @@ public class DiaryEditFragment extends BaseFragment {
         if (!isChecked) return;
 
         boolean hasUpdatedLocation = settingsViewModel.hasUpdatedGeoCoordinates();
-        if (!hasUpdatedLocation) return;
+        if (!hasUpdatedLocation) {
+            diaryEditViewModel.addWeatherInfoFetchError();
+            return;
+        }
 
         // 本フラグメント起動時のみダイアログなしで天気情報取得
         if (requestsShowingDialog) {

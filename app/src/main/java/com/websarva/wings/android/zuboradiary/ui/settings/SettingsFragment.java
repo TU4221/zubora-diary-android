@@ -33,6 +33,7 @@ import androidx.navigation.NavDirections;
 
 import com.google.android.material.divider.MaterialDivider;
 import com.google.android.material.materialswitch.MaterialSwitch;
+import com.websarva.wings.android.zuboradiary.MainActivity;
 import com.websarva.wings.android.zuboradiary.R;
 import com.websarva.wings.android.zuboradiary.data.DateTimeStringConverter;
 import com.websarva.wings.android.zuboradiary.data.DayOfWeekStringConverter;
@@ -85,10 +86,15 @@ public class SettingsFragment extends BaseFragment {
                             new ActivityResultCallback<Boolean>() {
                                 @Override
                                 public void onActivityResult(Boolean isGranted) {
-                                    if (isGranted && isGrantedPostNotifications()/*再確認*/) {
+
+                                    // 再確認
+                                    boolean _isGranted = ((MainActivity) requireActivity()).isGrantedPostNotifications();
+
+                                    if (isGranted && _isGranted) {
                                         showReminderNotificationTimePickerDialog();
                                     } else {
-                                        settingsViewModel.saveReminderNotificationInvalid();
+                                        binding.includePasscodeLockSetting
+                                                .materialSwitchSettingValue.setChecked(false);
                                     }
                                 }
                             }
@@ -113,8 +119,16 @@ public class SettingsFragment extends BaseFragment {
                                                 && isGrantedAccessFineLocation
                                                 && isGrantedAccessCoarseLocation != null
                                                 && isGrantedAccessCoarseLocation;
-                                boolean isChecked = isGrantedAll && isGrantedAccessLocation()/*再確認*/;
-                                settingsViewModel.saveWeatherInfoAcquisition(isChecked);
+
+                                // 再確認
+                                boolean _isGranted = ((MainActivity)requireActivity()).isGrantedAccessLocation();
+
+                                if (isGrantedAll && _isGranted) {
+                                    settingsViewModel.saveWeatherInfoAcquisition(true);
+                                } else {
+                                    binding.includeWeatherInfoAcquisitionSetting
+                                            .materialSwitchSettingValue.setChecked(false);
+                                }
                             }
                         }
                 );
@@ -214,7 +228,8 @@ public class SettingsFragment extends BaseFragment {
                 receiveResulFromDialog(ReminderNotificationTimePickerDialogFragment.KEY_SELECTED_BUTTON);
         if (selectedButton == null) return;
         if (selectedButton != DialogInterface.BUTTON_POSITIVE) {
-            settingsViewModel.saveReminderNotificationInvalid();
+            binding.includePasscodeLockSetting
+                    .materialSwitchSettingValue.setChecked(false);
             return;
         }
 
@@ -395,6 +410,7 @@ public class SettingsFragment extends BaseFragment {
 
     @SuppressLint("ClickableViewAccessibility")
     private void setUpReminderNotificationSettingItem() {
+
         binding.includeReminderNotificationSetting.materialSwitchSettingValue
                 .setOnTouchListener(new View.OnTouchListener() {
                     @Override
@@ -473,7 +489,8 @@ public class SettingsFragment extends BaseFragment {
 
         @RequiresApi(api = Build.VERSION_CODES.TIRAMISU)
         private void requestPostNotificationsPermission() {
-            if (isGrantedPostNotifications()) {
+            boolean isGranted = ((MainActivity)requireActivity()).isGrantedPostNotifications();
+            if (isGranted) {
                 showReminderNotificationTimePickerDialog();
             } else {
                 boolean shouldShowRequestPermissionRationale =
@@ -483,7 +500,8 @@ public class SettingsFragment extends BaseFragment {
                     requestPostNotificationsPermissionLauncher
                             .launch(Manifest.permission.POST_NOTIFICATIONS);
                 } else {
-                    settingsViewModel.saveReminderNotificationInvalid();
+                    binding.includePasscodeLockSetting
+                            .materialSwitchSettingValue.setChecked(false);
                     String permissionName = getString(R.string.fragment_settings_permission_name_notification);
                     showPermissionDialog(permissionName);
                 }
@@ -534,6 +552,12 @@ public class SettingsFragment extends BaseFragment {
     //      原因は不明。(Fragment、layout.xmlでのMaterialSwitchの設定に問題なし)
     @SuppressLint("ClickableViewAccessibility")
     private void setUpWeatherInfoAcquisitionSettingItem() {
+        // MEMO:端末設定画面で"許可 -> 無許可"に変更したときの対応コード
+        boolean isGranted = ((MainActivity)requireActivity()).isGrantedAccessLocation();
+        if (!isGranted) {
+            settingsViewModel.saveWeatherInfoAcquisition(false);
+        }
+
         binding.includeWeatherInfoAcquisitionSetting.materialSwitchSettingValue
                 .setOnTouchListener(new View.OnTouchListener() {
                     @Override
@@ -563,10 +587,12 @@ public class SettingsFragment extends BaseFragment {
             if (!isTouchedWeatherInfoAcquisitionSwitch) return;
 
             if (isChecked) {
-                if (isGrantedAccessLocation()) {
+                boolean isGranted = ((MainActivity)requireActivity()).isGrantedAccessLocation();
+                if (isGranted) {
                     settingsViewModel.saveWeatherInfoAcquisition(true);
                 } else {
-                    settingsViewModel.saveWeatherInfoAcquisition(false);
+                    binding.includeWeatherInfoAcquisitionSetting
+                            .materialSwitchSettingValue.setChecked(false);
                     boolean shouldShowRequestPermissionRationale =
                             ActivityCompat.shouldShowRequestPermissionRationale(
                                     requireActivity(), Manifest.permission.ACCESS_FINE_LOCATION)
@@ -578,7 +604,8 @@ public class SettingsFragment extends BaseFragment {
                                         Manifest.permission.ACCESS_COARSE_LOCATION};
                         requestAccessLocationPermissionLauncher.launch(requestPermissions);
                     } else {
-                        settingsViewModel.saveWeatherInfoAcquisition(false);
+                        binding.includeWeatherInfoAcquisitionSetting
+                                .materialSwitchSettingValue.setChecked(false);
                         String permissionName = getString(R.string.fragment_settings_permission_name_location);
                         showPermissionDialog(permissionName);
                     }
@@ -627,25 +654,6 @@ public class SettingsFragment extends BaseFragment {
         });
 
         binding.includeAllDataDeleteSetting.textSettingValue.setVisibility(View.GONE);
-    }
-
-    @RequiresApi(api = Build.VERSION_CODES.TIRAMISU)
-    private boolean isGrantedPostNotifications() {
-        return ActivityCompat.checkSelfPermission(
-                requireActivity(), Manifest.permission.POST_NOTIFICATIONS)
-                == PackageManager.PERMISSION_GRANTED;
-    }
-
-    private boolean isGrantedAccessLocation() {
-        boolean isGrantedAccessFineLocation =
-                ActivityCompat.checkSelfPermission(
-                        requireActivity(), Manifest.permission.ACCESS_FINE_LOCATION)
-                        == PackageManager.PERMISSION_GRANTED;
-        boolean isGrantedAccessCoarseLocation =
-                ActivityCompat.checkSelfPermission(
-                        requireActivity(), Manifest.permission.ACCESS_COARSE_LOCATION)
-                        == PackageManager.PERMISSION_GRANTED;
-        return isGrantedAccessFineLocation && isGrantedAccessCoarseLocation;
     }
 
     private void showThemeColorPickerDialog(ThemeColor themeColor) {
@@ -727,7 +735,7 @@ public class SettingsFragment extends BaseFragment {
         Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
         Uri uri = Uri.fromParts("package", requireActivity().getPackageName(), null);
         intent.setData(uri);
-        startActivity(intent);
+        startActivity(intent);onStart();
     }
 
     @Override

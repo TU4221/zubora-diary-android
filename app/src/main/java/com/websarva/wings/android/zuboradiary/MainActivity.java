@@ -3,6 +3,7 @@ package com.websarva.wings.android.zuboradiary;
 import android.Manifest;
 import android.content.pm.PackageManager;
 import android.location.Location;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Looper;
 import android.util.Log;
@@ -11,14 +12,20 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.Priority;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
@@ -79,7 +86,7 @@ public class MainActivity extends AppCompatActivity {
 
         setUpViewModel();
         setUpBinding();
-        setUpLocationInformation();
+        setUpLocationInfo();
         setUpThemeColor();
         setUpNavigation();
     }
@@ -98,7 +105,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(binding.getRoot());
     }
 
-    private void setUpLocationInformation() {
+    private void setUpLocationInfo() {
         LocationRequest.Builder builder =
                 new LocationRequest.Builder(Priority.PRIORITY_BALANCED_POWER_ACCURACY, 5000);
         locationRequest = builder.build();
@@ -107,7 +114,6 @@ public class MainActivity extends AppCompatActivity {
                 .observe(this, new Observer<Boolean>() {
                     @Override
                     public void onChanged(@Nullable Boolean aBoolean) {
-                        Log.d("20241114", "IsCheckedWeatherInfoAcquisitionObserver:" + aBoolean);
                         Boolean settingValue = aBoolean;
                         if (settingValue == null) {
                             settingValue = settingsViewModel.isCheckedWeatherInfoAcquisitionSetting();
@@ -129,20 +135,39 @@ public class MainActivity extends AppCompatActivity {
                 != PackageManager.PERMISSION_GRANTED) {
             return;
         }
-        Log.d("20241114", "requestLocationUpdates");
-        Log.d("20241114", "fusedLocationProviderClient" + fusedLocationProviderClient);
-        Log.d("20241114", "locationRequest" + locationRequest);
-        fusedLocationProviderClient.requestLocationUpdates(locationRequest, new LocationListener() {
+
+        if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED
+                && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED) {
+            return;
+        }
+
+        // TODO:現在位置が急に取得できなくなった。
+        fusedLocationProviderClient.requestLocationUpdates(locationRequest, new LocationCallback() {
             @Override
-            public void onLocationChanged(@NonNull Location location) {
-                Log.d("20241114", "onLocationChanged");
+            public void onLocationResult(@NonNull LocationResult locationResult) {
+                super.onLocationResult(locationResult);
                 // アプリ起動時に一回だけ取得
+                Location location = locationResult.getLastLocation();
+                Objects.requireNonNull(location);
                 GeoCoordinates geoCoordinates =
                         new GeoCoordinates(location.getLatitude(), location.getLongitude());
                 settingsViewModel.updateGeoCoordinates(geoCoordinates);
                 fusedLocationProviderClient.removeLocationUpdates(this);
             }
         }, Looper.getMainLooper());
+
+        fusedLocationProviderClient.getLastLocation().addOnSuccessListener(new OnSuccessListener<Location>() {
+            @Override
+            public void onSuccess(Location location) {
+                if (location == null) return;
+
+                GeoCoordinates geoCoordinates =
+                        new GeoCoordinates(location.getLatitude(), location.getLongitude());
+                settingsViewModel.updateGeoCoordinates(geoCoordinates);
+            }
+        });
     }
 
     private void setUpThemeColor() {
@@ -441,5 +466,36 @@ public class MainActivity extends AppCompatActivity {
     public ThemeColor requireDialogThemeColor() {
         Preconditions.checkNotNull(dialogThemeColor);
         return dialogThemeColor;
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+
+        checkPermission();
+    }
+
+    // MEMO:端末設定画面で"許可 -> 無許可"に変更したときの対応コード
+    private void checkPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (!isGrantedPostNotifications()) settingsViewModel.saveReminderNotificationInvalid();
+        }
+        if (!isGrantedAccessLocation()) settingsViewModel.saveWeatherInfoAcquisition(false);
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.TIRAMISU)
+    public boolean isGrantedPostNotifications() {
+        return ActivityCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS)
+                == PackageManager.PERMISSION_GRANTED;
+    }
+
+    public boolean isGrantedAccessLocation() {
+        boolean isGrantedAccessFineLocation =
+                ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                        == PackageManager.PERMISSION_GRANTED;
+        boolean isGrantedAccessCoarseLocation =
+                ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)
+                        == PackageManager.PERMISSION_GRANTED;
+        return isGrantedAccessFineLocation && isGrantedAccessCoarseLocation;
     }
 }
