@@ -57,20 +57,20 @@ public class ThemeColorSwitcher {
         switchViewColor(view, surfaceColor);
     }
 
-    public final void switchTextColorOnBackground(List<TextView> viewList) {
-        Objects.requireNonNull(viewList);
-        viewList.forEach(Objects::requireNonNull);
+    public final void switchTextColorOnBackground(List<TextView> textViewList) {
+        Objects.requireNonNull(textViewList);
+        textViewList.forEach(Objects::requireNonNull);
 
         int onSurfaceColor = themeColor.getOnSurfaceColor(resources);
-        switchTextViewsColorOnlyText(viewList, onSurfaceColor);
+        switchTextViewsColorOnlyText(textViewList, onSurfaceColor);
     }
 
-    public final void switchRedTextColorOnBackground(List<TextView> viewList) {
-        Objects.requireNonNull(viewList);
-        viewList.forEach(Objects::requireNonNull);
+    public final void switchRedTextColorOnBackground(List<TextView> textViewList) {
+        Objects.requireNonNull(textViewList);
+        textViewList.forEach(Objects::requireNonNull);
 
         int onSurfaceColor = themeColor.getErrorColor(resources);
-        switchTextViewsColorOnlyText(viewList, onSurfaceColor);
+        switchTextViewsColorOnlyText(textViewList, onSurfaceColor);
     }
 
     public final void switchStatusBarColor(Window window) {
@@ -84,55 +84,55 @@ public class ThemeColorSwitcher {
         new WindowInsetsControllerCompat(window, window.getDecorView()).setAppearanceLightStatusBars(isLight);
     }
 
-    public final void switchBottomNavigationColor(BottomNavigationView view) {
-        Objects.requireNonNull(view);
+    public final void switchBottomNavigationColor(BottomNavigationView bottomNavigationView) {
+        Objects.requireNonNull(bottomNavigationView);
 
-        switchBottomNavigationBackgroundColor(view);
-        switchBottomNavigationItemRippleColor(view);
-        switchBottomNavigationItemTextColor(view);
-        switchBottomNavigationItemIconColor(view);
-        switchBottomNavigationActiveIndicatorColor(view);
+        switchBottomNavigationBackgroundColor(bottomNavigationView);
+        switchBottomNavigationItemRippleColor(bottomNavigationView);
+        switchBottomNavigationItemTextColor(bottomNavigationView);
+        switchBottomNavigationItemIconColor(bottomNavigationView);
+        switchBottomNavigationActiveIndicatorColor(bottomNavigationView);
     }
 
-    private void switchBottomNavigationBackgroundColor (BottomNavigationView view) {
-        Objects.requireNonNull(view);
+    private void switchBottomNavigationBackgroundColor (BottomNavigationView bottomNavigationView) {
+        Objects.requireNonNull(bottomNavigationView);
 
         int color = themeColor.getSurfaceContainerColor(resources);
-        view.setBackgroundTintList(ColorStateList.valueOf(color));
+        bottomNavigationView.setBackgroundTintList(ColorStateList.valueOf(color));
     }
 
-    private void switchBottomNavigationItemRippleColor(BottomNavigationView view) {
-        Objects.requireNonNull(view);
+    private void switchBottomNavigationItemRippleColor(BottomNavigationView bottomNavigationView) {
+        Objects.requireNonNull(bottomNavigationView);
 
         int checkedColor = themeColor.getPrimaryColor(resources);
         int unCheckedColor = themeColor.getOnSurfaceVariantColor(resources);
         ColorStateList colorStateList = createCheckedColorStateList(checkedColor, unCheckedColor);
-        view.setItemRippleColor(colorStateList);
+        bottomNavigationView.setItemRippleColor(colorStateList);
     }
 
-    private void switchBottomNavigationItemTextColor(BottomNavigationView view) {
-        Objects.requireNonNull(view);
+    private void switchBottomNavigationItemTextColor(BottomNavigationView bottomNavigationView) {
+        Objects.requireNonNull(bottomNavigationView);
 
         int checkedColor = themeColor.getOnSurfaceColor(resources);
         int unCheckedColor = themeColor.getOnSurfaceVariantColor(resources);
         ColorStateList colorStateList = createCheckedColorStateList(checkedColor, unCheckedColor);
-        view.setItemTextColor(colorStateList);
+        bottomNavigationView.setItemTextColor(colorStateList);
     }
 
-    private void switchBottomNavigationItemIconColor(BottomNavigationView view) {
-        Objects.requireNonNull(view);
+    private void switchBottomNavigationItemIconColor(BottomNavigationView bottomNavigationView) {
+        Objects.requireNonNull(bottomNavigationView);
 
         int checkedColor = themeColor.getOnSecondaryContainerColor(resources);
         int unCheckedColor = themeColor.getOnSurfaceVariantColor(resources);
         ColorStateList colorStateList = createCheckedColorStateList(checkedColor, unCheckedColor);
-        view.setItemIconTintList(colorStateList);
+        bottomNavigationView.setItemIconTintList(colorStateList);
     }
 
-    private void switchBottomNavigationActiveIndicatorColor(BottomNavigationView view) {
-        Objects.requireNonNull(view);
+    private void switchBottomNavigationActiveIndicatorColor(BottomNavigationView bottomNavigationView) {
+        Objects.requireNonNull(bottomNavigationView);
 
         int secondaryContainerColor = themeColor.getSecondaryContainerColor(resources);
-        view.setItemActiveIndicatorColor(ColorStateList.valueOf(secondaryContainerColor));
+        bottomNavigationView.setItemActiveIndicatorColor(ColorStateList.valueOf(secondaryContainerColor));
     }
 
     public final void switchToolbarColor(MaterialToolbar toolbar) {
@@ -195,13 +195,13 @@ public class ThemeColorSwitcher {
         }
     }
 
-    public final void switchFloatingActionButtonColor(List<FloatingActionButton> buttonList) {
-        Objects.requireNonNull(buttonList);
-        buttonList.forEach(Objects::requireNonNull);
+    public final void switchFloatingActionButtonColor(List<FloatingActionButton> fabList) {
+        Objects.requireNonNull(fabList);
+        fabList.forEach(Objects::requireNonNull);
 
         int primaryContainerColor = themeColor.getPrimaryContainerColor(resources);
         int onPrimaryContainerColor = themeColor.getOnPrimaryContainerColor(resources);
-        buttonList.forEach(x -> {
+        fabList.forEach(x -> {
             x.setBackgroundTintList(ColorStateList.valueOf(primaryContainerColor));
             x.setImageTintList(ColorStateList.valueOf(onPrimaryContainerColor));
         });
@@ -303,38 +303,38 @@ public class ThemeColorSwitcher {
         view.setBackgroundColor(color);
     }
 
-    protected final void switchTextViewsColor(List<TextView> viewList, int color, int onColor) {
-        Objects.requireNonNull(viewList);
-        viewList.forEach(Objects::requireNonNull);
+    protected final void switchTextViewsColor(List<TextView> textViewList, int color, int onColor) {
+        Objects.requireNonNull(textViewList);
+        textViewList.forEach(Objects::requireNonNull);
 
-        viewList.forEach(x -> switchTextViewColor(x, color, onColor));
+        textViewList.forEach(x -> switchTextViewColor(x, color, onColor));
     }
 
-    protected final void switchTextViewColor(TextView view, int color, int onColor) {
-        Objects.requireNonNull(view);
+    protected final void switchTextViewColor(TextView textView, int color, int onColor) {
+        Objects.requireNonNull(textView);
 
-        view.setBackgroundColor(color);
-        view.setTextColor(onColor);
+        textView.setBackgroundColor(color);
+        textView.setTextColor(onColor);
     }
 
-    protected final void switchTextViewsColorOnlyText(List<TextView> viewList, int onColor) {
-        Objects.requireNonNull(viewList);
-        viewList.forEach(Objects::requireNonNull);
+    protected final void switchTextViewsColorOnlyText(List<TextView> textViewList, int onColor) {
+        Objects.requireNonNull(textViewList);
+        textViewList.forEach(Objects::requireNonNull);
 
-        viewList.forEach(x -> switchTextViewColorOnlyText(x, onColor));
+        textViewList.forEach(x -> switchTextViewColorOnlyText(x, onColor));
     }
 
-    protected final void switchTextViewColorOnlyText(TextView view, int color) {
-        Objects.requireNonNull(view);
+    protected final void switchTextViewColorOnlyText(TextView textView, int color) {
+        Objects.requireNonNull(textView);
 
-        view.setTextColor(color);
+        textView.setTextColor(color);
     }
 
-    protected final void switchTextViewsColorOnlyIcon(List<TextView> viewList, int color) {
-        Objects.requireNonNull(viewList);
-        viewList.forEach(Objects::requireNonNull);
+    protected final void switchTextViewsColorOnlyIcon(List<TextView> textViewList, int color) {
+        Objects.requireNonNull(textViewList);
+        textViewList.forEach(Objects::requireNonNull);
 
-        viewList.forEach(x -> switchTextViewColorOnlyIcon(x, color));
+        textViewList.forEach(x -> switchTextViewColorOnlyIcon(x, color));
     }
 
     protected final void switchTextViewColorOnlyIcon(TextView view, int color) {
