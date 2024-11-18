@@ -5,8 +5,8 @@ import android.widget.TextView;
 
 import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor;
 import com.websarva.wings.android.zuboradiary.ui.ThemeColorSwitcher;
-import com.websarva.wings.android.zuboradiary.ui.ColorSwitchingViewList;
 
+import java.util.List;
 import java.util.Objects;
 
 class SettingsThemeColorSwitcher extends ThemeColorSwitcher {
@@ -14,16 +14,18 @@ class SettingsThemeColorSwitcher extends ThemeColorSwitcher {
         super(context, themeColor);
     }
 
-    void switchSettingItemSectionColor(ColorSwitchingViewList<TextView> textViewList) {
+    void switchSettingItemSectionColor(List<TextView> textViewList) {
         Objects.requireNonNull(textViewList);
+        textViewList.forEach(Objects::requireNonNull);
 
         int color = themeColor.getSecondaryContainerColor(resources);
         int onColor = themeColor.getOnSecondaryContainerColor(resources);
         switchTextViewsColor(textViewList, color, onColor);
     }
 
-    void switchSettingItemIconColor(ColorSwitchingViewList<TextView> textViewList) {
+    void switchSettingItemIconColor(List<TextView> textViewList) {
         Objects.requireNonNull(textViewList);
+        textViewList.forEach(Objects::requireNonNull);
 
         int color = themeColor.getOnSurfaceVariantColor(resources);
         switchTextViewsColorOnlyIcon(textViewList, color);

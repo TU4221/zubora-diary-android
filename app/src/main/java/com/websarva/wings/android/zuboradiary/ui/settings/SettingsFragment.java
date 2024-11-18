@@ -31,8 +31,6 @@ import androidx.lifecycle.SavedStateHandle;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavDirections;
 
-import com.google.android.material.divider.MaterialDivider;
-import com.google.android.material.materialswitch.MaterialSwitch;
 import com.websarva.wings.android.zuboradiary.MainActivity;
 import com.websarva.wings.android.zuboradiary.R;
 import com.websarva.wings.android.zuboradiary.data.DateTimeStringConverter;
@@ -40,10 +38,10 @@ import com.websarva.wings.android.zuboradiary.data.DayOfWeekStringConverter;
 import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor;
 import com.websarva.wings.android.zuboradiary.databinding.FragmentSettingsBinding;
 import com.websarva.wings.android.zuboradiary.ui.BaseFragment;
-import com.websarva.wings.android.zuboradiary.ui.ColorSwitchingViewList;
 
 import java.time.DayOfWeek;
 import java.time.LocalTime;
+import java.util.Arrays;
 import java.util.Map;
 import java.util.Objects;
 
@@ -307,17 +305,17 @@ public class SettingsFragment extends BaseFragment {
         switcher.switchBackgroundColor(binding.viewFullScreenBackground);
         switcher.switchToolbarColor(binding.materialToolbarTopAppBar);
 
-        ColorSwitchingViewList<TextView> sectionList =
-                new ColorSwitchingViewList<>(
+        switcher.switchSettingItemSectionColor(
+                Arrays.asList(
                         binding.textSettingsSectionDesign,
                         binding.textSettingsSectionSetting,
                         binding.textSettingsSectionEnd,
                         binding.textSettingsSectionData
-                );
-        switcher.switchSettingItemSectionColor(sectionList);
+                )
+        );
 
-        ColorSwitchingViewList<TextView> iconList =
-                new ColorSwitchingViewList<>(
+        switcher.switchSettingItemIconColor(
+                Arrays.asList(
                         binding.includeThemeColorSetting.textSettingTitle,
                         binding.includeCalendarStartDaySetting.textSettingTitle,
                         binding.includeReminderNotificationSetting.textSettingTitle,
@@ -326,11 +324,11 @@ public class SettingsFragment extends BaseFragment {
                         binding.includeAllDiariesDeleteSetting.textSettingTitle,
                         binding.includeAllSettingsInitializationSetting.textSettingTitle,
                         binding.includeAllDataDeleteSetting.textSettingTitle
-                );
-        switcher.switchSettingItemIconColor(iconList);
+                )
+        );
 
-        ColorSwitchingViewList<TextView> textList =
-                new ColorSwitchingViewList<>(
+        switcher.switchTextColorOnBackground(
+                Arrays.asList(
                         binding.includeThemeColorSetting.textSettingTitle,
                         binding.includeThemeColorSetting.textSettingValue,
                         binding.includeCalendarStartDaySetting.textSettingTitle,
@@ -339,27 +337,27 @@ public class SettingsFragment extends BaseFragment {
                         binding.includeReminderNotificationSetting.textSettingValue,
                         binding.includePasscodeLockSetting.textSettingTitle,
                         binding.includeWeatherInfoAcquisitionSetting.textSettingTitle
-                );
-        switcher.switchTextColorOnBackground(textList);
+                )
+        );
 
-        ColorSwitchingViewList<TextView> redTextList =
-                new ColorSwitchingViewList<>(
+        switcher.switchRedTextColorOnBackground(
+                Arrays.asList(
                         binding.includeAllDiariesDeleteSetting.textSettingTitle,
                         binding.includeAllSettingsInitializationSetting.textSettingTitle,
                         binding.includeAllDataDeleteSetting.textSettingTitle
-                );
-        switcher.switchRedTextColorOnBackground(redTextList);
+                )
+        );
 
-        ColorSwitchingViewList<MaterialSwitch> switchList =
-                new ColorSwitchingViewList<>(
+        switcher.switchSwitchColor(
+                Arrays.asList(
                         binding.includeReminderNotificationSetting.materialSwitchSettingValue,
                         binding.includePasscodeLockSetting.materialSwitchSettingValue,
                         binding.includeWeatherInfoAcquisitionSetting.materialSwitchSettingValue
-                );
-        switcher.switchSwitchColor(switchList);
+                )
+        );
 
-        ColorSwitchingViewList<MaterialDivider> dividerList =
-                new ColorSwitchingViewList<>(
+        switcher.switchDividerColor(
+                Arrays.asList(
                         binding.materialDividerToolbar,
                         binding.materialDividerThemeColorSetting,
                         binding.materialDividerSectionSetting,
@@ -372,8 +370,8 @@ public class SettingsFragment extends BaseFragment {
                         binding.materialDividerAllSettingsInitializationSetting,
                         binding.materialDividerAllDataDeleteSetting,
                         binding.materialDividerSectionEnd
-                );
-        switcher.switchDividerColor(dividerList);
+                )
+        );
     }
 
     private void setUpCalendarStartDaySettingItem() {

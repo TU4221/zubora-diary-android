@@ -24,6 +24,8 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.materialswitch.MaterialSwitch;
 import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -55,15 +57,17 @@ public class ThemeColorSwitcher {
         switchViewColor(view, surfaceColor);
     }
 
-    public final void switchTextColorOnBackground(ColorSwitchingViewList<TextView> viewList) {
+    public final void switchTextColorOnBackground(List<TextView> viewList) {
         Objects.requireNonNull(viewList);
+        viewList.forEach(Objects::requireNonNull);
 
         int onSurfaceColor = themeColor.getOnSurfaceColor(resources);
         switchTextViewsColorOnlyText(viewList, onSurfaceColor);
     }
 
-    public final void switchRedTextColorOnBackground(ColorSwitchingViewList<TextView> viewList) {
+    public final void switchRedTextColorOnBackground(List<TextView> viewList) {
         Objects.requireNonNull(viewList);
+        viewList.forEach(Objects::requireNonNull);
 
         int onSurfaceColor = themeColor.getErrorColor(resources);
         switchTextViewsColorOnlyText(viewList, onSurfaceColor);
@@ -191,77 +195,83 @@ public class ThemeColorSwitcher {
         }
     }
 
-    public final void switchFloatingActionButtonColor(ColorSwitchingViewList<FloatingActionButton> fabList) {
-        Objects.requireNonNull(fabList);
+    public final void switchFloatingActionButtonColor(List<FloatingActionButton> buttonList) {
+        Objects.requireNonNull(buttonList);
+        buttonList.forEach(Objects::requireNonNull);
 
         int primaryContainerColor = themeColor.getPrimaryContainerColor(resources);
         int onPrimaryContainerColor = themeColor.getOnPrimaryContainerColor(resources);
-        fabList.getViewList().stream().forEach(x -> {
+        buttonList.forEach(x -> {
             x.setBackgroundTintList(ColorStateList.valueOf(primaryContainerColor));
             x.setImageTintList(ColorStateList.valueOf(onPrimaryContainerColor));
         });
     }
 
-    public final void switchSwitchColor(ColorSwitchingViewList<MaterialSwitch> switchList) {
+    public final void switchSwitchColor(List<MaterialSwitch> switchList) {
         Objects.requireNonNull(switchList);
+        switchList.forEach(Objects::requireNonNull);
 
         switchSwitchThumbColor(switchList);
         switchSwitchThumbIconColor(switchList);
         switchSwitchTrackColor(switchList);
     }
 
-    private void switchSwitchThumbColor(ColorSwitchingViewList<MaterialSwitch> switchList) {
+    private void switchSwitchThumbColor(List<MaterialSwitch> switchList) {
         Objects.requireNonNull(switchList);
+        switchList.forEach(Objects::requireNonNull);
 
         int checkedColor = themeColor.getOnPrimaryColor(resources);
         int unCheckedColor = themeColor.getOutlineColor(resources);
         ColorStateList thumbColorStateList = createCheckedColorStateList(checkedColor, unCheckedColor);
-        switchList.getViewList().stream().forEach(x -> x.setThumbTintList(thumbColorStateList));
+        switchList.forEach(x -> x.setThumbTintList(thumbColorStateList));
     }
 
-    private void switchSwitchThumbIconColor(ColorSwitchingViewList<MaterialSwitch> switchList) {
+    private void switchSwitchThumbIconColor(List<MaterialSwitch> switchList) {
         Objects.requireNonNull(switchList);
+        switchList.forEach(Objects::requireNonNull);
 
         int checkedColor = themeColor.getOnPrimaryContainerColor(resources);
         int unCheckedColor = themeColor.getSurfaceContainerHighestColor(resources);
         ColorStateList thumbIconColorStateList = createCheckedColorStateList(checkedColor, unCheckedColor);
-        switchList.getViewList().stream().forEach(x -> x.setThumbIconTintList(thumbIconColorStateList));
+        switchList.forEach(x -> x.setThumbIconTintList(thumbIconColorStateList));
     }
 
-    private void switchSwitchTrackColor(ColorSwitchingViewList<MaterialSwitch> switchList) {
+    private void switchSwitchTrackColor(List<MaterialSwitch> switchList) {
         Objects.requireNonNull(switchList);
+        switchList.forEach(Objects::requireNonNull);
 
         int checkedColor = themeColor.getPrimaryColor(resources);
         int unCheckedColor = themeColor.getSurfaceContainerHighestColor(resources);
         ColorStateList trackColorStateList = createCheckedColorStateList(checkedColor, unCheckedColor);
-        switchList.getViewList().stream().forEach(x -> x.setTrackTintList(trackColorStateList));
+        switchList.forEach(x -> x.setTrackTintList(trackColorStateList));
     }
 
-    public final void switchButtonColor(ColorSwitchingViewList<Button> buttonList) {
+    public final void switchButtonColor(List<Button> buttonList) {
         Objects.requireNonNull(buttonList);
+        buttonList.forEach(Objects::requireNonNull);
 
         int color = themeColor.getPrimaryColor(resources);
         int onColor = themeColor.getOnPrimaryColor(resources);
-        buttonList.getViewList().stream()
-                .forEach(x -> {
-                    x.setBackgroundColor(color);
-                    x.setTextColor(onColor);
-                });
+        buttonList.forEach(x -> {
+            x.setBackgroundColor(color);
+            x.setTextColor(onColor);
+        });
     }
 
-    public final void switchImageButtonColor(ColorSwitchingViewList<ImageButton> imageButtonList) {
+    public final void switchImageButtonColor(List<ImageButton> imageButtonList) {
         Objects.requireNonNull(imageButtonList);
+        imageButtonList.forEach(Objects::requireNonNull);
 
         int color = themeColor.getPrimaryColor(resources);
-        imageButtonList.getViewList().stream()
-                .forEach(x -> x.setImageTintList(ColorStateList.valueOf(color)));
+        imageButtonList.forEach(x -> x.setImageTintList(ColorStateList.valueOf(color)));
     }
 
-    public final void switchImageViewColor(ColorSwitchingViewList<ImageView> imageViewList) {
+    public final void switchImageViewColor(List<ImageView> imageViewList) {
         Objects.requireNonNull(imageViewList);
+        imageViewList.forEach(Objects::requireNonNull);
 
         int color = themeColor.getSecondaryColor(resources);
-        imageViewList.getViewList().stream().forEach(x -> switchImageView(x, color));
+        imageViewList.forEach(x -> switchImageView(x, color));
     }
 
     public final void switchCircularProgressBarColor(ProgressBar progressBar) {
@@ -271,18 +281,20 @@ public class ThemeColorSwitcher {
         progressBar.getIndeterminateDrawable().setTint(color);
     }
 
-    public final void switchDividerColor(ColorSwitchingViewList<MaterialDivider> divider) {
-        Objects.requireNonNull(divider);
+    public final void switchDividerColor(List<MaterialDivider> dividerList) {
+        Objects.requireNonNull(dividerList);
+        dividerList.forEach(Objects::requireNonNull);
 
         int color = themeColor.getOutlineVariantColor(resources);
-        divider.getViewList().stream().forEach(x -> x.setDividerColor(color));
+        dividerList.forEach(x -> x.setDividerColor(color));
     }
 
     // 共通処理
-    protected final void switchViewsColor(ColorSwitchingViewList<View> viewList, int color) {
+    protected final void switchViewsColor(List<View> viewList, int color) {
         Objects.requireNonNull(viewList);
+        viewList.forEach(Objects::requireNonNull);
 
-        viewList.getViewList().stream().forEach(x -> switchViewColor(x, color));
+        viewList.forEach(x -> switchViewColor(x, color));
     }
 
     protected final void switchViewColor(View view, int color) {
@@ -291,10 +303,11 @@ public class ThemeColorSwitcher {
         view.setBackgroundColor(color);
     }
 
-    protected final void switchTextViewsColor(ColorSwitchingViewList<TextView> viewList, int color, int onColor) {
+    protected final void switchTextViewsColor(List<TextView> viewList, int color, int onColor) {
         Objects.requireNonNull(viewList);
+        viewList.forEach(Objects::requireNonNull);
 
-        viewList.getViewList().stream().forEach(x -> switchTextViewColor(x, color, onColor));
+        viewList.forEach(x -> switchTextViewColor(x, color, onColor));
     }
 
     protected final void switchTextViewColor(TextView view, int color, int onColor) {
@@ -304,10 +317,11 @@ public class ThemeColorSwitcher {
         view.setTextColor(onColor);
     }
 
-    protected final void switchTextViewsColorOnlyText(ColorSwitchingViewList<TextView> viewList, int onColor) {
+    protected final void switchTextViewsColorOnlyText(List<TextView> viewList, int onColor) {
         Objects.requireNonNull(viewList);
+        viewList.forEach(Objects::requireNonNull);
 
-        viewList.getViewList().stream().forEach(x -> switchTextViewColorOnlyText(x, onColor));
+        viewList.forEach(x -> switchTextViewColorOnlyText(x, onColor));
     }
 
     protected final void switchTextViewColorOnlyText(TextView view, int color) {
@@ -316,10 +330,11 @@ public class ThemeColorSwitcher {
         view.setTextColor(color);
     }
 
-    protected final void switchTextViewsColorOnlyIcon(ColorSwitchingViewList<TextView> viewList, int color) {
+    protected final void switchTextViewsColorOnlyIcon(List<TextView> viewList, int color) {
         Objects.requireNonNull(viewList);
+        viewList.forEach(Objects::requireNonNull);
 
-        viewList.getViewList().stream().forEach(x -> switchTextViewColorOnlyIcon(x, color));
+        viewList.forEach(x -> switchTextViewColorOnlyIcon(x, color));
     }
 
     protected final void switchTextViewColorOnlyIcon(TextView view, int color) {
