@@ -44,9 +44,9 @@ public class WeatherApiResponse {
         Log.d("WeatherApi", String.valueOf(apiWeatherCode));
         switch (apiWeatherCode) {
             case 0:
-            case 1:
+            case 1: case 2:
                 return Weather.SUNNY;
-            case 2: case 3:
+            case 3:
             case 45: case 48:
                 return Weather.CLOUDY;
             case 51: case 53: case 55:
