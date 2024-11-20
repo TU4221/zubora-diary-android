@@ -46,7 +46,6 @@ public class DiaryListFragment extends BaseFragment {
 
     // ViewModel
     private DiaryListViewModel diaryListViewModel;
-    private SettingsViewModel settingsViewModel;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -57,7 +56,6 @@ public class DiaryListFragment extends BaseFragment {
     protected void initializeViewModel() {
         ViewModelProvider provider = new ViewModelProvider(requireActivity());
         diaryListViewModel = provider.get(DiaryListViewModel.class);
-        settingsViewModel = provider.get(SettingsViewModel.class);
     }
 
     @Override
@@ -67,15 +65,13 @@ public class DiaryListFragment extends BaseFragment {
     }
 
     @Override
-    protected ViewDataBinding initializeDataBinding(@NonNull LayoutInflater inflater, @NonNull ViewGroup container) {
-        ThemeColor themeColor = settingsViewModel.loadThemeColorSettingValue();
-        LayoutInflater themeColorInflater = createThemeColorInflater(inflater, themeColor);
+    protected ViewDataBinding initializeDataBinding(
+            @NonNull LayoutInflater themeColorInflater, @NonNull ViewGroup container) {
         binding = FragmentDiaryListBinding.inflate(themeColorInflater, container, false);
         binding.setLifecycleOwner(this);
         binding.setListViewModel(diaryListViewModel);
         return binding;
     }
-
 
     @Override
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
@@ -104,7 +100,7 @@ public class DiaryListFragment extends BaseFragment {
     }
 
     @Override
-    protected void setUpErrorMessageDialog() {
+    protected void setUpOtherErrorMessageDialog() {
         diaryListViewModel.getAppErrorBufferListLiveData()
                 .observe(getViewLifecycleOwner(), new AppErrorBufferListObserver(diaryListViewModel));
     }
@@ -183,13 +179,11 @@ public class DiaryListFragment extends BaseFragment {
 
     // 日記リスト(年月)設定
     private void setUpDiaryList() {
-        ThemeColor themeColor = settingsViewModel.loadThemeColorSettingValue();
-
         DiaryListAdapter diaryListAdapter =
                 new DiaryListAdapter(
                         requireContext(),
                         binding.recyclerDiaryYearMonthList,
-                        themeColor,
+                        requireThemeColor(),
                         true
                 );
         diaryListAdapter.build();
@@ -356,7 +350,7 @@ public class DiaryListFragment extends BaseFragment {
     }
 
     @Override
-    protected void retryErrorDialogShow() {
+    protected void retryOtherErrorDialogShow() {
         diaryListViewModel.triggerAppErrorBufferListObserver();
     }
 

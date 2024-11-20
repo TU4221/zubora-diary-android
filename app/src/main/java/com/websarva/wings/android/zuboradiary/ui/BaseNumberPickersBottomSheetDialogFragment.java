@@ -44,7 +44,7 @@ public abstract class BaseNumberPickersBottomSheetDialogFragment extends BaseBot
         //      ThemeResIdを取得してInflaterを再作成。
         //      ・NumberPickerの値はThemeが適用されず、TextColorはApiLevel29以上からしか変更できない。
         //      ・ThemeColorBlackの時は背景が黒となり、NumberPickerの値が見えない。
-        ThemeColor themeColor = getActivityThemeColor();
+        ThemeColor themeColor = requireThemeColor();
         int themeResId = themeColor.getNumberPickerBottomSheetDialogThemeResId();
         Context contextWithTheme = new ContextThemeWrapper(requireActivity(), themeResId);
         LayoutInflater _inflater = inflater.cloneInContext(contextWithTheme);
@@ -61,7 +61,7 @@ public abstract class BaseNumberPickersBottomSheetDialogFragment extends BaseBot
         Objects.requireNonNull(binding);
 
         if (Build.VERSION.SDK_INT >= 29) {
-            ThemeColor themeColor = getActivityThemeColor();
+            ThemeColor themeColor = requireThemeColor();
             int onSurfaceVariantColor = themeColor.getOnSurfaceVariantColor(getResources());
             binding.numberPickerFirst.setTextColor(onSurfaceVariantColor);
             binding.numberPickerSecond.setTextColor(onSurfaceVariantColor);

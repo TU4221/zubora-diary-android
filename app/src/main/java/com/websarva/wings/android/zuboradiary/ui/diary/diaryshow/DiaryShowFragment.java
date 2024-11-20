@@ -50,7 +50,6 @@ public class DiaryShowFragment extends BaseFragment {
 
     // ViewModel
     private DiaryShowViewModel diaryShowViewModel;
-    private SettingsViewModel settingsViewModel;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -70,7 +69,6 @@ public class DiaryShowFragment extends BaseFragment {
         diaryShowViewModel = provider.get(DiaryShowViewModel.class);
 
         ViewModelProvider activityScopeProvider = new ViewModelProvider(requireActivity());
-        settingsViewModel = activityScopeProvider.get(SettingsViewModel.class);
     }
 
     @Override
@@ -80,9 +78,8 @@ public class DiaryShowFragment extends BaseFragment {
     }
 
     @Override
-    protected ViewDataBinding initializeDataBinding(@NonNull LayoutInflater inflater, @NonNull ViewGroup container) {
-        ThemeColor themeColor = settingsViewModel.loadThemeColorSettingValue();
-        LayoutInflater themeColorInflater = createThemeColorInflater(inflater, themeColor);
+    protected ViewDataBinding initializeDataBinding(
+            @NonNull LayoutInflater themeColorInflater, @NonNull ViewGroup container) {
         binding = FragmentDiaryShowBinding.inflate(themeColorInflater, container, false);
         binding.setLifecycleOwner(this);
         binding.setDiaryShowViewModel(diaryShowViewModel);
@@ -109,7 +106,7 @@ public class DiaryShowFragment extends BaseFragment {
     @Override
     protected void handleOnReceivingDialogResult(@NonNull SavedStateHandle savedStateHandle) {
         receiveDeleteConfirmationDialogResult();
-        retryErrorDialogShow();
+        retryOtherErrorDialogShow();
     }
 
     @Override
@@ -118,7 +115,7 @@ public class DiaryShowFragment extends BaseFragment {
     }
 
     @Override
-    protected void setUpErrorMessageDialog() {
+    protected void setUpOtherErrorMessageDialog() {
         diaryShowViewModel.getAppErrorBufferListLiveData()
                 .observe(getViewLifecycleOwner(), new AppErrorBufferListObserver(diaryShowViewModel));
     }
@@ -137,8 +134,7 @@ public class DiaryShowFragment extends BaseFragment {
     // 画面表示データ準備
     private void setUpDiaryData() {
         diaryShowViewModel.initialize();
-        LocalDate diaryDate =
-                DiaryShowFragmentArgs.fromBundle(requireArguments()).getShowDiaryDate();
+        LocalDate diaryDate = DiaryShowFragmentArgs.fromBundle(requireArguments()).getDate();
 
         // 日記編集Fragmentで日記を削除して日記表示Fragmentに戻って来た時は更に一つ前のFragmentへ戻る。
         if (!diaryShowViewModel.existsSavedDiary(diaryDate)) {
@@ -383,19 +379,21 @@ public class DiaryShowFragment extends BaseFragment {
         if (!canShowOtherFragment()) return;
 
         NavDirections action =
-                DiaryShowFragmentDirections.actionDiaryShowFragmentToDiaryDeleteConfirmationDialog(date);
+                DiaryShowFragmentDirections.
+                        actionDiaryShowFragmentToDiaryDeleteConfirmationDialog(date);
         navController.navigate(action);
     }
 
     @Override
     protected void showMessageDialog(@NonNull String title, @NonNull String message) {
         NavDirections action =
-                DiaryShowFragmentDirections.actionDiaryShowFragmentToMessageDialog(title, message);
+                DiaryShowFragmentDirections
+                        .actionDiaryShowFragmentToMessageDialog(title, message);
         navController.navigate(action);
     }
 
     @Override
-    protected void retryErrorDialogShow() {
+    protected void retryOtherErrorDialogShow() {
         diaryShowViewModel.triggerAppErrorBufferListObserver();
     }
 

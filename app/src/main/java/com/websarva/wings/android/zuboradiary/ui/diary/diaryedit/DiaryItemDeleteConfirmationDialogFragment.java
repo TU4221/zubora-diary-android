@@ -6,7 +6,11 @@ import androidx.annotation.NonNull;
 
 import com.websarva.wings.android.zuboradiary.R;
 import com.websarva.wings.android.zuboradiary.data.diary.ItemNumber;
+import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor;
 import com.websarva.wings.android.zuboradiary.ui.BaseAlertDialogFragment;
+import com.websarva.wings.android.zuboradiary.ui.MessageDialogFragmentArgs;
+
+import java.util.Objects;
 
 public class DiaryItemDeleteConfirmationDialogFragment extends BaseAlertDialogFragment {
 
@@ -22,14 +26,16 @@ public class DiaryItemDeleteConfirmationDialogFragment extends BaseAlertDialogFr
     @Override
     protected String createMessage() {
         ItemNumber deleteItemNumber =
-                DiaryItemDeleteConfirmationDialogFragmentArgs.fromBundle(requireArguments()).getDeleteItemNumber();
+                DiaryItemDeleteConfirmationDialogFragmentArgs
+                        .fromBundle(requireArguments()).getItemNumber();
         return getString(R.string.dialog_diary_item_delete_confirmation_first_message) + deleteItemNumber + getString(R.string.dialog_diary_item_delete_confirmation_second_message);
     }
 
     @Override
     protected void handleOnClickPositiveButton(@NonNull DialogInterface dialog, int which) {
         ItemNumber deleteItemNumber =
-                DiaryItemDeleteConfirmationDialogFragmentArgs.fromBundle(requireArguments()).getDeleteItemNumber();
+                DiaryItemDeleteConfirmationDialogFragmentArgs
+                        .fromBundle(requireArguments()).getItemNumber();
         setResult(KEY_DELETE_ITEM_NUMBER, deleteItemNumber);
     }
 

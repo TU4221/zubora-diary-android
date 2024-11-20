@@ -44,7 +44,6 @@ public class DiaryItemTitleEditFragment extends BaseFragment {
 
     // ViewModel
     private DiaryItemTitleEditViewModel diaryItemTitleEditViewModel;
-    private SettingsViewModel settingsViewModel;
 
 
     @Override
@@ -56,9 +55,6 @@ public class DiaryItemTitleEditFragment extends BaseFragment {
     protected void initializeViewModel() {
         ViewModelProvider provider = new ViewModelProvider(this);
         diaryItemTitleEditViewModel = provider.get(DiaryItemTitleEditViewModel.class);
-
-        ViewModelProvider activityScopeProvider = new ViewModelProvider(requireActivity());
-        settingsViewModel = activityScopeProvider.get(SettingsViewModel.class);
     }
 
     @Override
@@ -68,9 +64,8 @@ public class DiaryItemTitleEditFragment extends BaseFragment {
     }
 
     @Override
-    protected ViewDataBinding initializeDataBinding(@NonNull LayoutInflater inflater, @NonNull ViewGroup container) {
-        ThemeColor themeColor = settingsViewModel.loadThemeColorSettingValue();
-        LayoutInflater themeColorInflater = createThemeColorInflater(inflater, themeColor);
+    protected ViewDataBinding initializeDataBinding(
+            @NonNull LayoutInflater themeColorInflater, @NonNull ViewGroup container) {
         binding = FragmentDiaryItemTitleEditBinding.inflate(themeColorInflater, container, false);
         binding.setLifecycleOwner(this);
         binding.setDiaryItemTitleEditViewModel(diaryItemTitleEditViewModel);
@@ -90,16 +85,16 @@ public class DiaryItemTitleEditFragment extends BaseFragment {
     protected void handleOnReceivingResultFromPreviousFragment(@NonNull SavedStateHandle savedStateHandle) {
         // EditDiaryFragmentからデータ受取
         ItemNumber targetItemNumber =
-                DiaryItemTitleEditFragmentArgs.fromBundle(getArguments()).getTargetItemNumber();
+                DiaryItemTitleEditFragmentArgs.fromBundle(getArguments()).getItemNumber();
         String targetItemTitle =
-                DiaryItemTitleEditFragmentArgs.fromBundle(getArguments()).getTargetItemTitle();
+                DiaryItemTitleEditFragmentArgs.fromBundle(getArguments()).getItemTitle();
         diaryItemTitleEditViewModel.updateDiaryItemTitle(targetItemNumber, targetItemTitle);
     }
 
     @Override
     protected void handleOnReceivingDialogResult(@NonNull SavedStateHandle savedStateHandle) {
         receiveDeleteConfirmationDialogResult(savedStateHandle);
-        retryErrorDialogShow();
+        retryOtherErrorDialogShow();
     }
 
     @Override
@@ -109,7 +104,7 @@ public class DiaryItemTitleEditFragment extends BaseFragment {
     }
 
     @Override
-    protected void setUpErrorMessageDialog() {
+    protected void setUpOtherErrorMessageDialog() {
         diaryItemTitleEditViewModel.getAppErrorBufferListLiveData()
                 .observe(getViewLifecycleOwner(), new AppErrorBufferListObserver(diaryItemTitleEditViewModel));
     }
@@ -218,12 +213,11 @@ public class DiaryItemTitleEditFragment extends BaseFragment {
     }
 
     private void setUpItemTitleSelectionHistory() {
-        ThemeColor themeColor = settingsViewModel.loadThemeColorSettingValue();
         ItemTitleSelectionHistoryListAdapter itemTitleSelectionHistoryListAdapter =
                 new ItemTitleSelectionHistoryListAdapter(
                         requireContext(),
                         binding.recyclerItemTitleSelectionHistory,
-                        themeColor
+                        requireThemeColor()
                 );
         itemTitleSelectionHistoryListAdapter.build();
         itemTitleSelectionHistoryListAdapter.setOnClickItemListener(new ItemTitleSelectionHistoryListAdapter.OnClickItemListener() {
@@ -289,7 +283,9 @@ public class DiaryItemTitleEditFragment extends BaseFragment {
         NavDirections action =
                 DiaryItemTitleEditFragmentDirections
                         .actionDiaryItemTitleEditFragmentToDiaryItemTitleDeleteConfirmationDialog(
-                                listItemPosition, listItemTitle);
+                                listItemPosition,
+                                listItemTitle
+                        );
         navController.navigate(action);
     }
 
@@ -302,7 +298,7 @@ public class DiaryItemTitleEditFragment extends BaseFragment {
     }
 
     @Override
-    protected void retryErrorDialogShow() {
+    protected void retryOtherErrorDialogShow() {
         diaryItemTitleEditViewModel.triggerAppErrorBufferListObserver();
     }
 

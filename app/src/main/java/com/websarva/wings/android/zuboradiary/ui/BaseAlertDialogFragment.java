@@ -9,27 +9,30 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.DialogFragment;
 import androidx.lifecycle.SavedStateHandle;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavBackStackEntry;
 import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
-import com.websarva.wings.android.zuboradiary.MainActivity;
 import com.websarva.wings.android.zuboradiary.R;
 import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor;
+import com.websarva.wings.android.zuboradiary.ui.settings.SettingsViewModel;
 
 import java.util.Objects;
 
 public abstract class BaseAlertDialogFragment extends DialogFragment {
+
+    protected SettingsViewModel settingsViewModel;
 
     @NonNull
     @Override
     public final Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
         super.onCreateDialog(savedInstanceState);
 
-        ThemeColor themeColor = getActivityThemeColor();
-        int themeResId = themeColor.getAlertDialogThemeResId();
+        settingsViewModel = createSettingsViewModel();
 
+        int themeResId = requireThemeColor().getAlertDialogThemeResId();
         MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(requireContext(), themeResId);
 
         customizeDialog(builder);
@@ -39,6 +42,18 @@ public abstract class BaseAlertDialogFragment extends DialogFragment {
         setUpDialogCancelFunction(alertDialog);
 
         return alertDialog;
+    }
+
+    @NonNull
+    private SettingsViewModel createSettingsViewModel() {
+        ViewModelProvider provider = new ViewModelProvider(requireActivity());
+        SettingsViewModel settingsViewModel = provider.get(SettingsViewModel.class);
+        return Objects.requireNonNull(settingsViewModel);
+    }
+
+    @NonNull
+    protected final ThemeColor requireThemeColor() {
+        return settingsViewModel.loadThemeColorSettingValue();
     }
 
     protected void customizeDialog(MaterialAlertDialogBuilder builder) {
@@ -67,11 +82,6 @@ public abstract class BaseAlertDialogFragment extends DialogFragment {
                 handleOnClickNegativeButton(dialog, which);
             }
         });
-    }
-
-    protected final ThemeColor getActivityThemeColor() {
-        MainActivity mainActivity = (MainActivity) requireActivity();
-        return mainActivity.requireDialogThemeColor();
     }
 
     private void setUpDialogCancelFunction(AlertDialog alertDialog) {

@@ -6,10 +6,12 @@ import android.view.View;
 import androidx.annotation.NonNull;
 
 import com.websarva.wings.android.zuboradiary.data.DayOfWeekStringConverter;
+import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor;
 import com.websarva.wings.android.zuboradiary.databinding.DialogFragmentNumberPickersBinding;
 import com.websarva.wings.android.zuboradiary.ui.BaseNumberPickersBottomSheetDialogFragment;
 
 import java.time.DayOfWeek;
+import java.util.Objects;
 
 public class CalendarStartDayPickerDialogFragment extends BaseNumberPickersBottomSheetDialogFragment {
 
@@ -68,7 +70,7 @@ public class CalendarStartDayPickerDialogFragment extends BaseNumberPickersBotto
     private void setUpInitialValue(DialogFragmentNumberPickersBinding binding) {
         DayOfWeek currentCalendarStartDayOfWeek =
                 CalendarStartDayPickerDialogFragmentArgs
-                        .fromBundle(requireArguments()).getCurrentCalendarStartDayOfWeek();
+                        .fromBundle(requireArguments()).getInitialValue();
         int initialValue;
         // MEMO:DayOfWeekはMonday～Sundayの値が1～7となる。Sundayを先頭に表示させたいため、下記コード記述。
         if (currentCalendarStartDayOfWeek == DayOfWeek.SUNDAY) {

@@ -6,6 +6,7 @@ import androidx.annotation.NonNull;
 
 import com.websarva.wings.android.zuboradiary.R;
 import com.websarva.wings.android.zuboradiary.data.DateTimeStringConverter;
+import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor;
 import com.websarva.wings.android.zuboradiary.ui.BaseAlertDialogFragment;
 
 import java.time.LocalDate;
@@ -25,7 +26,7 @@ public class WeatherInformationDialogFragment extends BaseAlertDialogFragment {
     @Override
     protected String createMessage() {
         LocalDate loadingDiaryDate =
-                WeatherInformationDialogFragmentArgs.fromBundle(requireArguments()).getTargetDiaryDate();
+                WeatherInformationDialogFragmentArgs.fromBundle(requireArguments()).getDate();
         Objects.requireNonNull(loadingDiaryDate);
 
         DateTimeStringConverter dateTimeStringConverter = new DateTimeStringConverter();

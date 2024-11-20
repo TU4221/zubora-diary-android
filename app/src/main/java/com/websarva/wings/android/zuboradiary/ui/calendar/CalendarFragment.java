@@ -35,7 +35,6 @@ import com.websarva.wings.android.zuboradiary.ui.diary.diaryshow.DiaryShowFragme
 
 import com.kizitonwose.calendar.view.CalendarView;
 import com.websarva.wings.android.zuboradiary.ui.diary.diaryshow.DiaryShowViewModel;
-import com.websarva.wings.android.zuboradiary.ui.settings.SettingsViewModel;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
@@ -58,7 +57,6 @@ public class CalendarFragment extends BaseFragment {
     // ViewModel
     private CalendarViewModel calendarViewModel;
     private DiaryShowViewModel diaryShowViewModel; // TODO:diaryViewModelの使用要素をcalendarViewModelに含めるか検討(DiaryFragment修正後)
-    private SettingsViewModel settingsViewModel;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -77,7 +75,6 @@ public class CalendarFragment extends BaseFragment {
         ViewModelProvider provider = new ViewModelProvider(requireActivity());
         calendarViewModel = provider.get(CalendarViewModel.class);
         diaryShowViewModel = provider.get(DiaryShowViewModel.class);
-        settingsViewModel = provider.get(SettingsViewModel.class);
     }
 
     @Override
@@ -87,9 +84,7 @@ public class CalendarFragment extends BaseFragment {
     }
 
     @Override
-    protected ViewDataBinding initializeDataBinding(@NonNull LayoutInflater inflater, @NonNull ViewGroup container) {
-        ThemeColor themeColor = settingsViewModel.loadThemeColorSettingValue();
-        LayoutInflater themeColorInflater = createThemeColorInflater(inflater, themeColor);
+    protected ViewDataBinding initializeDataBinding(@NonNull LayoutInflater themeColorInflater, @NonNull ViewGroup container) {
         binding = FragmentCalendarBinding.inflate(themeColorInflater, container, false);
         binding.setLifecycleOwner(this);
         binding.setDiaryShowViewModel(diaryShowViewModel);
@@ -120,7 +115,7 @@ public class CalendarFragment extends BaseFragment {
 
     @Override
     protected void handleOnReceivingDialogResult(@NonNull SavedStateHandle savedStateHandle) {
-        retryErrorDialogShow();
+        retryOtherErrorDialogShow();
     }
 
     @Override
@@ -129,21 +124,18 @@ public class CalendarFragment extends BaseFragment {
     }
 
     @Override
-    protected void setUpErrorMessageDialog() {
+    protected void setUpOtherErrorMessageDialog() {
         calendarViewModel.getAppErrorBufferListLiveData()
                 .observe(getViewLifecycleOwner(), new AppErrorBufferListObserver(calendarViewModel));
         diaryShowViewModel.getAppErrorBufferListLiveData()
                 .observe(getViewLifecycleOwner(), new AppErrorBufferListObserver(diaryShowViewModel));
-        settingsViewModel.getAppErrorBufferListLiveData()
-                .observe(getViewLifecycleOwner(), new AppErrorBufferListObserver(settingsViewModel));
     }
 
     private void setUpCalendar() {
         CalendarView calendar = binding.calendar;
 
         List<DayOfWeek> daysOfWeek = createDayOfWeekList(); // 曜日リスト取得
-        ThemeColor themeColor = settingsViewModel.loadThemeColorSettingValue();
-        configureCalendarBinders(daysOfWeek, themeColor);
+        configureCalendarBinders(daysOfWeek, requireThemeColor());
 
         YearMonth currentMonth = YearMonth.now();
         YearMonth startMonth = currentMonth.minusMonths(60); //現在から過去5年分
@@ -576,15 +568,15 @@ public class CalendarFragment extends BaseFragment {
     @Override
     protected void showMessageDialog(@NonNull String title, @NonNull String message) {
         NavDirections action =
-                CalendarFragmentDirections.actionCalendarFragmentToMessageDialog(title, message);
+                CalendarFragmentDirections
+                        .actionCalendarFragmentToMessageDialog(title, message);
         navController.navigate(action);
     }
 
     @Override
-    protected void retryErrorDialogShow() {
+    protected void retryOtherErrorDialogShow() {
         calendarViewModel.triggerAppErrorBufferListObserver();
         diaryShowViewModel.triggerAppErrorBufferListObserver();
-        settingsViewModel.triggerAppErrorBufferListObserver();
     }
 
     @Override

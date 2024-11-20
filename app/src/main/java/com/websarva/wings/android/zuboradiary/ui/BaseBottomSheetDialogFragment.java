@@ -8,16 +8,19 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
 
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
-import com.websarva.wings.android.zuboradiary.MainActivity;
 import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor;
+import com.websarva.wings.android.zuboradiary.ui.settings.SettingsViewModel;
 
 import java.util.Objects;
 
 public abstract class BaseBottomSheetDialogFragment extends BottomSheetDialogFragment {
+
+    protected SettingsViewModel settingsViewModel;
 
     @Override
     public View onCreateView(
@@ -28,8 +31,9 @@ public abstract class BaseBottomSheetDialogFragment extends BottomSheetDialogFra
 
         setUpDialogCancelFunction();
 
-        ThemeColor themeColor = getActivityThemeColor();
-        LayoutInflater themeColorInflater = createThemeColorInflater(inflater, themeColor);
+        settingsViewModel = createSettingsViewModel();
+
+        LayoutInflater themeColorInflater = createThemeColorInflater(inflater, requireThemeColor());
         return createDialogView(themeColorInflater, container, savedInstanceState);
     }
 
@@ -47,11 +51,16 @@ public abstract class BaseBottomSheetDialogFragment extends BottomSheetDialogFra
     protected abstract boolean isCancelableOtherThanPressingButton();
 
     @NonNull
-    protected final ThemeColor getActivityThemeColor() {
-        MainActivity mainActivity = (MainActivity) requireActivity();
-        Objects.requireNonNull(mainActivity);
-        return mainActivity.requireDialogThemeColor();
+    private SettingsViewModel createSettingsViewModel() {
+        ViewModelProvider provider = new ViewModelProvider(requireActivity());
+        SettingsViewModel settingsViewModel = provider.get(SettingsViewModel.class);
+        return Objects.requireNonNull(settingsViewModel);
     }
+
+    @NonNull
+    protected final ThemeColor requireThemeColor() {
+        return settingsViewModel.loadThemeColorSettingValue();
+    };
 
     // ThemeColorに合わせたインフレーター作成
     @NonNull

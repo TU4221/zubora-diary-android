@@ -5,7 +5,11 @@ import android.content.DialogInterface;
 import androidx.annotation.NonNull;
 
 import com.websarva.wings.android.zuboradiary.R;
+import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor;
 import com.websarva.wings.android.zuboradiary.ui.BaseAlertDialogFragment;
+import com.websarva.wings.android.zuboradiary.ui.diary.diaryedit.WeatherInformationDialogFragmentArgs;
+
+import java.util.Objects;
 
 public class DiaryItemTitleDeleteConfirmationDialogFragment extends BaseAlertDialogFragment {
 
@@ -23,7 +27,7 @@ public class DiaryItemTitleDeleteConfirmationDialogFragment extends BaseAlertDia
     protected String createMessage() {
         String deleteItemTitle =
                 DiaryItemTitleDeleteConfirmationDialogFragmentArgs
-                        .fromBundle(requireArguments()).getDeleteItemTitle();
+                        .fromBundle(requireArguments()).getItemTitle();
         return getString(R.string.dialog_diary_item_title_delete_confirmation_first_message) + deleteItemTitle + getString(
                 R.string.dialog_diary_item_title_delete_confirmation_second_message);
     }
@@ -53,7 +57,7 @@ public class DiaryItemTitleDeleteConfirmationDialogFragment extends BaseAlertDia
 
         int deleteListItemPosition =
                 DiaryItemTitleDeleteConfirmationDialogFragmentArgs
-                        .fromBundle(getArguments()).getDeleteListItemPosition();
+                        .fromBundle(getArguments()).getItemPosition();
         setResult(KEY_DELETE_LIST_ITEM_POSITION, deleteListItemPosition);
     }
 

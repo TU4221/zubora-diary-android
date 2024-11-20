@@ -5,7 +5,6 @@ import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -15,7 +14,6 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CompoundButton;
-import android.widget.TextView;
 
 import androidx.activity.OnBackPressedCallback;
 import androidx.activity.result.ActivityResultCallback;
@@ -55,9 +53,6 @@ public class SettingsFragment extends BaseFragment {
     private boolean isTouchedReminderNotificationSwitch = false;
     private boolean isTouchedPasscodeLockSwitch = false;
     private boolean isTouchedWeatherInfoAcquisitionSwitch = false;
-
-    // ViewModel関係
-    private SettingsViewModel settingsViewModel;
 
     // ActivityResultLauncher関係
     private ActivityResultLauncher<String> requestPostNotificationsPermissionLauncher;
@@ -134,8 +129,7 @@ public class SettingsFragment extends BaseFragment {
 
     @Override
     protected void initializeViewModel() {
-        ViewModelProvider provider = new ViewModelProvider(requireActivity());
-        settingsViewModel = provider.get(SettingsViewModel.class);
+        // 処理なし
     }
 
     @Override
@@ -145,9 +139,7 @@ public class SettingsFragment extends BaseFragment {
     }
 
     @Override
-    protected ViewDataBinding initializeDataBinding(@NonNull LayoutInflater inflater, @NonNull ViewGroup container) {
-        ThemeColor themeColor = settingsViewModel.loadThemeColorSettingValue();
-        LayoutInflater themeColorInflater = createThemeColorInflater(inflater, themeColor);
+    protected ViewDataBinding initializeDataBinding(@NonNull LayoutInflater themeColorInflater, @NonNull ViewGroup container) {
         binding = FragmentSettingsBinding.inflate(themeColorInflater, container, false);
         binding.setLifecycleOwner(this);
         binding.setSettingsViewModel(settingsViewModel);
@@ -197,9 +189,8 @@ public class SettingsFragment extends BaseFragment {
     }
 
     @Override
-    protected void setUpErrorMessageDialog() {
-        settingsViewModel.getAppErrorBufferListLiveData()
-                .observe(getViewLifecycleOwner(), new AppErrorBufferListObserver(settingsViewModel));
+    protected void setUpOtherErrorMessageDialog() {
+        // 処理なし
     }
 
     // テーマカラー設定ダイアログフラグメントから結果受取
@@ -226,8 +217,7 @@ public class SettingsFragment extends BaseFragment {
                 receiveResulFromDialog(ReminderNotificationTimePickerDialogFragment.KEY_SELECTED_BUTTON);
         if (selectedButton == null) return;
         if (selectedButton != DialogInterface.BUTTON_POSITIVE) {
-            binding.includePasscodeLockSetting
-                    .materialSwitchSettingValue.setChecked(false);
+            binding.includePasscodeLockSetting.materialSwitchSettingValue.setChecked(false);
             return;
         }
 
@@ -277,9 +267,7 @@ public class SettingsFragment extends BaseFragment {
         binding.includeThemeColorSetting.textSettingTitle.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ThemeColor currentThemeColor =
-                        settingsViewModel.getThemeColorSettingValueLiveData().getValue();
-                showThemeColorPickerDialog(currentThemeColor);
+                showThemeColorPickerDialog();
             }
         });
 
@@ -654,12 +642,12 @@ public class SettingsFragment extends BaseFragment {
         binding.includeAllDataDeleteSetting.textSettingValue.setVisibility(View.GONE);
     }
 
-    private void showThemeColorPickerDialog(ThemeColor themeColor) {
-        Objects.requireNonNull(themeColor);
+    private void showThemeColorPickerDialog() {
         if (!canShowOtherFragment()) return;
 
-        NavDirections action = SettingsFragmentDirections
-                .actionNavigationSettingsFragmentToThemeColorPickerDialog(themeColor);
+        NavDirections action =
+                SettingsFragmentDirections
+                        .actionNavigationSettingsFragmentToThemeColorPickerDialog();
         navController.navigate(action);
     }
 
@@ -667,16 +655,18 @@ public class SettingsFragment extends BaseFragment {
         Objects.requireNonNull(dayOfWeek);
         if (!canShowOtherFragment()) return;
 
-        NavDirections action = SettingsFragmentDirections
-                .actionNavigationSettingsFragmentToCalendarStartDayPickerDialog(dayOfWeek);
+        NavDirections action =
+                SettingsFragmentDirections
+                        .actionNavigationSettingsFragmentToCalendarStartDayPickerDialog(dayOfWeek);
         navController.navigate(action);
     }
 
     private void showReminderNotificationTimePickerDialog() {
         if (!canShowOtherFragment()) return;
 
-        NavDirections action = SettingsFragmentDirections
-                .actionNavigationSettingsFragmentToReminderNotificationTimePickerDialog();
+        NavDirections action =
+                SettingsFragmentDirections
+                        .actionNavigationSettingsFragmentToReminderNotificationTimePickerDialog();
         navController.navigate(action);
     }
 
@@ -720,13 +710,14 @@ public class SettingsFragment extends BaseFragment {
     @Override
     protected void showMessageDialog(@NonNull String title, @NonNull String message) {
         NavDirections action =
-                SettingsFragmentDirections.actionSettingsFragmentToMessageDialog(title, message);
+                SettingsFragmentDirections
+                        .actionSettingsFragmentToMessageDialog(title, message);
         navController.navigate(action);
     }
 
     @Override
-    protected void retryErrorDialogShow() {
-        settingsViewModel.triggerAppErrorBufferListObserver();
+    protected void retryOtherErrorDialogShow() {
+        // 処理なし
     }
 
     private void showApplicationDetailsSettings() {

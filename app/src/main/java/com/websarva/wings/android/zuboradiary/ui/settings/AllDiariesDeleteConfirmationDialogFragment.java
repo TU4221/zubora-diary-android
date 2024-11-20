@@ -5,7 +5,10 @@ import android.content.DialogInterface;
 import androidx.annotation.NonNull;
 
 import com.websarva.wings.android.zuboradiary.R;
+import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor;
 import com.websarva.wings.android.zuboradiary.ui.BaseAlertDialogFragment;
+
+import java.util.Objects;
 
 public class AllDiariesDeleteConfirmationDialogFragment extends BaseAlertDialogFragment {
 

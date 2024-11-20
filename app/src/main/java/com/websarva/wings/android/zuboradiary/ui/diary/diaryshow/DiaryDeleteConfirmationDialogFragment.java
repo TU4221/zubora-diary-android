@@ -6,9 +6,12 @@ import androidx.annotation.NonNull;
 
 import com.websarva.wings.android.zuboradiary.R;
 import com.websarva.wings.android.zuboradiary.data.DateTimeStringConverter;
+import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor;
 import com.websarva.wings.android.zuboradiary.ui.BaseAlertDialogFragment;
+import com.websarva.wings.android.zuboradiary.ui.diary.diaryitemtitleedit.DiaryItemTitleDeleteConfirmationDialogFragmentArgs;
 
 import java.time.LocalDate;
+import java.util.Objects;
 
 public class DiaryDeleteConfirmationDialogFragment extends BaseAlertDialogFragment {
 
@@ -24,7 +27,7 @@ public class DiaryDeleteConfirmationDialogFragment extends BaseAlertDialogFragme
     @Override
     protected String createMessage() {
         LocalDate date =
-                DiaryDeleteConfirmationDialogFragmentArgs.fromBundle(requireArguments()).getDeleteDiaryDate();
+                DiaryDeleteConfirmationDialogFragmentArgs.fromBundle(requireArguments()).getDate();
         DateTimeStringConverter dateTimeStringConverter = new DateTimeStringConverter();
         String strDate = dateTimeStringConverter.toYearMonthDayWeek(date);
         return strDate + getString(R.string.dialog_diary_delete_confirmation_message);

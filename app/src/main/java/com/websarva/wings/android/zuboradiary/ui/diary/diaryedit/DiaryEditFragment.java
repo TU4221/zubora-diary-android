@@ -71,7 +71,6 @@ public class DiaryEditFragment extends BaseFragment {
 
     // ViewModel
     private DiaryEditViewModel diaryEditViewModel;
-    private SettingsViewModel settingsViewModel;
 
 
     @Override
@@ -84,7 +83,6 @@ public class DiaryEditFragment extends BaseFragment {
         ViewModelProvider provider = new ViewModelProvider(requireActivity());
         diaryEditViewModel = provider.get(DiaryEditViewModel.class);
         diaryEditViewModel.initialize();
-        settingsViewModel = provider.get(SettingsViewModel.class);
     }
 
     @Override
@@ -94,9 +92,8 @@ public class DiaryEditFragment extends BaseFragment {
     }
 
     @Override
-    protected ViewDataBinding initializeDataBinding(@NonNull LayoutInflater inflater, @NonNull ViewGroup container) {
-        ThemeColor themeColor = settingsViewModel.loadThemeColorSettingValue();
-        LayoutInflater themeColorInflater = createThemeColorInflater(inflater, themeColor);
+    protected ViewDataBinding initializeDataBinding(
+            @NonNull LayoutInflater themeColorInflater, @NonNull ViewGroup container) {
         binding = FragmentDiaryEditBinding.inflate(themeColorInflater, container, false);
         binding.setLifecycleOwner(this);
         binding.setDiaryEditViewModel(diaryEditViewModel);
@@ -157,7 +154,7 @@ public class DiaryEditFragment extends BaseFragment {
         receiveUpdateExistingDiaryDialogResult();
         receiveDeleteConfirmDialogResult();
         receiveWeatherInformationDialogResult();
-        retryErrorDialogShow();
+        retryOtherErrorDialogShow();
         clearFocusAllEditText();
     }
 
@@ -171,11 +168,9 @@ public class DiaryEditFragment extends BaseFragment {
     }
 
     @Override
-    protected void setUpErrorMessageDialog() {
+    protected void setUpOtherErrorMessageDialog() {
         diaryEditViewModel.getAppErrorBufferListLiveData()
                 .observe(getViewLifecycleOwner(), new AppErrorBufferListObserver(diaryEditViewModel));
-        settingsViewModel.getAppErrorBufferListLiveData()
-                .observe(getViewLifecycleOwner(), new AppErrorBufferListObserver(settingsViewModel));
     }
 
     // 日付入力ダイアログフラグメントからデータ受取
@@ -253,9 +248,9 @@ public class DiaryEditFragment extends BaseFragment {
         // 画面表示データ準備
         if (!diaryEditViewModel.getHasPreparedDiary()) {
             LocalDate diaryDate =
-                    DiaryEditFragmentArgs.fromBundle(requireArguments()).getEditDiaryDate();
+                    DiaryEditFragmentArgs.fromBundle(requireArguments()).getDate();
             boolean isLoadingExistingDiary =
-                    DiaryEditFragmentArgs.fromBundle(requireArguments()).getIsLoadingDiary();
+                    DiaryEditFragmentArgs.fromBundle(requireArguments()).getRequiresLoadingExistedDiary();
             diaryEditViewModel.prepareDiary(diaryDate, isLoadingExistingDiary);
             if (!isLoadingExistingDiary) fetchWeatherInformation(diaryDate,false);
         }
@@ -467,8 +462,7 @@ public class DiaryEditFragment extends BaseFragment {
 
     @NonNull
     private ArrayAdapter<String> createWeatherSpinnerAdapter(@Nullable Weather... excludedWeathers) {
-        ThemeColor themeColor = settingsViewModel.loadThemeColorSettingValue();
-        int themeResId = themeColor.getThemeResId();
+        int themeResId = requireThemeColor().getThemeResId();
         Context contextWithTheme = new ContextThemeWrapper(requireContext(), themeResId);
 
         List<String> weatherItemList = new ArrayList<>();
@@ -522,8 +516,7 @@ public class DiaryEditFragment extends BaseFragment {
 
     @NonNull
     private ArrayAdapter<String> createConditionSpinnerAdapter() {
-        ThemeColor themeColor = settingsViewModel.loadThemeColorSettingValue();
-        int themeResId = themeColor.getThemeResId();
+        int themeResId = requireThemeColor().getThemeResId();
         Context contextWithTheme = new ContextThemeWrapper(requireContext(), themeResId);
 
         List<String> conditonItemList = new ArrayList<>();
@@ -913,7 +906,8 @@ public class DiaryEditFragment extends BaseFragment {
         if (!canShowOtherFragment()) return;
 
         NavDirections action =
-                DiaryEditFragmentDirections.actionDiaryEditFragmentToDatePickerDialog(date);
+                DiaryEditFragmentDirections
+                        .actionDiaryEditFragmentToDatePickerDialog(date);
         navController.navigate(action);
     }
 
@@ -971,9 +965,8 @@ public class DiaryEditFragment extends BaseFragment {
     }
 
     @Override
-    protected void retryErrorDialogShow() {
+    protected void retryOtherErrorDialogShow() {
         diaryEditViewModel.triggerAppErrorBufferListObserver();
-        settingsViewModel.triggerAppErrorBufferListObserver();
     }
 
     @SuppressLint("UseRequireInsteadOfGet")

@@ -14,7 +14,6 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavDirections;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -45,7 +44,6 @@ public class WordSearchFragment extends BaseFragment {
 
     // ViewModel
     private WordSearchViewModel wordSearchViewModel;
-    private SettingsViewModel settingsViewModel;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -57,7 +55,6 @@ public class WordSearchFragment extends BaseFragment {
         ViewModelProvider provider = new ViewModelProvider(requireActivity());
         wordSearchViewModel = provider.get(WordSearchViewModel.class);
         wordSearchViewModel.initialize();
-        settingsViewModel = provider.get(SettingsViewModel.class);
     }
 
     @Override
@@ -67,9 +64,8 @@ public class WordSearchFragment extends BaseFragment {
     }
 
     @Override
-    protected ViewDataBinding initializeDataBinding(@NonNull LayoutInflater inflater, @NonNull ViewGroup container) {
-        ThemeColor themeColor = settingsViewModel.loadThemeColorSettingValue();
-        LayoutInflater themeColorInflater = createThemeColorInflater(inflater, themeColor);
+    protected ViewDataBinding initializeDataBinding(
+            @NonNull LayoutInflater themeColorInflater, @NonNull ViewGroup container) {
         binding = FragmentWordSearchBinding.inflate(themeColorInflater, container, false);
         binding.setLifecycleOwner(this);
         binding.setWordSearchViewModel(wordSearchViewModel);
@@ -88,7 +84,7 @@ public class WordSearchFragment extends BaseFragment {
     }
 
     private void setUpThemeColor() {
-        ThemeColor themeColor = settingsViewModel.loadThemeColorSettingValue();
+        ThemeColor themeColor = requireThemeColor();
         resultWordColor = themeColor.getOnTertiaryContainerColor(getResources());
         resultWordBackgroundColor = themeColor.getTertiaryContainerColor(getResources());
     }
@@ -100,7 +96,7 @@ public class WordSearchFragment extends BaseFragment {
 
     @Override
     protected void handleOnReceivingDialogResult(@NonNull SavedStateHandle savedStateHandle) {
-        retryErrorDialogShow();
+        retryOtherErrorDialogShow();
     }
 
     @Override
@@ -109,7 +105,7 @@ public class WordSearchFragment extends BaseFragment {
     }
 
     @Override
-    protected void setUpErrorMessageDialog() {
+    protected void setUpOtherErrorMessageDialog() {
         wordSearchViewModel.getAppErrorBufferListLiveData()
                 .observe(getViewLifecycleOwner(), new AppErrorBufferListObserver(wordSearchViewModel));
     }
@@ -165,12 +161,11 @@ public class WordSearchFragment extends BaseFragment {
     }
 
     private void setUpWordSearchResultList() {
-        ThemeColor themeColor = settingsViewModel.loadThemeColorSettingValue();
         WordSearchResultListAdapter wordSearchResultListAdapter =
                 new WordSearchResultListAdapter(
                         requireContext(),
                         binding.recyclerWordSearchResultList,
-                        themeColor,
+                        requireThemeColor(),
                         false
                 );
         wordSearchResultListAdapter.build();
@@ -225,9 +220,6 @@ public class WordSearchFragment extends BaseFragment {
 
         @Override
         public void loadListOnScrollEnd() {
-            ThemeColor themeColor = settingsViewModel.getThemeColorSettingValueLiveData().getValue();
-            Objects.requireNonNull(themeColor);
-
             wordSearchViewModel
                     .loadAdditionWordSearchResultList(resultWordColor, resultWordBackgroundColor);
         }
@@ -324,13 +316,12 @@ public class WordSearchFragment extends BaseFragment {
     protected void showMessageDialog(@NonNull String title, @NonNull String message) {
         NavDirections action =
                 WordSearchFragmentDirections
-                        .actionWordSearchFragmentToMessageDialog(
-                                title, message);
+                        .actionWordSearchFragmentToMessageDialog(title, message);
         navController.navigate(action);
     }
 
     @Override
-    protected void retryErrorDialogShow() {
+    protected void retryOtherErrorDialogShow() {
         wordSearchViewModel.triggerAppErrorBufferListObserver();
     }
 

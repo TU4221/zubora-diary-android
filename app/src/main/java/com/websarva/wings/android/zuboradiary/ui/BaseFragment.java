@@ -15,6 +15,7 @@ import androidx.lifecycle.LifecycleEventObserver;
 import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.SavedStateHandle;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavBackStackEntry;
 import androidx.navigation.NavController;
 import androidx.navigation.NavDestination;
@@ -26,6 +27,7 @@ import com.websarva.wings.android.zuboradiary.MainActivity;
 import com.websarva.wings.android.zuboradiary.data.AppError;
 import com.websarva.wings.android.zuboradiary.data.AppErrorList;
 import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor;
+import com.websarva.wings.android.zuboradiary.ui.settings.SettingsViewModel;
 
 import java.util.Objects;
 
@@ -34,6 +36,7 @@ import dagger.internal.Preconditions;
 
 public abstract class BaseFragment extends CustomFragment {
 
+    protected SettingsViewModel settingsViewModel;
     protected NavController navController;
     protected int destinationId;
 
@@ -48,6 +51,7 @@ public abstract class BaseFragment extends CustomFragment {
 
         initializeViewModel();
 
+        settingsViewModel = createSettingsViewModel();
         navController = NavHostFragment.findNavController(this);
         destinationId = getCurrentDestinationId();
     }
@@ -56,6 +60,13 @@ public abstract class BaseFragment extends CustomFragment {
      * BaseFragment#onCreate()で呼び出される。
      * */
     protected abstract void initializeViewModel();
+
+    @NonNull
+    private SettingsViewModel createSettingsViewModel() {
+        ViewModelProvider provider = new ViewModelProvider(requireActivity());
+        SettingsViewModel settingsViewModel = provider.get(SettingsViewModel.class);
+        return Objects.requireNonNull(settingsViewModel);
+    }
 
     private int getCurrentDestinationId() {
         NavDestination navDestination = navController.getCurrentDestination();
@@ -82,7 +93,8 @@ public abstract class BaseFragment extends CustomFragment {
 
         setUpFragmentTransitionEffect();
 
-        ViewDataBinding dataBinding = initializeDataBinding(inflater, container);
+        LayoutInflater themeColorInflater = createThemeColorInflater(inflater);
+        ViewDataBinding dataBinding = initializeDataBinding(themeColorInflater, container);
         Objects.requireNonNull(dataBinding);
         return dataBinding.getRoot();
     }
@@ -90,18 +102,24 @@ public abstract class BaseFragment extends CustomFragment {
     /**
      * BaseFragment#onCreateView()で呼び出される。
      * */
-    protected abstract ViewDataBinding initializeDataBinding(@NonNull LayoutInflater inflater, @NonNull ViewGroup container);
+    protected abstract ViewDataBinding initializeDataBinding(
+            @NonNull LayoutInflater themeColorInflater, @NonNull ViewGroup container);
 
     // ThemeColorに合わせたインフレーター作成
     @NonNull
-    protected final LayoutInflater createThemeColorInflater(LayoutInflater inflater, ThemeColor themeColor) {
+    private LayoutInflater createThemeColorInflater(LayoutInflater inflater) {
         Preconditions.checkNotNull(inflater);
-        Preconditions.checkNotNull(themeColor);
 
         ThemeColorInflaterCreator creator =
-                new ThemeColorInflaterCreator(requireContext(), inflater, themeColor);
-        return creator.create();
+                new ThemeColorInflaterCreator(requireContext(), inflater, requireThemeColor());
+        LayoutInflater themeColorInflater = creator.create();
+        return Objects.requireNonNull(themeColorInflater);
     }
+
+    @NonNull
+    protected final ThemeColor requireThemeColor() {
+        return settingsViewModel.loadThemeColorSettingValue();
+    };
 
     private void setUpFragmentTransitionEffect() {
         // FROM:遷移元 TO:遷移先
@@ -158,7 +176,8 @@ public abstract class BaseFragment extends CustomFragment {
         super.onViewCreated(view, savedInstanceState);
         setUpPreviousFragmentResultReceiver();
         setUpDialogResultReceiver();
-        setUpErrorMessageDialog();
+        setUpSettingsErrorMessageDialog();
+        setUpOtherErrorMessageDialog();
     }
 
     @NonNull
@@ -195,7 +214,8 @@ public abstract class BaseFragment extends CustomFragment {
                 if (event.equals(Lifecycle.Event.ON_RESUME)) {
                     SavedStateHandle savedStateHandle = navBackStackEntry.getSavedStateHandle();
                     handleOnReceivingDialogResult(savedStateHandle);
-                    retryErrorDialogShow();
+                    retrySettingsErrorDialogShow();
+                    retryOtherErrorDialogShow();
                     removeDialogResultOnDestroy(savedStateHandle);
                 }
             }
@@ -239,11 +259,16 @@ public abstract class BaseFragment extends CustomFragment {
         return savedStateHandle.get(key);
     }
 
+    private void setUpSettingsErrorMessageDialog() {
+        settingsViewModel.getAppErrorBufferListLiveData()
+                .observe(getViewLifecycleOwner(), new AppErrorBufferListObserver(settingsViewModel));
+    }
+
     /**
      * BaseFragment#setUpDialogResultReceiver()で呼び出される。
      * BaseViewModelのAppErrorBufferListのObserverを設定する。
      * */
-    protected abstract void setUpErrorMessageDialog();
+    protected abstract void setUpOtherErrorMessageDialog();
 
     protected final class AppErrorBufferListObserver implements Observer<AppErrorList> {
 
@@ -284,7 +309,11 @@ public abstract class BaseFragment extends CustomFragment {
      * */
     protected abstract void showMessageDialog(@NonNull String title,@NonNull  String message);
 
-    protected abstract void retryErrorDialogShow();
+    protected abstract void retryOtherErrorDialogShow();
+
+    protected void retrySettingsErrorDialogShow() {
+        settingsViewModel.triggerAppErrorBufferListObserver();
+    };
 
     @Override
     public void onDestroyView() {
