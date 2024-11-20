@@ -119,7 +119,7 @@ public abstract class BaseFragment extends CustomFragment {
     @NonNull
     protected final ThemeColor requireThemeColor() {
         return settingsViewModel.loadThemeColorSettingValue();
-    };
+    }
 
     private void setUpFragmentTransitionEffect() {
         // FROM:遷移元 TO:遷移先
@@ -313,7 +313,7 @@ public abstract class BaseFragment extends CustomFragment {
 
     protected void retrySettingsErrorDialogShow() {
         settingsViewModel.triggerAppErrorBufferListObserver();
-    };
+    }
 
     @Override
     public void onDestroyView() {

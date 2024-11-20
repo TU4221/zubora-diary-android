@@ -60,7 +60,7 @@ public abstract class BaseBottomSheetDialogFragment extends BottomSheetDialogFra
     @NonNull
     protected final ThemeColor requireThemeColor() {
         return settingsViewModel.loadThemeColorSettingValue();
-    };
+    }
 
     // ThemeColorに合わせたインフレーター作成
     @NonNull

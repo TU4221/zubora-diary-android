@@ -11,18 +11,6 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import com.google.android.gms.location.FusedLocationProviderClient;
-import com.google.android.gms.location.LocationCallback;
-import com.google.android.gms.location.LocationListener;
-import com.google.android.gms.location.LocationRequest;
-import com.google.android.gms.location.LocationResult;
-import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.location.Priority;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
-import com.google.android.material.bottomnavigation.BottomNavigationView;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
@@ -43,15 +31,23 @@ import androidx.navigation.Navigation;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.navigation.ui.NavigationUI;
 
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationCallback;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationResult;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.Priority;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationBarView;
 import com.google.android.material.transition.platform.MaterialFadeThrough;
+import com.websarva.wings.android.zuboradiary.data.network.GeoCoordinates;
 import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor;
 import com.websarva.wings.android.zuboradiary.databinding.ActivityMainBinding;
-import com.websarva.wings.android.zuboradiary.ui.ThemeColorSwitcher;
 import com.websarva.wings.android.zuboradiary.ui.ThemeColorInflaterCreator;
+import com.websarva.wings.android.zuboradiary.ui.ThemeColorSwitcher;
 import com.websarva.wings.android.zuboradiary.ui.calendar.CalendarFragment;
 import com.websarva.wings.android.zuboradiary.ui.list.diarylist.DiaryListFragment;
-import com.websarva.wings.android.zuboradiary.data.network.GeoCoordinates;
 import com.websarva.wings.android.zuboradiary.ui.settings.SettingsFragment;
 import com.websarva.wings.android.zuboradiary.ui.settings.SettingsViewModel;
 
