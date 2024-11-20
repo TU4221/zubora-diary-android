@@ -26,7 +26,6 @@ import androidx.core.app.ActivityCompat;
 import androidx.databinding.ViewDataBinding;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.SavedStateHandle;
-import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavDirections;
 
 import com.websarva.wings.android.zuboradiary.MainActivity;
@@ -217,7 +216,7 @@ public class SettingsFragment extends BaseFragment {
                 receiveResulFromDialog(ReminderNotificationTimePickerDialogFragment.KEY_SELECTED_BUTTON);
         if (selectedButton == null) return;
         if (selectedButton != DialogInterface.BUTTON_POSITIVE) {
-            binding.includePasscodeLockSetting.materialSwitchSettingValue.setChecked(false);
+            binding.includeReminderNotificationSetting.materialSwitchSettingValue.setChecked(false);
             return;
         }
 
