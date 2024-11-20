@@ -946,6 +946,7 @@ public class DiaryEditFragment extends BaseFragment {
     private void showWeatherInformationDialog(LocalDate date) {
         Objects.requireNonNull(date);
         if (!canShowOtherFragment()) return;
+        if (!diaryEditViewModel.canFetchWeatherInformation(date)) return;
 
         // 今日の日付以降は天気情報を取得できないためダイアログ表示不要
         diaryEditViewModel.canFetchWeatherInformation(date);
