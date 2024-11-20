@@ -1,9 +1,13 @@
 package com.websarva.wings.android.zuboradiary.ui.list.wordsearch;
 
-import static com.websarva.wings.android.zuboradiary.ui.list.DiaryYearMonthListAdapter.*;
+import static com.websarva.wings.android.zuboradiary.ui.list.DiaryYearMonthListAdapter.OnClickChildItemListener;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.MotionEvent;
+import android.view.View;
+import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -14,19 +18,13 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavDirections;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.view.LayoutInflater;
-import android.view.MotionEvent;
-import android.view.View;
-import android.view.ViewGroup;
-
 import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor;
+import com.websarva.wings.android.zuboradiary.databinding.FragmentWordSearchBinding;
 import com.websarva.wings.android.zuboradiary.ui.BaseFragment;
 import com.websarva.wings.android.zuboradiary.ui.EditTextSetup;
-import com.websarva.wings.android.zuboradiary.ui.list.DiaryYearMonthListItemBase;
 import com.websarva.wings.android.zuboradiary.ui.KeyboardInitializer;
-import com.websarva.wings.android.zuboradiary.databinding.FragmentWordSearchBinding;
 import com.websarva.wings.android.zuboradiary.ui.list.DiaryYearMonthListAdapter;
-import com.websarva.wings.android.zuboradiary.ui.settings.SettingsViewModel;
+import com.websarva.wings.android.zuboradiary.ui.list.DiaryYearMonthListItemBase;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -244,6 +242,7 @@ public class WordSearchFragment extends BaseFragment {
             String searchWord = wordSearchViewModel.getSearchWordLiveData().getValue();
             Objects.requireNonNull(searchWord);
             if (searchWord.isEmpty()) {
+                binding.fabTopScroll.hide(); // MEMO:初回起動用
                 binding.textWordSearchNoResults.setVisibility(View.INVISIBLE);
                 binding.linerLayoutWordSearchResults.setVisibility(View.INVISIBLE);
             } else if (wordSearchResultYearMonthList.getWordSearchResultYearMonthListItemList().isEmpty()) {
