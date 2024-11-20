@@ -32,7 +32,7 @@ public class DiaryItemDeleteConfirmationDialogFragment extends BaseAlertDialogFr
     }
 
     @Override
-    protected void handleOnClickPositiveButton(@NonNull DialogInterface dialog, int which) {
+    protected void handleOnPositiveButtonClick(@NonNull DialogInterface dialog, int which) {
         ItemNumber deleteItemNumber =
                 DiaryItemDeleteConfirmationDialogFragmentArgs
                         .fromBundle(requireArguments()).getItemNumber();
@@ -40,7 +40,7 @@ public class DiaryItemDeleteConfirmationDialogFragment extends BaseAlertDialogFr
     }
 
     @Override
-    protected void handleOnClickNegativeButton(@NonNull DialogInterface dialog, int which) {
+    protected void handleOnNegativeButtonClick(@NonNull DialogInterface dialog, int which) {
         // 処理なし
     }
 

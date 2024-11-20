@@ -24,7 +24,7 @@ public class CalendarStartDayPickerDialogFragment extends BaseNumberPickersBotto
     }
 
     @Override
-    protected void handleOnClickPositiveButton(@NonNull View v) {
+    protected void handleOnPositiveButtonClick(@NonNull View v) {
         setResultSelectedDayOfWeek();
     }
 
@@ -41,7 +41,7 @@ public class CalendarStartDayPickerDialogFragment extends BaseNumberPickersBotto
     }
 
     @Override
-    protected void handleOnClickNegativeButton(@NonNull View v) {
+    protected void handleOnNegativeButtonClick(@NonNull View v) {
         // 処理なし
     }
 

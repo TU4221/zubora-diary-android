@@ -25,7 +25,7 @@ public class StartYearMonthPickerDialogFragment extends BaseNumberPickersBottomS
     }
 
     @Override
-    protected void handleOnClickPositiveButton(@NonNull View v) {
+    protected void handleOnPositiveButtonClick(@NonNull View v) {
         setResultSelectedYearMonth();
     }
 
@@ -40,7 +40,7 @@ public class StartYearMonthPickerDialogFragment extends BaseNumberPickersBottomS
     }
 
     @Override
-    protected void handleOnClickNegativeButton(@NonNull View v) {
+    protected void handleOnNegativeButtonClick(@NonNull View v) {
         // 処理なし
     }
 

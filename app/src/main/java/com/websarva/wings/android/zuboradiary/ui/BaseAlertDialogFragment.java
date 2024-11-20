@@ -71,7 +71,7 @@ public abstract class BaseAlertDialogFragment extends DialogFragment {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 Objects.requireNonNull(dialog);
-                handleOnClickPositiveButton(dialog, which);
+                handleOnPositiveButtonClick(dialog, which);
             }
         });
 
@@ -79,7 +79,7 @@ public abstract class BaseAlertDialogFragment extends DialogFragment {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 Objects.requireNonNull(dialog);
-                handleOnClickNegativeButton(dialog, which);
+                handleOnNegativeButtonClick(dialog, which);
             }
         });
     }
@@ -107,12 +107,12 @@ public abstract class BaseAlertDialogFragment extends DialogFragment {
     /**
      * BaseAlertDialogFragment.customizeDialog()で呼び出される。
      * */
-    protected abstract void handleOnClickPositiveButton(@NonNull DialogInterface dialog, int which);
+    protected abstract void handleOnPositiveButtonClick(@NonNull DialogInterface dialog, int which);
 
     /**
      * BaseAlertDialogFragment.customizeDialog()で呼び出される。
      * */
-    protected abstract void handleOnClickNegativeButton(@NonNull DialogInterface dialog, int which);
+    protected abstract void handleOnNegativeButtonClick(@NonNull DialogInterface dialog, int which);
 
     /**
      * 戻り値をtrueにすると、ダイアログ枠外、戻るボタンタッチ時にダイアログをキャンセルすることを可能にする。

@@ -27,7 +27,7 @@ public class ReminderNotificationTimePickerDialogFragment extends BaseNumberPick
     }
 
     @Override
-    protected void handleOnClickPositiveButton(@NonNull View v) {
+    protected void handleOnPositiveButtonClick(@NonNull View v) {
         setResultSelectedYearMonth();
     }
 
@@ -41,7 +41,7 @@ public class ReminderNotificationTimePickerDialogFragment extends BaseNumberPick
     }
 
     @Override
-    protected void handleOnClickNegativeButton(@NonNull View v) {
+    protected void handleOnNegativeButtonClick(@NonNull View v) {
         setResult(KEY_SELECTED_BUTTON, DialogInterface.BUTTON_NEGATIVE);
     }
 

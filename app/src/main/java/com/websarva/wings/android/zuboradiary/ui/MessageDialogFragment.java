@@ -23,12 +23,12 @@ public class MessageDialogFragment extends BaseAlertDialogFragment {
     }
 
     @Override
-    protected void handleOnClickPositiveButton(@NonNull DialogInterface dialog, int which) {
+    protected void handleOnPositiveButtonClick(@NonNull DialogInterface dialog, int which) {
         // 処理なし
     }
 
     @Override
-    protected void handleOnClickNegativeButton(@NonNull DialogInterface dialog, int which) {
+    protected void handleOnNegativeButtonClick(@NonNull DialogInterface dialog, int which) {
         // 処理なし
     }
 

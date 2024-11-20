@@ -86,7 +86,7 @@ public abstract class BaseBottomSheetDialogFragment extends BottomSheetDialogFra
         public void onClick(View v) {
             Objects.requireNonNull(v);
 
-            handleOnClickPositiveButton(v);
+            handleOnPositiveButtonClick(v);
             closeDialog();
         }
     }
@@ -97,7 +97,7 @@ public abstract class BaseBottomSheetDialogFragment extends BottomSheetDialogFra
         public void onClick(View v) {
             Objects.requireNonNull(v);
 
-            handleOnClickNegativeButton(v);
+            handleOnNegativeButtonClick(v);
             closeDialog();
         }
     }
@@ -110,12 +110,12 @@ public abstract class BaseBottomSheetDialogFragment extends BottomSheetDialogFra
     /**
      * BaseBottomSheetDialogFragment.PositiveButtonClickListener#onClick()で呼び出される。
      * */
-    protected abstract void handleOnClickPositiveButton(@NonNull View v);
+    protected abstract void handleOnPositiveButtonClick(@NonNull View v);
 
     /**
      * BaseBottomSheetDialogFragment.NegativeButtonClickListener#onClick()で呼び出される。
      * */
-    protected abstract void handleOnClickNegativeButton(@NonNull View v);
+    protected abstract void handleOnNegativeButtonClick(@NonNull View v);
 
     // ダイアログ枠外タッチ、popBackStack時に処理
     // MEMO:ダイアログフラグメントのCANCEL・DISMISS 処理について、
