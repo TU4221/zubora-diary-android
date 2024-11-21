@@ -20,20 +20,19 @@ import com.google.common.util.concurrent.FutureCallback;
 import com.kizitonwose.calendar.core.CalendarDay;
 import com.kizitonwose.calendar.core.CalendarMonth;
 import com.kizitonwose.calendar.core.DayPosition;
+import com.kizitonwose.calendar.view.CalendarView;
 import com.kizitonwose.calendar.view.MonthDayBinder;
 import com.kizitonwose.calendar.view.MonthHeaderFooterBinder;
 import com.kizitonwose.calendar.view.ViewContainer;
 import com.websarva.wings.android.zuboradiary.R;
+import com.websarva.wings.android.zuboradiary.data.DateTimeStringConverter;
 import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor;
 import com.websarva.wings.android.zuboradiary.databinding.CalendarDayBinding;
 import com.websarva.wings.android.zuboradiary.databinding.CalendarHeaderBinding;
 import com.websarva.wings.android.zuboradiary.databinding.FragmentCalendarBinding;
-import com.websarva.wings.android.zuboradiary.data.DateTimeStringConverter;
 import com.websarva.wings.android.zuboradiary.ui.BaseFragment;
 import com.websarva.wings.android.zuboradiary.ui.diary.DiaryLiveData;
 import com.websarva.wings.android.zuboradiary.ui.diary.diaryshow.DiaryShowFragment;
-
-import com.kizitonwose.calendar.view.CalendarView;
 import com.websarva.wings.android.zuboradiary.ui.diary.diaryshow.DiaryShowViewModel;
 
 import java.time.DayOfWeek;
@@ -561,7 +560,10 @@ public class CalendarFragment extends BaseFragment {
         NavDirections action =
                 CalendarFragmentDirections
                         .actionNavigationCalendarFragmentToDiaryEditFragment(
-                                true, true, date);
+                                true,
+                                true,
+                                date
+                        );
         navController.navigate(action);
     }
 

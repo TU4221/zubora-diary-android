@@ -1,7 +1,5 @@
 package com.websarva.wings.android.zuboradiary.ui.diary.diaryedit;
 
-import android.util.Log;
-
 import androidx.annotation.NonNull;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
@@ -73,7 +71,9 @@ public class DiaryEditViewModel extends BaseViewModel {
         if (requestsLoadingDiary) {
             try {
                 loadSavedDiary(date);
-            } catch (CancellationException | ExecutionException | InterruptedException | NoSuchElementException e) {
+            } catch (NoSuchElementException e) {
+                updateDate(date);
+            } catch (CancellationException | ExecutionException | InterruptedException e) {
                 addAppError(AppError.DIARY_LOADING);
                 return;
             }

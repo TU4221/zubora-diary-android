@@ -4,20 +4,6 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.view.ContextThemeWrapper;
-import androidx.appcompat.widget.Toolbar;
-import androidx.constraintlayout.motion.widget.MotionLayout;
-import androidx.databinding.ViewDataBinding;
-import androidx.lifecycle.Lifecycle;
-import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.Observer;
-import androidx.lifecycle.SavedStateHandle;
-import androidx.lifecycle.ViewModelProvider;
-import androidx.navigation.NavDirections;
-
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -33,23 +19,34 @@ import android.widget.ImageButton;
 import android.widget.ListAdapter;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.view.ContextThemeWrapper;
+import androidx.appcompat.widget.Toolbar;
+import androidx.constraintlayout.motion.widget.MotionLayout;
+import androidx.databinding.ViewDataBinding;
+import androidx.lifecycle.Lifecycle;
+import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.SavedStateHandle;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.NavDirections;
+
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
+import com.websarva.wings.android.zuboradiary.R;
 import com.websarva.wings.android.zuboradiary.data.DateTimeStringConverter;
 import com.websarva.wings.android.zuboradiary.data.diary.Condition;
 import com.websarva.wings.android.zuboradiary.data.diary.ItemNumber;
 import com.websarva.wings.android.zuboradiary.data.diary.Weather;
-import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor;
+import com.websarva.wings.android.zuboradiary.data.network.GeoCoordinates;
 import com.websarva.wings.android.zuboradiary.databinding.FragmentDiaryEditBinding;
-import com.websarva.wings.android.zuboradiary.R;
 import com.websarva.wings.android.zuboradiary.ui.BaseFragment;
 import com.websarva.wings.android.zuboradiary.ui.KeyboardInitializer;
 import com.websarva.wings.android.zuboradiary.ui.TestDiariesSaver;
 import com.websarva.wings.android.zuboradiary.ui.TextInputSetup;
 import com.websarva.wings.android.zuboradiary.ui.diary.DiaryLiveData;
 import com.websarva.wings.android.zuboradiary.ui.diary.diaryitemtitleedit.DiaryItemTitleEditFragment;
-import com.websarva.wings.android.zuboradiary.data.network.GeoCoordinates;
-import com.websarva.wings.android.zuboradiary.ui.settings.SettingsViewModel;
 
 import org.jetbrains.annotations.Unmodifiable;
 
@@ -249,10 +246,11 @@ public class DiaryEditFragment extends BaseFragment {
         if (!diaryEditViewModel.getHasPreparedDiary()) {
             LocalDate diaryDate =
                     DiaryEditFragmentArgs.fromBundle(requireArguments()).getDate();
-            boolean isLoadingExistingDiary =
+            Objects.requireNonNull(diaryDate);
+            boolean requiresLoadingExistedDiary =
                     DiaryEditFragmentArgs.fromBundle(requireArguments()).getRequiresLoadingExistedDiary();
-            diaryEditViewModel.prepareDiary(diaryDate, isLoadingExistingDiary);
-            if (!isLoadingExistingDiary) fetchWeatherInformation(diaryDate,false);
+            diaryEditViewModel.prepareDiary(diaryDate, requiresLoadingExistedDiary);
+            if (!requiresLoadingExistedDiary) fetchWeatherInformation(diaryDate,false);
         }
     }
 
