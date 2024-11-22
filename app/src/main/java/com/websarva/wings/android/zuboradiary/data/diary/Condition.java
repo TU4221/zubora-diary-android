@@ -11,12 +11,12 @@ import java.util.Objects;
 
 public enum Condition {
 
-    UNKNOWN(0, R.string.enum_conditions_unknown),
-    HAPPY(1, R.string.enum_conditions_happy),
-    GOOD(2, R.string.enum_conditions_good),
-    AVERAGE(3, R.string.enum_conditions_average),
-    POOR(4, R.string.enum_conditions_poor),
-    BAD(5, R.string.enum_conditions_bad);
+    UNKNOWN(0, R.string.enum_condition_unknown),
+    HAPPY(1, R.string.enum_condition_happy),
+    GOOD(2, R.string.enum_condition_good),
+    AVERAGE(3, R.string.enum_condition_average),
+    POOR(4, R.string.enum_condition_poor),
+    BAD(5, R.string.enum_condition_bad);
 
     private final int number;
     private final int stringResId;

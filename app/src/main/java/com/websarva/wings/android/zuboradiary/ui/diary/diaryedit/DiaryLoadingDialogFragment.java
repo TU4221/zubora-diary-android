@@ -6,32 +6,30 @@ import androidx.annotation.NonNull;
 
 import com.websarva.wings.android.zuboradiary.R;
 import com.websarva.wings.android.zuboradiary.data.DateTimeStringConverter;
-import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor;
 import com.websarva.wings.android.zuboradiary.ui.BaseAlertDialogFragment;
 
 import java.time.LocalDate;
 import java.util.Objects;
 
-public class UpdateExistingDiaryDialogFragment extends BaseAlertDialogFragment {
-
+public class DiaryLoadingDialogFragment extends BaseAlertDialogFragment {
     private static final String fromClassName =
-            "From" + UpdateExistingDiaryDialogFragment.class.getName();
+            "From" + DiaryLoadingDialogFragment.class.getName();
     static final String KEY_SELECTED_BUTTON = "SelectedButton" + fromClassName;
 
     @Override
     protected String createTitle() {
-        return getString(R.string.dialog_update_Existing_diary_title);
+        return getString(R.string.dialog_diary_loading_title);
     }
 
     @Override
     protected String createMessage() {
-        LocalDate updateDiaryDate =
-                UpdateExistingDiaryDialogFragmentArgs.fromBundle(requireArguments()).getDate();
-        Objects.requireNonNull(updateDiaryDate);
+        LocalDate diaryDate =
+                DiaryLoadingDialogFragmentArgs.fromBundle(requireArguments()).getDate();
+        Objects.requireNonNull(diaryDate);
 
         DateTimeStringConverter converter = new DateTimeStringConverter();
-        String updateDiaryDateString = converter.toYearMonthDayWeek(updateDiaryDate);
-        return updateDiaryDateString + getString(R.string.dialog_update_Existing_diary_message);
+        String diaryDateString = converter.toYearMonthDayWeek(diaryDate);
+        return diaryDateString + getString(R.string.dialog_diary_loading_message);
     }
 
     @Override
@@ -41,7 +39,7 @@ public class UpdateExistingDiaryDialogFragment extends BaseAlertDialogFragment {
 
     @Override
     protected void handleOnNegativeButtonClick(@NonNull DialogInterface dialog, int which) {
-        // 処理なし
+        setResult(KEY_SELECTED_BUTTON, DialogInterface.BUTTON_NEGATIVE);
     }
 
     @Override
@@ -51,7 +49,7 @@ public class UpdateExistingDiaryDialogFragment extends BaseAlertDialogFragment {
 
     @Override
     protected void handleOnCancel(@NonNull DialogInterface dialog) {
-        // 処理なし
+        setResult(KEY_SELECTED_BUTTON, DialogInterface.BUTTON_NEGATIVE);
     }
 
     @Override

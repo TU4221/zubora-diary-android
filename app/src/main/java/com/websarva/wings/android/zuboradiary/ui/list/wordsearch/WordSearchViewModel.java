@@ -7,7 +7,7 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
 import com.google.common.util.concurrent.ListenableFuture;
-import com.websarva.wings.android.zuboradiary.data.AppError;
+import com.websarva.wings.android.zuboradiary.data.AppMessage;
 import com.websarva.wings.android.zuboradiary.data.database.DiaryRepository;
 import com.websarva.wings.android.zuboradiary.data.database.WordSearchResultListItem;
 import com.websarva.wings.android.zuboradiary.ui.BaseViewModel;
@@ -140,18 +140,18 @@ public class WordSearchViewModel extends BaseViewModel {
             } catch (ExecutionException e) {
                 e.printStackTrace();
                 wordSearchResultList.postValue(previousResultList);
-                addAppError(AppError.DIARY_LOADING);
+                addAppMessage(AppMessage.DIARY_LOADING_ERROR);
             } catch (InterruptedException e) {
                 e.printStackTrace();
                 if (!isValidityDelay) {
                     // TODO:ProgressBarを表示させる為に仮で記述
                     wordSearchResultList.postValue(previousResultList);
-                    addAppError(AppError.DIARY_LOADING);
+                    addAppMessage(AppMessage.DIARY_LOADING_ERROR);
                 }
             } catch (Exception e) {
                 e.printStackTrace();
                 wordSearchResultList.postValue(previousResultList);
-                addAppError(AppError.DIARY_LOADING);
+                addAppMessage(AppMessage.DIARY_LOADING_ERROR);
             }
         }
     }

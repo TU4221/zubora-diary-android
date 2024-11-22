@@ -1,63 +1,61 @@
 package com.websarva.wings.android.zuboradiary.ui;
 
-import android.os.Handler;
 import android.os.Looper;
-import android.util.Log;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
-import com.websarva.wings.android.zuboradiary.data.AppError;
-import com.websarva.wings.android.zuboradiary.data.AppErrorList;
+import com.websarva.wings.android.zuboradiary.data.AppMessage;
+import com.websarva.wings.android.zuboradiary.data.AppMessageList;
 
 import java.util.Objects;
 
 public abstract class BaseViewModel extends ViewModel {
 
-    private final MutableLiveData<AppErrorList> appErrorBufferList = new MutableLiveData<>();
+    private final MutableLiveData<AppMessageList> appMessageBufferList = new MutableLiveData<>();
 
     protected void initialize() {
-        appErrorBufferList.setValue(new AppErrorList());
+        appMessageBufferList.setValue(new AppMessageList());
     }
 
-    protected final void addAppError(AppError appError) {
-        Objects.requireNonNull(appError);
+    protected final void addAppMessage(AppMessage appMessage) {
+        Objects.requireNonNull(appMessage);
 
-        AppErrorList currentList = appErrorBufferList.getValue();
+        AppMessageList currentList = appMessageBufferList.getValue();
         Objects.requireNonNull(currentList);
-        AppErrorList updateList = currentList.addAppError(appError);
+        AppMessageList updateList = currentList.add(appMessage);
 
         boolean isMainThread = (Looper.getMainLooper().getThread() == Thread.currentThread());
         if (isMainThread) {
-            appErrorBufferList.setValue(updateList);
+            appMessageBufferList.setValue(updateList);
         } else {
-            appErrorBufferList.postValue(updateList);
+            appMessageBufferList.postValue(updateList);
         }
     }
 
-    public final void triggerAppErrorBufferListObserver() {
-        AppErrorList currentList = appErrorBufferList.getValue();
-        appErrorBufferList.setValue(new AppErrorList());
-        appErrorBufferList.setValue(currentList);
+    public final void triggerAppMessageBufferListObserver() {
+        AppMessageList currentList = appMessageBufferList.getValue();
+        appMessageBufferList.setValue(new AppMessageList());
+        appMessageBufferList.setValue(currentList);
     }
 
-    public final void removeAppErrorBufferListFirstItem() {
-        AppErrorList currentList = appErrorBufferList.getValue();
+    public final void removeAppMessageBufferListFirstItem() {
+        AppMessageList currentList = appMessageBufferList.getValue();
         Objects.requireNonNull(currentList);
-        AppErrorList updateList = currentList.removeFirstAppError();
-        appErrorBufferList.setValue(updateList);
+        AppMessageList updateList = currentList.removeFirstItem();
+        appMessageBufferList.setValue(updateList);
     }
 
-    protected final boolean equalLastAppError(AppError appError) {
-        Objects.requireNonNull(appError);
+    protected final boolean equalLastAppMessage(AppMessage appMessage) {
+        Objects.requireNonNull(appMessage);
 
-        AppErrorList currentList = appErrorBufferList.getValue();
+        AppMessageList currentList = appMessageBufferList.getValue();
         Objects.requireNonNull(currentList);
-        return currentList.equalLastAppError(appError);
+        return currentList.equalLastItem(appMessage);
     }
 
-    public final LiveData<AppErrorList> getAppErrorBufferListLiveData() {
-        return appErrorBufferList;
+    public final LiveData<AppMessageList> getAppMessageBufferListLiveData() {
+        return appMessageBufferList;
     }
 }

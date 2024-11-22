@@ -10,7 +10,7 @@ import androidx.lifecycle.MutableLiveData;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
-import com.websarva.wings.android.zuboradiary.data.AppError;
+import com.websarva.wings.android.zuboradiary.data.AppMessage;
 import com.websarva.wings.android.zuboradiary.data.database.DiaryRepository;
 import com.websarva.wings.android.zuboradiary.ui.BaseViewModel;
 
@@ -71,9 +71,9 @@ class CalendarViewModel extends BaseViewModel {
             public void onFailure(@NonNull Throwable t) {
                 // MEMO:CalendarViewModel#hasDiary()はカレンダー日数分連続で処理する為、
                 //      エラーが連続で発生した場合、膨大なエラーを記録してしまう。これを回避する為に下記コードを記述。
-                if (equalLastAppError(AppError.DIARY_INFORMATION_LOADING)) return;
+                if (equalLastAppMessage(AppMessage.DIARY_INFO_LOADING_ERROR)) return;
 
-                addAppError(AppError.DIARY_INFORMATION_LOADING);
+                addAppMessage(AppMessage.DIARY_INFO_LOADING_ERROR);
             }
         }, new MainThreadExecutor());
     }

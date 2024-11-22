@@ -4,7 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
-import com.websarva.wings.android.zuboradiary.data.AppError;
+import com.websarva.wings.android.zuboradiary.data.AppMessage;
 import com.websarva.wings.android.zuboradiary.data.database.DiaryEntity;
 import com.websarva.wings.android.zuboradiary.data.database.DiaryItemTitleSelectionHistoryItemEntity;
 import com.websarva.wings.android.zuboradiary.data.database.DiaryRepository;
@@ -65,16 +65,16 @@ public class DiaryEditViewModel extends BaseViewModel {
         isShowingItemTitleEditFragment = false;
     }
 
-    void prepareDiary(LocalDate date, boolean requestsLoadingDiary) {
+    void prepareDiary(LocalDate date, boolean requiresDiaryLoading) {
         Objects.requireNonNull(date);
 
-        if (requestsLoadingDiary) {
+        if (requiresDiaryLoading) {
             try {
                 loadSavedDiary(date);
             } catch (NoSuchElementException e) {
                 updateDate(date);
             } catch (CancellationException | ExecutionException | InterruptedException e) {
-                addAppError(AppError.DIARY_LOADING);
+                addAppMessage(AppMessage.DIARY_LOADING_ERROR);
                 return;
             }
         } else {
@@ -110,7 +110,7 @@ public class DiaryEditViewModel extends BaseViewModel {
         try {
             return diaryRepository.existsDiary(date).get();
         } catch (ExecutionException | InterruptedException e) {
-            addAppError(AppError.DIARY_LOADING);
+            addAppMessage(AppMessage.DIARY_LOADING_ERROR);
             return false;
         }
     }
@@ -129,7 +129,7 @@ public class DiaryEditViewModel extends BaseViewModel {
                 diaryRepository.saveDiary(diaryEntity, diaryItemTitleSelectionHistoryItemEntityList).get();
             }
         } catch (CancellationException | ExecutionException | InterruptedException e) {
-            addAppError(AppError.DIARY_SAVING);
+            addAppMessage(AppMessage.DIARY_SAVING_ERROR);
             return false;
         }
         return true;
@@ -167,7 +167,7 @@ public class DiaryEditViewModel extends BaseViewModel {
         try {
             diaryRepository.deleteDiary(deleteDate).get();
         } catch (CancellationException | ExecutionException | InterruptedException e) {
-            addAppError(AppError.DIARY_DELETE);
+            addAppMessage(AppMessage.DIARY_DELETE_ERROR);
             return false;
         }
         return true;
@@ -243,7 +243,7 @@ public class DiaryEditViewModel extends BaseViewModel {
         try {
             executorService.submit(new CustomWeatherApiCallable(weatherApiResponseCall)).get();
         } catch (ExecutionException | InterruptedException e) {
-            addAppError(AppError.WEATHER_INFORMATION_LOADING);
+            addAppMessage(AppMessage.WEATHER_INFO_LOADING_ERROR);
         }
 
     }
@@ -261,12 +261,12 @@ public class DiaryEditViewModel extends BaseViewModel {
 
         @Override
         public void onFailure() {
-            addAppError(AppError.WEATHER_INFORMATION_LOADING);
+            addAppMessage(AppMessage.WEATHER_INFO_LOADING_ERROR);
         }
 
         @Override
         public void onException(@NonNull Exception e) {
-            addAppError(AppError.WEATHER_INFORMATION_LOADING);
+            addAppMessage(AppMessage.WEATHER_INFO_LOADING_ERROR);
         }
     }
 
@@ -292,8 +292,8 @@ public class DiaryEditViewModel extends BaseViewModel {
         isShowingItemTitleEditFragment = isShowing;
     }
 
-    void addWeatherInfoFetchError() {
-        addAppError(AppError.WEATHER_INFORMATION_LOADING);
+    void addWeatherInfoFetchErrorMessage() {
+        addAppMessage(AppMessage.WEATHER_INFO_LOADING_ERROR);
     }
 
     // Getter

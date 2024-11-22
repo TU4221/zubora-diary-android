@@ -5,25 +5,22 @@ import android.content.DialogInterface;
 import androidx.annotation.NonNull;
 
 import com.websarva.wings.android.zuboradiary.R;
-import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor;
 import com.websarva.wings.android.zuboradiary.ui.BaseAlertDialogFragment;
 
-import java.util.Objects;
-
-public class AllSettingsInitializationConfirmationDialogFragment extends BaseAlertDialogFragment {
+public class AllSettingsInitializationDialogFragment extends BaseAlertDialogFragment {
 
     private static final String FROM_CLASS_NAME =
-            "From" + AllSettingsInitializationConfirmationDialogFragment.class.getName();
+            "From" + AllSettingsInitializationDialogFragment.class.getName();
     static final String KEY_SELECTED_BUTTON = "SelectedButton" + FROM_CLASS_NAME;
 
     @Override
     protected String createTitle() {
-        return getString(R.string.dialog_all_settings_initialization_confirmation_title);
+        return getString(R.string.dialog_all_settings_initialization_title);
     }
 
     @Override
     protected String createMessage() {
-        return getString(R.string.dialog_all_settings_initialization_confirmation_message);
+        return getString(R.string.dialog_all_settings_initialization_message);
     }
 
     @Override

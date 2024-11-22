@@ -2,6 +2,12 @@ package com.websarva.wings.android.zuboradiary.ui.diary.diaryitemtitleedit;
 
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.EditText;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -12,21 +18,13 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavBackStackEntry;
 import androidx.navigation.NavDirections;
 
-import android.text.Editable;
-import android.text.TextWatcher;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.EditText;
-
 import com.google.android.material.textfield.TextInputLayout;
 import com.websarva.wings.android.zuboradiary.R;
+import com.websarva.wings.android.zuboradiary.data.AppMessage;
 import com.websarva.wings.android.zuboradiary.data.diary.ItemNumber;
-import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor;
 import com.websarva.wings.android.zuboradiary.databinding.FragmentDiaryItemTitleEditBinding;
 import com.websarva.wings.android.zuboradiary.ui.BaseFragment;
 import com.websarva.wings.android.zuboradiary.ui.TextInputSetup;
-import com.websarva.wings.android.zuboradiary.ui.settings.SettingsViewModel;
 
 import java.util.Objects;
 
@@ -93,31 +91,31 @@ public class DiaryItemTitleEditFragment extends BaseFragment {
 
     @Override
     protected void handleOnReceivingDialogResult(@NonNull SavedStateHandle savedStateHandle) {
-        receiveDeleteConfirmationDialogResult(savedStateHandle);
-        retryOtherErrorDialogShow();
+        receiveDiaryItemTitleDeleteDialogResult(savedStateHandle);
+        retryOtherAppMessageDialogShow();
     }
 
     @Override
     protected void removeDialogResultOnDestroy(@NonNull SavedStateHandle savedStateHandle) {
-        savedStateHandle.remove(DiaryItemTitleDeleteConfirmationDialogFragment.KEY_SELECTED_BUTTON);
-        savedStateHandle.remove(DiaryItemTitleDeleteConfirmationDialogFragment.KEY_DELETE_LIST_ITEM_POSITION);
+        savedStateHandle.remove(DiaryItemTitleDeleteDialogFragment.KEY_SELECTED_BUTTON);
+        savedStateHandle.remove(DiaryItemTitleDeleteDialogFragment.KEY_DELETE_LIST_ITEM_POSITION);
     }
 
     @Override
-    protected void setUpOtherErrorMessageDialog() {
-        diaryItemTitleEditViewModel.getAppErrorBufferListLiveData()
-                .observe(getViewLifecycleOwner(), new AppErrorBufferListObserver(diaryItemTitleEditViewModel));
+    protected void setUpOtherAppMessageDialog() {
+        diaryItemTitleEditViewModel.getAppMessageBufferListLiveData()
+                .observe(getViewLifecycleOwner(), new AppMessageBufferListObserver(diaryItemTitleEditViewModel));
     }
 
     // 履歴項目削除確認ダイアログからの結果受取
-    private void receiveDeleteConfirmationDialogResult(SavedStateHandle savedStateHandle) {
+    private void receiveDiaryItemTitleDeleteDialogResult(SavedStateHandle savedStateHandle) {
         Integer selectedButton =
-                receiveResulFromDialog(DiaryItemTitleDeleteConfirmationDialogFragment.KEY_SELECTED_BUTTON);
+                receiveResulFromDialog(DiaryItemTitleDeleteDialogFragment.KEY_SELECTED_BUTTON);
         if (selectedButton == null) return;
 
         if (selectedButton == DialogInterface.BUTTON_POSITIVE) {
             Integer deleteListItemPosition =
-                    receiveResulFromDialog(DiaryItemTitleDeleteConfirmationDialogFragment.KEY_DELETE_LIST_ITEM_POSITION);
+                    receiveResulFromDialog(DiaryItemTitleDeleteDialogFragment.KEY_DELETE_LIST_ITEM_POSITION);
             Objects.requireNonNull(deleteListItemPosition);
 
             diaryItemTitleEditViewModel
@@ -229,7 +227,7 @@ public class DiaryItemTitleEditFragment extends BaseFragment {
         itemTitleSelectionHistoryListAdapter.setOnClickDeleteButtonListener(new ItemTitleSelectionHistoryListAdapter.OnClickDeleteButtonListener() {
             @Override
             public void onClick(int position, @NonNull String title) {
-                showDeleteConfirmationDialog(position, title);
+                showDiaryItemTitleDeleteDialog(position, title);
             }
         });
 
@@ -267,7 +265,7 @@ public class DiaryItemTitleEditFragment extends BaseFragment {
     }
 
     private void showDiaryEditFragment() {
-        if (!canShowOtherFragment()) return;
+        if (!canShowFragment()) return;
 
         NavDirections action =
                 DiaryItemTitleEditFragmentDirections
@@ -275,14 +273,14 @@ public class DiaryItemTitleEditFragment extends BaseFragment {
         navController.navigate(action);
     }
 
-    private void showDeleteConfirmationDialog(int listItemPosition, String listItemTitle) {
+    private void showDiaryItemTitleDeleteDialog(int listItemPosition, String listItemTitle) {
         Objects.requireNonNull(listItemTitle);
         if (listItemPosition < 0) throw new IllegalArgumentException();
-        if (!canShowOtherFragment()) return;
+        if (!canShowFragment()) return;
 
         NavDirections action =
                 DiaryItemTitleEditFragmentDirections
-                        .actionDiaryItemTitleEditFragmentToDiaryItemTitleDeleteConfirmationDialog(
+                        .actionDiaryItemTitleEditFragmentToDiaryItemTitleDeleteDialog(
                                 listItemPosition,
                                 listItemTitle
                         );
@@ -290,16 +288,16 @@ public class DiaryItemTitleEditFragment extends BaseFragment {
     }
 
     @Override
-    protected void showMessageDialog(@NonNull String title, @NonNull String message) {
+    protected void navigateAppMessageDialog(@NonNull AppMessage appMessage) {
         NavDirections action =
                 DiaryItemTitleEditFragmentDirections
-                        .actionDiaryItemTitleEditFragmentToMessageDialog(title, message);
+                        .actionDiaryItemTitleEditFragmentToAppMessageDialog(appMessage);
         navController.navigate(action);
     }
 
     @Override
-    protected void retryOtherErrorDialogShow() {
-        diaryItemTitleEditViewModel.triggerAppErrorBufferListObserver();
+    protected void retryOtherAppMessageDialogShow() {
+        diaryItemTitleEditViewModel.triggerAppMessageBufferListObserver();
     }
 
     @Override

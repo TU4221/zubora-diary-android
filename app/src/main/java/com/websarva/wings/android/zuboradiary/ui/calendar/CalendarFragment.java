@@ -20,19 +20,21 @@ import com.google.common.util.concurrent.FutureCallback;
 import com.kizitonwose.calendar.core.CalendarDay;
 import com.kizitonwose.calendar.core.CalendarMonth;
 import com.kizitonwose.calendar.core.DayPosition;
-import com.kizitonwose.calendar.view.CalendarView;
 import com.kizitonwose.calendar.view.MonthDayBinder;
 import com.kizitonwose.calendar.view.MonthHeaderFooterBinder;
 import com.kizitonwose.calendar.view.ViewContainer;
 import com.websarva.wings.android.zuboradiary.R;
-import com.websarva.wings.android.zuboradiary.data.DateTimeStringConverter;
+import com.websarva.wings.android.zuboradiary.data.AppMessage;
 import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor;
 import com.websarva.wings.android.zuboradiary.databinding.CalendarDayBinding;
 import com.websarva.wings.android.zuboradiary.databinding.CalendarHeaderBinding;
 import com.websarva.wings.android.zuboradiary.databinding.FragmentCalendarBinding;
+import com.websarva.wings.android.zuboradiary.data.DateTimeStringConverter;
 import com.websarva.wings.android.zuboradiary.ui.BaseFragment;
 import com.websarva.wings.android.zuboradiary.ui.diary.DiaryLiveData;
 import com.websarva.wings.android.zuboradiary.ui.diary.diaryshow.DiaryShowFragment;
+
+import com.kizitonwose.calendar.view.CalendarView;
 import com.websarva.wings.android.zuboradiary.ui.diary.diaryshow.DiaryShowViewModel;
 
 import java.time.DayOfWeek;
@@ -114,7 +116,7 @@ public class CalendarFragment extends BaseFragment {
 
     @Override
     protected void handleOnReceivingDialogResult(@NonNull SavedStateHandle savedStateHandle) {
-        retryOtherErrorDialogShow();
+        retryOtherAppMessageDialogShow();
     }
 
     @Override
@@ -123,11 +125,11 @@ public class CalendarFragment extends BaseFragment {
     }
 
     @Override
-    protected void setUpOtherErrorMessageDialog() {
-        calendarViewModel.getAppErrorBufferListLiveData()
-                .observe(getViewLifecycleOwner(), new AppErrorBufferListObserver(calendarViewModel));
-        diaryShowViewModel.getAppErrorBufferListLiveData()
-                .observe(getViewLifecycleOwner(), new AppErrorBufferListObserver(diaryShowViewModel));
+    protected void setUpOtherAppMessageDialog() {
+        calendarViewModel.getAppMessageBufferListLiveData()
+                .observe(getViewLifecycleOwner(), new AppMessageBufferListObserver(calendarViewModel));
+        diaryShowViewModel.getAppMessageBufferListLiveData()
+                .observe(getViewLifecycleOwner(), new AppMessageBufferListObserver(diaryShowViewModel));
     }
 
     private void setUpCalendar() {
@@ -555,7 +557,7 @@ public class CalendarFragment extends BaseFragment {
 
     private void showDiaryEditFragment(LocalDate date) {
         Objects.requireNonNull(date);
-        if (!canShowOtherFragment()) return;
+        if (!canShowFragment()) return;
 
         NavDirections action =
                 CalendarFragmentDirections
@@ -568,17 +570,17 @@ public class CalendarFragment extends BaseFragment {
     }
 
     @Override
-    protected void showMessageDialog(@NonNull String title, @NonNull String message) {
+    protected void navigateAppMessageDialog(@NonNull AppMessage appMessage) {
         NavDirections action =
                 CalendarFragmentDirections
-                        .actionCalendarFragmentToMessageDialog(title, message);
+                        .actionCalendarFragmentToAppMessageDialog(appMessage);
         navController.navigate(action);
     }
 
     @Override
-    protected void retryOtherErrorDialogShow() {
-        calendarViewModel.triggerAppErrorBufferListObserver();
-        diaryShowViewModel.triggerAppErrorBufferListObserver();
+    protected void retryOtherAppMessageDialogShow() {
+        calendarViewModel.triggerAppMessageBufferListObserver();
+        diaryShowViewModel.triggerAppMessageBufferListObserver();
     }
 
     @Override

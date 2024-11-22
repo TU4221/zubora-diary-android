@@ -24,7 +24,6 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.materialswitch.MaterialSwitch;
 import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 

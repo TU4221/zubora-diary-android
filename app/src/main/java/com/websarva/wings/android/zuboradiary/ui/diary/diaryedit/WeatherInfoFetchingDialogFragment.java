@@ -6,32 +6,31 @@ import androidx.annotation.NonNull;
 
 import com.websarva.wings.android.zuboradiary.R;
 import com.websarva.wings.android.zuboradiary.data.DateTimeStringConverter;
-import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor;
 import com.websarva.wings.android.zuboradiary.ui.BaseAlertDialogFragment;
 
 import java.time.LocalDate;
 import java.util.Objects;
 
-public class WeatherInformationDialogFragment extends BaseAlertDialogFragment {
+public class WeatherInfoFetchingDialogFragment extends BaseAlertDialogFragment {
 
     private static final String fromClassName =
-            "From" + WeatherInformationDialogFragment.class.getName();
+            "From" + WeatherInfoFetchingDialogFragment.class.getName();
     static final String KEY_SELECTED_BUTTON = "SelectedButton" + fromClassName;
 
     @Override
     protected String createTitle() {
-        return getString(R.string.dialog_weather_information_title);
+        return getString(R.string.dialog_weather_info_fetching_title);
     }
 
     @Override
     protected String createMessage() {
         LocalDate loadingDiaryDate =
-                WeatherInformationDialogFragmentArgs.fromBundle(requireArguments()).getDate();
+                WeatherInfoFetchingDialogFragmentArgs.fromBundle(requireArguments()).getDate();
         Objects.requireNonNull(loadingDiaryDate);
 
         DateTimeStringConverter dateTimeStringConverter = new DateTimeStringConverter();
         String dateString = dateTimeStringConverter.toYearMonthDayWeek(loadingDiaryDate);
-        return dateString + getString(R.string.dialog_weather_information_message);
+        return dateString + getString(R.string.dialog_weather_info_fetching_message);
     }
 
     @Override

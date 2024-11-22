@@ -6,35 +6,31 @@ import androidx.annotation.NonNull;
 
 import com.websarva.wings.android.zuboradiary.R;
 import com.websarva.wings.android.zuboradiary.data.diary.ItemNumber;
-import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor;
 import com.websarva.wings.android.zuboradiary.ui.BaseAlertDialogFragment;
-import com.websarva.wings.android.zuboradiary.ui.MessageDialogFragmentArgs;
 
-import java.util.Objects;
-
-public class DiaryItemDeleteConfirmationDialogFragment extends BaseAlertDialogFragment {
+public class DiaryItemDeleteDialogFragment extends BaseAlertDialogFragment {
 
     private static final String fromClassName =
-            "From" + DiaryItemDeleteConfirmationDialogFragment.class.getName();
+            "From" + DiaryItemDeleteDialogFragment.class.getName();
     static final String KEY_DELETE_ITEM_NUMBER = "DeleteItemNumber" + fromClassName;
 
     @Override
     protected String createTitle() {
-        return getString(R.string.dialog_diary_item_delete_confirmation_title);
+        return getString(R.string.dialog_diary_item_delete_title);
     }
 
     @Override
     protected String createMessage() {
         ItemNumber deleteItemNumber =
-                DiaryItemDeleteConfirmationDialogFragmentArgs
+                DiaryItemDeleteDialogFragmentArgs
                         .fromBundle(requireArguments()).getItemNumber();
-        return getString(R.string.dialog_diary_item_delete_confirmation_first_message) + deleteItemNumber + getString(R.string.dialog_diary_item_delete_confirmation_second_message);
+        return getString(R.string.dialog_diary_item_delete_first_message) + deleteItemNumber + getString(R.string.dialog_diary_item_delete_second_message);
     }
 
     @Override
     protected void handleOnPositiveButtonClick(@NonNull DialogInterface dialog, int which) {
         ItemNumber deleteItemNumber =
-                DiaryItemDeleteConfirmationDialogFragmentArgs
+                DiaryItemDeleteDialogFragmentArgs
                         .fromBundle(requireArguments()).getItemNumber();
         setResult(KEY_DELETE_ITEM_NUMBER, deleteItemNumber);
     }

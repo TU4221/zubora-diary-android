@@ -18,6 +18,7 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavDirections;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.websarva.wings.android.zuboradiary.data.AppMessage;
 import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor;
 import com.websarva.wings.android.zuboradiary.databinding.FragmentWordSearchBinding;
 import com.websarva.wings.android.zuboradiary.ui.BaseFragment;
@@ -94,7 +95,7 @@ public class WordSearchFragment extends BaseFragment {
 
     @Override
     protected void handleOnReceivingDialogResult(@NonNull SavedStateHandle savedStateHandle) {
-        retryOtherErrorDialogShow();
+        retryOtherAppMessageDialogShow();
     }
 
     @Override
@@ -103,9 +104,9 @@ public class WordSearchFragment extends BaseFragment {
     }
 
     @Override
-    protected void setUpOtherErrorMessageDialog() {
-        wordSearchViewModel.getAppErrorBufferListLiveData()
-                .observe(getViewLifecycleOwner(), new AppErrorBufferListObserver(wordSearchViewModel));
+    protected void setUpOtherAppMessageDialog() {
+        wordSearchViewModel.getAppMessageBufferListLiveData()
+                .observe(getViewLifecycleOwner(), new AppMessageBufferListObserver(wordSearchViewModel));
     }
 
     private void setUpToolBar() {
@@ -303,7 +304,7 @@ public class WordSearchFragment extends BaseFragment {
 
     private void showShowDiaryFragment(LocalDate date) {
         Objects.requireNonNull(date);
-        if (!canShowOtherFragment()) return;
+        if (!canShowFragment()) return;
 
         NavDirections action =
                 WordSearchFragmentDirections
@@ -312,16 +313,16 @@ public class WordSearchFragment extends BaseFragment {
     }
 
     @Override
-    protected void showMessageDialog(@NonNull String title, @NonNull String message) {
+    protected void navigateAppMessageDialog(@NonNull AppMessage appMessage) {
         NavDirections action =
                 WordSearchFragmentDirections
-                        .actionWordSearchFragmentToMessageDialog(title, message);
+                        .actionWordSearchFragmentToAppMessageDialog(appMessage);
         navController.navigate(action);
     }
 
     @Override
-    protected void retryOtherErrorDialogShow() {
-        wordSearchViewModel.triggerAppErrorBufferListObserver();
+    protected void retryOtherAppMessageDialogShow() {
+        wordSearchViewModel.triggerAppMessageBufferListObserver();
     }
 
     @Override

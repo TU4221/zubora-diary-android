@@ -100,7 +100,7 @@
                 android:id="@+id/motionLayout_bottom_navigation"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:layoutDescription="@xml/activity_main_bottom_navigation_scene">
+                app:layoutDescription="@xml/motion_scene_activity_main_bottom_navigation">
 
                 <!-- MEMO:MotionLayoutタグ内にLayoutタグがないとMotionLayoutが機能しない。 -->
                 <LinearLayout

@@ -1,30 +1,36 @@
-package com.websarva.wings.android.zuboradiary.ui.settings;
+package com.websarva.wings.android.zuboradiary.ui.diary.diaryedit;
 
 import android.content.DialogInterface;
 
 import androidx.annotation.NonNull;
 
 import com.websarva.wings.android.zuboradiary.R;
-import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor;
+import com.websarva.wings.android.zuboradiary.data.DateTimeStringConverter;
 import com.websarva.wings.android.zuboradiary.ui.BaseAlertDialogFragment;
-import com.websarva.wings.android.zuboradiary.ui.list.diarylist.DiaryDeleteConfirmationDialogFragmentArgs;
 
+import java.time.LocalDate;
 import java.util.Objects;
 
-public class AllDataDeleteConfirmationDialogFragment extends BaseAlertDialogFragment {
+public class DiaryUpdateDialogFragment extends BaseAlertDialogFragment {
 
-    private static final String FROM_CLASS_NAME =
-            "From" + AllDataDeleteConfirmationDialogFragment.class.getName();
-    static final String KEY_SELECTED_BUTTON = "SelectedButton" + FROM_CLASS_NAME;
+    private static final String fromClassName =
+            "From" + DiaryUpdateDialogFragment.class.getName();
+    static final String KEY_SELECTED_BUTTON = "SelectedButton" + fromClassName;
 
     @Override
     protected String createTitle() {
-        return getString(R.string.dialog_all_data_delete_confirmation_title);
+        return getString(R.string.dialog_diary_update_title);
     }
 
     @Override
     protected String createMessage() {
-        return getString(R.string.dialog_all_data_delete_confirmation_message);
+        LocalDate updateDiaryDate =
+                DiaryUpdateDialogFragmentArgs.fromBundle(requireArguments()).getDate();
+        Objects.requireNonNull(updateDiaryDate);
+
+        DateTimeStringConverter converter = new DateTimeStringConverter();
+        String updateDiaryDateString = converter.toYearMonthDayWeek(updateDiaryDate);
+        return updateDiaryDateString + getString(R.string.dialog_diary_update_message);
     }
 
     @Override

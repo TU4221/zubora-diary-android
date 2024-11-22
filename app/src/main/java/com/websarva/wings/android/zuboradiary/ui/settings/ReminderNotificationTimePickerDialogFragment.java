@@ -6,13 +6,11 @@ import android.widget.NumberPicker;
 
 import androidx.annotation.NonNull;
 
-import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor;
 import com.websarva.wings.android.zuboradiary.databinding.DialogFragmentNumberPickersBinding;
 import com.websarva.wings.android.zuboradiary.ui.BaseNumberPickersBottomSheetDialogFragment;
 
 import java.time.LocalTime;
 import java.util.Locale;
-import java.util.Objects;
 
 // TODO:MaterialTimePickerに置き換える？
 public class ReminderNotificationTimePickerDialogFragment extends BaseNumberPickersBottomSheetDialogFragment {

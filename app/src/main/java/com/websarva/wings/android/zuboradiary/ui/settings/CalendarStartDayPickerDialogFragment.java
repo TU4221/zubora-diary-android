@@ -6,12 +6,10 @@ import android.view.View;
 import androidx.annotation.NonNull;
 
 import com.websarva.wings.android.zuboradiary.data.DayOfWeekStringConverter;
-import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor;
 import com.websarva.wings.android.zuboradiary.databinding.DialogFragmentNumberPickersBinding;
 import com.websarva.wings.android.zuboradiary.ui.BaseNumberPickersBottomSheetDialogFragment;
 
 import java.time.DayOfWeek;
-import java.util.Objects;
 
 public class CalendarStartDayPickerDialogFragment extends BaseNumberPickersBottomSheetDialogFragment {
 

@@ -4,7 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
-import com.websarva.wings.android.zuboradiary.data.AppError;
+import com.websarva.wings.android.zuboradiary.data.AppMessage;
 import com.websarva.wings.android.zuboradiary.data.database.DiaryItemTitleSelectionHistoryItemEntity;
 import com.websarva.wings.android.zuboradiary.data.database.DiaryItemTitleSelectionHistoryRepository;
 import com.websarva.wings.android.zuboradiary.data.diary.ItemNumber;
@@ -57,7 +57,7 @@ public class DiaryItemTitleEditViewModel extends BaseViewModel {
                     diaryItemTitleSelectionHistoryRepository
                             .loadSelectionHistory(MAX_LOADED_ITEM_TITLES,0).get();
         } catch (Exception e) {
-            addAppError(AppError.DIARY_ITEM_TITLE_HISTORY_LOADING);
+            addAppMessage(AppMessage.DIARY_ITEM_TITLE_HISTORY_LOADING_ERROR);
             return;
         }
         List<SelectionHistoryListItem> itemList = new ArrayList<>();
@@ -80,7 +80,7 @@ public class DiaryItemTitleEditViewModel extends BaseViewModel {
         try {
             diaryItemTitleSelectionHistoryRepository.deleteSelectionHistoryItem(deleteTitle).get();
         } catch (Exception e) {
-            addAppError(AppError.DIARY_ITEM_TITLE_HISTORY_ITEM_DELETE);
+            addAppMessage(AppMessage.DIARY_ITEM_TITLE_HISTORY_ITEM_DELETE_ERROR);
             return;
         }
 

@@ -6,7 +6,7 @@ import androidx.datastore.preferences.core.Preferences;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
-import com.websarva.wings.android.zuboradiary.data.AppError;
+import com.websarva.wings.android.zuboradiary.data.AppMessage;
 import com.websarva.wings.android.zuboradiary.data.database.DiaryRepository;
 import com.websarva.wings.android.zuboradiary.data.network.GeoCoordinates;
 import com.websarva.wings.android.zuboradiary.data.preferences.CalendarStartDayOfWeekPreference;
@@ -94,7 +94,7 @@ public class SettingsViewModel extends BaseViewModel {
                         },
                         throwable -> {
                             throwable.printStackTrace();
-                            addSettingLoadingError();
+                            addSettingLoadingErrorMessage();
                         }
                 )
         );
@@ -123,7 +123,7 @@ public class SettingsViewModel extends BaseViewModel {
                             },
                         throwable -> {
                             throwable.printStackTrace();
-                            addSettingLoadingError();
+                            addSettingLoadingErrorMessage();
                         }
                 )
         );
@@ -152,7 +152,7 @@ public class SettingsViewModel extends BaseViewModel {
                             },
                         throwable -> {
                             throwable.printStackTrace();
-                            addSettingLoadingError();
+                            addSettingLoadingErrorMessage();
                         }
                 )
         );
@@ -189,7 +189,7 @@ public class SettingsViewModel extends BaseViewModel {
                         },
                         throwable -> {
                             throwable.printStackTrace();
-                            addSettingLoadingError();
+                            addSettingLoadingErrorMessage();
                         }
                 )
         );
@@ -209,7 +209,7 @@ public class SettingsViewModel extends BaseViewModel {
                         },
                         throwable -> {
                             throwable.printStackTrace();
-                            addSettingLoadingError();
+                            addSettingLoadingErrorMessage();
                         }
                 )
         );
@@ -223,9 +223,9 @@ public class SettingsViewModel extends BaseViewModel {
         return weatherInfoAcquisitionPreferenceFlowable.blockingFirst(defaultValue).getIsChecked();
     }
 
-    private void addSettingLoadingError() {
-        if (equalLastAppError(AppError.SETTING_LOADING)) return;  // 設定更新エラー通知の重複防止
-        addAppError(AppError.SETTING_LOADING);
+    private void addSettingLoadingErrorMessage() {
+        if (equalLastAppMessage(AppMessage.SETTING_LOADING_ERROR)) return;  // 設定更新エラー通知の重複防止
+        addAppMessage(AppMessage.SETTING_LOADING_ERROR);
     }
 
     @Override
@@ -320,9 +320,9 @@ public class SettingsViewModel extends BaseViewModel {
             public void accept(Throwable throwable) {
                 Objects.requireNonNull(throwable);
 
-                AppError appError = AppError.SETTING_UPDATE;
-                if (equalLastAppError(appError)) return; // 設定更新エラー通知の重複防止
-                addAppError(appError);
+                AppMessage appMessage = AppMessage.SETTING_UPDATE_ERROR;
+                if (equalLastAppMessage(appMessage)) return; // 設定更新エラー通知の重複防止
+                addAppMessage(appMessage);
             }
         }));
     }
@@ -346,7 +346,7 @@ public class SettingsViewModel extends BaseViewModel {
         try {
             diaryRepository.deleteAllDiaries().get();
         } catch (CancellationException | ExecutionException | InterruptedException e) {
-            addAppError(AppError.DIARY_DELETE);
+            addAppMessage(AppMessage.DIARY_DELETE_ERROR);
         }
     }
 
@@ -359,7 +359,7 @@ public class SettingsViewModel extends BaseViewModel {
         try {
             diaryRepository.deleteAllData().get();
         } catch (CancellationException | ExecutionException | InterruptedException e) {
-            addAppError(AppError.DIARY_DELETE);
+            addAppMessage(AppMessage.DIARY_DELETE_ERROR);
         }
         deleteAllSettings();
     }

@@ -8,7 +8,7 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
 import com.google.common.util.concurrent.ListenableFuture;
-import com.websarva.wings.android.zuboradiary.data.AppError;
+import com.websarva.wings.android.zuboradiary.data.AppMessage;
 import com.websarva.wings.android.zuboradiary.data.database.DiaryEntity;
 import com.websarva.wings.android.zuboradiary.data.database.DiaryListItem;
 import com.websarva.wings.android.zuboradiary.data.database.DiaryRepository;
@@ -125,17 +125,17 @@ public class DiaryListViewModel extends BaseViewModel {
             } catch (ExecutionException e) {
                 e.printStackTrace();
                 diaryList.postValue(previousDiaryList);
-                addAppError(AppError.DIARY_LOADING);
+                addAppMessage(AppMessage.DIARY_LOADING_ERROR);
             } catch (InterruptedException e) {
                 e.printStackTrace();
                 if (!isValidityDelay) {
                     diaryList.postValue(previousDiaryList);
-                    addAppError(AppError.DIARY_LOADING);
+                    addAppMessage(AppMessage.DIARY_LOADING_ERROR);
                 }
             } catch (Exception e) {
                 e.printStackTrace();
                 diaryList.postValue(previousDiaryList);
-                addAppError(AppError.DIARY_LOADING);
+                addAppMessage(AppMessage.DIARY_LOADING_ERROR);
             }
         }
     }
@@ -254,14 +254,14 @@ public class DiaryListViewModel extends BaseViewModel {
         try {
             result = diaryRepository.deleteDiary(date).get();
         } catch (CancellationException | ExecutionException | InterruptedException e) {
-            addAppError(AppError.DIARY_DELETE);
+            addAppMessage(AppMessage.DIARY_DELETE_ERROR);
             return;
         }
         Objects.requireNonNull(result);
 
         // 削除件数 = 1が正常
         if (result != 1) {
-            addAppError(AppError.DIARY_DELETE);
+            addAppMessage(AppMessage.DIARY_DELETE_ERROR);
             return;
         }
 
@@ -273,7 +273,7 @@ public class DiaryListViewModel extends BaseViewModel {
         try {
             return diaryRepository.countDiaries().get();
         } catch (CancellationException | ExecutionException | InterruptedException e) {
-            addAppError(AppError.DIARY_INFORMATION_LOADING);
+            addAppMessage(AppMessage.DIARY_INFO_LOADING_ERROR);
             return null;
         }
     }
@@ -286,7 +286,7 @@ public class DiaryListViewModel extends BaseViewModel {
             String strDate = diaryEntity.getDate();
             return LocalDate.parse(strDate);
         } catch (Exception e) {
-            addAppError(AppError.DIARY_INFORMATION_LOADING);
+            addAppMessage(AppMessage.DIARY_INFO_LOADING_ERROR);
             return null;
         }
     }
@@ -298,7 +298,7 @@ public class DiaryListViewModel extends BaseViewModel {
             String strDate = diaryEntity.getDate();
             return LocalDate.parse(strDate);
         } catch (Exception e) {
-            addAppError(AppError.DIARY_INFORMATION_LOADING);
+            addAppMessage(AppMessage.DIARY_INFO_LOADING_ERROR);
             return null;
         }
     }

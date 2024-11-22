@@ -2,7 +2,7 @@ package com.websarva.wings.android.zuboradiary.ui.diary.diaryshow;
 
 import androidx.lifecycle.LiveData;
 
-import com.websarva.wings.android.zuboradiary.data.AppError;
+import com.websarva.wings.android.zuboradiary.data.AppMessage;
 import com.websarva.wings.android.zuboradiary.data.database.DiaryEntity;
 import com.websarva.wings.android.zuboradiary.data.database.DiaryRepository;
 import com.websarva.wings.android.zuboradiary.data.diary.Condition;
@@ -48,7 +48,7 @@ public class DiaryShowViewModel extends BaseViewModel {
         try {
             return diaryRepository.existsDiary(date).get();
         } catch (ExecutionException | InterruptedException e) {
-            addAppError(AppError.DIARY_INFORMATION_LOADING);
+            addAppMessage(AppMessage.DIARY_INFO_LOADING_ERROR);
             return false;
         }
     }
@@ -60,7 +60,7 @@ public class DiaryShowViewModel extends BaseViewModel {
             DiaryEntity diaryEntity = diaryRepository.loadDiary(date).get();
             diaryLiveData.update(diaryEntity);
         } catch (Exception e) {
-            addAppError(AppError.DIARY_LOADING);
+            addAppMessage(AppMessage.DIARY_LOADING_ERROR);
         }
     }
 
@@ -71,7 +71,7 @@ public class DiaryShowViewModel extends BaseViewModel {
         try {
             diaryRepository.deleteDiary(deleteDate).get();
         } catch (CancellationException | ExecutionException | InterruptedException  e) {
-            addAppError(AppError.DIARY_DELETE);
+            addAppMessage(AppMessage.DIARY_DELETE_ERROR);
         }
     }
 

@@ -24,8 +24,8 @@ import androidx.navigation.fragment.NavHostFragment;
 import com.google.android.material.transition.platform.MaterialFadeThrough;
 import com.google.android.material.transition.platform.MaterialSharedAxis;
 import com.websarva.wings.android.zuboradiary.MainActivity;
-import com.websarva.wings.android.zuboradiary.data.AppError;
-import com.websarva.wings.android.zuboradiary.data.AppErrorList;
+import com.websarva.wings.android.zuboradiary.data.AppMessage;
+import com.websarva.wings.android.zuboradiary.data.AppMessageList;
 import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor;
 import com.websarva.wings.android.zuboradiary.ui.settings.SettingsViewModel;
 
@@ -176,8 +176,8 @@ public abstract class BaseFragment extends CustomFragment {
         super.onViewCreated(view, savedInstanceState);
         setUpPreviousFragmentResultReceiver();
         setUpDialogResultReceiver();
-        setUpSettingsErrorMessageDialog();
-        setUpOtherErrorMessageDialog();
+        setUpSettingsAppMessageDialog();
+        setUpOtherAppMessageDialog();
     }
 
     @NonNull
@@ -214,8 +214,8 @@ public abstract class BaseFragment extends CustomFragment {
                 if (event.equals(Lifecycle.Event.ON_RESUME)) {
                     SavedStateHandle savedStateHandle = navBackStackEntry.getSavedStateHandle();
                     handleOnReceivingDialogResult(savedStateHandle);
-                    retrySettingsErrorDialogShow();
-                    retryOtherErrorDialogShow();
+                    retrySettingsAppMessageDialogShow();
+                    retryOtherAppMessageDialogShow();
                     removeDialogResultOnDestroy(savedStateHandle);
                 }
             }
@@ -259,60 +259,58 @@ public abstract class BaseFragment extends CustomFragment {
         return savedStateHandle.get(key);
     }
 
-    private void setUpSettingsErrorMessageDialog() {
-        settingsViewModel.getAppErrorBufferListLiveData()
-                .observe(getViewLifecycleOwner(), new AppErrorBufferListObserver(settingsViewModel));
+    private void setUpSettingsAppMessageDialog() {
+        settingsViewModel.getAppMessageBufferListLiveData()
+                .observe(getViewLifecycleOwner(), new AppMessageBufferListObserver(settingsViewModel));
     }
 
     /**
      * BaseFragment#setUpDialogResultReceiver()で呼び出される。
-     * BaseViewModelのAppErrorBufferListのObserverを設定する。
+     * BaseViewModelのAppMessageBufferListのObserverを設定する。
      * */
-    protected abstract void setUpOtherErrorMessageDialog();
+    protected abstract void setUpOtherAppMessageDialog();
 
-    protected final class AppErrorBufferListObserver implements Observer<AppErrorList> {
+    protected final class AppMessageBufferListObserver implements Observer<AppMessageList> {
 
         BaseViewModel baseViewModel;
 
-        public AppErrorBufferListObserver(BaseViewModel baseViewModel) {
+        public AppMessageBufferListObserver(BaseViewModel baseViewModel) {
             Objects.requireNonNull(baseViewModel);
 
             this.baseViewModel = baseViewModel;
         }
 
         @Override
-        public void onChanged(AppErrorList appErrorList) {
-            Objects.requireNonNull(appErrorList);
-            if (appErrorList.isEmpty()) return;
+        public void onChanged(AppMessageList appMessageList) {
+            Objects.requireNonNull(appMessageList);
+            if (appMessageList.isEmpty()) return;
 
-            AppError firstAppError = appErrorList.findFirstAppError();
-            showErrorMessageDialog(firstAppError);
-            baseViewModel.removeAppErrorBufferListFirstItem();
+            AppMessage firstAppMessage = appMessageList.findFirstItem();
+            showAppMessageDialog(firstAppMessage);
+            baseViewModel.removeAppMessageBufferListFirstItem();
         }
     }
 
-    private void showErrorMessageDialog(AppError appError) {
-        Objects.requireNonNull(appError);
-        if (!canShowOtherFragment()) return;
+    private void showAppMessageDialog(AppMessage appMessage) {
+        Objects.requireNonNull(appMessage);
+        if (!canShowFragment()) return;
 
-        String dialogTitle = appError.getDialogTitle(requireContext());
-        String dialogMessage = appError.getDialogMessage(requireContext());
-        showMessageDialog(dialogTitle, dialogMessage);
+        navigateAppMessageDialog(appMessage);
     }
 
-    protected final boolean canShowOtherFragment() {
+    protected final boolean canShowFragment() {
         return destinationId == getCurrentDestinationId();
     }
 
     /**
-     * BaseFragment#showErrorMessageDialog()で呼び出される。
+     * BaseFragment#showAppMessageDialog()で呼び出される。
      * */
-    protected abstract void showMessageDialog(@NonNull String title,@NonNull  String message);
+    protected abstract void navigateAppMessageDialog(@NonNull AppMessage appMessage);
 
-    protected abstract void retryOtherErrorDialogShow();
+    protected abstract void retryOtherAppMessageDialogShow();
 
-    protected void retrySettingsErrorDialogShow() {
-        settingsViewModel.triggerAppErrorBufferListObserver();
+    private void retrySettingsAppMessageDialogShow() {
+        settingsViewModel.triggerAppMessageBufferListObserver();
     }
 
     @Override

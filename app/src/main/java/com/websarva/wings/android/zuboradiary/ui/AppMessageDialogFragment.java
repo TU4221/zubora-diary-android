@@ -5,21 +5,28 @@ import android.content.DialogInterface;
 import androidx.annotation.NonNull;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
-import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor;
-import com.websarva.wings.android.zuboradiary.ui.list.diarylist.StartYearMonthPickerDialogFragmentArgs;
+import com.websarva.wings.android.zuboradiary.data.AppMessage;
 
 import java.util.Objects;
 
-public class MessageDialogFragment extends BaseAlertDialogFragment {
+public class AppMessageDialogFragment extends BaseAlertDialogFragment {
 
     @Override
     protected String createTitle() {
-        return MessageDialogFragmentArgs.fromBundle(requireArguments()).getTitle();
+        AppMessage appMessage =
+                AppMessageDialogFragmentArgs.fromBundle(requireArguments()).getAppMessage();
+        Objects.requireNonNull(appMessage);
+
+        return appMessage.getDialogTitle(requireContext());
     }
 
     @Override
     protected String createMessage() {
-        return MessageDialogFragmentArgs.fromBundle(requireArguments()).getMessage();
+        AppMessage appMessage =
+                AppMessageDialogFragmentArgs.fromBundle(requireArguments()).getAppMessage();
+        Objects.requireNonNull(appMessage);
+
+        return appMessage.getDialogMessage(requireContext());
     }
 
     @Override

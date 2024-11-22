@@ -5,14 +5,12 @@ import android.view.View;
 
 import androidx.annotation.NonNull;
 
-import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor;
 import com.websarva.wings.android.zuboradiary.databinding.DialogFragmentNumberPickersBinding;
 import com.websarva.wings.android.zuboradiary.ui.BaseNumberPickersBottomSheetDialogFragment;
 
 import java.time.LocalDate;
 import java.time.Year;
 import java.time.YearMonth;
-import java.util.Objects;
 
 public class StartYearMonthPickerDialogFragment extends BaseNumberPickersBottomSheetDialogFragment {
 

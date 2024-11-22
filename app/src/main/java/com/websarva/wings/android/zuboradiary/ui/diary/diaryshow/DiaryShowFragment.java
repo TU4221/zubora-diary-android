@@ -3,6 +3,11 @@ package com.websarva.wings.android.zuboradiary.ui.diary.diaryshow;
 import android.app.Dialog;
 import android.content.Context;
 import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.TextView;
 
 import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
@@ -15,21 +20,14 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavBackStackEntry;
 import androidx.navigation.NavDirections;
 
-import android.view.LayoutInflater;
-import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.TextView;
-
 import com.websarva.wings.android.zuboradiary.R;
+import com.websarva.wings.android.zuboradiary.data.AppMessage;
 import com.websarva.wings.android.zuboradiary.data.DateTimeStringConverter;
 import com.websarva.wings.android.zuboradiary.data.diary.Condition;
 import com.websarva.wings.android.zuboradiary.data.diary.ItemNumber;
 import com.websarva.wings.android.zuboradiary.data.diary.Weather;
-import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor;
 import com.websarva.wings.android.zuboradiary.databinding.FragmentDiaryShowBinding;
 import com.websarva.wings.android.zuboradiary.ui.BaseFragment;
-import com.websarva.wings.android.zuboradiary.ui.settings.SettingsViewModel;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -105,25 +103,25 @@ public class DiaryShowFragment extends BaseFragment {
 
     @Override
     protected void handleOnReceivingDialogResult(@NonNull SavedStateHandle savedStateHandle) {
-        receiveDeleteConfirmationDialogResult();
-        retryOtherErrorDialogShow();
+        receiveDiaryDeleteDialogResult();
+        retryOtherAppMessageDialogShow();
     }
 
     @Override
     protected void removeDialogResultOnDestroy(@NonNull SavedStateHandle savedStateHandle) {
-        savedStateHandle.remove(DiaryDeleteConfirmationDialogFragment.KEY_SELECTED_BUTTON);
+        savedStateHandle.remove(DiaryDeleteDialogFragment.KEY_SELECTED_BUTTON);
     }
 
     @Override
-    protected void setUpOtherErrorMessageDialog() {
-        diaryShowViewModel.getAppErrorBufferListLiveData()
-                .observe(getViewLifecycleOwner(), new AppErrorBufferListObserver(diaryShowViewModel));
+    protected void setUpOtherAppMessageDialog() {
+        diaryShowViewModel.getAppMessageBufferListLiveData()
+                .observe(getViewLifecycleOwner(), new AppMessageBufferListObserver(diaryShowViewModel));
     }
 
     // 日記削除確認ダイアログフラグメントからデータ受取
-    private void receiveDeleteConfirmationDialogResult() {
+    private void receiveDiaryDeleteDialogResult() {
         Integer selectedButton =
-                receiveResulFromDialog(DiaryDeleteConfirmationDialogFragment.KEY_SELECTED_BUTTON);
+                receiveResulFromDialog(DiaryDeleteDialogFragment.KEY_SELECTED_BUTTON);
         if (selectedButton == null) return;
         if (selectedButton != Dialog.BUTTON_POSITIVE) return;
 
@@ -169,7 +167,7 @@ public class DiaryShowFragment extends BaseFragment {
                             return true;
                         } else if (item.getItemId() == R.id.diaryShowToolbarOptionDeleteDiary) {
                             LocalDate deleteDiaryDate = diaryShowViewModel.getDateLiveData().getValue();
-                            showDiaryDeleteConfirmationDialog(deleteDiaryDate);
+                            showDiaryDeleteDialog(deleteDiaryDate);
                             return true;
                         }
                         return false;
@@ -362,7 +360,7 @@ public class DiaryShowFragment extends BaseFragment {
 
     private void showDiaryEdit(LocalDate date) {
         Objects.requireNonNull(date);
-        if (!canShowOtherFragment()) return;
+        if (!canShowFragment()) return;
 
         NavDirections action =
                 DiaryShowFragmentDirections
@@ -374,27 +372,27 @@ public class DiaryShowFragment extends BaseFragment {
         navController.navigate(action);
     }
 
-    private void showDiaryDeleteConfirmationDialog(LocalDate date) {
+    private void showDiaryDeleteDialog(LocalDate date) {
         Objects.requireNonNull(date);
-        if (!canShowOtherFragment()) return;
+        if (!canShowFragment()) return;
 
         NavDirections action =
                 DiaryShowFragmentDirections.
-                        actionDiaryShowFragmentToDiaryDeleteConfirmationDialog(date);
+                        actionDiaryShowFragmentToDiaryDeleteDialog(date);
         navController.navigate(action);
     }
 
     @Override
-    protected void showMessageDialog(@NonNull String title, @NonNull String message) {
+    protected void navigateAppMessageDialog(@NonNull AppMessage appMessage) {
         NavDirections action =
                 DiaryShowFragmentDirections
-                        .actionDiaryShowFragmentToMessageDialog(title, message);
+                        .actionDiaryShowFragmentToAppMessageDialog(appMessage);
         navController.navigate(action);
     }
 
     @Override
-    protected void retryOtherErrorDialogShow() {
-        diaryShowViewModel.triggerAppErrorBufferListObserver();
+    protected void retryOtherAppMessageDialogShow() {
+        diaryShowViewModel.triggerAppMessageBufferListObserver();
     }
 
     // 一つ前のフラグメントを表示

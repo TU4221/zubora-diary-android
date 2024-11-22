@@ -9,8 +9,6 @@ import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor;
 import com.websarva.wings.android.zuboradiary.databinding.DialogFragmentNumberPickersBinding;
 import com.websarva.wings.android.zuboradiary.ui.BaseNumberPickersBottomSheetDialogFragment;
 
-import java.util.Objects;
-
 public class ThemeColorPickerDialogFragment extends BaseNumberPickersBottomSheetDialogFragment {
 
     private static final String fromClassName = "From" + ThemeColorPickerDialogFragment.class.getName();

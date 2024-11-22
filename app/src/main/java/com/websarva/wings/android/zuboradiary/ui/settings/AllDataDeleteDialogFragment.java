@@ -7,22 +7,20 @@ import androidx.annotation.NonNull;
 import com.websarva.wings.android.zuboradiary.R;
 import com.websarva.wings.android.zuboradiary.ui.BaseAlertDialogFragment;
 
-public class PermissionDialogFragment extends BaseAlertDialogFragment {
+public class AllDataDeleteDialogFragment extends BaseAlertDialogFragment {
 
-    private static final String FROM_CLASS_NAME = "From" + PermissionDialogFragment.class.getName();
+    private static final String FROM_CLASS_NAME =
+            "From" + AllDataDeleteDialogFragment.class.getName();
     static final String KEY_SELECTED_BUTTON = "SelectedButton" + FROM_CLASS_NAME;
 
     @Override
     protected String createTitle() {
-        return getString(R.string.dialog_permission_title);
+        return getString(R.string.dialog_all_data_delete_title);
     }
 
     @Override
     protected String createMessage() {
-        String firstMessage = getString(R.string.dialog_permission_first_message);
-        String secondMessage = PermissionDialogFragmentArgs.fromBundle(requireArguments()).getPermissionName();
-        String thirdMessage = getString(R.string.dialog_permission_third_message);
-        return firstMessage + secondMessage + thirdMessage;
+        return getString(R.string.dialog_all_data_delete_message);
     }
 
     @Override

@@ -19,7 +19,7 @@
         android:id="@+id/motion_layout_diary_edit_item"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layoutDescription="@xml/layout_diary_edit_item_scene">
+        app:layoutDescription="@xml/motion_scene_layout_diary_edit_item">
 
         <LinearLayout
             android:id="@+id/liner_layout_diary_edit_item"

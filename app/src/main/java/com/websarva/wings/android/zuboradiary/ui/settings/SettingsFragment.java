@@ -30,6 +30,7 @@ import androidx.navigation.NavDirections;
 
 import com.websarva.wings.android.zuboradiary.MainActivity;
 import com.websarva.wings.android.zuboradiary.R;
+import com.websarva.wings.android.zuboradiary.data.AppMessage;
 import com.websarva.wings.android.zuboradiary.data.DateTimeStringConverter;
 import com.websarva.wings.android.zuboradiary.data.DayOfWeekStringConverter;
 import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor;
@@ -170,9 +171,9 @@ public class SettingsFragment extends BaseFragment {
         receiveCalendarStartDayPickerDialogResult();
         receiveReminderNotificationTimePickerDialogResult();
         receivePermissionDialogResult();
-        receiveAllDiariesDeleteConfirmationDialogResult();
-        receiveAllSettingsInitializationConfirmationDialogResult();
-        receiveAllDataDeleteConfirmationDialogResult();
+        receiveAllDiariesDeleteDialogResult();
+        receiveAllSettingsInitializationDialogResult();
+        receiveAllDataDeleteDialogResult();
     }
 
     @Override
@@ -182,13 +183,13 @@ public class SettingsFragment extends BaseFragment {
         savedStateHandle.remove(ReminderNotificationTimePickerDialogFragment.KEY_SELECTED_BUTTON);
         savedStateHandle.remove(ReminderNotificationTimePickerDialogFragment.KEY_SELECTED_TIME);
         savedStateHandle.remove(PermissionDialogFragment.KEY_SELECTED_BUTTON);
-        savedStateHandle.remove(AllDiariesDeleteConfirmationDialogFragment.KEY_SELECTED_BUTTON);
-        savedStateHandle.remove(AllSettingsInitializationConfirmationDialogFragment.KEY_SELECTED_BUTTON);
-        savedStateHandle.remove(AllDataDeleteConfirmationDialogFragment.KEY_SELECTED_BUTTON);
+        savedStateHandle.remove(AllDiariesDeleteDialogFragment.KEY_SELECTED_BUTTON);
+        savedStateHandle.remove(AllSettingsInitializationDialogFragment.KEY_SELECTED_BUTTON);
+        savedStateHandle.remove(AllDataDeleteDialogFragment.KEY_SELECTED_BUTTON);
     }
 
     @Override
-    protected void setUpOtherErrorMessageDialog() {
+    protected void setUpOtherAppMessageDialog() {
         // 処理なし
     }
 
@@ -235,27 +236,27 @@ public class SettingsFragment extends BaseFragment {
         showApplicationDetailsSettings();
     }
 
-    private void receiveAllDiariesDeleteConfirmationDialogResult() {
+    private void receiveAllDiariesDeleteDialogResult() {
         Integer selectedButton =
-                receiveResulFromDialog(AllDiariesDeleteConfirmationDialogFragment.KEY_SELECTED_BUTTON);
+                receiveResulFromDialog(AllDiariesDeleteDialogFragment.KEY_SELECTED_BUTTON);
         if (selectedButton == null) return;
         if (selectedButton != Dialog.BUTTON_POSITIVE) return;
 
         settingsViewModel.deleteAllDiaries();
     }
 
-    private void receiveAllSettingsInitializationConfirmationDialogResult() {
+    private void receiveAllSettingsInitializationDialogResult() {
         Integer selectedButton =
-                receiveResulFromDialog(AllSettingsInitializationConfirmationDialogFragment.KEY_SELECTED_BUTTON);
+                receiveResulFromDialog(AllSettingsInitializationDialogFragment.KEY_SELECTED_BUTTON);
         if (selectedButton == null) return;
         if (selectedButton != Dialog.BUTTON_POSITIVE) return;
 
         settingsViewModel.deleteAllSettings();
     }
 
-    private void receiveAllDataDeleteConfirmationDialogResult() {
+    private void receiveAllDataDeleteDialogResult() {
         Integer selectedButton =
-                receiveResulFromDialog(AllDataDeleteConfirmationDialogFragment.KEY_SELECTED_BUTTON);
+                receiveResulFromDialog(AllDataDeleteDialogFragment.KEY_SELECTED_BUTTON);
         if (selectedButton == null) return;
         if (selectedButton != Dialog.BUTTON_POSITIVE) return;
 
@@ -608,7 +609,7 @@ public class SettingsFragment extends BaseFragment {
             public void onClick(View v) {
                 Objects.requireNonNull(v);
 
-                showAllDiariesDeleteConfirmationDialog();
+                showAllDiariesDeleteDialog();
             }
         });
 
@@ -621,7 +622,7 @@ public class SettingsFragment extends BaseFragment {
             public void onClick(View v) {
                 Objects.requireNonNull(v);
 
-                showAllSettingsInitializationConfirmationDialog();
+                showAllSettingsInitializationDialog();
             }
         });
 
@@ -634,7 +635,7 @@ public class SettingsFragment extends BaseFragment {
             public void onClick(View v) {
                 Objects.requireNonNull(v);
 
-                showAllDataDeleteConfirmationDialog();
+                showAllDataDeleteDialog();
             }
         });
 
@@ -642,7 +643,7 @@ public class SettingsFragment extends BaseFragment {
     }
 
     private void showThemeColorPickerDialog() {
-        if (!canShowOtherFragment()) return;
+        if (!canShowFragment()) return;
 
         NavDirections action =
                 SettingsFragmentDirections
@@ -652,7 +653,7 @@ public class SettingsFragment extends BaseFragment {
 
     private void showCalendarStartDayPickerDialog(DayOfWeek dayOfWeek) {
         Objects.requireNonNull(dayOfWeek);
-        if (!canShowOtherFragment()) return;
+        if (!canShowFragment()) return;
 
         NavDirections action =
                 SettingsFragmentDirections
@@ -661,7 +662,7 @@ public class SettingsFragment extends BaseFragment {
     }
 
     private void showReminderNotificationTimePickerDialog() {
-        if (!canShowOtherFragment()) return;
+        if (!canShowFragment()) return;
 
         NavDirections action =
                 SettingsFragmentDirections
@@ -671,7 +672,7 @@ public class SettingsFragment extends BaseFragment {
 
     private void showPermissionDialog(String permissionName) {
         Objects.requireNonNull(permissionName);
-        if (!canShowOtherFragment()) return;
+        if (!canShowFragment()) return;
 
         NavDirections action =
                 SettingsFragmentDirections
@@ -679,43 +680,43 @@ public class SettingsFragment extends BaseFragment {
         navController.navigate(action);
     }
 
-    private void showAllDiariesDeleteConfirmationDialog() {
-        if (!canShowOtherFragment()) return;
+    private void showAllDiariesDeleteDialog() {
+        if (!canShowFragment()) return;
 
         NavDirections action =
                 SettingsFragmentDirections
-                        .actionSettingsFragmentToAllDiariesDeleteConfirmationDialog();
+                        .actionSettingsFragmentToAllDiariesDeleteDialog();
         navController.navigate(action);
     }
 
-    private void showAllSettingsInitializationConfirmationDialog() {
-        if (!canShowOtherFragment()) return;
+    private void showAllSettingsInitializationDialog() {
+        if (!canShowFragment()) return;
 
         NavDirections action =
                 SettingsFragmentDirections
-                        .actionSettingsFragmentToAllSettingsInitializationConfirmationDialog();
+                        .actionSettingsFragmentToAllSettingsInitializationDialog();
         navController.navigate(action);
     }
 
-    private void showAllDataDeleteConfirmationDialog() {
-        if (!canShowOtherFragment()) return;
+    private void showAllDataDeleteDialog() {
+        if (!canShowFragment()) return;
 
         NavDirections action =
                 SettingsFragmentDirections
-                        .actionSettingsFragmentToAllDataDeleteConfirmationDialog();
-        navController.navigate(action);
-    }
-
-    @Override
-    protected void showMessageDialog(@NonNull String title, @NonNull String message) {
-        NavDirections action =
-                SettingsFragmentDirections
-                        .actionSettingsFragmentToMessageDialog(title, message);
+                        .actionSettingsFragmentToAllDataDeleteDialog();
         navController.navigate(action);
     }
 
     @Override
-    protected void retryOtherErrorDialogShow() {
+    protected void navigateAppMessageDialog(@NonNull AppMessage appMessage) {
+        NavDirections action =
+                SettingsFragmentDirections
+                        .actionSettingsFragmentToAppMessageDialog(appMessage);
+        navController.navigate(action);
+    }
+
+    @Override
+    protected void retryOtherAppMessageDialogShow() {
         // 処理なし
     }
 

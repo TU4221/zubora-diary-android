@@ -71,11 +71,6 @@
     <color name="md_theme_dark_outlineVariant">#49454E</color>
     <color name="md_theme_dark_scrim">#000000</color>
 
-    <!-- TODO:最終的に削除 -->
-    <!-- dialog_fragment_number_picker -->
-    <color name="dialog_fragment_number_picker_button_text">@color/black</color>
-    <color name="dialog_fragment_number_picker_button_background">@color/gray</color>
-
     <!-- theme_color_white ((MaterialThemeBuilder SourceColor:#FFFFFFにて生成)-->
     <color name="md_theme_color_white_primary">#5D5F5F</color>
     <color name="md_theme_color_white_onPrimary">#FFFFFF</color>

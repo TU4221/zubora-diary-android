@@ -1,6 +1,6 @@
 package com.websarva.wings.android.zuboradiary.ui.list.diarylist;
 
-import static com.websarva.wings.android.zuboradiary.ui.list.DiaryYearMonthListAdapter.*;
+import static com.websarva.wings.android.zuboradiary.ui.list.DiaryYearMonthListAdapter.OnClickChildItemBackgroundButtonListener;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -20,6 +20,13 @@ import androidx.navigation.NavDirections;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.websarva.wings.android.zuboradiary.R;
+import com.websarva.wings.android.zuboradiary.data.AppMessage;
+import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor;
+import com.websarva.wings.android.zuboradiary.databinding.FragmentDiaryListBinding;
+import com.websarva.wings.android.zuboradiary.ui.BaseFragment;
+import com.websarva.wings.android.zuboradiary.ui.list.DiaryYearMonthListAdapter;
+import com.websarva.wings.android.zuboradiary.ui.list.DiaryYearMonthListAdapter.OnClickChildItemListener;
+import com.websarva.wings.android.zuboradiary.ui.list.DiaryYearMonthListItemBase;
 
 import java.time.LocalDate;
 import java.time.Year;
@@ -27,14 +34,6 @@ import java.time.YearMonth;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-
-import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor;
-import com.websarva.wings.android.zuboradiary.databinding.FragmentDiaryListBinding;
-import com.websarva.wings.android.zuboradiary.ui.BaseFragment;
-import com.websarva.wings.android.zuboradiary.ui.list.DiaryYearMonthListAdapter.OnClickChildItemListener;
-import com.websarva.wings.android.zuboradiary.ui.list.DiaryYearMonthListItemBase;
-import com.websarva.wings.android.zuboradiary.ui.list.DiaryYearMonthListAdapter;
-import com.websarva.wings.android.zuboradiary.ui.settings.SettingsViewModel;
 
 import dagger.hilt.android.AndroidEntryPoint;
 
@@ -90,19 +89,19 @@ public class DiaryListFragment extends BaseFragment {
     @Override
     protected void handleOnReceivingDialogResult(@NonNull SavedStateHandle savedStateHandle) {
         receiveDatePickerDialogResults(savedStateHandle);
-        receiveDiaryDeleteConfirmationDialogResults(savedStateHandle);
+        receiveDiaryDeleteDialogResults(savedStateHandle);
     }
 
     @Override
     protected void removeDialogResultOnDestroy(@NonNull SavedStateHandle savedStateHandle) {
         savedStateHandle.remove(StartYearMonthPickerDialogFragment.KEY_SELECTED_YEAR_MONTH);
-        savedStateHandle.remove(DiaryDeleteConfirmationDialogFragment.KEY_DELETE_DIARY_DATE);
+        savedStateHandle.remove(DiaryDeleteDialogFragment.KEY_DELETE_DIARY_DATE);
     }
 
     @Override
-    protected void setUpOtherErrorMessageDialog() {
-        diaryListViewModel.getAppErrorBufferListLiveData()
-                .observe(getViewLifecycleOwner(), new AppErrorBufferListObserver(diaryListViewModel));
+    protected void setUpOtherAppMessageDialog() {
+        diaryListViewModel.getAppMessageBufferListLiveData()
+                .observe(getViewLifecycleOwner(), new AppMessageBufferListObserver(diaryListViewModel));
     }
 
     // 日付入力ダイアログフラグメントから結果受取
@@ -119,11 +118,11 @@ public class DiaryListFragment extends BaseFragment {
     }
 
     // 日記削除ダイアログフラグメントから結果受取
-    private void receiveDiaryDeleteConfirmationDialogResults(SavedStateHandle savedStateHandle) {
+    private void receiveDiaryDeleteDialogResults(SavedStateHandle savedStateHandle) {
         Objects.requireNonNull(savedStateHandle);
 
         LocalDate deleteDiaryDate =
-                receiveResulFromDialog(DiaryDeleteConfirmationDialogFragment.KEY_DELETE_DIARY_DATE);
+                receiveResulFromDialog(DiaryDeleteDialogFragment.KEY_DELETE_DIARY_DATE);
         if (deleteDiaryDate == null) return;
 
         diaryListViewModel.deleteDiary(deleteDiaryDate);
@@ -200,7 +199,7 @@ public class DiaryListFragment extends BaseFragment {
             public void onClick(LocalDate date) {
                 Objects.requireNonNull(date);
 
-                showDiaryDeleteConfirmationDialog(date);
+                showDiaryDeleteDialog(date);
             }
         });
 
@@ -223,7 +222,8 @@ public class DiaryListFragment extends BaseFragment {
 
     private class DiaryListAdapter extends DiaryYearMonthListAdapter {
 
-        public DiaryListAdapter(Context context, RecyclerView recyclerView, ThemeColor themeColor, boolean canSwipeItem) {
+        public DiaryListAdapter(
+                Context context, RecyclerView recyclerView, ThemeColor themeColor, boolean canSwipeItem) {
             super(context, recyclerView, themeColor, canSwipeItem);
         }
 
@@ -289,7 +289,7 @@ public class DiaryListFragment extends BaseFragment {
     }
 
     private void showEditDiary() {
-        if (!canShowOtherFragment()) return;
+        if (!canShowFragment()) return;
 
         NavDirections action =
                 DiaryListFragmentDirections
@@ -303,7 +303,7 @@ public class DiaryListFragment extends BaseFragment {
 
     private void showShowDiaryFragment(LocalDate date) {
         Objects.requireNonNull(date);
-        if (!canShowOtherFragment()) return;
+        if (!canShowFragment()) return;
 
         NavDirections action =
                 DiaryListFragmentDirections
@@ -312,7 +312,7 @@ public class DiaryListFragment extends BaseFragment {
     }
 
     private void showWordSearchFragment() {
-        if (!canShowOtherFragment()) return;
+        if (!canShowFragment()) return;
 
         NavDirections action =
                 DiaryListFragmentDirections
@@ -323,7 +323,7 @@ public class DiaryListFragment extends BaseFragment {
     private void showStartYearMonthPickerDialog(Year newestYear, Year oldestYear) {
         Objects.requireNonNull(newestYear);
         Objects.requireNonNull(oldestYear);
-        if (!canShowOtherFragment()) return;
+        if (!canShowFragment()) return;
 
         NavDirections action =
                 DiaryListFragmentDirections
@@ -331,27 +331,25 @@ public class DiaryListFragment extends BaseFragment {
         navController.navigate(action);
     }
 
-    private void showDiaryDeleteConfirmationDialog(LocalDate date) {
+    private void showDiaryDeleteDialog(LocalDate date) {
         Objects.requireNonNull(date);
-        if (!canShowOtherFragment()) return;
+        if (!canShowFragment()) return;
 
         NavDirections action =
-                DiaryListFragmentDirections
-                        .actionDiaryListFragmentToDiaryDeleteConfirmationDialog(date);
+                DiaryListFragmentDirections.actionDiaryListFragmentToDiaryDeleteDialog(date);
         navController.navigate(action);
     }
 
     @Override
-    protected void showMessageDialog(@NonNull String title, @NonNull String message) {
+    protected void navigateAppMessageDialog(@NonNull AppMessage appMessage) {
         NavDirections action =
-                DiaryListFragmentDirections
-                        .actionDiaryListFragmentToMessageDialog(title, message);
+                DiaryListFragmentDirections.actionDiaryListFragmentToAppMessageDialog(appMessage);
         navController.navigate(action);
     }
 
     @Override
-    protected void retryOtherErrorDialogShow() {
-        diaryListViewModel.triggerAppErrorBufferListObserver();
+    protected void retryOtherAppMessageDialogShow() {
+        diaryListViewModel.triggerAppMessageBufferListObserver();
     }
 
     public void processOnReSelectNavigationItem(){

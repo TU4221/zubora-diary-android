@@ -6,31 +6,27 @@ import androidx.annotation.NonNull;
 
 import com.websarva.wings.android.zuboradiary.R;
 import com.websarva.wings.android.zuboradiary.data.DateTimeStringConverter;
-import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor;
 import com.websarva.wings.android.zuboradiary.ui.BaseAlertDialogFragment;
 
 import java.time.LocalDate;
-import java.util.Objects;
 
-public class LoadExistingDiaryDialogFragment extends BaseAlertDialogFragment {
+public class DiaryDeleteDialogFragment extends BaseAlertDialogFragment {
+
     private static final String fromClassName =
-            "From" + LoadExistingDiaryDialogFragment.class.getName();
+            "From" + DiaryDeleteDialogFragment.class.getName();
     static final String KEY_SELECTED_BUTTON = "SelectedButton" + fromClassName;
 
     @Override
     protected String createTitle() {
-        return getString(R.string.dialog_load_Existing_diary_title);
+        return getString(R.string.dialog_diary_delete_title);
     }
 
     @Override
     protected String createMessage() {
-        LocalDate loadingDiaryDate =
-                LoadExistingDiaryDialogFragmentArgs.fromBundle(requireArguments()).getDate();
-        Objects.requireNonNull(loadingDiaryDate);
-
-        DateTimeStringConverter converter = new DateTimeStringConverter();
-        String loadingDiaryDateString = converter.toYearMonthDayWeek(loadingDiaryDate);
-        return loadingDiaryDateString + getString(R.string.dialog_load_Existing_diary_message);
+        LocalDate diaryDate =
+                DiaryDeleteDialogFragmentArgs.fromBundle(requireArguments()).getDate();
+        String diaryDateString = new DateTimeStringConverter().toYearMonthDayWeek(diaryDate);
+        return diaryDateString + getString(R.string.dialog_diary_delete_message);
     }
 
     @Override
