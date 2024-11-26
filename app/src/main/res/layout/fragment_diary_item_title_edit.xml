@@ -31,7 +31,7 @@
                 android:layout_height="wrap_content"
                 app:navigationIcon="@drawable/ic_arrow_back_24px"
                 tools:title="@string/fragment_diary_item_title_edit_toolbar_title_tools_value"
-                style="@style/ToolbarStyle"/>
+                style="@style/CustomToolbarStyle"/>
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -77,13 +77,13 @@
             </LinearLayout>
 
             <TextView
-                style="@style/TextViewStyle"
+                style="@style/CustomTextViewStyle"
                 android:id="@+id/text_item_title_history"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/fragment_diary_item_title_edit_margin_start"
                 android:layout_marginTop="@dimen/fragment_diary_item_title_edit_margin_top"
-                android:textAppearance="@style/TextViewTextAppearance"
+                android:textAppearance="@style/CustomTextViewTextAppearance"
                 android:text="@string/fragment_diary_item_title_edit_title_selection_history"
                 android:textSize="@dimen/fragment_diary_item_title_edit_text_size" />
 

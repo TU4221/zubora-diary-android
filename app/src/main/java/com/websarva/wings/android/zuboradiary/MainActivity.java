@@ -37,7 +37,6 @@ import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.Priority;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationBarView;
 import com.google.android.material.transition.platform.MaterialFadeThrough;
@@ -139,7 +138,6 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
 
-        // TODO:現在位置が急に取得できなくなった。
         fusedLocationProviderClient.requestLocationUpdates(locationRequest, new LocationCallback() {
             @Override
             public void onLocationResult(@NonNull LocationResult locationResult) {
@@ -154,16 +152,6 @@ public class MainActivity extends AppCompatActivity {
             }
         }, Looper.getMainLooper());
 
-        fusedLocationProviderClient.getLastLocation().addOnSuccessListener(new OnSuccessListener<Location>() {
-            @Override
-            public void onSuccess(Location location) {
-                if (location == null) return;
-
-                GeoCoordinates geoCoordinates =
-                        new GeoCoordinates(location.getLatitude(), location.getLongitude());
-                settingsViewModel.updateGeoCoordinates(geoCoordinates);
-            }
-        });
     }
 
     private void setUpThemeColor() {

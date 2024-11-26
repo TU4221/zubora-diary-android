@@ -25,7 +25,7 @@
             android:orientation="vertical">
 
             <com.google.android.material.appbar.MaterialToolbar
-                style="@style/ToolbarStyle"
+                style="@style/CustomToolbarStyle"
                 android:id="@+id/material_toolbar_top_app_bar"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -101,11 +101,11 @@
 
                             <TextView
                                 android:id="@+id/text_weather"
-                                style="@style/TextViewStyle"
+                                style="@style/CustomTextViewStyle"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="@string/fragment_diary_edit_weather"
-                                android:textAppearance="@style/TextViewTextAppearance"
+                                android:textAppearance="@style/CustomTextViewTextAppearance"
                                 android:textSize="@dimen/fragment_diary_edit_text_size" />
 
                             <com.google.android.material.textfield.TextInputLayout
@@ -129,12 +129,12 @@
 
                             <TextView
                                 android:id="@+id/text_weather_slush"
-                                style="@style/TextViewStyle"
+                                style="@style/CustomTextViewStyle"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginStart="@dimen/fragment_diary_edit_margin_start"
                                 android:text="@string/fragment_diary_edit_weather_slush"
-                                android:textAppearance="@style/TextViewTextAppearance"
+                                android:textAppearance="@style/CustomTextViewTextAppearance"
                                 android:textSize="@dimen/fragment_diary_edit_text_size" />
 
                             <com.google.android.material.textfield.TextInputLayout
@@ -166,11 +166,11 @@
 
                             <TextView
                                 android:id="@+id/text_condition"
-                                style="@style/TextViewStyle"
+                                style="@style/CustomTextViewStyle"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="@string/fragment_diary_edit_condition"
-                                android:textAppearance="@style/TextViewTextAppearance"
+                                android:textAppearance="@style/CustomTextViewTextAppearance"
                                 android:textSize="@dimen/fragment_diary_edit_text_size" />
 
                             <com.google.android.material.textfield.TextInputLayout
@@ -255,12 +255,12 @@
 
                         <ImageButton
                             android:id="@+id/image_button_add_item"
-                            style="@style/ImageButtonStyle"
+                            style="@style/CustomImageButtonStyle"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_gravity="end"
                             android:layout_marginTop="@dimen/fragment_diary_edit_margin_top"
-                            android:src="@drawable/ic_add_circle_outline_24" />
+                            android:src="@drawable/ic_add_circle_24px" />
 
                         <ImageView
                             android:id="@+id/image_attach"
@@ -269,7 +269,7 @@
                             android:layout_height="360dp"
                             android:layout_gravity="center"
                             android:layout_marginTop="@dimen/fragment_diary_edit_margin_top"
-                            android:background="@drawable/image_bg_rounded_rectangle"
+                            android:background="@drawable/bg_rounded_rectangle_image"
                             android:src="@drawable/ic_photo_library_24px" />
 
                     </LinearLayout>

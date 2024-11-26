@@ -1,42 +1,19 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
-    <!-- <style name="Theme.ZuboraDiary" parent="Theme.MaterialComponents.DayNight.NoActionBar"> -->
     <style name="Theme.ZuboraDiary" parent="Theme.Material3.Light.NoActionBar">
-        <item name="android:color">@color/md_theme_light_primary</item>
-        <item name="colorPrimary">@color/md_theme_light_primary</item>
-        <item name="colorOnPrimary">@color/md_theme_light_onPrimary</item>
-        <item name="colorPrimaryContainer">@color/md_theme_light_primaryContainer</item>
-        <item name="colorOnPrimaryContainer">@color/md_theme_light_onPrimaryContainer</item>
-        <item name="colorSecondary">@color/md_theme_light_secondary</item>
-        <item name="colorOnSecondary">@color/md_theme_light_onSecondary</item>
-        <item name="colorSecondaryContainer">@color/md_theme_light_secondaryContainer</item>
-        <item name="colorOnSecondaryContainer">@color/md_theme_light_onSecondaryContainer</item>
-        <item name="colorTertiary">@color/md_theme_light_tertiary</item>
-        <item name="colorOnTertiary">@color/md_theme_light_onTertiary</item>
-        <item name="colorTertiaryContainer">@color/md_theme_light_tertiaryContainer</item>
-        <item name="colorOnTertiaryContainer">@color/md_theme_light_onTertiaryContainer</item>
-        <item name="colorError">@color/md_theme_light_error</item>
-        <item name="colorErrorContainer">@color/md_theme_light_errorContainer</item>
-        <item name="colorOnError">@color/md_theme_light_onError</item>
-        <item name="colorOnErrorContainer">@color/md_theme_light_onErrorContainer</item>
-        <item name="android:colorBackground">@color/md_theme_light_background</item>
-        <item name="colorOnBackground">@color/md_theme_light_onBackground</item>
-        <item name="colorSurface">@color/md_theme_light_surface</item>
-        <item name="colorOnSurface">@color/md_theme_light_onSurface</item>
-        <item name="colorSurfaceVariant">@color/md_theme_light_surfaceVariant</item>
-        <item name="colorOnSurfaceVariant">@color/md_theme_light_onSurfaceVariant</item>
-        <item name="colorOutline">@color/md_theme_light_outline</item>
-        <item name="colorOnSurfaceInverse">@color/md_theme_light_inverseOnSurface</item>
-        <item name="colorSurfaceInverse">@color/md_theme_light_inverseSurface</item>
-        <item name="colorPrimaryInverse">@color/md_theme_light_inversePrimary</item>
+    </style>
+    <style name="Theme.ZuboraDiary.Dark" parent="Theme.Material3.Dark.NoActionBar">
     </style>
 
-    <!-- TODO:RippleとToolTipsの色を変更できるようになったら、下記Style(6色分)の親を統一する。 -->
     <style name="AppThemeColorWhite" parent="Theme.ZuboraDiary">
         <item name="theme">@style/ThemeColorWhite</item>
     </style>
 
-    <style name="AppThemeColorBlack" parent="Theme.ZuboraDiary">
+    <!-- TODO:下記の対策をとるとテーマカラーを黒から白へ変更した時にToolbarとBottomNavigationのTooltipsの背景色が異なる現象が起きてしまう。 -->
+    <!-- MEMO:ThemeColorBlackの時、parentをLightThemeに設定しているとToolbarのメニューボタン等のRippleの色が背景と同化してみえなくなる。
+              Rippleの色変更方法が不明の為、parentをDarkThemeにして対応。
+              (Tooltipsの色変更方法も不明だが支障なし) -->
+    <style name="AppThemeColorBlack" parent="Theme.ZuboraDiary.Dark">
         <item name="theme">@style/ThemeColorBlack</item>
     </style>
 
@@ -61,6 +38,7 @@
     <!-- MEMO:ThemeColor(下記style)はView等に利用するため、
               styleタグに"parent="Theme.Material3.Light.NoActionBar"は追記しないこと。 -->
     <style name="ThemeColorWhite">
+        <item name="android:color">@color/md_theme_color_white_primary</item>
         <item name="colorPrimary">@color/md_theme_color_white_primary</item>
         <item name="colorOnPrimary">@color/md_theme_color_white_onPrimary</item>
         <item name="colorPrimaryContainer">@color/md_theme_color_white_primaryContainer</item>
@@ -111,6 +89,7 @@
 
     <!-- ThemeColorBlack -->
     <style name="ThemeColorBlack">
+        <item name="android:color">@color/md_theme_color_black_primary</item>
         <item name="colorPrimary">@color/md_theme_color_black_primary</item>
         <item name="colorOnPrimary">@color/md_theme_color_black_onPrimary</item>
         <item name="colorPrimaryContainer">@color/md_theme_color_black_primaryContainer</item>
@@ -161,6 +140,7 @@
 
     <!-- ThemeColorRed -->
     <style name="ThemeColorRed">
+        <item name="android:color">@color/md_theme_color_red_primary</item>
         <item name="colorPrimary">@color/md_theme_color_red_primary</item>
         <item name="colorOnPrimary">@color/md_theme_color_red_onPrimary</item>
         <item name="colorPrimaryContainer">@color/md_theme_color_red_primaryContainer</item>
@@ -211,6 +191,7 @@
 
     <!-- ThemeColorBlue -->
     <style name="ThemeColorBlue">
+        <item name="android:color">@color/md_theme_color_blue_primary</item>
         <item name="colorPrimary">@color/md_theme_color_blue_primary</item>
         <item name="colorOnPrimary">@color/md_theme_color_blue_onPrimary</item>
         <item name="colorPrimaryContainer">@color/md_theme_color_blue_primaryContainer</item>
@@ -261,6 +242,7 @@
 
     <!-- ThemeColorGreen -->
     <style name="ThemeColorGreen">
+        <item name="android:color">@color/md_theme_color_green_primary</item>
         <item name="colorPrimary">@color/md_theme_color_green_primary</item>
         <item name="colorOnPrimary">@color/md_theme_color_green_onPrimary</item>
         <item name="colorPrimaryContainer">@color/md_theme_color_green_primaryContainer</item>
@@ -311,6 +293,7 @@
 
     <!-- ThemeColorYellow -->
     <style name="ThemeColorYellow">
+        <item name="android:color">@color/md_theme_color_yellow_primary</item>
         <item name="colorPrimary">@color/md_theme_color_yellow_primary</item>
         <item name="colorOnPrimary">@color/md_theme_color_yellow_onPrimary</item>
         <item name="colorPrimaryContainer">@color/md_theme_color_yellow_primaryContainer</item>

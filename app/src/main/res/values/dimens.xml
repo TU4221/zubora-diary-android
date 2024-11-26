@@ -3,6 +3,7 @@
     <dimen name="activity_horizontal_margin">16dp</dimen>
     <dimen name="activity_vertical_margin">16dp</dimen>
 
+
     <!-- All fragment common margin -->
     <dimen name="fragment_margin_horizontal">16dp</dimen>
     <dimen name="fragment_margin_vertical">16dp</dimen>
@@ -10,10 +11,12 @@
     <dimen name="fab_margin_end">16dp</dimen>
     <dimen name="fab_margin_bottom">16dp</dimen>
 
+
     <!-- fragment_calendar -->
     <dimen name="fragment_calendar_text_size">18sp</dimen>
     <dimen name="fragment_calendar_margin_start">8dp</dimen>
     <dimen name="fragment_calendar_margin_top">16dp</dimen>
+
 
     <!-- layout_diary_show -->
     <dimen name="layout_diary_show_text_size">18sp</dimen>
@@ -23,6 +26,7 @@
     <dimen name="layout_diary_show_large_margin_top">32dp</dimen>
     <dimen name="layout_diary_show_small_margin_top">4dp</dimen>
 
+
     <!-- layout_diary_show_item -->
     <dimen name="layout_diary_show_item_text_size">@dimen/layout_diary_show_text_size</dimen>
     <dimen name="layout_diary_show_text_item_small_size">@dimen/layout_diary_show_small_text_size</dimen>
@@ -31,20 +35,24 @@
     <dimen name="layout_diary_show_item_large_margin_top">@dimen/layout_diary_show_large_margin_top</dimen>
     <dimen name="layout_diary_show_item_small_margin_top">@dimen/layout_diary_show_small_margin_top</dimen>
 
+
     <!-- fragment_diary_edit -->
     <dimen name="fragment_diary_edit_text_size">18sp</dimen>
     <dimen name="fragment_diary_edit_margin_start">8dp</dimen>
     <dimen name="fragment_diary_edit_margin_top">16dp</dimen>
+
 
     <!-- layout_diary_edit_item -->
     <dimen name="layout_diary_edit_item_text_size">@dimen/fragment_diary_edit_text_size</dimen>
     <dimen name="layout_diary_edit_item_margin_start">@dimen/fragment_diary_edit_margin_start</dimen>
     <dimen name="layout_diary_edit_item_margin_top">@dimen/fragment_diary_edit_margin_top</dimen>
 
+
     <!-- fragment_diary_item_title_edit -->
     <dimen name="fragment_diary_item_title_edit_text_size">18sp</dimen>
     <dimen name="fragment_diary_item_title_edit_margin_start">8dp</dimen>
     <dimen name="fragment_diary_item_title_edit_margin_top">16dp</dimen>
+
 
     <!-- fragment_settings -->
     <dimen name="fragment_settings_section_layout_height">56dp</dimen>
@@ -65,8 +73,5 @@
     <dimen name="dialog_fragment_number_picker_layout_margin_horizontal">16dp</dimen>
     <dimen name="dialog_fragment_number_picker_layout_margin_horizontal_between_items">8dp</dimen>
     <dimen name="dialog_fragment_number_picker_layout_margin_vertical">8dp</dimen>
-
-
-
 
 </resources>

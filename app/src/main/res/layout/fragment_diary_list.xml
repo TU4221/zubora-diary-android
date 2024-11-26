@@ -26,12 +26,12 @@
             android:orientation="vertical">
 
             <com.google.android.material.appbar.MaterialToolbar
-                style="@style/ToolbarStyle"
+                style="@style/CustomToolbarStyle"
                 android:id="@+id/material_toolbar_top_app_bar"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:menu="@menu/diary_list_toolbar_menu"
-                app:navigationIcon="@drawable/ic_calendar_month_24"
+                app:navigationIcon="@drawable/ic_calendar_month_24px"
                 app:navigationContentDescription="@string/fragment_diary_list_toolbar_navigation_top_year_month_switching"
                 app:title="@string/fragment_diary_list_toolbar_title"/>
 
@@ -40,11 +40,11 @@
                 android:layout_height="match_parent">
 
                 <TextView
-                    style="@style/TextViewStyle"
+                    style="@style/CustomTextViewStyle"
                     android:id="@+id/text_diary_list_no_diary_message"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:textAppearance="@style/TextViewTextAppearance"
+                    android:textAppearance="@style/CustomTextViewTextAppearance"
                     android:text="@string/fragment_diary_list_no_saved_diary_message"
                     android:gravity="center"
                     android:visibility="invisible"

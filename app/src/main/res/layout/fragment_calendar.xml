@@ -28,7 +28,7 @@
             android:orientation="vertical">
 
             <com.google.android.material.appbar.MaterialToolbar
-                style="@style/ToolbarStyle"
+                style="@style/CustomToolbarStyle"
                 android:id="@+id/material_toolbar_top_app_bar"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -81,11 +81,11 @@
                         </LinearLayout>
 
                         <TextView
-                            style="@style/TextViewStyle"
+                            style="@style/CustomTextViewStyle"
                             android:id="@+id/text_no_diary"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
-                            android:textAppearance="@style/TextViewTextAppearance"
+                            android:textAppearance="@style/CustomTextViewTextAppearance"
                             android:text="@string/fragment_calendar_no_diary_message"
                             android:gravity="center_horizontal|top"
                             android:paddingTop="16dp"/>

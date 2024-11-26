@@ -12,13 +12,13 @@
         android:layout_margin="2dp">
 
         <TextView
-            style="@style/TextViewStyle"
+            style="@style/CustomTextViewStyle"
             android:id="@+id/text_calendar_day"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_gravity="center"
             android:layout_margin="8dp"
-            android:textAppearance="@style/TextViewTextAppearance"
+            android:textAppearance="@style/CustomTextViewTextAppearance"
             android:textSize="16sp"
             android:gravity="center"
             tools:text="22" />

@@ -31,7 +31,7 @@
                 android:layout_height="wrap_content">
 
                 <com.google.android.material.appbar.MaterialToolbar
-                    style="@style/ToolbarStyle"
+                    style="@style/CustomToolbarStyle"
                     android:id="@+id/material_toolbar_top_app_bar"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -43,7 +43,7 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
                     android:orientation="horizontal"
-                    android:background="@drawable/bg_edit_text_for_search">
+                    android:background="@drawable/bg_word_search_input_bar">
 
                     <EditText
                         android:id="@+id/edit_text_key_word_search"
@@ -60,7 +60,7 @@
                         android:textSize="16sp" />
 
                     <ImageButton
-                        style="@style/ImageButtonStyle"
+                        style="@style/CustomImageButtonStyle"
                         android:id="@+id/image_button_key_word_clear"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -76,11 +76,11 @@
                 android:layout_height="match_parent">
 
                 <TextView
-                    style="@style/TextViewStyle"
+                    style="@style/CustomTextViewStyle"
                     android:id="@+id/text_word_search_no_results"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:textAppearance="@style/TextViewTextAppearance"
+                    android:textAppearance="@style/CustomTextViewTextAppearance"
                     android:text="@string/fragment_word_search_no_results_message"
                     android:gravity="center_horizontal"
                     android:paddingTop="100dp"
@@ -96,11 +96,11 @@
                     tools:visibility="visible" >
 
                     <TextView
-                        style="@style/TextViewStyle"
+                        style="@style/CustomTextViewStyle"
                         android:id="@+id/text_word_search_results"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:textAppearance="@style/TextViewTextAppearance"
+                        android:textAppearance="@style/CustomTextViewTextAppearance"
                         android:text="@{Integer.toString(word_search_view_model.numWordSearchResultsLiveData) + @string/fragment_word_search_num_results_message}"
                         android:paddingHorizontal="8dp"
                         android:paddingVertical="8dp"

@@ -19,11 +19,11 @@
             android:layout_height="match_parent"/>
 
         <TextView
-            style="@style/TextViewStyle"
+            style="@style/CustomTextViewStyle"
             android:id="@+id/text_item_title"
             android:layout_width="match_parent"
             android:layout_height="40dp"
-            android:textAppearance="@style/TextViewTextAppearance"
+            android:textAppearance="@style/CustomTextViewTextAppearance"
             android:gravity="center_vertical"
             android:paddingHorizontal="8dp"
             android:paddingVertical="4dp"

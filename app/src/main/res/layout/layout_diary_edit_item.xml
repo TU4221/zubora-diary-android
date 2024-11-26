@@ -43,22 +43,22 @@
                 android:orientation="horizontal">
 
                 <TextView
-                    style="@style/TextViewStyle"
+                    style="@style/CustomTextViewStyle"
                     android:id="@+id/text_item_number"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textAppearance="@style/TextViewTextAppearance"
+                    android:textAppearance="@style/CustomTextViewTextAppearance"
                     android:text="@{itemNumber}"
                     android:textSize="@dimen/layout_diary_edit_item_text_size"
                     tools:text="@string/layout_diary_edit_item_1_tools"/>
 
                 <ImageButton
-                    style="@style/ImageButtonStyle"
+                    style="@style/CustomImageButtonStyle"
                     android:id="@+id/image_button_item_delete"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="@dimen/layout_diary_edit_item_margin_start"
-                    android:src="@drawable/diary_edit_ic_delete_forever_24px" />
+                    android:src="@drawable/ic_delete_forever_24px" />
 
             </LinearLayout>
 
