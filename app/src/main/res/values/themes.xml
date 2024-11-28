@@ -4,6 +4,7 @@
         <item name="android:windowBackground">@color/ic_launcher_background</item>
     </style>
     <style name="Theme.ZuboraDiary.Dark" parent="Theme.Material3.Dark.NoActionBar">
+        <item name="android:windowBackground">@color/ic_launcher_background</item>
     </style>
 
     <style name="AppThemeColorWhite" parent="Theme.ZuboraDiary">
