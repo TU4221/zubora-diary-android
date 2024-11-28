@@ -11,10 +11,13 @@
         <item name="theme">@style/ThemeColorWhite</item>
     </style>
 
-    <!-- TODO:下記の対策をとるとテーマカラーを黒から白へ変更した時にToolbarとBottomNavigationのTooltipsの背景色が異なる現象が起きてしまう。 -->
-    <!-- MEMO:ThemeColorBlackの時、parentをLightThemeに設定しているとToolbarのメニューボタン等のRippleの色が背景と同化してみえなくなる。
+    <!-- HACK:ThemeColorBlackの時、parentをLightThemeに設定しているとToolbarのメニューボタン等のRippleの色が背景と同化してみえなくなる。
               Rippleの色変更方法が不明の為、parentをDarkThemeにして対応。
-              (Tooltipsの色変更方法も不明だが支障なし) -->
+              この場合、下記条件下でテーマカラーの切替を行ったときBottomNavigationViewのToolTipsと
+              それ以外のToolTipsのテキスト、背景色が異なる現象が起きる。
+              条件：テーマカラーブラック(DarkTheme)でアプリ起動 -> テーマカラーをブラック以外(LightTheme)に変更。(逆パターンも同様)
+              原因はBottomNavigationはActivityでインフレートしている為、起動時のテーマに依存してしまう。
+              Tooltipsの色変更方法も不明の為、現時点ではこのままとする。 -->
     <style name="AppThemeColorBlack" parent="Theme.ZuboraDiary.Dark">
         <item name="theme">@style/ThemeColorBlack</item>
     </style>
