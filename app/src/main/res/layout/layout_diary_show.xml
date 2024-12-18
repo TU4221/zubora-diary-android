@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
@@ -22,38 +23,38 @@
             android:orientation="horizontal">
 
             <TextView
-                style="@style/CustomTextViewStyle"
+                style="@style/AppTextViewStyle"
                 android:id="@+id/text_weather"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textAppearance="@style/CustomTextViewTextAppearance"
+                android:textAppearance="@style/AppTextViewTextAppearance"
                 android:text="@string/layout_diary_show_weather"
                 android:textSize="@dimen/layout_diary_show_small_text_size" />
 
             <TextView
-                style="@style/CustomTextViewStyle"
+                style="@style/AppTextViewStyle"
                 android:id="@+id/text_weather_1_selected"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textAppearance="@style/CustomTextViewTextAppearance"
+                android:textAppearance="@style/AppTextViewTextAppearance"
                 tools:text="@string/layout_diary_show_weather1_tools_value"
                 android:textSize="@dimen/layout_diary_show_text_size" />
 
             <TextView
-                style="@style/CustomTextViewStyle"
+                style="@style/AppTextViewStyle"
                 android:id="@+id/text_weather_slush"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textAppearance="@style/CustomTextViewTextAppearance"
+                android:textAppearance="@style/AppTextViewTextAppearance"
                 android:text="@string/layout_diary_show_weather_slush"
                 android:textSize="@dimen/layout_diary_show_text_size" />
 
             <TextView
-                style="@style/CustomTextViewStyle"
+                style="@style/AppTextViewStyle"
                 android:id="@+id/text_weather_2_selected"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textAppearance="@style/CustomTextViewTextAppearance"
+                android:textAppearance="@style/AppTextViewTextAppearance"
                 android:textSize="@dimen/layout_diary_show_text_size"
                 tools:text="@string/layout_diary_show_weather2_tools_value" />
 
@@ -66,101 +67,103 @@
             android:orientation="horizontal">
 
             <TextView
-                style="@style/CustomTextViewStyle"
+                style="@style/AppTextViewStyle"
                 android:id="@+id/text_condition"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textAppearance="@style/CustomTextViewTextAppearance"
+                android:textAppearance="@style/AppTextViewTextAppearance"
                 android:text="@string/layout_diary_show_condition"
                 android:textSize="@dimen/layout_diary_show_small_text_size" />
 
             <TextView
-                style="@style/CustomTextViewStyle"
+                style="@style/AppTextViewStyle"
                 android:id="@+id/text_condition_selected"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textAppearance="@style/CustomTextViewTextAppearance"
+                android:textAppearance="@style/AppTextViewTextAppearance"
                 tools:text="@string/layout_diary_show_condition_tools_value"
                 android:textSize="@dimen/layout_diary_show_text_size" />
 
         </LinearLayout>
 
         <TextView
-            style="@style/CustomTextViewStyle"
+            style="@style/AppTextViewStyle"
             android:id="@+id/text_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/layout_diary_show_margin_top"
-            android:textAppearance="@style/CustomTextViewTextAppearance"
+            android:textAppearance="@style/AppTextViewTextAppearance"
             android:text="@string/layout_diary_show_title"
             android:textSize="@dimen/layout_diary_show_small_text_size" />
 
         <TextView
-            style="@style/CustomTextViewStyle"
+            style="@style/AppTextViewStyle"
             android:id="@+id/text_title_value"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/layout_diary_show_small_margin_top"
-            android:textAppearance="@style/CustomTextViewTextAppearance"
+            android:textAppearance="@style/AppTextViewTextAppearance"
             android:text="@{diaryShowViewModel.titleLiveData}"
             android:hint="@string/layout_diary_show_title_hint"
             android:textSize="@dimen/layout_diary_show_text_size" />
 
         <include layout="@layout/layout_diary_show_item"
             android:id="@+id/include_item_1"
-            android:itemNumber="@{@string/layout_diary_show_item_1}"
-            android:titleLiveData="@{diaryShowViewModel.item1TitleLiveData}"
-            android:commentLiveData="@{diaryShowViewModel.item1CommentLiveData}"/>
+            app:itemNumber="@{@string/layout_diary_show_item_1}"
+            app:titleLiveData="@{diaryShowViewModel.item1TitleLiveData}"
+            app:commentLiveData="@{diaryShowViewModel.item1CommentLiveData}"/>
 
         <include layout="@layout/layout_diary_show_item"
             android:id="@+id/include_item_2"
-            android:itemNumber="@{@string/layout_diary_show_item_2}"
-            android:titleLiveData="@{diaryShowViewModel.item2TitleLiveData}"
-            android:commentLiveData="@{diaryShowViewModel.item2CommentLiveData}"/>
+            app:itemNumber="@{@string/layout_diary_show_item_2}"
+            app:titleLiveData="@{diaryShowViewModel.item2TitleLiveData}"
+            app:commentLiveData="@{diaryShowViewModel.item2CommentLiveData}"/>
 
         <include layout="@layout/layout_diary_show_item"
             android:id="@+id/include_item_3"
-            android:itemNumber="@{@string/layout_diary_show_item_3}"
-            android:titleLiveData="@{diaryShowViewModel.item3TitleLiveData}"
-            android:commentLiveData="@{diaryShowViewModel.item3CommentLiveData}"/>
+            app:itemNumber="@{@string/layout_diary_show_item_3}"
+            app:titleLiveData="@{diaryShowViewModel.item3TitleLiveData}"
+            app:commentLiveData="@{diaryShowViewModel.item3CommentLiveData}"/>
 
         <include layout="@layout/layout_diary_show_item"
             android:id="@+id/include_item_4"
-            android:itemNumber="@{@string/layout_diary_show_item_4}"
-            android:titleLiveData="@{diaryShowViewModel.item4TitleLiveData}"
-            android:commentLiveData="@{diaryShowViewModel.item4CommentLiveData}"/>
+            app:itemNumber="@{@string/layout_diary_show_item_4}"
+            app:titleLiveData="@{diaryShowViewModel.item4TitleLiveData}"
+            app:commentLiveData="@{diaryShowViewModel.item4CommentLiveData}"/>
 
         <include layout="@layout/layout_diary_show_item"
             android:id="@+id/include_item_5"
-            android:itemNumber="@{@string/layout_diary_show_item_5}"
-            android:titleLiveData="@{diaryShowViewModel.item5TitleLiveData}"
-            android:commentLiveData="@{diaryShowViewModel.item5CommentLiveData}"/>
+            app:itemNumber="@{@string/layout_diary_show_item_5}"
+            app:titleLiveData="@{diaryShowViewModel.item5TitleLiveData}"
+            app:commentLiveData="@{diaryShowViewModel.item5CommentLiveData}"/>
 
         <ImageView
+            style="@style/AppImageViewStyle"
             android:id="@+id/image_attached_picture"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/layout_diary_show_large_margin_top"
-            android:layout_gravity="center" />
+            android:layout_gravity="center"
+            android:contentDescription="@string/layout_diary_show_attached_picture"/>
 
         <TextView
-            style="@style/CustomTextViewStyle"
+            style="@style/AppTextViewStyle"
             android:id="@+id/text_log"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/layout_diary_show_large_margin_top"
             android:layout_gravity="end"
-            android:textAppearance="@style/CustomTextViewTextAppearance"
+            android:textAppearance="@style/AppTextViewTextAppearance"
             android:text="@string/layout_diary_show_last_update"
             android:textSize="@dimen/layout_diary_show_small_text_size" />
 
         <TextView
-            style="@style/CustomTextViewStyle"
+            style="@style/AppTextViewStyle"
             android:id="@+id/text_log_value"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="end"
-            android:textAppearance="@style/CustomTextViewTextAppearance"
+            android:textAppearance="@style/AppTextViewTextAppearance"
             tools:text="@string/layout_diary_show_last_update_tools_value"
             android:textSize="@dimen/layout_diary_show_small_text_size" />
 

@@ -125,9 +125,9 @@ public class WordSearchFragment extends BaseFragment {
         String searchWord = wordSearchViewModel.getSearchWordMutableLiveData().getValue();
         Objects.requireNonNull(searchWord);
         if (searchWord.isEmpty()) {
-            binding.editTextKeyWordSearch.requestFocus();
+            binding.editTextSearchWord.requestFocus();
             KeyboardInitializer keyboardInitializer = new KeyboardInitializer(requireActivity());
-            keyboardInitializer.show(binding.editTextKeyWordSearch);
+            keyboardInitializer.show(binding.editTextSearchWord);
         }
 
         wordSearchViewModel.getSearchWordMutableLiveData()
@@ -141,7 +141,7 @@ public class WordSearchFragment extends BaseFragment {
 
                         // 検索結果表示Viewは別Observerにて表示
                         if (s.isEmpty()) {
-                            binding.textWordSearchNoResults.setVisibility(View.INVISIBLE);
+                            binding.textNoWordSearchResultsMessage.setVisibility(View.INVISIBLE);
                             binding.linerLayoutWordSearchResults.setVisibility(View.INVISIBLE);
                             wordSearchViewModel.initialize();
 
@@ -154,9 +154,9 @@ public class WordSearchFragment extends BaseFragment {
                 });
 
         EditTextSetup editTextSetup = new EditTextSetup(requireActivity());
-        editTextSetup.setUpFocusClearOnClickBackground(binding.viewFullScreenBackground, binding.editTextKeyWordSearch);
-        editTextSetup.setUpKeyboardCloseOnEnter(binding.editTextKeyWordSearch);
-        editTextSetup.setUpClearButton(binding.editTextKeyWordSearch, binding.imageButtonKeyWordClear);
+        editTextSetup.setUpFocusClearOnClickBackground(binding.viewFullScreenBackground, binding.editTextSearchWord);
+        editTextSetup.setUpKeyboardCloseOnEnter(binding.editTextSearchWord);
+        editTextSetup.setUpClearButton(binding.editTextSearchWord, binding.imageButtonSearchWordClear);
     }
 
     private void setUpWordSearchResultList() {
@@ -192,7 +192,7 @@ public class WordSearchFragment extends BaseFragment {
                         } else {
                             visibility = View.INVISIBLE;
                         }
-                        binding.textWordSearchResults.setVisibility(visibility);
+                        binding.textNumWordSearchResults.setVisibility(visibility);
                     }
                 });
 
@@ -243,14 +243,14 @@ public class WordSearchFragment extends BaseFragment {
             String searchWord = wordSearchViewModel.getSearchWordLiveData().getValue();
             Objects.requireNonNull(searchWord);
             if (searchWord.isEmpty()) {
-                binding.fabTopScroll.hide(); // MEMO:初回起動用
-                binding.textWordSearchNoResults.setVisibility(View.INVISIBLE);
+                binding.floatingActionButtonTopScroll.hide(); // MEMO:初回起動用
+                binding.textNoWordSearchResultsMessage.setVisibility(View.INVISIBLE);
                 binding.linerLayoutWordSearchResults.setVisibility(View.INVISIBLE);
             } else if (wordSearchResultYearMonthList.getWordSearchResultYearMonthListItemList().isEmpty()) {
-                binding.textWordSearchNoResults.setVisibility(View.VISIBLE);
+                binding.textNoWordSearchResultsMessage.setVisibility(View.VISIBLE);
                 binding.linerLayoutWordSearchResults.setVisibility(View.INVISIBLE);
             } else {
-                binding.textWordSearchNoResults.setVisibility(View.INVISIBLE);
+                binding.textNoWordSearchResultsMessage.setVisibility(View.INVISIBLE);
                 binding.linerLayoutWordSearchResults.setVisibility(View.VISIBLE);
             }
 
@@ -271,7 +271,7 @@ public class WordSearchFragment extends BaseFragment {
     }
 
     private void setUpFloatingActionButton() {
-        binding.fabTopScroll.setOnClickListener(new View.OnClickListener() {
+        binding.floatingActionButtonTopScroll.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Objects.requireNonNull(v);
@@ -285,9 +285,9 @@ public class WordSearchFragment extends BaseFragment {
                 super.onScrolled(recyclerView, dx, dy);
 
                 if (recyclerView.canScrollVertically(-1)) {
-                    binding.fabTopScroll.show();
+                    binding.floatingActionButtonTopScroll.show();
                 } else {
-                    binding.fabTopScroll.hide();
+                    binding.floatingActionButtonTopScroll.hide();
                 }
             }
         });

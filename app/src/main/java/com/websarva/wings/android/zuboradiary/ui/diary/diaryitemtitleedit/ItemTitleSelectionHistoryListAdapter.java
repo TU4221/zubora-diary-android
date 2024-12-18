@@ -7,12 +7,12 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.databinding.ViewDataBinding;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.viewbinding.ViewBinding;
 
 import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor;
 import com.websarva.wings.android.zuboradiary.databinding.RowItemTitleSelectionHistoryBinding;
@@ -66,8 +66,8 @@ class ItemTitleSelectionHistoryListAdapter
     public void onBindViewHolder(@NonNull ItemTitleSelectionHistoryViewHolder holder, int position) {
         SelectionHistoryListItem item = getItem(position);
         String title = item.getTitle();
-        holder.binding.textItemTitle.setText(title);
-        holder.binding.textItemTitle.setOnClickListener(new View.OnClickListener() {
+        holder.binding.textTitle.setText(title);
+        holder.binding.textTitle.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Objects.requireNonNull(v);
@@ -116,10 +116,10 @@ class ItemTitleSelectionHistoryListAdapter
         }
 
         @Override
-        public void setUpView(@NonNull ViewDataBinding binding) {
+        public void setUpView(@NonNull ViewBinding binding) {
             RowItemTitleSelectionHistoryBinding rowItemTitleSelectionHistoryBinding =
                     (RowItemTitleSelectionHistoryBinding) binding;
-            foregroundView = rowItemTitleSelectionHistoryBinding.textItemTitle;
+            foregroundView = rowItemTitleSelectionHistoryBinding.textTitle;
             backgroundButtonView = rowItemTitleSelectionHistoryBinding.includeBackground.imageButtonDelete;
         }
     }

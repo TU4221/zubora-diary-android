@@ -22,23 +22,23 @@
         android:orientation="vertical">
 
         <TextView
-            style="@style/CustomTextViewStyle"
+            style="@style/AppTextViewStyle"
             android:id="@+id/text_item_number"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/layout_diary_show_item_large_margin_top"
-            android:textAppearance="@style/CustomTextViewTextAppearance"
+            android:textAppearance="@style/AppTextViewTextAppearance"
             android:text="@{itemNumber}"
             android:textSize="@dimen/layout_diary_show_small_text_size"
             tools:text="@string/layout_diary_show_item_tools"/>
 
         <TextView
-            style="@style/CustomTextViewStyle"
-            android:id="@+id/text_item_title"
+            style="@style/AppTextViewStyle"
+            android:id="@+id/text_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/layout_diary_show_item_small_margin_top"
-            android:textAppearance="@style/CustomTextViewTextAppearance"
+            android:textAppearance="@style/AppTextViewTextAppearance"
             android:text="@{titleLiveData}"
             android:textSize="@dimen/layout_diary_show_item_text_size"
             android:hint="@string/layout_diary_show_item_title_hint" />
@@ -49,15 +49,16 @@
             android:layout_marginTop="@dimen/layout_diary_show_item_small_margin_top" />
 
         <TextView
-            style="@style/CustomTextViewStyle"
-            android:id="@+id/text_item_comment"
+            style="@style/AppTextViewStyle"
+            android:id="@+id/text_comment"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/layout_diary_show_item_small_margin_top"
-            android:textAppearance="@style/CustomTextViewTextAppearance"
+            android:textAppearance="@style/AppTextViewTextAppearance"
             android:text="@{commentLiveData}"
             android:textSize="@dimen/layout_diary_show_item_text_size"
             android:hint="@string/layout_diary_show_item_comment_hint" />
 
     </LinearLayout>
+
 </layout>

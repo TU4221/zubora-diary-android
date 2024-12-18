@@ -65,8 +65,6 @@ public class DiaryShowFragment extends BaseFragment {
     protected void initializeViewModel() {
         ViewModelProvider provider = new ViewModelProvider(this);
         diaryShowViewModel = provider.get(DiaryShowViewModel.class);
-
-        ViewModelProvider activityScopeProvider = new ViewModelProvider(requireActivity());
     }
 
     @Override

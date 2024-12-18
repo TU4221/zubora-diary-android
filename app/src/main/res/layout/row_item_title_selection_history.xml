@@ -1,34 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools">
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
 
-    <data>
-
-    </data>
-
-    <FrameLayout
-        android:id="@+id/frame_layout_row"
+    <include
+        layout="@layout/row_background_delete_button"
+        android:id="@+id/include_background"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="match_parent"/>
 
-        <include
-            layout="@layout/row_background_delete_button"
-            android:id="@+id/include_background"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"/>
+    <TextView
+        style="@style/DiaryItemSelectionHistoryTextViewStyle"
+        android:id="@+id/text_title"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:textAppearance="@style/AppTextViewTextAppearance"
+        android:gravity="center_vertical"
+        android:paddingHorizontal="8dp"
+        android:paddingVertical="4dp"
+        tools:text="item title" />
 
-        <TextView
-            style="@style/CustomTextViewStyle"
-            android:id="@+id/text_item_title"
-            android:layout_width="match_parent"
-            android:layout_height="40dp"
-            android:textAppearance="@style/CustomTextViewTextAppearance"
-            android:gravity="center_vertical"
-            android:paddingHorizontal="8dp"
-            android:paddingVertical="4dp"
-            android:background="?attr/colorSurface"
-            tools:text="item title" />
-
-    </FrameLayout>
-</layout>
+</FrameLayout>

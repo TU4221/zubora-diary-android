@@ -8,10 +8,10 @@ import android.view.View;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.databinding.ViewDataBinding;
 import androidx.interpolator.view.animation.FastOutSlowInInterpolator;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.viewbinding.ViewBinding;
 
 import java.util.Objects;
 
@@ -21,7 +21,7 @@ public class LeftSwipeSimpleCallback extends ItemTouchHelper.SimpleCallback {
         public View foregroundView;
         public View backgroundButtonView;
 
-        public LeftSwipeViewHolder(@NonNull ViewDataBinding binding) {
+        public LeftSwipeViewHolder(@NonNull ViewBinding binding) {
             super(binding.getRoot());
             Objects.requireNonNull(binding);
             setUpView(binding);
@@ -37,7 +37,7 @@ public class LeftSwipeSimpleCallback extends ItemTouchHelper.SimpleCallback {
         /**
          * フィールド変数 View foregroundView、View backgroundButtonView に対象Viewを代入すること。
          */
-        protected abstract void setUpView(@NonNull ViewDataBinding binding);
+        protected abstract void setUpView(@NonNull ViewBinding binding);
     }
 
     protected final RecyclerView recyclerView;

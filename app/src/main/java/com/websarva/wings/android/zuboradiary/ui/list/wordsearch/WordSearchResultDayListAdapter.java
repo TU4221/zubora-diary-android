@@ -73,11 +73,11 @@ public class WordSearchResultDayListAdapter
         holder.date = date; // ホルダー毎に日記の日付情報一式付与
         holder.binding.includeDay.textDayOfWeek.setText(strDayOfWeek);
         holder.binding.includeDay.textDayOfMonth.setText(String.valueOf(date.getDayOfMonth()));
-        holder.binding.textWordSearchResultTitle.setText(title);
+        holder.binding.textTitle.setText(title);
         String strItemNumber = context.getString(R.string.fragment_word_search_result_item) + itemNumber;
-        holder.binding.textWordSearchResultItemNumber.setText(strItemNumber);
-        holder.binding.textWordSearchResultItemTitle.setText(itemTitle);
-        holder.binding.textWordSearchResultItemComment.setText(itemComment);
+        holder.binding.textItemNumber.setText(strItemNumber);
+        holder.binding.textItemTitle.setText(itemTitle);
+        holder.binding.textItemComment.setText(itemComment);
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

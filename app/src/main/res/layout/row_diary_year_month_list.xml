@@ -1,36 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android"
+<!-- MEMO:LinearLayoutではなくConstraintLayoutを使用する理由は、
+              RecyclerViewのスクロール位置でセクションViewを移動させた時に、
+              RecyclerViewの前面でセクションViewを移動させたい為。
+              (FrameLayoutとLinearLayoutの組み合わせでも可能) -->
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools">
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
 
-    <data>
-
-    </data>
-
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <androidx.recyclerview.widget.RecyclerView
+        style="@style/DiaryListRecyclerViewStyle"
+        android:id="@+id/recycler_day_list"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/text_section" />
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/recycler_day_list"
-            style="@style/DiaryListRecyclerViewStyle"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/text_section_bar" />
+    <!-- MEMO:セクション(TextView)をリスト(RecyclerView)の前面に配置したい為、TextViewを下記に記載 -->
+    <TextView
+        style="@style/DiaryYearMonthListSectionTextViewStyle"
+        android:id="@+id/text_section"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textAppearance="@style/DiaryListYearMonthSectionTextAppearance"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:hint="0000年00月" />
 
-        <!-- セクションバー(TextView)をリスト(RecyclerView)の前面に配置したい為、TextViewを下記に記載 -->
-        <TextView
-            android:id="@+id/text_section_bar"
-            style="@style/DiaryListYearMonthStyle"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textAppearance="@style/DiaryListYearMonthTextAppearance"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            tools:hint="0000年00月" />
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
-</layout>
+</androidx.constraintlayout.widget.ConstraintLayout>

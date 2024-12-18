@@ -43,55 +43,55 @@
                 android:orientation="horizontal">
 
                 <TextView
-                    style="@style/CustomTextViewStyle"
+                    style="@style/AppTextViewStyle"
                     android:id="@+id/text_item_number"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textAppearance="@style/CustomTextViewTextAppearance"
+                    android:layout_gravity="center_vertical"
+                    android:textAppearance="@style/AppTextViewTextAppearance"
                     android:text="@{itemNumber}"
                     android:textSize="@dimen/layout_diary_edit_item_text_size"
                     tools:text="@string/layout_diary_edit_item_1_tools"/>
 
                 <ImageButton
-                    style="@style/CustomImageButtonStyle"
+                    style="@style/AppImageButtonStyle"
                     android:id="@+id/image_button_item_delete"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
                     android:layout_marginStart="@dimen/layout_diary_edit_item_margin_start"
-                    android:src="@drawable/ic_delete_forever_24px" />
+                    android:layout_gravity="center_vertical"
+                    android:src="@drawable/ic_delete_forever_24px"
+                    android:contentDescription="@string/layout_diary_edit_item_delete"/>
 
             </LinearLayout>
 
             <!-- 下記 EditText は項目タイトル入力フラグメントから入力する為、android:text は単一方向データバインディングとする。 -->
             <com.google.android.material.textfield.TextInputLayout
-                style="@style/TextInputLayoutOutlinedBoxStyle"
-                android:id="@+id/textInputLayout_item_title"
+                style="@style/AppTextInputLayoutOutlinedBoxStyle"
+                android:id="@+id/text_input_layout_title"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/layout_diary_edit_item_margin_top"
                 android:hint="@string/layout_diary_edit_item_title"
                 app:counterEnabled="true"
-                app:counterMaxLength="@integer/layout_diary_edit_item_title_max_length"
-                app:endIconTint="?attr/colorOnSurfaceVariant">
+                app:counterMaxLength="@integer/layout_diary_edit_item_title_max_length">
 
                 <com.google.android.material.textfield.TextInputEditText
-                    style="@style/TextInputEditTextStyle"
-                    android:id="@+id/textInputEditText_item_title"
+                    style="@style/AppTextInputEditTextNoInputStyle"
+                    android:id="@+id/textInputEditText_title"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:textAppearance="@style/TextInputEditTextTextAppearance"
+                    android:textAppearance="@style/AppTextInputEditTextTextAppearance"
                     android:text="@={titleMutableLiveData}"
                     android:textSize="@dimen/layout_diary_edit_item_text_size"
                     android:hint="@string/layout_diary_edit_item_title_hint"
-                    android:inputType="none"
-                    android:cursorVisible="false"
                     android:maxLength="@integer/layout_diary_edit_item_title_max_length" />
 
             </com.google.android.material.textfield.TextInputLayout>
 
             <com.google.android.material.textfield.TextInputLayout
-                style="@style/TextInputLayoutOutlinedBoxStyle"
-                android:id="@+id/textInputLayout_item_comment"
+                style="@style/AppTextInputLayoutOutlinedBoxStyle"
+                android:id="@+id/text_input_layout_comment"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/layout_diary_edit_item_margin_top"
@@ -100,21 +100,17 @@
                 app:counterMaxLength="@integer/layout_diary_edit_item_comment_max_length">
 
                 <com.google.android.material.textfield.TextInputEditText
-                    style="@style/TextInputEditTextStyle"
-                    android:id="@+id/textInputEditText_item_comment"
+                    style="@style/AppTextInputEditTextMultiLineStyle"
+                    android:id="@+id/text_input_edit_text_comment"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:textAppearance="@style/TextInputEditTextTextAppearance"
+                    android:textAppearance="@style/AppTextInputEditTextTextAppearance"
                     android:text="@={commentMutableLiveData}"
                     android:textSize="@dimen/layout_diary_edit_item_text_size"
                     android:hint="@string/layout_diary_edit_item_comment_hint"
-                    android:inputType="textMultiLine"
                     android:maxLength="@integer/layout_diary_edit_item_comment_max_length"
                     android:minLines="@integer/layout_diary_edit_item_comment_min_lines"
-                    android:lines="@integer/layout_diary_edit_item_comment_min_lines"
-                    android:gravity="top"
-                    android:scrollbars="vertical"
-                    android:overScrollMode="ifContentScrolls"/>
+                    android:lines="@integer/layout_diary_edit_item_comment_min_lines"/>
 
             </com.google.android.material.textfield.TextInputLayout>
 

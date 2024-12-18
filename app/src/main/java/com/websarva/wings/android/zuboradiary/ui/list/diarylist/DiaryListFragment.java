@@ -166,7 +166,7 @@ public class DiaryListFragment extends BaseFragment {
 
     // 新規作成FAB設定
     private void setUpFloatActionButton() {
-        binding.fabEditDiary.setOnClickListener(new View.OnClickListener() {
+        binding.floatingActionButtonDiaryEdit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Objects.requireNonNull(v);
@@ -181,7 +181,7 @@ public class DiaryListFragment extends BaseFragment {
         DiaryListAdapter diaryListAdapter =
                 new DiaryListAdapter(
                         requireContext(),
-                        binding.recyclerDiaryYearMonthList,
+                        binding.recyclerDiaryList,
                         requireThemeColor(),
                         true
                 );
@@ -253,11 +253,11 @@ public class DiaryListFragment extends BaseFragment {
 
             boolean isNoDiary = list.getDiaryYearMonthListItemList().isEmpty();
             if (isNoDiary) {
-                binding.textDiaryListNoDiaryMessage.setVisibility(View.VISIBLE);
-                binding.recyclerDiaryYearMonthList.setVisibility(View.INVISIBLE);
+                binding.textNoDiaryMessage.setVisibility(View.VISIBLE);
+                binding.recyclerDiaryList.setVisibility(View.INVISIBLE);
             } else {
-                binding.textDiaryListNoDiaryMessage.setVisibility(View.INVISIBLE);
-                binding.recyclerDiaryYearMonthList.setVisibility(View.VISIBLE);
+                binding.textNoDiaryMessage.setVisibility(View.INVISIBLE);
+                binding.recyclerDiaryList.setVisibility(View.VISIBLE);
             }
         }
 
@@ -268,7 +268,7 @@ public class DiaryListFragment extends BaseFragment {
                     new ArrayList<>(list.getDiaryYearMonthListItemList());
             DiaryYearMonthListAdapter listAdapter =
                     (DiaryYearMonthListAdapter)
-                            binding.recyclerDiaryYearMonthList.getAdapter();
+                            binding.recyclerDiaryList.getAdapter();
             Objects.requireNonNull(listAdapter);
             listAdapter.submitList(convertedItemList);
         }
@@ -359,7 +359,7 @@ public class DiaryListFragment extends BaseFragment {
     //日記リスト(年月)を自動でトップへスクロールさせるメソッド。
     private void scrollDiaryListToFirstPosition() {
         DiaryYearMonthListAdapter adapter =
-                (DiaryYearMonthListAdapter) binding.recyclerDiaryYearMonthList.getAdapter();
+                (DiaryYearMonthListAdapter) binding.recyclerDiaryList.getAdapter();
         Objects.requireNonNull(adapter);
 
         adapter.scrollToFirstPosition();

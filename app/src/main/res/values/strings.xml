@@ -133,6 +133,7 @@
     <string name="layout_diary_show_item_3">項目3</string>
     <string name="layout_diary_show_item_4">項目4</string>
     <string name="layout_diary_show_item_5">項目5</string>
+    <string name="layout_diary_show_attached_picture">添付写真</string>
     <string name="layout_diary_show_last_update">最終更新日時</string>
     <string name="layout_diary_show_last_update_tools_value">0000/00/00 00:00:00</string>
 
@@ -172,6 +173,7 @@
 
     <!-- layout_diary_edit_item -->
     <string name="layout_diary_edit_item_1_tools">項目*</string>
+    <string name="layout_diary_edit_item_delete">項目削除</string>
     <string name="layout_diary_edit_item_title">タイトル</string>
     <string name="layout_diary_edit_item_title_hint">未選択</string>
     <string name="layout_diary_edit_item_comment">コメント</string>

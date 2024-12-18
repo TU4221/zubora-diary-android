@@ -16,7 +16,7 @@
         android:layout_height="match_parent">
 
         <View
-            style="@style/FragmentBackgroundViewStyle"
+            style="@style/AppFragmentBackgroundViewStyle"
             android:id="@+id/view_full_screen_background"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
@@ -31,14 +31,12 @@
                 android:layout_height="wrap_content">
 
                 <com.google.android.material.appbar.MaterialToolbar
-                    style="@style/CustomToolbarStyle"
+                    style="@style/AppToolbarNavBackStyle"
                     android:id="@+id/material_toolbar_top_app_bar"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    app:navigationIcon="@drawable/ic_arrow_back_24px" />
+                    android:layout_height="wrap_content" />
 
                 <LinearLayout
-                    android:id="@+id/liner_layout_key_word_search_background"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
@@ -46,27 +44,25 @@
                     android:background="@drawable/bg_word_search_input_bar">
 
                     <EditText
-                        android:id="@+id/edit_text_key_word_search"
+                        style="@style/WordSearchTextViewStyle"
+                        android:id="@+id/edit_text_search_word"
                         android:layout_width="250dp"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
                         android:paddingVertical="8dp"
                         android:paddingHorizontal="16dp"
-                        android:inputType="text"
+                        android:textAppearance="@style/WordSearchTextViewTextAppearance"
                         android:text="@={word_search_view_model.searchWordMutableLiveData}"
-                        android:textColor="?attr/colorOnSecondaryContainer"
-                        android:hint="@string/fragment_word_search_input_field_hint"
-                        android:background="@null"
                         android:textSize="16sp" />
 
                     <ImageButton
-                        style="@style/CustomImageButtonStyle"
-                        android:id="@+id/image_button_key_word_clear"
+                        style="@style/WordSearchImageButtonStyle"
+                        android:id="@+id/image_button_search_word_clear"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_vertical|end"
-                        android:layout_marginHorizontal="8dp"
-                        android:src="@drawable/ic_cancel_24px" />
+                        android:layout_marginHorizontal="8dp" />
+
                 </LinearLayout>
 
             </FrameLayout>
@@ -76,11 +72,11 @@
                 android:layout_height="match_parent">
 
                 <TextView
-                    style="@style/CustomTextViewStyle"
-                    android:id="@+id/text_word_search_no_results"
+                    style="@style/AppTextViewStyle"
+                    android:id="@+id/text_no_word_search_results_message"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:textAppearance="@style/CustomTextViewTextAppearance"
+                    android:textAppearance="@style/AppTextViewTextAppearance"
                     android:text="@string/fragment_word_search_no_results_message"
                     android:gravity="center_horizontal"
                     android:paddingTop="100dp"
@@ -96,14 +92,13 @@
                     tools:visibility="visible" >
 
                     <TextView
-                        style="@style/CustomTextViewStyle"
-                        android:id="@+id/text_word_search_results"
+                        style="@style/AppTextViewStyle"
+                        android:id="@+id/text_num_word_search_results"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:textAppearance="@style/CustomTextViewTextAppearance"
+                        android:textAppearance="@style/AppTextViewTextAppearance"
                         android:text="@{Integer.toString(word_search_view_model.numWordSearchResultsLiveData) + @string/fragment_word_search_num_results_message}"
-                        android:paddingHorizontal="8dp"
-                        android:paddingVertical="8dp"
+                        android:padding="8dp"
                         android:visibility="invisible"
                         tools:visibility="visible" />
 
@@ -116,8 +111,8 @@
                 </LinearLayout>
 
                 <include
-                    android:id="@+id/include_progress_indicator"
                     layout="@layout/layout_full_screen_circular_progress_indicator"
+                    android:id="@+id/include_progress_indicator"
                     app:isVisibleLiveData="@{word_search_view_model.isVisibleUpdateProgressBarLiveData}" />
 
             </FrameLayout>
@@ -125,8 +120,8 @@
         </LinearLayout>
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
-            style="?attr/floatingActionButtonSmallSurfaceStyle"
-            android:id="@+id/fab_top_scroll"
+            style="@style/AppSubFloatingActionButtonStyle"
+            android:id="@+id/floating_action_button_top_scroll"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="end|bottom"

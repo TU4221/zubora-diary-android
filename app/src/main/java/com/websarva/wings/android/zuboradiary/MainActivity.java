@@ -178,15 +178,15 @@ public class MainActivity extends AppCompatActivity {
                 new ThemeColorSwitcher(getApplicationContext(), themeColor);
         switcher.switchStatusBarColor(getWindow());
         switcher.switchBackgroundColor(binding.viewFullScreenBackground);
-        switcher.switchToolbarColor(binding.mtbMainToolbar);
-        switcher.switchBottomNavigationColor(binding.navView);
+        switcher.switchToolbarColor(binding.materialToolbarTopAppBar);
+        switcher.switchBottomNavigationColor(binding.bottomNavigation);
     }
 
     @NonNull
     private NavHostFragment findNavHostFragment() {
         NavHostFragment navHostFragment =
                 (NavHostFragment) getSupportFragmentManager()
-                        .findFragmentById(R.id.nav_host_fragment_activity_main);
+                        .findFragmentById(R.id.fragment_nav_host);
         return Objects.requireNonNull(navHostFragment);
     }
 
@@ -206,24 +206,24 @@ public class MainActivity extends AppCompatActivity {
 
     @NonNull
     private MenuItem findSelectedBottomNavigationMenuItem() {
-        BottomNavigationView navView = binding.navView;
-        int selectedItemId = navView.getSelectedItemId();
-        return navView.getMenu().findItem(selectedItemId);
+        BottomNavigationView bottomNavigationView = binding.bottomNavigation;
+        int selectedItemId = bottomNavigationView.getSelectedItemId();
+        return bottomNavigationView.getMenu().findItem(selectedItemId);
     }
     
     private void setUpNavigation() {
         // Navigation設定
         // 参考:https://inside.luchegroup.com/entry/2023/05/08/113236
-        BottomNavigationView navView = binding.navView;
+        BottomNavigationView bottomNavigationView = binding.bottomNavigation;
         NavController navController =
-                Navigation.findNavController(this, R.id.nav_host_fragment_activity_main);
-        NavigationUI.setupWithNavController(navView, navController);
+                Navigation.findNavController(this, R.id.fragment_nav_host);
+        NavigationUI.setupWithNavController(bottomNavigationView, navController);
 
         // ボトムナビゲーションのデフォルト選択アイテム情報取得
         startNavigationMenuItem = findSelectedBottomNavigationMenuItem();
 
-        navView.setOnItemSelectedListener(new CustomOnItemSelectedListener(navController));
-        navView.setOnItemReselectedListener(new CustomOnItemReselectedListener());
+        bottomNavigationView.setOnItemSelectedListener(new CustomOnItemSelectedListener(navController));
+        bottomNavigationView.setOnItemReselectedListener(new CustomOnItemReselectedListener());
         navController.addOnDestinationChangedListener(new BottomNavigationStateOnDestinationChangedListener());
     }
 
@@ -286,7 +286,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         private void switchEnabledNavigation(boolean isEnabled) {
-            Menu menu = binding.navView.getMenu();
+            Menu menu = binding.bottomNavigation.getMenu();
             int size = menu.size();
             for (int i = 0; i < size; i++) {
                 menu.getItem(i).setEnabled(isEnabled);
@@ -439,7 +439,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void popBackStackToStartFragment() {
-        binding.navView.setSelectedItemId(startNavigationMenuItem.getItemId());
+        binding.bottomNavigation.setSelectedItemId(startNavigationMenuItem.getItemId());
     }
 
     /**

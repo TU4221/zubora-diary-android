@@ -193,9 +193,9 @@ public abstract class DiaryYearMonthListAdapter extends ListAdapter<DiaryYearMon
             // 左端に余白を持たせる為、最初にスペースを入力。
             String diaryDate = "  " + diaryYearMonth.getYear() + context.getString(R.string.row_diary_year_month_list_section_bar_year)
                     + diaryYearMonth.getMonthValue() + context.getString(R.string.row_diary_year_month_list_section_bar_month);
-            _holder.binding.textSectionBar.setText(diaryDate);
+            _holder.binding.textSection.setText(diaryDate);
             // 日記リストスクロール時に移動させているので、バインディング時に位置リセット
-            _holder.binding.textSectionBar.setY(0);
+            _holder.binding.textSection.setY(0);
 
             // 日記リスト(日)設定
             // MEMO:日記リスト(年月)のLinearLayoutManagerとは併用できないので、
@@ -595,21 +595,21 @@ public abstract class DiaryYearMonthListAdapter extends ListAdapter<DiaryYearMon
 
         float firstVisibleItemViewPositionY = firstVisibleItemView.getY();
         if (secondVisibleItemView == null) {
-            _firstVisibleViewHolder.binding.textSectionBar.setY(-(firstVisibleItemViewPositionY));
+            _firstVisibleViewHolder.binding.textSection.setY(-(firstVisibleItemViewPositionY));
             return;
         }
 
-        int sectionBarHeight = _firstVisibleViewHolder.binding.textSectionBar.getHeight();
+        int sectionHeight = _firstVisibleViewHolder.binding.textSection.getHeight();
         float secondVisibleItemViewPositionY = secondVisibleItemView.getY();
-        int border = sectionBarHeight + DIARY_DAY_LIST_ITEM_MARGIN_VERTICAL;
+        int border = sectionHeight + DIARY_DAY_LIST_ITEM_MARGIN_VERTICAL;
         if (secondVisibleItemViewPositionY >= border) {
-            _firstVisibleViewHolder.binding.textSectionBar.setY(-(firstVisibleItemViewPositionY));
+            _firstVisibleViewHolder.binding.textSection.setY(-(firstVisibleItemViewPositionY));
         } else {
             if (secondVisibleItemViewPositionY < DIARY_DAY_LIST_ITEM_MARGIN_VERTICAL) {
-                _firstVisibleViewHolder.binding.textSectionBar.setY(0);
-            } else if (_firstVisibleViewHolder.binding.textSectionBar.getY() == 0) {
-                _firstVisibleViewHolder.binding.textSectionBar.setY(
-                        -(firstVisibleItemViewPositionY) - sectionBarHeight
+                _firstVisibleViewHolder.binding.textSection.setY(0);
+            } else if (_firstVisibleViewHolder.binding.textSection.getY() == 0) {
+                _firstVisibleViewHolder.binding.textSection.setY(
+                        -(firstVisibleItemViewPositionY) - sectionHeight
                 );
             }
         }
@@ -626,7 +626,7 @@ public abstract class DiaryYearMonthListAdapter extends ListAdapter<DiaryYearMon
         DiaryYearMonthListViewHolder _secondVisibleViewHolder =
                 (DiaryYearMonthListViewHolder) secondVisibleViewHolder;
 
-        _secondVisibleViewHolder.binding.textSectionBar.setY(0); // ズレ防止
+        _secondVisibleViewHolder.binding.textSection.setY(0); // ズレ防止
     }
 
     public void scrollToFirstPosition() {

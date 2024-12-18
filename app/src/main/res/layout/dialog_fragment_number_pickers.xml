@@ -1,84 +1,76 @@
 <?xml version="1.0" encoding="utf-8"?>
-
-<layout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools">
+    xmlns:tools="http://schemas.android.com/tools"
+    style="@style/FragmentBackgroundLayoutStyle"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
 
-    <data>
-
-    </data>
-
-    <LinearLayout
-        android:id="@+id/liner_layout_date_picker_bottom_sheet"
+    <FrameLayout
+        style="@style/BottomSheetTopBarBackgroundLayoutStyle"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:layout_height="wrap_content">
 
-        <FrameLayout
+        <Button
+            style="@style/BottomSheetTopBarButtonStyle"
+            android:id="@+id/button_cancel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="@style/BottomSheetTopBarButtonTextAppearance"
+            android:text="@string/dialog_fragment_number_picker_cancel" />
+
+        <Button
+            style="@style/BottomSheetTopBarButtonStyle"
+            android:id="@+id/button_decision"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:textAppearance="@style/BottomSheetTopBarButtonTextAppearance"
+            android:text="@string/dialog_fragment_number_picker_decision" />
+    </FrameLayout>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <View
+            android:id="@+id/view_full_screen_background"
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            style="@style/AppFragmentBackgroundViewStyle" />
+
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="?colorSecondaryContainer">
+            android:orientation="horizontal"
+            android:layout_marginHorizontal="@dimen/dialog_fragment_number_picker_layout_margin_horizontal"
+            android:layout_marginVertical="@dimen/dialog_fragment_number_picker_layout_margin_vertical">
 
-            <Button
-                style="@style/NumberPickerButtonStyle"
-                android:id="@+id/button_cancel"
-                android:layout_width="wrap_content"
+            <NumberPicker
+                style="@style/NumberPickerStyle"
+                android:id="@+id/number_picker_first"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:textAppearance="@style/NumberPickerButtonTextAppearance"
-                android:text="@string/dialog_fragment_number_picker_cancel" />
+                android:layout_weight="1" />
 
-            <Button
-                style="@style/NumberPickerButtonStyle"
-                android:id="@+id/button_decision"
-                android:layout_width="wrap_content"
+            <NumberPicker
+                style="@style/NumberPickerStyle"
+                android:id="@+id/number_picker_second"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_gravity="end"
-                android:textAppearance="@style/NumberPickerButtonTextAppearance"
-                android:text="@string/dialog_fragment_number_picker_decision" />
-        </FrameLayout>
+                android:layout_weight="1"
+                android:layout_marginStart="@dimen/dialog_fragment_number_picker_layout_margin_horizontal_between_items" />
 
-        <FrameLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <View
-                android:id="@+id/view_full_screen_background"
-                android:layout_width="match_parent"
-                android:layout_height="200dp"
-                style="@style/FragmentBackgroundViewStyle" />
-
-            <LinearLayout
-                android:layout_width="match_parent"
+            <NumberPicker
+                android:id="@+id/number_picker_third"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:layout_marginHorizontal="@dimen/dialog_fragment_number_picker_layout_margin_horizontal"
-                android:layout_marginVertical="@dimen/dialog_fragment_number_picker_layout_margin_vertical">
+                android:layout_weight="1"
+                android:layout_marginStart="@dimen/dialog_fragment_number_picker_layout_margin_horizontal_between_items"/>
 
-                <NumberPicker
-                    style="@style/NumberPickerStyle"
-                    android:id="@+id/number_picker_first"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1" />
+        </LinearLayout>
 
-                <NumberPicker
-                    style="@style/NumberPickerStyle"
-                    android:id="@+id/number_picker_second"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:layout_marginStart="@dimen/dialog_fragment_number_picker_layout_margin_horizontal_between_items" />
+    </FrameLayout>
 
-                <NumberPicker
-                    android:id="@+id/number_picker_third"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:layout_marginStart="@dimen/dialog_fragment_number_picker_layout_margin_horizontal_between_items"/>
-
-            </LinearLayout>
-
-        </FrameLayout>
-
-    </LinearLayout>
-</layout>
+</LinearLayout>

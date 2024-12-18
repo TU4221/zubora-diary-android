@@ -7,10 +7,10 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
-import androidx.databinding.ViewDataBinding;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.viewbinding.ViewBinding;
 
 import com.websarva.wings.android.zuboradiary.data.DayOfWeekStringConverter;
 import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor;
@@ -85,7 +85,7 @@ public class DiaryDayListAdapter extends ListAdapter<DiaryDayListItem, DiaryDayL
         Objects.requireNonNull(item);
 
         String title = item.getTitle();
-        holder.binding.textRowDiaryListDayTitle.setText(title);
+        holder.binding.textTitle.setText(title);
     }
 
     private void setUpPicture(DiaryDayListViewHolder holder, DiaryDayListItem item) {
@@ -132,7 +132,7 @@ public class DiaryDayListAdapter extends ListAdapter<DiaryDayListItem, DiaryDayL
         }
 
         @Override
-        protected void setUpView(@NonNull ViewDataBinding binding) {
+        protected void setUpView(@NonNull ViewBinding binding) {
             RowDiaryDayListBinding rowDiaryDayListBinding;
             if (binding instanceof RowDiaryDayListBinding) {
                 rowDiaryDayListBinding = (RowDiaryDayListBinding) binding;

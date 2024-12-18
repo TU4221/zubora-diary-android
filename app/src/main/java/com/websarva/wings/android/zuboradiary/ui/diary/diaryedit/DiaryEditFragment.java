@@ -549,33 +549,33 @@ public class DiaryEditFragment extends BaseFragment {
         ImageButton[] imageButtonItemsDelete = new ImageButton[MAX_ITEMS];
 
         textItems[0] = binding.includeItem1.textItemNumber;
-        textInputLayoutItemsTitle[0] = binding.includeItem1.textInputLayoutItemTitle;
-        textInputEditTextItemsTitle[0] = binding.includeItem1.textInputEditTextItemTitle;
-        textInputEditTextItemsComment[0] = binding.includeItem1.textInputEditTextItemComment;
+        textInputLayoutItemsTitle[0] = binding.includeItem1.textInputLayoutTitle;
+        textInputEditTextItemsTitle[0] = binding.includeItem1.textInputEditTextTitle;
+        textInputEditTextItemsComment[0] = binding.includeItem1.textInputEditTextComment;
         imageButtonItemsDelete[0] = binding.includeItem1.imageButtonItemDelete;
 
         textItems[1] = binding.includeItem2.textItemNumber;
-        textInputLayoutItemsTitle[1] = binding.includeItem2.textInputLayoutItemTitle;
-        textInputEditTextItemsTitle[1] = binding.includeItem2.textInputEditTextItemTitle;
-        textInputEditTextItemsComment[1] = binding.includeItem2.textInputEditTextItemComment;
+        textInputLayoutItemsTitle[1] = binding.includeItem2.textInputLayoutTitle;
+        textInputEditTextItemsTitle[1] = binding.includeItem2.textInputEditTextTitle;
+        textInputEditTextItemsComment[1] = binding.includeItem2.textInputEditTextComment;
         imageButtonItemsDelete[1] = binding.includeItem2.imageButtonItemDelete;
 
         textItems[2] = binding.includeItem3.textItemNumber;
-        textInputLayoutItemsTitle[2] = binding.includeItem3.textInputLayoutItemTitle;
-        textInputEditTextItemsTitle[2] = binding.includeItem3.textInputEditTextItemTitle;
-        textInputEditTextItemsComment[2] = binding.includeItem3.textInputEditTextItemComment;
+        textInputLayoutItemsTitle[2] = binding.includeItem3.textInputLayoutTitle;
+        textInputEditTextItemsTitle[2] = binding.includeItem3.textInputEditTextTitle;
+        textInputEditTextItemsComment[2] = binding.includeItem3.textInputEditTextComment;
         imageButtonItemsDelete[2] = binding.includeItem3.imageButtonItemDelete;
 
         textItems[3] = binding.includeItem4.textItemNumber;
-        textInputLayoutItemsTitle[3] = binding.includeItem4.textInputLayoutItemTitle;
-        textInputEditTextItemsTitle[3] = binding.includeItem4.textInputEditTextItemTitle;
-        textInputEditTextItemsComment[3] = binding.includeItem4.textInputEditTextItemComment;
+        textInputLayoutItemsTitle[3] = binding.includeItem4.textInputLayoutTitle;
+        textInputEditTextItemsTitle[3] = binding.includeItem4.textInputEditTextTitle;
+        textInputEditTextItemsComment[3] = binding.includeItem4.textInputEditTextComment;
         imageButtonItemsDelete[3] = binding.includeItem4.imageButtonItemDelete;
 
         textItems[4] = binding.includeItem5.textItemNumber;
-        textInputLayoutItemsTitle[4] = binding.includeItem5.textInputLayoutItemTitle;
-        textInputEditTextItemsTitle[4] = binding.includeItem5.textInputEditTextItemTitle;
-        textInputEditTextItemsComment[4] = binding.includeItem5.textInputEditTextItemComment;
+        textInputLayoutItemsTitle[4] = binding.includeItem5.textInputLayoutTitle;
+        textInputEditTextItemsTitle[4] = binding.includeItem5.textInputEditTextTitle;
+        textInputEditTextItemsComment[4] = binding.includeItem5.textInputEditTextComment;
         imageButtonItemsDelete[4] = binding.includeItem5.imageButtonItemDelete;
 
         // 項目欄設定
@@ -603,12 +603,12 @@ public class DiaryEditFragment extends BaseFragment {
         }
 
         // 項目追加ボタン設定
-        binding.imageButtonAddItem.setOnClickListener(new View.OnClickListener() {
+        binding.imageButtonItemAddition.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Objects.requireNonNull(v);
 
-                binding.imageButtonAddItem.setEnabled(false);
+                binding.imageButtonItemAddition.setEnabled(false);
                 diaryEditViewModel.incrementVisibleItemsCount();
             }
         });
@@ -655,12 +655,12 @@ public class DiaryEditFragment extends BaseFragment {
                             diaryEditViewModel.deleteItem(itemNumber);
                             isDeletingItemTransition = false;
                         }
-                        binding.imageButtonAddItem.setVisibility(View.VISIBLE);
+                        binding.imageButtonItemAddition.setVisibility(View.VISIBLE);
 
                     // 対象項目欄追加後の処理
                     } else if (currentId == R.id.motion_scene_edit_diary_item_showed_state) {
                         Log.d("MotionLayout", "currentId:showed_state");
-                        binding.imageButtonAddItem.setEnabled(true);
+                        binding.imageButtonItemAddition.setEnabled(true);
                     }
                 }
 
@@ -703,7 +703,7 @@ public class DiaryEditFragment extends BaseFragment {
             // 項目欄追加ボタン表示切替
             // TODO:使用不可時はボタンをぼかすように変更する。
             if (integer == DiaryLiveData.MAX_ITEMS) {
-                binding.imageButtonAddItem.setVisibility(View.INVISIBLE);
+                binding.imageButtonItemAddition.setVisibility(View.INVISIBLE);
             }
 
             setUpItemsLayout(integer);
@@ -791,27 +791,27 @@ public class DiaryEditFragment extends BaseFragment {
         textInputSetup.setUpKeyboardCloseOnEnter(binding.textInputLayoutTitle);
 
         TextInputLayout[] scrollableTextInputLayouts = {
-                binding.includeItem1.textInputLayoutItemComment,
-                binding.includeItem2.textInputLayoutItemComment,
-                binding.includeItem3.textInputLayoutItemComment,
-                binding.includeItem4.textInputLayoutItemComment,
-                binding.includeItem5.textInputLayoutItemComment,
+                binding.includeItem1.textInputLayoutComment,
+                binding.includeItem2.textInputLayoutComment,
+                binding.includeItem3.textInputLayoutComment,
+                binding.includeItem4.textInputLayoutComment,
+                binding.includeItem5.textInputLayoutComment,
         };
         textInputSetup.setUpScrollable(scrollableTextInputLayouts);
 
         TextInputLayout[] clearableTextInputLayouts = {
                 binding.textInputLayoutTitle,
-                binding.includeItem1.textInputLayoutItemTitle,
-                binding.includeItem2.textInputLayoutItemTitle,
-                binding.includeItem3.textInputLayoutItemTitle,
-                binding.includeItem4.textInputLayoutItemTitle,
-                binding.includeItem5.textInputLayoutItemTitle,
+                binding.includeItem1.textInputLayoutTitle,
+                binding.includeItem2.textInputLayoutTitle,
+                binding.includeItem3.textInputLayoutTitle,
+                binding.includeItem4.textInputLayoutTitle,
+                binding.includeItem5.textInputLayoutTitle,
         };
         TextInputSetup.ClearButtonSetUpTransitionListener transitionListener =
                 textInputSetup.createClearButtonSetupTransitionListener(clearableTextInputLayouts);
         addTransitionListener(transitionListener);
 
-        /*binding.includeItem1.textInputEditTextItemComment.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+        /*binding.includeItem1.textInputEditTextComment.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
             public void onFocusChange(View v, boolean hasFocus) {
                 if (hasFocus) {
@@ -843,16 +843,16 @@ public class DiaryEditFragment extends BaseFragment {
                 binding.textInputLayoutWeather2,
                 binding.textInputLayoutCondition,
                 binding.textInputLayoutTitle,
-                binding.includeItem1.textInputLayoutItemTitle,
-                binding.includeItem1.textInputLayoutItemComment,
-                binding.includeItem2.textInputLayoutItemTitle,
-                binding.includeItem2.textInputLayoutItemComment,
-                binding.includeItem3.textInputLayoutItemTitle,
-                binding.includeItem3.textInputLayoutItemComment,
-                binding.includeItem4.textInputLayoutItemTitle,
-                binding.includeItem4.textInputLayoutItemComment,
-                binding.includeItem5.textInputLayoutItemTitle,
-                binding.includeItem5.textInputLayoutItemComment
+                binding.includeItem1.textInputLayoutTitle,
+                binding.includeItem1.textInputLayoutComment,
+                binding.includeItem2.textInputLayoutTitle,
+                binding.includeItem2.textInputLayoutComment,
+                binding.includeItem3.textInputLayoutTitle,
+                binding.includeItem3.textInputLayoutComment,
+                binding.includeItem4.textInputLayoutTitle,
+                binding.includeItem4.textInputLayoutComment,
+                binding.includeItem5.textInputLayoutTitle,
+                binding.includeItem5.textInputLayoutComment
         );
     }
 

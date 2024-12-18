@@ -14,24 +14,22 @@
         android:layout_height="match_parent">
 
         <View
+            style="@style/AppFragmentBackgroundViewStyle"
             android:id="@+id/view_full_screen_background"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            style="@style/FragmentBackgroundViewStyle"/>
+            android:layout_height="match_parent"/>
 
         <LinearLayout
-            android:id="@+id/constraint_layout_full_screen"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical">
 
             <com.google.android.material.appbar.MaterialToolbar
+                style="@style/AppToolbarNavBackStyle"
                 android:id="@+id/material_toolbar_top_app_bar"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:navigationIcon="@drawable/ic_arrow_back_24px"
-                tools:title="@string/fragment_diary_item_title_edit_toolbar_title_tools_value"
-                style="@style/CustomToolbarStyle"/>
+                tools:title="@string/fragment_diary_item_title_edit_toolbar_title_tools_value"/>
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -41,24 +39,22 @@
                 android:orientation="vertical">
 
                 <com.google.android.material.textfield.TextInputLayout
-                    android:id="@+id/textInputLayout_new_item_title"
+                    style="@style/AppTextInputLayoutOutlinedBoxStyle"
+                    android:id="@+id/text_input_layout_new_item_title"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/fragment_diary_item_title_edit_margin_top"
                     android:hint="@string/fragment_diary_item_title_edit_new_item_title"
                     app:counterEnabled="true"
                     app:counterMaxLength="@integer/fragment_diary_item_title_edit_item_title_max_length"
-                    app:expandedHintEnabled="false"
-                    app:errorEnabled="true"
-                    app:endIconTint="?attr/colorOnSurfaceVariant">
+                    app:errorEnabled="true">
 
                     <com.google.android.material.textfield.TextInputEditText
-                        style="@style/TextInputEditTextStyle"
-                        android:id="@+id/textInputEditText_new_item_title"
+                        style="@style/AppTextInputEditTextStyle"
+                        android:id="@+id/text_input_edit_text_new_item_title"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:hint="@string/fragment_diary_item_title_edit_new_item_title_hint"
-                        android:inputType="text"
                         android:maxLength="@integer/fragment_diary_item_title_edit_item_title_max_length"
                         android:text="@={diaryItemTitleEditViewModel.itemTitleMutableLiveData}"
                         android:textSize="@dimen/fragment_diary_item_title_edit_text_size" />
@@ -66,7 +62,8 @@
                 </com.google.android.material.textfield.TextInputLayout>
 
                 <Button
-                    android:id="@+id/button_select_new_item_title"
+                    style="@style/AppTonalButtonStyle"
+                    android:id="@+id/button_new_item_title_selection"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/fragment_diary_item_title_edit_margin_top"
@@ -77,22 +74,22 @@
             </LinearLayout>
 
             <TextView
-                style="@style/CustomTextViewStyle"
+                style="@style/AppTextViewStyle"
                 android:id="@+id/text_item_title_history"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/fragment_diary_item_title_edit_margin_start"
                 android:layout_marginTop="@dimen/fragment_diary_item_title_edit_margin_top"
-                android:textAppearance="@style/CustomTextViewTextAppearance"
+                android:textAppearance="@style/AppTextViewTextAppearance"
                 android:text="@string/fragment_diary_item_title_edit_title_selection_history"
                 android:textSize="@dimen/fragment_diary_item_title_edit_text_size" />
 
             <androidx.recyclerview.widget.RecyclerView
+                style="@style/AppRecyclerViewStyle"
                 android:id="@+id/recycler_item_title_selection_history"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_marginTop="@dimen/fragment_diary_item_title_edit_margin_top"
-                android:transitionGroup="true" />
+                android:layout_marginTop="@dimen/fragment_diary_item_title_edit_margin_top" />
         </LinearLayout>
 
     </FrameLayout>

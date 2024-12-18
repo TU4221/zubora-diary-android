@@ -14,7 +14,7 @@
         android:layout_height="match_parent">
 
         <View
-            style="@style/FragmentBackgroundViewStyle"
+            style="@style/AppFragmentBackgroundViewStyle"
             android:id="@+id/view_full_screen_background"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
@@ -25,14 +25,14 @@
             android:orientation="vertical">
 
             <com.google.android.material.appbar.MaterialToolbar
-                style="@style/CustomToolbarStyle"
+                style="@style/AppToolbarStyle"
                 android:id="@+id/material_toolbar_top_app_bar"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:title="設定" />
 
             <com.google.android.material.divider.MaterialDivider
-                android:id="@+id/materialDivider_toolbar"
+                android:id="@+id/material_divider_toolbar"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
 
@@ -59,7 +59,7 @@
                             android:text="@string/fragment_settings_section_title_design"/>
 
                         <com.google.android.material.divider.MaterialDivider
-                            android:id="@+id/materialDivider_theme_color_setting"
+                            android:id="@+id/material_divider_theme_color_setting"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content" />
 
@@ -77,7 +77,7 @@
                         android:orientation="vertical">
 
                         <com.google.android.material.divider.MaterialDivider
-                            android:id="@+id/materialDivider_section_setting"
+                            android:id="@+id/material_divider_section_setting"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content" />
 
@@ -90,7 +90,7 @@
                             android:text="@string/fragment_settings_section_title_setting" />
 
                         <com.google.android.material.divider.MaterialDivider
-                            android:id="@+id/materialDivider_calendar_start_day_setting"
+                            android:id="@+id/material_divider_calendar_start_day_setting"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content" />
 
@@ -101,7 +101,7 @@
                             app:settingTitle="@{@string/fragment_settings_item_title_calendar_start_day}" />
 
                         <com.google.android.material.divider.MaterialDivider
-                            android:id="@+id/materialDivider_reminder_notification_setting"
+                            android:id="@+id/material_divider_reminder_notification_setting"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content" />
 
@@ -114,7 +114,7 @@
                             app:settingValueSwitch="@{settingsViewModel.isCheckedReminderNotificationLiveData}" />
 
                         <com.google.android.material.divider.MaterialDivider
-                            android:id="@+id/materialDivider_passcode_lock_setting"
+                            android:id="@+id/material_divider_passcode_lock_setting"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content" />
 
@@ -127,7 +127,7 @@
                             app:settingValueSwitch="@{settingsViewModel.isCheckedPasscodeLockLiveData}" />
 
                         <com.google.android.material.divider.MaterialDivider
-                            android:id="@+id/materialDivider_weather_info_acquisition_setting"
+                            android:id="@+id/material_divider_weather_info_acquisition_setting"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content" />
 
@@ -147,7 +147,7 @@
                         android:orientation="vertical">
 
                         <com.google.android.material.divider.MaterialDivider
-                            android:id="@+id/materialDivider_section_data"
+                            android:id="@+id/material_divider_section_data"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content" />
 
@@ -160,7 +160,7 @@
                             android:text="@string/fragment_settings_section_title_data"/>
 
                         <com.google.android.material.divider.MaterialDivider
-                            android:id="@+id/materialDivider_all_diaries_delete_setting"
+                            android:id="@+id/material_divider_all_diaries_delete_setting"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content" />
 
@@ -171,7 +171,7 @@
                             app:settingTitle="@{@string/fragment_settings_item_title_all_diaries_delete}" />
 
                         <com.google.android.material.divider.MaterialDivider
-                            android:id="@+id/materialDivider_all_settings_initialization_setting"
+                            android:id="@+id/material_divider_all_settings_initialization_setting"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content" />
 
@@ -182,7 +182,7 @@
                             app:settingTitle="@{@string/fragment_settings_item_title_all_settings_initialization}" />
 
                         <com.google.android.material.divider.MaterialDivider
-                            android:id="@+id/materialDivider_all_data_delete_setting"
+                            android:id="@+id/material_divider_all_data_delete_setting"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content" />
 
@@ -200,7 +200,7 @@
                         android:orientation="vertical">
 
                         <com.google.android.material.divider.MaterialDivider
-                            android:id="@+id/materialDivider_section_end"
+                            android:id="@+id/material_divider_section_end"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content" />
 

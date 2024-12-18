@@ -91,7 +91,7 @@ public class DiaryItemTitleEditFragment extends BaseFragment {
 
     @Override
     protected void handleOnReceivingDialogResult(@NonNull SavedStateHandle savedStateHandle) {
-        receiveDiaryItemTitleDeleteDialogResult(savedStateHandle);
+        receiveDiaryItemTitleDeleteDialogResult();
         retryOtherAppMessageDialogShow();
     }
 
@@ -108,7 +108,7 @@ public class DiaryItemTitleEditFragment extends BaseFragment {
     }
 
     // 履歴項目削除確認ダイアログからの結果受取
-    private void receiveDiaryItemTitleDeleteDialogResult(SavedStateHandle savedStateHandle) {
+    private void receiveDiaryItemTitleDeleteDialogResult() {
         Integer selectedButton =
                 receiveResulFromDialog(DiaryItemTitleDeleteDialogFragment.KEY_SELECTED_BUTTON);
         if (selectedButton == null) return;
@@ -160,7 +160,7 @@ public class DiaryItemTitleEditFragment extends BaseFragment {
         Objects.requireNonNull(editText);
         editText.addTextChangedListener(new InputItemTitleErrorWatcher());
 
-        binding.buttonSelectNewItemTitle.setOnClickListener(new View.OnClickListener() {
+        binding.buttonNewItemTitleSelection.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Objects.requireNonNull(v);
@@ -174,7 +174,7 @@ public class DiaryItemTitleEditFragment extends BaseFragment {
         });
 
         boolean isEnabled = !editText.getText().toString().isEmpty();
-        binding.buttonSelectNewItemTitle.setEnabled(isEnabled);
+        binding.buttonNewItemTitleSelection.setEnabled(isEnabled);
     }
 
     private class InputItemTitleErrorWatcher implements TextWatcher {
@@ -191,17 +191,17 @@ public class DiaryItemTitleEditFragment extends BaseFragment {
             String title = s.toString();
             if (title.isEmpty()) {
                 binding.textInputLayoutNewItemTitle.setError(getString(R.string.fragment_diary_item_title_edit_new_item_title_input_field_error_message_empty));
-                binding.buttonSelectNewItemTitle.setEnabled(false);
+                binding.buttonNewItemTitleSelection.setEnabled(false);
                 return;
             }
             // 先頭が空白文字(\\s)
             if (title.matches("\\s+.*")) {
                 binding.textInputLayoutNewItemTitle.setError(getString(R.string.fragment_diary_item_title_edit_new_item_title_input_field_error_message_initial_char_unmatched));
-                binding.buttonSelectNewItemTitle.setEnabled(false);
+                binding.buttonNewItemTitleSelection.setEnabled(false);
                 return;
             }
             binding.textInputLayoutNewItemTitle.setError(null);
-            binding.buttonSelectNewItemTitle.setEnabled(true);
+            binding.buttonNewItemTitleSelection.setEnabled(true);
         }
 
         @Override

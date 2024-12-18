@@ -3,17 +3,26 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:minHeight="@dimen/row_diary_day_list_height">
+    android:layout_height="match_parent"
+    android:layout_margin="2dp">
 
     <TextView
         style="@style/AppTextViewStyle"
-        android:id="@+id/text_no_diary_message"
+        android:id="@+id/text_day"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_gravity="center"
+        android:layout_margin="8dp"
         android:textAppearance="@style/AppTextViewTextAppearance"
-        android:text="@string/row_no_diary_message_message"
-        android:gravity="center" />
+        android:textSize="16sp"
+        android:gravity="center"
+        tools:text="22" />
+
+    <View
+        android:id="@+id/view_day_dot"
+        android:layout_width="3dp"
+        android:layout_height="3dp"
+        android:layout_marginBottom="10dp"
+        android:layout_gravity="bottom|center_horizontal" />
 
 </FrameLayout>

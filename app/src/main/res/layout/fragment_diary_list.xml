@@ -15,7 +15,7 @@
         android:layout_height="match_parent">
 
         <View
-            style="@style/FragmentBackgroundViewStyle"
+            style="@style/AppFragmentBackgroundViewStyle"
             android:id="@+id/view_full_screen_background"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
@@ -26,7 +26,7 @@
             android:orientation="vertical">
 
             <com.google.android.material.appbar.MaterialToolbar
-                style="@style/CustomToolbarStyle"
+                style="@style/AppToolbarStyle"
                 android:id="@+id/material_toolbar_top_app_bar"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -40,11 +40,11 @@
                 android:layout_height="match_parent">
 
                 <TextView
-                    style="@style/CustomTextViewStyle"
-                    android:id="@+id/text_diary_list_no_diary_message"
+                    style="@style/AppTextViewStyle"
+                    android:id="@+id/text_no_diary_message"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:textAppearance="@style/CustomTextViewTextAppearance"
+                    android:textAppearance="@style/AppTextViewTextAppearance"
                     android:text="@string/fragment_diary_list_no_saved_diary_message"
                     android:gravity="center"
                     android:visibility="invisible"
@@ -52,22 +52,24 @@
 
                 <androidx.recyclerview.widget.RecyclerView
                     style="@style/DiaryListRecyclerViewStyle"
-                    android:id="@+id/recycler_diary_year_month_list"
+                    android:id="@+id/recycler_diary_list"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:visibility="invisible"
                     tools:visibility="visible"/>
 
                 <include
-                    android:id="@+id/include_progress_indicator"
                     layout="@layout/layout_full_screen_circular_progress_indicator"
+                    android:id="@+id/include_progress_indicator"
                     app:isVisibleLiveData="@{list_view_model.isVisibleUpdateProgressBarLiveData}" />
 
             </FrameLayout>
+
         </LinearLayout>
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/fab_edit_diary"
+            style="@style/AppMainFloatingActionButtonStyle"
+            android:id="@+id/floating_action_button_diary_edit"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="end|bottom"

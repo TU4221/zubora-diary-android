@@ -2,9 +2,11 @@
 <TextView  xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    style="@style/AppDropDownTextViewStyle"
-    android:id="@+id/text_dropdown_item"
-    android:layout_width="match_parent"
+    style="@style/AppTextViewStyle"
+    android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:textAppearance="@style/AppDropDownTextViewTextAppearance"
-    tools:text="Item" />
+    android:layout_weight="1"
+    android:textAppearance="@style/AppTextViewTextAppearance"
+    android:textSize="14sp"
+    android:gravity="center"
+    tools:text="SUN" />

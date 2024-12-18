@@ -20,21 +20,20 @@ import com.google.common.util.concurrent.FutureCallback;
 import com.kizitonwose.calendar.core.CalendarDay;
 import com.kizitonwose.calendar.core.CalendarMonth;
 import com.kizitonwose.calendar.core.DayPosition;
+import com.kizitonwose.calendar.view.CalendarView;
 import com.kizitonwose.calendar.view.MonthDayBinder;
 import com.kizitonwose.calendar.view.MonthHeaderFooterBinder;
 import com.kizitonwose.calendar.view.ViewContainer;
 import com.websarva.wings.android.zuboradiary.R;
 import com.websarva.wings.android.zuboradiary.data.AppMessage;
-import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor;
-import com.websarva.wings.android.zuboradiary.databinding.CalendarDayBinding;
-import com.websarva.wings.android.zuboradiary.databinding.CalendarHeaderBinding;
-import com.websarva.wings.android.zuboradiary.databinding.FragmentCalendarBinding;
 import com.websarva.wings.android.zuboradiary.data.DateTimeStringConverter;
+import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor;
+import com.websarva.wings.android.zuboradiary.databinding.FragmentCalendarBinding;
+import com.websarva.wings.android.zuboradiary.databinding.LayoutCalendarDayBinding;
+import com.websarva.wings.android.zuboradiary.databinding.LayoutCalendarHeaderBinding;
 import com.websarva.wings.android.zuboradiary.ui.BaseFragment;
 import com.websarva.wings.android.zuboradiary.ui.diary.DiaryLiveData;
 import com.websarva.wings.android.zuboradiary.ui.diary.diaryshow.DiaryShowFragment;
-
-import com.kizitonwose.calendar.view.CalendarView;
 import com.websarva.wings.android.zuboradiary.ui.diary.diaryshow.DiaryShowViewModel;
 
 import java.time.DayOfWeek;
@@ -214,10 +213,10 @@ public class CalendarFragment extends BaseFragment {
         @Override
         public void bind(@NonNull DayViewContainer container, @NonNull CalendarDay calendarDay) {
 
-            TextView textCalendarDay = container.binding.textCalendarDay;
-            View viewCalendarDayDot = container.binding.viewCalendarDayDot;
+            TextView textDay = container.binding.textDay;
+            View viewDayDot = container.binding.viewDayDot;
 
-            textCalendarDay.setOnClickListener(new View.OnClickListener() {
+            textDay.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     Objects.requireNonNull(v);
@@ -230,16 +229,16 @@ public class CalendarFragment extends BaseFragment {
 
             // 数値設定
             String day = String.valueOf(calendarDay.getDate().getDayOfMonth());
-            textCalendarDay.setText(day);
+            textDay.setText(day);
 
             // 日にちマス状態(可視、数値色、背景色、ドット有無)設定
             if (calendarDay.getPosition() == DayPosition.MonthDate) {
-                textCalendarDay.setVisibility(View.VISIBLE);
-                setUpCalendarDayColor(calendarDay, textCalendarDay, viewCalendarDayDot);
-                setUpCalendarDayDotVisibility(calendarDay, viewCalendarDayDot);
+                textDay.setVisibility(View.VISIBLE);
+                setUpCalendarDayColor(calendarDay, textDay, viewDayDot);
+                setUpCalendarDayDotVisibility(calendarDay, viewDayDot);
             } else {
-                textCalendarDay.setVisibility(View.INVISIBLE);
-                viewCalendarDayDot.setVisibility(View.INVISIBLE);
+                textDay.setVisibility(View.INVISIBLE);
+                viewDayDot.setVisibility(View.INVISIBLE);
             }
         }
 
@@ -374,22 +373,22 @@ public class CalendarFragment extends BaseFragment {
     // カレンダー日単位コンテナ
     private static class DayViewContainer extends ViewContainer {
 
-        private final CalendarDayBinding binding;
+        private final LayoutCalendarDayBinding binding;
 
         private DayViewContainer(View view) {
             super(view);
-            binding = CalendarDayBinding.bind(view);
+            binding = LayoutCalendarDayBinding.bind(view);
         }
     }
 
     // カレンダー月単位コンテナ
     private static class MonthViewContainer extends ViewContainer {
 
-        private final CalendarHeaderBinding binding;
+        private final LayoutCalendarHeaderBinding binding;
 
         private MonthViewContainer(View view) {
             super(view);
-            binding = CalendarHeaderBinding.bind(view);
+            binding = LayoutCalendarHeaderBinding.bind(view);
         }
     }
 
@@ -472,13 +471,13 @@ public class CalendarFragment extends BaseFragment {
         private void showDiary() {
             diaryShowViewModel.initialize();
             diaryShowViewModel.loadSavedDiary(date);
-            binding.linearLayoutDiaryShow.setVisibility(View.VISIBLE);
-            binding.textNoDiary.setVisibility(View.GONE);
+            binding.frameLayoutDiaryShow.setVisibility(View.VISIBLE);
+            binding.textNoDiaryMessage.setVisibility(View.GONE);
         }
 
         private void closeDiary() {
-            binding.linearLayoutDiaryShow.setVisibility(View.GONE);
-            binding.textNoDiary.setVisibility(View.VISIBLE);
+            binding.frameLayoutDiaryShow.setVisibility(View.GONE);
+            binding.textNoDiaryMessage.setVisibility(View.VISIBLE);
             diaryShowViewModel.initialize();
         }
     }
@@ -530,7 +529,7 @@ public class CalendarFragment extends BaseFragment {
     }
 
     private void setUpFloatActionButton() {
-        binding.floatActionButtonDiaryEdit.setOnClickListener(new View.OnClickListener() {
+        binding.floatingActionButtonDiaryEdit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Objects.requireNonNull(v);

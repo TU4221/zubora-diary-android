@@ -1,69 +1,61 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools">
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
 
-    <data>
-
-    </data>
-
-    <FrameLayout
+    <View
+        style="@style/AppFragmentBackgroundViewStyle"
+        android:id="@+id/view_full_screen_background"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"/>
 
-        <View
-            style="@style/FragmentBackgroundViewStyle"
-            android:id="@+id/view_full_screen_background"
+    <com.google.android.material.appbar.MaterialToolbar
+        style="@style/AppToolbarStyle"
+        android:id="@+id/material_toolbar_top_app_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <fragment
+            android:id="@+id/fragment_nav_host"
+            android:name="androidx.navigation.fragment.NavHostFragment"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"/>
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            app:defaultNavHost="true"
+            app:navGraph="@navigation/mobile_navigation" />
 
-        <com.google.android.material.appbar.MaterialToolbar
-            android:id="@+id/mtbMainToolbar"
-            style="@style/CustomToolbarStyle"
+        <androidx.constraintlayout.motion.widget.MotionLayout
+            android:id="@+id/motion_layout_bottom_navigation"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layoutDescription="@xml/motion_scene_activity_main_bottom_navigation">
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical">
-
-            <fragment
-                android:id="@+id/nav_host_fragment_activity_main"
-                android:name="androidx.navigation.fragment.NavHostFragment"
+            <!-- MEMO:MotionLayoutタグ内にLayoutタグがないとMotionLayoutが機能しない。 -->
+            <LinearLayout
+                android:id="@+id/linear_layout_bottom_navigation"
                 android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="1"
-                app:defaultNavHost="true"
-                app:navGraph="@navigation/mobile_navigation" />
+                android:layout_height="wrap_content">
 
-            <androidx.constraintlayout.motion.widget.MotionLayout
-                android:id="@+id/motionLayout_bottom_navigation"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:layoutDescription="@xml/motion_scene_activity_main_bottom_navigation">
-
-                <!-- MEMO:MotionLayoutタグ内にLayoutタグがないとMotionLayoutが機能しない。 -->
-                <LinearLayout
-                    android:id="@+id/frameLayout_bottom_navigation"
+                <com.google.android.material.bottomnavigation.BottomNavigationView
+                    android:id="@+id/bottom_navigation"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
+                    android:layout_height="80dp"
+                    app:menu="@menu/bottom_nav_menu" />
 
-                    <com.google.android.material.bottomnavigation.BottomNavigationView
-                        android:id="@+id/nav_view"
-                        android:layout_width="match_parent"
-                        android:layout_height="80dp"
-                        app:menu="@menu/bottom_nav_menu" />
+            </LinearLayout>
 
-                </LinearLayout>
+        </androidx.constraintlayout.motion.widget.MotionLayout>
 
-            </androidx.constraintlayout.motion.widget.MotionLayout>
+    </LinearLayout>
 
-        </LinearLayout>
-
-    </FrameLayout>
-
-</layout>
+</FrameLayout>

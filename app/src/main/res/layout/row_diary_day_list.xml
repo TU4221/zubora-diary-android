@@ -1,61 +1,54 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools">
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:minHeight="@dimen/row_diary_day_list_height">
 
-    <data>
-
-    </data>
-
-    <FrameLayout
-        android:id="@+id/frame_layout_row_diary_day_list"
+    <include
+        layout="@layout/row_background_delete_button"
+        android:id="@+id/include_background"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="match_parent"/>
+
+    <LinearLayout
+        style="@style/DiaryDayListBackgroundLayoutStyle"
+        android:id="@+id/liner_layout_foreground"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="8dp">
 
         <include
-            layout="@layout/row_background_delete_button"
-            android:id="@+id/include_background"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"/>
+            layout="@layout/layout_diary_list_item_day"
+            android:id="@+id/include_day"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"/>
 
-        <LinearLayout
-            android:id="@+id/liner_layout_foreground"
-            style="@style/DiaryListDayStyle"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:minHeight="72dp"
-            android:orientation="horizontal">
+        <TextView
+            style="@style/DiaryDayListTextViewStyle"
+            android:id="@+id/text_title"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="2"
+            android:gravity="center_vertical"
+            android:hint="@string/row_diary_day_list_title_hint"
+            android:textAppearance="@style/DiaryListDayTextAppearance"
+            android:textSize="20sp" />
 
-            <include
-                android:id="@+id/include_day"
-                layout="@layout/layout_diary_list_item_day"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1" />
+        <ImageView
+            style="@style/DiaryDayListImageViewStyle"
+            android:id="@+id/image_attached_picture"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:contentDescription="@string/row_diary_day_list_picture_description"
+            app:srcCompat="@drawable/ic_image_24px" />
 
-            <TextView
-                android:id="@+id/text_row_diary_list_day_title"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="2"
-                android:gravity="center_vertical"
-                android:hint="@string/row_diary_day_list_title_hint"
-                android:textAppearance="@style/DiaryListDayTextAppearance"
-                android:textSize="20sp" />
+    </LinearLayout>
 
-            <ImageView
-                android:id="@+id/image_row_diary_list_day_picture"
-                style="@style/DiaryListDayStyle"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:contentDescription="@string/row_diary_day_list_picture_description"
-                android:paddingHorizontal="16dp"
-                android:paddingVertical="8dp"
-                app:srcCompat="@drawable/ic_image_24px" />
 
-        </LinearLayout>
-
-    </FrameLayout>
-</layout>
+</FrameLayout>
 

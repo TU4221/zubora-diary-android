@@ -1,34 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="horizontal"
+    android:background="?attr/colorError">
 
-    <data>
-
-    </data>
-
-    <LinearLayout
-        android:id="@+id/liner_layout"
-        android:layout_width="match_parent"
+    <View
+        android:id="@+id/view_blank"
+        android:layout_width="0dp"
         android:layout_height="match_parent"
-        android:orientation="horizontal"
-        android:background="?attr/colorError">
+        android:layout_weight="5"/>
 
-        <View
-            android:id="@+id/view_blank"
-            android:layout_weight="5"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"/>
+    <ImageButton
+        style="@style/AppImageButtonStyle"
+        android:id="@+id/image_button_delete"
+        android:contentDescription="@string/row_background_delete_button_delete"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:src="@drawable/ic_delete_forever_24px"
+        app:tint="?attr/colorOnError"/>
 
-        <ImageButton
-            style="@style/CustomImageButtonStyle"
-            android:id="@+id/image_button_delete"
-            android:contentDescription="@string/row_background_delete_button_delete"
-            android:layout_width="0dp"
-            android:layout_weight="1"
-            android:layout_height="match_parent"
-            android:background="?attr/colorError"
-            android:src="@drawable/ic_delete_forever_24px"
-            app:tint="?attr/colorOnError"/>
-
-    </LinearLayout>
-</layout>
+</LinearLayout>

@@ -38,7 +38,7 @@
                   (ChatGPTより)、本アプリはAPIレベル21が対応最小レベルとなるのでこのまま使用する。 -->
         <TextView
             style="@style/SettingsItemTextViewStyle"
-            android:id="@+id/text_setting_title"
+            android:id="@+id/text_title"
             android:layout_width="match_parent"
             android:layout_height="@dimen/fragment_settings_section_layout_height"
             android:textAppearance="@style/SettingsItemTextViewTextAppearance"
@@ -46,8 +46,6 @@
             android:drawableStart="@{settingIcon}"
             tools:text="@string/layout_settings_item_title_tools_value"
             tools:drawableStart="@drawable/ic_settings_24px" />
-
-
 
         <LinearLayout
             android:layout_width="wrap_content"
@@ -57,7 +55,7 @@
 
             <TextView
                 style="@style/SettingsItemValueTextViewStyle"
-                android:id="@+id/text_setting_value"
+                android:id="@+id/text_value"
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/fragment_settings_item_layout_height"
                 android:layout_gravity="end|center_vertical"
@@ -69,7 +67,7 @@
 
             <com.google.android.material.materialswitch.MaterialSwitch
                 style="@style/SettingsItemValueSwitchStyle"
-                android:id="@+id/materialSwitch_setting_value"
+                android:id="@+id/materialSwitch"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="end|center_vertical"

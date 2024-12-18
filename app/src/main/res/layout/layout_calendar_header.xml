@@ -1,14 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--<layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools">
-
-    <data>
-
-    </data>
-
-
-</layout>-->
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout  xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -17,18 +9,18 @@
     android:paddingBottom="10dp">
 
     <TextView
-        style="@style/CustomTextViewStyle"
+        style="@style/AppTextViewStyle"
         android:id="@+id/text_year_month"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
-        android:textAppearance="@style/CustomTextViewTextAppearance"
+        android:textAppearance="@style/AppTextViewTextAppearance"
         android:textSize="16sp"
         android:gravity="center"
         tools:text="0000年00月" />
 
     <include
-        android:id="@+id/legendLayout"
-        layout="@layout/calendar_day_legend_container" />
+        layout="@layout/layout_calendar_day_of_week_container"
+        android:id="@+id/legendLayout" />
 
 </LinearLayout>
