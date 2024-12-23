@@ -1,7 +1,6 @@
 package com.websarva.wings.android.zuboradiary.ui.list;
 
 import android.content.Context;
-import android.graphics.Rect;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,8 +21,8 @@ import com.websarva.wings.android.zuboradiary.databinding.RowProgressBarBinding;
 import com.websarva.wings.android.zuboradiary.ui.ThemeColorInflaterCreator;
 import com.websarva.wings.android.zuboradiary.ui.list.diarylist.DiaryDayListAdapter;
 import com.websarva.wings.android.zuboradiary.ui.list.diarylist.DiaryDayListItem;
-import com.websarva.wings.android.zuboradiary.ui.list.diarylist.DiaryYearMonthListItem;
 import com.websarva.wings.android.zuboradiary.ui.list.diarylist.DiaryListSimpleCallback;
+import com.websarva.wings.android.zuboradiary.ui.list.diarylist.DiaryYearMonthListItem;
 import com.websarva.wings.android.zuboradiary.ui.list.wordsearch.WordSearchResultDayListAdapter;
 import com.websarva.wings.android.zuboradiary.ui.list.wordsearch.WordSearchResultDayListItem;
 import com.websarva.wings.android.zuboradiary.ui.list.wordsearch.WordSearchResultYearMonthListItem;
@@ -129,36 +128,6 @@ public abstract class DiaryYearMonthListAdapter extends ListAdapter<DiaryYearMon
             // ホルダーアイテムアニメーション設定(build()メソッド内にて理由記載)
             // MEMO:子RecyclerViewのアニメーションを共通にする為、親Adapterクラス内で実装。
             holder.binding.recyclerDayList.setItemAnimator(null);
-
-            // TODO:layout.xmlで反映したい
-            // ホルダー内の日記リスト(日)のアイテム装飾設定
-            // MEMO:onBindViewHolder()で設定すると、設定内容が重複してアイテムが小さくなる為、onCreateViewHolderで設定。
-            // MEMO:子RecyclerViewの装飾を共通にする為、親Adapterクラス内で実装。
-            holder.binding.recyclerDayList.addItemDecoration(new RecyclerView.ItemDecoration() {
-                @Override
-                public void getItemOffsets(
-                        @NonNull Rect outRect,
-                        @NonNull View view,
-                        @NonNull RecyclerView parent,
-                        @NonNull RecyclerView.State state) {
-                    Log.d("リスト装飾確認","getItemOffsets()呼び出し");
-                    super.getItemOffsets(outRect, view, parent, state);
-                    outRect.top = DIARY_DAY_LIST_ITEM_MARGIN_VERTICAL;
-                    outRect.left = DIARY_DAY_LIST_ITEM_MARGIN_HORIZONTAL;
-                    outRect.right = DIARY_DAY_LIST_ITEM_MARGIN_HORIZONTAL;
-
-                    RecyclerView.ViewHolder viewHolder = parent.findContainingViewHolder(view);
-                    Objects.requireNonNull(viewHolder);
-
-                    RecyclerView.Adapter<?> adapter = parent.getAdapter();
-                    Objects.requireNonNull(adapter);
-
-                    Log.d("リスト装飾確認", Integer.toString(viewHolder.getBindingAdapterPosition()));
-                    if (viewHolder.getBindingAdapterPosition() == (adapter.getItemCount() - 1)) {
-                        outRect.bottom = DIARY_DAY_LIST_ITEM_MARGIN_VERTICAL;
-                    }
-                }
-            });
 
             // MEMO:子RecyclerViewに実装したSimpleCallbackクラスを親RecyclerViewで管理する為、親Adapterクラス内で実装。
             if (canSwipeItem) {
@@ -555,7 +524,7 @@ public abstract class DiaryYearMonthListAdapter extends ListAdapter<DiaryYearMon
         public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
             super.onScrolled(recyclerView, dx, dy);
 
-            updateFirstVisibleSectionBarPosition();
+            updateVisibleSectionBarPosition();
         }
     }
 
@@ -565,11 +534,11 @@ public abstract class DiaryYearMonthListAdapter extends ListAdapter<DiaryYearMon
         public void onLayoutChange(
                 View v, int left, int top, int right, int bottom,
                 int oldLeft, int oldTop, int oldRight, int oldBottom) {
-            updateFirstVisibleSectionBarPosition();
+            updateVisibleSectionBarPosition();
         }
     }
 
-    private void updateFirstVisibleSectionBarPosition() {
+    private void updateVisibleSectionBarPosition() {
         RecyclerView.LayoutManager _layoutManager = recyclerView.getLayoutManager();
         Objects.requireNonNull(_layoutManager);
         LinearLayoutManager layoutManager = (LinearLayoutManager) _layoutManager;
@@ -601,11 +570,12 @@ public abstract class DiaryYearMonthListAdapter extends ListAdapter<DiaryYearMon
 
         int sectionHeight = _firstVisibleViewHolder.binding.textSection.getHeight();
         float secondVisibleItemViewPositionY = secondVisibleItemView.getY();
-        int border = sectionHeight + DIARY_DAY_LIST_ITEM_MARGIN_VERTICAL;
+        int betweenSectionsMargin = _firstVisibleViewHolder.binding.recyclerDayList.getPaddingBottom();
+        int border = sectionHeight + betweenSectionsMargin;
         if (secondVisibleItemViewPositionY >= border) {
             _firstVisibleViewHolder.binding.textSection.setY(-(firstVisibleItemViewPositionY));
         } else {
-            if (secondVisibleItemViewPositionY < DIARY_DAY_LIST_ITEM_MARGIN_VERTICAL) {
+            if (secondVisibleItemViewPositionY < betweenSectionsMargin) {
                 _firstVisibleViewHolder.binding.textSection.setY(0);
             } else if (_firstVisibleViewHolder.binding.textSection.getY() == 0) {
                 _firstVisibleViewHolder.binding.textSection.setY(

@@ -74,10 +74,17 @@
     <dimen name="dialog_fragment_number_picker_layout_margin_horizontal_between_items">8dp</dimen>
     <dimen name="dialog_fragment_number_picker_layout_margin_vertical">8dp</dimen>
 
+    <!-- row_diary_year_month_list -->
+    <dimen name="row_diary_year_month_list_padding_bottom">@dimen/row_diary_day_list_layout_margin_vertical_between_items</dimen>
+
     <!-- row_diary_day_list -->
     <dimen name="row_diary_day_list_height">72dp</dimen>
+    <dimen name="row_diary_day_list_layout_margin_horizontal_between_items">16dp</dimen>
+    <dimen name="row_diary_day_list_layout_margin_vertical_between_items">8dp</dimen>
 
     <!-- row_word_search_result_list -->
-    <dimen name="row_word_search_result_list_layout_margin">8dp</dimen>
+    <dimen name="row_word_search_result_list_layout_margin_horizontal_between_items">@dimen/row_diary_day_list_layout_margin_horizontal_between_items</dimen>
+    <dimen name="row_word_search_result_list_layout_margin_vertical_between_items">@dimen/row_diary_day_list_layout_margin_vertical_between_items</dimen>
+    <dimen name="row_word_search_result_list_views_layout_margin">8dp</dimen>
 
 </resources>

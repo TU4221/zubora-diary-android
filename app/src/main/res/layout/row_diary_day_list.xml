@@ -10,13 +10,17 @@
         layout="@layout/row_background_delete_button"
         android:id="@+id/include_background"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        android:layout_height="match_parent"
+        android:layout_marginHorizontal="@dimen/row_diary_day_list_layout_margin_horizontal_between_items"
+        android:layout_marginTop="@dimen/row_diary_day_list_layout_margin_vertical_between_items" />
 
     <LinearLayout
         style="@style/DiaryDayListBackgroundLayoutStyle"
         android:id="@+id/liner_layout_foreground"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/row_diary_day_list_layout_margin_horizontal_between_items"
+        android:layout_marginTop="@dimen/row_diary_day_list_layout_margin_vertical_between_items"
         android:orientation="horizontal"
         android:padding="8dp">
 
