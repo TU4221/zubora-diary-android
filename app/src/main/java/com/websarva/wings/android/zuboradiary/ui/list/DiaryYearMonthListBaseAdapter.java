@@ -19,34 +19,20 @@ import com.websarva.wings.android.zuboradiary.databinding.RowDiaryYearMonthListB
 import com.websarva.wings.android.zuboradiary.databinding.RowNoDiaryMessageBinding;
 import com.websarva.wings.android.zuboradiary.databinding.RowProgressBarBinding;
 import com.websarva.wings.android.zuboradiary.ui.ThemeColorInflaterCreator;
-import com.websarva.wings.android.zuboradiary.ui.list.diarylist.DiaryDayListAdapter;
-import com.websarva.wings.android.zuboradiary.ui.list.diarylist.DiaryDayListItem;
-import com.websarva.wings.android.zuboradiary.ui.list.diarylist.DiaryListSimpleCallback;
-import com.websarva.wings.android.zuboradiary.ui.list.diarylist.DiaryYearMonthListItem;
-import com.websarva.wings.android.zuboradiary.ui.list.wordsearch.WordSearchResultDayListAdapter;
-import com.websarva.wings.android.zuboradiary.ui.list.wordsearch.WordSearchResultDayListItem;
-import com.websarva.wings.android.zuboradiary.ui.list.wordsearch.WordSearchResultYearMonthListItem;
 
 import java.time.LocalDate;
 import java.time.YearMonth;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 
 // DiaryFragment、WordSearchFragmentの親RecyclerViewのListAdapter。
 // 親RecyclerViewを同じ構成にする為、一つのクラスで両方の子RecyclerViewに対応できるように作成。
-public abstract class DiaryYearMonthListAdapter extends ListAdapter<DiaryYearMonthListItemBase, RecyclerView.ViewHolder> {
+public abstract class DiaryYearMonthListBaseAdapter extends ListAdapter<DiaryYearMonthListBaseItem, RecyclerView.ViewHolder> {
 
-    private final Context context;
-    private final RecyclerView recyclerView;
-    private final ThemeColor themeColor;
-    private OnClickChildItemListener onClickChildItemListener;
-    private OnClickChildItemBackgroundButtonListener onClickChildItemBackgroundButtonListener;
-    private final boolean canSwipeItem;
-    public static final int DIARY_DAY_LIST_ITEM_MARGIN_VERTICAL = 16;
-    public static final int DIARY_DAY_LIST_ITEM_MARGIN_HORIZONTAL = 32;
-    private final List<DiaryListSimpleCallback> simpleCallbackList = new ArrayList<>();
-    private boolean isLoadingListOnScrolled;
+    protected final Context context;
+    protected final RecyclerView recyclerView;
+    protected final ThemeColor themeColor;
+    protected OnClickChildItemListener onClickChildItemListener;
+    protected boolean isLoadingListOnScrolled;
 
     public enum ViewType {
         DIARY(0),
@@ -63,12 +49,12 @@ public abstract class DiaryYearMonthListAdapter extends ListAdapter<DiaryYearMon
         }
     }
 
-    public DiaryYearMonthListAdapter(
+    protected DiaryYearMonthListBaseAdapter(
             Context context,
             RecyclerView recyclerView,
             ThemeColor themeColor,
-            boolean canSwipeItem) {
-        super(new DiaryYearMonthListDiffUtilItemCallback());
+            DiffUtilItemCallback diffUtilItemCallback) {
+        super(diffUtilItemCallback);
 
         Objects.requireNonNull(context);
         Objects.requireNonNull(recyclerView);
@@ -77,22 +63,11 @@ public abstract class DiaryYearMonthListAdapter extends ListAdapter<DiaryYearMon
         this.context = context;
         this.recyclerView = recyclerView;
         this.themeColor = themeColor;
-        this.canSwipeItem = canSwipeItem;
     }
 
     public void build() {
         recyclerView.setAdapter(this);
         recyclerView.setLayoutManager(new LinearLayoutManager(context));
-        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
-            @Override
-            public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
-                super.onScrollStateChanged(recyclerView, newState);
-                if (newState != RecyclerView.SCROLL_STATE_DRAGGING) return;
-
-                // スクロール時スワイプ閉
-                if (canSwipeItem) closeSwipedItemOtherDayList(null);
-            }
-        });
 
         // HACK:下記問題が発生する為アイテムアニメーションを無効化
         //      問題1.アイテム追加時もやがかかる。今回の構成(親Recycler:年月、子Recycler:日)上、
@@ -129,14 +104,6 @@ public abstract class DiaryYearMonthListAdapter extends ListAdapter<DiaryYearMon
             // MEMO:子RecyclerViewのアニメーションを共通にする為、親Adapterクラス内で実装。
             holder.binding.recyclerDayList.setItemAnimator(null);
 
-            // MEMO:子RecyclerViewに実装したSimpleCallbackクラスを親RecyclerViewで管理する為、親Adapterクラス内で実装。
-            if (canSwipeItem) {
-                DiaryListSimpleCallback diaryListSimpleCallback =
-                        new DiaryListSimpleCallback(recyclerView, holder.binding.recyclerDayList);
-                diaryListSimpleCallback.build();
-                simpleCallbackList.add(diaryListSimpleCallback);
-            }
-
             return holder;
         } else if (viewType == ViewType.PROGRESS_INDICATOR.getViewTypeNumber()) {
             RowProgressBarBinding binding =
@@ -155,7 +122,7 @@ public abstract class DiaryYearMonthListAdapter extends ListAdapter<DiaryYearMon
             DiaryYearMonthListViewHolder _holder =
                     (DiaryYearMonthListViewHolder) holder;
             // 対象行の情報を取得
-            DiaryYearMonthListItemBase item = getItem(position);
+            DiaryYearMonthListBaseItem item = getItem(position);
             YearMonth diaryYearMonth = item.getYearMonth();
 
             // セクションバー設定
@@ -171,22 +138,14 @@ public abstract class DiaryYearMonthListAdapter extends ListAdapter<DiaryYearMon
             //      日記リスト(日)用のLinearLayoutManagerをインスタンス化する。
             _holder.binding.recyclerDayList.setLayoutManager(new LinearLayoutManager(context));
 
-            if (item instanceof DiaryYearMonthListItem) {
-                DiaryYearMonthListItem _item = (DiaryYearMonthListItem) item;
-                DiaryDayListAdapter diaryDayListAdapter = createDiaryDayListAdapter(_holder);
-                List<DiaryDayListItem> diaryDayList = _item.getDiaryDayList().getDiaryDayListItemList();
-                diaryDayListAdapter.submitList(diaryDayList);
-
-            } else if (item instanceof WordSearchResultYearMonthListItem) {
-                WordSearchResultYearMonthListItem _item = (WordSearchResultYearMonthListItem) item;
-                WordSearchResultDayListAdapter wordSearchResultDayListAdapter =
-                                                    createWordSearchResultDayListAdapter(_holder);
-                List<WordSearchResultDayListItem> wordSearchResultDayList =
-                        _item.getWordSearchResultDayList().getWordSearchResultDayListItemList();
-                wordSearchResultDayListAdapter.submitList(wordSearchResultDayList);
-            }
+            createDiaryDayList(_holder, item);
         }
     }
+
+    public abstract void createDiaryDayList(
+            DiaryYearMonthListViewHolder holder,
+            DiaryYearMonthListBaseItem item
+    );
 
     @FunctionalInterface
     public interface OnClickChildItemListener {
@@ -197,84 +156,13 @@ public abstract class DiaryYearMonthListAdapter extends ListAdapter<DiaryYearMon
         this.onClickChildItemListener = onClickChildItemListener;
     }
 
-    @FunctionalInterface
-    public interface OnClickChildItemBackgroundButtonListener {
-        void onClick(LocalDate date);
-    }
-
-    public void setOnClickChildItemBackgroundButtonListener(
-            @Nullable OnClickChildItemBackgroundButtonListener onClickChildItemBackgroundButtonListener) {
-        this.onClickChildItemBackgroundButtonListener = onClickChildItemBackgroundButtonListener;
-    }
-
-    @NonNull
-    private DiaryDayListAdapter createDiaryDayListAdapter(DiaryYearMonthListViewHolder _holder) {
-        Objects.requireNonNull(_holder);
-
-        DiaryDayListAdapter diaryDayListAdapter =
-                new DiaryDayListAdapter(context, _holder.binding.recyclerDayList, themeColor);
-        diaryDayListAdapter.build();
-        diaryDayListAdapter.setOnClickItemListener(new DiaryDayListAdapter.OnClickItemListener() {
-            @Override
-            public void onClick(LocalDate date) {
-                Objects.requireNonNull(date);
-                if (onClickChildItemListener == null) return;
-
-                onClickChildItemListener.onClick(date);
-            }
-        });
-        diaryDayListAdapter.setOnClickDeleteButtonListener(new DiaryDayListAdapter.OnClickDeleteButtonListener() {
-            @Override
-            public void onClick(LocalDate date) {
-                Objects.requireNonNull(date);
-                if (onClickChildItemBackgroundButtonListener == null) return;
-
-                onClickChildItemBackgroundButtonListener.onClick(date);
-            }
-        });
-        return diaryDayListAdapter;
-    }
-
-    @NonNull
-    private WordSearchResultDayListAdapter createWordSearchResultDayListAdapter(DiaryYearMonthListViewHolder _holder) {
-        Objects.requireNonNull(_holder);
-
-        WordSearchResultDayListAdapter wordSearchResultDayListAdapter =
-                new WordSearchResultDayListAdapter(context, _holder.binding.recyclerDayList, themeColor);
-        wordSearchResultDayListAdapter.build();
-        wordSearchResultDayListAdapter.setOnClickItemListener(new WordSearchResultDayListAdapter.OnClickItemListener() {
-            @Override
-            public void onClick(LocalDate date) {
-                Objects.requireNonNull(date);
-                if (onClickChildItemListener == null) return;
-
-                onClickChildItemListener.onClick(date);
-            }
-        });
-        return wordSearchResultDayListAdapter;
-    }
-
     @Override
     public int getItemViewType(int position ) {
-        DiaryYearMonthListItemBase item = getItem(position);
+        DiaryYearMonthListBaseItem item = getItem(position);
         return item.getViewType().getViewTypeNumber();
     }
 
-    public void closeSwipedItemOtherDayList(@Nullable DiaryListSimpleCallback simpleCallback) {
-        if (simpleCallback == null) {
-            for (DiaryListSimpleCallback _simpleCallback: simpleCallbackList) {
-                _simpleCallback.closeSwipedItem();
-            }
-        } else {
-            for (int i = 0; i < simpleCallbackList.size(); i++) {
-                if (simpleCallbackList.get(i) != simpleCallback) {
-                    simpleCallbackList.get(i).closeSwipedItem();
-                }
-            }
-        }
-    }
-
-    public static class DiaryYearMonthListViewHolder extends RecyclerView.ViewHolder {
+    public static final class DiaryYearMonthListViewHolder extends RecyclerView.ViewHolder {
         public RowDiaryYearMonthListBinding binding;
 
         public DiaryYearMonthListViewHolder(RowDiaryYearMonthListBinding binding) {
@@ -283,22 +171,22 @@ public abstract class DiaryYearMonthListAdapter extends ListAdapter<DiaryYearMon
         }
     }
 
-    public static class NoDiaryMessageViewHolder extends RecyclerView.ViewHolder {
+    public static final class NoDiaryMessageViewHolder extends RecyclerView.ViewHolder {
         public NoDiaryMessageViewHolder(RowNoDiaryMessageBinding binding) {
             super(binding.getRoot());
         }
     }
 
-    public static class ProgressBarViewHolder extends RecyclerView.ViewHolder {
+    public static final class ProgressBarViewHolder extends RecyclerView.ViewHolder {
         public ProgressBarViewHolder(RowProgressBarBinding binding) {
             super(binding.getRoot());
         }
     }
 
-    public static class DiaryYearMonthListDiffUtilItemCallback
-            extends DiffUtil.ItemCallback<DiaryYearMonthListItemBase> {
+    protected static abstract class DiffUtilItemCallback
+            extends DiffUtil.ItemCallback<DiaryYearMonthListBaseItem> {
         @Override
-        public boolean areItemsTheSame(@NonNull DiaryYearMonthListItemBase oldItem, @NonNull DiaryYearMonthListItemBase newItem) {
+        public boolean areItemsTheSame(@NonNull DiaryYearMonthListBaseItem oldItem, @NonNull DiaryYearMonthListBaseItem newItem) {
             Log.d("DiaryYearMonthList", "DiffUtil.ItemCallback_areItemsTheSame()");
             Log.d("DiaryYearMonthList", "oldItem_YearMonth:" + oldItem.getYearMonth());
             Log.d("DiaryYearMonthList", "newItem_YearMonth:" + newItem.getYearMonth());
@@ -323,88 +211,6 @@ public abstract class DiaryYearMonthListAdapter extends ListAdapter<DiaryYearMon
             }
 
             Log.d("DiaryYearMonthList", "一致");
-            return true;
-        }
-
-        @Override
-        public boolean areContentsTheSame(@NonNull DiaryYearMonthListItemBase oldItem, @NonNull DiaryYearMonthListItemBase newItem) {
-            Log.d("DiaryYearMonthList", "DiffUtil.ItemCallback_areContentsTheSame()");
-            Log.d("DiaryYearMonthList", "oldItem_YearMonth:" + oldItem.getYearMonth());
-            Log.d("DiaryYearMonthList", "newItem_YearMonth:" + newItem.getYearMonth());
-            // 日
-            if (oldItem instanceof DiaryYearMonthListItem && newItem instanceof DiaryYearMonthListItem) {
-                Log.d("DiaryYearMonthList", "DiaryYearMonthListItem");
-                DiaryYearMonthListItem _oldItem = (DiaryYearMonthListItem) oldItem;
-                DiaryYearMonthListItem _newItem = (DiaryYearMonthListItem) newItem;
-
-                int _oldChildListSize = _oldItem.getDiaryDayList().getDiaryDayListItemList().size();
-                int _newChildListSize = _newItem.getDiaryDayList().getDiaryDayListItemList().size();
-                if (_oldChildListSize != _newChildListSize) {
-                    Log.d("DiaryYearMonthList", "ChildList_Size不一致");
-                    return false;
-                }
-
-                for (int i = 0; i < _oldChildListSize; i++) {
-                    DiaryDayListItem oldChildListItem = _oldItem.getDiaryDayList().getDiaryDayListItemList().get(i);
-                    DiaryDayListItem newChildListItem = _newItem.getDiaryDayList().getDiaryDayListItemList().get(i);
-                    if (!oldChildListItem.getDate().equals(newChildListItem.getDate())) {
-                        Log.d("DiaryYearMonthList", "ChildListItem_Date不一致");
-                        return false;
-                    }
-                    if (!oldChildListItem.getTitle().equals(newChildListItem.getTitle())) {
-                        Log.d("DiaryYearMonthList", "ChildListItem_Title不一致");
-                        return false;
-                    }
-                    if (!oldChildListItem.getPicturePath().equals(newChildListItem.getPicturePath())) {
-                        Log.d("DiaryYearMonthList", "ChildListItem_PicturePath不一致");
-                        return false;
-                    }
-                }
-            } else if (oldItem instanceof WordSearchResultYearMonthListItem
-                    && newItem instanceof WordSearchResultYearMonthListItem) {
-                Log.d("WordSearchYearMonthList", "WordSearchResultYearMonthListItem");
-                WordSearchResultYearMonthListItem _oldItem = (WordSearchResultYearMonthListItem) oldItem;
-                WordSearchResultYearMonthListItem _newItem = (WordSearchResultYearMonthListItem) newItem;
-                int oldChildListSize =
-                        _oldItem.getWordSearchResultDayList().getWordSearchResultDayListItemList().size();
-                int newChildListSize =
-                        _newItem.getWordSearchResultDayList().getWordSearchResultDayListItemList().size();
-                if (oldChildListSize != newChildListSize) {
-                    Log.d("WordSearchYearMonthList", "ChildList_Size不一致");
-                    return false;
-                }
-
-                for (int i = 0; i < oldChildListSize; i++) {
-                    WordSearchResultDayListItem oldChildListItem =
-                            _oldItem.getWordSearchResultDayList().getWordSearchResultDayListItemList().get(i);
-                    WordSearchResultDayListItem newChildListItem =
-                            _newItem.getWordSearchResultDayList().getWordSearchResultDayListItemList().get(i);
-                    Log.d("WordSearchYearMonthList", "oldChildListItem_Date:" + oldChildListItem.getDate());
-                    Log.d("WordSearchYearMonthList", "newChildListItem_Date:" + newChildListItem.getDate());
-
-                    if (!oldChildListItem.getDate().equals(newChildListItem.getDate())) {
-                        Log.d("WordSearchYearMonthList", "ChildListItem_Date不一致");
-                        return false;
-                    }
-                    if (!oldChildListItem.getTitle().equals(newChildListItem.getTitle())) {
-                        Log.d("WordSearchYearMonthList", "ChildListItem_Title不一致");
-                        return false;
-                    }
-                    if (oldChildListItem.getItemNumber() != newChildListItem.getItemNumber()) {
-                        Log.d("WordSearchYearMonthList", "ChildListItem_ItemNumber不一致");
-                        return false;
-                    }
-                    if (!oldChildListItem.getItemTitle().equals(newChildListItem.getItemTitle())) {
-                        Log.d("WordSearchYearMonthList", "ChildListItem_ItemTitle不一致");
-                        return false;
-                    }
-                    if (!oldChildListItem.getItemComment().equals(newChildListItem.getItemComment())) {
-                        Log.d("WordSearchYearMonthList", "ChildListItem_ItemComment不一致");
-                        return false;
-                    }
-                }
-            }
-            Log.d("WordSearchYearMonthList", "一致");
             return true;
         }
     }
