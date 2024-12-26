@@ -1,12 +1,12 @@
 package com.websarva.wings.android.zuboradiary.ui.list.wordsearch;
 
-import com.websarva.wings.android.zuboradiary.ui.list.DiaryYearMonthListAdapter.ViewType;
-import com.websarva.wings.android.zuboradiary.ui.list.DiaryYearMonthListItemBase;
+import com.websarva.wings.android.zuboradiary.ui.list.DiaryYearMonthListBaseAdapter.ViewType;
+import com.websarva.wings.android.zuboradiary.ui.list.DiaryYearMonthListBaseItem;
 
 import java.time.YearMonth;
 import java.util.Objects;
 
-public class WordSearchResultYearMonthListItem extends DiaryYearMonthListItemBase {
+public class WordSearchResultYearMonthListItem extends DiaryYearMonthListBaseItem {
     private final WordSearchResultDayList wordSearchResultDayList;
 
     WordSearchResultYearMonthListItem(ViewType viewType) {

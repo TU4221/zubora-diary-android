@@ -1,7 +1,5 @@
 package com.websarva.wings.android.zuboradiary.ui.list.diarylist;
 
-import static com.websarva.wings.android.zuboradiary.ui.list.DiaryYearMonthListAdapter.OnClickChildItemBackgroundButtonListener;
-
 import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -24,9 +22,9 @@ import com.websarva.wings.android.zuboradiary.data.AppMessage;
 import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor;
 import com.websarva.wings.android.zuboradiary.databinding.FragmentDiaryListBinding;
 import com.websarva.wings.android.zuboradiary.ui.BaseFragment;
-import com.websarva.wings.android.zuboradiary.ui.list.DiaryYearMonthListAdapter;
-import com.websarva.wings.android.zuboradiary.ui.list.DiaryYearMonthListAdapter.OnClickChildItemListener;
-import com.websarva.wings.android.zuboradiary.ui.list.DiaryYearMonthListItemBase;
+import com.websarva.wings.android.zuboradiary.ui.list.DiaryYearMonthListBaseAdapter;
+import com.websarva.wings.android.zuboradiary.ui.list.DiaryYearMonthListBaseItem;
+import com.websarva.wings.android.zuboradiary.ui.list.SwipeDiaryYearMonthListBaseAdapter;
 
 import java.time.LocalDate;
 import java.time.Year;
@@ -182,11 +180,10 @@ public class DiaryListFragment extends BaseFragment {
                 new DiaryListAdapter(
                         requireContext(),
                         binding.recyclerDiaryList,
-                        requireThemeColor(),
-                        true
+                        requireThemeColor()
                 );
         diaryListAdapter.build();
-        diaryListAdapter.setOnClickChildItemListener(new OnClickChildItemListener() {
+        diaryListAdapter.setOnClickChildItemListener(new DiaryYearMonthListBaseAdapter.OnClickChildItemListener() {
             @Override
             public void onClick(LocalDate date) {
                 Objects.requireNonNull(date);
@@ -194,7 +191,7 @@ public class DiaryListFragment extends BaseFragment {
                 showShowDiaryFragment(date);
             }
         });
-        diaryListAdapter.setOnClickChildItemBackgroundButtonListener(new OnClickChildItemBackgroundButtonListener() {
+        diaryListAdapter.setOnClickChildItemBackgroundButtonListener(new SwipeDiaryYearMonthListBaseAdapter.OnClickChildItemBackgroundButtonListener() {
             @Override
             public void onClick(LocalDate date) {
                 Objects.requireNonNull(date);
@@ -222,9 +219,8 @@ public class DiaryListFragment extends BaseFragment {
 
     private class DiaryListAdapter extends DiaryYearMonthListAdapter {
 
-        public DiaryListAdapter(
-                Context context, RecyclerView recyclerView, ThemeColor themeColor, boolean canSwipeItem) {
-            super(context, recyclerView, themeColor, canSwipeItem);
+        public DiaryListAdapter(Context context, RecyclerView recyclerView, ThemeColor themeColor) {
+            super(context, recyclerView, themeColor);
         }
 
         @Override
@@ -264,11 +260,10 @@ public class DiaryListFragment extends BaseFragment {
         private void setUpList(DiaryYearMonthList list) {
             Objects.requireNonNull(list);
 
-            List<DiaryYearMonthListItemBase> convertedItemList =
+            List<DiaryYearMonthListBaseItem> convertedItemList =
                     new ArrayList<>(list.getDiaryYearMonthListItemList());
             DiaryYearMonthListAdapter listAdapter =
-                    (DiaryYearMonthListAdapter)
-                            binding.recyclerDiaryList.getAdapter();
+                    (DiaryYearMonthListAdapter) binding.recyclerDiaryList.getAdapter();
             Objects.requireNonNull(listAdapter);
             listAdapter.submitList(convertedItemList);
         }
@@ -358,11 +353,11 @@ public class DiaryListFragment extends BaseFragment {
 
     //日記リスト(年月)を自動でトップへスクロールさせるメソッド。
     private void scrollDiaryListToFirstPosition() {
-        DiaryYearMonthListAdapter adapter =
+        DiaryYearMonthListAdapter listAdapter =
                 (DiaryYearMonthListAdapter) binding.recyclerDiaryList.getAdapter();
-        Objects.requireNonNull(adapter);
+        Objects.requireNonNull(listAdapter);
 
-        adapter.scrollToFirstPosition();
+        listAdapter.scrollToFirstPosition();
     }
 
     @Override

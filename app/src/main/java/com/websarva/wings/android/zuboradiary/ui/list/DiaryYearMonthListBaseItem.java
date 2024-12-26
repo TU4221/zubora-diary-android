@@ -2,23 +2,23 @@ package com.websarva.wings.android.zuboradiary.ui.list;
 
 import androidx.annotation.NonNull;
 
-import com.websarva.wings.android.zuboradiary.ui.list.DiaryYearMonthListAdapter.ViewType;
+import com.websarva.wings.android.zuboradiary.ui.list.DiaryYearMonthListBaseAdapter.ViewType;
 
 import java.time.YearMonth;
 import java.util.Objects;
 
-public abstract class DiaryYearMonthListItemBase {
+public abstract class DiaryYearMonthListBaseItem {
     private final YearMonth yearMonth;
     private final ViewType viewType;
 
-    public DiaryYearMonthListItemBase(ViewType viewType) {
+    public DiaryYearMonthListBaseItem(ViewType viewType) {
         Objects.requireNonNull(viewType);
 
         yearMonth = YearMonth.now();
         this.viewType = viewType;
     }
 
-    public DiaryYearMonthListItemBase(YearMonth yearMonth, ViewType viewType) {
+    public DiaryYearMonthListBaseItem(YearMonth yearMonth, ViewType viewType) {
         Objects.requireNonNull(yearMonth);
         Objects.requireNonNull(viewType);
 
@@ -26,24 +26,24 @@ public abstract class DiaryYearMonthListItemBase {
         this.viewType = viewType;
     }
 
-    public boolean isDiaryViewType() {
+    public final boolean isDiaryViewType() {
         return viewType.equals(ViewType.DIARY);
     }
 
-    public boolean isProgressIndicatorViewType() {
+    public final boolean isProgressIndicatorViewType() {
         return viewType.equals(ViewType.PROGRESS_INDICATOR);
     }
 
-    public boolean isNoDiaryMessageViewType() {
+    public final boolean isNoDiaryMessageViewType() {
         return viewType.equals(ViewType.NO_DIARY_MESSAGE);
     }
 
     @NonNull
-    public YearMonth getYearMonth() {
+    public final YearMonth getYearMonth() {
         return this.yearMonth;
     }
 
-    public ViewType getViewType() {
+    public final ViewType getViewType() {
         return viewType;
     }
 }

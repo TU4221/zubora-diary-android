@@ -1,7 +1,5 @@
 package com.websarva.wings.android.zuboradiary.ui.list.wordsearch;
 
-import static com.websarva.wings.android.zuboradiary.ui.list.DiaryYearMonthListAdapter.OnClickChildItemListener;
-
 import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -24,8 +22,8 @@ import com.websarva.wings.android.zuboradiary.databinding.FragmentWordSearchBind
 import com.websarva.wings.android.zuboradiary.ui.BaseFragment;
 import com.websarva.wings.android.zuboradiary.ui.EditTextSetup;
 import com.websarva.wings.android.zuboradiary.ui.KeyboardInitializer;
-import com.websarva.wings.android.zuboradiary.ui.list.DiaryYearMonthListAdapter;
-import com.websarva.wings.android.zuboradiary.ui.list.DiaryYearMonthListItemBase;
+import com.websarva.wings.android.zuboradiary.ui.list.DiaryYearMonthListBaseAdapter;
+import com.websarva.wings.android.zuboradiary.ui.list.DiaryYearMonthListBaseItem;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -164,11 +162,10 @@ public class WordSearchFragment extends BaseFragment {
                 new WordSearchResultListAdapter(
                         requireContext(),
                         binding.recyclerWordSearchResultList,
-                        requireThemeColor(),
-                        false
+                        requireThemeColor()
                 );
         wordSearchResultListAdapter.build();
-        wordSearchResultListAdapter.setOnClickChildItemListener(new OnClickChildItemListener() {
+        wordSearchResultListAdapter.setOnClickChildItemListener(new DiaryYearMonthListBaseAdapter.OnClickChildItemListener() {
             @Override
             public void onClick(LocalDate date) {
                 Objects.requireNonNull(date);
@@ -210,11 +207,11 @@ public class WordSearchFragment extends BaseFragment {
         updateWordSearchResultList();
     }
 
-    private class WordSearchResultListAdapter extends DiaryYearMonthListAdapter {
+    private class WordSearchResultListAdapter extends WordSearchResultYearMonthListAdapter {
 
         private WordSearchResultListAdapter(
-                Context context, RecyclerView recyclerView, ThemeColor themeColor, boolean canSwipeItem) {
-            super(context, recyclerView, themeColor, canSwipeItem);
+                Context context, RecyclerView recyclerView, ThemeColor themeColor) {
+            super(context, recyclerView, themeColor);
         }
 
         @Override
@@ -235,10 +232,10 @@ public class WordSearchFragment extends BaseFragment {
         public void onChanged(WordSearchResultYearMonthList wordSearchResultYearMonthList) {
             Objects.requireNonNull(wordSearchResultYearMonthList);
 
-            DiaryYearMonthListAdapter wordSearchResultYearMonthListAdapter =
-                    (DiaryYearMonthListAdapter)
+            WordSearchResultYearMonthListAdapter listAdapter =
+                    (WordSearchResultYearMonthListAdapter)
                             binding.recyclerWordSearchResultList.getAdapter();
-            Objects.requireNonNull(wordSearchResultYearMonthListAdapter);
+            Objects.requireNonNull(listAdapter);
 
             String searchWord = wordSearchViewModel.getSearchWordLiveData().getValue();
             Objects.requireNonNull(searchWord);
@@ -254,9 +251,9 @@ public class WordSearchFragment extends BaseFragment {
                 binding.linerLayoutWordSearchResults.setVisibility(View.VISIBLE);
             }
 
-            List<DiaryYearMonthListItemBase> convertedList =
+            List<DiaryYearMonthListBaseItem> convertedList =
                     new ArrayList<>(wordSearchResultYearMonthList.getWordSearchResultYearMonthListItemList());
-            wordSearchResultYearMonthListAdapter.submitList(convertedList);
+            listAdapter.submitList(convertedList);
         }
     }
 
@@ -298,8 +295,9 @@ public class WordSearchFragment extends BaseFragment {
         RecyclerView.Adapter<?> adapter = binding.recyclerWordSearchResultList.getAdapter();
         Objects.requireNonNull(adapter);
 
-        DiaryYearMonthListAdapter diaryYearMonthListAdapter = (DiaryYearMonthListAdapter) adapter;
-        diaryYearMonthListAdapter.scrollToFirstPosition();
+        WordSearchResultYearMonthListAdapter listAdapter =
+                (WordSearchResultYearMonthListAdapter) adapter;
+        listAdapter.scrollToFirstPosition();
     }
 
     private void showShowDiaryFragment(LocalDate date) {

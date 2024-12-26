@@ -2,7 +2,7 @@ package com.websarva.wings.android.zuboradiary.ui.list.diarylist;
 
 import androidx.annotation.NonNull;
 
-import com.websarva.wings.android.zuboradiary.ui.list.DiaryYearMonthListAdapter.ViewType;
+import com.websarva.wings.android.zuboradiary.ui.list.DiaryYearMonthListBaseAdapter.ViewType;
 
 import java.time.LocalDate;
 import java.time.YearMonth;
