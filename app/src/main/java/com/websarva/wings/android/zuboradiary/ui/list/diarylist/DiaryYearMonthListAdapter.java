@@ -7,11 +7,13 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor;
+import com.websarva.wings.android.zuboradiary.ui.list.DiaryDayListBaseItem;
 import com.websarva.wings.android.zuboradiary.ui.list.DiaryYearMonthListBaseAdapter;
 import com.websarva.wings.android.zuboradiary.ui.list.DiaryYearMonthListBaseItem;
 import com.websarva.wings.android.zuboradiary.ui.list.SwipeDiaryYearMonthListBaseAdapter;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -28,7 +30,8 @@ public abstract class DiaryYearMonthListAdapter extends SwipeDiaryYearMonthListB
         DiaryYearMonthListItem _item = (DiaryYearMonthListItem) item;
         DiaryDayListAdapter diaryDayListAdapter = createDiaryDayListAdapter(holder);
         List<DiaryDayListItem> diaryDayList = _item.getDiaryDayList().getDiaryDayListItemList();
-        diaryDayListAdapter.submitList(diaryDayList);
+        List<DiaryDayListBaseItem> convertedList = new ArrayList<>(diaryDayList);
+        diaryDayListAdapter.submitList(convertedList);
     }
 
     @NonNull

@@ -9,14 +9,14 @@ import androidx.annotation.NonNull;
 
 import com.websarva.wings.android.zuboradiary.data.database.WordSearchResultListItem;
 import com.websarva.wings.android.zuboradiary.data.diary.ItemNumber;
+import com.websarva.wings.android.zuboradiary.ui.list.DiaryDayListBaseItem;
 
-import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
-public class WordSearchResultDayListItem {
-    private final LocalDate date;
+public class WordSearchResultDayListItem extends DiaryDayListBaseItem {
+
     private final SpannableString title;
     private final ItemNumber itemNumber;
     private final SpannableString itemTitle;
@@ -27,16 +27,15 @@ public class WordSearchResultDayListItem {
     private final String KEY_ITEM_COMMENT = "ItemComment";
 
     WordSearchResultDayListItem(
-            WordSearchResultListItem wordSearchResultListItem, String searchWord, int textColor, int backgroundColor) {
-        Objects.requireNonNull(wordSearchResultListItem);
+            WordSearchResultListItem listItem, String searchWord, int textColor, int backgroundColor) {
+        super(listItem);
+        Objects.requireNonNull(listItem);
+        Objects.requireNonNull(searchWord);
 
-        String strDate = wordSearchResultListItem.getDate();
-        this.date = LocalDate.parse(strDate);
-
-        String title = wordSearchResultListItem.getTitle();
+        String title = listItem.getTitle();
         this.title = toSpannableString(title, searchWord, textColor, backgroundColor);
 
-        Map<String, Object> diaryItem = extractTargetItem(wordSearchResultListItem, searchWord);
+        Map<String, Object> diaryItem = extractTargetItem(listItem, searchWord);
         Integer itemNumber = (Integer) diaryItem.get(KEY_ITEM_NUMBER);
         Objects.requireNonNull(itemNumber);
         this.itemNumber = new ItemNumber(itemNumber);
@@ -131,11 +130,6 @@ public class WordSearchResultDayListItem {
         result.put(KEY_ITEM_TITLE, itemTitle);
         result.put(KEY_ITEM_COMMENT, itemComment);
         return result;
-    }
-
-    @NonNull
-    public LocalDate getDate() {
-        return date;
     }
 
     @NonNull

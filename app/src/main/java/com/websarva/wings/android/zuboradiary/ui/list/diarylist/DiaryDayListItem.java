@@ -3,27 +3,18 @@ package com.websarva.wings.android.zuboradiary.ui.list.diarylist;
 import androidx.annotation.NonNull;
 
 import com.websarva.wings.android.zuboradiary.data.database.DiaryListItem;
+import com.websarva.wings.android.zuboradiary.ui.list.DiaryDayListBaseItem;
 
-import java.time.LocalDate;
-import java.util.Objects;
+public class DiaryDayListItem extends DiaryDayListBaseItem {
 
-public class DiaryDayListItem {
-    private final LocalDate date;
     private final String title;
     private final String picturePath;
 
-    DiaryDayListItem(DiaryListItem diaryListItem) {
-        Objects.requireNonNull(diaryListItem);
+    DiaryDayListItem(DiaryListItem listItem) {
+        super(listItem);
 
-        String strDate = diaryListItem.getDate();
-        this.date = LocalDate.parse(strDate);
-        this.title = diaryListItem.getTitle();
-        this.picturePath = diaryListItem.getPicturePath();
-    }
-
-    @NonNull
-    public LocalDate getDate() {
-        return date;
+        this.title = listItem.getTitle();
+        this.picturePath = listItem.getPicturePath();
     }
 
     @NonNull

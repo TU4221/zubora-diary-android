@@ -7,80 +7,68 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
-import androidx.recyclerview.widget.DiffUtil;
-import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewbinding.ViewBinding;
 
 import com.websarva.wings.android.zuboradiary.data.DayOfWeekStringConverter;
 import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor;
 import com.websarva.wings.android.zuboradiary.databinding.RowDiaryDayListBinding;
-import com.websarva.wings.android.zuboradiary.ui.ThemeColorInflaterCreator;
+import com.websarva.wings.android.zuboradiary.ui.list.DiaryDayListBaseAdapter;
+import com.websarva.wings.android.zuboradiary.ui.list.DiaryDayListBaseItem;
+import com.websarva.wings.android.zuboradiary.ui.list.SwipeDiaryDayListBaseAdapter;
 
 import java.time.LocalDate;
 import java.util.Objects;
 
-public class DiaryDayListAdapter extends ListAdapter<DiaryDayListItem, DiaryDayListAdapter.DiaryDayListViewHolder> {
-
-    private final Context context;
-    private final RecyclerView recyclerView;
-    private final ThemeColor themeColor;
-    private OnClickItemListener onClickItemListener;
-    private OnClickDeleteButtonListener onClickDeleteButtonListener;
+public class DiaryDayListAdapter extends SwipeDiaryDayListBaseAdapter {
 
     public DiaryDayListAdapter(Context context, RecyclerView recyclerView, ThemeColor themeColor) {
-        super(new DiaryDayListDiffUtilItemCallback());
-        Objects.requireNonNull(context);
-        Objects.requireNonNull(recyclerView);
-        Objects.requireNonNull(themeColor);
-
-        this.context = context;
-        this.recyclerView = recyclerView;
-        this.themeColor = themeColor;
-    }
-
-    public void build() {
-        recyclerView.setAdapter(this);
+        super(context, recyclerView, themeColor, new DiaryDayListDiffUtilItemCallback());
     }
 
     @NonNull
     @Override
-    public DiaryDayListViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        LayoutInflater inflater = LayoutInflater.from(parent.getContext());
-        ThemeColorInflaterCreator creator =
-                new ThemeColorInflaterCreator(parent.getContext(), inflater, themeColor);
-        LayoutInflater themeColorInflater = creator.create();
-
+    protected RecyclerView.ViewHolder onCreateDiaryDayViewHolder(@NonNull ViewGroup parent, @NonNull LayoutInflater themeColorInflater) {
         RowDiaryDayListBinding binding =
                 RowDiaryDayListBinding.inflate(themeColorInflater, parent, false);
         return new DiaryDayListViewHolder(binding);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull DiaryDayListViewHolder holder, int position) {
-        DiaryDayListItem item = getItem(position);
-        Objects.requireNonNull(item);
-
-        setUpDate(holder, item);
-        setUpTitle(holder, item);
-        setUpPicture(holder, item);
-        setUpClickListener(holder, item);
-    }
-
-    private void setUpDate(DiaryDayListViewHolder holder, DiaryDayListItem item) {
-        Objects.requireNonNull(holder);
-        Objects.requireNonNull(item);
+    protected void onBindDate(@NonNull RecyclerView.ViewHolder holder, @NonNull DiaryDayListBaseItem item) {
+        DiaryDayListViewHolder _holder = (DiaryDayListViewHolder) holder;
 
         LocalDate date = item.getDate();
-
         DayOfWeekStringConverter dayOfWeekStringConverter = new DayOfWeekStringConverter(context);
         String strDayOfWeek = dayOfWeekStringConverter.toDiaryListDayOfWeek(date.getDayOfWeek());
-        holder.binding.includeDay.textDayOfWeek.setText(strDayOfWeek);
-
-        holder.binding.includeDay.textDayOfMonth.setText(String.valueOf(date.getDayOfMonth()));
+        _holder.binding.includeDay.textDayOfWeek.setText(strDayOfWeek);
+        _holder.binding.includeDay.textDayOfMonth.setText(String.valueOf(date.getDayOfMonth()));
     }
 
-    private void setUpTitle(DiaryDayListViewHolder holder, DiaryDayListItem item) {
+    @Override
+    protected void onBindItemClickListener(@NonNull RecyclerView.ViewHolder holder, @NonNull DiaryDayListBaseItem item) {
+        DiaryDayListViewHolder _holder = (DiaryDayListViewHolder) holder;
+        LocalDate date = item.getDate();
+        _holder.binding.linerLayoutForeground.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Objects.requireNonNull(v);
+
+                onClickItem(date);
+            }
+        });
+    }
+
+    @Override
+    protected void onBindOtherView(@NonNull RecyclerView.ViewHolder holder, @NonNull DiaryDayListBaseItem item) {
+        DiaryDayListViewHolder _holder = (DiaryDayListViewHolder) holder;
+        DiaryDayListItem _item = (DiaryDayListItem) item;
+
+        onBindTitle(_holder, _item);
+        onBindPicture(_holder, _item);
+    }
+
+    private void onBindTitle(DiaryDayListViewHolder holder, DiaryDayListItem item) {
         Objects.requireNonNull(holder);
         Objects.requireNonNull(item);
 
@@ -88,7 +76,7 @@ public class DiaryDayListAdapter extends ListAdapter<DiaryDayListItem, DiaryDayL
         holder.binding.textTitle.setText(title);
     }
 
-    private void setUpPicture(DiaryDayListViewHolder holder, DiaryDayListItem item) {
+    private void onBindPicture(DiaryDayListViewHolder holder, DiaryDayListItem item) {
         Objects.requireNonNull(holder);
         Objects.requireNonNull(item);
 
@@ -96,28 +84,17 @@ public class DiaryDayListAdapter extends ListAdapter<DiaryDayListItem, DiaryDayL
         // TODO:picturePath
     }
 
-    private void setUpClickListener(DiaryDayListViewHolder holder, DiaryDayListItem item) {
-        Objects.requireNonNull(holder);
-        Objects.requireNonNull(item);
+    @Override
+    protected void onBindDeleteButtonClickListener(@NonNull RecyclerView.ViewHolder holder, @NonNull DiaryDayListBaseItem item) {
+        DiaryDayListViewHolder _holder = (DiaryDayListViewHolder) holder;
 
         LocalDate date = item.getDate();
-        holder.binding.linerLayoutForeground.setOnClickListener(new View.OnClickListener() {
+        _holder.binding.includeBackground.imageButtonDelete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Objects.requireNonNull(v);
-                if (onClickItemListener == null) return;
 
-                onClickItemListener.onClick(date);
-            }
-        });
-
-        holder.binding.includeBackground.imageButtonDelete.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Objects.requireNonNull(v);
-                if (onClickDeleteButtonListener == null) return;
-
-                onClickDeleteButtonListener.onClick(date);
+                onClickDeleteButton(date);
             }
         });
     }
@@ -142,45 +119,19 @@ public class DiaryDayListAdapter extends ListAdapter<DiaryDayListItem, DiaryDayL
         }
     }
 
-    @FunctionalInterface
-    public interface OnClickItemListener {
-        void onClick(LocalDate date);
-    }
-
-    public void setOnClickItemListener(OnClickItemListener onClickItemListener) {
-        Objects.requireNonNull(onClickItemListener);
-
-        this.onClickItemListener = onClickItemListener;
-    }
-
-    @FunctionalInterface
-    public interface OnClickDeleteButtonListener {
-        void onClick(LocalDate date);
-    }
-
-    public void setOnClickDeleteButtonListener(OnClickDeleteButtonListener onClickDeleteButtonListener) {
-        Objects.requireNonNull(onClickDeleteButtonListener);
-
-        this.onClickDeleteButtonListener = onClickDeleteButtonListener;
-    }
-
-    private static class DiaryDayListDiffUtilItemCallback extends DiffUtil.ItemCallback<DiaryDayListItem> {
-        @Override
-        public boolean areItemsTheSame(@NonNull DiaryDayListItem oldItem, @NonNull DiaryDayListItem newItem) {
-            Log.d("DiaryDayList", "DiffUtil.ItemCallback_areItemsTheSame()");
-            Log.d("DiaryDayList", "oldItem_Date:" + oldItem.getDate());
-            Log.d("DiaryDayList", "newItem_Date:" + newItem.getDate());
-            return oldItem.getDate().equals(newItem.getDate());
-        }
+    private static class DiaryDayListDiffUtilItemCallback extends DiaryDayListBaseAdapter.DiffUtilItemCallback {
 
         @Override
-        public boolean areContentsTheSame(@NonNull DiaryDayListItem oldItem, @NonNull DiaryDayListItem newItem) {
+        public boolean areContentsTheSame(@NonNull DiaryDayListBaseItem oldItem, @NonNull DiaryDayListBaseItem newItem) {
+            DiaryDayListItem _oldItem = (DiaryDayListItem) oldItem;
+            DiaryDayListItem _newItem = (DiaryDayListItem) newItem;
+
             Log.d("DiaryDayList", "DiffUtil.ItemCallback_areContentsTheSame()");
-            if (!oldItem.getTitle().equals(newItem.getTitle())) {
+            if (!_oldItem.getTitle().equals(_newItem.getTitle())) {
                 Log.d("DiaryDayList", "Title不一致");
                 return false;
             }
-            if (!oldItem.getPicturePath().equals(newItem.getPicturePath())) {
+            if (!_oldItem.getPicturePath().equals(_newItem.getPicturePath())) {
                 Log.d("DiaryDayList", "PicturePath不一致");
                 return false;
             }

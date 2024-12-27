@@ -7,10 +7,12 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor;
+import com.websarva.wings.android.zuboradiary.ui.list.DiaryDayListBaseItem;
 import com.websarva.wings.android.zuboradiary.ui.list.DiaryYearMonthListBaseAdapter;
 import com.websarva.wings.android.zuboradiary.ui.list.DiaryYearMonthListBaseItem;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -26,11 +28,10 @@ public abstract class WordSearchResultYearMonthListAdapter extends DiaryYearMont
     public void createDiaryDayList(
             DiaryYearMonthListBaseAdapter.DiaryYearMonthListViewHolder holder, DiaryYearMonthListBaseItem item) {
         WordSearchResultYearMonthListItem _item = (WordSearchResultYearMonthListItem) item;
-        WordSearchResultDayListAdapter wordSearchResultDayListAdapter =
-                createWordSearchResultDayListAdapter(holder);
-        List<WordSearchResultDayListItem> wordSearchResultDayList =
-                _item.getWordSearchResultDayList().getWordSearchResultDayListItemList();
-        wordSearchResultDayListAdapter.submitList(wordSearchResultDayList);
+        WordSearchResultDayListAdapter listAdapter = createWordSearchResultDayListAdapter(holder);
+        List<DiaryDayListBaseItem> convertedList =
+                new ArrayList<>(_item.getWordSearchResultDayList().getWordSearchResultDayListItemList());
+        listAdapter.submitList(convertedList);
     }
 
     @NonNull

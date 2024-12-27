@@ -8,8 +8,6 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
-import androidx.recyclerview.widget.DiffUtil;
-import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.websarva.wings.android.zuboradiary.R;
@@ -17,91 +15,80 @@ import com.websarva.wings.android.zuboradiary.data.DayOfWeekStringConverter;
 import com.websarva.wings.android.zuboradiary.data.diary.ItemNumber;
 import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor;
 import com.websarva.wings.android.zuboradiary.databinding.RowWordSearchResultListBinding;
-import com.websarva.wings.android.zuboradiary.ui.ThemeColorInflaterCreator;
+import com.websarva.wings.android.zuboradiary.ui.list.DiaryDayListBaseAdapter;
+import com.websarva.wings.android.zuboradiary.ui.list.DiaryDayListBaseItem;
 
 import java.time.LocalDate;
 import java.util.Objects;
 
-public class WordSearchResultDayListAdapter
-        extends ListAdapter<WordSearchResultDayListItem, WordSearchResultDayListAdapter.WordSearchResultDayViewHolder> {
-
-    private final Context context;
-    private final RecyclerView recyclerView;
-    private final ThemeColor themeColor;
-    private OnClickItemListener onClickItemListener;
+public class WordSearchResultDayListAdapter extends DiaryDayListBaseAdapter {
 
     public WordSearchResultDayListAdapter(Context context, RecyclerView recyclerView, ThemeColor themeColor){
-        super(new WordSearchResultDayListDiffUtilItemCallback());
-
-        Objects.requireNonNull(context);
-        Objects.requireNonNull(recyclerView);
-        Objects.requireNonNull(themeColor);
-
-        this.context = context;
-        this.recyclerView = recyclerView;
-        this.themeColor = themeColor;
+        super(context, recyclerView, themeColor, new DiffUtilItemCallback());
     }
 
-    public void build() {
-        recyclerView.setAdapter(this);
-    }
-
-    //日記リスト(日)のホルダーと日記リスト(日)のアイテムレイアウトを紐づける。
     @NonNull
     @Override
-    public WordSearchResultDayViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        LayoutInflater inflater = LayoutInflater.from(parent.getContext());
-        ThemeColorInflaterCreator creator =
-                new ThemeColorInflaterCreator(context, inflater, themeColor);
-        LayoutInflater themeColorInflater = creator.create();
+    protected RecyclerView.ViewHolder onCreateDiaryDayViewHolder(@NonNull ViewGroup parent, @NonNull LayoutInflater themeColorInflater) {
         RowWordSearchResultListBinding binding =
                 RowWordSearchResultListBinding.inflate(themeColorInflater, parent, false);
         return new WordSearchResultDayViewHolder(binding);
     }
 
-    //日記リスト(日)の各行アイテム(ホルダー)情報を設定。
     @Override
-    public void onBindViewHolder(WordSearchResultDayViewHolder holder, int position) {
-        WordSearchResultDayListItem item = getItem(position);
+    protected void onBindDate(@NonNull RecyclerView.ViewHolder holder, @NonNull DiaryDayListBaseItem item) {
         LocalDate date = item.getDate();
         DayOfWeekStringConverter dayOfWeekStringConverter = new DayOfWeekStringConverter(context);
         String strDayOfWeek = dayOfWeekStringConverter.toDiaryListDayOfWeek(date.getDayOfWeek());
-        SpannableString title = item.getTitle();
-        ItemNumber itemNumber = item.getItemNumber();
-        SpannableString itemTitle = item.getItemTitle();
-        SpannableString itemComment = item.getItemComment();
-        holder.date = date; // ホルダー毎に日記の日付情報一式付与
-        holder.binding.includeDay.textDayOfWeek.setText(strDayOfWeek);
-        holder.binding.includeDay.textDayOfMonth.setText(String.valueOf(date.getDayOfMonth()));
-        holder.binding.textTitle.setText(title);
-        String strItemNumber = context.getString(R.string.fragment_word_search_result_item) + itemNumber;
-        holder.binding.textItemNumber.setText(strItemNumber);
-        holder.binding.textItemTitle.setText(itemTitle);
-        holder.binding.textItemComment.setText(itemComment);
+        WordSearchResultDayViewHolder _holder = (WordSearchResultDayViewHolder) holder;
+        _holder.binding.includeDay.textDayOfWeek.setText(strDayOfWeek);
+        _holder.binding.includeDay.textDayOfMonth.setText(String.valueOf(date.getDayOfMonth()));
+    }
+
+    @Override
+    protected void onBindItemClickListener(@NonNull RecyclerView.ViewHolder holder, @NonNull DiaryDayListBaseItem item) {
+        LocalDate date = item.getDate();
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (onClickItemListener == null) {
-                    return;
-                }
-                onClickItemListener.onClick(date);
+                onClickItem(date);
             }
         });
     }
 
-    @FunctionalInterface
-    public interface OnClickItemListener {
-        void onClick(LocalDate date);
+    @Override
+    protected void onBindOtherView(@NonNull RecyclerView.ViewHolder holder, @NonNull DiaryDayListBaseItem item) {
+        WordSearchResultDayViewHolder _holder = (WordSearchResultDayViewHolder) holder;
+        WordSearchResultDayListItem _item = (WordSearchResultDayListItem) item;
+
+        onBindTitle(_holder, _item);
+        onBindItem(_holder, _item);
     }
 
-    public void setOnClickItemListener(OnClickItemListener onClickItemListener) {
-        this.onClickItemListener = onClickItemListener;
+    private void onBindTitle(WordSearchResultDayViewHolder holder, WordSearchResultDayListItem item) {
+        Objects.requireNonNull(holder);
+        Objects.requireNonNull(item);
+
+        SpannableString title = item.getTitle();
+        holder.binding.textTitle.setText(title);
+    }
+
+    private void onBindItem(WordSearchResultDayViewHolder holder, WordSearchResultDayListItem item) {
+        Objects.requireNonNull(holder);
+        Objects.requireNonNull(item);
+
+        ItemNumber itemNumber = item.getItemNumber();
+        SpannableString itemTitle = item.getItemTitle();
+        SpannableString itemComment = item.getItemComment();
+        String strItemNumber = context.getString(R.string.fragment_word_search_result_item) + itemNumber;
+        holder.binding.textItemNumber.setText(strItemNumber);
+        holder.binding.textItemTitle.setText(itemTitle);
+        holder.binding.textItemComment.setText(itemComment);
     }
 
     public static class WordSearchResultDayViewHolder extends RecyclerView.ViewHolder {
 
         public RowWordSearchResultListBinding binding;
-        public LocalDate date;
 
         public WordSearchResultDayViewHolder(RowWordSearchResultListBinding binding) {
             super(binding.getRoot());
@@ -109,32 +96,27 @@ public class WordSearchResultDayListAdapter
         }
     }
 
-    private static class WordSearchResultDayListDiffUtilItemCallback
-            extends DiffUtil.ItemCallback<WordSearchResultDayListItem> {
-        @Override
-        public boolean areItemsTheSame(@NonNull WordSearchResultDayListItem oldItem, @NonNull WordSearchResultDayListItem newItem) {
-            Log.d("WordSearchResultDayList", "DiffUtil.ItemCallback_areItemsTheSame()");
-            Log.d("WordSearchResultDayList", "oldItem_Date:" + oldItem.getDate());
-            Log.d("WordSearchResultDayList", "newItem_Date:" + newItem.getDate());
-            return oldItem.getDate().equals(newItem.getDate());
-        }
+    private static class DiffUtilItemCallback extends DiaryDayListBaseAdapter.DiffUtilItemCallback {
 
         @Override
-        public boolean areContentsTheSame(@NonNull WordSearchResultDayListItem oldItem, @NonNull WordSearchResultDayListItem newItem) {
+        public boolean areContentsTheSame(@NonNull DiaryDayListBaseItem oldItem, @NonNull DiaryDayListBaseItem newItem) {
             Log.d("WordSearchResultDayList", "DiffUtil.ItemCallback_areContentsTheSame()");
-            if (!oldItem.getTitle().equals(newItem.getTitle())) {
+            WordSearchResultDayListItem _oldItem = (WordSearchResultDayListItem) oldItem;
+            WordSearchResultDayListItem _newItem = (WordSearchResultDayListItem) newItem;
+
+            if (!_oldItem.getTitle().equals(_newItem.getTitle())) {
                 Log.d("WordSearchResultDayList", "Title不一致");
                 return false;
             }
-            if (oldItem.getItemNumber() != newItem.getItemNumber()) {
+            if (_oldItem.getItemNumber() != _newItem.getItemNumber()) {
                 Log.d("WordSearchResultDayList", "ItemNumber不一致");
                 return false;
             }
-            if (!oldItem.getItemTitle().equals(newItem.getItemTitle())) {
+            if (!_oldItem.getItemTitle().equals(_newItem.getItemTitle())) {
                 Log.d("WordSearchResultDayList", "ItemTitle不一致");
                 return false;
             }
-            if (!oldItem.getItemComment().equals(newItem.getItemComment())) {
+            if (!_oldItem.getItemComment().equals(_newItem.getItemComment())) {
                 Log.d("WordSearchResultDayList", "ItemComment不一致");
                 return false;
             }

@@ -3,10 +3,8 @@ package com.websarva.wings.android.zuboradiary.data.database;
 import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;
 
-public class WordSearchResultListItem {
+public class WordSearchResultListItem extends DiaryListBaseItem {
 
-    @NonNull
-    private String date = "";
     @NonNull
     private String title = "";
     @ColumnInfo(name = "item_1_title")
@@ -39,15 +37,6 @@ public class WordSearchResultListItem {
     @ColumnInfo(name = "item_5_comment")
     @NonNull
     private String item5Comment = "";
-
-    @NonNull
-    public String getDate() {
-        return this.date;
-    }
-
-    public void setDate(@NonNull String date) {
-        this.date = date;
-    }
 
     @NonNull
     public String getTitle() {
