@@ -11,7 +11,6 @@ import com.websarva.wings.android.zuboradiary.ui.list.DiaryDayListBaseItem;
 import com.websarva.wings.android.zuboradiary.ui.list.DiaryYearMonthListBaseAdapter;
 import com.websarva.wings.android.zuboradiary.ui.list.DiaryYearMonthListBaseItem;
 
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -44,11 +43,11 @@ public abstract class WordSearchResultYearMonthListAdapter extends DiaryYearMont
         wordSearchResultDayListAdapter.build();
         wordSearchResultDayListAdapter.setOnClickItemListener(new WordSearchResultDayListAdapter.OnClickItemListener() {
             @Override
-            public void onClick(LocalDate date) {
-                Objects.requireNonNull(date);
+            public void onClick(DiaryDayListBaseItem item) {
+                Objects.requireNonNull(item);
                 if (onClickChildItemListener == null) return;
 
-                onClickChildItemListener.onClick(date);
+                onClickChildItemListener.onClick(item);
             }
         });
         return wordSearchResultDayListAdapter;

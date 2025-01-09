@@ -1,6 +1,7 @@
 package com.websarva.wings.android.zuboradiary.ui.list.diarylist;
 
 import android.content.DialogInterface;
+import android.net.Uri;
 
 import androidx.annotation.NonNull;
 
@@ -14,6 +15,7 @@ public class DiaryDeleteDialogFragment extends BaseAlertDialogFragment {
     private static final String fromClassName =
             "From" + DiaryDeleteDialogFragment.class.getName();
     public static final String KEY_DELETE_DIARY_DATE = "DeleteDiaryDate" + fromClassName;
+    public static final String KEY_DELETE_DIARY_PICTURE_URI = "DeleteDiaryPictureUri" + fromClassName;
 
     @Override
     protected String createTitle() {
@@ -22,8 +24,7 @@ public class DiaryDeleteDialogFragment extends BaseAlertDialogFragment {
 
     @Override
     protected String createMessage() {
-        LocalDate date =
-                DiaryDeleteDialogFragmentArgs.fromBundle(requireArguments()).getDate();
+        LocalDate date = DiaryDeleteDialogFragmentArgs.fromBundle(requireArguments()).getDate();
         DateTimeStringConverter dateTimeStringConverter = new DateTimeStringConverter();
         String strDate = dateTimeStringConverter.toYearMonthDayWeek(date);
         return strDate + getString(R.string.dialog_diary_delete_message);
@@ -34,6 +35,11 @@ public class DiaryDeleteDialogFragment extends BaseAlertDialogFragment {
         LocalDate deleteDiaryDate =
                 DiaryDeleteDialogFragmentArgs.fromBundle(requireArguments()).getDate();
         setResult(KEY_DELETE_DIARY_DATE, deleteDiaryDate);
+
+
+        Uri deleteDiaryPictureUri =
+                DiaryDeleteDialogFragmentArgs.fromBundle(requireArguments()).getPictureUri();
+        setResult(KEY_DELETE_DIARY_PICTURE_URI, deleteDiaryPictureUri);
     }
 
     @Override

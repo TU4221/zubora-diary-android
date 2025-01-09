@@ -2,11 +2,13 @@ package com.websarva.wings.android.zuboradiary.ui.diary.diaryshow;
 
 import android.app.Dialog;
 import android.content.Context;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.activity.OnBackPressedCallback;
@@ -26,8 +28,11 @@ import com.websarva.wings.android.zuboradiary.data.DateTimeStringConverter;
 import com.websarva.wings.android.zuboradiary.data.diary.Condition;
 import com.websarva.wings.android.zuboradiary.data.diary.ItemNumber;
 import com.websarva.wings.android.zuboradiary.data.diary.Weather;
+import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor;
 import com.websarva.wings.android.zuboradiary.databinding.FragmentDiaryShowBinding;
+import com.websarva.wings.android.zuboradiary.ui.DiaryPictureManager;
 import com.websarva.wings.android.zuboradiary.ui.BaseFragment;
+import com.websarva.wings.android.zuboradiary.ui.UriPermissionManager;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -49,6 +54,9 @@ public class DiaryShowFragment extends BaseFragment {
     // ViewModel
     private DiaryShowViewModel diaryShowViewModel;
 
+    // Uri関係
+    private UriPermissionManager pictureUriPermissionManager;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -59,6 +67,14 @@ public class DiaryShowFragment extends BaseFragment {
                 backFragment(false);
             }
         });
+
+        pictureUriPermissionManager =
+                new UriPermissionManager(requireContext()) {
+                    @Override
+                    public boolean checkUsedUriDoesNotExist(@NonNull Uri uri) {
+                        return diaryShowViewModel.checkSavedPicturePathDoesNotExist(uri);
+                    }
+                };
     }
 
     @Override
@@ -91,6 +107,7 @@ public class DiaryShowFragment extends BaseFragment {
         setUpWeatherLayout();
         setUpConditionLayout();
         setUpItemLayout();
+        setUpPicture();
         setUpLogLayout();
     }
 
@@ -123,8 +140,18 @@ public class DiaryShowFragment extends BaseFragment {
         if (selectedButton == null) return;
         if (selectedButton != Dialog.BUTTON_POSITIVE) return;
 
-        diaryShowViewModel.deleteDiary();
+        boolean isSuccessful = diaryShowViewModel.deleteDiary();
+        if (!isSuccessful) return;
+
+        releasePictureUriPermission();
         backFragment(true);
+    }
+
+    private void releasePictureUriPermission() {
+        Uri pictureUri = diaryShowViewModel.getPicturePathLiveData().getValue();
+
+        if (pictureUri == null) return;
+        pictureUriPermissionManager.releasePersistablePermission(pictureUri);
     }
 
     // 画面表示データ準備
@@ -325,6 +352,57 @@ public class DiaryShowFragment extends BaseFragment {
                     itemLayouts[itemArrayNumber].setVisibility(View.GONE);
                 }
             }
+        }
+    }
+
+    private void setUpPicture() {
+        diaryShowViewModel.getPicturePathLiveData()
+                .observe(
+                        getViewLifecycleOwner(),
+                        new PicturePathObserver(
+                                requireContext(),
+                                requireThemeColor(),
+                                binding.includeDiaryShow.textAttachedPicture,
+                                binding.includeDiaryShow.imageAttachedPicture
+                        )
+                );
+    }
+
+    public static class PicturePathObserver implements Observer<Uri> {
+
+        private final ImageView imageView;
+        private final TextView textPictureTitle;
+        private final DiaryPictureManager diaryPictureManager;
+
+
+
+        public PicturePathObserver(
+                Context context, ThemeColor themeColor, TextView textPictureTitle, ImageView imageView) {
+            Objects.requireNonNull(context);
+            Objects.requireNonNull(themeColor);
+            Objects.requireNonNull(imageView);
+
+            this.imageView = imageView;
+            this.textPictureTitle = textPictureTitle;
+            this.diaryPictureManager =
+                    new DiaryPictureManager(
+                            context,
+                            imageView,
+                            themeColor.getOnSurfaceVariantColor(context.getResources())
+                    );
+        }
+
+        @Override
+        public void onChanged(Uri uri) {
+            if (uri == null) {
+                textPictureTitle.setVisibility(View.GONE);
+                imageView.setVisibility(View.GONE);
+                return;
+            }
+
+            textPictureTitle.setVisibility(View.VISIBLE);
+            imageView.setVisibility(View.VISIBLE);
+            diaryPictureManager.setUpPictureOnDiary(uri);
         }
     }
 

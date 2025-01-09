@@ -13,7 +13,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor;
 import com.websarva.wings.android.zuboradiary.ui.ThemeColorInflaterCreator;
 
-import java.time.LocalDate;
 import java.util.Objects;
 
 public abstract class DiaryDayListBaseAdapter extends ListAdapter<DiaryDayListBaseItem, RecyclerView.ViewHolder> {
@@ -76,7 +75,7 @@ public abstract class DiaryDayListBaseAdapter extends ListAdapter<DiaryDayListBa
 
     @FunctionalInterface
     public interface OnClickItemListener {
-        void onClick(LocalDate date);
+        void onClick(DiaryDayListBaseItem item);
     }
 
     public void setOnClickItemListener(OnClickItemListener onClickItemListener) {
@@ -85,11 +84,11 @@ public abstract class DiaryDayListBaseAdapter extends ListAdapter<DiaryDayListBa
         this.onClickItemListener = onClickItemListener;
     }
 
-    protected void onClickItem(LocalDate date) {
-        Objects.requireNonNull(date);
+    protected void onClickItem(DiaryDayListBaseItem item) {
+        Objects.requireNonNull(item);
         if (onClickItemListener == null) return;
 
-        onClickItemListener.onClick(date);
+        onClickItemListener.onClick(item);
     }
 
     protected static abstract class DiffUtilItemCallback extends DiffUtil.ItemCallback<DiaryDayListBaseItem> {

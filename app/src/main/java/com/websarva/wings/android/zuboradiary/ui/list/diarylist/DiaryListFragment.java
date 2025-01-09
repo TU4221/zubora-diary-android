@@ -1,6 +1,7 @@
 package com.websarva.wings.android.zuboradiary.ui.list.diarylist;
 
 import android.content.Context;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -22,6 +23,8 @@ import com.websarva.wings.android.zuboradiary.data.AppMessage;
 import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor;
 import com.websarva.wings.android.zuboradiary.databinding.FragmentDiaryListBinding;
 import com.websarva.wings.android.zuboradiary.ui.BaseFragment;
+import com.websarva.wings.android.zuboradiary.ui.UriPermissionManager;
+import com.websarva.wings.android.zuboradiary.ui.list.DiaryDayListBaseItem;
 import com.websarva.wings.android.zuboradiary.ui.list.DiaryYearMonthListBaseAdapter;
 import com.websarva.wings.android.zuboradiary.ui.list.DiaryYearMonthListBaseItem;
 import com.websarva.wings.android.zuboradiary.ui.list.SwipeDiaryYearMonthListBaseAdapter;
@@ -44,9 +47,20 @@ public class DiaryListFragment extends BaseFragment {
     // ViewModel
     private DiaryListViewModel diaryListViewModel;
 
+    // Uri関係
+    private UriPermissionManager pictureUriPermissionManager;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        pictureUriPermissionManager =
+                new UriPermissionManager(requireContext()) {
+                    @Override
+                    public boolean checkUsedUriDoesNotExist(@NonNull Uri uri) {
+                        return diaryListViewModel.checkSavedPicturePathDoesNotExist(uri);
+                    }
+                };
     }
 
     @Override
@@ -123,7 +137,19 @@ public class DiaryListFragment extends BaseFragment {
                 receiveResulFromDialog(DiaryDeleteDialogFragment.KEY_DELETE_DIARY_DATE);
         if (deleteDiaryDate == null) return;
 
-        diaryListViewModel.deleteDiary(deleteDiaryDate);
+        boolean isSuccessful = diaryListViewModel.deleteDiary(deleteDiaryDate);
+        if (!isSuccessful) return;
+
+        Uri deleteDiaryPictureUri =
+                receiveResulFromDialog(DiaryDeleteDialogFragment.KEY_DELETE_DIARY_PICTURE_URI);
+        if (deleteDiaryPictureUri == null) return;
+        releasePersistableLoadedPictureUriPermission(deleteDiaryPictureUri);
+    }
+
+    private void releasePersistableLoadedPictureUriPermission(Uri uri) {
+        Objects.requireNonNull(uri);
+
+        pictureUriPermissionManager.releasePersistablePermission(uri);
     }
 
     // ツールバー設定
@@ -185,18 +211,19 @@ public class DiaryListFragment extends BaseFragment {
         diaryListAdapter.build();
         diaryListAdapter.setOnClickChildItemListener(new DiaryYearMonthListBaseAdapter.OnClickChildItemListener() {
             @Override
-            public void onClick(LocalDate date) {
-                Objects.requireNonNull(date);
+            public void onClick(DiaryDayListBaseItem item) {
+                Objects.requireNonNull(item);
 
-                showShowDiaryFragment(date);
+                showShowDiaryFragment(item.getDate());
             }
         });
         diaryListAdapter.setOnClickChildItemBackgroundButtonListener(new SwipeDiaryYearMonthListBaseAdapter.OnClickChildItemBackgroundButtonListener() {
             @Override
-            public void onClick(LocalDate date) {
-                Objects.requireNonNull(date);
+            public void onClick(DiaryDayListBaseItem item) {
+                Objects.requireNonNull(item);
 
-                showDiaryDeleteDialog(date);
+                DiaryDayListItem _item = (DiaryDayListItem) item;
+                showDiaryDeleteDialog(_item.getDate(), _item.getPicturePath());
             }
         });
 
@@ -326,12 +353,12 @@ public class DiaryListFragment extends BaseFragment {
         navController.navigate(action);
     }
 
-    private void showDiaryDeleteDialog(LocalDate date) {
+    private void showDiaryDeleteDialog(LocalDate date, Uri pictureUri) {
         Objects.requireNonNull(date);
         if (!canShowFragment()) return;
 
         NavDirections action =
-                DiaryListFragmentDirections.actionDiaryListFragmentToDiaryDeleteDialog(date);
+                DiaryListFragmentDirections.actionDiaryListFragmentToDiaryDeleteDialog(date, pictureUri);
         navController.navigate(action);
     }
 

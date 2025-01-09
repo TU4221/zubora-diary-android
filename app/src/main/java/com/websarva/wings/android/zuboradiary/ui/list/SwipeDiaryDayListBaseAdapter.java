@@ -7,7 +7,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor;
 
-import java.time.LocalDate;
 import java.util.Objects;
 
 public abstract class SwipeDiaryDayListBaseAdapter extends DiaryDayListBaseAdapter {
@@ -36,7 +35,7 @@ public abstract class SwipeDiaryDayListBaseAdapter extends DiaryDayListBaseAdapt
 
     @FunctionalInterface
     public interface OnClickDeleteButtonListener {
-        void onClick(LocalDate date);
+        void onClick(DiaryDayListBaseItem item);
     }
 
     public void setOnClickDeleteButtonListener(OnClickDeleteButtonListener onClickDeleteButtonListener) {
@@ -45,10 +44,10 @@ public abstract class SwipeDiaryDayListBaseAdapter extends DiaryDayListBaseAdapt
         this.onClickDeleteButtonListener = onClickDeleteButtonListener;
     }
 
-    protected void onClickDeleteButton(LocalDate date) {
-        Objects.requireNonNull(date);
+    protected void onClickDeleteButton(DiaryDayListBaseItem item) {
+        Objects.requireNonNull(item);
         if (onClickDeleteButtonListener == null) return;
 
-        onClickDeleteButtonListener.onClick(date);
+        onClickDeleteButtonListener.onClick(item);
     }
 }

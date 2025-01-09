@@ -22,6 +22,9 @@ public interface DiaryDAO {
     @Query("SELECT EXISTS (SELECT 1 FROM diaries WHERE date = :date)")
     ListenableFuture<Boolean> existsDiary(String date);
 
+    @Query("SELECT EXISTS (SELECT 1 FROM diaries WHERE picturePath = :uri)")
+    ListenableFuture<Boolean> existsPicturePath(String uri);
+
     @Query("SELECT * FROM diaries WHERE date = :date")
     ListenableFuture<DiaryEntity> selectDiary(String date);
 

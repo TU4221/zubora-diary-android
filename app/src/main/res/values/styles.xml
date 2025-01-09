@@ -118,7 +118,6 @@
     <!-- ImageView -->
     <!-- MEMO:ImageViewのデフォルトスタイルなし -->
     <style name="AppImageViewStyle">
-        <item name="tint">?attr/colorOnSurfaceVariant</item>
     </style>
 
 
@@ -168,7 +167,6 @@
     </style>
 
     <style name="DiaryDayListImageViewStyle" parent="AppImageViewStyle">
-        <item name="tint">?attr/colorOnSecondaryContainer</item>
     </style>
 
     <!-- 検索バー -->

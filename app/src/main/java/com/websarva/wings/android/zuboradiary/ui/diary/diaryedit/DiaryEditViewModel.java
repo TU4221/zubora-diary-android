@@ -1,5 +1,7 @@
 package com.websarva.wings.android.zuboradiary.ui.diary.diaryedit;
 
+import android.net.Uri;
+
 import androidx.annotation.NonNull;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
@@ -42,6 +44,7 @@ public class DiaryEditViewModel extends BaseViewModel {
     private boolean hasPreparedDiary;
     private final MutableLiveData<LocalDate> previousDate = new MutableLiveData<>();
     private final MutableLiveData<LocalDate> loadedDate = new MutableLiveData<>();
+    private final MutableLiveData<Uri> loadedPicturePath = new MutableLiveData<>();
     private final DiaryLiveData diaryLiveData;
 
     // Fragment切替記憶
@@ -61,6 +64,7 @@ public class DiaryEditViewModel extends BaseViewModel {
         hasPreparedDiary = false;
         previousDate.setValue(null);
         loadedDate.setValue(null);
+        loadedPicturePath.setValue(null);
         diaryLiveData.initialize();
         isShowingItemTitleEditFragment = false;
     }
@@ -95,6 +99,7 @@ public class DiaryEditViewModel extends BaseViewModel {
         loadedDate.setValue(date);
 
         diaryLiveData.update(diaryEntity);
+        loadedPicturePath.setValue(diaryLiveData.getPicturePathMutableLiveData().getValue());
     }
 
     boolean isNewDiaryDefaultStatus() {
@@ -164,12 +169,20 @@ public class DiaryEditViewModel extends BaseViewModel {
         LocalDate deleteDate = loadedDate.getValue();
         Objects.requireNonNull(deleteDate);
 
+        Integer result;
         try {
-            diaryRepository.deleteDiary(deleteDate).get();
+            result = diaryRepository.deleteDiary(deleteDate).get();
         } catch (CancellationException | ExecutionException | InterruptedException e) {
             addAppMessage(AppMessage.DIARY_DELETE_ERROR);
             return false;
         }
+
+        // 削除件数 = 1が正常
+        if (result != 1) {
+            addAppMessage(AppMessage.DIARY_DELETE_ERROR);
+            return false;
+        }
+
         return true;
     }
 
@@ -287,6 +300,28 @@ public class DiaryEditViewModel extends BaseViewModel {
         diaryLiveData.updateItemTitle(itemNumber, title);
     }
 
+    void updatePicturePath(Uri uri) {
+        Objects.requireNonNull(uri);
+
+        diaryLiveData.getPicturePathMutableLiveData().setValue(uri);
+    }
+
+    void deletePicturePath() {
+        diaryLiveData.getPicturePathMutableLiveData().setValue(null);
+    }
+
+    // MEMO:存在しないことを確認したいため下記メソッドを否定的処理とする
+    boolean checkSavedPicturePathDoesNotExist(Uri uri) {
+        Objects.requireNonNull(uri);
+
+        try {
+            return !diaryRepository.existsPicturePath(uri).get();
+        } catch (ExecutionException | InterruptedException e) {
+            addAppMessage(AppMessage.DIARY_LOADING_ERROR);
+            return false;
+        }
+    }
+
     // Fragment切替記憶
     void updateIsShowingItemTitleEditFragment(boolean isShowing) {
         isShowingItemTitleEditFragment = isShowing;
@@ -402,4 +437,13 @@ public class DiaryEditViewModel extends BaseViewModel {
         return diaryLiveData.getItemLiveData(new ItemNumber(5)).getCommentMutableLiveData();
     }
 
+    @NonNull
+    LiveData<Uri> getPicturePathLiveData() {
+        return diaryLiveData.getPicturePathMutableLiveData();
+    }
+
+    @NonNull
+    LiveData<Uri> getLoadedPicturePathLiveData() {
+        return loadedPicturePath;
+    }
 }

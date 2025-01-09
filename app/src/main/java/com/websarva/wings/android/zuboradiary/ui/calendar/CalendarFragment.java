@@ -521,6 +521,17 @@ public class CalendarFragment extends BaseFragment {
         diaryShowViewModel.getNumVisibleItemsLiveData()
                 .observe(getViewLifecycleOwner(), new DiaryShowFragment.NumVisibleItemsObserver(itemLayouts));
 
+        diaryShowViewModel.getPicturePathLiveData()
+                .observe(
+                        getViewLifecycleOwner(),
+                        new DiaryShowFragment.PicturePathObserver(
+                                requireContext(),
+                                requireThemeColor(),
+                                binding.includeDiaryShow.textAttachedPicture,
+                                binding.includeDiaryShow.imageAttachedPicture
+                        )
+                );
+
         diaryShowViewModel.getLogLiveData()
                 .observe(
                         getViewLifecycleOwner(),

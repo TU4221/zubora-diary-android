@@ -1,6 +1,7 @@
 package com.websarva.wings.android.zuboradiary.ui.list.diarylist;
 
 import android.content.Context;
+import android.net.Uri;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,6 +14,7 @@ import androidx.viewbinding.ViewBinding;
 import com.websarva.wings.android.zuboradiary.data.DayOfWeekStringConverter;
 import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor;
 import com.websarva.wings.android.zuboradiary.databinding.RowDiaryDayListBinding;
+import com.websarva.wings.android.zuboradiary.ui.DiaryPictureManager;
 import com.websarva.wings.android.zuboradiary.ui.list.DiaryDayListBaseAdapter;
 import com.websarva.wings.android.zuboradiary.ui.list.DiaryDayListBaseItem;
 import com.websarva.wings.android.zuboradiary.ui.list.SwipeDiaryDayListBaseAdapter;
@@ -48,13 +50,12 @@ public class DiaryDayListAdapter extends SwipeDiaryDayListBaseAdapter {
     @Override
     protected void onBindItemClickListener(@NonNull RecyclerView.ViewHolder holder, @NonNull DiaryDayListBaseItem item) {
         DiaryDayListViewHolder _holder = (DiaryDayListViewHolder) holder;
-        LocalDate date = item.getDate();
         _holder.binding.linerLayoutForeground.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Objects.requireNonNull(v);
 
-                onClickItem(date);
+                onClickItem(item);
             }
         });
     }
@@ -80,21 +81,26 @@ public class DiaryDayListAdapter extends SwipeDiaryDayListBaseAdapter {
         Objects.requireNonNull(holder);
         Objects.requireNonNull(item);
 
-        String picturePath = item.getPicturePath();
-        // TODO:picturePath
+        DiaryPictureManager diaryPictureManager =
+                new DiaryPictureManager(
+                        context,
+                        holder.binding.imageAttachedPicture,
+                        themeColor.getOnSecondaryContainerColor(context.getResources())
+                );
+        Uri pictureUri = item.getPicturePath();
+        diaryPictureManager.setUpPictureOnDiaryList(pictureUri);
     }
 
     @Override
     protected void onBindDeleteButtonClickListener(@NonNull RecyclerView.ViewHolder holder, @NonNull DiaryDayListBaseItem item) {
         DiaryDayListViewHolder _holder = (DiaryDayListViewHolder) holder;
 
-        LocalDate date = item.getDate();
         _holder.binding.includeBackground.imageButtonDelete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Objects.requireNonNull(v);
 
-                onClickDeleteButton(date);
+                onClickDeleteButton(item);
             }
         });
     }
@@ -131,7 +137,16 @@ public class DiaryDayListAdapter extends SwipeDiaryDayListBaseAdapter {
                 Log.d("DiaryDayList", "Title不一致");
                 return false;
             }
-            if (!_oldItem.getPicturePath().equals(_newItem.getPicturePath())) {
+            if (_oldItem.getPicturePath() == null && _newItem.getPicturePath() != null) {
+                Log.d("DiaryDayList", "PicturePath不一致");
+                return false;
+            }
+            if (_oldItem.getPicturePath() != null && _newItem.getPicturePath() == null) {
+                Log.d("DiaryDayList", "PicturePath不一致");
+                return false;
+            }
+            if ((_oldItem.getPicturePath() != null && _newItem.getPicturePath() != null)
+                    && (!_oldItem.getPicturePath().equals(_newItem.getPicturePath()))) {
                 Log.d("DiaryDayList", "PicturePath不一致");
                 return false;
             }

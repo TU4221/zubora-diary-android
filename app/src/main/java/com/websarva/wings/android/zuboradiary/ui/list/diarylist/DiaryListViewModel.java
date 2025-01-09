@@ -1,5 +1,6 @@
 package com.websarva.wings.android.zuboradiary.ui.list.diarylist;
 
+import android.net.Uri;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -247,7 +248,7 @@ public class DiaryListViewModel extends BaseViewModel {
         sortConditionDate= yearMonth.atDay(1).with(TemporalAdjusters.lastDayOfMonth());
     }
 
-    void deleteDiary(LocalDate date) {
+    boolean deleteDiary(LocalDate date) {
         Objects.requireNonNull(date);
 
         Integer result;
@@ -255,17 +256,30 @@ public class DiaryListViewModel extends BaseViewModel {
             result = diaryRepository.deleteDiary(date).get();
         } catch (CancellationException | ExecutionException | InterruptedException e) {
             addAppMessage(AppMessage.DIARY_DELETE_ERROR);
-            return;
+            return false;
         }
         Objects.requireNonNull(result);
 
         // 削除件数 = 1が正常
         if (result != 1) {
             addAppMessage(AppMessage.DIARY_DELETE_ERROR);
-            return;
+            return false;
         }
 
         updateDiaryList();
+        return true;
+    }
+
+    // MEMO:存在しないことを確認したいため下記メソッドを否定的処理とする
+    boolean checkSavedPicturePathDoesNotExist(Uri uri) {
+        Objects.requireNonNull(uri);
+
+        try {
+            return !diaryRepository.existsPicturePath(uri).get();
+        } catch (ExecutionException | InterruptedException e) {
+            addAppMessage(AppMessage.DIARY_LOADING_ERROR);
+            return false;
+        }
     }
 
     @Nullable

@@ -1,5 +1,7 @@
 package com.websarva.wings.android.zuboradiary.ui.diary;
 
+import android.net.Uri;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.lifecycle.MutableLiveData;
@@ -25,7 +27,7 @@ public class DiaryLiveData {
     private final MutableLiveData<Integer> numVisibleItems = new MutableLiveData<>();
     public static final int MAX_ITEMS = ItemNumber.MAX_NUMBER;
     private final DiaryItemLiveData[] items = new DiaryItemLiveData[MAX_ITEMS];
-    private final MutableLiveData<String> picturePath = new MutableLiveData<>();
+    private final MutableLiveData<Uri> picturePath = new MutableLiveData<>();
     private final MutableLiveData<LocalDateTime> log = new MutableLiveData<>();
 
     public DiaryLiveData() {
@@ -46,7 +48,7 @@ public class DiaryLiveData {
         for (DiaryItemLiveData item: items) {
             item.initialize();
         }
-        picturePath.setValue("");
+        picturePath.setValue(null);
         log.setValue(null);
     }
 
@@ -95,6 +97,13 @@ public class DiaryLiveData {
         }
         this.numVisibleItems.setValue(numVisibleItems);
 
+        String uriString = getOrDefault(diaryEntity.getPicturePath(), "");
+        if (uriString.isEmpty()) {
+            picturePath.setValue(null);
+        } else {
+            picturePath.setValue(Uri.parse(uriString));
+        }
+
         log.setValue(LocalDateTime.parse(diaryEntity.getLog()));
     }
 
@@ -121,7 +130,7 @@ public class DiaryLiveData {
         diaryEntity.setItem4Comment(toTrimmedString(items[3].comment.getValue()));
         diaryEntity.setItem5Title(toTrimmedString(items[4].title.getValue()));
         diaryEntity.setItem5Comment(toTrimmedString(items[4].comment.getValue()));
-        diaryEntity.setPicturePath(toTrimmedString(picturePath.getValue()));
+        diaryEntity.setPicturePath(toUriString(picturePath.getValue()));
         diaryEntity.setLog(LocalDateTime.now().toString());
         return diaryEntity;
     }
@@ -150,6 +159,13 @@ public class DiaryLiveData {
         Objects.requireNonNull(s);
 
         return s.trim();
+    }
+
+    @NonNull
+    private String toUriString(Uri uri) {
+        if (uri == null) return "";
+
+        return uri.toString();
     }
 
     @NonNull
@@ -238,7 +254,7 @@ public class DiaryLiveData {
         return items[arrayNumber];
     }
 
-    public MutableLiveData<String> getPicturePathMutableLiveData() {
+    public MutableLiveData<Uri> getPicturePathMutableLiveData() {
         return picturePath;
     }
 

@@ -3,6 +3,7 @@ package com.websarva.wings.android.zuboradiary;
 import android.Manifest;
 import android.content.pm.PackageManager;
 import android.location.Location;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Looper;
@@ -11,6 +12,9 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
@@ -46,6 +50,7 @@ import com.websarva.wings.android.zuboradiary.databinding.ActivityMainBinding;
 import com.websarva.wings.android.zuboradiary.ui.ThemeColorInflaterCreator;
 import com.websarva.wings.android.zuboradiary.ui.ThemeColorSwitcher;
 import com.websarva.wings.android.zuboradiary.ui.calendar.CalendarFragment;
+import com.websarva.wings.android.zuboradiary.ui.diary.diaryedit.DiaryEditFragment;
 import com.websarva.wings.android.zuboradiary.ui.list.diarylist.DiaryListFragment;
 import com.websarva.wings.android.zuboradiary.ui.settings.SettingsFragment;
 import com.websarva.wings.android.zuboradiary.ui.settings.SettingsViewModel;
@@ -74,6 +79,23 @@ public class MainActivity extends AppCompatActivity {
 
     // Dialog用ThemeColor
     private ThemeColor dialogThemeColor = ThemeColor.WHITE;
+
+    // ギャラリーから画像取得
+    private final ActivityResultLauncher<String[]> openDocumentResultLauncher =
+            registerForActivityResult(
+                    new ActivityResultContracts.OpenDocument(),
+                    new ActivityResultCallback<Uri>() {
+                        @Override
+                        public void onActivityResult(Uri o) {
+                            if (o == null) return; // 未選択時
+
+                            Fragment showedFragment = findShowedFragment();
+                            if (showedFragment instanceof DiaryEditFragment) {
+                                DiaryEditFragment diaryEditFragment = (DiaryEditFragment) showedFragment;
+                                diaryEditFragment.attachPicture(o);
+                            }
+                        }
+                    });
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -481,5 +503,9 @@ public class MainActivity extends AppCompatActivity {
                 ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)
                         == PackageManager.PERMISSION_GRANTED;
         return isGrantedAccessFineLocation && isGrantedAccessCoarseLocation;
+    }
+
+    public void loadPicturePath() {
+        openDocumentResultLauncher.launch(new String[] {"image/*"});
     }
 }

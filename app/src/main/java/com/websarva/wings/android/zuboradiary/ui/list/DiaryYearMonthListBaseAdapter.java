@@ -20,7 +20,6 @@ import com.websarva.wings.android.zuboradiary.databinding.RowNoDiaryMessageBindi
 import com.websarva.wings.android.zuboradiary.databinding.RowProgressBarBinding;
 import com.websarva.wings.android.zuboradiary.ui.ThemeColorInflaterCreator;
 
-import java.time.LocalDate;
 import java.time.YearMonth;
 import java.util.Objects;
 
@@ -149,7 +148,7 @@ public abstract class DiaryYearMonthListBaseAdapter extends ListAdapter<DiaryYea
 
     @FunctionalInterface
     public interface OnClickChildItemListener {
-        void onClick(LocalDate date);
+        void onClick(DiaryDayListBaseItem item);
     }
 
     public void setOnClickChildItemListener(@Nullable OnClickChildItemListener onClickChildItemListener) {

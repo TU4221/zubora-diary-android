@@ -46,10 +46,12 @@
             style="@style/DiaryDayListImageViewStyle"
             android:id="@+id/image_attached_picture"
             android:layout_width="0dp"
-            android:layout_height="match_parent"
+            android:layout_height="@dimen/row_diary_day_list_image_height"
             android:layout_weight="1"
+            android:scaleType="fitXY"
             android:contentDescription="@string/row_diary_day_list_picture_description"
-            app:srcCompat="@drawable/ic_image_24px" />
+            android:src="@drawable/ic_image_24px"
+            tools:tint="?attr/colorOnSecondaryContainer"/>
 
     </LinearLayout>
 

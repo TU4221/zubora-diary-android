@@ -12,7 +12,6 @@ import com.websarva.wings.android.zuboradiary.ui.list.DiaryYearMonthListBaseAdap
 import com.websarva.wings.android.zuboradiary.ui.list.DiaryYearMonthListBaseItem;
 import com.websarva.wings.android.zuboradiary.ui.list.SwipeDiaryYearMonthListBaseAdapter;
 
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -44,20 +43,20 @@ public abstract class DiaryYearMonthListAdapter extends SwipeDiaryYearMonthListB
         diaryDayListAdapter.build();
         diaryDayListAdapter.setOnClickItemListener(new DiaryDayListAdapter.OnClickItemListener() {
             @Override
-            public void onClick(LocalDate date) {
-                Objects.requireNonNull(date);
+            public void onClick(DiaryDayListBaseItem item) {
+                Objects.requireNonNull(item);
                 if (onClickChildItemListener == null) return;
 
-                onClickChildItemListener.onClick(date);
+                onClickChildItemListener.onClick(item);
             }
         });
         diaryDayListAdapter.setOnClickDeleteButtonListener(new DiaryDayListAdapter.OnClickDeleteButtonListener() {
             @Override
-            public void onClick(LocalDate date) {
-                Objects.requireNonNull(date);
+            public void onClick(DiaryDayListBaseItem item) {
+                Objects.requireNonNull(item);
                 if (onClickChildItemBackgroundButtonListener == null) return;
 
-                onClickChildItemBackgroundButtonListener.onClick(date);
+                onClickChildItemBackgroundButtonListener.onClick(item);
             }
         });
         return diaryDayListAdapter;
@@ -94,7 +93,16 @@ public abstract class DiaryYearMonthListAdapter extends SwipeDiaryYearMonthListB
                         Log.d("DiaryYearMonthList", "ChildListItem_Title不一致");
                         return false;
                     }
-                    if (!oldChildListItem.getPicturePath().equals(newChildListItem.getPicturePath())) {
+                    if (oldChildListItem.getPicturePath() == null && newChildListItem.getPicturePath() != null) {
+                        Log.d("DiaryYearMonthList", "ChildListItem_PicturePath不一致");
+                        return false;
+                    }
+                    if (oldChildListItem.getPicturePath() != null && newChildListItem.getPicturePath() == null) {
+                        Log.d("DiaryYearMonthList", "ChildListItem_PicturePath不一致");
+                        return false;
+                    }
+                    if ((oldChildListItem.getPicturePath() != null && newChildListItem.getPicturePath() != null)
+                            && (!oldChildListItem.getPicturePath().equals(newChildListItem.getPicturePath()))) {
                         Log.d("DiaryYearMonthList", "ChildListItem_PicturePath不一致");
                         return false;
                     }

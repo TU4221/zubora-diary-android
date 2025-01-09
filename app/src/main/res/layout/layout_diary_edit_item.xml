@@ -56,8 +56,8 @@
                 <ImageButton
                     style="@style/AppImageButtonStyle"
                     android:id="@+id/image_button_item_delete"
-                    android:layout_width="48dp"
-                    android:layout_height="48dp"
+                    android:layout_width="@dimen/layout_diary_edit_item_delete_button_layout_width"
+                    android:layout_height="@dimen/layout_diary_edit_item_delete_button_layout_height"
                     android:layout_marginStart="@dimen/layout_diary_edit_item_margin_start"
                     android:layout_gravity="center_vertical"
                     android:src="@drawable/ic_delete_forever_24px"

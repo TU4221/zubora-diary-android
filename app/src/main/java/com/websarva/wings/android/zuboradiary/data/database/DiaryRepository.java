@@ -1,7 +1,7 @@
 package com.websarva.wings.android.zuboradiary.data.database;
 
 
-
+import android.net.Uri;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -58,6 +58,14 @@ public class DiaryRepository {
         Objects.requireNonNull(date);
 
         ListenableFuture<Boolean> future = diaryDAO.existsDiary(date.toString());
+        return Objects.requireNonNull(future);
+    }
+
+    @NonNull
+    public ListenableFuture<Boolean> existsPicturePath(Uri uri) {
+        Objects.requireNonNull(uri);
+
+        ListenableFuture<Boolean> future = diaryDAO.existsPicturePath(uri.toString());
         return Objects.requireNonNull(future);
     }
 

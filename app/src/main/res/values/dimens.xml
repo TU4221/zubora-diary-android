@@ -40,12 +40,16 @@
     <dimen name="fragment_diary_edit_text_size">18sp</dimen>
     <dimen name="fragment_diary_edit_margin_start">8dp</dimen>
     <dimen name="fragment_diary_edit_margin_top">16dp</dimen>
+    <dimen name="fragment_diary_edit_delete_button_layout_width">48dp</dimen>
+    <dimen name="fragment_diary_edit_delete_button_layout_height">@dimen/fragment_diary_edit_delete_button_layout_width</dimen>
 
 
     <!-- layout_diary_edit_item -->
     <dimen name="layout_diary_edit_item_text_size">@dimen/fragment_diary_edit_text_size</dimen>
     <dimen name="layout_diary_edit_item_margin_start">@dimen/fragment_diary_edit_margin_start</dimen>
     <dimen name="layout_diary_edit_item_margin_top">@dimen/fragment_diary_edit_margin_top</dimen>
+    <dimen name="layout_diary_edit_item_delete_button_layout_width">@dimen/fragment_diary_edit_delete_button_layout_width</dimen>
+    <dimen name="layout_diary_edit_item_delete_button_layout_height">@dimen/fragment_diary_edit_delete_button_layout_height</dimen>
 
 
     <!-- fragment_diary_item_title_edit -->
@@ -79,6 +83,7 @@
 
     <!-- row_diary_day_list -->
     <dimen name="row_diary_day_list_height">72dp</dimen>
+    <dimen name="row_diary_day_list_image_height">64dp</dimen>
     <dimen name="row_diary_day_list_layout_margin_horizontal_between_items">16dp</dimen>
     <dimen name="row_diary_day_list_layout_margin_vertical_between_items">8dp</dimen>
 

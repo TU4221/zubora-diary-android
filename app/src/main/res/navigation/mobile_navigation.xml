@@ -76,6 +76,10 @@
             <argument
                 android:name="date"
                 app:argType="java.time.LocalDate" />
+
+            <argument
+                android:name="picture_uri"
+                app:argType="android.net.Uri" />
         </dialog>
 
         <fragment
@@ -347,6 +351,10 @@
                 app:destination="@id/navigation_diary_item_delete_dialog"/>
 
             <action
+                android:id="@+id/action_diary_edit_fragment_to_diary_picture_delete_dialog"
+                app:destination="@id/navigation_diary_picture_delete_dialog"/>
+
+            <action
                 android:id="@+id/action_diary_edit_fragment_to_app_message_dialog"
                 app:destination="@id/navigation_app_message_dialog">
                 <argument
@@ -402,6 +410,11 @@
             <argument
                 android:name="item_number"
                 app:argType="com.websarva.wings.android.zuboradiary.data.diary.ItemNumber" />
+        </dialog>
+
+        <dialog
+            android:id="@+id/navigation_diary_picture_delete_dialog"
+            android:name="com.websarva.wings.android.zuboradiary.ui.diary.diaryedit.DiaryPictureDeleteDialogFragment">
         </dialog>
 
         <fragment

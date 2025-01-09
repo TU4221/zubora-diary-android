@@ -1,5 +1,7 @@
 package com.websarva.wings.android.zuboradiary.ui.diary.diaryshow;
 
+import android.net.Uri;
+
 import androidx.lifecycle.LiveData;
 
 import com.websarva.wings.android.zuboradiary.data.AppMessage;
@@ -64,14 +66,36 @@ public class DiaryShowViewModel extends BaseViewModel {
         }
     }
 
-    public void deleteDiary() {
+    boolean deleteDiary() {
         LocalDate deleteDate = diaryLiveData.getDateMutableLiveData().getValue();
         Objects.requireNonNull(deleteDate);
 
+        Integer result;
         try {
-            diaryRepository.deleteDiary(deleteDate).get();
+            result = diaryRepository.deleteDiary(deleteDate).get();
         } catch (CancellationException | ExecutionException | InterruptedException  e) {
             addAppMessage(AppMessage.DIARY_DELETE_ERROR);
+            return false;
+        }
+
+        // 削除件数 = 1が正常
+        if (result != 1) {
+            addAppMessage(AppMessage.DIARY_DELETE_ERROR);
+            return false;
+        }
+
+        return true;
+    }
+
+    // MEMO:存在しないことを確認したいため下記メソッドを否定的処理とする
+    boolean checkSavedPicturePathDoesNotExist(Uri uri) {
+        Objects.requireNonNull(uri);
+
+        try {
+            return !diaryRepository.existsPicturePath(uri).get();
+        } catch (ExecutionException | InterruptedException e) {
+            addAppMessage(AppMessage.DIARY_LOADING_ERROR);
+            return false;
         }
     }
 
@@ -138,6 +162,10 @@ public class DiaryShowViewModel extends BaseViewModel {
 
     public LiveData<String> getItem5CommentLiveData() {
         return diaryLiveData.getItemLiveData(new ItemNumber(5)).getCommentMutableLiveData();
+    }
+
+    public LiveData<Uri> getPicturePathLiveData() {
+        return diaryLiveData.getPicturePathMutableLiveData();
     }
 
     public LiveData<LocalDateTime> getLogLiveData() {

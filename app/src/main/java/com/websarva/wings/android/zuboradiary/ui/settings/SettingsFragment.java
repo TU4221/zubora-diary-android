@@ -36,6 +36,7 @@ import com.websarva.wings.android.zuboradiary.data.DayOfWeekStringConverter;
 import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor;
 import com.websarva.wings.android.zuboradiary.databinding.FragmentSettingsBinding;
 import com.websarva.wings.android.zuboradiary.ui.BaseFragment;
+import com.websarva.wings.android.zuboradiary.ui.UriPermissionManager;
 
 import java.time.DayOfWeek;
 import java.time.LocalTime;
@@ -57,6 +58,9 @@ public class SettingsFragment extends BaseFragment {
     // ActivityResultLauncher関係
     private ActivityResultLauncher<String> requestPostNotificationsPermissionLauncher;
     private ActivityResultLauncher<String[]> requestAccessLocationPermissionLauncher;
+
+    // Uri関係
+    private UriPermissionManager uriPermissionManager;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -125,6 +129,15 @@ public class SettingsFragment extends BaseFragment {
                             }
                         }
                 );
+
+        uriPermissionManager =
+                new UriPermissionManager(requireContext()) {
+                    @Override
+                    public boolean checkUsedUriDoesNotExist(@NonNull Uri uri) {
+                        return false; // MEMO:本フラグメントではUri権限を個別に解放しないため常時false
+
+                    }
+                };
     }
 
     @Override
@@ -243,6 +256,7 @@ public class SettingsFragment extends BaseFragment {
         if (selectedButton != Dialog.BUTTON_POSITIVE) return;
 
         settingsViewModel.deleteAllDiaries();
+        uriPermissionManager.releaseAllPersistablePermission();
     }
 
     private void receiveAllSettingsInitializationDialogResult() {
@@ -261,6 +275,7 @@ public class SettingsFragment extends BaseFragment {
         if (selectedButton != Dialog.BUTTON_POSITIVE) return;
 
         settingsViewModel.deleteAllData();
+        uriPermissionManager.releaseAllPersistablePermission();
     }
 
     private void setUpThemeColorSettingItem() {

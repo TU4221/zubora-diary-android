@@ -10,7 +10,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor;
 import com.websarva.wings.android.zuboradiary.ui.list.diarylist.DiaryListSimpleCallback;
 
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -65,7 +64,7 @@ public abstract class SwipeDiaryYearMonthListBaseAdapter extends DiaryYearMonthL
 
     @FunctionalInterface
     public interface OnClickChildItemBackgroundButtonListener {
-        void onClick(LocalDate date);
+        void onClick(DiaryDayListBaseItem item);
     }
 
     public void setOnClickChildItemBackgroundButtonListener(

@@ -3,6 +3,7 @@ package com.websarva.wings.android.zuboradiary.ui.diary.diaryedit;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -42,12 +43,14 @@ import com.websarva.wings.android.zuboradiary.data.diary.ItemNumber;
 import com.websarva.wings.android.zuboradiary.data.diary.Weather;
 import com.websarva.wings.android.zuboradiary.data.network.GeoCoordinates;
 import com.websarva.wings.android.zuboradiary.databinding.FragmentDiaryEditBinding;
+import com.websarva.wings.android.zuboradiary.ui.DiaryPictureManager;
 import com.websarva.wings.android.zuboradiary.ui.BaseFragment;
 import com.websarva.wings.android.zuboradiary.ui.KeyboardInitializer;
 import com.websarva.wings.android.zuboradiary.ui.TestDiariesSaver;
 import com.websarva.wings.android.zuboradiary.ui.TextInputSetup;
 import com.websarva.wings.android.zuboradiary.ui.diary.DiaryLiveData;
 import com.websarva.wings.android.zuboradiary.ui.diary.diaryitemtitleedit.DiaryItemTitleEditFragment;
+import com.websarva.wings.android.zuboradiary.ui.UriPermissionManager;
 
 import org.jetbrains.annotations.Unmodifiable;
 
@@ -70,10 +73,20 @@ public class DiaryEditFragment extends BaseFragment {
     // ViewModel
     private DiaryEditViewModel diaryEditViewModel;
 
+    // Uri関係
+    private UriPermissionManager pictureUriPermissionManager;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        pictureUriPermissionManager =
+                new UriPermissionManager(requireContext()) {
+                    @Override
+                    public boolean checkUsedUriDoesNotExist(@NonNull Uri uri) {
+                        return diaryEditViewModel.checkSavedPicturePathDoesNotExist(uri);
+                    }
+                };
     }
 
     @Override
@@ -125,6 +138,8 @@ public class DiaryEditFragment extends BaseFragment {
 
     @Override
     protected void handleOnReceivingResultFromPreviousFragment(@NonNull SavedStateHandle savedStateHandle) {
+
+        // DiaryItemTitleEditFragmentから編集結果受取
         MutableLiveData<String> newItemTitleLiveData =
                 savedStateHandle.getLiveData(DiaryItemTitleEditFragment.KEY_NEW_ITEM_TITLE);
         newItemTitleLiveData.observe(getViewLifecycleOwner(), new Observer<String>() {
@@ -153,6 +168,7 @@ public class DiaryEditFragment extends BaseFragment {
         receiveDatePickerDialogResult();
         receiveWeatherInfoFetchDialogResult();
         receiveDiaryItemDeleteDialogResult();
+        receiveDiaryPictureDeleteDialogResult();
         retryOtherAppMessageDialogShow();
         clearFocusAllEditText();
     }
@@ -165,6 +181,7 @@ public class DiaryEditFragment extends BaseFragment {
         savedStateHandle.remove(DatePickerDialogFragment.KEY_SELECTED_DATE);
         savedStateHandle.remove(WeatherInfoFetchingDialogFragment.KEY_SELECTED_BUTTON);
         savedStateHandle.remove(DiaryItemDeleteDialogFragment.KEY_DELETE_ITEM_NUMBER);
+        savedStateHandle.remove(DiaryPictureDeleteDialogFragment.KEY_SELECTED_BUTTON);
     }
 
     @Override
@@ -198,11 +215,12 @@ public class DiaryEditFragment extends BaseFragment {
         if (selectedButton != DialogInterface.BUTTON_POSITIVE) return;
 
         boolean isSuccessful = diaryEditViewModel.saveDiary();
-        if (isSuccessful) {
-            LocalDate date = diaryEditViewModel.getDateLiveData().getValue();
-            Objects.requireNonNull(date);
-            showDiaryShowFragment(date);
-        }
+        if (!isSuccessful) return;
+
+        updatePictureUriPermission();
+        LocalDate date = diaryEditViewModel.getDateLiveData().getValue();
+        Objects.requireNonNull(date);
+        showDiaryShowFragment(date);
     }
 
     // 既存日記上書きダイアログフラグメントから結果受取
@@ -212,7 +230,10 @@ public class DiaryEditFragment extends BaseFragment {
         if (selectedButton != DialogInterface.BUTTON_POSITIVE) return;
 
         boolean isSuccessful = diaryEditViewModel.deleteDiary();
-        if (isSuccessful) navController.navigateUp();
+        if (!isSuccessful) return;
+
+        releaseLoadedPictureUriPermission();
+        navController.navigateUp();
     }
 
     // 日付入力ダイアログフラグメントからデータ受取
@@ -254,6 +275,15 @@ public class DiaryEditFragment extends BaseFragment {
         }
     }
 
+    private void receiveDiaryPictureDeleteDialogResult() {
+        Integer selectedButton =
+                receiveResulFromDialog(DiaryPictureDeleteDialogFragment.KEY_SELECTED_BUTTON);
+        if (selectedButton == null) return;
+        if (selectedButton != DialogInterface.BUTTON_POSITIVE) return;
+
+        diaryEditViewModel.deletePicturePath();
+    }
+
     private void setUpDiaryData() {
         // 画面表示データ準備
         if (diaryEditViewModel.getHasPreparedDiary()) return;
@@ -292,7 +322,10 @@ public class DiaryEditFragment extends BaseFragment {
                                 showDiaryUpdateDialog(diaryDate);
                             } else {
                                 boolean isSuccessful = diaryEditViewModel.saveDiary();
-                                if (isSuccessful) showDiaryShowFragment(diaryDate);
+                                if (isSuccessful) {
+                                    updatePictureUriPermission();
+                                    showDiaryShowFragment(diaryDate);
+                                }
                             }
                             return true;
                         } else if (item.getItemId() == R.id.diaryEditToolbarOptionDeleteDiary) {
@@ -622,7 +655,7 @@ public class DiaryEditFragment extends BaseFragment {
                 public void onClick(View v) {
                     Objects.requireNonNull(v);
 
-                    showDiaryItemDeleteConfirmationDiaryDialog(deleteItemNumber);
+                    showDiaryItemDeleteDialog(deleteItemNumber);
                 }
             });
         }
@@ -779,7 +812,86 @@ public class DiaryEditFragment extends BaseFragment {
     }
 
     private void setUpPictureInputField() {
-        // TODO
+        binding.imageAttachedPicture.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Objects.requireNonNull(v);
+
+                requireMainActivity().loadPicturePath();
+            }
+        });
+
+        diaryEditViewModel.getPicturePathLiveData()
+                .observe(getViewLifecycleOwner(), new PicturePathObserver());
+
+        binding.imageButtonAttachedPictureDelete.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showDiaryPictureDeleteDialog();
+            }
+        });
+    }
+
+    private class PicturePathObserver implements Observer<Uri> {
+
+        @Override
+        public void onChanged(Uri uri) {
+            DiaryPictureManager diaryPictureManager =
+                    new DiaryPictureManager(
+                            requireContext(),
+                            binding.imageAttachedPicture,
+                            requireThemeColor().getOnSurfaceVariantColor(requireContext().getResources())
+                    );
+
+            diaryPictureManager.setUpPictureOnDiary(uri);
+            enablePictureDeleteButton(uri != null);
+
+        }
+
+        private void enablePictureDeleteButton(boolean enabled) {
+            if (enabled) {
+                binding.imageButtonAttachedPictureDelete.setEnabled(true);
+                float alpha = (float) 1.0;
+                binding.imageButtonAttachedPictureDelete.setAlpha(alpha);
+            } else {
+                binding.imageButtonAttachedPictureDelete.setEnabled(false);
+                float alpha = (float) 0.26; // TODO:@dimen/disabled_alpha_material_lightをコードで取得したい
+                binding.imageButtonAttachedPictureDelete.setAlpha(alpha);
+            }
+        }
+    }
+
+    private void updatePictureUriPermission() {
+        Uri latestPictureUri = diaryEditViewModel.getPicturePathLiveData().getValue();
+        Uri loadedPictureUri = diaryEditViewModel.getLoadedPicturePathLiveData().getValue();
+
+        try {
+            if (latestPictureUri == null && loadedPictureUri == null) return;
+
+            if (latestPictureUri != null && loadedPictureUri == null) {
+                pictureUriPermissionManager.takePersistablePermission(latestPictureUri);
+                return;
+            }
+
+            if (latestPictureUri == null) {
+                pictureUriPermissionManager.releasePersistablePermission(loadedPictureUri);
+                return;
+            }
+
+            if (latestPictureUri.equals(loadedPictureUri)) return;
+
+            pictureUriPermissionManager.takePersistablePermission(latestPictureUri);
+            pictureUriPermissionManager.releasePersistablePermission(loadedPictureUri);
+        } catch (SecurityException e) {
+            // 対処できないがアプリを落としたくない為、catchのみ処理する。
+        }
+
+    }
+
+    private void releaseLoadedPictureUriPermission() {
+        Uri loadedPictureUri = diaryEditViewModel.getLoadedPicturePathLiveData().getValue();
+        if (loadedPictureUri == null) return;
+        pictureUriPermissionManager.releasePersistablePermission(loadedPictureUri);
     }
 
     private void setupEditText() {
@@ -811,6 +923,7 @@ public class DiaryEditFragment extends BaseFragment {
                 textInputSetup.createClearButtonSetupTransitionListener(clearableTextInputLayouts);
         addTransitionListener(transitionListener);
 
+        // TODO:下記不要確認後削除
         /*binding.includeItem1.textInputEditTextComment.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
             public void onFocusChange(View v, boolean hasFocus) {
@@ -880,6 +993,7 @@ public class DiaryEditFragment extends BaseFragment {
         }
     }
 
+    //TODO public -> private
     public void showDiaryShowFragment(LocalDate date) {
         Objects.requireNonNull(date);
         if (!canShowFragment()) return;
@@ -964,13 +1078,22 @@ public class DiaryEditFragment extends BaseFragment {
         navController.navigate(action);
     }
 
-    private void showDiaryItemDeleteConfirmationDiaryDialog(ItemNumber itemNumber) {
+    private void showDiaryItemDeleteDialog(ItemNumber itemNumber) {
         Objects.requireNonNull(itemNumber);
         if (!canShowFragment()) return;
 
         NavDirections action =
                 DiaryEditFragmentDirections
                         .actionDiaryEditFragmentToDiaryItemDeleteDialog(itemNumber);
+        navController.navigate(action);
+    }
+
+    private void showDiaryPictureDeleteDialog() {
+        if (!canShowFragment()) return;
+
+        NavDirections action =
+                DiaryEditFragmentDirections
+                        .actionDiaryEditFragmentToDiaryPictureDeleteDialog();
         navController.navigate(action);
     }
 
@@ -1017,5 +1140,11 @@ public class DiaryEditFragment extends BaseFragment {
     @Override
     protected void destroyBinding() {
         binding = null;
+    }
+
+    public void attachPicture(Uri uri) {
+        Objects.requireNonNull(uri);
+
+        diaryEditViewModel.updatePicturePath(uri);
     }
 }

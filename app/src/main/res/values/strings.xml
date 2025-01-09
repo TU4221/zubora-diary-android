@@ -133,7 +133,8 @@
     <string name="layout_diary_show_item_3">項目3</string>
     <string name="layout_diary_show_item_4">項目4</string>
     <string name="layout_diary_show_item_5">項目5</string>
-    <string name="layout_diary_show_attached_picture">添付写真</string>
+    <string name="layout_diary_show_attached_picture">思い出の一枚</string>
+    <string name="layout_diary_show_attached_picture_description">添付写真</string>
     <string name="layout_diary_show_last_update">最終更新日時</string>
     <string name="layout_diary_show_last_update_tools_value">0000/00/00 00:00:00</string>
 
@@ -170,6 +171,9 @@
     <string name="fragment_diary_edit_item_3">項目3</string>
     <string name="fragment_diary_edit_item_4">項目4</string>
     <string name="fragment_diary_edit_item_5">項目5</string>
+    <string name="fragment_diary_edit_attached_picture">思い出の一枚</string>
+    <string name="fragment_diary_edit_attached_picture_delete">削除</string>
+    <string name="fragment_diary_edit_attached_picture_attachment">添付</string>
 
     <!-- layout_diary_edit_item -->
     <string name="layout_diary_edit_item_1_tools">項目*</string>
@@ -195,6 +199,10 @@
     <string name="dialog_diary_item_delete_title">警告</string>
     <string name="dialog_diary_item_delete_first_message">項目</string>
     <string name="dialog_diary_item_delete_second_message">を削除してもよろしいでしょうか。</string>
+
+    <!-- DiaryAttachedPictureDeleteDialog -->
+    <string name="dialog_diary_attached_picture_delete_title">警告</string>
+    <string name="dialog_diary_attached_picture_delete_message">思い出の一枚を削除してもよろしいでしょうか。</string>
 
     <!--*****************************************************************************************-->
 

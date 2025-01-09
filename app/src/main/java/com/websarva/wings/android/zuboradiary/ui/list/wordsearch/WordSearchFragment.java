@@ -22,6 +22,7 @@ import com.websarva.wings.android.zuboradiary.databinding.FragmentWordSearchBind
 import com.websarva.wings.android.zuboradiary.ui.BaseFragment;
 import com.websarva.wings.android.zuboradiary.ui.EditTextSetup;
 import com.websarva.wings.android.zuboradiary.ui.KeyboardInitializer;
+import com.websarva.wings.android.zuboradiary.ui.list.DiaryDayListBaseItem;
 import com.websarva.wings.android.zuboradiary.ui.list.DiaryYearMonthListBaseAdapter;
 import com.websarva.wings.android.zuboradiary.ui.list.DiaryYearMonthListBaseItem;
 
@@ -167,10 +168,10 @@ public class WordSearchFragment extends BaseFragment {
         wordSearchResultListAdapter.build();
         wordSearchResultListAdapter.setOnClickChildItemListener(new DiaryYearMonthListBaseAdapter.OnClickChildItemListener() {
             @Override
-            public void onClick(LocalDate date) {
-                Objects.requireNonNull(date);
+            public void onClick(DiaryDayListBaseItem item) {
+                Objects.requireNonNull(item);
 
-                showShowDiaryFragment(date);
+                showShowDiaryFragment(item.getDate());
             }
         });
 

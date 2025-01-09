@@ -47,11 +47,10 @@ public class WordSearchResultDayListAdapter extends DiaryDayListBaseAdapter {
 
     @Override
     protected void onBindItemClickListener(@NonNull RecyclerView.ViewHolder holder, @NonNull DiaryDayListBaseItem item) {
-        LocalDate date = item.getDate();
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                onClickItem(date);
+                onClickItem(item);
             }
         });
     }
