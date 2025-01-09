@@ -59,7 +59,6 @@ import java.util.List;
 import java.util.Objects;
 
 import dagger.hilt.android.AndroidEntryPoint;
-import dagger.internal.Preconditions;
 
 @AndroidEntryPoint
 public class MainActivity extends AppCompatActivity {
@@ -462,16 +461,6 @@ public class MainActivity extends AppCompatActivity {
 
     public void popBackStackToStartFragment() {
         binding.bottomNavigation.setSelectedItemId(startNavigationMenuItem.getItemId());
-    }
-
-    /**
-     * DialogFragment用メソッド
-     * */
-    // HACK:各FragmentからDialogへThemeColorを渡すのは冗長になるため。
-    @NonNull
-    public ThemeColor requireDialogThemeColor() {
-        Preconditions.checkNotNull(dialogThemeColor);
-        return dialogThemeColor;
     }
 
     @Override
