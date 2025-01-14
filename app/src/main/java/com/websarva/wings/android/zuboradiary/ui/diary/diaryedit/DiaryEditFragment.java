@@ -993,8 +993,7 @@ public class DiaryEditFragment extends BaseFragment {
         }
     }
 
-    //TODO public -> private
-    public void showDiaryShowFragment(LocalDate date) {
+    private void showDiaryShowFragment(LocalDate date) {
         Objects.requireNonNull(date);
         if (!canShowFragment()) return;
 
