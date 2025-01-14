@@ -140,8 +140,7 @@ public class DiaryEditViewModel extends BaseViewModel {
         return true;
     }
 
-    // TODO:下記いらないかも？
-    boolean isNewDiary() {
+    private boolean isNewDiary() {
         return loadedDate.getValue() == null;
     }
 
