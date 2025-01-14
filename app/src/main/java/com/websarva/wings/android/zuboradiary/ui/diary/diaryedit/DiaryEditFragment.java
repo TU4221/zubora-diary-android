@@ -923,7 +923,7 @@ public class DiaryEditFragment extends BaseFragment {
                 textInputSetup.createClearButtonSetupTransitionListener(clearableTextInputLayouts);
         addTransitionListener(transitionListener);
 
-        // TODO:下記不要確認後削除
+        // TODO:キーボード表示時の自動スクロールを無効化(自動スクロール時toolbarが隠れる為)している為、listenerで代用したいが上手くいかない。
         /*binding.includeItem1.textInputEditTextComment.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
             public void onFocusChange(View v, boolean hasFocus) {
