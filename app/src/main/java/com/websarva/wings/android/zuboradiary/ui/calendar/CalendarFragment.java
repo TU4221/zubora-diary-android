@@ -56,7 +56,10 @@ public class CalendarFragment extends BaseFragment {
 
     // ViewModel
     private CalendarViewModel calendarViewModel;
-    private DiaryShowViewModel diaryShowViewModel; // TODO:diaryViewModelの使用要素をcalendarViewModelに含めるか検討(DiaryFragment修正後)
+
+    // MEMO:CalendarFragment内にDiaryShowFragmentと同等のものを表示する為、DiaryShowViewModelを使用する。
+    //      (CalendarViewModelにDiaryShowViewModelと重複するデータは持たせない)
+    private DiaryShowViewModel diaryShowViewModel;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -259,7 +262,6 @@ public class CalendarFragment extends BaseFragment {
             } else if (isToday) {
                 themeColorSwitcher.switchCalendarTodayColor(textCalendarDay, viewCalendarDayDot);
             } else {
-                // TODO:祝日判定は手間がかかりそうなので保留
                 DayOfWeek dayOfWeek = calendarDay.getDate().getDayOfWeek();
                 boolean isSaturday = dayOfWeek == DayOfWeek.SATURDAY;
                 boolean isSunday = dayOfWeek == DayOfWeek.SUNDAY;
