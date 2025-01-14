@@ -14,7 +14,7 @@ import java.util.concurrent.Executors;
         autoMigrations = {@AutoMigration(from = 2, to = 3, spec = DiaryDatabase.MyAutoMigration.class)}*/)
 public abstract class DiaryDatabase extends RoomDatabase {
     //static class MyAutoMigration implements AutoMigrationSpec{}
-    public static final ExecutorService EXECUTOR_SERVICE = Executors.newSingleThreadExecutor(); // TODO:必要？
+    public static final ExecutorService EXECUTOR_SERVICE = Executors.newSingleThreadExecutor();
     public abstract DiaryDAO createDiaryDAO();
     public abstract DiaryItemTitleSelectionHistoryDAO createDiaryItemTitleSelectionHistoryDAO();
 }
