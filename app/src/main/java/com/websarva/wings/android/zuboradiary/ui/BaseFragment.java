@@ -2,6 +2,7 @@ package com.websarva.wings.android.zuboradiary.ui;
 
 import android.os.Bundle;
 import android.transition.Transition;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -231,7 +232,8 @@ public abstract class BaseFragment extends CustomFragment {
                     //      その為、このFragmentを再表示した時にObserverがResultの内容で処理してしまう。
                     SavedStateHandle savedStateHandle = navBackStackEntry.getSavedStateHandle();
                     removeDialogResultOnDestroy(savedStateHandle);
-                    // TODO:下記コード意味あるか検証。コメントアウトしてFragment切替後の状態を確認したがObserverが重複することはなかった。
+
+                    // MEMO:removeで削除しないと再度Fragment(前回表示Fragmentと同インスタンスの場合)を表示した時、Observerが重複する。
                     navBackStackEntry.getLifecycle().removeObserver(lifecycleEventObserver);
                 }
             }
