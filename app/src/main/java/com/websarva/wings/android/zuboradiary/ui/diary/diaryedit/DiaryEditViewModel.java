@@ -128,12 +128,17 @@ public class DiaryEditViewModel extends BaseViewModel {
         try {
             if (shouldDeleteLoadedDateDiary()) {
                 diaryRepository
-                        .deleteAndSaveDiary(loadedDate.getValue(), diaryEntity, diaryItemTitleSelectionHistoryItemEntityList)
+                        .deleteAndSaveDiary(
+                                loadedDate.getValue(),
+                                diaryEntity,
+                                diaryItemTitleSelectionHistoryItemEntityList
+                        )
                         .get();
             } else {
-                diaryRepository.saveDiary(diaryEntity, diaryItemTitleSelectionHistoryItemEntityList).get();
+                diaryRepository
+                        .saveDiary(diaryEntity, diaryItemTitleSelectionHistoryItemEntityList).get();
             }
-        } catch (CancellationException | ExecutionException | InterruptedException e) {
+        } catch (Exception e) {
             addAppMessage(AppMessage.DIARY_SAVING_ERROR);
             return false;
         }

@@ -14,8 +14,6 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.Callable;
-import java.util.concurrent.CancellationException;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
 import javax.inject.Inject;
@@ -125,7 +123,6 @@ public class DiaryRepository {
         return Objects.requireNonNull(future);
     }
 
-    // TODO:例外を取得できない。(DAOのメソッドそ同期的(get())で例外を確認しようとすると無言停止してしまう)
     @NonNull
     public Future<Void> saveDiary(DiaryEntity diaryEntity, List<DiaryItemTitleSelectionHistoryItemEntity> updateTitleList) {
         Objects.requireNonNull(diaryEntity);
@@ -135,17 +132,16 @@ public class DiaryRepository {
         Future<Void> future =
                 DiaryDatabase.EXECUTOR_SERVICE.submit(new Callable<Void>() {
                     @Override
-                    public Void call() throws CancellationException, ExecutionException, InterruptedException {
-                        diaryDatabase.runInTransaction(new Callable<Future<Void>>() {
+                    public Void call() {
+                        return diaryDatabase.runInTransaction(new Callable<Void>() {
                             @Override
-                            public Future<Void> call() throws CancellationException, ExecutionException, InterruptedException {
+                            public Void call() {
                                 diaryDAO.insertDiary(diaryEntity);
                                 diaryItemTitleSelectionHistoryDAO.insertHistoryItem(updateTitleList);
                                 diaryItemTitleSelectionHistoryDAO.deleteOldHistoryItem();
                                 return null;
                             }
                         });
-                        return null;
                     }
                 });
         return Objects.requireNonNull(future);
@@ -163,10 +159,10 @@ public class DiaryRepository {
         Future<Void> future =
                 DiaryDatabase.EXECUTOR_SERVICE.submit(new Callable<Void>() {
                     @Override
-                    public Void call() throws CancellationException, ExecutionException, InterruptedException {
-                        diaryDatabase.runInTransaction(new Callable<Future<Void>>() {
+                    public Void call() {
+                        return diaryDatabase.runInTransaction(new Callable<Void>() {
                             @Override
-                            public Future<Void> call() throws CancellationException, ExecutionException, InterruptedException {
+                            public Void call() {
                                 diaryDAO.deleteDiary(deleteDiaryDate.toString());
                                 diaryDAO.insertDiary(createDiaryEntity);
                                 diaryItemTitleSelectionHistoryDAO.insertHistoryItem(updateTitleList);
@@ -174,7 +170,6 @@ public class DiaryRepository {
                                 return null;
                             }
                         });
-                        return null;
                     }
                 });
         return Objects.requireNonNull(future);
@@ -199,16 +194,15 @@ public class DiaryRepository {
         Future<Void> future =
                 DiaryDatabase.EXECUTOR_SERVICE.submit(new Callable<Void>() {
                     @Override
-                    public Void call() throws CancellationException, ExecutionException, InterruptedException {
-                        diaryDatabase.runInTransaction(new Callable<Future<Void>>() {
+                    public Void call() {
+                        return diaryDatabase.runInTransaction(new Callable<Void>() {
                             @Override
-                            public Future<Void> call() throws CancellationException, ExecutionException, InterruptedException {
+                            public Void call() {
                                 diaryDAO.deleteAllDiaries();
                                 diaryItemTitleSelectionHistoryDAO.deleteAllItem();
                                 return null;
                             }
                         });
-                        return null;
                     }
                 });
         return Objects.requireNonNull(future);
