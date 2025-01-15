@@ -12,6 +12,11 @@
     <dimen name="fab_margin_bottom">16dp</dimen>
 
 
+    <!-- All fragment common -->
+    <dimen name="view_enabled_alpha">1.00</dimen>
+    <dimen name="view_disabled_alpha">@dimen/disabled_alpha_material_light</dimen>
+
+
     <!-- fragment_calendar -->
     <dimen name="fragment_calendar_text_size">18sp</dimen>
     <dimen name="fragment_calendar_margin_start">8dp</dimen>

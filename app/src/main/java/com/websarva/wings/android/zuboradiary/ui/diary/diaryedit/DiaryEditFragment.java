@@ -25,6 +25,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.view.ContextThemeWrapper;
 import androidx.appcompat.widget.Toolbar;
 import androidx.constraintlayout.motion.widget.MotionLayout;
+import androidx.core.content.res.ResourcesCompat;
 import androidx.databinding.ViewDataBinding;
 import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.MutableLiveData;
@@ -688,12 +689,10 @@ public class DiaryEditFragment extends BaseFragment {
                             diaryEditViewModel.deleteItem(itemNumber);
                             isDeletingItemTransition = false;
                         }
-                        binding.imageButtonItemAddition.setVisibility(View.VISIBLE);
 
                     // 対象項目欄追加後の処理
                     } else if (currentId == R.id.motion_scene_edit_diary_item_showed_state) {
                         Log.d("MotionLayout", "currentId:showed_state");
-                        binding.imageButtonItemAddition.setEnabled(true);
                     }
                 }
 
@@ -733,13 +732,20 @@ public class DiaryEditFragment extends BaseFragment {
         public void onChanged(Integer integer) {
             Objects.requireNonNull(integer);
 
-            // 項目欄追加ボタン表示切替
-            // TODO:使用不可時はボタンをぼかすように変更する。
-            if (integer == DiaryLiveData.MAX_ITEMS) {
-                binding.imageButtonItemAddition.setVisibility(View.INVISIBLE);
-            }
-
+            enableItemAdditionButton(integer < DiaryLiveData.MAX_ITEMS);
             setUpItemsLayout(integer);
+        }
+
+        private void enableItemAdditionButton(boolean enabled) {
+            binding.imageButtonItemAddition.setEnabled(enabled);
+            int alphaResId;
+            if (enabled) {
+                alphaResId = R.dimen.view_enabled_alpha;
+            } else {
+                alphaResId = R.dimen.view_disabled_alpha;
+            }
+            float alpha = ResourcesCompat.getFloat(getResources(), alphaResId);
+            binding.imageButtonItemAddition.setAlpha(alpha);
         }
 
         private void setUpItemsLayout(Integer numItems) {
@@ -849,15 +855,15 @@ public class DiaryEditFragment extends BaseFragment {
         }
 
         private void enablePictureDeleteButton(boolean enabled) {
+            binding.imageButtonAttachedPictureDelete.setEnabled(enabled);
+            int alphaResId;
             if (enabled) {
-                binding.imageButtonAttachedPictureDelete.setEnabled(true);
-                float alpha = (float) 1.0;
-                binding.imageButtonAttachedPictureDelete.setAlpha(alpha);
+                alphaResId = R.dimen.view_enabled_alpha;
             } else {
-                binding.imageButtonAttachedPictureDelete.setEnabled(false);
-                float alpha = (float) 0.26; // TODO:@dimen/disabled_alpha_material_lightをコードで取得したい
-                binding.imageButtonAttachedPictureDelete.setAlpha(alpha);
+                alphaResId = R.dimen.view_disabled_alpha;
             }
+            float alpha = ResourcesCompat.getFloat(getResources(), alphaResId);
+            binding.imageButtonAttachedPictureDelete.setAlpha(alpha);
         }
     }
 
