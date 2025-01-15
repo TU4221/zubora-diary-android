@@ -147,7 +147,6 @@ public class WordSearchViewModel extends BaseViewModel {
             } catch (InterruptedException e) {
                 e.printStackTrace();
                 if (!isValidityDelay) {
-                    // TODO:ProgressBarを表示させる為に仮で記述
                     wordSearchResultList.postValue(previousResultList);
                     addAppMessage(AppMessage.DIARY_LOADING_ERROR);
                 }
