@@ -92,7 +92,7 @@ public class DiaryEditViewModel extends BaseViewModel {
         Objects.requireNonNull(date);
 
         DiaryEntity diaryEntity = diaryRepository.loadDiary(date).get();
-        if (diaryEntity == null) throw new NoSuchElementException(); // TODO:DiaryRepositoryで例外をスローしたい（戻り値にListenableFutureをやめる？）
+        if (diaryEntity == null) throw new NoSuchElementException();
 
         // HACK:下記はDiaryLiveData#update()処理よりも前に処理すること。
         //      (後で処理するとDiaryLiveDataのDateのObserverがloadedDateの更新よりも先に処理される為)
