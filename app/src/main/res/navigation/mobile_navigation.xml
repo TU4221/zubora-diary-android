@@ -79,7 +79,8 @@
 
             <argument
                 android:name="picture_uri"
-                app:argType="android.net.Uri" />
+                app:argType="android.net.Uri"
+                app:nullable="true" />
         </dialog>
 
         <fragment

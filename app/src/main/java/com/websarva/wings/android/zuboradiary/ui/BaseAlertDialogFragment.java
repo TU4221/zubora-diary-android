@@ -146,9 +146,8 @@ public abstract class BaseAlertDialogFragment extends DialogFragment {
      * */
     protected abstract void handleOnDismiss();
 
-    protected final void setResult(String resultKey, Object result) {
+    protected final void setResult(String resultKey, @Nullable Object result) {
         Objects.requireNonNull(resultKey);
-        Objects.requireNonNull(result);
 
         NavController navController = NavHostFragment.findNavController(this);
         NavBackStackEntry navBackStackEntry = navController.getPreviousBackStackEntry();
