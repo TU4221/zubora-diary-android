@@ -37,10 +37,10 @@ public class DiaryListViewModel extends BaseViewModel {
     private final DiaryRepository diaryRepository;
     private Future<?> diaryListLoadingFuture; // キャンセル用
     private final MutableLiveData<DiaryYearMonthList> diaryList = new MutableLiveData<>();
+
     /**
      * データベース読込からRecyclerViewへの反映までを true とする。
      */
-    // TODO:Visible変数を削除してFragment上で制御できるか検討(UpdateはViewModelの方が簡潔に制御できる？)
     private final MutableLiveData<Boolean> isVisibleUpdateProgressBar = new MutableLiveData<>();
     private static final int NUM_LOADING_ITEMS = 10; //リストが画面全体に表示される値にすること。 // TODO:仮数値の為、最後に設定
     private LocalDate sortConditionDate;
