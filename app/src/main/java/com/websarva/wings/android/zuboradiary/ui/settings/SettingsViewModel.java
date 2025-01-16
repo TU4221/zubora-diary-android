@@ -266,7 +266,7 @@ public class SettingsViewModel extends BaseViewModel {
         ReminderNotificationPreference preferenceValue =
                 new ReminderNotificationPreference(false,(LocalTime) null);
         Single<Preferences> result = userPreferencesRepository.saveReminderNotificationPreference(preferenceValue);
-        setUpProcessOnUpdate(result, () -> workerRepository.cancelReminderNotificationWorker());
+        setUpProcessOnUpdate(result, workerRepository::cancelReminderNotificationWorker);
     }
 
     void savePasscodeLock(boolean value) {

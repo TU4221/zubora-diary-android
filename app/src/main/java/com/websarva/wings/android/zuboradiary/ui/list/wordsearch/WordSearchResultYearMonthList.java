@@ -3,6 +3,7 @@ package com.websarva.wings.android.zuboradiary.ui.list.wordsearch;
 import androidx.annotation.NonNull;
 
 import com.websarva.wings.android.zuboradiary.ui.list.DiaryYearMonthListBaseAdapter.ViewType;
+import com.websarva.wings.android.zuboradiary.ui.list.DiaryYearMonthListBaseItem;
 
 import java.time.LocalDate;
 import java.time.YearMonth;
@@ -86,7 +87,7 @@ public class WordSearchResultYearMonthList {
         Objects.requireNonNull(itemList);
         itemList.stream().forEach(Objects::requireNonNull);
 
-        itemList.removeIf(x -> x.isNotDiaryViewType());
+        itemList.removeIf(DiaryYearMonthListBaseItem::isNotDiaryViewType);
         if (needsNoDiaryMessage) {
             addLastItemNoDiaryMessage(itemList);
         } else {
@@ -127,8 +128,8 @@ public class WordSearchResultYearMonthList {
         List<WordSearchResultYearMonthListItem> additionItemList = new ArrayList<>(additionList.wordSearchResultYearMonthListItemList);
 
         // List最終アイテム(日記以外
-        originalItemList.removeIf(x -> x.isNotDiaryViewType());
-        additionItemList.removeIf(x -> x.isNotDiaryViewType());
+        originalItemList.removeIf(DiaryYearMonthListBaseItem::isNotDiaryViewType);
+        additionItemList.removeIf(DiaryYearMonthListBaseItem::isNotDiaryViewType);
 
         // 元リスト最終アイテムの年月取得
         int originalListLastItemPosition = originalItemList.size() - 1;
