@@ -116,7 +116,8 @@ public abstract class BaseAlertDialogFragment extends DialogFragment {
 
     /**
      * 戻り値をtrueにすると、ダイアログ枠外、戻るボタンタッチ時にダイアログをキャンセルすることを可能にする。
-     * */
+     *
+     * @noinspection SameReturnValue*/
     protected abstract boolean isCancelableOtherThanPressingButton();
 
     // ダイアログ枠外タッチ、popBackStack時に処理

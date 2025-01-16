@@ -47,7 +47,8 @@ public abstract class BaseBottomSheetDialogFragment extends BottomSheetDialogFra
     /**
      * 戻り値をtrueにすると、ダイアログ枠外、戻るボタンタッチ時にダイアログをキャンセルすることを可能にする。
      * BaseBottomSheetDialogFragment#setUpDialogCancelFunction()で呼び出される。
-     * */
+     *
+     * @noinspection SameReturnValue*/
     protected abstract boolean isCancelableOtherThanPressingButton();
 
     @NonNull
