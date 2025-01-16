@@ -42,7 +42,7 @@ public class DiaryListViewModel extends BaseViewModel {
      * データベース読込からRecyclerViewへの反映までを true とする。
      */
     private final MutableLiveData<Boolean> isVisibleUpdateProgressBar = new MutableLiveData<>();
-    private static final int NUM_LOADING_ITEMS = 10; //リストが画面全体に表示される値にすること。 // TODO:仮数値の為、最後に設定
+    public static final int NUM_LOADING_ITEMS = 10; //初期読込時の対象リストが画面全体に表示される値にすること。 // TODO:仮数値の為、最後に設定
     private LocalDate sortConditionDate;
     private final ExecutorService executorService;
 

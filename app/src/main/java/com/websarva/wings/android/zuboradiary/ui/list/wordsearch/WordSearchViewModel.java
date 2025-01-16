@@ -11,6 +11,7 @@ import com.websarva.wings.android.zuboradiary.data.AppMessage;
 import com.websarva.wings.android.zuboradiary.data.database.DiaryRepository;
 import com.websarva.wings.android.zuboradiary.data.database.WordSearchResultListItem;
 import com.websarva.wings.android.zuboradiary.ui.BaseViewModel;
+import com.websarva.wings.android.zuboradiary.ui.list.diarylist.DiaryListViewModel;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,7 +39,7 @@ public class WordSearchViewModel extends BaseViewModel {
      * データベース読込からRecyclerViewへの反映までを true とする。
      */
     private final MutableLiveData<Boolean> isVisibleUpdateProgressBar = new MutableLiveData<>();
-    private static final int NUM_LOADING_ITEMS = 10; //リストが画面全体に表示される値にすること。 // TODO:仮数値の為、最後に設定
+    private static final int NUM_LOADING_ITEMS = DiaryListViewModel.NUM_LOADING_ITEMS;
     private final ExecutorService executorService;
 
     private final boolean isValidityDelay = true;// TODO:調整用
