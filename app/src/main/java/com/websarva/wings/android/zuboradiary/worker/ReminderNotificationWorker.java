@@ -71,7 +71,7 @@ public class ReminderNotificationWorker extends Worker {
         try {
             hasWriteTodayDiary = existsSavedTodayDiary();
         } catch (Exception e) {
-            e.printStackTrace();
+            Log.d("Exception", "本日付日記保存済み確認失敗", e);
             return Result.failure();
         }
         if (hasWriteTodayDiary) return Result.success();

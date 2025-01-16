@@ -46,7 +46,7 @@ public abstract class WeatherApiCallable  implements Callable<Boolean> {
             }
         } catch (Exception e) {
             Objects.requireNonNull(e);
-            e.printStackTrace();
+            Log.d("Exception", "WeatherApi読込失敗", e);
             onException(e);
             return false;
         }

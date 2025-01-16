@@ -137,22 +137,16 @@ public class WordSearchViewModel extends BaseViewModel {
                         resultListCreator.create(spannableStringColor, spannableStringBackGroundColor);
                 wordSearchResultList.postValue(updateResultList);
             } catch (CancellationException e) {
-                Log.d("WordSearchLoading","Exception");
-                e.printStackTrace();
+                Log.d("Exception", "ワード検索結果読込キャンセル", e);
                 // 例外処理なし
-
-            } catch (ExecutionException e) {
-                e.printStackTrace();
-                wordSearchResultList.postValue(previousResultList);
-                addAppMessage(AppMessage.DIARY_LOADING_ERROR);
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                Log.d("Exception", "ワード検索結果読込キャンセル", e);
                 if (!isValidityDelay) {
                     wordSearchResultList.postValue(previousResultList);
                     addAppMessage(AppMessage.DIARY_LOADING_ERROR);
                 }
             } catch (Exception e) {
-                e.printStackTrace();
+                Log.d("Exception", "ワード検索結果読込キャンセル", e);
                 wordSearchResultList.postValue(previousResultList);
                 addAppMessage(AppMessage.DIARY_LOADING_ERROR);
             }

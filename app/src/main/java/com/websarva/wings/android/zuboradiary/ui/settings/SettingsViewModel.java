@@ -94,7 +94,7 @@ public class SettingsViewModel extends BaseViewModel {
                             this.themeColor.postValue(value.toThemeColor());
                         },
                         throwable -> {
-                            throwable.printStackTrace();
+                            Log.d("Exception", "テーマカラー設定値読込失敗", throwable);
                             addSettingLoadingErrorMessage();
                         }
                 )
@@ -123,7 +123,7 @@ public class SettingsViewModel extends BaseViewModel {
                             this.calendarStartDayOfWeek.postValue(calendarStartDayOfWeek);
                             },
                         throwable -> {
-                            throwable.printStackTrace();
+                            Log.d("Exception", "カレンダー開始曜日設定値読込失敗", throwable);
                             addSettingLoadingErrorMessage();
                         }
                 )
@@ -152,7 +152,7 @@ public class SettingsViewModel extends BaseViewModel {
                             reminderNotificationTime.postValue(value.getNotificationLocalTime());
                             },
                         throwable -> {
-                            throwable.printStackTrace();
+                            Log.d("Exception", "リマインダー通知設定値読込失敗", throwable);
                             addSettingLoadingErrorMessage();
                         }
                 )
@@ -189,7 +189,7 @@ public class SettingsViewModel extends BaseViewModel {
                             isCheckedPasscodeLock.postValue(value.getIsChecked());
                         },
                         throwable -> {
-                            throwable.printStackTrace();
+                            Log.d("Exception", "パスコード設定値読込失敗", throwable);
                             addSettingLoadingErrorMessage();
                         }
                 )
@@ -209,7 +209,7 @@ public class SettingsViewModel extends BaseViewModel {
                             isCheckedWeatherInfoAcquisition.postValue(value.getIsChecked());
                         },
                         throwable -> {
-                            throwable.printStackTrace();
+                            Log.d("Exception", "天気情報取得設定値読込失敗", throwable);
                             addSettingLoadingErrorMessage();
                         }
                 )

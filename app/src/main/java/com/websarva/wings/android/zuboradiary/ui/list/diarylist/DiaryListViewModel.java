@@ -121,20 +121,16 @@ public class DiaryListViewModel extends BaseViewModel {
                 Log.d("DiaryListLoading", "diaryList.postValue()");
                 diaryList.postValue(updateDiaryList);
             } catch (CancellationException e) {
-                e.printStackTrace();
+                Log.d("Exception", "日記読込キャンセル", e);
                 // 例外処理なし
-            } catch (ExecutionException e) {
-                e.printStackTrace();
-                diaryList.postValue(previousDiaryList);
-                addAppMessage(AppMessage.DIARY_LOADING_ERROR);
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                Log.d("Exception", "日記読込失敗", e);
                 if (!isValidityDelay) {
                     diaryList.postValue(previousDiaryList);
                     addAppMessage(AppMessage.DIARY_LOADING_ERROR);
                 }
             } catch (Exception e) {
-                e.printStackTrace();
+                Log.d("Exception", "日記読込失敗", e);
                 diaryList.postValue(previousDiaryList);
                 addAppMessage(AppMessage.DIARY_LOADING_ERROR);
             }
