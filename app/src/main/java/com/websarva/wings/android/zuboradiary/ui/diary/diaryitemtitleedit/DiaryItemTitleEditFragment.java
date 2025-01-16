@@ -137,13 +137,10 @@ public class DiaryItemTitleEditFragment extends BaseFragment {
         String toolBarTitle = getString(R.string.fragment_diary_item_title_edit_toolbar_first_title) + targetItemNumber + getString(R.string.fragment_diary_item_title_edit_toolbar_second_title);
         binding.materialToolbarTopAppBar.setTitle(toolBarTitle);
         binding.materialToolbarTopAppBar
-                .setNavigationOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        Objects.requireNonNull(v);
+                .setNavigationOnClickListener(v -> {
+                    Objects.requireNonNull(v);
 
-                        navController.navigateUp();
-                    }
+                    navController.navigateUp();
                 });
     }
 
@@ -160,17 +157,14 @@ public class DiaryItemTitleEditFragment extends BaseFragment {
         Objects.requireNonNull(editText);
         editText.addTextChangedListener(new InputItemTitleErrorWatcher());
 
-        binding.buttonNewItemTitleSelection.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Objects.requireNonNull(v);
-                boolean isError = Objects.nonNull(binding.textInputLayoutNewItemTitle.getError());
-                if (isError) return;
+        binding.buttonNewItemTitleSelection.setOnClickListener(v -> {
+            Objects.requireNonNull(v);
+            boolean isError = Objects.nonNull(binding.textInputLayoutNewItemTitle.getError());
+            if (isError) return;
 
-                String title = diaryItemTitleEditViewModel.getItemTitleLiveData().getValue();
-                Objects.requireNonNull(title);
-                completeItemTitleEdit(title);
-            }
+            String title = diaryItemTitleEditViewModel.getItemTitleLiveData().getValue();
+            Objects.requireNonNull(title);
+            completeItemTitleEdit(title);
         });
 
         boolean isEnabled = !editText.getText().toString().isEmpty();
@@ -218,33 +212,20 @@ public class DiaryItemTitleEditFragment extends BaseFragment {
                         requireThemeColor()
                 );
         itemTitleSelectionHistoryListAdapter.build();
-        itemTitleSelectionHistoryListAdapter.setOnClickItemListener(new ItemTitleSelectionHistoryListAdapter.OnClickItemListener() {
-            @Override
-            public void onClick(@NonNull String title) {
-                completeItemTitleEdit(title);
-            }
-        });
-        itemTitleSelectionHistoryListAdapter.setOnClickDeleteButtonListener(new ItemTitleSelectionHistoryListAdapter.OnClickDeleteButtonListener() {
-            @Override
-            public void onClick(int position, @NonNull String title) {
-                showDiaryItemTitleDeleteDialog(position, title);
-            }
-        });
+        itemTitleSelectionHistoryListAdapter.setOnClickItemListener(this::completeItemTitleEdit);
+        itemTitleSelectionHistoryListAdapter.setOnClickDeleteButtonListener(this::showDiaryItemTitleDeleteDialog);
 
         // 選択履歴読込・表示
         diaryItemTitleEditViewModel.loadDiaryItemTitleSelectionHistory();
         diaryItemTitleEditViewModel.getItemTitleSelectionHistoryLiveData()
-                .observe(getViewLifecycleOwner(), new Observer<SelectionHistoryList>() {
-                    @Override
-                    public void onChanged(SelectionHistoryList SelectionHistoryItemList) {
-                        Objects.requireNonNull(SelectionHistoryItemList);
+                .observe(getViewLifecycleOwner(), SelectionHistoryItemList -> {
+                    Objects.requireNonNull(SelectionHistoryItemList);
 
-                        ItemTitleSelectionHistoryListAdapter adapter =
-                                (ItemTitleSelectionHistoryListAdapter)
-                                        binding.recyclerItemTitleSelectionHistory.getAdapter();
-                        Objects.requireNonNull(adapter);
-                        adapter.submitList(SelectionHistoryItemList.getSelectionHistoryListItemList());
-                    }
+                    ItemTitleSelectionHistoryListAdapter adapter =
+                            (ItemTitleSelectionHistoryListAdapter)
+                                    binding.recyclerItemTitleSelectionHistory.getAdapter();
+                    Objects.requireNonNull(adapter);
+                    adapter.submitList(SelectionHistoryItemList.getSelectionHistoryListItemList());
                 });
     }
 

@@ -107,12 +107,9 @@ public class CalendarFragment extends BaseFragment {
     protected void handleOnReceivingResultFromPreviousFragment(@NonNull SavedStateHandle savedStateHandle) {
         MutableLiveData<LocalDate> showedDiaryDateLiveData =
                 savedStateHandle.getLiveData(DiaryShowFragment.KEY_SHOWED_DIARY_DATE);
-        showedDiaryDateLiveData.observe(getViewLifecycleOwner(), new Observer<LocalDate>() {
-            @Override
-            public void onChanged(LocalDate localDate) {
-                calendarViewModel.updateSelectedDate(localDate);
-                savedStateHandle.remove(DiaryShowFragment.KEY_SHOWED_DIARY_DATE);
-            }
+        showedDiaryDateLiveData.observe(getViewLifecycleOwner(), localDate -> {
+            calendarViewModel.updateSelectedDate(localDate);
+            savedStateHandle.remove(DiaryShowFragment.KEY_SHOWED_DIARY_DATE);
         });
     }
 
@@ -150,27 +147,21 @@ public class CalendarFragment extends BaseFragment {
         calendarViewModel.updateSelectedDate(selectedDate);
 
         calendarViewModel.getSelectedDateLiveData()
-                .observe(getViewLifecycleOwner(), new Observer<LocalDate>() {
-                    @Override
-                    public void onChanged(LocalDate localDate) {
-                        Objects.requireNonNull(localDate);
+                .observe(getViewLifecycleOwner(), localDate -> {
+                    Objects.requireNonNull(localDate);
 
-                        binding.calendar.notifyDateChanged(localDate); // 今回選択日付更新
-                        scrollCalendar(localDate);
-                        updateToolBarDate(localDate);
-                        showSelectedDiary(localDate);
-                    }
+                    binding.calendar.notifyDateChanged(localDate); // 今回選択日付更新
+                    scrollCalendar(localDate);
+                    updateToolBarDate(localDate);
+                    showSelectedDiary(localDate);
                 });
 
         calendarViewModel.getPreviousSelectedDateLiveData()
-                .observe(getViewLifecycleOwner(), new Observer<LocalDate>() {
-                    @Override
-                    public void onChanged(LocalDate localDate) {
-                        // MEMO:一度も日付選択をしていない場合はnullが代入されている。
-                        if (localDate == null) return;
+                .observe(getViewLifecycleOwner(), localDate -> {
+                    // MEMO:一度も日付選択をしていない場合はnullが代入されている。
+                    if (localDate == null) return;
 
-                        binding.calendar.notifyDateChanged(localDate); // 前回選択日付更新
-                    }
+                    binding.calendar.notifyDateChanged(localDate); // 前回選択日付更新
                 });
     }
 
@@ -219,14 +210,11 @@ public class CalendarFragment extends BaseFragment {
             TextView textDay = container.binding.textDay;
             View viewDayDot = container.binding.viewDayDot;
 
-            textDay.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Objects.requireNonNull(v);
+            textDay.setOnClickListener(v -> {
+                Objects.requireNonNull(v);
 
-                    if (calendarDay.getPosition() == DayPosition.MonthDate) {
-                        calendarViewModel.updateSelectedDate(calendarDay.getDate());
-                    }
+                if (calendarDay.getPosition() == DayPosition.MonthDate) {
+                    calendarViewModel.updateSelectedDate(calendarDay.getDate());
                 }
             });
 
@@ -542,14 +530,11 @@ public class CalendarFragment extends BaseFragment {
     }
 
     private void setUpFloatActionButton() {
-        binding.floatingActionButtonDiaryEdit.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Objects.requireNonNull(v);
+        binding.floatingActionButtonDiaryEdit.setOnClickListener(v -> {
+            Objects.requireNonNull(v);
 
-                LocalDate selectedDate = calendarViewModel.getSelectedDateLiveData().getValue();
-                showDiaryEditFragment(selectedDate);
-            }
+            LocalDate selectedDate = calendarViewModel.getSelectedDateLiveData().getValue();
+            showDiaryEditFragment(selectedDate);
         });
     }
 

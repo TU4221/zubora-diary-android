@@ -259,24 +259,14 @@ public class SettingsViewModel extends BaseViewModel {
         ReminderNotificationPreference preferenceValue =
                 new ReminderNotificationPreference(true, value);
         Single<Preferences> result = userPreferencesRepository.saveReminderNotificationPreference(preferenceValue);
-        setUpProcessOnUpdate(result, new OnSettingsUpdateCallback() {
-            @Override
-            public void onUpdateSettings() {
-                workerRepository.registerReminderNotificationWorker(value);
-            }
-        });
+        setUpProcessOnUpdate(result, () -> workerRepository.registerReminderNotificationWorker(value));
     }
 
     public void saveReminderNotificationInvalid() {
         ReminderNotificationPreference preferenceValue =
                 new ReminderNotificationPreference(false,(LocalTime) null);
         Single<Preferences> result = userPreferencesRepository.saveReminderNotificationPreference(preferenceValue);
-        setUpProcessOnUpdate(result, new OnSettingsUpdateCallback() {
-            @Override
-            public void onUpdateSettings() {
-                workerRepository.cancelReminderNotificationWorker();
-            }
-        });
+        setUpProcessOnUpdate(result, () -> workerRepository.cancelReminderNotificationWorker());
     }
 
     void savePasscodeLock(boolean value) {
@@ -308,23 +298,17 @@ public class SettingsViewModel extends BaseViewModel {
     private void setUpProcessOnUpdate(Single<Preferences> result, @Nullable OnSettingsUpdateCallback callback) {
         Objects.requireNonNull(result);
 
-        disposables.add(result.subscribe(new Consumer<Preferences>() {
-            @Override
-            public void accept(Preferences preferences) {
-                Objects.requireNonNull(preferences);
+        disposables.add(result.subscribe(preferences -> {
+            Objects.requireNonNull(preferences);
 
-                if (callback == null) return;
-                callback.onUpdateSettings();
-            }
-        }, new Consumer<Throwable>() {
-            @Override
-            public void accept(Throwable throwable) {
-                Objects.requireNonNull(throwable);
+            if (callback == null) return;
+            callback.onUpdateSettings();
+        }, throwable -> {
+            Objects.requireNonNull(throwable);
 
-                AppMessage appMessage = AppMessage.SETTING_UPDATE_ERROR;
-                if (equalLastAppMessage(appMessage)) return; // 設定更新エラー通知の重複防止
-                addAppMessage(appMessage);
-            }
+            AppMessage appMessage = AppMessage.SETTING_UPDATE_ERROR;
+            if (equalLastAppMessage(appMessage)) return; // 設定更新エラー通知の重複防止
+            addAppMessage(appMessage);
         }));
     }
 

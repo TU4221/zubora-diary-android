@@ -47,12 +47,7 @@ public class WordSearchResultDayListAdapter extends DiaryDayListBaseAdapter {
 
     @Override
     protected void onBindItemClickListener(@NonNull RecyclerView.ViewHolder holder, @NonNull DiaryDayListBaseItem item) {
-        holder.itemView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                onClickItem(item);
-            }
-        });
+        holder.itemView.setOnClickListener(v -> onClickItem(item));
     }
 
     @Override

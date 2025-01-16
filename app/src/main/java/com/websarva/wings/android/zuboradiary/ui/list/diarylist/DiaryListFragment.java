@@ -155,48 +155,39 @@ public class DiaryListFragment extends BaseFragment {
     // ツールバー設定
     private void setUpToolBar() {
         binding.materialToolbarTopAppBar
-                .setNavigationOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        Objects.requireNonNull(v);
+                .setNavigationOnClickListener(v -> {
+                    Objects.requireNonNull(v);
 
-                        // リスト先頭年月切り替えダイアログ起動
-                        LocalDate newestDiaryDate = diaryListViewModel.loadNewestSavedDiary();
-                        LocalDate oldestDiaryDate = diaryListViewModel.loadOldestSavedDiary();
-                        if (newestDiaryDate == null) return;
-                        if (oldestDiaryDate == null) return;
+                    // リスト先頭年月切り替えダイアログ起動
+                    LocalDate newestDiaryDate = diaryListViewModel.loadNewestSavedDiary();
+                    LocalDate oldestDiaryDate = diaryListViewModel.loadOldestSavedDiary();
+                    if (newestDiaryDate == null) return;
+                    if (oldestDiaryDate == null) return;
 
-                        Year newestYear = Year.of(newestDiaryDate.getYear());
-                        Year oldestYear = Year.of(oldestDiaryDate.getYear());
-                        showStartYearMonthPickerDialog(newestYear, oldestYear);
-                    }
+                    Year newestYear = Year.of(newestDiaryDate.getYear());
+                    Year oldestYear = Year.of(oldestDiaryDate.getYear());
+                    showStartYearMonthPickerDialog(newestYear, oldestYear);
                 });
 
         binding.materialToolbarTopAppBar
-                .setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
-                    @Override
-                    public boolean onMenuItemClick(MenuItem item) {
-                        Objects.requireNonNull(item);
+                .setOnMenuItemClickListener(item -> {
+                    Objects.requireNonNull(item);
 
-                        // ワード検索フラグメント起動
-                        if (item.getItemId() == R.id.diaryListToolbarOptionWordSearch) {
-                            showWordSearchFragment();
-                            return true;
-                        }
-                        return false;
+                    // ワード検索フラグメント起動
+                    if (item.getItemId() == R.id.diaryListToolbarOptionWordSearch) {
+                        showWordSearchFragment();
+                        return true;
                     }
+                    return false;
                 });
     }
 
     // 新規作成FAB設定
     private void setUpFloatActionButton() {
-        binding.floatingActionButtonDiaryEdit.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Objects.requireNonNull(v);
+        binding.floatingActionButtonDiaryEdit.setOnClickListener(v -> {
+            Objects.requireNonNull(v);
 
-                showEditDiary();
-            }
+            showEditDiary();
         });
     }
 
@@ -209,36 +200,27 @@ public class DiaryListFragment extends BaseFragment {
                         requireThemeColor()
                 );
         diaryListAdapter.build();
-        diaryListAdapter.setOnClickChildItemListener(new DiaryYearMonthListBaseAdapter.OnClickChildItemListener() {
-            @Override
-            public void onClick(DiaryDayListBaseItem item) {
-                Objects.requireNonNull(item);
+        diaryListAdapter.setOnClickChildItemListener(item -> {
+            Objects.requireNonNull(item);
 
-                showShowDiaryFragment(item.getDate());
-            }
+            showShowDiaryFragment(item.getDate());
         });
-        diaryListAdapter.setOnClickChildItemBackgroundButtonListener(new SwipeDiaryYearMonthListBaseAdapter.OnClickChildItemBackgroundButtonListener() {
-            @Override
-            public void onClick(DiaryDayListBaseItem item) {
-                Objects.requireNonNull(item);
+        diaryListAdapter.setOnClickChildItemBackgroundButtonListener(item -> {
+            Objects.requireNonNull(item);
 
-                DiaryDayListItem _item = (DiaryDayListItem) item;
-                showDiaryDeleteDialog(_item.getDate(), _item.getPicturePath());
-            }
+            DiaryDayListItem _item = (DiaryDayListItem) item;
+            showDiaryDeleteDialog(_item.getDate(), _item.getPicturePath());
         });
 
         diaryListViewModel.getDiaryListLiveData().observe(getViewLifecycleOwner(), new DiaryListObserver());
 
         // 画面全体ProgressBar表示中はタッチ無効化
-        binding.includeProgressIndicator.viewBackground.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                Objects.requireNonNull(v);
-                Objects.requireNonNull(event);
+        binding.includeProgressIndicator.viewBackground.setOnTouchListener((v, event) -> {
+            Objects.requireNonNull(v);
+            Objects.requireNonNull(event);
 
-                v.performClick();
-                return true;
-            }
+            v.performClick();
+            return true;
         });
 
         loadDiaryList();

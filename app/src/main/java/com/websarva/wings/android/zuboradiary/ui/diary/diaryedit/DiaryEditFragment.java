@@ -127,13 +127,10 @@ public class DiaryEditFragment extends BaseFragment {
         setupEditText();
 
         // TODO:最終的に削除
-        binding.fabTest.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Log.d("20240823", "OnClick");
-                TestDiariesSaver testDiariesSaver = new TestDiariesSaver(diaryEditViewModel);
-                testDiariesSaver.save(28);
-            }
+        binding.fabTest.setOnClickListener(v -> {
+            Log.d("20240823", "OnClick");
+            TestDiariesSaver testDiariesSaver = new TestDiariesSaver(diaryEditViewModel);
+            testDiariesSaver.save(28);
         });
     }
 
@@ -143,21 +140,18 @@ public class DiaryEditFragment extends BaseFragment {
         // DiaryItemTitleEditFragmentから編集結果受取
         MutableLiveData<String> newItemTitleLiveData =
                 savedStateHandle.getLiveData(DiaryItemTitleEditFragment.KEY_NEW_ITEM_TITLE);
-        newItemTitleLiveData.observe(getViewLifecycleOwner(), new Observer<String>() {
-            @Override
-            public void onChanged(@Nullable String string) {
-                // MEMO:結果がない場合もあるので"return"で返す。
-                if (string == null) return;
+        newItemTitleLiveData.observe(getViewLifecycleOwner(), string -> {
+            // MEMO:結果がない場合もあるので"return"で返す。
+            if (string == null) return;
 
-                ItemNumber itemNumber =
-                        savedStateHandle.get(DiaryItemTitleEditFragment.KEY_UPDATE_ITEM_NUMBER);
-                Objects.requireNonNull(itemNumber);
+            ItemNumber itemNumber =
+                    savedStateHandle.get(DiaryItemTitleEditFragment.KEY_UPDATE_ITEM_NUMBER);
+            Objects.requireNonNull(itemNumber);
 
-                diaryEditViewModel.updateItemTitle(itemNumber, string);
+            diaryEditViewModel.updateItemTitle(itemNumber, string);
 
-                savedStateHandle.remove(DiaryItemTitleEditFragment.KEY_UPDATE_ITEM_NUMBER);
-                savedStateHandle.remove(DiaryItemTitleEditFragment.KEY_NEW_ITEM_TITLE);
-            }
+            savedStateHandle.remove(DiaryItemTitleEditFragment.KEY_UPDATE_ITEM_NUMBER);
+            savedStateHandle.remove(DiaryItemTitleEditFragment.KEY_NEW_ITEM_TITLE);
         });
     }
 
@@ -300,83 +294,70 @@ public class DiaryEditFragment extends BaseFragment {
 
     private void setUpToolBar() {
         binding.materialToolbarTopAppBar
-                .setNavigationOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        Objects.requireNonNull(v);
+                .setNavigationOnClickListener(v -> {
+                    Objects.requireNonNull(v);
 
-                        navController.navigateUp();
-                    }
+                    navController.navigateUp();
                 });
 
         binding.materialToolbarTopAppBar
-                .setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
-                    @Override
-                    public boolean onMenuItemClick(MenuItem item) {
-                        Objects.requireNonNull(item);
-                        LocalDate diaryDate = diaryEditViewModel.getDateLiveData().getValue();
-                        Objects.requireNonNull(diaryDate);
+                .setOnMenuItemClickListener(item -> {
+                    Objects.requireNonNull(item);
+                    LocalDate diaryDate = diaryEditViewModel.getDateLiveData().getValue();
+                    Objects.requireNonNull(diaryDate);
 
-                        //日記保存(日記表示フラグメント起動)。
-                        if (item.getItemId() == R.id.diaryEditToolbarOptionSaveDiary) {
-                            if (diaryEditViewModel.shouldShowUpdateConfirmationDialog()) {
-                                showDiaryUpdateDialog(diaryDate);
-                            } else {
-                                boolean isSuccessful = diaryEditViewModel.saveDiary();
-                                if (isSuccessful) {
-                                    updatePictureUriPermission();
-                                    showDiaryShowFragment(diaryDate);
-                                }
+                    //日記保存(日記表示フラグメント起動)。
+                    if (item.getItemId() == R.id.diaryEditToolbarOptionSaveDiary) {
+                        if (diaryEditViewModel.shouldShowUpdateConfirmationDialog()) {
+                            showDiaryUpdateDialog(diaryDate);
+                        } else {
+                            boolean isSuccessful = diaryEditViewModel.saveDiary();
+                            if (isSuccessful) {
+                                updatePictureUriPermission();
+                                showDiaryShowFragment(diaryDate);
                             }
-                            return true;
-                        } else if (item.getItemId() == R.id.diaryEditToolbarOptionDeleteDiary) {
-                            showDiaryDeleteDialog(diaryDate);
                         }
-                        return false;
+                        return true;
+                    } else if (item.getItemId() == R.id.diaryEditToolbarOptionDeleteDiary) {
+                        showDiaryDeleteDialog(diaryDate);
                     }
+                    return false;
                 });
 
         diaryEditViewModel.getLoadedDateLiveData()
-                .observe(getViewLifecycleOwner(), new Observer<LocalDate>() {
-                    @Override
-                    public void onChanged(@Nullable LocalDate date) {
-                        String title;
-                        boolean enabledDelete;
-                        if (date == null) {
-                            title = getString(R.string.fragment_diary_edit_toolbar_title_create_new);
-                            enabledDelete = false;
-                        } else {
-                            title = getString(R.string.fragment_diary_edit_toolbar_title_edit);
-                            enabledDelete = true;
-                        }
-                        binding.materialToolbarTopAppBar.setTitle(title);
-
-                        Menu menu = binding.materialToolbarTopAppBar.getMenu();
-                        Objects.requireNonNull(menu);
-                        MenuItem deleteMenuItem = menu.findItem(R.id.diaryEditToolbarOptionDeleteDiary);
-                        Objects.requireNonNull(deleteMenuItem);
-                        deleteMenuItem.setEnabled(enabledDelete);
+                .observe(getViewLifecycleOwner(), date -> {
+                    String title;
+                    boolean enabledDelete;
+                    if (date == null) {
+                        title = getString(R.string.fragment_diary_edit_toolbar_title_create_new);
+                        enabledDelete = false;
+                    } else {
+                        title = getString(R.string.fragment_diary_edit_toolbar_title_edit);
+                        enabledDelete = true;
                     }
+                    binding.materialToolbarTopAppBar.setTitle(title);
+
+                    Menu menu = binding.materialToolbarTopAppBar.getMenu();
+                    Objects.requireNonNull(menu);
+                    MenuItem deleteMenuItem = menu.findItem(R.id.diaryEditToolbarOptionDeleteDiary);
+                    Objects.requireNonNull(deleteMenuItem);
+                    deleteMenuItem.setEnabled(enabledDelete);
                 });
     }
 
     // 日付入力欄設定
     private void setUpDateInputField() {
         binding.textInputEditTextDate.setInputType(EditorInfo.TYPE_NULL); //キーボード非表示設定
-        binding.textInputEditTextDate.setOnTouchListener(new View.OnTouchListener() {
+        binding.textInputEditTextDate.setOnTouchListener((v, event) -> {
+            Objects.requireNonNull(v);
+            Objects.requireNonNull(event);
+            if (event.getAction() != MotionEvent.ACTION_UP) return false;
 
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                Objects.requireNonNull(v);
-                Objects.requireNonNull(event);
-                if (event.getAction() != MotionEvent.ACTION_UP) return false;
-
-                hideKeyboard(v);
-                LocalDate date = diaryEditViewModel.getDateLiveData().getValue();
-                Objects.requireNonNull(date);
-                showDatePickerDialog(date);
-                return false;
-            }
+            hideKeyboard(v);
+            LocalDate date = diaryEditViewModel.getDateLiveData().getValue();
+            Objects.requireNonNull(date);
+            showDatePickerDialog(date);
+            return false;
         });
 
         diaryEditViewModel.getDateLiveData().observe(getViewLifecycleOwner(), new DateObserver());
@@ -435,71 +416,59 @@ public class DiaryEditFragment extends BaseFragment {
         weather2ArrayAdapter = createWeatherSpinnerAdapter();
         binding.autoCompleteTextWeather2.setAdapter(weather2ArrayAdapter);
 
-        binding.autoCompleteTextWeather1.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Objects.requireNonNull(parent);
-                Objects.requireNonNull(view);
+        binding.autoCompleteTextWeather1.setOnItemClickListener((parent, view, position, id) -> {
+            Objects.requireNonNull(parent);
+            Objects.requireNonNull(view);
 
-                ListAdapter listAdapter = binding.autoCompleteTextWeather1.getAdapter();
-                Objects.requireNonNull(listAdapter);
-                ArrayAdapter<?> arrayAdapter = (ArrayAdapter<?>) listAdapter;
-                String strWeather = (String) arrayAdapter.getItem(position);
-                Objects.requireNonNull(strWeather);
-                Weather weather = Weather.of(requireContext(), strWeather);
-                diaryEditViewModel.updateWeather1(weather);
-                binding.autoCompleteTextWeather1.clearFocus();
-            }
+            ListAdapter listAdapter = binding.autoCompleteTextWeather1.getAdapter();
+            Objects.requireNonNull(listAdapter);
+            ArrayAdapter<?> arrayAdapter = (ArrayAdapter<?>) listAdapter;
+            String strWeather = (String) arrayAdapter.getItem(position);
+            Objects.requireNonNull(strWeather);
+            Weather weather = Weather.of(requireContext(), strWeather);
+            diaryEditViewModel.updateWeather1(weather);
+            binding.autoCompleteTextWeather1.clearFocus();
         });
 
         diaryEditViewModel.getWeather1LiveData()
-                .observe(getViewLifecycleOwner(), new Observer<Weather>() {
-                    @Override
-                    public void onChanged(Weather weather) {
-                        Objects.requireNonNull(weather);
+                .observe(getViewLifecycleOwner(), weather -> {
+                    Objects.requireNonNull(weather);
 
-                        String strWeather = weather.toString(requireContext());
-                        binding.autoCompleteTextWeather1.setText(strWeather, false);
+                    String strWeather = weather.toString(requireContext());
+                    binding.autoCompleteTextWeather1.setText(strWeather, false);
 
-                        // Weather2 Spinner有効無効切替
-                        boolean isEnabled = (weather != Weather.UNKNOWN);
-                        binding.textInputLayoutWeather2.setEnabled(isEnabled);
-                        binding.autoCompleteTextWeather2.setEnabled(isEnabled);
+                    // Weather2 Spinner有効無効切替
+                    boolean isEnabled = (weather != Weather.UNKNOWN);
+                    binding.textInputLayoutWeather2.setEnabled(isEnabled);
+                    binding.autoCompleteTextWeather2.setEnabled(isEnabled);
 
-                        if (weather == Weather.UNKNOWN || diaryEditViewModel.isEqualWeathers()) {
-                            binding.autoCompleteTextWeather2.setAdapter(weatherArrayAdapter);
-                            diaryEditViewModel.updateWeather2(Weather.UNKNOWN);
-                        } else {
-                            weather2ArrayAdapter = createWeatherSpinnerAdapter(weather);
-                            binding.autoCompleteTextWeather2.setAdapter(weather2ArrayAdapter);
-                        }
+                    if (weather == Weather.UNKNOWN || diaryEditViewModel.isEqualWeathers()) {
+                        binding.autoCompleteTextWeather2.setAdapter(weatherArrayAdapter);
+                        diaryEditViewModel.updateWeather2(Weather.UNKNOWN);
+                    } else {
+                        weather2ArrayAdapter = createWeatherSpinnerAdapter(weather);
+                        binding.autoCompleteTextWeather2.setAdapter(weather2ArrayAdapter);
                     }
                 });
 
-        binding.autoCompleteTextWeather2.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Objects.requireNonNull(parent);
-                Objects.requireNonNull(view);
+        binding.autoCompleteTextWeather2.setOnItemClickListener((parent, view, position, id) -> {
+            Objects.requireNonNull(parent);
+            Objects.requireNonNull(view);
 
-                ListAdapter listAdapter = binding.autoCompleteTextWeather2.getAdapter();
-                ArrayAdapter<?> arrayAdapter = (ArrayAdapter<?>) listAdapter;
-                String strWeather = (String) arrayAdapter.getItem(position);
-                Weather weather = Weather.of(requireContext(), strWeather);
-                diaryEditViewModel.updateWeather2(weather);
-                binding.autoCompleteTextWeather2.clearFocus();
-            }
+            ListAdapter listAdapter = binding.autoCompleteTextWeather2.getAdapter();
+            ArrayAdapter<?> arrayAdapter = (ArrayAdapter<?>) listAdapter;
+            String strWeather = (String) arrayAdapter.getItem(position);
+            Weather weather = Weather.of(requireContext(), strWeather);
+            diaryEditViewModel.updateWeather2(weather);
+            binding.autoCompleteTextWeather2.clearFocus();
         });
 
         diaryEditViewModel.getWeather2LiveData()
-                .observe(getViewLifecycleOwner(), new Observer<Weather>() {
-                    @Override
-                    public void onChanged(Weather weather) {
-                        Objects.requireNonNull(weather);
+                .observe(getViewLifecycleOwner(), weather -> {
+                    Objects.requireNonNull(weather);
 
-                        String strWeather = weather.toString(requireContext());
-                        binding.autoCompleteTextWeather2.setText(strWeather, false);
-                    }
+                    String strWeather = weather.toString(requireContext());
+                    binding.autoCompleteTextWeather2.setText(strWeather, false);
                 });
     }
 
@@ -530,30 +499,24 @@ public class DiaryEditFragment extends BaseFragment {
         // ドロップダウン設定
         ArrayAdapter<String> conditionArrayAdapter = createConditionSpinnerAdapter();
         binding.autoCompleteTextCondition.setAdapter(conditionArrayAdapter);
-        binding.autoCompleteTextCondition.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Objects.requireNonNull(parent);
-                Objects.requireNonNull(view);
+        binding.autoCompleteTextCondition.setOnItemClickListener((parent, view, position, id) -> {
+            Objects.requireNonNull(parent);
+            Objects.requireNonNull(view);
 
-                ListAdapter listAdapter = binding.autoCompleteTextCondition.getAdapter();
-                ArrayAdapter<?> arrayAdapter = (ArrayAdapter<?>) listAdapter;
-                String strCondition = (String) arrayAdapter.getItem(position);
-                Condition condition = Condition.of(requireContext(), strCondition);
-                diaryEditViewModel.updateCondition(condition);
-                binding.autoCompleteTextCondition.clearFocus();
-            }
+            ListAdapter listAdapter = binding.autoCompleteTextCondition.getAdapter();
+            ArrayAdapter<?> arrayAdapter = (ArrayAdapter<?>) listAdapter;
+            String strCondition = (String) arrayAdapter.getItem(position);
+            Condition condition = Condition.of(requireContext(), strCondition);
+            diaryEditViewModel.updateCondition(condition);
+            binding.autoCompleteTextCondition.clearFocus();
         });
 
         diaryEditViewModel.getConditionLiveData()
-                .observe(getViewLifecycleOwner(), new Observer<Condition>() {
-                    @Override
-                    public void onChanged(Condition condition) {
-                        Objects.requireNonNull(condition);
+                .observe(getViewLifecycleOwner(), condition -> {
+                    Objects.requireNonNull(condition);
 
-                        String strCondition = condition.toString(requireContext());
-                        binding.autoCompleteTextCondition.setText(strCondition, false);
-                    }
+                    String strCondition = condition.toString(requireContext());
+                    binding.autoCompleteTextCondition.setText(strCondition, false);
                 });
     }
 
@@ -618,46 +581,37 @@ public class DiaryEditFragment extends BaseFragment {
             ItemNumber inputItemNumber =  new ItemNumber(i);
             int ItemArrayNumber = i - 1;
             textInputEditTextItemsTitle[ItemArrayNumber].setInputType(EditorInfo.TYPE_NULL); //キーボード非表示設定
-            textInputEditTextItemsTitle[ItemArrayNumber].setOnTouchListener(new View.OnTouchListener() {
-                @Override
-                public boolean onTouch(View v, MotionEvent event) {
-                    Objects.requireNonNull(v);
-                    Objects.requireNonNull(event);
-                    if (event.getAction() != MotionEvent.ACTION_UP) return false;
+            textInputEditTextItemsTitle[ItemArrayNumber].setOnTouchListener((v, event) -> {
+                Objects.requireNonNull(v);
+                Objects.requireNonNull(event);
+                if (event.getAction() != MotionEvent.ACTION_UP) return false;
 
-                    hideKeyboard(v);
+                hideKeyboard(v);
 
-                    // 項目タイトル入力フラグメント起動
-                    String inputItemTitle =
-                            diaryEditViewModel.getItemTitleLiveData(inputItemNumber).getValue();
-                    showDiaryItemTitleEditFragment(inputItemNumber, inputItemTitle);
-                    return false;
-                }
+                // 項目タイトル入力フラグメント起動
+                String inputItemTitle =
+                        diaryEditViewModel.getItemTitleLiveData(inputItemNumber).getValue();
+                showDiaryItemTitleEditFragment(inputItemNumber, inputItemTitle);
+                return false;
             });
         }
 
         // 項目追加ボタン設定
-        binding.imageButtonItemAddition.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Objects.requireNonNull(v);
+        binding.imageButtonItemAddition.setOnClickListener(v -> {
+            Objects.requireNonNull(v);
 
-                binding.imageButtonItemAddition.setEnabled(false);
-                diaryEditViewModel.incrementVisibleItemsCount();
-            }
+            binding.imageButtonItemAddition.setEnabled(false);
+            diaryEditViewModel.incrementVisibleItemsCount();
         });
 
         // 項目削除ボタン設定
         for (int i = ItemNumber.MIN_NUMBER; i <= ItemNumber.MAX_NUMBER; i++) {
             ItemNumber deleteItemNumber = new ItemNumber(i);
             int itemArrayNumber = i - 1;
-            imageButtonItemsDelete[itemArrayNumber].setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Objects.requireNonNull(v);
+            imageButtonItemsDelete[itemArrayNumber].setOnClickListener(v -> {
+                Objects.requireNonNull(v);
 
-                    showDiaryItemDeleteDialog(deleteItemNumber);
-                }
+                showDiaryItemDeleteDialog(deleteItemNumber);
             });
         }
 
@@ -818,24 +772,16 @@ public class DiaryEditFragment extends BaseFragment {
     }
 
     private void setUpPictureInputField() {
-        binding.imageAttachedPicture.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Objects.requireNonNull(v);
+        binding.imageAttachedPicture.setOnClickListener(v -> {
+            Objects.requireNonNull(v);
 
-                requireMainActivity().loadPicturePath();
-            }
+            requireMainActivity().loadPicturePath();
         });
 
         diaryEditViewModel.getPicturePathLiveData()
                 .observe(getViewLifecycleOwner(), new PicturePathObserver());
 
-        binding.imageButtonAttachedPictureDelete.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                showDiaryPictureDeleteDialog();
-            }
-        });
+        binding.imageButtonAttachedPictureDelete.setOnClickListener(v -> showDiaryPictureDeleteDialog());
     }
 
     private class PicturePathObserver implements Observer<Uri> {

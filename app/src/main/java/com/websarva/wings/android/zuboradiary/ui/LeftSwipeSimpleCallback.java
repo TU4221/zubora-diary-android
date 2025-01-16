@@ -121,25 +121,19 @@ public class LeftSwipeSimpleCallback extends ItemTouchHelper.SimpleCallback {
                 viewHolder,
                 300,
                 0f,
-                new AnimationAction() {
-                    @Override
-                    public void process() {
-                        itemTouchHelper.onChildViewDetachedFromWindow(viewHolder.itemView);
-                        itemTouchHelper.onChildViewAttachedToWindow(viewHolder.itemView);
-                    }
+                () -> {
+                    itemTouchHelper.onChildViewDetachedFromWindow(viewHolder.itemView);
+                    itemTouchHelper.onChildViewAttachedToWindow(viewHolder.itemView);
                 },
-                new AnimationAction() {
-                    @Override
-                    public void process() {
-                        // MEMO:StartActionのリセットのみでは、スワイプしたアイテムをタッチしてスワイプ状態を戻した後、
-                        //      アイテムをクリックしてもアイテム前面Viewのクリックリスナーが反応しない。
-                        //      2回目以降は反応する。対策として下記コードを記述。
-                        itemTouchHelper.onChildViewDetachedFromWindow(viewHolder.itemView);
-                        itemTouchHelper.onChildViewAttachedToWindow(viewHolder.itemView);
+                () -> {
+                    // MEMO:StartActionのリセットのみでは、スワイプしたアイテムをタッチしてスワイプ状態を戻した後、
+                    //      アイテムをクリックしてもアイテム前面Viewのクリックリスナーが反応しない。
+                    //      2回目以降は反応する。対策として下記コードを記述。
+                    itemTouchHelper.onChildViewDetachedFromWindow(viewHolder.itemView);
+                    itemTouchHelper.onChildViewAttachedToWindow(viewHolder.itemView);
 
-                        if (swipingAdapterPosition == position) clearSwipingAdapterPosition();
-                        if (swipedAdapterPosition == position) clearSwipedAdapterPosition();
-                    }
+                    if (swipingAdapterPosition == position) clearSwipingAdapterPosition();
+                    if (swipedAdapterPosition == position) clearSwipedAdapterPosition();
                 }
         );
     }
@@ -158,35 +152,29 @@ public class LeftSwipeSimpleCallback extends ItemTouchHelper.SimpleCallback {
                 .setDuration(duration)
                 .setInterpolator(new FastOutSlowInInterpolator())
                 .translationX(translationValue)
-                .withStartAction(new Runnable() {
-                    @Override
-                    public void run() {
-                        // MEMO:アニメーション中のViewHolderをタッチすると、
-                        //      ItemTouchHelper.Callback#getMovementFlags()で
-                        //      スワイプ機能を無効にするようにしている為、クリック機能が有効となる。
-                        //      アニメーション中はリスナーを機能させたくないので下記コードを記述。
-                        leftSwipeViewHolder.setClickableAllView(false);
+                .withStartAction(() -> {
+                    // MEMO:アニメーション中のViewHolderをタッチすると、
+                    //      ItemTouchHelper.Callback#getMovementFlags()で
+                    //      スワイプ機能を無効にするようにしている為、クリック機能が有効となる。
+                    //      アニメーション中はリスナーを機能させたくないので下記コードを記述。
+                    leftSwipeViewHolder.setClickableAllView(false);
 
-                        if (startAction == null) return;
-                        startAction.process();
-                    }
+                    if (startAction == null) return;
+                    startAction.process();
                 })
-                .withEndAction(new Runnable() {
-                    @Override
-                    public void run() {
-                        if (endAction == null) return;
-                        endAction.process();
+                .withEndAction(() -> {
+                    if (endAction == null) return;
+                    endAction.process();
 
-                        // MEMO:アニメーション中にスワイプしてそのままタッチを継続されると、
-                        //      アニメーション終了後にスワイプ分、前面Viewが移動してしまう。
-                        //      対策として、下記条件コード記述。
-                        if (previousMotionEvent != MotionEvent.ACTION_UP) {
-                            invalidSwipeAdapterPosition = position;
-                            return;
-                        }
-
-                        leftSwipeViewHolder.setClickableAllView(true);
+                    // MEMO:アニメーション中にスワイプしてそのままタッチを継続されると、
+                    //      アニメーション終了後にスワイプ分、前面Viewが移動してしまう。
+                    //      対策として、下記条件コード記述。
+                    if (previousMotionEvent != MotionEvent.ACTION_UP) {
+                        invalidSwipeAdapterPosition = position;
+                        return;
                     }
+
+                    leftSwipeViewHolder.setClickableAllView(true);
                 })
                 .start();
     }

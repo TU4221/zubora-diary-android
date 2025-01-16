@@ -143,13 +143,10 @@ public class TextInputSetup extends EditTextSetup {
 
                 boolean isVisible = !text.toString().isEmpty();
                 x.setEndIconVisible(isVisible);
-                x.setEndIconOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        Objects.requireNonNull(v);
+                x.setEndIconOnClickListener(v -> {
+                    Objects.requireNonNull(v);
 
-                        textInputEditText.setText("");
-                    }
+                    textInputEditText.setText("");
                 });
 
                 ClearButtonVisibleSwitchingTextWatcher textWatcher = new ClearButtonVisibleSwitchingTextWatcher(x);

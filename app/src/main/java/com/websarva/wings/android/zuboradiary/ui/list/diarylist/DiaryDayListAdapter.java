@@ -50,13 +50,10 @@ public class DiaryDayListAdapter extends SwipeDiaryDayListBaseAdapter {
     @Override
     protected void onBindItemClickListener(@NonNull RecyclerView.ViewHolder holder, @NonNull DiaryDayListBaseItem item) {
         DiaryDayListViewHolder _holder = (DiaryDayListViewHolder) holder;
-        _holder.binding.linerLayoutForeground.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Objects.requireNonNull(v);
+        _holder.binding.linerLayoutForeground.setOnClickListener(v -> {
+            Objects.requireNonNull(v);
 
-                onClickItem(item);
-            }
+            onClickItem(item);
         });
     }
 
@@ -95,13 +92,10 @@ public class DiaryDayListAdapter extends SwipeDiaryDayListBaseAdapter {
     protected void onBindDeleteButtonClickListener(@NonNull RecyclerView.ViewHolder holder, @NonNull DiaryDayListBaseItem item) {
         DiaryDayListViewHolder _holder = (DiaryDayListViewHolder) holder;
 
-        _holder.binding.includeBackground.imageButtonDelete.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Objects.requireNonNull(v);
+        _holder.binding.includeBackground.imageButtonDelete.setOnClickListener(v -> {
+            Objects.requireNonNull(v);
 
-                onClickDeleteButton(item);
-            }
+            onClickDeleteButton(item);
         });
     }
 

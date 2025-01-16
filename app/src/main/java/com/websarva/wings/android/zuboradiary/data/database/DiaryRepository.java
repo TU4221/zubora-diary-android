@@ -130,20 +130,12 @@ public class DiaryRepository {
         updateTitleList.stream().forEach(Objects::requireNonNull);
 
         Future<Void> future =
-                DiaryDatabase.EXECUTOR_SERVICE.submit(new Callable<Void>() {
-                    @Override
-                    public Void call() {
-                        return diaryDatabase.runInTransaction(new Callable<Void>() {
-                            @Override
-                            public Void call() {
-                                diaryDAO.insertDiary(diaryEntity);
-                                diaryItemTitleSelectionHistoryDAO.insertHistoryItem(updateTitleList);
-                                diaryItemTitleSelectionHistoryDAO.deleteOldHistoryItem();
-                                return null;
-                            }
-                        });
-                    }
-                });
+                DiaryDatabase.EXECUTOR_SERVICE.submit(() -> diaryDatabase.runInTransaction(() -> {
+                    diaryDAO.insertDiary(diaryEntity);
+                    diaryItemTitleSelectionHistoryDAO.insertHistoryItem(updateTitleList);
+                    diaryItemTitleSelectionHistoryDAO.deleteOldHistoryItem();
+                    return null;
+                }));
         return Objects.requireNonNull(future);
     }
 
@@ -157,21 +149,13 @@ public class DiaryRepository {
         updateTitleList.stream().forEach(Objects::requireNonNull);
 
         Future<Void> future =
-                DiaryDatabase.EXECUTOR_SERVICE.submit(new Callable<Void>() {
-                    @Override
-                    public Void call() {
-                        return diaryDatabase.runInTransaction(new Callable<Void>() {
-                            @Override
-                            public Void call() {
-                                diaryDAO.deleteDiary(deleteDiaryDate.toString());
-                                diaryDAO.insertDiary(createDiaryEntity);
-                                diaryItemTitleSelectionHistoryDAO.insertHistoryItem(updateTitleList);
-                                diaryItemTitleSelectionHistoryDAO.deleteOldHistoryItem();
-                                return null;
-                            }
-                        });
-                    }
-                });
+                DiaryDatabase.EXECUTOR_SERVICE.submit(() -> diaryDatabase.runInTransaction(() -> {
+                    diaryDAO.deleteDiary(deleteDiaryDate.toString());
+                    diaryDAO.insertDiary(createDiaryEntity);
+                    diaryItemTitleSelectionHistoryDAO.insertHistoryItem(updateTitleList);
+                    diaryItemTitleSelectionHistoryDAO.deleteOldHistoryItem();
+                    return null;
+                }));
         return Objects.requireNonNull(future);
     }
 
@@ -192,19 +176,11 @@ public class DiaryRepository {
     @NonNull
     public Future<Void> deleteAllData() {
         Future<Void> future =
-                DiaryDatabase.EXECUTOR_SERVICE.submit(new Callable<Void>() {
-                    @Override
-                    public Void call() {
-                        return diaryDatabase.runInTransaction(new Callable<Void>() {
-                            @Override
-                            public Void call() {
-                                diaryDAO.deleteAllDiaries();
-                                diaryItemTitleSelectionHistoryDAO.deleteAllItem();
-                                return null;
-                            }
-                        });
-                    }
-                });
+                DiaryDatabase.EXECUTOR_SERVICE.submit(() -> diaryDatabase.runInTransaction(() -> {
+                    diaryDAO.deleteAllDiaries();
+                    diaryItemTitleSelectionHistoryDAO.deleteAllItem();
+                    return null;
+                }));
         return Objects.requireNonNull(future);
     }
 }

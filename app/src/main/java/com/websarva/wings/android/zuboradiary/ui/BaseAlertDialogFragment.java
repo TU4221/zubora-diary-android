@@ -67,20 +67,14 @@ public abstract class BaseAlertDialogFragment extends DialogFragment {
         Objects.requireNonNull(message);
         builder.setMessage(message);
 
-        builder.setPositiveButton(R.string.dialog_base_alert_yes, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                Objects.requireNonNull(dialog);
-                handleOnPositiveButtonClick(dialog, which);
-            }
+        builder.setPositiveButton(R.string.dialog_base_alert_yes, (dialog, which) -> {
+            Objects.requireNonNull(dialog);
+            handleOnPositiveButtonClick(dialog, which);
         });
 
-        builder.setNegativeButton(R.string.dialog_base_alert_no, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                Objects.requireNonNull(dialog);
-                handleOnNegativeButtonClick(dialog, which);
-            }
+        builder.setNegativeButton(R.string.dialog_base_alert_no, (dialog, which) -> {
+            Objects.requireNonNull(dialog);
+            handleOnNegativeButtonClick(dialog, which);
         });
     }
 

@@ -124,14 +124,11 @@ public class EditTextSetup {
         Objects.requireNonNull(editTexts);
         Arrays.stream(editTexts).forEach(Objects::requireNonNull);
 
-        background.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Objects.requireNonNull(v);
+        background.setOnClickListener(v -> {
+            Objects.requireNonNull(v);
 
-                hideKeyboard(v);
-                Arrays.stream(editTexts).forEach(EditText::clearFocus);
-            }
+            hideKeyboard(v);
+            Arrays.stream(editTexts).forEach(EditText::clearFocus);
         });
     }
 
@@ -166,11 +163,6 @@ public class EditTextSetup {
         });
 
         clearButton.setVisibility(View.INVISIBLE);
-        clearButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                editText.setText("");
-            }
-        });
+        clearButton.setOnClickListener(v -> editText.setText(""));
     }
 }

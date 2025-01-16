@@ -110,13 +110,10 @@ public class WordSearchFragment extends BaseFragment {
 
     private void setUpToolBar() {
         binding.materialToolbarTopAppBar
-                .setNavigationOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        Objects.requireNonNull(v);
+                .setNavigationOnClickListener(v -> {
+                    Objects.requireNonNull(v);
 
-                        navController.navigateUp();
-                    }
+                    navController.navigateUp();
                 });
     }
 
@@ -130,26 +127,23 @@ public class WordSearchFragment extends BaseFragment {
         }
 
         wordSearchViewModel.getSearchWordMutableLiveData()
-                .observe(getViewLifecycleOwner(), new Observer<String>() {
-                    @Override
-                    public void onChanged(String s) {
-                        Objects.requireNonNull(s);
-                        // HACK:キーワードの入力時と確定時に検索Observerが起動してしまい
-                        //      同じキーワードで二重に検索してしまう。防止策として下記条件追加。
-                        if (s.equals(previousText)) return;
+                .observe(getViewLifecycleOwner(), s -> {
+                    Objects.requireNonNull(s);
+                    // HACK:キーワードの入力時と確定時に検索Observerが起動してしまい
+                    //      同じキーワードで二重に検索してしまう。防止策として下記条件追加。
+                    if (s.equals(previousText)) return;
 
-                        // 検索結果表示Viewは別Observerにて表示
-                        if (s.isEmpty()) {
-                            binding.textNoWordSearchResultsMessage.setVisibility(View.INVISIBLE);
-                            binding.linerLayoutWordSearchResults.setVisibility(View.INVISIBLE);
-                            wordSearchViewModel.initialize();
+                    // 検索結果表示Viewは別Observerにて表示
+                    if (s.isEmpty()) {
+                        binding.textNoWordSearchResultsMessage.setVisibility(View.INVISIBLE);
+                        binding.linerLayoutWordSearchResults.setVisibility(View.INVISIBLE);
+                        wordSearchViewModel.initialize();
 
-                        } else  {
-                            wordSearchViewModel
-                                    .loadNewWordSearchResultList(resultWordColor, resultWordBackgroundColor);
-                        }
-                        previousText = s;
+                    } else  {
+                        wordSearchViewModel
+                                .loadNewWordSearchResultList(resultWordColor, resultWordBackgroundColor);
                     }
+                    previousText = s;
                 });
 
         EditTextSetup editTextSetup = new EditTextSetup(requireActivity());
@@ -166,43 +160,34 @@ public class WordSearchFragment extends BaseFragment {
                         requireThemeColor()
                 );
         wordSearchResultListAdapter.build();
-        wordSearchResultListAdapter.setOnClickChildItemListener(new DiaryYearMonthListBaseAdapter.OnClickChildItemListener() {
-            @Override
-            public void onClick(DiaryDayListBaseItem item) {
-                Objects.requireNonNull(item);
+        wordSearchResultListAdapter.setOnClickChildItemListener(item -> {
+            Objects.requireNonNull(item);
 
-                showShowDiaryFragment(item.getDate());
-            }
+            showShowDiaryFragment(item.getDate());
         });
 
         wordSearchViewModel.getWordSearchResultListLiveData()
                 .observe(getViewLifecycleOwner(), new WordSearchResultListObserver());
 
         wordSearchViewModel.getNumWordSearchResultsLiveData()
-                .observe(getViewLifecycleOwner(), new Observer<Integer>() {
-                    @Override
-                    public void onChanged(Integer integer) {
-                        Objects.requireNonNull(integer);
+                .observe(getViewLifecycleOwner(), integer -> {
+                    Objects.requireNonNull(integer);
 
-                        int visibility;
-                        if (integer > 0) {
-                            visibility = View.VISIBLE;
-                        } else {
-                            visibility = View.INVISIBLE;
-                        }
-                        binding.textNumWordSearchResults.setVisibility(visibility);
+                    int visibility;
+                    if (integer > 0) {
+                        visibility = View.VISIBLE;
+                    } else {
+                        visibility = View.INVISIBLE;
                     }
+                    binding.textNumWordSearchResults.setVisibility(visibility);
                 });
 
-        binding.includeProgressIndicator.viewBackground.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                Objects.requireNonNull(v);
-                Objects.requireNonNull(event);
+        binding.includeProgressIndicator.viewBackground.setOnTouchListener((v, event) -> {
+            Objects.requireNonNull(v);
+            Objects.requireNonNull(event);
 
-                v.performClick();
-                return true;
-            }
+            v.performClick();
+            return true;
         });
 
         updateWordSearchResultList();
@@ -269,13 +254,10 @@ public class WordSearchFragment extends BaseFragment {
     }
 
     private void setUpFloatingActionButton() {
-        binding.floatingActionButtonTopScroll.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Objects.requireNonNull(v);
+        binding.floatingActionButtonTopScroll.setOnClickListener(v -> {
+            Objects.requireNonNull(v);
 
-                resultListScrollToFirstPosition();
-            }
+            resultListScrollToFirstPosition();
         });
         binding.recyclerWordSearchResultList.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override

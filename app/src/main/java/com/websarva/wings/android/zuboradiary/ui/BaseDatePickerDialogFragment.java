@@ -79,48 +79,36 @@ public abstract class BaseDatePickerDialogFragment extends DialogFragment{
         Objects.requireNonNull(datePicker);
         Objects.requireNonNull(dummyDialog);
 
-        datePicker.addOnPositiveButtonClickListener(new MaterialPickerOnPositiveButtonClickListener<Long>() {
-            @Override
-            public void onPositiveButtonClick(Long selection) {
-                Objects.requireNonNull(selection);
+        datePicker.addOnPositiveButtonClickListener(selection -> {
+            Objects.requireNonNull(selection);
 
-                // 選択日付型変換(EpochMilli -> LocalDate)
-                Instant instant = Instant.ofEpochMilli(selection);
-                LocalDate selectedDate = LocalDate.ofInstant(instant, ZoneId.systemDefault());
-                Objects.requireNonNull(selectedDate);
-                handleOnPositiveButtonClick(selectedDate);
-                dummyDialog.dismiss();
-            }
+            // 選択日付型変換(EpochMilli -> LocalDate)
+            Instant instant = Instant.ofEpochMilli(selection);
+            LocalDate selectedDate = LocalDate.ofInstant(instant, ZoneId.systemDefault());
+            Objects.requireNonNull(selectedDate);
+            handleOnPositiveButtonClick(selectedDate);
+            dummyDialog.dismiss();
         });
 
-        datePicker.addOnNegativeButtonClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Objects.requireNonNull(v);
+        datePicker.addOnNegativeButtonClickListener(v -> {
+            Objects.requireNonNull(v);
 
-                handleOnNegativeButtonClick(v);
-                dummyDialog.dismiss();
-            }
+            handleOnNegativeButtonClick(v);
+            dummyDialog.dismiss();
         });
 
-        datePicker.addOnCancelListener(new DialogInterface.OnCancelListener() {
-            @Override
-            public void onCancel(DialogInterface dialog) {
-                Objects.requireNonNull(dialog);
+        datePicker.addOnCancelListener(dialog -> {
+            Objects.requireNonNull(dialog);
 
-                handleOnCancel(dialog);
-                dummyDialog.dismiss();
-            }
+            handleOnCancel(dialog);
+            dummyDialog.dismiss();
         });
 
-        datePicker.addOnDismissListener(new DialogInterface.OnDismissListener() {
-            @Override
-            public void onDismiss(DialogInterface dialog) {
-                Objects.requireNonNull(dialog);
+        datePicker.addOnDismissListener(dialog -> {
+            Objects.requireNonNull(dialog);
 
-                handleOnDismiss(dialog);
-                dummyDialog.dismiss();
-            }
+            handleOnDismiss(dialog);
+            dummyDialog.dismiss();
         });
     }
 

@@ -80,16 +80,13 @@ public class MainActivity extends AppCompatActivity {
     private final ActivityResultLauncher<String[]> openDocumentResultLauncher =
             registerForActivityResult(
                     new ActivityResultContracts.OpenDocument(),
-                    new ActivityResultCallback<Uri>() {
-                        @Override
-                        public void onActivityResult(Uri o) {
-                            if (o == null) return; // 未選択時
+                    o -> {
+                        if (o == null) return; // 未選択時
 
-                            Fragment showedFragment = findShowedFragment();
-                            if (showedFragment instanceof DiaryEditFragment) {
-                                DiaryEditFragment diaryEditFragment = (DiaryEditFragment) showedFragment;
-                                diaryEditFragment.attachPicture(o);
-                            }
+                        Fragment showedFragment = findShowedFragment();
+                        if (showedFragment instanceof DiaryEditFragment) {
+                            DiaryEditFragment diaryEditFragment = (DiaryEditFragment) showedFragment;
+                            diaryEditFragment.attachPicture(o);
                         }
                     });
 
@@ -124,19 +121,16 @@ public class MainActivity extends AppCompatActivity {
         locationRequest = builder.build();
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
         settingsViewModel.getIsCheckedWeatherInfoAcquisitionLiveData()
-                .observe(this, new Observer<Boolean>() {
-                    @Override
-                    public void onChanged(@Nullable Boolean aBoolean) {
-                        Boolean settingValue = aBoolean;
-                        if (settingValue == null) {
-                            settingValue = settingsViewModel.isCheckedWeatherInfoAcquisitionSetting();
-                        }
+                .observe(this, aBoolean -> {
+                    Boolean settingValue = aBoolean;
+                    if (settingValue == null) {
+                        settingValue = settingsViewModel.isCheckedWeatherInfoAcquisitionSetting();
+                    }
 
-                        if (settingValue) {
-                            updateLocationInformation();
-                        } else {
-                            settingsViewModel.clearGeoCoordinates();
-                        }
+                    if (settingValue) {
+                        updateLocationInformation();
+                    } else {
+                        settingsViewModel.clearGeoCoordinates();
                     }
                 });
     }
@@ -174,16 +168,13 @@ public class MainActivity extends AppCompatActivity {
 
     private void setUpThemeColor() {
         settingsViewModel.getThemeColorSettingValueLiveData()
-                .observe(this, new Observer<ThemeColor>() {
-                    @Override
-                    public void onChanged(@Nullable ThemeColor themeColor) {
-                        ThemeColor settingValue = themeColor;
-                        if (settingValue == null) {
-                            settingValue = settingsViewModel.loadThemeColorSettingValue();
-                        }
-
-                        switchThemeColor(settingValue);
+                .observe(this, themeColor -> {
+                    ThemeColor settingValue = themeColor;
+                    if (settingValue == null) {
+                        settingValue = settingsViewModel.loadThemeColorSettingValue();
                     }
+
+                    switchThemeColor(settingValue);
                 });
     }
 
@@ -267,23 +258,19 @@ public class MainActivity extends AppCompatActivity {
             // StartDestinationFragment用ナビゲーション有効オブサーバー設定
             findShowedFragment().getLifecycle().addObserver(new EnabledNavigationLifecycleEventObserver());
             // StartDestinationFragment以外用ナビゲーション有効オブサーバー設定
-            findNavFragmentManager().addFragmentOnAttachListener(new FragmentOnAttachListener() {
-                @Override
-                public void onAttachFragment(
-                        @NonNull FragmentManager fragmentManager, @NonNull Fragment fragment) {
-                    // MEMO:BottomNavigationタブに割り当てられているFragment以外は処理不要
-                    //      Dialogを表示した時は背面FragmentのLifecycleEventが"OnResume"のままとなるため、
-                    //      DialogにEnabledNavigationLifecycleEventObserverクラスをセットすると
-                    //      BottomNavigationが無効状態のままとなる。
-                    if (!(fragment instanceof DiaryListFragment)
-                            && !(fragment instanceof CalendarFragment)
-                            && !(fragment instanceof SettingsFragment)) {
-                        return;
-                    }
-
-                    fragment.getLifecycle()
-                            .addObserver(new EnabledNavigationLifecycleEventObserver());
+            findNavFragmentManager().addFragmentOnAttachListener((fragmentManager, fragment) -> {
+                // MEMO:BottomNavigationタブに割り当てられているFragment以外は処理不要
+                //      Dialogを表示した時は背面FragmentのLifecycleEventが"OnResume"のままとなるため、
+                //      DialogにEnabledNavigationLifecycleEventObserverクラスをセットすると
+                //      BottomNavigationが無効状態のままとなる。
+                if (!(fragment instanceof DiaryListFragment)
+                        && !(fragment instanceof CalendarFragment)
+                        && !(fragment instanceof SettingsFragment)) {
+                    return;
                 }
+
+                fragment.getLifecycle()
+                        .addObserver(new EnabledNavigationLifecycleEventObserver());
             });
         }
         

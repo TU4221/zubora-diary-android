@@ -170,46 +170,37 @@ public class DiaryShowFragment extends BaseFragment {
 
     private void setUpToolBar() {
         binding.materialToolbarTopAppBar
-                .setNavigationOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        Objects.requireNonNull(v);
+                .setNavigationOnClickListener(v -> {
+                    Objects.requireNonNull(v);
 
-                        backFragment(true);
-                    }
+                    backFragment(true);
                 });
 
         binding.materialToolbarTopAppBar
-                .setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
-                    @Override
-                    public boolean onMenuItemClick(MenuItem item) {
-                        Objects.requireNonNull(item);
+                .setOnMenuItemClickListener(item -> {
+                    Objects.requireNonNull(item);
 
-                        // 日記編集フラグメント起動
-                        if (item.getItemId() == R.id.diaryShowToolbarOptionEditDiary) {
-                            LocalDate editDiaryDate = diaryShowViewModel.getDateLiveData().getValue();
-                            showDiaryEdit(editDiaryDate);
-                            return true;
-                        } else if (item.getItemId() == R.id.diaryShowToolbarOptionDeleteDiary) {
-                            LocalDate deleteDiaryDate = diaryShowViewModel.getDateLiveData().getValue();
-                            showDiaryDeleteDialog(deleteDiaryDate);
-                            return true;
-                        }
-                        return false;
+                    // 日記編集フラグメント起動
+                    if (item.getItemId() == R.id.diaryShowToolbarOptionEditDiary) {
+                        LocalDate editDiaryDate = diaryShowViewModel.getDateLiveData().getValue();
+                        showDiaryEdit(editDiaryDate);
+                        return true;
+                    } else if (item.getItemId() == R.id.diaryShowToolbarOptionDeleteDiary) {
+                        LocalDate deleteDiaryDate = diaryShowViewModel.getDateLiveData().getValue();
+                        showDiaryDeleteDialog(deleteDiaryDate);
+                        return true;
                     }
+                    return false;
                 });
 
         diaryShowViewModel.getDateLiveData()
-                .observe(getViewLifecycleOwner(), new Observer<LocalDate>() {
-                    @Override
-                    public void onChanged(LocalDate date) {
-                        // MEMO:DiaryViewModelを初期化するとDiaryDateにnullが代入されるため、下記"return"を処理。
-                        if (date == null) return;
+                .observe(getViewLifecycleOwner(), date -> {
+                    // MEMO:DiaryViewModelを初期化するとDiaryDateにnullが代入されるため、下記"return"を処理。
+                    if (date == null) return;
 
-                        DateTimeStringConverter converter = new DateTimeStringConverter();
-                        String stringDate = converter.toYearMonthDayWeek(date);
-                        binding.materialToolbarTopAppBar.setTitle(stringDate);
-                    }
+                    DateTimeStringConverter converter = new DateTimeStringConverter();
+                    String stringDate = converter.toYearMonthDayWeek(date);
+                    binding.materialToolbarTopAppBar.setTitle(stringDate);
                 });
     }
 

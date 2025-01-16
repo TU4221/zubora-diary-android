@@ -80,19 +80,16 @@ public class SettingsFragment extends BaseFragment {
             requestPostNotificationsPermissionLauncher =
                     registerForActivityResult(
                             new ActivityResultContracts.RequestPermission(),
-                            new ActivityResultCallback<Boolean>() {
-                                @Override
-                                public void onActivityResult(Boolean isGranted) {
+                            isGranted -> {
 
-                                    // 再確認
-                                    boolean _isGranted = ((MainActivity) requireActivity()).isGrantedPostNotifications();
+                                // 再確認
+                                boolean _isGranted = ((MainActivity) requireActivity()).isGrantedPostNotifications();
 
-                                    if (isGranted && _isGranted) {
-                                        showReminderNotificationTimePickerDialog();
-                                    } else {
-                                        binding.includePasscodeLockSetting
-                                                .materialSwitch.setChecked(false);
-                                    }
+                                if (isGranted && _isGranted) {
+                                    showReminderNotificationTimePickerDialog();
+                                } else {
+                                    binding.includePasscodeLockSetting
+                                            .materialSwitch.setChecked(false);
                                 }
                             }
                     );
@@ -103,29 +100,26 @@ public class SettingsFragment extends BaseFragment {
         requestAccessLocationPermissionLauncher =
                 registerForActivityResult(
                         new ActivityResultContracts.RequestMultiplePermissions(),
-                        new ActivityResultCallback<Map<String, Boolean>>() {
-                            @Override
-                            public void onActivityResult(Map<String, Boolean> o) {
-                                Boolean isGrantedAccessFineLocation =
-                                        o.get(Manifest.permission.ACCESS_FINE_LOCATION);
-                                Boolean isGrantedAccessCoarseLocation =
-                                        o.get(Manifest.permission.ACCESS_COARSE_LOCATION);
+                        o -> {
+                            Boolean isGrantedAccessFineLocation =
+                                    o.get(Manifest.permission.ACCESS_FINE_LOCATION);
+                            Boolean isGrantedAccessCoarseLocation =
+                                    o.get(Manifest.permission.ACCESS_COARSE_LOCATION);
 
-                                boolean isGrantedAll =
-                                        isGrantedAccessFineLocation != null
-                                                && isGrantedAccessFineLocation
-                                                && isGrantedAccessCoarseLocation != null
-                                                && isGrantedAccessCoarseLocation;
+                            boolean isGrantedAll =
+                                    isGrantedAccessFineLocation != null
+                                            && isGrantedAccessFineLocation
+                                            && isGrantedAccessCoarseLocation != null
+                                            && isGrantedAccessCoarseLocation;
 
-                                // 再確認
-                                boolean _isGranted = ((MainActivity)requireActivity()).isGrantedAccessLocation();
+                            // 再確認
+                            boolean _isGranted = ((MainActivity)requireActivity()).isGrantedAccessLocation();
 
-                                if (isGrantedAll && _isGranted) {
-                                    settingsViewModel.saveWeatherInfoAcquisition(true);
-                                } else {
-                                    binding.includeWeatherInfoAcquisitionSetting
-                                            .materialSwitch.setChecked(false);
-                                }
+                            if (isGrantedAll && _isGranted) {
+                                settingsViewModel.saveWeatherInfoAcquisition(true);
+                            } else {
+                                binding.includeWeatherInfoAcquisitionSetting
+                                        .materialSwitch.setChecked(false);
                             }
                         }
                 );
@@ -279,23 +273,15 @@ public class SettingsFragment extends BaseFragment {
     }
 
     private void setUpThemeColorSettingItem() {
-        binding.includeThemeColorSetting.textTitle.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                showThemeColorPickerDialog();
-            }
-        });
+        binding.includeThemeColorSetting.textTitle.setOnClickListener(v -> showThemeColorPickerDialog());
 
         settingsViewModel.getThemeColorSettingValueLiveData()
-                .observe(getViewLifecycleOwner(), new Observer<ThemeColor>() {
-                    @Override
-                    public void onChanged(ThemeColor themeColor) {
-                        Objects.requireNonNull(themeColor);
+                .observe(getViewLifecycleOwner(), themeColor -> {
+                    Objects.requireNonNull(themeColor);
 
-                        String strThemeColor = themeColor.toSting(requireContext());
-                        binding.includeThemeColorSetting.textValue.setText(strThemeColor);
-                        switchViewColor(themeColor);
-                    }
+                    String strThemeColor = themeColor.toSting(requireContext());
+                    binding.includeThemeColorSetting.textValue.setText(strThemeColor);
+                    switchViewColor(themeColor);
                 });
     }
 
@@ -378,34 +364,28 @@ public class SettingsFragment extends BaseFragment {
     }
 
     private void setUpCalendarStartDaySettingItem() {
-        binding.includeCalendarStartDaySetting.textTitle.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Objects.requireNonNull(v);
+        binding.includeCalendarStartDaySetting.textTitle.setOnClickListener(v -> {
+            Objects.requireNonNull(v);
 
-                DayOfWeek currentCalendarStartDayOfWeek =
-                        settingsViewModel.loadCalendarStartDaySettingValue();
-                Objects.requireNonNull(currentCalendarStartDayOfWeek);
+            DayOfWeek currentCalendarStartDayOfWeek =
+                    settingsViewModel.loadCalendarStartDaySettingValue();
+            Objects.requireNonNull(currentCalendarStartDayOfWeek);
 
-                showCalendarStartDayPickerDialog(currentCalendarStartDayOfWeek);
-            }
+            showCalendarStartDayPickerDialog(currentCalendarStartDayOfWeek);
         });
 
         settingsViewModel.getCalendarStartDayOfWeekLiveData()
-                .observe(getViewLifecycleOwner(), new Observer<DayOfWeek>() {
-                    @Override
-                    public void onChanged(DayOfWeek dayOfWeek) {
-                        DayOfWeek settingValue = dayOfWeek;
-                        if (settingValue == null) {
-                            settingValue = settingsViewModel.loadCalendarStartDaySettingValue();
-                        }
-
-                        DayOfWeekStringConverter stringConverter =
-                                new DayOfWeekStringConverter(requireContext());
-                        String strDayOfWeek =
-                                stringConverter.toCalendarStartDayOfWeek(settingValue);
-                        binding.includeCalendarStartDaySetting.textValue.setText(strDayOfWeek);
+                .observe(getViewLifecycleOwner(), dayOfWeek -> {
+                    DayOfWeek settingValue = dayOfWeek;
+                    if (settingValue == null) {
+                        settingValue = settingsViewModel.loadCalendarStartDaySettingValue();
                     }
+
+                    DayOfWeekStringConverter stringConverter =
+                            new DayOfWeekStringConverter(requireContext());
+                    String strDayOfWeek =
+                            stringConverter.toCalendarStartDayOfWeek(settingValue);
+                    binding.includeCalendarStartDaySetting.textValue.setText(strDayOfWeek);
                 });
     }
 
@@ -413,17 +393,14 @@ public class SettingsFragment extends BaseFragment {
     private void setUpReminderNotificationSettingItem() {
 
         binding.includeReminderNotificationSetting.materialSwitch
-                .setOnTouchListener(new View.OnTouchListener() {
-                    @Override
-                    public boolean onTouch(View v, MotionEvent event) {
-                        Objects.requireNonNull(v);
-                        Objects.requireNonNull(event);
+                .setOnTouchListener((v, event) -> {
+                    Objects.requireNonNull(v);
+                    Objects.requireNonNull(event);
 
-                        if (event.getAction() == MotionEvent.ACTION_DOWN){
-                            isTouchedReminderNotificationSwitch = true;
-                        }
-                        return false;
+                    if (event.getAction() == MotionEvent.ACTION_DOWN){
+                        isTouchedReminderNotificationSwitch = true;
                     }
+                    return false;
                 });
         binding.includeReminderNotificationSetting.materialSwitch
                 .setOnCheckedChangeListener(
@@ -431,40 +408,34 @@ public class SettingsFragment extends BaseFragment {
                 );
 
         settingsViewModel.getIsCheckedReminderNotificationLiveData()
-                .observe(getViewLifecycleOwner(), new Observer<Boolean>() {
-                    @Override
-                    public void onChanged(Boolean aBoolean) {
-                        Boolean settingValue = aBoolean;
-                        if (settingValue == null) {
-                            settingValue = settingsViewModel.isCheckedReminderNotificationSetting();
-                        }
+                .observe(getViewLifecycleOwner(), aBoolean -> {
+                    Boolean settingValue = aBoolean;
+                    if (settingValue == null) {
+                        settingValue = settingsViewModel.isCheckedReminderNotificationSetting();
+                    }
 
-                        if (settingValue) {
-                            binding.includeReminderNotificationSetting
-                                    .textValue.setVisibility(View.VISIBLE);
-                        } else {
-                            binding.includeReminderNotificationSetting
-                                    .textValue.setVisibility(View.INVISIBLE);
-                        }
+                    if (settingValue) {
+                        binding.includeReminderNotificationSetting
+                                .textValue.setVisibility(View.VISIBLE);
+                    } else {
+                        binding.includeReminderNotificationSetting
+                                .textValue.setVisibility(View.INVISIBLE);
                     }
                 });
 
         settingsViewModel.getReminderNotificationTimeLiveData()
-                .observe(getViewLifecycleOwner(), new Observer<LocalTime>() {
-                    @Override
-                    public void onChanged(@Nullable LocalTime time) {
-                        // MEMO:未設定の場合nullが代入される。
-                        //      その為、nullはエラーではないので下記メソッドの処理は不要(処理するとループする)
-                        //      "SettingsViewModel#isCheckedReminderNotificationSetting()"
-                        if (time == null) {
-                            binding.includeReminderNotificationSetting.textValue.setText("");
-                            return;
-                        }
-
-                        DateTimeStringConverter converter = new DateTimeStringConverter();
-                        String strTime = converter.toHourMinute(time);
-                        binding.includeReminderNotificationSetting.textValue.setText(strTime);
+                .observe(getViewLifecycleOwner(), time -> {
+                    // MEMO:未設定の場合nullが代入される。
+                    //      その為、nullはエラーではないので下記メソッドの処理は不要(処理するとループする)
+                    //      "SettingsViewModel#isCheckedReminderNotificationSetting()"
+                    if (time == null) {
+                        binding.includeReminderNotificationSetting.textValue.setText("");
+                        return;
                     }
+
+                    DateTimeStringConverter converter = new DateTimeStringConverter();
+                    String strTime = converter.toHourMinute(time);
+                    binding.includeReminderNotificationSetting.textValue.setText(strTime);
                 });
     }
 
@@ -512,35 +483,26 @@ public class SettingsFragment extends BaseFragment {
     @SuppressLint("ClickableViewAccessibility")
     private void setUpPasscodeLockSettingItem() {
         binding.includePasscodeLockSetting.materialSwitch
-                .setOnTouchListener(new View.OnTouchListener() {
-                    @Override
-                    public boolean onTouch(View v, MotionEvent event) {
-                        Objects.requireNonNull(v);
-                        Objects.requireNonNull(event);
+                .setOnTouchListener((v, event) -> {
+                    Objects.requireNonNull(v);
+                    Objects.requireNonNull(event);
 
-                        if (event.getAction() == MotionEvent.ACTION_DOWN){
-                            isTouchedPasscodeLockSwitch = true;
-                        }
-                        return false;
+                    if (event.getAction() == MotionEvent.ACTION_DOWN){
+                        isTouchedPasscodeLockSwitch = true;
                     }
+                    return false;
                 });
         binding.includePasscodeLockSetting.materialSwitch
-                .setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-                    @Override
-                    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                        Objects.requireNonNull(buttonView);
-                        if (!isTouchedPasscodeLockSwitch) return;
+                .setOnCheckedChangeListener((buttonView, isChecked) -> {
+                    Objects.requireNonNull(buttonView);
+                    if (!isTouchedPasscodeLockSwitch) return;
 
-                        settingsViewModel.savePasscodeLock(isChecked);
-                        isTouchedPasscodeLockSwitch = false;
-                    }
+                    settingsViewModel.savePasscodeLock(isChecked);
+                    isTouchedPasscodeLockSwitch = false;
                 });
 
         settingsViewModel.getIsCheckedPasscodeLockLiveData()
-                .observe(getViewLifecycleOwner(), new Observer<Boolean>() {
-                    @Override
-                    public void onChanged(Boolean aBoolean) {
-                    }
+                .observe(getViewLifecycleOwner(), aBoolean -> {
                 });
     }
 
@@ -559,17 +521,14 @@ public class SettingsFragment extends BaseFragment {
         }
 
         binding.includeWeatherInfoAcquisitionSetting.materialSwitch
-                .setOnTouchListener(new View.OnTouchListener() {
-                    @Override
-                    public boolean onTouch(View v, MotionEvent event) {
-                        Objects.requireNonNull(v);
-                        Objects.requireNonNull(event);
+                .setOnTouchListener((v, event) -> {
+                    Objects.requireNonNull(v);
+                    Objects.requireNonNull(event);
 
-                        if (event.getAction() == MotionEvent.ACTION_DOWN){
-                            isTouchedWeatherInfoAcquisitionSwitch = true;
-                        }
-                        return false;
+                    if (event.getAction() == MotionEvent.ACTION_DOWN){
+                        isTouchedWeatherInfoAcquisitionSwitch = true;
                     }
+                    return false;
                 });
 
         binding.includeWeatherInfoAcquisitionSetting.materialSwitch
@@ -616,39 +575,30 @@ public class SettingsFragment extends BaseFragment {
     }
 
     private void setUpAllDiariesDeleteSettingItem() {
-        binding.includeAllDiariesDeleteSetting.textTitle.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Objects.requireNonNull(v);
+        binding.includeAllDiariesDeleteSetting.textTitle.setOnClickListener(v -> {
+            Objects.requireNonNull(v);
 
-                showAllDiariesDeleteDialog();
-            }
+            showAllDiariesDeleteDialog();
         });
 
         binding.includeAllDiariesDeleteSetting.textValue.setVisibility(View.GONE);
     }
 
     private void setUpAllSettingsInitializationSettingItem() {
-        binding.includeAllSettingsInitializationSetting.textTitle.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Objects.requireNonNull(v);
+        binding.includeAllSettingsInitializationSetting.textTitle.setOnClickListener(v -> {
+            Objects.requireNonNull(v);
 
-                showAllSettingsInitializationDialog();
-            }
+            showAllSettingsInitializationDialog();
         });
 
         binding.includeAllSettingsInitializationSetting.textValue.setVisibility(View.GONE);
     }
 
     private void setUpAllDataDeleteSettingItem() {
-        binding.includeAllDataDeleteSetting.textTitle.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Objects.requireNonNull(v);
+        binding.includeAllDataDeleteSetting.textTitle.setOnClickListener(v -> {
+            Objects.requireNonNull(v);
 
-                showAllDataDeleteDialog();
-            }
+            showAllDataDeleteDialog();
         });
 
         binding.includeAllDataDeleteSetting.textValue.setVisibility(View.GONE);

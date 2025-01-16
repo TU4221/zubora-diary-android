@@ -205,38 +205,31 @@ public abstract class BaseFragment extends CustomFragment {
         NavBackStackEntry navBackStackEntry = navController.getCurrentBackStackEntry();
         Objects.requireNonNull(navBackStackEntry);
 
-        LifecycleEventObserver lifecycleEventObserver = new LifecycleEventObserver() {
-            @Override
-            public void onStateChanged(
-                    @NonNull LifecycleOwner lifecycleOwner, @NonNull Lifecycle.Event event) {
-                // MEMO:Dialog表示中:Lifecycle.Event.ON_PAUSE
-                //      Dialog非表示中:Lifecycle.Event.ON_RESUME
-                if (event.equals(Lifecycle.Event.ON_RESUME)) {
-                    SavedStateHandle savedStateHandle = navBackStackEntry.getSavedStateHandle();
-                    handleOnReceivingDialogResult(savedStateHandle);
-                    retrySettingsAppMessageDialogShow();
-                    retryOtherAppMessageDialogShow();
-                    removeDialogResultOnDestroy(savedStateHandle);
-                }
+        LifecycleEventObserver lifecycleEventObserver = (lifecycleOwner, event) -> {
+            // MEMO:Dialog表示中:Lifecycle.Event.ON_PAUSE
+            //      Dialog非表示中:Lifecycle.Event.ON_RESUME
+            if (event.equals(Lifecycle.Event.ON_RESUME)) {
+                SavedStateHandle savedStateHandle = navBackStackEntry.getSavedStateHandle();
+                handleOnReceivingDialogResult(savedStateHandle);
+                retrySettingsAppMessageDialogShow();
+                retryOtherAppMessageDialogShow();
+                removeDialogResultOnDestroy(savedStateHandle);
             }
         };
 
         navBackStackEntry.getLifecycle().addObserver(lifecycleEventObserver);
-        getViewLifecycleOwner().getLifecycle().addObserver(new LifecycleEventObserver() {
-            @Override
-            public void onStateChanged(
-                    @NonNull LifecycleOwner source, @NonNull Lifecycle.Event event) {
-                if (event.equals(Lifecycle.Event.ON_DESTROY)) {
-                    // MEMO:removeで削除しないとこのFragmentを閉じてもResult内容が残ってしまう。
-                    //      その為、このFragmentを再表示した時にObserverがResultの内容で処理してしまう。
-                    SavedStateHandle savedStateHandle = navBackStackEntry.getSavedStateHandle();
-                    removeDialogResultOnDestroy(savedStateHandle);
+        getViewLifecycleOwner().getLifecycle()
+                .addObserver((LifecycleEventObserver) (source, event) -> {
+                    if (event.equals(Lifecycle.Event.ON_DESTROY)) {
+                        // MEMO:removeで削除しないとこのFragmentを閉じてもResult内容が残ってしまう。
+                        //      その為、このFragmentを再表示した時にObserverがResultの内容で処理してしまう。
+                        SavedStateHandle savedStateHandle = navBackStackEntry.getSavedStateHandle();
+                        removeDialogResultOnDestroy(savedStateHandle);
 
-                    // MEMO:removeで削除しないと再度Fragment(前回表示Fragmentと同インスタンスの場合)を表示した時、Observerが重複する。
-                    navBackStackEntry.getLifecycle().removeObserver(lifecycleEventObserver);
-                }
-            }
-        });
+                        // MEMO:removeで削除しないと再度Fragment(前回表示Fragmentと同インスタンスの場合)を表示した時、Observerが重複する。
+                        navBackStackEntry.getLifecycle().removeObserver(lifecycleEventObserver);
+                    }
+                });
     }
 
     /**

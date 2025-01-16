@@ -67,24 +67,18 @@ class ItemTitleSelectionHistoryListAdapter
         SelectionHistoryListItem item = getItem(position);
         String title = item.getTitle();
         holder.binding.textTitle.setText(title);
-        holder.binding.textTitle.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Objects.requireNonNull(v);
-                if (onClickItemListener == null) return;
+        holder.binding.textTitle.setOnClickListener(v -> {
+            Objects.requireNonNull(v);
+            if (onClickItemListener == null) return;
 
-                onClickItemListener.onClick(title);
-            }
+            onClickItemListener.onClick(title);
         });
-        holder.binding.includeBackground.imageButtonDelete.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Objects.requireNonNull(v);
-                if (onClickDeleteButtonListener == null) return;
+        holder.binding.includeBackground.imageButtonDelete.setOnClickListener(v -> {
+            Objects.requireNonNull(v);
+            if (onClickDeleteButtonListener == null) return;
 
-                // MEMO:onBindViewHolder()の引数であるpositionを使用すると警告がでる。
-                onClickDeleteButtonListener.onClick(holder.getBindingAdapterPosition(), title);
-            }
+            // MEMO:onBindViewHolder()の引数であるpositionを使用すると警告がでる。
+            onClickDeleteButtonListener.onClick(holder.getBindingAdapterPosition(), title);
         });
     }
 

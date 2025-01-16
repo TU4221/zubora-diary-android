@@ -41,14 +41,11 @@ public abstract class WordSearchResultYearMonthListAdapter extends DiaryYearMont
         WordSearchResultDayListAdapter wordSearchResultDayListAdapter =
                 new WordSearchResultDayListAdapter(context, holder.binding.recyclerDayList, themeColor);
         wordSearchResultDayListAdapter.build();
-        wordSearchResultDayListAdapter.setOnClickItemListener(new WordSearchResultDayListAdapter.OnClickItemListener() {
-            @Override
-            public void onClick(DiaryDayListBaseItem item) {
-                Objects.requireNonNull(item);
-                if (onClickChildItemListener == null) return;
+        wordSearchResultDayListAdapter.setOnClickItemListener(item -> {
+            Objects.requireNonNull(item);
+            if (onClickChildItemListener == null) return;
 
-                onClickChildItemListener.onClick(item);
-            }
+            onClickChildItemListener.onClick(item);
         });
         return wordSearchResultDayListAdapter;
     }
