@@ -37,7 +37,7 @@ class CalendarViewModel extends BaseViewModel {
 
     @Override
     protected void initialize() {
-        super.initialize();
+        initializeAppMessageList();
         selectedDate.setValue(LocalDate.now());
         previousSelectedDate.setValue(null);
     }

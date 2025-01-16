@@ -1,6 +1,7 @@
 package com.websarva.wings.android.zuboradiary.ui;
 
 import android.os.Looper;
+import android.util.Log;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
@@ -15,9 +16,18 @@ public abstract class BaseViewModel extends ViewModel {
 
     private final MutableLiveData<AppMessageList> appMessageBufferList = new MutableLiveData<>();
 
-    protected void initialize() {
+    public BaseViewModel() {
+        initializeAppMessageList();
+    }
+
+    protected void initializeAppMessageList() {
         appMessageBufferList.setValue(new AppMessageList());
     }
+
+    /**
+     * 本メソッドは継承先のクラス毎に処理するタイミングが異なるので、Override後、継承クラスのコンストラクタに含めること。
+     * */
+    protected abstract void initialize();
 
     protected final void addAppMessage(AppMessage appMessage) {
         Objects.requireNonNull(appMessage);

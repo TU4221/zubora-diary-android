@@ -52,7 +52,7 @@ public class WordSearchViewModel extends BaseViewModel {
 
     @Override
     public void initialize() {
-        super.initialize();
+        initializeAppMessageList();
         searchWord.setValue("");
         wordSearchResultList.setValue(new WordSearchResultYearMonthList());
         numWordSearchResults.setValue(0);

@@ -1,5 +1,7 @@
 package com.websarva.wings.android.zuboradiary.ui.settings;
 
+import android.util.Log;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.datastore.preferences.core.Preferences;
@@ -68,8 +70,7 @@ public class SettingsViewModel extends BaseViewModel {
 
     @Override
     protected void initialize() {
-        super.initialize();
-
+        initializeAppMessageList();
         setUpThemeColorPreferenceValueLoading();
         setUpCalendarStartDayOfWeekPreferenceValueLoading();
         setUpReminderNotificationPreferenceValueLoading();

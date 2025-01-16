@@ -36,7 +36,7 @@ public class DiaryItemTitleEditViewModel extends BaseViewModel {
 
     @Override
     protected void initialize() {
-        super.initialize();
+        initializeAppMessageList();
         itemNumber.setValue(null);
         itemTitle.setValue("");
         selectionHistoryList.setValue(new SelectionHistoryList());

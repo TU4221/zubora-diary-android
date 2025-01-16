@@ -60,7 +60,7 @@ public class DiaryEditViewModel extends BaseViewModel {
 
     @Override
     public void initialize() {
-        super.initialize();
+        initializeAppMessageList();
         hasPreparedDiary = false;
         previousDate.setValue(null);
         loadedDate.setValue(null);

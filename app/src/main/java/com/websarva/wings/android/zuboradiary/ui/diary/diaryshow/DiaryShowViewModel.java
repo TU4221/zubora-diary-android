@@ -40,7 +40,7 @@ public class DiaryShowViewModel extends BaseViewModel {
 
     @Override
     public void initialize() {
-        super.initialize();
+        initializeAppMessageList();
         diaryLiveData.initialize();
     }
 

@@ -57,7 +57,7 @@ public class DiaryListViewModel extends BaseViewModel {
 
     @Override
     protected void initialize() {
-        super.initialize();
+        initializeAppMessageList();
         diaryList.setValue(new DiaryYearMonthList());
         isVisibleUpdateProgressBar.setValue(false);
         sortConditionDate = null;
