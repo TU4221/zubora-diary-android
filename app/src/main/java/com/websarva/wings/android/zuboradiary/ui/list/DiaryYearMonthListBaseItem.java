@@ -26,16 +26,8 @@ public abstract class DiaryYearMonthListBaseItem {
         this.viewType = viewType;
     }
 
-    public final boolean isDiaryViewType() {
-        return viewType.equals(ViewType.DIARY);
-    }
-
-    public final boolean isProgressIndicatorViewType() {
-        return viewType.equals(ViewType.PROGRESS_INDICATOR);
-    }
-
-    public final boolean isNoDiaryMessageViewType() {
-        return viewType.equals(ViewType.NO_DIARY_MESSAGE);
+    public final boolean isNotDiaryViewType() {
+        return !viewType.equals(ViewType.DIARY);
     }
 
     @NonNull

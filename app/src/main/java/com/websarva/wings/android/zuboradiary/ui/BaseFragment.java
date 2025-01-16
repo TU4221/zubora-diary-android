@@ -2,7 +2,6 @@ package com.websarva.wings.android.zuboradiary.ui;
 
 import android.os.Bundle;
 import android.transition.Transition;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -295,13 +294,13 @@ public abstract class BaseFragment extends CustomFragment {
 
     private void showAppMessageDialog(AppMessage appMessage) {
         Objects.requireNonNull(appMessage);
-        if (!canShowFragment()) return;
+        if (isDialogShowing()) return;
 
         navigateAppMessageDialog(appMessage);
     }
 
-    protected final boolean canShowFragment() {
-        return destinationId == getCurrentDestinationId();
+    protected final boolean isDialogShowing() {
+        return destinationId != getCurrentDestinationId();
     }
 
     /**

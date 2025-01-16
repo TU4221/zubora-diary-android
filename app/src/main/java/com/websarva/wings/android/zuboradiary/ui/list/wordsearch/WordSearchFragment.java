@@ -303,7 +303,7 @@ public class WordSearchFragment extends BaseFragment {
 
     private void showShowDiaryFragment(LocalDate date) {
         Objects.requireNonNull(date);
-        if (!canShowFragment()) return;
+        if (isDialogShowing()) return;
 
         NavDirections action =
                 WordSearchFragmentDirections

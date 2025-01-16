@@ -655,7 +655,7 @@ public class SettingsFragment extends BaseFragment {
     }
 
     private void showThemeColorPickerDialog() {
-        if (!canShowFragment()) return;
+        if (isDialogShowing()) return;
 
         NavDirections action =
                 SettingsFragmentDirections
@@ -665,7 +665,7 @@ public class SettingsFragment extends BaseFragment {
 
     private void showCalendarStartDayPickerDialog(DayOfWeek dayOfWeek) {
         Objects.requireNonNull(dayOfWeek);
-        if (!canShowFragment()) return;
+        if (isDialogShowing()) return;
 
         NavDirections action =
                 SettingsFragmentDirections
@@ -674,7 +674,7 @@ public class SettingsFragment extends BaseFragment {
     }
 
     private void showReminderNotificationTimePickerDialog() {
-        if (!canShowFragment()) return;
+        if (isDialogShowing()) return;
 
         NavDirections action =
                 SettingsFragmentDirections
@@ -684,7 +684,7 @@ public class SettingsFragment extends BaseFragment {
 
     private void showPermissionDialog(String permissionName) {
         Objects.requireNonNull(permissionName);
-        if (!canShowFragment()) return;
+        if (isDialogShowing()) return;
 
         NavDirections action =
                 SettingsFragmentDirections
@@ -693,7 +693,7 @@ public class SettingsFragment extends BaseFragment {
     }
 
     private void showAllDiariesDeleteDialog() {
-        if (!canShowFragment()) return;
+        if (isDialogShowing()) return;
 
         NavDirections action =
                 SettingsFragmentDirections
@@ -702,7 +702,7 @@ public class SettingsFragment extends BaseFragment {
     }
 
     private void showAllSettingsInitializationDialog() {
-        if (!canShowFragment()) return;
+        if (isDialogShowing()) return;
 
         NavDirections action =
                 SettingsFragmentDirections
@@ -711,7 +711,7 @@ public class SettingsFragment extends BaseFragment {
     }
 
     private void showAllDataDeleteDialog() {
-        if (!canShowFragment()) return;
+        if (isDialogShowing()) return;
 
         NavDirections action =
                 SettingsFragmentDirections

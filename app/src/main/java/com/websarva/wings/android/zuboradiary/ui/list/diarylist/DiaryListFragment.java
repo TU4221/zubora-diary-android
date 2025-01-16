@@ -311,7 +311,7 @@ public class DiaryListFragment extends BaseFragment {
     }
 
     private void showEditDiary() {
-        if (!canShowFragment()) return;
+        if (isDialogShowing()) return;
 
         NavDirections action =
                 DiaryListFragmentDirections
@@ -325,7 +325,7 @@ public class DiaryListFragment extends BaseFragment {
 
     private void showShowDiaryFragment(LocalDate date) {
         Objects.requireNonNull(date);
-        if (!canShowFragment()) return;
+        if (isDialogShowing()) return;
 
         NavDirections action =
                 DiaryListFragmentDirections
@@ -334,7 +334,7 @@ public class DiaryListFragment extends BaseFragment {
     }
 
     private void showWordSearchFragment() {
-        if (!canShowFragment()) return;
+        if (isDialogShowing()) return;
 
         NavDirections action =
                 DiaryListFragmentDirections
@@ -345,7 +345,7 @@ public class DiaryListFragment extends BaseFragment {
     private void showStartYearMonthPickerDialog(Year newestYear, Year oldestYear) {
         Objects.requireNonNull(newestYear);
         Objects.requireNonNull(oldestYear);
-        if (!canShowFragment()) return;
+        if (isDialogShowing()) return;
 
         NavDirections action =
                 DiaryListFragmentDirections
@@ -355,7 +355,7 @@ public class DiaryListFragment extends BaseFragment {
 
     private void showDiaryDeleteDialog(LocalDate date, Uri pictureUri) {
         Objects.requireNonNull(date);
-        if (!canShowFragment()) return;
+        if (isDialogShowing()) return;
 
         NavDirections action =
                 DiaryListFragmentDirections.actionDiaryListFragmentToDiaryDeleteDialog(date, pictureUri);

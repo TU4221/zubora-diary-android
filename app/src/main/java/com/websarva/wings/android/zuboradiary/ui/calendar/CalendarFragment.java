@@ -569,7 +569,7 @@ public class CalendarFragment extends BaseFragment {
 
     private void showDiaryEditFragment(LocalDate date) {
         Objects.requireNonNull(date);
-        if (!canShowFragment()) return;
+        if (isDialogShowing()) return;
 
         NavDirections action =
                 CalendarFragmentDirections

@@ -86,7 +86,7 @@ public class DiaryYearMonthList {
         Objects.requireNonNull(itemList);
         itemList.stream().forEach(Objects::requireNonNull);
 
-        itemList.removeIf(x -> !x.isDiaryViewType());
+        itemList.removeIf(x -> x.isNotDiaryViewType());
         if (needsNoDiaryMessage) {
             addLastItemNoDiaryMessage(itemList);
         } else {
@@ -127,8 +127,8 @@ public class DiaryYearMonthList {
         List<DiaryYearMonthListItem> additionItemList = new ArrayList<>(additionList.diaryYearMonthListItemList);
 
         // List最終アイテム(日記以外
-        originalItemList.removeIf(x -> !x.isDiaryViewType());
-        additionItemList.removeIf(x -> !x.isDiaryViewType());
+        originalItemList.removeIf(x -> x.isNotDiaryViewType());
+        additionItemList.removeIf(x -> x.isNotDiaryViewType());
 
         // 元リスト最終アイテムの年月取得
         int originalListLastItemPosition = originalItemList.size() - 1;

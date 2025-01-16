@@ -265,7 +265,7 @@ public class DiaryItemTitleEditFragment extends BaseFragment {
     }
 
     private void showDiaryEditFragment() {
-        if (!canShowFragment()) return;
+        if (isDialogShowing()) return;
 
         NavDirections action =
                 DiaryItemTitleEditFragmentDirections
@@ -276,7 +276,7 @@ public class DiaryItemTitleEditFragment extends BaseFragment {
     private void showDiaryItemTitleDeleteDialog(int listItemPosition, String listItemTitle) {
         Objects.requireNonNull(listItemTitle);
         if (listItemPosition < 0) throw new IllegalArgumentException();
-        if (!canShowFragment()) return;
+        if (isDialogShowing()) return;
 
         NavDirections action =
                 DiaryItemTitleEditFragmentDirections

@@ -1001,7 +1001,7 @@ public class DiaryEditFragment extends BaseFragment {
 
     private void showDiaryShowFragment(LocalDate date) {
         Objects.requireNonNull(date);
-        if (!canShowFragment()) return;
+        if (isDialogShowing()) return;
 
         boolean isStartDiaryFragment =
                 DiaryEditFragmentArgs.fromBundle(requireArguments()).getIsStartDiaryFragment();
@@ -1020,7 +1020,7 @@ public class DiaryEditFragment extends BaseFragment {
     private void showDiaryItemTitleEditFragment(ItemNumber inputItemNumber, String inputItemTitle) {
         Objects.requireNonNull(inputItemNumber);
         Objects.requireNonNull(inputItemTitle);
-        if (!canShowFragment()) return;
+        if (isDialogShowing()) return;
 
         NavDirections action =
                 DiaryEditFragmentDirections
@@ -1031,7 +1031,7 @@ public class DiaryEditFragment extends BaseFragment {
 
     private void showDiaryLoadingDialog(LocalDate date) {
         Objects.requireNonNull(date);
-        if (!canShowFragment()) return;
+        if (isDialogShowing()) return;
 
         NavDirections action =
                 DiaryEditFragmentDirections
@@ -1041,7 +1041,7 @@ public class DiaryEditFragment extends BaseFragment {
 
     private void showDiaryUpdateDialog(LocalDate date) {
         Objects.requireNonNull(date);
-        if (!canShowFragment()) return;
+        if (isDialogShowing()) return;
 
         NavDirections action =
                 DiaryEditFragmentDirections
@@ -1051,7 +1051,7 @@ public class DiaryEditFragment extends BaseFragment {
 
     private void showDiaryDeleteDialog(LocalDate date) {
         Objects.requireNonNull(date);
-        if (!canShowFragment()) return;
+        if (isDialogShowing()) return;
 
         NavDirections action =
                 DiaryEditFragmentDirections
@@ -1061,7 +1061,7 @@ public class DiaryEditFragment extends BaseFragment {
 
     private void showDatePickerDialog(LocalDate date) {
         Objects.requireNonNull(date);
-        if (!canShowFragment()) return;
+        if (isDialogShowing()) return;
 
         NavDirections action =
                 DiaryEditFragmentDirections
@@ -1071,7 +1071,7 @@ public class DiaryEditFragment extends BaseFragment {
 
     private void showWeatherInfoFetchingDialog(LocalDate date) {
         Objects.requireNonNull(date);
-        if (!canShowFragment()) return;
+        if (isDialogShowing()) return;
         if (!diaryEditViewModel.canFetchWeatherInformation(date)) return;
 
         // 今日の日付以降は天気情報を取得できないためダイアログ表示不要
@@ -1085,7 +1085,7 @@ public class DiaryEditFragment extends BaseFragment {
 
     private void showDiaryItemDeleteDialog(ItemNumber itemNumber) {
         Objects.requireNonNull(itemNumber);
-        if (!canShowFragment()) return;
+        if (isDialogShowing()) return;
 
         NavDirections action =
                 DiaryEditFragmentDirections
@@ -1094,7 +1094,7 @@ public class DiaryEditFragment extends BaseFragment {
     }
 
     private void showDiaryPictureDeleteDialog() {
-        if (!canShowFragment()) return;
+        if (isDialogShowing()) return;
 
         NavDirections action =
                 DiaryEditFragmentDirections

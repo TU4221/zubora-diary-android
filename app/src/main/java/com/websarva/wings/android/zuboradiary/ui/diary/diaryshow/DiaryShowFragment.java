@@ -436,7 +436,7 @@ public class DiaryShowFragment extends BaseFragment {
 
     private void showDiaryEdit(LocalDate date) {
         Objects.requireNonNull(date);
-        if (!canShowFragment()) return;
+        if (isDialogShowing()) return;
 
         NavDirections action =
                 DiaryShowFragmentDirections
@@ -450,7 +450,7 @@ public class DiaryShowFragment extends BaseFragment {
 
     private void showDiaryDeleteDialog(LocalDate date) {
         Objects.requireNonNull(date);
-        if (!canShowFragment()) return;
+        if (isDialogShowing()) return;
 
         NavDirections action =
                 DiaryShowFragmentDirections.
