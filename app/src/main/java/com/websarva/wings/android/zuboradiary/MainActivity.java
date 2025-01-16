@@ -76,9 +76,6 @@ public class MainActivity extends AppCompatActivity {
     private FusedLocationProviderClient fusedLocationProviderClient;
     private LocationRequest locationRequest;
 
-    // Dialog用ThemeColor
-    private ThemeColor dialogThemeColor = ThemeColor.WHITE;
-
     // ギャラリーから画像取得
     private final ActivityResultLauncher<String[]> openDocumentResultLauncher =
             registerForActivityResult(
