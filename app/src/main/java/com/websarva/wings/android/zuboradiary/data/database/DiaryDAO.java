@@ -75,6 +75,7 @@ public interface DiaryDAO {
             "ORDER BY date DESC LIMIT :num OFFSET :offset")
     ListenableFuture<List<WordSearchResultListItem>> selectWordSearchResultListOrderByDateDesc(int num, int offset, String word);
 
+    /** @noinspection UnusedReturnValue*/
     @Insert (onConflict = OnConflictStrategy.REPLACE)
     ListenableFuture<Long> insertDiary(DiaryEntity diaryEntity);
 

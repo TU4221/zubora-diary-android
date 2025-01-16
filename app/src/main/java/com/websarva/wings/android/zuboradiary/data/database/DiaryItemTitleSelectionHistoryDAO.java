@@ -31,6 +31,7 @@ public interface DiaryItemTitleSelectionHistoryDAO {
     @Query(query)
     ListenableFuture<Integer> deleteOldHistoryItem();
 
+    /** @noinspection UnusedReturnValue*/
     @Query("DELETE FROM diary_item_title_selection_history")
     ListenableFuture<Void> deleteAllItem();
 }
