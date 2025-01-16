@@ -190,8 +190,6 @@ public class MainActivity extends AppCompatActivity {
     private void switchThemeColor(ThemeColor themeColor) {
         Objects.requireNonNull(themeColor);
 
-        dialogThemeColor = themeColor;
-
         ThemeColorSwitcher switcher =
                 new ThemeColorSwitcher(getApplicationContext(), themeColor);
         switcher.switchStatusBarColor(getWindow());
