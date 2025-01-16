@@ -8,7 +8,7 @@ import java.time.LocalDate;
 
 // TODO:最終的に削除
 public class TestDiariesSaver {
-    DiaryEditViewModel diaryEditViewModel;
+    private final DiaryEditViewModel diaryEditViewModel;
 
     public TestDiariesSaver(DiaryEditViewModel diaryEditViewModel) {
         this.diaryEditViewModel = diaryEditViewModel;

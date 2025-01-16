@@ -162,7 +162,7 @@ public abstract class DiaryYearMonthListBaseAdapter extends ListAdapter<DiaryYea
     }
 
     public static final class DiaryYearMonthListViewHolder extends RecyclerView.ViewHolder {
-        public RowDiaryYearMonthListBinding binding;
+        public final RowDiaryYearMonthListBinding binding;
 
         public DiaryYearMonthListViewHolder(RowDiaryYearMonthListBinding binding) {
             super(binding.getRoot());

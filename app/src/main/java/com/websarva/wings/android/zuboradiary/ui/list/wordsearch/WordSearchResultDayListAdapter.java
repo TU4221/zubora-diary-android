@@ -87,7 +87,7 @@ public class WordSearchResultDayListAdapter extends DiaryDayListBaseAdapter {
 
     public static class WordSearchResultDayViewHolder extends RecyclerView.ViewHolder {
 
-        public RowWordSearchResultListBinding binding;
+        public final RowWordSearchResultListBinding binding;
 
         public WordSearchResultDayViewHolder(RowWordSearchResultListBinding binding) {
             super(binding.getRoot());

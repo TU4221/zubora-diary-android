@@ -108,7 +108,7 @@ class ItemTitleSelectionHistoryListAdapter
 
     static class ItemTitleSelectionHistoryViewHolder
             extends LeftSwipeSimpleCallback.LeftSwipeViewHolder {
-        public RowItemTitleSelectionHistoryBinding binding;
+        public final RowItemTitleSelectionHistoryBinding binding;
 
         ItemTitleSelectionHistoryViewHolder(RowItemTitleSelectionHistoryBinding binding) {
             super(binding);

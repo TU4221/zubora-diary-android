@@ -273,7 +273,7 @@ public abstract class BaseFragment extends CustomFragment {
 
     protected final class AppMessageBufferListObserver implements Observer<AppMessageList> {
 
-        BaseViewModel baseViewModel;
+        private final BaseViewModel baseViewModel;
 
         public AppMessageBufferListObserver(BaseViewModel baseViewModel) {
             Objects.requireNonNull(baseViewModel);

@@ -105,7 +105,7 @@ public class DiaryListViewModel extends BaseViewModel {
 
     private class DiaryListLoadingRunnable implements Runnable {
 
-        DiaryListCreator diaryListCreator;
+        private final DiaryListCreator diaryListCreator;
 
         DiaryListLoadingRunnable(DiaryListCreator diaryListCreator) {
             this.diaryListCreator = diaryListCreator;
