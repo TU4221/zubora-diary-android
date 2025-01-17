@@ -349,15 +349,12 @@ public class DiaryEditFragment extends BaseFragment {
     private void setUpDateInputField() {
         binding.textInputEditTextDate.setInputType(EditorInfo.TYPE_NULL); //キーボード非表示設定
 
-        binding.textInputEditTextDate.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Objects.requireNonNull(v);
+        binding.textInputEditTextDate.setOnClickListener(v -> {
+            Objects.requireNonNull(v);
 
-                LocalDate date = diaryEditViewModel.getDateLiveData().getValue();
-                Objects.requireNonNull(date);
-                showDatePickerDialog(date);
-            }
+            LocalDate date = diaryEditViewModel.getDateLiveData().getValue();
+            Objects.requireNonNull(date);
+            showDatePickerDialog(date);
         });
 
         diaryEditViewModel.getDateLiveData().observe(getViewLifecycleOwner(), new DateObserver());
