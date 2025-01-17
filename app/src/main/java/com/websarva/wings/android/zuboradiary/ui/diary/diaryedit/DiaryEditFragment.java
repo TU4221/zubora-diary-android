@@ -418,7 +418,7 @@ public class DiaryEditFragment extends BaseFragment {
 
         binding.autoCompleteTextWeather1.setOnItemClickListener((parent, view, position, id) -> {
             Objects.requireNonNull(parent);
-            Objects.requireNonNull(view);
+            requireView();
 
             ListAdapter listAdapter = binding.autoCompleteTextWeather1.getAdapter();
             Objects.requireNonNull(listAdapter);
@@ -453,7 +453,7 @@ public class DiaryEditFragment extends BaseFragment {
 
         binding.autoCompleteTextWeather2.setOnItemClickListener((parent, view, position, id) -> {
             Objects.requireNonNull(parent);
-            Objects.requireNonNull(view);
+            requireView();
 
             ListAdapter listAdapter = binding.autoCompleteTextWeather2.getAdapter();
             ArrayAdapter<?> arrayAdapter = (ArrayAdapter<?>) listAdapter;
@@ -501,7 +501,7 @@ public class DiaryEditFragment extends BaseFragment {
         binding.autoCompleteTextCondition.setAdapter(conditionArrayAdapter);
         binding.autoCompleteTextCondition.setOnItemClickListener((parent, view, position, id) -> {
             Objects.requireNonNull(parent);
-            Objects.requireNonNull(view);
+            requireView();
 
             ListAdapter listAdapter = binding.autoCompleteTextCondition.getAdapter();
             ArrayAdapter<?> arrayAdapter = (ArrayAdapter<?>) listAdapter;
