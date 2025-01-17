@@ -80,19 +80,19 @@ dependencies {
 
     implementation("androidx.appcompat:appcompat:1.7.0")
     implementation("com.google.android.material:material:1.12.0")
-    implementation("androidx.constraintlayout:constraintlayout:2.1.4")
-    implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.8.4")
-    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.4")
-    implementation("androidx.navigation:navigation-fragment:2.7.7")
-    implementation("androidx.navigation:navigation-ui:2.7.7")
-    implementation("androidx.navigation:navigation-fragment-ktx:2.7.7")
-    implementation("androidx.navigation:navigation-ui-ktx:2.7.7")
+    implementation("androidx.constraintlayout:constraintlayout:2.2.0")
+    implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.8.7")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.7")
+    implementation("androidx.navigation:navigation-fragment:2.8.5")
+    implementation("androidx.navigation:navigation-ui:2.8.5")
+    implementation("androidx.navigation:navigation-fragment-ktx:2.8.5")
+    implementation("androidx.navigation:navigation-ui-ktx:2.8.5")
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.2.1")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.6.1")
 
     // Material3追加
-    implementation("androidx.compose.material3:material3:1.3.0")
+    implementation("androidx.compose.material3:material3:1.3.1")
 
 
     // 下記は公式より
@@ -126,7 +126,7 @@ dependencies {
 
 
     // kizitonwose/Calendar 追加設定
-    val desugar_version = "2.0.4"
+    val desugar_version = "2.1.4"
     val calendar_version = "2.5.0"
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:$desugar_version")
     // The view calendar library
@@ -137,11 +137,11 @@ dependencies {
 
     // Preference,PreferencesDataStore 追加
     implementation("androidx.preference:preference:1.2.1")
-    implementation("androidx.datastore:datastore-preferences:1.1.1")
+    implementation("androidx.datastore:datastore-preferences:1.1.2")
     // optional - RxJava2 support
-    implementation("androidx.datastore:datastore-preferences-rxjava2:1.1.1")
+    implementation("androidx.datastore:datastore-preferences-rxjava2:1.1.2")
     // optional - RxJava3 support
-    implementation("androidx.datastore:datastore-preferences-rxjava3:1.1.1")
+    implementation("androidx.datastore:datastore-preferences-rxjava3:1.1.2")
 
     // WorkerManager 追加
     val work_version = "2.9.0"
@@ -169,7 +169,7 @@ dependencies {
 
     // ライフサイクル管理 追加
     // TODO:kotlinとJavaで切り換えること
-    val lifecycle_version = "2.8.4"
+    val lifecycle_version = "2.8.7"
     val arch_version = "2.2.0"
     // kotlin
     /*
