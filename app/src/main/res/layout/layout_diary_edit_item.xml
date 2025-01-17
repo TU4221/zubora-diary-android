@@ -76,7 +76,7 @@
                 app:counterEnabled="true"
                 app:counterMaxLength="@integer/layout_diary_edit_item_title_max_length">
 
-                <com.google.android.material.textfield.TextInputEditText
+                <com.websarva.wings.android.zuboradiary.ui.diary.diaryedit.CustomTextInputEditText
                     style="@style/AppTextInputEditTextNoInputStyle"
                     android:id="@+id/textInputEditText_title"
                     android:layout_width="match_parent"

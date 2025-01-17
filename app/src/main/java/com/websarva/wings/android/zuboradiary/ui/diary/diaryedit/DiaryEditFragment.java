@@ -348,16 +348,15 @@ public class DiaryEditFragment extends BaseFragment {
     // 日付入力欄設定
     private void setUpDateInputField() {
         binding.textInputEditTextDate.setInputType(EditorInfo.TYPE_NULL); //キーボード非表示設定
-        binding.textInputEditTextDate.setOnTouchListener((v, event) -> {
-            Objects.requireNonNull(v);
-            Objects.requireNonNull(event);
-            if (event.getAction() != MotionEvent.ACTION_UP) return false;
 
-            hideKeyboard(v);
-            LocalDate date = diaryEditViewModel.getDateLiveData().getValue();
-            Objects.requireNonNull(date);
-            showDatePickerDialog(date);
-            return false;
+        binding.textInputEditTextDate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                hideKeyboard(v);
+                LocalDate date = diaryEditViewModel.getDateLiveData().getValue();
+                Objects.requireNonNull(date);
+                showDatePickerDialog(date);
+            }
         });
 
         diaryEditViewModel.getDateLiveData().observe(getViewLifecycleOwner(), new DateObserver());
@@ -581,18 +580,15 @@ public class DiaryEditFragment extends BaseFragment {
             ItemNumber inputItemNumber =  new ItemNumber(i);
             int ItemArrayNumber = i - 1;
             textInputEditTextItemsTitle[ItemArrayNumber].setInputType(EditorInfo.TYPE_NULL); //キーボード非表示設定
-            textInputEditTextItemsTitle[ItemArrayNumber].setOnTouchListener((v, event) -> {
+
+            textInputEditTextItemsTitle[ItemArrayNumber].setOnClickListener(v -> {
                 Objects.requireNonNull(v);
-                Objects.requireNonNull(event);
-                if (event.getAction() != MotionEvent.ACTION_UP) return false;
 
                 hideKeyboard(v);
-
                 // 項目タイトル入力フラグメント起動
                 String inputItemTitle =
                         diaryEditViewModel.getItemTitleLiveData(inputItemNumber).getValue();
                 showDiaryItemTitleEditFragment(inputItemNumber, inputItemTitle);
-                return false;
             });
         }
 
