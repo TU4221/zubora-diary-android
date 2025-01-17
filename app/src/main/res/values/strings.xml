@@ -26,6 +26,7 @@
 
     <!-- fragment_word_search -->
     <string name="fragment_word_search_input_field_hint">検索ワード入力</string>
+    <string name="fragment_word_search_input_field_clear">検索ワードクリア</string>
     <string name="fragment_word_search_no_results_message">一致するものが見つかりません。</string>
     <string name="fragment_word_search_num_results_message">件見つかりました。</string>
     <string name="fragment_word_search_result_item">項目</string>
@@ -171,6 +172,7 @@
     <string name="fragment_diary_edit_item_3">項目3</string>
     <string name="fragment_diary_edit_item_4">項目4</string>
     <string name="fragment_diary_edit_item_5">項目5</string>
+    <string name="fragment_diary_edit_item_addition">項目追加</string>
     <string name="fragment_diary_edit_attached_picture">思い出の一枚</string>
     <string name="fragment_diary_edit_attached_picture_delete">削除</string>
     <string name="fragment_diary_edit_attached_picture_attachment">添付</string>

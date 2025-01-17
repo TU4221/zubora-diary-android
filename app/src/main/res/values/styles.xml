@@ -173,7 +173,6 @@
     <style name="WordSearchTextViewStyle" parent="AppTextViewStyle">
         <!-- HACK:"android:textColorHint"はTextAppearanceでは反映されない為、Styleに記述 -->
         <item name="android:textColorHint">@color/hint_text_color_on_secondary_container</item>
-        <item name="android:hint">@string/fragment_word_search_input_field_hint</item>
         <item name="android:inputType">text</item>
         <item name="android:background">@null</item>
     </style>
