@@ -222,8 +222,10 @@ public class MainActivity extends AppCompatActivity {
         // Navigation設定
         // 参考:https://inside.luchegroup.com/entry/2023/05/08/113236
         BottomNavigationView bottomNavigationView = binding.bottomNavigation;
-        NavController navController =
-                Navigation.findNavController(this, R.id.fragment_nav_host);
+        NavHostFragment navHostFragment =
+                (NavHostFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_nav_host);
+        Objects.requireNonNull(navHostFragment);
+        NavController navController = navHostFragment.getNavController();
         NavigationUI.setupWithNavController(bottomNavigationView, navController);
 
         // ボトムナビゲーションのデフォルト選択アイテム情報取得
