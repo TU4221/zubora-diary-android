@@ -241,12 +241,12 @@ public class WordSearchViewModel extends BaseViewModel {
 
         if (loadedResultList.isEmpty()) return new WordSearchResultYearMonthList();
         List<WordSearchResultDayListItem> resultDayListItemList = new ArrayList<>();
-        loadedResultList.stream().forEach(x -> {
-            resultDayListItemList.add(
-                    new WordSearchResultDayListItem(
-                            x, searchWord, spannableStringColor, spannableStringBackGroundColor)
-            );
-        });
+        loadedResultList.stream().forEach(x ->
+                resultDayListItemList.add(
+                        new WordSearchResultDayListItem(
+                                x, searchWord, spannableStringColor, spannableStringBackGroundColor)
+                )
+        );
         WordSearchResultDayList resultDayList = new WordSearchResultDayList(resultDayListItemList);
         boolean existsUnloadedDiaries = existsUnloadedDiaries(resultDayList.countDiaries());
         return new WordSearchResultYearMonthList(resultDayList, !existsUnloadedDiaries);
