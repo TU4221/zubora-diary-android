@@ -31,7 +31,7 @@
             android:layout_height="@dimen/fragment_settings_section_layout_height"
             android:textAppearance="@style/SettingsItemTextViewTextAppearance"
             android:text="@{settingTitle}"
-            android:drawableStart="@{settingIcon}"
+            app:drawableStartCompat="@{settingIcon}"
             tools:text="@string/layout_settings_item_title_tools_value"
             tools:drawableStart="@drawable/ic_settings_24px" />
 
