@@ -352,7 +352,8 @@ public class DiaryEditFragment extends BaseFragment {
         binding.textInputEditTextDate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                hideKeyboard(v);
+                Objects.requireNonNull(v);
+
                 LocalDate date = diaryEditViewModel.getDateLiveData().getValue();
                 Objects.requireNonNull(date);
                 showDatePickerDialog(date);
@@ -584,7 +585,6 @@ public class DiaryEditFragment extends BaseFragment {
             textInputEditTextItemsTitle[ItemArrayNumber].setOnClickListener(v -> {
                 Objects.requireNonNull(v);
 
-                hideKeyboard(v);
                 // 項目タイトル入力フラグメント起動
                 String inputItemTitle =
                         diaryEditViewModel.getItemTitleLiveData(inputItemNumber).getValue();
