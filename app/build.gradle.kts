@@ -209,7 +209,7 @@ dependencies {
     // Saved state module for ViewModel
     implementation("androidx.lifecycle:lifecycle-viewmodel-savedstate:$lifecycleVersion")
     // Annotation processor
-    annotationProcessor("androidx.lifecycle:lifecycle-compiler:$lifecycleVersion")
+    //annotationProcessor("androidx.lifecycle:lifecycle-compiler:$lifecycleVersion")
     // alternately - if using Java8, use the following instead of lifecycle-compiler
     implementation("androidx.lifecycle:lifecycle-common-java8:$lifecycleVersion")
     // optional - helpers for implementing LifecycleOwner in a Service
