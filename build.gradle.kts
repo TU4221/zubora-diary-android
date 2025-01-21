@@ -18,7 +18,7 @@ plugins {
 buildscript {
     dependencies {
         // Navigation SafeArgs 機能追加
-        val nav_version = "2.8.5"
-        classpath("androidx.navigation:navigation-safe-args-gradle-plugin:$nav_version")
+        val navVersion = "2.8.5"
+        classpath("androidx.navigation:navigation-safe-args-gradle-plugin:$navVersion")
     }
 }

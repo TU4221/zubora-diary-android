@@ -1,5 +1,3 @@
-import com.android.build.gradle.tasks.KSP_PROCESSORS_INDICATOR_FILE
-
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
@@ -98,41 +96,41 @@ dependencies {
     // 下記は公式より
     // kapt, ksp は公式通りプラグイン等を変更したがエラーのままで機能しなかった
     // https://developer.android.com/jetpack/androidx/releases/room#declaring_dependencies
-    val room_version = "2.6.1"
-    implementation("androidx.room:room-runtime:$room_version")
-    annotationProcessor("androidx.room:room-compiler:$room_version")
+    val roomVersion = "2.6.1"
+    implementation("androidx.room:room-runtime:$roomVersion")
+    annotationProcessor("androidx.room:room-compiler:$roomVersion")
     // To use Kotlin annotation processing tool (kapt)
-    kapt("androidx.room:room-compiler:$room_version") // kapt -> kspに置換(例外発生)
+    kapt("androidx.room:room-compiler:$roomVersion") // kapt -> kspに置換(例外発生)
     // To use Kotlin Symbol Processing (KSP)
     // ksp("androidx.room:room-compiler:$room_version")
     // optional - Kotlin Extensions and Coroutines support for Room
-    implementation("androidx.room:room-ktx:$room_version")
+    implementation("androidx.room:room-ktx:$roomVersion")
     // optional - RxJava2 support for Room
-    implementation("androidx.room:room-rxjava2:$room_version")
+    implementation("androidx.room:room-rxjava2:$roomVersion")
     // optional - RxJava3 support for Room
-    implementation("androidx.room:room-rxjava3:$room_version")
+    implementation("androidx.room:room-rxjava3:$roomVersion")
     // optional - Guava support for Room, including Optional and ListenableFuture
-    implementation("androidx.room:room-guava:$room_version")
+    implementation("androidx.room:room-guava:$roomVersion")
     // optional - Test helpers
-    testImplementation("androidx.room:room-testing:$room_version")
+    testImplementation("androidx.room:room-testing:$roomVersion")
     // optional - Paging 3 Integration
-    implementation("androidx.room:room-paging:$room_version")
+    implementation("androidx.room:room-paging:$roomVersion")
 
 
     // zennの記事より上記不足分追加
     // https://codezine.jp/article/detail/17124?p=1&anchor=0
-    annotationProcessor("androidx.room:room-compiler:$room_version")
+    annotationProcessor("androidx.room:room-compiler:$roomVersion")
     implementation("com.google.guava:guava:31.1-android")
 
 
     // kizitonwose/Calendar 追加設定
-    val desugar_version = "2.1.4"
-    val calendar_version = "2.5.0"
-    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:$desugar_version")
+    val desugarVersion = "2.1.4"
+    val calendarVersion = "2.5.0"
+    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:$desugarVersion")
     // The view calendar library
-    implementation("com.kizitonwose.calendar:view:$calendar_version")
+    implementation("com.kizitonwose.calendar:view:$calendarVersion")
     // The compose calendar library
-    implementation("com.kizitonwose.calendar:compose:$calendar_version")
+    implementation("com.kizitonwose.calendar:compose:$calendarVersion")
 
 
     // Preference,PreferencesDataStore 追加
@@ -144,19 +142,19 @@ dependencies {
     implementation("androidx.datastore:datastore-preferences-rxjava3:1.1.2")
 
     // WorkerManager 追加
-    val work_version = "2.9.0"
+    val workVersion = "2.9.0"
     // (Java only)
-    implementation("androidx.work:work-runtime:$work_version")
+    implementation("androidx.work:work-runtime:$workVersion")
     // Kotlin + coroutines
-    implementation("androidx.work:work-runtime-ktx:$work_version")
+    implementation("androidx.work:work-runtime-ktx:$workVersion")
     // optional - RxJava2 support
-    implementation("androidx.work:work-rxjava2:$work_version")
+    implementation("androidx.work:work-rxjava2:$workVersion")
     // optional - GCMNetworkManager support
-    implementation("androidx.work:work-gcm:$work_version")
+    implementation("androidx.work:work-gcm:$workVersion")
     // optional - Test helpers
-    androidTestImplementation("androidx.work:work-testing:$work_version")
+    androidTestImplementation("androidx.work:work-testing:$workVersion")
     // optional - Multiprocess support
-    implementation("androidx.work:work-multiprocess:$work_version")
+    implementation("androidx.work:work-multiprocess:$workVersion")
 
     // Retrofit 追加
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
@@ -169,8 +167,8 @@ dependencies {
 
     // ライフサイクル管理 追加
     // TODO:kotlinとJavaで切り換えること
-    val lifecycle_version = "2.8.7"
-    val arch_version = "2.2.0"
+    val lifecycleVersion = "2.8.7"
+    val archVersion = "2.2.0"
     // kotlin
     /*
     // ViewModel
@@ -203,27 +201,27 @@ dependencies {
 
     //Java
     // ViewModel
-    implementation("androidx.lifecycle:lifecycle-viewmodel:$lifecycle_version")
+    implementation("androidx.lifecycle:lifecycle-viewmodel:$lifecycleVersion")
     // LiveData
-    implementation("androidx.lifecycle:lifecycle-livedata:$lifecycle_version")
+    implementation("androidx.lifecycle:lifecycle-livedata:$lifecycleVersion")
     // Lifecycles only (without ViewModel or LiveData)
-    implementation("androidx.lifecycle:lifecycle-runtime:$lifecycle_version")
+    implementation("androidx.lifecycle:lifecycle-runtime:$lifecycleVersion")
     // Saved state module for ViewModel
-    implementation("androidx.lifecycle:lifecycle-viewmodel-savedstate:$lifecycle_version")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-savedstate:$lifecycleVersion")
     // Annotation processor
-    annotationProcessor("androidx.lifecycle:lifecycle-compiler:$lifecycle_version")
+    annotationProcessor("androidx.lifecycle:lifecycle-compiler:$lifecycleVersion")
     // alternately - if using Java8, use the following instead of lifecycle-compiler
-    implementation("androidx.lifecycle:lifecycle-common-java8:$lifecycle_version")
+    implementation("androidx.lifecycle:lifecycle-common-java8:$lifecycleVersion")
     // optional - helpers for implementing LifecycleOwner in a Service
-    implementation("androidx.lifecycle:lifecycle-service:$lifecycle_version")
+    implementation("androidx.lifecycle:lifecycle-service:$lifecycleVersion")
     // optional - ProcessLifecycleOwner provides a lifecycle for the whole application process
-    implementation("androidx.lifecycle:lifecycle-process:$lifecycle_version")
+    implementation("androidx.lifecycle:lifecycle-process:$lifecycleVersion")
     // optional - ReactiveStreams support for LiveData
-    implementation("androidx.lifecycle:lifecycle-reactivestreams:$lifecycle_version")
+    implementation("androidx.lifecycle:lifecycle-reactivestreams:$lifecycleVersion")
     // optional - Test helpers for LiveData
-    testImplementation("androidx.arch.core:core-testing:$arch_version")
+    testImplementation("androidx.arch.core:core-testing:$archVersion")
     // optional - Test helpers for Lifecycle runtime
-    testImplementation("androidx.lifecycle:lifecycle-runtime-testing:$lifecycle_version")
+    testImplementation("androidx.lifecycle:lifecycle-runtime-testing:$lifecycleVersion")
 
     // Hilt機能追加
     implementation("com.google.dagger:hilt-android:2.51.1")
