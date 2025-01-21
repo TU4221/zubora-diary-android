@@ -15,6 +15,10 @@
     <!-- All fragment common -->
     <dimen name="view_enabled_alpha">1.00</dimen>
     <dimen name="view_disabled_alpha">@dimen/disabled_alpha_material_light</dimen>
+    <dimen name="text_enabled_alpha">1.00</dimen>
+    <dimen name="text_disabled_alpha">@dimen/disabled_alpha_material_light</dimen>
+    <dimen name="hint_alpha">@dimen/hint_alpha_material_light</dimen>
+    <dimen name="hint_pressed_alpha">@dimen/hint_pressed_alpha_material_light</dimen>
 
 
     <!-- fragment_calendar -->
