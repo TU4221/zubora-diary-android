@@ -28,6 +28,6 @@ public class KeyboardInitializer {
     public void show(View focusView) {
         Objects.requireNonNull(focusView);
 
-        inputMethodManager.showSoftInput(focusView, InputMethodManager.RESULT_UNCHANGED_SHOWN);
+        inputMethodManager.showSoftInput(focusView, InputMethodManager.SHOW_IMPLICIT);
     }
 }
