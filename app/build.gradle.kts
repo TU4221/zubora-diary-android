@@ -81,8 +81,8 @@ dependencies {
     implementation("androidx.constraintlayout:constraintlayout:2.2.0")
     implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.8.7")
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.7")
-    implementation("androidx.navigation:navigation-fragment:2.8.5")
-    implementation("androidx.navigation:navigation-ui:2.8.5")
+    implementation("androidx.navigation:navigation-fragment-ktx:2.8.5")
+    implementation("androidx.navigation:navigation-ui-ktx:2.8.5")
     implementation("androidx.navigation:navigation-fragment-ktx:2.8.5")
     implementation("androidx.navigation:navigation-ui-ktx:2.8.5")
     testImplementation("junit:junit:4.13.2")
@@ -133,7 +133,7 @@ dependencies {
 
 
     // Preference,PreferencesDataStore 追加
-    implementation("androidx.preference:preference:1.2.1")
+    implementation("androidx.preference:preference-ktx:1.2.1")
     implementation("androidx.datastore:datastore-preferences:1.1.2")
     // optional - RxJava2 support
     implementation("androidx.datastore:datastore-preferences-rxjava2:1.1.2")
@@ -200,11 +200,11 @@ dependencies {
 
     //Java
     // ViewModel
-    implementation("androidx.lifecycle:lifecycle-viewmodel:$lifecycleVersion")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycleVersion")
     // LiveData
-    implementation("androidx.lifecycle:lifecycle-livedata:$lifecycleVersion")
+    implementation("androidx.lifecycle:lifecycle-livedata-ktx:$lifecycleVersion")
     // Lifecycles only (without ViewModel or LiveData)
-    implementation("androidx.lifecycle:lifecycle-runtime:$lifecycleVersion")
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:$lifecycleVersion")
     // Saved state module for ViewModel
     implementation("androidx.lifecycle:lifecycle-viewmodel-savedstate:$lifecycleVersion")
     // Annotation processor
@@ -216,7 +216,7 @@ dependencies {
     // optional - ProcessLifecycleOwner provides a lifecycle for the whole application process
     implementation("androidx.lifecycle:lifecycle-process:$lifecycleVersion")
     // optional - ReactiveStreams support for LiveData
-    implementation("androidx.lifecycle:lifecycle-reactivestreams:$lifecycleVersion")
+    implementation("androidx.lifecycle:lifecycle-reactivestreams-ktx:$lifecycleVersion")
     // optional - Test helpers for LiveData
     testImplementation("androidx.arch.core:core-testing:$archVersion")
     // optional - Test helpers for Lifecycle runtime
