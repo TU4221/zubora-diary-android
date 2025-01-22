@@ -142,7 +142,7 @@ dependencies {
     implementation("androidx.datastore:datastore-preferences-rxjava3:1.1.2")
 
     // WorkerManager 追加
-    val workVersion = "2.9.0"
+    val workVersion = "2.10.0"
     // (Java only)
     implementation("androidx.work:work-runtime:$workVersion")
     // Kotlin + coroutines
