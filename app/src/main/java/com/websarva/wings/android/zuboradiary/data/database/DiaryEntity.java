@@ -10,9 +10,9 @@ import androidx.room.PrimaryKey;
 public class DiaryEntity {
     @PrimaryKey
     @NonNull
-    private String date;
+    private String date = "";
     @NonNull
-    private String log;
+    private String log = "";
     @ColumnInfo(name = "weather_1")
     //@NonNull
     private Integer weather1;
