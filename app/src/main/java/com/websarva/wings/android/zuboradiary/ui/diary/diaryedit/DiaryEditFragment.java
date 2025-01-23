@@ -536,40 +536,22 @@ public class DiaryEditFragment extends BaseFragment {
     private void setUpItemInputField() {
         // 項目入力欄関係Viewを配列に格納
         final int MAX_ITEMS = DiaryLiveData.MAX_ITEMS;
-        TextView[] textItems = new TextView[MAX_ITEMS];
-        TextInputLayout[] textInputLayoutItemsTitle = new TextInputLayout[MAX_ITEMS];
         TextInputEditText[] textInputEditTextItemsTitle = new TextInputEditText[MAX_ITEMS];
-        TextInputEditText[] textInputEditTextItemsComment = new TextInputEditText[MAX_ITEMS];
         ImageButton[] imageButtonItemsDelete = new ImageButton[MAX_ITEMS];
 
-        textItems[0] = binding.includeItem1.textItemNumber;
-        textInputLayoutItemsTitle[0] = binding.includeItem1.textInputLayoutTitle;
         textInputEditTextItemsTitle[0] = binding.includeItem1.textInputEditTextTitle;
-        textInputEditTextItemsComment[0] = binding.includeItem1.textInputEditTextComment;
         imageButtonItemsDelete[0] = binding.includeItem1.imageButtonItemDelete;
 
-        textItems[1] = binding.includeItem2.textItemNumber;
-        textInputLayoutItemsTitle[1] = binding.includeItem2.textInputLayoutTitle;
         textInputEditTextItemsTitle[1] = binding.includeItem2.textInputEditTextTitle;
-        textInputEditTextItemsComment[1] = binding.includeItem2.textInputEditTextComment;
         imageButtonItemsDelete[1] = binding.includeItem2.imageButtonItemDelete;
 
-        textItems[2] = binding.includeItem3.textItemNumber;
-        textInputLayoutItemsTitle[2] = binding.includeItem3.textInputLayoutTitle;
         textInputEditTextItemsTitle[2] = binding.includeItem3.textInputEditTextTitle;
-        textInputEditTextItemsComment[2] = binding.includeItem3.textInputEditTextComment;
         imageButtonItemsDelete[2] = binding.includeItem3.imageButtonItemDelete;
 
-        textItems[3] = binding.includeItem4.textItemNumber;
-        textInputLayoutItemsTitle[3] = binding.includeItem4.textInputLayoutTitle;
         textInputEditTextItemsTitle[3] = binding.includeItem4.textInputEditTextTitle;
-        textInputEditTextItemsComment[3] = binding.includeItem4.textInputEditTextComment;
         imageButtonItemsDelete[3] = binding.includeItem4.imageButtonItemDelete;
 
-        textItems[4] = binding.includeItem5.textItemNumber;
-        textInputLayoutItemsTitle[4] = binding.includeItem5.textInputLayoutTitle;
         textInputEditTextItemsTitle[4] = binding.includeItem5.textInputEditTextTitle;
-        textInputEditTextItemsComment[4] = binding.includeItem5.textInputEditTextComment;
         imageButtonItemsDelete[4] = binding.includeItem5.imageButtonItemDelete;
 
         // 項目欄設定
