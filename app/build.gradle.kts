@@ -152,7 +152,7 @@ dependencies {
     implementation("androidx.work:work-gcm:$workVersion")
     // optional - Test helpers
     androidTestImplementation("androidx.work:work-testing:$workVersion")
-    // optional - Multiprocess support
+    // optional - Multi process support
     implementation("androidx.work:work-multiprocess:$workVersion")
 
     // Retrofit 追加
