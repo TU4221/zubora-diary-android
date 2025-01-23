@@ -216,7 +216,6 @@
     <string name="fragment_diary_item_title_edit_toolbar_title_tools_value">項目1タイトル編集中</string>
     <string name="fragment_diary_item_title_edit_new_item_title">新規項目タイトル</string>
     <string name="fragment_diary_item_title_edit_new_item_title_hint">未入力</string>
-    <string name="fragment_diary_item_title_edit_num_of_char_tools_value">0/0</string>
     <string name="fragment_diary_item_title_edit_new_item_title_selection_button">新規選択</string>
     <string name="fragment_diary_item_title_edit_title_selection_history">選択履歴</string>
 
