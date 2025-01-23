@@ -291,17 +291,25 @@
 
                     </LinearLayout>
 
-                    <ImageView
-                        style="@style/AppImageViewStyle"
-                        android:id="@+id/image_attached_picture"
+                    <FrameLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:scaleType="fitXY"
-                        android:background="@drawable/diary_edit_image_bg_rounded_rectangle_image"
-                        android:src="@drawable/diary_edit_image_ic_photo_library_360px"
-                        android:contentDescription="@string/fragment_diary_edit_attached_picture_attachment"
-                        tools:tint="?attr/colorOnSurfaceVariant" />
+                        android:background="@drawable/diary_edit_image_bg_rounded_rectangle_image">
+
+                        <ImageView
+                            style="@style/AppImageViewStyle"
+                            android:id="@+id/image_attached_picture"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:layout_margin="@dimen/fragment_diary_edit_picture_margin"
+                            android:minHeight="@dimen/fragment_diary_edit_picture_minHeight"
+                            android:scaleType="fitXY"
+                            android:src="@drawable/diary_edit_image_ic_photo_library_24px"
+                            android:contentDescription="@string/fragment_diary_edit_attached_picture_attachment"
+                            tools:tint="?attr/colorOnSurfaceVariant" />
+
+                    </FrameLayout>
 
                     </LinearLayout>
 

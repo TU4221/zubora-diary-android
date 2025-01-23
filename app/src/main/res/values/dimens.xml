@@ -34,6 +34,7 @@
     <dimen name="layout_diary_show_margin_top">16dp</dimen>
     <dimen name="layout_diary_show_large_margin_top">32dp</dimen>
     <dimen name="layout_diary_show_small_margin_top">4dp</dimen>
+    <dimen name="layout_diary_show_picture_minHeight">360dp</dimen>
 
 
     <!-- layout_diary_show_item -->
@@ -51,6 +52,8 @@
     <dimen name="fragment_diary_edit_margin_top">16dp</dimen>
     <dimen name="fragment_diary_edit_delete_button_layout_width">48dp</dimen>
     <dimen name="fragment_diary_edit_delete_button_layout_height">@dimen/fragment_diary_edit_delete_button_layout_width</dimen>
+    <dimen name="fragment_diary_edit_picture_margin">16dp</dimen>
+    <dimen name="fragment_diary_edit_picture_minHeight">@dimen/layout_diary_show_picture_minHeight</dimen>
 
 
     <!-- layout_diary_edit_item -->

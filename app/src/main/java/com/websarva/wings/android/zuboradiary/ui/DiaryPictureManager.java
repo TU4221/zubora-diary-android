@@ -40,11 +40,11 @@ public class DiaryPictureManager {
     }
 
     public void setUpDefaultIconOnDiary() {
-        setUpIcon(R.drawable.diary_edit_image_ic_photo_library_360px);
+        setUpIcon(R.drawable.diary_edit_image_ic_photo_library_24px);
     }
 
     private void setUpPermissionDenialIconOnDiary() {
-        setUpIcon(R.drawable.diary_image_ic_hide_image_360px);
+        setUpIcon(R.drawable.diary_image_ic_hide_image_24px);
     }
 
     public void setUpPictureOnDiaryList(Uri uri) {
