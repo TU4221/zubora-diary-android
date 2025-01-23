@@ -16,7 +16,6 @@ import android.view.ViewGroup;
 import android.widget.CompoundButton;
 
 import androidx.activity.OnBackPressedCallback;
-import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
@@ -24,7 +23,6 @@ import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.core.app.ActivityCompat;
 import androidx.databinding.ViewDataBinding;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.SavedStateHandle;
 import androidx.navigation.NavDirections;
 
@@ -41,7 +39,6 @@ import com.websarva.wings.android.zuboradiary.ui.UriPermissionManager;
 import java.time.DayOfWeek;
 import java.time.LocalTime;
 import java.util.Arrays;
-import java.util.Map;
 import java.util.Objects;
 
 import dagger.hilt.android.AndroidEntryPoint;

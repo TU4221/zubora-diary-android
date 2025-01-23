@@ -3,7 +3,6 @@ package com.websarva.wings.android.zuboradiary.ui.list.wordsearch;
 import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -22,8 +21,6 @@ import com.websarva.wings.android.zuboradiary.databinding.FragmentWordSearchBind
 import com.websarva.wings.android.zuboradiary.ui.BaseFragment;
 import com.websarva.wings.android.zuboradiary.ui.EditTextSetup;
 import com.websarva.wings.android.zuboradiary.ui.KeyboardInitializer;
-import com.websarva.wings.android.zuboradiary.ui.list.DiaryDayListBaseItem;
-import com.websarva.wings.android.zuboradiary.ui.list.DiaryYearMonthListBaseAdapter;
 import com.websarva.wings.android.zuboradiary.ui.list.DiaryYearMonthListBaseItem;
 
 import java.time.LocalDate;

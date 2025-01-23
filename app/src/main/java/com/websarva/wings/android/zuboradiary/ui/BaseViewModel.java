@@ -1,7 +1,6 @@
 package com.websarva.wings.android.zuboradiary.ui;
 
 import android.os.Looper;
-import android.util.Log;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
