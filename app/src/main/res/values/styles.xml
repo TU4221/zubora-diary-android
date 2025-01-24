@@ -205,7 +205,7 @@
         <item name="android:paddingBottom">@dimen/fragment_settings_item_padding_vertical</item>
     </style>
     <style name="SettingsItemBaseTextViewTextAppearance" parent="AppTextViewTextAppearance">
-        <item name="android:textSize">@dimen/fragment_settings_section_text_size</item>
+        <item name="android:textSize">@dimen/fragment_settings_text_size</item>
     </style>
 
 
@@ -236,9 +236,7 @@
         <item name="android:gravity">center_vertical|end</item>
         <item name="android:hint">@string/fragment_settings_item_value_not_set</item>
     </style>
-    <style name="SettingsItemValueTextViewTextAppearance" parent="AppTextViewTextAppearance">
-        <item name="android:textSize">@dimen/fragment_settings_item_value_text_size</item>
-    </style>
+    <style name="SettingsItemValueTextViewTextAppearance" parent="SettingsItemBaseTextViewTextAppearance"/>
 
 
     <!-- SettingsItemValueSwitch -->

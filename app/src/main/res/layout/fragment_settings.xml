@@ -54,7 +54,8 @@
                             style="@style/SettingsSectionTextViewStyle"
                             android:id="@+id/text_settings_section_design"
                             android:layout_width="match_parent"
-                            android:layout_height="@dimen/fragment_settings_section_layout_height"
+                            android:layout_height="wrap_content"
+                            android:minHeight="@dimen/fragment_settings_section_layout_min_height"
                             android:textAppearance="@style/SettingsSectionTextViewTextAppearance"
                             android:text="@string/fragment_settings_section_title_design"/>
 
@@ -85,7 +86,8 @@
                             style="@style/SettingsSectionTextViewStyle"
                             android:id="@+id/text_settings_section_setting"
                             android:layout_width="match_parent"
-                            android:layout_height="@dimen/fragment_settings_section_layout_height"
+                            android:layout_height="wrap_content"
+                            android:minHeight="@dimen/fragment_settings_section_layout_min_height"
                             android:textAppearance="@style/SettingsSectionTextViewTextAppearance"
                             android:text="@string/fragment_settings_section_title_setting" />
 
@@ -155,7 +157,8 @@
                             style="@style/SettingsSectionTextViewStyle"
                             android:id="@+id/text_settings_section_data"
                             android:layout_width="match_parent"
-                            android:layout_height="@dimen/fragment_settings_section_layout_height"
+                            android:layout_height="wrap_content"
+                            android:minHeight="@dimen/fragment_settings_section_layout_min_height"
                             android:textAppearance="@style/SettingsSectionTextViewTextAppearance"
                             android:text="@string/fragment_settings_section_title_data"/>
 
@@ -208,7 +211,8 @@
                             style="@style/SettingsSectionTextViewStyle"
                             android:id="@+id/text_settings_section_end"
                             android:layout_width="match_parent"
-                            android:layout_height="@dimen/fragment_settings_section_layout_height"
+                            android:layout_height="wrap_content"
+                            android:minHeight="@dimen/fragment_settings_section_layout_min_height"
                             android:textAppearance="@style/SettingsSectionTextViewTextAppearance" />
 
                     </LinearLayout>

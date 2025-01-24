@@ -30,7 +30,8 @@
 
     <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:minHeight="@dimen/fragment_settings_section_layout_min_height" >
 
         <!-- HACK:警告で"android:drawableStart"から"app:drawableStartCompat"に変更するように促されるが、
                   "app:drawableStartCompat"はリソースしか受け付けない為、"android:drawableStart"を使用
@@ -40,7 +41,8 @@
             style="@style/SettingsItemTextViewStyle"
             android:id="@+id/text_title"
             android:layout_width="match_parent"
-            android:layout_height="@dimen/fragment_settings_section_layout_height"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
             android:textAppearance="@style/SettingsItemTextViewTextAppearance"
             android:text="@{settingTitle}"
             app:drawableStartCompat="@{settingIcon}"
@@ -57,8 +59,8 @@
                 style="@style/SettingsItemValueTextViewStyle"
                 android:id="@+id/text_value"
                 android:layout_width="match_parent"
-                android:layout_height="@dimen/fragment_settings_item_layout_height"
-                android:layout_gravity="end|center_vertical"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end"
                 android:textAppearance="@style/SettingsItemValueTextViewTextAppearance"
                 android:text="@{settingValue}"
                 android:paddingStart="0dp"
