@@ -3,9 +3,10 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:minHeight="@dimen/row_diary_day_list_height">
+    android:layout_height="wrap_content">
 
+    <!-- MEMO:親タグのFrameLayoutにpadding属性を設定するのではなく、子タグにmargin属性を設定する理由は、
+              スワイプ時にViewの端が途切れずに画面外に出てくような動きを表現するため。 -->
     <include
         layout="@layout/row_background_delete_button"
         android:id="@+id/include_background"
@@ -21,6 +22,7 @@
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="@dimen/row_diary_day_list_layout_margin_horizontal_between_items"
         android:layout_marginTop="@dimen/row_diary_day_list_layout_margin_vertical_between_items"
+        android:minHeight="@dimen/row_diary_day_list_height"
         android:orientation="horizontal"
         android:padding="8dp">
 
@@ -28,15 +30,16 @@
             layout="@layout/layout_diary_list_item_day"
             android:id="@+id/include_day"
             android:layout_width="0dp"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:layout_weight="1"/>
 
         <TextView
             style="@style/DiaryDayListTextViewStyle"
             android:id="@+id/text_title"
             android:layout_width="0dp"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:layout_weight="2"
+            android:layout_gravity="center_vertical"
             android:gravity="center_vertical"
             android:hint="@string/row_diary_day_list_title_hint"
             android:textAppearance="@style/DiaryListDayTextAppearance"
@@ -48,6 +51,8 @@
             android:layout_width="0dp"
             android:layout_height="@dimen/row_diary_day_list_image_height"
             android:layout_weight="1"
+            android:layout_gravity="center_vertical"
+            android:foregroundGravity="center_vertical"
             android:scaleType="fitXY"
             android:contentDescription="@string/row_diary_day_list_picture_description"
             android:src="@drawable/ic_image_24px"
