@@ -49,6 +49,7 @@
                         android:layout_width="250dp"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
+                        android:minHeight="48dp"
                         android:autofillHints="false"
                         android:paddingVertical="8dp"
                         android:paddingHorizontal="16dp"
@@ -60,8 +61,8 @@
                     <ImageButton
                         style="@style/WordSearchImageButtonStyle"
                         android:id="@+id/image_button_search_word_clear"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
                         android:layout_gravity="center_vertical|end"
                         android:layout_marginHorizontal="8dp"
                         android:contentDescription="@string/fragment_word_search_input_field_clear" />
