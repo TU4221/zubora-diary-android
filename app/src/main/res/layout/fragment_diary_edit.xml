@@ -206,16 +206,22 @@
                             app:counterEnabled="true"
                             app:counterMaxLength="@integer/fragment_diary_edit_title_max_length">
 
+                            <!-- MEMO:日記タイトル入力欄と項目1タイトル入力欄のTextInputLayoutのhint属性が同じ文字列の為、
+                                      警告"Duplicate speakable text present"が発生。
+                                      この警告に対応すると項目1～5のタイトル、コメント入力欄のTextInputLayoutの
+                                      hint属性も変更する必要がある為、警告を無視することにした。
+                                      (項目1～5のタイトル、コメント入力欄はincludeタグで複製している為、警告は表示されない)-->
                             <com.google.android.material.textfield.TextInputEditText
-                                style="@style/AppTextInputEditTextStyle"
                                 android:id="@+id/text_input_edit_text_title"
+                                style="@style/AppTextInputEditTextStyle"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:hint="@string/fragment_diary_edit_title_hint"
                                 android:maxLength="@integer/fragment_diary_edit_title_max_length"
                                 android:text="@={diaryEditViewModel.titleMutableLiveData}"
                                 android:textAppearance="@style/AppTextInputEditTextTextAppearance"
-                                android:textSize="@dimen/fragment_diary_edit_text_size" />
+                                android:textSize="@dimen/fragment_diary_edit_text_size"
+                                tools:ignore="DuplicateSpeakableTextCheck" />
 
                         </com.google.android.material.textfield.TextInputLayout>
 
