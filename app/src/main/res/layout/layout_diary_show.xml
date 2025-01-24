@@ -10,7 +10,8 @@
             type="com.websarva.wings.android.zuboradiary.ui.diary.diaryshow.DiaryShowViewModel" />
     </data>
 
-    <!-- MEMO:FloatingActionButtonと重ならないようにpaddingBottomで調整 -->
+    <!-- MEMO:本レイアウトをincludeタグで参照する場合はincludeタグ使用先でスクロール機能を持たせること。 -->
+    <!-- MEMO:FloatingActionButtonと重ならないようにpaddingBottomで調整すること。 -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -148,6 +149,8 @@
             android:textAppearance="@style/AppTextViewTextAppearance"
             android:textSize="@dimen/layout_diary_show_small_text_size" />
 
+        <!-- MEMO:本レイアウトはincludeタグ使用先でスクロール機能を用意してもらう前提のため、警告"partially hidden in layout"
+                  を"tools:ignore="VisualLintBounds""で無視する。 -->
         <ImageView
             style="@style/AppImageViewStyle"
             android:id="@+id/image_attached_picture"
@@ -157,7 +160,8 @@
             android:layout_gravity="center"
             android:minHeight="@dimen/fragment_diary_edit_picture_minHeight"
             android:scaleType="fitXY"
-            android:contentDescription="@string/layout_diary_show_attached_picture_description"/>
+            android:contentDescription="@string/layout_diary_show_attached_picture_description"
+            tools:ignore="VisualLintBounds" />
 
         <TextView
             style="@style/AppTextViewStyle"
@@ -168,7 +172,8 @@
             android:layout_gravity="end"
             android:textAppearance="@style/AppTextViewTextAppearance"
             android:text="@string/layout_diary_show_last_update"
-            android:textSize="@dimen/layout_diary_show_small_text_size" />
+            android:textSize="@dimen/layout_diary_show_small_text_size"
+            tools:ignore="VisualLintBounds" />
 
         <TextView
             style="@style/AppTextViewStyle"
@@ -178,7 +183,8 @@
             android:layout_gravity="end"
             android:textAppearance="@style/AppTextViewTextAppearance"
             tools:text="@string/layout_diary_show_last_update_tools_value"
-            android:textSize="@dimen/layout_diary_show_small_text_size" />
+            android:textSize="@dimen/layout_diary_show_small_text_size"
+            tools:ignore="VisualLintBounds" />
 
     </LinearLayout>
 
