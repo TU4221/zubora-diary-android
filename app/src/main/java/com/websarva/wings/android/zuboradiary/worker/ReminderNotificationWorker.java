@@ -64,7 +64,7 @@ public class ReminderNotificationWorker extends Worker {
     @Override
     public Result doWork() {
         CustomApplication application = (CustomApplication) getApplicationContext();
-        boolean isAppInForeground = application.getIsAppInForeground();
+        boolean isAppInForeground = application.isAppInForeground();
 
         if (isAppInForeground) return Result.success();
         boolean hasWriteTodayDiary;
