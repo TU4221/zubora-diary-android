@@ -1,147 +1,127 @@
-package com.websarva.wings.android.zuboradiary.ui;
+package com.websarva.wings.android.zuboradiary.ui
 
-import android.content.DialogInterface;
-import android.os.Bundle;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
+import android.content.DialogInterface
+import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.fragment.NavHostFragment
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor
+import com.websarva.wings.android.zuboradiary.ui.settings.SettingsViewModel
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.lifecycle.ViewModelProvider;
-import androidx.navigation.NavController;
-import androidx.navigation.fragment.NavHostFragment;
+abstract class BaseBottomSheetDialogFragment : BottomSheetDialogFragment() {
 
-import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
-import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor;
-import com.websarva.wings.android.zuboradiary.ui.settings.SettingsViewModel;
+    protected lateinit var settingsViewModel: SettingsViewModel
 
-import java.util.Objects;
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        super.onCreateView(inflater, container, savedInstanceState)
 
-public abstract class BaseBottomSheetDialogFragment extends BottomSheetDialogFragment {
+        setUpDialogCancelFunction()
 
-    protected SettingsViewModel settingsViewModel;
+        settingsViewModel = createSettingsViewModel()
 
-    @Override
-    public View onCreateView(
-            @NonNull LayoutInflater inflater,
-            @Nullable ViewGroup container,
-            @Nullable Bundle savedInstanceState) {
-        super.onCreateView(inflater, container, savedInstanceState);
-
-        setUpDialogCancelFunction();
-
-        settingsViewModel = createSettingsViewModel();
-
-        LayoutInflater themeColorInflater = createThemeColorInflater(inflater, requireThemeColor());
-        return createDialogView(themeColorInflater, container, savedInstanceState);
+        val themeColorInflater = createThemeColorInflater(inflater, requireThemeColor())
+        return createDialogView(themeColorInflater, container, savedInstanceState)
     }
 
-    private void setUpDialogCancelFunction() {
+    private fun setUpDialogCancelFunction() {
         // MEMO:下記機能を無効にするにはDialogFragment#setCancelableを設定する必要あり。
         //      ・UIに表示されているダイアログ外の部分をタッチしてダイアログを閉じる(キャンセル)
         //      ・端末の戻るボタンでダイアログを閉じる(キャンセルする)
-        if (!isCancelableOtherThanPressingButton()) this.setCancelable(false);
+        if (!isCancelableOtherThanPressingButton) this.isCancelable = false
     }
 
     /**
      * 戻り値をtrueにすると、ダイアログ枠外、戻るボタンタッチ時にダイアログをキャンセルすることを可能にする。
      * BaseBottomSheetDialogFragment#setUpDialogCancelFunction()で呼び出される。
      *
-     * @noinspection SameReturnValue*/
-    protected abstract boolean isCancelableOtherThanPressingButton();
+     * @noinspection SameReturnValue
+     */
+    protected abstract val isCancelableOtherThanPressingButton: Boolean
 
-    @NonNull
-    private SettingsViewModel createSettingsViewModel() {
-        ViewModelProvider provider = new ViewModelProvider(requireActivity());
-        SettingsViewModel settingsViewModel = provider.get(SettingsViewModel.class);
-        return Objects.requireNonNull(settingsViewModel);
+    private fun createSettingsViewModel(): SettingsViewModel {
+        val provider = ViewModelProvider(requireActivity())
+        return provider[SettingsViewModel::class.java]
     }
 
-    @NonNull
-    protected final ThemeColor requireThemeColor() {
-        return settingsViewModel.loadThemeColorSettingValue();
+    protected fun requireThemeColor(): ThemeColor {
+        return settingsViewModel.loadThemeColorSettingValue()
     }
 
     // ThemeColorに合わせたインフレーター作成
-    @NonNull
-    protected final LayoutInflater createThemeColorInflater(LayoutInflater inflater, ThemeColor themeColor) {
-        Objects.requireNonNull(inflater);
-        Objects.requireNonNull(themeColor);
-
-        ThemeColorInflaterCreator creator =
-                new ThemeColorInflaterCreator(requireContext(), inflater, themeColor);
-        return creator.create();
+    private fun createThemeColorInflater(
+        inflater: LayoutInflater,
+        themeColor: ThemeColor
+    ): LayoutInflater {
+        val creator = ThemeColorInflaterCreator(requireContext(), inflater, themeColor)
+        return creator.create()
     }
 
     /**
      * 戻り値をtrueにすると、ダイアログ枠外、戻るボタンタッチ時にダイアログをキャンセルすることを可能にする。
      * BaseBottomSheetDialogFragment#onCreateView()で呼び出される。
-     * */
-    protected abstract View createDialogView(
-            @NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState);
+     */
+    protected abstract fun createDialogView(
+        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
+    ): View?
 
-    protected final class PositiveButtonClickListener implements View.OnClickListener {
-
-        @Override
-        public void onClick(View v) {
-            Objects.requireNonNull(v);
-
-            handleOnPositiveButtonClick(v);
-            closeDialog();
+    protected inner class PositiveButtonClickListener : View.OnClickListener {
+        override fun onClick(v: View) {
+            handleOnPositiveButtonClick(v)
+            closeDialog()
         }
     }
 
-    protected final class NegativeButtonClickListener implements View.OnClickListener {
-
-        @Override
-        public void onClick(View v) {
-            Objects.requireNonNull(v);
-
-            handleOnNegativeButtonClick(v);
-            closeDialog();
+    protected inner class NegativeButtonClickListener : View.OnClickListener {
+        override fun onClick(v: View) {
+            handleOnNegativeButtonClick(v)
+            closeDialog()
         }
     }
 
-    private void closeDialog() {
-        NavController navController = NavHostFragment.findNavController(this);
-        navController.navigateUp();
+    private fun closeDialog() {
+        val navController = NavHostFragment.findNavController(this)
+        navController.navigateUp()
     }
 
     /**
      * BaseBottomSheetDialogFragment.PositiveButtonClickListener#onClick()で呼び出される。
-     * */
-    protected abstract void handleOnPositiveButtonClick(@NonNull View v);
+     */
+    protected abstract fun handleOnPositiveButtonClick(v: View)
 
     /**
      * BaseBottomSheetDialogFragment.NegativeButtonClickListener#onClick()で呼び出される。
-     * */
-    protected abstract void handleOnNegativeButtonClick(@NonNull View v);
+     */
+    protected abstract fun handleOnNegativeButtonClick(v: View)
 
     // ダイアログ枠外タッチ、popBackStack時に処理
     // MEMO:ダイアログフラグメントのCANCEL・DISMISS 処理について、
     //      このクラスのような、DialogFragmentにAlertDialogを作成する場合、
     //      CANCEL・DISMISSの処理内容はDialogFragmentのonCancel/onDismissをオーバーライドする必要がある。
     //      DialogFragment、AlertDialogのリスナセットメソッドを使用して処理内容を記述きても処理はされない。
-    @Override
-    public final void onCancel(@NonNull DialogInterface dialog) {
-        handleOnCancel(dialog);
-        super.onCancel(dialog);
+    override fun onCancel(dialog: DialogInterface) {
+        handleOnCancel(dialog)
+        super.onCancel(dialog)
     }
 
     /**
      * BaseBottomSheetDialogFragment.onCancel()で呼び出される。
-     * */
-    protected abstract void handleOnCancel(@NonNull DialogInterface dialog);
+     */
+    protected abstract fun handleOnCancel(dialog: DialogInterface)
 
-    @Override
-    public final void dismiss() {
-        handleOnDismiss();
-        super.dismiss();
+    override fun dismiss() {
+        handleOnDismiss()
+        super.dismiss()
     }
 
     /**
      * BaseBottomSheetDialogFragment.dismiss()で呼び出される。
-     * */
-    protected abstract void handleOnDismiss();
+     */
+    protected abstract fun handleOnDismiss()
 }
