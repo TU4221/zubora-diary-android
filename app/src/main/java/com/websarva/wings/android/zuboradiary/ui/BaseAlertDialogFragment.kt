@@ -17,6 +17,13 @@ abstract class BaseAlertDialogFragment : DialogFragment() {
 
     protected lateinit var settingsViewModel: SettingsViewModel
 
+    /**
+     * 戻り値をtrueにすると、ダイアログ枠外、戻るボタンタッチ時にダイアログをキャンセルすることを可能にする。
+     *
+     * @noinspection SameReturnValue
+     */
+    protected abstract val isCancelableOtherThanPressingButton: Boolean
+
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         super.onCreateDialog(savedInstanceState)
 
@@ -89,13 +96,6 @@ abstract class BaseAlertDialogFragment : DialogFragment() {
      * BaseAlertDialogFragment.customizeDialog()で呼び出される。
      */
     protected abstract fun handleOnNegativeButtonClick(dialog: DialogInterface, which: Int)
-
-    /**
-     * 戻り値をtrueにすると、ダイアログ枠外、戻るボタンタッチ時にダイアログをキャンセルすることを可能にする。
-     *
-     * @noinspection SameReturnValue
-     */
-    protected abstract val isCancelableOtherThanPressingButton: Boolean
 
     // ダイアログ枠外タッチ、popBackStack時に処理
     // MEMO:ダイアログフラグメントのCANCEL・DISMISS 処理について、
