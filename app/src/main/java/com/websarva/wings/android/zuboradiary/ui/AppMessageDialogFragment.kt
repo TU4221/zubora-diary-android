@@ -1,62 +1,41 @@
-package com.websarva.wings.android.zuboradiary.ui;
+package com.websarva.wings.android.zuboradiary.ui
 
-import android.content.DialogInterface;
+import android.content.DialogInterface
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
-import androidx.annotation.NonNull;
+class AppMessageDialogFragment : BaseAlertDialogFragment() {
 
-import com.google.android.material.dialog.MaterialAlertDialogBuilder;
-import com.websarva.wings.android.zuboradiary.data.AppMessage;
+    override val isCancelableOtherThanPressingButton: Boolean
+        get() = true
 
-import java.util.Objects;
-
-public class AppMessageDialogFragment extends BaseAlertDialogFragment {
-
-    @Override
-    protected String createTitle() {
-        AppMessage appMessage =
-                AppMessageDialogFragmentArgs.fromBundle(requireArguments()).getAppMessage();
-        Objects.requireNonNull(appMessage);
-
-        return appMessage.getDialogTitle(requireContext());
+    override fun createTitle(): String {
+        val appMessage = AppMessageDialogFragmentArgs.fromBundle(requireArguments()).appMessage
+        return appMessage.getDialogTitle(requireContext())
     }
 
-    @Override
-    protected String createMessage() {
-        AppMessage appMessage =
-                AppMessageDialogFragmentArgs.fromBundle(requireArguments()).getAppMessage();
-        Objects.requireNonNull(appMessage);
-
-        return appMessage.getDialogMessage(requireContext());
+    override fun createMessage(): String {
+        val appMessage = AppMessageDialogFragmentArgs.fromBundle(requireArguments()).appMessage
+        return appMessage.getDialogMessage(requireContext())
     }
 
-    @Override
-    protected void handleOnPositiveButtonClick(@NonNull DialogInterface dialog, int which) {
+    override fun handleOnPositiveButtonClick(dialog: DialogInterface, which: Int) {
         // 処理なし
     }
 
-    @Override
-    protected void handleOnNegativeButtonClick(@NonNull DialogInterface dialog, int which) {
+    override fun handleOnNegativeButtonClick(dialog: DialogInterface, which: Int) {
         // 処理なし
     }
 
-    @Override
-    protected boolean isCancelableOtherThanPressingButton() {
-        return true;
-    }
-
-    @Override
-    protected void handleOnCancel(@NonNull DialogInterface dialog) {
+    override fun handleOnCancel(dialog: DialogInterface) {
         // 処理なし
     }
 
-    @Override
-    protected void handleOnDismiss() {
+    override fun handleOnDismiss() {
         // 処理なし
     }
 
-    @Override
-    protected void customizeDialog(MaterialAlertDialogBuilder builder) {
-        super.customizeDialog(builder);
-        builder.setNegativeButton("", null);
+    override fun customizeDialog(builder: MaterialAlertDialogBuilder) {
+        super.customizeDialog(builder)
+        builder.setNegativeButton("", null)
     }
 }
