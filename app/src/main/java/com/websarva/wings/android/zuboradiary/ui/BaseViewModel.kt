@@ -1,70 +1,57 @@
-package com.websarva.wings.android.zuboradiary.ui;
+package com.websarva.wings.android.zuboradiary.ui
 
-import android.os.Looper;
+import android.os.Looper
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import com.websarva.wings.android.zuboradiary.data.AppMessage
+import com.websarva.wings.android.zuboradiary.data.AppMessageList
 
-import androidx.lifecycle.LiveData;
-import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.ViewModel;
+abstract class BaseViewModel : ViewModel() {
 
-import com.websarva.wings.android.zuboradiary.data.AppMessage;
-import com.websarva.wings.android.zuboradiary.data.AppMessageList;
+    private val _appMessageBufferList = MutableLiveData<AppMessageList>()
+    val appMessageBufferList: LiveData<AppMessageList>
+        get() = _appMessageBufferList
 
-import java.util.Objects;
-
-public abstract class BaseViewModel extends ViewModel {
-
-    private final MutableLiveData<AppMessageList> appMessageBufferList = new MutableLiveData<>();
-
-    public BaseViewModel() {
-        initializeAppMessageList();
+    init {
+        initializeAppMessageList()
     }
 
-    protected void initializeAppMessageList() {
-        appMessageBufferList.setValue(new AppMessageList());
+    protected fun initializeAppMessageList() {
+        _appMessageBufferList.value = AppMessageList()
     }
 
     /**
      * 本メソッドは継承先のクラス毎に処理するタイミングが異なるので、Override後、継承クラスのコンストラクタに含めること。
-     * */
-    protected abstract void initialize();
+     */
+    protected abstract fun initialize()
 
-    protected final void addAppMessage(AppMessage appMessage) {
-        Objects.requireNonNull(appMessage);
+    protected fun addAppMessage(appMessage: AppMessage) {
+        val currentList = requireNotNull(_appMessageBufferList.value)
+        val updateList = currentList.add(appMessage)
 
-        AppMessageList currentList = appMessageBufferList.getValue();
-        Objects.requireNonNull(currentList);
-        AppMessageList updateList = currentList.add(appMessage);
-
-        boolean isMainThread = (Looper.getMainLooper().getThread() == Thread.currentThread());
+        val isMainThread = (Looper.getMainLooper().thread === Thread.currentThread())
         if (isMainThread) {
-            appMessageBufferList.setValue(updateList);
+            _appMessageBufferList.setValue(updateList)
         } else {
-            appMessageBufferList.postValue(updateList);
+            _appMessageBufferList.postValue(updateList)
         }
     }
 
-    public final void triggerAppMessageBufferListObserver() {
-        AppMessageList currentList = appMessageBufferList.getValue();
-        appMessageBufferList.setValue(new AppMessageList());
-        appMessageBufferList.setValue(currentList);
+    fun triggerAppMessageBufferListObserver() {
+        val currentList = requireNotNull(_appMessageBufferList.value)
+        _appMessageBufferList.value = AppMessageList()
+        _appMessageBufferList.value = currentList
     }
 
-    public final void removeAppMessageBufferListFirstItem() {
-        AppMessageList currentList = appMessageBufferList.getValue();
-        Objects.requireNonNull(currentList);
-        AppMessageList updateList = currentList.removeFirstItem();
-        appMessageBufferList.setValue(updateList);
+    fun removeAppMessageBufferListFirstItem() {
+        val currentList = requireNotNull(_appMessageBufferList.value)
+        val updateList = currentList.removeFirstItem()
+        _appMessageBufferList.value = updateList
     }
 
-    protected final boolean equalLastAppMessage(AppMessage appMessage) {
-        Objects.requireNonNull(appMessage);
-
-        AppMessageList currentList = appMessageBufferList.getValue();
-        Objects.requireNonNull(currentList);
-        return currentList.equalLastItem(appMessage);
-    }
-
-    public final LiveData<AppMessageList> getAppMessageBufferListLiveData() {
-        return appMessageBufferList;
+    protected fun equalLastAppMessage(appMessage: AppMessage): Boolean {
+        val currentList = requireNotNull(_appMessageBufferList.value)
+        return currentList.equalLastItem(appMessage)
     }
 }

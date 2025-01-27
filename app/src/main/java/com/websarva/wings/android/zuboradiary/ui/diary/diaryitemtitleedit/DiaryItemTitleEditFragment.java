@@ -102,7 +102,7 @@ public class DiaryItemTitleEditFragment extends BaseFragment {
 
     @Override
     protected void setUpOtherAppMessageDialog() {
-        diaryItemTitleEditViewModel.getAppMessageBufferListLiveData()
+        diaryItemTitleEditViewModel.getAppMessageBufferList()
                 .observe(getViewLifecycleOwner(), new AppMessageBufferListObserver(diaryItemTitleEditViewModel));
     }
 

@@ -124,9 +124,9 @@ public class CalendarFragment extends BaseFragment {
 
     @Override
     protected void setUpOtherAppMessageDialog() {
-        calendarViewModel.getAppMessageBufferListLiveData()
+        calendarViewModel.getAppMessageBufferList()
                 .observe(getViewLifecycleOwner(), new AppMessageBufferListObserver(calendarViewModel));
-        diaryShowViewModel.getAppMessageBufferListLiveData()
+        diaryShowViewModel.getAppMessageBufferList()
                 .observe(getViewLifecycleOwner(), new AppMessageBufferListObserver(diaryShowViewModel));
     }
 

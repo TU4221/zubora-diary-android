@@ -223,7 +223,7 @@ abstract class BaseFragment : CustomFragment() {
     }
 
     private fun setUpSettingsAppMessageDialog() {
-        settingsViewModel.appMessageBufferListLiveData
+        settingsViewModel.appMessageBufferList
             .observe(viewLifecycleOwner, AppMessageBufferListObserver(settingsViewModel))
     }
 

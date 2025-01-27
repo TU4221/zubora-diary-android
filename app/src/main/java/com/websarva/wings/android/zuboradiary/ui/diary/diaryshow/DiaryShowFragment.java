@@ -127,7 +127,7 @@ public class DiaryShowFragment extends BaseFragment {
 
     @Override
     protected void setUpOtherAppMessageDialog() {
-        diaryShowViewModel.getAppMessageBufferListLiveData()
+        diaryShowViewModel.getAppMessageBufferList()
                 .observe(getViewLifecycleOwner(), new AppMessageBufferListObserver(diaryShowViewModel));
     }
 

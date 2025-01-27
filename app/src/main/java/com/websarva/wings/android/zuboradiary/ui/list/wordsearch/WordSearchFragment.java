@@ -101,7 +101,7 @@ public class WordSearchFragment extends BaseFragment {
 
     @Override
     protected void setUpOtherAppMessageDialog() {
-        wordSearchViewModel.getAppMessageBufferListLiveData()
+        wordSearchViewModel.getAppMessageBufferList()
                 .observe(getViewLifecycleOwner(), new AppMessageBufferListObserver(wordSearchViewModel));
     }
 
