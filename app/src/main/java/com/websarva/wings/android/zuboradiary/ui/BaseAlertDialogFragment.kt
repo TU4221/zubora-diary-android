@@ -1,154 +1,132 @@
-package com.websarva.wings.android.zuboradiary.ui;
+package com.websarva.wings.android.zuboradiary.ui
 
-import android.app.Dialog;
-import android.content.DialogInterface;
-import android.os.Bundle;
+import android.app.Dialog
+import android.content.DialogInterface
+import android.os.Bundle
+import androidx.appcompat.app.AlertDialog
+import androidx.fragment.app.DialogFragment
+import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.fragment.NavHostFragment
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.websarva.wings.android.zuboradiary.R
+import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor
+import com.websarva.wings.android.zuboradiary.ui.settings.SettingsViewModel
+import java.util.Objects
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AlertDialog;
-import androidx.fragment.app.DialogFragment;
-import androidx.lifecycle.SavedStateHandle;
-import androidx.lifecycle.ViewModelProvider;
-import androidx.navigation.NavBackStackEntry;
-import androidx.navigation.NavController;
-import androidx.navigation.fragment.NavHostFragment;
+abstract class BaseAlertDialogFragment : DialogFragment() {
 
-import com.google.android.material.dialog.MaterialAlertDialogBuilder;
-import com.websarva.wings.android.zuboradiary.R;
-import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor;
-import com.websarva.wings.android.zuboradiary.ui.settings.SettingsViewModel;
+    protected lateinit var settingsViewModel: SettingsViewModel
 
-import java.util.Objects;
+    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+        super.onCreateDialog(savedInstanceState)
 
-public abstract class BaseAlertDialogFragment extends DialogFragment {
+        settingsViewModel = createSettingsViewModel()
 
-    protected SettingsViewModel settingsViewModel;
+        val themeResId = requireThemeColor().alertDialogThemeResId
+        val builder = MaterialAlertDialogBuilder(requireContext(), themeResId)
 
-    @NonNull
-    @Override
-    public final Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
-        super.onCreateDialog(savedInstanceState);
+        customizeDialog(builder)
 
-        settingsViewModel = createSettingsViewModel();
+        val alertDialog = builder.create()
 
-        int themeResId = requireThemeColor().getAlertDialogThemeResId();
-        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(requireContext(), themeResId);
+        setUpDialogCancelFunction(alertDialog)
 
-        customizeDialog(builder);
-
-        AlertDialog alertDialog = builder.create();
-
-        setUpDialogCancelFunction(alertDialog);
-
-        return alertDialog;
+        return alertDialog
     }
 
-    @NonNull
-    private SettingsViewModel createSettingsViewModel() {
-        ViewModelProvider provider = new ViewModelProvider(requireActivity());
-        SettingsViewModel settingsViewModel = provider.get(SettingsViewModel.class);
-        return Objects.requireNonNull(settingsViewModel);
+    private fun createSettingsViewModel(): SettingsViewModel {
+        val provider = ViewModelProvider(requireActivity())
+        val settingsViewModel = provider[SettingsViewModel::class.java]
+        return Objects.requireNonNull(settingsViewModel)
     }
 
-    @NonNull
-    protected final ThemeColor requireThemeColor() {
-        return settingsViewModel.loadThemeColorSettingValue();
+    protected fun requireThemeColor(): ThemeColor {
+        return settingsViewModel.loadThemeColorSettingValue()
     }
 
-    protected void customizeDialog(MaterialAlertDialogBuilder builder) {
-        Objects.requireNonNull(builder);
+    protected open fun customizeDialog(builder: MaterialAlertDialogBuilder) {
+        val title = createTitle()
+        builder.setTitle(title)
 
-        String title = createTitle();
-        Objects.requireNonNull(title);
-        builder.setTitle(title);
+        val message = createMessage()
+        builder.setMessage(message)
 
-        String message = createMessage();
-        Objects.requireNonNull(message);
-        builder.setMessage(message);
+        builder.setPositiveButton(R.string.dialog_base_alert_yes) { dialog: DialogInterface, which: Int ->
+            handleOnPositiveButtonClick(dialog, which)
+        }
 
-        builder.setPositiveButton(R.string.dialog_base_alert_yes, (dialog, which) -> {
-            Objects.requireNonNull(dialog);
-            handleOnPositiveButtonClick(dialog, which);
-        });
-
-        builder.setNegativeButton(R.string.dialog_base_alert_no, (dialog, which) -> {
-            Objects.requireNonNull(dialog);
-            handleOnNegativeButtonClick(dialog, which);
-        });
+        builder.setNegativeButton(R.string.dialog_base_alert_no) { dialog: DialogInterface, which: Int ->
+            handleOnNegativeButtonClick(dialog, which)
+        }
     }
 
-    private void setUpDialogCancelFunction(AlertDialog alertDialog) {
+    private fun setUpDialogCancelFunction(alertDialog: AlertDialog) {
         // MEMO:下記機能を無効にするにはAlertDialog#setCanceledOnTouchOutside、DialogFragment#setCancelableを設定する必要あり。
         //      ・UIに表示されているダイアログ外の部分をタッチしてダイアログを閉じる(キャンセル)(AlertDialog#setCanceledOnTouchOutside)
         //      ・端末の戻るボタンでダイアログを閉じる(キャンセルする)(DialogFragment#setCancelable)
-        if (!isCancelableOtherThanPressingButton()) {
-            alertDialog.setCanceledOnTouchOutside(false);
-            this.setCancelable(false);
+        if (!isCancelableOtherThanPressingButton) {
+            alertDialog.setCanceledOnTouchOutside(false)
+            this.isCancelable = false
         }
     }
 
     /**
      * BaseAlertDialogFragment.customizeDialog()で呼び出される。
-     * */
-    protected abstract String createTitle();
+     */
+    protected abstract fun createTitle(): String
 
     /**
      * BaseAlertDialogFragment.customizeDialog()で呼び出される。
-     * */
-    protected abstract String createMessage();
+     */
+    protected abstract fun createMessage(): String
 
     /**
      * BaseAlertDialogFragment.customizeDialog()で呼び出される。
-     * */
-    protected abstract void handleOnPositiveButtonClick(@NonNull DialogInterface dialog, int which);
+     */
+    protected abstract fun handleOnPositiveButtonClick(dialog: DialogInterface, which: Int)
 
     /**
      * BaseAlertDialogFragment.customizeDialog()で呼び出される。
-     * */
-    protected abstract void handleOnNegativeButtonClick(@NonNull DialogInterface dialog, int which);
+     */
+    protected abstract fun handleOnNegativeButtonClick(dialog: DialogInterface, which: Int)
 
     /**
      * 戻り値をtrueにすると、ダイアログ枠外、戻るボタンタッチ時にダイアログをキャンセルすることを可能にする。
      *
-     * @noinspection SameReturnValue*/
-    protected abstract boolean isCancelableOtherThanPressingButton();
+     * @noinspection SameReturnValue
+     */
+    protected abstract val isCancelableOtherThanPressingButton: Boolean
 
     // ダイアログ枠外タッチ、popBackStack時に処理
     // MEMO:ダイアログフラグメントのCANCEL・DISMISS 処理について、
     //      このクラスのような、DialogFragmentにAlertDialogを作成する場合、
     //      CANCEL・DISMISSの処理内容はDialogFragmentのonCancel/onDismissをオーバーライドする必要がある。
     //      DialogFragment、AlertDialogのリスナセットメソッドを使用して処理内容を記述きても処理はされない。
-    @Override
-    public final void onCancel(@NonNull DialogInterface dialog) {
-        handleOnCancel(dialog);
-        super.onCancel(dialog);
+    override fun onCancel(dialog: DialogInterface) {
+        handleOnCancel(dialog)
+        super.onCancel(dialog)
     }
 
     /**
      * BaseAlertDialogFragment.onCancel()で呼び出される。
-     * */
-    protected abstract void handleOnCancel(@NonNull DialogInterface dialog);
+     */
+    protected abstract fun handleOnCancel(dialog: DialogInterface)
 
-    @Override
-    public final void dismiss() {
-        handleOnDismiss();
-        super.dismiss();
+    override fun dismiss() {
+        handleOnDismiss()
+        super.dismiss()
     }
 
     /**
      * BaseAlertDialogFragment.dismiss()で呼び出される。
-     * */
-    protected abstract void handleOnDismiss();
+     */
+    protected abstract fun handleOnDismiss()
 
-    protected final void setResult(String resultKey, @Nullable Object result) {
-        Objects.requireNonNull(resultKey);
+    protected fun setResult(resultKey: String, result: Any) {
+        val navController = NavHostFragment.findNavController(this)
+        val navBackStackEntry = requireNotNull(navController.previousBackStackEntry)
+        val savedStateHandle = navBackStackEntry.savedStateHandle
 
-        NavController navController = NavHostFragment.findNavController(this);
-        NavBackStackEntry navBackStackEntry = navController.getPreviousBackStackEntry();
-        Objects.requireNonNull(navBackStackEntry);
-        SavedStateHandle savedStateHandle = navBackStackEntry.getSavedStateHandle();
-
-        savedStateHandle.set(resultKey, result);
+        savedStateHandle[resultKey] = result
     }
 }
