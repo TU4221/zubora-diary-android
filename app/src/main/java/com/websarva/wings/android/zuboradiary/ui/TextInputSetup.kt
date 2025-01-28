@@ -1,124 +1,82 @@
-package com.websarva.wings.android.zuboradiary.ui;
+package com.websarva.wings.android.zuboradiary.ui
 
-import android.app.Activity;
-import android.text.Editable;
-import android.text.TextWatcher;
-import android.transition.Transition;
-import android.view.View;
-import android.widget.EditText;
+import android.app.Activity
+import android.text.Editable
+import android.text.TextWatcher
+import android.transition.Transition
+import android.view.View
+import android.widget.EditText
+import com.google.android.material.textfield.TextInputEditText
+import com.google.android.material.textfield.TextInputLayout
+import com.websarva.wings.android.zuboradiary.R
+import java.util.Arrays
 
-import androidx.annotation.NonNull;
+class TextInputSetup(activity: Activity) : EditTextSetup(activity) {
 
-import com.google.android.material.textfield.TextInputEditText;
-import com.google.android.material.textfield.TextInputLayout;
-import com.websarva.wings.android.zuboradiary.R;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
-
-public class TextInputSetup extends EditTextSetup {
-
-    public TextInputSetup(Activity activity) {
-        super(activity);
+    private fun TextInputLayout.getEditTextNonNull(): EditText {
+        return requireNotNull(editText)
     }
 
-    @NonNull
-    public EditText getTextInputEditTextNonNull(TextInputLayout textInputLayout) {
-        Objects.requireNonNull(textInputLayout);
-
-        EditText editText = textInputLayout.getEditText();
-        Objects.requireNonNull(editText);
-        return editText;
+    fun setUpScrollable(vararg textInputLayouts: TextInputLayout) {
+        Arrays.stream(textInputLayouts).forEach { x: TextInputLayout ->
+            val editText = x.getEditTextNonNull()
+            setUpScrollable(editText)
+        }
     }
 
-    public void setUpScrollable(TextInputLayout... textInputLayouts) {
-        Objects.requireNonNull(textInputLayouts);
-        Arrays.stream(textInputLayouts).forEach(Objects::requireNonNull);
-
-        Arrays.stream(textInputLayouts).forEach(x -> {
-            EditText editText = getTextInputEditTextNonNull(x);
-            setUpScrollable(editText);
-        });
-    }
-
-    public void setUpKeyboardCloseOnEnter(TextInputLayout... textInputLayouts) {
-        Objects.requireNonNull(textInputLayouts);
-        Arrays.stream(textInputLayouts).forEach(Objects::requireNonNull);
-
+    fun setUpKeyboardCloseOnEnter(vararg textInputLayouts: TextInputLayout) {
         // 入力欄エンターキー押下時の処理。
-        Arrays.stream(textInputLayouts).forEach(x -> {
-            EditText editText = getTextInputEditTextNonNull(x);
-            setUpKeyboardCloseOnEnter(editText);
-        });
+        Arrays.stream(textInputLayouts).forEach { x: TextInputLayout ->
+            val editText = x.getEditTextNonNull()
+            setUpKeyboardCloseOnEnter(editText)
+        }
     }
 
-    public void setUpFocusClearOnClickBackground(View background, TextInputLayout... textInputLayouts) {
-        Objects.requireNonNull(background);
-        Objects.requireNonNull(textInputLayouts);
-        Arrays.stream(textInputLayouts).forEach(Objects::requireNonNull);
-
-        List<EditText> editTextList = new ArrayList<>();
-        Arrays.stream(textInputLayouts).forEach(x -> {
-            EditText editText = getTextInputEditTextNonNull(x);
-            editTextList.add(editText);
-        });
-        EditText[] editTexts = editTextList.toArray(new EditText[0]);
-        setUpFocusClearOnClickBackground(background, editTexts);
+    fun setUpFocusClearOnClickBackground(background: View, vararg textInputLayouts: TextInputLayout) {
+        val editTextList: MutableList<EditText> = ArrayList()
+        Arrays.stream(textInputLayouts).forEach { x: TextInputLayout ->
+            val editText = x.getEditTextNonNull()
+            editTextList.add(editText)
+        }
+        val editTexts = editTextList.toTypedArray<EditText>()
+        setUpFocusClearOnClickBackground(background, *editTexts)
     }
 
     /**
-     * クリアボタンを設定するListenerを作成。BaseFragment#addTransitionListenerに渡すこと。<br>
-     * 上記方法をとる理由は下記不具合が発生する為。<br><br>
-     * xmlファイル、又はレイアウト前の処理コードにてTextInputLayoutのEndIconを設定した時、<br>
+     * クリアボタンを設定するListenerを作成。BaseFragment#addTransitionListenerに渡すこと。<br></br>
+     * 上記方法をとる理由は下記不具合が発生する為。<br></br><br></br>
+     * xmlファイル、又はレイアウト前の処理コードにてTextInputLayoutのEndIconを設定した時、<br></br>
      * FragmentのTransitionを処理させると、hintラベルがずれる不具合が発生。
-    * */
+     */
     // HACK:xmlファイル、又はレイアウト前のコードにてTextInputLayoutのEndIconを設定した時、FragmentのTransitionを処理させると、
     //      hintラベルがずれる不具合が発生。これはTransitionとラベルのアニメーションが干渉している事が原因らしい。
     //      対策としてTransition完了後にEndIconを設定するようにTransitionListenerを作成し対象Transitionに設定。
-    public ClearButtonSetUpTransitionListener createClearButtonSetupTransitionListener(TextInputLayout... textInputLayouts) {
-        Objects.requireNonNull(textInputLayouts);
-        Arrays.stream(textInputLayouts).forEach(Objects::requireNonNull);
+    fun createClearButtonSetupTransitionListener(
+        vararg textInputLayouts: TextInputLayout): ClearButtonSetUpTransitionListener {
 
-        return new ClearButtonSetUpTransitionListener(textInputLayouts);
+        return ClearButtonSetUpTransitionListener(*textInputLayouts)
     }
 
-    public static class ClearButtonSetUpTransitionListener implements Transition.TransitionListener {
+    class ClearButtonSetUpTransitionListener(
+        private vararg val textInputLayouts: TextInputLayout) : Transition.TransitionListener {
 
-        private final TextInputLayout[] textInputLayouts;
-
-        private ClearButtonSetUpTransitionListener(TextInputLayout... textInputLayouts) {
-            Objects.requireNonNull(textInputLayouts);
-            Arrays.stream(textInputLayouts).forEach(Objects::requireNonNull);
-
-            this.textInputLayouts = textInputLayouts;
-        }
-
-        @Override
-        public void onTransitionStart(Transition transition) {
+        override fun onTransitionStart(transition: Transition) {
             // 処理なし
         }
 
-        @Override
-        public void onTransitionEnd(Transition transition) {
-            Objects.requireNonNull(transition);
-
-            setUpClearButton(textInputLayouts);
+        override fun onTransitionEnd(transition: Transition) {
+            setUpClearButton(*textInputLayouts)
         }
 
-        @Override
-        public void onTransitionCancel(Transition transition) {
+        override fun onTransitionCancel(transition: Transition) {
             // 処理なし
         }
 
-        @Override
-        public void onTransitionPause(Transition transition) {
+        override fun onTransitionPause(transition: Transition) {
             // 処理なし
         }
 
-        @Override
-        public void onTransitionResume(Transition transition) {
+        override fun onTransitionResume(transition: Transition) {
             // 処理なし
         }
 
@@ -127,54 +85,37 @@ public class TextInputSetup extends EditTextSetup {
         //      ・コードからEditTextの文字列を設定してもクリアボタンが表示されない。
         //      ・FragmentのTransition完了後にEndIconを設定しても一度画面からEditTextのTextを編集すると、
         //        フォーカスしない限りクリアボタンが表示されなくなる。
-        private void setUpClearButton(TextInputLayout... textInputLayouts) {
-            Objects.requireNonNull(textInputLayouts);
-            Arrays.stream(textInputLayouts).forEach(Objects::requireNonNull);
+        private fun setUpClearButton(vararg textInputLayouts: TextInputLayout) {
+            Arrays.stream(textInputLayouts).forEach { x: TextInputLayout ->
+                x.endIconMode = TextInputLayout.END_ICON_CUSTOM
+                x.setEndIconDrawable(R.drawable.ic_cancel_24px)
 
-            Arrays.stream(textInputLayouts).forEach(x -> {
-                x.setEndIconMode(TextInputLayout.END_ICON_CUSTOM);
-                x.setEndIconDrawable(R.drawable.ic_cancel_24px);
+                val textInputEditText = requireNotNull(x.editText) as TextInputEditText
 
-                TextInputEditText textInputEditText = (TextInputEditText) x.getEditText();
-                Objects.requireNonNull(textInputEditText);
+                val text = requireNotNull(textInputEditText.text)
+                val isVisible = text.toString().isNotEmpty()
+                x.isEndIconVisible = isVisible
+                x.setEndIconOnClickListener {
+                    textInputEditText.setText("")
+                }
 
-                Editable text = textInputEditText.getText();
-                Objects.requireNonNull(text);
-
-                boolean isVisible = !text.toString().isEmpty();
-                x.setEndIconVisible(isVisible);
-                x.setEndIconOnClickListener(v -> {
-                    Objects.requireNonNull(v);
-
-                    textInputEditText.setText("");
-                });
-
-                ClearButtonVisibleSwitchingTextWatcher textWatcher = new ClearButtonVisibleSwitchingTextWatcher(x);
-                textInputEditText.addTextChangedListener(textWatcher);
-            });
+                val textWatcher = ClearButtonVisibleSwitchingTextWatcher(x)
+                textInputEditText.addTextChangedListener(textWatcher)
+            }
         }
 
-        private static class ClearButtonVisibleSwitchingTextWatcher implements TextWatcher {
-
-            private final TextInputLayout textInputLayout;
-
-            ClearButtonVisibleSwitchingTextWatcher(TextInputLayout textInputLayout) {
-                this.textInputLayout = textInputLayout;
-            }
-
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+        private class ClearButtonVisibleSwitchingTextWatcher(private val textInputLayout: TextInputLayout) :
+            TextWatcher {
+            override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {
                 // 処理なし
             }
 
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                boolean isVisible = !s.toString().isEmpty();
-                textInputLayout.setEndIconVisible(isVisible);
+            override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
+                val isVisible = s.toString().isNotEmpty()
+                textInputLayout.isEndIconVisible = isVisible
             }
 
-            @Override
-            public void afterTextChanged(Editable s) {
+            override fun afterTextChanged(s: Editable) {
                 // 処理なし
             }
         }
