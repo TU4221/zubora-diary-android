@@ -1,33 +1,20 @@
-package com.websarva.wings.android.zuboradiary.ui;
+package com.websarva.wings.android.zuboradiary.ui
 
-import android.app.Activity;
-import android.content.Context;
-import android.view.View;
-import android.view.inputmethod.InputMethodManager;
+import android.app.Activity
+import android.content.Context
+import android.view.View
+import android.view.inputmethod.InputMethodManager
 
-import java.util.Objects;
+class KeyboardInitializer(activity: Activity) {
+    private val inputMethodManager: InputMethodManager =
+        activity.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
 
-public class KeyboardInitializer {
-
-    private final InputMethodManager inputMethodManager;
-
-    public KeyboardInitializer(Activity activity) {
-        Objects.requireNonNull(activity);
-
-        inputMethodManager =
-                (InputMethodManager) activity.getSystemService(Context.INPUT_METHOD_SERVICE);
-    }
-
-    public void hide(View focusView) {
-        Objects.requireNonNull(focusView);
-
+    fun hide(focusView: View) {
         inputMethodManager
-                .hideSoftInputFromWindow(focusView.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
+            .hideSoftInputFromWindow(focusView.windowToken, InputMethodManager.HIDE_NOT_ALWAYS)
     }
 
-    public void show(View focusView) {
-        Objects.requireNonNull(focusView);
-
-        inputMethodManager.showSoftInput(focusView, InputMethodManager.SHOW_IMPLICIT);
+    fun show(focusView: View) {
+        inputMethodManager.showSoftInput(focusView, InputMethodManager.SHOW_IMPLICIT)
     }
 }
