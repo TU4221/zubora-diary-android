@@ -1,67 +1,49 @@
-package com.websarva.wings.android.zuboradiary.ui;
+package com.websarva.wings.android.zuboradiary.ui
 
-import android.content.ContentResolver;
-import android.content.Context;
-import android.content.Intent;
-import android.content.UriPermission;
-import android.net.Uri;
+import android.content.ContentResolver
+import android.content.Context
+import android.content.Intent
+import android.net.Uri
 
-import androidx.annotation.NonNull;
+abstract class UriPermissionManager(context: Context) {
 
-import java.util.List;
-import java.util.Objects;
+    private val resolver: ContentResolver = context.contentResolver
 
-public abstract class UriPermissionManager {
-
-    private final ContentResolver resolver;
-
-    public UriPermissionManager(Context context) {
-        Objects.requireNonNull(context);
-
-        resolver = context.getContentResolver();
-    }
-
-    public void takePersistablePermission(Uri uri){
-        Objects.requireNonNull(uri);
-
+    fun takePersistablePermission(uri: Uri) {
         try {
-            resolver.takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
-        } catch (SecurityException e) {
-        // 対処できないがアプリを落としたくない為、catchのみの処理とする。
+            resolver.takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        } catch (e: SecurityException) {
+            // 対処できないがアプリを落としたくない為、catchのみの処理とする。
         }
     }
 
     /**
      * 対象Uriが他で使用されていないかを確認するコードを記述すること。権限解放時、このメソッドが処理される。
-     * */
-    public abstract boolean checkUsedUriDoesNotExist(@NonNull Uri uri);
+     */
+    abstract fun checkUsedUriDoesNotExist(uri: Uri): Boolean
 
     // MEMO:Uri先のファイルを削除すると、登録されていたUriPermissionも同時に削除される。
-    public void releasePersistablePermission(Uri uri) {
-        Objects.requireNonNull(uri);
+    fun releasePersistablePermission(uri: Uri) {
+        val permissionList = resolver.persistedUriPermissions
+        for (uriPermission in permissionList) {
+            val permittedUri = uriPermission.uri
+            val permittedUriString = permittedUri.toString()
+            val targetUriString = uri.toString()
 
-        List<UriPermission> permissionList = resolver.getPersistedUriPermissions();
-        for (UriPermission uriPermission: permissionList) {
-            Uri permissionedUri = uriPermission.getUri();
-            Objects.requireNonNull(permissionedUri);
-            String permissionedUriString = permissionedUri.toString();
-            String targetUriString = uri.toString();
+            if (permittedUriString == targetUriString) {
+                if (!checkUsedUriDoesNotExist(uri)) return
 
-            if (permissionedUriString.equals(targetUriString)) {
-                if (!checkUsedUriDoesNotExist(uri)) return;
-
-                resolver.releasePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                return;
+                resolver.releasePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                return
             }
         }
     }
 
-    public void releaseAllPersistablePermission() {
-        List<UriPermission> permissionList = resolver.getPersistedUriPermissions();
-        for (UriPermission uriPermission: permissionList) {
-            Uri uri = uriPermission.getUri();
-            Objects.requireNonNull(uri);
-            resolver.releasePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
+    fun releaseAllPersistablePermission() {
+        val permissionList = resolver.persistedUriPermissions
+        for (uriPermission in permissionList) {
+            val uri = uriPermission.uri
+            resolver.releasePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION)
         }
     }
 }
