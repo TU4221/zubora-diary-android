@@ -18,8 +18,8 @@ class SettingsThemeColorSwitcher extends ThemeColorSwitcher {
         Objects.requireNonNull(textViewList);
         textViewList.forEach(Objects::requireNonNull);
 
-        int color = themeColor.getSecondaryContainerColor(resources);
-        int onColor = themeColor.getOnSecondaryContainerColor(resources);
+        int color = getThemeColor().getSecondaryContainerColor(getResources());
+        int onColor = getThemeColor().getOnSecondaryContainerColor(getResources());
         switchTextViewsColor(textViewList, color, onColor);
     }
 
@@ -27,7 +27,7 @@ class SettingsThemeColorSwitcher extends ThemeColorSwitcher {
         Objects.requireNonNull(textViewList);
         textViewList.forEach(Objects::requireNonNull);
 
-        int color = themeColor.getOnSurfaceVariantColor(resources);
+        int color = getThemeColor().getOnSurfaceVariantColor(getResources());
         switchTextViewsColorOnlyIcon(textViewList, color);
     }
 }

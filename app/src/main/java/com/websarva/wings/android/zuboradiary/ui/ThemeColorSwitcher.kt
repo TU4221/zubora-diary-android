@@ -1,382 +1,277 @@
-package com.websarva.wings.android.zuboradiary.ui;
+package com.websarva.wings.android.zuboradiary.ui
 
-import android.content.Context;
-import android.content.res.ColorStateList;
-import android.content.res.Resources;
-import android.graphics.drawable.Drawable;
-import android.view.Menu;
-import android.view.View;
-import android.view.Window;
-import android.widget.Button;
-import android.widget.ImageButton;
-import android.widget.ImageView;
-import android.widget.ProgressBar;
-import android.widget.TextView;
-
-import androidx.annotation.NonNull;
-import androidx.core.graphics.drawable.DrawableCompat;
-import androidx.core.view.WindowInsetsControllerCompat;
-
-import com.google.android.material.appbar.MaterialToolbar;
-import com.google.android.material.bottomnavigation.BottomNavigationView;
-import com.google.android.material.divider.MaterialDivider;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.materialswitch.MaterialSwitch;
-import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor;
-
-import java.util.List;
-import java.util.Objects;
+import android.content.Context
+import android.content.res.ColorStateList
+import android.content.res.Resources
+import android.graphics.drawable.Drawable
+import android.view.View
+import android.view.Window
+import android.widget.Button
+import android.widget.ImageButton
+import android.widget.ImageView
+import android.widget.ProgressBar
+import android.widget.TextView
+import androidx.core.graphics.drawable.DrawableCompat
+import androidx.core.view.WindowInsetsControllerCompat
+import com.google.android.material.appbar.MaterialToolbar
+import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.android.material.divider.MaterialDivider
+import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.google.android.material.materialswitch.MaterialSwitch
+import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor
+import java.util.function.Consumer
 
 /**
  * Enum ThemeColorをもとにViewの色を変更するクラス。
  * Activity、各Fragment共通処理を本クラスにまとめる。
  * 各Fragment固有のViewに対しては本クラスを継承して継承クラスにメソッドを追加する。
  * 本クラスに記述されている各Viewの色はアプリ背景色(SurfaceColor)を考慮して選定。
- * */
-public class ThemeColorSwitcher {
-    protected final Resources resources;
-    protected final Context context;
-    protected final ThemeColor themeColor;
+ */
+open class ThemeColorSwitcher(protected val context: Context, protected val themeColor: ThemeColor) {
 
-    public ThemeColorSwitcher(Context context, ThemeColor themeColor) {
-        Objects.requireNonNull(context);
-        Objects.requireNonNull(themeColor);
+    protected val resources: Resources = context.resources
 
-        resources = context.getResources();
-        Objects.requireNonNull(resources);
-
-        this.context = context;
-        this.themeColor = themeColor;
+    fun switchBackgroundColor(view: View) {
+        val surfaceColor = themeColor.getSurfaceColor(resources)
+        switchViewColor(view, surfaceColor)
     }
 
-    public final void switchBackgroundColor(View view) {
-        Objects.requireNonNull(view);
-
-        int surfaceColor = themeColor.getSurfaceColor(resources);
-        switchViewColor(view, surfaceColor);
+    fun switchTextColorOnBackground(textViewList: List<TextView>) {
+        val onSurfaceColor = themeColor.getOnSurfaceColor(resources)
+        switchTextViewsColorOnlyText(textViewList, onSurfaceColor)
     }
 
-    public final void switchTextColorOnBackground(List<TextView> textViewList) {
-        Objects.requireNonNull(textViewList);
-        textViewList.forEach(Objects::requireNonNull);
-
-        int onSurfaceColor = themeColor.getOnSurfaceColor(resources);
-        switchTextViewsColorOnlyText(textViewList, onSurfaceColor);
+    fun switchRedTextColorOnBackground(textViewList: List<TextView>) {
+        val onSurfaceColor = themeColor.getErrorColor(resources)
+        switchTextViewsColorOnlyText(textViewList, onSurfaceColor)
     }
 
-    public final void switchRedTextColorOnBackground(List<TextView> textViewList) {
-        Objects.requireNonNull(textViewList);
-        textViewList.forEach(Objects::requireNonNull);
-
-        int onSurfaceColor = themeColor.getErrorColor(resources);
-        switchTextViewsColorOnlyText(textViewList, onSurfaceColor);
-    }
-
-    public final void switchStatusBarColor(Window window) {
-        Objects.requireNonNull(window);
-
-        int surfaceColor = themeColor.getSurfaceColor(resources);
-        window.setStatusBarColor(surfaceColor);
+    fun switchStatusBarColor(window: Window) {
+        val surfaceColor = themeColor.getSurfaceColor(resources)
+        window.statusBarColor = surfaceColor // TODO:後日対応
 
         // ステータスバーのアイコンの色を変更(白 or 灰)
-        boolean isLight = themeColor.isAppearanceLightStatusBars();
-        new WindowInsetsControllerCompat(window, window.getDecorView()).setAppearanceLightStatusBars(isLight);
+        val isLight = themeColor.isAppearanceLightStatusBars
+        WindowInsetsControllerCompat(window, window.decorView).isAppearanceLightStatusBars = isLight
     }
 
-    public final void switchBottomNavigationColor(BottomNavigationView bottomNavigationView) {
-        Objects.requireNonNull(bottomNavigationView);
-
-        switchBottomNavigationBackgroundColor(bottomNavigationView);
-        switchBottomNavigationItemRippleColor(bottomNavigationView);
-        switchBottomNavigationItemTextColor(bottomNavigationView);
-        switchBottomNavigationItemIconColor(bottomNavigationView);
-        switchBottomNavigationActiveIndicatorColor(bottomNavigationView);
+    fun switchBottomNavigationColor(bottomNavigationView: BottomNavigationView) {
+        switchBottomNavigationBackgroundColor(bottomNavigationView)
+        switchBottomNavigationItemRippleColor(bottomNavigationView)
+        switchBottomNavigationItemTextColor(bottomNavigationView)
+        switchBottomNavigationItemIconColor(bottomNavigationView)
+        switchBottomNavigationActiveIndicatorColor(bottomNavigationView)
     }
 
-    private void switchBottomNavigationBackgroundColor (BottomNavigationView bottomNavigationView) {
-        Objects.requireNonNull(bottomNavigationView);
-
-        int color = themeColor.getSurfaceContainerColor(resources);
-        bottomNavigationView.setBackgroundTintList(ColorStateList.valueOf(color));
+    private fun switchBottomNavigationBackgroundColor(bottomNavigationView: BottomNavigationView) {
+        val color = themeColor.getSurfaceContainerColor(resources)
+        bottomNavigationView.backgroundTintList = ColorStateList.valueOf(color)
     }
 
-    private void switchBottomNavigationItemRippleColor(BottomNavigationView bottomNavigationView) {
-        Objects.requireNonNull(bottomNavigationView);
-
-        int checkedColor = themeColor.getPrimaryColor(resources);
-        int unCheckedColor = themeColor.getOnSurfaceVariantColor(resources);
-        ColorStateList colorStateList = createCheckedColorStateList(checkedColor, unCheckedColor);
-        bottomNavigationView.setItemRippleColor(colorStateList);
+    private fun switchBottomNavigationItemRippleColor(bottomNavigationView: BottomNavigationView) {
+        val checkedColor = themeColor.getPrimaryColor(resources)
+        val unCheckedColor = themeColor.getOnSurfaceVariantColor(resources)
+        val colorStateList = createCheckedColorStateList(checkedColor, unCheckedColor)
+        bottomNavigationView.itemRippleColor = colorStateList
     }
 
-    private void switchBottomNavigationItemTextColor(BottomNavigationView bottomNavigationView) {
-        Objects.requireNonNull(bottomNavigationView);
-
-        int checkedColor = themeColor.getOnSurfaceColor(resources);
-        int unCheckedColor = themeColor.getOnSurfaceVariantColor(resources);
-        ColorStateList colorStateList = createCheckedColorStateList(checkedColor, unCheckedColor);
-        bottomNavigationView.setItemTextColor(colorStateList);
+    private fun switchBottomNavigationItemTextColor(bottomNavigationView: BottomNavigationView) {
+        val checkedColor = themeColor.getOnSurfaceColor(resources)
+        val unCheckedColor = themeColor.getOnSurfaceVariantColor(resources)
+        val colorStateList = createCheckedColorStateList(checkedColor, unCheckedColor)
+        bottomNavigationView.itemTextColor = colorStateList
     }
 
-    private void switchBottomNavigationItemIconColor(BottomNavigationView bottomNavigationView) {
-        Objects.requireNonNull(bottomNavigationView);
-
-        int checkedColor = themeColor.getOnSecondaryContainerColor(resources);
-        int unCheckedColor = themeColor.getOnSurfaceVariantColor(resources);
-        ColorStateList colorStateList = createCheckedColorStateList(checkedColor, unCheckedColor);
-        bottomNavigationView.setItemIconTintList(colorStateList);
+    private fun switchBottomNavigationItemIconColor(bottomNavigationView: BottomNavigationView) {
+        val checkedColor = themeColor.getOnSecondaryContainerColor(resources)
+        val unCheckedColor = themeColor.getOnSurfaceVariantColor(resources)
+        val colorStateList = createCheckedColorStateList(checkedColor, unCheckedColor)
+        bottomNavigationView.itemIconTintList = colorStateList
     }
 
-    private void switchBottomNavigationActiveIndicatorColor(BottomNavigationView bottomNavigationView) {
-        Objects.requireNonNull(bottomNavigationView);
-
-        int secondaryContainerColor = themeColor.getSecondaryContainerColor(resources);
-        bottomNavigationView.setItemActiveIndicatorColor(ColorStateList.valueOf(secondaryContainerColor));
+    private fun switchBottomNavigationActiveIndicatorColor(bottomNavigationView: BottomNavigationView) {
+        val secondaryContainerColor = themeColor.getSecondaryContainerColor(resources)
+        bottomNavigationView.itemActiveIndicatorColor =
+            ColorStateList.valueOf(secondaryContainerColor)
     }
 
-    public final void switchToolbarColor(MaterialToolbar toolbar) {
-        Objects.requireNonNull(toolbar);
-
-        int surfaceColor = themeColor.getSurfaceColor(resources);
-        int onSurfaceColor = themeColor.getOnSurfaceColor(resources);
-        int onSurfaceVariantColor = themeColor.getOnSurfaceVariantColor(resources);
-        toolbar.setBackgroundColor(surfaceColor);
-        toolbar.setTitleTextColor(onSurfaceColor);
-        switchToolbarMenuColor(toolbar, onSurfaceColor);
-        switchToolbarNavigationIconColor(toolbar, onSurfaceVariantColor);
+    fun switchToolbarColor(toolbar: MaterialToolbar) {
+        val surfaceColor = themeColor.getSurfaceColor(resources)
+        val onSurfaceColor = themeColor.getOnSurfaceColor(resources)
+        val onSurfaceVariantColor = themeColor.getOnSurfaceVariantColor(resources)
+        toolbar.setBackgroundColor(surfaceColor)
+        toolbar.setTitleTextColor(onSurfaceColor)
+        switchToolbarMenuColor(toolbar, onSurfaceColor)
+        switchToolbarNavigationIconColor(toolbar, onSurfaceVariantColor)
     }
 
-    private void switchToolbarNavigationIconColor(MaterialToolbar toolbar, int color) {
-        Objects.requireNonNull(toolbar);
-
-        Drawable navigationIcon = toolbar.getNavigationIcon();
-        if (navigationIcon == null) {
-            return;
-        }
-
-        navigationIcon.setTint(color);
+    private fun switchToolbarNavigationIconColor(toolbar: MaterialToolbar, color: Int) {
+        val navigationIcon = toolbar.navigationIcon ?: return
+        navigationIcon.setTint(color)
     }
 
-    private void switchToolbarMenuColor(MaterialToolbar toolbar, int color) {
-        Objects.requireNonNull(toolbar);
+    private fun switchToolbarMenuColor(toolbar: MaterialToolbar, color: Int) {
+        val menuIcon = toolbar.overflowIcon
+        menuIcon?.setTint(color)
 
-        Drawable menuIcon = toolbar.getOverflowIcon();
-        if (menuIcon != null) {
-            menuIcon.setTint(color);
-        }
+        val collapseIcon = toolbar.collapseIcon
+        collapseIcon?.setTint(color)
 
-        Drawable collapseIcon = toolbar.getCollapseIcon();
-        if (collapseIcon != null) {
-            collapseIcon.setTint(color);
-        }
-
-        switchToolbarMenuIconColor(toolbar, color);
+        switchToolbarMenuIconColor(toolbar, color)
     }
 
-    private void switchToolbarMenuIconColor(MaterialToolbar toolbar, int color) {
-        Objects.requireNonNull(toolbar);
+    private fun switchToolbarMenuIconColor(toolbar: MaterialToolbar, color: Int) {
+        val menu = toolbar.menu ?: return
 
-        Menu menu = toolbar.getMenu();
-        if (menu == null) {
-            return;
-        }
+        val numMenuIcons = menu.size()
+        if (numMenuIcons <= 0) return
 
-        int numMenuIcons = menu.size();
-        if (numMenuIcons <= 0) {
-            return;
-        }
-
-        for (int i = 0; i < numMenuIcons; i++) {
-            Drawable icon = menu.getItem(i).getIcon();
-            if (icon != null) {
-                icon.setTint(color);
-            }
+        for (i in 0 until numMenuIcons) {
+            val icon = menu.getItem(i).icon
+            icon?.setTint(color)
         }
     }
 
-    public final void switchFloatingActionButtonColor(List<FloatingActionButton> fabList) {
-        Objects.requireNonNull(fabList);
-        fabList.forEach(Objects::requireNonNull);
-
-        int primaryContainerColor = themeColor.getPrimaryContainerColor(resources);
-        int onPrimaryContainerColor = themeColor.getOnPrimaryContainerColor(resources);
-        fabList.forEach(x -> {
-            x.setBackgroundTintList(ColorStateList.valueOf(primaryContainerColor));
-            x.setImageTintList(ColorStateList.valueOf(onPrimaryContainerColor));
-        });
+    fun switchFloatingActionButtonColor(fabList: List<FloatingActionButton>) {
+        val primaryContainerColor = themeColor.getPrimaryContainerColor(resources)
+        val onPrimaryContainerColor = themeColor.getOnPrimaryContainerColor(resources)
+        fabList.forEach(Consumer { x: FloatingActionButton ->
+            x.backgroundTintList = ColorStateList.valueOf(primaryContainerColor)
+            x.imageTintList = ColorStateList.valueOf(onPrimaryContainerColor)
+        })
     }
 
-    public final void switchSwitchColor(List<MaterialSwitch> switchList) {
-        Objects.requireNonNull(switchList);
-        switchList.forEach(Objects::requireNonNull);
-
-        switchSwitchThumbColor(switchList);
-        switchSwitchThumbIconColor(switchList);
-        switchSwitchTrackColor(switchList);
+    fun switchSwitchColor(switchList: List<MaterialSwitch>) {
+        switchSwitchThumbColor(switchList)
+        switchSwitchThumbIconColor(switchList)
+        switchSwitchTrackColor(switchList)
     }
 
-    private void switchSwitchThumbColor(List<MaterialSwitch> switchList) {
-        Objects.requireNonNull(switchList);
-        switchList.forEach(Objects::requireNonNull);
-
-        int checkedColor = themeColor.getOnPrimaryColor(resources);
-        int unCheckedColor = themeColor.getOutlineColor(resources);
-        ColorStateList thumbColorStateList = createCheckedColorStateList(checkedColor, unCheckedColor);
-        switchList.forEach(x -> x.setThumbTintList(thumbColorStateList));
+    private fun switchSwitchThumbColor(switchList: List<MaterialSwitch>) {
+        val checkedColor = themeColor.getOnPrimaryColor(resources)
+        val unCheckedColor = themeColor.getOutlineColor(resources)
+        val thumbColorStateList = createCheckedColorStateList(checkedColor, unCheckedColor)
+        switchList.forEach(Consumer { x: MaterialSwitch ->
+            x.thumbTintList = thumbColorStateList
+        })
     }
 
-    private void switchSwitchThumbIconColor(List<MaterialSwitch> switchList) {
-        Objects.requireNonNull(switchList);
-        switchList.forEach(Objects::requireNonNull);
-
-        int checkedColor = themeColor.getOnPrimaryContainerColor(resources);
-        int unCheckedColor = themeColor.getSurfaceContainerHighestColor(resources);
-        ColorStateList thumbIconColorStateList = createCheckedColorStateList(checkedColor, unCheckedColor);
-        switchList.forEach(x -> x.setThumbIconTintList(thumbIconColorStateList));
+    private fun switchSwitchThumbIconColor(switchList: List<MaterialSwitch>) {
+        val checkedColor = themeColor.getOnPrimaryContainerColor(resources)
+        val unCheckedColor = themeColor.getSurfaceContainerHighestColor(resources)
+        val thumbIconColorStateList = createCheckedColorStateList(checkedColor, unCheckedColor)
+        switchList.forEach(Consumer { x: MaterialSwitch ->
+            x.thumbIconTintList = thumbIconColorStateList
+        })
     }
 
-    private void switchSwitchTrackColor(List<MaterialSwitch> switchList) {
-        Objects.requireNonNull(switchList);
-        switchList.forEach(Objects::requireNonNull);
-
-        int checkedColor = themeColor.getPrimaryColor(resources);
-        int unCheckedColor = themeColor.getSurfaceContainerHighestColor(resources);
-        ColorStateList trackColorStateList = createCheckedColorStateList(checkedColor, unCheckedColor);
-        switchList.forEach(x -> x.setTrackTintList(trackColorStateList));
+    private fun switchSwitchTrackColor(switchList: List<MaterialSwitch>) {
+        val checkedColor = themeColor.getPrimaryColor(resources)
+        val unCheckedColor = themeColor.getSurfaceContainerHighestColor(resources)
+        val trackColorStateList = createCheckedColorStateList(checkedColor, unCheckedColor)
+        switchList.forEach(Consumer { x: MaterialSwitch ->
+            x.trackTintList = trackColorStateList
+        })
     }
 
-    public final void switchButtonColor(List<Button> buttonList) {
-        Objects.requireNonNull(buttonList);
-        buttonList.forEach(Objects::requireNonNull);
-
-        int color = themeColor.getPrimaryColor(resources);
-        int onColor = themeColor.getOnPrimaryColor(resources);
-        buttonList.forEach(x -> {
-            x.setBackgroundColor(color);
-            x.setTextColor(onColor);
-        });
+    fun switchButtonColor(buttonList: List<Button>) {
+        val color = themeColor.getPrimaryColor(resources)
+        val onColor = themeColor.getOnPrimaryColor(resources)
+        buttonList.forEach(Consumer { x: Button ->
+            x.setBackgroundColor(color)
+            x.setTextColor(onColor)
+        })
     }
 
-    public final void switchImageButtonColor(List<ImageButton> imageButtonList) {
-        Objects.requireNonNull(imageButtonList);
-        imageButtonList.forEach(Objects::requireNonNull);
-
-        int color = themeColor.getPrimaryColor(resources);
-        imageButtonList.forEach(x -> x.setImageTintList(ColorStateList.valueOf(color)));
+    fun switchImageButtonColor(imageButtonList: List<ImageButton>) {
+        val color = themeColor.getPrimaryColor(resources)
+        imageButtonList.forEach(Consumer { x: ImageButton ->
+            x.imageTintList = ColorStateList.valueOf(color)
+        })
     }
 
-    public final void switchImageViewColor(List<ImageView> imageViewList) {
-        Objects.requireNonNull(imageViewList);
-        imageViewList.forEach(Objects::requireNonNull);
-
-        int color = themeColor.getSecondaryColor(resources);
-        imageViewList.forEach(x -> switchImageView(x, color));
+    fun switchImageViewColor(imageViewList: List<ImageView>) {
+        val color = themeColor.getSecondaryColor(resources)
+        imageViewList.forEach(Consumer { x: ImageView -> switchImageView(x, color) })
     }
 
-    public final void switchCircularProgressBarColor(ProgressBar progressBar) {
-        Objects.requireNonNull(progressBar);
-
-        int color = themeColor.getPrimaryContainerColor(resources);
-        progressBar.getIndeterminateDrawable().setTint(color);
+    fun switchCircularProgressBarColor(progressBar: ProgressBar) {
+        val color = themeColor.getPrimaryContainerColor(resources)
+        progressBar.indeterminateDrawable.setTint(color)
     }
 
-    public final void switchDividerColor(List<MaterialDivider> dividerList) {
-        Objects.requireNonNull(dividerList);
-        dividerList.forEach(Objects::requireNonNull);
-
-        int color = themeColor.getOutlineVariantColor(resources);
-        dividerList.forEach(x -> x.setDividerColor(color));
+    fun switchDividerColor(dividerList: List<MaterialDivider>) {
+        val color = themeColor.getOutlineVariantColor(resources)
+        dividerList.forEach(Consumer { x: MaterialDivider ->
+            x.dividerColor = color
+        })
     }
 
     // 共通処理
-    protected final void switchViewsColor(List<View> viewList, int color) {
-        Objects.requireNonNull(viewList);
-        viewList.forEach(Objects::requireNonNull);
-
-        viewList.forEach(x -> switchViewColor(x, color));
+    protected fun switchViewsColor(viewList: List<View>, color: Int) {
+        viewList.forEach(Consumer { x: View -> switchViewColor(x, color) })
     }
 
-    protected final void switchViewColor(View view, int color) {
-        Objects.requireNonNull(view);
-
-        view.setBackgroundColor(color);
+    protected fun switchViewColor(view: View, color: Int) {
+        view.setBackgroundColor(color)
     }
 
-    protected final void switchTextViewsColor(List<TextView> textViewList, int color, int onColor) {
-        Objects.requireNonNull(textViewList);
-        textViewList.forEach(Objects::requireNonNull);
-
-        textViewList.forEach(x -> switchTextViewColor(x, color, onColor));
+    protected fun switchTextViewsColor(textViewList: List<TextView>, color: Int, onColor: Int) {
+        textViewList.forEach(Consumer { x: TextView -> switchTextViewColor(x, color, onColor) })
     }
 
-    protected final void switchTextViewColor(TextView textView, int color, int onColor) {
-        Objects.requireNonNull(textView);
-
-        textView.setBackgroundColor(color);
-        textView.setTextColor(onColor);
+    protected fun switchTextViewColor(textView: TextView, color: Int, onColor: Int) {
+        textView.setBackgroundColor(color)
+        textView.setTextColor(onColor)
     }
 
-    protected final void switchTextViewsColorOnlyText(List<TextView> textViewList, int onColor) {
-        Objects.requireNonNull(textViewList);
-        textViewList.forEach(Objects::requireNonNull);
-
-        textViewList.forEach(x -> switchTextViewColorOnlyText(x, onColor));
+    protected fun switchTextViewsColorOnlyText(textViewList: List<TextView>, onColor: Int) {
+        textViewList.forEach(Consumer { x: TextView -> switchTextViewColorOnlyText(x, onColor) })
     }
 
-    protected final void switchTextViewColorOnlyText(TextView textView, int color) {
-        Objects.requireNonNull(textView);
-
-        textView.setTextColor(color);
+    protected fun switchTextViewColorOnlyText(textView: TextView, color: Int) {
+        textView.setTextColor(color)
     }
 
-    protected final void switchTextViewsColorOnlyIcon(List<TextView> textViewList, int color) {
-        Objects.requireNonNull(textViewList);
-        textViewList.forEach(Objects::requireNonNull);
-
-        textViewList.forEach(x -> switchTextViewColorOnlyIcon(x, color));
+    protected fun switchTextViewsColorOnlyIcon(textViewList: List<TextView>, color: Int) {
+        textViewList.forEach(Consumer { x: TextView -> switchTextViewColorOnlyIcon(x, color) })
     }
 
-    protected final void switchTextViewColorOnlyIcon(TextView view, int color) {
-        Objects.requireNonNull(view);
+    protected fun switchTextViewColorOnlyIcon(view: TextView, color: Int) {
+        val drawables = view.compoundDrawablesRelative
+        val wrappedDrawable = arrayOfNulls<Drawable>(drawables.size)
 
-        Drawable[] drawables = view.getCompoundDrawablesRelative();
-        Drawable[] wrappedDrawable = new Drawable[drawables.length];
-
-        for (int i = 0; i < drawables.length; i++) {
-            Drawable drawable = drawables[i];
+        for (i in drawables.indices) {
+            val drawable = drawables[i]
             if (drawable != null) {
-                wrappedDrawable[i] = DrawableCompat.wrap(drawable);
-                DrawableCompat.setTint(wrappedDrawable[i], color);
+                wrappedDrawable[i] = DrawableCompat.wrap(drawable)
+                DrawableCompat.setTint(requireNotNull(wrappedDrawable[i]) , color)
             }
         }
         view.setCompoundDrawablesRelativeWithIntrinsicBounds(
-                wrappedDrawable[0], wrappedDrawable[1], wrappedDrawable[2], wrappedDrawable[3]);
+            wrappedDrawable[0], wrappedDrawable[1], wrappedDrawable[2], wrappedDrawable[3]
+        )
     }
 
-    protected final void switchImageView(ImageView imageView, int color) {
-        Objects.requireNonNull(imageView);
-
-        Drawable drawable = imageView.getDrawable();
-        switchDrawableColor(drawable, color);
+    protected fun switchImageView(imageView: ImageView, color: Int) {
+        val drawable = imageView.drawable
+        switchDrawableColor(drawable, color)
     }
 
-    protected final void switchDrawableColor(Drawable drawable, int color) {
-        Objects.requireNonNull(drawable);
-
-        drawable.setTint(color);
+    protected fun switchDrawableColor(drawable: Drawable, color: Int) {
+        drawable.setTint(color)
     }
 
-    @NonNull
-    protected final ColorStateList createCheckedColorStateList(int checkedColor, int unCheckedColor) {
-        int[][] states = new int[][] {
-                new int[] { android.R.attr.state_checked },  // ON状態
-                new int[] { -android.R.attr.state_checked }  // OFF状態
-        };
-        int[] colors = new int[] {
-                checkedColor,
-                unCheckedColor
-        };
+    protected fun createCheckedColorStateList(checkedColor: Int, unCheckedColor: Int): ColorStateList {
+        val states = arrayOf(
+            intArrayOf(android.R.attr.state_checked),  // ON状態
+            intArrayOf(-android.R.attr.state_checked) // OFF状態
+        )
+        val colors = intArrayOf(
+            checkedColor,
+            unCheckedColor
+        )
 
-        return new ColorStateList(states, colors);
+        return ColorStateList(states, colors)
     }
 }

@@ -23,8 +23,8 @@ class CalendarThemeColorSwitcher extends ThemeColorSwitcher {
         Objects.requireNonNull(textDay);
         Objects.requireNonNull(viewDot);
 
-        int color = themeColor.getSecondaryContainerColor(resources);
-        int onColor = themeColor.getOnSecondaryContainerColor(resources);
+        int color = getThemeColor().getSecondaryContainerColor(getResources());
+        int onColor = getThemeColor().getOnSecondaryContainerColor(getResources());
         switchCalendarDayColor(color, onColor, textDay, viewDot);
     }
 
@@ -32,8 +32,8 @@ class CalendarThemeColorSwitcher extends ThemeColorSwitcher {
         Objects.requireNonNull(textDay);
         Objects.requireNonNull(viewDot);
 
-        int color = themeColor.getSecondaryColor(resources);
-        int onColor = themeColor.getOnSecondaryColor(resources);
+        int color = getThemeColor().getSecondaryColor(getResources());
+        int onColor = getThemeColor().getOnSecondaryColor(getResources());
         switchCalendarDayColor(color, onColor, textDay, viewDot);
     }
 
@@ -69,7 +69,7 @@ class CalendarThemeColorSwitcher extends ThemeColorSwitcher {
         Objects.requireNonNull(viewDot);
 
         Drawable drawable =
-                ResourcesCompat.getDrawable(resources, R.drawable.bg_calendar_day, null);
+                ResourcesCompat.getDrawable(getResources(), R.drawable.bg_calendar_day, null);
 
         switchDrawableColor(drawable, color);
         textDay.setBackground(drawable);
@@ -100,19 +100,19 @@ class CalendarThemeColorSwitcher extends ThemeColorSwitcher {
     }
 
     private int getCalendarSurfaceColor() {
-        return themeColor.getSurfaceColor(resources);
+        return getThemeColor().getSurfaceColor(getResources());
     }
 
     private int getOnWeekdaysColor() {
-        return themeColor.getOnSurfaceColor(resources);
+        return getThemeColor().getOnSurfaceColor(getResources());
     }
 
     private int getOnSaturdayColor() {
-        return ResourcesCompat.getColor(resources, R.color.blue, null);
+        return ResourcesCompat.getColor(getResources(), R.color.blue, null);
     }
 
     private int getOnSundayColor() {
-        return ResourcesCompat.getColor(resources, R.color.red, null);
+        return ResourcesCompat.getColor(getResources(), R.color.red, null);
     }
 
 
