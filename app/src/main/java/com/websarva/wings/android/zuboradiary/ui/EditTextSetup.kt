@@ -1,168 +1,122 @@
-package com.websarva.wings.android.zuboradiary.ui;
+package com.websarva.wings.android.zuboradiary.ui
 
-import static android.text.InputType.TYPE_TEXT_FLAG_MULTI_LINE;
+import android.annotation.SuppressLint
+import android.app.Activity
+import android.text.Editable
+import android.text.InputType
+import android.text.TextWatcher
+import android.view.KeyEvent
+import android.view.MotionEvent
+import android.view.View
+import android.view.View.OnFocusChangeListener
+import android.view.View.OnTouchListener
+import android.widget.EditText
+import android.widget.ImageButton
+import java.util.Arrays
 
-import android.annotation.SuppressLint;
-import android.app.Activity;
-import android.text.Editable;
-import android.text.TextWatcher;
-import android.view.KeyEvent;
-import android.view.MotionEvent;
-import android.view.View;
-import android.widget.EditText;
-import android.widget.ImageButton;
+open class EditTextSetup(private val activity: Activity) {
 
-import java.util.Arrays;
-import java.util.Objects;
-
-public class EditTextSetup {
-
-    private final Activity activity;
-
-    public EditTextSetup(Activity activity) {
-        Objects.requireNonNull(activity);
-
-        this.activity = activity;
+    protected fun hideKeyboard(view: View) {
+        val keyboardInitializer = KeyboardInitializer(activity)
+        keyboardInitializer.hide(view)
     }
 
-    protected void hideKeyboard(View view) {
-        KeyboardInitializer keyboardInitializer = new KeyboardInitializer(activity);
-        keyboardInitializer.hide(view);
+    fun setUpScrollable(vararg editTexts: EditText) {
+        Arrays.stream(editTexts).forEach { editText: EditText -> this.setUpScrollable(editText) }
     }
 
-    public void setUpScrollable(EditText... editTexts) {
-        Objects.requireNonNull(editTexts);
-        Arrays.stream(editTexts).forEach(Objects::requireNonNull);
-
-        Arrays.stream(editTexts).forEach(this::setUpScrollable);
+    protected fun setUpScrollable(editText: EditText) {
+        editText.onFocusChangeListener = EditTextScrollableOnFocusChangeListener()
     }
 
-    protected void setUpScrollable(EditText editText) {
-        Objects.requireNonNull(editText);
-
-        editText.setOnFocusChangeListener(new EditTextScrollableOnFocusChangeListener());
-    }
-
-    private static class EditTextScrollableOnFocusChangeListener implements View.OnFocusChangeListener {
-
-        @Override
-        public void onFocusChange(View v, boolean hasFocus) {
-            Objects.requireNonNull(v);
-
+    private class EditTextScrollableOnFocusChangeListener : OnFocusChangeListener {
+        override fun onFocusChange(v: View, hasFocus: Boolean) {
             if (hasFocus) {
-                setUpEditTextScrollable(v);
+                setUpEditTextScrollable(v)
             } else {
-                resetEditTextScrollable(v);
+                resetEditTextScrollable(v)
             }
         }
 
-        private void setUpEditTextScrollable(View focusedView) {
-            Objects.requireNonNull(focusedView);
-
-            EditText editText = (EditText) focusedView;
-            if (editText.getMinLines() > 1) focusedView.setOnTouchListener(new ScrollableTextOnTouchListener());
+        fun setUpEditTextScrollable(focusedView: View) {
+            val editText = focusedView as EditText
+            if (editText.minLines > 1) focusedView.setOnTouchListener(ScrollableTextOnTouchListener())
         }
 
-        private void resetEditTextScrollable(View focusedView) {
-            Objects.requireNonNull(focusedView);
-
-            EditText editText = (EditText) focusedView;
-            if (editText.getMinLines() > 1) focusedView.setOnTouchListener(null);
+        fun resetEditTextScrollable(focusedView: View) {
+            val editText = focusedView as EditText
+            if (editText.minLines > 1) focusedView.setOnTouchListener(null)
         }
 
-        private static class ScrollableTextOnTouchListener implements View.OnTouchListener {
-
+        private class ScrollableTextOnTouchListener : OnTouchListener {
+            // TODO:@SuppressLintを使用せず、DiaryEdit.CustomTextInputEditTextと同等に修正する？
             @SuppressLint("ClickableViewAccessibility")
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                if (!v.canScrollVertically(1) && !v.canScrollVertically(-1)) return false;
+            override fun onTouch(v: View, event: MotionEvent): Boolean {
+                if (!v.canScrollVertically(1) && !v.canScrollVertically(-1)) return false
 
-                v.getParent().requestDisallowInterceptTouchEvent(true);
-                if ((event.getAction() & MotionEvent.ACTION_MASK) == MotionEvent.ACTION_UP) {
-                    v.getParent().requestDisallowInterceptTouchEvent(false);
+                v.parent.requestDisallowInterceptTouchEvent(true)
+                if ((event.action and MotionEvent.ACTION_MASK) == MotionEvent.ACTION_UP) {
+                    v.parent.requestDisallowInterceptTouchEvent(false)
                 }
-                return false;
+                return false
             }
         }
     }
 
-    public void setUpKeyboardCloseOnEnter(EditText... editTexts) {
-        Objects.requireNonNull(editTexts);
-        Arrays.stream(editTexts).forEach(Objects::requireNonNull);
-
-        Arrays.stream(editTexts).forEach(this::setUpKeyboardCloseOnEnter);
+    fun setUpKeyboardCloseOnEnter(vararg editTexts: EditText) {
+        Arrays.stream(editTexts)
+            .forEach { editText: EditText -> this.setUpKeyboardCloseOnEnter(editText) }
     }
 
-    protected void setUpKeyboardCloseOnEnter(EditText editText) {
-        Objects.requireNonNull(editText);
-
-        editText.setOnKeyListener(new KeyboardCloseOnEnterListener());
+    protected fun setUpKeyboardCloseOnEnter(editText: EditText) {
+        editText.setOnKeyListener(KeyboardCloseOnEnterListener())
     }
 
-    private class KeyboardCloseOnEnterListener implements View.OnKeyListener {
+    private inner class KeyboardCloseOnEnterListener : View.OnKeyListener {
+        override fun onKey(v: View, keyCode: Int, event: KeyEvent): Boolean {
+            if (event.action != KeyEvent.ACTION_DOWN) return false
+            if (keyCode != KeyEvent.KEYCODE_ENTER) return false
 
-        @Override
-        public boolean onKey(View v, int keyCode, KeyEvent event) {
-            Objects.requireNonNull(v);
-            Objects.requireNonNull(event);
-            if (event.getAction() != KeyEvent.ACTION_DOWN) return false;
-            if (keyCode != KeyEvent.KEYCODE_ENTER) return false;
-
-            EditText editText = (EditText) v;
+            val editText = v as EditText
             // HACK:InputTypeの値が何故か1ズレている。(公式のリファレンスでもズレあり。)(setとgetを駆使してLogで確認確認済み)
-            if (editText.getInputType() == (TYPE_TEXT_FLAG_MULTI_LINE + 1)) return false;
+            if (editText.inputType == (InputType.TYPE_TEXT_FLAG_MULTI_LINE + 1)) return false
 
-            hideKeyboard(v);
-            editText.clearFocus();
+            hideKeyboard(v)
+            editText.clearFocus()
 
-            return false; // MEMO:”return true” だとバックスペースが機能しなくなり入力文字を削除できなくなる。
+            return false // MEMO:”return true” だとバックスペースが機能しなくなり入力文字を削除できなくなる。
         }
     }
 
-    public void setUpFocusClearOnClickBackground(View background, EditText... editTexts) {
-        Objects.requireNonNull(background);
-        Objects.requireNonNull(editTexts);
-        Arrays.stream(editTexts).forEach(Objects::requireNonNull);
-
-        background.setOnClickListener(v -> {
-            Objects.requireNonNull(v);
-
-            hideKeyboard(v);
-            Arrays.stream(editTexts).forEach(EditText::clearFocus);
-        });
+    fun setUpFocusClearOnClickBackground(background: View, vararg editTexts: EditText) {
+        background.setOnClickListener { v: View ->
+            hideKeyboard(v)
+            Arrays.stream(editTexts).forEach { obj: EditText -> obj.clearFocus() }
+        }
     }
 
-    public void setUpClearButton(EditText editText, ImageButton clearButton) {
-        Objects.requireNonNull(editText);
-        Objects.requireNonNull(clearButton);
-
-        editText.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+    fun setUpClearButton(editText: EditText, clearButton: ImageButton) {
+        editText.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {
                 // 処理なし
             }
 
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                Objects.requireNonNull(s);
-
-                boolean isVisible = !s.toString().isEmpty();
-                int visibility;
-                if (isVisible) {
-                    visibility = View.VISIBLE;
+            override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
+                val isVisible = s.toString().isNotEmpty()
+                val visibility = if (isVisible) {
+                    View.VISIBLE
                 } else {
-                    visibility = View.INVISIBLE;
+                    View.INVISIBLE
                 }
-                clearButton.setVisibility(visibility);
+                clearButton.visibility = visibility
             }
 
-            @Override
-            public void afterTextChanged(Editable s) {
+            override fun afterTextChanged(s: Editable) {
                 // 処理なし
             }
-        });
+        })
 
-        clearButton.setVisibility(View.INVISIBLE);
-        clearButton.setOnClickListener(v -> editText.setText(""));
+        clearButton.visibility = View.INVISIBLE
+        clearButton.setOnClickListener { editText.setText("") }
     }
 }
