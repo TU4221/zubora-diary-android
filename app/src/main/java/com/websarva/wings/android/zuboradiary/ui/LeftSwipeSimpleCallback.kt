@@ -1,98 +1,85 @@
-package com.websarva.wings.android.zuboradiary.ui;
+package com.websarva.wings.android.zuboradiary.ui
 
-import android.annotation.SuppressLint;
-import android.graphics.Canvas;
-import android.util.Log;
-import android.view.MotionEvent;
-import android.view.View;
+import android.annotation.SuppressLint
+import android.graphics.Canvas
+import android.util.Log
+import android.view.MotionEvent
+import android.view.View
+import android.view.View.OnTouchListener
+import androidx.interpolator.view.animation.FastOutSlowInInterpolator
+import androidx.recyclerview.widget.ItemTouchHelper
+import androidx.recyclerview.widget.RecyclerView
+import androidx.viewbinding.ViewBinding
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.interpolator.view.animation.FastOutSlowInInterpolator;
-import androidx.recyclerview.widget.ItemTouchHelper;
-import androidx.recyclerview.widget.RecyclerView;
-import androidx.viewbinding.ViewBinding;
+open class LeftSwipeSimpleCallback(protected val recyclerView: RecyclerView) :
+    ItemTouchHelper.SimpleCallback(ItemTouchHelper.ACTION_STATE_IDLE, ItemTouchHelper.LEFT) {
 
-import java.util.Objects;
+    abstract class LeftSwipeViewHolder(binding: ViewBinding) :
+        RecyclerView.ViewHolder(binding.root) {
 
-public class LeftSwipeSimpleCallback extends ItemTouchHelper.SimpleCallback {
+        lateinit var foregroundView: View
+        lateinit var backgroundButtonView: View
 
-    public static abstract class LeftSwipeViewHolder extends RecyclerView.ViewHolder {
-        public View foregroundView;
-        public View backgroundButtonView;
-
-        public LeftSwipeViewHolder(@NonNull ViewBinding binding) {
-            super(binding.getRoot());
-            Objects.requireNonNull(binding);
-            setUpView(binding);
-            foregroundView.setClickable(true);
-            backgroundButtonView.setClickable(true);
+        init {
+            setUpView(binding) // TODO:全ファイルKotlinへ変換後対応
+            foregroundView.isClickable = true
+            backgroundButtonView.isClickable = true
         }
 
-        public void setClickableAllView(boolean clickable) {
-            foregroundView.setClickable(clickable);
-            backgroundButtonView.setClickable(clickable);
+        fun setClickableAllView(clickable: Boolean) {
+            foregroundView.isClickable = clickable
+            backgroundButtonView.isClickable = clickable
         }
 
         /**
          * フィールド変数 View foregroundView、View backgroundButtonView に対象Viewを代入すること。
          */
-        protected abstract void setUpView(@NonNull ViewBinding binding);
+        protected abstract fun setUpView(binding: ViewBinding)
     }
 
-    protected final RecyclerView recyclerView;
-    protected ItemTouchHelper itemTouchHelper = null;
-
-    protected int swipingAdapterPosition = -1;
-    protected int swipedAdapterPosition = -1;
-    protected int invalidSwipeAdapterPosition = -1;
-    protected int previousMotionEvent = -1;
+    protected lateinit var itemTouchHelper: ItemTouchHelper
+    protected var swipingAdapterPosition: Int = -1
+    protected var swipedAdapterPosition: Int = -1
+    protected var invalidSwipeAdapterPosition: Int = -1
+    protected var previousMotionEvent: Int = -1
 
 
-    public LeftSwipeSimpleCallback(RecyclerView recyclerView) {
-        super(ItemTouchHelper.ACTION_STATE_IDLE, ItemTouchHelper.LEFT);
-        this.recyclerView = recyclerView;
-    }
-
+    // TODO:
     @SuppressLint("ClickableViewAccessibility")
-    public void build() {
-        itemTouchHelper = new ItemTouchHelper(this);
-        itemTouchHelper.attachToRecyclerView(recyclerView);
-        recyclerView.setOnTouchListener(new OnTouchSwipedItemListener());
+    open fun build() {
+        itemTouchHelper = ItemTouchHelper(this)
+        itemTouchHelper.attachToRecyclerView(recyclerView)
+        recyclerView.setOnTouchListener(OnTouchSwipedItemListener())
     }
 
+    // TODO:
     @SuppressLint("ClickableViewAccessibility")
-    protected class OnTouchSwipedItemListener implements View.OnTouchListener {
-
+    protected open inner class OnTouchSwipedItemListener : OnTouchListener {
         // MEMO:スワイプ状態はItemTouchHelperが効いていてonClickListenerが反応しない為、
         //      onTouchListenerを使ってボタンの境界を判定して処理させる。
         //      通常スワイプ時、ACTION_DOWN -> MOVE -> UPとなるが
         //      未スワイプ状態からはACTION_DOWNは取得できず、ACTION_MOVE -> UPとなる。
-        @Override
-        public boolean onTouch(View v,@NonNull MotionEvent event) {
-            Objects.requireNonNull(v);
-
-            Log.d("LeftSwipeSimpleCallBack", "onTouch()_MotionEvent:" + event.getAction());
-            if (event.getAction() == MotionEvent.ACTION_UP) clearInvalidSwipeViewHolder();
-            previousMotionEvent = event.getAction();
-            return false;
+        override fun onTouch(v: View, event: MotionEvent): Boolean {
+            Log.d("LeftSwipeSimpleCallBack", "onTouch()_MotionEvent:" + event.action)
+            if (event.action == MotionEvent.ACTION_UP) clearInvalidSwipeViewHolder()
+            previousMotionEvent = event.action
+            return false
         }
     }
 
     // MEMO:スワイプクローズアニメーション開始時にfalseとなり、終了時にtrueとなるようにしているが、
     //      終了時にタッチ中の場合はfalseのままとしているため、ここでtrueにする。
     //      理由は"InvalidSwipeAdapterPosition"書き込みコード参照。
-    protected void clearInvalidSwipeViewHolder() {
-        if (invalidSwipeAdapterPosition == -1) return;
+    protected fun clearInvalidSwipeViewHolder() {
+        if (invalidSwipeAdapterPosition == -1) return
 
-        RecyclerView.ViewHolder lockedViewHolder =
-                recyclerView.findViewHolderForAdapterPosition(invalidSwipeAdapterPosition);
-        Objects.requireNonNull(lockedViewHolder);
+        val lockedViewHolder =
+            recyclerView.findViewHolderForAdapterPosition(invalidSwipeAdapterPosition)
 
-        LeftSwipeViewHolder leftSwipeViewHolder = (LeftSwipeViewHolder) lockedViewHolder;
-        leftSwipeViewHolder.foregroundView.setClickable(true);
+        val leftSwipeViewHolder = lockedViewHolder as LeftSwipeViewHolder
+        leftSwipeViewHolder.foregroundView.isClickable = true
 
-        clearInvalidSwipeAdapterPosition();
+        clearInvalidSwipeAdapterPosition()
     }
 
     // MEMO:スワイプメニューを閉じるアニメーション中も onChildDraw が反応する
@@ -104,198 +91,218 @@ public class LeftSwipeSimpleCallback extends ItemTouchHelper.SimpleCallback {
     //      アニメーション開始前に ItemTouchHelper#onChildViewDetached/AttachedFromWindow でリセットしておくと、これらの問題を解消できる
     //      アニメーション中のフラグ isAnimating が無いので isClickable で代用する
     //      (参照:https://mt312.com/3182)
-    protected void closeSwipedViewHolder(int position) {
-        if (position < 0) throw new IllegalArgumentException();
-        RecyclerView.Adapter<?> adapter = recyclerView.getAdapter();
-        Objects.requireNonNull(adapter);
-        int listSize = adapter.getItemCount();
-        if (position >= listSize) throw new IllegalArgumentException();
+    protected fun closeSwipedViewHolder(position: Int) {
+        require(position >= 0)
+        val adapter = requireNotNull(recyclerView.adapter)
+        val listSize = adapter.itemCount
+        require(position < listSize)
 
-        Log.d("LeftSwipeSimpleCallBack", "closeSwipedViewHolder()_position:" + position);
-        RecyclerView.ViewHolder viewHolder =
-                recyclerView.findViewHolderForAdapterPosition(position);
-        Objects.requireNonNull(viewHolder);
+        Log.d("LeftSwipeSimpleCallBack", "closeSwipedViewHolder()_position:$position")
+        val viewHolder =
+            requireNotNull(recyclerView.findViewHolderForAdapterPosition(position))
 
         animateSwipingView(
-                position,
-                viewHolder,
-                300,
-                0f,
-                () -> {
-                    itemTouchHelper.onChildViewDetachedFromWindow(viewHolder.itemView);
-                    itemTouchHelper.onChildViewAttachedToWindow(viewHolder.itemView);
-                },
-                () -> {
-                    // MEMO:StartActionのリセットのみでは、スワイプしたアイテムをタッチしてスワイプ状態を戻した後、
-                    //      アイテムをクリックしてもアイテム前面Viewのクリックリスナーが反応しない。
-                    //      2回目以降は反応する。対策として下記コードを記述。
-                    itemTouchHelper.onChildViewDetachedFromWindow(viewHolder.itemView);
-                    itemTouchHelper.onChildViewAttachedToWindow(viewHolder.itemView);
+            position,
+            viewHolder,
+            300,
+            0f,
+            {
+            itemTouchHelper.onChildViewDetachedFromWindow(viewHolder.itemView)
+            itemTouchHelper.onChildViewAttachedToWindow(viewHolder.itemView)
+            },
+            {
+            // MEMO:StartActionのリセットのみでは、スワイプしたアイテムをタッチしてスワイプ状態を戻した後、
+            //      アイテムをクリックしてもアイテム前面Viewのクリックリスナーが反応しない。
+            //      2回目以降は反応する。対策として下記コードを記述。
+            itemTouchHelper.onChildViewDetachedFromWindow(viewHolder.itemView)
+            itemTouchHelper.onChildViewAttachedToWindow(viewHolder.itemView)
 
-                    if (swipingAdapterPosition == position) clearSwipingAdapterPosition();
-                    if (swipedAdapterPosition == position) clearSwipedAdapterPosition();
-                }
-        );
+            if (swipingAdapterPosition == position) clearSwipingAdapterPosition()
+            if (swipedAdapterPosition == position) clearSwipedAdapterPosition()
+            }
+        )
     }
 
-    @FunctionalInterface
-    protected interface AnimationAction {
-        void process();
+    protected fun interface AnimationAction {
+        fun process()
     }
 
-    protected void animateSwipingView(
-            int position, RecyclerView.ViewHolder viewHolder, int duration, float translationValue,
-            @Nullable AnimationAction startAction, @Nullable AnimationAction endAction) {
-        Log.d("LeftSwipeSimpleCallBack", "animateSwipingView()");
-        LeftSwipeViewHolder leftSwipeViewHolder= (LeftSwipeViewHolder) viewHolder;
+    protected fun animateSwipingView(
+        position: Int, viewHolder: RecyclerView.ViewHolder, duration: Int, translationValue: Float,
+        startAction: AnimationAction?, endAction: AnimationAction?
+    ) {
+        Log.d("LeftSwipeSimpleCallBack", "animateSwipingView()")
+        val leftSwipeViewHolder = viewHolder as LeftSwipeViewHolder
         leftSwipeViewHolder.foregroundView.animate()
-                .setDuration(duration)
-                .setInterpolator(new FastOutSlowInInterpolator())
-                .translationX(translationValue)
-                .withStartAction(() -> {
-                    // MEMO:アニメーション中のViewHolderをタッチすると、
-                    //      ItemTouchHelper.Callback#getMovementFlags()で
-                    //      スワイプ機能を無効にするようにしている為、クリック機能が有効となる。
-                    //      アニメーション中はリスナーを機能させたくないので下記コードを記述。
-                    leftSwipeViewHolder.setClickableAllView(false);
+            .setDuration(duration.toLong())
+            .setInterpolator(FastOutSlowInInterpolator())
+            .translationX(translationValue)
+            .withStartAction {
+                // MEMO:アニメーション中のViewHolderをタッチすると、
+                //      ItemTouchHelper.Callback#getMovementFlags()で
+                //      スワイプ機能を無効にするようにしている為、クリック機能が有効となる。
+                //      アニメーション中はリスナーを機能させたくないので下記コードを記述。
+                leftSwipeViewHolder.setClickableAllView(false)
 
-                    if (startAction == null) return;
-                    startAction.process();
-                })
-                .withEndAction(() -> {
-                    if (endAction == null) return;
-                    endAction.process();
+                if (startAction == null) return@withStartAction
+                startAction.process()
+            }
+            .withEndAction {
+                if (endAction == null) return@withEndAction
+                endAction.process()
 
-                    // MEMO:アニメーション中にスワイプしてそのままタッチを継続されると、
-                    //      アニメーション終了後にスワイプ分、前面Viewが移動してしまう。
-                    //      対策として、下記条件コード記述。
-                    if (previousMotionEvent != MotionEvent.ACTION_UP) {
-                        invalidSwipeAdapterPosition = position;
-                        return;
-                    }
-
-                    leftSwipeViewHolder.setClickableAllView(true);
-                })
-                .start();
+                // MEMO:アニメーション中にスワイプしてそのままタッチを継続されると、
+                //      アニメーション終了後にスワイプ分、前面Viewが移動してしまう。
+                //      対策として、下記条件コード記述。
+                if (previousMotionEvent != MotionEvent.ACTION_UP) {
+                    invalidSwipeAdapterPosition = position
+                    return@withEndAction
+                }
+                leftSwipeViewHolder.setClickableAllView(true)
+            }
+            .start()
     }
 
-    @Override
-    public int getMovementFlags(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder){
-        Log.d("LeftSwipeSimpleCallBack", "getMovementFlags()_position:" + viewHolder.getBindingAdapterPosition());
-        LeftSwipeViewHolder leftSwipeViewHolder = (LeftSwipeViewHolder) viewHolder;
+    override fun getMovementFlags(
+        recyclerView: RecyclerView,
+        viewHolder: RecyclerView.ViewHolder
+    ): Int {
+        Log.d(
+            "LeftSwipeSimpleCallBack",
+            "getMovementFlags()_position:" + viewHolder.bindingAdapterPosition
+        )
+        val leftSwipeViewHolder = viewHolder as LeftSwipeViewHolder
 
         // アニメーション中スワイプ機能無効
-        if (!leftSwipeViewHolder.foregroundView.isClickable()) return 0;
+        if (!leftSwipeViewHolder.foregroundView.isClickable) return 0
 
-        return super.getMovementFlags(recyclerView, viewHolder);
+        return super.getMovementFlags(recyclerView, viewHolder)
     }
 
     // MEMO:タッチダウン、アップで呼び出し
-    @Override
-    public void onSelectedChanged(@Nullable RecyclerView.ViewHolder viewHolder, int actionState) {
-        String position = "null";
+    override fun onSelectedChanged(viewHolder: RecyclerView.ViewHolder?, actionState: Int) {
+        var position = "null"
         if (viewHolder != null) {
-            position = String.valueOf(viewHolder.getBindingAdapterPosition());
+            position = viewHolder.bindingAdapterPosition.toString()
         }
-        Log.d("LeftSwipeSimpleCallBack", "onSelectedChanged()_position:" + position);
-        Log.d("LeftSwipeSimpleCallBack", "onSelectedChanged()_actionState:" + actionState);
+        Log.d("LeftSwipeSimpleCallBack", "onSelectedChanged()_position:$position")
+        Log.d(
+            "LeftSwipeSimpleCallBack",
+            "onSelectedChanged()_actionState:$actionState"
+        )
 
-        super.onSelectedChanged(viewHolder, actionState);
+        super.onSelectedChanged(viewHolder, actionState)
 
-        if (viewHolder == null) return;
-        if (actionState != ItemTouchHelper.ACTION_STATE_SWIPE) return;
+        if (viewHolder == null) return
+        if (actionState != ItemTouchHelper.ACTION_STATE_SWIPE) return
 
         // 他ViewHolderがスワイプ中時の処理
-        Log.d("LeftSwipeSimpleCallBack", "onSelectedChanged()_swipingAdapterPosition:" + swipingAdapterPosition);
+        Log.d(
+            "LeftSwipeSimpleCallBack",
+            "onSelectedChanged()_swipingAdapterPosition:$swipingAdapterPosition"
+        )
         if (swipingAdapterPosition >= 0
-                && swipingAdapterPosition != viewHolder.getBindingAdapterPosition()) {
-            closeSwipedViewHolder(swipingAdapterPosition);
+            && swipingAdapterPosition != viewHolder.bindingAdapterPosition
+        ) {
+            closeSwipedViewHolder(swipingAdapterPosition)
         }
-        swipingAdapterPosition = viewHolder.getBindingAdapterPosition();
+        swipingAdapterPosition = viewHolder.bindingAdapterPosition
 
         // 他ViewHolderがスワイプ状態時の処理
-        Log.d("LeftSwipeSimpleCallBack", "onSelectedChanged()_swipedAdapterPosition:" + swipedAdapterPosition);
+        Log.d(
+            "LeftSwipeSimpleCallBack",
+            "onSelectedChanged()_swipedAdapterPosition:$swipedAdapterPosition"
+        )
         if (swipedAdapterPosition >= 0
-                && swipedAdapterPosition != viewHolder.getBindingAdapterPosition()) {
-            closeSwipedViewHolder(swipedAdapterPosition);
+            && swipedAdapterPosition != viewHolder.bindingAdapterPosition
+        ) {
+            closeSwipedViewHolder(swipedAdapterPosition)
         }
     }
 
-    @Override
-    public boolean onMove(@NonNull RecyclerView recyclerView,
-                          @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
-        Log.d("LeftSwipeSimpleCallBack", "onMove()");
-        return false;
+    override fun onMove(
+        recyclerView: RecyclerView,
+        viewHolder: RecyclerView.ViewHolder, target: RecyclerView.ViewHolder
+    ): Boolean {
+        Log.d("LeftSwipeSimpleCallBack", "onMove()")
+        return false
     }
 
-    @Override
-    public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
-        if (direction != ItemTouchHelper.LEFT) return;
+    override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+        if (direction != ItemTouchHelper.LEFT) return
 
-        LeftSwipeViewHolder leftSwipeViewHolder = (LeftSwipeViewHolder) viewHolder;
-        leftSwipeViewHolder.backgroundButtonView.performClick();
+        val leftSwipeViewHolder = viewHolder as LeftSwipeViewHolder
+        leftSwipeViewHolder.backgroundButtonView.performClick()
     }
 
-    @Override
-    public void onChildDraw(@NonNull Canvas c,
-                            @NonNull RecyclerView recyclerView,
-                            @NonNull RecyclerView.ViewHolder viewHolder,
-                            float dX,
-                            float dY,
-                            int actionState,
-                            boolean isCurrentlyActive) {
-        Log.d("LeftSwipeSimpleCallBack", "onChildDraw()_position:" + viewHolder.getBindingAdapterPosition());
-        Log.d("LeftSwipeSimpleCallBack", "onChildDraw()_dX:" + dX);
+    override fun onChildDraw(
+        c: Canvas,
+        recyclerView: RecyclerView,
+        viewHolder: RecyclerView.ViewHolder,
+        dX: Float,
+        dY: Float,
+        actionState: Int,
+        isCurrentlyActive: Boolean
+    ) {
+        Log.d(
+            "LeftSwipeSimpleCallBack",
+            "onChildDraw()_position:" + viewHolder.bindingAdapterPosition
+        )
+        Log.d("LeftSwipeSimpleCallBack", "onChildDraw()_dX:$dX")
 
-        if (actionState != ItemTouchHelper.ACTION_STATE_SWIPE) return;
+        if (actionState != ItemTouchHelper.ACTION_STATE_SWIPE) return
 
-        Log.d("LeftSwipeSimpleCallBack", "onChildDraw()_ACTION_STATE_SWIPE");
-        LeftSwipeViewHolder leftSwipeViewHolder = (LeftSwipeViewHolder) viewHolder;
+        Log.d("LeftSwipeSimpleCallBack", "onChildDraw()_ACTION_STATE_SWIPE")
+        val leftSwipeViewHolder = viewHolder as LeftSwipeViewHolder
 
         // アニメーション中は無効
-        if (!leftSwipeViewHolder.foregroundView.isClickable()) return;
+        if (!leftSwipeViewHolder.foregroundView.isClickable) return
         // 右スワイプ
-        if (dX > 0f) return;
+        if (dX > 0f) return
 
         // 手動でスワイプを戻した時にクリア
-        if (dX == 0) {
+        if (dX == 0f) {
             if (swipedAdapterPosition == viewHolder.getBindingAdapterPosition()) {
-                clearSwipedAdapterPosition();
+                clearSwipedAdapterPosition()
             }
-            Log.d("LeftSwipeSimpleCallBack", "onChildDraw()_swipedAdapterPosition:Clear");
+            Log.d("LeftSwipeSimpleCallBack", "onChildDraw()_swipedAdapterPosition:Clear")
         }
 
-        translateForegroundView(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
+        translateForegroundView(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive)
     }
 
-    protected void translateForegroundView(
-            @NonNull Canvas c, @NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder,
-            float dX, float dY, int actionState, boolean isCurrentlyActive) {
-        LeftSwipeViewHolder leftSwipeViewHolder = (LeftSwipeViewHolder) viewHolder;
-        leftSwipeViewHolder.foregroundView.setTranslationX(dX);
+    protected open fun translateForegroundView(
+        c: Canvas, recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder,
+        dX: Float, dY: Float, actionState: Int, isCurrentlyActive: Boolean
+    ) {
+        val leftSwipeViewHolder = viewHolder as LeftSwipeViewHolder
+        leftSwipeViewHolder.foregroundView.translationX = dX
     }
 
-    @Override
-    public void clearView(
-            @NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder) {
-        Log.d("LeftSwipeSimpleCallBack", "clearView()_position:" + viewHolder.getBindingAdapterPosition());
-        super.clearView(recyclerView, viewHolder);
+    override fun clearView(
+        recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder
+    ) {
+        Log.d(
+            "LeftSwipeSimpleCallBack",
+            "clearView()_position:" + viewHolder.bindingAdapterPosition
+        )
+        super.clearView(recyclerView, viewHolder)
     }
 
-    protected void clearSwipingAdapterPosition() {
-        swipingAdapterPosition = -1;
+    protected fun clearSwipingAdapterPosition() {
+        swipingAdapterPosition = -1
     }
 
-    protected void clearSwipedAdapterPosition() {
-        swipedAdapterPosition = -1;
+    protected fun clearSwipedAdapterPosition() {
+        swipedAdapterPosition = -1
     }
 
-    protected void clearInvalidSwipeAdapterPosition() {
-        invalidSwipeAdapterPosition = -1;
+    protected fun clearInvalidSwipeAdapterPosition() {
+        invalidSwipeAdapterPosition = -1
     }
 
-    public void closeSwipedItem() {
-        if (swipingAdapterPosition != -1) closeSwipedViewHolder(swipingAdapterPosition);
-        if (swipedAdapterPosition != -1) closeSwipedViewHolder(swipedAdapterPosition);
+    fun closeSwipedItem() {
+        if (swipingAdapterPosition != -1) closeSwipedViewHolder(swipingAdapterPosition)
+        if (swipedAdapterPosition != -1) closeSwipedViewHolder(swipedAdapterPosition)
     }
 }

@@ -24,7 +24,7 @@ public class LeftSwipeBackgroundButtonSimpleCallback extends LeftSwipeSimpleCall
     @SuppressLint("ClickableViewAccessibility")
     public void build() {
         super.build();
-        recyclerView.setOnTouchListener(new CustomOnTouchSwipedItemListener());
+        getRecyclerView().setOnTouchListener(new CustomOnTouchSwipedItemListener());
     }
 
     @SuppressLint("ClickableViewAccessibility")
@@ -43,11 +43,11 @@ public class LeftSwipeBackgroundButtonSimpleCallback extends LeftSwipeSimpleCall
             if (event.getAction() == MotionEvent.ACTION_UP) {
                 clearInvalidSwipeViewHolder();
                 // 疑似クリック処理
-                if (previousMotionEvent == MotionEvent.ACTION_DOWN) {
+                if (getPreviousMotionEvent() == MotionEvent.ACTION_DOWN) {
                     result = OnClickSwipedViewHolder(v, event);
                 }
             }
-            previousMotionEvent = event.getAction();
+            setPreviousMotionEvent(event.getAction());
             return result;
         }
 
@@ -55,12 +55,12 @@ public class LeftSwipeBackgroundButtonSimpleCallback extends LeftSwipeSimpleCall
             Objects.requireNonNull(v);
 
             // タッチViewHolder取得
-            View childView = recyclerView.findChildViewUnder(event.getX(), event.getY());
+            View childView = getRecyclerView().findChildViewUnder(event.getX(), event.getY());
             if (childView == null) return false;
 
-            int adapterPosition = recyclerView.getChildAdapterPosition(childView);
+            int adapterPosition = getRecyclerView().getChildAdapterPosition(childView);
             RecyclerView.ViewHolder viewHolder =
-                    recyclerView.findViewHolderForAdapterPosition(adapterPosition);
+                    getRecyclerView().findViewHolderForAdapterPosition(adapterPosition);
             Objects.requireNonNull(viewHolder);
             LeftSwipeViewHolder leftSwipeViewHolder = (LeftSwipeViewHolder) viewHolder;
 
@@ -83,7 +83,7 @@ public class LeftSwipeBackgroundButtonSimpleCallback extends LeftSwipeSimpleCall
                 return true;
             }
             // スワイプアイテム押下時処理
-            if (swipedAdapterPosition == adapterPosition) {
+            if (getSwipedAdapterPosition() == adapterPosition) {
                 closeSwipedViewHolder(adapterPosition);
                 return true;
             }
@@ -99,13 +99,13 @@ public class LeftSwipeBackgroundButtonSimpleCallback extends LeftSwipeSimpleCall
 
         // スワイプ境界を背面ボタンの中心にする
         float threshold =
-                leftSwipeViewHolder.backgroundButtonView.getWidth() / 2f / recyclerView.getWidth();
+                leftSwipeViewHolder.backgroundButtonView.getWidth() / 2f / getRecyclerView().getWidth();
 
         // スワイプメニューを閉じる時は、反対方向からの割合に変更
         // MEMO:ViewHolderの前面Viewは背面ボタン位置までのスワイプ状態になっているが、
         //      スワイプ機能の値(ItemTouchHelper.Callback#onChildDraw()の引数であるdX)としては
         //      ViewHolderの端までスワイプしている事になっている。その為下記コードが必要となる。
-        if (swipedAdapterPosition != viewHolder.getBindingAdapterPosition()) {
+        if (getSwipedAdapterPosition() != viewHolder.getBindingAdapterPosition()) {
             Log.d("LeftSwipeBackButton", "getSwipeThreshold()_return:" + threshold);
             return threshold;
         }
@@ -121,13 +121,13 @@ public class LeftSwipeBackgroundButtonSimpleCallback extends LeftSwipeSimpleCall
         Log.d("LeftSwipeBackButton", "onSwiped()_position:" + viewHolder.getBindingAdapterPosition());
         LeftSwipeViewHolder leftSwipeViewHolder = (LeftSwipeViewHolder) viewHolder;
 
-        if (swipingAdapterPosition != viewHolder.getBindingAdapterPosition()) {
+        if (getSwipingAdapterPosition() != viewHolder.getBindingAdapterPosition()) {
             throw new IllegalStateException();
         }
-        swipedAdapterPosition = swipingAdapterPosition;
+        setSwipedAdapterPosition(getSwipingAdapterPosition());
         clearSwipingAdapterPosition();
         swipingOffset =
-                recyclerView.getWidth() - leftSwipeViewHolder.backgroundButtonView.getWidth();
+                getRecyclerView().getWidth() - leftSwipeViewHolder.backgroundButtonView.getWidth();
     }
 
     @Override
@@ -140,7 +140,7 @@ public class LeftSwipeBackgroundButtonSimpleCallback extends LeftSwipeSimpleCall
         float backgroundButtonWidth =
                 leftSwipeViewHolder.backgroundButtonView.getWidth();
         float translationValueX;
-        if (swipedAdapterPosition == viewHolder.getBindingAdapterPosition()) {
+        if (getSwipedAdapterPosition() == viewHolder.getBindingAdapterPosition()) {
             translationValueX = Math.min(0, Math.max(-backgroundButtonWidth, dX + swipingOffset));
         } else {
             translationValueX = Math.min(0, Math.max(-backgroundButtonWidth, dX));
