@@ -99,7 +99,7 @@ public class DiaryEditViewModel extends BaseViewModel {
         loadedDate.setValue(date);
 
         diaryLiveData.update(diaryEntity);
-        loadedPicturePath.setValue(diaryLiveData.getPicturePathMutableLiveData().getValue());
+        loadedPicturePath.setValue(diaryLiveData.getPicturePath().getValue());
     }
 
     boolean isNewDiaryDefaultStatus() {
@@ -157,14 +157,14 @@ public class DiaryEditViewModel extends BaseViewModel {
     boolean shouldShowUpdateConfirmationDialog() {
         if (isLoadedDateEqualToInputDate()) return false;
 
-        LocalDate inputDate = diaryLiveData.getDateMutableLiveData().getValue();
+        LocalDate inputDate = diaryLiveData.getDate().getValue();
         return existsSavedDiary(inputDate);
     }
 
     boolean isLoadedDateEqualToInputDate() {
         LocalDate loadedDate = this.loadedDate.getValue();
         if (loadedDate == null) return false;
-        LocalDate inputDate = diaryLiveData.getDateMutableLiveData().getValue();
+        LocalDate inputDate = diaryLiveData.getDate().getValue();
         Objects.requireNonNull(inputDate);
         return loadedDate.equals(inputDate);
     }
@@ -195,13 +195,13 @@ public class DiaryEditViewModel extends BaseViewModel {
     public void updateDate(LocalDate date) {
         Objects.requireNonNull(date);
 
-        LocalDate previousDate = diaryLiveData.getDateMutableLiveData().getValue();
+        LocalDate previousDate = diaryLiveData.getDate().getValue();
 
         // HACK:下記はDiaryLiveDataのDateのsetValue()処理よりも前に処理すること。
         //      (後で処理するとDateのObserverがpreviousDateの更新よりも先に処理される為)
         this.previousDate.setValue(previousDate);
 
-        diaryLiveData.getDateMutableLiveData().setValue(date);
+        diaryLiveData.getDate().setValue(date);
     }
 
     // 天気、体調関係
@@ -210,18 +210,18 @@ public class DiaryEditViewModel extends BaseViewModel {
     void updateWeather1(Weather weather) {
         Objects.requireNonNull(weather);
 
-        diaryLiveData.getWeather1MutableLiveData().setValue(weather);
+        diaryLiveData.getWeather1().setValue(weather);
     }
 
     void updateWeather2(Weather weather) {
         Objects.requireNonNull(weather);
 
-        diaryLiveData.getWeather2MutableLiveData().setValue(weather);
+        diaryLiveData.getWeather2().setValue(weather);
     }
 
     boolean isEqualWeathers() {
-        Weather weather1 = diaryLiveData.getWeather1MutableLiveData().getValue();
-        Weather weather2 = diaryLiveData.getWeather2MutableLiveData().getValue();
+        Weather weather1 = diaryLiveData.getWeather1().getValue();
+        Weather weather2 = diaryLiveData.getWeather2().getValue();
         Objects.requireNonNull(weather1);
         Objects.requireNonNull(weather2);
 
@@ -231,7 +231,7 @@ public class DiaryEditViewModel extends BaseViewModel {
     void updateCondition(Condition condition) {
         Objects.requireNonNull(condition);
 
-        diaryLiveData.getConditionMutableLiveData().setValue(condition);
+        diaryLiveData.getCondition().setValue(condition);
     }
 
     boolean canFetchWeatherInformation(LocalDate date) {
@@ -273,7 +273,7 @@ public class DiaryEditViewModel extends BaseViewModel {
 
         @Override
         public void onResponse(@NonNull Weather weather) {
-            diaryLiveData.getWeather1MutableLiveData().postValue(weather);
+            diaryLiveData.getWeather1().postValue(weather);
         }
 
         @Override
@@ -307,11 +307,11 @@ public class DiaryEditViewModel extends BaseViewModel {
     void updatePicturePath(Uri uri) {
         Objects.requireNonNull(uri);
 
-        diaryLiveData.getPicturePathMutableLiveData().setValue(uri);
+        diaryLiveData.getPicturePath().setValue(uri);
     }
 
     void deletePicturePath() {
-        diaryLiveData.getPicturePathMutableLiveData().setValue(null);
+        diaryLiveData.getPicturePath().setValue(null);
     }
 
     // MEMO:存在しないことを確認したいため下記メソッドを否定的処理とする
@@ -357,93 +357,93 @@ public class DiaryEditViewModel extends BaseViewModel {
 
     @NonNull
     public LiveData<LocalDate> getDateLiveData() {
-        return diaryLiveData.getDateMutableLiveData();
+        return diaryLiveData.getDate();
     }
 
     @NonNull
     LiveData<Weather> getWeather1LiveData() {
-        return diaryLiveData.getWeather1MutableLiveData();
+        return diaryLiveData.getWeather1();
     }
 
     @NonNull
     LiveData<Weather> getWeather2LiveData() {
-        return diaryLiveData.getWeather2MutableLiveData();
+        return diaryLiveData.getWeather2();
     }
 
     @NonNull
     LiveData<Condition> getConditionLiveData() {
-        return diaryLiveData.getConditionMutableLiveData();
+        return diaryLiveData.getCondition();
     }
 
     @NonNull
     public MutableLiveData<String> getTitleMutableLiveData() {
-        return diaryLiveData.getTitleMutableLiveData();
+        return diaryLiveData.getTitle();
     }
 
     @NonNull
     LiveData<Integer> getNumVisibleItemsLiveData() {
-        return diaryLiveData.getNumVisibleItemsMutableLiveData();
+        return diaryLiveData.getNumVisibleItems();
     }
 
     @NonNull
     LiveData<String> getItemTitleLiveData(ItemNumber itemNumber) {
-        return diaryLiveData.getItemLiveData(itemNumber).getTitleMutableLiveData();
+        return diaryLiveData.getItemLiveData(itemNumber).getTitle();
     }
 
     @NonNull
     public MutableLiveData<String> getItem1TitleMutableLiveData() {
-        return diaryLiveData.getItemLiveData(new ItemNumber(1)).getTitleMutableLiveData();
+        return diaryLiveData.getItemLiveData(new ItemNumber(1)).getTitle();
     }
 
     @NonNull
     public MutableLiveData<String> getItem2TitleMutableLiveData() {
-        return diaryLiveData.getItemLiveData(new ItemNumber(2)).getTitleMutableLiveData();
+        return diaryLiveData.getItemLiveData(new ItemNumber(2)).getTitle();
     }
 
 
     @NonNull
     public MutableLiveData<String> getItem3TitleMutableLiveData() {
-        return diaryLiveData.getItemLiveData(new ItemNumber(3)).getTitleMutableLiveData();
+        return diaryLiveData.getItemLiveData(new ItemNumber(3)).getTitle();
     }
 
     @NonNull
     public MutableLiveData<String> getItem4TitleMutableLiveData() {
-        return diaryLiveData.getItemLiveData(new ItemNumber(4)).getTitleMutableLiveData();
+        return diaryLiveData.getItemLiveData(new ItemNumber(4)).getTitle();
     }
 
     @NonNull
     public MutableLiveData<String> getItem5TitleMutableLiveData() {
-        return diaryLiveData.getItemLiveData(new ItemNumber(5)).getTitleMutableLiveData();
+        return diaryLiveData.getItemLiveData(new ItemNumber(5)).getTitle();
     }
 
     @NonNull
     public MutableLiveData<String> getItem1CommentMutableLiveData() {
-        return diaryLiveData.getItemLiveData(new ItemNumber(1)).getCommentMutableLiveData();
+        return diaryLiveData.getItemLiveData(new ItemNumber(1)).getComment();
     }
 
     @NonNull
     public MutableLiveData<String> getItem2CommentMutableLiveData() {
-        return diaryLiveData.getItemLiveData(new ItemNumber(2)).getCommentMutableLiveData();
+        return diaryLiveData.getItemLiveData(new ItemNumber(2)).getComment();
     }
 
     @NonNull
     public MutableLiveData<String> getItem3CommentMutableLiveData() {
-        return diaryLiveData.getItemLiveData(new ItemNumber(3)).getCommentMutableLiveData();
+        return diaryLiveData.getItemLiveData(new ItemNumber(3)).getComment();
     }
 
     @NonNull
     public MutableLiveData<String> getItem4CommentMutableLiveData() {
-        return diaryLiveData.getItemLiveData(new ItemNumber(4)).getCommentMutableLiveData();
+        return diaryLiveData.getItemLiveData(new ItemNumber(4)).getComment();
     }
 
     @NonNull
     public MutableLiveData<String> getItem5CommentMutableLiveData() {
-        return diaryLiveData.getItemLiveData(new ItemNumber(5)).getCommentMutableLiveData();
+        return diaryLiveData.getItemLiveData(new ItemNumber(5)).getComment();
     }
 
     @NonNull
     LiveData<Uri> getPicturePathLiveData() {
-        return diaryLiveData.getPicturePathMutableLiveData();
+        return diaryLiveData.getPicturePath();
     }
 
     @NonNull

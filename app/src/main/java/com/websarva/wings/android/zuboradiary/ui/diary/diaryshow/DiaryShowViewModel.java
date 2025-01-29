@@ -67,7 +67,7 @@ public class DiaryShowViewModel extends BaseViewModel {
     }
 
     boolean deleteDiary() {
-        LocalDate deleteDate = diaryLiveData.getDateMutableLiveData().getValue();
+        LocalDate deleteDate = diaryLiveData.getDate().getValue();
         Objects.requireNonNull(deleteDate);
 
         Integer result;
@@ -101,74 +101,74 @@ public class DiaryShowViewModel extends BaseViewModel {
 
     // LiveDataGetter
     public LiveData<LocalDate> getDateLiveData() {
-        return diaryLiveData.getDateMutableLiveData();
+        return diaryLiveData.getDate();
     }
 
     public LiveData<Weather> getWeather1LiveData() {
-        return diaryLiveData.getWeather1MutableLiveData();
+        return diaryLiveData.getWeather1();
     }
 
     public LiveData<Weather> getWeather2LiveData() {
-        return diaryLiveData.getWeather2MutableLiveData();
+        return diaryLiveData.getWeather2();
     }
 
     public LiveData<Condition> getConditionLiveData() {
-        return diaryLiveData.getConditionMutableLiveData();
+        return diaryLiveData.getCondition();
     }
 
     public LiveData<String> getTitleLiveData() {
-        return diaryLiveData.getTitleMutableLiveData();
+        return diaryLiveData.getTitle();
     }
 
     public LiveData<Integer> getNumVisibleItemsLiveData() {
-        return diaryLiveData.getNumVisibleItemsMutableLiveData();
+        return diaryLiveData.getNumVisibleItems();
     }
 
     public LiveData<String> getItem1TitleLiveData() {
-        return diaryLiveData.getItemLiveData(new ItemNumber(1)).getTitleMutableLiveData();
+        return diaryLiveData.getItemLiveData(new ItemNumber(1)).getTitle();
     }
 
     public LiveData<String> getItem2TitleLiveData() {
-        return diaryLiveData.getItemLiveData(new ItemNumber(2)).getTitleMutableLiveData();
+        return diaryLiveData.getItemLiveData(new ItemNumber(2)).getTitle();
     }
 
     public LiveData<String> getItem3TitleLiveData() {
-        return diaryLiveData.getItemLiveData(new ItemNumber(3)).getTitleMutableLiveData();
+        return diaryLiveData.getItemLiveData(new ItemNumber(3)).getTitle();
     }
 
     public LiveData<String> getItem4TitleLiveData() {
-        return diaryLiveData.getItemLiveData(new ItemNumber(4)).getTitleMutableLiveData();
+        return diaryLiveData.getItemLiveData(new ItemNumber(4)).getTitle();
     }
 
     public LiveData<String> getItem5TitleLiveData() {
-        return diaryLiveData.getItemLiveData(new ItemNumber(5)).getTitleMutableLiveData();
+        return diaryLiveData.getItemLiveData(new ItemNumber(5)).getTitle();
     }
 
     public LiveData<String> getItem1CommentLiveData() {
-        return diaryLiveData.getItemLiveData(new ItemNumber(1)).getCommentMutableLiveData();
+        return diaryLiveData.getItemLiveData(new ItemNumber(1)).getComment();
     }
 
     public LiveData<String> getItem2CommentLiveData() {
-        return diaryLiveData.getItemLiveData(new ItemNumber(2)).getCommentMutableLiveData();
+        return diaryLiveData.getItemLiveData(new ItemNumber(2)).getComment();
     }
 
     public LiveData<String> getItem3CommentLiveData() {
-        return diaryLiveData.getItemLiveData(new ItemNumber(3)).getCommentMutableLiveData();
+        return diaryLiveData.getItemLiveData(new ItemNumber(3)).getComment();
     }
 
     public LiveData<String> getItem4CommentLiveData() {
-        return diaryLiveData.getItemLiveData(new ItemNumber(4)).getCommentMutableLiveData();
+        return diaryLiveData.getItemLiveData(new ItemNumber(4)).getComment();
     }
 
     public LiveData<String> getItem5CommentLiveData() {
-        return diaryLiveData.getItemLiveData(new ItemNumber(5)).getCommentMutableLiveData();
+        return diaryLiveData.getItemLiveData(new ItemNumber(5)).getComment();
     }
 
     public LiveData<Uri> getPicturePathLiveData() {
-        return diaryLiveData.getPicturePathMutableLiveData();
+        return diaryLiveData.getPicturePath();
     }
 
     public LiveData<LocalDateTime> getLogLiveData() {
-        return diaryLiveData.getLogMutableLiveData();
+        return diaryLiveData.getLog();
     }
 }
