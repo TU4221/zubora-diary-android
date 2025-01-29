@@ -1,586 +1,507 @@
-package com.websarva.wings.android.zuboradiary.ui.calendar;
+package com.websarva.wings.android.zuboradiary.ui.calendar
 
-import android.os.Bundle;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.LinearLayout;
-import android.widget.TextView;
-
-import androidx.activity.OnBackPressedCallback;
-import androidx.annotation.NonNull;
-import androidx.databinding.ViewDataBinding;
-import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.SavedStateHandle;
-import androidx.lifecycle.ViewModelProvider;
-import androidx.navigation.NavDirections;
-
-import com.google.common.util.concurrent.FutureCallback;
-import com.kizitonwose.calendar.core.CalendarDay;
-import com.kizitonwose.calendar.core.CalendarMonth;
-import com.kizitonwose.calendar.core.DayPosition;
-import com.kizitonwose.calendar.view.CalendarView;
-import com.kizitonwose.calendar.view.MonthDayBinder;
-import com.kizitonwose.calendar.view.MonthHeaderFooterBinder;
-import com.kizitonwose.calendar.view.ViewContainer;
-import com.websarva.wings.android.zuboradiary.R;
-import com.websarva.wings.android.zuboradiary.data.AppMessage;
-import com.websarva.wings.android.zuboradiary.data.DateTimeStringConverter;
-import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor;
-import com.websarva.wings.android.zuboradiary.databinding.FragmentCalendarBinding;
-import com.websarva.wings.android.zuboradiary.databinding.LayoutCalendarDayBinding;
-import com.websarva.wings.android.zuboradiary.databinding.LayoutCalendarHeaderBinding;
-import com.websarva.wings.android.zuboradiary.ui.BaseFragment;
-import com.websarva.wings.android.zuboradiary.ui.diary.DiaryLiveData;
-import com.websarva.wings.android.zuboradiary.ui.diary.diaryshow.DiaryShowFragment;
-import com.websarva.wings.android.zuboradiary.ui.diary.diaryshow.DiaryShowViewModel;
-
-import java.time.DayOfWeek;
-import java.time.LocalDate;
-import java.time.YearMonth;
-import java.time.format.DateTimeFormatter;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-import dagger.hilt.android.AndroidEntryPoint;
+import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.TextView
+import androidx.activity.OnBackPressedCallback
+import androidx.databinding.ViewDataBinding
+import androidx.lifecycle.SavedStateHandle
+import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.NavDirections
+import com.google.common.util.concurrent.FutureCallback
+import com.kizitonwose.calendar.core.CalendarDay
+import com.kizitonwose.calendar.core.CalendarMonth
+import com.kizitonwose.calendar.core.DayPosition
+import com.kizitonwose.calendar.view.MonthDayBinder
+import com.kizitonwose.calendar.view.MonthHeaderFooterBinder
+import com.kizitonwose.calendar.view.ViewContainer
+import com.websarva.wings.android.zuboradiary.R
+import com.websarva.wings.android.zuboradiary.data.AppMessage
+import com.websarva.wings.android.zuboradiary.data.DateTimeStringConverter
+import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor
+import com.websarva.wings.android.zuboradiary.databinding.FragmentCalendarBinding
+import com.websarva.wings.android.zuboradiary.databinding.LayoutCalendarDayBinding
+import com.websarva.wings.android.zuboradiary.databinding.LayoutCalendarHeaderBinding
+import com.websarva.wings.android.zuboradiary.ui.BaseFragment
+import com.websarva.wings.android.zuboradiary.ui.diary.DiaryLiveData
+import com.websarva.wings.android.zuboradiary.ui.diary.diaryshow.DiaryShowFragment
+import com.websarva.wings.android.zuboradiary.ui.diary.diaryshow.DiaryShowFragment.ConditionObserver
+import com.websarva.wings.android.zuboradiary.ui.diary.diaryshow.DiaryShowFragment.LogObserver
+import com.websarva.wings.android.zuboradiary.ui.diary.diaryshow.DiaryShowFragment.Weather1Observer
+import com.websarva.wings.android.zuboradiary.ui.diary.diaryshow.DiaryShowFragment.Weather2Observer
+import com.websarva.wings.android.zuboradiary.ui.diary.diaryshow.DiaryShowViewModel
+import dagger.hilt.android.AndroidEntryPoint
+import java.time.DayOfWeek
+import java.time.LocalDate
+import java.time.YearMonth
+import java.time.format.DateTimeFormatter
+import java.util.Arrays
+import java.util.stream.Collectors
+import java.util.stream.Stream
 
 @AndroidEntryPoint
-public class CalendarFragment extends BaseFragment {
+class CalendarFragment : BaseFragment() {
 
     // View関係
-    private FragmentCalendarBinding binding;
+    private var _binding: FragmentCalendarBinding? = null
+    private val binding get() = _binding!!
 
     // ViewModel
-    private CalendarViewModel calendarViewModel;
+    private lateinit var calendarViewModel: CalendarViewModel
 
     // MEMO:CalendarFragment内にDiaryShowFragmentと同等のものを表示する為、DiaryShowViewModelを使用する。
     //      (CalendarViewModelにDiaryShowViewModelと重複するデータは持たせない)
-    private DiaryShowViewModel diaryShowViewModel;
+    private lateinit var diaryShowViewModel: DiaryShowViewModel
 
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
 
-        addOnBackPressedCallback(new OnBackPressedCallback(true) {
-            @Override
-            public void handleOnBackPressed() {
-                requireMainActivity().popBackStackToStartFragment();
+        addOnBackPressedCallback(object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                requireMainActivity().popBackStackToStartFragment()
             }
-        });
+        })
     }
 
-    @Override
-    protected void initializeViewModel() {
-        ViewModelProvider provider = new ViewModelProvider(requireActivity());
-        calendarViewModel = provider.get(CalendarViewModel.class);
-        diaryShowViewModel = provider.get(DiaryShowViewModel.class);
+    override fun initializeViewModel() {
+        val provider = ViewModelProvider(requireActivity())
+        calendarViewModel = provider[CalendarViewModel::class.java]
+        diaryShowViewModel = provider[DiaryShowViewModel::class.java]
     }
 
-    @Override
-    public View onCreateView(
-            @NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        return super.onCreateView(inflater,container,savedInstanceState);
+    override fun initializeDataBinding(
+        themeColorInflater: LayoutInflater,
+        container: ViewGroup
+    ): ViewDataBinding {
+        _binding = FragmentCalendarBinding.inflate(themeColorInflater, container, false)
+
+        return binding.apply {
+            lifecycleOwner = this@CalendarFragment
+            diaryShowViewModel = diaryShowViewModel
+        }
     }
 
-    @Override
-    protected ViewDataBinding initializeDataBinding(@NonNull LayoutInflater themeColorInflater, @NonNull ViewGroup container) {
-        binding = FragmentCalendarBinding.inflate(themeColorInflater, container, false);
-        binding.setLifecycleOwner(this);
-        binding.setDiaryShowViewModel(diaryShowViewModel);
-        return binding;
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        setUpCalendar()
+        setUpDiaryShow()
+        setUpFloatActionButton()
     }
 
-    @Override
-    public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-
-        setUpCalendar();
-        setUpDiaryShow();
-        setUpFloatActionButton();
+    override fun handleOnReceivingResultFromPreviousFragment(savedStateHandle: SavedStateHandle) {
+        val showedDiaryDateLiveData =
+            savedStateHandle.getLiveData<LocalDate>(DiaryShowFragment.KEY_SHOWED_DIARY_DATE)
+        showedDiaryDateLiveData.observe(viewLifecycleOwner) { localDate: LocalDate ->
+            calendarViewModel.updateSelectedDate(localDate)
+            savedStateHandle.remove<Any>(DiaryShowFragment.KEY_SHOWED_DIARY_DATE)
+        }
     }
 
-    @Override
-    protected void handleOnReceivingResultFromPreviousFragment(@NonNull SavedStateHandle savedStateHandle) {
-        MutableLiveData<LocalDate> showedDiaryDateLiveData =
-                savedStateHandle.getLiveData(DiaryShowFragment.KEY_SHOWED_DIARY_DATE);
-        showedDiaryDateLiveData.observe(getViewLifecycleOwner(), localDate -> {
-            calendarViewModel.updateSelectedDate(localDate);
-            savedStateHandle.remove(DiaryShowFragment.KEY_SHOWED_DIARY_DATE);
-        });
+    override fun handleOnReceivingDialogResult(savedStateHandle: SavedStateHandle) {
+        retryOtherAppMessageDialogShow()
     }
 
-    @Override
-    protected void handleOnReceivingDialogResult(@NonNull SavedStateHandle savedStateHandle) {
-        retryOtherAppMessageDialogShow();
-    }
-
-    @Override
-    protected void removeDialogResultOnDestroy(@NonNull SavedStateHandle savedStateHandle) {
+    override fun removeDialogResultOnDestroy(savedStateHandle: SavedStateHandle) {
         // 処理なし
     }
 
-    @Override
-    protected void setUpOtherAppMessageDialog() {
-        calendarViewModel.getAppMessageBufferList()
-                .observe(getViewLifecycleOwner(), new AppMessageBufferListObserver(calendarViewModel));
-        diaryShowViewModel.getAppMessageBufferList()
-                .observe(getViewLifecycleOwner(), new AppMessageBufferListObserver(diaryShowViewModel));
+    override fun setUpOtherAppMessageDialog() {
+        calendarViewModel.appMessageBufferList
+            .observe(viewLifecycleOwner, AppMessageBufferListObserver(calendarViewModel))
+        diaryShowViewModel.appMessageBufferList
+            .observe(viewLifecycleOwner, AppMessageBufferListObserver(diaryShowViewModel))
     }
 
-    private void setUpCalendar() {
-        CalendarView calendar = binding.calendar;
+    private fun setUpCalendar() {
+        val calendar = binding.calendar
 
-        List<DayOfWeek> daysOfWeek = createDayOfWeekList(); // 曜日リスト取得
-        configureCalendarBinders(daysOfWeek, requireThemeColor());
+        val daysOfWeek = createDayOfWeekList() // 曜日リスト取得
+        configureCalendarBinders(daysOfWeek, requireThemeColor())
 
-        YearMonth currentMonth = YearMonth.now();
-        YearMonth startMonth = currentMonth.minusMonths(60); //現在から過去5年分
-        YearMonth endMonth = currentMonth.plusMonths(60); //現在から未来5年分
-        calendar.setup(startMonth,endMonth,daysOfWeek.get(0));
+        val currentMonth = YearMonth.now()
+        val startMonth = currentMonth.minusMonths(60) //現在から過去5年分
+        val endMonth = currentMonth.plusMonths(60) //現在から未来5年分
+        calendar.setup(startMonth, endMonth, daysOfWeek[0])
 
-        LocalDate selectedDate = calendarViewModel.getSelectedDateLiveData().getValue();
-        Objects.requireNonNull(selectedDate);
-        calendarViewModel.updateSelectedDate(selectedDate);
+        val selectedDate = calendarViewModel.selectedDateLiveData.value
+        calendarViewModel.updateSelectedDate(selectedDate)
 
-        calendarViewModel.getSelectedDateLiveData()
-                .observe(getViewLifecycleOwner(), localDate -> {
-                    Objects.requireNonNull(localDate);
+        calendarViewModel.selectedDateLiveData
+            .observe(viewLifecycleOwner) { localDate: LocalDate ->
+                binding.calendar.notifyDateChanged(localDate) // 今回選択日付更新
+                scrollCalendar(localDate)
+                updateToolBarDate(localDate)
+                showSelectedDiary(localDate)
+            }
 
-                    binding.calendar.notifyDateChanged(localDate); // 今回選択日付更新
-                    scrollCalendar(localDate);
-                    updateToolBarDate(localDate);
-                    showSelectedDiary(localDate);
-                });
+        calendarViewModel.previousSelectedDateLiveData
+            .observe(viewLifecycleOwner) { localDate: LocalDate? ->
+                // MEMO:一度も日付選択をしていない場合はnullが代入されている。
+                if (localDate == null) return@observe
 
-        calendarViewModel.getPreviousSelectedDateLiveData()
-                .observe(getViewLifecycleOwner(), localDate -> {
-                    // MEMO:一度も日付選択をしていない場合はnullが代入されている。
-                    if (localDate == null) return;
-
-                    binding.calendar.notifyDateChanged(localDate); // 前回選択日付更新
-                });
+                binding.calendar.notifyDateChanged(localDate) // 前回選択日付更新
+            }
     }
 
-    private List<DayOfWeek> createDayOfWeekList() {
-        DayOfWeek firstDayOfWeek = settingsViewModel.loadCalendarStartDaySettingValue();
+    private fun createDayOfWeekList(): List<DayOfWeek> {
+        val firstDayOfWeek = settingsViewModel.loadCalendarStartDaySettingValue()
 
-        DayOfWeek[] daysOfWeek = DayOfWeek.values();
-        int firstDayOfWeekListPos = firstDayOfWeek.getValue();
+        val daysOfWeek = DayOfWeek.entries.toTypedArray()
+        val firstDayOfWeekListPos = firstDayOfWeek.value
         // 開始曜日を先頭に並び替え
-        List<DayOfWeek> firstList =
-                Arrays.stream(daysOfWeek)
-                        .skip(firstDayOfWeekListPos - 1)
-                        .collect(Collectors.toList());
-        List<DayOfWeek> secondList =
-                Arrays.stream(daysOfWeek)
-                        .limit(firstDayOfWeekListPos - 1)
-                        .collect(Collectors.toList());
+        val firstList =
+            Arrays.stream(daysOfWeek)
+                .skip((firstDayOfWeekListPos - 1).toLong())
+                .collect(Collectors.toList())
+        val secondList =
+            Arrays.stream(daysOfWeek)
+                .limit((firstDayOfWeekListPos - 1).toLong())
+                .collect(Collectors.toList())
         return Stream
-                .concat(firstList.stream(), secondList.stream())
-                .collect(Collectors.toList());
+            .concat(firstList.stream(), secondList.stream())
+            .collect(Collectors.toList())
     }
 
     // カレンダーBind設定
-    private void configureCalendarBinders(List<DayOfWeek> daysOfWeek, ThemeColor themeColor) {
-        Objects.requireNonNull(daysOfWeek);
-        daysOfWeek.stream().forEach(Objects::requireNonNull);
-        Objects.requireNonNull(themeColor);
-
-        binding.calendar.setDayBinder(new CalendarMonthDayBinder(themeColor));
-        binding.calendar.setMonthHeaderBinder(new CalendarMonthHeaderFooterBinder(daysOfWeek, themeColor));
+    private fun configureCalendarBinders(daysOfWeek: List<DayOfWeek>, themeColor: ThemeColor) {
+        binding.calendar.dayBinder = CalendarMonthDayBinder(themeColor)
+        binding.calendar.monthHeaderBinder =
+            CalendarMonthHeaderFooterBinder(daysOfWeek, themeColor)
     }
 
-    private class CalendarMonthDayBinder implements MonthDayBinder<DayViewContainer> {
+    private inner class CalendarMonthDayBinder(private val themeColor: ThemeColor) :
+        MonthDayBinder<DayViewContainer> {
 
-        private final ThemeColor themeColor;
-
-        private CalendarMonthDayBinder(ThemeColor themeColor) {
-            Objects.requireNonNull(themeColor);
-
-            this.themeColor = themeColor;
-        }
-
-        @Override
-        public void bind(@NonNull DayViewContainer container, @NonNull CalendarDay calendarDay) {
-
-            TextView textDay = container.binding.textDay;
-            View viewDayDot = container.binding.viewDayDot;
-
-            textDay.setOnClickListener(v -> {
-                Objects.requireNonNull(v);
-
-                if (calendarDay.getPosition() == DayPosition.MonthDate) {
-                    calendarViewModel.updateSelectedDate(calendarDay.getDate());
-                }
-            });
-
-            // 数値設定
-            String day = String.valueOf(calendarDay.getDate().getDayOfMonth());
-            textDay.setText(day);
-
-            // 日にちマス状態(可視、数値色、背景色、ドット有無)設定
-            if (calendarDay.getPosition() == DayPosition.MonthDate) {
-                textDay.setVisibility(View.VISIBLE);
-                setUpCalendarDayColor(calendarDay, textDay, viewDayDot);
-                setUpCalendarDayDotVisibility(calendarDay, viewDayDot);
-            } else {
-                textDay.setVisibility(View.INVISIBLE);
-                viewDayDot.setVisibility(View.INVISIBLE);
-            }
-        }
-
-        private void setUpCalendarDayColor(
-                @NonNull CalendarDay calendarDay, TextView textCalendarDay, View viewCalendarDayDot) {
-            Objects.requireNonNull(textCalendarDay);
-            Objects.requireNonNull(viewCalendarDayDot);
-
-            CalendarThemeColorSwitcher themeColorSwitcher =
-                    new CalendarThemeColorSwitcher(requireContext(), themeColor);
-
-            LocalDate selectedDate = calendarViewModel.getSelectedDateLiveData().getValue();
-            boolean isSelectedDay = calendarDay.getDate().isEqual(selectedDate);
-            boolean isToday = calendarDay.getDate().isEqual(LocalDate.now());
-
-            if (isSelectedDay) {
-                themeColorSwitcher.switchCalendarSelectedDayColor(textCalendarDay, viewCalendarDayDot);
-            } else if (isToday) {
-                themeColorSwitcher.switchCalendarTodayColor(textCalendarDay, viewCalendarDayDot);
-            } else {
-                DayOfWeek dayOfWeek = calendarDay.getDate().getDayOfWeek();
-                boolean isSaturday = dayOfWeek == DayOfWeek.SATURDAY;
-                boolean isSunday = dayOfWeek == DayOfWeek.SUNDAY;
-
-                if (isSaturday) {
-                    themeColorSwitcher.switchCalendarSaturdayColor(textCalendarDay, viewCalendarDayDot);
-                } else if (isSunday) {
-                    themeColorSwitcher.switchCalendarSundayColor(textCalendarDay, viewCalendarDayDot);
-                } else {
-                    themeColorSwitcher.switchCalendarWeekdaysColor(textCalendarDay, viewCalendarDayDot);
-                }
-            }
-        }
-
-        private void setUpCalendarDayDotVisibility(
-                @NonNull CalendarDay calendarDay, View viewCalendarDayDot) {
-            Objects.requireNonNull(viewCalendarDayDot);
-
-            LocalDate localDate = calendarDay.getDate();
-            calendarViewModel.existsSavedDiary(localDate, new FutureCallback<Boolean>() {
-                @Override
-                public void onSuccess(Boolean result) {
-                    if (result) {
-                        viewCalendarDayDot.setVisibility(View.VISIBLE);
-                    } else {
-                        viewCalendarDayDot.setVisibility(View.INVISIBLE);
+        @Suppress("PARAMETER_NAME_CHANGED_ON_OVERRIDE")
+        override fun bind(container: DayViewContainer, calendarDay: CalendarDay) {
+            val textDay = container.binding.textDay.apply {
+                setOnClickListener {
+                    if (calendarDay.position == DayPosition.MonthDate) {
+                        calendarViewModel.updateSelectedDate(calendarDay.date)
                     }
                 }
 
-                @Override
-                public void onFailure(@NonNull Throwable t) {
-                    // 例外はViewModelクラス内で例外用リスナーを追加して対応
-                    viewCalendarDayDot.setVisibility(View.INVISIBLE);
-                }
-            });
+                // 数値設定
+                val day = calendarDay.date.dayOfMonth.toString()
+                text = day
+            }
+            val viewDayDot = container.binding.viewDayDot
+
+            // 日にちマス状態(可視、数値色、背景色、ドット有無)設定
+            if (calendarDay.position == DayPosition.MonthDate) {
+                textDay.visibility = View.VISIBLE
+                setUpCalendarDayColor(calendarDay, textDay, viewDayDot)
+                setUpCalendarDayDotVisibility(calendarDay, viewDayDot)
+            } else {
+                textDay.visibility = View.INVISIBLE
+                viewDayDot.visibility = View.INVISIBLE
+            }
         }
 
-        @NonNull
-        @Override
-        public DayViewContainer create(@NonNull View view) {
-            return new DayViewContainer(view);
+        fun setUpCalendarDayColor(
+            calendarDay: CalendarDay, textCalendarDay: TextView, viewCalendarDayDot: View
+        ) {
+            val themeColorSwitcher =
+                CalendarThemeColorSwitcher(requireContext(), themeColor)
+
+            val selectedDate = calendarViewModel.selectedDateLiveData.value
+            val isSelectedDay = calendarDay.date.isEqual(selectedDate)
+            val isToday = calendarDay.date.isEqual(LocalDate.now())
+
+            if (isSelectedDay) {
+                themeColorSwitcher.switchCalendarSelectedDayColor(
+                    textCalendarDay,
+                    viewCalendarDayDot
+                )
+            } else if (isToday) {
+                themeColorSwitcher.switchCalendarTodayColor(textCalendarDay, viewCalendarDayDot)
+            } else {
+                val dayOfWeek = calendarDay.date.dayOfWeek
+                val isSaturday = dayOfWeek == DayOfWeek.SATURDAY
+                val isSunday = dayOfWeek == DayOfWeek.SUNDAY
+
+                if (isSaturday) {
+                    themeColorSwitcher.switchCalendarSaturdayColor(
+                        textCalendarDay,
+                        viewCalendarDayDot
+                    )
+                } else if (isSunday) {
+                    themeColorSwitcher.switchCalendarSundayColor(
+                        textCalendarDay,
+                        viewCalendarDayDot
+                    )
+                } else {
+                    themeColorSwitcher.switchCalendarWeekdaysColor(
+                        textCalendarDay,
+                        viewCalendarDayDot
+                    )
+                }
+            }
+        }
+
+        fun setUpCalendarDayDotVisibility(calendarDay: CalendarDay, viewCalendarDayDot: View) {
+            val localDate = calendarDay.date
+            calendarViewModel.existsSavedDiary(localDate, object : FutureCallback<Boolean> {
+                override fun onSuccess(result: Boolean) {
+                    if (result) {
+                        viewCalendarDayDot.visibility = View.VISIBLE
+                    } else {
+                        viewCalendarDayDot.visibility = View.INVISIBLE
+                    }
+                }
+
+                override fun onFailure(t: Throwable) {
+                    // 例外はViewModelクラス内で例外用リスナーを追加して対応
+                    viewCalendarDayDot.visibility = View.INVISIBLE
+                }
+            })
+        }
+
+        override fun create(view: View): DayViewContainer {
+            return DayViewContainer(view)
         }
     }
 
-    private class CalendarMonthHeaderFooterBinder implements MonthHeaderFooterBinder<MonthViewContainer> {
+    private inner class CalendarMonthHeaderFooterBinder(
+        private val daysOfWeek: List<DayOfWeek>,
+        private val themeColor: ThemeColor
+    ) : MonthHeaderFooterBinder<MonthViewContainer> {
 
-        private final List<DayOfWeek> daysOfWeek;
-        private final ThemeColor themeColor;
-
-        private CalendarMonthHeaderFooterBinder(List<DayOfWeek> daysOfWeek, ThemeColor themeColor) {
-            Objects.requireNonNull(daysOfWeek);
-            daysOfWeek.stream().forEach(Objects::requireNonNull);
-            Objects.requireNonNull(themeColor);
-
-            this.daysOfWeek = daysOfWeek;
-            this.themeColor = themeColor;
-        }
-
-        @Override
-        public void bind(@NonNull MonthViewContainer container, @NonNull CalendarMonth calendarMonth) {
+        @Suppress("PARAMETER_NAME_CHANGED_ON_OVERRIDE")
+        override fun bind(container: MonthViewContainer, calendarMonth: CalendarMonth) {
             // カレンダーの年月表示設定
-            String format = getString(R.string.fragment_calendar_month_header_format);
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern(format);
-            String stringYearMonth = calendarMonth.getYearMonth().format(formatter);
-            container.binding.textYearMonth.setText(stringYearMonth);
+            val format = getString(R.string.fragment_calendar_month_header_format)
+            val formatter = DateTimeFormatter.ofPattern(format)
+            val stringYearMonth = calendarMonth.yearMonth.format(formatter)
+            container.binding.textYearMonth.text = stringYearMonth
 
             // カレンダーの曜日設定(未設定アイテムのみ設定)
-            LinearLayout linearLayout = container.binding.legendLayout.getRoot();
-            if (linearLayout.getTag() != null) return;
-            linearLayout.setTag(calendarMonth.getYearMonth());
+            val linearLayout = container.binding.legendLayout.root
+            if (linearLayout.tag != null) return
+            linearLayout.tag = calendarMonth.yearMonth
 
             // カレンダー曜日表示設定
-            int max = linearLayout.getChildCount();
-            for (int i = 0; i < max; i++) {
-                View childView = linearLayout.getChildAt(i);
-                TextView childTextView = (TextView) childView;
-                DayOfWeek dayOfWeek = daysOfWeek.get(i);
+            val max = linearLayout.childCount
+            for (i in 0 until max) {
+                val childView = linearLayout.getChildAt(i)
+                val childTextView = childView as TextView
+                val dayOfWeek = daysOfWeek[i]
 
-                childTextView.setText(dayOfWeek.name().substring(0,3));
+                childTextView.text = dayOfWeek.name.substring(0, 3)
 
-                setUpDayOfWeekColor(dayOfWeek, childTextView);
+                setUpDayOfWeekColor(dayOfWeek, childTextView)
             }
         }
 
-        private void setUpDayOfWeekColor(DayOfWeek dayOfWeek, TextView dayOfWeekText) {
-            Objects.requireNonNull(dayOfWeek);
-            Objects.requireNonNull(dayOfWeekText);
+        fun setUpDayOfWeekColor(dayOfWeek: DayOfWeek, dayOfWeekText: TextView) {
+            val themeColorSwitcher =
+                CalendarThemeColorSwitcher(requireContext(), themeColor)
 
-            CalendarThemeColorSwitcher themeColorSwitcher =
-                    new CalendarThemeColorSwitcher(requireContext(), themeColor);
-
-            boolean isSaturday = dayOfWeek == DayOfWeek.SATURDAY;
-            boolean isSunday = dayOfWeek == DayOfWeek.SUNDAY;
+            val isSaturday = dayOfWeek == DayOfWeek.SATURDAY
+            val isSunday = dayOfWeek == DayOfWeek.SUNDAY
 
             if (isSaturday) {
-                themeColorSwitcher.switchCalendarDayOfWeekSaturdayColor(dayOfWeekText);
+                themeColorSwitcher.switchCalendarDayOfWeekSaturdayColor(dayOfWeekText)
             } else if (isSunday) {
-                themeColorSwitcher.switchCalendarDayOfWeekSundayColor(dayOfWeekText);
+                themeColorSwitcher.switchCalendarDayOfWeekSundayColor(dayOfWeekText)
             } else {
-                themeColorSwitcher.switchCalendarDayOfWeekWeekdaysColor(dayOfWeekText);
+                themeColorSwitcher.switchCalendarDayOfWeekWeekdaysColor(dayOfWeekText)
             }
         }
 
-        @NonNull
-        @Override
-        public MonthViewContainer create(@NonNull View view) {
-            return new MonthViewContainer(view);
+        override fun create(view: View): MonthViewContainer {
+            return MonthViewContainer(view)
         }
     }
 
     // カレンダー日単位コンテナ
-    private static class DayViewContainer extends ViewContainer {
-
-        private final LayoutCalendarDayBinding binding;
-
-        private DayViewContainer(View view) {
-            super(view);
-            binding = LayoutCalendarDayBinding.bind(view);
-        }
+    private class DayViewContainer(view: View) : ViewContainer(view) {
+        val binding: LayoutCalendarDayBinding = LayoutCalendarDayBinding.bind(view)
     }
 
     // カレンダー月単位コンテナ
-    private static class MonthViewContainer extends ViewContainer {
-
-        private final LayoutCalendarHeaderBinding binding;
-
-        private MonthViewContainer(View view) {
-            super(view);
-            binding = LayoutCalendarHeaderBinding.bind(view);
-        }
+    private class MonthViewContainer(view: View) : ViewContainer(view) {
+        val binding: LayoutCalendarHeaderBinding = LayoutCalendarHeaderBinding.bind(view)
     }
 
     // カレンダーを指定した日付へ自動スクロール
-    private void scrollCalendar(LocalDate date) {
-        Objects.requireNonNull(date);
-
-        YearMonth targetYearMonth = YearMonth.of(date.getYear(), date.getMonthValue());
-        CalendarMonth currentMonth = binding.calendar.findFirstVisibleMonth();
+    private fun scrollCalendar(date: LocalDate) {
+        val targetYearMonth = YearMonth.of(date.year, date.monthValue)
+        val currentMonth = binding.calendar.findFirstVisibleMonth()
         if (currentMonth == null) {
-            binding.calendar.scrollToMonth(targetYearMonth);
-            return;
+            binding.calendar.scrollToMonth(targetYearMonth)
+            return
         }
 
-        YearMonth currentYearMonth = currentMonth.getYearMonth();
-        Objects.requireNonNull(currentYearMonth);
+        val currentYearMonth = currentMonth.yearMonth
 
         // MEMO:カレンダーが今日の日付月から遠い月を表示していたらsmoothScrollの処理時間が延びるので、
         //      間にScroll処理を入れる。
         if (currentYearMonth.isAfter(targetYearMonth)) {
-            YearMonth firstSwitchPoint  = currentYearMonth.minusMonths(3);
-            YearMonth secondSwitchPoint  = targetYearMonth.plusMonths(6);
+            val firstSwitchPoint = currentYearMonth.minusMonths(3)
+            val secondSwitchPoint = targetYearMonth.plusMonths(6)
             if (currentYearMonth.isAfter(secondSwitchPoint)) {
-                binding.calendar.smoothScrollToMonth(firstSwitchPoint);
-                binding.calendar.scrollToMonth(secondSwitchPoint);
+                binding.calendar.smoothScrollToMonth(firstSwitchPoint)
+                binding.calendar.scrollToMonth(secondSwitchPoint)
             }
         } else {
-            YearMonth firstSwitchPoint  = currentYearMonth.plusMonths(3);
-            YearMonth secondSwitchPoint  = targetYearMonth.minusMonths(6);
+            val firstSwitchPoint = currentYearMonth.plusMonths(3)
+            val secondSwitchPoint = targetYearMonth.minusMonths(6)
             if (currentYearMonth.isBefore(secondSwitchPoint)) {
-                binding.calendar.smoothScrollToMonth(firstSwitchPoint);
-                binding.calendar.scrollToMonth(secondSwitchPoint);
+                binding.calendar.smoothScrollToMonth(firstSwitchPoint)
+                binding.calendar.scrollToMonth(secondSwitchPoint)
             }
         }
-        binding.calendar.smoothScrollToMonth(targetYearMonth);
+        binding.calendar.smoothScrollToMonth(targetYearMonth)
     }
 
-    private void updateToolBarDate(LocalDate date) {
-        Objects.requireNonNull(date);
-
-        DateTimeStringConverter dateTimeStringConverter = new DateTimeStringConverter();
-        String stringDate = dateTimeStringConverter.toYearMonthDayWeek(date);
-        binding.materialToolbarTopAppBar.setTitle(stringDate);
+    private fun updateToolBarDate(date: LocalDate) {
+        val dateTimeStringConverter = DateTimeStringConverter()
+        val stringDate = dateTimeStringConverter.toYearMonthDayWeek(date)
+        binding.materialToolbarTopAppBar.title = stringDate
     }
 
     // CalendarViewで選択された日付の日記を表示
-    private void showSelectedDiary(LocalDate date) {
-        Objects.requireNonNull(date);
-
-        calendarViewModel.existsSavedDiary(date, new DiaryShowFutureCallback(date));
+    private fun showSelectedDiary(date: LocalDate) {
+        calendarViewModel.existsSavedDiary(date, DiaryShowFutureCallback(date))
     }
 
-    private class DiaryShowFutureCallback implements FutureCallback<Boolean> {
+    private inner class DiaryShowFutureCallback(private val date: LocalDate) : FutureCallback<Boolean> {
 
-        private final LocalDate date;
-
-        private DiaryShowFutureCallback(LocalDate date) {
-            Objects.requireNonNull(date);
-
-            this.date = date;
-        }
-
-        @Override
-        public void onSuccess(Boolean result) {
-            Objects.requireNonNull(result);
-
+        override fun onSuccess(result: Boolean) {
             if (result) {
-                showDiary();
+                showDiary()
             } else {
-                closeDiary();
+                closeDiary()
             }
         }
 
-        @Override
-        public void onFailure(@NonNull Throwable t) {
+        override fun onFailure(t: Throwable) {
             // 例外はViewModelクラス内で例外用リスナーを追加して対応
-            closeDiary();
+            closeDiary()
         }
 
-        private void showDiary() {
-            diaryShowViewModel.initialize();
-            diaryShowViewModel.loadSavedDiary(date);
-            binding.frameLayoutDiaryShow.setVisibility(View.VISIBLE);
-            binding.textNoDiaryMessage.setVisibility(View.GONE);
+        fun showDiary() {
+            diaryShowViewModel.initialize()
+            diaryShowViewModel.loadSavedDiary(date)
+            binding.frameLayoutDiaryShow.visibility = View.VISIBLE
+            binding.textNoDiaryMessage.visibility = View.GONE
         }
 
-        private void closeDiary() {
-            binding.frameLayoutDiaryShow.setVisibility(View.GONE);
-            binding.textNoDiaryMessage.setVisibility(View.VISIBLE);
-            diaryShowViewModel.initialize();
+        fun closeDiary() {
+            binding.frameLayoutDiaryShow.visibility = View.GONE
+            binding.textNoDiaryMessage.visibility = View.VISIBLE
+            diaryShowViewModel.initialize()
         }
     }
 
-    private void setUpDiaryShow() {
-        diaryShowViewModel.getWeather1LiveData()
-                .observe(
-                        getViewLifecycleOwner(),
-                        new DiaryShowFragment.Weather1Observer(
-                                requireContext(),
-                                binding.includeDiaryShow.textWeather1Selected
-                        )
-                );
+    private fun setUpDiaryShow() {
+        diaryShowViewModel.weather1LiveData
+            .observe(
+                viewLifecycleOwner,
+                Weather1Observer(
+                    requireContext(),
+                    binding.includeDiaryShow.textWeather1Selected
+                )
+            )
 
-        diaryShowViewModel.getWeather2LiveData()
-                .observe(
-                        getViewLifecycleOwner(),
-                        new DiaryShowFragment.Weather2Observer(
-                                requireContext(),
-                                binding.includeDiaryShow.textWeatherSlush,
-                                binding.includeDiaryShow.textWeather2Selected
-                        )
-                );
+        diaryShowViewModel.weather2LiveData
+            .observe(
+                viewLifecycleOwner,
+                Weather2Observer(
+                    requireContext(),
+                    binding.includeDiaryShow.textWeatherSlush,
+                    binding.includeDiaryShow.textWeather2Selected
+                )
+            )
 
-        diaryShowViewModel.getConditionLiveData()
-                .observe(
-                        getViewLifecycleOwner(),
-                        new DiaryShowFragment.ConditionObserver(
-                                requireContext(),
-                                binding.includeDiaryShow.textConditionSelected
-                        )
-                );
+        diaryShowViewModel.conditionLiveData
+            .observe(
+                viewLifecycleOwner,
+                ConditionObserver(
+                    requireContext(),
+                    binding.includeDiaryShow.textConditionSelected
+                )
+            )
 
         // 項目レイアウト設定
-        View[] itemLayouts = new View[DiaryLiveData.MAX_ITEMS];
-        itemLayouts[0] = binding.includeDiaryShow.includeItem1.linerLayoutDiaryShowItem;
-        itemLayouts[1] = binding.includeDiaryShow.includeItem2.linerLayoutDiaryShowItem;
-        itemLayouts[2] = binding.includeDiaryShow.includeItem3.linerLayoutDiaryShowItem;
-        itemLayouts[3] = binding.includeDiaryShow.includeItem4.linerLayoutDiaryShowItem;
-        itemLayouts[4] = binding.includeDiaryShow.includeItem5.linerLayoutDiaryShowItem;
-        diaryShowViewModel.getNumVisibleItemsLiveData()
-                .observe(getViewLifecycleOwner(), new DiaryShowFragment.NumVisibleItemsObserver(itemLayouts));
+        val itemLayouts = arrayOfNulls<View>(DiaryLiveData.MAX_ITEMS)
+        itemLayouts[0] = binding.includeDiaryShow.includeItem1.linerLayoutDiaryShowItem
+        itemLayouts[1] = binding.includeDiaryShow.includeItem2.linerLayoutDiaryShowItem
+        itemLayouts[2] = binding.includeDiaryShow.includeItem3.linerLayoutDiaryShowItem
+        itemLayouts[3] = binding.includeDiaryShow.includeItem4.linerLayoutDiaryShowItem
+        itemLayouts[4] = binding.includeDiaryShow.includeItem5.linerLayoutDiaryShowItem
+        diaryShowViewModel.numVisibleItemsLiveData
+            .observe(viewLifecycleOwner, DiaryShowFragment.NumVisibleItemsObserver(itemLayouts))
 
-        diaryShowViewModel.getPicturePathLiveData()
-                .observe(
-                        getViewLifecycleOwner(),
-                        new DiaryShowFragment.PicturePathObserver(
-                                requireContext(),
-                                requireThemeColor(),
-                                binding.includeDiaryShow.textAttachedPicture,
-                                binding.includeDiaryShow.imageAttachedPicture
-                        )
-                );
+        diaryShowViewModel.picturePathLiveData
+            .observe(
+                viewLifecycleOwner,
+                DiaryShowFragment.PicturePathObserver(
+                    requireContext(),
+                    requireThemeColor(),
+                    binding.includeDiaryShow.textAttachedPicture,
+                    binding.includeDiaryShow.imageAttachedPicture
+                )
+            )
 
-        diaryShowViewModel.getLogLiveData()
-                .observe(
-                        getViewLifecycleOwner(),
-                        new DiaryShowFragment.LogObserver(binding.includeDiaryShow.textLogValue)
-                );
+        diaryShowViewModel.logLiveData
+            .observe(
+                viewLifecycleOwner,
+                LogObserver(binding.includeDiaryShow.textLogValue)
+            )
     }
 
-    private void setUpFloatActionButton() {
-        binding.floatingActionButtonDiaryEdit.setOnClickListener(v -> {
-            Objects.requireNonNull(v);
-
-            LocalDate selectedDate = calendarViewModel.getSelectedDateLiveData().getValue();
-            showDiaryEditFragment(selectedDate);
-        });
+    private fun setUpFloatActionButton() {
+        binding.floatingActionButtonDiaryEdit.setOnClickListener {
+            val selectedDate = requireNotNull(calendarViewModel.selectedDateLiveData.value)
+            showDiaryEditFragment(selectedDate)
+        }
     }
 
     // 選択中ボトムナビゲーションタブを再選択時の処理
-    public void processOnReselectNavigationItem() {
+    fun processOnReselectNavigationItem() {
         if (binding.nestedScrollFullScreen.canScrollVertically(-1)) {
-            scrollToTop();
+            scrollToTop()
         } else {
-            calendarViewModel.updateSelectedDate(LocalDate.now());
+            calendarViewModel.updateSelectedDate(LocalDate.now())
         }
     }
 
     // 先頭へ自動スクロール
-    private void scrollToTop() {
-        binding.nestedScrollFullScreen.smoothScrollTo(0, 0);
+    private fun scrollToTop() {
+        binding.nestedScrollFullScreen.smoothScrollTo(0, 0)
     }
 
-    private void showDiaryEditFragment(LocalDate date) {
-        Objects.requireNonNull(date);
-        if (isDialogShowing()) return;
+    private fun showDiaryEditFragment(date: LocalDate) {
+        if (isDialogShowing()) return
 
-        NavDirections action =
-                CalendarFragmentDirections
-                        .actionNavigationCalendarFragmentToDiaryEditFragment(
-                                true,
-                                true,
-                                date
-                        );
-        navController.navigate(action);
+        val action: NavDirections =
+            CalendarFragmentDirections
+                .actionNavigationCalendarFragmentToDiaryEditFragment(
+                    true,
+                    true,
+                    date
+                )
+        navController.navigate(action)
     }
 
-    @Override
-    protected void navigateAppMessageDialog(@NonNull AppMessage appMessage) {
-        NavDirections action =
-                CalendarFragmentDirections
-                        .actionCalendarFragmentToAppMessageDialog(appMessage);
-        navController.navigate(action);
+    override fun navigateAppMessageDialog(appMessage: AppMessage) {
+        val action: NavDirections =
+            CalendarFragmentDirections
+                .actionCalendarFragmentToAppMessageDialog(appMessage)
+        navController.navigate(action)
     }
 
-    @Override
-    protected void retryOtherAppMessageDialogShow() {
-        calendarViewModel.triggerAppMessageBufferListObserver();
-        diaryShowViewModel.triggerAppMessageBufferListObserver();
+    override fun retryOtherAppMessageDialogShow() {
+        calendarViewModel.triggerAppMessageBufferListObserver()
+        diaryShowViewModel.triggerAppMessageBufferListObserver()
     }
 
-    @Override
-    protected void destroyBinding() {
-        binding = null;
+    override fun destroyBinding() {
+        _binding = null
     }
 }
