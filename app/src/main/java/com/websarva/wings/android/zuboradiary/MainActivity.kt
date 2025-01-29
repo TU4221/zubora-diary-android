@@ -140,7 +140,7 @@ class MainActivity : AppCompatActivity() {
                 override fun onLocationResult(locationResult: LocationResult) {
                     super.onLocationResult(locationResult)
                     // アプリ起動時に一回だけ取得
-                    val location = requireNotNull(locationResult.lastLocation)
+                    val location = checkNotNull(locationResult.lastLocation)
                     val geoCoordinates =
                         GeoCoordinates(location.latitude, location.longitude)
                     settingsViewModel.updateGeoCoordinates(geoCoordinates)
@@ -172,9 +172,9 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun findNavHostFragment(): NavHostFragment {
-        val navHostFragment =
-            supportFragmentManager.findFragmentById(R.id.fragment_nav_host) as NavHostFragment?
-        return requireNotNull(navHostFragment)
+        return checkNotNull(
+            supportFragmentManager.findFragmentById(R.id.fragment_nav_host)
+        ) as NavHostFragment
     }
 
     private fun findNavFragmentManager(): FragmentManager {
@@ -185,8 +185,7 @@ class MainActivity : AppCompatActivity() {
     private fun findShowedFragment(): Fragment {
         val fragmentManager = findNavFragmentManager()
         val fragmentList = fragmentManager.fragments
-        val fragment = fragmentList[0]
-        return requireNotNull(fragment)
+        return checkNotNull(fragmentList[0])
     }
 
     private fun findSelectedBottomNavigationMenuItem(): MenuItem {
@@ -200,9 +199,9 @@ class MainActivity : AppCompatActivity() {
         // 参考:https://inside.luchegroup.com/entry/2023/05/08/113236
         val bottomNavigationView = binding.bottomNavigation
         val navHostFragment =
-            requireNotNull(
-                supportFragmentManager.findFragmentById(R.id.fragment_nav_host) as NavHostFragment
-            )
+            checkNotNull(
+                supportFragmentManager.findFragmentById(R.id.fragment_nav_host)
+            ) as NavHostFragment
         val navController = navHostFragment.navController
         setupWithNavController(bottomNavigationView, navController)
 
@@ -352,7 +351,7 @@ class MainActivity : AppCompatActivity() {
             }
 
             // Fragment以外(Dialog)表示中は一つ前のFragmentを元に判断
-            val previousNavBackStackEntry = requireNotNull(navController.previousBackStackEntry)
+            val previousNavBackStackEntry = checkNotNull(navController.previousBackStackEntry)
             val previousNavDestination = previousNavBackStackEntry.destination
             return isFragmentWithBottomNavigation(previousNavDestination)
         }

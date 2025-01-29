@@ -93,13 +93,13 @@ open class LeftSwipeSimpleCallback(protected val recyclerView: RecyclerView) :
     //      (参照:https://mt312.com/3182)
     protected fun closeSwipedViewHolder(position: Int) {
         require(position >= 0)
-        val adapter = requireNotNull(recyclerView.adapter)
+        val adapter = checkNotNull(recyclerView.adapter)
         val listSize = adapter.itemCount
         require(position < listSize)
 
         Log.d("LeftSwipeSimpleCallBack", "closeSwipedViewHolder()_position:$position")
         val viewHolder =
-            requireNotNull(recyclerView.findViewHolderForAdapterPosition(position))
+            checkNotNull(recyclerView.findViewHolderForAdapterPosition(position))
 
         animateSwipingView(
             position,

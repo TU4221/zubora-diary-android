@@ -63,7 +63,7 @@ abstract class BaseNumberPickersBottomSheetDialogFragment : BaseBottomSheetDialo
 
     protected fun setResult(key: String, value: Any) {
         val navController = NavHostFragment.findNavController(this)
-        val navBackStackEntry = requireNotNull(navController.previousBackStackEntry)
+        val navBackStackEntry = checkNotNull(navController.previousBackStackEntry)
         val savedStateHandle = navBackStackEntry.savedStateHandle
         savedStateHandle[key] = value
     }

@@ -39,19 +39,19 @@ abstract class BaseViewModel : ViewModel() {
     }
 
     fun triggerAppMessageBufferListObserver() {
-        val currentList = requireNotNull(_appMessageBufferList.value)
+        val currentList = checkNotNull(_appMessageBufferList.value)
         _appMessageBufferList.value = AppMessageList()
         _appMessageBufferList.value = currentList
     }
 
     fun removeAppMessageBufferListFirstItem() {
-        val currentList = requireNotNull(_appMessageBufferList.value)
+        val currentList = checkNotNull(_appMessageBufferList.value)
         val updateList = currentList.removeFirstItem()
         _appMessageBufferList.value = updateList
     }
 
     protected fun equalLastAppMessage(appMessage: AppMessage): Boolean {
-        val currentList = requireNotNull(_appMessageBufferList.value)
+        val currentList = checkNotNull(_appMessageBufferList.value)
         return currentList.equalLastItem(appMessage)
     }
 }

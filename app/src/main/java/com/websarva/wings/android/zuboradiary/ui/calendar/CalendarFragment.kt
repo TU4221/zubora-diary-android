@@ -126,7 +126,7 @@ class CalendarFragment : BaseFragment() {
         val endMonth = currentMonth.plusMonths(60) //現在から未来5年分
         calendar.setup(startMonth, endMonth, daysOfWeek[0])
 
-        val selectedDate = requireNotNull(calendarViewModel.selectedDate.value)
+        val selectedDate = checkNotNull(calendarViewModel.selectedDate.value)
         calendarViewModel.updateSelectedDate(selectedDate)
 
         calendarViewModel.selectedDate
@@ -457,7 +457,7 @@ class CalendarFragment : BaseFragment() {
 
     private fun setUpFloatActionButton() {
         binding.floatingActionButtonDiaryEdit.setOnClickListener {
-            val selectedDate = requireNotNull(calendarViewModel.selectedDate.value)
+            val selectedDate = checkNotNull(calendarViewModel.selectedDate.value)
             showDiaryEditFragment(selectedDate)
         }
     }

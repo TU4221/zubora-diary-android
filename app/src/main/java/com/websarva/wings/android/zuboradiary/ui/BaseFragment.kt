@@ -54,7 +54,7 @@ abstract class BaseFragment : CustomFragment() {
 
     private fun getCurrentDestinationId(): Int {
         val navDestination = navController.currentDestination
-        return requireNotNull(navDestination).id
+        return checkNotNull(navDestination).id
     }
 
     /**
@@ -135,17 +135,17 @@ abstract class BaseFragment : CustomFragment() {
     }
 
     protected fun addTransitionListener(listener: Transition.TransitionListener) {
-        val enterTransition = enterTransition as MaterialSharedAxis?
-        requireNotNull(enterTransition).addListener(listener)
+        val enterTransition = checkNotNull(enterTransition as MaterialSharedAxis)
+        enterTransition.addListener(listener)
 
-        val exitTransition = exitTransition as MaterialSharedAxis?
-        requireNotNull(exitTransition).addListener(listener)
+        val exitTransition = checkNotNull(exitTransition as MaterialSharedAxis)
+        exitTransition.addListener(listener)
 
-        val reenterTransition = reenterTransition as MaterialSharedAxis?
-        requireNotNull(reenterTransition).addListener(listener)
+        val reenterTransition = checkNotNull(reenterTransition as MaterialSharedAxis)
+        reenterTransition.addListener(listener)
 
-        val returnTransition = returnTransition as MaterialSharedAxis?
-        requireNotNull(returnTransition).addListener(listener)
+        val returnTransition = checkNotNull(returnTransition as MaterialSharedAxis)
+        returnTransition.addListener(listener)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -158,8 +158,8 @@ abstract class BaseFragment : CustomFragment() {
 
 
     private fun getNavBackStackEntrySavedStateHandle(): SavedStateHandle {
-        val navBackStackEntry = navController.currentBackStackEntry
-        return requireNotNull(navBackStackEntry).savedStateHandle
+        val navBackStackEntry = checkNotNull(navController.currentBackStackEntry)
+        return navBackStackEntry.savedStateHandle
     }
 
     private fun setUpPreviousFragmentResultReceiver() {
@@ -174,7 +174,7 @@ abstract class BaseFragment : CustomFragment() {
     protected abstract fun handleOnReceivingResultFromPreviousFragment(savedStateHandle: SavedStateHandle)
 
     private fun setUpDialogResultReceiver() {
-        val navBackStackEntry = requireNotNull(navController.currentBackStackEntry)
+        val navBackStackEntry = checkNotNull(navController.currentBackStackEntry)
 
         val lifecycleEventObserver =
             LifecycleEventObserver { _, event: Lifecycle.Event ->
@@ -238,7 +238,7 @@ abstract class BaseFragment : CustomFragment() {
         override fun onChanged(value: AppMessageList) {
             if (value.isEmpty) return
 
-            val firstAppMessage = requireNotNull(value.findFirstItem())
+            val firstAppMessage = checkNotNull(value.findFirstItem())
             showAppMessageDialog(firstAppMessage)
             baseViewModel.removeAppMessageBufferListFirstItem()
         }

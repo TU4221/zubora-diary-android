@@ -14,7 +14,7 @@ import java.util.Arrays
 class TextInputSetup(activity: Activity) : EditTextSetup(activity) {
 
     private fun TextInputLayout.getEditTextNonNull(): EditText {
-        return requireNotNull(editText)
+        return checkNotNull(editText)
     }
 
     fun setUpScrollable(vararg textInputLayouts: TextInputLayout) {
@@ -90,9 +90,9 @@ class TextInputSetup(activity: Activity) : EditTextSetup(activity) {
                 x.endIconMode = TextInputLayout.END_ICON_CUSTOM
                 x.setEndIconDrawable(R.drawable.ic_cancel_24px)
 
-                val textInputEditText = requireNotNull(x.editText) as TextInputEditText
+                val textInputEditText = checkNotNull(x.editText) as TextInputEditText
 
-                val text = requireNotNull(textInputEditText.text)
+                val text = checkNotNull(textInputEditText.text)
                 val isVisible = text.toString().isNotEmpty()
                 x.isEndIconVisible = isVisible
                 x.setEndIconOnClickListener {

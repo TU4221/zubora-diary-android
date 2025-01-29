@@ -245,7 +245,7 @@ open class ThemeColorSwitcher(protected val context: Context, protected val them
             val drawable = drawables[i]
             if (drawable != null) {
                 wrappedDrawable[i] = DrawableCompat.wrap(drawable)
-                DrawableCompat.setTint(requireNotNull(wrappedDrawable[i]) , color)
+                DrawableCompat.setTint(checkNotNull(wrappedDrawable[i]) , color)
             }
         }
         view.setCompoundDrawablesRelativeWithIntrinsicBounds(
