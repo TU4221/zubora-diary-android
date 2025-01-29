@@ -126,10 +126,10 @@ class CalendarFragment : BaseFragment() {
         val endMonth = currentMonth.plusMonths(60) //現在から未来5年分
         calendar.setup(startMonth, endMonth, daysOfWeek[0])
 
-        val selectedDate = calendarViewModel.selectedDateLiveData.value
+        val selectedDate = requireNotNull(calendarViewModel.selectedDate.value)
         calendarViewModel.updateSelectedDate(selectedDate)
 
-        calendarViewModel.selectedDateLiveData
+        calendarViewModel.selectedDate
             .observe(viewLifecycleOwner) { localDate: LocalDate ->
                 binding.calendar.notifyDateChanged(localDate) // 今回選択日付更新
                 scrollCalendar(localDate)
@@ -137,7 +137,7 @@ class CalendarFragment : BaseFragment() {
                 showSelectedDiary(localDate)
             }
 
-        calendarViewModel.previousSelectedDateLiveData
+        calendarViewModel.previousSelectedDate
             .observe(viewLifecycleOwner) { localDate: LocalDate? ->
                 // MEMO:一度も日付選択をしていない場合はnullが代入されている。
                 if (localDate == null) return@observe
@@ -207,7 +207,7 @@ class CalendarFragment : BaseFragment() {
             val themeColorSwitcher =
                 CalendarThemeColorSwitcher(requireContext(), themeColor)
 
-            val selectedDate = calendarViewModel.selectedDateLiveData.value
+            val selectedDate = calendarViewModel.selectedDate.value
             val isSelectedDay = calendarDay.date.isEqual(selectedDate)
             val isToday = calendarDay.date.isEqual(LocalDate.now())
 
@@ -457,7 +457,7 @@ class CalendarFragment : BaseFragment() {
 
     private fun setUpFloatActionButton() {
         binding.floatingActionButtonDiaryEdit.setOnClickListener {
-            val selectedDate = requireNotNull(calendarViewModel.selectedDateLiveData.value)
+            val selectedDate = requireNotNull(calendarViewModel.selectedDate.value)
             showDiaryEditFragment(selectedDate)
         }
     }

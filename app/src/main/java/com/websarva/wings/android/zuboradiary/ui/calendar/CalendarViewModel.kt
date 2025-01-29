@@ -1,98 +1,67 @@
-package com.websarva.wings.android.zuboradiary.ui.calendar;
+package com.websarva.wings.android.zuboradiary.ui.calendar
 
-import android.os.Handler;
-import android.os.Looper;
-
-import androidx.annotation.NonNull;
-import androidx.lifecycle.LiveData;
-import androidx.lifecycle.MutableLiveData;
-
-import com.google.common.util.concurrent.FutureCallback;
-import com.google.common.util.concurrent.Futures;
-import com.google.common.util.concurrent.ListenableFuture;
-import com.websarva.wings.android.zuboradiary.data.AppMessage;
-import com.websarva.wings.android.zuboradiary.data.database.DiaryRepository;
-import com.websarva.wings.android.zuboradiary.ui.BaseViewModel;
-
-import java.time.LocalDate;
-import java.util.Objects;
-import java.util.concurrent.Executor;
-
-import javax.inject.Inject;
-
-import dagger.hilt.android.lifecycle.HiltViewModel;
+import android.os.Handler
+import android.os.Looper
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import com.google.common.util.concurrent.FutureCallback
+import com.google.common.util.concurrent.Futures
+import com.websarva.wings.android.zuboradiary.data.AppMessage
+import com.websarva.wings.android.zuboradiary.data.database.DiaryRepository
+import com.websarva.wings.android.zuboradiary.ui.BaseViewModel
+import dagger.hilt.android.lifecycle.HiltViewModel
+import java.time.LocalDate
+import java.util.concurrent.Executor
+import javax.inject.Inject
 
 @HiltViewModel
-class CalendarViewModel extends BaseViewModel {
+internal class CalendarViewModel @Inject constructor(private val diaryRepository: DiaryRepository) :
+    BaseViewModel() {
 
-    private final DiaryRepository diaryRepository;
-    private final MutableLiveData<LocalDate> selectedDate = new MutableLiveData<>();
-    private final MutableLiveData<LocalDate> previousSelectedDate = new MutableLiveData<>();
+    private val _selectedDate = MutableLiveData<LocalDate>()
+    internal val selectedDate: LiveData<LocalDate> get() = _selectedDate
 
-    @Inject
-    CalendarViewModel(DiaryRepository diaryRepository) {
-        this.diaryRepository = diaryRepository;
-        initialize();
+    private val _previousSelectedDate = MutableLiveData<LocalDate?>()
+    internal val previousSelectedDate: LiveData<LocalDate?> get() = _previousSelectedDate
+
+    init {
+        initialize()
     }
 
-    @Override
-    protected void initialize() {
-        initializeAppMessageList();
-        selectedDate.setValue(LocalDate.now());
-        previousSelectedDate.setValue(null);
+    override fun initialize() {
+        initializeAppMessageList()
+        _selectedDate.value = LocalDate.now()
+        _previousSelectedDate.value = null
     }
 
-    private static class MainThreadExecutor implements Executor {
-        private final Handler handler;
+    private class MainThreadExecutor : Executor {
+        private val handler = Handler(Looper.getMainLooper())
 
-        private MainThreadExecutor() {
-            handler = new Handler(Looper.getMainLooper());
-        }
-
-        @Override
-        public void execute(Runnable command) {
-            handler.post(command);
+        override fun execute(command: Runnable) {
+            handler.post(command)
         }
     }
 
-    void existsSavedDiary(LocalDate date, FutureCallback<Boolean> futureCallback) {
-        Objects.requireNonNull(date);
-        Objects.requireNonNull(futureCallback);
-
-        ListenableFuture<Boolean> hasDiaryListenableFuture = diaryRepository.existsDiary(date);
-        Futures.addCallback(hasDiaryListenableFuture, futureCallback, new MainThreadExecutor());
-        Futures.addCallback(hasDiaryListenableFuture, new FutureCallback<Boolean>() {
-            @Override
-            public void onSuccess(Boolean result) {
+    fun existsSavedDiary(date: LocalDate, futureCallback: FutureCallback<Boolean>) {
+        val hasDiaryListenableFuture = diaryRepository.existsDiary(date)
+        Futures.addCallback(hasDiaryListenableFuture, futureCallback, MainThreadExecutor())
+        Futures.addCallback(hasDiaryListenableFuture, object : FutureCallback<Boolean?> {
+            override fun onSuccess(result: Boolean?) {
                 // 処理なし
             }
 
-            @Override
-            public void onFailure(@NonNull Throwable t) {
+            override fun onFailure(t: Throwable) {
                 // MEMO:CalendarViewModel#hasDiary()はカレンダー日数分連続で処理する為、
                 //      エラーが連続で発生した場合、膨大なエラーを記録してしまう。これを回避する為に下記コードを記述。
-                if (equalLastAppMessage(AppMessage.DIARY_INFO_LOADING_ERROR)) return;
+                if (equalLastAppMessage(AppMessage.DIARY_INFO_LOADING_ERROR)) return
 
-                addAppMessage(AppMessage.DIARY_INFO_LOADING_ERROR);
+                addAppMessage(AppMessage.DIARY_INFO_LOADING_ERROR)
             }
-        }, new MainThreadExecutor());
+        }, MainThreadExecutor())
     }
 
-    void updateSelectedDate(LocalDate date) {
-        Objects.requireNonNull(date);
-
-        previousSelectedDate.setValue(selectedDate.getValue());
-        selectedDate.setValue(date);
+    fun updateSelectedDate(date: LocalDate) {
+        _previousSelectedDate.value = _selectedDate.value
+        _selectedDate.value = date
     }
-
-    @NonNull
-    LiveData<LocalDate> getSelectedDateLiveData() {
-        return selectedDate;
-    }
-
-    @NonNull
-    LiveData<LocalDate> getPreviousSelectedDateLiveData() {
-        return previousSelectedDate;
-    }
-
 }
