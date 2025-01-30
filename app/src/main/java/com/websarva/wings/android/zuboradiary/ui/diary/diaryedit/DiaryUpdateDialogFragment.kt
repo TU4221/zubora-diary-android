@@ -1,60 +1,46 @@
-package com.websarva.wings.android.zuboradiary.ui.diary.diaryedit;
+package com.websarva.wings.android.zuboradiary.ui.diary.diaryedit
 
-import android.content.DialogInterface;
+import android.content.DialogInterface
+import com.websarva.wings.android.zuboradiary.R
+import com.websarva.wings.android.zuboradiary.data.DateTimeStringConverter
+import com.websarva.wings.android.zuboradiary.ui.BaseAlertDialogFragment
 
-import androidx.annotation.NonNull;
+class DiaryUpdateDialogFragment : BaseAlertDialogFragment() {
 
-import com.websarva.wings.android.zuboradiary.R;
-import com.websarva.wings.android.zuboradiary.data.DateTimeStringConverter;
-import com.websarva.wings.android.zuboradiary.ui.BaseAlertDialogFragment;
-
-import java.time.LocalDate;
-import java.util.Objects;
-
-public class DiaryUpdateDialogFragment extends BaseAlertDialogFragment {
-
-    private static final String fromClassName =
-            "From" + DiaryUpdateDialogFragment.class.getName();
-    static final String KEY_SELECTED_BUTTON = "SelectedButton" + fromClassName;
-
-    @Override
-    protected String createTitle() {
-        return getString(R.string.dialog_diary_update_title);
+    companion object {
+        private val fromClassName = "From" + DiaryUpdateDialogFragment::class.java.name
+        @JvmField
+        val KEY_SELECTED_BUTTON: String = "SelectedButton$fromClassName"
     }
 
-    @Override
-    protected String createMessage() {
-        LocalDate updateDiaryDate =
-                DiaryUpdateDialogFragmentArgs.fromBundle(requireArguments()).getDate();
-        Objects.requireNonNull(updateDiaryDate);
+    override val isCancelableOtherThanPressingButton: Boolean
+        get() = true
 
-        DateTimeStringConverter converter = new DateTimeStringConverter();
-        String updateDiaryDateString = converter.toYearMonthDayWeek(updateDiaryDate);
-        return updateDiaryDateString + getString(R.string.dialog_diary_update_message);
+    override fun createTitle(): String {
+        return getString(R.string.dialog_diary_update_title)
     }
 
-    @Override
-    protected void handleOnPositiveButtonClick(@NonNull DialogInterface dialog, int which) {
-        setResult(KEY_SELECTED_BUTTON, DialogInterface.BUTTON_POSITIVE);
+    override fun createMessage(): String {
+        val updateDiaryDate =
+            DiaryUpdateDialogFragmentArgs.fromBundle(requireArguments()).date
+        val converter = DateTimeStringConverter()
+        val updateDiaryDateString = converter.toYearMonthDayWeek(updateDiaryDate)
+        return updateDiaryDateString + getString(R.string.dialog_diary_update_message)
     }
 
-    @Override
-    protected void handleOnNegativeButtonClick(@NonNull DialogInterface dialog, int which) {
+    override fun handleOnPositiveButtonClick(dialog: DialogInterface, which: Int) {
+        setResult(KEY_SELECTED_BUTTON, DialogInterface.BUTTON_POSITIVE)
+    }
+
+    override fun handleOnNegativeButtonClick(dialog: DialogInterface, which: Int) {
         // 処理なし
     }
 
-    @Override
-    protected boolean isCancelableOtherThanPressingButton() {
-        return true;
-    }
-
-    @Override
-    protected void handleOnCancel(@NonNull DialogInterface dialog) {
+    override fun handleOnCancel(dialog: DialogInterface) {
         // 処理なし
     }
 
-    @Override
-    protected void handleOnDismiss() {
+    override fun handleOnDismiss() {
         // 処理なし
     }
 }
