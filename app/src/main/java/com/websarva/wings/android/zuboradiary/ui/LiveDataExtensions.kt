@@ -6,3 +6,11 @@ import androidx.lifecycle.LiveData
 fun LiveData<String?>.orEmptyString(): String {
     return value ?: ""
 }
+
+fun <T :Any> LiveData<T>.notNullValue(): T {
+    return checkNotNull(value)
+}
+
+fun <T> LiveData<T?>.checkNotNull(): T {
+    return checkNotNull(value)
+}
