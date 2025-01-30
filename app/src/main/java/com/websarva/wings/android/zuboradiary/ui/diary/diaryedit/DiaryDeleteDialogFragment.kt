@@ -1,56 +1,45 @@
-package com.websarva.wings.android.zuboradiary.ui.diary.diaryedit;
+package com.websarva.wings.android.zuboradiary.ui.diary.diaryedit
 
-import android.content.DialogInterface;
+import android.content.DialogInterface
+import com.websarva.wings.android.zuboradiary.R
+import com.websarva.wings.android.zuboradiary.data.DateTimeStringConverter
+import com.websarva.wings.android.zuboradiary.ui.BaseAlertDialogFragment
 
-import androidx.annotation.NonNull;
+class DiaryDeleteDialogFragment : BaseAlertDialogFragment() {
 
-import com.websarva.wings.android.zuboradiary.R;
-import com.websarva.wings.android.zuboradiary.data.DateTimeStringConverter;
-import com.websarva.wings.android.zuboradiary.ui.BaseAlertDialogFragment;
-
-import java.time.LocalDate;
-
-public class DiaryDeleteDialogFragment extends BaseAlertDialogFragment {
-
-    private static final String fromClassName =
-            "From" + DiaryDeleteDialogFragment.class.getName();
-    static final String KEY_SELECTED_BUTTON = "SelectedButton" + fromClassName;
-
-    @Override
-    protected String createTitle() {
-        return getString(R.string.dialog_diary_delete_title);
+    companion object {
+        private val fromClassName = "From" + DiaryDeleteDialogFragment::class.java.name
+        @JvmField
+        val KEY_SELECTED_BUTTON: String = "SelectedButton$fromClassName"
     }
 
-    @Override
-    protected String createMessage() {
-        LocalDate diaryDate =
-                DiaryDeleteDialogFragmentArgs.fromBundle(requireArguments()).getDate();
-        String diaryDateString = new DateTimeStringConverter().toYearMonthDayWeek(diaryDate);
-        return diaryDateString + getString(R.string.dialog_diary_delete_message);
+    override val isCancelableOtherThanPressingButton: Boolean
+        get() = true
+
+    override fun createTitle(): String {
+        return getString(R.string.dialog_diary_delete_title)
     }
 
-    @Override
-    protected void handleOnPositiveButtonClick(@NonNull DialogInterface dialog, int which) {
-        setResult(KEY_SELECTED_BUTTON, DialogInterface.BUTTON_POSITIVE);
+    override fun createMessage(): String {
+        val diaryDate =
+            DiaryDeleteDialogFragmentArgs.fromBundle(requireArguments()).date
+        val diaryDateString = DateTimeStringConverter().toYearMonthDayWeek(diaryDate)
+        return diaryDateString + getString(R.string.dialog_diary_delete_message)
     }
 
-    @Override
-    protected void handleOnNegativeButtonClick(@NonNull DialogInterface dialog, int which) {
-        setResult(KEY_SELECTED_BUTTON, DialogInterface.BUTTON_NEGATIVE);
+    override fun handleOnPositiveButtonClick(dialog: DialogInterface, which: Int) {
+        setResult(KEY_SELECTED_BUTTON, DialogInterface.BUTTON_POSITIVE)
     }
 
-    @Override
-    protected boolean isCancelableOtherThanPressingButton() {
-        return true;
+    override fun handleOnNegativeButtonClick(dialog: DialogInterface, which: Int) {
+        setResult(KEY_SELECTED_BUTTON, DialogInterface.BUTTON_NEGATIVE)
     }
 
-    @Override
-    protected void handleOnCancel(@NonNull DialogInterface dialog) {
-        setResult(KEY_SELECTED_BUTTON, DialogInterface.BUTTON_NEGATIVE);
+    override fun handleOnCancel(dialog: DialogInterface) {
+        setResult(KEY_SELECTED_BUTTON, DialogInterface.BUTTON_NEGATIVE)
     }
 
-    @Override
-    protected void handleOnDismiss() {
+    override fun handleOnDismiss() {
         // 処理なし
     }
 }
