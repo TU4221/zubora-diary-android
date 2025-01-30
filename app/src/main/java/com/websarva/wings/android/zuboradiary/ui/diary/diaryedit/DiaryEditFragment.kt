@@ -1,850 +1,766 @@
-package com.websarva.wings.android.zuboradiary.ui.diary.diaryedit;
+package com.websarva.wings.android.zuboradiary.ui.diary.diaryedit
 
-import android.annotation.SuppressLint;
-import android.content.Context;
-import android.content.DialogInterface;
-import android.net.Uri;
-import android.os.Bundle;
-import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
-import android.view.inputmethod.EditorInfo;
-import android.widget.ArrayAdapter;
-import android.widget.EditText;
-import android.widget.ImageButton;
-import android.widget.ListAdapter;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.view.ContextThemeWrapper;
-import androidx.constraintlayout.motion.widget.MotionLayout;
-import androidx.core.content.res.ResourcesCompat;
-import androidx.databinding.ViewDataBinding;
-import androidx.lifecycle.Lifecycle;
-import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.Observer;
-import androidx.lifecycle.SavedStateHandle;
-import androidx.lifecycle.ViewModelProvider;
-import androidx.navigation.NavDirections;
-
-import com.google.android.material.textfield.TextInputEditText;
-import com.google.android.material.textfield.TextInputLayout;
-import com.websarva.wings.android.zuboradiary.R;
-import com.websarva.wings.android.zuboradiary.data.AppMessage;
-import com.websarva.wings.android.zuboradiary.data.DateTimeStringConverter;
-import com.websarva.wings.android.zuboradiary.data.diary.Condition;
-import com.websarva.wings.android.zuboradiary.data.diary.ItemNumber;
-import com.websarva.wings.android.zuboradiary.data.diary.Weather;
-import com.websarva.wings.android.zuboradiary.data.network.GeoCoordinates;
-import com.websarva.wings.android.zuboradiary.databinding.FragmentDiaryEditBinding;
-import com.websarva.wings.android.zuboradiary.ui.DiaryPictureManager;
-import com.websarva.wings.android.zuboradiary.ui.BaseFragment;
-import com.websarva.wings.android.zuboradiary.ui.KeyboardInitializer;
-import com.websarva.wings.android.zuboradiary.ui.TestDiariesSaver;
-import com.websarva.wings.android.zuboradiary.ui.TextInputSetup;
-import com.websarva.wings.android.zuboradiary.ui.diary.DiaryLiveData;
-import com.websarva.wings.android.zuboradiary.ui.diary.diaryitemtitleedit.DiaryItemTitleEditFragment;
-import com.websarva.wings.android.zuboradiary.ui.UriPermissionManager;
-
-import org.jetbrains.annotations.Unmodifiable;
-
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
-
-import dagger.hilt.android.AndroidEntryPoint;
+import android.content.Context
+import android.content.DialogInterface
+import android.net.Uri
+import android.os.Bundle
+import android.util.Log
+import android.view.LayoutInflater
+import android.view.MenuItem
+import android.view.View
+import android.view.ViewGroup
+import android.view.inputmethod.EditorInfo
+import android.widget.AdapterView
+import android.widget.AdapterView.OnItemClickListener
+import android.widget.ArrayAdapter
+import androidx.appcompat.view.ContextThemeWrapper
+import androidx.constraintlayout.motion.widget.MotionLayout
+import androidx.core.content.res.ResourcesCompat
+import androidx.databinding.ViewDataBinding
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.Observer
+import androidx.lifecycle.SavedStateHandle
+import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.NavDirections
+import com.google.android.material.textfield.TextInputLayout
+import com.websarva.wings.android.zuboradiary.R
+import com.websarva.wings.android.zuboradiary.data.AppMessage
+import com.websarva.wings.android.zuboradiary.data.DateTimeStringConverter
+import com.websarva.wings.android.zuboradiary.data.diary.Condition
+import com.websarva.wings.android.zuboradiary.data.diary.ItemNumber
+import com.websarva.wings.android.zuboradiary.data.diary.Weather
+import com.websarva.wings.android.zuboradiary.databinding.FragmentDiaryEditBinding
+import com.websarva.wings.android.zuboradiary.ui.BaseFragment
+import com.websarva.wings.android.zuboradiary.ui.DiaryPictureManager
+import com.websarva.wings.android.zuboradiary.ui.TestDiariesSaver
+import com.websarva.wings.android.zuboradiary.ui.TextInputSetup
+import com.websarva.wings.android.zuboradiary.ui.UriPermissionManager
+import com.websarva.wings.android.zuboradiary.ui.checkNotNull
+import com.websarva.wings.android.zuboradiary.ui.diary.DiaryLiveData
+import com.websarva.wings.android.zuboradiary.ui.diary.diaryitemtitleedit.DiaryItemTitleEditFragment
+import com.websarva.wings.android.zuboradiary.ui.notNullValue
+import dagger.hilt.android.AndroidEntryPoint
+import org.jetbrains.annotations.Unmodifiable
+import java.time.LocalDate
+import java.util.Arrays
 
 @AndroidEntryPoint
-public class DiaryEditFragment extends BaseFragment {
-
+class DiaryEditFragment : BaseFragment() {
     // View関係
-    private FragmentDiaryEditBinding binding;
-    private boolean isDeletingItemTransition = false;
-    private ArrayAdapter<String> weather2ArrayAdapter;
+    private var _binding: FragmentDiaryEditBinding? = null
+    private val binding get() = checkNotNull(_binding)
+    private var isDeletingItemTransition = false
+    private lateinit var weather2ArrayAdapter: ArrayAdapter<String>
 
     // ViewModel
-    private DiaryEditViewModel diaryEditViewModel;
+    private lateinit var diaryEditViewModel: DiaryEditViewModel
 
     // Uri関係
-    private UriPermissionManager pictureUriPermissionManager;
+    private lateinit var pictureUriPermissionManager: UriPermissionManager
 
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
 
         pictureUriPermissionManager =
-                new UriPermissionManager(requireContext()) {
-                    @Override
-                    public boolean checkUsedUriDoesNotExist(@NonNull Uri uri) {
-                        return diaryEditViewModel.checkSavedPicturePathDoesNotExist(uri);
-                    }
-                };
+            object : UriPermissionManager(requireContext()) {
+                override fun checkUsedUriDoesNotExist(uri: Uri): Boolean {
+                    return diaryEditViewModel.checkSavedPicturePathDoesNotExist(uri)
+                }
+            }
     }
 
-    @Override
-    protected void initializeViewModel() {
-        ViewModelProvider provider = new ViewModelProvider(requireActivity());
-        diaryEditViewModel = provider.get(DiaryEditViewModel.class);
-        diaryEditViewModel.initialize();
+    override fun initializeViewModel() {
+        val provider = ViewModelProvider(requireActivity())
+        diaryEditViewModel = provider[DiaryEditViewModel::class.java]
+        diaryEditViewModel.initialize()
     }
 
-    @Override
-    public View onCreateView(
-            @NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        return super.onCreateView(inflater, container, savedInstanceState);
+    override fun initializeDataBinding(
+        themeColorInflater: LayoutInflater, container: ViewGroup
+    ): ViewDataBinding {
+        _binding = FragmentDiaryEditBinding.inflate(themeColorInflater, container, false)
+        binding.lifecycleOwner = this
+        binding.diaryEditViewModel = diaryEditViewModel
+        return binding
     }
 
-    @Override
-    protected ViewDataBinding initializeDataBinding(
-            @NonNull LayoutInflater themeColorInflater, @NonNull ViewGroup container) {
-        binding = FragmentDiaryEditBinding.inflate(themeColorInflater, container, false);
-        binding.setLifecycleOwner(this);
-        binding.setDiaryEditViewModel(diaryEditViewModel);
-        return binding;
-    }
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
-    @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-
-        setUpDiaryData();
-        setUpToolBar();
-        setUpDateInputField();
-        setUpWeatherInputField();
-        setUpConditionInputField();
-        setUpTitleInputField();
-        setUpItemInputField();
-        setUpPictureInputField();
-        setupEditText();
+        setUpDiaryData()
+        setUpToolBar()
+        setUpDateInputField()
+        setUpWeatherInputField()
+        setUpConditionInputField()
+        setUpTitleInputField()
+        setUpItemInputField()
+        setUpPictureInputField()
+        setupEditText()
 
         // TODO:最終的に削除
-        binding.fabTest.setOnClickListener(v -> {
-            Log.d("20240823", "OnClick");
-            TestDiariesSaver testDiariesSaver = new TestDiariesSaver(diaryEditViewModel);
-            testDiariesSaver.save(28);
-        });
+        binding.fabTest.setOnClickListener {
+            Log.d("20240823", "OnClick")
+            val testDiariesSaver = TestDiariesSaver(diaryEditViewModel)
+            testDiariesSaver.save(28)
+        }
     }
 
-    @Override
-    protected void handleOnReceivingResultFromPreviousFragment(@NonNull SavedStateHandle savedStateHandle) {
-
+    override fun handleOnReceivingResultFromPreviousFragment(savedStateHandle: SavedStateHandle) {
         // DiaryItemTitleEditFragmentから編集結果受取
-        MutableLiveData<String> newItemTitleLiveData =
-                savedStateHandle.getLiveData(DiaryItemTitleEditFragment.KEY_NEW_ITEM_TITLE);
-        newItemTitleLiveData.observe(getViewLifecycleOwner(), string -> {
+
+        val newItemTitleLiveData =
+            savedStateHandle.getLiveData<String>(DiaryItemTitleEditFragment.KEY_NEW_ITEM_TITLE)
+        newItemTitleLiveData.observe(viewLifecycleOwner) { string: String? ->
             // MEMO:結果がない場合もあるので"return"で返す。
-            if (string == null) return;
+            if (string == null) return@observe
 
-            ItemNumber itemNumber =
-                    savedStateHandle.get(DiaryItemTitleEditFragment.KEY_UPDATE_ITEM_NUMBER);
-            Objects.requireNonNull(itemNumber);
+            val itemNumber =
+                checkNotNull(
+                    savedStateHandle.get<ItemNumber>(DiaryItemTitleEditFragment.KEY_UPDATE_ITEM_NUMBER)
+                )
 
-            diaryEditViewModel.updateItemTitle(itemNumber, string);
+            diaryEditViewModel.updateItemTitle(itemNumber, string)
 
-            savedStateHandle.remove(DiaryItemTitleEditFragment.KEY_UPDATE_ITEM_NUMBER);
-            savedStateHandle.remove(DiaryItemTitleEditFragment.KEY_NEW_ITEM_TITLE);
-        });
+            savedStateHandle.remove<Any>(DiaryItemTitleEditFragment.KEY_UPDATE_ITEM_NUMBER)
+            savedStateHandle.remove<Any>(DiaryItemTitleEditFragment.KEY_NEW_ITEM_TITLE)
+        }
     }
 
-    @Override
-    protected void handleOnReceivingDialogResult(@NonNull SavedStateHandle savedStateHandle) {
-        receiveDiaryLoadingDialogResult();
-        receiveDiaryUpdateDialogResult();
-        receiveDiaryDeleteDialogResult();
-        receiveDatePickerDialogResult();
-        receiveWeatherInfoFetchDialogResult();
-        receiveDiaryItemDeleteDialogResult();
-        receiveDiaryPictureDeleteDialogResult();
-        retryOtherAppMessageDialogShow();
-        clearFocusAllEditText();
+    override fun handleOnReceivingDialogResult(savedStateHandle: SavedStateHandle) {
+        receiveDiaryLoadingDialogResult()
+        receiveDiaryUpdateDialogResult()
+        receiveDiaryDeleteDialogResult()
+        receiveDatePickerDialogResult()
+        receiveWeatherInfoFetchDialogResult()
+        receiveDiaryItemDeleteDialogResult()
+        receiveDiaryPictureDeleteDialogResult()
+        retryOtherAppMessageDialogShow()
+        clearFocusAllEditText()
     }
 
-    @Override
-    protected void removeDialogResultOnDestroy(@NonNull SavedStateHandle savedStateHandle) {
-        savedStateHandle.remove(DiaryLoadingDialogFragment.KEY_SELECTED_BUTTON);
-        savedStateHandle.remove(DiaryUpdateDialogFragment.KEY_SELECTED_BUTTON);
-        savedStateHandle.remove(DiaryDeleteDialogFragment.KEY_SELECTED_BUTTON);
-        savedStateHandle.remove(DatePickerDialogFragment.KEY_SELECTED_DATE);
-        savedStateHandle.remove(WeatherInfoFetchingDialogFragment.KEY_SELECTED_BUTTON);
-        savedStateHandle.remove(DiaryItemDeleteDialogFragment.KEY_DELETE_ITEM_NUMBER);
-        savedStateHandle.remove(DiaryPictureDeleteDialogFragment.KEY_SELECTED_BUTTON);
+    override fun removeDialogResultOnDestroy(savedStateHandle: SavedStateHandle) {
+        savedStateHandle.remove<Any>(DiaryLoadingDialogFragment.KEY_SELECTED_BUTTON)
+        savedStateHandle.remove<Any>(DiaryUpdateDialogFragment.KEY_SELECTED_BUTTON)
+        savedStateHandle.remove<Any>(DiaryDeleteDialogFragment.KEY_SELECTED_BUTTON)
+        savedStateHandle.remove<Any>(DatePickerDialogFragment.KEY_SELECTED_DATE)
+        savedStateHandle.remove<Any>(WeatherInfoFetchingDialogFragment.KEY_SELECTED_BUTTON)
+        savedStateHandle.remove<Any>(DiaryItemDeleteDialogFragment.KEY_DELETE_ITEM_NUMBER)
+        savedStateHandle.remove<Any>(DiaryPictureDeleteDialogFragment.KEY_SELECTED_BUTTON)
     }
 
-    @Override
-    protected void setUpOtherAppMessageDialog() {
-        diaryEditViewModel.getAppMessageBufferList()
-                .observe(getViewLifecycleOwner(), new AppMessageBufferListObserver(diaryEditViewModel));
+    override fun setUpOtherAppMessageDialog() {
+        diaryEditViewModel.appMessageBufferList
+            .observe(viewLifecycleOwner, AppMessageBufferListObserver(diaryEditViewModel))
     }
 
     // 既存日記読込ダイアログフラグメントから結果受取
-    private void receiveDiaryLoadingDialogResult() {
-        Integer selectedButton = receiveResulFromDialog(DiaryLoadingDialogFragment.KEY_SELECTED_BUTTON);
-        if (selectedButton == null) return;
+    private fun receiveDiaryLoadingDialogResult() {
+        val selectedButton =
+            receiveResulFromDialog<Int>(DiaryLoadingDialogFragment.KEY_SELECTED_BUTTON) ?: return
 
-        LocalDate date = diaryEditViewModel.getDate().getValue();
-        Objects.requireNonNull(date);
+        val date = checkNotNull(diaryEditViewModel.date.value)
 
         if (selectedButton == DialogInterface.BUTTON_POSITIVE) {
-            diaryEditViewModel.initialize();
-            diaryEditViewModel.prepareDiary(date, true);
+            diaryEditViewModel.initialize()
+            diaryEditViewModel.prepareDiary(date, true)
         } else {
-            if (!diaryEditViewModel.isNewDiaryDefaultStatus()) {
-                fetchWeatherInfo(date, true);
+            if (!diaryEditViewModel.isNewDiaryDefaultStatus) {
+                fetchWeatherInfo(date, true)
             }
         }
     }
 
     // 既存日記上書きダイアログフラグメントから結果受取
-    private void receiveDiaryUpdateDialogResult() {
-        Integer selectedButton = receiveResulFromDialog(DiaryUpdateDialogFragment.KEY_SELECTED_BUTTON);
-        if (selectedButton == null) return;
-        if (selectedButton != DialogInterface.BUTTON_POSITIVE) return;
+    private fun receiveDiaryUpdateDialogResult() {
+        val selectedButton =
+            receiveResulFromDialog<Int>(DiaryUpdateDialogFragment.KEY_SELECTED_BUTTON) ?: return
+        if (selectedButton != DialogInterface.BUTTON_POSITIVE) return
 
-        boolean isSuccessful = diaryEditViewModel.saveDiary();
-        if (!isSuccessful) return;
+        val isSuccessful = diaryEditViewModel.saveDiary()
+        if (!isSuccessful) return
 
-        updatePictureUriPermission();
-        LocalDate date = diaryEditViewModel.getDate().getValue();
-        Objects.requireNonNull(date);
-        showDiaryShowFragment(date);
+        updatePictureUriPermission()
+        val date = diaryEditViewModel.date.checkNotNull()
+        showDiaryShowFragment(date)
     }
 
     // 既存日記上書きダイアログフラグメントから結果受取
-    private void receiveDiaryDeleteDialogResult() {
-        Integer selectedButton = receiveResulFromDialog(DiaryDeleteDialogFragment.KEY_SELECTED_BUTTON);
-        if (selectedButton == null) return;
-        if (selectedButton != DialogInterface.BUTTON_POSITIVE) return;
+    private fun receiveDiaryDeleteDialogResult() {
+        val selectedButton =
+            receiveResulFromDialog<Int>(DiaryDeleteDialogFragment.KEY_SELECTED_BUTTON) ?: return
+        if (selectedButton != DialogInterface.BUTTON_POSITIVE) return
 
-        boolean isSuccessful = diaryEditViewModel.deleteDiary();
-        if (!isSuccessful) return;
+        val isSuccessful = diaryEditViewModel.deleteDiary()
+        if (!isSuccessful) return
 
-        releaseLoadedPictureUriPermission();
-        navController.navigateUp();
+        releaseLoadedPictureUriPermission()
+        navController.navigateUp()
     }
 
     // 日付入力ダイアログフラグメントからデータ受取
-    private void receiveDatePickerDialogResult() {
-        LocalDate selectedDate = receiveResulFromDialog(DatePickerDialogFragment.KEY_SELECTED_DATE);
-        if (selectedDate == null) return;
+    private fun receiveDatePickerDialogResult() {
+        val selectedDate =
+            receiveResulFromDialog<LocalDate>(DatePickerDialogFragment.KEY_SELECTED_DATE) ?: return
 
-        diaryEditViewModel.updateDate(selectedDate);
+        diaryEditViewModel.updateDate(selectedDate)
     }
 
-    private void receiveWeatherInfoFetchDialogResult() {
+    private fun receiveWeatherInfoFetchDialogResult() {
         // 天気情報読込ダイアログフラグメントから結果受取
-        Integer selectedButton =
-                receiveResulFromDialog(WeatherInfoFetchingDialogFragment.KEY_SELECTED_BUTTON);
-        if (selectedButton == null) return;
-        if (selectedButton != DialogInterface.BUTTON_POSITIVE) return;
+        val selectedButton =
+            receiveResulFromDialog<Int>(
+                WeatherInfoFetchingDialogFragment.KEY_SELECTED_BUTTON
+            ) ?: return
+        if (selectedButton != DialogInterface.BUTTON_POSITIVE) return
 
-        LocalDate loadDiaryDate = diaryEditViewModel.getDate().getValue();
-        Objects.requireNonNull(loadDiaryDate);
-        GeoCoordinates geoCoordinates = settingsViewModel.getGeoCoordinatesLiveData().getValue();
-        Objects.requireNonNull(geoCoordinates);
-        diaryEditViewModel.fetchWeatherInformation(loadDiaryDate, geoCoordinates);
+        val loadDiaryDate = diaryEditViewModel.date.checkNotNull()
+        val geoCoordinates = settingsViewModel.geoCoordinatesLiveData.checkNotNull()
+        diaryEditViewModel.fetchWeatherInformation(loadDiaryDate, geoCoordinates)
     }
 
     // 項目削除確認ダイアログフラグメントから結果受取
-    private void receiveDiaryItemDeleteDialogResult() {
-        ItemNumber deleteItemNumber =
-                receiveResulFromDialog(DiaryItemDeleteDialogFragment.KEY_DELETE_ITEM_NUMBER);
-        if (deleteItemNumber == null) return;
+    private fun receiveDiaryItemDeleteDialogResult() {
+        val deleteItemNumber =
+            receiveResulFromDialog<ItemNumber>(
+                DiaryItemDeleteDialogFragment.KEY_DELETE_ITEM_NUMBER
+            ) ?: return
 
-        Integer numVisibleItems = diaryEditViewModel.getNumVisibleItems().getValue();
-        Objects.requireNonNull(numVisibleItems);
+        val numVisibleItems = diaryEditViewModel.numVisibleItems.notNullValue()
 
-        if (deleteItemNumber.getValue() == 1 && numVisibleItems.equals(deleteItemNumber.getValue())) {
-            diaryEditViewModel.deleteItem(deleteItemNumber);
+        if (deleteItemNumber.value == 1 && numVisibleItems == deleteItemNumber.value) {
+            diaryEditViewModel.deleteItem(deleteItemNumber)
         } else {
-            isDeletingItemTransition = true;
-            hideItem(deleteItemNumber, false);
+            isDeletingItemTransition = true
+            hideItem(deleteItemNumber, false)
         }
     }
 
-    private void receiveDiaryPictureDeleteDialogResult() {
-        Integer selectedButton =
-                receiveResulFromDialog(DiaryPictureDeleteDialogFragment.KEY_SELECTED_BUTTON);
-        if (selectedButton == null) return;
-        if (selectedButton != DialogInterface.BUTTON_POSITIVE) return;
+    private fun receiveDiaryPictureDeleteDialogResult() {
+        val selectedButton =
+            receiveResulFromDialog<Int>(
+                DiaryPictureDeleteDialogFragment.KEY_SELECTED_BUTTON
+            ) ?: return
+        if (selectedButton != DialogInterface.BUTTON_POSITIVE) return
 
-        diaryEditViewModel.deletePicturePath();
+        diaryEditViewModel.deletePicturePath()
     }
 
-    private void setUpDiaryData() {
+    private fun setUpDiaryData() {
         // 画面表示データ準備
-        if (diaryEditViewModel.getHasPreparedDiary()) return;
+        if (diaryEditViewModel.hasPreparedDiary) return
 
-        LocalDate diaryDate =
-                DiaryEditFragmentArgs.fromBundle(requireArguments()).getDate();
-        Objects.requireNonNull(diaryDate);
-        boolean requiresDiaryLoading =
-                DiaryEditFragmentArgs.fromBundle(requireArguments()).getRequiresDiaryLoading();
-        diaryEditViewModel.prepareDiary(diaryDate, requiresDiaryLoading);
-        if (!requiresDiaryLoading) fetchWeatherInfo(diaryDate,false);
+        val diaryDate = DiaryEditFragmentArgs.fromBundle(requireArguments()).date
+        val requiresDiaryLoading =
+            DiaryEditFragmentArgs.fromBundle(requireArguments()).requiresDiaryLoading
+        diaryEditViewModel.prepareDiary(diaryDate, requiresDiaryLoading)
+        if (!requiresDiaryLoading) fetchWeatherInfo(diaryDate, false)
     }
 
-    private void setUpToolBar() {
+    private fun setUpToolBar() {
         binding.materialToolbarTopAppBar
-                .setNavigationOnClickListener(v -> {
-                    Objects.requireNonNull(v);
-
-                    navController.navigateUp();
-                });
+            .setNavigationOnClickListener {
+                navController.navigateUp()
+            }
 
         binding.materialToolbarTopAppBar
-                .setOnMenuItemClickListener(item -> {
-                    Objects.requireNonNull(item);
-                    LocalDate diaryDate = diaryEditViewModel.getDate().getValue();
-                    Objects.requireNonNull(diaryDate);
+            .setOnMenuItemClickListener { item: MenuItem ->
+                val diaryDate = diaryEditViewModel.date.checkNotNull()
 
-                    //日記保存(日記表示フラグメント起動)。
-                    if (item.getItemId() == R.id.diaryEditToolbarOptionSaveDiary) {
-                        if (diaryEditViewModel.getShouldShowUpdateConfirmationDialog()) {
-                            showDiaryUpdateDialog(diaryDate);
-                        } else {
-                            boolean isSuccessful = diaryEditViewModel.saveDiary();
-                            if (isSuccessful) {
-                                updatePictureUriPermission();
-                                showDiaryShowFragment(diaryDate);
-                            }
-                        }
-                        return true;
-                    } else if (item.getItemId() == R.id.diaryEditToolbarOptionDeleteDiary) {
-                        showDiaryDeleteDialog(diaryDate);
-                    }
-                    return false;
-                });
-
-        diaryEditViewModel.getLoadedDate()
-                .observe(getViewLifecycleOwner(), date -> {
-                    String title;
-                    boolean enabledDelete;
-                    if (date == null) {
-                        title = getString(R.string.fragment_diary_edit_toolbar_title_create_new);
-                        enabledDelete = false;
+                //日記保存(日記表示フラグメント起動)。
+                if (item.itemId == R.id.diaryEditToolbarOptionSaveDiary) {
+                    if (diaryEditViewModel.shouldShowUpdateConfirmationDialog) {
+                        showDiaryUpdateDialog(diaryDate)
                     } else {
-                        title = getString(R.string.fragment_diary_edit_toolbar_title_edit);
-                        enabledDelete = true;
+                        val isSuccessful = diaryEditViewModel.saveDiary()
+                        if (isSuccessful) {
+                            updatePictureUriPermission()
+                            showDiaryShowFragment(diaryDate)
+                        }
                     }
-                    binding.materialToolbarTopAppBar.setTitle(title);
+                    return@setOnMenuItemClickListener true
+                } else if (item.itemId == R.id.diaryEditToolbarOptionDeleteDiary) {
+                    showDiaryDeleteDialog(diaryDate)
+                }
+                false
+            }
 
-                    Menu menu = binding.materialToolbarTopAppBar.getMenu();
-                    Objects.requireNonNull(menu);
-                    MenuItem deleteMenuItem = menu.findItem(R.id.diaryEditToolbarOptionDeleteDiary);
-                    Objects.requireNonNull(deleteMenuItem);
-                    deleteMenuItem.setEnabled(enabledDelete);
-                });
+        diaryEditViewModel.loadedDate
+            .observe(viewLifecycleOwner) { date: LocalDate? ->
+                val title: String
+                val enabledDelete: Boolean
+                if (date == null) {
+                    title = getString(R.string.fragment_diary_edit_toolbar_title_create_new)
+                    enabledDelete = false
+                } else {
+                    title = getString(R.string.fragment_diary_edit_toolbar_title_edit)
+                    enabledDelete = true
+                }
+                binding.materialToolbarTopAppBar.title = title
+
+                val menu = binding.materialToolbarTopAppBar.menu
+                val deleteMenuItem = menu.findItem(R.id.diaryEditToolbarOptionDeleteDiary)
+                deleteMenuItem.setEnabled(enabledDelete)
+            }
     }
 
     // 日付入力欄設定
-    private void setUpDateInputField() {
-        binding.textInputEditTextDate.setInputType(EditorInfo.TYPE_NULL); //キーボード非表示設定
+    private fun setUpDateInputField() {
+        binding.textInputEditTextDate.inputType = EditorInfo.TYPE_NULL //キーボード非表示設定
 
-        binding.textInputEditTextDate.setOnClickListener(v -> {
-            Objects.requireNonNull(v);
+        binding.textInputEditTextDate.setOnClickListener {
+            val date = diaryEditViewModel.date.checkNotNull()
+            showDatePickerDialog(date)
+        }
 
-            LocalDate date = diaryEditViewModel.getDate().getValue();
-            Objects.requireNonNull(date);
-            showDatePickerDialog(date);
-        });
-
-        diaryEditViewModel.getDate().observe(getViewLifecycleOwner(), new DateObserver());
+        diaryEditViewModel.date.observe(viewLifecycleOwner, DateObserver())
     }
 
-    private class DateObserver implements Observer<LocalDate> {
+    private inner class DateObserver : Observer<LocalDate?> {
+        override fun onChanged(value: LocalDate?) {
+            if (value == null) return
+            if (diaryEditViewModel.isShowingItemTitleEditFragment) return
 
-        @Override
-        public void onChanged(@Nullable LocalDate date) {
-            if (date == null) return;
-            if (diaryEditViewModel.isShowingItemTitleEditFragment()) return;
-
-            DateTimeStringConverter dateTimeStringConverter = new DateTimeStringConverter();
-            binding.textInputEditTextDate.setText(dateTimeStringConverter.toYearMonthDayWeek(date));
-            Log.d("DiaryEditInputDate", "currentDate:" + date);
-            LocalDate loadedDate = diaryEditViewModel.getLoadedDate().getValue();
-            Log.d("DiaryEditInputDate", "loadedDate:" + loadedDate);
-            LocalDate previousDate = diaryEditViewModel.getPreviousDate().getValue();
-            Log.d("DiaryEditInputDate", "previousDate:" + previousDate);
-            if (requiresDiaryLoadingDialogShow(date)) {
-                showDiaryLoadingDialog(date);
+            val dateTimeStringConverter = DateTimeStringConverter()
+            binding.textInputEditTextDate.setText(dateTimeStringConverter.toYearMonthDayWeek(value))
+            Log.d("DiaryEditInputDate", "currentDate:$value")
+            val loadedDate = diaryEditViewModel.loadedDate.value
+            Log.d("DiaryEditInputDate", "loadedDate:$loadedDate")
+            val previousDate = diaryEditViewModel.previousDate.value
+            Log.d("DiaryEditInputDate", "previousDate:$previousDate")
+            if (requiresDiaryLoadingDialogShow(value)) {
+                showDiaryLoadingDialog(value)
             } else {
                 // 読込確認Dialog表示時は、確認後下記処理を行う。
-                if (requiresWeatherInfoFetching(date)) {
-                    fetchWeatherInfo(date, true);
+                if (requiresWeatherInfoFetching(value)) {
+                    fetchWeatherInfo(value, true)
                 }
             }
         }
 
-        private boolean requiresDiaryLoadingDialogShow(LocalDate changedDate) {
-            Objects.requireNonNull(changedDate);
+        fun requiresDiaryLoadingDialogShow(changedDate: LocalDate): Boolean {
+            if (diaryEditViewModel.isNewDiaryDefaultStatus) return diaryEditViewModel.existsSavedDiary(
+                changedDate
+            )
 
-            if (diaryEditViewModel.isNewDiaryDefaultStatus()) return diaryEditViewModel.existsSavedDiary(changedDate);
+            val previousDate = diaryEditViewModel.previousDate.value
+            val loadedDate = diaryEditViewModel.loadedDate.value
 
-            LocalDate previousDate = diaryEditViewModel.getPreviousDate().getValue();
-            LocalDate loadedDate = diaryEditViewModel.getLoadedDate().getValue();
-
-            if (changedDate.equals(previousDate)) return false;
-            if (changedDate.equals(loadedDate)) return false;
-            return diaryEditViewModel.existsSavedDiary(changedDate);
+            if (changedDate == previousDate) return false
+            if (changedDate == loadedDate) return false
+            return diaryEditViewModel.existsSavedDiary(changedDate)
         }
 
-        private boolean requiresWeatherInfoFetching(LocalDate date) {
-            Objects.requireNonNull(date);
-
-            LocalDate previousDate = diaryEditViewModel.getPreviousDate().getValue();
-            if (previousDate == null) return false;
-            return !date.equals(previousDate);
+        fun requiresWeatherInfoFetching(date: LocalDate): Boolean {
+            val previousDate = diaryEditViewModel.previousDate.value ?: return false
+            return date != previousDate
         }
     }
 
     // 天気入力欄。
-    private void setUpWeatherInputField() {
-        ArrayAdapter<String> weatherArrayAdapter = createWeatherSpinnerAdapter();
-        binding.autoCompleteTextWeather1.setAdapter(weatherArrayAdapter);
-        weather2ArrayAdapter = createWeatherSpinnerAdapter();
-        binding.autoCompleteTextWeather2.setAdapter(weather2ArrayAdapter);
+    private fun setUpWeatherInputField() {
+        val weatherArrayAdapter = createWeatherSpinnerAdapter()
+        binding.autoCompleteTextWeather1.setAdapter(weatherArrayAdapter)
+        weather2ArrayAdapter = createWeatherSpinnerAdapter()
+        binding.autoCompleteTextWeather2.setAdapter(weather2ArrayAdapter)
 
-        binding.autoCompleteTextWeather1.setOnItemClickListener((parent, view, position, id) -> {
-            Objects.requireNonNull(parent);
-            requireView();
+        binding.autoCompleteTextWeather1.onItemClickListener =
+            OnItemClickListener { _: AdapterView<*>?, _: View?, position: Int, _: Long ->
+                val listAdapter = binding.autoCompleteTextWeather1.adapter
+                val arrayAdapter = listAdapter as ArrayAdapter<*>
+                val strWeather = checkNotNull(arrayAdapter.getItem(position)) as String
+                val weather = Weather.of(requireContext(), strWeather)
+                diaryEditViewModel.updateWeather1(weather)
+                binding.autoCompleteTextWeather1.clearFocus()
+            }
 
-            ListAdapter listAdapter = binding.autoCompleteTextWeather1.getAdapter();
-            Objects.requireNonNull(listAdapter);
-            ArrayAdapter<?> arrayAdapter = (ArrayAdapter<?>) listAdapter;
-            String strWeather = (String) arrayAdapter.getItem(position);
-            Objects.requireNonNull(strWeather);
-            Weather weather = Weather.of(requireContext(), strWeather);
-            diaryEditViewModel.updateWeather1(weather);
-            binding.autoCompleteTextWeather1.clearFocus();
-        });
+        diaryEditViewModel.weather1
+            .observe(viewLifecycleOwner) { weather: Weather ->
+                val strWeather = weather.toString(requireContext())
+                binding.autoCompleteTextWeather1.setText(strWeather, false)
 
-        diaryEditViewModel.getWeather1()
-                .observe(getViewLifecycleOwner(), weather -> {
-                    Objects.requireNonNull(weather);
+                // Weather2 Spinner有効無効切替
+                val isEnabled = (weather != Weather.UNKNOWN)
+                binding.textInputLayoutWeather2.isEnabled = isEnabled
+                binding.autoCompleteTextWeather2.isEnabled = isEnabled
+                if (weather == Weather.UNKNOWN || diaryEditViewModel.isEqualWeathers) {
+                    binding.autoCompleteTextWeather2.setAdapter(
+                        weatherArrayAdapter
+                    )
+                    diaryEditViewModel.updateWeather2(Weather.UNKNOWN)
+                } else {
+                    weather2ArrayAdapter = createWeatherSpinnerAdapter(weather)
+                    binding.autoCompleteTextWeather2.setAdapter(
+                        weather2ArrayAdapter
+                    )
+                }
+            }
 
-                    String strWeather = weather.toString(requireContext());
-                    binding.autoCompleteTextWeather1.setText(strWeather, false);
+        binding.autoCompleteTextWeather2.onItemClickListener =
+            OnItemClickListener { _: AdapterView<*>?, _: View?, position: Int, _: Long ->
+                val listAdapter = binding.autoCompleteTextWeather2.adapter
+                val arrayAdapter = listAdapter as ArrayAdapter<*>
+                val strWeather = checkNotNull(arrayAdapter.getItem(position)) as String
+                val weather = Weather.of(requireContext(), strWeather)
+                diaryEditViewModel.updateWeather2(weather)
+                binding.autoCompleteTextWeather2.clearFocus()
+            }
 
-                    // Weather2 Spinner有効無効切替
-                    boolean isEnabled = (weather != Weather.UNKNOWN);
-                    binding.textInputLayoutWeather2.setEnabled(isEnabled);
-                    binding.autoCompleteTextWeather2.setEnabled(isEnabled);
-
-                    if (weather == Weather.UNKNOWN || diaryEditViewModel.isEqualWeathers()) {
-                        binding.autoCompleteTextWeather2.setAdapter(weatherArrayAdapter);
-                        diaryEditViewModel.updateWeather2(Weather.UNKNOWN);
-                    } else {
-                        weather2ArrayAdapter = createWeatherSpinnerAdapter(weather);
-                        binding.autoCompleteTextWeather2.setAdapter(weather2ArrayAdapter);
-                    }
-                });
-
-        binding.autoCompleteTextWeather2.setOnItemClickListener((parent, view, position, id) -> {
-            Objects.requireNonNull(parent);
-            requireView();
-
-            ListAdapter listAdapter = binding.autoCompleteTextWeather2.getAdapter();
-            ArrayAdapter<?> arrayAdapter = (ArrayAdapter<?>) listAdapter;
-            String strWeather = (String) arrayAdapter.getItem(position);
-            Weather weather = Weather.of(requireContext(), strWeather);
-            diaryEditViewModel.updateWeather2(weather);
-            binding.autoCompleteTextWeather2.clearFocus();
-        });
-
-        diaryEditViewModel.getWeather2()
-                .observe(getViewLifecycleOwner(), weather -> {
-                    Objects.requireNonNull(weather);
-
-                    String strWeather = weather.toString(requireContext());
-                    binding.autoCompleteTextWeather2.setText(strWeather, false);
-                });
+        diaryEditViewModel.weather2
+            .observe(viewLifecycleOwner) { weather: Weather ->
+                val strWeather = weather.toString(requireContext())
+                binding.autoCompleteTextWeather2.setText(strWeather, false)
+            }
     }
 
-    @NonNull
-    private ArrayAdapter<String> createWeatherSpinnerAdapter(@Nullable Weather... excludedWeathers) {
-        int themeResId = requireThemeColor().getThemeResId();
-        Context contextWithTheme = new ContextThemeWrapper(requireContext(), themeResId);
+    private fun createWeatherSpinnerAdapter(vararg excludedWeathers: Weather?): ArrayAdapter<String> {
+        val themeResId = requireThemeColor().themeResId
+        val contextWithTheme: Context = ContextThemeWrapper(requireContext(), themeResId)
 
-        List<String> weatherItemList = new ArrayList<>();
-        Arrays.stream(Weather.values()).forEach(x -> {
-            boolean isIncluded = !isExcludedWeather(x, excludedWeathers);
-            if (isIncluded) weatherItemList.add(x.toString(requireContext()));
-        });
-
-        return new ArrayAdapter<>(contextWithTheme, R.layout.layout_drop_down_list_item, weatherItemList);
-    }
-
-    private boolean isExcludedWeather(Weather weather, @Nullable Weather... excludedWeathers) {
-        if (excludedWeathers == null) return false;
-        for(Weather excludedWeather: excludedWeathers) {
-            if (weather == excludedWeather) return true;
+        val weatherItemList: MutableList<String> = ArrayList()
+        Arrays.stream(Weather.entries.toTypedArray()).forEach { x: Weather ->
+            val isIncluded = !isExcludedWeather(x, *excludedWeathers)
+            if (isIncluded) weatherItemList.add(x.toString(requireContext()))
         }
-        return false;
+
+        return ArrayAdapter(contextWithTheme, R.layout.layout_drop_down_list_item, weatherItemList)
+    }
+
+    private fun isExcludedWeather(weather: Weather, vararg excludedWeathers: Weather?): Boolean {
+        for (excludedWeather in excludedWeathers) {
+            if (weather == excludedWeather) return true
+        }
+        return false
     }
 
     // 気分入力欄。
-    private void setUpConditionInputField() {
+    private fun setUpConditionInputField() {
         // ドロップダウン設定
-        ArrayAdapter<String> conditionArrayAdapter = createConditionSpinnerAdapter();
-        binding.autoCompleteTextCondition.setAdapter(conditionArrayAdapter);
-        binding.autoCompleteTextCondition.setOnItemClickListener((parent, view, position, id) -> {
-            Objects.requireNonNull(parent);
-            requireView();
+        val conditionArrayAdapter = createConditionSpinnerAdapter()
+        binding.autoCompleteTextCondition.setAdapter(conditionArrayAdapter)
+        binding.autoCompleteTextCondition.onItemClickListener =
+            OnItemClickListener { _: AdapterView<*>?, _: View?, position: Int, _: Long ->
+                val listAdapter = binding.autoCompleteTextCondition.adapter
+                val arrayAdapter = listAdapter as ArrayAdapter<*>
+                val strCondition = arrayAdapter.getItem(position) as String?
+                val condition = Condition.of(requireContext(), strCondition)
+                diaryEditViewModel.updateCondition(condition)
+                binding.autoCompleteTextCondition.clearFocus()
+            }
 
-            ListAdapter listAdapter = binding.autoCompleteTextCondition.getAdapter();
-            ArrayAdapter<?> arrayAdapter = (ArrayAdapter<?>) listAdapter;
-            String strCondition = (String) arrayAdapter.getItem(position);
-            Condition condition = Condition.of(requireContext(), strCondition);
-            diaryEditViewModel.updateCondition(condition);
-            binding.autoCompleteTextCondition.clearFocus();
-        });
-
-        diaryEditViewModel.getCondition()
-                .observe(getViewLifecycleOwner(), condition -> {
-                    Objects.requireNonNull(condition);
-
-                    String strCondition = condition.toString(requireContext());
-                    binding.autoCompleteTextCondition.setText(strCondition, false);
-                });
+        diaryEditViewModel.condition
+            .observe(viewLifecycleOwner) { condition: Condition ->
+                val strCondition = condition.toString(requireContext())
+                binding.autoCompleteTextCondition.setText(strCondition, false)
+            }
     }
 
-    @NonNull
-    private ArrayAdapter<String> createConditionSpinnerAdapter() {
-        int themeResId = requireThemeColor().getThemeResId();
-        Context contextWithTheme = new ContextThemeWrapper(requireContext(), themeResId);
+    private fun createConditionSpinnerAdapter(): ArrayAdapter<String> {
+        val themeResId = requireThemeColor().themeResId
+        val contextWithTheme: Context = ContextThemeWrapper(requireContext(), themeResId)
 
-        List<String> conditonItemList = new ArrayList<>();
-        Arrays.stream(Condition.values())
-                .forEach(x -> conditonItemList.add(x.toString(requireContext())));
+        val conditionItemList: MutableList<String> = ArrayList()
+        Arrays.stream(Condition.entries.toTypedArray())
+            .forEach { x: Condition -> conditionItemList.add(x.toString(requireContext())) }
 
-        return new ArrayAdapter<>(contextWithTheme, R.layout.layout_drop_down_list_item, conditonItemList);
+        return ArrayAdapter(contextWithTheme, R.layout.layout_drop_down_list_item, conditionItemList)
     }
 
-    private void setUpTitleInputField() {
+    private fun setUpTitleInputField() {
         // 処理なし
     }
 
-    private void setUpItemInputField() {
+    private fun setUpItemInputField() {
         // 項目入力欄関係Viewを配列に格納
-        final int MAX_ITEMS = DiaryLiveData.MAX_ITEMS;
-        TextInputEditText[] textInputEditTextItemsTitle = new TextInputEditText[MAX_ITEMS];
-        ImageButton[] imageButtonItemsDelete = new ImageButton[MAX_ITEMS];
-
-        textInputEditTextItemsTitle[0] = binding.includeItem1.textInputEditTextTitle;
-        imageButtonItemsDelete[0] = binding.includeItem1.imageButtonItemDelete;
-
-        textInputEditTextItemsTitle[1] = binding.includeItem2.textInputEditTextTitle;
-        imageButtonItemsDelete[1] = binding.includeItem2.imageButtonItemDelete;
-
-        textInputEditTextItemsTitle[2] = binding.includeItem3.textInputEditTextTitle;
-        imageButtonItemsDelete[2] = binding.includeItem3.imageButtonItemDelete;
-
-        textInputEditTextItemsTitle[3] = binding.includeItem4.textInputEditTextTitle;
-        imageButtonItemsDelete[3] = binding.includeItem4.imageButtonItemDelete;
-
-        textInputEditTextItemsTitle[4] = binding.includeItem5.textInputEditTextTitle;
-        imageButtonItemsDelete[4] = binding.includeItem5.imageButtonItemDelete;
+        val textInputEditTextItemsTitle =
+            arrayOf(
+                binding.includeItem1.textInputEditTextTitle,
+                binding.includeItem2.textInputEditTextTitle,
+                binding.includeItem3.textInputEditTextTitle,
+                binding.includeItem4.textInputEditTextTitle,
+                binding.includeItem5.textInputEditTextTitle,
+            )
+        val imageButtonItemsDelete = arrayOf(
+            binding.includeItem1.imageButtonItemDelete,
+            binding.includeItem2.imageButtonItemDelete,
+            binding.includeItem3.imageButtonItemDelete,
+            binding.includeItem4.imageButtonItemDelete,
+            binding.includeItem5.imageButtonItemDelete,
+        )
 
         // 項目欄設定
         // 項目タイトル入力欄設定
-        for (int i = ItemNumber.MIN_NUMBER; i <= ItemNumber.MAX_NUMBER; i++) {
-            ItemNumber inputItemNumber =  new ItemNumber(i);
-            int ItemArrayNumber = i - 1;
-            textInputEditTextItemsTitle[ItemArrayNumber].setInputType(EditorInfo.TYPE_NULL); //キーボード非表示設定
+        for (i in ItemNumber.MIN_NUMBER..ItemNumber.MAX_NUMBER) {
+            val inputItemNumber = ItemNumber(i)
+            val itemArrayNumber = i - 1
+            textInputEditTextItemsTitle[itemArrayNumber].inputType = EditorInfo.TYPE_NULL //キーボード非表示設定
 
-            textInputEditTextItemsTitle[ItemArrayNumber].setOnClickListener(v -> {
-                Objects.requireNonNull(v);
-
+            textInputEditTextItemsTitle[itemArrayNumber].setOnClickListener {
                 // 項目タイトル入力フラグメント起動
-                String inputItemTitle =
-                        diaryEditViewModel.getItemTitleLiveData(inputItemNumber).getValue();
-                showDiaryItemTitleEditFragment(inputItemNumber, inputItemTitle);
-            });
+                val inputItemTitle =
+                    diaryEditViewModel.getItemTitleLiveData(inputItemNumber).notNullValue()
+                showDiaryItemTitleEditFragment(inputItemNumber, inputItemTitle)
+            }
         }
 
         // 項目追加ボタン設定
-        binding.imageButtonItemAddition.setOnClickListener(v -> {
-            Objects.requireNonNull(v);
-
-            binding.imageButtonItemAddition.setEnabled(false);
-            diaryEditViewModel.incrementVisibleItemsCount();
-        });
+        binding.imageButtonItemAddition.setOnClickListener {
+            binding.imageButtonItemAddition.isEnabled = false
+            diaryEditViewModel.incrementVisibleItemsCount()
+        }
 
         // 項目削除ボタン設定
-        for (int i = ItemNumber.MIN_NUMBER; i <= ItemNumber.MAX_NUMBER; i++) {
-            ItemNumber deleteItemNumber = new ItemNumber(i);
-            int itemArrayNumber = i - 1;
-            imageButtonItemsDelete[itemArrayNumber].setOnClickListener(v -> {
-                Objects.requireNonNull(v);
-
-                showDiaryItemDeleteDialog(deleteItemNumber);
-            });
+        for (i in ItemNumber.MIN_NUMBER..ItemNumber.MAX_NUMBER) {
+            val deleteItemNumber = ItemNumber(i)
+            val itemArrayNumber = i - 1
+            imageButtonItemsDelete[itemArrayNumber].setOnClickListener {
+                showDiaryItemDeleteDialog(deleteItemNumber)
+            }
         }
 
         // 項目欄MotionLayout設定
-        for (int i = ItemNumber.MIN_NUMBER; i <= ItemNumber.MAX_NUMBER; i++) {
-            ItemNumber itemNumber = new ItemNumber(i);
-            MotionLayout itemMotionLayout = selectItemMotionLayout(itemNumber);
-            itemMotionLayout.setTransitionListener(new MotionLayout.TransitionListener() {
-                @Override
-                public void onTransitionStarted(MotionLayout motionLayout, int startId, int endId) {
+        for (i in ItemNumber.MIN_NUMBER..ItemNumber.MAX_NUMBER) {
+            val itemNumber = ItemNumber(i)
+            val itemMotionLayout = selectItemMotionLayout(itemNumber)
+            itemMotionLayout.setTransitionListener(object : MotionLayout.TransitionListener {
+                override fun onTransitionStarted(
+                    motionLayout: MotionLayout,
+                    startId: Int,
+                    endId: Int
+                ) {
                     // 処理なし
                 }
 
-                @Override
-                public void onTransitionChange(
-                        MotionLayout motionLayout, int startId, int endId, float progress) {
+                override fun onTransitionChange(
+                    motionLayout: MotionLayout, startId: Int, endId: Int, progress: Float
+                ) {
                     // 処理なし
                 }
 
-                @Override
-                public void onTransitionCompleted(MotionLayout motionLayout, int currentId) {
-                    Objects.requireNonNull(motionLayout);
-
-                    Log.d("MotionLayout", "ItemLiveData" + itemNumber + " onTransitionCompleted");
+                override fun onTransitionCompleted(motionLayout: MotionLayout, currentId: Int) {
+                    Log.d(
+                        "MotionLayout",
+                        "ItemLiveData$itemNumber onTransitionCompleted"
+                    )
                     // 対象項目欄削除後の処理
                     if (currentId == R.id.motion_scene_edit_diary_item_hided_state) {
-                        Log.d("MotionLayout", "currentId:hided_state");
+                        Log.d("MotionLayout", "currentId:hided_state")
                         if (isDeletingItemTransition) {
-                            diaryEditViewModel.deleteItem(itemNumber);
-                            isDeletingItemTransition = false;
+                            diaryEditViewModel.deleteItem(itemNumber)
+                            isDeletingItemTransition = false
                         }
 
-                    // 対象項目欄追加後の処理
+                        // 対象項目欄追加後の処理
                     } else if (currentId == R.id.motion_scene_edit_diary_item_showed_state) {
-                        Log.d("MotionLayout", "currentId:showed_state");
+                        Log.d("MotionLayout", "currentId:showed_state")
                     }
                 }
 
-                @Override
-                public void onTransitionTrigger(MotionLayout motionLayout, int triggerId, boolean positive, float progress) {
+                override fun onTransitionTrigger(
+                    motionLayout: MotionLayout,
+                    triggerId: Int,
+                    positive: Boolean,
+                    progress: Float
+                ) {
                     // 処理なし
                 }
-            });
-
+            })
         }
 
-        diaryEditViewModel.getNumVisibleItems()
-                        .observe(getViewLifecycleOwner(), new NumVisibleItemsObserver());
+        diaryEditViewModel.numVisibleItems
+            .observe(viewLifecycleOwner, NumVisibleItemsObserver())
     }
 
-    @NonNull
-    private MotionLayout selectItemMotionLayout(ItemNumber itemNumber) {
-        switch (itemNumber.getValue()) {
-            case 1:
-                return binding.includeItem1.motionLayoutDiaryEditItem;
-            case 2:
-                return binding.includeItem2.motionLayoutDiaryEditItem;
-            case 3:
-                return binding.includeItem3.motionLayoutDiaryEditItem;
-            case 4:
-                return binding.includeItem4.motionLayoutDiaryEditItem;
-            case 5:
-                return binding.includeItem5.motionLayoutDiaryEditItem;
-            default:
-                throw new IllegalArgumentException();
+    private fun selectItemMotionLayout(itemNumber: ItemNumber): MotionLayout {
+        return when (itemNumber.value) {
+            1 -> binding.includeItem1.motionLayoutDiaryEditItem
+            2 -> binding.includeItem2.motionLayoutDiaryEditItem
+            3 -> binding.includeItem3.motionLayoutDiaryEditItem
+            4 -> binding.includeItem4.motionLayoutDiaryEditItem
+            5 -> binding.includeItem5.motionLayoutDiaryEditItem
+            else -> throw IllegalArgumentException()
         }
     }
 
-    private class NumVisibleItemsObserver implements Observer<Integer> {
-
-        @Override
-        public void onChanged(Integer integer) {
-            Objects.requireNonNull(integer);
-
-            enableItemAdditionButton(integer < DiaryLiveData.MAX_ITEMS);
-            setUpItemsLayout(integer);
+    private inner class NumVisibleItemsObserver : Observer<Int> {
+        override fun onChanged(value: Int) {
+            enableItemAdditionButton(value < DiaryLiveData.MAX_ITEMS)
+            setUpItemsLayout(value)
         }
 
-        private void enableItemAdditionButton(boolean enabled) {
-            binding.imageButtonItemAddition.setEnabled(enabled);
-            int alphaResId;
-            if (enabled) {
-                alphaResId = R.dimen.view_enabled_alpha;
+        fun enableItemAdditionButton(enabled: Boolean) {
+            binding.imageButtonItemAddition.isEnabled = enabled
+            val alphaResId = if (enabled) {
+                R.dimen.view_enabled_alpha
             } else {
-                alphaResId = R.dimen.view_disabled_alpha;
+                R.dimen.view_disabled_alpha
             }
-            float alpha = ResourcesCompat.getFloat(getResources(), alphaResId);
-            binding.imageButtonItemAddition.setAlpha(alpha);
+            val alpha = ResourcesCompat.getFloat(resources, alphaResId)
+            binding.imageButtonItemAddition.alpha = alpha
         }
 
-        private void setUpItemsLayout(Integer numItems) {
-            Objects.requireNonNull(numItems);
-            if (numItems < ItemNumber.MIN_NUMBER || numItems > ItemNumber.MAX_NUMBER) {
-                throw new IllegalArgumentException();
-            }
+        fun setUpItemsLayout(numItems: Int) {
+            require(!(numItems < ItemNumber.MIN_NUMBER || numItems > ItemNumber.MAX_NUMBER))
 
             // MEMO:LifeCycleがResumedの時のみ項目欄のモーション追加処理を行う。
             //      削除処理はObserverで適切なモーション削除処理を行うのは難しいのでここでは処理せず、削除ダイアログから処理する。
-            if (getViewLifecycleOwner().getLifecycle().getCurrentState() == Lifecycle.State.RESUMED) {
-                int numShowedItems = countShowedItems();
-                int differenceValue = numItems - numShowedItems;
+            if (viewLifecycleOwner.lifecycle.currentState == Lifecycle.State.RESUMED) {
+                val numShowedItems = countShowedItems()
+                val differenceValue = numItems - numShowedItems
                 if (numItems > numShowedItems && differenceValue == 1) {
-                    showItem(new ItemNumber(numItems), false);
-                    return;
+                    showItem(ItemNumber(numItems), false)
+                    return
                 }
             }
 
-            for (int i = ItemNumber.MIN_NUMBER; i <= ItemNumber.MAX_NUMBER; i++) {
-                ItemNumber itemNumber = new ItemNumber(i);
-                if (itemNumber.getValue() <= numItems) {
-                    showItem(itemNumber, true);
+            for (i in ItemNumber.MIN_NUMBER..ItemNumber.MAX_NUMBER) {
+                val itemNumber = ItemNumber(i)
+                if (itemNumber.value <= numItems) {
+                    showItem(itemNumber, true)
                 } else {
-                    hideItem(itemNumber, true);
+                    hideItem(itemNumber, true)
                 }
             }
         }
     }
 
-    private void hideItem(ItemNumber itemNumber, boolean isJump) {
-        MotionLayout itemMotionLayout = selectItemMotionLayout(itemNumber);
+    private fun hideItem(itemNumber: ItemNumber, isJump: Boolean) {
+        val itemMotionLayout = selectItemMotionLayout(itemNumber)
         if (isJump) {
             itemMotionLayout
-                    .jumpToState(R.id.motion_scene_edit_diary_item_hided_state);
+                .jumpToState(R.id.motion_scene_edit_diary_item_hided_state)
         } else {
-            itemMotionLayout.transitionToState(R.id.motion_scene_edit_diary_item_hided_state);
+            itemMotionLayout.transitionToState(R.id.motion_scene_edit_diary_item_hided_state)
         }
     }
 
-    private void showItem(ItemNumber itemNumber, boolean isJump) {
-        Objects.requireNonNull(itemNumber);
-
-        MotionLayout itemMotionLayout = selectItemMotionLayout(itemNumber);
+    private fun showItem(itemNumber: ItemNumber, isJump: Boolean) {
+        val itemMotionLayout = selectItemMotionLayout(itemNumber)
         if (isJump) {
             itemMotionLayout
-                    .jumpToState(R.id.motion_scene_edit_diary_item_showed_state);
+                .jumpToState(R.id.motion_scene_edit_diary_item_showed_state)
         } else {
-            itemMotionLayout.transitionToState(R.id.motion_scene_edit_diary_item_showed_state);
+            itemMotionLayout.transitionToState(R.id.motion_scene_edit_diary_item_showed_state)
             binding.nestedScrollFullScreen
-                    .smoothScrollBy(
-                            0,
-                            binding.includeItem1.linerLayoutDiaryEditItem.getHeight(),
-                            1400
-                    );
+                .smoothScrollBy(
+                    0,
+                    binding.includeItem1.linerLayoutDiaryEditItem.height,
+                    1400
+                )
         }
     }
 
-    private int countShowedItems() {
-        int numShowedItems = 0;
-        for (int i = ItemNumber.MIN_NUMBER; i <= ItemNumber.MAX_NUMBER; i++) {
-            ItemNumber itemNumber = new ItemNumber(i);
-            MotionLayout motionLayout = selectItemMotionLayout(itemNumber);
-            if (motionLayout.getCurrentState() != R.id.motion_scene_edit_diary_item_showed_state) {
-                continue;
+    private fun countShowedItems(): Int {
+        var numShowedItems = 0
+        for (i in ItemNumber.MIN_NUMBER..ItemNumber.MAX_NUMBER) {
+            val itemNumber = ItemNumber(i)
+            val motionLayout = selectItemMotionLayout(itemNumber)
+            if (motionLayout.currentState != R.id.motion_scene_edit_diary_item_showed_state) {
+                continue
             }
-            numShowedItems++;
+            numShowedItems++
         }
-        return numShowedItems;
+        return numShowedItems
     }
 
-    private void setUpPictureInputField() {
-        binding.imageAttachedPicture.setOnClickListener(v -> {
-            Objects.requireNonNull(v);
-
-            requireMainActivity().loadPicturePath();
-        });
-
-        diaryEditViewModel.getPicturePath()
-                .observe(getViewLifecycleOwner(), new PicturePathObserver());
-
-        binding.imageButtonAttachedPictureDelete.setOnClickListener(v -> showDiaryPictureDeleteDialog());
-    }
-
-    private class PicturePathObserver implements Observer<Uri> {
-
-        @Override
-        public void onChanged(Uri uri) {
-            DiaryPictureManager diaryPictureManager =
-                    new DiaryPictureManager(
-                            requireContext(),
-                            binding.imageAttachedPicture,
-                            requireThemeColor().getOnSurfaceVariantColor(requireContext().getResources())
-                    );
-
-            diaryPictureManager.setUpPictureOnDiary(uri);
-            enablePictureDeleteButton(uri != null);
-
+    private fun setUpPictureInputField() {
+        binding.imageAttachedPicture.setOnClickListener {
+            requireMainActivity().loadPicturePath()
         }
 
-        private void enablePictureDeleteButton(boolean enabled) {
-            binding.imageButtonAttachedPictureDelete.setEnabled(enabled);
-            int alphaResId;
-            if (enabled) {
-                alphaResId = R.dimen.view_enabled_alpha;
+        diaryEditViewModel.picturePath
+            .observe(viewLifecycleOwner, PicturePathObserver())
+
+        binding.imageButtonAttachedPictureDelete.setOnClickListener { showDiaryPictureDeleteDialog() }
+    }
+
+    private inner class PicturePathObserver : Observer<Uri?> {
+        override fun onChanged(value: Uri?) {
+            val diaryPictureManager =
+                DiaryPictureManager(
+                    requireContext(),
+                    binding.imageAttachedPicture,
+                    requireThemeColor().getOnSurfaceVariantColor(requireContext().resources)
+                )
+
+            diaryPictureManager.setUpPictureOnDiary(value)
+            enablePictureDeleteButton(value != null)
+        }
+
+        fun enablePictureDeleteButton(enabled: Boolean) {
+            binding.imageButtonAttachedPictureDelete.isEnabled = enabled
+            val alphaResId = if (enabled) {
+                R.dimen.view_enabled_alpha
             } else {
-                alphaResId = R.dimen.view_disabled_alpha;
+                R.dimen.view_disabled_alpha
             }
-            float alpha = ResourcesCompat.getFloat(getResources(), alphaResId);
-            binding.imageButtonAttachedPictureDelete.setAlpha(alpha);
+            val alpha = ResourcesCompat.getFloat(resources, alphaResId)
+            binding.imageButtonAttachedPictureDelete.alpha = alpha
         }
     }
 
-    private void updatePictureUriPermission() {
-        Uri latestPictureUri = diaryEditViewModel.getPicturePath().getValue();
-        Uri loadedPictureUri = diaryEditViewModel.getLoadedPicturePath().getValue();
+    private fun updatePictureUriPermission() {
+        val latestPictureUri = diaryEditViewModel.picturePath.value
+        val loadedPictureUri = diaryEditViewModel.loadedPicturePath.value
 
         try {
-            if (latestPictureUri == null && loadedPictureUri == null) return;
+            if (latestPictureUri == null && loadedPictureUri == null) return
 
             if (latestPictureUri != null && loadedPictureUri == null) {
-                pictureUriPermissionManager.takePersistablePermission(latestPictureUri);
-                return;
+                pictureUriPermissionManager.takePersistablePermission(latestPictureUri)
+                return
             }
 
             if (latestPictureUri == null) {
-                pictureUriPermissionManager.releasePersistablePermission(loadedPictureUri);
-                return;
+                pictureUriPermissionManager
+                    .releasePersistablePermission(checkNotNull(loadedPictureUri))
+                return
             }
 
-            if (latestPictureUri.equals(loadedPictureUri)) return;
+            if (latestPictureUri == loadedPictureUri) return
 
-            pictureUriPermissionManager.takePersistablePermission(latestPictureUri);
-            pictureUriPermissionManager.releasePersistablePermission(loadedPictureUri);
-        } catch (SecurityException e) {
+            pictureUriPermissionManager.takePersistablePermission(latestPictureUri)
+            pictureUriPermissionManager.releasePersistablePermission(checkNotNull(loadedPictureUri))
+        } catch (e: SecurityException) {
             // 対処できないがアプリを落としたくない為、catchのみ処理する。
         }
-
     }
 
-    private void releaseLoadedPictureUriPermission() {
-        Uri loadedPictureUri = diaryEditViewModel.getLoadedPicturePath().getValue();
-        if (loadedPictureUri == null) return;
-        pictureUriPermissionManager.releasePersistablePermission(loadedPictureUri);
+    private fun releaseLoadedPictureUriPermission() {
+        val loadedPictureUri = diaryEditViewModel.loadedPicturePath.value ?: return
+        pictureUriPermissionManager.releasePersistablePermission(loadedPictureUri)
     }
 
-    private void setupEditText() {
-        TextInputSetup textInputSetup = new TextInputSetup(requireActivity());
+    private fun setupEditText() {
+        val textInputSetup = TextInputSetup(requireActivity())
 
-        TextInputLayout[] allTextInputLayouts = createAllTextInputLayoutList().toArray(new TextInputLayout[0]);
-        textInputSetup.setUpFocusClearOnClickBackground(binding.viewNestedScrollBackground, allTextInputLayouts);
+        val allTextInputLayouts = createAllTextInputLayoutList().toTypedArray<TextInputLayout>()
+        textInputSetup.setUpFocusClearOnClickBackground(
+            binding.viewNestedScrollBackground,
+            *allTextInputLayouts
+        )
 
-        textInputSetup.setUpKeyboardCloseOnEnter(binding.textInputLayoutTitle);
+        textInputSetup.setUpKeyboardCloseOnEnter(binding.textInputLayoutTitle)
 
-        TextInputLayout[] scrollableTextInputLayouts = {
-                binding.includeItem1.textInputLayoutComment,
-                binding.includeItem2.textInputLayoutComment,
-                binding.includeItem3.textInputLayoutComment,
-                binding.includeItem4.textInputLayoutComment,
-                binding.includeItem5.textInputLayoutComment,
-        };
-        textInputSetup.setUpScrollable(scrollableTextInputLayouts);
+        val scrollableTextInputLayouts = arrayOf(
+            binding.includeItem1.textInputLayoutComment,
+            binding.includeItem2.textInputLayoutComment,
+            binding.includeItem3.textInputLayoutComment,
+            binding.includeItem4.textInputLayoutComment,
+            binding.includeItem5.textInputLayoutComment,
+        )
+        textInputSetup.setUpScrollable(*scrollableTextInputLayouts)
 
-        TextInputLayout[] clearableTextInputLayouts = {
-                binding.textInputLayoutTitle,
-                binding.includeItem1.textInputLayoutTitle,
-                binding.includeItem2.textInputLayoutTitle,
-                binding.includeItem3.textInputLayoutTitle,
-                binding.includeItem4.textInputLayoutTitle,
-                binding.includeItem5.textInputLayoutTitle,
-        };
-        TextInputSetup.ClearButtonSetUpTransitionListener transitionListener =
-                textInputSetup.createClearButtonSetupTransitionListener(clearableTextInputLayouts);
-        addTransitionListener(transitionListener);
+        val clearableTextInputLayouts = arrayOf(
+            binding.textInputLayoutTitle,
+            binding.includeItem1.textInputLayoutTitle,
+            binding.includeItem2.textInputLayoutTitle,
+            binding.includeItem3.textInputLayoutTitle,
+            binding.includeItem4.textInputLayoutTitle,
+            binding.includeItem5.textInputLayoutTitle,
+        )
+        val transitionListener =
+            textInputSetup.createClearButtonSetupTransitionListener(*clearableTextInputLayouts)
+        addTransitionListener(transitionListener)
 
         // TODO:キーボード表示時の自動スクロールを無効化(自動スクロール時toolbarが隠れる為)している為、listenerで代用したいが上手くいかない。
         /*binding.includeItem1.textInputEditTextComment.setOnFocusChangeListener(new View.OnFocusChangeListener() {
@@ -859,214 +775,184 @@ public class DiaryEditFragment extends BaseFragment {
         });*/
     }
 
-    private void clearFocusAllEditText() {
-        List<TextInputLayout> textInputLayoutList = createAllTextInputLayoutList();
-        textInputLayoutList.stream().forEach(x -> {
-            Objects.requireNonNull(x);
-
-            EditText editText = x.getEditText();
-            Objects.requireNonNull(editText);
-            editText.clearFocus();
-        });
+    private fun clearFocusAllEditText() {
+        val textInputLayoutList = createAllTextInputLayoutList()
+        textInputLayoutList.stream().forEach { x: TextInputLayout ->
+            val editText = checkNotNull(x.editText)
+            editText.clearFocus()
+        }
     }
 
-    @NonNull
-    @Unmodifiable
-    private List<TextInputLayout> createAllTextInputLayoutList() {
-        return List.of(
-                binding.textInputLayoutDate,
-                binding.textInputLayoutWeather1,
-                binding.textInputLayoutWeather2,
-                binding.textInputLayoutCondition,
-                binding.textInputLayoutTitle,
-                binding.includeItem1.textInputLayoutTitle,
-                binding.includeItem1.textInputLayoutComment,
-                binding.includeItem2.textInputLayoutTitle,
-                binding.includeItem2.textInputLayoutComment,
-                binding.includeItem3.textInputLayoutTitle,
-                binding.includeItem3.textInputLayoutComment,
-                binding.includeItem4.textInputLayoutTitle,
-                binding.includeItem4.textInputLayoutComment,
-                binding.includeItem5.textInputLayoutTitle,
-                binding.includeItem5.textInputLayoutComment
-        );
+    private fun createAllTextInputLayoutList(): @Unmodifiable List<TextInputLayout> {
+        return listOf(
+            binding.textInputLayoutDate,
+            binding.textInputLayoutWeather1,
+            binding.textInputLayoutWeather2,
+            binding.textInputLayoutCondition,
+            binding.textInputLayoutTitle,
+            binding.includeItem1.textInputLayoutTitle,
+            binding.includeItem1.textInputLayoutComment,
+            binding.includeItem2.textInputLayoutTitle,
+            binding.includeItem2.textInputLayoutComment,
+            binding.includeItem3.textInputLayoutTitle,
+            binding.includeItem3.textInputLayoutComment,
+            binding.includeItem4.textInputLayoutTitle,
+            binding.includeItem4.textInputLayoutComment,
+            binding.includeItem5.textInputLayoutTitle,
+            binding.includeItem5.textInputLayoutComment
+        )
     }
 
-    private void fetchWeatherInfo(LocalDate date, boolean requestsShowingDialog) {
-        Objects.requireNonNull(date);
-
+    private fun fetchWeatherInfo(date: LocalDate, requestsShowingDialog: Boolean) {
         // HACK:EditFragment起動時、設定値を参照してから位置情報を取得する為、タイムラグが発生する。
         //      対策として記憶boolean変数を用意し、true時は位置情報取得処理コードにて天気情報も取得する。
-        boolean isChecked = settingsViewModel.isCheckedWeatherInfoAcquisitionSetting();
-        if (!isChecked) return;
+        val isChecked = settingsViewModel.isCheckedWeatherInfoAcquisitionSetting
+        if (!isChecked) return
 
-        boolean hasUpdatedLocation = settingsViewModel.hasUpdatedGeoCoordinates();
+        val hasUpdatedLocation = settingsViewModel.hasUpdatedGeoCoordinates()
         if (!hasUpdatedLocation) {
-            diaryEditViewModel.addWeatherInfoFetchErrorMessage();
-            return;
+            diaryEditViewModel.addWeatherInfoFetchErrorMessage()
+            return
         }
 
         // 本フラグメント起動時のみダイアログなしで天気情報取得
         if (requestsShowingDialog) {
-            showWeatherInfoFetchingDialog(date);
+            showWeatherInfoFetchingDialog(date)
         } else {
-            GeoCoordinates geoCoordinates = settingsViewModel.getGeoCoordinatesLiveData().getValue();
-            Objects.requireNonNull(geoCoordinates);
-            diaryEditViewModel.fetchWeatherInformation(date, geoCoordinates);
+            val geoCoordinates = settingsViewModel.geoCoordinatesLiveData.checkNotNull()
+            diaryEditViewModel.fetchWeatherInformation(date, geoCoordinates)
         }
     }
 
-    private void showDiaryShowFragment(LocalDate date) {
-        Objects.requireNonNull(date);
-        if (isDialogShowing()) return;
+    private fun showDiaryShowFragment(date: LocalDate) {
+        if (isDialogShowing()) return
 
-        boolean isStartDiaryFragment =
-                DiaryEditFragmentArgs.fromBundle(requireArguments()).getIsStartDiaryFragment();
-        NavDirections action;
+        val isStartDiaryFragment =
+            DiaryEditFragmentArgs.fromBundle(requireArguments()).isStartDiaryFragment
         // 循環型画面遷移を成立させるためにPopup対象Fragmentが異なるactionを切り替える。
-        if (isStartDiaryFragment) {
-            action = DiaryEditFragmentDirections
-                    .actionDiaryEditFragmentToDiaryShowFragmentPattern2(date);
+        val action = if (isStartDiaryFragment) {
+            DiaryEditFragmentDirections
+                .actionDiaryEditFragmentToDiaryShowFragmentPattern2(date)
         } else {
-            action = DiaryEditFragmentDirections
-                    .actionDiaryEditFragmentToDiaryShowFragmentPattern1(date);
+            DiaryEditFragmentDirections
+                .actionDiaryEditFragmentToDiaryShowFragmentPattern1(date)
         }
-        navController.navigate(action);
+        navController.navigate(action)
     }
 
-    private void showDiaryItemTitleEditFragment(ItemNumber inputItemNumber, String inputItemTitle) {
-        Objects.requireNonNull(inputItemNumber);
-        Objects.requireNonNull(inputItemTitle);
-        if (isDialogShowing()) return;
+    private fun showDiaryItemTitleEditFragment(
+        inputItemNumber: ItemNumber,
+        inputItemTitle: String
+    ) {
+        if (isDialogShowing()) return
 
-        NavDirections action =
-                DiaryEditFragmentDirections
-                        .actionDiaryEditFragmentToSelectItemTitleFragment(inputItemNumber, inputItemTitle);
-        navController.navigate(action);
-        diaryEditViewModel.updateIsShowingItemTitleEditFragment(true);
+        val action: NavDirections =
+            DiaryEditFragmentDirections
+                .actionDiaryEditFragmentToSelectItemTitleFragment(inputItemNumber, inputItemTitle)
+        navController.navigate(action)
+        diaryEditViewModel.updateIsShowingItemTitleEditFragment(true)
     }
 
-    private void showDiaryLoadingDialog(LocalDate date) {
-        Objects.requireNonNull(date);
-        if (isDialogShowing()) return;
+    private fun showDiaryLoadingDialog(date: LocalDate) {
+        if (isDialogShowing()) return
 
-        NavDirections action =
-                DiaryEditFragmentDirections
-                        .actionDiaryEditFragmentToDiaryLoadingDialog(date);
-        navController.navigate(action);
+        val action: NavDirections =
+            DiaryEditFragmentDirections
+                .actionDiaryEditFragmentToDiaryLoadingDialog(date)
+        navController.navigate(action)
     }
 
-    private void showDiaryUpdateDialog(LocalDate date) {
-        Objects.requireNonNull(date);
-        if (isDialogShowing()) return;
+    private fun showDiaryUpdateDialog(date: LocalDate) {
+        if (isDialogShowing()) return
 
-        NavDirections action =
-                DiaryEditFragmentDirections
-                        .actionDiaryEditFragmentToDiaryUpdateDialog(date);
-        navController.navigate(action);
+        val action: NavDirections =
+            DiaryEditFragmentDirections
+                .actionDiaryEditFragmentToDiaryUpdateDialog(date)
+        navController.navigate(action)
     }
 
-    private void showDiaryDeleteDialog(LocalDate date) {
-        Objects.requireNonNull(date);
-        if (isDialogShowing()) return;
+    private fun showDiaryDeleteDialog(date: LocalDate) {
+        if (isDialogShowing()) return
 
-        NavDirections action =
-                DiaryEditFragmentDirections
-                        .actionDiaryEditFragmentToDiaryDeleteDialog(date);
-        navController.navigate(action);
+        val action: NavDirections =
+            DiaryEditFragmentDirections
+                .actionDiaryEditFragmentToDiaryDeleteDialog(date)
+        navController.navigate(action)
     }
 
-    private void showDatePickerDialog(LocalDate date) {
-        Objects.requireNonNull(date);
-        if (isDialogShowing()) return;
+    private fun showDatePickerDialog(date: LocalDate) {
+        if (isDialogShowing()) return
 
-        NavDirections action =
-                DiaryEditFragmentDirections
-                        .actionDiaryEditFragmentToDatePickerDialog(date);
-        navController.navigate(action);
+        val action: NavDirections =
+            DiaryEditFragmentDirections
+                .actionDiaryEditFragmentToDatePickerDialog(date)
+        navController.navigate(action)
     }
 
-    private void showWeatherInfoFetchingDialog(LocalDate date) {
-        Objects.requireNonNull(date);
-        if (isDialogShowing()) return;
-        if (!diaryEditViewModel.canFetchWeatherInformation(date)) return;
+    private fun showWeatherInfoFetchingDialog(date: LocalDate) {
+        if (isDialogShowing()) return
+        if (!diaryEditViewModel.canFetchWeatherInformation(date)) return
 
         // 今日の日付以降は天気情報を取得できないためダイアログ表示不要
-        diaryEditViewModel.canFetchWeatherInformation(date);
+        diaryEditViewModel.canFetchWeatherInformation(date)
 
-        NavDirections action =
-                DiaryEditFragmentDirections
-                        .actionDiaryEditFragmentToWeatherInfoFetchingDialog(date);
-        navController.navigate(action);
+        val action: NavDirections =
+            DiaryEditFragmentDirections
+                .actionDiaryEditFragmentToWeatherInfoFetchingDialog(date)
+        navController.navigate(action)
     }
 
-    private void showDiaryItemDeleteDialog(ItemNumber itemNumber) {
-        Objects.requireNonNull(itemNumber);
-        if (isDialogShowing()) return;
+    private fun showDiaryItemDeleteDialog(itemNumber: ItemNumber) {
+        if (isDialogShowing()) return
 
-        NavDirections action =
-                DiaryEditFragmentDirections
-                        .actionDiaryEditFragmentToDiaryItemDeleteDialog(itemNumber);
-        navController.navigate(action);
+        val action: NavDirections =
+            DiaryEditFragmentDirections
+                .actionDiaryEditFragmentToDiaryItemDeleteDialog(itemNumber)
+        navController.navigate(action)
     }
 
-    private void showDiaryPictureDeleteDialog() {
-        if (isDialogShowing()) return;
+    private fun showDiaryPictureDeleteDialog() {
+        if (isDialogShowing()) return
 
-        NavDirections action =
-                DiaryEditFragmentDirections
-                        .actionDiaryEditFragmentToDiaryPictureDeleteDialog();
-        navController.navigate(action);
+        val action =
+            DiaryEditFragmentDirections
+                .actionDiaryEditFragmentToDiaryPictureDeleteDialog()
+        navController.navigate(action)
     }
 
-    @Override
-    protected void navigateAppMessageDialog(@NonNull AppMessage appMessage) {
-        NavDirections action =
-                DiaryEditFragmentDirections
-                        .actionDiaryEditFragmentToAppMessageDialog(appMessage);
-        navController.navigate(action);
+    override fun navigateAppMessageDialog(appMessage: AppMessage) {
+        val action: NavDirections =
+            DiaryEditFragmentDirections
+                .actionDiaryEditFragmentToAppMessageDialog(appMessage)
+        navController.navigate(action)
     }
 
-    @Override
-    protected void retryOtherAppMessageDialogShow() {
-        diaryEditViewModel.triggerAppMessageBufferListObserver();
+    override fun retryOtherAppMessageDialogShow() {
+        diaryEditViewModel.triggerAppMessageBufferListObserver()
     }
 
-    @SuppressLint("UseRequireInsteadOfGet")
-    private void hideKeyboard(View view) {
-        Objects.requireNonNull(view);
-
-        KeyboardInitializer keyboardInitializer = new KeyboardInitializer(requireActivity());
-        keyboardInitializer.hide(view);
-        onResume();
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
+    override fun onResume() {
+        super.onResume()
 
         // HACK:DiaryItemTitleEditFragmentから本Fragmentへ画面遷移(戻る)した時、
         //      スピナーのアダプターが選択中アイテムのみで構成されたアダプターに更新されてしまうので
         //      onResume()メソッドにて再度アダプターを設定して対策。
         //      (Weather2はWeather1のObserver内で設定している為不要)
-        ArrayAdapter<String> weatherArrayAdapter = createWeatherSpinnerAdapter();
-        binding.autoCompleteTextWeather1.setAdapter(weatherArrayAdapter);
-        ArrayAdapter<String> conditionArrayAdapter = createConditionSpinnerAdapter();
-        binding.autoCompleteTextCondition.setAdapter(conditionArrayAdapter);
+        val weatherArrayAdapter = createWeatherSpinnerAdapter()
+        binding.autoCompleteTextWeather1.setAdapter(weatherArrayAdapter)
+        val conditionArrayAdapter = createConditionSpinnerAdapter()
+        binding.autoCompleteTextCondition.setAdapter(conditionArrayAdapter)
 
         // HACK:ItemTitleEditFragmentから戻ってきた時に処理させたく箇所を
         //      変数(DiaryEditViewModel.IsShowingItemTitleEditFragment)で分岐させる。
-        diaryEditViewModel.updateIsShowingItemTitleEditFragment(false);
+        diaryEditViewModel.updateIsShowingItemTitleEditFragment(false)
     }
 
-    @Override
-    protected void destroyBinding() {
-        binding = null;
+    override fun destroyBinding() {
+        _binding = null
     }
 
-    public void attachPicture(Uri uri) {
-        Objects.requireNonNull(uri);
-
-        diaryEditViewModel.updatePicturePath(uri);
+    fun attachPicture(uri: Uri) {
+        diaryEditViewModel.updatePicturePath(uri)
     }
 }
