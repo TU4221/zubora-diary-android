@@ -1,45 +1,35 @@
-package com.websarva.wings.android.zuboradiary.ui.diary.diaryedit;
+package com.websarva.wings.android.zuboradiary.ui.diary.diaryedit
 
-import android.content.Context;
-import android.util.AttributeSet;
-import android.view.MotionEvent;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-
-import com.google.android.material.textfield.TextInputEditText;
+import android.content.Context
+import android.util.AttributeSet
+import android.view.MotionEvent
+import com.google.android.material.textfield.TextInputEditText
 
 /**
  * 本クラスは”TextInputEditText”をタッチした時、一度のタッチで"OnClickListener"が処理されるようにカスタマイズしたクラスである。
  * ”TextInputLayout”に"OnClickListener"を設定しても処理はされない。
- * */
-
+ */
 // MEMO:"TextInputEditText"にOnTouchListenerをセットすると
 //      警告"Custom view has setOnTouchListener called on it but does not override performClick"が表示される。
 //      これは本来のアクセシビリティサービスが損なわれる可能性があることを示唆している。
 //      対策としてonTouchEvent()メソッドをOverrideした本クラスを作成して使用。
 //      https://www.binarydevelop.com/article/androidsetontouchlistenerperformclick-68009
-public class CustomTextInputEditText extends TextInputEditText {
-    public CustomTextInputEditText(@NonNull Context context) {
-        super(context);
+class CustomTextInputEditText : TextInputEditText {
+    constructor(context: Context) : super(context)
+
+    constructor(context: Context, attrs: AttributeSet?) : super(context, attrs)
+
+    constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) :
+            super(context, attrs, defStyleAttr)
+
+    override fun onTouchEvent(event: MotionEvent): Boolean {
+        if (event.action == MotionEvent.ACTION_UP) performClick()
+        return super.onTouchEvent(event)
     }
 
-    public CustomTextInputEditText(@NonNull Context context, @Nullable AttributeSet attrs) {
-        super(context, attrs);
-    }
-
-    public CustomTextInputEditText(@NonNull Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
-        super(context, attrs, defStyleAttr);
-    }
-
-    @Override
-    public boolean onTouchEvent(@NonNull MotionEvent event) {
-        if (event.getAction() == MotionEvent.ACTION_UP) performClick();
-        return super.onTouchEvent(event);
-    }
-
-    @Override
-    public boolean performClick() {
-        return super.performClick();
+    // MEMO:警告"Custom view overrides `onTouchEvent` but not `performClick`"対策として下記用意
+    @Suppress("RedundantOverride")
+    override fun performClick(): Boolean {
+        return super.performClick()
     }
 }
