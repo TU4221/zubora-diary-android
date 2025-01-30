@@ -228,37 +228,37 @@
                         <include
                             layout="@layout/layout_diary_edit_item"
                             android:id="@+id/include_item_1"
-                            app:commentMutableLiveData="@{diaryEditViewModel.item1CommentMutableLiveData}"
+                            app:commentMutableLiveData="@{diaryEditViewModel.item1CommentMutable}"
                             app:itemNumber="@{@string/fragment_diary_edit_item_1}"
-                            app:titleMutableLiveData="@{diaryEditViewModel.item1TitleMutableLiveData}" />
+                            app:titleMutableLiveData="@{diaryEditViewModel.item1TitleMutable}" />
 
                         <include
                             layout="@layout/layout_diary_edit_item"
                             android:id="@+id/include_item_2"
-                            app:commentMutableLiveData="@{diaryEditViewModel.item2CommentMutableLiveData}"
+                            app:commentMutableLiveData="@{diaryEditViewModel.item2CommentMutable}"
                             app:itemNumber="@{@string/fragment_diary_edit_item_2}"
-                            app:titleMutableLiveData="@{diaryEditViewModel.item2TitleMutableLiveData}" />
+                            app:titleMutableLiveData="@{diaryEditViewModel.item2TitleMutable}" />
 
                         <include
                             layout="@layout/layout_diary_edit_item"
                             android:id="@+id/include_item_3"
-                            app:commentMutableLiveData="@{diaryEditViewModel.item3CommentMutableLiveData}"
+                            app:commentMutableLiveData="@{diaryEditViewModel.item3CommentMutable}"
                             app:itemNumber="@{@string/fragment_diary_edit_item_3}"
-                            app:titleMutableLiveData="@{diaryEditViewModel.item3TitleMutableLiveData}" />
+                            app:titleMutableLiveData="@{diaryEditViewModel.item3TitleMutable}" />
 
                         <include
                             layout="@layout/layout_diary_edit_item"
                             android:id="@+id/include_item_4"
-                            app:commentMutableLiveData="@{diaryEditViewModel.item4CommentMutableLiveData}"
+                            app:commentMutableLiveData="@{diaryEditViewModel.item4CommentMutable}"
                             app:itemNumber="@{@string/fragment_diary_edit_item_4}"
-                            app:titleMutableLiveData="@{diaryEditViewModel.item4TitleMutableLiveData}" />
+                            app:titleMutableLiveData="@{diaryEditViewModel.item4TitleMutable}" />
 
                         <include
                             layout="@layout/layout_diary_edit_item"
                             android:id="@+id/include_item_5"
-                            app:commentMutableLiveData="@{diaryEditViewModel.item5CommentMutableLiveData}"
+                            app:commentMutableLiveData="@{diaryEditViewModel.item5CommentMutable}"
                             app:itemNumber="@{@string/fragment_diary_edit_item_5}"
-                            app:titleMutableLiveData="@{diaryEditViewModel.item5TitleMutableLiveData}" />
+                            app:titleMutableLiveData="@{diaryEditViewModel.item5TitleMutable}" />
 
                         <ImageButton
                             style="@style/AppImageButtonStyle"

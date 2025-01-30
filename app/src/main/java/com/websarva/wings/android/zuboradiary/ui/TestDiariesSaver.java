@@ -15,7 +15,7 @@ public class TestDiariesSaver {
     }
 
     public void save(long number) {
-        LocalDate startDate = diaryEditViewModel.getDateLiveData().getValue();
+        LocalDate startDate = diaryEditViewModel.getDate().getValue();
         if (startDate != null) {
             Log.d("20240823", "save");
             for (long i = 0; i < number; i++) {

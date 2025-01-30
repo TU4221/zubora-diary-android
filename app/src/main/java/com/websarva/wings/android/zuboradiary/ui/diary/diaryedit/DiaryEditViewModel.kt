@@ -1,453 +1,406 @@
-package com.websarva.wings.android.zuboradiary.ui.diary.diaryedit;
+package com.websarva.wings.android.zuboradiary.ui.diary.diaryedit
 
-import android.net.Uri;
-
-import androidx.annotation.NonNull;
-import androidx.lifecycle.LiveData;
-import androidx.lifecycle.MutableLiveData;
-
-import com.websarva.wings.android.zuboradiary.data.AppMessage;
-import com.websarva.wings.android.zuboradiary.data.database.DiaryEntity;
-import com.websarva.wings.android.zuboradiary.data.database.DiaryItemTitleSelectionHistoryItemEntity;
-import com.websarva.wings.android.zuboradiary.data.database.DiaryRepository;
-import com.websarva.wings.android.zuboradiary.data.diary.Condition;
-import com.websarva.wings.android.zuboradiary.data.diary.ItemNumber;
-import com.websarva.wings.android.zuboradiary.data.diary.Weather;
-import com.websarva.wings.android.zuboradiary.data.network.GeoCoordinates;
-import com.websarva.wings.android.zuboradiary.data.network.WeatherApiCallable;
-import com.websarva.wings.android.zuboradiary.data.network.WeatherApiRepository;
-import com.websarva.wings.android.zuboradiary.data.network.WeatherApiResponse;
-import com.websarva.wings.android.zuboradiary.ui.BaseViewModel;
-import com.websarva.wings.android.zuboradiary.ui.diary.DiaryLiveData;
-
-import java.time.LocalDate;
-import java.time.temporal.ChronoUnit;
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Objects;
-import java.util.concurrent.CancellationException;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-
-import javax.inject.Inject;
-
-import dagger.hilt.android.lifecycle.HiltViewModel;
-import retrofit2.Call;
+import android.net.Uri
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import com.websarva.wings.android.zuboradiary.data.AppMessage
+import com.websarva.wings.android.zuboradiary.data.database.DiaryRepository
+import com.websarva.wings.android.zuboradiary.data.diary.Condition
+import com.websarva.wings.android.zuboradiary.data.diary.ItemNumber
+import com.websarva.wings.android.zuboradiary.data.diary.Weather
+import com.websarva.wings.android.zuboradiary.data.network.GeoCoordinates
+import com.websarva.wings.android.zuboradiary.data.network.WeatherApiCallable
+import com.websarva.wings.android.zuboradiary.data.network.WeatherApiRepository
+import com.websarva.wings.android.zuboradiary.data.network.WeatherApiResponse
+import com.websarva.wings.android.zuboradiary.ui.BaseViewModel
+import com.websarva.wings.android.zuboradiary.ui.diary.DiaryLiveData
+import dagger.hilt.android.lifecycle.HiltViewModel
+import retrofit2.Call
+import java.time.LocalDate
+import java.time.temporal.ChronoUnit
+import java.util.concurrent.CancellationException
+import java.util.concurrent.ExecutionException
+import java.util.concurrent.Executors
+import javax.inject.Inject
 
 @HiltViewModel
-public class DiaryEditViewModel extends BaseViewModel {
-    private final DiaryRepository diaryRepository;
-    private final WeatherApiRepository weatherApiRepository;
-
+class DiaryEditViewModel @Inject constructor(
+    private val diaryRepository: DiaryRepository,
+    private val weatherApiRepository: WeatherApiRepository
+) :
+    BaseViewModel() {
+    // Getter
     // 日記データ関係
-    private boolean hasPreparedDiary;
-    private final MutableLiveData<LocalDate> previousDate = new MutableLiveData<>();
-    private final MutableLiveData<LocalDate> loadedDate = new MutableLiveData<>();
-    private final MutableLiveData<Uri> loadedPicturePath = new MutableLiveData<>();
-    private final DiaryLiveData diaryLiveData;
+    private val _previousDate = MutableLiveData<LocalDate?>()
+    val previousDate: LiveData<LocalDate?>
+        get() = _previousDate
+
+    private val _loadedDate = MutableLiveData<LocalDate?>()
+    val loadedDate: LiveData<LocalDate?>
+        get() = _loadedDate
+
+    private val diaryLiveData = DiaryLiveData()
+
+    val date: LiveData<LocalDate?>
+        get() = diaryLiveData.date
+
+    /**
+     * LayoutDataBinding用
+     * */
+    val titleMutableLiveData: MutableLiveData<String>
+        get() = diaryLiveData.title
+
+    val weather1: LiveData<Weather>
+        get() = diaryLiveData.weather1
+
+    val weather2: LiveData<Weather>
+        get() = diaryLiveData.weather2
+
+    val condition: LiveData<Condition>
+        get() = diaryLiveData.condition
+
+    val numVisibleItems: LiveData<Int>
+        get() = diaryLiveData.numVisibleItems
+
+    /**
+     * LayoutDataBinding用
+     * */
+    val item1TitleMutable: MutableLiveData<String>
+        get() = diaryLiveData.getItemLiveData(ItemNumber(1)).title
+
+    /**
+     * LayoutDataBinding用
+     * */
+    val item2TitleMutable: MutableLiveData<String>
+        get() = diaryLiveData.getItemLiveData(ItemNumber(2)).title
+
+    /**
+     * LayoutDataBinding用
+     * */
+    val item3TitleMutable: MutableLiveData<String>
+        get() = diaryLiveData.getItemLiveData(ItemNumber(3)).title
+
+    /**
+     * LayoutDataBinding用
+     * */
+    val item4TitleMutable: MutableLiveData<String>
+        get() = diaryLiveData.getItemLiveData(ItemNumber(4)).title
+
+    /**
+     * LayoutDataBinding用
+     * */
+    val item5TitleMutable: MutableLiveData<String>
+        get() = diaryLiveData.getItemLiveData(ItemNumber(5)).title
+
+    /**
+     * LayoutDataBinding用
+     * */
+    val item1CommentMutable: MutableLiveData<String>
+        get() = diaryLiveData.getItemLiveData(ItemNumber(1)).comment
+
+    /**
+     * LayoutDataBinding用
+     * */
+    val item2CommentMutable: MutableLiveData<String>
+        get() = diaryLiveData.getItemLiveData(ItemNumber(2)).comment
+
+    /**
+     * LayoutDataBinding用
+     * */
+    val item3CommentMutable: MutableLiveData<String>
+        get() = diaryLiveData.getItemLiveData(ItemNumber(3)).comment
+
+    /**
+     * LayoutDataBinding用
+     * */
+    val item4CommentMutable: MutableLiveData<String>
+        get() = diaryLiveData.getItemLiveData(ItemNumber(4)).comment
+
+    /**
+     * LayoutDataBinding用
+     * */
+    val item5CommentMutable: MutableLiveData<String>
+        get() = diaryLiveData.getItemLiveData(ItemNumber(5)).comment
+
+    val picturePath: LiveData<Uri?>
+        get() = diaryLiveData.picturePath
+
+    private val _loadedPicturePath = MutableLiveData<Uri?>()
+    val loadedPicturePath: LiveData<Uri?>
+        get() = _loadedPicturePath
+
+    var hasPreparedDiary: Boolean = false
+        private set
+
+    val isNewDiaryDefaultStatus: Boolean
+        get() {
+            return hasPreparedDiary && _previousDate.value == null && _loadedDate.value == null
+        }
+
+    private val isNewDiary: Boolean
+        get() = _loadedDate.value == null
+
+    private val shouldDeleteLoadedDateDiary: Boolean
+        get() {
+            if (isNewDiary) return false
+            return !isLoadedDateEqualToInputDate
+        }
+
+    val shouldShowUpdateConfirmationDialog: Boolean
+        get() {
+            if (isLoadedDateEqualToInputDate) return false
+            val inputDate = checkNotNull(diaryLiveData.date.value)
+            return existsSavedDiary(inputDate)
+        }
+
+    private val isLoadedDateEqualToInputDate: Boolean
+        get() {
+            val loadedDate = _loadedDate.value ?: return false
+            val inputDate = diaryLiveData.date.value
+            return loadedDate == inputDate
+        }
+
+    val isEqualWeathers: Boolean
+        get() {
+            val weather1 = checkNotNull(diaryLiveData.weather1.value)
+            val weather2 = checkNotNull(diaryLiveData.weather2.value)
+
+            return weather1 == weather2
+        }
 
     // Fragment切替記憶
-    private boolean isShowingItemTitleEditFragment;
+    var isShowingItemTitleEditFragment: Boolean = false
+        private set
 
-    @Inject
-    public DiaryEditViewModel(DiaryRepository diaryRepository, WeatherApiRepository weatherApiRepository) {
-        this.diaryRepository = diaryRepository;
-        this.weatherApiRepository = weatherApiRepository;
-        diaryLiveData = new DiaryLiveData();
-        initialize();
+    init {
+        initialize()
     }
 
-    @Override
-    public void initialize() {
-        initializeAppMessageList();
-        hasPreparedDiary = false;
-        previousDate.setValue(null);
-        loadedDate.setValue(null);
-        loadedPicturePath.setValue(null);
-        diaryLiveData.initialize();
-        isShowingItemTitleEditFragment = false;
+    public override fun initialize() {
+        initializeAppMessageList()
+        hasPreparedDiary = false
+        _previousDate.value = null
+        _loadedDate.value = null
+        _loadedPicturePath.value = null
+        diaryLiveData.initialize()
+        isShowingItemTitleEditFragment = false
     }
 
-    void prepareDiary(LocalDate date, boolean requiresDiaryLoading) {
-        Objects.requireNonNull(date);
-
+    fun prepareDiary(date: LocalDate, requiresDiaryLoading: Boolean) {
         if (requiresDiaryLoading) {
             try {
-                loadSavedDiary(date);
-            } catch (NoSuchElementException e) {
-                updateDate(date);
-            } catch (CancellationException | ExecutionException | InterruptedException e) {
-                addAppMessage(AppMessage.DIARY_LOADING_ERROR);
-                return;
+                loadSavedDiary(date)
+            } catch (e: NoSuchElementException) {
+                updateDate(date)
+            } catch (e: CancellationException) {
+                addAppMessage(AppMessage.DIARY_LOADING_ERROR)
+                return
+            } catch (e: ExecutionException) {
+                addAppMessage(AppMessage.DIARY_LOADING_ERROR)
+                return
+            } catch (e: InterruptedException) {
+                addAppMessage(AppMessage.DIARY_LOADING_ERROR)
+                return
             }
         } else {
-            updateDate(date);
+            updateDate(date)
         }
-        hasPreparedDiary = true;
+        hasPreparedDiary = true
     }
 
-    private void loadSavedDiary(LocalDate date)
-            throws CancellationException, ExecutionException, InterruptedException,NoSuchElementException {
-        Objects.requireNonNull(date);
-
-        DiaryEntity diaryEntity = diaryRepository.loadDiary(date).get();
-        if (diaryEntity == null) throw new NoSuchElementException();
+    @Throws(
+        CancellationException::class,
+        ExecutionException::class,
+        InterruptedException::class,
+        NoSuchElementException::class
+    )
+    private fun loadSavedDiary(date: LocalDate) {
+        val diaryEntity = diaryRepository.loadDiary(date).get()
+            ?: throw NoSuchElementException()
 
         // HACK:下記はDiaryLiveData#update()処理よりも前に処理すること。
         //      (後で処理するとDiaryLiveDataのDateのObserverがloadedDateの更新よりも先に処理される為)
-        loadedDate.setValue(date);
+        _loadedDate.value = date
 
-        diaryLiveData.update(diaryEntity);
-        loadedPicturePath.setValue(diaryLiveData.getPicturePath().getValue());
+        diaryLiveData.update(diaryEntity)
+        _loadedPicturePath.value = diaryLiveData.picturePath.value
     }
 
-    boolean isNewDiaryDefaultStatus() {
-        LocalDate previousDate = this.previousDate.getValue();
-        LocalDate loadedDate = this.loadedDate.getValue();
-
-        return hasPreparedDiary && previousDate == null && loadedDate == null;
-    }
-
-    boolean existsSavedDiary(LocalDate date) {
-        Objects.requireNonNull(date);
-
+    fun existsSavedDiary(date: LocalDate): Boolean {
         try {
-            return diaryRepository.existsDiary(date).get();
-        } catch (ExecutionException | InterruptedException e) {
-            addAppMessage(AppMessage.DIARY_LOADING_ERROR);
-            return false;
+            return diaryRepository.existsDiary(date).get()
+        } catch (e: ExecutionException) {
+            addAppMessage(AppMessage.DIARY_LOADING_ERROR)
+            return false
+        } catch (e: InterruptedException) {
+            addAppMessage(AppMessage.DIARY_LOADING_ERROR)
+            return false
         }
     }
 
     // TODO:TestDiariesSaverクラス削除後、public削除。
-    public boolean saveDiary() {
-        DiaryEntity diaryEntity = diaryLiveData.createDiaryEntity();
-        List<DiaryItemTitleSelectionHistoryItemEntity> diaryItemTitleSelectionHistoryItemEntityList =
-                diaryLiveData.createDiaryItemTitleSelectionHistoryItemEntityList();
+    fun saveDiary(): Boolean {
+        val diaryEntity = diaryLiveData.createDiaryEntity()
+        val diaryItemTitleSelectionHistoryItemEntityList =
+            diaryLiveData.createDiaryItemTitleSelectionHistoryItemEntityList()
         try {
-            if (shouldDeleteLoadedDateDiary()) {
+            if (shouldDeleteLoadedDateDiary) {
                 diaryRepository
-                        .deleteAndSaveDiary(
-                                loadedDate.getValue(),
-                                diaryEntity,
-                                diaryItemTitleSelectionHistoryItemEntityList
-                        )
-                        .get();
+                    .deleteAndSaveDiary(
+                        _loadedDate.value,
+                        diaryEntity,
+                        diaryItemTitleSelectionHistoryItemEntityList
+                    )
+                    .get()
             } else {
                 diaryRepository
-                        .saveDiary(diaryEntity, diaryItemTitleSelectionHistoryItemEntityList).get();
+                    .saveDiary(diaryEntity, diaryItemTitleSelectionHistoryItemEntityList).get()
             }
-        } catch (Exception e) {
-            addAppMessage(AppMessage.DIARY_SAVING_ERROR);
-            return false;
+        } catch (e: Exception) {
+            addAppMessage(AppMessage.DIARY_SAVING_ERROR)
+            return false
         }
-        return true;
+        return true
     }
 
-    private boolean isNewDiary() {
-        return loadedDate.getValue() == null;
-    }
+    fun deleteDiary(): Boolean {
+        val deleteDate = _loadedDate.value
 
-    boolean shouldDeleteLoadedDateDiary() {
-        if (isNewDiary()) return false;
-        return !isLoadedDateEqualToInputDate();
-    }
-
-    boolean shouldShowUpdateConfirmationDialog() {
-        if (isLoadedDateEqualToInputDate()) return false;
-
-        LocalDate inputDate = diaryLiveData.getDate().getValue();
-        return existsSavedDiary(inputDate);
-    }
-
-    boolean isLoadedDateEqualToInputDate() {
-        LocalDate loadedDate = this.loadedDate.getValue();
-        if (loadedDate == null) return false;
-        LocalDate inputDate = diaryLiveData.getDate().getValue();
-        Objects.requireNonNull(inputDate);
-        return loadedDate.equals(inputDate);
-    }
-
-    boolean deleteDiary() {
-        LocalDate deleteDate = loadedDate.getValue();
-        Objects.requireNonNull(deleteDate);
-
-        Integer result;
+        val result: Int
         try {
-            result = diaryRepository.deleteDiary(deleteDate).get();
-        } catch (CancellationException | ExecutionException | InterruptedException e) {
-            addAppMessage(AppMessage.DIARY_DELETE_ERROR);
-            return false;
+            result = diaryRepository.deleteDiary(deleteDate).get()
+        } catch (e: CancellationException) {
+            addAppMessage(AppMessage.DIARY_DELETE_ERROR)
+            return false
+        } catch (e: ExecutionException) {
+            addAppMessage(AppMessage.DIARY_DELETE_ERROR)
+            return false
+        } catch (e: InterruptedException) {
+            addAppMessage(AppMessage.DIARY_DELETE_ERROR)
+            return false
         }
 
         // 削除件数 = 1が正常
         if (result != 1) {
-            addAppMessage(AppMessage.DIARY_DELETE_ERROR);
-            return false;
+            addAppMessage(AppMessage.DIARY_DELETE_ERROR)
+            return false
         }
 
-        return true;
+        return true
     }
 
     // 日付関係
     // TODO:TestDiariesSaverクラス削除後、public削除。
-    public void updateDate(LocalDate date) {
-        Objects.requireNonNull(date);
-
-        LocalDate previousDate = diaryLiveData.getDate().getValue();
+    fun updateDate(date: LocalDate) {
+        val previousDate = diaryLiveData.date.value
 
         // HACK:下記はDiaryLiveDataのDateのsetValue()処理よりも前に処理すること。
         //      (後で処理するとDateのObserverがpreviousDateの更新よりも先に処理される為)
-        this.previousDate.setValue(previousDate);
+        this._previousDate.value = previousDate
 
-        diaryLiveData.getDate().setValue(date);
+        diaryLiveData.date.value = date
     }
 
     // 天気、体調関係
     // MEMO:Weather、Conditionsから文字列に変換するにはContextが必要なため、
     //      Fragment上のLivedDateObserverにて変換した値を受け取る。
-    void updateWeather1(Weather weather) {
-        Objects.requireNonNull(weather);
-
-        diaryLiveData.getWeather1().setValue(weather);
+    fun updateWeather1(weather: Weather) {
+        diaryLiveData.weather1.value = weather
     }
 
-    void updateWeather2(Weather weather) {
-        Objects.requireNonNull(weather);
-
-        diaryLiveData.getWeather2().setValue(weather);
+    fun updateWeather2(weather: Weather) {
+        diaryLiveData.weather2.value = weather
     }
 
-    boolean isEqualWeathers() {
-        Weather weather1 = diaryLiveData.getWeather1().getValue();
-        Weather weather2 = diaryLiveData.getWeather2().getValue();
-        Objects.requireNonNull(weather1);
-        Objects.requireNonNull(weather2);
-
-        return weather1.equals(weather2);
+    fun updateCondition(condition: Condition) {
+        diaryLiveData.condition.value = condition
     }
 
-    void updateCondition(Condition condition) {
-        Objects.requireNonNull(condition);
-
-        diaryLiveData.getCondition().setValue(condition);
-    }
-
-    boolean canFetchWeatherInformation(LocalDate date) {
-        Objects.requireNonNull(date);
-
-        return weatherApiRepository.canFetchWeatherInfo(date);
+    fun canFetchWeatherInformation(date: LocalDate): Boolean {
+        return weatherApiRepository.canFetchWeatherInfo(date)
     }
 
     // 天気情報関係
-    void fetchWeatherInformation(LocalDate date, GeoCoordinates geoCoordinates) {
-        Objects.requireNonNull(date);
-        Objects.requireNonNull(geoCoordinates);
-        if (!canFetchWeatherInformation(date)) return;
+    fun fetchWeatherInformation(date: LocalDate, geoCoordinates: GeoCoordinates) {
+        if (!canFetchWeatherInformation(date)) return
 
-        LocalDate currentDate = LocalDate.now();
-        long betweenDays = ChronoUnit.DAYS.between(date, currentDate);
-        Call<WeatherApiResponse> weatherApiResponseCall;
-        if (betweenDays == 0) {
-            weatherApiResponseCall = weatherApiRepository.fetchTodayWeatherInfo(geoCoordinates);
+        val currentDate = LocalDate.now()
+        val betweenDays = ChronoUnit.DAYS.between(date, currentDate)
+        val weatherApiResponseCall = if (betweenDays == 0L) {
+            weatherApiRepository.fetchTodayWeatherInfo(geoCoordinates)
         } else {
-            weatherApiResponseCall =
-                    weatherApiRepository.fetchPastDayWeatherInfo(geoCoordinates, (int) betweenDays);
+            weatherApiRepository.fetchPastDayWeatherInfo(geoCoordinates, betweenDays.toInt())
         }
 
-        ExecutorService executorService = Executors.newSingleThreadExecutor();
+        val executorService = Executors.newSingleThreadExecutor()
         try {
-            executorService.submit(new CustomWeatherApiCallable(weatherApiResponseCall)).get();
-        } catch (ExecutionException | InterruptedException e) {
-            addAppMessage(AppMessage.WEATHER_INFO_LOADING_ERROR);
+            executorService.submit(CustomWeatherApiCallable(weatherApiResponseCall)).get()
+        } catch (e: ExecutionException) {
+            addAppMessage(AppMessage.WEATHER_INFO_LOADING_ERROR)
+        } catch (e: InterruptedException) {
+            addAppMessage(AppMessage.WEATHER_INFO_LOADING_ERROR)
         }
-
     }
 
-    private class CustomWeatherApiCallable extends WeatherApiCallable {
-
-        public CustomWeatherApiCallable(Call<WeatherApiResponse> weatherApiResponseCall) {
-            super(weatherApiResponseCall);
+    private inner class CustomWeatherApiCallable(weatherApiResponseCall: Call<WeatherApiResponse?>?) :
+        WeatherApiCallable(weatherApiResponseCall) {
+        override fun onResponse(weather: Weather) {
+            diaryLiveData.weather1.postValue(weather)
         }
 
-        @Override
-        public void onResponse(@NonNull Weather weather) {
-            diaryLiveData.getWeather1().postValue(weather);
+        override fun onFailure() {
+            addAppMessage(AppMessage.WEATHER_INFO_LOADING_ERROR)
         }
 
-        @Override
-        public void onFailure() {
-            addAppMessage(AppMessage.WEATHER_INFO_LOADING_ERROR);
-        }
-
-        @Override
-        public void onException(@NonNull Exception e) {
-            addAppMessage(AppMessage.WEATHER_INFO_LOADING_ERROR);
+        override fun onException(e: Exception) {
+            addAppMessage(AppMessage.WEATHER_INFO_LOADING_ERROR)
         }
     }
 
     // 項目関係
-    void incrementVisibleItemsCount() {
-        diaryLiveData.incrementVisibleItemsCount();
+    fun incrementVisibleItemsCount() {
+        diaryLiveData.incrementVisibleItemsCount()
     }
 
-    void deleteItem(ItemNumber itemNumber) {
-        Objects.requireNonNull(itemNumber);
-
-        diaryLiveData.deleteItem(itemNumber);
+    fun getItemTitleLiveData(itemNumber: ItemNumber): LiveData<String> {
+        return diaryLiveData.getItemLiveData(itemNumber).title
     }
 
-    void updateItemTitle(ItemNumber itemNumber, String title) {
-        Objects.requireNonNull(title);
-
-        diaryLiveData.updateItemTitle(itemNumber, title);
+    fun deleteItem(itemNumber: ItemNumber) {
+        diaryLiveData.deleteItem(itemNumber)
     }
 
-    void updatePicturePath(Uri uri) {
-        Objects.requireNonNull(uri);
-
-        diaryLiveData.getPicturePath().setValue(uri);
+    fun updateItemTitle(itemNumber: ItemNumber, title: String) {
+        diaryLiveData.updateItemTitle(itemNumber, title)
     }
 
-    void deletePicturePath() {
-        diaryLiveData.getPicturePath().setValue(null);
+    fun updatePicturePath(uri: Uri) {
+        diaryLiveData.picturePath.value = uri
+    }
+
+    fun deletePicturePath() {
+        diaryLiveData.picturePath.value = null
     }
 
     // MEMO:存在しないことを確認したいため下記メソッドを否定的処理とする
-    boolean checkSavedPicturePathDoesNotExist(Uri uri) {
-        Objects.requireNonNull(uri);
-
+    fun checkSavedPicturePathDoesNotExist(uri: Uri): Boolean {
         try {
-            return !diaryRepository.existsPicturePath(uri).get();
-        } catch (ExecutionException | InterruptedException e) {
-            addAppMessage(AppMessage.DIARY_LOADING_ERROR);
-            return false;
+            return !diaryRepository.existsPicturePath(uri).get()
+        } catch (e: ExecutionException) {
+            addAppMessage(AppMessage.DIARY_LOADING_ERROR)
+            return false
+        } catch (e: InterruptedException) {
+            addAppMessage(AppMessage.DIARY_LOADING_ERROR)
+            return false
         }
     }
 
     // Fragment切替記憶
-    void updateIsShowingItemTitleEditFragment(boolean isShowing) {
-        isShowingItemTitleEditFragment = isShowing;
+    fun updateIsShowingItemTitleEditFragment(isShowing: Boolean) {
+        isShowingItemTitleEditFragment = isShowing
     }
 
-    void addWeatherInfoFetchErrorMessage() {
-        addAppMessage(AppMessage.WEATHER_INFO_LOADING_ERROR);
-    }
-
-    // Getter
-    boolean getHasPreparedDiary() {
-        return hasPreparedDiary;
-    }
-
-    boolean getIsShowingItemTitleEditFragment() {
-        return isShowingItemTitleEditFragment;
-    }
-
-    // LiveDataGetter
-    @NonNull
-    LiveData<LocalDate> getPreviousDateLiveData() {
-        return previousDate;
-    }
-
-    @NonNull
-    LiveData<LocalDate> getLoadedDateLiveData() {
-        return loadedDate;
-    }
-
-    @NonNull
-    public LiveData<LocalDate> getDateLiveData() {
-        return diaryLiveData.getDate();
-    }
-
-    @NonNull
-    LiveData<Weather> getWeather1LiveData() {
-        return diaryLiveData.getWeather1();
-    }
-
-    @NonNull
-    LiveData<Weather> getWeather2LiveData() {
-        return diaryLiveData.getWeather2();
-    }
-
-    @NonNull
-    LiveData<Condition> getConditionLiveData() {
-        return diaryLiveData.getCondition();
-    }
-
-    @NonNull
-    public MutableLiveData<String> getTitleMutableLiveData() {
-        return diaryLiveData.getTitle();
-    }
-
-    @NonNull
-    LiveData<Integer> getNumVisibleItemsLiveData() {
-        return diaryLiveData.getNumVisibleItems();
-    }
-
-    @NonNull
-    LiveData<String> getItemTitleLiveData(ItemNumber itemNumber) {
-        return diaryLiveData.getItemLiveData(itemNumber).getTitle();
-    }
-
-    @NonNull
-    public MutableLiveData<String> getItem1TitleMutableLiveData() {
-        return diaryLiveData.getItemLiveData(new ItemNumber(1)).getTitle();
-    }
-
-    @NonNull
-    public MutableLiveData<String> getItem2TitleMutableLiveData() {
-        return diaryLiveData.getItemLiveData(new ItemNumber(2)).getTitle();
-    }
-
-
-    @NonNull
-    public MutableLiveData<String> getItem3TitleMutableLiveData() {
-        return diaryLiveData.getItemLiveData(new ItemNumber(3)).getTitle();
-    }
-
-    @NonNull
-    public MutableLiveData<String> getItem4TitleMutableLiveData() {
-        return diaryLiveData.getItemLiveData(new ItemNumber(4)).getTitle();
-    }
-
-    @NonNull
-    public MutableLiveData<String> getItem5TitleMutableLiveData() {
-        return diaryLiveData.getItemLiveData(new ItemNumber(5)).getTitle();
-    }
-
-    @NonNull
-    public MutableLiveData<String> getItem1CommentMutableLiveData() {
-        return diaryLiveData.getItemLiveData(new ItemNumber(1)).getComment();
-    }
-
-    @NonNull
-    public MutableLiveData<String> getItem2CommentMutableLiveData() {
-        return diaryLiveData.getItemLiveData(new ItemNumber(2)).getComment();
-    }
-
-    @NonNull
-    public MutableLiveData<String> getItem3CommentMutableLiveData() {
-        return diaryLiveData.getItemLiveData(new ItemNumber(3)).getComment();
-    }
-
-    @NonNull
-    public MutableLiveData<String> getItem4CommentMutableLiveData() {
-        return diaryLiveData.getItemLiveData(new ItemNumber(4)).getComment();
-    }
-
-    @NonNull
-    public MutableLiveData<String> getItem5CommentMutableLiveData() {
-        return diaryLiveData.getItemLiveData(new ItemNumber(5)).getComment();
-    }
-
-    @NonNull
-    LiveData<Uri> getPicturePathLiveData() {
-        return diaryLiveData.getPicturePath();
-    }
-
-    @NonNull
-    LiveData<Uri> getLoadedPicturePathLiveData() {
-        return loadedPicturePath;
+    fun addWeatherInfoFetchErrorMessage() {
+        addAppMessage(AppMessage.WEATHER_INFO_LOADING_ERROR)
     }
 }

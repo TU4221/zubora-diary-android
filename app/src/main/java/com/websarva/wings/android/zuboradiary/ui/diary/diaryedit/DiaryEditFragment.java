@@ -186,7 +186,7 @@ public class DiaryEditFragment extends BaseFragment {
         Integer selectedButton = receiveResulFromDialog(DiaryLoadingDialogFragment.KEY_SELECTED_BUTTON);
         if (selectedButton == null) return;
 
-        LocalDate date = diaryEditViewModel.getDateLiveData().getValue();
+        LocalDate date = diaryEditViewModel.getDate().getValue();
         Objects.requireNonNull(date);
 
         if (selectedButton == DialogInterface.BUTTON_POSITIVE) {
@@ -209,7 +209,7 @@ public class DiaryEditFragment extends BaseFragment {
         if (!isSuccessful) return;
 
         updatePictureUriPermission();
-        LocalDate date = diaryEditViewModel.getDateLiveData().getValue();
+        LocalDate date = diaryEditViewModel.getDate().getValue();
         Objects.requireNonNull(date);
         showDiaryShowFragment(date);
     }
@@ -242,7 +242,7 @@ public class DiaryEditFragment extends BaseFragment {
         if (selectedButton == null) return;
         if (selectedButton != DialogInterface.BUTTON_POSITIVE) return;
 
-        LocalDate loadDiaryDate = diaryEditViewModel.getDateLiveData().getValue();
+        LocalDate loadDiaryDate = diaryEditViewModel.getDate().getValue();
         Objects.requireNonNull(loadDiaryDate);
         GeoCoordinates geoCoordinates = settingsViewModel.getGeoCoordinatesLiveData().getValue();
         Objects.requireNonNull(geoCoordinates);
@@ -255,7 +255,7 @@ public class DiaryEditFragment extends BaseFragment {
                 receiveResulFromDialog(DiaryItemDeleteDialogFragment.KEY_DELETE_ITEM_NUMBER);
         if (deleteItemNumber == null) return;
 
-        Integer numVisibleItems = diaryEditViewModel.getNumVisibleItemsLiveData().getValue();
+        Integer numVisibleItems = diaryEditViewModel.getNumVisibleItems().getValue();
         Objects.requireNonNull(numVisibleItems);
 
         if (deleteItemNumber.getValue() == 1 && numVisibleItems.equals(deleteItemNumber.getValue())) {
@@ -299,12 +299,12 @@ public class DiaryEditFragment extends BaseFragment {
         binding.materialToolbarTopAppBar
                 .setOnMenuItemClickListener(item -> {
                     Objects.requireNonNull(item);
-                    LocalDate diaryDate = diaryEditViewModel.getDateLiveData().getValue();
+                    LocalDate diaryDate = diaryEditViewModel.getDate().getValue();
                     Objects.requireNonNull(diaryDate);
 
                     //日記保存(日記表示フラグメント起動)。
                     if (item.getItemId() == R.id.diaryEditToolbarOptionSaveDiary) {
-                        if (diaryEditViewModel.shouldShowUpdateConfirmationDialog()) {
+                        if (diaryEditViewModel.getShouldShowUpdateConfirmationDialog()) {
                             showDiaryUpdateDialog(diaryDate);
                         } else {
                             boolean isSuccessful = diaryEditViewModel.saveDiary();
@@ -320,7 +320,7 @@ public class DiaryEditFragment extends BaseFragment {
                     return false;
                 });
 
-        diaryEditViewModel.getLoadedDateLiveData()
+        diaryEditViewModel.getLoadedDate()
                 .observe(getViewLifecycleOwner(), date -> {
                     String title;
                     boolean enabledDelete;
@@ -348,12 +348,12 @@ public class DiaryEditFragment extends BaseFragment {
         binding.textInputEditTextDate.setOnClickListener(v -> {
             Objects.requireNonNull(v);
 
-            LocalDate date = diaryEditViewModel.getDateLiveData().getValue();
+            LocalDate date = diaryEditViewModel.getDate().getValue();
             Objects.requireNonNull(date);
             showDatePickerDialog(date);
         });
 
-        diaryEditViewModel.getDateLiveData().observe(getViewLifecycleOwner(), new DateObserver());
+        diaryEditViewModel.getDate().observe(getViewLifecycleOwner(), new DateObserver());
     }
 
     private class DateObserver implements Observer<LocalDate> {
@@ -361,14 +361,14 @@ public class DiaryEditFragment extends BaseFragment {
         @Override
         public void onChanged(@Nullable LocalDate date) {
             if (date == null) return;
-            if (diaryEditViewModel.getIsShowingItemTitleEditFragment()) return;
+            if (diaryEditViewModel.isShowingItemTitleEditFragment()) return;
 
             DateTimeStringConverter dateTimeStringConverter = new DateTimeStringConverter();
             binding.textInputEditTextDate.setText(dateTimeStringConverter.toYearMonthDayWeek(date));
             Log.d("DiaryEditInputDate", "currentDate:" + date);
-            LocalDate loadedDate = diaryEditViewModel.getLoadedDateLiveData().getValue();
+            LocalDate loadedDate = diaryEditViewModel.getLoadedDate().getValue();
             Log.d("DiaryEditInputDate", "loadedDate:" + loadedDate);
-            LocalDate previousDate = diaryEditViewModel.getPreviousDateLiveData().getValue();
+            LocalDate previousDate = diaryEditViewModel.getPreviousDate().getValue();
             Log.d("DiaryEditInputDate", "previousDate:" + previousDate);
             if (requiresDiaryLoadingDialogShow(date)) {
                 showDiaryLoadingDialog(date);
@@ -385,8 +385,8 @@ public class DiaryEditFragment extends BaseFragment {
 
             if (diaryEditViewModel.isNewDiaryDefaultStatus()) return diaryEditViewModel.existsSavedDiary(changedDate);
 
-            LocalDate previousDate = diaryEditViewModel.getPreviousDateLiveData().getValue();
-            LocalDate loadedDate = diaryEditViewModel.getLoadedDateLiveData().getValue();
+            LocalDate previousDate = diaryEditViewModel.getPreviousDate().getValue();
+            LocalDate loadedDate = diaryEditViewModel.getLoadedDate().getValue();
 
             if (changedDate.equals(previousDate)) return false;
             if (changedDate.equals(loadedDate)) return false;
@@ -396,7 +396,7 @@ public class DiaryEditFragment extends BaseFragment {
         private boolean requiresWeatherInfoFetching(LocalDate date) {
             Objects.requireNonNull(date);
 
-            LocalDate previousDate = diaryEditViewModel.getPreviousDateLiveData().getValue();
+            LocalDate previousDate = diaryEditViewModel.getPreviousDate().getValue();
             if (previousDate == null) return false;
             return !date.equals(previousDate);
         }
@@ -423,7 +423,7 @@ public class DiaryEditFragment extends BaseFragment {
             binding.autoCompleteTextWeather1.clearFocus();
         });
 
-        diaryEditViewModel.getWeather1LiveData()
+        diaryEditViewModel.getWeather1()
                 .observe(getViewLifecycleOwner(), weather -> {
                     Objects.requireNonNull(weather);
 
@@ -456,7 +456,7 @@ public class DiaryEditFragment extends BaseFragment {
             binding.autoCompleteTextWeather2.clearFocus();
         });
 
-        diaryEditViewModel.getWeather2LiveData()
+        diaryEditViewModel.getWeather2()
                 .observe(getViewLifecycleOwner(), weather -> {
                     Objects.requireNonNull(weather);
 
@@ -504,7 +504,7 @@ public class DiaryEditFragment extends BaseFragment {
             binding.autoCompleteTextCondition.clearFocus();
         });
 
-        diaryEditViewModel.getConditionLiveData()
+        diaryEditViewModel.getCondition()
                 .observe(getViewLifecycleOwner(), condition -> {
                     Objects.requireNonNull(condition);
 
@@ -629,7 +629,7 @@ public class DiaryEditFragment extends BaseFragment {
 
         }
 
-        diaryEditViewModel.getNumVisibleItemsLiveData()
+        diaryEditViewModel.getNumVisibleItems()
                         .observe(getViewLifecycleOwner(), new NumVisibleItemsObserver());
     }
 
@@ -749,7 +749,7 @@ public class DiaryEditFragment extends BaseFragment {
             requireMainActivity().loadPicturePath();
         });
 
-        diaryEditViewModel.getPicturePathLiveData()
+        diaryEditViewModel.getPicturePath()
                 .observe(getViewLifecycleOwner(), new PicturePathObserver());
 
         binding.imageButtonAttachedPictureDelete.setOnClickListener(v -> showDiaryPictureDeleteDialog());
@@ -785,8 +785,8 @@ public class DiaryEditFragment extends BaseFragment {
     }
 
     private void updatePictureUriPermission() {
-        Uri latestPictureUri = diaryEditViewModel.getPicturePathLiveData().getValue();
-        Uri loadedPictureUri = diaryEditViewModel.getLoadedPicturePathLiveData().getValue();
+        Uri latestPictureUri = diaryEditViewModel.getPicturePath().getValue();
+        Uri loadedPictureUri = diaryEditViewModel.getLoadedPicturePath().getValue();
 
         try {
             if (latestPictureUri == null && loadedPictureUri == null) return;
@@ -812,7 +812,7 @@ public class DiaryEditFragment extends BaseFragment {
     }
 
     private void releaseLoadedPictureUriPermission() {
-        Uri loadedPictureUri = diaryEditViewModel.getLoadedPicturePathLiveData().getValue();
+        Uri loadedPictureUri = diaryEditViewModel.getLoadedPicturePath().getValue();
         if (loadedPictureUri == null) return;
         pictureUriPermissionManager.releasePersistablePermission(loadedPictureUri);
     }
