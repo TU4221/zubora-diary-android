@@ -1,57 +1,49 @@
-package com.websarva.wings.android.zuboradiary.ui.diary.diaryedit;
+package com.websarva.wings.android.zuboradiary.ui.diary.diaryedit
 
-import android.content.DialogInterface;
+import android.content.DialogInterface
+import com.websarva.wings.android.zuboradiary.R
+import com.websarva.wings.android.zuboradiary.ui.BaseAlertDialogFragment
 
-import androidx.annotation.NonNull;
+class DiaryItemDeleteDialogFragment : BaseAlertDialogFragment() {
 
-import com.websarva.wings.android.zuboradiary.R;
-import com.websarva.wings.android.zuboradiary.data.diary.ItemNumber;
-import com.websarva.wings.android.zuboradiary.ui.BaseAlertDialogFragment;
-
-public class DiaryItemDeleteDialogFragment extends BaseAlertDialogFragment {
-
-    private static final String fromClassName =
-            "From" + DiaryItemDeleteDialogFragment.class.getName();
-    static final String KEY_DELETE_ITEM_NUMBER = "DeleteItemNumber" + fromClassName;
-
-    @Override
-    protected String createTitle() {
-        return getString(R.string.dialog_diary_item_delete_title);
+    companion object {
+        private val fromClassName = "From" + DiaryItemDeleteDialogFragment::class.java.name
+        @JvmField
+        val KEY_DELETE_ITEM_NUMBER: String = "DeleteItemNumber$fromClassName"
     }
 
-    @Override
-    protected String createMessage() {
-        ItemNumber deleteItemNumber =
-                DiaryItemDeleteDialogFragmentArgs
-                        .fromBundle(requireArguments()).getItemNumber();
-        return getString(R.string.dialog_diary_item_delete_first_message) + deleteItemNumber + getString(R.string.dialog_diary_item_delete_second_message);
+    override val isCancelableOtherThanPressingButton: Boolean
+        get() = true
+
+    override fun createTitle(): String {
+        return getString(R.string.dialog_diary_item_delete_title)
     }
 
-    @Override
-    protected void handleOnPositiveButtonClick(@NonNull DialogInterface dialog, int which) {
-        ItemNumber deleteItemNumber =
-                DiaryItemDeleteDialogFragmentArgs
-                        .fromBundle(requireArguments()).getItemNumber();
-        setResult(KEY_DELETE_ITEM_NUMBER, deleteItemNumber);
+    override fun createMessage(): String {
+        val deleteItemNumber =
+            DiaryItemDeleteDialogFragmentArgs
+                .fromBundle(requireArguments()).itemNumber
+        return getString(R.string.dialog_diary_item_delete_first_message) + deleteItemNumber + getString(
+            R.string.dialog_diary_item_delete_second_message
+        )
     }
 
-    @Override
-    protected void handleOnNegativeButtonClick(@NonNull DialogInterface dialog, int which) {
+    override fun handleOnPositiveButtonClick(dialog: DialogInterface, which: Int) {
+        val deleteItemNumber =
+            DiaryItemDeleteDialogFragmentArgs
+                .fromBundle(requireArguments()).itemNumber
+        setResult(KEY_DELETE_ITEM_NUMBER, deleteItemNumber)
+    }
+
+    override fun handleOnNegativeButtonClick(dialog: DialogInterface, which: Int) {
         // 処理なし
     }
 
-    @Override
-    protected boolean isCancelableOtherThanPressingButton() {
-        return true;
-    }
-
-    @Override
-    protected void handleOnCancel(@NonNull DialogInterface dialog) {
+    override fun handleOnCancel(dialog: DialogInterface) {
         // 処理なし
     }
 
-    @Override
-    protected void handleOnDismiss() {
+    override fun handleOnDismiss() {
         // 処理なし
     }
 }
