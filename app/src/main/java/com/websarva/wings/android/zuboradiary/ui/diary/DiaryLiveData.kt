@@ -14,6 +14,10 @@ import java.time.LocalDateTime
 
 class DiaryLiveData {
 
+    companion object {
+        const val MAX_ITEMS: Int = ItemNumber.MAX_NUMBER
+    }
+
     // MEMO:双方向DataBindingが必要の為、MutableLiveData変数はアクセス修飾子をpublicとする。
     //      LiveData変数を用意しても意味がないので作成しない。
     val date: MutableLiveData<LocalDate?> = MutableLiveData() // MEMO:初期化時日付が未定の為、null許容型とする。
@@ -174,6 +178,11 @@ class DiaryLiveData {
 
     class DiaryItemLiveData(val itemNumber: Int) {
 
+        companion object {
+            const val MIN_ITEM_NUMBER: Int = ItemNumber.MIN_NUMBER
+            const val MAX_ITEM_NUMBER: Int = ItemNumber.MAX_NUMBER
+        }
+
         // MEMO:双方向DataBindingが必要の為、MutableLiveData変数はアクセス修飾子をpublicとする。
         //      LiveData変数を用意しても意味がないので作成しない。
         val title: MutableLiveData<String> = MutableLiveData()
@@ -215,14 +224,5 @@ class DiaryLiveData {
                 val comment = comment.orEmptyString()
                 return title.isEmpty() && comment.isEmpty()
             }
-
-        companion object {
-            const val MIN_ITEM_NUMBER: Int = ItemNumber.MIN_NUMBER
-            const val MAX_ITEM_NUMBER: Int = ItemNumber.MAX_NUMBER
-        }
-    }
-
-    companion object {
-        const val MAX_ITEMS: Int = ItemNumber.MAX_NUMBER
     }
 }
