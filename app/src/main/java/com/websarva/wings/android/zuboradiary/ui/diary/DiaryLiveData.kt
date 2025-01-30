@@ -7,7 +7,6 @@ import com.websarva.wings.android.zuboradiary.data.database.DiaryItemTitleSelect
 import com.websarva.wings.android.zuboradiary.data.diary.Condition
 import com.websarva.wings.android.zuboradiary.data.diary.ItemNumber
 import com.websarva.wings.android.zuboradiary.data.diary.Weather
-import com.websarva.wings.android.zuboradiary.ui.checkNotNull
 import com.websarva.wings.android.zuboradiary.ui.orEmptyString
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -139,14 +138,14 @@ class DiaryLiveData {
     }
 
     fun incrementVisibleItemsCount() {
-        val numVisibleItems = numVisibleItems.checkNotNull()
+        val numVisibleItems = checkNotNull(numVisibleItems.value)
         val incrementedNumVisibleItems = numVisibleItems + 1
         this.numVisibleItems.value = incrementedNumVisibleItems
     }
 
     fun deleteItem(itemNumber: ItemNumber) {
         getItemLiveData(itemNumber).initialize()
-        val numVisibleItems = numVisibleItems.checkNotNull()
+        val numVisibleItems = checkNotNull(numVisibleItems.value)
 
         if (itemNumber.value < numVisibleItems) {
             for (i in itemNumber.value until numVisibleItems) {
