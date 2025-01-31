@@ -59,7 +59,7 @@ abstract class BaseNumberPickersBottomSheetDialogFragment : BaseBottomSheetDialo
     /**
      * BaseNumberPickersBottomSheetDialogFragment#createDialogView()で呼び出される。
      */
-    protected abstract fun setUpNumberPickers(binding: DialogFragmentNumberPickersBinding?)
+    protected abstract fun setUpNumberPickers(binding: DialogFragmentNumberPickersBinding)
 
     protected fun setResult(key: String, value: Any) {
         val navController = NavHostFragment.findNavController(this)
