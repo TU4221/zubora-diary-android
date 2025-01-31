@@ -1,52 +1,45 @@
-package com.websarva.wings.android.zuboradiary.ui.settings;
+package com.websarva.wings.android.zuboradiary.ui.settings
 
-import android.content.DialogInterface;
+import android.content.DialogInterface
+import com.websarva.wings.android.zuboradiary.R
+import com.websarva.wings.android.zuboradiary.ui.BaseAlertDialogFragment
 
-import androidx.annotation.NonNull;
+class PermissionDialogFragment : BaseAlertDialogFragment() {
 
-import com.websarva.wings.android.zuboradiary.R;
-import com.websarva.wings.android.zuboradiary.ui.BaseAlertDialogFragment;
-
-public class PermissionDialogFragment extends BaseAlertDialogFragment {
-
-    private static final String FROM_CLASS_NAME = "From" + PermissionDialogFragment.class.getName();
-    static final String KEY_SELECTED_BUTTON = "SelectedButton" + FROM_CLASS_NAME;
-
-    @Override
-    protected String createTitle() {
-        return getString(R.string.dialog_permission_title);
+    companion object {
+        private val FROM_CLASS_NAME = "From" + PermissionDialogFragment::class.java.name
+        @JvmField
+        val KEY_SELECTED_BUTTON: String = "SelectedButton$FROM_CLASS_NAME"
     }
 
-    @Override
-    protected String createMessage() {
-        String firstMessage = getString(R.string.dialog_permission_first_message);
-        String secondMessage = PermissionDialogFragmentArgs.fromBundle(requireArguments()).getPermissionName();
-        String thirdMessage = getString(R.string.dialog_permission_third_message);
-        return firstMessage + secondMessage + thirdMessage;
+    override val isCancelableOtherThanPressingButton: Boolean
+        get() = true
+
+    override fun createTitle(): String {
+        return getString(R.string.dialog_permission_title)
     }
 
-    @Override
-    protected void handleOnPositiveButtonClick(@NonNull DialogInterface dialog, int which) {
-        setResult(KEY_SELECTED_BUTTON, DialogInterface.BUTTON_POSITIVE);
+    override fun createMessage(): String {
+        val firstMessage = getString(R.string.dialog_permission_first_message)
+        val secondMessage =
+            PermissionDialogFragmentArgs.fromBundle(requireArguments()).permissionName
+        val thirdMessage = getString(R.string.dialog_permission_third_message)
+        return firstMessage + secondMessage + thirdMessage
     }
 
-    @Override
-    protected void handleOnNegativeButtonClick(@NonNull DialogInterface dialog, int which) {
+    override fun handleOnPositiveButtonClick(dialog: DialogInterface, which: Int) {
+        setResult(KEY_SELECTED_BUTTON, DialogInterface.BUTTON_POSITIVE)
+    }
+
+    override fun handleOnNegativeButtonClick(dialog: DialogInterface, which: Int) {
         // 処理なし
     }
 
-    @Override
-    protected boolean isCancelableOtherThanPressingButton() {
-        return true;
-    }
-
-    @Override
-    protected void handleOnCancel(@NonNull DialogInterface dialog) {
+    override fun handleOnCancel(dialog: DialogInterface) {
         // 処理なし
     }
 
-    @Override
-    protected void handleOnDismiss() {
+    override fun handleOnDismiss() {
         // 処理なし
     }
 }
