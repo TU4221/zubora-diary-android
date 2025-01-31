@@ -1,287 +1,262 @@
-package com.websarva.wings.android.zuboradiary.ui.diary.diaryitemtitleedit;
+package com.websarva.wings.android.zuboradiary.ui.diary.diaryitemtitleedit
 
-import android.content.DialogInterface;
-import android.os.Bundle;
-import android.text.Editable;
-import android.text.TextWatcher;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.EditText;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.databinding.ViewDataBinding;
-import androidx.lifecycle.SavedStateHandle;
-import androidx.lifecycle.ViewModelProvider;
-import androidx.navigation.NavBackStackEntry;
-import androidx.navigation.NavDirections;
-
-import com.google.android.material.textfield.TextInputLayout;
-import com.websarva.wings.android.zuboradiary.R;
-import com.websarva.wings.android.zuboradiary.data.AppMessage;
-import com.websarva.wings.android.zuboradiary.data.diary.ItemNumber;
-import com.websarva.wings.android.zuboradiary.databinding.FragmentDiaryItemTitleEditBinding;
-import com.websarva.wings.android.zuboradiary.ui.BaseFragment;
-import com.websarva.wings.android.zuboradiary.ui.TextInputSetup;
-
-import java.util.Objects;
-
-import dagger.hilt.android.AndroidEntryPoint;
+import android.content.DialogInterface
+import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import androidx.databinding.ViewDataBinding
+import androidx.lifecycle.SavedStateHandle
+import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.NavDirections
+import com.websarva.wings.android.zuboradiary.R
+import com.websarva.wings.android.zuboradiary.data.AppMessage
+import com.websarva.wings.android.zuboradiary.databinding.FragmentDiaryItemTitleEditBinding
+import com.websarva.wings.android.zuboradiary.ui.BaseFragment
+import com.websarva.wings.android.zuboradiary.ui.TextInputSetup
+import com.websarva.wings.android.zuboradiary.ui.checkNotNull
+import com.websarva.wings.android.zuboradiary.ui.notNullValue
+import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-public class DiaryItemTitleEditFragment extends BaseFragment {
+class DiaryItemTitleEditFragment : BaseFragment() {
+
+    companion object {
+        private val fromClassName = "From" + DiaryItemTitleEditFragment::class.java.name
+        val KEY_UPDATE_ITEM_NUMBER: String = "UpdateItemNumber$fromClassName"
+        val KEY_NEW_ITEM_TITLE: String = "NewItemTitle$fromClassName"
+    }
 
     // View関係
-    private FragmentDiaryItemTitleEditBinding binding;
-
-    private static final String fromClassName = "From" + DiaryItemTitleEditFragment.class.getName();
-    public static final String KEY_UPDATE_ITEM_NUMBER = "UpdateItemNumber" + fromClassName;
-    public static final String KEY_NEW_ITEM_TITLE = "NewItemTitle" + fromClassName;
+    private var _binding: FragmentDiaryItemTitleEditBinding? = null
+    private val binding: FragmentDiaryItemTitleEditBinding get() = checkNotNull(_binding)
 
     // ViewModel
-    private DiaryItemTitleEditViewModel diaryItemTitleEditViewModel;
+    private lateinit var diaryItemTitleEditViewModel: DiaryItemTitleEditViewModel
 
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    override fun initializeViewModel() {
+        val provider = ViewModelProvider(this)
+        diaryItemTitleEditViewModel = provider[DiaryItemTitleEditViewModel::class.java]
     }
 
-    @Override
-    protected void initializeViewModel() {
-        ViewModelProvider provider = new ViewModelProvider(this);
-        diaryItemTitleEditViewModel = provider.get(DiaryItemTitleEditViewModel.class);
+    override fun initializeDataBinding(
+        themeColorInflater: LayoutInflater, container: ViewGroup
+    ): ViewDataBinding {
+        _binding = FragmentDiaryItemTitleEditBinding.inflate(themeColorInflater, container, false)
+        binding.lifecycleOwner = this
+        binding.diaryItemTitleEditViewModel = diaryItemTitleEditViewModel
+        return binding
     }
 
-    @Override
-    public View onCreateView(
-            @NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        return super.onCreateView(inflater,container,savedInstanceState);
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        setUpToolBar()
+        setUpItemTitleInputField()
+        setUpItemTitleSelectionHistory()
     }
 
-    @Override
-    protected ViewDataBinding initializeDataBinding(
-            @NonNull LayoutInflater themeColorInflater, @NonNull ViewGroup container) {
-        binding = FragmentDiaryItemTitleEditBinding.inflate(themeColorInflater, container, false);
-        binding.setLifecycleOwner(this);
-        binding.setDiaryItemTitleEditViewModel(diaryItemTitleEditViewModel);
-        return binding;
-    }
-
-    @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-
-        setUpToolBar();
-        setUpItemTitleInputField();
-        setUpItemTitleSelectionHistory();
-    }
-
-    @Override
-    protected void handleOnReceivingResultFromPreviousFragment(@NonNull SavedStateHandle savedStateHandle) {
+    override fun handleOnReceivingResultFromPreviousFragment(savedStateHandle: SavedStateHandle) {
         // EditDiaryFragmentからデータ受取
-        ItemNumber targetItemNumber =
-                DiaryItemTitleEditFragmentArgs.fromBundle(getArguments()).getItemNumber();
-        String targetItemTitle =
-                DiaryItemTitleEditFragmentArgs.fromBundle(getArguments()).getItemTitle();
-        diaryItemTitleEditViewModel.updateDiaryItemTitle(targetItemNumber, targetItemTitle);
+        val targetItemNumber =
+            DiaryItemTitleEditFragmentArgs.fromBundle(requireArguments()).itemNumber
+        val targetItemTitle =
+            DiaryItemTitleEditFragmentArgs.fromBundle(requireArguments()).itemTitle
+        diaryItemTitleEditViewModel.updateDiaryItemTitle(targetItemNumber, targetItemTitle)
     }
 
-    @Override
-    protected void handleOnReceivingDialogResult(@NonNull SavedStateHandle savedStateHandle) {
-        receiveDiaryItemTitleDeleteDialogResult();
-        retryOtherAppMessageDialogShow();
+    override fun handleOnReceivingDialogResult(savedStateHandle: SavedStateHandle) {
+        receiveDiaryItemTitleDeleteDialogResult()
+        retryOtherAppMessageDialogShow()
     }
 
-    @Override
-    protected void removeDialogResultOnDestroy(@NonNull SavedStateHandle savedStateHandle) {
-        savedStateHandle.remove(DiaryItemTitleDeleteDialogFragment.KEY_SELECTED_BUTTON);
-        savedStateHandle.remove(DiaryItemTitleDeleteDialogFragment.KEY_DELETE_LIST_ITEM_POSITION);
+    override fun removeDialogResultOnDestroy(savedStateHandle: SavedStateHandle) {
+        savedStateHandle.remove<Any>(DiaryItemTitleDeleteDialogFragment.KEY_SELECTED_BUTTON)
+        savedStateHandle.remove<Any>(DiaryItemTitleDeleteDialogFragment.KEY_DELETE_LIST_ITEM_POSITION)
     }
 
-    @Override
-    protected void setUpOtherAppMessageDialog() {
-        diaryItemTitleEditViewModel.getAppMessageBufferList()
-                .observe(getViewLifecycleOwner(), new AppMessageBufferListObserver(diaryItemTitleEditViewModel));
+    override fun setUpOtherAppMessageDialog() {
+        diaryItemTitleEditViewModel.appMessageBufferList
+            .observe(
+                viewLifecycleOwner,
+                AppMessageBufferListObserver(diaryItemTitleEditViewModel)
+            )
     }
 
     // 履歴項目削除確認ダイアログからの結果受取
-    private void receiveDiaryItemTitleDeleteDialogResult() {
-        Integer selectedButton =
-                receiveResulFromDialog(DiaryItemTitleDeleteDialogFragment.KEY_SELECTED_BUTTON);
-        if (selectedButton == null) return;
+    private fun receiveDiaryItemTitleDeleteDialogResult() {
+        val selectedButton =
+            receiveResulFromDialog<Int>(DiaryItemTitleDeleteDialogFragment.KEY_SELECTED_BUTTON)
+                ?: return
 
         if (selectedButton == DialogInterface.BUTTON_POSITIVE) {
-            Integer deleteListItemPosition =
-                    receiveResulFromDialog(DiaryItemTitleDeleteDialogFragment.KEY_DELETE_LIST_ITEM_POSITION);
-            Objects.requireNonNull(deleteListItemPosition);
+            val deleteListItemPosition =
+                checkNotNull(
+                    receiveResulFromDialog<Int>(
+                        DiaryItemTitleDeleteDialogFragment.KEY_DELETE_LIST_ITEM_POSITION
+                    )
+                )
 
             diaryItemTitleEditViewModel
-                    .deleteDiaryItemTitleSelectionHistoryItem(deleteListItemPosition);
+                .deleteDiaryItemTitleSelectionHistoryItem(deleteListItemPosition)
         } else {
-            ItemTitleSelectionHistoryListAdapter adapter =
-                    (ItemTitleSelectionHistoryListAdapter)
-                            binding.recyclerItemTitleSelectionHistory.getAdapter();
-            Objects.requireNonNull(adapter);
-
-            adapter.closeSwipedItem();
+            val adapter =
+                checkNotNull(
+                    binding.recyclerItemTitleSelectionHistory.adapter
+                ) as ItemTitleSelectionHistoryListAdapter
+            adapter.closeSwipedItem()
         }
     }
 
-    private void setUpToolBar() {
-        ItemNumber targetItemNumber = diaryItemTitleEditViewModel.getItemNumber().getValue();
-        Objects.requireNonNull(targetItemNumber);
-
-        String toolBarTitle = getString(R.string.fragment_diary_item_title_edit_toolbar_first_title) + targetItemNumber + getString(R.string.fragment_diary_item_title_edit_toolbar_second_title);
-        binding.materialToolbarTopAppBar.setTitle(toolBarTitle);
+    private fun setUpToolBar() {
+        val targetItemNumber = diaryItemTitleEditViewModel.itemNumber.checkNotNull()
+        val toolBarTitle =
+            getString(R.string.fragment_diary_item_title_edit_toolbar_first_title) + targetItemNumber + getString(
+                R.string.fragment_diary_item_title_edit_toolbar_second_title
+            )
+        binding.materialToolbarTopAppBar.title = toolBarTitle
         binding.materialToolbarTopAppBar
-                .setNavigationOnClickListener(v -> {
-                    Objects.requireNonNull(v);
-
-                    navController.navigateUp();
-                });
+            .setNavigationOnClickListener { navController.navigateUp() }
     }
 
-    private void setUpItemTitleInputField() {
-        TextInputSetup textInputSetup = new TextInputSetup(requireActivity());
-        TextInputLayout[] textInputLayouts = {binding.textInputLayoutNewItemTitle};
-        textInputSetup.setUpKeyboardCloseOnEnter(textInputLayouts);
-        textInputSetup.setUpFocusClearOnClickBackground(binding.viewFullScreenBackground, textInputLayouts);
-        TextInputSetup.ClearButtonSetUpTransitionListener transitionListener =
-                textInputSetup.createClearButtonSetupTransitionListener(textInputLayouts);
-        addTransitionListener(transitionListener);
+    private fun setUpItemTitleInputField() {
+        val textInputSetup = TextInputSetup(requireActivity())
+        val textInputLayouts = arrayOf(
+            binding.textInputLayoutNewItemTitle
+        )
+        textInputSetup.setUpKeyboardCloseOnEnter(*textInputLayouts)
+        textInputSetup.setUpFocusClearOnClickBackground(
+            binding.viewFullScreenBackground,
+            *textInputLayouts
+        )
+        val transitionListener =
+            textInputSetup.createClearButtonSetupTransitionListener(*textInputLayouts)
+        addTransitionListener(transitionListener)
 
-        EditText editText = binding.textInputLayoutNewItemTitle.getEditText();
-        Objects.requireNonNull(editText);
-        editText.addTextChangedListener(new InputItemTitleErrorWatcher());
+        val editText = checkNotNull(binding.textInputLayoutNewItemTitle.editText)
+        editText.addTextChangedListener(InputItemTitleErrorWatcher())
 
-        binding.buttonNewItemTitleSelection.setOnClickListener(v -> {
-            Objects.requireNonNull(v);
-            boolean isError = Objects.nonNull(binding.textInputLayoutNewItemTitle.getError());
-            if (isError) return;
+        binding.buttonNewItemTitleSelection.setOnClickListener {
+            val isError = binding.textInputLayoutNewItemTitle.error.isNullOrEmpty()
+            if (isError) return@setOnClickListener
 
-            String title = diaryItemTitleEditViewModel.getItemTitle().getValue();
-            Objects.requireNonNull(title);
-            completeItemTitleEdit(title);
-        });
+            val title = diaryItemTitleEditViewModel.itemTitle.notNullValue()
+            completeItemTitleEdit(title)
+        }
 
-        boolean isEnabled = !editText.getText().toString().isEmpty();
-        binding.buttonNewItemTitleSelection.setEnabled(isEnabled);
+        val isEnabled = editText.text.toString().isNotEmpty()
+        binding.buttonNewItemTitleSelection.isEnabled = isEnabled
     }
 
-    private class InputItemTitleErrorWatcher implements TextWatcher {
-
-        @Override
-        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+    private inner class InputItemTitleErrorWatcher : TextWatcher {
+        override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {
             // 処理なし
         }
 
-        @Override
-        public void onTextChanged(CharSequence s, int start, int before, int count) {
-            Objects.requireNonNull(s);
-
-            String title = s.toString();
+        override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
+            val title = s.toString()
             if (title.isEmpty()) {
-                binding.textInputLayoutNewItemTitle.setError(getString(R.string.fragment_diary_item_title_edit_new_item_title_input_field_error_message_empty));
-                binding.buttonNewItemTitleSelection.setEnabled(false);
-                return;
+                binding.textInputLayoutNewItemTitle.error =
+                    getString(R.string.fragment_diary_item_title_edit_new_item_title_input_field_error_message_empty)
+                binding.buttonNewItemTitleSelection.isEnabled = false
+                return
             }
             // 先頭が空白文字(\\s)
-            if (title.matches("\\s+.*")) {
-                binding.textInputLayoutNewItemTitle.setError(getString(R.string.fragment_diary_item_title_edit_new_item_title_input_field_error_message_initial_char_unmatched));
-                binding.buttonNewItemTitleSelection.setEnabled(false);
-                return;
+            if (title.matches("\\s+.*".toRegex())) {
+                binding.textInputLayoutNewItemTitle.error =
+                    getString(R.string.fragment_diary_item_title_edit_new_item_title_input_field_error_message_initial_char_unmatched)
+                binding.buttonNewItemTitleSelection.isEnabled = false
+                return
             }
-            binding.textInputLayoutNewItemTitle.setError(null);
-            binding.buttonNewItemTitleSelection.setEnabled(true);
+            binding.textInputLayoutNewItemTitle.error = null
+            binding.buttonNewItemTitleSelection.isEnabled = true
         }
 
-        @Override
-        public void afterTextChanged(Editable s) {
+        override fun afterTextChanged(s: Editable) {
             // 処理なし
         }
     }
 
-    private void setUpItemTitleSelectionHistory() {
-        ItemTitleSelectionHistoryListAdapter itemTitleSelectionHistoryListAdapter =
-                new ItemTitleSelectionHistoryListAdapter(
-                        requireContext(),
-                        binding.recyclerItemTitleSelectionHistory,
-                        requireThemeColor()
-                );
-        itemTitleSelectionHistoryListAdapter.build();
-        itemTitleSelectionHistoryListAdapter.setOnClickItemListener(this::completeItemTitleEdit);
-        itemTitleSelectionHistoryListAdapter.setOnClickDeleteButtonListener(this::showDiaryItemTitleDeleteDialog);
+    private fun setUpItemTitleSelectionHistory() {
+        val itemTitleSelectionHistoryListAdapter =
+            ItemTitleSelectionHistoryListAdapter(
+                requireContext(),
+                binding.recyclerItemTitleSelectionHistory,
+                requireThemeColor()
+            )
+        itemTitleSelectionHistoryListAdapter.build()
+        itemTitleSelectionHistoryListAdapter.setOnClickItemListener { newItemTitle: String ->
+            this.completeItemTitleEdit(
+                newItemTitle
+            )
+        }
+        itemTitleSelectionHistoryListAdapter.setOnClickDeleteButtonListener { listItemPosition: Int, listItemTitle: String ->
+            this.showDiaryItemTitleDeleteDialog(
+                listItemPosition,
+                listItemTitle
+            )
+        }
 
         // 選択履歴読込・表示
-        diaryItemTitleEditViewModel.loadDiaryItemTitleSelectionHistory();
-        diaryItemTitleEditViewModel.getItemTitleSelectionHistoryLiveData()
-                .observe(getViewLifecycleOwner(), selectionHistoryList -> {
-                    Objects.requireNonNull(selectionHistoryList);
-
-                    ItemTitleSelectionHistoryListAdapter adapter =
-                            (ItemTitleSelectionHistoryListAdapter)
-                                    binding.recyclerItemTitleSelectionHistory.getAdapter();
-                    Objects.requireNonNull(adapter);
-                    adapter.submitList(selectionHistoryList.getSelectionHistoryListItemList());
-                });
+        diaryItemTitleEditViewModel.loadDiaryItemTitleSelectionHistory()
+        diaryItemTitleEditViewModel.itemTitleSelectionHistoryLiveData
+            .observe(viewLifecycleOwner) { selectionHistoryList: SelectionHistoryList ->
+                val adapter =
+                    checkNotNull(
+                        binding.recyclerItemTitleSelectionHistory.adapter
+                    ) as ItemTitleSelectionHistoryListAdapter
+                adapter.submitList(selectionHistoryList.selectionHistoryListItemList)
+            }
     }
 
     // DiaryItemTitleEditFragmentを閉じる
-    private void completeItemTitleEdit(String newItemTitle) {
-        Objects.requireNonNull(newItemTitle);
+    private fun completeItemTitleEdit(newItemTitle: String) {
+        val targetItemNumber = diaryItemTitleEditViewModel.itemNumber.checkNotNull()
 
-        ItemNumber targetItemNumber = diaryItemTitleEditViewModel.getItemNumber().getValue();
-        Objects.requireNonNull(targetItemNumber);
+        val navBackStackEntry = checkNotNull(navController.previousBackStackEntry)
+        val savedStateHandle = navBackStackEntry.savedStateHandle
+        savedStateHandle[KEY_UPDATE_ITEM_NUMBER] = targetItemNumber
+        savedStateHandle[KEY_NEW_ITEM_TITLE] = newItemTitle
 
-        NavBackStackEntry navBackStackEntry = navController.getPreviousBackStackEntry();
-        Objects.requireNonNull(navBackStackEntry);
-        SavedStateHandle savedStateHandle = navBackStackEntry.getSavedStateHandle();
-        savedStateHandle.set(KEY_UPDATE_ITEM_NUMBER, targetItemNumber);
-        savedStateHandle.set(KEY_NEW_ITEM_TITLE, newItemTitle);
-
-        showDiaryEditFragment();
+        showDiaryEditFragment()
     }
 
-    private void showDiaryEditFragment() {
-        if (isDialogShowing()) return;
+    private fun showDiaryEditFragment() {
+        if (isDialogShowing()) return
 
-        NavDirections action =
-                DiaryItemTitleEditFragmentDirections
-                        .actionDiaryItemTitleEditFragmentToDiaryEditFragment();
-        navController.navigate(action);
+        val action =
+            DiaryItemTitleEditFragmentDirections
+                .actionDiaryItemTitleEditFragmentToDiaryEditFragment()
+        navController.navigate(action)
     }
 
-    private void showDiaryItemTitleDeleteDialog(int listItemPosition, String listItemTitle) {
-        Objects.requireNonNull(listItemTitle);
-        if (listItemPosition < 0) throw new IllegalArgumentException();
-        if (isDialogShowing()) return;
+    private fun showDiaryItemTitleDeleteDialog(listItemPosition: Int, listItemTitle: String) {
+        require(listItemPosition >= 0)
+        if (isDialogShowing()) return
 
-        NavDirections action =
-                DiaryItemTitleEditFragmentDirections
-                        .actionDiaryItemTitleEditFragmentToDiaryItemTitleDeleteDialog(
-                                listItemPosition,
-                                listItemTitle
-                        );
-        navController.navigate(action);
+        val action: NavDirections =
+            DiaryItemTitleEditFragmentDirections
+                .actionDiaryItemTitleEditFragmentToDiaryItemTitleDeleteDialog(
+                    listItemPosition,
+                    listItemTitle
+                )
+        navController.navigate(action)
     }
 
-    @Override
-    protected void navigateAppMessageDialog(@NonNull AppMessage appMessage) {
-        NavDirections action =
-                DiaryItemTitleEditFragmentDirections
-                        .actionDiaryItemTitleEditFragmentToAppMessageDialog(appMessage);
-        navController.navigate(action);
+    override fun navigateAppMessageDialog(appMessage: AppMessage) {
+        val action: NavDirections =
+            DiaryItemTitleEditFragmentDirections
+                .actionDiaryItemTitleEditFragmentToAppMessageDialog(appMessage)
+        navController.navigate(action)
     }
 
-    @Override
-    protected void retryOtherAppMessageDialogShow() {
-        diaryItemTitleEditViewModel.triggerAppMessageBufferListObserver();
+    override fun retryOtherAppMessageDialogShow() {
+        diaryItemTitleEditViewModel.triggerAppMessageBufferListObserver()
     }
 
-    @Override
-    protected void destroyBinding() {
-        binding = null;
+    override fun destroyBinding() {
+        _binding = null
     }
 }
