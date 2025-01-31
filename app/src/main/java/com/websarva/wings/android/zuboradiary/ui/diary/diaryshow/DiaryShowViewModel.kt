@@ -1,174 +1,122 @@
-package com.websarva.wings.android.zuboradiary.ui.diary.diaryshow;
+package com.websarva.wings.android.zuboradiary.ui.diary.diaryshow
 
-import android.net.Uri;
-
-import androidx.lifecycle.LiveData;
-
-import com.websarva.wings.android.zuboradiary.data.AppMessage;
-import com.websarva.wings.android.zuboradiary.data.database.DiaryEntity;
-import com.websarva.wings.android.zuboradiary.data.database.DiaryRepository;
-import com.websarva.wings.android.zuboradiary.data.diary.Condition;
-import com.websarva.wings.android.zuboradiary.data.diary.ItemNumber;
-import com.websarva.wings.android.zuboradiary.data.diary.Weather;
-import com.websarva.wings.android.zuboradiary.ui.BaseViewModel;
-import com.websarva.wings.android.zuboradiary.ui.diary.DiaryLiveData;
-
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.Objects;
-import java.util.concurrent.CancellationException;
-import java.util.concurrent.ExecutionException;
-
-import javax.inject.Inject;
-
-import dagger.hilt.android.lifecycle.HiltViewModel;
+import android.net.Uri
+import androidx.lifecycle.LiveData
+import com.websarva.wings.android.zuboradiary.data.AppMessage
+import com.websarva.wings.android.zuboradiary.data.database.DiaryRepository
+import com.websarva.wings.android.zuboradiary.data.diary.Condition
+import com.websarva.wings.android.zuboradiary.data.diary.ItemNumber
+import com.websarva.wings.android.zuboradiary.data.diary.Weather
+import com.websarva.wings.android.zuboradiary.ui.BaseViewModel
+import com.websarva.wings.android.zuboradiary.ui.checkNotNull
+import com.websarva.wings.android.zuboradiary.ui.diary.DiaryLiveData
+import dagger.hilt.android.lifecycle.HiltViewModel
+import java.time.LocalDate
+import java.time.LocalDateTime
+import java.util.concurrent.CancellationException
+import java.util.concurrent.ExecutionException
+import javax.inject.Inject
 
 @HiltViewModel
-public class DiaryShowViewModel extends BaseViewModel {
-
-    private final DiaryRepository diaryRepository;
+class DiaryShowViewModel @Inject constructor(private val diaryRepository: DiaryRepository) :
+    BaseViewModel() {
 
     // 日記データ関係
-    private final DiaryLiveData diaryLiveData;
+    private val diaryLiveData = DiaryLiveData()
+    val dateLiveData: LiveData<LocalDate?> get() = diaryLiveData.date
+    val weather1LiveData: LiveData<Weather> get() = diaryLiveData.weather1
+    val weather2LiveData: LiveData<Weather> get() = diaryLiveData.weather2
+    val conditionLiveData: LiveData<Condition> get() = diaryLiveData.condition
+    val titleLiveData: LiveData<String> get() = diaryLiveData.title
+    val numVisibleItemsLiveData: LiveData<Int> get() = diaryLiveData.numVisibleItems
+    val item1TitleLiveData: LiveData<String>
+        get() = diaryLiveData.getItemLiveData(ItemNumber(1)).title
+    val item2TitleLiveData: LiveData<String>
+        get() = diaryLiveData.getItemLiveData(ItemNumber(2)).title
+    val item3TitleLiveData: LiveData<String>
+        get() = diaryLiveData.getItemLiveData(ItemNumber(3)).title
+    val item4TitleLiveData: LiveData<String>
+        get() = diaryLiveData.getItemLiveData(ItemNumber(4)).title
+    val item5TitleLiveData: LiveData<String>
+        get() = diaryLiveData.getItemLiveData(ItemNumber(5)).title
+    val item1CommentLiveData: LiveData<String>
+        get() = diaryLiveData.getItemLiveData(ItemNumber(1)).comment
+    val item2CommentLiveData: LiveData<String>
+        get() = diaryLiveData.getItemLiveData(ItemNumber(2)).comment
+    val item3CommentLiveData: LiveData<String>
+        get() = diaryLiveData.getItemLiveData(ItemNumber(3)).comment
+    val item4CommentLiveData: LiveData<String>
+        get() = diaryLiveData.getItemLiveData(ItemNumber(4)).comment
+    val item5CommentLiveData: LiveData<String>
+        get() = diaryLiveData.getItemLiveData(ItemNumber(5)).comment
+    val picturePathLiveData: LiveData<Uri?> get() = diaryLiveData.picturePath
+    val logLiveData: LiveData<LocalDateTime?> get() = diaryLiveData.log
 
-    @Inject
-    public DiaryShowViewModel(DiaryRepository diaryRepository) {
-        this.diaryRepository = diaryRepository;
-        diaryLiveData = new DiaryLiveData();
-        initialize();
+    init {
+        initialize()
     }
 
-    @Override
-    public void initialize() {
-        initializeAppMessageList();
-        diaryLiveData.initialize();
+    public override fun initialize() {
+        initializeAppMessageList()
+        diaryLiveData.initialize()
     }
 
-    public boolean existsSavedDiary(LocalDate date) {
-        Objects.requireNonNull(date);
-
+    fun existsSavedDiary(date: LocalDate): Boolean {
         try {
-            return diaryRepository.existsDiary(date).get();
-        } catch (ExecutionException | InterruptedException e) {
-            addAppMessage(AppMessage.DIARY_INFO_LOADING_ERROR);
-            return false;
+            return diaryRepository.existsDiary(date).get()
+        } catch (e: ExecutionException) {
+            addAppMessage(AppMessage.DIARY_INFO_LOADING_ERROR)
+            return false
+        } catch (e: InterruptedException) {
+            addAppMessage(AppMessage.DIARY_INFO_LOADING_ERROR)
+            return false
         }
     }
 
-    public void loadSavedDiary(LocalDate date) {
-        Objects.requireNonNull(date);
-
+    fun loadSavedDiary(date: LocalDate) {
         try {
-            DiaryEntity diaryEntity = diaryRepository.loadDiary(date).get();
-            diaryLiveData.update(diaryEntity);
-        } catch (Exception e) {
-            addAppMessage(AppMessage.DIARY_LOADING_ERROR);
+            val diaryEntity = diaryRepository.loadDiary(date).get()
+            diaryLiveData.update(diaryEntity)
+        } catch (e: Exception) {
+            addAppMessage(AppMessage.DIARY_LOADING_ERROR)
         }
     }
 
-    boolean deleteDiary() {
-        LocalDate deleteDate = diaryLiveData.getDate().getValue();
-        Objects.requireNonNull(deleteDate);
-
-        Integer result;
+    fun deleteDiary(): Boolean {
+        val deleteDate = diaryLiveData.date.checkNotNull()
+        val result: Int
         try {
-            result = diaryRepository.deleteDiary(deleteDate).get();
-        } catch (CancellationException | ExecutionException | InterruptedException  e) {
-            addAppMessage(AppMessage.DIARY_DELETE_ERROR);
-            return false;
+            result = diaryRepository.deleteDiary(deleteDate).get()
+        } catch (e: CancellationException) {
+            addAppMessage(AppMessage.DIARY_DELETE_ERROR)
+            return false
+        } catch (e: ExecutionException) {
+            addAppMessage(AppMessage.DIARY_DELETE_ERROR)
+            return false
+        } catch (e: InterruptedException) {
+            addAppMessage(AppMessage.DIARY_DELETE_ERROR)
+            return false
         }
 
         // 削除件数 = 1が正常
         if (result != 1) {
-            addAppMessage(AppMessage.DIARY_DELETE_ERROR);
-            return false;
+            addAppMessage(AppMessage.DIARY_DELETE_ERROR)
+            return false
         }
 
-        return true;
+        return true
     }
 
     // MEMO:存在しないことを確認したいため下記メソッドを否定的処理とする
-    boolean checkSavedPicturePathDoesNotExist(Uri uri) {
-        Objects.requireNonNull(uri);
-
+    fun checkSavedPicturePathDoesNotExist(uri: Uri): Boolean {
         try {
-            return !diaryRepository.existsPicturePath(uri).get();
-        } catch (ExecutionException | InterruptedException e) {
-            addAppMessage(AppMessage.DIARY_LOADING_ERROR);
-            return false;
+            return !diaryRepository.existsPicturePath(uri).get()
+        } catch (e: ExecutionException) {
+            addAppMessage(AppMessage.DIARY_LOADING_ERROR)
+            return false
+        } catch (e: InterruptedException) {
+            addAppMessage(AppMessage.DIARY_LOADING_ERROR)
+            return false
         }
-    }
-
-    // LiveDataGetter
-    public LiveData<LocalDate> getDateLiveData() {
-        return diaryLiveData.getDate();
-    }
-
-    public LiveData<Weather> getWeather1LiveData() {
-        return diaryLiveData.getWeather1();
-    }
-
-    public LiveData<Weather> getWeather2LiveData() {
-        return diaryLiveData.getWeather2();
-    }
-
-    public LiveData<Condition> getConditionLiveData() {
-        return diaryLiveData.getCondition();
-    }
-
-    public LiveData<String> getTitleLiveData() {
-        return diaryLiveData.getTitle();
-    }
-
-    public LiveData<Integer> getNumVisibleItemsLiveData() {
-        return diaryLiveData.getNumVisibleItems();
-    }
-
-    public LiveData<String> getItem1TitleLiveData() {
-        return diaryLiveData.getItemLiveData(new ItemNumber(1)).getTitle();
-    }
-
-    public LiveData<String> getItem2TitleLiveData() {
-        return diaryLiveData.getItemLiveData(new ItemNumber(2)).getTitle();
-    }
-
-    public LiveData<String> getItem3TitleLiveData() {
-        return diaryLiveData.getItemLiveData(new ItemNumber(3)).getTitle();
-    }
-
-    public LiveData<String> getItem4TitleLiveData() {
-        return diaryLiveData.getItemLiveData(new ItemNumber(4)).getTitle();
-    }
-
-    public LiveData<String> getItem5TitleLiveData() {
-        return diaryLiveData.getItemLiveData(new ItemNumber(5)).getTitle();
-    }
-
-    public LiveData<String> getItem1CommentLiveData() {
-        return diaryLiveData.getItemLiveData(new ItemNumber(1)).getComment();
-    }
-
-    public LiveData<String> getItem2CommentLiveData() {
-        return diaryLiveData.getItemLiveData(new ItemNumber(2)).getComment();
-    }
-
-    public LiveData<String> getItem3CommentLiveData() {
-        return diaryLiveData.getItemLiveData(new ItemNumber(3)).getComment();
-    }
-
-    public LiveData<String> getItem4CommentLiveData() {
-        return diaryLiveData.getItemLiveData(new ItemNumber(4)).getComment();
-    }
-
-    public LiveData<String> getItem5CommentLiveData() {
-        return diaryLiveData.getItemLiveData(new ItemNumber(5)).getComment();
-    }
-
-    public LiveData<Uri> getPicturePathLiveData() {
-        return diaryLiveData.getPicturePath();
-    }
-
-    public LiveData<LocalDateTime> getLogLiveData() {
-        return diaryLiveData.getLog();
     }
 }
