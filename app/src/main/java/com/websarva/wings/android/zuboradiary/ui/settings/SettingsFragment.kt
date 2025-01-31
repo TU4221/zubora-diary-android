@@ -1,508 +1,463 @@
-package com.websarva.wings.android.zuboradiary.ui.settings;
+package com.websarva.wings.android.zuboradiary.ui.settings
 
-import android.Manifest;
-import android.annotation.SuppressLint;
-import android.app.Dialog;
-import android.content.DialogInterface;
-import android.content.Intent;
-import android.net.Uri;
-import android.os.Build;
-import android.os.Bundle;
-import android.provider.Settings;
-import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.MotionEvent;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.CompoundButton;
-
-import androidx.activity.OnBackPressedCallback;
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.annotation.RequiresApi;
-import androidx.core.app.ActivityCompat;
-import androidx.databinding.ViewDataBinding;
-import androidx.lifecycle.SavedStateHandle;
-import androidx.navigation.NavDirections;
-
-import com.websarva.wings.android.zuboradiary.MainActivity;
-import com.websarva.wings.android.zuboradiary.R;
-import com.websarva.wings.android.zuboradiary.data.AppMessage;
-import com.websarva.wings.android.zuboradiary.data.DateTimeStringConverter;
-import com.websarva.wings.android.zuboradiary.data.DayOfWeekStringConverter;
-import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor;
-import com.websarva.wings.android.zuboradiary.databinding.FragmentSettingsBinding;
-import com.websarva.wings.android.zuboradiary.ui.BaseFragment;
-import com.websarva.wings.android.zuboradiary.ui.UriPermissionManager;
-
-import java.time.DayOfWeek;
-import java.time.LocalTime;
-import java.util.Arrays;
-import java.util.Objects;
-
-import dagger.hilt.android.AndroidEntryPoint;
+import android.Manifest
+import android.annotation.SuppressLint
+import android.app.Dialog
+import android.content.DialogInterface
+import android.content.Intent
+import android.net.Uri
+import android.os.Build
+import android.os.Bundle
+import android.provider.Settings
+import android.view.LayoutInflater
+import android.view.MotionEvent
+import android.view.View
+import android.view.ViewGroup
+import android.widget.CompoundButton
+import androidx.activity.OnBackPressedCallback
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.RequiresApi
+import androidx.core.app.ActivityCompat
+import androidx.databinding.ViewDataBinding
+import androidx.lifecycle.SavedStateHandle
+import androidx.navigation.NavDirections
+import com.websarva.wings.android.zuboradiary.R
+import com.websarva.wings.android.zuboradiary.data.AppMessage
+import com.websarva.wings.android.zuboradiary.data.DateTimeStringConverter
+import com.websarva.wings.android.zuboradiary.data.DayOfWeekStringConverter
+import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor
+import com.websarva.wings.android.zuboradiary.databinding.FragmentSettingsBinding
+import com.websarva.wings.android.zuboradiary.ui.BaseFragment
+import com.websarva.wings.android.zuboradiary.ui.UriPermissionManager
+import dagger.hilt.android.AndroidEntryPoint
+import java.time.DayOfWeek
+import java.time.LocalTime
 
 @AndroidEntryPoint
-public class SettingsFragment extends BaseFragment {
+class SettingsFragment : BaseFragment() {
 
     // View関係
-    private FragmentSettingsBinding binding;
-    private boolean isTouchedReminderNotificationSwitch = false;
-    private boolean isTouchedPasscodeLockSwitch = false;
-    private boolean isTouchedWeatherInfoAcquisitionSwitch = false;
+    private var _binding: FragmentSettingsBinding? = null
+    private val binding: FragmentSettingsBinding get() = checkNotNull(_binding)
+    private var isTouchedReminderNotificationSwitch = false
+    private var isTouchedPasscodeLockSwitch = false
+    private var isTouchedWeatherInfoAcquisitionSwitch = false
 
     // ActivityResultLauncher関係
-    private ActivityResultLauncher<String> requestPostNotificationsPermissionLauncher;
-    private ActivityResultLauncher<String[]> requestAccessLocationPermissionLauncher;
+    private lateinit var requestPostNotificationsPermissionLauncher: ActivityResultLauncher<String>
+    private lateinit var requestAccessLocationPermissionLauncher: ActivityResultLauncher<Array<String>>
 
     // Uri関係
-    private UriPermissionManager uriPermissionManager;
+    private lateinit var uriPermissionManager: UriPermissionManager
 
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
 
-        addOnBackPressedCallback(new OnBackPressedCallback(true) {
-            @Override
-            public void handleOnBackPressed() {
-                requireMainActivity().popBackStackToStartFragment();
+        addOnBackPressedCallback(object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                requireMainActivity().popBackStackToStartFragment()
             }
-        });
+        })
 
         // ActivityResultLauncher設定
         // 通知権限取得結果処理
         // MEMO:PostNotificationsはApiLevel33で導入されたPermission。33未満は許可取り不要。
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             requestPostNotificationsPermissionLauncher =
-                    registerForActivityResult(
-                            new ActivityResultContracts.RequestPermission(),
-                            isGranted -> {
+                registerForActivityResult(
+                    ActivityResultContracts.RequestPermission()
+                ) { isGranted: Boolean ->
 
-                                // 再確認
-                                boolean _isGranted = ((MainActivity) requireActivity()).isGrantedPostNotifications();
-
-                                if (isGranted && _isGranted) {
-                                    showReminderNotificationTimePickerDialog();
-                                } else {
-                                    binding.includePasscodeLockSetting
-                                            .materialSwitch.setChecked(false);
-                                }
-                            }
-                    );
+                    // 再確認
+                    val recheck = requireMainActivity().isGrantedPostNotifications
+                    if (isGranted && recheck) {
+                        showReminderNotificationTimePickerDialog()
+                    } else {
+                        binding.includePasscodeLockSetting
+                            .materialSwitch.isChecked = false
+                    }
+                }
         }
 
 
         // 位置情報利用権限取得結果処理
         requestAccessLocationPermissionLauncher =
-                registerForActivityResult(
-                        new ActivityResultContracts.RequestMultiplePermissions(),
-                        o -> {
-                            Boolean isGrantedAccessFineLocation =
-                                    o.get(Manifest.permission.ACCESS_FINE_LOCATION);
-                            Boolean isGrantedAccessCoarseLocation =
-                                    o.get(Manifest.permission.ACCESS_COARSE_LOCATION);
+            registerForActivityResult(
+                ActivityResultContracts.RequestMultiplePermissions()
+            ) { o: Map<String, Boolean> ->
+                val isGrantedAccessFineLocation = o[Manifest.permission.ACCESS_FINE_LOCATION] ?: false
+                val isGrantedAccessCoarseLocation = o[Manifest.permission.ACCESS_COARSE_LOCATION] ?: false
 
-                            boolean isGrantedAll =
-                                    isGrantedAccessFineLocation != null
-                                            && isGrantedAccessFineLocation
-                                            && isGrantedAccessCoarseLocation != null
-                                            && isGrantedAccessCoarseLocation;
+                val isGrantedAll = isGrantedAccessFineLocation && isGrantedAccessCoarseLocation
 
-                            // 再確認
-                            boolean _isGranted = ((MainActivity)requireActivity()).isGrantedAccessLocation();
-
-                            if (isGrantedAll && _isGranted) {
-                                settingsViewModel.saveWeatherInfoAcquisition(true);
-                            } else {
-                                binding.includeWeatherInfoAcquisitionSetting
-                                        .materialSwitch.setChecked(false);
-                            }
-                        }
-                );
+                // 再確認
+                val recheck = requireMainActivity().isGrantedAccessLocation
+                if (isGrantedAll && recheck) {
+                    settingsViewModel.saveWeatherInfoAcquisition(true)
+                } else {
+                    binding.includeWeatherInfoAcquisitionSetting
+                        .materialSwitch.isChecked = false
+                }
+            }
 
         uriPermissionManager =
-                new UriPermissionManager(requireContext()) {
-                    @Override
-                    public boolean checkUsedUriDoesNotExist(@NonNull Uri uri) {
-                        return false; // MEMO:本フラグメントではUri権限を個別に解放しないため常時false
-
-                    }
-                };
+            object : UriPermissionManager(requireContext()) {
+                override fun checkUsedUriDoesNotExist(uri: Uri): Boolean {
+                    return false // MEMO:本フラグメントではUri権限を個別に解放しないため常時false
+                }
+            }
     }
 
-    @Override
-    protected void initializeViewModel() {
+    override fun initializeViewModel() {
         // 処理なし
     }
 
-    @Override
-    public View onCreateView(
-            @NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        return super.onCreateView(inflater, container, savedInstanceState);
+    override fun initializeDataBinding(
+        themeColorInflater: LayoutInflater,
+        container: ViewGroup
+    ): ViewDataBinding {
+        _binding = FragmentSettingsBinding.inflate(themeColorInflater, container, false)
+        binding.lifecycleOwner = this
+        binding.settingsViewModel = settingsViewModel
+        return binding
     }
 
-    @Override
-    protected ViewDataBinding initializeDataBinding(@NonNull LayoutInflater themeColorInflater, @NonNull ViewGroup container) {
-        binding = FragmentSettingsBinding.inflate(themeColorInflater, container, false);
-        binding.setLifecycleOwner(this);
-        binding.setSettingsViewModel(settingsViewModel);
-        return binding;
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        setUpThemeColorSettingItem()
+        setUpCalendarStartDaySettingItem()
+        setUpReminderNotificationSettingItem()
+        setUpPasscodeLockSettingItem()
+        setUpWeatherInfoAcquisitionSettingItem()
+        setUpAllDiariesDeleteSettingItem()
+        setUpAllSettingsInitializationSettingItem()
+        setUpAllDataDeleteSettingItem()
     }
 
-    @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-
-        setUpThemeColorSettingItem();
-        setUpCalendarStartDaySettingItem();
-        setUpReminderNotificationSettingItem();
-        setUpPasscodeLockSettingItem();
-        setUpWeatherInfoAcquisitionSettingItem();
-        setUpAllDiariesDeleteSettingItem();
-        setUpAllSettingsInitializationSettingItem();
-        setUpAllDataDeleteSettingItem();
-    }
-
-    @Override
-    protected void handleOnReceivingResultFromPreviousFragment(@NonNull SavedStateHandle savedStateHandle) {
+    override fun handleOnReceivingResultFromPreviousFragment(savedStateHandle: SavedStateHandle) {
         // 処理なし
     }
 
-    @Override
-    protected void handleOnReceivingDialogResult(@NonNull SavedStateHandle savedStateHandle) {
-        receiveThemeColorPickerDialogResult();
-        receiveCalendarStartDayPickerDialogResult();
-        receiveReminderNotificationTimePickerDialogResult();
-        receivePermissionDialogResult();
-        receiveAllDiariesDeleteDialogResult();
-        receiveAllSettingsInitializationDialogResult();
-        receiveAllDataDeleteDialogResult();
+    override fun handleOnReceivingDialogResult(savedStateHandle: SavedStateHandle) {
+        receiveThemeColorPickerDialogResult()
+        receiveCalendarStartDayPickerDialogResult()
+        receiveReminderNotificationTimePickerDialogResult()
+        receivePermissionDialogResult()
+        receiveAllDiariesDeleteDialogResult()
+        receiveAllSettingsInitializationDialogResult()
+        receiveAllDataDeleteDialogResult()
     }
 
-    @Override
-    protected void removeDialogResultOnDestroy(@NonNull SavedStateHandle savedStateHandle) {
-        savedStateHandle.remove(ThemeColorPickerDialogFragment.KEY_SELECTED_THEME_COLOR);
-        savedStateHandle.remove(CalendarStartDayPickerDialogFragment.KEY_SELECTED_DAY_OF_WEEK);
-        savedStateHandle.remove(ReminderNotificationTimePickerDialogFragment.KEY_SELECTED_BUTTON);
-        savedStateHandle.remove(ReminderNotificationTimePickerDialogFragment.KEY_SELECTED_TIME);
-        savedStateHandle.remove(PermissionDialogFragment.KEY_SELECTED_BUTTON);
-        savedStateHandle.remove(AllDiariesDeleteDialogFragment.KEY_SELECTED_BUTTON);
-        savedStateHandle.remove(AllSettingsInitializationDialogFragment.KEY_SELECTED_BUTTON);
-        savedStateHandle.remove(AllDataDeleteDialogFragment.KEY_SELECTED_BUTTON);
+    override fun removeDialogResultOnDestroy(savedStateHandle: SavedStateHandle) {
+        savedStateHandle.remove<Any>(ThemeColorPickerDialogFragment.KEY_SELECTED_THEME_COLOR)
+        savedStateHandle.remove<Any>(CalendarStartDayPickerDialogFragment.KEY_SELECTED_DAY_OF_WEEK)
+        savedStateHandle.remove<Any>(ReminderNotificationTimePickerDialogFragment.KEY_SELECTED_BUTTON)
+        savedStateHandle.remove<Any>(ReminderNotificationTimePickerDialogFragment.KEY_SELECTED_TIME)
+        savedStateHandle.remove<Any>(PermissionDialogFragment.KEY_SELECTED_BUTTON)
+        savedStateHandle.remove<Any>(AllDiariesDeleteDialogFragment.KEY_SELECTED_BUTTON)
+        savedStateHandle.remove<Any>(AllSettingsInitializationDialogFragment.KEY_SELECTED_BUTTON)
+        savedStateHandle.remove<Any>(AllDataDeleteDialogFragment.KEY_SELECTED_BUTTON)
     }
 
-    @Override
-    protected void setUpOtherAppMessageDialog() {
+    override fun setUpOtherAppMessageDialog() {
         // 処理なし
     }
 
     // テーマカラー設定ダイアログフラグメントから結果受取
-    private void receiveThemeColorPickerDialogResult() {
-        ThemeColor selectedThemeColor =
-                receiveResulFromDialog(ThemeColorPickerDialogFragment.KEY_SELECTED_THEME_COLOR);
-        if (selectedThemeColor == null) return;
+    private fun receiveThemeColorPickerDialogResult() {
+        val selectedThemeColor =
+            receiveResulFromDialog<ThemeColor>(ThemeColorPickerDialogFragment.KEY_SELECTED_THEME_COLOR)
+                ?: return
 
-        settingsViewModel.saveThemeColor(selectedThemeColor);
+        settingsViewModel.saveThemeColor(selectedThemeColor)
     }
 
     // カレンダー開始曜日設定ダイアログフラグメントから結果受取
-    private void receiveCalendarStartDayPickerDialogResult() {
-        DayOfWeek selectedDayOfWeek =
-                receiveResulFromDialog(CalendarStartDayPickerDialogFragment.KEY_SELECTED_DAY_OF_WEEK);
-        if (selectedDayOfWeek == null) return;
+    private fun receiveCalendarStartDayPickerDialogResult() {
+        val selectedDayOfWeek =
+            receiveResulFromDialog<DayOfWeek>(CalendarStartDayPickerDialogFragment.KEY_SELECTED_DAY_OF_WEEK)
+                ?: return
 
-        settingsViewModel.saveCalendarStartDayOfWeek(selectedDayOfWeek);
+        settingsViewModel.saveCalendarStartDayOfWeek(selectedDayOfWeek)
     }
 
     // リマインダー通知時間設定ダイアログフラグメントから結果受取
-    private void receiveReminderNotificationTimePickerDialogResult() {
-        Integer selectedButton =
-                receiveResulFromDialog(ReminderNotificationTimePickerDialogFragment.KEY_SELECTED_BUTTON);
-        if (selectedButton == null) return;
+    private fun receiveReminderNotificationTimePickerDialogResult() {
+        val selectedButton =
+            receiveResulFromDialog<Int>(ReminderNotificationTimePickerDialogFragment.KEY_SELECTED_BUTTON)
+                ?: return
         if (selectedButton != DialogInterface.BUTTON_POSITIVE) {
-            binding.includeReminderNotificationSetting.materialSwitch.setChecked(false);
-            return;
+            binding.includeReminderNotificationSetting.materialSwitch.isChecked = false
+            return
         }
 
-        LocalTime selectedTime =
-                receiveResulFromDialog(ReminderNotificationTimePickerDialogFragment.KEY_SELECTED_TIME);
-        Objects.requireNonNull(selectedTime);
-        settingsViewModel.saveReminderNotificationValid(selectedTime);
+        val selectedTime =
+            checkNotNull(
+                receiveResulFromDialog<LocalTime>(
+                    ReminderNotificationTimePickerDialogFragment.KEY_SELECTED_TIME
+                )
+            )
+        settingsViewModel.saveReminderNotificationValid(selectedTime)
     }
 
     // 権限催促ダイアログフラグメントから結果受取
-    private void receivePermissionDialogResult() {
-        Integer selectedButton = receiveResulFromDialog(PermissionDialogFragment.KEY_SELECTED_BUTTON);
-        if (selectedButton == null) return;
-        if (selectedButton != Dialog.BUTTON_POSITIVE) return;
+    private fun receivePermissionDialogResult() {
+        val selectedButton =
+            receiveResulFromDialog<Int>(PermissionDialogFragment.KEY_SELECTED_BUTTON) ?: return
+        if (selectedButton != Dialog.BUTTON_POSITIVE) return
 
-        showApplicationDetailsSettings();
+        showApplicationDetailsSettings()
     }
 
-    private void receiveAllDiariesDeleteDialogResult() {
-        Integer selectedButton =
-                receiveResulFromDialog(AllDiariesDeleteDialogFragment.KEY_SELECTED_BUTTON);
-        if (selectedButton == null) return;
-        if (selectedButton != Dialog.BUTTON_POSITIVE) return;
+    private fun receiveAllDiariesDeleteDialogResult() {
+        val selectedButton =
+            receiveResulFromDialog<Int>(AllDiariesDeleteDialogFragment.KEY_SELECTED_BUTTON) ?: return
+        if (selectedButton != Dialog.BUTTON_POSITIVE) return
 
-        settingsViewModel.deleteAllDiaries();
-        uriPermissionManager.releaseAllPersistablePermission();
+        settingsViewModel.deleteAllDiaries()
+        uriPermissionManager.releaseAllPersistablePermission()
     }
 
-    private void receiveAllSettingsInitializationDialogResult() {
-        Integer selectedButton =
-                receiveResulFromDialog(AllSettingsInitializationDialogFragment.KEY_SELECTED_BUTTON);
-        if (selectedButton == null) return;
-        if (selectedButton != Dialog.BUTTON_POSITIVE) return;
+    private fun receiveAllSettingsInitializationDialogResult() {
+        val selectedButton =
+            receiveResulFromDialog<Int>(AllSettingsInitializationDialogFragment.KEY_SELECTED_BUTTON)
+                ?: return
+        if (selectedButton != Dialog.BUTTON_POSITIVE) return
 
-        settingsViewModel.deleteAllSettings();
+        settingsViewModel.deleteAllSettings()
     }
 
-    private void receiveAllDataDeleteDialogResult() {
-        Integer selectedButton =
-                receiveResulFromDialog(AllDataDeleteDialogFragment.KEY_SELECTED_BUTTON);
-        if (selectedButton == null) return;
-        if (selectedButton != Dialog.BUTTON_POSITIVE) return;
+    private fun receiveAllDataDeleteDialogResult() {
+        val selectedButton =
+            receiveResulFromDialog<Int>(AllDataDeleteDialogFragment.KEY_SELECTED_BUTTON) ?: return
+        if (selectedButton != Dialog.BUTTON_POSITIVE) return
 
-        settingsViewModel.deleteAllData();
-        uriPermissionManager.releaseAllPersistablePermission();
+        settingsViewModel.deleteAllData()
+        uriPermissionManager.releaseAllPersistablePermission()
     }
 
-    private void setUpThemeColorSettingItem() {
-        binding.includeThemeColorSetting.textTitle.setOnClickListener(v -> showThemeColorPickerDialog());
+    private fun setUpThemeColorSettingItem() {
+        binding.includeThemeColorSetting.textTitle.setOnClickListener {
+            showThemeColorPickerDialog()
+        }
 
-        settingsViewModel.getThemeColor()
-                .observe(getViewLifecycleOwner(), themeColor -> {
-                    Objects.requireNonNull(themeColor);
-
-                    String strThemeColor = themeColor.toSting(requireContext());
-                    binding.includeThemeColorSetting.textValue.setText(strThemeColor);
-                    switchViewColor(themeColor);
-                });
+        settingsViewModel.themeColor
+            .observe(viewLifecycleOwner) { themeColor: ThemeColor? ->
+                var settingValue = themeColor
+                if (settingValue == null) {
+                    settingValue = settingsViewModel.loadThemeColorSettingValue()
+                }
+                val strThemeColor = settingValue.toSting(requireContext())
+                binding.includeThemeColorSetting.textValue.text = strThemeColor
+                switchViewColor(settingValue)
+            }
     }
 
-    private void switchViewColor(ThemeColor themeColor) {
-        Objects.requireNonNull(themeColor);
+    private fun switchViewColor(themeColor: ThemeColor) {
+        val switcher =
+            SettingsThemeColorSwitcher(requireContext(), themeColor)
 
-        SettingsThemeColorSwitcher switcher =
-                new SettingsThemeColorSwitcher(requireContext(), themeColor);
-
-        switcher.switchBackgroundColor(binding.viewFullScreenBackground);
-        switcher.switchToolbarColor(binding.materialToolbarTopAppBar);
+        switcher.switchBackgroundColor(binding.viewFullScreenBackground)
+        switcher.switchToolbarColor(binding.materialToolbarTopAppBar)
 
         switcher.switchSettingItemSectionColor(
-                Arrays.asList(
-                        binding.textSettingsSectionDesign,
-                        binding.textSettingsSectionSetting,
-                        binding.textSettingsSectionEnd,
-                        binding.textSettingsSectionData
-                )
-        );
+            listOf(
+                binding.textSettingsSectionDesign,
+                binding.textSettingsSectionSetting,
+                binding.textSettingsSectionEnd,
+                binding.textSettingsSectionData
+            )
+        )
 
         switcher.switchSettingItemIconColor(
-                Arrays.asList(
-                        binding.includeThemeColorSetting.textTitle,
-                        binding.includeCalendarStartDaySetting.textTitle,
-                        binding.includeReminderNotificationSetting.textTitle,
-                        binding.includePasscodeLockSetting.textTitle,
-                        binding.includeWeatherInfoAcquisitionSetting.textTitle,
-                        binding.includeAllDiariesDeleteSetting.textTitle,
-                        binding.includeAllSettingsInitializationSetting.textTitle,
-                        binding.includeAllDataDeleteSetting.textTitle
-                )
-        );
+            listOf(
+                binding.includeThemeColorSetting.textTitle,
+                binding.includeCalendarStartDaySetting.textTitle,
+                binding.includeReminderNotificationSetting.textTitle,
+                binding.includePasscodeLockSetting.textTitle,
+                binding.includeWeatherInfoAcquisitionSetting.textTitle,
+                binding.includeAllDiariesDeleteSetting.textTitle,
+                binding.includeAllSettingsInitializationSetting.textTitle,
+                binding.includeAllDataDeleteSetting.textTitle
+            )
+        )
 
         switcher.switchTextColorOnBackground(
-                Arrays.asList(
-                        binding.includeThemeColorSetting.textTitle,
-                        binding.includeThemeColorSetting.textValue,
-                        binding.includeCalendarStartDaySetting.textTitle,
-                        binding.includeCalendarStartDaySetting.textValue,
-                        binding.includeReminderNotificationSetting.textTitle,
-                        binding.includeReminderNotificationSetting.textValue,
-                        binding.includePasscodeLockSetting.textTitle,
-                        binding.includeWeatherInfoAcquisitionSetting.textTitle
-                )
-        );
+            listOf(
+                binding.includeThemeColorSetting.textTitle,
+                binding.includeThemeColorSetting.textValue,
+                binding.includeCalendarStartDaySetting.textTitle,
+                binding.includeCalendarStartDaySetting.textValue,
+                binding.includeReminderNotificationSetting.textTitle,
+                binding.includeReminderNotificationSetting.textValue,
+                binding.includePasscodeLockSetting.textTitle,
+                binding.includeWeatherInfoAcquisitionSetting.textTitle
+            )
+        )
 
         switcher.switchRedTextColorOnBackground(
-                Arrays.asList(
-                        binding.includeAllDiariesDeleteSetting.textTitle,
-                        binding.includeAllSettingsInitializationSetting.textTitle,
-                        binding.includeAllDataDeleteSetting.textTitle
-                )
-        );
+            listOf(
+                binding.includeAllDiariesDeleteSetting.textTitle,
+                binding.includeAllSettingsInitializationSetting.textTitle,
+                binding.includeAllDataDeleteSetting.textTitle
+            )
+        )
 
         switcher.switchSwitchColor(
-                Arrays.asList(
-                        binding.includeReminderNotificationSetting.materialSwitch,
-                        binding.includePasscodeLockSetting.materialSwitch,
-                        binding.includeWeatherInfoAcquisitionSetting.materialSwitch
-                )
-        );
+            listOf(
+                binding.includeReminderNotificationSetting.materialSwitch,
+                binding.includePasscodeLockSetting.materialSwitch,
+                binding.includeWeatherInfoAcquisitionSetting.materialSwitch
+            )
+        )
 
         switcher.switchDividerColor(
-                Arrays.asList(
-                        binding.materialDividerToolbar,
-                        binding.materialDividerThemeColorSetting,
-                        binding.materialDividerSectionSetting,
-                        binding.materialDividerCalendarStartDaySetting,
-                        binding.materialDividerReminderNotificationSetting,
-                        binding.materialDividerPasscodeLockSetting,
-                        binding.materialDividerWeatherInfoAcquisitionSetting,
-                        binding.materialDividerSectionData,
-                        binding.materialDividerAllDiariesDeleteSetting,
-                        binding.materialDividerAllSettingsInitializationSetting,
-                        binding.materialDividerAllDataDeleteSetting,
-                        binding.materialDividerSectionEnd
-                )
-        );
+            listOf(
+                binding.materialDividerToolbar,
+                binding.materialDividerThemeColorSetting,
+                binding.materialDividerSectionSetting,
+                binding.materialDividerCalendarStartDaySetting,
+                binding.materialDividerReminderNotificationSetting,
+                binding.materialDividerPasscodeLockSetting,
+                binding.materialDividerWeatherInfoAcquisitionSetting,
+                binding.materialDividerSectionData,
+                binding.materialDividerAllDiariesDeleteSetting,
+                binding.materialDividerAllSettingsInitializationSetting,
+                binding.materialDividerAllDataDeleteSetting,
+                binding.materialDividerSectionEnd
+            )
+        )
     }
 
-    private void setUpCalendarStartDaySettingItem() {
-        binding.includeCalendarStartDaySetting.textTitle.setOnClickListener(v -> {
-            Objects.requireNonNull(v);
+    private fun setUpCalendarStartDaySettingItem() {
+        binding.includeCalendarStartDaySetting.textTitle.setOnClickListener {
+            val currentCalendarStartDayOfWeek = settingsViewModel.loadCalendarStartDaySettingValue()
+            showCalendarStartDayPickerDialog(currentCalendarStartDayOfWeek)
+        }
 
-            DayOfWeek currentCalendarStartDayOfWeek =
-                    settingsViewModel.loadCalendarStartDaySettingValue();
-            Objects.requireNonNull(currentCalendarStartDayOfWeek);
+        settingsViewModel.calendarStartDayOfWeek
+            .observe(viewLifecycleOwner) { dayOfWeek: DayOfWeek? ->
+                var settingValue = dayOfWeek
+                if (settingValue == null) {
+                    settingValue = settingsViewModel.loadCalendarStartDaySettingValue()
+                }
 
-            showCalendarStartDayPickerDialog(currentCalendarStartDayOfWeek);
-        });
-
-        settingsViewModel.getCalendarStartDayOfWeek()
-                .observe(getViewLifecycleOwner(), dayOfWeek -> {
-                    DayOfWeek settingValue = dayOfWeek;
-                    if (settingValue == null) {
-                        settingValue = settingsViewModel.loadCalendarStartDaySettingValue();
-                    }
-
-                    DayOfWeekStringConverter stringConverter =
-                            new DayOfWeekStringConverter(requireContext());
-                    String strDayOfWeek =
-                            stringConverter.toCalendarStartDayOfWeek(settingValue);
-                    binding.includeCalendarStartDaySetting.textValue.setText(strDayOfWeek);
-                });
+                val stringConverter =
+                    DayOfWeekStringConverter(requireContext())
+                val strDayOfWeek =
+                    stringConverter.toCalendarStartDayOfWeek(settingValue)
+                binding.includeCalendarStartDaySetting.textValue.text = strDayOfWeek
+            }
     }
 
     @SuppressLint("ClickableViewAccessibility")
-    private void setUpReminderNotificationSettingItem() {
-
+    private fun setUpReminderNotificationSettingItem() {
         binding.includeReminderNotificationSetting.materialSwitch
-                .setOnTouchListener((v, event) -> {
-                    Objects.requireNonNull(v);
-                    Objects.requireNonNull(event);
-
-                    if (event.getAction() == MotionEvent.ACTION_DOWN){
-                        isTouchedReminderNotificationSwitch = true;
-                    }
-                    return false;
-                });
+            .setOnTouchListener { _: View, event: MotionEvent ->
+                if (event.action == MotionEvent.ACTION_DOWN) {
+                    isTouchedReminderNotificationSwitch = true
+                }
+                false
+            }
         binding.includeReminderNotificationSetting.materialSwitch
-                .setOnCheckedChangeListener(
-                        new ReminderNotificationOnCheckedChangeListener()
-                );
+            .setOnCheckedChangeListener(
+                ReminderNotificationOnCheckedChangeListener()
+            )
 
-        settingsViewModel.isCheckedReminderNotification()
-                .observe(getViewLifecycleOwner(), aBoolean -> {
-                    Log.d("20250131", "boolean:" + aBoolean);
-                    Boolean settingValue = aBoolean;
-                    if (settingValue == null) {
-                        settingValue = settingsViewModel.loadIsCheckedReminderNotificationSetting();
-                    }
+        settingsViewModel.isCheckedReminderNotification
+            .observe(viewLifecycleOwner) { aBoolean: Boolean? ->
+                var settingValue = aBoolean
+                if (settingValue == null) {
+                    settingValue = settingsViewModel.loadIsCheckedReminderNotificationSetting()
+                }
+                if (settingValue) {
+                    binding.includeReminderNotificationSetting
+                        .textValue.visibility = View.VISIBLE
+                } else {
+                    binding.includeReminderNotificationSetting
+                        .textValue.visibility = View.INVISIBLE
+                }
+            }
 
-                    if (settingValue) {
-                        binding.includeReminderNotificationSetting
-                                .textValue.setVisibility(View.VISIBLE);
-                    } else {
-                        binding.includeReminderNotificationSetting
-                                .textValue.setVisibility(View.INVISIBLE);
-                    }
-                });
+        settingsViewModel.reminderNotificationTime
+            .observe(viewLifecycleOwner) { time: LocalTime? ->
+                // MEMO:未設定の場合nullが代入される。
+                //      その為、nullはエラーではないので下記メソッドの処理は不要(処理するとループする)
+                //      "SettingsViewModel#isCheckedReminderNotificationSetting()"
+                if (time == null) {
+                    binding.includeReminderNotificationSetting.textValue.text = ""
+                    return@observe
+                }
 
-        settingsViewModel.getReminderNotificationTime()
-                .observe(getViewLifecycleOwner(), time -> {
-                    // MEMO:未設定の場合nullが代入される。
-                    //      その為、nullはエラーではないので下記メソッドの処理は不要(処理するとループする)
-                    //      "SettingsViewModel#isCheckedReminderNotificationSetting()"
-                    if (time == null) {
-                        binding.includeReminderNotificationSetting.textValue.setText("");
-                        return;
-                    }
-
-                    DateTimeStringConverter converter = new DateTimeStringConverter();
-                    String strTime = converter.toHourMinute(time);
-                    binding.includeReminderNotificationSetting.textValue.setText(strTime);
-                });
+                val converter = DateTimeStringConverter()
+                val strTime = converter.toHourMinute(time)
+                binding.includeReminderNotificationSetting.textValue.text = strTime
+            }
     }
 
-    private class ReminderNotificationOnCheckedChangeListener
-            implements CompoundButton.OnCheckedChangeListener {
-        @Override
-        public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-            Objects.requireNonNull(buttonView);
-            if (!isTouchedReminderNotificationSwitch) return;
+    private inner class ReminderNotificationOnCheckedChangeListener
+
+        : CompoundButton.OnCheckedChangeListener {
+        override fun onCheckedChanged(buttonView: CompoundButton, isChecked: Boolean) {
+            if (!isTouchedReminderNotificationSwitch) return
 
             if (isChecked) {
                 // MEMO:PostNotificationsはApiLevel33で導入されたPermission。33未満は許可取り不要。
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                    requestPostNotificationsPermission();
+                    requestPostNotificationsPermission()
                 } else {
-                    showReminderNotificationTimePickerDialog();
+                    showReminderNotificationTimePickerDialog()
                 }
             } else {
-                settingsViewModel.saveReminderNotificationInvalid();
+                settingsViewModel.saveReminderNotificationInvalid()
             }
-            isTouchedReminderNotificationSwitch = false;
+            isTouchedReminderNotificationSwitch = false
         }
 
         @RequiresApi(api = Build.VERSION_CODES.TIRAMISU)
-        private void requestPostNotificationsPermission() {
-            boolean isGranted = ((MainActivity)requireActivity()).isGrantedPostNotifications();
+        fun requestPostNotificationsPermission() {
+            val isGranted = requireMainActivity().isGrantedPostNotifications
             if (isGranted) {
-                showReminderNotificationTimePickerDialog();
+                showReminderNotificationTimePickerDialog()
             } else {
-                boolean shouldShowRequestPermissionRationale =
-                        ActivityCompat.shouldShowRequestPermissionRationale(
-                                requireActivity(), Manifest.permission.POST_NOTIFICATIONS);
+                val shouldShowRequestPermissionRationale =
+                    ActivityCompat.shouldShowRequestPermissionRationale(
+                        requireActivity(), Manifest.permission.POST_NOTIFICATIONS
+                    )
                 if (shouldShowRequestPermissionRationale) {
                     requestPostNotificationsPermissionLauncher
-                            .launch(Manifest.permission.POST_NOTIFICATIONS);
+                        .launch(Manifest.permission.POST_NOTIFICATIONS)
                 } else {
-                    binding.includePasscodeLockSetting.materialSwitch.setChecked(false);
-                    String permissionName = getString(R.string.fragment_settings_permission_name_notification);
-                    showPermissionDialog(permissionName);
+                    binding.includePasscodeLockSetting.materialSwitch.isChecked = false
+                    val permissionName =
+                        getString(R.string.fragment_settings_permission_name_notification)
+                    showPermissionDialog(permissionName)
                 }
             }
         }
     }
 
     @SuppressLint("ClickableViewAccessibility")
-    private void setUpPasscodeLockSettingItem() {
+    private fun setUpPasscodeLockSettingItem() {
         binding.includePasscodeLockSetting.materialSwitch
-                .setOnTouchListener((v, event) -> {
-                    Objects.requireNonNull(v);
-                    Objects.requireNonNull(event);
-
-                    if (event.getAction() == MotionEvent.ACTION_DOWN){
-                        isTouchedPasscodeLockSwitch = true;
-                    }
-                    return false;
-                });
+            .setOnTouchListener { _: View, event: MotionEvent ->
+                if (event.action == MotionEvent.ACTION_DOWN) {
+                    isTouchedPasscodeLockSwitch = true
+                }
+                false
+            }
         binding.includePasscodeLockSetting.materialSwitch
-                .setOnCheckedChangeListener((buttonView, isChecked) -> {
-                    Objects.requireNonNull(buttonView);
-                    if (!isTouchedPasscodeLockSwitch) return;
+            .setOnCheckedChangeListener { _: CompoundButton, isChecked: Boolean ->
+                if (!isTouchedPasscodeLockSwitch) return@setOnCheckedChangeListener
 
-                    settingsViewModel.savePasscodeLock(isChecked);
-                    isTouchedPasscodeLockSwitch = false;
-                });
+                settingsViewModel.savePasscodeLock(isChecked)
+                isTouchedPasscodeLockSwitch = false
+            }
 
-        settingsViewModel.isCheckedPasscodeLock()
-                .observe(getViewLifecycleOwner(), aBoolean -> {
-                });
+        settingsViewModel.isCheckedPasscodeLock
+            .observe(viewLifecycleOwner) { }
     }
 
     // HACK:WeatherInfoAcquisitionSettingのMaterialSwitchがOn状態(SettingViewModelのisCheckedLiveDataが"true")だと、
@@ -512,184 +467,175 @@ public class SettingsFragment extends BaseFragment {
     //      OnCheckedChangeListenerはユーザーがタッチした時に限り処理されるよう条件が入っている為、問題は発生していない。
     //      原因は不明。(Fragment、layout.xmlでのMaterialSwitchの設定に問題なし)
     @SuppressLint("ClickableViewAccessibility")
-    private void setUpWeatherInfoAcquisitionSettingItem() {
+    private fun setUpWeatherInfoAcquisitionSettingItem() {
         // MEMO:端末設定画面で"許可 -> 無許可"に変更したときの対応コード
-        boolean isGranted = ((MainActivity)requireActivity()).isGrantedAccessLocation();
+        val isGranted = requireMainActivity().isGrantedAccessLocation
         if (!isGranted) {
-            settingsViewModel.saveWeatherInfoAcquisition(false);
+            settingsViewModel.saveWeatherInfoAcquisition(false)
         }
 
         binding.includeWeatherInfoAcquisitionSetting.materialSwitch
-                .setOnTouchListener((v, event) -> {
-                    Objects.requireNonNull(v);
-                    Objects.requireNonNull(event);
-
-                    if (event.getAction() == MotionEvent.ACTION_DOWN){
-                        isTouchedWeatherInfoAcquisitionSwitch = true;
-                    }
-                    return false;
-                });
+            .setOnTouchListener { _: View, event: MotionEvent ->
+                if (event.action == MotionEvent.ACTION_DOWN) {
+                    isTouchedWeatherInfoAcquisitionSwitch = true
+                }
+                false
+            }
 
         binding.includeWeatherInfoAcquisitionSetting.materialSwitch
-                .setOnCheckedChangeListener(
-                        new WeatherInfoAcquisitionOnCheckedChangeListener()
-                );
+            .setOnCheckedChangeListener(
+                WeatherInfoAcquisitionOnCheckedChangeListener()
+            )
     }
 
-    private class WeatherInfoAcquisitionOnCheckedChangeListener
-            implements CompoundButton.OnCheckedChangeListener {
+    private inner class WeatherInfoAcquisitionOnCheckedChangeListener
 
-        @Override
-        public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-            Objects.requireNonNull(buttonView);
-            if (!isTouchedWeatherInfoAcquisitionSwitch) return;
+        : CompoundButton.OnCheckedChangeListener {
+        override fun onCheckedChanged(buttonView: CompoundButton, isChecked: Boolean) {
+            if (!isTouchedWeatherInfoAcquisitionSwitch) return
 
             if (isChecked) {
-                boolean isGranted = ((MainActivity)requireActivity()).isGrantedAccessLocation();
+                val isGranted = requireMainActivity().isGrantedAccessLocation
                 if (isGranted) {
-                    settingsViewModel.saveWeatherInfoAcquisition(true);
+                    settingsViewModel.saveWeatherInfoAcquisition(true)
                 } else {
-                    binding.includeWeatherInfoAcquisitionSetting.materialSwitch.setChecked(false);
-                    boolean shouldShowRequestPermissionRationale =
-                            ActivityCompat.shouldShowRequestPermissionRationale(
-                                    requireActivity(), Manifest.permission.ACCESS_FINE_LOCATION)
-                                    && ActivityCompat.shouldShowRequestPermissionRationale(
-                                    requireActivity(), Manifest.permission.ACCESS_COARSE_LOCATION);
+                    binding.includeWeatherInfoAcquisitionSetting.materialSwitch.isChecked = false
+                    val shouldShowRequestPermissionRationale =
+                        ActivityCompat.shouldShowRequestPermissionRationale(
+                            requireActivity(), Manifest.permission.ACCESS_FINE_LOCATION
+                        )
+                                && ActivityCompat.shouldShowRequestPermissionRationale(
+                            requireActivity(), Manifest.permission.ACCESS_COARSE_LOCATION
+                        )
                     if (shouldShowRequestPermissionRationale) {
-                        String[] requestPermissions =
-                                {Manifest.permission.ACCESS_FINE_LOCATION,
-                                        Manifest.permission.ACCESS_COARSE_LOCATION};
-                        requestAccessLocationPermissionLauncher.launch(requestPermissions);
+                        val requestPermissions =
+                            arrayOf(
+                                Manifest.permission.ACCESS_FINE_LOCATION,
+                                Manifest.permission.ACCESS_COARSE_LOCATION
+                            )
+                        requestAccessLocationPermissionLauncher.launch(requestPermissions)
                     } else {
-                        binding.includeWeatherInfoAcquisitionSetting.materialSwitch.setChecked(false);
-                        String permissionName = getString(R.string.fragment_settings_permission_name_location);
-                        showPermissionDialog(permissionName);
+                        binding.includeWeatherInfoAcquisitionSetting.materialSwitch.isChecked =
+                            false
+                        val permissionName =
+                            getString(R.string.fragment_settings_permission_name_location)
+                        showPermissionDialog(permissionName)
                     }
                 }
             } else {
-                settingsViewModel.saveWeatherInfoAcquisition(false);
+                settingsViewModel.saveWeatherInfoAcquisition(false)
             }
-            isTouchedWeatherInfoAcquisitionSwitch = false;
+            isTouchedWeatherInfoAcquisitionSwitch = false
         }
     }
 
-    private void setUpAllDiariesDeleteSettingItem() {
-        binding.includeAllDiariesDeleteSetting.textTitle.setOnClickListener(v -> {
-            Objects.requireNonNull(v);
+    private fun setUpAllDiariesDeleteSettingItem() {
+        binding.includeAllDiariesDeleteSetting.textTitle.setOnClickListener {
+            showAllDiariesDeleteDialog()
+        }
 
-            showAllDiariesDeleteDialog();
-        });
-
-        binding.includeAllDiariesDeleteSetting.textValue.setVisibility(View.GONE);
+        binding.includeAllDiariesDeleteSetting.textValue.visibility = View.GONE
     }
 
-    private void setUpAllSettingsInitializationSettingItem() {
-        binding.includeAllSettingsInitializationSetting.textTitle.setOnClickListener(v -> {
-            Objects.requireNonNull(v);
+    private fun setUpAllSettingsInitializationSettingItem() {
+        binding.includeAllSettingsInitializationSetting.textTitle.setOnClickListener {
+            showAllSettingsInitializationDialog()
+        }
 
-            showAllSettingsInitializationDialog();
-        });
-
-        binding.includeAllSettingsInitializationSetting.textValue.setVisibility(View.GONE);
+        binding.includeAllSettingsInitializationSetting.textValue.visibility = View.GONE
     }
 
-    private void setUpAllDataDeleteSettingItem() {
-        binding.includeAllDataDeleteSetting.textTitle.setOnClickListener(v -> {
-            Objects.requireNonNull(v);
+    private fun setUpAllDataDeleteSettingItem() {
+        binding.includeAllDataDeleteSetting.textTitle.setOnClickListener {
+            showAllDataDeleteDialog()
+        }
 
-            showAllDataDeleteDialog();
-        });
-
-        binding.includeAllDataDeleteSetting.textValue.setVisibility(View.GONE);
+        binding.includeAllDataDeleteSetting.textValue.visibility = View.GONE
     }
 
-    private void showThemeColorPickerDialog() {
-        if (isDialogShowing()) return;
+    private fun showThemeColorPickerDialog() {
+        if (isDialogShowing()) return
 
-        NavDirections action =
-                SettingsFragmentDirections
-                        .actionNavigationSettingsFragmentToThemeColorPickerDialog();
-        navController.navigate(action);
+        val action =
+            SettingsFragmentDirections
+                .actionNavigationSettingsFragmentToThemeColorPickerDialog()
+        navController.navigate(action)
     }
 
-    private void showCalendarStartDayPickerDialog(DayOfWeek dayOfWeek) {
-        Objects.requireNonNull(dayOfWeek);
-        if (isDialogShowing()) return;
+    private fun showCalendarStartDayPickerDialog(dayOfWeek: DayOfWeek) {
+        if (isDialogShowing()) return
 
-        NavDirections action =
-                SettingsFragmentDirections
-                        .actionNavigationSettingsFragmentToCalendarStartDayPickerDialog(dayOfWeek);
-        navController.navigate(action);
+        val action: NavDirections =
+            SettingsFragmentDirections
+                .actionNavigationSettingsFragmentToCalendarStartDayPickerDialog(dayOfWeek)
+        navController.navigate(action)
     }
 
-    private void showReminderNotificationTimePickerDialog() {
-        if (isDialogShowing()) return;
+    private fun showReminderNotificationTimePickerDialog() {
+        if (isDialogShowing()) return
 
-        NavDirections action =
-                SettingsFragmentDirections
-                        .actionNavigationSettingsFragmentToReminderNotificationTimePickerDialog();
-        navController.navigate(action);
+        val action =
+            SettingsFragmentDirections
+                .actionNavigationSettingsFragmentToReminderNotificationTimePickerDialog()
+        navController.navigate(action)
     }
 
-    private void showPermissionDialog(String permissionName) {
-        Objects.requireNonNull(permissionName);
-        if (isDialogShowing()) return;
+    private fun showPermissionDialog(permissionName: String) {
+        if (isDialogShowing()) return
 
-        NavDirections action =
-                SettingsFragmentDirections
-                        .actionSettingsFragmentToPermissionDialog(permissionName);
-        navController.navigate(action);
+        val action: NavDirections =
+            SettingsFragmentDirections
+                .actionSettingsFragmentToPermissionDialog(permissionName)
+        navController.navigate(action)
     }
 
-    private void showAllDiariesDeleteDialog() {
-        if (isDialogShowing()) return;
+    private fun showAllDiariesDeleteDialog() {
+        if (isDialogShowing()) return
 
-        NavDirections action =
-                SettingsFragmentDirections
-                        .actionSettingsFragmentToAllDiariesDeleteDialog();
-        navController.navigate(action);
+        val action =
+            SettingsFragmentDirections
+                .actionSettingsFragmentToAllDiariesDeleteDialog()
+        navController.navigate(action)
     }
 
-    private void showAllSettingsInitializationDialog() {
-        if (isDialogShowing()) return;
+    private fun showAllSettingsInitializationDialog() {
+        if (isDialogShowing()) return
 
-        NavDirections action =
-                SettingsFragmentDirections
-                        .actionSettingsFragmentToAllSettingsInitializationDialog();
-        navController.navigate(action);
+        val action =
+            SettingsFragmentDirections
+                .actionSettingsFragmentToAllSettingsInitializationDialog()
+        navController.navigate(action)
     }
 
-    private void showAllDataDeleteDialog() {
-        if (isDialogShowing()) return;
+    private fun showAllDataDeleteDialog() {
+        if (isDialogShowing()) return
 
-        NavDirections action =
-                SettingsFragmentDirections
-                        .actionSettingsFragmentToAllDataDeleteDialog();
-        navController.navigate(action);
+        val action =
+            SettingsFragmentDirections
+                .actionSettingsFragmentToAllDataDeleteDialog()
+        navController.navigate(action)
     }
 
-    @Override
-    protected void navigateAppMessageDialog(@NonNull AppMessage appMessage) {
-        NavDirections action =
-                SettingsFragmentDirections
-                        .actionSettingsFragmentToAppMessageDialog(appMessage);
-        navController.navigate(action);
+    override fun navigateAppMessageDialog(appMessage: AppMessage) {
+        val action: NavDirections =
+            SettingsFragmentDirections
+                .actionSettingsFragmentToAppMessageDialog(appMessage)
+        navController.navigate(action)
     }
 
-    @Override
-    protected void retryOtherAppMessageDialogShow() {
+    override fun retryOtherAppMessageDialogShow() {
         // 処理なし
     }
 
-    private void showApplicationDetailsSettings() {
-        Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
-        Uri uri = Uri.fromParts("package", requireActivity().getPackageName(), null);
-        intent.setData(uri);
-        startActivity(intent);onStart();
+    private fun showApplicationDetailsSettings() {
+        val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+        val uri = Uri.fromParts("package", requireActivity().packageName, null)
+        intent.setData(uri)
+        startActivity(intent)
+        onStart()
     }
 
-    @Override
-    protected void destroyBinding() {
-        binding = null;
+    override fun destroyBinding() {
+        _binding = null
     }
 }
