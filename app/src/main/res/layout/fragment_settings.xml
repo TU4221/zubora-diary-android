@@ -113,7 +113,7 @@
                             app:settingIcon="@{@drawable/ic_notifications_24px}"
                             app:settingTitle="@{@string/fragment_settings_item_title_reminder_notification}"
                             app:isVisibleSettingValue="@{true}"
-                            app:settingValueSwitch="@{settingsViewModel.isCheckedReminderNotificationLiveData}" />
+                            app:settingValueSwitch="@{settingsViewModel.isCheckedReminderNotification}" />
 
                         <com.google.android.material.divider.MaterialDivider
                             android:id="@+id/material_divider_passcode_lock_setting"
@@ -126,7 +126,7 @@
                             app:settingIcon="@{@drawable/ic_lock_24px}"
                             app:settingTitle="@{@string/fragment_settings_item_title_passcode_lock}"
                             app:isVisibleSettingValue="@{false}"
-                            app:settingValueSwitch="@{settingsViewModel.isCheckedPasscodeLockLiveData}" />
+                            app:settingValueSwitch="@{settingsViewModel.isCheckedPasscodeLock}" />
 
                         <com.google.android.material.divider.MaterialDivider
                             android:id="@+id/material_divider_weather_info_acquisition_setting"
@@ -139,7 +139,7 @@
                             app:settingIcon="@{@drawable/ic_sunny_24px}"
                             app:settingTitle="@{@string/fragment_settings_item_title_weather_info_acquisition}"
                             app:isVisibleSettingValue="@{false}"
-                            app:settingValueSwitch="@{settingsViewModel.isCheckedWeatherInfoAcquisitionLiveData}" />
+                            app:settingValueSwitch="@{settingsViewModel.isCheckedWeatherInfoAcquisition}" />
 
                     </LinearLayout>
 

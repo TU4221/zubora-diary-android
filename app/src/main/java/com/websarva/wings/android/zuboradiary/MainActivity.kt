@@ -103,11 +103,11 @@ class MainActivity : AppCompatActivity() {
             LocationRequest.Builder(Priority.PRIORITY_BALANCED_POWER_ACCURACY, 5000)
         locationRequest = builder.build()
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
-        settingsViewModel.isCheckedWeatherInfoAcquisitionLiveData
+        settingsViewModel.isCheckedWeatherInfoAcquisition
             .observe(this) { aBoolean: Boolean? ->
                 var settingValue = aBoolean
                 if (settingValue == null) {
-                    settingValue = settingsViewModel.isCheckedWeatherInfoAcquisitionSetting
+                    settingValue = settingsViewModel.loadIsCheckedWeatherInfoAcquisitionSetting()
                 }
                 if (settingValue) {
                     updateLocationInformation()
@@ -152,7 +152,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setUpThemeColor() {
-        settingsViewModel.themeColorSettingValueLiveData
+        settingsViewModel.themeColor
             .observe(this) { themeColor: ThemeColor? ->
                 var settingValue = themeColor
                 if (settingValue == null) {

@@ -9,6 +9,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -272,7 +273,7 @@ public class SettingsFragment extends BaseFragment {
     private void setUpThemeColorSettingItem() {
         binding.includeThemeColorSetting.textTitle.setOnClickListener(v -> showThemeColorPickerDialog());
 
-        settingsViewModel.getThemeColorSettingValueLiveData()
+        settingsViewModel.getThemeColor()
                 .observe(getViewLifecycleOwner(), themeColor -> {
                     Objects.requireNonNull(themeColor);
 
@@ -371,7 +372,7 @@ public class SettingsFragment extends BaseFragment {
             showCalendarStartDayPickerDialog(currentCalendarStartDayOfWeek);
         });
 
-        settingsViewModel.getCalendarStartDayOfWeekLiveData()
+        settingsViewModel.getCalendarStartDayOfWeek()
                 .observe(getViewLifecycleOwner(), dayOfWeek -> {
                     DayOfWeek settingValue = dayOfWeek;
                     if (settingValue == null) {
@@ -404,11 +405,12 @@ public class SettingsFragment extends BaseFragment {
                         new ReminderNotificationOnCheckedChangeListener()
                 );
 
-        settingsViewModel.getIsCheckedReminderNotificationLiveData()
+        settingsViewModel.isCheckedReminderNotification()
                 .observe(getViewLifecycleOwner(), aBoolean -> {
+                    Log.d("20250131", "boolean:" + aBoolean);
                     Boolean settingValue = aBoolean;
                     if (settingValue == null) {
-                        settingValue = settingsViewModel.isCheckedReminderNotificationSetting();
+                        settingValue = settingsViewModel.loadIsCheckedReminderNotificationSetting();
                     }
 
                     if (settingValue) {
@@ -420,7 +422,7 @@ public class SettingsFragment extends BaseFragment {
                     }
                 });
 
-        settingsViewModel.getReminderNotificationTimeLiveData()
+        settingsViewModel.getReminderNotificationTime()
                 .observe(getViewLifecycleOwner(), time -> {
                     // MEMO:未設定の場合nullが代入される。
                     //      その為、nullはエラーではないので下記メソッドの処理は不要(処理するとループする)
@@ -498,7 +500,7 @@ public class SettingsFragment extends BaseFragment {
                     isTouchedPasscodeLockSwitch = false;
                 });
 
-        settingsViewModel.getIsCheckedPasscodeLockLiveData()
+        settingsViewModel.isCheckedPasscodeLock()
                 .observe(getViewLifecycleOwner(), aBoolean -> {
                 });
     }

@@ -214,7 +214,7 @@ class DiaryEditFragment : BaseFragment() {
         if (selectedButton != DialogInterface.BUTTON_POSITIVE) return
 
         val loadDiaryDate = diaryEditViewModel.date.checkNotNull()
-        val geoCoordinates = settingsViewModel.geoCoordinatesLiveData.checkNotNull()
+        val geoCoordinates = settingsViewModel.geoCoordinates.checkNotNull()
         diaryEditViewModel.fetchWeatherInformation(loadDiaryDate, geoCoordinates)
     }
 
@@ -806,7 +806,7 @@ class DiaryEditFragment : BaseFragment() {
     private fun fetchWeatherInfo(date: LocalDate, requestsShowingDialog: Boolean) {
         // HACK:EditFragment起動時、設定値を参照してから位置情報を取得する為、タイムラグが発生する。
         //      対策として記憶boolean変数を用意し、true時は位置情報取得処理コードにて天気情報も取得する。
-        val isChecked = settingsViewModel.isCheckedWeatherInfoAcquisitionSetting
+        val isChecked = settingsViewModel.loadIsCheckedWeatherInfoAcquisitionSetting()
         if (!isChecked) return
 
         val hasUpdatedLocation = settingsViewModel.hasUpdatedGeoCoordinates()
@@ -819,7 +819,7 @@ class DiaryEditFragment : BaseFragment() {
         if (requestsShowingDialog) {
             showWeatherInfoFetchingDialog(date)
         } else {
-            val geoCoordinates = settingsViewModel.geoCoordinatesLiveData.checkNotNull()
+            val geoCoordinates = settingsViewModel.geoCoordinates.checkNotNull()
             diaryEditViewModel.fetchWeatherInformation(date, geoCoordinates)
         }
     }

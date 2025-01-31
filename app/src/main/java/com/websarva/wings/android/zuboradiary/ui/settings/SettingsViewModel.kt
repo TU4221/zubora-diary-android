@@ -1,379 +1,336 @@
-package com.websarva.wings.android.zuboradiary.ui.settings;
+package com.websarva.wings.android.zuboradiary.ui.settings
 
-import android.util.Log;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.datastore.preferences.core.Preferences;
-import androidx.lifecycle.LiveData;
-import androidx.lifecycle.MutableLiveData;
-
-import com.websarva.wings.android.zuboradiary.data.AppMessage;
-import com.websarva.wings.android.zuboradiary.data.database.DiaryRepository;
-import com.websarva.wings.android.zuboradiary.data.network.GeoCoordinates;
-import com.websarva.wings.android.zuboradiary.data.preferences.CalendarStartDayOfWeekPreference;
-import com.websarva.wings.android.zuboradiary.data.preferences.UserPreferencesRepository;
-import com.websarva.wings.android.zuboradiary.data.preferences.WeatherInfoAcquisitionPreference;
-import com.websarva.wings.android.zuboradiary.data.preferences.PassCodeLockPreference;
-import com.websarva.wings.android.zuboradiary.data.preferences.ReminderNotificationPreference;
-import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColorPreference;
-import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor;
-import com.websarva.wings.android.zuboradiary.data.worker.WorkerRepository;
-import com.websarva.wings.android.zuboradiary.ui.BaseViewModel;
-
-import java.time.DayOfWeek;
-import java.time.LocalTime;
-import java.util.Objects;
-import java.util.concurrent.CancellationException;
-import java.util.concurrent.ExecutionException;
-
-import javax.inject.Inject;
-
-import dagger.hilt.android.lifecycle.HiltViewModel;
-import io.reactivex.rxjava3.core.Flowable;
-import io.reactivex.rxjava3.core.Single;
-import io.reactivex.rxjava3.disposables.CompositeDisposable;
+import android.util.Log
+import androidx.datastore.preferences.core.Preferences
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import com.websarva.wings.android.zuboradiary.data.AppMessage
+import com.websarva.wings.android.zuboradiary.data.database.DiaryRepository
+import com.websarva.wings.android.zuboradiary.data.network.GeoCoordinates
+import com.websarva.wings.android.zuboradiary.data.preferences.CalendarStartDayOfWeekPreference
+import com.websarva.wings.android.zuboradiary.data.preferences.PassCodeLockPreference
+import com.websarva.wings.android.zuboradiary.data.preferences.ReminderNotificationPreference
+import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor
+import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColorPreference
+import com.websarva.wings.android.zuboradiary.data.preferences.UserPreferencesRepository
+import com.websarva.wings.android.zuboradiary.data.preferences.WeatherInfoAcquisitionPreference
+import com.websarva.wings.android.zuboradiary.data.worker.WorkerRepository
+import com.websarva.wings.android.zuboradiary.ui.BaseViewModel
+import dagger.hilt.android.lifecycle.HiltViewModel
+import io.reactivex.rxjava3.core.Flowable
+import io.reactivex.rxjava3.core.Single
+import io.reactivex.rxjava3.disposables.CompositeDisposable
+import java.time.DayOfWeek
+import java.time.LocalTime
+import java.util.concurrent.CancellationException
+import java.util.concurrent.ExecutionException
+import javax.inject.Inject
 
 @HiltViewModel
-public class SettingsViewModel extends BaseViewModel {
-    private final UserPreferencesRepository userPreferencesRepository;
-    private final WorkerRepository workerRepository;
-    private final DiaryRepository diaryRepository;
-    private final CompositeDisposable disposables = new CompositeDisposable();
+class SettingsViewModel @Inject constructor(
+    private val userPreferencesRepository: UserPreferencesRepository,
+    private val workerRepository: WorkerRepository,
+    private val diaryRepository: DiaryRepository
+) : BaseViewModel() {
+    private val disposables = CompositeDisposable()
 
-    private final MutableLiveData<ThemeColor> themeColor = new MutableLiveData<>();
-    private final MutableLiveData<DayOfWeek> calendarStartDayOfWeek = new MutableLiveData<>();
-    private final MutableLiveData<Boolean> isCheckedReminderNotification = new MutableLiveData<>();
-    private final MutableLiveData<LocalTime> reminderNotificationTime = new MutableLiveData<>();
-    private final MutableLiveData<Boolean> isCheckedPasscodeLock = new MutableLiveData<>();
-    private final MutableLiveData<Boolean> isCheckedWeatherInfoAcquisition = new MutableLiveData<>();
+    private val _themeColor = MutableLiveData<ThemeColor>()
+    val themeColor: LiveData<ThemeColor>
+        get() = _themeColor
 
-    private final MutableLiveData<GeoCoordinates> geoCoordinates = new MutableLiveData<>();
-    private Flowable<ThemeColorPreference> themeColorPreferenceFlowable;
-    private Flowable<CalendarStartDayOfWeekPreference> calendarStartDayPreferenceFlowable;
-    private Flowable<ReminderNotificationPreference> reminderNotificationPreferenceFlowable;
-    private Flowable<PassCodeLockPreference> passCodeLockPreferenceFlowable;
-    private Flowable<WeatherInfoAcquisitionPreference> weatherInfoAcquisitionPreferenceFlowable;
+    private val _calendarStartDayOfWeek = MutableLiveData<DayOfWeek>()
+    val calendarStartDayOfWeek: LiveData<DayOfWeek>
+        get() = _calendarStartDayOfWeek
 
-    @Inject
-    public SettingsViewModel(
-            UserPreferencesRepository userPreferencesRepository,
-            WorkerRepository workerRepository,
-            DiaryRepository diaryRepository) {
-        this.userPreferencesRepository = userPreferencesRepository;
-        this.workerRepository = workerRepository;
-        this.diaryRepository = diaryRepository;
+    private val _isCheckedReminderNotification = MutableLiveData<Boolean>()
+    val isCheckedReminderNotification: LiveData<Boolean>
+        get() = _isCheckedReminderNotification
 
-        initialize();
+    private val _reminderNotificationTime = MutableLiveData<LocalTime?>()
+    val reminderNotificationTime: LiveData<LocalTime?>
+        get() = _reminderNotificationTime
+
+    private val _isCheckedPasscodeLock = MutableLiveData<Boolean>()
+    val isCheckedPasscodeLock: LiveData<Boolean>
+        get() = _isCheckedPasscodeLock
+
+    private val _isCheckedWeatherInfoAcquisition = MutableLiveData<Boolean>()
+    val isCheckedWeatherInfoAcquisition: LiveData<Boolean>
+        get() = _isCheckedWeatherInfoAcquisition
+
+    private val _geoCoordinates = MutableLiveData<GeoCoordinates?>()
+    val geoCoordinates: LiveData<GeoCoordinates?>
+        get() = _geoCoordinates
+
+    private lateinit var themeColorPreferenceFlowable: Flowable<ThemeColorPreference>
+    private lateinit var calendarStartDayPreferenceFlowable: Flowable<CalendarStartDayOfWeekPreference>
+    private lateinit var reminderNotificationPreferenceFlowable: Flowable<ReminderNotificationPreference>
+    private lateinit var passCodeLockPreferenceFlowable: Flowable<PassCodeLockPreference>
+    private lateinit var weatherInfoAcquisitionPreferenceFlowable: Flowable<WeatherInfoAcquisitionPreference>
+
+    init {
+        initialize()
     }
 
-    @Override
-    protected void initialize() {
-        initializeAppMessageList();
-        setUpThemeColorPreferenceValueLoading();
-        setUpCalendarStartDayOfWeekPreferenceValueLoading();
-        setUpReminderNotificationPreferenceValueLoading();
-        setUpPasscodeLockPreferenceValueLoading();
-        setUpWeatherInfoAcquisitionPreferenceValueLoading();
+    override fun initialize() {
+        initializeAppMessageList()
+        setUpThemeColorPreferenceValueLoading()
+        setUpCalendarStartDayOfWeekPreferenceValueLoading()
+        setUpReminderNotificationPreferenceValueLoading()
+        setUpPasscodeLockPreferenceValueLoading()
+        setUpWeatherInfoAcquisitionPreferenceValueLoading()
     }
 
-    private void setUpThemeColorPreferenceValueLoading() {
-        themeColorPreferenceFlowable = userPreferencesRepository.loadThemeColorPreference();
+    private fun setUpThemeColorPreferenceValueLoading() {
+        themeColorPreferenceFlowable = userPreferencesRepository.loadThemeColorPreference()
         disposables.add(
-                themeColorPreferenceFlowable.subscribe(
-                        value -> {
-                            // HACK:一つのDataStore(UserPreferencesクラス)からFlowableを生成している為、
-                            //      一つのPreferenceを更新すると他のPreferenceのFlowableにも通知される。
-                            //      結果的にObserverにも通知が行き、不必要な処理が発生してしまう。
-                            //      対策として下記コードを記述。(他PreferenceFlowableも同様)
-                            Objects.requireNonNull(value);
-                            ThemeColor themeColor = this.themeColor.getValue();
-                            if (themeColor != null && themeColor.equals(value.toThemeColor())) return;
-
-                            this.themeColor.postValue(value.toThemeColor());
-                        },
-                        throwable -> {
-                            Log.d("Exception", "テーマカラー設定値読込失敗", throwable);
-                            addSettingLoadingErrorMessage();
-                        }
-                )
-        );
+            themeColorPreferenceFlowable.subscribe(
+                { value: ThemeColorPreference ->
+                    // HACK:一つのDataStore(UserPreferencesクラス)からFlowableを生成している為、
+                    //      一つのPreferenceを更新すると他のPreferenceのFlowableにも通知される。
+                    //      結果的にObserverにも通知が行き、不必要な処理が発生してしまう。
+                    //      対策として下記コードを記述。(他PreferenceFlowableも同様)
+                    val themeColor = _themeColor.value
+                    if (themeColor != null && themeColor == value.toThemeColor()) return@subscribe
+                    this._themeColor.postValue(value.toThemeColor())
+                },
+                { throwable: Throwable ->
+                    Log.d("Exception", "テーマカラー設定値読込失敗", throwable)
+                    addSettingLoadingErrorMessage()
+                }
+            )
+        )
     }
 
-    @NonNull
-    public ThemeColor loadThemeColorSettingValue() {
-        ThemeColor themeColorValue = themeColor.getValue();
-        if (themeColorValue != null) return themeColorValue;
-        ThemeColorPreference defaultValue = new ThemeColorPreference();
-        return themeColorPreferenceFlowable.blockingFirst(defaultValue).toThemeColor();
+    fun loadThemeColorSettingValue(): ThemeColor {
+        val themeColorValue = _themeColor.value
+        if (themeColorValue != null) return themeColorValue
+        val defaultValue = ThemeColorPreference()
+        return themeColorPreferenceFlowable.blockingFirst(defaultValue).toThemeColor()
     }
 
-    private void setUpCalendarStartDayOfWeekPreferenceValueLoading() {
+    private fun setUpCalendarStartDayOfWeekPreferenceValueLoading() {
         calendarStartDayPreferenceFlowable =
-                userPreferencesRepository.loadCalendarStartDayOfWeekPreference();
+            userPreferencesRepository.loadCalendarStartDayOfWeekPreference()
         disposables.add(
-                calendarStartDayPreferenceFlowable.subscribe(
-                        value -> {
-                            Objects.requireNonNull(value);
-                            DayOfWeek dayOfWeek = calendarStartDayOfWeek.getValue();
-                            if (dayOfWeek != null && dayOfWeek.equals(value.toDayOfWeek())) return;
+            calendarStartDayPreferenceFlowable.subscribe(
+                { value: CalendarStartDayOfWeekPreference ->
+                    val dayOfWeek = _calendarStartDayOfWeek.value
+                    if (dayOfWeek != null && dayOfWeek == value.toDayOfWeek()) return@subscribe
 
-                            DayOfWeek calendarStartDayOfWeek = value.toDayOfWeek();
-                            this.calendarStartDayOfWeek.postValue(calendarStartDayOfWeek);
-                            },
-                        throwable -> {
-                            Log.d("Exception", "カレンダー開始曜日設定値読込失敗", throwable);
-                            addSettingLoadingErrorMessage();
-                        }
-                )
-        );
+                    val calendarStartDayOfWeek = value.toDayOfWeek()
+                    this._calendarStartDayOfWeek.postValue(calendarStartDayOfWeek)
+                },
+                { throwable: Throwable ->
+                    Log.d("Exception", "カレンダー開始曜日設定値読込失敗", throwable)
+                    addSettingLoadingErrorMessage()
+                }
+            )
+        )
     }
 
-    @NonNull
-    public DayOfWeek loadCalendarStartDaySettingValue() {
-        DayOfWeek dayOfWeekValue = calendarStartDayOfWeek.getValue();
-        if (dayOfWeekValue != null) return dayOfWeekValue;
-        CalendarStartDayOfWeekPreference defaultValue = new CalendarStartDayOfWeekPreference();
-        return calendarStartDayPreferenceFlowable.blockingFirst(defaultValue).toDayOfWeek();
+    fun loadCalendarStartDaySettingValue(): DayOfWeek {
+        val dayOfWeekValue = _calendarStartDayOfWeek.value
+        if (dayOfWeekValue != null) return dayOfWeekValue
+        val defaultValue = CalendarStartDayOfWeekPreference()
+        return calendarStartDayPreferenceFlowable.blockingFirst(defaultValue).toDayOfWeek()
     }
 
-    private void setUpReminderNotificationPreferenceValueLoading() {
+    private fun setUpReminderNotificationPreferenceValueLoading() {
         reminderNotificationPreferenceFlowable =
-                userPreferencesRepository.loadReminderNotificationPreference();
+            userPreferencesRepository.loadReminderNotificationPreference()
         disposables.add(
-                reminderNotificationPreferenceFlowable.subscribe(
-                        value -> {
-                            Objects.requireNonNull(value);
-                            Boolean isChecked = isCheckedReminderNotification.getValue();
-                            if (isChecked != null && isChecked == value.getIsChecked()) return;
+            reminderNotificationPreferenceFlowable.subscribe(
+                { value: ReminderNotificationPreference ->
+                    val isChecked = _isCheckedReminderNotification.value
+                    if (isChecked != null && isChecked == value.isChecked) return@subscribe
 
-                            isCheckedReminderNotification.postValue(value.getIsChecked());
-                            reminderNotificationTime.postValue(value.getNotificationLocalTime());
-                            },
-                        throwable -> {
-                            Log.d("Exception", "リマインダー通知設定値読込失敗", throwable);
-                            addSettingLoadingErrorMessage();
-                        }
-                )
-        );
+                    _isCheckedReminderNotification.postValue(value.isChecked)
+                    _reminderNotificationTime.postValue(value.notificationLocalTime)
+                },
+                { throwable: Throwable ->
+                    Log.d("Exception", "リマインダー通知設定値読込失敗", throwable)
+                    addSettingLoadingErrorMessage()
+                }
+            )
+        )
     }
 
-    public boolean isCheckedReminderNotificationSetting() {
-        Boolean value = isCheckedReminderNotification.getValue();
-        if (value != null) return value;
-        ReminderNotificationPreference defaultValue =
-                new ReminderNotificationPreference();
-        return reminderNotificationPreferenceFlowable.blockingFirst(defaultValue).getIsChecked();
+    fun loadIsCheckedReminderNotificationSetting(): Boolean {
+        val value = _isCheckedReminderNotification.value
+        if (value != null) return value
+        val defaultValue =
+            ReminderNotificationPreference()
+        return reminderNotificationPreferenceFlowable.blockingFirst(defaultValue).isChecked
     }
 
-    @Nullable
-    public LocalTime loadReminderNotificationTimeSettingValue() {
-        LocalTime value = reminderNotificationTime.getValue();
-        if (value != null) return value;
-        ReminderNotificationPreference defaultValue =
-                new ReminderNotificationPreference();
-        return reminderNotificationPreferenceFlowable
-                .blockingFirst(defaultValue).getNotificationLocalTime();
-    }
-
-    private void setUpPasscodeLockPreferenceValueLoading() {
-        passCodeLockPreferenceFlowable = userPreferencesRepository.loadPasscodeLockPreference();
+    private fun setUpPasscodeLockPreferenceValueLoading() {
+        passCodeLockPreferenceFlowable = userPreferencesRepository.loadPasscodeLockPreference()
         disposables.add(
-                passCodeLockPreferenceFlowable.subscribe(
-                        value -> {
-                            Objects.requireNonNull(value);
-                            Boolean isChecked = isCheckedPasscodeLock.getValue();
-                            if (isChecked != null && isChecked == value.getIsChecked()) return;
-
-                            isCheckedPasscodeLock.postValue(value.getIsChecked());
-                        },
-                        throwable -> {
-                            Log.d("Exception", "パスコード設定値読込失敗", throwable);
-                            addSettingLoadingErrorMessage();
-                        }
-                )
-        );
+            passCodeLockPreferenceFlowable.subscribe(
+                { value: PassCodeLockPreference ->
+                    val isChecked = _isCheckedPasscodeLock.value
+                    if (isChecked != null && isChecked == value.isChecked) return@subscribe
+                    _isCheckedPasscodeLock.postValue(value.isChecked)
+                },
+                { throwable: Throwable ->
+                    Log.d("Exception", "パスコード設定値読込失敗", throwable)
+                    addSettingLoadingErrorMessage()
+                }
+            )
+        )
     }
 
-    private void setUpWeatherInfoAcquisitionPreferenceValueLoading() {
+    private fun setUpWeatherInfoAcquisitionPreferenceValueLoading() {
         weatherInfoAcquisitionPreferenceFlowable =
-                userPreferencesRepository.loadWeatherInfoAcquisitionPreference();
+            userPreferencesRepository.loadWeatherInfoAcquisitionPreference()
         disposables.add(
-                weatherInfoAcquisitionPreferenceFlowable.subscribe(
-                        value -> {
-                            Objects.requireNonNull(value);
-                            Boolean isChecked = isCheckedWeatherInfoAcquisition.getValue();
-                            if (isChecked != null && isChecked == value.getIsChecked()) return;
-
-                            isCheckedWeatherInfoAcquisition.postValue(value.getIsChecked());
-                        },
-                        throwable -> {
-                            Log.d("Exception", "天気情報取得設定値読込失敗", throwable);
-                            addSettingLoadingErrorMessage();
-                        }
-                )
-        );
+            weatherInfoAcquisitionPreferenceFlowable.subscribe(
+                { value: WeatherInfoAcquisitionPreference ->
+                    val isChecked = _isCheckedWeatherInfoAcquisition.value
+                    if (isChecked != null && isChecked == value.isChecked) return@subscribe
+                    _isCheckedWeatherInfoAcquisition.postValue(value.isChecked)
+                },
+                { throwable: Throwable ->
+                    Log.d("Exception", "天気情報取得設定値読込失敗", throwable)
+                    addSettingLoadingErrorMessage()
+                }
+            )
+        )
     }
 
-    public boolean isCheckedWeatherInfoAcquisitionSetting() {
-        Boolean value = isCheckedWeatherInfoAcquisition.getValue();
-        if (value != null) return value;
-        WeatherInfoAcquisitionPreference defaultValue =
-                new WeatherInfoAcquisitionPreference();
-        return weatherInfoAcquisitionPreferenceFlowable.blockingFirst(defaultValue).getIsChecked();
+    fun loadIsCheckedWeatherInfoAcquisitionSetting(): Boolean {
+        val value = _isCheckedWeatherInfoAcquisition.value
+        if (value != null) return value
+        val defaultValue =
+            WeatherInfoAcquisitionPreference()
+        return weatherInfoAcquisitionPreferenceFlowable.blockingFirst(defaultValue).isChecked
     }
 
-    private void addSettingLoadingErrorMessage() {
-        if (equalLastAppMessage(AppMessage.SETTING_LOADING_ERROR)) return;  // 設定更新エラー通知の重複防止
-        addAppMessage(AppMessage.SETTING_LOADING_ERROR);
+    private fun addSettingLoadingErrorMessage() {
+        if (equalLastAppMessage(AppMessage.SETTING_LOADING_ERROR)) return  // 設定更新エラー通知の重複防止
+
+        addAppMessage(AppMessage.SETTING_LOADING_ERROR)
     }
 
-    @Override
-    protected void onCleared() {
-        super.onCleared();
-        disposables.clear();
+    override fun onCleared() {
+        super.onCleared()
+        disposables.clear()
     }
 
-    void saveThemeColor(ThemeColor value) {
-        Objects.requireNonNull(value);
-
-        ThemeColorPreference preferenceValue = new ThemeColorPreference(value);
-        Single<Preferences> result = userPreferencesRepository.saveThemeColorPreference(preferenceValue);
-        setUpProcessOnUpdate(result, null);
+    fun saveThemeColor(value: ThemeColor) {
+        val preferenceValue = ThemeColorPreference(value)
+        val result = userPreferencesRepository.saveThemeColorPreference(preferenceValue)
+        setUpProcessOnUpdate(result, null)
     }
 
-    void saveCalendarStartDayOfWeek(DayOfWeek value) {
-        Objects.requireNonNull(value);
-
-        CalendarStartDayOfWeekPreference preferenceValue =
-                new CalendarStartDayOfWeekPreference(value);
-        Single<Preferences> result =
-                userPreferencesRepository.saveCalendarStartDayOfWeekPreference(preferenceValue);
-        setUpProcessOnUpdate(result, null);
+    fun saveCalendarStartDayOfWeek(value: DayOfWeek) {
+        val preferenceValue =
+            CalendarStartDayOfWeekPreference(value)
+        val result =
+            userPreferencesRepository.saveCalendarStartDayOfWeekPreference(preferenceValue)
+        setUpProcessOnUpdate(result, null)
     }
 
-    void saveReminderNotificationValid(LocalTime value) {
-        Objects.requireNonNull(value);
-
-        ReminderNotificationPreference preferenceValue =
-                new ReminderNotificationPreference(true, value);
-        Single<Preferences> result = userPreferencesRepository.saveReminderNotificationPreference(preferenceValue);
-        setUpProcessOnUpdate(result, () -> workerRepository.registerReminderNotificationWorker(value));
+    fun saveReminderNotificationValid(value: LocalTime) {
+        val preferenceValue =
+            ReminderNotificationPreference(true, value)
+        val result = userPreferencesRepository.saveReminderNotificationPreference(preferenceValue)
+        setUpProcessOnUpdate(result) {
+            workerRepository.registerReminderNotificationWorker(value)
+        }
     }
 
-    public void saveReminderNotificationInvalid() {
-        ReminderNotificationPreference preferenceValue =
-                new ReminderNotificationPreference(false,(LocalTime) null);
-        Single<Preferences> result = userPreferencesRepository.saveReminderNotificationPreference(preferenceValue);
-        setUpProcessOnUpdate(result, workerRepository::cancelReminderNotificationWorker);
+    fun saveReminderNotificationInvalid() {
+        val preferenceValue =
+            ReminderNotificationPreference(false, null as LocalTime?)
+        val result = userPreferencesRepository.saveReminderNotificationPreference(preferenceValue)
+        setUpProcessOnUpdate(result) {
+            workerRepository.cancelReminderNotificationWorker()
+        }
     }
 
-    void savePasscodeLock(boolean value) {
-        String passcode;
-        if (value) {
-            passcode = "0000"; // TODO:仮
+    fun savePasscodeLock(value: Boolean) {
+        val passcode = if (value) {
+            "0000" // TODO:仮
         } else {
-            passcode = "";
+            ""
         }
 
-        PassCodeLockPreference preferenceValue = new PassCodeLockPreference(value, passcode);
-        Single<Preferences> result = userPreferencesRepository.savePasscodeLockPreference(preferenceValue);
-        setUpProcessOnUpdate(result, null);
+        val preferenceValue = PassCodeLockPreference(value, passcode)
+        val result = userPreferencesRepository.savePasscodeLockPreference(preferenceValue)
+        setUpProcessOnUpdate(result, null)
     }
 
-    public void saveWeatherInfoAcquisition(boolean value) {
-        WeatherInfoAcquisitionPreference preferenceValue =
-                new WeatherInfoAcquisitionPreference(value);
-        Single<Preferences> result =
-                userPreferencesRepository.saveWeatherInfoAcquisitionPreference(preferenceValue);
-        setUpProcessOnUpdate(result, null);
+    fun saveWeatherInfoAcquisition(value: Boolean) {
+        val preferenceValue =
+            WeatherInfoAcquisitionPreference(value)
+        val result =
+            userPreferencesRepository.saveWeatherInfoAcquisitionPreference(preferenceValue)
+        setUpProcessOnUpdate(result, null)
     }
 
-    @FunctionalInterface
-    private interface OnSettingsUpdateCallback {
-        void onUpdateSettings();
+    private fun interface OnSettingsUpdateCallback {
+        fun onUpdateSettings()
     }
 
-    private void setUpProcessOnUpdate(Single<Preferences> result, @Nullable OnSettingsUpdateCallback callback) {
-        Objects.requireNonNull(result);
-
-        disposables.add(result.subscribe(preferences -> {
-            Objects.requireNonNull(preferences);
-
-            if (callback == null) return;
-            callback.onUpdateSettings();
-        }, throwable -> {
-            Objects.requireNonNull(throwable);
-
-            AppMessage appMessage = AppMessage.SETTING_UPDATE_ERROR;
-            if (equalLastAppMessage(appMessage)) return; // 設定更新エラー通知の重複防止
-            addAppMessage(appMessage);
-        }));
+    private fun setUpProcessOnUpdate(
+        result: Single<Preferences>,
+        callback: OnSettingsUpdateCallback?
+    ) {
+        disposables.add(
+            result.subscribe(
+                { if (callback == null) return@subscribe
+                    callback.onUpdateSettings()
+                },
+                { val appMessage = AppMessage.SETTING_UPDATE_ERROR
+                    if (equalLastAppMessage(appMessage)) return@subscribe  // 設定更新エラー通知の重複防止
+                    addAppMessage(appMessage)
+                }
+            )
+        )
     }
 
-    public void updateGeoCoordinates(GeoCoordinates geoCoordinates) {
-        Objects.requireNonNull(geoCoordinates);
-
-        this.geoCoordinates.setValue(geoCoordinates);
+    fun updateGeoCoordinates(geoCoordinates: GeoCoordinates) {
+        this._geoCoordinates.value = geoCoordinates
     }
 
-    public void clearGeoCoordinates() {
-        geoCoordinates.setValue(null);
+    fun clearGeoCoordinates() {
+        _geoCoordinates.value = null
     }
 
-    public boolean hasUpdatedGeoCoordinates() {
-        GeoCoordinates geoCoordinates = this.geoCoordinates.getValue();
-        return geoCoordinates != null;
+    fun hasUpdatedGeoCoordinates(): Boolean {
+        val geoCoordinates = _geoCoordinates.value
+        return geoCoordinates != null
     }
 
-    void deleteAllDiaries() {
+    fun deleteAllDiaries() {
         try {
-            diaryRepository.deleteAllDiaries().get();
-        } catch (CancellationException | ExecutionException | InterruptedException e) {
-            addAppMessage(AppMessage.DIARY_DELETE_ERROR);
+            diaryRepository.deleteAllDiaries().get()
+        } catch (e: CancellationException) {
+            addAppMessage(AppMessage.DIARY_DELETE_ERROR)
+        } catch (e: ExecutionException) {
+            addAppMessage(AppMessage.DIARY_DELETE_ERROR)
+        } catch (e: InterruptedException) {
+            addAppMessage(AppMessage.DIARY_DELETE_ERROR)
         }
     }
 
-    void deleteAllSettings() {
-        Single<Preferences> result = userPreferencesRepository.initializeAllPreferences();
-        setUpProcessOnUpdate(result, null);
+    fun deleteAllSettings() {
+        val result = userPreferencesRepository.initializeAllPreferences()
+        setUpProcessOnUpdate(result, null)
     }
 
-    void deleteAllData() {
+    fun deleteAllData() {
         try {
-            diaryRepository.deleteAllData().get();
-        } catch (CancellationException | ExecutionException | InterruptedException e) {
-            addAppMessage(AppMessage.DIARY_DELETE_ERROR);
+            diaryRepository.deleteAllData().get()
+        } catch (e: CancellationException) {
+            addAppMessage(AppMessage.DIARY_DELETE_ERROR)
+        } catch (e: ExecutionException) {
+            addAppMessage(AppMessage.DIARY_DELETE_ERROR)
+        } catch (e: InterruptedException) {
+            addAppMessage(AppMessage.DIARY_DELETE_ERROR)
         }
-        deleteAllSettings();
-    }
-
-    // Getter/Setter
-    public LiveData<ThemeColor> getThemeColorSettingValueLiveData() {
-        return themeColor;
-    }
-
-    public LiveData<DayOfWeek> getCalendarStartDayOfWeekLiveData() {
-        return calendarStartDayOfWeek;
-    }
-
-    public LiveData<Boolean> getIsCheckedReminderNotificationLiveData() {
-        return isCheckedReminderNotification;
-    }
-
-    public LiveData<LocalTime> getReminderNotificationTimeLiveData() {
-        return reminderNotificationTime;
-    }
-
-    public LiveData<Boolean> getIsCheckedPasscodeLockLiveData() {
-        return isCheckedPasscodeLock;
-    }
-
-    public LiveData<Boolean> getIsCheckedWeatherInfoAcquisitionLiveData() {
-        return isCheckedWeatherInfoAcquisition;
-    }
-
-    public LiveData<GeoCoordinates> getGeoCoordinatesLiveData() {
-        return geoCoordinates;
+        deleteAllSettings()
     }
 }
