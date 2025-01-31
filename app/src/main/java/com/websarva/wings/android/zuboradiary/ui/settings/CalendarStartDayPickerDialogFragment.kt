@@ -1,98 +1,88 @@
-package com.websarva.wings.android.zuboradiary.ui.settings;
+package com.websarva.wings.android.zuboradiary.ui.settings
 
-import android.content.DialogInterface;
-import android.view.View;
+import android.content.DialogInterface
+import android.view.View
+import com.websarva.wings.android.zuboradiary.data.DayOfWeekStringConverter
+import com.websarva.wings.android.zuboradiary.databinding.DialogFragmentNumberPickersBinding
+import com.websarva.wings.android.zuboradiary.ui.BaseNumberPickersBottomSheetDialogFragment
+import java.time.DayOfWeek
 
-import androidx.annotation.NonNull;
+class CalendarStartDayPickerDialogFragment : BaseNumberPickersBottomSheetDialogFragment() {
 
-import com.websarva.wings.android.zuboradiary.data.DayOfWeekStringConverter;
-import com.websarva.wings.android.zuboradiary.databinding.DialogFragmentNumberPickersBinding;
-import com.websarva.wings.android.zuboradiary.ui.BaseNumberPickersBottomSheetDialogFragment;
-
-import java.time.DayOfWeek;
-
-public class CalendarStartDayPickerDialogFragment extends BaseNumberPickersBottomSheetDialogFragment {
-
-    private static final String FROM_CLASS_NAME = "From" + CalendarStartDayPickerDialogFragment.class.getName();
-    static final String KEY_SELECTED_DAY_OF_WEEK = "SelectedDayOfWeek" + FROM_CLASS_NAME;
-
-    @Override
-    public boolean isCancelableOtherThanPressingButton() {
-        return true;
+    companion object {
+        private val FROM_CLASS_NAME = "From" + CalendarStartDayPickerDialogFragment::class.java.name
+        @JvmField
+        val KEY_SELECTED_DAY_OF_WEEK: String = "SelectedDayOfWeek$FROM_CLASS_NAME"
     }
 
-    @Override
-    protected void handleOnPositiveButtonClick(@NonNull View v) {
-        setResultSelectedDayOfWeek();
+    override val isCancelableOtherThanPressingButton: Boolean
+        get() = true
+
+    override fun handleOnPositiveButtonClick(v: View) {
+        setResultSelectedDayOfWeek()
     }
 
-    private void setResultSelectedDayOfWeek() {
-        int selectedValue = binding.numberPickerFirst.getValue();
+    private fun setResultSelectedDayOfWeek() {
+        val selectedValue = binding.numberPickerFirst.value
         // MEMO:DayOfWeekはMonday～Sundayの値が1～7となる。Sundayを先頭に表示させたいため、下記コード記述。
-        DayOfWeek selectedDayOfWeek;
-        if (selectedValue == 0) {
-            selectedDayOfWeek = DayOfWeek.SUNDAY;
+        val selectedDayOfWeek = if (selectedValue == 0) {
+            DayOfWeek.SUNDAY
         } else {
-            selectedDayOfWeek = DayOfWeek.of(selectedValue);
+            DayOfWeek.of(selectedValue)
         }
-        setResult(KEY_SELECTED_DAY_OF_WEEK, selectedDayOfWeek);
+        setResult(KEY_SELECTED_DAY_OF_WEEK, selectedDayOfWeek)
     }
 
-    @Override
-    protected void handleOnNegativeButtonClick(@NonNull View v) {
+    override fun handleOnNegativeButtonClick(v: View) {
         // 処理なし
     }
 
-    @Override
-    protected void handleOnCancel(@NonNull DialogInterface dialog) {
+    override fun handleOnCancel(dialog: DialogInterface) {
         // 処理なし
     }
 
-    @Override
-    protected void handleOnDismiss() {
+    override fun handleOnDismiss() {
         // 処理なし
     }
 
-    @Override
-    protected void setUpNumberPickers(DialogFragmentNumberPickersBinding binding) {
-        int maxNumDaysOfWeek = DayOfWeek.values().length;
-        this.binding.numberPickerFirst.setMaxValue(maxNumDaysOfWeek - 1);
-        this.binding.numberPickerFirst.setMinValue(0);
-        setUpInitialValue(this.binding);
-        setUpDisplayedValues(this.binding);
-        this.binding.numberPickerFirst.setWrapSelectorWheel(false);
-        this.binding.numberPickerSecond.setVisibility(View.GONE);
-        this.binding.numberPickerThird.setVisibility(View.GONE);
+    override fun setUpNumberPickers(binding: DialogFragmentNumberPickersBinding) {
+        val maxNumDaysOfWeek = DayOfWeek.entries.size
+        binding.numberPickerFirst.maxValue = maxNumDaysOfWeek - 1
+        binding.numberPickerFirst.minValue = 0
+        setUpInitialValue(binding)
+        setUpDisplayedValues(binding)
+        binding.numberPickerFirst.wrapSelectorWheel = false
+        binding.numberPickerSecond.visibility = View.GONE
+        binding.numberPickerThird.visibility = View.GONE
     }
 
-    private void setUpInitialValue(DialogFragmentNumberPickersBinding binding) {
-        DayOfWeek currentCalendarStartDayOfWeek =
-                CalendarStartDayPickerDialogFragmentArgs
-                        .fromBundle(requireArguments()).getInitialValue();
-        int initialValue;
+    private fun setUpInitialValue(binding: DialogFragmentNumberPickersBinding) {
+        val currentCalendarStartDayOfWeek =
+            CalendarStartDayPickerDialogFragmentArgs
+                .fromBundle(requireArguments()).initialValue
         // MEMO:DayOfWeekはMonday～Sundayの値が1～7となる。Sundayを先頭に表示させたいため、下記コード記述。
-        if (currentCalendarStartDayOfWeek == DayOfWeek.SUNDAY) {
-            initialValue = 0;
+        val initialValue = if (currentCalendarStartDayOfWeek == DayOfWeek.SUNDAY) {
+            0
         } else {
-            initialValue = currentCalendarStartDayOfWeek.getValue();
+            currentCalendarStartDayOfWeek.value
         }
-        binding.numberPickerFirst.setValue(initialValue); // MEMO:最大最小値を設定してから設定すること。(0の位置が表示される)
+        binding.numberPickerFirst.value = initialValue // MEMO:最大最小値を設定してから設定すること。(0の位置が表示される)
     }
 
-    private void setUpDisplayedValues(DialogFragmentNumberPickersBinding binding) {
-        int maxNumDaysOfWeek = DayOfWeek.values().length;
-        String[] dayOfWeekList = new String[maxNumDaysOfWeek];
-        for (DayOfWeek dayOfWeek: DayOfWeek.values()) {
-            int dayOfWeekNumber;
+    private fun setUpDisplayedValues(binding: DialogFragmentNumberPickersBinding) {
+        val maxNumDaysOfWeek = DayOfWeek.entries.size
+        val dayOfWeekList = arrayOfNulls<String>(maxNumDaysOfWeek)
+        for (dayOfWeek in DayOfWeek.entries) {
             // MEMO:DayOfWeekはMonday～Sundayの値が1～7となる。Sundayを先頭に表示させたいため、下記コード記述。
-            if (dayOfWeek == DayOfWeek.SUNDAY) {
-                dayOfWeekNumber = 0;
+            val dayOfWeekNumber = if (dayOfWeek == DayOfWeek.SUNDAY) {
+                0
             } else {
-                dayOfWeekNumber = dayOfWeek.getValue();
+                dayOfWeek.value
             }
-            DayOfWeekStringConverter dayOfWeekStringConverter = new DayOfWeekStringConverter(requireContext());
-            dayOfWeekList[dayOfWeekNumber] = dayOfWeekStringConverter.toCalendarStartDayOfWeek(dayOfWeek);
+            val dayOfWeekStringConverter = DayOfWeekStringConverter(requireContext())
+            dayOfWeekList[dayOfWeekNumber] =
+                dayOfWeekStringConverter.toCalendarStartDayOfWeek(dayOfWeek)
         }
-        binding.numberPickerFirst.setDisplayedValues(dayOfWeekList);
+        binding.numberPickerFirst.displayedValues = dayOfWeekList
     }
 }
