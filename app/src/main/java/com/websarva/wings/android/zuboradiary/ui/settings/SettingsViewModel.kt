@@ -34,28 +34,30 @@ class SettingsViewModel @Inject constructor(
 ) : BaseViewModel() {
     private val disposables = CompositeDisposable()
 
-    private val _themeColor = MutableLiveData<ThemeColor>()
-    val themeColor: LiveData<ThemeColor>
+    // MEMO:MutableLiveDataに値セットするまでFlowableによるラグが発生するためnull許容型とする。
+    //      これにより、Observerの引数がnull許容型となりnull時の処理ができる。
+    private val _themeColor = MutableLiveData<ThemeColor?>()
+    val themeColor: LiveData<ThemeColor?>
         get() = _themeColor
 
-    private val _calendarStartDayOfWeek = MutableLiveData<DayOfWeek>()
-    val calendarStartDayOfWeek: LiveData<DayOfWeek>
+    private val _calendarStartDayOfWeek = MutableLiveData<DayOfWeek?>()
+    val calendarStartDayOfWeek: LiveData<DayOfWeek?>
         get() = _calendarStartDayOfWeek
 
-    private val _isCheckedReminderNotification = MutableLiveData<Boolean>()
-    val isCheckedReminderNotification: LiveData<Boolean>
+    private val _isCheckedReminderNotification = MutableLiveData<Boolean?>()
+    val isCheckedReminderNotification: LiveData<Boolean?>
         get() = _isCheckedReminderNotification
 
     private val _reminderNotificationTime = MutableLiveData<LocalTime?>()
     val reminderNotificationTime: LiveData<LocalTime?>
         get() = _reminderNotificationTime
 
-    private val _isCheckedPasscodeLock = MutableLiveData<Boolean>()
-    val isCheckedPasscodeLock: LiveData<Boolean>
+    private val _isCheckedPasscodeLock = MutableLiveData<Boolean?>()
+    val isCheckedPasscodeLock: LiveData<Boolean?>
         get() = _isCheckedPasscodeLock
 
-    private val _isCheckedWeatherInfoAcquisition = MutableLiveData<Boolean>()
-    val isCheckedWeatherInfoAcquisition: LiveData<Boolean>
+    private val _isCheckedWeatherInfoAcquisition = MutableLiveData<Boolean?>()
+    val isCheckedWeatherInfoAcquisition: LiveData<Boolean?>
         get() = _isCheckedWeatherInfoAcquisition
 
     private val _geoCoordinates = MutableLiveData<GeoCoordinates?>()
