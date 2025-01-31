@@ -1,75 +1,68 @@
-package com.websarva.wings.android.zuboradiary.ui.settings;
+package com.websarva.wings.android.zuboradiary.ui.settings
 
-import android.content.DialogInterface;
-import android.view.View;
+import android.content.DialogInterface
+import android.view.View
+import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor
+import com.websarva.wings.android.zuboradiary.databinding.DialogFragmentNumberPickersBinding
+import com.websarva.wings.android.zuboradiary.ui.BaseNumberPickersBottomSheetDialogFragment
 
-import androidx.annotation.NonNull;
+class ThemeColorPickerDialogFragment : BaseNumberPickersBottomSheetDialogFragment() {
 
-import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor;
-import com.websarva.wings.android.zuboradiary.databinding.DialogFragmentNumberPickersBinding;
-import com.websarva.wings.android.zuboradiary.ui.BaseNumberPickersBottomSheetDialogFragment;
-
-public class ThemeColorPickerDialogFragment extends BaseNumberPickersBottomSheetDialogFragment {
-
-    private static final String fromClassName = "From" + ThemeColorPickerDialogFragment.class.getName();
-    static final String KEY_SELECTED_THEME_COLOR = "SelectedThemeColor" + fromClassName;
-
-    @Override
-    public boolean isCancelableOtherThanPressingButton() {
-        return true;
+    companion object {
+        private val fromClassName = "From" + ThemeColorPickerDialogFragment::class.java.name
+        @JvmField
+        val KEY_SELECTED_THEME_COLOR: String = "SelectedThemeColor$fromClassName"
     }
 
-    @Override
-    protected void handleOnPositiveButtonClick(@NonNull View v) {
-        setResultSelectedThemeColor();
+    override val isCancelableOtherThanPressingButton: Boolean
+        get() = true
+
+    override fun handleOnPositiveButtonClick(v: View) {
+        setResultSelectedThemeColor()
     }
 
-    private void setResultSelectedThemeColor() {
-        int selectedValue = binding.numberPickerFirst.getValue();
-        ThemeColor selectedThemeColor = ThemeColor.values()[selectedValue];
+    private fun setResultSelectedThemeColor() {
+        val selectedValue = binding.numberPickerFirst.value
+        val selectedThemeColor = ThemeColor.entries[selectedValue]
 
-        setResult(KEY_SELECTED_THEME_COLOR, selectedThemeColor);
+        setResult(KEY_SELECTED_THEME_COLOR, selectedThemeColor)
     }
 
-    @Override
-    protected void handleOnNegativeButtonClick(@NonNull View v) {
+    override fun handleOnNegativeButtonClick(v: View) {
         // 処理なし
     }
 
-    @Override
-    protected void handleOnCancel(@NonNull DialogInterface dialog) {
+    override fun handleOnCancel(dialog: DialogInterface) {
         // 処理なし
     }
 
-    @Override
-    protected void handleOnDismiss() {
-
+    override fun handleOnDismiss() {
     }
 
-    @Override
-    protected void setUpNumberPickers(DialogFragmentNumberPickersBinding binding) {
-        int maxNumThemeColors = ThemeColor.values().length;
-        this.binding.numberPickerFirst.setMaxValue(maxNumThemeColors - 1);
-        this.binding.numberPickerFirst.setMinValue(0);
-        setUpInitialValue();
-        setUpDisplayedValues();
-        this.binding.numberPickerFirst.setWrapSelectorWheel(false);
-        this.binding.numberPickerSecond.setVisibility(View.GONE);
-        this.binding.numberPickerThird.setVisibility(View.GONE);
+    override fun setUpNumberPickers(binding: DialogFragmentNumberPickersBinding) {
+        val maxNumThemeColors = ThemeColor.entries.size
+        binding.numberPickerFirst.maxValue = maxNumThemeColors - 1
+        binding.numberPickerFirst.minValue = 0
+        setUpInitialValue()
+        setUpDisplayedValues()
+        binding.numberPickerFirst.wrapSelectorWheel = false
+        binding.numberPickerSecond.visibility = View.GONE
+        binding.numberPickerThird.visibility = View.GONE
     }
 
-    private void setUpInitialValue() {
-        ThemeColor currentThemeColor = requireThemeColor();
-        binding.numberPickerFirst.setValue(currentThemeColor.ordinal()); // MEMO:最大最小値を設定してから設定すること。(0の位置が表示される)
+    private fun setUpInitialValue() {
+        val currentThemeColor = requireThemeColor()
+        binding.numberPickerFirst.value =
+            currentThemeColor.ordinal // MEMO:最大最小値を設定してから設定すること。(0の位置が表示される)
     }
 
-    private void setUpDisplayedValues() {
-        int maxNumThemeColors = ThemeColor.values().length;
-        String[] themeColorList = new String[maxNumThemeColors];
-        for (ThemeColor item: ThemeColor.values()) {
-            int ordinal = item.ordinal();
-            themeColorList[ordinal] = item.toSting(requireContext());
+    private fun setUpDisplayedValues() {
+        val maxNumThemeColors = ThemeColor.entries.size
+        val themeColorList = arrayOfNulls<String>(maxNumThemeColors)
+        for (item in ThemeColor.entries) {
+            val ordinal = item.ordinal
+            themeColorList[ordinal] = item.toSting(requireContext())
         }
-        binding.numberPickerFirst.setDisplayedValues(themeColorList);
+        binding.numberPickerFirst.displayedValues = themeColorList
     }
 }
