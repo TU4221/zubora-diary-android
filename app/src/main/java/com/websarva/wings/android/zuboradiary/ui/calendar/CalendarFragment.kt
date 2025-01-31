@@ -25,7 +25,6 @@ import com.websarva.wings.android.zuboradiary.databinding.FragmentCalendarBindin
 import com.websarva.wings.android.zuboradiary.databinding.LayoutCalendarDayBinding
 import com.websarva.wings.android.zuboradiary.databinding.LayoutCalendarHeaderBinding
 import com.websarva.wings.android.zuboradiary.ui.BaseFragment
-import com.websarva.wings.android.zuboradiary.ui.diary.DiaryLiveData
 import com.websarva.wings.android.zuboradiary.ui.diary.diaryshow.DiaryShowFragment
 import com.websarva.wings.android.zuboradiary.ui.diary.diaryshow.DiaryShowFragment.ConditionObserver
 import com.websarva.wings.android.zuboradiary.ui.diary.diaryshow.DiaryShowFragment.LogObserver
@@ -428,12 +427,13 @@ class CalendarFragment : BaseFragment() {
             )
 
         // 項目レイアウト設定
-        val itemLayouts = arrayOfNulls<View>(DiaryLiveData.MAX_ITEMS)
-        itemLayouts[0] = binding.includeDiaryShow.includeItem1.linerLayoutDiaryShowItem
-        itemLayouts[1] = binding.includeDiaryShow.includeItem2.linerLayoutDiaryShowItem
-        itemLayouts[2] = binding.includeDiaryShow.includeItem3.linerLayoutDiaryShowItem
-        itemLayouts[3] = binding.includeDiaryShow.includeItem4.linerLayoutDiaryShowItem
-        itemLayouts[4] = binding.includeDiaryShow.includeItem5.linerLayoutDiaryShowItem
+        val itemLayouts = arrayOf(
+            binding.includeDiaryShow.includeItem1.linerLayoutDiaryShowItem,
+            binding.includeDiaryShow.includeItem2.linerLayoutDiaryShowItem,
+            binding.includeDiaryShow.includeItem3.linerLayoutDiaryShowItem,
+            binding.includeDiaryShow.includeItem4.linerLayoutDiaryShowItem,
+            binding.includeDiaryShow.includeItem5.linerLayoutDiaryShowItem,
+        )
         diaryShowViewModel.numVisibleItemsLiveData
             .observe(viewLifecycleOwner, DiaryShowFragment.NumVisibleItemsObserver(itemLayouts))
 
