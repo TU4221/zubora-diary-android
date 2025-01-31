@@ -1,110 +1,93 @@
-package com.websarva.wings.android.zuboradiary.ui.diary.diaryitemtitleedit;
+package com.websarva.wings.android.zuboradiary.ui.diary.diaryitemtitleedit
 
-import androidx.annotation.NonNull;
-import androidx.lifecycle.LiveData;
-import androidx.lifecycle.MutableLiveData;
-
-import com.websarva.wings.android.zuboradiary.data.AppMessage;
-import com.websarva.wings.android.zuboradiary.data.database.DiaryItemTitleSelectionHistoryItemEntity;
-import com.websarva.wings.android.zuboradiary.data.database.DiaryItemTitleSelectionHistoryRepository;
-import com.websarva.wings.android.zuboradiary.data.diary.ItemNumber;
-import com.websarva.wings.android.zuboradiary.ui.BaseViewModel;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-
-import javax.inject.Inject;
-
-import dagger.hilt.android.lifecycle.HiltViewModel;
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import com.websarva.wings.android.zuboradiary.data.AppMessage
+import com.websarva.wings.android.zuboradiary.data.database.DiaryItemTitleSelectionHistoryItemEntity
+import com.websarva.wings.android.zuboradiary.data.database.DiaryItemTitleSelectionHistoryRepository
+import com.websarva.wings.android.zuboradiary.data.diary.ItemNumber
+import com.websarva.wings.android.zuboradiary.ui.BaseViewModel
+import com.websarva.wings.android.zuboradiary.ui.checkNotNull
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 
 @HiltViewModel
-public class DiaryItemTitleEditViewModel extends BaseViewModel {
+class DiaryItemTitleEditViewModel @Inject constructor(
+    private val diaryItemTitleSelectionHistoryRepository: DiaryItemTitleSelectionHistoryRepository
+) : BaseViewModel() {
 
-    private final DiaryItemTitleSelectionHistoryRepository diaryItemTitleSelectionHistoryRepository;
-    private final MutableLiveData<ItemNumber> itemNumber = new MutableLiveData<>();
-    private final MutableLiveData<String> itemTitle = new MutableLiveData<>();
-    private final MutableLiveData<SelectionHistoryList> selectionHistoryList = new MutableLiveData<>();
-    private static final int MAX_LOADED_ITEM_TITLES = 50;
-
-    @Inject
-    public DiaryItemTitleEditViewModel(
-            DiaryItemTitleSelectionHistoryRepository diaryItemTitleSelectionHistoryRepository) {
-        this.diaryItemTitleSelectionHistoryRepository = diaryItemTitleSelectionHistoryRepository;
-        initialize();
+    companion object {
+        private const val MAX_LOADED_ITEM_TITLES = 50
     }
 
-    @Override
-    protected void initialize() {
-        initializeAppMessageList();
-        itemNumber.setValue(null);
-        itemTitle.setValue("");
-        selectionHistoryList.setValue(new SelectionHistoryList());
+    private val _itemNumber = MutableLiveData<ItemNumber?>()
+    val itemNumber: LiveData<ItemNumber?> get() = _itemNumber
+
+    private val _itemTitle = MutableLiveData<String>()
+    val itemTitle: LiveData<String> get() = _itemTitle
+
+    /**
+     * LayoutDataBinding用
+     * */
+    val itemTitleMutable get() = _itemTitle
+
+    private val _itemTitleSelectionHistoryList = MutableLiveData<SelectionHistoryList>()
+    val itemTitleSelectionHistoryLiveData: LiveData<SelectionHistoryList>
+        get() = _itemTitleSelectionHistoryList
+
+
+    init {
+        initialize()
     }
 
-    void updateDiaryItemTitle(ItemNumber itemNumber, String itemTitle) {
-        Objects.requireNonNull(itemNumber);
-        Objects.requireNonNull(itemTitle);
-
-        this.itemNumber.setValue(itemNumber);
-        this.itemTitle.setValue(itemTitle);
+    override fun initialize() {
+        initializeAppMessageList()
+        _itemNumber.value = null
+        _itemTitle.value = ""
+        _itemTitleSelectionHistoryList.value = SelectionHistoryList()
     }
 
-   void loadDiaryItemTitleSelectionHistory() {
-        List<DiaryItemTitleSelectionHistoryItemEntity> loadedList;
+    fun updateDiaryItemTitle(itemNumber: ItemNumber, itemTitle: String) {
+        _itemNumber.value = itemNumber
+        _itemTitle.value = itemTitle
+    }
+
+    fun loadDiaryItemTitleSelectionHistory() {
+        val loadedList: List<DiaryItemTitleSelectionHistoryItemEntity>
         try {
             loadedList =
-                    diaryItemTitleSelectionHistoryRepository
-                            .loadSelectionHistory(MAX_LOADED_ITEM_TITLES,0).get();
-        } catch (Exception e) {
-            addAppMessage(AppMessage.DIARY_ITEM_TITLE_HISTORY_LOADING_ERROR);
-            return;
+                diaryItemTitleSelectionHistoryRepository
+                    .loadSelectionHistory(MAX_LOADED_ITEM_TITLES, 0).get()
+        } catch (e: Exception) {
+            addAppMessage(AppMessage.DIARY_ITEM_TITLE_HISTORY_LOADING_ERROR)
+            return
         }
-        List<SelectionHistoryListItem> itemList = new ArrayList<>();
-        loadedList.stream().forEach(x -> itemList.add(new SelectionHistoryListItem(x)));
-        SelectionHistoryList list = new SelectionHistoryList(itemList);
-        selectionHistoryList.setValue(list);
+        val itemList: MutableList<SelectionHistoryListItem> = ArrayList()
+        loadedList.stream().forEach { x: DiaryItemTitleSelectionHistoryItemEntity ->
+            itemList.add(
+                SelectionHistoryListItem(x)
+            )
+        }
+        val list = SelectionHistoryList(itemList)
+        _itemTitleSelectionHistoryList.value = list
     }
 
-    void deleteDiaryItemTitleSelectionHistoryItem(int deletePosition) {
-        if (deletePosition < 0) throw new IllegalArgumentException();
+    fun deleteDiaryItemTitleSelectionHistoryItem(deletePosition: Int) {
+        require(deletePosition >= 0)
 
-        SelectionHistoryList currentList = selectionHistoryList.getValue();
-        Objects.requireNonNull(currentList);
-        int listSize = currentList.getSelectionHistoryListItemList().size();
-        if (deletePosition >= listSize) throw new IllegalArgumentException();
+        val currentList = _itemTitleSelectionHistoryList.checkNotNull()
+        val listSize = currentList.selectionHistoryListItemList.size
+        require(deletePosition < listSize)
 
-        SelectionHistoryListItem deleteItem =
-                currentList.getSelectionHistoryListItemList().get(deletePosition);
-        String deleteTitle = deleteItem.getTitle();
+        val deleteItem = currentList.selectionHistoryListItemList[deletePosition]
+        val deleteTitle = deleteItem.title
         try {
-            diaryItemTitleSelectionHistoryRepository.deleteSelectionHistoryItem(deleteTitle).get();
-        } catch (Exception e) {
-            addAppMessage(AppMessage.DIARY_ITEM_TITLE_HISTORY_ITEM_DELETE_ERROR);
-            return;
+            diaryItemTitleSelectionHistoryRepository.deleteSelectionHistoryItem(deleteTitle).get()
+        } catch (e: Exception) {
+            addAppMessage(AppMessage.DIARY_ITEM_TITLE_HISTORY_ITEM_DELETE_ERROR)
+            return
         }
 
-        selectionHistoryList.setValue(currentList.deleteItem(deletePosition));
-    }
-
-    // LiveDataGetter
-    @NonNull
-    LiveData<ItemNumber> getItemNumberLiveData() {
-        return itemNumber;
-    }
-
-    @NonNull
-    LiveData<String> getItemTitleLiveData() {
-        return itemTitle;
-    }
-
-    @NonNull
-    public MutableLiveData<String> getItemTitleMutableLiveData() {
-        return itemTitle;
-    }
-
-    @NonNull
-    LiveData<SelectionHistoryList> getItemTitleSelectionHistoryLiveData() {
-        return selectionHistoryList;
+        _itemTitleSelectionHistoryList.value = currentList.deleteItem(deletePosition)
     }
 }

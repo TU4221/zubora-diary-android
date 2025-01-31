@@ -1,6 +1,6 @@
 package com.websarva.wings.android.zuboradiary.ui.diary.diaryitemtitleedit
 
-internal class SelectionHistoryList {
+class SelectionHistoryList {
 
     val selectionHistoryListItemList: List<SelectionHistoryListItem>
 

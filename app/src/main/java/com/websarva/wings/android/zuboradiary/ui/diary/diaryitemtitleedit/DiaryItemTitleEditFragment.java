@@ -130,7 +130,7 @@ public class DiaryItemTitleEditFragment extends BaseFragment {
     }
 
     private void setUpToolBar() {
-        ItemNumber targetItemNumber = diaryItemTitleEditViewModel.getItemNumberLiveData().getValue();
+        ItemNumber targetItemNumber = diaryItemTitleEditViewModel.getItemNumber().getValue();
         Objects.requireNonNull(targetItemNumber);
 
         String toolBarTitle = getString(R.string.fragment_diary_item_title_edit_toolbar_first_title) + targetItemNumber + getString(R.string.fragment_diary_item_title_edit_toolbar_second_title);
@@ -161,7 +161,7 @@ public class DiaryItemTitleEditFragment extends BaseFragment {
             boolean isError = Objects.nonNull(binding.textInputLayoutNewItemTitle.getError());
             if (isError) return;
 
-            String title = diaryItemTitleEditViewModel.getItemTitleLiveData().getValue();
+            String title = diaryItemTitleEditViewModel.getItemTitle().getValue();
             Objects.requireNonNull(title);
             completeItemTitleEdit(title);
         });
@@ -232,7 +232,7 @@ public class DiaryItemTitleEditFragment extends BaseFragment {
     private void completeItemTitleEdit(String newItemTitle) {
         Objects.requireNonNull(newItemTitle);
 
-        ItemNumber targetItemNumber = diaryItemTitleEditViewModel.getItemNumberLiveData().getValue();
+        ItemNumber targetItemNumber = diaryItemTitleEditViewModel.getItemNumber().getValue();
         Objects.requireNonNull(targetItemNumber);
 
         NavBackStackEntry navBackStackEntry = navController.getPreviousBackStackEntry();

@@ -56,7 +56,7 @@
                         android:layout_height="wrap_content"
                         android:hint="@string/fragment_diary_item_title_edit_new_item_title_hint"
                         android:maxLength="@integer/fragment_diary_item_title_edit_item_title_max_length"
-                        android:text="@={diaryItemTitleEditViewModel.itemTitleMutableLiveData}"
+                        android:text="@={diaryItemTitleEditViewModel.itemTitleMutable}"
                         android:textSize="@dimen/fragment_diary_item_title_edit_text_size" />
 
                 </com.google.android.material.textfield.TextInputLayout>
