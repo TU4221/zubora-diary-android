@@ -39,13 +39,13 @@ public abstract class WordSearchResultYearMonthListAdapter extends DiaryYearMont
         Objects.requireNonNull(holder);
 
         WordSearchResultDayListAdapter wordSearchResultDayListAdapter =
-                new WordSearchResultDayListAdapter(context, holder.binding.recyclerDayList, themeColor);
+                new WordSearchResultDayListAdapter(getContext(), holder.getBinding().recyclerDayList, getThemeColor());
         wordSearchResultDayListAdapter.build();
         wordSearchResultDayListAdapter.setOnClickItemListener(item -> {
             Objects.requireNonNull(item);
-            if (onClickChildItemListener == null) return;
+            if (getOnClickChildItemListener() == null) return;
 
-            onClickChildItemListener.onClick(item);
+            getOnClickChildItemListener().onClick(item);
         });
         return wordSearchResultDayListAdapter;
     }

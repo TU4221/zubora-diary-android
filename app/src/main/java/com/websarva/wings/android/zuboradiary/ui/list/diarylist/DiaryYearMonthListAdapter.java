@@ -39,13 +39,13 @@ public abstract class DiaryYearMonthListAdapter extends SwipeDiaryYearMonthListB
         Objects.requireNonNull(holder);
 
         DiaryDayListAdapter diaryDayListAdapter =
-                new DiaryDayListAdapter(context, holder.binding.recyclerDayList, themeColor);
+                new DiaryDayListAdapter(getContext(), holder.getBinding().recyclerDayList, getThemeColor());
         diaryDayListAdapter.build();
         diaryDayListAdapter.setOnClickItemListener(item -> {
             Objects.requireNonNull(item);
-            if (onClickChildItemListener == null) return;
+            if (getOnClickChildItemListener() == null) return;
 
-            onClickChildItemListener.onClick(item);
+            getOnClickChildItemListener().onClick(item);
         });
         diaryDayListAdapter.setOnClickDeleteButtonListener(item -> {
             Objects.requireNonNull(item);

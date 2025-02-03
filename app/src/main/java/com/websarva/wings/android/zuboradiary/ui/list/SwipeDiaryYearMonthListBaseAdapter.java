@@ -31,7 +31,7 @@ public abstract class SwipeDiaryYearMonthListBaseAdapter extends DiaryYearMonthL
 
     public void build() {
         super.build();
-        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+        getRecyclerView().addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
                 super.onScrollStateChanged(recyclerView, newState);
@@ -54,7 +54,7 @@ public abstract class SwipeDiaryYearMonthListBaseAdapter extends DiaryYearMonthL
             DiaryYearMonthListViewHolder diaryYearMonthListViewHolder =
                                                             (DiaryYearMonthListViewHolder) holder;
             DiaryListSimpleCallback diaryListSimpleCallback =
-                    new DiaryListSimpleCallback(recyclerView, diaryYearMonthListViewHolder.binding.recyclerDayList);
+                    new DiaryListSimpleCallback(getRecyclerView(), diaryYearMonthListViewHolder.getBinding().recyclerDayList);
             diaryListSimpleCallback.build();
             simpleCallbackList.add(diaryListSimpleCallback);
         }
