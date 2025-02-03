@@ -115,7 +115,7 @@ public class WordSearchFragment extends BaseFragment {
     }
 
     private void setUpWordSearchView() {
-        String searchWord = wordSearchViewModel.getSearchWordMutableLiveData().getValue();
+        String searchWord = wordSearchViewModel.getSearchWord().getValue();
         Objects.requireNonNull(searchWord);
         if (searchWord.isEmpty()) {
             binding.editTextSearchWord.requestFocus();
@@ -123,7 +123,7 @@ public class WordSearchFragment extends BaseFragment {
             keyboardInitializer.show(binding.editTextSearchWord);
         }
 
-        wordSearchViewModel.getSearchWordMutableLiveData()
+        wordSearchViewModel.getSearchWord()
                 .observe(getViewLifecycleOwner(), s -> {
                     Objects.requireNonNull(s);
                     // HACK:キーワードの入力時と確定時に検索Observerが起動してしまい
@@ -163,10 +163,10 @@ public class WordSearchFragment extends BaseFragment {
             showShowDiaryFragment(item.getDate());
         });
 
-        wordSearchViewModel.getWordSearchResultListLiveData()
+        wordSearchViewModel.getWordSearchResultList()
                 .observe(getViewLifecycleOwner(), new WordSearchResultListObserver());
 
-        wordSearchViewModel.getNumWordSearchResultsLiveData()
+        wordSearchViewModel.getNumWordSearchResults()
                 .observe(getViewLifecycleOwner(), integer -> {
                     Objects.requireNonNull(integer);
 
@@ -220,7 +220,7 @@ public class WordSearchFragment extends BaseFragment {
                             binding.recyclerWordSearchResultList.getAdapter();
             Objects.requireNonNull(listAdapter);
 
-            String searchWord = wordSearchViewModel.getSearchWordLiveData().getValue();
+            String searchWord = wordSearchViewModel.getSearchWord().getValue();
             Objects.requireNonNull(searchWord);
             if (searchWord.isEmpty()) {
                 binding.floatingActionButtonTopScroll.hide(); // MEMO:初回起動用
@@ -242,7 +242,7 @@ public class WordSearchFragment extends BaseFragment {
 
     private void updateWordSearchResultList() {
         WordSearchResultYearMonthList list =
-                wordSearchViewModel.getWordSearchResultListLiveData().getValue();
+                wordSearchViewModel.getWordSearchResultList().getValue();
         Objects.requireNonNull(list);
 
         if (list.getWordSearchResultYearMonthListItemList().isEmpty()) return;

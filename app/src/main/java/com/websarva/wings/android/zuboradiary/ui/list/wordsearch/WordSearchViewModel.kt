@@ -1,303 +1,320 @@
-package com.websarva.wings.android.zuboradiary.ui.list.wordsearch;
+package com.websarva.wings.android.zuboradiary.ui.list.wordsearch
 
-import android.util.Log;
-
-import androidx.annotation.NonNull;
-import androidx.lifecycle.LiveData;
-import androidx.lifecycle.MutableLiveData;
-
-import com.google.common.util.concurrent.ListenableFuture;
-import com.websarva.wings.android.zuboradiary.data.AppMessage;
-import com.websarva.wings.android.zuboradiary.data.database.DiaryRepository;
-import com.websarva.wings.android.zuboradiary.data.database.WordSearchResultListItem;
-import com.websarva.wings.android.zuboradiary.ui.BaseViewModel;
-import com.websarva.wings.android.zuboradiary.ui.list.diarylist.DiaryListViewModel;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.concurrent.CancellationException;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-
-import javax.inject.Inject;
-
-import dagger.hilt.android.lifecycle.HiltViewModel;
+import android.util.Log
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import com.websarva.wings.android.zuboradiary.data.AppMessage
+import com.websarva.wings.android.zuboradiary.data.database.DiaryRepository
+import com.websarva.wings.android.zuboradiary.data.database.WordSearchResultListItem
+import com.websarva.wings.android.zuboradiary.ui.BaseViewModel
+import com.websarva.wings.android.zuboradiary.ui.checkNotNull
+import com.websarva.wings.android.zuboradiary.ui.list.diarylist.DiaryListViewModel
+import dagger.hilt.android.lifecycle.HiltViewModel
+import java.util.concurrent.CancellationException
+import java.util.concurrent.ExecutionException
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.Executors
+import java.util.concurrent.Future
+import javax.inject.Inject
 
 @HiltViewModel
-public class WordSearchViewModel extends BaseViewModel {
+class WordSearchViewModel @Inject internal constructor(
+    private val diaryRepository: DiaryRepository
+) : BaseViewModel() {
 
-    private final DiaryRepository diaryRepository;
-    private final MutableLiveData<String> searchWord = new MutableLiveData<>();
-    private Future<?> wordSearchResultListLoadingFuture; // キャンセル用
-    private final MutableLiveData<WordSearchResultYearMonthList> wordSearchResultList = new MutableLiveData<>();
-    private final MutableLiveData<Integer> numWordSearchResults = new MutableLiveData<>();
+    companion object {
+        private const val NUM_LOADING_ITEMS = DiaryListViewModel.NUM_LOADING_ITEMS
+    }
+
+    private val _searchWord: MutableLiveData<String> = MutableLiveData()
+    val searchWord: LiveData<String>
+        get() = _searchWord
+    /**
+     * LayoutDataBinding用
+     * */
+    val searchWordMutable: MutableLiveData<String>
+        get() = _searchWord
+
+    private var wordSearchResultListLoadingFuture: Future<*>? = null // キャンセル用
+
+    private val _wordSearchResultList = MutableLiveData<WordSearchResultYearMonthList>()
+    val wordSearchResultList: LiveData<WordSearchResultYearMonthList>
+        get() = _wordSearchResultList
+
+    private val _numWordSearchResults = MutableLiveData<Int>()
+    val numWordSearchResults: LiveData<Int>
+        get() = _numWordSearchResults
 
     /**
      * データベース読込からRecyclerViewへの反映までを true とする。
      */
-    private final MutableLiveData<Boolean> isVisibleUpdateProgressBar = new MutableLiveData<>();
-    private static final int NUM_LOADING_ITEMS = DiaryListViewModel.NUM_LOADING_ITEMS;
-    private final ExecutorService executorService;
+    private val _isVisibleUpdateProgressBar = MutableLiveData<Boolean>()
+    val isVisibleUpdateProgressBar: LiveData<Boolean>
+        get() = _isVisibleUpdateProgressBar
 
-    private final boolean isValidityDelay = true;// TODO:調整用
+    private val executorService: ExecutorService = Executors.newSingleThreadExecutor()
 
-    @Inject
-    WordSearchViewModel(DiaryRepository diaryRepository) {
-        this.diaryRepository = diaryRepository;
-        this.executorService = Executors.newSingleThreadExecutor();
-        initialize();
+    private val isValidityDelay = true // TODO:調整用
+
+    init {
+        initialize()
     }
 
-    @Override
-    public void initialize() {
-        initializeAppMessageList();
-        searchWord.setValue("");
-        wordSearchResultList.setValue(new WordSearchResultYearMonthList());
-        numWordSearchResults.setValue(0);
-        isVisibleUpdateProgressBar.setValue(false);
-        cancelPreviousLoading();
-        wordSearchResultListLoadingFuture = null;
+    public override fun initialize() {
+        initializeAppMessageList()
+        _searchWord.value = ""
+        _wordSearchResultList.value = WordSearchResultYearMonthList()
+        _numWordSearchResults.value = 0
+        _isVisibleUpdateProgressBar.value = false
+        cancelPreviousLoading()
+        wordSearchResultListLoadingFuture = null
     }
 
-    boolean canLoadWordSearchResultList() {
-        Log.d("OnScrollDiaryList", "isLoadingDiaryList()");
-        if (wordSearchResultListLoadingFuture == null) {
-            Log.d("OnScrollDiaryList", "wordSearchResultListLoadingFuture == null");
-            return true;
+    fun canLoadWordSearchResultList(): Boolean {
+        Log.d("OnScrollDiaryList", "isLoadingDiaryList()")
+        val currentFuture = wordSearchResultListLoadingFuture
+        if (currentFuture == null) {
+            Log.d("OnScrollDiaryList", "wordSearchResultListLoadingFuture == null")
+            return true
         }
-        return wordSearchResultListLoadingFuture.isDone();
+        return currentFuture.isDone
     }
 
-    void loadNewWordSearchResultList(int spannableStringColor, int spannableStringBackgroundColor) {
+    fun loadNewWordSearchResultList(
+        spannableStringColor: Int,
+        spannableStringBackgroundColor: Int
+    ) {
         loadWordSearchResultDiaryList(
-                new NewWordSearchResultListCreator(), spannableStringColor, spannableStringBackgroundColor);
+            NewWordSearchResultListCreator(),
+            spannableStringColor,
+            spannableStringBackgroundColor
+        )
     }
 
-    void loadAdditionWordSearchResultList(int spannableStringColor, int spannableStringBackgroundColor) {
+    fun loadAdditionWordSearchResultList(
+        spannableStringColor: Int,
+        spannableStringBackgroundColor: Int
+    ) {
         loadWordSearchResultDiaryList(
-                new AddedWordSearchResultListCreator(), spannableStringColor, spannableStringBackgroundColor);
+            AddedWordSearchResultListCreator(),
+            spannableStringColor,
+            spannableStringBackgroundColor
+        )
     }
 
-    void updateWordSearchResultList(int spannableStringColor, int spannableStringBackgroundColor) {
+    fun updateWordSearchResultList(
+        spannableStringColor: Int,
+        spannableStringBackgroundColor: Int
+    ) {
         loadWordSearchResultDiaryList(
-                new UpdateWordSearchResultListCreator(), spannableStringColor, spannableStringBackgroundColor);
+            UpdateWordSearchResultListCreator(),
+            spannableStringColor,
+            spannableStringBackgroundColor
+        )
     }
 
-    private void loadWordSearchResultDiaryList(
-            WordSearchResultListCreator creator, int spannableStringColor, int spannableStringBackgroundColor){
-        Objects.requireNonNull(creator);
-
-        cancelPreviousLoading();
-        Runnable loadWordSearchResultList =
-                new WordSearchResultListLoadingRunnable(
-                        creator, spannableStringColor, spannableStringBackgroundColor);
-        wordSearchResultListLoadingFuture = executorService.submit(loadWordSearchResultList);
+    private fun loadWordSearchResultDiaryList(
+        creator: WordSearchResultListCreator,
+        spannableStringColor: Int,
+        spannableStringBackgroundColor: Int
+    ) {
+        cancelPreviousLoading()
+        val loadWordSearchResultList =
+            WordSearchResultListLoadingRunnable(
+                creator, spannableStringColor, spannableStringBackgroundColor
+            )
+        wordSearchResultListLoadingFuture = executorService.submit(loadWordSearchResultList)
     }
 
-    private void cancelPreviousLoading() {
+    private fun cancelPreviousLoading() {
         if (!canLoadWordSearchResultList()) {
-            Log.d("WordSearchLoading","Cancel");
-            wordSearchResultListLoadingFuture.cancel(true);
+            Log.d("WordSearchLoading", "Cancel")
+            checkNotNull(wordSearchResultListLoadingFuture).cancel(true)
         }
     }
 
     private interface WordSearchResultListCreator {
-
-        @NonNull
-        WordSearchResultYearMonthList create(int spannableStringColor, int spannableStringBackGroundColor)
-                throws CancellationException, ExecutionException, InterruptedException;
+        @Throws(
+            CancellationException::class,
+            ExecutionException::class,
+            InterruptedException::class
+        )
+        fun create(
+            spannableStringColor: Int,
+            spannableStringBackGroundColor: Int
+        ): WordSearchResultYearMonthList
     }
 
-    private class WordSearchResultListLoadingRunnable implements Runnable {
+    private inner class WordSearchResultListLoadingRunnable(
+        private val resultListCreator: WordSearchResultListCreator,
+        private val spannableStringColor: Int,
+        private val spannableStringBackGroundColor: Int
+    ) : Runnable {
 
-        private final WordSearchResultListCreator resultListCreator;
-        private final int spannableStringColor;
-        private final int spannableStringBackGroundColor;
-
-        private WordSearchResultListLoadingRunnable(
-                WordSearchResultListCreator resultListCreator,
-                int spannableStringColor, int spannableStringBackGroundColor) {
-            Objects.requireNonNull(resultListCreator);
-
-            this.resultListCreator = resultListCreator;
-            this.spannableStringColor = spannableStringColor;
-            this.spannableStringBackGroundColor = spannableStringBackGroundColor;
-        }
-        @Override
-        public void run() {
-            Log.d("WordSearchLoading", "run()_start");
-            WordSearchResultYearMonthList previousResultList = wordSearchResultList.getValue();
-            Objects.requireNonNull(previousResultList);
+        override fun run() {
+            Log.d("WordSearchLoading", "run()_start")
+            val previousResultList = _wordSearchResultList.checkNotNull()
 
             try {
-                WordSearchResultYearMonthList updateResultList =
-                        resultListCreator.create(spannableStringColor, spannableStringBackGroundColor);
-                wordSearchResultList.postValue(updateResultList);
-            } catch (CancellationException e) {
-                Log.d("Exception", "ワード検索結果読込キャンセル", e);
+                val updateResultList =
+                    resultListCreator.create(spannableStringColor, spannableStringBackGroundColor)
+                _wordSearchResultList.postValue(updateResultList)
+            } catch (e: CancellationException) {
+                Log.d("Exception", "ワード検索結果読込キャンセル", e)
                 // 例外処理なし
-            } catch (InterruptedException e) {
-                Log.d("Exception", "ワード検索結果読込キャンセル", e);
+            } catch (e: InterruptedException) {
+                Log.d("Exception", "ワード検索結果読込キャンセル", e)
                 if (!isValidityDelay) {
-                    wordSearchResultList.postValue(previousResultList);
-                    addAppMessage(AppMessage.DIARY_LOADING_ERROR);
+                    _wordSearchResultList.postValue(previousResultList)
+                    addAppMessage(AppMessage.DIARY_LOADING_ERROR)
                 }
-            } catch (Exception e) {
-                Log.d("Exception", "ワード検索結果読込キャンセル", e);
-                wordSearchResultList.postValue(previousResultList);
-                addAppMessage(AppMessage.DIARY_LOADING_ERROR);
+            } catch (e: Exception) {
+                Log.d("Exception", "ワード検索結果読込キャンセル", e)
+                _wordSearchResultList.postValue(previousResultList)
+                addAppMessage(AppMessage.DIARY_LOADING_ERROR)
             }
         }
     }
 
-    private class NewWordSearchResultListCreator implements WordSearchResultListCreator {
-
-        @Override
-        @NonNull
-        public WordSearchResultYearMonthList create(int spannableStringColor, int spannableStringBackGroundColor)
-                throws CancellationException, ExecutionException, InterruptedException {
-            showWordSearchResultListFirstItemProgressIndicator();
-            if (isValidityDelay) Thread.sleep(1000);
+    private inner class NewWordSearchResultListCreator : WordSearchResultListCreator {
+        @Throws(
+            CancellationException::class,
+            ExecutionException::class,
+            InterruptedException::class
+        )
+        override fun create(
+            spannableStringColor: Int,
+            spannableStringBackGroundColor: Int
+        ): WordSearchResultYearMonthList {
+            showWordSearchResultListFirstItemProgressIndicator()
+            if (isValidityDelay) Thread.sleep(1000)
             return loadWordSearchResultDiaryList(
-                    NUM_LOADING_ITEMS, 0, spannableStringColor, spannableStringBackGroundColor);
+                NUM_LOADING_ITEMS, 0, spannableStringColor, spannableStringBackGroundColor
+            )
         }
 
-        private void showWordSearchResultListFirstItemProgressIndicator() {
-            WordSearchResultYearMonthList list =
-                    new WordSearchResultYearMonthList(false);
-            wordSearchResultList.postValue(list);
-            numWordSearchResults.postValue(0);
-        }
-    }
-
-    private class AddedWordSearchResultListCreator implements WordSearchResultListCreator {
-
-        @Override
-        @NonNull
-        public WordSearchResultYearMonthList create(int spannableStringColor, int spannableStringBackGroundColor)
-                throws CancellationException, ExecutionException, InterruptedException {
-            WordSearchResultYearMonthList currentResultList = wordSearchResultList.getValue();
-            Objects.requireNonNull(currentResultList);
-            if (currentResultList.getWordSearchResultYearMonthListItemList().isEmpty()) throw new IllegalStateException();
-
-            if (isValidityDelay) Thread.sleep(1000);
-            int loadingOffset = currentResultList.countDiaries();
-            WordSearchResultYearMonthList loadedResultList =
-                    loadWordSearchResultDiaryList(
-                            NUM_LOADING_ITEMS, loadingOffset, spannableStringColor, spannableStringBackGroundColor);
-            int numLoadedDiaries = currentResultList.countDiaries() + loadedResultList.countDiaries();
-            boolean existsUnloadedDiaries = existsUnloadedDiaries(numLoadedDiaries);
-            return currentResultList.combineDiaryLists(loadedResultList, !existsUnloadedDiaries);
+        fun showWordSearchResultListFirstItemProgressIndicator() {
+            val list = WordSearchResultYearMonthList(false)
+            _wordSearchResultList.postValue(list)
+            _numWordSearchResults.postValue(0)
         }
     }
 
-    private class UpdateWordSearchResultListCreator implements WordSearchResultListCreator {
+    private inner class AddedWordSearchResultListCreator : WordSearchResultListCreator {
+        @Throws(
+            CancellationException::class,
+            ExecutionException::class,
+            InterruptedException::class
+        )
+        override fun create(
+            spannableStringColor: Int,
+            spannableStringBackGroundColor: Int
+        ): WordSearchResultYearMonthList {
+            val currentResultList = _wordSearchResultList.checkNotNull()
+            check(currentResultList.wordSearchResultYearMonthListItemList.isNotEmpty())
 
-        @Override
-        @NonNull
-        public WordSearchResultYearMonthList create(int spannableStringColor, int spannableStringBackGroundColor)
-                throws CancellationException, ExecutionException, InterruptedException {
-            WordSearchResultYearMonthList currentResultList = wordSearchResultList.getValue();
-            Objects.requireNonNull(currentResultList);
-            if (currentResultList.getWordSearchResultYearMonthListItemList().isEmpty()) throw new IllegalStateException();
+            if (isValidityDelay) Thread.sleep(1000)
+            val loadingOffset = currentResultList.countDiaries()
+            val loadedResultList =
+                loadWordSearchResultDiaryList(
+                    NUM_LOADING_ITEMS,
+                    loadingOffset,
+                    spannableStringColor,
+                    spannableStringBackGroundColor
+                )
+            val numLoadedDiaries =
+                currentResultList.countDiaries() + loadedResultList.countDiaries()
+            val existsUnloadedDiaries = existsUnloadedDiaries(numLoadedDiaries)
+            return currentResultList.combineDiaryLists(loadedResultList, !existsUnloadedDiaries)
+        }
+    }
 
-            isVisibleUpdateProgressBar.postValue(true);
+    private inner class UpdateWordSearchResultListCreator : WordSearchResultListCreator {
+        @Throws(
+            CancellationException::class,
+            ExecutionException::class,
+            InterruptedException::class
+        )
+        override fun create(
+            spannableStringColor: Int,
+            spannableStringBackGroundColor: Int
+        ): WordSearchResultYearMonthList {
+            val currentResultList = _wordSearchResultList.checkNotNull()
+            check(currentResultList.wordSearchResultYearMonthListItemList.isNotEmpty())
+
+            _isVisibleUpdateProgressBar.postValue(true)
             try {
-                if (isValidityDelay) Thread.sleep(3000);
-                int numLoadingItems = currentResultList.countDiaries();
+                if (isValidityDelay) Thread.sleep(3000)
+                var numLoadingItems = currentResultList.countDiaries()
                 // HACK:画面全体にリストアイテムが存在しない状態で日記を追加した後にリスト画面に戻ると、
                 //      日記追加前のアイテム数しか表示されない状態となる。また、スクロール更新もできない。
                 //      対策として下記コードを記述。
                 if (numLoadingItems < NUM_LOADING_ITEMS) {
-                    numLoadingItems = NUM_LOADING_ITEMS;
+                    numLoadingItems = NUM_LOADING_ITEMS
                 }
                 return loadWordSearchResultDiaryList(
-                        numLoadingItems, 0, spannableStringColor, spannableStringBackGroundColor);
+                    numLoadingItems, 0, spannableStringColor, spannableStringBackGroundColor
+                )
             } finally {
-                isVisibleUpdateProgressBar.postValue(false);
+                _isVisibleUpdateProgressBar.postValue(false)
             }
         }
     }
 
-    @NonNull
-    private WordSearchResultYearMonthList loadWordSearchResultDiaryList(
-            int numLoadingItems, int loadingOffset, int spannableStringColor, int spannableStringBackGroundColor)
-            throws CancellationException, ExecutionException, InterruptedException {
-        if (numLoadingItems <= 0) throw new IllegalArgumentException();
-        if (loadingOffset < 0) throw new IllegalArgumentException();
+    @Throws(
+        CancellationException::class,
+        ExecutionException::class,
+        InterruptedException::class
+    )
+    private fun loadWordSearchResultDiaryList(
+        numLoadingItems: Int,
+        loadingOffset: Int,
+        spannableStringColor: Int,
+        spannableStringBackGroundColor: Int
+    ): WordSearchResultYearMonthList {
+        require(numLoadingItems > 0)
+        require(loadingOffset >= 0)
 
-        String searchWord = this.searchWord.getValue();
-        Objects.requireNonNull(searchWord);
+        val searchWord = _searchWord.checkNotNull()
 
-        ListenableFuture<List<WordSearchResultListItem>> listenableFutureResults =
-                diaryRepository.loadWordSearchResultDiaryList(
-                        numLoadingItems, loadingOffset, searchWord
-                );
+        val listenableFutureResults =
+            diaryRepository.loadWordSearchResultDiaryList(
+                numLoadingItems, loadingOffset, searchWord
+            )
 
-        List<WordSearchResultListItem> loadedResultList = listenableFutureResults.get();
+        val loadedResultList = listenableFutureResults.get()
 
-        if (loadedResultList.isEmpty()) return new WordSearchResultYearMonthList();
-        List<WordSearchResultDayListItem> resultDayListItemList = new ArrayList<>();
-        loadedResultList.stream().forEach(x ->
-                resultDayListItemList.add(
-                        new WordSearchResultDayListItem(
-                                x, searchWord, spannableStringColor, spannableStringBackGroundColor)
+        if (loadedResultList.isEmpty()) return WordSearchResultYearMonthList()
+        val resultDayListItemList: MutableList<WordSearchResultDayListItem> = ArrayList()
+        loadedResultList.stream().forEach { x: WordSearchResultListItem ->
+            resultDayListItemList.add(
+                WordSearchResultDayListItem(
+                    x, searchWord, spannableStringColor, spannableStringBackGroundColor
                 )
-        );
-        WordSearchResultDayList resultDayList = new WordSearchResultDayList(resultDayListItemList);
-        boolean existsUnloadedDiaries = existsUnloadedDiaries(resultDayList.countDiaries());
-        return new WordSearchResultYearMonthList(resultDayList, !existsUnloadedDiaries);
+            )
+        }
+        val resultDayList = WordSearchResultDayList(resultDayListItemList)
+        val existsUnloadedDiaries = existsUnloadedDiaries(resultDayList.countDiaries())
+        return WordSearchResultYearMonthList(resultDayList, !existsUnloadedDiaries)
     }
 
-    private boolean existsUnloadedDiaries(int numLoadedDiaries)
-            throws CancellationException, ExecutionException, InterruptedException {
+    @Throws(
+        CancellationException::class,
+        ExecutionException::class,
+        InterruptedException::class
+    )
+    private fun existsUnloadedDiaries(numLoadedDiaries: Int): Boolean {
+        val searchWord = _searchWord.checkNotNull()
 
-        String searchWord = this.searchWord.getValue();
-        Objects.requireNonNull(searchWord);
+        val numExistingDiaries = diaryRepository.countWordSearchResultDiaries(searchWord).get()
+        _numWordSearchResults.postValue(numExistingDiaries)
+        if (numExistingDiaries <= 0) return false
 
-        Integer numExistingDiaries = diaryRepository.countWordSearchResultDiaries(searchWord).get();
-        Objects.requireNonNull(numExistingDiaries);
-        this.numWordSearchResults.postValue(numExistingDiaries);
-        if (numExistingDiaries <= 0) return false;
-
-        return numLoadedDiaries < numExistingDiaries;
+        return numLoadedDiaries < numExistingDiaries
     }
 
-    // LiveDataGetter
-    // MEMO:単一データバインディングの場合、ゲッターの戻り値はLiveData<>にすること。
-    //      双方向データバインディングの場合、ゲッターの戻り値はMutableLiveData<>にすること。
-    @NonNull
-    LiveData<String> getSearchWordLiveData() {
-        return searchWord;
+    override fun onCleared() {
+        super.onCleared()
+        executorService.shutdown()
     }
-
-    @NonNull
-    public MutableLiveData<String> getSearchWordMutableLiveData() {
-        return searchWord;
-    }
-
-    @NonNull
-    LiveData<WordSearchResultYearMonthList> getWordSearchResultListLiveData() {
-        return wordSearchResultList;
-    }
-
-    @NonNull
-    public LiveData<Integer> getNumWordSearchResultsLiveData() {
-        return numWordSearchResults;
-    }
-
-    @NonNull
-    public LiveData<Boolean> getIsVisibleUpdateProgressBarLiveData() {
-        return isVisibleUpdateProgressBar;
-    }
-
-    @Override
-    protected void onCleared() {
-        super.onCleared();
-        executorService.shutdown();
-    }
-
 }
