@@ -1,109 +1,105 @@
-package com.websarva.wings.android.zuboradiary.ui.list.wordsearch;
+package com.websarva.wings.android.zuboradiary.ui.list.wordsearch
 
-import android.content.Context;
-import android.util.Log;
+import android.content.Context
+import android.util.Log
+import androidx.recyclerview.widget.RecyclerView
+import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor
+import com.websarva.wings.android.zuboradiary.ui.list.DiaryDayListBaseAdapter
+import com.websarva.wings.android.zuboradiary.ui.list.DiaryDayListBaseItem
+import com.websarva.wings.android.zuboradiary.ui.list.DiaryYearMonthListBaseAdapter
+import com.websarva.wings.android.zuboradiary.ui.list.DiaryYearMonthListBaseItem
 
-import androidx.annotation.NonNull;
-import androidx.recyclerview.widget.RecyclerView;
+abstract class WordSearchResultYearMonthListAdapter(
+    context: Context,
+    recyclerView: RecyclerView,
+    themeColor: ThemeColor
+) :
+    DiaryYearMonthListBaseAdapter(context, recyclerView, themeColor, DiffUtilItemCallback()) {
 
-import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor;
-import com.websarva.wings.android.zuboradiary.ui.list.DiaryDayListBaseItem;
-import com.websarva.wings.android.zuboradiary.ui.list.DiaryYearMonthListBaseAdapter;
-import com.websarva.wings.android.zuboradiary.ui.list.DiaryYearMonthListBaseItem;
+    override fun createDiaryDayList(
+        holder: DiaryYearMonthListViewHolder, item: DiaryYearMonthListBaseItem
+    ) {
+        if (item !is WordSearchResultYearMonthListItem) throw IllegalStateException()
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-
-public abstract class WordSearchResultYearMonthListAdapter extends DiaryYearMonthListBaseAdapter {
-    public WordSearchResultYearMonthListAdapter(
-            Context context,
-            RecyclerView recyclerView,
-            ThemeColor themeColor) {
-        super(context, recyclerView, themeColor, new DiffUtilItemCallback());
+        val listAdapter = createWordSearchResultDayListAdapter(holder)
+        listAdapter.submitList(item.wordSearchResultDayList.wordSearchResultDayListItemList)
     }
 
-    @Override
-    public void createDiaryDayList(
-            DiaryYearMonthListBaseAdapter.DiaryYearMonthListViewHolder holder, DiaryYearMonthListBaseItem item) {
-        WordSearchResultYearMonthListItem _item = (WordSearchResultYearMonthListItem) item;
-        WordSearchResultDayListAdapter listAdapter = createWordSearchResultDayListAdapter(holder);
-        List<DiaryDayListBaseItem> convertedList =
-                new ArrayList<>(_item.getWordSearchResultDayList().getWordSearchResultDayListItemList());
-        listAdapter.submitList(convertedList);
-    }
-
-    @NonNull
-    private WordSearchResultDayListAdapter createWordSearchResultDayListAdapter(
-            DiaryYearMonthListBaseAdapter.DiaryYearMonthListViewHolder holder) {
-        Objects.requireNonNull(holder);
-
-        WordSearchResultDayListAdapter wordSearchResultDayListAdapter =
-                new WordSearchResultDayListAdapter(getContext(), holder.getBinding().recyclerDayList, getThemeColor());
-        wordSearchResultDayListAdapter.build();
-        wordSearchResultDayListAdapter.setOnClickItemListener(item -> {
-            Objects.requireNonNull(item);
-            if (getOnClickChildItemListener() == null) return;
-
-            getOnClickChildItemListener().onClick(item);
-        });
-        return wordSearchResultDayListAdapter;
-    }
-
-    private static class DiffUtilItemCallback extends DiaryYearMonthListBaseAdapter.DiffUtilItemCallback {
-
-        @Override
-        public boolean areContentsTheSame(@NonNull DiaryYearMonthListBaseItem oldItem, @NonNull DiaryYearMonthListBaseItem newItem) {
-            Log.d("WordSearchYearMonthList", "DiffUtil.ItemCallback_areContentsTheSame()");
-            Log.d("WordSearchYearMonthList", "oldItem_YearMonth:" + oldItem.getYearMonth());
-            Log.d("WordSearchYearMonthList", "newItem_YearMonth:" + newItem.getYearMonth());
-            // 日
-            if (oldItem instanceof WordSearchResultYearMonthListItem
-                    && newItem instanceof WordSearchResultYearMonthListItem) {
-                Log.d("WordSearchYearMonthList", "WordSearchResultYearMonthListItem");
-                WordSearchResultYearMonthListItem _oldItem = (WordSearchResultYearMonthListItem) oldItem;
-                WordSearchResultYearMonthListItem _newItem = (WordSearchResultYearMonthListItem) newItem;
-                int oldChildListSize =
-                        _oldItem.getWordSearchResultDayList().getWordSearchResultDayListItemList().size();
-                int newChildListSize =
-                        _newItem.getWordSearchResultDayList().getWordSearchResultDayListItemList().size();
-                if (oldChildListSize != newChildListSize) {
-                    Log.d("WordSearchYearMonthList", "ChildList_Size不一致");
-                    return false;
+    private fun createWordSearchResultDayListAdapter(
+        holder: DiaryYearMonthListViewHolder
+    ): WordSearchResultDayListAdapter {
+        val wordSearchResultDayListAdapter =
+            WordSearchResultDayListAdapter(context, holder.binding.recyclerDayList, themeColor)
+        return wordSearchResultDayListAdapter.apply {
+            build()
+            onClickItemListener =
+                DiaryDayListBaseAdapter.OnClickItemListener { item: DiaryDayListBaseItem ->
+                    if (onClickChildItemListener == null) return@OnClickItemListener
+                    onClickChildItemListener!!.onClick(item)
                 }
+        }
+    }
 
-                for (int i = 0; i < oldChildListSize; i++) {
-                    WordSearchResultDayListItem oldChildListItem =
-                            _oldItem.getWordSearchResultDayList().getWordSearchResultDayListItemList().get(i);
-                    WordSearchResultDayListItem newChildListItem =
-                            _newItem.getWordSearchResultDayList().getWordSearchResultDayListItemList().get(i);
-                    Log.d("WordSearchYearMonthList", "oldChildListItem_Date:" + oldChildListItem.getDate());
-                    Log.d("WordSearchYearMonthList", "newChildListItem_Date:" + newChildListItem.getDate());
+    private class DiffUtilItemCallback : DiaryYearMonthListBaseAdapter.DiffUtilItemCallback() {
+        override fun areContentsTheSame(
+            oldItem: DiaryYearMonthListBaseItem,
+            newItem: DiaryYearMonthListBaseItem
+        ): Boolean {
+            Log.d("WordSearchYearMonthList", "DiffUtil.ItemCallback_areContentsTheSame()")
+            Log.d("WordSearchYearMonthList", "oldItem_YearMonth:" + oldItem.yearMonth)
+            Log.d("WordSearchYearMonthList", "newItem_YearMonth:" + newItem.yearMonth)
 
-                    if (!oldChildListItem.getDate().equals(newChildListItem.getDate())) {
-                        Log.d("WordSearchYearMonthList", "ChildListItem_Date不一致");
-                        return false;
-                    }
-                    if (!oldChildListItem.getTitle().equals(newChildListItem.getTitle())) {
-                        Log.d("WordSearchYearMonthList", "ChildListItem_Title不一致");
-                        return false;
-                    }
-                    if (oldChildListItem.getItemNumber() != newChildListItem.getItemNumber()) {
-                        Log.d("WordSearchYearMonthList", "ChildListItem_ItemNumber不一致");
-                        return false;
-                    }
-                    if (!oldChildListItem.getItemTitle().equals(newChildListItem.getItemTitle())) {
-                        Log.d("WordSearchYearMonthList", "ChildListItem_ItemTitle不一致");
-                        return false;
-                    }
-                    if (!oldChildListItem.getItemComment().equals(newChildListItem.getItemComment())) {
-                        Log.d("WordSearchYearMonthList", "ChildListItem_ItemComment不一致");
-                        return false;
-                    }
+            if (oldItem !is WordSearchResultYearMonthListItem) throw IllegalStateException()
+            if (newItem !is WordSearchResultYearMonthListItem) throw IllegalStateException()
+
+            // 日
+            Log.d("WordSearchYearMonthList", "WordSearchResultYearMonthListItem")
+            val oldChildListSize =
+                oldItem.wordSearchResultDayList.wordSearchResultDayListItemList.size
+            val newChildListSize =
+                newItem.wordSearchResultDayList.wordSearchResultDayListItemList.size
+            if (oldChildListSize != newChildListSize) {
+                Log.d("WordSearchYearMonthList", "ChildList_Size不一致")
+                return false
+            }
+
+            for (i in 0 until oldChildListSize) {
+                val oldChildListItem =
+                    oldItem.wordSearchResultDayList.wordSearchResultDayListItemList[i]
+                val newChildListItem =
+                    newItem.wordSearchResultDayList.wordSearchResultDayListItemList[i]
+                Log.d(
+                    "WordSearchYearMonthList",
+                    "oldChildListItem_Date:" + oldChildListItem.date
+                )
+                Log.d(
+                    "WordSearchYearMonthList",
+                    "newChildListItem_Date:" + newChildListItem.date
+                )
+
+                if (oldChildListItem.date != newChildListItem.date) {
+                    Log.d("WordSearchYearMonthList", "ChildListItem_Date不一致")
+                    return false
+                }
+                if (oldChildListItem.title != newChildListItem.title) {
+                    Log.d("WordSearchYearMonthList", "ChildListItem_Title不一致")
+                    return false
+                }
+                if (oldChildListItem.itemNumber !== newChildListItem.itemNumber) {
+                    Log.d("WordSearchYearMonthList", "ChildListItem_ItemNumber不一致")
+                    return false
+                }
+                if (oldChildListItem.itemTitle != newChildListItem.itemTitle) {
+                    Log.d("WordSearchYearMonthList", "ChildListItem_ItemTitle不一致")
+                    return false
+                }
+                if (oldChildListItem.itemComment != newChildListItem.itemComment) {
+                    Log.d("WordSearchYearMonthList", "ChildListItem_ItemComment不一致")
+                    return false
                 }
             }
-            Log.d("WordSearchYearMonthList", "一致");
-            return true;
+            Log.d("WordSearchYearMonthList", "一致")
+            return true
         }
     }
 }
