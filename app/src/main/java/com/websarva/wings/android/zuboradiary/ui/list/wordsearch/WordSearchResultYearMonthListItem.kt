@@ -1,32 +1,22 @@
-package com.websarva.wings.android.zuboradiary.ui.list.wordsearch;
+package com.websarva.wings.android.zuboradiary.ui.list.wordsearch
 
-import com.websarva.wings.android.zuboradiary.ui.list.DiaryYearMonthListBaseAdapter.ViewType;
-import com.websarva.wings.android.zuboradiary.ui.list.DiaryYearMonthListBaseItem;
+import com.websarva.wings.android.zuboradiary.ui.list.DiaryYearMonthListBaseAdapter
+import com.websarva.wings.android.zuboradiary.ui.list.DiaryYearMonthListBaseItem
+import java.time.YearMonth
 
-import java.time.YearMonth;
-import java.util.Objects;
+class WordSearchResultYearMonthListItem : DiaryYearMonthListBaseItem {
+    val wordSearchResultDayList: WordSearchResultDayList
 
-public class WordSearchResultYearMonthListItem extends DiaryYearMonthListBaseItem {
-    private final WordSearchResultDayList wordSearchResultDayList;
-
-    WordSearchResultYearMonthListItem(ViewType viewType) {
-        super(viewType);
-        wordSearchResultDayList = new WordSearchResultDayList();
+    constructor(viewType: DiaryYearMonthListBaseAdapter.ViewType) : super(viewType) {
+        this.wordSearchResultDayList = WordSearchResultDayList()
     }
 
-    WordSearchResultYearMonthListItem(
-            YearMonth yearMonth, WordSearchResultDayList wordSearchResultDayList) {
-        super(yearMonth, ViewType.DIARY);
+    constructor(
+        yearMonth: YearMonth,
+        wordSearchResultDayList: WordSearchResultDayList
+    ) : super(yearMonth, DiaryYearMonthListBaseAdapter.ViewType.DIARY) {
+        require(wordSearchResultDayList.wordSearchResultDayListItemList.isNotEmpty())
 
-        Objects.requireNonNull(wordSearchResultDayList);
-        if (wordSearchResultDayList.getWordSearchResultDayListItemList().isEmpty()) {
-            throw new IllegalArgumentException();
-        }
-
-        this.wordSearchResultDayList = wordSearchResultDayList;
-    }
-
-    public WordSearchResultDayList getWordSearchResultDayList() {
-        return wordSearchResultDayList;
+        this.wordSearchResultDayList = wordSearchResultDayList
     }
 }

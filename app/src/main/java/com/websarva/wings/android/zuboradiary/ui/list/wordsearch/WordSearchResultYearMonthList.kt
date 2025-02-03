@@ -74,7 +74,10 @@ class WordSearchResultYearMonthList {
         // 最後尾YearMonthListItemの追加処理
         val sortedWordSearchResultDayList = WordSearchResultDayList(sortingDayItemList)
         resultYearMonthListItem =
-            WordSearchResultYearMonthListItem(sortingYearMonth, sortedWordSearchResultDayList)
+            WordSearchResultYearMonthListItem(
+                checkNotNull(sortingYearMonth),
+                sortedWordSearchResultDayList
+            )
         resultYearMonthListItemList.add(resultYearMonthListItem)
 
         return resultYearMonthListItemList
