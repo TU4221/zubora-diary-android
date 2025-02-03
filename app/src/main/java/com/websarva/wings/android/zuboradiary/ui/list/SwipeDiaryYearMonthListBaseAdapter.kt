@@ -1,86 +1,63 @@
-package com.websarva.wings.android.zuboradiary.ui.list;
+package com.websarva.wings.android.zuboradiary.ui.list
 
-import android.content.Context;
-import android.view.ViewGroup;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.recyclerview.widget.RecyclerView;
-
-import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor;
-import com.websarva.wings.android.zuboradiary.ui.list.diarylist.DiaryListSimpleCallback;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import android.content.Context
+import android.view.ViewGroup
+import androidx.recyclerview.widget.RecyclerView
+import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor
+import com.websarva.wings.android.zuboradiary.ui.list.diarylist.DiaryListSimpleCallback
 
 // DiaryFragment、WordSearchFragmentの親RecyclerViewのListAdapter。
 // 親RecyclerViewを同じ構成にする為、一つのクラスで両方の子RecyclerViewに対応できるように作成。
-public abstract class SwipeDiaryYearMonthListBaseAdapter extends DiaryYearMonthListBaseAdapter {
+abstract class SwipeDiaryYearMonthListBaseAdapter protected constructor(
+    context: Context,
+    recyclerView: RecyclerView,
+    themeColor: ThemeColor,
+    diffUtilItemCallback: DiffUtilItemCallback
+) : DiaryYearMonthListBaseAdapter(context, recyclerView, themeColor, diffUtilItemCallback) {
 
-    protected OnClickChildItemBackgroundButtonListener onClickChildItemBackgroundButtonListener;
-    protected final List<DiaryListSimpleCallback> simpleCallbackList = new ArrayList<>();
-
-    protected SwipeDiaryYearMonthListBaseAdapter(
-            Context context,
-            RecyclerView recyclerView,
-            ThemeColor themeColor,
-            DiffUtilItemCallback diffUtilItemCallback) {
-        super(context, recyclerView, themeColor, diffUtilItemCallback);
+    fun interface OnClickChildItemBackgroundButtonListener {
+        fun onClick(item: DiaryDayListBaseItem?)
     }
+    var onClickChildItemBackgroundButtonListener: OnClickChildItemBackgroundButtonListener? = null
 
-    public void build() {
-        super.build();
-        getRecyclerView().addOnScrollListener(new RecyclerView.OnScrollListener() {
-            @Override
-            public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
-                super.onScrollStateChanged(recyclerView, newState);
-                if (newState != RecyclerView.SCROLL_STATE_DRAGGING) return;
+    private val simpleCallbackList: MutableList<DiaryListSimpleCallback> = ArrayList()
+
+    override fun build() {
+        super.build()
+        recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+                super.onScrollStateChanged(recyclerView, newState)
+                if (newState != RecyclerView.SCROLL_STATE_DRAGGING) return
 
                 // スクロール時スワイプ閉
-                closeSwipedItemOtherDayList(null);
+                closeSwipedItemOtherDayList(null)
             }
-        });
+        })
     }
 
-    @NonNull
-    @Override
-    public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        Objects.requireNonNull(parent);
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
+        val holder = super.onCreateViewHolder(parent, viewType)
 
-        RecyclerView.ViewHolder holder = super.onCreateViewHolder(parent,viewType);
-
-        if (holder instanceof DiaryYearMonthListViewHolder) {
-            DiaryYearMonthListViewHolder diaryYearMonthListViewHolder =
-                                                            (DiaryYearMonthListViewHolder) holder;
-            DiaryListSimpleCallback diaryListSimpleCallback =
-                    new DiaryListSimpleCallback(getRecyclerView(), diaryYearMonthListViewHolder.getBinding().recyclerDayList);
-            diaryListSimpleCallback.build();
-            simpleCallbackList.add(diaryListSimpleCallback);
+        if (holder is DiaryYearMonthListViewHolder) {
+            DiaryListSimpleCallback(recyclerView, holder.binding.recyclerDayList)
+                .apply {
+                    build()
+                    simpleCallbackList.add(this)
+                }
         }
 
-        return holder;
+        return holder
     }
 
-    @FunctionalInterface
-    public interface OnClickChildItemBackgroundButtonListener {
-        void onClick(DiaryDayListBaseItem item);
-    }
-
-    public void setOnClickChildItemBackgroundButtonListener(
-            @Nullable OnClickChildItemBackgroundButtonListener onClickChildItemBackgroundButtonListener) {
-        this.onClickChildItemBackgroundButtonListener = onClickChildItemBackgroundButtonListener;
-    }
-
-    public void closeSwipedItemOtherDayList(@Nullable DiaryListSimpleCallback simpleCallback) {
+    fun closeSwipedItemOtherDayList(simpleCallback: DiaryListSimpleCallback?) {
         if (simpleCallback == null) {
-            for (DiaryListSimpleCallback _simpleCallback: simpleCallbackList) {
-                _simpleCallback.closeSwipedItem();
+            for (i in simpleCallbackList) {
+                i.closeSwipedItem()
             }
         } else {
-            for (int i = 0; i < simpleCallbackList.size(); i++) {
-                if (simpleCallbackList.get(i) != simpleCallback) {
-                    simpleCallbackList.get(i).closeSwipedItem();
+            for (i in simpleCallbackList.indices) {
+                if (simpleCallbackList[i] !== simpleCallback) {
+                    simpleCallbackList[i].closeSwipedItem()
                 }
             }
         }

@@ -49,9 +49,9 @@ public abstract class DiaryYearMonthListAdapter extends SwipeDiaryYearMonthListB
         });
         diaryDayListAdapter.setOnClickDeleteButtonListener(item -> {
             Objects.requireNonNull(item);
-            if (onClickChildItemBackgroundButtonListener == null) return;
+            if (getOnClickChildItemBackgroundButtonListener() == null) return;
 
-            onClickChildItemBackgroundButtonListener.onClick(item);
+            getOnClickChildItemBackgroundButtonListener().onClick(item);
         });
         return diaryDayListAdapter;
     }
