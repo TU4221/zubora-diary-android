@@ -18,7 +18,11 @@ abstract class DiaryDayListBaseAdapter protected constructor(
 ) :
 
     ListAdapter<DiaryDayListBaseItem, RecyclerView.ViewHolder>(diffUtilItemCallback) {
-    private var onClickItemListener: OnClickItemListener? = null
+
+    fun interface OnClickItemListener {
+        fun onClick(item: DiaryDayListBaseItem)
+    }
+    var onClickItemListener: OnClickItemListener? = null
 
     fun build() {
         recyclerView.adapter = this
@@ -54,14 +58,6 @@ abstract class DiaryDayListBaseAdapter protected constructor(
         holder: RecyclerView.ViewHolder,
         item: DiaryDayListBaseItem
     )
-
-    fun interface OnClickItemListener {
-        fun onClick(item: DiaryDayListBaseItem)
-    }
-
-    fun setOnClickItemListener(onClickItemListener: OnClickItemListener) {
-        this.onClickItemListener = onClickItemListener
-    }
 
     protected fun onClickItem(item: DiaryDayListBaseItem) {
         onClickItemListener?.onClick(item) ?: return
