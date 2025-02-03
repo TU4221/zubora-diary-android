@@ -1,41 +1,19 @@
-package com.websarva.wings.android.zuboradiary.ui.list;
+package com.websarva.wings.android.zuboradiary.ui.list
 
-import androidx.annotation.NonNull;
+import java.time.YearMonth
 
-import com.websarva.wings.android.zuboradiary.ui.list.DiaryYearMonthListBaseAdapter.ViewType;
+abstract class DiaryYearMonthListBaseItem {
 
-import java.time.YearMonth;
-import java.util.Objects;
+    val yearMonth: YearMonth
+    val viewType: DiaryYearMonthListBaseAdapter.ViewType
 
-public abstract class DiaryYearMonthListBaseItem {
-    private final YearMonth yearMonth;
-    private final ViewType viewType;
+    val isNotDiaryViewType: Boolean
+        get() = viewType != DiaryYearMonthListBaseAdapter.ViewType.DIARY
 
-    public DiaryYearMonthListBaseItem(ViewType viewType) {
-        Objects.requireNonNull(viewType);
+    constructor(viewType: DiaryYearMonthListBaseAdapter.ViewType): this(YearMonth.now(), viewType)
 
-        yearMonth = YearMonth.now();
-        this.viewType = viewType;
-    }
-
-    public DiaryYearMonthListBaseItem(YearMonth yearMonth, ViewType viewType) {
-        Objects.requireNonNull(yearMonth);
-        Objects.requireNonNull(viewType);
-
-        this.yearMonth = yearMonth;
-        this.viewType = viewType;
-    }
-
-    public final boolean isNotDiaryViewType() {
-        return !viewType.equals(ViewType.DIARY);
-    }
-
-    @NonNull
-    public final YearMonth getYearMonth() {
-        return this.yearMonth;
-    }
-
-    public final ViewType getViewType() {
-        return viewType;
+    constructor(yearMonth: YearMonth, viewType: DiaryYearMonthListBaseAdapter.ViewType) {
+        this.yearMonth = yearMonth
+        this.viewType = viewType
     }
 }
