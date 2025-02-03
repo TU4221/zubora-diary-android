@@ -37,7 +37,7 @@ public class WordSearchResultDayListAdapter extends DiaryDayListBaseAdapter {
     @Override
     protected void onBindDate(@NonNull RecyclerView.ViewHolder holder, @NonNull DiaryDayListBaseItem item) {
         LocalDate date = item.getDate();
-        DayOfWeekStringConverter dayOfWeekStringConverter = new DayOfWeekStringConverter(context);
+        DayOfWeekStringConverter dayOfWeekStringConverter = new DayOfWeekStringConverter(getContext());
         String strDayOfWeek = dayOfWeekStringConverter.toDiaryListDayOfWeek(date.getDayOfWeek());
         WordSearchResultDayViewHolder _holder = (WordSearchResultDayViewHolder) holder;
         _holder.binding.includeDay.textDayOfWeek.setText(strDayOfWeek);
@@ -73,7 +73,7 @@ public class WordSearchResultDayListAdapter extends DiaryDayListBaseAdapter {
         ItemNumber itemNumber = item.getItemNumber();
         SpannableString itemTitle = item.getItemTitle();
         SpannableString itemComment = item.getItemComment();
-        String strItemNumber = context.getString(R.string.fragment_word_search_result_item) + itemNumber;
+        String strItemNumber = getContext().getString(R.string.fragment_word_search_result_item) + itemNumber;
         holder.binding.textItemNumber.setText(strItemNumber);
         holder.binding.textItemTitle.setText(itemTitle);
         holder.binding.textItemComment.setText(itemComment);

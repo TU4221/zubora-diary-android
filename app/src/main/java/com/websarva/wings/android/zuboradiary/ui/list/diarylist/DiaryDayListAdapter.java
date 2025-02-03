@@ -40,7 +40,7 @@ public class DiaryDayListAdapter extends SwipeDiaryDayListBaseAdapter {
         DiaryDayListViewHolder _holder = (DiaryDayListViewHolder) holder;
 
         LocalDate date = item.getDate();
-        DayOfWeekStringConverter dayOfWeekStringConverter = new DayOfWeekStringConverter(context);
+        DayOfWeekStringConverter dayOfWeekStringConverter = new DayOfWeekStringConverter(getContext());
         String strDayOfWeek = dayOfWeekStringConverter.toDiaryListDayOfWeek(date.getDayOfWeek());
         _holder.binding.includeDay.textDayOfWeek.setText(strDayOfWeek);
         _holder.binding.includeDay.textDayOfMonth.setText(String.valueOf(date.getDayOfMonth()));
@@ -79,9 +79,9 @@ public class DiaryDayListAdapter extends SwipeDiaryDayListBaseAdapter {
 
         DiaryPictureManager diaryPictureManager =
                 new DiaryPictureManager(
-                        context,
+                        getContext(),
                         holder.binding.imageAttachedPicture,
-                        themeColor.getOnSecondaryContainerColor(context.getResources())
+                        getThemeColor().getOnSecondaryContainerColor(getContext().getResources())
                 );
         Uri pictureUri = item.getPicturePath();
         diaryPictureManager.setUpPictureOnDiaryList(pictureUri);
