@@ -1,119 +1,109 @@
-package com.websarva.wings.android.zuboradiary.ui.list.wordsearch;
+package com.websarva.wings.android.zuboradiary.ui.list.wordsearch
 
-import android.content.Context;
-import android.text.SpannableString;
-import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.ViewGroup;
+import android.content.Context
+import android.util.Log
+import android.view.LayoutInflater
+import android.view.ViewGroup
+import androidx.recyclerview.widget.RecyclerView
+import com.websarva.wings.android.zuboradiary.R
+import com.websarva.wings.android.zuboradiary.data.DayOfWeekStringConverter
+import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor
+import com.websarva.wings.android.zuboradiary.databinding.RowWordSearchResultListBinding
+import com.websarva.wings.android.zuboradiary.ui.list.DiaryDayListBaseAdapter
+import com.websarva.wings.android.zuboradiary.ui.list.DiaryDayListBaseItem
+import java.text.NumberFormat
 
-import androidx.annotation.NonNull;
-import androidx.recyclerview.widget.RecyclerView;
+class WordSearchResultDayListAdapter(
+    context: Context,
+    recyclerView: RecyclerView,
+    themeColor: ThemeColor
+) : DiaryDayListBaseAdapter(context, recyclerView, themeColor, DiffUtilItemCallback()) {
 
-import com.websarva.wings.android.zuboradiary.R;
-import com.websarva.wings.android.zuboradiary.data.DayOfWeekStringConverter;
-import com.websarva.wings.android.zuboradiary.data.diary.ItemNumber;
-import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor;
-import com.websarva.wings.android.zuboradiary.databinding.RowWordSearchResultListBinding;
-import com.websarva.wings.android.zuboradiary.ui.list.DiaryDayListBaseAdapter;
-import com.websarva.wings.android.zuboradiary.ui.list.DiaryDayListBaseItem;
-
-import java.time.LocalDate;
-import java.util.Objects;
-
-public class WordSearchResultDayListAdapter extends DiaryDayListBaseAdapter {
-
-    public WordSearchResultDayListAdapter(Context context, RecyclerView recyclerView, ThemeColor themeColor){
-        super(context, recyclerView, themeColor, new DiffUtilItemCallback());
+    override fun onCreateDiaryDayViewHolder(
+        parent: ViewGroup,
+        themeColorInflater: LayoutInflater
+    ): RecyclerView.ViewHolder {
+        val binding =
+            RowWordSearchResultListBinding.inflate(themeColorInflater, parent, false)
+        return WordSearchResultDayViewHolder(binding)
     }
 
-    @NonNull
-    @Override
-    protected RecyclerView.ViewHolder onCreateDiaryDayViewHolder(@NonNull ViewGroup parent, @NonNull LayoutInflater themeColorInflater) {
-        RowWordSearchResultListBinding binding =
-                RowWordSearchResultListBinding.inflate(themeColorInflater, parent, false);
-        return new WordSearchResultDayViewHolder(binding);
+    override fun onBindDate(holder: RecyclerView.ViewHolder, item: DiaryDayListBaseItem) {
+        if (holder !is WordSearchResultDayViewHolder) throw IllegalStateException()
+
+        val date = item.date
+        val dayOfWeekStringConverter = DayOfWeekStringConverter(context)
+        val dayOfWeekString = dayOfWeekStringConverter.toDiaryListDayOfWeek(date.dayOfWeek)
+        holder.binding.includeDay.textDayOfWeek.text = dayOfWeekString
+        holder.binding.includeDay.textDayOfMonth.text =
+            NumberFormat.getInstance().format(date.dayOfMonth)
     }
 
-    @Override
-    protected void onBindDate(@NonNull RecyclerView.ViewHolder holder, @NonNull DiaryDayListBaseItem item) {
-        LocalDate date = item.getDate();
-        DayOfWeekStringConverter dayOfWeekStringConverter = new DayOfWeekStringConverter(getContext());
-        String strDayOfWeek = dayOfWeekStringConverter.toDiaryListDayOfWeek(date.getDayOfWeek());
-        WordSearchResultDayViewHolder _holder = (WordSearchResultDayViewHolder) holder;
-        _holder.binding.includeDay.textDayOfWeek.setText(strDayOfWeek);
-        _holder.binding.includeDay.textDayOfMonth.setText(String.valueOf(date.getDayOfMonth()));
+    override fun onBindItemClickListener(
+        holder: RecyclerView.ViewHolder,
+        item: DiaryDayListBaseItem
+    ) {
+        holder.itemView.setOnClickListener { onClickItem(item) }
     }
 
-    @Override
-    protected void onBindItemClickListener(@NonNull RecyclerView.ViewHolder holder, @NonNull DiaryDayListBaseItem item) {
-        holder.itemView.setOnClickListener(v -> onClickItem(item));
+    override fun onBindOtherView(holder: RecyclerView.ViewHolder, item: DiaryDayListBaseItem) {
+        if (holder !is WordSearchResultDayViewHolder) throw IllegalStateException()
+        if (item !is WordSearchResultDayListItem) throw IllegalStateException()
+
+        onBindTitle(holder, item)
+        onBindItem(holder, item)
     }
 
-    @Override
-    protected void onBindOtherView(@NonNull RecyclerView.ViewHolder holder, @NonNull DiaryDayListBaseItem item) {
-        WordSearchResultDayViewHolder _holder = (WordSearchResultDayViewHolder) holder;
-        WordSearchResultDayListItem _item = (WordSearchResultDayListItem) item;
-
-        onBindTitle(_holder, _item);
-        onBindItem(_holder, _item);
+    private fun onBindTitle(
+        holder: WordSearchResultDayViewHolder,
+        item: WordSearchResultDayListItem
+    ) {
+        val title = item.title
+        holder.binding.textTitle.text = title
     }
 
-    private void onBindTitle(WordSearchResultDayViewHolder holder, WordSearchResultDayListItem item) {
-        Objects.requireNonNull(holder);
-        Objects.requireNonNull(item);
-
-        SpannableString title = item.getTitle();
-        holder.binding.textTitle.setText(title);
-    }
-
-    private void onBindItem(WordSearchResultDayViewHolder holder, WordSearchResultDayListItem item) {
-        Objects.requireNonNull(holder);
-        Objects.requireNonNull(item);
-
-        ItemNumber itemNumber = item.getItemNumber();
-        SpannableString itemTitle = item.getItemTitle();
-        SpannableString itemComment = item.getItemComment();
-        String strItemNumber = getContext().getString(R.string.fragment_word_search_result_item) + itemNumber;
-        holder.binding.textItemNumber.setText(strItemNumber);
-        holder.binding.textItemTitle.setText(itemTitle);
-        holder.binding.textItemComment.setText(itemComment);
-    }
-
-    public static class WordSearchResultDayViewHolder extends RecyclerView.ViewHolder {
-
-        public final RowWordSearchResultListBinding binding;
-
-        public WordSearchResultDayViewHolder(RowWordSearchResultListBinding binding) {
-            super(binding.getRoot());
-            this.binding = binding;
+    private fun onBindItem(
+        holder: WordSearchResultDayViewHolder,
+        item: WordSearchResultDayListItem
+    ) {
+        holder.binding.apply {
+            val strItemNumber = context.getString(R.string.fragment_word_search_result_item) + item.itemNumber
+            textItemNumber.text = strItemNumber
+            textItemTitle.text = item.itemTitle
+            textItemComment.text = item.itemComment
         }
+
     }
 
-    private static class DiffUtilItemCallback extends DiaryDayListBaseAdapter.DiffUtilItemCallback {
+    class WordSearchResultDayViewHolder(val binding: RowWordSearchResultListBinding)
+        : RecyclerView.ViewHolder(binding.root)
 
-        @Override
-        public boolean areContentsTheSame(@NonNull DiaryDayListBaseItem oldItem, @NonNull DiaryDayListBaseItem newItem) {
-            Log.d("WordSearchResultDayList", "DiffUtil.ItemCallback_areContentsTheSame()");
-            WordSearchResultDayListItem _oldItem = (WordSearchResultDayListItem) oldItem;
-            WordSearchResultDayListItem _newItem = (WordSearchResultDayListItem) newItem;
+    private class DiffUtilItemCallback : DiaryDayListBaseAdapter.DiffUtilItemCallback() {
+        override fun areContentsTheSame(
+            oldItem: DiaryDayListBaseItem,
+            newItem: DiaryDayListBaseItem
+        ): Boolean {
+            Log.d("WordSearchResultDayList", "DiffUtil.ItemCallback_areContentsTheSame()")
+            if (oldItem !is WordSearchResultDayListItem) throw IllegalStateException()
+            if (newItem !is WordSearchResultDayListItem) throw IllegalStateException()
 
-            if (!_oldItem.getTitle().equals(_newItem.getTitle())) {
-                Log.d("WordSearchResultDayList", "Title不一致");
-                return false;
+            if (oldItem.title != newItem.title) {
+                Log.d("WordSearchResultDayList", "Title不一致")
+                return false
             }
-            if (_oldItem.getItemNumber() != _newItem.getItemNumber()) {
-                Log.d("WordSearchResultDayList", "ItemNumber不一致");
-                return false;
+            if (oldItem.itemNumber !== newItem.itemNumber) {
+                Log.d("WordSearchResultDayList", "ItemNumber不一致")
+                return false
             }
-            if (!_oldItem.getItemTitle().equals(_newItem.getItemTitle())) {
-                Log.d("WordSearchResultDayList", "ItemTitle不一致");
-                return false;
+            if (oldItem.itemTitle != newItem.itemTitle) {
+                Log.d("WordSearchResultDayList", "ItemTitle不一致")
+                return false
             }
-            if (!_oldItem.getItemComment().equals(_newItem.getItemComment())) {
-                Log.d("WordSearchResultDayList", "ItemComment不一致");
-                return false;
+            if (oldItem.itemComment != newItem.itemComment) {
+                Log.d("WordSearchResultDayList", "ItemComment不一致")
+                return false
             }
-            return true;
+            return true
         }
     }
 }
