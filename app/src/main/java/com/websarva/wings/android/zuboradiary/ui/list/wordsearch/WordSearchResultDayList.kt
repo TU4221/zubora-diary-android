@@ -1,42 +1,25 @@
-package com.websarva.wings.android.zuboradiary.ui.list.wordsearch;
+package com.websarva.wings.android.zuboradiary.ui.list.wordsearch
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
+class WordSearchResultDayList {
 
-public class WordSearchResultDayList {
+    // TODO:下記変数をprivateでカプセル化し、必要なメソッドは本クラスで新規に作成する。(countDiaries()のように)(他のクラスも同様にする)
+    val wordSearchResultDayListItemList: List<WordSearchResultDayListItem>
 
-    private final List<WordSearchResultDayListItem> wordSearchResultDayListItemList;
-
-    WordSearchResultDayList(List<WordSearchResultDayListItem> itemList) {
-        Objects.requireNonNull(itemList);
-        if (itemList.isEmpty()) throw new IllegalArgumentException();
-        itemList.stream().forEach(Objects::requireNonNull);
-
-        this.wordSearchResultDayListItemList = Collections.unmodifiableList(itemList);
+    constructor(itemList: List<WordSearchResultDayListItem>) {
+        this.wordSearchResultDayListItemList = itemList.toList()
     }
 
-    WordSearchResultDayList() {
-        this.wordSearchResultDayListItemList = new ArrayList<>();
+    constructor() : this(ArrayList())
+
+    fun countDiaries(): Int {
+        return wordSearchResultDayListItemList.size
     }
 
-    public int countDiaries() {
-        return wordSearchResultDayListItemList.size();
-    }
+    fun combineDiaryDayLists(additionList: WordSearchResultDayList): WordSearchResultDayList {
+        require(additionList.wordSearchResultDayListItemList.isNotEmpty())
 
-    WordSearchResultDayList combineDiaryDayLists(WordSearchResultDayList additionList) {
-        Objects.requireNonNull(additionList);
-        if (additionList.wordSearchResultDayListItemList.isEmpty()) throw new IllegalArgumentException();
-
-        List<WordSearchResultDayListItem> resultItemList = new ArrayList<>();
-        resultItemList.addAll(this.wordSearchResultDayListItemList);
-        resultItemList.addAll(additionList.wordSearchResultDayListItemList);
-
-        return new WordSearchResultDayList(resultItemList);
-    }
-
-    public List<WordSearchResultDayListItem> getWordSearchResultDayListItemList() {
-        return wordSearchResultDayListItemList;
+        val resultItemList =
+            wordSearchResultDayListItemList + additionList.wordSearchResultDayListItemList
+        return WordSearchResultDayList(resultItemList)
     }
 }
