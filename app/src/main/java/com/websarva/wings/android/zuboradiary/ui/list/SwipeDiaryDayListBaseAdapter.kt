@@ -1,53 +1,34 @@
-package com.websarva.wings.android.zuboradiary.ui.list;
+package com.websarva.wings.android.zuboradiary.ui.list
 
-import android.content.Context;
+import android.content.Context
+import androidx.recyclerview.widget.RecyclerView
+import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor
 
-import androidx.annotation.NonNull;
-import androidx.recyclerview.widget.RecyclerView;
+abstract class SwipeDiaryDayListBaseAdapter protected constructor(
+    context: Context,
+    recyclerView: RecyclerView,
+    themeColor: ThemeColor,
+    diffUtilItemCallback: DiffUtilItemCallback
+) : DiaryDayListBaseAdapter(context, recyclerView, themeColor, diffUtilItemCallback) {
 
-import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor;
+    fun interface OnClickDeleteButtonListener {
+        fun onClick(item: DiaryDayListBaseItem?)
+    }
+    var onClickDeleteButtonListener: OnClickDeleteButtonListener? = null
 
-import java.util.Objects;
+    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+        super.onBindViewHolder(holder, position)
 
-public abstract class SwipeDiaryDayListBaseAdapter extends DiaryDayListBaseAdapter {
-
-    private OnClickDeleteButtonListener onClickDeleteButtonListener;
-
-    protected SwipeDiaryDayListBaseAdapter(
-            Context context,
-            RecyclerView recyclerView,
-            ThemeColor themeColor,
-            DiffUtilItemCallback diffUtilItemCallback) {
-        super(context, recyclerView, themeColor, diffUtilItemCallback);
+        val item = getItem(position)
+        onBindDeleteButtonClickListener(holder, item)
     }
 
-    @Override
-    public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
-        super.onBindViewHolder(holder, position);
+    protected abstract fun onBindDeleteButtonClickListener(
+        holder: RecyclerView.ViewHolder,
+        item: DiaryDayListBaseItem
+    )
 
-        DiaryDayListBaseItem item = getItem(position);
-        Objects.requireNonNull(item);
-
-        onBindDeleteButtonClickListener(holder, item);
-    }
-
-    protected abstract void onBindDeleteButtonClickListener(@NonNull RecyclerView.ViewHolder holder, @NonNull DiaryDayListBaseItem item);
-
-    @FunctionalInterface
-    public interface OnClickDeleteButtonListener {
-        void onClick(DiaryDayListBaseItem item);
-    }
-
-    public void setOnClickDeleteButtonListener(OnClickDeleteButtonListener onClickDeleteButtonListener) {
-        Objects.requireNonNull(onClickDeleteButtonListener);
-
-        this.onClickDeleteButtonListener = onClickDeleteButtonListener;
-    }
-
-    protected void onClickDeleteButton(DiaryDayListBaseItem item) {
-        Objects.requireNonNull(item);
-        if (onClickDeleteButtonListener == null) return;
-
-        onClickDeleteButtonListener.onClick(item);
+    protected fun onClickDeleteButton(item: DiaryDayListBaseItem) {
+        onClickDeleteButtonListener?.onClick(item) ?: return
     }
 }
