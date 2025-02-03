@@ -30,7 +30,7 @@ abstract class SwipeDiaryYearMonthListBaseAdapter protected constructor(
                 if (newState != RecyclerView.SCROLL_STATE_DRAGGING) return
 
                 // スクロール時スワイプ閉
-                closeSwipedItemOtherDayList(null)
+                closeAllSwipedItem()
             }
         })
     }
@@ -49,16 +49,16 @@ abstract class SwipeDiaryYearMonthListBaseAdapter protected constructor(
         return holder
     }
 
-    fun closeSwipedItemOtherDayList(simpleCallback: DiaryListSimpleCallback?) {
-        if (simpleCallback == null) {
-            for (i in simpleCallbackList) {
-                i.closeSwipedItem()
-            }
-        } else {
-            for (i in simpleCallbackList.indices) {
-                if (simpleCallbackList[i] !== simpleCallback) {
-                    simpleCallbackList[i].closeSwipedItem()
-                }
+    fun closeAllSwipedItem() {
+        for (i in simpleCallbackList) {
+            i.closeSwipedItem()
+        }
+    }
+
+    fun closeSwipedItemOtherDayList(selfSimpleCallback: DiaryListSimpleCallback) {
+        for (i in simpleCallbackList.indices) {
+            if (simpleCallbackList[i] !== selfSimpleCallback) {
+                simpleCallbackList[i].closeSwipedItem()
             }
         }
     }
