@@ -10,7 +10,9 @@ class DiaryDayList {
         this.diaryDayListItemList = itemList.toList()
     }
 
-    constructor(): this(ArrayList())
+    constructor() {
+        this.diaryDayListItemList = ArrayList()
+    }
 
     fun countDiaries(): Int {
         return diaryDayListItemList.size
