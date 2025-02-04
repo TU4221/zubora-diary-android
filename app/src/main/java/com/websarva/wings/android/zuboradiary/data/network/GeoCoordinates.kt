@@ -1,29 +1,21 @@
-package com.websarva.wings.android.zuboradiary.data.network;
+package com.websarva.wings.android.zuboradiary.data.network
 
-import androidx.annotation.FloatRange;
+import androidx.annotation.FloatRange
 
-public class GeoCoordinates {
+class GeoCoordinates(latitude: Double, longitude: Double) {
 
     @FloatRange(from = -90.0, to = 90.0)
-    private final double latitude;
+    val latitude: Double
     @FloatRange(from = -180.0, to = 180.0)
-    private final double longitude;
+    val longitude: Double
 
-    public GeoCoordinates(double latitude, double longitude) {
-        if (latitude < -90) throw new IllegalArgumentException();
-        if (latitude > 90) throw new IllegalArgumentException();
-        if (longitude < -180) throw new IllegalArgumentException();
-        if (longitude > 180) throw new IllegalArgumentException();
+    init {
+        require(latitude >= -90)
+        require(latitude <= 90)
+        require(longitude >= -180)
+        require(longitude <= 180)
 
-        this.latitude = latitude;
-        this.longitude = longitude;
-    }
-
-    public double getLatitude() {
-        return latitude;
-    }
-
-    public double getLongitude() {
-        return longitude;
+        this.latitude = latitude
+        this.longitude = longitude
     }
 }
