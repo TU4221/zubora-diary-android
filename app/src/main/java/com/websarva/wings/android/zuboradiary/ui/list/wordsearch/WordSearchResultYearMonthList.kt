@@ -8,7 +8,7 @@ class WordSearchResultYearMonthList {
 
     val wordSearchResultYearMonthListItemList: List<WordSearchResultYearMonthListItem>
 
-    internal constructor(
+    constructor(
         wordSearchResultDayList: WordSearchResultDayList,
         needsNoDiaryMessage: Boolean
     ) {
@@ -33,7 +33,7 @@ class WordSearchResultYearMonthList {
      * false:ProgressIndicatorのみのリスト作成
      */
     constructor(needsNoDiaryMessage: Boolean) {
-        val emptyList: MutableList<WordSearchResultYearMonthListItem> = ArrayList()
+        val emptyList: List<WordSearchResultYearMonthListItem> = ArrayList()
         this.wordSearchResultYearMonthListItemList = addLastItem(emptyList, needsNoDiaryMessage)
     }
 
@@ -167,10 +167,7 @@ class WordSearchResultYearMonthList {
             additionItemList.removeAt(0)
         }
 
-        val resultItemList: MutableList<WordSearchResultYearMonthListItem> =
-            originalItemList.toMutableList()
-        resultItemList.addAll(additionItemList)
-
+        val resultItemList = originalItemList + additionItemList
         return WordSearchResultYearMonthList(resultItemList, needsNoDiaryMessage)
     }
 }
