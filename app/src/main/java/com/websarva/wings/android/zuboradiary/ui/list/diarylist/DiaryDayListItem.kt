@@ -1,38 +1,21 @@
-package com.websarva.wings.android.zuboradiary.ui.list.diarylist;
+package com.websarva.wings.android.zuboradiary.ui.list.diarylist
 
-import android.net.Uri;
+import android.net.Uri
+import com.websarva.wings.android.zuboradiary.data.database.DiaryListItem
+import com.websarva.wings.android.zuboradiary.ui.list.DiaryDayListBaseItem
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
+class DiaryDayListItem(listItem: DiaryListItem) :
+    DiaryDayListBaseItem(listItem) {
 
-import com.websarva.wings.android.zuboradiary.data.database.DiaryListItem;
-import com.websarva.wings.android.zuboradiary.ui.list.DiaryDayListBaseItem;
+    val title: String = listItem.title
+    var picturePath: Uri? = null
 
-public class DiaryDayListItem extends DiaryDayListBaseItem {
-
-    private final String title;
-    private final Uri picturePath;
-
-    DiaryDayListItem(DiaryListItem listItem) {
-        super(listItem);
-
-        this.title = listItem.getTitle();
-        String picturePath = listItem.getPicturePath();
+    init {
+        val picturePath = listItem.picturePath
         if (picturePath.isEmpty()) {
-            this.picturePath = null;
+            this.picturePath = null
         } else {
-            this.picturePath = Uri.parse(picturePath);
+            this.picturePath = Uri.parse(picturePath)
         }
     }
-
-    @NonNull
-    public String getTitle() {
-        return title;
-    }
-
-    @Nullable
-    public Uri getPicturePath() {
-        return picturePath;
-    }
-
 }
