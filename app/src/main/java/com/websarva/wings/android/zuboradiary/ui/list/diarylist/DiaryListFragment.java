@@ -206,7 +206,7 @@ public class DiaryListFragment extends BaseFragment {
             showDiaryDeleteDialog(_item.getDate(), _item.getPicturePath());
         });
 
-        diaryListViewModel.getDiaryListLiveData().observe(getViewLifecycleOwner(), new DiaryListObserver());
+        diaryListViewModel.getDiaryList().observe(getViewLifecycleOwner(), new DiaryListObserver());
 
         // 画面全体ProgressBar表示中はタッチ無効化
         binding.includeProgressIndicator.viewBackground.setOnTouchListener((v, event) -> {
@@ -273,7 +273,7 @@ public class DiaryListFragment extends BaseFragment {
     }
 
     private void loadDiaryList() {
-        DiaryYearMonthList diaryList = diaryListViewModel.getDiaryListLiveData().getValue();
+        DiaryYearMonthList diaryList = diaryListViewModel.getDiaryList().getValue();
         Objects.requireNonNull(diaryList);
 
         if (diaryList.getDiaryYearMonthListItemList().isEmpty()) {

@@ -1,332 +1,320 @@
-package com.websarva.wings.android.zuboradiary.ui.list.diarylist;
+package com.websarva.wings.android.zuboradiary.ui.list.diarylist
 
-import android.net.Uri;
-import android.util.Log;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.lifecycle.LiveData;
-import androidx.lifecycle.MutableLiveData;
-
-import com.google.common.util.concurrent.ListenableFuture;
-import com.websarva.wings.android.zuboradiary.data.AppMessage;
-import com.websarva.wings.android.zuboradiary.data.database.DiaryEntity;
-import com.websarva.wings.android.zuboradiary.data.database.DiaryListItem;
-import com.websarva.wings.android.zuboradiary.data.database.DiaryRepository;
-import com.websarva.wings.android.zuboradiary.ui.BaseViewModel;
-
-import java.time.LocalDate;
-import java.time.YearMonth;
-import java.time.temporal.TemporalAdjusters;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.concurrent.CancellationException;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-
-import javax.inject.Inject;
-
-import dagger.hilt.android.lifecycle.HiltViewModel;
+import android.net.Uri
+import android.util.Log
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import com.websarva.wings.android.zuboradiary.data.AppMessage
+import com.websarva.wings.android.zuboradiary.data.database.DiaryListItem
+import com.websarva.wings.android.zuboradiary.data.database.DiaryRepository
+import com.websarva.wings.android.zuboradiary.ui.BaseViewModel
+import com.websarva.wings.android.zuboradiary.ui.checkNotNull
+import dagger.hilt.android.lifecycle.HiltViewModel
+import java.time.LocalDate
+import java.time.YearMonth
+import java.time.temporal.TemporalAdjusters
+import java.util.concurrent.CancellationException
+import java.util.concurrent.ExecutionException
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.Executors
+import java.util.concurrent.Future
+import javax.inject.Inject
 
 @HiltViewModel
-public class DiaryListViewModel extends BaseViewModel {
+class DiaryListViewModel @Inject constructor(private val diaryRepository: DiaryRepository) :
+    BaseViewModel() {
 
-    private final DiaryRepository diaryRepository;
-    private Future<?> diaryListLoadingFuture; // キャンセル用
-    private final MutableLiveData<DiaryYearMonthList> diaryList = new MutableLiveData<>();
+    companion object {
+        const val NUM_LOADING_ITEMS: Int = 10 //初期読込時の対象リストが画面全体に表示される値にすること。 // TODO:仮数値の為、最後に設定
+    }
+
+    private var diaryListLoadingFuture: Future<*>? = null // キャンセル用
+
+    private val _diaryList = MutableLiveData<DiaryYearMonthList>()
+    val diaryList: LiveData<DiaryYearMonthList>
+        get() = _diaryList
 
     /**
      * データベース読込からRecyclerViewへの反映までを true とする。
      */
-    private final MutableLiveData<Boolean> isVisibleUpdateProgressBar = new MutableLiveData<>();
-    public static final int NUM_LOADING_ITEMS = 10; //初期読込時の対象リストが画面全体に表示される値にすること。 // TODO:仮数値の為、最後に設定
-    private LocalDate sortConditionDate;
-    private final ExecutorService executorService;
+    private val _isVisibleUpdateProgressBar = MutableLiveData<Boolean>()
+    val isVisibleUpdateProgressBar: LiveData<Boolean>
+        get() = _isVisibleUpdateProgressBar
 
-    private final boolean isValidityDelay = true;// TODO:調整用
+    private var sortConditionDate: LocalDate? = null
+    private val executorService: ExecutorService = Executors.newSingleThreadExecutor()
 
-    @Inject
-    DiaryListViewModel(DiaryRepository diaryRepository) {
-        this.diaryRepository = diaryRepository;
-        executorService = Executors.newSingleThreadExecutor();
-        initialize();
+    private val isValidityDelay = true // TODO:調整用
+
+    init {
+        initialize()
     }
 
-    @Override
-    protected void initialize() {
-        initializeAppMessageList();
-        diaryList.setValue(new DiaryYearMonthList());
-        isVisibleUpdateProgressBar.setValue(false);
-        sortConditionDate = null;
+    override fun initialize() {
+        initializeAppMessageList()
+        _diaryList.value = DiaryYearMonthList()
+        _isVisibleUpdateProgressBar.value = false
+        sortConditionDate = null
     }
 
-    boolean canLoadDiaryList() {
-        Log.d("OnScrollDiaryList", "isLoadingDiaryList()");
-        if (diaryListLoadingFuture == null) {
-            Log.d("OnScrollDiaryList", "diaryListLoadingFuture == null");
-            return true;
-        }
-        return diaryListLoadingFuture.isDone();
+    fun canLoadDiaryList(): Boolean {
+        Log.d("OnScrollDiaryList", "isLoadingDiaryList()")
+        return diaryListLoadingFuture?.isDone ?: true
     }
 
-    void loadNewDiaryList() {
-        loadSavedDiaryList(new NewDiaryListCreator());
+    fun loadNewDiaryList() {
+        loadSavedDiaryList(NewDiaryListCreator())
     }
 
-    void loadAdditionDiaryList() {
-        loadSavedDiaryList(new AddedDiaryListCreator());
+    fun loadAdditionDiaryList() {
+        loadSavedDiaryList(AddedDiaryListCreator())
     }
 
-    void updateDiaryList() {
-        loadSavedDiaryList(new UpdateDiaryListCreator());
+    fun updateDiaryList() {
+        loadSavedDiaryList(UpdateDiaryListCreator())
     }
 
-    private void loadSavedDiaryList(DiaryListCreator creator) {
-        Log.d("DiaryListLoading", "loadDiaryList()");
-        cancelPreviousLoading();
-        DiaryListLoadingRunnable runnable = new DiaryListLoadingRunnable(creator);
-        diaryListLoadingFuture = executorService.submit(runnable);
+    private fun loadSavedDiaryList(creator: DiaryListCreator) {
+        Log.d("DiaryListLoading", "loadDiaryList()")
+        cancelPreviousLoading()
+        val runnable = DiaryListLoadingRunnable(creator)
+        diaryListLoadingFuture = executorService.submit(runnable)
     }
 
-    private void cancelPreviousLoading() {
+    private fun cancelPreviousLoading() {
         if (!canLoadDiaryList()) {
-            diaryListLoadingFuture.cancel(true);
+            diaryListLoadingFuture?.cancel(true) ?: throw IllegalStateException()
         }
     }
 
     private interface DiaryListCreator {
-
-        @NonNull
-        DiaryYearMonthList create() throws CancellationException, ExecutionException, InterruptedException;
+        @Throws(
+            CancellationException::class,
+            ExecutionException::class,
+            InterruptedException::class
+        )
+        fun create(): DiaryYearMonthList
     }
 
-    private class DiaryListLoadingRunnable implements Runnable {
+    private inner class DiaryListLoadingRunnable(private val diaryListCreator: DiaryListCreator)
+        : Runnable {
 
-        private final DiaryListCreator diaryListCreator;
-
-        DiaryListLoadingRunnable(DiaryListCreator diaryListCreator) {
-            this.diaryListCreator = diaryListCreator;
-        }
-
-        @Override
-        public void run() {
-            Log.d("DiaryListLoading", "DiaryListLoadingRunnable.run()");
-            DiaryYearMonthList previousDiaryList = diaryList.getValue();
-            Objects.requireNonNull(previousDiaryList);
+        override fun run() {
+            Log.d("DiaryListLoading", "DiaryListLoadingRunnable.run()")
+            val previousDiaryList = _diaryList.checkNotNull()
             try {
-                DiaryYearMonthList updateDiaryList = diaryListCreator.create();
-                Log.d("DiaryListLoading", "diaryList.postValue()");
-                diaryList.postValue(updateDiaryList);
-            } catch (CancellationException e) {
-                Log.d("Exception", "日記読込キャンセル", e);
+                val updateDiaryList = diaryListCreator.create()
+                Log.d("DiaryListLoading", "diaryList.postValue()")
+                _diaryList.postValue(updateDiaryList)
+            } catch (e: CancellationException) {
+                Log.d("Exception", "日記読込キャンセル", e)
                 // 例外処理なし
-            } catch (InterruptedException e) {
-                Log.d("Exception", "日記読込失敗", e);
+            } catch (e: InterruptedException) {
+                Log.d("Exception", "日記読込失敗", e)
                 if (!isValidityDelay) {
-                    diaryList.postValue(previousDiaryList);
-                    addAppMessage(AppMessage.DIARY_LOADING_ERROR);
+                    _diaryList.postValue(previousDiaryList)
+                    addAppMessage(AppMessage.DIARY_LOADING_ERROR)
                 }
-            } catch (Exception e) {
-                Log.d("Exception", "日記読込失敗", e);
-                diaryList.postValue(previousDiaryList);
-                addAppMessage(AppMessage.DIARY_LOADING_ERROR);
+            } catch (e: Exception) {
+                Log.d("Exception", "日記読込失敗", e)
+                _diaryList.postValue(previousDiaryList)
+                addAppMessage(AppMessage.DIARY_LOADING_ERROR)
             }
         }
     }
 
-    private class NewDiaryListCreator implements DiaryListCreator {
-
-        @Override
-        @NonNull
-        public DiaryYearMonthList create()
-                throws CancellationException, ExecutionException, InterruptedException {
-            showDiaryListFirstItemProgressIndicator();
-            if (isValidityDelay) Thread.sleep(1000);
-            return loadSavedDiaryList(NUM_LOADING_ITEMS, 0);
+    private inner class NewDiaryListCreator : DiaryListCreator {
+        @Throws(
+            CancellationException::class,
+            ExecutionException::class,
+            InterruptedException::class
+        )
+        override fun create(): DiaryYearMonthList {
+            showDiaryListFirstItemProgressIndicator()
+            if (isValidityDelay) Thread.sleep(1000)
+            return loadSavedDiaryList(NUM_LOADING_ITEMS, 0)
         }
 
-        private void showDiaryListFirstItemProgressIndicator() {
-            DiaryYearMonthList list = new DiaryYearMonthList(false);
-            diaryList.postValue(list);
-        }
-    }
-
-    private class AddedDiaryListCreator implements DiaryListCreator {
-
-        @Override
-        @NonNull
-        public DiaryYearMonthList create()
-                throws CancellationException, ExecutionException, InterruptedException {
-            DiaryYearMonthList currentDiaryList = diaryList.getValue();
-            Objects.requireNonNull(currentDiaryList);
-            if (currentDiaryList.getDiaryYearMonthListItemList().isEmpty()) throw new IllegalStateException();
-
-            if (isValidityDelay) Thread.sleep(1000);
-            int loadingOffset = currentDiaryList.countDiaries();
-            DiaryYearMonthList loadedDiaryList = loadSavedDiaryList(NUM_LOADING_ITEMS, loadingOffset);
-            int numLoadedDiaries = currentDiaryList.countDiaries() + loadedDiaryList.countDiaries();
-            boolean existsUnloadedDiaries = existsUnloadedDiaries(numLoadedDiaries);
-            return currentDiaryList.combineDiaryLists(loadedDiaryList, !existsUnloadedDiaries);
+        fun showDiaryListFirstItemProgressIndicator() {
+            val list = DiaryYearMonthList(false)
+            _diaryList.postValue(list)
         }
     }
 
-    private class UpdateDiaryListCreator implements DiaryListCreator {
+    private inner class AddedDiaryListCreator : DiaryListCreator {
+        @Throws(
+            CancellationException::class,
+            ExecutionException::class,
+            InterruptedException::class
+        )
+        override fun create(): DiaryYearMonthList {
+            val currentDiaryList = _diaryList.checkNotNull()
+            check(currentDiaryList.diaryYearMonthListItemList.isNotEmpty())
 
-        @Override
-        @NonNull
-        public DiaryYearMonthList create()
-                throws CancellationException, ExecutionException, InterruptedException {
-            DiaryYearMonthList currentDiaryList = diaryList.getValue();
-            Objects.requireNonNull(currentDiaryList);
-            if (currentDiaryList.getDiaryYearMonthListItemList().isEmpty()) throw new IllegalStateException();
+            if (isValidityDelay) Thread.sleep(1000)
+            val loadingOffset = currentDiaryList.countDiaries()
+            val loadedDiaryList = loadSavedDiaryList(NUM_LOADING_ITEMS, loadingOffset)
+            val numLoadedDiaries = currentDiaryList.countDiaries() + loadedDiaryList.countDiaries()
+            val existsUnloadedDiaries = existsUnloadedDiaries(numLoadedDiaries)
+            return currentDiaryList.combineDiaryLists(loadedDiaryList, !existsUnloadedDiaries)
+        }
+    }
 
-            isVisibleUpdateProgressBar.postValue(true);
+    private inner class UpdateDiaryListCreator : DiaryListCreator {
+        @Throws(
+            CancellationException::class,
+            ExecutionException::class,
+            InterruptedException::class
+        )
+        override fun create(): DiaryYearMonthList {
+            val currentDiaryList = _diaryList.checkNotNull()
+            check(currentDiaryList.diaryYearMonthListItemList.isNotEmpty())
+
+            _isVisibleUpdateProgressBar.postValue(true)
             try {
-                if (isValidityDelay) Thread.sleep(3000);
-                int numLoadingItems = currentDiaryList.countDiaries();
+                if (isValidityDelay) Thread.sleep(3000)
+                var numLoadingItems = currentDiaryList.countDiaries()
                 // HACK:画面全体にリストアイテムが存在しない状態で日記を追加した後にリスト画面に戻ると、
                 //      日記追加前のアイテム数しか表示されない状態となる。また、スクロール更新もできない。
                 //      対策として下記コードを記述。
                 if (numLoadingItems < NUM_LOADING_ITEMS) {
-                    numLoadingItems = NUM_LOADING_ITEMS;
+                    numLoadingItems = NUM_LOADING_ITEMS
                 }
-                return loadSavedDiaryList(numLoadingItems, 0);
+                return loadSavedDiaryList(numLoadingItems, 0)
             } finally {
-                isVisibleUpdateProgressBar.postValue(false);
+                _isVisibleUpdateProgressBar.postValue(false)
             }
         }
     }
 
-    @NonNull
-    private DiaryYearMonthList loadSavedDiaryList(int numLoadingItems, int loadingOffset)
-            throws CancellationException, ExecutionException, InterruptedException {
-        if (numLoadingItems <= 0) throw new IllegalArgumentException();
-        if (loadingOffset < 0) throw new IllegalArgumentException();
+    @Throws(
+        CancellationException::class,
+        ExecutionException::class,
+        InterruptedException::class
+    )
+    private fun loadSavedDiaryList(numLoadingItems: Int, loadingOffset: Int): DiaryYearMonthList {
+        require(numLoadingItems > 0)
+        require(loadingOffset >= 0)
 
 
-        ListenableFuture<List<DiaryListItem>> listListenableFuture =
-                diaryRepository.loadDiaryList(
-                        numLoadingItems,
-                        loadingOffset,
-                        sortConditionDate
-                );
+        val listListenableFuture =
+            diaryRepository.loadDiaryList(
+                numLoadingItems,
+                loadingOffset,
+                sortConditionDate
+            )
 
-        List<DiaryListItem> loadedDiaryList = listListenableFuture.get();
-        if (loadedDiaryList.isEmpty()) return new DiaryYearMonthList();
-        List<DiaryDayListItem> diaryDayListItemList = new ArrayList<>();
-        loadedDiaryList.stream().forEach(x -> diaryDayListItemList.add(new DiaryDayListItem(x)));
-        DiaryDayList diaryDayList = new DiaryDayList(diaryDayListItemList);
-        boolean existsUnloadedDiaries = existsUnloadedDiaries(diaryDayList.countDiaries());
-        return new DiaryYearMonthList(diaryDayList, !existsUnloadedDiaries);
+        val loadedDiaryList = listListenableFuture.get()
+        if (loadedDiaryList.isEmpty()) return DiaryYearMonthList()
+        val diaryDayListItemList: MutableList<DiaryDayListItem> = ArrayList()
+        loadedDiaryList.stream().forEach { x: DiaryListItem ->
+            diaryDayListItemList.add(
+                DiaryDayListItem(x)
+            )
+        }
+        val diaryDayList = DiaryDayList(diaryDayListItemList)
+        val existsUnloadedDiaries = existsUnloadedDiaries(diaryDayList.countDiaries())
+        return DiaryYearMonthList(diaryDayList, !existsUnloadedDiaries)
     }
 
-    private boolean existsUnloadedDiaries(int numLoadedDiaries)
-            throws CancellationException, ExecutionException, InterruptedException {
-
-        Integer numExistingDiaries;
-        if (sortConditionDate == null) {
-            numExistingDiaries = diaryRepository.countDiaries().get();
+    @Throws(
+        CancellationException::class,
+        ExecutionException::class,
+        InterruptedException::class
+    )
+    private fun existsUnloadedDiaries(numLoadedDiaries: Int): Boolean {
+        val numExistingDiaries = if (sortConditionDate == null) {
+            diaryRepository.countDiaries().get()
         } else {
-            numExistingDiaries = diaryRepository.countDiaries(sortConditionDate).get();
+            diaryRepository.countDiaries(sortConditionDate).get()
         }
-        Objects.requireNonNull(numExistingDiaries);
-        if (numExistingDiaries <= 0) return false;
+        if (numExistingDiaries <= 0) return false
 
-        return numLoadedDiaries < numExistingDiaries;
+        return numLoadedDiaries < numExistingDiaries
     }
 
-    void updateSortConditionDate(YearMonth yearMonth) {
-        Objects.requireNonNull(yearMonth);
-
-        sortConditionDate= yearMonth.atDay(1).with(TemporalAdjusters.lastDayOfMonth());
+    fun updateSortConditionDate(yearMonth: YearMonth) {
+        sortConditionDate = yearMonth.atDay(1).with(TemporalAdjusters.lastDayOfMonth())
     }
 
-    boolean deleteDiary(LocalDate date) {
-        Objects.requireNonNull(date);
-
-        Integer result;
+    fun deleteDiary(date: LocalDate): Boolean {
+        val result: Int
         try {
-            result = diaryRepository.deleteDiary(date).get();
-        } catch (CancellationException | ExecutionException | InterruptedException e) {
-            addAppMessage(AppMessage.DIARY_DELETE_ERROR);
-            return false;
+            result = diaryRepository.deleteDiary(date).get()
+        } catch (e: CancellationException) {
+            addAppMessage(AppMessage.DIARY_DELETE_ERROR)
+            return false
+        } catch (e: ExecutionException) {
+            addAppMessage(AppMessage.DIARY_DELETE_ERROR)
+            return false
+        } catch (e: InterruptedException) {
+            addAppMessage(AppMessage.DIARY_DELETE_ERROR)
+            return false
         }
-        Objects.requireNonNull(result);
 
         // 削除件数 = 1が正常
         if (result != 1) {
-            addAppMessage(AppMessage.DIARY_DELETE_ERROR);
-            return false;
+            addAppMessage(AppMessage.DIARY_DELETE_ERROR)
+            return false
         }
 
-        updateDiaryList();
-        return true;
+        updateDiaryList()
+        return true
     }
 
     // MEMO:存在しないことを確認したいため下記メソッドを否定的処理とする
-    boolean checkSavedPicturePathDoesNotExist(Uri uri) {
-        Objects.requireNonNull(uri);
-
+    fun checkSavedPicturePathDoesNotExist(uri: Uri): Boolean {
         try {
-            return !diaryRepository.existsPicturePath(uri).get();
-        } catch (ExecutionException | InterruptedException e) {
-            addAppMessage(AppMessage.DIARY_LOADING_ERROR);
-            return false;
+            return !diaryRepository.existsPicturePath(uri).get()
+        } catch (e: ExecutionException) {
+            addAppMessage(AppMessage.DIARY_LOADING_ERROR)
+            return false
+        } catch (e: InterruptedException) {
+            addAppMessage(AppMessage.DIARY_LOADING_ERROR)
+            return false
         }
     }
 
-    @Nullable
-    Integer countSavedDiaries() {
+    fun countSavedDiaries(): Int? {
         try {
-            return diaryRepository.countDiaries().get();
-        } catch (CancellationException | ExecutionException | InterruptedException e) {
-            addAppMessage(AppMessage.DIARY_INFO_LOADING_ERROR);
-            return null;
+            return diaryRepository.countDiaries().get()
+        } catch (e: CancellationException) {
+            addAppMessage(AppMessage.DIARY_INFO_LOADING_ERROR)
+            return null
+        } catch (e: ExecutionException) {
+            addAppMessage(AppMessage.DIARY_INFO_LOADING_ERROR)
+            return null
+        } catch (e: InterruptedException) {
+            addAppMessage(AppMessage.DIARY_INFO_LOADING_ERROR)
+            return null
         }
     }
 
 
-    @Nullable
-    LocalDate loadNewestSavedDiary() {
+    fun loadNewestSavedDiary(): LocalDate? {
         try {
-            DiaryEntity diaryEntity = diaryRepository.loadNewestDiary().get();
-            String strDate = diaryEntity.getDate();
-            return LocalDate.parse(strDate);
-        } catch (Exception e) {
-            addAppMessage(AppMessage.DIARY_INFO_LOADING_ERROR);
-            return null;
+            val diaryEntity = diaryRepository.loadNewestDiary().get()
+            val strDate = diaryEntity.date
+            return LocalDate.parse(strDate)
+        } catch (e: Exception) {
+            addAppMessage(AppMessage.DIARY_INFO_LOADING_ERROR)
+            return null
         }
     }
 
-    @Nullable
-    LocalDate loadOldestSavedDiary() {
+    fun loadOldestSavedDiary(): LocalDate? {
         try {
-            DiaryEntity diaryEntity = diaryRepository.loadOldestDiary().get();
-            String strDate = diaryEntity.getDate();
-            return LocalDate.parse(strDate);
-        } catch (Exception e) {
-            addAppMessage(AppMessage.DIARY_INFO_LOADING_ERROR);
-            return null;
+            val diaryEntity = diaryRepository.loadOldestDiary().get()
+            val strDate = diaryEntity.date
+            return LocalDate.parse(strDate)
+        } catch (e: Exception) {
+            addAppMessage(AppMessage.DIARY_INFO_LOADING_ERROR)
+            return null
         }
     }
 
-    // LiveDataGetter
-    @NonNull
-    LiveData<DiaryYearMonthList> getDiaryListLiveData() {
-        return diaryList;
-    }
-
-    @NonNull
-    public LiveData<Boolean> getIsVisibleUpdateProgressBarLiveData() {
-        return isVisibleUpdateProgressBar;
-    }
-
-    @Override
-    protected void onCleared() {
-        super.onCleared();
-        executorService.shutdown();
+    override fun onCleared() {
+        super.onCleared()
+        executorService.shutdown()
     }
 }
