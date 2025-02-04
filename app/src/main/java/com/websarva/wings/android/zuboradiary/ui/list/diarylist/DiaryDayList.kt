@@ -1,42 +1,25 @@
-package com.websarva.wings.android.zuboradiary.ui.list.diarylist;
+package com.websarva.wings.android.zuboradiary.ui.list.diarylist
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
+class DiaryDayList {
 
-public class DiaryDayList {
+    val diaryDayListItemList: List<DiaryDayListItem>
 
-    private final List<DiaryDayListItem> diaryDayListItemList;
+    constructor(itemList: List<DiaryDayListItem>) {
+        require(itemList.isNotEmpty())
 
-    DiaryDayList(List<DiaryDayListItem> itemList) {
-        Objects.requireNonNull(itemList);
-        if (itemList.isEmpty()) throw new IllegalArgumentException();
-        itemList.stream().forEach(Objects::requireNonNull);
-
-        this.diaryDayListItemList = Collections.unmodifiableList(itemList);
+        this.diaryDayListItemList = itemList.toList()
     }
 
-    DiaryDayList() {
-        this.diaryDayListItemList = new ArrayList<>();
+    constructor(): this(ArrayList())
+
+    fun countDiaries(): Int {
+        return diaryDayListItemList.size
     }
 
-    int countDiaries() {
-        return diaryDayListItemList.size();
-    }
+    fun combineDiaryDayLists(additionList: DiaryDayList): DiaryDayList {
+        require(additionList.diaryDayListItemList.isNotEmpty())
 
-    DiaryDayList combineDiaryDayLists(DiaryDayList additionList) {
-        Objects.requireNonNull(additionList);
-        if (additionList.diaryDayListItemList.isEmpty()) throw new IllegalArgumentException();
-
-        List<DiaryDayListItem> resultItemList = new ArrayList<>();
-        resultItemList.addAll(this.diaryDayListItemList);
-        resultItemList.addAll(additionList.diaryDayListItemList);
-
-        return new DiaryDayList(resultItemList);
-    }
-
-    public List<DiaryDayListItem> getDiaryDayListItemList() {
-        return diaryDayListItemList;
+        val resultItemList = diaryDayListItemList + additionList.diaryDayListItemList
+        return DiaryDayList(resultItemList)
     }
 }
