@@ -72,12 +72,7 @@ class WordSearchViewModel @Inject internal constructor(
 
     fun canLoadWordSearchResultList(): Boolean {
         Log.d("OnScrollDiaryList", "isLoadingDiaryList()")
-        val currentFuture = wordSearchResultListLoadingFuture
-        if (currentFuture == null) {
-            Log.d("OnScrollDiaryList", "wordSearchResultListLoadingFuture == null")
-            return true
-        }
-        return currentFuture.isDone
+        return wordSearchResultListLoadingFuture?.isDone ?: true
     }
 
     fun loadNewWordSearchResultList(
@@ -129,7 +124,7 @@ class WordSearchViewModel @Inject internal constructor(
     private fun cancelPreviousLoading() {
         if (!canLoadWordSearchResultList()) {
             Log.d("WordSearchLoading", "Cancel")
-            checkNotNull(wordSearchResultListLoadingFuture).cancel(true)
+            wordSearchResultListLoadingFuture?.cancel(true) ?: throw IllegalStateException()
         }
     }
 
