@@ -1,61 +1,41 @@
-package com.websarva.wings.android.zuboradiary.data.network;
+package com.websarva.wings.android.zuboradiary.data.network
 
-import android.util.Log;
+import android.util.Log
+import com.websarva.wings.android.zuboradiary.data.diary.Weather
+import retrofit2.Call
+import java.util.concurrent.Callable
 
-import androidx.annotation.NonNull;
+abstract class WeatherApiCallable(private val weatherApiResponseCall: Call<WeatherApiResponse>)
+    : Callable<Boolean> {
 
-import com.websarva.wings.android.zuboradiary.data.diary.Weather;
-
-import java.util.Objects;
-import java.util.concurrent.Callable;
-
-import okhttp3.ResponseBody;
-import retrofit2.Call;
-import retrofit2.Response;
-
-public abstract class WeatherApiCallable  implements Callable<Boolean> {
-
-    private final Call<WeatherApiResponse> weatherApiResponseCall;
-
-    public WeatherApiCallable(Call<WeatherApiResponse> weatherApiResponseCall) {
-        Objects.requireNonNull(weatherApiResponseCall);
-
-        this.weatherApiResponseCall = weatherApiResponseCall;
-    }
-
-    @Override
-    public Boolean call() {
+    override fun call(): Boolean {
         try {
-            Response<WeatherApiResponse> response = weatherApiResponseCall.execute();
-            Log.d("WeatherApi", "response.code():" + response.code());
-            Log.d("WeatherApi", "response.message():" + response.message());
-            if (response.isSuccessful()) {
-                WeatherApiResponse weatherApiResponse = response.body();
-                Objects.requireNonNull(weatherApiResponse);
-                Log.d("WeatherApi", "response.body():" + response.body());
-                Weather weather = weatherApiResponse.toWeatherInfo();
-                onResponse(weather);
-                return true;
+            val response = weatherApiResponseCall.execute()
+            Log.d("WeatherApi", "response.code():" + response.code())
+            Log.d("WeatherApi", "response.message():" + response.message())
+            if (response.isSuccessful) {
+                val weatherApiResponse = response.body()
+                Log.d("WeatherApi", "response.body():" + response.body())
+                val weather = weatherApiResponse!!.toWeatherInfo()
+                onResponse(weather)
+                return true
             } else {
-                try(ResponseBody errorBody = response.errorBody()) {
-                    Objects.requireNonNull(errorBody);
-                    Log.d("WeatherApi", "response.errorBody():" + errorBody.string());
+                response.errorBody().use { errorBody ->
+                    Log.d("WeatherApi", "response.errorBody():" + errorBody!!.string())
                 }
-                onFailure();
-                return false;
+                onFailure()
+                return false
             }
-        } catch (Exception e) {
-            Objects.requireNonNull(e);
-            Log.d("Exception", "WeatherApi読込失敗", e);
-            onException(e);
-            return false;
+        } catch (e: Exception) {
+            Log.d("Exception", "WeatherApi読込失敗", e)
+            onException(e)
+            return false
         }
-
     }
 
-    public abstract void onResponse(@NonNull Weather weather);
+    abstract fun onResponse(weather: Weather)
 
-    public abstract void onFailure();
+    abstract fun onFailure()
 
-    public abstract void onException(@NonNull Exception e);
+    abstract fun onException(e: Exception)
 }

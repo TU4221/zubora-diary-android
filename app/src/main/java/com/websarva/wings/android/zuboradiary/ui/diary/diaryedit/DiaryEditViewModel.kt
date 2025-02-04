@@ -342,7 +342,7 @@ class DiaryEditViewModel @Inject constructor(
         }
     }
 
-    private inner class CustomWeatherApiCallable(weatherApiResponseCall: Call<WeatherApiResponse?>?) :
+    private inner class CustomWeatherApiCallable(weatherApiResponseCall: Call<WeatherApiResponse>) :
         WeatherApiCallable(weatherApiResponseCall) {
         override fun onResponse(weather: Weather) {
             diaryLiveData.weather1.postValue(weather)
