@@ -1,64 +1,57 @@
-package com.websarva.wings.android.zuboradiary.ui.list.diarylist;
+package com.websarva.wings.android.zuboradiary.ui.list.diarylist
 
-import android.content.DialogInterface;
-import android.net.Uri;
+import android.content.DialogInterface
+import com.websarva.wings.android.zuboradiary.R
+import com.websarva.wings.android.zuboradiary.data.DateTimeStringConverter
+import com.websarva.wings.android.zuboradiary.ui.BaseAlertDialogFragment
 
-import androidx.annotation.NonNull;
+class DiaryDeleteDialogFragment : BaseAlertDialogFragment() {
 
-import com.websarva.wings.android.zuboradiary.R;
-import com.websarva.wings.android.zuboradiary.data.DateTimeStringConverter;
-import com.websarva.wings.android.zuboradiary.ui.BaseAlertDialogFragment;
-
-import java.time.LocalDate;
-
-public class DiaryDeleteDialogFragment extends BaseAlertDialogFragment {
-    private static final String fromClassName =
-            "From" + DiaryDeleteDialogFragment.class.getName();
-    public static final String KEY_DELETE_DIARY_DATE = "DeleteDiaryDate" + fromClassName;
-    public static final String KEY_DELETE_DIARY_PICTURE_URI = "DeleteDiaryPictureUri" + fromClassName;
-
-    @Override
-    protected String createTitle() {
-        return getString(R.string.dialog_diary_delete_title);
+    companion object {
+        private val fromClassName = "From" + DiaryDeleteDialogFragment::class.java.name
+        @JvmField
+        val KEY_DELETE_DIARY_DATE: String = "DeleteDiaryDate$fromClassName"
+        @JvmField
+        val KEY_DELETE_DIARY_PICTURE_URI: String = "DeleteDiaryPictureUri$fromClassName"
     }
 
-    @Override
-    protected String createMessage() {
-        LocalDate date = DiaryDeleteDialogFragmentArgs.fromBundle(requireArguments()).getDate();
-        DateTimeStringConverter dateTimeStringConverter = new DateTimeStringConverter();
-        String strDate = dateTimeStringConverter.toYearMonthDayWeek(date);
-        return strDate + getString(R.string.dialog_diary_delete_message);
+    override val isCancelableOtherThanPressingButton: Boolean
+        get() = true
+
+    override fun createTitle(): String {
+        return getString(R.string.dialog_diary_delete_title)
     }
 
-    @Override
-    protected void handleOnPositiveButtonClick(@NonNull DialogInterface dialog, int which) {
-        LocalDate deleteDiaryDate =
-                DiaryDeleteDialogFragmentArgs.fromBundle(requireArguments()).getDate();
-        setResult(KEY_DELETE_DIARY_DATE, deleteDiaryDate);
-
-
-        Uri deleteDiaryPictureUri =
-                DiaryDeleteDialogFragmentArgs.fromBundle(requireArguments()).getPictureUri();
-        setResult(KEY_DELETE_DIARY_PICTURE_URI, deleteDiaryPictureUri);
+    override fun createMessage(): String {
+        val date = DiaryDeleteDialogFragmentArgs.fromBundle(requireArguments()).date
+        val dateTimeStringConverter = DateTimeStringConverter()
+        val strDate = dateTimeStringConverter.toYearMonthDayWeek(date)
+        return strDate + getString(R.string.dialog_diary_delete_message)
     }
 
-    @Override
-    protected void handleOnNegativeButtonClick(@NonNull DialogInterface dialog, int which) {
+    override fun handleOnPositiveButtonClick(dialog: DialogInterface, which: Int) {
+        val deleteDiaryDate =
+            DiaryDeleteDialogFragmentArgs.fromBundle(requireArguments()).date
+        setResult(KEY_DELETE_DIARY_DATE, deleteDiaryDate)
+
+
+        val deleteDiaryPictureUri =
+            DiaryDeleteDialogFragmentArgs.fromBundle(requireArguments()).pictureUri
+        setResult(
+            KEY_DELETE_DIARY_PICTURE_URI,
+            deleteDiaryPictureUri!!
+        )
+    }
+
+    override fun handleOnNegativeButtonClick(dialog: DialogInterface, which: Int) {
         // 処理なし
     }
 
-    @Override
-    protected boolean isCancelableOtherThanPressingButton() {
-        return true;
-    }
-
-    @Override
-    protected void handleOnCancel(@NonNull DialogInterface dialog) {
+    override fun handleOnCancel(dialog: DialogInterface) {
         // 処理なし
     }
 
-    @Override
-    protected void handleOnDismiss() {
+    override fun handleOnDismiss() {
         // 処理なし
     }
 }
