@@ -1,149 +1,131 @@
-package com.websarva.wings.android.zuboradiary.ui.list.diarylist;
+package com.websarva.wings.android.zuboradiary.ui.list.diarylist
 
-import android.content.Context;
-import android.net.Uri;
-import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.ViewGroup;
+import android.content.Context
+import android.util.Log
+import android.view.LayoutInflater
+import android.view.ViewGroup
+import androidx.recyclerview.widget.RecyclerView
+import androidx.viewbinding.ViewBinding
+import com.websarva.wings.android.zuboradiary.data.DayOfWeekStringConverter
+import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor
+import com.websarva.wings.android.zuboradiary.databinding.RowDiaryDayListBinding
+import com.websarva.wings.android.zuboradiary.ui.DiaryPictureManager
+import com.websarva.wings.android.zuboradiary.ui.LeftSwipeSimpleCallback.LeftSwipeViewHolder
+import com.websarva.wings.android.zuboradiary.ui.list.DiaryDayListBaseItem
+import com.websarva.wings.android.zuboradiary.ui.list.SwipeDiaryDayListBaseAdapter
+import java.text.NumberFormat
 
-import androidx.annotation.NonNull;
-import androidx.recyclerview.widget.RecyclerView;
-import androidx.viewbinding.ViewBinding;
+class DiaryDayListAdapter(context: Context, recyclerView: RecyclerView, themeColor: ThemeColor)
+    : SwipeDiaryDayListBaseAdapter(
+        context,
+        recyclerView,
+        themeColor,
+        DiaryDayListDiffUtilItemCallback()
+    ) {
 
-import com.websarva.wings.android.zuboradiary.data.DayOfWeekStringConverter;
-import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor;
-import com.websarva.wings.android.zuboradiary.databinding.RowDiaryDayListBinding;
-import com.websarva.wings.android.zuboradiary.ui.DiaryPictureManager;
-import com.websarva.wings.android.zuboradiary.ui.list.DiaryDayListBaseAdapter;
-import com.websarva.wings.android.zuboradiary.ui.list.DiaryDayListBaseItem;
-import com.websarva.wings.android.zuboradiary.ui.list.SwipeDiaryDayListBaseAdapter;
-
-import java.time.LocalDate;
-import java.util.Objects;
-
-public class DiaryDayListAdapter extends SwipeDiaryDayListBaseAdapter {
-
-    public DiaryDayListAdapter(Context context, RecyclerView recyclerView, ThemeColor themeColor) {
-        super(context, recyclerView, themeColor, new DiaryDayListDiffUtilItemCallback());
+    override fun onCreateDiaryDayViewHolder(
+        parent: ViewGroup,
+        themeColorInflater: LayoutInflater
+    ): RecyclerView.ViewHolder {
+        val binding =
+            RowDiaryDayListBinding.inflate(themeColorInflater, parent, false)
+        return DiaryDayListViewHolder(binding)
     }
 
-    @NonNull
-    @Override
-    protected RecyclerView.ViewHolder onCreateDiaryDayViewHolder(@NonNull ViewGroup parent, @NonNull LayoutInflater themeColorInflater) {
-        RowDiaryDayListBinding binding =
-                RowDiaryDayListBinding.inflate(themeColorInflater, parent, false);
-        return new DiaryDayListViewHolder(binding);
+    override fun onBindDate(holder: RecyclerView.ViewHolder, item: DiaryDayListBaseItem) {
+        if (holder !is DiaryDayListViewHolder) throw IllegalStateException()
+
+        val date = item.date
+        val dayOfWeekStringConverter = DayOfWeekStringConverter(context)
+        val strDayOfWeek = dayOfWeekStringConverter.toDiaryListDayOfWeek(date.dayOfWeek)
+        holder.binding.includeDay.textDayOfWeek.text = strDayOfWeek
+        holder.binding.includeDay.textDayOfMonth.text =
+            NumberFormat.getInstance().format(date.dayOfMonth)
     }
 
-    @Override
-    protected void onBindDate(@NonNull RecyclerView.ViewHolder holder, @NonNull DiaryDayListBaseItem item) {
-        DiaryDayListViewHolder _holder = (DiaryDayListViewHolder) holder;
-
-        LocalDate date = item.getDate();
-        DayOfWeekStringConverter dayOfWeekStringConverter = new DayOfWeekStringConverter(getContext());
-        String strDayOfWeek = dayOfWeekStringConverter.toDiaryListDayOfWeek(date.getDayOfWeek());
-        _holder.binding.includeDay.textDayOfWeek.setText(strDayOfWeek);
-        _holder.binding.includeDay.textDayOfMonth.setText(String.valueOf(date.getDayOfMonth()));
-    }
-
-    @Override
-    protected void onBindItemClickListener(@NonNull RecyclerView.ViewHolder holder, @NonNull DiaryDayListBaseItem item) {
-        DiaryDayListViewHolder _holder = (DiaryDayListViewHolder) holder;
-        _holder.binding.linerLayoutForeground.setOnClickListener(v -> {
-            Objects.requireNonNull(v);
-
-            onClickItem(item);
-        });
-    }
-
-    @Override
-    protected void onBindOtherView(@NonNull RecyclerView.ViewHolder holder, @NonNull DiaryDayListBaseItem item) {
-        DiaryDayListViewHolder _holder = (DiaryDayListViewHolder) holder;
-        DiaryDayListItem _item = (DiaryDayListItem) item;
-
-        onBindTitle(_holder, _item);
-        onBindPicture(_holder, _item);
-    }
-
-    private void onBindTitle(DiaryDayListViewHolder holder, DiaryDayListItem item) {
-        Objects.requireNonNull(holder);
-        Objects.requireNonNull(item);
-
-        String title = item.getTitle();
-        holder.binding.textTitle.setText(title);
-    }
-
-    private void onBindPicture(DiaryDayListViewHolder holder, DiaryDayListItem item) {
-        Objects.requireNonNull(holder);
-        Objects.requireNonNull(item);
-
-        DiaryPictureManager diaryPictureManager =
-                new DiaryPictureManager(
-                        getContext(),
-                        holder.binding.imageAttachedPicture,
-                        getThemeColor().getOnSecondaryContainerColor(getContext().getResources())
-                );
-        Uri pictureUri = item.getPicturePath();
-        diaryPictureManager.setUpPictureOnDiaryList(pictureUri);
-    }
-
-    @Override
-    protected void onBindDeleteButtonClickListener(@NonNull RecyclerView.ViewHolder holder, @NonNull DiaryDayListBaseItem item) {
-        DiaryDayListViewHolder _holder = (DiaryDayListViewHolder) holder;
-
-        _holder.binding.includeBackground.imageButtonDelete.setOnClickListener(v -> {
-            Objects.requireNonNull(v);
-
-            onClickDeleteButton(item);
-        });
-    }
-
-    public static class DiaryDayListViewHolder extends DiaryListSimpleCallback.LeftSwipeViewHolder {
-
-        public final RowDiaryDayListBinding binding;
-
-        public DiaryDayListViewHolder(@NonNull RowDiaryDayListBinding binding) {
-            super(binding);
-            this.binding = binding;
-        }
-
-        @Override
-        protected void setUpView(@NonNull ViewBinding binding) {
-            RowDiaryDayListBinding rowDiaryDayListBinding;
-            if (binding instanceof RowDiaryDayListBinding) {
-                rowDiaryDayListBinding = (RowDiaryDayListBinding) binding;
-                foregroundView = rowDiaryDayListBinding.linerLayoutForeground;
-                backgroundButtonView = rowDiaryDayListBinding.includeBackground.imageButtonDelete;
-            }
+    override fun onBindItemClickListener(
+        holder: RecyclerView.ViewHolder,
+        item: DiaryDayListBaseItem
+    ) {
+        if (holder !is DiaryDayListViewHolder) throw IllegalStateException()
+        holder.binding.linerLayoutForeground.setOnClickListener {
+            onClickItem(item)
         }
     }
 
-    private static class DiaryDayListDiffUtilItemCallback extends DiaryDayListBaseAdapter.DiffUtilItemCallback {
+    override fun onBindOtherView(holder: RecyclerView.ViewHolder, item: DiaryDayListBaseItem) {
+        if (holder !is DiaryDayListViewHolder) throw IllegalStateException()
+        if (item !is DiaryDayListItem) throw IllegalStateException()
 
-        @Override
-        public boolean areContentsTheSame(@NonNull DiaryDayListBaseItem oldItem, @NonNull DiaryDayListBaseItem newItem) {
-            DiaryDayListItem _oldItem = (DiaryDayListItem) oldItem;
-            DiaryDayListItem _newItem = (DiaryDayListItem) newItem;
+        onBindTitle(holder, item)
+        onBindPicture(holder, item)
+    }
 
-            Log.d("DiaryDayList", "DiffUtil.ItemCallback_areContentsTheSame()");
-            if (!_oldItem.getTitle().equals(_newItem.getTitle())) {
-                Log.d("DiaryDayList", "Title不一致");
-                return false;
+    private fun onBindTitle(holder: DiaryDayListViewHolder, item: DiaryDayListItem) {
+        val title = item.title
+        holder.binding.textTitle.text = title
+    }
+
+    private fun onBindPicture(holder: DiaryDayListViewHolder, item: DiaryDayListItem) {
+        val diaryPictureManager =
+            DiaryPictureManager(
+                context,
+                holder.binding.imageAttachedPicture,
+                themeColor.getOnSecondaryContainerColor(context.resources)
+            )
+        val pictureUri = item.picturePath
+        diaryPictureManager.setUpPictureOnDiaryList(pictureUri)
+    }
+
+    override fun onBindDeleteButtonClickListener(
+        holder: RecyclerView.ViewHolder,
+        item: DiaryDayListBaseItem
+    ) {
+        if (holder !is DiaryDayListViewHolder) throw IllegalStateException()
+
+        holder.binding.includeBackground.imageButtonDelete.setOnClickListener {
+            onClickDeleteButton(item)
+        }
+    }
+
+    class DiaryDayListViewHolder(val binding: RowDiaryDayListBinding) :
+        LeftSwipeViewHolder(binding) {
+        override fun setUpView(binding: ViewBinding) {
+            if (binding !is RowDiaryDayListBinding) throw IllegalStateException()
+
+            foregroundView = binding.linerLayoutForeground
+            backgroundButtonView = binding.includeBackground.imageButtonDelete
+        }
+    }
+
+    private class DiaryDayListDiffUtilItemCallback : DiffUtilItemCallback() {
+        override fun areContentsTheSame(
+            oldItem: DiaryDayListBaseItem,
+            newItem: DiaryDayListBaseItem
+        ): Boolean {
+            if (oldItem !is DiaryDayListItem) throw IllegalStateException()
+            if (newItem !is DiaryDayListItem) throw IllegalStateException()
+
+            Log.d("DiaryDayList", "DiffUtil.ItemCallback_areContentsTheSame()")
+            if (oldItem.title != newItem.title) {
+                Log.d("DiaryDayList", "Title不一致")
+                return false
             }
-            if (_oldItem.getPicturePath() == null && _newItem.getPicturePath() != null) {
-                Log.d("DiaryDayList", "PicturePath不一致");
-                return false;
+            if (oldItem.picturePath == null && newItem.picturePath != null) {
+                Log.d("DiaryDayList", "PicturePath不一致")
+                return false
             }
-            if (_oldItem.getPicturePath() != null && _newItem.getPicturePath() == null) {
-                Log.d("DiaryDayList", "PicturePath不一致");
-                return false;
+            if (oldItem.picturePath != null && newItem.picturePath == null) {
+                Log.d("DiaryDayList", "PicturePath不一致")
+                return false
             }
-            if ((_oldItem.getPicturePath() != null && _newItem.getPicturePath() != null)
-                    && (!_oldItem.getPicturePath().equals(_newItem.getPicturePath()))) {
-                Log.d("DiaryDayList", "PicturePath不一致");
-                return false;
+            if ((oldItem.picturePath != null && newItem.picturePath != null)
+                && (oldItem.picturePath != newItem.picturePath)
+            ) {
+                Log.d("DiaryDayList", "PicturePath不一致")
+                return false
             }
-            return true;
+            return true
         }
     }
 }
