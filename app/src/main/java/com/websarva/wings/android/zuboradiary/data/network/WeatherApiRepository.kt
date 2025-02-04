@@ -1,67 +1,60 @@
-package com.websarva.wings.android.zuboradiary.data.network;
+package com.websarva.wings.android.zuboradiary.data.network
 
-import android.util.Log;
+import android.util.Log
+import androidx.annotation.IntRange
+import retrofit2.Call
+import java.time.LocalDate
+import java.time.temporal.ChronoUnit
+import javax.inject.Inject
 
-import androidx.annotation.IntRange;
+class WeatherApiRepository @Inject constructor(private val weatherApiService: WeatherApiService) {
 
-import java.time.LocalDate;
-import java.time.temporal.ChronoUnit;
-import java.util.Objects;
-
-import javax.inject.Inject;
-
-import retrofit2.Call;
-
-public class WeatherApiRepository {
-    private final WeatherApiService weatherApiService;
-    private final String QUERY_DAIRY_PARAMETER = "weather_code";
-    private final String QUERY_TIME_ZONE_PARAMETER = "Asia/Tokyo";
-    private final int MIN_PAST_DAYS = 1; //過去天気情報取得可能最小日
-    private final int MAX_PAST_DAYS = 92; //過去天気情報取得可能最大日
-
-    @Inject
-    public WeatherApiRepository(WeatherApiService weatherApiService) {
-        Objects.requireNonNull(weatherApiService);
-
-        this.weatherApiService = weatherApiService;
+    companion object {
+        private const val MIN_PAST_DAYS = 1 //過去天気情報取得可能最小日
+        private const val MAX_PAST_DAYS = 92 //過去天気情報取得可能最大日
     }
 
-    public boolean canFetchWeatherInfo(LocalDate date) {
-        Objects.requireNonNull(date);
+    private val queryDiaryParameter = "weather_code"
+    private val queryTimeZoneParameter = "Asia/Tokyo"
 
-        LocalDate currentDate = LocalDate.now();
-        Log.d("fetchWeatherInfo", "isAfter:" + date.isAfter(currentDate));
-        if (date.isAfter(currentDate)) return false;
 
-        long betweenDays = ChronoUnit.DAYS.between(date, currentDate);
-        Log.d("fetchWeatherInfo", "betweenDays:" + betweenDays);
+    fun canFetchWeatherInfo(date: LocalDate): Boolean {
+        val currentDate = LocalDate.now()
+        Log.d("fetchWeatherInfo", "isAfter:" + date.isAfter(currentDate))
+        if (date.isAfter(currentDate)) return false
 
-        return betweenDays <= MAX_PAST_DAYS;
+        val betweenDays = ChronoUnit.DAYS.between(date, currentDate)
+        Log.d("fetchWeatherInfo", "betweenDays:$betweenDays")
+
+        return betweenDays <= MAX_PAST_DAYS
     }
 
-    public Call<WeatherApiResponse> fetchTodayWeatherInfo(GeoCoordinates geoCoordinates) {
-        Objects.requireNonNull(geoCoordinates);
+    fun fetchTodayWeatherInfo(geoCoordinates: GeoCoordinates): Call<WeatherApiResponse> {
+        return weatherApiService.getWeather(
+            geoCoordinates.latitude.toString(),
+            geoCoordinates.longitude.toString(),
+            queryDiaryParameter,
+            queryTimeZoneParameter,
+            "0",  /*today*/
+            "1" /*1日分*/
+        )
+    }
+
+    fun fetchPastDayWeatherInfo(
+        geoCoordinates: GeoCoordinates,
+        @IntRange(from = MIN_PAST_DAYS.toLong(), to = MAX_PAST_DAYS.toLong())
+        numPastDays: Int
+    ): Call<WeatherApiResponse> {
+        require(numPastDays >= MIN_PAST_DAYS)
+        require(numPastDays <= MAX_PAST_DAYS)
 
         return weatherApiService.getWeather(
-                String.valueOf(geoCoordinates.getLatitude()),
-                String.valueOf(geoCoordinates.getLongitude()),
-                QUERY_DAIRY_PARAMETER,
-                QUERY_TIME_ZONE_PARAMETER,
-                "0" /*today*/,
-                "1" /*1日分*/);
-    }
-
-    public Call<WeatherApiResponse> fetchPastDayWeatherInfo(
-            GeoCoordinates geoCoordinates, @IntRange(from = MIN_PAST_DAYS, to = MAX_PAST_DAYS) int numPastDays) {
-        Objects.requireNonNull(geoCoordinates);
-        if (numPastDays < MIN_PAST_DAYS || numPastDays > MAX_PAST_DAYS) throw new IllegalArgumentException();
-
-        return weatherApiService.getWeather(
-                String.valueOf(geoCoordinates.getLatitude()),
-                String.valueOf(geoCoordinates.getLongitude()),
-                QUERY_DAIRY_PARAMETER,
-                QUERY_TIME_ZONE_PARAMETER,
-                String.valueOf(numPastDays),
-                "0" /*1日分(過去日から1日分取得する場合"0"を代入)*/);
+            geoCoordinates.latitude.toString(),
+            geoCoordinates.longitude.toString(),
+            queryDiaryParameter,
+            queryTimeZoneParameter,
+            numPastDays.toString(),
+            "0" /*1日分(過去日から1日分取得する場合"0"を代入)*/
+        )
     }
 }
