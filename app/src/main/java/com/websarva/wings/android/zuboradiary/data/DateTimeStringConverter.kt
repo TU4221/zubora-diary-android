@@ -1,45 +1,35 @@
-package com.websarva.wings.android.zuboradiary.data;
+package com.websarva.wings.android.zuboradiary.data
 
-import androidx.annotation.NonNull;
-
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
-import java.util.Objects;
+import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.LocalTime
+import java.time.format.DateTimeFormatter
 
 /**
  *
  * Class LocalDate を用途に合わせたの文字列に変換するクラス。
- * */
-public class DateTimeStringConverter {
+ */
+class DateTimeStringConverter {
 
-    private final String DATE_FORMAT = "yyyy年MM月dd日(E)";
-    private final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern(DATE_FORMAT);
-    private final String DATE_TIME_FORMAT = "yyyy年MM月dd日(E) HH:mm:ss";
-    private final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern(DATE_TIME_FORMAT);
-    private final String TIME_HOUR_MINUTE = "HH:mm";
-    private final DateTimeFormatter TIME_HOUR_MINUTE_FORMATTER = DateTimeFormatter.ofPattern(TIME_HOUR_MINUTE);
+    private val dateFormat = "yyyy年MM月dd日(E)"
+    private val dateFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern(dateFormat)
 
-    @NonNull
-    public String toYearMonthDayWeek(LocalDate localDate) {
-        Objects.requireNonNull(localDate);
+    private val dateTimeFormat = "yyyy年MM月dd日(E) HH:mm:ss"
+    private val dateTimeFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern(dateTimeFormat)
 
-        return localDate.format(DATE_FORMATTER);
+    private val timeHourMinuteFormat = "HH:mm"
+    private val timeHourMinuteFormatter: DateTimeFormatter =
+        DateTimeFormatter.ofPattern(timeHourMinuteFormat)
+
+    fun toYearMonthDayWeek(localDate: LocalDate): String {
+        return localDate.format(dateFormatter)
     }
 
-    @NonNull
-    public String toYearMonthDayWeekHourMinuteSeconds(LocalDateTime localDateTime) {
-        Objects.requireNonNull(localDateTime);
-
-        return localDateTime.format(DATE_TIME_FORMATTER);
+    fun toYearMonthDayWeekHourMinuteSeconds(localDateTime: LocalDateTime): String {
+        return localDateTime.format(dateTimeFormatter)
     }
 
-
-    @NonNull
-    public String toHourMinute(LocalTime localTime) {
-        Objects.requireNonNull(localTime);
-
-        return localTime.format(TIME_HOUR_MINUTE_FORMATTER);
+    fun toHourMinute(localTime: LocalTime): String {
+        return localTime.format(timeHourMinuteFormatter)
     }
 }
