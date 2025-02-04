@@ -1,29 +1,19 @@
-package com.websarva.wings.android.zuboradiary.ui.list.diarylist;
+package com.websarva.wings.android.zuboradiary.ui.list.diarylist
 
-import androidx.annotation.Nullable;
-import androidx.recyclerview.widget.RecyclerView;
+import androidx.recyclerview.widget.RecyclerView
+import com.websarva.wings.android.zuboradiary.ui.LeftSwipeBackgroundButtonSimpleCallback
 
-import com.websarva.wings.android.zuboradiary.ui.LeftSwipeBackgroundButtonSimpleCallback;
+class DiaryListSimpleCallback(
+    private val parentRecyclerView: RecyclerView,
+    recyclerView: RecyclerView
+) : LeftSwipeBackgroundButtonSimpleCallback(recyclerView) {
 
-import java.util.Objects;
-
-public class DiaryListSimpleCallback extends LeftSwipeBackgroundButtonSimpleCallback {
-
-    private final RecyclerView parentRecyclerView;
-
-    public DiaryListSimpleCallback(RecyclerView parentRecyclerView, RecyclerView recyclerView) {
-        super(recyclerView);
-        this.parentRecyclerView = parentRecyclerView;
-    }
-
-    @Override
-    public void onSelectedChanged(@Nullable RecyclerView.ViewHolder viewHolder, int actionState) {
-        super.onSelectedChanged(viewHolder, actionState);
+    override fun onSelectedChanged(viewHolder: RecyclerView.ViewHolder?, actionState: Int) {
+        super.onSelectedChanged(viewHolder, actionState)
 
         // 他ChildRecyclerView(DayList)のスワイプ状態を閉じる
-        RecyclerView.Adapter<?> adapter = parentRecyclerView.getAdapter();
-        Objects.requireNonNull(adapter);
-        DiaryYearMonthListAdapter listAdapter = (DiaryYearMonthListAdapter) adapter;
-        listAdapter.closeSwipedItemOtherDayList(this);
+        val adapter = parentRecyclerView.adapter
+        val listAdapter = adapter as DiaryYearMonthListAdapter
+        listAdapter.closeSwipedItemOtherDayList(this)
     }
 }
