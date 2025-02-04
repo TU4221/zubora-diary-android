@@ -12,7 +12,7 @@ abstract class SwipeDiaryDayListBaseAdapter protected constructor(
 ) : DiaryDayListBaseAdapter(context, recyclerView, themeColor, diffUtilItemCallback) {
 
     fun interface OnClickDeleteButtonListener {
-        fun onClick(item: DiaryDayListBaseItem?)
+        fun onClick(item: DiaryDayListBaseItem)
     }
     var onClickDeleteButtonListener: OnClickDeleteButtonListener? = null
 

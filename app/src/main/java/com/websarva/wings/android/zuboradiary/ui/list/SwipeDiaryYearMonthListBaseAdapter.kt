@@ -16,7 +16,7 @@ abstract class SwipeDiaryYearMonthListBaseAdapter protected constructor(
 ) : DiaryYearMonthListBaseAdapter(context, recyclerView, themeColor, diffUtilItemCallback) {
 
     fun interface OnClickChildItemBackgroundButtonListener {
-        fun onClick(item: DiaryDayListBaseItem?)
+        fun onClick(item: DiaryDayListBaseItem)
     }
     var onClickChildItemBackgroundButtonListener: OnClickChildItemBackgroundButtonListener? = null
 

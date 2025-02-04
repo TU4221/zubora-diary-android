@@ -41,7 +41,7 @@ abstract class DiaryYearMonthListAdapter(
                     onClickChildItemListener?.onClick(item) ?: return@OnClickItemListener
                 }
             onClickDeleteButtonListener =
-                SwipeDiaryDayListBaseAdapter.OnClickDeleteButtonListener { item: DiaryDayListBaseItem? ->
+                SwipeDiaryDayListBaseAdapter.OnClickDeleteButtonListener { item: DiaryDayListBaseItem ->
                     onClickChildItemBackgroundButtonListener?.onClick(item)
                         ?: return@OnClickDeleteButtonListener
                 }
