@@ -61,7 +61,7 @@ class DiaryYearMonthList {
 
         val sortedDiaryDayList = DiaryDayList(sortingDayItemList)
         diaryYearMonthListItem =
-            DiaryYearMonthListItem(sortingYearMonth, sortedDiaryDayList)
+            DiaryYearMonthListItem(checkNotNull(sortingYearMonth) , sortedDiaryDayList)
         diaryYearMonthListItemList.add(diaryYearMonthListItem)
         return diaryYearMonthListItemList
     }

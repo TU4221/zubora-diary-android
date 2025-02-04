@@ -1,29 +1,23 @@
-package com.websarva.wings.android.zuboradiary.ui.list.diarylist;
+package com.websarva.wings.android.zuboradiary.ui.list.diarylist
 
-import com.websarva.wings.android.zuboradiary.ui.list.DiaryYearMonthListBaseAdapter.ViewType;
-import com.websarva.wings.android.zuboradiary.ui.list.DiaryYearMonthListBaseItem;
+import com.websarva.wings.android.zuboradiary.ui.list.DiaryYearMonthListBaseAdapter
+import com.websarva.wings.android.zuboradiary.ui.list.DiaryYearMonthListBaseItem
+import java.time.YearMonth
 
-import java.time.YearMonth;
-import java.util.Objects;
+class DiaryYearMonthListItem : DiaryYearMonthListBaseItem {
 
-public class DiaryYearMonthListItem extends DiaryYearMonthListBaseItem {
-    private final DiaryDayList diaryDayList;
+    val diaryDayList: DiaryDayList
 
-    DiaryYearMonthListItem(ViewType viewType) {
-        super(viewType);
-        diaryDayList = new DiaryDayList();
+   constructor(viewType: DiaryYearMonthListBaseAdapter.ViewType) : super(viewType) {
+        diaryDayList = DiaryDayList()
     }
 
-    DiaryYearMonthListItem(YearMonth yearMonth, DiaryDayList diaryDayList) {
-        super(yearMonth, ViewType.DIARY);
+   constructor(yearMonth: YearMonth, diaryDayList: DiaryDayList) : super(
+       yearMonth,
+       DiaryYearMonthListBaseAdapter.ViewType.DIARY
+    ) {
+        require(diaryDayList.diaryDayListItemList.isNotEmpty())
 
-        Objects.requireNonNull(diaryDayList);
-        if (diaryDayList.getDiaryDayListItemList().isEmpty()) throw new IllegalArgumentException();
-
-        this.diaryDayList = diaryDayList;
-    }
-
-    public DiaryDayList getDiaryDayList() {
-        return diaryDayList;
+        this.diaryDayList = diaryDayList
     }
 }
