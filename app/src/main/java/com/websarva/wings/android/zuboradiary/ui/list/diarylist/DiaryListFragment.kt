@@ -1,370 +1,317 @@
-package com.websarva.wings.android.zuboradiary.ui.list.diarylist;
+package com.websarva.wings.android.zuboradiary.ui.list.diarylist
 
-import android.content.Context;
-import android.net.Uri;
-import android.os.Bundle;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-
-import androidx.annotation.NonNull;
-import androidx.databinding.ViewDataBinding;
-import androidx.lifecycle.Observer;
-import androidx.lifecycle.SavedStateHandle;
-import androidx.lifecycle.ViewModelProvider;
-import androidx.navigation.NavDirections;
-import androidx.recyclerview.widget.RecyclerView;
-
-import com.websarva.wings.android.zuboradiary.R;
-import com.websarva.wings.android.zuboradiary.data.AppMessage;
-import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor;
-import com.websarva.wings.android.zuboradiary.databinding.FragmentDiaryListBinding;
-import com.websarva.wings.android.zuboradiary.ui.BaseFragment;
-import com.websarva.wings.android.zuboradiary.ui.UriPermissionManager;
-import com.websarva.wings.android.zuboradiary.ui.list.DiaryYearMonthListBaseItem;
-
-import java.time.LocalDate;
-import java.time.Year;
-import java.time.YearMonth;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-
-import dagger.hilt.android.AndroidEntryPoint;
+import android.content.Context
+import android.net.Uri
+import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.MenuItem
+import android.view.MotionEvent
+import android.view.View
+import android.view.ViewGroup
+import androidx.databinding.ViewDataBinding
+import androidx.lifecycle.Observer
+import androidx.lifecycle.SavedStateHandle
+import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.NavDirections
+import androidx.recyclerview.widget.RecyclerView
+import com.websarva.wings.android.zuboradiary.R
+import com.websarva.wings.android.zuboradiary.data.AppMessage
+import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor
+import com.websarva.wings.android.zuboradiary.databinding.FragmentDiaryListBinding
+import com.websarva.wings.android.zuboradiary.ui.BaseFragment
+import com.websarva.wings.android.zuboradiary.ui.UriPermissionManager
+import com.websarva.wings.android.zuboradiary.ui.list.DiaryDayListBaseItem
+import com.websarva.wings.android.zuboradiary.ui.list.DiaryYearMonthListBaseAdapter.OnClickChildItemListener
+import com.websarva.wings.android.zuboradiary.ui.list.DiaryYearMonthListBaseItem
+import com.websarva.wings.android.zuboradiary.ui.list.SwipeDiaryYearMonthListBaseAdapter.OnClickChildItemBackgroundButtonListener
+import com.websarva.wings.android.zuboradiary.ui.notNullValue
+import dagger.hilt.android.AndroidEntryPoint
+import java.time.LocalDate
+import java.time.Year
+import java.time.YearMonth
 
 @AndroidEntryPoint
-public class DiaryListFragment extends BaseFragment {
-
+class DiaryListFragment : BaseFragment() {
     // View関係
-    private FragmentDiaryListBinding binding;
+    private var _binding: FragmentDiaryListBinding? = null
+    private val binding: FragmentDiaryListBinding get() = checkNotNull(_binding)
 
     // ViewModel
-    private DiaryListViewModel diaryListViewModel;
+    private lateinit var diaryListViewModel: DiaryListViewModel
 
     // Uri関係
-    private UriPermissionManager pictureUriPermissionManager;
+    private lateinit var pictureUriPermissionManager: UriPermissionManager
 
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
 
         pictureUriPermissionManager =
-                new UriPermissionManager(requireContext()) {
-                    @Override
-                    public boolean checkUsedUriDoesNotExist(@NonNull Uri uri) {
-                        return diaryListViewModel.checkSavedPicturePathDoesNotExist(uri);
-                    }
-                };
+            object : UriPermissionManager(requireContext()) {
+                override fun checkUsedUriDoesNotExist(uri: Uri): Boolean {
+                    return diaryListViewModel.checkSavedPicturePathDoesNotExist(uri)
+                }
+            }
     }
 
-    @Override
-    protected void initializeViewModel() {
-        ViewModelProvider provider = new ViewModelProvider(requireActivity());
-        diaryListViewModel = provider.get(DiaryListViewModel.class);
+    override fun initializeViewModel() {
+        val provider = ViewModelProvider(requireActivity())
+        diaryListViewModel = provider[DiaryListViewModel::class.java]
     }
 
-    @Override
-    public View onCreateView(
-            @NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        return super.onCreateView(inflater,container,savedInstanceState);
+    override fun initializeDataBinding(
+        themeColorInflater: LayoutInflater, container: ViewGroup
+    ): ViewDataBinding {
+        _binding = FragmentDiaryListBinding.inflate(themeColorInflater, container, false)
+        binding.lifecycleOwner = this
+        binding.listViewModel = diaryListViewModel
+        return binding
     }
 
-    @Override
-    protected ViewDataBinding initializeDataBinding(
-            @NonNull LayoutInflater themeColorInflater, @NonNull ViewGroup container) {
-        binding = FragmentDiaryListBinding.inflate(themeColorInflater, container, false);
-        binding.setLifecycleOwner(this);
-        binding.setListViewModel(diaryListViewModel);
-        return binding;
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        setUpToolBar()
+        setUpFloatActionButton()
+        setUpDiaryList()
     }
 
-    @Override
-    public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-
-        setUpToolBar();
-        setUpFloatActionButton();
-        setUpDiaryList();
-    }
-
-    @Override
-    protected void handleOnReceivingResultFromPreviousFragment(@NonNull SavedStateHandle savedStateHandle) {
+    override fun handleOnReceivingResultFromPreviousFragment(savedStateHandle: SavedStateHandle) {
         // 処理なし
     }
 
-    @Override
-    protected void handleOnReceivingDialogResult(@NonNull SavedStateHandle savedStateHandle) {
-        receiveDatePickerDialogResults(savedStateHandle);
-        receiveDiaryDeleteDialogResults(savedStateHandle);
+    override fun handleOnReceivingDialogResult(savedStateHandle: SavedStateHandle) {
+        receiveDatePickerDialogResults()
+        receiveDiaryDeleteDialogResults()
     }
 
-    @Override
-    protected void removeDialogResultOnDestroy(@NonNull SavedStateHandle savedStateHandle) {
-        savedStateHandle.remove(StartYearMonthPickerDialogFragment.KEY_SELECTED_YEAR_MONTH);
-        savedStateHandle.remove(DiaryDeleteDialogFragment.KEY_DELETE_DIARY_DATE);
+    override fun removeDialogResultOnDestroy(savedStateHandle: SavedStateHandle) {
+        savedStateHandle.remove<Any>(StartYearMonthPickerDialogFragment.KEY_SELECTED_YEAR_MONTH)
+        savedStateHandle.remove<Any>(DiaryDeleteDialogFragment.KEY_DELETE_DIARY_DATE)
     }
 
-    @Override
-    protected void setUpOtherAppMessageDialog() {
-        diaryListViewModel.getAppMessageBufferList()
-                .observe(getViewLifecycleOwner(), new AppMessageBufferListObserver(diaryListViewModel));
+    override fun setUpOtherAppMessageDialog() {
+        diaryListViewModel.appMessageBufferList
+            .observe(viewLifecycleOwner, AppMessageBufferListObserver(diaryListViewModel))
     }
 
     // 日付入力ダイアログフラグメントから結果受取
-    private void receiveDatePickerDialogResults(SavedStateHandle savedStateHandle) {
-        Objects.requireNonNull(savedStateHandle);
+    private fun receiveDatePickerDialogResults() {
+        val selectedYearMonth =
+            receiveResulFromDialog<YearMonth>(StartYearMonthPickerDialogFragment.KEY_SELECTED_YEAR_MONTH)
+                ?: return
 
-        YearMonth selectedYearMonth =
-                receiveResulFromDialog(StartYearMonthPickerDialogFragment.KEY_SELECTED_YEAR_MONTH);
-        if (selectedYearMonth == null) return;
-
-        diaryListViewModel.updateSortConditionDate(selectedYearMonth);
-        scrollDiaryListToFirstPosition();
-        diaryListViewModel.loadNewDiaryList();
+        diaryListViewModel.updateSortConditionDate(selectedYearMonth)
+        scrollDiaryListToFirstPosition()
+        diaryListViewModel.loadNewDiaryList()
     }
 
     // 日記削除ダイアログフラグメントから結果受取
-    private void receiveDiaryDeleteDialogResults(SavedStateHandle savedStateHandle) {
-        Objects.requireNonNull(savedStateHandle);
+    private fun receiveDiaryDeleteDialogResults() {
+        val deleteDiaryDate =
+            receiveResulFromDialog<LocalDate>(DiaryDeleteDialogFragment.KEY_DELETE_DIARY_DATE)
+                ?: return
 
-        LocalDate deleteDiaryDate =
-                receiveResulFromDialog(DiaryDeleteDialogFragment.KEY_DELETE_DIARY_DATE);
-        if (deleteDiaryDate == null) return;
+        val isSuccessful = diaryListViewModel.deleteDiary(deleteDiaryDate)
+        if (!isSuccessful) return
 
-        boolean isSuccessful = diaryListViewModel.deleteDiary(deleteDiaryDate);
-        if (!isSuccessful) return;
-
-        Uri deleteDiaryPictureUri =
-                receiveResulFromDialog(DiaryDeleteDialogFragment.KEY_DELETE_DIARY_PICTURE_URI);
-        if (deleteDiaryPictureUri == null) return;
-        releasePersistableLoadedPictureUriPermission(deleteDiaryPictureUri);
+        val deleteDiaryPictureUri =
+            receiveResulFromDialog<Uri>(DiaryDeleteDialogFragment.KEY_DELETE_DIARY_PICTURE_URI)
+                ?: return
+        releasePersistableLoadedPictureUriPermission(deleteDiaryPictureUri)
     }
 
-    private void releasePersistableLoadedPictureUriPermission(Uri uri) {
-        Objects.requireNonNull(uri);
-
-        pictureUriPermissionManager.releasePersistablePermission(uri);
+    private fun releasePersistableLoadedPictureUriPermission(uri: Uri) {
+        pictureUriPermissionManager.releasePersistablePermission(uri)
     }
 
     // ツールバー設定
-    private void setUpToolBar() {
+    private fun setUpToolBar() {
         binding.materialToolbarTopAppBar
-                .setNavigationOnClickListener(v -> {
-                    Objects.requireNonNull(v);
+            .setNavigationOnClickListener {
+                // リスト先頭年月切り替えダイアログ起動
+                val newestDiaryDate = diaryListViewModel.loadNewestSavedDiary()
+                val oldestDiaryDate = diaryListViewModel.loadOldestSavedDiary()
+                if (newestDiaryDate == null) return@setNavigationOnClickListener
+                if (oldestDiaryDate == null) return@setNavigationOnClickListener
 
-                    // リスト先頭年月切り替えダイアログ起動
-                    LocalDate newestDiaryDate = diaryListViewModel.loadNewestSavedDiary();
-                    LocalDate oldestDiaryDate = diaryListViewModel.loadOldestSavedDiary();
-                    if (newestDiaryDate == null) return;
-                    if (oldestDiaryDate == null) return;
-
-                    Year newestYear = Year.of(newestDiaryDate.getYear());
-                    Year oldestYear = Year.of(oldestDiaryDate.getYear());
-                    showStartYearMonthPickerDialog(newestYear, oldestYear);
-                });
+                val newestYear = Year.of(newestDiaryDate.year)
+                val oldestYear = Year.of(oldestDiaryDate.year)
+                showStartYearMonthPickerDialog(newestYear, oldestYear)
+            }
 
         binding.materialToolbarTopAppBar
-                .setOnMenuItemClickListener(item -> {
-                    Objects.requireNonNull(item);
-
-                    // ワード検索フラグメント起動
-                    if (item.getItemId() == R.id.diaryListToolbarOptionWordSearch) {
-                        showWordSearchFragment();
-                        return true;
-                    }
-                    return false;
-                });
+            .setOnMenuItemClickListener { item: MenuItem ->
+                // ワード検索フラグメント起動
+                if (item.itemId == R.id.diaryListToolbarOptionWordSearch) {
+                    showWordSearchFragment()
+                    return@setOnMenuItemClickListener true
+                }
+                false
+            }
     }
 
     // 新規作成FAB設定
-    private void setUpFloatActionButton() {
-        binding.floatingActionButtonDiaryEdit.setOnClickListener(v -> {
-            Objects.requireNonNull(v);
-
-            showEditDiary();
-        });
+    private fun setUpFloatActionButton() {
+        binding.floatingActionButtonDiaryEdit.setOnClickListener {
+            showEditDiary()
+        }
     }
 
     // 日記リスト(年月)設定
-    private void setUpDiaryList() {
-        DiaryListAdapter diaryListAdapter =
-                new DiaryListAdapter(
-                        requireContext(),
-                        binding.recyclerDiaryList,
-                        requireThemeColor()
-                );
-        diaryListAdapter.build();
-        diaryListAdapter.setOnClickChildItemListener(item -> {
-            Objects.requireNonNull(item);
+    private fun setUpDiaryList() {
+        val diaryListAdapter =
+            DiaryListAdapter(
+                requireContext(),
+                binding.recyclerDiaryList,
+                requireThemeColor()
+            )
+        diaryListAdapter.build()
+        diaryListAdapter.onClickChildItemListener =
+            OnClickChildItemListener { item: DiaryDayListBaseItem ->
+                showShowDiaryFragment(item.date)
+            }
+        diaryListAdapter.onClickChildItemBackgroundButtonListener =
+            OnClickChildItemBackgroundButtonListener { item: DiaryDayListBaseItem ->
+                if (item !is DiaryDayListItem) throw IllegalStateException()
+                showDiaryDeleteDialog(item.date, item.picturePath)
+            }
 
-            showShowDiaryFragment(item.getDate());
-        });
-        diaryListAdapter.setOnClickChildItemBackgroundButtonListener(item -> {
-            Objects.requireNonNull(item);
-
-            DiaryDayListItem _item = (DiaryDayListItem) item;
-            showDiaryDeleteDialog(_item.getDate(), _item.getPicturePath());
-        });
-
-        diaryListViewModel.getDiaryList().observe(getViewLifecycleOwner(), new DiaryListObserver());
+        diaryListViewModel.diaryList.observe(viewLifecycleOwner, DiaryListObserver())
 
         // 画面全体ProgressBar表示中はタッチ無効化
-        binding.includeProgressIndicator.viewBackground.setOnTouchListener((v, event) -> {
-            Objects.requireNonNull(v);
-            Objects.requireNonNull(event);
-
-            v.performClick();
-            return true;
-        });
-
-        loadDiaryList();
-    }
-
-    private class DiaryListAdapter extends DiaryYearMonthListAdapter {
-
-        public DiaryListAdapter(Context context, RecyclerView recyclerView, ThemeColor themeColor) {
-            super(context, recyclerView, themeColor);
-        }
-
-        @Override
-        public void loadListOnScrollEnd() {
-            diaryListViewModel.loadAdditionDiaryList();
-        }
-
-        @Override
-        public boolean canLoadList() {
-            return diaryListViewModel.canLoadDiaryList();
-        }
-    }
-
-    private class DiaryListObserver implements Observer<DiaryYearMonthList> {
-
-        @Override
-        public void onChanged(DiaryYearMonthList list) {
-            Objects.requireNonNull(list);
-
-            setUpListViewVisibility(list);
-            setUpList(list);
-        }
-
-        private void setUpListViewVisibility(DiaryYearMonthList list) {
-            Objects.requireNonNull(list);
-
-            boolean isNoDiary = list.getDiaryYearMonthListItemList().isEmpty();
-            if (isNoDiary) {
-                binding.textNoDiaryMessage.setVisibility(View.VISIBLE);
-                binding.recyclerDiaryList.setVisibility(View.INVISIBLE);
-            } else {
-                binding.textNoDiaryMessage.setVisibility(View.INVISIBLE);
-                binding.recyclerDiaryList.setVisibility(View.VISIBLE);
+        binding.includeProgressIndicator.viewBackground
+            .setOnTouchListener { v: View, _: MotionEvent ->
+                v.performClick()
+                true
             }
+
+        loadDiaryList()
+    }
+
+    private inner class DiaryListAdapter(
+        context: Context,
+        recyclerView: RecyclerView,
+        themeColor: ThemeColor
+    ) :
+        DiaryYearMonthListAdapter(context, recyclerView, themeColor) {
+        override fun loadListOnScrollEnd() {
+            diaryListViewModel.loadAdditionDiaryList()
         }
 
-        private void setUpList(DiaryYearMonthList list) {
-            Objects.requireNonNull(list);
-
-            List<DiaryYearMonthListBaseItem> convertedItemList =
-                    new ArrayList<>(list.getDiaryYearMonthListItemList());
-            DiaryYearMonthListAdapter listAdapter =
-                    (DiaryYearMonthListAdapter) binding.recyclerDiaryList.getAdapter();
-            Objects.requireNonNull(listAdapter);
-            listAdapter.submitList(convertedItemList);
+        override fun canLoadList(): Boolean {
+            return diaryListViewModel.canLoadDiaryList()
         }
     }
 
-    private void loadDiaryList() {
-        DiaryYearMonthList diaryList = diaryListViewModel.getDiaryList().getValue();
-        Objects.requireNonNull(diaryList);
+    private inner class DiaryListObserver : Observer<DiaryYearMonthList> {
+        override fun onChanged(value: DiaryYearMonthList) {
+            setUpListViewVisibility(value)
+            setUpList(value)
+        }
 
-        if (diaryList.getDiaryYearMonthListItemList().isEmpty()) {
-            Integer numSavedDiaries = diaryListViewModel.countSavedDiaries();
-            if (numSavedDiaries == null) return;
+        fun setUpListViewVisibility(list: DiaryYearMonthList) {
+            val isNoDiary = list.diaryYearMonthListItemList.isEmpty()
+            val noDiaryMessageVisibility: Int
+            val diaryListVisibility: Int
+            if (isNoDiary) {
+                noDiaryMessageVisibility = View.VISIBLE
+                diaryListVisibility = View.INVISIBLE
+            } else {
+                noDiaryMessageVisibility = View.INVISIBLE
+                diaryListVisibility = View.VISIBLE
+            }
+            binding.textNoDiaryMessage.visibility = noDiaryMessageVisibility
+            binding.recyclerDiaryList.visibility = diaryListVisibility
+        }
 
-            if (numSavedDiaries >= 1) diaryListViewModel.loadNewDiaryList();
+        fun setUpList(list: DiaryYearMonthList) {
+            val convertedItemList: List<DiaryYearMonthListBaseItem> = list.diaryYearMonthListItemList
+            val listAdapter = binding.recyclerDiaryList.adapter as DiaryYearMonthListAdapter
+            listAdapter.submitList(convertedItemList)
+        }
+    }
+
+    private fun loadDiaryList() {
+        val diaryList = diaryListViewModel.diaryList.notNullValue()
+
+        if (diaryList.diaryYearMonthListItemList.isEmpty()) {
+            val numSavedDiaries = diaryListViewModel.countSavedDiaries() ?: return
+
+            if (numSavedDiaries >= 1) diaryListViewModel.loadNewDiaryList()
         } else {
-            diaryListViewModel.updateDiaryList();
+            diaryListViewModel.updateDiaryList()
         }
     }
 
-    private void showEditDiary() {
-        if (isDialogShowing()) return;
+    private fun showEditDiary() {
+        if (isDialogShowing()) return
 
-        NavDirections action =
-                DiaryListFragmentDirections
-                        .actionNavigationDiaryListFragmentToDiaryEditFragment(
-                                true,
-                                false,
-                                LocalDate.now()
-                        );
-        navController.navigate(action);
+        val action: NavDirections =
+            DiaryListFragmentDirections
+                .actionNavigationDiaryListFragmentToDiaryEditFragment(
+                    true,
+                    false,
+                    LocalDate.now()
+                )
+        navController.navigate(action)
     }
 
-    private void showShowDiaryFragment(LocalDate date) {
-        Objects.requireNonNull(date);
-        if (isDialogShowing()) return;
+    private fun showShowDiaryFragment(date: LocalDate) {
+        if (isDialogShowing()) return
 
-        NavDirections action =
-                DiaryListFragmentDirections
-                        .actionNavigationDiaryListFragmentToDiaryShowFragment(date);
-        navController.navigate(action);
+        val action: NavDirections =
+            DiaryListFragmentDirections
+                .actionNavigationDiaryListFragmentToDiaryShowFragment(date)
+        navController.navigate(action)
     }
 
-    private void showWordSearchFragment() {
-        if (isDialogShowing()) return;
+    private fun showWordSearchFragment() {
+        if (isDialogShowing()) return
 
-        NavDirections action =
-                DiaryListFragmentDirections
-                        .actionNavigationDiaryListFragmentToWordSearchFragment();
-        navController.navigate(action);
+        val action =
+            DiaryListFragmentDirections
+                .actionNavigationDiaryListFragmentToWordSearchFragment()
+        navController.navigate(action)
     }
 
-    private void showStartYearMonthPickerDialog(Year newestYear, Year oldestYear) {
-        Objects.requireNonNull(newestYear);
-        Objects.requireNonNull(oldestYear);
-        if (isDialogShowing()) return;
+    private fun showStartYearMonthPickerDialog(newestYear: Year, oldestYear: Year) {
+        if (isDialogShowing()) return
 
-        NavDirections action =
-                DiaryListFragmentDirections
-                        .actionDiaryListFragmentToStartYearMonthPickerDialog(newestYear, oldestYear);
-        navController.navigate(action);
+        val action: NavDirections =
+            DiaryListFragmentDirections
+                .actionDiaryListFragmentToStartYearMonthPickerDialog(newestYear, oldestYear)
+        navController.navigate(action)
     }
 
-    private void showDiaryDeleteDialog(LocalDate date, Uri pictureUri) {
-        Objects.requireNonNull(date);
-        if (isDialogShowing()) return;
+    private fun showDiaryDeleteDialog(date: LocalDate, pictureUri: Uri?) {
+        if (isDialogShowing()) return
 
-        NavDirections action =
-                DiaryListFragmentDirections.actionDiaryListFragmentToDiaryDeleteDialog(date, pictureUri);
-        navController.navigate(action);
+        val action: NavDirections =
+            DiaryListFragmentDirections.actionDiaryListFragmentToDiaryDeleteDialog(date, pictureUri)
+        navController.navigate(action)
     }
 
-    @Override
-    protected void navigateAppMessageDialog(@NonNull AppMessage appMessage) {
-        NavDirections action =
-                DiaryListFragmentDirections.actionDiaryListFragmentToAppMessageDialog(appMessage);
-        navController.navigate(action);
+    override fun navigateAppMessageDialog(appMessage: AppMessage) {
+        val action: NavDirections =
+            DiaryListFragmentDirections.actionDiaryListFragmentToAppMessageDialog(appMessage)
+        navController.navigate(action)
     }
 
-    @Override
-    protected void retryOtherAppMessageDialogShow() {
-        diaryListViewModel.triggerAppMessageBufferListObserver();
+    override fun retryOtherAppMessageDialogShow() {
+        diaryListViewModel.triggerAppMessageBufferListObserver()
     }
 
-    public void processOnReSelectNavigationItem(){
-        scrollDiaryListToFirstPosition();
+    fun processOnReSelectNavigationItem() {
+        scrollDiaryListToFirstPosition()
     }
 
     //日記リスト(年月)を自動でトップへスクロールさせるメソッド。
-    private void scrollDiaryListToFirstPosition() {
-        DiaryYearMonthListAdapter listAdapter =
-                (DiaryYearMonthListAdapter) binding.recyclerDiaryList.getAdapter();
-        Objects.requireNonNull(listAdapter);
-
-        listAdapter.scrollToFirstPosition();
+    private fun scrollDiaryListToFirstPosition() {
+        val listAdapter = binding.recyclerDiaryList.adapter as DiaryYearMonthListAdapter
+        listAdapter.scrollToFirstPosition()
     }
 
-    @Override
-    protected void destroyBinding() {
-        binding = null;
+    override fun destroyBinding() {
+        _binding = null
     }
 }
