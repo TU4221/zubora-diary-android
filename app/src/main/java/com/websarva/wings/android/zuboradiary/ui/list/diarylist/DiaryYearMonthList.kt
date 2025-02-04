@@ -1,166 +1,144 @@
-package com.websarva.wings.android.zuboradiary.ui.list.diarylist;
+package com.websarva.wings.android.zuboradiary.ui.list.diarylist
 
-import androidx.annotation.NonNull;
+import com.websarva.wings.android.zuboradiary.ui.list.DiaryYearMonthListBaseAdapter
+import com.websarva.wings.android.zuboradiary.ui.list.DiaryYearMonthListBaseItem
+import java.time.YearMonth
 
-import com.websarva.wings.android.zuboradiary.ui.list.DiaryYearMonthListBaseAdapter.ViewType;
-import com.websarva.wings.android.zuboradiary.ui.list.DiaryYearMonthListBaseItem;
+class DiaryYearMonthList {
 
-import java.time.LocalDate;
-import java.time.YearMonth;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
+    val diaryYearMonthListItemList: List<DiaryYearMonthListItem>
 
-public class DiaryYearMonthList {
+    constructor(diaryDayList: DiaryDayList, needsNoDiaryMessage: Boolean) {
+        require(diaryDayList.diaryDayListItemList.isNotEmpty())
 
-    private final List<DiaryYearMonthListItem> diaryYearMonthListItemList;
-
-    DiaryYearMonthList(DiaryDayList diaryDayList, boolean needsNoDiaryMessage) {
-        Objects.requireNonNull(diaryDayList);
-        if (diaryDayList.getDiaryDayListItemList().isEmpty()) throw new IllegalArgumentException();
-
-        List<DiaryYearMonthListItem> diaryYearMonthListItemList = createDiaryYearMonthListItem(diaryDayList);
-        addLastItem(diaryYearMonthListItemList, needsNoDiaryMessage);
-        this.diaryYearMonthListItemList = Collections.unmodifiableList(diaryYearMonthListItemList);
+        val itemList = createDiaryYearMonthListItem(diaryDayList)
+        this.diaryYearMonthListItemList = addLastItem(itemList, needsNoDiaryMessage)
     }
 
-    DiaryYearMonthList(List<DiaryYearMonthListItem> itemList, boolean needsNoDiaryMessage) {
-        Objects.requireNonNull(itemList);
-        if (itemList.isEmpty()) throw new IllegalArgumentException();
-        itemList.stream().forEach(Objects::requireNonNull);
+    constructor(itemList: List<DiaryYearMonthListItem>, needsNoDiaryMessage: Boolean) {
+        require(itemList.isNotEmpty())
 
-        List<DiaryYearMonthListItem> _itemList = new ArrayList<>(itemList);
-        addLastItem(_itemList, needsNoDiaryMessage);
-        this.diaryYearMonthListItemList = Collections.unmodifiableList(_itemList);
+        this.diaryYearMonthListItemList = addLastItem(itemList, needsNoDiaryMessage)
     }
 
     /**
-     * true:日記なしメッセージのみのリスト作成<br>
+     * true:日記なしメッセージのみのリスト作成<br></br>
      * false:ProgressIndicatorのみのリスト作成
-     * */
-    DiaryYearMonthList(boolean needsNoDiaryMessage) {
-        List<DiaryYearMonthListItem> itemList = new ArrayList<>();
-        addLastItem(itemList, needsNoDiaryMessage);
-        this.diaryYearMonthListItemList = Collections.unmodifiableList(itemList);
+     */
+    constructor(needsNoDiaryMessage: Boolean) {
+        val emptyList: List<DiaryYearMonthListItem> = ArrayList()
+
+        this.diaryYearMonthListItemList = addLastItem(emptyList, needsNoDiaryMessage)
     }
 
-    DiaryYearMonthList() {
-        List<DiaryYearMonthListItem> itemList = new ArrayList<>();
-        this.diaryYearMonthListItemList = Collections.unmodifiableList(itemList);
+    constructor() {
+        this.diaryYearMonthListItemList = ArrayList()
     }
 
-    @NonNull
-    private List<DiaryYearMonthListItem> createDiaryYearMonthListItem(DiaryDayList diaryDayList) {
-        Objects.requireNonNull(diaryDayList);
-        if (diaryDayList.getDiaryDayListItemList().isEmpty()) throw new IllegalArgumentException();
+    private fun createDiaryYearMonthListItem(diaryDayList: DiaryDayList): List<DiaryYearMonthListItem> {
+        require(diaryDayList.diaryDayListItemList.isNotEmpty())
 
-        List<DiaryDayListItem> sortingDayItemList= new ArrayList<>();
-        List<DiaryYearMonthListItem> diaryYearMonthListItemList = new ArrayList<>();
-        DiaryYearMonthListItem diaryYearMonthListItem;
-        YearMonth sortingYearMonth = null;
+        var sortingDayItemList: MutableList<DiaryDayListItem> = ArrayList()
+        val diaryYearMonthListItemList: MutableList<DiaryYearMonthListItem> = ArrayList()
+        var diaryYearMonthListItem: DiaryYearMonthListItem
+        var sortingYearMonth: YearMonth? = null
 
-        List<DiaryDayListItem> diaryDayListItemList = diaryDayList.getDiaryDayListItemList();
-        for (DiaryDayListItem day: diaryDayListItemList) {
-            LocalDate date = day.getDate();
-            YearMonth yearMonth = YearMonth.of(date.getYear(), date.getMonth());
+        val diaryDayListItemList = diaryDayList.diaryDayListItemList
+        for (day in diaryDayListItemList) {
+            val date = day.date
+            val yearMonth = YearMonth.of(date.year, date.month)
 
-            if (sortingYearMonth != null && !yearMonth.equals(sortingYearMonth)) {
-                DiaryDayList sortedDiaryDayList = new DiaryDayList(sortingDayItemList);
+            if (sortingYearMonth != null && yearMonth != sortingYearMonth) {
+                val sortedDiaryDayList = DiaryDayList(sortingDayItemList)
                 diaryYearMonthListItem =
-                        new DiaryYearMonthListItem(sortingYearMonth, sortedDiaryDayList);
-                diaryYearMonthListItemList.add(diaryYearMonthListItem);
-                sortingDayItemList= new ArrayList<>();
+                    DiaryYearMonthListItem(sortingYearMonth, sortedDiaryDayList)
+                diaryYearMonthListItemList.add(diaryYearMonthListItem)
+                sortingDayItemList = ArrayList()
             }
-            sortingDayItemList.add(day);
-            sortingYearMonth = yearMonth;
+            sortingDayItemList.add(day)
+            sortingYearMonth = yearMonth
         }
 
-        DiaryDayList sortedDiaryDayList = new DiaryDayList(sortingDayItemList);
+        val sortedDiaryDayList = DiaryDayList(sortingDayItemList)
         diaryYearMonthListItem =
-                new DiaryYearMonthListItem(sortingYearMonth, sortedDiaryDayList);
-        diaryYearMonthListItemList.add(diaryYearMonthListItem);
-        return diaryYearMonthListItemList;
+            DiaryYearMonthListItem(sortingYearMonth, sortedDiaryDayList)
+        diaryYearMonthListItemList.add(diaryYearMonthListItem)
+        return diaryYearMonthListItemList
     }
 
-    private void addLastItem(List<DiaryYearMonthListItem> itemList, boolean needsNoDiaryMessage) {
-        Objects.requireNonNull(itemList);
-        itemList.stream().forEach(Objects::requireNonNull);
-
-        itemList.removeIf(DiaryYearMonthListBaseItem::isNotDiaryViewType);
-        if (needsNoDiaryMessage) {
-            addLastItemNoDiaryMessage(itemList);
+    private fun addLastItem(
+        itemList: List<DiaryYearMonthListItem>,
+        needsNoDiaryMessage: Boolean
+    ) : List<DiaryYearMonthListItem> {
+        val mutableItemList = itemList.toMutableList()
+        mutableItemList.removeIf(DiaryYearMonthListBaseItem::isNotDiaryViewType)
+        return if (needsNoDiaryMessage) {
+            addLastItemNoDiaryMessage(mutableItemList)
         } else {
-            addLastItemProgressIndicator(itemList);
+            addLastItemProgressIndicator(mutableItemList)
         }
     }
 
-    private void addLastItemProgressIndicator(List<DiaryYearMonthListItem> itemList) {
-        Objects.requireNonNull(itemList);
-        itemList.stream().forEach(Objects::requireNonNull);
-
-        itemList.add(new DiaryYearMonthListItem(ViewType.PROGRESS_INDICATOR));
+    private fun addLastItemProgressIndicator(itemList: List<DiaryYearMonthListItem>)
+        : List<DiaryYearMonthListItem> {
+        return itemList +
+                DiaryYearMonthListItem(DiaryYearMonthListBaseAdapter.ViewType.PROGRESS_INDICATOR)
     }
 
-    private void addLastItemNoDiaryMessage(List<DiaryYearMonthListItem> itemList) {
-        Objects.requireNonNull(itemList);
-        itemList.stream().forEach(Objects::requireNonNull);
-
-        itemList.add(new DiaryYearMonthListItem(ViewType.NO_DIARY_MESSAGE));
+    private fun addLastItemNoDiaryMessage(itemList: List<DiaryYearMonthListItem>)
+        : List<DiaryYearMonthListItem> {
+        return itemList +
+                DiaryYearMonthListItem(DiaryYearMonthListBaseAdapter.ViewType.NO_DIARY_MESSAGE)
     }
 
-    int countDiaries() {
-        int count = 0;
-        for (DiaryYearMonthListItem item: diaryYearMonthListItemList) {
-            if (item.getViewType().equals(ViewType.DIARY)) {
-                count += item.getDiaryDayList().countDiaries();
+    fun countDiaries(): Int {
+        var count = 0
+        for (item in diaryYearMonthListItemList) {
+            if (item.viewType == DiaryYearMonthListBaseAdapter.ViewType.DIARY) {
+                count += item.diaryDayList.countDiaries()
             }
         }
-        return count;
+        return count
     }
 
-    DiaryYearMonthList combineDiaryLists(
-            DiaryYearMonthList additionList, boolean needsNoDiaryMessage) {
-        Objects.requireNonNull(additionList);
-        if (additionList.getDiaryYearMonthListItemList().isEmpty()) throw new IllegalArgumentException();
+    fun combineDiaryLists(
+        additionList: DiaryYearMonthList, needsNoDiaryMessage: Boolean
+    ): DiaryYearMonthList {
+        require(additionList.diaryYearMonthListItemList.isNotEmpty())
 
-        List<DiaryYearMonthListItem> originalItemList = new ArrayList<>(this.diaryYearMonthListItemList);
-        List<DiaryYearMonthListItem> additionItemList = new ArrayList<>(additionList.diaryYearMonthListItemList);
+        val originalItemList: MutableList<DiaryYearMonthListItem> =
+            diaryYearMonthListItemList.toMutableList()
+        val additionItemList: MutableList<DiaryYearMonthListItem> =
+            additionList.diaryYearMonthListItemList.toMutableList()
 
         // List最終アイテム(日記以外
-        originalItemList.removeIf(DiaryYearMonthListBaseItem::isNotDiaryViewType);
-        additionItemList.removeIf(DiaryYearMonthListBaseItem::isNotDiaryViewType);
+        originalItemList.removeIf(DiaryYearMonthListBaseItem::isNotDiaryViewType)
+        additionItemList.removeIf(DiaryYearMonthListBaseItem::isNotDiaryViewType)
 
         // 元リスト最終アイテムの年月取得
-        int originalListLastItemPosition = originalItemList.size() - 1;
-        DiaryYearMonthListItem originalListLastItem = originalItemList.get(originalListLastItemPosition);
-        YearMonth originalListLastItemYearMonth = originalListLastItem.getYearMonth();
+        val originalListLastItemPosition = originalItemList.size - 1
+        val originalListLastItem = originalItemList[originalListLastItemPosition]
+        val originalListLastItemYearMonth = originalListLastItem.yearMonth
 
         // 追加リスト先頭アイテムの年月取得
-        DiaryYearMonthListItem additionListFirstItem = additionList.getDiaryYearMonthListItemList().get(0);
-        YearMonth additionListFirstItemYearMonth = additionListFirstItem.getYearMonth();
+        val additionListFirstItem = additionList.diaryYearMonthListItemList[0]
+        val additionListFirstItemYearMonth = additionListFirstItem.yearMonth
 
         // 元リストに追加リストの年月が含まれていたらアイテムを足し込む
-        if (originalListLastItemYearMonth.equals(additionListFirstItemYearMonth)) {
-            DiaryDayList originalLastDiaryDayList =
-                    originalItemList.get(originalListLastItemPosition).getDiaryDayList();
-            DiaryDayList additionDiaryDayList = additionListFirstItem.getDiaryDayList();
-            DiaryDayList combinedDiaryDayList =
-                    originalLastDiaryDayList.combineDiaryDayLists(additionDiaryDayList);
-            DiaryYearMonthListItem combinedDiaryYearMonthListItem
-                    = new DiaryYearMonthListItem(originalListLastItemYearMonth, combinedDiaryDayList);
-            originalItemList.remove(originalListLastItemPosition);
-            originalItemList.add(combinedDiaryYearMonthListItem);
-            additionItemList.remove(0);
+        if (originalListLastItemYearMonth == additionListFirstItemYearMonth) {
+            val originalLastDiaryDayList =
+                originalItemList[originalListLastItemPosition].diaryDayList
+            val additionDiaryDayList = additionListFirstItem.diaryDayList
+            val combinedDiaryDayList =
+                originalLastDiaryDayList.combineDiaryDayLists(additionDiaryDayList)
+            val combinedDiaryYearMonthListItem =
+                DiaryYearMonthListItem(originalListLastItemYearMonth, combinedDiaryDayList)
+            originalItemList.removeAt(originalListLastItemPosition)
+            originalItemList.add(combinedDiaryYearMonthListItem)
+            additionItemList.removeAt(0)
         }
 
-        List<DiaryYearMonthListItem> resultItemList = new ArrayList<>(originalItemList);
-        resultItemList.addAll(additionItemList);
-
-        return new DiaryYearMonthList(resultItemList, needsNoDiaryMessage);
-    }
-
-    public List<DiaryYearMonthListItem> getDiaryYearMonthListItemList() {
-        return diaryYearMonthListItemList;
+        val resultItemList = originalItemList + additionItemList
+        return DiaryYearMonthList(resultItemList, needsNoDiaryMessage)
     }
 }
