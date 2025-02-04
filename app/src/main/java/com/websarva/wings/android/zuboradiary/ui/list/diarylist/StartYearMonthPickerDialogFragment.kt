@@ -1,72 +1,63 @@
-package com.websarva.wings.android.zuboradiary.ui.list.diarylist;
+package com.websarva.wings.android.zuboradiary.ui.list.diarylist
 
-import android.content.DialogInterface;
-import android.view.View;
+import android.content.DialogInterface
+import android.view.View
+import com.websarva.wings.android.zuboradiary.databinding.DialogFragmentNumberPickersBinding
+import com.websarva.wings.android.zuboradiary.ui.BaseNumberPickersBottomSheetDialogFragment
+import java.time.LocalDate
+import java.time.YearMonth
 
-import androidx.annotation.NonNull;
+class StartYearMonthPickerDialogFragment : BaseNumberPickersBottomSheetDialogFragment() {
 
-import com.websarva.wings.android.zuboradiary.databinding.DialogFragmentNumberPickersBinding;
-import com.websarva.wings.android.zuboradiary.ui.BaseNumberPickersBottomSheetDialogFragment;
-
-import java.time.LocalDate;
-import java.time.Year;
-import java.time.YearMonth;
-
-public class StartYearMonthPickerDialogFragment extends BaseNumberPickersBottomSheetDialogFragment {
-
-    private static final String fromClassName = "From" + StartYearMonthPickerDialogFragment.class.getName();
-    static final String KEY_SELECTED_YEAR_MONTH = "SelectedYearMonth" + fromClassName;
-
-    @Override
-    public boolean isCancelableOtherThanPressingButton() {
-        return true;
+    companion object {
+        private val fromClassName = "From" + StartYearMonthPickerDialogFragment::class.java.name
+        @JvmField
+        val KEY_SELECTED_YEAR_MONTH: String = "SelectedYearMonth$fromClassName"
     }
 
-    @Override
-    protected void handleOnPositiveButtonClick(@NonNull View v) {
-        setResultSelectedYearMonth();
+    override val isCancelableOtherThanPressingButton: Boolean
+        get() = true
+
+    override fun handleOnPositiveButtonClick(v: View) {
+        setResultSelectedYearMonth()
     }
 
-    private void setResultSelectedYearMonth() {
-        int selectedYear =
-                binding.numberPickerFirst.getValue();
-        int selectedMonth =
-                binding.numberPickerSecond.getValue();
-        YearMonth selectedYearMonth = YearMonth.of(selectedYear, selectedMonth);
+    private fun setResultSelectedYearMonth() {
+        val selectedYear = binding.numberPickerFirst.value
+        val selectedMonth = binding.numberPickerSecond.value
+        val selectedYearMonth = YearMonth.of(selectedYear, selectedMonth)
 
-        setResult(KEY_SELECTED_YEAR_MONTH, selectedYearMonth);
+        setResult(KEY_SELECTED_YEAR_MONTH, selectedYearMonth)
     }
 
-    @Override
-    protected void handleOnNegativeButtonClick(@NonNull View v) {
+    override fun handleOnNegativeButtonClick(v: View) {
         // 処理なし
     }
 
-    @Override
-    protected void handleOnCancel(@NonNull DialogInterface dialog) {
+    override fun handleOnCancel(dialog: DialogInterface) {
         // 処理なし
     }
 
-    @Override
-    protected void handleOnDismiss() {
+    override fun handleOnDismiss() {
         // 処理なし
     }
 
-    @Override
-    protected void setUpNumberPickers(DialogFragmentNumberPickersBinding binding) {
-        LocalDate today = LocalDate.now();
-        Year maxYear =
-                StartYearMonthPickerDialogFragmentArgs.fromBundle(requireArguments()).getMaxYear();
-        Year minYear =
-                StartYearMonthPickerDialogFragmentArgs.fromBundle(requireArguments()).getMinYear();
-        this.binding.numberPickerFirst.setMaxValue(maxYear.getValue());
-        this.binding.numberPickerFirst.setMinValue(minYear.getValue());
-        this.binding.numberPickerFirst.setValue(today.getYear());
-        this.binding.numberPickerFirst.setWrapSelectorWheel(false);
-        this.binding.numberPickerSecond.setMaxValue(12);
-        this.binding.numberPickerSecond.setMinValue(1);
-        this.binding.numberPickerSecond.setValue(today.getMonthValue());
-        this.binding.numberPickerSecond.setWrapSelectorWheel(false);
-        this.binding.numberPickerThird.setVisibility(View.GONE);
+    override fun setUpNumberPickers(binding: DialogFragmentNumberPickersBinding) {
+        val today = LocalDate.now()
+        val maxYear =
+            StartYearMonthPickerDialogFragmentArgs.fromBundle(requireArguments()).maxYear
+        val minYear =
+            StartYearMonthPickerDialogFragmentArgs.fromBundle(requireArguments()).minYear
+        binding.apply {
+            numberPickerFirst.maxValue = maxYear.value
+            numberPickerFirst.minValue = minYear.value
+            numberPickerFirst.value = today.year
+            numberPickerFirst.wrapSelectorWheel = false
+            numberPickerSecond.maxValue = 12
+            numberPickerSecond.minValue = 1
+            numberPickerSecond.value = today.monthValue
+            numberPickerSecond.wrapSelectorWheel = false
+            numberPickerThird.visibility = View.GONE
+        }
     }
 }
