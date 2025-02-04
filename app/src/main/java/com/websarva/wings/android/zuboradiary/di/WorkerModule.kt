@@ -1,29 +1,21 @@
-package com.websarva.wings.android.zuboradiary.di;
+package com.websarva.wings.android.zuboradiary.di
 
-import android.content.Context;
-
-import androidx.annotation.NonNull;
-import androidx.work.WorkManager;
-
-import java.util.Objects;
-
-import javax.inject.Singleton;
-
-import dagger.Module;
-import dagger.Provides;
-import dagger.hilt.InstallIn;
-import dagger.hilt.android.qualifiers.ApplicationContext;
-import dagger.hilt.components.SingletonComponent;
+import android.content.Context
+import androidx.work.WorkManager
+import dagger.Module
+import dagger.Provides
+import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
+import dagger.hilt.components.SingletonComponent
+import javax.inject.Singleton
 
 @Module
-@InstallIn(SingletonComponent.class)
-public class WorkerModule {
+@InstallIn(SingletonComponent::class)
+object WorkerModule {
+    @JvmStatic
     @Singleton
     @Provides
-    @NonNull
-    public static WorkManager provideWorkManager(@ApplicationContext Context context) {
-        Objects.requireNonNull(context);
-
-        return WorkManager.getInstance(context);
+    fun provideWorkManager(@ApplicationContext context: Context): WorkManager {
+        return WorkManager.getInstance(context)
     }
 }
