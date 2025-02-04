@@ -1,60 +1,39 @@
-package com.websarva.wings.android.zuboradiary.data;
+package com.websarva.wings.android.zuboradiary.data
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
+class AppMessageList {
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
+    private val appMessageList: List<AppMessage>
 
-public class AppMessageList {
+    val isEmpty: Boolean
+        get() = appMessageList.isEmpty()
 
-    private final List<AppMessage> appMessageList;
-
-    public AppMessageList(List<AppMessage> appMessageList) {
-        Objects.requireNonNull(appMessageList);
-        appMessageList.stream().forEach(Objects::requireNonNull);
-
-        this.appMessageList = Collections.unmodifiableList(appMessageList);
+    constructor(appMessageList: List<AppMessage>) {
+        this.appMessageList = appMessageList.toList()
     }
 
-    public AppMessageList() {
-        this.appMessageList = new ArrayList<>();
+    constructor(): this(ArrayList())
+
+    fun add(appMessage: AppMessage): AppMessageList {
+        val resultList = appMessageList + appMessage
+        return AppMessageList(resultList)
     }
 
-    public boolean isEmpty() {
-        return appMessageList.isEmpty();
+    fun removeFirstItem(): AppMessageList {
+        val resultList = appMessageList.toMutableList()
+        if (resultList.isNotEmpty()) resultList.removeAt(0)
+        return AppMessageList(resultList)
     }
 
-    @NonNull
-    public AppMessageList add(AppMessage appMessage) {
-        Objects.requireNonNull(appMessage);
+    fun equalLastItem(appMessage: AppMessage): Boolean {
+        if (appMessageList.isEmpty()) return false
 
-        List<AppMessage> resultList = new ArrayList<>(appMessageList);
-        resultList.add(appMessage);
-        return new AppMessageList(resultList);
+        val lastPosition = appMessageList.size - 1
+        val lastAppMessage = appMessageList[lastPosition]
+        return lastAppMessage == appMessage
     }
 
-    @NonNull
-    public AppMessageList removeFirstItem() {
-        List<AppMessage> resultList = new ArrayList<>(appMessageList);
-        if (!resultList.isEmpty()) resultList.remove(0);
-        return new AppMessageList(resultList);
-    }
-
-    public boolean equalLastItem(AppMessage appMessage) {
-        Objects.requireNonNull(appMessage);
-        if (appMessageList.isEmpty()) return false;
-
-        int lastPosition = appMessageList.size() - 1;
-        AppMessage lastAppMessage = appMessageList.get(lastPosition);
-        return lastAppMessage.equals(appMessage);
-    }
-
-    @Nullable
-    public AppMessage findFirstItem() {
-        if (appMessageList.isEmpty()) return null;
-        return appMessageList.get(0);
+    fun findFirstItem(): AppMessage? {
+        if (appMessageList.isEmpty()) return null
+        return appMessageList[0]
     }
 }
