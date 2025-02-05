@@ -1,81 +1,57 @@
-package com.websarva.wings.android.zuboradiary.data.preferences;
+package com.websarva.wings.android.zuboradiary.data.preferences
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.datastore.preferences.core.MutablePreferences;
-import androidx.datastore.preferences.core.Preferences;
-import androidx.datastore.preferences.core.PreferencesKeys;
+import androidx.datastore.preferences.core.MutablePreferences
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.booleanPreferencesKey
+import androidx.datastore.preferences.core.stringPreferencesKey
+import java.time.LocalTime
 
-import java.time.LocalTime;
-import java.time.format.DateTimeParseException;
-import java.util.Objects;
+class ReminderNotificationPreference {
 
-public class ReminderNotificationPreference {
+    companion object {
+        @JvmField
+        val PREFERENCES_KEY_IS_CHECKED: Preferences.Key<Boolean> =
+            booleanPreferencesKey("is_checked_reminder_notification")
+        @JvmField
+        val PREFERENCES_KEY_TIME: Preferences.Key<String> =
+            stringPreferencesKey("reminder_notification_time")
+    }
 
-    static final Preferences.Key<Boolean> PREFERENCES_KEY_IS_CHECKED =
-            PreferencesKeys.booleanKey("is_checked_reminder_notification");
-    static final Preferences.Key<String> PREFERENCES_KEY_TIME =
-            PreferencesKeys.stringKey("reminder_notification_time");
-    private final boolean isChecked;
-    private final String notificationTime;
+    val isChecked: Boolean
+    private val notificationTimeString: String
 
-    public ReminderNotificationPreference(boolean isChecked, @Nullable LocalTime notificationTime) {
-        if (isChecked) Objects.requireNonNull(notificationTime);
+    val notificationLocalTime: LocalTime?
+        get() {
+            if (!isChecked) return null
+            return LocalTime.parse(notificationTimeString)
+        }
 
-        this.isChecked = isChecked;
+    constructor(isChecked: Boolean, notificationTime: LocalTime? = null) {
+        if (isChecked) require(notificationTime != null)
+
+        this.isChecked = isChecked
         if (isChecked) {
-            this.notificationTime = notificationTime.toString();
+            this.notificationTimeString = notificationTime.toString()
         } else {
-            this.notificationTime = "";
+            this.notificationTimeString = ""
         }
     }
 
-    public ReminderNotificationPreference(boolean isChecked, @Nullable String notificationTime) {
-        String _notificationTime;
+    @JvmOverloads
+    constructor(isChecked: Boolean = false, notificationTime: String = "") {
         if (isChecked) {
-            Objects.requireNonNull(notificationTime);
-            boolean isFormat;
-            try {
-                LocalTime.parse(notificationTime);
-                isFormat = true;
-            } catch (DateTimeParseException e) {
-                isFormat = false;
-            }
-            if (notificationTime.isEmpty() || !isFormat) throw new IllegalArgumentException();
-
-            _notificationTime = notificationTime;
+            // 時間文字列形式確認
+            LocalTime.parse(notificationTime)
         } else {
-            _notificationTime = "";
+            require(notificationTime.matches("".toRegex()))
         }
 
-        this.isChecked = isChecked;
-        this.notificationTime = _notificationTime;
+        this.isChecked = isChecked
+        this.notificationTimeString = notificationTime
     }
 
-    public ReminderNotificationPreference() {
-        this(false, "");
-    }
-
-    void setUpPreferences(MutablePreferences mutablePreferences) {
-        Objects.requireNonNull(mutablePreferences);
-
-        mutablePreferences.set(PREFERENCES_KEY_IS_CHECKED, isChecked);
-        mutablePreferences.set(PREFERENCES_KEY_TIME, notificationTime);
-    }
-
-    public boolean getIsChecked() {
-        return isChecked;
-    }
-
-    @NonNull
-    public String getNotificationTimeString() {
-        return notificationTime;
-    }
-
-    @Nullable
-    public LocalTime getNotificationLocalTime() {
-        if (!isChecked) return null;
-
-        return LocalTime.parse(notificationTime);
+    fun setUpPreferences(mutablePreferences: MutablePreferences) {
+        mutablePreferences[PREFERENCES_KEY_IS_CHECKED] = isChecked
+        mutablePreferences[PREFERENCES_KEY_TIME] = notificationTimeString
     }
 }
