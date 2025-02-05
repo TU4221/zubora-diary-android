@@ -1,58 +1,34 @@
-package com.websarva.wings.android.zuboradiary.data.database;
+package com.websarva.wings.android.zuboradiary.data.database
 
-import androidx.annotation.NonNull;
+import com.google.common.util.concurrent.ListenableFuture
+import javax.inject.Inject
 
-import com.google.common.util.concurrent.ListenableFuture;
+class DiaryItemTitleSelectionHistoryRepository @Inject constructor(
+    private val diaryItemTitleSelectionHistoryDAO: DiaryItemTitleSelectionHistoryDAO
+) {
 
-import java.util.List;
-import java.util.Objects;
+    fun loadSelectionHistory(
+        num: Int, offset: Int
+    ): ListenableFuture<List<DiaryItemTitleSelectionHistoryItemEntity>> {
+        require(num >= 1)
+        require(offset >= 0)
 
-import javax.inject.Inject;
-
-public class DiaryItemTitleSelectionHistoryRepository {
-    private final DiaryItemTitleSelectionHistoryDAO diaryItemTitleSelectionHistoryDAO;
-
-    @Inject
-    public DiaryItemTitleSelectionHistoryRepository(DiaryItemTitleSelectionHistoryDAO diaryItemTitleSelectionHistoryDAO) {
-        Objects.requireNonNull(diaryItemTitleSelectionHistoryDAO);
-
-        this.diaryItemTitleSelectionHistoryDAO = diaryItemTitleSelectionHistoryDAO;
-    }
-
-    @NonNull
-    public ListenableFuture<List<DiaryItemTitleSelectionHistoryItemEntity>> loadSelectionHistory(
-            int num, int offset) {
-        if (num < 1) throw new IllegalArgumentException();
-        if (offset < 0) throw new IllegalArgumentException();
-
-        ListenableFuture<List<DiaryItemTitleSelectionHistoryItemEntity>> future =
-                diaryItemTitleSelectionHistoryDAO.selectHistoryListOrderByLogDesc(num, offset);
-        return Objects.requireNonNull(future);
+        return diaryItemTitleSelectionHistoryDAO.selectHistoryListOrderByLogDesc(num, offset)
     }
 
     // MEMO:保存する時は日記保存と同時に処理したいので、DiaryRepositoryにて処理。
-    @NonNull
-    public ListenableFuture<List<Long>> saveSelectionHistoryItems(
-                                            List<DiaryItemTitleSelectionHistoryItemEntity> list) {
-        Objects.requireNonNull(list);
-        list.stream().forEach(Objects::requireNonNull);
-
-        ListenableFuture<List<Long>> future = diaryItemTitleSelectionHistoryDAO.insertHistoryItem(list);
-        return Objects.requireNonNull(future);
+    fun saveSelectionHistoryItems(
+        list: List<DiaryItemTitleSelectionHistoryItemEntity>
+    ): ListenableFuture<List<Long>> {
+        return diaryItemTitleSelectionHistoryDAO.insertHistoryItem(list)
     }
 
-    @NonNull
-    public ListenableFuture<Integer> deleteSelectionHistoryItem(String title) {
-        Objects.requireNonNull(title);
-
-        ListenableFuture<Integer> future = diaryItemTitleSelectionHistoryDAO.deleteHistoryItem(title);
-        return Objects.requireNonNull(future);
+    fun deleteSelectionHistoryItem(title: String): ListenableFuture<Int> {
+        return diaryItemTitleSelectionHistoryDAO.deleteHistoryItem(title)
     }
 
     // MEMO:保存する時は日記保存と同時に処理したいので、DiaryRepositoryにて処理。
-    @NonNull
-    public ListenableFuture<Integer> deleteOldHistoryItems() {
-        ListenableFuture<Integer> future = diaryItemTitleSelectionHistoryDAO.deleteOldHistoryItem();
-        return Objects.requireNonNull(future);
+    fun deleteOldHistoryItems(): ListenableFuture<Int> {
+        return diaryItemTitleSelectionHistoryDAO.deleteOldHistoryItem()
     }
 }
