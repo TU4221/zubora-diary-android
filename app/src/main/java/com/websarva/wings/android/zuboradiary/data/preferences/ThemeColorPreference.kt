@@ -1,48 +1,39 @@
-package com.websarva.wings.android.zuboradiary.data.preferences;
+package com.websarva.wings.android.zuboradiary.data.preferences
+
+import androidx.datastore.preferences.core.MutablePreferences
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.intPreferencesKey
+import java.util.Arrays
 
 
-import androidx.datastore.preferences.core.MutablePreferences;
-import androidx.datastore.preferences.core.Preferences;
-import androidx.datastore.preferences.core.PreferencesKeys;
+class ThemeColorPreference {
 
-import java.util.Arrays;
-import java.util.Objects;
-
-public class ThemeColorPreference {
-
-    static final Preferences.Key<Integer> PREFERENCES_KEY_COLOR =
-                                                        PreferencesKeys.intKey("theme_color");
-    private final int themeColorNumber;
-
-    public ThemeColorPreference(int themeColorNumber) {
-        boolean contains =
-                Arrays.stream(ThemeColor.values()).anyMatch(x -> x.toNumber() == themeColorNumber);
-        if (!contains) throw new IllegalArgumentException();
-
-        this.themeColorNumber = themeColorNumber;
+    companion object {
+        @JvmField
+        val PREFERENCES_KEY_COLOR: Preferences.Key<Int> = intPreferencesKey("theme_color")
     }
 
-    public ThemeColorPreference(ThemeColor themeColor) {
-        Objects.requireNonNull(themeColor);
+    private val themeColorNumber: Int
 
-        this.themeColorNumber = themeColor.toNumber();
+    constructor(themeColorNumber: Int) {
+        val contains =
+            Arrays.stream(ThemeColor.entries.toTypedArray())
+                .anyMatch { x: ThemeColor -> x.toNumber() == themeColorNumber }
+        require(contains)
+
+        this.themeColorNumber = themeColorNumber
     }
 
-    public ThemeColorPreference() {
-        this(ThemeColor.values()[0]);
+    @JvmOverloads
+    constructor(themeColor: ThemeColor = ThemeColor.entries[0]) {
+        this.themeColorNumber = themeColor.toNumber()
     }
 
-    void setUpPreferences(MutablePreferences mutablePreferences) {
-        Objects.requireNonNull(mutablePreferences);
-
-        mutablePreferences.set(PREFERENCES_KEY_COLOR, themeColorNumber);
+    fun setUpPreferences(mutablePreferences: MutablePreferences) {
+        mutablePreferences[PREFERENCES_KEY_COLOR] = themeColorNumber
     }
 
-    public int getThemeColorNumber() {
-        return themeColorNumber;
-    }
-
-    public ThemeColor toThemeColor() {
-        return ThemeColor.of(themeColorNumber);
+    fun toThemeColor(): ThemeColor {
+        return ThemeColor.of(themeColorNumber)
     }
 }
