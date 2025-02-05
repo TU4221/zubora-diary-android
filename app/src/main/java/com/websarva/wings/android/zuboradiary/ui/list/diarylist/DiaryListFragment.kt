@@ -34,7 +34,7 @@ import java.time.YearMonth
 class DiaryListFragment : BaseFragment() {
     // View関係
     private var _binding: FragmentDiaryListBinding? = null
-    private val binding: FragmentDiaryListBinding get() = checkNotNull(_binding)
+    private val binding get() = checkNotNull(_binding)
 
     // ViewModel
     private lateinit var diaryListViewModel: DiaryListViewModel

@@ -29,8 +29,8 @@ class WordSearchFragment : BaseFragment() {
     // View関係
     private var _binding: FragmentWordSearchBinding? = null
     private val binding get() = checkNotNull(_binding)
-    private var previousText = "" // 二重検索防止用
 
+    private var previousText = "" // 二重検索防止用
     private var resultWordColor = -1 // 検索結果ワード色
     private var resultWordBackgroundColor = -1 // 検索結果ワードマーカー色
 

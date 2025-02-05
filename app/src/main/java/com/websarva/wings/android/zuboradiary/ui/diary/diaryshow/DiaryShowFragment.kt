@@ -44,7 +44,7 @@ class DiaryShowFragment : BaseFragment() {
 
     // View関係
     private var _binding: FragmentDiaryShowBinding? = null
-    private val binding: FragmentDiaryShowBinding get() = checkNotNull(_binding)
+    private val binding get() = checkNotNull(_binding)
 
     // ViewModel
     private lateinit var diaryShowViewModel: DiaryShowViewModel

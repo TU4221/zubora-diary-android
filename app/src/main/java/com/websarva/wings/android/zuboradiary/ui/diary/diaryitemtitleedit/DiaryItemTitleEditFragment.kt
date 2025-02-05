@@ -31,7 +31,7 @@ class DiaryItemTitleEditFragment : BaseFragment() {
 
     // View関係
     private var _binding: FragmentDiaryItemTitleEditBinding? = null
-    private val binding: FragmentDiaryItemTitleEditBinding get() = checkNotNull(_binding)
+    private val binding get() = checkNotNull(_binding)
 
     // ViewModel
     private lateinit var diaryItemTitleEditViewModel: DiaryItemTitleEditViewModel

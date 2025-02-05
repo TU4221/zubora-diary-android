@@ -47,7 +47,8 @@ import dagger.hilt.android.AndroidEntryPoint
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
 
-    private lateinit var binding: ActivityMainBinding
+    private var _binding: ActivityMainBinding? = null
+    private val binding get() = checkNotNull(_binding)
 
     // BottomNavigationタブによる画面遷移関係
     var wasSelectedTab: Boolean = false
@@ -94,7 +95,7 @@ class MainActivity : AppCompatActivity() {
         val creator =
             ThemeColorInflaterCreator(this, layoutInflater, themeColor)
         val themeColorInflater = creator.create()
-        binding = ActivityMainBinding.inflate(themeColorInflater)
+        _binding = ActivityMainBinding.inflate(themeColorInflater)
         setContentView(binding.root)
     }
 
@@ -447,5 +448,11 @@ class MainActivity : AppCompatActivity() {
 
     fun loadPicturePath() {
         openDocumentResultLauncher.launch(arrayOf("image/*"))
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+
+        _binding = null
     }
 }

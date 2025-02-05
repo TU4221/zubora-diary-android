@@ -45,7 +45,7 @@ class CalendarFragment : BaseFragment() {
 
     // View関係
     private var _binding: FragmentCalendarBinding? = null
-    private val binding get() = _binding!!
+    private val binding get() = checkNotNull(_binding)
 
     // ViewModel
     private lateinit var calendarViewModel: CalendarViewModel

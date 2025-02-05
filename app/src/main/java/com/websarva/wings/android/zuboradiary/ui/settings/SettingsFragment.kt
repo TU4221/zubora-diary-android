@@ -39,7 +39,8 @@ class SettingsFragment : BaseFragment() {
 
     // View関係
     private var _binding: FragmentSettingsBinding? = null
-    private val binding: FragmentSettingsBinding get() = checkNotNull(_binding)
+    private val binding get() = checkNotNull(_binding)
+
     private var isTouchedReminderNotificationSwitch = false
     private var isTouchedPasscodeLockSwitch = false
     private var isTouchedWeatherInfoAcquisitionSwitch = false
