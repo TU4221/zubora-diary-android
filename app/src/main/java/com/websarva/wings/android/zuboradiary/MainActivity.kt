@@ -51,7 +51,7 @@ class MainActivity : AppCompatActivity() {
     private val binding get() = checkNotNull(_binding)
 
     // BottomNavigationタブによる画面遷移関係
-    var wasSelectedTab: Boolean = false
+    var wasSelectedTab = false
         private set
     private lateinit var startNavigationMenuItem: MenuItem
 
@@ -68,12 +68,36 @@ class MainActivity : AppCompatActivity() {
     ) { o: Uri? ->
         if (o == null) return@registerForActivityResult  // 未選択時
 
-
         val showedFragment = findShowedFragment()
         if (showedFragment is DiaryEditFragment) {
             showedFragment.attachPicture(o)
         }
     }
+
+    @get:RequiresApi(api = Build.VERSION_CODES.TIRAMISU)
+    val isGrantedPostNotifications: Boolean
+        get() = (ActivityCompat.checkSelfPermission(
+            this,
+            Manifest.permission.POST_NOTIFICATIONS
+        )
+                == PackageManager.PERMISSION_GRANTED)
+
+    val isGrantedAccessLocation: Boolean
+        get() {
+            val isGrantedAccessFineLocation =
+                (ActivityCompat.checkSelfPermission(
+                    this,
+                    Manifest.permission.ACCESS_FINE_LOCATION
+                )
+                        == PackageManager.PERMISSION_GRANTED)
+            val isGrantedAccessCoarseLocation =
+                (ActivityCompat.checkSelfPermission(
+                    this,
+                    Manifest.permission.ACCESS_COARSE_LOCATION
+                )
+                        == PackageManager.PERMISSION_GRANTED)
+            return isGrantedAccessFineLocation && isGrantedAccessCoarseLocation
+        }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -92,8 +116,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun setUpBinding() {
         val themeColor = settingsViewModel.loadThemeColorSettingValue()
-        val creator =
-            ThemeColorInflaterCreator(this, layoutInflater, themeColor)
+        val creator = ThemeColorInflaterCreator(this, layoutInflater, themeColor)
         val themeColorInflater = creator.create()
         _binding = ActivityMainBinding.inflate(themeColorInflater)
         setContentView(binding.root)
@@ -241,7 +264,9 @@ class MainActivity : AppCompatActivity() {
                 //      Dialogを表示した時は背面FragmentのLifecycleEventが"OnResume"のままとなるため、
                 //      DialogにEnabledNavigationLifecycleEventObserverクラスをセットすると
                 //      BottomNavigationが無効状態のままとなる。
-                if (fragment !is DiaryListFragment && fragment !is CalendarFragment && fragment !is SettingsFragment) {
+                if (fragment !is DiaryListFragment
+                    && fragment !is CalendarFragment
+                    && fragment !is SettingsFragment) {
                     return@addFragmentOnAttachListener
                 }
                 fragment.lifecycle.addObserver(EnabledNavigationLifecycleEventObserver())
@@ -294,10 +319,8 @@ class MainActivity : AppCompatActivity() {
         fun setUpFragmentTransition() {
             // 表示中のFragmentを取得し、Transitionを設定
             val fragment = findShowedFragment()
-            fragment.exitTransition =
-                MaterialFadeThrough()
-            fragment.returnTransition =
-                MaterialFadeThrough()
+            fragment.exitTransition = MaterialFadeThrough()
+            fragment.returnTransition = MaterialFadeThrough()
 
             // MEMO:NavigationUI.onNavDestinationSelected()による、
             //      Fragment切替時の対象Transitionパターン表(StartDestination:A-1)
@@ -400,7 +423,7 @@ class MainActivity : AppCompatActivity() {
 
     // BottomNavigationタブ選択による画面遷移の遷移先FragmentのTransition設定完了後用リセットメソッド
     fun clearWasSelectedTab() {
-        this.wasSelectedTab = false
+        wasSelectedTab = false
     }
 
     fun popBackStackToStartFragment() {
@@ -420,31 +443,6 @@ class MainActivity : AppCompatActivity() {
         }
         if (!isGrantedAccessLocation) settingsViewModel.saveWeatherInfoAcquisition(false)
     }
-
-    @get:RequiresApi(api = Build.VERSION_CODES.TIRAMISU)
-    val isGrantedPostNotifications: Boolean
-        get() = (ActivityCompat.checkSelfPermission(
-            this,
-            Manifest.permission.POST_NOTIFICATIONS
-        )
-                == PackageManager.PERMISSION_GRANTED)
-
-    val isGrantedAccessLocation: Boolean
-        get() {
-            val isGrantedAccessFineLocation =
-                (ActivityCompat.checkSelfPermission(
-                    this,
-                    Manifest.permission.ACCESS_FINE_LOCATION
-                )
-                        == PackageManager.PERMISSION_GRANTED)
-            val isGrantedAccessCoarseLocation =
-                (ActivityCompat.checkSelfPermission(
-                    this,
-                    Manifest.permission.ACCESS_COARSE_LOCATION
-                )
-                        == PackageManager.PERMISSION_GRANTED)
-            return isGrantedAccessFineLocation && isGrantedAccessCoarseLocation
-        }
 
     fun loadPicturePath() {
         openDocumentResultLauncher.launch(arrayOf("image/*"))

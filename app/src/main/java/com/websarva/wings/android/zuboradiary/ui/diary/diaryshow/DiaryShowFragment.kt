@@ -148,13 +148,11 @@ class DiaryShowFragment : BaseFragment() {
     }
 
     private fun setUpToolBar() {
-        binding.materialToolbarTopAppBar
-            .setNavigationOnClickListener {
+        binding.materialToolbarTopAppBar.apply {
+            setNavigationOnClickListener {
                 backFragment(true)
             }
-
-        binding.materialToolbarTopAppBar
-            .setOnMenuItemClickListener { item: MenuItem ->
+            setOnMenuItemClickListener { item: MenuItem ->
                 // 日記編集フラグメント起動
                 if (item.itemId == R.id.diaryShowToolbarOptionEditDiary) {
                     val editDiaryDate = diaryShowViewModel.dateLiveData.checkNotNull()
@@ -167,6 +165,7 @@ class DiaryShowFragment : BaseFragment() {
                 }
                 false
             }
+        }
 
         diaryShowViewModel.dateLiveData
             .observe(viewLifecycleOwner) { date: LocalDate? ->
@@ -181,17 +180,15 @@ class DiaryShowFragment : BaseFragment() {
 
     // 天気表示欄設定
     private fun setUpWeatherLayout() {
-        diaryShowViewModel.weather1LiveData
-            .observe(
+        diaryShowViewModel.apply {
+            weather1LiveData.observe(
                 viewLifecycleOwner,
                 Weather1Observer(
                     requireContext(),
                     binding.includeDiaryShow.textWeather1Selected
                 )
             )
-
-        diaryShowViewModel.weather2LiveData
-            .observe(
+            weather2LiveData.observe(
                 viewLifecycleOwner,
                 Weather2Observer(
                     requireContext(),
@@ -199,6 +196,7 @@ class DiaryShowFragment : BaseFragment() {
                     binding.includeDiaryShow.textWeather2Selected
                 )
             )
+        }
     }
 
     class Weather1Observer(private val context: Context, private val textWeather: TextView)
@@ -246,14 +244,16 @@ class DiaryShowFragment : BaseFragment() {
     }
 
     private fun setUpItemLayout() {
-        val itemLayouts = arrayOf(
-            binding.includeDiaryShow.includeItem1.linerLayoutDiaryShowItem,
-            binding.includeDiaryShow.includeItem2.linerLayoutDiaryShowItem,
-            binding.includeDiaryShow.includeItem3.linerLayoutDiaryShowItem,
-            binding.includeDiaryShow.includeItem4.linerLayoutDiaryShowItem,
-            binding.includeDiaryShow.includeItem5.linerLayoutDiaryShowItem
-
-        )
+        val itemLayouts =
+            binding.includeDiaryShow.run {
+                arrayOf(
+                    includeItem1.linerLayoutDiaryShowItem,
+                    includeItem2.linerLayoutDiaryShowItem,
+                    includeItem3.linerLayoutDiaryShowItem,
+                    includeItem4.linerLayoutDiaryShowItem,
+                    includeItem5.linerLayoutDiaryShowItem
+                )
+            }
         diaryShowViewModel.numVisibleItemsLiveData
             .observe(viewLifecycleOwner, NumVisibleItemsObserver(itemLayouts))
     }

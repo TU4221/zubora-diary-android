@@ -264,71 +264,83 @@ class SettingsFragment : BaseFragment() {
         switcher.switchToolbarColor(binding.materialToolbarTopAppBar)
 
         switcher.switchSettingItemSectionColor(
-            listOf(
-                binding.textSettingsSectionDesign,
-                binding.textSettingsSectionSetting,
-                binding.textSettingsSectionEnd,
-                binding.textSettingsSectionData
-            )
+            binding.run {
+                listOf(
+                    textSettingsSectionDesign,
+                    textSettingsSectionSetting,
+                    textSettingsSectionEnd,
+                    textSettingsSectionData
+                )
+            }
         )
 
         switcher.switchSettingItemIconColor(
-            listOf(
-                binding.includeThemeColorSetting.textTitle,
-                binding.includeCalendarStartDaySetting.textTitle,
-                binding.includeReminderNotificationSetting.textTitle,
-                binding.includePasscodeLockSetting.textTitle,
-                binding.includeWeatherInfoAcquisitionSetting.textTitle,
-                binding.includeAllDiariesDeleteSetting.textTitle,
-                binding.includeAllSettingsInitializationSetting.textTitle,
-                binding.includeAllDataDeleteSetting.textTitle
-            )
+            binding.run {
+                listOf(
+                    includeThemeColorSetting.textTitle,
+                    includeCalendarStartDaySetting.textTitle,
+                    includeReminderNotificationSetting.textTitle,
+                    includePasscodeLockSetting.textTitle,
+                    includeWeatherInfoAcquisitionSetting.textTitle,
+                    includeAllDiariesDeleteSetting.textTitle,
+                    includeAllSettingsInitializationSetting.textTitle,
+                    includeAllDataDeleteSetting.textTitle
+                )
+            }
         )
 
         switcher.switchTextColorOnBackground(
-            listOf(
-                binding.includeThemeColorSetting.textTitle,
-                binding.includeThemeColorSetting.textValue,
-                binding.includeCalendarStartDaySetting.textTitle,
-                binding.includeCalendarStartDaySetting.textValue,
-                binding.includeReminderNotificationSetting.textTitle,
-                binding.includeReminderNotificationSetting.textValue,
-                binding.includePasscodeLockSetting.textTitle,
-                binding.includeWeatherInfoAcquisitionSetting.textTitle
-            )
+            binding.run {
+                listOf(
+                    includeThemeColorSetting.textTitle,
+                    includeThemeColorSetting.textValue,
+                    includeCalendarStartDaySetting.textTitle,
+                    includeCalendarStartDaySetting.textValue,
+                    includeReminderNotificationSetting.textTitle,
+                    includeReminderNotificationSetting.textValue,
+                    includePasscodeLockSetting.textTitle,
+                    includeWeatherInfoAcquisitionSetting.textTitle
+                )
+            }
         )
 
         switcher.switchRedTextColorOnBackground(
-            listOf(
-                binding.includeAllDiariesDeleteSetting.textTitle,
-                binding.includeAllSettingsInitializationSetting.textTitle,
-                binding.includeAllDataDeleteSetting.textTitle
-            )
+            binding.run {
+                listOf(
+                    includeAllDiariesDeleteSetting.textTitle,
+                    includeAllSettingsInitializationSetting.textTitle,
+                    includeAllDataDeleteSetting.textTitle
+                )
+            }
         )
 
         switcher.switchSwitchColor(
-            listOf(
-                binding.includeReminderNotificationSetting.materialSwitch,
-                binding.includePasscodeLockSetting.materialSwitch,
-                binding.includeWeatherInfoAcquisitionSetting.materialSwitch
-            )
+            binding.run {
+                listOf(
+                    includeReminderNotificationSetting.materialSwitch,
+                    includePasscodeLockSetting.materialSwitch,
+                    includeWeatherInfoAcquisitionSetting.materialSwitch
+                )
+            }
         )
 
         switcher.switchDividerColor(
-            listOf(
-                binding.materialDividerToolbar,
-                binding.materialDividerThemeColorSetting,
-                binding.materialDividerSectionSetting,
-                binding.materialDividerCalendarStartDaySetting,
-                binding.materialDividerReminderNotificationSetting,
-                binding.materialDividerPasscodeLockSetting,
-                binding.materialDividerWeatherInfoAcquisitionSetting,
-                binding.materialDividerSectionData,
-                binding.materialDividerAllDiariesDeleteSetting,
-                binding.materialDividerAllSettingsInitializationSetting,
-                binding.materialDividerAllDataDeleteSetting,
-                binding.materialDividerSectionEnd
-            )
+            binding.run {
+                listOf(
+                    materialDividerToolbar,
+                    materialDividerThemeColorSetting,
+                    materialDividerSectionSetting,
+                    materialDividerCalendarStartDaySetting,
+                    materialDividerReminderNotificationSetting,
+                    materialDividerPasscodeLockSetting,
+                    materialDividerWeatherInfoAcquisitionSetting,
+                    materialDividerSectionData,
+                    materialDividerAllDiariesDeleteSetting,
+                    materialDividerAllSettingsInitializationSetting,
+                    materialDividerAllDataDeleteSetting,
+                    materialDividerSectionEnd
+                )
+            }
         )
     }
 
@@ -345,10 +357,8 @@ class SettingsFragment : BaseFragment() {
                     settingValue = settingsViewModel.loadCalendarStartDaySettingValue()
                 }
 
-                val stringConverter =
-                    DayOfWeekStringConverter(requireContext())
-                val strDayOfWeek =
-                    stringConverter.toCalendarStartDayOfWeek(settingValue)
+                val stringConverter = DayOfWeekStringConverter(requireContext())
+                val strDayOfWeek = stringConverter.toCalendarStartDayOfWeek(settingValue)
                 binding.includeCalendarStartDaySetting.textValue.text = strDayOfWeek
             }
     }
@@ -393,8 +403,8 @@ class SettingsFragment : BaseFragment() {
                 }
 
                 val converter = DateTimeStringConverter()
-                val strTime = converter.toHourMinute(time)
-                binding.includeReminderNotificationSetting.textValue.text = strTime
+                val timeString = converter.toHourMinute(time)
+                binding.includeReminderNotificationSetting.textValue.text = timeString
             }
     }
 
@@ -531,27 +541,30 @@ class SettingsFragment : BaseFragment() {
     }
 
     private fun setUpAllDiariesDeleteSettingItem() {
-        binding.includeAllDiariesDeleteSetting.textTitle.setOnClickListener {
-            showAllDiariesDeleteDialog()
+        binding.includeAllDiariesDeleteSetting.apply {
+            textTitle.setOnClickListener {
+                showAllDiariesDeleteDialog()
+            }
+            textValue.visibility = View.GONE
         }
-
-        binding.includeAllDiariesDeleteSetting.textValue.visibility = View.GONE
     }
 
     private fun setUpAllSettingsInitializationSettingItem() {
-        binding.includeAllSettingsInitializationSetting.textTitle.setOnClickListener {
-            showAllSettingsInitializationDialog()
+        binding.includeAllSettingsInitializationSetting.apply {
+            textTitle.setOnClickListener {
+                showAllSettingsInitializationDialog()
+            }
+            textValue.visibility = View.GONE
         }
-
-        binding.includeAllSettingsInitializationSetting.textValue.visibility = View.GONE
     }
 
     private fun setUpAllDataDeleteSettingItem() {
-        binding.includeAllDataDeleteSetting.textTitle.setOnClickListener {
-            showAllDataDeleteDialog()
+        binding.includeAllDataDeleteSetting.apply {
+            textTitle.setOnClickListener {
+                showAllDataDeleteDialog()
+            }
+            textValue.visibility = View.GONE
         }
-
-        binding.includeAllDataDeleteSetting.textValue.visibility = View.GONE
     }
 
     private fun showThemeColorPickerDialog() {

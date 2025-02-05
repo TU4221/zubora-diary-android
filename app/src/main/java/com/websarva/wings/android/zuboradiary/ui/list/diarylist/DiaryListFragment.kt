@@ -220,8 +220,10 @@ class DiaryListFragment : BaseFragment() {
                 noDiaryMessageVisibility = View.INVISIBLE
                 diaryListVisibility = View.VISIBLE
             }
-            binding.textNoDiaryMessage.visibility = noDiaryMessageVisibility
-            binding.recyclerDiaryList.visibility = diaryListVisibility
+            binding.apply {
+                textNoDiaryMessage.visibility = noDiaryMessageVisibility
+                recyclerDiaryList.visibility = diaryListVisibility
+            }
         }
 
         fun setUpList(list: DiaryYearMonthList) {

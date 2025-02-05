@@ -49,6 +49,7 @@ class DiaryEditFragment : BaseFragment() {
     // View関係
     private var _binding: FragmentDiaryEditBinding? = null
     private val binding get() = checkNotNull(_binding)
+
     private var isDeletingItemTransition = false
     private lateinit var weather2ArrayAdapter: ArrayAdapter<String>
 
@@ -158,7 +159,7 @@ class DiaryEditFragment : BaseFragment() {
         val selectedButton =
             receiveResulFromDialog<Int>(DiaryLoadingDialogFragment.KEY_SELECTED_BUTTON) ?: return
 
-        val date = checkNotNull(diaryEditViewModel.date.value)
+        val date = diaryEditViewModel.date.checkNotNull()
 
         if (selectedButton == DialogInterface.BUTTON_POSITIVE) {
             diaryEditViewModel.initialize()
@@ -305,11 +306,12 @@ class DiaryEditFragment : BaseFragment() {
 
     // 日付入力欄設定
     private fun setUpDateInputField() {
-        binding.textInputEditTextDate.inputType = EditorInfo.TYPE_NULL //キーボード非表示設定
-
-        binding.textInputEditTextDate.setOnClickListener {
-            val date = diaryEditViewModel.date.checkNotNull()
-            showDatePickerDialog(date)
+        binding.textInputEditTextDate.apply {
+            inputType = EditorInfo.TYPE_NULL //キーボード非表示設定
+            setOnClickListener {
+                val date = diaryEditViewModel.date.checkNotNull()
+                showDatePickerDialog(date)
+            }
         }
 
         diaryEditViewModel.date.observe(viewLifecycleOwner, DateObserver())
@@ -436,16 +438,19 @@ class DiaryEditFragment : BaseFragment() {
     private fun setUpConditionInputField() {
         // ドロップダウン設定
         val conditionArrayAdapter = createConditionSpinnerAdapter()
-        binding.autoCompleteTextCondition.setAdapter(conditionArrayAdapter)
-        binding.autoCompleteTextCondition.onItemClickListener =
-            OnItemClickListener { _: AdapterView<*>?, _: View?, position: Int, _: Long ->
-                val listAdapter = binding.autoCompleteTextCondition.adapter
-                val arrayAdapter = listAdapter as ArrayAdapter<*>
-                val strCondition = arrayAdapter.getItem(position) as String
-                val condition = Condition.of(requireContext(), strCondition)
-                diaryEditViewModel.updateCondition(condition)
-                binding.autoCompleteTextCondition.clearFocus()
-            }
+        binding.autoCompleteTextCondition.apply {
+            setAdapter(conditionArrayAdapter)
+            onItemClickListener =
+                OnItemClickListener { _: AdapterView<*>?, _: View?, position: Int, _: Long ->
+                    val listAdapter = adapter
+                    val arrayAdapter = listAdapter as ArrayAdapter<*>
+                    val strCondition = arrayAdapter.getItem(position) as String
+                    val condition = Condition.of(requireContext(), strCondition)
+                    diaryEditViewModel.updateCondition(condition)
+                    clearFocus()
+                }
+        }
+
 
         diaryEditViewModel.condition
             .observe(viewLifecycleOwner) { condition: Condition ->
@@ -472,20 +477,26 @@ class DiaryEditFragment : BaseFragment() {
     private fun setUpItemInputField() {
         // 項目入力欄関係Viewを配列に格納
         val textInputEditTextItemsTitle =
-            arrayOf(
-                binding.includeItem1.textInputEditTextTitle,
-                binding.includeItem2.textInputEditTextTitle,
-                binding.includeItem3.textInputEditTextTitle,
-                binding.includeItem4.textInputEditTextTitle,
-                binding.includeItem5.textInputEditTextTitle,
-            )
-        val imageButtonItemsDelete = arrayOf(
-            binding.includeItem1.imageButtonItemDelete,
-            binding.includeItem2.imageButtonItemDelete,
-            binding.includeItem3.imageButtonItemDelete,
-            binding.includeItem4.imageButtonItemDelete,
-            binding.includeItem5.imageButtonItemDelete,
-        )
+            binding.run {
+                arrayOf(
+                    includeItem1.textInputEditTextTitle,
+                    includeItem2.textInputEditTextTitle,
+                    includeItem3.textInputEditTextTitle,
+                    includeItem4.textInputEditTextTitle,
+                    includeItem5.textInputEditTextTitle,
+                )
+            }
+
+        val imageButtonItemsDelete =
+            binding.run {
+                arrayOf(
+                    includeItem1.imageButtonItemDelete,
+                    includeItem2.imageButtonItemDelete,
+                    includeItem3.imageButtonItemDelete,
+                    includeItem4.imageButtonItemDelete,
+                    includeItem5.imageButtonItemDelete,
+                )
+            }
 
         // 項目欄設定
         // 項目タイトル入力欄設定
@@ -663,14 +674,18 @@ class DiaryEditFragment : BaseFragment() {
     }
 
     private fun setUpPictureInputField() {
-        binding.imageAttachedPicture.setOnClickListener {
-            requireMainActivity().loadPicturePath()
-        }
-
         diaryEditViewModel.picturePath
             .observe(viewLifecycleOwner, PicturePathObserver())
 
-        binding.imageButtonAttachedPictureDelete.setOnClickListener { showDiaryPictureDeleteDialog() }
+        binding.apply {
+            imageAttachedPicture.setOnClickListener {
+                requireMainActivity().loadPicturePath()
+            }
+            imageButtonAttachedPictureDelete.setOnClickListener {
+                showDiaryPictureDeleteDialog()
+            }
+        }
+
     }
 
     private inner class PicturePathObserver : Observer<Uri?> {
@@ -687,14 +702,16 @@ class DiaryEditFragment : BaseFragment() {
         }
 
         fun enablePictureDeleteButton(enabled: Boolean) {
-            binding.imageButtonAttachedPictureDelete.isEnabled = enabled
-            val alphaResId = if (enabled) {
-                R.dimen.view_enabled_alpha
-            } else {
-                R.dimen.view_disabled_alpha
+            binding.imageButtonAttachedPictureDelete.apply {
+                isEnabled = enabled
+                val alphaResId = if (enabled) {
+                    R.dimen.view_enabled_alpha
+                } else {
+                    R.dimen.view_disabled_alpha
+                }
+                val alphaValue = ResourcesCompat.getFloat(resources, alphaResId)
+                alpha = alphaValue
             }
-            val alpha = ResourcesCompat.getFloat(resources, alphaResId)
-            binding.imageButtonAttachedPictureDelete.alpha = alpha
         }
     }
 
@@ -703,23 +720,20 @@ class DiaryEditFragment : BaseFragment() {
         val loadedPictureUri = diaryEditViewModel.loadedPicturePath.value
 
         try {
-            if (latestPictureUri == null && loadedPictureUri == null) return
-
-            if (latestPictureUri != null && loadedPictureUri == null) {
-                pictureUriPermissionManager.takePersistablePermission(latestPictureUri)
-                return
+            pictureUriPermissionManager.apply {
+                if (latestPictureUri == null && loadedPictureUri == null) return
+                if (latestPictureUri != null && loadedPictureUri == null) {
+                    takePersistablePermission(latestPictureUri)
+                    return
+                }
+                if (latestPictureUri == null) {
+                    releasePersistablePermission(checkNotNull(loadedPictureUri))
+                    return
+                }
+                if (latestPictureUri == loadedPictureUri) return
+                takePersistablePermission(latestPictureUri)
+                releasePersistablePermission(checkNotNull(loadedPictureUri))
             }
-
-            if (latestPictureUri == null) {
-                pictureUriPermissionManager
-                    .releasePersistablePermission(checkNotNull(loadedPictureUri))
-                return
-            }
-
-            if (latestPictureUri == loadedPictureUri) return
-
-            pictureUriPermissionManager.takePersistablePermission(latestPictureUri)
-            pictureUriPermissionManager.releasePersistablePermission(checkNotNull(loadedPictureUri))
         } catch (e: SecurityException) {
             // 対処できないがアプリを落としたくない為、catchのみ処理する。
         }
@@ -741,23 +755,30 @@ class DiaryEditFragment : BaseFragment() {
 
         textInputSetup.setUpKeyboardCloseOnEnter(binding.textInputLayoutTitle)
 
-        val scrollableTextInputLayouts = arrayOf(
-            binding.includeItem1.textInputLayoutComment,
-            binding.includeItem2.textInputLayoutComment,
-            binding.includeItem3.textInputLayoutComment,
-            binding.includeItem4.textInputLayoutComment,
-            binding.includeItem5.textInputLayoutComment,
-        )
+        val scrollableTextInputLayouts =
+            binding.run {
+                arrayOf(
+                    includeItem1.textInputLayoutComment,
+                    includeItem2.textInputLayoutComment,
+                    includeItem3.textInputLayoutComment,
+                    includeItem4.textInputLayoutComment,
+                    includeItem5.textInputLayoutComment,
+                )
+            }
+
         textInputSetup.setUpScrollable(*scrollableTextInputLayouts)
 
-        val clearableTextInputLayouts = arrayOf(
-            binding.textInputLayoutTitle,
-            binding.includeItem1.textInputLayoutTitle,
-            binding.includeItem2.textInputLayoutTitle,
-            binding.includeItem3.textInputLayoutTitle,
-            binding.includeItem4.textInputLayoutTitle,
-            binding.includeItem5.textInputLayoutTitle,
-        )
+        val clearableTextInputLayouts =
+            binding.run {
+                arrayOf(
+                    textInputLayoutTitle,
+                    includeItem1.textInputLayoutTitle,
+                    includeItem2.textInputLayoutTitle,
+                    includeItem3.textInputLayoutTitle,
+                    includeItem4.textInputLayoutTitle,
+                    includeItem5.textInputLayoutTitle,
+                )
+            }
         val transitionListener =
             textInputSetup.createClearButtonSetupTransitionListener(*clearableTextInputLayouts)
         addTransitionListener(transitionListener)
@@ -784,23 +805,25 @@ class DiaryEditFragment : BaseFragment() {
     }
 
     private fun createAllTextInputLayoutList(): @Unmodifiable List<TextInputLayout> {
-        return listOf(
-            binding.textInputLayoutDate,
-            binding.textInputLayoutWeather1,
-            binding.textInputLayoutWeather2,
-            binding.textInputLayoutCondition,
-            binding.textInputLayoutTitle,
-            binding.includeItem1.textInputLayoutTitle,
-            binding.includeItem1.textInputLayoutComment,
-            binding.includeItem2.textInputLayoutTitle,
-            binding.includeItem2.textInputLayoutComment,
-            binding.includeItem3.textInputLayoutTitle,
-            binding.includeItem3.textInputLayoutComment,
-            binding.includeItem4.textInputLayoutTitle,
-            binding.includeItem4.textInputLayoutComment,
-            binding.includeItem5.textInputLayoutTitle,
-            binding.includeItem5.textInputLayoutComment
-        )
+        return binding.run {
+            listOf(
+                textInputLayoutDate,
+                textInputLayoutWeather1,
+                textInputLayoutWeather2,
+                textInputLayoutCondition,
+                textInputLayoutTitle,
+                includeItem1.textInputLayoutTitle,
+                includeItem1.textInputLayoutComment,
+                includeItem2.textInputLayoutTitle,
+                includeItem2.textInputLayoutComment,
+                includeItem3.textInputLayoutTitle,
+                includeItem3.textInputLayoutComment,
+                includeItem4.textInputLayoutTitle,
+                includeItem4.textInputLayoutComment,
+                includeItem5.textInputLayoutTitle,
+                includeItem5.textInputLayoutComment
+            )
+        }
     }
 
     private fun fetchWeatherInfo(date: LocalDate, requestsShowingDialog: Boolean) {
@@ -938,10 +961,12 @@ class DiaryEditFragment : BaseFragment() {
         //      スピナーのアダプターが選択中アイテムのみで構成されたアダプターに更新されてしまうので
         //      onResume()メソッドにて再度アダプターを設定して対策。
         //      (Weather2はWeather1のObserver内で設定している為不要)
-        val weatherArrayAdapter = createWeatherSpinnerAdapter()
-        binding.autoCompleteTextWeather1.setAdapter(weatherArrayAdapter)
-        val conditionArrayAdapter = createConditionSpinnerAdapter()
-        binding.autoCompleteTextCondition.setAdapter(conditionArrayAdapter)
+        binding.apply {
+            val weatherArrayAdapter = createWeatherSpinnerAdapter()
+            autoCompleteTextWeather1.setAdapter(weatherArrayAdapter)
+            val conditionArrayAdapter = createConditionSpinnerAdapter()
+            autoCompleteTextCondition.setAdapter(conditionArrayAdapter)
+        }
 
         // HACK:ItemTitleEditFragmentから戻ってきた時に処理させたく箇所を
         //      変数(DiaryEditViewModel.IsShowingItemTitleEditFragment)で分岐させる。

@@ -78,7 +78,7 @@ class CalendarFragment : BaseFragment() {
 
         return binding.apply {
             lifecycleOwner = this@CalendarFragment
-            diaryShowViewModel = diaryShowViewModel
+            diaryShowViewModel = this@CalendarFragment.diaryShowViewModel
         }
     }
 
@@ -386,13 +386,17 @@ class CalendarFragment : BaseFragment() {
         fun showDiary() {
             diaryShowViewModel.initialize()
             diaryShowViewModel.loadSavedDiary(date)
-            binding.frameLayoutDiaryShow.visibility = View.VISIBLE
-            binding.textNoDiaryMessage.visibility = View.GONE
+            binding.apply {
+                frameLayoutDiaryShow.visibility = View.VISIBLE
+                textNoDiaryMessage.visibility = View.GONE
+            }
         }
 
         fun closeDiary() {
-            binding.frameLayoutDiaryShow.visibility = View.GONE
-            binding.textNoDiaryMessage.visibility = View.VISIBLE
+            binding.apply {
+                frameLayoutDiaryShow.visibility = View.GONE
+                textNoDiaryMessage.visibility = View.VISIBLE
+            }
             diaryShowViewModel.initialize()
         }
     }
@@ -427,13 +431,17 @@ class CalendarFragment : BaseFragment() {
             )
 
         // 項目レイアウト設定
-        val itemLayouts = arrayOf(
-            binding.includeDiaryShow.includeItem1.linerLayoutDiaryShowItem,
-            binding.includeDiaryShow.includeItem2.linerLayoutDiaryShowItem,
-            binding.includeDiaryShow.includeItem3.linerLayoutDiaryShowItem,
-            binding.includeDiaryShow.includeItem4.linerLayoutDiaryShowItem,
-            binding.includeDiaryShow.includeItem5.linerLayoutDiaryShowItem,
-        )
+        val itemLayouts =
+            binding.run{
+                arrayOf(
+                    includeDiaryShow.includeItem1.linerLayoutDiaryShowItem,
+                    includeDiaryShow.includeItem2.linerLayoutDiaryShowItem,
+                    includeDiaryShow.includeItem3.linerLayoutDiaryShowItem,
+                    includeDiaryShow.includeItem4.linerLayoutDiaryShowItem,
+                    includeDiaryShow.includeItem5.linerLayoutDiaryShowItem,
+                )
+            }
+
         diaryShowViewModel.numVisibleItemsLiveData
             .observe(viewLifecycleOwner, DiaryShowFragment.NumVisibleItemsObserver(itemLayouts))
 

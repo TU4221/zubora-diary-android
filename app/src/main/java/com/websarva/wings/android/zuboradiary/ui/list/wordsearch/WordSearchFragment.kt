@@ -102,7 +102,6 @@ class WordSearchFragment : BaseFragment() {
 
         wordSearchViewModel.searchWord
             .observe(viewLifecycleOwner) { s: String ->
-                Log.d("20250204", "searchWordObserve")
                 // HACK:キーワードの入力時と確定時に検索Observerが起動してしまい
                 //      同じキーワードで二重に検索してしまう。防止策として下記条件追加。
                 if (s == previousText) return@observe
@@ -192,15 +191,21 @@ class WordSearchFragment : BaseFragment() {
 
             val searchWord = wordSearchViewModel.searchWord.notNullValue()
             if (searchWord.isEmpty()) {
-                binding.floatingActionButtonTopScroll.hide() // MEMO:初回起動用
-                binding.textNoWordSearchResultsMessage.visibility = View.INVISIBLE
-                binding.linerLayoutWordSearchResults.visibility = View.INVISIBLE
+                binding.apply {
+                    floatingActionButtonTopScroll.hide() // MEMO:初回起動用
+                    textNoWordSearchResultsMessage.visibility = View.INVISIBLE
+                    linerLayoutWordSearchResults.visibility = View.INVISIBLE
+                }
             } else if (value.wordSearchResultYearMonthListItemList.isEmpty()) {
-                binding.textNoWordSearchResultsMessage.visibility = View.VISIBLE
-                binding.linerLayoutWordSearchResults.visibility = View.INVISIBLE
+                binding.apply {
+                    textNoWordSearchResultsMessage.visibility = View.VISIBLE
+                    linerLayoutWordSearchResults.visibility = View.INVISIBLE
+                }
             } else {
-                binding.textNoWordSearchResultsMessage.visibility = View.INVISIBLE
-                binding.linerLayoutWordSearchResults.visibility = View.VISIBLE
+                binding.apply {
+                    textNoWordSearchResultsMessage.visibility = View.INVISIBLE
+                    linerLayoutWordSearchResults.visibility = View.VISIBLE
+                }
             }
 
             val convertedList: List<DiaryYearMonthListBaseItem> =

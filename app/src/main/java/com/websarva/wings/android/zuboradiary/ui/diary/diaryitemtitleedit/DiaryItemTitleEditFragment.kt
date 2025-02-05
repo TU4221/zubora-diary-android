@@ -111,14 +111,15 @@ class DiaryItemTitleEditFragment : BaseFragment() {
     }
 
     private fun setUpToolBar() {
-        val targetItemNumber = diaryItemTitleEditViewModel.itemNumber.checkNotNull()
-        val toolBarTitle =
-            getString(R.string.fragment_diary_item_title_edit_toolbar_first_title) + targetItemNumber + getString(
-                R.string.fragment_diary_item_title_edit_toolbar_second_title
-            )
-        binding.materialToolbarTopAppBar.title = toolBarTitle
-        binding.materialToolbarTopAppBar
-            .setNavigationOnClickListener { navController.navigateUp() }
+        binding.materialToolbarTopAppBar.apply {
+            val targetItemNumber = diaryItemTitleEditViewModel.itemNumber.checkNotNull()
+            val toolBarTitle =
+                getString(R.string.fragment_diary_item_title_edit_toolbar_first_title) + targetItemNumber + getString(
+                    R.string.fragment_diary_item_title_edit_toolbar_second_title
+                )
+            title = toolBarTitle
+            setNavigationOnClickListener { navController.navigateUp() }
+        }
     }
 
     private fun setUpItemTitleInputField() {
@@ -138,16 +139,18 @@ class DiaryItemTitleEditFragment : BaseFragment() {
         val editText = checkNotNull(binding.textInputLayoutNewItemTitle.editText)
         editText.addTextChangedListener(InputItemTitleErrorWatcher())
 
-        binding.buttonNewItemTitleSelection.setOnClickListener {
-            val isError = binding.textInputLayoutNewItemTitle.error.isNullOrEmpty()
-            if (isError) return@setOnClickListener
+        binding.buttonNewItemTitleSelection.apply {
+            setOnClickListener {
+                val isError = binding.textInputLayoutNewItemTitle.error.isNullOrEmpty()
+                if (isError) return@setOnClickListener
 
-            val title = diaryItemTitleEditViewModel.itemTitle.notNullValue()
-            completeItemTitleEdit(title)
+                val title = diaryItemTitleEditViewModel.itemTitle.notNullValue()
+                completeItemTitleEdit(title)
+            }
+
+            val isEnabled = editText.text.toString().isNotEmpty()
+            this.isEnabled = isEnabled
         }
-
-        val isEnabled = editText.text.toString().isNotEmpty()
-        binding.buttonNewItemTitleSelection.isEnabled = isEnabled
     }
 
     private inner class InputItemTitleErrorWatcher : TextWatcher {
@@ -156,22 +159,25 @@ class DiaryItemTitleEditFragment : BaseFragment() {
         }
 
         override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
-            val title = s.toString()
-            if (title.isEmpty()) {
-                binding.textInputLayoutNewItemTitle.error =
-                    getString(R.string.fragment_diary_item_title_edit_new_item_title_input_field_error_message_empty)
-                binding.buttonNewItemTitleSelection.isEnabled = false
-                return
+            binding.apply {
+                val title = s.toString()
+                if (title.isEmpty()) {
+                    textInputLayoutNewItemTitle.error =
+                        getString(R.string.fragment_diary_item_title_edit_new_item_title_input_field_error_message_empty)
+                    buttonNewItemTitleSelection.isEnabled = false
+                    return
+                }
+                // 先頭が空白文字(\\s)
+                if (title.matches("\\s+.*".toRegex())) {
+                    textInputLayoutNewItemTitle.error =
+                        getString(R.string.fragment_diary_item_title_edit_new_item_title_input_field_error_message_initial_char_unmatched)
+                    buttonNewItemTitleSelection.isEnabled = false
+                    return
+                }
+                textInputLayoutNewItemTitle.error = null
+                buttonNewItemTitleSelection.isEnabled = true
             }
-            // 先頭が空白文字(\\s)
-            if (title.matches("\\s+.*".toRegex())) {
-                binding.textInputLayoutNewItemTitle.error =
-                    getString(R.string.fragment_diary_item_title_edit_new_item_title_input_field_error_message_initial_char_unmatched)
-                binding.buttonNewItemTitleSelection.isEnabled = false
-                return
-            }
-            binding.textInputLayoutNewItemTitle.error = null
-            binding.buttonNewItemTitleSelection.isEnabled = true
+
         }
 
         override fun afterTextChanged(s: Editable) {
@@ -200,15 +206,17 @@ class DiaryItemTitleEditFragment : BaseFragment() {
         }
 
         // 選択履歴読込・表示
-        diaryItemTitleEditViewModel.loadDiaryItemTitleSelectionHistory()
-        diaryItemTitleEditViewModel.itemTitleSelectionHistoryLiveData
-            .observe(viewLifecycleOwner) { selectionHistoryList: SelectionHistoryList ->
-                val adapter =
-                    checkNotNull(
-                        binding.recyclerItemTitleSelectionHistory.adapter
-                    ) as ItemTitleSelectionHistoryListAdapter
-                adapter.submitList(selectionHistoryList.selectionHistoryListItemList)
-            }
+        diaryItemTitleEditViewModel.apply {
+            loadDiaryItemTitleSelectionHistory()
+            itemTitleSelectionHistoryLiveData
+                .observe(viewLifecycleOwner) { selectionHistoryList: SelectionHistoryList ->
+                    val adapter =
+                        checkNotNull(
+                            binding.recyclerItemTitleSelectionHistory.adapter
+                        ) as ItemTitleSelectionHistoryListAdapter
+                    adapter.submitList(selectionHistoryList.selectionHistoryListItemList)
+                }
+        }
     }
 
     // DiaryItemTitleEditFragmentを閉じる
