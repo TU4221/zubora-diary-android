@@ -75,8 +75,10 @@ class DiaryItemTitleEditFragment : BaseFragment() {
     }
 
     override fun removeDialogResultOnDestroy(savedStateHandle: SavedStateHandle) {
-        savedStateHandle.remove<Any>(DiaryItemTitleDeleteDialogFragment.KEY_SELECTED_BUTTON)
-        savedStateHandle.remove<Any>(DiaryItemTitleDeleteDialogFragment.KEY_DELETE_LIST_ITEM_POSITION)
+        savedStateHandle.apply {
+            remove<Any>(DiaryItemTitleDeleteDialogFragment.KEY_SELECTED_BUTTON)
+            remove<Any>(DiaryItemTitleDeleteDialogFragment.KEY_DELETE_LIST_ITEM_POSITION)
+        }
     }
 
     override fun setUpOtherAppMessageDialog() {

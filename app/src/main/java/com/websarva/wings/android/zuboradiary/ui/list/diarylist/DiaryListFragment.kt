@@ -87,8 +87,10 @@ class DiaryListFragment : BaseFragment() {
     }
 
     override fun removeDialogResultOnDestroy(savedStateHandle: SavedStateHandle) {
-        savedStateHandle.remove<Any>(StartYearMonthPickerDialogFragment.KEY_SELECTED_YEAR_MONTH)
-        savedStateHandle.remove<Any>(DiaryDeleteDialogFragment.KEY_DELETE_DIARY_DATE)
+        savedStateHandle.apply {
+            remove<Any>(StartYearMonthPickerDialogFragment.KEY_SELECTED_YEAR_MONTH)
+            remove<Any>(DiaryDeleteDialogFragment.KEY_DELETE_DIARY_DATE)
+        }
     }
 
     override fun setUpOtherAppMessageDialog() {

@@ -9,6 +9,7 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
+import android.system.Os.remove
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
@@ -154,14 +155,16 @@ class SettingsFragment : BaseFragment() {
     }
 
     override fun removeDialogResultOnDestroy(savedStateHandle: SavedStateHandle) {
-        savedStateHandle.remove<Any>(ThemeColorPickerDialogFragment.KEY_SELECTED_THEME_COLOR)
-        savedStateHandle.remove<Any>(CalendarStartDayPickerDialogFragment.KEY_SELECTED_DAY_OF_WEEK)
-        savedStateHandle.remove<Any>(ReminderNotificationTimePickerDialogFragment.KEY_SELECTED_BUTTON)
-        savedStateHandle.remove<Any>(ReminderNotificationTimePickerDialogFragment.KEY_SELECTED_TIME)
-        savedStateHandle.remove<Any>(PermissionDialogFragment.KEY_SELECTED_BUTTON)
-        savedStateHandle.remove<Any>(AllDiariesDeleteDialogFragment.KEY_SELECTED_BUTTON)
-        savedStateHandle.remove<Any>(AllSettingsInitializationDialogFragment.KEY_SELECTED_BUTTON)
-        savedStateHandle.remove<Any>(AllDataDeleteDialogFragment.KEY_SELECTED_BUTTON)
+        savedStateHandle.apply {
+            remove<Any>(ThemeColorPickerDialogFragment.KEY_SELECTED_THEME_COLOR)
+            remove<Any>(CalendarStartDayPickerDialogFragment.KEY_SELECTED_DAY_OF_WEEK)
+            remove<Any>(ReminderNotificationTimePickerDialogFragment.KEY_SELECTED_BUTTON)
+            remove<Any>(ReminderNotificationTimePickerDialogFragment.KEY_SELECTED_TIME)
+            remove<Any>(PermissionDialogFragment.KEY_SELECTED_BUTTON)
+            remove<Any>(AllDiariesDeleteDialogFragment.KEY_SELECTED_BUTTON)
+            remove<Any>(AllSettingsInitializationDialogFragment.KEY_SELECTED_BUTTON)
+            remove<Any>(AllDataDeleteDialogFragment.KEY_SELECTED_BUTTON)
+        }
     }
 
     override fun setUpOtherAppMessageDialog() {

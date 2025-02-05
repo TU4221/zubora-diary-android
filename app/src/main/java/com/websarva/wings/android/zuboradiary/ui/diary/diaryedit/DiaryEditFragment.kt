@@ -142,13 +142,15 @@ class DiaryEditFragment : BaseFragment() {
     }
 
     override fun removeDialogResultOnDestroy(savedStateHandle: SavedStateHandle) {
-        savedStateHandle.remove<Any>(DiaryLoadingDialogFragment.KEY_SELECTED_BUTTON)
-        savedStateHandle.remove<Any>(DiaryUpdateDialogFragment.KEY_SELECTED_BUTTON)
-        savedStateHandle.remove<Any>(DiaryDeleteDialogFragment.KEY_SELECTED_BUTTON)
-        savedStateHandle.remove<Any>(DatePickerDialogFragment.KEY_SELECTED_DATE)
-        savedStateHandle.remove<Any>(WeatherInfoFetchingDialogFragment.KEY_SELECTED_BUTTON)
-        savedStateHandle.remove<Any>(DiaryItemDeleteDialogFragment.KEY_DELETE_ITEM_NUMBER)
-        savedStateHandle.remove<Any>(DiaryPictureDeleteDialogFragment.KEY_SELECTED_BUTTON)
+        savedStateHandle.apply {
+            remove<Any>(DiaryLoadingDialogFragment.KEY_SELECTED_BUTTON)
+            remove<Any>(DiaryUpdateDialogFragment.KEY_SELECTED_BUTTON)
+            remove<Any>(DiaryDeleteDialogFragment.KEY_SELECTED_BUTTON)
+            remove<Any>(DatePickerDialogFragment.KEY_SELECTED_DATE)
+            remove<Any>(WeatherInfoFetchingDialogFragment.KEY_SELECTED_BUTTON)
+            remove<Any>(DiaryItemDeleteDialogFragment.KEY_DELETE_ITEM_NUMBER)
+            remove<Any>(DiaryPictureDeleteDialogFragment.KEY_SELECTED_BUTTON)
+        }
     }
 
     override fun setUpOtherAppMessageDialog() {
