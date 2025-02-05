@@ -144,7 +144,7 @@ class DiaryItemTitleEditFragment : BaseFragment() {
 
         binding.buttonNewItemTitleSelection.apply {
             setOnClickListener {
-                val isError = binding.textInputLayoutNewItemTitle.error.isNullOrEmpty()
+                val isError = !binding.textInputLayoutNewItemTitle.error.isNullOrEmpty()
                 if (isError) return@setOnClickListener
 
                 val title = diaryItemTitleEditViewModel.itemTitle.notNullValue()
