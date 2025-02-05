@@ -856,15 +856,15 @@ class DiaryEditFragment : BaseFragment() {
 
         val isStartDiaryFragment =
             DiaryEditFragmentArgs.fromBundle(requireArguments()).isStartDiaryFragment
-        // 循環型画面遷移を成立させるためにPopup対象Fragmentが異なるactionを切り替える。
-        val action = if (isStartDiaryFragment) {
+        // 循環型画面遷移を成立させるためにPopup対象Fragmentが異なるdirectionsを切り替える。
+        val directions = if (isStartDiaryFragment) {
             DiaryEditFragmentDirections
                 .actionDiaryEditFragmentToDiaryShowFragmentPattern2(date)
         } else {
             DiaryEditFragmentDirections
                 .actionDiaryEditFragmentToDiaryShowFragmentPattern1(date)
         }
-        navController.navigate(action)
+        navController.navigate(directions)
     }
 
     private fun showDiaryItemTitleEditFragment(
@@ -873,47 +873,47 @@ class DiaryEditFragment : BaseFragment() {
     ) {
         if (isDialogShowing()) return
 
-        val action: NavDirections =
+        val directions =
             DiaryEditFragmentDirections
                 .actionDiaryEditFragmentToSelectItemTitleFragment(inputItemNumber, inputItemTitle)
-        navController.navigate(action)
+        navController.navigate(directions)
         diaryEditViewModel.updateIsShowingItemTitleEditFragment(true)
     }
 
     private fun showDiaryLoadingDialog(date: LocalDate) {
         if (isDialogShowing()) return
 
-        val action: NavDirections =
+        val directions =
             DiaryEditFragmentDirections
                 .actionDiaryEditFragmentToDiaryLoadingDialog(date)
-        navController.navigate(action)
+        navController.navigate(directions)
     }
 
     private fun showDiaryUpdateDialog(date: LocalDate) {
         if (isDialogShowing()) return
 
-        val action: NavDirections =
+        val directions =
             DiaryEditFragmentDirections
                 .actionDiaryEditFragmentToDiaryUpdateDialog(date)
-        navController.navigate(action)
+        navController.navigate(directions)
     }
 
     private fun showDiaryDeleteDialog(date: LocalDate) {
         if (isDialogShowing()) return
 
-        val action: NavDirections =
+        val directions =
             DiaryEditFragmentDirections
                 .actionDiaryEditFragmentToDiaryDeleteDialog(date)
-        navController.navigate(action)
+        navController.navigate(directions)
     }
 
     private fun showDatePickerDialog(date: LocalDate) {
         if (isDialogShowing()) return
 
-        val action: NavDirections =
+        val directions =
             DiaryEditFragmentDirections
                 .actionDiaryEditFragmentToDatePickerDialog(date)
-        navController.navigate(action)
+        navController.navigate(directions)
     }
 
     private fun showWeatherInfoFetchingDialog(date: LocalDate) {
@@ -923,28 +923,28 @@ class DiaryEditFragment : BaseFragment() {
         // 今日の日付以降は天気情報を取得できないためダイアログ表示不要
         diaryEditViewModel.canFetchWeatherInformation(date)
 
-        val action: NavDirections =
+        val directions =
             DiaryEditFragmentDirections
                 .actionDiaryEditFragmentToWeatherInfoFetchingDialog(date)
-        navController.navigate(action)
+        navController.navigate(directions)
     }
 
     private fun showDiaryItemDeleteDialog(itemNumber: ItemNumber) {
         if (isDialogShowing()) return
 
-        val action: NavDirections =
+        val directions =
             DiaryEditFragmentDirections
                 .actionDiaryEditFragmentToDiaryItemDeleteDialog(itemNumber)
-        navController.navigate(action)
+        navController.navigate(directions)
     }
 
     private fun showDiaryPictureDeleteDialog() {
         if (isDialogShowing()) return
 
-        val action =
+        val directions =
             DiaryEditFragmentDirections
                 .actionDiaryEditFragmentToDiaryPictureDeleteDialog()
-        navController.navigate(action)
+        navController.navigate(directions)
     }
 
     override fun navigateAppMessageDialog(appMessage: AppMessage) {

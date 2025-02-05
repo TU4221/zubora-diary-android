@@ -16,7 +16,6 @@ import androidx.databinding.ViewDataBinding
 import androidx.lifecycle.Observer
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModelProvider
-import androidx.navigation.NavDirections
 import com.websarva.wings.android.zuboradiary.R
 import com.websarva.wings.android.zuboradiary.data.AppMessage
 import com.websarva.wings.android.zuboradiary.data.DateTimeStringConverter
@@ -340,28 +339,30 @@ class DiaryShowFragment : BaseFragment() {
     private fun showDiaryEdit(date: LocalDate) {
         if (isDialogShowing()) return
 
-        val action: NavDirections =
+        val directions =
             DiaryShowFragmentDirections
                 .actionNavigationDiaryShowFragmentToDiaryEditFragment(
                     false,
                     true,
                     date
                 )
-        navController.navigate(action)
+        navController.navigate(directions)
     }
 
     private fun showDiaryDeleteDialog(date: LocalDate) {
         if (isDialogShowing()) return
 
-        val action: NavDirections =
-            DiaryShowFragmentDirections.actionDiaryShowFragmentToDiaryDeleteDialog(date)
-        navController.navigate(action)
+        val directions =
+            DiaryShowFragmentDirections
+                .actionDiaryShowFragmentToDiaryDeleteDialog(date)
+        navController.navigate(directions)
     }
 
     override fun navigateAppMessageDialog(appMessage: AppMessage) {
-        val action: NavDirections =
-            DiaryShowFragmentDirections.actionDiaryShowFragmentToAppMessageDialog(appMessage)
-        navController.navigate(action)
+        val directions =
+            DiaryShowFragmentDirections
+                .actionDiaryShowFragmentToAppMessageDialog(appMessage)
+        navController.navigate(directions)
     }
 
     override fun retryOtherAppMessageDialogShow() {

@@ -2,7 +2,6 @@ package com.websarva.wings.android.zuboradiary.ui.list.wordsearch
 
 import android.content.Context
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
@@ -11,7 +10,6 @@ import androidx.databinding.ViewDataBinding
 import androidx.lifecycle.Observer
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModelProvider
-import androidx.navigation.NavDirections
 import androidx.recyclerview.widget.RecyclerView
 import com.websarva.wings.android.zuboradiary.data.AppMessage
 import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor
@@ -250,17 +248,17 @@ class WordSearchFragment : BaseFragment() {
     private fun showShowDiaryFragment(date: LocalDate) {
         if (isDialogShowing()) return
 
-        val action: NavDirections =
+        val directions =
             WordSearchFragmentDirections
                 .actionNavigationWordSearchFragmentToDiaryShowFragment(date)
-        navController.navigate(action)
+        navController.navigate(directions)
     }
 
     override fun navigateAppMessageDialog(appMessage: AppMessage) {
-        val action: NavDirections =
+        val directions =
             WordSearchFragmentDirections
                 .actionWordSearchFragmentToAppMessageDialog(appMessage)
-        navController.navigate(action)
+        navController.navigate(directions)
     }
 
     override fun retryOtherAppMessageDialogShow() {

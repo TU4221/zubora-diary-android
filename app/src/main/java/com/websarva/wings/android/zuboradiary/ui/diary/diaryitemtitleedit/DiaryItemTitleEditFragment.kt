@@ -10,7 +10,6 @@ import android.view.ViewGroup
 import androidx.databinding.ViewDataBinding
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModelProvider
-import androidx.navigation.NavDirections
 import com.websarva.wings.android.zuboradiary.R
 import com.websarva.wings.android.zuboradiary.data.AppMessage
 import com.websarva.wings.android.zuboradiary.databinding.FragmentDiaryItemTitleEditBinding
@@ -238,30 +237,30 @@ class DiaryItemTitleEditFragment : BaseFragment() {
     private fun showDiaryEditFragment() {
         if (isDialogShowing()) return
 
-        val action =
+        val directions =
             DiaryItemTitleEditFragmentDirections
                 .actionDiaryItemTitleEditFragmentToDiaryEditFragment()
-        navController.navigate(action)
+        navController.navigate(directions)
     }
 
     private fun showDiaryItemTitleDeleteDialog(listItemPosition: Int, listItemTitle: String) {
         require(listItemPosition >= 0)
         if (isDialogShowing()) return
 
-        val action: NavDirections =
+        val directions =
             DiaryItemTitleEditFragmentDirections
                 .actionDiaryItemTitleEditFragmentToDiaryItemTitleDeleteDialog(
                     listItemPosition,
                     listItemTitle
                 )
-        navController.navigate(action)
+        navController.navigate(directions)
     }
 
     override fun navigateAppMessageDialog(appMessage: AppMessage) {
-        val action: NavDirections =
+        val directions =
             DiaryItemTitleEditFragmentDirections
                 .actionDiaryItemTitleEditFragmentToAppMessageDialog(appMessage)
-        navController.navigate(action)
+        navController.navigate(directions)
     }
 
     override fun retryOtherAppMessageDialogShow() {

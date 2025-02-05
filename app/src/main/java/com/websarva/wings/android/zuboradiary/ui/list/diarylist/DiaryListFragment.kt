@@ -12,7 +12,6 @@ import androidx.databinding.ViewDataBinding
 import androidx.lifecycle.Observer
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModelProvider
-import androidx.navigation.NavDirections
 import androidx.recyclerview.widget.RecyclerView
 import com.websarva.wings.android.zuboradiary.R
 import com.websarva.wings.android.zuboradiary.data.AppMessage
@@ -252,55 +251,57 @@ class DiaryListFragment : BaseFragment() {
     private fun showEditDiary() {
         if (isDialogShowing()) return
 
-        val action: NavDirections =
+        val directions =
             DiaryListFragmentDirections
                 .actionNavigationDiaryListFragmentToDiaryEditFragment(
                     true,
                     false,
                     LocalDate.now()
                 )
-        navController.navigate(action)
+        navController.navigate(directions)
     }
 
     private fun showShowDiaryFragment(date: LocalDate) {
         if (isDialogShowing()) return
 
-        val action: NavDirections =
+        val directions =
             DiaryListFragmentDirections
                 .actionNavigationDiaryListFragmentToDiaryShowFragment(date)
-        navController.navigate(action)
+        navController.navigate(directions)
     }
 
     private fun showWordSearchFragment() {
         if (isDialogShowing()) return
 
-        val action =
+        val directions =
             DiaryListFragmentDirections
                 .actionNavigationDiaryListFragmentToWordSearchFragment()
-        navController.navigate(action)
+        navController.navigate(directions)
     }
 
     private fun showStartYearMonthPickerDialog(newestYear: Year, oldestYear: Year) {
         if (isDialogShowing()) return
 
-        val action: NavDirections =
+        val directions =
             DiaryListFragmentDirections
                 .actionDiaryListFragmentToStartYearMonthPickerDialog(newestYear, oldestYear)
-        navController.navigate(action)
+        navController.navigate(directions)
     }
 
     private fun showDiaryDeleteDialog(date: LocalDate, pictureUri: Uri?) {
         if (isDialogShowing()) return
 
-        val action: NavDirections =
-            DiaryListFragmentDirections.actionDiaryListFragmentToDiaryDeleteDialog(date, pictureUri)
-        navController.navigate(action)
+        val directions =
+            DiaryListFragmentDirections
+                .actionDiaryListFragmentToDiaryDeleteDialog(date, pictureUri)
+        navController.navigate(directions)
     }
 
     override fun navigateAppMessageDialog(appMessage: AppMessage) {
-        val action: NavDirections =
-            DiaryListFragmentDirections.actionDiaryListFragmentToAppMessageDialog(appMessage)
-        navController.navigate(action)
+        val directions =
+            DiaryListFragmentDirections
+                .actionDiaryListFragmentToAppMessageDialog(appMessage)
+        navController.navigate(directions)
     }
 
     override fun retryOtherAppMessageDialogShow() {

@@ -9,7 +9,6 @@ import androidx.activity.OnBackPressedCallback
 import androidx.databinding.ViewDataBinding
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModelProvider
-import androidx.navigation.NavDirections
 import com.google.common.util.concurrent.FutureCallback
 import com.kizitonwose.calendar.core.CalendarDay
 import com.kizitonwose.calendar.core.CalendarMonth
@@ -487,21 +486,21 @@ class CalendarFragment : BaseFragment() {
     private fun showDiaryEditFragment(date: LocalDate) {
         if (isDialogShowing()) return
 
-        val action: NavDirections =
+        val directions =
             CalendarFragmentDirections
                 .actionNavigationCalendarFragmentToDiaryEditFragment(
                     true,
                     true,
                     date
                 )
-        navController.navigate(action)
+        navController.navigate(directions)
     }
 
     override fun navigateAppMessageDialog(appMessage: AppMessage) {
-        val action: NavDirections =
+        val directions =
             CalendarFragmentDirections
                 .actionCalendarFragmentToAppMessageDialog(appMessage)
-        navController.navigate(action)
+        navController.navigate(directions)
     }
 
     override fun retryOtherAppMessageDialogShow() {

@@ -9,7 +9,6 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
-import android.system.Os.remove
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
@@ -22,7 +21,6 @@ import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
 import androidx.databinding.ViewDataBinding
 import androidx.lifecycle.SavedStateHandle
-import androidx.navigation.NavDirections
 import com.websarva.wings.android.zuboradiary.R
 import com.websarva.wings.android.zuboradiary.data.AppMessage
 import com.websarva.wings.android.zuboradiary.data.DateTimeStringConverter
@@ -575,71 +573,71 @@ class SettingsFragment : BaseFragment() {
     private fun showThemeColorPickerDialog() {
         if (isDialogShowing()) return
 
-        val action =
+        val directions =
             SettingsFragmentDirections
                 .actionNavigationSettingsFragmentToThemeColorPickerDialog()
-        navController.navigate(action)
+        navController.navigate(directions)
     }
 
     private fun showCalendarStartDayPickerDialog(dayOfWeek: DayOfWeek) {
         if (isDialogShowing()) return
 
-        val action: NavDirections =
+        val directions =
             SettingsFragmentDirections
                 .actionNavigationSettingsFragmentToCalendarStartDayPickerDialog(dayOfWeek)
-        navController.navigate(action)
+        navController.navigate(directions)
     }
 
     private fun showReminderNotificationTimePickerDialog() {
         if (isDialogShowing()) return
 
-        val action =
+        val directions =
             SettingsFragmentDirections
                 .actionNavigationSettingsFragmentToReminderNotificationTimePickerDialog()
-        navController.navigate(action)
+        navController.navigate(directions)
     }
 
     private fun showPermissionDialog(permissionName: String) {
         if (isDialogShowing()) return
 
-        val action: NavDirections =
+        val directions =
             SettingsFragmentDirections
                 .actionSettingsFragmentToPermissionDialog(permissionName)
-        navController.navigate(action)
+        navController.navigate(directions)
     }
 
     private fun showAllDiariesDeleteDialog() {
         if (isDialogShowing()) return
 
-        val action =
+        val directions =
             SettingsFragmentDirections
                 .actionSettingsFragmentToAllDiariesDeleteDialog()
-        navController.navigate(action)
+        navController.navigate(directions)
     }
 
     private fun showAllSettingsInitializationDialog() {
         if (isDialogShowing()) return
 
-        val action =
+        val directions =
             SettingsFragmentDirections
                 .actionSettingsFragmentToAllSettingsInitializationDialog()
-        navController.navigate(action)
+        navController.navigate(directions)
     }
 
     private fun showAllDataDeleteDialog() {
         if (isDialogShowing()) return
 
-        val action =
+        val directions =
             SettingsFragmentDirections
                 .actionSettingsFragmentToAllDataDeleteDialog()
-        navController.navigate(action)
+        navController.navigate(directions)
     }
 
     override fun navigateAppMessageDialog(appMessage: AppMessage) {
-        val action: NavDirections =
+        val directions =
             SettingsFragmentDirections
                 .actionSettingsFragmentToAppMessageDialog(appMessage)
-        navController.navigate(action)
+        navController.navigate(directions)
     }
 
     override fun retryOtherAppMessageDialogShow() {
