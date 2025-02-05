@@ -1,51 +1,41 @@
-package com.websarva.wings.android.zuboradiary.data.preferences;
+package com.websarva.wings.android.zuboradiary.data.preferences
+
+import androidx.datastore.preferences.core.MutablePreferences
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.intPreferencesKey
+import java.time.DayOfWeek
+import java.util.Arrays
 
 
-import androidx.annotation.NonNull;
-import androidx.datastore.preferences.core.MutablePreferences;
-import androidx.datastore.preferences.core.Preferences;
-import androidx.datastore.preferences.core.PreferencesKeys;
+class CalendarStartDayOfWeekPreference {
 
-import java.time.DayOfWeek;
-import java.util.Arrays;
-import java.util.Objects;
-
-public class CalendarStartDayOfWeekPreference {
-
-    static final Preferences.Key<Integer> PREFERENCES_KEY_DAY_OF_WEEK =
-            PreferencesKeys.intKey("calendar_start_day_of_week");
-    private final int dayOfWeekNumber;
-
-    public CalendarStartDayOfWeekPreference(DayOfWeek dayOfWeek) {
-        Objects.requireNonNull(dayOfWeek);
-
-        dayOfWeekNumber = dayOfWeek.getValue();
+    companion object {
+        @JvmField
+        val PREFERENCES_KEY_DAY_OF_WEEK: Preferences.Key<Int> =
+            intPreferencesKey("calendar_start_day_of_week")
     }
 
-    public CalendarStartDayOfWeekPreference(int dayOfWeekNumber) {
-        boolean contains =
-                Arrays.stream(DayOfWeek.values()).anyMatch(x -> x.getValue() == dayOfWeekNumber);
-        if (!contains) throw new IllegalArgumentException();
+    private val dayOfWeekNumber: Int
 
-        this.dayOfWeekNumber = dayOfWeekNumber;
+    @JvmOverloads
+    constructor(dayOfWeek: DayOfWeek = DayOfWeek.SUNDAY) {
+        dayOfWeekNumber = dayOfWeek.value
     }
 
-    public CalendarStartDayOfWeekPreference() {
-        this(DayOfWeek.SUNDAY);
+    constructor(dayOfWeekNumber: Int) {
+        val contains =
+            Arrays.stream(DayOfWeek.entries.toTypedArray())
+                .anyMatch { x: DayOfWeek -> x.value == dayOfWeekNumber }
+        require(contains)
+
+        this.dayOfWeekNumber = dayOfWeekNumber
     }
 
-    void setUpPreferences(MutablePreferences mutablePreferences) {
-        Objects.requireNonNull(mutablePreferences);
-
-        mutablePreferences.set(PREFERENCES_KEY_DAY_OF_WEEK, dayOfWeekNumber);
+    fun setUpPreferences(mutablePreferences: MutablePreferences) {
+        mutablePreferences[PREFERENCES_KEY_DAY_OF_WEEK] = dayOfWeekNumber
     }
 
-    public int getDayOfWeekNumber() {
-        return dayOfWeekNumber;
-    }
-
-    @NonNull
-    public DayOfWeek toDayOfWeek() {
-        return DayOfWeek.of(dayOfWeekNumber);
+    fun toDayOfWeek(): DayOfWeek {
+        return DayOfWeek.of(dayOfWeekNumber)
     }
 }
