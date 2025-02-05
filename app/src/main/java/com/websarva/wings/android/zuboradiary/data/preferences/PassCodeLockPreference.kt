@@ -1,50 +1,41 @@
-package com.websarva.wings.android.zuboradiary.data.preferences;
+package com.websarva.wings.android.zuboradiary.data.preferences
 
-import androidx.annotation.Nullable;
-import androidx.datastore.preferences.core.MutablePreferences;
-import androidx.datastore.preferences.core.Preferences;
-import androidx.datastore.preferences.core.PreferencesKeys;
+import android.util.Log
+import androidx.datastore.preferences.core.MutablePreferences
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.booleanPreferencesKey
+import androidx.datastore.preferences.core.stringPreferencesKey
 
-import java.util.Objects;
+class PassCodeLockPreference @JvmOverloads constructor(
+    isChecked: Boolean = false,
+    passCode: String = ""
+) {
 
-public class PassCodeLockPreference {
+    companion object {
+        @JvmField
+        val PREFERENCES_KEY_IS_CHECKED: Preferences.Key<Boolean> =
+            booleanPreferencesKey("is_checked_passcode_lock")
+        @JvmField
+        val PREFERENCES_KEY_PASSCODE: Preferences.Key<String> =
+            stringPreferencesKey("passcode")
+    }
 
-    static final Preferences.Key<Boolean> PREFERENCES_KEY_IS_CHECKED =
-            PreferencesKeys.booleanKey("is_checked_passcode_lock");
-    static final Preferences.Key<String> PREFERENCES_KEY_PASSCODE = PreferencesKeys.stringKey("passcode");
-    private final boolean isChecked;
-    private final String passCode;
+    val isChecked: Boolean
+    private var passCode: String
 
-    public PassCodeLockPreference(boolean isChecked, @Nullable String passCode) {
+    init {
         if (isChecked) {
-            Objects.requireNonNull(passCode);
-            if (passCode.matches("|d{4}")) throw new IllegalArgumentException();
-        }
-
-        this.isChecked = isChecked;
-        if (isChecked) {
-            this.passCode = passCode;
+            require(passCode.matches("\\d{4}".toRegex()))
         } else {
-            this.passCode = "";
+            require(passCode.matches("".toRegex()))
         }
+
+        this.isChecked = isChecked
+        this.passCode = passCode
     }
 
-    public PassCodeLockPreference() {
-        this(false, "");
-    }
-
-    void setUpPreferences(MutablePreferences mutablePreferences) {
-        Objects.requireNonNull(mutablePreferences);
-
-        mutablePreferences.set(PREFERENCES_KEY_IS_CHECKED, isChecked);
-        mutablePreferences.set(PREFERENCES_KEY_PASSCODE, passCode);
-    }
-
-    public boolean getIsChecked() {
-        return isChecked;
-    }
-
-    public String getPassCode() {
-        return passCode;
+    fun setUpPreferences(mutablePreferences: MutablePreferences) {
+        mutablePreferences[PREFERENCES_KEY_IS_CHECKED] = isChecked
+        mutablePreferences[PREFERENCES_KEY_PASSCODE] = passCode
     }
 }
