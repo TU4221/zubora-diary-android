@@ -1,150 +1,134 @@
-package com.websarva.wings.android.zuboradiary.data.preferences;
+package com.websarva.wings.android.zuboradiary.data.preferences
 
-import androidx.datastore.preferences.core.MutablePreferences;
-import androidx.datastore.preferences.core.Preferences;
-import androidx.datastore.rxjava3.RxDataStore;
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.rxjava3.RxDataStore
+import io.reactivex.rxjava3.core.Flowable
+import io.reactivex.rxjava3.core.Single
+import javax.inject.Inject
 
-import java.util.Objects;
-
-import javax.inject.Inject;
-
-import io.reactivex.rxjava3.core.Flowable;
-import io.reactivex.rxjava3.core.Single;
-
-public class UserPreferences {
-
-    private final RxDataStore<Preferences> dataStore;
-
-    @Inject
-    public UserPreferences(RxDataStore<Preferences> preferencesRxDataStore) {
-        Objects.requireNonNull(preferencesRxDataStore);
-
-        this.dataStore = preferencesRxDataStore;
-    }
+class UserPreferences @Inject constructor(private val dataStore: RxDataStore<Preferences>) {
 
     // MEMO:初回読込は"null"が返ってくるので、その場合は初期値を返す。(他のPreferenceValueも同様)
-    public Flowable<ThemeColorPreference> loadThemeColorPreference() {
-        return dataStore.data().cache().map(preferences -> {
-            Integer savedThemeColorNumber = preferences.get(ThemeColorPreference.PREFERENCES_KEY_COLOR);
-            if (savedThemeColorNumber == null) return new ThemeColorPreference();
-
-            return new ThemeColorPreference(savedThemeColorNumber);
-        });
+    fun loadThemeColorPreference(): Flowable<ThemeColorPreference> {
+        return dataStore.data().cache().map { preferences: Preferences ->
+            val savedThemeColorNumber =
+                preferences.get<Int>(ThemeColorPreference.PREFERENCES_KEY_COLOR)
+                    ?: return@map ThemeColorPreference()
+            ThemeColorPreference(savedThemeColorNumber)
+        }
     }
 
-    public Single<Preferences> saveThemeColorPreference(ThemeColorPreference value) {
-        Objects.requireNonNull(value);
-
-        return dataStore.updateDataAsync(preferences -> {
-            MutablePreferences mutablePreferences = preferences.toMutablePreferences();
-            value.setUpPreferences(mutablePreferences);
-            return Single.just(mutablePreferences);
-        });
+    fun saveThemeColorPreference(value: ThemeColorPreference): Single<Preferences> {
+        return dataStore.updateDataAsync { preferences: Preferences ->
+            val mutablePreferences = preferences.toMutablePreferences()
+            value.setUpPreferences(mutablePreferences)
+            Single.just(
+                mutablePreferences
+            )
+        }
     }
 
-    public Flowable<CalendarStartDayOfWeekPreference> loadCalendarStartDayOfWeekPreference() {
-        return dataStore.data().map(preferences -> {
-            Integer savedCalendarStartDayOfWeekNumber =
-                    preferences.get(CalendarStartDayOfWeekPreference.PREFERENCES_KEY_DAY_OF_WEEK);
-            if (savedCalendarStartDayOfWeekNumber == null) {
-                return new CalendarStartDayOfWeekPreference();
-            }
-
-            return new CalendarStartDayOfWeekPreference(savedCalendarStartDayOfWeekNumber);
-        });
+    fun loadCalendarStartDayOfWeekPreference(): Flowable<CalendarStartDayOfWeekPreference> {
+        return dataStore.data().map { preferences: Preferences ->
+            val savedCalendarStartDayOfWeekNumber =
+                preferences.get<Int>(CalendarStartDayOfWeekPreference.PREFERENCES_KEY_DAY_OF_WEEK)
+                    ?: return@map CalendarStartDayOfWeekPreference()
+            CalendarStartDayOfWeekPreference(savedCalendarStartDayOfWeekNumber)
+        }
     }
 
-    public Single<Preferences> saveCalendarStartDayOfWeekPreference(CalendarStartDayOfWeekPreference value) {
-        Objects.requireNonNull(value);
-
-        return dataStore.updateDataAsync(preferences -> {
-            MutablePreferences mutablePreferences = preferences.toMutablePreferences();
-            value.setUpPreferences(mutablePreferences);
-            return Single.just(mutablePreferences);
-        });
+    fun saveCalendarStartDayOfWeekPreference(value: CalendarStartDayOfWeekPreference): Single<Preferences> {
+        return dataStore.updateDataAsync { preferences: Preferences ->
+            val mutablePreferences = preferences.toMutablePreferences()
+            value.setUpPreferences(mutablePreferences)
+            Single.just(
+                mutablePreferences
+            )
+        }
     }
 
-    public Flowable<ReminderNotificationPreference> loadReminderNotificationPreference() {
-        return dataStore.data().map(preferences -> {
-            Boolean savedIsReminderNotification =
-                    preferences.get(ReminderNotificationPreference.PREFERENCES_KEY_IS_CHECKED);
-            String savedReminderNotificationTime =
-                    preferences.get(ReminderNotificationPreference.PREFERENCES_KEY_TIME);
+    fun loadReminderNotificationPreference(): Flowable<ReminderNotificationPreference> {
+        return dataStore.data().map { preferences: Preferences ->
+            val savedIsReminderNotification =
+                preferences[ReminderNotificationPreference.PREFERENCES_KEY_IS_CHECKED]
+            val savedReminderNotificationTime =
+                preferences[ReminderNotificationPreference.PREFERENCES_KEY_TIME]
             if (savedIsReminderNotification == null || savedReminderNotificationTime == null) {
-                return new ReminderNotificationPreference();
+                return@map ReminderNotificationPreference()
             }
-
-            return new ReminderNotificationPreference(savedIsReminderNotification, savedReminderNotificationTime);
-        });
+            ReminderNotificationPreference(
+                savedIsReminderNotification,
+                savedReminderNotificationTime
+            )
+        }
     }
 
-    public Single<Preferences> saveReminderNotificationPreference(ReminderNotificationPreference value) {
-        Objects.requireNonNull(value);
-
-        return dataStore.updateDataAsync(preferences -> {
-            MutablePreferences mutablePreferences = preferences.toMutablePreferences();
-            value.setUpPreferences(mutablePreferences);
-            return Single.just(mutablePreferences);
-        });
+    fun saveReminderNotificationPreference(value: ReminderNotificationPreference): Single<Preferences> {
+        return dataStore.updateDataAsync { preferences: Preferences ->
+            val mutablePreferences = preferences.toMutablePreferences()
+            value.setUpPreferences(mutablePreferences)
+            Single.just(
+                mutablePreferences
+            )
+        }
     }
 
-    public Flowable<PassCodeLockPreference> loadPasscodeLockPreference() {
-        return dataStore.data().map(preferences -> {
-            Boolean savedIsPasscodeLock =
-                    preferences.get(PassCodeLockPreference.PREFERENCES_KEY_IS_CHECKED);
-            String savedPasscode =
-                    preferences.get(PassCodeLockPreference.PREFERENCES_KEY_PASSCODE);
+    fun loadPasscodeLockPreference(): Flowable<PassCodeLockPreference> {
+        return dataStore.data().map { preferences: Preferences ->
+            val savedIsPasscodeLock =
+                preferences[PassCodeLockPreference.PREFERENCES_KEY_IS_CHECKED]
+            val savedPasscode =
+                preferences[PassCodeLockPreference.PREFERENCES_KEY_PASSCODE]
             if (savedIsPasscodeLock == null || savedPasscode == null) {
-                return new PassCodeLockPreference();
+                return@map PassCodeLockPreference()
             }
-
-            return new PassCodeLockPreference(savedIsPasscodeLock, savedPasscode);
-        });
+            PassCodeLockPreference(savedIsPasscodeLock, savedPasscode)
+        }
     }
 
-    public Single<Preferences> savePasscodeLockPreference(PassCodeLockPreference value) {
-        Objects.requireNonNull(value);
-
-        return dataStore.updateDataAsync(preferences -> {
-            MutablePreferences mutablePreferences = preferences.toMutablePreferences();
-            value.setUpPreferences(mutablePreferences);
-            return Single.just(mutablePreferences);
-        });
+    fun savePasscodeLockPreference(value: PassCodeLockPreference): Single<Preferences> {
+        return dataStore.updateDataAsync { preferences: Preferences ->
+            val mutablePreferences = preferences.toMutablePreferences()
+            value.setUpPreferences(mutablePreferences)
+            Single.just(
+                mutablePreferences
+            )
+        }
     }
 
-    public Flowable<WeatherInfoAcquisitionPreference> loadWeatherInfoAcquisitionPreference() {
-
+    fun loadWeatherInfoAcquisitionPreference(): Flowable<WeatherInfoAcquisitionPreference> {
         return dataStore.data()
-                .map(preferences -> {
-                    Boolean savedIsGettingWeatherInformation =
-                            preferences.get(WeatherInfoAcquisitionPreference.PREFERENCES_KEY_IS_CHECKED);
-                    if (savedIsGettingWeatherInformation == null) {
-                        return new WeatherInfoAcquisitionPreference();
-                    }
-
-                    return new WeatherInfoAcquisitionPreference(savedIsGettingWeatherInformation);
-                });
+            .map { preferences: Preferences ->
+                val savedIsGettingWeatherInformation =
+                    preferences.get<Boolean>(WeatherInfoAcquisitionPreference.PREFERENCES_KEY_IS_CHECKED)
+                        ?: return@map WeatherInfoAcquisitionPreference()
+                WeatherInfoAcquisitionPreference(savedIsGettingWeatherInformation)
+            }
     }
 
-    public Single<Preferences> saveWeatherInfoAcquisitionPreference(WeatherInfoAcquisitionPreference value) {
-        Objects.requireNonNull(value);
-
-        return dataStore.updateDataAsync(preferences -> {
-            MutablePreferences mutablePreferences = preferences.toMutablePreferences();
-            value.setUpPreferences(mutablePreferences);
-            return Single.just(mutablePreferences);
-        });
+    fun saveWeatherInfoAcquisitionPreference(value: WeatherInfoAcquisitionPreference): Single<Preferences> {
+        return dataStore.updateDataAsync { preferences: Preferences ->
+            val mutablePreferences = preferences.toMutablePreferences()
+            Single.just(
+                mutablePreferences.apply {
+                    value.setUpPreferences(this)
+                }
+            )
+        }
     }
 
-    public Single<Preferences> initializeAllPreferences() {
-        return dataStore.updateDataAsync(preferences -> {
-            MutablePreferences mutablePreferences = preferences.toMutablePreferences();
-            new ThemeColorPreference().setUpPreferences(mutablePreferences);
-            new CalendarStartDayOfWeekPreference().setUpPreferences(mutablePreferences);
-            new ReminderNotificationPreference().setUpPreferences(mutablePreferences);
-            new PassCodeLockPreference().setUpPreferences(mutablePreferences);
-            new WeatherInfoAcquisitionPreference().setUpPreferences(mutablePreferences);
-            return Single.just(mutablePreferences);
-        });
+    fun initializeAllPreferences(): Single<Preferences> {
+        return dataStore.updateDataAsync { preferences: Preferences ->
+            val mutablePreferences = preferences.toMutablePreferences()
+            Single.just(
+                mutablePreferences.apply {
+                    ThemeColorPreference().setUpPreferences(this)
+                    CalendarStartDayOfWeekPreference().setUpPreferences(this)
+                    ReminderNotificationPreference().setUpPreferences(this)
+                    PassCodeLockPreference().setUpPreferences(this)
+                    WeatherInfoAcquisitionPreference().setUpPreferences(this)
+                }
+            )
+        }
     }
 }
