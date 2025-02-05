@@ -1,43 +1,38 @@
-package com.websarva.wings.android.zuboradiary.data.diary;
+package com.websarva.wings.android.zuboradiary.data.diary
 
-import androidx.annotation.NonNull;
+import java.io.Serializable
 
-import java.io.Serializable;
-import java.util.Objects;
+class ItemNumber(value: Int) : Serializable, Comparable<ItemNumber> {
 
-public class ItemNumber implements Serializable, Comparable<ItemNumber> {
-
-    private final int value;
-    public static final int MIN_NUMBER = 1;
-    public static final int MAX_NUMBER = 5;
-
-    public ItemNumber(int value) {
-        if (value < MIN_NUMBER || value > MAX_NUMBER) throw new IllegalArgumentException();
-
-        this.value = value;
+    companion object {
+        const val MIN_NUMBER: Int = 1
+        const val MAX_NUMBER: Int = 5
     }
 
-    public int getValue() {
-        return value;
+    val value: Int
+
+    init {
+        require(value >= MIN_NUMBER)
+        require(value <= MAX_NUMBER)
+
+        this.value = value
     }
 
-    @NonNull
-    @Override
-    public String toString() {
-        return String.valueOf(value);
+    override fun toString(): String {
+        return value.toString()
     }
 
-    @Override
-    public boolean equals(Object obj) {
-        if (obj == null) return false;
-        if (!(obj instanceof ItemNumber)) return false;
-        ItemNumber target = (ItemNumber) obj;
-        return this.getValue() == target.getValue();
+    override fun equals(other: Any?): Boolean {
+        if (other == null) return false
+        if (other !is ItemNumber) return false
+        return this.value == other.value
     }
 
-    @Override
-    public int compareTo(ItemNumber itemNumber) {
-        Objects.requireNonNull(itemNumber);
-        return Integer.compare(this.value, itemNumber.value);
+    override fun compareTo(other: ItemNumber): Int {
+        return this.value.compareTo(other.value)
+    }
+
+    override fun hashCode(): Int {
+        return value
     }
 }
