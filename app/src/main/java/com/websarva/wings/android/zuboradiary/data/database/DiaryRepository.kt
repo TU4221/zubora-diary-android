@@ -1,185 +1,132 @@
-package com.websarva.wings.android.zuboradiary.data.database;
+package com.websarva.wings.android.zuboradiary.data.database
+
+import android.net.Uri
+import android.util.Log
+import com.google.common.util.concurrent.ListenableFuture
+import java.time.LocalDate
+import java.util.concurrent.Callable
+import java.util.concurrent.Future
+import javax.inject.Inject
 
 
-import android.net.Uri;
-import android.util.Log;
+class DiaryRepository @Inject constructor(
+    private val diaryDatabase: DiaryDatabase,
+    private val diaryDAO: DiaryDAO,
+    private val diaryItemTitleSelectionHistoryDAO: DiaryItemTitleSelectionHistoryDAO
+) {
 
-import androidx.annotation.NonNull;
-
-import com.google.common.util.concurrent.ListenableFuture;
-
-import org.jetbrains.annotations.Nullable;
-
-import java.time.LocalDate;
-import java.util.List;
-import java.util.Objects;
-import java.util.concurrent.Future;
-
-import javax.inject.Inject;
-
-public class DiaryRepository {
-
-    private final DiaryDatabase diaryDatabase;
-    private final DiaryDAO diaryDAO;
-    private final DiaryItemTitleSelectionHistoryDAO diaryItemTitleSelectionHistoryDAO;
-
-    @Inject
-    public DiaryRepository(
-            DiaryDatabase diaryDatabase, DiaryDAO diaryDAO,
-            DiaryItemTitleSelectionHistoryDAO diaryItemTitleSelectionHistoryDAO) {
-        Objects.requireNonNull(diaryDatabase);
-        Objects.requireNonNull(diaryDAO);
-        Objects.requireNonNull(diaryItemTitleSelectionHistoryDAO);
-
-        this.diaryDatabase = diaryDatabase;
-        this.diaryDAO = diaryDAO;
-        this.diaryItemTitleSelectionHistoryDAO = diaryItemTitleSelectionHistoryDAO;
+    fun countDiaries(): ListenableFuture<Int> {
+        return diaryDAO.countDiaries()
     }
 
-    @NonNull
-    public ListenableFuture<Integer> countDiaries(){
-        ListenableFuture<Integer> future = diaryDAO.countDiaries();
-        return Objects.requireNonNull(future);
+    fun countDiaries(date: LocalDate): ListenableFuture<Int> {
+        return diaryDAO.countDiaries(date.toString())
     }
 
-    @NonNull
-    public ListenableFuture<Integer> countDiaries(LocalDate date){
-        Objects.requireNonNull(date);
-
-        ListenableFuture<Integer> future = diaryDAO.countDiaries(date.toString());
-        return Objects.requireNonNull(future);
+    fun existsDiary(date: LocalDate): ListenableFuture<Boolean> {
+        return diaryDAO.existsDiary(date.toString())
     }
 
-    @NonNull
-    public ListenableFuture<Boolean> existsDiary(LocalDate date) {
-        Objects.requireNonNull(date);
-
-        ListenableFuture<Boolean> future = diaryDAO.existsDiary(date.toString());
-        return Objects.requireNonNull(future);
+    fun existsPicturePath(uri: Uri): ListenableFuture<Boolean> {
+        return diaryDAO.existsPicturePath(uri.toString())
     }
 
-    @NonNull
-    public ListenableFuture<Boolean> existsPicturePath(Uri uri) {
-        Objects.requireNonNull(uri);
-
-        ListenableFuture<Boolean> future = diaryDAO.existsPicturePath(uri.toString());
-        return Objects.requireNonNull(future);
+    fun loadDiary(date: LocalDate): ListenableFuture<DiaryEntity> {
+        return diaryDAO.selectDiary(date.toString())
     }
 
-    @NonNull
-    public ListenableFuture<DiaryEntity> loadDiary(LocalDate date) {
-        Objects.requireNonNull(date);
-
-        ListenableFuture<DiaryEntity> future = diaryDAO.selectDiary(date.toString());
-        return Objects.requireNonNull(future);
+    fun loadNewestDiary(): ListenableFuture<DiaryEntity> {
+        return diaryDAO.selectNewestDiary()
     }
 
-    @NonNull
-    public ListenableFuture<DiaryEntity> loadNewestDiary() {
-        ListenableFuture<DiaryEntity> future = diaryDAO.selectNewestDiary();
-        return Objects.requireNonNull(future);
+    fun loadOldestDiary(): ListenableFuture<DiaryEntity> {
+        return diaryDAO.selectOldestDiary()
     }
 
-    @NonNull
-    public ListenableFuture<DiaryEntity> loadOldestDiary() {
-        ListenableFuture<DiaryEntity> future = diaryDAO.selectOldestDiary();
-        return Objects.requireNonNull(future);
-    }
+    fun loadDiaryList(
+        num: Int, offset: Int, date: LocalDate?
+    ): ListenableFuture<List<DiaryListItem>> {
+        require(num >= 1)
+        require(offset >= 0)
 
-    @NonNull
-    public ListenableFuture<List<DiaryListItem>> loadDiaryList(
-            int num, int offset, @Nullable LocalDate date) {
-        if (num < 1) throw new IllegalArgumentException();
-        if (offset < 0) throw new IllegalArgumentException();
-
-        Log.d("DiaryRepository", "loadDiaryList(num = " + num + ", offset = " + offset + ", date = " + date + ")");
-        ListenableFuture<List<DiaryListItem>> future;
-        if (date == null) {
-            future = diaryDAO.selectDiaryListOrderByDateDesc(num, offset);
+        Log.d(
+            "DiaryRepository",
+            "loadDiaryList(num = $num, offset = $offset, date = $date)"
+        )
+        return if (date == null) {
+            diaryDAO.selectDiaryListOrderByDateDesc(num, offset)
         } else {
-            future = diaryDAO.selectDiaryListOrderByDateDesc(num, offset, date.toString());
+            diaryDAO.selectDiaryListOrderByDateDesc(num, offset, date.toString())
         }
-        return Objects.requireNonNull(future);
     }
 
-    @NonNull
-    public ListenableFuture<Integer> countWordSearchResultDiaries(String searchWord) {
-        Objects.requireNonNull(searchWord);
-
-        ListenableFuture<Integer> future = diaryDAO.countWordSearchResults(searchWord);
-        return Objects.requireNonNull(future);
+    fun countWordSearchResultDiaries(searchWord: String): ListenableFuture<Int> {
+        return diaryDAO.countWordSearchResults(searchWord)
     }
 
-    @NonNull
-    public ListenableFuture<List<WordSearchResultListItem>> loadWordSearchResultDiaryList(
-            int num, int offset, String searchWord) {
-        if (num < 1) throw new IllegalArgumentException();
-        if (offset < 0) throw new IllegalArgumentException();
-        Objects.requireNonNull(searchWord);
+    fun loadWordSearchResultDiaryList(
+        num: Int, offset: Int, searchWord: String
+    ): ListenableFuture<List<WordSearchResultListItem>> {
+        require(num >= 1)
+        require(offset >= 0)
 
-        ListenableFuture<List<WordSearchResultListItem>> future =
-                diaryDAO.selectWordSearchResultListOrderByDateDesc(num, offset, searchWord);
-        return Objects.requireNonNull(future);
+        return diaryDAO.selectWordSearchResultListOrderByDateDesc(num, offset, searchWord)
     }
 
-    @NonNull
-    public Future<Void> saveDiary(DiaryEntity diaryEntity, List<DiaryItemTitleSelectionHistoryItemEntity> updateTitleList) {
-        Objects.requireNonNull(diaryEntity);
-        Objects.requireNonNull(updateTitleList);
-        updateTitleList.stream().forEach(Objects::requireNonNull);
-
-        Future<Void> future =
-                DiaryDatabase.EXECUTOR_SERVICE.submit(() -> diaryDatabase.runInTransaction(() -> {
-                    diaryDAO.insertDiary(diaryEntity);
-                    diaryItemTitleSelectionHistoryDAO.insertHistoryItem(updateTitleList);
-                    diaryItemTitleSelectionHistoryDAO.deleteOldHistoryItem();
-                    return null;
-                }));
-        return Objects.requireNonNull(future);
+    fun saveDiary(
+        diaryEntity: DiaryEntity,
+        updateTitleList: List<DiaryItemTitleSelectionHistoryItemEntity>
+    ): Future<Void> {
+        return DiaryDatabase.EXECUTOR_SERVICE.submit(
+            Callable {
+                diaryDatabase.runInTransaction(
+                    Callable<Void> {
+                        diaryDAO.insertDiary(diaryEntity)
+                        diaryItemTitleSelectionHistoryDAO.insertHistoryItem(updateTitleList)
+                        diaryItemTitleSelectionHistoryDAO.deleteOldHistoryItem()
+                        null
+                    }
+                )
+            }
+        )
     }
 
-    @NonNull
-    public Future<Void> deleteAndSaveDiary(
-            LocalDate deleteDiaryDate, DiaryEntity createDiaryEntity,
-            List<DiaryItemTitleSelectionHistoryItemEntity> updateTitleList) {
-        Objects.requireNonNull(deleteDiaryDate);
-        Objects.requireNonNull(createDiaryEntity);
-        Objects.requireNonNull(updateTitleList);
-        updateTitleList.stream().forEach(Objects::requireNonNull);
-
-        Future<Void> future =
-                DiaryDatabase.EXECUTOR_SERVICE.submit(() -> diaryDatabase.runInTransaction(() -> {
-                    diaryDAO.deleteDiary(deleteDiaryDate.toString());
-                    diaryDAO.insertDiary(createDiaryEntity);
-                    diaryItemTitleSelectionHistoryDAO.insertHistoryItem(updateTitleList);
-                    diaryItemTitleSelectionHistoryDAO.deleteOldHistoryItem();
-                    return null;
-                }));
-        return Objects.requireNonNull(future);
+    fun deleteAndSaveDiary(
+        deleteDiaryDate: LocalDate, createDiaryEntity: DiaryEntity,
+        updateTitleList: List<DiaryItemTitleSelectionHistoryItemEntity>
+    ): Future<Void> {
+        return DiaryDatabase.EXECUTOR_SERVICE.submit(
+            Callable {
+                diaryDatabase.runInTransaction(
+                    Callable<Void> {
+                        diaryDAO.deleteDiary(deleteDiaryDate.toString())
+                        diaryDAO.insertDiary(createDiaryEntity)
+                        diaryItemTitleSelectionHistoryDAO.insertHistoryItem(updateTitleList)
+                        diaryItemTitleSelectionHistoryDAO.deleteOldHistoryItem()
+                        null
+                    }
+                )
+            }
+        )
     }
 
-    @NonNull
-    public ListenableFuture<Integer> deleteDiary(LocalDate date) {
-        Objects.requireNonNull(date);
-
-        ListenableFuture<Integer> future = diaryDAO.deleteDiary(date.toString());
-        return Objects.requireNonNull(future);
+    fun deleteDiary(date: LocalDate): ListenableFuture<Int> {
+        return diaryDAO.deleteDiary(date.toString())
     }
 
-    @NonNull
-    public ListenableFuture<Integer> deleteAllDiaries() {
-        ListenableFuture<Integer> future = diaryDAO.deleteAllDiaries();
-        return Objects.requireNonNull(future);
+    fun deleteAllDiaries(): ListenableFuture<Int> {
+        return diaryDAO.deleteAllDiaries()
     }
 
-    @NonNull
-    public Future<Void> deleteAllData() {
-        Future<Void> future =
-                DiaryDatabase.EXECUTOR_SERVICE.submit(() -> diaryDatabase.runInTransaction(() -> {
-                    diaryDAO.deleteAllDiaries();
-                    diaryItemTitleSelectionHistoryDAO.deleteAllItem();
-                    return null;
-                }));
-        return Objects.requireNonNull(future);
+    fun deleteAllData(): Future<Void> {
+        return DiaryDatabase.EXECUTOR_SERVICE.submit(Callable {
+            diaryDatabase.runInTransaction(
+                Callable<Void> {
+                    diaryDAO.deleteAllDiaries()
+                    diaryItemTitleSelectionHistoryDAO.deleteAllItem()
+                    null
+                }
+            )
+        })
     }
 }

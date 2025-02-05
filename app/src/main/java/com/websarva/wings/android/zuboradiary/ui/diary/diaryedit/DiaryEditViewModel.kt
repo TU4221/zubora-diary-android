@@ -13,6 +13,7 @@ import com.websarva.wings.android.zuboradiary.data.network.WeatherApiCallable
 import com.websarva.wings.android.zuboradiary.data.network.WeatherApiRepository
 import com.websarva.wings.android.zuboradiary.data.network.WeatherApiResponse
 import com.websarva.wings.android.zuboradiary.ui.BaseViewModel
+import com.websarva.wings.android.zuboradiary.ui.checkNotNull
 import com.websarva.wings.android.zuboradiary.ui.diary.DiaryLiveData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import retrofit2.Call
@@ -247,7 +248,7 @@ class DiaryEditViewModel @Inject constructor(
             if (shouldDeleteLoadedDateDiary) {
                 diaryRepository
                     .deleteAndSaveDiary(
-                        _loadedDate.value,
+                        _loadedDate.checkNotNull(),
                         diaryEntity,
                         diaryItemTitleSelectionHistoryItemEntityList
                     )
@@ -264,7 +265,7 @@ class DiaryEditViewModel @Inject constructor(
     }
 
     fun deleteDiary(): Boolean {
-        val deleteDate = _loadedDate.value
+        val deleteDate = _loadedDate.checkNotNull()
 
         val result: Int
         try {

@@ -226,7 +226,9 @@ class DiaryListViewModel @Inject constructor(private val diaryRepository: DiaryR
         val numExistingDiaries = if (sortConditionDate == null) {
             diaryRepository.countDiaries().get()
         } else {
-            diaryRepository.countDiaries(sortConditionDate).get()
+            diaryRepository.countDiaries(
+                checkNotNull(sortConditionDate)
+            ).get()
         }
         if (numExistingDiaries <= 0) return false
 
