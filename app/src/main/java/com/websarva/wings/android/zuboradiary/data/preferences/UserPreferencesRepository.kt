@@ -1,63 +1,52 @@
-package com.websarva.wings.android.zuboradiary.data.preferences;
+package com.websarva.wings.android.zuboradiary.data.preferences
 
-import androidx.datastore.preferences.core.Preferences;
+import androidx.datastore.preferences.core.Preferences
+import io.reactivex.rxjava3.core.Flowable
+import io.reactivex.rxjava3.core.Single
 
-import java.util.Objects;
+class UserPreferencesRepository(private val userPreferences: UserPreferences) {
 
-import io.reactivex.rxjava3.core.Flowable;
-import io.reactivex.rxjava3.core.Single;
-
-public class UserPreferencesRepository {
-
-    private final UserPreferences userPreferences;
-
-    public UserPreferencesRepository(UserPreferences userPreferences) {
-        Objects.requireNonNull(userPreferences);
-
-        this.userPreferences = userPreferences;
+    fun loadThemeColorPreference(): Flowable<ThemeColorPreference> {
+        return userPreferences.loadThemeColorPreference()
     }
 
-    public Flowable<ThemeColorPreference> loadThemeColorPreference() {
-        return userPreferences.loadThemeColorPreference();
+    fun saveThemeColorPreference(preference: ThemeColorPreference): Single<Preferences> {
+        return userPreferences.saveThemeColorPreference(preference)
     }
 
-    public Single<Preferences> saveThemeColorPreference(ThemeColorPreference preference) {
-        return userPreferences.saveThemeColorPreference(preference);
+    fun loadCalendarStartDayOfWeekPreference(): Flowable<CalendarStartDayOfWeekPreference> {
+        return userPreferences.loadCalendarStartDayOfWeekPreference()
     }
 
-    public Flowable<CalendarStartDayOfWeekPreference> loadCalendarStartDayOfWeekPreference() {
-        return userPreferences.loadCalendarStartDayOfWeekPreference();
+    fun saveCalendarStartDayOfWeekPreference(preference: CalendarStartDayOfWeekPreference): Single<Preferences> {
+        return userPreferences.saveCalendarStartDayOfWeekPreference(preference)
     }
 
-    public Single<Preferences> saveCalendarStartDayOfWeekPreference(CalendarStartDayOfWeekPreference preference) {
-        return userPreferences.saveCalendarStartDayOfWeekPreference(preference);
+    fun loadReminderNotificationPreference(): Flowable<ReminderNotificationPreference> {
+        return userPreferences.loadReminderNotificationPreference()
     }
 
-    public Flowable<ReminderNotificationPreference> loadReminderNotificationPreference() {
-        return userPreferences.loadReminderNotificationPreference();
+    fun saveReminderNotificationPreference(preference: ReminderNotificationPreference): Single<Preferences> {
+        return userPreferences.saveReminderNotificationPreference(preference)
     }
 
-    public Single<Preferences> saveReminderNotificationPreference(ReminderNotificationPreference preference) {
-        return userPreferences.saveReminderNotificationPreference(preference);
+    fun loadPasscodeLockPreference(): Flowable<PassCodeLockPreference> {
+        return userPreferences.loadPasscodeLockPreference()
     }
 
-    public Flowable<PassCodeLockPreference> loadPasscodeLockPreference() {
-        return userPreferences.loadPasscodeLockPreference();
+    fun savePasscodeLockPreference(preference: PassCodeLockPreference): Single<Preferences> {
+        return userPreferences.savePasscodeLockPreference(preference)
     }
 
-    public Single<Preferences> savePasscodeLockPreference(PassCodeLockPreference preference) {
-        return userPreferences.savePasscodeLockPreference(preference);
+    fun loadWeatherInfoAcquisitionPreference(): Flowable<WeatherInfoAcquisitionPreference> {
+        return userPreferences.loadWeatherInfoAcquisitionPreference()
     }
 
-    public Flowable<WeatherInfoAcquisitionPreference> loadWeatherInfoAcquisitionPreference() {
-        return userPreferences.loadWeatherInfoAcquisitionPreference();
+    fun saveWeatherInfoAcquisitionPreference(preference: WeatherInfoAcquisitionPreference): Single<Preferences> {
+        return userPreferences.saveWeatherInfoAcquisitionPreference(preference)
     }
 
-    public Single<Preferences> saveWeatherInfoAcquisitionPreference(WeatherInfoAcquisitionPreference preference) {
-        return userPreferences.saveWeatherInfoAcquisitionPreference(preference);
-    }
-
-    public Single<Preferences> initializeAllPreferences() {
-        return userPreferences.initializeAllPreferences();
+    fun initializeAllPreferences(): Single<Preferences> {
+        return userPreferences.initializeAllPreferences()
     }
 }
