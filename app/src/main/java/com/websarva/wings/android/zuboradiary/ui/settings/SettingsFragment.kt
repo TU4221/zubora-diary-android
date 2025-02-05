@@ -119,9 +119,11 @@ class SettingsFragment : BaseFragment() {
         container: ViewGroup
     ): ViewDataBinding {
         _binding = FragmentSettingsBinding.inflate(themeColorInflater, container, false)
-        binding.lifecycleOwner = this
-        binding.settingsViewModel = settingsViewModel
-        return binding
+
+        return binding.apply {
+            binding.lifecycleOwner = this@SettingsFragment
+            binding.settingsViewModel = this@SettingsFragment.settingsViewModel
+        }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

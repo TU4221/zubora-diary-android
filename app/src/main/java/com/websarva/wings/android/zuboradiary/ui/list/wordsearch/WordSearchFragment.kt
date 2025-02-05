@@ -47,9 +47,11 @@ class WordSearchFragment : BaseFragment() {
         themeColorInflater: LayoutInflater, container: ViewGroup
     ): ViewDataBinding {
         _binding = FragmentWordSearchBinding.inflate(themeColorInflater, container, false)
-        binding.lifecycleOwner = this
-        binding.wordSearchViewModel = wordSearchViewModel
-        return binding
+
+        return binding.apply {
+            lifecycleOwner = this@WordSearchFragment
+            wordSearchViewModel = this@WordSearchFragment.wordSearchViewModel
+        }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

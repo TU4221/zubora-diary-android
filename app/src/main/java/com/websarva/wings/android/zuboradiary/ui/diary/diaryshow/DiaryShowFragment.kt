@@ -78,9 +78,11 @@ class DiaryShowFragment : BaseFragment() {
         themeColorInflater: LayoutInflater, container: ViewGroup
     ): ViewDataBinding {
         _binding = FragmentDiaryShowBinding.inflate(themeColorInflater, container, false)
-        binding.lifecycleOwner = this
-        binding.diaryShowViewModel = diaryShowViewModel
-        return binding
+
+        return binding.apply {
+            lifecycleOwner = this@DiaryShowFragment
+            diaryShowViewModel = this@DiaryShowFragment.diaryShowViewModel
+        }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

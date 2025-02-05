@@ -45,9 +45,11 @@ class DiaryItemTitleEditFragment : BaseFragment() {
         themeColorInflater: LayoutInflater, container: ViewGroup
     ): ViewDataBinding {
         _binding = FragmentDiaryItemTitleEditBinding.inflate(themeColorInflater, container, false)
-        binding.lifecycleOwner = this
-        binding.diaryItemTitleEditViewModel = diaryItemTitleEditViewModel
-        return binding
+
+        return binding.apply {
+            lifecycleOwner = this@DiaryItemTitleEditFragment
+            diaryItemTitleEditViewModel = this@DiaryItemTitleEditFragment.diaryItemTitleEditViewModel
+        }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

@@ -62,9 +62,11 @@ class DiaryListFragment : BaseFragment() {
         themeColorInflater: LayoutInflater, container: ViewGroup
     ): ViewDataBinding {
         _binding = FragmentDiaryListBinding.inflate(themeColorInflater, container, false)
-        binding.lifecycleOwner = this
-        binding.listViewModel = diaryListViewModel
-        return binding
+
+        return binding.apply {
+            lifecycleOwner = this@DiaryListFragment
+            listViewModel = this@DiaryListFragment.diaryListViewModel
+        }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
