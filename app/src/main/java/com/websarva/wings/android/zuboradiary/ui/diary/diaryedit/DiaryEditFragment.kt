@@ -441,7 +441,7 @@ class DiaryEditFragment : BaseFragment() {
             OnItemClickListener { _: AdapterView<*>?, _: View?, position: Int, _: Long ->
                 val listAdapter = binding.autoCompleteTextCondition.adapter
                 val arrayAdapter = listAdapter as ArrayAdapter<*>
-                val strCondition = arrayAdapter.getItem(position) as String?
+                val strCondition = arrayAdapter.getItem(position) as String
                 val condition = Condition.of(requireContext(), strCondition)
                 diaryEditViewModel.updateCondition(condition)
                 binding.autoCompleteTextCondition.clearFocus()
