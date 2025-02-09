@@ -58,7 +58,7 @@ class CalendarFragment : BaseFragment() {
 
         addOnBackPressedCallback(object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
-                requireMainActivity().popBackStackToStartFragment()
+                mainActivity.popBackStackToStartFragment()
             }
         })
     }

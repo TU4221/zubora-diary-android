@@ -56,7 +56,7 @@ class SettingsFragment : BaseFragment() {
 
         addOnBackPressedCallback(object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
-                requireMainActivity().popBackStackToStartFragment()
+                mainActivity.popBackStackToStartFragment()
             }
         })
 
@@ -70,7 +70,7 @@ class SettingsFragment : BaseFragment() {
                 ) { isGranted: Boolean ->
 
                     // 再確認
-                    val recheck = requireMainActivity().isGrantedPostNotifications
+                    val recheck = mainActivity.isGrantedPostNotifications
                     if (isGranted && recheck) {
                         showReminderNotificationTimePickerDialog()
                     } else {
@@ -92,7 +92,7 @@ class SettingsFragment : BaseFragment() {
                 val isGrantedAll = isGrantedAccessFineLocation && isGrantedAccessCoarseLocation
 
                 // 再確認
-                val recheck = requireMainActivity().isGrantedAccessLocation
+                val recheck = mainActivity.isGrantedAccessLocation
                 if (isGrantedAll && recheck) {
                     settingsViewModel.saveWeatherInfoAcquisition(true)
                 } else {
@@ -432,7 +432,7 @@ class SettingsFragment : BaseFragment() {
 
         @RequiresApi(api = Build.VERSION_CODES.TIRAMISU)
         fun requestPostNotificationsPermission() {
-            val isGranted = requireMainActivity().isGrantedPostNotifications
+            val isGranted = mainActivity.isGrantedPostNotifications
             if (isGranted) {
                 showReminderNotificationTimePickerDialog()
             } else {
@@ -483,7 +483,7 @@ class SettingsFragment : BaseFragment() {
     @SuppressLint("ClickableViewAccessibility")
     private fun setUpWeatherInfoAcquisitionSettingItem() {
         // MEMO:端末設定画面で"許可 -> 無許可"に変更したときの対応コード
-        val isGranted = requireMainActivity().isGrantedAccessLocation
+        val isGranted = mainActivity.isGrantedAccessLocation
         if (!isGranted) {
             settingsViewModel.saveWeatherInfoAcquisition(false)
         }
@@ -509,7 +509,7 @@ class SettingsFragment : BaseFragment() {
             if (!isTouchedWeatherInfoAcquisitionSwitch) return
 
             if (isChecked) {
-                val isGranted = requireMainActivity().isGrantedAccessLocation
+                val isGranted = mainActivity.isGrantedAccessLocation
                 if (isGranted) {
                     settingsViewModel.saveWeatherInfoAcquisition(true)
                 } else {

@@ -683,7 +683,7 @@ class DiaryEditFragment : BaseFragment() {
 
         binding.apply {
             imageAttachedPicture.setOnClickListener {
-                requireMainActivity().loadPicturePath()
+                mainActivity.loadPicturePath()
             }
             imageButtonAttachedPictureDelete.setOnClickListener {
                 showDiaryPictureDeleteDialog()

@@ -27,10 +27,7 @@ abstract class BaseFragment : CustomFragment() {
     protected lateinit var settingsViewModel: SettingsViewModel
     protected lateinit var navController: NavController
     private var destinationId: Int = 0
-
-    protected fun requireMainActivity(): MainActivity {
-        return requireActivity() as MainActivity
-    }
+    protected val mainActivity get() = requireActivity() as MainActivity
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -100,8 +97,6 @@ abstract class BaseFragment : CustomFragment() {
         // HACK:ボトムナビゲーションタブでFragment切替時はEnterTransitionで設定されるエフェクトを変更する。
         //      NavigationStartFragment(DiaryListFragment)はReenterTransitionで設定されたエフェクトが処理される。
         //      遷移元FragmentのエフェクトはMainActivityクラスにて設定。
-
-        val mainActivity = requireMainActivity()
 
         enterTransition = if (mainActivity.wasSelectedTab) {
             MaterialFadeThrough() as Transition // MEMO:"as Transition"は警告対策
