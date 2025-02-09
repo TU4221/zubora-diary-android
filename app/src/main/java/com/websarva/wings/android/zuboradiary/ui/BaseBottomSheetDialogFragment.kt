@@ -15,6 +15,9 @@ abstract class BaseBottomSheetDialogFragment : BottomSheetDialogFragment() {
 
     protected lateinit var settingsViewModel: SettingsViewModel
 
+    protected val themeColor
+        get() = settingsViewModel.loadThemeColorSettingValue()
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -26,7 +29,7 @@ abstract class BaseBottomSheetDialogFragment : BottomSheetDialogFragment() {
 
         settingsViewModel = createSettingsViewModel()
 
-        val themeColorInflater = createThemeColorInflater(inflater, requireThemeColor())
+        val themeColorInflater = createThemeColorInflater(inflater, themeColor)
         return createDialogView(themeColorInflater, container, savedInstanceState)
     }
 
@@ -48,10 +51,6 @@ abstract class BaseBottomSheetDialogFragment : BottomSheetDialogFragment() {
     private fun createSettingsViewModel(): SettingsViewModel {
         val provider = ViewModelProvider(requireActivity())
         return provider[SettingsViewModel::class.java]
-    }
-
-    protected fun requireThemeColor(): ThemeColor {
-        return settingsViewModel.loadThemeColorSettingValue()
     }
 
     // ThemeColorに合わせたインフレーター作成

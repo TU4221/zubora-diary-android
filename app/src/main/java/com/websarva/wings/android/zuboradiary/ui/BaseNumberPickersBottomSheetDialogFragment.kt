@@ -33,7 +33,6 @@ abstract class BaseNumberPickersBottomSheetDialogFragment : BaseBottomSheetDialo
         //      ・NumberPickerの値はThemeが適用されず、TextColorはApiLevel29以上からしか変更できない。
         //      ・ThemeColorBlackの時は背景が黒となり、NumberPickerの値が見えない。
 
-        val themeColor = requireThemeColor()
         val themeResId = themeColor.numberPickerBottomSheetDialogThemeResId
         val contextWithTheme: Context = ContextThemeWrapper(requireActivity(), themeResId)
         val cloneInflater = inflater.cloneInContext(contextWithTheme)
@@ -48,7 +47,6 @@ abstract class BaseNumberPickersBottomSheetDialogFragment : BaseBottomSheetDialo
 
     private fun setUpNumberPickerTextColor(binding: DialogFragmentNumberPickersBinding) {
         if (Build.VERSION.SDK_INT >= 29) {
-            val themeColor = requireThemeColor()
             val onSurfaceVariantColor = themeColor.getOnSurfaceVariantColor(resources)
             binding.numberPickerFirst.textColor = onSurfaceVariantColor
             binding.numberPickerSecond.textColor = onSurfaceVariantColor

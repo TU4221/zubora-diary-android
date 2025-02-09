@@ -51,9 +51,8 @@ class ThemeColorPickerDialogFragment : BaseNumberPickersBottomSheetDialogFragmen
     }
 
     private fun setUpInitialValue() {
-        val currentThemeColor = requireThemeColor()
         binding.numberPickerFirst.value =
-            currentThemeColor.ordinal // MEMO:最大最小値を設定してから設定すること。(0の位置が表示される)
+            themeColor.ordinal // MEMO:最大最小値を設定してから設定すること。(0の位置が表示される)
     }
 
     private fun setUpDisplayedValues() {

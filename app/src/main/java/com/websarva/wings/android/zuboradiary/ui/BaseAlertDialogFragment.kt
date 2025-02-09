@@ -9,13 +9,14 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.NavHostFragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.websarva.wings.android.zuboradiary.R
-import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor
 import com.websarva.wings.android.zuboradiary.ui.settings.SettingsViewModel
-import java.util.Objects
 
 abstract class BaseAlertDialogFragment : DialogFragment() {
 
     protected lateinit var settingsViewModel: SettingsViewModel
+
+    private val themeColor
+        get() = settingsViewModel.loadThemeColorSettingValue()
 
     /**
      * 戻り値をtrueにすると、ダイアログ枠外、戻るボタンタッチ時にダイアログをキャンセルすることを可能にする。
@@ -29,7 +30,7 @@ abstract class BaseAlertDialogFragment : DialogFragment() {
 
         settingsViewModel = createSettingsViewModel()
 
-        val themeResId = requireThemeColor().alertDialogThemeResId
+        val themeResId = themeColor.alertDialogThemeResId
         val builder = MaterialAlertDialogBuilder(requireContext(), themeResId)
 
         customizeDialog(builder)
@@ -44,10 +45,6 @@ abstract class BaseAlertDialogFragment : DialogFragment() {
     private fun createSettingsViewModel(): SettingsViewModel {
         val provider = ViewModelProvider(requireActivity())
         return provider[SettingsViewModel::class.java]
-    }
-
-    protected fun requireThemeColor(): ThemeColor {
-        return settingsViewModel.loadThemeColorSettingValue()
     }
 
     protected open fun customizeDialog(builder: MaterialAlertDialogBuilder) {

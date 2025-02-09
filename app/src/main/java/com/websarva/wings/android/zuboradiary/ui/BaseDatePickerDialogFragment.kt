@@ -7,7 +7,6 @@ import android.view.View
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.datepicker.MaterialDatePicker
-import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor
 import com.websarva.wings.android.zuboradiary.ui.settings.SettingsViewModel
 import java.time.Instant
 import java.time.LocalDate
@@ -15,7 +14,12 @@ import java.time.ZoneId
 
 
 abstract class BaseDatePickerDialogFragment : DialogFragment() {
+
     protected lateinit var settingsViewModel: SettingsViewModel
+
+    private val themeColor
+        get() = settingsViewModel.loadThemeColorSettingValue()
+
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         settingsViewModel = createSettingsViewModel()
@@ -36,14 +40,10 @@ abstract class BaseDatePickerDialogFragment : DialogFragment() {
         return provider[SettingsViewModel::class.java]
     }
 
-    protected fun requireThemeColor(): ThemeColor {
-        return settingsViewModel.loadThemeColorSettingValue()
-    }
-
     private fun createDatePickerDialog(dummyDialog: Dialog): MaterialDatePicker<Long> {
         val builder = MaterialDatePicker.Builder.datePicker()
 
-        val themeResId = requireThemeColor().datePickerDialogThemeResId
+        val themeResId = themeColor.datePickerDialogThemeResId
         builder.setTheme(themeResId)
 
         val initialDate = createInitialDate()
