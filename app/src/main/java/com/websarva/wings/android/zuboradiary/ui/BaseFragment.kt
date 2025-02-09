@@ -32,6 +32,7 @@ abstract class BaseFragment : CustomFragment() {
         val navBackStackEntry = checkNotNull(navController.currentBackStackEntry)
         return navBackStackEntry.savedStateHandle
     }
+    protected val themeColor get() = settingsViewModel.loadThemeColorSettingValue()
 
     protected val isDialogShowing
         get() = destinationId != getCurrentDestinationId()
@@ -90,12 +91,8 @@ abstract class BaseFragment : CustomFragment() {
 
     // ThemeColorに合わせたインフレーター作成
     private fun createThemeColorInflater(inflater: LayoutInflater): LayoutInflater {
-        val creator = ThemeColorInflaterCreator(requireContext(), inflater, requireThemeColor())
+        val creator = ThemeColorInflaterCreator(requireContext(), inflater, themeColor)
         return creator.create()
-    }
-
-    protected fun requireThemeColor(): ThemeColor {
-        return settingsViewModel.loadThemeColorSettingValue()
     }
 
     private fun setUpFragmentTransitionEffect() {

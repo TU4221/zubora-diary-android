@@ -419,7 +419,7 @@ class DiaryEditFragment : BaseFragment() {
     }
 
     private fun createWeatherSpinnerAdapter(vararg excludedWeathers: Weather?): ArrayAdapter<String> {
-        val themeResId = requireThemeColor().themeResId
+        val themeResId = themeColor.themeResId
         val contextWithTheme: Context = ContextThemeWrapper(requireContext(), themeResId)
 
         val weatherItemList: MutableList<String> = ArrayList()
@@ -464,7 +464,7 @@ class DiaryEditFragment : BaseFragment() {
     }
 
     private fun createConditionSpinnerAdapter(): ArrayAdapter<String> {
-        val themeResId = requireThemeColor().themeResId
+        val themeResId = themeColor.themeResId
         val contextWithTheme: Context = ContextThemeWrapper(requireContext(), themeResId)
 
         val conditionItemList: MutableList<String> = ArrayList()
@@ -698,7 +698,7 @@ class DiaryEditFragment : BaseFragment() {
                 DiaryPictureManager(
                     requireContext(),
                     binding.imageAttachedPicture,
-                    requireThemeColor().getOnSurfaceVariantColor(requireContext().resources)
+                    themeColor.getOnSurfaceVariantColor(requireContext().resources)
                 )
 
             diaryPictureManager.setUpPictureOnDiary(value)

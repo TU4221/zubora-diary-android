@@ -117,7 +117,7 @@ class CalendarFragment : BaseFragment() {
         val calendar = binding.calendar
 
         val daysOfWeek = createDayOfWeekList() // 曜日リスト取得
-        configureCalendarBinders(daysOfWeek, requireThemeColor())
+        configureCalendarBinders(daysOfWeek, themeColor)
 
         val currentMonth = YearMonth.now()
         val startMonth = currentMonth.minusMonths(60) //現在から過去5年分
@@ -449,7 +449,7 @@ class CalendarFragment : BaseFragment() {
                 viewLifecycleOwner,
                 DiaryShowFragment.PicturePathObserver(
                     requireContext(),
-                    requireThemeColor(),
+                    themeColor,
                     binding.includeDiaryShow.textAttachedPicture,
                     binding.includeDiaryShow.imageAttachedPicture
                 )

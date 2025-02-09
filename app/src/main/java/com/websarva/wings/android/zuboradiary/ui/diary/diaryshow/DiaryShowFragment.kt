@@ -282,7 +282,7 @@ class DiaryShowFragment : BaseFragment() {
                 viewLifecycleOwner,
                 PicturePathObserver(
                     requireContext(),
-                    requireThemeColor(),
+                    themeColor,
                     binding.includeDiaryShow.textAttachedPicture,
                     binding.includeDiaryShow.imageAttachedPicture
                 )

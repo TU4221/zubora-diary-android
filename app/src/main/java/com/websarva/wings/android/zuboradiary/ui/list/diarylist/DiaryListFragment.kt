@@ -166,7 +166,7 @@ class DiaryListFragment : BaseFragment() {
             DiaryListAdapter(
                 requireContext(),
                 binding.recyclerDiaryList,
-                requireThemeColor()
+                themeColor
             )
         diaryListAdapter.build()
         diaryListAdapter.onClickChildItemListener =

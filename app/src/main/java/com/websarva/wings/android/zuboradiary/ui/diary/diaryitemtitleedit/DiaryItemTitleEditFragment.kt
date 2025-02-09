@@ -193,7 +193,7 @@ class DiaryItemTitleEditFragment : BaseFragment() {
             ItemTitleSelectionHistoryListAdapter(
                 requireContext(),
                 binding.recyclerItemTitleSelectionHistory,
-                requireThemeColor()
+                themeColor
             )
         itemTitleSelectionHistoryListAdapter.build()
         itemTitleSelectionHistoryListAdapter.setOnClickItemListener { newItemTitle: String ->

@@ -63,7 +63,6 @@ class WordSearchFragment : BaseFragment() {
     }
 
     private fun setUpThemeColor() {
-        val themeColor = requireThemeColor()
         resultWordColor = themeColor.getOnTertiaryContainerColor(resources)
         resultWordBackgroundColor = themeColor.getTertiaryContainerColor(resources)
     }
@@ -135,7 +134,7 @@ class WordSearchFragment : BaseFragment() {
             WordSearchResultListAdapter(
                 requireContext(),
                 binding.recyclerWordSearchResultList,
-                requireThemeColor()
+                themeColor
             )
         wordSearchResultListAdapter.build()
         wordSearchResultListAdapter.onClickChildItemListener =
