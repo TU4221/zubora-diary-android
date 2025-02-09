@@ -36,7 +36,7 @@ abstract class BaseFragment : CustomFragment() {
     protected val themeColor
         get() = settingsViewModel.loadThemeColorSettingValue()
 
-    private var fragmentDestinationId: Int = 0
+    private var fragmentDestinationId = 0
     private val currentDestinationId: Int get() {
         val navDestination = navController.currentDestination
         return checkNotNull(navDestination).id
