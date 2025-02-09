@@ -26,7 +26,6 @@ object DatabaseModule {
     @Singleton
     @Provides
     fun provideDiaryDatabase(@ApplicationContext context: Context): DiaryDatabase {
-        Objects.requireNonNull(context)
         // TODO:下記上手くいかなかったので余裕があれば調べる
         val migration2to3: Migration = object : Migration(2, 3) {
             override fun migrate(db: SupportSQLiteDatabase) {

@@ -43,8 +43,7 @@ abstract class BaseAlertDialogFragment : DialogFragment() {
 
     private fun createSettingsViewModel(): SettingsViewModel {
         val provider = ViewModelProvider(requireActivity())
-        val settingsViewModel = provider[SettingsViewModel::class.java]
-        return Objects.requireNonNull(settingsViewModel)
+        return provider[SettingsViewModel::class.java]
     }
 
     protected fun requireThemeColor(): ThemeColor {
