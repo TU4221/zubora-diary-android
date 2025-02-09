@@ -28,6 +28,10 @@ abstract class BaseFragment : CustomFragment() {
     protected lateinit var navController: NavController
     private var destinationId: Int = 0
     protected val mainActivity get() = requireActivity() as MainActivity
+    private val navBackStackEntrySavedStateHandle: SavedStateHandle get() {
+        val navBackStackEntry = checkNotNull(navController.currentBackStackEntry)
+        return navBackStackEntry.savedStateHandle
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -151,15 +155,8 @@ abstract class BaseFragment : CustomFragment() {
         setUpOtherAppMessageDialog()
     }
 
-
-    private fun getNavBackStackEntrySavedStateHandle(): SavedStateHandle {
-        val navBackStackEntry = checkNotNull(navController.currentBackStackEntry)
-        return navBackStackEntry.savedStateHandle
-    }
-
     private fun setUpPreviousFragmentResultReceiver() {
-        val savedStateHandle = getNavBackStackEntrySavedStateHandle()
-        handleOnReceivingResultFromPreviousFragment(savedStateHandle)
+        handleOnReceivingResultFromPreviousFragment(navBackStackEntrySavedStateHandle)
     }
 
 
@@ -210,11 +207,10 @@ abstract class BaseFragment : CustomFragment() {
     protected abstract fun removeDialogResultOnDestroy(savedStateHandle: SavedStateHandle)
 
     fun <T> receiveResulFromDialog(key: String): T? {
-        val savedStateHandle = getNavBackStackEntrySavedStateHandle()
-        val containsDialogResult = savedStateHandle.contains(key)
+        val containsDialogResult = navBackStackEntrySavedStateHandle.contains(key)
         if (!containsDialogResult) return null
 
-        return savedStateHandle.get<T>(key)
+        return navBackStackEntrySavedStateHandle.get<T>(key)
     }
 
     private fun setUpSettingsAppMessageDialog() {
