@@ -246,7 +246,7 @@ class WordSearchFragment : BaseFragment() {
     }
 
     private fun showShowDiaryFragment(date: LocalDate) {
-        if (isDialogShowing()) return
+        if (isDialogShowing) return
 
         val directions =
             WordSearchFragmentDirections

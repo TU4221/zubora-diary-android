@@ -33,6 +33,10 @@ abstract class BaseFragment : CustomFragment() {
         return navBackStackEntry.savedStateHandle
     }
 
+    protected val isDialogShowing
+        get() = destinationId != getCurrentDestinationId()
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -236,13 +240,9 @@ abstract class BaseFragment : CustomFragment() {
     }
 
     private fun showAppMessageDialog(appMessage: AppMessage) {
-        if (isDialogShowing()) return
+        if (isDialogShowing) return
 
         navigateAppMessageDialog(appMessage)
-    }
-
-    protected fun isDialogShowing(): Boolean {
-        return destinationId != getCurrentDestinationId()
     }
 
     /**

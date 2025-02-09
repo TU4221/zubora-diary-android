@@ -337,7 +337,7 @@ class DiaryShowFragment : BaseFragment() {
     }
 
     private fun showDiaryEdit(date: LocalDate) {
-        if (isDialogShowing()) return
+        if (isDialogShowing) return
 
         val directions =
             DiaryShowFragmentDirections
@@ -350,7 +350,7 @@ class DiaryShowFragment : BaseFragment() {
     }
 
     private fun showDiaryDeleteDialog(date: LocalDate) {
-        if (isDialogShowing()) return
+        if (isDialogShowing) return
 
         val directions =
             DiaryShowFragmentDirections

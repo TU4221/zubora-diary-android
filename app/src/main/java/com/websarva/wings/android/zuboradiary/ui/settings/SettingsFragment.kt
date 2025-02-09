@@ -571,7 +571,7 @@ class SettingsFragment : BaseFragment() {
     }
 
     private fun showThemeColorPickerDialog() {
-        if (isDialogShowing()) return
+        if (isDialogShowing) return
 
         val directions =
             SettingsFragmentDirections
@@ -580,7 +580,7 @@ class SettingsFragment : BaseFragment() {
     }
 
     private fun showCalendarStartDayPickerDialog(dayOfWeek: DayOfWeek) {
-        if (isDialogShowing()) return
+        if (isDialogShowing) return
 
         val directions =
             SettingsFragmentDirections
@@ -589,7 +589,7 @@ class SettingsFragment : BaseFragment() {
     }
 
     private fun showReminderNotificationTimePickerDialog() {
-        if (isDialogShowing()) return
+        if (isDialogShowing) return
 
         val directions =
             SettingsFragmentDirections
@@ -598,7 +598,7 @@ class SettingsFragment : BaseFragment() {
     }
 
     private fun showPermissionDialog(permissionName: String) {
-        if (isDialogShowing()) return
+        if (isDialogShowing) return
 
         val directions =
             SettingsFragmentDirections
@@ -607,7 +607,7 @@ class SettingsFragment : BaseFragment() {
     }
 
     private fun showAllDiariesDeleteDialog() {
-        if (isDialogShowing()) return
+        if (isDialogShowing) return
 
         val directions =
             SettingsFragmentDirections
@@ -616,7 +616,7 @@ class SettingsFragment : BaseFragment() {
     }
 
     private fun showAllSettingsInitializationDialog() {
-        if (isDialogShowing()) return
+        if (isDialogShowing) return
 
         val directions =
             SettingsFragmentDirections
@@ -625,7 +625,7 @@ class SettingsFragment : BaseFragment() {
     }
 
     private fun showAllDataDeleteDialog() {
-        if (isDialogShowing()) return
+        if (isDialogShowing) return
 
         val directions =
             SettingsFragmentDirections

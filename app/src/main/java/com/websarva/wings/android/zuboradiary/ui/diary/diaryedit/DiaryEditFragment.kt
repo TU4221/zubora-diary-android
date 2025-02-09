@@ -852,7 +852,7 @@ class DiaryEditFragment : BaseFragment() {
     }
 
     private fun showDiaryShowFragment(date: LocalDate) {
-        if (isDialogShowing()) return
+        if (isDialogShowing) return
 
         val isStartDiaryFragment =
             DiaryEditFragmentArgs.fromBundle(requireArguments()).isStartDiaryFragment
@@ -871,7 +871,7 @@ class DiaryEditFragment : BaseFragment() {
         inputItemNumber: ItemNumber,
         inputItemTitle: String
     ) {
-        if (isDialogShowing()) return
+        if (isDialogShowing) return
 
         val directions =
             DiaryEditFragmentDirections
@@ -881,7 +881,7 @@ class DiaryEditFragment : BaseFragment() {
     }
 
     private fun showDiaryLoadingDialog(date: LocalDate) {
-        if (isDialogShowing()) return
+        if (isDialogShowing) return
 
         val directions =
             DiaryEditFragmentDirections
@@ -890,7 +890,7 @@ class DiaryEditFragment : BaseFragment() {
     }
 
     private fun showDiaryUpdateDialog(date: LocalDate) {
-        if (isDialogShowing()) return
+        if (isDialogShowing) return
 
         val directions =
             DiaryEditFragmentDirections
@@ -899,7 +899,7 @@ class DiaryEditFragment : BaseFragment() {
     }
 
     private fun showDiaryDeleteDialog(date: LocalDate) {
-        if (isDialogShowing()) return
+        if (isDialogShowing) return
 
         val directions =
             DiaryEditFragmentDirections
@@ -908,7 +908,7 @@ class DiaryEditFragment : BaseFragment() {
     }
 
     private fun showDatePickerDialog(date: LocalDate) {
-        if (isDialogShowing()) return
+        if (isDialogShowing) return
 
         val directions =
             DiaryEditFragmentDirections
@@ -917,7 +917,7 @@ class DiaryEditFragment : BaseFragment() {
     }
 
     private fun showWeatherInfoFetchingDialog(date: LocalDate) {
-        if (isDialogShowing()) return
+        if (isDialogShowing) return
         if (!diaryEditViewModel.canFetchWeatherInformation(date)) return
 
         // 今日の日付以降は天気情報を取得できないためダイアログ表示不要
@@ -930,7 +930,7 @@ class DiaryEditFragment : BaseFragment() {
     }
 
     private fun showDiaryItemDeleteDialog(itemNumber: ItemNumber) {
-        if (isDialogShowing()) return
+        if (isDialogShowing) return
 
         val directions =
             DiaryEditFragmentDirections
@@ -939,7 +939,7 @@ class DiaryEditFragment : BaseFragment() {
     }
 
     private fun showDiaryPictureDeleteDialog() {
-        if (isDialogShowing()) return
+        if (isDialogShowing) return
 
         val directions =
             DiaryEditFragmentDirections
