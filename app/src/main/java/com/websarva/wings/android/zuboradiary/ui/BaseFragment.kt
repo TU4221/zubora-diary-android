@@ -34,8 +34,13 @@ abstract class BaseFragment : CustomFragment() {
     }
     protected val themeColor get() = settingsViewModel.loadThemeColorSettingValue()
 
+    private val currentDestinationId: Int get() {
+        val navDestination = navController.currentDestination
+        return checkNotNull(navDestination).id
+    }
+
     protected val isDialogShowing
-        get() = destinationId != getCurrentDestinationId()
+        get() = destinationId != currentDestinationId
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -45,7 +50,7 @@ abstract class BaseFragment : CustomFragment() {
 
         settingsViewModel = createSettingsViewModel()
         navController = NavHostFragment.findNavController(this)
-        destinationId = getCurrentDestinationId()
+        destinationId = currentDestinationId
     }
 
     /**
@@ -56,11 +61,6 @@ abstract class BaseFragment : CustomFragment() {
     private fun createSettingsViewModel(): SettingsViewModel {
         val provider = ViewModelProvider(requireActivity())
         return provider[SettingsViewModel::class.java]
-    }
-
-    private fun getCurrentDestinationId(): Int {
-        val navDestination = navController.currentDestination
-        return checkNotNull(navDestination).id
     }
 
     /**
