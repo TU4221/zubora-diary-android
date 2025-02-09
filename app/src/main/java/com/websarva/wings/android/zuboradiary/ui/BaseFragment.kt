@@ -19,28 +19,30 @@ import com.google.android.material.transition.platform.MaterialSharedAxis
 import com.websarva.wings.android.zuboradiary.MainActivity
 import com.websarva.wings.android.zuboradiary.data.AppMessage
 import com.websarva.wings.android.zuboradiary.data.AppMessageList
-import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor
 import com.websarva.wings.android.zuboradiary.ui.settings.SettingsViewModel
 
 abstract class BaseFragment : CustomFragment() {
 
-    protected lateinit var settingsViewModel: SettingsViewModel
+    protected val mainActivity
+        get() = requireActivity() as MainActivity
+
     protected lateinit var navController: NavController
-    private var destinationId: Int = 0
-    protected val mainActivity get() = requireActivity() as MainActivity
     private val navBackStackEntrySavedStateHandle: SavedStateHandle get() {
         val navBackStackEntry = checkNotNull(navController.currentBackStackEntry)
         return navBackStackEntry.savedStateHandle
     }
-    protected val themeColor get() = settingsViewModel.loadThemeColorSettingValue()
 
+    protected lateinit var settingsViewModel: SettingsViewModel
+    protected val themeColor
+        get() = settingsViewModel.loadThemeColorSettingValue()
+
+    private var fragmentDestinationId: Int = 0
     private val currentDestinationId: Int get() {
         val navDestination = navController.currentDestination
         return checkNotNull(navDestination).id
     }
-
     protected val isDialogShowing
-        get() = destinationId != currentDestinationId
+        get() = fragmentDestinationId != currentDestinationId
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -50,7 +52,7 @@ abstract class BaseFragment : CustomFragment() {
 
         settingsViewModel = createSettingsViewModel()
         navController = NavHostFragment.findNavController(this)
-        destinationId = currentDestinationId
+        fragmentDestinationId = currentDestinationId
     }
 
     /**
