@@ -13,12 +13,13 @@ import com.websarva.wings.android.zuboradiary.databinding.DialogFragmentNumberPi
 abstract class BaseNumberPickersBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
 
     // View関係
-    protected lateinit var binding: DialogFragmentNumberPickersBinding
+    private var _binding: DialogFragmentNumberPickersBinding? = null
+    protected val binding get() = checkNotNull(_binding)
 
     override fun createDialogView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
-        binding = createBinding(inflater, container)
+        _binding = createBinding(inflater, container)
         binding.buttonDecision.setOnClickListener(PositiveButtonClickListener())
         binding.buttonCancel.setOnClickListener(NegativeButtonClickListener())
         setUpNumberPickers(binding)
@@ -64,5 +65,10 @@ abstract class BaseNumberPickersBottomSheetDialogFragment : BaseBottomSheetDialo
         val navBackStackEntry = checkNotNull(navController.previousBackStackEntry)
         val savedStateHandle = navBackStackEntry.savedStateHandle
         savedStateHandle[key] = value
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 }
