@@ -20,10 +20,11 @@ abstract class BaseNumberPickersBottomSheetDialogFragment : BaseBottomSheetDialo
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
         _binding = createBinding(inflater, container)
-        binding.buttonDecision.setOnClickListener(PositiveButtonClickListener())
-        binding.buttonCancel.setOnClickListener(NegativeButtonClickListener())
-        setUpNumberPickers(binding)
-        return binding.root
+        return binding.apply {
+            buttonDecision.setOnClickListener(PositiveButtonClickListener())
+            buttonCancel.setOnClickListener(NegativeButtonClickListener())
+            setUpNumberPickers(this)
+        }.root
     }
 
     private fun createBinding(
@@ -49,9 +50,11 @@ abstract class BaseNumberPickersBottomSheetDialogFragment : BaseBottomSheetDialo
     private fun setUpNumberPickerTextColor(binding: DialogFragmentNumberPickersBinding) {
         if (Build.VERSION.SDK_INT >= 29) {
             val onSurfaceVariantColor = themeColor.getOnSurfaceVariantColor(resources)
-            binding.numberPickerFirst.textColor = onSurfaceVariantColor
-            binding.numberPickerSecond.textColor = onSurfaceVariantColor
-            binding.numberPickerThird.textColor = onSurfaceVariantColor
+            binding.apply {
+                numberPickerFirst.textColor = onSurfaceVariantColor
+                numberPickerSecond.textColor = onSurfaceVariantColor
+                numberPickerThird.textColor = onSurfaceVariantColor
+            }
         }
     }
 
