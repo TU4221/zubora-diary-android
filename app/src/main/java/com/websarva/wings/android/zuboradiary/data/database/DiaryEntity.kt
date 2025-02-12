@@ -4,58 +4,52 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
-// MEMO:@NonNullに関する警告はROOMの機能で解消されるため無視すること。
 @Entity(tableName = "diaries")
-class DiaryEntity {
-
-    // TODO:全プロパティを非null型に変更する。
+data class DiaryEntity(
     @PrimaryKey
-    var date: String = ""
+    val date: String,
 
-    var log: String = ""
+    val log: String,
 
-    @ColumnInfo(name = "weather_1") //@NonNull
-    var weather1: Int? = null
+    @ColumnInfo(name = "weather_1")
+    val weather1: Int,
 
-    @ColumnInfo(name = "weather_2") //@NonNull
-    var weather2: Int? = null
+    @ColumnInfo(name = "weather_2")
+    val weather2: Int,
 
-    //@NonNull
-    var condition: Int? = null
+    val condition: Int,
 
-    //@NonNull
-    var title: String? = null
+    val title: String,
 
-    @ColumnInfo(name = "item_1_title") //@NonNull
-    var item1Title: String? = null
+    @ColumnInfo(name = "item_1_title")
+    val item1Title: String,
 
-    @ColumnInfo(name = "item_1_comment") //@NonNull
-    var item1Comment: String? = null
+    @ColumnInfo(name = "item_1_comment")
+    val item1Comment: String,
 
-    @ColumnInfo(name = "item_2_title") //@NonNull
-    var item2Title: String? = null
+    @ColumnInfo(name = "item_2_title")
+    val item2Title: String,
 
-    @ColumnInfo(name = "item_2_comment") //@NonNull
-    var item2Comment: String? = null
+    @ColumnInfo(name = "item_2_comment")
+    val item2Comment: String,
 
-    @ColumnInfo(name = "item_3_title") //@NonNull
-    var item3Title: String? = null
+    @ColumnInfo(name = "item_3_title")
+    val item3Title: String,
 
-    @ColumnInfo(name = "item_3_comment") //@NonNull
-    var item3Comment: String? = null
+    @ColumnInfo(name = "item_3_comment")
+    val item3Comment: String,
 
-    @ColumnInfo(name = "item_4_title") //@NonNull
-    var item4Title: String? = null
+    @ColumnInfo(name = "item_4_title")
+    val item4Title: String,
 
-    @ColumnInfo(name = "item_4_comment") //@NonNull
-    var item4Comment: String? = null
+    @ColumnInfo(name = "item_4_comment")
+    val item4Comment: String,
 
-    @ColumnInfo(name = "item_5_title") //@NonNull
-    var item5Title: String? = null
+    @ColumnInfo(name = "item_5_title")
+    val item5Title: String,
 
-    @ColumnInfo(name = "item_5_comment") //@NonNull
-    var item5Comment: String? = null
+    @ColumnInfo(name = "item_5_comment")
+    val item5Comment: String,
 
-    //@NonNull
-    var picturePath: String? = null
-}
+    val picturePath: String
+)

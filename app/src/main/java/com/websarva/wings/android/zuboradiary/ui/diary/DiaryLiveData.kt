@@ -48,38 +48,36 @@ class DiaryLiveData {
     }
 
     fun update(diaryEntity: DiaryEntity) {
-
-        // TODO:DiaryEntityのプロパティをすべて非null型に変更してから下記"!!"削除
         date.value = LocalDate.parse(diaryEntity.date)
         val intWeather1 = diaryEntity.weather1
-        weather1.value = Weather.of(intWeather1!!)
+        weather1.value = Weather.of(intWeather1)
         val intWeather2 = diaryEntity.weather2
-        weather2.value = Weather.of(intWeather2!!)
+        weather2.value = Weather.of(intWeather2)
         val intCondition = diaryEntity.condition
-        condition.value = Condition.of(intCondition!!)
+        condition.value = Condition.of(intCondition)
         val title = diaryEntity.title
         this.title.value = title
 
         val nullDateTime: LocalDateTime? = null
         val item1Title = diaryEntity.item1Title
         val item1Comment = diaryEntity.item1Comment
-        items[0].update(item1Title!!, item1Comment!!, nullDateTime)
+        items[0].update(item1Title, item1Comment, nullDateTime)
 
         val item2Title = diaryEntity.item2Title
         val item2Comment = diaryEntity.item2Comment
-        items[1].update(item2Title!!, item2Comment!!, nullDateTime)
+        items[1].update(item2Title, item2Comment, nullDateTime)
 
         val item3Title = diaryEntity.item3Title
         val item3Comment = diaryEntity.item3Comment
-        items[2].update(item3Title!!, item3Comment!!, nullDateTime)
+        items[2].update(item3Title, item3Comment, nullDateTime)
 
         val item4Title = diaryEntity.item4Title
         val item4Comment = diaryEntity.item4Comment
-        items[3].update(item4Title!!, item4Comment!!, nullDateTime)
+        items[3].update(item4Title, item4Comment, nullDateTime)
 
         val item5Title = diaryEntity.item5Title
         val item5Comment = diaryEntity.item5Comment
-        items[4].update(item5Title!!, item5Comment!!, nullDateTime)
+        items[4].update(item5Title, item5Comment, nullDateTime)
 
         var numVisibleItems = items.size
         val maxArrayNumber = numVisibleItems - 1
@@ -93,7 +91,7 @@ class DiaryLiveData {
         this.numVisibleItems.value = numVisibleItems
 
         val uriString = diaryEntity.picturePath
-        if (uriString!!.isEmpty()) {
+        if (uriString.isEmpty()) {
             picturePath.setValue(null)
         } else {
             picturePath.setValue(Uri.parse(uriString))
@@ -103,25 +101,25 @@ class DiaryLiveData {
     }
 
     fun createDiaryEntity(): DiaryEntity {
-        val diaryEntity = DiaryEntity()
-        diaryEntity.date = date.value?.toString() ?:throw IllegalStateException("日付なし(null)")
-        diaryEntity.weather1 = weather1.value?.toNumber() ?:Weather.UNKNOWN.toNumber()
-        diaryEntity.weather2 = weather2.value?.toNumber() ?:Weather.UNKNOWN.toNumber()
-        diaryEntity.condition = condition.value?.toNumber() ?:Condition.UNKNOWN.toNumber()
-        diaryEntity.title = title.orEmptyString().trim()
-        diaryEntity.item1Title = items[0].title.orEmptyString().trim()
-        diaryEntity.item1Comment = items[0].comment.orEmptyString().trim()
-        diaryEntity.item2Title = items[1].title.orEmptyString().trim()
-        diaryEntity.item2Comment = items[1].comment.orEmptyString().trim()
-        diaryEntity.item3Title = items[2].title.orEmptyString().trim()
-        diaryEntity.item3Comment = items[2].comment.orEmptyString().trim()
-        diaryEntity.item4Title = items[3].title.orEmptyString().trim()
-        diaryEntity.item4Comment = items[3].comment.orEmptyString().trim()
-        diaryEntity.item5Title = items[4].title.orEmptyString().trim()
-        diaryEntity.item5Comment = items[4].comment.orEmptyString().trim()
-        diaryEntity.picturePath = picturePath.value?.toString() ?:""
-        diaryEntity.log = LocalDateTime.now().toString()
-        return diaryEntity
+        return DiaryEntity(
+            date.value?.toString() ?:throw IllegalStateException("日付なし(null)"),
+            LocalDateTime.now().toString(),
+            weather1.value?.toNumber() ?:Weather.UNKNOWN.toNumber(),
+            weather2.value?.toNumber() ?:Weather.UNKNOWN.toNumber(),
+            condition.value?.toNumber() ?:Condition.UNKNOWN.toNumber(),
+            title.orEmptyString().trim(),
+            items[0].title.orEmptyString().trim(),
+            items[0].comment.orEmptyString().trim(),
+            items[1].title.orEmptyString().trim(),
+            items[1].comment.orEmptyString().trim(),
+            items[2].title.orEmptyString().trim(),
+            items[2].comment.orEmptyString().trim(),
+            items[3].title.orEmptyString().trim(),
+            items[3].comment.orEmptyString().trim(),
+            items[4].title.orEmptyString().trim(),
+            items[4].comment.orEmptyString().trim(),
+            picturePath.value?.toString() ?:"",
+            )
     }
 
     fun createDiaryItemTitleSelectionHistoryItemEntityList(): List<DiaryItemTitleSelectionHistoryItemEntity> {
@@ -130,9 +128,11 @@ class DiaryLiveData {
             val itemTitle = items[i].title.orEmptyString()
             val itemTitleUpdateLog = items[i].titleUpdateLog.value ?: continue
             if (itemTitle.matches("\\S+.*".toRegex())) {
-                val item = DiaryItemTitleSelectionHistoryItemEntity()
-                item.title = itemTitle
-                item.log = itemTitleUpdateLog.toString()
+                val item =
+                    DiaryItemTitleSelectionHistoryItemEntity(
+                        itemTitle,
+                        itemTitleUpdateLog.toString()
+                    )
                 list.add(item)
             }
         }

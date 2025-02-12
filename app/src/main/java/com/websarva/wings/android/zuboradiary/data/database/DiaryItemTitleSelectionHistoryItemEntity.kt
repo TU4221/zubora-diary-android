@@ -4,8 +4,9 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 
 @Entity(tableName = "diary_item_title_selection_history")
-class DiaryItemTitleSelectionHistoryItemEntity {
+data class DiaryItemTitleSelectionHistoryItemEntity (
     @PrimaryKey
-    var title: String = ""
-    var log: String = ""
-}
+    val title: String,
+
+    val log: String
+)
