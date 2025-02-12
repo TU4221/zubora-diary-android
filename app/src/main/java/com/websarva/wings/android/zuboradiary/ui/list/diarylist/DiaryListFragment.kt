@@ -195,14 +195,14 @@ class DiaryListFragment : BaseFragment() {
         context: Context,
         recyclerView: RecyclerView,
         themeColor: ThemeColor
-    ) :
-        DiaryYearMonthListAdapter(context, recyclerView, themeColor) {
+    ) : DiaryYearMonthListAdapter(context, recyclerView, themeColor) {
+
         override fun loadListOnScrollEnd() {
             diaryListViewModel.loadAdditionDiaryList()
         }
 
         override fun canLoadList(): Boolean {
-            return diaryListViewModel.canLoadDiaryList()
+            return diaryListViewModel.canLoadDiaryList
         }
     }
 

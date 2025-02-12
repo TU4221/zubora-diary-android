@@ -25,8 +25,7 @@ abstract class DiaryYearMonthListBaseAdapter protected constructor(
     protected val recyclerView: RecyclerView,
     protected val themeColor: ThemeColor,
     diffUtilItemCallback: DiffUtilItemCallback
-) :
-    ListAdapter<DiaryYearMonthListBaseItem, RecyclerView.ViewHolder>(diffUtilItemCallback) {
+) : ListAdapter<DiaryYearMonthListBaseItem, RecyclerView.ViewHolder>(diffUtilItemCallback) {
 
     fun interface OnClickChildItemListener {
         fun onClick(item: DiaryDayListBaseItem)

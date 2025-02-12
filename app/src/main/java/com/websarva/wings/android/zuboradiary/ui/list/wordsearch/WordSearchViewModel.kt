@@ -45,6 +45,12 @@ class WordSearchViewModel @Inject internal constructor(
     val numWordSearchResults: LiveData<Int>
         get() = _numWordSearchResults
 
+    val canLoadWordSearchResultList: Boolean
+        get() {
+            Log.d("OnScrollDiaryList", "isLoadingDiaryList()")
+            return wordSearchResultListLoadingFuture?.isDone ?: true
+        }
+
     /**
      * データベース読込からRecyclerViewへの反映までを true とする。
      */
@@ -68,11 +74,6 @@ class WordSearchViewModel @Inject internal constructor(
         _isVisibleUpdateProgressBar.value = false
         cancelPreviousLoading()
         wordSearchResultListLoadingFuture = null
-    }
-
-    fun canLoadWordSearchResultList(): Boolean {
-        Log.d("OnScrollDiaryList", "isLoadingDiaryList()")
-        return wordSearchResultListLoadingFuture?.isDone ?: true
     }
 
     fun loadNewWordSearchResultList(
@@ -122,7 +123,7 @@ class WordSearchViewModel @Inject internal constructor(
     }
 
     private fun cancelPreviousLoading() {
-        if (!canLoadWordSearchResultList()) {
+        if (!canLoadWordSearchResultList) {
             Log.d("WordSearchLoading", "Cancel")
             wordSearchResultListLoadingFuture?.cancel(true) ?: throw IllegalStateException()
         }

@@ -64,6 +64,9 @@ class SettingsViewModel @Inject constructor(
     val geoCoordinates: LiveData<GeoCoordinates?>
         get() = _geoCoordinates
 
+    val hasUpdatedGeoCoordinates
+        get() = _geoCoordinates.value != null
+
     private lateinit var themeColorPreferenceFlowable: Flowable<ThemeColorPreference>
     private lateinit var calendarStartDayPreferenceFlowable: Flowable<CalendarStartDayOfWeekPreference>
     private lateinit var reminderNotificationPreferenceFlowable: Flowable<ReminderNotificationPreference>
@@ -299,11 +302,6 @@ class SettingsViewModel @Inject constructor(
 
     fun clearGeoCoordinates() {
         _geoCoordinates.value = null
-    }
-
-    fun hasUpdatedGeoCoordinates(): Boolean {
-        val geoCoordinates = _geoCoordinates.value
-        return geoCoordinates != null
     }
 
     fun deleteAllDiaries() {

@@ -836,8 +836,7 @@ class DiaryEditFragment : BaseFragment() {
         val isChecked = settingsViewModel.loadIsCheckedWeatherInfoAcquisitionSetting()
         if (!isChecked) return
 
-        val hasUpdatedLocation = settingsViewModel.hasUpdatedGeoCoordinates()
-        if (!hasUpdatedLocation) {
+        if (!settingsViewModel.hasUpdatedGeoCoordinates) {
             diaryEditViewModel.addWeatherInfoFetchErrorMessage()
             return
         }

@@ -176,7 +176,7 @@ class WordSearchFragment : BaseFragment() {
         }
 
         override fun canLoadList(): Boolean {
-            return wordSearchViewModel.canLoadWordSearchResultList()
+            return wordSearchViewModel.canLoadWordSearchResultList
         }
     }
 

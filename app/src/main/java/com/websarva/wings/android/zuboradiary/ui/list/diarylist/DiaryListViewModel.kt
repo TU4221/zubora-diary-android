@@ -34,6 +34,12 @@ class DiaryListViewModel @Inject constructor(private val diaryRepository: DiaryR
     val diaryList: LiveData<DiaryYearMonthList>
         get() = _diaryList
 
+    val canLoadDiaryList: Boolean
+        get() {
+        Log.d("OnScrollDiaryList", "isLoadingDiaryList()")
+        return diaryListLoadingFuture?.isDone ?: true
+        }
+
     /**
      * データベース読込からRecyclerViewへの反映までを true とする。
      */
@@ -57,11 +63,6 @@ class DiaryListViewModel @Inject constructor(private val diaryRepository: DiaryR
         sortConditionDate = null
     }
 
-    fun canLoadDiaryList(): Boolean {
-        Log.d("OnScrollDiaryList", "isLoadingDiaryList()")
-        return diaryListLoadingFuture?.isDone ?: true
-    }
-
     fun loadNewDiaryList() {
         loadSavedDiaryList(NewDiaryListCreator())
     }
@@ -82,7 +83,7 @@ class DiaryListViewModel @Inject constructor(private val diaryRepository: DiaryR
     }
 
     private fun cancelPreviousLoading() {
-        if (!canLoadDiaryList()) {
+        if (!canLoadDiaryList) {
             diaryListLoadingFuture?.cancel(true) ?: throw IllegalStateException()
         }
     }
