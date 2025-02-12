@@ -5,7 +5,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
 class AppMessageDialogFragment : BaseAlertDialogFragment() {
 
-    override val isCancelableOtherThanPressingButton: Boolean
+    override val isCancelableOtherThanPressingButton
         get() = true
 
     override fun createTitle(): String {

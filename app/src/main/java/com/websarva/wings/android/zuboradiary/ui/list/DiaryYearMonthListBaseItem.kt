@@ -7,7 +7,7 @@ abstract class DiaryYearMonthListBaseItem {
     val yearMonth: YearMonth
     val viewType: DiaryYearMonthListBaseAdapter.ViewType
 
-    val isNotDiaryViewType: Boolean
+    val isNotDiaryViewType
         get() = viewType != DiaryYearMonthListBaseAdapter.ViewType.DIARY
 
     constructor(viewType: DiaryYearMonthListBaseAdapter.ViewType): this(YearMonth.now(), viewType)

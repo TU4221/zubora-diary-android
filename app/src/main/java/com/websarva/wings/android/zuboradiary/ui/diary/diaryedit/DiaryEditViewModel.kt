@@ -130,15 +130,13 @@ class DiaryEditViewModel @Inject constructor(
     val loadedPicturePath: LiveData<Uri?>
         get() = _loadedPicturePath
 
-    var hasPreparedDiary: Boolean = false
+    var hasPreparedDiary = false
         private set
 
-    val isNewDiaryDefaultStatus: Boolean
-        get() {
-            return hasPreparedDiary && _previousDate.value == null && _loadedDate.value == null
-        }
+    val isNewDiaryDefaultStatus
+        get() = hasPreparedDiary && _previousDate.value == null && _loadedDate.value == null
 
-    private val isNewDiary: Boolean
+    private val isNewDiary
         get() = _loadedDate.value == null
 
     private val shouldDeleteLoadedDateDiary: Boolean
@@ -170,7 +168,7 @@ class DiaryEditViewModel @Inject constructor(
         }
 
     // Fragment切替記憶
-    var isShowingItemTitleEditFragment: Boolean = false
+    var isShowingItemTitleEditFragment = false
         private set
 
     init {

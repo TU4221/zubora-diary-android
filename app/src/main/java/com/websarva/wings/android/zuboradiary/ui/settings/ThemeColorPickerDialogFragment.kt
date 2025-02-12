@@ -14,7 +14,7 @@ class ThemeColorPickerDialogFragment : BaseNumberPickersBottomSheetDialogFragmen
         val KEY_SELECTED_THEME_COLOR: String = "SelectedThemeColor$fromClassName"
     }
 
-    override val isCancelableOtherThanPressingButton: Boolean
+    override val isCancelableOtherThanPressingButton
         get() = true
 
     override fun handleOnPositiveButtonClick(v: View) {

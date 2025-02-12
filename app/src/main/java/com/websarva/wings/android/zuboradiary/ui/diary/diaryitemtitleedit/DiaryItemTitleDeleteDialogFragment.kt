@@ -14,7 +14,7 @@ class DiaryItemTitleDeleteDialogFragment : BaseAlertDialogFragment() {
         val KEY_DELETE_LIST_ITEM_POSITION: String = "DeleteItemPosition$fromClassName"
     }
 
-    override val isCancelableOtherThanPressingButton: Boolean
+    override val isCancelableOtherThanPressingButton
         get() = true
 
     override fun createTitle(): String {

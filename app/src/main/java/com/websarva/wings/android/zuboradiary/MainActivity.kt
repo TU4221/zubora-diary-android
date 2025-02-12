@@ -75,7 +75,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     @get:RequiresApi(api = Build.VERSION_CODES.TIRAMISU)
-    val isGrantedPostNotifications: Boolean
+    val isGrantedPostNotifications
         get() = (ActivityCompat.checkSelfPermission(
             this,
             Manifest.permission.POST_NOTIFICATIONS

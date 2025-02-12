@@ -4,7 +4,7 @@ class AppMessageList {
 
     private val appMessageList: List<AppMessage>
 
-    val isEmpty: Boolean
+    val isEmpty
         get() = appMessageList.isEmpty()
 
     constructor(appMessageList: List<AppMessage>) {

@@ -7,7 +7,7 @@ import com.websarva.wings.android.zuboradiary.ui.BaseAlertDialogFragment
 
 class DiaryDeleteDialogFragment : BaseAlertDialogFragment() {
 
-    override val isCancelableOtherThanPressingButton: Boolean
+    override val isCancelableOtherThanPressingButton
         get() = true
 
     companion object {

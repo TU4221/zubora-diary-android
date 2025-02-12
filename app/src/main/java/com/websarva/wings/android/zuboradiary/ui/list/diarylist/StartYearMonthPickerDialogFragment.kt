@@ -15,7 +15,7 @@ class StartYearMonthPickerDialogFragment : BaseNumberPickersBottomSheetDialogFra
         val KEY_SELECTED_YEAR_MONTH: String = "SelectedYearMonth$fromClassName"
     }
 
-    override val isCancelableOtherThanPressingButton: Boolean
+    override val isCancelableOtherThanPressingButton
         get() = true
 
     override fun handleOnPositiveButtonClick(v: View) {

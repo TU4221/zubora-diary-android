@@ -32,7 +32,7 @@ enum class ThemeColor(private val number: Int, private val stringResId: Int) {
         return context.getString(stringResId)
     }
 
-    val isAppearanceLightStatusBars: Boolean
+    val isAppearanceLightStatusBars
         // MEMO:下記以降はViewに関するカラー、リソース等を取得するメソッド。
         get() = when (this) {
             BLACK -> false
