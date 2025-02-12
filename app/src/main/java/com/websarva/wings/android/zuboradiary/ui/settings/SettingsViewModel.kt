@@ -297,7 +297,7 @@ class SettingsViewModel @Inject constructor(
     }
 
     fun updateGeoCoordinates(geoCoordinates: GeoCoordinates) {
-        this._geoCoordinates.value = geoCoordinates
+        _geoCoordinates.value = geoCoordinates
     }
 
     fun clearGeoCoordinates() {
