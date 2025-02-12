@@ -236,6 +236,9 @@ dependencies {
     kapt("androidx.hilt:hilt-compiler:1.2.0") // MEMO:Javaを使用していても左記未設定だとWorkerの引数を変更する事はできない。
     // When using Java.
     annotationProcessor("androidx.hilt:hilt-compiler:1.2.0")
+
+    // debugImplementation because LeakCanary should only run in debug builds.
+    debugImplementation("com.squareup.leakcanary:leakcanary-android:2.14")
 }
 
 // Hilt機能追加(生成されたコードへの参照を許可する)
