@@ -7,12 +7,12 @@ import com.websarva.wings.android.zuboradiary.data.diary.Weather
 // HACK:Retrofit2(Moshi)を使用して本クラスをインスタンス化する時、引数ありのコンストラクタは処理されない。
 //      引数なしコンストラクタ処理時は、フィールド変数の値は未格納。
 //      原因が明らかになるまで、フィールド変数参照時はNullチェック等を行う。
-class WeatherApiResponse private constructor() {
+data class WeatherApiResponse (
     // MEMO:フィールド変数はRetrofit2(Moshi)にて代入。
-    private var latitude = 0f
-    private var longitude = 0f
-    private lateinit var daily: WeatherApiResponseDairy
-
+    private val latitude: Float,
+    private val longitude: Float,
+    private val daily: WeatherApiResponseDairy
+) {
     fun toWeatherInfo(): Weather {
         // GeoCoordinatesのコンストラクタを使用してlatitude、longitudeの値チェック
         GeoCoordinates(latitude.toDouble(), longitude.toDouble())
@@ -40,12 +40,30 @@ class WeatherApiResponse private constructor() {
         }
     }
 
-    private class WeatherApiResponseDairy {
+    data class WeatherApiResponseDairy(
         // MEMO:フィールド変数はRetrofit2(Moshi)にて代入。
         @Json(name = "time")
-        lateinit var times: Array<String>
+        val times: Array<String>,
 
         @Json(name = "weather_code")
-        lateinit var weatherCodes: IntArray
+        val weatherCodes: IntArray
+    ) {
+        override fun equals(other: Any?): Boolean {
+            if (this === other) return true
+            if (javaClass != other?.javaClass) return false
+
+            other as WeatherApiResponseDairy
+
+            if (!times.contentEquals(other.times)) return false
+            if (!weatherCodes.contentEquals(other.weatherCodes)) return false
+
+            return true
+        }
+
+        override fun hashCode(): Int {
+            var result = times.contentHashCode()
+            result = 31 * result + weatherCodes.contentHashCode()
+            return result
+        }
     }
 }
