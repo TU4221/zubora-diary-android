@@ -8,8 +8,8 @@ import com.websarva.wings.android.zuboradiary.data.database.DiaryItemTitleSelect
 import com.websarva.wings.android.zuboradiary.data.database.DiaryRepository
 import com.websarva.wings.android.zuboradiary.data.network.WeatherApiRepository
 import com.websarva.wings.android.zuboradiary.data.network.WeatherApiService
-import com.websarva.wings.android.zuboradiary.data.preferences.UserPreferences
 import com.websarva.wings.android.zuboradiary.data.preferences.UserPreferencesRepository
+import com.websarva.wings.android.zuboradiary.data.preferences.UserPreferences
 import com.websarva.wings.android.zuboradiary.data.worker.WorkerRepository
 import dagger.Module
 import dagger.Provides
@@ -43,7 +43,7 @@ object RepositoryModule {
     @JvmStatic
     @Singleton
     @Provides
-    fun provideSettingsRepository(userPreferences: UserPreferences): UserPreferencesRepository {
+    fun provideUserPreferencesRepository(userPreferences: UserPreferences): UserPreferencesRepository {
         return UserPreferencesRepository(userPreferences)
     }
 

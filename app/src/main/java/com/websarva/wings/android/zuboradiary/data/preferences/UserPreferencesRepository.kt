@@ -1,52 +1,80 @@
 package com.websarva.wings.android.zuboradiary.data.preferences
 
-import androidx.datastore.preferences.core.Preferences
-import io.reactivex.rxjava3.core.Flowable
-import io.reactivex.rxjava3.core.Single
+import androidx.datastore.core.IOException
+import kotlinx.coroutines.flow.Flow
 
 class UserPreferencesRepository(private val userPreferences: UserPreferences) {
 
-    fun loadThemeColorPreference(): Flowable<ThemeColorPreference> {
+    @Throws(Throwable::class)
+    fun loadThemeColorPreference(): Flow<ThemeColorPreference> {
         return userPreferences.loadThemeColorPreference()
     }
 
-    fun saveThemeColorPreference(preference: ThemeColorPreference): Single<Preferences> {
-        return userPreferences.saveThemeColorPreference(preference)
+    @Throws(
+        IOException::class,
+        Exception::class
+    )
+    suspend fun saveThemeColorPreference(preference: ThemeColorPreference) {
+        userPreferences.saveThemeColorPreference(preference)
     }
 
-    fun loadCalendarStartDayOfWeekPreference(): Flowable<CalendarStartDayOfWeekPreference> {
+    @Throws(Throwable::class)
+    fun loadCalendarStartDayOfWeekPreference(): Flow<CalendarStartDayOfWeekPreference> {
         return userPreferences.loadCalendarStartDayOfWeekPreference()
     }
 
-    fun saveCalendarStartDayOfWeekPreference(preference: CalendarStartDayOfWeekPreference): Single<Preferences> {
+    @Throws(
+        IOException::class,
+        Exception::class
+    )
+    suspend fun saveCalendarStartDayOfWeekPreference(preference: CalendarStartDayOfWeekPreference) {
         return userPreferences.saveCalendarStartDayOfWeekPreference(preference)
     }
 
-    fun loadReminderNotificationPreference(): Flowable<ReminderNotificationPreference> {
+    @Throws(Throwable::class)
+    fun loadReminderNotificationPreference(): Flow<ReminderNotificationPreference> {
         return userPreferences.loadReminderNotificationPreference()
     }
 
-    fun saveReminderNotificationPreference(preference: ReminderNotificationPreference): Single<Preferences> {
+    @Throws(
+        IOException::class,
+        Exception::class
+    )
+    suspend fun saveReminderNotificationPreference(preference: ReminderNotificationPreference) {
         return userPreferences.saveReminderNotificationPreference(preference)
     }
 
-    fun loadPasscodeLockPreference(): Flowable<PassCodeLockPreference> {
+    @Throws(Throwable::class)
+    fun loadPasscodeLockPreference(): Flow<PassCodeLockPreference> {
         return userPreferences.loadPasscodeLockPreference()
     }
 
-    fun savePasscodeLockPreference(preference: PassCodeLockPreference): Single<Preferences> {
+    @Throws(
+        IOException::class,
+        Exception::class
+    )
+    suspend fun savePasscodeLockPreference(preference: PassCodeLockPreference) {
         return userPreferences.savePasscodeLockPreference(preference)
     }
 
-    fun loadWeatherInfoAcquisitionPreference(): Flowable<WeatherInfoAcquisitionPreference> {
+    @Throws(Throwable::class)
+    fun loadWeatherInfoAcquisitionPreference(): Flow<WeatherInfoAcquisitionPreference> {
         return userPreferences.loadWeatherInfoAcquisitionPreference()
     }
 
-    fun saveWeatherInfoAcquisitionPreference(preference: WeatherInfoAcquisitionPreference): Single<Preferences> {
+    @Throws(
+        IOException::class,
+        Exception::class
+    )
+    suspend fun saveWeatherInfoAcquisitionPreference(preference: WeatherInfoAcquisitionPreference) {
         return userPreferences.saveWeatherInfoAcquisitionPreference(preference)
     }
 
-    fun initializeAllPreferences(): Single<Preferences> {
+    @Throws(
+        IOException::class,
+        Exception::class
+    )
+    suspend fun initializeAllPreferences() {
         return userPreferences.initializeAllPreferences()
     }
 }

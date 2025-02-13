@@ -4,38 +4,32 @@ import androidx.datastore.preferences.core.MutablePreferences
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.intPreferencesKey
 import java.time.DayOfWeek
-import java.util.Arrays
 
 
 class CalendarStartDayOfWeekPreference {
 
     companion object {
-        @JvmField
-        val PREFERENCES_KEY_DAY_OF_WEEK: Preferences.Key<Int> =
-            intPreferencesKey("calendar_start_day_of_week")
+        private val DAY_OF_WEEK_DEFAULT_VALUE = DayOfWeek.SUNDAY
     }
+
+    private val dayOfWeekPreferenceKey = intPreferencesKey("calendar_start_day_of_week")
 
     private val dayOfWeekNumber: Int
 
+    val dayOfWeek: DayOfWeek
+        get() = DayOfWeek.of(dayOfWeekNumber)
+
+    constructor(preferences: Preferences) {
+        this.dayOfWeekNumber =
+            preferences[dayOfWeekPreferenceKey] ?: DAY_OF_WEEK_DEFAULT_VALUE.value
+    }
+
     @JvmOverloads
-    constructor(dayOfWeek: DayOfWeek = DayOfWeek.SUNDAY) {
+    constructor(dayOfWeek: DayOfWeek = DAY_OF_WEEK_DEFAULT_VALUE) {
         dayOfWeekNumber = dayOfWeek.value
     }
 
-    constructor(dayOfWeekNumber: Int) {
-        val contains =
-            Arrays.stream(DayOfWeek.entries.toTypedArray())
-                .anyMatch { x: DayOfWeek -> x.value == dayOfWeekNumber }
-        require(contains)
-
-        this.dayOfWeekNumber = dayOfWeekNumber
-    }
-
     fun setUpPreferences(mutablePreferences: MutablePreferences) {
-        mutablePreferences[PREFERENCES_KEY_DAY_OF_WEEK] = dayOfWeekNumber
-    }
-
-    fun toDayOfWeek(): DayOfWeek {
-        return DayOfWeek.of(dayOfWeekNumber)
+        mutablePreferences[dayOfWeekPreferenceKey] = dayOfWeekNumber
     }
 }

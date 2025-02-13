@@ -3,37 +3,32 @@ package com.websarva.wings.android.zuboradiary.data.preferences
 import androidx.datastore.preferences.core.MutablePreferences
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.intPreferencesKey
-import java.util.Arrays
 
 
 class ThemeColorPreference {
 
     companion object {
-        @JvmField
-        val PREFERENCES_KEY_COLOR: Preferences.Key<Int> = intPreferencesKey("theme_color")
+        private val THEME_COLOR_DEFAULT_VALUE = ThemeColor.entries[0]
     }
+
+    private val themeColorPreferenceKey = intPreferencesKey("theme_color")
 
     private val themeColorNumber: Int
 
-    constructor(themeColorNumber: Int) {
-        val contains =
-            Arrays.stream(ThemeColor.entries.toTypedArray())
-                .anyMatch { x: ThemeColor -> x.toNumber() == themeColorNumber }
-        require(contains)
+    val themeColor: ThemeColor
+        get() = ThemeColor.of(themeColorNumber)
 
-        this.themeColorNumber = themeColorNumber
+    constructor(preferences: Preferences) {
+        this.themeColorNumber =
+            preferences[themeColorPreferenceKey] ?: THEME_COLOR_DEFAULT_VALUE.toNumber()
     }
 
     @JvmOverloads
-    constructor(themeColor: ThemeColor = ThemeColor.entries[0]) {
+    constructor(themeColor: ThemeColor = THEME_COLOR_DEFAULT_VALUE) {
         this.themeColorNumber = themeColor.toNumber()
     }
 
     fun setUpPreferences(mutablePreferences: MutablePreferences) {
-        mutablePreferences[PREFERENCES_KEY_COLOR] = themeColorNumber
-    }
-
-    fun toThemeColor(): ThemeColor {
-        return ThemeColor.of(themeColorNumber)
+        mutablePreferences[themeColorPreferenceKey] = themeColorNumber
     }
 }

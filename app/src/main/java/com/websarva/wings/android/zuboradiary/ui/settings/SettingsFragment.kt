@@ -230,7 +230,7 @@ class SettingsFragment : BaseFragment() {
                 ?: return
         if (selectedButton != Dialog.BUTTON_POSITIVE) return
 
-        settingsViewModel.deleteAllSettings()
+        settingsViewModel.initializeAllSettings()
     }
 
     private fun receiveAllDataDeleteDialogResult() {

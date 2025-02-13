@@ -1,9 +1,11 @@
 package com.websarva.wings.android.zuboradiary.ui.settings
 
 import android.util.Log
-import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.core.IOException
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.asLiveData
+import androidx.lifecycle.viewModelScope
 import com.websarva.wings.android.zuboradiary.data.AppMessage
 import com.websarva.wings.android.zuboradiary.data.database.DiaryRepository
 import com.websarva.wings.android.zuboradiary.data.network.GeoCoordinates
@@ -17,9 +19,10 @@ import com.websarva.wings.android.zuboradiary.data.preferences.WeatherInfoAcquis
 import com.websarva.wings.android.zuboradiary.data.worker.WorkerRepository
 import com.websarva.wings.android.zuboradiary.ui.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
-import io.reactivex.rxjava3.core.Flowable
-import io.reactivex.rxjava3.core.Single
-import io.reactivex.rxjava3.disposables.CompositeDisposable
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import java.time.DayOfWeek
 import java.time.LocalTime
 import java.util.concurrent.CancellationException
@@ -32,33 +35,16 @@ class SettingsViewModel @Inject constructor(
     private val workerRepository: WorkerRepository,
     private val diaryRepository: DiaryRepository
 ) : BaseViewModel() {
-    private val disposables = CompositeDisposable()
 
-    // MEMO:MutableLiveDataに値セットするまでFlowableによるラグが発生するためnull許容型とする。
+    // MEMO:MutableLiveDataに値セットするまでFlowによるラグが発生する可能性があるためnull許容型とする。
     //      これにより、Observerの引数がnull許容型となりnull時の処理ができる。
-    private val _themeColor = MutableLiveData<ThemeColor?>()
-    val themeColor: LiveData<ThemeColor?>
-        get() = _themeColor
-
-    private val _calendarStartDayOfWeek = MutableLiveData<DayOfWeek?>()
-    val calendarStartDayOfWeek: LiveData<DayOfWeek?>
-        get() = _calendarStartDayOfWeek
-
-    private val _isCheckedReminderNotification = MutableLiveData<Boolean?>()
-    val isCheckedReminderNotification: LiveData<Boolean?>
-        get() = _isCheckedReminderNotification
-
-    private val _reminderNotificationTime = MutableLiveData<LocalTime?>()
-    val reminderNotificationTime: LiveData<LocalTime?>
-        get() = _reminderNotificationTime
-
-    private val _isCheckedPasscodeLock = MutableLiveData<Boolean?>()
-    val isCheckedPasscodeLock: LiveData<Boolean?>
-        get() = _isCheckedPasscodeLock
-
-    private val _isCheckedWeatherInfoAcquisition = MutableLiveData<Boolean?>()
-    val isCheckedWeatherInfoAcquisition: LiveData<Boolean?>
-        get() = _isCheckedWeatherInfoAcquisition
+    lateinit var themeColor: LiveData<ThemeColor?>
+    lateinit var calendarStartDayOfWeek: LiveData<DayOfWeek?>
+    lateinit var isCheckedReminderNotification: LiveData<Boolean?>
+    lateinit var reminderNotificationTime: LiveData<LocalTime?>
+    lateinit var isCheckedPasscodeLock: LiveData<Boolean?>
+    private lateinit var passcode: LiveData<String?>
+    lateinit var isCheckedWeatherInfoAcquisition: LiveData<Boolean?>
 
     private val _geoCoordinates = MutableLiveData<GeoCoordinates?>()
     val geoCoordinates: LiveData<GeoCoordinates?>
@@ -66,12 +52,6 @@ class SettingsViewModel @Inject constructor(
 
     val hasUpdatedGeoCoordinates
         get() = _geoCoordinates.value != null
-
-    private lateinit var themeColorPreferenceFlowable: Flowable<ThemeColorPreference>
-    private lateinit var calendarStartDayPreferenceFlowable: Flowable<CalendarStartDayOfWeekPreference>
-    private lateinit var reminderNotificationPreferenceFlowable: Flowable<ReminderNotificationPreference>
-    private lateinit var passCodeLockPreferenceFlowable: Flowable<PassCodeLockPreference>
-    private lateinit var weatherInfoAcquisitionPreferenceFlowable: Flowable<WeatherInfoAcquisitionPreference>
 
     init {
         initialize()
@@ -87,129 +67,94 @@ class SettingsViewModel @Inject constructor(
     }
 
     private fun setUpThemeColorPreferenceValueLoading() {
-        themeColorPreferenceFlowable = userPreferencesRepository.loadThemeColorPreference()
-        disposables.add(
-            themeColorPreferenceFlowable.subscribe(
-                { value: ThemeColorPreference ->
-                    // HACK:一つのDataStore(UserPreferencesクラス)からFlowableを生成している為、
-                    //      一つのPreferenceを更新すると他のPreferenceのFlowableにも通知される。
-                    //      結果的にObserverにも通知が行き、不必要な処理が発生してしまう。
-                    //      対策として下記コードを記述。(他PreferenceFlowableも同様)
-                    val themeColor = _themeColor.value
-                    if (themeColor != null && themeColor == value.toThemeColor()) return@subscribe
-                    this._themeColor.postValue(value.toThemeColor())
-                },
-                { throwable: Throwable ->
-                    Log.d("Exception", "テーマカラー設定値読込失敗", throwable)
-                    addSettingLoadingErrorMessage()
-                }
-            )
-        )
-    }
-
-    fun loadThemeColorSettingValue(): ThemeColor {
-        val themeColorValue = _themeColor.value
-        if (themeColorValue != null) return themeColorValue
-        val defaultValue = ThemeColorPreference()
-        return themeColorPreferenceFlowable.blockingFirst(defaultValue).toThemeColor()
+        loadSettingValue {
+            themeColor =
+                userPreferencesRepository.loadThemeColorPreference()
+                    .map { preference ->
+                        preference.themeColor
+                    }
+                    .asLiveData()
+        }
     }
 
     private fun setUpCalendarStartDayOfWeekPreferenceValueLoading() {
-        calendarStartDayPreferenceFlowable =
-            userPreferencesRepository.loadCalendarStartDayOfWeekPreference()
-        disposables.add(
-            calendarStartDayPreferenceFlowable.subscribe(
-                { value: CalendarStartDayOfWeekPreference ->
-                    val dayOfWeek = _calendarStartDayOfWeek.value
-                    if (dayOfWeek != null && dayOfWeek == value.toDayOfWeek()) return@subscribe
-
-                    val calendarStartDayOfWeek = value.toDayOfWeek()
-                    this._calendarStartDayOfWeek.postValue(calendarStartDayOfWeek)
-                },
-                { throwable: Throwable ->
-                    Log.d("Exception", "カレンダー開始曜日設定値読込失敗", throwable)
-                    addSettingLoadingErrorMessage()
-                }
-            )
-        )
-    }
-
-    fun loadCalendarStartDaySettingValue(): DayOfWeek {
-        val dayOfWeekValue = _calendarStartDayOfWeek.value
-        if (dayOfWeekValue != null) return dayOfWeekValue
-        val defaultValue = CalendarStartDayOfWeekPreference()
-        return calendarStartDayPreferenceFlowable.blockingFirst(defaultValue).toDayOfWeek()
+        loadSettingValue {
+            calendarStartDayOfWeek =
+                userPreferencesRepository.loadCalendarStartDayOfWeekPreference()
+                    .map { preference ->
+                        preference.dayOfWeek
+                    }
+                    .asLiveData()
+        }
     }
 
     private fun setUpReminderNotificationPreferenceValueLoading() {
-        reminderNotificationPreferenceFlowable =
-            userPreferencesRepository.loadReminderNotificationPreference()
-        disposables.add(
-            reminderNotificationPreferenceFlowable.subscribe(
-                { value: ReminderNotificationPreference ->
-                    val isChecked = _isCheckedReminderNotification.value
-                    if (isChecked != null && isChecked == value.isChecked) return@subscribe
-
-                    _isCheckedReminderNotification.postValue(value.isChecked)
-                    _reminderNotificationTime.postValue(value.notificationLocalTime)
-                },
-                { throwable: Throwable ->
-                    Log.d("Exception", "リマインダー通知設定値読込失敗", throwable)
-                    addSettingLoadingErrorMessage()
-                }
-            )
-        )
-    }
-
-    fun loadIsCheckedReminderNotificationSetting(): Boolean {
-        val value = _isCheckedReminderNotification.value
-        if (value != null) return value
-        val defaultValue =
-            ReminderNotificationPreference()
-        return reminderNotificationPreferenceFlowable.blockingFirst(defaultValue).isChecked
+        loadSettingValue {
+            isCheckedReminderNotification =
+                userPreferencesRepository.loadReminderNotificationPreference()
+                    .map { preference ->
+                        preference.isChecked
+                    }
+                    .asLiveData()
+            reminderNotificationTime =
+                userPreferencesRepository.loadReminderNotificationPreference()
+                    .map { preference ->
+                        preference.notificationLocalTime
+                    }
+                    .asLiveData()
+        }
     }
 
     private fun setUpPasscodeLockPreferenceValueLoading() {
-        passCodeLockPreferenceFlowable = userPreferencesRepository.loadPasscodeLockPreference()
-        disposables.add(
-            passCodeLockPreferenceFlowable.subscribe(
-                { value: PassCodeLockPreference ->
-                    val isChecked = _isCheckedPasscodeLock.value
-                    if (isChecked != null && isChecked == value.isChecked) return@subscribe
-                    _isCheckedPasscodeLock.postValue(value.isChecked)
-                },
-                { throwable: Throwable ->
-                    Log.d("Exception", "パスコード設定値読込失敗", throwable)
-                    addSettingLoadingErrorMessage()
-                }
-            )
-        )
+        loadSettingValue {
+            isCheckedPasscodeLock =
+                userPreferencesRepository.loadPasscodeLockPreference()
+                    .map { preference ->
+                        preference.isChecked
+                    }
+                    .asLiveData()
+            passcode =
+                userPreferencesRepository.loadPasscodeLockPreference()
+                    .map { preference ->
+                        preference.passCode
+                    }
+                    .asLiveData()
+        }
     }
 
     private fun setUpWeatherInfoAcquisitionPreferenceValueLoading() {
-        weatherInfoAcquisitionPreferenceFlowable =
-            userPreferencesRepository.loadWeatherInfoAcquisitionPreference()
-        disposables.add(
-            weatherInfoAcquisitionPreferenceFlowable.subscribe(
-                { value: WeatherInfoAcquisitionPreference ->
-                    val isChecked = _isCheckedWeatherInfoAcquisition.value
-                    if (isChecked != null && isChecked == value.isChecked) return@subscribe
-                    _isCheckedWeatherInfoAcquisition.postValue(value.isChecked)
-                },
-                { throwable: Throwable ->
-                    Log.d("Exception", "天気情報取得設定値読込失敗", throwable)
-                    addSettingLoadingErrorMessage()
-                }
-            )
-        )
+        loadSettingValue {
+            isCheckedWeatherInfoAcquisition =
+                userPreferencesRepository.loadWeatherInfoAcquisitionPreference()
+                    .map { preference ->
+                        preference.isChecked
+                    }
+                    .asLiveData()
+        }
     }
 
-    fun loadIsCheckedWeatherInfoAcquisitionSetting(): Boolean {
-        val value = _isCheckedWeatherInfoAcquisition.value
-        if (value != null) return value
-        val defaultValue =
-            WeatherInfoAcquisitionPreference()
-        return weatherInfoAcquisitionPreferenceFlowable.blockingFirst(defaultValue).isChecked
+    private fun interface SettingLoadingProcess {
+        @Throws(
+            IOException::class,
+            Exception::class
+        )
+        suspend fun load()
+    }
+
+    private fun loadSettingValue(
+        loadingProcess: SettingLoadingProcess
+    ) {
+        viewModelScope.launch {
+            try {
+                loadingProcess.load()
+            } catch (e: IOException) {
+                Log.d("Exception", "設定値読込失敗", e)
+                addSettingLoadingErrorMessage()
+            } catch (e: Exception) {
+                Log.d("Exception", "設定値読込失敗", e)
+                addSettingLoadingErrorMessage()
+            }
+        }
     }
 
     private fun addSettingLoadingErrorMessage() {
@@ -218,30 +163,74 @@ class SettingsViewModel @Inject constructor(
         addAppMessage(AppMessage.SETTING_LOADING_ERROR)
     }
 
-    override fun onCleared() {
-        super.onCleared()
-        disposables.clear()
+    /**
+     * 同期的に設定値を取得したいときに使用。
+     * 早期参照により、PreferencesDataStore から LiveData へ設定値が未格納(null)の可能性があるため。
+     * */
+    fun loadThemeColorSettingValue(): ThemeColor {
+        val themeColorValue = themeColor.value
+        if (themeColorValue != null) return themeColorValue
+        return runBlocking {
+            userPreferencesRepository.loadThemeColorPreference().first().themeColor
+        }
+    }
+
+    /**
+     * 同期的に設定値を取得したいときに使用。
+     * 早期参照により、PreferencesDataStore から LiveData へ設定値が未格納(null)の可能性があるため。
+     * */
+    fun loadCalendarStartDaySettingValue(): DayOfWeek {
+        val dayOfWeekValue = calendarStartDayOfWeek.value
+        if (dayOfWeekValue != null) return dayOfWeekValue
+        return runBlocking {
+            userPreferencesRepository.loadCalendarStartDayOfWeekPreference().first().dayOfWeek
+        }
+    }
+
+    /**
+     * 同期的に設定値を取得したいときに使用。
+     * 早期参照により、PreferencesDataStore から LiveData へ設定値が未格納(null)の可能性があるため。
+     * */
+    fun loadIsCheckedReminderNotificationSetting(): Boolean {
+        val value = isCheckedReminderNotification.value
+        if (value != null) return value
+        return runBlocking {
+            userPreferencesRepository.loadReminderNotificationPreference().first().isChecked
+        }
+    }
+
+    /**
+     * 同期的に設定値を取得したいときに使用。
+     * 早期参照により、PreferencesDataStore から LiveData へ設定値が未格納(null)の可能性があるため。
+     * */
+    fun loadIsCheckedWeatherInfoAcquisitionSetting(): Boolean {
+        val value = isCheckedWeatherInfoAcquisition.value
+        if (value != null) return value
+        return runBlocking {
+            userPreferencesRepository.loadWeatherInfoAcquisitionPreference().first().isChecked
+        }
     }
 
     fun saveThemeColor(value: ThemeColor) {
         val preferenceValue = ThemeColorPreference(value)
-        val result = userPreferencesRepository.saveThemeColorPreference(preferenceValue)
-        setUpProcessOnUpdate(result, null)
+        updateSettingValue{
+            userPreferencesRepository.saveThemeColorPreference(preferenceValue)
+        }
     }
 
     fun saveCalendarStartDayOfWeek(value: DayOfWeek) {
         val preferenceValue =
             CalendarStartDayOfWeekPreference(value)
-        val result =
+        updateSettingValue{
             userPreferencesRepository.saveCalendarStartDayOfWeekPreference(preferenceValue)
-        setUpProcessOnUpdate(result, null)
+        }
     }
 
     fun saveReminderNotificationValid(value: LocalTime) {
         val preferenceValue =
             ReminderNotificationPreference(true, value)
-        val result = userPreferencesRepository.saveReminderNotificationPreference(preferenceValue)
-        setUpProcessOnUpdate(result) {
+        updateSettingValue{
+            userPreferencesRepository.saveReminderNotificationPreference(preferenceValue)
             workerRepository.registerReminderNotificationWorker(value)
         }
     }
@@ -249,8 +238,8 @@ class SettingsViewModel @Inject constructor(
     fun saveReminderNotificationInvalid() {
         val preferenceValue =
             ReminderNotificationPreference(false, null as LocalTime?)
-        val result = userPreferencesRepository.saveReminderNotificationPreference(preferenceValue)
-        setUpProcessOnUpdate(result) {
+        updateSettingValue{
+            userPreferencesRepository.saveReminderNotificationPreference(preferenceValue)
             workerRepository.cancelReminderNotificationWorker()
         }
     }
@@ -263,37 +252,47 @@ class SettingsViewModel @Inject constructor(
         }
 
         val preferenceValue = PassCodeLockPreference(value, passcode)
-        val result = userPreferencesRepository.savePasscodeLockPreference(preferenceValue)
-        setUpProcessOnUpdate(result, null)
+        updateSettingValue{
+            userPreferencesRepository.savePasscodeLockPreference(preferenceValue)
+        }
     }
 
     fun saveWeatherInfoAcquisition(value: Boolean) {
         val preferenceValue =
             WeatherInfoAcquisitionPreference(value)
-        val result =
+        updateSettingValue{
             userPreferencesRepository.saveWeatherInfoAcquisitionPreference(preferenceValue)
-        setUpProcessOnUpdate(result, null)
+        }
     }
 
-    private fun interface OnSettingsUpdateCallback {
-        fun onUpdateSettings()
-    }
-
-    private fun setUpProcessOnUpdate(
-        result: Single<Preferences>,
-        callback: OnSettingsUpdateCallback?
-    ) {
-        disposables.add(
-            result.subscribe(
-                { if (callback == null) return@subscribe
-                    callback.onUpdateSettings()
-                },
-                { val appMessage = AppMessage.SETTING_UPDATE_ERROR
-                    if (equalLastAppMessage(appMessage)) return@subscribe  // 設定更新エラー通知の重複防止
-                    addAppMessage(appMessage)
-                }
-            )
+    private fun interface SettingUpdateProcess {
+        @Throws(
+            IOException::class,
+            Exception::class
         )
+        suspend fun update()
+    }
+
+    private fun updateSettingValue(
+        updateProcess: SettingUpdateProcess
+    ) {
+        viewModelScope.launch {
+            try {
+                updateProcess.update()
+            } catch (e: IOException) {
+                Log.d("Exception", "設定値更新失敗", e)
+                addSettingUpdateErrorMessage()
+            } catch (e: Exception) {
+                Log.d("Exception", "設定値更新失敗", e)
+                addSettingUpdateErrorMessage()
+            }
+        }
+    }
+
+    private fun addSettingUpdateErrorMessage() {
+        if (equalLastAppMessage(AppMessage.SETTING_UPDATE_ERROR)) return  // 設定更新エラー通知の重複防止
+
+        addAppMessage(AppMessage.SETTING_UPDATE_ERROR)
     }
 
     fun updateGeoCoordinates(geoCoordinates: GeoCoordinates) {
@@ -316,9 +315,10 @@ class SettingsViewModel @Inject constructor(
         }
     }
 
-    fun deleteAllSettings() {
-        val result = userPreferencesRepository.initializeAllPreferences()
-        setUpProcessOnUpdate(result, null)
+    fun initializeAllSettings() {
+        updateSettingValue{
+            userPreferencesRepository.initializeAllPreferences()
+        }
     }
 
     fun deleteAllData() {
@@ -331,6 +331,6 @@ class SettingsViewModel @Inject constructor(
         } catch (e: InterruptedException) {
             addAppMessage(AppMessage.DIARY_DELETE_ERROR)
         }
-        deleteAllSettings()
+        initializeAllSettings()
     }
 }

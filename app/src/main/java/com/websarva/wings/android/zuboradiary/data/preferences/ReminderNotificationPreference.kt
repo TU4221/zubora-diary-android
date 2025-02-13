@@ -9,13 +9,14 @@ import java.time.LocalTime
 class ReminderNotificationPreference {
 
     companion object {
-        @JvmField
-        val PREFERENCES_KEY_IS_CHECKED: Preferences.Key<Boolean> =
-            booleanPreferencesKey("is_checked_reminder_notification")
-        @JvmField
-        val PREFERENCES_KEY_TIME: Preferences.Key<String> =
-            stringPreferencesKey("reminder_notification_time")
+        private const val IS_CHECKED_DEFAULT_VALUE = false
+        private const val NOTIFICATION_TIME_DEFAULT_VALUE = ""
     }
+
+    private val isCheckedPreferenceKey =
+        booleanPreferencesKey("is_checked_reminder_notification")
+    private val notificationTimePreferenceKey =
+        stringPreferencesKey("reminder_notification_time")
 
     val isChecked: Boolean
     private val notificationTimeString: String
@@ -37,8 +38,22 @@ class ReminderNotificationPreference {
         }
     }
 
+    constructor(preferences: Preferences) {
+        var isChecked = preferences[isCheckedPreferenceKey]
+        var notificationTimeString = preferences[notificationTimePreferenceKey]
+        if (isChecked == null || notificationTimeString == null) {
+            isChecked = IS_CHECKED_DEFAULT_VALUE
+            notificationTimeString = NOTIFICATION_TIME_DEFAULT_VALUE
+        }
+        this.isChecked = isChecked
+        this.notificationTimeString = notificationTimeString
+    }
+
     @JvmOverloads
-    constructor(isChecked: Boolean = false, notificationTime: String = "") {
+    constructor(
+        isChecked: Boolean = IS_CHECKED_DEFAULT_VALUE,
+        notificationTime: String = NOTIFICATION_TIME_DEFAULT_VALUE
+    ) {
         if (isChecked) {
             // 時間文字列形式確認
             LocalTime.parse(notificationTime)
@@ -51,7 +66,7 @@ class ReminderNotificationPreference {
     }
 
     fun setUpPreferences(mutablePreferences: MutablePreferences) {
-        mutablePreferences[PREFERENCES_KEY_IS_CHECKED] = isChecked
-        mutablePreferences[PREFERENCES_KEY_TIME] = notificationTimeString
+        mutablePreferences[isCheckedPreferenceKey] = isChecked
+        mutablePreferences[notificationTimePreferenceKey] = notificationTimeString
     }
 }

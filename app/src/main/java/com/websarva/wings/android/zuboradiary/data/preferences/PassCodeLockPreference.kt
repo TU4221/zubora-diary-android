@@ -1,41 +1,60 @@
 package com.websarva.wings.android.zuboradiary.data.preferences
 
-import android.util.Log
 import androidx.datastore.preferences.core.MutablePreferences
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 
-class PassCodeLockPreference @JvmOverloads constructor(
-    isChecked: Boolean = false,
-    passCode: String = ""
-) {
+class PassCodeLockPreference {
 
     companion object {
-        @JvmField
-        val PREFERENCES_KEY_IS_CHECKED: Preferences.Key<Boolean> =
-            booleanPreferencesKey("is_checked_passcode_lock")
-        @JvmField
-        val PREFERENCES_KEY_PASSCODE: Preferences.Key<String> =
-            stringPreferencesKey("passcode")
+        private const val IS_CHECKED_DEFAULT_VALUE = false
+        private const val PASS_CODE_DEFAULT_VALUE = ""
     }
 
-    val isChecked: Boolean
-    private var passCode: String
+    private val isCheckedPreferenceKey = booleanPreferencesKey("is_checked_passcode_lock")
+    private val passcodePreferenceKey = stringPreferencesKey("passcode")
 
-    init {
-        if (isChecked) {
-            require(passCode.matches("\\d{4}".toRegex()))
-        } else {
-            require(passCode.matches("".toRegex()))
+    val isChecked: Boolean
+    var passCode: String
+
+    constructor(preferences: Preferences) {
+        var isChecked = preferences[isCheckedPreferenceKey]
+        var passCode = preferences[passcodePreferenceKey]
+        if (isChecked == null || passCode == null) {
+            isChecked = IS_CHECKED_DEFAULT_VALUE
+            passCode = PASS_CODE_DEFAULT_VALUE
         }
+        require(checkLegalArgument(isChecked, passCode))
 
         this.isChecked = isChecked
         this.passCode = passCode
     }
 
+    @JvmOverloads
+    constructor(
+        isChecked: Boolean = IS_CHECKED_DEFAULT_VALUE,
+        passCode: String = PASS_CODE_DEFAULT_VALUE
+    ) {
+        require(checkLegalArgument(isChecked, passCode))
+
+        this.isChecked = isChecked
+        this.passCode = passCode
+    }
+
+    private fun checkLegalArgument(
+        isChecked: Boolean,
+        passCode: String
+    ): Boolean {
+        return if (isChecked) {
+            passCode.matches("\\d{4}".toRegex())
+        } else {
+            passCode.matches("".toRegex())
+        }
+    }
+
     fun setUpPreferences(mutablePreferences: MutablePreferences) {
-        mutablePreferences[PREFERENCES_KEY_IS_CHECKED] = isChecked
-        mutablePreferences[PREFERENCES_KEY_PASSCODE] = passCode
+        mutablePreferences[isCheckedPreferenceKey] = isChecked
+        mutablePreferences[passcodePreferenceKey] = passCode
     }
 }
