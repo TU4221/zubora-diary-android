@@ -134,6 +134,10 @@ dependencies {
 
     // PreferencesDataStore 追加
     implementation("androidx.datastore:datastore-preferences:1.1.2")
+    // optional - RxJava2 support
+    implementation("androidx.datastore:datastore-preferences-rxjava2:1.1.2")
+    // optional - RxJava3 support
+    implementation("androidx.datastore:datastore-preferences-rxjava3:1.1.2")
 
     // WorkerManager 追加
     val workVersion = "2.10.0"
