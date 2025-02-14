@@ -25,10 +25,9 @@ object RepositoryModule {
     @Provides
     fun provideDiaryRepository(
         diaryDatabase: DiaryDatabase,
-        diaryDAO: DiaryDAO,
-        diaryItemTitleSelectionHistoryDAO: DiaryItemTitleSelectionHistoryDAO
+        diaryDAO: DiaryDAO
     ): DiaryRepository {
-        return DiaryRepository(diaryDatabase, diaryDAO, diaryItemTitleSelectionHistoryDAO)
+        return DiaryRepository(diaryDatabase, diaryDAO)
     }
 
     @JvmStatic

@@ -16,6 +16,7 @@ import com.websarva.wings.android.zuboradiary.ui.BaseViewModel
 import com.websarva.wings.android.zuboradiary.ui.checkNotNull
 import com.websarva.wings.android.zuboradiary.ui.diary.DiaryLiveData
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.runBlocking
 import retrofit2.Call
 import java.time.LocalDate
 import java.time.temporal.ChronoUnit
@@ -214,8 +215,10 @@ class DiaryEditViewModel @Inject constructor(
         NoSuchElementException::class
     )
     private fun loadSavedDiary(date: LocalDate) {
-        val diaryEntity = diaryRepository.loadDiary(date).get()
-            ?: throw NoSuchElementException()
+        val diaryEntity =
+            runBlocking {
+                diaryRepository.loadDiary(date)
+            }
 
         // HACK:下記はDiaryLiveData#update()処理よりも前に処理すること。
         //      (後で処理するとDiaryLiveDataのDateのObserverがloadedDateの更新よりも先に処理される為)
@@ -227,7 +230,9 @@ class DiaryEditViewModel @Inject constructor(
 
     fun existsSavedDiary(date: LocalDate): Boolean {
         try {
-            return diaryRepository.existsDiary(date).get()
+            return runBlocking {
+                diaryRepository.existsDiary(date)
+            }
         } catch (e: ExecutionException) {
             addAppMessage(AppMessage.DIARY_LOADING_ERROR)
             return false
@@ -239,48 +244,38 @@ class DiaryEditViewModel @Inject constructor(
 
     // TODO:TestDiariesSaverクラス削除後、public削除。
     fun saveDiary(): Boolean {
-        val diaryEntity = diaryLiveData.createDiaryEntity()
-        val diaryItemTitleSelectionHistoryItemEntityList =
-            diaryLiveData.createDiaryItemTitleSelectionHistoryItemEntityList()
-        try {
-            if (shouldDeleteLoadedDateDiary) {
-                diaryRepository
-                    .deleteAndSaveDiary(
-                        _loadedDate.checkNotNull(),
-                        diaryEntity,
-                        diaryItemTitleSelectionHistoryItemEntityList
-                    )
-                    .get()
-            } else {
-                diaryRepository
-                    .saveDiary(diaryEntity, diaryItemTitleSelectionHistoryItemEntityList).get()
+        return runBlocking {
+            val diaryEntity = diaryLiveData.createDiaryEntity()
+            val diaryItemTitleSelectionHistoryItemEntityList =
+                diaryLiveData.createDiaryItemTitleSelectionHistoryItemEntityList()
+            try {
+                if (shouldDeleteLoadedDateDiary) {
+                    diaryRepository
+                        .deleteAndSaveDiary(
+                            _loadedDate.checkNotNull(),
+                            diaryEntity,
+                            diaryItemTitleSelectionHistoryItemEntityList
+                        )
+                } else {
+                    diaryRepository
+                        .saveDiary(diaryEntity, diaryItemTitleSelectionHistoryItemEntityList)
+                }
+            } catch (e: Exception) {
+                addAppMessage(AppMessage.DIARY_SAVING_ERROR)
+                return@runBlocking false
             }
-        } catch (e: Exception) {
-            addAppMessage(AppMessage.DIARY_SAVING_ERROR)
-            return false
+            return@runBlocking true
         }
-        return true
     }
 
     fun deleteDiary(): Boolean {
         val deleteDate = _loadedDate.checkNotNull()
 
-        val result: Int
         try {
-            result = diaryRepository.deleteDiary(deleteDate).get()
-        } catch (e: CancellationException) {
-            addAppMessage(AppMessage.DIARY_DELETE_ERROR)
-            return false
-        } catch (e: ExecutionException) {
-            addAppMessage(AppMessage.DIARY_DELETE_ERROR)
-            return false
-        } catch (e: InterruptedException) {
-            addAppMessage(AppMessage.DIARY_DELETE_ERROR)
-            return false
-        }
-
-        // 削除件数 = 1が正常
-        if (result != 1) {
+            runBlocking {
+                diaryRepository.deleteDiary(deleteDate)
+            }
+        } catch (e: Exception) {
             addAppMessage(AppMessage.DIARY_DELETE_ERROR)
             return false
         }
@@ -295,7 +290,7 @@ class DiaryEditViewModel @Inject constructor(
 
         // HACK:下記はDiaryLiveDataのDateのsetValue()処理よりも前に処理すること。
         //      (後で処理するとDateのObserverがpreviousDateの更新よりも先に処理される為)
-        this._previousDate.value = previousDate
+        _previousDate.value = previousDate
 
         diaryLiveData.date.value = date
     }
@@ -384,11 +379,10 @@ class DiaryEditViewModel @Inject constructor(
     // MEMO:存在しないことを確認したいため下記メソッドを否定的処理とする
     fun checkSavedPicturePathDoesNotExist(uri: Uri): Boolean {
         try {
-            return !diaryRepository.existsPicturePath(uri).get()
-        } catch (e: ExecutionException) {
-            addAppMessage(AppMessage.DIARY_LOADING_ERROR)
-            return false
-        } catch (e: InterruptedException) {
+            return runBlocking {
+                !diaryRepository.existsPicturePath(uri)
+            }
+        } catch (e: Exception) {
             addAppMessage(AppMessage.DIARY_LOADING_ERROR)
             return false
         }

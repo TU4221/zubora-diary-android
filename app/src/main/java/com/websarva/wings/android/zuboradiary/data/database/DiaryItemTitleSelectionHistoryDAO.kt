@@ -4,7 +4,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import com.google.common.util.concurrent.ListenableFuture
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface DiaryItemTitleSelectionHistoryDAO {
@@ -14,22 +14,22 @@ interface DiaryItemTitleSelectionHistoryDAO {
     fun selectHistoryListOrderByLogDesc(
         numTitles: Int,
         offset: Int
-    ): ListenableFuture<List<DiaryItemTitleSelectionHistoryItemEntity>>
+    ): Flow<List<DiaryItemTitleSelectionHistoryItemEntity>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertHistoryItem(
+    suspend fun insertHistoryItem(
         diaryItemTitleSelectionHistoryItemEntityList: List<DiaryItemTitleSelectionHistoryItemEntity>
-    ): ListenableFuture<List<Long>>
+    )
 
     @Query("DELETE FROM diary_item_title_selection_history WHERE title = :title")
-    fun deleteHistoryItem(title: String): ListenableFuture<Int>
+    suspend fun deleteHistoryItem(title: String)
 
     // MEMO:SQLITEはDELETE ORDER BYが使用できない。
     /*@Query("DELETE FROM diary_item_title_history ORDER BY log DESC LIMIT ((SELECT COUNT(*) FROM diary_item_title_history) - 50) OFFSET 50")*/
     @Query("DELETE FROM diary_item_title_selection_history WHERE title " +
             "NOT IN (SELECT title FROM diary_item_title_selection_history ORDER BY log DESC LIMIT 50 OFFSET 0)")
-    fun deleteOldHistoryItem(): ListenableFuture<Int>
+    suspend fun deleteOldHistoryItem()
 
     @Query("DELETE FROM diary_item_title_selection_history")
-    fun deleteAllItem(): ListenableFuture<Void?>
+    suspend fun deleteAllItem()
 }

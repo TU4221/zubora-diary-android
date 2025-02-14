@@ -305,12 +305,10 @@ class SettingsViewModel @Inject constructor(
 
     fun deleteAllDiaries() {
         try {
-            diaryRepository.deleteAllDiaries().get()
-        } catch (e: CancellationException) {
-            addAppMessage(AppMessage.DIARY_DELETE_ERROR)
-        } catch (e: ExecutionException) {
-            addAppMessage(AppMessage.DIARY_DELETE_ERROR)
-        } catch (e: InterruptedException) {
+            runBlocking {
+                diaryRepository.deleteAllDiaries()
+            }
+        } catch (e: Exception) {
             addAppMessage(AppMessage.DIARY_DELETE_ERROR)
         }
     }
@@ -322,15 +320,17 @@ class SettingsViewModel @Inject constructor(
     }
 
     fun deleteAllData() {
-        try {
-            diaryRepository.deleteAllData().get()
-        } catch (e: CancellationException) {
-            addAppMessage(AppMessage.DIARY_DELETE_ERROR)
-        } catch (e: ExecutionException) {
-            addAppMessage(AppMessage.DIARY_DELETE_ERROR)
-        } catch (e: InterruptedException) {
-            addAppMessage(AppMessage.DIARY_DELETE_ERROR)
+        viewModelScope.launch {
+            try {
+                diaryRepository.deleteAllData()
+            } catch (e: CancellationException) {
+                addAppMessage(AppMessage.DIARY_DELETE_ERROR)
+            } catch (e: ExecutionException) {
+                addAppMessage(AppMessage.DIARY_DELETE_ERROR)
+            } catch (e: InterruptedException) {
+                addAppMessage(AppMessage.DIARY_DELETE_ERROR)
+            }
+            initializeAllSettings()
         }
-        initializeAllSettings()
     }
 }

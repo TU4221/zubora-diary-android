@@ -6,6 +6,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.websarva.wings.android.zuboradiary.data.AppMessage
 import com.websarva.wings.android.zuboradiary.data.AppMessageList
+import java.lang.Exception
 
 abstract class BaseViewModel : ViewModel() {
 
@@ -53,5 +54,10 @@ abstract class BaseViewModel : ViewModel() {
     protected fun equalLastAppMessage(appMessage: AppMessage): Boolean {
         val currentList = checkNotNull(_appMessageBufferList.value)
         return currentList.equalLastItem(appMessage)
+    }
+
+    abstract class ViewModelCallback<T> {
+        abstract fun onSuccess(result: T)
+        abstract fun onFailure(exception: Exception)
     }
 }

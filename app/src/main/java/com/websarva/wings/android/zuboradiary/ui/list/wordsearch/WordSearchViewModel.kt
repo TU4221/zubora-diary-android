@@ -10,6 +10,7 @@ import com.websarva.wings.android.zuboradiary.ui.BaseViewModel
 import com.websarva.wings.android.zuboradiary.ui.checkNotNull
 import com.websarva.wings.android.zuboradiary.ui.list.diarylist.DiaryListViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.runBlocking
 import java.util.concurrent.CancellationException
 import java.util.concurrent.ExecutionException
 import java.util.concurrent.ExecutorService
@@ -273,14 +274,15 @@ class WordSearchViewModel @Inject internal constructor(
 
         val searchWord = _searchWord.checkNotNull()
 
-        val listenableFutureResults =
-            diaryRepository.loadWordSearchResultDiaryList(
-                numLoadingItems, loadingOffset, searchWord
-            )
-
-        val loadedResultList = listenableFutureResults.get()
+        val loadedResultList =
+            runBlocking {
+                diaryRepository.loadWordSearchResultDiaryList(
+                    numLoadingItems, loadingOffset, searchWord
+                )
+            }
 
         if (loadedResultList.isEmpty()) return WordSearchResultYearMonthList()
+
         val resultDayListItemList: MutableList<WordSearchResultDayListItem> = ArrayList()
         loadedResultList.stream().forEach { x: WordSearchResultListItem ->
             resultDayListItemList.add(
@@ -302,7 +304,10 @@ class WordSearchViewModel @Inject internal constructor(
     private fun existsUnloadedDiaries(numLoadedDiaries: Int): Boolean {
         val searchWord = _searchWord.checkNotNull()
 
-        val numExistingDiaries = diaryRepository.countWordSearchResultDiaries(searchWord).get()
+        val numExistingDiaries =
+            runBlocking {
+                diaryRepository.countWordSearchResultDiaries(searchWord)
+            }
         _numWordSearchResults.postValue(numExistingDiaries)
         if (numExistingDiaries <= 0) return false
 

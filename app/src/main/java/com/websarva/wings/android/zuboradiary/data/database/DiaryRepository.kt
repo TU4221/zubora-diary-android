@@ -2,50 +2,48 @@ package com.websarva.wings.android.zuboradiary.data.database
 
 import android.net.Uri
 import android.util.Log
-import com.google.common.util.concurrent.ListenableFuture
 import java.time.LocalDate
-import java.util.concurrent.Callable
-import java.util.concurrent.Future
 import javax.inject.Inject
 
 
 class DiaryRepository @Inject constructor(
     private val diaryDatabase: DiaryDatabase,
     private val diaryDAO: DiaryDAO,
-    private val diaryItemTitleSelectionHistoryDAO: DiaryItemTitleSelectionHistoryDAO
 ) {
 
-    fun countDiaries(): ListenableFuture<Int> {
+    suspend fun countDiaries(): Int {
         return diaryDAO.countDiaries()
     }
 
-    fun countDiaries(date: LocalDate): ListenableFuture<Int> {
+    suspend fun countDiaries(date: LocalDate): Int {
         return diaryDAO.countDiaries(date.toString())
     }
 
-    fun existsDiary(date: LocalDate): ListenableFuture<Boolean> {
+    suspend fun existsDiary(date: LocalDate): Boolean {
         return diaryDAO.existsDiary(date.toString())
     }
 
-    fun existsPicturePath(uri: Uri): ListenableFuture<Boolean> {
+    suspend fun existsPicturePath(uri: Uri): Boolean {
         return diaryDAO.existsPicturePath(uri.toString())
     }
 
-    fun loadDiary(date: LocalDate): ListenableFuture<DiaryEntity> {
+    suspend fun loadDiary(date: LocalDate): DiaryEntity {
         return diaryDAO.selectDiary(date.toString())
     }
 
-    fun loadNewestDiary(): ListenableFuture<DiaryEntity> {
+    suspend fun loadNewestDiary(): DiaryEntity {
         return diaryDAO.selectNewestDiary()
     }
 
-    fun loadOldestDiary(): ListenableFuture<DiaryEntity> {
+    suspend fun loadOldestDiary(): DiaryEntity {
         return diaryDAO.selectOldestDiary()
     }
 
-    fun loadDiaryList(
-        num: Int, offset: Int, date: LocalDate?
-    ): ListenableFuture<List<DiaryListItem>> {
+    suspend fun loadDiaryList(
+        num: Int,
+        offset: Int,
+        date: LocalDate?
+    ): List<DiaryListItem> {
         require(num >= 1)
         require(offset >= 0)
 
@@ -60,73 +58,44 @@ class DiaryRepository @Inject constructor(
         }
     }
 
-    fun countWordSearchResultDiaries(searchWord: String): ListenableFuture<Int> {
+    suspend fun countWordSearchResultDiaries(searchWord: String): Int {
         return diaryDAO.countWordSearchResults(searchWord)
     }
 
-    fun loadWordSearchResultDiaryList(
-        num: Int, offset: Int, searchWord: String
-    ): ListenableFuture<List<WordSearchResultListItem>> {
+    suspend fun loadWordSearchResultDiaryList(
+        num: Int,
+        offset: Int,
+        searchWord: String
+    ): List<WordSearchResultListItem> {
         require(num >= 1)
         require(offset >= 0)
 
         return diaryDAO.selectWordSearchResultListOrderByDateDesc(num, offset, searchWord)
     }
 
-    fun saveDiary(
+    suspend fun saveDiary(
         diaryEntity: DiaryEntity,
         updateTitleList: List<DiaryItemTitleSelectionHistoryItemEntity>
-    ): Future<Void> {
-        return DiaryDatabase.EXECUTOR_SERVICE.submit(
-            Callable {
-                diaryDatabase.runInTransaction(
-                    Callable<Void> {
-                        diaryDAO.insertDiary(diaryEntity)
-                        diaryItemTitleSelectionHistoryDAO.insertHistoryItem(updateTitleList)
-                        diaryItemTitleSelectionHistoryDAO.deleteOldHistoryItem()
-                        null
-                    }
-                )
-            }
-        )
+    ) {
+        diaryDatabase.saveDiary(diaryEntity, updateTitleList)
     }
 
-    fun deleteAndSaveDiary(
+    suspend fun deleteAndSaveDiary(
         deleteDiaryDate: LocalDate, createDiaryEntity: DiaryEntity,
         updateTitleList: List<DiaryItemTitleSelectionHistoryItemEntity>
-    ): Future<Void> {
-        return DiaryDatabase.EXECUTOR_SERVICE.submit(
-            Callable {
-                diaryDatabase.runInTransaction(
-                    Callable<Void> {
-                        diaryDAO.deleteDiary(deleteDiaryDate.toString())
-                        diaryDAO.insertDiary(createDiaryEntity)
-                        diaryItemTitleSelectionHistoryDAO.insertHistoryItem(updateTitleList)
-                        diaryItemTitleSelectionHistoryDAO.deleteOldHistoryItem()
-                        null
-                    }
-                )
-            }
-        )
+    ) {
+        diaryDatabase.deleteAndSaveDiary(deleteDiaryDate, createDiaryEntity, updateTitleList)
     }
 
-    fun deleteDiary(date: LocalDate): ListenableFuture<Int> {
-        return diaryDAO.deleteDiary(date.toString())
+    suspend fun deleteDiary(date: LocalDate) {
+        diaryDAO.deleteDiary(date.toString())
     }
 
-    fun deleteAllDiaries(): ListenableFuture<Int> {
-        return diaryDAO.deleteAllDiaries()
+    suspend fun deleteAllDiaries() {
+        diaryDAO.deleteAllDiaries()
     }
 
-    fun deleteAllData(): Future<Void> {
-        return DiaryDatabase.EXECUTOR_SERVICE.submit(Callable {
-            diaryDatabase.runInTransaction(
-                Callable<Void> {
-                    diaryDAO.deleteAllDiaries()
-                    diaryItemTitleSelectionHistoryDAO.deleteAllItem()
-                    null
-                }
-            )
-        })
+    suspend fun deleteAllData() {
+        diaryDatabase.deleteAllData()
     }
 }

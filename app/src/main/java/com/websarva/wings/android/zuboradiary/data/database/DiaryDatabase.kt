@@ -2,6 +2,8 @@ package com.websarva.wings.android.zuboradiary.data.database
 
 import androidx.room.Database
 import androidx.room.RoomDatabase
+import androidx.room.Transaction
+import java.time.LocalDate
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
@@ -16,12 +18,34 @@ import java.util.concurrent.Executors
 )
 abstract class DiaryDatabase : RoomDatabase() {
 
-    companion object {
-        //static class MyAutoMigration implements AutoMigrationSpec{}
-        @JvmField
-        val EXECUTOR_SERVICE: ExecutorService = Executors.newSingleThreadExecutor()
-    }
-
     abstract fun createDiaryDAO(): DiaryDAO
     abstract fun createDiaryItemTitleSelectionHistoryDAO(): DiaryItemTitleSelectionHistoryDAO
+
+    @Transaction
+    suspend fun saveDiary(
+        diaryEntity: DiaryEntity,
+        updateTitleList: List<DiaryItemTitleSelectionHistoryItemEntity>
+    ) {
+        createDiaryDAO().insertDiary(diaryEntity)
+        createDiaryItemTitleSelectionHistoryDAO().insertHistoryItem(updateTitleList)
+        createDiaryItemTitleSelectionHistoryDAO().deleteOldHistoryItem()
+    }
+
+    @Transaction
+    suspend fun deleteAndSaveDiary(
+        deleteDiaryDate: LocalDate,
+        createDiaryEntity: DiaryEntity,
+        updateTitleList: List<DiaryItemTitleSelectionHistoryItemEntity>
+    ) {
+        createDiaryDAO().deleteDiary(deleteDiaryDate.toString())
+        createDiaryDAO().insertDiary(createDiaryEntity)
+        createDiaryItemTitleSelectionHistoryDAO().insertHistoryItem(updateTitleList)
+        createDiaryItemTitleSelectionHistoryDAO().deleteOldHistoryItem()
+    }
+
+    @Transaction
+    suspend fun deleteAllData() {
+        createDiaryDAO().deleteAllDiaries()
+        createDiaryItemTitleSelectionHistoryDAO().deleteAllItem()
+    }
 }

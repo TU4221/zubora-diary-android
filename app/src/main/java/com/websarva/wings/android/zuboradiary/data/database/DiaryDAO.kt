@@ -4,45 +4,44 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import com.google.common.util.concurrent.ListenableFuture
 
 @Dao
 interface DiaryDAO {
     // MEMO:@Query使用方法下記参照
     //      https://developer.android.com/reference/kotlin/androidx/room/Query
     @Query("SELECT COUNT(*) FROM diaries")
-    fun countDiaries(): ListenableFuture<Int>
+    suspend fun countDiaries(): Int
 
     @Query("SELECT COUNT(*) FROM diaries WHERE date < :startDate")
-    fun countDiaries(startDate: String): ListenableFuture<Int>
+    suspend fun countDiaries(startDate: String): Int
 
     @Query("SELECT EXISTS (SELECT 1 FROM diaries WHERE date = :date)")
-    fun existsDiary(date: String): ListenableFuture<Boolean>
+    suspend fun existsDiary(date: String): Boolean
 
     @Query("SELECT EXISTS (SELECT 1 FROM diaries WHERE picturePath = :uri)")
-    fun existsPicturePath(uri: String): ListenableFuture<Boolean>
+    suspend fun existsPicturePath(uri: String): Boolean
 
     @Query("SELECT * FROM diaries WHERE date = :date")
-    fun selectDiary(date: String): ListenableFuture<DiaryEntity>
+    suspend fun selectDiary(date: String): DiaryEntity
 
     @Query("SELECT * FROM diaries ORDER BY date DESC LIMIT 1 OFFSET 0")
-    fun selectNewestDiary(): ListenableFuture<DiaryEntity>
+    suspend fun selectNewestDiary(): DiaryEntity
 
     @Query("SELECT * FROM diaries ORDER BY date ASC LIMIT 1 OFFSET 0")
-    fun selectOldestDiary(): ListenableFuture<DiaryEntity>
+    suspend fun selectOldestDiary(): DiaryEntity
 
     @Query("SELECT date, title, picturePath FROM diaries ORDER BY date DESC LIMIT :num OFFSET :offset")
-    fun selectDiaryListOrderByDateDesc(
+    suspend fun selectDiaryListOrderByDateDesc(
         num: Int,
         offset: Int
-    ): ListenableFuture<List<DiaryListItem>>
+    ): List<DiaryListItem>
 
     @Query("SELECT date, title, picturePath FROM diaries WHERE date < :startDate ORDER BY date DESC LIMIT :num OFFSET :offset")
-    fun selectDiaryListOrderByDateDesc(
+    suspend fun selectDiaryListOrderByDateDesc(
         num: Int,
         offset: Int,
         startDate: String
-    ): ListenableFuture<List<DiaryListItem>>
+    ): List<DiaryListItem>
 
     @Query(
         ("SELECT COUNT(*) " +
@@ -59,7 +58,7 @@ interface DiaryDAO {
                 "OR item_5_title LIKE '%' || :word || '%'" +
                 "OR item_5_comment LIKE '%' || :word || '%'")
     )
-    fun countWordSearchResults(word: String): ListenableFuture<Int>
+    suspend fun countWordSearchResults(word: String): Int
 
     @Query(
         ("SELECT date, title, item_1_title, item_1_comment, " +
@@ -81,18 +80,18 @@ interface DiaryDAO {
                 "OR item_5_comment LIKE '%' || :word || '%'" +
                 "ORDER BY date DESC LIMIT :num OFFSET :offset")
     )
-    fun selectWordSearchResultListOrderByDateDesc(
+    suspend fun selectWordSearchResultListOrderByDateDesc(
         num: Int,
         offset: Int,
         word: String
-    ): ListenableFuture<List<WordSearchResultListItem>>
+    ): List<WordSearchResultListItem>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertDiary(diaryEntity: DiaryEntity): ListenableFuture<Long>
+    suspend fun insertDiary(diaryEntity: DiaryEntity)
 
     @Query("DELETE FROM diaries WHERE date = :date")
-    fun deleteDiary(date: String): ListenableFuture<Int>
+    suspend fun deleteDiary(date: String)
 
     @Query("DELETE FROM diaries")
-    fun deleteAllDiaries(): ListenableFuture<Int>
+    suspend fun deleteAllDiaries()
 }

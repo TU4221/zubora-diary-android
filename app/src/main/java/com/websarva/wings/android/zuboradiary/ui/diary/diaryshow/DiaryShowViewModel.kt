@@ -11,9 +11,9 @@ import com.websarva.wings.android.zuboradiary.ui.BaseViewModel
 import com.websarva.wings.android.zuboradiary.ui.checkNotNull
 import com.websarva.wings.android.zuboradiary.ui.diary.DiaryLiveData
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.runBlocking
 import java.time.LocalDate
 import java.time.LocalDateTime
-import java.util.concurrent.CancellationException
 import java.util.concurrent.ExecutionException
 import javax.inject.Inject
 
@@ -63,11 +63,10 @@ class DiaryShowViewModel @Inject constructor(private val diaryRepository: DiaryR
 
     fun existsSavedDiary(date: LocalDate): Boolean {
         try {
-            return diaryRepository.existsDiary(date).get()
-        } catch (e: ExecutionException) {
-            addAppMessage(AppMessage.DIARY_INFO_LOADING_ERROR)
-            return false
-        } catch (e: InterruptedException) {
+            return runBlocking {
+                diaryRepository.existsDiary(date)
+            }
+        } catch (e: Exception) {
             addAppMessage(AppMessage.DIARY_INFO_LOADING_ERROR)
             return false
         }
@@ -75,7 +74,10 @@ class DiaryShowViewModel @Inject constructor(private val diaryRepository: DiaryR
 
     fun loadSavedDiary(date: LocalDate) {
         try {
-            val diaryEntity = diaryRepository.loadDiary(date).get()
+            val diaryEntity =
+                runBlocking {
+                    diaryRepository.loadDiary(date)
+                }
             diaryLiveData.update(diaryEntity)
         } catch (e: Exception) {
             addAppMessage(AppMessage.DIARY_LOADING_ERROR)
@@ -84,22 +86,11 @@ class DiaryShowViewModel @Inject constructor(private val diaryRepository: DiaryR
 
     fun deleteDiary(): Boolean {
         val deleteDate = diaryLiveData.date.checkNotNull()
-        val result: Int
         try {
-            result = diaryRepository.deleteDiary(deleteDate).get()
-        } catch (e: CancellationException) {
-            addAppMessage(AppMessage.DIARY_DELETE_ERROR)
-            return false
-        } catch (e: ExecutionException) {
-            addAppMessage(AppMessage.DIARY_DELETE_ERROR)
-            return false
-        } catch (e: InterruptedException) {
-            addAppMessage(AppMessage.DIARY_DELETE_ERROR)
-            return false
-        }
-
-        // 削除件数 = 1が正常
-        if (result != 1) {
+            runBlocking {
+                diaryRepository.deleteDiary(deleteDate)
+            }
+        } catch (e: Exception) {
             addAppMessage(AppMessage.DIARY_DELETE_ERROR)
             return false
         }
@@ -110,7 +101,9 @@ class DiaryShowViewModel @Inject constructor(private val diaryRepository: DiaryR
     // MEMO:存在しないことを確認したいため下記メソッドを否定的処理とする
     fun checkSavedPicturePathDoesNotExist(uri: Uri): Boolean {
         try {
-            return !diaryRepository.existsPicturePath(uri).get()
+            return runBlocking {
+                !diaryRepository.existsPicturePath(uri)
+            }
         } catch (e: ExecutionException) {
             addAppMessage(AppMessage.DIARY_LOADING_ERROR)
             return false

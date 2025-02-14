@@ -4,12 +4,16 @@ import android.os.Handler
 import android.os.Looper
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.viewModelFactory
 import com.google.common.util.concurrent.FutureCallback
 import com.google.common.util.concurrent.Futures
 import com.websarva.wings.android.zuboradiary.data.AppMessage
 import com.websarva.wings.android.zuboradiary.data.database.DiaryRepository
 import com.websarva.wings.android.zuboradiary.ui.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import java.time.LocalDate
 import java.util.concurrent.Executor
 import javax.inject.Inject
@@ -42,22 +46,20 @@ internal class CalendarViewModel @Inject constructor(private val diaryRepository
         }
     }
 
-    fun existsSavedDiary(date: LocalDate, futureCallback: FutureCallback<Boolean>) {
-        val hasDiaryListenableFuture = diaryRepository.existsDiary(date)
-        Futures.addCallback(hasDiaryListenableFuture, futureCallback, MainThreadExecutor())
-        Futures.addCallback(hasDiaryListenableFuture, object : FutureCallback<Boolean?> {
-            override fun onSuccess(result: Boolean?) {
-                // 処理なし
-            }
+    fun existsSavedDiary(date: LocalDate, callback: ViewModelCallback<Boolean>) {
+        viewModelScope.launch {
+            try {
+                val existsDiary = diaryRepository.existsDiary(date)
+                callback.onSuccess(existsDiary)
+            } catch (e: Exception) {
+                callback.onFailure(e)
 
-            override fun onFailure(t: Throwable) {
                 // MEMO:CalendarViewModel#hasDiary()はカレンダー日数分連続で処理する為、
                 //      エラーが連続で発生した場合、膨大なエラーを記録してしまう。これを回避する為に下記コードを記述。
-                if (equalLastAppMessage(AppMessage.DIARY_INFO_LOADING_ERROR)) return
-
+                if (equalLastAppMessage(AppMessage.DIARY_INFO_LOADING_ERROR)) return@launch
                 addAppMessage(AppMessage.DIARY_INFO_LOADING_ERROR)
             }
-        }, MainThreadExecutor())
+        }
     }
 
     fun updateSelectedDate(date: LocalDate) {

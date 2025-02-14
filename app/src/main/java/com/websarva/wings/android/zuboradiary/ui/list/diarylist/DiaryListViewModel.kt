@@ -10,6 +10,7 @@ import com.websarva.wings.android.zuboradiary.data.database.DiaryRepository
 import com.websarva.wings.android.zuboradiary.ui.BaseViewModel
 import com.websarva.wings.android.zuboradiary.ui.checkNotNull
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.runBlocking
 import java.time.LocalDate
 import java.time.YearMonth
 import java.time.temporal.TemporalAdjusters
@@ -198,15 +199,18 @@ class DiaryListViewModel @Inject constructor(private val diaryRepository: DiaryR
         require(loadingOffset >= 0)
 
 
-        val listListenableFuture =
-            diaryRepository.loadDiaryList(
-                numLoadingItems,
-                loadingOffset,
-                sortConditionDate
-            )
 
-        val loadedDiaryList = listListenableFuture.get()
+        val loadedDiaryList =
+            runBlocking {
+                diaryRepository.loadDiaryList(
+                    numLoadingItems,
+                    loadingOffset,
+                    sortConditionDate
+                )
+            }
+
         if (loadedDiaryList.isEmpty()) return DiaryYearMonthList()
+
         val diaryDayListItemList: MutableList<DiaryDayListItem> = ArrayList()
         loadedDiaryList.stream().forEach { x: DiaryListItem ->
             diaryDayListItemList.add(
@@ -224,13 +228,17 @@ class DiaryListViewModel @Inject constructor(private val diaryRepository: DiaryR
         InterruptedException::class
     )
     private fun existsUnloadedDiaries(numLoadedDiaries: Int): Boolean {
-        val numExistingDiaries = if (sortConditionDate == null) {
-            diaryRepository.countDiaries().get()
-        } else {
-            diaryRepository.countDiaries(
-                checkNotNull(sortConditionDate)
-            ).get()
-        }
+        val numExistingDiaries =
+            runBlocking {
+                if (sortConditionDate == null) {
+                    diaryRepository.countDiaries()
+                } else {
+                    diaryRepository.countDiaries(
+                        checkNotNull(sortConditionDate)
+                    )
+                }
+            }
+
         if (numExistingDiaries <= 0) return false
 
         return numLoadedDiaries < numExistingDiaries
@@ -241,22 +249,11 @@ class DiaryListViewModel @Inject constructor(private val diaryRepository: DiaryR
     }
 
     fun deleteDiary(date: LocalDate): Boolean {
-        val result: Int
         try {
-            result = diaryRepository.deleteDiary(date).get()
-        } catch (e: CancellationException) {
-            addAppMessage(AppMessage.DIARY_DELETE_ERROR)
-            return false
-        } catch (e: ExecutionException) {
-            addAppMessage(AppMessage.DIARY_DELETE_ERROR)
-            return false
-        } catch (e: InterruptedException) {
-            addAppMessage(AppMessage.DIARY_DELETE_ERROR)
-            return false
-        }
-
-        // 削除件数 = 1が正常
-        if (result != 1) {
+            runBlocking {
+                diaryRepository.deleteDiary(date)
+            }
+        } catch (e: Exception) {
             addAppMessage(AppMessage.DIARY_DELETE_ERROR)
             return false
         }
@@ -268,11 +265,10 @@ class DiaryListViewModel @Inject constructor(private val diaryRepository: DiaryR
     // MEMO:存在しないことを確認したいため下記メソッドを否定的処理とする
     fun checkSavedPicturePathDoesNotExist(uri: Uri): Boolean {
         try {
-            return !diaryRepository.existsPicturePath(uri).get()
-        } catch (e: ExecutionException) {
-            addAppMessage(AppMessage.DIARY_LOADING_ERROR)
-            return false
-        } catch (e: InterruptedException) {
+            return runBlocking {
+                !diaryRepository.existsPicturePath(uri)
+            }
+        } catch (e: Exception) {
             addAppMessage(AppMessage.DIARY_LOADING_ERROR)
             return false
         }
@@ -280,14 +276,10 @@ class DiaryListViewModel @Inject constructor(private val diaryRepository: DiaryR
 
     fun countSavedDiaries(): Int? {
         try {
-            return diaryRepository.countDiaries().get()
-        } catch (e: CancellationException) {
-            addAppMessage(AppMessage.DIARY_INFO_LOADING_ERROR)
-            return null
-        } catch (e: ExecutionException) {
-            addAppMessage(AppMessage.DIARY_INFO_LOADING_ERROR)
-            return null
-        } catch (e: InterruptedException) {
+            return runBlocking {
+                diaryRepository.countDiaries()
+            }
+        } catch (e: Exception) {
             addAppMessage(AppMessage.DIARY_INFO_LOADING_ERROR)
             return null
         }
@@ -296,7 +288,10 @@ class DiaryListViewModel @Inject constructor(private val diaryRepository: DiaryR
 
     fun loadNewestSavedDiary(): LocalDate? {
         try {
-            val diaryEntity = diaryRepository.loadNewestDiary().get()
+            val diaryEntity =
+                runBlocking {
+                    diaryRepository.loadNewestDiary()
+                }
             val strDate = diaryEntity.date
             return LocalDate.parse(strDate)
         } catch (e: Exception) {
@@ -307,7 +302,10 @@ class DiaryListViewModel @Inject constructor(private val diaryRepository: DiaryR
 
     fun loadOldestSavedDiary(): LocalDate? {
         try {
-            val diaryEntity = diaryRepository.loadOldestDiary().get()
+            val diaryEntity =
+                runBlocking {
+                    diaryRepository.loadOldestDiary()
+                }
             val strDate = diaryEntity.date
             return LocalDate.parse(strDate)
         } catch (e: Exception) {

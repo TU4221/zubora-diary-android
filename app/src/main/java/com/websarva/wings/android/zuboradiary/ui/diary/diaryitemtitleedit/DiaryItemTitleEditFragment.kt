@@ -210,8 +210,8 @@ class DiaryItemTitleEditFragment : BaseFragment() {
 
         // 選択履歴読込・表示
         diaryItemTitleEditViewModel.apply {
-            loadDiaryItemTitleSelectionHistory()
-            itemTitleSelectionHistoryLiveData
+            //loadDiaryItemTitleSelectionHistory()
+            itemTitleSelectionHistoryList
                 .observe(viewLifecycleOwner) { selectionHistoryList: SelectionHistoryList ->
                     val adapter =
                         checkNotNull(

@@ -20,6 +20,7 @@ import com.websarva.wings.android.zuboradiary.R
 import com.websarva.wings.android.zuboradiary.data.database.DiaryRepository
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
+import kotlinx.coroutines.runBlocking
 import java.time.LocalDate
 
 @HiltWorker
@@ -76,8 +77,10 @@ class ReminderNotificationWorker @AssistedInject constructor(
 
     @Throws(Exception::class)
     private fun existsSavedTodayDiary(): Boolean {
-        val listenableFuture = diaryRepository.existsDiary(LocalDate.now())
-        val result = listenableFuture.get() ?: return false
+        val result =
+            runBlocking {
+                diaryRepository.existsDiary(LocalDate.now())
+            }
         Log.d("NotificationWorker", "hasWriteTodayDiary():$result")
         return result
     }
