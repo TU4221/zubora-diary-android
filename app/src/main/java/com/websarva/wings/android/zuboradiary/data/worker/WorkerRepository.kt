@@ -4,7 +4,6 @@ import android.util.Log
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.PeriodicWorkRequest
 import androidx.work.WorkManager
-import com.websarva.wings.android.zuboradiary.worker.ReminderNotificationWorker
 import java.time.LocalTime
 import java.time.temporal.ChronoUnit
 import java.util.concurrent.TimeUnit
@@ -12,8 +11,8 @@ import javax.inject.Inject
 
 class WorkerRepository @Inject constructor(private val workManager: WorkManager) {
 
-    private val workTagReminderNotification = "ReminderNotification"
-    private val uniqueWorkNameReminderNotification = workTagReminderNotification
+    private val reminderNotificationWorkTag = "ReminderNotification"
+    private val reminderNotificationUniqueWorkName = reminderNotificationWorkTag
 
     fun registerReminderNotificationWorker(settingTime: LocalTime) {
         cancelReminderNotificationWorker()
@@ -24,11 +23,11 @@ class WorkerRepository @Inject constructor(private val workManager: WorkManager)
         val request =
             PeriodicWorkRequest
                 .Builder(ReminderNotificationWorker::class.java, 1, TimeUnit.DAYS)
-                .addTag(workTagReminderNotification)
+                .addTag(reminderNotificationWorkTag)
                 .setInitialDelay(initialDelaySeconds, TimeUnit.SECONDS)
                 .build()
         workManager.enqueueUniquePeriodicWork(
-            uniqueWorkNameReminderNotification,
+            reminderNotificationUniqueWorkName,
             ExistingPeriodicWorkPolicy.CANCEL_AND_REENQUEUE,
             request
         )
@@ -44,8 +43,8 @@ class WorkerRepository @Inject constructor(private val workManager: WorkManager)
 
     fun cancelReminderNotificationWorker() {
         workManager.apply {
-            cancelAllWorkByTag(workTagReminderNotification)
-            cancelUniqueWork(uniqueWorkNameReminderNotification)
+            cancelAllWorkByTag(reminderNotificationWorkTag)
+            cancelUniqueWork(reminderNotificationUniqueWorkName)
         }
 
     }

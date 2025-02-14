@@ -1,4 +1,4 @@
-package com.websarva.wings.android.zuboradiary.worker
+package com.websarva.wings.android.zuboradiary.data.worker
 
 import android.Manifest
 import android.app.Notification
@@ -28,6 +28,7 @@ class ReminderNotificationWorker @AssistedInject constructor(
     @Assisted workerParams: WorkerParameters,
     private val diaryRepository: DiaryRepository
 ) : Worker(context, workerParams) {
+
     private val channelId: String = context.getString(R.string.reminder_notification_worker_channel_id)
     private val channelName: String = context.getString(R.string.reminder_notification_worker_channel_name)
     private val channelDescription: String = context.getString(R.string.reminder_notification_worker_channel_description)
@@ -37,22 +38,6 @@ class ReminderNotificationWorker @AssistedInject constructor(
 
     init {
         prepareNotificationManager()
-    }
-
-    override fun doWork(): Result {
-        val application = applicationContext as CustomApplication
-        val isAppInForeground = application.isAppInForeground
-
-        if (isAppInForeground) return Result.success()
-        val hasWriteTodayDiary: Boolean
-        try {
-            hasWriteTodayDiary = existsSavedTodayDiary()
-        } catch (e: Exception) {
-            Log.d("Exception", "本日付日記保存済み確認失敗", e)
-            return Result.failure()
-        }
-        if (hasWriteTodayDiary) return Result.success()
-        return showHeadsUpNotification()
     }
 
     private fun prepareNotificationManager() {
@@ -71,6 +56,22 @@ class ReminderNotificationWorker @AssistedInject constructor(
                     }
             notificationManager.createNotificationChannel(channel)
         }
+    }
+
+    override fun doWork(): Result {
+        val application = applicationContext as CustomApplication
+        if (application.isAppInForeground) return Result.success()
+
+        val hasWriteTodayDiary: Boolean
+        try {
+            hasWriteTodayDiary = existsSavedTodayDiary()
+        } catch (e: Exception) {
+            Log.d("Exception", "本日付日記保存済み確認失敗", e)
+            return Result.failure()
+        }
+        if (hasWriteTodayDiary) return Result.success()
+
+        return showHeadsUpNotification()
     }
 
     @Throws(Exception::class)
@@ -97,14 +98,15 @@ class ReminderNotificationWorker @AssistedInject constructor(
 
         if (!isPermission) return Result.failure()
 
+        val builder =
+            NotificationCompat.Builder(applicationContext, channelId)
+
         val pendingIntent =
             NavDeepLinkBuilder(applicationContext)
                 .setGraph(R.navigation.mobile_navigation)
                 .setDestination(R.id.navigation_diary_list_fragment)
                 .createPendingIntent()
 
-        val builder =
-            NotificationCompat.Builder(applicationContext, channelId)
         val notification =
             builder.setSmallIcon(R.drawable.ic_notifications_24px)
                 .setContentTitle(channelTitle)
@@ -115,9 +117,8 @@ class ReminderNotificationWorker @AssistedInject constructor(
                 .setAutoCancel(true)
                 .build()
 
-        val notificationManager =
-            NotificationManagerCompat.from(applicationContext)
-        notificationManager.notify(notifyId, notification)
+        val notificationManagerCompat = NotificationManagerCompat.from(applicationContext)
+        notificationManagerCompat.notify(notifyId, notification)
         return Result.success()
     }
 }

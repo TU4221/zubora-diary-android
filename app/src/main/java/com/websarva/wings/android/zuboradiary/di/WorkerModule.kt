@@ -12,6 +12,7 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object WorkerModule {
+
     @JvmStatic
     @Singleton
     @Provides
