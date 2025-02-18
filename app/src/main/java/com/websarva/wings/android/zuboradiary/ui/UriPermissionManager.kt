@@ -20,10 +20,10 @@ abstract class UriPermissionManager(context: Context) {
     /**
      * 対象Uriが他で使用されていないかを確認するコードを記述すること。権限解放時、このメソッドが処理される。
      */
-    abstract fun checkUsedUriDoesNotExist(uri: Uri): Boolean
+    abstract suspend fun checkUsedUriDoesNotExist(uri: Uri): Boolean?
 
     // MEMO:Uri先のファイルを削除すると、登録されていたUriPermissionも同時に削除される。
-    fun releasePersistablePermission(uri: Uri) {
+    suspend fun releasePersistablePermission(uri: Uri) {
         val permissionList = resolver.persistedUriPermissions
         for (uriPermission in permissionList) {
             val permittedUri = uriPermission.uri
@@ -31,7 +31,7 @@ abstract class UriPermissionManager(context: Context) {
             val targetUriString = uri.toString()
 
             if (permittedUriString == targetUriString) {
-                if (!checkUsedUriDoesNotExist(uri)) return
+                if (!(checkUsedUriDoesNotExist(uri) ?: return)) return
 
                 resolver.releasePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION)
                 return

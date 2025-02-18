@@ -12,6 +12,7 @@ import androidx.databinding.ViewDataBinding
 import androidx.lifecycle.Observer
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import com.websarva.wings.android.zuboradiary.R
 import com.websarva.wings.android.zuboradiary.data.AppMessage
@@ -23,8 +24,10 @@ import com.websarva.wings.android.zuboradiary.ui.list.DiaryDayListBaseItem
 import com.websarva.wings.android.zuboradiary.ui.list.DiaryYearMonthListBaseAdapter.OnClickChildItemListener
 import com.websarva.wings.android.zuboradiary.ui.list.DiaryYearMonthListBaseItem
 import com.websarva.wings.android.zuboradiary.ui.list.SwipeDiaryYearMonthListBaseAdapter.OnClickChildItemBackgroundButtonListener
-import com.websarva.wings.android.zuboradiary.ui.notNullValue
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.time.LocalDate
 import java.time.Year
 import java.time.YearMonth
@@ -46,7 +49,7 @@ class DiaryListFragment : BaseFragment() {
 
         pictureUriPermissionManager =
             object : UriPermissionManager(requireContext()) {
-                override fun checkUsedUriDoesNotExist(uri: Uri): Boolean {
+                override suspend fun checkUsedUriDoesNotExist(uri: Uri): Boolean? {
                     return diaryListViewModel.checkSavedPicturePathDoesNotExist(uri)
                 }
             }
@@ -114,32 +117,34 @@ class DiaryListFragment : BaseFragment() {
             receiveResulFromDialog<LocalDate>(DiaryDeleteDialogFragment.KEY_DELETE_DIARY_DATE)
                 ?: return
 
-        val isSuccessful = diaryListViewModel.deleteDiary(deleteDiaryDate)
-        if (!isSuccessful) return
+        lifecycleScope.launch(Dispatchers.IO) {
+            val isSuccessful = diaryListViewModel.deleteDiary(deleteDiaryDate)
+            if (!isSuccessful) return@launch
 
-        val deleteDiaryPictureUri =
-            receiveResulFromDialog<Uri>(DiaryDeleteDialogFragment.KEY_DELETE_DIARY_PICTURE_URI)
-                ?: return
-        releasePersistableLoadedPictureUriPermission(deleteDiaryPictureUri)
-    }
-
-    private fun releasePersistableLoadedPictureUriPermission(uri: Uri) {
-        pictureUriPermissionManager.releasePersistablePermission(uri)
+            val deleteDiaryPictureUri =
+                receiveResulFromDialog<Uri>(DiaryDeleteDialogFragment.KEY_DELETE_DIARY_PICTURE_URI)
+                    ?: return@launch
+            pictureUriPermissionManager.releasePersistablePermission(deleteDiaryPictureUri)
+        }
     }
 
     // ツールバー設定
     private fun setUpToolBar() {
         binding.materialToolbarTopAppBar
             .setNavigationOnClickListener {
-                // リスト先頭年月切り替えダイアログ起動
-                val newestDiaryDate = diaryListViewModel.loadNewestSavedDiary()
-                val oldestDiaryDate = diaryListViewModel.loadOldestSavedDiary()
-                if (newestDiaryDate == null) return@setNavigationOnClickListener
-                if (oldestDiaryDate == null) return@setNavigationOnClickListener
+                lifecycleScope.launch(Dispatchers.IO) {
+                    // リスト先頭年月切り替えダイアログ起動
+                    val newestDiaryDate = diaryListViewModel.loadNewestSavedDiaryDate()
+                    val oldestDiaryDate = diaryListViewModel.loadOldestSavedDiaryDate()
+                    if (newestDiaryDate == null) return@launch
+                    if (oldestDiaryDate == null) return@launch
 
-                val newestYear = Year.of(newestDiaryDate.year)
-                val oldestYear = Year.of(oldestDiaryDate.year)
-                showStartYearMonthPickerDialog(newestYear, oldestYear)
+                    val newestYear = Year.of(newestDiaryDate.year)
+                    val oldestYear = Year.of(oldestDiaryDate.year)
+                    withContext(Dispatchers.Main) {
+                        showStartYearMonthPickerDialog(newestYear, oldestYear)
+                    }
+                }
             }
 
         binding.materialToolbarTopAppBar
@@ -188,7 +193,7 @@ class DiaryListFragment : BaseFragment() {
                 true
             }
 
-        loadDiaryList()
+        diaryListViewModel.loadDiaryListOnSetUp()
     }
 
     private inner class DiaryListAdapter(
@@ -233,18 +238,6 @@ class DiaryListFragment : BaseFragment() {
             val convertedItemList: List<DiaryYearMonthListBaseItem> = list.diaryYearMonthListItemList
             val listAdapter = binding.recyclerDiaryList.adapter as DiaryYearMonthListAdapter
             listAdapter.submitList(convertedItemList)
-        }
-    }
-
-    private fun loadDiaryList() {
-        val diaryList = diaryListViewModel.diaryList.notNullValue()
-
-        if (diaryList.diaryYearMonthListItemList.isEmpty()) {
-            val numSavedDiaries = diaryListViewModel.countSavedDiaries() ?: return
-
-            if (numSavedDiaries >= 1) diaryListViewModel.loadNewDiaryList()
-        } else {
-            diaryListViewModel.updateDiaryList()
         }
     }
 

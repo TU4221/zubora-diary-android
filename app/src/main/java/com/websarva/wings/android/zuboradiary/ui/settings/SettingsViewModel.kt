@@ -19,6 +19,7 @@ import com.websarva.wings.android.zuboradiary.data.preferences.WeatherInfoAcquis
 import com.websarva.wings.android.zuboradiary.data.worker.WorkerRepository
 import com.websarva.wings.android.zuboradiary.ui.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
@@ -134,26 +135,18 @@ class SettingsViewModel @Inject constructor(
     }
 
     private fun interface SettingLoadingProcess {
-        @Throws(
-            IOException::class,
-            Exception::class
-        )
-        suspend fun load()
+        @Throws(Throwable::class)
+        fun load()
     }
 
     private fun loadSettingValue(
         loadingProcess: SettingLoadingProcess
     ) {
-        viewModelScope.launch {
-            try {
-                loadingProcess.load()
-            } catch (e: IOException) {
-                Log.d("Exception", "設定値読込失敗", e)
-                addSettingLoadingErrorMessage()
-            } catch (e: Exception) {
-                Log.d("Exception", "設定値読込失敗", e)
-                addSettingLoadingErrorMessage()
-            }
+        try {
+            loadingProcess.load()
+        } catch (e: Throwable) {
+            Log.d("Exception", "設定値読込失敗", e)
+            addSettingLoadingErrorMessage()
         }
     }
 
@@ -276,7 +269,7 @@ class SettingsViewModel @Inject constructor(
     private fun updateSettingValue(
         updateProcess: SettingUpdateProcess
     ) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             try {
                 updateProcess.update()
             } catch (e: IOException) {
@@ -303,13 +296,13 @@ class SettingsViewModel @Inject constructor(
         _geoCoordinates.value = null
     }
 
-    fun deleteAllDiaries() {
+    suspend fun deleteAllDiaries(): Boolean {
         try {
-            runBlocking {
-                diaryRepository.deleteAllDiaries()
-            }
+            diaryRepository.deleteAllDiaries()
+            return true
         } catch (e: Exception) {
             addAppMessage(AppMessage.DIARY_DELETE_ERROR)
+            return false
         }
     }
 
@@ -320,7 +313,7 @@ class SettingsViewModel @Inject constructor(
     }
 
     fun deleteAllData() {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             try {
                 diaryRepository.deleteAllData()
             } catch (e: CancellationException) {

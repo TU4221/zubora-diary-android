@@ -4,8 +4,6 @@ import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.Transaction
 import java.time.LocalDate
-import java.util.concurrent.ExecutorService
-import java.util.concurrent.Executors
 
 // MEMO:テーブル構成変更手順
 //      https://qiita.com/kazuma_f/items/8c15e7087623e8f6706b

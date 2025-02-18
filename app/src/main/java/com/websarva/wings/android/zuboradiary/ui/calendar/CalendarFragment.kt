@@ -9,6 +9,7 @@ import androidx.activity.OnBackPressedCallback
 import androidx.databinding.ViewDataBinding
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import com.kizitonwose.calendar.core.CalendarDay
 import com.kizitonwose.calendar.core.CalendarMonth
 import com.kizitonwose.calendar.core.DayPosition
@@ -23,7 +24,6 @@ import com.websarva.wings.android.zuboradiary.databinding.FragmentCalendarBindin
 import com.websarva.wings.android.zuboradiary.databinding.LayoutCalendarDayBinding
 import com.websarva.wings.android.zuboradiary.databinding.LayoutCalendarHeaderBinding
 import com.websarva.wings.android.zuboradiary.ui.BaseFragment
-import com.websarva.wings.android.zuboradiary.ui.BaseViewModel
 import com.websarva.wings.android.zuboradiary.ui.diary.diaryshow.DiaryShowFragment
 import com.websarva.wings.android.zuboradiary.ui.diary.diaryshow.DiaryShowFragment.ConditionObserver
 import com.websarva.wings.android.zuboradiary.ui.diary.diaryshow.DiaryShowFragment.LogObserver
@@ -31,7 +31,9 @@ import com.websarva.wings.android.zuboradiary.ui.diary.diaryshow.DiaryShowFragme
 import com.websarva.wings.android.zuboradiary.ui.diary.diaryshow.DiaryShowFragment.Weather2Observer
 import com.websarva.wings.android.zuboradiary.ui.diary.diaryshow.DiaryShowViewModel
 import dagger.hilt.android.AndroidEntryPoint
-import java.lang.Exception
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.YearMonth
@@ -243,24 +245,17 @@ class CalendarFragment : BaseFragment() {
 
         fun setUpCalendarDayDotVisibility(calendarDay: CalendarDay, viewCalendarDayDot: View) {
             val localDate = calendarDay.date
-            calendarViewModel
-                .existsSavedDiary(
-                    localDate,
-                    object : BaseViewModel.ViewModelCallback<Boolean>() {
-                        override fun onSuccess(result: Boolean) {
-                            if (result) {
-                                viewCalendarDayDot.visibility = View.VISIBLE
-                            } else {
-                                viewCalendarDayDot.visibility = View.INVISIBLE
-                            }
-                        }
 
-                        override fun onFailure(exception: Exception) {
-                            // 例外はViewModelクラス内で例外用リスナーを追加して対応
-                            viewCalendarDayDot.visibility = View.INVISIBLE
-                        }
+            lifecycleScope.launch(Dispatchers.IO) {
+                val exists = calendarViewModel.existsSavedDiary(localDate)
+                withContext(Dispatchers.Main) {
+                    if (exists == true) {
+                        viewCalendarDayDot.visibility = View.VISIBLE
+                    } else {
+                        viewCalendarDayDot.visibility = View.INVISIBLE
                     }
-                )
+                }
+            }
         }
 
         override fun create(view: View): DayViewContainer {
@@ -369,42 +364,41 @@ class CalendarFragment : BaseFragment() {
 
     // CalendarViewで選択された日付の日記を表示
     private fun showSelectedDiary(date: LocalDate) {
-        calendarViewModel.existsSavedDiary(date, DiaryShowFutureCallback(date))
+        lifecycleScope.launch(Dispatchers.IO) {
+            val exists = calendarViewModel.existsSavedDiary(date)
+            withContext(Dispatchers.Main) {
+                if (exists == true) {
+                    showDiary(date)
+                } else {
+                    closeDiary()
+                }
+            }
+        }
     }
 
-    private inner class DiaryShowFutureCallback(
-        private val date: LocalDate
-    ): BaseViewModel.ViewModelCallback<Boolean>() {
-
-        override fun onSuccess(result: Boolean) {
-            if (result) {
-                showDiary()
-            } else {
-                closeDiary()
+    private fun showDiary(date: LocalDate) {
+        diaryShowViewModel.initialize()
+        lifecycleScope.launch(Dispatchers.IO) {
+            val isSuccessful = diaryShowViewModel.loadSavedDiary(date)
+            withContext(Dispatchers.Main) {
+                if (isSuccessful) {
+                    binding.apply {
+                        frameLayoutDiaryShow.visibility = View.VISIBLE
+                        textNoDiaryMessage.visibility = View.GONE
+                    }
+                } else {
+                    closeDiary()
+                }
             }
         }
+    }
 
-        override fun onFailure(exception: Exception) {
-            // 例外はViewModelクラス内で例外用リスナーを追加して対応
-            closeDiary()
+    private fun closeDiary() {
+        binding.apply {
+            frameLayoutDiaryShow.visibility = View.GONE
+            textNoDiaryMessage.visibility = View.VISIBLE
         }
-
-        fun showDiary() {
-            diaryShowViewModel.initialize()
-            diaryShowViewModel.loadSavedDiary(date)
-            binding.apply {
-                frameLayoutDiaryShow.visibility = View.VISIBLE
-                textNoDiaryMessage.visibility = View.GONE
-            }
-        }
-
-        fun closeDiary() {
-            binding.apply {
-                frameLayoutDiaryShow.visibility = View.GONE
-                textNoDiaryMessage.visibility = View.VISIBLE
-            }
-            diaryShowViewModel.initialize()
-        }
+        diaryShowViewModel.initialize()
     }
 
     private fun setUpDiaryShow() {

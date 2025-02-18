@@ -21,6 +21,7 @@ import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
 import androidx.databinding.ViewDataBinding
 import androidx.lifecycle.SavedStateHandle
+import androidx.lifecycle.lifecycleScope
 import com.websarva.wings.android.zuboradiary.R
 import com.websarva.wings.android.zuboradiary.data.AppMessage
 import com.websarva.wings.android.zuboradiary.data.DateTimeStringConverter
@@ -30,6 +31,8 @@ import com.websarva.wings.android.zuboradiary.databinding.FragmentSettingsBindin
 import com.websarva.wings.android.zuboradiary.ui.BaseFragment
 import com.websarva.wings.android.zuboradiary.ui.UriPermissionManager
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import java.time.DayOfWeek
 import java.time.LocalTime
 
@@ -103,7 +106,7 @@ class SettingsFragment : BaseFragment() {
 
         uriPermissionManager =
             object : UriPermissionManager(requireContext()) {
-                override fun checkUsedUriDoesNotExist(uri: Uri): Boolean {
+                override suspend fun checkUsedUriDoesNotExist(uri: Uri): Boolean {
                     return false // MEMO:本フラグメントではUri権限を個別に解放しないため常時false
                 }
             }
@@ -220,8 +223,10 @@ class SettingsFragment : BaseFragment() {
             receiveResulFromDialog<Int>(AllDiariesDeleteDialogFragment.KEY_SELECTED_BUTTON) ?: return
         if (selectedButton != Dialog.BUTTON_POSITIVE) return
 
-        settingsViewModel.deleteAllDiaries()
-        uriPermissionManager.releaseAllPersistablePermission()
+        lifecycleScope.launch(Dispatchers.IO) {
+            val isSuccessful = settingsViewModel.deleteAllDiaries()
+            if (isSuccessful) uriPermissionManager.releaseAllPersistablePermission()
+        }
     }
 
     private fun receiveAllSettingsInitializationDialogResult() {

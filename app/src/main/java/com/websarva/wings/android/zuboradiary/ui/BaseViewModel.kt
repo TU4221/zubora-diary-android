@@ -55,9 +55,4 @@ abstract class BaseViewModel : ViewModel() {
         val currentList = checkNotNull(_appMessageBufferList.value)
         return currentList.equalLastItem(appMessage)
     }
-
-    abstract class ViewModelCallback<T> {
-        abstract fun onSuccess(result: T)
-        abstract fun onFailure(exception: Exception)
-    }
 }

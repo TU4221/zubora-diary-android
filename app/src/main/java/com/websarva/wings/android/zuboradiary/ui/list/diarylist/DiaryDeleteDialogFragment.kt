@@ -39,7 +39,7 @@ class DiaryDeleteDialogFragment : BaseAlertDialogFragment() {
             DiaryDeleteDialogFragmentArgs.fromBundle(requireArguments()).pictureUri
         setResult(
             KEY_DELETE_DIARY_PICTURE_URI,
-            deleteDiaryPictureUri!!
+            deleteDiaryPictureUri
         )
     }
 

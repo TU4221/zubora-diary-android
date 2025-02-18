@@ -10,6 +10,7 @@ import com.websarva.wings.android.zuboradiary.data.diary.ItemNumber
 import com.websarva.wings.android.zuboradiary.ui.BaseViewModel
 import com.websarva.wings.android.zuboradiary.ui.notNullValue
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -74,7 +75,7 @@ class DiaryItemTitleEditViewModel @Inject constructor(
         val listSize = currentList.selectionHistoryListItemList.size
         require(deletePosition < listSize)
 
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             val deleteItem = currentList.selectionHistoryListItemList[deletePosition]
             val deleteTitle = deleteItem.title
             try {

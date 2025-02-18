@@ -1,9 +1,11 @@
 package com.websarva.wings.android.zuboradiary.ui.diary.diaryedit
 
 import android.net.Uri
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.websarva.wings.android.zuboradiary.data.AppMessage
+import com.websarva.wings.android.zuboradiary.data.database.DiaryEntity
 import com.websarva.wings.android.zuboradiary.data.database.DiaryRepository
 import com.websarva.wings.android.zuboradiary.data.diary.Condition
 import com.websarva.wings.android.zuboradiary.data.diary.ItemNumber
@@ -16,11 +18,9 @@ import com.websarva.wings.android.zuboradiary.ui.BaseViewModel
 import com.websarva.wings.android.zuboradiary.ui.checkNotNull
 import com.websarva.wings.android.zuboradiary.ui.diary.DiaryLiveData
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.runBlocking
 import retrofit2.Call
 import java.time.LocalDate
 import java.time.temporal.ChronoUnit
-import java.util.concurrent.CancellationException
 import java.util.concurrent.ExecutionException
 import java.util.concurrent.Executors
 import javax.inject.Inject
@@ -146,13 +146,6 @@ class DiaryEditViewModel @Inject constructor(
             return !isLoadedDateEqualToInputDate
         }
 
-    val shouldShowUpdateConfirmationDialog: Boolean
-        get() {
-            if (isLoadedDateEqualToInputDate) return false
-            val inputDate = checkNotNull(diaryLiveData.date.value)
-            return existsSavedDiary(inputDate)
-        }
-
     private val isLoadedDateEqualToInputDate: Boolean
         get() {
             val loadedDate = _loadedDate.value ?: return false
@@ -186,101 +179,87 @@ class DiaryEditViewModel @Inject constructor(
         isShowingItemTitleEditFragment = false
     }
 
-    fun prepareDiary(date: LocalDate, requiresDiaryLoading: Boolean) {
-        if (requiresDiaryLoading) {
+    suspend fun prepareDiary(date: LocalDate, shouldLoadDiary: Boolean): Boolean {
+        if (shouldLoadDiary) {
             try {
                 loadSavedDiary(date)
             } catch (e: NoSuchElementException) {
                 updateDate(date)
-            } catch (e: CancellationException) {
+            } catch (e: Exception) {
                 addAppMessage(AppMessage.DIARY_LOADING_ERROR)
-                return
-            } catch (e: ExecutionException) {
-                addAppMessage(AppMessage.DIARY_LOADING_ERROR)
-                return
-            } catch (e: InterruptedException) {
-                addAppMessage(AppMessage.DIARY_LOADING_ERROR)
-                return
+                return false
             }
         } else {
             updateDate(date)
         }
         hasPreparedDiary = true
+        return true
     }
 
-    @Throws(
-        CancellationException::class,
-        ExecutionException::class,
-        InterruptedException::class,
-        NoSuchElementException::class
-    )
-    private fun loadSavedDiary(date: LocalDate) {
-        val diaryEntity =
-            runBlocking {
-                diaryRepository.loadDiary(date)
-            }
-
-        // HACK:下記はDiaryLiveData#update()処理よりも前に処理すること。
-        //      (後で処理するとDiaryLiveDataのDateのObserverがloadedDateの更新よりも先に処理される為)
-        _loadedDate.value = date
-
-        diaryLiveData.update(diaryEntity)
-        _loadedPicturePath.value = diaryLiveData.picturePath.value
-    }
-
-    fun existsSavedDiary(date: LocalDate): Boolean {
+    @Throws(Exception::class)
+    private suspend fun loadSavedDiary(date: LocalDate): Boolean {
+        val diaryEntity: DiaryEntity
         try {
-            return runBlocking {
-                diaryRepository.existsDiary(date)
-            }
-        } catch (e: ExecutionException) {
+            diaryEntity = diaryRepository.loadDiary(date)
+
+            // HACK:下記はDiaryLiveData#update()処理よりも前に処理すること。
+            //      (後で処理するとDiaryLiveDataのDateのObserverがloadedDateの更新よりも先に処理される為)
+            _loadedDate.postValue(date)
+
+            diaryLiveData.update(diaryEntity)
+            _loadedPicturePath.postValue(diaryLiveData.picturePath.value)
+
+            return true
+        } catch (e: Exception) {
+            Log.d("Exception", "loadSavedDiary()" , e)
             addAppMessage(AppMessage.DIARY_LOADING_ERROR)
             return false
-        } catch (e: InterruptedException) {
+        }
+    }
+
+    suspend fun existsSavedDiary(date: LocalDate): Boolean? {
+        try {
+            return diaryRepository.existsDiary(date)
+        } catch (e: Exception) {
             addAppMessage(AppMessage.DIARY_LOADING_ERROR)
-            return false
+            return null
         }
     }
 
     // TODO:TestDiariesSaverクラス削除後、public削除。
-    fun saveDiary(): Boolean {
-        return runBlocking {
-            val diaryEntity = diaryLiveData.createDiaryEntity()
-            val diaryItemTitleSelectionHistoryItemEntityList =
-                diaryLiveData.createDiaryItemTitleSelectionHistoryItemEntityList()
-            try {
-                if (shouldDeleteLoadedDateDiary) {
-                    diaryRepository
-                        .deleteAndSaveDiary(
-                            _loadedDate.checkNotNull(),
-                            diaryEntity,
-                            diaryItemTitleSelectionHistoryItemEntityList
-                        )
-                } else {
-                    diaryRepository
-                        .saveDiary(diaryEntity, diaryItemTitleSelectionHistoryItemEntityList)
-                }
-            } catch (e: Exception) {
-                addAppMessage(AppMessage.DIARY_SAVING_ERROR)
-                return@runBlocking false
+    suspend fun saveDiary(): Boolean {
+        val diaryEntity = diaryLiveData.createDiaryEntity()
+        val diaryItemTitleSelectionHistoryItemEntityList =
+            diaryLiveData.createDiaryItemTitleSelectionHistoryItemEntityList()
+        try {
+            if (shouldDeleteLoadedDateDiary) {
+                diaryRepository
+                    .deleteAndSaveDiary(
+                        _loadedDate.checkNotNull(),
+                        diaryEntity,
+                        diaryItemTitleSelectionHistoryItemEntityList
+                    )
+            } else {
+                diaryRepository
+                    .saveDiary(diaryEntity, diaryItemTitleSelectionHistoryItemEntityList)
             }
-            return@runBlocking true
+            return true
+        } catch (e: Exception) {
+            addAppMessage(AppMessage.DIARY_SAVING_ERROR)
+            return false
         }
     }
 
-    fun deleteDiary(): Boolean {
+    suspend fun deleteDiary(): Boolean {
         val deleteDate = _loadedDate.checkNotNull()
 
         try {
-            runBlocking {
-                diaryRepository.deleteDiary(deleteDate)
-            }
+            diaryRepository.deleteDiary(deleteDate)
+            return true
         } catch (e: Exception) {
             addAppMessage(AppMessage.DIARY_DELETE_ERROR)
             return false
         }
-
-        return true
     }
 
     // 日付関係
@@ -377,14 +356,12 @@ class DiaryEditViewModel @Inject constructor(
     }
 
     // MEMO:存在しないことを確認したいため下記メソッドを否定的処理とする
-    fun checkSavedPicturePathDoesNotExist(uri: Uri): Boolean {
+    suspend fun checkSavedPicturePathDoesNotExist(uri: Uri): Boolean? {
         try {
-            return runBlocking {
-                !diaryRepository.existsPicturePath(uri)
-            }
+            return !diaryRepository.existsPicturePath(uri)
         } catch (e: Exception) {
             addAppMessage(AppMessage.DIARY_LOADING_ERROR)
-            return false
+            return null
         }
     }
 
@@ -395,5 +372,11 @@ class DiaryEditViewModel @Inject constructor(
 
     fun addWeatherInfoFetchErrorMessage() {
         addAppMessage(AppMessage.WEATHER_INFO_LOADING_ERROR)
+    }
+
+    suspend fun shouldShowUpdateConfirmationDialog(): Boolean? {
+        if (isLoadedDateEqualToInputDate) return false
+        val inputDate = diaryLiveData.date.checkNotNull()
+        return existsSavedDiary(inputDate)
     }
 }

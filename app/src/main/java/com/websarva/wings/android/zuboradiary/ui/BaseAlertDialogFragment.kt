@@ -118,7 +118,7 @@ abstract class BaseAlertDialogFragment : DialogFragment() {
      */
     protected abstract fun handleOnDismiss()
 
-    protected fun setResult(resultKey: String, result: Any) {
+    protected fun setResult(resultKey: String, result: Any?) {
         val navController = NavHostFragment.findNavController(this)
         val navBackStackEntry = checkNotNull(navController.previousBackStackEntry)
         val savedStateHandle = navBackStackEntry.savedStateHandle

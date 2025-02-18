@@ -1,6 +1,7 @@
 package com.websarva.wings.android.zuboradiary.ui.diary.diaryshow
 
 import android.net.Uri
+import android.util.Log
 import androidx.lifecycle.LiveData
 import com.websarva.wings.android.zuboradiary.data.AppMessage
 import com.websarva.wings.android.zuboradiary.data.database.DiaryRepository
@@ -11,10 +12,8 @@ import com.websarva.wings.android.zuboradiary.ui.BaseViewModel
 import com.websarva.wings.android.zuboradiary.ui.checkNotNull
 import com.websarva.wings.android.zuboradiary.ui.diary.DiaryLiveData
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.runBlocking
 import java.time.LocalDate
 import java.time.LocalDateTime
-import java.util.concurrent.ExecutionException
 import javax.inject.Inject
 
 @HiltViewModel
@@ -61,55 +60,45 @@ class DiaryShowViewModel @Inject constructor(private val diaryRepository: DiaryR
         diaryLiveData.initialize()
     }
 
-    fun existsSavedDiary(date: LocalDate): Boolean {
+    suspend fun existsSavedDiary(date: LocalDate): Boolean? {
         try {
-            return runBlocking {
-                diaryRepository.existsDiary(date)
-            }
+            return diaryRepository.existsDiary(date)
         } catch (e: Exception) {
             addAppMessage(AppMessage.DIARY_INFO_LOADING_ERROR)
+            return null
+        }
+    }
+
+    suspend fun loadSavedDiary(date: LocalDate): Boolean {
+        try {
+            val diaryEntity = diaryRepository.loadDiary(date)
+            diaryLiveData.update(diaryEntity)
+            return true
+        } catch (e: Exception) {
+            Log.d("Exception", "loadSavedDiary()", e)
+            addAppMessage(AppMessage.DIARY_LOADING_ERROR)
             return false
         }
     }
 
-    fun loadSavedDiary(date: LocalDate) {
-        try {
-            val diaryEntity =
-                runBlocking {
-                    diaryRepository.loadDiary(date)
-                }
-            diaryLiveData.update(diaryEntity)
-        } catch (e: Exception) {
-            addAppMessage(AppMessage.DIARY_LOADING_ERROR)
-        }
-    }
-
-    fun deleteDiary(): Boolean {
+    suspend fun deleteDiary(): Boolean {
         val deleteDate = diaryLiveData.date.checkNotNull()
         try {
-            runBlocking {
-                diaryRepository.deleteDiary(deleteDate)
-            }
+            diaryRepository.deleteDiary(deleteDate)
+            return true
         } catch (e: Exception) {
             addAppMessage(AppMessage.DIARY_DELETE_ERROR)
             return false
         }
-
-        return true
     }
 
     // MEMO:存在しないことを確認したいため下記メソッドを否定的処理とする
-    fun checkSavedPicturePathDoesNotExist(uri: Uri): Boolean {
+    suspend fun checkSavedPicturePathDoesNotExist(uri: Uri): Boolean? {
         try {
-            return runBlocking {
-                !diaryRepository.existsPicturePath(uri)
-            }
-        } catch (e: ExecutionException) {
+            return !diaryRepository.existsPicturePath(uri)
+        } catch (e: Exception) {
             addAppMessage(AppMessage.DIARY_LOADING_ERROR)
-            return false
-        } catch (e: InterruptedException) {
-            addAppMessage(AppMessage.DIARY_LOADING_ERROR)
-            return false
+            return null
         }
     }
 }

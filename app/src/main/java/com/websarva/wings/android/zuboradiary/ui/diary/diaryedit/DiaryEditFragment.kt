@@ -21,6 +21,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.Observer
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavDirections
 import com.google.android.material.textfield.TextInputLayout
 import com.websarva.wings.android.zuboradiary.R
@@ -40,6 +41,9 @@ import com.websarva.wings.android.zuboradiary.ui.diary.DiaryLiveData
 import com.websarva.wings.android.zuboradiary.ui.diary.diaryitemtitleedit.DiaryItemTitleEditFragment
 import com.websarva.wings.android.zuboradiary.ui.notNullValue
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.jetbrains.annotations.Unmodifiable
 import java.time.LocalDate
 import java.util.Arrays
@@ -64,7 +68,7 @@ class DiaryEditFragment : BaseFragment() {
 
         pictureUriPermissionManager =
             object : UriPermissionManager(requireContext()) {
-                override fun checkUsedUriDoesNotExist(uri: Uri): Boolean {
+                override suspend fun checkUsedUriDoesNotExist(uri: Uri): Boolean? {
                     return diaryEditViewModel.checkSavedPicturePathDoesNotExist(uri)
                 }
             }
@@ -104,7 +108,9 @@ class DiaryEditFragment : BaseFragment() {
         binding.fabTest.setOnClickListener {
             Log.d("20240823", "OnClick")
             val testDiariesSaver = TestDiariesSaver(diaryEditViewModel)
-            testDiariesSaver.save(28)
+            lifecycleScope.launch(Dispatchers.IO) {
+                testDiariesSaver.save(28)
+            }
         }
     }
 
@@ -167,7 +173,9 @@ class DiaryEditFragment : BaseFragment() {
 
         if (selectedButton == DialogInterface.BUTTON_POSITIVE) {
             diaryEditViewModel.initialize()
-            diaryEditViewModel.prepareDiary(date, true)
+            lifecycleScope.launch(Dispatchers.IO) {
+                diaryEditViewModel.prepareDiary(date, true)
+            }
         } else {
             if (!diaryEditViewModel.isNewDiaryDefaultStatus) {
                 fetchWeatherInfo(date, true)
@@ -181,12 +189,16 @@ class DiaryEditFragment : BaseFragment() {
             receiveResulFromDialog<Int>(DiaryUpdateDialogFragment.KEY_SELECTED_BUTTON) ?: return
         if (selectedButton != DialogInterface.BUTTON_POSITIVE) return
 
-        val isSuccessful = diaryEditViewModel.saveDiary()
-        if (!isSuccessful) return
+        lifecycleScope.launch(Dispatchers.IO) {
+            val isSuccessful = diaryEditViewModel.saveDiary()
+            if (!isSuccessful) return@launch
 
-        updatePictureUriPermission()
-        val date = diaryEditViewModel.date.checkNotNull()
-        showDiaryShowFragment(date)
+            updatePictureUriPermission()
+            val date = diaryEditViewModel.date.checkNotNull()
+            withContext(Dispatchers.Main) {
+                showDiaryShowFragment(date)
+            }
+        }
     }
 
     // 既存日記上書きダイアログフラグメントから結果受取
@@ -195,11 +207,16 @@ class DiaryEditFragment : BaseFragment() {
             receiveResulFromDialog<Int>(DiaryDeleteDialogFragment.KEY_SELECTED_BUTTON) ?: return
         if (selectedButton != DialogInterface.BUTTON_POSITIVE) return
 
-        val isSuccessful = diaryEditViewModel.deleteDiary()
-        if (!isSuccessful) return
+        lifecycleScope.launch(Dispatchers.IO) {
+            val isSuccessful = diaryEditViewModel.deleteDiary()
+            if (!isSuccessful) return@launch
 
-        releaseLoadedPictureUriPermission()
-        navController.navigateUp()
+            releaseLoadedPictureUriPermission()
+            withContext(Dispatchers.Main) {
+                navController.navigateUp()
+            }
+        }
+
     }
 
     // 日付入力ダイアログフラグメントからデータ受取
@@ -257,8 +274,11 @@ class DiaryEditFragment : BaseFragment() {
         val diaryDate = DiaryEditFragmentArgs.fromBundle(requireArguments()).date
         val requiresDiaryLoading =
             DiaryEditFragmentArgs.fromBundle(requireArguments()).requiresDiaryLoading
-        diaryEditViewModel.prepareDiary(diaryDate, requiresDiaryLoading)
-        if (!requiresDiaryLoading) fetchWeatherInfo(diaryDate, false)
+        lifecycleScope.launch(Dispatchers.IO) {
+            val isSuccessful = diaryEditViewModel.prepareDiary(diaryDate, requiresDiaryLoading)
+            if (!isSuccessful) return@launch
+            if (!requiresDiaryLoading) fetchWeatherInfo(diaryDate, false)
+        }
     }
 
     private fun setUpToolBar() {
@@ -273,18 +293,27 @@ class DiaryEditFragment : BaseFragment() {
 
                 //日記保存(日記表示フラグメント起動)。
                 if (item.itemId == R.id.diaryEditToolbarOptionSaveDiary) {
-                    if (diaryEditViewModel.shouldShowUpdateConfirmationDialog) {
-                        showDiaryUpdateDialog(diaryDate)
-                    } else {
-                        val isSuccessful = diaryEditViewModel.saveDiary()
-                        if (isSuccessful) {
-                            updatePictureUriPermission()
-                            showDiaryShowFragment(diaryDate)
+                    lifecycleScope.launch(Dispatchers.IO) {
+                        val shouldShowDialog =
+                            diaryEditViewModel.shouldShowUpdateConfirmationDialog() ?: return@launch
+                        if (shouldShowDialog) {
+                            withContext(Dispatchers.Main) {
+                                showDiaryUpdateDialog(diaryDate)
+                            }
+                        } else {
+                            val isSuccessful = diaryEditViewModel.saveDiary()
+                            if (isSuccessful) {
+                                updatePictureUriPermission()
+                                withContext(Dispatchers.Main) {
+                                    showDiaryShowFragment(diaryDate)
+                                }
+                            }
                         }
                     }
                     return@setOnMenuItemClickListener true
                 } else if (item.itemId == R.id.diaryEditToolbarOptionDeleteDiary) {
                     showDiaryDeleteDialog(diaryDate)
+                    return@setOnMenuItemClickListener true
                 }
                 false
             }
@@ -333,20 +362,28 @@ class DiaryEditFragment : BaseFragment() {
             Log.d("DiaryEditInputDate", "loadedDate:$loadedDate")
             val previousDate = diaryEditViewModel.previousDate.value
             Log.d("DiaryEditInputDate", "previousDate:$previousDate")
-            if (requiresDiaryLoadingDialogShow(value)) {
-                showDiaryLoadingDialog(value)
-            } else {
-                // 読込確認Dialog表示時は、確認後下記処理を行う。
-                if (requiresWeatherInfoFetching(value)) {
-                    fetchWeatherInfo(value, true)
+
+            lifecycleScope.launch(Dispatchers.IO) {
+                val shouldShowDialog = shouldShowDiaryLoadingDialog(value) ?: return@launch
+                if (shouldShowDialog) {
+                    withContext(Dispatchers.Main) {
+                        showDiaryLoadingDialog(value)
+                    }
+                } else {
+                    // 読込確認Dialog表示時は、確認後下記処理を行う。
+                    if (requiresWeatherInfoFetching(value)) {
+                        fetchWeatherInfo(value, true)
+                    }
                 }
             }
+
+
         }
 
-        fun requiresDiaryLoadingDialogShow(changedDate: LocalDate): Boolean {
-            if (diaryEditViewModel.isNewDiaryDefaultStatus) return diaryEditViewModel.existsSavedDiary(
-                changedDate
-            )
+        suspend fun shouldShowDiaryLoadingDialog(changedDate: LocalDate): Boolean? {
+            if (diaryEditViewModel.isNewDiaryDefaultStatus) {
+                return diaryEditViewModel.existsSavedDiary(changedDate)
+            }
 
             val previousDate = diaryEditViewModel.previousDate.value
             val loadedDate = diaryEditViewModel.loadedDate.value
@@ -723,29 +760,33 @@ class DiaryEditFragment : BaseFragment() {
         val latestPictureUri = diaryEditViewModel.picturePath.value
         val loadedPictureUri = diaryEditViewModel.loadedPicturePath.value
 
-        try {
-            pictureUriPermissionManager.apply {
-                if (latestPictureUri == null && loadedPictureUri == null) return
-                if (latestPictureUri != null && loadedPictureUri == null) {
+        lifecycleScope.launch(Dispatchers.IO) {
+            try {
+                pictureUriPermissionManager.apply {
+                    if (latestPictureUri == null && loadedPictureUri == null) return@launch
+                    if (latestPictureUri != null && loadedPictureUri == null) {
+                        takePersistablePermission(latestPictureUri)
+                        return@launch
+                    }
+                    if (latestPictureUri == null) {
+                        releasePersistablePermission(checkNotNull(loadedPictureUri))
+                        return@launch
+                    }
+                    if (latestPictureUri == loadedPictureUri) return@launch
                     takePersistablePermission(latestPictureUri)
-                    return
-                }
-                if (latestPictureUri == null) {
                     releasePersistablePermission(checkNotNull(loadedPictureUri))
-                    return
                 }
-                if (latestPictureUri == loadedPictureUri) return
-                takePersistablePermission(latestPictureUri)
-                releasePersistablePermission(checkNotNull(loadedPictureUri))
+            } catch (e: SecurityException) {
+                // 対処できないがアプリを落としたくない為、catchのみ処理する。
             }
-        } catch (e: SecurityException) {
-            // 対処できないがアプリを落としたくない為、catchのみ処理する。
         }
     }
 
     private fun releaseLoadedPictureUriPermission() {
         val loadedPictureUri = diaryEditViewModel.loadedPicturePath.value ?: return
-        pictureUriPermissionManager.releasePersistablePermission(loadedPictureUri)
+        lifecycleScope.launch(Dispatchers.IO) {
+            pictureUriPermissionManager.releasePersistablePermission(loadedPictureUri)
+        }
     }
 
     private fun setupEditText() {

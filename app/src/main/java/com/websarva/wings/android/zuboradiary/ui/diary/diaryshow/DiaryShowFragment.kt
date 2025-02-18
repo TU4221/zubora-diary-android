@@ -16,6 +16,7 @@ import androidx.databinding.ViewDataBinding
 import androidx.lifecycle.Observer
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import com.websarva.wings.android.zuboradiary.R
 import com.websarva.wings.android.zuboradiary.data.AppMessage
 import com.websarva.wings.android.zuboradiary.data.DateTimeStringConverter
@@ -29,6 +30,9 @@ import com.websarva.wings.android.zuboradiary.ui.DiaryPictureManager
 import com.websarva.wings.android.zuboradiary.ui.UriPermissionManager
 import com.websarva.wings.android.zuboradiary.ui.checkNotNull
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.time.LocalDate
 import java.time.LocalDateTime
 
@@ -62,7 +66,7 @@ class DiaryShowFragment : BaseFragment() {
 
         pictureUriPermissionManager =
             object : UriPermissionManager(requireContext()) {
-                override fun checkUsedUriDoesNotExist(uri: Uri): Boolean {
+                override suspend fun checkUsedUriDoesNotExist(uri: Uri): Boolean? {
                     return diaryShowViewModel.checkSavedPicturePathDoesNotExist(uri)
                 }
             }
@@ -121,17 +125,23 @@ class DiaryShowFragment : BaseFragment() {
                 ?: return
         if (selectedButton != Dialog.BUTTON_POSITIVE) return
 
-        val isSuccessful = diaryShowViewModel.deleteDiary()
-        if (!isSuccessful) return
+        lifecycleScope.launch(Dispatchers.IO) {
+            val isSuccessful = diaryShowViewModel.deleteDiary()
+            if (!isSuccessful) return@launch
 
-        releasePictureUriPermission()
-        backFragment(true)
+            releasePictureUriPermission()
+            withContext(Dispatchers.Main) {
+                backFragment(true)
+            }
+        }
     }
 
     private fun releasePictureUriPermission() {
         val pictureUri = diaryShowViewModel.picturePathLiveData.value ?: return
 
-        pictureUriPermissionManager.releasePersistablePermission(pictureUri)
+        lifecycleScope.launch(Dispatchers.IO) {
+            pictureUriPermissionManager.releasePersistablePermission(pictureUri)
+        }
     }
 
     // 画面表示データ準備
@@ -139,13 +149,16 @@ class DiaryShowFragment : BaseFragment() {
         diaryShowViewModel.initialize()
         val diaryDate = DiaryShowFragmentArgs.fromBundle(requireArguments()).date
 
-        // 日記編集Fragmentで日記を削除して日記表示Fragmentに戻って来た時は更に一つ前のFragmentへ戻る。
-        if (!diaryShowViewModel.existsSavedDiary(diaryDate)) {
-            navController.navigateUp()
-            return
-        }
+        lifecycleScope.launch(Dispatchers.IO) {
+            // 日記編集Fragmentで日記を削除して日記表示Fragmentに戻って来た時は更に一つ前のFragmentへ戻る。
+            val exists = diaryShowViewModel.existsSavedDiary(diaryDate) ?: return@launch
+            if (!exists) {
+                navController.navigateUp()
+                return@launch
+            }
 
-        diaryShowViewModel.loadSavedDiary(diaryDate)
+            diaryShowViewModel.loadSavedDiary(diaryDate)
+        }
     }
 
     private fun setUpToolBar() {

@@ -13,14 +13,13 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.hilt.work.HiltWorker
 import androidx.navigation.NavDeepLinkBuilder
-import androidx.work.Worker
+import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.websarva.wings.android.zuboradiary.CustomApplication
 import com.websarva.wings.android.zuboradiary.R
 import com.websarva.wings.android.zuboradiary.data.database.DiaryRepository
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
-import kotlinx.coroutines.runBlocking
 import java.time.LocalDate
 
 @HiltWorker
@@ -28,7 +27,7 @@ class ReminderNotificationWorker @AssistedInject constructor(
     @Assisted context: Context,
     @Assisted workerParams: WorkerParameters,
     private val diaryRepository: DiaryRepository
-) : Worker(context, workerParams) {
+) : CoroutineWorker(context, workerParams) {
 
     private val channelId: String = context.getString(R.string.reminder_notification_worker_channel_id)
     private val channelName: String = context.getString(R.string.reminder_notification_worker_channel_name)
@@ -59,7 +58,7 @@ class ReminderNotificationWorker @AssistedInject constructor(
         }
     }
 
-    override fun doWork(): Result {
+    override suspend fun doWork(): Result {
         val application = applicationContext as CustomApplication
         if (application.isAppInForeground) return Result.success()
 
@@ -76,11 +75,9 @@ class ReminderNotificationWorker @AssistedInject constructor(
     }
 
     @Throws(Exception::class)
-    private fun existsSavedTodayDiary(): Boolean {
-        val result =
-            runBlocking {
-                diaryRepository.existsDiary(LocalDate.now())
-            }
+    private suspend fun existsSavedTodayDiary(): Boolean {
+        // TODO:非同期にするか検討
+        val result = diaryRepository.existsDiary(LocalDate.now())
         Log.d("NotificationWorker", "hasWriteTodayDiary():$result")
         return result
     }

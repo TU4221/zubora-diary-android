@@ -48,15 +48,15 @@ class DiaryLiveData {
     }
 
     fun update(diaryEntity: DiaryEntity) {
-        date.value = LocalDate.parse(diaryEntity.date)
+        date.postValue(LocalDate.parse(diaryEntity.date))
         val intWeather1 = diaryEntity.weather1
-        weather1.value = Weather.of(intWeather1)
+        weather1.postValue(Weather.of(intWeather1))
         val intWeather2 = diaryEntity.weather2
-        weather2.value = Weather.of(intWeather2)
+        weather2.postValue(Weather.of(intWeather2))
         val intCondition = diaryEntity.condition
-        condition.value = Condition.of(intCondition)
+        condition.postValue(Condition.of(intCondition))
         val title = diaryEntity.title
-        this.title.value = title
+        this.title.postValue(title)
 
         val nullDateTime: LocalDateTime? = null
         val item1Title = diaryEntity.item1Title
@@ -88,16 +88,16 @@ class DiaryLiveData {
                 break
             }
         }
-        this.numVisibleItems.value = numVisibleItems
+        this.numVisibleItems.postValue(numVisibleItems)
 
         val uriString = diaryEntity.picturePath
         if (uriString.isEmpty()) {
-            picturePath.setValue(null)
+            picturePath.postValue(null)
         } else {
-            picturePath.setValue(Uri.parse(uriString))
+            picturePath.postValue(Uri.parse(uriString))
         }
 
-        log.value = LocalDateTime.parse(diaryEntity.log)
+        log.postValue(LocalDateTime.parse(diaryEntity.log))
     }
 
     fun createDiaryEntity(): DiaryEntity {
@@ -209,14 +209,14 @@ class DiaryLiveData {
         }
 
         fun update(title: String, comment: String, titleUpdateLog: LocalDateTime?) {
-            this.title.value = title
-            this.comment.value = comment
-            this.titleUpdateLog.value = titleUpdateLog
+            this.title.postValue(title)
+            this.comment.postValue(comment)
+            this.titleUpdateLog.postValue(titleUpdateLog)
         }
 
         fun updateItemTitle(title: String) {
-            this.title.value = title
-            titleUpdateLog.value = LocalDateTime.now()
+            this.title.postValue(title)
+            titleUpdateLog.postValue(LocalDateTime.now())
         }
 
         val isEmpty: Boolean
