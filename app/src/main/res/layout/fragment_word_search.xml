@@ -106,11 +106,14 @@
                         android:visibility="invisible"
                         tools:visibility="visible" />
 
+                    <!-- MEMO:スクロールバーを表示させたいが、子RecyclerViewに反応してスクロールバーの長さが安定しない。
+                          その為、"android:scrollbars="none"" とする。 -->
                     <androidx.recyclerview.widget.RecyclerView
                         style="@style/DiaryListRecyclerViewStyle"
                         android:id="@+id/recycler_word_search_result_list"
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent"/>
+                        android:layout_height="match_parent"
+                        android:scrollbars="none" />
 
                 </LinearLayout>
 
