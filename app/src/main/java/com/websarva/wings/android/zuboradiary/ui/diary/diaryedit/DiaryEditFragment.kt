@@ -178,7 +178,9 @@ class DiaryEditFragment : BaseFragment() {
             }
         } else {
             if (!diaryEditViewModel.isNewDiaryDefaultStatus) {
-                fetchWeatherInfo(date, true)
+                lifecycleScope.launch(Dispatchers.IO) {
+                    fetchWeatherInfo(date, true)
+                }
             }
         }
     }
@@ -237,7 +239,9 @@ class DiaryEditFragment : BaseFragment() {
 
         val loadDiaryDate = diaryEditViewModel.date.checkNotNull()
         val geoCoordinates = settingsViewModel.geoCoordinates.checkNotNull()
-        diaryEditViewModel.fetchWeatherInformation(loadDiaryDate, geoCoordinates)
+        lifecycleScope.launch(Dispatchers.IO) {
+            diaryEditViewModel.fetchWeatherInformation(loadDiaryDate, geoCoordinates)
+        }
     }
 
     // 項目削除確認ダイアログフラグメントから結果受取
@@ -376,8 +380,6 @@ class DiaryEditFragment : BaseFragment() {
                     }
                 }
             }
-
-
         }
 
         suspend fun shouldShowDiaryLoadingDialog(changedDate: LocalDate): Boolean? {
@@ -871,7 +873,7 @@ class DiaryEditFragment : BaseFragment() {
         }
     }
 
-    private fun fetchWeatherInfo(date: LocalDate, requestsShowingDialog: Boolean) {
+    private suspend fun fetchWeatherInfo(date: LocalDate, requestsShowingDialog: Boolean) {
         // HACK:EditFragment起動時、設定値を参照してから位置情報を取得する為、タイムラグが発生する。
         //      対策として記憶boolean変数を用意し、true時は位置情報取得処理コードにて天気情報も取得する。
         val isChecked = settingsViewModel.isCheckedWeatherInfoAcquisition.notNullValue()
@@ -884,7 +886,9 @@ class DiaryEditFragment : BaseFragment() {
 
         // 本フラグメント起動時のみダイアログなしで天気情報取得
         if (requestsShowingDialog) {
-            showWeatherInfoFetchingDialog(date)
+            withContext(Dispatchers.Main) {
+                showWeatherInfoFetchingDialog(date)
+            }
         } else {
             val geoCoordinates = settingsViewModel.geoCoordinates.checkNotNull()
             diaryEditViewModel.fetchWeatherInformation(date, geoCoordinates)

@@ -2,7 +2,7 @@ package com.websarva.wings.android.zuboradiary.data.network
 
 import android.util.Log
 import androidx.annotation.IntRange
-import retrofit2.Call
+import retrofit2.Response
 import java.time.LocalDate
 import java.time.temporal.ChronoUnit
 import javax.inject.Inject
@@ -29,7 +29,7 @@ class WeatherApiRepository @Inject constructor(private val weatherApiService: We
         return betweenDays <= MAX_PAST_DAYS
     }
 
-    fun fetchTodayWeatherInfo(geoCoordinates: GeoCoordinates): Call<WeatherApiResponse> {
+    suspend fun fetchTodayWeatherInfo(geoCoordinates: GeoCoordinates): Response<WeatherApiData> {
         return weatherApiService.getWeather(
             geoCoordinates.latitude.toString(),
             geoCoordinates.longitude.toString(),
@@ -40,11 +40,11 @@ class WeatherApiRepository @Inject constructor(private val weatherApiService: We
         )
     }
 
-    fun fetchPastDayWeatherInfo(
+    suspend fun fetchPastDayWeatherInfo(
         geoCoordinates: GeoCoordinates,
         @IntRange(from = MIN_PAST_DAYS.toLong(), to = MAX_PAST_DAYS.toLong())
         numPastDays: Int
-    ): Call<WeatherApiResponse> {
+    ): Response<WeatherApiData> {
         require(numPastDays >= MIN_PAST_DAYS)
         require(numPastDays <= MAX_PAST_DAYS)
 

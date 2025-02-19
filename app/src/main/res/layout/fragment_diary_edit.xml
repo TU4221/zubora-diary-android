@@ -325,6 +325,11 @@
 
         </LinearLayout>
 
+        <include
+            layout="@layout/layout_full_screen_circular_progress_indicator"
+            android:id="@+id/include_progress_indicator"
+            app:isVisibleLiveData="@{diaryEditViewModel.isVisibleUpdateProgressBar}" />
+
     </FrameLayout>
 
 </layout>

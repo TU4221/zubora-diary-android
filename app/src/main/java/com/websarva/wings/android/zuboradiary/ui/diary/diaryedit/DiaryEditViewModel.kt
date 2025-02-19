@@ -11,18 +11,13 @@ import com.websarva.wings.android.zuboradiary.data.diary.Condition
 import com.websarva.wings.android.zuboradiary.data.diary.ItemNumber
 import com.websarva.wings.android.zuboradiary.data.diary.Weather
 import com.websarva.wings.android.zuboradiary.data.network.GeoCoordinates
-import com.websarva.wings.android.zuboradiary.data.network.WeatherApiCallable
 import com.websarva.wings.android.zuboradiary.data.network.WeatherApiRepository
-import com.websarva.wings.android.zuboradiary.data.network.WeatherApiResponse
 import com.websarva.wings.android.zuboradiary.ui.BaseViewModel
 import com.websarva.wings.android.zuboradiary.ui.checkNotNull
 import com.websarva.wings.android.zuboradiary.ui.diary.DiaryLiveData
 import dagger.hilt.android.lifecycle.HiltViewModel
-import retrofit2.Call
 import java.time.LocalDate
 import java.time.temporal.ChronoUnit
-import java.util.concurrent.ExecutionException
-import java.util.concurrent.Executors
 import javax.inject.Inject
 
 @HiltViewModel
@@ -131,6 +126,10 @@ class DiaryEditViewModel @Inject constructor(
     val loadedPicturePath: LiveData<Uri?>
         get() = _loadedPicturePath
 
+    private val _isVisibleUpdateProgressBar = MutableLiveData<Boolean>()
+    val isVisibleUpdateProgressBar: LiveData<Boolean>
+        get() = _isVisibleUpdateProgressBar
+
     var hasPreparedDiary = false
         private set
 
@@ -180,6 +179,7 @@ class DiaryEditViewModel @Inject constructor(
     }
 
     suspend fun prepareDiary(date: LocalDate, shouldLoadDiary: Boolean): Boolean {
+        _isVisibleUpdateProgressBar.postValue(true)
         if (shouldLoadDiary) {
             try {
                 loadSavedDiary(date)
@@ -187,12 +187,14 @@ class DiaryEditViewModel @Inject constructor(
                 updateDate(date)
             } catch (e: Exception) {
                 addAppMessage(AppMessage.DIARY_LOADING_ERROR)
+                _isVisibleUpdateProgressBar.postValue(false)
                 return false
             }
         } else {
             updateDate(date)
         }
         hasPreparedDiary = true
+        _isVisibleUpdateProgressBar.postValue(false)
         return true
     }
 
@@ -269,9 +271,9 @@ class DiaryEditViewModel @Inject constructor(
 
         // HACK:下記はDiaryLiveDataのDateのsetValue()処理よりも前に処理すること。
         //      (後で処理するとDateのObserverがpreviousDateの更新よりも先に処理される為)
-        _previousDate.value = previousDate
+        _previousDate.postValue(previousDate)
 
-        diaryLiveData.date.value = date
+        diaryLiveData.date.postValue(date)
     }
 
     // 天気、体調関係
@@ -294,40 +296,37 @@ class DiaryEditViewModel @Inject constructor(
     }
 
     // 天気情報関係
-    fun fetchWeatherInformation(date: LocalDate, geoCoordinates: GeoCoordinates) {
+    suspend fun fetchWeatherInformation(date: LocalDate, geoCoordinates: GeoCoordinates) {
         if (!canFetchWeatherInformation(date)) return
 
         val currentDate = LocalDate.now()
         val betweenDays = ChronoUnit.DAYS.between(date, currentDate)
-        val weatherApiResponseCall = if (betweenDays == 0L) {
-            weatherApiRepository.fetchTodayWeatherInfo(geoCoordinates)
+
+        _isVisibleUpdateProgressBar.postValue(true)
+        val response =
+            if (betweenDays == 0L) {
+                weatherApiRepository.fetchTodayWeatherInfo(geoCoordinates)
+            } else {
+                weatherApiRepository.fetchPastDayWeatherInfo(
+                    geoCoordinates,
+                    betweenDays.toInt()
+                )
+            }
+        Log.d("WeatherApi", "response.code():" + response.code())
+        Log.d("WeatherApi", "response.message():" + response.message())
+
+        if (response.isSuccessful) {
+            Log.d("WeatherApi", "response.body():" + response.body())
+            val result =
+                response.body()?.toWeatherInfo() ?: throw IllegalStateException()
+            diaryLiveData.weather1.postValue(result)
         } else {
-            weatherApiRepository.fetchPastDayWeatherInfo(geoCoordinates, betweenDays.toInt())
-        }
-
-        val executorService = Executors.newSingleThreadExecutor()
-        try {
-            executorService.submit(CustomWeatherApiCallable(weatherApiResponseCall)).get()
-        } catch (e: ExecutionException) {
-            addAppMessage(AppMessage.WEATHER_INFO_LOADING_ERROR)
-        } catch (e: InterruptedException) {
+            response.errorBody().use { errorBody ->
+                Log.d("WeatherApi", "response.errorBody():" + errorBody!!.string())
+            }
             addAppMessage(AppMessage.WEATHER_INFO_LOADING_ERROR)
         }
-    }
-
-    private inner class CustomWeatherApiCallable(weatherApiResponseCall: Call<WeatherApiResponse>) :
-        WeatherApiCallable(weatherApiResponseCall) {
-        override fun onResponse(weather: Weather) {
-            diaryLiveData.weather1.postValue(weather)
-        }
-
-        override fun onFailure() {
-            addAppMessage(AppMessage.WEATHER_INFO_LOADING_ERROR)
-        }
-
-        override fun onException(e: Exception) {
-            addAppMessage(AppMessage.WEATHER_INFO_LOADING_ERROR)
-        }
+        _isVisibleUpdateProgressBar.postValue(false)
     }
 
     // 項目関係

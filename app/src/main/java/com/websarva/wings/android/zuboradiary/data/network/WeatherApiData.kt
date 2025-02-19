@@ -7,7 +7,7 @@ import com.websarva.wings.android.zuboradiary.data.diary.Weather
 // HACK:Retrofit2(Moshi)を使用して本クラスをインスタンス化する時、引数ありのコンストラクタは処理されない。
 //      引数なしコンストラクタ処理時は、フィールド変数の値は未格納。
 //      原因が明らかになるまで、フィールド変数参照時はNullチェック等を行う。
-data class WeatherApiResponse (
+data class WeatherApiData (
     // MEMO:フィールド変数はRetrofit2(Moshi)にて代入。
     private val latitude: Float,
     private val longitude: Float,
