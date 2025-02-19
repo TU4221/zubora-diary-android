@@ -3,6 +3,7 @@ package com.websarva.wings.android.zuboradiary.ui.settings
 import android.util.Log
 import androidx.datastore.core.IOException
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
@@ -20,14 +21,10 @@ import com.websarva.wings.android.zuboradiary.data.worker.WorkerRepository
 import com.websarva.wings.android.zuboradiary.ui.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import java.time.DayOfWeek
 import java.time.LocalTime
-import java.util.concurrent.CancellationException
-import java.util.concurrent.ExecutionException
 import javax.inject.Inject
 
 @HiltViewModel
@@ -39,13 +36,17 @@ class SettingsViewModel @Inject constructor(
 
     // MEMO:MutableLiveDataに値セットするまでFlowによるラグが発生する可能性があるためnull許容型とする。
     //      これにより、Observerの引数がnull許容型となりnull時の処理ができる。
-    lateinit var themeColor: LiveData<ThemeColor?>
-    lateinit var calendarStartDayOfWeek: LiveData<DayOfWeek?>
-    lateinit var isCheckedReminderNotification: LiveData<Boolean?>
+    lateinit var themeColor: LiveData<ThemeColor>
+    lateinit var calendarStartDayOfWeek: LiveData<DayOfWeek>
+    lateinit var isCheckedReminderNotification: LiveData<Boolean>
     lateinit var reminderNotificationTime: LiveData<LocalTime?>
-    lateinit var isCheckedPasscodeLock: LiveData<Boolean?>
+    lateinit var isCheckedPasscodeLock: LiveData<Boolean>
     private lateinit var passcode: LiveData<String?>
-    lateinit var isCheckedWeatherInfoAcquisition: LiveData<Boolean?>
+    lateinit var isCheckedWeatherInfoAcquisition: LiveData<Boolean>
+
+    private val _isAllSettingsNotNull = MediatorLiveData(false)
+    val isAllSettingsNotNull: LiveData<Boolean>
+        get() = _isAllSettingsNotNull
 
     private val _geoCoordinates = MutableLiveData<GeoCoordinates?>()
     val geoCoordinates: LiveData<GeoCoordinates?>
@@ -56,6 +57,7 @@ class SettingsViewModel @Inject constructor(
 
     init {
         initialize()
+        setUpIsAllSettingsNotNull()
     }
 
     override fun initialize() {
@@ -65,6 +67,35 @@ class SettingsViewModel @Inject constructor(
         setUpReminderNotificationPreferenceValueLoading()
         setUpPasscodeLockPreferenceValueLoading()
         setUpWeatherInfoAcquisitionPreferenceValueLoading()
+    }
+
+    private fun setUpIsAllSettingsNotNull() {
+        _isAllSettingsNotNull.addSource(themeColor) { checkAllSettingsNotNull() }
+        _isAllSettingsNotNull.addSource(calendarStartDayOfWeek) { checkAllSettingsNotNull() }
+        _isAllSettingsNotNull.addSource(isCheckedReminderNotification) { checkAllSettingsNotNull() }
+        _isAllSettingsNotNull.addSource(reminderNotificationTime) { checkAllSettingsNotNull() }
+        _isAllSettingsNotNull.addSource(isCheckedPasscodeLock) { checkAllSettingsNotNull() }
+        _isAllSettingsNotNull.addSource(passcode) { checkAllSettingsNotNull() }
+        _isAllSettingsNotNull.addSource(isCheckedWeatherInfoAcquisition) { checkAllSettingsNotNull() }
+    }
+
+    private fun checkAllSettingsNotNull() {
+        _isAllSettingsNotNull.value =
+            themeColor.value != null
+                    && calendarStartDayOfWeek.value != null
+                    && isCheckedReminderNotification.value != null
+                    && checkIsCheckedReminderNotificationNotNull()
+                    && passcode.value != null
+                    && isCheckedWeatherInfoAcquisition.value != null
+    }
+
+    private fun checkIsCheckedReminderNotificationNotNull(): Boolean {
+        val isCheckedReminderNotification = isCheckedReminderNotification.value ?: return false
+        if (isCheckedReminderNotification) {
+            return reminderNotificationTime.value != null
+        }
+
+        return true
     }
 
     private fun setUpThemeColorPreferenceValueLoading() {
@@ -154,54 +185,6 @@ class SettingsViewModel @Inject constructor(
         if (equalLastAppMessage(AppMessage.SETTING_LOADING_ERROR)) return  // 設定更新エラー通知の重複防止
 
         addAppMessage(AppMessage.SETTING_LOADING_ERROR)
-    }
-
-    /**
-     * 同期的に設定値を取得したいときに使用。
-     * 早期参照により、PreferencesDataStore から LiveData へ設定値が未格納(null)の可能性があるため。
-     * */
-    fun loadThemeColorSettingValue(): ThemeColor {
-        val themeColorValue = themeColor.value
-        if (themeColorValue != null) return themeColorValue
-        return runBlocking {
-            userPreferencesRepository.loadThemeColorPreference().first().themeColor
-        }
-    }
-
-    /**
-     * 同期的に設定値を取得したいときに使用。
-     * 早期参照により、PreferencesDataStore から LiveData へ設定値が未格納(null)の可能性があるため。
-     * */
-    fun loadCalendarStartDaySettingValue(): DayOfWeek {
-        val dayOfWeekValue = calendarStartDayOfWeek.value
-        if (dayOfWeekValue != null) return dayOfWeekValue
-        return runBlocking {
-            userPreferencesRepository.loadCalendarStartDayOfWeekPreference().first().dayOfWeek
-        }
-    }
-
-    /**
-     * 同期的に設定値を取得したいときに使用。
-     * 早期参照により、PreferencesDataStore から LiveData へ設定値が未格納(null)の可能性があるため。
-     * */
-    fun loadIsCheckedReminderNotificationSetting(): Boolean {
-        val value = isCheckedReminderNotification.value
-        if (value != null) return value
-        return runBlocking {
-            userPreferencesRepository.loadReminderNotificationPreference().first().isChecked
-        }
-    }
-
-    /**
-     * 同期的に設定値を取得したいときに使用。
-     * 早期参照により、PreferencesDataStore から LiveData へ設定値が未格納(null)の可能性があるため。
-     * */
-    fun loadIsCheckedWeatherInfoAcquisitionSetting(): Boolean {
-        val value = isCheckedWeatherInfoAcquisition.value
-        if (value != null) return value
-        return runBlocking {
-            userPreferencesRepository.loadWeatherInfoAcquisitionPreference().first().isChecked
-        }
     }
 
     fun saveThemeColor(value: ThemeColor) {
@@ -316,11 +299,7 @@ class SettingsViewModel @Inject constructor(
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 diaryRepository.deleteAllData()
-            } catch (e: CancellationException) {
-                addAppMessage(AppMessage.DIARY_DELETE_ERROR)
-            } catch (e: ExecutionException) {
-                addAppMessage(AppMessage.DIARY_DELETE_ERROR)
-            } catch (e: InterruptedException) {
+            } catch (e: Exception) {
                 addAppMessage(AppMessage.DIARY_DELETE_ERROR)
             }
             initializeAllSettings()

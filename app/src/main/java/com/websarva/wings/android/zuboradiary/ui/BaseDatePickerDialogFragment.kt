@@ -18,7 +18,7 @@ abstract class BaseDatePickerDialogFragment : DialogFragment() {
     protected lateinit var settingsViewModel: SettingsViewModel
 
     private val themeColor
-        get() = settingsViewModel.loadThemeColorSettingValue()
+        get() = settingsViewModel.themeColor.notNullValue()
 
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {

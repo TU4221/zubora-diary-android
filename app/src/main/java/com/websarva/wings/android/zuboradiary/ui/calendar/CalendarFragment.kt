@@ -30,6 +30,7 @@ import com.websarva.wings.android.zuboradiary.ui.diary.diaryshow.DiaryShowFragme
 import com.websarva.wings.android.zuboradiary.ui.diary.diaryshow.DiaryShowFragment.Weather1Observer
 import com.websarva.wings.android.zuboradiary.ui.diary.diaryshow.DiaryShowFragment.Weather2Observer
 import com.websarva.wings.android.zuboradiary.ui.diary.diaryshow.DiaryShowViewModel
+import com.websarva.wings.android.zuboradiary.ui.notNullValue
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -148,7 +149,7 @@ class CalendarFragment : BaseFragment() {
     }
 
     private fun createDayOfWeekList(): List<DayOfWeek> {
-        val firstDayOfWeek = settingsViewModel.loadCalendarStartDaySettingValue()
+        val firstDayOfWeek = settingsViewModel.calendarStartDayOfWeek.notNullValue()
 
         val daysOfWeek = DayOfWeek.entries.toTypedArray()
         val firstDayOfWeekListPos = firstDayOfWeek.value

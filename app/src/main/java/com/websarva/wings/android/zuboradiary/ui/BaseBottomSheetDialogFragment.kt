@@ -16,7 +16,7 @@ abstract class BaseBottomSheetDialogFragment : BottomSheetDialogFragment() {
     protected lateinit var settingsViewModel: SettingsViewModel
 
     protected val themeColor
-        get() = settingsViewModel.loadThemeColorSettingValue()
+        get() = settingsViewModel.themeColor.notNullValue()
 
     override fun onCreateView(
         inflater: LayoutInflater,

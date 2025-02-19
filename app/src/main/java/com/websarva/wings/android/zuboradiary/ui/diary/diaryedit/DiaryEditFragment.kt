@@ -874,7 +874,7 @@ class DiaryEditFragment : BaseFragment() {
     private fun fetchWeatherInfo(date: LocalDate, requestsShowingDialog: Boolean) {
         // HACK:EditFragment起動時、設定値を参照してから位置情報を取得する為、タイムラグが発生する。
         //      対策として記憶boolean変数を用意し、true時は位置情報取得処理コードにて天気情報も取得する。
-        val isChecked = settingsViewModel.loadIsCheckedWeatherInfoAcquisitionSetting()
+        val isChecked = settingsViewModel.isCheckedWeatherInfoAcquisition.notNullValue()
         if (!isChecked) return
 
         if (!settingsViewModel.hasUpdatedGeoCoordinates) {

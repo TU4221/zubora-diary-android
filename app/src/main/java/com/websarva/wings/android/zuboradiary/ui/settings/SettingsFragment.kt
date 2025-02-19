@@ -30,6 +30,7 @@ import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor
 import com.websarva.wings.android.zuboradiary.databinding.FragmentSettingsBinding
 import com.websarva.wings.android.zuboradiary.ui.BaseFragment
 import com.websarva.wings.android.zuboradiary.ui.UriPermissionManager
+import com.websarva.wings.android.zuboradiary.ui.notNullValue
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -254,13 +255,11 @@ class SettingsFragment : BaseFragment() {
 
         settingsViewModel.themeColor
             .observe(viewLifecycleOwner) { themeColor: ThemeColor? ->
-                var settingValue = themeColor
-                if (settingValue == null) {
-                    settingValue = settingsViewModel.loadThemeColorSettingValue()
-                }
-                val strThemeColor = settingValue.toSting(requireContext())
+                themeColor ?: return@observe
+
+                val strThemeColor = themeColor.toSting(requireContext())
                 binding.includeThemeColorSetting.textValue.text = strThemeColor
-                switchViewColor(settingValue)
+                switchViewColor(themeColor)
             }
     }
 
@@ -354,19 +353,17 @@ class SettingsFragment : BaseFragment() {
 
     private fun setUpCalendarStartDaySettingItem() {
         binding.includeCalendarStartDaySetting.textTitle.setOnClickListener {
-            val currentCalendarStartDayOfWeek = settingsViewModel.loadCalendarStartDaySettingValue()
+            val currentCalendarStartDayOfWeek =
+                settingsViewModel.calendarStartDayOfWeek.notNullValue()
             showCalendarStartDayPickerDialog(currentCalendarStartDayOfWeek)
         }
 
         settingsViewModel.calendarStartDayOfWeek
             .observe(viewLifecycleOwner) { dayOfWeek: DayOfWeek? ->
-                var settingValue = dayOfWeek
-                if (settingValue == null) {
-                    settingValue = settingsViewModel.loadCalendarStartDaySettingValue()
-                }
+                dayOfWeek ?: return@observe
 
                 val stringConverter = DayOfWeekStringConverter(requireContext())
-                val strDayOfWeek = stringConverter.toCalendarStartDayOfWeek(settingValue)
+                val strDayOfWeek = stringConverter.toCalendarStartDayOfWeek(dayOfWeek)
                 binding.includeCalendarStartDaySetting.textValue.text = strDayOfWeek
             }
     }
@@ -387,17 +384,14 @@ class SettingsFragment : BaseFragment() {
 
         settingsViewModel.isCheckedReminderNotification
             .observe(viewLifecycleOwner) { aBoolean: Boolean? ->
-                var settingValue = aBoolean
-                if (settingValue == null) {
-                    settingValue = settingsViewModel.loadIsCheckedReminderNotificationSetting()
-                }
-                if (settingValue) {
-                    binding.includeReminderNotificationSetting
-                        .textValue.visibility = View.VISIBLE
-                } else {
-                    binding.includeReminderNotificationSetting
-                        .textValue.visibility = View.INVISIBLE
-                }
+                aBoolean ?: return@observe
+
+                binding.includeReminderNotificationSetting.textValue.visibility =
+                    if (aBoolean) {
+                        View.VISIBLE
+                    } else {
+                        View.INVISIBLE
+                    }
             }
 
         settingsViewModel.reminderNotificationTime

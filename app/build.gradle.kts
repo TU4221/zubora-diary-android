@@ -238,6 +238,9 @@ dependencies {
 
     // debugImplementation because LeakCanary should only run in debug builds.
     debugImplementation("com.squareup.leakcanary:leakcanary-android:2.14")
+
+    // SplashScreen
+    implementation("androidx.core:core-splashscreen:1.0.1")
 }
 
 // Hilt機能追加(生成されたコードへの参照を許可する)

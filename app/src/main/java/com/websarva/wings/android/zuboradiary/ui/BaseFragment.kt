@@ -34,7 +34,7 @@ abstract class BaseFragment : CustomFragment() {
 
     protected lateinit var settingsViewModel: SettingsViewModel
     protected val themeColor
-        get() = settingsViewModel.loadThemeColorSettingValue()
+        get() = settingsViewModel.themeColor.notNullValue()
 
     private var fragmentDestinationId = 0
     private val currentDestinationId: Int get() {

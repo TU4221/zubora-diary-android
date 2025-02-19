@@ -12,6 +12,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.Lifecycle
@@ -40,6 +41,7 @@ import com.websarva.wings.android.zuboradiary.ui.ThemeColorSwitcher
 import com.websarva.wings.android.zuboradiary.ui.calendar.CalendarFragment
 import com.websarva.wings.android.zuboradiary.ui.diary.diaryedit.DiaryEditFragment
 import com.websarva.wings.android.zuboradiary.ui.list.diarylist.DiaryListFragment
+import com.websarva.wings.android.zuboradiary.ui.notNullValue
 import com.websarva.wings.android.zuboradiary.ui.settings.SettingsFragment
 import com.websarva.wings.android.zuboradiary.ui.settings.SettingsViewModel
 import dagger.hilt.android.AndroidEntryPoint
@@ -49,6 +51,7 @@ class MainActivity : AppCompatActivity() {
 
     private var _binding: ActivityMainBinding? = null
     private val binding get() = checkNotNull(_binding)
+    private var isMainActivityLayoutInflated = false
 
     // BottomNavigationタブによる画面遷移関係
     var wasSelectedTab = false
@@ -104,9 +107,17 @@ class MainActivity : AppCompatActivity() {
 
         setUpViewModel()
         setUpBinding()
-        setUpLocationInfo()
-        setUpThemeColor()
-        setUpNavigation()
+        settingsViewModel.isAllSettingsNotNull
+            .observe(this) { aBoolean: Boolean ->
+                if (!aBoolean) return@observe
+
+                if (!isMainActivityLayoutInflated) setUpMainActivityBinding()
+                setUpLocationInfo()
+                setUpThemeColor()
+                setUpNavigation()
+            }
+
+        installSplashScreen().setKeepOnScreenCondition { !isMainActivityLayoutInflated }
     }
 
     private fun setUpViewModel() {
@@ -115,11 +126,18 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setUpBinding() {
-        val themeColor = settingsViewModel.loadThemeColorSettingValue()
+        if (!settingsViewModel.isAllSettingsNotNull.notNullValue()) return
+
+        setUpMainActivityBinding()
+    }
+
+    private fun setUpMainActivityBinding() {
+        val themeColor = settingsViewModel.themeColor.notNullValue()
         val creator = ThemeColorInflaterCreator(this, layoutInflater, themeColor)
         val themeColorInflater = creator.create()
         _binding = ActivityMainBinding.inflate(themeColorInflater)
         setContentView(binding.root)
+        isMainActivityLayoutInflated = true
     }
 
     private fun setUpLocationInfo() {
@@ -129,11 +147,9 @@ class MainActivity : AppCompatActivity() {
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
         settingsViewModel.isCheckedWeatherInfoAcquisition
             .observe(this) { aBoolean: Boolean? ->
-                var settingValue = aBoolean
-                if (settingValue == null) {
-                    settingValue = settingsViewModel.loadIsCheckedWeatherInfoAcquisitionSetting()
-                }
-                if (settingValue) {
+                aBoolean ?: return@observe
+
+                if (aBoolean) {
                     updateLocationInformation()
                 } else {
                     settingsViewModel.clearGeoCoordinates()
@@ -178,11 +194,9 @@ class MainActivity : AppCompatActivity() {
     private fun setUpThemeColor() {
         settingsViewModel.themeColor
             .observe(this) { themeColor: ThemeColor? ->
-                var settingValue = themeColor
-                if (settingValue == null) {
-                    settingValue = settingsViewModel.loadThemeColorSettingValue()
-                }
-                switchThemeColor(settingValue)
+                themeColor ?: return@observe
+
+                switchThemeColor(themeColor)
             }
     }
 
@@ -452,5 +466,6 @@ class MainActivity : AppCompatActivity() {
         super.onDestroy()
 
         _binding = null
+        isMainActivityLayoutInflated = false
     }
 }
