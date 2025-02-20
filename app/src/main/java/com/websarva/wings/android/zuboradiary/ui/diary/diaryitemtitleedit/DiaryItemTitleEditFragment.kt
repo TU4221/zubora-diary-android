@@ -10,6 +10,7 @@ import android.view.ViewGroup
 import androidx.databinding.ViewDataBinding
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import com.websarva.wings.android.zuboradiary.R
 import com.websarva.wings.android.zuboradiary.data.AppMessage
 import com.websarva.wings.android.zuboradiary.databinding.FragmentDiaryItemTitleEditBinding
@@ -18,6 +19,8 @@ import com.websarva.wings.android.zuboradiary.ui.TextInputSetup
 import com.websarva.wings.android.zuboradiary.ui.checkNotNull
 import com.websarva.wings.android.zuboradiary.ui.notNullValue
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class DiaryItemTitleEditFragment : BaseFragment() {
@@ -102,8 +105,10 @@ class DiaryItemTitleEditFragment : BaseFragment() {
                     )
                 )
 
-            diaryItemTitleEditViewModel
-                .deleteDiaryItemTitleSelectionHistoryItem(deleteListItemPosition)
+            lifecycleScope.launch(Dispatchers.IO) {
+                diaryItemTitleEditViewModel
+                    .deleteDiaryItemTitleSelectionHistoryItem(deleteListItemPosition)
+            }
         } else {
             val adapter =
                 checkNotNull(

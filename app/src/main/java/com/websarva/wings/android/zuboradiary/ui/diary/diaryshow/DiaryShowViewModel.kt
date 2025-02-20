@@ -73,23 +73,23 @@ class DiaryShowViewModel @Inject constructor(private val diaryRepository: DiaryR
         try {
             val diaryEntity = diaryRepository.loadDiary(date)
             diaryLiveData.update(diaryEntity)
-            return true
         } catch (e: Exception) {
             Log.d("Exception", "loadSavedDiary()", e)
             addAppMessage(AppMessage.DIARY_LOADING_ERROR)
             return false
         }
+        return true
     }
 
     suspend fun deleteDiary(): Boolean {
         val deleteDate = diaryLiveData.date.checkNotNull()
         try {
             diaryRepository.deleteDiary(deleteDate)
-            return true
         } catch (e: Exception) {
             addAppMessage(AppMessage.DIARY_DELETE_ERROR)
             return false
         }
+        return true
     }
 
     // MEMO:存在しないことを確認したいため下記メソッドを否定的処理とする

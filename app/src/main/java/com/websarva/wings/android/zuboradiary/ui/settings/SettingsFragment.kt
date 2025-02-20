@@ -98,7 +98,9 @@ class SettingsFragment : BaseFragment() {
                 // 再確認
                 val recheck = mainActivity.isGrantedAccessLocation
                 if (isGrantedAll && recheck) {
-                    settingsViewModel.saveWeatherInfoAcquisition(true)
+                    lifecycleScope.launch(Dispatchers.IO) {
+                        settingsViewModel.saveWeatherInfoAcquisition(true)
+                    }
                 } else {
                     binding.includeWeatherInfoAcquisitionSetting
                         .materialSwitch.isChecked = false
@@ -179,7 +181,9 @@ class SettingsFragment : BaseFragment() {
             receiveResulFromDialog<ThemeColor>(ThemeColorPickerDialogFragment.KEY_SELECTED_THEME_COLOR)
                 ?: return
 
-        settingsViewModel.saveThemeColor(selectedThemeColor)
+        lifecycleScope.launch(Dispatchers.IO) {
+            settingsViewModel.saveThemeColor(selectedThemeColor)
+        }
     }
 
     // カレンダー開始曜日設定ダイアログフラグメントから結果受取
@@ -188,7 +192,9 @@ class SettingsFragment : BaseFragment() {
             receiveResulFromDialog<DayOfWeek>(CalendarStartDayPickerDialogFragment.KEY_SELECTED_DAY_OF_WEEK)
                 ?: return
 
-        settingsViewModel.saveCalendarStartDayOfWeek(selectedDayOfWeek)
+        lifecycleScope.launch(Dispatchers.IO) {
+            settingsViewModel.saveCalendarStartDayOfWeek(selectedDayOfWeek)
+        }
     }
 
     // リマインダー通知時間設定ダイアログフラグメントから結果受取
@@ -207,7 +213,10 @@ class SettingsFragment : BaseFragment() {
                     ReminderNotificationTimePickerDialogFragment.KEY_SELECTED_TIME
                 )
             )
-        settingsViewModel.saveReminderNotificationValid(selectedTime)
+
+        lifecycleScope.launch(Dispatchers.IO) {
+            settingsViewModel.saveReminderNotificationValid(selectedTime)
+        }
     }
 
     // 権限催促ダイアログフラグメントから結果受取
@@ -236,7 +245,9 @@ class SettingsFragment : BaseFragment() {
                 ?: return
         if (selectedButton != Dialog.BUTTON_POSITIVE) return
 
-        settingsViewModel.initializeAllSettings()
+        lifecycleScope.launch(Dispatchers.IO) {
+            settingsViewModel.initializeAllSettings()
+        }
     }
 
     private fun receiveAllDataDeleteDialogResult() {
@@ -244,8 +255,10 @@ class SettingsFragment : BaseFragment() {
             receiveResulFromDialog<Int>(AllDataDeleteDialogFragment.KEY_SELECTED_BUTTON) ?: return
         if (selectedButton != Dialog.BUTTON_POSITIVE) return
 
-        settingsViewModel.deleteAllData()
-        uriPermissionManager.releaseAllPersistablePermission()
+        lifecycleScope.launch(Dispatchers.IO) {
+            val isSuccessful = settingsViewModel.deleteAllData()
+            if (isSuccessful) uriPermissionManager.releaseAllPersistablePermission()
+        }
     }
 
     private fun setUpThemeColorSettingItem() {
@@ -411,23 +424,24 @@ class SettingsFragment : BaseFragment() {
     }
 
     private inner class ReminderNotificationOnCheckedChangeListener
-
         : CompoundButton.OnCheckedChangeListener {
-        override fun onCheckedChanged(buttonView: CompoundButton, isChecked: Boolean) {
-            if (!isTouchedReminderNotificationSwitch) return
+            override fun onCheckedChanged(buttonView: CompoundButton, isChecked: Boolean) {
+                if (!isTouchedReminderNotificationSwitch) return
 
-            if (isChecked) {
-                // MEMO:PostNotificationsはApiLevel33で導入されたPermission。33未満は許可取り不要。
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                    requestPostNotificationsPermission()
+                if (isChecked) {
+                    // MEMO:PostNotificationsはApiLevel33で導入されたPermission。33未満は許可取り不要。
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                        requestPostNotificationsPermission()
+                    } else {
+                        showReminderNotificationTimePickerDialog()
+                    }
                 } else {
-                    showReminderNotificationTimePickerDialog()
+                    lifecycleScope.launch(Dispatchers.IO) {
+                        settingsViewModel.saveReminderNotificationInvalid()
+                    }
                 }
-            } else {
-                settingsViewModel.saveReminderNotificationInvalid()
+                isTouchedReminderNotificationSwitch = false
             }
-            isTouchedReminderNotificationSwitch = false
-        }
 
         @RequiresApi(api = Build.VERSION_CODES.TIRAMISU)
         fun requestPostNotificationsPermission() {
@@ -465,7 +479,9 @@ class SettingsFragment : BaseFragment() {
             .setOnCheckedChangeListener { _: CompoundButton, isChecked: Boolean ->
                 if (!isTouchedPasscodeLockSwitch) return@setOnCheckedChangeListener
 
-                settingsViewModel.savePasscodeLock(isChecked)
+                lifecycleScope.launch(Dispatchers.IO) {
+                    settingsViewModel.savePasscodeLock(isChecked)
+                }
                 isTouchedPasscodeLockSwitch = false
             }
 
@@ -484,7 +500,9 @@ class SettingsFragment : BaseFragment() {
         // MEMO:端末設定画面で"許可 -> 無許可"に変更したときの対応コード
         val isGranted = mainActivity.isGrantedAccessLocation
         if (!isGranted) {
-            settingsViewModel.saveWeatherInfoAcquisition(false)
+            lifecycleScope.launch(Dispatchers.IO) {
+                settingsViewModel.saveWeatherInfoAcquisition(false)
+            }
         }
 
         binding.includeWeatherInfoAcquisitionSetting.materialSwitch
@@ -510,7 +528,9 @@ class SettingsFragment : BaseFragment() {
             if (isChecked) {
                 val isGranted = mainActivity.isGrantedAccessLocation
                 if (isGranted) {
-                    settingsViewModel.saveWeatherInfoAcquisition(true)
+                    lifecycleScope.launch(Dispatchers.IO) {
+                        settingsViewModel.saveWeatherInfoAcquisition(true)
+                    }
                 } else {
                     binding.includeWeatherInfoAcquisitionSetting.materialSwitch.isChecked = false
                     val shouldShowRequestPermissionRationale =
@@ -536,7 +556,9 @@ class SettingsFragment : BaseFragment() {
                     }
                 }
             } else {
-                settingsViewModel.saveWeatherInfoAcquisition(false)
+                lifecycleScope.launch(Dispatchers.IO) {
+                    settingsViewModel.saveWeatherInfoAcquisition(false)
+                }
             }
             isTouchedWeatherInfoAcquisitionSwitch = false
         }

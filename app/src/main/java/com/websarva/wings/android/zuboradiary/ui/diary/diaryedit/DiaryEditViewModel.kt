@@ -210,13 +210,12 @@ class DiaryEditViewModel @Inject constructor(
 
             diaryLiveData.update(diaryEntity)
             _loadedPicturePath.postValue(diaryLiveData.picturePath.value)
-
-            return true
         } catch (e: Exception) {
             Log.d("Exception", "loadSavedDiary()" , e)
             addAppMessage(AppMessage.DIARY_LOADING_ERROR)
             return false
         }
+        return true
     }
 
     suspend fun existsSavedDiary(date: LocalDate): Boolean? {
@@ -245,11 +244,11 @@ class DiaryEditViewModel @Inject constructor(
                 diaryRepository
                     .saveDiary(diaryEntity, diaryItemTitleSelectionHistoryItemEntityList)
             }
-            return true
         } catch (e: Exception) {
             addAppMessage(AppMessage.DIARY_SAVING_ERROR)
             return false
         }
+        return true
     }
 
     suspend fun deleteDiary(): Boolean {
@@ -257,11 +256,11 @@ class DiaryEditViewModel @Inject constructor(
 
         try {
             diaryRepository.deleteDiary(deleteDate)
-            return true
         } catch (e: Exception) {
             addAppMessage(AppMessage.DIARY_DELETE_ERROR)
             return false
         }
+        return true
     }
 
     // 日付関係

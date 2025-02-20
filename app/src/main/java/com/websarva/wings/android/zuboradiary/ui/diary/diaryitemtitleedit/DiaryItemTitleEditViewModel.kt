@@ -3,16 +3,13 @@ package com.websarva.wings.android.zuboradiary.ui.diary.diaryitemtitleedit
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.asLiveData
-import androidx.lifecycle.viewModelScope
 import com.websarva.wings.android.zuboradiary.data.AppMessage
 import com.websarva.wings.android.zuboradiary.data.database.DiaryItemTitleSelectionHistoryRepository
 import com.websarva.wings.android.zuboradiary.data.diary.ItemNumber
 import com.websarva.wings.android.zuboradiary.ui.BaseViewModel
 import com.websarva.wings.android.zuboradiary.ui.notNullValue
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
@@ -68,22 +65,21 @@ class DiaryItemTitleEditViewModel @Inject constructor(
         _itemTitle.value = itemTitle
     }
 
-    fun deleteDiaryItemTitleSelectionHistoryItem(deletePosition: Int) {
+    suspend fun deleteDiaryItemTitleSelectionHistoryItem(deletePosition: Int): Boolean {
         require(deletePosition >= 0)
 
         val currentList = itemTitleSelectionHistoryList.notNullValue()
         val listSize = currentList.selectionHistoryListItemList.size
         require(deletePosition < listSize)
 
-        viewModelScope.launch(Dispatchers.IO) {
-            val deleteItem = currentList.selectionHistoryListItemList[deletePosition]
-            val deleteTitle = deleteItem.title
-            try {
-                diaryItemTitleSelectionHistoryRepository.deleteSelectionHistoryItem(deleteTitle)
-            } catch (e: Exception) {
-                addAppMessage(AppMessage.DIARY_ITEM_TITLE_HISTORY_ITEM_DELETE_ERROR)
-                return@launch
-            }
+        val deleteItem = currentList.selectionHistoryListItemList[deletePosition]
+        val deleteTitle = deleteItem.title
+        try {
+            diaryItemTitleSelectionHistoryRepository.deleteSelectionHistoryItem(deleteTitle)
+        } catch (e: Exception) {
+            addAppMessage(AppMessage.DIARY_ITEM_TITLE_HISTORY_ITEM_DELETE_ERROR)
+            return false
         }
+        return true
     }
 }

@@ -64,19 +64,17 @@ class DiaryListViewModel @Inject constructor(private val diaryRepository: DiaryR
         sortConditionDate = null
     }
 
-    fun loadDiaryListOnSetUp() {
+    suspend fun loadDiaryListOnSetUp() {
         val diaryList = diaryList.notNullValue()
-        viewModelScope.launch(Dispatchers.IO) {
-            if (diaryList.diaryYearMonthListItemList.isEmpty()) {
-                try {
-                    val numSavedDiaries = diaryRepository.countDiaries()
-                    if (numSavedDiaries >= 1) loadNewDiaryList()
-                } catch (e: Exception) {
-                    addAppMessage(AppMessage.DIARY_INFO_LOADING_ERROR)
-                }
-            } else {
-                updateDiaryList()
+        if (diaryList.diaryYearMonthListItemList.isEmpty()) {
+            try {
+                val numSavedDiaries = diaryRepository.countDiaries()
+                if (numSavedDiaries >= 1) loadNewDiaryList()
+            } catch (e: Exception) {
+                addAppMessage(AppMessage.DIARY_INFO_LOADING_ERROR)
             }
+        } else {
+            updateDiaryList()
         }
     }
 
@@ -92,6 +90,7 @@ class DiaryListViewModel @Inject constructor(private val diaryRepository: DiaryR
         loadDiaryList(UpdateDiaryListCreator())
     }
 
+    // TODO:suspend関数にしたいがJobをViewModel側で管理したい。後日検討。
     private fun loadDiaryList(creator: DiaryListCreator) {
         Log.d("DiaryListLoading", "loadDiaryList()")
         cancelPreviousLoading()

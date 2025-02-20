@@ -193,7 +193,9 @@ class DiaryListFragment : BaseFragment() {
                 true
             }
 
-        diaryListViewModel.loadDiaryListOnSetUp()
+        lifecycleScope.launch(Dispatchers.IO) {
+            diaryListViewModel.loadDiaryListOnSetUp()
+        }
     }
 
     private inner class DiaryListAdapter(

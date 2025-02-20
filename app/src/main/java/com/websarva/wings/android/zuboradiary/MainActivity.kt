@@ -19,6 +19,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination
 import androidx.navigation.fragment.NavHostFragment
@@ -45,6 +46,8 @@ import com.websarva.wings.android.zuboradiary.ui.notNullValue
 import com.websarva.wings.android.zuboradiary.ui.settings.SettingsFragment
 import com.websarva.wings.android.zuboradiary.ui.settings.SettingsViewModel
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
@@ -453,9 +456,17 @@ class MainActivity : AppCompatActivity() {
     // MEMO:端末設定画面で"許可 -> 無許可"に変更したときの対応コード
     private fun checkPermission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            if (!isGrantedPostNotifications) settingsViewModel.saveReminderNotificationInvalid()
+            if (!isGrantedPostNotifications) {
+                lifecycleScope.launch(Dispatchers.IO) {
+                    settingsViewModel.saveReminderNotificationInvalid()
+                }
+            }
         }
-        if (!isGrantedAccessLocation) settingsViewModel.saveWeatherInfoAcquisition(false)
+        if (!isGrantedAccessLocation) {
+            lifecycleScope.launch(Dispatchers.IO) {
+                settingsViewModel.saveWeatherInfoAcquisition(false)
+            }
+        }
     }
 
     fun loadPicturePath() {

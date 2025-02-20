@@ -6,7 +6,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.asLiveData
-import androidx.lifecycle.viewModelScope
 import com.websarva.wings.android.zuboradiary.data.AppMessage
 import com.websarva.wings.android.zuboradiary.data.database.DiaryRepository
 import com.websarva.wings.android.zuboradiary.data.network.GeoCoordinates
@@ -20,9 +19,7 @@ import com.websarva.wings.android.zuboradiary.data.preferences.WeatherInfoAcquis
 import com.websarva.wings.android.zuboradiary.data.worker.WorkerRepository
 import com.websarva.wings.android.zuboradiary.ui.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.launch
 import java.time.DayOfWeek
 import java.time.LocalTime
 import javax.inject.Inject
@@ -38,6 +35,8 @@ class SettingsViewModel @Inject constructor(
     //      これにより、Observerの引数がnull許容型となりnull時の処理ができる。
     lateinit var themeColor: LiveData<ThemeColor>
     lateinit var calendarStartDayOfWeek: LiveData<DayOfWeek>
+    // TODO:preferencesの更新をsuspend関数にしたことによりMaterialSwitchがカクつくようになった。
+    //      DataBindingをやめてObserverで切替たら直る？
     lateinit var isCheckedReminderNotification: LiveData<Boolean>
     lateinit var reminderNotificationTime: LiveData<LocalTime?>
     lateinit var isCheckedPasscodeLock: LiveData<Boolean>
@@ -187,40 +186,40 @@ class SettingsViewModel @Inject constructor(
         addAppMessage(AppMessage.SETTING_LOADING_ERROR)
     }
 
-    fun saveThemeColor(value: ThemeColor) {
+    suspend fun saveThemeColor(value: ThemeColor): Boolean {
         val preferenceValue = ThemeColorPreference(value)
-        updateSettingValue{
+        return updateSettingValue{
             userPreferencesRepository.saveThemeColorPreference(preferenceValue)
         }
     }
 
-    fun saveCalendarStartDayOfWeek(value: DayOfWeek) {
+    suspend fun saveCalendarStartDayOfWeek(value: DayOfWeek): Boolean {
         val preferenceValue =
             CalendarStartDayOfWeekPreference(value)
-        updateSettingValue{
+        return updateSettingValue{
             userPreferencesRepository.saveCalendarStartDayOfWeekPreference(preferenceValue)
         }
     }
 
-    fun saveReminderNotificationValid(value: LocalTime) {
+    suspend fun saveReminderNotificationValid(value: LocalTime): Boolean {
         val preferenceValue =
             ReminderNotificationPreference(true, value)
-        updateSettingValue{
+        return updateSettingValue{
             userPreferencesRepository.saveReminderNotificationPreference(preferenceValue)
             workerRepository.registerReminderNotificationWorker(value)
         }
     }
 
-    fun saveReminderNotificationInvalid() {
+    suspend fun saveReminderNotificationInvalid(): Boolean {
         val preferenceValue =
             ReminderNotificationPreference(false, null as LocalTime?)
-        updateSettingValue{
+        return updateSettingValue{
             userPreferencesRepository.saveReminderNotificationPreference(preferenceValue)
             workerRepository.cancelReminderNotificationWorker()
         }
     }
 
-    fun savePasscodeLock(value: Boolean) {
+    suspend fun savePasscodeLock(value: Boolean): Boolean {
         val passcode = if (value) {
             "0000" // TODO:仮
         } else {
@@ -228,15 +227,15 @@ class SettingsViewModel @Inject constructor(
         }
 
         val preferenceValue = PassCodeLockPreference(value, passcode)
-        updateSettingValue{
+        return updateSettingValue{
             userPreferencesRepository.savePasscodeLockPreference(preferenceValue)
         }
     }
 
-    fun saveWeatherInfoAcquisition(value: Boolean) {
+    suspend fun saveWeatherInfoAcquisition(value: Boolean): Boolean {
         val preferenceValue =
             WeatherInfoAcquisitionPreference(value)
-        updateSettingValue{
+        return updateSettingValue{
             userPreferencesRepository.saveWeatherInfoAcquisitionPreference(preferenceValue)
         }
     }
@@ -249,20 +248,21 @@ class SettingsViewModel @Inject constructor(
         suspend fun update()
     }
 
-    private fun updateSettingValue(
+    private suspend fun updateSettingValue(
         updateProcess: SettingUpdateProcess
-    ) {
-        viewModelScope.launch(Dispatchers.IO) {
-            try {
-                updateProcess.update()
-            } catch (e: IOException) {
-                Log.d("Exception", "設定値更新失敗", e)
-                addSettingUpdateErrorMessage()
-            } catch (e: Exception) {
-                Log.d("Exception", "設定値更新失敗", e)
-                addSettingUpdateErrorMessage()
-            }
+    ): Boolean {
+        try {
+            updateProcess.update()
+        } catch (e: IOException) {
+            Log.d("Exception", "設定値更新失敗", e)
+            addSettingUpdateErrorMessage()
+            return false
+        } catch (e: Exception) {
+            Log.d("Exception", "設定値更新失敗", e)
+            addSettingUpdateErrorMessage()
+            return false
         }
+        return true
     }
 
     private fun addSettingUpdateErrorMessage() {
@@ -282,27 +282,26 @@ class SettingsViewModel @Inject constructor(
     suspend fun deleteAllDiaries(): Boolean {
         try {
             diaryRepository.deleteAllDiaries()
-            return true
         } catch (e: Exception) {
             addAppMessage(AppMessage.DIARY_DELETE_ERROR)
             return false
         }
+        return true
     }
 
-    fun initializeAllSettings() {
-        updateSettingValue{
+    suspend fun initializeAllSettings(): Boolean {
+        return updateSettingValue{
             userPreferencesRepository.initializeAllPreferences()
         }
     }
 
-    fun deleteAllData() {
-        viewModelScope.launch(Dispatchers.IO) {
-            try {
-                diaryRepository.deleteAllData()
-            } catch (e: Exception) {
-                addAppMessage(AppMessage.DIARY_DELETE_ERROR)
-            }
-            initializeAllSettings()
+    suspend fun deleteAllData(): Boolean {
+        try {
+            diaryRepository.deleteAllData()
+        } catch (e: Exception) {
+            addAppMessage(AppMessage.DIARY_DELETE_ERROR)
+            return false
         }
+        return initializeAllSettings()
     }
 }
