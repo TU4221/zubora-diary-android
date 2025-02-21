@@ -8,11 +8,11 @@
             name="itemNumber"
             type="java.lang.String" />
         <variable
-            name="titleMutableLiveData"
-            type="androidx.lifecycle.MutableLiveData&lt;String>" />
+            name="titleMutableStateFlow"
+            type="kotlinx.coroutines.flow.MutableStateFlow&lt;String>" />
         <variable
-            name="commentMutableLiveData"
-            type="androidx.lifecycle.MutableLiveData&lt;String>" />
+            name="commentMutableStateFlow"
+            type="kotlinx.coroutines.flow.MutableStateFlow&lt;String>" />
     </data>
 
     <androidx.constraintlayout.motion.widget.MotionLayout
@@ -82,7 +82,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:textAppearance="@style/AppTextInputEditTextTextAppearance"
-                    android:text="@={titleMutableLiveData}"
+                    android:text="@={titleMutableStateFlow}"
                     android:textSize="@dimen/layout_diary_edit_item_text_size"
                     android:hint="@string/layout_diary_edit_item_title_hint"
                     android:maxLength="@integer/layout_diary_edit_item_title_max_length" />
@@ -105,7 +105,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:textAppearance="@style/AppTextInputEditTextTextAppearance"
-                    android:text="@={commentMutableLiveData}"
+                    android:text="@={commentMutableStateFlow}"
                     android:textSize="@dimen/layout_diary_edit_item_text_size"
                     android:hint="@string/layout_diary_edit_item_comment_hint"
                     android:maxLength="@integer/layout_diary_edit_item_comment_max_length"

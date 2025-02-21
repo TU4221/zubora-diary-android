@@ -20,6 +20,7 @@ import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination
 import androidx.navigation.fragment.NavHostFragment
@@ -40,13 +41,14 @@ import com.websarva.wings.android.zuboradiary.databinding.ActivityMainBinding
 import com.websarva.wings.android.zuboradiary.ui.ThemeColorInflaterCreator
 import com.websarva.wings.android.zuboradiary.ui.ThemeColorSwitcher
 import com.websarva.wings.android.zuboradiary.ui.calendar.CalendarFragment
+import com.websarva.wings.android.zuboradiary.ui.checkNotNull
 import com.websarva.wings.android.zuboradiary.ui.diary.diaryedit.DiaryEditFragment
 import com.websarva.wings.android.zuboradiary.ui.list.diarylist.DiaryListFragment
-import com.websarva.wings.android.zuboradiary.ui.notNullValue
 import com.websarva.wings.android.zuboradiary.ui.settings.SettingsFragment
 import com.websarva.wings.android.zuboradiary.ui.settings.SettingsViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
@@ -110,15 +112,20 @@ class MainActivity : AppCompatActivity() {
 
         setUpViewModel()
         setUpBinding()
-        settingsViewModel.isAllSettingsNotNull
-            .observe(this) { aBoolean: Boolean ->
-                if (!aBoolean) return@observe
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                settingsViewModel.isAllSettingsNotNull
+                    .collectLatest { value: Boolean ->
+                        if (!value) return@collectLatest
 
-                if (!isMainActivityLayoutInflated) setUpMainActivityBinding()
-                setUpLocationInfo()
-                setUpThemeColor()
-                setUpNavigation()
+                        if (!isMainActivityLayoutInflated) setUpMainActivityBinding()
+                        setUpLocationInfo()
+                        setUpThemeColor()
+                        setUpNavigation()
+                    }
             }
+        }
+
 
         installSplashScreen().setKeepOnScreenCondition { !isMainActivityLayoutInflated }
     }
@@ -129,13 +136,13 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setUpBinding() {
-        if (!settingsViewModel.isAllSettingsNotNull.notNullValue()) return
+        if (!settingsViewModel.isAllSettingsNotNull.value) return
 
         setUpMainActivityBinding()
     }
 
     private fun setUpMainActivityBinding() {
-        val themeColor = settingsViewModel.themeColor.notNullValue()
+        val themeColor = settingsViewModel.themeColor.checkNotNull()
         val creator = ThemeColorInflaterCreator(this, layoutInflater, themeColor)
         val themeColorInflater = creator.create()
         _binding = ActivityMainBinding.inflate(themeColorInflater)
@@ -148,16 +155,21 @@ class MainActivity : AppCompatActivity() {
             LocationRequest.Builder(Priority.PRIORITY_BALANCED_POWER_ACCURACY, 5000)
         locationRequest = builder.build()
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
-        settingsViewModel.isCheckedWeatherInfoAcquisition
-            .observe(this) { aBoolean: Boolean? ->
-                aBoolean ?: return@observe
 
-                if (aBoolean) {
-                    updateLocationInformation()
-                } else {
-                    settingsViewModel.clearGeoCoordinates()
-                }
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                settingsViewModel.isCheckedWeatherInfoAcquisition
+                    .collectLatest { value: Boolean? ->
+                        value ?: return@collectLatest
+
+                        if (value) {
+                            updateLocationInformation()
+                        } else {
+                            settingsViewModel.clearGeoCoordinates()
+                        }
+                    }
             }
+        }
     }
 
     private fun updateLocationInformation() {
@@ -195,12 +207,16 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setUpThemeColor() {
-        settingsViewModel.themeColor
-            .observe(this) { themeColor: ThemeColor? ->
-                themeColor ?: return@observe
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                settingsViewModel.themeColor
+                    .collectLatest { themeColor: ThemeColor? ->
+                        themeColor ?: return@collectLatest
 
-                switchThemeColor(themeColor)
+                        switchThemeColor(themeColor)
+                    }
             }
+        }
     }
 
     private fun switchThemeColor(themeColor: ThemeColor) {

@@ -1,5 +1,6 @@
 package com.websarva.wings.android.zuboradiary.ui.calendar
 
+import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -18,25 +19,32 @@ import com.kizitonwose.calendar.view.MonthHeaderFooterBinder
 import com.kizitonwose.calendar.view.ViewContainer
 import com.websarva.wings.android.zuboradiary.R
 import com.websarva.wings.android.zuboradiary.data.AppMessage
+import com.websarva.wings.android.zuboradiary.data.AppMessageList
 import com.websarva.wings.android.zuboradiary.data.DateTimeStringConverter
+import com.websarva.wings.android.zuboradiary.data.diary.Condition
+import com.websarva.wings.android.zuboradiary.data.diary.Weather
 import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor
 import com.websarva.wings.android.zuboradiary.databinding.FragmentCalendarBinding
 import com.websarva.wings.android.zuboradiary.databinding.LayoutCalendarDayBinding
 import com.websarva.wings.android.zuboradiary.databinding.LayoutCalendarHeaderBinding
 import com.websarva.wings.android.zuboradiary.ui.BaseFragment
+import com.websarva.wings.android.zuboradiary.ui.checkNotNull
 import com.websarva.wings.android.zuboradiary.ui.diary.diaryshow.DiaryShowFragment
 import com.websarva.wings.android.zuboradiary.ui.diary.diaryshow.DiaryShowFragment.ConditionObserver
 import com.websarva.wings.android.zuboradiary.ui.diary.diaryshow.DiaryShowFragment.LogObserver
+import com.websarva.wings.android.zuboradiary.ui.diary.diaryshow.DiaryShowFragment.NumVisibleItemsObserver
+import com.websarva.wings.android.zuboradiary.ui.diary.diaryshow.DiaryShowFragment.PicturePathObserver
 import com.websarva.wings.android.zuboradiary.ui.diary.diaryshow.DiaryShowFragment.Weather1Observer
 import com.websarva.wings.android.zuboradiary.ui.diary.diaryshow.DiaryShowFragment.Weather2Observer
 import com.websarva.wings.android.zuboradiary.ui.diary.diaryshow.DiaryShowViewModel
-import com.websarva.wings.android.zuboradiary.ui.notNullValue
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.time.DayOfWeek
 import java.time.LocalDate
+import java.time.LocalDateTime
 import java.time.YearMonth
 import java.time.format.DateTimeFormatter
 import java.util.Arrays
@@ -111,10 +119,19 @@ class CalendarFragment : BaseFragment() {
     }
 
     override fun setUpOtherAppMessageDialog() {
-        calendarViewModel.appMessageBufferList
-            .observe(viewLifecycleOwner, AppMessageBufferListObserver(calendarViewModel))
-        diaryShowViewModel.appMessageBufferList
-            .observe(viewLifecycleOwner, AppMessageBufferListObserver(diaryShowViewModel))
+        launchAndRepeatOnLifeCycleStarted {
+            calendarViewModel.appMessageBufferList
+                .collectLatest { value: AppMessageList ->
+                    AppMessageBufferListObserver(calendarViewModel).onChanged(value)
+                }
+        }
+
+        launchAndRepeatOnLifeCycleStarted {
+            diaryShowViewModel.appMessageBufferList
+                .collectLatest { value: AppMessageList ->
+                    AppMessageBufferListObserver(diaryShowViewModel).onChanged(value)
+                }
+        }
     }
 
     private fun setUpCalendar() {
@@ -128,28 +145,29 @@ class CalendarFragment : BaseFragment() {
         val endMonth = currentMonth.plusMonths(60) //現在から未来5年分
         calendar.setup(startMonth, endMonth, daysOfWeek[0])
 
-        val selectedDate = checkNotNull(calendarViewModel.selectedDate.value)
-        calendarViewModel.updateSelectedDate(selectedDate)
+        launchAndRepeatOnLifeCycleStarted {
+            calendarViewModel.selectedDate
+                .collectLatest { value: LocalDate ->
+                    binding.calendar.notifyDateChanged(value) // 今回選択日付更新
+                    scrollCalendar(value)
+                    updateToolBarDate(value)
+                    showSelectedDiary(value)
+                }
+        }
 
-        calendarViewModel.selectedDate
-            .observe(viewLifecycleOwner) { localDate: LocalDate ->
-                binding.calendar.notifyDateChanged(localDate) // 今回選択日付更新
-                scrollCalendar(localDate)
-                updateToolBarDate(localDate)
-                showSelectedDiary(localDate)
-            }
+        launchAndRepeatOnLifeCycleStarted {
+            calendarViewModel.previousSelectedDate
+                .collectLatest { value: LocalDate? ->
+                    // MEMO:一度も日付選択をしていない場合はnullが代入されている。
+                    if (value == null) return@collectLatest
 
-        calendarViewModel.previousSelectedDate
-            .observe(viewLifecycleOwner) { localDate: LocalDate? ->
-                // MEMO:一度も日付選択をしていない場合はnullが代入されている。
-                if (localDate == null) return@observe
-
-                binding.calendar.notifyDateChanged(localDate) // 前回選択日付更新
-            }
+                    binding.calendar.notifyDateChanged(value) // 前回選択日付更新
+                }
+        }
     }
 
     private fun createDayOfWeekList(): List<DayOfWeek> {
-        val firstDayOfWeek = settingsViewModel.calendarStartDayOfWeek.notNullValue()
+        val firstDayOfWeek = settingsViewModel.calendarStartDayOfWeek.checkNotNull()
 
         val daysOfWeek = DayOfWeek.entries.toTypedArray()
         val firstDayOfWeekListPos = firstDayOfWeek.value
@@ -403,70 +421,82 @@ class CalendarFragment : BaseFragment() {
     }
 
     private fun setUpDiaryShow() {
-        diaryShowViewModel.weather1LiveData
-            .observe(
-                viewLifecycleOwner,
-                Weather1Observer(
-                    requireContext(),
-                    binding.includeDiaryShow.textWeather1Selected
-                )
-            )
 
-        diaryShowViewModel.weather2LiveData
-            .observe(
-                viewLifecycleOwner,
-                Weather2Observer(
-                    requireContext(),
-                    binding.includeDiaryShow.textWeatherSlush,
-                    binding.includeDiaryShow.textWeather2Selected
-                )
-            )
+        launchAndRepeatOnLifeCycleStarted {
+            diaryShowViewModel.weather1
+                .collectLatest { value: Weather ->
+                    Weather1Observer(
+                        requireContext(),
+                        binding.includeDiaryShow.textWeather1Selected
+                    ).onChanged(value)
+                }
+        }
 
-        diaryShowViewModel.conditionLiveData
-            .observe(
-                viewLifecycleOwner,
-                ConditionObserver(
-                    requireContext(),
-                    binding.includeDiaryShow.textConditionSelected
-                )
-            )
+        launchAndRepeatOnLifeCycleStarted {
+            diaryShowViewModel.weather2
+                .collectLatest { value: Weather ->
+                    Weather2Observer(
+                        requireContext(),
+                        binding.includeDiaryShow.textWeatherSlush,
+                        binding.includeDiaryShow.textWeather2Selected
+                    ).onChanged(value)
+                }
 
-        // 項目レイアウト設定
-        val itemLayouts =
-            binding.run{
-                arrayOf(
-                    includeDiaryShow.includeItem1.linerLayoutDiaryShowItem,
-                    includeDiaryShow.includeItem2.linerLayoutDiaryShowItem,
-                    includeDiaryShow.includeItem3.linerLayoutDiaryShowItem,
-                    includeDiaryShow.includeItem4.linerLayoutDiaryShowItem,
-                    includeDiaryShow.includeItem5.linerLayoutDiaryShowItem,
-                )
-            }
+        }
 
-        diaryShowViewModel.numVisibleItemsLiveData
-            .observe(viewLifecycleOwner, DiaryShowFragment.NumVisibleItemsObserver(itemLayouts))
+        launchAndRepeatOnLifeCycleStarted {
+            diaryShowViewModel.condition
+                .collectLatest { value: Condition ->
+                    ConditionObserver(
+                        requireContext(),
+                        binding.includeDiaryShow.textConditionSelected
+                    ).onChanged(value)
+                }
+        }
 
-        diaryShowViewModel.picturePathLiveData
-            .observe(
-                viewLifecycleOwner,
-                DiaryShowFragment.PicturePathObserver(
-                    requireContext(),
-                    themeColor,
-                    binding.includeDiaryShow.textAttachedPicture,
-                    binding.includeDiaryShow.imageAttachedPicture
-                )
-            )
+        launchAndRepeatOnLifeCycleStarted {
+            // 項目レイアウト設定
+            val itemLayouts =
+                binding.run{
+                    arrayOf(
+                        includeDiaryShow.includeItem1.linerLayoutDiaryShowItem,
+                        includeDiaryShow.includeItem2.linerLayoutDiaryShowItem,
+                        includeDiaryShow.includeItem3.linerLayoutDiaryShowItem,
+                        includeDiaryShow.includeItem4.linerLayoutDiaryShowItem,
+                        includeDiaryShow.includeItem5.linerLayoutDiaryShowItem,
+                    )
+                }
 
-        diaryShowViewModel.logLiveData
-            .observe(
-                viewLifecycleOwner,
-                LogObserver(binding.includeDiaryShow.textLogValue)
-            )
+            diaryShowViewModel.numVisibleItems
+                .collectLatest { value: Int ->
+                    NumVisibleItemsObserver(itemLayouts).onChanged(value)
+                }
+        }
+
+        launchAndRepeatOnLifeCycleStarted {
+            diaryShowViewModel.picturePath
+                .collectLatest { value: Uri? ->
+                    PicturePathObserver(
+                        requireContext(),
+                        themeColor,
+                        binding.includeDiaryShow.textAttachedPicture,
+                        binding.includeDiaryShow.imageAttachedPicture
+                    ).onChanged(value)
+                }
+        }
+
+        launchAndRepeatOnLifeCycleStarted {
+            diaryShowViewModel.log
+                .collectLatest { value: LocalDateTime? ->
+                    LogObserver(binding.includeDiaryShow.textLogValue).onChanged(value)
+                }
+        }
+
     }
 
     private fun setUpFloatActionButton() {
         binding.floatingActionButtonDiaryEdit.setOnClickListener {
-            val selectedDate = checkNotNull(calendarViewModel.selectedDate.value)
+            val selectedDate = calendarViewModel.selectedDate.value
             showDiaryEditFragment(selectedDate)
         }
     }

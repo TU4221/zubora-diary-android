@@ -54,7 +54,7 @@
                         android:paddingVertical="8dp"
                         android:paddingHorizontal="16dp"
                         android:textAppearance="@style/WordSearchTextViewTextAppearance"
-                        android:text="@={word_search_view_model.searchWordMutable}"
+                        android:text="@={word_search_view_model.searchWordMutableStateFlow}"
                         android:hint="@string/fragment_word_search_input_field_hint"
                         android:textSize="16sp" />
 
@@ -120,7 +120,7 @@
                 <include
                     layout="@layout/layout_full_screen_circular_progress_indicator"
                     android:id="@+id/include_progress_indicator"
-                    app:isVisibleLiveData="@{word_search_view_model.isVisibleUpdateProgressBar}" />
+                    app:isVisibleStateFlow="@{word_search_view_model.isVisibleUpdateProgressBar}" />
 
             </FrameLayout>
 

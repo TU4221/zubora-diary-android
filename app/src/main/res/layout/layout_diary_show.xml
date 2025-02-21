@@ -104,39 +104,39 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/layout_diary_show_small_margin_top"
             android:textAppearance="@style/AppTextViewTextAppearance"
-            android:text="@{diaryShowViewModel.titleLiveData}"
+            android:text="@{diaryShowViewModel.title}"
             android:hint="@string/layout_diary_show_title_hint"
             android:textSize="@dimen/layout_diary_show_text_size" />
 
         <include layout="@layout/layout_diary_show_item"
             android:id="@+id/include_item_1"
             app:itemNumber="@{@string/layout_diary_show_item_1}"
-            app:titleLiveData="@{diaryShowViewModel.item1TitleLiveData}"
-            app:commentLiveData="@{diaryShowViewModel.item1CommentLiveData}"/>
+            app:titleStateFlow="@{diaryShowViewModel.item1Title}"
+            app:commentStateFlow="@{diaryShowViewModel.item1Comment}"/>
 
         <include layout="@layout/layout_diary_show_item"
             android:id="@+id/include_item_2"
             app:itemNumber="@{@string/layout_diary_show_item_2}"
-            app:titleLiveData="@{diaryShowViewModel.item2TitleLiveData}"
-            app:commentLiveData="@{diaryShowViewModel.item2CommentLiveData}"/>
+            app:titleStateFlow="@{diaryShowViewModel.item2Title}"
+            app:commentStateFlow="@{diaryShowViewModel.item2Comment}"/>
 
         <include layout="@layout/layout_diary_show_item"
             android:id="@+id/include_item_3"
             app:itemNumber="@{@string/layout_diary_show_item_3}"
-            app:titleLiveData="@{diaryShowViewModel.item3TitleLiveData}"
-            app:commentLiveData="@{diaryShowViewModel.item3CommentLiveData}"/>
+            app:titleStateFlow="@{diaryShowViewModel.item3Title}"
+            app:commentStateFlow="@{diaryShowViewModel.item3Comment}"/>
 
         <include layout="@layout/layout_diary_show_item"
             android:id="@+id/include_item_4"
             app:itemNumber="@{@string/layout_diary_show_item_4}"
-            app:titleLiveData="@{diaryShowViewModel.item4TitleLiveData}"
-            app:commentLiveData="@{diaryShowViewModel.item4CommentLiveData}"/>
+            app:titleStateFlow="@{diaryShowViewModel.item4Title}"
+            app:commentStateFlow="@{diaryShowViewModel.item4Comment}"/>
 
         <include layout="@layout/layout_diary_show_item"
             android:id="@+id/include_item_5"
             app:itemNumber="@{@string/layout_diary_show_item_5}"
-            app:titleLiveData="@{diaryShowViewModel.item5TitleLiveData}"
-            app:commentLiveData="@{diaryShowViewModel.item5CommentLiveData}"/>
+            app:titleStateFlow="@{diaryShowViewModel.item5Title}"
+            app:commentStateFlow="@{diaryShowViewModel.item5Comment}"/>
 
         <TextView
             style="@style/AppTextViewStyle"

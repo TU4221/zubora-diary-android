@@ -16,7 +16,7 @@ abstract class BaseAlertDialogFragment : DialogFragment() {
     protected lateinit var settingsViewModel: SettingsViewModel
 
     private val themeColor
-        get() = settingsViewModel.themeColor.notNullValue()
+        get() = settingsViewModel.themeColor.checkNotNull()
 
     /**
      * 戻り値をtrueにすると、ダイアログ枠外、戻るボタンタッチ時にダイアログをキャンセルすることを可能にする。

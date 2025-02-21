@@ -8,11 +8,11 @@
             name="itemNumber"
             type="java.lang.String" />
         <variable
-            name="titleLiveData"
-            type="androidx.lifecycle.LiveData&lt;String>" />
+            name="titleStateFlow"
+            type="kotlinx.coroutines.flow.StateFlow&lt;String>" />
         <variable
-            name="commentLiveData"
-            type="androidx.lifecycle.LiveData&lt;String>" />
+            name="commentStateFlow"
+            type="kotlinx.coroutines.flow.StateFlow&lt;String>" />
     </data>
 
     <LinearLayout
@@ -39,7 +39,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/layout_diary_show_item_small_margin_top"
             android:textAppearance="@style/AppTextViewTextAppearance"
-            android:text="@{titleLiveData}"
+            android:text="@{titleStateFlow}"
             android:textSize="@dimen/layout_diary_show_item_text_size"
             android:hint="@string/layout_diary_show_item_title_hint" />
 
@@ -55,7 +55,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/layout_diary_show_item_small_margin_top"
             android:textAppearance="@style/AppTextViewTextAppearance"
-            android:text="@{commentLiveData}"
+            android:text="@{commentStateFlow}"
             android:textSize="@dimen/layout_diary_show_item_text_size"
             android:hint="@string/layout_diary_show_item_comment_hint" />
 

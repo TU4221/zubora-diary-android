@@ -2,8 +2,6 @@ package com.websarva.wings.android.zuboradiary.ui.diary.diaryedit
 
 import android.net.Uri
 import android.util.Log
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import com.websarva.wings.android.zuboradiary.data.AppMessage
 import com.websarva.wings.android.zuboradiary.data.database.DiaryEntity
 import com.websarva.wings.android.zuboradiary.data.database.DiaryRepository
@@ -14,8 +12,11 @@ import com.websarva.wings.android.zuboradiary.data.network.GeoCoordinates
 import com.websarva.wings.android.zuboradiary.data.network.WeatherApiRepository
 import com.websarva.wings.android.zuboradiary.ui.BaseViewModel
 import com.websarva.wings.android.zuboradiary.ui.checkNotNull
-import com.websarva.wings.android.zuboradiary.ui.diary.DiaryLiveData
+import com.websarva.wings.android.zuboradiary.ui.diary.DiaryStateFlow
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import java.time.LocalDate
 import java.time.temporal.ChronoUnit
 import javax.inject.Inject
@@ -24,113 +25,117 @@ import javax.inject.Inject
 class DiaryEditViewModel @Inject constructor(
     private val diaryRepository: DiaryRepository,
     private val weatherApiRepository: WeatherApiRepository
-) :
-    BaseViewModel() {
+) : BaseViewModel() {
     // Getter
     // 日記データ関係
-    private val _previousDate = MutableLiveData<LocalDate?>()
-    val previousDate: LiveData<LocalDate?>
-        get() = _previousDate
+    private val initialPreviousDate = null
+    private val _previousDate = MutableStateFlow<LocalDate?>(initialPreviousDate)
+    val previousDate
+        get() = _previousDate.asStateFlow()
 
-    private val _loadedDate = MutableLiveData<LocalDate?>()
-    val loadedDate: LiveData<LocalDate?>
-        get() = _loadedDate
+    private val initialLoadedDate = null
+    private val _loadedDate = MutableStateFlow<LocalDate?>(initialLoadedDate)
+    val loadedDate
+        get() = _loadedDate.asStateFlow()
 
-    private val diaryLiveData = DiaryLiveData()
+    private val diaryStateFlow = DiaryStateFlow()
 
-    val date: LiveData<LocalDate?>
-        get() = diaryLiveData.date
-
-    /**
-     * LayoutDataBinding用
-     * */
-    val titleMutableLiveData: MutableLiveData<String>
-        get() = diaryLiveData.title
-
-    val weather1: LiveData<Weather>
-        get() = diaryLiveData.weather1
-
-    val weather2: LiveData<Weather>
-        get() = diaryLiveData.weather2
-
-    val condition: LiveData<Condition>
-        get() = diaryLiveData.condition
-
-    val numVisibleItems: LiveData<Int>
-        get() = diaryLiveData.numVisibleItems
+    val date
+        get() = diaryStateFlow.date.asStateFlow()
 
     /**
      * LayoutDataBinding用
      * */
-    val item1TitleMutable: MutableLiveData<String>
-        get() = diaryLiveData.getItemLiveData(ItemNumber(1)).title
+    val titleMutableStateFlow
+        get() = diaryStateFlow.title
+
+    val weather1
+        get() = diaryStateFlow.weather1.asStateFlow()
+
+    val weather2
+        get() = diaryStateFlow.weather2.asStateFlow()
+
+    val condition
+        get() = diaryStateFlow.condition.asStateFlow()
+
+    val numVisibleItems
+        get() = diaryStateFlow.numVisibleItems.asStateFlow()
 
     /**
      * LayoutDataBinding用
      * */
-    val item2TitleMutable: MutableLiveData<String>
-        get() = diaryLiveData.getItemLiveData(ItemNumber(2)).title
+    val item1TitleMutable
+        get() = diaryStateFlow.getItemStateFlow(ItemNumber(1)).title
 
     /**
      * LayoutDataBinding用
      * */
-    val item3TitleMutable: MutableLiveData<String>
-        get() = diaryLiveData.getItemLiveData(ItemNumber(3)).title
+    val item2TitleMutable
+        get() = diaryStateFlow.getItemStateFlow(ItemNumber(2)).title
 
     /**
      * LayoutDataBinding用
      * */
-    val item4TitleMutable: MutableLiveData<String>
-        get() = diaryLiveData.getItemLiveData(ItemNumber(4)).title
+    val item3TitleMutable
+        get() = diaryStateFlow.getItemStateFlow(ItemNumber(3)).title
 
     /**
      * LayoutDataBinding用
      * */
-    val item5TitleMutable: MutableLiveData<String>
-        get() = diaryLiveData.getItemLiveData(ItemNumber(5)).title
+    val item4TitleMutable
+        get() = diaryStateFlow.getItemStateFlow(ItemNumber(4)).title
 
     /**
      * LayoutDataBinding用
      * */
-    val item1CommentMutable: MutableLiveData<String>
-        get() = diaryLiveData.getItemLiveData(ItemNumber(1)).comment
+    val item5TitleMutable
+        get() = diaryStateFlow.getItemStateFlow(ItemNumber(5)).title
 
     /**
      * LayoutDataBinding用
      * */
-    val item2CommentMutable: MutableLiveData<String>
-        get() = diaryLiveData.getItemLiveData(ItemNumber(2)).comment
+    val item1CommentMutable
+        get() = diaryStateFlow.getItemStateFlow(ItemNumber(1)).comment
 
     /**
      * LayoutDataBinding用
      * */
-    val item3CommentMutable: MutableLiveData<String>
-        get() = diaryLiveData.getItemLiveData(ItemNumber(3)).comment
+    val item2CommentMutable
+        get() = diaryStateFlow.getItemStateFlow(ItemNumber(2)).comment
 
     /**
      * LayoutDataBinding用
      * */
-    val item4CommentMutable: MutableLiveData<String>
-        get() = diaryLiveData.getItemLiveData(ItemNumber(4)).comment
+    val item3CommentMutable
+        get() = diaryStateFlow.getItemStateFlow(ItemNumber(3)).comment
 
     /**
      * LayoutDataBinding用
      * */
-    val item5CommentMutable: MutableLiveData<String>
-        get() = diaryLiveData.getItemLiveData(ItemNumber(5)).comment
+    val item4CommentMutable
+        get() = diaryStateFlow.getItemStateFlow(ItemNumber(4)).comment
 
-    val picturePath: LiveData<Uri?>
-        get() = diaryLiveData.picturePath
+    /**
+     * LayoutDataBinding用
+     * */
+    val item5CommentMutable
+        get() = diaryStateFlow.getItemStateFlow(ItemNumber(5)).comment
 
-    private val _loadedPicturePath = MutableLiveData<Uri?>()
-    val loadedPicturePath: LiveData<Uri?>
-        get() = _loadedPicturePath
+    val picturePath
+        get() = diaryStateFlow.picturePath.asStateFlow()
 
-    private val _isVisibleUpdateProgressBar = MutableLiveData<Boolean>()
-    val isVisibleUpdateProgressBar: LiveData<Boolean>
-        get() = _isVisibleUpdateProgressBar
+    private val initialLoadedPicturePath = null
+    private val _loadedPicturePath = MutableStateFlow<Uri?>(initialLoadedPicturePath)
+    val loadedPicturePath
+        get() = _loadedPicturePath.asStateFlow()
 
-    var hasPreparedDiary = false
+    private val initialIsVisibleUpdateProgressBar = false
+    private val _isVisibleUpdateProgressBar = MutableStateFlow(initialIsVisibleUpdateProgressBar)
+    val isVisibleUpdateProgressBar
+        get() = _isVisibleUpdateProgressBar.asStateFlow()
+
+    private val initialHasPreparedDiary = false
+    var hasPreparedDiary = initialHasPreparedDiary
         private set
 
     val isNewDiaryDefaultStatus
@@ -148,20 +153,21 @@ class DiaryEditViewModel @Inject constructor(
     private val isLoadedDateEqualToInputDate: Boolean
         get() {
             val loadedDate = _loadedDate.value ?: return false
-            val inputDate = diaryLiveData.date.value
+            val inputDate = diaryStateFlow.date.value
             return loadedDate == inputDate
         }
 
     val isEqualWeathers: Boolean
         get() {
-            val weather1 = checkNotNull(diaryLiveData.weather1.value)
-            val weather2 = checkNotNull(diaryLiveData.weather2.value)
+            val weather1 = checkNotNull(diaryStateFlow.weather1.value)
+            val weather2 = checkNotNull(diaryStateFlow.weather2.value)
 
             return weather1 == weather2
         }
 
     // Fragment切替記憶
-    var isShowingItemTitleEditFragment = false
+    private val initialIsShowingItemTitleEditFragment = false
+    var isShowingItemTitleEditFragment = initialIsShowingItemTitleEditFragment
         private set
 
     init {
@@ -170,16 +176,16 @@ class DiaryEditViewModel @Inject constructor(
 
     public override fun initialize() {
         initializeAppMessageList()
-        hasPreparedDiary = false
-        _previousDate.value = null
-        _loadedDate.value = null
-        _loadedPicturePath.value = null
-        diaryLiveData.initialize()
-        isShowingItemTitleEditFragment = false
+        hasPreparedDiary = initialHasPreparedDiary
+        _previousDate.value = initialPreviousDate
+        _loadedDate.value = initialLoadedDate
+        _loadedPicturePath.value = initialLoadedPicturePath
+        diaryStateFlow.initialize()
+        isShowingItemTitleEditFragment = initialIsShowingItemTitleEditFragment
     }
 
     suspend fun prepareDiary(date: LocalDate, shouldLoadDiary: Boolean): Boolean {
-        _isVisibleUpdateProgressBar.postValue(true)
+        _isVisibleUpdateProgressBar.value = true
         if (shouldLoadDiary) {
             try {
                 loadSavedDiary(date)
@@ -187,14 +193,14 @@ class DiaryEditViewModel @Inject constructor(
                 updateDate(date)
             } catch (e: Exception) {
                 addAppMessage(AppMessage.DIARY_LOADING_ERROR)
-                _isVisibleUpdateProgressBar.postValue(false)
+                _isVisibleUpdateProgressBar.value = false
                 return false
             }
         } else {
             updateDate(date)
         }
         hasPreparedDiary = true
-        _isVisibleUpdateProgressBar.postValue(false)
+        _isVisibleUpdateProgressBar.value = false
         return true
     }
 
@@ -204,12 +210,12 @@ class DiaryEditViewModel @Inject constructor(
         try {
             diaryEntity = diaryRepository.loadDiary(date)
 
-            // HACK:下記はDiaryLiveData#update()処理よりも前に処理すること。
-            //      (後で処理するとDiaryLiveDataのDateのObserverがloadedDateの更新よりも先に処理される為)
-            _loadedDate.postValue(date)
+            // HACK:下記はDiaryStateFlow#update()処理よりも前に処理すること。
+            //      (後で処理するとDiaryStateFlowのDateのObserverがloadedDateの更新よりも先に処理される為)
+            _loadedDate.value = date
 
-            diaryLiveData.update(diaryEntity)
-            _loadedPicturePath.postValue(diaryLiveData.picturePath.value)
+            diaryStateFlow.update(diaryEntity)
+            _loadedPicturePath.value = diaryStateFlow.picturePath.value
         } catch (e: Exception) {
             Log.d("Exception", "loadSavedDiary()" , e)
             addAppMessage(AppMessage.DIARY_LOADING_ERROR)
@@ -229,9 +235,9 @@ class DiaryEditViewModel @Inject constructor(
 
     // TODO:TestDiariesSaverクラス削除後、public削除。
     suspend fun saveDiary(): Boolean {
-        val diaryEntity = diaryLiveData.createDiaryEntity()
+        val diaryEntity = diaryStateFlow.createDiaryEntity()
         val diaryItemTitleSelectionHistoryItemEntityList =
-            diaryLiveData.createDiaryItemTitleSelectionHistoryItemEntityList()
+            diaryStateFlow.createDiaryItemTitleSelectionHistoryItemEntityList()
         try {
             if (shouldDeleteLoadedDateDiary) {
                 diaryRepository
@@ -266,28 +272,28 @@ class DiaryEditViewModel @Inject constructor(
     // 日付関係
     // TODO:TestDiariesSaverクラス削除後、public削除。
     fun updateDate(date: LocalDate) {
-        val previousDate = diaryLiveData.date.value
+        val previousDate = diaryStateFlow.date.value
 
-        // HACK:下記はDiaryLiveDataのDateのsetValue()処理よりも前に処理すること。
+        // HACK:下記はDiaryStateFlowのDateのsetValue()処理よりも前に処理すること。
         //      (後で処理するとDateのObserverがpreviousDateの更新よりも先に処理される為)
-        _previousDate.postValue(previousDate)
+        _previousDate.value = previousDate
 
-        diaryLiveData.date.postValue(date)
+        diaryStateFlow.date.value = date
     }
 
     // 天気、体調関係
     // MEMO:Weather、Conditionsから文字列に変換するにはContextが必要なため、
     //      Fragment上のLivedDateObserverにて変換した値を受け取る。
     fun updateWeather1(weather: Weather) {
-        diaryLiveData.weather1.value = weather
+        diaryStateFlow.weather1.value = weather
     }
 
     fun updateWeather2(weather: Weather) {
-        diaryLiveData.weather2.value = weather
+        diaryStateFlow.weather2.value = weather
     }
 
     fun updateCondition(condition: Condition) {
-        diaryLiveData.condition.value = condition
+        diaryStateFlow.condition.value = condition
     }
 
     fun canFetchWeatherInformation(date: LocalDate): Boolean {
@@ -301,7 +307,7 @@ class DiaryEditViewModel @Inject constructor(
         val currentDate = LocalDate.now()
         val betweenDays = ChronoUnit.DAYS.between(date, currentDate)
 
-        _isVisibleUpdateProgressBar.postValue(true)
+        _isVisibleUpdateProgressBar.value = true
         val response =
             if (betweenDays == 0L) {
                 weatherApiRepository.fetchTodayWeatherInfo(geoCoordinates)
@@ -318,39 +324,39 @@ class DiaryEditViewModel @Inject constructor(
             Log.d("WeatherApi", "response.body():" + response.body())
             val result =
                 response.body()?.toWeatherInfo() ?: throw IllegalStateException()
-            diaryLiveData.weather1.postValue(result)
+            diaryStateFlow.weather1.value = result
         } else {
             response.errorBody().use { errorBody ->
                 Log.d("WeatherApi", "response.errorBody():" + errorBody!!.string())
             }
             addAppMessage(AppMessage.WEATHER_INFO_LOADING_ERROR)
         }
-        _isVisibleUpdateProgressBar.postValue(false)
+        _isVisibleUpdateProgressBar.value = false
     }
 
     // 項目関係
     fun incrementVisibleItemsCount() {
-        diaryLiveData.incrementVisibleItemsCount()
+        diaryStateFlow.incrementVisibleItemsCount()
     }
 
-    fun getItemTitleLiveData(itemNumber: ItemNumber): LiveData<String> {
-        return diaryLiveData.getItemLiveData(itemNumber).title
+    fun getItemTitle(itemNumber: ItemNumber): StateFlow<String> {
+        return diaryStateFlow.getItemStateFlow(itemNumber).title
     }
 
     fun deleteItem(itemNumber: ItemNumber) {
-        diaryLiveData.deleteItem(itemNumber)
+        diaryStateFlow.deleteItem(itemNumber)
     }
 
     fun updateItemTitle(itemNumber: ItemNumber, title: String) {
-        diaryLiveData.updateItemTitle(itemNumber, title)
+        diaryStateFlow.updateItemTitle(itemNumber, title)
     }
 
     fun updatePicturePath(uri: Uri) {
-        diaryLiveData.picturePath.value = uri
+        diaryStateFlow.picturePath.value = uri
     }
 
     fun deletePicturePath() {
-        diaryLiveData.picturePath.value = null
+        diaryStateFlow.picturePath.value = null
     }
 
     // MEMO:存在しないことを確認したいため下記メソッドを否定的処理とする
@@ -374,7 +380,7 @@ class DiaryEditViewModel @Inject constructor(
 
     suspend fun shouldShowUpdateConfirmationDialog(): Boolean? {
         if (isLoadedDateEqualToInputDate) return false
-        val inputDate = diaryLiveData.date.checkNotNull()
+        val inputDate = diaryStateFlow.date.checkNotNull()
         return existsSavedDiary(inputDate)
     }
 }

@@ -30,9 +30,10 @@ import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor
 import com.websarva.wings.android.zuboradiary.databinding.FragmentSettingsBinding
 import com.websarva.wings.android.zuboradiary.ui.BaseFragment
 import com.websarva.wings.android.zuboradiary.ui.UriPermissionManager
-import com.websarva.wings.android.zuboradiary.ui.notNullValue
+import com.websarva.wings.android.zuboradiary.ui.checkNotNull
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import java.time.DayOfWeek
 import java.time.LocalTime
@@ -266,14 +267,16 @@ class SettingsFragment : BaseFragment() {
             showThemeColorPickerDialog()
         }
 
-        settingsViewModel.themeColor
-            .observe(viewLifecycleOwner) { themeColor: ThemeColor? ->
-                themeColor ?: return@observe
+        launchAndRepeatOnLifeCycleStarted {
+            settingsViewModel.themeColor
+                .collectLatest { value: ThemeColor? ->
+                    value ?: return@collectLatest
 
-                val strThemeColor = themeColor.toSting(requireContext())
-                binding.includeThemeColorSetting.textValue.text = strThemeColor
-                switchViewColor(themeColor)
-            }
+                    val strThemeColor = value.toSting(requireContext())
+                    binding.includeThemeColorSetting.textValue.text = strThemeColor
+                    switchViewColor(value)
+                }
+        }
     }
 
     private fun switchViewColor(themeColor: ThemeColor) {
@@ -367,18 +370,20 @@ class SettingsFragment : BaseFragment() {
     private fun setUpCalendarStartDaySettingItem() {
         binding.includeCalendarStartDaySetting.textTitle.setOnClickListener {
             val currentCalendarStartDayOfWeek =
-                settingsViewModel.calendarStartDayOfWeek.notNullValue()
+                settingsViewModel.calendarStartDayOfWeek.checkNotNull()
             showCalendarStartDayPickerDialog(currentCalendarStartDayOfWeek)
         }
 
-        settingsViewModel.calendarStartDayOfWeek
-            .observe(viewLifecycleOwner) { dayOfWeek: DayOfWeek? ->
-                dayOfWeek ?: return@observe
+        launchAndRepeatOnLifeCycleStarted {
+            settingsViewModel.calendarStartDayOfWeek
+                .collectLatest { value: DayOfWeek? ->
+                    value ?: return@collectLatest
 
-                val stringConverter = DayOfWeekStringConverter(requireContext())
-                val strDayOfWeek = stringConverter.toCalendarStartDayOfWeek(dayOfWeek)
-                binding.includeCalendarStartDaySetting.textValue.text = strDayOfWeek
-            }
+                    val stringConverter = DayOfWeekStringConverter(requireContext())
+                    val strDayOfWeek = stringConverter.toCalendarStartDayOfWeek(value)
+                    binding.includeCalendarStartDaySetting.textValue.text = strDayOfWeek
+                }
+        }
     }
 
     @SuppressLint("ClickableViewAccessibility")
@@ -395,32 +400,36 @@ class SettingsFragment : BaseFragment() {
                 ReminderNotificationOnCheckedChangeListener()
             )
 
-        settingsViewModel.isCheckedReminderNotification
-            .observe(viewLifecycleOwner) { aBoolean: Boolean? ->
-                aBoolean ?: return@observe
+        launchAndRepeatOnLifeCycleStarted {
+            settingsViewModel.isCheckedReminderNotification
+                .collectLatest { value: Boolean? ->
+                    value ?: return@collectLatest
 
-                binding.includeReminderNotificationSetting.textValue.visibility =
-                    if (aBoolean) {
-                        View.VISIBLE
-                    } else {
-                        View.INVISIBLE
-                    }
-            }
-
-        settingsViewModel.reminderNotificationTime
-            .observe(viewLifecycleOwner) { time: LocalTime? ->
-                // MEMO:未設定の場合nullが代入される。
-                //      その為、nullはエラーではないので下記メソッドの処理は不要(処理するとループする)
-                //      "SettingsViewModel#isCheckedReminderNotificationSetting()"
-                if (time == null) {
-                    binding.includeReminderNotificationSetting.textValue.text = ""
-                    return@observe
+                    binding.includeReminderNotificationSetting.textValue.visibility =
+                        if (value) {
+                            View.VISIBLE
+                        } else {
+                            View.INVISIBLE
+                        }
                 }
+        }
 
-                val converter = DateTimeStringConverter()
-                val timeString = converter.toHourMinute(time)
-                binding.includeReminderNotificationSetting.textValue.text = timeString
-            }
+        launchAndRepeatOnLifeCycleStarted {
+            settingsViewModel.reminderNotificationTime
+                .collectLatest { value: LocalTime? ->
+                    // MEMO:未設定の場合nullが代入される。
+                    //      その為、nullはエラーではないので下記メソッドの処理は不要(処理するとループする)
+                    //      "SettingsViewModel#isCheckedReminderNotificationSetting()"
+                    if (value == null) {
+                        binding.includeReminderNotificationSetting.textValue.text = ""
+                        return@collectLatest
+                    }
+
+                    val converter = DateTimeStringConverter()
+                    val timeString = converter.toHourMinute(value)
+                    binding.includeReminderNotificationSetting.textValue.text = timeString
+                }
+        }
     }
 
     private inner class ReminderNotificationOnCheckedChangeListener
@@ -485,14 +494,16 @@ class SettingsFragment : BaseFragment() {
                 isTouchedPasscodeLockSwitch = false
             }
 
-        settingsViewModel.isCheckedPasscodeLock
-            .observe(viewLifecycleOwner) { }
+        launchAndRepeatOnLifeCycleStarted {
+            settingsViewModel.isCheckedPasscodeLock
+                .collectLatest { }
+        }
     }
 
-    // HACK:WeatherInfoAcquisitionSettingのMaterialSwitchがOn状態(SettingViewModelのisCheckedLiveDataが"true")だと、
+    // HACK:WeatherInfoAcquisitionSettingのMaterialSwitchがOn状態(SettingViewModelのisCheckedStateFlowが"true")だと、
     //      本Fragment起動時に他のMaterialSwitchのOnCheckedChangeListenerがOn状態("true")で起動してしまう。
     //      (他のMaterialSwitchがOn状態でも本問題は起きない)
-    //      SettingViewModelの対象isCheckedLiveDataは"false"かつ、
+    //      SettingViewModelの対象isCheckedStateFlowは"false"かつ、
     //      OnCheckedChangeListenerはユーザーがタッチした時に限り処理されるよう条件が入っている為、問題は発生していない。
     //      原因は不明。(Fragment、layout.xmlでのMaterialSwitchの設定に問題なし)
     @SuppressLint("ClickableViewAccessibility")

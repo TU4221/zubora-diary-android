@@ -1,23 +1,26 @@
 package com.websarva.wings.android.zuboradiary.ui.calendar
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import com.websarva.wings.android.zuboradiary.data.AppMessage
 import com.websarva.wings.android.zuboradiary.data.database.DiaryRepository
 import com.websarva.wings.android.zuboradiary.ui.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import java.time.LocalDate
 import javax.inject.Inject
 
 @HiltViewModel
-internal class CalendarViewModel @Inject constructor(private val diaryRepository: DiaryRepository) :
-    BaseViewModel() {
+internal class CalendarViewModel @Inject constructor(
+    private val diaryRepository: DiaryRepository
+) : BaseViewModel() {
 
-    private val _selectedDate = MutableLiveData<LocalDate>()
-    internal val selectedDate: LiveData<LocalDate> get() = _selectedDate
+    private val initialSelectedDate = LocalDate.now()
+    private val _selectedDate = MutableStateFlow<LocalDate>(initialSelectedDate)
+    internal val selectedDate get() = _selectedDate.asStateFlow()
 
-    private val _previousSelectedDate = MutableLiveData<LocalDate?>()
-    internal val previousSelectedDate: LiveData<LocalDate?> get() = _previousSelectedDate
+    private val initialPreviousSelectedDate = null
+    private val _previousSelectedDate = MutableStateFlow<LocalDate?>(initialPreviousSelectedDate)
+    internal val previousSelectedDate get() = _previousSelectedDate.asStateFlow()
 
     init {
         initialize()
@@ -25,8 +28,8 @@ internal class CalendarViewModel @Inject constructor(private val diaryRepository
 
     override fun initialize() {
         initializeAppMessageList()
-        _selectedDate.value = LocalDate.now()
-        _previousSelectedDate.value = null
+        _selectedDate.value = initialSelectedDate
+        _previousSelectedDate.value = initialPreviousSelectedDate
     }
 
     suspend fun existsSavedDiary(date: LocalDate): Boolean? {

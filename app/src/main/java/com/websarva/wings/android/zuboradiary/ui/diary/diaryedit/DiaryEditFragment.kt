@@ -18,7 +18,6 @@ import androidx.constraintlayout.motion.widget.MotionLayout
 import androidx.core.content.res.ResourcesCompat
 import androidx.databinding.ViewDataBinding
 import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.Observer
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
@@ -26,6 +25,7 @@ import androidx.navigation.NavDirections
 import com.google.android.material.textfield.TextInputLayout
 import com.websarva.wings.android.zuboradiary.R
 import com.websarva.wings.android.zuboradiary.data.AppMessage
+import com.websarva.wings.android.zuboradiary.data.AppMessageList
 import com.websarva.wings.android.zuboradiary.data.DateTimeStringConverter
 import com.websarva.wings.android.zuboradiary.data.diary.Condition
 import com.websarva.wings.android.zuboradiary.data.diary.ItemNumber
@@ -37,11 +37,11 @@ import com.websarva.wings.android.zuboradiary.ui.TestDiariesSaver
 import com.websarva.wings.android.zuboradiary.ui.TextInputSetup
 import com.websarva.wings.android.zuboradiary.ui.UriPermissionManager
 import com.websarva.wings.android.zuboradiary.ui.checkNotNull
-import com.websarva.wings.android.zuboradiary.ui.diary.DiaryLiveData
+import com.websarva.wings.android.zuboradiary.ui.diary.DiaryStateFlow
 import com.websarva.wings.android.zuboradiary.ui.diary.diaryitemtitleedit.DiaryItemTitleEditFragment
-import com.websarva.wings.android.zuboradiary.ui.notNullValue
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.jetbrains.annotations.Unmodifiable
@@ -160,8 +160,12 @@ class DiaryEditFragment : BaseFragment() {
     }
 
     override fun setUpOtherAppMessageDialog() {
-        diaryEditViewModel.appMessageBufferList
-            .observe(viewLifecycleOwner, AppMessageBufferListObserver(diaryEditViewModel))
+        launchAndRepeatOnLifeCycleStarted {
+            diaryEditViewModel.appMessageBufferList
+                .collectLatest { value: AppMessageList ->
+                    AppMessageBufferListObserver(diaryEditViewModel).onChanged(value)
+                }
+        }
     }
 
     // 既存日記読込ダイアログフラグメントから結果受取
@@ -251,7 +255,7 @@ class DiaryEditFragment : BaseFragment() {
                 DiaryItemDeleteDialogFragment.KEY_DELETE_ITEM_NUMBER
             ) ?: return
 
-        val numVisibleItems = diaryEditViewModel.numVisibleItems.notNullValue()
+        val numVisibleItems = diaryEditViewModel.numVisibleItems.value
 
         if (deleteItemNumber.value == 1 && numVisibleItems == deleteItemNumber.value) {
             diaryEditViewModel.deleteItem(deleteItemNumber)
@@ -322,23 +326,25 @@ class DiaryEditFragment : BaseFragment() {
                 false
             }
 
-        diaryEditViewModel.loadedDate
-            .observe(viewLifecycleOwner) { date: LocalDate? ->
-                val title: String
-                val enabledDelete: Boolean
-                if (date == null) {
-                    title = getString(R.string.fragment_diary_edit_toolbar_title_create_new)
-                    enabledDelete = false
-                } else {
-                    title = getString(R.string.fragment_diary_edit_toolbar_title_edit)
-                    enabledDelete = true
-                }
-                binding.materialToolbarTopAppBar.title = title
+        launchAndRepeatOnLifeCycleStarted {
+            diaryEditViewModel.loadedDate
+                .collectLatest { value: LocalDate? ->
+                    val title: String
+                    val enabledDelete: Boolean
+                    if (value == null) {
+                        title = getString(R.string.fragment_diary_edit_toolbar_title_create_new)
+                        enabledDelete = false
+                    } else {
+                        title = getString(R.string.fragment_diary_edit_toolbar_title_edit)
+                        enabledDelete = true
+                    }
+                    binding.materialToolbarTopAppBar.title = title
 
-                val menu = binding.materialToolbarTopAppBar.menu
-                val deleteMenuItem = menu.findItem(R.id.diaryEditToolbarOptionDeleteDiary)
-                deleteMenuItem.setEnabled(enabledDelete)
-            }
+                    val menu = binding.materialToolbarTopAppBar.menu
+                    val deleteMenuItem = menu.findItem(R.id.diaryEditToolbarOptionDeleteDiary)
+                    deleteMenuItem.setEnabled(enabledDelete)
+                }
+        }
     }
 
     // 日付入力欄設定
@@ -351,16 +357,22 @@ class DiaryEditFragment : BaseFragment() {
             }
         }
 
-        diaryEditViewModel.date.observe(viewLifecycleOwner, DateObserver())
+        launchAndRepeatOnLifeCycleStarted {
+            diaryEditViewModel.date
+                .collectLatest { value: LocalDate? ->
+                    DateObserver().onChanged(value)
+                }
+        }
     }
 
-    private inner class DateObserver : Observer<LocalDate?> {
-        override fun onChanged(value: LocalDate?) {
+    private inner class DateObserver {
+        fun onChanged(value: LocalDate?) {
             if (value == null) return
             if (diaryEditViewModel.isShowingItemTitleEditFragment) return
 
             val dateTimeStringConverter = DateTimeStringConverter()
-            binding.textInputEditTextDate.setText(dateTimeStringConverter.toYearMonthDayWeek(value))
+            val dateString = dateTimeStringConverter.toYearMonthDayWeek(value)
+            binding.textInputEditTextDate.setText(dateString)
             Log.d("DiaryEditInputDate", "currentDate:$value")
             val loadedDate = diaryEditViewModel.loadedDate.value
             Log.d("DiaryEditInputDate", "loadedDate:$loadedDate")
@@ -368,7 +380,8 @@ class DiaryEditFragment : BaseFragment() {
             Log.d("DiaryEditInputDate", "previousDate:$previousDate")
 
             lifecycleScope.launch(Dispatchers.IO) {
-                val shouldShowDialog = shouldShowDiaryLoadingDialog(value) ?: return@launch
+                val shouldShowDialog =
+                    shouldShowDiaryLoadingDialog(value) ?: return@launch
                 if (shouldShowDialog) {
                     withContext(Dispatchers.Main) {
                         showDiaryLoadingDialog(value)
@@ -418,27 +431,29 @@ class DiaryEditFragment : BaseFragment() {
                 binding.autoCompleteTextWeather1.clearFocus()
             }
 
-        diaryEditViewModel.weather1
-            .observe(viewLifecycleOwner) { weather: Weather ->
-                val strWeather = weather.toString(requireContext())
-                binding.autoCompleteTextWeather1.setText(strWeather, false)
+        launchAndRepeatOnLifeCycleStarted {
+            diaryEditViewModel.weather1
+                .collectLatest { value: Weather ->
+                    val strWeather = value.toString(requireContext())
+                    binding.autoCompleteTextWeather1.setText(strWeather, false)
 
-                // Weather2 Spinner有効無効切替
-                val isEnabled = (weather != Weather.UNKNOWN)
-                binding.textInputLayoutWeather2.isEnabled = isEnabled
-                binding.autoCompleteTextWeather2.isEnabled = isEnabled
-                if (weather == Weather.UNKNOWN || diaryEditViewModel.isEqualWeathers) {
-                    binding.autoCompleteTextWeather2.setAdapter(
-                        weatherArrayAdapter
-                    )
-                    diaryEditViewModel.updateWeather2(Weather.UNKNOWN)
-                } else {
-                    weather2ArrayAdapter = createWeatherSpinnerAdapter(weather)
-                    binding.autoCompleteTextWeather2.setAdapter(
-                        weather2ArrayAdapter
-                    )
+                    // Weather2 Spinner有効無効切替
+                    val isEnabled = (value != Weather.UNKNOWN)
+                    binding.textInputLayoutWeather2.isEnabled = isEnabled
+                    binding.autoCompleteTextWeather2.isEnabled = isEnabled
+                    if (value == Weather.UNKNOWN || diaryEditViewModel.isEqualWeathers) {
+                        binding.autoCompleteTextWeather2.setAdapter(
+                            weatherArrayAdapter
+                        )
+                        diaryEditViewModel.updateWeather2(Weather.UNKNOWN)
+                    } else {
+                        weather2ArrayAdapter = createWeatherSpinnerAdapter(value)
+                        binding.autoCompleteTextWeather2.setAdapter(
+                            weather2ArrayAdapter
+                        )
+                    }
                 }
-            }
+        }
 
         binding.autoCompleteTextWeather2.onItemClickListener =
             OnItemClickListener { _: AdapterView<*>?, _: View?, position: Int, _: Long ->
@@ -450,11 +465,13 @@ class DiaryEditFragment : BaseFragment() {
                 binding.autoCompleteTextWeather2.clearFocus()
             }
 
-        diaryEditViewModel.weather2
-            .observe(viewLifecycleOwner) { weather: Weather ->
-                val strWeather = weather.toString(requireContext())
-                binding.autoCompleteTextWeather2.setText(strWeather, false)
-            }
+        launchAndRepeatOnLifeCycleStarted {
+            diaryEditViewModel.weather2
+                .collectLatest { value: Weather ->
+                    val strWeather = value.toString(requireContext())
+                    binding.autoCompleteTextWeather2.setText(strWeather, false)
+                }
+        }
     }
 
     private fun createWeatherSpinnerAdapter(vararg excludedWeathers: Weather?): ArrayAdapter<String> {
@@ -495,11 +512,13 @@ class DiaryEditFragment : BaseFragment() {
         }
 
 
-        diaryEditViewModel.condition
-            .observe(viewLifecycleOwner) { condition: Condition ->
-                val strCondition = condition.toString(requireContext())
-                binding.autoCompleteTextCondition.setText(strCondition, false)
-            }
+        launchAndRepeatOnLifeCycleStarted {
+            diaryEditViewModel.condition
+                .collectLatest { value: Condition ->
+                    val strCondition = value.toString(requireContext())
+                    binding.autoCompleteTextCondition.setText(strCondition, false)
+                }
+        }
     }
 
     private fun createConditionSpinnerAdapter(): ArrayAdapter<String> {
@@ -551,7 +570,7 @@ class DiaryEditFragment : BaseFragment() {
             textInputEditTextItemsTitle[itemArrayNumber].setOnClickListener {
                 // 項目タイトル入力フラグメント起動
                 val inputItemTitle =
-                    diaryEditViewModel.getItemTitleLiveData(inputItemNumber).notNullValue()
+                    diaryEditViewModel.getItemTitle(inputItemNumber).value
                 showDiaryItemTitleEditFragment(inputItemNumber, inputItemTitle)
             }
         }
@@ -593,7 +612,7 @@ class DiaryEditFragment : BaseFragment() {
                 override fun onTransitionCompleted(motionLayout: MotionLayout, currentId: Int) {
                     Log.d(
                         "MotionLayout",
-                        "ItemLiveData$itemNumber onTransitionCompleted"
+                        "Item$itemNumber onTransitionCompleted"
                     )
                     // 対象項目欄削除後の処理
                     if (currentId == R.id.motion_scene_edit_diary_item_hided_state) {
@@ -620,8 +639,12 @@ class DiaryEditFragment : BaseFragment() {
             })
         }
 
-        diaryEditViewModel.numVisibleItems
-            .observe(viewLifecycleOwner, NumVisibleItemsObserver())
+        launchAndRepeatOnLifeCycleStarted {
+            diaryEditViewModel.numVisibleItems
+                .collectLatest { value: Int ->
+                    NumVisibleItemsObserver().onChanged(value)
+                }
+        }
     }
 
     private fun selectItemMotionLayout(itemNumber: ItemNumber): MotionLayout {
@@ -635,9 +658,9 @@ class DiaryEditFragment : BaseFragment() {
         }
     }
 
-    private inner class NumVisibleItemsObserver : Observer<Int> {
-        override fun onChanged(value: Int) {
-            enableItemAdditionButton(value < DiaryLiveData.MAX_ITEMS)
+    private inner class NumVisibleItemsObserver {
+        fun onChanged(value: Int) {
+            enableItemAdditionButton(value < DiaryStateFlow.MAX_ITEMS)
             setUpItemsLayout(value)
         }
 
@@ -717,8 +740,12 @@ class DiaryEditFragment : BaseFragment() {
     }
 
     private fun setUpPictureInputField() {
-        diaryEditViewModel.picturePath
-            .observe(viewLifecycleOwner, PicturePathObserver())
+        launchAndRepeatOnLifeCycleStarted {
+            diaryEditViewModel.picturePath
+                .collectLatest { value: Uri? ->
+                    PicturePathObserver().onChanged(value)
+                }
+        }
 
         binding.apply {
             imageAttachedPicture.setOnClickListener {
@@ -731,8 +758,8 @@ class DiaryEditFragment : BaseFragment() {
 
     }
 
-    private inner class PicturePathObserver : Observer<Uri?> {
-        override fun onChanged(value: Uri?) {
+    private inner class PicturePathObserver {
+        fun onChanged(value: Uri?) {
             val diaryPictureManager =
                 DiaryPictureManager(
                     requireContext(),
@@ -876,7 +903,7 @@ class DiaryEditFragment : BaseFragment() {
     private suspend fun fetchWeatherInfo(date: LocalDate, requestsShowingDialog: Boolean) {
         // HACK:EditFragment起動時、設定値を参照してから位置情報を取得する為、タイムラグが発生する。
         //      対策として記憶boolean変数を用意し、true時は位置情報取得処理コードにて天気情報も取得する。
-        val isChecked = settingsViewModel.isCheckedWeatherInfoAcquisition.notNullValue()
+        val isChecked = settingsViewModel.isCheckedWeatherInfoAcquisition.checkNotNull()
         if (!isChecked) return
 
         if (!settingsViewModel.hasUpdatedGeoCoordinates) {

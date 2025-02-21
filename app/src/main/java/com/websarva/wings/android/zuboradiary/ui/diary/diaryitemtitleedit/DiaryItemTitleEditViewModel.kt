@@ -1,15 +1,18 @@
 package com.websarva.wings.android.zuboradiary.ui.diary.diaryitemtitleedit
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.asLiveData
+import androidx.lifecycle.viewModelScope
 import com.websarva.wings.android.zuboradiary.data.AppMessage
 import com.websarva.wings.android.zuboradiary.data.database.DiaryItemTitleSelectionHistoryRepository
 import com.websarva.wings.android.zuboradiary.data.diary.ItemNumber
 import com.websarva.wings.android.zuboradiary.ui.BaseViewModel
-import com.websarva.wings.android.zuboradiary.ui.notNullValue
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
@@ -21,18 +24,20 @@ class DiaryItemTitleEditViewModel @Inject constructor(
         private const val MAX_LOADED_ITEM_TITLES = 50
     }
 
-    private val _itemNumber = MutableLiveData<ItemNumber?>()
-    val itemNumber: LiveData<ItemNumber?> get() = _itemNumber
+    private val initialItemNumber = null
+    private val _itemNumber = MutableStateFlow<ItemNumber?>(initialItemNumber)
+    val itemNumber get() = _itemNumber.asStateFlow()
 
-    private val _itemTitle = MutableLiveData<String>()
-    val itemTitle: LiveData<String> get() = _itemTitle
+    private val initialItemTitle = ""
+    private val _itemTitle = MutableStateFlow(initialItemTitle)
+    val itemTitle get() = _itemTitle.asStateFlow()
 
     /**
      * LayoutDataBinding用
      * */
     val itemTitleMutable get() = _itemTitle
 
-    lateinit var itemTitleSelectionHistoryList: LiveData<SelectionHistoryList>
+    lateinit var itemTitleSelectionHistoryList: StateFlow<SelectionHistoryList>
 
     init {
         initialize()
@@ -46,18 +51,19 @@ class DiaryItemTitleEditViewModel @Inject constructor(
     }
 
     private fun setUpItemTitleSelectionHistoryList() {
-        itemTitleSelectionHistoryList =
-            diaryItemTitleSelectionHistoryRepository
-                .loadSelectionHistory(MAX_LOADED_ITEM_TITLES, 0)
-                .map { list ->
-                    list.map { item ->
-                        SelectionHistoryListItem(item)
+        viewModelScope.launch(Dispatchers.IO) {
+            itemTitleSelectionHistoryList =
+                diaryItemTitleSelectionHistoryRepository
+                    .loadSelectionHistory(MAX_LOADED_ITEM_TITLES, 0)
+                    .map { list ->
+                        list.map { item ->
+                            SelectionHistoryListItem(item)
 
-                    }
-                }.map { list ->
-                    SelectionHistoryList(list)
-                }
-                .asLiveData()
+                        }
+                    }.map { list ->
+                        SelectionHistoryList(list)
+                    }.stateIn(this)
+        }
     }
 
     fun updateDiaryItemTitle(itemNumber: ItemNumber, itemTitle: String) {
@@ -68,7 +74,7 @@ class DiaryItemTitleEditViewModel @Inject constructor(
     suspend fun deleteDiaryItemTitleSelectionHistoryItem(deletePosition: Int): Boolean {
         require(deletePosition >= 0)
 
-        val currentList = itemTitleSelectionHistoryList.notNullValue()
+        val currentList = itemTitleSelectionHistoryList.value
         val listSize = currentList.selectionHistoryListItemList.size
         require(deletePosition < listSize)
 

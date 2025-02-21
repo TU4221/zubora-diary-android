@@ -1,8 +1,6 @@
 package com.websarva.wings.android.zuboradiary.ui.list.wordsearch
 
 import android.util.Log
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.websarva.wings.android.zuboradiary.data.AppMessage
 import com.websarva.wings.android.zuboradiary.data.database.DiaryRepository
@@ -14,6 +12,8 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -26,24 +26,27 @@ class WordSearchViewModel @Inject internal constructor(
         private const val NUM_LOADING_ITEMS = DiaryListViewModel.NUM_LOADING_ITEMS
     }
 
-    private val _searchWord: MutableLiveData<String> = MutableLiveData()
-    val searchWord: LiveData<String>
-        get() = _searchWord
+    private val initialSearchWord = ""
+    private val _searchWord = MutableStateFlow(initialSearchWord)
+    val searchWord
+        get() = _searchWord.asStateFlow()
     /**
      * LayoutDataBinding用
      * */
-    val searchWordMutable: MutableLiveData<String>
+    val searchWordMutableStateFlow: MutableStateFlow<String>
         get() = _searchWord
 
     private var wordSearchResultListLoadingJob: Job? = null // キャンセル用
 
-    private val _wordSearchResultList = MutableLiveData<WordSearchResultYearMonthList>()
-    val wordSearchResultList: LiveData<WordSearchResultYearMonthList>
-        get() = _wordSearchResultList
+    private val initialWordSearchResultList = WordSearchResultYearMonthList()
+    private val _wordSearchResultList = MutableStateFlow(initialWordSearchResultList)
+    val wordSearchResultList
+        get() = _wordSearchResultList.asStateFlow()
 
-    private val _numWordSearchResults = MutableLiveData<Int>()
-    val numWordSearchResults: LiveData<Int>
-        get() = _numWordSearchResults
+    private val initialNumWordSearchResults = 0
+    private val _numWordSearchResults = MutableStateFlow(initialNumWordSearchResults)
+    val numWordSearchResults
+        get() = _numWordSearchResults.asStateFlow()
 
     val canLoadWordSearchResultList: Boolean
         get() {
@@ -54,9 +57,10 @@ class WordSearchViewModel @Inject internal constructor(
     /**
      * データベース読込からRecyclerViewへの反映までを true とする。
      */
-    private val _isVisibleUpdateProgressBar = MutableLiveData<Boolean>()
-    val isVisibleUpdateProgressBar: LiveData<Boolean>
-        get() = _isVisibleUpdateProgressBar
+    private val initialIsVisibleUpdateProgressBar = false
+    private val _isVisibleUpdateProgressBar = MutableStateFlow(initialIsVisibleUpdateProgressBar)
+    val isVisibleUpdateProgressBar
+        get() = _isVisibleUpdateProgressBar.asStateFlow()
 
     private val isValidityDelay = true // TODO:調整用
 
@@ -66,10 +70,10 @@ class WordSearchViewModel @Inject internal constructor(
 
     public override fun initialize() {
         initializeAppMessageList()
-        _searchWord.value = ""
-        _wordSearchResultList.value = WordSearchResultYearMonthList()
-        _numWordSearchResults.value = 0
-        _isVisibleUpdateProgressBar.value = false
+        _searchWord.value = initialSearchWord
+        _wordSearchResultList.value = initialWordSearchResultList
+        _numWordSearchResults.value = initialNumWordSearchResults
+        _isVisibleUpdateProgressBar.value = initialIsVisibleUpdateProgressBar
         cancelPreviousLoading()
         wordSearchResultListLoadingJob = null
     }
@@ -140,10 +144,10 @@ class WordSearchViewModel @Inject internal constructor(
         try {
             val updateResultList =
                 resultListCreator.create(spannableStringColor, spannableStringBackGroundColor)
-            _wordSearchResultList.postValue(updateResultList)
+            _wordSearchResultList.value = updateResultList
         } catch (e: Exception) {
             Log.d("Exception", "ワード検索結果読込キャンセル", e)
-            _wordSearchResultList.postValue(previousResultList)
+            _wordSearchResultList.value = previousResultList
             addAppMessage(AppMessage.DIARY_LOADING_ERROR)
         }
     }
@@ -175,8 +179,8 @@ class WordSearchViewModel @Inject internal constructor(
 
         fun showWordSearchResultListFirstItemProgressIndicator() {
             val list = WordSearchResultYearMonthList(false)
-            _wordSearchResultList.postValue(list)
-            _numWordSearchResults.postValue(0)
+            _wordSearchResultList.value = list
+            _numWordSearchResults.value = 0
         }
     }
 
@@ -216,7 +220,7 @@ class WordSearchViewModel @Inject internal constructor(
             val currentResultList = _wordSearchResultList.checkNotNull()
             check(currentResultList.wordSearchResultYearMonthListItemList.isNotEmpty())
 
-            _isVisibleUpdateProgressBar.postValue(true)
+            _isVisibleUpdateProgressBar.value = true
             try {
                 if (isValidityDelay) delay(3000)
                 var numLoadingItems = currentResultList.countDiaries()
@@ -233,7 +237,7 @@ class WordSearchViewModel @Inject internal constructor(
                     spannableStringBackGroundColor
                 )
             } finally {
-                _isVisibleUpdateProgressBar.postValue(false)
+                _isVisibleUpdateProgressBar.value = false
             }
         }
     }
@@ -279,7 +283,7 @@ class WordSearchViewModel @Inject internal constructor(
         val searchWord = _searchWord.checkNotNull()
 
         val numExistingDiaries = diaryRepository.countWordSearchResultDiaries(searchWord)
-        _numWordSearchResults.postValue(numExistingDiaries)
+        _numWordSearchResults.value = numExistingDiaries
         if (numExistingDiaries <= 0) return false
 
         return numLoadedDiaries < numExistingDiaries

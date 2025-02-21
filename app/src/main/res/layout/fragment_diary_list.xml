@@ -64,7 +64,7 @@
                 <include
                     layout="@layout/layout_full_screen_circular_progress_indicator"
                     android:id="@+id/include_progress_indicator"
-                    app:isVisibleLiveData="@{list_view_model.isVisibleUpdateProgressBar}" />
+                    app:isVisibleStateFlow="@{list_view_model.isVisibleUpdateProgressBar}" />
 
             </FrameLayout>
 

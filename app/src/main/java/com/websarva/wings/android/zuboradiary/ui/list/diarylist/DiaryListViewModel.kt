@@ -2,19 +2,18 @@ package com.websarva.wings.android.zuboradiary.ui.list.diarylist
 
 import android.net.Uri
 import android.util.Log
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.websarva.wings.android.zuboradiary.data.AppMessage
 import com.websarva.wings.android.zuboradiary.data.database.DiaryListItem
 import com.websarva.wings.android.zuboradiary.data.database.DiaryRepository
 import com.websarva.wings.android.zuboradiary.ui.BaseViewModel
 import com.websarva.wings.android.zuboradiary.ui.checkNotNull
-import com.websarva.wings.android.zuboradiary.ui.notNullValue
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.YearMonth
@@ -32,9 +31,10 @@ class DiaryListViewModel @Inject constructor(private val diaryRepository: DiaryR
 
     private var diaryListLoadingJob: Job? = null // キャンセル用
 
-    private val _diaryList = MutableLiveData<DiaryYearMonthList>()
-    val diaryList: LiveData<DiaryYearMonthList>
-        get() = _diaryList
+    private val initialDiaryList = DiaryYearMonthList()
+    private val _diaryList = MutableStateFlow(initialDiaryList)
+    val diaryList
+        get() = _diaryList.asStateFlow()
 
     val canLoadDiaryList: Boolean
         get() {
@@ -45,9 +45,10 @@ class DiaryListViewModel @Inject constructor(private val diaryRepository: DiaryR
     /**
      * データベース読込からRecyclerViewへの反映までを true とする。
      */
-    private val _isVisibleUpdateProgressBar = MutableLiveData<Boolean>()
-    val isVisibleUpdateProgressBar: LiveData<Boolean>
-        get() = _isVisibleUpdateProgressBar
+    private val initialIsVisibleUpdateProgressBar = false
+    private val _isVisibleUpdateProgressBar = MutableStateFlow(initialIsVisibleUpdateProgressBar)
+    val isVisibleUpdateProgressBar
+        get() = _isVisibleUpdateProgressBar.asStateFlow()
 
     private var sortConditionDate: LocalDate? = null
 
@@ -59,13 +60,13 @@ class DiaryListViewModel @Inject constructor(private val diaryRepository: DiaryR
 
     override fun initialize() {
         initializeAppMessageList()
-        _diaryList.value = DiaryYearMonthList()
-        _isVisibleUpdateProgressBar.value = false
+        _diaryList.value = initialDiaryList
+        _isVisibleUpdateProgressBar.value = initialIsVisibleUpdateProgressBar
         sortConditionDate = null
     }
 
     suspend fun loadDiaryListOnSetUp() {
-        val diaryList = diaryList.notNullValue()
+        val diaryList = this.diaryList.value
         if (diaryList.diaryYearMonthListItemList.isEmpty()) {
             try {
                 val numSavedDiaries = diaryRepository.countDiaries()
@@ -110,10 +111,10 @@ class DiaryListViewModel @Inject constructor(private val diaryRepository: DiaryR
         val previousDiaryList = _diaryList.checkNotNull()
         try {
             val updateDiaryList = creator.create()
-            _diaryList.postValue(updateDiaryList)
+            _diaryList.value = updateDiaryList
         } catch (e: Exception) {
             Log.d("Exception", "日記読込失敗", e)
-            _diaryList.postValue(previousDiaryList)
+            _diaryList.value = previousDiaryList
             addAppMessage(AppMessage.DIARY_LOADING_ERROR)
         }
     }
@@ -134,7 +135,7 @@ class DiaryListViewModel @Inject constructor(private val diaryRepository: DiaryR
 
         fun showDiaryListFirstItemProgressIndicator() {
             val list = DiaryYearMonthList(false)
-            _diaryList.postValue(list)
+            _diaryList.value = list
         }
     }
 
@@ -162,7 +163,7 @@ class DiaryListViewModel @Inject constructor(private val diaryRepository: DiaryR
             val currentDiaryList = _diaryList.checkNotNull()
             check(currentDiaryList.diaryYearMonthListItemList.isNotEmpty())
 
-            _isVisibleUpdateProgressBar.postValue(true)
+            _isVisibleUpdateProgressBar.value = true
             try {
                 if (isValidityDelay) delay(3000)
                 var numLoadingItems = currentDiaryList.countDiaries()
@@ -174,7 +175,7 @@ class DiaryListViewModel @Inject constructor(private val diaryRepository: DiaryR
                 }
                 return loadSavedDiaryList(numLoadingItems, 0)
             } finally {
-                _isVisibleUpdateProgressBar.postValue(false)
+                _isVisibleUpdateProgressBar.value = false
             }
         }
     }

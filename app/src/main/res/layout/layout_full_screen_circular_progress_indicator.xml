@@ -6,14 +6,14 @@
     <data>
         <import type="android.view.View" />
         <variable
-            name="isVisibleLiveData"
-            type="androidx.lifecycle.LiveData&lt;Boolean>" />
+            name="isVisibleStateFlow"
+            type="kotlinx.coroutines.flow.StateFlow&lt;Boolean>" />
     </data>
 
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:visibility="@{isVisibleLiveData ? View.VISIBLE : View.INVISIBLE}"
+        android:visibility="@{isVisibleStateFlow ? View.VISIBLE : View.INVISIBLE}"
         tools:visibility="visible">
 
         <View

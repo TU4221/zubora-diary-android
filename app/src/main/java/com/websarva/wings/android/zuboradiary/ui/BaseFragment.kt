@@ -9,9 +9,10 @@ import androidx.activity.OnBackPressedCallback
 import androidx.databinding.ViewDataBinding
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
-import androidx.lifecycle.Observer
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import com.google.android.material.transition.platform.MaterialFadeThrough
@@ -20,6 +21,9 @@ import com.websarva.wings.android.zuboradiary.MainActivity
 import com.websarva.wings.android.zuboradiary.data.AppMessage
 import com.websarva.wings.android.zuboradiary.data.AppMessageList
 import com.websarva.wings.android.zuboradiary.ui.settings.SettingsViewModel
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 
 abstract class BaseFragment : CustomFragment() {
 
@@ -34,7 +38,7 @@ abstract class BaseFragment : CustomFragment() {
 
     protected lateinit var settingsViewModel: SettingsViewModel
     protected val themeColor
-        get() = settingsViewModel.themeColor.notNullValue()
+        get() = settingsViewModel.themeColor.checkNotNull()
 
     private var fragmentDestinationId = 0
     private val currentDestinationId: Int get() {
@@ -44,6 +48,12 @@ abstract class BaseFragment : CustomFragment() {
     protected val isDialogShowing
         get() = fragmentDestinationId != currentDestinationId
 
+    protected fun launchAndRepeatOnLifeCycleStarted(
+        block: suspend CoroutineScope.() -> Unit) {
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED, block)
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -217,8 +227,12 @@ abstract class BaseFragment : CustomFragment() {
     }
 
     private fun setUpSettingsAppMessageDialog() {
-        settingsViewModel.appMessageBufferList
-            .observe(viewLifecycleOwner, AppMessageBufferListObserver(settingsViewModel))
+        launchAndRepeatOnLifeCycleStarted {
+            settingsViewModel.appMessageBufferList
+                .collectLatest { value: AppMessageList ->
+                    AppMessageBufferListObserver(settingsViewModel).onChanged(value)
+                }
+        }
     }
 
     /**
@@ -227,9 +241,8 @@ abstract class BaseFragment : CustomFragment() {
      */
     protected abstract fun setUpOtherAppMessageDialog()
 
-    protected inner class AppMessageBufferListObserver(private val baseViewModel: BaseViewModel):
-        Observer<AppMessageList> {
-        override fun onChanged(value: AppMessageList) {
+    protected inner class AppMessageBufferListObserver(private val baseViewModel: BaseViewModel) {
+        fun onChanged(value: AppMessageList) {
             if (value.isEmpty) return
 
             val firstAppMessage = checkNotNull(value.findFirstItem())

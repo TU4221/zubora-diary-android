@@ -13,12 +13,12 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.activity.OnBackPressedCallback
 import androidx.databinding.ViewDataBinding
-import androidx.lifecycle.Observer
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.websarva.wings.android.zuboradiary.R
 import com.websarva.wings.android.zuboradiary.data.AppMessage
+import com.websarva.wings.android.zuboradiary.data.AppMessageList
 import com.websarva.wings.android.zuboradiary.data.DateTimeStringConverter
 import com.websarva.wings.android.zuboradiary.data.diary.Condition
 import com.websarva.wings.android.zuboradiary.data.diary.ItemNumber
@@ -31,6 +31,7 @@ import com.websarva.wings.android.zuboradiary.ui.UriPermissionManager
 import com.websarva.wings.android.zuboradiary.ui.checkNotNull
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.time.LocalDate
@@ -114,8 +115,12 @@ class DiaryShowFragment : BaseFragment() {
     }
 
     override fun setUpOtherAppMessageDialog() {
-        diaryShowViewModel.appMessageBufferList
-            .observe(viewLifecycleOwner, AppMessageBufferListObserver(diaryShowViewModel))
+        launchAndRepeatOnLifeCycleStarted {
+            diaryShowViewModel.appMessageBufferList
+                .collectLatest { value: AppMessageList ->
+                    AppMessageBufferListObserver(diaryShowViewModel).onChanged(value)
+                }
+        }
     }
 
     // 日記削除確認ダイアログフラグメントからデータ受取
@@ -137,7 +142,7 @@ class DiaryShowFragment : BaseFragment() {
     }
 
     private fun releasePictureUriPermission() {
-        val pictureUri = diaryShowViewModel.picturePathLiveData.value ?: return
+        val pictureUri = diaryShowViewModel.picturePath.value ?: return
 
         lifecycleScope.launch(Dispatchers.IO) {
             pictureUriPermissionManager.releasePersistablePermission(pictureUri)
@@ -169,11 +174,11 @@ class DiaryShowFragment : BaseFragment() {
             setOnMenuItemClickListener { item: MenuItem ->
                 // 日記編集フラグメント起動
                 if (item.itemId == R.id.diaryShowToolbarOptionEditDiary) {
-                    val editDiaryDate = diaryShowViewModel.dateLiveData.checkNotNull()
+                    val editDiaryDate = diaryShowViewModel.date.checkNotNull()
                     showDiaryEdit(editDiaryDate)
                     return@setOnMenuItemClickListener true
                 } else if (item.itemId == R.id.diaryShowToolbarOptionDeleteDiary) {
-                    val deleteDiaryDate = diaryShowViewModel.dateLiveData.checkNotNull()
+                    val deleteDiaryDate = diaryShowViewModel.date.checkNotNull()
                     showDiaryDeleteDialog(deleteDiaryDate)
                     return@setOnMenuItemClickListener true
                 }
@@ -181,42 +186,46 @@ class DiaryShowFragment : BaseFragment() {
             }
         }
 
-        diaryShowViewModel.dateLiveData
-            .observe(viewLifecycleOwner) { date: LocalDate? ->
-                // MEMO:DiaryViewModelを初期化するとDiaryDateにnullが代入されるため、下記"return"を処理。
-                if (date == null) return@observe
+        launchAndRepeatOnLifeCycleStarted {
+            diaryShowViewModel.date
+                .collectLatest { value: LocalDate? ->
+                    // MEMO:DiaryViewModelを初期化するとDiaryDateにnullが代入されるため、下記"return"を処理。
+                    if (value == null) return@collectLatest
 
-                val converter = DateTimeStringConverter()
-                val stringDate = converter.toYearMonthDayWeek(date)
-                binding.materialToolbarTopAppBar.title = stringDate
-            }
+                    val converter = DateTimeStringConverter()
+                    val stringDate = converter.toYearMonthDayWeek(value)
+                    binding.materialToolbarTopAppBar.title = stringDate
+                }
+        }
     }
 
     // 天気表示欄設定
     private fun setUpWeatherLayout() {
-        diaryShowViewModel.apply {
-            weather1LiveData.observe(
-                viewLifecycleOwner,
-                Weather1Observer(
-                    requireContext(),
-                    binding.includeDiaryShow.textWeather1Selected
-                )
-            )
-            weather2LiveData.observe(
-                viewLifecycleOwner,
-                Weather2Observer(
-                    requireContext(),
-                    binding.includeDiaryShow.textWeatherSlush,
-                    binding.includeDiaryShow.textWeather2Selected
-                )
-            )
+        launchAndRepeatOnLifeCycleStarted {
+            diaryShowViewModel.weather1
+                .collectLatest { value: Weather ->
+                    Weather1Observer(
+                        requireContext(),
+                        binding.includeDiaryShow.textWeather1Selected
+                    ).onChanged(value)
+                }
+        }
+
+        launchAndRepeatOnLifeCycleStarted {
+            diaryShowViewModel.weather2
+                .collectLatest { value: Weather ->
+                    Weather2Observer(
+                        requireContext(),
+                        binding.includeDiaryShow.textWeatherSlush,
+                        binding.includeDiaryShow.textWeather2Selected
+                    ).onChanged(value)
+                }
         }
     }
 
-    class Weather1Observer(private val context: Context, private val textWeather: TextView)
-        : Observer<Weather> {
+    class Weather1Observer(private val context: Context, private val textWeather: TextView) {
 
-        override fun onChanged(value: Weather) {
+        fun onChanged(value: Weather) {
             textWeather.text = value.toString(context)
         }
     }
@@ -225,8 +234,8 @@ class DiaryShowFragment : BaseFragment() {
         private val context: Context,
         private val slush: TextView,
         private val textWeather: TextView
-    ) : Observer<Weather> {
-        override fun onChanged(value: Weather) {
+    ) {
+        fun onChanged(value: Weather) {
             if (value == Weather.UNKNOWN) {
                 slush.visibility = View.GONE
                 textWeather.visibility = View.GONE
@@ -239,43 +248,47 @@ class DiaryShowFragment : BaseFragment() {
     }
 
     private fun setUpConditionLayout() {
-        diaryShowViewModel.conditionLiveData
-            .observe(
-                viewLifecycleOwner,
-                ConditionObserver(
-                    requireContext(),
-                    binding.includeDiaryShow.textConditionSelected
-                )
-            )
+        launchAndRepeatOnLifeCycleStarted {
+            diaryShowViewModel.condition
+                .collectLatest { value: Condition ->
+                    ConditionObserver(
+                        requireContext(),
+                        binding.includeDiaryShow.textConditionSelected
+                    ).onChanged(value)
+                }
+        }
     }
 
-    class ConditionObserver(private val context: Context, private val textCondition: TextView)
-        : Observer<Condition> {
+    class ConditionObserver(private val context: Context, private val textCondition: TextView) {
 
-        override fun onChanged(value: Condition) {
+        fun onChanged(value: Condition) {
             textCondition.text = value.toString(context)
         }
     }
 
     private fun setUpItemLayout() {
-        val itemLayouts =
-            binding.includeDiaryShow.run {
-                arrayOf(
-                    includeItem1.linerLayoutDiaryShowItem,
-                    includeItem2.linerLayoutDiaryShowItem,
-                    includeItem3.linerLayoutDiaryShowItem,
-                    includeItem4.linerLayoutDiaryShowItem,
-                    includeItem5.linerLayoutDiaryShowItem
-                )
-            }
-        diaryShowViewModel.numVisibleItemsLiveData
-            .observe(viewLifecycleOwner, NumVisibleItemsObserver(itemLayouts))
+        launchAndRepeatOnLifeCycleStarted {
+            val itemLayouts =
+                binding.includeDiaryShow.run {
+                    arrayOf(
+                        includeItem1.linerLayoutDiaryShowItem,
+                        includeItem2.linerLayoutDiaryShowItem,
+                        includeItem3.linerLayoutDiaryShowItem,
+                        includeItem4.linerLayoutDiaryShowItem,
+                        includeItem5.linerLayoutDiaryShowItem
+                    )
+                }
+
+            diaryShowViewModel.numVisibleItems
+                .collectLatest { value: Int ->
+                    NumVisibleItemsObserver(itemLayouts).onChanged(value)
+                }
+        }
     }
 
-    class NumVisibleItemsObserver(private val itemLayouts: Array<LinearLayout>) :
-        Observer<Int> {
+    class NumVisibleItemsObserver(private val itemLayouts: Array<LinearLayout>) {
 
-        override fun onChanged(value: Int) {
+        fun onChanged(value: Int) {
             require(!(value < ItemNumber.MIN_NUMBER || value > ItemNumber.MAX_NUMBER))
 
             for (i in ItemNumber.MIN_NUMBER..ItemNumber.MAX_NUMBER) {
@@ -290,16 +303,17 @@ class DiaryShowFragment : BaseFragment() {
     }
 
     private fun setUpPicture() {
-        diaryShowViewModel.picturePathLiveData
-            .observe(
-                viewLifecycleOwner,
-                PicturePathObserver(
-                    requireContext(),
-                    themeColor,
-                    binding.includeDiaryShow.textAttachedPicture,
-                    binding.includeDiaryShow.imageAttachedPicture
-                )
-            )
+        launchAndRepeatOnLifeCycleStarted {
+            diaryShowViewModel.picturePath
+                .collectLatest { value: Uri? ->
+                    PicturePathObserver(
+                        requireContext(),
+                        themeColor,
+                        binding.includeDiaryShow.textAttachedPicture,
+                        binding.includeDiaryShow.imageAttachedPicture
+                    ).onChanged(value)
+                }
+        }
     }
 
     class PicturePathObserver(
@@ -307,7 +321,7 @@ class DiaryShowFragment : BaseFragment() {
         themeColor: ThemeColor,
         private val textPictureTitle: TextView,
         private val imageView: ImageView
-    ) : Observer<Uri?> {
+    ) {
 
             private val diaryPictureManager: DiaryPictureManager =
                 DiaryPictureManager(
@@ -316,7 +330,7 @@ class DiaryShowFragment : BaseFragment() {
                     themeColor.getOnSurfaceVariantColor(context.resources)
                 )
 
-        override fun onChanged(value: Uri?) {
+        fun onChanged(value: Uri?) {
             if (value == null) {
                 textPictureTitle.visibility = View.GONE
                 imageView.visibility = View.GONE
@@ -330,16 +344,17 @@ class DiaryShowFragment : BaseFragment() {
     }
 
     private fun setUpLogLayout() {
-        diaryShowViewModel.logLiveData
-            .observe(
-                viewLifecycleOwner,
-                LogObserver(binding.includeDiaryShow.textLogValue)
-            )
+        launchAndRepeatOnLifeCycleStarted {
+            diaryShowViewModel.log
+                .collectLatest { value: LocalDateTime? ->
+                    LogObserver(binding.includeDiaryShow.textLogValue).onChanged(value)
+                }
+        }
     }
 
-    class LogObserver(private val textLog: TextView) : Observer<LocalDateTime?> {
+    class LogObserver(private val textLog: TextView) {
 
-        override fun onChanged(value: LocalDateTime?) {
+        fun onChanged(value: LocalDateTime?) {
             // MEMO:DiaryViewModelを初期化するとDiaryLogにnullが代入されるため、下記"return"を処理。
             if (value == null) return
 
@@ -391,7 +406,7 @@ class DiaryShowFragment : BaseFragment() {
         val destinationId = navBackStackEntry.destination.id
         if (destinationId == R.id.navigation_calendar_fragment) {
             val savedStateHandle = navBackStackEntry.savedStateHandle
-            val showedDiaryLocalDate = diaryShowViewModel.dateLiveData.value
+            val showedDiaryLocalDate = diaryShowViewModel.date.value
             savedStateHandle[KEY_SHOWED_DIARY_DATE] = showedDiaryLocalDate
         }
 

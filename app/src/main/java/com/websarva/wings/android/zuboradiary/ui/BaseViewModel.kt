@@ -1,25 +1,24 @@
 package com.websarva.wings.android.zuboradiary.ui
 
-import android.os.Looper
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.websarva.wings.android.zuboradiary.data.AppMessage
 import com.websarva.wings.android.zuboradiary.data.AppMessageList
-import java.lang.Exception
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 
 abstract class BaseViewModel : ViewModel() {
 
-    private val _appMessageBufferList = MutableLiveData<AppMessageList>()
-    val appMessageBufferList: LiveData<AppMessageList>
-        get() = _appMessageBufferList
+    private val initialAppMessageBufferList = AppMessageList()
+    private val _appMessageBufferList = MutableStateFlow(initialAppMessageBufferList)
+    val appMessageBufferList
+        get() = _appMessageBufferList.asStateFlow()
 
     init {
         initializeAppMessageList()
     }
 
     protected fun initializeAppMessageList() {
-        _appMessageBufferList.value = AppMessageList()
+        _appMessageBufferList.value = initialAppMessageBufferList
     }
 
     /**
@@ -30,13 +29,7 @@ abstract class BaseViewModel : ViewModel() {
     protected fun addAppMessage(appMessage: AppMessage) {
         val currentList = requireNotNull(_appMessageBufferList.value)
         val updateList = currentList.add(appMessage)
-
-        val isMainThread = (Looper.getMainLooper().thread === Thread.currentThread())
-        if (isMainThread) {
-            _appMessageBufferList.setValue(updateList)
-        } else {
-            _appMessageBufferList.postValue(updateList)
-        }
+        _appMessageBufferList.value = updateList
     }
 
     fun triggerAppMessageBufferListObserver() {

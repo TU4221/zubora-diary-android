@@ -2,10 +2,7 @@ package com.websarva.wings.android.zuboradiary.ui.settings
 
 import android.util.Log
 import androidx.datastore.core.IOException
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MediatorLiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.asLiveData
+import androidx.lifecycle.viewModelScope
 import com.websarva.wings.android.zuboradiary.data.AppMessage
 import com.websarva.wings.android.zuboradiary.data.database.DiaryRepository
 import com.websarva.wings.android.zuboradiary.data.network.GeoCoordinates
@@ -19,7 +16,14 @@ import com.websarva.wings.android.zuboradiary.data.preferences.WeatherInfoAcquis
 import com.websarva.wings.android.zuboradiary.data.worker.WorkerRepository
 import com.websarva.wings.android.zuboradiary.ui.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 import java.time.DayOfWeek
 import java.time.LocalTime
 import javax.inject.Inject
@@ -31,32 +35,30 @@ class SettingsViewModel @Inject constructor(
     private val diaryRepository: DiaryRepository
 ) : BaseViewModel() {
 
-    // MEMO:MutableLiveDataに値セットするまでFlowによるラグが発生する可能性があるためnull許容型とする。
-    //      これにより、Observerの引数がnull許容型となりnull時の処理ができる。
-    lateinit var themeColor: LiveData<ThemeColor>
-    lateinit var calendarStartDayOfWeek: LiveData<DayOfWeek>
-    // TODO:preferencesの更新をsuspend関数にしたことによりMaterialSwitchがカクつくようになった。
-    //      DataBindingをやめてObserverで切替たら直る？
-    lateinit var isCheckedReminderNotification: LiveData<Boolean>
-    lateinit var reminderNotificationTime: LiveData<LocalTime?>
-    lateinit var isCheckedPasscodeLock: LiveData<Boolean>
-    private lateinit var passcode: LiveData<String?>
-    lateinit var isCheckedWeatherInfoAcquisition: LiveData<Boolean>
+    // MEMO:StateFlow型設定値変数の値ははPreferencesDatastoreの値のみを代入したいので、
+    //      代入されるまでの間(初回設定値読込中)はnullとする。
+    lateinit var themeColor: StateFlow<ThemeColor?>
+    lateinit var calendarStartDayOfWeek: StateFlow<DayOfWeek?>
+    lateinit var isCheckedReminderNotification: StateFlow<Boolean?>
+    lateinit var reminderNotificationTime: StateFlow<LocalTime?>
+    lateinit var isCheckedPasscodeLock: StateFlow<Boolean?>
+    private lateinit var passcode: StateFlow<String?>
+    lateinit var isCheckedWeatherInfoAcquisition: StateFlow<Boolean?>
 
-    private val _isAllSettingsNotNull = MediatorLiveData(false)
-    val isAllSettingsNotNull: LiveData<Boolean>
-        get() = _isAllSettingsNotNull
+    private val _isAllSettingsNotNull = MutableStateFlow(false)
+    val isAllSettingsNotNull
+        get() = _isAllSettingsNotNull.asStateFlow()
 
-    private val _geoCoordinates = MutableLiveData<GeoCoordinates?>()
-    val geoCoordinates: LiveData<GeoCoordinates?>
-        get() = _geoCoordinates
+    private val initialGeoCoordinates = null
+    private val _geoCoordinates = MutableStateFlow<GeoCoordinates?>(initialGeoCoordinates)
+    val geoCoordinates
+        get() = _geoCoordinates.asStateFlow()
 
     val hasUpdatedGeoCoordinates
         get() = _geoCoordinates.value != null
 
     init {
         initialize()
-        setUpIsAllSettingsNotNull()
     }
 
     override fun initialize() {
@@ -68,14 +70,132 @@ class SettingsViewModel @Inject constructor(
         setUpWeatherInfoAcquisitionPreferenceValueLoading()
     }
 
-    private fun setUpIsAllSettingsNotNull() {
-        _isAllSettingsNotNull.addSource(themeColor) { checkAllSettingsNotNull() }
-        _isAllSettingsNotNull.addSource(calendarStartDayOfWeek) { checkAllSettingsNotNull() }
-        _isAllSettingsNotNull.addSource(isCheckedReminderNotification) { checkAllSettingsNotNull() }
-        _isAllSettingsNotNull.addSource(reminderNotificationTime) { checkAllSettingsNotNull() }
-        _isAllSettingsNotNull.addSource(isCheckedPasscodeLock) { checkAllSettingsNotNull() }
-        _isAllSettingsNotNull.addSource(passcode) { checkAllSettingsNotNull() }
-        _isAllSettingsNotNull.addSource(isCheckedWeatherInfoAcquisition) { checkAllSettingsNotNull() }
+    private fun setUpThemeColorPreferenceValueLoading() {
+        loadSettingValue {
+            themeColor =
+                userPreferencesRepository.loadThemeColorPreference()
+                    .map { preference ->
+                        preference.themeColor
+                    }.stateIn(
+                        viewModelScope,
+                        SharingStarted.Eagerly,
+                        null
+                    )
+        }
+        checkSettingNotNull(themeColor)
+    }
+
+    private fun setUpCalendarStartDayOfWeekPreferenceValueLoading() {
+        loadSettingValue {
+            calendarStartDayOfWeek =
+                userPreferencesRepository.loadCalendarStartDayOfWeekPreference()
+                    .map { preference ->
+                        preference.dayOfWeek
+                    }.stateIn(
+                        viewModelScope,
+                        SharingStarted.Eagerly,
+                        null
+                    )
+        }
+        checkSettingNotNull(calendarStartDayOfWeek)
+    }
+
+    private fun setUpReminderNotificationPreferenceValueLoading() {
+        loadSettingValue {
+            isCheckedReminderNotification =
+                userPreferencesRepository.loadReminderNotificationPreference()
+                    .map { preference ->
+                        preference.isChecked
+                    }.stateIn(
+                        viewModelScope,
+                        SharingStarted.Eagerly,
+                        null
+                    )
+        }
+        checkSettingNotNull(isCheckedReminderNotification)
+
+        loadSettingValue {
+            reminderNotificationTime =
+                userPreferencesRepository.loadReminderNotificationPreference()
+                    .map { preference ->
+                        preference.notificationLocalTime
+                    }.stateIn(
+                        viewModelScope,
+                        SharingStarted.Eagerly,
+                        null
+                    )
+        }
+        checkSettingNotNull(reminderNotificationTime)
+    }
+
+    private fun setUpPasscodeLockPreferenceValueLoading() {
+        loadSettingValue {
+            isCheckedPasscodeLock =
+                userPreferencesRepository.loadPasscodeLockPreference()
+                    .map { preference ->
+                        preference.isChecked
+                    }.stateIn(
+                        viewModelScope,
+                        SharingStarted.Eagerly,
+                        null
+                    )
+        }
+        checkSettingNotNull(isCheckedPasscodeLock)
+
+        loadSettingValue {
+            passcode =
+                userPreferencesRepository.loadPasscodeLockPreference()
+                    .map { preference ->
+                        preference.passCode
+                    }.stateIn(
+                        viewModelScope,
+                        SharingStarted.Eagerly,
+                        null
+                    )
+        }
+        checkSettingNotNull(passcode)
+    }
+
+    private fun setUpWeatherInfoAcquisitionPreferenceValueLoading() {
+        loadSettingValue {
+            isCheckedWeatherInfoAcquisition =
+                userPreferencesRepository.loadWeatherInfoAcquisitionPreference()
+                    .map { preference ->
+                        preference.isChecked
+                    }.stateIn(
+                        viewModelScope,
+                        SharingStarted.Eagerly,
+                        null
+                    )
+        }
+        checkSettingNotNull(isCheckedWeatherInfoAcquisition)
+    }
+
+    private fun interface SettingLoadingProcess {
+        @Throws(Throwable::class)
+        fun load()
+    }
+
+    private fun loadSettingValue(
+        loadingProcess: SettingLoadingProcess
+    ) {
+        try {
+            loadingProcess.load()
+        } catch (e: Throwable) {
+            Log.d("Exception", "設定値読込失敗", e)
+            addSettingLoadingErrorMessage()
+        }
+    }
+
+    private fun <T> checkSettingNotNull(setting: StateFlow<T?>) {
+        viewModelScope.launch(Dispatchers.IO) {
+            setting.collect { value: T? ->
+                if (_isAllSettingsNotNull.value) return@collect
+                if (value == null) return@collect
+
+                checkAllSettingsNotNull()
+            }
+        }
     }
 
     private fun checkAllSettingsNotNull() {
@@ -95,89 +215,6 @@ class SettingsViewModel @Inject constructor(
         }
 
         return true
-    }
-
-    private fun setUpThemeColorPreferenceValueLoading() {
-        loadSettingValue {
-            themeColor =
-                userPreferencesRepository.loadThemeColorPreference()
-                    .map { preference ->
-                        preference.themeColor
-                    }
-                    .asLiveData()
-        }
-    }
-
-    private fun setUpCalendarStartDayOfWeekPreferenceValueLoading() {
-        loadSettingValue {
-            calendarStartDayOfWeek =
-                userPreferencesRepository.loadCalendarStartDayOfWeekPreference()
-                    .map { preference ->
-                        preference.dayOfWeek
-                    }
-                    .asLiveData()
-        }
-    }
-
-    private fun setUpReminderNotificationPreferenceValueLoading() {
-        loadSettingValue {
-            isCheckedReminderNotification =
-                userPreferencesRepository.loadReminderNotificationPreference()
-                    .map { preference ->
-                        preference.isChecked
-                    }
-                    .asLiveData()
-            reminderNotificationTime =
-                userPreferencesRepository.loadReminderNotificationPreference()
-                    .map { preference ->
-                        preference.notificationLocalTime
-                    }
-                    .asLiveData()
-        }
-    }
-
-    private fun setUpPasscodeLockPreferenceValueLoading() {
-        loadSettingValue {
-            isCheckedPasscodeLock =
-                userPreferencesRepository.loadPasscodeLockPreference()
-                    .map { preference ->
-                        preference.isChecked
-                    }
-                    .asLiveData()
-            passcode =
-                userPreferencesRepository.loadPasscodeLockPreference()
-                    .map { preference ->
-                        preference.passCode
-                    }
-                    .asLiveData()
-        }
-    }
-
-    private fun setUpWeatherInfoAcquisitionPreferenceValueLoading() {
-        loadSettingValue {
-            isCheckedWeatherInfoAcquisition =
-                userPreferencesRepository.loadWeatherInfoAcquisitionPreference()
-                    .map { preference ->
-                        preference.isChecked
-                    }
-                    .asLiveData()
-        }
-    }
-
-    private fun interface SettingLoadingProcess {
-        @Throws(Throwable::class)
-        fun load()
-    }
-
-    private fun loadSettingValue(
-        loadingProcess: SettingLoadingProcess
-    ) {
-        try {
-            loadingProcess.load()
-        } catch (e: Throwable) {
-            Log.d("Exception", "設定値読込失敗", e)
-            addSettingLoadingErrorMessage()
-        }
     }
 
     private fun addSettingLoadingErrorMessage() {
@@ -276,7 +313,7 @@ class SettingsViewModel @Inject constructor(
     }
 
     fun clearGeoCoordinates() {
-        _geoCoordinates.value = null
+        _geoCoordinates.value = initialGeoCoordinates
     }
 
     suspend fun deleteAllDiaries(): Boolean {

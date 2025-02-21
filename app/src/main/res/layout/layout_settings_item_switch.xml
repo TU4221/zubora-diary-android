@@ -20,11 +20,11 @@
 
         <variable
             name="settingValue"
-            type="androidx.lifecycle.LiveData&lt;String>" />
+            type="kotlinx.coroutines.flow.StateFlow&lt;String>" />
 
         <variable
             name="settingValueSwitch"
-            type="androidx.lifecycle.LiveData&lt;Boolean>" />
+            type="kotlinx.coroutines.flow.StateFlow&lt;Boolean>" />
 
     </data>
 

@@ -9,13 +9,13 @@ import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.ViewDataBinding
-import androidx.lifecycle.Observer
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import com.websarva.wings.android.zuboradiary.R
 import com.websarva.wings.android.zuboradiary.data.AppMessage
+import com.websarva.wings.android.zuboradiary.data.AppMessageList
 import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor
 import com.websarva.wings.android.zuboradiary.databinding.FragmentDiaryListBinding
 import com.websarva.wings.android.zuboradiary.ui.BaseFragment
@@ -26,6 +26,7 @@ import com.websarva.wings.android.zuboradiary.ui.list.DiaryYearMonthListBaseItem
 import com.websarva.wings.android.zuboradiary.ui.list.SwipeDiaryYearMonthListBaseAdapter.OnClickChildItemBackgroundButtonListener
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.time.LocalDate
@@ -96,8 +97,12 @@ class DiaryListFragment : BaseFragment() {
     }
 
     override fun setUpOtherAppMessageDialog() {
-        diaryListViewModel.appMessageBufferList
-            .observe(viewLifecycleOwner, AppMessageBufferListObserver(diaryListViewModel))
+        launchAndRepeatOnLifeCycleStarted {
+            diaryListViewModel.appMessageBufferList
+                .collectLatest { value: AppMessageList ->
+                    AppMessageBufferListObserver(diaryListViewModel).onChanged(value)
+                }
+        }
     }
 
     // 日付入力ダイアログフラグメントから結果受取
@@ -184,7 +189,12 @@ class DiaryListFragment : BaseFragment() {
                 showDiaryDeleteDialog(item.date, item.picturePath)
             }
 
-        diaryListViewModel.diaryList.observe(viewLifecycleOwner, DiaryListObserver())
+        launchAndRepeatOnLifeCycleStarted {
+            diaryListViewModel.diaryList
+                .collectLatest { value: DiaryYearMonthList ->
+                    DiaryListObserver().onChanged(value)
+                }
+        }
 
         // 画面全体ProgressBar表示中はタッチ無効化
         binding.includeProgressIndicator.viewBackground
@@ -213,8 +223,8 @@ class DiaryListFragment : BaseFragment() {
         }
     }
 
-    private inner class DiaryListObserver : Observer<DiaryYearMonthList> {
-        override fun onChanged(value: DiaryYearMonthList) {
+    private inner class DiaryListObserver {
+        fun onChanged(value: DiaryYearMonthList) {
             setUpListViewVisibility(value)
             setUpList(value)
         }

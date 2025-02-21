@@ -12,7 +12,7 @@
             type="String" />
         <variable
             name="settingValue"
-            type="androidx.lifecycle.LiveData&lt;String>" />
+            type="kotlinx.coroutines.flow.StateFlow&lt;String>" />
 
     </data>
 

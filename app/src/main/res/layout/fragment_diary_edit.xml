@@ -74,16 +74,16 @@
                              2. android:text="@={diaryEditViewModel.date}"
                               -->
                         <com.google.android.material.textfield.TextInputLayout
-                            style="@style/AppTextInputLayoutOutlinedBoxStyle"
                             android:id="@+id/text_input_layout_date"
+                            style="@style/AppTextInputLayoutOutlinedBoxStyle"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="@dimen/fragment_diary_edit_margin_top"
                             android:hint="@string/fragment_diary_edit_date">
 
                             <com.websarva.wings.android.zuboradiary.ui.diary.diaryedit.CustomTextInputEditText
-                                style="@style/AppTextInputEditTextNoInputStyle"
                                 android:id="@+id/text_input_edit_text_date"
+                                style="@style/AppTextInputEditTextNoInputStyle"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:textAppearance="@style/AppTextInputEditTextTextAppearance"
@@ -99,26 +99,26 @@
                             android:orientation="horizontal">
 
                             <TextView
-                                style="@style/AppTextViewStyle"
                                 android:id="@+id/text_weather"
+                                style="@style/AppTextViewStyle"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
+                                android:labelFor="@id/auto_complete_text_weather_1"
                                 android:text="@string/fragment_diary_edit_weather"
                                 android:textAppearance="@style/AppTextViewTextAppearance"
-                                android:textSize="@dimen/fragment_diary_edit_text_size"
-                                android:labelFor="@id/auto_complete_text_weather_1" />
+                                android:textSize="@dimen/fragment_diary_edit_text_size" />
 
                             <com.google.android.material.textfield.TextInputLayout
-                                style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
                                 android:id="@+id/text_input_layout_weather_1"
+                                style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
                                 android:layout_marginStart="@dimen/fragment_diary_edit_margin_start"
                                 android:layout_weight="1">
 
                                 <AutoCompleteTextView
-                                    style="@style/AppAutoCompleteTextViewDropDownStyle"
                                     android:id="@+id/auto_complete_text_weather_1"
+                                    style="@style/AppAutoCompleteTextViewDropDownStyle"
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
                                     android:textAppearance="@style/AppAutoCompleteTextViewDropDownTextAppearance"
@@ -128,23 +128,23 @@
                             </com.google.android.material.textfield.TextInputLayout>
 
                             <TextView
-                                style="@style/AppTextViewStyle"
                                 android:id="@+id/text_weather_slush"
+                                style="@style/AppTextViewStyle"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginStart="@dimen/fragment_diary_edit_margin_start"
+                                android:labelFor="@id/auto_complete_text_weather_2"
                                 android:text="@string/fragment_diary_edit_weather_slush"
                                 android:textAppearance="@style/AppTextViewTextAppearance"
-                                android:textSize="@dimen/fragment_diary_edit_text_size"
-                                android:labelFor="@id/auto_complete_text_weather_2" />
+                                android:textSize="@dimen/fragment_diary_edit_text_size" />
 
                             <com.google.android.material.textfield.TextInputLayout
-                                style="@style/AppTextInputLayoutDropdownMenuStyle"
                                 android:id="@+id/text_input_layout_weather_2"
+                                style="@style/AppTextInputLayoutDropdownMenuStyle"
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
                                 android:layout_marginStart="@dimen/fragment_diary_edit_margin_start"
-                                android:layout_weight="1" >
+                                android:layout_weight="1">
 
                                 <!-- MEMO:"android:contentDescription"で代用-->
                                 <AutoCompleteTextView
@@ -167,25 +167,25 @@
                             android:orientation="horizontal">
 
                             <TextView
-                                style="@style/AppTextViewStyle"
                                 android:id="@+id/text_condition"
+                                style="@style/AppTextViewStyle"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
+                                android:labelFor="@id/auto_complete_text_condition"
                                 android:text="@string/fragment_diary_edit_condition"
                                 android:textAppearance="@style/AppTextViewTextAppearance"
-                                android:textSize="@dimen/fragment_diary_edit_text_size"
-                                android:labelFor="@id/auto_complete_text_condition" />
+                                android:textSize="@dimen/fragment_diary_edit_text_size" />
 
                             <com.google.android.material.textfield.TextInputLayout
-                                style="@style/AppTextInputLayoutDropdownMenuStyle"
                                 android:id="@+id/text_input_layout_condition"
+                                style="@style/AppTextInputLayoutDropdownMenuStyle"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:layout_marginStart="@dimen/fragment_diary_edit_margin_start">
 
                                 <AutoCompleteTextView
-                                    style="@style/AppAutoCompleteTextViewDropDownStyle"
                                     android:id="@+id/auto_complete_text_condition"
+                                    style="@style/AppAutoCompleteTextViewDropDownStyle"
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
                                     android:textAppearance="@style/AppAutoCompleteTextViewDropDownTextAppearance"
@@ -197,8 +197,8 @@
                         </LinearLayout>
 
                         <com.google.android.material.textfield.TextInputLayout
-                            style="@style/AppTextInputLayoutOutlinedBoxStyle"
                             android:id="@+id/text_input_layout_title"
+                            style="@style/AppTextInputLayoutOutlinedBoxStyle"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="@dimen/fragment_diary_edit_margin_top"
@@ -218,7 +218,7 @@
                                 android:layout_height="wrap_content"
                                 android:hint="@string/fragment_diary_edit_title_hint"
                                 android:maxLength="@integer/fragment_diary_edit_title_max_length"
-                                android:text="@={diaryEditViewModel.titleMutableLiveData}"
+                                android:text="@={diaryEditViewModel.titleMutableStateFlow}"
                                 android:textAppearance="@style/AppTextInputEditTextTextAppearance"
                                 android:textSize="@dimen/fragment_diary_edit_text_size"
                                 tools:ignore="DuplicateSpeakableTextCheck" />
@@ -226,43 +226,43 @@
                         </com.google.android.material.textfield.TextInputLayout>
 
                         <include
-                            layout="@layout/layout_diary_edit_item"
                             android:id="@+id/include_item_1"
-                            app:commentMutableLiveData="@{diaryEditViewModel.item1CommentMutable}"
+                            layout="@layout/layout_diary_edit_item"
+                            app:commentMutableStateFlow="@{diaryEditViewModel.item1CommentMutable}"
                             app:itemNumber="@{@string/fragment_diary_edit_item_1}"
-                            app:titleMutableLiveData="@{diaryEditViewModel.item1TitleMutable}" />
+                            app:titleMutableStateFlow="@{diaryEditViewModel.item1TitleMutable}" />
 
                         <include
-                            layout="@layout/layout_diary_edit_item"
                             android:id="@+id/include_item_2"
-                            app:commentMutableLiveData="@{diaryEditViewModel.item2CommentMutable}"
+                            layout="@layout/layout_diary_edit_item"
+                            app:commentMutableStateFlow="@{diaryEditViewModel.item2CommentMutable}"
                             app:itemNumber="@{@string/fragment_diary_edit_item_2}"
-                            app:titleMutableLiveData="@{diaryEditViewModel.item2TitleMutable}" />
+                            app:titleMutableStateFlow="@{diaryEditViewModel.item2TitleMutable}" />
 
                         <include
-                            layout="@layout/layout_diary_edit_item"
                             android:id="@+id/include_item_3"
-                            app:commentMutableLiveData="@{diaryEditViewModel.item3CommentMutable}"
+                            layout="@layout/layout_diary_edit_item"
+                            app:commentMutableStateFlow="@{diaryEditViewModel.item3CommentMutable}"
                             app:itemNumber="@{@string/fragment_diary_edit_item_3}"
-                            app:titleMutableLiveData="@{diaryEditViewModel.item3TitleMutable}" />
+                            app:titleMutableStateFlow="@{diaryEditViewModel.item3TitleMutable}" />
 
                         <include
-                            layout="@layout/layout_diary_edit_item"
                             android:id="@+id/include_item_4"
-                            app:commentMutableLiveData="@{diaryEditViewModel.item4CommentMutable}"
+                            layout="@layout/layout_diary_edit_item"
+                            app:commentMutableStateFlow="@{diaryEditViewModel.item4CommentMutable}"
                             app:itemNumber="@{@string/fragment_diary_edit_item_4}"
-                            app:titleMutableLiveData="@{diaryEditViewModel.item4TitleMutable}" />
+                            app:titleMutableStateFlow="@{diaryEditViewModel.item4TitleMutable}" />
 
                         <include
-                            layout="@layout/layout_diary_edit_item"
                             android:id="@+id/include_item_5"
-                            app:commentMutableLiveData="@{diaryEditViewModel.item5CommentMutable}"
+                            layout="@layout/layout_diary_edit_item"
+                            app:commentMutableStateFlow="@{diaryEditViewModel.item5CommentMutable}"
                             app:itemNumber="@{@string/fragment_diary_edit_item_5}"
-                            app:titleMutableLiveData="@{diaryEditViewModel.item5TitleMutable}" />
+                            app:titleMutableStateFlow="@{diaryEditViewModel.item5TitleMutable}" />
 
                         <ImageButton
-                            style="@style/AppImageButtonStyle"
                             android:id="@+id/image_button_item_addition"
+                            style="@style/AppImageButtonStyle"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_gravity="end"
@@ -270,52 +270,52 @@
                             android:contentDescription="@string/fragment_diary_edit_item_addition"
                             android:src="@drawable/ic_add_circle_24px" />
 
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="@dimen/fragment_diary_edit_margin_top"
-                        android:orientation="horizontal">
-
-                        <TextView
-                            style="@style/AppTextViewStyle"
-                            android:id="@+id/text_attached_picture"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center_vertical"
-                            android:text="@string/fragment_diary_edit_attached_picture"
-                            android:textAppearance="@style/AppTextViewTextAppearance"
-                            android:textSize="@dimen/fragment_diary_edit_text_size" />
-
-                        <ImageButton
-                            style="@style/AppImageButtonStyle"
-                            android:id="@+id/image_button_attached_picture_delete"
-                            android:layout_width="@dimen/fragment_diary_edit_delete_button_layout_width"
-                            android:layout_height="@dimen/fragment_diary_edit_delete_button_layout_height"
-                            android:layout_gravity="center_vertical"
-                            android:src="@drawable/ic_delete_forever_24px"
-                            android:contentDescription="@string/fragment_diary_edit_attached_picture_delete"/>
-
-                    </LinearLayout>
-
-                    <FrameLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:background="@drawable/diary_edit_image_bg_rounded_rectangle_image">
-
-                        <ImageView
-                            style="@style/AppImageViewStyle"
-                            android:id="@+id/image_attached_picture"
+                        <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_gravity="center"
-                            android:layout_margin="@dimen/fragment_diary_edit_picture_margin"
-                            android:minHeight="@dimen/fragment_diary_edit_picture_minHeight"
-                            android:scaleType="fitXY"
-                            android:src="@drawable/diary_edit_image_ic_photo_library_24px"
-                            android:contentDescription="@string/fragment_diary_edit_attached_picture_attachment"
-                            tools:tint="?attr/colorOnSurfaceVariant" />
+                            android:layout_marginTop="@dimen/fragment_diary_edit_margin_top"
+                            android:orientation="horizontal">
 
-                    </FrameLayout>
+                            <TextView
+                                android:id="@+id/text_attached_picture"
+                                style="@style/AppTextViewStyle"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center_vertical"
+                                android:text="@string/fragment_diary_edit_attached_picture"
+                                android:textAppearance="@style/AppTextViewTextAppearance"
+                                android:textSize="@dimen/fragment_diary_edit_text_size" />
+
+                            <ImageButton
+                                android:id="@+id/image_button_attached_picture_delete"
+                                style="@style/AppImageButtonStyle"
+                                android:layout_width="@dimen/fragment_diary_edit_delete_button_layout_width"
+                                android:layout_height="@dimen/fragment_diary_edit_delete_button_layout_height"
+                                android:layout_gravity="center_vertical"
+                                android:contentDescription="@string/fragment_diary_edit_attached_picture_delete"
+                                android:src="@drawable/ic_delete_forever_24px" />
+
+                        </LinearLayout>
+
+                        <FrameLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:background="@drawable/diary_edit_image_bg_rounded_rectangle_image">
+
+                            <ImageView
+                                android:id="@+id/image_attached_picture"
+                                style="@style/AppImageViewStyle"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center"
+                                android:layout_margin="@dimen/fragment_diary_edit_picture_margin"
+                                android:contentDescription="@string/fragment_diary_edit_attached_picture_attachment"
+                                android:minHeight="@dimen/fragment_diary_edit_picture_minHeight"
+                                android:scaleType="fitXY"
+                                android:src="@drawable/diary_edit_image_ic_photo_library_24px"
+                                tools:tint="?attr/colorOnSurfaceVariant" />
+
+                        </FrameLayout>
 
                     </LinearLayout>
 
@@ -328,7 +328,7 @@
         <include
             layout="@layout/layout_full_screen_circular_progress_indicator"
             android:id="@+id/include_progress_indicator"
-            app:isVisibleLiveData="@{diaryEditViewModel.isVisibleUpdateProgressBar}" />
+            app:isVisibleStateFlow="@{diaryEditViewModel.isVisibleUpdateProgressBar}" />
 
     </FrameLayout>
 

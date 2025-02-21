@@ -2,6 +2,7 @@ package com.websarva.wings.android.zuboradiary.ui.list.wordsearch
 
 import android.content.Context
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
@@ -12,6 +13,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.RecyclerView
 import com.websarva.wings.android.zuboradiary.data.AppMessage
+import com.websarva.wings.android.zuboradiary.data.AppMessageList
 import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor
 import com.websarva.wings.android.zuboradiary.databinding.FragmentWordSearchBinding
 import com.websarva.wings.android.zuboradiary.ui.BaseFragment
@@ -20,7 +22,7 @@ import com.websarva.wings.android.zuboradiary.ui.KeyboardInitializer
 import com.websarva.wings.android.zuboradiary.ui.list.DiaryDayListBaseItem
 import com.websarva.wings.android.zuboradiary.ui.list.DiaryYearMonthListBaseAdapter.OnClickChildItemListener
 import com.websarva.wings.android.zuboradiary.ui.list.DiaryYearMonthListBaseItem
-import com.websarva.wings.android.zuboradiary.ui.notNullValue
+import kotlinx.coroutines.flow.collectLatest
 import java.time.LocalDate
 
 class WordSearchFragment : BaseFragment() {
@@ -80,8 +82,12 @@ class WordSearchFragment : BaseFragment() {
     }
 
     override fun setUpOtherAppMessageDialog() {
-        wordSearchViewModel.appMessageBufferList
-            .observe(viewLifecycleOwner, AppMessageBufferListObserver(wordSearchViewModel))
+        launchAndRepeatOnLifeCycleStarted {
+            wordSearchViewModel.appMessageBufferList
+                .collectLatest { value: AppMessageList ->
+                    AppMessageBufferListObserver(wordSearchViewModel).onChanged(value)
+                }
+        }
     }
 
     private fun setUpToolBar() {
@@ -92,30 +98,33 @@ class WordSearchFragment : BaseFragment() {
     }
 
     private fun setUpWordSearchView() {
-        val searchWord = wordSearchViewModel.searchWord.notNullValue()
+        val searchWord = wordSearchViewModel.searchWord.value
         if (searchWord.isEmpty()) {
             binding.editTextSearchWord.requestFocus()
             val keyboardInitializer = KeyboardInitializer(requireActivity())
             keyboardInitializer.show(binding.editTextSearchWord)
         }
 
-        wordSearchViewModel.searchWord
-            .observe(viewLifecycleOwner) { s: String ->
-                // HACK:キーワードの入力時と確定時に検索Observerが起動してしまい
-                //      同じキーワードで二重に検索してしまう。防止策として下記条件追加。
-                if (s == previousText) return@observe
+        launchAndRepeatOnLifeCycleStarted {
+            wordSearchViewModel.searchWord
+                .collectLatest { value: String ->
+                    // HACK:キーワードの入力時と確定時に検索Observerが起動してしまい
+                    //      同じキーワードで二重に検索してしまう。防止策として下記条件追加。
+                    if (value == previousText) return@collectLatest
 
-                // 検索結果表示Viewは別Observerにて表示
-                if (s.isEmpty()) {
-                    binding.textNoWordSearchResultsMessage.visibility = View.INVISIBLE
-                    binding.linerLayoutWordSearchResults.visibility = View.INVISIBLE
-                    wordSearchViewModel.initialize()
-                } else {
-                    wordSearchViewModel
-                        .loadNewWordSearchResultList(resultWordColor, resultWordBackgroundColor)
+                    // 検索結果表示Viewは別Observerにて表示
+                    if (value.isEmpty()) {
+                        binding.textNoWordSearchResultsMessage.visibility = View.INVISIBLE
+                        binding.linerLayoutWordSearchResults.visibility = View.INVISIBLE
+                        wordSearchViewModel.initialize()
+                    } else {
+                        wordSearchViewModel
+                            .loadNewWordSearchResultList(resultWordColor, resultWordBackgroundColor)
+                    }
+                    previousText = value
                 }
-                previousText = s
-            }
+        }
+
 
         val editTextSetup = EditTextSetup(requireActivity())
         editTextSetup.setUpFocusClearOnClickBackground(
@@ -142,18 +151,25 @@ class WordSearchFragment : BaseFragment() {
                 showShowDiaryFragment(item.date)
             }
 
-        wordSearchViewModel.wordSearchResultList
-            .observe(viewLifecycleOwner, WordSearchResultListObserver())
-
-        wordSearchViewModel.numWordSearchResults
-            .observe(viewLifecycleOwner) { integer: Int ->
-                val visibility = if (integer > 0) {
-                    View.VISIBLE
-                } else {
-                    View.INVISIBLE
+        launchAndRepeatOnLifeCycleStarted {
+            wordSearchViewModel.wordSearchResultList
+                .collectLatest { value: WordSearchResultYearMonthList ->
+                    WordSearchResultListObserver().onChanged(value)
                 }
-                binding.textNumWordSearchResults.visibility = visibility
-            }
+        }
+
+        launchAndRepeatOnLifeCycleStarted {
+            wordSearchViewModel.numWordSearchResults
+                .collectLatest { value: Int ->
+                    Log.d("WordSearchFragment", "numWordSearchResults: $value")
+                    val visibility = if (value > 0) {
+                        View.VISIBLE
+                    } else {
+                        View.INVISIBLE
+                    }
+                    binding.textNumWordSearchResults.visibility = visibility
+                }
+        }
 
         binding.includeProgressIndicator.viewBackground
             .setOnTouchListener { v: View, _: MotionEvent ->
@@ -188,7 +204,7 @@ class WordSearchFragment : BaseFragment() {
                     binding.recyclerWordSearchResultList.adapter
                 ) as WordSearchResultYearMonthListAdapter
 
-            val searchWord = wordSearchViewModel.searchWord.notNullValue()
+            val searchWord = wordSearchViewModel.searchWord.value
             if (searchWord.isEmpty()) {
                 binding.apply {
                     floatingActionButtonTopScroll.hide() // MEMO:初回起動用
@@ -214,7 +230,7 @@ class WordSearchFragment : BaseFragment() {
     }
 
     private fun updateWordSearchResultList() {
-        val list = wordSearchViewModel.wordSearchResultList.notNullValue()
+        val list = wordSearchViewModel.wordSearchResultList.value
         if (list.wordSearchResultYearMonthListItemList.isEmpty()) return
         wordSearchViewModel.updateWordSearchResultList(resultWordColor, resultWordBackgroundColor)
     }

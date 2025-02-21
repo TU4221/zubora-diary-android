@@ -2,18 +2,15 @@ package com.websarva.wings.android.zuboradiary.ui.diary.diaryshow
 
 import android.net.Uri
 import android.util.Log
-import androidx.lifecycle.LiveData
 import com.websarva.wings.android.zuboradiary.data.AppMessage
 import com.websarva.wings.android.zuboradiary.data.database.DiaryRepository
-import com.websarva.wings.android.zuboradiary.data.diary.Condition
 import com.websarva.wings.android.zuboradiary.data.diary.ItemNumber
-import com.websarva.wings.android.zuboradiary.data.diary.Weather
 import com.websarva.wings.android.zuboradiary.ui.BaseViewModel
 import com.websarva.wings.android.zuboradiary.ui.checkNotNull
-import com.websarva.wings.android.zuboradiary.ui.diary.DiaryLiveData
+import com.websarva.wings.android.zuboradiary.ui.diary.DiaryStateFlow
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.asStateFlow
 import java.time.LocalDate
-import java.time.LocalDateTime
 import javax.inject.Inject
 
 @HiltViewModel
@@ -21,35 +18,43 @@ class DiaryShowViewModel @Inject constructor(private val diaryRepository: DiaryR
     BaseViewModel() {
 
     // 日記データ関係
-    private val diaryLiveData = DiaryLiveData()
-    val dateLiveData: LiveData<LocalDate?> get() = diaryLiveData.date
-    val weather1LiveData: LiveData<Weather> get() = diaryLiveData.weather1
-    val weather2LiveData: LiveData<Weather> get() = diaryLiveData.weather2
-    val conditionLiveData: LiveData<Condition> get() = diaryLiveData.condition
-    val titleLiveData: LiveData<String> get() = diaryLiveData.title
-    val numVisibleItemsLiveData: LiveData<Int> get() = diaryLiveData.numVisibleItems
-    val item1TitleLiveData: LiveData<String>
-        get() = diaryLiveData.getItemLiveData(ItemNumber(1)).title
-    val item2TitleLiveData: LiveData<String>
-        get() = diaryLiveData.getItemLiveData(ItemNumber(2)).title
-    val item3TitleLiveData: LiveData<String>
-        get() = diaryLiveData.getItemLiveData(ItemNumber(3)).title
-    val item4TitleLiveData: LiveData<String>
-        get() = diaryLiveData.getItemLiveData(ItemNumber(4)).title
-    val item5TitleLiveData: LiveData<String>
-        get() = diaryLiveData.getItemLiveData(ItemNumber(5)).title
-    val item1CommentLiveData: LiveData<String>
-        get() = diaryLiveData.getItemLiveData(ItemNumber(1)).comment
-    val item2CommentLiveData: LiveData<String>
-        get() = diaryLiveData.getItemLiveData(ItemNumber(2)).comment
-    val item3CommentLiveData: LiveData<String>
-        get() = diaryLiveData.getItemLiveData(ItemNumber(3)).comment
-    val item4CommentLiveData: LiveData<String>
-        get() = diaryLiveData.getItemLiveData(ItemNumber(4)).comment
-    val item5CommentLiveData: LiveData<String>
-        get() = diaryLiveData.getItemLiveData(ItemNumber(5)).comment
-    val picturePathLiveData: LiveData<Uri?> get() = diaryLiveData.picturePath
-    val logLiveData: LiveData<LocalDateTime?> get() = diaryLiveData.log
+    private val diaryStateFlow = DiaryStateFlow()
+    val date
+        get() = diaryStateFlow.date.asStateFlow()
+    val weather1
+        get() = diaryStateFlow.weather1.asStateFlow()
+    val weather2
+        get() = diaryStateFlow.weather2.asStateFlow()
+    val condition
+        get() = diaryStateFlow.condition.asStateFlow()
+    val title
+        get() = diaryStateFlow.title.asStateFlow()
+    val numVisibleItems
+        get() = diaryStateFlow.numVisibleItems.asStateFlow()
+    val item1Title
+        get() = diaryStateFlow.getItemStateFlow(ItemNumber(1)).title.asStateFlow()
+    val item2Title
+        get() = diaryStateFlow.getItemStateFlow(ItemNumber(2)).title.asStateFlow()
+    val item3Title
+        get() = diaryStateFlow.getItemStateFlow(ItemNumber(3)).title.asStateFlow()
+    val item4Title
+        get() = diaryStateFlow.getItemStateFlow(ItemNumber(4)).title.asStateFlow()
+    val item5Title
+        get() = diaryStateFlow.getItemStateFlow(ItemNumber(5)).title.asStateFlow()
+    val item1Comment
+        get() = diaryStateFlow.getItemStateFlow(ItemNumber(1)).comment.asStateFlow()
+    val item2Comment
+        get() = diaryStateFlow.getItemStateFlow(ItemNumber(2)).comment.asStateFlow()
+    val item3Comment
+        get() = diaryStateFlow.getItemStateFlow(ItemNumber(3)).comment.asStateFlow()
+    val item4Comment
+        get() = diaryStateFlow.getItemStateFlow(ItemNumber(4)).comment.asStateFlow()
+    val item5Comment
+        get() = diaryStateFlow.getItemStateFlow(ItemNumber(5)).comment.asStateFlow()
+    val picturePath
+        get() = diaryStateFlow.picturePath.asStateFlow()
+    val log
+        get() = diaryStateFlow.log.asStateFlow()
 
     init {
         initialize()
@@ -57,7 +62,7 @@ class DiaryShowViewModel @Inject constructor(private val diaryRepository: DiaryR
 
     public override fun initialize() {
         initializeAppMessageList()
-        diaryLiveData.initialize()
+        diaryStateFlow.initialize()
     }
 
     suspend fun existsSavedDiary(date: LocalDate): Boolean? {
@@ -72,7 +77,7 @@ class DiaryShowViewModel @Inject constructor(private val diaryRepository: DiaryR
     suspend fun loadSavedDiary(date: LocalDate): Boolean {
         try {
             val diaryEntity = diaryRepository.loadDiary(date)
-            diaryLiveData.update(diaryEntity)
+            diaryStateFlow.update(diaryEntity)
         } catch (e: Exception) {
             Log.d("Exception", "loadSavedDiary()", e)
             addAppMessage(AppMessage.DIARY_LOADING_ERROR)
@@ -82,7 +87,7 @@ class DiaryShowViewModel @Inject constructor(private val diaryRepository: DiaryR
     }
 
     suspend fun deleteDiary(): Boolean {
-        val deleteDate = diaryLiveData.date.checkNotNull()
+        val deleteDate = diaryStateFlow.date.checkNotNull()
         try {
             diaryRepository.deleteDiary(deleteDate)
         } catch (e: Exception) {

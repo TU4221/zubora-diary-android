@@ -13,13 +13,14 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.websarva.wings.android.zuboradiary.R
 import com.websarva.wings.android.zuboradiary.data.AppMessage
+import com.websarva.wings.android.zuboradiary.data.AppMessageList
 import com.websarva.wings.android.zuboradiary.databinding.FragmentDiaryItemTitleEditBinding
 import com.websarva.wings.android.zuboradiary.ui.BaseFragment
 import com.websarva.wings.android.zuboradiary.ui.TextInputSetup
 import com.websarva.wings.android.zuboradiary.ui.checkNotNull
-import com.websarva.wings.android.zuboradiary.ui.notNullValue
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
@@ -84,11 +85,12 @@ class DiaryItemTitleEditFragment : BaseFragment() {
     }
 
     override fun setUpOtherAppMessageDialog() {
-        diaryItemTitleEditViewModel.appMessageBufferList
-            .observe(
-                viewLifecycleOwner,
-                AppMessageBufferListObserver(diaryItemTitleEditViewModel)
-            )
+        launchAndRepeatOnLifeCycleStarted {
+            diaryItemTitleEditViewModel.appMessageBufferList
+                .collectLatest { value: AppMessageList ->
+                    AppMessageBufferListObserver(diaryItemTitleEditViewModel).onChanged(value)
+                }
+        }
     }
 
     // 履歴項目削除確認ダイアログからの結果受取
@@ -152,7 +154,7 @@ class DiaryItemTitleEditFragment : BaseFragment() {
                 val isError = !binding.textInputLayoutNewItemTitle.error.isNullOrEmpty()
                 if (isError) return@setOnClickListener
 
-                val title = diaryItemTitleEditViewModel.itemTitle.notNullValue()
+                val title = diaryItemTitleEditViewModel.itemTitle.value
                 completeItemTitleEdit(title)
             }
 
@@ -214,15 +216,14 @@ class DiaryItemTitleEditFragment : BaseFragment() {
         }
 
         // 選択履歴読込・表示
-        diaryItemTitleEditViewModel.apply {
-            //loadDiaryItemTitleSelectionHistory()
-            itemTitleSelectionHistoryList
-                .observe(viewLifecycleOwner) { selectionHistoryList: SelectionHistoryList ->
+        launchAndRepeatOnLifeCycleStarted {
+            diaryItemTitleEditViewModel.itemTitleSelectionHistoryList
+                .collectLatest { value: SelectionHistoryList ->
                     val adapter =
                         checkNotNull(
                             binding.recyclerItemTitleSelectionHistory.adapter
                         ) as ItemTitleSelectionHistoryListAdapter
-                    adapter.submitList(selectionHistoryList.selectionHistoryListItemList)
+                    adapter.submitList(value.selectionHistoryListItemList)
                 }
         }
     }
