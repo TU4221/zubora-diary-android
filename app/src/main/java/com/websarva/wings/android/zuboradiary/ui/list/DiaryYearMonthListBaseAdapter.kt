@@ -27,8 +27,6 @@ abstract class DiaryYearMonthListBaseAdapter protected constructor(
     diffUtilItemCallback: DiffUtilItemCallback
 ) : ListAdapter<DiaryYearMonthListBaseItem, RecyclerView.ViewHolder>(diffUtilItemCallback) {
 
-    private val sharedPool = RecyclerView.RecycledViewPool()
-
     fun interface OnClickChildItemListener {
         fun onClick(item: DiaryDayListBaseItem)
     }
@@ -46,7 +44,6 @@ abstract class DiaryYearMonthListBaseAdapter protected constructor(
         recyclerView.apply {
             adapter = this@DiaryYearMonthListBaseAdapter
             layoutManager = LinearLayoutManager(context)
-            setRecycledViewPool(sharedPool)
 
             // HACK:下記問題が発生する為アイテムアニメーションを無効化
             //      問題1.アイテム追加時もやがかかる。今回の構成(親Recycler:年月、子Recycler:日)上、
@@ -80,8 +77,6 @@ abstract class DiaryYearMonthListBaseAdapter protected constructor(
                         // ホルダーアイテムアニメーション設定(build()メソッド内にて理由記載)
                         // MEMO:子RecyclerViewのアニメーションを共通にする為、親Adapterクラス内で実装。
                         itemAnimator = null
-
-                        setRecycledViewPool(sharedPool)
                     }
 
                 return holder
