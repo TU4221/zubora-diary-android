@@ -9,7 +9,6 @@ import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.ViewDataBinding
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
@@ -80,20 +79,18 @@ class DiaryListFragment : BaseFragment() {
         setUpDiaryList()
     }
 
-    override fun handleOnReceivingResultFromPreviousFragment(savedStateHandle: SavedStateHandle) {
+    override fun handleOnReceivingResultFromPreviousFragment() {
         // 処理なし
     }
 
-    override fun handleOnReceivingDialogResult(savedStateHandle: SavedStateHandle) {
+    override fun handleOnReceivingDialogResult() {
         receiveDatePickerDialogResults()
         receiveDiaryDeleteDialogResults()
     }
 
-    override fun removeDialogResultOnDestroy(savedStateHandle: SavedStateHandle) {
-        savedStateHandle.apply {
-            remove<Any>(StartYearMonthPickerDialogFragment.KEY_SELECTED_YEAR_MONTH)
-            remove<Any>(DiaryDeleteDialogFragment.KEY_DELETE_DIARY_DATE)
-        }
+    override fun removeDialogResultOnDestroy() {
+        removeResulFromFragment(StartYearMonthPickerDialogFragment.KEY_SELECTED_YEAR_MONTH)
+        removeResulFromFragment(DiaryDeleteDialogFragment.KEY_DELETE_DIARY_DATE)
     }
 
     override fun setUpOtherAppMessageDialog() {

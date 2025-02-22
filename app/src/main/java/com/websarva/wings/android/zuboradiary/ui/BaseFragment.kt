@@ -9,6 +9,8 @@ import androidx.activity.OnBackPressedCallback
 import androidx.databinding.ViewDataBinding
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
@@ -51,7 +53,7 @@ abstract class BaseFragment : CustomFragment() {
     protected fun launchAndRepeatOnLifeCycleStarted(
         block: suspend CoroutineScope.() -> Unit) {
         viewLifecycleOwner.lifecycleScope.launch {
-            viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED, block)
+            lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED, block)
         }
     }
 
@@ -168,40 +170,50 @@ abstract class BaseFragment : CustomFragment() {
         setUpOtherAppMessageDialog()
     }
 
+    // MEMO:Fragment、DialogFragmentからの結果受け取り方法
+    //      https://developer.android.com/guide/navigation/use-graph/programmatic?hl=ja
     private fun setUpPreviousFragmentResultReceiver() {
-        handleOnReceivingResultFromPreviousFragment(navBackStackEntrySavedStateHandle)
+        handleOnReceivingResultFromPreviousFragment()
     }
-
 
     /**
      * BaseFragment#setUpPreviousFragmentResultReceiver()で呼び出される。
      */
-    protected abstract fun handleOnReceivingResultFromPreviousFragment(savedStateHandle: SavedStateHandle)
+    protected abstract fun handleOnReceivingResultFromPreviousFragment()
+
+    protected fun <T> receiveResulFromPreviousFragment(key: String): LiveData<T?> {
+        val containsDialogResult = navBackStackEntrySavedStateHandle.contains(key)
+        if (!containsDialogResult) return MutableLiveData<T?>()
+
+        return navBackStackEntrySavedStateHandle.getLiveData(key)
+    }
+
+    protected fun removeResulFromFragment(key: String) {
+        navBackStackEntrySavedStateHandle.remove<Any>(key)
+    }
 
     private fun setUpDialogResultReceiver() {
-        val navBackStackEntry = checkNotNull(navController.currentBackStackEntry)
 
         val lifecycleEventObserver =
             LifecycleEventObserver { _, event: Lifecycle.Event ->
                 // MEMO:Dialog表示中:Lifecycle.Event.ON_PAUSE
                 //      Dialog非表示中:Lifecycle.Event.ON_RESUME
                 if (event == Lifecycle.Event.ON_RESUME) {
-                    val savedStateHandle = navBackStackEntry.savedStateHandle
-                    handleOnReceivingDialogResult(savedStateHandle)
+                    handleOnReceivingDialogResult()
                     retrySettingsAppMessageDialogShow()
                     retryOtherAppMessageDialogShow()
-                    removeDialogResultOnDestroy(savedStateHandle)
+                    removeDialogResultOnDestroy()
                 }
             }
 
+        val navBackStackEntry = checkNotNull(navController.currentBackStackEntry)
         navBackStackEntry.lifecycle.addObserver(lifecycleEventObserver)
         viewLifecycleOwner.lifecycle
             .addObserver(LifecycleEventObserver { _, event: Lifecycle.Event ->
                 if (event == Lifecycle.Event.ON_DESTROY) {
                     // MEMO:removeで削除しないとこのFragmentを閉じてもResult内容が残ってしまう。
                     //      その為、このFragmentを再表示した時にObserverがResultの内容で処理してしまう。
-                    val savedStateHandle = navBackStackEntry.savedStateHandle
-                    removeDialogResultOnDestroy(savedStateHandle)
+                    removeDialogResultOnDestroy()
 
                     // MEMO:removeで削除しないと再度Fragment(前回表示Fragmentと同インスタンスの場合)を表示した時、Observerが重複する。
                     navBackStackEntry.lifecycle.removeObserver(lifecycleEventObserver)
@@ -212,14 +224,14 @@ abstract class BaseFragment : CustomFragment() {
     /**
      * BaseFragment#setUpDialogResultReceiver()で呼び出される。
      */
-    protected abstract fun handleOnReceivingDialogResult(savedStateHandle: SavedStateHandle)
+    protected abstract fun handleOnReceivingDialogResult()
 
     /**
      * BaseFragment#setUpDialogResultReceiver()で呼び出される。
      */
-    protected abstract fun removeDialogResultOnDestroy(savedStateHandle: SavedStateHandle)
+    protected abstract fun removeDialogResultOnDestroy()
 
-    fun <T> receiveResulFromDialog(key: String): T? {
+    protected fun <T> receiveResulFromDialog(key: String): T? {
         val containsDialogResult = navBackStackEntrySavedStateHandle.contains(key)
         if (!containsDialogResult) return null
 

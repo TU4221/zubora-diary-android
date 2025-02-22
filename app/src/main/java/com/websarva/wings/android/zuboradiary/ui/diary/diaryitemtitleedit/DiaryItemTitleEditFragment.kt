@@ -8,7 +8,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.ViewDataBinding
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.websarva.wings.android.zuboradiary.R
@@ -63,7 +62,7 @@ class DiaryItemTitleEditFragment : BaseFragment() {
         setUpItemTitleSelectionHistory()
     }
 
-    override fun handleOnReceivingResultFromPreviousFragment(savedStateHandle: SavedStateHandle) {
+    override fun handleOnReceivingResultFromPreviousFragment() {
         // EditDiaryFragmentからデータ受取
         val targetItemNumber =
             DiaryItemTitleEditFragmentArgs.fromBundle(requireArguments()).itemNumber
@@ -72,16 +71,14 @@ class DiaryItemTitleEditFragment : BaseFragment() {
         diaryItemTitleEditViewModel.updateDiaryItemTitle(targetItemNumber, targetItemTitle)
     }
 
-    override fun handleOnReceivingDialogResult(savedStateHandle: SavedStateHandle) {
+    override fun handleOnReceivingDialogResult() {
         receiveDiaryItemTitleDeleteDialogResult()
         retryOtherAppMessageDialogShow()
     }
 
-    override fun removeDialogResultOnDestroy(savedStateHandle: SavedStateHandle) {
-        savedStateHandle.apply {
-            remove<Any>(DiaryItemTitleDeleteDialogFragment.KEY_SELECTED_BUTTON)
-            remove<Any>(DiaryItemTitleDeleteDialogFragment.KEY_DELETE_LIST_ITEM_POSITION)
-        }
+    override fun removeDialogResultOnDestroy() {
+        removeResulFromFragment(DiaryItemTitleDeleteDialogFragment.KEY_SELECTED_BUTTON)
+        removeResulFromFragment(DiaryItemTitleDeleteDialogFragment.KEY_DELETE_LIST_ITEM_POSITION)
     }
 
     override fun setUpOtherAppMessageDialog() {

@@ -20,7 +20,6 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
 import androidx.databinding.ViewDataBinding
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.lifecycleScope
 import com.websarva.wings.android.zuboradiary.R
 import com.websarva.wings.android.zuboradiary.data.AppMessage
@@ -145,11 +144,11 @@ class SettingsFragment : BaseFragment() {
         setUpAllDataDeleteSettingItem()
     }
 
-    override fun handleOnReceivingResultFromPreviousFragment(savedStateHandle: SavedStateHandle) {
+    override fun handleOnReceivingResultFromPreviousFragment() {
         // 処理なし
     }
 
-    override fun handleOnReceivingDialogResult(savedStateHandle: SavedStateHandle) {
+    override fun handleOnReceivingDialogResult() {
         receiveThemeColorPickerDialogResult()
         receiveCalendarStartDayPickerDialogResult()
         receiveReminderNotificationTimePickerDialogResult()
@@ -159,17 +158,15 @@ class SettingsFragment : BaseFragment() {
         receiveAllDataDeleteDialogResult()
     }
 
-    override fun removeDialogResultOnDestroy(savedStateHandle: SavedStateHandle) {
-        savedStateHandle.apply {
-            remove<Any>(ThemeColorPickerDialogFragment.KEY_SELECTED_THEME_COLOR)
-            remove<Any>(CalendarStartDayPickerDialogFragment.KEY_SELECTED_DAY_OF_WEEK)
-            remove<Any>(ReminderNotificationTimePickerDialogFragment.KEY_SELECTED_BUTTON)
-            remove<Any>(ReminderNotificationTimePickerDialogFragment.KEY_SELECTED_TIME)
-            remove<Any>(PermissionDialogFragment.KEY_SELECTED_BUTTON)
-            remove<Any>(AllDiariesDeleteDialogFragment.KEY_SELECTED_BUTTON)
-            remove<Any>(AllSettingsInitializationDialogFragment.KEY_SELECTED_BUTTON)
-            remove<Any>(AllDataDeleteDialogFragment.KEY_SELECTED_BUTTON)
-        }
+    override fun removeDialogResultOnDestroy() {
+        removeResulFromFragment(ThemeColorPickerDialogFragment.KEY_SELECTED_THEME_COLOR)
+        removeResulFromFragment(CalendarStartDayPickerDialogFragment.KEY_SELECTED_DAY_OF_WEEK)
+        removeResulFromFragment(ReminderNotificationTimePickerDialogFragment.KEY_SELECTED_BUTTON)
+        removeResulFromFragment(ReminderNotificationTimePickerDialogFragment.KEY_SELECTED_TIME)
+        removeResulFromFragment(PermissionDialogFragment.KEY_SELECTED_BUTTON)
+        removeResulFromFragment(AllDiariesDeleteDialogFragment.KEY_SELECTED_BUTTON)
+        removeResulFromFragment(AllSettingsInitializationDialogFragment.KEY_SELECTED_BUTTON)
+        removeResulFromFragment(AllDataDeleteDialogFragment.KEY_SELECTED_BUTTON)
     }
 
     override fun setUpOtherAppMessageDialog() {

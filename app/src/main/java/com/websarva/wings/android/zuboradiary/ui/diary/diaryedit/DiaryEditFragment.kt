@@ -18,7 +18,6 @@ import androidx.constraintlayout.motion.widget.MotionLayout
 import androidx.core.content.res.ResourcesCompat
 import androidx.databinding.ViewDataBinding
 import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavDirections
@@ -114,28 +113,30 @@ class DiaryEditFragment : BaseFragment() {
         }
     }
 
-    override fun handleOnReceivingResultFromPreviousFragment(savedStateHandle: SavedStateHandle) {
+    override fun handleOnReceivingResultFromPreviousFragment() {
         // DiaryItemTitleEditFragmentから編集結果受取
 
         val newItemTitleLiveData =
-            savedStateHandle.getLiveData<String>(DiaryItemTitleEditFragment.KEY_NEW_ITEM_TITLE)
+            receiveResulFromPreviousFragment<String>(DiaryItemTitleEditFragment.KEY_NEW_ITEM_TITLE)
         newItemTitleLiveData.observe(viewLifecycleOwner) { string: String? ->
             // MEMO:結果がない場合もあるので"return"で返す。
             if (string == null) return@observe
 
             val itemNumber =
                 checkNotNull(
-                    savedStateHandle.get<ItemNumber>(DiaryItemTitleEditFragment.KEY_UPDATE_ITEM_NUMBER)
+                    receiveResulFromPreviousFragment<ItemNumber>(
+                        DiaryItemTitleEditFragment.KEY_UPDATE_ITEM_NUMBER
+                    ).value
                 )
 
             diaryEditViewModel.updateItemTitle(itemNumber, string)
 
-            savedStateHandle.remove<Any>(DiaryItemTitleEditFragment.KEY_UPDATE_ITEM_NUMBER)
-            savedStateHandle.remove<Any>(DiaryItemTitleEditFragment.KEY_NEW_ITEM_TITLE)
+            removeResulFromFragment(DiaryItemTitleEditFragment.KEY_NEW_ITEM_TITLE)
+            removeResulFromFragment(DiaryItemTitleEditFragment.KEY_UPDATE_ITEM_NUMBER)
         }
     }
 
-    override fun handleOnReceivingDialogResult(savedStateHandle: SavedStateHandle) {
+    override fun handleOnReceivingDialogResult() {
         receiveDiaryLoadingDialogResult()
         receiveDiaryUpdateDialogResult()
         receiveDiaryDeleteDialogResult()
@@ -147,16 +148,14 @@ class DiaryEditFragment : BaseFragment() {
         clearFocusAllEditText()
     }
 
-    override fun removeDialogResultOnDestroy(savedStateHandle: SavedStateHandle) {
-        savedStateHandle.apply {
-            remove<Any>(DiaryLoadingDialogFragment.KEY_SELECTED_BUTTON)
-            remove<Any>(DiaryUpdateDialogFragment.KEY_SELECTED_BUTTON)
-            remove<Any>(DiaryDeleteDialogFragment.KEY_SELECTED_BUTTON)
-            remove<Any>(DatePickerDialogFragment.KEY_SELECTED_DATE)
-            remove<Any>(WeatherInfoFetchingDialogFragment.KEY_SELECTED_BUTTON)
-            remove<Any>(DiaryItemDeleteDialogFragment.KEY_DELETE_ITEM_NUMBER)
-            remove<Any>(DiaryPictureDeleteDialogFragment.KEY_SELECTED_BUTTON)
-        }
+    override fun removeDialogResultOnDestroy() {
+        removeResulFromFragment(DiaryLoadingDialogFragment.KEY_SELECTED_BUTTON)
+        removeResulFromFragment(DiaryUpdateDialogFragment.KEY_SELECTED_BUTTON)
+        removeResulFromFragment(DiaryDeleteDialogFragment.KEY_SELECTED_BUTTON)
+        removeResulFromFragment(DatePickerDialogFragment.KEY_SELECTED_DATE)
+        removeResulFromFragment(WeatherInfoFetchingDialogFragment.KEY_SELECTED_BUTTON)
+        removeResulFromFragment(DiaryItemDeleteDialogFragment.KEY_DELETE_ITEM_NUMBER)
+        removeResulFromFragment(DiaryPictureDeleteDialogFragment.KEY_SELECTED_BUTTON)
     }
 
     override fun setUpOtherAppMessageDialog() {

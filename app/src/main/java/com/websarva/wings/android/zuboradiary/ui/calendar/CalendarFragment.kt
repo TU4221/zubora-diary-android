@@ -8,7 +8,6 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.activity.OnBackPressedCallback
 import androidx.databinding.ViewDataBinding
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.kizitonwose.calendar.core.CalendarDay
@@ -101,20 +100,23 @@ class CalendarFragment : BaseFragment() {
         setUpFloatActionButton()
     }
 
-    override fun handleOnReceivingResultFromPreviousFragment(savedStateHandle: SavedStateHandle) {
+    override fun handleOnReceivingResultFromPreviousFragment() {
         val showedDiaryDateLiveData =
-            savedStateHandle.getLiveData<LocalDate>(DiaryShowFragment.KEY_SHOWED_DIARY_DATE)
-        showedDiaryDateLiveData.observe(viewLifecycleOwner) { localDate: LocalDate ->
-            calendarViewModel.updateSelectedDate(localDate)
-            savedStateHandle.remove<Any>(DiaryShowFragment.KEY_SHOWED_DIARY_DATE)
+            receiveResulFromPreviousFragment<LocalDate>(DiaryShowFragment.KEY_SHOWED_DIARY_DATE)
+
+        showedDiaryDateLiveData.observe(viewLifecycleOwner) { value: LocalDate? ->
+            value ?: return@observe
+
+            calendarViewModel.updateSelectedDate(value)
+            removeResulFromFragment(DiaryShowFragment.KEY_SHOWED_DIARY_DATE)
         }
     }
 
-    override fun handleOnReceivingDialogResult(savedStateHandle: SavedStateHandle) {
+    override fun handleOnReceivingDialogResult() {
         retryOtherAppMessageDialogShow()
     }
 
-    override fun removeDialogResultOnDestroy(savedStateHandle: SavedStateHandle) {
+    override fun removeDialogResultOnDestroy() {
         // 処理なし
     }
 

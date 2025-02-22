@@ -13,7 +13,6 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.activity.OnBackPressedCallback
 import androidx.databinding.ViewDataBinding
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.websarva.wings.android.zuboradiary.R
@@ -101,17 +100,17 @@ class DiaryShowFragment : BaseFragment() {
         setUpLogLayout()
     }
 
-    override fun handleOnReceivingResultFromPreviousFragment(savedStateHandle: SavedStateHandle) {
+    override fun handleOnReceivingResultFromPreviousFragment() {
         // 処理なし
     }
 
-    override fun handleOnReceivingDialogResult(savedStateHandle: SavedStateHandle) {
+    override fun handleOnReceivingDialogResult() {
         receiveDiaryDeleteDialogResult()
         retryOtherAppMessageDialogShow()
     }
 
-    override fun removeDialogResultOnDestroy(savedStateHandle: SavedStateHandle) {
-        savedStateHandle.remove<Any>(DiaryDeleteDialogFragment.KEY_SELECTED_BUTTON)
+    override fun removeDialogResultOnDestroy() {
+        removeResulFromFragment(DiaryDeleteDialogFragment.KEY_SELECTED_BUTTON)
     }
 
     override fun setUpOtherAppMessageDialog() {
