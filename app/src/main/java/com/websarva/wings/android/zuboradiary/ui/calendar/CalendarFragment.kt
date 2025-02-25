@@ -101,14 +101,16 @@ class CalendarFragment : BaseFragment() {
     }
 
     override fun handleOnReceivingResultFromPreviousFragment() {
-        val showedDiaryDateLiveData =
+        val showedDiaryDate =
             receiveResulFromPreviousFragment<LocalDate>(DiaryShowFragment.KEY_SHOWED_DIARY_DATE)
 
-        showedDiaryDateLiveData.observe(viewLifecycleOwner) { value: LocalDate? ->
-            value ?: return@observe
+        launchAndRepeatOnLifeCycleStarted {
+            showedDiaryDate.collectLatest { value: LocalDate? ->
+                value ?: return@collectLatest
 
-            calendarViewModel.updateSelectedDate(value)
-            removeResulFromFragment(DiaryShowFragment.KEY_SHOWED_DIARY_DATE)
+                calendarViewModel.updateSelectedDate(value)
+                removeResulFromFragment(DiaryShowFragment.KEY_SHOWED_DIARY_DATE)
+            }
         }
     }
 

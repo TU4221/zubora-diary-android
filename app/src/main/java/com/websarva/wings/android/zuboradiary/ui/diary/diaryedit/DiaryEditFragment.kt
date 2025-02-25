@@ -116,23 +116,26 @@ class DiaryEditFragment : BaseFragment() {
     override fun handleOnReceivingResultFromPreviousFragment() {
         // DiaryItemTitleEditFragmentから編集結果受取
 
-        val newItemTitleLiveData =
+        val newItemTitle =
             receiveResulFromPreviousFragment<String>(DiaryItemTitleEditFragment.KEY_NEW_ITEM_TITLE)
-        newItemTitleLiveData.observe(viewLifecycleOwner) { string: String? ->
-            // MEMO:結果がない場合もあるので"return"で返す。
-            if (string == null) return@observe
 
-            val itemNumber =
-                checkNotNull(
-                    receiveResulFromPreviousFragment<ItemNumber>(
-                        DiaryItemTitleEditFragment.KEY_UPDATE_ITEM_NUMBER
-                    ).value
-                )
+        launchAndRepeatOnLifeCycleStarted {
+            newItemTitle.collectLatest { value: String? ->
+                // MEMO:結果がない場合もあるので"return"で返す。
+                if (value == null) return@collectLatest
 
-            diaryEditViewModel.updateItemTitle(itemNumber, string)
+                val itemNumber =
+                    checkNotNull(
+                        receiveResulFromPreviousFragment<ItemNumber>(
+                            DiaryItemTitleEditFragment.KEY_UPDATE_ITEM_NUMBER
+                        ).value
+                    )
 
-            removeResulFromFragment(DiaryItemTitleEditFragment.KEY_NEW_ITEM_TITLE)
-            removeResulFromFragment(DiaryItemTitleEditFragment.KEY_UPDATE_ITEM_NUMBER)
+                diaryEditViewModel.updateItemTitle(itemNumber, value)
+
+                removeResulFromFragment(DiaryItemTitleEditFragment.KEY_NEW_ITEM_TITLE)
+                removeResulFromFragment(DiaryItemTitleEditFragment.KEY_UPDATE_ITEM_NUMBER)
+            }
         }
     }
 

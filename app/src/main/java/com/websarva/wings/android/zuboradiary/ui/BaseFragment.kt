@@ -24,6 +24,8 @@ import com.websarva.wings.android.zuboradiary.data.AppMessage
 import com.websarva.wings.android.zuboradiary.data.AppMessageList
 import com.websarva.wings.android.zuboradiary.ui.settings.SettingsViewModel
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
@@ -181,11 +183,11 @@ abstract class BaseFragment : CustomFragment() {
      */
     protected abstract fun handleOnReceivingResultFromPreviousFragment()
 
-    protected fun <T> receiveResulFromPreviousFragment(key: String): LiveData<T?> {
+    protected fun <T> receiveResulFromPreviousFragment(key: String): StateFlow<T?> {
         val containsDialogResult = navBackStackEntrySavedStateHandle.contains(key)
-        if (!containsDialogResult) return MutableLiveData<T?>()
+        if (!containsDialogResult) return MutableStateFlow<T?>(null)
 
-        return navBackStackEntrySavedStateHandle.getLiveData(key)
+        return navBackStackEntrySavedStateHandle.getStateFlow(key, null)
     }
 
     protected fun removeResulFromFragment(key: String) {
