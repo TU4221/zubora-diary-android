@@ -97,11 +97,12 @@ dependencies {
     // https://developer.android.com/jetpack/androidx/releases/room#declaring_dependencies
     val roomVersion = "2.6.1"
     implementation("androidx.room:room-runtime:$roomVersion")
-    annotationProcessor("androidx.room:room-compiler:$roomVersion")
-    // To use Kotlin annotation processing tool (kapt)
-    //kapt("androidx.room:room-compiler:$roomVersion")
-    // To use Kotlin Symbol Processing (KSP)
+    // If this project uses any Kotlin source, use Kotlin Symbol Processing (KSP)
+    // See Add the KSP plugin to your project
     ksp("androidx.room:room-compiler:$roomVersion")
+    // If this project only uses Java source, use the Java annotationProcessor
+    // No additional plugins are necessary
+    annotationProcessor("androidx.room:room-compiler:$roomVersion")
     // optional - Kotlin Extensions and Coroutines support for Room
     implementation("androidx.room:room-ktx:$roomVersion")
     // optional - RxJava2 support for Room
