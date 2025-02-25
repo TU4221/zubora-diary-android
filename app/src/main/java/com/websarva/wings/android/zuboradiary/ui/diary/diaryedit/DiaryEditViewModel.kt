@@ -3,7 +3,6 @@ package com.websarva.wings.android.zuboradiary.ui.diary.diaryedit
 import android.net.Uri
 import android.util.Log
 import com.websarva.wings.android.zuboradiary.data.AppMessage
-import com.websarva.wings.android.zuboradiary.data.database.DiaryEntity
 import com.websarva.wings.android.zuboradiary.data.database.DiaryRepository
 import com.websarva.wings.android.zuboradiary.data.diary.Condition
 import com.websarva.wings.android.zuboradiary.data.diary.ItemNumber
@@ -188,9 +187,8 @@ class DiaryEditViewModel @Inject constructor(
         _isVisibleUpdateProgressBar.value = true
         if (shouldLoadDiary) {
             try {
-                loadSavedDiary(date)
-            } catch (e: NoSuchElementException) {
-                updateDate(date)
+                val result = loadSavedDiary(date)
+                if (!result) updateDate(date)
             } catch (e: Exception) {
                 addAppMessage(AppMessage.DIARY_LOADING_ERROR)
                 _isVisibleUpdateProgressBar.value = false
@@ -206,21 +204,14 @@ class DiaryEditViewModel @Inject constructor(
 
     @Throws(Exception::class)
     private suspend fun loadSavedDiary(date: LocalDate): Boolean {
-        val diaryEntity: DiaryEntity
-        try {
-            diaryEntity = diaryRepository.loadDiary(date)
+        val diaryEntity = diaryRepository.loadDiary(date) ?: return false
 
-            // HACK:下記はDiaryStateFlow#update()処理よりも前に処理すること。
-            //      (後で処理するとDiaryStateFlowのDateのObserverがloadedDateの更新よりも先に処理される為)
-            _loadedDate.value = date
+        // HACK:下記はDiaryStateFlow#update()処理よりも前に処理すること。
+        //      (後で処理するとDiaryStateFlowのDateのObserverがloadedDateの更新よりも先に処理される為)
+        _loadedDate.value = date
 
-            diaryStateFlow.update(diaryEntity)
-            _loadedPicturePath.value = diaryStateFlow.picturePath.value
-        } catch (e: Exception) {
-            Log.d("Exception", "loadSavedDiary()" , e)
-            addAppMessage(AppMessage.DIARY_LOADING_ERROR)
-            return false
-        }
+        diaryStateFlow.update(diaryEntity)
+        _loadedPicturePath.value = diaryStateFlow.picturePath.value
         return true
     }
 

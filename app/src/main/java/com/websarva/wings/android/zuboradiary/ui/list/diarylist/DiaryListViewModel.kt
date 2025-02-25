@@ -252,7 +252,7 @@ class DiaryListViewModel @Inject constructor(private val diaryRepository: DiaryR
 
     suspend fun loadNewestSavedDiaryDate(): LocalDate? {
         try {
-            val diaryEntity = diaryRepository.loadNewestDiary()
+            val diaryEntity = diaryRepository.loadNewestDiary() ?: return null
             val strDate = diaryEntity.date
             return LocalDate.parse(strDate)
         } catch (e: Exception) {
@@ -263,7 +263,7 @@ class DiaryListViewModel @Inject constructor(private val diaryRepository: DiaryR
 
     suspend fun loadOldestSavedDiaryDate(): LocalDate? {
         try {
-            val diaryEntity = diaryRepository.loadOldestDiary()
+            val diaryEntity = diaryRepository.loadOldestDiary() ?: return null
             val strDate = diaryEntity.date
             return LocalDate.parse(strDate)
         } catch (e: Exception) {

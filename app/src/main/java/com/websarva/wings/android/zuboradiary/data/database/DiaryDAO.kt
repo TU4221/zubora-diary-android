@@ -22,13 +22,13 @@ interface DiaryDAO {
     suspend fun existsPicturePath(uri: String): Boolean
 
     @Query("SELECT * FROM diaries WHERE date = :date")
-    suspend fun selectDiary(date: String): DiaryEntity
+    suspend fun selectDiary(date: String): DiaryEntity?
 
     @Query("SELECT * FROM diaries ORDER BY date DESC LIMIT 1 OFFSET 0")
-    suspend fun selectNewestDiary(): DiaryEntity
+    suspend fun selectNewestDiary(): DiaryEntity?
 
     @Query("SELECT * FROM diaries ORDER BY date ASC LIMIT 1 OFFSET 0")
-    suspend fun selectOldestDiary(): DiaryEntity
+    suspend fun selectOldestDiary(): DiaryEntity?
 
     @Query("SELECT date, title, picturePath FROM diaries ORDER BY date DESC LIMIT :num OFFSET :offset")
     suspend fun selectDiaryListOrderByDateDesc(

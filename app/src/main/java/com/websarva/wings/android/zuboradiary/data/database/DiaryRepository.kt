@@ -27,15 +27,15 @@ class DiaryRepository @Inject constructor(
         return diaryDAO.existsPicturePath(uri.toString())
     }
 
-    suspend fun loadDiary(date: LocalDate): DiaryEntity {
+    suspend fun loadDiary(date: LocalDate): DiaryEntity? {
         return diaryDAO.selectDiary(date.toString())
     }
 
-    suspend fun loadNewestDiary(): DiaryEntity {
+    suspend fun loadNewestDiary(): DiaryEntity? {
         return diaryDAO.selectNewestDiary()
     }
 
-    suspend fun loadOldestDiary(): DiaryEntity {
+    suspend fun loadOldestDiary(): DiaryEntity? {
         return diaryDAO.selectOldestDiary()
     }
 

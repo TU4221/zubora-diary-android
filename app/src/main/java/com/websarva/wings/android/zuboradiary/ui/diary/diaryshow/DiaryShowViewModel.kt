@@ -76,7 +76,7 @@ class DiaryShowViewModel @Inject constructor(private val diaryRepository: DiaryR
 
     suspend fun loadSavedDiary(date: LocalDate): Boolean {
         try {
-            val diaryEntity = diaryRepository.loadDiary(date)
+            val diaryEntity = diaryRepository.loadDiary(date) ?: throw IllegalArgumentException()
             diaryStateFlow.update(diaryEntity)
         } catch (e: Exception) {
             Log.d("Exception", "loadSavedDiary()", e)
