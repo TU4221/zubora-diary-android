@@ -38,12 +38,18 @@ class SettingsViewModel @Inject constructor(
     // MEMO:StateFlow型設定値変数の値ははPreferencesDatastoreの値のみを代入したいので、
     //      代入されるまでの間(初回設定値読込中)はnullとする。
     lateinit var themeColor: StateFlow<ThemeColor?>
+        private set
     lateinit var calendarStartDayOfWeek: StateFlow<DayOfWeek?>
+        private set
     lateinit var isCheckedReminderNotification: StateFlow<Boolean?>
+        private set
     lateinit var reminderNotificationTime: StateFlow<LocalTime?>
+        private set
     lateinit var isCheckedPasscodeLock: StateFlow<Boolean?>
+        private set
     private lateinit var passcode: StateFlow<String?>
     lateinit var isCheckedWeatherInfoAcquisition: StateFlow<Boolean?>
+        private set
 
     private val _isAllSettingsNotNull = MutableStateFlow(false)
     val isAllSettingsNotNull

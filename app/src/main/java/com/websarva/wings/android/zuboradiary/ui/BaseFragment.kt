@@ -33,12 +33,14 @@ abstract class BaseFragment : CustomFragment() {
         get() = requireActivity() as MainActivity
 
     protected lateinit var navController: NavController
+        private set
     private val navBackStackEntrySavedStateHandle: SavedStateHandle get() {
         val navBackStackEntry = checkNotNull(navController.currentBackStackEntry)
         return navBackStackEntry.savedStateHandle
     }
 
     protected lateinit var settingsViewModel: SettingsViewModel
+        private set
     protected val themeColor
         get() = settingsViewModel.themeColor.requireValue()
 

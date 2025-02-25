@@ -38,6 +38,7 @@ class DiaryItemTitleEditViewModel @Inject constructor(
     val itemTitleMutable get() = _itemTitle
 
     lateinit var itemTitleSelectionHistoryList: StateFlow<SelectionHistoryList>
+        private set
 
     init {
         initialize()

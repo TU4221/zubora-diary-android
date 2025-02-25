@@ -16,7 +16,7 @@ class PassCodeLockPreference {
     private val passcodePreferenceKey = stringPreferencesKey("passcode")
 
     val isChecked: Boolean
-    var passCode: String
+    val passCode: String
 
     constructor(preferences: Preferences) {
         var isChecked = preferences[isCheckedPreferenceKey]

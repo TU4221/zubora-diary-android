@@ -33,6 +33,7 @@ abstract class DiaryYearMonthListBaseAdapter protected constructor(
     var onClickChildItemListener: OnClickChildItemListener? = null
     
     protected var isLoadingListOnScrolled = false
+        private set
 
     enum class ViewType(val viewTypeNumber: Int) {
         DIARY(0),

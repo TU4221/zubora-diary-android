@@ -38,9 +38,12 @@ open class LeftSwipeSimpleCallback(protected val recyclerView: RecyclerView) :
     }
 
     protected lateinit var itemTouchHelper: ItemTouchHelper
+        private set
     protected var swipingAdapterPosition: Int = -1
+        private set
     protected var swipedAdapterPosition: Int = -1
     protected var invalidSwipeAdapterPosition: Int = -1
+        private set
     protected var previousMotionEvent: Int = -1
 
 

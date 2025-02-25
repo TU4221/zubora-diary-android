@@ -8,7 +8,7 @@ class DiaryDayListItem(listItem: DiaryListItem) :
     DiaryDayListBaseItem(listItem) {
 
     val title: String = listItem.title
-    var picturePath: Uri? = null
+    val picturePath: Uri?
 
     init {
         val picturePath = listItem.picturePath

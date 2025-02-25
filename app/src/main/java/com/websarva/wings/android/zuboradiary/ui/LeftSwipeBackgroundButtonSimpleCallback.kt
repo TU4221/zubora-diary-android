@@ -15,6 +15,7 @@ open class LeftSwipeBackgroundButtonSimpleCallback(recyclerView: RecyclerView) :
     LeftSwipeSimpleCallback(recyclerView) {
 
     protected var swipingOffset: Float = 0f
+        private set
 
     // TODO:@SuppressLintを使用せず、DiaryEdit.CustomTextInputEditTextと同等に修正する？
     @SuppressLint("ClickableViewAccessibility")

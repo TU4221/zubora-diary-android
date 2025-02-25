@@ -67,7 +67,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var settingsViewModel: SettingsViewModel
 
     // 位置情報取得
-    private lateinit  var fusedLocationProviderClient: FusedLocationProviderClient
+    private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
     private lateinit var locationRequest: LocationRequest
 
     // ギャラリーから画像取得

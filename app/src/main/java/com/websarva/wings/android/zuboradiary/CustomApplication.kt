@@ -17,6 +17,7 @@ open class CustomApplication : Application(), DefaultLifecycleObserver, Configur
     @Inject
     lateinit var workerFactory: HiltWorkerFactory
     var isAppInForeground = false
+        private set
     override val workManagerConfiguration: Configuration
         get() = Configuration.Builder().setWorkerFactory(workerFactory).build()
 

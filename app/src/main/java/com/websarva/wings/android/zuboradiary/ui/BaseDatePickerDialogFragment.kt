@@ -16,6 +16,7 @@ import java.time.ZoneId
 abstract class BaseDatePickerDialogFragment : DialogFragment() {
 
     protected lateinit var settingsViewModel: SettingsViewModel
+        private set
 
     private val themeColor
         get() = settingsViewModel.themeColor.requireValue()

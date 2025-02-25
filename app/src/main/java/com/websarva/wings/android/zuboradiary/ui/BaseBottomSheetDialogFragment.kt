@@ -14,6 +14,7 @@ import com.websarva.wings.android.zuboradiary.ui.settings.SettingsViewModel
 abstract class BaseBottomSheetDialogFragment : BottomSheetDialogFragment() {
 
     protected lateinit var settingsViewModel: SettingsViewModel
+        private set
 
     protected val themeColor
         get() = settingsViewModel.themeColor.requireValue()

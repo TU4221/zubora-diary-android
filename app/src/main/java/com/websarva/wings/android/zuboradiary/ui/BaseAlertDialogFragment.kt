@@ -14,6 +14,7 @@ import com.websarva.wings.android.zuboradiary.ui.settings.SettingsViewModel
 abstract class BaseAlertDialogFragment : DialogFragment() {
 
     protected lateinit var settingsViewModel: SettingsViewModel
+        private set
 
     private val themeColor
         get() = settingsViewModel.themeColor.requireValue()
