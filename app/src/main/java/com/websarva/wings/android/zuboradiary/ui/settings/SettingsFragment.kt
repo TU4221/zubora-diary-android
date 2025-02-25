@@ -29,7 +29,7 @@ import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor
 import com.websarva.wings.android.zuboradiary.databinding.FragmentSettingsBinding
 import com.websarva.wings.android.zuboradiary.ui.BaseFragment
 import com.websarva.wings.android.zuboradiary.ui.UriPermissionManager
-import com.websarva.wings.android.zuboradiary.ui.checkNotNull
+import com.websarva.wings.android.zuboradiary.ui.requireValue
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
@@ -367,7 +367,7 @@ class SettingsFragment : BaseFragment() {
     private fun setUpCalendarStartDaySettingItem() {
         binding.includeCalendarStartDaySetting.textTitle.setOnClickListener {
             val currentCalendarStartDayOfWeek =
-                settingsViewModel.calendarStartDayOfWeek.checkNotNull()
+                settingsViewModel.calendarStartDayOfWeek.requireValue()
             showCalendarStartDayPickerDialog(currentCalendarStartDayOfWeek)
         }
 

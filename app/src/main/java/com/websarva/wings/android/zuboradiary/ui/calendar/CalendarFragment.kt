@@ -27,7 +27,7 @@ import com.websarva.wings.android.zuboradiary.databinding.FragmentCalendarBindin
 import com.websarva.wings.android.zuboradiary.databinding.LayoutCalendarDayBinding
 import com.websarva.wings.android.zuboradiary.databinding.LayoutCalendarHeaderBinding
 import com.websarva.wings.android.zuboradiary.ui.BaseFragment
-import com.websarva.wings.android.zuboradiary.ui.checkNotNull
+import com.websarva.wings.android.zuboradiary.ui.requireValue
 import com.websarva.wings.android.zuboradiary.ui.diary.diaryshow.DiaryShowFragment
 import com.websarva.wings.android.zuboradiary.ui.diary.diaryshow.DiaryShowFragment.ConditionObserver
 import com.websarva.wings.android.zuboradiary.ui.diary.diaryshow.DiaryShowFragment.LogObserver
@@ -171,7 +171,7 @@ class CalendarFragment : BaseFragment() {
     }
 
     private fun createDayOfWeekList(): List<DayOfWeek> {
-        val firstDayOfWeek = settingsViewModel.calendarStartDayOfWeek.checkNotNull()
+        val firstDayOfWeek = settingsViewModel.calendarStartDayOfWeek.requireValue()
 
         val daysOfWeek = DayOfWeek.entries.toTypedArray()
         val firstDayOfWeekListPos = firstDayOfWeek.value

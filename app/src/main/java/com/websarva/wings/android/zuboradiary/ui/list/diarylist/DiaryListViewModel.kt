@@ -7,7 +7,7 @@ import com.websarva.wings.android.zuboradiary.data.AppMessage
 import com.websarva.wings.android.zuboradiary.data.database.DiaryListItem
 import com.websarva.wings.android.zuboradiary.data.database.DiaryRepository
 import com.websarva.wings.android.zuboradiary.ui.BaseViewModel
-import com.websarva.wings.android.zuboradiary.ui.checkNotNull
+import com.websarva.wings.android.zuboradiary.ui.requireValue
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -108,7 +108,7 @@ class DiaryListViewModel @Inject constructor(private val diaryRepository: DiaryR
     }
 
     private suspend fun createDiaryList(creator: DiaryListCreator) {
-        val previousDiaryList = _diaryList.checkNotNull()
+        val previousDiaryList = _diaryList.requireValue()
         try {
             val updateDiaryList = creator.create()
             _diaryList.value = updateDiaryList
@@ -143,7 +143,7 @@ class DiaryListViewModel @Inject constructor(private val diaryRepository: DiaryR
 
         @Throws(CancellationException::class)
         override suspend fun create(): DiaryYearMonthList {
-            val currentDiaryList = _diaryList.checkNotNull()
+            val currentDiaryList = _diaryList.requireValue()
             check(currentDiaryList.diaryYearMonthListItemList.isNotEmpty())
 
             if (isValidityDelay) delay(1000)
@@ -160,7 +160,7 @@ class DiaryListViewModel @Inject constructor(private val diaryRepository: DiaryR
 
         @Throws(Exception::class)
         override suspend fun create(): DiaryYearMonthList {
-            val currentDiaryList = _diaryList.checkNotNull()
+            val currentDiaryList = _diaryList.requireValue()
             check(currentDiaryList.diaryYearMonthListItemList.isNotEmpty())
 
             _isVisibleUpdateProgressBar.value = true

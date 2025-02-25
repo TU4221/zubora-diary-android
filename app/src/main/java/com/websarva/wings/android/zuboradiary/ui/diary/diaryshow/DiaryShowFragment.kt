@@ -27,7 +27,7 @@ import com.websarva.wings.android.zuboradiary.databinding.FragmentDiaryShowBindi
 import com.websarva.wings.android.zuboradiary.ui.BaseFragment
 import com.websarva.wings.android.zuboradiary.ui.DiaryPictureManager
 import com.websarva.wings.android.zuboradiary.ui.UriPermissionManager
-import com.websarva.wings.android.zuboradiary.ui.checkNotNull
+import com.websarva.wings.android.zuboradiary.ui.requireValue
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
@@ -173,11 +173,11 @@ class DiaryShowFragment : BaseFragment() {
             setOnMenuItemClickListener { item: MenuItem ->
                 // 日記編集フラグメント起動
                 if (item.itemId == R.id.diaryShowToolbarOptionEditDiary) {
-                    val editDiaryDate = diaryShowViewModel.date.checkNotNull()
+                    val editDiaryDate = diaryShowViewModel.date.requireValue()
                     showDiaryEdit(editDiaryDate)
                     return@setOnMenuItemClickListener true
                 } else if (item.itemId == R.id.diaryShowToolbarOptionDeleteDiary) {
-                    val deleteDiaryDate = diaryShowViewModel.date.checkNotNull()
+                    val deleteDiaryDate = diaryShowViewModel.date.requireValue()
                     showDiaryDeleteDialog(deleteDiaryDate)
                     return@setOnMenuItemClickListener true
                 }

@@ -11,7 +11,7 @@ import com.websarva.wings.android.zuboradiary.data.diary.Weather
 import com.websarva.wings.android.zuboradiary.data.network.GeoCoordinates
 import com.websarva.wings.android.zuboradiary.data.network.WeatherApiRepository
 import com.websarva.wings.android.zuboradiary.ui.BaseViewModel
-import com.websarva.wings.android.zuboradiary.ui.checkNotNull
+import com.websarva.wings.android.zuboradiary.ui.requireValue
 import com.websarva.wings.android.zuboradiary.ui.diary.DiaryStateFlow
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -242,7 +242,7 @@ class DiaryEditViewModel @Inject constructor(
             if (shouldDeleteLoadedDateDiary) {
                 diaryRepository
                     .deleteAndSaveDiary(
-                        _loadedDate.checkNotNull(),
+                        _loadedDate.requireValue(),
                         diaryEntity,
                         diaryItemTitleSelectionHistoryItemEntityList
                     )
@@ -258,7 +258,7 @@ class DiaryEditViewModel @Inject constructor(
     }
 
     suspend fun deleteDiary(): Boolean {
-        val deleteDate = _loadedDate.checkNotNull()
+        val deleteDate = _loadedDate.requireValue()
 
         try {
             diaryRepository.deleteDiary(deleteDate)
@@ -380,7 +380,7 @@ class DiaryEditViewModel @Inject constructor(
 
     suspend fun shouldShowUpdateConfirmationDialog(): Boolean? {
         if (isLoadedDateEqualToInputDate) return false
-        val inputDate = diaryStateFlow.date.checkNotNull()
+        val inputDate = diaryStateFlow.date.requireValue()
         return existsSavedDiary(inputDate)
     }
 }

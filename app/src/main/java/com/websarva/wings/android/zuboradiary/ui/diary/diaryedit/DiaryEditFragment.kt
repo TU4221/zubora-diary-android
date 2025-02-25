@@ -35,7 +35,7 @@ import com.websarva.wings.android.zuboradiary.ui.DiaryPictureManager
 import com.websarva.wings.android.zuboradiary.ui.TestDiariesSaver
 import com.websarva.wings.android.zuboradiary.ui.TextInputSetup
 import com.websarva.wings.android.zuboradiary.ui.UriPermissionManager
-import com.websarva.wings.android.zuboradiary.ui.checkNotNull
+import com.websarva.wings.android.zuboradiary.ui.requireValue
 import com.websarva.wings.android.zuboradiary.ui.diary.DiaryStateFlow
 import com.websarva.wings.android.zuboradiary.ui.diary.diaryitemtitleedit.DiaryItemTitleEditFragment
 import dagger.hilt.android.AndroidEntryPoint
@@ -175,7 +175,7 @@ class DiaryEditFragment : BaseFragment() {
         val selectedButton =
             receiveResulFromDialog<Int>(DiaryLoadingDialogFragment.KEY_SELECTED_BUTTON) ?: return
 
-        val date = diaryEditViewModel.date.checkNotNull()
+        val date = diaryEditViewModel.date.requireValue()
 
         if (selectedButton == DialogInterface.BUTTON_POSITIVE) {
             diaryEditViewModel.initialize()
@@ -202,7 +202,7 @@ class DiaryEditFragment : BaseFragment() {
             if (!isSuccessful) return@launch
 
             updatePictureUriPermission()
-            val date = diaryEditViewModel.date.checkNotNull()
+            val date = diaryEditViewModel.date.requireValue()
             withContext(Dispatchers.Main) {
                 showDiaryShowFragment(date)
             }
@@ -243,8 +243,8 @@ class DiaryEditFragment : BaseFragment() {
             ) ?: return
         if (selectedButton != DialogInterface.BUTTON_POSITIVE) return
 
-        val loadDiaryDate = diaryEditViewModel.date.checkNotNull()
-        val geoCoordinates = settingsViewModel.geoCoordinates.checkNotNull()
+        val loadDiaryDate = diaryEditViewModel.date.requireValue()
+        val geoCoordinates = settingsViewModel.geoCoordinates.requireValue()
         lifecycleScope.launch(Dispatchers.IO) {
             diaryEditViewModel.fetchWeatherInformation(loadDiaryDate, geoCoordinates)
         }
@@ -299,7 +299,7 @@ class DiaryEditFragment : BaseFragment() {
 
         binding.materialToolbarTopAppBar
             .setOnMenuItemClickListener { item: MenuItem ->
-                val diaryDate = diaryEditViewModel.date.checkNotNull()
+                val diaryDate = diaryEditViewModel.date.requireValue()
 
                 //日記保存(日記表示フラグメント起動)。
                 if (item.itemId == R.id.diaryEditToolbarOptionSaveDiary) {
@@ -354,7 +354,7 @@ class DiaryEditFragment : BaseFragment() {
         binding.textInputEditTextDate.apply {
             inputType = EditorInfo.TYPE_NULL //キーボード非表示設定
             setOnClickListener {
-                val date = diaryEditViewModel.date.checkNotNull()
+                val date = diaryEditViewModel.date.requireValue()
                 showDatePickerDialog(date)
             }
         }
@@ -905,7 +905,7 @@ class DiaryEditFragment : BaseFragment() {
     private suspend fun fetchWeatherInfo(date: LocalDate, requestsShowingDialog: Boolean) {
         // HACK:EditFragment起動時、設定値を参照してから位置情報を取得する為、タイムラグが発生する。
         //      対策として記憶boolean変数を用意し、true時は位置情報取得処理コードにて天気情報も取得する。
-        val isChecked = settingsViewModel.isCheckedWeatherInfoAcquisition.checkNotNull()
+        val isChecked = settingsViewModel.isCheckedWeatherInfoAcquisition.requireValue()
         if (!isChecked) return
 
         if (!settingsViewModel.hasUpdatedGeoCoordinates) {
@@ -919,7 +919,7 @@ class DiaryEditFragment : BaseFragment() {
                 showWeatherInfoFetchingDialog(date)
             }
         } else {
-            val geoCoordinates = settingsViewModel.geoCoordinates.checkNotNull()
+            val geoCoordinates = settingsViewModel.geoCoordinates.requireValue()
             diaryEditViewModel.fetchWeatherInformation(date, geoCoordinates)
         }
     }

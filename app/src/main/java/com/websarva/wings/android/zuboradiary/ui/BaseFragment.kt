@@ -9,8 +9,6 @@ import androidx.activity.OnBackPressedCallback
 import androidx.databinding.ViewDataBinding
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
@@ -42,7 +40,7 @@ abstract class BaseFragment : CustomFragment() {
 
     protected lateinit var settingsViewModel: SettingsViewModel
     protected val themeColor
-        get() = settingsViewModel.themeColor.checkNotNull()
+        get() = settingsViewModel.themeColor.requireValue()
 
     private var fragmentDestinationId = 0
     private val currentDestinationId: Int get() {

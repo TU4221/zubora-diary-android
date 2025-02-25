@@ -41,7 +41,7 @@ import com.websarva.wings.android.zuboradiary.databinding.ActivityMainBinding
 import com.websarva.wings.android.zuboradiary.ui.ThemeColorInflaterCreator
 import com.websarva.wings.android.zuboradiary.ui.ThemeColorSwitcher
 import com.websarva.wings.android.zuboradiary.ui.calendar.CalendarFragment
-import com.websarva.wings.android.zuboradiary.ui.checkNotNull
+import com.websarva.wings.android.zuboradiary.ui.requireValue
 import com.websarva.wings.android.zuboradiary.ui.diary.diaryedit.DiaryEditFragment
 import com.websarva.wings.android.zuboradiary.ui.list.diarylist.DiaryListFragment
 import com.websarva.wings.android.zuboradiary.ui.settings.SettingsFragment
@@ -142,7 +142,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setUpMainActivityBinding() {
-        val themeColor = settingsViewModel.themeColor.checkNotNull()
+        val themeColor = settingsViewModel.themeColor.requireValue()
         val creator = ThemeColorInflaterCreator(this, layoutInflater, themeColor)
         val themeColorInflater = creator.create()
         _binding = ActivityMainBinding.inflate(themeColorInflater)

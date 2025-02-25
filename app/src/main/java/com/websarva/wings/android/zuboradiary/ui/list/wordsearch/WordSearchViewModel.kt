@@ -6,7 +6,7 @@ import com.websarva.wings.android.zuboradiary.data.AppMessage
 import com.websarva.wings.android.zuboradiary.data.database.DiaryRepository
 import com.websarva.wings.android.zuboradiary.data.database.WordSearchResultListItem
 import com.websarva.wings.android.zuboradiary.ui.BaseViewModel
-import com.websarva.wings.android.zuboradiary.ui.checkNotNull
+import com.websarva.wings.android.zuboradiary.ui.requireValue
 import com.websarva.wings.android.zuboradiary.ui.list.diarylist.DiaryListViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -139,7 +139,7 @@ class WordSearchViewModel @Inject internal constructor(
         spannableStringColor: Int,
         spannableStringBackGroundColor: Int
     ) {
-        val previousResultList = _wordSearchResultList.checkNotNull()
+        val previousResultList = _wordSearchResultList.requireValue()
 
         try {
             val updateResultList =
@@ -191,7 +191,7 @@ class WordSearchViewModel @Inject internal constructor(
             spannableStringColor: Int,
             spannableStringBackGroundColor: Int
         ): WordSearchResultYearMonthList {
-            val currentResultList = _wordSearchResultList.checkNotNull()
+            val currentResultList = _wordSearchResultList.requireValue()
             check(currentResultList.wordSearchResultYearMonthListItemList.isNotEmpty())
 
             if (isValidityDelay) delay(1000)
@@ -217,7 +217,7 @@ class WordSearchViewModel @Inject internal constructor(
             spannableStringColor: Int,
             spannableStringBackGroundColor: Int
         ): WordSearchResultYearMonthList {
-            val currentResultList = _wordSearchResultList.checkNotNull()
+            val currentResultList = _wordSearchResultList.requireValue()
             check(currentResultList.wordSearchResultYearMonthListItemList.isNotEmpty())
 
             _isVisibleUpdateProgressBar.value = true
@@ -252,7 +252,7 @@ class WordSearchViewModel @Inject internal constructor(
         require(numLoadingItems > 0)
         require(loadingOffset >= 0)
 
-        val searchWord = _searchWord.checkNotNull()
+        val searchWord = _searchWord.requireValue()
         val loadedResultList =
             diaryRepository.loadWordSearchResultDiaryList(
                 numLoadingItems,
@@ -280,7 +280,7 @@ class WordSearchViewModel @Inject internal constructor(
 
     @Throws(Exception::class)
     private suspend fun existsUnloadedDiaries(numLoadedDiaries: Int): Boolean {
-        val searchWord = _searchWord.checkNotNull()
+        val searchWord = _searchWord.requireValue()
 
         val numExistingDiaries = diaryRepository.countWordSearchResultDiaries(searchWord)
         _numWordSearchResults.value = numExistingDiaries

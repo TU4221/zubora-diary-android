@@ -16,7 +16,7 @@ import com.websarva.wings.android.zuboradiary.data.AppMessageList
 import com.websarva.wings.android.zuboradiary.databinding.FragmentDiaryItemTitleEditBinding
 import com.websarva.wings.android.zuboradiary.ui.BaseFragment
 import com.websarva.wings.android.zuboradiary.ui.TextInputSetup
-import com.websarva.wings.android.zuboradiary.ui.checkNotNull
+import com.websarva.wings.android.zuboradiary.ui.requireValue
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
@@ -119,7 +119,7 @@ class DiaryItemTitleEditFragment : BaseFragment() {
 
     private fun setUpToolBar() {
         binding.materialToolbarTopAppBar.apply {
-            val targetItemNumber = diaryItemTitleEditViewModel.itemNumber.checkNotNull()
+            val targetItemNumber = diaryItemTitleEditViewModel.itemNumber.requireValue()
             val toolBarTitle =
                 getString(R.string.fragment_diary_item_title_edit_toolbar_first_title) + targetItemNumber + getString(
                     R.string.fragment_diary_item_title_edit_toolbar_second_title
@@ -227,7 +227,7 @@ class DiaryItemTitleEditFragment : BaseFragment() {
 
     // DiaryItemTitleEditFragmentを閉じる
     private fun completeItemTitleEdit(newItemTitle: String) {
-        val targetItemNumber = diaryItemTitleEditViewModel.itemNumber.checkNotNull()
+        val targetItemNumber = diaryItemTitleEditViewModel.itemNumber.requireValue()
 
         val navBackStackEntry = checkNotNull(navController.previousBackStackEntry)
         val savedStateHandle = navBackStackEntry.savedStateHandle

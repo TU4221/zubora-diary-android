@@ -6,7 +6,7 @@ import com.websarva.wings.android.zuboradiary.data.AppMessage
 import com.websarva.wings.android.zuboradiary.data.database.DiaryRepository
 import com.websarva.wings.android.zuboradiary.data.diary.ItemNumber
 import com.websarva.wings.android.zuboradiary.ui.BaseViewModel
-import com.websarva.wings.android.zuboradiary.ui.checkNotNull
+import com.websarva.wings.android.zuboradiary.ui.requireValue
 import com.websarva.wings.android.zuboradiary.ui.diary.DiaryStateFlow
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.asStateFlow
@@ -87,7 +87,7 @@ class DiaryShowViewModel @Inject constructor(private val diaryRepository: DiaryR
     }
 
     suspend fun deleteDiary(): Boolean {
-        val deleteDate = diaryStateFlow.date.checkNotNull()
+        val deleteDate = diaryStateFlow.date.requireValue()
         try {
             diaryRepository.deleteDiary(deleteDate)
         } catch (e: Exception) {
