@@ -159,8 +159,8 @@ class DiaryEditViewModel @Inject constructor(
 
     val isEqualWeathers: Boolean
         get() {
-            val weather1 = checkNotNull(diaryStateFlow.weather1.value)
-            val weather2 = checkNotNull(diaryStateFlow.weather2.value)
+            val weather1 = diaryStateFlow.weather1.value
+            val weather2 = diaryStateFlow.weather2.value
 
             return weather1 == weather2
         }

@@ -6,6 +6,7 @@ import com.websarva.wings.android.zuboradiary.data.database.DiaryItemTitleSelect
 import com.websarva.wings.android.zuboradiary.data.diary.Condition
 import com.websarva.wings.android.zuboradiary.data.diary.ItemNumber
 import com.websarva.wings.android.zuboradiary.data.diary.Weather
+import com.websarva.wings.android.zuboradiary.ui.requireValue
 import kotlinx.coroutines.flow.MutableStateFlow
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -152,14 +153,14 @@ class DiaryStateFlow {
     }
 
     fun incrementVisibleItemsCount() {
-        val numVisibleItems = checkNotNull(numVisibleItems.value)
+        val numVisibleItems = numVisibleItems.requireValue()
         val incrementedNumVisibleItems = numVisibleItems + 1
         this.numVisibleItems.value = incrementedNumVisibleItems
     }
 
     fun deleteItem(itemNumber: ItemNumber) {
         getItemStateFlow(itemNumber).initialize()
-        val numVisibleItems = checkNotNull(numVisibleItems.value)
+        val numVisibleItems = numVisibleItems.value
 
         if (itemNumber.value < numVisibleItems) {
             for (i in itemNumber.value until numVisibleItems) {

@@ -149,16 +149,16 @@ abstract class BaseFragment : CustomFragment() {
     }
 
     protected fun addTransitionListener(listener: Transition.TransitionListener) {
-        val enterTransition = checkNotNull(enterTransition as MaterialSharedAxis)
+        val enterTransition = checkNotNull(enterTransition) as MaterialSharedAxis
         enterTransition.addListener(listener)
 
-        val exitTransition = checkNotNull(exitTransition as MaterialSharedAxis)
+        val exitTransition = checkNotNull(exitTransition) as MaterialSharedAxis
         exitTransition.addListener(listener)
 
-        val reenterTransition = checkNotNull(reenterTransition as MaterialSharedAxis)
+        val reenterTransition = checkNotNull(reenterTransition) as MaterialSharedAxis
         reenterTransition.addListener(listener)
 
-        val returnTransition = checkNotNull(returnTransition as MaterialSharedAxis)
+        val returnTransition = checkNotNull(returnTransition) as MaterialSharedAxis
         returnTransition.addListener(listener)
     }
 

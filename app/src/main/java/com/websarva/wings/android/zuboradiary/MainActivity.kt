@@ -242,7 +242,7 @@ class MainActivity : AppCompatActivity() {
     private fun findShowedFragment(): Fragment {
         val fragmentManager = findNavFragmentManager()
         val fragmentList = fragmentManager.fragments
-        return checkNotNull(fragmentList[0])
+        return fragmentList[0]
     }
 
     private fun findSelectedBottomNavigationMenuItem(): MenuItem {
