@@ -8,7 +8,6 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import androidx.viewbinding.ViewBinding
 import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor
 import com.websarva.wings.android.zuboradiary.databinding.RowItemTitleSelectionHistoryBinding
 import com.websarva.wings.android.zuboradiary.ui.LeftSwipeSimpleCallback
@@ -85,16 +84,11 @@ internal class ItemTitleSelectionHistoryListAdapter
         this.onClickDeleteButtonListener = onClickDeleteButtonListener
     }
 
-    internal class ItemTitleSelectionHistoryViewHolder
-        (val binding: RowItemTitleSelectionHistoryBinding) : LeftSwipeViewHolder(binding) {
-
-        public override fun setUpView(binding: ViewBinding) {
-            val rowItemTitleSelectionHistoryBinding =
-                binding as RowItemTitleSelectionHistoryBinding
-            foregroundView = rowItemTitleSelectionHistoryBinding.textTitle
-            backgroundButtonView =
-                rowItemTitleSelectionHistoryBinding.includeBackground.imageButtonDelete
-        }
+    internal class ItemTitleSelectionHistoryViewHolder(
+        val binding: RowItemTitleSelectionHistoryBinding,
+    ) : LeftSwipeViewHolder(binding) {
+        override val foregroundView = binding.textTitle
+        override val backgroundButtonView = binding.includeBackground.imageButtonDelete
     }
 
     internal class DiaryItemTitleSelectionHistoryDiffUtilItemCallback

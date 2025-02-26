@@ -5,7 +5,6 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import androidx.viewbinding.ViewBinding
 import com.websarva.wings.android.zuboradiary.data.DayOfWeekStringConverter
 import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor
 import com.websarva.wings.android.zuboradiary.databinding.RowDiaryDayListBinding
@@ -88,14 +87,10 @@ class DiaryDayListAdapter(context: Context, recyclerView: RecyclerView, themeCol
         }
     }
 
-    class DiaryDayListViewHolder(val binding: RowDiaryDayListBinding) :
-        LeftSwipeViewHolder(binding) {
-        override fun setUpView(binding: ViewBinding) {
-            if (binding !is RowDiaryDayListBinding) throw IllegalStateException()
-
-            foregroundView = binding.linerLayoutForeground
-            backgroundButtonView = binding.includeBackground.imageButtonDelete
-        }
+    class DiaryDayListViewHolder(val binding: RowDiaryDayListBinding)
+        : LeftSwipeViewHolder(binding) {
+        override val foregroundView = binding.linerLayoutForeground
+        override val backgroundButtonView = binding.includeBackground.imageButtonDelete
     }
 
     private class DiaryDayListDiffUtilItemCallback : DiffUtilItemCallback() {

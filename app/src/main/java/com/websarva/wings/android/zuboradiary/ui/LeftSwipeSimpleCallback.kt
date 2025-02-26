@@ -14,27 +14,16 @@ import androidx.viewbinding.ViewBinding
 open class LeftSwipeSimpleCallback(protected val recyclerView: RecyclerView) :
     ItemTouchHelper.SimpleCallback(ItemTouchHelper.ACTION_STATE_IDLE, ItemTouchHelper.LEFT) {
 
-    abstract class LeftSwipeViewHolder(binding: ViewBinding) :
-        RecyclerView.ViewHolder(binding.root) {
+    abstract class LeftSwipeViewHolder(binding: ViewBinding)
+        : RecyclerView.ViewHolder(binding.root) {
 
-        lateinit var foregroundView: View
-        lateinit var backgroundButtonView: View
-
-        init {
-            setUpView(binding) // TODO:全ファイルKotlinへ変換後対応
-            foregroundView.isClickable = true
-            backgroundButtonView.isClickable = true
-        }
+        abstract val foregroundView: View
+        abstract val backgroundButtonView: View
 
         fun setClickableAllView(clickable: Boolean) {
             foregroundView.isClickable = clickable
             backgroundButtonView.isClickable = clickable
         }
-
-        /**
-         * フィールド変数 View foregroundView、View backgroundButtonView に対象Viewを代入すること。
-         */
-        protected abstract fun setUpView(binding: ViewBinding)
     }
 
     protected lateinit var itemTouchHelper: ItemTouchHelper
