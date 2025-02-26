@@ -91,42 +91,16 @@ open class LeftSwipeSimpleCallback(protected val recyclerView: RecyclerView) :
         val viewHolder =
             checkNotNull(recyclerView.findViewHolderForAdapterPosition(position))
 
-        animateSwipingView(
-            position,
-            viewHolder,
-            300,
-            0f,
-            {
-            itemTouchHelper.onChildViewDetachedFromWindow(viewHolder.itemView)
-            itemTouchHelper.onChildViewAttachedToWindow(viewHolder.itemView)
-            },
-            {
-            // MEMO:StartActionのリセットのみでは、スワイプしたアイテムをタッチしてスワイプ状態を戻した後、
-            //      アイテムをクリックしてもアイテム前面Viewのクリックリスナーが反応しない。
-            //      2回目以降は反応する。対策として下記コードを記述。
-            itemTouchHelper.onChildViewDetachedFromWindow(viewHolder.itemView)
-            itemTouchHelper.onChildViewAttachedToWindow(viewHolder.itemView)
-
-            if (swipingAdapterPosition == position) clearSwipingAdapterPosition()
-            if (swipedAdapterPosition == position) clearSwipedAdapterPosition()
-            }
-        )
+        animateCloseSwipedViewHolder(position, viewHolder)
     }
 
-    protected fun interface AnimationAction {
-        fun process()
-    }
-
-    private fun animateSwipingView(
-        position: Int, viewHolder: RecyclerView.ViewHolder, duration: Int, translationValue: Float,
-        startAction: AnimationAction?, endAction: AnimationAction?
-    ) {
+    private fun animateCloseSwipedViewHolder(position: Int, viewHolder: RecyclerView.ViewHolder) {
         Log.d("LeftSwipeSimpleCallBack", "animateSwipingView()")
         val leftSwipeViewHolder = viewHolder as LeftSwipeViewHolder
         leftSwipeViewHolder.foregroundView.animate()
-            .setDuration(duration.toLong())
+            .setDuration(300)
             .setInterpolator(FastOutSlowInInterpolator())
-            .translationX(translationValue)
+            .translationX(0f)
             .withStartAction {
                 // MEMO:アニメーション中のViewHolderをタッチすると、
                 //      ItemTouchHelper.Callback#getMovementFlags()で
@@ -134,12 +108,18 @@ open class LeftSwipeSimpleCallback(protected val recyclerView: RecyclerView) :
                 //      アニメーション中はリスナーを機能させたくないので下記コードを記述。
                 leftSwipeViewHolder.setClickableAllView(false)
 
-                if (startAction == null) return@withStartAction
-                startAction.process()
+                itemTouchHelper.onChildViewDetachedFromWindow(viewHolder.itemView)
+                itemTouchHelper.onChildViewAttachedToWindow(viewHolder.itemView)
             }
             .withEndAction {
-                if (endAction == null) return@withEndAction
-                endAction.process()
+                // MEMO:StartActionのリセットのみでは、スワイプしたアイテムをタッチしてスワイプ状態を戻した後、
+                //      アイテムをクリックしてもアイテム前面Viewのクリックリスナーが反応しない。
+                //      2回目以降は反応する。対策として下記コードを記述。
+                itemTouchHelper.onChildViewDetachedFromWindow(viewHolder.itemView)
+                itemTouchHelper.onChildViewAttachedToWindow(viewHolder.itemView)
+
+                if (swipingAdapterPosition == position) clearSwipingAdapterPosition()
+                if (swipedAdapterPosition == position) clearSwipedAdapterPosition()
 
                 // MEMO:アニメーション中にスワイプしてそのままタッチを継続されると、
                 //      アニメーション終了後にスワイプ分、前面Viewが移動してしまう。
