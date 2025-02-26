@@ -6,17 +6,12 @@ import android.content.res.Resources
 import android.graphics.drawable.Drawable
 import android.view.View
 import android.view.Window
-import android.widget.Button
-import android.widget.ImageButton
-import android.widget.ImageView
-import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.core.graphics.drawable.DrawableCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.divider.MaterialDivider
-import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.materialswitch.MaterialSwitch
 import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor
 import java.util.function.Consumer
@@ -132,15 +127,6 @@ open class ThemeColorSwitcher(protected val context: Context, protected val them
         }
     }
 
-    fun switchFloatingActionButtonColor(fabList: List<FloatingActionButton>) {
-        val primaryContainerColor = themeColor.getPrimaryContainerColor(resources)
-        val onPrimaryContainerColor = themeColor.getOnPrimaryContainerColor(resources)
-        fabList.forEach(Consumer { x: FloatingActionButton ->
-            x.backgroundTintList = ColorStateList.valueOf(primaryContainerColor)
-            x.imageTintList = ColorStateList.valueOf(onPrimaryContainerColor)
-        })
-    }
-
     fun switchSwitchColor(switchList: List<MaterialSwitch>) {
         switchSwitchThumbColor(switchList)
         switchSwitchThumbIconColor(switchList)
@@ -174,32 +160,6 @@ open class ThemeColorSwitcher(protected val context: Context, protected val them
         })
     }
 
-    fun switchButtonColor(buttonList: List<Button>) {
-        val color = themeColor.getPrimaryColor(resources)
-        val onColor = themeColor.getOnPrimaryColor(resources)
-        buttonList.forEach(Consumer { x: Button ->
-            x.setBackgroundColor(color)
-            x.setTextColor(onColor)
-        })
-    }
-
-    fun switchImageButtonColor(imageButtonList: List<ImageButton>) {
-        val color = themeColor.getPrimaryColor(resources)
-        imageButtonList.forEach(Consumer { x: ImageButton ->
-            x.imageTintList = ColorStateList.valueOf(color)
-        })
-    }
-
-    fun switchImageViewColor(imageViewList: List<ImageView>) {
-        val color = themeColor.getSecondaryColor(resources)
-        imageViewList.forEach(Consumer { x: ImageView -> switchImageView(x, color) })
-    }
-
-    fun switchCircularProgressBarColor(progressBar: ProgressBar) {
-        val color = themeColor.getPrimaryContainerColor(resources)
-        progressBar.indeterminateDrawable.setTint(color)
-    }
-
     fun switchDividerColor(dividerList: List<MaterialDivider>) {
         val color = themeColor.getOutlineVariantColor(resources)
         dividerList.forEach(Consumer { x: MaterialDivider ->
@@ -208,10 +168,6 @@ open class ThemeColorSwitcher(protected val context: Context, protected val them
     }
 
     // 共通処理
-    protected open fun switchViewsColor(viewList: List<View>, color: Int) {
-        viewList.forEach(Consumer { x: View -> switchViewColor(x, color) })
-    }
-
     protected open fun switchViewColor(view: View, color: Int) {
         view.setBackgroundColor(color)
     }
@@ -251,11 +207,6 @@ open class ThemeColorSwitcher(protected val context: Context, protected val them
         view.setCompoundDrawablesRelativeWithIntrinsicBounds(
             wrappedDrawable[0], wrappedDrawable[1], wrappedDrawable[2], wrappedDrawable[3]
         )
-    }
-
-    protected open fun switchImageView(imageView: ImageView, color: Int) {
-        val drawable = imageView.drawable
-        switchDrawableColor(drawable, color)
     }
 
     protected open fun switchDrawableColor(drawable: Drawable, color: Int) {
