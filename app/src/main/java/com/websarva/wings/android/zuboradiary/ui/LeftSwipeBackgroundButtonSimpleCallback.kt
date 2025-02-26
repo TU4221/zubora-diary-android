@@ -14,8 +14,7 @@ import kotlin.math.min
 open class LeftSwipeBackgroundButtonSimpleCallback(recyclerView: RecyclerView) :
     LeftSwipeSimpleCallback(recyclerView) {
 
-    protected var swipingOffset: Float = 0f
-        private set
+    private var swipingOffset: Float = 0f
 
     // TODO:@SuppressLintを使用せず、DiaryEdit.CustomTextInputEditTextと同等に修正する？
     @SuppressLint("ClickableViewAccessibility")
@@ -45,7 +44,7 @@ open class LeftSwipeBackgroundButtonSimpleCallback(recyclerView: RecyclerView) :
             return result
         }
 
-        protected fun onClickSwipedViewHolder(v: View, event: MotionEvent): Boolean {
+         private fun onClickSwipedViewHolder(v: View, event: MotionEvent): Boolean {
             // タッチViewHolder取得
             val childView = recyclerView.findChildViewUnder(event.x, event.y) ?: return false
 

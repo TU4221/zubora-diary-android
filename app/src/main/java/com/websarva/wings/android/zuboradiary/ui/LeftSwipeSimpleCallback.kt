@@ -26,13 +26,11 @@ open class LeftSwipeSimpleCallback(protected val recyclerView: RecyclerView) :
         }
     }
 
-    protected lateinit var itemTouchHelper: ItemTouchHelper
-        private set
+    private lateinit var itemTouchHelper: ItemTouchHelper
     protected var swipingAdapterPosition: Int = -1
         private set
     protected var swipedAdapterPosition: Int = -1
-    protected var invalidSwipeAdapterPosition: Int = -1
-        private set
+    private var invalidSwipeAdapterPosition: Int = -1
     protected var previousMotionEvent: Int = -1
 
 
@@ -119,7 +117,7 @@ open class LeftSwipeSimpleCallback(protected val recyclerView: RecyclerView) :
         fun process()
     }
 
-    protected fun animateSwipingView(
+    private fun animateSwipingView(
         position: Int, viewHolder: RecyclerView.ViewHolder, duration: Int, translationValue: Float,
         startAction: AnimationAction?, endAction: AnimationAction?
     ) {
@@ -285,11 +283,11 @@ open class LeftSwipeSimpleCallback(protected val recyclerView: RecyclerView) :
         swipingAdapterPosition = -1
     }
 
-    protected fun clearSwipedAdapterPosition() {
+    private fun clearSwipedAdapterPosition() {
         swipedAdapterPosition = -1
     }
 
-    protected fun clearInvalidSwipeAdapterPosition() {
+    private fun clearInvalidSwipeAdapterPosition() {
         invalidSwipeAdapterPosition = -1
     }
 
