@@ -135,30 +135,6 @@ enum class ThemeColor(private val number: Int, private val stringResId: Int) {
         return ResourcesCompat.getColor(resources, colorResId, null)
     }
 
-    fun getTertiaryColor(resources: Resources): Int {
-        val colorResId = when (this) {
-            WHITE -> R.color.md_theme_color_white_tertiary
-            BLACK -> R.color.md_theme_color_black_tertiary
-            RED -> R.color.md_theme_color_red_tertiary
-            BLUE -> R.color.md_theme_color_blue_tertiary
-            GREEN -> R.color.md_theme_color_green_tertiary
-            YELLOW -> R.color.md_theme_color_yellow_tertiary
-        }
-        return ResourcesCompat.getColor(resources, colorResId, null)
-    }
-
-    fun getOnTertiaryColor(resources: Resources): Int {
-        val colorResId = when (this) {
-            WHITE -> R.color.md_theme_color_white_onTertiary
-            BLACK -> R.color.md_theme_color_black_onTertiary
-            RED -> R.color.md_theme_color_red_onTertiary
-            BLUE -> R.color.md_theme_color_blue_onTertiary
-            GREEN -> R.color.md_theme_color_green_onTertiary
-            YELLOW -> R.color.md_theme_color_yellow_onTertiary
-        }
-        return ResourcesCompat.getColor(resources, colorResId, null)
-    }
-
     fun getTertiaryContainerColor(resources: Resources): Int {
         val colorResId = when (this) {
             WHITE -> R.color.md_theme_color_white_tertiaryContainer
@@ -195,18 +171,6 @@ enum class ThemeColor(private val number: Int, private val stringResId: Int) {
         return ResourcesCompat.getColor(resources, colorResId, null)
     }
 
-    fun getSurfaceContainerLowColor(resources: Resources): Int {
-        val colorResId = when (this) {
-            WHITE -> R.color.md_theme_color_white_surfaceContainerLow
-            BLACK -> R.color.md_theme_color_black_surfaceContainerLow
-            RED -> R.color.md_theme_color_red_surfaceContainerLow
-            BLUE -> R.color.md_theme_color_blue_surfaceContainerLow
-            GREEN -> R.color.md_theme_color_green_surfaceContainerLow
-            YELLOW -> R.color.md_theme_color_yellow_surfaceContainerLow
-        }
-        return ResourcesCompat.getColor(resources, colorResId, null)
-    }
-
     fun getSurfaceContainerColor(resources: Resources): Int {
         val colorResId = when (this) {
             WHITE -> R.color.md_theme_color_white_surfaceContainer
@@ -215,18 +179,6 @@ enum class ThemeColor(private val number: Int, private val stringResId: Int) {
             BLUE -> R.color.md_theme_color_blue_surfaceContainer
             GREEN -> R.color.md_theme_color_green_surfaceContainer
             YELLOW -> R.color.md_theme_color_yellow_surfaceContainer
-        }
-        return ResourcesCompat.getColor(resources, colorResId, null)
-    }
-
-    fun getSurfaceContainerHighColor(resources: Resources): Int {
-        val colorResId = when (this) {
-            WHITE -> R.color.md_theme_color_white_surfaceContainerHigh
-            BLACK -> R.color.md_theme_color_black_surfaceContainerHigh
-            RED -> R.color.md_theme_color_red_surfaceContainerHigh
-            BLUE -> R.color.md_theme_color_blue_surfaceContainerHigh
-            GREEN -> R.color.md_theme_color_green_surfaceContainerHigh
-            YELLOW -> R.color.md_theme_color_yellow_surfaceContainerHigh
         }
         return ResourcesCompat.getColor(resources, colorResId, null)
     }
@@ -251,30 +203,6 @@ enum class ThemeColor(private val number: Int, private val stringResId: Int) {
             BLUE -> R.color.md_theme_color_blue_onSurface
             GREEN -> R.color.md_theme_color_green_onSurface
             YELLOW -> R.color.md_theme_color_yellow_onSurface
-        }
-        return ResourcesCompat.getColor(resources, colorResId, null)
-    }
-
-    fun getSurfaceDimColor(resources: Resources): Int {
-        val colorResId = when (this) {
-            WHITE -> R.color.md_theme_color_white_surfaceDim
-            BLACK -> R.color.md_theme_color_black_surfaceDim
-            RED -> R.color.md_theme_color_red_surfaceDim
-            BLUE -> R.color.md_theme_color_blue_surfaceDim
-            GREEN -> R.color.md_theme_color_green_surfaceDim
-            YELLOW -> R.color.md_theme_color_yellow_surfaceDim
-        }
-        return ResourcesCompat.getColor(resources, colorResId, null)
-    }
-
-    fun getSurfaceVariantColor(resources: Resources): Int {
-        val colorResId = when (this) {
-            WHITE -> R.color.md_theme_color_white_surfaceVariant
-            BLACK -> R.color.md_theme_color_black_surfaceVariant
-            RED -> R.color.md_theme_color_red_surfaceVariant
-            BLUE -> R.color.md_theme_color_blue_surfaceVariant
-            GREEN -> R.color.md_theme_color_green_surfaceVariant
-            YELLOW -> R.color.md_theme_color_yellow_surfaceVariant
         }
         return ResourcesCompat.getColor(resources, colorResId, null)
     }
