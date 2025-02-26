@@ -1,6 +1,5 @@
 package com.websarva.wings.android.zuboradiary.ui
 
-import android.annotation.SuppressLint
 import android.app.Activity
 import android.text.Editable
 import android.text.InputType
