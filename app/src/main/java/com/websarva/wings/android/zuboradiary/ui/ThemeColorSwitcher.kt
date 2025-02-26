@@ -208,36 +208,36 @@ open class ThemeColorSwitcher(protected val context: Context, protected val them
     }
 
     // 共通処理
-    protected fun switchViewsColor(viewList: List<View>, color: Int) {
+    protected open fun switchViewsColor(viewList: List<View>, color: Int) {
         viewList.forEach(Consumer { x: View -> switchViewColor(x, color) })
     }
 
-    protected fun switchViewColor(view: View, color: Int) {
+    protected open fun switchViewColor(view: View, color: Int) {
         view.setBackgroundColor(color)
     }
 
-    protected fun switchTextViewsColor(textViewList: List<TextView>, color: Int, onColor: Int) {
+    protected open fun switchTextViewsColor(textViewList: List<TextView>, color: Int, onColor: Int) {
         textViewList.forEach(Consumer { x: TextView -> switchTextViewColor(x, color, onColor) })
     }
 
-    protected fun switchTextViewColor(textView: TextView, color: Int, onColor: Int) {
+    protected open fun switchTextViewColor(textView: TextView, color: Int, onColor: Int) {
         textView.setBackgroundColor(color)
         textView.setTextColor(onColor)
     }
 
-    protected fun switchTextViewsColorOnlyText(textViewList: List<TextView>, onColor: Int) {
+    protected open fun switchTextViewsColorOnlyText(textViewList: List<TextView>, onColor: Int) {
         textViewList.forEach(Consumer { x: TextView -> switchTextViewColorOnlyText(x, onColor) })
     }
 
-    protected fun switchTextViewColorOnlyText(textView: TextView, color: Int) {
+    protected open fun switchTextViewColorOnlyText(textView: TextView, color: Int) {
         textView.setTextColor(color)
     }
 
-    protected fun switchTextViewsColorOnlyIcon(textViewList: List<TextView>, color: Int) {
+    protected open fun switchTextViewsColorOnlyIcon(textViewList: List<TextView>, color: Int) {
         textViewList.forEach(Consumer { x: TextView -> switchTextViewColorOnlyIcon(x, color) })
     }
 
-    protected fun switchTextViewColorOnlyIcon(view: TextView, color: Int) {
+    protected open fun switchTextViewColorOnlyIcon(view: TextView, color: Int) {
         val drawables = view.compoundDrawablesRelative
         val wrappedDrawable = arrayOfNulls<Drawable>(drawables.size)
 
@@ -253,16 +253,16 @@ open class ThemeColorSwitcher(protected val context: Context, protected val them
         )
     }
 
-    protected fun switchImageView(imageView: ImageView, color: Int) {
+    protected open fun switchImageView(imageView: ImageView, color: Int) {
         val drawable = imageView.drawable
         switchDrawableColor(drawable, color)
     }
 
-    protected fun switchDrawableColor(drawable: Drawable, color: Int) {
+    protected open fun switchDrawableColor(drawable: Drawable, color: Int) {
         drawable.setTint(color)
     }
 
-    protected fun createCheckedColorStateList(checkedColor: Int, unCheckedColor: Int): ColorStateList {
+    protected open fun createCheckedColorStateList(checkedColor: Int, unCheckedColor: Int): ColorStateList {
         val states = arrayOf(
             intArrayOf(android.R.attr.state_checked),  // ON状態
             intArrayOf(-android.R.attr.state_checked) // OFF状態
