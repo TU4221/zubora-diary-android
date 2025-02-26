@@ -49,14 +49,13 @@ open class EditTextSetup(private val activity: Activity) {
         }
 
         private class ScrollableTextOnTouchListener : OnTouchListener {
-            // TODO:@SuppressLintを使用せず、DiaryEdit.CustomTextInputEditTextと同等に修正する？
-            @SuppressLint("ClickableViewAccessibility")
             override fun onTouch(v: View, event: MotionEvent): Boolean {
                 if (!v.canScrollVertically(1) && !v.canScrollVertically(-1)) return false
 
                 v.parent.requestDisallowInterceptTouchEvent(true)
                 if ((event.action and MotionEvent.ACTION_MASK) == MotionEvent.ACTION_UP) {
                     v.parent.requestDisallowInterceptTouchEvent(false)
+                    v.performClick()
                 }
                 return false
             }
