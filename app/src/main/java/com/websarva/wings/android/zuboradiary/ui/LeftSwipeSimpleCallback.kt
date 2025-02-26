@@ -80,7 +80,7 @@ open class LeftSwipeSimpleCallback(protected val recyclerView: RecyclerView) :
             recyclerView.findViewHolderForAdapterPosition(invalidSwipeAdapterPosition)
 
         val leftSwipeViewHolder = lockedViewHolder as LeftSwipeViewHolder
-        leftSwipeViewHolder.foregroundView.isClickable = true
+        leftSwipeViewHolder.setClickableAllView(true)
 
         clearInvalidSwipeAdapterPosition()
     }
