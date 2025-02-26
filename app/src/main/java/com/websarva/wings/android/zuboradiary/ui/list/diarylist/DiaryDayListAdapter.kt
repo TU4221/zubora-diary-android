@@ -106,17 +106,7 @@ class DiaryDayListAdapter(context: Context, recyclerView: RecyclerView, themeCol
                 Log.d("DiaryDayList", "Title不一致")
                 return false
             }
-            if (oldItem.picturePath == null && newItem.picturePath != null) {
-                Log.d("DiaryDayList", "PicturePath不一致")
-                return false
-            }
-            if (oldItem.picturePath != null && newItem.picturePath == null) {
-                Log.d("DiaryDayList", "PicturePath不一致")
-                return false
-            }
-            if ((oldItem.picturePath != null && newItem.picturePath != null)
-                && (oldItem.picturePath != newItem.picturePath)
-            ) {
+            if (oldItem.picturePath?.equals(newItem.picturePath) != true) {
                 Log.d("DiaryDayList", "PicturePath不一致")
                 return false
             }
