@@ -1,7 +1,6 @@
 package com.websarva.wings.android.zuboradiary.ui.settings
 
 import android.Manifest
-import android.annotation.SuppressLint
 import android.app.Dialog
 import android.content.DialogInterface
 import android.content.Intent
@@ -10,7 +9,6 @@ import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
 import android.view.LayoutInflater
-import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.widget.CompoundButton
@@ -43,10 +41,6 @@ class SettingsFragment : BaseFragment() {
     // View関係
     private var _binding: FragmentSettingsBinding? = null
     private val binding get() = checkNotNull(_binding)
-
-    private var isTouchedReminderNotificationSwitch = false
-    private var isTouchedPasscodeLockSwitch = false
-    private var isTouchedWeatherInfoAcquisitionSwitch = false
 
     // ActivityResultLauncher関係
     private lateinit var requestPostNotificationsPermissionLauncher: ActivityResultLauncher<String>
@@ -383,15 +377,7 @@ class SettingsFragment : BaseFragment() {
         }
     }
 
-    @SuppressLint("ClickableViewAccessibility")
     private fun setUpReminderNotificationSettingItem() {
-        binding.includeReminderNotificationSetting.materialSwitch
-            .setOnTouchListener { _: View, event: MotionEvent ->
-                if (event.action == MotionEvent.ACTION_DOWN) {
-                    isTouchedReminderNotificationSwitch = true
-                }
-                false
-            }
         binding.includeReminderNotificationSetting.materialSwitch
             .setOnCheckedChangeListener(
                 ReminderNotificationOnCheckedChangeListener()
@@ -432,7 +418,10 @@ class SettingsFragment : BaseFragment() {
     private inner class ReminderNotificationOnCheckedChangeListener
         : CompoundButton.OnCheckedChangeListener {
             override fun onCheckedChanged(buttonView: CompoundButton, isChecked: Boolean) {
-                if (!isTouchedReminderNotificationSwitch) return
+                // DateStorePreferences初回読込時の値がtrueの場合、本メソッドが呼び出される。
+                // 初回読込時は処理不要のため下記条件追加。
+                val settingValue = settingsViewModel.isCheckedReminderNotification.requireValue()
+                if (isChecked == settingValue) return
 
                 if (isChecked) {
                     // MEMO:PostNotificationsはApiLevel33で導入されたPermission。33未満は許可取り不要。
@@ -446,7 +435,6 @@ class SettingsFragment : BaseFragment() {
                         settingsViewModel.saveReminderNotificationInvalid()
                     }
                 }
-                isTouchedReminderNotificationSwitch = false
             }
 
         @RequiresApi(api = Build.VERSION_CODES.TIRAMISU)
@@ -472,23 +460,17 @@ class SettingsFragment : BaseFragment() {
         }
     }
 
-    @SuppressLint("ClickableViewAccessibility")
     private fun setUpPasscodeLockSettingItem() {
         binding.includePasscodeLockSetting.materialSwitch
-            .setOnTouchListener { _: View, event: MotionEvent ->
-                if (event.action == MotionEvent.ACTION_DOWN) {
-                    isTouchedPasscodeLockSwitch = true
-                }
-                false
-            }
-        binding.includePasscodeLockSetting.materialSwitch
             .setOnCheckedChangeListener { _: CompoundButton, isChecked: Boolean ->
-                if (!isTouchedPasscodeLockSwitch) return@setOnCheckedChangeListener
+                // DateStorePreferences初回読込時の値がtrueの場合、本メソッドが呼び出される。
+                // 初回読込時は処理不要のため下記条件追加。
+                val settingValue = settingsViewModel.isCheckedPasscodeLock.requireValue()
+                if (isChecked == settingValue) return@setOnCheckedChangeListener
 
                 lifecycleScope.launch(Dispatchers.IO) {
                     settingsViewModel.savePasscodeLock(isChecked)
                 }
-                isTouchedPasscodeLockSwitch = false
             }
 
         launchAndRepeatOnLifeCycleStarted {
@@ -503,7 +485,6 @@ class SettingsFragment : BaseFragment() {
     //      SettingViewModelの対象isCheckedStateFlowは"false"かつ、
     //      OnCheckedChangeListenerはユーザーがタッチした時に限り処理されるよう条件が入っている為、問題は発生していない。
     //      原因は不明。(Fragment、layout.xmlでのMaterialSwitchの設定に問題なし)
-    @SuppressLint("ClickableViewAccessibility")
     private fun setUpWeatherInfoAcquisitionSettingItem() {
         // MEMO:端末設定画面で"許可 -> 無許可"に変更したときの対応コード
         val isGranted = mainActivity.isGrantedAccessLocation
@@ -512,14 +493,6 @@ class SettingsFragment : BaseFragment() {
                 settingsViewModel.saveWeatherInfoAcquisition(false)
             }
         }
-
-        binding.includeWeatherInfoAcquisitionSetting.materialSwitch
-            .setOnTouchListener { _: View, event: MotionEvent ->
-                if (event.action == MotionEvent.ACTION_DOWN) {
-                    isTouchedWeatherInfoAcquisitionSwitch = true
-                }
-                false
-            }
 
         binding.includeWeatherInfoAcquisitionSetting.materialSwitch
             .setOnCheckedChangeListener(
@@ -531,7 +504,10 @@ class SettingsFragment : BaseFragment() {
 
         : CompoundButton.OnCheckedChangeListener {
         override fun onCheckedChanged(buttonView: CompoundButton, isChecked: Boolean) {
-            if (!isTouchedWeatherInfoAcquisitionSwitch) return
+            // DateStorePreferences初回読込時の値がtrueの場合、本メソッドが呼び出される。
+            // 初回読込時は処理不要のため下記条件追加。
+            val settingValue = settingsViewModel.isCheckedWeatherInfoAcquisition.requireValue()
+            if (isChecked == settingValue) return
 
             if (isChecked) {
                 val isGranted = mainActivity.isGrantedAccessLocation
@@ -568,7 +544,6 @@ class SettingsFragment : BaseFragment() {
                     settingsViewModel.saveWeatherInfoAcquisition(false)
                 }
             }
-            isTouchedWeatherInfoAcquisitionSwitch = false
         }
     }
 
