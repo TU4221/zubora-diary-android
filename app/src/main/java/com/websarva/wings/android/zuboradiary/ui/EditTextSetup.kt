@@ -20,10 +20,6 @@ open class EditTextSetup(private val activity: Activity) {
         keyboardInitializer.hide(view)
     }
 
-    fun setUpScrollable(vararg editTexts: EditText) {
-        Arrays.stream(editTexts).forEach { editText: EditText -> this.setUpScrollable(editText) }
-    }
-
     protected fun setUpScrollable(editText: EditText) {
         editText.onFocusChangeListener = EditTextScrollableOnFocusChangeListener()
     }
