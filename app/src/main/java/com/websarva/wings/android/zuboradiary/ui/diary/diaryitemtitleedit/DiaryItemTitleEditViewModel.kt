@@ -53,17 +53,21 @@ class DiaryItemTitleEditViewModel @Inject constructor(
 
     private fun setUpItemTitleSelectionHistoryList() {
         viewModelScope.launch(Dispatchers.IO) {
-            itemTitleSelectionHistoryList =
-                diaryItemTitleSelectionHistoryRepository
-                    .loadSelectionHistory(MAX_LOADED_ITEM_TITLES, 0)
-                    .map { list ->
-                        list.map { item ->
-                            SelectionHistoryListItem(item)
+            try {
+                itemTitleSelectionHistoryList =
+                    diaryItemTitleSelectionHistoryRepository
+                        .loadSelectionHistory(MAX_LOADED_ITEM_TITLES, 0)
+                        .map { list ->
+                            list.map { item ->
+                                SelectionHistoryListItem(item)
 
-                        }
-                    }.map { list ->
-                        SelectionHistoryList(list)
-                    }.stateIn(this)
+                            }
+                        }.map { list ->
+                            SelectionHistoryList(list)
+                        }.stateIn(this)
+            } catch (e: Exception) {
+                addAppMessage(AppMessage.DIARY_ITEM_TITLE_HISTORY_LOADING_ERROR)
+            }
         }
     }
 
