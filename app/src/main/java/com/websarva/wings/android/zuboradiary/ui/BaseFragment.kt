@@ -118,12 +118,12 @@ abstract class BaseFragment : CustomFragment() {
         // HACK:ボトムナビゲーションタブでFragment切替時はEnterTransitionで設定されるエフェクトを変更する。
         //      NavigationStartFragment(DiaryListFragment)はReenterTransitionで設定されたエフェクトが処理される。
         //      遷移元FragmentのエフェクトはMainActivityクラスにて設定。
-
-        enterTransition = if (mainActivity.wasSelectedTab) {
-            MaterialFadeThrough() as Transition // MEMO:"as Transition"は警告対策
+        val enterTransitionType: Transition = if (mainActivity.wasSelectedTab) {
+            MaterialFadeThrough()
         } else {
             MaterialSharedAxis(MaterialSharedAxis.X, true)
         }
+        enterTransition = enterTransitionType
 
         // FROM - TO の FROM として消えるアニメーション
         exitTransition = MaterialSharedAxis(
@@ -132,14 +132,15 @@ abstract class BaseFragment : CustomFragment() {
         )
 
         // TO - FROM の FROM として現れるアニメーション
-        reenterTransition = if (mainActivity.wasSelectedTab) {
-            MaterialFadeThrough() as Transition // MEMO:"as Transition"は警告対策
+        val reenterTransitionType: Transition = if (mainActivity.wasSelectedTab) {
+            MaterialFadeThrough()
         } else {
             MaterialSharedAxis(
                 MaterialSharedAxis.X,
                 false
             )
         }
+        reenterTransition = reenterTransitionType
 
         // TO - FROM の TO として消えるアニメーション
         returnTransition = MaterialSharedAxis(
