@@ -1,18 +1,6 @@
 package com.websarva.wings.android.zuboradiary.ui.diary.diaryitemtitleedit
 
-class SelectionHistoryList {
+class SelectionHistoryList(itemList: List<SelectionHistoryListItem>) {
 
-    val selectionHistoryListItemList: List<SelectionHistoryListItem>
-
-    constructor(itemList: List<SelectionHistoryListItem>) {
-        selectionHistoryListItemList = itemList.toList()
-    }
-
-    constructor() : this(listOf())
-
-    fun deleteItem(position: Int): SelectionHistoryList {
-        val result = selectionHistoryListItemList.toMutableList()
-        result.removeAt(position)
-        return SelectionHistoryList(result)
-    }
+    val selectionHistoryListItemList: List<SelectionHistoryListItem> = itemList.toList()
 }
