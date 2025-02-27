@@ -8,7 +8,12 @@ import com.websarva.wings.android.zuboradiary.R
 import java.util.Arrays
 
 // CAUTION:要素の追加、順序変更を行った時はThemeColorPickerDialogFragment、string.xmlを修正すること。
-enum class ThemeColor(private val number: Int, private val stringResId: Int) {
+// MEMO:constructorは直接使用されていないが必要な為、@Suppressで警告回避。
+enum class ThemeColor @Suppress("unused") constructor(
+    private val number: Int,
+    private val stringResId: Int
+) {
+
     WHITE(0, R.string.enum_theme_color_white),
     BLACK(1, R.string.enum_theme_color_black),
     RED(2, R.string.enum_theme_color_red),

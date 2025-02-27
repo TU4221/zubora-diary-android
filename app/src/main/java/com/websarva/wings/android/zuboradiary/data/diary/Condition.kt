@@ -4,12 +4,22 @@ import android.content.Context
 import com.websarva.wings.android.zuboradiary.R
 import java.util.Arrays
 
-enum class Condition(private val number: Int, private val stringResId: Int) {
+// MEMO:constructorは直接使用されていないが必要な為、@Suppressで警告回避。
+enum class Condition @Suppress("unused") constructor(
+    private val number: Int,
+    private val stringResId: Int
+) {
+
     UNKNOWN(0, R.string.enum_condition_unknown),
+    @Suppress("unused") // 下記定数は直接使用されていないが必要な為、@Suppressで警告回避。
     HAPPY(1, R.string.enum_condition_happy),
+    @Suppress("unused") // 同上
     GOOD(2, R.string.enum_condition_good),
+    @Suppress("unused") // 同上
     AVERAGE(3, R.string.enum_condition_average),
+    @Suppress("unused") // 同上
     POOR(4, R.string.enum_condition_poor),
+    @Suppress("unused") // 同上
     BAD(5, R.string.enum_condition_bad);
 
     companion object {

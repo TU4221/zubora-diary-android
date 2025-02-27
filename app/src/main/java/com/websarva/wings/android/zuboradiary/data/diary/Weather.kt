@@ -4,7 +4,12 @@ import android.content.Context
 import com.websarva.wings.android.zuboradiary.R
 import java.util.Arrays
 
-enum class Weather(private val number: Int, private val stringResId: Int) {
+// MEMO:constructorは直接使用されていないが必要な為、@Suppressで警告回避。
+enum class Weather @Suppress("unused") constructor(
+    private val number: Int,
+    private val stringResId: Int
+) {
+
     UNKNOWN(0, R.string.enum_weather_unknown),
     SUNNY(1, R.string.enum_weather_sunny),
     CLOUDY(2, R.string.enum_weather_cloudy),
