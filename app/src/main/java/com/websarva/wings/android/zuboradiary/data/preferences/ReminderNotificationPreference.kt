@@ -8,6 +8,7 @@ import java.time.LocalTime
 
 class ReminderNotificationPreference {
 
+    @Suppress("unused") // MEMO:デフォルトパラメータで使用する為、@Suppressで警告回避。
     companion object {
         private const val IS_CHECKED_DEFAULT_VALUE = false
         private const val NOTIFICATION_TIME_DEFAULT_VALUE = ""

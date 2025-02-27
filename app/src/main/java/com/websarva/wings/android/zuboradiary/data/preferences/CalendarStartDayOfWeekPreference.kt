@@ -8,6 +8,7 @@ import java.time.DayOfWeek
 
 class CalendarStartDayOfWeekPreference {
 
+    @Suppress("unused") // MEMO:デフォルトパラメータで使用する為、@Suppressで警告回避。
     companion object {
         private val DAY_OF_WEEK_DEFAULT_VALUE = DayOfWeek.SUNDAY
     }

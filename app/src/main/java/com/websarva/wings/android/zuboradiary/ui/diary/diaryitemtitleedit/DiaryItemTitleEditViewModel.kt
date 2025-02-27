@@ -20,11 +20,8 @@ class DiaryItemTitleEditViewModel @Inject constructor(
     private val diaryItemTitleSelectionHistoryRepository: DiaryItemTitleSelectionHistoryRepository
 ) : BaseViewModel() {
 
-    companion object {
-        private const val MAX_LOADED_ITEM_TITLES = 50
-    }
-
     private val initialItemNumber = null
+    private val maxLoadedItemTitles = 50
     private val _itemNumber = MutableStateFlow<ItemNumber?>(initialItemNumber)
     val itemNumber get() = _itemNumber.asStateFlow()
 
@@ -56,7 +53,7 @@ class DiaryItemTitleEditViewModel @Inject constructor(
             try {
                 itemTitleSelectionHistoryList =
                     diaryItemTitleSelectionHistoryRepository
-                        .loadSelectionHistory(MAX_LOADED_ITEM_TITLES, 0)
+                        .loadSelectionHistory(maxLoadedItemTitles, 0)
                         .map { list ->
                             list.map { item ->
                                 SelectionHistoryListItem(item)

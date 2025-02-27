@@ -6,6 +6,7 @@ import androidx.datastore.preferences.core.booleanPreferencesKey
 
 class WeatherInfoAcquisitionPreference {
 
+    @Suppress("unused") // MEMO:デフォルトパラメータで使用する為、@Suppressで警告回避。
     companion object {
         private const val IS_CHECKED_DEFAULT_VALUE = false
     }

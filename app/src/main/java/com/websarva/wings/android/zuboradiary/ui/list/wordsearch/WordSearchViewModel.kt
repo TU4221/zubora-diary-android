@@ -22,10 +22,6 @@ class WordSearchViewModel @Inject internal constructor(
     private val diaryRepository: DiaryRepository
 ) : BaseViewModel() {
 
-    companion object {
-        private const val NUM_LOADING_ITEMS = DiaryListViewModel.NUM_LOADING_ITEMS
-    }
-
     private val initialSearchWord = ""
     private val _searchWord = MutableStateFlow(initialSearchWord)
     val searchWord
@@ -38,6 +34,7 @@ class WordSearchViewModel @Inject internal constructor(
 
     private var wordSearchResultListLoadingJob: Job? = null // キャンセル用
 
+    private val numLoadingItems = DiaryListViewModel.NUM_LOADING_ITEMS
     private val initialWordSearchResultList = WordSearchResultYearMonthList()
     private val _wordSearchResultList = MutableStateFlow(initialWordSearchResultList)
     val wordSearchResultList
@@ -170,7 +167,7 @@ class WordSearchViewModel @Inject internal constructor(
             showWordSearchResultListFirstItemProgressIndicator()
             if (isValidityDelay) delay(1000)
             return loadWordSearchResultDiaryList(
-                NUM_LOADING_ITEMS,
+                numLoadingItems,
                 0,
                 spannableStringColor,
                 spannableStringBackGroundColor
@@ -198,7 +195,7 @@ class WordSearchViewModel @Inject internal constructor(
             val loadingOffset = currentResultList.countDiaries()
             val loadedResultList =
                 loadWordSearchResultDiaryList(
-                    NUM_LOADING_ITEMS,
+                    numLoadingItems,
                     loadingOffset,
                     spannableStringColor,
                     spannableStringBackGroundColor
@@ -227,8 +224,8 @@ class WordSearchViewModel @Inject internal constructor(
                 // HACK:画面全体にリストアイテムが存在しない状態で日記を追加した後にリスト画面に戻ると、
                 //      日記追加前のアイテム数しか表示されない状態となる。また、スクロール更新もできない。
                 //      対策として下記コードを記述。
-                if (numLoadingItems < NUM_LOADING_ITEMS) {
-                    numLoadingItems = NUM_LOADING_ITEMS
+                if (numLoadingItems < this@WordSearchViewModel.numLoadingItems) {
+                    numLoadingItems = this@WordSearchViewModel.numLoadingItems
                 }
                 return loadWordSearchResultDiaryList(
                     numLoadingItems,

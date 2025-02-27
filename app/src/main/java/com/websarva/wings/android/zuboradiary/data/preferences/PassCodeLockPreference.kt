@@ -7,6 +7,7 @@ import androidx.datastore.preferences.core.stringPreferencesKey
 
 class PassCodeLockPreference {
 
+    @Suppress("unused") // MEMO:デフォルトパラメータで使用する為、@Suppressで警告回避。
     companion object {
         private const val IS_CHECKED_DEFAULT_VALUE = false
         private const val PASS_CODE_DEFAULT_VALUE = ""

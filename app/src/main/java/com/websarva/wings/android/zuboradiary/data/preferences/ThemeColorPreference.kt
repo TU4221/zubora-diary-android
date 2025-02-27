@@ -7,6 +7,7 @@ import androidx.datastore.preferences.core.intPreferencesKey
 
 class ThemeColorPreference {
 
+    @Suppress("unused") // MEMO:デフォルトパラメータで使用する為、@Suppressで警告回避。
     companion object {
         private val THEME_COLOR_DEFAULT_VALUE = ThemeColor.entries[0]
     }

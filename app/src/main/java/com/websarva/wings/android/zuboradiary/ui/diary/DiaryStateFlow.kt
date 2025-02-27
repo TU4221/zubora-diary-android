@@ -192,10 +192,8 @@ class DiaryStateFlow {
 
     class DiaryItemStateFlow(val itemNumber: Int) {
 
-        companion object {
-            const val MIN_ITEM_NUMBER: Int = ItemNumber.MIN_NUMBER
-            const val MAX_ITEM_NUMBER: Int = ItemNumber.MAX_NUMBER
-        }
+        private val minItemNumber = ItemNumber.MIN_NUMBER
+        private val maxItemNumber = ItemNumber.MAX_NUMBER
 
         // MEMO:双方向DataBindingが必要の為、MutableStateFlow変数はアクセス修飾子をpublicとする。
         //      StateFlow変数を用意しても意味がないので作成しない。
@@ -216,7 +214,7 @@ class DiaryStateFlow {
         }
 
         private fun isItemNumberInRange(itemNumber: Int): Boolean {
-            return itemNumber in MIN_ITEM_NUMBER..MAX_ITEM_NUMBER
+            return itemNumber in minItemNumber..maxItemNumber
         }
 
         fun initialize() {
