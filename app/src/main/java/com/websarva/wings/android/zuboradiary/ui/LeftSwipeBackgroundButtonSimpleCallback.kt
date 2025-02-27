@@ -117,8 +117,9 @@ open class LeftSwipeBackgroundButtonSimpleCallback(recyclerView: RecyclerView) :
     }
 
     override fun translateForegroundView(
-        c: Canvas, recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder,
-        dX: Float, dY: Float, actionState: Int, isCurrentlyActive: Boolean
+        viewHolder: RecyclerView.ViewHolder,
+        dX: Float,
+        actionState: Int
     ) {
         if (actionState != ItemTouchHelper.ACTION_STATE_SWIPE) return
 

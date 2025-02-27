@@ -238,12 +238,13 @@ open class LeftSwipeSimpleCallback(protected val recyclerView: RecyclerView) :
             Log.d("LeftSwipeSimpleCallBack", "onChildDraw()_swipedAdapterPosition:Clear")
         }
 
-        translateForegroundView(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive)
+        translateForegroundView(viewHolder, dX, actionState)
     }
 
     protected open fun translateForegroundView(
-        c: Canvas, recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder,
-        dX: Float, dY: Float, actionState: Int, isCurrentlyActive: Boolean
+        viewHolder: RecyclerView.ViewHolder,
+        dX: Float,
+        actionState: Int
     ) {
         val leftSwipeViewHolder = viewHolder as LeftSwipeViewHolder
         leftSwipeViewHolder.foregroundView.translationX = dX
