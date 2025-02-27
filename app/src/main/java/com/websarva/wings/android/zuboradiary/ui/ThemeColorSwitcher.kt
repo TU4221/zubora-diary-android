@@ -42,9 +42,6 @@ open class ThemeColorSwitcher(protected val context: Context, protected val them
     }
 
     fun switchStatusBarColor(window: Window) {
-        val surfaceColor = themeColor.getSurfaceColor(resources)
-        window.statusBarColor = surfaceColor // TODO:後日対応
-
         // ステータスバーのアイコンの色を変更(白 or 灰)
         val isLight = themeColor.isAppearanceLightStatusBars
         WindowInsetsControllerCompat(window, window.decorView).isAppearanceLightStatusBars = isLight

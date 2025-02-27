@@ -8,6 +8,7 @@ import android.os.Bundle
 import android.os.Looper
 import android.util.Log
 import android.view.MenuItem
+import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
@@ -107,7 +108,10 @@ class MainActivity : AppCompatActivity() {
             return isGrantedAccessFineLocation && isGrantedAccessCoarseLocation
         }
 
+    @RequiresApi(Build.VERSION_CODES.Q)
     override fun onCreate(savedInstanceState: Bundle?) {
+        installSplashScreen().setKeepOnScreenCondition { !isMainActivityLayoutInflated }
+        setUpEdgeToEdge()
         super.onCreate(savedInstanceState)
 
         setUpViewModel()
@@ -125,9 +129,15 @@ class MainActivity : AppCompatActivity() {
                     }
             }
         }
+    }
 
-
-        installSplashScreen().setKeepOnScreenCondition { !isMainActivityLayoutInflated }
+    // MEMO:EdgeToEdge対応。下記ページ参照。
+    //      https://developer.android.com/develop/ui/views/layout/edge-to-edge?hl=ja
+    //      https://developer.android.com/codelabs/edge-to-edge?hl=ja#2
+    @RequiresApi(Build.VERSION_CODES.Q)
+    private fun setUpEdgeToEdge() {
+        enableEdgeToEdge()
+        window.isNavigationBarContrastEnforced = false
     }
 
     private fun setUpViewModel() {
