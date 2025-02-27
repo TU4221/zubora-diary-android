@@ -5,5 +5,4 @@ import java.time.LocalDateTime
 
 class SelectionHistoryListItem(item: DiaryItemTitleSelectionHistoryItemEntity) {
     val title: String = item.title
-    val log: LocalDateTime = LocalDateTime.parse(item.log)
 }
