@@ -4,10 +4,8 @@ import android.util.Log
 import com.squareup.moshi.Json
 import com.websarva.wings.android.zuboradiary.data.diary.Weather
 
-// HACK:Retrofit2(Moshi)を使用して本クラスをインスタンス化する時、引数ありのコンストラクタは処理されない。
-//      引数なしコンストラクタ処理時は、フィールド変数の値は未格納。
-//      原因が明らかになるまで、フィールド変数参照時はNullチェック等を行う。
-data class WeatherApiData (
+// MEMO:constructorは直接使用されていないがRetrofit2(Moshi)にてインスタンス化している為、@Suppressで警告回避。
+data class WeatherApiData @Suppress("unused") constructor(
     // MEMO:フィールド変数はRetrofit2(Moshi)にて代入。
     private val latitude: Float,
     private val longitude: Float,
@@ -40,11 +38,10 @@ data class WeatherApiData (
         }
     }
 
-    data class WeatherApiResponseDairy(
-        // MEMO:フィールド変数はRetrofit2(Moshi)にて代入。
+    // MEMO:constructorは直接使用されていないがRetrofit2(Moshi)にてインスタンス化している為、@Suppressで警告回避。
+    data class WeatherApiResponseDairy @Suppress("unused") constructor(
         @Json(name = "time")
         val times: Array<String>,
-
         @Json(name = "weather_code")
         val weatherCodes: IntArray
     ) {
