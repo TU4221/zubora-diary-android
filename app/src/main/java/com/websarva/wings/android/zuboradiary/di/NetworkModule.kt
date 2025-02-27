@@ -9,7 +9,6 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
-import javax.inject.Qualifier
 import javax.inject.Singleton
 
 @Module
@@ -36,12 +35,7 @@ object NetworkModule {
         return MoshiConverterFactory.create(moshi)
     }
 
-    @Qualifier
-    @Retention(AnnotationRetention.RUNTIME)
-    private annotation class WeatherApiRetrofit
-
     @JvmStatic
-    @WeatherApiRetrofit
     @Singleton
     @Provides
     fun provideWeatherApiRetrofit(moshiConverterFactory: MoshiConverterFactory): Retrofit {
@@ -54,7 +48,7 @@ object NetworkModule {
     @JvmStatic
     @Singleton
     @Provides
-    fun provideWeatherApiService(@WeatherApiRetrofit retrofit: Retrofit): WeatherApiService {
+    fun provideWeatherApiService(retrofit: Retrofit): WeatherApiService {
         return retrofit.create(WeatherApiService::class.java)
     }
 }
