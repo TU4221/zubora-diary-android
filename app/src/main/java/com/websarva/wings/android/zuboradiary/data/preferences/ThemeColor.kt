@@ -63,18 +63,6 @@ enum class ThemeColor(private val number: Int, private val stringResId: Int) {
         return ResourcesCompat.getColor(resources, colorResId, null)
     }
 
-    fun getPrimaryContainerColor(resources: Resources): Int {
-        val colorResId = when (this) {
-            WHITE -> R.color.md_theme_color_white_primaryContainer
-            BLACK -> R.color.md_theme_color_black_primaryContainer
-            RED -> R.color.md_theme_color_red_primaryContainer
-            BLUE -> R.color.md_theme_color_blue_primaryContainer
-            GREEN -> R.color.md_theme_color_green_primaryContainer
-            YELLOW -> R.color.md_theme_color_yellow_primaryContainer
-        }
-        return ResourcesCompat.getColor(resources, colorResId, null)
-    }
-
     fun getOnPrimaryContainerColor(resources: Resources): Int {
         val colorResId = when (this) {
             WHITE -> R.color.md_theme_color_white_onPrimaryContainer
