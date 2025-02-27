@@ -35,7 +35,8 @@ abstract class DiaryYearMonthListBaseAdapter protected constructor(
     protected var isLoadingListOnScrolled = false
         private set
 
-    enum class ViewType(val viewTypeNumber: Int) {
+    // MEMO:constructorは直接使用されていないが必要な為、@Suppressで警告回避。
+    enum class ViewType @Suppress("unused") constructor(val viewTypeNumber: Int) {
         DIARY(0),
         PROGRESS_INDICATOR(1),
         NO_DIARY_MESSAGE(2)
