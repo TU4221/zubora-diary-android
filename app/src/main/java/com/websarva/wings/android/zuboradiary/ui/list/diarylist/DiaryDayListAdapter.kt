@@ -47,7 +47,7 @@ class DiaryDayListAdapter(context: Context, recyclerView: RecyclerView, themeCol
         item: DiaryDayListBaseItem
     ) {
         if (holder !is DiaryDayListViewHolder) throw IllegalStateException()
-        holder.binding.linerLayoutForeground.setOnClickListener {
+        holder.foregroundView.setOnClickListener {
             onClickItem(item)
         }
     }
@@ -82,15 +82,17 @@ class DiaryDayListAdapter(context: Context, recyclerView: RecyclerView, themeCol
     ) {
         if (holder !is DiaryDayListViewHolder) throw IllegalStateException()
 
-        holder.binding.includeBackground.imageButtonDelete.setOnClickListener {
+        holder.backgroundButtonView.setOnClickListener {
             onClickDeleteButton(item)
         }
     }
 
     class DiaryDayListViewHolder(val binding: RowDiaryDayListBinding)
         : LeftSwipeViewHolder(binding) {
-        override val foregroundView = binding.linerLayoutForeground
-        override val backgroundButtonView = binding.includeBackground.imageButtonDelete
+        override val foregroundView
+            get() = binding.linerLayoutForeground
+        override val backgroundButtonView
+            get() = binding.includeBackground.imageButtonDelete
     }
 
     private class DiaryDayListDiffUtilItemCallback : DiffUtilItemCallback() {

@@ -55,12 +55,14 @@ internal class ItemTitleSelectionHistoryListAdapter
     override fun onBindViewHolder(holder: ItemTitleSelectionHistoryViewHolder, position: Int) {
         val item = checkNotNull(getItem(position))
         val title = item.title
-        holder.binding.textTitle.text = title
-        holder.binding.textTitle.setOnClickListener {
-            if (onClickItemListener == null) return@setOnClickListener
-            checkNotNull(onClickItemListener).onClick(title)
+        holder.foregroundView.apply {
+            text = title
+            setOnClickListener {
+                if (onClickItemListener == null) return@setOnClickListener
+                checkNotNull(onClickItemListener).onClick(title)
+            }
         }
-        holder.binding.includeBackground.imageButtonDelete.setOnClickListener {
+        holder.backgroundButtonView.setOnClickListener {
             if (onClickDeleteButtonListener == null) return@setOnClickListener
 
             // MEMO:onBindViewHolder()の引数であるpositionを使用すると警告がでる。
@@ -85,10 +87,12 @@ internal class ItemTitleSelectionHistoryListAdapter
     }
 
     internal class ItemTitleSelectionHistoryViewHolder(
-        val binding: RowItemTitleSelectionHistoryBinding,
+        val binding: RowItemTitleSelectionHistoryBinding
     ) : LeftSwipeViewHolder(binding) {
-        override val foregroundView = binding.textTitle
-        override val backgroundButtonView = binding.includeBackground.imageButtonDelete
+        override val foregroundView
+            get() = binding.textTitle
+        override val backgroundButtonView
+            get() = binding.includeBackground.imageButtonDelete
     }
 
     internal class DiaryItemTitleSelectionHistoryDiffUtilItemCallback
