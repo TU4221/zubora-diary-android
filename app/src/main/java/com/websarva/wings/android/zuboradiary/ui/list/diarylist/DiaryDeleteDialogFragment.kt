@@ -15,9 +15,6 @@ class DiaryDeleteDialogFragment : BaseAlertDialogFragment() {
         val KEY_DELETE_DIARY_PICTURE_URI: String = "DeleteDiaryPictureUri$fromClassName"
     }
 
-    override val isCancelableOtherThanPressingButton
-        get() = true
-
     override fun createTitle(): String {
         return getString(R.string.dialog_diary_delete_title)
     }

@@ -38,16 +38,8 @@ abstract class BaseBottomSheetDialogFragment : BottomSheetDialogFragment() {
         // MEMO:下記機能を無効にするにはDialogFragment#setCancelableを設定する必要あり。
         //      ・UIに表示されているダイアログ外の部分をタッチしてダイアログを閉じる(キャンセル)
         //      ・端末の戻るボタンでダイアログを閉じる(キャンセルする)
-        if (!isCancelableOtherThanPressingButton) this.isCancelable = false
+        isCancelable = false
     }
-
-    /**
-     * 戻り値をtrueにすると、ダイアログ枠外、戻るボタンタッチ時にダイアログをキャンセルすることを可能にする。
-     * BaseBottomSheetDialogFragment#setUpDialogCancelFunction()で呼び出される。
-     *
-     * @noinspection SameReturnValue
-     */
-    protected abstract val isCancelableOtherThanPressingButton: Boolean
 
     private fun createSettingsViewModel(): SettingsViewModel {
         val provider = ViewModelProvider(requireActivity())

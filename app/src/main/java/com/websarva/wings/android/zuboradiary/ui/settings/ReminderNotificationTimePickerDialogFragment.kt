@@ -20,9 +20,6 @@ class ReminderNotificationTimePickerDialogFragment : BaseNumberPickersBottomShee
         val KEY_SELECTED_TIME: String = "SelectedTIME$fromClassName"
     }
 
-    override val isCancelableOtherThanPressingButton
-        get() = true
-
     override fun handleOnPositiveButtonClick(v: View) {
         setResultSelectedYearMonth()
     }

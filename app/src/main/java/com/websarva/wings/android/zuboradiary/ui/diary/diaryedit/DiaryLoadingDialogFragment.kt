@@ -13,9 +13,6 @@ class DiaryLoadingDialogFragment : BaseAlertDialogFragment() {
         val KEY_SELECTED_BUTTON: String = "SelectedButton$fromClassName"
     }
 
-    override val isCancelableOtherThanPressingButton
-        get() = true
-
     override fun createTitle(): String {
         return getString(R.string.dialog_diary_loading_title)
     }

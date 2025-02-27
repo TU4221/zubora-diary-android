@@ -3,7 +3,6 @@ package com.websarva.wings.android.zuboradiary.ui
 import android.app.Dialog
 import android.content.DialogInterface
 import android.os.Bundle
-import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.NavHostFragment
@@ -19,13 +18,6 @@ abstract class BaseAlertDialogFragment : DialogFragment() {
     private val themeColor
         get() = settingsViewModel.themeColor.requireValue()
 
-    /**
-     * 戻り値をtrueにすると、ダイアログ枠外、戻るボタンタッチ時にダイアログをキャンセルすることを可能にする。
-     *
-     * @noinspection SameReturnValue
-     */
-    protected abstract val isCancelableOtherThanPressingButton: Boolean
-
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         super.onCreateDialog(savedInstanceState)
 
@@ -33,14 +25,11 @@ abstract class BaseAlertDialogFragment : DialogFragment() {
 
         val themeResId = themeColor.alertDialogThemeResId
         val builder = MaterialAlertDialogBuilder(requireContext(), themeResId)
-
         customizeDialog(builder)
 
-        val alertDialog = builder.create()
+        setUpDialogCancelFunction()
 
-        setUpDialogCancelFunction(alertDialog)
-
-        return alertDialog
+        return builder.create()
     }
 
     private fun createSettingsViewModel(): SettingsViewModel {
@@ -64,14 +53,11 @@ abstract class BaseAlertDialogFragment : DialogFragment() {
         }
     }
 
-    private fun setUpDialogCancelFunction(alertDialog: AlertDialog) {
+    private fun setUpDialogCancelFunction() {
         // MEMO:下記機能を無効にするにはAlertDialog#setCanceledOnTouchOutside、DialogFragment#setCancelableを設定する必要あり。
         //      ・UIに表示されているダイアログ外の部分をタッチしてダイアログを閉じる(キャンセル)(AlertDialog#setCanceledOnTouchOutside)
         //      ・端末の戻るボタンでダイアログを閉じる(キャンセルする)(DialogFragment#setCancelable)
-        if (!isCancelableOtherThanPressingButton) {
-            alertDialog.setCanceledOnTouchOutside(false)
-            this.isCancelable = false
-        }
+        isCancelable = false
     }
 
     /**

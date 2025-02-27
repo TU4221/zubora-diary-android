@@ -15,9 +15,6 @@ class CalendarStartDayPickerDialogFragment : BaseNumberPickersBottomSheetDialogF
         val KEY_SELECTED_DAY_OF_WEEK: String = "SelectedDayOfWeek$FROM_CLASS_NAME"
     }
 
-    override val isCancelableOtherThanPressingButton
-        get() = true
-
     override fun handleOnPositiveButtonClick(v: View) {
         setResultSelectedDayOfWeek()
     }
