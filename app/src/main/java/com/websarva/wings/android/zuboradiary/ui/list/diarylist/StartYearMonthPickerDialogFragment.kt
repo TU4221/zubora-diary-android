@@ -27,15 +27,11 @@ class StartYearMonthPickerDialogFragment : BaseNumberPickersBottomSheetDialogFra
     }
 
     override fun handleOnNegativeButtonClick() {
-        // 処理なし
+        setResult(KEY_SELECTED_YEAR_MONTH, null)
     }
 
     override fun handleOnCancel() {
-        // 処理なし
-    }
-
-    override fun handleOnDismiss() {
-        // 処理なし
+        setResult(KEY_SELECTED_YEAR_MONTH, null)
     }
 
     override fun setUpNumberPickers(binding: DialogFragmentNumberPickersBinding) {

@@ -25,14 +25,11 @@ class ThemeColorPickerDialogFragment : BaseNumberPickersBottomSheetDialogFragmen
     }
 
     override fun handleOnNegativeButtonClick() {
-        // 処理なし
+        setResult(KEY_SELECTED_THEME_COLOR, null)
     }
 
     override fun handleOnCancel() {
-        // 処理なし
-    }
-
-    override fun handleOnDismiss() {
+        setResult(KEY_SELECTED_THEME_COLOR, null)
     }
 
     override fun setUpNumberPickers(binding: DialogFragmentNumberPickersBinding) {

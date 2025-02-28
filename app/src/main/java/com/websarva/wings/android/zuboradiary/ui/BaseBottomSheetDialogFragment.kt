@@ -105,13 +105,11 @@ abstract class BaseBottomSheetDialogFragment : BottomSheetDialogFragment() {
      */
     protected abstract fun handleOnCancel()
 
-    override fun dismiss() {
-        handleOnDismiss()
-        super.dismiss()
-    }
+    protected fun setResult(resultKey: String, result: Any?) {
+        val navController = NavHostFragment.findNavController(this)
+        val navBackStackEntry = checkNotNull(navController.previousBackStackEntry)
+        val savedStateHandle = navBackStackEntry.savedStateHandle
 
-    /**
-     * BaseBottomSheetDialogFragment.dismiss()で呼び出される。
-     */
-    protected abstract fun handleOnDismiss()
+        savedStateHandle[resultKey] = result
+    }
 }

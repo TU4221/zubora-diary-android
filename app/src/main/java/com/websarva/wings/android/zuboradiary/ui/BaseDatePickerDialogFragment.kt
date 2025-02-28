@@ -4,6 +4,7 @@ import android.app.Dialog
 import android.os.Bundle
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.fragment.NavHostFragment
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.websarva.wings.android.zuboradiary.ui.settings.SettingsViewModel
 import java.time.Instant
@@ -77,11 +78,6 @@ abstract class BaseDatePickerDialogFragment : DialogFragment() {
             handleOnCancel()
             dummyDialog.dismiss()
         }
-
-        datePicker.addOnDismissListener {
-            handleOnDismiss()
-            dummyDialog.dismiss()
-        }
     }
 
     protected abstract fun handleOnPositiveButtonClick(selectedDate: LocalDate)
@@ -90,5 +86,12 @@ abstract class BaseDatePickerDialogFragment : DialogFragment() {
 
     protected abstract fun handleOnCancel()
 
-    protected abstract fun handleOnDismiss()
+    @Suppress("SameParameterValue")
+    protected fun setResult(resultKey: String, result: Any?) {
+        val navController = NavHostFragment.findNavController(this)
+        val navBackStackEntry = checkNotNull(navController.previousBackStackEntry)
+        val savedStateHandle = navBackStackEntry.savedStateHandle
+
+        savedStateHandle[resultKey] = result
+    }
 }

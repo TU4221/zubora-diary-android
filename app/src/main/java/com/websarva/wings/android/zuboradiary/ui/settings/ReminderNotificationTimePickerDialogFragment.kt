@@ -41,10 +41,6 @@ class ReminderNotificationTimePickerDialogFragment : BaseNumberPickersBottomShee
         setResult(KEY_SELECTED_BUTTON, DialogInterface.BUTTON_NEGATIVE)
     }
 
-    override fun handleOnDismiss() {
-        // 処理なし
-    }
-
     override fun setUpNumberPickers(binding: DialogFragmentNumberPickersBinding) {
         val localTime = LocalTime.now()
         binding.numberPickerFirst.maxValue = 23

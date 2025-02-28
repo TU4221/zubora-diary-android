@@ -27,26 +27,22 @@ class DiaryItemTitleDeleteDialogFragment : BaseAlertDialogFragment() {
     }
 
     override fun handleOnPositiveButtonClick() {
-        processResults(DialogInterface.BUTTON_POSITIVE)
+        setResults(DialogInterface.BUTTON_POSITIVE)
     }
 
     override fun handleOnNegativeButtonClick() {
-        processResults(DialogInterface.BUTTON_NEGATIVE)
+        setResults(DialogInterface.BUTTON_NEGATIVE)
     }
 
     override fun handleOnCancel() {
-        processResults(DialogInterface.BUTTON_NEGATIVE)
+        setResults(DialogInterface.BUTTON_NEGATIVE)
     }
 
-    private fun processResults(status: Int) {
+    private fun setResults(status: Int) {
         setResult(KEY_SELECTED_BUTTON, status)
 
         val deleteListItemPosition =
             DiaryItemTitleDeleteDialogFragmentArgs.fromBundle(requireArguments()).itemPosition
         setResult(KEY_DELETE_LIST_ITEM_POSITION, deleteListItemPosition)
-    }
-
-    override fun handleOnDismiss() {
-        // 処理なし
     }
 }

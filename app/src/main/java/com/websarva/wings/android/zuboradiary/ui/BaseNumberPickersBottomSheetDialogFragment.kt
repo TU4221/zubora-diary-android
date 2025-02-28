@@ -6,7 +6,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.view.ContextThemeWrapper
-import androidx.navigation.fragment.NavHostFragment
 import com.websarva.wings.android.zuboradiary.databinding.DialogFragmentNumberPickersBinding
 
 abstract class BaseNumberPickersBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
@@ -61,13 +60,6 @@ abstract class BaseNumberPickersBottomSheetDialogFragment : BaseBottomSheetDialo
      * BaseNumberPickersBottomSheetDialogFragment#createDialogView()で呼び出される。
      */
     protected abstract fun setUpNumberPickers(binding: DialogFragmentNumberPickersBinding)
-
-    protected fun setResult(key: String, value: Any) {
-        val navController = NavHostFragment.findNavController(this)
-        val navBackStackEntry = checkNotNull(navController.previousBackStackEntry)
-        val savedStateHandle = navBackStackEntry.savedStateHandle
-        savedStateHandle[key] = value
-    }
 
     override fun onDestroyView() {
         super.onDestroyView()

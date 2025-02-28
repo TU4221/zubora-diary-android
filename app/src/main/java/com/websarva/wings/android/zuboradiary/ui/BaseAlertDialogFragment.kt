@@ -57,7 +57,7 @@ abstract class BaseAlertDialogFragment : DialogFragment() {
         // MEMO:下記機能を無効にするにはAlertDialog#setCanceledOnTouchOutside、DialogFragment#setCancelableを設定する必要あり。
         //      ・UIに表示されているダイアログ外の部分をタッチしてダイアログを閉じる(キャンセル)(AlertDialog#setCanceledOnTouchOutside)
         //      ・端末の戻るボタンでダイアログを閉じる(キャンセルする)(DialogFragment#setCancelable)
-        isCancelable = false
+        isCancelable = true
     }
 
     /**
@@ -94,16 +94,6 @@ abstract class BaseAlertDialogFragment : DialogFragment() {
      * BaseAlertDialogFragment.onCancel()で呼び出される。
      */
     protected abstract fun handleOnCancel()
-
-    override fun dismiss() {
-        handleOnDismiss()
-        super.dismiss()
-    }
-
-    /**
-     * BaseAlertDialogFragment.dismiss()で呼び出される。
-     */
-    protected abstract fun handleOnDismiss()
 
     protected fun setResult(resultKey: String, result: Any?) {
         val navController = NavHostFragment.findNavController(this)

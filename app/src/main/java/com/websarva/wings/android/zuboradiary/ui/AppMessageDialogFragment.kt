@@ -26,10 +26,6 @@ class AppMessageDialogFragment : BaseAlertDialogFragment() {
         // 処理なし
     }
 
-    override fun handleOnDismiss() {
-        // 処理なし
-    }
-
     override fun customizeDialog(builder: MaterialAlertDialogBuilder) {
         super.customizeDialog(builder)
         builder.setNegativeButton("", null)

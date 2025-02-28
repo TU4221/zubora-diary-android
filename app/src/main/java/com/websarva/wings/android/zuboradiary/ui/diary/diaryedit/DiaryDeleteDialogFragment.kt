@@ -35,8 +35,4 @@ class DiaryDeleteDialogFragment : BaseAlertDialogFragment() {
     override fun handleOnCancel() {
         setResult(KEY_SELECTED_BUTTON, DialogInterface.BUTTON_NEGATIVE)
     }
-
-    override fun handleOnDismiss() {
-        // 処理なし
-    }
 }

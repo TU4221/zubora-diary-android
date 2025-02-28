@@ -32,14 +32,10 @@ class DiaryItemDeleteDialogFragment : BaseAlertDialogFragment() {
     }
 
     override fun handleOnNegativeButtonClick() {
-        // 処理なし
+        setResult(KEY_DELETE_ITEM_NUMBER, null)
     }
 
     override fun handleOnCancel() {
-        // 処理なし
-    }
-
-    override fun handleOnDismiss() {
-        // 処理なし
+        setResult(KEY_DELETE_ITEM_NUMBER, null)
     }
 }

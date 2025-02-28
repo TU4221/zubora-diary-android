@@ -1,5 +1,6 @@
 package com.websarva.wings.android.zuboradiary.ui.diary.diaryedit
 
+import android.util.Log
 import androidx.navigation.fragment.NavHostFragment
 import com.websarva.wings.android.zuboradiary.ui.BaseDatePickerDialogFragment
 import java.time.LocalDate
@@ -18,23 +19,21 @@ class DatePickerDialogFragment : BaseDatePickerDialogFragment() {
     }
 
     override fun handleOnPositiveButtonClick(selectedDate: LocalDate) {
-        // 選択日付を返す
-        val navController =
-            NavHostFragment.findNavController(this@DatePickerDialogFragment)
-        val navBackStackEntry = checkNotNull(navController.previousBackStackEntry)
-        val savedStateHandle = navBackStackEntry.savedStateHandle
-        savedStateHandle[KEY_SELECTED_DATE] = selectedDate
+        Log.d("20250228", "handleOnPositiveButtonClick")
+        setSelectedDate(selectedDate)
     }
 
     override fun handleOnNegativeButtonClick() {
-        // 処理なし
+        Log.d("20250228", "handleOnNegativeButtonClick")
+        setSelectedDate(null)
     }
 
     override fun handleOnCancel() {
-        // 処理なし
+        Log.d("20250228", "handleOnCancel()")
+        setSelectedDate(null)
     }
 
-    override fun handleOnDismiss() {
-        // 処理なし
+    private fun setSelectedDate(selectedDate: LocalDate?) {
+        setResult(KEY_SELECTED_DATE, selectedDate)
     }
 }
