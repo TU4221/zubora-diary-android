@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
+@Suppress( "unused") //MEMO:警告対策。(初期化してない為、Unusedの警告が表示される)
 val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "settings")
 
 class UserPreferences @Inject constructor(private val context: Context) {
