@@ -21,11 +21,6 @@ abstract class BaseViewModel : ViewModel() {
         _appMessageBufferList.value = initialAppMessageBufferList
     }
 
-    /**
-     * 本メソッドは継承先のクラス毎に処理するタイミングが異なるので、Override後、継承クラスのコンストラクタに含めること。
-     */
-    protected abstract fun initialize()
-
     protected fun addAppMessage(appMessage: AppMessage) {
         val currentList = requireNotNull(_appMessageBufferList.value)
         val updateList = currentList.add(appMessage)

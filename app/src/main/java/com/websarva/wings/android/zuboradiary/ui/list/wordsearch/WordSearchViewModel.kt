@@ -65,7 +65,7 @@ class WordSearchViewModel @Inject internal constructor(
         initialize()
     }
 
-    public override fun initialize() {
+    fun initialize() {
         initializeAppMessageList()
         _searchWord.value = initialSearchWord
         _wordSearchResultList.value = initialWordSearchResultList

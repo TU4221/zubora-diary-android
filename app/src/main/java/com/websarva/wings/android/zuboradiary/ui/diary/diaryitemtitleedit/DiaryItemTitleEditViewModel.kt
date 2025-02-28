@@ -41,7 +41,7 @@ class DiaryItemTitleEditViewModel @Inject constructor(
         initialize()
     }
 
-    override fun initialize() {
+    fun initialize() {
         initializeAppMessageList()
         _itemNumber.value = null
         _itemTitle.value = ""

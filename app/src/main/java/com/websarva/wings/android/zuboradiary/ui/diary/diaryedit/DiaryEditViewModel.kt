@@ -173,7 +173,7 @@ class DiaryEditViewModel @Inject constructor(
         initialize()
     }
 
-    public override fun initialize() {
+    fun initialize() {
         initializeAppMessageList()
         hasPreparedDiary = initialHasPreparedDiary
         _previousDate.value = initialPreviousDate

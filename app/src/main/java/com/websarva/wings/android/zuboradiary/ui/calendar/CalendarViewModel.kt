@@ -26,7 +26,7 @@ internal class CalendarViewModel @Inject constructor(
         initialize()
     }
 
-    override fun initialize() {
+    fun initialize() {
         initializeAppMessageList()
         _selectedDate.value = initialSelectedDate
         _previousSelectedDate.value = initialPreviousSelectedDate

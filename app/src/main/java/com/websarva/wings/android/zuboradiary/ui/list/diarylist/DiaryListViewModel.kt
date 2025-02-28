@@ -58,7 +58,7 @@ class DiaryListViewModel @Inject constructor(private val diaryRepository: DiaryR
         initialize()
     }
 
-    override fun initialize() {
+    fun initialize() {
         initializeAppMessageList()
         _diaryList.value = initialDiaryList
         _isVisibleUpdateProgressBar.value = initialIsVisibleUpdateProgressBar

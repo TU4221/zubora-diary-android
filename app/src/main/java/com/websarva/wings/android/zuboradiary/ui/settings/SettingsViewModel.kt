@@ -67,7 +67,7 @@ class SettingsViewModel @Inject constructor(
         initialize()
     }
 
-    override fun initialize() {
+    fun initialize() {
         initializeAppMessageList()
         setUpThemeColorPreferenceValueLoading()
         setUpCalendarStartDayOfWeekPreferenceValueLoading()

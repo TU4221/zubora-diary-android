@@ -60,7 +60,7 @@ class DiaryShowViewModel @Inject constructor(private val diaryRepository: DiaryR
         initialize()
     }
 
-    public override fun initialize() {
+    fun initialize() {
         initializeAppMessageList()
         diaryStateFlow.initialize()
     }
