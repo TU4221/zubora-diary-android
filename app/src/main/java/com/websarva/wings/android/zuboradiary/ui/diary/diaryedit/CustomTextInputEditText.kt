@@ -28,7 +28,7 @@ class CustomTextInputEditText : TextInputEditText {
     }
 
     // MEMO:警告"Custom view overrides `onTouchEvent` but not `performClick`"対策として下記メソッド用意
-    @Suppress("RedundantOverride")
+    @Suppress("RedundantOverride", "EmptyMethod")
     override fun performClick(): Boolean {
         return super.performClick()
     }
