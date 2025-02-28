@@ -2,7 +2,6 @@ package com.websarva.wings.android.zuboradiary.ui
 
 import android.content.Context
 import android.os.Build
-import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -17,7 +16,7 @@ abstract class BaseNumberPickersBottomSheetDialogFragment : BaseBottomSheetDialo
     protected val binding get() = checkNotNull(_binding)
 
     override fun createDialogView(
-        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
+        inflater: LayoutInflater, container: ViewGroup?
     ): View {
         _binding = createBinding(inflater, container)
         return binding.apply {

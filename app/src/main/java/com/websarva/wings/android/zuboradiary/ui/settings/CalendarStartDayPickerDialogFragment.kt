@@ -1,6 +1,5 @@
 package com.websarva.wings.android.zuboradiary.ui.settings
 
-import android.content.DialogInterface
 import android.view.View
 import com.websarva.wings.android.zuboradiary.data.DayOfWeekStringConverter
 import com.websarva.wings.android.zuboradiary.databinding.DialogFragmentNumberPickersBinding
@@ -15,7 +14,7 @@ class CalendarStartDayPickerDialogFragment : BaseNumberPickersBottomSheetDialogF
         val KEY_SELECTED_DAY_OF_WEEK: String = "SelectedDayOfWeek$FROM_CLASS_NAME"
     }
 
-    override fun handleOnPositiveButtonClick(v: View) {
+    override fun handleOnPositiveButtonClick() {
         setResultSelectedDayOfWeek()
     }
 
@@ -30,11 +29,11 @@ class CalendarStartDayPickerDialogFragment : BaseNumberPickersBottomSheetDialogF
         setResult(KEY_SELECTED_DAY_OF_WEEK, selectedDayOfWeek)
     }
 
-    override fun handleOnNegativeButtonClick(v: View) {
+    override fun handleOnNegativeButtonClick() {
         // 処理なし
     }
 
-    override fun handleOnCancel(dialog: DialogInterface) {
+    override fun handleOnCancel() {
         // 処理なし
     }
 

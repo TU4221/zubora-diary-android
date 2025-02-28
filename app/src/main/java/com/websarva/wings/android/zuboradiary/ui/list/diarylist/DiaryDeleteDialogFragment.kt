@@ -1,6 +1,5 @@
 package com.websarva.wings.android.zuboradiary.ui.list.diarylist
 
-import android.content.DialogInterface
 import com.websarva.wings.android.zuboradiary.R
 import com.websarva.wings.android.zuboradiary.data.DateTimeStringConverter
 import com.websarva.wings.android.zuboradiary.ui.BaseAlertDialogFragment
@@ -26,7 +25,7 @@ class DiaryDeleteDialogFragment : BaseAlertDialogFragment() {
         return strDate + getString(R.string.dialog_diary_delete_message)
     }
 
-    override fun handleOnPositiveButtonClick(dialog: DialogInterface, which: Int) {
+    override fun handleOnPositiveButtonClick() {
         val deleteDiaryDate =
             DiaryDeleteDialogFragmentArgs.fromBundle(requireArguments()).date
         setResult(KEY_DELETE_DIARY_DATE, deleteDiaryDate)
@@ -40,11 +39,11 @@ class DiaryDeleteDialogFragment : BaseAlertDialogFragment() {
         )
     }
 
-    override fun handleOnNegativeButtonClick(dialog: DialogInterface, which: Int) {
+    override fun handleOnNegativeButtonClick() {
         // 処理なし
     }
 
-    override fun handleOnCancel(dialog: DialogInterface) {
+    override fun handleOnCancel() {
         // 処理なし
     }
 

@@ -26,15 +26,15 @@ class DiaryItemTitleDeleteDialogFragment : BaseAlertDialogFragment() {
         )
     }
 
-    override fun handleOnPositiveButtonClick(dialog: DialogInterface, which: Int) {
+    override fun handleOnPositiveButtonClick() {
         processResults(DialogInterface.BUTTON_POSITIVE)
     }
 
-    override fun handleOnNegativeButtonClick(dialog: DialogInterface, which: Int) {
+    override fun handleOnNegativeButtonClick() {
         processResults(DialogInterface.BUTTON_NEGATIVE)
     }
 
-    override fun handleOnCancel(dialog: DialogInterface) {
+    override fun handleOnCancel() {
         processResults(DialogInterface.BUTTON_NEGATIVE)
     }
 

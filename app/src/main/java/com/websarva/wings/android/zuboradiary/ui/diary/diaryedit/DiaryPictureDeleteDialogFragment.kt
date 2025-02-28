@@ -20,15 +20,15 @@ class DiaryPictureDeleteDialogFragment : BaseAlertDialogFragment() {
         return getString(R.string.dialog_diary_attached_picture_delete_message)
     }
 
-    override fun handleOnPositiveButtonClick(dialog: DialogInterface, which: Int) {
+    override fun handleOnPositiveButtonClick() {
         setResult(KEY_SELECTED_BUTTON, DialogInterface.BUTTON_POSITIVE)
     }
 
-    override fun handleOnNegativeButtonClick(dialog: DialogInterface, which: Int) {
+    override fun handleOnNegativeButtonClick() {
         setResult(KEY_SELECTED_BUTTON, DialogInterface.BUTTON_NEGATIVE)
     }
 
-    override fun handleOnCancel(dialog: DialogInterface) {
+    override fun handleOnCancel() {
         setResult(KEY_SELECTED_BUTTON, DialogInterface.BUTTON_NEGATIVE)
     }
 

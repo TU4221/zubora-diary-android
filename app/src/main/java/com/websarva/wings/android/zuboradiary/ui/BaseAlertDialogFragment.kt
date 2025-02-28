@@ -44,12 +44,12 @@ abstract class BaseAlertDialogFragment : DialogFragment() {
         val message = createMessage()
         builder.setMessage(message)
 
-        builder.setPositiveButton(R.string.dialog_base_alert_yes) { dialog: DialogInterface, which: Int ->
-            handleOnPositiveButtonClick(dialog, which)
+        builder.setPositiveButton(R.string.dialog_base_alert_yes) { _: DialogInterface, _: Int ->
+            handleOnPositiveButtonClick()
         }
 
-        builder.setNegativeButton(R.string.dialog_base_alert_no) { dialog: DialogInterface, which: Int ->
-            handleOnNegativeButtonClick(dialog, which)
+        builder.setNegativeButton(R.string.dialog_base_alert_no) { _: DialogInterface, _: Int ->
+            handleOnNegativeButtonClick()
         }
     }
 
@@ -73,12 +73,12 @@ abstract class BaseAlertDialogFragment : DialogFragment() {
     /**
      * BaseAlertDialogFragment.customizeDialog()で呼び出される。
      */
-    protected abstract fun handleOnPositiveButtonClick(dialog: DialogInterface, which: Int)
+    protected abstract fun handleOnPositiveButtonClick()
 
     /**
      * BaseAlertDialogFragment.customizeDialog()で呼び出される。
      */
-    protected abstract fun handleOnNegativeButtonClick(dialog: DialogInterface, which: Int)
+    protected abstract fun handleOnNegativeButtonClick()
 
     // ダイアログ枠外タッチ、popBackStack時に処理
     // MEMO:ダイアログフラグメントのCANCEL・DISMISS 処理について、
@@ -86,14 +86,14 @@ abstract class BaseAlertDialogFragment : DialogFragment() {
     //      CANCEL・DISMISSの処理内容はDialogFragmentのonCancel/onDismissをオーバーライドする必要がある。
     //      DialogFragment、AlertDialogのリスナセットメソッドを使用して処理内容を記述きても処理はされない。
     override fun onCancel(dialog: DialogInterface) {
-        handleOnCancel(dialog)
+        handleOnCancel()
         super.onCancel(dialog)
     }
 
     /**
      * BaseAlertDialogFragment.onCancel()で呼び出される。
      */
-    protected abstract fun handleOnCancel(dialog: DialogInterface)
+    protected abstract fun handleOnCancel()
 
     override fun dismiss() {
         handleOnDismiss()

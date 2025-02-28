@@ -20,7 +20,7 @@ class ReminderNotificationTimePickerDialogFragment : BaseNumberPickersBottomShee
         val KEY_SELECTED_TIME: String = "SelectedTIME$fromClassName"
     }
 
-    override fun handleOnPositiveButtonClick(v: View) {
+    override fun handleOnPositiveButtonClick() {
         setResultSelectedYearMonth()
     }
 
@@ -33,11 +33,11 @@ class ReminderNotificationTimePickerDialogFragment : BaseNumberPickersBottomShee
         setResult(KEY_SELECTED_TIME, selectedTime)
     }
 
-    override fun handleOnNegativeButtonClick(v: View) {
+    override fun handleOnNegativeButtonClick() {
         setResult(KEY_SELECTED_BUTTON, DialogInterface.BUTTON_NEGATIVE)
     }
 
-    override fun handleOnCancel(dialog: DialogInterface) {
+    override fun handleOnCancel() {
         setResult(KEY_SELECTED_BUTTON, DialogInterface.BUTTON_NEGATIVE)
     }
 

@@ -31,7 +31,7 @@ abstract class BaseBottomSheetDialogFragment : BottomSheetDialogFragment() {
         settingsViewModel = createSettingsViewModel()
 
         val themeColorInflater = createThemeColorInflater(inflater, themeColor)
-        return createDialogView(themeColorInflater, container, savedInstanceState)
+        return createDialogView(themeColorInflater, container)
     }
 
     private fun setUpDialogCancelFunction() {
@@ -59,20 +59,18 @@ abstract class BaseBottomSheetDialogFragment : BottomSheetDialogFragment() {
      * 戻り値をtrueにすると、ダイアログ枠外、戻るボタンタッチ時にダイアログをキャンセルすることを可能にする。
      * BaseBottomSheetDialogFragment#onCreateView()で呼び出される。
      */
-    protected abstract fun createDialogView(
-        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
-    ): View?
+    protected abstract fun createDialogView(inflater: LayoutInflater, container: ViewGroup?): View?
 
     protected inner class PositiveButtonClickListener : View.OnClickListener {
         override fun onClick(v: View) {
-            handleOnPositiveButtonClick(v)
+            handleOnPositiveButtonClick()
             closeDialog()
         }
     }
 
     protected inner class NegativeButtonClickListener : View.OnClickListener {
         override fun onClick(v: View) {
-            handleOnNegativeButtonClick(v)
+            handleOnNegativeButtonClick()
             closeDialog()
         }
     }
@@ -85,12 +83,12 @@ abstract class BaseBottomSheetDialogFragment : BottomSheetDialogFragment() {
     /**
      * BaseBottomSheetDialogFragment.PositiveButtonClickListener#onClick()で呼び出される。
      */
-    protected abstract fun handleOnPositiveButtonClick(v: View)
+    protected abstract fun handleOnPositiveButtonClick()
 
     /**
      * BaseBottomSheetDialogFragment.NegativeButtonClickListener#onClick()で呼び出される。
      */
-    protected abstract fun handleOnNegativeButtonClick(v: View)
+    protected abstract fun handleOnNegativeButtonClick()
 
     // ダイアログ枠外タッチ、popBackStack時に処理
     // MEMO:ダイアログフラグメントのCANCEL・DISMISS 処理について、
@@ -98,14 +96,14 @@ abstract class BaseBottomSheetDialogFragment : BottomSheetDialogFragment() {
     //      CANCEL・DISMISSの処理内容はDialogFragmentのonCancel/onDismissをオーバーライドする必要がある。
     //      DialogFragment、AlertDialogのリスナセットメソッドを使用して処理内容を記述きても処理はされない。
     override fun onCancel(dialog: DialogInterface) {
-        handleOnCancel(dialog)
+        handleOnCancel()
         super.onCancel(dialog)
     }
 
     /**
      * BaseBottomSheetDialogFragment.onCancel()で呼び出される。
      */
-    protected abstract fun handleOnCancel(dialog: DialogInterface)
+    protected abstract fun handleOnCancel()
 
     override fun dismiss() {
         handleOnDismiss()

@@ -24,15 +24,15 @@ class PermissionDialogFragment : BaseAlertDialogFragment() {
         return firstMessage + secondMessage + thirdMessage
     }
 
-    override fun handleOnPositiveButtonClick(dialog: DialogInterface, which: Int) {
+    override fun handleOnPositiveButtonClick() {
         setResult(KEY_SELECTED_BUTTON, DialogInterface.BUTTON_POSITIVE)
     }
 
-    override fun handleOnNegativeButtonClick(dialog: DialogInterface, which: Int) {
+    override fun handleOnNegativeButtonClick() {
         // 処理なし
     }
 
-    override fun handleOnCancel(dialog: DialogInterface) {
+    override fun handleOnCancel() {
         // 処理なし
     }
 

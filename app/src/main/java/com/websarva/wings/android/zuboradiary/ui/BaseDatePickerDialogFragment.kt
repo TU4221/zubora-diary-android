@@ -1,9 +1,7 @@
 package com.websarva.wings.android.zuboradiary.ui
 
 import android.app.Dialog
-import android.content.DialogInterface
 import android.os.Bundle
-import android.view.View
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.datepicker.MaterialDatePicker
@@ -70,27 +68,27 @@ abstract class BaseDatePickerDialogFragment : DialogFragment() {
             dummyDialog.dismiss()
         }
 
-        datePicker.addOnNegativeButtonClickListener { v: View ->
-            handleOnNegativeButtonClick(v)
+        datePicker.addOnNegativeButtonClickListener {
+            handleOnNegativeButtonClick()
             dummyDialog.dismiss()
         }
 
-        datePicker.addOnCancelListener { dialog: DialogInterface ->
-            handleOnCancel(dialog)
+        datePicker.addOnCancelListener {
+            handleOnCancel()
             dummyDialog.dismiss()
         }
 
-        datePicker.addOnDismissListener { dialog: DialogInterface ->
-            handleOnDismiss(dialog)
+        datePicker.addOnDismissListener {
+            handleOnDismiss()
             dummyDialog.dismiss()
         }
     }
 
     protected abstract fun handleOnPositiveButtonClick(selectedDate: LocalDate)
 
-    protected abstract fun handleOnNegativeButtonClick(v: View)
+    protected abstract fun handleOnNegativeButtonClick()
 
-    protected abstract fun handleOnCancel(dialog: DialogInterface)
+    protected abstract fun handleOnCancel()
 
-    protected abstract fun handleOnDismiss(dialog: DialogInterface)
+    protected abstract fun handleOnDismiss()
 }

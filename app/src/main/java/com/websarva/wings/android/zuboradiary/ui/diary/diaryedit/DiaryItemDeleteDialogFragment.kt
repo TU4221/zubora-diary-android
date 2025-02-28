@@ -1,6 +1,5 @@
 package com.websarva.wings.android.zuboradiary.ui.diary.diaryedit
 
-import android.content.DialogInterface
 import com.websarva.wings.android.zuboradiary.R
 import com.websarva.wings.android.zuboradiary.ui.BaseAlertDialogFragment
 
@@ -25,18 +24,18 @@ class DiaryItemDeleteDialogFragment : BaseAlertDialogFragment() {
         )
     }
 
-    override fun handleOnPositiveButtonClick(dialog: DialogInterface, which: Int) {
+    override fun handleOnPositiveButtonClick() {
         val deleteItemNumber =
             DiaryItemDeleteDialogFragmentArgs
                 .fromBundle(requireArguments()).itemNumber
         setResult(KEY_DELETE_ITEM_NUMBER, deleteItemNumber)
     }
 
-    override fun handleOnNegativeButtonClick(dialog: DialogInterface, which: Int) {
+    override fun handleOnNegativeButtonClick() {
         // 処理なし
     }
 
-    override fun handleOnCancel(dialog: DialogInterface) {
+    override fun handleOnCancel() {
         // 処理なし
     }
 

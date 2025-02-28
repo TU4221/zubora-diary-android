@@ -1,6 +1,5 @@
 package com.websarva.wings.android.zuboradiary.ui.settings
 
-import android.content.DialogInterface
 import android.view.View
 import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor
 import com.websarva.wings.android.zuboradiary.databinding.DialogFragmentNumberPickersBinding
@@ -14,7 +13,7 @@ class ThemeColorPickerDialogFragment : BaseNumberPickersBottomSheetDialogFragmen
         val KEY_SELECTED_THEME_COLOR: String = "SelectedThemeColor$fromClassName"
     }
 
-    override fun handleOnPositiveButtonClick(v: View) {
+    override fun handleOnPositiveButtonClick() {
         setResultSelectedThemeColor()
     }
 
@@ -25,11 +24,11 @@ class ThemeColorPickerDialogFragment : BaseNumberPickersBottomSheetDialogFragmen
         setResult(KEY_SELECTED_THEME_COLOR, selectedThemeColor)
     }
 
-    override fun handleOnNegativeButtonClick(v: View) {
+    override fun handleOnNegativeButtonClick() {
         // 処理なし
     }
 
-    override fun handleOnCancel(dialog: DialogInterface) {
+    override fun handleOnCancel() {
         // 処理なし
     }
 

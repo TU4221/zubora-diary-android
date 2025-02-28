@@ -1,6 +1,5 @@
 package com.websarva.wings.android.zuboradiary.ui.list.diarylist
 
-import android.content.DialogInterface
 import android.view.View
 import com.websarva.wings.android.zuboradiary.databinding.DialogFragmentNumberPickersBinding
 import com.websarva.wings.android.zuboradiary.ui.BaseNumberPickersBottomSheetDialogFragment
@@ -15,7 +14,7 @@ class StartYearMonthPickerDialogFragment : BaseNumberPickersBottomSheetDialogFra
         val KEY_SELECTED_YEAR_MONTH: String = "SelectedYearMonth$fromClassName"
     }
 
-    override fun handleOnPositiveButtonClick(v: View) {
+    override fun handleOnPositiveButtonClick() {
         setResultSelectedYearMonth()
     }
 
@@ -27,11 +26,11 @@ class StartYearMonthPickerDialogFragment : BaseNumberPickersBottomSheetDialogFra
         setResult(KEY_SELECTED_YEAR_MONTH, selectedYearMonth)
     }
 
-    override fun handleOnNegativeButtonClick(v: View) {
+    override fun handleOnNegativeButtonClick() {
         // 処理なし
     }
 
-    override fun handleOnCancel(dialog: DialogInterface) {
+    override fun handleOnCancel() {
         // 処理なし
     }
 

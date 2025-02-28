@@ -1,6 +1,5 @@
 package com.websarva.wings.android.zuboradiary.ui
 
-import android.content.DialogInterface
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
 class AppMessageDialogFragment : BaseAlertDialogFragment() {
@@ -15,15 +14,15 @@ class AppMessageDialogFragment : BaseAlertDialogFragment() {
         return appMessage.getDialogMessage(requireContext())
     }
 
-    override fun handleOnPositiveButtonClick(dialog: DialogInterface, which: Int) {
+    override fun handleOnPositiveButtonClick() {
         // 処理なし
     }
 
-    override fun handleOnNegativeButtonClick(dialog: DialogInterface, which: Int) {
+    override fun handleOnNegativeButtonClick() {
         // 処理なし
     }
 
-    override fun handleOnCancel(dialog: DialogInterface) {
+    override fun handleOnCancel() {
         // 処理なし
     }
 
