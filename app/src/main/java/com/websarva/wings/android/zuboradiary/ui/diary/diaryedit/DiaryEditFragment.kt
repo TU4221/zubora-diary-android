@@ -534,6 +534,7 @@ class DiaryEditFragment : BaseFragment() {
         return ArrayAdapter(contextWithTheme, R.layout.layout_drop_down_list_item, conditionItemList)
     }
 
+    @Suppress("EmptyMethod")
     private fun setUpTitleInputField() {
         // 処理なし
     }
