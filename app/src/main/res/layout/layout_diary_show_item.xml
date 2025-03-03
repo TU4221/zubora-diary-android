@@ -31,6 +31,7 @@
             android:textSize="@dimen/layout_diary_show_small_text_size"
             tools:text="@string/layout_diary_show_item_tools"/>
 
+        <!-- MEMO:ViewBindingを使用している為、tools:ignore="DuplicateIncludedIds"記述 -->
         <TextView
             style="@style/AppTextViewStyle"
             android:id="@+id/text_title"
@@ -40,7 +41,8 @@
             android:textAppearance="@style/AppTextViewTextAppearance"
             android:text="@{titleStateFlow}"
             android:textSize="@dimen/layout_diary_show_item_text_size"
-            android:hint="@string/layout_diary_show_item_title_hint" />
+            android:hint="@string/layout_diary_show_item_title_hint"
+            tools:ignore="DuplicateIncludedIds" />
 
         <com.google.android.material.divider.MaterialDivider
             android:layout_width="match_parent"

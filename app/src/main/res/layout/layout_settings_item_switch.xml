@@ -37,6 +37,7 @@
                   "app:drawableStartCompat"はリソースしか受け付けない為、"android:drawableStart"を使用
                   この警告は"android:drawableStart"がAPIレベルが17以上でないと対応してないことから起きており
                   (ChatGPTより)、本アプリはAPIレベル21が対応最小レベルとなるのでこのまま使用する。 -->
+        <!-- MEMO:ViewBindingを使用している為、tools:ignore="DuplicateIncludedIds"記述 -->
         <TextView
             style="@style/SettingsItemTextViewStyle"
             android:id="@+id/text_title"
@@ -47,7 +48,8 @@
             android:text="@{settingTitle}"
             app:drawableStartCompat="@{settingIcon}"
             tools:text="@string/layout_settings_item_title_tools_value"
-            tools:drawableStart="@drawable/ic_settings_24px" />
+            tools:drawableStart="@drawable/ic_settings_24px"
+            tools:ignore="DuplicateIncludedIds" />
 
         <LinearLayout
             android:layout_width="wrap_content"
@@ -55,6 +57,7 @@
             android:layout_gravity="center_vertical|end"
             android:orientation="horizontal">
 
+            <!-- MEMO:ViewBindingを使用している為、tools:ignore="DuplicateIncludedIds"記述 -->
             <TextView
                 style="@style/SettingsItemValueTextViewStyle"
                 android:id="@+id/text_value"
@@ -65,7 +68,8 @@
                 android:text="@{settingValue}"
                 android:paddingStart="0dp"
                 android:paddingEnd="0dp"
-                android:visibility="@{isVisibleSettingValue ? View.VISIBLE : View.GONE}"/>
+                android:visibility="@{isVisibleSettingValue ? View.VISIBLE : View.GONE}"
+                tools:ignore="DuplicateIncludedIds" />
 
             <com.google.android.material.materialswitch.MaterialSwitch
                 style="@style/SettingsItemValueSwitchStyle"

@@ -196,6 +196,7 @@
 
                         </LinearLayout>
 
+                        <!-- MEMO:ViewBindingを使用している為、tools:ignore="DuplicateIncludedIds"記述 -->
                         <com.google.android.material.textfield.TextInputLayout
                             android:id="@+id/text_input_layout_title"
                             style="@style/AppTextInputLayoutOutlinedBoxStyle"
@@ -204,7 +205,8 @@
                             android:layout_marginTop="@dimen/fragment_diary_edit_margin_top"
                             android:hint="@string/fragment_diary_edit_title"
                             app:counterEnabled="true"
-                            app:counterMaxLength="@integer/fragment_diary_edit_title_max_length">
+                            app:counterMaxLength="@integer/fragment_diary_edit_title_max_length"
+                            tools:ignore="DuplicateIncludedIds">
 
                             <!-- MEMO:日記タイトル入力欄と項目1タイトル入力欄のTextInputLayoutのhint属性が同じ文字列の為、
                                       警告"Duplicate speakable text present"が発生。
@@ -253,12 +255,14 @@
                             app:itemNumber="@{@string/fragment_diary_edit_item_4}"
                             app:titleMutableStateFlow="@{diaryEditViewModel.item4TitleMutable}" />
 
+                        <!-- MEMO:ViewBindingを使用している為、tools:ignore="DuplicateIncludedIds"記述 -->
                         <include
                             android:id="@+id/include_item_5"
                             layout="@layout/layout_diary_edit_item"
                             app:commentMutableStateFlow="@{diaryEditViewModel.item5CommentMutable}"
                             app:itemNumber="@{@string/fragment_diary_edit_item_5}"
-                            app:titleMutableStateFlow="@{diaryEditViewModel.item5TitleMutable}" />
+                            app:titleMutableStateFlow="@{diaryEditViewModel.item5TitleMutable}"
+                            tools:ignore="DuplicateIncludedIds" />
 
                         <ImageButton
                             android:id="@+id/image_button_item_addition"

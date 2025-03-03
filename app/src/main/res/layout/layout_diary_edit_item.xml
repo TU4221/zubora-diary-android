@@ -66,6 +66,7 @@
             </LinearLayout>
 
             <!-- 下記 EditText は項目タイトル入力フラグメントから入力する為、android:text は単一方向データバインディングとする。 -->
+            <!-- MEMO:ViewBindingを使用している為、tools:ignore="DuplicateIncludedIds"記述 -->
             <com.google.android.material.textfield.TextInputLayout
                 style="@style/AppTextInputLayoutOutlinedBoxStyle"
                 android:id="@+id/text_input_layout_title"
@@ -74,7 +75,8 @@
                 android:layout_marginTop="@dimen/layout_diary_edit_item_margin_top"
                 android:hint="@string/layout_diary_edit_item_title"
                 app:counterEnabled="true"
-                app:counterMaxLength="@integer/layout_diary_edit_item_title_max_length">
+                app:counterMaxLength="@integer/layout_diary_edit_item_title_max_length"
+                tools:ignore="DuplicateIncludedIds">
 
                 <com.websarva.wings.android.zuboradiary.ui.diary.diaryedit.CustomTextInputEditText
                     style="@style/AppTextInputEditTextNoInputStyle"

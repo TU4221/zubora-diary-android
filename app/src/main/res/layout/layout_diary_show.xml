@@ -87,6 +87,7 @@
 
         </LinearLayout>
 
+        <!-- MEMO:ViewBindingを使用している為、tools:ignore="DuplicateIncludedIds"記述 -->
         <TextView
             style="@style/AppTextViewStyle"
             android:id="@+id/text_title"
@@ -95,7 +96,8 @@
             android:layout_marginTop="@dimen/layout_diary_show_margin_top"
             android:textAppearance="@style/AppTextViewTextAppearance"
             android:text="@string/layout_diary_show_title"
-            android:textSize="@dimen/layout_diary_show_small_text_size" />
+            android:textSize="@dimen/layout_diary_show_small_text_size"
+            tools:ignore="DuplicateIncludedIds" />
 
         <TextView
             style="@style/AppTextViewStyle"
@@ -132,11 +134,13 @@
             app:titleStateFlow="@{diaryShowViewModel.item4Title}"
             app:commentStateFlow="@{diaryShowViewModel.item4Comment}"/>
 
+        <!-- MEMO:ViewBindingを使用している為、tools:ignore="DuplicateIncludedIds"記述 -->
         <include layout="@layout/layout_diary_show_item"
             android:id="@+id/include_item_5"
             app:itemNumber="@{@string/layout_diary_show_item_5}"
             app:titleStateFlow="@{diaryShowViewModel.item5Title}"
-            app:commentStateFlow="@{diaryShowViewModel.item5Comment}"/>
+            app:commentStateFlow="@{diaryShowViewModel.item5Comment}"
+            tools:ignore="DuplicateIncludedIds" />
 
         <TextView
             style="@style/AppTextViewStyle"

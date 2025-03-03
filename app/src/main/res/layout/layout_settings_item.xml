@@ -25,6 +25,7 @@
                   "app:drawableStartCompat"はリソースしか受け付けない為、"android:drawableStart"を使用
                   この警告は"android:drawableStart"がAPIレベルが17以上でないと対応してないことから起きており
                   (ChatGPTより)、本アプリはAPIレベル21が対応最小レベルとなるのでこのまま使用する。 -->
+        <!-- MEMO:ViewBindingを使用している為、tools:ignore="DuplicateIncludedIds"記述 -->
         <TextView
             style="@style/SettingsItemTextViewStyle"
             android:id="@+id/text_title"
@@ -35,8 +36,10 @@
             android:text="@{settingTitle}"
             app:drawableStartCompat="@{settingIcon}"
             tools:text="@string/layout_settings_item_title_tools_value"
-            tools:drawableStart="@drawable/ic_settings_24px" />
+            tools:drawableStart="@drawable/ic_settings_24px"
+            tools:ignore="DuplicateIncludedIds" />
 
+        <!-- MEMO:ViewBindingを使用している為、tools:ignore="DuplicateIncludedIds"記述 -->
         <TextView
             style="@style/SettingsItemValueTextViewStyle"
             android:id="@+id/text_value"
@@ -44,7 +47,8 @@
             android:layout_height="wrap_content"
             android:layout_gravity="end|center_vertical"
             android:textAppearance="@style/SettingsItemValueTextViewTextAppearance"
-            android:text="@{settingValue}"/>
+            android:text="@{settingValue}"
+            tools:ignore="DuplicateIncludedIds" />
 
     </FrameLayout>
 
