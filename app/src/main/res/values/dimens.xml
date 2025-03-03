@@ -1,8 +1,4 @@
 <resources>
-    <!-- Default screen margins, per the Android Design guidelines. -->
-    <dimen name="activity_horizontal_margin">16dp</dimen>
-    <dimen name="activity_vertical_margin">16dp</dimen>
-
 
     <!-- All fragment common margin -->
     <dimen name="fragment_margin_horizontal">16dp</dimen>
@@ -15,22 +11,18 @@
     <!-- All fragment common -->
     <dimen name="view_enabled_alpha">1.00</dimen>
     <dimen name="view_disabled_alpha">@dimen/disabled_alpha_material_light</dimen>
-    <dimen name="text_enabled_alpha">1.00</dimen>
     <dimen name="text_disabled_alpha">@dimen/disabled_alpha_material_light</dimen>
     <dimen name="hint_alpha">@dimen/hint_alpha_material_light</dimen>
     <dimen name="hint_pressed_alpha">@dimen/hint_pressed_alpha_material_light</dimen>
 
 
     <!-- fragment_calendar -->
-    <dimen name="fragment_calendar_text_size">18sp</dimen>
-    <dimen name="fragment_calendar_margin_start">8dp</dimen>
     <dimen name="fragment_calendar_margin_top">16dp</dimen>
 
 
     <!-- layout_diary_show -->
     <dimen name="layout_diary_show_text_size">18sp</dimen>
     <dimen name="layout_diary_show_small_text_size">14sp</dimen>
-    <dimen name="layout_diary_show_margin_start">8dp</dimen>
     <dimen name="layout_diary_show_margin_top">16dp</dimen>
     <dimen name="layout_diary_show_large_margin_top">32dp</dimen>
     <dimen name="layout_diary_show_small_margin_top">4dp</dimen>
@@ -39,9 +31,6 @@
 
     <!-- layout_diary_show_item -->
     <dimen name="layout_diary_show_item_text_size">@dimen/layout_diary_show_text_size</dimen>
-    <dimen name="layout_diary_show_text_item_small_size">@dimen/layout_diary_show_small_text_size</dimen>
-    <dimen name="layout_diary_show_item_margin_start">@dimen/layout_diary_show_margin_start</dimen>
-    <dimen name="layout_diary_show_item_margin_top">@dimen/layout_diary_show_margin_top</dimen>
     <dimen name="layout_diary_show_item_large_margin_top">@dimen/layout_diary_show_large_margin_top</dimen>
     <dimen name="layout_diary_show_item_small_margin_top">@dimen/layout_diary_show_small_margin_top</dimen>
 
@@ -74,12 +63,8 @@
     <dimen name="fragment_settings_text_size">18sp</dimen>
 
     <dimen name="fragment_settings_section_layout_min_height">56dp</dimen>
-    <dimen name="fragment_settings_section_padding_horizontal">16dp</dimen>
-    <dimen name="fragment_settings_section_padding_vertical">8dp</dimen>
 
-    <dimen name="fragment_settings_item_layout_height">56dp</dimen>
     <dimen name="fragment_settings_item_padding_horizontal">16dp</dimen>
-    <dimen name="fragment_settings_item_padding_horizontal_between_items">4dp</dimen>
     <dimen name="fragment_settings_item_padding_vertical">8dp</dimen>
     <dimen name="fragment_settings_item_drawable_padding">16dp</dimen>
 
