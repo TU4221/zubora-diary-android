@@ -1,5 +1,109 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="EntryPointsManager">
+    <entry_points version="2.0">
+      <entry_point TYPE="field" FQNAME="file://$PROJECT_DIR$/app/src/main/java/com/websarva/wings/android/zuboradiary/data/preferences/UserPreferences.kt dataStore$delegate" />
+      <entry_point TYPE="file" FQNAME="file://$PROJECT_DIR$/app/src/main/java/com/websarva/wings/android/zuboradiary/data/preferences/UserPreferences.kt" />
+      <entry_point TYPE="field" FQNAME="com.websarva.wings.android.zuboradiary.CustomApplication workerFactory" />
+    </entry_points>
+    <pattern value="com.websarva.wings.android.zuboradiary.ExampleUnitTest" method="addition_isCorrect" />
+    <pattern value="com.websarva.wings.android.zuboradiary.ui.settings.AllDataDeleteDialogFragment" />
+    <pattern value="com.websarva.wings.android.zuboradiary.ui.settings.AllDiariesDeleteDialogFragment" />
+    <pattern value="com.websarva.wings.android.zuboradiary.ui.settings.AllSettingsInitializationDialogFragment" />
+    <pattern value="com.websarva.wings.android.zuboradiary.data.AppMessage" />
+    <pattern value="com.websarva.wings.android.zuboradiary.data.AppMessage" method="AppMessage" />
+    <pattern value="com.websarva.wings.android.zuboradiary.ui.AppMessageDialogFragment" />
+    <pattern value="com.websarva.wings.android.zuboradiary.ui.BaseAlertDialogFragment" />
+    <pattern value="com.websarva.wings.android.zuboradiary.ui.BaseBottomSheetDialogFragment" />
+    <pattern value="com.websarva.wings.android.zuboradiary.ui.BaseDatePickerDialogFragment" />
+    <pattern value="com.websarva.wings.android.zuboradiary.ui.BaseFragment" />
+    <pattern value="com.websarva.wings.android.zuboradiary.ui.BaseNumberPickersBottomSheetDialogFragment" />
+    <pattern value="com.websarva.wings.android.zuboradiary.ui.BindingAdapters" />
+    <pattern value="com.websarva.wings.android.zuboradiary.ui.calendar.CalendarFragment" />
+    <pattern value="com.websarva.wings.android.zuboradiary.ui.settings.CalendarStartDayPickerDialogFragment" />
+    <pattern value="com.websarva.wings.android.zuboradiary.CustomApplication" />
+    <pattern value="com.websarva.wings.android.zuboradiary.ui.CustomFragment" />
+    <pattern value="com.websarva.wings.android.zuboradiary.ui.diary.diaryedit.CustomTextInputEditText" />
+    <pattern value="com.websarva.wings.android.zuboradiary.ui.diary.diaryedit.CustomTextInputEditText" method="CustomTextInputEditText" />
+    <pattern value="com.websarva.wings.android.zuboradiary.di.DatabaseModule" />
+    <pattern value="com.websarva.wings.android.zuboradiary.ui.diary.diaryedit.DatePickerDialogFragment" />
+    <pattern value="com.websarva.wings.android.zuboradiary.data.database.DiaryDatabase" />
+    <pattern value="com.websarva.wings.android.zuboradiary.ui.diary.diaryedit.DiaryDeleteDialogFragment" />
+    <pattern value="com.websarva.wings.android.zuboradiary.ui.diary.diaryshow.DiaryDeleteDialogFragment" />
+    <pattern value="com.websarva.wings.android.zuboradiary.ui.list.diarylist.DiaryDeleteDialogFragment" />
+    <pattern value="com.websarva.wings.android.zuboradiary.ui.diary.diaryedit.DiaryEditFragment" />
+    <pattern value="com.websarva.wings.android.zuboradiary.ui.diary.diaryedit.DiaryEditViewModel" />
+    <pattern value="com.websarva.wings.android.zuboradiary.ui.diary.diaryedit.DiaryItemDeleteDialogFragment" />
+    <pattern value="com.websarva.wings.android.zuboradiary.ui.diary.diaryitemtitleedit.DiaryItemTitleDeleteDialogFragment" />
+    <pattern value="com.websarva.wings.android.zuboradiary.ui.diary.diaryitemtitleedit.DiaryItemTitleEditFragment" />
+    <pattern value="com.websarva.wings.android.zuboradiary.ui.diary.diaryitemtitleedit.DiaryItemTitleEditViewModel" />
+    <pattern value="com.websarva.wings.android.zuboradiary.ui.list.diarylist.DiaryListFragment" />
+    <pattern value="com.websarva.wings.android.zuboradiary.ui.list.diarylist.DiaryListViewModel" />
+    <pattern value="com.websarva.wings.android.zuboradiary.ui.diary.diaryedit.DiaryLoadingDialogFragment" />
+    <pattern value="com.websarva.wings.android.zuboradiary.ui.diary.diaryedit.DiaryPictureDeleteDialogFragment" />
+    <pattern value="com.websarva.wings.android.zuboradiary.ui.diary.diaryshow.DiaryShowFragment" />
+    <pattern value="com.websarva.wings.android.zuboradiary.ui.diary.diaryshow.DiaryShowViewModel" />
+    <pattern value="com.websarva.wings.android.zuboradiary.ui.diary.diaryedit.DiaryUpdateDialogFragment" />
+    <pattern value="com.websarva.wings.android.zuboradiary.ExampleInstrumentedTest" />
+    <pattern value="com.websarva.wings.android.zuboradiary.ExampleUnitTest" />
+    <pattern value="com.websarva.wings.android.zuboradiary.ui.diary.diaryshow.DiaryShowViewModel" method="getItem1Comment" />
+    <pattern value="com.websarva.wings.android.zuboradiary.ui.diary.diaryedit.DiaryEditViewModel" method="getItem1CommentMutable" />
+    <pattern value="com.websarva.wings.android.zuboradiary.ui.diary.diaryshow.DiaryShowViewModel" method="getItem1Title" />
+    <pattern value="com.websarva.wings.android.zuboradiary.ui.diary.diaryedit.DiaryEditViewModel" method="getItem1TitleMutable" />
+    <pattern value="com.websarva.wings.android.zuboradiary.ui.diary.diaryshow.DiaryShowViewModel" method="getItem2Comment" />
+    <pattern value="com.websarva.wings.android.zuboradiary.ui.diary.diaryedit.DiaryEditViewModel" method="getItem2CommentMutable" />
+    <pattern value="com.websarva.wings.android.zuboradiary.ui.diary.diaryshow.DiaryShowViewModel" method="getItem2Title" />
+    <pattern value="com.websarva.wings.android.zuboradiary.ui.diary.diaryedit.DiaryEditViewModel" method="getItem2TitleMutable" />
+    <pattern value="com.websarva.wings.android.zuboradiary.ui.diary.diaryshow.DiaryShowViewModel" method="getItem3Comment" />
+    <pattern value="com.websarva.wings.android.zuboradiary.ui.diary.diaryedit.DiaryEditViewModel" method="getItem3CommentMutable" />
+    <pattern value="com.websarva.wings.android.zuboradiary.ui.diary.diaryshow.DiaryShowViewModel" method="getItem3Title" />
+    <pattern value="com.websarva.wings.android.zuboradiary.ui.diary.diaryedit.DiaryEditViewModel" method="getItem3TitleMutable" />
+    <pattern value="com.websarva.wings.android.zuboradiary.ui.diary.diaryshow.DiaryShowViewModel" method="getItem4Comment" />
+    <pattern value="com.websarva.wings.android.zuboradiary.ui.diary.diaryedit.DiaryEditViewModel" method="getItem4CommentMutable" />
+    <pattern value="com.websarva.wings.android.zuboradiary.ui.diary.diaryshow.DiaryShowViewModel" method="getItem4Title" />
+    <pattern value="com.websarva.wings.android.zuboradiary.ui.diary.diaryedit.DiaryEditViewModel" method="getItem4TitleMutable" />
+    <pattern value="com.websarva.wings.android.zuboradiary.ui.diary.diaryshow.DiaryShowViewModel" method="getItem5Comment" />
+    <pattern value="com.websarva.wings.android.zuboradiary.ui.diary.diaryedit.DiaryEditViewModel" method="getItem5CommentMutable" />
+    <pattern value="com.websarva.wings.android.zuboradiary.ui.diary.diaryshow.DiaryShowViewModel" method="getItem5Title" />
+    <pattern value="com.websarva.wings.android.zuboradiary.ui.diary.diaryedit.DiaryEditViewModel" method="getItem5TitleMutable" />
+    <pattern value="com.websarva.wings.android.zuboradiary.ui.diary.diaryitemtitleedit.DiaryItemTitleEditViewModel" method="getItemTitleMutable" />
+    <pattern value="com.websarva.wings.android.zuboradiary.ui.list.wordsearch.WordSearchViewModel" method="getSearchWordMutableStateFlow" />
+    <pattern value="com.websarva.wings.android.zuboradiary.ui.diary.diaryshow.DiaryShowViewModel" method="getTitle" />
+    <pattern value="com.websarva.wings.android.zuboradiary.ui.diary.diaryedit.DiaryEditViewModel" method="getTitleMutableStateFlow" />
+    <pattern value="com.websarva.wings.android.zuboradiary.ui.diary.diaryedit.DiaryEditViewModel" method="isVisibleUpdateProgressBar" />
+    <pattern value="com.websarva.wings.android.zuboradiary.ui.list.diarylist.DiaryListViewModel" method="isVisibleUpdateProgressBar" />
+    <pattern value="com.websarva.wings.android.zuboradiary.ui.list.wordsearch.WordSearchViewModel" method="isVisibleUpdateProgressBar" />
+    <pattern value="com.websarva.wings.android.zuboradiary.MainActivity" />
+    <pattern value="com.websarva.wings.android.zuboradiary.di.NetworkModule" />
+    <pattern value="com.websarva.wings.android.zuboradiary.ui.settings.PermissionDialogFragment" />
+    <pattern value="com.websarva.wings.android.zuboradiary.di.PreferencesModule" />
+    <pattern value="com.websarva.wings.android.zuboradiary.di.DatabaseModule" method="provideDiaryDAO" />
+    <pattern value="com.websarva.wings.android.zuboradiary.di.DatabaseModule" method="provideDiaryDatabase" />
+    <pattern value="com.websarva.wings.android.zuboradiary.di.RepositoryModule" method="provideDiaryRepository" />
+    <pattern value="com.websarva.wings.android.zuboradiary.di.RepositoryModule" method="provideEditDiarySelectItemTitleRepository" />
+    <pattern value="com.websarva.wings.android.zuboradiary.di.NetworkModule" method="provideKotlinJsonAdapterFactory" />
+    <pattern value="com.websarva.wings.android.zuboradiary.di.NetworkModule" method="provideMoshi" />
+    <pattern value="com.websarva.wings.android.zuboradiary.di.NetworkModule" method="provideMoshiConverterFactory" />
+    <pattern value="com.websarva.wings.android.zuboradiary.di.DatabaseModule" method="provideSelectedItemTitlesHistoryDAO" />
+    <pattern value="com.websarva.wings.android.zuboradiary.di.PreferencesModule" method="provideUserPreferences" />
+    <pattern value="com.websarva.wings.android.zuboradiary.di.RepositoryModule" method="provideUserPreferencesRepository" />
+    <pattern value="com.websarva.wings.android.zuboradiary.di.RepositoryModule" method="provideWeatherApiRepository" />
+    <pattern value="com.websarva.wings.android.zuboradiary.di.NetworkModule" method="provideWeatherApiRetrofit" />
+    <pattern value="com.websarva.wings.android.zuboradiary.di.NetworkModule" method="provideWeatherApiService" />
+    <pattern value="com.websarva.wings.android.zuboradiary.di.RepositoryModule" method="provideWorkerRepository" />
+    <pattern value="com.websarva.wings.android.zuboradiary.di.WorkerModule" method="provideWorkManager" />
+    <pattern value="com.websarva.wings.android.zuboradiary.ui.settings.ReminderNotificationTimePickerDialogFragment" />
+    <pattern value="com.websarva.wings.android.zuboradiary.di.RepositoryModule" />
+    <pattern value="com.websarva.wings.android.zuboradiary.ui.BindingAdapters" method="setDrawableStartCompat" />
+    <pattern value="com.websarva.wings.android.zuboradiary.ui.settings.SettingsFragment" />
+    <pattern value="com.websarva.wings.android.zuboradiary.ui.list.diarylist.StartYearMonthPickerDialogFragment" />
+    <pattern value="com.websarva.wings.android.zuboradiary.ui.settings.ThemeColorPickerDialogFragment" />
+    <pattern value="com.websarva.wings.android.zuboradiary.ExampleInstrumentedTest" method="useAppContext" />
+    <pattern value="com.websarva.wings.android.zuboradiary.ui.diary.diaryedit.WeatherInfoFetchingDialogFragment" />
+    <pattern value="com.websarva.wings.android.zuboradiary.ui.list.wordsearch.WordSearchFragment" />
+    <pattern value="com.websarva.wings.android.zuboradiary.ui.list.wordsearch.WordSearchViewModel" />
+    <pattern value="com.websarva.wings.android.zuboradiary.di.WorkerModule" />
+  </component>
   <component name="ExternalStorageConfigurationManager" enabled="true" />
   <component name="ProjectRootManager" version="2" languageLevel="JDK_21" default="true" project-jdk-name="jbr-21" project-jdk-type="JavaSDK">
     <output url="file://$PROJECT_DIR$/build/classes" />
