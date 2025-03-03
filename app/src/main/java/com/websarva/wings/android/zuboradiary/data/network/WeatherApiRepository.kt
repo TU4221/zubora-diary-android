@@ -9,7 +9,9 @@ import javax.inject.Inject
 
 class WeatherApiRepository @Inject constructor(private val weatherApiService: WeatherApiService) {
 
-    @Suppress("unused") // MEMO:@IntRangeで使用する為、@Suppressで警告回避。
+    // MEMO:@Suppress("unused")が不要と警告が発生したので削除したが、"unused"警告が再発する。
+    //      その為、@Suppress("RedundantSuppression")で警告回避。
+    @Suppress("unused", "RedundantSuppression") // MEMO:@IntRangeで使用する為、@Suppressで警告回避。
     companion object {
         private const val MIN_PAST_DAYS = 1 //過去天気情報取得可能最小日
         private const val MAX_PAST_DAYS = 92 //過去天気情報取得可能最大日

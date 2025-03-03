@@ -6,7 +6,9 @@ import androidx.datastore.preferences.core.booleanPreferencesKey
 
 class WeatherInfoAcquisitionPreference {
 
-    @Suppress("unused") // MEMO:デフォルトパラメータで使用する為、@Suppressで警告回避。
+    // MEMO:@Suppress("unused")が不要と警告が発生したので削除したが、"unused"警告が再発する。
+    //      その為、@Suppress("RedundantSuppression")で警告回避。
+    @Suppress("unused", "RedundantSuppression") // MEMO:デフォルトパラメータで使用する為、@Suppressで警告回避。
     companion object {
         private const val IS_CHECKED_DEFAULT_VALUE = false
     }

@@ -4,6 +4,9 @@ import android.content.Context
 import com.websarva.wings.android.zuboradiary.R
 import java.util.Arrays
 
+// MEMO:@Suppress("unused")が不要と警告が発生したので削除したが、"unused"警告が再発する。
+//      その為、@Suppress("RedundantSuppression")で警告回避。
+@Suppress("RedundantSuppression")
 // MEMO:constructorは直接使用されていないが必要な為、@Suppressで警告回避。
 enum class Weather @Suppress("unused") constructor(
     private val number: Int,

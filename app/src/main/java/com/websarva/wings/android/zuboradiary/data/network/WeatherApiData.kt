@@ -4,6 +4,9 @@ import android.util.Log
 import com.squareup.moshi.Json
 import com.websarva.wings.android.zuboradiary.data.diary.Weather
 
+// MEMO:@Suppress("unused")が不要と警告が発生したので削除したが、"unused"警告が再発する。
+//      その為、@Suppress("RedundantSuppression")で警告回避。
+@Suppress("RedundantSuppression")
 // MEMO:constructorは直接使用されていないがRetrofit2(Moshi)にてインスタンス化している為、@Suppressで警告回避。
 data class WeatherApiData @Suppress("unused") constructor(
     // MEMO:フィールド変数はRetrofit2(Moshi)にて代入。
