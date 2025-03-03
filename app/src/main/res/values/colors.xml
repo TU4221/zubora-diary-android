@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
+<!-- MEMO:警告対策として"tools:ignore="UnusedResources"を記述。
+          本アプリはView(Layout)のInflaterにてテーマ(色)を変更している。
+          そのため使用している色リソースもIDEでは未使用となるため、
+          警告を"tools:ignore="UnusedResources"を記述して無視する。 -->
+<resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="UnusedResources">
     <color name="ic_launcher_foreground">#333333</color>
     <color name="ic_launcher_background">#FAFAFA</color>
 
