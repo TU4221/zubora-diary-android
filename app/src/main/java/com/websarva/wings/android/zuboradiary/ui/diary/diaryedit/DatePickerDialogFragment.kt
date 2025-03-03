@@ -1,7 +1,5 @@
 package com.websarva.wings.android.zuboradiary.ui.diary.diaryedit
 
-import android.util.Log
-import androidx.navigation.fragment.NavHostFragment
 import com.websarva.wings.android.zuboradiary.ui.BaseDatePickerDialogFragment
 import java.time.LocalDate
 
@@ -19,17 +17,14 @@ class DatePickerDialogFragment : BaseDatePickerDialogFragment() {
     }
 
     override fun handleOnPositiveButtonClick(selectedDate: LocalDate) {
-        Log.d("20250228", "handleOnPositiveButtonClick")
         setSelectedDate(selectedDate)
     }
 
     override fun handleOnNegativeButtonClick() {
-        Log.d("20250228", "handleOnNegativeButtonClick")
         setSelectedDate(null)
     }
 
     override fun handleOnCancel() {
-        Log.d("20250228", "handleOnCancel()")
         setSelectedDate(null)
     }
 
