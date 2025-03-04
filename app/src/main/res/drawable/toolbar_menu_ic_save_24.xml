@@ -1,3 +1,7 @@
+<!--
+  Source: GoogleFonts
+  URL: https://fonts.google.com/icons
+-->
 <!-- HACK:menu.xmlではappLevel26以上でないと色(tint)を変更できなかったのでメニューアイコン専用drawable.xml作成 -->
 <vector android:height="24dp" android:tint="?attr/colorOnSurfaceVariant"
     android:viewportHeight="24" android:viewportWidth="24"
