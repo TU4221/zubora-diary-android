@@ -2,7 +2,7 @@
 
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 plugins {
-    id("com.android.application") version "8.8.0" apply false
+    id("com.android.application") version "8.8.2" apply false
     id("org.jetbrains.kotlin.android") version "2.0.21" apply false
 
     // KSP機能追加
@@ -25,7 +25,7 @@ buildscript {
     dependencies {
         // Navigation SafeArgs 機能追加
         // https://developer.android.com/jetpack/androidx/releases/navigation?hl=JA#safe_args
-        val navVersion = "2.8.5"
+        val navVersion = "2.8.8"
         classpath("androidx.navigation:navigation-safe-args-gradle-plugin:$navVersion")
     }
 }

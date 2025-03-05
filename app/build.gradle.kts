@@ -68,7 +68,7 @@ android {
 dependencies {
 
     implementation("androidx.appcompat:appcompat:1.7.0")
-    implementation("androidx.constraintlayout:constraintlayout:2.2.0")
+    implementation("androidx.constraintlayout:constraintlayout:2.2.1")
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.2.1")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.6.1")
@@ -82,7 +82,7 @@ dependencies {
     implementation("androidx.core:core-splashscreen:1.0.1")
 
     // Navigation
-    val navVersion = "2.8.5"
+    val navVersion = "2.8.8"
     // Jetpack Compose integration
     implementation("androidx.navigation:navigation-compose:$navVersion")
     // Views/Fragments integration
@@ -152,11 +152,11 @@ dependencies {
 
     // PreferencesDataStore
     // https://developer.android.com/topic/libraries/architecture/datastore?hl=ja#preferences-datastore-dependencies
-    implementation("androidx.datastore:datastore-preferences:1.1.2")
+    implementation("androidx.datastore:datastore-preferences:1.1.3")
     // optional - RxJava2 support
-    implementation("androidx.datastore:datastore-preferences-rxjava2:1.1.2")
+    implementation("androidx.datastore:datastore-preferences-rxjava2:1.1.3")
     // optional - RxJava3 support
-    implementation("androidx.datastore:datastore-preferences-rxjava3:1.1.2")
+    implementation("androidx.datastore:datastore-preferences-rxjava3:1.1.3")
 
     // WorkerManager(バックグラウンドタスク管理)
     // https://developer.android.com/develop/background-work/background-tasks/persistent/getting-started?hl=ja
@@ -204,7 +204,7 @@ dependencies {
 
     // kizitonwose/Calendar
     // https://github.com/kizitonwose/Calendar
-    val desugarVersion = "2.1.4"
+    val desugarVersion = "2.1.5"
     val calendarVersion = "2.5.0"
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:$desugarVersion")
     // The view calendar library
