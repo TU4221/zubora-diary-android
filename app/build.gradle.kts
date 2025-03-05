@@ -2,21 +2,26 @@ plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
 
-    // Navigation SafeArgs 機能追加
-    // MEMO:下記追加同期後、Gradleの他の箇所を変更してから同期するとDirectionsクラスがエラーになる。(Buildは通る)
-    //      下記削除同期後、再度追加同期を行えばエラーは消える。
-    //      この解決策を発見する前にキャッシュクリア、再起動を行ったが関係なさそう。
-    id("androidx.navigation.safeargs")
-
-    // RoomのSchemaエクスポート機能を使用する為に追加
-    id("androidx.room")
+    // KSP機能追加
+    // https://developer.android.com/build/migrate-to-ksp?hl=ja#add-ksp
+    id("com.google.devtools.ksp")
 
     // Hilt機能追加
+    // https://developer.android.com/training/dependency-injection/hilt-android?hl=ja#setup
     id("kotlin-kapt")
     id("com.google.dagger.hilt.android")
 
-    // KSP機能追加
-    id("com.google.devtools.ksp")
+    // Room Schemaエクスポート機能追加
+    // https://developer.android.com/training/data-storage/room/migrating-db-versions?hl=ja#export-schemas
+    id("androidx.room")
+
+    // Navigation Kotlinシリアル化プラグイン機能追加
+    // https://developer.android.com/jetpack/androidx/releases/navigation?hl=JA#declaring_dependencies
+    kotlin("plugin.serialization")
+
+    // Navigation SafeArgs 機能追加
+    // https://developer.android.com/jetpack/androidx/releases/navigation?hl=JA#safe_args
+    id("androidx.navigation.safeargs")
 }
 
 android {
@@ -31,10 +36,6 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-
-        // kizitonwose/Calendar 追加設定
-        // Required ONLY if your minSdkVersion is below 21
-        multiDexEnabled = true
     }
 
     buildTypes {
@@ -43,57 +44,90 @@ android {
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
     }
+    
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
 
-        // kizitonwose/Calendar 追加設定
+        // kizitonwose/Calendar
+        // https://github.com/kizitonwose/Calendar
         // Enable support for the new language APIs
         isCoreLibraryDesugaringEnabled = true
-        // Set Java compatibility (version can be higher if desired)
-        //sourceCompatibility JavaVersion.VERSION_1_8 // 前の行で記述済みの為、コメントアウト。(記録として残す)
-        //targetCompatibility JavaVersion.VERSION_1_8 // 前の行で記述済みの為、コメントアウト。(記録として残す)
-
     }
+
     buildFeatures {
         dataBinding = true
         viewBinding = true
     }
 
-    // kizitonwose/Calendar 追加設定
-    // HACK:kotlinOptionsの設定ができない為保留。後日調べる。
     kotlinOptions {
-        // Also add this for Kotlin projects (version can be higher if desired)
         jvmTarget = "1.8"
     }
-
-    // RoomのSchemaエクスポート機能を使用する為に追加
-    room {
-        schemaDirectory("$projectDir/schemas")
-    }
 }
-
 
 dependencies {
 
     implementation("androidx.appcompat:appcompat:1.7.0")
-    implementation("com.google.android.material:material:1.12.0")
     implementation("androidx.constraintlayout:constraintlayout:2.2.0")
-    implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.8.7")
-    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.7")
-    implementation("androidx.navigation:navigation-fragment-ktx:2.8.5")
-    implementation("androidx.navigation:navigation-ui-ktx:2.8.5")
-    implementation("androidx.navigation:navigation-fragment-ktx:2.8.5")
-    implementation("androidx.navigation:navigation-ui-ktx:2.8.5")
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.2.1")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.6.1")
 
-    // Material3追加
+    // Material
+    implementation("com.google.android.material:material:1.12.0")
     implementation("androidx.compose.material3:material3:1.3.1")
 
+    // SplashScreen
+    // https://developer.android.com/develop/ui/views/launch/splash-screen?hl=ja#getting-started
+    implementation("androidx.core:core-splashscreen:1.0.1")
 
-    // 下記は公式より
+    // Navigation
+    val navVersion = "2.8.5"
+    // Jetpack Compose integration
+    implementation("androidx.navigation:navigation-compose:$navVersion")
+    // Views/Fragments integration
+    implementation("androidx.navigation:navigation-fragment-ktx:$navVersion")
+    implementation("androidx.navigation:navigation-ui-ktx:$navVersion")
+    // Feature module support for Fragments
+    implementation("androidx.navigation:navigation-dynamic-features-fragment:$navVersion")
+    // Testing Navigation
+    androidTestImplementation("androidx.navigation:navigation-testing:$navVersion")
+    // JSON serialization library, works with the Kotlin serialization plugin
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.3")
+
+    // Lifecycle
+    // https://developer.android.com/jetpack/androidx/releases/lifecycle?hl=ja#kotlin
+    val lifecycleVersion = "2.8.7"
+    val archVersion = "2.2.0"
+    // ViewModel
+    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycleVersion")
+    // ViewModel utilities for Compose
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:$lifecycleVersion")
+    // LiveData
+    implementation("androidx.lifecycle:lifecycle-livedata-ktx:$lifecycleVersion")
+    // Lifecycles only (without ViewModel or LiveData)
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:$lifecycleVersion")
+    // Lifecycle utilities for Compose
+    implementation("androidx.lifecycle:lifecycle-runtime-compose:$lifecycleVersion")
+    // Saved state module for ViewModel
+    implementation("androidx.lifecycle:lifecycle-viewmodel-savedstate:$lifecycleVersion")
+    // Annotation processor
+    // MEMO:"androidx.lifecycle:lifecycle-common-java8"を使用する為、下記コメントアウト。
+    //kapt("androidx.lifecycle:lifecycle-compiler:$lifecycleVersion")
+    // alternately - if using Java8, use the following instead of lifecycle-compiler
+    implementation("androidx.lifecycle:lifecycle-common-java8:$lifecycleVersion")
+    // optional - helpers for implementing LifecycleOwner in a Service
+    implementation("androidx.lifecycle:lifecycle-service:$lifecycleVersion")
+    // optional - ProcessLifecycleOwner provides a lifecycle for the whole application process
+    implementation("androidx.lifecycle:lifecycle-process:$lifecycleVersion")
+    // optional - ReactiveStreams support for LiveData
+    implementation("androidx.lifecycle:lifecycle-reactivestreams-ktx:$lifecycleVersion")
+    // optional - Test helpers for LiveData
+    testImplementation("androidx.arch.core:core-testing:$archVersion")
+    // optional - Test helpers for Lifecycle runtime
+    testImplementation ("androidx.lifecycle:lifecycle-runtime-testing:$lifecycleVersion")
+
+    // Room(SQLiteデータベース管理)
     // https://developer.android.com/jetpack/androidx/releases/room#declaring_dependencies
     val roomVersion = "2.6.1"
     implementation("androidx.room:room-runtime:$roomVersion")
@@ -116,31 +150,16 @@ dependencies {
     // optional - Paging 3 Integration
     implementation("androidx.room:room-paging:$roomVersion")
 
-
-    // zennの記事より上記不足分追加
-    // https://codezine.jp/article/detail/17124?p=1&anchor=0
-    annotationProcessor("androidx.room:room-compiler:$roomVersion")
-    implementation("com.google.guava:guava:31.1-android")
-
-
-    // kizitonwose/Calendar 追加設定
-    val desugarVersion = "2.1.4"
-    val calendarVersion = "2.5.0"
-    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:$desugarVersion")
-    // The view calendar library
-    implementation("com.kizitonwose.calendar:view:$calendarVersion")
-    // The compose calendar library
-    implementation("com.kizitonwose.calendar:compose:$calendarVersion")
-
-
-    // PreferencesDataStore 追加
+    // PreferencesDataStore
+    // https://developer.android.com/topic/libraries/architecture/datastore?hl=ja#preferences-datastore-dependencies
     implementation("androidx.datastore:datastore-preferences:1.1.2")
     // optional - RxJava2 support
     implementation("androidx.datastore:datastore-preferences-rxjava2:1.1.2")
     // optional - RxJava3 support
     implementation("androidx.datastore:datastore-preferences-rxjava3:1.1.2")
 
-    // WorkerManager 追加
+    // WorkerManager(バックグラウンドタスク管理)
+    // https://developer.android.com/develop/background-work/background-tasks/persistent/getting-started?hl=ja
     val workVersion = "2.10.0"
     // (Java only)
     implementation("androidx.work:work-runtime:$workVersion")
@@ -155,96 +174,57 @@ dependencies {
     // optional - Multi process support
     implementation("androidx.work:work-multiprocess:$workVersion")
 
-    // Retrofit 追加
+    // Retrofit(HTTP通信)
+    // https://square.github.io/retrofit/
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
     implementation("com.squareup.retrofit2:converter-gson:2.9.0")
     implementation("com.squareup.moshi:moshi-kotlin:1.15.1")
     implementation("com.squareup.retrofit2:converter-moshi:2.9.0")
 
-    //  FusedLocationProviderClient(位置情報利用) 追加
+    // FusedLocationProviderClient(位置情報)
+    // https://developer.android.com/develop/sensors-and-location/location/retrieve-current?hl=ja#setup
     implementation("com.google.android.gms:play-services-location:21.3.0")
 
-    // ライフサイクル管理 追加
-    // TODO:kotlinとJavaで切り換えること
-    val lifecycleVersion = "2.8.7"
-    val archVersion = "2.2.0"
-    // kotlin
-    /*
-    // ViewModel
-    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycle_version")
-    // ViewModel utilities for Compose
-    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:$lifecycle_version")
-    // LiveData
-    implementation("androidx.lifecycle:lifecycle-livedata-ktx:$lifecycle_version")
-    // Lifecycles only (without ViewModel or LiveData)
-    implementation("androidx.lifecycle:lifecycle-runtime-ktx:$lifecycle_version")
-    // Lifecycle utilities for Compose
-    implementation("androidx.lifecycle:lifecycle-runtime-compose:$lifecycle_version")
-    // Saved state module for ViewModel
-    implementation("androidx.lifecycle:lifecycle-viewmodel-savedstate:$lifecycle_version")
-    // Annotation processor
-    kapt("androidx.lifecycle:lifecycle-compiler:$lifecycle_version")
-    // alternately - if using Java8, use the following instead of lifecycle-compiler
-    implementation("androidx.lifecycle:lifecycle-common-java8:$lifecycle_version")
-    // optional - helpers for implementing LifecycleOwner in a Service
-    implementation("androidx.lifecycle:lifecycle-service:$lifecycle_version")
-    // optional - ProcessLifecycleOwner provides a lifecycle for the whole application process
-    implementation("androidx.lifecycle:lifecycle-process:$lifecycle_version")
-    // optional - ReactiveStreams support for LiveData
-    implementation("androidx.lifecycle:lifecycle-reactivestreams-ktx:$lifecycle_version")
-    // optional - Test helpers for LiveData
-    testImplementation("androidx.arch.core:core-testing:$arch_version")
-    // optional - Test helpers for Lifecycle runtime
-    testImplementation ("androidx.lifecycle:lifecycle-runtime-testing:$lifecycle_version")
-    */
-
-    //Java
-    // ViewModel
-    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycleVersion")
-    // LiveData
-    implementation("androidx.lifecycle:lifecycle-livedata-ktx:$lifecycleVersion")
-    // Lifecycles only (without ViewModel or LiveData)
-    implementation("androidx.lifecycle:lifecycle-runtime-ktx:$lifecycleVersion")
-    // Saved state module for ViewModel
-    implementation("androidx.lifecycle:lifecycle-viewmodel-savedstate:$lifecycleVersion")
-    // Annotation processor
-    //annotationProcessor("androidx.lifecycle:lifecycle-compiler:$lifecycleVersion")
-    // alternately - if using Java8, use the following instead of lifecycle-compiler
-    implementation("androidx.lifecycle:lifecycle-common-java8:$lifecycleVersion")
-    // optional - helpers for implementing LifecycleOwner in a Service
-    implementation("androidx.lifecycle:lifecycle-service:$lifecycleVersion")
-    // optional - ProcessLifecycleOwner provides a lifecycle for the whole application process
-    implementation("androidx.lifecycle:lifecycle-process:$lifecycleVersion")
-    // optional - ReactiveStreams support for LiveData
-    implementation("androidx.lifecycle:lifecycle-reactivestreams-ktx:$lifecycleVersion")
-    // optional - Test helpers for LiveData
-    testImplementation("androidx.arch.core:core-testing:$archVersion")
-    // optional - Test helpers for Lifecycle runtime
-    testImplementation("androidx.lifecycle:lifecycle-runtime-testing:$lifecycleVersion")
-
-    // Hilt機能追加
+    // Hilt(依存性注入)
+    // https://developer.android.com/training/dependency-injection/hilt-android?hl=ja#setup
     implementation("com.google.dagger:hilt-android:2.51.1")
     kapt("com.google.dagger:hilt-android-compiler:2.51.1")
-    // HiltLifecycle
-    //implementation("androidx.hilt.lifecycle:1.2.0")
+
     // HiltNavigation
-    //implementation("androidx.hilt:hilt-navigation:1.2.0")
+    // https://developer.android.com/training/dependency-injection/hilt-jetpack?hl=ja#viewmodel-navigation
     implementation("androidx.hilt:hilt-navigation-fragment:1.2.0")
+
     // HiltWorker
+    // https://developer.android.com/training/dependency-injection/hilt-jetpack?hl=ja#workmanager
     implementation("androidx.hilt:hilt-work:1.2.0")
     // When using Kotlin.
     kapt("androidx.hilt:hilt-compiler:1.2.0") // MEMO:Javaを使用していても左記未設定だとWorkerの引数を変更する事はできない。
     // When using Java.
     annotationProcessor("androidx.hilt:hilt-compiler:1.2.0")
 
+    // kizitonwose/Calendar
+    // https://github.com/kizitonwose/Calendar
+    val desugarVersion = "2.1.4"
+    val calendarVersion = "2.5.0"
+    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:$desugarVersion")
+    // The view calendar library
+    implementation("com.kizitonwose.calendar:view:$calendarVersion")
+    // The compose calendar library
+    implementation("com.kizitonwose.calendar:compose:$calendarVersion")
+
+    // LeakCanary
+    // https://square.github.io/leakcanary/getting_started/
     // debugImplementation because LeakCanary should only run in debug builds.
     debugImplementation("com.squareup.leakcanary:leakcanary-android:2.14")
-
-    // SplashScreen
-    implementation("androidx.core:core-splashscreen:1.0.1")
 }
 
-// Hilt機能追加(生成されたコードへの参照を許可する)
+// Hilt(生成されたコードへの参照を許可する)
 kapt {
     correctErrorTypes = true
+}
+
+// Room Schemaエクスポート機能追加
+// https://developer.android.com/training/data-storage/room/migrating-db-versions?hl=ja#export-schemas
+room {
+    schemaDirectory("$projectDir/schemas")
 }
