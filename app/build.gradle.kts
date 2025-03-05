@@ -1,6 +1,7 @@
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
+    id("kotlin-kapt") // MEMO:KotlinプロジェクトにてDataBindingを実装する時、左記プラグイン必要。(警告より)
 
     // KSP機能追加
     // https://developer.android.com/build/migrate-to-ksp?hl=ja#add-ksp
@@ -8,7 +9,6 @@ plugins {
 
     // Hilt機能追加
     // https://developer.android.com/training/dependency-injection/hilt-android?hl=ja#setup
-    id("kotlin-kapt")
     id("com.google.dagger.hilt.android")
 
     // Room Schemaエクスポート機能追加
@@ -44,7 +44,7 @@ android {
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
     }
-    
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
@@ -113,7 +113,7 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-viewmodel-savedstate:$lifecycleVersion")
     // Annotation processor
     // MEMO:"androidx.lifecycle:lifecycle-common-java8"を使用する為、下記コメントアウト。
-    //kapt("androidx.lifecycle:lifecycle-compiler:$lifecycleVersion")
+    //ksp("androidx.lifecycle:lifecycle-compiler:$lifecycleVersion")
     // alternately - if using Java8, use the following instead of lifecycle-compiler
     implementation("androidx.lifecycle:lifecycle-common-java8:$lifecycleVersion")
     // optional - helpers for implementing LifecycleOwner in a Service
@@ -188,7 +188,7 @@ dependencies {
     // Hilt(依存性注入)
     // https://developer.android.com/training/dependency-injection/hilt-android?hl=ja#setup
     implementation("com.google.dagger:hilt-android:2.51.1")
-    kapt("com.google.dagger:hilt-android-compiler:2.51.1")
+    ksp("com.google.dagger:hilt-android-compiler:2.51.1")
 
     // HiltNavigation
     // https://developer.android.com/training/dependency-injection/hilt-jetpack?hl=ja#viewmodel-navigation
@@ -198,7 +198,7 @@ dependencies {
     // https://developer.android.com/training/dependency-injection/hilt-jetpack?hl=ja#workmanager
     implementation("androidx.hilt:hilt-work:1.2.0")
     // When using Kotlin.
-    kapt("androidx.hilt:hilt-compiler:1.2.0") // MEMO:Javaを使用していても左記未設定だとWorkerの引数を変更する事はできない。
+    ksp("androidx.hilt:hilt-compiler:1.2.0") // MEMO:Javaを使用していても左記未設定だとWorkerの引数を変更する事はできない。
     // When using Java.
     annotationProcessor("androidx.hilt:hilt-compiler:1.2.0")
 
@@ -216,11 +216,6 @@ dependencies {
     // https://square.github.io/leakcanary/getting_started/
     // debugImplementation because LeakCanary should only run in debug builds.
     debugImplementation("com.squareup.leakcanary:leakcanary-android:2.14")
-}
-
-// Hilt(生成されたコードへの参照を許可する)
-kapt {
-    correctErrorTypes = true
 }
 
 // Room Schemaエクスポート機能追加
