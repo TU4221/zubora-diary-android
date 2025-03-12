@@ -29,8 +29,6 @@ buildscript {
     dependencies {
         // Navigation SafeArgs 機能追加
         // https://developer.android.com/jetpack/androidx/releases/navigation?hl=JA#safe_args
-        val navVersion = "2.8.8"
         classpath(libs.androidx.navigation.safe.args.gradle.plugin)
-        //classpath(libs.androidx.navigation.safe.args.gradle.plugin)
     }
 }

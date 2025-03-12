@@ -11,9 +11,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.compose.ui.unit.dp
 import androidx.databinding.ViewDataBinding
-import com.mikepenz.aboutlibraries.ui.compose.LibraryDefaults
 import com.mikepenz.aboutlibraries.ui.compose.m3.LibrariesContainer
-import com.mikepenz.aboutlibraries.ui.compose.m3.libraryColors
+import com.mikepenz.aboutlibraries.ui.compose.m3.LibraryDefaults
 import com.websarva.wings.android.zuboradiary.data.AppMessage
 import com.websarva.wings.android.zuboradiary.databinding.FragmentOpenSourceLicensesBinding
 import com.websarva.wings.android.zuboradiary.ui.BaseFragment
@@ -47,7 +46,8 @@ class OpenSourceLicensesFragment: BaseFragment() {
                             badgeBackgroundColor = Color(themeColor.getPrimaryColor(resources)),
                             dialogConfirmButtonColor = Color(themeColor.getPrimaryColor(resources))
                         ),
-                        dimensions = LibraryDefaults.libraryDimensions(8.dp),
+                        itemContentPadding = LibraryDefaults.ContentPadding,
+                        itemSpacing = 8.dp
                     )
                 }
             }

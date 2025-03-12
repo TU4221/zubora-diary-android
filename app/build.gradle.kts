@@ -83,38 +83,12 @@ dependencies {
     val composeBom = platform(libs.androidx.compose.bom)
     implementation(composeBom)
     androidTestImplementation(composeBom)
-    // Choose one of the following:
-    // Material Design 3
-    //implementation("androidx.compose.material3:material3")
-    // or Material Design 2
-    //implementation("androidx.compose.material:material")
-    // or skip Material Design and build directly on top of foundational components
-    //implementation("androidx.compose.foundation:foundation")
-    // or only import the main APIs for the underlying toolkit systems,
-    // such as input and measurement/layout
-    //implementation("androidx.compose.ui:ui")
     // Android Studio Preview support
     implementation(libs.androidx.compose.ui.tooling.preview)
     debugImplementation(libs.androidx.compose.ui.tooling)
     // UI Tests
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
-    // Optional - Included automatically by material, only add when you need
-    // the icons but not the material library (e.g. when using Material3 or a
-    // custom design system based on Foundation)
-    //implementation("androidx.compose.material:material-icons-core")
-    // Optional - Add full set of material icons
-    //implementation("androidx.compose.material:material-icons-extended")
-    // Optional - Add window size utils
-    //implementation("androidx.compose.material3.adaptive:adaptive")
-    // Optional - Integration with activities
-    //implementation(libs.androidx.activity.compose)
-    // Optional - Integration with ViewModels
-    //implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.5")
-    // Optional - Integration with LiveData
-    //implementation("androidx.compose.runtime:runtime-livedata")
-    // Optional - Integration with RxJava
-    //implementation("androidx.compose.runtime:runtime-rxjava2")
 
     // Material
     implementation(libs.material)
@@ -144,8 +118,6 @@ dependencies {
     implementation(libs.androidx.lifecycle.viewmodel.ktx)
     // ViewModel utilities for Compose
     implementation(libs.androidx.lifecycle.viewmodel.compose)
-    // LiveData
-    implementation(libs.androidx.lifecycle.livedata.ktx)
     // Lifecycles only (without ViewModel or LiveData)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     // Lifecycle utilities for Compose
@@ -153,18 +125,7 @@ dependencies {
     // Saved state module for ViewModel
     implementation(libs.androidx.lifecycle.viewmodel.savedstate)
     // Annotation processor
-    // MEMO:"androidx.lifecycle:lifecycle-common-java8"を使用する為、下記コメントアウト。
-    //ksp("androidx.lifecycle:lifecycle-compiler:$lifecycleVersion")
-    // alternately - if using Java8, use the following instead of lifecycle-compiler
-    implementation(libs.androidx.lifecycle.common.java8)
-    // optional - helpers for implementing LifecycleOwner in a Service
-    implementation(libs.androidx.lifecycle.service)
-    // optional - ProcessLifecycleOwner provides a lifecycle for the whole application process
-    implementation(libs.androidx.lifecycle.process)
-    // optional - ReactiveStreams support for LiveData
-    implementation(libs.androidx.lifecycle.reactivestreams.ktx)
-    // optional - Test helpers for LiveData
-    testImplementation(libs.androidx.core.testing)
+    ksp(libs.androidx.lifecycle.compiler)
     // optional - Test helpers for Lifecycle runtime
     testImplementation (libs.androidx.lifecycle.runtime.testing)
 
@@ -179,39 +140,19 @@ dependencies {
     annotationProcessor(libs.androidx.room.compiler)
     // optional - Kotlin Extensions and Coroutines support for Room
     implementation(libs.androidx.room.ktx)
-    // optional - RxJava2 support for Room
-    implementation(libs.androidx.room.rxjava2)
-    // optional - RxJava3 support for Room
-    implementation(libs.androidx.room.rxjava3)
-    // optional - Guava support for Room, including Optional and ListenableFuture
-    implementation(libs.androidx.room.guava)
     // optional - Test helpers
     testImplementation(libs.androidx.room.testing)
-    // optional - Paging 3 Integration
-    implementation(libs.androidx.room.paging)
 
     // PreferencesDataStore
     // https://developer.android.com/topic/libraries/architecture/datastore?hl=ja#preferences-datastore-dependencies
     implementation(libs.androidx.datastore.preferences)
-    // optional - RxJava2 support
-    implementation(libs.androidx.datastore.preferences.rxjava2)
-    // optional - RxJava3 support
-    implementation(libs.androidx.datastore.preferences.rxjava3)
 
     // WorkerManager(バックグラウンドタスク管理)
     // https://developer.android.com/develop/background-work/background-tasks/persistent/getting-started?hl=ja
-    // (Java only)
-    implementation(libs.androidx.work.runtime)
     // Kotlin + coroutines
     implementation(libs.androidx.work.runtime.ktx)
-    // optional - RxJava2 support
-    implementation(libs.androidx.work.rxjava2)
-    // optional - GCMNetworkManager support
-    implementation(libs.androidx.work.gcm)
     // optional - Test helpers
     androidTestImplementation(libs.androidx.work.testing)
-    // optional - Multi process support
-    implementation(libs.androidx.work.multiprocess)
 
     // Retrofit(HTTP通信)
     // https://square.github.io/retrofit/
@@ -250,9 +191,9 @@ dependencies {
     implementation(libs.kizitonwose.calendar.compose)
 
     // AboutLibraries
+    // https://github.com/mikepenz/AboutLibraries
     implementation(libs.aboutlibraries.core)
     implementation(libs.aboutlibraries.compose.core)
-    //implementation(libs.aboutlibraries.compose.m2) // material 2
     implementation(libs.aboutlibraries.compose.m3) // material 3
     implementation(libs.aboutlibraries.compose.view)
 
