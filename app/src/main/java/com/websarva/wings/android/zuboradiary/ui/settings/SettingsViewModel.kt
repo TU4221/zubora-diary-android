@@ -63,6 +63,8 @@ class SettingsViewModel @Inject constructor(
     val hasUpdatedGeoCoordinates
         get() = _geoCoordinates.value != null
 
+    var scrollPositionY = 0
+
     init {
         initialize()
     }

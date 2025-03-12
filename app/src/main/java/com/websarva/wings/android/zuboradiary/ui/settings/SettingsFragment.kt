@@ -8,6 +8,7 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -128,6 +129,7 @@ class SettingsFragment : BaseFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        setUpScrollPosition()
         setUpThemeColorSettingItem()
         setUpCalendarStartDaySettingItem()
         setUpReminderNotificationSettingItem()
@@ -252,6 +254,10 @@ class SettingsFragment : BaseFragment() {
             val isSuccessful = settingsViewModel.deleteAllData()
             if (isSuccessful) uriPermissionManager.releaseAllPersistablePermission()
         }
+    }
+
+    private fun setUpScrollPosition() {
+        binding.scrollViewSettings.scrollY = settingsViewModel.scrollPositionY
     }
 
     private fun setUpThemeColorSettingItem() {
@@ -593,6 +599,11 @@ class SettingsFragment : BaseFragment() {
         navController.navigate(directions)
     }
 
+    private fun saveScrollPosition() {
+        Log.d("20250312", binding.scrollViewSettings.scrollY.toString())
+        settingsViewModel.scrollPositionY = binding.scrollViewSettings.scrollY
+    }
+
     private fun showThemeColorPickerDialog() {
         if (isDialogShowing) return
 
@@ -676,6 +687,7 @@ class SettingsFragment : BaseFragment() {
     }
 
     override fun destroyBinding() {
+        saveScrollPosition()
         _binding = null
     }
 }
