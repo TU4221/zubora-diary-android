@@ -205,6 +205,38 @@
                         android:orientation="vertical">
 
                         <com.google.android.material.divider.MaterialDivider
+                            android:id="@+id/material_divider_section_app"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content" />
+
+                        <TextView
+                            style="@style/SettingsSectionTextViewStyle"
+                            android:id="@+id/text_settings_section_other"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:minHeight="@dimen/fragment_settings_section_layout_min_height"
+                            android:textAppearance="@style/SettingsSectionTextViewTextAppearance"
+                            android:text="@string/fragment_settings_section_title_other"/>
+
+                        <com.google.android.material.divider.MaterialDivider
+                            android:id="@+id/material_divider_open_source_licenses_setting"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content" />
+
+                        <include
+                            layout="@layout/layout_settings_item"
+                            android:id="@+id/include_open_source_licenses_setting"
+                            app:settingIcon="@{@drawable/ic_copyright_24dp}"
+                            app:settingTitle="@{@string/fragment_settings_item_title_open_source_licenses}" />
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+
+                        <com.google.android.material.divider.MaterialDivider
                             android:id="@+id/material_divider_section_end"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content" />

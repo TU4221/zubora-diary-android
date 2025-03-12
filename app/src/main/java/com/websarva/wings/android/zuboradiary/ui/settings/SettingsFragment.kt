@@ -136,6 +136,7 @@ class SettingsFragment : BaseFragment() {
         setUpAllDiariesDeleteSettingItem()
         setUpAllSettingsInitializationSettingItem()
         setUpAllDataDeleteSettingItem()
+        setUpOpenSourceLicensesSettingItem()
     }
 
     override fun handleOnReceivingResultFromPreviousFragment() {
@@ -572,6 +573,24 @@ class SettingsFragment : BaseFragment() {
             }
             textValue.visibility = View.GONE
         }
+    }
+
+    private fun setUpOpenSourceLicensesSettingItem() {
+        binding.includeOpenSourceLicensesSetting.apply {
+            textTitle.setOnClickListener {
+                showOpenSourceLicensesFragment()
+            }
+            textValue.visibility = View.GONE
+        }
+    }
+
+    private fun showOpenSourceLicensesFragment() {
+        if (isDialogShowing) return
+
+        val directions =
+            SettingsFragmentDirections
+                .actionNavigationSettingsFragmentToOpenSourceLicensesFragment()
+        navController.navigate(directions)
     }
 
     private fun showThemeColorPickerDialog() {

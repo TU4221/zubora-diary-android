@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.kotlin.compose)
     id("kotlin-kapt") // MEMO:KotlinプロジェクトにてDataBindingを実装する時、左記プラグイン必要。(警告より)
 
     // KSP機能追加
@@ -22,6 +23,9 @@ plugins {
     // Navigation SafeArgs 機能追加
     // https://developer.android.com/jetpack/androidx/releases/navigation?hl=JA#safe_args
     id("androidx.navigation.safeargs")
+
+    // AboutLibraries機能追加
+    alias(libs.plugins.aboutLibraries)
 }
 
 android {
@@ -58,6 +62,7 @@ android {
     buildFeatures {
         dataBinding = true
         viewBinding = true
+        compose = true
     }
 
     kotlinOptions {
@@ -72,6 +77,44 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
+
+    // Compose
+    // https://developer.android.com/develop/ui/compose/setup?hl=ja#setup-compose
+    val composeBom = platform(libs.androidx.compose.bom)
+    implementation(composeBom)
+    androidTestImplementation(composeBom)
+    // Choose one of the following:
+    // Material Design 3
+    //implementation("androidx.compose.material3:material3")
+    // or Material Design 2
+    //implementation("androidx.compose.material:material")
+    // or skip Material Design and build directly on top of foundational components
+    //implementation("androidx.compose.foundation:foundation")
+    // or only import the main APIs for the underlying toolkit systems,
+    // such as input and measurement/layout
+    //implementation("androidx.compose.ui:ui")
+    // Android Studio Preview support
+    implementation(libs.androidx.compose.ui.tooling.preview)
+    debugImplementation(libs.androidx.compose.ui.tooling)
+    // UI Tests
+    androidTestImplementation(libs.androidx.compose.ui.test.junit4)
+    debugImplementation(libs.androidx.compose.ui.test.manifest)
+    // Optional - Included automatically by material, only add when you need
+    // the icons but not the material library (e.g. when using Material3 or a
+    // custom design system based on Foundation)
+    //implementation("androidx.compose.material:material-icons-core")
+    // Optional - Add full set of material icons
+    //implementation("androidx.compose.material:material-icons-extended")
+    // Optional - Add window size utils
+    //implementation("androidx.compose.material3.adaptive:adaptive")
+    // Optional - Integration with activities
+    //implementation(libs.androidx.activity.compose)
+    // Optional - Integration with ViewModels
+    //implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.5")
+    // Optional - Integration with LiveData
+    //implementation("androidx.compose.runtime:runtime-livedata")
+    // Optional - Integration with RxJava
+    //implementation("androidx.compose.runtime:runtime-rxjava2")
 
     // Material
     implementation(libs.material)
@@ -205,6 +248,13 @@ dependencies {
     implementation(libs.kizitonwose.calendar.view)
     // The compose calendar library
     implementation(libs.kizitonwose.calendar.compose)
+
+    // AboutLibraries
+    implementation(libs.aboutlibraries.core)
+    implementation(libs.aboutlibraries.compose.core)
+    //implementation(libs.aboutlibraries.compose.m2) // material 2
+    implementation(libs.aboutlibraries.compose.m3) // material 3
+    implementation(libs.aboutlibraries.compose.view)
 
     // LeakCanary
     // https://square.github.io/leakcanary/getting_started/

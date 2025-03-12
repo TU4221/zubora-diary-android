@@ -189,6 +189,10 @@
                     app:argType="com.websarva.wings.android.zuboradiary.data.AppMessage" />
             </action>
 
+            <action
+                android:id="@+id/action_navigation_settings_fragment_to_open_source_licenses_fragment"
+                app:destination="@id/navigation_open_source_licenses_fragment"/>
+
         </fragment>
 
         <dialog
@@ -231,6 +235,10 @@
             android:id="@+id/navigation_all_data_delete_dialog"
             android:name="com.websarva.wings.android.zuboradiary.ui.settings.AllDataDeleteDialogFragment">
         </dialog>
+
+        <fragment
+            android:id="@+id/navigation_open_source_licenses_fragment"
+            android:name="com.websarva.wings.android.zuboradiary.ui.settings.OpenSourceLicensesFragment" />
 
     </navigation>
 

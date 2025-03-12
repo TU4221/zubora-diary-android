@@ -72,7 +72,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var locationRequest: LocationRequest
 
     // ギャラリーから画像取得
-    private val openDocumentResultLauncher = registerForActivityResult<Array<String>, Uri>(
+    private val openDocumentResultLauncher = registerForActivityResult(
         ActivityResultContracts.OpenDocument()
     ) { o: Uri? ->
         if (o == null) return@registerForActivityResult  // 未選択時
@@ -428,6 +428,7 @@ class MainActivity : AppCompatActivity() {
             if (navDestinationId == R.id.navigation_diary_list_fragment) return true
             if (navDestinationId == R.id.navigation_calendar_fragment) return true
             if (navDestinationId == R.id.navigation_settings_fragment) return true
+            if (navDestinationId == R.id.navigation_open_source_licenses_fragment) return true
             if (navDestinationId == R.id.navigation_word_search_fragment) return true
             if (navDestinationId == R.id.navigation_diary_show_fragment) return true
             if (navDestinationId == R.id.navigation_diary_edit_fragment) return true

@@ -4,6 +4,7 @@
 plugins {
     alias(libs.plugins.android.application) apply false
     alias(libs.plugins.kotlin.android)  apply false
+    alias(libs.plugins.kotlin.compose) apply false
 
     // KSP機能追加
     // https://developer.android.com/build/migrate-to-ksp?hl=ja#add-ksp
@@ -20,6 +21,9 @@ plugins {
     // Navigation Kotlinシリアル化プラグイン機能追加
     // https://developer.android.com/jetpack/androidx/releases/navigation?hl=JA#declaring_dependencies
     alias(libs.plugins.kotlin.serialization) apply false
+
+    // AboutLibraries機能追加
+    alias(libs.plugins.aboutLibraries) apply false
 }
 buildscript {
     dependencies {
