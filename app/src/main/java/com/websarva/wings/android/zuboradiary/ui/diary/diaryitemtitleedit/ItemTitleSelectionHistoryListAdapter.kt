@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor
+import com.websarva.wings.android.zuboradiary.databinding.RowBackgroundDeleteButtonFullWideBinding
 import com.websarva.wings.android.zuboradiary.databinding.RowItemTitleSelectionHistoryBinding
 import com.websarva.wings.android.zuboradiary.ui.LeftSwipeSimpleCallback
 import com.websarva.wings.android.zuboradiary.ui.LeftSwipeSimpleCallback.LeftSwipeViewHolder
@@ -92,7 +93,7 @@ internal class ItemTitleSelectionHistoryListAdapter
         override val foregroundView
             get() = binding.textTitle
         override val backgroundButtonView
-            get() = binding.includeBackground.imageButtonDelete
+            get() = RowBackgroundDeleteButtonFullWideBinding.bind(binding.root).imageButtonDelete
     }
 
     internal class DiaryItemTitleSelectionHistoryDiffUtilItemCallback
