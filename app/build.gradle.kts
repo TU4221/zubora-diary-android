@@ -208,3 +208,8 @@ dependencies {
 room {
     schemaDirectory("$projectDir/schemas")
 }
+
+// AboutLibraries Libraries手動追加
+aboutLibraries {
+    configPath = "$projectDir/src/main/assets/about_libraries"
+}

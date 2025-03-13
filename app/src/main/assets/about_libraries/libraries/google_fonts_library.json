@@ -1,0 +1,19 @@
+{
+      "uniqueId": "fonts.google.com/icons",
+      "funding": [],
+      "developers": [
+        {
+          "name": "Google"
+        }
+      ],
+      "artifactVersion": "N/A",
+      "description": "Material Icons is a font service provided by Google that is designed to match Material Design.",
+      "name": "Material Icons",
+      "website": "https://fonts.google.com/icons",
+      "licenses": [
+        "Apache-2.0"
+      ],
+      "organization": {
+        "name": "Google"
+      }
+    }

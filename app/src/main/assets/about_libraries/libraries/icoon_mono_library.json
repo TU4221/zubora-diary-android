@@ -1,0 +1,19 @@
+{
+      "uniqueId": "icooon-mono.com",
+      "funding": [],
+      "developers": [
+        {
+          "name": "TopeconHeroes"
+        }
+      ],
+      "artifactVersion": "N/A",
+      "description": "This is a material distribution site where you can download monochrome icon materials for free, for commercial use.",
+      "name": "ICOOON MONO",
+      "website": "https://icooon-mono.com/",
+      "licenses": [
+        "ICOOON MONO"
+      ],
+      "organization": {
+        "name": "TopeconHeroes"
+      }
+    }
