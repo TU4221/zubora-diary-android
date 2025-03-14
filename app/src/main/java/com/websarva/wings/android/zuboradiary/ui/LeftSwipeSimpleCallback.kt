@@ -11,7 +11,7 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewbinding.ViewBinding
 
-open class LeftSwipeSimpleCallback(protected val recyclerView: RecyclerView) :
+internal open class LeftSwipeSimpleCallback(protected val recyclerView: RecyclerView) :
     ItemTouchHelper.SimpleCallback(ItemTouchHelper.ACTION_STATE_IDLE, ItemTouchHelper.LEFT) {
 
     abstract class LeftSwipeViewHolder(binding: ViewBinding)

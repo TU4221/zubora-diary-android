@@ -3,7 +3,7 @@ package com.websarva.wings.android.zuboradiary.ui.list.diarylist
 import androidx.recyclerview.widget.RecyclerView
 import com.websarva.wings.android.zuboradiary.ui.LeftSwipeBackgroundButtonSimpleCallback
 
-class DiaryListSimpleCallback(
+internal class DiaryListSimpleCallback(
     private val parentRecyclerView: RecyclerView,
     recyclerView: RecyclerView
 ) : LeftSwipeBackgroundButtonSimpleCallback(recyclerView) {

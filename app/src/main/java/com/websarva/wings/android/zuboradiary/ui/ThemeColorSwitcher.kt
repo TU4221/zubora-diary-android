@@ -22,7 +22,7 @@ import java.util.function.Consumer
  * 各Fragment固有のViewに対しては本クラスを継承して継承クラスにメソッドを追加する。
  * 本クラスに記述されている各Viewの色はアプリ背景色(SurfaceColor)を考慮して選定。
  */
-open class ThemeColorSwitcher(protected val context: Context, protected val themeColor: ThemeColor) {
+internal open class ThemeColorSwitcher(protected val context: Context, protected val themeColor: ThemeColor) {
 
     protected val resources: Resources = context.resources
 

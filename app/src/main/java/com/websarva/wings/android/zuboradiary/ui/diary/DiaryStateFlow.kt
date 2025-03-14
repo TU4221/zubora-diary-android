@@ -11,7 +11,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import java.time.LocalDate
 import java.time.LocalDateTime
 
-class DiaryStateFlow {
+internal class DiaryStateFlow {
 
     companion object {
         const val MAX_ITEMS: Int = ItemNumber.MAX_NUMBER

@@ -4,7 +4,7 @@ import com.websarva.wings.android.zuboradiary.ui.list.DiaryYearMonthListBaseAdap
 import com.websarva.wings.android.zuboradiary.ui.list.DiaryYearMonthListBaseItem
 import java.time.YearMonth
 
-class DiaryYearMonthListItem : DiaryYearMonthListBaseItem {
+internal class DiaryYearMonthListItem : DiaryYearMonthListBaseItem {
 
     val diaryDayList: DiaryDayList
 

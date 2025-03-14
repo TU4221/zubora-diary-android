@@ -5,7 +5,7 @@ import android.view.LayoutInflater
 import androidx.appcompat.view.ContextThemeWrapper
 import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor
 
-class ThemeColorInflaterCreator(
+internal class ThemeColorInflaterCreator(
     private val context: Context,
     private val inflater: LayoutInflater,
     private val themeColor: ThemeColor) {

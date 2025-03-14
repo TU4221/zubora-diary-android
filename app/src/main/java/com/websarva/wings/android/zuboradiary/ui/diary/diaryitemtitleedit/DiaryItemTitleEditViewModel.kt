@@ -16,7 +16,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class DiaryItemTitleEditViewModel @Inject constructor(
+internal class DiaryItemTitleEditViewModel @Inject constructor(
     private val diaryItemTitleSelectionHistoryRepository: DiaryItemTitleSelectionHistoryRepository
 ) : BaseViewModel() {
 

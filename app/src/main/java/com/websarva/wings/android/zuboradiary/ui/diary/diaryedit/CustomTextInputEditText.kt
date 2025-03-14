@@ -14,7 +14,7 @@ import com.google.android.material.textfield.TextInputEditText
 //      これは本来のアクセシビリティサービスが損なわれる可能性があることを示唆している。
 //      対策としてonTouchEvent()メソッドをOverrideした本クラスを作成して使用。
 //      https://www.binarydevelop.com/article/androidsetontouchlistenerperformclick-68009
-class CustomTextInputEditText : TextInputEditText {
+internal class CustomTextInputEditText : TextInputEditText {
     constructor(context: Context) : super(context)
 
     constructor(context: Context, attrs: AttributeSet?) : super(context, attrs)

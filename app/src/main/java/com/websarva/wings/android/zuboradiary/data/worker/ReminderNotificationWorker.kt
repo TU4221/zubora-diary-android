@@ -23,7 +23,7 @@ import dagger.assisted.AssistedInject
 import java.time.LocalDate
 
 @HiltWorker
-class ReminderNotificationWorker @AssistedInject constructor(
+internal class ReminderNotificationWorker @AssistedInject constructor(
     @Assisted context: Context,
     @Assisted workerParams: WorkerParameters,
     private val diaryRepository: DiaryRepository

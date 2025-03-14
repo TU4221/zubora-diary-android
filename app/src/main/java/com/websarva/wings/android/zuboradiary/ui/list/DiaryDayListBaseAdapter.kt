@@ -10,7 +10,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor
 import com.websarva.wings.android.zuboradiary.ui.ThemeColorInflaterCreator
 
-abstract class DiaryDayListBaseAdapter protected constructor(
+internal abstract class DiaryDayListBaseAdapter protected constructor(
     protected val context: Context,
     protected val recyclerView: RecyclerView,
     protected val themeColor: ThemeColor,

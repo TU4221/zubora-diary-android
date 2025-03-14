@@ -8,7 +8,7 @@ import com.websarva.wings.android.zuboradiary.data.diary.Weather
 //      その為、@Suppress("RedundantSuppression")で警告回避。
 @Suppress("RedundantSuppression")
 // MEMO:constructorは直接使用されていないがRetrofit2(Moshi)にてインスタンス化している為、@Suppressで警告回避。
-data class WeatherApiData @Suppress("unused") constructor(
+internal data class WeatherApiData @Suppress("unused") constructor(
     // MEMO:フィールド変数はRetrofit2(Moshi)にて代入。
     private val latitude: Float,
     private val longitude: Float,

@@ -11,7 +11,7 @@ import com.websarva.wings.android.zuboradiary.ui.list.DiaryYearMonthListBaseItem
 import com.websarva.wings.android.zuboradiary.ui.list.SwipeDiaryDayListBaseAdapter
 import com.websarva.wings.android.zuboradiary.ui.list.SwipeDiaryYearMonthListBaseAdapter
 
-abstract class DiaryYearMonthListAdapter(
+internal abstract class DiaryYearMonthListAdapter(
     context: Context,
     recyclerView: RecyclerView,
     themeColor: ThemeColor

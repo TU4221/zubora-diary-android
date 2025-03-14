@@ -4,7 +4,7 @@ import com.websarva.wings.android.zuboradiary.ui.list.DiaryYearMonthListBaseAdap
 import com.websarva.wings.android.zuboradiary.ui.list.DiaryYearMonthListBaseItem
 import java.time.YearMonth
 
-class WordSearchResultYearMonthListItem : DiaryYearMonthListBaseItem {
+internal class WordSearchResultYearMonthListItem : DiaryYearMonthListBaseItem {
     val wordSearchResultDayList: WordSearchResultDayList
 
     constructor(viewType: DiaryYearMonthListBaseAdapter.ViewType) : super(viewType) {

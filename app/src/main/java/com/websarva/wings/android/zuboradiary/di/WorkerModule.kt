@@ -11,7 +11,7 @@ import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
-object WorkerModule {
+internal object WorkerModule {
 
     @JvmStatic
     @Singleton

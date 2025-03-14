@@ -14,7 +14,7 @@ import java.time.LocalDate
 import javax.inject.Inject
 
 @HiltViewModel
-class DiaryShowViewModel @Inject constructor(private val diaryRepository: DiaryRepository) :
+internal class DiaryShowViewModel @Inject constructor(private val diaryRepository: DiaryRepository) :
     BaseViewModel() {
 
     // 日記データ関係

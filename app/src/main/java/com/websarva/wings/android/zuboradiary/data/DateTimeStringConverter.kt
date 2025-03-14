@@ -9,7 +9,7 @@ import java.time.format.DateTimeFormatter
  *
  * Class LocalDate を用途に合わせたの文字列に変換するクラス。
  */
-class DateTimeStringConverter {
+internal class DateTimeStringConverter {
 
     private val dateFormat = "yyyy年MM月dd日(E)"
     private val dateFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern(dateFormat)

@@ -3,7 +3,7 @@ package com.websarva.wings.android.zuboradiary.ui
 import com.websarva.wings.android.zuboradiary.ui.diary.diaryedit.DiaryEditViewModel
 
 // TODO:最終的に削除
-class TestDiariesSaver(private val diaryEditViewModel: DiaryEditViewModel) {
+internal class TestDiariesSaver(private val diaryEditViewModel: DiaryEditViewModel) {
     suspend fun save(number: Long) {
         val startDate = diaryEditViewModel.date.value
         if (startDate != null) {

@@ -2,7 +2,7 @@ package com.websarva.wings.android.zuboradiary.ui.list
 
 import java.time.YearMonth
 
-abstract class DiaryYearMonthListBaseItem {
+internal abstract class DiaryYearMonthListBaseItem {
 
     val yearMonth: YearMonth
     val viewType: DiaryYearMonthListBaseAdapter.ViewType

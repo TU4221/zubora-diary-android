@@ -37,7 +37,7 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 
 @AndroidEntryPoint
-class DiaryShowFragment : BaseFragment() {
+internal class DiaryShowFragment : BaseFragment() {
 
     companion object {
         // Navigation関係

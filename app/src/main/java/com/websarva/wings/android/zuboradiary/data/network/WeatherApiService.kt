@@ -4,7 +4,7 @@ import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Query
 
-interface WeatherApiService {
+internal interface WeatherApiService {
     @GET("forecast")
     suspend fun getWeather(
         @Query("latitude") latitude: String,

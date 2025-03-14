@@ -5,7 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 
-abstract class UriPermissionManager(context: Context) {
+internal abstract class UriPermissionManager(context: Context) {
 
     private val resolver: ContentResolver = context.contentResolver
 

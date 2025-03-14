@@ -20,7 +20,7 @@ import com.websarva.wings.android.zuboradiary.ui.ThemeColorInflaterCreator
 
 // DiaryFragment、WordSearchFragmentの親RecyclerViewのListAdapter。
 // 親RecyclerViewを同じ構成にする為、一つのクラスで両方の子RecyclerViewに対応できるように作成。
-abstract class DiaryYearMonthListBaseAdapter protected constructor(
+internal abstract class DiaryYearMonthListBaseAdapter protected constructor(
     protected val context: Context,
     protected val recyclerView: RecyclerView,
     protected val themeColor: ThemeColor,

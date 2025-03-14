@@ -7,7 +7,7 @@ import java.time.DayOfWeek
 /**
  * Enum java.time.DayOfWeeK を用途に合わせた文字列に変換するクラス。
  */
-class DayOfWeekStringConverter(private val context: Context) {
+internal class DayOfWeekStringConverter(private val context: Context) {
 
     fun toCalendarStartDayOfWeek(dayOfWeek: DayOfWeek): String {
         val resId = when (dayOfWeek) {

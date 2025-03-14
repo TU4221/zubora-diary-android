@@ -21,7 +21,7 @@ import java.time.temporal.ChronoUnit
 import javax.inject.Inject
 
 @HiltViewModel
-class DiaryEditViewModel @Inject constructor(
+internal class DiaryEditViewModel @Inject constructor(
     private val diaryRepository: DiaryRepository,
     private val weatherApiRepository: WeatherApiRepository
 ) : BaseViewModel() {

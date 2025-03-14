@@ -8,7 +8,7 @@ import com.websarva.wings.android.zuboradiary.ui.list.diarylist.DiaryListSimpleC
 
 // DiaryFragment、WordSearchFragmentの親RecyclerViewのListAdapter。
 // 親RecyclerViewを同じ構成にする為、一つのクラスで両方の子RecyclerViewに対応できるように作成。
-abstract class SwipeDiaryYearMonthListBaseAdapter protected constructor(
+internal abstract class SwipeDiaryYearMonthListBaseAdapter protected constructor(
     context: Context,
     recyclerView: RecyclerView,
     themeColor: ThemeColor,

@@ -6,7 +6,7 @@ import android.widget.ImageView
 import androidx.core.content.ContextCompat
 import com.websarva.wings.android.zuboradiary.R
 
-class DiaryPictureManager(
+internal class DiaryPictureManager(
     private val context: Context, private val imageView: ImageView, private val iconColor: Int) {
 
     fun setUpPictureOnDiary(uri: Uri?) {

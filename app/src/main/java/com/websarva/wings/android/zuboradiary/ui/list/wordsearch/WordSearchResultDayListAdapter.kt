@@ -13,7 +13,7 @@ import com.websarva.wings.android.zuboradiary.ui.list.DiaryDayListBaseAdapter
 import com.websarva.wings.android.zuboradiary.ui.list.DiaryDayListBaseItem
 import java.text.NumberFormat
 
-class WordSearchResultDayListAdapter(
+internal class WordSearchResultDayListAdapter(
     context: Context,
     recyclerView: RecyclerView,
     themeColor: ThemeColor

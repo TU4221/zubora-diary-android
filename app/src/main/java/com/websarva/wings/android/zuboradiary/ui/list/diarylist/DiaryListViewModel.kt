@@ -22,7 +22,7 @@ import java.util.concurrent.CancellationException
 import javax.inject.Inject
 
 @HiltViewModel
-class DiaryListViewModel @Inject constructor(private val diaryRepository: DiaryRepository) :
+internal class DiaryListViewModel @Inject constructor(private val diaryRepository: DiaryRepository) :
     BaseViewModel() {
 
     companion object {

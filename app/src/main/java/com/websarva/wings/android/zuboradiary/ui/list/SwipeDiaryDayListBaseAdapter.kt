@@ -4,7 +4,7 @@ import android.content.Context
 import androidx.recyclerview.widget.RecyclerView
 import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor
 
-abstract class SwipeDiaryDayListBaseAdapter protected constructor(
+internal abstract class SwipeDiaryDayListBaseAdapter protected constructor(
     context: Context,
     recyclerView: RecyclerView,
     themeColor: ThemeColor,

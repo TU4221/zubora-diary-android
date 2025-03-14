@@ -14,7 +14,7 @@ import com.websarva.wings.android.zuboradiary.ui.list.DiaryDayListBaseItem
 import com.websarva.wings.android.zuboradiary.ui.list.SwipeDiaryDayListBaseAdapter
 import java.text.NumberFormat
 
-class DiaryDayListAdapter(context: Context, recyclerView: RecyclerView, themeColor: ThemeColor)
+internal class DiaryDayListAdapter(context: Context, recyclerView: RecyclerView, themeColor: ThemeColor)
     : SwipeDiaryDayListBaseAdapter(
         context,
         recyclerView,

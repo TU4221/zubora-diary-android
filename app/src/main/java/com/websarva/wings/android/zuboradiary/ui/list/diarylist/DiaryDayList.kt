@@ -1,6 +1,6 @@
 package com.websarva.wings.android.zuboradiary.ui.list.diarylist
 
-class DiaryDayList {
+internal class DiaryDayList {
 
     val diaryDayListItemList: List<DiaryDayListItem>
 

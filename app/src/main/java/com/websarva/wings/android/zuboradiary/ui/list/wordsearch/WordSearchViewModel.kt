@@ -18,7 +18,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class WordSearchViewModel @Inject internal constructor(
+internal class WordSearchViewModel @Inject internal constructor(
     private val diaryRepository: DiaryRepository
 ) : BaseViewModel() {
 

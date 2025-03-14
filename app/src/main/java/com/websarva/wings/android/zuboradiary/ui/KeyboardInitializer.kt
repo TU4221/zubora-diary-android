@@ -5,7 +5,7 @@ import android.content.Context
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 
-class KeyboardInitializer(activity: Activity) {
+internal class KeyboardInitializer(activity: Activity) {
     private val inputMethodManager: InputMethodManager =
         activity.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
 

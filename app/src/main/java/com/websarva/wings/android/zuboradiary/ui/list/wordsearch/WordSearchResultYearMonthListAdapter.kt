@@ -9,7 +9,7 @@ import com.websarva.wings.android.zuboradiary.ui.list.DiaryDayListBaseItem
 import com.websarva.wings.android.zuboradiary.ui.list.DiaryYearMonthListBaseAdapter
 import com.websarva.wings.android.zuboradiary.ui.list.DiaryYearMonthListBaseItem
 
-abstract class WordSearchResultYearMonthListAdapter(
+internal abstract class WordSearchResultYearMonthListAdapter(
     context: Context,
     recyclerView: RecyclerView,
     themeColor: ThemeColor

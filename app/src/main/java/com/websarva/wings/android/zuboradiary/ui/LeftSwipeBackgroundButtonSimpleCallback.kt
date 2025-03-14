@@ -10,7 +10,7 @@ import androidx.recyclerview.widget.RecyclerView
 import kotlin.math.max
 import kotlin.math.min
 
-open class LeftSwipeBackgroundButtonSimpleCallback(recyclerView: RecyclerView) :
+internal open class LeftSwipeBackgroundButtonSimpleCallback(recyclerView: RecyclerView) :
     LeftSwipeSimpleCallback(recyclerView) {
 
     private var swipingOffset: Float = 0f

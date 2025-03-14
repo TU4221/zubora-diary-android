@@ -2,7 +2,7 @@ package com.websarva.wings.android.zuboradiary.data.diary
 
 import java.io.Serializable
 
-class ItemNumber(value: Int) : Serializable, Comparable<ItemNumber> {
+internal class ItemNumber(value: Int) : Serializable, Comparable<ItemNumber> {
 
     companion object {
         const val MIN_NUMBER: Int = 1

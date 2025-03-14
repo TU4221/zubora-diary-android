@@ -8,7 +8,7 @@ import com.websarva.wings.android.zuboradiary.data.database.WordSearchResultList
 import com.websarva.wings.android.zuboradiary.data.diary.ItemNumber
 import com.websarva.wings.android.zuboradiary.ui.list.DiaryDayListBaseItem
 
-class WordSearchResultDayListItem(
+internal class WordSearchResultDayListItem(
     listItem: WordSearchResultListItem,
     searchWord: String,
     textColor: Int,

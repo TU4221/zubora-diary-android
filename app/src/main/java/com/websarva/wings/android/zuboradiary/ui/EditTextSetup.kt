@@ -13,7 +13,7 @@ import android.widget.EditText
 import android.widget.ImageButton
 import java.util.Arrays
 
-open class EditTextSetup(private val activity: Activity) {
+internal open class EditTextSetup(private val activity: Activity) {
 
     protected fun hideKeyboard(view: View) {
         val keyboardInitializer = KeyboardInitializer(activity)
