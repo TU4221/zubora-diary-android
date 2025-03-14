@@ -1,7 +1,6 @@
 package com.websarva.wings.android.zuboradiary.ui.settings
 
 import android.content.DialogInterface
-import android.util.Log
 import com.websarva.wings.android.zuboradiary.R
 import com.websarva.wings.android.zuboradiary.ui.BaseAlertDialogFragment
 
@@ -23,17 +22,14 @@ class AllSettingsInitializationDialogFragment : BaseAlertDialogFragment() {
     }
 
     override fun handleOnPositiveButtonClick() {
-        Log.d("20250228", "handleOnPositiveButtonClick")
         setResult(KEY_SELECTED_BUTTON, DialogInterface.BUTTON_POSITIVE)
     }
 
     override fun handleOnNegativeButtonClick() {
-        Log.d("20250228", "handleOnNegativeButtonClick")
         setResult(KEY_SELECTED_BUTTON, DialogInterface.BUTTON_NEGATIVE)
     }
 
     override fun handleOnCancel() {
-        Log.d("20250228", "handleOnCancel()")
         setResult(KEY_SELECTED_BUTTON, DialogInterface.BUTTON_NEGATIVE)
     }
 }

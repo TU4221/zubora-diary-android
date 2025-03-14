@@ -105,7 +105,6 @@ class DiaryEditFragment : BaseFragment() {
 
         // TODO:最終的に削除
         binding.fabTest.setOnClickListener {
-            Log.d("20240823", "OnClick")
             val testDiariesSaver = TestDiariesSaver(diaryEditViewModel)
             lifecycleScope.launch(Dispatchers.IO) {
                 testDiariesSaver.save(28)

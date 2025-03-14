@@ -6,7 +6,6 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.Looper
-import android.util.Log
 import android.view.MenuItem
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
@@ -318,8 +317,6 @@ class MainActivity : AppCompatActivity() {
 
         private inner class EnabledNavigationLifecycleEventObserver : LifecycleEventObserver {
             override fun onStateChanged(source: LifecycleOwner, event: Lifecycle.Event) {
-                Log.d("20241107", "LifecycleOwner$source")
-                Log.d("20241107", "LifecycleEvent$event")
                 if (event != Lifecycle.Event.ON_RESUME) {
                     switchEnabledNavigation(false)
                     return
