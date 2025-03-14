@@ -225,7 +225,7 @@ class CalendarFragment : BaseFragment() {
             }
         }
 
-        fun setUpCalendarDayColor(
+        private fun setUpCalendarDayColor(
             calendarDay: CalendarDay, textCalendarDay: TextView, viewCalendarDayDot: View
         ) {
             val themeColorSwitcher =
@@ -266,7 +266,7 @@ class CalendarFragment : BaseFragment() {
             }
         }
 
-        fun setUpCalendarDayDotVisibility(calendarDay: CalendarDay, viewCalendarDayDot: View) {
+        private fun setUpCalendarDayDotVisibility(calendarDay: CalendarDay, viewCalendarDayDot: View) {
             val localDate = calendarDay.date
 
             lifecycleScope.launch(Dispatchers.IO) {
@@ -317,7 +317,7 @@ class CalendarFragment : BaseFragment() {
             }
         }
 
-        fun setUpDayOfWeekColor(dayOfWeek: DayOfWeek, dayOfWeekText: TextView) {
+        private fun setUpDayOfWeekColor(dayOfWeek: DayOfWeek, dayOfWeekText: TextView) {
             val themeColorSwitcher =
                 CalendarThemeColorSwitcher(requireContext(), themeColor)
 

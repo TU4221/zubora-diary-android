@@ -133,7 +133,7 @@ class DiaryListViewModel @Inject constructor(private val diaryRepository: DiaryR
             return loadSavedDiaryList(NUM_LOADING_ITEMS, 0)
         }
 
-        fun showDiaryListFirstItemProgressIndicator() {
+        private fun showDiaryListFirstItemProgressIndicator() {
             val list = DiaryYearMonthList(false)
             _diaryList.value = list
         }

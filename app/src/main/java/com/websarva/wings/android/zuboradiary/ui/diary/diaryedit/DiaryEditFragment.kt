@@ -396,7 +396,7 @@ class DiaryEditFragment : BaseFragment() {
             }
         }
 
-        suspend fun shouldShowDiaryLoadingDialog(changedDate: LocalDate): Boolean? {
+        private suspend fun shouldShowDiaryLoadingDialog(changedDate: LocalDate): Boolean? {
             if (diaryEditViewModel.isNewDiaryDefaultStatus) {
                 return diaryEditViewModel.existsSavedDiary(changedDate)
             }
@@ -409,7 +409,7 @@ class DiaryEditFragment : BaseFragment() {
             return diaryEditViewModel.existsSavedDiary(changedDate)
         }
 
-        fun requiresWeatherInfoFetching(date: LocalDate): Boolean {
+        private fun requiresWeatherInfoFetching(date: LocalDate): Boolean {
             val previousDate = diaryEditViewModel.previousDate.value ?: return false
             return date != previousDate
         }
@@ -666,7 +666,7 @@ class DiaryEditFragment : BaseFragment() {
             setUpItemsLayout(value)
         }
 
-        fun enableItemAdditionButton(enabled: Boolean) {
+        private fun enableItemAdditionButton(enabled: Boolean) {
             binding.imageButtonItemAddition.isEnabled = enabled
             val alphaResId = if (enabled) {
                 R.dimen.view_enabled_alpha
@@ -677,7 +677,7 @@ class DiaryEditFragment : BaseFragment() {
             binding.imageButtonItemAddition.alpha = alpha
         }
 
-        fun setUpItemsLayout(numItems: Int) {
+        private fun setUpItemsLayout(numItems: Int) {
             require(!(numItems < ItemNumber.MIN_NUMBER || numItems > ItemNumber.MAX_NUMBER))
 
             // MEMO:LifeCycleがResumedの時のみ項目欄のモーション追加処理を行う。
@@ -773,7 +773,7 @@ class DiaryEditFragment : BaseFragment() {
             enablePictureDeleteButton(value != null)
         }
 
-        fun enablePictureDeleteButton(enabled: Boolean) {
+        private fun enablePictureDeleteButton(enabled: Boolean) {
             binding.imageButtonAttachedPictureDelete.apply {
                 isEnabled = enabled
                 val alphaResId = if (enabled) {

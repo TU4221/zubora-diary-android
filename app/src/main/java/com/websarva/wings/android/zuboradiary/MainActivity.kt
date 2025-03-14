@@ -296,7 +296,7 @@ class MainActivity : AppCompatActivity() {
         //      (何も表示されない状態)
         //      これを回避するために、遷移先のFragmentが表示しきるまで、タブ選択できないようにする。
         //      Fragment A → B → A
-        fun setUpEnabledNavigationSwitchFunction() {
+        private fun setUpEnabledNavigationSwitchFunction() {
             // 上記不具合対策で無効にしたBottomNavigationを有効にする
             // StartDestinationFragment用ナビゲーション有効オブサーバー設定
             findShowedFragment().lifecycle.addObserver(EnabledNavigationLifecycleEventObserver())
@@ -325,7 +325,7 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        fun switchEnabledNavigation(isEnabled: Boolean) {
+        private fun switchEnabledNavigation(isEnabled: Boolean) {
             val menu = binding.bottomNavigation.menu
             val size = menu.size()
             for (i in 0 until size) {
@@ -356,7 +356,7 @@ class MainActivity : AppCompatActivity() {
             return true
         }
 
-        fun setUpFragmentTransition() {
+        private fun setUpFragmentTransition() {
             // 表示中のFragmentを取得し、Transitionを設定
             val fragment = findShowedFragment()
             fragment.exitTransition = MaterialFadeThrough()
@@ -406,7 +406,7 @@ class MainActivity : AppCompatActivity() {
             binding.motionLayoutBottomNavigation.transitionToState(motionResId)
         }
 
-        fun needsBottomNavigationView(
+        private fun needsBottomNavigationView(
             navController: NavController,
             navDestination: NavDestination
         ): Boolean {
@@ -420,7 +420,7 @@ class MainActivity : AppCompatActivity() {
             return isFragmentWithBottomNavigation(previousNavDestination)
         }
 
-        fun isFragment(navDestination: NavDestination): Boolean {
+        private fun isFragment(navDestination: NavDestination): Boolean {
             val navDestinationId = navDestination.id
             if (navDestinationId == R.id.navigation_diary_list_fragment) return true
             if (navDestinationId == R.id.navigation_calendar_fragment) return true
@@ -432,7 +432,7 @@ class MainActivity : AppCompatActivity() {
             return navDestinationId == R.id.navigation_diary_item_title_edit_fragment
         }
 
-        fun isFragmentWithBottomNavigation(navDestination: NavDestination): Boolean {
+        private fun isFragmentWithBottomNavigation(navDestination: NavDestination): Boolean {
             // MEMO:下記理由より、対象FragmentはBottomNavigationViewの各タブ先頭のFragmentのみとする。
             //      ・標準のNavigation機能は各タブ毎にFragment状態を保存しない為。
             //        例)WordSearchFragment
