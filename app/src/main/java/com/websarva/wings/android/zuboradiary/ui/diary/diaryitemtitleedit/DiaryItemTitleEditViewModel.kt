@@ -1,5 +1,6 @@
 package com.websarva.wings.android.zuboradiary.ui.diary.diaryitemtitleedit
 
+import android.util.Log
 import androidx.lifecycle.viewModelScope
 import com.websarva.wings.android.zuboradiary.data.AppMessage
 import com.websarva.wings.android.zuboradiary.data.database.DiaryItemTitleSelectionHistoryRepository
@@ -63,6 +64,7 @@ internal class DiaryItemTitleEditViewModel @Inject constructor(
                             SelectionHistoryList(list)
                         }.stateIn(this)
             } catch (e: Exception) {
+                Log.e(javaClass.simpleName, "日記項目タイトル選択履歴読込失敗", e)
                 addAppMessage(AppMessage.DIARY_ITEM_TITLE_HISTORY_LOADING_ERROR)
             }
         }
@@ -85,6 +87,7 @@ internal class DiaryItemTitleEditViewModel @Inject constructor(
         try {
             diaryItemTitleSelectionHistoryRepository.deleteSelectionHistoryItem(deleteTitle)
         } catch (e: Exception) {
+            Log.e(javaClass.simpleName, "日記項目タイトル選択履歴アイテム削除失敗", e)
             addAppMessage(AppMessage.DIARY_ITEM_TITLE_HISTORY_ITEM_DELETE_ERROR)
             return false
         }

@@ -4,15 +4,18 @@ import android.content.ContentResolver
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import android.util.Log
 
 internal abstract class UriPermissionManager(context: Context) {
 
     private val resolver: ContentResolver = context.contentResolver
 
     fun takePersistablePermission(uri: Uri) {
+        resolver.takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION)
         try {
             resolver.takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION)
         } catch (e: SecurityException) {
+            Log.e(javaClass.simpleName, "端末写真使用権限取得失敗", e)
             // 対処できないがアプリを落としたくない為、catchのみの処理とする。
         }
     }

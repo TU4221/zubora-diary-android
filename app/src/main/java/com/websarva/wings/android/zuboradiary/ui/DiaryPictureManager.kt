@@ -2,6 +2,7 @@ package com.websarva.wings.android.zuboradiary.ui
 
 import android.content.Context
 import android.net.Uri
+import android.util.Log
 import android.widget.ImageView
 import androidx.core.content.ContextCompat
 import com.websarva.wings.android.zuboradiary.R
@@ -18,6 +19,7 @@ internal class DiaryPictureManager(
         try {
             setUpPicture(uri)
         } catch (e: SecurityException) {
+            Log.e(javaClass.simpleName, "日記添付写真読込失敗", e)
             setUpPermissionDenialIconOnDiary()
         }
     }
@@ -39,6 +41,7 @@ internal class DiaryPictureManager(
         try {
             setUpPicture(uri)
         } catch (e: SecurityException) {
+            Log.e(javaClass.simpleName, "日記リスト添付写真読込失敗", e)
             setUpPermissionDenialIconOnDiaryList()
         }
     }

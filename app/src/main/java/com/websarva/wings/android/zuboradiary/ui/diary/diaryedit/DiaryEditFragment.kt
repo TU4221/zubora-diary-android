@@ -808,6 +808,7 @@ class DiaryEditFragment : BaseFragment() {
                     releasePersistablePermission(checkNotNull(loadedPictureUri))
                 }
             } catch (e: SecurityException) {
+                Log.e(javaClass.simpleName, "端末写真使用権限取得/解放失敗", e)
                 // 対処できないがアプリを落としたくない為、catchのみ処理する。
             }
         }

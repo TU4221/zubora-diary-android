@@ -143,7 +143,7 @@ internal class WordSearchViewModel @Inject internal constructor(
                 resultListCreator.create(spannableStringColor, spannableStringBackGroundColor)
             _wordSearchResultList.value = updateResultList
         } catch (e: Exception) {
-            Log.d("Exception", "ワード検索結果読込キャンセル", e)
+            Log.e(javaClass.simpleName, "ワード検索結果読込失敗", e)
             _wordSearchResultList.value = previousResultList
             addAppMessage(AppMessage.DIARY_LOADING_ERROR)
         }

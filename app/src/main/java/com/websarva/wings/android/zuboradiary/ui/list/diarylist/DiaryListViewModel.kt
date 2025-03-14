@@ -72,6 +72,7 @@ internal class DiaryListViewModel @Inject constructor(private val diaryRepositor
                 val numSavedDiaries = diaryRepository.countDiaries()
                 if (numSavedDiaries >= 1) loadNewDiaryList()
             } catch (e: Exception) {
+                Log.e(javaClass.simpleName, "日記リスト初回読込失敗", e)
                 addAppMessage(AppMessage.DIARY_INFO_LOADING_ERROR)
             }
         } else {
@@ -113,7 +114,7 @@ internal class DiaryListViewModel @Inject constructor(private val diaryRepositor
             val updateDiaryList = creator.create()
             _diaryList.value = updateDiaryList
         } catch (e: Exception) {
-            Log.d("Exception", "日記読込失敗", e)
+            Log.e(javaClass.simpleName, "日記リスト読込失敗", e)
             _diaryList.value = previousDiaryList
             addAppMessage(AppMessage.DIARY_LOADING_ERROR)
         }
@@ -232,6 +233,7 @@ internal class DiaryListViewModel @Inject constructor(private val diaryRepositor
         try {
             diaryRepository.deleteDiary(date)
         } catch (e: Exception) {
+            Log.e(javaClass.simpleName, "日記削除失敗", e)
             addAppMessage(AppMessage.DIARY_DELETE_ERROR)
             return false
         }
@@ -245,6 +247,7 @@ internal class DiaryListViewModel @Inject constructor(private val diaryRepositor
         try {
             return !diaryRepository.existsPicturePath(uri)
         } catch (e: Exception) {
+            Log.e(javaClass.simpleName, "端末写真URI使用状況確認失敗", e)
             addAppMessage(AppMessage.DIARY_LOADING_ERROR)
             return null
         }
@@ -256,6 +259,7 @@ internal class DiaryListViewModel @Inject constructor(private val diaryRepositor
             val strDate = diaryEntity.date
             return LocalDate.parse(strDate)
         } catch (e: Exception) {
+            Log.e(javaClass.simpleName, "最新日記読込失敗", e)
             addAppMessage(AppMessage.DIARY_INFO_LOADING_ERROR)
             return null
         }
@@ -267,6 +271,7 @@ internal class DiaryListViewModel @Inject constructor(private val diaryRepositor
             val strDate = diaryEntity.date
             return LocalDate.parse(strDate)
         } catch (e: Exception) {
+            Log.e(javaClass.simpleName, "最古日記読込失敗", e)
             addAppMessage(AppMessage.DIARY_INFO_LOADING_ERROR)
             return null
         }

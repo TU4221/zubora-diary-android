@@ -69,6 +69,7 @@ internal class DiaryShowViewModel @Inject constructor(private val diaryRepositor
         try {
             return diaryRepository.existsDiary(date)
         } catch (e: Exception) {
+            Log.e(javaClass.simpleName, "日記既存確認失敗", e)
             addAppMessage(AppMessage.DIARY_INFO_LOADING_ERROR)
             return null
         }
@@ -79,7 +80,7 @@ internal class DiaryShowViewModel @Inject constructor(private val diaryRepositor
             val diaryEntity = diaryRepository.loadDiary(date) ?: throw IllegalArgumentException()
             diaryStateFlow.update(diaryEntity)
         } catch (e: Exception) {
-            Log.d("Exception", "loadSavedDiary()", e)
+            Log.e(javaClass.simpleName, "日記読込失敗", e)
             addAppMessage(AppMessage.DIARY_LOADING_ERROR)
             return false
         }
@@ -91,6 +92,7 @@ internal class DiaryShowViewModel @Inject constructor(private val diaryRepositor
         try {
             diaryRepository.deleteDiary(deleteDate)
         } catch (e: Exception) {
+            Log.e(javaClass.simpleName, "日記削除失敗", e)
             addAppMessage(AppMessage.DIARY_DELETE_ERROR)
             return false
         }
@@ -102,6 +104,7 @@ internal class DiaryShowViewModel @Inject constructor(private val diaryRepositor
         try {
             return !diaryRepository.existsPicturePath(uri)
         } catch (e: Exception) {
+            Log.e(javaClass.simpleName, "端末写真URI使用状況確認失敗", e)
             addAppMessage(AppMessage.DIARY_LOADING_ERROR)
             return null
         }

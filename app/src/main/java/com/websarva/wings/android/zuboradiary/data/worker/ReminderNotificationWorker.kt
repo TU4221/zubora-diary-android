@@ -66,7 +66,7 @@ internal class ReminderNotificationWorker @AssistedInject constructor(
         try {
             hasWriteTodayDiary = existsSavedTodayDiary()
         } catch (e: Exception) {
-            Log.d("Exception", "本日付日記保存済み確認失敗", e)
+            Log.e(javaClass.simpleName, "本日付日記既存確認失敗", e)
             return Result.failure()
         }
         if (hasWriteTodayDiary) return Result.success()
@@ -76,7 +76,6 @@ internal class ReminderNotificationWorker @AssistedInject constructor(
 
     @Throws(Exception::class)
     private suspend fun existsSavedTodayDiary(): Boolean {
-        // TODO:非同期にするか検討
         val result = diaryRepository.existsDiary(LocalDate.now())
         Log.d("NotificationWorker", "hasWriteTodayDiary():$result")
         return result

@@ -1,6 +1,7 @@
 package com.websarva.wings.android.zuboradiary.data.preferences
 
 import android.content.Context
+import android.util.Log
 import androidx.datastore.core.DataStore
 import androidx.datastore.core.IOException
 import androidx.datastore.preferences.core.Preferences
@@ -21,11 +22,12 @@ class UserPreferences @Inject constructor(private val context: Context) {
 
     @Throws(Throwable::class)
     private fun Flow<Preferences>.setUpIOExceptionHandling(): Flow<Preferences> {
-        return this.catch { exception ->
-            if (exception is IOException) {
+        return this.catch { cause ->
+            if (cause is IOException) {
+                Log.e(javaClass.simpleName, "アプリ設定値読込失敗", cause)
                 emit(emptyPreferences())
             } else {
-                throw exception
+                throw cause
             }
         }
     }

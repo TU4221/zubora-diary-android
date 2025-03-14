@@ -190,6 +190,7 @@ internal class DiaryEditViewModel @Inject constructor(
                 val result = loadSavedDiary(date)
                 if (!result) updateDate(date)
             } catch (e: Exception) {
+                Log.e(javaClass.simpleName, "日記読込失敗", e)
                 addAppMessage(AppMessage.DIARY_LOADING_ERROR)
                 _isVisibleUpdateProgressBar.value = false
                 return false
@@ -219,6 +220,7 @@ internal class DiaryEditViewModel @Inject constructor(
         try {
             return diaryRepository.existsDiary(date)
         } catch (e: Exception) {
+            Log.e(javaClass.simpleName, "日記既存確認失敗", e)
             addAppMessage(AppMessage.DIARY_LOADING_ERROR)
             return null
         }
@@ -242,6 +244,7 @@ internal class DiaryEditViewModel @Inject constructor(
                     .saveDiary(diaryEntity, diaryItemTitleSelectionHistoryItemEntityList)
             }
         } catch (e: Exception) {
+            Log.e(javaClass.simpleName, "日記保存失敗", e)
             addAppMessage(AppMessage.DIARY_SAVING_ERROR)
             return false
         }
@@ -254,6 +257,7 @@ internal class DiaryEditViewModel @Inject constructor(
         try {
             diaryRepository.deleteDiary(deleteDate)
         } catch (e: Exception) {
+            Log.e(javaClass.simpleName, "日記削除失敗", e)
             addAppMessage(AppMessage.DIARY_DELETE_ERROR)
             return false
         }
@@ -355,6 +359,7 @@ internal class DiaryEditViewModel @Inject constructor(
         try {
             return !diaryRepository.existsPicturePath(uri)
         } catch (e: Exception) {
+            Log.e(javaClass.simpleName, "端末写真URI使用状況確認失敗", e)
             addAppMessage(AppMessage.DIARY_LOADING_ERROR)
             return null
         }
