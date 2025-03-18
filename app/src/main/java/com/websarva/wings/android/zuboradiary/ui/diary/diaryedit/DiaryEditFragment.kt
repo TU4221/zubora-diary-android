@@ -591,88 +591,7 @@ class DiaryEditFragment : BaseFragment() {
         for (i in ItemNumber.MIN_NUMBER..ItemNumber.MAX_NUMBER) {
             val itemNumber = ItemNumber(i)
             val itemMotionLayout = selectItemMotionLayout(itemNumber)
-            itemMotionLayout.setTransitionListener(object : MotionLayout.TransitionListener {
-
-                val initializeValue = -1
-                var startScrollPosition = initializeValue
-                var goalStateId = initializeValue
-
-                override fun onTransitionStarted(
-                    motionLayout: MotionLayout,
-                    startId: Int,
-                    endId: Int
-                ) {
-                    Log.d(
-                        javaClass.simpleName,
-                        "onTransitionStarted()_itemNumber = $itemNumber"
-                    )
-
-                    // MEMO:startId,endIdはMotionSceneファイル(.xml)で記述したIdが代入される。
-                    //      また、motionLayout.currentStateは指定先のIdを取得する。
-                    goalStateId = motionLayout.currentState
-                    startScrollPosition = binding.nestedScrollFullScreen.scrollY
-                }
-
-                override fun onTransitionChange(
-                    motionLayout: MotionLayout, startId: Int, endId: Int, progress: Float
-                ) {
-                    Log.d(
-                        javaClass.simpleName,
-                        "onTransitionChange()_itemNumber = $itemNumber"
-                    )
-
-                    val itemHeight = binding.includeItem1.linerLayoutDiaryEditItem.height
-                    val scrollY =
-                        when (goalStateId) {
-                            R.id.motion_scene_edit_diary_item_hided_state -> {
-                                startScrollPosition -
-                                        (itemHeight * progress).toInt()
-                            }
-                            R.id.motion_scene_edit_diary_item_showed_state -> {
-                                startScrollPosition +
-                                        (itemHeight * (1 - progress)).toInt()
-                            }
-                            else -> 0
-                        }
-                    binding.nestedScrollFullScreen.smoothScrollTo(0, scrollY)
-                }
-
-                override fun onTransitionCompleted(motionLayout: MotionLayout, currentId: Int) {
-                    Log.d(
-                        javaClass.simpleName,
-                        "onTransitionCompleted()_itemNumber = $itemNumber"
-                    )
-                    // 対象項目欄削除後の処理
-                    var completedStateLogMsg = "UnknownState"
-                    if (currentId == R.id.motion_scene_edit_diary_item_hided_state) {
-                        completedStateLogMsg = "HidedState"
-                        if (isDeletingItemTransition) {
-                            diaryEditViewModel.deleteItem(itemNumber)
-                            isDeletingItemTransition = false
-                        }
-
-                        // 対象項目欄追加後の処理
-                    } else if (currentId == R.id.motion_scene_edit_diary_item_showed_state) {
-                        completedStateLogMsg = "ShowedState"
-                    }
-                    Log.d(
-                        javaClass.simpleName,
-                        "onTransitionCompleted()_CompletedState = $completedStateLogMsg"
-                    )
-
-                    startScrollPosition = initializeValue
-                    goalStateId = initializeValue
-                }
-
-                override fun onTransitionTrigger(
-                    motionLayout: MotionLayout,
-                    triggerId: Int,
-                    positive: Boolean,
-                    progress: Float
-                ) {
-                    // 処理なし
-                }
-            })
+            itemMotionLayout.setTransitionListener(ItemMotionLayoutListener(itemNumber))
         }
 
         launchAndRepeatOnLifeCycleStarted {
@@ -681,6 +600,107 @@ class DiaryEditFragment : BaseFragment() {
                     NumVisibleItemsObserver().onChanged(value)
                 }
         }
+    }
+
+    private inner class ItemMotionLayoutListener(
+        val itemNumber: ItemNumber
+    ): MotionLayout.TransitionListener {
+
+        val initializeValue = -1
+        var startScrollPosition = initializeValue
+        var goalStateId = initializeValue
+
+        override fun onTransitionStarted(motionLayout: MotionLayout?, startId: Int, endId: Int) {
+            Log.d(
+                javaClass.simpleName,
+                "onTransitionStarted()_itemNumber = $itemNumber"
+            )
+
+            setUpScroll(motionLayout)
+        }
+
+        // MEMO:startId,endIdはMotionSceneファイル(.xml)で記述したIdが代入される。
+        //      また、motionLayout.currentStateは指定先のIdを取得する。
+        private fun setUpScroll(motionLayout: MotionLayout?) {
+            goalStateId = motionLayout?.currentState ?: return
+            startScrollPosition = binding.nestedScrollFullScreen.scrollY
+        }
+
+        override fun onTransitionChange(
+            motionLayout: MotionLayout?,
+            startId: Int,
+            endId: Int,
+            progress: Float
+        ) {
+            Log.d(
+                javaClass.simpleName,
+                "onTransitionChange()_itemNumber = $itemNumber"
+            )
+
+            scrollOnTransition(progress)
+        }
+
+        private fun scrollOnTransition(progress: Float) {
+            val itemHeight = binding.includeItem1.linerLayoutDiaryEditItem.height
+            val scrollY =
+                when (goalStateId) {
+                    R.id.motion_scene_edit_diary_item_hided_state -> {
+                        startScrollPosition -
+                                (itemHeight * progress).toInt()
+                    }
+                    R.id.motion_scene_edit_diary_item_showed_state -> {
+                        startScrollPosition +
+                                (itemHeight * (1 - progress)).toInt()
+                    }
+                    else -> 0
+                }
+            binding.nestedScrollFullScreen.smoothScrollTo(0, scrollY)
+        }
+
+        override fun onTransitionCompleted(motionLayout: MotionLayout?, currentId: Int) {
+            Log.d(
+                javaClass.simpleName,
+                "onTransitionCompleted()_itemNumber = $itemNumber"
+            )
+            // 対象項目欄削除後の処理
+            var completedStateLogMsg = "UnknownState"
+            if (currentId == R.id.motion_scene_edit_diary_item_hided_state) {
+                completedStateLogMsg = "HidedState"
+                deleteItemContents()
+
+                // 対象項目欄追加後の処理
+            } else if (currentId == R.id.motion_scene_edit_diary_item_showed_state) {
+                completedStateLogMsg = "ShowedState"
+            }
+            Log.d(
+                javaClass.simpleName,
+                "onTransitionCompleted()_CompletedState = $completedStateLogMsg"
+            )
+
+            initializeProperty()
+        }
+
+        private fun deleteItemContents() {
+            if (isDeletingItemTransition) {
+                diaryEditViewModel.deleteItem(itemNumber)
+                isDeletingItemTransition = false
+            }
+        }
+
+        private fun initializeProperty() {
+            startScrollPosition = initializeValue
+            goalStateId = initializeValue
+        }
+
+        override fun onTransitionTrigger(
+            motionLayout: MotionLayout?,
+            triggerId: Int,
+            positive: Boolean,
+            progress: Float
+        ) {
+            // 処理なし
+        }
+
     }
 
     private fun selectItemMotionLayout(itemNumber: ItemNumber): MotionLayout {
