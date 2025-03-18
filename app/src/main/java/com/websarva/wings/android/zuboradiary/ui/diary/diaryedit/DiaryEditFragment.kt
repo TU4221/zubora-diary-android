@@ -793,25 +793,19 @@ class DiaryEditFragment : BaseFragment() {
         val loadedPictureUri = diaryEditViewModel.loadedPicturePath.value
 
         lifecycleScope.launch(Dispatchers.IO) {
-            try {
-                pictureUriPermissionManager.apply {
-                    if (latestPictureUri == null && loadedPictureUri == null) return@launch
-                    if (latestPictureUri != null && loadedPictureUri == null) {
-                        takePersistablePermission(latestPictureUri)
-                        return@launch
-                    }
-                    if (latestPictureUri == null) {
-                        releasePersistablePermission(checkNotNull(loadedPictureUri))
-                        return@launch
-                    }
-                    if (latestPictureUri == loadedPictureUri) return@launch
+            pictureUriPermissionManager.apply {
+                if (latestPictureUri == null && loadedPictureUri == null) return@launch
+                if (latestPictureUri != null && loadedPictureUri == null) {
                     takePersistablePermission(latestPictureUri)
-                    releasePersistablePermission(checkNotNull(loadedPictureUri))
+                    return@launch
                 }
-            } catch (e: SecurityException) {
-                // TODO:catch不要(take/releasePersistablePermission()メソッド内で例外処理)
-                Log.e(javaClass.simpleName, "端末写真使用権限取得/解放_失敗", e)
-                // 対処できないがアプリを落としたくない為、catchのみ処理する。
+                if (latestPictureUri == null) {
+                    releasePersistablePermission(checkNotNull(loadedPictureUri))
+                    return@launch
+                }
+                if (latestPictureUri == loadedPictureUri) return@launch
+                takePersistablePermission(latestPictureUri)
+                releasePersistablePermission(checkNotNull(loadedPictureUri))
             }
         }
     }
