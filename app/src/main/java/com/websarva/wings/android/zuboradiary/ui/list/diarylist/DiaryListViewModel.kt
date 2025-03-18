@@ -69,14 +69,8 @@ internal class DiaryListViewModel @Inject constructor(private val diaryRepositor
     suspend fun loadDiaryListOnSetUp() {
         val diaryList = this.diaryList.value
         if (diaryList.diaryYearMonthListItemList.isEmpty()) {
-            try {
-                val numSavedDiaries = diaryRepository.countDiaries()
-                if (numSavedDiaries >= 1) loadNewDiaryList()
-            } catch (e: Exception) {
-                // TODO:catch不要(2重catch)
-                Log.e(javaClass.simpleName, "日記リスト初回読込_失敗", e)
-                addAppMessage(AppMessage.DIARY_INFO_LOADING_ERROR)
-            }
+            val numSavedDiaries = diaryRepository.countDiaries()
+            if (numSavedDiaries >= 1) loadNewDiaryList()
         } else {
             updateDiaryList()
         }
