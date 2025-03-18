@@ -908,18 +908,6 @@ class DiaryEditFragment : BaseFragment() {
         val transitionListener =
             textInputSetup.createClearButtonSetupTransitionListener(*clearableTextInputLayouts)
         addTransitionListener(transitionListener)
-
-        // TODO:キーボード表示時の自動スクロールを無効化(自動スクロール時toolbarが隠れる為)している為、listenerで代用したいが上手くいかない。
-        /*binding.includeItem1.textInputEditTextComment.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-            @Override
-            public void onFocusChange(View v, boolean hasFocus) {
-                if (hasFocus) {
-                    int scrollAmount = v.get
-                    binding.nestedScrollFullScreen.smoothScrollBy(0, v.getHeight());
-                    binding.nestedScrollFullScreen.scroll
-                }
-            }
-        });*/
     }
 
     private fun clearFocusAllEditText() {

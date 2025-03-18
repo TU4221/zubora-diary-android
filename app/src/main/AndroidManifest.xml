@@ -48,12 +48,10 @@
         </provider>
 
         <!--MEMO:"android:windowSoftInputMode="adjustPan""は"BottomNavigationView"をキーボードの上に表示させない為の設定-->
-        <!--MEMO:"android:windowSoftInputMode="adjustResize""はフォーカスしたEditTextがキーボード表示時に隠れないように
-                 ActivityLayoutが上へ動く(Fragment内のToolbarが隠れる)のを防ぐ。-->
         <activity
             android:name=".MainActivity"
             android:exported="true"
-            android:windowSoftInputMode="adjustPan|adjustResize">
+            android:windowSoftInputMode="adjustPan">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
