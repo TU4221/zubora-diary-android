@@ -109,7 +109,7 @@ internal class DiaryDayListAdapter(context: Context, recyclerView: RecyclerView,
                 Log.d(javaClass.simpleName, "Title不一致")
                 return false
             }
-            if (oldItem.picturePath?.equals(newItem.picturePath) != true) {
+            if (oldItem.picturePath != newItem.picturePath) {
                 Log.d(javaClass.simpleName, "PicturePath不一致")
                 return false
             }
