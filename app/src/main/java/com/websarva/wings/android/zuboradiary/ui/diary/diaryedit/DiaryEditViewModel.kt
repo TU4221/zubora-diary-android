@@ -339,9 +339,11 @@ internal class DiaryEditViewModel @Inject constructor(
             Log.i(javaClass.simpleName, "${logMsg}_完了")
         } else {
             response.errorBody().use { errorBody ->
+                val errorBodyString = errorBody?.string() ?: "null"
                 Log.d(
                     javaClass.simpleName,
-                    "fetchWeatherInformation()_errorBody = " + errorBody!!.string())
+                    "fetchWeatherInformation()_errorBody = $errorBodyString"
+                )
             }
             addAppMessage(AppMessage.WEATHER_INFO_LOADING_ERROR)
             Log.d(javaClass.simpleName, "${logMsg}_失敗")
