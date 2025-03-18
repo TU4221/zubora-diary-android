@@ -634,7 +634,7 @@ class DiaryEditFragment : BaseFragment() {
         ) {
             Log.d(
                 javaClass.simpleName,
-                "onTransitionChange()_itemNumber = $itemNumber"
+                "onTransitionChange()_itemNumber = $itemNumber, progress = $progress"
             )
 
             scrollOnTransition(progress)
@@ -645,14 +645,20 @@ class DiaryEditFragment : BaseFragment() {
             val scrollY =
                 when (goalStateId) {
                     R.id.motion_scene_edit_diary_item_hided_state -> {
-                        startScrollPosition -
-                                (itemHeight * progress).toInt()
+                        // MEMO:アイテム削除時は
+                        if (itemNumber.value == diaryEditViewModel.numVisibleItems.value) {
+                            startScrollPosition -
+                                    (itemHeight * progress).toInt()
+                        } else {
+                            startScrollPosition
+                        }
+
                     }
                     R.id.motion_scene_edit_diary_item_showed_state -> {
                         startScrollPosition +
                                 (itemHeight * (1 - progress)).toInt()
                     }
-                    else -> 0
+                    else -> startScrollPosition
                 }
             binding.nestedScrollFullScreen.smoothScrollTo(0, scrollY)
         }
@@ -668,7 +674,7 @@ class DiaryEditFragment : BaseFragment() {
                 completedStateLogMsg = "HidedState"
                 deleteItemContents()
 
-                // 対象項目欄追加後の処理
+            // 対象項目欄追加後の処理
             } else if (currentId == R.id.motion_scene_edit_diary_item_showed_state) {
                 completedStateLogMsg = "ShowedState"
             }
