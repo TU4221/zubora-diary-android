@@ -16,10 +16,13 @@ internal class DiaryPictureManager(
             return
         }
 
+        val logMsg = "日記添付写真読込"
         try {
+            Log.e(javaClass.simpleName, "${logMsg}_開始")
             setUpPicture(uri)
+            Log.e(javaClass.simpleName, "${logMsg}_完了")
         } catch (e: SecurityException) {
-            Log.e(javaClass.simpleName, "日記添付写真読込失敗", e)
+            Log.e(javaClass.simpleName, "${logMsg}_失敗", e)
             setUpPermissionDenialIconOnDiary()
         }
     }
@@ -38,10 +41,13 @@ internal class DiaryPictureManager(
             return
         }
 
+        val logMsg = "日記リスト添付写真読込"
         try {
+            Log.e(javaClass.simpleName, "${logMsg}_開始")
             setUpPicture(uri)
+            Log.e(javaClass.simpleName, "${logMsg}_完了")
         } catch (e: SecurityException) {
-            Log.e(javaClass.simpleName, "日記リスト添付写真読込失敗", e)
+            Log.e(javaClass.simpleName, "${logMsg}_失敗", e)
             setUpPermissionDenialIconOnDiaryList()
         }
     }

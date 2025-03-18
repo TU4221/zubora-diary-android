@@ -3,6 +3,7 @@ package com.websarva.wings.android.zuboradiary.ui
 import android.app.Dialog
 import android.content.DialogInterface
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.NavHostFragment
@@ -19,6 +20,7 @@ abstract class BaseAlertDialogFragment : DialogFragment() {
         get() = settingsViewModel.themeColor.requireValue()
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+        Log.d(javaClass.simpleName, "onCreateDialog()")
         super.onCreateDialog(savedInstanceState)
 
         settingsViewModel = createSettingsViewModel()
@@ -45,10 +47,12 @@ abstract class BaseAlertDialogFragment : DialogFragment() {
         builder.setMessage(message)
 
         builder.setPositiveButton(R.string.dialog_base_alert_yes) { _: DialogInterface, _: Int ->
+            Log.d(javaClass.simpleName, "onClick()_PositiveButton")
             handleOnPositiveButtonClick()
         }
 
         builder.setNegativeButton(R.string.dialog_base_alert_no) { _: DialogInterface, _: Int ->
+            Log.d(javaClass.simpleName, "onClick()_NegativeButton")
             handleOnNegativeButtonClick()
         }
     }
@@ -86,6 +90,7 @@ abstract class BaseAlertDialogFragment : DialogFragment() {
     //      CANCEL・DISMISSの処理内容はDialogFragmentのonCancel/onDismissをオーバーライドする必要がある。
     //      DialogFragment、AlertDialogのリスナセットメソッドを使用して処理内容を記述きても処理はされない。
     override fun onCancel(dialog: DialogInterface) {
+        Log.d(javaClass.simpleName, "onCancel()")
         handleOnCancel()
         super.onCancel(dialog)
     }

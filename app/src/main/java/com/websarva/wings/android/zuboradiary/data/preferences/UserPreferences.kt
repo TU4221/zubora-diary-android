@@ -24,7 +24,7 @@ class UserPreferences @Inject constructor(private val context: Context) {
     private fun Flow<Preferences>.setUpIOExceptionHandling(): Flow<Preferences> {
         return this.catch { cause ->
             if (cause is IOException) {
-                Log.e(javaClass.simpleName, "アプリ設定値読込失敗", cause)
+                Log.e(javaClass.simpleName, "アプリ設定値読込_失敗", cause)
                 emit(emptyPreferences())
             } else {
                 throw cause

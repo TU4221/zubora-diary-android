@@ -2,7 +2,6 @@ package com.websarva.wings.android.zuboradiary.ui.list.wordsearch
 
 import android.content.Context
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
@@ -160,7 +159,6 @@ class WordSearchFragment : BaseFragment() {
         launchAndRepeatOnLifeCycleStarted {
             wordSearchViewModel.numWordSearchResults
                 .collectLatest { value: Int ->
-                    Log.d("WordSearchFragment", "numWordSearchResults: $value")
                     val visibility = if (value > 0) {
                         View.VISIBLE
                     } else {

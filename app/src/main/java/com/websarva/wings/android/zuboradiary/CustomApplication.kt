@@ -22,7 +22,7 @@ open class CustomApplication : Application(), DefaultLifecycleObserver, Configur
         get() = Configuration.Builder().setWorkerFactory(workerFactory).build()
 
     override fun onCreate() {
-        Log.d("ApplicationLifeCycle", "onCreate()")
+        Log.d(javaClass.simpleName, "onCreate()")
         super<Application>.onCreate()
         ProcessLifecycleOwner.get().lifecycle.addObserver(this)
 
@@ -31,12 +31,12 @@ open class CustomApplication : Application(), DefaultLifecycleObserver, Configur
     }
 
     override fun onStart(owner: LifecycleOwner) {
-        Log.d("ApplicationLifeCycle", "onStart()")
+        Log.d(javaClass.simpleName, "onStart()")
         isAppInForeground = true
     }
 
     override fun onStop(owner: LifecycleOwner) {
-        Log.d("ApplicationLifeCycle", "onStop()")
+        Log.d(javaClass.simpleName, "onStop()")
         isAppInForeground = false
     }
 }

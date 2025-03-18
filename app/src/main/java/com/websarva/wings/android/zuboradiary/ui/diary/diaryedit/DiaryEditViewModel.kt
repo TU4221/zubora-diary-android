@@ -184,13 +184,15 @@ internal class DiaryEditViewModel @Inject constructor(
     }
 
     suspend fun prepareDiary(date: LocalDate, shouldLoadDiary: Boolean): Boolean {
+        val logMsg = "日記読込"
+        Log.i(javaClass.simpleName, "${logMsg}_開始")
         _isVisibleUpdateProgressBar.value = true
         if (shouldLoadDiary) {
             try {
                 val result = loadSavedDiary(date)
                 if (!result) updateDate(date)
             } catch (e: Exception) {
-                Log.e(javaClass.simpleName, "日記読込失敗", e)
+                Log.e(javaClass.simpleName, "${logMsg}_失敗", e)
                 addAppMessage(AppMessage.DIARY_LOADING_ERROR)
                 _isVisibleUpdateProgressBar.value = false
                 return false
@@ -200,6 +202,8 @@ internal class DiaryEditViewModel @Inject constructor(
         }
         hasPreparedDiary = true
         _isVisibleUpdateProgressBar.value = false
+
+        Log.i(javaClass.simpleName, "${logMsg}_完了")
         return true
     }
 
@@ -220,7 +224,7 @@ internal class DiaryEditViewModel @Inject constructor(
         try {
             return diaryRepository.existsDiary(date)
         } catch (e: Exception) {
-            Log.e(javaClass.simpleName, "日記既存確認失敗", e)
+            Log.e(javaClass.simpleName, "日記既存確認_失敗", e)
             addAppMessage(AppMessage.DIARY_LOADING_ERROR)
             return null
         }
@@ -228,6 +232,9 @@ internal class DiaryEditViewModel @Inject constructor(
 
     // TODO:TestDiariesSaverクラス削除後、public削除。
     suspend fun saveDiary(): Boolean {
+        val logMsg = "日記保存"
+        Log.i(javaClass.simpleName, "${logMsg}_開始")
+
         val diaryEntity = diaryStateFlow.createDiaryEntity()
         val diaryItemTitleSelectionHistoryItemEntityList =
             diaryStateFlow.createDiaryItemTitleSelectionHistoryItemEntityList()
@@ -244,23 +251,29 @@ internal class DiaryEditViewModel @Inject constructor(
                     .saveDiary(diaryEntity, diaryItemTitleSelectionHistoryItemEntityList)
             }
         } catch (e: Exception) {
-            Log.e(javaClass.simpleName, "日記保存失敗", e)
+            Log.e(javaClass.simpleName, "${logMsg}_失敗", e)
             addAppMessage(AppMessage.DIARY_SAVING_ERROR)
             return false
         }
+
+        Log.i(javaClass.simpleName, "${logMsg}_完了")
         return true
     }
 
     suspend fun deleteDiary(): Boolean {
+        val logMsg = "日記削除"
+        Log.i(javaClass.simpleName, "${logMsg}_開始")
         val deleteDate = _loadedDate.requireValue()
 
         try {
             diaryRepository.deleteDiary(deleteDate)
         } catch (e: Exception) {
-            Log.e(javaClass.simpleName, "日記削除失敗", e)
+            Log.e(javaClass.simpleName, "${logMsg}_失敗", e)
             addAppMessage(AppMessage.DIARY_DELETE_ERROR)
             return false
         }
+
+        Log.i(javaClass.simpleName, "${logMsg}_完了")
         return true
     }
 
@@ -299,6 +312,9 @@ internal class DiaryEditViewModel @Inject constructor(
     suspend fun fetchWeatherInformation(date: LocalDate, geoCoordinates: GeoCoordinates) {
         if (!canFetchWeatherInformation(date)) return
 
+        val logMsg = "天気情報取得"
+        Log.d(javaClass.simpleName, "${logMsg}_開始")
+
         val currentDate = LocalDate.now()
         val betweenDays = ChronoUnit.DAYS.between(date, currentDate)
 
@@ -312,19 +328,23 @@ internal class DiaryEditViewModel @Inject constructor(
                     betweenDays.toInt()
                 )
             }
-        Log.d("WeatherApi", "response.code():" + response.code())
-        Log.d("WeatherApi", "response.message():" + response.message())
+        Log.d(javaClass.simpleName, "fetchWeatherInformation()_code = " + response.code())
+        Log.d(javaClass.simpleName, "fetchWeatherInformation()_message = :" + response.message())
 
         if (response.isSuccessful) {
-            Log.d("WeatherApi", "response.body():" + response.body())
+            Log.d(javaClass.simpleName, "fetchWeatherInformation()_body = " + response.body())
             val result =
                 response.body()?.toWeatherInfo() ?: throw IllegalStateException()
             diaryStateFlow.weather1.value = result
+            Log.i(javaClass.simpleName, "${logMsg}_完了")
         } else {
             response.errorBody().use { errorBody ->
-                Log.d("WeatherApi", "response.errorBody():" + errorBody!!.string())
+                Log.d(
+                    javaClass.simpleName,
+                    "fetchWeatherInformation()_errorBody = " + errorBody!!.string())
             }
             addAppMessage(AppMessage.WEATHER_INFO_LOADING_ERROR)
+            Log.d(javaClass.simpleName, "${logMsg}_失敗")
         }
         _isVisibleUpdateProgressBar.value = false
     }
@@ -359,7 +379,7 @@ internal class DiaryEditViewModel @Inject constructor(
         try {
             return !diaryRepository.existsPicturePath(uri)
         } catch (e: Exception) {
-            Log.e(javaClass.simpleName, "端末写真URI使用状況確認失敗", e)
+            Log.e(javaClass.simpleName, "端末写真URI使用状況確認_失敗", e)
             addAppMessage(AppMessage.DIARY_LOADING_ERROR)
             return null
         }

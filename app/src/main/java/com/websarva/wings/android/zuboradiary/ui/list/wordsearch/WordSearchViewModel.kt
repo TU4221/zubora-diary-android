@@ -47,8 +47,9 @@ internal class WordSearchViewModel @Inject internal constructor(
 
     val canLoadWordSearchResultList: Boolean
         get() {
-            Log.d("OnScrollDiaryList", "isLoadingDiaryList()")
-            return wordSearchResultListLoadingJob?.isCompleted ?: true
+            val result = wordSearchResultListLoadingJob?.isCompleted ?: true
+            Log.d(javaClass.simpleName, "canLoadWordSearchResultList() = $result")
+            return result
         }
 
     /**
@@ -126,24 +127,27 @@ internal class WordSearchViewModel @Inject internal constructor(
 
     private fun cancelPreviousLoading() {
         if (!canLoadWordSearchResultList) {
-            Log.d("WordSearchLoading", "Cancel")
+            Log.i(javaClass.simpleName, "ワード検索結果読込_キャンセル")
             wordSearchResultListLoadingJob?.cancel() ?: throw IllegalStateException()
         }
     }
 
+    // TODO:DiaryListViewModelとメソッド名統一
     private suspend fun loadSavedDiaryList(
         resultListCreator: WordSearchResultListCreator,
         spannableStringColor: Int,
         spannableStringBackGroundColor: Int
     ) {
+        val logMsg = "ワード検索結果読込"
+        Log.i(javaClass.simpleName, "${logMsg}_開始")
         val previousResultList = _wordSearchResultList.requireValue()
-
         try {
             val updateResultList =
                 resultListCreator.create(spannableStringColor, spannableStringBackGroundColor)
             _wordSearchResultList.value = updateResultList
+            Log.i(javaClass.simpleName, "${logMsg}_完了")
         } catch (e: Exception) {
-            Log.e(javaClass.simpleName, "ワード検索結果読込失敗", e)
+            Log.e(javaClass.simpleName, "${logMsg}_失敗", e)
             _wordSearchResultList.value = previousResultList
             addAppMessage(AppMessage.DIARY_LOADING_ERROR)
         }

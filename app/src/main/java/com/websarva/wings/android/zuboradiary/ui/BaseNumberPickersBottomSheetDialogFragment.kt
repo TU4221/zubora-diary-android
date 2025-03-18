@@ -2,6 +2,7 @@ package com.websarva.wings.android.zuboradiary.ui
 
 import android.content.Context
 import android.os.Build
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -17,6 +18,8 @@ abstract class BaseNumberPickersBottomSheetDialogFragment : BaseBottomSheetDialo
     override fun createDialogView(
         inflater: LayoutInflater, container: ViewGroup?
     ): View {
+        Log.d(javaClass.simpleName, "createDialogView()")
+
         _binding = createBinding(inflater, container)
         return binding.apply {
             buttonDecision.setOnClickListener(PositiveButtonClickListener())
@@ -62,6 +65,7 @@ abstract class BaseNumberPickersBottomSheetDialogFragment : BaseBottomSheetDialo
     protected abstract fun setUpNumberPickers(binding: DialogFragmentNumberPickersBinding)
 
     override fun onDestroyView() {
+        Log.d(javaClass.simpleName, "onDestroyView()")
         super.onDestroyView()
         _binding = null
     }

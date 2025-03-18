@@ -30,8 +30,8 @@ internal open class LeftSwipeBackgroundButtonSimpleCallback(recyclerView: Recycl
         //      通常スワイプ時、ACTION_DOWN -> MOVE -> UPとなるが
         //      未スワイプ状態からはACTION_DOWNは取得できず、ACTION_MOVE -> UPとなる。
         override fun onTouch(v: View, event: MotionEvent): Boolean {
+            Log.d(javaClass.simpleName, "onTouch()_MotionEvent = " + event.action)
             var result = false
-            Log.d("onTouch()", "MotionEvent:" + event.action)
             if (event.action == MotionEvent.ACTION_UP) {
                 clearInvalidSwipeViewHolder()
                 // 疑似クリック処理
@@ -80,8 +80,8 @@ internal open class LeftSwipeBackgroundButtonSimpleCallback(recyclerView: Recycl
 
     override fun getSwipeThreshold(viewHolder: RecyclerView.ViewHolder): Float {
         Log.d(
-            "LeftSwipeBackButton",
-            "getSwipeThreshold()_position:" + viewHolder.bindingAdapterPosition
+            javaClass.simpleName,
+            "getSwipeThreshold()_position = " + viewHolder.bindingAdapterPosition
         )
         val leftSwipeViewHolder = viewHolder as LeftSwipeViewHolder
 
@@ -94,18 +94,18 @@ internal open class LeftSwipeBackgroundButtonSimpleCallback(recyclerView: Recycl
         //      スワイプ機能の値(ItemTouchHelper.Callback#onChildDraw()の引数であるdX)としては
         //      ViewHolderの端までスワイプしている事になっている。その為下記コードが必要となる。
         if (swipedAdapterPosition != viewHolder.getBindingAdapterPosition()) {
-            Log.d("LeftSwipeBackButton", "getSwipeThreshold()_return:$threshold")
+            Log.d(javaClass.simpleName, "getSwipeThreshold()_return = $threshold")
             return threshold
         }
 
-        Log.d("LeftSwipeBackButton", "getSwipeThreshold()_return:" + (1 - threshold))
+        Log.d(javaClass.simpleName, "getSwipeThreshold()_return = " + (1 - threshold))
         return 1 - threshold
     }
 
     override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+        Log.d(javaClass.simpleName, "onSwiped()_position = " + viewHolder.bindingAdapterPosition)
         if (direction != ItemTouchHelper.LEFT) return
 
-        Log.d("LeftSwipeBackButton", "onSwiped()_position:" + viewHolder.bindingAdapterPosition)
         val leftSwipeViewHolder = viewHolder as LeftSwipeViewHolder
 
         check(swipingAdapterPosition == viewHolder.getBindingAdapterPosition())
@@ -138,8 +138,8 @@ internal open class LeftSwipeBackgroundButtonSimpleCallback(recyclerView: Recycl
                 ).toFloat()
             }
         Log.d(
-            "LeftSwipeBackButton",
-            "onChildDraw()_translationValueX:$translationValueX"
+            javaClass.simpleName,
+            "onChildDraw()_translationValueX = $translationValueX"
         )
         leftSwipeViewHolder.foregroundView.translationX = translationValueX
     }

@@ -23,13 +23,16 @@ internal class WeatherApiRepository @Inject constructor(private val weatherApiSe
 
     fun canFetchWeatherInfo(date: LocalDate): Boolean {
         val currentDate = LocalDate.now()
-        Log.d("fetchWeatherInfo", "isAfter:" + date.isAfter(currentDate))
-        if (date.isAfter(currentDate)) return false
+
+        if (date.isAfter(currentDate)) {
+            Log.d(javaClass.simpleName, "canFetchWeatherInfo(date = $date) = false")
+            return false
+        }
 
         val betweenDays = ChronoUnit.DAYS.between(date, currentDate)
-        Log.d("fetchWeatherInfo", "betweenDays:$betweenDays")
-
-        return betweenDays <= MAX_PAST_DAYS
+        val result = betweenDays <= MAX_PAST_DAYS
+        Log.d(javaClass.simpleName, "canFetchWeatherInfo(date = $date) = $result")
+        return result
     }
 
     suspend fun fetchTodayWeatherInfo(geoCoordinates: GeoCoordinates): Response<WeatherApiData> {

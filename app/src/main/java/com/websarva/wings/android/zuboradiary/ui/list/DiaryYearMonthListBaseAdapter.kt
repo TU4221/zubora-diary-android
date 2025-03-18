@@ -149,36 +149,44 @@ internal abstract class DiaryYearMonthListBaseAdapter protected constructor(
     protected abstract class DiffUtilItemCallback
         : DiffUtil.ItemCallback<DiaryYearMonthListBaseItem>() {
 
-        override fun areItemsTheSame(
-            oldItem: DiaryYearMonthListBaseItem,
-            newItem: DiaryYearMonthListBaseItem
-        ): Boolean {
-            Log.d("DiaryYearMonthList", "DiffUtil.ItemCallback_areItemsTheSame()")
-            Log.d("DiaryYearMonthList", "oldItem_YearMonth:" + oldItem.yearMonth)
-            Log.d("DiaryYearMonthList", "newItem_YearMonth:" + newItem.yearMonth)
+            override fun areItemsTheSame(
+                oldItem: DiaryYearMonthListBaseItem,
+                newItem: DiaryYearMonthListBaseItem
+            ): Boolean {
+                Log.d(
+                    javaClass.simpleName,
+                    "areItemsTheSame()_oldItem.yearMonth = " + oldItem.yearMonth
+                )
+                Log.d(
+                    javaClass.simpleName,
+                    "areItemsTheSame()_newItem.yearMonth = " + newItem.yearMonth
+                )
 
-            // ViewType
-            if (oldItem.viewType != newItem.viewType) {
-                Log.d("DiaryYearMonthList", "ViewType不一致")
-                return false
+                // ViewType
+                if (oldItem.viewType != newItem.viewType) {
+                    Log.d(javaClass.simpleName, "areItemsTheSame()_ViewType不一致")
+                    return false
+                }
+                // HACK:RecyclerViewの初回アイテム表示時にスクロール初期位置がズレる事がある。
+                //      原因はプログレスバーの存在。最初にアイテムを表示する時、読込中の意味を込めてプログレスバーのみを表示させている。
+                //      スクロール読込機能の仕様により、読込データをRecyclerViewに表示する際、アイテムリスト末尾にプログレスバーを追加している。
+                //      これにより、初回読込中プログレスバーとアイテムリスト末尾のプログレスバーが同一アイテムと認識するため、
+                //      ListAdapterクラスの仕様により表示されていたプログレスバーが更新後も表示されるようにスクロール位置がズレた。
+                //      プログレスバー同士が同一アイテムと認識されないようにするために、下記条件を追加して対策。
+                if (oldItem.viewType == ViewType.PROGRESS_INDICATOR) {
+                    Log.d(javaClass.simpleName, "areItemsTheSame()_ViewType = ProgressIndicator(不一致)")
+                    return false
+                }
+
+                // 年月
+                if (oldItem.yearMonth != newItem.yearMonth) {
+                    Log.d(javaClass.simpleName, "areItemsTheSame()_YearMonth不一致")
+                    return false
+                }
+
+                Log.d(javaClass.simpleName, "areItemsTheSame()_全項目一致")
+                return true
             }
-            // HACK:RecyclerViewの初回アイテム表示時にスクロール初期位置がズレる事がある。
-            //      原因はプログレスバーの存在。最初にアイテムを表示する時、読込中の意味を込めてプログレスバーのみを表示させている。
-            //      スクロール読込機能の仕様により、読込データをRecyclerViewに表示する際、アイテムリスト末尾にプログレスバーを追加している。
-            //      これにより、初回読込中プログレスバーとアイテムリスト末尾のプログレスバーが同一アイテムと認識するため、
-            //      ListAdapterクラスの仕様により表示されていたプログレスバーが更新後も表示されるようにスクロール位置がズレた。
-            //      プログレスバー同士が同一アイテムと認識されないようにするために、下記条件を追加して対策。
-            if (oldItem.viewType == ViewType.PROGRESS_INDICATOR) return false
-
-            // 年月
-            if (oldItem.yearMonth != newItem.yearMonth) {
-                Log.d("DiaryYearMonthList", "YearMonth不一致")
-                return false
-            }
-
-            Log.d("DiaryYearMonthList", "一致")
-            return true
-        }
     }
 
     /**
@@ -219,7 +227,6 @@ internal abstract class DiaryYearMonthListBaseAdapter protected constructor(
             val recyclerViewAdapter = checkNotNull(recyclerView.adapter)
             val lastItemViewType = recyclerViewAdapter.getItemViewType(lastItemPosition)
             if (lastItemViewType == ViewType.PROGRESS_INDICATOR.viewTypeNumber) {
-                Log.d("OnScrollDiaryList", "DiaryListLoading")
                 loadListOnScrollEnd()
                 isLoadingListOnScrolled = true
             }
@@ -228,43 +235,43 @@ internal abstract class DiaryYearMonthListBaseAdapter protected constructor(
 
     private inner class ListLoadingCompleteNotificationAdapterDataObserver : AdapterDataObserver() {
         override fun onChanged() {
-            Log.d("OnScrollDiaryList", "RecyclerView_OnChanged()")
+            Log.d(javaClass.simpleName, "OnChanged()")
             super.onChanged()
             clearIsLoadingListOnScrolled()
         }
 
         override fun onItemRangeChanged(positionStart: Int, itemCount: Int) {
-            Log.d("OnScrollDiaryList", "RecyclerView_onItemRangeChanged()")
+            Log.d(javaClass.simpleName, "onItemRangeChanged()")
             super.onItemRangeChanged(positionStart, itemCount)
             clearIsLoadingListOnScrolled()
         }
 
         override fun onItemRangeChanged(positionStart: Int, itemCount: Int, payload: Any?) {
-            Log.d("OnScrollDiaryList", "RecyclerView_onItemRangeChanged()")
+            Log.d(javaClass.simpleName, "onItemRangeChanged()")
             super.onItemRangeChanged(positionStart, itemCount, payload)
             clearIsLoadingListOnScrolled()
         }
 
         override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
-            Log.d("OnScrollDiaryList", "RecyclerView_onItemRangeInserted()")
+            Log.d(javaClass.simpleName, "onItemRangeInserted()")
             super.onItemRangeInserted(positionStart, itemCount)
             clearIsLoadingListOnScrolled()
         }
 
         override fun onItemRangeRemoved(positionStart: Int, itemCount: Int) {
-            Log.d("OnScrollDiaryList", "RecyclerView_onItemRangeRemoved()")
+            Log.d(javaClass.simpleName, "onItemRangeRemoved()")
             super.onItemRangeRemoved(positionStart, itemCount)
             clearIsLoadingListOnScrolled()
         }
 
         override fun onItemRangeMoved(fromPosition: Int, toPosition: Int, itemCount: Int) {
-            Log.d("OnScrollDiaryList", "RecyclerView_onItemRangeMoved()")
+            Log.d(javaClass.simpleName, "onItemRangeMoved()")
             super.onItemRangeMoved(fromPosition, toPosition, itemCount)
             clearIsLoadingListOnScrolled()
         }
 
         override fun onStateRestorationPolicyChanged() {
-            Log.d("OnScrollDiaryList", "RecyclerView_onStateRestorationPolicyChanged()")
+            Log.d(javaClass.simpleName, "onStateRestorationPolicyChanged()")
             super.onStateRestorationPolicyChanged()
         }
     }
@@ -346,22 +353,16 @@ internal abstract class DiaryYearMonthListBaseAdapter protected constructor(
     }
 
     fun scrollToFirstPosition() {
-        val layoutManager = recyclerView.layoutManager
-        val linearLayoutManager = layoutManager as LinearLayoutManager
-
-        val firstVisibleItemPosition = linearLayoutManager.findFirstVisibleItemPosition()
-        Log.d(
-            "スクロール動作確認",
-            "firstVisibleItemPosition：$firstVisibleItemPosition"
-        )
-
+        Log.d(javaClass.simpleName, "scrollToFirstPosition()")
         // HACK:日記リスト(年月)のアイテム数が多い場合、
         //      ユーザーが数多くのアイテムをスクロールした状態でsmoothScrollToPosition(0)を起動すると先頭にたどり着くのに時間がかかる。
         //      その時間を回避する為に先頭付近へジャンプ(scrollToPosition())してからsmoothScrollToPosition()を起動させたかったが、
         //      エミュレーターでは処理落ちで上手く確認できなかった。(プログラムの可能性もある)
+        val layoutManager = recyclerView.layoutManager
+        val linearLayoutManager = layoutManager as LinearLayoutManager
+        val firstVisibleItemPosition = linearLayoutManager.findFirstVisibleItemPosition()
         val jumpPosition = 2
         if (firstVisibleItemPosition >= jumpPosition) {
-            Log.d("スクロール動作確認", "scrollToPosition()呼出")
             recyclerView.scrollToPosition(jumpPosition)
         }
 

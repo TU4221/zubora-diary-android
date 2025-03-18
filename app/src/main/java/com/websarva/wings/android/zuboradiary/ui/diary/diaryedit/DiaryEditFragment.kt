@@ -374,11 +374,6 @@ class DiaryEditFragment : BaseFragment() {
             val dateTimeStringConverter = DateTimeStringConverter()
             val dateString = dateTimeStringConverter.toYearMonthDayWeek(value)
             binding.textInputEditTextDate.setText(dateString)
-            Log.d("DiaryEditInputDate", "currentDate:$value")
-            val loadedDate = diaryEditViewModel.loadedDate.value
-            Log.d("DiaryEditInputDate", "loadedDate:$loadedDate")
-            val previousDate = diaryEditViewModel.previousDate.value
-            Log.d("DiaryEditInputDate", "previousDate:$previousDate")
 
             lifecycleScope.launch(Dispatchers.IO) {
                 val shouldShowDialog =
@@ -613,12 +608,15 @@ class DiaryEditFragment : BaseFragment() {
 
                 override fun onTransitionCompleted(motionLayout: MotionLayout, currentId: Int) {
                     Log.d(
-                        "MotionLayout",
-                        "Item$itemNumber onTransitionCompleted"
+                        javaClass.simpleName,
+                        "onTransitionCompleted()_itemNumber = $itemNumber"
                     )
                     // 対象項目欄削除後の処理
                     if (currentId == R.id.motion_scene_edit_diary_item_hided_state) {
-                        Log.d("MotionLayout", "currentId:hided_state")
+                        Log.d(
+                            javaClass.simpleName,
+                            "onTransitionCompleted()_currentId = hided_state"
+                        )
                         if (isDeletingItemTransition) {
                             diaryEditViewModel.deleteItem(itemNumber)
                             isDeletingItemTransition = false
@@ -626,7 +624,10 @@ class DiaryEditFragment : BaseFragment() {
 
                         // 対象項目欄追加後の処理
                     } else if (currentId == R.id.motion_scene_edit_diary_item_showed_state) {
-                        Log.d("MotionLayout", "currentId:showed_state")
+                        Log.d(
+                            javaClass.simpleName,
+                            "onTransitionCompleted()_currentId = showed_state"
+                        )
                     }
                 }
 
@@ -808,7 +809,8 @@ class DiaryEditFragment : BaseFragment() {
                     releasePersistablePermission(checkNotNull(loadedPictureUri))
                 }
             } catch (e: SecurityException) {
-                Log.e(javaClass.simpleName, "端末写真使用権限取得/解放失敗", e)
+                // TODO:catch不要(take/releasePersistablePermission()メソッド内で例外処理)
+                Log.e(javaClass.simpleName, "端末写真使用権限取得/解放_失敗", e)
                 // 対処できないがアプリを落としたくない為、catchのみ処理する。
             }
         }

@@ -15,7 +15,9 @@ internal abstract class DiaryYearMonthListAdapter(
     context: Context,
     recyclerView: RecyclerView,
     themeColor: ThemeColor
-) : SwipeDiaryYearMonthListBaseAdapter(context, recyclerView, themeColor, DiffUtilItemCallback()) {
+) : SwipeDiaryYearMonthListBaseAdapter(context, recyclerView, themeColor,
+    DiffUtilItemCallback()
+) {
 
     override fun createDiaryDayList(
         holder: DiaryYearMonthListViewHolder,
@@ -49,55 +51,59 @@ internal abstract class DiaryYearMonthListAdapter(
     }
 
     private class DiffUtilItemCallback : DiaryYearMonthListBaseAdapter.DiffUtilItemCallback() {
-        override fun areContentsTheSame(
-            oldItem: DiaryYearMonthListBaseItem,
-            newItem: DiaryYearMonthListBaseItem
-        ): Boolean {
-            Log.d("DiaryYearMonthList", "DiffUtil.ItemCallback_areContentsTheSame()")
-            Log.d("DiaryYearMonthList", "oldItem_YearMonth:" + oldItem.yearMonth)
-            Log.d("DiaryYearMonthList", "newItem_YearMonth:" + newItem.yearMonth)
 
-            if (oldItem !is DiaryYearMonthListItem) throw IllegalStateException()
-            if (newItem !is DiaryYearMonthListItem) throw IllegalStateException()
+            override fun areContentsTheSame(
+                oldItem: DiaryYearMonthListBaseItem,
+                newItem: DiaryYearMonthListBaseItem
+            ): Boolean {
+                Log.d(
+                    javaClass.simpleName,
+                    "areContentsTheSame()_oldItem.yearMonth = " + oldItem.yearMonth
+                )
+                Log.d(
+                    javaClass.simpleName,
+                    "areContentsTheSame()_newItem.yearMonth = " + newItem.yearMonth
+                )
 
-            // 日
-            Log.d("DiaryYearMonthList", "DiaryYearMonthListItem")
+                if (oldItem !is DiaryYearMonthListItem) throw IllegalStateException()
+                if (newItem !is DiaryYearMonthListItem) throw IllegalStateException()
 
-            val oldChildListSize = oldItem.diaryDayList.diaryDayListItemList.size
-            val newChildListSize = newItem.diaryDayList.diaryDayListItemList.size
-            if (oldChildListSize != newChildListSize) {
-                Log.d("DiaryYearMonthList", "ChildList_Size不一致")
-                return false
+                // 日
+                val oldChildListSize = oldItem.diaryDayList.diaryDayListItemList.size
+                val newChildListSize = newItem.diaryDayList.diaryDayListItemList.size
+                if (oldChildListSize != newChildListSize) {
+                    Log.d(javaClass.simpleName, "areContentsTheSame()_ChildList_Size不一致")
+                    return false
+                }
+
+                for (i in 0 until oldChildListSize) {
+                    val oldChildListItem = oldItem.diaryDayList.diaryDayListItemList[i]
+                    val newChildListItem = newItem.diaryDayList.diaryDayListItemList[i]
+                    if (oldChildListItem.date != newChildListItem.date) {
+                        Log.d(javaClass.simpleName, "areContentsTheSame()_ChildListItem_Date不一致")
+                        return false
+                    }
+                    if (oldChildListItem.title != newChildListItem.title) {
+                        Log.d(javaClass.simpleName, "areContentsTheSame()ChildListItem_Title不一致")
+                        return false
+                    }
+                    if (oldChildListItem.picturePath == null && newChildListItem.picturePath != null) {
+                        Log.d(javaClass.simpleName, "areContentsTheSame()ChildListItem_PicturePath不一致")
+                        return false
+                    }
+                    if (oldChildListItem.picturePath != null && newChildListItem.picturePath == null) {
+                        Log.d(javaClass.simpleName, "areContentsTheSame()ChildListItem_PicturePath不一致")
+                        return false
+                    }
+                    if ((oldChildListItem.picturePath != null/* && newChildListItem.picturePath != null*/)
+                        && (oldChildListItem.picturePath != newChildListItem.picturePath)
+                    ) {
+                        Log.d(javaClass.simpleName, "areContentsTheSame()ChildListItem_PicturePath不一致")
+                        return false
+                    }
+                }
+                Log.d(javaClass.simpleName, "areContentsTheSame()_全項目一致")
+                return true
             }
-
-            for (i in 0 until oldChildListSize) {
-                val oldChildListItem = oldItem.diaryDayList.diaryDayListItemList[i]
-                val newChildListItem = newItem.diaryDayList.diaryDayListItemList[i]
-                if (oldChildListItem.date != newChildListItem.date) {
-                    Log.d("DiaryYearMonthList", "ChildListItem_Date不一致")
-                    return false
-                }
-                if (oldChildListItem.title != newChildListItem.title) {
-                    Log.d("DiaryYearMonthList", "ChildListItem_Title不一致")
-                    return false
-                }
-                if (oldChildListItem.picturePath == null && newChildListItem.picturePath != null) {
-                    Log.d("DiaryYearMonthList", "ChildListItem_PicturePath不一致")
-                    return false
-                }
-                if (oldChildListItem.picturePath != null && newChildListItem.picturePath == null) {
-                    Log.d("DiaryYearMonthList", "ChildListItem_PicturePath不一致")
-                    return false
-                }
-                if ((oldChildListItem.picturePath != null/* && newChildListItem.picturePath != null*/)
-                    && (oldChildListItem.picturePath != newChildListItem.picturePath)
-                ) {
-                    Log.d("DiaryYearMonthList", "ChildListItem_PicturePath不一致")
-                    return false
-                }
-            }
-            Log.d("DiaryYearMonthList", "一致")
-            return true
-        }
     }
 }

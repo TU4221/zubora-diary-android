@@ -6,6 +6,7 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.Looper
+import android.util.Log
 import android.view.MenuItem
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
@@ -109,6 +110,7 @@ class MainActivity : AppCompatActivity() {
 
     @RequiresApi(Build.VERSION_CODES.Q)
     override fun onCreate(savedInstanceState: Bundle?) {
+        Log.d(javaClass.simpleName, "onCreate()")
         installSplashScreen().setKeepOnScreenCondition { !isMainActivityLayoutInflated }
         setUpEdgeToEdge()
         super.onCreate(savedInstanceState)
@@ -347,12 +349,15 @@ class MainActivity : AppCompatActivity() {
             // BottomNavigationのタブ選択による画面遷移
             if (previousItemSelected === menuItem) return true
 
+            val logMsg = "ボトムナビゲーション_フラグメント切替"
+            Log.i(javaClass.simpleName, "${logMsg}_開始")
             wasSelectedTab = true
             previousItemSelected = menuItem
 
             setUpFragmentTransition()
             onNavDestinationSelected(menuItem, navController)
 
+            Log.i(javaClass.simpleName, "${logMsg}_完了")
             return true
         }
 
@@ -450,6 +455,7 @@ class MainActivity : AppCompatActivity() {
         override fun onNavigationItemReselected(menuItem: MenuItem) {
             val fragment = findShowedFragment()
 
+            Log.i(javaClass.simpleName, "ボトムナビゲーション_リセレクト")
             if (menuItem.toString() == getString(R.string.title_list)) {
                 if (fragment !is DiaryListFragment) return
 
@@ -472,6 +478,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     public override fun onStart() {
+        Log.d(javaClass.simpleName, "onStart()")
         super.onStart()
 
         checkPermission()
@@ -498,6 +505,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onDestroy() {
+        Log.d(javaClass.simpleName, "onDestroy()")
         super.onDestroy()
 
         _binding = null

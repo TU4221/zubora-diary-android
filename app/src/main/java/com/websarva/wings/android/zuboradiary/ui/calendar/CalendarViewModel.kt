@@ -40,7 +40,7 @@ internal class CalendarViewModel @Inject constructor(
             // MEMO:CalendarViewModel#hasDiary()はカレンダー日数分連続で処理する為、
             //      エラーが連続で発生した場合、膨大なエラーを記録してしまう。これを回避する為に下記コードを記述。
             if (equalLastAppMessage(AppMessage.DIARY_INFO_LOADING_ERROR)) return false
-            Log.e(javaClass.simpleName, "日記既存確認失敗", e)
+            Log.e(javaClass.simpleName, "日記既存確認_失敗", e)
             addAppMessage(AppMessage.DIARY_INFO_LOADING_ERROR)
             return null
         }

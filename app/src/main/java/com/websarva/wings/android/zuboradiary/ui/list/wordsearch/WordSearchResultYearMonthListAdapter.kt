@@ -45,21 +45,19 @@ internal abstract class WordSearchResultYearMonthListAdapter(
             oldItem: DiaryYearMonthListBaseItem,
             newItem: DiaryYearMonthListBaseItem
         ): Boolean {
-            Log.d("WordSearchYearMonthList", "DiffUtil.ItemCallback_areContentsTheSame()")
-            Log.d("WordSearchYearMonthList", "oldItem_YearMonth:" + oldItem.yearMonth)
-            Log.d("WordSearchYearMonthList", "newItem_YearMonth:" + newItem.yearMonth)
+            Log.d(javaClass.simpleName, "areContentsTheSame()_oldItem.yearMonth = " + oldItem.yearMonth)
+            Log.d(javaClass.simpleName, "areContentsTheSame()_newItem.yearMonth = " + newItem.yearMonth)
 
             if (oldItem !is WordSearchResultYearMonthListItem) throw IllegalStateException()
             if (newItem !is WordSearchResultYearMonthListItem) throw IllegalStateException()
 
             // 日
-            Log.d("WordSearchYearMonthList", "WordSearchResultYearMonthListItem")
             val oldChildListSize =
                 oldItem.wordSearchResultDayList.wordSearchResultDayListItemList.size
             val newChildListSize =
                 newItem.wordSearchResultDayList.wordSearchResultDayListItemList.size
             if (oldChildListSize != newChildListSize) {
-                Log.d("WordSearchYearMonthList", "ChildList_Size不一致")
+                Log.d(javaClass.simpleName, "areContentsTheSame()_ChildList_Size不一致")
                 return false
             }
 
@@ -69,36 +67,36 @@ internal abstract class WordSearchResultYearMonthListAdapter(
                 val newChildListItem =
                     newItem.wordSearchResultDayList.wordSearchResultDayListItemList[i]
                 Log.d(
-                    "WordSearchYearMonthList",
-                    "oldChildListItem_Date:" + oldChildListItem.date
+                    javaClass.simpleName,
+                    "areContentsTheSame()_oldChildListItem_Date:" + oldChildListItem.date
                 )
                 Log.d(
-                    "WordSearchYearMonthList",
-                    "newChildListItem_Date:" + newChildListItem.date
+                    javaClass.simpleName,
+                    "areContentsTheSame()_newChildListItem_Date:" + newChildListItem.date
                 )
 
                 if (oldChildListItem.date != newChildListItem.date) {
-                    Log.d("WordSearchYearMonthList", "ChildListItem_Date不一致")
+                    Log.d(javaClass.simpleName, "areContentsTheSame()_ChildListItem_Date不一致")
                     return false
                 }
                 if (oldChildListItem.title != newChildListItem.title) {
-                    Log.d("WordSearchYearMonthList", "ChildListItem_Title不一致")
+                    Log.d(javaClass.simpleName, "areContentsTheSame()_ChildListItem_Title不一致")
                     return false
                 }
                 if (oldChildListItem.itemNumber !== newChildListItem.itemNumber) {
-                    Log.d("WordSearchYearMonthList", "ChildListItem_ItemNumber不一致")
+                    Log.d(javaClass.simpleName, "areContentsTheSame()_ChildListItem_ItemNumber不一致")
                     return false
                 }
                 if (oldChildListItem.itemTitle != newChildListItem.itemTitle) {
-                    Log.d("WordSearchYearMonthList", "ChildListItem_ItemTitle不一致")
+                    Log.d(javaClass.simpleName, "areContentsTheSame()_ChildListItem_ItemTitle不一致")
                     return false
                 }
                 if (oldChildListItem.itemComment != newChildListItem.itemComment) {
-                    Log.d("WordSearchYearMonthList", "ChildListItem_ItemComment不一致")
+                    Log.d(javaClass.simpleName, "areContentsTheSame()_ChildListItem_ItemComment不一致")
                     return false
                 }
             }
-            Log.d("WordSearchYearMonthList", "一致")
+            Log.d(javaClass.simpleName, "areContentsTheSame()_全項目一致")
             return true
         }
     }

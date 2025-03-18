@@ -18,10 +18,20 @@ internal data class WeatherApiData @Suppress("unused") constructor(
         // GeoCoordinatesのコンストラクタを使用してlatitude、longitudeの値チェック
         GeoCoordinates(latitude.toDouble(), longitude.toDouble())
 
-        Log.d("WeatherApi", "latitude:$latitude")
-        Log.d("WeatherApi", "longitude:$longitude")
-        for (time in daily.times) Log.d("WeatherApi", "time:$time")
-        for (code in daily.weatherCodes) Log.d("WeatherApi", "weatherCode:$code")
+        Log.d(
+            javaClass.simpleName,
+            "toWeatherInfo()_latitude = $latitude, longitude = $longitude"
+        )
+        if (daily.times.isNotEmpty()
+            && daily.weatherCodes.isNotEmpty()
+            && daily.times.size == daily.weatherCodes.size) {
+            for (i in  0 ..< daily.times.size) {
+                Log.d(
+                    javaClass.simpleName,
+                    "toWeatherInfo()_time = " + daily.times[i] +
+                            ", weatherCode = " + daily.weatherCodes[i])
+            }
+        }
 
         val weatherCodes = daily.weatherCodes
         val weatherCode = weatherCodes[0]
@@ -31,14 +41,20 @@ internal data class WeatherApiData @Suppress("unused") constructor(
     // "apiWeatherCode"は下記ページの"WMO 気象解釈コード"
     // https://open-meteo.com/en/docs
     private fun convertWeathers(apiWeatherCode: Int): Weather {
-        Log.d("WeatherApi", apiWeatherCode.toString())
-        return when (apiWeatherCode) {
-            0, 1, 2 -> Weather.SUNNY
-            3, 45, 48 -> Weather.CLOUDY
-            51, 53, 55, 56, 57, 61, 63, 65, 66, 67, 80, 81, 82, 95, 96, 99 -> Weather.RAINY
-            71, 73, 75, 77, 85, 86 -> Weather.SNOWY
-            else -> Weather.UNKNOWN
-        }
+        val result =
+            when (apiWeatherCode) {
+                0, 1, 2 -> Weather.SUNNY
+                3, 45, 48 -> Weather.CLOUDY
+                51, 53, 55, 56, 57, 61, 63, 65, 66, 67, 80, 81, 82, 95, 96, 99 -> Weather.RAINY
+                71, 73, 75, 77, 85, 86 -> Weather.SNOWY
+                else -> Weather.UNKNOWN
+            }
+
+        Log.d(
+            javaClass.simpleName,
+            "convertWeathers(apiWeatherCode = $apiWeatherCode) = $result"
+        )
+        return result
     }
 
     // MEMO:constructorは直接使用されていないがRetrofit2(Moshi)にてインスタンス化している為、@Suppressで警告回避。

@@ -44,13 +44,13 @@ class DiaryRepository @Inject constructor(
         offset: Int,
         date: LocalDate?
     ): List<DiaryListItem> {
+        Log.d(
+            javaClass.simpleName,
+            "loadDiaryList(num = $num, offset = $offset, date = $date)"
+        )
         require(num >= 1)
         require(offset >= 0)
 
-        Log.d(
-            "DiaryRepository",
-            "loadDiaryList(num = $num, offset = $offset, date = $date)"
-        )
         return if (date == null) {
             diaryDAO.selectDiaryListOrderByDateDesc(num, offset)
         } else {

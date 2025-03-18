@@ -2,6 +2,7 @@ package com.websarva.wings.android.zuboradiary.ui
 
 import android.content.DialogInterface
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -24,6 +25,7 @@ abstract class BaseBottomSheetDialogFragment : BottomSheetDialogFragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        Log.d(javaClass.simpleName, "onCreateView()")
         super.onCreateView(inflater, container, savedInstanceState)
 
         setUpDialogCancelFunction()
@@ -63,6 +65,7 @@ abstract class BaseBottomSheetDialogFragment : BottomSheetDialogFragment() {
 
     protected inner class PositiveButtonClickListener : View.OnClickListener {
         override fun onClick(v: View) {
+            Log.d(javaClass.simpleName, "onClick()_PositiveButton")
             handleOnPositiveButtonClick()
             closeDialog()
         }
@@ -70,6 +73,7 @@ abstract class BaseBottomSheetDialogFragment : BottomSheetDialogFragment() {
 
     protected inner class NegativeButtonClickListener : View.OnClickListener {
         override fun onClick(v: View) {
+            Log.d(javaClass.simpleName, "onClick()_NegativeButton")
             handleOnNegativeButtonClick()
             closeDialog()
         }
@@ -96,6 +100,7 @@ abstract class BaseBottomSheetDialogFragment : BottomSheetDialogFragment() {
     //      CANCEL・DISMISSの処理内容はDialogFragmentのonCancel/onDismissをオーバーライドする必要がある。
     //      DialogFragment、AlertDialogのリスナセットメソッドを使用して処理内容を記述きても処理はされない。
     override fun onCancel(dialog: DialogInterface) {
+        Log.d(javaClass.simpleName, "onCancel()")
         handleOnCancel()
         super.onCancel(dialog)
     }

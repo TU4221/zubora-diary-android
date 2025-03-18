@@ -10,6 +10,7 @@ import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor
 import com.websarva.wings.android.zuboradiary.databinding.RowDiaryDayListBinding
 import com.websarva.wings.android.zuboradiary.ui.DiaryPictureManager
 import com.websarva.wings.android.zuboradiary.ui.LeftSwipeSimpleCallback.LeftSwipeViewHolder
+import com.websarva.wings.android.zuboradiary.ui.list.DiaryDayListBaseAdapter
 import com.websarva.wings.android.zuboradiary.ui.list.DiaryDayListBaseItem
 import com.websarva.wings.android.zuboradiary.ui.list.SwipeDiaryDayListBaseAdapter
 import java.text.NumberFormat
@@ -19,7 +20,7 @@ internal class DiaryDayListAdapter(context: Context, recyclerView: RecyclerView,
         context,
         recyclerView,
         themeColor,
-        DiaryDayListDiffUtilItemCallback()
+    DiffUtilItemCallback()
     ) {
 
     override fun onCreateDiaryDayViewHolder(
@@ -95,7 +96,7 @@ internal class DiaryDayListAdapter(context: Context, recyclerView: RecyclerView,
             get() = binding.includeBackground.imageButtonDelete
     }
 
-    private class DiaryDayListDiffUtilItemCallback : DiffUtilItemCallback() {
+    private class DiffUtilItemCallback : DiaryDayListBaseAdapter.DiffUtilItemCallback() {
         override fun areContentsTheSame(
             oldItem: DiaryDayListBaseItem,
             newItem: DiaryDayListBaseItem
@@ -103,13 +104,13 @@ internal class DiaryDayListAdapter(context: Context, recyclerView: RecyclerView,
             if (oldItem !is DiaryDayListItem) throw IllegalStateException()
             if (newItem !is DiaryDayListItem) throw IllegalStateException()
 
-            Log.d("DiaryDayList", "DiffUtil.ItemCallback_areContentsTheSame()")
+            Log.d(javaClass.simpleName, "DiffUtil.ItemCallback_areContentsTheSame()")
             if (oldItem.title != newItem.title) {
-                Log.d("DiaryDayList", "Title不一致")
+                Log.d(javaClass.simpleName, "Title不一致")
                 return false
             }
             if (oldItem.picturePath?.equals(newItem.picturePath) != true) {
-                Log.d("DiaryDayList", "PicturePath不一致")
+                Log.d(javaClass.simpleName, "PicturePath不一致")
                 return false
             }
             return true

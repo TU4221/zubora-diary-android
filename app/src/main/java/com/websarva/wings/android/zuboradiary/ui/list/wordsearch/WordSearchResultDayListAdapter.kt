@@ -83,26 +83,27 @@ internal class WordSearchResultDayListAdapter(
             oldItem: DiaryDayListBaseItem,
             newItem: DiaryDayListBaseItem
         ): Boolean {
-            Log.d("WordSearchResultDayList", "DiffUtil.ItemCallback_areContentsTheSame()")
             if (oldItem !is WordSearchResultDayListItem) throw IllegalStateException()
             if (newItem !is WordSearchResultDayListItem) throw IllegalStateException()
 
             if (oldItem.title != newItem.title) {
-                Log.d("WordSearchResultDayList", "Title不一致")
+                Log.d(javaClass.simpleName, "areContentsTheSame()_Title不一致")
                 return false
             }
             if (oldItem.itemNumber !== newItem.itemNumber) {
-                Log.d("WordSearchResultDayList", "ItemNumber不一致")
+                Log.d(javaClass.simpleName, "areContentsTheSame()_ItemNumber不一致")
                 return false
             }
             if (oldItem.itemTitle != newItem.itemTitle) {
-                Log.d("WordSearchResultDayList", "ItemTitle不一致")
+                Log.d(javaClass.simpleName, "areContentsTheSame()_ItemTitle不一致")
                 return false
             }
             if (oldItem.itemComment != newItem.itemComment) {
-                Log.d("WordSearchResultDayList", "ItemComment不一致")
+                Log.d(javaClass.simpleName, "areContentsTheSame()_ItemComment不一致")
                 return false
             }
+
+            Log.d(javaClass.simpleName, "areContentsTheSame()_全項目一致")
             return true
         }
     }

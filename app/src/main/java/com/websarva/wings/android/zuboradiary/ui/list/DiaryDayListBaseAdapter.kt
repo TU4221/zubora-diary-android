@@ -68,9 +68,9 @@ internal abstract class DiaryDayListBaseAdapter protected constructor(
             oldItem: DiaryDayListBaseItem,
             newItem: DiaryDayListBaseItem
         ): Boolean {
-            Log.d("DiaryDayList", "DiffUtil.ItemCallback_areItemsTheSame()")
-            Log.d("DiaryDayList", "oldItem_Date:" + oldItem.date)
-            Log.d("DiaryDayList", "newItem_Date:" + newItem.date)
+            Log.d(javaClass.simpleName, "areItemsTheSame()")
+            Log.d(javaClass.simpleName, "oldItem_Date = " + oldItem.date)
+            Log.d(javaClass.simpleName, "newItem_Date = " + newItem.date)
 
             return oldItem.date == newItem.date
         }

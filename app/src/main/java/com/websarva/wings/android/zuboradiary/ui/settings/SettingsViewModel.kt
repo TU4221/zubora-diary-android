@@ -190,7 +190,7 @@ class SettingsViewModel @Inject constructor(
         try {
             loadingProcess.load()
         } catch (e: Throwable) {
-            Log.e(javaClass.simpleName, "アプリ設定値読込失敗", e)
+            Log.e(javaClass.simpleName, "アプリ設定値読込_失敗", e)
             addSettingLoadingErrorMessage()
         }
     }
@@ -299,11 +299,11 @@ class SettingsViewModel @Inject constructor(
         try {
             updateProcess.update()
         } catch (e: IOException) {
-            Log.e(javaClass.simpleName, "アプリ設定値更新失敗", e)
+            Log.e(javaClass.simpleName, "アプリ設定値更新_失敗", e)
             addSettingUpdateErrorMessage()
             return false
         } catch (e: Exception) {
-            Log.e(javaClass.simpleName, "アプリ設定値更新失敗", e)
+            Log.e(javaClass.simpleName, "アプリ設定値更新_失敗", e)
             addSettingUpdateErrorMessage()
             return false
         }
@@ -328,7 +328,7 @@ class SettingsViewModel @Inject constructor(
         try {
             diaryRepository.deleteAllDiaries()
         } catch (e: Exception) {
-            Log.e(javaClass.simpleName, "全日記削除失敗", e)
+            Log.e(javaClass.simpleName, "全日記削除_失敗", e)
             addAppMessage(AppMessage.DIARY_DELETE_ERROR)
             return false
         }
@@ -345,7 +345,7 @@ class SettingsViewModel @Inject constructor(
         try {
             diaryRepository.deleteAllData()
         } catch (e: Exception) {
-            Log.e(javaClass.simpleName, "アプリ全データ削除失敗", e)
+            Log.e(javaClass.simpleName, "アプリ全データ削除_失敗", e)
             addAppMessage(AppMessage.DIARY_DELETE_ERROR)
             return false
         }

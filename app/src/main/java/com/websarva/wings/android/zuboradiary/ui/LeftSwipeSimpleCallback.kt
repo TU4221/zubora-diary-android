@@ -27,11 +27,13 @@ internal open class LeftSwipeSimpleCallback(protected val recyclerView: Recycler
     }
 
     private lateinit var itemTouchHelper: ItemTouchHelper
-    protected var swipingAdapterPosition: Int = -1
+
+    private val initializePosition = -1
+    protected var swipingAdapterPosition: Int = initializePosition
         private set
-    protected var swipedAdapterPosition: Int = -1
-    private var invalidSwipeAdapterPosition: Int = -1
-    protected var previousMotionEvent: Int = -1
+    protected var swipedAdapterPosition: Int = initializePosition
+    private var invalidSwipeAdapterPosition: Int = initializePosition
+    protected var previousMotionEvent: Int = initializePosition
 
 
     // TODO:
@@ -50,7 +52,7 @@ internal open class LeftSwipeSimpleCallback(protected val recyclerView: Recycler
         //      通常スワイプ時、ACTION_DOWN -> MOVE -> UPとなるが
         //      未スワイプ状態からはACTION_DOWNは取得できず、ACTION_MOVE -> UPとなる。
         override fun onTouch(v: View, event: MotionEvent): Boolean {
-            Log.d("LeftSwipeSimpleCallBack", "onTouch()_MotionEvent:" + event.action)
+            Log.d(javaClass.simpleName, "onTouch()_MotionEvent = " + event.action)
             if (event.action == MotionEvent.ACTION_UP) clearInvalidSwipeViewHolder()
             previousMotionEvent = event.action
             return false
@@ -61,7 +63,7 @@ internal open class LeftSwipeSimpleCallback(protected val recyclerView: Recycler
     //      終了時にタッチ中の場合はfalseのままとしているため、ここでtrueにする。
     //      理由は"InvalidSwipeAdapterPosition"書き込みコード参照。
     protected fun clearInvalidSwipeViewHolder() {
-        if (invalidSwipeAdapterPosition == -1) return
+        if (invalidSwipeAdapterPosition == initializePosition) return
 
         val lockedViewHolder =
             recyclerView.findViewHolderForAdapterPosition(invalidSwipeAdapterPosition)
@@ -82,12 +84,13 @@ internal open class LeftSwipeSimpleCallback(protected val recyclerView: Recycler
     //      アニメーション中のフラグ isAnimating が無いので isClickable で代用する
     //      (参照:https://mt312.com/3182)
     protected fun closeSwipedViewHolder(position: Int) {
+        Log.d(javaClass.simpleName, "closeSwipedViewHolder()_position = $position")
+
         require(position >= 0)
         val adapter = checkNotNull(recyclerView.adapter)
         val listSize = adapter.itemCount
         require(position < listSize)
 
-        Log.d("LeftSwipeSimpleCallBack", "closeSwipedViewHolder()_position:$position")
         val viewHolder =
             checkNotNull(recyclerView.findViewHolderForAdapterPosition(position))
 
@@ -95,7 +98,8 @@ internal open class LeftSwipeSimpleCallback(protected val recyclerView: Recycler
     }
 
     private fun animateCloseSwipedViewHolder(position: Int, viewHolder: RecyclerView.ViewHolder) {
-        Log.d("LeftSwipeSimpleCallBack", "animateSwipingView()")
+        Log.d(javaClass.simpleName, "animateCloseSwipedViewHolder()_position = $position")
+
         val leftSwipeViewHolder = viewHolder as LeftSwipeViewHolder
         leftSwipeViewHolder.foregroundView.animate()
             .setDuration(300)
@@ -138,9 +142,10 @@ internal open class LeftSwipeSimpleCallback(protected val recyclerView: Recycler
         viewHolder: RecyclerView.ViewHolder
     ): Int {
         Log.d(
-            "LeftSwipeSimpleCallBack",
-            "getMovementFlags()_position:" + viewHolder.bindingAdapterPosition
+            javaClass.simpleName,
+            "getMovementFlags()_position = " + viewHolder.bindingAdapterPosition
         )
+
         val leftSwipeViewHolder = viewHolder as LeftSwipeViewHolder
 
         // アニメーション中スワイプ機能無効
@@ -151,14 +156,11 @@ internal open class LeftSwipeSimpleCallback(protected val recyclerView: Recycler
 
     // MEMO:タッチダウン、アップで呼び出し
     override fun onSelectedChanged(viewHolder: RecyclerView.ViewHolder?, actionState: Int) {
-        var position = "null"
-        if (viewHolder != null) {
-            position = viewHolder.bindingAdapterPosition.toString()
-        }
-        Log.d("LeftSwipeSimpleCallBack", "onSelectedChanged()_position:$position")
+        val position = viewHolder?.bindingAdapterPosition ?: initializePosition
+        Log.d(javaClass.simpleName, "onSelectedChanged()_position = $position")
         Log.d(
-            "LeftSwipeSimpleCallBack",
-            "onSelectedChanged()_actionState:$actionState"
+            javaClass.simpleName,
+            "onSelectedChanged()_actionState = " + toStringItemTouchHelperActionState(actionState)
         )
 
         super.onSelectedChanged(viewHolder, actionState)
@@ -168,8 +170,8 @@ internal open class LeftSwipeSimpleCallback(protected val recyclerView: Recycler
 
         // 他ViewHolderがスワイプ中時の処理
         Log.d(
-            "LeftSwipeSimpleCallBack",
-            "onSelectedChanged()_swipingAdapterPosition:$swipingAdapterPosition"
+            javaClass.simpleName,
+            "onSelectedChanged()_swipingAdapterPosition = $swipingAdapterPosition"
         )
         if (swipingAdapterPosition >= 0
             && swipingAdapterPosition != viewHolder.bindingAdapterPosition
@@ -180,8 +182,8 @@ internal open class LeftSwipeSimpleCallback(protected val recyclerView: Recycler
 
         // 他ViewHolderがスワイプ状態時の処理
         Log.d(
-            "LeftSwipeSimpleCallBack",
-            "onSelectedChanged()_swipedAdapterPosition:$swipedAdapterPosition"
+            javaClass.simpleName,
+            "onSelectedChanged()_swipedAdapterPosition = $swipedAdapterPosition"
         )
         if (swipedAdapterPosition >= 0
             && swipedAdapterPosition != viewHolder.bindingAdapterPosition
@@ -194,7 +196,7 @@ internal open class LeftSwipeSimpleCallback(protected val recyclerView: Recycler
         recyclerView: RecyclerView,
         viewHolder: RecyclerView.ViewHolder, target: RecyclerView.ViewHolder
     ): Boolean {
-        Log.d("LeftSwipeSimpleCallBack", "onMove()")
+        Log.d(javaClass.simpleName, "onMove()")
         return false
     }
 
@@ -215,14 +217,17 @@ internal open class LeftSwipeSimpleCallback(protected val recyclerView: Recycler
         isCurrentlyActive: Boolean
     ) {
         Log.d(
-            "LeftSwipeSimpleCallBack",
-            "onChildDraw()_position:" + viewHolder.bindingAdapterPosition
+            javaClass.simpleName,
+            "onChildDraw()_position = " + viewHolder.bindingAdapterPosition
         )
-        Log.d("LeftSwipeSimpleCallBack", "onChildDraw()_dX:$dX")
+        Log.d(javaClass.simpleName, "onChildDraw()_dX = $dX")
+        Log.d(
+            javaClass.simpleName,
+            "onChildDraw()_actionState = " + toStringItemTouchHelperActionState(actionState)
+        )
 
         if (actionState != ItemTouchHelper.ACTION_STATE_SWIPE) return
 
-        Log.d("LeftSwipeSimpleCallBack", "onChildDraw()_ACTION_STATE_SWIPE")
         val leftSwipeViewHolder = viewHolder as LeftSwipeViewHolder
 
         // アニメーション中は無効
@@ -235,7 +240,6 @@ internal open class LeftSwipeSimpleCallback(protected val recyclerView: Recycler
             if (swipedAdapterPosition == viewHolder.getBindingAdapterPosition()) {
                 clearSwipedAdapterPosition()
             }
-            Log.d("LeftSwipeSimpleCallBack", "onChildDraw()_swipedAdapterPosition:Clear")
         }
 
         translateForegroundView(viewHolder, dX, actionState)
@@ -254,26 +258,36 @@ internal open class LeftSwipeSimpleCallback(protected val recyclerView: Recycler
         recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder
     ) {
         Log.d(
-            "LeftSwipeSimpleCallBack",
-            "clearView()_position:" + viewHolder.bindingAdapterPosition
+            javaClass.simpleName,
+            "clearView()_position = " + viewHolder.bindingAdapterPosition
         )
         super.clearView(recyclerView, viewHolder)
     }
 
     protected fun clearSwipingAdapterPosition() {
-        swipingAdapterPosition = -1
+        swipingAdapterPosition = initializePosition
     }
 
     private fun clearSwipedAdapterPosition() {
-        swipedAdapterPosition = -1
+        swipedAdapterPosition = initializePosition
     }
 
     private fun clearInvalidSwipeAdapterPosition() {
-        invalidSwipeAdapterPosition = -1
+        invalidSwipeAdapterPosition = initializePosition
     }
 
     fun closeSwipedItem() {
-        if (swipingAdapterPosition != -1) closeSwipedViewHolder(swipingAdapterPosition)
-        if (swipedAdapterPosition != -1) closeSwipedViewHolder(swipedAdapterPosition)
+        if (swipingAdapterPosition != initializePosition) closeSwipedViewHolder(swipingAdapterPosition)
+        if (swipedAdapterPosition != initializePosition) closeSwipedViewHolder(swipedAdapterPosition)
+    }
+
+    private fun toStringItemTouchHelperActionState(actionState: Int): String {
+        when (actionState) {
+            ItemTouchHelper.ACTION_STATE_IDLE -> return "ACTION_STATE_IDLE"
+            ItemTouchHelper.ACTION_STATE_SWIPE -> return "ACTION_STATE_SWIPE"
+            ItemTouchHelper.ACTION_STATE_DRAG -> return "ACTION_STATE_DRAG"
+        }
+
+        return "UNKNOWN_ACTION_STATE"
     }
 }

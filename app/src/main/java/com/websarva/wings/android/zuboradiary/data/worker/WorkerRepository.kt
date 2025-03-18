@@ -19,7 +19,10 @@ class WorkerRepository @Inject constructor(private val workManager: WorkManager)
 
         val nowTime = LocalTime.now()
         val initialDelaySeconds = calculationBetweenSeconds(nowTime, settingTime)
-        Log.d("NotificationWorker", "initialDelaySeconds:$initialDelaySeconds")
+        Log.d(
+            javaClass.simpleName,
+            "registerReminderNotificationWorker()_initialDelaySeconds = $initialDelaySeconds"
+        )
         val request =
             PeriodicWorkRequest
                 .Builder(ReminderNotificationWorker::class.java, 1, TimeUnit.DAYS)

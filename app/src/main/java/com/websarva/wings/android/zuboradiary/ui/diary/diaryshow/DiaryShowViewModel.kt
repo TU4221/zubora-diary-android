@@ -69,33 +69,43 @@ internal class DiaryShowViewModel @Inject constructor(private val diaryRepositor
         try {
             return diaryRepository.existsDiary(date)
         } catch (e: Exception) {
-            Log.e(javaClass.simpleName, "日記既存確認失敗", e)
+            Log.e(javaClass.simpleName, "日記既存確認_失敗", e)
             addAppMessage(AppMessage.DIARY_INFO_LOADING_ERROR)
             return null
         }
     }
 
     suspend fun loadSavedDiary(date: LocalDate): Boolean {
+        val logMsg = "日記読込"
+        Log.i(javaClass.simpleName, "${logMsg}_開始")
+
         try {
             val diaryEntity = diaryRepository.loadDiary(date) ?: throw IllegalArgumentException()
             diaryStateFlow.update(diaryEntity)
         } catch (e: Exception) {
-            Log.e(javaClass.simpleName, "日記読込失敗", e)
+            Log.e(javaClass.simpleName, "${logMsg}_失敗", e)
             addAppMessage(AppMessage.DIARY_LOADING_ERROR)
             return false
         }
+
+        Log.i(javaClass.simpleName, "${logMsg}_完了")
         return true
     }
 
     suspend fun deleteDiary(): Boolean {
+        val logMsg = "日記削除"
+        Log.i(javaClass.simpleName, "${logMsg}_開始")
+
         val deleteDate = diaryStateFlow.date.requireValue()
         try {
             diaryRepository.deleteDiary(deleteDate)
         } catch (e: Exception) {
-            Log.e(javaClass.simpleName, "日記削除失敗", e)
+            Log.e(javaClass.simpleName, "${logMsg}_失敗", e)
             addAppMessage(AppMessage.DIARY_DELETE_ERROR)
             return false
         }
+
+        Log.i(javaClass.simpleName, "${logMsg}_完了")
         return true
     }
 
@@ -104,7 +114,7 @@ internal class DiaryShowViewModel @Inject constructor(private val diaryRepositor
         try {
             return !diaryRepository.existsPicturePath(uri)
         } catch (e: Exception) {
-            Log.e(javaClass.simpleName, "端末写真URI使用状況確認失敗", e)
+            Log.e(javaClass.simpleName, "端末写真URI使用状況確認_失敗", e)
             addAppMessage(AppMessage.DIARY_LOADING_ERROR)
             return null
         }

@@ -50,6 +50,9 @@ internal class DiaryItemTitleEditViewModel @Inject constructor(
     }
 
     private fun setUpItemTitleSelectionHistoryList() {
+        val logMsg = "日記項目タイトル選択履歴読込"
+        Log.i(javaClass.simpleName, "${logMsg}_開始")
+
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 itemTitleSelectionHistoryList =
@@ -63,8 +66,9 @@ internal class DiaryItemTitleEditViewModel @Inject constructor(
                         }.map { list ->
                             SelectionHistoryList(list)
                         }.stateIn(this)
+                Log.i(javaClass.simpleName, "${logMsg}_完了")
             } catch (e: Exception) {
-                Log.e(javaClass.simpleName, "日記項目タイトル選択履歴読込失敗", e)
+                Log.e(javaClass.simpleName, "${logMsg}_失敗", e)
                 addAppMessage(AppMessage.DIARY_ITEM_TITLE_HISTORY_LOADING_ERROR)
             }
         }
@@ -78,6 +82,9 @@ internal class DiaryItemTitleEditViewModel @Inject constructor(
     suspend fun deleteDiaryItemTitleSelectionHistoryItem(deletePosition: Int): Boolean {
         require(deletePosition >= 0)
 
+        val logMsg = "日記項目タイトル選択履歴アイテム削除"
+        Log.i(javaClass.simpleName, "${logMsg}_開始")
+
         val currentList = itemTitleSelectionHistoryList.value
         val listSize = currentList.selectionHistoryListItemList.size
         require(deletePosition < listSize)
@@ -87,10 +94,12 @@ internal class DiaryItemTitleEditViewModel @Inject constructor(
         try {
             diaryItemTitleSelectionHistoryRepository.deleteSelectionHistoryItem(deleteTitle)
         } catch (e: Exception) {
-            Log.e(javaClass.simpleName, "日記項目タイトル選択履歴アイテム削除失敗", e)
+            Log.e(javaClass.simpleName, "${logMsg}_失敗", e)
             addAppMessage(AppMessage.DIARY_ITEM_TITLE_HISTORY_ITEM_DELETE_ERROR)
             return false
         }
+
+        Log.i(javaClass.simpleName, "${logMsg}_完了")
         return true
     }
 }

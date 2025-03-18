@@ -2,6 +2,7 @@ package com.websarva.wings.android.zuboradiary.ui
 
 import android.app.Dialog
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.NavHostFragment
@@ -22,6 +23,8 @@ abstract class BaseDatePickerDialogFragment : DialogFragment() {
 
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+        Log.d(javaClass.simpleName, "onCreateDialog()")
+
         settingsViewModel = createSettingsViewModel()
 
         // MEMO:MaterialDatePickerはDialogクラスを作成できないのでダミーDialogを作成して戻り値として返し
@@ -62,6 +65,8 @@ abstract class BaseDatePickerDialogFragment : DialogFragment() {
 
     private fun setUpOnClickListener(datePicker: MaterialDatePicker<Long>, dummyDialog: Dialog) {
         datePicker.addOnPositiveButtonClickListener { selection: Long ->
+            Log.d(javaClass.simpleName, "onClick()_PositiveButton")
+
             // 選択日付型変換(EpochMilli -> LocalDate)
             val instant = Instant.ofEpochMilli(selection)
             val selectedDate = LocalDate.ofInstant(instant, ZoneId.systemDefault())
@@ -70,11 +75,13 @@ abstract class BaseDatePickerDialogFragment : DialogFragment() {
         }
 
         datePicker.addOnNegativeButtonClickListener {
+            Log.d(javaClass.simpleName, "onClick()_NegativeButton")
             handleOnNegativeButtonClick()
             dummyDialog.dismiss()
         }
 
         datePicker.addOnCancelListener {
+            Log.d(javaClass.simpleName, "onCancel()")
             handleOnCancel()
             dummyDialog.dismiss()
         }
