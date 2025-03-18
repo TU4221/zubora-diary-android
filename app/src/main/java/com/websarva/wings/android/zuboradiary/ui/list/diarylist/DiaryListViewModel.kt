@@ -88,7 +88,7 @@ internal class DiaryListViewModel @Inject constructor(private val diaryRepositor
         loadDiaryList(UpdateDiaryListCreator())
     }
 
-    // TODO:suspend関数にしたいがJobをViewModel側で管理したい。後日検討。
+    // MEMO:List読込JobをViewModel側で管理(読込重複防止)
     private fun loadDiaryList(creator: DiaryListCreator) {
         cancelPreviousLoading()
         diaryListLoadingJob =

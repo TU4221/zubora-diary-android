@@ -110,6 +110,7 @@ internal class WordSearchViewModel @Inject internal constructor(
         )
     }
 
+    // MEMO:List読込JobをViewModel側で管理(読込重複防止)
     private fun loadWordSearchResultDiaryList(
         creator: WordSearchResultListCreator,
         spannableStringColor: Int,
