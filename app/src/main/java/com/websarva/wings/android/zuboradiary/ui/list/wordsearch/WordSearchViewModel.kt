@@ -118,7 +118,7 @@ internal class WordSearchViewModel @Inject internal constructor(
         cancelPreviousLoading()
         wordSearchResultListLoadingJob =
             viewModelScope.launch(Dispatchers.IO) {
-                loadSavedDiaryList(
+                createWordSearchResultList(
                     creator,
                     spannableStringColor,
                     spannableStringBackgroundColor
@@ -132,8 +132,7 @@ internal class WordSearchViewModel @Inject internal constructor(
         }
     }
 
-    // TODO:DiaryListViewModelとメソッド名統一
-    private suspend fun loadSavedDiaryList(
+    private suspend fun createWordSearchResultList(
         resultListCreator: WordSearchResultListCreator,
         spannableStringColor: Int,
         spannableStringBackGroundColor: Int
