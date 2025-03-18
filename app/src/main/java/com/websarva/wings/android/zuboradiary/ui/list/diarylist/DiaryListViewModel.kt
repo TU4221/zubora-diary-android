@@ -99,7 +99,6 @@ internal class DiaryListViewModel @Inject constructor(private val diaryRepositor
 
     private fun cancelPreviousLoading() {
         if (!canLoadDiaryList) {
-            Log.i(javaClass.simpleName, "日記リスト読込_キャンセル")
             diaryListLoadingJob?.cancel() ?: throw IllegalStateException()
         }
     }
@@ -112,6 +111,9 @@ internal class DiaryListViewModel @Inject constructor(private val diaryRepositor
             val updateDiaryList = creator.create()
             _diaryList.value = updateDiaryList
             Log.i(javaClass.simpleName, "${logMsg}_完了")
+        } catch (e: CancellationException) {
+            Log.e(javaClass.simpleName, "${logMsg}_キャンセル", e)
+            // 処理なし
         } catch (e: Exception) {
             Log.e(javaClass.simpleName, "${logMsg}_失敗", e)
             _diaryList.value = previousDiaryList

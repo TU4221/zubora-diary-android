@@ -9,6 +9,7 @@ import com.websarva.wings.android.zuboradiary.ui.BaseViewModel
 import com.websarva.wings.android.zuboradiary.ui.requireValue
 import com.websarva.wings.android.zuboradiary.ui.list.diarylist.DiaryListViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -127,7 +128,6 @@ internal class WordSearchViewModel @Inject internal constructor(
 
     private fun cancelPreviousLoading() {
         if (!canLoadWordSearchResultList) {
-            Log.i(javaClass.simpleName, "ワード検索結果読込_キャンセル")
             wordSearchResultListLoadingJob?.cancel() ?: throw IllegalStateException()
         }
     }
@@ -146,6 +146,9 @@ internal class WordSearchViewModel @Inject internal constructor(
                 resultListCreator.create(spannableStringColor, spannableStringBackGroundColor)
             _wordSearchResultList.value = updateResultList
             Log.i(javaClass.simpleName, "${logMsg}_完了")
+        } catch (e: CancellationException) {
+            Log.e(javaClass.simpleName, "${logMsg}_キャンセル", e)
+            // 処理なし
         } catch (e: Exception) {
             Log.e(javaClass.simpleName, "${logMsg}_失敗", e)
             _wordSearchResultList.value = previousResultList
