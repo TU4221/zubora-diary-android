@@ -106,7 +106,6 @@ internal class DiaryShowFragment : BaseFragment() {
 
     override fun handleOnReceivingDialogResult() {
         receiveDiaryDeleteDialogResult()
-        retryOtherAppMessageDialogShow()
     }
 
     override fun removeDialogResultOnDestroy() {

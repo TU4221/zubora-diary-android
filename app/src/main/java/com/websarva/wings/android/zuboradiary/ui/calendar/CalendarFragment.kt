@@ -115,7 +115,7 @@ class CalendarFragment : BaseFragment() {
     }
 
     override fun handleOnReceivingDialogResult() {
-        retryOtherAppMessageDialogShow()
+        // 処理なし
     }
 
     override fun removeDialogResultOnDestroy() {

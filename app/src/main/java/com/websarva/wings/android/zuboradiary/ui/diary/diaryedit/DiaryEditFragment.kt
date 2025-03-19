@@ -146,7 +146,6 @@ class DiaryEditFragment : BaseFragment() {
         receiveWeatherInfoFetchDialogResult()
         receiveDiaryItemDeleteDialogResult()
         receiveDiaryPictureDeleteDialogResult()
-        retryOtherAppMessageDialogShow()
         clearFocusAllEditText()
     }
 

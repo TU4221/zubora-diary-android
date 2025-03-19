@@ -73,7 +73,6 @@ class DiaryItemTitleEditFragment : BaseFragment() {
 
     override fun handleOnReceivingDialogResult() {
         receiveDiaryItemTitleDeleteDialogResult()
-        retryOtherAppMessageDialogShow()
     }
 
     override fun removeDialogResultOnDestroy() {
