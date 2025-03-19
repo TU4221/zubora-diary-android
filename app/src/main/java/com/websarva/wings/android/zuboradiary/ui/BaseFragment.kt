@@ -52,10 +52,10 @@ abstract class BaseFragment : CustomFragment() {
     protected val isDialogShowing
         get() = fragmentDestinationId != currentDestinationId
 
-    protected fun launchAndRepeatOnLifeCycleStarted(
+    protected fun launchAndRepeatOnViewLifeCycleStarted(
         block: suspend CoroutineScope.() -> Unit) {
         viewLifecycleOwner.lifecycleScope.launch {
-            lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED, block)
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED, block)
         }
     }
 
@@ -242,7 +242,7 @@ abstract class BaseFragment : CustomFragment() {
     }
 
     private fun setUpSettingsAppMessageDialog() {
-        launchAndRepeatOnLifeCycleStarted {
+        launchAndRepeatOnViewLifeCycleStarted {
             settingsViewModel.appMessageBufferList
                 .collectLatest { value: AppMessageList ->
                     AppMessageBufferListObserver(settingsViewModel).onChanged(value)

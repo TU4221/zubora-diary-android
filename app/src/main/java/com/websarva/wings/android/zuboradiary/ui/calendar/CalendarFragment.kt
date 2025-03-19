@@ -87,7 +87,7 @@ class CalendarFragment : BaseFragment() {
         _binding = FragmentCalendarBinding.inflate(themeColorInflater, container, false)
 
         return binding.apply {
-            lifecycleOwner = this@CalendarFragment
+            lifecycleOwner = this@CalendarFragment.viewLifecycleOwner
             diaryShowViewModel = this@CalendarFragment.diaryShowViewModel
         }
     }
@@ -104,7 +104,7 @@ class CalendarFragment : BaseFragment() {
         val showedDiaryDate =
             receiveResulFromPreviousFragment<LocalDate>(DiaryShowFragment.KEY_SHOWED_DIARY_DATE)
 
-        launchAndRepeatOnLifeCycleStarted {
+        launchAndRepeatOnViewLifeCycleStarted {
             showedDiaryDate.collectLatest { value: LocalDate? ->
                 value ?: return@collectLatest
 
@@ -123,14 +123,14 @@ class CalendarFragment : BaseFragment() {
     }
 
     override fun setUpOtherAppMessageDialog() {
-        launchAndRepeatOnLifeCycleStarted {
+        launchAndRepeatOnViewLifeCycleStarted {
             calendarViewModel.appMessageBufferList
                 .collectLatest { value: AppMessageList ->
                     AppMessageBufferListObserver(calendarViewModel).onChanged(value)
                 }
         }
 
-        launchAndRepeatOnLifeCycleStarted {
+        launchAndRepeatOnViewLifeCycleStarted {
             diaryShowViewModel.appMessageBufferList
                 .collectLatest { value: AppMessageList ->
                     AppMessageBufferListObserver(diaryShowViewModel).onChanged(value)
@@ -149,7 +149,7 @@ class CalendarFragment : BaseFragment() {
         val endMonth = currentMonth.plusMonths(60) //現在から未来5年分
         calendar.setup(startMonth, endMonth, daysOfWeek[0])
 
-        launchAndRepeatOnLifeCycleStarted {
+        launchAndRepeatOnViewLifeCycleStarted {
             calendarViewModel.selectedDate
                 .collectLatest { value: LocalDate ->
                     binding.calendar.notifyDateChanged(value) // 今回選択日付更新
@@ -159,7 +159,7 @@ class CalendarFragment : BaseFragment() {
                 }
         }
 
-        launchAndRepeatOnLifeCycleStarted {
+        launchAndRepeatOnViewLifeCycleStarted {
             calendarViewModel.previousSelectedDate
                 .collectLatest { value: LocalDate? ->
                     // MEMO:一度も日付選択をしていない場合はnullが代入されている。
@@ -426,7 +426,7 @@ class CalendarFragment : BaseFragment() {
 
     private fun setUpDiaryShow() {
 
-        launchAndRepeatOnLifeCycleStarted {
+        launchAndRepeatOnViewLifeCycleStarted {
             diaryShowViewModel.weather1
                 .collectLatest { value: Weather ->
                     Weather1Observer(
@@ -436,7 +436,7 @@ class CalendarFragment : BaseFragment() {
                 }
         }
 
-        launchAndRepeatOnLifeCycleStarted {
+        launchAndRepeatOnViewLifeCycleStarted {
             diaryShowViewModel.weather2
                 .collectLatest { value: Weather ->
                     Weather2Observer(
@@ -448,7 +448,7 @@ class CalendarFragment : BaseFragment() {
 
         }
 
-        launchAndRepeatOnLifeCycleStarted {
+        launchAndRepeatOnViewLifeCycleStarted {
             diaryShowViewModel.condition
                 .collectLatest { value: Condition ->
                     ConditionObserver(
@@ -458,7 +458,7 @@ class CalendarFragment : BaseFragment() {
                 }
         }
 
-        launchAndRepeatOnLifeCycleStarted {
+        launchAndRepeatOnViewLifeCycleStarted {
             // 項目レイアウト設定
             val itemLayouts =
                 binding.run{
@@ -477,7 +477,7 @@ class CalendarFragment : BaseFragment() {
                 }
         }
 
-        launchAndRepeatOnLifeCycleStarted {
+        launchAndRepeatOnViewLifeCycleStarted {
             diaryShowViewModel.picturePath
                 .collectLatest { value: Uri? ->
                     PicturePathObserver(
@@ -489,7 +489,7 @@ class CalendarFragment : BaseFragment() {
                 }
         }
 
-        launchAndRepeatOnLifeCycleStarted {
+        launchAndRepeatOnViewLifeCycleStarted {
             diaryShowViewModel.log
                 .collectLatest { value: LocalDateTime? ->
                     LogObserver(binding.includeDiaryShow.textLogValue).onChanged(value)

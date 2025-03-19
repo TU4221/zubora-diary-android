@@ -49,7 +49,7 @@ class DiaryItemTitleEditFragment : BaseFragment() {
         _binding = FragmentDiaryItemTitleEditBinding.inflate(themeColorInflater, container, false)
 
         return binding.apply {
-            lifecycleOwner = this@DiaryItemTitleEditFragment
+            lifecycleOwner = this@DiaryItemTitleEditFragment.viewLifecycleOwner
             diaryItemTitleEditViewModel = this@DiaryItemTitleEditFragment.diaryItemTitleEditViewModel
         }
     }
@@ -82,7 +82,7 @@ class DiaryItemTitleEditFragment : BaseFragment() {
     }
 
     override fun setUpOtherAppMessageDialog() {
-        launchAndRepeatOnLifeCycleStarted {
+        launchAndRepeatOnViewLifeCycleStarted {
             diaryItemTitleEditViewModel.appMessageBufferList
                 .collectLatest { value: AppMessageList ->
                     AppMessageBufferListObserver(diaryItemTitleEditViewModel).onChanged(value)
@@ -213,7 +213,7 @@ class DiaryItemTitleEditFragment : BaseFragment() {
         }
 
         // 選択履歴読込・表示
-        launchAndRepeatOnLifeCycleStarted {
+        launchAndRepeatOnViewLifeCycleStarted {
             diaryItemTitleEditViewModel.itemTitleSelectionHistoryList
                 .collectLatest { value: SelectionHistoryList ->
                     val adapter =

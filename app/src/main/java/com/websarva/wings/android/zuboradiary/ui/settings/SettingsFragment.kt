@@ -120,7 +120,7 @@ class SettingsFragment : BaseFragment() {
         _binding = FragmentSettingsBinding.inflate(themeColorInflater, container, false)
 
         return binding.apply {
-            binding.lifecycleOwner = this@SettingsFragment
+            binding.lifecycleOwner = this@SettingsFragment.viewLifecycleOwner
             binding.settingsViewModel = this@SettingsFragment.settingsViewModel
         }
     }
@@ -264,7 +264,7 @@ class SettingsFragment : BaseFragment() {
             showThemeColorPickerDialog()
         }
 
-        launchAndRepeatOnLifeCycleStarted {
+        launchAndRepeatOnViewLifeCycleStarted {
             settingsViewModel.themeColor
                 .collectLatest { value: ThemeColor? ->
                     value ?: return@collectLatest
@@ -371,7 +371,7 @@ class SettingsFragment : BaseFragment() {
             showCalendarStartDayPickerDialog(currentCalendarStartDayOfWeek)
         }
 
-        launchAndRepeatOnLifeCycleStarted {
+        launchAndRepeatOnViewLifeCycleStarted {
             settingsViewModel.calendarStartDayOfWeek
                 .collectLatest { value: DayOfWeek? ->
                     value ?: return@collectLatest
@@ -389,7 +389,7 @@ class SettingsFragment : BaseFragment() {
                 ReminderNotificationOnCheckedChangeListener()
             )
 
-        launchAndRepeatOnLifeCycleStarted {
+        launchAndRepeatOnViewLifeCycleStarted {
             settingsViewModel.isCheckedReminderNotification
                 .collectLatest { value: Boolean? ->
                     value ?: return@collectLatest
@@ -403,7 +403,7 @@ class SettingsFragment : BaseFragment() {
                 }
         }
 
-        launchAndRepeatOnLifeCycleStarted {
+        launchAndRepeatOnViewLifeCycleStarted {
             settingsViewModel.reminderNotificationTime
                 .collectLatest { value: LocalTime? ->
                     // MEMO:未設定の場合nullが代入される。
@@ -479,7 +479,7 @@ class SettingsFragment : BaseFragment() {
                 }
             }
 
-        launchAndRepeatOnLifeCycleStarted {
+        launchAndRepeatOnViewLifeCycleStarted {
             settingsViewModel.isCheckedPasscodeLock
                 .collectLatest { }
         }

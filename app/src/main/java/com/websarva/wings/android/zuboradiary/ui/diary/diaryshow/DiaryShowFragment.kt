@@ -83,7 +83,7 @@ internal class DiaryShowFragment : BaseFragment() {
         _binding = FragmentDiaryShowBinding.inflate(themeColorInflater, container, false)
 
         return binding.apply {
-            lifecycleOwner = this@DiaryShowFragment
+            lifecycleOwner = this@DiaryShowFragment.viewLifecycleOwner
             diaryShowViewModel = this@DiaryShowFragment.diaryShowViewModel
         }
     }
@@ -114,7 +114,7 @@ internal class DiaryShowFragment : BaseFragment() {
     }
 
     override fun setUpOtherAppMessageDialog() {
-        launchAndRepeatOnLifeCycleStarted {
+        launchAndRepeatOnViewLifeCycleStarted {
             diaryShowViewModel.appMessageBufferList
                 .collectLatest { value: AppMessageList ->
                     AppMessageBufferListObserver(diaryShowViewModel).onChanged(value)
@@ -185,7 +185,7 @@ internal class DiaryShowFragment : BaseFragment() {
             }
         }
 
-        launchAndRepeatOnLifeCycleStarted {
+        launchAndRepeatOnViewLifeCycleStarted {
             diaryShowViewModel.date
                 .collectLatest { value: LocalDate? ->
                     // MEMO:DiaryViewModelを初期化するとDiaryDateにnullが代入されるため、下記"return"を処理。
@@ -200,7 +200,7 @@ internal class DiaryShowFragment : BaseFragment() {
 
     // 天気表示欄設定
     private fun setUpWeatherLayout() {
-        launchAndRepeatOnLifeCycleStarted {
+        launchAndRepeatOnViewLifeCycleStarted {
             diaryShowViewModel.weather1
                 .collectLatest { value: Weather ->
                     Weather1Observer(
@@ -210,7 +210,7 @@ internal class DiaryShowFragment : BaseFragment() {
                 }
         }
 
-        launchAndRepeatOnLifeCycleStarted {
+        launchAndRepeatOnViewLifeCycleStarted {
             diaryShowViewModel.weather2
                 .collectLatest { value: Weather ->
                     Weather2Observer(
@@ -247,7 +247,7 @@ internal class DiaryShowFragment : BaseFragment() {
     }
 
     private fun setUpConditionLayout() {
-        launchAndRepeatOnLifeCycleStarted {
+        launchAndRepeatOnViewLifeCycleStarted {
             diaryShowViewModel.condition
                 .collectLatest { value: Condition ->
                     ConditionObserver(
@@ -266,7 +266,7 @@ internal class DiaryShowFragment : BaseFragment() {
     }
 
     private fun setUpItemLayout() {
-        launchAndRepeatOnLifeCycleStarted {
+        launchAndRepeatOnViewLifeCycleStarted {
             val itemLayouts =
                 binding.includeDiaryShow.run {
                     arrayOf(
@@ -302,7 +302,7 @@ internal class DiaryShowFragment : BaseFragment() {
     }
 
     private fun setUpPicture() {
-        launchAndRepeatOnLifeCycleStarted {
+        launchAndRepeatOnViewLifeCycleStarted {
             diaryShowViewModel.picturePath
                 .collectLatest { value: Uri? ->
                     PicturePathObserver(
@@ -343,7 +343,7 @@ internal class DiaryShowFragment : BaseFragment() {
     }
 
     private fun setUpLogLayout() {
-        launchAndRepeatOnLifeCycleStarted {
+        launchAndRepeatOnViewLifeCycleStarted {
             diaryShowViewModel.log
                 .collectLatest { value: LocalDateTime? ->
                     LogObserver(binding.includeDiaryShow.textLogValue).onChanged(value)

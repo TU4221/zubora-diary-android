@@ -85,7 +85,7 @@ class DiaryEditFragment : BaseFragment() {
         _binding = FragmentDiaryEditBinding.inflate(themeColorInflater, container, false)
 
         return binding.apply {
-            lifecycleOwner = this@DiaryEditFragment
+            lifecycleOwner = this@DiaryEditFragment.viewLifecycleOwner
             diaryEditViewModel = this@DiaryEditFragment.diaryEditViewModel
         }
     }
@@ -118,7 +118,7 @@ class DiaryEditFragment : BaseFragment() {
         val newItemTitle =
             receiveResulFromPreviousFragment<String>(DiaryItemTitleEditFragment.KEY_NEW_ITEM_TITLE)
 
-        launchAndRepeatOnLifeCycleStarted {
+        launchAndRepeatOnViewLifeCycleStarted {
             newItemTitle.collectLatest { value: String? ->
                 // MEMO:結果がない場合もあるので"return"で返す。
                 if (value == null) return@collectLatest
@@ -161,7 +161,7 @@ class DiaryEditFragment : BaseFragment() {
     }
 
     override fun setUpOtherAppMessageDialog() {
-        launchAndRepeatOnLifeCycleStarted {
+        launchAndRepeatOnViewLifeCycleStarted {
             diaryEditViewModel.appMessageBufferList
                 .collectLatest { value: AppMessageList ->
                     AppMessageBufferListObserver(diaryEditViewModel).onChanged(value)
@@ -327,7 +327,7 @@ class DiaryEditFragment : BaseFragment() {
                 false
             }
 
-        launchAndRepeatOnLifeCycleStarted {
+        launchAndRepeatOnViewLifeCycleStarted {
             diaryEditViewModel.loadedDate
                 .collectLatest { value: LocalDate? ->
                     val title: String
@@ -358,7 +358,7 @@ class DiaryEditFragment : BaseFragment() {
             }
         }
 
-        launchAndRepeatOnLifeCycleStarted {
+        launchAndRepeatOnViewLifeCycleStarted {
             diaryEditViewModel.date
                 .collectLatest { value: LocalDate? ->
                     DateObserver().onChanged(value)
@@ -427,7 +427,7 @@ class DiaryEditFragment : BaseFragment() {
                 binding.autoCompleteTextWeather1.clearFocus()
             }
 
-        launchAndRepeatOnLifeCycleStarted {
+        launchAndRepeatOnViewLifeCycleStarted {
             diaryEditViewModel.weather1
                 .collectLatest { value: Weather ->
                     val strWeather = value.toString(requireContext())
@@ -461,7 +461,7 @@ class DiaryEditFragment : BaseFragment() {
                 binding.autoCompleteTextWeather2.clearFocus()
             }
 
-        launchAndRepeatOnLifeCycleStarted {
+        launchAndRepeatOnViewLifeCycleStarted {
             diaryEditViewModel.weather2
                 .collectLatest { value: Weather ->
                     val strWeather = value.toString(requireContext())
@@ -508,7 +508,7 @@ class DiaryEditFragment : BaseFragment() {
         }
 
 
-        launchAndRepeatOnLifeCycleStarted {
+        launchAndRepeatOnViewLifeCycleStarted {
             diaryEditViewModel.condition
                 .collectLatest { value: Condition ->
                     val strCondition = value.toString(requireContext())
@@ -594,7 +594,7 @@ class DiaryEditFragment : BaseFragment() {
             itemMotionLayout.setTransitionListener(ItemMotionLayoutListener(itemNumber))
         }
 
-        launchAndRepeatOnLifeCycleStarted {
+        launchAndRepeatOnViewLifeCycleStarted {
             diaryEditViewModel.numVisibleItems
                 .collectLatest { value: Int ->
                     NumVisibleItemsObserver().onChanged(value)
@@ -796,7 +796,7 @@ class DiaryEditFragment : BaseFragment() {
     }
 
     private fun setUpPictureInputField() {
-        launchAndRepeatOnLifeCycleStarted {
+        launchAndRepeatOnViewLifeCycleStarted {
             diaryEditViewModel.picturePath
                 .collectLatest { value: Uri? ->
                     PicturePathObserver().onChanged(value)

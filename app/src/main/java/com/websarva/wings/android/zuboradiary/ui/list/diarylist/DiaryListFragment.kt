@@ -66,7 +66,7 @@ class DiaryListFragment : BaseFragment() {
         _binding = FragmentDiaryListBinding.inflate(themeColorInflater, container, false)
 
         return binding.apply {
-            lifecycleOwner = this@DiaryListFragment
+            lifecycleOwner = this@DiaryListFragment.viewLifecycleOwner
             listViewModel = this@DiaryListFragment.diaryListViewModel
         }
     }
@@ -94,7 +94,7 @@ class DiaryListFragment : BaseFragment() {
     }
 
     override fun setUpOtherAppMessageDialog() {
-        launchAndRepeatOnLifeCycleStarted {
+        launchAndRepeatOnViewLifeCycleStarted {
             diaryListViewModel.appMessageBufferList
                 .collectLatest { value: AppMessageList ->
                     AppMessageBufferListObserver(diaryListViewModel).onChanged(value)
@@ -186,7 +186,7 @@ class DiaryListFragment : BaseFragment() {
                 showDiaryDeleteDialog(item.date, item.picturePath)
             }
 
-        launchAndRepeatOnLifeCycleStarted {
+        launchAndRepeatOnViewLifeCycleStarted {
             diaryListViewModel.diaryList
                 .collectLatest { value: DiaryYearMonthList ->
                     DiaryListObserver().onChanged(value)

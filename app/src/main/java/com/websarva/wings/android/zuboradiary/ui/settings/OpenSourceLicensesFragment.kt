@@ -62,7 +62,7 @@ class OpenSourceLicensesFragment: BaseFragment() {
         _binding = FragmentOpenSourceLicensesBinding.inflate(themeColorInflater, container, false)
 
         return binding.apply {
-            lifecycleOwner = this@OpenSourceLicensesFragment
+            lifecycleOwner = this@OpenSourceLicensesFragment.viewLifecycleOwner
         }
     }
 

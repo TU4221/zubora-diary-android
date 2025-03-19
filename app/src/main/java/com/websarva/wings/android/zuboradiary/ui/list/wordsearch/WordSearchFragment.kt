@@ -47,7 +47,7 @@ class WordSearchFragment : BaseFragment() {
         _binding = FragmentWordSearchBinding.inflate(themeColorInflater, container, false)
 
         return binding.apply {
-            lifecycleOwner = this@WordSearchFragment
+            lifecycleOwner = this@WordSearchFragment.viewLifecycleOwner
             wordSearchViewModel = this@WordSearchFragment.wordSearchViewModel
         }
     }
@@ -80,7 +80,7 @@ class WordSearchFragment : BaseFragment() {
     }
 
     override fun setUpOtherAppMessageDialog() {
-        launchAndRepeatOnLifeCycleStarted {
+        launchAndRepeatOnViewLifeCycleStarted {
             wordSearchViewModel.appMessageBufferList
                 .collectLatest { value: AppMessageList ->
                     AppMessageBufferListObserver(wordSearchViewModel).onChanged(value)
@@ -103,7 +103,7 @@ class WordSearchFragment : BaseFragment() {
             keyboardInitializer.show(binding.editTextSearchWord)
         }
 
-        launchAndRepeatOnLifeCycleStarted {
+        launchAndRepeatOnViewLifeCycleStarted {
             wordSearchViewModel.searchWord
                 .collectLatest { value: String ->
                     // HACK:キーワードの入力時と確定時に検索Observerが起動してしまい
@@ -149,14 +149,14 @@ class WordSearchFragment : BaseFragment() {
                 showShowDiaryFragment(item.date)
             }
 
-        launchAndRepeatOnLifeCycleStarted {
+        launchAndRepeatOnViewLifeCycleStarted {
             wordSearchViewModel.wordSearchResultList
                 .collectLatest { value: WordSearchResultYearMonthList ->
                     WordSearchResultListObserver().onChanged(value)
                 }
         }
 
-        launchAndRepeatOnLifeCycleStarted {
+        launchAndRepeatOnViewLifeCycleStarted {
             wordSearchViewModel.numWordSearchResults
                 .collectLatest { value: Int ->
                     val visibility = if (value > 0) {
