@@ -8,7 +8,7 @@
     </style>
 
     <style name="AppThemeColorWhite" parent="Theme.ZuboraDiary">
-        <item name="theme">@style/ThemeColorWhite</item>
+        <item name="android:theme">@style/ThemeColorWhite</item>
     </style>
 
     <!-- HACK:ThemeColorBlackの時、parentをLightThemeに設定しているとToolbarのメニューボタン等のRippleの色が背景と同化してみえなくなる。
@@ -19,23 +19,23 @@
               原因はBottomNavigationはActivityでインフレートしている為、起動時のテーマに依存してしまう。
               Tooltipsの色変更方法も不明の為、現時点ではこのままとする。 -->
     <style name="AppThemeColorBlack" parent="Theme.ZuboraDiary.Dark">
-        <item name="theme">@style/ThemeColorBlack</item>
+        <item name="android:theme">@style/ThemeColorBlack</item>
     </style>
 
     <style name="AppThemeColorRed" parent="Theme.ZuboraDiary">
-        <item name="theme">@style/ThemeColorRed</item>
+        <item name="android:theme">@style/ThemeColorRed</item>
     </style>
 
     <style name="AppThemeColorBlue" parent="Theme.ZuboraDiary">
-        <item name="theme">@style/ThemeColorBlue</item>
+        <item name="android:theme">@style/ThemeColorBlue</item>
     </style>
 
     <style name="AppThemeColorGreen" parent="Theme.ZuboraDiary">
-        <item name="theme">@style/ThemeColorGreen</item>
+        <item name="android:theme">@style/ThemeColorGreen</item>
     </style>
 
     <style name="AppThemeColorYellow" parent="Theme.ZuboraDiary">
-        <item name="theme">@style/ThemeColorYellow</item>
+        <item name="android:theme">@style/ThemeColorYellow</item>
     </style>
 
 
