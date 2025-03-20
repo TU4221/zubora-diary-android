@@ -127,7 +127,7 @@ class MainActivity : AppCompatActivity() {
         setUpViewModel()
         setUpBinding()
         lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
+            repeatOnLifecycle(Lifecycle.State.CREATED) {
                 settingsViewModel.isAllSettingsNotNull
                     .collectLatest { value: Boolean ->
                         if (!value) return@collectLatest
