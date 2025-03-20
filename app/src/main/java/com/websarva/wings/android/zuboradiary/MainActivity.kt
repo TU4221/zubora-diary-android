@@ -125,7 +125,6 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
 
         setUpViewModel()
-        setUpBinding()
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.CREATED) {
                 settingsViewModel.isAllSettingsNotNull
@@ -153,12 +152,6 @@ class MainActivity : AppCompatActivity() {
     private fun setUpViewModel() {
         val provider = ViewModelProvider(this)
         settingsViewModel = provider[SettingsViewModel::class.java]
-    }
-
-    private fun setUpBinding() {
-        if (!settingsViewModel.isAllSettingsNotNull.value) return
-
-        setUpMainActivityBinding()
     }
 
     private fun setUpMainActivityBinding() {
