@@ -12,7 +12,6 @@ import android.view.MenuItem
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.fragment.app.Fragment
@@ -53,7 +52,7 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
-class MainActivity : AppCompatActivity() {
+class MainActivity : CustomActivity() {
 
     private var _binding: ActivityMainBinding? = null
     private val binding get() = checkNotNull(_binding)
@@ -119,7 +118,6 @@ class MainActivity : AppCompatActivity() {
 
     @RequiresApi(Build.VERSION_CODES.Q)
     override fun onCreate(savedInstanceState: Bundle?) {
-        Log.d(javaClass.simpleName, "onCreate()")
         installSplashScreen().setKeepOnScreenCondition { !isMainActivityLayoutInflated }
         setUpEdgeToEdge()
         super.onCreate(savedInstanceState)
@@ -491,7 +489,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     public override fun onStart() {
-        Log.d(javaClass.simpleName, "onStart()")
         super.onStart()
 
         checkPermission()
@@ -518,7 +515,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onDestroy() {
-        Log.d(javaClass.simpleName, "onDestroy()")
         super.onDestroy()
 
         _binding = null
