@@ -1,6 +1,7 @@
 package com.websarva.wings.android.zuboradiary
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
@@ -27,7 +28,6 @@ import androidx.navigation.NavDestination
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.NavigationUI.onNavDestinationSelected
 import androidx.navigation.ui.NavigationUI.setupWithNavController
-import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationResult
@@ -67,9 +67,8 @@ class MainActivity : AppCompatActivity() {
     // ViewModel
     private lateinit var settingsViewModel: SettingsViewModel
 
-    // 位置情報取得
-    private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
-    private lateinit var locationRequest: LocationRequest
+    // 位置情報取得関係
+    private var isListenerSet = false
 
     // ギャラリーから画像取得
     private val openDocumentResultLauncher = registerForActivityResult(
@@ -99,13 +98,23 @@ class MainActivity : AppCompatActivity() {
                     Manifest.permission.ACCESS_FINE_LOCATION
                 )
                         == PackageManager.PERMISSION_GRANTED)
+            Log.d(
+                javaClass.simpleName,
+                "isGrantedAccessLocation.get()_FineLocation = $isGrantedAccessFineLocation"
+            )
+
             val isGrantedAccessCoarseLocation =
                 (ActivityCompat.checkSelfPermission(
                     this,
                     Manifest.permission.ACCESS_COARSE_LOCATION
                 )
                         == PackageManager.PERMISSION_GRANTED)
-            return isGrantedAccessFineLocation && isGrantedAccessCoarseLocation
+            Log.d(
+                javaClass.simpleName,
+                "isGrantedAccessLocation.get()_CoarseLocation = $isGrantedAccessCoarseLocation"
+            )
+
+            return isGrantedAccessFineLocation || isGrantedAccessCoarseLocation
         }
 
     @RequiresApi(Build.VERSION_CODES.Q)
@@ -162,11 +171,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setUpLocationInfo() {
-        val builder =
-            LocationRequest.Builder(Priority.PRIORITY_BALANCED_POWER_ACCURACY, 5000)
-        locationRequest = builder.build()
-        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
-
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 settingsViewModel.isCheckedWeatherInfoAcquisition
@@ -183,34 +187,50 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    // MEMO:fusedLocationProviderClient.lastLocation()を記述する時、Permission確認コードが必須となるが、
+    //      Permission確認はプロパティで管理する為、@SuppressLintで警告抑制。
+    @SuppressLint("MissingPermission")
     private fun updateLocationInformation() {
-        if ((ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
-                    != PackageManager.PERMISSION_GRANTED)
-            && (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)
-                    != PackageManager.PERMISSION_GRANTED)
-        ) {
-            return
-        }
+        if (!isGrantedAccessLocation) return
 
-        if ((ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
-                    != PackageManager.PERMISSION_GRANTED)
-            && (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)
-                    != PackageManager.PERMISSION_GRANTED)
-        ) {
-            return
+        val logMsg = "位置情報取得"
+        Log.i(javaClass.simpleName, "${logMsg}_開始")
+
+        val fusedLocationProviderClient =
+            LocationServices.getFusedLocationProviderClient(this)
+        val locationRequest =
+            LocationRequest.Builder(
+                Priority.PRIORITY_BALANCED_POWER_ACCURACY,
+                5000
+            ).build()
+
+        // HACK:FusedLocationProviderClient#requestLocationUpdates()の引数であるLocationCallbackが起動しない不具合が発生。
+        //      lastLocation.addOnSuccessListener()でOnSuccessListenerを追加するとLocationCallbackが起動。
+        //      エミュレータが原因と思われる。また、OnSuccessListenerは一度追加すると解除できないので、
+        //      アプリを起動してから一度のみの追加とする。
+        if (!isListenerSet) {
+            fusedLocationProviderClient.lastLocation.addOnSuccessListener {}
+            isListenerSet = true
         }
 
         fusedLocationProviderClient.requestLocationUpdates(
             locationRequest,
             object : LocationCallback() {
                 override fun onLocationResult(locationResult: LocationResult) {
+                    Log.d(this@MainActivity.javaClass.simpleName, "onLocationResult()")
                     super.onLocationResult(locationResult)
                     // アプリ起動時に一回だけ取得
-                    val location = checkNotNull(locationResult.lastLocation)
+                    val location = locationResult.lastLocation
+                    if (location == null) {
+                        Log.d(this@MainActivity.javaClass.simpleName, "${logMsg}_失敗")
+                        return
+                    }
                     val geoCoordinates =
                         GeoCoordinates(location.latitude, location.longitude)
                     settingsViewModel.updateGeoCoordinates(geoCoordinates)
                     fusedLocationProviderClient.removeLocationUpdates(this)
+
+                    Log.i(this@MainActivity.javaClass.simpleName, "${logMsg}_完了_$location")
                 }
             },
             Looper.getMainLooper()
