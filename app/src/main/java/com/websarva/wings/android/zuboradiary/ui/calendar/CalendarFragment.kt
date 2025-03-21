@@ -509,6 +509,12 @@ class CalendarFragment : BaseFragment() {
     fun processOnReselectNavigationItem() {
         if (binding.nestedScrollFullScreen.canScrollVertically(-1)) {
             scrollToTop()
+            return
+        }
+        // MEMO:StateFlowに現在値と同じ値を代入してもCollectメソッドに登録した処理が起動しないため、
+        //      下記条件でカレンダースクロールのみ処理。
+        if (calendarViewModel.selectedDate.value == LocalDate.now()) {
+            scrollCalendar(LocalDate.now())
         } else {
             calendarViewModel.updateSelectedDate(LocalDate.now())
         }
