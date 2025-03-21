@@ -181,10 +181,8 @@ class DiaryEditFragment : BaseFragment() {
                 diaryEditViewModel.prepareDiary(date, true)
             }
         } else {
-            if (!diaryEditViewModel.isNewDiaryDefaultStatus) {
-                lifecycleScope.launch(Dispatchers.IO) {
-                    fetchWeatherInfo(date, true)
-                }
+            lifecycleScope.launch(Dispatchers.IO) {
+                DateObserver().fetchWeatherInfo(date)
             }
         }
     }
@@ -283,9 +281,7 @@ class DiaryEditFragment : BaseFragment() {
         val requiresDiaryLoading =
             DiaryEditFragmentArgs.fromBundle(requireArguments()).requiresDiaryLoading
         lifecycleScope.launch(Dispatchers.IO) {
-            val isSuccessful = diaryEditViewModel.prepareDiary(diaryDate, requiresDiaryLoading)
-            if (!isSuccessful) return@launch
-            if (!requiresDiaryLoading) fetchWeatherInfo(diaryDate, false)
+            diaryEditViewModel.prepareDiary(diaryDate, requiresDiaryLoading)
         }
     }
 
@@ -383,9 +379,7 @@ class DiaryEditFragment : BaseFragment() {
                     }
                 } else {
                     // 読込確認Dialog表示時は、確認後下記処理を行う。
-                    if (requiresWeatherInfoFetching(value)) {
-                        fetchWeatherInfo(value, true)
-                    }
+                    fetchWeatherInfo(value)
                 }
             }
         }
@@ -403,9 +397,23 @@ class DiaryEditFragment : BaseFragment() {
             return diaryEditViewModel.existsSavedDiary(changedDate)
         }
 
+        suspend fun fetchWeatherInfo(changedDate: LocalDate) {
+            if (requiresWeatherInfoFetching(changedDate)) {
+                fetchWeatherInfo(
+                    changedDate,
+                    requiresShowingWeatherInfoFetchingDialog())
+            }
+        }
+
         private fun requiresWeatherInfoFetching(date: LocalDate): Boolean {
-            val previousDate = diaryEditViewModel.previousDate.value ?: return false
-            return date != previousDate
+            val previousDate = diaryEditViewModel.previousDate.value
+            if (!diaryEditViewModel.isNewDiary && previousDate == null) return false
+            return previousDate != date
+        }
+
+        private fun requiresShowingWeatherInfoFetchingDialog(): Boolean {
+            val previousDate = diaryEditViewModel.previousDate.value
+            return previousDate != null
         }
     }
 

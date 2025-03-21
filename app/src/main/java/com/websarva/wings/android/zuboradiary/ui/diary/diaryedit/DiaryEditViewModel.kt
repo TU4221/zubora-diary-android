@@ -140,7 +140,7 @@ internal class DiaryEditViewModel @Inject constructor(
     val isNewDiaryDefaultStatus
         get() = hasPreparedDiary && _previousDate.value == null && _loadedDate.value == null
 
-    private val isNewDiary
+    val isNewDiary
         get() = _loadedDate.value == null
 
     private val shouldDeleteLoadedDateDiary: Boolean
@@ -194,6 +194,7 @@ internal class DiaryEditViewModel @Inject constructor(
             } catch (e: Exception) {
                 Log.e(javaClass.simpleName, "${logMsg}_失敗", e)
                 addAppMessage(AppMessage.DIARY_LOADING_ERROR)
+                updateDate(date)
                 _isVisibleUpdateProgressBar.value = false
                 return false
             }
