@@ -40,7 +40,7 @@ abstract class BaseBottomSheetDialogFragment : BottomSheetDialogFragment() {
         // MEMO:下記機能を無効にするにはDialogFragment#setCancelableを設定する必要あり。
         //      ・UIに表示されているダイアログ外の部分をタッチしてダイアログを閉じる(キャンセル)
         //      ・端末の戻るボタンでダイアログを閉じる(キャンセルする)
-        isCancelable = false
+        isCancelable = true
     }
 
     private fun createSettingsViewModel(): SettingsViewModel {
