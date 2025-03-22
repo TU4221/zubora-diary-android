@@ -62,4 +62,10 @@ internal abstract class SwipeDiaryYearMonthListBaseAdapter protected constructor
             }
         }
     }
+
+    fun setSwipeEnabled(enabled: Boolean) {
+        for (i in simpleCallbackList) {
+            i.isSwipeEnabled = enabled
+        }
+    }
 }

@@ -15,6 +15,8 @@ internal open class LeftSwipeBackgroundButtonSimpleCallback(recyclerView: Recycl
 
     private var swipingOffset: Float = 0f
 
+    var isSwipeEnabled = true
+
     // TODO:@SuppressLintを使用せず、DiaryEdit.CustomTextInputEditTextと同等に修正する？
     @SuppressLint("ClickableViewAccessibility")
     override fun build() {
@@ -75,6 +77,20 @@ internal open class LeftSwipeBackgroundButtonSimpleCallback(recyclerView: Recycl
                 return true
             }
             return false
+        }
+    }
+
+    // MEMO:スワイプ時、タッチ状態を継続したままRecyclerViewを更新するとonSwiped()が起動するが、
+    //      対象ViewHolderのItemPositionが-1となるため、Overrideで記述したコードで例外が発生する。
+    //      その為、RecyclerViewを更新時はgetSwipeDirs()をOverrideしてスワイプ機能を無効にする。
+    override fun getSwipeDirs(
+        recyclerView: RecyclerView,
+        viewHolder: RecyclerView.ViewHolder
+    ): Int {
+        return if (isSwipeEnabled) {
+            super.getSwipeDirs(recyclerView, viewHolder)
+        } else {
+            0
         }
     }
 

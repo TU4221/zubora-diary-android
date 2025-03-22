@@ -38,10 +38,19 @@ internal class DiaryListViewModel @Inject constructor(private val diaryRepositor
 
     val canLoadDiaryList: Boolean
         get() {
-            val result = diaryListLoadingJob?.isCompleted ?: true
+            val result =
+                if (_isLoadingDiaryList.value) {
+                    false
+                } else {
+                    diaryListLoadingJob?.isCompleted ?: true
+                }
             Log.d(javaClass.simpleName, "canLoadDiaryList() = $result")
             return result
         }
+
+    private var _isLoadingDiaryList = MutableStateFlow(false)
+    val isLoadingDiaryList
+        get() = _isLoadingDiaryList.asStateFlow()
 
     /**
      * データベース読込からRecyclerViewへの反映までを true とする。
@@ -95,6 +104,7 @@ internal class DiaryListViewModel @Inject constructor(private val diaryRepositor
             viewModelScope.launch(Dispatchers.IO) {
                 createDiaryList(creator)
             }
+        _isLoadingDiaryList.value = true
     }
 
     private fun cancelPreviousLoading() {
@@ -280,5 +290,9 @@ internal class DiaryListViewModel @Inject constructor(private val diaryRepositor
             addAppMessage(AppMessage.DIARY_INFO_LOADING_ERROR)
             return null
         }
+    }
+
+    fun clearIsLoadingDiaryList() {
+        _isLoadingDiaryList.value = false
     }
 }

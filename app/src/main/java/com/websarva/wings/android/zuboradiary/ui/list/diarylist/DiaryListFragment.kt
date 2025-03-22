@@ -169,27 +169,46 @@ class DiaryListFragment : BaseFragment() {
 
     // 日記リスト(年月)設定
     private fun setUpDiaryList() {
+        binding.floatingActionButtonDiaryEdit.isEnabled = true
         val diaryListAdapter =
             DiaryListAdapter(
                 requireContext(),
                 binding.recyclerDiaryList,
                 themeColor
             )
-        diaryListAdapter.build()
-        diaryListAdapter.onClickChildItemListener =
-            OnClickChildItemListener { item: DiaryDayListBaseItem ->
-                showShowDiaryFragment(item.date)
-            }
-        diaryListAdapter.onClickChildItemBackgroundButtonListener =
-            OnClickChildItemBackgroundButtonListener { item: DiaryDayListBaseItem ->
-                if (item !is DiaryDayListItem) throw IllegalStateException()
-                showDiaryDeleteDialog(item.date, item.picturePath)
-            }
+        diaryListAdapter.apply {
+            build()
+            onClickChildItemListener =
+                OnClickChildItemListener { item: DiaryDayListBaseItem ->
+                    showShowDiaryFragment(item.date)
+                }
+            onClickChildItemBackgroundButtonListener =
+                OnClickChildItemBackgroundButtonListener { item: DiaryDayListBaseItem ->
+                    if (item !is DiaryDayListItem) throw IllegalStateException()
+                    showDiaryDeleteDialog(item.date, item.picturePath)
+                }
+            registerAdapterDataObserver(
+                object : RecyclerView.AdapterDataObserver() {
+
+                    override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
+                        diaryListViewModel.clearIsLoadingDiaryList()
+                    }
+                }
+            )
+        }
+
 
         launchAndRepeatOnViewLifeCycleStarted {
             diaryListViewModel.diaryList
                 .collectLatest { value: DiaryYearMonthList ->
                     DiaryListObserver().onChanged(value)
+                }
+        }
+
+        launchAndRepeatOnViewLifeCycleStarted {
+            diaryListViewModel.isLoadingDiaryList
+                .collectLatest { value: Boolean ->
+                    diaryListAdapter.setSwipeEnabled(!value)
                 }
         }
 
