@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.OnBackPressedCallback
+import androidx.annotation.MainThread
 import androidx.databinding.ViewDataBinding
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
@@ -22,10 +23,12 @@ import com.websarva.wings.android.zuboradiary.data.AppMessage
 import com.websarva.wings.android.zuboradiary.data.AppMessageList
 import com.websarva.wings.android.zuboradiary.ui.settings.SettingsViewModel
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 abstract class BaseFragment : CustomFragment() {
 
@@ -257,24 +260,27 @@ abstract class BaseFragment : CustomFragment() {
     protected abstract fun setUpOtherAppMessageDialog()
 
     protected inner class AppMessageBufferListObserver(private val baseViewModel: BaseViewModel) {
-        fun onChanged(value: AppMessageList) {
+        suspend fun onChanged(value: AppMessageList) {
             if (value.isEmpty) return
 
             val firstAppMessage = checkNotNull(value.findFirstItem())
             showAppMessageDialog(firstAppMessage)
         }
 
-        private fun showAppMessageDialog(appMessage: AppMessage) {
+        private suspend fun showAppMessageDialog(appMessage: AppMessage) {
             if (isDialogShowing) return
 
-            navigateAppMessageDialog(appMessage)
-            baseViewModel.removeAppMessageBufferListFirstItem()
+            withContext(Dispatchers.Main) {
+                navigateAppMessageDialog(appMessage)
+                baseViewModel.removeAppMessageBufferListFirstItem()
+            }
         }
     }
 
     /**
      * BaseFragment#showAppMessageDialog()で呼び出される。
      */
+    @MainThread
     protected abstract fun navigateAppMessageDialog(appMessage: AppMessage)
 
     protected abstract fun retryOtherAppMessageDialogShow()
