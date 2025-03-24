@@ -2,6 +2,7 @@ package com.websarva.wings.android.zuboradiary.ui
 
 import android.os.Bundle
 import android.transition.Transition
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -54,6 +55,13 @@ abstract class BaseFragment : CustomFragment() {
     }
     protected val isDialogShowing
         get() = fragmentDestinationId != currentDestinationId
+
+    private val currentNavBackStackEntryLifecycle: Lifecycle
+        get() {
+            val navBackStackEntry = checkNotNull(navController.currentBackStackEntry)
+            return navBackStackEntry.lifecycle
+        }
+    private val addedLifecycleEventObserverList = ArrayList<LifecycleEventObserver>()
 
     protected fun launchAndRepeatOnViewLifeCycleStarted(
         block: suspend CoroutineScope.() -> Unit) {
@@ -205,6 +213,7 @@ abstract class BaseFragment : CustomFragment() {
                 // MEMO:Dialog表示中:Lifecycle.Event.ON_PAUSE
                 //      Dialog非表示中:Lifecycle.Event.ON_RESUME
                 if (event == Lifecycle.Event.ON_RESUME) {
+                    Log.d(this.javaClass.simpleName, "Lifecycle.Event.ON_RESUME")
                     handleOnReceivingDialogResult()
                     retrySettingsAppMessageDialogShow()
                     retryOtherAppMessageDialogShow()
@@ -212,19 +221,31 @@ abstract class BaseFragment : CustomFragment() {
                 }
             }
 
-        val navBackStackEntry = checkNotNull(navController.currentBackStackEntry)
-        navBackStackEntry.lifecycle.addObserver(lifecycleEventObserver)
+        addNavBackStackEntryLifecycleObserver(lifecycleEventObserver)
+
+        // MEMO:ViewLifeCycleEventが"OnDestroy"の時は、NavのCurrentBackStackが切替先のFragmentに更新されている為、
+        //      ローカル変数に代入して保持しておく。
+        val currentNavBackStackEntryLifecycle = currentNavBackStackEntryLifecycle
         viewLifecycleOwner.lifecycle
             .addObserver(LifecycleEventObserver { _, event: Lifecycle.Event ->
                 if (event == Lifecycle.Event.ON_DESTROY) {
+                    Log.d(this.javaClass.simpleName, "Lifecycle.Event.ON_DESTROY")
                     // MEMO:removeで削除しないとこのFragmentを閉じてもResult内容が残ってしまう。
                     //      その為、このFragmentを再表示した時にObserverがResultの内容で処理してしまう。
                     removeDialogResultOnDestroy()
 
                     // MEMO:removeで削除しないと再度Fragment(前回表示Fragmentと同インスタンスの場合)を表示した時、Observerが重複する。
-                    navBackStackEntry.lifecycle.removeObserver(lifecycleEventObserver)
+                    for (observer in addedLifecycleEventObserverList) {
+                        currentNavBackStackEntryLifecycle.removeObserver(observer)
+                    }
+                    addedLifecycleEventObserverList.clear()
                 }
             })
+    }
+
+    protected fun addNavBackStackEntryLifecycleObserver(observer: LifecycleEventObserver) {
+        currentNavBackStackEntryLifecycle.addObserver(observer)
+        addedLifecycleEventObserverList.add(observer)
     }
 
     /**
