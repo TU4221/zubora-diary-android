@@ -13,6 +13,7 @@ import android.view.inputmethod.EditorInfo
 import android.widget.AdapterView
 import android.widget.AdapterView.OnItemClickListener
 import android.widget.ArrayAdapter
+import androidx.annotation.MainThread
 import androidx.appcompat.view.ContextThemeWrapper
 import androidx.constraintlayout.motion.widget.MotionLayout
 import androidx.core.content.res.ResourcesCompat
@@ -969,6 +970,7 @@ class DiaryEditFragment : BaseFragment() {
         }
     }
 
+    @MainThread
     private fun showDiaryShowFragment(date: LocalDate) {
         if (isDialogShowing) return
 
@@ -985,6 +987,7 @@ class DiaryEditFragment : BaseFragment() {
         navController.navigate(directions)
     }
 
+    @MainThread
     private fun showDiaryItemTitleEditFragment(
         inputItemNumber: ItemNumber,
         inputItemTitle: String
@@ -998,6 +1001,7 @@ class DiaryEditFragment : BaseFragment() {
         diaryEditViewModel.updateIsShowingItemTitleEditFragment(true)
     }
 
+    @MainThread
     private fun showDiaryLoadingDialog(date: LocalDate) {
         if (isDialogShowing) return
 
@@ -1007,6 +1011,7 @@ class DiaryEditFragment : BaseFragment() {
         navController.navigate(directions)
     }
 
+    @MainThread
     private fun showDiaryUpdateDialog(date: LocalDate) {
         if (isDialogShowing) return
 
@@ -1016,6 +1021,7 @@ class DiaryEditFragment : BaseFragment() {
         navController.navigate(directions)
     }
 
+    @MainThread
     private fun showDiaryDeleteDialog(date: LocalDate) {
         if (isDialogShowing) return
 
@@ -1025,6 +1031,7 @@ class DiaryEditFragment : BaseFragment() {
         navController.navigate(directions)
     }
 
+    @MainThread
     private fun showDatePickerDialog(date: LocalDate) {
         if (isDialogShowing) return
 
@@ -1034,6 +1041,7 @@ class DiaryEditFragment : BaseFragment() {
         navController.navigate(directions)
     }
 
+    @MainThread
     private fun showWeatherInfoFetchingDialog(date: LocalDate) {
         if (isDialogShowing) return
         if (!diaryEditViewModel.canFetchWeatherInformation(date)) return
@@ -1047,6 +1055,7 @@ class DiaryEditFragment : BaseFragment() {
         navController.navigate(directions)
     }
 
+    @MainThread
     private fun showDiaryItemDeleteDialog(itemNumber: ItemNumber) {
         if (isDialogShowing) return
 
@@ -1056,6 +1065,7 @@ class DiaryEditFragment : BaseFragment() {
         navController.navigate(directions)
     }
 
+    @MainThread
     private fun showDiaryPictureDeleteDialog() {
         if (isDialogShowing) return
 
@@ -1065,6 +1075,7 @@ class DiaryEditFragment : BaseFragment() {
         navController.navigate(directions)
     }
 
+    @MainThread
     override fun navigateAppMessageDialog(appMessage: AppMessage) {
         val action: NavDirections =
             DiaryEditFragmentDirections

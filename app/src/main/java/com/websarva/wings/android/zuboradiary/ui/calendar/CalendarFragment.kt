@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.activity.OnBackPressedCallback
+import androidx.annotation.MainThread
 import androidx.databinding.ViewDataBinding
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
@@ -525,6 +526,7 @@ class CalendarFragment : BaseFragment() {
         binding.nestedScrollFullScreen.smoothScrollTo(0, 0)
     }
 
+    @MainThread
     private fun showDiaryEditFragment(date: LocalDate) {
         if (isDialogShowing) return
 
@@ -538,6 +540,7 @@ class CalendarFragment : BaseFragment() {
         navController.navigate(directions)
     }
 
+    @MainThread
     override fun navigateAppMessageDialog(appMessage: AppMessage) {
         val directions =
             CalendarFragmentDirections

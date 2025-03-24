@@ -15,6 +15,7 @@ import android.widget.CompoundButton
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.MainThread
 import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
 import androidx.databinding.ViewDataBinding
@@ -602,6 +603,7 @@ class SettingsFragment : BaseFragment() {
         settingsViewModel.scrollPositionY = binding.scrollViewSettings.scrollY
     }
 
+    @MainThread
     private fun showThemeColorPickerDialog() {
         if (isDialogShowing) return
 
@@ -611,6 +613,7 @@ class SettingsFragment : BaseFragment() {
         navController.navigate(directions)
     }
 
+    @MainThread
     private fun showCalendarStartDayPickerDialog(dayOfWeek: DayOfWeek) {
         if (isDialogShowing) return
 
@@ -620,6 +623,7 @@ class SettingsFragment : BaseFragment() {
         navController.navigate(directions)
     }
 
+    @MainThread
     private fun showReminderNotificationTimePickerDialog() {
         if (isDialogShowing) return
 
@@ -629,6 +633,7 @@ class SettingsFragment : BaseFragment() {
         navController.navigate(directions)
     }
 
+    @MainThread
     private fun showPermissionDialog(permissionName: String) {
         if (isDialogShowing) return
 
@@ -638,6 +643,7 @@ class SettingsFragment : BaseFragment() {
         navController.navigate(directions)
     }
 
+    @MainThread
     private fun showAllDiariesDeleteDialog() {
         if (isDialogShowing) return
 
@@ -647,6 +653,7 @@ class SettingsFragment : BaseFragment() {
         navController.navigate(directions)
     }
 
+    @MainThread
     private fun showAllSettingsInitializationDialog() {
         if (isDialogShowing) return
 
@@ -656,6 +663,7 @@ class SettingsFragment : BaseFragment() {
         navController.navigate(directions)
     }
 
+    @MainThread
     private fun showAllDataDeleteDialog() {
         if (isDialogShowing) return
 
@@ -665,6 +673,7 @@ class SettingsFragment : BaseFragment() {
         navController.navigate(directions)
     }
 
+    @MainThread
     override fun navigateAppMessageDialog(appMessage: AppMessage) {
         val directions =
             SettingsFragmentDirections

@@ -8,6 +8,7 @@ import android.view.MenuItem
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
+import androidx.annotation.MainThread
 import androidx.databinding.ViewDataBinding
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
@@ -269,6 +270,7 @@ class DiaryListFragment : BaseFragment() {
         }
     }
 
+    @MainThread
     private fun showEditDiary() {
         if (isDialogShowing) return
 
@@ -282,6 +284,7 @@ class DiaryListFragment : BaseFragment() {
         navController.navigate(directions)
     }
 
+    @MainThread
     private fun showShowDiaryFragment(date: LocalDate) {
         if (isDialogShowing) return
 
@@ -291,6 +294,7 @@ class DiaryListFragment : BaseFragment() {
         navController.navigate(directions)
     }
 
+    @MainThread
     private fun showWordSearchFragment() {
         if (isDialogShowing) return
 
@@ -300,6 +304,7 @@ class DiaryListFragment : BaseFragment() {
         navController.navigate(directions)
     }
 
+    @MainThread
     private fun showStartYearMonthPickerDialog(newestYear: Year, oldestYear: Year) {
         if (isDialogShowing) return
 
@@ -309,6 +314,7 @@ class DiaryListFragment : BaseFragment() {
         navController.navigate(directions)
     }
 
+    @MainThread
     private fun showDiaryDeleteDialog(date: LocalDate, pictureUri: Uri?) {
         if (isDialogShowing) return
 
@@ -318,6 +324,7 @@ class DiaryListFragment : BaseFragment() {
         navController.navigate(directions)
     }
 
+    @MainThread
     override fun navigateAppMessageDialog(appMessage: AppMessage) {
         val directions =
             DiaryListFragmentDirections

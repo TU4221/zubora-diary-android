@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.annotation.MainThread
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.ui.Modifier
@@ -95,6 +96,7 @@ class OpenSourceLicensesFragment: BaseFragment() {
         // 処理なし
     }
 
+    @MainThread
     override fun navigateAppMessageDialog(appMessage: AppMessage) {
         // 処理なし
     }

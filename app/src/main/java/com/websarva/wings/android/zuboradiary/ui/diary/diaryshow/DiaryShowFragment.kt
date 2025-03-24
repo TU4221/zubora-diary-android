@@ -12,6 +12,7 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.activity.OnBackPressedCallback
+import androidx.annotation.MainThread
 import androidx.databinding.ViewDataBinding
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
@@ -362,6 +363,7 @@ internal class DiaryShowFragment : BaseFragment() {
         }
     }
 
+    @MainThread
     private fun showDiaryEdit(date: LocalDate) {
         if (isDialogShowing) return
 
@@ -375,6 +377,7 @@ internal class DiaryShowFragment : BaseFragment() {
         navController.navigate(directions)
     }
 
+    @MainThread
     private fun showDiaryDeleteDialog(date: LocalDate) {
         if (isDialogShowing) return
 
@@ -384,6 +387,7 @@ internal class DiaryShowFragment : BaseFragment() {
         navController.navigate(directions)
     }
 
+    @MainThread
     override fun navigateAppMessageDialog(appMessage: AppMessage) {
         val directions =
             DiaryShowFragmentDirections

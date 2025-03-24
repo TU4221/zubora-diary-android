@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
+import androidx.annotation.MainThread
 import androidx.databinding.ViewDataBinding
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -257,6 +258,7 @@ class WordSearchFragment : BaseFragment() {
         listAdapter.scrollToFirstPosition()
     }
 
+    @MainThread
     private fun showShowDiaryFragment(date: LocalDate) {
         if (isDialogShowing) return
 
@@ -266,6 +268,7 @@ class WordSearchFragment : BaseFragment() {
         navController.navigate(directions)
     }
 
+    @MainThread
     override fun navigateAppMessageDialog(appMessage: AppMessage) {
         val directions =
             WordSearchFragmentDirections
