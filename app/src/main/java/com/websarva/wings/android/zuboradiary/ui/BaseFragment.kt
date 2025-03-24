@@ -262,14 +262,14 @@ abstract class BaseFragment : CustomFragment() {
 
             val firstAppMessage = checkNotNull(value.findFirstItem())
             showAppMessageDialog(firstAppMessage)
+        }
+
+        private fun showAppMessageDialog(appMessage: AppMessage) {
+            if (isDialogShowing) return
+
+            navigateAppMessageDialog(appMessage)
             baseViewModel.removeAppMessageBufferListFirstItem()
         }
-    }
-
-    private fun showAppMessageDialog(appMessage: AppMessage) {
-        if (isDialogShowing) return
-
-        navigateAppMessageDialog(appMessage)
     }
 
     /**
