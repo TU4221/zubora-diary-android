@@ -49,13 +49,13 @@ abstract class BaseFragment : CustomFragment() {
     protected val themeColor
         get() = settingsViewModel.themeColor.requireValue()
 
-    private var fragmentDestinationId = 0 // MEMO:Int型は遅延初期化不可
+    private var destinationId = 0 // MEMO:Int型は遅延初期化不可
     private val currentDestinationId: Int get() {
         val navDestination = navController.currentDestination
         return checkNotNull(navDestination).id
     }
     protected val isDialogShowing
-        get() = fragmentDestinationId != currentDestinationId
+        get() = destinationId != currentDestinationId
 
     private val addedLifecycleEventObserverList = ArrayList<LifecycleEventObserver>()
 
@@ -74,7 +74,7 @@ abstract class BaseFragment : CustomFragment() {
         settingsViewModel = createSettingsViewModel()
         navController = NavHostFragment.findNavController(this)
         navBackStackEntry = checkNotNull(navController.currentBackStackEntry)
-        fragmentDestinationId = currentDestinationId
+        destinationId = currentDestinationId
     }
 
     /**
