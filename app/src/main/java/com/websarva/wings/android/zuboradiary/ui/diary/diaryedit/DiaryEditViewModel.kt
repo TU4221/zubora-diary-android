@@ -169,6 +169,12 @@ internal class DiaryEditViewModel @Inject constructor(
     var isShowingItemTitleEditFragment = initialIsShowingItemTitleEditFragment
         private set
 
+    // 表示保留中Dialog
+    private val initialPendingDialogList = PendingDialogList()
+    private val _pendingDialogList = MutableStateFlow(initialPendingDialogList)
+    val pendingDialogList
+        get() = _pendingDialogList.asStateFlow()
+
     init {
         initialize()
     }
@@ -181,6 +187,7 @@ internal class DiaryEditViewModel @Inject constructor(
         _loadedPicturePath.value = initialLoadedPicturePath
         diaryStateFlow.initialize()
         isShowingItemTitleEditFragment = initialIsShowingItemTitleEditFragment
+        _pendingDialogList.value = initialPendingDialogList
     }
 
     suspend fun prepareDiary(date: LocalDate, shouldLoadDiary: Boolean): Boolean {
@@ -386,6 +393,27 @@ internal class DiaryEditViewModel @Inject constructor(
             addAppMessage(AppMessage.DIARY_LOADING_ERROR)
             return null
         }
+    }
+
+    // 表示保留中Dialog
+    fun addPendingDialogList(pendingDialog: PendingDialog) {
+        val currentList = _pendingDialogList.value
+        val updateList = currentList.add(pendingDialog)
+        _pendingDialogList.value = updateList
+    }
+
+    fun triggerPendingDialogListObserver() {
+        Log.d(javaClass.simpleName, "triggerAppMessageBufferListObserver()")
+        val currentList = _pendingDialogList.value
+        _pendingDialogList.value = PendingDialogList()
+        _pendingDialogList.value = currentList
+    }
+
+    fun removePendingDialogListFirstItem() {
+        Log.d(javaClass.simpleName, "removeAppMessageBufferListFirstItem()")
+        val currentList = _pendingDialogList.value
+        val updateList = currentList.removeFirstItem()
+        _pendingDialogList.value = updateList
     }
 
     // Fragment切替記憶

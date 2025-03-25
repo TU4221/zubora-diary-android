@@ -94,6 +94,7 @@ class DiaryEditFragment : BaseFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        setUpPendingDialogObserver()
         setUpDiaryData()
         setUpToolBar()
         setUpDateInputField()
@@ -272,6 +273,29 @@ class DiaryEditFragment : BaseFragment() {
         if (selectedButton != DialogInterface.BUTTON_POSITIVE) return
 
         diaryEditViewModel.deletePicturePath()
+    }
+
+    private fun setUpPendingDialogObserver() {
+        addNavBackStackEntryLifecycleObserver { _, event: Lifecycle.Event ->
+            if (event == Lifecycle.Event.ON_RESUME) {
+                diaryEditViewModel.triggerPendingDialogListObserver()
+            }
+        }
+
+        launchAndRepeatOnViewLifeCycleStarted {
+            diaryEditViewModel.pendingDialogList
+                .collectLatest { value: PendingDialogList ->
+                    val pendingDialog = value.findFirstItem() ?: return@collectLatest
+                    val date = diaryEditViewModel.date.requireValue()
+                    withContext(Dispatchers.Main) {
+                        when (pendingDialog) {
+                            PendingDialog.DIARY_LOADING -> showDiaryLoadingDialog(date)
+                            PendingDialog.WEATHER_INFO_FETCHING -> showWeatherInfoFetchingDialog(date)
+                        }
+                        diaryEditViewModel.removePendingDialogListFirstItem()
+                    }
+                }
+        }
     }
 
     private fun setUpDiaryData() {
@@ -1003,7 +1027,10 @@ class DiaryEditFragment : BaseFragment() {
 
     @MainThread
     private fun showDiaryLoadingDialog(date: LocalDate) {
-        if (isDialogShowing) return
+        if (isDialogShowing) {
+            diaryEditViewModel.addPendingDialogList(PendingDialog.DIARY_LOADING)
+            return
+        }
 
         val directions =
             DiaryEditFragmentDirections
@@ -1043,8 +1070,11 @@ class DiaryEditFragment : BaseFragment() {
 
     @MainThread
     private fun showWeatherInfoFetchingDialog(date: LocalDate) {
-        if (isDialogShowing) return
         if (!diaryEditViewModel.canFetchWeatherInformation(date)) return
+        if (isDialogShowing) {
+            diaryEditViewModel.addPendingDialogList(PendingDialog.WEATHER_INFO_FETCHING)
+            return
+        }
 
         // 今日の日付以降は天気情報を取得できないためダイアログ表示不要
         diaryEditViewModel.canFetchWeatherInformation(date)
