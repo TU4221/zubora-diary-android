@@ -25,15 +25,20 @@ class AppMessageList {
     }
 
     fun equalLastItem(appMessage: AppMessage): Boolean {
-        if (appMessageList.isEmpty()) return false
-
-        val lastPosition = appMessageList.size - 1
-        val lastAppMessage = appMessageList[lastPosition]
-        return lastAppMessage == appMessage
+        try {
+            val lastAppMessage = appMessageList.last()
+            return lastAppMessage == appMessage
+        } catch (e: NoSuchElementException) {
+            return false
+        }
     }
 
     fun findFirstItem(): AppMessage? {
-        if (appMessageList.isEmpty()) return null
-        return appMessageList[0]
+        return try {
+            appMessageList.first()
+        } catch (e: NoSuchElementException) {
+            null
+        }
+
     }
 }
