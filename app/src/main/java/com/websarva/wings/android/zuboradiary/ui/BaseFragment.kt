@@ -11,10 +11,10 @@ import androidx.annotation.MainThread
 import androidx.databinding.ViewDataBinding
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import com.google.android.material.transition.platform.MaterialFadeThrough
@@ -38,10 +38,11 @@ abstract class BaseFragment : CustomFragment() {
 
     protected lateinit var navController: NavController
         private set
-    private val currentNavBackStackEntrySavedStateHandle: SavedStateHandle get() {
-        val navBackStackEntry = checkNotNull(navController.currentBackStackEntry)
-        return navBackStackEntry.savedStateHandle
-    }
+
+    // MEMO:NavController#currentBackStackEntry()はFragmentライフサイクル状態で取得する値が異なるため、
+    //      Create状態の時の値を保持して使用。
+    //      (ViewLifeCycleEventが"OnDestroy"の時は、NavのCurrentBackStackが切替先のFragmentに更新される)
+    private lateinit var navBackStackEntry: NavBackStackEntry
 
     protected lateinit var settingsViewModel: SettingsViewModel
         private set
@@ -56,11 +57,6 @@ abstract class BaseFragment : CustomFragment() {
     protected val isDialogShowing
         get() = fragmentDestinationId != currentDestinationId
 
-    private val currentNavBackStackEntryLifecycle: Lifecycle
-        get() {
-            val navBackStackEntry = checkNotNull(navController.currentBackStackEntry)
-            return navBackStackEntry.lifecycle
-        }
     private val addedLifecycleEventObserverList = ArrayList<LifecycleEventObserver>()
 
     protected fun launchAndRepeatOnViewLifeCycleStarted(
@@ -77,6 +73,7 @@ abstract class BaseFragment : CustomFragment() {
 
         settingsViewModel = createSettingsViewModel()
         navController = NavHostFragment.findNavController(this)
+        navBackStackEntry = checkNotNull(navController.currentBackStackEntry)
         fragmentDestinationId = currentDestinationId
     }
 
@@ -196,14 +193,14 @@ abstract class BaseFragment : CustomFragment() {
     protected abstract fun handleOnReceivingResultFromPreviousFragment()
 
     protected fun <T> receiveResulFromPreviousFragment(key: String): StateFlow<T?> {
-        val containsDialogResult = currentNavBackStackEntrySavedStateHandle.contains(key)
+        val containsDialogResult = navBackStackEntry.savedStateHandle.contains(key)
         if (!containsDialogResult) return MutableStateFlow<T?>(null)
 
-        return currentNavBackStackEntrySavedStateHandle.getStateFlow(key, null)
+        return navBackStackEntry.savedStateHandle.getStateFlow(key, null)
     }
 
     protected fun removeResulFromFragment(key: String) {
-        currentNavBackStackEntrySavedStateHandle.remove<Any>(key)
+        navBackStackEntry.savedStateHandle.remove<Any>(key)
     }
 
     private fun setUpDialogResultReceiver() {
@@ -222,10 +219,6 @@ abstract class BaseFragment : CustomFragment() {
             }
 
         addNavBackStackEntryLifecycleObserver(lifecycleEventObserver)
-
-        // MEMO:ViewLifeCycleEventが"OnDestroy"の時は、NavのCurrentBackStackが切替先のFragmentに更新されている為、
-        //      ローカル変数に代入して保持しておく。
-        val currentNavBackStackEntryLifecycle = currentNavBackStackEntryLifecycle
         viewLifecycleOwner.lifecycle
             .addObserver(LifecycleEventObserver { _, event: Lifecycle.Event ->
                 if (event == Lifecycle.Event.ON_DESTROY) {
@@ -236,7 +229,7 @@ abstract class BaseFragment : CustomFragment() {
 
                     // MEMO:removeで削除しないと再度Fragment(前回表示Fragmentと同インスタンスの場合)を表示した時、Observerが重複する。
                     for (observer in addedLifecycleEventObserverList) {
-                        currentNavBackStackEntryLifecycle.removeObserver(observer)
+                        navBackStackEntry.lifecycle.removeObserver(observer)
                     }
                     addedLifecycleEventObserverList.clear()
                 }
@@ -244,7 +237,7 @@ abstract class BaseFragment : CustomFragment() {
     }
 
     protected fun addNavBackStackEntryLifecycleObserver(observer: LifecycleEventObserver) {
-        currentNavBackStackEntryLifecycle.addObserver(observer)
+        navBackStackEntry.lifecycle.addObserver(observer)
         addedLifecycleEventObserverList.add(observer)
     }
 
@@ -259,10 +252,10 @@ abstract class BaseFragment : CustomFragment() {
     protected abstract fun removeDialogResultOnDestroy()
 
     protected fun <T> receiveResulFromDialog(key: String): T? {
-        val containsDialogResult = currentNavBackStackEntrySavedStateHandle.contains(key)
+        val containsDialogResult = navBackStackEntry.savedStateHandle.contains(key)
         if (!containsDialogResult) return null
 
-        return currentNavBackStackEntrySavedStateHandle.get<T>(key)
+        return navBackStackEntry.savedStateHandle.get<T>(key)
     }
 
     private fun setUpSettingsAppMessageDialog() {
