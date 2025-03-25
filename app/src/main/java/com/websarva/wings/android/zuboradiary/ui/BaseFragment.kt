@@ -72,9 +72,6 @@ abstract class BaseFragment : CustomFragment() {
         initializeViewModel()
 
         settingsViewModel = createSettingsViewModel()
-        navController = NavHostFragment.findNavController(this)
-        navBackStackEntry = checkNotNull(navController.currentBackStackEntry)
-        destinationId = currentDestinationId
     }
 
     /**
@@ -175,6 +172,11 @@ abstract class BaseFragment : CustomFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        navController = NavHostFragment.findNavController(this)
+        navBackStackEntry = checkNotNull(navController.currentBackStackEntry)
+        destinationId = currentDestinationId
+
         setUpPreviousFragmentResultReceiver()
         setUpDialogResultReceiver()
         setUpSettingsAppMessageDialog()
