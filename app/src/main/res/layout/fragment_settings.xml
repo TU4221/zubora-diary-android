@@ -144,6 +144,16 @@
                             app:settingValueSwitch="@{settingsViewModel.isCheckedWeatherInfoAcquisition}"
                             tools:ignore="DuplicateIncludedIds" />
 
+                        <!-- HACK:MaterialSwitchを配置したLayoutをincludeタグで複数配置すると、
+                                  MaterialSwitchの初期状態が前回表示した本Fragment内のMaterialSwitchの状態に依存する不具合が発生。
+                                  前回表示したMaterialSwitchとは本FragmentLayoutの最後に配置したincludeタグ内のMaterialSwitchである。
+                                  この状態だとCompoundButton.OnCheckedChangeListenerがチェック状態で誤作動する。
+                                  includeタグを使用しなければこの不具合は発生しないが、Layoutの再利用性を考慮してincludeタグを使用する。
+                                  この不具合を解決する為に、MaterialSwitchが常時false状態となる下記Layoutを追加する。-->
+                        <include
+                            layout="@layout/layout_settings_item_switch"
+                            android:visibility="gone"/>
+
                     </LinearLayout>
 
                     <LinearLayout

@@ -486,12 +486,6 @@ class SettingsFragment : BaseFragment() {
         }
     }
 
-    // HACK:WeatherInfoAcquisitionSettingのMaterialSwitchがOn状態(SettingViewModelのisCheckedStateFlowが"true")だと、
-    //      本Fragment起動時に他のMaterialSwitchのOnCheckedChangeListenerがOn状態("true")で起動してしまう。
-    //      (他のMaterialSwitchがOn状態でも本問題は起きない)
-    //      SettingViewModelの対象isCheckedStateFlowは"false"かつ、
-    //      OnCheckedChangeListenerはユーザーがタッチした時に限り処理されるよう条件が入っている為、問題は発生していない。
-    //      原因は不明。(Fragment、layout.xmlでのMaterialSwitchの設定に問題なし)
     private fun setUpWeatherInfoAcquisitionSettingItem() {
         // MEMO:端末設定画面で"許可 -> 無許可"に変更したときの対応コード
         val isGranted = mainActivity.isGrantedAccessLocation
