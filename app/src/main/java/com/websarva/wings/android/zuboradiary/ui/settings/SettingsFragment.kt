@@ -73,8 +73,7 @@ class SettingsFragment : BaseFragment() {
                     if (isGranted && recheck) {
                         showReminderNotificationTimePickerDialog()
                     } else {
-                        binding.includePasscodeLockSetting
-                            .materialSwitch.isChecked = false
+                        binding.includeReminderNotificationSetting.materialSwitch.isChecked = false
                     }
                 }
         }
@@ -458,9 +457,8 @@ class SettingsFragment : BaseFragment() {
                     requestPostNotificationsPermissionLauncher
                         .launch(Manifest.permission.POST_NOTIFICATIONS)
                 } else {
-                    binding.includePasscodeLockSetting.materialSwitch.isChecked = false
-                    val permissionName =
-                        getString(R.string.fragment_settings_permission_name_notification)
+                    binding.includeReminderNotificationSetting.materialSwitch.isChecked = false
+                    val permissionName = getString(R.string.fragment_settings_permission_name_notification)
                     showPermissionDialog(permissionName)
                 }
             }
@@ -502,7 +500,6 @@ class SettingsFragment : BaseFragment() {
     }
 
     private inner class WeatherInfoAcquisitionOnCheckedChangeListener
-
         : CompoundButton.OnCheckedChangeListener {
         override fun onCheckedChanged(buttonView: CompoundButton, isChecked: Boolean) {
             // DateStorePreferences初回読込時の値がtrueの場合、本メソッドが呼び出される。
