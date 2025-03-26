@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.websarva.wings.android.zuboradiary.data.AppMessage
 import com.websarva.wings.android.zuboradiary.data.database.DiaryItemTitleSelectionHistoryRepository
 import com.websarva.wings.android.zuboradiary.data.diary.ItemNumber
+import com.websarva.wings.android.zuboradiary.getLogTag
 import com.websarva.wings.android.zuboradiary.ui.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -20,6 +21,8 @@ import javax.inject.Inject
 internal class DiaryItemTitleEditViewModel @Inject constructor(
     private val diaryItemTitleSelectionHistoryRepository: DiaryItemTitleSelectionHistoryRepository
 ) : BaseViewModel() {
+
+    private val logTag = getLogTag()
 
     private val initialItemNumber = null
     private val maxLoadedItemTitles = 50
@@ -51,7 +54,7 @@ internal class DiaryItemTitleEditViewModel @Inject constructor(
 
     private fun setUpItemTitleSelectionHistoryList() {
         val logMsg = "日記項目タイトル選択履歴読込"
-        Log.i(javaClass.simpleName, "${logMsg}_開始")
+        Log.i(logTag, "${logMsg}_開始")
 
         viewModelScope.launch(Dispatchers.IO) {
             try {
@@ -66,9 +69,9 @@ internal class DiaryItemTitleEditViewModel @Inject constructor(
                         }.map { list ->
                             SelectionHistoryList(list)
                         }.stateIn(this)
-                Log.i(javaClass.simpleName, "${logMsg}_完了")
+                Log.i(logTag, "${logMsg}_完了")
             } catch (e: Exception) {
-                Log.e(javaClass.simpleName, "${logMsg}_失敗", e)
+                Log.e(logTag, "${logMsg}_失敗", e)
                 addAppMessage(AppMessage.DIARY_ITEM_TITLE_HISTORY_LOADING_ERROR)
             }
         }
@@ -83,7 +86,7 @@ internal class DiaryItemTitleEditViewModel @Inject constructor(
         require(deletePosition >= 0)
 
         val logMsg = "日記項目タイトル選択履歴アイテム削除"
-        Log.i(javaClass.simpleName, "${logMsg}_開始")
+        Log.i(logTag, "${logMsg}_開始")
 
         val currentList = itemTitleSelectionHistoryList.value
         val listSize = currentList.selectionHistoryListItemList.size
@@ -94,12 +97,12 @@ internal class DiaryItemTitleEditViewModel @Inject constructor(
         try {
             diaryItemTitleSelectionHistoryRepository.deleteSelectionHistoryItem(deleteTitle)
         } catch (e: Exception) {
-            Log.e(javaClass.simpleName, "${logMsg}_失敗", e)
+            Log.e(logTag, "${logMsg}_失敗", e)
             addAppMessage(AppMessage.DIARY_ITEM_TITLE_HISTORY_ITEM_DELETE_ERROR)
             return false
         }
 
-        Log.i(javaClass.simpleName, "${logMsg}_完了")
+        Log.i(logTag, "${logMsg}_完了")
         return true
     }
 }

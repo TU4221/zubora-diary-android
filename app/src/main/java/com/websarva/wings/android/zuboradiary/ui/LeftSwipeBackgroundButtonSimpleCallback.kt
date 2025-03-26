@@ -7,11 +7,14 @@ import android.view.MotionEvent
 import android.view.View
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
+import com.websarva.wings.android.zuboradiary.getLogTag
 import kotlin.math.max
 import kotlin.math.min
 
 internal open class LeftSwipeBackgroundButtonSimpleCallback(recyclerView: RecyclerView) :
     LeftSwipeSimpleCallback(recyclerView) {
+
+    private val logTag = getLogTag()
 
     private var swipingOffset: Float = 0f
 
@@ -32,7 +35,7 @@ internal open class LeftSwipeBackgroundButtonSimpleCallback(recyclerView: Recycl
         //      通常スワイプ時、ACTION_DOWN -> MOVE -> UPとなるが
         //      未スワイプ状態からはACTION_DOWNは取得できず、ACTION_MOVE -> UPとなる。
         override fun onTouch(v: View, event: MotionEvent): Boolean {
-            Log.d(javaClass.simpleName, "onTouch()_MotionEvent = " + event.action)
+            Log.d(logTag, "onTouch()_MotionEvent = " + event.action)
             var result = false
             if (event.action == MotionEvent.ACTION_UP) {
                 clearInvalidSwipeViewHolder()
@@ -95,10 +98,7 @@ internal open class LeftSwipeBackgroundButtonSimpleCallback(recyclerView: Recycl
     }
 
     override fun getSwipeThreshold(viewHolder: RecyclerView.ViewHolder): Float {
-        Log.d(
-            javaClass.simpleName,
-            "getSwipeThreshold()_position = " + viewHolder.bindingAdapterPosition
-        )
+        Log.d(logTag, "getSwipeThreshold()_position = " + viewHolder.bindingAdapterPosition)
         val leftSwipeViewHolder = viewHolder as LeftSwipeViewHolder
 
         // スワイプ境界を背面ボタンの中心にする
@@ -110,16 +110,16 @@ internal open class LeftSwipeBackgroundButtonSimpleCallback(recyclerView: Recycl
         //      スワイプ機能の値(ItemTouchHelper.Callback#onChildDraw()の引数であるdX)としては
         //      ViewHolderの端までスワイプしている事になっている。その為下記コードが必要となる。
         if (swipedAdapterPosition != viewHolder.getBindingAdapterPosition()) {
-            Log.d(javaClass.simpleName, "getSwipeThreshold()_return = $threshold")
+            Log.d(logTag, "getSwipeThreshold()_return = $threshold")
             return threshold
         }
 
-        Log.d(javaClass.simpleName, "getSwipeThreshold()_return = " + (1 - threshold))
+        Log.d(logTag, "getSwipeThreshold()_return = " + (1 - threshold))
         return 1 - threshold
     }
 
     override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
-        Log.d(javaClass.simpleName, "onSwiped()_position = " + viewHolder.bindingAdapterPosition)
+        Log.d(logTag, "onSwiped()_position = " + viewHolder.bindingAdapterPosition)
         if (direction != ItemTouchHelper.LEFT) return
 
         val leftSwipeViewHolder = viewHolder as LeftSwipeViewHolder
@@ -153,10 +153,7 @@ internal open class LeftSwipeBackgroundButtonSimpleCallback(recyclerView: Recycl
                     max(-backgroundButtonWidth.toDouble(), dX.toDouble())
                 ).toFloat()
             }
-        Log.d(
-            javaClass.simpleName,
-            "onChildDraw()_translationValueX = $translationValueX"
-        )
+        Log.d(logTag, "onChildDraw()_translationValueX = $translationValueX")
         leftSwipeViewHolder.foregroundView.translationX = translationValueX
     }
 }

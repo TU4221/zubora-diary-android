@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor
+import com.websarva.wings.android.zuboradiary.getLogTag
 import com.websarva.wings.android.zuboradiary.ui.ThemeColorInflaterCreator
 
 internal abstract class DiaryDayListBaseAdapter protected constructor(
@@ -64,13 +65,16 @@ internal abstract class DiaryDayListBaseAdapter protected constructor(
     }
 
     protected abstract class DiffUtilItemCallback : DiffUtil.ItemCallback<DiaryDayListBaseItem>() {
+
+        private val logTag = getLogTag()
+
         override fun areItemsTheSame(
             oldItem: DiaryDayListBaseItem,
             newItem: DiaryDayListBaseItem
         ): Boolean {
-            Log.d(javaClass.simpleName, "areItemsTheSame()")
-            Log.d(javaClass.simpleName, "oldItem_Date = " + oldItem.date)
-            Log.d(javaClass.simpleName, "newItem_Date = " + newItem.date)
+            Log.d(logTag, "areItemsTheSame()")
+            Log.d(logTag, "oldItem_Date = " + oldItem.date)
+            Log.d(logTag, "newItem_Date = " + newItem.date)
 
             return oldItem.date == newItem.date
         }

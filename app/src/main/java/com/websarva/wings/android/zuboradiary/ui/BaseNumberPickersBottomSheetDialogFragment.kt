@@ -8,8 +8,11 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.view.ContextThemeWrapper
 import com.websarva.wings.android.zuboradiary.databinding.DialogFragmentNumberPickersBinding
+import com.websarva.wings.android.zuboradiary.getLogTag
 
 abstract class BaseNumberPickersBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
+
+    private val logTag = getLogTag()
 
     // View関係
     private var _binding: DialogFragmentNumberPickersBinding? = null
@@ -18,7 +21,7 @@ abstract class BaseNumberPickersBottomSheetDialogFragment : BaseBottomSheetDialo
     override fun createDialogView(
         inflater: LayoutInflater, container: ViewGroup?
     ): View {
-        Log.d(javaClass.simpleName, "createDialogView()")
+        Log.d(logTag, "createDialogView()")
 
         _binding = createBinding(inflater, container)
         return binding.apply {
@@ -65,7 +68,7 @@ abstract class BaseNumberPickersBottomSheetDialogFragment : BaseBottomSheetDialo
     protected abstract fun setUpNumberPickers(binding: DialogFragmentNumberPickersBinding)
 
     override fun onDestroyView() {
-        Log.d(javaClass.simpleName, "onDestroyView()")
+        Log.d(logTag, "onDestroyView()")
         super.onDestroyView()
         _binding = null
     }

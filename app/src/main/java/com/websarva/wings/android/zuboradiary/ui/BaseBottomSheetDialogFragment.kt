@@ -10,9 +10,12 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.NavHostFragment
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor
+import com.websarva.wings.android.zuboradiary.getLogTag
 import com.websarva.wings.android.zuboradiary.ui.settings.SettingsViewModel
 
 abstract class BaseBottomSheetDialogFragment : BottomSheetDialogFragment() {
+
+    private val logTag = getLogTag()
 
     protected lateinit var settingsViewModel: SettingsViewModel
         private set
@@ -25,7 +28,7 @@ abstract class BaseBottomSheetDialogFragment : BottomSheetDialogFragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        Log.d(javaClass.simpleName, "onCreateView()")
+        Log.d(logTag, "onCreateView()")
         super.onCreateView(inflater, container, savedInstanceState)
 
         setUpDialogCancelFunction()
@@ -65,7 +68,7 @@ abstract class BaseBottomSheetDialogFragment : BottomSheetDialogFragment() {
 
     protected inner class PositiveButtonClickListener : View.OnClickListener {
         override fun onClick(v: View) {
-            Log.d(javaClass.simpleName, "onClick()_PositiveButton")
+            Log.d(logTag, "onClick()_PositiveButton")
             handleOnPositiveButtonClick()
             closeDialog()
         }
@@ -73,7 +76,7 @@ abstract class BaseBottomSheetDialogFragment : BottomSheetDialogFragment() {
 
     protected inner class NegativeButtonClickListener : View.OnClickListener {
         override fun onClick(v: View) {
-            Log.d(javaClass.simpleName, "onClick()_NegativeButton")
+            Log.d(logTag, "onClick()_NegativeButton")
             handleOnNegativeButtonClick()
             closeDialog()
         }
@@ -100,7 +103,7 @@ abstract class BaseBottomSheetDialogFragment : BottomSheetDialogFragment() {
     //      CANCEL・DISMISSの処理内容はDialogFragmentのonCancel/onDismissをオーバーライドする必要がある。
     //      DialogFragment、AlertDialogのリスナセットメソッドを使用して処理内容を記述きても処理はされない。
     override fun onCancel(dialog: DialogInterface) {
-        Log.d(javaClass.simpleName, "onCancel()")
+        Log.d(logTag, "onCancel()")
         handleOnCancel()
         super.onCancel(dialog)
     }

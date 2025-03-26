@@ -4,10 +4,13 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import com.websarva.wings.android.zuboradiary.data.AppMessage
 import com.websarva.wings.android.zuboradiary.data.AppMessageList
+import com.websarva.wings.android.zuboradiary.getLogTag
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
 abstract class BaseViewModel : ViewModel() {
+
+    private val logTag = getLogTag()
 
     private val initialAppMessageBufferList = AppMessageList()
     private val _appMessageBufferList = MutableStateFlow(initialAppMessageBufferList)
@@ -19,33 +22,33 @@ abstract class BaseViewModel : ViewModel() {
     }
 
     protected fun initializeAppMessageList() {
-        Log.d(javaClass.simpleName, "initializeAppMessageList()")
+        Log.d(logTag, "initializeAppMessageList()")
         _appMessageBufferList.value = initialAppMessageBufferList
     }
 
     protected fun addAppMessage(appMessage: AppMessage) {
-        Log.d(javaClass.simpleName, "addAppMessage()")
+        Log.d(logTag, "addAppMessage()")
         val currentList = requireNotNull(_appMessageBufferList.value)
         val updateList = currentList.add(appMessage)
         _appMessageBufferList.value = updateList
     }
 
     fun triggerAppMessageBufferListObserver() {
-        Log.d(javaClass.simpleName, "triggerAppMessageBufferListObserver()")
+        Log.d(logTag, "triggerAppMessageBufferListObserver()")
         val currentList = _appMessageBufferList.value
         _appMessageBufferList.value = AppMessageList()
         _appMessageBufferList.value = currentList
     }
 
     fun removeAppMessageBufferListFirstItem() {
-        Log.d(javaClass.simpleName, "removeAppMessageBufferListFirstItem()")
+        Log.d(logTag, "removeAppMessageBufferListFirstItem()")
         val currentList = _appMessageBufferList.value
         val updateList = currentList.removeFirstItem()
         _appMessageBufferList.value = updateList
     }
 
     protected fun equalLastAppMessage(appMessage: AppMessage): Boolean {
-        Log.d(javaClass.simpleName, "equalLastAppMessage()")
+        Log.d(logTag, "equalLastAppMessage()")
         val currentList = _appMessageBufferList.value
         return currentList.equalLastItem(appMessage)
     }

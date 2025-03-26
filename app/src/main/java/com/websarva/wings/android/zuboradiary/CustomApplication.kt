@@ -14,6 +14,8 @@ import javax.inject.Inject
 @HiltAndroidApp
 open class CustomApplication : Application(), DefaultLifecycleObserver, Configuration.Provider {
 
+    private val logTag = getLogTag()
+
     @Inject
     lateinit var workerFactory: HiltWorkerFactory
     var isAppInForeground = false
@@ -22,7 +24,7 @@ open class CustomApplication : Application(), DefaultLifecycleObserver, Configur
         get() = Configuration.Builder().setWorkerFactory(workerFactory).build()
 
     override fun onCreate() {
-        Log.d(javaClass.simpleName, "onCreate()")
+        Log.d(logTag, "onCreate()")
         super<Application>.onCreate()
         ProcessLifecycleOwner.get().lifecycle.addObserver(this)
 
@@ -31,12 +33,12 @@ open class CustomApplication : Application(), DefaultLifecycleObserver, Configur
     }
 
     override fun onStart(owner: LifecycleOwner) {
-        Log.d(javaClass.simpleName, "onStart()")
+        Log.d(logTag, "onStart()")
         isAppInForeground = true
     }
 
     override fun onStop(owner: LifecycleOwner) {
-        Log.d(javaClass.simpleName, "onStop()")
+        Log.d(logTag, "onStop()")
         isAppInForeground = false
     }
 }

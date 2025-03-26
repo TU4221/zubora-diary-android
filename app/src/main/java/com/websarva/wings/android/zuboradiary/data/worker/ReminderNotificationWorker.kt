@@ -18,6 +18,7 @@ import androidx.work.WorkerParameters
 import com.websarva.wings.android.zuboradiary.CustomApplication
 import com.websarva.wings.android.zuboradiary.R
 import com.websarva.wings.android.zuboradiary.data.database.DiaryRepository
+import com.websarva.wings.android.zuboradiary.getLogTag
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import java.time.LocalDate
@@ -28,6 +29,8 @@ internal class ReminderNotificationWorker @AssistedInject constructor(
     @Assisted workerParams: WorkerParameters,
     private val diaryRepository: DiaryRepository
 ) : CoroutineWorker(context, workerParams) {
+
+    private val logTag = getLogTag()
 
     private val channelId: String = context.getString(R.string.reminder_notification_worker_channel_id)
     private val channelName: String = context.getString(R.string.reminder_notification_worker_channel_name)
@@ -66,7 +69,7 @@ internal class ReminderNotificationWorker @AssistedInject constructor(
         try {
             hasWriteTodayDiary = existsSavedTodayDiary()
         } catch (e: Exception) {
-            Log.e(javaClass.simpleName, "本日付日記既存確認_失敗", e)
+            Log.e(logTag, "本日付日記既存確認_失敗", e)
             return Result.failure()
         }
         if (hasWriteTodayDiary) return Result.success()
@@ -77,7 +80,7 @@ internal class ReminderNotificationWorker @AssistedInject constructor(
     @Throws(Exception::class)
     private suspend fun existsSavedTodayDiary(): Boolean {
         val result = diaryRepository.existsDiary(LocalDate.now())
-        Log.d(javaClass.simpleName, "existsSavedTodayDiary() = $result")
+        Log.d(logTag, "existsSavedTodayDiary() = $result")
         return result
     }
 
@@ -90,10 +93,7 @@ internal class ReminderNotificationWorker @AssistedInject constructor(
             } else {
                 true
             }
-        Log.d(
-            javaClass.simpleName,
-            "showHeadsUpNotification()_NotificationIsPermission = $isPermission"
-        )
+        Log.d(logTag, "showHeadsUpNotification()_NotificationIsPermission = $isPermission")
 
         if (!isPermission) return Result.failure()
 

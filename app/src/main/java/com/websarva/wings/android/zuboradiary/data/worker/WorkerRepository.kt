@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.PeriodicWorkRequest
 import androidx.work.WorkManager
+import com.websarva.wings.android.zuboradiary.getLogTag
 import java.time.LocalTime
 import java.time.temporal.ChronoUnit
 import java.util.concurrent.TimeUnit
@@ -14,13 +15,15 @@ class WorkerRepository @Inject constructor(private val workManager: WorkManager)
     private val reminderNotificationWorkTag = "ReminderNotification"
     private val reminderNotificationUniqueWorkName = reminderNotificationWorkTag
 
+    private val logTag = getLogTag()
+
     fun registerReminderNotificationWorker(settingTime: LocalTime) {
         cancelReminderNotificationWorker()
 
         val nowTime = LocalTime.now()
         val initialDelaySeconds = calculationBetweenSeconds(nowTime, settingTime)
         Log.d(
-            javaClass.simpleName,
+            logTag,
             "registerReminderNotificationWorker()_initialDelaySeconds = $initialDelaySeconds"
         )
         val request =

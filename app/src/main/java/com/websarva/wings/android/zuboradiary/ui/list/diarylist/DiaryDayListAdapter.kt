@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.websarva.wings.android.zuboradiary.data.DayOfWeekStringConverter
 import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor
 import com.websarva.wings.android.zuboradiary.databinding.RowDiaryDayListBinding
+import com.websarva.wings.android.zuboradiary.getLogTag
 import com.websarva.wings.android.zuboradiary.ui.DiaryPictureManager
 import com.websarva.wings.android.zuboradiary.ui.LeftSwipeSimpleCallback.LeftSwipeViewHolder
 import com.websarva.wings.android.zuboradiary.ui.list.DiaryDayListBaseAdapter
@@ -20,7 +21,7 @@ internal class DiaryDayListAdapter(context: Context, recyclerView: RecyclerView,
         context,
         recyclerView,
         themeColor,
-    DiffUtilItemCallback()
+        DiffUtilItemCallback()
     ) {
 
     override fun onCreateDiaryDayViewHolder(
@@ -97,6 +98,9 @@ internal class DiaryDayListAdapter(context: Context, recyclerView: RecyclerView,
     }
 
     private class DiffUtilItemCallback : DiaryDayListBaseAdapter.DiffUtilItemCallback() {
+
+        val logTag = getLogTag()
+
         override fun areContentsTheSame(
             oldItem: DiaryDayListBaseItem,
             newItem: DiaryDayListBaseItem
@@ -104,13 +108,13 @@ internal class DiaryDayListAdapter(context: Context, recyclerView: RecyclerView,
             if (oldItem !is DiaryDayListItem) throw IllegalStateException()
             if (newItem !is DiaryDayListItem) throw IllegalStateException()
 
-            Log.d(javaClass.simpleName, "DiffUtil.ItemCallback_areContentsTheSame()")
+            Log.d(logTag, "DiffUtil.ItemCallback_areContentsTheSame()")
             if (oldItem.title != newItem.title) {
-                Log.d(javaClass.simpleName, "Title不一致")
+                Log.d(logTag, "Title不一致")
                 return false
             }
             if (oldItem.picturePath != newItem.picturePath) {
-                Log.d(javaClass.simpleName, "PicturePath不一致")
+                Log.d(logTag, "PicturePath不一致")
                 return false
             }
             return true

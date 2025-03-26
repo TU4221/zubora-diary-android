@@ -4,6 +4,7 @@ import android.content.Context
 import android.util.Log
 import androidx.recyclerview.widget.RecyclerView
 import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor
+import com.websarva.wings.android.zuboradiary.getLogTag
 import com.websarva.wings.android.zuboradiary.ui.list.DiaryDayListBaseAdapter
 import com.websarva.wings.android.zuboradiary.ui.list.DiaryDayListBaseItem
 import com.websarva.wings.android.zuboradiary.ui.list.DiaryYearMonthListBaseAdapter
@@ -52,16 +53,18 @@ internal abstract class DiaryYearMonthListAdapter(
 
     private class DiffUtilItemCallback : DiaryYearMonthListBaseAdapter.DiffUtilItemCallback() {
 
+        private val logTag = getLogTag()
+
             override fun areContentsTheSame(
                 oldItem: DiaryYearMonthListBaseItem,
                 newItem: DiaryYearMonthListBaseItem
             ): Boolean {
                 Log.d(
-                    javaClass.simpleName,
+                    logTag,
                     "areContentsTheSame()_oldItem.yearMonth = " + oldItem.yearMonth
                 )
                 Log.d(
-                    javaClass.simpleName,
+                    logTag,
                     "areContentsTheSame()_newItem.yearMonth = " + newItem.yearMonth
                 )
 
@@ -72,7 +75,7 @@ internal abstract class DiaryYearMonthListAdapter(
                 val oldChildListSize = oldItem.diaryDayList.diaryDayListItemList.size
                 val newChildListSize = newItem.diaryDayList.diaryDayListItemList.size
                 if (oldChildListSize != newChildListSize) {
-                    Log.d(javaClass.simpleName, "areContentsTheSame()_ChildList_Size不一致")
+                    Log.d(logTag, "areContentsTheSame()_ChildList_Size不一致")
                     return false
                 }
 
@@ -80,29 +83,29 @@ internal abstract class DiaryYearMonthListAdapter(
                     val oldChildListItem = oldItem.diaryDayList.diaryDayListItemList[i]
                     val newChildListItem = newItem.diaryDayList.diaryDayListItemList[i]
                     if (oldChildListItem.date != newChildListItem.date) {
-                        Log.d(javaClass.simpleName, "areContentsTheSame()_ChildListItem_Date不一致")
+                        Log.d(logTag, "areContentsTheSame()_ChildListItem_Date不一致")
                         return false
                     }
                     if (oldChildListItem.title != newChildListItem.title) {
-                        Log.d(javaClass.simpleName, "areContentsTheSame()ChildListItem_Title不一致")
+                        Log.d(logTag, "areContentsTheSame()ChildListItem_Title不一致")
                         return false
                     }
                     if (oldChildListItem.picturePath == null && newChildListItem.picturePath != null) {
-                        Log.d(javaClass.simpleName, "areContentsTheSame()ChildListItem_PicturePath不一致")
+                        Log.d(logTag, "areContentsTheSame()ChildListItem_PicturePath不一致")
                         return false
                     }
                     if (oldChildListItem.picturePath != null && newChildListItem.picturePath == null) {
-                        Log.d(javaClass.simpleName, "areContentsTheSame()ChildListItem_PicturePath不一致")
+                        Log.d(logTag, "areContentsTheSame()ChildListItem_PicturePath不一致")
                         return false
                     }
                     if ((oldChildListItem.picturePath != null/* && newChildListItem.picturePath != null*/)
                         && (oldChildListItem.picturePath != newChildListItem.picturePath)
                     ) {
-                        Log.d(javaClass.simpleName, "areContentsTheSame()ChildListItem_PicturePath不一致")
+                        Log.d(logTag, "areContentsTheSame()ChildListItem_PicturePath不一致")
                         return false
                     }
                 }
-                Log.d(javaClass.simpleName, "areContentsTheSame()_全項目一致")
+                Log.d(logTag, "areContentsTheSame()_全項目一致")
                 return true
             }
     }

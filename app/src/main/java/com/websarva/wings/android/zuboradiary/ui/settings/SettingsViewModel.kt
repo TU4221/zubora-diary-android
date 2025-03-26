@@ -14,6 +14,7 @@ import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColorPrefere
 import com.websarva.wings.android.zuboradiary.data.preferences.UserPreferencesRepository
 import com.websarva.wings.android.zuboradiary.data.preferences.WeatherInfoAcquisitionPreference
 import com.websarva.wings.android.zuboradiary.data.worker.WorkerRepository
+import com.websarva.wings.android.zuboradiary.getLogTag
 import com.websarva.wings.android.zuboradiary.ui.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -34,6 +35,8 @@ class SettingsViewModel @Inject constructor(
     private val workerRepository: WorkerRepository,
     private val diaryRepository: DiaryRepository
 ) : BaseViewModel() {
+
+    private val logTag = getLogTag()
 
     // MEMO:StateFlow型設定値変数の値ははPreferencesDatastoreの値のみを代入したいので、
     //      代入されるまでの間(初回設定値読込中)はnullとする。
@@ -190,7 +193,7 @@ class SettingsViewModel @Inject constructor(
         try {
             loadingProcess.load()
         } catch (e: Throwable) {
-            Log.e(javaClass.simpleName, "アプリ設定値読込_失敗", e)
+            Log.e(logTag, "アプリ設定値読込_失敗", e)
             addSettingLoadingErrorMessage()
         }
     }
@@ -299,11 +302,11 @@ class SettingsViewModel @Inject constructor(
         try {
             updateProcess.update()
         } catch (e: IOException) {
-            Log.e(javaClass.simpleName, "アプリ設定値更新_失敗", e)
+            Log.e(logTag, "アプリ設定値更新_失敗", e)
             addSettingUpdateErrorMessage()
             return false
         } catch (e: Exception) {
-            Log.e(javaClass.simpleName, "アプリ設定値更新_失敗", e)
+            Log.e(logTag, "アプリ設定値更新_失敗", e)
             addSettingUpdateErrorMessage()
             return false
         }
@@ -328,7 +331,7 @@ class SettingsViewModel @Inject constructor(
         try {
             diaryRepository.deleteAllDiaries()
         } catch (e: Exception) {
-            Log.e(javaClass.simpleName, "全日記削除_失敗", e)
+            Log.e(logTag, "全日記削除_失敗", e)
             addAppMessage(AppMessage.DIARY_DELETE_ERROR)
             return false
         }
@@ -345,7 +348,7 @@ class SettingsViewModel @Inject constructor(
         try {
             diaryRepository.deleteAllData()
         } catch (e: Exception) {
-            Log.e(javaClass.simpleName, "アプリ全データ削除_失敗", e)
+            Log.e(logTag, "アプリ全データ削除_失敗", e)
             addAppMessage(AppMessage.DIARY_DELETE_ERROR)
             return false
         }

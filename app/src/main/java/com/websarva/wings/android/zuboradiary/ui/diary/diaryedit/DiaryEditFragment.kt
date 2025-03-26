@@ -31,6 +31,7 @@ import com.websarva.wings.android.zuboradiary.data.diary.Condition
 import com.websarva.wings.android.zuboradiary.data.diary.ItemNumber
 import com.websarva.wings.android.zuboradiary.data.diary.Weather
 import com.websarva.wings.android.zuboradiary.databinding.FragmentDiaryEditBinding
+import com.websarva.wings.android.zuboradiary.getLogTag
 import com.websarva.wings.android.zuboradiary.ui.BaseFragment
 import com.websarva.wings.android.zuboradiary.ui.DiaryPictureManager
 import com.websarva.wings.android.zuboradiary.ui.TestDiariesSaver
@@ -50,6 +51,9 @@ import java.util.Arrays
 
 @AndroidEntryPoint
 class DiaryEditFragment : BaseFragment() {
+
+    private val logTag = getLogTag()
+
     // View関係
     private var _binding: FragmentDiaryEditBinding? = null
     private val binding get() = checkNotNull(_binding)
@@ -643,10 +647,7 @@ class DiaryEditFragment : BaseFragment() {
         var goalStateId = initializeValue
 
         override fun onTransitionStarted(motionLayout: MotionLayout?, startId: Int, endId: Int) {
-            Log.d(
-                javaClass.simpleName,
-                "onTransitionStarted()_itemNumber = $itemNumber"
-            )
+            Log.d(logTag, "onTransitionStarted()_itemNumber = $itemNumber")
 
             setUpScroll(motionLayout)
         }
@@ -665,7 +666,7 @@ class DiaryEditFragment : BaseFragment() {
             progress: Float
         ) {
             Log.d(
-                javaClass.simpleName,
+                logTag,
                 "onTransitionChange()_itemNumber = $itemNumber, progress = $progress"
             )
 
@@ -696,10 +697,7 @@ class DiaryEditFragment : BaseFragment() {
         }
 
         override fun onTransitionCompleted(motionLayout: MotionLayout?, currentId: Int) {
-            Log.d(
-                javaClass.simpleName,
-                "onTransitionCompleted()_itemNumber = $itemNumber"
-            )
+            Log.d(logTag, "onTransitionCompleted()_itemNumber = $itemNumber")
             // 対象項目欄削除後の処理
             var completedStateLogMsg = "UnknownState"
             if (currentId == R.id.motion_scene_edit_diary_item_hided_state) {
@@ -710,10 +708,7 @@ class DiaryEditFragment : BaseFragment() {
             } else if (currentId == R.id.motion_scene_edit_diary_item_showed_state) {
                 completedStateLogMsg = "ShowedState"
             }
-            Log.d(
-                javaClass.simpleName,
-                "onTransitionCompleted()_CompletedState = $completedStateLogMsg"
-            )
+            Log.d(logTag, "onTransitionCompleted()_CompletedState = $completedStateLogMsg")
 
             initializeProperty()
         }

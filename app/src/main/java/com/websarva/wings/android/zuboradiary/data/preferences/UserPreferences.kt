@@ -8,6 +8,7 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.emptyPreferences
 import androidx.datastore.preferences.preferencesDataStore
+import com.websarva.wings.android.zuboradiary.getLogTag
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
@@ -20,11 +21,13 @@ val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "se
 
 class UserPreferences @Inject constructor(private val context: Context) {
 
+    private val logTag = getLogTag()
+
     @Throws(Throwable::class)
     private fun Flow<Preferences>.setUpIOExceptionHandling(): Flow<Preferences> {
         return this.catch { cause ->
             if (cause is IOException) {
-                Log.e(javaClass.simpleName, "アプリ設定値読込_失敗", cause)
+                Log.e(logTag, "アプリ設定値読込_失敗", cause)
                 emit(emptyPreferences())
             } else {
                 throw cause

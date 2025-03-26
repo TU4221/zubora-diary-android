@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.websarva.wings.android.zuboradiary.data.AppMessage
 import com.websarva.wings.android.zuboradiary.data.database.DiaryListItem
 import com.websarva.wings.android.zuboradiary.data.database.DiaryRepository
+import com.websarva.wings.android.zuboradiary.getLogTag
 import com.websarva.wings.android.zuboradiary.ui.BaseViewModel
 import com.websarva.wings.android.zuboradiary.ui.requireValue
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -29,6 +30,8 @@ internal class DiaryListViewModel @Inject constructor(private val diaryRepositor
         const val NUM_LOADING_ITEMS: Int = 10 //初期読込時の対象リストが画面全体に表示される値にすること。 // TODO:仮数値の為、最後に設定
     }
 
+    private val logTag = getLogTag()
+
     private var diaryListLoadingJob: Job? = null // キャンセル用
 
     private val initialDiaryList = DiaryYearMonthList()
@@ -44,7 +47,7 @@ internal class DiaryListViewModel @Inject constructor(private val diaryRepositor
                 } else {
                     diaryListLoadingJob?.isCompleted ?: true
                 }
-            Log.d(javaClass.simpleName, "canLoadDiaryList() = $result")
+            Log.d(logTag, "canLoadDiaryList() = $result")
             return result
         }
 
@@ -115,17 +118,17 @@ internal class DiaryListViewModel @Inject constructor(private val diaryRepositor
 
     private suspend fun createDiaryList(creator: DiaryListCreator) {
         val logMsg = "日記リスト読込"
-        Log.i(javaClass.simpleName, "${logMsg}_開始")
+        Log.i(logTag, "${logMsg}_開始")
         val previousDiaryList = _diaryList.requireValue()
         try {
             val updateDiaryList = creator.create()
             _diaryList.value = updateDiaryList
-            Log.i(javaClass.simpleName, "${logMsg}_完了")
+            Log.i(logTag, "${logMsg}_完了")
         } catch (e: CancellationException) {
-            Log.e(javaClass.simpleName, "${logMsg}_キャンセル", e)
+            Log.e(logTag, "${logMsg}_キャンセル", e)
             // 処理なし
         } catch (e: Exception) {
-            Log.e(javaClass.simpleName, "${logMsg}_失敗", e)
+            Log.e(logTag, "${logMsg}_失敗", e)
             _diaryList.value = previousDiaryList
             addAppMessage(AppMessage.DIARY_LOADING_ERROR)
         }
@@ -237,23 +240,23 @@ internal class DiaryListViewModel @Inject constructor(private val diaryRepositor
     }
 
     fun updateSortConditionDate(yearMonth: YearMonth) {
-        Log.i(javaClass.simpleName, "日記リスト先頭年月更新 = $yearMonth")
+        Log.i(logTag, "日記リスト先頭年月更新 = $yearMonth")
         sortConditionDate = yearMonth.atDay(1).with(TemporalAdjusters.lastDayOfMonth())
     }
 
     suspend fun deleteDiary(date: LocalDate): Boolean {
         val logMsg = "日記削除"
-        Log.i(javaClass.simpleName, "${logMsg}_開始")
+        Log.i(logTag, "${logMsg}_開始")
         try {
             diaryRepository.deleteDiary(date)
         } catch (e: Exception) {
-            Log.e(javaClass.simpleName, "${logMsg}_失敗", e)
+            Log.e(logTag, "${logMsg}_失敗", e)
             addAppMessage(AppMessage.DIARY_DELETE_ERROR)
             return false
         }
 
         updateDiaryList()
-        Log.i(javaClass.simpleName, "${logMsg}_完了")
+        Log.i(logTag, "${logMsg}_完了")
         return true
     }
 
@@ -262,7 +265,7 @@ internal class DiaryListViewModel @Inject constructor(private val diaryRepositor
         try {
             return !diaryRepository.existsPicturePath(uri)
         } catch (e: Exception) {
-            Log.e(javaClass.simpleName, "端末写真URI使用状況確認_失敗", e)
+            Log.e(logTag, "端末写真URI使用状況確認_失敗", e)
             addAppMessage(AppMessage.DIARY_LOADING_ERROR)
             return null
         }
@@ -274,7 +277,7 @@ internal class DiaryListViewModel @Inject constructor(private val diaryRepositor
             val strDate = diaryEntity.date
             return LocalDate.parse(strDate)
         } catch (e: Exception) {
-            Log.e(javaClass.simpleName, "最新日記読込_失敗", e)
+            Log.e(logTag, "最新日記読込_失敗", e)
             addAppMessage(AppMessage.DIARY_INFO_LOADING_ERROR)
             return null
         }
@@ -286,7 +289,7 @@ internal class DiaryListViewModel @Inject constructor(private val diaryRepositor
             val strDate = diaryEntity.date
             return LocalDate.parse(strDate)
         } catch (e: Exception) {
-            Log.e(javaClass.simpleName, "最古日記読込_失敗", e)
+            Log.e(logTag, "最古日記読込_失敗", e)
             addAppMessage(AppMessage.DIARY_INFO_LOADING_ERROR)
             return null
         }

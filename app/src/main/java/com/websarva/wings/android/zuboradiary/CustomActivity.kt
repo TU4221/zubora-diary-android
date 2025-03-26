@@ -6,38 +6,40 @@ import androidx.appcompat.app.AppCompatActivity
 
 open class CustomActivity : AppCompatActivity() {
 
+    private val logTag = getLogTag()
+
     override fun onCreate(savedInstanceState: Bundle?) {
-        Log.d(javaClass.simpleName, "onCreate()")
+        Log.d(logTag, "onCreate()")
         super.onCreate(savedInstanceState)
     }
 
     override fun onRestart() {
-        Log.d(javaClass.simpleName, "onRestart()")
+        Log.d(logTag, "onRestart()")
         super.onRestart()
     }
 
     override fun onStart() {
-        Log.d(javaClass.simpleName, "onStart()")
+        Log.d(logTag, "onStart()")
         super.onStart()
     }
 
     override fun onResume() {
-        Log.d(javaClass.simpleName, "onResume()")
+        Log.d(logTag, "onResume()")
         super.onResume()
     }
 
     override fun onPause() {
-        Log.d(javaClass.simpleName, "onPause()")
+        Log.d(logTag, "onPause()")
         super.onPause()
     }
 
     override fun onStop() {
-        Log.d(javaClass.simpleName, "onStop()")
+        Log.d(logTag, "onStop()")
         super.onStop()
     }
 
     override fun onDestroy() {
-        Log.d(javaClass.simpleName, "onDestroy()")
+        Log.d(logTag, "onDestroy()")
         super.onDestroy()
     }
 }

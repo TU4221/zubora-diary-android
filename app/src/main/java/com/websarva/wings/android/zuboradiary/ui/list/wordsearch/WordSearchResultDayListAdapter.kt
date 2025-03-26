@@ -9,6 +9,7 @@ import com.websarva.wings.android.zuboradiary.R
 import com.websarva.wings.android.zuboradiary.data.DayOfWeekStringConverter
 import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor
 import com.websarva.wings.android.zuboradiary.databinding.RowWordSearchResultListBinding
+import com.websarva.wings.android.zuboradiary.getLogTag
 import com.websarva.wings.android.zuboradiary.ui.list.DiaryDayListBaseAdapter
 import com.websarva.wings.android.zuboradiary.ui.list.DiaryDayListBaseItem
 import java.text.NumberFormat
@@ -79,6 +80,9 @@ internal class WordSearchResultDayListAdapter(
         : RecyclerView.ViewHolder(binding.root)
 
     private class DiffUtilItemCallback : DiaryDayListBaseAdapter.DiffUtilItemCallback() {
+
+        private val logTag = getLogTag()
+
         override fun areContentsTheSame(
             oldItem: DiaryDayListBaseItem,
             newItem: DiaryDayListBaseItem
@@ -87,23 +91,23 @@ internal class WordSearchResultDayListAdapter(
             if (newItem !is WordSearchResultDayListItem) throw IllegalStateException()
 
             if (oldItem.title != newItem.title) {
-                Log.d(javaClass.simpleName, "areContentsTheSame()_Title不一致")
+                Log.d(logTag, "areContentsTheSame()_Title不一致")
                 return false
             }
             if (oldItem.itemNumber !== newItem.itemNumber) {
-                Log.d(javaClass.simpleName, "areContentsTheSame()_ItemNumber不一致")
+                Log.d(logTag, "areContentsTheSame()_ItemNumber不一致")
                 return false
             }
             if (oldItem.itemTitle != newItem.itemTitle) {
-                Log.d(javaClass.simpleName, "areContentsTheSame()_ItemTitle不一致")
+                Log.d(logTag, "areContentsTheSame()_ItemTitle不一致")
                 return false
             }
             if (oldItem.itemComment != newItem.itemComment) {
-                Log.d(javaClass.simpleName, "areContentsTheSame()_ItemComment不一致")
+                Log.d(logTag, "areContentsTheSame()_ItemComment不一致")
                 return false
             }
 
-            Log.d(javaClass.simpleName, "areContentsTheSame()_全項目一致")
+            Log.d(logTag, "areContentsTheSame()_全項目一致")
             return true
         }
     }

@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.websarva.wings.android.zuboradiary.data.AppMessage
 import com.websarva.wings.android.zuboradiary.data.database.DiaryRepository
 import com.websarva.wings.android.zuboradiary.data.database.WordSearchResultListItem
+import com.websarva.wings.android.zuboradiary.getLogTag
 import com.websarva.wings.android.zuboradiary.ui.BaseViewModel
 import com.websarva.wings.android.zuboradiary.ui.requireValue
 import com.websarva.wings.android.zuboradiary.ui.list.diarylist.DiaryListViewModel
@@ -22,6 +23,8 @@ import javax.inject.Inject
 internal class WordSearchViewModel @Inject internal constructor(
     private val diaryRepository: DiaryRepository
 ) : BaseViewModel() {
+
+    private val logTag = getLogTag()
 
     private val initialSearchWord = ""
     private val _searchWord = MutableStateFlow(initialSearchWord)
@@ -49,7 +52,7 @@ internal class WordSearchViewModel @Inject internal constructor(
     val canLoadWordSearchResultList: Boolean
         get() {
             val result = wordSearchResultListLoadingJob?.isCompleted ?: true
-            Log.d(javaClass.simpleName, "canLoadWordSearchResultList() = $result")
+            Log.d(logTag, "canLoadWordSearchResultList() = $result")
             return result
         }
 
@@ -139,18 +142,18 @@ internal class WordSearchViewModel @Inject internal constructor(
         spannableStringBackGroundColor: Int
     ) {
         val logMsg = "ワード検索結果読込"
-        Log.i(javaClass.simpleName, "${logMsg}_開始")
+        Log.i(logTag, "${logMsg}_開始")
         val previousResultList = _wordSearchResultList.requireValue()
         try {
             val updateResultList =
                 resultListCreator.create(spannableStringColor, spannableStringBackGroundColor)
             _wordSearchResultList.value = updateResultList
-            Log.i(javaClass.simpleName, "${logMsg}_完了")
+            Log.i(logTag, "${logMsg}_完了")
         } catch (e: CancellationException) {
-            Log.e(javaClass.simpleName, "${logMsg}_キャンセル", e)
+            Log.e(logTag, "${logMsg}_キャンセル", e)
             // 処理なし
         } catch (e: Exception) {
-            Log.e(javaClass.simpleName, "${logMsg}_失敗", e)
+            Log.e(logTag, "${logMsg}_失敗", e)
             _wordSearchResultList.value = previousResultList
             addAppMessage(AppMessage.DIARY_LOADING_ERROR)
         }

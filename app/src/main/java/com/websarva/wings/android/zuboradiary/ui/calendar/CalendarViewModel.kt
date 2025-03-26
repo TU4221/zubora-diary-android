@@ -3,6 +3,7 @@ package com.websarva.wings.android.zuboradiary.ui.calendar
 import android.util.Log
 import com.websarva.wings.android.zuboradiary.data.AppMessage
 import com.websarva.wings.android.zuboradiary.data.database.DiaryRepository
+import com.websarva.wings.android.zuboradiary.getLogTag
 import com.websarva.wings.android.zuboradiary.ui.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -14,6 +15,8 @@ import javax.inject.Inject
 internal class CalendarViewModel @Inject constructor(
     private val diaryRepository: DiaryRepository
 ) : BaseViewModel() {
+
+    private val logTag = getLogTag()
 
     private val initialSelectedDate = LocalDate.now()
     private val _selectedDate = MutableStateFlow<LocalDate>(initialSelectedDate)
@@ -40,7 +43,7 @@ internal class CalendarViewModel @Inject constructor(
             // MEMO:CalendarViewModel#hasDiary()はカレンダー日数分連続で処理する為、
             //      エラーが連続で発生した場合、膨大なエラーを記録してしまう。これを回避する為に下記コードを記述。
             if (equalLastAppMessage(AppMessage.DIARY_INFO_LOADING_ERROR)) return false
-            Log.e(javaClass.simpleName, "日記既存確認_失敗", e)
+            Log.e(logTag, "日記既存確認_失敗", e)
             addAppMessage(AppMessage.DIARY_INFO_LOADING_ERROR)
             return null
         }

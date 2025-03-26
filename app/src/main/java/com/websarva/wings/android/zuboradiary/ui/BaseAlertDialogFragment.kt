@@ -9,9 +9,12 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.NavHostFragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.websarva.wings.android.zuboradiary.R
+import com.websarva.wings.android.zuboradiary.getLogTag
 import com.websarva.wings.android.zuboradiary.ui.settings.SettingsViewModel
 
 abstract class BaseAlertDialogFragment : DialogFragment() {
+    
+    private val logTag = getLogTag()
 
     protected lateinit var settingsViewModel: SettingsViewModel
         private set
@@ -20,7 +23,7 @@ abstract class BaseAlertDialogFragment : DialogFragment() {
         get() = settingsViewModel.themeColor.requireValue()
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        Log.d(javaClass.simpleName, "onCreateDialog()")
+        Log.d(logTag, "onCreateDialog()")
         super.onCreateDialog(savedInstanceState)
 
         settingsViewModel = createSettingsViewModel()
@@ -47,12 +50,12 @@ abstract class BaseAlertDialogFragment : DialogFragment() {
         builder.setMessage(message)
 
         builder.setPositiveButton(R.string.dialog_base_alert_yes) { _: DialogInterface, _: Int ->
-            Log.d(javaClass.simpleName, "onClick()_PositiveButton")
+            Log.d(logTag, "onClick()_PositiveButton")
             handleOnPositiveButtonClick()
         }
 
         builder.setNegativeButton(R.string.dialog_base_alert_no) { _: DialogInterface, _: Int ->
-            Log.d(javaClass.simpleName, "onClick()_NegativeButton")
+            Log.d(logTag, "onClick()_NegativeButton")
             handleOnNegativeButtonClick()
         }
     }
@@ -90,7 +93,7 @@ abstract class BaseAlertDialogFragment : DialogFragment() {
     //      CANCEL・DISMISSの処理内容はDialogFragmentのonCancel/onDismissをオーバーライドする必要がある。
     //      DialogFragment、AlertDialogのリスナセットメソッドを使用して処理内容を記述きても処理はされない。
     override fun onCancel(dialog: DialogInterface) {
-        Log.d(javaClass.simpleName, "onCancel()")
+        Log.d(logTag, "onCancel()")
         handleOnCancel()
         super.onCancel(dialog)
     }

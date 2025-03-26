@@ -2,6 +2,7 @@ package com.websarva.wings.android.zuboradiary.data.network
 
 import android.util.Log
 import androidx.annotation.IntRange
+import com.websarva.wings.android.zuboradiary.getLogTag
 import retrofit2.Response
 import java.time.LocalDate
 import java.time.temporal.ChronoUnit
@@ -17,6 +18,8 @@ internal class WeatherApiRepository @Inject constructor(private val weatherApiSe
         private const val MAX_PAST_DAYS = 92 //過去天気情報取得可能最大日
     }
 
+    private val logTag = getLogTag()
+
     private val queryDiaryParameter = "weather_code"
     private val queryTimeZoneParameter = "Asia/Tokyo"
 
@@ -25,13 +28,13 @@ internal class WeatherApiRepository @Inject constructor(private val weatherApiSe
         val currentDate = LocalDate.now()
 
         if (date.isAfter(currentDate)) {
-            Log.d(javaClass.simpleName, "canFetchWeatherInfo(date = $date) = false")
+            Log.d(logTag, "canFetchWeatherInfo(date = $date) = false")
             return false
         }
 
         val betweenDays = ChronoUnit.DAYS.between(date, currentDate)
         val result = betweenDays <= MAX_PAST_DAYS
-        Log.d(javaClass.simpleName, "canFetchWeatherInfo(date = $date) = $result")
+        Log.d(logTag, "canFetchWeatherInfo(date = $date) = $result")
         return result
     }
 

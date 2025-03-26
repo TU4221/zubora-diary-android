@@ -3,6 +3,7 @@ package com.websarva.wings.android.zuboradiary.data.network
 import android.util.Log
 import com.squareup.moshi.Json
 import com.websarva.wings.android.zuboradiary.data.diary.Weather
+import com.websarva.wings.android.zuboradiary.getLogTag
 
 // MEMO:@Suppress("unused")が不要と警告が発生したので削除したが、"unused"警告が再発する。
 //      その為、@Suppress("RedundantSuppression")で警告回避。
@@ -14,22 +15,23 @@ internal data class WeatherApiData @Suppress("unused") constructor(
     private val longitude: Float,
     private val daily: WeatherApiResponseDairy
 ) {
+
+    private val logTag = getLogTag()
+
     fun toWeatherInfo(): Weather {
         // GeoCoordinatesのコンストラクタを使用してlatitude、longitudeの値チェック
         GeoCoordinates(latitude.toDouble(), longitude.toDouble())
 
-        Log.d(
-            javaClass.simpleName,
-            "toWeatherInfo()_latitude = $latitude, longitude = $longitude"
-        )
+        Log.d(logTag, "toWeatherInfo()_latitude = $latitude, longitude = $longitude")
         if (daily.times.isNotEmpty()
             && daily.weatherCodes.isNotEmpty()
             && daily.times.size == daily.weatherCodes.size) {
             for (i in  0 ..< daily.times.size) {
                 Log.d(
-                    javaClass.simpleName,
+                    logTag,
                     "toWeatherInfo()_time = " + daily.times[i] +
-                            ", weatherCode = " + daily.weatherCodes[i])
+                            ", weatherCode = " + daily.weatherCodes[i]
+                )
             }
         }
 
@@ -50,10 +52,7 @@ internal data class WeatherApiData @Suppress("unused") constructor(
                 else -> Weather.UNKNOWN
             }
 
-        Log.d(
-            javaClass.simpleName,
-            "convertWeathers(apiWeatherCode = $apiWeatherCode) = $result"
-        )
+        Log.d(logTag, "convertWeathers(apiWeatherCode = $apiWeatherCode) = $result")
         return result
     }
 

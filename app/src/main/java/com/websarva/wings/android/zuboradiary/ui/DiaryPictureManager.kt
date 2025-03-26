@@ -6,9 +6,12 @@ import android.util.Log
 import android.widget.ImageView
 import androidx.core.content.ContextCompat
 import com.websarva.wings.android.zuboradiary.R
+import com.websarva.wings.android.zuboradiary.getLogTag
 
 internal class DiaryPictureManager(
     private val context: Context, private val imageView: ImageView, private val iconColor: Int) {
+
+    private val logTag = getLogTag()
 
     fun setUpPictureOnDiary(uri: Uri?) {
         if (uri == null) {
@@ -18,11 +21,11 @@ internal class DiaryPictureManager(
 
         val logMsg = "日記添付写真読込"
         try {
-            Log.e(javaClass.simpleName, "${logMsg}_開始")
+            Log.e(logTag, "${logMsg}_開始")
             setUpPicture(uri)
-            Log.e(javaClass.simpleName, "${logMsg}_完了")
+            Log.e(logTag, "${logMsg}_完了")
         } catch (e: SecurityException) {
-            Log.e(javaClass.simpleName, "${logMsg}_失敗", e)
+            Log.e(logTag, "${logMsg}_失敗", e)
             setUpPermissionDenialIconOnDiary()
         }
     }
@@ -43,11 +46,11 @@ internal class DiaryPictureManager(
 
         val logMsg = "日記リスト添付写真読込"
         try {
-            Log.e(javaClass.simpleName, "${logMsg}_開始")
+            Log.e(logTag, "${logMsg}_開始")
             setUpPicture(uri)
-            Log.e(javaClass.simpleName, "${logMsg}_完了")
+            Log.e(logTag, "${logMsg}_完了")
         } catch (e: SecurityException) {
-            Log.e(javaClass.simpleName, "${logMsg}_失敗", e)
+            Log.e(logTag, "${logMsg}_失敗", e)
             setUpPermissionDenialIconOnDiaryList()
         }
     }

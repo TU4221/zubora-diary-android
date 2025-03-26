@@ -22,6 +22,7 @@ import com.google.android.material.transition.platform.MaterialSharedAxis
 import com.websarva.wings.android.zuboradiary.MainActivity
 import com.websarva.wings.android.zuboradiary.data.AppMessage
 import com.websarva.wings.android.zuboradiary.data.AppMessageList
+import com.websarva.wings.android.zuboradiary.getLogTag
 import com.websarva.wings.android.zuboradiary.ui.settings.SettingsViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -32,6 +33,8 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 abstract class BaseFragment : CustomFragment() {
+
+    private val logTag = getLogTag()
 
     protected val mainActivity
         get() = requireActivity() as MainActivity
@@ -212,7 +215,7 @@ abstract class BaseFragment : CustomFragment() {
                 // MEMO:Dialog表示中:Lifecycle.Event.ON_PAUSE
                 //      Dialog非表示中:Lifecycle.Event.ON_RESUME
                 if (event == Lifecycle.Event.ON_RESUME) {
-                    Log.d(this.javaClass.simpleName, "Lifecycle.Event.ON_RESUME")
+                    Log.d(logTag, "Lifecycle.Event.ON_RESUME")
                     handleOnReceivingDialogResult()
                     retrySettingsAppMessageDialogShow()
                     retryOtherAppMessageDialogShow()
@@ -224,7 +227,7 @@ abstract class BaseFragment : CustomFragment() {
         viewLifecycleOwner.lifecycle
             .addObserver(LifecycleEventObserver { _, event: Lifecycle.Event ->
                 if (event == Lifecycle.Event.ON_DESTROY) {
-                    Log.d(this.javaClass.simpleName, "Lifecycle.Event.ON_DESTROY")
+                    Log.d(logTag, "Lifecycle.Event.ON_DESTROY")
                     // MEMO:removeで削除しないとこのFragmentを閉じてもResult内容が残ってしまう。
                     //      その為、このFragmentを再表示した時にObserverがResultの内容で処理してしまう。
                     removeDialogResultOnDestroy()

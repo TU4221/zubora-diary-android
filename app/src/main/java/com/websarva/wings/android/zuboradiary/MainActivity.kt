@@ -54,6 +54,8 @@ import kotlinx.coroutines.launch
 @AndroidEntryPoint
 class MainActivity : CustomActivity() {
 
+    private val logTag = getLogTag()
+
     private var _binding: ActivityMainBinding? = null
     private val binding get() = checkNotNull(_binding)
     private var isMainActivityLayoutInflated = false
@@ -98,7 +100,7 @@ class MainActivity : CustomActivity() {
                 )
                         == PackageManager.PERMISSION_GRANTED)
             Log.d(
-                javaClass.simpleName,
+                logTag,
                 "isGrantedAccessLocation.get()_FineLocation = $isGrantedAccessFineLocation"
             )
 
@@ -109,7 +111,7 @@ class MainActivity : CustomActivity() {
                 )
                         == PackageManager.PERMISSION_GRANTED)
             Log.d(
-                javaClass.simpleName,
+                logTag,
                 "isGrantedAccessLocation.get()_CoarseLocation = $isGrantedAccessCoarseLocation"
             )
 
@@ -185,7 +187,7 @@ class MainActivity : CustomActivity() {
         if (!isGrantedAccessLocation) return
 
         val logMsg = "位置情報取得"
-        Log.i(javaClass.simpleName, "${logMsg}_開始")
+        Log.i(logTag, "${logMsg}_開始")
 
         val fusedLocationProviderClient =
             LocationServices.getFusedLocationProviderClient(this)
@@ -208,12 +210,12 @@ class MainActivity : CustomActivity() {
             locationRequest,
             object : LocationCallback() {
                 override fun onLocationResult(locationResult: LocationResult) {
-                    Log.d(this@MainActivity.javaClass.simpleName, "onLocationResult()")
+                    Log.d(this@MainActivity.logTag, "onLocationResult()")
                     super.onLocationResult(locationResult)
                     // アプリ起動時に一回だけ取得
                     val location = locationResult.lastLocation
                     if (location == null) {
-                        Log.d(this@MainActivity.javaClass.simpleName, "${logMsg}_失敗")
+                        Log.d(this@MainActivity.logTag, "${logMsg}_失敗")
                         return
                     }
                     val geoCoordinates =
@@ -221,7 +223,7 @@ class MainActivity : CustomActivity() {
                     settingsViewModel.updateGeoCoordinates(geoCoordinates)
                     fusedLocationProviderClient.removeLocationUpdates(this)
 
-                    Log.i(this@MainActivity.javaClass.simpleName, "${logMsg}_完了_$location")
+                    Log.i(this@MainActivity.logTag, "${logMsg}_完了_$location")
                 }
             },
             Looper.getMainLooper()
@@ -361,14 +363,14 @@ class MainActivity : CustomActivity() {
             if (previousItemSelected === menuItem) return true
 
             val logMsg = "ボトムナビゲーション_フラグメント切替"
-            Log.i(javaClass.simpleName, "${logMsg}_開始")
+            Log.i(logTag, "${logMsg}_開始")
             wasSelectedTab = true
             previousItemSelected = menuItem
 
             setUpFragmentTransition()
             onNavDestinationSelected(menuItem, navController)
 
-            Log.i(javaClass.simpleName, "${logMsg}_完了")
+            Log.i(logTag, "${logMsg}_完了")
             return true
         }
 
@@ -466,7 +468,7 @@ class MainActivity : CustomActivity() {
         override fun onNavigationItemReselected(menuItem: MenuItem) {
             val fragment = findShowedFragment()
 
-            Log.i(javaClass.simpleName, "ボトムナビゲーション_リセレクト")
+            Log.i(logTag, "ボトムナビゲーション_リセレクト")
             if (menuItem.toString() == getString(R.string.title_list)) {
                 if (fragment !is DiaryListFragment) return
 

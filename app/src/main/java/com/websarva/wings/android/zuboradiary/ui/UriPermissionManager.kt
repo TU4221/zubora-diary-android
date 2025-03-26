@@ -5,22 +5,25 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.util.Log
+import com.websarva.wings.android.zuboradiary.getLogTag
 
 internal abstract class UriPermissionManager(context: Context) {
+
+    private val logTag = getLogTag()
 
     private val resolver: ContentResolver = context.contentResolver
 
     fun takePersistablePermission(uri: Uri) {
         val logMsg = "端末写真使用権限取得"
-        Log.d(javaClass.simpleName, "${logMsg}_開始=$uri")
+        Log.d(logTag, "${logMsg}_開始=$uri")
         resolver.takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION)
         try {
             resolver.takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION)
         } catch (e: SecurityException) {
-            Log.e(javaClass.simpleName, "${logMsg}_失敗", e)
+            Log.e(logTag, "${logMsg}_失敗", e)
             // 対処できないがアプリを落としたくない為、catchのみの処理とする。
         }
-        Log.d(javaClass.simpleName, "${logMsg}_完了")
+        Log.d(logTag, "${logMsg}_完了")
     }
 
     /**
@@ -31,7 +34,7 @@ internal abstract class UriPermissionManager(context: Context) {
     // MEMO:Uri先のファイルを削除すると、登録されていたUriPermissionも同時に削除される。
     suspend fun releasePersistablePermission(uri: Uri) {
         val logMsg = "端末写真使用権限解放"
-        Log.d(javaClass.simpleName, "${logMsg}_開始_URI=$uri")
+        Log.d(logTag, "${logMsg}_開始_URI=$uri")
 
         val permissionList = resolver.persistedUriPermissions
         for (uriPermission in permissionList) {
@@ -47,12 +50,12 @@ internal abstract class UriPermissionManager(context: Context) {
             }
         }
 
-        Log.d(javaClass.simpleName, "${logMsg}_完了")
+        Log.d(logTag, "${logMsg}_完了")
     }
 
     fun releaseAllPersistablePermission() {
         val logMsg = "端末写真使用権限全解放"
-        Log.d(javaClass.simpleName, "${logMsg}_開始")
+        Log.d(logTag, "${logMsg}_開始")
 
         val permissionList = resolver.persistedUriPermissions
         for (uriPermission in permissionList) {
@@ -60,6 +63,6 @@ internal abstract class UriPermissionManager(context: Context) {
             resolver.releasePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION)
         }
 
-        Log.d(javaClass.simpleName, "${logMsg}_完了")
+        Log.d(logTag, "${logMsg}_完了")
     }
 }

@@ -16,6 +16,7 @@ import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor
 import com.websarva.wings.android.zuboradiary.databinding.RowDiaryYearMonthListBinding
 import com.websarva.wings.android.zuboradiary.databinding.RowNoDiaryMessageBinding
 import com.websarva.wings.android.zuboradiary.databinding.RowProgressBarBinding
+import com.websarva.wings.android.zuboradiary.getLogTag
 import com.websarva.wings.android.zuboradiary.ui.ThemeColorInflaterCreator
 
 // DiaryFragment、WordSearchFragmentの親RecyclerViewのListAdapter。
@@ -26,6 +27,8 @@ internal abstract class DiaryYearMonthListBaseAdapter protected constructor(
     protected val themeColor: ThemeColor,
     diffUtilItemCallback: DiffUtilItemCallback
 ) : ListAdapter<DiaryYearMonthListBaseItem, RecyclerView.ViewHolder>(diffUtilItemCallback) {
+
+    private val logTag = getLogTag()
 
     fun interface OnClickChildItemListener {
         fun onClick(item: DiaryDayListBaseItem)
@@ -149,22 +152,24 @@ internal abstract class DiaryYearMonthListBaseAdapter protected constructor(
     protected abstract class DiffUtilItemCallback
         : DiffUtil.ItemCallback<DiaryYearMonthListBaseItem>() {
 
+            private val logTag = getLogTag()
+
             override fun areItemsTheSame(
                 oldItem: DiaryYearMonthListBaseItem,
                 newItem: DiaryYearMonthListBaseItem
             ): Boolean {
                 Log.d(
-                    javaClass.simpleName,
+                    logTag,
                     "areItemsTheSame()_oldItem.yearMonth = " + oldItem.yearMonth
                 )
                 Log.d(
-                    javaClass.simpleName,
+                    logTag,
                     "areItemsTheSame()_newItem.yearMonth = " + newItem.yearMonth
                 )
 
                 // ViewType
                 if (oldItem.viewType != newItem.viewType) {
-                    Log.d(javaClass.simpleName, "areItemsTheSame()_ViewType不一致")
+                    Log.d(logTag, "areItemsTheSame()_ViewType不一致")
                     return false
                 }
                 // HACK:RecyclerViewの初回アイテム表示時にスクロール初期位置がズレる事がある。
@@ -174,17 +179,17 @@ internal abstract class DiaryYearMonthListBaseAdapter protected constructor(
                 //      ListAdapterクラスの仕様により表示されていたプログレスバーが更新後も表示されるようにスクロール位置がズレた。
                 //      プログレスバー同士が同一アイテムと認識されないようにするために、下記条件を追加して対策。
                 if (oldItem.viewType == ViewType.PROGRESS_INDICATOR) {
-                    Log.d(javaClass.simpleName, "areItemsTheSame()_ViewType = ProgressIndicator(不一致)")
+                    Log.d(logTag, "areItemsTheSame()_ViewType = ProgressIndicator(不一致)")
                     return false
                 }
 
                 // 年月
                 if (oldItem.yearMonth != newItem.yearMonth) {
-                    Log.d(javaClass.simpleName, "areItemsTheSame()_YearMonth不一致")
+                    Log.d(logTag, "areItemsTheSame()_YearMonth不一致")
                     return false
                 }
 
-                Log.d(javaClass.simpleName, "areItemsTheSame()_全項目一致")
+                Log.d(logTag, "areItemsTheSame()_全項目一致")
                 return true
             }
     }
@@ -235,43 +240,43 @@ internal abstract class DiaryYearMonthListBaseAdapter protected constructor(
 
     private inner class ListLoadingCompleteNotificationAdapterDataObserver : AdapterDataObserver() {
         override fun onChanged() {
-            Log.d(javaClass.simpleName, "OnChanged()")
+            Log.d(logTag, "OnChanged()")
             super.onChanged()
             clearIsLoadingListOnScrolled()
         }
 
         override fun onItemRangeChanged(positionStart: Int, itemCount: Int) {
-            Log.d(javaClass.simpleName, "onItemRangeChanged()")
+            Log.d(logTag, "onItemRangeChanged()")
             super.onItemRangeChanged(positionStart, itemCount)
             clearIsLoadingListOnScrolled()
         }
 
         override fun onItemRangeChanged(positionStart: Int, itemCount: Int, payload: Any?) {
-            Log.d(javaClass.simpleName, "onItemRangeChanged()")
+            Log.d(logTag, "onItemRangeChanged()")
             super.onItemRangeChanged(positionStart, itemCount, payload)
             clearIsLoadingListOnScrolled()
         }
 
         override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
-            Log.d(javaClass.simpleName, "onItemRangeInserted()")
+            Log.d(logTag, "onItemRangeInserted()")
             super.onItemRangeInserted(positionStart, itemCount)
             clearIsLoadingListOnScrolled()
         }
 
         override fun onItemRangeRemoved(positionStart: Int, itemCount: Int) {
-            Log.d(javaClass.simpleName, "onItemRangeRemoved()")
+            Log.d(logTag, "onItemRangeRemoved()")
             super.onItemRangeRemoved(positionStart, itemCount)
             clearIsLoadingListOnScrolled()
         }
 
         override fun onItemRangeMoved(fromPosition: Int, toPosition: Int, itemCount: Int) {
-            Log.d(javaClass.simpleName, "onItemRangeMoved()")
+            Log.d(logTag, "onItemRangeMoved()")
             super.onItemRangeMoved(fromPosition, toPosition, itemCount)
             clearIsLoadingListOnScrolled()
         }
 
         override fun onStateRestorationPolicyChanged() {
-            Log.d(javaClass.simpleName, "onStateRestorationPolicyChanged()")
+            Log.d(logTag, "onStateRestorationPolicyChanged()")
             super.onStateRestorationPolicyChanged()
         }
     }
@@ -353,7 +358,7 @@ internal abstract class DiaryYearMonthListBaseAdapter protected constructor(
     }
 
     fun scrollToFirstPosition() {
-        Log.d(javaClass.simpleName, "scrollToFirstPosition()")
+        Log.d(logTag, "scrollToFirstPosition()")
         // HACK:日記リスト(年月)のアイテム数が多い場合、
         //      ユーザーが数多くのアイテムをスクロールした状態でsmoothScrollToPosition(0)を起動すると先頭にたどり着くのに時間がかかる。
         //      その時間を回避する為に先頭付近へジャンプ(scrollToPosition())してからsmoothScrollToPosition()を起動させたかったが、

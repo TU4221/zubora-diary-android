@@ -7,6 +7,7 @@ import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.NavHostFragment
 import com.google.android.material.datepicker.MaterialDatePicker
+import com.websarva.wings.android.zuboradiary.getLogTag
 import com.websarva.wings.android.zuboradiary.ui.settings.SettingsViewModel
 import java.time.Instant
 import java.time.LocalDate
@@ -14,6 +15,8 @@ import java.time.ZoneId
 
 
 abstract class BaseDatePickerDialogFragment : DialogFragment() {
+
+    private val logTag = getLogTag()
 
     protected lateinit var settingsViewModel: SettingsViewModel
         private set
@@ -23,7 +26,7 @@ abstract class BaseDatePickerDialogFragment : DialogFragment() {
 
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        Log.d(javaClass.simpleName, "onCreateDialog()")
+        Log.d(logTag, "onCreateDialog()")
 
         settingsViewModel = createSettingsViewModel()
 
@@ -65,7 +68,7 @@ abstract class BaseDatePickerDialogFragment : DialogFragment() {
 
     private fun setUpOnClickListener(datePicker: MaterialDatePicker<Long>, dummyDialog: Dialog) {
         datePicker.addOnPositiveButtonClickListener { selection: Long ->
-            Log.d(javaClass.simpleName, "onClick()_PositiveButton")
+            Log.d(logTag, "onClick()_PositiveButton")
 
             // 選択日付型変換(EpochMilli -> LocalDate)
             val instant = Instant.ofEpochMilli(selection)
@@ -75,13 +78,13 @@ abstract class BaseDatePickerDialogFragment : DialogFragment() {
         }
 
         datePicker.addOnNegativeButtonClickListener {
-            Log.d(javaClass.simpleName, "onClick()_NegativeButton")
+            Log.d(logTag, "onClick()_NegativeButton")
             handleOnNegativeButtonClick()
             dummyDialog.dismiss()
         }
 
         datePicker.addOnCancelListener {
-            Log.d(javaClass.simpleName, "onCancel()")
+            Log.d(logTag, "onCancel()")
             handleOnCancel()
             dummyDialog.dismiss()
         }

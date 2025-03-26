@@ -2,6 +2,7 @@ package com.websarva.wings.android.zuboradiary.data.database
 
 import android.net.Uri
 import android.util.Log
+import com.websarva.wings.android.zuboradiary.getLogTag
 import java.time.LocalDate
 import javax.inject.Inject
 
@@ -10,6 +11,8 @@ class DiaryRepository @Inject constructor(
     private val diaryDatabase: DiaryDatabase,
     private val diaryDAO: DiaryDAO,
 ) {
+
+    private val logTag = getLogTag()
 
     suspend fun countDiaries(): Int {
         return diaryDAO.countDiaries()
@@ -44,10 +47,7 @@ class DiaryRepository @Inject constructor(
         offset: Int,
         date: LocalDate?
     ): List<DiaryListItem> {
-        Log.d(
-            javaClass.simpleName,
-            "loadDiaryList(num = $num, offset = $offset, date = $date)"
-        )
+        Log.d(logTag, "loadDiaryList(num = $num, offset = $offset, date = $date)")
         require(num >= 1)
         require(offset >= 0)
 
