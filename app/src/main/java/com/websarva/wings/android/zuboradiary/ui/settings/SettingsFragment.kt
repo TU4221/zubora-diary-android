@@ -289,7 +289,8 @@ class SettingsFragment : BaseFragment() {
                     textSettingsSectionDesign,
                     textSettingsSectionSetting,
                     textSettingsSectionEnd,
-                    textSettingsSectionData
+                    textSettingsSectionData,
+                    textSettingsSectionOther
                 )
             }
         )
@@ -304,7 +305,8 @@ class SettingsFragment : BaseFragment() {
                     includeWeatherInfoAcquisitionSetting.textTitle,
                     includeAllDiariesDeleteSetting.textTitle,
                     includeAllSettingsInitializationSetting.textTitle,
-                    includeAllDataDeleteSetting.textTitle
+                    includeAllDataDeleteSetting.textTitle,
+                    includeOpenSourceLicensesSetting.textTitle
                 )
             }
         )
@@ -319,7 +321,8 @@ class SettingsFragment : BaseFragment() {
                     includeReminderNotificationSetting.textTitle,
                     includeReminderNotificationSetting.textValue,
                     includePasscodeLockSetting.textTitle,
-                    includeWeatherInfoAcquisitionSetting.textTitle
+                    includeWeatherInfoAcquisitionSetting.textTitle,
+                    includeOpenSourceLicensesSetting.textTitle
                 )
             }
         )
@@ -358,6 +361,7 @@ class SettingsFragment : BaseFragment() {
                     materialDividerAllDiariesDeleteSetting,
                     materialDividerAllSettingsInitializationSetting,
                     materialDividerAllDataDeleteSetting,
+                    materialDividerOpenSourceLicensesSetting,
                     materialDividerSectionEnd
                 )
             }
