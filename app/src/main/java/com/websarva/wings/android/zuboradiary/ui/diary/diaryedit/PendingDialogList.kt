@@ -5,9 +5,6 @@ class PendingDialogList {
 
     private val pendingDialogList: List<PendingDialog>
 
-    val isEmpty
-        get() = pendingDialogList.isEmpty()
-
     constructor(pendingDialogList: List<PendingDialog>) {
         this.pendingDialogList = pendingDialogList.toList()
     }
