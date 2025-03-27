@@ -70,8 +70,6 @@ class DiaryEditFragment : BaseFragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        diaryEditViewModel.initialize()
-
         pictureUriPermissionManager =
             object : UriPermissionManager(requireContext()) {
                 override suspend fun checkUsedUriDoesNotExist(uri: Uri): Boolean? {
@@ -178,7 +176,6 @@ class DiaryEditFragment : BaseFragment() {
         val date = diaryEditViewModel.date.requireValue()
 
         if (selectedButton == DialogInterface.BUTTON_POSITIVE) {
-            diaryEditViewModel.initialize()
             lifecycleScope.launch(Dispatchers.IO) {
                 diaryEditViewModel.prepareDiary(date, true)
             }
@@ -1129,6 +1126,15 @@ class DiaryEditFragment : BaseFragment() {
 
     override fun destroyBinding() {
         _binding = null
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+
+        // MEMO:DiaryEditViewModelのスコープ範囲はActivityになるが、
+        //      DiaryEditFragment、DiaryItemTitleEditFragment表示時のみViewModelのプロパティ値を保持できたらよいので、
+        //      DiaryEditFragmentを破棄するタイミングでViewModelのプロパティ値を初期化する。
+        diaryEditViewModel.initialize()
     }
 
     fun attachPicture(uri: Uri) {

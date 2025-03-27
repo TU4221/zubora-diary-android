@@ -396,7 +396,6 @@ class CalendarFragment : BaseFragment() {
     }
 
     private fun showDiary(date: LocalDate) {
-        diaryShowViewModel.initialize()
         lifecycleScope.launch(Dispatchers.IO) {
             val isSuccessful = diaryShowViewModel.loadSavedDiary(date)
             withContext(Dispatchers.Main) {

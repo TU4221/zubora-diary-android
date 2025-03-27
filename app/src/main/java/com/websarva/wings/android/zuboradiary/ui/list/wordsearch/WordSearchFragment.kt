@@ -36,12 +36,6 @@ class WordSearchFragment : BaseFragment() {
     // ViewModel
     private val wordSearchViewModel: WordSearchViewModel by activityViewModels()
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-        wordSearchViewModel.initialize()
-    }
-
     override fun initializeDataBinding(
         themeColorInflater: LayoutInflater, container: ViewGroup
     ): ViewDataBinding {
@@ -282,5 +276,15 @@ class WordSearchFragment : BaseFragment() {
 
     override fun destroyBinding() {
         _binding = null
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+
+        // MEMO:WordSearchViewModelのスコープ範囲はActivityになるが、
+        //      WordSearchFragment、DiaryShowFragment、DiaryEditFragment、
+        //      DiaryItemTitleEditFragment表示時のみ ViewModelのプロパティ値を保持できたらよいので、
+        //      WordSearchFragmentを破棄するタイミングでViewModelのプロパティ値を初期化する。
+        wordSearchViewModel.initialize()
     }
 }
