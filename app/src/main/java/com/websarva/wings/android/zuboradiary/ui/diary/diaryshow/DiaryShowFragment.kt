@@ -14,7 +14,7 @@ import android.widget.TextView
 import androidx.activity.OnBackPressedCallback
 import androidx.annotation.MainThread
 import androidx.databinding.ViewDataBinding
-import androidx.lifecycle.ViewModelProvider
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.websarva.wings.android.zuboradiary.R
 import com.websarva.wings.android.zuboradiary.data.AppMessage
@@ -51,7 +51,7 @@ internal class DiaryShowFragment : BaseFragment() {
     private val binding get() = checkNotNull(_binding)
 
     // ViewModel
-    private lateinit var diaryShowViewModel: DiaryShowViewModel
+    private val diaryShowViewModel: DiaryShowViewModel by viewModels()
 
     // Uri関係
     private lateinit var pictureUriPermissionManager: UriPermissionManager
@@ -71,11 +71,6 @@ internal class DiaryShowFragment : BaseFragment() {
                     return diaryShowViewModel.checkSavedPicturePathDoesNotExist(uri)
                 }
             }
-    }
-
-    override fun initializeViewModel() {
-        val provider = ViewModelProvider(this)
-        diaryShowViewModel = provider[DiaryShowViewModel::class.java]
     }
 
     override fun initializeDataBinding(

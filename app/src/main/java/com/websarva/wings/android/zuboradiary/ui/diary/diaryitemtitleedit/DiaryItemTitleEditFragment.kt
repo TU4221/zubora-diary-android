@@ -9,7 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.MainThread
 import androidx.databinding.ViewDataBinding
-import androidx.lifecycle.ViewModelProvider
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.websarva.wings.android.zuboradiary.R
 import com.websarva.wings.android.zuboradiary.data.AppMessage
@@ -37,12 +37,7 @@ class DiaryItemTitleEditFragment : BaseFragment() {
     private val binding get() = checkNotNull(_binding)
 
     // ViewModel
-    private lateinit var diaryItemTitleEditViewModel: DiaryItemTitleEditViewModel
-
-    override fun initializeViewModel() {
-        val provider = ViewModelProvider(this)
-        diaryItemTitleEditViewModel = provider[DiaryItemTitleEditViewModel::class.java]
-    }
+    private val diaryItemTitleEditViewModel: DiaryItemTitleEditViewModel by viewModels()
 
     override fun initializeDataBinding(
         themeColorInflater: LayoutInflater, container: ViewGroup

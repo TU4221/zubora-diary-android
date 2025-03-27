@@ -10,7 +10,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.MainThread
 import androidx.databinding.ViewDataBinding
-import androidx.lifecycle.ViewModelProvider
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import com.websarva.wings.android.zuboradiary.R
@@ -40,7 +40,7 @@ class DiaryListFragment : BaseFragment() {
     private val binding get() = checkNotNull(_binding)
 
     // ViewModel
-    private lateinit var diaryListViewModel: DiaryListViewModel
+    private val diaryListViewModel: DiaryListViewModel by activityViewModels()
 
     // Uri関係
     private lateinit var pictureUriPermissionManager: UriPermissionManager
@@ -54,11 +54,6 @@ class DiaryListFragment : BaseFragment() {
                     return diaryListViewModel.checkSavedPicturePathDoesNotExist(uri)
                 }
             }
-    }
-
-    override fun initializeViewModel() {
-        val provider = ViewModelProvider(requireActivity())
-        diaryListViewModel = provider[DiaryListViewModel::class.java]
     }
 
     override fun initializeDataBinding(

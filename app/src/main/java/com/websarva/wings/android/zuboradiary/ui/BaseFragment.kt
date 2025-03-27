@@ -9,9 +9,9 @@ import android.view.ViewGroup
 import androidx.activity.OnBackPressedCallback
 import androidx.annotation.MainThread
 import androidx.databinding.ViewDataBinding
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.NavBackStackEntry
@@ -47,8 +47,8 @@ abstract class BaseFragment : CustomFragment() {
     //      (ViewLifeCycleEventが"OnDestroy"の時は、NavのCurrentBackStackが切替先のFragmentに更新される)
     private lateinit var navBackStackEntry: NavBackStackEntry
 
-    protected lateinit var settingsViewModel: SettingsViewModel
-        private set
+    protected val settingsViewModel: SettingsViewModel by activityViewModels()
+
     protected val themeColor
         get() = settingsViewModel.themeColor.requireValue()
 
@@ -67,24 +67,6 @@ abstract class BaseFragment : CustomFragment() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED, block)
         }
-    }
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-        initializeViewModel()
-
-        settingsViewModel = createSettingsViewModel()
-    }
-
-    /**
-     * BaseFragment#onCreate()で呼び出される。
-     */
-    protected abstract fun initializeViewModel()
-
-    private fun createSettingsViewModel(): SettingsViewModel {
-        val provider = ViewModelProvider(requireActivity())
-        return provider[SettingsViewModel::class.java]
     }
 
     /**

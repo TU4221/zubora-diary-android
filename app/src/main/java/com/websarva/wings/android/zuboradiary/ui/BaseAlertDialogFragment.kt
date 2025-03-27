@@ -5,7 +5,7 @@ import android.content.DialogInterface
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.DialogFragment
-import androidx.lifecycle.ViewModelProvider
+import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.NavHostFragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.websarva.wings.android.zuboradiary.R
@@ -16,8 +16,7 @@ abstract class BaseAlertDialogFragment : DialogFragment() {
     
     private val logTag = getLogTag()
 
-    protected lateinit var settingsViewModel: SettingsViewModel
-        private set
+    protected val settingsViewModel: SettingsViewModel by activityViewModels()
 
     private val themeColor
         get() = settingsViewModel.themeColor.requireValue()
@@ -26,8 +25,6 @@ abstract class BaseAlertDialogFragment : DialogFragment() {
         Log.d(logTag, "onCreateDialog()")
         super.onCreateDialog(savedInstanceState)
 
-        settingsViewModel = createSettingsViewModel()
-
         val themeResId = themeColor.alertDialogThemeResId
         val builder = MaterialAlertDialogBuilder(requireContext(), themeResId)
         customizeDialog(builder)
@@ -35,11 +32,6 @@ abstract class BaseAlertDialogFragment : DialogFragment() {
         setUpDialogCancelFunction()
 
         return builder.create()
-    }
-
-    private fun createSettingsViewModel(): SettingsViewModel {
-        val provider = ViewModelProvider(requireActivity())
-        return provider[SettingsViewModel::class.java]
     }
 
     protected open fun customizeDialog(builder: MaterialAlertDialogBuilder) {

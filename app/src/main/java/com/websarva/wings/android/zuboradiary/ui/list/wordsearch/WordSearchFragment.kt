@@ -8,8 +8,8 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.MainThread
 import androidx.databinding.ViewDataBinding
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.RecyclerView
 import com.websarva.wings.android.zuboradiary.data.AppMessage
 import com.websarva.wings.android.zuboradiary.data.AppMessageList
@@ -34,11 +34,11 @@ class WordSearchFragment : BaseFragment() {
     private var resultWordBackgroundColor = -1 // 検索結果ワードマーカー色
 
     // ViewModel
-    private lateinit var wordSearchViewModel: WordSearchViewModel
+    private val wordSearchViewModel: WordSearchViewModel by activityViewModels()
 
-    override fun initializeViewModel() {
-        val provider = ViewModelProvider(requireActivity())
-        wordSearchViewModel = provider[WordSearchViewModel::class.java]
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
         wordSearchViewModel.initialize()
     }
 

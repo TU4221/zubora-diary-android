@@ -6,7 +6,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.lifecycle.ViewModelProvider
+import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.NavHostFragment
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor
@@ -17,8 +17,7 @@ abstract class BaseBottomSheetDialogFragment : BottomSheetDialogFragment() {
 
     private val logTag = getLogTag()
 
-    protected lateinit var settingsViewModel: SettingsViewModel
-        private set
+    protected val settingsViewModel: SettingsViewModel by activityViewModels()
 
     protected val themeColor
         get() = settingsViewModel.themeColor.requireValue()
@@ -33,8 +32,6 @@ abstract class BaseBottomSheetDialogFragment : BottomSheetDialogFragment() {
 
         setUpDialogCancelFunction()
 
-        settingsViewModel = createSettingsViewModel()
-
         val themeColorInflater = createThemeColorInflater(inflater, themeColor)
         return createDialogView(themeColorInflater, container)
     }
@@ -44,11 +41,6 @@ abstract class BaseBottomSheetDialogFragment : BottomSheetDialogFragment() {
         //      ・UIに表示されているダイアログ外の部分をタッチしてダイアログを閉じる(キャンセル)
         //      ・端末の戻るボタンでダイアログを閉じる(キャンセルする)
         isCancelable = true
-    }
-
-    private fun createSettingsViewModel(): SettingsViewModel {
-        val provider = ViewModelProvider(requireActivity())
-        return provider[SettingsViewModel::class.java]
     }
 
     // ThemeColorに合わせたインフレーター作成

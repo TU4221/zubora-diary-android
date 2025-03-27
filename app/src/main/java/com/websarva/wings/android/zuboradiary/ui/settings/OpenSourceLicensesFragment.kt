@@ -24,10 +24,6 @@ class OpenSourceLicensesFragment: BaseFragment() {
     private var _binding: FragmentOpenSourceLicensesBinding? = null
     private val binding get() = checkNotNull(_binding)
 
-    override fun initializeViewModel() {
-        // ViewModel不要
-    }
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View? {

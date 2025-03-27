@@ -109,10 +109,6 @@ class SettingsFragment : BaseFragment() {
             }
     }
 
-    override fun initializeViewModel() {
-        // 処理なし
-    }
-
     override fun initializeDataBinding(
         themeColorInflater: LayoutInflater,
         container: ViewGroup

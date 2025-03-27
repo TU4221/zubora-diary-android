@@ -18,8 +18,8 @@ import androidx.appcompat.view.ContextThemeWrapper
 import androidx.constraintlayout.motion.widget.MotionLayout
 import androidx.core.content.res.ResourcesCompat
 import androidx.databinding.ViewDataBinding
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavDirections
 import com.google.android.material.textfield.TextInputLayout
@@ -62,7 +62,7 @@ class DiaryEditFragment : BaseFragment() {
     private lateinit var weather2ArrayAdapter: ArrayAdapter<String>
 
     // ViewModel
-    private lateinit var diaryEditViewModel: DiaryEditViewModel
+    private val diaryEditViewModel: DiaryEditViewModel by activityViewModels()
 
     // Uri関係
     private lateinit var pictureUriPermissionManager: UriPermissionManager
@@ -70,18 +70,14 @@ class DiaryEditFragment : BaseFragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        diaryEditViewModel.initialize()
+
         pictureUriPermissionManager =
             object : UriPermissionManager(requireContext()) {
                 override suspend fun checkUsedUriDoesNotExist(uri: Uri): Boolean? {
                     return diaryEditViewModel.checkSavedPicturePathDoesNotExist(uri)
                 }
             }
-    }
-
-    override fun initializeViewModel() {
-        val provider = ViewModelProvider(requireActivity())
-        diaryEditViewModel = provider[DiaryEditViewModel::class.java]
-        diaryEditViewModel.initialize()
     }
 
     override fun initializeDataBinding(
