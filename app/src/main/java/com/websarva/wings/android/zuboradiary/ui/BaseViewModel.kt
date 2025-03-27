@@ -12,19 +12,13 @@ abstract class BaseViewModel : ViewModel() {
 
     private val logTag = getLogTag()
 
-    private val initialAppMessageBufferList = AppMessageList()
-    private val _appMessageBufferList = MutableStateFlow(initialAppMessageBufferList)
+    // MEMO:ViewModelのスコープ範囲がActivityの時に各プロパティを初期化できるように抽象メソッドinitialize()を用意しているが、
+    //      appMessageBufferListに関しては主にエラー表示となるため、ViewModelの初期化時のみの初期化する。
+    private val _appMessageBufferList = MutableStateFlow(AppMessageList())
     val appMessageBufferList
         get() = _appMessageBufferList.asStateFlow()
 
-    init {
-        initializeAppMessageList()
-    }
-
-    protected fun initializeAppMessageList() {
-        Log.d(logTag, "initializeAppMessageList()")
-        _appMessageBufferList.value = initialAppMessageBufferList
-    }
+    abstract fun initialize()
 
     protected fun addAppMessage(appMessage: AppMessage) {
         Log.d(logTag, "addAppMessage()")

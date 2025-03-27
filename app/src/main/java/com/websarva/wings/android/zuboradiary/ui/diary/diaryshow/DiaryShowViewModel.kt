@@ -63,8 +63,7 @@ internal class DiaryShowViewModel @Inject constructor(private val diaryRepositor
         initialize()
     }
 
-    fun initialize() {
-        initializeAppMessageList()
+    override fun initialize() {
         diaryStateFlow.initialize()
     }
 

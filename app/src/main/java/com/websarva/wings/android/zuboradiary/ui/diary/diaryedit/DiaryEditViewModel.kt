@@ -183,8 +183,7 @@ internal class DiaryEditViewModel @Inject constructor(
         initialize()
     }
 
-    fun initialize() {
-        initializeAppMessageList()
+    override fun initialize() {
         hasPreparedDiary = initialHasPreparedDiary
         _previousDate.value = initialPreviousDate
         _loadedDate.value = initialLoadedDate

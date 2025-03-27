@@ -71,8 +71,7 @@ internal class DiaryListViewModel @Inject constructor(private val diaryRepositor
         initialize()
     }
 
-    fun initialize() {
-        initializeAppMessageList()
+    override fun initialize() {
         _diaryList.value = initialDiaryList
         _isVisibleUpdateProgressBar.value = initialIsVisibleUpdateProgressBar
         sortConditionDate = null

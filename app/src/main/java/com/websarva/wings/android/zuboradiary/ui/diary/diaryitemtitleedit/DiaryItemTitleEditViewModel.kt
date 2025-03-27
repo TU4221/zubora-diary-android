@@ -45,8 +45,7 @@ internal class DiaryItemTitleEditViewModel @Inject constructor(
         initialize()
     }
 
-    fun initialize() {
-        initializeAppMessageList()
+    override fun initialize() {
         _itemNumber.value = null
         _itemTitle.value = ""
         setUpItemTitleSelectionHistoryList()
