@@ -13,7 +13,6 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 internal object WorkerModule {
 
-    @JvmStatic
     @Singleton
     @Provides
     fun provideWorkManager(@ApplicationContext context: Context): WorkManager {

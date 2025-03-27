@@ -21,7 +21,7 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 internal object DatabaseModule {
-    @JvmStatic
+
     @Singleton
     @Provides
     fun provideDiaryDatabase(@ApplicationContext context: Context): DiaryDatabase {
@@ -77,14 +77,12 @@ internal object DatabaseModule {
             .build()
     }
 
-    @JvmStatic
     @Singleton
     @Provides
     fun provideDiaryDAO(diaryDatabase: DiaryDatabase): DiaryDAO {
         return diaryDatabase.createDiaryDAO()
     }
 
-    @JvmStatic
     @Singleton
     @Provides
     fun provideSelectedItemTitlesHistoryDAO(diaryDatabase: DiaryDatabase): DiaryItemTitleSelectionHistoryDAO {

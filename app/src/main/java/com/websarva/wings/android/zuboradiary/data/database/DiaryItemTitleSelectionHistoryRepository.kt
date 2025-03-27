@@ -1,9 +1,8 @@
 package com.websarva.wings.android.zuboradiary.data.database
 
 import kotlinx.coroutines.flow.Flow
-import javax.inject.Inject
 
-internal class DiaryItemTitleSelectionHistoryRepository @Inject constructor(
+internal class DiaryItemTitleSelectionHistoryRepository (
     private val diaryItemTitleSelectionHistoryDAO: DiaryItemTitleSelectionHistoryDAO
 ) {
 

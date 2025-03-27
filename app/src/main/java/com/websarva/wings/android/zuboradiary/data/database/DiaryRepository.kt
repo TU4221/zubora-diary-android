@@ -4,10 +4,9 @@ import android.net.Uri
 import android.util.Log
 import com.websarva.wings.android.zuboradiary.getLogTag
 import java.time.LocalDate
-import javax.inject.Inject
 
 
-class DiaryRepository @Inject constructor(
+class DiaryRepository (
     private val diaryDatabase: DiaryDatabase,
     private val diaryDAO: DiaryDAO,
 ) {

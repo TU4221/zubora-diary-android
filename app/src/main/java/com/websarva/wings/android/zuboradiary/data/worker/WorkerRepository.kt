@@ -8,9 +8,8 @@ import com.websarva.wings.android.zuboradiary.getLogTag
 import java.time.LocalTime
 import java.time.temporal.ChronoUnit
 import java.util.concurrent.TimeUnit
-import javax.inject.Inject
 
-class WorkerRepository @Inject constructor(private val workManager: WorkManager) {
+class WorkerRepository (private val workManager: WorkManager) {
 
     private val reminderNotificationWorkTag = "ReminderNotification"
     private val reminderNotificationUniqueWorkName = reminderNotificationWorkTag

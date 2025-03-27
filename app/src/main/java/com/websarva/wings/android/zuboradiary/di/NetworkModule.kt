@@ -14,28 +14,25 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 internal object NetworkModule {
-    @JvmStatic
+
     @Singleton
     @Provides
     fun provideKotlinJsonAdapterFactory(): KotlinJsonAdapterFactory {
         return KotlinJsonAdapterFactory()
     }
 
-    @JvmStatic
     @Singleton
     @Provides
     fun provideMoshi(kotlinJsonAdapterFactory: KotlinJsonAdapterFactory): Moshi {
         return Moshi.Builder().add(kotlinJsonAdapterFactory).build()
     }
 
-    @JvmStatic
     @Singleton
     @Provides
     fun provideMoshiConverterFactory(moshi: Moshi): MoshiConverterFactory {
         return MoshiConverterFactory.create(moshi)
     }
 
-    @JvmStatic
     @Singleton
     @Provides
     fun provideWeatherApiRetrofit(moshiConverterFactory: MoshiConverterFactory): Retrofit {
@@ -45,7 +42,6 @@ internal object NetworkModule {
                 .build()
     }
 
-    @JvmStatic
     @Singleton
     @Provides
     fun provideWeatherApiService(retrofit: Retrofit): WeatherApiService {

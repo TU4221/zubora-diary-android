@@ -20,7 +20,7 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 internal object RepositoryModule {
-    @JvmStatic
+
     @Singleton
     @Provides
     fun provideDiaryRepository(
@@ -30,7 +30,6 @@ internal object RepositoryModule {
         return DiaryRepository(diaryDatabase, diaryDAO)
     }
 
-    @JvmStatic
     @Singleton
     @Provides
     fun provideEditDiarySelectItemTitleRepository(
@@ -39,21 +38,18 @@ internal object RepositoryModule {
         return DiaryItemTitleSelectionHistoryRepository(diaryItemTitleSelectionHistoryDAO)
     }
 
-    @JvmStatic
     @Singleton
     @Provides
     fun provideUserPreferencesRepository(userPreferences: UserPreferences): UserPreferencesRepository {
         return UserPreferencesRepository(userPreferences)
     }
 
-    @JvmStatic
     @Singleton
     @Provides
     fun provideWorkerRepository(workManager: WorkManager): WorkerRepository {
         return WorkerRepository(workManager)
     }
 
-    @JvmStatic
     @Singleton
     @Provides
     fun provideWeatherApiRepository(weatherApiService: WeatherApiService): WeatherApiRepository {

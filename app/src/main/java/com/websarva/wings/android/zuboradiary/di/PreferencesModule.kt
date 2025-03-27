@@ -14,7 +14,7 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 internal object PreferencesModule {
-    @JvmStatic
+
     @Singleton
     @Provides
     fun provideUserPreferences(@ApplicationContext context: Context): UserPreferences {
