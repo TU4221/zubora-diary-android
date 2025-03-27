@@ -49,6 +49,11 @@ internal class CalendarViewModel @Inject constructor(
     }
 
     fun updateSelectedDate(date: LocalDate) {
+        // MEMO:selectedDateと同日付を選択した時、previousSelectedDateと同値となり、
+        //      次に他の日付を選択した時にpreviousSelectedDateのcollectedが起動しなくなる。
+        //      下記条件で対策。
+        if (date == _selectedDate.value) return
+
         _previousSelectedDate.value = _selectedDate.value
         _selectedDate.value = date
     }
