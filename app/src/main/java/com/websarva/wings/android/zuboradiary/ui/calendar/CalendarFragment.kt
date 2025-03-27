@@ -10,6 +10,7 @@ import androidx.activity.OnBackPressedCallback
 import androidx.annotation.MainThread
 import androidx.databinding.ViewDataBinding
 import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.kizitonwose.calendar.core.CalendarDay
 import com.kizitonwose.calendar.core.CalendarMonth
@@ -63,7 +64,7 @@ class CalendarFragment : BaseFragment() {
 
     // MEMO:CalendarFragment内にDiaryShowFragmentと同等のものを表示する為、DiaryShowViewModelを使用する。
     //      (CalendarViewModelにDiaryShowViewModelと重複するデータは持たせない)
-    private val diaryShowViewModel: DiaryShowViewModel by activityViewModels()
+    private val diaryShowViewModel: DiaryShowViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
