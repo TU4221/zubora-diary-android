@@ -116,8 +116,8 @@ class SettingsFragment : BaseFragment() {
         _binding = FragmentSettingsBinding.inflate(themeColorInflater, container, false)
 
         return binding.apply {
-            binding.lifecycleOwner = this@SettingsFragment.viewLifecycleOwner
-            binding.settingsViewModel = this@SettingsFragment.settingsViewModel
+            lifecycleOwner = this@SettingsFragment.viewLifecycleOwner
+            settingsViewModel = this@SettingsFragment.settingsViewModel
         }
     }
 
