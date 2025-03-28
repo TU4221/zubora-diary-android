@@ -135,9 +135,6 @@ dependencies {
     // If this project uses any Kotlin source, use Kotlin Symbol Processing (KSP)
     // See Add the KSP plugin to your project
     ksp(libs.androidx.room.compiler)
-    // If this project only uses Java source, use the Java annotationProcessor
-    // No additional plugins are necessary
-    annotationProcessor(libs.androidx.room.compiler)
     // optional - Kotlin Extensions and Coroutines support for Room
     implementation(libs.androidx.room.ktx)
     // optional - Test helpers
@@ -178,9 +175,7 @@ dependencies {
     // https://developer.android.com/training/dependency-injection/hilt-jetpack?hl=ja#workmanager
     implementation(libs.androidx.hilt.work)
     // When using Kotlin.
-    ksp(libs.androidx.hilt.compiler) // MEMO:Javaを使用していても左記未設定だとWorkerの引数を変更する事はできない。
-    // When using Java.
-    annotationProcessor(libs.androidx.hilt.compiler)
+    ksp(libs.androidx.hilt.compiler)
 
     // kizitonwose/Calendar
     // https://github.com/kizitonwose/Calendar
