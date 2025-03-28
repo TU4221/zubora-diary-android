@@ -10,8 +10,8 @@ import com.websarva.wings.android.zuboradiary.ui.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -38,8 +38,8 @@ internal class DiaryItemTitleEditViewModel @Inject constructor(
      * */
     val itemTitleMutable get() = _itemTitle
 
-    lateinit var itemTitleSelectionHistoryList: StateFlow<SelectionHistoryList>
-        private set
+    private val _itemTitleSelectionHistoryList = MutableStateFlow(SelectionHistoryList(emptyList()))
+    val itemTitleSelectionHistoryList = _itemTitleSelectionHistoryList.asStateFlow()
 
     init {
         initialize()
@@ -57,17 +57,18 @@ internal class DiaryItemTitleEditViewModel @Inject constructor(
 
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                itemTitleSelectionHistoryList =
-                    diaryItemTitleSelectionHistoryRepository
-                        .loadSelectionHistory(maxLoadedItemTitles, 0)
-                        .map { list ->
+                diaryItemTitleSelectionHistoryRepository
+                    .loadSelectionHistory(maxLoadedItemTitles, 0)
+                    .map { list ->
+                        SelectionHistoryList(
                             list.map { item ->
                                 SelectionHistoryListItem(item)
-
                             }
-                        }.map { list ->
-                            SelectionHistoryList(list)
-                        }.stateIn(this)
+                        )
+                    }.stateIn(this)
+                    .collectLatest { selectionHistoryList ->
+                        _itemTitleSelectionHistoryList.value = selectionHistoryList
+                    }
                 Log.i(logTag, "${logMsg}_完了")
             } catch (e: Exception) {
                 Log.e(logTag, "${logMsg}_失敗", e)
