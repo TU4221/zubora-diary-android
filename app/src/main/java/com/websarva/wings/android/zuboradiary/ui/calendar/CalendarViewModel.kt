@@ -20,11 +20,11 @@ internal class CalendarViewModel @Inject constructor(
 
     private val initialSelectedDate = LocalDate.now()
     private val _selectedDate = MutableStateFlow<LocalDate>(initialSelectedDate)
-    internal val selectedDate get() = _selectedDate.asStateFlow()
+    val selectedDate get() = _selectedDate.asStateFlow()
 
     private val initialPreviousSelectedDate = null
     private val _previousSelectedDate = MutableStateFlow<LocalDate?>(initialPreviousSelectedDate)
-    internal val previousSelectedDate get() = _previousSelectedDate.asStateFlow()
+    val previousSelectedDate get() = _previousSelectedDate.asStateFlow()
 
     init {
         initialize()

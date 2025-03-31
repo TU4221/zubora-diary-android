@@ -190,7 +190,7 @@ internal class DiaryStateFlow {
         return items[arrayNumber]
     }
 
-    class DiaryItemStateFlow(val itemNumber: Int) {
+    inner class DiaryItemStateFlow(val itemNumber: Int) {
 
         private val minItemNumber = ItemNumber.MIN_NUMBER
         private val maxItemNumber = ItemNumber.MAX_NUMBER
@@ -205,7 +205,7 @@ internal class DiaryStateFlow {
 
         // MEMO:初期化時日付有無が未定、タイトル未更新のケースがある為、null許容型とする。
         private val initialUpdateLog = null
-        internal val titleUpdateLog = MutableStateFlow<LocalDateTime?>(initialUpdateLog)
+        val titleUpdateLog = MutableStateFlow<LocalDateTime?>(initialUpdateLog)
 
         init {
             require(isItemNumberInRange(itemNumber))
