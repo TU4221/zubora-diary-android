@@ -36,7 +36,8 @@ internal class WordSearchViewModel @Inject internal constructor(
     val searchWordMutableStateFlow: MutableStateFlow<String>
         get() = _searchWord
 
-    private var wordSearchResultListLoadingJob: Job? = null // キャンセル用
+    private val initialWordSearchResultListLoadingJob: Job? = null
+    private var wordSearchResultListLoadingJob: Job? = initialWordSearchResultListLoadingJob // キャンセル用
 
     private val numLoadingItems = DiaryListViewModel.NUM_LOADING_ITEMS
     private val initialWordSearchResultList = WordSearchResultYearMonthList()
@@ -66,17 +67,14 @@ internal class WordSearchViewModel @Inject internal constructor(
 
     private val isValidityDelay = true // TODO:調整用
 
-    init {
-        initialize()
-    }
-
     override fun initialize() {
+        super.initialize()
         _searchWord.value = initialSearchWord
+        cancelPreviousLoading()
+        wordSearchResultListLoadingJob = initialWordSearchResultListLoadingJob
         _wordSearchResultList.value = initialWordSearchResultList
         _numWordSearchResults.value = initialNumWordSearchResults
         _isVisibleUpdateProgressBar.value = initialIsVisibleUpdateProgressBar
-        cancelPreviousLoading()
-        wordSearchResultListLoadingJob = null
     }
 
     fun loadNewWordSearchResultList(

@@ -24,9 +24,10 @@ internal class DiaryItemTitleEditViewModel @Inject constructor(
 
     private val logTag = getLogTag()
 
-    private val initialItemNumber = null
     private val maxLoadedItemTitles = 50
-    private val _itemNumber = MutableStateFlow<ItemNumber?>(initialItemNumber)
+
+    private val initialItemNumber: ItemNumber? = null
+    private val _itemNumber = MutableStateFlow(initialItemNumber)
     val itemNumber get() = _itemNumber.asStateFlow()
 
     private val initialItemTitle = ""
@@ -38,16 +39,19 @@ internal class DiaryItemTitleEditViewModel @Inject constructor(
      * */
     val itemTitleMutable get() = _itemTitle
 
-    private val _itemTitleSelectionHistoryList = MutableStateFlow(SelectionHistoryList(emptyList()))
+    private val initialItemTitleSelectionHistoryList = SelectionHistoryList(emptyList())
+    private val _itemTitleSelectionHistoryList = MutableStateFlow(initialItemTitleSelectionHistoryList)
     val itemTitleSelectionHistoryList = _itemTitleSelectionHistoryList.asStateFlow()
 
     init {
-        initialize()
+        setUpItemTitleSelectionHistoryList()
     }
 
     override fun initialize() {
-        _itemNumber.value = null
-        _itemTitle.value = ""
+        super.initialize()
+        _itemNumber.value = initialItemNumber
+        _itemTitle.value = initialItemTitle
+        _itemTitleSelectionHistoryList.value = initialItemTitleSelectionHistoryList
         setUpItemTitleSelectionHistoryList()
     }
 

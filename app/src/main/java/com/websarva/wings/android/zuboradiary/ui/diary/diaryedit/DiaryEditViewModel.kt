@@ -29,15 +29,14 @@ internal class DiaryEditViewModel @Inject constructor(
 
     private val logTag = getLogTag()
 
-    // Getter
     // 日記データ関係
-    private val initialPreviousDate = null
-    private val _previousDate = MutableStateFlow<LocalDate?>(initialPreviousDate)
+    private val initialPreviousDate: LocalDate? = null
+    private val _previousDate = MutableStateFlow(initialPreviousDate)
     val previousDate
         get() = _previousDate.asStateFlow()
 
-    private val initialLoadedDate = null
-    private val _loadedDate = MutableStateFlow<LocalDate?>(initialLoadedDate)
+    private val initialLoadedDate: LocalDate? = null
+    private val _loadedDate = MutableStateFlow(initialLoadedDate)
     val loadedDate
         get() = _loadedDate.asStateFlow()
 
@@ -127,8 +126,8 @@ internal class DiaryEditViewModel @Inject constructor(
     val picturePath
         get() = diaryStateFlow.picturePath.asStateFlow()
 
-    private val initialLoadedPicturePath = null
-    private val _loadedPicturePath = MutableStateFlow<Uri?>(initialLoadedPicturePath)
+    private val initialLoadedPicturePath: Uri? = null
+    private val _loadedPicturePath = MutableStateFlow(initialLoadedPicturePath)
     val loadedPicturePath
         get() = _loadedPicturePath.asStateFlow()
 
@@ -179,16 +178,14 @@ internal class DiaryEditViewModel @Inject constructor(
     val pendingDialogList
         get() = _pendingDialogList.asStateFlow()
 
-    init {
-        initialize()
-    }
-
     override fun initialize() {
-        hasPreparedDiary = initialHasPreparedDiary
+        super.initialize()
         _previousDate.value = initialPreviousDate
         _loadedDate.value = initialLoadedDate
-        _loadedPicturePath.value = initialLoadedPicturePath
         diaryStateFlow.initialize()
+        _loadedPicturePath.value = initialLoadedPicturePath
+        _isVisibleUpdateProgressBar.value = initialIsVisibleUpdateProgressBar
+        hasPreparedDiary = initialHasPreparedDiary
         isShowingItemTitleEditFragment = initialIsShowingItemTitleEditFragment
         _pendingDialogList.value = initialPendingDialogList
     }

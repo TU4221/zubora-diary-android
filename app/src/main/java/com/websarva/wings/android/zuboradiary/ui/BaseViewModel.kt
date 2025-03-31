@@ -18,7 +18,9 @@ abstract class BaseViewModel : ViewModel() {
     val appMessageBufferList
         get() = _appMessageBufferList.asStateFlow()
 
-    abstract fun initialize()
+    open fun initialize() {
+        Log.d(logTag, "addAppMessage()")
+    }
 
     protected fun addAppMessage(appMessage: AppMessage) {
         Log.d(logTag, "addAppMessage()")

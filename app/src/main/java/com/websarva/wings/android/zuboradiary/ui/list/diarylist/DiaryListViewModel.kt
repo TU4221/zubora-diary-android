@@ -32,7 +32,8 @@ internal class DiaryListViewModel @Inject constructor(private val diaryRepositor
 
     private val logTag = getLogTag()
 
-    private var diaryListLoadingJob: Job? = null // キャンセル用
+    private val initialDiaryListLoadingJob: Job? = null
+    private var diaryListLoadingJob: Job? = initialDiaryListLoadingJob // キャンセル用
 
     private val initialDiaryList = DiaryYearMonthList()
     private val _diaryList = MutableStateFlow(initialDiaryList)
@@ -51,7 +52,8 @@ internal class DiaryListViewModel @Inject constructor(private val diaryRepositor
             return result
         }
 
-    private var _isLoadingDiaryList = MutableStateFlow(false)
+    private val initialIsLoadingDiaryList = false
+    private var _isLoadingDiaryList = MutableStateFlow(initialIsLoadingDiaryList)
     val isLoadingDiaryList
         get() = _isLoadingDiaryList.asStateFlow()
 
@@ -63,18 +65,18 @@ internal class DiaryListViewModel @Inject constructor(private val diaryRepositor
     val isVisibleUpdateProgressBar
         get() = _isVisibleUpdateProgressBar.asStateFlow()
 
-    private var sortConditionDate: LocalDate? = null
+    private val initialSortConditionDate: LocalDate? = null
+    private var sortConditionDate: LocalDate? = initialSortConditionDate
 
     private val isValidityDelay = true // TODO:調整用
 
-    init {
-        initialize()
-    }
-
     override fun initialize() {
+        super.initialize()
+        diaryListLoadingJob = initialDiaryListLoadingJob
         _diaryList.value = initialDiaryList
+        _isLoadingDiaryList.value = initialIsLoadingDiaryList
         _isVisibleUpdateProgressBar.value = initialIsVisibleUpdateProgressBar
-        sortConditionDate = null
+        sortConditionDate = initialSortConditionDate
     }
 
     suspend fun loadDiaryListOnSetUp() {

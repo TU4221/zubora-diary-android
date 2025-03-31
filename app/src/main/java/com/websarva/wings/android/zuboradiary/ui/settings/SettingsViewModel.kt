@@ -66,18 +66,26 @@ class SettingsViewModel @Inject constructor(
     val hasUpdatedGeoCoordinates
         get() = _geoCoordinates.value != null
 
-    var scrollPositionY = 0
+    private val initialScrollPositionY = 0
+    var scrollPositionY = initialScrollPositionY
 
     init {
-        initialize()
-    }
-
-    override fun initialize() {
         setUpThemeColorPreferenceValueLoading()
         setUpCalendarStartDayOfWeekPreferenceValueLoading()
         setUpReminderNotificationPreferenceValueLoading()
         setUpPasscodeLockPreferenceValueLoading()
         setUpWeatherInfoAcquisitionPreferenceValueLoading()
+    }
+
+    override fun initialize() {
+        super.initialize()
+        setUpThemeColorPreferenceValueLoading()
+        setUpCalendarStartDayOfWeekPreferenceValueLoading()
+        setUpReminderNotificationPreferenceValueLoading()
+        setUpPasscodeLockPreferenceValueLoading()
+        setUpWeatherInfoAcquisitionPreferenceValueLoading()
+        clearGeoCoordinates()
+        scrollPositionY = initialScrollPositionY
     }
 
     private fun setUpThemeColorPreferenceValueLoading() {

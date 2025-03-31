@@ -59,11 +59,8 @@ internal class DiaryShowViewModel @Inject constructor(private val diaryRepositor
     val log
         get() = diaryStateFlow.log.asStateFlow()
 
-    init {
-        initialize()
-    }
-
     override fun initialize() {
+        super.initialize()
         diaryStateFlow.initialize()
     }
 
