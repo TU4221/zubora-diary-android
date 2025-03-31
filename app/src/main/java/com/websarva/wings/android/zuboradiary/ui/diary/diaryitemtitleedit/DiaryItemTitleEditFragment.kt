@@ -37,6 +37,10 @@ class DiaryItemTitleEditFragment : BaseFragment() {
     private val binding get() = checkNotNull(_binding)
 
     // ViewModel
+    // MEMO:委譲プロパティの委譲先(viewModels())の遅延初期化により"Field is never assigned."と警告が表示される。
+    //      委譲プロパティによるViewModel生成は公式が推奨する方法の為、警告を無視する。その為、@Suppressを付与する。
+    //      この警告に対応するSuppressネームはなく、"unused"のみでは不要Suppressとなる為、"RedundantSuppression"も追記する。
+    @Suppress("unused", "RedundantSuppression")
     private val diaryItemTitleEditViewModel: DiaryItemTitleEditViewModel by viewModels()
 
     override fun initializeDataBinding(

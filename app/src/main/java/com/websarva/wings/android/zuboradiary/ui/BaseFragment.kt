@@ -47,6 +47,10 @@ abstract class BaseFragment : CustomFragment() {
     //      (ViewLifeCycleEventが"OnDestroy"の時は、NavのCurrentBackStackが切替先のFragmentに更新される)
     private lateinit var navBackStackEntry: NavBackStackEntry
 
+    // MEMO:委譲プロパティの委譲先(viewModels())の遅延初期化により"Field is never assigned."と警告が表示される。
+    //      委譲プロパティによるViewModel生成は公式が推奨する方法の為、警告を無視する。その為、@Suppressを付与する。
+    //      この警告に対応するSuppressネームはなく、"unused"のみでは不要Suppressとなる為、"RedundantSuppression"も追記する。
+    @Suppress("unused", "RedundantSuppression")
     protected val settingsViewModel: SettingsViewModel by activityViewModels()
 
     protected val themeColor
