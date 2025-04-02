@@ -58,9 +58,29 @@ class MainActivity : CustomActivity() {
     private val binding get() = checkNotNull(_binding)
     private var isMainActivityLayoutInflated = false
 
-    // BottomNavigationタブによる画面遷移関係
+    // BottomNavigation
     var wasSelectedTab = false
         private set
+
+    private val navHostFragment: NavHostFragment
+        get() =
+            checkNotNull(
+                supportFragmentManager.findFragmentById(R.id.fragment_nav_host)
+            ) as NavHostFragment
+
+    private val navFragmentManager: FragmentManager
+        get() = navHostFragment.childFragmentManager
+
+    private val showedFragment: Fragment
+        get() = navFragmentManager.fragments[0]
+
+    private val selectedBottomNavigationMenuItem: MenuItem
+        get() {
+            val bottomNavigationView = binding.bottomNavigation
+            val selectedItemId = bottomNavigationView.selectedItemId
+            return bottomNavigationView.menu.findItem(selectedItemId)
+        }
+
     private lateinit var startNavigationMenuItem: MenuItem
 
     // ViewModel
@@ -75,7 +95,7 @@ class MainActivity : CustomActivity() {
     ) { o: Uri? ->
         if (o == null) return@registerForActivityResult  // 未選択時
 
-        val showedFragment = findShowedFragment()
+        val showedFragment = showedFragment
         if (showedFragment is DiaryEditFragment) {
             showedFragment.attachPicture(o)
         }
@@ -250,29 +270,6 @@ class MainActivity : CustomActivity() {
         switcher.switchBottomNavigationColor(binding.bottomNavigation)
     }
 
-    private fun findNavHostFragment(): NavHostFragment {
-        return checkNotNull(
-            supportFragmentManager.findFragmentById(R.id.fragment_nav_host)
-        ) as NavHostFragment
-    }
-
-    private fun findNavFragmentManager(): FragmentManager {
-        val navHostFragment = findNavHostFragment()
-        return navHostFragment.childFragmentManager
-    }
-
-    private fun findShowedFragment(): Fragment {
-        val fragmentManager = findNavFragmentManager()
-        val fragmentList = fragmentManager.fragments
-        return fragmentList[0]
-    }
-
-    private fun findSelectedBottomNavigationMenuItem(): MenuItem {
-        val bottomNavigationView = binding.bottomNavigation
-        val selectedItemId = bottomNavigationView.selectedItemId
-        return bottomNavigationView.menu.findItem(selectedItemId)
-    }
-
     private fun setUpNavigation() {
         // Navigation設定
         // 参考:https://inside.luchegroup.com/entry/2023/05/08/113236
@@ -285,7 +282,7 @@ class MainActivity : CustomActivity() {
         setupWithNavController(bottomNavigationView, navController)
 
         // ボトムナビゲーションのデフォルト選択アイテム情報取得
-        startNavigationMenuItem = findSelectedBottomNavigationMenuItem()
+        startNavigationMenuItem = selectedBottomNavigationMenuItem
 
         setUpEnabledNavigationSwitchFunction()
         bottomNavigationView.setOnItemSelectedListener(CustomOnItemSelectedListener(navController))
@@ -301,7 +298,7 @@ class MainActivity : CustomActivity() {
     //      これを回避するために、遷移先のFragmentが表示しきるまで、タブ選択できないようにする。
     //      Fragment A → B → A
     private fun setUpEnabledNavigationSwitchFunction() {
-        findNavFragmentManager().registerFragmentLifecycleCallbacks(
+        navFragmentManager.registerFragmentLifecycleCallbacks(
             BottomNavigationEnabledSwitchCallbacks(),
             false
         )
@@ -353,7 +350,7 @@ class MainActivity : CustomActivity() {
         private var previousItemSelected: MenuItem
 
         init {
-            previousItemSelected = findSelectedBottomNavigationMenuItem()
+            previousItemSelected = selectedBottomNavigationMenuItem
         }
 
         // MEMO:下記動作を行った時にタブのアイコンが更新されない問題があるため、
@@ -370,23 +367,20 @@ class MainActivity : CustomActivity() {
             // BottomNavigationのタブ選択による画面遷移
             if (previousItemSelected === menuItem) return true
 
-            val logMsg = "ボトムナビゲーション_フラグメント切替"
-            Log.i(logTag, "${logMsg}_開始")
+            Log.i(logTag, "ボトムナビゲーション_フラグメント切替")
             wasSelectedTab = true
             previousItemSelected = menuItem
 
             setUpFragmentTransition()
             onNavDestinationSelected(menuItem, navController)
-
-            Log.i(logTag, "${logMsg}_完了")
             return true
         }
 
         private fun setUpFragmentTransition() {
             // 表示中のFragmentを取得し、Transitionを設定
-            val fragment = findShowedFragment()
-            fragment.exitTransition = MaterialFadeThrough()
-            fragment.returnTransition = MaterialFadeThrough()
+            val showedFragment = showedFragment
+            showedFragment.exitTransition = MaterialFadeThrough()
+            showedFragment.returnTransition = MaterialFadeThrough()
 
             // MEMO:NavigationUI.onNavDestinationSelected()による、
             //      Fragment切替時の対象Transitionパターン表(StartDestination:A-1)
@@ -447,15 +441,17 @@ class MainActivity : CustomActivity() {
         }
 
         private fun isFragment(navDestination: NavDestination): Boolean {
-            val navDestinationId = navDestination.id
-            if (navDestinationId == R.id.navigation_diary_list_fragment) return true
-            if (navDestinationId == R.id.navigation_calendar_fragment) return true
-            if (navDestinationId == R.id.navigation_settings_fragment) return true
-            if (navDestinationId == R.id.navigation_open_source_licenses_fragment) return true
-            if (navDestinationId == R.id.navigation_word_search_fragment) return true
-            if (navDestinationId == R.id.navigation_diary_show_fragment) return true
-            if (navDestinationId == R.id.navigation_diary_edit_fragment) return true
-            return navDestinationId == R.id.navigation_diary_item_title_edit_fragment
+            return when (navDestination.id) {
+                R.id.navigation_diary_list_fragment,
+                R.id.navigation_calendar_fragment,
+                R.id.navigation_settings_fragment,
+                R.id.navigation_open_source_licenses_fragment,
+                R.id.navigation_word_search_fragment,
+                R.id.navigation_diary_show_fragment,
+                R.id.navigation_diary_edit_fragment,
+                R.id.navigation_diary_item_title_edit_fragment -> true
+                else -> false
+            }
         }
 
         private fun isFragmentWithBottomNavigation(navDestination: NavDestination): Boolean {
@@ -465,26 +461,28 @@ class MainActivity : CustomActivity() {
             //              -> CalendarFragment
             //              -> WordSearchFragment(onCreate()から処理)
             //              ViewModelが初期化される為検索状態が保持されない。保持することも出来るが複雑になるため避ける。
-            val navDestinationId = navDestination.id
-            if (navDestinationId == R.id.navigation_diary_list_fragment) return true
-            if (navDestinationId == R.id.navigation_calendar_fragment) return true
-            return navDestinationId == R.id.navigation_settings_fragment
+            return when (navDestination.id) {
+                R.id.navigation_diary_list_fragment,
+                R.id.navigation_calendar_fragment,
+                R.id.navigation_settings_fragment -> true
+                else -> false
+            }
         }
     }
 
     private inner class CustomOnItemReselectedListener : OnItemReselectedListener {
         override fun onNavigationItemReselected(menuItem: MenuItem) {
-            val fragment = findShowedFragment()
+            val showedFragment = showedFragment
 
             Log.i(logTag, "ボトムナビゲーション_リセレクト")
             if (menuItem.toString() == getString(R.string.title_list)) {
-                if (fragment !is DiaryListFragment) return
+                if (showedFragment !is DiaryListFragment) return
 
-                fragment.processOnReSelectNavigationItem()
+                showedFragment.processOnReSelectNavigationItem()
             } else if (menuItem.toString() == getString(R.string.title_calendar)) {
-                if (fragment !is CalendarFragment) return
+                if (showedFragment !is CalendarFragment) return
 
-                fragment.processOnReselectNavigationItem()
+                showedFragment.processOnReselectNavigationItem()
             }
         }
     }
