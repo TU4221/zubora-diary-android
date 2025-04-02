@@ -287,11 +287,64 @@ class MainActivity : CustomActivity() {
         // ボトムナビゲーションのデフォルト選択アイテム情報取得
         startNavigationMenuItem = findSelectedBottomNavigationMenuItem()
 
+        setUpEnabledNavigationSwitchFunction()
         bottomNavigationView.setOnItemSelectedListener(CustomOnItemSelectedListener(navController))
         bottomNavigationView.setOnItemReselectedListener(CustomOnItemReselectedListener())
         navController.addOnDestinationChangedListener(
             BottomNavigationStateOnDestinationChangedListener()
         )
+    }
+
+    // MEMO:タブ選択で下記の様な画面遷移を行う時、Bを表示中にタブ選択でAを表示させようとすると、
+    //      BのFragmentが消えた後、AのFragmentが表示されない不具合が生じる。
+    //      (何も表示されない状態)
+    //      これを回避するために、遷移先のFragmentが表示しきるまで、タブ選択できないようにする。
+    //      Fragment A → B → A
+    private fun setUpEnabledNavigationSwitchFunction() {
+        findNavFragmentManager().registerFragmentLifecycleCallbacks(
+            BottomNavigationEnabledSwitchCallbacks(),
+            false
+        )
+    }
+
+    private inner class BottomNavigationEnabledSwitchCallbacks :
+        FragmentManager.FragmentLifecycleCallbacks() {
+
+            init {
+                // HACK:StartFragmentの最初のResumedの時点では、onFragmentResumed()が呼び出されない。
+                //      理由は本クラスのインスタンスをActivity#onResume()よりも後に設定している為。
+                //      本クラスはbinding変数を参照しているため、Activity#onCreate()で設定せずに、
+                //      SettingViewModelの設定値の読込が完了してから設定している。
+                //      有効状態から始めれるように初期化タイミングで有効処理するように対応。
+                switchEnabledNavigation(true)
+            }
+
+            override fun onFragmentResumed(fm: FragmentManager, f: Fragment) {
+                super.onFragmentPaused(fm, f)
+                if (isFragmentWithBottomNavigation(f)) switchEnabledNavigation(true)
+            }
+
+            override fun onFragmentPaused(fm: FragmentManager, f: Fragment) {
+                super.onFragmentPaused(fm, f)
+                if (isFragmentWithBottomNavigation(f)) switchEnabledNavigation(false)
+            }
+
+            private fun isFragmentWithBottomNavigation(f: Fragment): Boolean {
+                return when(f) {
+                    is DiaryListFragment,
+                    is CalendarFragment,
+                    is SettingsFragment -> true
+                    else -> false
+                }
+            }
+
+            private fun switchEnabledNavigation(isEnabled: Boolean) {
+                val menu = binding.bottomNavigation.menu
+                val size = menu.size()
+                for (i in 0 until size) {
+                    menu.getItem(i).setEnabled(isEnabled)
+                }
+            }
     }
 
     private inner class CustomOnItemSelectedListener(private val navController: NavController):
@@ -301,43 +354,6 @@ class MainActivity : CustomActivity() {
 
         init {
             previousItemSelected = findSelectedBottomNavigationMenuItem()
-            setUpEnabledNavigationSwitchFunction()
-        }
-
-        // MEMO:タブ選択で下記の様な画面遷移を行う時、Bを表示中にタブ選択でAを表示させようとすると、
-        //      BのFragmentが消えた後、AのFragmentが表示されない不具合が生じる。
-        //      (何も表示されない状態)
-        //      これを回避するために、遷移先のFragmentが表示しきるまで、タブ選択できないようにする。
-        //      Fragment A → B → A
-        private fun setUpEnabledNavigationSwitchFunction() {
-            findNavFragmentManager().registerFragmentLifecycleCallbacks(
-                object: FragmentManager.FragmentLifecycleCallbacks() {
-
-                    override fun onFragmentResumed(fm: FragmentManager, f: Fragment) {
-                        super.onFragmentPaused(fm, f)
-                        if (isFragmentWithBottomNavigation(f)) switchEnabledNavigation(true)
-                    }
-
-                    override fun onFragmentPaused(fm: FragmentManager, f: Fragment) {
-                        super.onFragmentPaused(fm, f)
-                        if (isFragmentWithBottomNavigation(f)) switchEnabledNavigation(false)
-                    }
-
-                    private fun isFragmentWithBottomNavigation(f: Fragment): Boolean {
-                        return f is DiaryListFragment
-                                || f is CalendarFragment
-                                || f is SettingsFragment
-                    }
-
-                    private fun switchEnabledNavigation(isEnabled: Boolean) {
-                        val menu = binding.bottomNavigation.menu
-                        val size = menu.size()
-                        for (i in 0 until size) {
-                            menu.getItem(i).setEnabled(isEnabled)
-                        }
-                    }
-
-            },false)
         }
 
         // MEMO:下記動作を行った時にタブのアイコンが更新されない問題があるため、
