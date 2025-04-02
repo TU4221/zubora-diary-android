@@ -11,13 +11,13 @@ import android.util.Log
 import android.view.MenuItem
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.viewModels
 import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.NavController
@@ -84,7 +84,11 @@ class MainActivity : CustomActivity() {
     private lateinit var startNavigationMenuItem: MenuItem
 
     // ViewModel
-    private lateinit var settingsViewModel: SettingsViewModel
+    // MEMO:委譲プロパティの委譲先(viewModels())の遅延初期化により"Field is never assigned."と警告が表示される。
+    //      委譲プロパティによるViewModel生成は公式が推奨する方法の為、警告を無視する。その為、@Suppressを付与する。
+    //      この警告に対応するSuppressネームはなく、"unused"のみでは不要Suppressとなる為、"RedundantSuppression"も追記する。
+    @Suppress("unused", "RedundantSuppression")
+    private val settingsViewModel: SettingsViewModel by viewModels()
 
     // 位置情報取得関係
     private var isListenerSet = false
@@ -142,7 +146,6 @@ class MainActivity : CustomActivity() {
         setUpEdgeToEdge()
         super.onCreate(savedInstanceState)
 
-        setUpViewModel()
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.CREATED) {
                 settingsViewModel.isAllSettingsNotNull
@@ -165,11 +168,6 @@ class MainActivity : CustomActivity() {
     private fun setUpEdgeToEdge() {
         enableEdgeToEdge()
         window.isNavigationBarContrastEnforced = false
-    }
-
-    private fun setUpViewModel() {
-        val provider = ViewModelProvider(this)
-        settingsViewModel = provider[SettingsViewModel::class.java]
     }
 
     private fun setUpMainActivityBinding() {
