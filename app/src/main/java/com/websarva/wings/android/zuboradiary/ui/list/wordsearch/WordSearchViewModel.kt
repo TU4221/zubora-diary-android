@@ -36,6 +36,12 @@ internal class WordSearchViewModel @Inject internal constructor(
     val searchWordMutableStateFlow: MutableStateFlow<String>
         get() = _searchWord
 
+    private val initialPreviousSearchWord = ""
+    var previousSearchWord = initialPreviousSearchWord // 二重検索防止用
+
+    val shouldLoadWordSearchResultList: Boolean
+        get() = _searchWord.value != previousSearchWord
+
     private val initialWordSearchResultListLoadingJob: Job? = null
     private var wordSearchResultListLoadingJob: Job? = initialWordSearchResultListLoadingJob // キャンセル用
 
@@ -57,6 +63,10 @@ internal class WordSearchViewModel @Inject internal constructor(
             return result
         }
 
+    // MEMO:画面回転時の不要なアップデートを防ぐ
+    private val initialShouldUpdateWordSearchResultList = false
+    var shouldUpdateWordSearchResultList = initialShouldUpdateWordSearchResultList
+
     /**
      * データベース読込からRecyclerViewへの反映までを true とする。
      */
@@ -65,16 +75,23 @@ internal class WordSearchViewModel @Inject internal constructor(
     val isVisibleUpdateProgressBar
         get() = _isVisibleUpdateProgressBar.asStateFlow()
 
+    // MEMO:画面回転時の不要な初期化を防ぐ
+    private val initialShouldInitializeOnFragmentDestroy = false
+    var shouldInitializeOnFragmentDestroy = initialShouldInitializeOnFragmentDestroy
+
     private val isValidityDelay = true // TODO:調整用
 
     override fun initialize() {
         super.initialize()
         _searchWord.value = initialSearchWord
+        previousSearchWord = initialPreviousSearchWord
         cancelPreviousLoading()
         wordSearchResultListLoadingJob = initialWordSearchResultListLoadingJob
         _wordSearchResultList.value = initialWordSearchResultList
         _numWordSearchResults.value = initialNumWordSearchResults
+        shouldUpdateWordSearchResultList = initialShouldUpdateWordSearchResultList
         _isVisibleUpdateProgressBar.value = initialIsVisibleUpdateProgressBar
+        shouldInitializeOnFragmentDestroy = initialShouldInitializeOnFragmentDestroy
     }
 
     fun loadNewWordSearchResultList(
@@ -108,6 +125,7 @@ internal class WordSearchViewModel @Inject internal constructor(
             spannableStringColor,
             spannableStringBackgroundColor
         )
+        shouldUpdateWordSearchResultList = false
     }
 
     // MEMO:List読込JobをViewModel側で管理(読込重複防止)

@@ -10,7 +10,10 @@ import androidx.annotation.MainThread
 import androidx.databinding.ViewDataBinding
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
+import androidx.navigation.NavController
+import androidx.navigation.NavDestination
 import androidx.recyclerview.widget.RecyclerView
+import com.websarva.wings.android.zuboradiary.R
 import com.websarva.wings.android.zuboradiary.data.AppMessage
 import com.websarva.wings.android.zuboradiary.data.AppMessageList
 import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor
@@ -29,7 +32,6 @@ class WordSearchFragment : BaseFragment() {
     private var _binding: FragmentWordSearchBinding? = null
     private val binding get() = checkNotNull(_binding)
 
-    private var previousText = "" // 二重検索防止用
     private var resultWordColor = -1 // 検索結果ワード色
     private var resultWordBackgroundColor = -1 // 検索結果ワードマーカー色
 
@@ -54,6 +56,7 @@ class WordSearchFragment : BaseFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        setUpViewModelInitialization()
         setUpThemeColor()
         setUpToolBar()
         setUpWordSearchView()
@@ -87,6 +90,10 @@ class WordSearchFragment : BaseFragment() {
         }
     }
 
+    private fun setUpViewModelInitialization() {
+        navController.addOnDestinationChangedListener(ViewModelInitializationSetupListener())
+    }
+
     private fun setUpToolBar() {
         binding.materialToolbarTopAppBar
             .setNavigationOnClickListener {
@@ -107,7 +114,12 @@ class WordSearchFragment : BaseFragment() {
                 .collectLatest { value: String ->
                     // HACK:キーワードの入力時と確定時に検索Observerが起動してしまい
                     //      同じキーワードで二重に検索してしまう。防止策として下記条件追加。
-                    if (value == previousText) return@collectLatest
+                    if (!wordSearchViewModel.shouldLoadWordSearchResultList) {
+                        if (wordSearchViewModel.shouldUpdateWordSearchResultList) {
+                            updateWordSearchResultList()
+                        }
+                        return@collectLatest
+                    }
 
                     // 検索結果表示Viewは別Observerにて表示
                     if (value.isEmpty()) {
@@ -118,7 +130,7 @@ class WordSearchFragment : BaseFragment() {
                         wordSearchViewModel
                             .loadNewWordSearchResultList(resultWordColor, resultWordBackgroundColor)
                     }
-                    previousText = value
+                    wordSearchViewModel.previousSearchWord = value
                 }
         }
 
@@ -167,13 +179,13 @@ class WordSearchFragment : BaseFragment() {
                 }
         }
 
+        navController.addOnDestinationChangedListener(WordSearchResultListUpdateSetupListener())
+
         binding.includeProgressIndicator.viewBackground
             .setOnTouchListener { v: View, _: MotionEvent ->
                 v.performClick()
                 true
             }
-
-        updateWordSearchResultList()
     }
 
     private inner class WordSearchResultListAdapter(
@@ -229,6 +241,40 @@ class WordSearchFragment : BaseFragment() {
         val list = wordSearchViewModel.wordSearchResultList.value
         if (list.wordSearchResultYearMonthListItemList.isEmpty()) return
         wordSearchViewModel.updateWordSearchResultList(resultWordColor, resultWordBackgroundColor)
+    }
+
+    private inner class WordSearchResultListUpdateSetupListener
+        : NavController.OnDestinationChangedListener {
+            override fun onDestinationChanged(
+                controller: NavController,
+                destination: NavDestination,
+                arguments: Bundle?
+            ) {
+                if (destination.id == R.id.navigation_word_search_fragment) return
+
+                if (destination.id == R.id.navigation_diary_show_fragment) {
+                    wordSearchViewModel.shouldUpdateWordSearchResultList = true
+                }
+
+                navController.removeOnDestinationChangedListener(this)
+            }
+    }
+
+    private inner class ViewModelInitializationSetupListener
+        : NavController.OnDestinationChangedListener {
+        override fun onDestinationChanged(
+            controller: NavController,
+            destination: NavDestination,
+            arguments: Bundle?
+        ) {
+            if (destination.id == R.id.navigation_word_search_fragment) return
+
+            if (destination.id != R.id.navigation_diary_show_fragment) {
+                wordSearchViewModel.shouldInitializeOnFragmentDestroy = true
+            }
+
+            navController.removeOnDestinationChangedListener(this)
+        }
     }
 
     private fun setUpFloatingActionButton() {
@@ -289,6 +335,8 @@ class WordSearchFragment : BaseFragment() {
         //      WordSearchFragment、DiaryShowFragment、DiaryEditFragment、
         //      DiaryItemTitleEditFragment表示時のみ ViewModelのプロパティ値を保持できたらよいので、
         //      WordSearchFragmentを破棄するタイミングでViewModelのプロパティ値を初期化する。
-        wordSearchViewModel.initialize()
+        wordSearchViewModel.apply {
+            if (shouldInitializeOnFragmentDestroy) initialize()
+        }
     }
 }

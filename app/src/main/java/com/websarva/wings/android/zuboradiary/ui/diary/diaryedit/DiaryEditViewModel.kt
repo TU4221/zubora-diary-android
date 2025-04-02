@@ -178,6 +178,10 @@ internal class DiaryEditViewModel @Inject constructor(
     val pendingDialogList
         get() = _pendingDialogList.asStateFlow()
 
+    // MEMO:画面回転時の不要な初期化を防ぐ
+    private val initialShouldInitializeOnFragmentDestroy = false
+    var shouldInitializeOnFragmentDestroy = initialShouldInitializeOnFragmentDestroy
+
     override fun initialize() {
         super.initialize()
         _previousDate.value = initialPreviousDate
@@ -188,6 +192,7 @@ internal class DiaryEditViewModel @Inject constructor(
         hasPreparedDiary = initialHasPreparedDiary
         isShowingItemTitleEditFragment = initialIsShowingItemTitleEditFragment
         _pendingDialogList.value = initialPendingDialogList
+        shouldInitializeOnFragmentDestroy = initialShouldInitializeOnFragmentDestroy
     }
 
     suspend fun prepareDiary(date: LocalDate, shouldLoadDiary: Boolean): Boolean {

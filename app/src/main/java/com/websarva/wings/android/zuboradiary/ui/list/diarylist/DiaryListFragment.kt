@@ -12,6 +12,8 @@ import androidx.annotation.MainThread
 import androidx.databinding.ViewDataBinding
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.NavController
+import androidx.navigation.NavDestination
 import androidx.recyclerview.widget.RecyclerView
 import com.websarva.wings.android.zuboradiary.R
 import com.websarva.wings.android.zuboradiary.data.AppMessage
@@ -222,6 +224,8 @@ class DiaryListFragment : BaseFragment() {
         lifecycleScope.launch(Dispatchers.IO) {
             diaryListViewModel.loadDiaryListOnSetUp()
         }
+
+        navController.addOnDestinationChangedListener(DiaryListUpdateSetupListener())
     }
 
     private inner class DiaryListAdapter(
@@ -266,6 +270,21 @@ class DiaryListFragment : BaseFragment() {
             val convertedItemList: List<DiaryYearMonthListBaseItem> = list.diaryYearMonthListItemList
             val listAdapter = binding.recyclerDiaryList.adapter as DiaryYearMonthListAdapter
             listAdapter.submitList(convertedItemList)
+        }
+    }
+
+    private inner class DiaryListUpdateSetupListener : NavController.OnDestinationChangedListener {
+        override fun onDestinationChanged(
+            controller: NavController,
+            destination: NavDestination,
+            arguments: Bundle?
+        ) {
+            // MEMO:本Fragment、Dialog以外のFragmentへ切り替わった時のみDiaryListを更新する。
+            if (destination.id == R.id.navigation_diary_list_fragment
+                || destination.id == R.id.navigation_start_year_month_picker_dialog) return
+
+            diaryListViewModel.shouldUpdateDiaryList = true
+            navController.removeOnDestinationChangedListener(this)
         }
     }
 
