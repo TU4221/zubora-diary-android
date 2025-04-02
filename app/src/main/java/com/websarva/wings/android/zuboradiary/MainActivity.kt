@@ -17,8 +17,6 @@ import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleEventObserver
-import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -312,40 +310,34 @@ class MainActivity : CustomActivity() {
         //      これを回避するために、遷移先のFragmentが表示しきるまで、タブ選択できないようにする。
         //      Fragment A → B → A
         private fun setUpEnabledNavigationSwitchFunction() {
-            // 上記不具合対策で無効にしたBottomNavigationを有効にする
-            // StartDestinationFragment用ナビゲーション有効オブサーバー設定
-            findShowedFragment().lifecycle.addObserver(EnabledNavigationLifecycleEventObserver())
-            // StartDestinationFragment以外用ナビゲーション有効オブサーバー設定
-            findNavFragmentManager().addFragmentOnAttachListener { _, fragment: Fragment ->
-                // MEMO:BottomNavigationタブに割り当てられているFragment以外は処理不要
-                //      Dialogを表示した時は背面FragmentのLifecycleEventが"OnResume"のままとなるため、
-                //      DialogにEnabledNavigationLifecycleEventObserverクラスをセットすると
-                //      BottomNavigationが無効状態のままとなる。
-                if (fragment !is DiaryListFragment
-                    && fragment !is CalendarFragment
-                    && fragment !is SettingsFragment) {
-                    return@addFragmentOnAttachListener
-                }
-                fragment.lifecycle.addObserver(EnabledNavigationLifecycleEventObserver())
-            }
-        }
+            findNavFragmentManager().registerFragmentLifecycleCallbacks(
+                object: FragmentManager.FragmentLifecycleCallbacks() {
 
-        private inner class EnabledNavigationLifecycleEventObserver : LifecycleEventObserver {
-            override fun onStateChanged(source: LifecycleOwner, event: Lifecycle.Event) {
-                if (event != Lifecycle.Event.ON_RESUME) {
-                    switchEnabledNavigation(false)
-                    return
-                }
-                switchEnabledNavigation(true)
-            }
-        }
+                    override fun onFragmentResumed(fm: FragmentManager, f: Fragment) {
+                        super.onFragmentPaused(fm, f)
+                        if (isFragmentWithBottomNavigation(f)) switchEnabledNavigation(true)
+                    }
 
-        private fun switchEnabledNavigation(isEnabled: Boolean) {
-            val menu = binding.bottomNavigation.menu
-            val size = menu.size()
-            for (i in 0 until size) {
-                menu.getItem(i).setEnabled(isEnabled)
-            }
+                    override fun onFragmentPaused(fm: FragmentManager, f: Fragment) {
+                        super.onFragmentPaused(fm, f)
+                        if (isFragmentWithBottomNavigation(f)) switchEnabledNavigation(false)
+                    }
+
+                    private fun isFragmentWithBottomNavigation(f: Fragment): Boolean {
+                        return f is DiaryListFragment
+                                || f is CalendarFragment
+                                || f is SettingsFragment
+                    }
+
+                    private fun switchEnabledNavigation(isEnabled: Boolean) {
+                        val menu = binding.bottomNavigation.menu
+                        val size = menu.size()
+                        for (i in 0 until size) {
+                            menu.getItem(i).setEnabled(isEnabled)
+                        }
+                    }
+
+            },false)
         }
 
         // MEMO:下記動作を行った時にタブのアイコンが更新されない問題があるため、
