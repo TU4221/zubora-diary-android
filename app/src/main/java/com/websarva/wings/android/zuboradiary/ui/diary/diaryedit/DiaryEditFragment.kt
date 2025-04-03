@@ -357,9 +357,9 @@ class DiaryEditFragment : BaseFragment() {
         val requiresDiaryLoading =
             DiaryEditFragmentArgs.fromBundle(requireArguments()).requiresDiaryLoading
         lifecycleScope.launch(Dispatchers.IO) {
-            val isSuccess =
+            val isSuccessful =
                 diaryEditViewModel.prepareDiary(diaryDate, requiresDiaryLoading, true)
-            if (isSuccess) return@launch
+            if (isSuccessful) return@launch
 
             withContext(Dispatchers.Main) {
                 showDiaryLoadingFailureDialog(diaryDate)

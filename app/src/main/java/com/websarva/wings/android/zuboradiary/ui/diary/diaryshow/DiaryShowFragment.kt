@@ -188,8 +188,8 @@ internal class DiaryShowFragment : BaseFragment() {
         val diaryDate = DiaryShowFragmentArgs.fromBundle(requireArguments()).date
 
         lifecycleScope.launch(Dispatchers.IO) {
-            val isSuccess = diaryShowViewModel.loadSavedDiary(diaryDate, true)
-            if (isSuccess) return@launch
+            val isSuccessful = diaryShowViewModel.loadSavedDiary(diaryDate, true)
+            if (isSuccessful) return@launch
 
             withContext(Dispatchers.Main) {
                 showDiaryLoadingFailureDialog(diaryDate)
