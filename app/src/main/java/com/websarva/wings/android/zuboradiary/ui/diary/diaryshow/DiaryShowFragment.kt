@@ -156,7 +156,9 @@ internal class DiaryShowFragment : BaseFragment() {
             // 日記編集Fragmentで日記を削除して日記表示Fragmentに戻って来た時は更に一つ前のFragmentへ戻る。
             val exists = diaryShowViewModel.existsSavedDiary(diaryDate) ?: return@launch
             if (!exists) {
-                navController.navigateUp()
+                withContext(Dispatchers.Main) {
+                    backFragment(true)
+                }
                 return@launch
             }
 
@@ -402,6 +404,7 @@ internal class DiaryShowFragment : BaseFragment() {
     // MEMO:ツールバーの戻るボタンと端末の戻るボタンを区別している。
     //      ツールバーの戻るボタン:アプリ内でのみ戻る
     //      端末の戻るボタン:端末内で戻る(アプリ外から本アプリを起動した場合起動もとへ戻る)
+    @MainThread
     private fun backFragment(requestsNavigateUp: Boolean) {
         val navBackStackEntry = checkNotNull(navController.previousBackStackEntry)
         val destinationId = navBackStackEntry.destination.id
