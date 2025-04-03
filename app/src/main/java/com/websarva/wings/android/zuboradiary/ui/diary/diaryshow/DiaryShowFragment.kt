@@ -153,15 +153,6 @@ internal class DiaryShowFragment : BaseFragment() {
         val diaryDate = DiaryShowFragmentArgs.fromBundle(requireArguments()).date
 
         lifecycleScope.launch(Dispatchers.IO) {
-            // 日記編集Fragmentで日記を削除して日記表示Fragmentに戻って来た時は更に一つ前のFragmentへ戻る。
-            val exists = diaryShowViewModel.existsSavedDiary(diaryDate) ?: return@launch
-            if (!exists) {
-                withContext(Dispatchers.Main) {
-                    backFragment(true)
-                }
-                return@launch
-            }
-
             diaryShowViewModel.loadSavedDiary(diaryDate)
         }
     }

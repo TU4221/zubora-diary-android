@@ -223,6 +223,11 @@ class DiaryEditFragment : BaseFragment() {
 
             releaseLoadedPictureUriPermission()
             withContext(Dispatchers.Main) {
+                val navBackStackEntry = checkNotNull(navController.previousBackStackEntry)
+                val destinationId = navBackStackEntry.destination.id
+                if (destinationId == R.id.navigation_diary_show_fragment) {
+                    navController.navigateUp()
+                }
                 navController.navigateUp()
             }
         }
