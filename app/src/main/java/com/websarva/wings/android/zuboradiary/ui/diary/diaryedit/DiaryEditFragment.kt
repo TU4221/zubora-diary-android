@@ -55,6 +55,12 @@ import java.util.Arrays
 @AndroidEntryPoint
 class DiaryEditFragment : BaseFragment() {
 
+    companion object {
+        // Navigation関係
+        private val fromClassName = "From" + DiaryEditFragment::class.java.name
+        val KEY_EDITED_DIARY_DATE: String = "EditedDiaryDate$fromClassName"
+    }
+
     private val logTag = createLogTag()
 
     // View関係
@@ -202,7 +208,7 @@ class DiaryEditFragment : BaseFragment() {
                 ?: return
         if (selectedButton != Dialog.BUTTON_POSITIVE) return
 
-        navController.navigateUp()
+        backFragment()
     }
 
     // 既存日記上書きダイアログフラグメントから結果受取
@@ -240,7 +246,7 @@ class DiaryEditFragment : BaseFragment() {
                 if (destinationId == R.id.navigation_diary_show_fragment) {
                     navController.navigateUp()
                 }
-                navController.navigateUp()
+                backFragment()
             }
         }
 
@@ -370,7 +376,7 @@ class DiaryEditFragment : BaseFragment() {
     private fun setUpToolBar() {
         binding.materialToolbarTopAppBar
             .setNavigationOnClickListener {
-                navController.navigateUp()
+                backFragment()
             }
 
         binding.materialToolbarTopAppBar
@@ -1176,6 +1182,18 @@ class DiaryEditFragment : BaseFragment() {
 
     override fun retryOtherAppMessageDialogShow() {
         diaryEditViewModel.triggerAppMessageBufferListObserver()
+    }
+
+    @MainThread
+    private fun backFragment() {
+        val navBackStackEntry = checkNotNull(navController.previousBackStackEntry)
+        val destinationId = navBackStackEntry.destination.id
+        if (destinationId == R.id.navigation_calendar_fragment) {
+            val savedStateHandle = navBackStackEntry.savedStateHandle
+            val editedDiaryLocalDate = diaryEditViewModel.loadedDate.value
+            savedStateHandle[KEY_EDITED_DIARY_DATE] = editedDiaryLocalDate
+        }
+        navController.navigateUp()
     }
 
     override fun onResume() {

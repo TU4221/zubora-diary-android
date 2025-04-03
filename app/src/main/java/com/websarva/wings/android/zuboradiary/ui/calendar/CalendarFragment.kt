@@ -29,6 +29,7 @@ import com.websarva.wings.android.zuboradiary.databinding.FragmentCalendarBindin
 import com.websarva.wings.android.zuboradiary.databinding.LayoutCalendarDayBinding
 import com.websarva.wings.android.zuboradiary.databinding.LayoutCalendarHeaderBinding
 import com.websarva.wings.android.zuboradiary.ui.BaseFragment
+import com.websarva.wings.android.zuboradiary.ui.diary.diaryedit.DiaryEditFragment
 import com.websarva.wings.android.zuboradiary.ui.requireValue
 import com.websarva.wings.android.zuboradiary.ui.diary.diaryshow.DiaryShowFragment
 import com.websarva.wings.android.zuboradiary.ui.diary.diaryshow.DiaryShowFragment.ConditionObserver
@@ -102,6 +103,11 @@ class CalendarFragment : BaseFragment() {
     }
 
     override fun handleOnReceivingResultFromPreviousFragment() {
+        receivingDiaryShowFragmentResult()
+        receivingDiaryEditFragmentResult()
+    }
+
+    private fun receivingDiaryShowFragmentResult() {
         val showedDiaryDate =
             receiveResulFromPreviousFragment<LocalDate>(DiaryShowFragment.KEY_SHOWED_DIARY_DATE)
 
@@ -111,6 +117,20 @@ class CalendarFragment : BaseFragment() {
 
                 calendarViewModel.updateSelectedDate(value)
                 removeResulFromFragment(DiaryShowFragment.KEY_SHOWED_DIARY_DATE)
+            }
+        }
+    }
+
+    private fun receivingDiaryEditFragmentResult() {
+        val editedDiaryDate =
+            receiveResulFromPreviousFragment<LocalDate>(DiaryEditFragment.KEY_EDITED_DIARY_DATE)
+
+        launchAndRepeatOnViewLifeCycleStarted {
+            editedDiaryDate.collectLatest { value: LocalDate? ->
+                value ?: return@collectLatest
+
+                calendarViewModel.updateSelectedDate(value)
+                removeResulFromFragment(DiaryEditFragment.KEY_EDITED_DIARY_DATE)
             }
         }
     }
