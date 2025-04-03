@@ -35,8 +35,7 @@ internal abstract class WordSearchResultYearMonthListAdapter(
             build()
             onClickItemListener =
                 DiaryDayListBaseAdapter.OnClickItemListener { item: DiaryDayListBaseItem ->
-                    if (onClickChildItemListener == null) return@OnClickItemListener
-                    onClickChildItemListener!!.onClick(item)
+                    onClickChildItemListener?.onClick(item) ?: return@OnClickItemListener
                 }
         }
     }
