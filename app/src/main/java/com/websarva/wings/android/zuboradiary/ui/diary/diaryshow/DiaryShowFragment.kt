@@ -11,7 +11,6 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
-import androidx.activity.OnBackPressedCallback
 import androidx.annotation.MainThread
 import androidx.databinding.ViewDataBinding
 import androidx.fragment.app.viewModels
@@ -63,12 +62,6 @@ internal class DiaryShowFragment : BaseFragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        addOnBackPressedCallback(object : OnBackPressedCallback(true) {
-            override fun handleOnBackPressed() {
-                backFragment(false)
-            }
-        })
 
         pictureUriPermissionManager =
             object : UriPermissionManager(requireContext()) {
@@ -131,7 +124,7 @@ internal class DiaryShowFragment : BaseFragment() {
                 ?: return
         if (selectedButton != Dialog.BUTTON_POSITIVE) return
 
-        backFragment(true)
+        backFragment()
     }
 
     // 日記削除確認ダイアログフラグメントからデータ受取
@@ -147,7 +140,7 @@ internal class DiaryShowFragment : BaseFragment() {
 
             releasePictureUriPermission()
             withContext(Dispatchers.Main) {
-                backFragment(true)
+                backFragment()
             }
         }
     }
@@ -200,7 +193,7 @@ internal class DiaryShowFragment : BaseFragment() {
     private fun setUpToolBar() {
         binding.materialToolbarTopAppBar.apply {
             setNavigationOnClickListener {
-                backFragment(true)
+                backFragment()
             }
             setOnMenuItemClickListener { item: MenuItem ->
                 // 日記編集フラグメント起動
@@ -444,12 +437,8 @@ internal class DiaryShowFragment : BaseFragment() {
         diaryShowViewModel.triggerAppMessageBufferListObserver()
     }
 
-    // 一つ前のフラグメントを表示
-    // MEMO:ツールバーの戻るボタンと端末の戻るボタンを区別している。
-    //      ツールバーの戻るボタン:アプリ内でのみ戻る
-    //      端末の戻るボタン:端末内で戻る(アプリ外から本アプリを起動した場合起動もとへ戻る)
     @MainThread
-    private fun backFragment(requestsNavigateUp: Boolean) {
+    private fun backFragment() {
         val navBackStackEntry = checkNotNull(navController.previousBackStackEntry)
         val destinationId = navBackStackEntry.destination.id
         if (destinationId == R.id.navigation_calendar_fragment) {
@@ -457,12 +446,7 @@ internal class DiaryShowFragment : BaseFragment() {
             val showedDiaryLocalDate = diaryShowViewModel.date.value
             savedStateHandle[KEY_SHOWED_DIARY_DATE] = showedDiaryLocalDate
         }
-
-        if (requestsNavigateUp) {
-            navController.navigateUp()
-        } else {
-            navController.popBackStack()
-        }
+        navController.navigateUp()
     }
 
     override fun destroyBinding() {
