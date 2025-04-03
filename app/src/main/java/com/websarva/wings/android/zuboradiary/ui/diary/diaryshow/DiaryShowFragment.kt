@@ -15,6 +15,7 @@ import androidx.activity.OnBackPressedCallback
 import androidx.annotation.MainThread
 import androidx.databinding.ViewDataBinding
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import com.websarva.wings.android.zuboradiary.R
 import com.websarva.wings.android.zuboradiary.data.AppMessage
@@ -91,6 +92,7 @@ internal class DiaryShowFragment : BaseFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        setUpPendingDialogObserver()
         setUpDiaryData()
         setUpToolBar()
         setUpWeatherLayout()
@@ -105,6 +107,7 @@ internal class DiaryShowFragment : BaseFragment() {
     }
 
     override fun handleOnReceivingDialogResult() {
+        receiveDiaryLoadingFailureDialogResult()
         receiveDiaryDeleteDialogResult()
     }
 
@@ -119,6 +122,16 @@ internal class DiaryShowFragment : BaseFragment() {
                     AppMessageBufferListObserver(diaryShowViewModel).onChanged(value)
                 }
         }
+    }
+
+    // 日記読込失敗確認ダイアログフラグメントからデータ受取
+    private fun receiveDiaryLoadingFailureDialogResult() {
+        val selectedButton =
+            receiveResulFromDialog<Int>(DiaryLoadingFailureDialogFragment.KEY_SELECTED_BUTTON)
+                ?: return
+        if (selectedButton != Dialog.BUTTON_POSITIVE) return
+
+        backFragment(true)
     }
 
     // 日記削除確認ダイアログフラグメントからデータ受取
@@ -147,13 +160,40 @@ internal class DiaryShowFragment : BaseFragment() {
         }
     }
 
+    private fun setUpPendingDialogObserver() {
+        addNavBackStackEntryLifecycleObserver { _, event: Lifecycle.Event ->
+            if (event == Lifecycle.Event.ON_RESUME) {
+                diaryShowViewModel.triggerPendingDialogListObserver()
+            }
+        }
+
+        launchAndRepeatOnViewLifeCycleStarted {
+            diaryShowViewModel.pendingDialogList
+                .collectLatest { value: PendingDialogList ->
+                    val pendingDialog = value.findFirstItem() ?: return@collectLatest
+                    val date = diaryShowViewModel.date.requireValue()
+                    withContext(Dispatchers.Main) {
+                        when (pendingDialog) {
+                            PendingDialog.DIARY_LOADING_FAILURE -> showDiaryLoadingFailureDialog(date)
+                        }
+                        diaryShowViewModel.removePendingDialogListFirstItem()
+                    }
+                }
+        }
+    }
+
     // 画面表示データ準備
     private fun setUpDiaryData() {
         diaryShowViewModel.initialize()
         val diaryDate = DiaryShowFragmentArgs.fromBundle(requireArguments()).date
 
         lifecycleScope.launch(Dispatchers.IO) {
-            diaryShowViewModel.loadSavedDiary(diaryDate)
+            val isSuccess = diaryShowViewModel.loadSavedDiary(diaryDate, true)
+            if (isSuccess) return@launch
+
+            withContext(Dispatchers.Main) {
+                showDiaryLoadingFailureDialog(diaryDate)
+            }
         }
     }
 
@@ -366,6 +406,19 @@ internal class DiaryShowFragment : BaseFragment() {
                     true,
                     date
                 )
+        navController.navigate(directions)
+    }
+
+    @MainThread
+    private fun showDiaryLoadingFailureDialog(date: LocalDate) {
+        if (isDialogShowing) {
+            diaryShowViewModel.addPendingDialogList(PendingDialog.DIARY_LOADING_FAILURE)
+            return
+        }
+
+        val directions =
+            DiaryShowFragmentDirections
+                .actionDiaryShowFragmentToDiaryLoadingFailureDialog(date)
         navController.navigate(directions)
     }
 

@@ -10,6 +10,7 @@ import com.websarva.wings.android.zuboradiary.ui.BaseViewModel
 import com.websarva.wings.android.zuboradiary.ui.requireValue
 import com.websarva.wings.android.zuboradiary.ui.diary.DiaryStateFlow
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import java.time.LocalDate
 import javax.inject.Inject
@@ -59,6 +60,12 @@ internal class DiaryShowViewModel @Inject constructor(private val diaryRepositor
     val log
         get() = diaryStateFlow.log.asStateFlow()
 
+    // 表示保留中Dialog
+    private val initialPendingDialogList = PendingDialogList()
+    private val _pendingDialogList = MutableStateFlow(initialPendingDialogList)
+    val pendingDialogList
+        get() = _pendingDialogList.asStateFlow()
+
     override fun initialize() {
         super.initialize()
         diaryStateFlow.initialize()
@@ -74,7 +81,7 @@ internal class DiaryShowViewModel @Inject constructor(private val diaryRepositor
         }
     }
 
-    suspend fun loadSavedDiary(date: LocalDate): Boolean {
+    suspend fun loadSavedDiary(date: LocalDate, ignoreAppMessage: Boolean = false): Boolean {
         val logMsg = "日記読込"
         Log.i(logTag, "${logMsg}_開始")
 
@@ -83,7 +90,9 @@ internal class DiaryShowViewModel @Inject constructor(private val diaryRepositor
             diaryStateFlow.update(diaryEntity)
         } catch (e: Exception) {
             Log.e(logTag, "${logMsg}_失敗", e)
-            addAppMessage(AppMessage.DIARY_LOADING_ERROR)
+            if (!ignoreAppMessage) {
+                addAppMessage(AppMessage.DIARY_LOADING_ERROR)
+            }
             return false
         }
 
@@ -117,5 +126,26 @@ internal class DiaryShowViewModel @Inject constructor(private val diaryRepositor
             addAppMessage(AppMessage.DIARY_LOADING_ERROR)
             return null
         }
+    }
+
+    // 表示保留中Dialog
+    fun addPendingDialogList(pendingDialog: PendingDialog) {
+        val currentList = _pendingDialogList.value
+        val updateList = currentList.add(pendingDialog)
+        _pendingDialogList.value = updateList
+    }
+
+    fun triggerPendingDialogListObserver() {
+        Log.d(logTag, "triggerAppMessageBufferListObserver()")
+        val currentList = _pendingDialogList.value
+        _pendingDialogList.value = PendingDialogList()
+        _pendingDialogList.value = currentList
+    }
+
+    fun removePendingDialogListFirstItem() {
+        Log.d(logTag, "removeAppMessageBufferListFirstItem()")
+        val currentList = _pendingDialogList.value
+        val updateList = currentList.removeFirstItem()
+        _pendingDialogList.value = updateList
     }
 }

@@ -269,6 +269,10 @@
             </action>
 
             <action
+                android:id="@+id/action_diary_show_fragment_to_diary_loading_failure_dialog"
+                app:destination="@id/navigation_diary_loading_failure_dialog_for_diary_show_fragment"/>
+
+            <action
                 android:id="@+id/action_diary_show_fragment_to_diary_delete_dialog"
                 app:destination="@id/navigation_diary_delete_dialog_for_diary_show_fragment"/>
 
@@ -281,6 +285,14 @@
             </action>
 
         </fragment>
+
+        <dialog
+            android:id="@+id/navigation_diary_loading_failure_dialog_for_diary_show_fragment"
+            android:name="com.websarva.wings.android.zuboradiary.ui.diary.diaryshow.DiaryLoadingFailureDialogFragment">
+            <argument
+                android:name="date"
+                app:argType="java.time.LocalDate" />
+        </dialog>
 
         <dialog
             android:id="@+id/navigation_diary_delete_dialog_for_diary_show_fragment"
@@ -340,6 +352,10 @@
                 app:destination="@id/navigation_diary_loading_dialog"/>
 
             <action
+                android:id="@+id/action_diary_edit_fragment_to_diary_loading_failure_dialog"
+                app:destination="@id/navigation_diary_loading_failure_dialog_for_diary_edit_fragment"/>
+
+            <action
                 android:id="@+id/action_diary_edit_fragment_to_diary_update_dialog"
                 app:destination="@id/navigation_diary_update_dialog"/>
 
@@ -376,6 +392,14 @@
         <dialog
             android:id="@+id/navigation_diary_loading_dialog"
             android:name="com.websarva.wings.android.zuboradiary.ui.diary.diaryedit.DiaryLoadingDialogFragment">
+            <argument
+                android:name="date"
+                app:argType="java.time.LocalDate" />
+        </dialog>
+
+        <dialog
+            android:id="@+id/navigation_diary_loading_failure_dialog_for_diary_edit_fragment"
+            android:name="com.websarva.wings.android.zuboradiary.ui.diary.diaryedit.DiaryLoadingFailureDialogFragment">
             <argument
                 android:name="date"
                 app:argType="java.time.LocalDate" />

@@ -11,6 +11,10 @@
     <string name="dialog_diary_delete_title">警告</string>
     <string name="dialog_diary_delete_message">の日記を削除してもよろしいでしょうか。</string>
 
+    <!-- DiaryLoadingFailureDialog -->
+    <string name="dialog_diary_loading_failure_title">警告</string>
+    <string name="dialog_diary_loading_failure_message">の日記の読込に失敗しました。</string>
+
     <!--*****************************************************************************************-->
 
 

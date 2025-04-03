@@ -1,5 +1,6 @@
 package com.websarva.wings.android.zuboradiary.ui.diary.diaryedit
 
+import android.app.Dialog
 import android.content.Context
 import android.content.DialogInterface
 import android.net.Uri
@@ -147,6 +148,7 @@ class DiaryEditFragment : BaseFragment() {
 
     override fun handleOnReceivingDialogResult() {
         receiveDiaryLoadingDialogResult()
+        receiveDiaryLoadingFailureDialogResult()
         receiveDiaryUpdateDialogResult()
         receiveDiaryDeleteDialogResult()
         receiveDatePickerDialogResult()
@@ -191,6 +193,16 @@ class DiaryEditFragment : BaseFragment() {
                 DateObserver().fetchWeatherInfo(date)
             }
         }
+    }
+
+    // 日記読込失敗確認ダイアログフラグメントから結果受取
+    private fun receiveDiaryLoadingFailureDialogResult() {
+        val selectedButton =
+            receiveResulFromDialog<Int>(DiaryLoadingFailureDialogFragment.KEY_SELECTED_BUTTON)
+                ?: return
+        if (selectedButton != Dialog.BUTTON_POSITIVE) return
+
+        navController.navigateUp()
     }
 
     // 既存日記上書きダイアログフラグメントから結果受取
@@ -328,6 +340,7 @@ class DiaryEditFragment : BaseFragment() {
                     withContext(Dispatchers.Main) {
                         when (pendingDialog) {
                             PendingDialog.DIARY_LOADING -> showDiaryLoadingDialog(date)
+                            PendingDialog.DIARY_LOADING_FAILURE -> showDiaryLoadingFailureDialog(date)
                             PendingDialog.WEATHER_INFO_FETCHING -> showWeatherInfoFetchingDialog(date)
                         }
                         diaryEditViewModel.removePendingDialogListFirstItem()
@@ -344,7 +357,13 @@ class DiaryEditFragment : BaseFragment() {
         val requiresDiaryLoading =
             DiaryEditFragmentArgs.fromBundle(requireArguments()).requiresDiaryLoading
         lifecycleScope.launch(Dispatchers.IO) {
-            diaryEditViewModel.prepareDiary(diaryDate, requiresDiaryLoading)
+            val isSuccess =
+                diaryEditViewModel.prepareDiary(diaryDate, requiresDiaryLoading, true)
+            if (isSuccess) return@launch
+
+            withContext(Dispatchers.Main) {
+                showDiaryLoadingFailureDialog(diaryDate)
+            }
         }
     }
 
@@ -1064,6 +1083,19 @@ class DiaryEditFragment : BaseFragment() {
         val directions =
             DiaryEditFragmentDirections
                 .actionDiaryEditFragmentToDiaryLoadingDialog(date)
+        navController.navigate(directions)
+    }
+
+    @MainThread
+    private fun showDiaryLoadingFailureDialog(date: LocalDate) {
+        if (isDialogShowing) {
+            diaryEditViewModel.addPendingDialogList(PendingDialog.DIARY_LOADING_FAILURE)
+            return
+        }
+
+        val directions =
+            DiaryEditFragmentDirections
+                .actionDiaryEditFragmentToDiaryLoadingFailureDialog(date)
         navController.navigate(directions)
     }
 

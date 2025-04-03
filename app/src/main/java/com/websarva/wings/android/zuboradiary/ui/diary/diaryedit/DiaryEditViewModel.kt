@@ -195,7 +195,11 @@ internal class DiaryEditViewModel @Inject constructor(
         shouldInitializeOnFragmentDestroy = initialShouldInitializeOnFragmentDestroy
     }
 
-    suspend fun prepareDiary(date: LocalDate, shouldLoadDiary: Boolean): Boolean {
+    suspend fun prepareDiary(
+        date: LocalDate,
+        shouldLoadDiary: Boolean,
+        ignoreAppMessage: Boolean = false
+    ): Boolean {
         val logMsg = "日記読込"
         Log.i(logTag, "${logMsg}_開始")
         _isVisibleUpdateProgressBar.value = true
@@ -205,7 +209,7 @@ internal class DiaryEditViewModel @Inject constructor(
                 if (!result) updateDate(date)
             } catch (e: Exception) {
                 Log.e(logTag, "${logMsg}_失敗", e)
-                addAppMessage(AppMessage.DIARY_LOADING_ERROR)
+                if (!ignoreAppMessage) addAppMessage(AppMessage.DIARY_LOADING_ERROR)
                 updateDate(date)
                 _isVisibleUpdateProgressBar.value = false
                 return false
