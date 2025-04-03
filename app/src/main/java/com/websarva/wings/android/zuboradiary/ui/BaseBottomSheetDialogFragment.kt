@@ -1,5 +1,6 @@
 package com.websarva.wings.android.zuboradiary.ui
 
+import android.app.Dialog
 import android.content.DialogInterface
 import android.os.Bundle
 import android.util.Log
@@ -8,6 +9,8 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.NavHostFragment
+import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor
 import com.websarva.wings.android.zuboradiary.getLogTag
@@ -25,6 +28,14 @@ abstract class BaseBottomSheetDialogFragment : BottomSheetDialogFragment() {
 
     protected val themeColor
         get() = settingsViewModel.themeColor.requireValue()
+
+    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+        val dialog = super.onCreateDialog(savedInstanceState) as BottomSheetDialog
+        return dialog.apply {
+            // MEMO:表示するLayoutによっては折り畳み状態で表示される為、固定で展開状態で表示する。
+            behavior.state = BottomSheetBehavior.STATE_EXPANDED
+        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
