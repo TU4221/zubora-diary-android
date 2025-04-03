@@ -71,16 +71,6 @@ internal class DiaryShowViewModel @Inject constructor(private val diaryRepositor
         diaryStateFlow.initialize()
     }
 
-    suspend fun existsSavedDiary(date: LocalDate): Boolean? {
-        try {
-            return diaryRepository.existsDiary(date)
-        } catch (e: Exception) {
-            Log.e(logTag, "日記既存確認_失敗", e)
-            addAppMessage(AppMessage.DIARY_INFO_LOADING_ERROR)
-            return null
-        }
-    }
-
     suspend fun loadSavedDiary(date: LocalDate, ignoreAppMessage: Boolean = false): Boolean {
         val logMsg = "日記読込"
         Log.i(logTag, "${logMsg}_開始")
