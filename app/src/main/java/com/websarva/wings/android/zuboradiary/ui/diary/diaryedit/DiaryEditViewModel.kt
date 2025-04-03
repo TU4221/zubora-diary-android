@@ -206,11 +206,10 @@ internal class DiaryEditViewModel @Inject constructor(
         if (shouldLoadDiary) {
             try {
                 val isSuccessful = loadSavedDiary(date)
-                if (!isSuccessful) updateDate(date)
+                if (!isSuccessful) throw Exception()
             } catch (e: Exception) {
                 Log.e(logTag, "${logMsg}_失敗", e)
                 if (!ignoreAppMessage) addAppMessage(AppMessage.DIARY_LOADING_ERROR)
-                updateDate(date)
                 _isVisibleUpdateProgressBar.value = false
                 return false
             }
