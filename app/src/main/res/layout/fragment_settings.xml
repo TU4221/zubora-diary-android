@@ -213,7 +213,7 @@
                         android:orientation="vertical">
 
                         <com.google.android.material.divider.MaterialDivider
-                            android:id="@+id/material_divider_section_app"
+                            android:id="@+id/material_divider_section_other"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content" />
 

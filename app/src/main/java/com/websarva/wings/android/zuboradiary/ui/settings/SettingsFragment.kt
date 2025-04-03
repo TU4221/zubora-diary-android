@@ -357,6 +357,7 @@ class SettingsFragment : BaseFragment() {
                     materialDividerAllDiariesDeleteSetting,
                     materialDividerAllSettingsInitializationSetting,
                     materialDividerAllDataDeleteSetting,
+                    materialDividerSectionOther,
                     materialDividerOpenSourceLicensesSetting,
                     materialDividerSectionEnd
                 )
