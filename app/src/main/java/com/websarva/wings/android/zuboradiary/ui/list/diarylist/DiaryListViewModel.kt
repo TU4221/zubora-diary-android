@@ -6,7 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.websarva.wings.android.zuboradiary.data.AppMessage
 import com.websarva.wings.android.zuboradiary.data.database.DiaryListItem
 import com.websarva.wings.android.zuboradiary.data.database.DiaryRepository
-import com.websarva.wings.android.zuboradiary.getLogTag
+import com.websarva.wings.android.zuboradiary.createLogTag
 import com.websarva.wings.android.zuboradiary.ui.BaseViewModel
 import com.websarva.wings.android.zuboradiary.ui.requireValue
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -30,7 +30,7 @@ internal class DiaryListViewModel @Inject constructor(private val diaryRepositor
         const val NUM_LOADING_ITEMS: Int = 10 //初期読込時の対象リストが画面全体に表示される値にすること。 // TODO:仮数値の為、最後に設定
     }
 
-    private val logTag = getLogTag()
+    private val logTag = createLogTag()
 
     private val initialDiaryListLoadingJob: Job? = null
     private var diaryListLoadingJob: Job? = initialDiaryListLoadingJob // キャンセル用

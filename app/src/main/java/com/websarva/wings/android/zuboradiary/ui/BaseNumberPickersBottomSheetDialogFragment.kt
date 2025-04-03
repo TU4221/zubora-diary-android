@@ -8,11 +8,11 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.view.ContextThemeWrapper
 import com.websarva.wings.android.zuboradiary.databinding.DialogFragmentNumberPickersBinding
-import com.websarva.wings.android.zuboradiary.getLogTag
+import com.websarva.wings.android.zuboradiary.createLogTag
 
 abstract class BaseNumberPickersBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
 
-    private val logTag = getLogTag()
+    private val logTag = createLogTag()
 
     // View関係
     private var _binding: DialogFragmentNumberPickersBinding? = null

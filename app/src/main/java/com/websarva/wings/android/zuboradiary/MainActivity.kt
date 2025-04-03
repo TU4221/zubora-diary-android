@@ -52,7 +52,7 @@ import kotlinx.coroutines.launch
 @AndroidEntryPoint
 class MainActivity : CustomActivity() {
 
-    private val logTag = getLogTag()
+    private val logTag = createLogTag()
 
     private var _binding: ActivityMainBinding? = null
     private val binding get() = checkNotNull(_binding)

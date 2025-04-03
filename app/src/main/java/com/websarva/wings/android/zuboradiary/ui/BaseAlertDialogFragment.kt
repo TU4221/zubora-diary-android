@@ -9,12 +9,12 @@ import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.NavHostFragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.websarva.wings.android.zuboradiary.R
-import com.websarva.wings.android.zuboradiary.getLogTag
+import com.websarva.wings.android.zuboradiary.createLogTag
 import com.websarva.wings.android.zuboradiary.ui.settings.SettingsViewModel
 
 abstract class BaseAlertDialogFragment : DialogFragment() {
     
-    private val logTag = getLogTag()
+    private val logTag = createLogTag()
 
     // MEMO:委譲プロパティの委譲先(viewModels())の遅延初期化により"Field is never assigned."と警告が表示される。
     //      委譲プロパティによるViewModel生成は公式が推奨する方法の為、警告を無視する。その為、@Suppressを付与する。

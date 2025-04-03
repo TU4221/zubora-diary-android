@@ -3,7 +3,7 @@ package com.websarva.wings.android.zuboradiary.ui.calendar
 import android.util.Log
 import com.websarva.wings.android.zuboradiary.data.AppMessage
 import com.websarva.wings.android.zuboradiary.data.database.DiaryRepository
-import com.websarva.wings.android.zuboradiary.getLogTag
+import com.websarva.wings.android.zuboradiary.createLogTag
 import com.websarva.wings.android.zuboradiary.ui.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -16,7 +16,7 @@ internal class CalendarViewModel @Inject constructor(
     private val diaryRepository: DiaryRepository
 ) : BaseViewModel() {
 
-    private val logTag = getLogTag()
+    private val logTag = createLogTag()
 
     private val initialSelectedDate = LocalDate.now()
     private val _selectedDate = MutableStateFlow<LocalDate>(initialSelectedDate)

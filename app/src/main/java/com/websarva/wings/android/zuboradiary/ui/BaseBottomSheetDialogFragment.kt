@@ -13,12 +13,12 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor
-import com.websarva.wings.android.zuboradiary.getLogTag
+import com.websarva.wings.android.zuboradiary.createLogTag
 import com.websarva.wings.android.zuboradiary.ui.settings.SettingsViewModel
 
 abstract class BaseBottomSheetDialogFragment : BottomSheetDialogFragment() {
 
-    private val logTag = getLogTag()
+    private val logTag = createLogTag()
 
     // MEMO:委譲プロパティの委譲先(viewModels())の遅延初期化により"Field is never assigned."と警告が表示される。
     //      委譲プロパティによるViewModel生成は公式が推奨する方法の為、警告を無視する。その為、@Suppressを付与する。

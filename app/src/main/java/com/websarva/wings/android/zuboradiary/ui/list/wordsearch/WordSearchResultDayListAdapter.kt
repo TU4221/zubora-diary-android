@@ -9,7 +9,7 @@ import com.websarva.wings.android.zuboradiary.R
 import com.websarva.wings.android.zuboradiary.data.DayOfWeekStringConverter
 import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor
 import com.websarva.wings.android.zuboradiary.databinding.RowWordSearchResultListBinding
-import com.websarva.wings.android.zuboradiary.getLogTag
+import com.websarva.wings.android.zuboradiary.createLogTag
 import com.websarva.wings.android.zuboradiary.ui.list.DiaryDayListBaseAdapter
 import com.websarva.wings.android.zuboradiary.ui.list.DiaryDayListBaseItem
 import java.text.NumberFormat
@@ -81,7 +81,7 @@ internal class WordSearchResultDayListAdapter(
 
     private class DiffUtilItemCallback : DiaryDayListBaseAdapter.DiffUtilItemCallback() {
 
-        private val logTag = getLogTag()
+        private val logTag = createLogTag()
 
         override fun areContentsTheSame(
             oldItem: DiaryDayListBaseItem,

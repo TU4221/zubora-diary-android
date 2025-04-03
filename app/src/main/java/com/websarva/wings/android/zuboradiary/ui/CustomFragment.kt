@@ -6,11 +6,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import com.websarva.wings.android.zuboradiary.getLogTag
+import com.websarva.wings.android.zuboradiary.createLogTag
 
 abstract class CustomFragment : Fragment() {
 
-    private val logTag = getLogTag()
+    private val logTag = createLogTag()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         Log.d(logTag, "onCreate()")

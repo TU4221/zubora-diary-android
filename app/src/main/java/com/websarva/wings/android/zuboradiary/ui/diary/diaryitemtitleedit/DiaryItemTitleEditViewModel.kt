@@ -5,7 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.websarva.wings.android.zuboradiary.data.AppMessage
 import com.websarva.wings.android.zuboradiary.data.database.DiaryItemTitleSelectionHistoryRepository
 import com.websarva.wings.android.zuboradiary.data.diary.ItemNumber
-import com.websarva.wings.android.zuboradiary.getLogTag
+import com.websarva.wings.android.zuboradiary.createLogTag
 import com.websarva.wings.android.zuboradiary.ui.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -22,7 +22,7 @@ internal class DiaryItemTitleEditViewModel @Inject constructor(
     private val diaryItemTitleSelectionHistoryRepository: DiaryItemTitleSelectionHistoryRepository
 ) : BaseViewModel() {
 
-    private val logTag = getLogTag()
+    private val logTag = createLogTag()
 
     private val maxLoadedItemTitles = 50
 

@@ -7,14 +7,14 @@ import android.view.MotionEvent
 import android.view.View
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
-import com.websarva.wings.android.zuboradiary.getLogTag
+import com.websarva.wings.android.zuboradiary.createLogTag
 import kotlin.math.max
 import kotlin.math.min
 
 internal open class LeftSwipeBackgroundButtonSimpleCallback(recyclerView: RecyclerView) :
     LeftSwipeSimpleCallback(recyclerView) {
 
-    private val logTag = getLogTag()
+    private val logTag = createLogTag()
 
     private var swipingOffset: Float = 0f
 

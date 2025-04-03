@@ -8,7 +8,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.websarva.wings.android.zuboradiary.data.DayOfWeekStringConverter
 import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor
 import com.websarva.wings.android.zuboradiary.databinding.RowDiaryDayListBinding
-import com.websarva.wings.android.zuboradiary.getLogTag
+import com.websarva.wings.android.zuboradiary.createLogTag
 import com.websarva.wings.android.zuboradiary.ui.DiaryPictureManager
 import com.websarva.wings.android.zuboradiary.ui.LeftSwipeSimpleCallback.LeftSwipeViewHolder
 import com.websarva.wings.android.zuboradiary.ui.list.DiaryDayListBaseAdapter
@@ -99,7 +99,7 @@ internal class DiaryDayListAdapter(context: Context, recyclerView: RecyclerView,
 
     private class DiffUtilItemCallback : DiaryDayListBaseAdapter.DiffUtilItemCallback() {
 
-        val logTag = getLogTag()
+        val logTag = createLogTag()
 
         override fun areContentsTheSame(
             oldItem: DiaryDayListBaseItem,

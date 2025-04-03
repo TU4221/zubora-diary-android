@@ -5,11 +5,11 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.util.Log
-import com.websarva.wings.android.zuboradiary.getLogTag
+import com.websarva.wings.android.zuboradiary.createLogTag
 
 internal abstract class UriPermissionManager(context: Context) {
 
-    private val logTag = getLogTag()
+    private val logTag = createLogTag()
 
     private val resolver: ContentResolver = context.contentResolver
 

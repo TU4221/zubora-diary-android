@@ -9,7 +9,7 @@ import com.websarva.wings.android.zuboradiary.data.diary.ItemNumber
 import com.websarva.wings.android.zuboradiary.data.diary.Weather
 import com.websarva.wings.android.zuboradiary.data.network.GeoCoordinates
 import com.websarva.wings.android.zuboradiary.data.network.WeatherApiRepository
-import com.websarva.wings.android.zuboradiary.getLogTag
+import com.websarva.wings.android.zuboradiary.createLogTag
 import com.websarva.wings.android.zuboradiary.ui.BaseViewModel
 import com.websarva.wings.android.zuboradiary.ui.requireValue
 import com.websarva.wings.android.zuboradiary.ui.diary.DiaryStateFlow
@@ -27,7 +27,7 @@ internal class DiaryEditViewModel @Inject constructor(
     private val weatherApiRepository: WeatherApiRepository
 ) : BaseViewModel() {
 
-    private val logTag = getLogTag()
+    private val logTag = createLogTag()
 
     // 日記データ関係
     private val initialPreviousDate: LocalDate? = null

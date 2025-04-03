@@ -4,7 +4,7 @@ import android.content.Context
 import android.util.Log
 import androidx.recyclerview.widget.RecyclerView
 import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor
-import com.websarva.wings.android.zuboradiary.getLogTag
+import com.websarva.wings.android.zuboradiary.createLogTag
 import com.websarva.wings.android.zuboradiary.ui.list.DiaryDayListBaseAdapter
 import com.websarva.wings.android.zuboradiary.ui.list.DiaryDayListBaseItem
 import com.websarva.wings.android.zuboradiary.ui.list.DiaryYearMonthListBaseAdapter
@@ -53,7 +53,7 @@ internal abstract class DiaryYearMonthListAdapter(
 
     private class DiffUtilItemCallback : DiaryYearMonthListBaseAdapter.DiffUtilItemCallback() {
 
-        private val logTag = getLogTag()
+        private val logTag = createLogTag()
 
             override fun areContentsTheSame(
                 oldItem: DiaryYearMonthListBaseItem,

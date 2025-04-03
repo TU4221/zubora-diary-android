@@ -5,7 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.websarva.wings.android.zuboradiary.data.AppMessage
 import com.websarva.wings.android.zuboradiary.data.database.DiaryRepository
 import com.websarva.wings.android.zuboradiary.data.database.WordSearchResultListItem
-import com.websarva.wings.android.zuboradiary.getLogTag
+import com.websarva.wings.android.zuboradiary.createLogTag
 import com.websarva.wings.android.zuboradiary.ui.BaseViewModel
 import com.websarva.wings.android.zuboradiary.ui.requireValue
 import com.websarva.wings.android.zuboradiary.ui.list.diarylist.DiaryListViewModel
@@ -24,7 +24,7 @@ internal class WordSearchViewModel @Inject internal constructor(
     private val diaryRepository: DiaryRepository
 ) : BaseViewModel() {
 
-    private val logTag = getLogTag()
+    private val logTag = createLogTag()
 
     private val initialSearchWord = ""
     private val _searchWord = MutableStateFlow(initialSearchWord)

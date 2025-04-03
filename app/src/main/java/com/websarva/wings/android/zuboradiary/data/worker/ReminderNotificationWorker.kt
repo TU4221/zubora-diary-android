@@ -18,7 +18,7 @@ import androidx.work.WorkerParameters
 import com.websarva.wings.android.zuboradiary.CustomApplication
 import com.websarva.wings.android.zuboradiary.R
 import com.websarva.wings.android.zuboradiary.data.database.DiaryRepository
-import com.websarva.wings.android.zuboradiary.getLogTag
+import com.websarva.wings.android.zuboradiary.createLogTag
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import java.time.LocalDate
@@ -30,7 +30,7 @@ internal class ReminderNotificationWorker @AssistedInject constructor(
     private val diaryRepository: DiaryRepository
 ) : CoroutineWorker(context, workerParams) {
 
-    private val logTag = getLogTag()
+    private val logTag = createLogTag()
 
     private val channelId: String = context.getString(R.string.reminder_notification_worker_channel_id)
     private val channelName: String = context.getString(R.string.reminder_notification_worker_channel_name)

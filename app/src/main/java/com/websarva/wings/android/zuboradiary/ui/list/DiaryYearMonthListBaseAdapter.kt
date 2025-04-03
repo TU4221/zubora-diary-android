@@ -16,7 +16,7 @@ import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor
 import com.websarva.wings.android.zuboradiary.databinding.RowDiaryYearMonthListBinding
 import com.websarva.wings.android.zuboradiary.databinding.RowNoDiaryMessageBinding
 import com.websarva.wings.android.zuboradiary.databinding.RowProgressBarBinding
-import com.websarva.wings.android.zuboradiary.getLogTag
+import com.websarva.wings.android.zuboradiary.createLogTag
 import com.websarva.wings.android.zuboradiary.ui.ThemeColorInflaterCreator
 
 // DiaryFragment、WordSearchFragmentの親RecyclerViewのListAdapter。
@@ -28,7 +28,7 @@ internal abstract class DiaryYearMonthListBaseAdapter protected constructor(
     diffUtilItemCallback: DiffUtilItemCallback
 ) : ListAdapter<DiaryYearMonthListBaseItem, RecyclerView.ViewHolder>(diffUtilItemCallback) {
 
-    private val logTag = getLogTag()
+    private val logTag = createLogTag()
 
     fun interface OnClickChildItemListener {
         fun onClick(item: DiaryDayListBaseItem)
@@ -152,7 +152,7 @@ internal abstract class DiaryYearMonthListBaseAdapter protected constructor(
     protected abstract class DiffUtilItemCallback
         : DiffUtil.ItemCallback<DiaryYearMonthListBaseItem>() {
 
-            private val logTag = getLogTag()
+            private val logTag = createLogTag()
 
             override fun areItemsTheSame(
                 oldItem: DiaryYearMonthListBaseItem,

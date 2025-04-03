@@ -8,7 +8,7 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.emptyPreferences
 import androidx.datastore.preferences.preferencesDataStore
-import com.websarva.wings.android.zuboradiary.getLogTag
+import com.websarva.wings.android.zuboradiary.createLogTag
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
@@ -21,7 +21,7 @@ val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "se
 
 class UserPreferences @Inject constructor(private val context: Context) {
 
-    private val logTag = getLogTag()
+    private val logTag = createLogTag()
 
     @Throws(Throwable::class)
     private fun Flow<Preferences>.setUpIOExceptionHandling(): Flow<Preferences> {

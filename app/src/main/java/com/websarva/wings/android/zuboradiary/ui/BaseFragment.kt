@@ -22,7 +22,7 @@ import com.google.android.material.transition.platform.MaterialSharedAxis
 import com.websarva.wings.android.zuboradiary.MainActivity
 import com.websarva.wings.android.zuboradiary.data.AppMessage
 import com.websarva.wings.android.zuboradiary.data.AppMessageList
-import com.websarva.wings.android.zuboradiary.getLogTag
+import com.websarva.wings.android.zuboradiary.createLogTag
 import com.websarva.wings.android.zuboradiary.ui.settings.SettingsViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -34,7 +34,7 @@ import kotlinx.coroutines.withContext
 
 abstract class BaseFragment : CustomFragment() {
 
-    private val logTag = getLogTag()
+    private val logTag = createLogTag()
 
     protected val mainActivity
         get() = requireActivity() as MainActivity

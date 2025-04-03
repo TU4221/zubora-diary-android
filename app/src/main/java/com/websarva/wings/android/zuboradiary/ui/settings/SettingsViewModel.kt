@@ -14,7 +14,7 @@ import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColorPrefere
 import com.websarva.wings.android.zuboradiary.data.preferences.UserPreferencesRepository
 import com.websarva.wings.android.zuboradiary.data.preferences.WeatherInfoAcquisitionPreference
 import com.websarva.wings.android.zuboradiary.data.worker.WorkerRepository
-import com.websarva.wings.android.zuboradiary.getLogTag
+import com.websarva.wings.android.zuboradiary.createLogTag
 import com.websarva.wings.android.zuboradiary.ui.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -36,7 +36,7 @@ class SettingsViewModel @Inject constructor(
     private val diaryRepository: DiaryRepository
 ) : BaseViewModel() {
 
-    private val logTag = getLogTag()
+    private val logTag = createLogTag()
 
     // MEMO:StateFlow型設定値変数の値ははPreferencesDatastoreの値のみを代入したいので、
     //      代入されるまでの間(初回設定値読込中)はnullとする。

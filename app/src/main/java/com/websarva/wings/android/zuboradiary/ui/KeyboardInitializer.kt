@@ -5,11 +5,11 @@ import android.content.Context
 import android.util.Log
 import android.view.View
 import android.view.inputmethod.InputMethodManager
-import com.websarva.wings.android.zuboradiary.getLogTag
+import com.websarva.wings.android.zuboradiary.createLogTag
 
 internal class KeyboardInitializer(activity: Activity) {
 
-    private val logTag = getLogTag()
+    private val logTag = createLogTag()
 
     private val inputMethodManager: InputMethodManager =
         activity.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager

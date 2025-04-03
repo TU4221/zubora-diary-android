@@ -6,12 +6,12 @@ import android.util.Log
 import android.widget.ImageView
 import androidx.core.content.ContextCompat
 import com.websarva.wings.android.zuboradiary.R
-import com.websarva.wings.android.zuboradiary.getLogTag
+import com.websarva.wings.android.zuboradiary.createLogTag
 
 internal class DiaryPictureManager(
     private val context: Context, private val imageView: ImageView, private val iconColor: Int) {
 
-    private val logTag = getLogTag()
+    private val logTag = createLogTag()
 
     fun setUpPictureOnDiary(uri: Uri?) {
         if (uri == null) {

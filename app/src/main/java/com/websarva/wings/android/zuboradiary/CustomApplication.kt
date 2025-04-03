@@ -14,7 +14,7 @@ import javax.inject.Inject
 @HiltAndroidApp
 open class CustomApplication : Application(), DefaultLifecycleObserver, Configuration.Provider {
 
-    private val logTag = getLogTag()
+    private val logTag = createLogTag()
 
     @Inject
     lateinit var workerFactory: HiltWorkerFactory

@@ -6,7 +6,7 @@ import androidx.appcompat.app.AppCompatActivity
 
 open class CustomActivity : AppCompatActivity() {
 
-    private val logTag = getLogTag()
+    private val logTag = createLogTag()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         Log.d(logTag, "onCreate()")

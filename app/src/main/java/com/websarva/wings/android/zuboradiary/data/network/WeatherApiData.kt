@@ -3,7 +3,7 @@ package com.websarva.wings.android.zuboradiary.data.network
 import android.util.Log
 import com.squareup.moshi.Json
 import com.websarva.wings.android.zuboradiary.data.diary.Weather
-import com.websarva.wings.android.zuboradiary.getLogTag
+import com.websarva.wings.android.zuboradiary.createLogTag
 
 // MEMO:@Suppress("unused")が不要と警告が発生したので削除したが、"unused"警告が再発する。
 //      その為、@Suppress("RedundantSuppression")で警告回避。
@@ -16,7 +16,7 @@ internal data class WeatherApiData @Suppress("unused") constructor(
     private val daily: WeatherApiResponseDairy
 ) {
 
-    private val logTag = getLogTag()
+    private val logTag = createLogTag()
 
     fun toWeatherInfo(): Weather {
         // GeoCoordinatesのコンストラクタを使用してlatitude、longitudeの値チェック

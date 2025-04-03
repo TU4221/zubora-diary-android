@@ -4,13 +4,13 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import com.websarva.wings.android.zuboradiary.data.AppMessage
 import com.websarva.wings.android.zuboradiary.data.AppMessageList
-import com.websarva.wings.android.zuboradiary.getLogTag
+import com.websarva.wings.android.zuboradiary.createLogTag
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
 abstract class BaseViewModel : ViewModel() {
 
-    private val logTag = getLogTag()
+    private val logTag = createLogTag()
 
     // MEMO:ViewModelのスコープ範囲がActivityの時に各プロパティを初期化できるように抽象メソッドinitialize()を用意しているが、
     //      appMessageBufferListに関しては主にエラー表示となるため、ViewModelの初期化時のみの初期化する。

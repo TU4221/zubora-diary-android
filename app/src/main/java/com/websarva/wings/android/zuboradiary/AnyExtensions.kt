@@ -1,5 +1,5 @@
 package com.websarva.wings.android.zuboradiary
 
-fun Any.getLogTag(): String {
+fun Any.createLogTag(): String {
     return this.javaClass.simpleName
 }

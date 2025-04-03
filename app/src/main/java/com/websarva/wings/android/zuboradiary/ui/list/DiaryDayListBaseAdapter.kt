@@ -8,7 +8,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor
-import com.websarva.wings.android.zuboradiary.getLogTag
+import com.websarva.wings.android.zuboradiary.createLogTag
 import com.websarva.wings.android.zuboradiary.ui.ThemeColorInflaterCreator
 
 internal abstract class DiaryDayListBaseAdapter protected constructor(
@@ -66,7 +66,7 @@ internal abstract class DiaryDayListBaseAdapter protected constructor(
 
     protected abstract class DiffUtilItemCallback : DiffUtil.ItemCallback<DiaryDayListBaseItem>() {
 
-        private val logTag = getLogTag()
+        private val logTag = createLogTag()
 
         override fun areItemsTheSame(
             oldItem: DiaryDayListBaseItem,

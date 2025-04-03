@@ -5,7 +5,7 @@ import android.util.Log
 import com.websarva.wings.android.zuboradiary.data.AppMessage
 import com.websarva.wings.android.zuboradiary.data.database.DiaryRepository
 import com.websarva.wings.android.zuboradiary.data.diary.ItemNumber
-import com.websarva.wings.android.zuboradiary.getLogTag
+import com.websarva.wings.android.zuboradiary.createLogTag
 import com.websarva.wings.android.zuboradiary.ui.BaseViewModel
 import com.websarva.wings.android.zuboradiary.ui.requireValue
 import com.websarva.wings.android.zuboradiary.ui.diary.DiaryStateFlow
@@ -18,7 +18,7 @@ import javax.inject.Inject
 internal class DiaryShowViewModel @Inject constructor(private val diaryRepository: DiaryRepository) :
     BaseViewModel() {
 
-    private val logTag = getLogTag()
+    private val logTag = createLogTag()
 
     // 日記データ関係
     private val diaryStateFlow = DiaryStateFlow()

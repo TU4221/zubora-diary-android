@@ -33,7 +33,7 @@ import com.websarva.wings.android.zuboradiary.data.diary.Condition
 import com.websarva.wings.android.zuboradiary.data.diary.ItemNumber
 import com.websarva.wings.android.zuboradiary.data.diary.Weather
 import com.websarva.wings.android.zuboradiary.databinding.FragmentDiaryEditBinding
-import com.websarva.wings.android.zuboradiary.getLogTag
+import com.websarva.wings.android.zuboradiary.createLogTag
 import com.websarva.wings.android.zuboradiary.ui.BaseFragment
 import com.websarva.wings.android.zuboradiary.ui.DiaryPictureManager
 import com.websarva.wings.android.zuboradiary.ui.TestDiariesSaver
@@ -54,7 +54,7 @@ import java.util.Arrays
 @AndroidEntryPoint
 class DiaryEditFragment : BaseFragment() {
 
-    private val logTag = getLogTag()
+    private val logTag = createLogTag()
 
     // View関係
     private var _binding: FragmentDiaryEditBinding? = null

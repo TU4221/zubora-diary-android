@@ -10,12 +10,12 @@ import androidx.interpolator.view.animation.FastOutSlowInInterpolator
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewbinding.ViewBinding
-import com.websarva.wings.android.zuboradiary.getLogTag
+import com.websarva.wings.android.zuboradiary.createLogTag
 
 internal open class LeftSwipeSimpleCallback(protected val recyclerView: RecyclerView) :
     ItemTouchHelper.SimpleCallback(ItemTouchHelper.ACTION_STATE_IDLE, ItemTouchHelper.LEFT) {
 
-    private val logTag = getLogTag()
+    private val logTag = createLogTag()
 
     abstract class LeftSwipeViewHolder(binding: ViewBinding)
         : RecyclerView.ViewHolder(binding.root) {

@@ -2,7 +2,7 @@ package com.websarva.wings.android.zuboradiary.data.database
 
 import android.net.Uri
 import android.util.Log
-import com.websarva.wings.android.zuboradiary.getLogTag
+import com.websarva.wings.android.zuboradiary.createLogTag
 import java.time.LocalDate
 
 
@@ -11,7 +11,7 @@ class DiaryRepository (
     private val diaryDAO: DiaryDAO,
 ) {
 
-    private val logTag = getLogTag()
+    private val logTag = createLogTag()
 
     suspend fun countDiaries(): Int {
         return diaryDAO.countDiaries()
