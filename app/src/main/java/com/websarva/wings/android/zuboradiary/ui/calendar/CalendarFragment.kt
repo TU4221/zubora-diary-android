@@ -520,8 +520,14 @@ class CalendarFragment : BaseFragment() {
 
     private fun setUpFloatActionButton() {
         binding.floatingActionButtonDiaryEdit.setOnClickListener {
-            val selectedDate = calendarViewModel.selectedDate.value
-            showDiaryEditFragment(selectedDate)
+            lifecycleScope.launch(Dispatchers.IO) {
+                val selectedDate = calendarViewModel.selectedDate.value
+                val requiresDiaryLoading =
+                    calendarViewModel.existsSavedDiary(selectedDate) ?: return@launch
+                withContext(Dispatchers.Main) {
+                    showDiaryEditFragment(selectedDate, requiresDiaryLoading)
+                }
+            }
         }
     }
 
@@ -546,14 +552,14 @@ class CalendarFragment : BaseFragment() {
     }
 
     @MainThread
-    private fun showDiaryEditFragment(date: LocalDate) {
+    private fun showDiaryEditFragment(date: LocalDate, requiresDiaryLoading: Boolean) {
         if (isDialogShowing) return
 
         val directions =
             CalendarFragmentDirections
                 .actionNavigationCalendarFragmentToDiaryEditFragment(
                     true,
-                    true,
+                    requiresDiaryLoading,
                     date
                 )
         navController.navigate(directions)
