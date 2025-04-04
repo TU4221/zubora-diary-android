@@ -3,7 +3,6 @@ package com.websarva.wings.android.zuboradiary.ui.list.wordsearch
 import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
-import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.MainThread
@@ -180,12 +179,6 @@ class WordSearchFragment : BaseFragment() {
         }
 
         navController.addOnDestinationChangedListener(WordSearchResultListUpdateSetupListener())
-
-        binding.includeProgressIndicator.viewBackground
-            .setOnTouchListener { v: View, _: MotionEvent ->
-                v.performClick()
-                true
-            }
     }
 
     private inner class WordSearchResultListAdapter(

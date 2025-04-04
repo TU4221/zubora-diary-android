@@ -15,12 +15,13 @@
         android:visibility="@{isVisibleStateFlow ? View.VISIBLE : View.INVISIBLE}"
         tools:visibility="visible">
 
-        <View
+        <com.websarva.wings.android.zuboradiary.ui.ProgressIndicatorBackgroundView
             android:id="@+id/view_background"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:background="?attr/colorSecondaryContainer"
-            android:alpha="0.5"/>
+            android:alpha="0.5"
+            android:focusableInTouchMode="false"/>
 
         <com.google.android.material.progressindicator.CircularProgressIndicator
             style="@style/AppMediumCircularProgressIndicatorStyle"

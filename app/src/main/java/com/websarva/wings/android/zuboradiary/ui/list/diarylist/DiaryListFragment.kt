@@ -5,7 +5,6 @@ import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.MenuItem
-import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.MainThread
@@ -213,13 +212,6 @@ class DiaryListFragment : BaseFragment() {
                     diaryListAdapter.setSwipeEnabled(!value)
                 }
         }
-
-        // 画面全体ProgressBar表示中はタッチ無効化
-        binding.includeProgressIndicator.viewBackground
-            .setOnTouchListener { v: View, _: MotionEvent ->
-                v.performClick()
-                true
-            }
 
         lifecycleScope.launch(Dispatchers.IO) {
             diaryListViewModel.loadDiaryListOnSetUp()
