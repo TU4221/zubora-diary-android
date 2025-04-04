@@ -735,10 +735,7 @@ class DiaryEditFragment : BaseFragment() {
             Log.d(logTag, "onTransitionCompleted()_itemNumber = $itemNumber")
 
             // 対象項目追加削除後のスクロール処理
-            if (!diaryEditViewModel.shouldJumpItemMotionLayout) {
-                scrollOnTransition()
-            }
-            diaryEditViewModel.shouldJumpItemMotionLayout = false
+            if (!diaryEditViewModel.shouldJumpItemMotionLayout) scrollOnTransition()
 
             // 対象項目欄削除後の処理
             var completedStateLogMsg = "UnknownState"
@@ -753,6 +750,8 @@ class DiaryEditFragment : BaseFragment() {
             Log.d(logTag, "onTransitionCompleted()_CompletedState = $completedStateLogMsg")
 
             initializeProperty()
+
+            if (isMotionLayoutNormalState()) diaryEditViewModel.clearShouldJumpItemMotionLayout()
         }
 
         private fun scrollOnTransition() {
@@ -829,7 +828,6 @@ class DiaryEditFragment : BaseFragment() {
             require(!(numItems < ItemNumber.MIN_NUMBER || numItems > ItemNumber.MAX_NUMBER))
 
             // MEMO:削除処理はObserverで適切なモーション削除処理を行うのは難しいのでここでは処理せず、削除ダイアログから処理する。
-            //
             if (!diaryEditViewModel.shouldJumpItemMotionLayout) {
                 val numShowedItems = countShowedItems()
                 val differenceValue = numItems - numShowedItems
@@ -889,6 +887,24 @@ class DiaryEditFragment : BaseFragment() {
             numShowedItems++
         }
         return numShowedItems
+    }
+
+    private fun isMotionLayoutNormalState(): Boolean {
+        for (i in ItemNumber.MIN_NUMBER..ItemNumber.MAX_NUMBER) {
+            val itemNumber = ItemNumber(i)
+            val motionLayout = selectItemMotionLayout(itemNumber)
+
+            val numVisibleItems = diaryEditViewModel.numVisibleItems.value
+            val normalState =
+                if (itemNumber.value <= numVisibleItems) {
+                    R.id.motion_scene_edit_diary_item_showed_state
+                } else {
+                    R.id.motion_scene_edit_diary_item_hided_state
+                }
+
+            if (motionLayout.currentState != normalState) return false
+        }
+        return true
     }
 
     private fun setUpPictureInputField() {

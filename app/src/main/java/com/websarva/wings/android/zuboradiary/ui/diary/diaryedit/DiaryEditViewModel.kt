@@ -169,6 +169,7 @@ internal class DiaryEditViewModel @Inject constructor(
 
     private val initialShouldJumpItemMotionLayout = false
     var shouldJumpItemMotionLayout = initialShouldJumpItemMotionLayout
+        private set
 
     // Fragment切替記憶
     private val initialIsShowingItemTitleEditFragment = false
@@ -208,6 +209,7 @@ internal class DiaryEditViewModel @Inject constructor(
         Log.i(logTag, "${logMsg}_開始")
         _isVisibleUpdateProgressBar.value = true
         shouldJumpItemMotionLayout = true
+        val previousNumVisibleItems = diaryStateFlow.numVisibleItems.value
         if (shouldLoadDiary) {
             try {
                 val isSuccessful = loadSavedDiary(date)
@@ -224,6 +226,12 @@ internal class DiaryEditViewModel @Inject constructor(
         }
         hasPreparedDiary = true
         _isVisibleUpdateProgressBar.value = false
+
+        // MEMO:"numVisibleItems"が読込前と同じ時はStateFlowのCollectが起動せず、MotionLayoutが処理されないので、
+        //      ”shouldJumpItemMotionLayout”を下記でクリアする。
+        if (previousNumVisibleItems == diaryStateFlow.numVisibleItems.value) {
+            shouldJumpItemMotionLayout = false
+        }
 
         Log.i(logTag, "${logMsg}_完了")
         return true
@@ -407,6 +415,10 @@ internal class DiaryEditViewModel @Inject constructor(
             addAppMessage(AppMessage.DIARY_LOADING_ERROR)
             return null
         }
+    }
+
+    fun clearShouldJumpItemMotionLayout() {
+        shouldJumpItemMotionLayout = false
     }
 
     // 表示保留中Dialog
