@@ -218,13 +218,14 @@ internal abstract class DiaryYearMonthListBaseAdapter protected constructor(
             super.onScrolled(recyclerView, dx, dy)
             if (isLoadingListOnScrolled) return
             if (!canLoadList()) return
-            if (dy <= 0) return
+            if (dy < 0) return // MEMO:RecyclerView更新時にも処理できるように "<=" -> "<" とする。(画面回転対応)
 
             val layoutManager = checkNotNull(recyclerView.layoutManager) as LinearLayoutManager
 
             val lastVisibleItemPosition = layoutManager.findLastVisibleItemPosition()
             val totalItemCount = layoutManager.itemCount
-            if (totalItemCount <= 0) return
+            // MEMO:初回読込時除外のため"<= 1"とする。(ProgressIndicatorViewHolderのみ表示)
+            if (totalItemCount <= 1) return
 
             val lastItemPosition = totalItemCount - 1
             if (lastVisibleItemPosition != lastItemPosition) return
