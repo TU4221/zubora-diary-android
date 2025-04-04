@@ -70,6 +70,9 @@ class DiaryEditFragment : BaseFragment() {
     private var isDeletingItemTransition = false
     private lateinit var weather2ArrayAdapter: ArrayAdapter<String>
 
+    private val motionLayoutTransitionTime = 500 /*ms*/
+    private val scrollTimeMotionLayoutTransition = 1000 /*ms*/
+
     // ViewModel
     // MEMO:委譲プロパティの委譲先(viewModels())の遅延初期化により"Field is never assigned."と警告が表示される。
     //      委譲プロパティによるViewModel生成は公式が推奨する方法の為、警告を無視する。その為、@Suppressを付与する。
@@ -702,7 +705,6 @@ class DiaryEditFragment : BaseFragment() {
     ): MotionLayout.TransitionListener {
 
         val initializeValue = -1
-        var startScrollPosition = initializeValue
         var goalStateId = initializeValue
 
         override fun onTransitionStarted(motionLayout: MotionLayout?, startId: Int, endId: Int) {
@@ -715,7 +717,6 @@ class DiaryEditFragment : BaseFragment() {
         //      また、motionLayout.currentStateは指定先のIdを取得する。
         private fun setUpScroll(motionLayout: MotionLayout?) {
             goalStateId = motionLayout?.currentState ?: return
-            startScrollPosition = binding.nestedScrollFullScreen.scrollY
         }
 
         override fun onTransitionChange(
@@ -728,37 +729,17 @@ class DiaryEditFragment : BaseFragment() {
                 logTag,
                 "onTransitionChange()_itemNumber = $itemNumber, progress = $progress"
             )
-
-            if (diaryEditViewModel.shouldJumpItemMotionLayout) return
-
-            scrollOnTransition(progress)
-        }
-
-        private fun scrollOnTransition(progress: Float) {
-            val itemHeight = binding.includeItem1.linerLayoutDiaryEditItem.height
-            val scrollY =
-                when (goalStateId) {
-                    R.id.motion_scene_edit_diary_item_hided_state -> {
-                        // MEMO:アイテム削除時は
-                        if (itemNumber.value == diaryEditViewModel.numVisibleItems.value) {
-                            startScrollPosition -
-                                    (itemHeight * progress).toInt()
-                        } else {
-                            startScrollPosition
-                        }
-
-                    }
-                    R.id.motion_scene_edit_diary_item_showed_state -> {
-                        startScrollPosition +
-                                (itemHeight * (1 - progress)).toInt()
-                    }
-                    else -> startScrollPosition
-                }
-            binding.nestedScrollFullScreen.smoothScrollTo(0, scrollY)
         }
 
         override fun onTransitionCompleted(motionLayout: MotionLayout?, currentId: Int) {
             Log.d(logTag, "onTransitionCompleted()_itemNumber = $itemNumber")
+
+            // 対象項目追加削除後のスクロール処理
+            if (!diaryEditViewModel.shouldJumpItemMotionLayout) {
+                scrollOnTransition()
+            }
+            diaryEditViewModel.shouldJumpItemMotionLayout = false
+
             // 対象項目欄削除後の処理
             var completedStateLogMsg = "UnknownState"
             if (currentId == R.id.motion_scene_edit_diary_item_hided_state) {
@@ -772,7 +753,26 @@ class DiaryEditFragment : BaseFragment() {
             Log.d(logTag, "onTransitionCompleted()_CompletedState = $completedStateLogMsg")
 
             initializeProperty()
-            diaryEditViewModel.shouldJumpItemMotionLayout = false
+        }
+
+        private fun scrollOnTransition() {
+            val itemHeight = binding.includeItem1.linerLayoutDiaryEditItem.height
+            val scrollY =
+                when (goalStateId) {
+                    R.id.motion_scene_edit_diary_item_hided_state -> {
+                        if (itemNumber.value == diaryEditViewModel.numVisibleItems.value) {
+                            - itemHeight
+                        } else {
+                            0
+                        }
+                    }
+                    R.id.motion_scene_edit_diary_item_showed_state -> {
+                        itemHeight
+                    }
+                    else -> 0
+                }
+            binding.nestedScrollFullScreen
+                .smoothScrollBy(0, scrollY, scrollTimeMotionLayoutTransition)
         }
 
         private fun deleteItemContents() {
@@ -783,7 +783,6 @@ class DiaryEditFragment : BaseFragment() {
         }
 
         private fun initializeProperty() {
-            startScrollPosition = initializeValue
             goalStateId = initializeValue
         }
 
@@ -857,7 +856,11 @@ class DiaryEditFragment : BaseFragment() {
             itemMotionLayout
                 .jumpToState(R.id.motion_scene_edit_diary_item_hided_state)
         } else {
-            itemMotionLayout.transitionToState(R.id.motion_scene_edit_diary_item_hided_state)
+            itemMotionLayout
+                .transitionToState(
+                    R.id.motion_scene_edit_diary_item_hided_state,
+                    motionLayoutTransitionTime
+                )
         }
     }
 
@@ -867,7 +870,11 @@ class DiaryEditFragment : BaseFragment() {
             itemMotionLayout
                 .jumpToState(R.id.motion_scene_edit_diary_item_showed_state)
         } else {
-            itemMotionLayout.transitionToState(R.id.motion_scene_edit_diary_item_showed_state)
+            itemMotionLayout
+                .transitionToState(
+                    R.id.motion_scene_edit_diary_item_showed_state,
+                    motionLayoutTransitionTime
+                )
         }
     }
 

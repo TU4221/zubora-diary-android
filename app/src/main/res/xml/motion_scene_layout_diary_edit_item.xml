@@ -5,8 +5,7 @@
 
     <Transition
         motion:constraintSetEnd="@id/motion_scene_edit_diary_item_hided_state"
-        motion:constraintSetStart="@id/motion_scene_edit_diary_item_showed_state"
-        motion:duration="500"/>
+        motion:constraintSetStart="@id/motion_scene_edit_diary_item_showed_state"/>
 
     <ConstraintSet android:id="@+id/motion_scene_edit_diary_item_showed_state">
         <Constraint
