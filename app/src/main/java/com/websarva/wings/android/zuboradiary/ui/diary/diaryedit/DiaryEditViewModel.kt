@@ -167,6 +167,9 @@ internal class DiaryEditViewModel @Inject constructor(
             return weather1 == weather2
         }
 
+    private val initialShouldJumpItemMotionLayout = false
+    var shouldJumpItemMotionLayout = initialShouldJumpItemMotionLayout
+
     // Fragment切替記憶
     private val initialIsShowingItemTitleEditFragment = false
     var isShowingItemTitleEditFragment = initialIsShowingItemTitleEditFragment
@@ -190,6 +193,7 @@ internal class DiaryEditViewModel @Inject constructor(
         _loadedPicturePath.value = initialLoadedPicturePath
         _isVisibleUpdateProgressBar.value = initialIsVisibleUpdateProgressBar
         hasPreparedDiary = initialHasPreparedDiary
+        shouldJumpItemMotionLayout = initialShouldJumpItemMotionLayout
         isShowingItemTitleEditFragment = initialIsShowingItemTitleEditFragment
         _pendingDialogList.value = initialPendingDialogList
         shouldInitializeOnFragmentDestroy = initialShouldInitializeOnFragmentDestroy
@@ -203,6 +207,7 @@ internal class DiaryEditViewModel @Inject constructor(
         val logMsg = "日記読込"
         Log.i(logTag, "${logMsg}_開始")
         _isVisibleUpdateProgressBar.value = true
+        shouldJumpItemMotionLayout = true
         if (shouldLoadDiary) {
             try {
                 val isSuccessful = loadSavedDiary(date)
@@ -211,6 +216,7 @@ internal class DiaryEditViewModel @Inject constructor(
                 Log.e(logTag, "${logMsg}_失敗", e)
                 if (!ignoreAppMessage) addAppMessage(AppMessage.DIARY_LOADING_ERROR)
                 _isVisibleUpdateProgressBar.value = false
+                shouldJumpItemMotionLayout = false
                 return false
             }
         } else {

@@ -729,6 +729,8 @@ class DiaryEditFragment : BaseFragment() {
                 "onTransitionChange()_itemNumber = $itemNumber, progress = $progress"
             )
 
+            if (diaryEditViewModel.shouldJumpItemMotionLayout) return
+
             scrollOnTransition(progress)
         }
 
@@ -770,6 +772,7 @@ class DiaryEditFragment : BaseFragment() {
             Log.d(logTag, "onTransitionCompleted()_CompletedState = $completedStateLogMsg")
 
             initializeProperty()
+            diaryEditViewModel.shouldJumpItemMotionLayout = false
         }
 
         private fun deleteItemContents() {
@@ -826,9 +829,9 @@ class DiaryEditFragment : BaseFragment() {
         private fun setUpItemsLayout(numItems: Int) {
             require(!(numItems < ItemNumber.MIN_NUMBER || numItems > ItemNumber.MAX_NUMBER))
 
-            // MEMO:LifeCycleがResumedの時のみ項目欄のモーション追加処理を行う。
-            //      削除処理はObserverで適切なモーション削除処理を行うのは難しいのでここでは処理せず、削除ダイアログから処理する。
-            if (viewLifecycleOwner.lifecycle.currentState == Lifecycle.State.RESUMED) {
+            // MEMO:削除処理はObserverで適切なモーション削除処理を行うのは難しいのでここでは処理せず、削除ダイアログから処理する。
+            //
+            if (!diaryEditViewModel.shouldJumpItemMotionLayout) {
                 val numShowedItems = countShowedItems()
                 val differenceValue = numItems - numShowedItems
                 if (numItems > numShowedItems && differenceValue == 1) {
