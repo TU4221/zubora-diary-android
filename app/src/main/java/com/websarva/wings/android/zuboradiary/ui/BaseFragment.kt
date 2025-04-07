@@ -202,10 +202,13 @@ abstract class BaseFragment : CustomFragment() {
                 //      Dialog非表示中:Lifecycle.Event.ON_RESUME
                 if (event == Lifecycle.Event.ON_RESUME) {
                     Log.d(logTag, "Lifecycle.Event.ON_RESUME")
-                    handleOnReceivingDialogResult()
+                    receiveDialogResults()
+                    // MEMO:Results残留防止。"ON_RESUME"で呼び出される為、
+                    //      削除しないと端末ホーム画面からのアプリ再表示時に受取メソッドが処理される。
+                    removeDialogResults()
+
                     retrySettingsAppMessageDialogShow()
                     retryOtherAppMessageDialogShow()
-                    removeDialogResultOnDestroy()
                 }
             }
 
@@ -214,9 +217,6 @@ abstract class BaseFragment : CustomFragment() {
             .addObserver(LifecycleEventObserver { _, event: Lifecycle.Event ->
                 if (event == Lifecycle.Event.ON_DESTROY) {
                     Log.d(logTag, "Lifecycle.Event.ON_DESTROY")
-                    // MEMO:removeで削除しないとこのFragmentを閉じてもResult内容が残ってしまう。
-                    //      その為、このFragmentを再表示した時にObserverがResultの内容で処理してしまう。
-                    removeDialogResultOnDestroy()
 
                     // MEMO:removeで削除しないと再度Fragment(前回表示Fragmentと同インスタンスの場合)を表示した時、Observerが重複する。
                     for (observer in addedLifecycleEventObserverList) {
@@ -235,12 +235,12 @@ abstract class BaseFragment : CustomFragment() {
     /**
      * BaseFragment#setUpDialogResultReceiver()で呼び出される。
      */
-    protected abstract fun handleOnReceivingDialogResult()
+    protected abstract fun receiveDialogResults()
 
     /**
      * BaseFragment#setUpDialogResultReceiver()で呼び出される。
      */
-    protected abstract fun removeDialogResultOnDestroy()
+    protected abstract fun removeDialogResults()
 
     protected fun <T> receiveResulFromDialog(key: String): T? {
         val containsDialogResult = navBackStackEntry.savedStateHandle.contains(key)

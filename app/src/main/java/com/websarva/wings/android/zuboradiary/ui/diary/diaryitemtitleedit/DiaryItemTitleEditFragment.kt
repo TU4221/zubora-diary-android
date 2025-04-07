@@ -71,11 +71,11 @@ class DiaryItemTitleEditFragment : BaseFragment() {
         diaryItemTitleEditViewModel.updateDiaryItemTitle(targetItemNumber, targetItemTitle)
     }
 
-    override fun handleOnReceivingDialogResult() {
+    override fun receiveDialogResults() {
         receiveDiaryItemTitleDeleteDialogResult()
     }
 
-    override fun removeDialogResultOnDestroy() {
+    override fun removeDialogResults() {
         removeResulFromFragment(DiaryItemTitleDeleteDialogFragment.KEY_SELECTED_BUTTON)
         removeResulFromFragment(DiaryItemTitleDeleteDialogFragment.KEY_DELETE_LIST_ITEM_POSITION)
     }

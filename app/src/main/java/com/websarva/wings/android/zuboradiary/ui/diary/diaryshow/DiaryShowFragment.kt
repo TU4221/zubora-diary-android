@@ -99,12 +99,12 @@ internal class DiaryShowFragment : BaseFragment() {
         // 処理なし
     }
 
-    override fun handleOnReceivingDialogResult() {
+    override fun receiveDialogResults() {
         receiveDiaryLoadingFailureDialogResult()
         receiveDiaryDeleteDialogResult()
     }
 
-    override fun removeDialogResultOnDestroy() {
+    override fun removeDialogResults() {
         removeResulFromFragment(DiaryDeleteDialogFragment.KEY_SELECTED_BUTTON)
     }
 

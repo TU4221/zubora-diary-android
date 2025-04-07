@@ -72,11 +72,11 @@ class WordSearchFragment : BaseFragment() {
         // 処理なし
     }
 
-    override fun handleOnReceivingDialogResult() {
+    override fun receiveDialogResults() {
         // 処理なし
     }
 
-    override fun removeDialogResultOnDestroy() {
+    override fun removeDialogResults() {
         // LifecycleEventObserverにダイアログからの結果受取処理コードを記述したら、ここに削除処理を記述する。
     }
 

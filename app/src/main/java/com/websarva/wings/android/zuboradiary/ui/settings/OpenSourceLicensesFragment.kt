@@ -80,11 +80,11 @@ class OpenSourceLicensesFragment: BaseFragment() {
         // 処理なし
     }
 
-    override fun handleOnReceivingDialogResult() {
+    override fun receiveDialogResults() {
         // 処理なし
     }
 
-    override fun removeDialogResultOnDestroy() {
+    override fun removeDialogResults() {
         // 処理なし
     }
 

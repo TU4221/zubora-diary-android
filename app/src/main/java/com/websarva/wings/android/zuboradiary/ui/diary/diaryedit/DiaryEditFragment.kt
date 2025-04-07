@@ -155,7 +155,7 @@ class DiaryEditFragment : BaseFragment() {
         }
     }
 
-    override fun handleOnReceivingDialogResult() {
+    override fun receiveDialogResults() {
         receiveDiaryLoadingDialogResult()
         receiveDiaryLoadingFailureDialogResult()
         receiveDiaryUpdateDialogResult()
@@ -167,7 +167,7 @@ class DiaryEditFragment : BaseFragment() {
         clearFocusAllEditText()
     }
 
-    override fun removeDialogResultOnDestroy() {
+    override fun removeDialogResults() {
         removeResulFromFragment(DiaryLoadingDialogFragment.KEY_SELECTED_BUTTON)
         removeResulFromFragment(DiaryUpdateDialogFragment.KEY_SELECTED_BUTTON)
         removeResulFromFragment(DiaryDeleteDialogFragment.KEY_SELECTED_BUTTON)

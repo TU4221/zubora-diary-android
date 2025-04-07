@@ -135,11 +135,11 @@ class CalendarFragment : BaseFragment() {
         }
     }
 
-    override fun handleOnReceivingDialogResult() {
+    override fun receiveDialogResults() {
         // 処理なし
     }
 
-    override fun removeDialogResultOnDestroy() {
+    override fun removeDialogResults() {
         // 処理なし
     }
 

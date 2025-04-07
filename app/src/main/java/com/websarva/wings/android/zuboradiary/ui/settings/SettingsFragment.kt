@@ -140,7 +140,7 @@ class SettingsFragment : BaseFragment() {
         // 処理なし
     }
 
-    override fun handleOnReceivingDialogResult() {
+    override fun receiveDialogResults() {
         receiveThemeColorPickerDialogResult()
         receiveCalendarStartDayPickerDialogResult()
         receiveReminderNotificationTimePickerDialogResult()
@@ -150,7 +150,7 @@ class SettingsFragment : BaseFragment() {
         receiveAllDataDeleteDialogResult()
     }
 
-    override fun removeDialogResultOnDestroy() {
+    override fun removeDialogResults() {
         removeResulFromFragment(ThemeColorPickerDialogFragment.KEY_SELECTED_THEME_COLOR)
         removeResulFromFragment(CalendarStartDayPickerDialogFragment.KEY_SELECTED_DAY_OF_WEEK)
         removeResulFromFragment(ReminderNotificationTimePickerDialogFragment.KEY_SELECTED_BUTTON)

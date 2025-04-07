@@ -84,12 +84,12 @@ class DiaryListFragment : BaseFragment() {
         // 処理なし
     }
 
-    override fun handleOnReceivingDialogResult() {
+    override fun receiveDialogResults() {
         receiveDatePickerDialogResults()
         receiveDiaryDeleteDialogResults()
     }
 
-    override fun removeDialogResultOnDestroy() {
+    override fun removeDialogResults() {
         removeResulFromFragment(StartYearMonthPickerDialogFragment.KEY_SELECTED_YEAR_MONTH)
         removeResulFromFragment(DiaryDeleteDialogFragment.KEY_DELETE_DIARY_DATE)
     }
