@@ -65,7 +65,7 @@ class CalendarFragment : BaseFragment() {
     //      委譲プロパティによるViewModel生成は公式が推奨する方法の為、警告を無視する。その為、@Suppressを付与する。
     //      この警告に対応するSuppressネームはなく、"unused"のみでは不要Suppressとなる為、"RedundantSuppression"も追記する。
     @Suppress("unused", "RedundantSuppression")
-    private val calendarViewModel: CalendarViewModel by activityViewModels()
+    override val mainViewModel: CalendarViewModel by activityViewModels()
 
     // MEMO:CalendarFragment内にDiaryShowFragmentと同等のものを表示する為、DiaryShowViewModelを使用する。
     //      (CalendarViewModelにDiaryShowViewModelと重複するデータは持たせない)
@@ -115,7 +115,7 @@ class CalendarFragment : BaseFragment() {
             showedDiaryDate.collectLatest { value: LocalDate? ->
                 value ?: return@collectLatest
 
-                calendarViewModel.updateSelectedDate(value)
+                mainViewModel.updateSelectedDate(value)
                 removeResulFromFragment(DiaryShowFragment.KEY_SHOWED_DIARY_DATE)
             }
         }
@@ -129,7 +129,7 @@ class CalendarFragment : BaseFragment() {
             editedDiaryDate.collectLatest { value: LocalDate? ->
                 value ?: return@collectLatest
 
-                calendarViewModel.updateSelectedDate(value)
+                mainViewModel.updateSelectedDate(value)
                 removeResulFromFragment(DiaryEditFragment.KEY_EDITED_DIARY_DATE)
             }
         }
@@ -143,13 +143,8 @@ class CalendarFragment : BaseFragment() {
         // 処理なし
     }
 
-    override fun setUpOtherAppMessageDialog() {
-        launchAndRepeatOnViewLifeCycleStarted {
-            calendarViewModel.appMessageBufferList
-                .collectLatest { value: AppMessageList ->
-                    AppMessageBufferListObserver(calendarViewModel).onChanged(value)
-                }
-        }
+    override fun setUpAppMessageDialog() {
+        super.setUpAppMessageDialog()
 
         launchAndRepeatOnViewLifeCycleStarted {
             diaryShowViewModel.appMessageBufferList
@@ -171,7 +166,7 @@ class CalendarFragment : BaseFragment() {
         calendar.setup(startMonth, endMonth, daysOfWeek[0])
 
         launchAndRepeatOnViewLifeCycleStarted {
-            calendarViewModel.selectedDate
+            mainViewModel.selectedDate
                 .collectLatest { value: LocalDate ->
                     binding.calendar.notifyDateChanged(value) // 今回選択日付更新
                     scrollCalendar(value)
@@ -181,7 +176,7 @@ class CalendarFragment : BaseFragment() {
         }
 
         launchAndRepeatOnViewLifeCycleStarted {
-            calendarViewModel.previousSelectedDate
+            mainViewModel.previousSelectedDate
                 .collectLatest { value: LocalDate? ->
                     // MEMO:一度も日付選択をしていない場合はnullが代入されている。
                     if (value == null) return@collectLatest
@@ -225,7 +220,7 @@ class CalendarFragment : BaseFragment() {
             val textDay = container.binding.textDay.apply {
                 setOnClickListener {
                     if (calendarDay.position == DayPosition.MonthDate) {
-                        calendarViewModel.updateSelectedDate(calendarDay.date)
+                        mainViewModel.updateSelectedDate(calendarDay.date)
                     }
                 }
 
@@ -252,7 +247,7 @@ class CalendarFragment : BaseFragment() {
             val themeColorSwitcher =
                 CalendarThemeColorSwitcher(requireContext(), themeColor)
 
-            val selectedDate = calendarViewModel.selectedDate.value
+            val selectedDate = mainViewModel.selectedDate.value
             val isSelectedDay = calendarDay.date.isEqual(selectedDate)
             val isToday = calendarDay.date.isEqual(LocalDate.now())
 
@@ -291,7 +286,7 @@ class CalendarFragment : BaseFragment() {
             val localDate = calendarDay.date
 
             lifecycleScope.launch(Dispatchers.IO) {
-                val exists = calendarViewModel.existsSavedDiary(localDate)
+                val exists = mainViewModel.existsSavedDiary(localDate)
                 withContext(Dispatchers.Main) {
                     if (exists == true) {
                         viewCalendarDayDot.visibility = View.VISIBLE
@@ -409,7 +404,7 @@ class CalendarFragment : BaseFragment() {
     // CalendarViewで選択された日付の日記を表示
     private fun showSelectedDiary(date: LocalDate) {
         lifecycleScope.launch(Dispatchers.IO) {
-            val exists = calendarViewModel.existsSavedDiary(date)
+            val exists = mainViewModel.existsSavedDiary(date)
             withContext(Dispatchers.Main) {
                 if (exists == true) {
                     showDiary(date)
@@ -521,9 +516,9 @@ class CalendarFragment : BaseFragment() {
     private fun setUpFloatActionButton() {
         binding.floatingActionButtonDiaryEdit.setOnClickListener {
             lifecycleScope.launch(Dispatchers.IO) {
-                val selectedDate = calendarViewModel.selectedDate.value
+                val selectedDate = mainViewModel.selectedDate.value
                 val requiresDiaryLoading =
-                    calendarViewModel.existsSavedDiary(selectedDate) ?: return@launch
+                    mainViewModel.existsSavedDiary(selectedDate) ?: return@launch
                 withContext(Dispatchers.Main) {
                     showDiaryEditFragment(selectedDate, requiresDiaryLoading)
                 }
@@ -539,10 +534,10 @@ class CalendarFragment : BaseFragment() {
         }
         // MEMO:StateFlowに現在値と同じ値を代入してもCollectメソッドに登録した処理が起動しないため、
         //      下記条件でカレンダースクロールのみ処理。
-        if (calendarViewModel.selectedDate.value == LocalDate.now()) {
+        if (mainViewModel.selectedDate.value == LocalDate.now()) {
             scrollCalendar(LocalDate.now())
         } else {
-            calendarViewModel.updateSelectedDate(LocalDate.now())
+            mainViewModel.updateSelectedDate(LocalDate.now())
         }
     }
 
@@ -573,8 +568,8 @@ class CalendarFragment : BaseFragment() {
         navController.navigate(directions)
     }
 
-    override fun retryOtherAppMessageDialogShow() {
-        calendarViewModel.triggerAppMessageBufferListObserver()
+    override fun retryAppMessageDialogShow() {
+        super.retryAppMessageDialogShow()
         diaryShowViewModel.triggerAppMessageBufferListObserver()
     }
 

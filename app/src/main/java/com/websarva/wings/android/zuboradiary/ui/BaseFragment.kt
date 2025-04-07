@@ -39,6 +39,9 @@ abstract class BaseFragment : CustomFragment() {
     protected val mainActivity
         get() = requireActivity() as MainActivity
 
+    // MEMO:ViewModelが無いFragmentに対応できるようにNull許容型とする。
+    internal abstract val mainViewModel: BaseViewModel?
+
     protected lateinit var navController: NavController
         private set
 
@@ -168,8 +171,7 @@ abstract class BaseFragment : CustomFragment() {
 
         setUpPreviousFragmentResultReceiver()
         setUpDialogResultReceiver()
-        setUpSettingsAppMessageDialog()
-        setUpOtherAppMessageDialog()
+        setUpAppMessageDialog()
     }
 
     // MEMO:Fragment、DialogFragmentからの結果受け取り方法
@@ -207,8 +209,7 @@ abstract class BaseFragment : CustomFragment() {
                     //      削除しないと端末ホーム画面からのアプリ再表示時に受取メソッドが処理される。
                     removeDialogResults()
 
-                    retrySettingsAppMessageDialogShow()
-                    retryOtherAppMessageDialogShow()
+                    retryAppMessageDialogShow()
                 }
             }
 
@@ -249,6 +250,21 @@ abstract class BaseFragment : CustomFragment() {
         return navBackStackEntry.savedStateHandle.get<T>(key)
     }
 
+    protected open fun setUpAppMessageDialog() {
+        setUpMainAppMessageDialog()
+        setUpSettingsAppMessageDialog()
+    }
+
+    private fun setUpMainAppMessageDialog() {
+        mainViewModel ?: return
+        launchAndRepeatOnViewLifeCycleStarted {
+            mainViewModel!!.appMessageBufferList
+                .collectLatest { value: AppMessageList ->
+                    AppMessageBufferListObserver(mainViewModel!!).onChanged(value)
+                }
+        }
+    }
+
     private fun setUpSettingsAppMessageDialog() {
         launchAndRepeatOnViewLifeCycleStarted {
             settingsViewModel.appMessageBufferList
@@ -257,12 +273,6 @@ abstract class BaseFragment : CustomFragment() {
                 }
         }
     }
-
-    /**
-     * BaseFragment#setUpDialogResultReceiver()で呼び出される。
-     * BaseViewModelのAppMessageBufferListのObserverを設定する。
-     */
-    protected abstract fun setUpOtherAppMessageDialog()
 
     protected inner class AppMessageBufferListObserver(private val baseViewModel: BaseViewModel) {
         suspend fun onChanged(value: AppMessageList) {
@@ -288,7 +298,14 @@ abstract class BaseFragment : CustomFragment() {
     @MainThread
     protected abstract fun navigateAppMessageDialog(appMessage: AppMessage)
 
-    protected abstract fun retryOtherAppMessageDialogShow()
+    protected open fun retryAppMessageDialogShow() {
+        retryMainAppMessageDialogShow()
+        retrySettingsAppMessageDialogShow()
+    }
+
+    private fun retryMainAppMessageDialogShow() {
+        mainViewModel?.triggerAppMessageBufferListObserver() ?: return
+    }
 
     private fun retrySettingsAppMessageDialogShow() {
         settingsViewModel.triggerAppMessageBufferListObserver()

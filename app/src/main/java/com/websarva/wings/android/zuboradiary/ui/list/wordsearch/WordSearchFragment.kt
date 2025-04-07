@@ -14,7 +14,6 @@ import androidx.navigation.NavDestination
 import androidx.recyclerview.widget.RecyclerView
 import com.websarva.wings.android.zuboradiary.R
 import com.websarva.wings.android.zuboradiary.data.AppMessage
-import com.websarva.wings.android.zuboradiary.data.AppMessageList
 import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor
 import com.websarva.wings.android.zuboradiary.databinding.FragmentWordSearchBinding
 import com.websarva.wings.android.zuboradiary.ui.BaseFragment
@@ -39,7 +38,7 @@ class WordSearchFragment : BaseFragment() {
     //      委譲プロパティによるViewModel生成は公式が推奨する方法の為、警告を無視する。その為、@Suppressを付与する。
     //      この警告に対応するSuppressネームはなく、"unused"のみでは不要Suppressとなる為、"RedundantSuppression"も追記する。
     @Suppress("unused", "RedundantSuppression")
-    private val wordSearchViewModel: WordSearchViewModel by activityViewModels()
+    override val mainViewModel: WordSearchViewModel by activityViewModels()
 
     override fun initializeDataBinding(
         themeColorInflater: LayoutInflater, container: ViewGroup
@@ -48,7 +47,7 @@ class WordSearchFragment : BaseFragment() {
 
         return binding.apply {
             lifecycleOwner = this@WordSearchFragment.viewLifecycleOwner
-            wordSearchViewModel = this@WordSearchFragment.wordSearchViewModel
+            wordSearchViewModel = mainViewModel
         }
     }
 
@@ -80,15 +79,6 @@ class WordSearchFragment : BaseFragment() {
         // LifecycleEventObserverにダイアログからの結果受取処理コードを記述したら、ここに削除処理を記述する。
     }
 
-    override fun setUpOtherAppMessageDialog() {
-        launchAndRepeatOnViewLifeCycleStarted {
-            wordSearchViewModel.appMessageBufferList
-                .collectLatest { value: AppMessageList ->
-                    AppMessageBufferListObserver(wordSearchViewModel).onChanged(value)
-                }
-        }
-    }
-
     private fun setUpViewModelInitialization() {
         navController.addOnDestinationChangedListener(ViewModelInitializationSetupListener())
     }
@@ -101,7 +91,7 @@ class WordSearchFragment : BaseFragment() {
     }
 
     private fun setUpWordSearchView() {
-        val searchWord = wordSearchViewModel.searchWord.value
+        val searchWord = mainViewModel.searchWord.value
         if (searchWord.isEmpty()) {
             binding.editTextSearchWord.requestFocus()
             val keyboardInitializer = KeyboardInitializer(requireActivity())
@@ -109,12 +99,12 @@ class WordSearchFragment : BaseFragment() {
         }
 
         launchAndRepeatOnViewLifeCycleStarted {
-            wordSearchViewModel.searchWord
+            mainViewModel.searchWord
                 .collectLatest { value: String ->
                     // HACK:キーワードの入力時と確定時に検索Observerが起動してしまい
                     //      同じキーワードで二重に検索してしまう。防止策として下記条件追加。
-                    if (!wordSearchViewModel.shouldLoadWordSearchResultList) {
-                        if (wordSearchViewModel.shouldUpdateWordSearchResultList) {
+                    if (!mainViewModel.shouldLoadWordSearchResultList) {
+                        if (mainViewModel.shouldUpdateWordSearchResultList) {
                             updateWordSearchResultList()
                         }
                         return@collectLatest
@@ -124,12 +114,12 @@ class WordSearchFragment : BaseFragment() {
                     if (value.isEmpty()) {
                         binding.textNoWordSearchResultsMessage.visibility = View.INVISIBLE
                         binding.linerLayoutWordSearchResults.visibility = View.INVISIBLE
-                        wordSearchViewModel.initialize()
+                        mainViewModel.initialize()
                     } else {
-                        wordSearchViewModel
+                        mainViewModel
                             .loadNewWordSearchResultList(resultWordColor, resultWordBackgroundColor)
                     }
-                    wordSearchViewModel.previousSearchWord = value
+                    mainViewModel.previousSearchWord = value
                 }
         }
 
@@ -160,14 +150,14 @@ class WordSearchFragment : BaseFragment() {
             }
 
         launchAndRepeatOnViewLifeCycleStarted {
-            wordSearchViewModel.wordSearchResultList
+            mainViewModel.wordSearchResultList
                 .collectLatest { value: WordSearchResultYearMonthList ->
                     WordSearchResultListObserver().onChanged(value)
                 }
         }
 
         launchAndRepeatOnViewLifeCycleStarted {
-            wordSearchViewModel.numWordSearchResults
+            mainViewModel.numWordSearchResults
                 .collectLatest { value: Int ->
                     val visibility = if (value > 0) {
                         View.VISIBLE
@@ -188,12 +178,12 @@ class WordSearchFragment : BaseFragment() {
     ) :
         WordSearchResultYearMonthListAdapter(context, recyclerView, themeColor) {
         override fun loadListOnScrollEnd() {
-            wordSearchViewModel
+            mainViewModel
                 .loadAdditionWordSearchResultList(resultWordColor, resultWordBackgroundColor)
         }
 
         override fun canLoadList(): Boolean {
-            return wordSearchViewModel.canLoadWordSearchResultList
+            return mainViewModel.canLoadWordSearchResultList
         }
     }
 
@@ -205,7 +195,7 @@ class WordSearchFragment : BaseFragment() {
                     binding.recyclerWordSearchResultList.adapter
                 ) as WordSearchResultYearMonthListAdapter
 
-            val searchWord = wordSearchViewModel.searchWord.value
+            val searchWord = mainViewModel.searchWord.value
             if (searchWord.isEmpty()) {
                 binding.apply {
                     floatingActionButtonTopScroll.hide() // MEMO:初回起動用
@@ -231,9 +221,9 @@ class WordSearchFragment : BaseFragment() {
     }
 
     private fun updateWordSearchResultList() {
-        val list = wordSearchViewModel.wordSearchResultList.value
+        val list = mainViewModel.wordSearchResultList.value
         if (list.wordSearchResultYearMonthListItemList.isEmpty()) return
-        wordSearchViewModel.updateWordSearchResultList(resultWordColor, resultWordBackgroundColor)
+        mainViewModel.updateWordSearchResultList(resultWordColor, resultWordBackgroundColor)
     }
 
     private inner class WordSearchResultListUpdateSetupListener
@@ -246,7 +236,7 @@ class WordSearchFragment : BaseFragment() {
                 if (destination.id == R.id.navigation_word_search_fragment) return
 
                 if (destination.id == R.id.navigation_diary_show_fragment) {
-                    wordSearchViewModel.shouldUpdateWordSearchResultList = true
+                    mainViewModel.shouldUpdateWordSearchResultList = true
                 }
 
                 navController.removeOnDestinationChangedListener(this)
@@ -263,7 +253,7 @@ class WordSearchFragment : BaseFragment() {
             if (destination.id == R.id.navigation_word_search_fragment) return
 
             if (destination.id != R.id.navigation_diary_show_fragment) {
-                wordSearchViewModel.shouldInitializeOnFragmentDestroy = true
+                mainViewModel.shouldInitializeOnFragmentDestroy = true
             }
 
             navController.removeOnDestinationChangedListener(this)
@@ -313,10 +303,6 @@ class WordSearchFragment : BaseFragment() {
         navController.navigate(directions)
     }
 
-    override fun retryOtherAppMessageDialogShow() {
-        wordSearchViewModel.triggerAppMessageBufferListObserver()
-    }
-
     override fun destroyBinding() {
         _binding = null
     }
@@ -328,7 +314,7 @@ class WordSearchFragment : BaseFragment() {
         //      WordSearchFragment、DiaryShowFragment、DiaryEditFragment、
         //      DiaryItemTitleEditFragment表示時のみ ViewModelのプロパティ値を保持できたらよいので、
         //      WordSearchFragmentを破棄するタイミングでViewModelのプロパティ値を初期化する。
-        wordSearchViewModel.apply {
+        mainViewModel.apply {
             if (shouldInitializeOnFragmentDestroy) initialize()
         }
     }

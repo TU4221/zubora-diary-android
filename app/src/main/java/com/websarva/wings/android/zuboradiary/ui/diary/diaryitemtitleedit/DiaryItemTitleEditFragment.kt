@@ -13,7 +13,6 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.websarva.wings.android.zuboradiary.R
 import com.websarva.wings.android.zuboradiary.data.AppMessage
-import com.websarva.wings.android.zuboradiary.data.AppMessageList
 import com.websarva.wings.android.zuboradiary.databinding.FragmentDiaryItemTitleEditBinding
 import com.websarva.wings.android.zuboradiary.ui.BaseFragment
 import com.websarva.wings.android.zuboradiary.ui.TextInputSetup
@@ -41,7 +40,7 @@ class DiaryItemTitleEditFragment : BaseFragment() {
     //      委譲プロパティによるViewModel生成は公式が推奨する方法の為、警告を無視する。その為、@Suppressを付与する。
     //      この警告に対応するSuppressネームはなく、"unused"のみでは不要Suppressとなる為、"RedundantSuppression"も追記する。
     @Suppress("unused", "RedundantSuppression")
-    private val diaryItemTitleEditViewModel: DiaryItemTitleEditViewModel by viewModels()
+    override val mainViewModel: DiaryItemTitleEditViewModel by viewModels()
 
     override fun initializeDataBinding(
         themeColorInflater: LayoutInflater, container: ViewGroup
@@ -50,7 +49,7 @@ class DiaryItemTitleEditFragment : BaseFragment() {
 
         return binding.apply {
             lifecycleOwner = this@DiaryItemTitleEditFragment.viewLifecycleOwner
-            diaryItemTitleEditViewModel = this@DiaryItemTitleEditFragment.diaryItemTitleEditViewModel
+            diaryItemTitleEditViewModel = mainViewModel
         }
     }
 
@@ -68,7 +67,7 @@ class DiaryItemTitleEditFragment : BaseFragment() {
             DiaryItemTitleEditFragmentArgs.fromBundle(requireArguments()).itemNumber
         val targetItemTitle =
             DiaryItemTitleEditFragmentArgs.fromBundle(requireArguments()).itemTitle
-        diaryItemTitleEditViewModel.updateDiaryItemTitle(targetItemNumber, targetItemTitle)
+        mainViewModel.updateDiaryItemTitle(targetItemNumber, targetItemTitle)
     }
 
     override fun receiveDialogResults() {
@@ -78,15 +77,6 @@ class DiaryItemTitleEditFragment : BaseFragment() {
     override fun removeDialogResults() {
         removeResulFromFragment(DiaryItemTitleDeleteDialogFragment.KEY_SELECTED_BUTTON)
         removeResulFromFragment(DiaryItemTitleDeleteDialogFragment.KEY_DELETE_LIST_ITEM_POSITION)
-    }
-
-    override fun setUpOtherAppMessageDialog() {
-        launchAndRepeatOnViewLifeCycleStarted {
-            diaryItemTitleEditViewModel.appMessageBufferList
-                .collectLatest { value: AppMessageList ->
-                    AppMessageBufferListObserver(diaryItemTitleEditViewModel).onChanged(value)
-                }
-        }
     }
 
     // 履歴項目削除確認ダイアログからの結果受取
@@ -104,7 +94,7 @@ class DiaryItemTitleEditFragment : BaseFragment() {
                 )
 
             lifecycleScope.launch(Dispatchers.IO) {
-                diaryItemTitleEditViewModel
+                mainViewModel
                     .deleteDiaryItemTitleSelectionHistoryItem(deleteListItemPosition)
             }
         } else {
@@ -118,7 +108,7 @@ class DiaryItemTitleEditFragment : BaseFragment() {
 
     private fun setUpToolBar() {
         binding.materialToolbarTopAppBar.apply {
-            val targetItemNumber = diaryItemTitleEditViewModel.itemNumber.requireValue()
+            val targetItemNumber = mainViewModel.itemNumber.requireValue()
             val toolBarTitle =
                 getString(R.string.fragment_diary_item_title_edit_toolbar_first_title) + targetItemNumber + getString(
                     R.string.fragment_diary_item_title_edit_toolbar_second_title
@@ -150,7 +140,7 @@ class DiaryItemTitleEditFragment : BaseFragment() {
                 val isError = !binding.textInputLayoutNewItemTitle.error.isNullOrEmpty()
                 if (isError) return@setOnClickListener
 
-                val title = diaryItemTitleEditViewModel.itemTitle.value
+                val title = mainViewModel.itemTitle.value
                 completeItemTitleEdit(title)
             }
 
@@ -213,7 +203,7 @@ class DiaryItemTitleEditFragment : BaseFragment() {
 
         // 選択履歴読込・表示
         launchAndRepeatOnViewLifeCycleStarted {
-            diaryItemTitleEditViewModel.itemTitleSelectionHistoryList
+            mainViewModel.itemTitleSelectionHistoryList
                 .collectLatest { value: SelectionHistoryList ->
                     val adapter =
                         checkNotNull(
@@ -226,7 +216,7 @@ class DiaryItemTitleEditFragment : BaseFragment() {
 
     // DiaryItemTitleEditFragmentを閉じる
     private fun completeItemTitleEdit(newItemTitle: String) {
-        val targetItemNumber = diaryItemTitleEditViewModel.itemNumber.requireValue()
+        val targetItemNumber = mainViewModel.itemNumber.requireValue()
 
         val navBackStackEntry = checkNotNull(navController.previousBackStackEntry)
         val savedStateHandle = navBackStackEntry.savedStateHandle
@@ -266,10 +256,6 @@ class DiaryItemTitleEditFragment : BaseFragment() {
             DiaryItemTitleEditFragmentDirections
                 .actionDiaryItemTitleEditFragmentToAppMessageDialog(appMessage)
         navController.navigate(directions)
-    }
-
-    override fun retryOtherAppMessageDialogShow() {
-        diaryItemTitleEditViewModel.triggerAppMessageBufferListObserver()
     }
 
     override fun destroyBinding() {

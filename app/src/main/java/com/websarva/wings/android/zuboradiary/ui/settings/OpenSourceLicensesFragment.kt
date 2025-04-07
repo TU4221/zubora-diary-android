@@ -24,6 +24,9 @@ class OpenSourceLicensesFragment: BaseFragment() {
     private var _binding: FragmentOpenSourceLicensesBinding? = null
     private val binding get() = checkNotNull(_binding)
 
+    // ViewModel
+    override val mainViewModel = null
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View? {
@@ -88,16 +91,8 @@ class OpenSourceLicensesFragment: BaseFragment() {
         // 処理なし
     }
 
-    override fun setUpOtherAppMessageDialog() {
-        // 処理なし
-    }
-
     @MainThread
     override fun navigateAppMessageDialog(appMessage: AppMessage) {
-        // 処理なし
-    }
-
-    override fun retryOtherAppMessageDialogShow() {
         // 処理なし
     }
 

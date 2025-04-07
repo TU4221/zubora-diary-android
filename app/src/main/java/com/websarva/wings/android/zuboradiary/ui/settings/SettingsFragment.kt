@@ -43,6 +43,9 @@ class SettingsFragment : BaseFragment() {
     private var _binding: FragmentSettingsBinding? = null
     private val binding get() = checkNotNull(_binding)
 
+    // ViewModel
+    override val mainViewModel = null
+
     // ActivityResultLauncher関係
     private lateinit var requestPostNotificationsPermissionLauncher: ActivityResultLauncher<String>
     private lateinit var requestAccessLocationPermissionLauncher: ActivityResultLauncher<Array<String>>
@@ -159,10 +162,6 @@ class SettingsFragment : BaseFragment() {
         removeResulFromFragment(AllDiariesDeleteDialogFragment.KEY_SELECTED_BUTTON)
         removeResulFromFragment(AllSettingsInitializationDialogFragment.KEY_SELECTED_BUTTON)
         removeResulFromFragment(AllDataDeleteDialogFragment.KEY_SELECTED_BUTTON)
-    }
-
-    override fun setUpOtherAppMessageDialog() {
-        // 処理なし
     }
 
     // テーマカラー設定ダイアログフラグメントから結果受取
@@ -671,10 +670,6 @@ class SettingsFragment : BaseFragment() {
             SettingsFragmentDirections
                 .actionSettingsFragmentToAppMessageDialog(appMessage)
         navController.navigate(directions)
-    }
-
-    override fun retryOtherAppMessageDialogShow() {
-        // 処理なし
     }
 
     private fun showApplicationDetailsSettings() {

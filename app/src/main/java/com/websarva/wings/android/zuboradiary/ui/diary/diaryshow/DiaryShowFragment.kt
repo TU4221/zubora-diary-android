@@ -18,7 +18,6 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import com.websarva.wings.android.zuboradiary.R
 import com.websarva.wings.android.zuboradiary.data.AppMessage
-import com.websarva.wings.android.zuboradiary.data.AppMessageList
 import com.websarva.wings.android.zuboradiary.data.DateTimeStringConverter
 import com.websarva.wings.android.zuboradiary.data.diary.Condition
 import com.websarva.wings.android.zuboradiary.data.diary.ItemNumber
@@ -55,7 +54,7 @@ internal class DiaryShowFragment : BaseFragment() {
     //      委譲プロパティによるViewModel生成は公式が推奨する方法の為、警告を無視する。その為、@Suppressを付与する。
     //      この警告に対応するSuppressネームはなく、"unused"のみでは不要Suppressとなる為、"RedundantSuppression"も追記する。
     @Suppress("unused", "RedundantSuppression")
-    private val diaryShowViewModel: DiaryShowViewModel by viewModels()
+    override val mainViewModel: DiaryShowViewModel by viewModels()
 
     // Uri関係
     private lateinit var pictureUriPermissionManager: UriPermissionManager
@@ -66,7 +65,7 @@ internal class DiaryShowFragment : BaseFragment() {
         pictureUriPermissionManager =
             object : UriPermissionManager(requireContext()) {
                 override suspend fun checkUsedUriDoesNotExist(uri: Uri): Boolean? {
-                    return diaryShowViewModel.checkSavedPicturePathDoesNotExist(uri)
+                    return mainViewModel.checkSavedPicturePathDoesNotExist(uri)
                 }
             }
     }
@@ -78,7 +77,7 @@ internal class DiaryShowFragment : BaseFragment() {
 
         return binding.apply {
             lifecycleOwner = this@DiaryShowFragment.viewLifecycleOwner
-            diaryShowViewModel = this@DiaryShowFragment.diaryShowViewModel
+            diaryShowViewModel = mainViewModel
         }
     }
 
@@ -108,15 +107,6 @@ internal class DiaryShowFragment : BaseFragment() {
         removeResulFromFragment(DiaryDeleteDialogFragment.KEY_SELECTED_BUTTON)
     }
 
-    override fun setUpOtherAppMessageDialog() {
-        launchAndRepeatOnViewLifeCycleStarted {
-            diaryShowViewModel.appMessageBufferList
-                .collectLatest { value: AppMessageList ->
-                    AppMessageBufferListObserver(diaryShowViewModel).onChanged(value)
-                }
-        }
-    }
-
     // 日記読込失敗確認ダイアログフラグメントからデータ受取
     private fun receiveDiaryLoadingFailureDialogResult() {
         val selectedButton =
@@ -135,7 +125,7 @@ internal class DiaryShowFragment : BaseFragment() {
         if (selectedButton != Dialog.BUTTON_POSITIVE) return
 
         lifecycleScope.launch(Dispatchers.IO) {
-            val isSuccessful = diaryShowViewModel.deleteDiary()
+            val isSuccessful = mainViewModel.deleteDiary()
             if (!isSuccessful) return@launch
 
             releasePictureUriPermission()
@@ -146,7 +136,7 @@ internal class DiaryShowFragment : BaseFragment() {
     }
 
     private fun releasePictureUriPermission() {
-        val pictureUri = diaryShowViewModel.picturePath.value ?: return
+        val pictureUri = mainViewModel.picturePath.value ?: return
 
         lifecycleScope.launch(Dispatchers.IO) {
             pictureUriPermissionManager.releasePersistablePermission(pictureUri)
@@ -156,20 +146,20 @@ internal class DiaryShowFragment : BaseFragment() {
     private fun setUpPendingDialogObserver() {
         addNavBackStackEntryLifecycleObserver { _, event: Lifecycle.Event ->
             if (event == Lifecycle.Event.ON_RESUME) {
-                diaryShowViewModel.triggerPendingDialogListObserver()
+                mainViewModel.triggerPendingDialogListObserver()
             }
         }
 
         launchAndRepeatOnViewLifeCycleStarted {
-            diaryShowViewModel.pendingDialogList
+            mainViewModel.pendingDialogList
                 .collectLatest { value: PendingDialogList ->
                     val pendingDialog = value.findFirstItem() ?: return@collectLatest
-                    val date = diaryShowViewModel.date.requireValue()
+                    val date = mainViewModel.date.requireValue()
                     withContext(Dispatchers.Main) {
                         when (pendingDialog) {
                             PendingDialog.DIARY_LOADING_FAILURE -> showDiaryLoadingFailureDialog(date)
                         }
-                        diaryShowViewModel.removePendingDialogListFirstItem()
+                        mainViewModel.removePendingDialogListFirstItem()
                     }
                 }
         }
@@ -177,11 +167,11 @@ internal class DiaryShowFragment : BaseFragment() {
 
     // 画面表示データ準備
     private fun setUpDiaryData() {
-        diaryShowViewModel.initialize()
+        mainViewModel.initialize()
         val diaryDate = DiaryShowFragmentArgs.fromBundle(requireArguments()).date
 
         lifecycleScope.launch(Dispatchers.IO) {
-            val isSuccessful = diaryShowViewModel.loadSavedDiary(diaryDate, true)
+            val isSuccessful = mainViewModel.loadSavedDiary(diaryDate, true)
             if (isSuccessful) return@launch
 
             withContext(Dispatchers.Main) {
@@ -198,11 +188,11 @@ internal class DiaryShowFragment : BaseFragment() {
             setOnMenuItemClickListener { item: MenuItem ->
                 // 日記編集フラグメント起動
                 if (item.itemId == R.id.diaryShowToolbarOptionEditDiary) {
-                    val editDiaryDate = diaryShowViewModel.date.requireValue()
+                    val editDiaryDate = mainViewModel.date.requireValue()
                     showDiaryEdit(editDiaryDate)
                     return@setOnMenuItemClickListener true
                 } else if (item.itemId == R.id.diaryShowToolbarOptionDeleteDiary) {
-                    val deleteDiaryDate = diaryShowViewModel.date.requireValue()
+                    val deleteDiaryDate = mainViewModel.date.requireValue()
                     showDiaryDeleteDialog(deleteDiaryDate)
                     return@setOnMenuItemClickListener true
                 }
@@ -211,7 +201,7 @@ internal class DiaryShowFragment : BaseFragment() {
         }
 
         launchAndRepeatOnViewLifeCycleStarted {
-            diaryShowViewModel.date
+            mainViewModel.date
                 .collectLatest { value: LocalDate? ->
                     // MEMO:DiaryViewModelを初期化するとDiaryDateにnullが代入されるため、下記"return"を処理。
                     if (value == null) return@collectLatest
@@ -226,7 +216,7 @@ internal class DiaryShowFragment : BaseFragment() {
     // 天気表示欄設定
     private fun setUpWeatherLayout() {
         launchAndRepeatOnViewLifeCycleStarted {
-            diaryShowViewModel.weather1
+            mainViewModel.weather1
                 .collectLatest { value: Weather ->
                     Weather1Observer(
                         requireContext(),
@@ -236,7 +226,7 @@ internal class DiaryShowFragment : BaseFragment() {
         }
 
         launchAndRepeatOnViewLifeCycleStarted {
-            diaryShowViewModel.weather2
+            mainViewModel.weather2
                 .collectLatest { value: Weather ->
                     Weather2Observer(
                         requireContext(),
@@ -273,7 +263,7 @@ internal class DiaryShowFragment : BaseFragment() {
 
     private fun setUpConditionLayout() {
         launchAndRepeatOnViewLifeCycleStarted {
-            diaryShowViewModel.condition
+            mainViewModel.condition
                 .collectLatest { value: Condition ->
                     ConditionObserver(
                         requireContext(),
@@ -303,7 +293,7 @@ internal class DiaryShowFragment : BaseFragment() {
                     )
                 }
 
-            diaryShowViewModel.numVisibleItems
+            mainViewModel.numVisibleItems
                 .collectLatest { value: Int ->
                     NumVisibleItemsObserver(itemLayouts).onChanged(value)
                 }
@@ -328,7 +318,7 @@ internal class DiaryShowFragment : BaseFragment() {
 
     private fun setUpPicture() {
         launchAndRepeatOnViewLifeCycleStarted {
-            diaryShowViewModel.picturePath
+            mainViewModel.picturePath
                 .collectLatest { value: Uri? ->
                     PicturePathObserver(
                         requireContext(),
@@ -369,7 +359,7 @@ internal class DiaryShowFragment : BaseFragment() {
 
     private fun setUpLogLayout() {
         launchAndRepeatOnViewLifeCycleStarted {
-            diaryShowViewModel.log
+            mainViewModel.log
                 .collectLatest { value: LocalDateTime? ->
                     LogObserver(binding.includeDiaryShow.textLogValue).onChanged(value)
                 }
@@ -405,7 +395,7 @@ internal class DiaryShowFragment : BaseFragment() {
     @MainThread
     private fun showDiaryLoadingFailureDialog(date: LocalDate) {
         if (isDialogShowing) {
-            diaryShowViewModel.addPendingDialogList(PendingDialog.DIARY_LOADING_FAILURE)
+            mainViewModel.addPendingDialogList(PendingDialog.DIARY_LOADING_FAILURE)
             return
         }
 
@@ -433,17 +423,13 @@ internal class DiaryShowFragment : BaseFragment() {
         navController.navigate(directions)
     }
 
-    override fun retryOtherAppMessageDialogShow() {
-        diaryShowViewModel.triggerAppMessageBufferListObserver()
-    }
-
     @MainThread
     private fun backFragment() {
         val navBackStackEntry = checkNotNull(navController.previousBackStackEntry)
         val destinationId = navBackStackEntry.destination.id
         if (destinationId == R.id.navigation_calendar_fragment) {
             val savedStateHandle = navBackStackEntry.savedStateHandle
-            val showedDiaryLocalDate = diaryShowViewModel.date.value
+            val showedDiaryLocalDate = mainViewModel.date.value
             savedStateHandle[KEY_SHOWED_DIARY_DATE] = showedDiaryLocalDate
         }
         navController.navigateUp()

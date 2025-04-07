@@ -16,7 +16,6 @@ import androidx.navigation.NavDestination
 import androidx.recyclerview.widget.RecyclerView
 import com.websarva.wings.android.zuboradiary.R
 import com.websarva.wings.android.zuboradiary.data.AppMessage
-import com.websarva.wings.android.zuboradiary.data.AppMessageList
 import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor
 import com.websarva.wings.android.zuboradiary.databinding.FragmentDiaryListBinding
 import com.websarva.wings.android.zuboradiary.ui.BaseFragment
@@ -45,7 +44,7 @@ class DiaryListFragment : BaseFragment() {
     //      委譲プロパティによるViewModel生成は公式が推奨する方法の為、警告を無視する。その為、@Suppressを付与する。
     //      この警告に対応するSuppressネームはなく、"unused"のみでは不要Suppressとなる為、"RedundantSuppression"も追記する。
     @Suppress("unused", "RedundantSuppression")
-    private val diaryListViewModel: DiaryListViewModel by activityViewModels()
+    override val mainViewModel: DiaryListViewModel by activityViewModels()
 
     // Uri関係
     private lateinit var pictureUriPermissionManager: UriPermissionManager
@@ -56,7 +55,7 @@ class DiaryListFragment : BaseFragment() {
         pictureUriPermissionManager =
             object : UriPermissionManager(requireContext()) {
                 override suspend fun checkUsedUriDoesNotExist(uri: Uri): Boolean? {
-                    return diaryListViewModel.checkSavedPicturePathDoesNotExist(uri)
+                    return mainViewModel.checkSavedPicturePathDoesNotExist(uri)
                 }
             }
     }
@@ -68,7 +67,7 @@ class DiaryListFragment : BaseFragment() {
 
         return binding.apply {
             lifecycleOwner = this@DiaryListFragment.viewLifecycleOwner
-            listViewModel = this@DiaryListFragment.diaryListViewModel
+            listViewModel = mainViewModel
         }
     }
 
@@ -94,24 +93,15 @@ class DiaryListFragment : BaseFragment() {
         removeResulFromFragment(DiaryDeleteDialogFragment.KEY_DELETE_DIARY_DATE)
     }
 
-    override fun setUpOtherAppMessageDialog() {
-        launchAndRepeatOnViewLifeCycleStarted {
-            diaryListViewModel.appMessageBufferList
-                .collectLatest { value: AppMessageList ->
-                    AppMessageBufferListObserver(diaryListViewModel).onChanged(value)
-                }
-        }
-    }
-
     // 日付入力ダイアログフラグメントから結果受取
     private fun receiveDatePickerDialogResults() {
         val selectedYearMonth =
             receiveResulFromDialog<YearMonth>(StartYearMonthPickerDialogFragment.KEY_SELECTED_YEAR_MONTH)
                 ?: return
 
-        diaryListViewModel.updateSortConditionDate(selectedYearMonth)
+        mainViewModel.updateSortConditionDate(selectedYearMonth)
         scrollDiaryListToFirstPosition()
-        diaryListViewModel.loadNewDiaryList()
+        mainViewModel.loadNewDiaryList()
     }
 
     // 日記削除ダイアログフラグメントから結果受取
@@ -121,7 +111,7 @@ class DiaryListFragment : BaseFragment() {
                 ?: return
 
         lifecycleScope.launch(Dispatchers.IO) {
-            val isSuccessful = diaryListViewModel.deleteDiary(deleteDiaryDate)
+            val isSuccessful = mainViewModel.deleteDiary(deleteDiaryDate)
             if (!isSuccessful) return@launch
 
             val deleteDiaryPictureUri =
@@ -137,8 +127,8 @@ class DiaryListFragment : BaseFragment() {
             .setNavigationOnClickListener {
                 lifecycleScope.launch(Dispatchers.IO) {
                     // リスト先頭年月切り替えダイアログ起動
-                    val newestDiaryDate = diaryListViewModel.loadNewestSavedDiaryDate()
-                    val oldestDiaryDate = diaryListViewModel.loadOldestSavedDiaryDate()
+                    val newestDiaryDate = mainViewModel.loadNewestSavedDiaryDate()
+                    val oldestDiaryDate = mainViewModel.loadOldestSavedDiaryDate()
                     if (newestDiaryDate == null) return@launch
                     if (oldestDiaryDate == null) return@launch
 
@@ -192,7 +182,7 @@ class DiaryListFragment : BaseFragment() {
                 object : RecyclerView.AdapterDataObserver() {
 
                     override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
-                        diaryListViewModel.clearIsLoadingDiaryList()
+                        mainViewModel.clearIsLoadingDiaryList()
                     }
                 }
             )
@@ -200,21 +190,21 @@ class DiaryListFragment : BaseFragment() {
 
 
         launchAndRepeatOnViewLifeCycleStarted {
-            diaryListViewModel.diaryList
+            mainViewModel.diaryList
                 .collectLatest { value: DiaryYearMonthList ->
                     DiaryListObserver().onChanged(value)
                 }
         }
 
         launchAndRepeatOnViewLifeCycleStarted {
-            diaryListViewModel.isLoadingDiaryList
+            mainViewModel.isLoadingDiaryList
                 .collectLatest { value: Boolean ->
                     diaryListAdapter.setSwipeEnabled(!value)
                 }
         }
 
         lifecycleScope.launch(Dispatchers.IO) {
-            diaryListViewModel.loadDiaryListOnSetUp()
+            mainViewModel.loadDiaryListOnSetUp()
         }
 
         navController.addOnDestinationChangedListener(DiaryListUpdateSetupListener())
@@ -227,11 +217,11 @@ class DiaryListFragment : BaseFragment() {
     ) : DiaryYearMonthListAdapter(context, recyclerView, themeColor) {
 
         override fun loadListOnScrollEnd() {
-            diaryListViewModel.loadAdditionDiaryList()
+            mainViewModel.loadAdditionDiaryList()
         }
 
         override fun canLoadList(): Boolean {
-            return diaryListViewModel.canLoadDiaryList
+            return mainViewModel.canLoadDiaryList
         }
     }
 
@@ -275,7 +265,7 @@ class DiaryListFragment : BaseFragment() {
             if (destination.id == R.id.navigation_diary_list_fragment
                 || destination.id == R.id.navigation_start_year_month_picker_dialog) return
 
-            diaryListViewModel.shouldUpdateDiaryList = true
+            mainViewModel.shouldUpdateDiaryList = true
             navController.removeOnDestinationChangedListener(this)
         }
     }
@@ -340,10 +330,6 @@ class DiaryListFragment : BaseFragment() {
             DiaryListFragmentDirections
                 .actionDiaryListFragmentToAppMessageDialog(appMessage)
         navController.navigate(directions)
-    }
-
-    override fun retryOtherAppMessageDialogShow() {
-        diaryListViewModel.triggerAppMessageBufferListObserver()
     }
 
     fun processOnReSelectNavigationItem() {

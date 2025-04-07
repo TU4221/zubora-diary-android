@@ -28,7 +28,6 @@ import androidx.navigation.NavDirections
 import com.google.android.material.textfield.TextInputLayout
 import com.websarva.wings.android.zuboradiary.R
 import com.websarva.wings.android.zuboradiary.data.AppMessage
-import com.websarva.wings.android.zuboradiary.data.AppMessageList
 import com.websarva.wings.android.zuboradiary.data.DateTimeStringConverter
 import com.websarva.wings.android.zuboradiary.data.diary.Condition
 import com.websarva.wings.android.zuboradiary.data.diary.ItemNumber
@@ -78,7 +77,7 @@ class DiaryEditFragment : BaseFragment() {
     //      委譲プロパティによるViewModel生成は公式が推奨する方法の為、警告を無視する。その為、@Suppressを付与する。
     //      この警告に対応するSuppressネームはなく、"unused"のみでは不要Suppressとなる為、"RedundantSuppression"も追記する。
     @Suppress("unused", "RedundantSuppression")
-    private val diaryEditViewModel: DiaryEditViewModel by activityViewModels()
+    override val mainViewModel: DiaryEditViewModel by activityViewModels()
 
     // Uri関係
     private lateinit var pictureUriPermissionManager: UriPermissionManager
@@ -89,7 +88,7 @@ class DiaryEditFragment : BaseFragment() {
         pictureUriPermissionManager =
             object : UriPermissionManager(requireContext()) {
                 override suspend fun checkUsedUriDoesNotExist(uri: Uri): Boolean? {
-                    return diaryEditViewModel.checkSavedPicturePathDoesNotExist(uri)
+                    return mainViewModel.checkSavedPicturePathDoesNotExist(uri)
                 }
             }
     }
@@ -101,7 +100,7 @@ class DiaryEditFragment : BaseFragment() {
 
         return binding.apply {
             lifecycleOwner = this@DiaryEditFragment.viewLifecycleOwner
-            diaryEditViewModel = this@DiaryEditFragment.diaryEditViewModel
+            diaryEditViewModel = mainViewModel
         }
     }
 
@@ -122,7 +121,7 @@ class DiaryEditFragment : BaseFragment() {
 
         // TODO:最終的に削除
         binding.fabTest.setOnClickListener {
-            val testDiariesSaver = TestDiariesSaver(diaryEditViewModel)
+            val testDiariesSaver = TestDiariesSaver(mainViewModel)
             lifecycleScope.launch(Dispatchers.IO) {
                 testDiariesSaver.save(28)
             }
@@ -147,7 +146,7 @@ class DiaryEditFragment : BaseFragment() {
                         ).value
                     )
 
-                diaryEditViewModel.updateItemTitle(itemNumber, value)
+                mainViewModel.updateItemTitle(itemNumber, value)
 
                 removeResulFromFragment(DiaryItemTitleEditFragment.KEY_NEW_ITEM_TITLE)
                 removeResulFromFragment(DiaryItemTitleEditFragment.KEY_UPDATE_ITEM_NUMBER)
@@ -177,25 +176,16 @@ class DiaryEditFragment : BaseFragment() {
         removeResulFromFragment(DiaryPictureDeleteDialogFragment.KEY_SELECTED_BUTTON)
     }
 
-    override fun setUpOtherAppMessageDialog() {
-        launchAndRepeatOnViewLifeCycleStarted {
-            diaryEditViewModel.appMessageBufferList
-                .collectLatest { value: AppMessageList ->
-                    AppMessageBufferListObserver(diaryEditViewModel).onChanged(value)
-                }
-        }
-    }
-
     // 既存日記読込ダイアログフラグメントから結果受取
     private fun receiveDiaryLoadingDialogResult() {
         val selectedButton =
             receiveResulFromDialog<Int>(DiaryLoadingDialogFragment.KEY_SELECTED_BUTTON) ?: return
 
-        val date = diaryEditViewModel.date.requireValue()
+        val date = mainViewModel.date.requireValue()
 
         if (selectedButton == DialogInterface.BUTTON_POSITIVE) {
             lifecycleScope.launch(Dispatchers.IO) {
-                diaryEditViewModel.prepareDiary(date, true)
+                mainViewModel.prepareDiary(date, true)
             }
         } else {
             lifecycleScope.launch(Dispatchers.IO) {
@@ -221,11 +211,11 @@ class DiaryEditFragment : BaseFragment() {
         if (selectedButton != DialogInterface.BUTTON_POSITIVE) return
 
         lifecycleScope.launch(Dispatchers.IO) {
-            val isSuccessful = diaryEditViewModel.saveDiary()
+            val isSuccessful = mainViewModel.saveDiary()
             if (!isSuccessful) return@launch
 
             updatePictureUriPermission()
-            val date = diaryEditViewModel.date.requireValue()
+            val date = mainViewModel.date.requireValue()
             withContext(Dispatchers.Main) {
                 showDiaryShowFragment(date)
             }
@@ -239,7 +229,7 @@ class DiaryEditFragment : BaseFragment() {
         if (selectedButton != DialogInterface.BUTTON_POSITIVE) return
 
         lifecycleScope.launch(Dispatchers.IO) {
-            val isSuccessful = diaryEditViewModel.deleteDiary()
+            val isSuccessful = mainViewModel.deleteDiary()
             if (!isSuccessful) return@launch
 
             releaseLoadedPictureUriPermission()
@@ -260,7 +250,7 @@ class DiaryEditFragment : BaseFragment() {
         val selectedDate =
             receiveResulFromDialog<LocalDate>(DatePickerDialogFragment.KEY_SELECTED_DATE) ?: return
 
-        diaryEditViewModel.updateDate(selectedDate)
+        mainViewModel.updateDate(selectedDate)
     }
 
     private fun receiveWeatherInfoFetchDialogResult() {
@@ -271,10 +261,10 @@ class DiaryEditFragment : BaseFragment() {
             ) ?: return
         if (selectedButton != DialogInterface.BUTTON_POSITIVE) return
 
-        val loadDiaryDate = diaryEditViewModel.date.requireValue()
+        val loadDiaryDate = mainViewModel.date.requireValue()
         val geoCoordinates = settingsViewModel.geoCoordinates.requireValue()
         lifecycleScope.launch(Dispatchers.IO) {
-            diaryEditViewModel.fetchWeatherInformation(loadDiaryDate, geoCoordinates)
+            mainViewModel.fetchWeatherInformation(loadDiaryDate, geoCoordinates)
         }
     }
 
@@ -285,10 +275,10 @@ class DiaryEditFragment : BaseFragment() {
                 DiaryItemDeleteDialogFragment.KEY_DELETE_ITEM_NUMBER
             ) ?: return
 
-        val numVisibleItems = diaryEditViewModel.numVisibleItems.value
+        val numVisibleItems = mainViewModel.numVisibleItems.value
 
         if (deleteItemNumber.value == 1 && numVisibleItems == deleteItemNumber.value) {
-            diaryEditViewModel.deleteItem(deleteItemNumber)
+            mainViewModel.deleteItem(deleteItemNumber)
         } else {
             isDeletingItemTransition = true
             hideItem(deleteItemNumber, false)
@@ -302,7 +292,7 @@ class DiaryEditFragment : BaseFragment() {
             ) ?: return
         if (selectedButton != DialogInterface.BUTTON_POSITIVE) return
 
-        diaryEditViewModel.deletePicturePath()
+        mainViewModel.deletePicturePath()
     }
 
     private fun setUpViewModelInitialization() {
@@ -327,7 +317,7 @@ class DiaryEditFragment : BaseFragment() {
                 || destination.id == R.id.navigation_weather_info_fetching_dialog) return
 
             if (destination.id != R.id.navigation_diary_item_title_edit_fragment) {
-                diaryEditViewModel.shouldInitializeOnFragmentDestroy = true
+                mainViewModel.shouldInitializeOnFragmentDestroy = true
             }
 
             navController.removeOnDestinationChangedListener(this)
@@ -337,22 +327,22 @@ class DiaryEditFragment : BaseFragment() {
     private fun setUpPendingDialogObserver() {
         addNavBackStackEntryLifecycleObserver { _, event: Lifecycle.Event ->
             if (event == Lifecycle.Event.ON_RESUME) {
-                diaryEditViewModel.triggerPendingDialogListObserver()
+                mainViewModel.triggerPendingDialogListObserver()
             }
         }
 
         launchAndRepeatOnViewLifeCycleStarted {
-            diaryEditViewModel.pendingDialogList
+            mainViewModel.pendingDialogList
                 .collectLatest { value: PendingDialogList ->
                     val pendingDialog = value.findFirstItem() ?: return@collectLatest
-                    val date = diaryEditViewModel.date.requireValue()
+                    val date = mainViewModel.date.requireValue()
                     withContext(Dispatchers.Main) {
                         when (pendingDialog) {
                             PendingDialog.DIARY_LOADING -> showDiaryLoadingDialog(date)
                             PendingDialog.DIARY_LOADING_FAILURE -> showDiaryLoadingFailureDialog(date)
                             PendingDialog.WEATHER_INFO_FETCHING -> showWeatherInfoFetchingDialog(date)
                         }
-                        diaryEditViewModel.removePendingDialogListFirstItem()
+                        mainViewModel.removePendingDialogListFirstItem()
                     }
                 }
         }
@@ -360,14 +350,14 @@ class DiaryEditFragment : BaseFragment() {
 
     private fun setUpDiaryData() {
         // 画面表示データ準備
-        if (diaryEditViewModel.hasPreparedDiary) return
+        if (mainViewModel.hasPreparedDiary) return
 
         val diaryDate = DiaryEditFragmentArgs.fromBundle(requireArguments()).date
         val requiresDiaryLoading =
             DiaryEditFragmentArgs.fromBundle(requireArguments()).requiresDiaryLoading
         lifecycleScope.launch(Dispatchers.IO) {
             val isSuccessful =
-                diaryEditViewModel.prepareDiary(diaryDate, requiresDiaryLoading, true)
+                mainViewModel.prepareDiary(diaryDate, requiresDiaryLoading, true)
             if (isSuccessful) return@launch
 
             withContext(Dispatchers.Main) {
@@ -384,19 +374,19 @@ class DiaryEditFragment : BaseFragment() {
 
         binding.materialToolbarTopAppBar
             .setOnMenuItemClickListener { item: MenuItem ->
-                val diaryDate = diaryEditViewModel.date.requireValue()
+                val diaryDate = mainViewModel.date.requireValue()
 
                 //日記保存(日記表示フラグメント起動)。
                 if (item.itemId == R.id.diaryEditToolbarOptionSaveDiary) {
                     lifecycleScope.launch(Dispatchers.IO) {
                         val shouldShowDialog =
-                            diaryEditViewModel.shouldShowUpdateConfirmationDialog() ?: return@launch
+                            mainViewModel.shouldShowUpdateConfirmationDialog() ?: return@launch
                         if (shouldShowDialog) {
                             withContext(Dispatchers.Main) {
                                 showDiaryUpdateDialog(diaryDate)
                             }
                         } else {
-                            val isSuccessful = diaryEditViewModel.saveDiary()
+                            val isSuccessful = mainViewModel.saveDiary()
                             if (isSuccessful) {
                                 updatePictureUriPermission()
                                 withContext(Dispatchers.Main) {
@@ -414,7 +404,7 @@ class DiaryEditFragment : BaseFragment() {
             }
 
         launchAndRepeatOnViewLifeCycleStarted {
-            diaryEditViewModel.loadedDate
+            mainViewModel.loadedDate
                 .collectLatest { value: LocalDate? ->
                     val title: String
                     val enabledDelete: Boolean
@@ -439,13 +429,13 @@ class DiaryEditFragment : BaseFragment() {
         binding.textInputEditTextDate.apply {
             inputType = EditorInfo.TYPE_NULL //キーボード非表示設定
             setOnClickListener {
-                val date = diaryEditViewModel.date.requireValue()
+                val date = mainViewModel.date.requireValue()
                 showDatePickerDialog(date)
             }
         }
 
         launchAndRepeatOnViewLifeCycleStarted {
-            diaryEditViewModel.date
+            mainViewModel.date
                 .collectLatest { value: LocalDate? ->
                     DateObserver().onChanged(value)
                 }
@@ -455,7 +445,7 @@ class DiaryEditFragment : BaseFragment() {
     private inner class DateObserver {
         fun onChanged(value: LocalDate?) {
             if (value == null) return
-            if (diaryEditViewModel.isShowingItemTitleEditFragment) return
+            if (mainViewModel.isShowingItemTitleEditFragment) return
 
             val dateTimeStringConverter = DateTimeStringConverter()
             val dateString = dateTimeStringConverter.toYearMonthDayWeek(value)
@@ -476,16 +466,16 @@ class DiaryEditFragment : BaseFragment() {
         }
 
         private suspend fun shouldShowDiaryLoadingDialog(changedDate: LocalDate): Boolean? {
-            if (diaryEditViewModel.isNewDiaryDefaultStatus) {
-                return diaryEditViewModel.existsSavedDiary(changedDate)
+            if (mainViewModel.isNewDiaryDefaultStatus) {
+                return mainViewModel.existsSavedDiary(changedDate)
             }
 
-            val previousDate = diaryEditViewModel.previousDate.value
-            val loadedDate = diaryEditViewModel.loadedDate.value
+            val previousDate = mainViewModel.previousDate.value
+            val loadedDate = mainViewModel.loadedDate.value
 
             if (changedDate == previousDate) return false
             if (changedDate == loadedDate) return false
-            return diaryEditViewModel.existsSavedDiary(changedDate)
+            return mainViewModel.existsSavedDiary(changedDate)
         }
 
         suspend fun fetchWeatherInfo(changedDate: LocalDate) {
@@ -497,13 +487,13 @@ class DiaryEditFragment : BaseFragment() {
         }
 
         private fun requiresWeatherInfoFetching(date: LocalDate): Boolean {
-            val previousDate = diaryEditViewModel.previousDate.value
-            if (!diaryEditViewModel.isNewDiary && previousDate == null) return false
+            val previousDate = mainViewModel.previousDate.value
+            if (!mainViewModel.isNewDiary && previousDate == null) return false
             return previousDate != date
         }
 
         private fun requiresShowingWeatherInfoFetchingDialog(): Boolean {
-            val previousDate = diaryEditViewModel.previousDate.value
+            val previousDate = mainViewModel.previousDate.value
             return previousDate != null
         }
     }
@@ -521,12 +511,12 @@ class DiaryEditFragment : BaseFragment() {
                 val arrayAdapter = listAdapter as ArrayAdapter<*>
                 val strWeather = checkNotNull(arrayAdapter.getItem(position)) as String
                 val weather = Weather.of(requireContext(), strWeather)
-                diaryEditViewModel.updateWeather1(weather)
+                mainViewModel.updateWeather1(weather)
                 binding.autoCompleteTextWeather1.clearFocus()
             }
 
         launchAndRepeatOnViewLifeCycleStarted {
-            diaryEditViewModel.weather1
+            mainViewModel.weather1
                 .collectLatest { value: Weather ->
                     val strWeather = value.toString(requireContext())
                     binding.autoCompleteTextWeather1.setText(strWeather, false)
@@ -535,11 +525,11 @@ class DiaryEditFragment : BaseFragment() {
                     val isEnabled = (value != Weather.UNKNOWN)
                     binding.textInputLayoutWeather2.isEnabled = isEnabled
                     binding.autoCompleteTextWeather2.isEnabled = isEnabled
-                    if (value == Weather.UNKNOWN || diaryEditViewModel.isEqualWeathers) {
+                    if (value == Weather.UNKNOWN || mainViewModel.isEqualWeathers) {
                         binding.autoCompleteTextWeather2.setAdapter(
                             weatherArrayAdapter
                         )
-                        diaryEditViewModel.updateWeather2(Weather.UNKNOWN)
+                        mainViewModel.updateWeather2(Weather.UNKNOWN)
                     } else {
                         weather2ArrayAdapter = createWeatherSpinnerAdapter(value)
                         binding.autoCompleteTextWeather2.setAdapter(
@@ -555,12 +545,12 @@ class DiaryEditFragment : BaseFragment() {
                 val arrayAdapter = listAdapter as ArrayAdapter<*>
                 val strWeather = checkNotNull(arrayAdapter.getItem(position)) as String
                 val weather = Weather.of(requireContext(), strWeather)
-                diaryEditViewModel.updateWeather2(weather)
+                mainViewModel.updateWeather2(weather)
                 binding.autoCompleteTextWeather2.clearFocus()
             }
 
         launchAndRepeatOnViewLifeCycleStarted {
-            diaryEditViewModel.weather2
+            mainViewModel.weather2
                 .collectLatest { value: Weather ->
                     val strWeather = value.toString(requireContext())
                     binding.autoCompleteTextWeather2.setText(strWeather, false)
@@ -600,14 +590,14 @@ class DiaryEditFragment : BaseFragment() {
                     val arrayAdapter = listAdapter as ArrayAdapter<*>
                     val strCondition = arrayAdapter.getItem(position) as String
                     val condition = Condition.of(requireContext(), strCondition)
-                    diaryEditViewModel.updateCondition(condition)
+                    mainViewModel.updateCondition(condition)
                     clearFocus()
                 }
         }
 
 
         launchAndRepeatOnViewLifeCycleStarted {
-            diaryEditViewModel.condition
+            mainViewModel.condition
                 .collectLatest { value: Condition ->
                     val strCondition = value.toString(requireContext())
                     binding.autoCompleteTextCondition.setText(strCondition, false)
@@ -665,7 +655,7 @@ class DiaryEditFragment : BaseFragment() {
             textInputEditTextItemsTitle[itemArrayNumber].setOnClickListener {
                 // 項目タイトル入力フラグメント起動
                 val inputItemTitle =
-                    diaryEditViewModel.getItemTitle(inputItemNumber).value
+                    mainViewModel.getItemTitle(inputItemNumber).value
                 showDiaryItemTitleEditFragment(inputItemNumber, inputItemTitle)
             }
         }
@@ -673,7 +663,7 @@ class DiaryEditFragment : BaseFragment() {
         // 項目追加ボタン設定
         binding.imageButtonItemAddition.setOnClickListener {
             binding.imageButtonItemAddition.isEnabled = false
-            diaryEditViewModel.incrementVisibleItemsCount()
+            mainViewModel.incrementVisibleItemsCount()
         }
 
         // 項目削除ボタン設定
@@ -693,7 +683,7 @@ class DiaryEditFragment : BaseFragment() {
         }
 
         launchAndRepeatOnViewLifeCycleStarted {
-            diaryEditViewModel.numVisibleItems
+            mainViewModel.numVisibleItems
                 .collectLatest { value: Int ->
                     NumVisibleItemsObserver().onChanged(value)
                 }
@@ -735,7 +725,7 @@ class DiaryEditFragment : BaseFragment() {
             Log.d(logTag, "onTransitionCompleted()_itemNumber = $itemNumber")
 
             // 対象項目追加削除後のスクロール処理
-            if (!diaryEditViewModel.shouldJumpItemMotionLayout) scrollOnTransition()
+            if (!mainViewModel.shouldJumpItemMotionLayout) scrollOnTransition()
 
             // 対象項目欄削除後の処理
             var completedStateLogMsg = "UnknownState"
@@ -751,7 +741,7 @@ class DiaryEditFragment : BaseFragment() {
 
             initializeProperty()
 
-            if (isMotionLayoutNormalState()) diaryEditViewModel.clearShouldJumpItemMotionLayout()
+            if (isMotionLayoutNormalState()) mainViewModel.clearShouldJumpItemMotionLayout()
         }
 
         private fun scrollOnTransition() {
@@ -759,7 +749,7 @@ class DiaryEditFragment : BaseFragment() {
             val scrollY =
                 when (goalStateId) {
                     R.id.motion_scene_edit_diary_item_hided_state -> {
-                        if (itemNumber.value == diaryEditViewModel.numVisibleItems.value) {
+                        if (itemNumber.value == mainViewModel.numVisibleItems.value) {
                             - itemHeight
                         } else {
                             0
@@ -776,7 +766,7 @@ class DiaryEditFragment : BaseFragment() {
 
         private fun deleteItemContents() {
             if (isDeletingItemTransition) {
-                diaryEditViewModel.deleteItem(itemNumber)
+                mainViewModel.deleteItem(itemNumber)
                 isDeletingItemTransition = false
             }
         }
@@ -828,7 +818,7 @@ class DiaryEditFragment : BaseFragment() {
             require(!(numItems < ItemNumber.MIN_NUMBER || numItems > ItemNumber.MAX_NUMBER))
 
             // MEMO:削除処理はObserverで適切なモーション削除処理を行うのは難しいのでここでは処理せず、削除ダイアログから処理する。
-            if (!diaryEditViewModel.shouldJumpItemMotionLayout) {
+            if (!mainViewModel.shouldJumpItemMotionLayout) {
                 val numShowedItems = countShowedItems()
                 val differenceValue = numItems - numShowedItems
                 if (numItems > numShowedItems && differenceValue == 1) {
@@ -894,7 +884,7 @@ class DiaryEditFragment : BaseFragment() {
             val itemNumber = ItemNumber(i)
             val motionLayout = selectItemMotionLayout(itemNumber)
 
-            val numVisibleItems = diaryEditViewModel.numVisibleItems.value
+            val numVisibleItems = mainViewModel.numVisibleItems.value
             val normalState =
                 if (itemNumber.value <= numVisibleItems) {
                     R.id.motion_scene_edit_diary_item_showed_state
@@ -909,7 +899,7 @@ class DiaryEditFragment : BaseFragment() {
 
     private fun setUpPictureInputField() {
         launchAndRepeatOnViewLifeCycleStarted {
-            diaryEditViewModel.picturePath
+            mainViewModel.picturePath
                 .collectLatest { value: Uri? ->
                     PicturePathObserver().onChanged(value)
                 }
@@ -954,8 +944,8 @@ class DiaryEditFragment : BaseFragment() {
     }
 
     private fun updatePictureUriPermission() {
-        val latestPictureUri = diaryEditViewModel.picturePath.value
-        val loadedPictureUri = diaryEditViewModel.loadedPicturePath.value
+        val latestPictureUri = mainViewModel.picturePath.value
+        val loadedPictureUri = mainViewModel.loadedPicturePath.value
 
         lifecycleScope.launch(Dispatchers.IO) {
             pictureUriPermissionManager.apply {
@@ -976,7 +966,7 @@ class DiaryEditFragment : BaseFragment() {
     }
 
     private fun releaseLoadedPictureUriPermission() {
-        val loadedPictureUri = diaryEditViewModel.loadedPicturePath.value ?: return
+        val loadedPictureUri = mainViewModel.loadedPicturePath.value ?: return
         lifecycleScope.launch(Dispatchers.IO) {
             pictureUriPermissionManager.releasePersistablePermission(loadedPictureUri)
         }
@@ -1059,7 +1049,7 @@ class DiaryEditFragment : BaseFragment() {
         if (!isChecked) return
 
         if (!settingsViewModel.hasUpdatedGeoCoordinates) {
-            diaryEditViewModel.addWeatherInfoFetchErrorMessage()
+            mainViewModel.addWeatherInfoFetchErrorMessage()
             return
         }
 
@@ -1070,7 +1060,7 @@ class DiaryEditFragment : BaseFragment() {
             }
         } else {
             val geoCoordinates = settingsViewModel.geoCoordinates.requireValue()
-            diaryEditViewModel.fetchWeatherInformation(date, geoCoordinates)
+            mainViewModel.fetchWeatherInformation(date, geoCoordinates)
         }
     }
 
@@ -1102,13 +1092,13 @@ class DiaryEditFragment : BaseFragment() {
             DiaryEditFragmentDirections
                 .actionDiaryEditFragmentToSelectItemTitleFragment(inputItemNumber, inputItemTitle)
         navController.navigate(directions)
-        diaryEditViewModel.updateIsShowingItemTitleEditFragment(true)
+        mainViewModel.updateIsShowingItemTitleEditFragment(true)
     }
 
     @MainThread
     private fun showDiaryLoadingDialog(date: LocalDate) {
         if (isDialogShowing) {
-            diaryEditViewModel.addPendingDialogList(PendingDialog.DIARY_LOADING)
+            mainViewModel.addPendingDialogList(PendingDialog.DIARY_LOADING)
             return
         }
 
@@ -1121,7 +1111,7 @@ class DiaryEditFragment : BaseFragment() {
     @MainThread
     private fun showDiaryLoadingFailureDialog(date: LocalDate) {
         if (isDialogShowing) {
-            diaryEditViewModel.addPendingDialogList(PendingDialog.DIARY_LOADING_FAILURE)
+            mainViewModel.addPendingDialogList(PendingDialog.DIARY_LOADING_FAILURE)
             return
         }
 
@@ -1163,14 +1153,14 @@ class DiaryEditFragment : BaseFragment() {
 
     @MainThread
     private fun showWeatherInfoFetchingDialog(date: LocalDate) {
-        if (!diaryEditViewModel.canFetchWeatherInformation(date)) return
+        if (!mainViewModel.canFetchWeatherInformation(date)) return
         if (isDialogShowing) {
-            diaryEditViewModel.addPendingDialogList(PendingDialog.WEATHER_INFO_FETCHING)
+            mainViewModel.addPendingDialogList(PendingDialog.WEATHER_INFO_FETCHING)
             return
         }
 
         // 今日の日付以降は天気情報を取得できないためダイアログ表示不要
-        diaryEditViewModel.canFetchWeatherInformation(date)
+        mainViewModel.canFetchWeatherInformation(date)
 
         val directions =
             DiaryEditFragmentDirections
@@ -1206,17 +1196,13 @@ class DiaryEditFragment : BaseFragment() {
         navController.navigate(action)
     }
 
-    override fun retryOtherAppMessageDialogShow() {
-        diaryEditViewModel.triggerAppMessageBufferListObserver()
-    }
-
     @MainThread
     private fun backFragment() {
         val navBackStackEntry = checkNotNull(navController.previousBackStackEntry)
         val destinationId = navBackStackEntry.destination.id
         if (destinationId == R.id.navigation_calendar_fragment) {
             val savedStateHandle = navBackStackEntry.savedStateHandle
-            val editedDiaryLocalDate = diaryEditViewModel.loadedDate.value
+            val editedDiaryLocalDate = mainViewModel.loadedDate.value
             savedStateHandle[KEY_EDITED_DIARY_DATE] = editedDiaryLocalDate
         }
         navController.navigateUp()
@@ -1238,7 +1224,7 @@ class DiaryEditFragment : BaseFragment() {
 
         // HACK:ItemTitleEditFragmentから戻ってきた時に処理させたく箇所を
         //      変数(DiaryEditViewModel.IsShowingItemTitleEditFragment)で分岐させる。
-        diaryEditViewModel.updateIsShowingItemTitleEditFragment(false)
+        mainViewModel.updateIsShowingItemTitleEditFragment(false)
     }
 
     override fun destroyBinding() {
@@ -1251,12 +1237,12 @@ class DiaryEditFragment : BaseFragment() {
         // MEMO:DiaryEditViewModelのスコープ範囲はActivityになるが、
         //      DiaryEditFragment、DiaryItemTitleEditFragment表示時のみViewModelのプロパティ値を保持できたらよいので、
         //      DiaryEditFragmentを破棄するタイミングでViewModelのプロパティ値を初期化する。
-        diaryEditViewModel.apply {
+        mainViewModel.apply {
             if (shouldInitializeOnFragmentDestroy) initialize()
         }
     }
 
     fun attachPicture(uri: Uri) {
-        diaryEditViewModel.updatePicturePath(uri)
+        mainViewModel.updatePicturePath(uri)
     }
 }
