@@ -44,6 +44,8 @@ class SettingsFragment : BaseFragment() {
     private val binding get() = checkNotNull(_binding)
 
     // ViewModel
+    // MEMO:SettingsViewModelはスーパークラスでインスタンス化している為、nullを代入。
+    @Suppress("unused")
     override val mainViewModel = null
 
     // ActivityResultLauncher関係

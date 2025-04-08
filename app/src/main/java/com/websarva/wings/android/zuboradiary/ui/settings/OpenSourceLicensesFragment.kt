@@ -25,6 +25,8 @@ class OpenSourceLicensesFragment: BaseFragment() {
     private val binding get() = checkNotNull(_binding)
 
     // ViewModel
+    // MEMO:ViewModel不要の為、nullを代入。
+    @Suppress("unused")
     override val mainViewModel = null
 
     override fun onCreateView(
