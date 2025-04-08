@@ -7,10 +7,10 @@ import com.websarva.wings.android.zuboradiary.data.database.DiaryRepository
 import com.websarva.wings.android.zuboradiary.data.diary.ItemNumber
 import com.websarva.wings.android.zuboradiary.createLogTag
 import com.websarva.wings.android.zuboradiary.ui.BaseViewModel
+import com.websarva.wings.android.zuboradiary.ui.DiaryShowPendingDialog
 import com.websarva.wings.android.zuboradiary.ui.requireValue
 import com.websarva.wings.android.zuboradiary.ui.diary.DiaryStateFlow
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import java.time.LocalDate
 import javax.inject.Inject
@@ -59,12 +59,6 @@ internal class DiaryShowViewModel @Inject constructor(private val diaryRepositor
         get() = diaryStateFlow.picturePath.asStateFlow()
     val log
         get() = diaryStateFlow.log.asStateFlow()
-
-    // 表示保留中Dialog
-    private val initialPendingDialogList = PendingDialogList()
-    private val _pendingDialogList = MutableStateFlow(initialPendingDialogList)
-    val pendingDialogList
-        get() = _pendingDialogList.asStateFlow()
 
     override fun initialize() {
         super.initialize()
@@ -118,24 +112,9 @@ internal class DiaryShowViewModel @Inject constructor(private val diaryRepositor
         }
     }
 
-    // 表示保留中Dialog
-    fun addPendingDialogList(pendingDialog: PendingDialog) {
-        val currentList = _pendingDialogList.value
-        val updateList = currentList.add(pendingDialog)
-        _pendingDialogList.value = updateList
-    }
-
-    fun triggerPendingDialogListObserver() {
-        Log.d(logTag, "triggerAppMessageBufferListObserver()")
-        val currentList = _pendingDialogList.value
-        _pendingDialogList.value = PendingDialogList()
-        _pendingDialogList.value = currentList
-    }
-
-    fun removePendingDialogListFirstItem() {
-        Log.d(logTag, "removeAppMessageBufferListFirstItem()")
-        val currentList = _pendingDialogList.value
-        val updateList = currentList.removeFirstItem()
-        _pendingDialogList.value = updateList
+    // 表示保留中Dialog追加
+    // MEMO:引数の型をサブクラスに制限
+    fun addPendingDialogList(pendingDialog: DiaryShowPendingDialog) {
+        super.addPendingDialogList(pendingDialog)
     }
 }

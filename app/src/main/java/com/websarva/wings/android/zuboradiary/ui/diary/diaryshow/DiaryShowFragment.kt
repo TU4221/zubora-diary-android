@@ -26,6 +26,8 @@ import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor
 import com.websarva.wings.android.zuboradiary.databinding.FragmentDiaryShowBinding
 import com.websarva.wings.android.zuboradiary.ui.BaseFragment
 import com.websarva.wings.android.zuboradiary.ui.DiaryPictureManager
+import com.websarva.wings.android.zuboradiary.ui.DiaryShowPendingDialog
+import com.websarva.wings.android.zuboradiary.ui.PendingDialogList
 import com.websarva.wings.android.zuboradiary.ui.UriPermissionManager
 import com.websarva.wings.android.zuboradiary.ui.requireValue
 import dagger.hilt.android.AndroidEntryPoint
@@ -154,10 +156,13 @@ internal class DiaryShowFragment : BaseFragment() {
             mainViewModel.pendingDialogList
                 .collectLatest { value: PendingDialogList ->
                     val pendingDialog = value.findFirstItem() ?: return@collectLatest
+                    if (pendingDialog !is DiaryShowPendingDialog) return@collectLatest
+
                     val date = mainViewModel.date.requireValue()
                     withContext(Dispatchers.Main) {
                         when (pendingDialog) {
-                            PendingDialog.DIARY_LOADING_FAILURE -> showDiaryLoadingFailureDialog(date)
+                            DiaryShowPendingDialog.DiaryLoadingFailure ->
+                                showDiaryLoadingFailureDialog(date)
                         }
                         mainViewModel.removePendingDialogListFirstItem()
                     }
@@ -395,7 +400,7 @@ internal class DiaryShowFragment : BaseFragment() {
     @MainThread
     private fun showDiaryLoadingFailureDialog(date: LocalDate) {
         if (isDialogShowing) {
-            mainViewModel.addPendingDialogList(PendingDialog.DIARY_LOADING_FAILURE)
+            mainViewModel.addPendingDialogList(DiaryShowPendingDialog.DiaryLoadingFailure)
             return
         }
 

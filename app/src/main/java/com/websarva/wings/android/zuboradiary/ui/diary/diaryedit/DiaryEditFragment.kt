@@ -35,7 +35,9 @@ import com.websarva.wings.android.zuboradiary.data.diary.Weather
 import com.websarva.wings.android.zuboradiary.databinding.FragmentDiaryEditBinding
 import com.websarva.wings.android.zuboradiary.createLogTag
 import com.websarva.wings.android.zuboradiary.ui.BaseFragment
+import com.websarva.wings.android.zuboradiary.ui.DiaryEditPendingDialog
 import com.websarva.wings.android.zuboradiary.ui.DiaryPictureManager
+import com.websarva.wings.android.zuboradiary.ui.PendingDialogList
 import com.websarva.wings.android.zuboradiary.ui.TestDiariesSaver
 import com.websarva.wings.android.zuboradiary.ui.TextInputSetup
 import com.websarva.wings.android.zuboradiary.ui.UriPermissionManager
@@ -335,12 +337,17 @@ class DiaryEditFragment : BaseFragment() {
             mainViewModel.pendingDialogList
                 .collectLatest { value: PendingDialogList ->
                     val pendingDialog = value.findFirstItem() ?: return@collectLatest
+                    if (pendingDialog !is DiaryEditPendingDialog) return@collectLatest
+
                     val date = mainViewModel.date.requireValue()
                     withContext(Dispatchers.Main) {
                         when (pendingDialog) {
-                            PendingDialog.DIARY_LOADING -> showDiaryLoadingDialog(date)
-                            PendingDialog.DIARY_LOADING_FAILURE -> showDiaryLoadingFailureDialog(date)
-                            PendingDialog.WEATHER_INFO_FETCHING -> showWeatherInfoFetchingDialog(date)
+                            DiaryEditPendingDialog.DiaryLoading ->
+                                showDiaryLoadingDialog(date)
+                            DiaryEditPendingDialog.DiaryLoadingFailure ->
+                                showDiaryLoadingFailureDialog(date)
+                            DiaryEditPendingDialog.WeatherInfoFetching ->
+                                showWeatherInfoFetchingDialog(date)
                         }
                         mainViewModel.removePendingDialogListFirstItem()
                     }
@@ -1098,7 +1105,7 @@ class DiaryEditFragment : BaseFragment() {
     @MainThread
     private fun showDiaryLoadingDialog(date: LocalDate) {
         if (isDialogShowing) {
-            mainViewModel.addPendingDialogList(PendingDialog.DIARY_LOADING)
+            mainViewModel.addPendingDialogList(DiaryEditPendingDialog.DiaryLoading)
             return
         }
 
@@ -1111,7 +1118,7 @@ class DiaryEditFragment : BaseFragment() {
     @MainThread
     private fun showDiaryLoadingFailureDialog(date: LocalDate) {
         if (isDialogShowing) {
-            mainViewModel.addPendingDialogList(PendingDialog.DIARY_LOADING_FAILURE)
+            mainViewModel.addPendingDialogList(DiaryEditPendingDialog.DiaryLoadingFailure)
             return
         }
 
@@ -1155,7 +1162,7 @@ class DiaryEditFragment : BaseFragment() {
     private fun showWeatherInfoFetchingDialog(date: LocalDate) {
         if (!mainViewModel.canFetchWeatherInformation(date)) return
         if (isDialogShowing) {
-            mainViewModel.addPendingDialogList(PendingDialog.WEATHER_INFO_FETCHING)
+            mainViewModel.addPendingDialogList(DiaryEditPendingDialog.WeatherInfoFetching)
             return
         }
 

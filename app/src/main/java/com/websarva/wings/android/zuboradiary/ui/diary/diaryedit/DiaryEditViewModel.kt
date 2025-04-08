@@ -11,6 +11,7 @@ import com.websarva.wings.android.zuboradiary.data.network.GeoCoordinates
 import com.websarva.wings.android.zuboradiary.data.network.WeatherApiRepository
 import com.websarva.wings.android.zuboradiary.createLogTag
 import com.websarva.wings.android.zuboradiary.ui.BaseViewModel
+import com.websarva.wings.android.zuboradiary.ui.DiaryEditPendingDialog
 import com.websarva.wings.android.zuboradiary.ui.requireValue
 import com.websarva.wings.android.zuboradiary.ui.diary.DiaryStateFlow
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -176,12 +177,6 @@ internal class DiaryEditViewModel @Inject constructor(
     var isShowingItemTitleEditFragment = initialIsShowingItemTitleEditFragment
         private set
 
-    // 表示保留中Dialog
-    private val initialPendingDialogList = PendingDialogList()
-    private val _pendingDialogList = MutableStateFlow(initialPendingDialogList)
-    val pendingDialogList
-        get() = _pendingDialogList.asStateFlow()
-
     // MEMO:画面回転時の不要な初期化を防ぐ
     private val initialShouldInitializeOnFragmentDestroy = false
     var shouldInitializeOnFragmentDestroy = initialShouldInitializeOnFragmentDestroy
@@ -196,7 +191,6 @@ internal class DiaryEditViewModel @Inject constructor(
         hasPreparedDiary = initialHasPreparedDiary
         shouldJumpItemMotionLayout = initialShouldJumpItemMotionLayout
         isShowingItemTitleEditFragment = initialIsShowingItemTitleEditFragment
-        _pendingDialogList.value = initialPendingDialogList
         shouldInitializeOnFragmentDestroy = initialShouldInitializeOnFragmentDestroy
     }
 
@@ -421,27 +415,6 @@ internal class DiaryEditViewModel @Inject constructor(
         shouldJumpItemMotionLayout = false
     }
 
-    // 表示保留中Dialog
-    fun addPendingDialogList(pendingDialog: PendingDialog) {
-        val currentList = _pendingDialogList.value
-        val updateList = currentList.add(pendingDialog)
-        _pendingDialogList.value = updateList
-    }
-
-    fun triggerPendingDialogListObserver() {
-        Log.d(logTag, "triggerAppMessageBufferListObserver()")
-        val currentList = _pendingDialogList.value
-        _pendingDialogList.value = PendingDialogList()
-        _pendingDialogList.value = currentList
-    }
-
-    fun removePendingDialogListFirstItem() {
-        Log.d(logTag, "removeAppMessageBufferListFirstItem()")
-        val currentList = _pendingDialogList.value
-        val updateList = currentList.removeFirstItem()
-        _pendingDialogList.value = updateList
-    }
-
     // Fragment切替記憶
     fun updateIsShowingItemTitleEditFragment(isShowing: Boolean) {
         isShowingItemTitleEditFragment = isShowing
@@ -455,5 +428,11 @@ internal class DiaryEditViewModel @Inject constructor(
         if (isLoadedDateEqualToInputDate) return false
         val inputDate = diaryStateFlow.date.requireValue()
         return existsSavedDiary(inputDate)
+    }
+
+    // 表示保留中Dialog追加
+    // MEMO:引数の型をサブクラスに制限
+    fun addPendingDialogList(pendingDialog: DiaryEditPendingDialog) {
+        super.addPendingDialogList(pendingDialog)
     }
 }
