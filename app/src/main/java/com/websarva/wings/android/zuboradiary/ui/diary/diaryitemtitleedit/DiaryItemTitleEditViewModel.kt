@@ -2,10 +2,10 @@ package com.websarva.wings.android.zuboradiary.ui.diary.diaryitemtitleedit
 
 import android.util.Log
 import androidx.lifecycle.viewModelScope
-import com.websarva.wings.android.zuboradiary.data.AppMessage
 import com.websarva.wings.android.zuboradiary.data.database.DiaryItemTitleSelectionHistoryRepository
 import com.websarva.wings.android.zuboradiary.data.diary.ItemNumber
 import com.websarva.wings.android.zuboradiary.createLogTag
+import com.websarva.wings.android.zuboradiary.data.DiaryItemTitleEditAppMessage
 import com.websarva.wings.android.zuboradiary.ui.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -76,7 +76,7 @@ internal class DiaryItemTitleEditViewModel @Inject constructor(
                 Log.i(logTag, "${logMsg}_完了")
             } catch (e: Exception) {
                 Log.e(logTag, "${logMsg}_失敗", e)
-                addAppMessage(AppMessage.DIARY_ITEM_TITLE_HISTORY_LOADING_ERROR)
+                addAppMessage(DiaryItemTitleEditAppMessage.ItemTitleHistoryLoadingFailure)
             }
         }
     }
@@ -102,7 +102,7 @@ internal class DiaryItemTitleEditViewModel @Inject constructor(
             diaryItemTitleSelectionHistoryRepository.deleteSelectionHistoryItem(deleteTitle)
         } catch (e: Exception) {
             Log.e(logTag, "${logMsg}_失敗", e)
-            addAppMessage(AppMessage.DIARY_ITEM_TITLE_HISTORY_ITEM_DELETE_ERROR)
+            addAppMessage(DiaryItemTitleEditAppMessage.ItemTitleHistoryDeleteFailure)
             return false
         }
 

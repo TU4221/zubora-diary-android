@@ -2,7 +2,6 @@ package com.websarva.wings.android.zuboradiary.ui.diary.diaryedit
 
 import android.net.Uri
 import android.util.Log
-import com.websarva.wings.android.zuboradiary.data.AppMessage
 import com.websarva.wings.android.zuboradiary.data.database.DiaryRepository
 import com.websarva.wings.android.zuboradiary.data.diary.Condition
 import com.websarva.wings.android.zuboradiary.data.diary.ItemNumber
@@ -10,6 +9,7 @@ import com.websarva.wings.android.zuboradiary.data.diary.Weather
 import com.websarva.wings.android.zuboradiary.data.network.GeoCoordinates
 import com.websarva.wings.android.zuboradiary.data.network.WeatherApiRepository
 import com.websarva.wings.android.zuboradiary.createLogTag
+import com.websarva.wings.android.zuboradiary.data.DiaryEditAppMessage
 import com.websarva.wings.android.zuboradiary.ui.BaseViewModel
 import com.websarva.wings.android.zuboradiary.ui.DiaryEditPendingDialog
 import com.websarva.wings.android.zuboradiary.ui.requireValue
@@ -210,7 +210,7 @@ internal class DiaryEditViewModel @Inject constructor(
                 if (!isSuccessful) throw Exception()
             } catch (e: Exception) {
                 Log.e(logTag, "${logMsg}_失敗", e)
-                if (!ignoreAppMessage) addAppMessage(AppMessage.DIARY_LOADING_ERROR)
+                if (!ignoreAppMessage) addAppMessage(DiaryEditAppMessage.DiaryLoadingFailure)
                 _isVisibleUpdateProgressBar.value = false
                 shouldJumpItemMotionLayout = false
                 return false
@@ -249,7 +249,7 @@ internal class DiaryEditViewModel @Inject constructor(
             return diaryRepository.existsDiary(date)
         } catch (e: Exception) {
             Log.e(logTag, "日記既存確認_失敗", e)
-            addAppMessage(AppMessage.DIARY_LOADING_ERROR)
+            addAppMessage(DiaryEditAppMessage.WeatherInfoLoadingFailure)
             return null
         }
     }
@@ -276,7 +276,7 @@ internal class DiaryEditViewModel @Inject constructor(
             }
         } catch (e: Exception) {
             Log.e(logTag, "${logMsg}_失敗", e)
-            addAppMessage(AppMessage.DIARY_SAVING_ERROR)
+            addAppMessage(DiaryEditAppMessage.DiarySavingFailure)
             return false
         }
 
@@ -293,7 +293,7 @@ internal class DiaryEditViewModel @Inject constructor(
             diaryRepository.deleteDiary(deleteDate)
         } catch (e: Exception) {
             Log.e(logTag, "${logMsg}_失敗", e)
-            addAppMessage(AppMessage.DIARY_DELETE_ERROR)
+            addAppMessage(DiaryEditAppMessage.DiaryDeleteFailure)
             return false
         }
 
@@ -369,7 +369,7 @@ internal class DiaryEditViewModel @Inject constructor(
                     "fetchWeatherInformation()_errorBody = $errorBodyString"
                 )
             }
-            addAppMessage(AppMessage.WEATHER_INFO_LOADING_ERROR)
+            addAppMessage(DiaryEditAppMessage.WeatherInfoLoadingFailure)
             Log.d(logTag, "${logMsg}_失敗")
         }
         _isVisibleUpdateProgressBar.value = false
@@ -406,7 +406,7 @@ internal class DiaryEditViewModel @Inject constructor(
             return !diaryRepository.existsPicturePath(uri)
         } catch (e: Exception) {
             Log.e(logTag, "端末写真URI使用状況確認_失敗", e)
-            addAppMessage(AppMessage.DIARY_LOADING_ERROR)
+            addAppMessage(DiaryEditAppMessage.DiaryInfoLoadingFailure)
             return null
         }
     }
@@ -421,7 +421,7 @@ internal class DiaryEditViewModel @Inject constructor(
     }
 
     fun addWeatherInfoFetchErrorMessage() {
-        addAppMessage(AppMessage.WEATHER_INFO_LOADING_ERROR)
+        addAppMessage(DiaryEditAppMessage.WeatherInfoLoadingFailure)
     }
 
     suspend fun shouldShowUpdateConfirmationDialog(): Boolean? {

@@ -2,10 +2,10 @@ package com.websarva.wings.android.zuboradiary.ui.diary.diaryshow
 
 import android.net.Uri
 import android.util.Log
-import com.websarva.wings.android.zuboradiary.data.AppMessage
 import com.websarva.wings.android.zuboradiary.data.database.DiaryRepository
 import com.websarva.wings.android.zuboradiary.data.diary.ItemNumber
 import com.websarva.wings.android.zuboradiary.createLogTag
+import com.websarva.wings.android.zuboradiary.data.DiaryShowAppMessage
 import com.websarva.wings.android.zuboradiary.ui.BaseViewModel
 import com.websarva.wings.android.zuboradiary.ui.DiaryShowPendingDialog
 import com.websarva.wings.android.zuboradiary.ui.requireValue
@@ -75,7 +75,7 @@ internal class DiaryShowViewModel @Inject constructor(private val diaryRepositor
         } catch (e: Exception) {
             Log.e(logTag, "${logMsg}_失敗", e)
             if (!ignoreAppMessage) {
-                addAppMessage(AppMessage.DIARY_LOADING_ERROR)
+                addAppMessage(DiaryShowAppMessage.DiaryLoadingFailure)
             }
             return false
         }
@@ -93,7 +93,7 @@ internal class DiaryShowViewModel @Inject constructor(private val diaryRepositor
             diaryRepository.deleteDiary(deleteDate)
         } catch (e: Exception) {
             Log.e(logTag, "${logMsg}_失敗", e)
-            addAppMessage(AppMessage.DIARY_DELETE_ERROR)
+            addAppMessage(DiaryShowAppMessage.DiaryDeleteFailure)
             return false
         }
 
@@ -107,7 +107,7 @@ internal class DiaryShowViewModel @Inject constructor(private val diaryRepositor
             return !diaryRepository.existsPicturePath(uri)
         } catch (e: Exception) {
             Log.e(logTag, "端末写真URI使用状況確認_失敗", e)
-            addAppMessage(AppMessage.DIARY_LOADING_ERROR)
+            addAppMessage(DiaryShowAppMessage.DiaryLoadingFailure)
             return null
         }
     }

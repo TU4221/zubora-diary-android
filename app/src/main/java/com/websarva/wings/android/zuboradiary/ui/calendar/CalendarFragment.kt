@@ -22,6 +22,7 @@ import com.websarva.wings.android.zuboradiary.R
 import com.websarva.wings.android.zuboradiary.data.AppMessage
 import com.websarva.wings.android.zuboradiary.data.AppMessageList
 import com.websarva.wings.android.zuboradiary.data.DateTimeStringConverter
+import com.websarva.wings.android.zuboradiary.data.DiaryShowAppMessage
 import com.websarva.wings.android.zuboradiary.data.diary.Condition
 import com.websarva.wings.android.zuboradiary.data.diary.Weather
 import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor
@@ -149,7 +150,11 @@ class CalendarFragment : BaseFragment() {
         launchAndRepeatOnViewLifeCycleStarted {
             diaryShowViewModel.appMessageBufferList
                 .collectLatest { value: AppMessageList ->
-                    AppMessageBufferListObserver(diaryShowViewModel).onChanged(value)
+                    object : AppMessageBufferListObserver(diaryShowViewModel){
+                        override fun checkAppMessageTargetType(appMessage: AppMessage): Boolean {
+                            return appMessage is DiaryShowAppMessage
+                        }
+                    }.onChanged(value)
                 }
         }
     }

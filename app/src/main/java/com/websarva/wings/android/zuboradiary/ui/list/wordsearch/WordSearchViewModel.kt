@@ -2,10 +2,10 @@ package com.websarva.wings.android.zuboradiary.ui.list.wordsearch
 
 import android.util.Log
 import androidx.lifecycle.viewModelScope
-import com.websarva.wings.android.zuboradiary.data.AppMessage
 import com.websarva.wings.android.zuboradiary.data.database.DiaryRepository
 import com.websarva.wings.android.zuboradiary.data.database.WordSearchResultListItem
 import com.websarva.wings.android.zuboradiary.createLogTag
+import com.websarva.wings.android.zuboradiary.data.WordSearchAppMessage
 import com.websarva.wings.android.zuboradiary.ui.BaseViewModel
 import com.websarva.wings.android.zuboradiary.ui.requireValue
 import com.websarva.wings.android.zuboradiary.ui.list.diarylist.DiaryListViewModel
@@ -170,7 +170,7 @@ internal class WordSearchViewModel @Inject internal constructor(
         } catch (e: Exception) {
             Log.e(logTag, "${logMsg}_失敗", e)
             _wordSearchResultList.value = previousResultList
-            addAppMessage(AppMessage.DIARY_LOADING_ERROR)
+            addAppMessage(WordSearchAppMessage.SearchResultListLoadingFailure)
         }
     }
 

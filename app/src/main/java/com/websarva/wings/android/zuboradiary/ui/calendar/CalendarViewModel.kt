@@ -1,9 +1,9 @@
 package com.websarva.wings.android.zuboradiary.ui.calendar
 
 import android.util.Log
-import com.websarva.wings.android.zuboradiary.data.AppMessage
 import com.websarva.wings.android.zuboradiary.data.database.DiaryRepository
 import com.websarva.wings.android.zuboradiary.createLogTag
+import com.websarva.wings.android.zuboradiary.data.CalendarAppMessage
 import com.websarva.wings.android.zuboradiary.ui.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -38,9 +38,9 @@ internal class CalendarViewModel @Inject constructor(
         } catch (e: Exception) {
             // MEMO:CalendarViewModel#hasDiary()はカレンダー日数分連続で処理する為、
             //      エラーが連続で発生した場合、膨大なエラーを記録してしまう。これを回避する為に下記コードを記述。
-            if (equalLastAppMessage(AppMessage.DIARY_INFO_LOADING_ERROR)) return false
+            if (equalLastAppMessage(CalendarAppMessage.DiaryLoadingFailure)) return false
             Log.e(logTag, "日記既存確認_失敗", e)
-            addAppMessage(AppMessage.DIARY_INFO_LOADING_ERROR)
+            addAppMessage(CalendarAppMessage.DiaryInfoLoadingFailure)
             return null
         }
     }

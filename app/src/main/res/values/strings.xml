@@ -269,18 +269,40 @@
     <string name="enum_theme_color_green">グリーン</string>
     <string name="enum_theme_color_yellow">イエロー</string>
 
-    <!-- Enum_AppMessage -->
-    <string name="enum_app_message_title_access_error">アクセスエラー</string>
-    <string name="enum_app_message_message_diary_loading_error">日記の読込に失敗しました。</string>
-    <string name="enum_app_message_message_diary_saving_error">日記の保存に失敗しました。</string>
-    <string name="enum_app_message_message_diary_delete_error">日記の削除に失敗しました。</string>
-    <string name="enum_app_message_message_diary_information_loading_error">日記情報の読込に失敗しました。</string>
-    <string name="enum_app_message_message_item_title_selection_history_loading_error">選択履歴の読込に失敗しました。</string>
-    <string name="enum_app_message_message_item_title_selection_history_item_delete_error">削除に失敗しました。</string>
-    <string name="enum_app_message_message_setting_loading_error">設定の読込に失敗しました。</string>
-    <string name="enum_app_message_message_setting_update_error">設定の更新に失敗しました。</string>
-    <string name="enum_app_message_title_connection_error">通信エラー</string>
-    <string name="enum_app_message_message_weather_information_loading_error">天気情報の読込に失敗しました。</string>
+    <!-- AppMessageDialog -->
+    <!-- AppMessageCommonTitle -->
+    <string name="dialog_app_message_title_access_error">アクセスエラー</string>
+    <string name="dialog_app_message_title_connection_error">通信エラー</string>
+    <!-- AppMessageCommonMessage -->
+    <string name="dialog_app_message_diary_loading_failure">日記の読込に失敗しました。</string>
+    <string name="dialog_app_message_diary_delete_failure">日記の削除に失敗しました。</string>
+    <string name="dialog_app_message_diary_info_loading_failure">日記情報の読込に失敗しました。</string>
+    <!-- DiaryListAppMessage -->
+    <string name="dialog_diary_list_app_message_diary_list_loading_failure">日記リストの読込に失敗しました。</string>
+    <string name="dialog_diary_list_app_message_diary_delete_failure">@string/dialog_app_message_diary_delete_failure</string>
+    <string name="dialog_diary_list_app_message_diary_info_loading_failure">@string/dialog_app_message_diary_info_loading_failure</string>
+    <!-- WordSearchAppMessage -->
+    <string name="dialog_word_search_app_message_search_result_list_loading_failure">検索結果リストの読込に失敗しました。</string>
+    <!-- CalendarAppMessage -->
+    <string name="dialog_calendar_app_message_diary_loading_failure">@string/dialog_app_message_diary_loading_failure</string>
+    <string name="dialog_calendar_app_message_diary_info_loading_failure">@string/dialog_app_message_diary_info_loading_failure</string>
+    <!-- SettingsAppMessage -->
+    <string name="dialog_settings_app_message_setting_loading_failure">設定の読込に失敗しました。</string>
+    <string name="dialog_settings_app_message_setting_update_failure">設定の更新に失敗しました。</string>
+    <string name="dialog_settings_app_message_all_diary_delete_failure">全ての日記の削除に失敗しました。</string>
+    <string name="dialog_settings_app_message_all_data_delete_failure">全てのデータの削除に失敗しました。</string>
+    <!-- DiaryShowAppMessage -->
+    <string name="dialog_diary_show_app_message_diary_loading_failure">@string/dialog_app_message_diary_loading_failure</string>
+    <string name="dialog_diary_show_app_message_diary_delete_failure">@string/dialog_app_message_diary_delete_failure</string>
+    <!-- DiaryEditAppMessage -->
+    <string name="dialog_diary_edit_app_message_diary_loading_failure">@string/dialog_app_message_diary_loading_failure</string>
+    <string name="dialog_diary_edit_app_message_diary_saving_failure">日記の保存に失敗しました。</string>
+    <string name="dialog_diary_edit_app_message_diary_delete_failure">@string/dialog_app_message_diary_delete_failure</string>
+    <string name="dialog_diary_edit_app_message_diary_info_loading_failure">@string/dialog_app_message_diary_info_loading_failure</string>
+    <string name="dialog_diary_edit_app_message_weather_info_loading_failure">天気情報の読込に失敗しました。</string>
+    <!-- DiaryItemTitleEditAppMessage -->
+    <string name="dialog_diary_item_title_edit_app_message_selection_history_loading_failure">選択履歴の読込に失敗しました。</string>
+    <string name="dialog_diary_item_title_edit_app_message_selection_history_item_delete_failure">選択履歴の削除に失敗しました。</string>
 
     <!--*****************************************************************************************-->
 

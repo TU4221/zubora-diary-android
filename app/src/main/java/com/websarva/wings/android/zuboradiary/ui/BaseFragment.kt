@@ -20,9 +20,23 @@ import androidx.navigation.fragment.NavHostFragment
 import com.google.android.material.transition.platform.MaterialFadeThrough
 import com.google.android.material.transition.platform.MaterialSharedAxis
 import com.websarva.wings.android.zuboradiary.MainActivity
-import com.websarva.wings.android.zuboradiary.data.AppMessage
 import com.websarva.wings.android.zuboradiary.data.AppMessageList
 import com.websarva.wings.android.zuboradiary.createLogTag
+import com.websarva.wings.android.zuboradiary.data.AppMessage
+import com.websarva.wings.android.zuboradiary.data.CalendarAppMessage
+import com.websarva.wings.android.zuboradiary.data.DiaryEditAppMessage
+import com.websarva.wings.android.zuboradiary.data.DiaryItemTitleEditAppMessage
+import com.websarva.wings.android.zuboradiary.data.DiaryListAppMessage
+import com.websarva.wings.android.zuboradiary.data.DiaryShowAppMessage
+import com.websarva.wings.android.zuboradiary.data.SettingsAppMessage
+import com.websarva.wings.android.zuboradiary.data.WordSearchAppMessage
+import com.websarva.wings.android.zuboradiary.ui.calendar.CalendarFragment
+import com.websarva.wings.android.zuboradiary.ui.diary.diaryedit.DiaryEditFragment
+import com.websarva.wings.android.zuboradiary.ui.diary.diaryitemtitleedit.DiaryItemTitleEditFragment
+import com.websarva.wings.android.zuboradiary.ui.diary.diaryshow.DiaryShowFragment
+import com.websarva.wings.android.zuboradiary.ui.list.diarylist.DiaryListFragment
+import com.websarva.wings.android.zuboradiary.ui.list.wordsearch.WordSearchFragment
+import com.websarva.wings.android.zuboradiary.ui.settings.SettingsFragment
 import com.websarva.wings.android.zuboradiary.ui.settings.SettingsViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -260,8 +274,39 @@ abstract class BaseFragment : CustomFragment() {
         launchAndRepeatOnViewLifeCycleStarted {
             mainViewModel!!.appMessageBufferList
                 .collectLatest { value: AppMessageList ->
-                    AppMessageBufferListObserver(mainViewModel!!).onChanged(value)
+                    MainAppMessageBufferListObserver(mainViewModel!!).onChanged(value)
                 }
+        }
+    }
+
+    private inner class MainAppMessageBufferListObserver(viewModel: BaseViewModel)
+        : AppMessageBufferListObserver(viewModel) {
+
+        override fun checkAppMessageTargetType(appMessage: AppMessage): Boolean {
+            when (appMessage) {
+                is DiaryListAppMessage -> {
+                    return (this@BaseFragment is DiaryListFragment)
+                }
+                is WordSearchAppMessage -> {
+                    return (this@BaseFragment is WordSearchFragment)
+                }
+                is CalendarAppMessage -> {
+                    return (this@BaseFragment is CalendarFragment)
+                }
+                is SettingsAppMessage -> {
+                    return (this@BaseFragment is SettingsFragment)
+                }
+                is DiaryShowAppMessage -> {
+                    return (this@BaseFragment is DiaryShowFragment)
+                }
+                is DiaryEditAppMessage -> {
+                    return (this@BaseFragment is DiaryEditFragment)
+                }
+                is DiaryItemTitleEditAppMessage -> {
+                    return (this@BaseFragment is DiaryItemTitleEditFragment)
+                }
+                else -> return false
+            }
         }
     }
 
@@ -269,12 +314,16 @@ abstract class BaseFragment : CustomFragment() {
         launchAndRepeatOnViewLifeCycleStarted {
             settingsViewModel.appMessageBufferList
                 .collectLatest { value: AppMessageList ->
-                    AppMessageBufferListObserver(settingsViewModel).onChanged(value)
+                    object : AppMessageBufferListObserver(settingsViewModel) {
+                        override fun checkAppMessageTargetType(appMessage: AppMessage): Boolean {
+                            return appMessage is SettingsAppMessage
+                        }
+                    }.onChanged(value)
                 }
         }
     }
 
-    protected inner class AppMessageBufferListObserver(private val baseViewModel: BaseViewModel) {
+    protected abstract inner class AppMessageBufferListObserver(private val baseViewModel: BaseViewModel) {
         suspend fun onChanged(value: AppMessageList) {
             if (value.isEmpty) return
 
@@ -283,6 +332,7 @@ abstract class BaseFragment : CustomFragment() {
         }
 
         private suspend fun showAppMessageDialog(appMessage: AppMessage) {
+            if (!checkAppMessageTargetType(appMessage)) throw IllegalStateException()
             if (isDialogShowing) return
 
             withContext(Dispatchers.Main) {
@@ -290,6 +340,8 @@ abstract class BaseFragment : CustomFragment() {
                 baseViewModel.removeAppMessageBufferListFirstItem()
             }
         }
+
+        protected abstract fun checkAppMessageTargetType(appMessage: AppMessage): Boolean
     }
 
     /**

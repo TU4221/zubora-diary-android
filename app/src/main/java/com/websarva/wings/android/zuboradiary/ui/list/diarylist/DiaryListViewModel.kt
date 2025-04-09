@@ -3,10 +3,10 @@ package com.websarva.wings.android.zuboradiary.ui.list.diarylist
 import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.viewModelScope
-import com.websarva.wings.android.zuboradiary.data.AppMessage
 import com.websarva.wings.android.zuboradiary.data.database.DiaryListItem
 import com.websarva.wings.android.zuboradiary.data.database.DiaryRepository
 import com.websarva.wings.android.zuboradiary.createLogTag
+import com.websarva.wings.android.zuboradiary.data.DiaryListAppMessage
 import com.websarva.wings.android.zuboradiary.ui.BaseViewModel
 import com.websarva.wings.android.zuboradiary.ui.requireValue
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -139,7 +139,7 @@ internal class DiaryListViewModel @Inject constructor(private val diaryRepositor
         } catch (e: Exception) {
             Log.e(logTag, "${logMsg}_失敗", e)
             _diaryList.value = previousDiaryList
-            addAppMessage(AppMessage.DIARY_LOADING_ERROR)
+            addAppMessage(DiaryListAppMessage.DiaryListLoadingFailure)
         }
     }
 
@@ -260,7 +260,7 @@ internal class DiaryListViewModel @Inject constructor(private val diaryRepositor
             diaryRepository.deleteDiary(date)
         } catch (e: Exception) {
             Log.e(logTag, "${logMsg}_失敗", e)
-            addAppMessage(AppMessage.DIARY_DELETE_ERROR)
+            addAppMessage(DiaryListAppMessage.DiaryDeleteFailure)
             return false
         }
 
@@ -275,7 +275,7 @@ internal class DiaryListViewModel @Inject constructor(private val diaryRepositor
             return !diaryRepository.existsPicturePath(uri)
         } catch (e: Exception) {
             Log.e(logTag, "端末写真URI使用状況確認_失敗", e)
-            addAppMessage(AppMessage.DIARY_LOADING_ERROR)
+            addAppMessage(DiaryListAppMessage.DiaryInfoLoadingFailure)
             return null
         }
     }
@@ -287,7 +287,7 @@ internal class DiaryListViewModel @Inject constructor(private val diaryRepositor
             return LocalDate.parse(strDate)
         } catch (e: Exception) {
             Log.e(logTag, "最新日記読込_失敗", e)
-            addAppMessage(AppMessage.DIARY_INFO_LOADING_ERROR)
+            addAppMessage(DiaryListAppMessage.DiaryInfoLoadingFailure)
             return null
         }
     }
@@ -299,7 +299,7 @@ internal class DiaryListViewModel @Inject constructor(private val diaryRepositor
             return LocalDate.parse(strDate)
         } catch (e: Exception) {
             Log.e(logTag, "最古日記読込_失敗", e)
-            addAppMessage(AppMessage.DIARY_INFO_LOADING_ERROR)
+            addAppMessage(DiaryListAppMessage.DiaryInfoLoadingFailure)
             return null
         }
     }

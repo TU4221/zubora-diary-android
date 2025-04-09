@@ -3,7 +3,6 @@ package com.websarva.wings.android.zuboradiary.ui.settings
 import android.util.Log
 import androidx.datastore.core.IOException
 import androidx.lifecycle.viewModelScope
-import com.websarva.wings.android.zuboradiary.data.AppMessage
 import com.websarva.wings.android.zuboradiary.data.database.DiaryRepository
 import com.websarva.wings.android.zuboradiary.data.network.GeoCoordinates
 import com.websarva.wings.android.zuboradiary.data.preferences.CalendarStartDayOfWeekPreference
@@ -15,6 +14,7 @@ import com.websarva.wings.android.zuboradiary.data.preferences.UserPreferencesRe
 import com.websarva.wings.android.zuboradiary.data.preferences.WeatherInfoAcquisitionPreference
 import com.websarva.wings.android.zuboradiary.data.worker.WorkerRepository
 import com.websarva.wings.android.zuboradiary.createLogTag
+import com.websarva.wings.android.zuboradiary.data.SettingsAppMessage
 import com.websarva.wings.android.zuboradiary.ui.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -236,9 +236,9 @@ class SettingsViewModel @Inject constructor(
     }
 
     private fun addSettingLoadingErrorMessage() {
-        if (equalLastAppMessage(AppMessage.SETTING_LOADING_ERROR)) return  // 設定更新エラー通知の重複防止
+        if (equalLastAppMessage(SettingsAppMessage.SettingLoadingFailure)) return  // 設定更新エラー通知の重複防止
 
-        addAppMessage(AppMessage.SETTING_LOADING_ERROR)
+        addAppMessage(SettingsAppMessage.SettingLoadingFailure)
     }
 
     suspend fun saveThemeColor(value: ThemeColor): Boolean {
@@ -321,9 +321,9 @@ class SettingsViewModel @Inject constructor(
     }
 
     private fun addSettingUpdateErrorMessage() {
-        if (equalLastAppMessage(AppMessage.SETTING_UPDATE_ERROR)) return  // 設定更新エラー通知の重複防止
+        if (equalLastAppMessage(SettingsAppMessage.SettingUpdateFailure)) return  // 設定更新エラー通知の重複防止
 
-        addAppMessage(AppMessage.SETTING_UPDATE_ERROR)
+        addAppMessage(SettingsAppMessage.SettingUpdateFailure)
     }
 
     fun updateGeoCoordinates(geoCoordinates: GeoCoordinates) {
@@ -339,7 +339,7 @@ class SettingsViewModel @Inject constructor(
             diaryRepository.deleteAllDiaries()
         } catch (e: Exception) {
             Log.e(logTag, "全日記削除_失敗", e)
-            addAppMessage(AppMessage.DIARY_DELETE_ERROR)
+            addAppMessage(SettingsAppMessage.AllDiaryDeleteFailure)
             return false
         }
         return true
@@ -356,7 +356,7 @@ class SettingsViewModel @Inject constructor(
             diaryRepository.deleteAllData()
         } catch (e: Exception) {
             Log.e(logTag, "アプリ全データ削除_失敗", e)
-            addAppMessage(AppMessage.DIARY_DELETE_ERROR)
+            addAppMessage(SettingsAppMessage.AllDataDeleteFailure)
             return false
         }
         return initializeAllSettings()
