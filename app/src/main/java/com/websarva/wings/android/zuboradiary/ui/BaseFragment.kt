@@ -78,8 +78,8 @@ abstract class BaseFragment : CustomFragment() {
         val navDestination = navController.currentDestination
         return checkNotNull(navDestination).id
     }
-    protected val isDialogShowing
-        get() = destinationId != currentDestinationId
+    protected val canNavigateFragment
+        get() = destinationId == currentDestinationId
 
     private val addedLifecycleEventObserverList = ArrayList<LifecycleEventObserver>()
 
@@ -340,7 +340,7 @@ abstract class BaseFragment : CustomFragment() {
 
     @MainThread
     private fun showAppMessageDialog(appMessage: AppMessage): Boolean {
-        if (isDialogShowing) return false
+        if (!canNavigateFragment) return false
 
         navigateAppMessageDialog(appMessage)
         return true

@@ -1073,7 +1073,7 @@ class DiaryEditFragment : BaseFragment() {
 
     @MainThread
     private fun showDiaryShowFragment(date: LocalDate) {
-        if (isDialogShowing) return
+        if (!canNavigateFragment) return
 
         val isStartDiaryFragment =
             DiaryEditFragmentArgs.fromBundle(requireArguments()).isStartDiaryFragment
@@ -1093,7 +1093,7 @@ class DiaryEditFragment : BaseFragment() {
         inputItemNumber: ItemNumber,
         inputItemTitle: String
     ) {
-        if (isDialogShowing) return
+        if (!canNavigateFragment) return
 
         val directions =
             DiaryEditFragmentDirections
@@ -1104,7 +1104,7 @@ class DiaryEditFragment : BaseFragment() {
 
     @MainThread
     private fun showDiaryLoadingDialog(date: LocalDate) {
-        if (isDialogShowing) {
+        if (!canNavigateFragment) {
             mainViewModel.addPendingDialogList(DiaryEditPendingDialog.DiaryLoading)
             return
         }
@@ -1117,7 +1117,7 @@ class DiaryEditFragment : BaseFragment() {
 
     @MainThread
     private fun showDiaryLoadingFailureDialog(date: LocalDate) {
-        if (isDialogShowing) {
+        if (!canNavigateFragment) {
             mainViewModel.addPendingDialogList(DiaryEditPendingDialog.DiaryLoadingFailure)
             return
         }
@@ -1130,7 +1130,7 @@ class DiaryEditFragment : BaseFragment() {
 
     @MainThread
     private fun showDiaryUpdateDialog(date: LocalDate) {
-        if (isDialogShowing) return
+        if (!canNavigateFragment) return
 
         val directions =
             DiaryEditFragmentDirections
@@ -1140,7 +1140,7 @@ class DiaryEditFragment : BaseFragment() {
 
     @MainThread
     private fun showDiaryDeleteDialog(date: LocalDate) {
-        if (isDialogShowing) return
+        if (!canNavigateFragment) return
 
         val directions =
             DiaryEditFragmentDirections
@@ -1150,7 +1150,7 @@ class DiaryEditFragment : BaseFragment() {
 
     @MainThread
     private fun showDatePickerDialog(date: LocalDate) {
-        if (isDialogShowing) return
+        if (!canNavigateFragment) return
 
         val directions =
             DiaryEditFragmentDirections
@@ -1161,7 +1161,7 @@ class DiaryEditFragment : BaseFragment() {
     @MainThread
     private fun showWeatherInfoFetchingDialog(date: LocalDate) {
         if (!mainViewModel.canFetchWeatherInformation(date)) return
-        if (isDialogShowing) {
+        if (!canNavigateFragment) {
             mainViewModel.addPendingDialogList(DiaryEditPendingDialog.WeatherInfoFetching)
             return
         }
@@ -1177,7 +1177,7 @@ class DiaryEditFragment : BaseFragment() {
 
     @MainThread
     private fun showDiaryItemDeleteDialog(itemNumber: ItemNumber) {
-        if (isDialogShowing) return
+        if (!canNavigateFragment) return
 
         val directions =
             DiaryEditFragmentDirections
@@ -1187,7 +1187,7 @@ class DiaryEditFragment : BaseFragment() {
 
     @MainThread
     private fun showDiaryPictureDeleteDialog() {
-        if (isDialogShowing) return
+        if (!canNavigateFragment) return
 
         val directions =
             DiaryEditFragmentDirections

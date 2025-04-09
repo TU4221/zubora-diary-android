@@ -287,7 +287,7 @@ class WordSearchFragment : BaseFragment() {
 
     @MainThread
     private fun showShowDiaryFragment(date: LocalDate) {
-        if (isDialogShowing) return
+        if (!canNavigateFragment) return
 
         val directions =
             WordSearchFragmentDirections

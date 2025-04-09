@@ -272,7 +272,7 @@ class DiaryListFragment : BaseFragment() {
 
     @MainThread
     private fun showEditDiary() {
-        if (isDialogShowing) return
+        if (!canNavigateFragment) return
 
         val directions =
             DiaryListFragmentDirections
@@ -286,7 +286,7 @@ class DiaryListFragment : BaseFragment() {
 
     @MainThread
     private fun showShowDiaryFragment(date: LocalDate) {
-        if (isDialogShowing) return
+        if (!canNavigateFragment) return
 
         val directions =
             DiaryListFragmentDirections
@@ -296,7 +296,7 @@ class DiaryListFragment : BaseFragment() {
 
     @MainThread
     private fun showWordSearchFragment() {
-        if (isDialogShowing) return
+        if (!canNavigateFragment) return
 
         val directions =
             DiaryListFragmentDirections
@@ -306,7 +306,7 @@ class DiaryListFragment : BaseFragment() {
 
     @MainThread
     private fun showStartYearMonthPickerDialog(newestYear: Year, oldestYear: Year) {
-        if (isDialogShowing) return
+        if (!canNavigateFragment) return
 
         val directions =
             DiaryListFragmentDirections
@@ -316,7 +316,7 @@ class DiaryListFragment : BaseFragment() {
 
     @MainThread
     private fun showDiaryDeleteDialog(date: LocalDate, pictureUri: Uri?) {
-        if (isDialogShowing) return
+        if (!canNavigateFragment) return
 
         val directions =
             DiaryListFragmentDirections

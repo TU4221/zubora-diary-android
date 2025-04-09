@@ -228,7 +228,7 @@ class DiaryItemTitleEditFragment : BaseFragment() {
 
     @MainThread
     private fun showDiaryEditFragment() {
-        if (isDialogShowing) return
+        if (!canNavigateFragment) return
 
         val directions =
             DiaryItemTitleEditFragmentDirections
@@ -239,7 +239,7 @@ class DiaryItemTitleEditFragment : BaseFragment() {
     @MainThread
     private fun showDiaryItemTitleDeleteDialog(listItemPosition: Int, listItemTitle: String) {
         require(listItemPosition >= 0)
-        if (isDialogShowing) return
+        if (!canNavigateFragment) return
 
         val directions =
             DiaryItemTitleEditFragmentDirections

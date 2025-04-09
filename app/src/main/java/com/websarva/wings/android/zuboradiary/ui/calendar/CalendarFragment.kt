@@ -553,7 +553,7 @@ class CalendarFragment : BaseFragment() {
 
     @MainThread
     private fun showDiaryEditFragment(date: LocalDate, requiresDiaryLoading: Boolean) {
-        if (isDialogShowing) return
+        if (!canNavigateFragment) return
 
         val directions =
             CalendarFragmentDirections

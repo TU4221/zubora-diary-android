@@ -385,7 +385,7 @@ internal class DiaryShowFragment : BaseFragment() {
 
     @MainThread
     private fun showDiaryEdit(date: LocalDate) {
-        if (isDialogShowing) return
+        if (!canNavigateFragment) return
 
         val directions =
             DiaryShowFragmentDirections
@@ -399,7 +399,7 @@ internal class DiaryShowFragment : BaseFragment() {
 
     @MainThread
     private fun showDiaryLoadingFailureDialog(date: LocalDate) {
-        if (isDialogShowing) {
+        if (!canNavigateFragment) {
             mainViewModel.addPendingDialogList(DiaryShowPendingDialog.DiaryLoadingFailure)
             return
         }
@@ -412,7 +412,7 @@ internal class DiaryShowFragment : BaseFragment() {
 
     @MainThread
     private fun showDiaryDeleteDialog(date: LocalDate) {
-        if (isDialogShowing) return
+        if (!canNavigateFragment) return
 
         val directions =
             DiaryShowFragmentDirections

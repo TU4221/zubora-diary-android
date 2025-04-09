@@ -584,7 +584,7 @@ class SettingsFragment : BaseFragment() {
     }
 
     private fun showOpenSourceLicensesFragment() {
-        if (isDialogShowing) return
+        if (!canNavigateFragment) return
 
         val directions =
             SettingsFragmentDirections
@@ -598,7 +598,7 @@ class SettingsFragment : BaseFragment() {
 
     @MainThread
     private fun showThemeColorPickerDialog() {
-        if (isDialogShowing) return
+        if (!canNavigateFragment) return
 
         val directions =
             SettingsFragmentDirections
@@ -608,7 +608,7 @@ class SettingsFragment : BaseFragment() {
 
     @MainThread
     private fun showCalendarStartDayPickerDialog(dayOfWeek: DayOfWeek) {
-        if (isDialogShowing) return
+        if (!canNavigateFragment) return
 
         val directions =
             SettingsFragmentDirections
@@ -618,7 +618,7 @@ class SettingsFragment : BaseFragment() {
 
     @MainThread
     private fun showReminderNotificationTimePickerDialog() {
-        if (isDialogShowing) return
+        if (!canNavigateFragment) return
 
         val directions =
             SettingsFragmentDirections
@@ -628,7 +628,7 @@ class SettingsFragment : BaseFragment() {
 
     @MainThread
     private fun showPermissionDialog(permissionName: String) {
-        if (isDialogShowing) return
+        if (!canNavigateFragment) return
 
         val directions =
             SettingsFragmentDirections
@@ -638,7 +638,7 @@ class SettingsFragment : BaseFragment() {
 
     @MainThread
     private fun showAllDiariesDeleteDialog() {
-        if (isDialogShowing) return
+        if (!canNavigateFragment) return
 
         val directions =
             SettingsFragmentDirections
@@ -648,7 +648,7 @@ class SettingsFragment : BaseFragment() {
 
     @MainThread
     private fun showAllSettingsInitializationDialog() {
-        if (isDialogShowing) return
+        if (!canNavigateFragment) return
 
         val directions =
             SettingsFragmentDirections
@@ -658,7 +658,7 @@ class SettingsFragment : BaseFragment() {
 
     @MainThread
     private fun showAllDataDeleteDialog() {
-        if (isDialogShowing) return
+        if (!canNavigateFragment) return
 
         val directions =
             SettingsFragmentDirections
