@@ -328,20 +328,22 @@ abstract class BaseFragment : CustomFragment() {
             if (value.isEmpty) return
 
             val firstAppMessage = checkNotNull(value.findFirstItem())
-            showAppMessageDialog(firstAppMessage)
-        }
-
-        private suspend fun showAppMessageDialog(appMessage: AppMessage) {
-            if (!checkAppMessageTargetType(appMessage)) throw IllegalStateException()
-            if (isDialogShowing) return
-
+            if (!checkAppMessageTargetType(firstAppMessage)) throw IllegalStateException()
             withContext(Dispatchers.Main) {
-                navigateAppMessageDialog(appMessage)
-                baseViewModel.removeAppMessageBufferListFirstItem()
+                val isSuccess = showAppMessageDialog(firstAppMessage)
+                if (isSuccess) baseViewModel.removeAppMessageBufferListFirstItem()
             }
         }
 
         protected abstract fun checkAppMessageTargetType(appMessage: AppMessage): Boolean
+    }
+
+    @MainThread
+    private fun showAppMessageDialog(appMessage: AppMessage): Boolean {
+        if (isDialogShowing) return false
+
+        navigateAppMessageDialog(appMessage)
+        return true
     }
 
     /**
