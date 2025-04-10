@@ -9,7 +9,7 @@ import com.websarva.wings.android.zuboradiary.data.diary.Weather
 import com.websarva.wings.android.zuboradiary.data.network.GeoCoordinates
 import com.websarva.wings.android.zuboradiary.data.network.WeatherApiRepository
 import com.websarva.wings.android.zuboradiary.createLogTag
-import com.websarva.wings.android.zuboradiary.data.DiaryEditAppMessage
+import com.websarva.wings.android.zuboradiary.ui.appmessage.DiaryEditAppMessage
 import com.websarva.wings.android.zuboradiary.ui.base.BaseViewModel
 import com.websarva.wings.android.zuboradiary.ui.DiaryEditPendingDialog
 import com.websarva.wings.android.zuboradiary.ui.requireValue

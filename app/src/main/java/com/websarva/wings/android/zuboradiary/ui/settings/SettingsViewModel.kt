@@ -14,7 +14,7 @@ import com.websarva.wings.android.zuboradiary.data.preferences.UserPreferencesRe
 import com.websarva.wings.android.zuboradiary.data.preferences.WeatherInfoAcquisitionPreference
 import com.websarva.wings.android.zuboradiary.data.worker.WorkerRepository
 import com.websarva.wings.android.zuboradiary.createLogTag
-import com.websarva.wings.android.zuboradiary.data.SettingsAppMessage
+import com.websarva.wings.android.zuboradiary.ui.appmessage.SettingsAppMessage
 import com.websarva.wings.android.zuboradiary.ui.base.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers

@@ -5,7 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.websarva.wings.android.zuboradiary.data.database.DiaryRepository
 import com.websarva.wings.android.zuboradiary.data.database.WordSearchResultListItem
 import com.websarva.wings.android.zuboradiary.createLogTag
-import com.websarva.wings.android.zuboradiary.data.WordSearchAppMessage
+import com.websarva.wings.android.zuboradiary.ui.appmessage.WordSearchAppMessage
 import com.websarva.wings.android.zuboradiary.ui.base.BaseViewModel
 import com.websarva.wings.android.zuboradiary.ui.requireValue
 import com.websarva.wings.android.zuboradiary.ui.list.diarylist.DiaryListViewModel

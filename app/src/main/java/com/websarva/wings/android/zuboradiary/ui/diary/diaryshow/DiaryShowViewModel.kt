@@ -5,7 +5,7 @@ import android.util.Log
 import com.websarva.wings.android.zuboradiary.data.database.DiaryRepository
 import com.websarva.wings.android.zuboradiary.data.diary.ItemNumber
 import com.websarva.wings.android.zuboradiary.createLogTag
-import com.websarva.wings.android.zuboradiary.data.DiaryShowAppMessage
+import com.websarva.wings.android.zuboradiary.ui.appmessage.DiaryShowAppMessage
 import com.websarva.wings.android.zuboradiary.ui.base.BaseViewModel
 import com.websarva.wings.android.zuboradiary.ui.DiaryShowPendingDialog
 import com.websarva.wings.android.zuboradiary.ui.requireValue

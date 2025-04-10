@@ -21,7 +21,7 @@ import androidx.core.app.ActivityCompat
 import androidx.databinding.ViewDataBinding
 import androidx.lifecycle.lifecycleScope
 import com.websarva.wings.android.zuboradiary.R
-import com.websarva.wings.android.zuboradiary.data.AppMessage
+import com.websarva.wings.android.zuboradiary.ui.appmessage.AppMessage
 import com.websarva.wings.android.zuboradiary.data.DateTimeStringConverter
 import com.websarva.wings.android.zuboradiary.data.DayOfWeekStringConverter
 import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor

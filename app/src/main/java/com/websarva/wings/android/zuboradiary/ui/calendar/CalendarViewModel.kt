@@ -3,7 +3,7 @@ package com.websarva.wings.android.zuboradiary.ui.calendar
 import android.util.Log
 import com.websarva.wings.android.zuboradiary.data.database.DiaryRepository
 import com.websarva.wings.android.zuboradiary.createLogTag
-import com.websarva.wings.android.zuboradiary.data.CalendarAppMessage
+import com.websarva.wings.android.zuboradiary.ui.appmessage.CalendarAppMessage
 import com.websarva.wings.android.zuboradiary.ui.base.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow

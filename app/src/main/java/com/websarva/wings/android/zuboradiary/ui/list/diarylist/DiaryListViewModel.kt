@@ -6,7 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.websarva.wings.android.zuboradiary.data.database.DiaryListItem
 import com.websarva.wings.android.zuboradiary.data.database.DiaryRepository
 import com.websarva.wings.android.zuboradiary.createLogTag
-import com.websarva.wings.android.zuboradiary.data.DiaryListAppMessage
+import com.websarva.wings.android.zuboradiary.ui.appmessage.DiaryListAppMessage
 import com.websarva.wings.android.zuboradiary.ui.base.BaseViewModel
 import com.websarva.wings.android.zuboradiary.ui.requireValue
 import dagger.hilt.android.lifecycle.HiltViewModel

@@ -2,9 +2,9 @@ package com.websarva.wings.android.zuboradiary.ui.base
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
-import com.websarva.wings.android.zuboradiary.data.AppMessageList
+import com.websarva.wings.android.zuboradiary.ui.appmessage.AppMessageList
 import com.websarva.wings.android.zuboradiary.createLogTag
-import com.websarva.wings.android.zuboradiary.data.AppMessage
+import com.websarva.wings.android.zuboradiary.ui.appmessage.AppMessage
 import com.websarva.wings.android.zuboradiary.ui.PendingDialog
 import com.websarva.wings.android.zuboradiary.ui.PendingDialogList
 import kotlinx.coroutines.flow.MutableStateFlow
