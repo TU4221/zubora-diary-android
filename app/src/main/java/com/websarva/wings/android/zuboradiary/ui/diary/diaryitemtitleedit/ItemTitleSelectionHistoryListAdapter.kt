@@ -13,7 +13,7 @@ import com.websarva.wings.android.zuboradiary.databinding.RowBackgroundDeleteBut
 import com.websarva.wings.android.zuboradiary.databinding.RowItemTitleSelectionHistoryBinding
 import com.websarva.wings.android.zuboradiary.ui.LeftSwipeSimpleCallback
 import com.websarva.wings.android.zuboradiary.ui.LeftSwipeSimpleCallback.LeftSwipeViewHolder
-import com.websarva.wings.android.zuboradiary.ui.ThemeColorInflaterCreator
+import com.websarva.wings.android.zuboradiary.ui.utils.ThemeColorInflaterCreator
 import com.websarva.wings.android.zuboradiary.ui.diary.diaryitemtitleedit.ItemTitleSelectionHistoryListAdapter.ItemTitleSelectionHistoryViewHolder
 
 internal class ItemTitleSelectionHistoryListAdapter

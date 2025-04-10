@@ -38,8 +38,8 @@ import com.websarva.wings.android.zuboradiary.createLogTag
 import com.websarva.wings.android.zuboradiary.data.network.GeoCoordinates
 import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor
 import com.websarva.wings.android.zuboradiary.databinding.ActivityMainBinding
-import com.websarva.wings.android.zuboradiary.ui.ThemeColorInflaterCreator
-import com.websarva.wings.android.zuboradiary.ui.ThemeColorSwitcher
+import com.websarva.wings.android.zuboradiary.ui.utils.ThemeColorInflaterCreator
+import com.websarva.wings.android.zuboradiary.ui.utils.ThemeColorSwitcher
 import com.websarva.wings.android.zuboradiary.ui.calendar.CalendarFragment
 import com.websarva.wings.android.zuboradiary.ui.requireValue
 import com.websarva.wings.android.zuboradiary.ui.diary.diaryedit.DiaryEditFragment

@@ -3,7 +3,7 @@ package com.websarva.wings.android.zuboradiary.ui.settings
 import android.content.Context
 import android.widget.TextView
 import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor
-import com.websarva.wings.android.zuboradiary.ui.ThemeColorSwitcher
+import com.websarva.wings.android.zuboradiary.ui.utils.ThemeColorSwitcher
 
 internal class SettingsThemeColorSwitcher(context: Context, themeColor: ThemeColor)
     : ThemeColorSwitcher(context, themeColor) {

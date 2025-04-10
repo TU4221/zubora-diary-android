@@ -1,4 +1,4 @@
-package com.websarva.wings.android.zuboradiary.data
+package com.websarva.wings.android.zuboradiary.ui.utils
 
 import java.time.LocalDate
 import java.time.LocalDateTime

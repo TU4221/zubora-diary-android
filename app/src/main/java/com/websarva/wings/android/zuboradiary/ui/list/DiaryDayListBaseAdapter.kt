@@ -9,7 +9,7 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor
 import com.websarva.wings.android.zuboradiary.createLogTag
-import com.websarva.wings.android.zuboradiary.ui.ThemeColorInflaterCreator
+import com.websarva.wings.android.zuboradiary.ui.utils.ThemeColorInflaterCreator
 
 internal abstract class DiaryDayListBaseAdapter protected constructor(
     protected val context: Context,

@@ -1,4 +1,4 @@
-package com.websarva.wings.android.zuboradiary.ui
+package com.websarva.wings.android.zuboradiary.ui.utils
 
 import android.content.Context
 import android.view.LayoutInflater

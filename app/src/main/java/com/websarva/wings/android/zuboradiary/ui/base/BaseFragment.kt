@@ -35,7 +35,7 @@ import com.websarva.wings.android.zuboradiary.ui.DiaryEditPendingDialog
 import com.websarva.wings.android.zuboradiary.ui.DiaryShowPendingDialog
 import com.websarva.wings.android.zuboradiary.ui.PendingDialog
 import com.websarva.wings.android.zuboradiary.ui.PendingDialogList
-import com.websarva.wings.android.zuboradiary.ui.ThemeColorInflaterCreator
+import com.websarva.wings.android.zuboradiary.ui.utils.ThemeColorInflaterCreator
 import com.websarva.wings.android.zuboradiary.ui.calendar.CalendarFragment
 import com.websarva.wings.android.zuboradiary.ui.diary.diaryedit.DiaryEditFragment
 import com.websarva.wings.android.zuboradiary.ui.diary.diaryitemtitleedit.DiaryItemTitleEditFragment
