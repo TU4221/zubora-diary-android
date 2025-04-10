@@ -149,10 +149,9 @@ internal class DiaryShowFragment : BaseFragment() {
             override fun showPendingDialog(pendingDialog: PendingDialog): Boolean {
                 if (pendingDialog !is DiaryShowPendingDialog) return false
 
-                val date = mainViewModel.date.requireValue()
                 when (pendingDialog) {
-                    DiaryShowPendingDialog.DiaryLoadingFailure ->
-                        showDiaryLoadingFailureDialog(date)
+                    is DiaryShowPendingDialog.DiaryLoadingFailure ->
+                        showDiaryLoadingFailureDialog(pendingDialog.date)
                 }
                 return true
             }
@@ -389,7 +388,7 @@ internal class DiaryShowFragment : BaseFragment() {
     @MainThread
     private fun showDiaryLoadingFailureDialog(date: LocalDate) {
         if (!canNavigateFragment) {
-            mainViewModel.addPendingDialogList(DiaryShowPendingDialog.DiaryLoadingFailure)
+            mainViewModel.addPendingDialogList(DiaryShowPendingDialog.DiaryLoadingFailure(date))
             return
         }
 

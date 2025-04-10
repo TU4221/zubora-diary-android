@@ -1,13 +1,15 @@
 package com.websarva.wings.android.zuboradiary.ui
 
+import java.time.LocalDate
+
 sealed interface PendingDialog
 
 sealed class DiaryEditPendingDialog : PendingDialog {
-    data object DiaryLoading: DiaryEditPendingDialog()
-    data object DiaryLoadingFailure: DiaryEditPendingDialog()
-    data object WeatherInfoFetching: DiaryEditPendingDialog()
+    data class DiaryLoading(val date: LocalDate): DiaryEditPendingDialog()
+    data class DiaryLoadingFailure(val date: LocalDate): DiaryEditPendingDialog()
+    data class WeatherInfoFetching(val date: LocalDate): DiaryEditPendingDialog()
 }
 
 sealed class DiaryShowPendingDialog : PendingDialog {
-    data object DiaryLoadingFailure: DiaryShowPendingDialog()
+    data class DiaryLoadingFailure(val date: LocalDate): DiaryShowPendingDialog()
 }

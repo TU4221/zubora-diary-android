@@ -330,14 +330,13 @@ class DiaryEditFragment : BaseFragment() {
             override fun showPendingDialog(pendingDialog: PendingDialog): Boolean {
                 if (pendingDialog !is DiaryEditPendingDialog) return false
 
-                val date = mainViewModel.date.requireValue()
                 when (pendingDialog) {
-                    DiaryEditPendingDialog.DiaryLoading ->
-                        showDiaryLoadingDialog(date)
-                    DiaryEditPendingDialog.DiaryLoadingFailure ->
-                        showDiaryLoadingFailureDialog(date)
-                    DiaryEditPendingDialog.WeatherInfoFetching ->
-                        showWeatherInfoFetchingDialog(date)
+                    is DiaryEditPendingDialog.DiaryLoading ->
+                        showDiaryLoadingDialog(pendingDialog.date)
+                    is DiaryEditPendingDialog.DiaryLoadingFailure ->
+                        showDiaryLoadingFailureDialog(pendingDialog.date)
+                    is DiaryEditPendingDialog.WeatherInfoFetching ->
+                        showWeatherInfoFetchingDialog(pendingDialog.date)
                 }
                 return true
             }
@@ -1094,7 +1093,7 @@ class DiaryEditFragment : BaseFragment() {
     @MainThread
     private fun showDiaryLoadingDialog(date: LocalDate) {
         if (!canNavigateFragment) {
-            mainViewModel.addPendingDialogList(DiaryEditPendingDialog.DiaryLoading)
+            mainViewModel.addPendingDialogList(DiaryEditPendingDialog.DiaryLoading(date))
             return
         }
 
@@ -1107,7 +1106,7 @@ class DiaryEditFragment : BaseFragment() {
     @MainThread
     private fun showDiaryLoadingFailureDialog(date: LocalDate) {
         if (!canNavigateFragment) {
-            mainViewModel.addPendingDialogList(DiaryEditPendingDialog.DiaryLoadingFailure)
+            mainViewModel.addPendingDialogList(DiaryEditPendingDialog.DiaryLoadingFailure(date))
             return
         }
 
@@ -1151,7 +1150,7 @@ class DiaryEditFragment : BaseFragment() {
     private fun showWeatherInfoFetchingDialog(date: LocalDate) {
         if (!mainViewModel.canFetchWeatherInformation(date)) return
         if (!canNavigateFragment) {
-            mainViewModel.addPendingDialogList(DiaryEditPendingDialog.WeatherInfoFetching)
+            mainViewModel.addPendingDialogList(DiaryEditPendingDialog.WeatherInfoFetching(date))
             return
         }
 
