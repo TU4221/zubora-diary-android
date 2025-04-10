@@ -20,7 +20,6 @@ import androidx.constraintlayout.motion.widget.MotionLayout
 import androidx.core.content.res.ResourcesCompat
 import androidx.databinding.ViewDataBinding
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination
@@ -37,7 +36,7 @@ import com.websarva.wings.android.zuboradiary.data.AppMessage
 import com.websarva.wings.android.zuboradiary.ui.BaseFragment
 import com.websarva.wings.android.zuboradiary.ui.DiaryEditPendingDialog
 import com.websarva.wings.android.zuboradiary.ui.DiaryPictureManager
-import com.websarva.wings.android.zuboradiary.ui.PendingDialogList
+import com.websarva.wings.android.zuboradiary.ui.PendingDialog
 import com.websarva.wings.android.zuboradiary.ui.TestDiariesSaver
 import com.websarva.wings.android.zuboradiary.ui.TextInputSetup
 import com.websarva.wings.android.zuboradiary.ui.UriPermissionManager
@@ -327,31 +326,21 @@ class DiaryEditFragment : BaseFragment() {
     }
 
     private fun setUpPendingDialogObserver() {
-        addNavBackStackEntryLifecycleObserver { _, event: Lifecycle.Event ->
-            if (event == Lifecycle.Event.ON_RESUME) {
-                mainViewModel.triggerPendingDialogListObserver()
-            }
-        }
+        pendingDialogNavigation = object : PendingDialogNavigation {
+            override fun showPendingDialog(pendingDialog: PendingDialog): Boolean {
+                if (pendingDialog !is DiaryEditPendingDialog) return false
 
-        launchAndRepeatOnViewLifeCycleStarted {
-            mainViewModel.pendingDialogList
-                .collectLatest { value: PendingDialogList ->
-                    val pendingDialog = value.findFirstItem() ?: return@collectLatest
-                    if (pendingDialog !is DiaryEditPendingDialog) return@collectLatest
-
-                    val date = mainViewModel.date.requireValue()
-                    withContext(Dispatchers.Main) {
-                        when (pendingDialog) {
-                            DiaryEditPendingDialog.DiaryLoading ->
-                                showDiaryLoadingDialog(date)
-                            DiaryEditPendingDialog.DiaryLoadingFailure ->
-                                showDiaryLoadingFailureDialog(date)
-                            DiaryEditPendingDialog.WeatherInfoFetching ->
-                                showWeatherInfoFetchingDialog(date)
-                        }
-                        mainViewModel.removePendingDialogListFirstItem()
-                    }
+                val date = mainViewModel.date.requireValue()
+                when (pendingDialog) {
+                    DiaryEditPendingDialog.DiaryLoading ->
+                        showDiaryLoadingDialog(date)
+                    DiaryEditPendingDialog.DiaryLoadingFailure ->
+                        showDiaryLoadingFailureDialog(date)
+                    DiaryEditPendingDialog.WeatherInfoFetching ->
+                        showWeatherInfoFetchingDialog(date)
                 }
+                return true
+            }
         }
     }
 

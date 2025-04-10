@@ -83,6 +83,8 @@ abstract class BaseFragment : CustomFragment() {
 
     private val addedLifecycleEventObserverList = ArrayList<LifecycleEventObserver>()
 
+    protected var pendingDialogNavigation: PendingDialogNavigation? = null
+
     protected fun launchAndRepeatOnViewLifeCycleStarted(
         block: suspend CoroutineScope.() -> Unit) {
         viewLifecycleOwner.lifecycleScope.launch {
@@ -186,6 +188,7 @@ abstract class BaseFragment : CustomFragment() {
         setUpPreviousFragmentResultReceiver()
         setUpDialogResultReceiver()
         setUpAppMessageDialog()
+        setUpPendingDialogObserver()
     }
 
     // MEMO:Fragment、DialogFragmentからの結果受け取り方法
@@ -242,7 +245,7 @@ abstract class BaseFragment : CustomFragment() {
             })
     }
 
-    protected fun addNavBackStackEntryLifecycleObserver(observer: LifecycleEventObserver) {
+    private fun addNavBackStackEntryLifecycleObserver(observer: LifecycleEventObserver) {
         navBackStackEntry.lifecycle.addObserver(observer)
         addedLifecycleEventObserverList.add(observer)
     }
@@ -363,6 +366,49 @@ abstract class BaseFragment : CustomFragment() {
 
     private fun retrySettingsAppMessageDialogShow() {
         settingsViewModel.triggerAppMessageBufferListObserver()
+    }
+
+    protected interface PendingDialogNavigation {
+        fun showPendingDialog(pendingDialog: PendingDialog):Boolean
+    }
+
+    private fun setUpPendingDialogObserver() {
+        mainViewModel ?: return
+
+        addNavBackStackEntryLifecycleObserver { _, event: Lifecycle.Event ->
+            if (event == Lifecycle.Event.ON_RESUME) {
+                mainViewModel!!.triggerPendingDialogListObserver()
+            }
+        }
+
+        launchAndRepeatOnViewLifeCycleStarted {
+            mainViewModel!!.pendingDialogList
+                .collectLatest { value: PendingDialogList ->
+                    val pendingDialog = value.findFirstItem() ?: return@collectLatest
+                    pendingDialogNavigation ?: throw IllegalStateException()
+                    if (!checkPendingDialogTargetType(pendingDialog)) throw IllegalStateException()
+
+                    withContext(Dispatchers.Main) {
+                        // MEMO:下記条件はスパークラスのFragment切替メソッドに含まれているが、
+                        //      そこで判断させると再度保留ダイアログが追加されるので、ここに記述する。(重複処理防止)
+                        if (!canNavigateFragment) return@withContext
+
+                        val isSuccess = pendingDialogNavigation!!.showPendingDialog(pendingDialog)
+                        if (isSuccess) mainViewModel!!.removePendingDialogListFirstItem()
+                    }
+                }
+        }
+    }
+
+    private fun checkPendingDialogTargetType(pendingDialog: PendingDialog): Boolean {
+        return when (pendingDialog) {
+            is DiaryShowPendingDialog -> {
+                (this@BaseFragment is DiaryShowFragment)
+            }
+            is DiaryEditPendingDialog -> {
+                (this@BaseFragment is DiaryEditFragment)
+            }
+        }
     }
 
     override fun onDestroyView() {
