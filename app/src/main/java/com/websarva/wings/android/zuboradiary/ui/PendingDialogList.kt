@@ -11,6 +11,8 @@ class PendingDialogList {
 
     constructor(): this(ArrayList())
 
+    constructor(pendingDialogList: PendingDialogList):this(pendingDialogList.pendingDialogList.toList())
+
     fun add(pendingDialog: PendingDialog): PendingDialogList {
         val resultList = pendingDialogList + pendingDialog
         return PendingDialogList(resultList)

@@ -13,6 +13,8 @@ class AppMessageList {
 
     constructor(): this(ArrayList())
 
+    constructor(appMessageList: AppMessageList):this(appMessageList.appMessageList.toList())
+
     fun add(appMessage: AppMessage): AppMessageList {
         val resultList = appMessageList + appMessage
         return AppMessageList(resultList)

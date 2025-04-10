@@ -39,8 +39,7 @@ abstract class BaseViewModel : ViewModel() {
     fun triggerAppMessageBufferListObserver() {
         Log.d(logTag, "triggerAppMessageBufferListObserver()")
         val currentList = _appMessageBufferList.value
-        _appMessageBufferList.value = AppMessageList()
-        _appMessageBufferList.value = currentList
+        _appMessageBufferList.value = AppMessageList(currentList)
     }
 
     fun removeAppMessageBufferListFirstItem() {
@@ -73,8 +72,7 @@ abstract class BaseViewModel : ViewModel() {
     fun triggerPendingDialogListObserver() {
         Log.d(logTag, "triggerPendingDialogListObserver()")
         val currentList = _pendingDialogList.value
-        _pendingDialogList.value = PendingDialogList()
-        _pendingDialogList.value = currentList
+        _pendingDialogList.value = PendingDialogList(currentList)
     }
 
     fun removePendingDialogListFirstItem() {
