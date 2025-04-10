@@ -44,9 +44,8 @@ class SettingsFragment : BaseFragment() {
     private val binding get() = checkNotNull(_binding)
 
     // ViewModel
-    // MEMO:SettingsViewModelはスーパークラスでインスタンス化している為、nullを代入。
-    @Suppress("unused")
-    override val mainViewModel = null
+    // MEMO:本FragmentのMainViewModelはSettingsViewModelになる為、BaseFragmentのSettingsViewModel変数を代入。
+    override val mainViewModel = settingsViewModel
 
     // ActivityResultLauncher関係
     private lateinit var requestPostNotificationsPermissionLauncher: ActivityResultLauncher<String>
