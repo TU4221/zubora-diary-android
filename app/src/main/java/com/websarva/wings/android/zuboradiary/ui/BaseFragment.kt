@@ -189,6 +189,7 @@ abstract class BaseFragment : CustomFragment() {
         setUpDialogResultReceiver()
         setUpAppMessageDialog()
         setUpPendingDialogObserver()
+        setUpNavBackStackEntryLifecycleObserverDispose()
     }
 
     // MEMO:Fragment、DialogFragmentからの結果受け取り方法
@@ -231,18 +232,6 @@ abstract class BaseFragment : CustomFragment() {
             }
 
         addNavBackStackEntryLifecycleObserver(lifecycleEventObserver)
-        viewLifecycleOwner.lifecycle
-            .addObserver(LifecycleEventObserver { _, event: Lifecycle.Event ->
-                if (event == Lifecycle.Event.ON_DESTROY) {
-                    Log.d(logTag, "Lifecycle.Event.ON_DESTROY")
-
-                    // MEMO:removeで削除しないと再度Fragment(前回表示Fragmentと同インスタンスの場合)を表示した時、Observerが重複する。
-                    for (observer in addedLifecycleEventObserverList) {
-                        navBackStackEntry.lifecycle.removeObserver(observer)
-                    }
-                    addedLifecycleEventObserverList.clear()
-                }
-            })
     }
 
     private fun addNavBackStackEntryLifecycleObserver(observer: LifecycleEventObserver) {
@@ -409,6 +398,21 @@ abstract class BaseFragment : CustomFragment() {
                 (this@BaseFragment is DiaryEditFragment)
             }
         }
+    }
+
+    // MEMO:removeで削除しないと再度Fragment(前回表示Fragmentと同インスタンスの場合)を表示した時、Observerが重複する。
+    private fun setUpNavBackStackEntryLifecycleObserverDispose() {
+        viewLifecycleOwner.lifecycle
+            .addObserver(LifecycleEventObserver { _, event: Lifecycle.Event ->
+                if (event == Lifecycle.Event.ON_DESTROY) {
+                    Log.d(logTag, "Lifecycle.Event.ON_DESTROY")
+
+                    for (observer in addedLifecycleEventObserverList) {
+                        navBackStackEntry.lifecycle.removeObserver(observer)
+                    }
+                    addedLifecycleEventObserverList.clear()
+                }
+            })
     }
 
     override fun onDestroyView() {
