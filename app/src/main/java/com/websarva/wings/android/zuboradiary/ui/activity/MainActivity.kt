@@ -1,4 +1,4 @@
-package com.websarva.wings.android.zuboradiary
+package com.websarva.wings.android.zuboradiary.ui.activity
 
 import android.Manifest
 import android.annotation.SuppressLint
@@ -33,6 +33,8 @@ import com.google.android.gms.location.Priority
 import com.google.android.material.navigation.NavigationBarView
 import com.google.android.material.navigation.NavigationBarView.OnItemReselectedListener
 import com.google.android.material.transition.platform.MaterialFadeThrough
+import com.websarva.wings.android.zuboradiary.R
+import com.websarva.wings.android.zuboradiary.createLogTag
 import com.websarva.wings.android.zuboradiary.data.network.GeoCoordinates
 import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor
 import com.websarva.wings.android.zuboradiary.databinding.ActivityMainBinding

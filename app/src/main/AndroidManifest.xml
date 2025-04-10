@@ -51,7 +51,7 @@
 
         <!--MEMO:"android:windowSoftInputMode="adjustPan""は"BottomNavigationView"をキーボードの上に表示させない為の設定-->
         <activity
-            android:name=".MainActivity"
+            android:name=".ui.activity.MainActivity"
             android:exported="true"
             android:windowSoftInputMode="adjustPan">
             <intent-filter>

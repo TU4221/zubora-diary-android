@@ -19,7 +19,7 @@ import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import com.google.android.material.transition.platform.MaterialFadeThrough
 import com.google.android.material.transition.platform.MaterialSharedAxis
-import com.websarva.wings.android.zuboradiary.MainActivity
+import com.websarva.wings.android.zuboradiary.ui.activity.MainActivity
 import com.websarva.wings.android.zuboradiary.data.AppMessageList
 import com.websarva.wings.android.zuboradiary.createLogTag
 import com.websarva.wings.android.zuboradiary.data.AppMessage
