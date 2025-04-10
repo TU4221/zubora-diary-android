@@ -3,7 +3,7 @@ package com.websarva.wings.android.zuboradiary.ui.diary.diaryedit
 import android.content.DialogInterface
 import com.websarva.wings.android.zuboradiary.R
 import com.websarva.wings.android.zuboradiary.data.DateTimeStringConverter
-import com.websarva.wings.android.zuboradiary.ui.BaseAlertDialogFragment
+import com.websarva.wings.android.zuboradiary.ui.base.BaseAlertDialogFragment
 
 class DiaryUpdateDialogFragment : BaseAlertDialogFragment() {
 

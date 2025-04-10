@@ -1,6 +1,7 @@
 package com.websarva.wings.android.zuboradiary.ui
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.websarva.wings.android.zuboradiary.ui.base.BaseAlertDialogFragment
 
 class AppMessageDialogFragment : BaseAlertDialogFragment() {
 

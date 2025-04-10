@@ -1,4 +1,4 @@
-package com.websarva.wings.android.zuboradiary.ui
+package com.websarva.wings.android.zuboradiary.ui.base
 
 import android.app.Dialog
 import android.content.DialogInterface
@@ -10,6 +10,7 @@ import androidx.navigation.fragment.NavHostFragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.websarva.wings.android.zuboradiary.R
 import com.websarva.wings.android.zuboradiary.createLogTag
+import com.websarva.wings.android.zuboradiary.ui.requireValue
 import com.websarva.wings.android.zuboradiary.ui.settings.SettingsViewModel
 
 abstract class BaseAlertDialogFragment : DialogFragment() {

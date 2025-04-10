@@ -3,7 +3,7 @@ package com.websarva.wings.android.zuboradiary.ui.settings
 import android.view.View
 import com.websarva.wings.android.zuboradiary.data.DayOfWeekStringConverter
 import com.websarva.wings.android.zuboradiary.databinding.DialogFragmentNumberPickersBinding
-import com.websarva.wings.android.zuboradiary.ui.BaseNumberPickersBottomSheetDialogFragment
+import com.websarva.wings.android.zuboradiary.ui.base.BaseNumberPickersBottomSheetDialogFragment
 import java.time.DayOfWeek
 
 class CalendarStartDayPickerDialogFragment : BaseNumberPickersBottomSheetDialogFragment() {

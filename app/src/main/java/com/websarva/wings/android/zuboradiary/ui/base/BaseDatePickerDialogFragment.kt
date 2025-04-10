@@ -1,4 +1,4 @@
-package com.websarva.wings.android.zuboradiary.ui
+package com.websarva.wings.android.zuboradiary.ui.base
 
 import android.app.Dialog
 import android.os.Bundle
@@ -8,6 +8,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.NavHostFragment
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.websarva.wings.android.zuboradiary.createLogTag
+import com.websarva.wings.android.zuboradiary.ui.requireValue
 import com.websarva.wings.android.zuboradiary.ui.settings.SettingsViewModel
 import java.time.Instant
 import java.time.LocalDate

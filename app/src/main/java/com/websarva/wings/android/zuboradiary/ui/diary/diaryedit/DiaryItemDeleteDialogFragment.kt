@@ -1,7 +1,7 @@
 package com.websarva.wings.android.zuboradiary.ui.diary.diaryedit
 
 import com.websarva.wings.android.zuboradiary.R
-import com.websarva.wings.android.zuboradiary.ui.BaseAlertDialogFragment
+import com.websarva.wings.android.zuboradiary.ui.base.BaseAlertDialogFragment
 
 class DiaryItemDeleteDialogFragment : BaseAlertDialogFragment() {
 
