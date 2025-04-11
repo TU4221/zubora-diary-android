@@ -1,4 +1,4 @@
-package com.websarva.wings.android.zuboradiary.ui.utils
+package com.websarva.wings.android.zuboradiary.ui.permission
 
 import android.content.ContentResolver
 import android.content.Context
