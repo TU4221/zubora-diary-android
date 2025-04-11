@@ -1,6 +1,6 @@
 <resources>
 
-    <!-- MEMO:ダークテーマは未使用。CustomApplication#oncreate()メソッド内にて無効化。 -->
+    <!-- MEMO:ダークテーマは未使用。ZuboraDiaryApplication#oncreate()メソッド内にて無効化。 -->
 
     <!-- Base application theme. -->
     <style name="Theme.ZuboraDiary" parent="Theme.Material3.Dark.NoActionBar">

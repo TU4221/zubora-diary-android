@@ -15,7 +15,7 @@ import androidx.hilt.work.HiltWorker
 import androidx.navigation.NavDeepLinkBuilder
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
-import com.websarva.wings.android.zuboradiary.CustomApplication
+import com.websarva.wings.android.zuboradiary.ZuboraDiaryApplication
 import com.websarva.wings.android.zuboradiary.R
 import com.websarva.wings.android.zuboradiary.data.database.DiaryRepository
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
@@ -62,7 +62,7 @@ internal class ReminderNotificationWorker @AssistedInject constructor(
     }
 
     override suspend fun doWork(): Result {
-        val application = applicationContext as CustomApplication
+        val application = applicationContext as ZuboraDiaryApplication
         if (application.isAppInForeground) return Result.success()
 
         val hasWriteTodayDiary: Boolean
