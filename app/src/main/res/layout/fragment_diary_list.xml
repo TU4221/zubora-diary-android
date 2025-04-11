@@ -7,7 +7,7 @@
         <import type="android.view.View" />
         <variable
             name="list_view_model"
-            type="com.websarva.wings.android.zuboradiary.ui.list.diarylist.DiaryListViewModel" />
+            type="com.websarva.wings.android.zuboradiary.ui.viewmodel.DiaryListViewModel" />
     </data>
 
     <FrameLayout

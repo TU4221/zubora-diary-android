@@ -7,7 +7,7 @@
         <import type="android.view.View" />
         <variable
             name="diaryEditViewModel"
-            type="com.websarva.wings.android.zuboradiary.ui.diary.diaryedit.DiaryEditViewModel" />
+            type="com.websarva.wings.android.zuboradiary.ui.viewmodel.DiaryEditViewModel" />
     </data>
 
     <FrameLayout

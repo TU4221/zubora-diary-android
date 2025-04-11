@@ -1,4 +1,4 @@
-package com.websarva.wings.android.zuboradiary.ui.base
+package com.websarva.wings.android.zuboradiary.ui.viewmodel
 
 import android.util.Log
 import androidx.lifecycle.ViewModel

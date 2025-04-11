@@ -1,4 +1,4 @@
-package com.websarva.wings.android.zuboradiary.ui.diary
+package com.websarva.wings.android.zuboradiary.ui.viewmodel
 
 import android.net.Uri
 import com.websarva.wings.android.zuboradiary.data.database.DiaryEntity

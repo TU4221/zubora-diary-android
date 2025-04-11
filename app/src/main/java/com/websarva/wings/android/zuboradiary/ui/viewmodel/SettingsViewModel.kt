@@ -1,4 +1,4 @@
-package com.websarva.wings.android.zuboradiary.ui.settings
+package com.websarva.wings.android.zuboradiary.ui.viewmodel
 
 import android.util.Log
 import androidx.datastore.core.IOException
@@ -15,7 +15,6 @@ import com.websarva.wings.android.zuboradiary.data.preferences.WeatherInfoAcquis
 import com.websarva.wings.android.zuboradiary.data.worker.WorkerRepository
 import com.websarva.wings.android.zuboradiary.createLogTag
 import com.websarva.wings.android.zuboradiary.ui.appmessage.SettingsAppMessage
-import com.websarva.wings.android.zuboradiary.ui.base.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow

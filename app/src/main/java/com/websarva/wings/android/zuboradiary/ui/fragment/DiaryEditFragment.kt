@@ -40,10 +40,10 @@ import com.websarva.wings.android.zuboradiary.ui.TestDiariesSaver
 import com.websarva.wings.android.zuboradiary.ui.utils.TextInputSetup
 import com.websarva.wings.android.zuboradiary.ui.utils.UriPermissionManager
 import com.websarva.wings.android.zuboradiary.ui.requireValue
-import com.websarva.wings.android.zuboradiary.ui.diary.DiaryStateFlow
+import com.websarva.wings.android.zuboradiary.ui.viewmodel.DiaryStateFlow
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.DatePickerDialogFragment
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.DiaryDeleteDialogFragment
-import com.websarva.wings.android.zuboradiary.ui.diary.diaryedit.DiaryEditViewModel
+import com.websarva.wings.android.zuboradiary.ui.viewmodel.DiaryEditViewModel
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.DiaryItemDeleteDialogFragment
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.DiaryLoadingDialogFragment
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.DiaryLoadingFailureDialogFragment

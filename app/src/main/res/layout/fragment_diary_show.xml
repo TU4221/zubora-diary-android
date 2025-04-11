@@ -11,7 +11,7 @@
                   https://qiita.com/nanoyatsu/items/afad39a63d42d6fa3ac8 -->
         <variable
             name="diaryShowViewModel"
-            type="com.websarva.wings.android.zuboradiary.ui.diary.diaryshow.DiaryShowViewModel" />
+            type="com.websarva.wings.android.zuboradiary.ui.viewmodel.DiaryShowViewModel" />
     </data>
 
     <FrameLayout

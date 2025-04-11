@@ -9,7 +9,7 @@ import androidx.navigation.fragment.NavHostFragment
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.websarva.wings.android.zuboradiary.createLogTag
 import com.websarva.wings.android.zuboradiary.ui.requireValue
-import com.websarva.wings.android.zuboradiary.ui.settings.SettingsViewModel
+import com.websarva.wings.android.zuboradiary.ui.viewmodel.SettingsViewModel
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId

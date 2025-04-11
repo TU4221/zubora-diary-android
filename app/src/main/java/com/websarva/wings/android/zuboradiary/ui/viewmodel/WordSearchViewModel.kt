@@ -1,4 +1,4 @@
-package com.websarva.wings.android.zuboradiary.ui.list.wordsearch
+package com.websarva.wings.android.zuboradiary.ui.viewmodel
 
 import android.util.Log
 import androidx.lifecycle.viewModelScope
@@ -6,9 +6,10 @@ import com.websarva.wings.android.zuboradiary.data.database.DiaryRepository
 import com.websarva.wings.android.zuboradiary.data.database.WordSearchResultListItem
 import com.websarva.wings.android.zuboradiary.createLogTag
 import com.websarva.wings.android.zuboradiary.ui.appmessage.WordSearchAppMessage
-import com.websarva.wings.android.zuboradiary.ui.base.BaseViewModel
+import com.websarva.wings.android.zuboradiary.ui.list.wordsearch.WordSearchResultDayList
+import com.websarva.wings.android.zuboradiary.ui.list.wordsearch.WordSearchResultDayListItem
+import com.websarva.wings.android.zuboradiary.ui.list.wordsearch.WordSearchResultYearMonthList
 import com.websarva.wings.android.zuboradiary.ui.requireValue
-import com.websarva.wings.android.zuboradiary.ui.list.diarylist.DiaryListViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers

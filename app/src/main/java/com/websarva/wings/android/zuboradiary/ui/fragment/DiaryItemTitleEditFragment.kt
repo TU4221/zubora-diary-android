@@ -15,7 +15,7 @@ import com.websarva.wings.android.zuboradiary.R
 import com.websarva.wings.android.zuboradiary.ui.appmessage.AppMessage
 import com.websarva.wings.android.zuboradiary.databinding.FragmentDiaryItemTitleEditBinding
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.DiaryItemTitleDeleteDialogFragment
-import com.websarva.wings.android.zuboradiary.ui.diary.diaryitemtitleedit.DiaryItemTitleEditViewModel
+import com.websarva.wings.android.zuboradiary.ui.viewmodel.DiaryItemTitleEditViewModel
 import com.websarva.wings.android.zuboradiary.ui.diary.diaryitemtitleedit.ItemTitleSelectionHistoryListAdapter
 import com.websarva.wings.android.zuboradiary.ui.diary.diaryitemtitleedit.SelectionHistoryList
 import com.websarva.wings.android.zuboradiary.ui.utils.TextInputSetup

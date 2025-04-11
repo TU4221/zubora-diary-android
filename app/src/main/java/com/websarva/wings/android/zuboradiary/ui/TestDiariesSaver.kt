@@ -1,6 +1,6 @@
 package com.websarva.wings.android.zuboradiary.ui
 
-import com.websarva.wings.android.zuboradiary.ui.diary.diaryedit.DiaryEditViewModel
+import com.websarva.wings.android.zuboradiary.ui.viewmodel.DiaryEditViewModel
 
 // TODO:最終的に削除
 internal class TestDiariesSaver(private val diaryEditViewModel: DiaryEditViewModel) {

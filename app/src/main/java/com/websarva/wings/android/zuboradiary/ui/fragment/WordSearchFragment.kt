@@ -23,7 +23,7 @@ import com.websarva.wings.android.zuboradiary.ui.list.DiaryYearMonthListBaseAdap
 import com.websarva.wings.android.zuboradiary.ui.list.DiaryYearMonthListBaseItem
 import com.websarva.wings.android.zuboradiary.ui.list.wordsearch.WordSearchResultYearMonthList
 import com.websarva.wings.android.zuboradiary.ui.list.wordsearch.WordSearchResultYearMonthListAdapter
-import com.websarva.wings.android.zuboradiary.ui.list.wordsearch.WordSearchViewModel
+import com.websarva.wings.android.zuboradiary.ui.viewmodel.WordSearchViewModel
 import kotlinx.coroutines.flow.collectLatest
 import java.time.LocalDate
 

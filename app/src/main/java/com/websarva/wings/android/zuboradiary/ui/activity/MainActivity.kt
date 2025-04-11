@@ -45,7 +45,7 @@ import com.websarva.wings.android.zuboradiary.ui.requireValue
 import com.websarva.wings.android.zuboradiary.ui.fragment.DiaryEditFragment
 import com.websarva.wings.android.zuboradiary.ui.fragment.DiaryListFragment
 import com.websarva.wings.android.zuboradiary.ui.fragment.SettingsFragment
-import com.websarva.wings.android.zuboradiary.ui.settings.SettingsViewModel
+import com.websarva.wings.android.zuboradiary.ui.viewmodel.SettingsViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest

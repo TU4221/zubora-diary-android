@@ -1,4 +1,4 @@
-package com.websarva.wings.android.zuboradiary.ui.diary.diaryedit
+package com.websarva.wings.android.zuboradiary.ui.viewmodel
 
 import android.net.Uri
 import android.util.Log
@@ -10,10 +10,8 @@ import com.websarva.wings.android.zuboradiary.data.network.GeoCoordinates
 import com.websarva.wings.android.zuboradiary.data.network.WeatherApiRepository
 import com.websarva.wings.android.zuboradiary.createLogTag
 import com.websarva.wings.android.zuboradiary.ui.appmessage.DiaryEditAppMessage
-import com.websarva.wings.android.zuboradiary.ui.base.BaseViewModel
 import com.websarva.wings.android.zuboradiary.ui.DiaryEditPendingDialog
 import com.websarva.wings.android.zuboradiary.ui.requireValue
-import com.websarva.wings.android.zuboradiary.ui.diary.DiaryStateFlow
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

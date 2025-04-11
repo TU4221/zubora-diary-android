@@ -30,7 +30,7 @@ import com.websarva.wings.android.zuboradiary.databinding.FragmentCalendarBindin
 import com.websarva.wings.android.zuboradiary.databinding.LayoutCalendarDayBinding
 import com.websarva.wings.android.zuboradiary.databinding.LayoutCalendarHeaderBinding
 import com.websarva.wings.android.zuboradiary.ui.calendar.CalendarThemeColorSwitcher
-import com.websarva.wings.android.zuboradiary.ui.calendar.CalendarViewModel
+import com.websarva.wings.android.zuboradiary.ui.viewmodel.CalendarViewModel
 import com.websarva.wings.android.zuboradiary.ui.requireValue
 import com.websarva.wings.android.zuboradiary.ui.fragment.DiaryShowFragment.ConditionObserver
 import com.websarva.wings.android.zuboradiary.ui.fragment.DiaryShowFragment.LogObserver
@@ -38,7 +38,7 @@ import com.websarva.wings.android.zuboradiary.ui.fragment.DiaryShowFragment.NumV
 import com.websarva.wings.android.zuboradiary.ui.fragment.DiaryShowFragment.PicturePathObserver
 import com.websarva.wings.android.zuboradiary.ui.fragment.DiaryShowFragment.Weather1Observer
 import com.websarva.wings.android.zuboradiary.ui.fragment.DiaryShowFragment.Weather2Observer
-import com.websarva.wings.android.zuboradiary.ui.diary.diaryshow.DiaryShowViewModel
+import com.websarva.wings.android.zuboradiary.ui.viewmodel.DiaryShowViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest

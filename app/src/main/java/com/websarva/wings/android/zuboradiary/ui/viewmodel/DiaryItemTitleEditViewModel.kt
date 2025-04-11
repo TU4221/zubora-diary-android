@@ -1,4 +1,4 @@
-package com.websarva.wings.android.zuboradiary.ui.diary.diaryitemtitleedit
+package com.websarva.wings.android.zuboradiary.ui.viewmodel
 
 import android.util.Log
 import androidx.lifecycle.viewModelScope
@@ -6,7 +6,8 @@ import com.websarva.wings.android.zuboradiary.data.database.DiaryItemTitleSelect
 import com.websarva.wings.android.zuboradiary.data.diary.ItemNumber
 import com.websarva.wings.android.zuboradiary.createLogTag
 import com.websarva.wings.android.zuboradiary.ui.appmessage.DiaryItemTitleEditAppMessage
-import com.websarva.wings.android.zuboradiary.ui.base.BaseViewModel
+import com.websarva.wings.android.zuboradiary.ui.diary.diaryitemtitleedit.SelectionHistoryList
+import com.websarva.wings.android.zuboradiary.ui.diary.diaryitemtitleedit.SelectionHistoryListItem
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow

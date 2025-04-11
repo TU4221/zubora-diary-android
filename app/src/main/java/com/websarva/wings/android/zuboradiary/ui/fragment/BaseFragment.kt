@@ -35,10 +35,10 @@ import com.websarva.wings.android.zuboradiary.ui.DiaryEditPendingDialog
 import com.websarva.wings.android.zuboradiary.ui.DiaryShowPendingDialog
 import com.websarva.wings.android.zuboradiary.ui.PendingDialog
 import com.websarva.wings.android.zuboradiary.ui.PendingDialogList
-import com.websarva.wings.android.zuboradiary.ui.base.BaseViewModel
+import com.websarva.wings.android.zuboradiary.ui.viewmodel.BaseViewModel
 import com.websarva.wings.android.zuboradiary.ui.utils.ThemeColorInflaterCreator
 import com.websarva.wings.android.zuboradiary.ui.requireValue
-import com.websarva.wings.android.zuboradiary.ui.settings.SettingsViewModel
+import com.websarva.wings.android.zuboradiary.ui.viewmodel.SettingsViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
