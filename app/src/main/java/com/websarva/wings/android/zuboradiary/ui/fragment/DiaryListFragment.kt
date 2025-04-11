@@ -24,11 +24,11 @@ import com.websarva.wings.android.zuboradiary.ui.list.DiaryYearMonthListBaseAdap
 import com.websarva.wings.android.zuboradiary.ui.list.DiaryYearMonthListBaseItem
 import com.websarva.wings.android.zuboradiary.ui.list.SwipeDiaryYearMonthListBaseAdapter.OnClickChildItemBackgroundButtonListener
 import com.websarva.wings.android.zuboradiary.ui.list.diarylist.DiaryDayListItem
-import com.websarva.wings.android.zuboradiary.ui.list.diarylist.DiaryDeleteDialogFragment
+import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.DiaryListDeleteDialogFragment
 import com.websarva.wings.android.zuboradiary.ui.list.diarylist.DiaryListViewModel
 import com.websarva.wings.android.zuboradiary.ui.list.diarylist.DiaryYearMonthList
 import com.websarva.wings.android.zuboradiary.ui.list.diarylist.DiaryYearMonthListAdapter
-import com.websarva.wings.android.zuboradiary.ui.list.diarylist.StartYearMonthPickerDialogFragment
+import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.StartYearMonthPickerDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
@@ -95,7 +95,7 @@ class DiaryListFragment : BaseFragment() {
 
     override fun removeDialogResults() {
         removeResulFromFragment(StartYearMonthPickerDialogFragment.KEY_SELECTED_YEAR_MONTH)
-        removeResulFromFragment(DiaryDeleteDialogFragment.KEY_DELETE_DIARY_DATE)
+        removeResulFromFragment(DiaryListDeleteDialogFragment.KEY_DELETE_DIARY_DATE)
     }
 
     // 日付入力ダイアログフラグメントから結果受取
@@ -112,7 +112,7 @@ class DiaryListFragment : BaseFragment() {
     // 日記削除ダイアログフラグメントから結果受取
     private fun receiveDiaryDeleteDialogResults() {
         val deleteDiaryDate =
-            receiveResulFromDialog<LocalDate>(DiaryDeleteDialogFragment.KEY_DELETE_DIARY_DATE)
+            receiveResulFromDialog<LocalDate>(DiaryListDeleteDialogFragment.KEY_DELETE_DIARY_DATE)
                 ?: return
 
         lifecycleScope.launch(Dispatchers.IO) {
@@ -120,7 +120,7 @@ class DiaryListFragment : BaseFragment() {
             if (!isSuccessful) return@launch
 
             val deleteDiaryPictureUri =
-                receiveResulFromDialog<Uri>(DiaryDeleteDialogFragment.KEY_DELETE_DIARY_PICTURE_URI)
+                receiveResulFromDialog<Uri>(DiaryListDeleteDialogFragment.KEY_DELETE_DIARY_PICTURE_URI)
                     ?: return@launch
             pictureUriPermissionManager.releasePersistablePermission(deleteDiaryPictureUri)
         }

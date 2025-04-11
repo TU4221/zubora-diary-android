@@ -1,15 +1,14 @@
-package com.websarva.wings.android.zuboradiary.ui.list.diarylist
+package com.websarva.wings.android.zuboradiary.ui.fragment.dialog
 
 import android.net.Uri
 import com.websarva.wings.android.zuboradiary.R
 import com.websarva.wings.android.zuboradiary.ui.utils.DateTimeStringConverter
-import com.websarva.wings.android.zuboradiary.ui.base.BaseAlertDialogFragment
 import java.time.LocalDate
 
-class DiaryDeleteDialogFragment : BaseAlertDialogFragment() {
+class DiaryListDeleteDialogFragment : BaseAlertDialogFragment() {
 
     companion object {
-        private val fromClassName = "From" + DiaryDeleteDialogFragment::class.java.name
+        private val fromClassName = "From" + DiaryListDeleteDialogFragment::class.java.name
         @JvmField
         val KEY_DELETE_DIARY_DATE: String = "DeleteDiaryDate$fromClassName"
         @JvmField
@@ -21,7 +20,7 @@ class DiaryDeleteDialogFragment : BaseAlertDialogFragment() {
     }
 
     override fun createMessage(): String {
-        val date = DiaryDeleteDialogFragmentArgs.fromBundle(requireArguments()).date
+        val date = DiaryListDeleteDialogFragmentArgs.fromBundle(requireArguments()).date
         val dateTimeStringConverter = DateTimeStringConverter()
         val strDate = dateTimeStringConverter.toYearMonthDayWeek(date)
         return strDate + getString(R.string.dialog_diary_delete_message)
@@ -30,9 +29,9 @@ class DiaryDeleteDialogFragment : BaseAlertDialogFragment() {
     override fun handleOnPositiveButtonClick() {
 
         val deleteDiaryDate =
-            DiaryDeleteDialogFragmentArgs.fromBundle(requireArguments()).date
+            DiaryListDeleteDialogFragmentArgs.fromBundle(requireArguments()).date
         val deleteDiaryPictureUri =
-            DiaryDeleteDialogFragmentArgs.fromBundle(requireArguments()).pictureUri
+            DiaryListDeleteDialogFragmentArgs.fromBundle(requireArguments()).pictureUri
         setResults(deleteDiaryDate, deleteDiaryPictureUri)
     }
 

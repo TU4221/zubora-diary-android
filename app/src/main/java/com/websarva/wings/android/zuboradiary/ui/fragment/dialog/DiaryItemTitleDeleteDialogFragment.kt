@@ -1,8 +1,7 @@
-package com.websarva.wings.android.zuboradiary.ui.diary.diaryitemtitleedit
+package com.websarva.wings.android.zuboradiary.ui.fragment.dialog
 
 import android.content.DialogInterface
 import com.websarva.wings.android.zuboradiary.R
-import com.websarva.wings.android.zuboradiary.ui.base.BaseAlertDialogFragment
 
 class DiaryItemTitleDeleteDialogFragment : BaseAlertDialogFragment() {
 

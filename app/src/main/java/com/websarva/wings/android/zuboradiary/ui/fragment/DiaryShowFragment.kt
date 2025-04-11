@@ -26,8 +26,8 @@ import com.websarva.wings.android.zuboradiary.databinding.FragmentDiaryShowBindi
 import com.websarva.wings.android.zuboradiary.ui.utils.DiaryPictureManager
 import com.websarva.wings.android.zuboradiary.ui.DiaryShowPendingDialog
 import com.websarva.wings.android.zuboradiary.ui.PendingDialog
-import com.websarva.wings.android.zuboradiary.ui.diary.diaryshow.DiaryDeleteDialogFragment
-import com.websarva.wings.android.zuboradiary.ui.diary.diaryshow.DiaryLoadingFailureDialogFragment
+import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.DiaryDeleteDialogFragment
+import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.DiaryLoadingFailureDialogFragment
 import com.websarva.wings.android.zuboradiary.ui.diary.diaryshow.DiaryShowViewModel
 import com.websarva.wings.android.zuboradiary.ui.utils.UriPermissionManager
 import com.websarva.wings.android.zuboradiary.ui.requireValue

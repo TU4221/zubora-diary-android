@@ -1,27 +1,27 @@
-package com.websarva.wings.android.zuboradiary.ui.diary.diaryshow
+package com.websarva.wings.android.zuboradiary.ui.fragment.dialog
 
 import android.content.DialogInterface
 import com.websarva.wings.android.zuboradiary.R
 import com.websarva.wings.android.zuboradiary.ui.utils.DateTimeStringConverter
-import com.websarva.wings.android.zuboradiary.ui.base.BaseAlertDialogFragment
 
-class DiaryDeleteDialogFragment : BaseAlertDialogFragment() {
+class WeatherInfoFetchingDialogFragment : BaseAlertDialogFragment() {
 
     companion object {
-        private val fromClassName = "From" + DiaryDeleteDialogFragment::class.java.name
+        private val fromClassName = "From" + WeatherInfoFetchingDialogFragment::class.java.name
         @JvmField
         val KEY_SELECTED_BUTTON: String = "SelectedButton$fromClassName"
     }
 
     override fun createTitle(): String {
-        return getString(R.string.dialog_diary_delete_title)
+        return getString(R.string.dialog_weather_info_fetching_title)
     }
 
     override fun createMessage(): String {
-        val date = DiaryDeleteDialogFragmentArgs.fromBundle(requireArguments()).date
+        val loadingDiaryDate =
+            WeatherInfoFetchingDialogFragmentArgs.fromBundle(requireArguments()).date
         val dateTimeStringConverter = DateTimeStringConverter()
-        val strDate = dateTimeStringConverter.toYearMonthDayWeek(date)
-        return strDate + getString(R.string.dialog_diary_delete_message)
+        val dateString = dateTimeStringConverter.toYearMonthDayWeek(loadingDiaryDate)
+        return dateString + getString(R.string.dialog_weather_info_fetching_message)
     }
 
     override fun handleOnPositiveButtonClick() {

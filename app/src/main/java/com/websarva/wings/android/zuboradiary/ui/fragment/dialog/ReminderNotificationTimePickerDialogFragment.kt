@@ -1,10 +1,9 @@
-package com.websarva.wings.android.zuboradiary.ui.settings
+package com.websarva.wings.android.zuboradiary.ui.fragment.dialog
 
 import android.content.DialogInterface
 import android.view.View
 import android.widget.NumberPicker
 import com.websarva.wings.android.zuboradiary.databinding.DialogFragmentNumberPickersBinding
-import com.websarva.wings.android.zuboradiary.ui.base.BaseNumberPickersBottomSheetDialogFragment
 import java.time.LocalTime
 import java.util.Locale
 

@@ -1,9 +1,8 @@
-package com.websarva.wings.android.zuboradiary.ui.settings
+package com.websarva.wings.android.zuboradiary.ui.fragment.dialog
 
 import android.view.View
 import com.websarva.wings.android.zuboradiary.ui.utils.DayOfWeekStringConverter
 import com.websarva.wings.android.zuboradiary.databinding.DialogFragmentNumberPickersBinding
-import com.websarva.wings.android.zuboradiary.ui.base.BaseNumberPickersBottomSheetDialogFragment
 import java.time.DayOfWeek
 
 class CalendarStartDayPickerDialogFragment : BaseNumberPickersBottomSheetDialogFragment() {
@@ -50,8 +49,7 @@ class CalendarStartDayPickerDialogFragment : BaseNumberPickersBottomSheetDialogF
 
     private fun setUpInitialValue(binding: DialogFragmentNumberPickersBinding) {
         val currentCalendarStartDayOfWeek =
-            CalendarStartDayPickerDialogFragmentArgs
-                .fromBundle(requireArguments()).initialValue
+            CalendarStartDayPickerDialogFragmentArgs.fromBundle(requireArguments()).initialValue
         // MEMO:DayOfWeekはMonday～Sundayの値が1～7となる。Sundayを先頭に表示させたいため、下記コード記述。
         val initialValue = if (currentCalendarStartDayOfWeek == DayOfWeek.SUNDAY) {
             0

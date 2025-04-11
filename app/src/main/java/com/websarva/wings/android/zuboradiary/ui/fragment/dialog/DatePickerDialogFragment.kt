@@ -1,6 +1,5 @@
-package com.websarva.wings.android.zuboradiary.ui.diary.diaryedit
+package com.websarva.wings.android.zuboradiary.ui.fragment.dialog
 
-import com.websarva.wings.android.zuboradiary.ui.base.BaseDatePickerDialogFragment
 import java.time.LocalDate
 
 

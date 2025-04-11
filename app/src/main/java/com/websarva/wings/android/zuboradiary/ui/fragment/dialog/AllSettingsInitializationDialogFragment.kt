@@ -1,27 +1,23 @@
-package com.websarva.wings.android.zuboradiary.ui.settings
+package com.websarva.wings.android.zuboradiary.ui.fragment.dialog
 
 import android.content.DialogInterface
 import com.websarva.wings.android.zuboradiary.R
-import com.websarva.wings.android.zuboradiary.ui.base.BaseAlertDialogFragment
 
-class PermissionDialogFragment : BaseAlertDialogFragment() {
+class AllSettingsInitializationDialogFragment : BaseAlertDialogFragment() {
 
     companion object {
-        private val FROM_CLASS_NAME = "From" + PermissionDialogFragment::class.java.name
+        private val FROM_CLASS_NAME =
+            "From" + AllSettingsInitializationDialogFragment::class.java.name
         @JvmField
         val KEY_SELECTED_BUTTON: String = "SelectedButton$FROM_CLASS_NAME"
     }
 
     override fun createTitle(): String {
-        return getString(R.string.dialog_permission_title)
+        return getString(R.string.dialog_all_settings_initialization_title)
     }
 
     override fun createMessage(): String {
-        val firstMessage = getString(R.string.dialog_permission_first_message)
-        val secondMessage =
-            PermissionDialogFragmentArgs.fromBundle(requireArguments()).permissionName
-        val thirdMessage = getString(R.string.dialog_permission_third_message)
-        return firstMessage + secondMessage + thirdMessage
+        return getString(R.string.dialog_all_settings_initialization_message)
     }
 
     override fun handleOnPositiveButtonClick() {

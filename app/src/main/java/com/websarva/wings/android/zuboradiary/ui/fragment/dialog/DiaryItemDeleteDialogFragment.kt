@@ -1,7 +1,6 @@
-package com.websarva.wings.android.zuboradiary.ui.diary.diaryedit
+package com.websarva.wings.android.zuboradiary.ui.fragment.dialog
 
 import com.websarva.wings.android.zuboradiary.R
-import com.websarva.wings.android.zuboradiary.ui.base.BaseAlertDialogFragment
 
 class DiaryItemDeleteDialogFragment : BaseAlertDialogFragment() {
 
@@ -17,8 +16,7 @@ class DiaryItemDeleteDialogFragment : BaseAlertDialogFragment() {
 
     override fun createMessage(): String {
         val deleteItemNumber =
-            DiaryItemDeleteDialogFragmentArgs
-                .fromBundle(requireArguments()).itemNumber
+            DiaryItemDeleteDialogFragmentArgs.fromBundle(requireArguments()).itemNumber
         return getString(R.string.dialog_diary_item_delete_first_message) + deleteItemNumber + getString(
             R.string.dialog_diary_item_delete_second_message
         )
@@ -26,8 +24,7 @@ class DiaryItemDeleteDialogFragment : BaseAlertDialogFragment() {
 
     override fun handleOnPositiveButtonClick() {
         val deleteItemNumber =
-            DiaryItemDeleteDialogFragmentArgs
-                .fromBundle(requireArguments()).itemNumber
+            DiaryItemDeleteDialogFragmentArgs.fromBundle(requireArguments()).itemNumber
         setResult(KEY_DELETE_ITEM_NUMBER, deleteItemNumber)
     }
 

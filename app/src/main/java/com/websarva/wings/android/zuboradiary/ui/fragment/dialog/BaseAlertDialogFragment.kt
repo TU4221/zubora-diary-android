@@ -1,4 +1,4 @@
-package com.websarva.wings.android.zuboradiary.ui.base
+package com.websarva.wings.android.zuboradiary.ui.fragment.dialog
 
 import android.app.Dialog
 import android.content.DialogInterface

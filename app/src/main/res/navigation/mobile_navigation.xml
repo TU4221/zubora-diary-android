@@ -61,7 +61,7 @@
 
         <dialog
             android:id="@+id/navigation_start_year_month_picker_dialog"
-            android:name="com.websarva.wings.android.zuboradiary.ui.list.diarylist.StartYearMonthPickerDialogFragment">
+            android:name="com.websarva.wings.android.zuboradiary.ui.fragment.dialog.StartYearMonthPickerDialogFragment">
             <argument
                 android:name="max_year"
                 app:argType="java.time.Year" />
@@ -72,7 +72,7 @@
 
         <dialog
             android:id="@+id/navigation_diary_delete_dialog_for_diary_list_fragment"
-            android:name="com.websarva.wings.android.zuboradiary.ui.list.diarylist.DiaryDeleteDialogFragment">
+            android:name="com.websarva.wings.android.zuboradiary.ui.fragment.dialog.DiaryListDeleteDialogFragment">
             <argument
                 android:name="date"
                 app:argType="java.time.LocalDate" />
@@ -197,12 +197,12 @@
 
         <dialog
             android:id="@+id/navigation_theme_color_picker_dialog"
-            android:name="com.websarva.wings.android.zuboradiary.ui.settings.ThemeColorPickerDialogFragment">
+            android:name="com.websarva.wings.android.zuboradiary.ui.fragment.dialog.ThemeColorPickerDialogFragment">
         </dialog>
 
         <dialog
             android:id="@+id/navigation_calendar_start_day_picker_dialog"
-            android:name="com.websarva.wings.android.zuboradiary.ui.settings.CalendarStartDayPickerDialogFragment">
+            android:name="com.websarva.wings.android.zuboradiary.ui.fragment.dialog.CalendarStartDayPickerDialogFragment">
             <argument
                 android:name="initial_value"
                 app:argType="java.time.DayOfWeek" />
@@ -210,12 +210,12 @@
 
         <dialog
             android:id="@+id/navigation_reminder_notification_time_picker_dialog"
-            android:name="com.websarva.wings.android.zuboradiary.ui.settings.ReminderNotificationTimePickerDialogFragment">
+            android:name="com.websarva.wings.android.zuboradiary.ui.fragment.dialog.ReminderNotificationTimePickerDialogFragment">
         </dialog>
 
         <dialog
             android:id="@+id/navigation_permission_dialog"
-            android:name="com.websarva.wings.android.zuboradiary.ui.settings.PermissionDialogFragment">
+            android:name="com.websarva.wings.android.zuboradiary.ui.fragment.dialog.PermissionDialogFragment">
             <argument
                 android:name="permission_name"
                 app:argType="string" />
@@ -223,17 +223,17 @@
 
         <dialog
             android:id="@+id/navigation_all_diaries_delete_dialog"
-            android:name="com.websarva.wings.android.zuboradiary.ui.settings.AllDiariesDeleteDialogFragment">
+            android:name="com.websarva.wings.android.zuboradiary.ui.fragment.dialog.AllDiariesDeleteDialogFragment">
         </dialog>
 
         <dialog
             android:id="@+id/navigation_all_settings_initialization_dialog"
-            android:name="com.websarva.wings.android.zuboradiary.ui.settings.AllSettingsInitializationDialogFragment">
+            android:name="com.websarva.wings.android.zuboradiary.ui.fragment.dialog.AllSettingsInitializationDialogFragment">
         </dialog>
 
         <dialog
             android:id="@+id/navigation_all_data_delete_dialog"
-            android:name="com.websarva.wings.android.zuboradiary.ui.settings.AllDataDeleteDialogFragment">
+            android:name="com.websarva.wings.android.zuboradiary.ui.fragment.dialog.AllDataDeleteDialogFragment">
         </dialog>
 
         <fragment
@@ -288,7 +288,7 @@
 
         <dialog
             android:id="@+id/navigation_diary_loading_failure_dialog_for_diary_show_fragment"
-            android:name="com.websarva.wings.android.zuboradiary.ui.diary.diaryshow.DiaryLoadingFailureDialogFragment">
+            android:name="com.websarva.wings.android.zuboradiary.ui.fragment.dialog.DiaryLoadingFailureDialogFragment">
             <argument
                 android:name="date"
                 app:argType="java.time.LocalDate" />
@@ -296,7 +296,7 @@
 
         <dialog
             android:id="@+id/navigation_diary_delete_dialog_for_diary_show_fragment"
-            android:name="com.websarva.wings.android.zuboradiary.ui.diary.diaryshow.DiaryDeleteDialogFragment">
+            android:name="com.websarva.wings.android.zuboradiary.ui.fragment.dialog.DiaryDeleteDialogFragment">
             <argument
                 android:name="date"
                 app:argType="java.time.LocalDate" />
@@ -391,7 +391,7 @@
 
         <dialog
             android:id="@+id/navigation_diary_loading_dialog"
-            android:name="com.websarva.wings.android.zuboradiary.ui.diary.diaryedit.DiaryLoadingDialogFragment">
+            android:name="com.websarva.wings.android.zuboradiary.ui.fragment.dialog.DiaryLoadingDialogFragment">
             <argument
                 android:name="date"
                 app:argType="java.time.LocalDate" />
@@ -399,7 +399,7 @@
 
         <dialog
             android:id="@+id/navigation_diary_loading_failure_dialog_for_diary_edit_fragment"
-            android:name="com.websarva.wings.android.zuboradiary.ui.diary.diaryedit.DiaryLoadingFailureDialogFragment">
+            android:name="com.websarva.wings.android.zuboradiary.ui.fragment.dialog.DiaryLoadingFailureDialogFragment">
             <argument
                 android:name="date"
                 app:argType="java.time.LocalDate" />
@@ -407,7 +407,7 @@
 
         <dialog
             android:id="@+id/navigation_diary_update_dialog"
-            android:name="com.websarva.wings.android.zuboradiary.ui.diary.diaryedit.DiaryUpdateDialogFragment">
+            android:name="com.websarva.wings.android.zuboradiary.ui.fragment.dialog.DiaryUpdateDialogFragment">
             <argument
                 android:name="date"
                 app:argType="java.time.LocalDate" />
@@ -415,7 +415,7 @@
 
         <dialog
             android:id="@+id/navigation_diary_delete_dialog_for_diary_edit_fragment"
-            android:name="com.websarva.wings.android.zuboradiary.ui.diary.diaryedit.DiaryDeleteDialogFragment">
+            android:name="com.websarva.wings.android.zuboradiary.ui.fragment.dialog.DiaryDeleteDialogFragment">
             <argument
                 android:name="date"
                 app:argType="java.time.LocalDate" />
@@ -423,7 +423,7 @@
 
         <dialog
             android:id="@+id/navigation_date_picker_dialog"
-            android:name="com.websarva.wings.android.zuboradiary.ui.diary.diaryedit.DatePickerDialogFragment">
+            android:name="com.websarva.wings.android.zuboradiary.ui.fragment.dialog.DatePickerDialogFragment">
             <argument
                 android:name="date"
                 app:argType="java.time.LocalDate" />
@@ -431,7 +431,7 @@
 
         <dialog
             android:id="@+id/navigation_weather_info_fetching_dialog"
-            android:name="com.websarva.wings.android.zuboradiary.ui.diary.diaryedit.WeatherInfoFetchingDialogFragment">
+            android:name="com.websarva.wings.android.zuboradiary.ui.fragment.dialog.WeatherInfoFetchingDialogFragment">
             <argument
                 android:name="date"
                 app:argType="java.time.LocalDate" />
@@ -439,7 +439,7 @@
 
         <dialog
             android:id="@+id/navigation_diary_item_delete_dialog"
-            android:name="com.websarva.wings.android.zuboradiary.ui.diary.diaryedit.DiaryItemDeleteDialogFragment">
+            android:name="com.websarva.wings.android.zuboradiary.ui.fragment.dialog.DiaryItemDeleteDialogFragment">
             <argument
                 android:name="item_number"
                 app:argType="com.websarva.wings.android.zuboradiary.data.diary.ItemNumber" />
@@ -447,7 +447,7 @@
 
         <dialog
             android:id="@+id/navigation_diary_picture_delete_dialog"
-            android:name="com.websarva.wings.android.zuboradiary.ui.diary.diaryedit.DiaryPictureDeleteDialogFragment">
+            android:name="com.websarva.wings.android.zuboradiary.ui.fragment.dialog.DiaryPictureDeleteDialogFragment">
         </dialog>
 
         <fragment
@@ -482,7 +482,7 @@
 
         <dialog
             android:id="@+id/navigation_diary_item_title_delete_dialog"
-            android:name="com.websarva.wings.android.zuboradiary.ui.diary.diaryitemtitleedit.DiaryItemTitleDeleteDialogFragment">
+            android:name="com.websarva.wings.android.zuboradiary.ui.fragment.dialog.DiaryItemTitleDeleteDialogFragment">
             <argument
                 android:name="item_position"
                 app:argType="integer" />
@@ -495,7 +495,7 @@
 
     <dialog
         android:id="@+id/navigation_app_message_dialog"
-        android:name="com.websarva.wings.android.zuboradiary.ui.appmessage.AppMessageDialogFragment">
+        android:name="com.websarva.wings.android.zuboradiary.ui.fragment.dialog.AppMessageDialogFragment">
         <argument
             android:name="app_message"
             app:argType="com.websarva.wings.android.zuboradiary.ui.appmessage.AppMessage" />

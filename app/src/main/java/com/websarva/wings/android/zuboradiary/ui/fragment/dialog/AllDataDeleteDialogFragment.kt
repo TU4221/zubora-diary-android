@@ -1,23 +1,22 @@
-package com.websarva.wings.android.zuboradiary.ui.settings
+package com.websarva.wings.android.zuboradiary.ui.fragment.dialog
 
 import android.content.DialogInterface
 import com.websarva.wings.android.zuboradiary.R
-import com.websarva.wings.android.zuboradiary.ui.base.BaseAlertDialogFragment
 
-class AllDiariesDeleteDialogFragment : BaseAlertDialogFragment() {
+class AllDataDeleteDialogFragment : BaseAlertDialogFragment() {
 
     companion object {
-        private val FROM_CLASS_NAME = "From" + AllDiariesDeleteDialogFragment::class.java.name
+        private val FROM_CLASS_NAME = "From" + AllDataDeleteDialogFragment::class.java.name
         @JvmField
         val KEY_SELECTED_BUTTON: String = "SelectedButton$FROM_CLASS_NAME"
     }
 
     override fun createTitle(): String {
-        return getString(R.string.dialog_all_diaries_delete_title)
+        return getString(R.string.dialog_all_data_delete_title)
     }
 
     override fun createMessage(): String {
-        return getString(R.string.dialog_all_diaries_delete_message)
+        return getString(R.string.dialog_all_data_delete_message)
     }
 
     override fun handleOnPositiveButtonClick() {
