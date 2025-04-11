@@ -34,7 +34,7 @@ import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.AllSettingsInit
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.CalendarStartDayPickerDialogFragment
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.PermissionDialogFragment
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.ReminderNotificationTimePickerDialogFragment
-import com.websarva.wings.android.zuboradiary.ui.settings.SettingsThemeColorSwitcher
+import com.websarva.wings.android.zuboradiary.ui.theme.SettingsThemeColorSwitcher
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.ThemeColorPickerDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers

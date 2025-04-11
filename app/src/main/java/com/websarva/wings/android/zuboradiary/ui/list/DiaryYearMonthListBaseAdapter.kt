@@ -17,7 +17,7 @@ import com.websarva.wings.android.zuboradiary.databinding.RowDiaryYearMonthListB
 import com.websarva.wings.android.zuboradiary.databinding.RowNoDiaryMessageBinding
 import com.websarva.wings.android.zuboradiary.databinding.RowProgressBarBinding
 import com.websarva.wings.android.zuboradiary.createLogTag
-import com.websarva.wings.android.zuboradiary.ui.utils.ThemeColorInflaterCreator
+import com.websarva.wings.android.zuboradiary.ui.theme.ThemeColorInflaterCreator
 
 // DiaryFragment、WordSearchFragmentの親RecyclerViewのListAdapter。
 // 親RecyclerViewを同じ構成にする為、一つのクラスで両方の子RecyclerViewに対応できるように作成。

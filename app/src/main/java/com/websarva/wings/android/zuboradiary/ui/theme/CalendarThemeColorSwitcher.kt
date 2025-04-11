@@ -1,4 +1,4 @@
-package com.websarva.wings.android.zuboradiary.ui.calendar
+package com.websarva.wings.android.zuboradiary.ui.theme
 
 import android.content.Context
 import android.view.View
@@ -6,7 +6,6 @@ import android.widget.TextView
 import androidx.core.content.res.ResourcesCompat
 import com.websarva.wings.android.zuboradiary.R
 import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor
-import com.websarva.wings.android.zuboradiary.ui.utils.ThemeColorSwitcher
 
 internal class CalendarThemeColorSwitcher(context: Context, themeColor: ThemeColor) :
     ThemeColorSwitcher(context, themeColor) {

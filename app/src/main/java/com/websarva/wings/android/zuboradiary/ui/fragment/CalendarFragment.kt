@@ -29,7 +29,7 @@ import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor
 import com.websarva.wings.android.zuboradiary.databinding.FragmentCalendarBinding
 import com.websarva.wings.android.zuboradiary.databinding.LayoutCalendarDayBinding
 import com.websarva.wings.android.zuboradiary.databinding.LayoutCalendarHeaderBinding
-import com.websarva.wings.android.zuboradiary.ui.calendar.CalendarThemeColorSwitcher
+import com.websarva.wings.android.zuboradiary.ui.theme.CalendarThemeColorSwitcher
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.CalendarViewModel
 import com.websarva.wings.android.zuboradiary.ui.requireValue
 import com.websarva.wings.android.zuboradiary.ui.fragment.DiaryShowFragment.ConditionObserver
