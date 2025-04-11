@@ -15,7 +15,7 @@
         android:visibility="@{isVisibleStateFlow ? View.VISIBLE : View.INVISIBLE}"
         tools:visibility="visible">
 
-        <com.websarva.wings.android.zuboradiary.ui.ProgressIndicatorBackgroundView
+        <com.websarva.wings.android.zuboradiary.ui.view.ProgressIndicatorBackgroundView
             android:id="@+id/view_background"
             android:layout_width="match_parent"
             android:layout_height="match_parent"

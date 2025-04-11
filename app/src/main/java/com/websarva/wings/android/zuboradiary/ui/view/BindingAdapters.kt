@@ -1,4 +1,4 @@
-package com.websarva.wings.android.zuboradiary.ui
+package com.websarva.wings.android.zuboradiary.ui.view
 
 import android.graphics.drawable.Drawable
 import android.widget.TextView

@@ -81,7 +81,7 @@
                             android:layout_marginTop="@dimen/fragment_diary_edit_margin_top"
                             android:hint="@string/fragment_diary_edit_date">
 
-                            <com.websarva.wings.android.zuboradiary.ui.diary.diaryedit.CustomTextInputEditText
+                            <com.websarva.wings.android.zuboradiary.ui.view.CustomTextInputEditText
                                 android:id="@+id/text_input_edit_text_date"
                                 style="@style/AppTextInputEditTextNoInputStyle"
                                 android:layout_width="match_parent"

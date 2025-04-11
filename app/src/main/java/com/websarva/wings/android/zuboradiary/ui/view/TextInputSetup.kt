@@ -1,4 +1,4 @@
-package com.websarva.wings.android.zuboradiary.ui.utils
+package com.websarva.wings.android.zuboradiary.ui.view
 
 import android.app.Activity
 import android.text.Editable

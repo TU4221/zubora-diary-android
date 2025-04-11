@@ -1,4 +1,4 @@
-package com.websarva.wings.android.zuboradiary.ui.utils
+package com.websarva.wings.android.zuboradiary.ui.view
 
 import android.app.Activity
 import android.text.Editable
@@ -11,6 +11,7 @@ import android.view.View.OnFocusChangeListener
 import android.view.View.OnTouchListener
 import android.widget.EditText
 import android.widget.ImageButton
+import com.websarva.wings.android.zuboradiary.ui.utils.KeyboardInitializer
 import java.util.Arrays
 
 internal open class EditTextSetup(private val activity: Activity) {

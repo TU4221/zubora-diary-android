@@ -78,7 +78,7 @@
                 app:counterMaxLength="@integer/layout_diary_edit_item_title_max_length"
                 tools:ignore="DuplicateIncludedIds">
 
-                <com.websarva.wings.android.zuboradiary.ui.diary.diaryedit.CustomTextInputEditText
+                <com.websarva.wings.android.zuboradiary.ui.view.CustomTextInputEditText
                     style="@style/AppTextInputEditTextNoInputStyle"
                     android:id="@+id/textInputEditText_title"
                     android:layout_width="match_parent"

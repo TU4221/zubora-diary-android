@@ -37,7 +37,7 @@ import com.websarva.wings.android.zuboradiary.ui.model.DiaryEditPendingDialog
 import com.websarva.wings.android.zuboradiary.ui.utils.DiaryPictureManager
 import com.websarva.wings.android.zuboradiary.ui.model.PendingDialog
 import com.websarva.wings.android.zuboradiary.ui.TestDiariesSaver
-import com.websarva.wings.android.zuboradiary.ui.utils.TextInputSetup
+import com.websarva.wings.android.zuboradiary.ui.view.TextInputSetup
 import com.websarva.wings.android.zuboradiary.ui.utils.UriPermissionManager
 import com.websarva.wings.android.zuboradiary.ui.requireValue
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.DiaryStateFlow
