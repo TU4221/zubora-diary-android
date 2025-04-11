@@ -1,4 +1,4 @@
-package com.websarva.wings.android.zuboradiary.ui.appmessage
+package com.websarva.wings.android.zuboradiary.ui.model
 
 class AppMessageList {
 

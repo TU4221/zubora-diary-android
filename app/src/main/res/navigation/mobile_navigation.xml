@@ -54,7 +54,7 @@
                 app:destination="@id/navigation_app_message_dialog">
                 <argument
                     android:name="app_message"
-                    app:argType="com.websarva.wings.android.zuboradiary.ui.appmessage.AppMessage" />
+                    app:argType="com.websarva.wings.android.zuboradiary.ui.model.AppMessage" />
             </action>
 
         </fragment>
@@ -101,7 +101,7 @@
                 app:destination="@id/navigation_app_message_dialog">
                 <argument
                     android:name="app_message"
-                    app:argType="com.websarva.wings.android.zuboradiary.ui.appmessage.AppMessage" />
+                    app:argType="com.websarva.wings.android.zuboradiary.ui.model.AppMessage" />
             </action>
 
         </fragment>
@@ -137,7 +137,7 @@
                 app:destination="@id/navigation_app_message_dialog">
                 <argument
                     android:name="app_message"
-                    app:argType="com.websarva.wings.android.zuboradiary.ui.appmessage.AppMessage" />
+                    app:argType="com.websarva.wings.android.zuboradiary.ui.model.AppMessage" />
             </action>
 
         </fragment>
@@ -186,7 +186,7 @@
                 app:destination="@id/navigation_app_message_dialog">
                 <argument
                     android:name="app_message"
-                    app:argType="com.websarva.wings.android.zuboradiary.ui.appmessage.AppMessage" />
+                    app:argType="com.websarva.wings.android.zuboradiary.ui.model.AppMessage" />
             </action>
 
             <action
@@ -281,7 +281,7 @@
                 app:destination="@id/navigation_app_message_dialog">
                 <argument
                     android:name="app_message"
-                    app:argType="com.websarva.wings.android.zuboradiary.ui.appmessage.AppMessage" />
+                    app:argType="com.websarva.wings.android.zuboradiary.ui.model.AppMessage" />
             </action>
 
         </fragment>
@@ -384,7 +384,7 @@
                 app:destination="@id/navigation_app_message_dialog">
                 <argument
                     android:name="app_message"
-                    app:argType="com.websarva.wings.android.zuboradiary.ui.appmessage.AppMessage" />
+                    app:argType="com.websarva.wings.android.zuboradiary.ui.model.AppMessage" />
             </action>
 
         </fragment>
@@ -475,7 +475,7 @@
                 app:destination="@id/navigation_app_message_dialog">
                 <argument
                     android:name="app_message"
-                    app:argType="com.websarva.wings.android.zuboradiary.ui.appmessage.AppMessage" />
+                    app:argType="com.websarva.wings.android.zuboradiary.ui.model.AppMessage" />
             </action>
 
         </fragment>
@@ -498,7 +498,7 @@
         android:name="com.websarva.wings.android.zuboradiary.ui.fragment.dialog.AppMessageDialogFragment">
         <argument
             android:name="app_message"
-            app:argType="com.websarva.wings.android.zuboradiary.ui.appmessage.AppMessage" />
+            app:argType="com.websarva.wings.android.zuboradiary.ui.model.AppMessage" />
     </dialog>
 
 </navigation>

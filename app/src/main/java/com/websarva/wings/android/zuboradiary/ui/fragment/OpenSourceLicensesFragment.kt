@@ -14,7 +14,7 @@ import androidx.compose.ui.unit.dp
 import androidx.databinding.ViewDataBinding
 import com.mikepenz.aboutlibraries.ui.compose.m3.LibrariesContainer
 import com.mikepenz.aboutlibraries.ui.compose.m3.LibraryDefaults
-import com.websarva.wings.android.zuboradiary.ui.appmessage.AppMessage
+import com.websarva.wings.android.zuboradiary.ui.model.AppMessage
 import com.websarva.wings.android.zuboradiary.databinding.FragmentOpenSourceLicensesBinding
 
 class OpenSourceLicensesFragment: BaseFragment() {

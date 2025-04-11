@@ -15,7 +15,7 @@ import androidx.navigation.NavController
 import androidx.navigation.NavDestination
 import androidx.recyclerview.widget.RecyclerView
 import com.websarva.wings.android.zuboradiary.R
-import com.websarva.wings.android.zuboradiary.ui.appmessage.AppMessage
+import com.websarva.wings.android.zuboradiary.ui.model.AppMessage
 import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor
 import com.websarva.wings.android.zuboradiary.databinding.FragmentDiaryListBinding
 import com.websarva.wings.android.zuboradiary.ui.utils.UriPermissionManager

@@ -19,10 +19,10 @@ import com.kizitonwose.calendar.view.MonthDayBinder
 import com.kizitonwose.calendar.view.MonthHeaderFooterBinder
 import com.kizitonwose.calendar.view.ViewContainer
 import com.websarva.wings.android.zuboradiary.R
-import com.websarva.wings.android.zuboradiary.ui.appmessage.AppMessage
-import com.websarva.wings.android.zuboradiary.ui.appmessage.AppMessageList
+import com.websarva.wings.android.zuboradiary.ui.model.AppMessage
+import com.websarva.wings.android.zuboradiary.ui.model.AppMessageList
 import com.websarva.wings.android.zuboradiary.ui.utils.DateTimeStringConverter
-import com.websarva.wings.android.zuboradiary.ui.appmessage.DiaryShowAppMessage
+import com.websarva.wings.android.zuboradiary.ui.model.DiaryShowAppMessage
 import com.websarva.wings.android.zuboradiary.data.diary.Condition
 import com.websarva.wings.android.zuboradiary.data.diary.Weather
 import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor

@@ -16,7 +16,7 @@ import androidx.databinding.ViewDataBinding
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.websarva.wings.android.zuboradiary.R
-import com.websarva.wings.android.zuboradiary.ui.appmessage.AppMessage
+import com.websarva.wings.android.zuboradiary.ui.model.AppMessage
 import com.websarva.wings.android.zuboradiary.ui.utils.DateTimeStringConverter
 import com.websarva.wings.android.zuboradiary.data.diary.Condition
 import com.websarva.wings.android.zuboradiary.data.diary.ItemNumber
@@ -24,8 +24,8 @@ import com.websarva.wings.android.zuboradiary.data.diary.Weather
 import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor
 import com.websarva.wings.android.zuboradiary.databinding.FragmentDiaryShowBinding
 import com.websarva.wings.android.zuboradiary.ui.utils.DiaryPictureManager
-import com.websarva.wings.android.zuboradiary.ui.DiaryShowPendingDialog
-import com.websarva.wings.android.zuboradiary.ui.PendingDialog
+import com.websarva.wings.android.zuboradiary.ui.model.DiaryShowPendingDialog
+import com.websarva.wings.android.zuboradiary.ui.model.PendingDialog
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.DiaryDeleteDialogFragment
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.DiaryLoadingFailureDialogFragment
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.DiaryShowViewModel

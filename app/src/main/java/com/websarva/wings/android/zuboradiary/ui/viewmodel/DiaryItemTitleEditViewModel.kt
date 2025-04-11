@@ -5,7 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.websarva.wings.android.zuboradiary.data.database.DiaryItemTitleSelectionHistoryRepository
 import com.websarva.wings.android.zuboradiary.data.diary.ItemNumber
 import com.websarva.wings.android.zuboradiary.createLogTag
-import com.websarva.wings.android.zuboradiary.ui.appmessage.DiaryItemTitleEditAppMessage
+import com.websarva.wings.android.zuboradiary.ui.model.DiaryItemTitleEditAppMessage
 import com.websarva.wings.android.zuboradiary.ui.diary.diaryitemtitleedit.SelectionHistoryList
 import com.websarva.wings.android.zuboradiary.ui.diary.diaryitemtitleedit.SelectionHistoryListItem
 import dagger.hilt.android.lifecycle.HiltViewModel

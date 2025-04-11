@@ -1,4 +1,4 @@
-package com.websarva.wings.android.zuboradiary.ui
+package com.websarva.wings.android.zuboradiary.ui.model
 
 
 class PendingDialogList {
