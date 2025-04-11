@@ -3,7 +3,7 @@ package com.websarva.wings.android.zuboradiary.ui.activity
 import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
-import com.websarva.wings.android.zuboradiary.createLogTag
+import com.websarva.wings.android.zuboradiary.utils.createLogTag
 
 open class CustomActivity : AppCompatActivity() {
 

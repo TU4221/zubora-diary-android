@@ -6,7 +6,7 @@ import android.util.Log
 import android.widget.ImageView
 import androidx.core.content.ContextCompat
 import com.websarva.wings.android.zuboradiary.R
-import com.websarva.wings.android.zuboradiary.createLogTag
+import com.websarva.wings.android.zuboradiary.utils.createLogTag
 
 internal class DiaryPictureManager(
     private val context: Context, private val imageView: ImageView, private val iconColor: Int) {

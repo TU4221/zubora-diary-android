@@ -2,7 +2,7 @@ package com.websarva.wings.android.zuboradiary.data.database
 
 import android.net.Uri
 import android.util.Log
-import com.websarva.wings.android.zuboradiary.createLogTag
+import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import java.time.LocalDate
 
 

@@ -8,6 +8,7 @@ import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ProcessLifecycleOwner
 import androidx.work.Configuration
+import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import dagger.hilt.android.HiltAndroidApp
 import javax.inject.Inject
 

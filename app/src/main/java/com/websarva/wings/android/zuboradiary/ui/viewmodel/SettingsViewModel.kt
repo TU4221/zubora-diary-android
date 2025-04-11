@@ -13,7 +13,7 @@ import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColorPrefere
 import com.websarva.wings.android.zuboradiary.data.preferences.UserPreferencesRepository
 import com.websarva.wings.android.zuboradiary.data.preferences.WeatherInfoAcquisitionPreference
 import com.websarva.wings.android.zuboradiary.data.worker.WorkerRepository
-import com.websarva.wings.android.zuboradiary.createLogTag
+import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import com.websarva.wings.android.zuboradiary.ui.model.SettingsAppMessage
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
