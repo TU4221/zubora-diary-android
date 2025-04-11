@@ -1,16 +1,16 @@
-package com.websarva.wings.android.zuboradiary.ui.list.diarylist
+package com.websarva.wings.android.zuboradiary.ui.adapter.diary.diary
 
 import android.content.Context
 import android.util.Log
 import androidx.recyclerview.widget.RecyclerView
 import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor
 import com.websarva.wings.android.zuboradiary.createLogTag
-import com.websarva.wings.android.zuboradiary.ui.list.DiaryDayListBaseAdapter
-import com.websarva.wings.android.zuboradiary.ui.list.DiaryDayListBaseItem
-import com.websarva.wings.android.zuboradiary.ui.list.DiaryYearMonthListBaseAdapter
-import com.websarva.wings.android.zuboradiary.ui.list.DiaryYearMonthListBaseItem
-import com.websarva.wings.android.zuboradiary.ui.list.SwipeDiaryDayListBaseAdapter
-import com.websarva.wings.android.zuboradiary.ui.list.SwipeDiaryYearMonthListBaseAdapter
+import com.websarva.wings.android.zuboradiary.ui.adapter.diary.DiaryDayListBaseAdapter
+import com.websarva.wings.android.zuboradiary.ui.adapter.diary.DiaryDayListBaseItem
+import com.websarva.wings.android.zuboradiary.ui.adapter.diary.DiaryYearMonthListBaseAdapter
+import com.websarva.wings.android.zuboradiary.ui.adapter.diary.DiaryYearMonthListBaseItem
+import com.websarva.wings.android.zuboradiary.ui.adapter.diary.SwipeDiaryDayListBaseAdapter
+import com.websarva.wings.android.zuboradiary.ui.adapter.diary.SwipeDiaryYearMonthListBaseAdapter
 
 internal abstract class DiaryYearMonthListAdapter(
     context: Context,

@@ -1,4 +1,4 @@
-package com.websarva.wings.android.zuboradiary.ui.list.wordsearch
+package com.websarva.wings.android.zuboradiary.ui.adapter.diary.wordsearchresult
 
 import android.text.SpannableString
 import android.text.Spanned
@@ -6,7 +6,7 @@ import android.text.style.BackgroundColorSpan
 import android.text.style.ForegroundColorSpan
 import com.websarva.wings.android.zuboradiary.data.database.WordSearchResultListItem
 import com.websarva.wings.android.zuboradiary.data.diary.ItemNumber
-import com.websarva.wings.android.zuboradiary.ui.list.DiaryDayListBaseItem
+import com.websarva.wings.android.zuboradiary.ui.adapter.diary.DiaryDayListBaseItem
 
 internal class WordSearchResultDayListItem(
     listItem: WordSearchResultListItem,

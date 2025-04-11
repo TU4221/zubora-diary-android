@@ -1,4 +1,4 @@
-package com.websarva.wings.android.zuboradiary.ui.list.diarylist
+package com.websarva.wings.android.zuboradiary.ui.adapter.diary.diary
 
 import android.content.Context
 import android.util.Log
@@ -10,10 +10,10 @@ import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor
 import com.websarva.wings.android.zuboradiary.databinding.RowDiaryDayListBinding
 import com.websarva.wings.android.zuboradiary.createLogTag
 import com.websarva.wings.android.zuboradiary.ui.utils.DiaryPictureManager
-import com.websarva.wings.android.zuboradiary.ui.LeftSwipeSimpleCallback.LeftSwipeViewHolder
-import com.websarva.wings.android.zuboradiary.ui.list.DiaryDayListBaseAdapter
-import com.websarva.wings.android.zuboradiary.ui.list.DiaryDayListBaseItem
-import com.websarva.wings.android.zuboradiary.ui.list.SwipeDiaryDayListBaseAdapter
+import com.websarva.wings.android.zuboradiary.ui.adapter.LeftSwipeSimpleCallback.LeftSwipeViewHolder
+import com.websarva.wings.android.zuboradiary.ui.adapter.diary.DiaryDayListBaseAdapter
+import com.websarva.wings.android.zuboradiary.ui.adapter.diary.DiaryDayListBaseItem
+import com.websarva.wings.android.zuboradiary.ui.adapter.diary.SwipeDiaryDayListBaseAdapter
 import java.text.NumberFormat
 
 internal class DiaryDayListAdapter(context: Context, recyclerView: RecyclerView, themeColor: ThemeColor)

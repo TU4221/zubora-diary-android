@@ -1,10 +1,10 @@
-package com.websarva.wings.android.zuboradiary.ui.list
+package com.websarva.wings.android.zuboradiary.ui.adapter.diary
 
 import android.content.Context
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor
-import com.websarva.wings.android.zuboradiary.ui.list.diarylist.DiaryListSimpleCallback
+import com.websarva.wings.android.zuboradiary.ui.adapter.diary.diary.DiaryListSimpleCallback
 
 // DiaryFragment、WordSearchFragmentの親RecyclerViewのListAdapter。
 // 親RecyclerViewを同じ構成にする為、一つのクラスで両方の子RecyclerViewに対応できるように作成。

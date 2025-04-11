@@ -18,11 +18,11 @@ import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor
 import com.websarva.wings.android.zuboradiary.databinding.FragmentWordSearchBinding
 import com.websarva.wings.android.zuboradiary.ui.view.EditTextSetup
 import com.websarva.wings.android.zuboradiary.ui.utils.KeyboardInitializer
-import com.websarva.wings.android.zuboradiary.ui.list.DiaryDayListBaseItem
-import com.websarva.wings.android.zuboradiary.ui.list.DiaryYearMonthListBaseAdapter.OnClickChildItemListener
-import com.websarva.wings.android.zuboradiary.ui.list.DiaryYearMonthListBaseItem
-import com.websarva.wings.android.zuboradiary.ui.list.wordsearch.WordSearchResultYearMonthList
-import com.websarva.wings.android.zuboradiary.ui.list.wordsearch.WordSearchResultYearMonthListAdapter
+import com.websarva.wings.android.zuboradiary.ui.adapter.diary.DiaryDayListBaseItem
+import com.websarva.wings.android.zuboradiary.ui.adapter.diary.DiaryYearMonthListBaseAdapter.OnClickChildItemListener
+import com.websarva.wings.android.zuboradiary.ui.adapter.diary.DiaryYearMonthListBaseItem
+import com.websarva.wings.android.zuboradiary.ui.adapter.diary.wordsearchresult.WordSearchResultYearMonthList
+import com.websarva.wings.android.zuboradiary.ui.adapter.diary.wordsearchresult.WordSearchResultYearMonthListAdapter
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.WordSearchViewModel
 import kotlinx.coroutines.flow.collectLatest
 import java.time.LocalDate

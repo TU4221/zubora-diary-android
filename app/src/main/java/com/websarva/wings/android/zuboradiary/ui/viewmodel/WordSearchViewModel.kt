@@ -6,9 +6,9 @@ import com.websarva.wings.android.zuboradiary.data.database.DiaryRepository
 import com.websarva.wings.android.zuboradiary.data.database.WordSearchResultListItem
 import com.websarva.wings.android.zuboradiary.createLogTag
 import com.websarva.wings.android.zuboradiary.ui.model.WordSearchAppMessage
-import com.websarva.wings.android.zuboradiary.ui.list.wordsearch.WordSearchResultDayList
-import com.websarva.wings.android.zuboradiary.ui.list.wordsearch.WordSearchResultDayListItem
-import com.websarva.wings.android.zuboradiary.ui.list.wordsearch.WordSearchResultYearMonthList
+import com.websarva.wings.android.zuboradiary.ui.adapter.diary.wordsearchresult.WordSearchResultDayList
+import com.websarva.wings.android.zuboradiary.ui.adapter.diary.wordsearchresult.WordSearchResultDayListItem
+import com.websarva.wings.android.zuboradiary.ui.adapter.diary.wordsearchresult.WordSearchResultYearMonthList
 import com.websarva.wings.android.zuboradiary.ui.requireValue
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CancellationException

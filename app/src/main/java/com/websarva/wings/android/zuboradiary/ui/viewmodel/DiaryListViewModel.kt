@@ -7,9 +7,9 @@ import com.websarva.wings.android.zuboradiary.data.database.DiaryListItem
 import com.websarva.wings.android.zuboradiary.data.database.DiaryRepository
 import com.websarva.wings.android.zuboradiary.createLogTag
 import com.websarva.wings.android.zuboradiary.ui.model.DiaryListAppMessage
-import com.websarva.wings.android.zuboradiary.ui.list.diarylist.DiaryDayList
-import com.websarva.wings.android.zuboradiary.ui.list.diarylist.DiaryDayListItem
-import com.websarva.wings.android.zuboradiary.ui.list.diarylist.DiaryYearMonthList
+import com.websarva.wings.android.zuboradiary.ui.adapter.diary.diary.DiaryDayList
+import com.websarva.wings.android.zuboradiary.ui.adapter.diary.diary.DiaryDayListItem
+import com.websarva.wings.android.zuboradiary.ui.adapter.diary.diary.DiaryYearMonthList
 import com.websarva.wings.android.zuboradiary.ui.requireValue
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers

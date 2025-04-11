@@ -1,4 +1,4 @@
-package com.websarva.wings.android.zuboradiary.ui.list
+package com.websarva.wings.android.zuboradiary.ui.adapter.diary
 
 import android.content.Context
 import android.util.Log

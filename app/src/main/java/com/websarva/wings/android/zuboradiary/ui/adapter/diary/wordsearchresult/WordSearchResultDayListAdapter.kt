@@ -1,4 +1,4 @@
-package com.websarva.wings.android.zuboradiary.ui.list.wordsearch
+package com.websarva.wings.android.zuboradiary.ui.adapter.diary.wordsearchresult
 
 import android.content.Context
 import android.util.Log
@@ -10,8 +10,8 @@ import com.websarva.wings.android.zuboradiary.ui.utils.DayOfWeekStringConverter
 import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor
 import com.websarva.wings.android.zuboradiary.databinding.RowWordSearchResultListBinding
 import com.websarva.wings.android.zuboradiary.createLogTag
-import com.websarva.wings.android.zuboradiary.ui.list.DiaryDayListBaseAdapter
-import com.websarva.wings.android.zuboradiary.ui.list.DiaryDayListBaseItem
+import com.websarva.wings.android.zuboradiary.ui.adapter.diary.DiaryDayListBaseAdapter
+import com.websarva.wings.android.zuboradiary.ui.adapter.diary.DiaryDayListBaseItem
 import java.text.NumberFormat
 
 internal class WordSearchResultDayListAdapter(

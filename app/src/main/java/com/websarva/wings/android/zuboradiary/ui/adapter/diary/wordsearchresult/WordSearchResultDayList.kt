@@ -1,4 +1,4 @@
-package com.websarva.wings.android.zuboradiary.ui.list.wordsearch
+package com.websarva.wings.android.zuboradiary.ui.adapter.diary.wordsearchresult
 
 internal class WordSearchResultDayList {
 

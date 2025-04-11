@@ -1,4 +1,4 @@
-package com.websarva.wings.android.zuboradiary.ui
+package com.websarva.wings.android.zuboradiary.ui.adapter
 
 import android.annotation.SuppressLint
 import android.graphics.Rect

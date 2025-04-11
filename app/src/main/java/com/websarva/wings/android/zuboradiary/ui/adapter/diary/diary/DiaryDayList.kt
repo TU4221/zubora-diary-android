@@ -1,4 +1,4 @@
-package com.websarva.wings.android.zuboradiary.ui.list.diarylist
+package com.websarva.wings.android.zuboradiary.ui.adapter.diary.diary
 
 internal class DiaryDayList {
 
