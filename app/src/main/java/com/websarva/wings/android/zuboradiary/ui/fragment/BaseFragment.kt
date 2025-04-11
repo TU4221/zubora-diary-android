@@ -1,4 +1,4 @@
-package com.websarva.wings.android.zuboradiary.ui.base
+package com.websarva.wings.android.zuboradiary.ui.fragment
 
 import android.os.Bundle
 import android.transition.Transition
@@ -35,15 +35,9 @@ import com.websarva.wings.android.zuboradiary.ui.DiaryEditPendingDialog
 import com.websarva.wings.android.zuboradiary.ui.DiaryShowPendingDialog
 import com.websarva.wings.android.zuboradiary.ui.PendingDialog
 import com.websarva.wings.android.zuboradiary.ui.PendingDialogList
+import com.websarva.wings.android.zuboradiary.ui.base.BaseViewModel
 import com.websarva.wings.android.zuboradiary.ui.utils.ThemeColorInflaterCreator
-import com.websarva.wings.android.zuboradiary.ui.calendar.CalendarFragment
-import com.websarva.wings.android.zuboradiary.ui.diary.diaryedit.DiaryEditFragment
-import com.websarva.wings.android.zuboradiary.ui.diary.diaryitemtitleedit.DiaryItemTitleEditFragment
-import com.websarva.wings.android.zuboradiary.ui.diary.diaryshow.DiaryShowFragment
-import com.websarva.wings.android.zuboradiary.ui.list.diarylist.DiaryListFragment
-import com.websarva.wings.android.zuboradiary.ui.list.wordsearch.WordSearchFragment
 import com.websarva.wings.android.zuboradiary.ui.requireValue
-import com.websarva.wings.android.zuboradiary.ui.settings.SettingsFragment
 import com.websarva.wings.android.zuboradiary.ui.settings.SettingsViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers

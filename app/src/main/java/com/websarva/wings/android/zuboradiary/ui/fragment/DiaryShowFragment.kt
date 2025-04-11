@@ -1,4 +1,4 @@
-package com.websarva.wings.android.zuboradiary.ui.diary.diaryshow
+package com.websarva.wings.android.zuboradiary.ui.fragment
 
 import android.app.Dialog
 import android.content.Context
@@ -23,10 +23,12 @@ import com.websarva.wings.android.zuboradiary.data.diary.ItemNumber
 import com.websarva.wings.android.zuboradiary.data.diary.Weather
 import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor
 import com.websarva.wings.android.zuboradiary.databinding.FragmentDiaryShowBinding
-import com.websarva.wings.android.zuboradiary.ui.base.BaseFragment
 import com.websarva.wings.android.zuboradiary.ui.utils.DiaryPictureManager
 import com.websarva.wings.android.zuboradiary.ui.DiaryShowPendingDialog
 import com.websarva.wings.android.zuboradiary.ui.PendingDialog
+import com.websarva.wings.android.zuboradiary.ui.diary.diaryshow.DiaryDeleteDialogFragment
+import com.websarva.wings.android.zuboradiary.ui.diary.diaryshow.DiaryLoadingFailureDialogFragment
+import com.websarva.wings.android.zuboradiary.ui.diary.diaryshow.DiaryShowViewModel
 import com.websarva.wings.android.zuboradiary.ui.utils.UriPermissionManager
 import com.websarva.wings.android.zuboradiary.ui.requireValue
 import dagger.hilt.android.AndroidEntryPoint
@@ -376,12 +378,11 @@ internal class DiaryShowFragment : BaseFragment() {
         if (!canNavigateFragment) return
 
         val directions =
-            DiaryShowFragmentDirections
-                .actionNavigationDiaryShowFragmentToDiaryEditFragment(
-                    false,
-                    true,
-                    date
-                )
+            DiaryShowFragmentDirections.actionNavigationDiaryShowFragmentToDiaryEditFragment(
+                false,
+                true,
+                date
+            )
         navController.navigate(directions)
     }
 
@@ -393,8 +394,7 @@ internal class DiaryShowFragment : BaseFragment() {
         }
 
         val directions =
-            DiaryShowFragmentDirections
-                .actionDiaryShowFragmentToDiaryLoadingFailureDialog(date)
+            DiaryShowFragmentDirections.actionDiaryShowFragmentToDiaryLoadingFailureDialog(date)
         navController.navigate(directions)
     }
 
@@ -403,16 +403,14 @@ internal class DiaryShowFragment : BaseFragment() {
         if (!canNavigateFragment) return
 
         val directions =
-            DiaryShowFragmentDirections
-                .actionDiaryShowFragmentToDiaryDeleteDialog(date)
+            DiaryShowFragmentDirections.actionDiaryShowFragmentToDiaryDeleteDialog(date)
         navController.navigate(directions)
     }
 
     @MainThread
     override fun navigateAppMessageDialog(appMessage: AppMessage) {
         val directions =
-            DiaryShowFragmentDirections
-                .actionDiaryShowFragmentToAppMessageDialog(appMessage)
+            DiaryShowFragmentDirections.actionDiaryShowFragmentToAppMessageDialog(appMessage)
         navController.navigate(directions)
     }
 

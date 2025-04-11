@@ -40,11 +40,11 @@ import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor
 import com.websarva.wings.android.zuboradiary.databinding.ActivityMainBinding
 import com.websarva.wings.android.zuboradiary.ui.utils.ThemeColorInflaterCreator
 import com.websarva.wings.android.zuboradiary.ui.utils.ThemeColorSwitcher
-import com.websarva.wings.android.zuboradiary.ui.calendar.CalendarFragment
+import com.websarva.wings.android.zuboradiary.ui.fragment.CalendarFragment
 import com.websarva.wings.android.zuboradiary.ui.requireValue
-import com.websarva.wings.android.zuboradiary.ui.diary.diaryedit.DiaryEditFragment
-import com.websarva.wings.android.zuboradiary.ui.list.diarylist.DiaryListFragment
-import com.websarva.wings.android.zuboradiary.ui.settings.SettingsFragment
+import com.websarva.wings.android.zuboradiary.ui.fragment.DiaryEditFragment
+import com.websarva.wings.android.zuboradiary.ui.fragment.DiaryListFragment
+import com.websarva.wings.android.zuboradiary.ui.fragment.SettingsFragment
 import com.websarva.wings.android.zuboradiary.ui.settings.SettingsViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers

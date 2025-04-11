@@ -11,7 +11,7 @@
 
         <fragment
             android:id="@+id/navigation_diary_list_fragment"
-            android:name="com.websarva.wings.android.zuboradiary.ui.list.diarylist.DiaryListFragment"
+            android:name="com.websarva.wings.android.zuboradiary.ui.fragment.DiaryListFragment"
             tools:layout="@layout/fragment_diary_list"
             android:label="@string/title_list" >
 
@@ -85,7 +85,7 @@
 
         <fragment
             android:id="@+id/navigation_word_search_fragment"
-            android:name="com.websarva.wings.android.zuboradiary.ui.list.wordsearch.WordSearchFragment"
+            android:name="com.websarva.wings.android.zuboradiary.ui.fragment.WordSearchFragment"
             tools:layout="@layout/fragment_word_search" >
 
             <action
@@ -114,7 +114,7 @@
 
         <fragment
             android:id="@+id/navigation_calendar_fragment"
-            android:name="com.websarva.wings.android.zuboradiary.ui.calendar.CalendarFragment"
+            android:name="com.websarva.wings.android.zuboradiary.ui.fragment.CalendarFragment"
             tools:layout="@layout/fragment_calendar"
             android:label="@string/title_calendar" >
 
@@ -150,7 +150,7 @@
 
         <fragment
             android:id="@+id/navigation_settings_fragment"
-            android:name="com.websarva.wings.android.zuboradiary.ui.settings.SettingsFragment"
+            android:name="com.websarva.wings.android.zuboradiary.ui.fragment.SettingsFragment"
             tools:layout="@layout/fragment_settings" >
 
             <action
@@ -238,7 +238,7 @@
 
         <fragment
             android:id="@+id/navigation_open_source_licenses_fragment"
-            android:name="com.websarva.wings.android.zuboradiary.ui.settings.OpenSourceLicensesFragment" />
+            android:name="com.websarva.wings.android.zuboradiary.ui.fragment.OpenSourceLicensesFragment" />
 
     </navigation>
 
@@ -248,7 +248,7 @@
 
         <fragment
             android:id="@+id/navigation_diary_show_fragment"
-            android:name="com.websarva.wings.android.zuboradiary.ui.diary.diaryshow.DiaryShowFragment"
+            android:name="com.websarva.wings.android.zuboradiary.ui.fragment.DiaryShowFragment"
             tools:layout="@layout/fragment_diary_show" >
             <argument
                 android:name="date"
@@ -310,7 +310,7 @@
 
         <fragment
             android:id="@+id/navigation_diary_edit_fragment"
-            android:name="com.websarva.wings.android.zuboradiary.ui.diary.diaryedit.DiaryEditFragment"
+            android:name="com.websarva.wings.android.zuboradiary.ui.fragment.DiaryEditFragment"
             tools:layout="@layout/fragment_diary_edit"
             android:label="@string/title_settings" >
             <argument
@@ -452,7 +452,7 @@
 
         <fragment
             android:id="@+id/navigation_diary_item_title_edit_fragment"
-            android:name="com.websarva.wings.android.zuboradiary.ui.diary.diaryitemtitleedit.DiaryItemTitleEditFragment"
+            android:name="com.websarva.wings.android.zuboradiary.ui.fragment.DiaryItemTitleEditFragment"
             tools:layout="@layout/fragment_diary_item_title_edit" >
             <argument
                 android:name="item_number"
@@ -495,7 +495,7 @@
 
     <dialog
         android:id="@+id/navigation_app_message_dialog"
-        android:name="com.websarva.wings.android.zuboradiary.ui.AppMessageDialogFragment">
+        android:name="com.websarva.wings.android.zuboradiary.ui.appmessage.AppMessageDialogFragment">
         <argument
             android:name="app_message"
             app:argType="com.websarva.wings.android.zuboradiary.ui.appmessage.AppMessage" />

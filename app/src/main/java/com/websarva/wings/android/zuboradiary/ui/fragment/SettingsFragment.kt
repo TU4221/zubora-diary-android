@@ -1,4 +1,4 @@
-package com.websarva.wings.android.zuboradiary.ui.settings
+package com.websarva.wings.android.zuboradiary.ui.fragment
 
 import android.Manifest
 import android.app.Dialog
@@ -26,9 +26,16 @@ import com.websarva.wings.android.zuboradiary.ui.utils.DateTimeStringConverter
 import com.websarva.wings.android.zuboradiary.ui.utils.DayOfWeekStringConverter
 import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor
 import com.websarva.wings.android.zuboradiary.databinding.FragmentSettingsBinding
-import com.websarva.wings.android.zuboradiary.ui.base.BaseFragment
 import com.websarva.wings.android.zuboradiary.ui.utils.UriPermissionManager
 import com.websarva.wings.android.zuboradiary.ui.requireValue
+import com.websarva.wings.android.zuboradiary.ui.settings.AllDataDeleteDialogFragment
+import com.websarva.wings.android.zuboradiary.ui.settings.AllDiariesDeleteDialogFragment
+import com.websarva.wings.android.zuboradiary.ui.settings.AllSettingsInitializationDialogFragment
+import com.websarva.wings.android.zuboradiary.ui.settings.CalendarStartDayPickerDialogFragment
+import com.websarva.wings.android.zuboradiary.ui.settings.PermissionDialogFragment
+import com.websarva.wings.android.zuboradiary.ui.settings.ReminderNotificationTimePickerDialogFragment
+import com.websarva.wings.android.zuboradiary.ui.settings.SettingsThemeColorSwitcher
+import com.websarva.wings.android.zuboradiary.ui.settings.ThemeColorPickerDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
@@ -586,8 +593,7 @@ class SettingsFragment : BaseFragment() {
         if (!canNavigateFragment) return
 
         val directions =
-            SettingsFragmentDirections
-                .actionNavigationSettingsFragmentToOpenSourceLicensesFragment()
+            SettingsFragmentDirections.actionNavigationSettingsFragmentToOpenSourceLicensesFragment()
         navController.navigate(directions)
     }
 
@@ -600,8 +606,7 @@ class SettingsFragment : BaseFragment() {
         if (!canNavigateFragment) return
 
         val directions =
-            SettingsFragmentDirections
-                .actionNavigationSettingsFragmentToThemeColorPickerDialog()
+            SettingsFragmentDirections.actionNavigationSettingsFragmentToThemeColorPickerDialog()
         navController.navigate(directions)
     }
 
@@ -610,8 +615,9 @@ class SettingsFragment : BaseFragment() {
         if (!canNavigateFragment) return
 
         val directions =
-            SettingsFragmentDirections
-                .actionNavigationSettingsFragmentToCalendarStartDayPickerDialog(dayOfWeek)
+            SettingsFragmentDirections.actionNavigationSettingsFragmentToCalendarStartDayPickerDialog(
+                dayOfWeek
+            )
         navController.navigate(directions)
     }
 
@@ -620,8 +626,7 @@ class SettingsFragment : BaseFragment() {
         if (!canNavigateFragment) return
 
         val directions =
-            SettingsFragmentDirections
-                .actionNavigationSettingsFragmentToReminderNotificationTimePickerDialog()
+            SettingsFragmentDirections.actionNavigationSettingsFragmentToReminderNotificationTimePickerDialog()
         navController.navigate(directions)
     }
 
@@ -630,8 +635,7 @@ class SettingsFragment : BaseFragment() {
         if (!canNavigateFragment) return
 
         val directions =
-            SettingsFragmentDirections
-                .actionSettingsFragmentToPermissionDialog(permissionName)
+            SettingsFragmentDirections.actionSettingsFragmentToPermissionDialog(permissionName)
         navController.navigate(directions)
     }
 
@@ -640,8 +644,7 @@ class SettingsFragment : BaseFragment() {
         if (!canNavigateFragment) return
 
         val directions =
-            SettingsFragmentDirections
-                .actionSettingsFragmentToAllDiariesDeleteDialog()
+            SettingsFragmentDirections.actionSettingsFragmentToAllDiariesDeleteDialog()
         navController.navigate(directions)
     }
 
@@ -650,8 +653,7 @@ class SettingsFragment : BaseFragment() {
         if (!canNavigateFragment) return
 
         val directions =
-            SettingsFragmentDirections
-                .actionSettingsFragmentToAllSettingsInitializationDialog()
+            SettingsFragmentDirections.actionSettingsFragmentToAllSettingsInitializationDialog()
         navController.navigate(directions)
     }
 
@@ -660,16 +662,14 @@ class SettingsFragment : BaseFragment() {
         if (!canNavigateFragment) return
 
         val directions =
-            SettingsFragmentDirections
-                .actionSettingsFragmentToAllDataDeleteDialog()
+            SettingsFragmentDirections.actionSettingsFragmentToAllDataDeleteDialog()
         navController.navigate(directions)
     }
 
     @MainThread
     override fun navigateAppMessageDialog(appMessage: AppMessage) {
         val directions =
-            SettingsFragmentDirections
-                .actionSettingsFragmentToAppMessageDialog(appMessage)
+            SettingsFragmentDirections.actionSettingsFragmentToAppMessageDialog(appMessage)
         navController.navigate(directions)
     }
 

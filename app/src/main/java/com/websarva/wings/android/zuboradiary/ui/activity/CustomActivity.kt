@@ -10,6 +10,7 @@ open class CustomActivity : AppCompatActivity() {
     private val logTag = createLogTag()
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        application
         Log.d(logTag, "onCreate()")
         super.onCreate(savedInstanceState)
     }

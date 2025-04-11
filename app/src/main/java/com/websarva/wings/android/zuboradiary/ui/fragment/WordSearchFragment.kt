@@ -1,4 +1,4 @@
-package com.websarva.wings.android.zuboradiary.ui.list.wordsearch
+package com.websarva.wings.android.zuboradiary.ui.fragment
 
 import android.content.Context
 import android.os.Bundle
@@ -16,12 +16,14 @@ import com.websarva.wings.android.zuboradiary.R
 import com.websarva.wings.android.zuboradiary.ui.appmessage.AppMessage
 import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor
 import com.websarva.wings.android.zuboradiary.databinding.FragmentWordSearchBinding
-import com.websarva.wings.android.zuboradiary.ui.base.BaseFragment
 import com.websarva.wings.android.zuboradiary.ui.utils.EditTextSetup
 import com.websarva.wings.android.zuboradiary.ui.utils.KeyboardInitializer
 import com.websarva.wings.android.zuboradiary.ui.list.DiaryDayListBaseItem
 import com.websarva.wings.android.zuboradiary.ui.list.DiaryYearMonthListBaseAdapter.OnClickChildItemListener
 import com.websarva.wings.android.zuboradiary.ui.list.DiaryYearMonthListBaseItem
+import com.websarva.wings.android.zuboradiary.ui.list.wordsearch.WordSearchResultYearMonthList
+import com.websarva.wings.android.zuboradiary.ui.list.wordsearch.WordSearchResultYearMonthListAdapter
+import com.websarva.wings.android.zuboradiary.ui.list.wordsearch.WordSearchViewModel
 import kotlinx.coroutines.flow.collectLatest
 import java.time.LocalDate
 
@@ -290,16 +292,14 @@ class WordSearchFragment : BaseFragment() {
         if (!canNavigateFragment) return
 
         val directions =
-            WordSearchFragmentDirections
-                .actionNavigationWordSearchFragmentToDiaryShowFragment(date)
+            WordSearchFragmentDirections.actionNavigationWordSearchFragmentToDiaryShowFragment(date)
         navController.navigate(directions)
     }
 
     @MainThread
     override fun navigateAppMessageDialog(appMessage: AppMessage) {
         val directions =
-            WordSearchFragmentDirections
-                .actionWordSearchFragmentToAppMessageDialog(appMessage)
+            WordSearchFragmentDirections.actionWordSearchFragmentToAppMessageDialog(appMessage)
         navController.navigate(directions)
     }
 

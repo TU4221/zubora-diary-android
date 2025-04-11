@@ -1,4 +1,4 @@
-package com.websarva.wings.android.zuboradiary.ui.diary.diaryitemtitleedit
+package com.websarva.wings.android.zuboradiary.ui.fragment
 
 import android.content.DialogInterface
 import android.os.Bundle
@@ -14,7 +14,10 @@ import androidx.lifecycle.lifecycleScope
 import com.websarva.wings.android.zuboradiary.R
 import com.websarva.wings.android.zuboradiary.ui.appmessage.AppMessage
 import com.websarva.wings.android.zuboradiary.databinding.FragmentDiaryItemTitleEditBinding
-import com.websarva.wings.android.zuboradiary.ui.base.BaseFragment
+import com.websarva.wings.android.zuboradiary.ui.diary.diaryitemtitleedit.DiaryItemTitleDeleteDialogFragment
+import com.websarva.wings.android.zuboradiary.ui.diary.diaryitemtitleedit.DiaryItemTitleEditViewModel
+import com.websarva.wings.android.zuboradiary.ui.diary.diaryitemtitleedit.ItemTitleSelectionHistoryListAdapter
+import com.websarva.wings.android.zuboradiary.ui.diary.diaryitemtitleedit.SelectionHistoryList
 import com.websarva.wings.android.zuboradiary.ui.utils.TextInputSetup
 import com.websarva.wings.android.zuboradiary.ui.requireValue
 import dagger.hilt.android.AndroidEntryPoint
@@ -231,8 +234,7 @@ class DiaryItemTitleEditFragment : BaseFragment() {
         if (!canNavigateFragment) return
 
         val directions =
-            DiaryItemTitleEditFragmentDirections
-                .actionDiaryItemTitleEditFragmentToDiaryEditFragment()
+            DiaryItemTitleEditFragmentDirections.actionDiaryItemTitleEditFragmentToDiaryEditFragment()
         navController.navigate(directions)
     }
 
@@ -242,19 +244,19 @@ class DiaryItemTitleEditFragment : BaseFragment() {
         if (!canNavigateFragment) return
 
         val directions =
-            DiaryItemTitleEditFragmentDirections
-                .actionDiaryItemTitleEditFragmentToDiaryItemTitleDeleteDialog(
-                    listItemPosition,
-                    listItemTitle
-                )
+            DiaryItemTitleEditFragmentDirections.actionDiaryItemTitleEditFragmentToDiaryItemTitleDeleteDialog(
+                listItemPosition,
+                listItemTitle
+            )
         navController.navigate(directions)
     }
 
     @MainThread
     override fun navigateAppMessageDialog(appMessage: AppMessage) {
         val directions =
-            DiaryItemTitleEditFragmentDirections
-                .actionDiaryItemTitleEditFragmentToAppMessageDialog(appMessage)
+            DiaryItemTitleEditFragmentDirections.actionDiaryItemTitleEditFragmentToAppMessageDialog(
+                appMessage
+            )
         navController.navigate(directions)
     }
 

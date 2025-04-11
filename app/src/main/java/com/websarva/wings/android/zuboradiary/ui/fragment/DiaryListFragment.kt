@@ -1,4 +1,4 @@
-package com.websarva.wings.android.zuboradiary.ui.list.diarylist
+package com.websarva.wings.android.zuboradiary.ui.fragment
 
 import android.content.Context
 import android.net.Uri
@@ -18,12 +18,17 @@ import com.websarva.wings.android.zuboradiary.R
 import com.websarva.wings.android.zuboradiary.ui.appmessage.AppMessage
 import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor
 import com.websarva.wings.android.zuboradiary.databinding.FragmentDiaryListBinding
-import com.websarva.wings.android.zuboradiary.ui.base.BaseFragment
 import com.websarva.wings.android.zuboradiary.ui.utils.UriPermissionManager
 import com.websarva.wings.android.zuboradiary.ui.list.DiaryDayListBaseItem
 import com.websarva.wings.android.zuboradiary.ui.list.DiaryYearMonthListBaseAdapter.OnClickChildItemListener
 import com.websarva.wings.android.zuboradiary.ui.list.DiaryYearMonthListBaseItem
 import com.websarva.wings.android.zuboradiary.ui.list.SwipeDiaryYearMonthListBaseAdapter.OnClickChildItemBackgroundButtonListener
+import com.websarva.wings.android.zuboradiary.ui.list.diarylist.DiaryDayListItem
+import com.websarva.wings.android.zuboradiary.ui.list.diarylist.DiaryDeleteDialogFragment
+import com.websarva.wings.android.zuboradiary.ui.list.diarylist.DiaryListViewModel
+import com.websarva.wings.android.zuboradiary.ui.list.diarylist.DiaryYearMonthList
+import com.websarva.wings.android.zuboradiary.ui.list.diarylist.DiaryYearMonthListAdapter
+import com.websarva.wings.android.zuboradiary.ui.list.diarylist.StartYearMonthPickerDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
@@ -275,12 +280,11 @@ class DiaryListFragment : BaseFragment() {
         if (!canNavigateFragment) return
 
         val directions =
-            DiaryListFragmentDirections
-                .actionNavigationDiaryListFragmentToDiaryEditFragment(
-                    true,
-                    false,
-                    LocalDate.now()
-                )
+            DiaryListFragmentDirections.actionNavigationDiaryListFragmentToDiaryEditFragment(
+                true,
+                false,
+                LocalDate.now()
+            )
         navController.navigate(directions)
     }
 
@@ -289,8 +293,7 @@ class DiaryListFragment : BaseFragment() {
         if (!canNavigateFragment) return
 
         val directions =
-            DiaryListFragmentDirections
-                .actionNavigationDiaryListFragmentToDiaryShowFragment(date)
+            DiaryListFragmentDirections.actionNavigationDiaryListFragmentToDiaryShowFragment(date)
         navController.navigate(directions)
     }
 
@@ -299,8 +302,7 @@ class DiaryListFragment : BaseFragment() {
         if (!canNavigateFragment) return
 
         val directions =
-            DiaryListFragmentDirections
-                .actionNavigationDiaryListFragmentToWordSearchFragment()
+            DiaryListFragmentDirections.actionNavigationDiaryListFragmentToWordSearchFragment()
         navController.navigate(directions)
     }
 
@@ -309,8 +311,10 @@ class DiaryListFragment : BaseFragment() {
         if (!canNavigateFragment) return
 
         val directions =
-            DiaryListFragmentDirections
-                .actionDiaryListFragmentToStartYearMonthPickerDialog(newestYear, oldestYear)
+            DiaryListFragmentDirections.actionDiaryListFragmentToStartYearMonthPickerDialog(
+                newestYear,
+                oldestYear
+            )
         navController.navigate(directions)
     }
 
@@ -319,16 +323,14 @@ class DiaryListFragment : BaseFragment() {
         if (!canNavigateFragment) return
 
         val directions =
-            DiaryListFragmentDirections
-                .actionDiaryListFragmentToDiaryDeleteDialog(date, pictureUri)
+            DiaryListFragmentDirections.actionDiaryListFragmentToDiaryDeleteDialog(date, pictureUri)
         navController.navigate(directions)
     }
 
     @MainThread
     override fun navigateAppMessageDialog(appMessage: AppMessage) {
         val directions =
-            DiaryListFragmentDirections
-                .actionDiaryListFragmentToAppMessageDialog(appMessage)
+            DiaryListFragmentDirections.actionDiaryListFragmentToAppMessageDialog(appMessage)
         navController.navigate(directions)
     }
 

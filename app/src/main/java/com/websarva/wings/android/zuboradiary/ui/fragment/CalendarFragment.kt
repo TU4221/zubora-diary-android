@@ -1,4 +1,4 @@
-package com.websarva.wings.android.zuboradiary.ui.calendar
+package com.websarva.wings.android.zuboradiary.ui.fragment
 
 import android.net.Uri
 import android.os.Bundle
@@ -29,16 +29,15 @@ import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor
 import com.websarva.wings.android.zuboradiary.databinding.FragmentCalendarBinding
 import com.websarva.wings.android.zuboradiary.databinding.LayoutCalendarDayBinding
 import com.websarva.wings.android.zuboradiary.databinding.LayoutCalendarHeaderBinding
-import com.websarva.wings.android.zuboradiary.ui.base.BaseFragment
-import com.websarva.wings.android.zuboradiary.ui.diary.diaryedit.DiaryEditFragment
+import com.websarva.wings.android.zuboradiary.ui.calendar.CalendarThemeColorSwitcher
+import com.websarva.wings.android.zuboradiary.ui.calendar.CalendarViewModel
 import com.websarva.wings.android.zuboradiary.ui.requireValue
-import com.websarva.wings.android.zuboradiary.ui.diary.diaryshow.DiaryShowFragment
-import com.websarva.wings.android.zuboradiary.ui.diary.diaryshow.DiaryShowFragment.ConditionObserver
-import com.websarva.wings.android.zuboradiary.ui.diary.diaryshow.DiaryShowFragment.LogObserver
-import com.websarva.wings.android.zuboradiary.ui.diary.diaryshow.DiaryShowFragment.NumVisibleItemsObserver
-import com.websarva.wings.android.zuboradiary.ui.diary.diaryshow.DiaryShowFragment.PicturePathObserver
-import com.websarva.wings.android.zuboradiary.ui.diary.diaryshow.DiaryShowFragment.Weather1Observer
-import com.websarva.wings.android.zuboradiary.ui.diary.diaryshow.DiaryShowFragment.Weather2Observer
+import com.websarva.wings.android.zuboradiary.ui.fragment.DiaryShowFragment.ConditionObserver
+import com.websarva.wings.android.zuboradiary.ui.fragment.DiaryShowFragment.LogObserver
+import com.websarva.wings.android.zuboradiary.ui.fragment.DiaryShowFragment.NumVisibleItemsObserver
+import com.websarva.wings.android.zuboradiary.ui.fragment.DiaryShowFragment.PicturePathObserver
+import com.websarva.wings.android.zuboradiary.ui.fragment.DiaryShowFragment.Weather1Observer
+import com.websarva.wings.android.zuboradiary.ui.fragment.DiaryShowFragment.Weather2Observer
 import com.websarva.wings.android.zuboradiary.ui.diary.diaryshow.DiaryShowViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
@@ -556,20 +555,18 @@ class CalendarFragment : BaseFragment() {
         if (!canNavigateFragment) return
 
         val directions =
-            CalendarFragmentDirections
-                .actionNavigationCalendarFragmentToDiaryEditFragment(
-                    true,
-                    requiresDiaryLoading,
-                    date
-                )
+            CalendarFragmentDirections.actionNavigationCalendarFragmentToDiaryEditFragment(
+                true,
+                requiresDiaryLoading,
+                date
+            )
         navController.navigate(directions)
     }
 
     @MainThread
     override fun navigateAppMessageDialog(appMessage: AppMessage) {
         val directions =
-            CalendarFragmentDirections
-                .actionCalendarFragmentToAppMessageDialog(appMessage)
+            CalendarFragmentDirections.actionCalendarFragmentToAppMessageDialog(appMessage)
         navController.navigate(directions)
     }
 

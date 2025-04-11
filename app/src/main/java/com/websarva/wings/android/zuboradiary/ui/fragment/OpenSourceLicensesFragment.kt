@@ -1,4 +1,4 @@
-package com.websarva.wings.android.zuboradiary.ui.settings
+package com.websarva.wings.android.zuboradiary.ui.fragment
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -16,7 +16,6 @@ import com.mikepenz.aboutlibraries.ui.compose.m3.LibrariesContainer
 import com.mikepenz.aboutlibraries.ui.compose.m3.LibraryDefaults
 import com.websarva.wings.android.zuboradiary.ui.appmessage.AppMessage
 import com.websarva.wings.android.zuboradiary.databinding.FragmentOpenSourceLicensesBinding
-import com.websarva.wings.android.zuboradiary.ui.base.BaseFragment
 
 class OpenSourceLicensesFragment: BaseFragment() {
 

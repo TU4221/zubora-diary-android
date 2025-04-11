@@ -1,4 +1,4 @@
-package com.websarva.wings.android.zuboradiary.ui.diary.diaryedit
+package com.websarva.wings.android.zuboradiary.ui.fragment
 
 import android.app.Dialog
 import android.content.Context
@@ -33,7 +33,6 @@ import com.websarva.wings.android.zuboradiary.data.diary.Weather
 import com.websarva.wings.android.zuboradiary.databinding.FragmentDiaryEditBinding
 import com.websarva.wings.android.zuboradiary.createLogTag
 import com.websarva.wings.android.zuboradiary.ui.appmessage.AppMessage
-import com.websarva.wings.android.zuboradiary.ui.base.BaseFragment
 import com.websarva.wings.android.zuboradiary.ui.DiaryEditPendingDialog
 import com.websarva.wings.android.zuboradiary.ui.utils.DiaryPictureManager
 import com.websarva.wings.android.zuboradiary.ui.PendingDialog
@@ -42,7 +41,15 @@ import com.websarva.wings.android.zuboradiary.ui.utils.TextInputSetup
 import com.websarva.wings.android.zuboradiary.ui.utils.UriPermissionManager
 import com.websarva.wings.android.zuboradiary.ui.requireValue
 import com.websarva.wings.android.zuboradiary.ui.diary.DiaryStateFlow
-import com.websarva.wings.android.zuboradiary.ui.diary.diaryitemtitleedit.DiaryItemTitleEditFragment
+import com.websarva.wings.android.zuboradiary.ui.diary.diaryedit.DatePickerDialogFragment
+import com.websarva.wings.android.zuboradiary.ui.diary.diaryedit.DiaryDeleteDialogFragment
+import com.websarva.wings.android.zuboradiary.ui.diary.diaryedit.DiaryEditViewModel
+import com.websarva.wings.android.zuboradiary.ui.diary.diaryedit.DiaryItemDeleteDialogFragment
+import com.websarva.wings.android.zuboradiary.ui.diary.diaryedit.DiaryLoadingDialogFragment
+import com.websarva.wings.android.zuboradiary.ui.diary.diaryedit.DiaryLoadingFailureDialogFragment
+import com.websarva.wings.android.zuboradiary.ui.diary.diaryedit.DiaryPictureDeleteDialogFragment
+import com.websarva.wings.android.zuboradiary.ui.diary.diaryedit.DiaryUpdateDialogFragment
+import com.websarva.wings.android.zuboradiary.ui.diary.diaryedit.WeatherInfoFetchingDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
@@ -1067,11 +1074,9 @@ class DiaryEditFragment : BaseFragment() {
             DiaryEditFragmentArgs.fromBundle(requireArguments()).isStartDiaryFragment
         // 循環型画面遷移を成立させるためにPopup対象Fragmentが異なるdirectionsを切り替える。
         val directions = if (isStartDiaryFragment) {
-            DiaryEditFragmentDirections
-                .actionDiaryEditFragmentToDiaryShowFragmentPattern2(date)
+            DiaryEditFragmentDirections.actionDiaryEditFragmentToDiaryShowFragmentPattern2(date)
         } else {
-            DiaryEditFragmentDirections
-                .actionDiaryEditFragmentToDiaryShowFragmentPattern1(date)
+            DiaryEditFragmentDirections.actionDiaryEditFragmentToDiaryShowFragmentPattern1(date)
         }
         navController.navigate(directions)
     }
@@ -1084,8 +1089,10 @@ class DiaryEditFragment : BaseFragment() {
         if (!canNavigateFragment) return
 
         val directions =
-            DiaryEditFragmentDirections
-                .actionDiaryEditFragmentToSelectItemTitleFragment(inputItemNumber, inputItemTitle)
+            DiaryEditFragmentDirections.actionDiaryEditFragmentToSelectItemTitleFragment(
+                inputItemNumber,
+                inputItemTitle
+            )
         navController.navigate(directions)
         mainViewModel.updateIsShowingItemTitleEditFragment(true)
     }
@@ -1098,8 +1105,7 @@ class DiaryEditFragment : BaseFragment() {
         }
 
         val directions =
-            DiaryEditFragmentDirections
-                .actionDiaryEditFragmentToDiaryLoadingDialog(date)
+            DiaryEditFragmentDirections.actionDiaryEditFragmentToDiaryLoadingDialog(date)
         navController.navigate(directions)
     }
 
@@ -1111,8 +1117,7 @@ class DiaryEditFragment : BaseFragment() {
         }
 
         val directions =
-            DiaryEditFragmentDirections
-                .actionDiaryEditFragmentToDiaryLoadingFailureDialog(date)
+            DiaryEditFragmentDirections.actionDiaryEditFragmentToDiaryLoadingFailureDialog(date)
         navController.navigate(directions)
     }
 
@@ -1121,8 +1126,7 @@ class DiaryEditFragment : BaseFragment() {
         if (!canNavigateFragment) return
 
         val directions =
-            DiaryEditFragmentDirections
-                .actionDiaryEditFragmentToDiaryUpdateDialog(date)
+            DiaryEditFragmentDirections.actionDiaryEditFragmentToDiaryUpdateDialog(date)
         navController.navigate(directions)
     }
 
@@ -1131,8 +1135,7 @@ class DiaryEditFragment : BaseFragment() {
         if (!canNavigateFragment) return
 
         val directions =
-            DiaryEditFragmentDirections
-                .actionDiaryEditFragmentToDiaryDeleteDialog(date)
+            DiaryEditFragmentDirections.actionDiaryEditFragmentToDiaryDeleteDialog(date)
         navController.navigate(directions)
     }
 
@@ -1141,8 +1144,7 @@ class DiaryEditFragment : BaseFragment() {
         if (!canNavigateFragment) return
 
         val directions =
-            DiaryEditFragmentDirections
-                .actionDiaryEditFragmentToDatePickerDialog(date)
+            DiaryEditFragmentDirections.actionDiaryEditFragmentToDatePickerDialog(date)
         navController.navigate(directions)
     }
 
@@ -1158,8 +1160,7 @@ class DiaryEditFragment : BaseFragment() {
         mainViewModel.canFetchWeatherInformation(date)
 
         val directions =
-            DiaryEditFragmentDirections
-                .actionDiaryEditFragmentToWeatherInfoFetchingDialog(date)
+            DiaryEditFragmentDirections.actionDiaryEditFragmentToWeatherInfoFetchingDialog(date)
         navController.navigate(directions)
     }
 
@@ -1168,8 +1169,7 @@ class DiaryEditFragment : BaseFragment() {
         if (!canNavigateFragment) return
 
         val directions =
-            DiaryEditFragmentDirections
-                .actionDiaryEditFragmentToDiaryItemDeleteDialog(itemNumber)
+            DiaryEditFragmentDirections.actionDiaryEditFragmentToDiaryItemDeleteDialog(itemNumber)
         navController.navigate(directions)
     }
 
@@ -1178,16 +1178,14 @@ class DiaryEditFragment : BaseFragment() {
         if (!canNavigateFragment) return
 
         val directions =
-            DiaryEditFragmentDirections
-                .actionDiaryEditFragmentToDiaryPictureDeleteDialog()
+            DiaryEditFragmentDirections.actionDiaryEditFragmentToDiaryPictureDeleteDialog()
         navController.navigate(directions)
     }
 
     @MainThread
     override fun navigateAppMessageDialog(appMessage: AppMessage) {
         val action: NavDirections =
-            DiaryEditFragmentDirections
-                .actionDiaryEditFragmentToAppMessageDialog(appMessage)
+            DiaryEditFragmentDirections.actionDiaryEditFragmentToAppMessageDialog(appMessage)
         navController.navigate(action)
     }
 
