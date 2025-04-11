@@ -30,7 +30,7 @@ import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.DiaryDeleteDial
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.DiaryLoadingFailureDialogFragment
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.DiaryShowViewModel
 import com.websarva.wings.android.zuboradiary.ui.utils.UriPermissionManager
-import com.websarva.wings.android.zuboradiary.ui.requireValue
+import com.websarva.wings.android.zuboradiary.ui.utils.requireValue
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
