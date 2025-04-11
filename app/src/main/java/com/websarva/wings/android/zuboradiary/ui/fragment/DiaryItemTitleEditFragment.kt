@@ -18,7 +18,7 @@ import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.DiaryItemTitleD
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.DiaryItemTitleEditViewModel
 import com.websarva.wings.android.zuboradiary.ui.adapter.diaryitemtitle.ItemTitleSelectionHistoryListAdapter
 import com.websarva.wings.android.zuboradiary.ui.adapter.diaryitemtitle.SelectionHistoryList
-import com.websarva.wings.android.zuboradiary.ui.view.TextInputSetup
+import com.websarva.wings.android.zuboradiary.ui.view.edittext.TextInputSetup
 import com.websarva.wings.android.zuboradiary.ui.utils.requireValue
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers

@@ -16,7 +16,7 @@ import com.websarva.wings.android.zuboradiary.R
 import com.websarva.wings.android.zuboradiary.ui.model.AppMessage
 import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor
 import com.websarva.wings.android.zuboradiary.databinding.FragmentWordSearchBinding
-import com.websarva.wings.android.zuboradiary.ui.view.EditTextSetup
+import com.websarva.wings.android.zuboradiary.ui.view.edittext.EditTextSetup
 import com.websarva.wings.android.zuboradiary.ui.keyboard.KeyboardInitializer
 import com.websarva.wings.android.zuboradiary.ui.adapter.diary.DiaryDayListBaseItem
 import com.websarva.wings.android.zuboradiary.ui.adapter.diary.DiaryYearMonthListBaseAdapter.OnClickChildItemListener

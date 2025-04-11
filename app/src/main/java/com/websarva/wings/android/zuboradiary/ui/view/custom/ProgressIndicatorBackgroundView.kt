@@ -1,4 +1,4 @@
-package com.websarva.wings.android.zuboradiary.ui.view
+package com.websarva.wings.android.zuboradiary.ui.view.custom
 
 import android.content.Context
 import android.util.AttributeSet

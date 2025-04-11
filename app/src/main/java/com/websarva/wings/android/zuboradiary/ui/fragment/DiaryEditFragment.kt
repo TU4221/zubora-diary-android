@@ -34,10 +34,10 @@ import com.websarva.wings.android.zuboradiary.databinding.FragmentDiaryEditBindi
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import com.websarva.wings.android.zuboradiary.ui.model.AppMessage
 import com.websarva.wings.android.zuboradiary.ui.model.DiaryEditPendingDialog
-import com.websarva.wings.android.zuboradiary.ui.utils.DiaryPictureManager
+import com.websarva.wings.android.zuboradiary.ui.view.imageview.DiaryPictureManager
 import com.websarva.wings.android.zuboradiary.ui.model.PendingDialog
 import com.websarva.wings.android.zuboradiary.ui.TestDiariesSaver
-import com.websarva.wings.android.zuboradiary.ui.view.TextInputSetup
+import com.websarva.wings.android.zuboradiary.ui.view.edittext.TextInputSetup
 import com.websarva.wings.android.zuboradiary.ui.permission.UriPermissionManager
 import com.websarva.wings.android.zuboradiary.ui.utils.requireValue
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.DiaryStateFlow

@@ -1,4 +1,4 @@
-package com.websarva.wings.android.zuboradiary.ui.utils
+package com.websarva.wings.android.zuboradiary.ui.view.imageview
 
 import android.content.Context
 import android.net.Uri

@@ -23,7 +23,7 @@ import com.websarva.wings.android.zuboradiary.data.diary.ItemNumber
 import com.websarva.wings.android.zuboradiary.data.diary.Weather
 import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor
 import com.websarva.wings.android.zuboradiary.databinding.FragmentDiaryShowBinding
-import com.websarva.wings.android.zuboradiary.ui.utils.DiaryPictureManager
+import com.websarva.wings.android.zuboradiary.ui.view.imageview.DiaryPictureManager
 import com.websarva.wings.android.zuboradiary.ui.model.DiaryShowPendingDialog
 import com.websarva.wings.android.zuboradiary.ui.model.PendingDialog
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.DiaryDeleteDialogFragment
