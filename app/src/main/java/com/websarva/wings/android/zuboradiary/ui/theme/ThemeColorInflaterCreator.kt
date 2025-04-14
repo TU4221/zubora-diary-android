@@ -3,12 +3,13 @@ package com.websarva.wings.android.zuboradiary.ui.theme
 import android.content.Context
 import android.view.LayoutInflater
 import androidx.appcompat.view.ContextThemeWrapper
-import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor
+import com.websarva.wings.android.zuboradiary.data.model.ThemeColor
 
 internal class ThemeColorInflaterCreator(
     private val context: Context,
     private val inflater: LayoutInflater,
-    private val themeColor: ThemeColor) {
+    private val themeColor: ThemeColor
+) {
 
     fun create(): LayoutInflater {
         val themeResId = themeColor.themeResId

@@ -1,4 +1,4 @@
-package com.websarva.wings.android.zuboradiary.data.network
+package com.websarva.wings.android.zuboradiary.data.model
 
 import androidx.annotation.FloatRange
 

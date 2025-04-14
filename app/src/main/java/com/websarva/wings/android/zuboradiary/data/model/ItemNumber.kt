@@ -1,4 +1,4 @@
-package com.websarva.wings.android.zuboradiary.data.diary
+package com.websarva.wings.android.zuboradiary.data.model
 
 import java.io.Serializable
 

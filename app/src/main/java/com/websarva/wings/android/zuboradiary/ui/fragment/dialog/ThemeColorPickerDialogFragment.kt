@@ -1,7 +1,7 @@
 package com.websarva.wings.android.zuboradiary.ui.fragment.dialog
 
 import android.view.View
-import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor
+import com.websarva.wings.android.zuboradiary.data.model.ThemeColor
 import com.websarva.wings.android.zuboradiary.databinding.DialogFragmentNumberPickersBinding
 
 class ThemeColorPickerDialogFragment : BaseNumberPickersBottomSheetDialogFragment() {

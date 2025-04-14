@@ -3,9 +3,9 @@ package com.websarva.wings.android.zuboradiary.ui.viewmodel
 import android.net.Uri
 import com.websarva.wings.android.zuboradiary.data.database.DiaryEntity
 import com.websarva.wings.android.zuboradiary.data.database.DiaryItemTitleSelectionHistoryItemEntity
-import com.websarva.wings.android.zuboradiary.data.diary.Condition
-import com.websarva.wings.android.zuboradiary.data.diary.ItemNumber
-import com.websarva.wings.android.zuboradiary.data.diary.Weather
+import com.websarva.wings.android.zuboradiary.data.model.Condition
+import com.websarva.wings.android.zuboradiary.data.model.ItemNumber
+import com.websarva.wings.android.zuboradiary.data.model.Weather
 import com.websarva.wings.android.zuboradiary.ui.utils.requireValue
 import kotlinx.coroutines.flow.MutableStateFlow
 import java.time.LocalDate

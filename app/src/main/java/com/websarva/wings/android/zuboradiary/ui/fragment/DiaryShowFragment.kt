@@ -18,10 +18,10 @@ import androidx.lifecycle.lifecycleScope
 import com.websarva.wings.android.zuboradiary.R
 import com.websarva.wings.android.zuboradiary.ui.model.AppMessage
 import com.websarva.wings.android.zuboradiary.ui.utils.DateTimeStringConverter
-import com.websarva.wings.android.zuboradiary.data.diary.Condition
-import com.websarva.wings.android.zuboradiary.data.diary.ItemNumber
-import com.websarva.wings.android.zuboradiary.data.diary.Weather
-import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor
+import com.websarva.wings.android.zuboradiary.data.model.Condition
+import com.websarva.wings.android.zuboradiary.data.model.ItemNumber
+import com.websarva.wings.android.zuboradiary.data.model.Weather
+import com.websarva.wings.android.zuboradiary.data.model.ThemeColor
 import com.websarva.wings.android.zuboradiary.databinding.FragmentDiaryShowBinding
 import com.websarva.wings.android.zuboradiary.ui.view.imageview.DiaryPictureManager
 import com.websarva.wings.android.zuboradiary.ui.model.DiaryShowPendingDialog

@@ -3,7 +3,7 @@ package com.websarva.wings.android.zuboradiary.ui.adapter.diary
 import android.content.Context
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor
+import com.websarva.wings.android.zuboradiary.data.model.ThemeColor
 import com.websarva.wings.android.zuboradiary.ui.adapter.diary.diary.DiaryListSimpleCallback
 
 // DiaryFragment、WordSearchFragmentの親RecyclerViewのListAdapter。

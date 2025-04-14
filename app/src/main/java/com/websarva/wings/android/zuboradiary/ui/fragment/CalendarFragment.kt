@@ -23,9 +23,9 @@ import com.websarva.wings.android.zuboradiary.ui.model.AppMessage
 import com.websarva.wings.android.zuboradiary.ui.model.AppMessageList
 import com.websarva.wings.android.zuboradiary.ui.utils.DateTimeStringConverter
 import com.websarva.wings.android.zuboradiary.ui.model.DiaryShowAppMessage
-import com.websarva.wings.android.zuboradiary.data.diary.Condition
-import com.websarva.wings.android.zuboradiary.data.diary.Weather
-import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor
+import com.websarva.wings.android.zuboradiary.data.model.Condition
+import com.websarva.wings.android.zuboradiary.data.model.Weather
+import com.websarva.wings.android.zuboradiary.data.model.ThemeColor
 import com.websarva.wings.android.zuboradiary.databinding.FragmentCalendarBinding
 import com.websarva.wings.android.zuboradiary.databinding.LayoutCalendarDayBinding
 import com.websarva.wings.android.zuboradiary.databinding.LayoutCalendarHeaderBinding

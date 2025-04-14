@@ -3,7 +3,7 @@ package com.websarva.wings.android.zuboradiary.ui.adapter.diary.diary
 import android.content.Context
 import android.util.Log
 import androidx.recyclerview.widget.RecyclerView
-import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor
+import com.websarva.wings.android.zuboradiary.data.model.ThemeColor
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import com.websarva.wings.android.zuboradiary.ui.adapter.diary.DiaryDayListBaseAdapter
 import com.websarva.wings.android.zuboradiary.ui.adapter.diary.DiaryDayListBaseItem

@@ -4,11 +4,11 @@ import android.util.Log
 import androidx.datastore.core.IOException
 import androidx.lifecycle.viewModelScope
 import com.websarva.wings.android.zuboradiary.data.database.DiaryRepository
-import com.websarva.wings.android.zuboradiary.data.network.GeoCoordinates
+import com.websarva.wings.android.zuboradiary.data.model.GeoCoordinates
 import com.websarva.wings.android.zuboradiary.data.preferences.CalendarStartDayOfWeekPreference
 import com.websarva.wings.android.zuboradiary.data.preferences.PassCodeLockPreference
 import com.websarva.wings.android.zuboradiary.data.preferences.ReminderNotificationPreference
-import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColor
+import com.websarva.wings.android.zuboradiary.data.model.ThemeColor
 import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColorPreference
 import com.websarva.wings.android.zuboradiary.data.preferences.UserPreferencesRepository
 import com.websarva.wings.android.zuboradiary.data.preferences.WeatherInfoAcquisitionPreference
