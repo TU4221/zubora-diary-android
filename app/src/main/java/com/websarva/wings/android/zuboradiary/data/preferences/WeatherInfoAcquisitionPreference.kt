@@ -18,6 +18,7 @@ class WeatherInfoAcquisitionPreference {
 
     val isChecked: Boolean
 
+    // MEMO:初回読込は"null"が返ってくるので、その場合は初期値を返す。(他のPreferenceValueも同様)
     constructor(preferences: Preferences) {
         this.isChecked = preferences[isCheckedPreferenceKey] ?: IS_CHECKED_DEFAULT_VALUE
     }

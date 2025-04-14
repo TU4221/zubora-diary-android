@@ -1,6 +1,7 @@
 package com.websarva.wings.android.zuboradiary.data.repository
 
 import androidx.datastore.core.IOException
+import com.websarva.wings.android.zuboradiary.data.preferences.AllPreferences
 import com.websarva.wings.android.zuboradiary.data.preferences.CalendarStartDayOfWeekPreference
 import com.websarva.wings.android.zuboradiary.data.preferences.PassCodeLockPreference
 import com.websarva.wings.android.zuboradiary.data.preferences.ReminderNotificationPreference
@@ -12,8 +13,8 @@ import kotlinx.coroutines.flow.Flow
 class UserPreferencesRepository(private val userPreferences: UserPreferences) {
 
     @Throws(Throwable::class)
-    fun loadThemeColorPreference(): Flow<ThemeColorPreference> {
-        return userPreferences.loadThemeColorPreference()
+    fun loadAllPreferences(): Flow<AllPreferences> {
+        return userPreferences.loadAllPreferences()
     }
 
     @Throws(
@@ -24,22 +25,12 @@ class UserPreferencesRepository(private val userPreferences: UserPreferences) {
         userPreferences.saveThemeColorPreference(preference)
     }
 
-    @Throws(Throwable::class)
-    fun loadCalendarStartDayOfWeekPreference(): Flow<CalendarStartDayOfWeekPreference> {
-        return userPreferences.loadCalendarStartDayOfWeekPreference()
-    }
-
     @Throws(
         IOException::class,
         Exception::class
     )
     suspend fun saveCalendarStartDayOfWeekPreference(preference: CalendarStartDayOfWeekPreference) {
         return userPreferences.saveCalendarStartDayOfWeekPreference(preference)
-    }
-
-    @Throws(Throwable::class)
-    fun loadReminderNotificationPreference(): Flow<ReminderNotificationPreference> {
-        return userPreferences.loadReminderNotificationPreference()
     }
 
     @Throws(
@@ -50,22 +41,12 @@ class UserPreferencesRepository(private val userPreferences: UserPreferences) {
         return userPreferences.saveReminderNotificationPreference(preference)
     }
 
-    @Throws(Throwable::class)
-    fun loadPasscodeLockPreference(): Flow<PassCodeLockPreference> {
-        return userPreferences.loadPasscodeLockPreference()
-    }
-
     @Throws(
         IOException::class,
         Exception::class
     )
     suspend fun savePasscodeLockPreference(preference: PassCodeLockPreference) {
         return userPreferences.savePasscodeLockPreference(preference)
-    }
-
-    @Throws(Throwable::class)
-    fun loadWeatherInfoAcquisitionPreference(): Flow<WeatherInfoAcquisitionPreference> {
-        return userPreferences.loadWeatherInfoAcquisitionPreference()
     }
 
     @Throws(

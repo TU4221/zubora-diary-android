@@ -21,6 +21,7 @@ class PassCodeLockPreference {
     val isChecked: Boolean
     val passCode: String
 
+    // MEMO:初回読込は"null"が返ってくるので、その場合は初期値を返す。(他のPreferenceValueも同様)
     constructor(preferences: Preferences) {
         var isChecked = preferences[isCheckedPreferenceKey]
         var passCode = preferences[passcodePreferenceKey]

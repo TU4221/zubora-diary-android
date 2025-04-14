@@ -24,23 +24,18 @@ class UserPreferences @Inject constructor(private val context: Context) {
     private val logTag = createLogTag()
 
     @Throws(Throwable::class)
-    private fun Flow<Preferences>.setUpIOExceptionHandling(): Flow<Preferences> {
-        return this.catch { cause ->
-            if (cause is IOException) {
-                Log.e(logTag, "アプリ設定値読込_失敗", cause)
-                emit(emptyPreferences())
-            } else {
-                throw cause
+    fun loadAllPreferences(): Flow<AllPreferences> {
+        return context.dataStore.data
+            .catch { cause ->
+                if (cause is IOException) {
+                    Log.e(logTag, "アプリ設定値読込_失敗", cause)
+                    emit(emptyPreferences())
+                } else {
+                    throw cause
+                }
             }
-        }
-    }
-
-    // MEMO:初回読込は"null"が返ってくるので、その場合は初期値を返す。(他のPreferenceValueも同様)
-    @Throws(Throwable::class)
-    fun loadThemeColorPreference(): Flow<ThemeColorPreference> {
-        return context.dataStore.data.setUpIOExceptionHandling()
             .map { preferences ->
-                ThemeColorPreference(preferences)
+                AllPreferences(preferences)
             }
     }
 
@@ -54,14 +49,6 @@ class UserPreferences @Inject constructor(private val context: Context) {
         }
     }
 
-    @Throws(Throwable::class)
-    fun loadCalendarStartDayOfWeekPreference(): Flow<CalendarStartDayOfWeekPreference> {
-        return context.dataStore.data.setUpIOExceptionHandling()
-            .map { preferences ->
-                CalendarStartDayOfWeekPreference(preferences)
-            }
-    }
-
     @Throws(
         IOException::class,
         Exception::class
@@ -70,14 +57,6 @@ class UserPreferences @Inject constructor(private val context: Context) {
         context.dataStore.edit { preferences ->
             value.setUpPreferences(preferences)
         }
-    }
-
-    @Throws(Throwable::class)
-    fun loadReminderNotificationPreference(): Flow<ReminderNotificationPreference> {
-        return context.dataStore.data.setUpIOExceptionHandling()
-            .map { preferences ->
-                ReminderNotificationPreference(preferences)
-            }
     }
 
     @Throws(
@@ -90,14 +69,6 @@ class UserPreferences @Inject constructor(private val context: Context) {
         }
     }
 
-    @Throws(Throwable::class)
-    fun loadPasscodeLockPreference(): Flow<PassCodeLockPreference> {
-        return context.dataStore.data.setUpIOExceptionHandling()
-            .map { preferences ->
-                PassCodeLockPreference(preferences)
-            }
-    }
-
     @Throws(
         IOException::class,
         Exception::class
@@ -106,14 +77,6 @@ class UserPreferences @Inject constructor(private val context: Context) {
         context.dataStore.edit { preferences ->
             value.setUpPreferences(preferences)
         }
-    }
-
-    @Throws(Throwable::class)
-    fun loadWeatherInfoAcquisitionPreference(): Flow<WeatherInfoAcquisitionPreference> {
-        return context.dataStore.data.setUpIOExceptionHandling()
-            .map { preferences ->
-                WeatherInfoAcquisitionPreference(preferences)
-            }
     }
 
     @Throws(

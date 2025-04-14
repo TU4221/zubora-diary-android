@@ -30,6 +30,7 @@ class ReminderNotificationPreference {
             return LocalTime.parse(notificationTimeString)
         }
 
+    // MEMO:初回読込は"null"が返ってくるので、その場合は初期値を返す。(他のPreferenceValueも同様)
     constructor(isChecked: Boolean, notificationTime: LocalTime? = null) {
         if (isChecked) require(notificationTime != null)
 

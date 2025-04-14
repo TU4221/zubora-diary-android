@@ -22,6 +22,7 @@ class CalendarStartDayOfWeekPreference {
     val dayOfWeek: DayOfWeek
         get() = DayOfWeek.of(dayOfWeekNumber)
 
+    // MEMO:初回読込は"null"が返ってくるので、その場合は初期値を返す。(他のPreferenceValueも同様)
     constructor(preferences: Preferences) {
         this.dayOfWeekNumber =
             preferences[dayOfWeekPreferenceKey] ?: DAY_OF_WEEK_DEFAULT_VALUE.value

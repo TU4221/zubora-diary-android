@@ -22,6 +22,7 @@ class ThemeColorPreference {
     val themeColor: ThemeColor
         get() = ThemeColor.of(themeColorNumber)
 
+    // MEMO:初回読込は"null"が返ってくるので、その場合は初期値を返す。(他のPreferenceValueも同様)
     constructor(preferences: Preferences) {
         this.themeColorNumber =
             preferences[themeColorPreferenceKey] ?: THEME_COLOR_DEFAULT_VALUE.toNumber()

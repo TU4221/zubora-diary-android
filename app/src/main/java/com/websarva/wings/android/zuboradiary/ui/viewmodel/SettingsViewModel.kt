@@ -9,6 +9,7 @@ import com.websarva.wings.android.zuboradiary.data.preferences.CalendarStartDayO
 import com.websarva.wings.android.zuboradiary.data.preferences.PassCodeLockPreference
 import com.websarva.wings.android.zuboradiary.data.preferences.ReminderNotificationPreference
 import com.websarva.wings.android.zuboradiary.data.model.ThemeColor
+import com.websarva.wings.android.zuboradiary.data.preferences.AllPreferences
 import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColorPreference
 import com.websarva.wings.android.zuboradiary.data.repository.UserPreferencesRepository
 import com.websarva.wings.android.zuboradiary.data.preferences.WeatherInfoAcquisitionPreference
@@ -17,6 +18,7 @@ import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import com.websarva.wings.android.zuboradiary.ui.model.SettingsAppMessage
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -69,139 +71,117 @@ class SettingsViewModel @Inject constructor(
     var scrollPositionY = initialScrollPositionY
 
     init {
-        setUpThemeColorPreferenceValueLoading()
-        setUpCalendarStartDayOfWeekPreferenceValueLoading()
-        setUpReminderNotificationPreferenceValueLoading()
-        setUpPasscodeLockPreferenceValueLoading()
-        setUpWeatherInfoAcquisitionPreferenceValueLoading()
+        setUpPreferencesValueLoading()
     }
 
     override fun initialize() {
         super.initialize()
-        setUpThemeColorPreferenceValueLoading()
-        setUpCalendarStartDayOfWeekPreferenceValueLoading()
-        setUpReminderNotificationPreferenceValueLoading()
-        setUpPasscodeLockPreferenceValueLoading()
-        setUpWeatherInfoAcquisitionPreferenceValueLoading()
+        setUpPreferencesValueLoading()
         clearGeoCoordinates()
         scrollPositionY = initialScrollPositionY
     }
 
-    private fun setUpThemeColorPreferenceValueLoading() {
-        loadSettingValue {
-            themeColor =
-                userPreferencesRepository.loadThemeColorPreference()
-                    .map { preference ->
-                        preference.themeColor
-                    }.stateIn(
-                        viewModelScope,
-                        SharingStarted.Eagerly,
-                        null
-                    )
-        }
-        checkSettingNotNull(themeColor)
-    }
-
-    private fun setUpCalendarStartDayOfWeekPreferenceValueLoading() {
-        loadSettingValue {
-            calendarStartDayOfWeek =
-                userPreferencesRepository.loadCalendarStartDayOfWeekPreference()
-                    .map { preference ->
-                        preference.dayOfWeek
-                    }.stateIn(
-                        viewModelScope,
-                        SharingStarted.Eagerly,
-                        null
-                    )
-        }
-        checkSettingNotNull(calendarStartDayOfWeek)
-    }
-
-    private fun setUpReminderNotificationPreferenceValueLoading() {
-        loadSettingValue {
-            isCheckedReminderNotification =
-                userPreferencesRepository.loadReminderNotificationPreference()
-                    .map { preference ->
-                        preference.isChecked
-                    }.stateIn(
-                        viewModelScope,
-                        SharingStarted.Eagerly,
-                        null
-                    )
-        }
-        checkSettingNotNull(isCheckedReminderNotification)
-
-        loadSettingValue {
-            reminderNotificationTime =
-                userPreferencesRepository.loadReminderNotificationPreference()
-                    .map { preference ->
-                        preference.notificationLocalTime
-                    }.stateIn(
-                        viewModelScope,
-                        SharingStarted.Eagerly,
-                        null
-                    )
-        }
-        checkSettingNotNull(reminderNotificationTime)
-    }
-
-    private fun setUpPasscodeLockPreferenceValueLoading() {
-        loadSettingValue {
-            isCheckedPasscodeLock =
-                userPreferencesRepository.loadPasscodeLockPreference()
-                    .map { preference ->
-                        preference.isChecked
-                    }.stateIn(
-                        viewModelScope,
-                        SharingStarted.Eagerly,
-                        null
-                    )
-        }
-        checkSettingNotNull(isCheckedPasscodeLock)
-
-        loadSettingValue {
-            passcode =
-                userPreferencesRepository.loadPasscodeLockPreference()
-                    .map { preference ->
-                        preference.passCode
-                    }.stateIn(
-                        viewModelScope,
-                        SharingStarted.Eagerly,
-                        null
-                    )
-        }
-        checkSettingNotNull(passcode)
-    }
-
-    private fun setUpWeatherInfoAcquisitionPreferenceValueLoading() {
-        loadSettingValue {
-            isCheckedWeatherInfoAcquisition =
-                userPreferencesRepository.loadWeatherInfoAcquisitionPreference()
-                    .map { preference ->
-                        preference.isChecked
-                    }.stateIn(
-                        viewModelScope,
-                        SharingStarted.Eagerly,
-                        null
-                    )
-        }
-        checkSettingNotNull(isCheckedWeatherInfoAcquisition)
-    }
-
-    private fun interface SettingLoadingProcess {
-        @Throws(Throwable::class)
-        fun load()
-    }
-
-    private fun loadSettingValue(
-        loadingProcess: SettingLoadingProcess
-    ) {
+    private fun setUpPreferencesValueLoading() {
+        val allPreferences: Flow<AllPreferences>
         try {
-            loadingProcess.load()
+            allPreferences = userPreferencesRepository.loadAllPreferences()
         } catch (e: Throwable) {
             Log.e(logTag, "アプリ設定値読込_失敗", e)
             addSettingLoadingErrorMessage()
+            return
         }
+        setUpThemeColorPreferenceValueLoading(allPreferences)
+        setUpCalendarStartDayOfWeekPreferenceValueLoading(allPreferences)
+        setUpReminderNotificationPreferenceValueLoading(allPreferences)
+        setUpPasscodeLockPreferenceValueLoading(allPreferences)
+        setUpWeatherInfoAcquisitionPreferenceValueLoading(allPreferences)
+    }
+
+    private fun setUpThemeColorPreferenceValueLoading(preferences: Flow<AllPreferences>) {
+        themeColor =
+            preferences
+                .map { value ->
+                    value.themeColorPreference.themeColor
+                }.stateIn(
+                    viewModelScope,
+                    SharingStarted.Eagerly,
+                    null
+                )
+        checkSettingNotNull(themeColor)
+    }
+
+    private fun setUpCalendarStartDayOfWeekPreferenceValueLoading(preferences: Flow<AllPreferences>) {
+        calendarStartDayOfWeek =
+            preferences
+                .map { value ->
+                    value.calendarStartDayOfWeekPreference.dayOfWeek
+                }.stateIn(
+                    viewModelScope,
+                    SharingStarted.Eagerly,
+                    null
+                )
+        checkSettingNotNull(calendarStartDayOfWeek)
+    }
+
+    private fun setUpReminderNotificationPreferenceValueLoading(preferences: Flow<AllPreferences>) {
+        isCheckedReminderNotification =
+            preferences
+                .map { value ->
+                    value.reminderNotificationPreference.isChecked
+                }.stateIn(
+                    viewModelScope,
+                    SharingStarted.Eagerly,
+                    null
+                )
+        checkSettingNotNull(isCheckedReminderNotification)
+
+        reminderNotificationTime =
+            preferences
+                .map { value ->
+                    value.reminderNotificationPreference.notificationLocalTime
+                }.stateIn(
+                    viewModelScope,
+                    SharingStarted.Eagerly,
+                    null
+                )
+        checkSettingNotNull(reminderNotificationTime)
+    }
+
+    private fun setUpPasscodeLockPreferenceValueLoading(preferences: Flow<AllPreferences>) {
+        isCheckedPasscodeLock =
+            preferences
+                .map { value ->
+                    value.passcodeLockPreference.isChecked
+                }.stateIn(
+                    viewModelScope,
+                    SharingStarted.Eagerly,
+                    null
+                )
+        checkSettingNotNull(isCheckedPasscodeLock)
+
+        passcode =
+            preferences
+                .map { value ->
+                    value.passcodeLockPreference.passCode
+                }.stateIn(
+                    viewModelScope,
+                    SharingStarted.Eagerly,
+                    null
+                )
+        checkSettingNotNull(passcode)
+    }
+
+    private fun setUpWeatherInfoAcquisitionPreferenceValueLoading(preferences: Flow<AllPreferences>) {
+        isCheckedWeatherInfoAcquisition =
+            preferences
+                .map { value ->
+                    value.weatherInfoAcquisitionPreference.isChecked
+                }.stateIn(
+                    viewModelScope,
+                    SharingStarted.Eagerly,
+                    null
+                )
+        checkSettingNotNull(isCheckedWeatherInfoAcquisition)
     }
 
     private fun <T> checkSettingNotNull(setting: StateFlow<T?>) {
