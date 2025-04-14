@@ -107,7 +107,7 @@ class SettingsViewModel @Inject constructor(
                     SharingStarted.Eagerly,
                     null
                 )
-        checkSettingNotNull(themeColor)
+        setUpSettingValueNotNullCheck(themeColor)
     }
 
     private fun setUpCalendarStartDayOfWeekPreferenceValueLoading(preferences: Flow<AllPreferences>) {
@@ -120,7 +120,7 @@ class SettingsViewModel @Inject constructor(
                     SharingStarted.Eagerly,
                     null
                 )
-        checkSettingNotNull(calendarStartDayOfWeek)
+        setUpSettingValueNotNullCheck(calendarStartDayOfWeek)
     }
 
     private fun setUpReminderNotificationPreferenceValueLoading(preferences: Flow<AllPreferences>) {
@@ -133,7 +133,7 @@ class SettingsViewModel @Inject constructor(
                     SharingStarted.Eagerly,
                     null
                 )
-        checkSettingNotNull(isCheckedReminderNotification)
+        setUpSettingValueNotNullCheck(isCheckedReminderNotification)
 
         reminderNotificationTime =
             preferences
@@ -144,7 +144,7 @@ class SettingsViewModel @Inject constructor(
                     SharingStarted.Eagerly,
                     null
                 )
-        checkSettingNotNull(reminderNotificationTime)
+        setUpSettingValueNotNullCheck(reminderNotificationTime)
     }
 
     private fun setUpPasscodeLockPreferenceValueLoading(preferences: Flow<AllPreferences>) {
@@ -157,7 +157,7 @@ class SettingsViewModel @Inject constructor(
                     SharingStarted.Eagerly,
                     null
                 )
-        checkSettingNotNull(isCheckedPasscodeLock)
+        setUpSettingValueNotNullCheck(isCheckedPasscodeLock)
 
         passcode =
             preferences
@@ -168,7 +168,7 @@ class SettingsViewModel @Inject constructor(
                     SharingStarted.Eagerly,
                     null
                 )
-        checkSettingNotNull(passcode)
+        setUpSettingValueNotNullCheck(passcode)
     }
 
     private fun setUpWeatherInfoAcquisitionPreferenceValueLoading(preferences: Flow<AllPreferences>) {
@@ -181,10 +181,10 @@ class SettingsViewModel @Inject constructor(
                     SharingStarted.Eagerly,
                     null
                 )
-        checkSettingNotNull(isCheckedWeatherInfoAcquisition)
+        setUpSettingValueNotNullCheck(isCheckedWeatherInfoAcquisition)
     }
 
-    private fun <T> checkSettingNotNull(setting: StateFlow<T?>) {
+    private fun <T> setUpSettingValueNotNullCheck(setting: StateFlow<T?>) {
         viewModelScope.launch(Dispatchers.IO) {
             setting.collect { value: T? ->
                 if (_isAllSettingsNotNull.value) return@collect
