@@ -17,7 +17,7 @@ import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.websarva.wings.android.zuboradiary.ZuboraDiaryApplication
 import com.websarva.wings.android.zuboradiary.R
-import com.websarva.wings.android.zuboradiary.data.database.DiaryRepository
+import com.websarva.wings.android.zuboradiary.data.repository.DiaryRepository
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject

@@ -51,8 +51,9 @@ class SettingsFragment : BaseFragment() {
     private val binding get() = checkNotNull(_binding)
 
     // ViewModel
-    // MEMO:本FragmentのMainViewModelはSettingsViewModelになる為、BaseFragmentのSettingsViewModel変数を代入。
-    override val mainViewModel = settingsViewModel
+    // MEMO:本FragmentのMainViewModelはSettingsViewModelになる為、BaseFragmentのSettingsViewModel変数を取得。
+    override val mainViewModel
+        get() = settingsViewModel
 
     // ActivityResultLauncher関係
     private lateinit var requestPostNotificationsPermissionLauncher: ActivityResultLauncher<String>

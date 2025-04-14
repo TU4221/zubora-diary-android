@@ -1,8 +1,10 @@
-package com.websarva.wings.android.zuboradiary.data.network
+package com.websarva.wings.android.zuboradiary.data.repository
 
 import android.util.Log
 import androidx.annotation.IntRange
 import com.websarva.wings.android.zuboradiary.data.model.GeoCoordinates
+import com.websarva.wings.android.zuboradiary.data.network.WeatherApiData
+import com.websarva.wings.android.zuboradiary.data.network.WeatherApiService
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import retrofit2.Response
 import java.time.LocalDate

@@ -5,12 +5,12 @@ import com.websarva.wings.android.zuboradiary.data.database.DiaryDAO
 import com.websarva.wings.android.zuboradiary.data.database.DiaryDatabase
 import com.websarva.wings.android.zuboradiary.data.database.DiaryItemTitleSelectionHistoryDAO
 import com.websarva.wings.android.zuboradiary.data.database.DiaryItemTitleSelectionHistoryRepository
-import com.websarva.wings.android.zuboradiary.data.database.DiaryRepository
-import com.websarva.wings.android.zuboradiary.data.network.WeatherApiRepository
+import com.websarva.wings.android.zuboradiary.data.repository.DiaryRepository
+import com.websarva.wings.android.zuboradiary.data.repository.WeatherApiRepository
 import com.websarva.wings.android.zuboradiary.data.network.WeatherApiService
-import com.websarva.wings.android.zuboradiary.data.preferences.UserPreferencesRepository
+import com.websarva.wings.android.zuboradiary.data.repository.UserPreferencesRepository
 import com.websarva.wings.android.zuboradiary.data.preferences.UserPreferences
-import com.websarva.wings.android.zuboradiary.data.worker.WorkerRepository
+import com.websarva.wings.android.zuboradiary.data.repository.WorkerRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

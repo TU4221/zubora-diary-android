@@ -2,12 +2,12 @@ package com.websarva.wings.android.zuboradiary.ui.viewmodel
 
 import android.net.Uri
 import android.util.Log
-import com.websarva.wings.android.zuboradiary.data.database.DiaryRepository
+import com.websarva.wings.android.zuboradiary.data.repository.DiaryRepository
 import com.websarva.wings.android.zuboradiary.data.model.Condition
 import com.websarva.wings.android.zuboradiary.data.model.ItemNumber
 import com.websarva.wings.android.zuboradiary.data.model.Weather
 import com.websarva.wings.android.zuboradiary.data.model.GeoCoordinates
-import com.websarva.wings.android.zuboradiary.data.network.WeatherApiRepository
+import com.websarva.wings.android.zuboradiary.data.repository.WeatherApiRepository
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import com.websarva.wings.android.zuboradiary.ui.model.DiaryEditAppMessage
 import com.websarva.wings.android.zuboradiary.ui.model.DiaryEditPendingDialog

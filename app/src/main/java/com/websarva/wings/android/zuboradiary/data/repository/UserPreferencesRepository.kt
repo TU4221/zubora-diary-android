@@ -1,6 +1,12 @@
-package com.websarva.wings.android.zuboradiary.data.preferences
+package com.websarva.wings.android.zuboradiary.data.repository
 
 import androidx.datastore.core.IOException
+import com.websarva.wings.android.zuboradiary.data.preferences.CalendarStartDayOfWeekPreference
+import com.websarva.wings.android.zuboradiary.data.preferences.PassCodeLockPreference
+import com.websarva.wings.android.zuboradiary.data.preferences.ReminderNotificationPreference
+import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColorPreference
+import com.websarva.wings.android.zuboradiary.data.preferences.UserPreferences
+import com.websarva.wings.android.zuboradiary.data.preferences.WeatherInfoAcquisitionPreference
 import kotlinx.coroutines.flow.Flow
 
 class UserPreferencesRepository(private val userPreferences: UserPreferences) {
