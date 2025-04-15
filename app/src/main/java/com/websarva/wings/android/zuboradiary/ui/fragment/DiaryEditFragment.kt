@@ -34,7 +34,7 @@ import com.websarva.wings.android.zuboradiary.databinding.FragmentDiaryEditBindi
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import com.websarva.wings.android.zuboradiary.ui.model.AppMessage
 import com.websarva.wings.android.zuboradiary.ui.model.DiaryEditPendingDialog
-import com.websarva.wings.android.zuboradiary.ui.view.imageview.DiaryPictureManager
+import com.websarva.wings.android.zuboradiary.ui.view.imageview.DiaryPictureConfigurator
 import com.websarva.wings.android.zuboradiary.ui.model.PendingDialog
 import com.websarva.wings.android.zuboradiary.ui.TestDiariesSaver
 import com.websarva.wings.android.zuboradiary.ui.view.edittext.TextInputSetup
@@ -920,14 +920,14 @@ class DiaryEditFragment : BaseFragment() {
 
     private inner class PicturePathObserver {
         fun onChanged(value: Uri?) {
-            val diaryPictureManager =
-                DiaryPictureManager(
+            val diaryPictureConfigurator =
+                DiaryPictureConfigurator(
                     requireContext(),
                     binding.imageAttachedPicture,
                     themeColor.getOnSurfaceVariantColor(requireContext().resources)
                 )
 
-            diaryPictureManager.setUpPictureOnDiary(value)
+            diaryPictureConfigurator.setUpPictureOnDiary(value)
             enablePictureDeleteButton(value != null)
         }
 

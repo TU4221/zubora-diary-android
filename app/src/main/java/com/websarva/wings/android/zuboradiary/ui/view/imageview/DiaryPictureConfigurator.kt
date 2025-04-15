@@ -8,7 +8,7 @@ import androidx.core.content.ContextCompat
 import com.websarva.wings.android.zuboradiary.R
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 
-internal class DiaryPictureManager(
+internal class DiaryPictureConfigurator(
     private val context: Context, private val imageView: ImageView, private val iconColor: Int) {
 
     private val logTag = createLogTag()

@@ -23,7 +23,7 @@ import com.websarva.wings.android.zuboradiary.data.model.ItemNumber
 import com.websarva.wings.android.zuboradiary.data.model.Weather
 import com.websarva.wings.android.zuboradiary.data.model.ThemeColor
 import com.websarva.wings.android.zuboradiary.databinding.FragmentDiaryShowBinding
-import com.websarva.wings.android.zuboradiary.ui.view.imageview.DiaryPictureManager
+import com.websarva.wings.android.zuboradiary.ui.view.imageview.DiaryPictureConfigurator
 import com.websarva.wings.android.zuboradiary.ui.model.DiaryShowPendingDialog
 import com.websarva.wings.android.zuboradiary.ui.model.PendingDialog
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.DiaryDeleteDialogFragment
@@ -332,8 +332,8 @@ internal class DiaryShowFragment : BaseFragment() {
         private val imageView: ImageView
     ) {
 
-            private val diaryPictureManager: DiaryPictureManager =
-                DiaryPictureManager(
+            private val diaryPictureConfigurator: DiaryPictureConfigurator =
+                DiaryPictureConfigurator(
                     context,
                     imageView,
                     themeColor.getOnSurfaceVariantColor(context.resources)
@@ -348,7 +348,7 @@ internal class DiaryShowFragment : BaseFragment() {
 
             textPictureTitle.visibility = View.VISIBLE
             imageView.visibility = View.VISIBLE
-            diaryPictureManager.setUpPictureOnDiary(value)
+            diaryPictureConfigurator.setUpPictureOnDiary(value)
         }
     }
 

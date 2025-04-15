@@ -9,7 +9,7 @@ import com.websarva.wings.android.zuboradiary.ui.utils.DayOfWeekStringConverter
 import com.websarva.wings.android.zuboradiary.data.model.ThemeColor
 import com.websarva.wings.android.zuboradiary.databinding.RowDiaryDayListBinding
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
-import com.websarva.wings.android.zuboradiary.ui.view.imageview.DiaryPictureManager
+import com.websarva.wings.android.zuboradiary.ui.view.imageview.DiaryPictureConfigurator
 import com.websarva.wings.android.zuboradiary.ui.adapter.LeftSwipeSimpleCallback.LeftSwipeViewHolder
 import com.websarva.wings.android.zuboradiary.ui.adapter.diary.DiaryDayListBaseAdapter
 import com.websarva.wings.android.zuboradiary.ui.adapter.diary.DiaryDayListBaseItem
@@ -68,14 +68,14 @@ internal class DiaryDayListAdapter(context: Context, recyclerView: RecyclerView,
     }
 
     private fun onBindPicture(holder: DiaryDayListViewHolder, item: DiaryDayListItem) {
-        val diaryPictureManager =
-            DiaryPictureManager(
+        val diaryPictureConfigurator =
+            DiaryPictureConfigurator(
                 context,
                 holder.binding.imageAttachedPicture,
                 themeColor.getOnSecondaryContainerColor(context.resources)
             )
         val pictureUri = item.picturePath
-        diaryPictureManager.setUpPictureOnDiaryList(pictureUri)
+        diaryPictureConfigurator.setUpPictureOnDiaryList(pictureUri)
     }
 
     override fun onBindDeleteButtonClickListener(
