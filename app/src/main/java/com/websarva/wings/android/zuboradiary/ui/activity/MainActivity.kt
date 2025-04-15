@@ -264,10 +264,10 @@ class MainActivity : CustomActivity() {
     private fun switchThemeColor(themeColor: ThemeColor) {
         val changer =
             ThemeColorChanger(applicationContext, themeColor)
-        changer.switchStatusBarColor(window)
-        changer.switchBackgroundColor(binding.viewFullScreenBackground)
-        changer.switchToolbarColor(binding.materialToolbarTopAppBar)
-        changer.switchBottomNavigationColor(binding.bottomNavigation)
+        changer.applyStatusBarColor(window)
+        changer.applyBackgroundColor(binding.viewFullScreenBackground)
+        changer.applyToolbarColor(binding.materialToolbarTopAppBar)
+        changer.applyBottomNavigationColor(binding.bottomNavigation)
     }
 
     private fun setUpNavigation() {

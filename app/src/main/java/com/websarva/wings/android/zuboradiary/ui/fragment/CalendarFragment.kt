@@ -256,29 +256,29 @@ class CalendarFragment : BaseFragment() {
             val isToday = calendarDay.date.isEqual(LocalDate.now())
 
             if (isSelectedDay) {
-                themeColorChanger.switchCalendarSelectedDayColor(
+                themeColorChanger.applyCalendarSelectedDayColor(
                     textCalendarDay,
                     viewCalendarDayDot
                 )
             } else if (isToday) {
-                themeColorChanger.switchCalendarTodayColor(textCalendarDay, viewCalendarDayDot)
+                themeColorChanger.applyCalendarTodayColor(textCalendarDay, viewCalendarDayDot)
             } else {
                 val dayOfWeek = calendarDay.date.dayOfWeek
                 val isSaturday = dayOfWeek == DayOfWeek.SATURDAY
                 val isSunday = dayOfWeek == DayOfWeek.SUNDAY
 
                 if (isSaturday) {
-                    themeColorChanger.switchCalendarSaturdayColor(
+                    themeColorChanger.applyCalendarSaturdayColor(
                         textCalendarDay,
                         viewCalendarDayDot
                     )
                 } else if (isSunday) {
-                    themeColorChanger.switchCalendarSundayColor(
+                    themeColorChanger.applyCalendarSundayColor(
                         textCalendarDay,
                         viewCalendarDayDot
                     )
                 } else {
-                    themeColorChanger.switchCalendarWeekdaysColor(
+                    themeColorChanger.applyCalendarWeekdaysColor(
                         textCalendarDay,
                         viewCalendarDayDot
                     )
@@ -345,11 +345,11 @@ class CalendarFragment : BaseFragment() {
             val isSunday = dayOfWeek == DayOfWeek.SUNDAY
 
             if (isSaturday) {
-                themeColorChanger.switchCalendarDayOfWeekSaturdayColor(dayOfWeekText)
+                themeColorChanger.applyCalendarDayOfWeekSaturdayColor(dayOfWeekText)
             } else if (isSunday) {
-                themeColorChanger.switchCalendarDayOfWeekSundayColor(dayOfWeekText)
+                themeColorChanger.applyCalendarDayOfWeekSundayColor(dayOfWeekText)
             } else {
-                themeColorChanger.switchCalendarDayOfWeekWeekdaysColor(dayOfWeekText)
+                themeColorChanger.applyCalendarDayOfWeekWeekdaysColor(dayOfWeekText)
             }
         }
 

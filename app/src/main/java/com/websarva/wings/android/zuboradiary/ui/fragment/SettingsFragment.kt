@@ -284,10 +284,10 @@ class SettingsFragment : BaseFragment() {
         val changer =
             SettingsThemeColorChanger(requireContext(), themeColor)
 
-        changer.switchBackgroundColor(binding.viewFullScreenBackground)
-        changer.switchToolbarColor(binding.materialToolbarTopAppBar)
+        changer.applyBackgroundColor(binding.viewFullScreenBackground)
+        changer.applyToolbarColor(binding.materialToolbarTopAppBar)
 
-        changer.switchSettingItemSectionColor(
+        changer.applySettingItemSectionColor(
             binding.run {
                 listOf(
                     textSettingsSectionDesign,
@@ -299,7 +299,7 @@ class SettingsFragment : BaseFragment() {
             }
         )
 
-        changer.switchSettingItemIconColor(
+        changer.applySettingItemIconColor(
             binding.run {
                 listOf(
                     includeThemeColorSetting.textTitle,
@@ -315,7 +315,7 @@ class SettingsFragment : BaseFragment() {
             }
         )
 
-        changer.switchTextColorOnBackground(
+        changer.applyTextColorOnBackground(
             binding.run {
                 listOf(
                     includeThemeColorSetting.textTitle,
@@ -331,7 +331,7 @@ class SettingsFragment : BaseFragment() {
             }
         )
 
-        changer.switchRedTextColorOnBackground(
+        changer.applyRedTextColorOnBackground(
             binding.run {
                 listOf(
                     includeAllDiariesDeleteSetting.textTitle,
@@ -341,7 +341,7 @@ class SettingsFragment : BaseFragment() {
             }
         )
 
-        changer.switchSwitchColor(
+        changer.applySwitchColor(
             binding.run {
                 listOf(
                     includeReminderNotificationSetting.materialSwitch,
@@ -351,7 +351,7 @@ class SettingsFragment : BaseFragment() {
             }
         )
 
-        changer.switchDividerColor(
+        changer.applyDividerColor(
             binding.run {
                 listOf(
                     materialDividerToolbar,

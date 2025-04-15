@@ -26,93 +26,93 @@ internal open class ThemeColorChanger(protected val context: Context, protected 
 
     protected val resources: Resources = context.resources
 
-    fun switchBackgroundColor(view: View) {
+    fun applyBackgroundColor(view: View) {
         val surfaceColor = themeColor.getSurfaceColor(resources)
-        switchViewColor(view, surfaceColor)
+        applyViewColor(view, surfaceColor)
     }
 
-    fun switchTextColorOnBackground(textViewList: List<TextView>) {
+    fun applyTextColorOnBackground(textViewList: List<TextView>) {
         val onSurfaceColor = themeColor.getOnSurfaceColor(resources)
-        switchTextViewsColorOnlyText(textViewList, onSurfaceColor)
+        applyTextViewsColorOnlyText(textViewList, onSurfaceColor)
     }
 
-    fun switchRedTextColorOnBackground(textViewList: List<TextView>) {
+    fun applyRedTextColorOnBackground(textViewList: List<TextView>) {
         val onSurfaceColor = themeColor.getErrorColor(resources)
-        switchTextViewsColorOnlyText(textViewList, onSurfaceColor)
+        applyTextViewsColorOnlyText(textViewList, onSurfaceColor)
     }
 
-    fun switchStatusBarColor(window: Window) {
+    fun applyStatusBarColor(window: Window) {
         // ステータスバーのアイコンの色を変更(白 or 灰)
         val isLight = themeColor.isAppearanceLightStatusBars
         WindowInsetsControllerCompat(window, window.decorView).isAppearanceLightStatusBars = isLight
     }
 
-    fun switchBottomNavigationColor(bottomNavigationView: BottomNavigationView) {
-        switchBottomNavigationBackgroundColor(bottomNavigationView)
-        switchBottomNavigationItemRippleColor(bottomNavigationView)
-        switchBottomNavigationItemTextColor(bottomNavigationView)
-        switchBottomNavigationItemIconColor(bottomNavigationView)
-        switchBottomNavigationActiveIndicatorColor(bottomNavigationView)
+    fun applyBottomNavigationColor(bottomNavigationView: BottomNavigationView) {
+        applyBottomNavigationBackgroundColor(bottomNavigationView)
+        applyBottomNavigationItemRippleColor(bottomNavigationView)
+        applyBottomNavigationItemTextColor(bottomNavigationView)
+        applyBottomNavigationItemIconColor(bottomNavigationView)
+        applyBottomNavigationActiveIndicatorColor(bottomNavigationView)
     }
 
-    private fun switchBottomNavigationBackgroundColor(bottomNavigationView: BottomNavigationView) {
+    private fun applyBottomNavigationBackgroundColor(bottomNavigationView: BottomNavigationView) {
         val color = themeColor.getSurfaceContainerColor(resources)
         bottomNavigationView.backgroundTintList = ColorStateList.valueOf(color)
     }
 
-    private fun switchBottomNavigationItemRippleColor(bottomNavigationView: BottomNavigationView) {
+    private fun applyBottomNavigationItemRippleColor(bottomNavigationView: BottomNavigationView) {
         val checkedColor = themeColor.getPrimaryColor(resources)
         val unCheckedColor = themeColor.getOnSurfaceVariantColor(resources)
         val colorStateList = createCheckedColorStateList(checkedColor, unCheckedColor)
         bottomNavigationView.itemRippleColor = colorStateList
     }
 
-    private fun switchBottomNavigationItemTextColor(bottomNavigationView: BottomNavigationView) {
+    private fun applyBottomNavigationItemTextColor(bottomNavigationView: BottomNavigationView) {
         val checkedColor = themeColor.getOnSurfaceColor(resources)
         val unCheckedColor = themeColor.getOnSurfaceVariantColor(resources)
         val colorStateList = createCheckedColorStateList(checkedColor, unCheckedColor)
         bottomNavigationView.itemTextColor = colorStateList
     }
 
-    private fun switchBottomNavigationItemIconColor(bottomNavigationView: BottomNavigationView) {
+    private fun applyBottomNavigationItemIconColor(bottomNavigationView: BottomNavigationView) {
         val checkedColor = themeColor.getOnSecondaryContainerColor(resources)
         val unCheckedColor = themeColor.getOnSurfaceVariantColor(resources)
         val colorStateList = createCheckedColorStateList(checkedColor, unCheckedColor)
         bottomNavigationView.itemIconTintList = colorStateList
     }
 
-    private fun switchBottomNavigationActiveIndicatorColor(bottomNavigationView: BottomNavigationView) {
+    private fun applyBottomNavigationActiveIndicatorColor(bottomNavigationView: BottomNavigationView) {
         val secondaryContainerColor = themeColor.getSecondaryContainerColor(resources)
         bottomNavigationView.itemActiveIndicatorColor =
             ColorStateList.valueOf(secondaryContainerColor)
     }
 
-    fun switchToolbarColor(toolbar: MaterialToolbar) {
+    fun applyToolbarColor(toolbar: MaterialToolbar) {
         val surfaceColor = themeColor.getSurfaceColor(resources)
         val onSurfaceColor = themeColor.getOnSurfaceColor(resources)
         val onSurfaceVariantColor = themeColor.getOnSurfaceVariantColor(resources)
         toolbar.setBackgroundColor(surfaceColor)
         toolbar.setTitleTextColor(onSurfaceColor)
-        switchToolbarMenuColor(toolbar, onSurfaceColor)
-        switchToolbarNavigationIconColor(toolbar, onSurfaceVariantColor)
+        applyToolbarMenuColor(toolbar, onSurfaceColor)
+        applyToolbarNavigationIconColor(toolbar, onSurfaceVariantColor)
     }
 
-    private fun switchToolbarNavigationIconColor(toolbar: MaterialToolbar, color: Int) {
+    private fun applyToolbarNavigationIconColor(toolbar: MaterialToolbar, color: Int) {
         val navigationIcon = toolbar.navigationIcon ?: return
         navigationIcon.setTint(color)
     }
 
-    private fun switchToolbarMenuColor(toolbar: MaterialToolbar, color: Int) {
+    private fun applyToolbarMenuColor(toolbar: MaterialToolbar, color: Int) {
         val menuIcon = toolbar.overflowIcon
         menuIcon?.setTint(color)
 
         val collapseIcon = toolbar.collapseIcon
         collapseIcon?.setTint(color)
 
-        switchToolbarMenuIconColor(toolbar, color)
+        applyToolbarMenuIconColor(toolbar, color)
     }
 
-    private fun switchToolbarMenuIconColor(toolbar: MaterialToolbar, color: Int) {
+    private fun applyToolbarMenuIconColor(toolbar: MaterialToolbar, color: Int) {
         val menu = toolbar.menu ?: return
 
         val numMenuIcons = menu.size()
@@ -124,13 +124,13 @@ internal open class ThemeColorChanger(protected val context: Context, protected 
         }
     }
 
-    fun switchSwitchColor(switchList: List<MaterialSwitch>) {
-        switchSwitchThumbColor(switchList)
-        switchSwitchThumbIconColor(switchList)
-        switchSwitchTrackColor(switchList)
+    fun applySwitchColor(switchList: List<MaterialSwitch>) {
+        applySwitchThumbColor(switchList)
+        applySwitchThumbIconColor(switchList)
+        applySwitchTrackColor(switchList)
     }
 
-    private fun switchSwitchThumbColor(switchList: List<MaterialSwitch>) {
+    private fun applySwitchThumbColor(switchList: List<MaterialSwitch>) {
         val checkedColor = themeColor.getOnPrimaryColor(resources)
         val unCheckedColor = themeColor.getOutlineColor(resources)
         val thumbColorStateList = createCheckedColorStateList(checkedColor, unCheckedColor)
@@ -139,7 +139,7 @@ internal open class ThemeColorChanger(protected val context: Context, protected 
         })
     }
 
-    private fun switchSwitchThumbIconColor(switchList: List<MaterialSwitch>) {
+    private fun applySwitchThumbIconColor(switchList: List<MaterialSwitch>) {
         val checkedColor = themeColor.getOnPrimaryContainerColor(resources)
         val unCheckedColor = themeColor.getSurfaceContainerHighestColor(resources)
         val thumbIconColorStateList = createCheckedColorStateList(checkedColor, unCheckedColor)
@@ -148,7 +148,7 @@ internal open class ThemeColorChanger(protected val context: Context, protected 
         })
     }
 
-    private fun switchSwitchTrackColor(switchList: List<MaterialSwitch>) {
+    private fun applySwitchTrackColor(switchList: List<MaterialSwitch>) {
         val checkedColor = themeColor.getPrimaryColor(resources)
         val unCheckedColor = themeColor.getSurfaceContainerHighestColor(resources)
         val trackColorStateList = createCheckedColorStateList(checkedColor, unCheckedColor)
@@ -157,7 +157,7 @@ internal open class ThemeColorChanger(protected val context: Context, protected 
         })
     }
 
-    fun switchDividerColor(dividerList: List<MaterialDivider>) {
+    fun applyDividerColor(dividerList: List<MaterialDivider>) {
         val color = themeColor.getOutlineVariantColor(resources)
         dividerList.forEach(Consumer { x: MaterialDivider ->
             x.dividerColor = color
@@ -165,32 +165,32 @@ internal open class ThemeColorChanger(protected val context: Context, protected 
     }
 
     // 共通処理
-    protected open fun switchViewColor(view: View, color: Int) {
+    protected open fun applyViewColor(view: View, color: Int) {
         view.setBackgroundColor(color)
     }
 
-    protected open fun switchTextViewsColor(textViewList: List<TextView>, color: Int, onColor: Int) {
-        textViewList.forEach(Consumer { x: TextView -> switchTextViewColor(x, color, onColor) })
+    protected open fun applyTextViewsColor(textViewList: List<TextView>, color: Int, onColor: Int) {
+        textViewList.forEach(Consumer { x: TextView -> applyTextViewColor(x, color, onColor) })
     }
 
-    protected open fun switchTextViewColor(textView: TextView, color: Int, onColor: Int) {
+    protected open fun applyTextViewColor(textView: TextView, color: Int, onColor: Int) {
         textView.setBackgroundColor(color)
         textView.setTextColor(onColor)
     }
 
-    protected open fun switchTextViewsColorOnlyText(textViewList: List<TextView>, onColor: Int) {
-        textViewList.forEach(Consumer { x: TextView -> switchTextViewColorOnlyText(x, onColor) })
+    protected open fun applyTextViewsColorOnlyText(textViewList: List<TextView>, onColor: Int) {
+        textViewList.forEach(Consumer { x: TextView -> applyTextViewColorOnlyText(x, onColor) })
     }
 
-    protected open fun switchTextViewColorOnlyText(textView: TextView, color: Int) {
+    protected open fun applyTextViewColorOnlyText(textView: TextView, color: Int) {
         textView.setTextColor(color)
     }
 
-    protected open fun switchTextViewsColorOnlyIcon(textViewList: List<TextView>, color: Int) {
-        textViewList.forEach(Consumer { x: TextView -> switchTextViewColorOnlyIcon(x, color) })
+    protected open fun applyTextViewsColorOnlyIcon(textViewList: List<TextView>, color: Int) {
+        textViewList.forEach(Consumer { x: TextView -> applyTextViewColorOnlyIcon(x, color) })
     }
 
-    protected open fun switchTextViewColorOnlyIcon(view: TextView, color: Int) {
+    protected open fun applyTextViewColorOnlyIcon(view: TextView, color: Int) {
         val drawables = view.compoundDrawablesRelative
         val wrappedDrawable = arrayOfNulls<Drawable>(drawables.size)
 
@@ -206,7 +206,7 @@ internal open class ThemeColorChanger(protected val context: Context, protected 
         )
     }
 
-    protected open fun switchDrawableColor(drawable: Drawable, color: Int) {
+    protected open fun applyDrawableColor(drawable: Drawable, color: Int) {
         drawable.setTint(color)
     }
 

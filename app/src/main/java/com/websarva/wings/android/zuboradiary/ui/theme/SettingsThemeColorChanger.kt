@@ -7,14 +7,14 @@ import com.websarva.wings.android.zuboradiary.data.model.ThemeColor
 internal class SettingsThemeColorChanger(context: Context, themeColor: ThemeColor)
     : ThemeColorChanger(context, themeColor) {
 
-    fun switchSettingItemSectionColor(textViewList: List<TextView>) {
+    fun applySettingItemSectionColor(textViewList: List<TextView>) {
         val color = themeColor.getSecondaryContainerColor(resources)
         val onColor = themeColor.getOnSecondaryContainerColor(resources)
-        switchTextViewsColor(textViewList, color, onColor)
+        applyTextViewsColor(textViewList, color, onColor)
     }
 
-    fun switchSettingItemIconColor(textViewList: List<TextView>) {
+    fun applySettingItemIconColor(textViewList: List<TextView>) {
         val color = themeColor.getOnSurfaceVariantColor(resources)
-        switchTextViewsColorOnlyIcon(textViewList, color)
+        applyTextViewsColorOnlyIcon(textViewList, color)
     }
 }

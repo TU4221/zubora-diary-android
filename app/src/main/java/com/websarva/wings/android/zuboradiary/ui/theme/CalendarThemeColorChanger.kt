@@ -9,62 +9,62 @@ import com.websarva.wings.android.zuboradiary.data.model.ThemeColor
 
 internal class CalendarThemeColorChanger(context: Context, themeColor: ThemeColor) :
     ThemeColorChanger(context, themeColor) {
-    fun switchCalendarTodayColor(textDay: TextView, viewDot: View) {
+    fun applyCalendarTodayColor(textDay: TextView, viewDot: View) {
         val color = themeColor.getSecondaryContainerColor(resources)
         val onColor = themeColor.getOnSecondaryContainerColor(resources)
-        switchCalendarDayColor(color, onColor, textDay, viewDot)
+        applyCalendarDayColor(color, onColor, textDay, viewDot)
     }
 
-    fun switchCalendarSelectedDayColor(textDay: TextView, viewDot: View) {
+    fun applyCalendarSelectedDayColor(textDay: TextView, viewDot: View) {
         val color = themeColor.getSecondaryColor(resources)
         val onColor = themeColor.getOnSecondaryColor(resources)
-        switchCalendarDayColor(color, onColor, textDay, viewDot)
+        applyCalendarDayColor(color, onColor, textDay, viewDot)
     }
 
-    fun switchCalendarWeekdaysColor(textDay: TextView, viewDot: View) {
+    fun applyCalendarWeekdaysColor(textDay: TextView, viewDot: View) {
         val color = calendarSurfaceColor
         val onColor = onWeekdaysColor
-        switchCalendarDayColor(color, onColor, textDay, viewDot)
+        applyCalendarDayColor(color, onColor, textDay, viewDot)
     }
 
-    fun switchCalendarSaturdayColor(textDay: TextView, viewDot: View) {
+    fun applyCalendarSaturdayColor(textDay: TextView, viewDot: View) {
         val color = calendarSurfaceColor
         val onColor = onSaturdayColor
-        switchCalendarDayColor(color, onColor, textDay, viewDot)
+        applyCalendarDayColor(color, onColor, textDay, viewDot)
     }
 
-    fun switchCalendarSundayColor(textDay: TextView, viewDot: View) {
+    fun applyCalendarSundayColor(textDay: TextView, viewDot: View) {
         val color = calendarSurfaceColor
         val onColor = onSundayColor
-        switchCalendarDayColor(color, onColor, textDay, viewDot)
+        applyCalendarDayColor(color, onColor, textDay, viewDot)
     }
 
-    private fun switchCalendarDayColor(color: Int, onColor: Int, textDay: TextView, viewDot: View) {
+    private fun applyCalendarDayColor(color: Int, onColor: Int, textDay: TextView, viewDot: View) {
         val drawable =
             checkNotNull(
                 ResourcesCompat.getDrawable(resources, R.drawable.bg_calendar_day, null)
             )
 
-        switchDrawableColor(drawable, color)
+        applyDrawableColor(drawable, color)
         textDay.background = drawable
 
-        switchTextViewColorOnlyText(textDay, onColor)
-        switchViewColor(viewDot, onColor)
+        applyTextViewColorOnlyText(textDay, onColor)
+        applyViewColor(viewDot, onColor)
     }
 
-    fun switchCalendarDayOfWeekWeekdaysColor(textDayOfWeek: TextView) {
+    fun applyCalendarDayOfWeekWeekdaysColor(textDayOfWeek: TextView) {
         val onColor = onWeekdaysColor
-        switchTextViewColorOnlyText(textDayOfWeek, onColor)
+        applyTextViewColorOnlyText(textDayOfWeek, onColor)
     }
 
-    fun switchCalendarDayOfWeekSaturdayColor(textDayOfWeek: TextView) {
+    fun applyCalendarDayOfWeekSaturdayColor(textDayOfWeek: TextView) {
         val onColor = onSaturdayColor
-        switchTextViewColorOnlyText(textDayOfWeek, onColor)
+        applyTextViewColorOnlyText(textDayOfWeek, onColor)
     }
 
-    fun switchCalendarDayOfWeekSundayColor(textDayOfWeek: TextView) {
+    fun applyCalendarDayOfWeekSundayColor(textDayOfWeek: TextView) {
         val onColor = onSundayColor
-        switchTextViewColorOnlyText(textDayOfWeek, onColor)
+        applyTextViewColorOnlyText(textDayOfWeek, onColor)
     }
 
     private val calendarSurfaceColor
