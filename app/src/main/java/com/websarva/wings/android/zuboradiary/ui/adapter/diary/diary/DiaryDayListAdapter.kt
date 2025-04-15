@@ -5,7 +5,6 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.websarva.wings.android.zuboradiary.ui.utils.DayOfWeekStringConverter
 import com.websarva.wings.android.zuboradiary.data.model.ThemeColor
 import com.websarva.wings.android.zuboradiary.databinding.RowDiaryDayListBinding
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
@@ -14,6 +13,7 @@ import com.websarva.wings.android.zuboradiary.ui.adapter.LeftSwipeSimpleCallback
 import com.websarva.wings.android.zuboradiary.ui.adapter.diary.DiaryDayListBaseAdapter
 import com.websarva.wings.android.zuboradiary.ui.adapter.diary.DiaryDayListBaseItem
 import com.websarva.wings.android.zuboradiary.ui.adapter.diary.SwipeDiaryDayListBaseAdapter
+import com.websarva.wings.android.zuboradiary.ui.utils.toDiaryListDayOfWeekString
 import java.text.NumberFormat
 
 internal class DiaryDayListAdapter(context: Context, recyclerView: RecyclerView, themeColor: ThemeColor)
@@ -37,8 +37,7 @@ internal class DiaryDayListAdapter(context: Context, recyclerView: RecyclerView,
         if (holder !is DiaryDayListViewHolder) throw IllegalStateException()
 
         val date = item.date
-        val dayOfWeekStringConverter = DayOfWeekStringConverter(context)
-        val strDayOfWeek = dayOfWeekStringConverter.toDiaryListDayOfWeek(date.dayOfWeek)
+        val strDayOfWeek = date.dayOfWeek.toDiaryListDayOfWeekString(context)
         holder.binding.includeDay.textDayOfWeek.text = strDayOfWeek
         holder.binding.includeDay.textDayOfMonth.text =
             NumberFormat.getInstance().format(date.dayOfMonth)

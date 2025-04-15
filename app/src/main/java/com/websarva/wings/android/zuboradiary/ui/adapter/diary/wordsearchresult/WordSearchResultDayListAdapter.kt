@@ -6,12 +6,12 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.websarva.wings.android.zuboradiary.R
-import com.websarva.wings.android.zuboradiary.ui.utils.DayOfWeekStringConverter
 import com.websarva.wings.android.zuboradiary.data.model.ThemeColor
 import com.websarva.wings.android.zuboradiary.databinding.RowWordSearchResultListBinding
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import com.websarva.wings.android.zuboradiary.ui.adapter.diary.DiaryDayListBaseAdapter
 import com.websarva.wings.android.zuboradiary.ui.adapter.diary.DiaryDayListBaseItem
+import com.websarva.wings.android.zuboradiary.ui.utils.toDiaryListDayOfWeekString
 import java.text.NumberFormat
 
 internal class WordSearchResultDayListAdapter(
@@ -33,8 +33,7 @@ internal class WordSearchResultDayListAdapter(
         if (holder !is WordSearchResultDayViewHolder) throw IllegalStateException()
 
         val date = item.date
-        val dayOfWeekStringConverter = DayOfWeekStringConverter(context)
-        val dayOfWeekString = dayOfWeekStringConverter.toDiaryListDayOfWeek(date.dayOfWeek)
+        val dayOfWeekString = date.dayOfWeek.toDiaryListDayOfWeekString(context)
         holder.binding.includeDay.textDayOfWeek.text = dayOfWeekString
         holder.binding.includeDay.textDayOfMonth.text =
             NumberFormat.getInstance().format(date.dayOfMonth)

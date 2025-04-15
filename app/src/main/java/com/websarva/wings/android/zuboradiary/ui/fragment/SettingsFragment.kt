@@ -23,7 +23,6 @@ import androidx.lifecycle.lifecycleScope
 import com.websarva.wings.android.zuboradiary.R
 import com.websarva.wings.android.zuboradiary.ui.model.AppMessage
 import com.websarva.wings.android.zuboradiary.ui.utils.DateTimeStringConverter
-import com.websarva.wings.android.zuboradiary.ui.utils.DayOfWeekStringConverter
 import com.websarva.wings.android.zuboradiary.data.model.ThemeColor
 import com.websarva.wings.android.zuboradiary.databinding.FragmentSettingsBinding
 import com.websarva.wings.android.zuboradiary.ui.permission.UriPermissionManager
@@ -36,6 +35,7 @@ import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.PermissionDialo
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.ReminderNotificationTimePickerDialogFragment
 import com.websarva.wings.android.zuboradiary.ui.theme.SettingsThemeColorChanger
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.ThemeColorPickerDialogFragment
+import com.websarva.wings.android.zuboradiary.ui.utils.toCalendarStartDayOfWeekString
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
@@ -385,8 +385,7 @@ class SettingsFragment : BaseFragment() {
                 .collectLatest { value: DayOfWeek? ->
                     value ?: return@collectLatest
 
-                    val stringConverter = DayOfWeekStringConverter(requireContext())
-                    val strDayOfWeek = stringConverter.toCalendarStartDayOfWeek(value)
+                    val strDayOfWeek = value.toCalendarStartDayOfWeekString(requireContext())
                     binding.includeCalendarStartDaySetting.textValue.text = strDayOfWeek
                 }
         }
