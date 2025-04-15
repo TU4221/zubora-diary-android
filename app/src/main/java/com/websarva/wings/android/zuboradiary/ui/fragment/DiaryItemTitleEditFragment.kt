@@ -18,7 +18,7 @@ import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.DiaryItemTitleD
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.DiaryItemTitleEditViewModel
 import com.websarva.wings.android.zuboradiary.ui.adapter.diaryitemtitle.ItemTitleSelectionHistoryListAdapter
 import com.websarva.wings.android.zuboradiary.ui.adapter.diaryitemtitle.SelectionHistoryList
-import com.websarva.wings.android.zuboradiary.ui.view.edittext.TextInputSetup
+import com.websarva.wings.android.zuboradiary.ui.view.edittext.TextInputConfigurator
 import com.websarva.wings.android.zuboradiary.ui.utils.requireValue
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
@@ -122,17 +122,17 @@ class DiaryItemTitleEditFragment : BaseFragment() {
     }
 
     private fun setUpItemTitleInputField() {
-        val textInputSetup = TextInputSetup(requireActivity())
+        val textInputConfigurator = TextInputConfigurator(requireActivity())
         val textInputLayouts = arrayOf(
             binding.textInputLayoutNewItemTitle
         )
-        textInputSetup.setUpKeyboardCloseOnEnter(*textInputLayouts)
-        textInputSetup.setUpFocusClearOnClickBackground(
+        textInputConfigurator.setUpKeyboardCloseOnEnter(*textInputLayouts)
+        textInputConfigurator.setUpFocusClearOnClickBackground(
             binding.viewFullScreenBackground,
             *textInputLayouts
         )
         val transitionListener =
-            textInputSetup.createClearButtonSetupTransitionListener(*textInputLayouts)
+            textInputConfigurator.createClearButtonSetupTransitionListener(*textInputLayouts)
         addTransitionListener(transitionListener)
 
         val editText = checkNotNull(binding.textInputLayoutNewItemTitle.editText)

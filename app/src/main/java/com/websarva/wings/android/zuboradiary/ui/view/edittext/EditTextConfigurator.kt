@@ -14,7 +14,7 @@ import android.widget.ImageButton
 import com.websarva.wings.android.zuboradiary.ui.keyboard.KeyboardInitializer
 import java.util.Arrays
 
-internal open class EditTextSetup(private val activity: Activity) {
+internal open class EditTextConfigurator(private val activity: Activity) {
 
     protected fun hideKeyboard(view: View) {
         val keyboardInitializer = KeyboardInitializer(activity)

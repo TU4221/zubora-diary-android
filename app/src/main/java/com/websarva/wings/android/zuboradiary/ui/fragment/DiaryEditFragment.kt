@@ -37,7 +37,7 @@ import com.websarva.wings.android.zuboradiary.ui.model.DiaryEditPendingDialog
 import com.websarva.wings.android.zuboradiary.ui.view.imageview.DiaryPictureConfigurator
 import com.websarva.wings.android.zuboradiary.ui.model.PendingDialog
 import com.websarva.wings.android.zuboradiary.ui.TestDiariesSaver
-import com.websarva.wings.android.zuboradiary.ui.view.edittext.TextInputSetup
+import com.websarva.wings.android.zuboradiary.ui.view.edittext.TextInputConfigurator
 import com.websarva.wings.android.zuboradiary.ui.permission.UriPermissionManager
 import com.websarva.wings.android.zuboradiary.ui.utils.requireValue
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.DiaryStateFlow
@@ -975,15 +975,15 @@ class DiaryEditFragment : BaseFragment() {
     }
 
     private fun setupEditText() {
-        val textInputSetup = TextInputSetup(requireActivity())
+        val textInputConfigurator = TextInputConfigurator(requireActivity())
 
         val allTextInputLayouts = createAllTextInputLayoutList().toTypedArray<TextInputLayout>()
-        textInputSetup.setUpFocusClearOnClickBackground(
+        textInputConfigurator.setUpFocusClearOnClickBackground(
             binding.viewNestedScrollBackground,
             *allTextInputLayouts
         )
 
-        textInputSetup.setUpKeyboardCloseOnEnter(binding.textInputLayoutTitle)
+        textInputConfigurator.setUpKeyboardCloseOnEnter(binding.textInputLayoutTitle)
 
         val scrollableTextInputLayouts =
             binding.run {
@@ -996,7 +996,7 @@ class DiaryEditFragment : BaseFragment() {
                 )
             }
 
-        textInputSetup.setUpScrollable(*scrollableTextInputLayouts)
+        textInputConfigurator.setUpScrollable(*scrollableTextInputLayouts)
 
         val clearableTextInputLayouts =
             binding.run {
@@ -1010,7 +1010,7 @@ class DiaryEditFragment : BaseFragment() {
                 )
             }
         val transitionListener =
-            textInputSetup.createClearButtonSetupTransitionListener(*clearableTextInputLayouts)
+            textInputConfigurator.createClearButtonSetupTransitionListener(*clearableTextInputLayouts)
         addTransitionListener(transitionListener)
     }
 
