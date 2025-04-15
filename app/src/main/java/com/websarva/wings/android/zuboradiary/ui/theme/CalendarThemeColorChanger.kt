@@ -7,8 +7,8 @@ import androidx.core.content.res.ResourcesCompat
 import com.websarva.wings.android.zuboradiary.R
 import com.websarva.wings.android.zuboradiary.data.model.ThemeColor
 
-internal class CalendarThemeColorSwitcher(context: Context, themeColor: ThemeColor) :
-    ThemeColorSwitcher(context, themeColor) {
+internal class CalendarThemeColorChanger(context: Context, themeColor: ThemeColor) :
+    ThemeColorChanger(context, themeColor) {
     fun switchCalendarTodayColor(textDay: TextView, viewDot: View) {
         val color = themeColor.getSecondaryContainerColor(resources)
         val onColor = themeColor.getOnSecondaryContainerColor(resources)

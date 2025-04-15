@@ -34,7 +34,7 @@ import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.AllSettingsInit
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.CalendarStartDayPickerDialogFragment
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.PermissionDialogFragment
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.ReminderNotificationTimePickerDialogFragment
-import com.websarva.wings.android.zuboradiary.ui.theme.SettingsThemeColorSwitcher
+import com.websarva.wings.android.zuboradiary.ui.theme.SettingsThemeColorChanger
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.ThemeColorPickerDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
@@ -281,13 +281,13 @@ class SettingsFragment : BaseFragment() {
     }
 
     private fun switchViewColor(themeColor: ThemeColor) {
-        val switcher =
-            SettingsThemeColorSwitcher(requireContext(), themeColor)
+        val changer =
+            SettingsThemeColorChanger(requireContext(), themeColor)
 
-        switcher.switchBackgroundColor(binding.viewFullScreenBackground)
-        switcher.switchToolbarColor(binding.materialToolbarTopAppBar)
+        changer.switchBackgroundColor(binding.viewFullScreenBackground)
+        changer.switchToolbarColor(binding.materialToolbarTopAppBar)
 
-        switcher.switchSettingItemSectionColor(
+        changer.switchSettingItemSectionColor(
             binding.run {
                 listOf(
                     textSettingsSectionDesign,
@@ -299,7 +299,7 @@ class SettingsFragment : BaseFragment() {
             }
         )
 
-        switcher.switchSettingItemIconColor(
+        changer.switchSettingItemIconColor(
             binding.run {
                 listOf(
                     includeThemeColorSetting.textTitle,
@@ -315,7 +315,7 @@ class SettingsFragment : BaseFragment() {
             }
         )
 
-        switcher.switchTextColorOnBackground(
+        changer.switchTextColorOnBackground(
             binding.run {
                 listOf(
                     includeThemeColorSetting.textTitle,
@@ -331,7 +331,7 @@ class SettingsFragment : BaseFragment() {
             }
         )
 
-        switcher.switchRedTextColorOnBackground(
+        changer.switchRedTextColorOnBackground(
             binding.run {
                 listOf(
                     includeAllDiariesDeleteSetting.textTitle,
@@ -341,7 +341,7 @@ class SettingsFragment : BaseFragment() {
             }
         )
 
-        switcher.switchSwitchColor(
+        changer.switchSwitchColor(
             binding.run {
                 listOf(
                     includeReminderNotificationSetting.materialSwitch,
@@ -351,7 +351,7 @@ class SettingsFragment : BaseFragment() {
             }
         )
 
-        switcher.switchDividerColor(
+        changer.switchDividerColor(
             binding.run {
                 listOf(
                     materialDividerToolbar,

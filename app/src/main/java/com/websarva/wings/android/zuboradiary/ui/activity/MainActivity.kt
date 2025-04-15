@@ -39,7 +39,7 @@ import com.websarva.wings.android.zuboradiary.data.model.GeoCoordinates
 import com.websarva.wings.android.zuboradiary.data.model.ThemeColor
 import com.websarva.wings.android.zuboradiary.databinding.ActivityMainBinding
 import com.websarva.wings.android.zuboradiary.ui.theme.ThemeColorInflaterCreator
-import com.websarva.wings.android.zuboradiary.ui.theme.ThemeColorSwitcher
+import com.websarva.wings.android.zuboradiary.ui.theme.ThemeColorChanger
 import com.websarva.wings.android.zuboradiary.ui.fragment.CalendarFragment
 import com.websarva.wings.android.zuboradiary.ui.utils.requireValue
 import com.websarva.wings.android.zuboradiary.ui.fragment.DiaryEditFragment
@@ -262,12 +262,12 @@ class MainActivity : CustomActivity() {
     }
 
     private fun switchThemeColor(themeColor: ThemeColor) {
-        val switcher =
-            ThemeColorSwitcher(applicationContext, themeColor)
-        switcher.switchStatusBarColor(window)
-        switcher.switchBackgroundColor(binding.viewFullScreenBackground)
-        switcher.switchToolbarColor(binding.materialToolbarTopAppBar)
-        switcher.switchBottomNavigationColor(binding.bottomNavigation)
+        val changer =
+            ThemeColorChanger(applicationContext, themeColor)
+        changer.switchStatusBarColor(window)
+        changer.switchBackgroundColor(binding.viewFullScreenBackground)
+        changer.switchToolbarColor(binding.materialToolbarTopAppBar)
+        changer.switchBottomNavigationColor(binding.bottomNavigation)
     }
 
     private fun setUpNavigation() {

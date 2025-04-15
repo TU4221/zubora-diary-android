@@ -29,7 +29,7 @@ import com.websarva.wings.android.zuboradiary.data.model.ThemeColor
 import com.websarva.wings.android.zuboradiary.databinding.FragmentCalendarBinding
 import com.websarva.wings.android.zuboradiary.databinding.LayoutCalendarDayBinding
 import com.websarva.wings.android.zuboradiary.databinding.LayoutCalendarHeaderBinding
-import com.websarva.wings.android.zuboradiary.ui.theme.CalendarThemeColorSwitcher
+import com.websarva.wings.android.zuboradiary.ui.theme.CalendarThemeColorChanger
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.CalendarViewModel
 import com.websarva.wings.android.zuboradiary.ui.utils.requireValue
 import com.websarva.wings.android.zuboradiary.ui.fragment.DiaryShowFragment.ConditionObserver
@@ -248,37 +248,37 @@ class CalendarFragment : BaseFragment() {
         private fun setUpCalendarDayColor(
             calendarDay: CalendarDay, textCalendarDay: TextView, viewCalendarDayDot: View
         ) {
-            val themeColorSwitcher =
-                CalendarThemeColorSwitcher(requireContext(), themeColor)
+            val themeColorChanger =
+                CalendarThemeColorChanger(requireContext(), themeColor)
 
             val selectedDate = mainViewModel.selectedDate.value
             val isSelectedDay = calendarDay.date.isEqual(selectedDate)
             val isToday = calendarDay.date.isEqual(LocalDate.now())
 
             if (isSelectedDay) {
-                themeColorSwitcher.switchCalendarSelectedDayColor(
+                themeColorChanger.switchCalendarSelectedDayColor(
                     textCalendarDay,
                     viewCalendarDayDot
                 )
             } else if (isToday) {
-                themeColorSwitcher.switchCalendarTodayColor(textCalendarDay, viewCalendarDayDot)
+                themeColorChanger.switchCalendarTodayColor(textCalendarDay, viewCalendarDayDot)
             } else {
                 val dayOfWeek = calendarDay.date.dayOfWeek
                 val isSaturday = dayOfWeek == DayOfWeek.SATURDAY
                 val isSunday = dayOfWeek == DayOfWeek.SUNDAY
 
                 if (isSaturday) {
-                    themeColorSwitcher.switchCalendarSaturdayColor(
+                    themeColorChanger.switchCalendarSaturdayColor(
                         textCalendarDay,
                         viewCalendarDayDot
                     )
                 } else if (isSunday) {
-                    themeColorSwitcher.switchCalendarSundayColor(
+                    themeColorChanger.switchCalendarSundayColor(
                         textCalendarDay,
                         viewCalendarDayDot
                     )
                 } else {
-                    themeColorSwitcher.switchCalendarWeekdaysColor(
+                    themeColorChanger.switchCalendarWeekdaysColor(
                         textCalendarDay,
                         viewCalendarDayDot
                     )
@@ -338,18 +338,18 @@ class CalendarFragment : BaseFragment() {
         }
 
         private fun setUpDayOfWeekColor(dayOfWeek: DayOfWeek, dayOfWeekText: TextView) {
-            val themeColorSwitcher =
-                CalendarThemeColorSwitcher(requireContext(), themeColor)
+            val themeColorChanger =
+                CalendarThemeColorChanger(requireContext(), themeColor)
 
             val isSaturday = dayOfWeek == DayOfWeek.SATURDAY
             val isSunday = dayOfWeek == DayOfWeek.SUNDAY
 
             if (isSaturday) {
-                themeColorSwitcher.switchCalendarDayOfWeekSaturdayColor(dayOfWeekText)
+                themeColorChanger.switchCalendarDayOfWeekSaturdayColor(dayOfWeekText)
             } else if (isSunday) {
-                themeColorSwitcher.switchCalendarDayOfWeekSundayColor(dayOfWeekText)
+                themeColorChanger.switchCalendarDayOfWeekSundayColor(dayOfWeekText)
             } else {
-                themeColorSwitcher.switchCalendarDayOfWeekWeekdaysColor(dayOfWeekText)
+                themeColorChanger.switchCalendarDayOfWeekWeekdaysColor(dayOfWeekText)
             }
         }
 

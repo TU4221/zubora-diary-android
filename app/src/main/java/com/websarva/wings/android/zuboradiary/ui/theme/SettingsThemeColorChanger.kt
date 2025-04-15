@@ -4,8 +4,8 @@ import android.content.Context
 import android.widget.TextView
 import com.websarva.wings.android.zuboradiary.data.model.ThemeColor
 
-internal class SettingsThemeColorSwitcher(context: Context, themeColor: ThemeColor)
-    : ThemeColorSwitcher(context, themeColor) {
+internal class SettingsThemeColorChanger(context: Context, themeColor: ThemeColor)
+    : ThemeColorChanger(context, themeColor) {
 
     fun switchSettingItemSectionColor(textViewList: List<TextView>) {
         val color = themeColor.getSecondaryContainerColor(resources)
