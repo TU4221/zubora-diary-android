@@ -2,7 +2,7 @@ package com.websarva.wings.android.zuboradiary.ui.fragment.dialog
 
 import android.content.DialogInterface
 import com.websarva.wings.android.zuboradiary.R
-import com.websarva.wings.android.zuboradiary.ui.utils.DateTimeStringConverter
+import com.websarva.wings.android.zuboradiary.ui.utils.toJapaneseDateString
 
 class WeatherInfoFetchingDialogFragment : BaseAlertDialogFragment() {
 
@@ -19,8 +19,7 @@ class WeatherInfoFetchingDialogFragment : BaseAlertDialogFragment() {
     override fun createMessage(): String {
         val loadingDiaryDate =
             WeatherInfoFetchingDialogFragmentArgs.fromBundle(requireArguments()).date
-        val dateTimeStringConverter = DateTimeStringConverter()
-        val dateString = dateTimeStringConverter.toYearMonthDayWeek(loadingDiaryDate)
+        val dateString = loadingDiaryDate.toJapaneseDateString(requireContext())
         return dateString + getString(R.string.dialog_weather_info_fetching_message)
     }
 

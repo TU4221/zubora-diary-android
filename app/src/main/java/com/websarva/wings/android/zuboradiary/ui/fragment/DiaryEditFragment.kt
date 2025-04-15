@@ -26,7 +26,6 @@ import androidx.navigation.NavDestination
 import androidx.navigation.NavDirections
 import com.google.android.material.textfield.TextInputLayout
 import com.websarva.wings.android.zuboradiary.R
-import com.websarva.wings.android.zuboradiary.ui.utils.DateTimeStringConverter
 import com.websarva.wings.android.zuboradiary.data.model.Condition
 import com.websarva.wings.android.zuboradiary.data.model.ItemNumber
 import com.websarva.wings.android.zuboradiary.data.model.Weather
@@ -50,6 +49,7 @@ import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.DiaryLoadingFai
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.DiaryPictureDeleteDialogFragment
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.DiaryUpdateDialogFragment
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.WeatherInfoFetchingDialogFragment
+import com.websarva.wings.android.zuboradiary.ui.utils.toJapaneseDateString
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
@@ -449,8 +449,7 @@ class DiaryEditFragment : BaseFragment() {
             if (value == null) return
             if (mainViewModel.isShowingItemTitleEditFragment) return
 
-            val dateTimeStringConverter = DateTimeStringConverter()
-            val dateString = dateTimeStringConverter.toYearMonthDayWeek(value)
+            val dateString = value.toJapaneseDateString(requireContext())
             binding.textInputEditTextDate.setText(dateString)
 
             lifecycleScope.launch(Dispatchers.IO) {

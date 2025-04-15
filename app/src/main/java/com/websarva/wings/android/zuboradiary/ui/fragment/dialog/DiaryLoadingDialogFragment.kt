@@ -2,7 +2,7 @@ package com.websarva.wings.android.zuboradiary.ui.fragment.dialog
 
 import android.content.DialogInterface
 import com.websarva.wings.android.zuboradiary.R
-import com.websarva.wings.android.zuboradiary.ui.utils.DateTimeStringConverter
+import com.websarva.wings.android.zuboradiary.ui.utils.toJapaneseDateString
 
 class DiaryLoadingDialogFragment : BaseAlertDialogFragment() {
 
@@ -19,8 +19,7 @@ class DiaryLoadingDialogFragment : BaseAlertDialogFragment() {
     override fun createMessage(): String {
         val diaryDate =
             DiaryLoadingDialogFragmentArgs.fromBundle(requireArguments()).date
-        val converter = DateTimeStringConverter()
-        val diaryDateString = converter.toYearMonthDayWeek(diaryDate)
+        val diaryDateString = diaryDate.toJapaneseDateString(requireContext())
         return diaryDateString + getString(R.string.dialog_diary_loading_message)
     }
 

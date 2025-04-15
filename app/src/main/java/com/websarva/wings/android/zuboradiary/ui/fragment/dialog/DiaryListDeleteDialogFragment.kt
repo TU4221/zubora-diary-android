@@ -2,7 +2,7 @@ package com.websarva.wings.android.zuboradiary.ui.fragment.dialog
 
 import android.net.Uri
 import com.websarva.wings.android.zuboradiary.R
-import com.websarva.wings.android.zuboradiary.ui.utils.DateTimeStringConverter
+import com.websarva.wings.android.zuboradiary.ui.utils.toJapaneseDateString
 import java.time.LocalDate
 
 class DiaryListDeleteDialogFragment : BaseAlertDialogFragment() {
@@ -21,8 +21,7 @@ class DiaryListDeleteDialogFragment : BaseAlertDialogFragment() {
 
     override fun createMessage(): String {
         val date = DiaryListDeleteDialogFragmentArgs.fromBundle(requireArguments()).date
-        val dateTimeStringConverter = DateTimeStringConverter()
-        val strDate = dateTimeStringConverter.toYearMonthDayWeek(date)
+        val strDate = date.toJapaneseDateString(requireContext())
         return strDate + getString(R.string.dialog_diary_delete_message)
     }
 

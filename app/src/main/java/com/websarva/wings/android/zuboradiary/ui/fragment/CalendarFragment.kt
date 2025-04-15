@@ -21,7 +21,6 @@ import com.kizitonwose.calendar.view.ViewContainer
 import com.websarva.wings.android.zuboradiary.R
 import com.websarva.wings.android.zuboradiary.ui.model.AppMessage
 import com.websarva.wings.android.zuboradiary.ui.model.AppMessageList
-import com.websarva.wings.android.zuboradiary.ui.utils.DateTimeStringConverter
 import com.websarva.wings.android.zuboradiary.ui.model.DiaryShowAppMessage
 import com.websarva.wings.android.zuboradiary.data.model.Condition
 import com.websarva.wings.android.zuboradiary.data.model.Weather
@@ -38,6 +37,7 @@ import com.websarva.wings.android.zuboradiary.ui.fragment.DiaryShowFragment.NumV
 import com.websarva.wings.android.zuboradiary.ui.fragment.DiaryShowFragment.PicturePathObserver
 import com.websarva.wings.android.zuboradiary.ui.fragment.DiaryShowFragment.Weather1Observer
 import com.websarva.wings.android.zuboradiary.ui.fragment.DiaryShowFragment.Weather2Observer
+import com.websarva.wings.android.zuboradiary.ui.utils.toJapaneseDateString
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.DiaryShowViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
@@ -400,8 +400,7 @@ class CalendarFragment : BaseFragment() {
     }
 
     private fun updateToolBarDate(date: LocalDate) {
-        val dateTimeStringConverter = DateTimeStringConverter()
-        val stringDate = dateTimeStringConverter.toYearMonthDayWeek(date)
+        val stringDate = date.toJapaneseDateString(requireContext())
         binding.materialToolbarTopAppBar.title = stringDate
     }
 
@@ -511,7 +510,8 @@ class CalendarFragment : BaseFragment() {
         launchAndRepeatOnViewLifeCycleStarted {
             diaryShowViewModel.log
                 .collectLatest { value: LocalDateTime? ->
-                    LogObserver(binding.includeDiaryShow.textLogValue).onChanged(value)
+                    LogObserver(requireContext(), binding.includeDiaryShow.textLogValue)
+                        .onChanged(value)
                 }
         }
 

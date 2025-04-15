@@ -17,7 +17,6 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.websarva.wings.android.zuboradiary.R
 import com.websarva.wings.android.zuboradiary.ui.model.AppMessage
-import com.websarva.wings.android.zuboradiary.ui.utils.DateTimeStringConverter
 import com.websarva.wings.android.zuboradiary.data.model.Condition
 import com.websarva.wings.android.zuboradiary.data.model.ItemNumber
 import com.websarva.wings.android.zuboradiary.data.model.Weather
@@ -30,6 +29,8 @@ import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.DiaryDeleteDial
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.DiaryLoadingFailureDialogFragment
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.DiaryShowViewModel
 import com.websarva.wings.android.zuboradiary.ui.permission.UriPermissionManager
+import com.websarva.wings.android.zuboradiary.ui.utils.toJapaneseDateString
+import com.websarva.wings.android.zuboradiary.ui.utils.toJapaneseDateTimeWithSecondsString
 import com.websarva.wings.android.zuboradiary.ui.utils.requireValue
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
@@ -201,8 +202,7 @@ internal class DiaryShowFragment : BaseFragment() {
                     // MEMO:DiaryViewModelを初期化するとDiaryDateにnullが代入されるため、下記"return"を処理。
                     if (value == null) return@collectLatest
 
-                    val converter = DateTimeStringConverter()
-                    val stringDate = converter.toYearMonthDayWeek(value)
+                    val stringDate = value.toJapaneseDateString(requireContext())
                     binding.materialToolbarTopAppBar.title = stringDate
                 }
         }
@@ -356,19 +356,19 @@ internal class DiaryShowFragment : BaseFragment() {
         launchAndRepeatOnViewLifeCycleStarted {
             mainViewModel.log
                 .collectLatest { value: LocalDateTime? ->
-                    LogObserver(binding.includeDiaryShow.textLogValue).onChanged(value)
+                    LogObserver(requireContext(), binding.includeDiaryShow.textLogValue)
+                        .onChanged(value)
                 }
         }
     }
 
-    class LogObserver(private val textLog: TextView) {
+    class LogObserver(private val context: Context ,private val textLog: TextView) {
 
         fun onChanged(value: LocalDateTime?) {
             // MEMO:DiaryViewModelを初期化するとDiaryLogにnullが代入されるため、下記"return"を処理。
             if (value == null) return
 
-            val dateTimeStringConverter = DateTimeStringConverter()
-            val strDate = dateTimeStringConverter.toYearMonthDayWeekHourMinuteSeconds(value)
+            val strDate = value.toJapaneseDateTimeWithSecondsString(context)
             textLog.text = strDate
         }
     }

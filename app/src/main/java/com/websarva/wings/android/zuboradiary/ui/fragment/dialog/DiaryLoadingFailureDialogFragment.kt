@@ -3,7 +3,7 @@ package com.websarva.wings.android.zuboradiary.ui.fragment.dialog
 import android.content.DialogInterface
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.websarva.wings.android.zuboradiary.R
-import com.websarva.wings.android.zuboradiary.ui.utils.DateTimeStringConverter
+import com.websarva.wings.android.zuboradiary.ui.utils.toJapaneseDateString
 
 class DiaryLoadingFailureDialogFragment : BaseAlertDialogFragment() {
 
@@ -20,7 +20,7 @@ class DiaryLoadingFailureDialogFragment : BaseAlertDialogFragment() {
     override fun createMessage(): String {
         val diaryDate =
             DiaryLoadingFailureDialogFragmentArgs.fromBundle(requireArguments()).date
-        val diaryDateString = DateTimeStringConverter().toYearMonthDayWeek(diaryDate)
+        val diaryDateString = diaryDate.toJapaneseDateString(requireContext())
         return diaryDateString + getString(R.string.dialog_diary_loading_failure_message)
     }
 

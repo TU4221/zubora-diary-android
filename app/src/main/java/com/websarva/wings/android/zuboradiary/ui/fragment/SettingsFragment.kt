@@ -22,7 +22,6 @@ import androidx.databinding.ViewDataBinding
 import androidx.lifecycle.lifecycleScope
 import com.websarva.wings.android.zuboradiary.R
 import com.websarva.wings.android.zuboradiary.ui.model.AppMessage
-import com.websarva.wings.android.zuboradiary.ui.utils.DateTimeStringConverter
 import com.websarva.wings.android.zuboradiary.data.model.ThemeColor
 import com.websarva.wings.android.zuboradiary.databinding.FragmentSettingsBinding
 import com.websarva.wings.android.zuboradiary.ui.permission.UriPermissionManager
@@ -35,6 +34,7 @@ import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.PermissionDialo
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.ReminderNotificationTimePickerDialogFragment
 import com.websarva.wings.android.zuboradiary.ui.theme.SettingsThemeColorChanger
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.ThemeColorPickerDialogFragment
+import com.websarva.wings.android.zuboradiary.ui.utils.formatToHourMinuteString
 import com.websarva.wings.android.zuboradiary.ui.utils.toCalendarStartDayOfWeekString
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
@@ -422,8 +422,7 @@ class SettingsFragment : BaseFragment() {
                         return@collectLatest
                     }
 
-                    val converter = DateTimeStringConverter()
-                    val timeString = converter.toHourMinute(value)
+                    val timeString = value.formatToHourMinuteString(requireContext())
                     binding.includeReminderNotificationSetting.textValue.text = timeString
                 }
         }

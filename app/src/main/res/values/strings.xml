@@ -335,6 +335,11 @@
     <string name="day_of_week_short_name_friday">金</string>
     <string name="day_of_week_short_name_saturday">土</string>
 
+    <!-- TimeFormatPattern -->
+    <string name="local_date_format_pattern_japanese_date">yyyy年MM月dd日(E)</string>
+    <string name="local_date_time_format_pattern_japanese_date_time_with_seconds">yyyy年MM月dd日(E) HH:mm:ss</string>
+    <string name="local_time_format_pattern_hour_minute">HH:mm</string>
+
     <!-- ReminderNotificationWorker -->
     <string name="reminder_notification_worker_channel_id">reminder_notification_worker</string>
     <string name="reminder_notification_worker_channel_name">リマインダー通知</string>
