@@ -2,26 +2,26 @@ package com.websarva.wings.android.zuboradiary.ui.adapter.diary.diary
 
 internal class DiaryDayList {
 
-    val diaryDayListItemList: List<DiaryDayListItem>
+    val itemList: List<DiaryDayListItem>
 
     constructor(itemList: List<DiaryDayListItem>) {
         require(itemList.isNotEmpty())
 
-        this.diaryDayListItemList = itemList.toList()
+        this.itemList = itemList.toList()
     }
 
     constructor() {
-        this.diaryDayListItemList = ArrayList()
+        this.itemList = ArrayList()
     }
 
     fun countDiaries(): Int {
-        return diaryDayListItemList.size
+        return itemList.size
     }
 
     fun combineDiaryDayLists(additionList: DiaryDayList): DiaryDayList {
-        require(additionList.diaryDayListItemList.isNotEmpty())
+        require(additionList.itemList.isNotEmpty())
 
-        val resultItemList = diaryDayListItemList + additionList.diaryDayListItemList
+        val resultItemList = itemList + additionList.itemList
         return DiaryDayList(resultItemList)
     }
 }

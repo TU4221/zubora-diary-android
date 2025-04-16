@@ -9,7 +9,7 @@ internal class DiaryYearMonthList {
     val diaryYearMonthListItemList: List<DiaryYearMonthListItem>
 
     constructor(diaryDayList: DiaryDayList, needsNoDiaryMessage: Boolean) {
-        require(diaryDayList.diaryDayListItemList.isNotEmpty())
+        require(diaryDayList.itemList.isNotEmpty())
 
         val itemList = createDiaryYearMonthListItem(diaryDayList)
         this.diaryYearMonthListItemList = addLastItem(itemList, needsNoDiaryMessage)
@@ -36,14 +36,14 @@ internal class DiaryYearMonthList {
     }
 
     private fun createDiaryYearMonthListItem(diaryDayList: DiaryDayList): List<DiaryYearMonthListItem> {
-        require(diaryDayList.diaryDayListItemList.isNotEmpty())
+        require(diaryDayList.itemList.isNotEmpty())
 
         var sortingDayItemList: MutableList<DiaryDayListItem> = ArrayList()
         val diaryYearMonthListItemList: MutableList<DiaryYearMonthListItem> = ArrayList()
         var diaryYearMonthListItem: DiaryYearMonthListItem
         var sortingYearMonth: YearMonth? = null
 
-        val diaryDayListItemList = diaryDayList.diaryDayListItemList
+        val diaryDayListItemList = diaryDayList.itemList
         for (day in diaryDayListItemList) {
             val date = day.date
             val yearMonth = YearMonth.of(date.year, date.month)
