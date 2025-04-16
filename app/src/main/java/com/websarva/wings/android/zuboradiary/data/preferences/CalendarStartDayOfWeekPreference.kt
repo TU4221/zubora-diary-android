@@ -33,7 +33,7 @@ class CalendarStartDayOfWeekPreference {
         dayOfWeekNumber = dayOfWeek.value
     }
 
-    fun setUpPreferences(mutablePreferences: MutablePreferences) {
+    fun applyTo(mutablePreferences: MutablePreferences) {
         mutablePreferences[dayOfWeekPreferenceKey] = dayOfWeekNumber
     }
 }

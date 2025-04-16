@@ -28,7 +28,7 @@ class WeatherInfoAcquisitionPreference {
         this.isChecked = isChecked
     }
 
-    fun setUpPreferences(mutablePreferences: MutablePreferences) {
+    fun applyTo(mutablePreferences: MutablePreferences) {
         mutablePreferences[isCheckedPreferenceKey] = isChecked
     }
 }

@@ -57,7 +57,7 @@ class PassCodeLockPreference {
         }
     }
 
-    fun setUpPreferences(mutablePreferences: MutablePreferences) {
+    fun applyTo(mutablePreferences: MutablePreferences) {
         mutablePreferences[isCheckedPreferenceKey] = isChecked
         mutablePreferences[passcodePreferenceKey] = passCode
     }

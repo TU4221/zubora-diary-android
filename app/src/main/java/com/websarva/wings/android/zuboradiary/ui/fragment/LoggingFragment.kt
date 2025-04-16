@@ -8,7 +8,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 
-abstract class CustomFragment : Fragment() {
+abstract class LoggingFragment : Fragment() {
 
     private val logTag = createLogTag()
 

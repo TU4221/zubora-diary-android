@@ -33,7 +33,7 @@ class ThemeColorPreference {
         this.themeColorNumber = themeColor.toNumber()
     }
 
-    fun setUpPreferences(mutablePreferences: MutablePreferences) {
+    fun applyTo(mutablePreferences: MutablePreferences) {
         mutablePreferences[themeColorPreferenceKey] = themeColorNumber
     }
 }

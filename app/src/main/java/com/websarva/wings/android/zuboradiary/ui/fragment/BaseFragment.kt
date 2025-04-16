@@ -46,7 +46,7 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-abstract class BaseFragment : CustomFragment() {
+abstract class BaseFragment : LoggingFragment() {
 
     private val logTag = createLogTag()
 

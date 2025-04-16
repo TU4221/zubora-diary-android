@@ -45,7 +45,7 @@ class UserPreferences @Inject constructor(private val context: Context) {
     )
     suspend fun saveThemeColorPreference(value: ThemeColorPreference) {
         context.dataStore.edit { preferences ->
-            value.setUpPreferences(preferences)
+            value.applyTo(preferences)
         }
     }
 
@@ -55,7 +55,7 @@ class UserPreferences @Inject constructor(private val context: Context) {
     )
     suspend fun saveCalendarStartDayOfWeekPreference(value: CalendarStartDayOfWeekPreference) {
         context.dataStore.edit { preferences ->
-            value.setUpPreferences(preferences)
+            value.applyTo(preferences)
         }
     }
 
@@ -65,7 +65,7 @@ class UserPreferences @Inject constructor(private val context: Context) {
     )
     suspend fun saveReminderNotificationPreference(value: ReminderNotificationPreference) {
         context.dataStore.edit { preferences ->
-            value.setUpPreferences(preferences)
+            value.applyTo(preferences)
         }
     }
 
@@ -75,7 +75,7 @@ class UserPreferences @Inject constructor(private val context: Context) {
     )
     suspend fun savePasscodeLockPreference(value: PassCodeLockPreference) {
         context.dataStore.edit { preferences ->
-            value.setUpPreferences(preferences)
+            value.applyTo(preferences)
         }
     }
 
@@ -85,18 +85,18 @@ class UserPreferences @Inject constructor(private val context: Context) {
     )
     suspend fun saveWeatherInfoAcquisitionPreference(value: WeatherInfoAcquisitionPreference) {
         context.dataStore.edit { preferences ->
-            value.setUpPreferences(preferences)
+            value.applyTo(preferences)
         }
     }
 
 
     suspend fun initializeAllPreferences() {
         context.dataStore.edit { preferences ->
-            ThemeColorPreference().setUpPreferences(preferences)
-            CalendarStartDayOfWeekPreference().setUpPreferences(preferences)
-            ReminderNotificationPreference().setUpPreferences(preferences)
-            PassCodeLockPreference().setUpPreferences(preferences)
-            WeatherInfoAcquisitionPreference().setUpPreferences(preferences)
+            ThemeColorPreference().applyTo(preferences)
+            CalendarStartDayOfWeekPreference().applyTo(preferences)
+            ReminderNotificationPreference().applyTo(preferences)
+            PassCodeLockPreference().applyTo(preferences)
+            WeatherInfoAcquisitionPreference().applyTo(preferences)
         }
     }
 }
