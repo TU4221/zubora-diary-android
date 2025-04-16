@@ -237,7 +237,7 @@ class DiaryListFragment : BaseFragment() {
         }
 
         private fun setUpListViewVisibility(list: DiaryYearMonthList) {
-            val isNoDiary = list.diaryYearMonthListItemList.isEmpty()
+            val isNoDiary = list.itemList.isEmpty()
             val noDiaryMessageVisibility: Int
             val diaryListVisibility: Int
             if (isNoDiary) {
@@ -254,7 +254,7 @@ class DiaryListFragment : BaseFragment() {
         }
 
         private fun setUpList(list: DiaryYearMonthList) {
-            val convertedItemList: List<DiaryYearMonthListBaseItem> = list.diaryYearMonthListItemList
+            val convertedItemList: List<DiaryYearMonthListBaseItem> = list.itemList
             val listAdapter = binding.recyclerDiaryList.adapter as DiaryYearMonthListAdapter
             listAdapter.submitList(convertedItemList)
         }
