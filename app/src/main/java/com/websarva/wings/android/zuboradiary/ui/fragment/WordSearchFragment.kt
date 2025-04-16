@@ -17,7 +17,7 @@ import com.websarva.wings.android.zuboradiary.ui.model.AppMessage
 import com.websarva.wings.android.zuboradiary.data.model.ThemeColor
 import com.websarva.wings.android.zuboradiary.databinding.FragmentWordSearchBinding
 import com.websarva.wings.android.zuboradiary.ui.view.edittext.EditTextConfigurator
-import com.websarva.wings.android.zuboradiary.ui.keyboard.KeyboardInitializer
+import com.websarva.wings.android.zuboradiary.ui.keyboard.KeyboardManager
 import com.websarva.wings.android.zuboradiary.ui.adapter.diary.DiaryDayListBaseItem
 import com.websarva.wings.android.zuboradiary.ui.adapter.diary.DiaryYearMonthListBaseAdapter.OnClickChildItemListener
 import com.websarva.wings.android.zuboradiary.ui.adapter.diary.DiaryYearMonthListBaseItem
@@ -96,8 +96,8 @@ class WordSearchFragment : BaseFragment() {
         val searchWord = mainViewModel.searchWord.value
         if (searchWord.isEmpty()) {
             binding.editTextSearchWord.requestFocus()
-            val keyboardInitializer = KeyboardInitializer(requireActivity())
-            keyboardInitializer.show(binding.editTextSearchWord)
+            val keyboardManager = KeyboardManager(requireActivity())
+            keyboardManager.showKeyboard(binding.editTextSearchWord)
         }
 
         launchAndRepeatOnViewLifeCycleStarted {

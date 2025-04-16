@@ -7,21 +7,21 @@ import android.view.View
 import android.view.inputmethod.InputMethodManager
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 
-internal class KeyboardInitializer(activity: Activity) {
+internal class KeyboardManager(activity: Activity) {
 
     private val logTag = createLogTag()
 
     private val inputMethodManager: InputMethodManager =
         activity.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
 
-    fun hide(focusView: View) {
-        Log.d(logTag, "hide()")
+    fun hideKeyboard(focusView: View) {
+        Log.d(logTag, "hideKeyboard()")
         inputMethodManager
             .hideSoftInputFromWindow(focusView.windowToken, InputMethodManager.HIDE_NOT_ALWAYS)
     }
 
-    fun show(focusView: View) {
-        Log.d(logTag, "show()")
+    fun showKeyboard(focusView: View) {
+        Log.d(logTag, "showKeyboard()")
         inputMethodManager.showSoftInput(focusView, InputMethodManager.SHOW_IMPLICIT)
     }
 }

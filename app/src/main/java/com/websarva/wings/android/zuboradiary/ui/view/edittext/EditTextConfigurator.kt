@@ -11,14 +11,14 @@ import android.view.View.OnFocusChangeListener
 import android.view.View.OnTouchListener
 import android.widget.EditText
 import android.widget.ImageButton
-import com.websarva.wings.android.zuboradiary.ui.keyboard.KeyboardInitializer
+import com.websarva.wings.android.zuboradiary.ui.keyboard.KeyboardManager
 import java.util.Arrays
 
 internal open class EditTextConfigurator(private val activity: Activity) {
 
     protected fun hideKeyboard(view: View) {
-        val keyboardInitializer = KeyboardInitializer(activity)
-        keyboardInitializer.hide(view)
+        val keyboardManager = KeyboardManager(activity)
+        keyboardManager.hideKeyboard(view)
     }
 
     protected fun setUpScrollable(editText: EditText) {
