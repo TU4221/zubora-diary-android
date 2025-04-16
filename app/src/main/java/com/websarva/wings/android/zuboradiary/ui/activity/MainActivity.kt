@@ -52,7 +52,7 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
-class MainActivity : CustomActivity() {
+class MainActivity : LoggingActivity() {
 
     private val logTag = createLogTag()
 

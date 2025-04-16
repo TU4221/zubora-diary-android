@@ -5,7 +5,7 @@ import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 
-open class CustomActivity : AppCompatActivity() {
+open class LoggingActivity : AppCompatActivity() {
 
     private val logTag = createLogTag()
 
