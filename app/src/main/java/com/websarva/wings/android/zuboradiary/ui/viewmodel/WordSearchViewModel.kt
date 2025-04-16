@@ -215,7 +215,7 @@ internal class WordSearchViewModel @Inject internal constructor(
             spannableStringBackGroundColor: Int
         ): WordSearchResultYearMonthList {
             val currentResultList = _wordSearchResultList.requireValue()
-            check(currentResultList.wordSearchResultYearMonthListItemList.isNotEmpty())
+            check(currentResultList.itemList.isNotEmpty())
 
             if (isValidityDelay) delay(1000)
             val loadingOffset = currentResultList.countDiaries()
@@ -241,7 +241,7 @@ internal class WordSearchViewModel @Inject internal constructor(
             spannableStringBackGroundColor: Int
         ): WordSearchResultYearMonthList {
             val currentResultList = _wordSearchResultList.requireValue()
-            check(currentResultList.wordSearchResultYearMonthListItemList.isNotEmpty())
+            check(currentResultList.itemList.isNotEmpty())
 
             _isVisibleUpdateProgressBar.value = true
             try {

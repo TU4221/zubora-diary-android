@@ -204,7 +204,7 @@ class WordSearchFragment : BaseFragment() {
                     textNoWordSearchResultsMessage.visibility = View.INVISIBLE
                     linerLayoutWordSearchResults.visibility = View.INVISIBLE
                 }
-            } else if (value.wordSearchResultYearMonthListItemList.isEmpty()) {
+            } else if (value.itemList.isEmpty()) {
                 binding.apply {
                     textNoWordSearchResultsMessage.visibility = View.VISIBLE
                     linerLayoutWordSearchResults.visibility = View.INVISIBLE
@@ -217,14 +217,14 @@ class WordSearchFragment : BaseFragment() {
             }
 
             val convertedList: List<DiaryYearMonthListBaseItem> =
-                ArrayList<DiaryYearMonthListBaseItem>(value.wordSearchResultYearMonthListItemList)
+                ArrayList<DiaryYearMonthListBaseItem>(value.itemList)
             listAdapter.submitList(convertedList)
         }
     }
 
     private fun updateWordSearchResultList() {
         val list = mainViewModel.wordSearchResultList.value
-        if (list.wordSearchResultYearMonthListItemList.isEmpty()) return
+        if (list.itemList.isEmpty()) return
         mainViewModel.updateWordSearchResultList(resultWordColor, resultWordBackgroundColor)
     }
 

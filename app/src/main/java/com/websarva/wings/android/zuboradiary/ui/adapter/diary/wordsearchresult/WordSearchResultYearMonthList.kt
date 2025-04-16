@@ -6,7 +6,7 @@ import java.time.YearMonth
 
 internal class WordSearchResultYearMonthList {
 
-    val wordSearchResultYearMonthListItemList: List<WordSearchResultYearMonthListItem>
+    val itemList: List<WordSearchResultYearMonthListItem>
 
     constructor(
         wordSearchResultDayList: WordSearchResultDayList,
@@ -16,7 +16,7 @@ internal class WordSearchResultYearMonthList {
 
         val itemList =
             createWordSearchResultYearMonthListItem(wordSearchResultDayList)
-        this.wordSearchResultYearMonthListItemList = addLastItem(itemList, needsNoDiaryMessage)
+        this.itemList = addLastItem(itemList, needsNoDiaryMessage)
     }
 
     constructor(
@@ -25,7 +25,7 @@ internal class WordSearchResultYearMonthList {
     ) {
         require(itemList.isNotEmpty())
 
-        this.wordSearchResultYearMonthListItemList = addLastItem(itemList, needsNoDiaryMessage)
+        this.itemList = addLastItem(itemList, needsNoDiaryMessage)
     }
 
     /**
@@ -34,11 +34,11 @@ internal class WordSearchResultYearMonthList {
      */
     constructor(needsNoDiaryMessage: Boolean) {
         val emptyList: List<WordSearchResultYearMonthListItem> = ArrayList()
-        this.wordSearchResultYearMonthListItemList = addLastItem(emptyList, needsNoDiaryMessage)
+        this.itemList = addLastItem(emptyList, needsNoDiaryMessage)
     }
 
     constructor() {
-        this.wordSearchResultYearMonthListItemList = ArrayList()
+        this.itemList = ArrayList()
     }
 
     private fun createWordSearchResultYearMonthListItem(
@@ -118,7 +118,7 @@ internal class WordSearchResultYearMonthList {
 
     fun countDiaries(): Int {
         var count = 0
-        for (item in wordSearchResultYearMonthListItemList) {
+        for (item in itemList) {
             if (item.viewType == DiaryYearMonthListBaseAdapter.ViewType.DIARY) {
                 count += item.wordSearchResultDayList.countDiaries()
             }
@@ -129,12 +129,12 @@ internal class WordSearchResultYearMonthList {
     fun combineDiaryLists(
         additionList: WordSearchResultYearMonthList, needsNoDiaryMessage: Boolean
     ): WordSearchResultYearMonthList {
-        require(additionList.wordSearchResultYearMonthListItemList.isNotEmpty())
+        require(additionList.itemList.isNotEmpty())
 
         val originalItemList: MutableList<WordSearchResultYearMonthListItem> =
-            wordSearchResultYearMonthListItemList.toMutableList()
+            itemList.toMutableList()
         val additionItemList: MutableList<WordSearchResultYearMonthListItem> =
-            additionList.wordSearchResultYearMonthListItemList.toMutableList()
+            additionList.itemList.toMutableList()
 
         // List最終アイテム(日記以外
         originalItemList.removeIf(DiaryYearMonthListBaseItem::isNotDiaryViewType)
@@ -146,7 +146,7 @@ internal class WordSearchResultYearMonthList {
         val originalListLastItemYearMonth = originalListLastItem.yearMonth
 
         // 追加リスト先頭アイテムの年月取得
-        val additionListFirstItem = additionList.wordSearchResultYearMonthListItemList[0]
+        val additionListFirstItem = additionList.itemList[0]
         val additionListFirstItemYearMonth = additionListFirstItem.yearMonth
 
         // 元リストに追加リストの年月が含まれていたらアイテムを足し込む
