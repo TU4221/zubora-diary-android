@@ -15,7 +15,7 @@ internal class WordSearchResultYearMonthListItem : DiaryYearMonthListBaseItem {
         yearMonth: YearMonth,
         wordSearchResultDayList: WordSearchResultDayList
     ) : super(yearMonth, DiaryYearMonthListBaseAdapter.ViewType.DIARY) {
-        require(wordSearchResultDayList.wordSearchResultDayListItemList.isNotEmpty())
+        require(wordSearchResultDayList.itemList.isNotEmpty())
 
         this.wordSearchResultDayList = wordSearchResultDayList
     }

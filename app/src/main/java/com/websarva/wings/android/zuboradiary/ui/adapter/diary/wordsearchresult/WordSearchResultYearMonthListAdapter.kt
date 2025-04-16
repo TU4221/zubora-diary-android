@@ -23,7 +23,7 @@ internal abstract class WordSearchResultYearMonthListAdapter(
         if (item !is WordSearchResultYearMonthListItem) throw IllegalStateException()
 
         val listAdapter = createWordSearchResultDayListAdapter(holder)
-        listAdapter.submitList(item.wordSearchResultDayList.wordSearchResultDayListItemList)
+        listAdapter.submitList(item.wordSearchResultDayList.itemList)
     }
 
     private fun createWordSearchResultDayListAdapter(
@@ -56,9 +56,9 @@ internal abstract class WordSearchResultYearMonthListAdapter(
 
             // 日
             val oldChildListSize =
-                oldItem.wordSearchResultDayList.wordSearchResultDayListItemList.size
+                oldItem.wordSearchResultDayList.itemList.size
             val newChildListSize =
-                newItem.wordSearchResultDayList.wordSearchResultDayListItemList.size
+                newItem.wordSearchResultDayList.itemList.size
             if (oldChildListSize != newChildListSize) {
                 Log.d(logTag, "areContentsTheSame()_ChildList_Size不一致")
                 return false
@@ -66,9 +66,9 @@ internal abstract class WordSearchResultYearMonthListAdapter(
 
             for (i in 0 until oldChildListSize) {
                 val oldChildListItem =
-                    oldItem.wordSearchResultDayList.wordSearchResultDayListItemList[i]
+                    oldItem.wordSearchResultDayList.itemList[i]
                 val newChildListItem =
-                    newItem.wordSearchResultDayList.wordSearchResultDayListItemList[i]
+                    newItem.wordSearchResultDayList.itemList[i]
                 Log.d(
                     logTag,
                     "areContentsTheSame()_oldChildListItem_Date:" + oldChildListItem.date

@@ -12,7 +12,7 @@ internal class WordSearchResultYearMonthList {
         wordSearchResultDayList: WordSearchResultDayList,
         needsNoDiaryMessage: Boolean
     ) {
-        require(wordSearchResultDayList.wordSearchResultDayListItemList.isNotEmpty())
+        require(wordSearchResultDayList.itemList.isNotEmpty())
 
         val itemList =
             createWordSearchResultYearMonthListItem(wordSearchResultDayList)
@@ -44,7 +44,7 @@ internal class WordSearchResultYearMonthList {
     private fun createWordSearchResultYearMonthListItem(
         wordSearchResultDayList: WordSearchResultDayList
     ): List<WordSearchResultYearMonthListItem> {
-        require(wordSearchResultDayList.wordSearchResultDayListItemList.isNotEmpty())
+        require(wordSearchResultDayList.itemList.isNotEmpty())
 
         var sortingDayItemList: MutableList<WordSearchResultDayListItem> = ArrayList()
         val resultYearMonthListItemList: MutableList<WordSearchResultYearMonthListItem> = ArrayList()
@@ -52,7 +52,7 @@ internal class WordSearchResultYearMonthList {
         var sortingYearMonth: YearMonth? = null
 
         // DayListItemを対象YearMonthListItem毎に仕分け
-        val resultDayListItemList = wordSearchResultDayList.wordSearchResultDayListItemList
+        val resultDayListItemList = wordSearchResultDayList.itemList
         for (day in resultDayListItemList) {
             val date = day.date
             val yearMonth = YearMonth.of(date.year, date.month)
