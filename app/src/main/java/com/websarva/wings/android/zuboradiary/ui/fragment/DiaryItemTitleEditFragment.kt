@@ -212,7 +212,7 @@ class DiaryItemTitleEditFragment : BaseFragment() {
                         checkNotNull(
                             binding.recyclerItemTitleSelectionHistory.adapter
                         ) as ItemTitleSelectionHistoryListAdapter
-                    adapter.submitList(value.selectionHistoryListItemList)
+                    adapter.submitList(value.itemList)
                 }
         }
     }

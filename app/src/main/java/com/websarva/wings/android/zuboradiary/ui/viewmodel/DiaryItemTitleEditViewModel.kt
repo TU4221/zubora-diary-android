@@ -94,10 +94,10 @@ internal class DiaryItemTitleEditViewModel @Inject constructor(
         Log.i(logTag, "${logMsg}_開始")
 
         val currentList = itemTitleSelectionHistoryList.value
-        val listSize = currentList.selectionHistoryListItemList.size
+        val listSize = currentList.itemList.size
         require(deletePosition < listSize)
 
-        val deleteItem = currentList.selectionHistoryListItemList[deletePosition]
+        val deleteItem = currentList.itemList[deletePosition]
         val deleteTitle = deleteItem.title
         try {
             diaryItemTitleSelectionHistoryRepository.deleteSelectionHistoryItem(deleteTitle)
