@@ -1,18 +1,17 @@
 package com.websarva.wings.android.zuboradiary.ui.adapter
 
-import android.annotation.SuppressLint
 import android.graphics.Canvas
 import android.util.Log
 import android.view.MotionEvent
 import android.view.View
-import android.view.View.OnTouchListener
 import androidx.interpolator.view.animation.FastOutSlowInInterpolator
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewbinding.ViewBinding
+import com.websarva.wings.android.zuboradiary.ui.view.custom.SwipeRecyclerView
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 
-internal open class LeftSwipeSimpleCallback(protected val recyclerView: RecyclerView) :
+internal open class LeftSwipeSimpleCallback(protected val recyclerView: SwipeRecyclerView) :
     ItemTouchHelper.SimpleCallback(ItemTouchHelper.ACTION_STATE_IDLE, ItemTouchHelper.LEFT) {
 
     private val logTag = createLogTag()
@@ -36,29 +35,19 @@ internal open class LeftSwipeSimpleCallback(protected val recyclerView: Recycler
         private set
     protected var swipedAdapterPosition: Int = initializePosition
     private var invalidSwipeAdapterPosition: Int = initializePosition
-    protected var previousMotionEvent: Int = initializePosition
 
+    private val previousMotionEventAction
+        get() = recyclerView.previousMotionEventAction
 
-    // TODO:
-    @SuppressLint("ClickableViewAccessibility")
     open fun build() {
         itemTouchHelper = ItemTouchHelper(this)
         itemTouchHelper.attachToRecyclerView(recyclerView)
-        recyclerView.setOnTouchListener(OnTouchSwipedItemListener())
+        recyclerView.setOnTouchUpListener(LeftSwipeRecyclerViewOnTouchUpListener())
     }
 
-    // TODO:
-    @SuppressLint("ClickableViewAccessibility")
-    protected open inner class OnTouchSwipedItemListener : OnTouchListener {
-        // MEMO:スワイプ状態はItemTouchHelperが効いていてonClickListenerが反応しない為、
-        //      onTouchListenerを使ってボタンの境界を判定して処理させる。
-        //      通常スワイプ時、ACTION_DOWN -> MOVE -> UPとなるが
-        //      未スワイプ状態からはACTION_DOWNは取得できず、ACTION_MOVE -> UPとなる。
-        override fun onTouch(v: View, event: MotionEvent): Boolean {
-            Log.d(logTag, "onTouch()_MotionEvent = " + event.action)
-            if (event.action == MotionEvent.ACTION_UP) clearInvalidSwipeViewHolder()
-            previousMotionEvent = event.action
-            return false
+    private inner class LeftSwipeRecyclerViewOnTouchUpListener : SwipeRecyclerView.OnTouchUpListener {
+        override fun onTouchUp() {
+            clearInvalidSwipeViewHolder()
         }
     }
 
@@ -131,7 +120,7 @@ internal open class LeftSwipeSimpleCallback(protected val recyclerView: Recycler
                 // MEMO:アニメーション中にスワイプしてそのままタッチを継続されると、
                 //      アニメーション終了後にスワイプ分、前面Viewが移動してしまう。
                 //      対策として、下記条件コード記述。
-                if (previousMotionEvent != MotionEvent.ACTION_UP) {
+                if (previousMotionEventAction != MotionEvent.ACTION_UP) {
                     invalidSwipeAdapterPosition = position
                     return@withEndAction
                 }

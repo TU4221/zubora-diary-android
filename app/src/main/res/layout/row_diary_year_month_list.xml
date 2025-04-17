@@ -9,7 +9,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
-    <androidx.recyclerview.widget.RecyclerView
+    <com.websarva.wings.android.zuboradiary.ui.view.custom.SwipeRecyclerView
         style="@style/DiaryListRecyclerViewStyle"
         android:id="@+id/recycler_day_list"
         android:layout_width="match_parent"

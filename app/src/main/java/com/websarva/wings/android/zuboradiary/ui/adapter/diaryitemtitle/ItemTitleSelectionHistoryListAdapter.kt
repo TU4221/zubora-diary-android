@@ -7,7 +7,6 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.ListAdapter
-import androidx.recyclerview.widget.RecyclerView
 import com.websarva.wings.android.zuboradiary.data.model.ThemeColor
 import com.websarva.wings.android.zuboradiary.databinding.RowBackgroundDeleteButtonFullWideBinding
 import com.websarva.wings.android.zuboradiary.databinding.RowItemTitleSelectionHistoryBinding
@@ -15,11 +14,12 @@ import com.websarva.wings.android.zuboradiary.ui.adapter.LeftSwipeSimpleCallback
 import com.websarva.wings.android.zuboradiary.ui.adapter.LeftSwipeSimpleCallback.LeftSwipeViewHolder
 import com.websarva.wings.android.zuboradiary.ui.theme.ThemeColorInflaterCreator
 import com.websarva.wings.android.zuboradiary.ui.adapter.diaryitemtitle.ItemTitleSelectionHistoryListAdapter.ItemTitleSelectionHistoryViewHolder
+import com.websarva.wings.android.zuboradiary.ui.view.custom.SwipeRecyclerView
 
 internal class ItemTitleSelectionHistoryListAdapter
     (
     private val context: Context,
-    private val recyclerView: RecyclerView,
+    private val recyclerView: SwipeRecyclerView,
     private val themeColor: ThemeColor
 ) :
     ListAdapter<SelectionHistoryListItem, ItemTitleSelectionHistoryViewHolder>(

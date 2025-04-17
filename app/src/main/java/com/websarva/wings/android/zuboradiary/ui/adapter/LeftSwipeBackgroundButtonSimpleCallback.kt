@@ -1,17 +1,17 @@
 package com.websarva.wings.android.zuboradiary.ui.adapter
 
-import android.annotation.SuppressLint
 import android.graphics.Rect
 import android.util.Log
 import android.view.MotionEvent
 import android.view.View
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
+import com.websarva.wings.android.zuboradiary.ui.view.custom.SwipeRecyclerView
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import kotlin.math.max
 import kotlin.math.min
 
-internal open class LeftSwipeBackgroundButtonSimpleCallback(recyclerView: RecyclerView) :
+internal open class LeftSwipeBackgroundButtonSimpleCallback(recyclerView: SwipeRecyclerView) :
     LeftSwipeSimpleCallback(recyclerView) {
 
     private val logTag = createLogTag()
@@ -20,35 +20,20 @@ internal open class LeftSwipeBackgroundButtonSimpleCallback(recyclerView: Recycl
 
     var isSwipeEnabled = true
 
-    // TODO:@SuppressLintを使用せず、DiaryEdit.CustomTextInputEditTextと同等に修正する？
-    @SuppressLint("ClickableViewAccessibility")
     override fun build() {
         super.build()
-        recyclerView.setOnTouchListener(CustomOnTouchSwipedItemListener())
+        recyclerView.setOnPerformClickListener(
+            LeftSwipeBackgroundButtonRecyclerViewOnPerformClickListener()
+        )
     }
 
-    // TODO:@SuppressLintを使用せず、DiaryEdit.CustomTextInputEditTextと同等に修正する？
-    @SuppressLint("ClickableViewAccessibility")
-    protected inner class CustomOnTouchSwipedItemListener : OnTouchSwipedItemListener() {
-        // MEMO:スワイプ状態はItemTouchHelperが効いていてonClickListenerが反応しない為、
-        //      onTouchListenerを使ってボタンの境界を判定して処理させる。
-        //      通常スワイプ時、ACTION_DOWN -> MOVE -> UPとなるが
-        //      未スワイプ状態からはACTION_DOWNは取得できず、ACTION_MOVE -> UPとなる。
-        override fun onTouch(v: View, event: MotionEvent): Boolean {
-            Log.d(logTag, "onTouch()_MotionEvent = " + event.action)
-            var result = false
-            if (event.action == MotionEvent.ACTION_UP) {
-                clearInvalidSwipeViewHolder()
-                // 疑似クリック処理
-                if (previousMotionEvent == MotionEvent.ACTION_DOWN) {
-                    result = onClickSwipedViewHolder(v, event)
-                }
-            }
-            previousMotionEvent = event.action
-            return result
+    private inner class LeftSwipeBackgroundButtonRecyclerViewOnPerformClickListener
+        : SwipeRecyclerView.OnPerformClickListener {
+        override fun onPerformClick(view: View, event: MotionEvent): Boolean {
+            return onClickSwipedViewHolder(view, event)
         }
 
-         private fun onClickSwipedViewHolder(v: View, event: MotionEvent): Boolean {
+        private fun onClickSwipedViewHolder(v: View, event: MotionEvent): Boolean {
             // タッチViewHolder取得
             val childView = recyclerView.findChildViewUnder(event.x, event.y) ?: return false
 

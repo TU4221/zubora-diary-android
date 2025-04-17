@@ -2,10 +2,11 @@ package com.websarva.wings.android.zuboradiary.ui.adapter.diary.diary
 
 import androidx.recyclerview.widget.RecyclerView
 import com.websarva.wings.android.zuboradiary.ui.adapter.LeftSwipeBackgroundButtonSimpleCallback
+import com.websarva.wings.android.zuboradiary.ui.view.custom.SwipeRecyclerView
 
 internal class DiaryListSimpleCallback(
     private val parentRecyclerView: RecyclerView,
-    recyclerView: RecyclerView
+    recyclerView: SwipeRecyclerView
 ) : LeftSwipeBackgroundButtonSimpleCallback(recyclerView) {
 
     override fun onSelectedChanged(viewHolder: RecyclerView.ViewHolder?, actionState: Int) {
