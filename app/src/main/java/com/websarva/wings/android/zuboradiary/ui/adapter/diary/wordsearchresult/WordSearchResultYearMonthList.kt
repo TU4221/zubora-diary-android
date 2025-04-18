@@ -22,7 +22,7 @@ internal class WordSearchResultYearMonthList {
         this.itemList = addLastItem(itemList, needsNoDiaryMessage)
     }
 
-    constructor(
+    private constructor(
         itemList: List<WordSearchResultYearMonthListItem>,
         needsNoDiaryMessage: Boolean
     ) {
