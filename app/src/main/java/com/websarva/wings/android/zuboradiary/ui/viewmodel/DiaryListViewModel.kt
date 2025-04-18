@@ -88,7 +88,7 @@ internal class DiaryListViewModel @Inject constructor(private val diaryRepositor
 
     suspend fun loadDiaryListOnSetUp() {
         val diaryList = this.diaryList.value
-        if (diaryList.itemList.isEmpty()) {
+        if (diaryList.isEmpty) {
             val numSavedDiaries = diaryRepository.countDiaries()
             if (numSavedDiaries >= 1) loadNewDiaryList()
         } else {
@@ -170,7 +170,7 @@ internal class DiaryListViewModel @Inject constructor(private val diaryRepositor
         @Throws(CancellationException::class)
         override suspend fun create(): DiaryYearMonthList {
             val currentDiaryList = _diaryList.requireValue()
-            check(currentDiaryList.itemList.isNotEmpty())
+            check(currentDiaryList.isNotEmpty)
 
             if (isValidityDelay) delay(1000)
             val loadingOffset = currentDiaryList.countDiaries()
@@ -187,7 +187,7 @@ internal class DiaryListViewModel @Inject constructor(private val diaryRepositor
         @Throws(Exception::class)
         override suspend fun create(): DiaryYearMonthList {
             val currentDiaryList = _diaryList.requireValue()
-            check(currentDiaryList.itemList.isNotEmpty())
+            check(currentDiaryList.isNotEmpty)
 
             _isVisibleUpdateProgressBar.value = true
             try {

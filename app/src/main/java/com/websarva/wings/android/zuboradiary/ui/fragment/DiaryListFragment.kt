@@ -237,10 +237,9 @@ class DiaryListFragment : BaseFragment() {
         }
 
         private fun setUpListViewVisibility(list: DiaryYearMonthList) {
-            val isNoDiary = list.itemList.isEmpty()
             val noDiaryMessageVisibility: Int
             val diaryListVisibility: Int
-            if (isNoDiary) {
+            if (list.isEmpty) {
                 noDiaryMessageVisibility = View.VISIBLE
                 diaryListVisibility = View.INVISIBLE
             } else {

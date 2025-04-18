@@ -8,6 +8,9 @@ internal class DiaryYearMonthList {
 
     val itemList: List<DiaryYearMonthListItem>
 
+    val isEmpty get() = itemList.isEmpty()
+    val isNotEmpty get() = itemList.isNotEmpty()
+
     constructor(diaryDayList: DiaryDayList, needsNoDiaryMessage: Boolean) {
         require(diaryDayList.isNotEmpty)
 
@@ -104,7 +107,7 @@ internal class DiaryYearMonthList {
     fun combineDiaryLists(
         additionList: DiaryYearMonthList, needsNoDiaryMessage: Boolean
     ): DiaryYearMonthList {
-        require(additionList.itemList.isNotEmpty())
+        require(additionList.isNotEmpty)
 
         val originalItemList: MutableList<DiaryYearMonthListItem> =
             itemList.toMutableList()
