@@ -204,7 +204,7 @@ class WordSearchFragment : BaseFragment() {
                     textNoWordSearchResultsMessage.visibility = View.INVISIBLE
                     linerLayoutWordSearchResults.visibility = View.INVISIBLE
                 }
-            } else if (value.itemList.isEmpty()) {
+            } else if (value.isEmpty) {
                 binding.apply {
                     textNoWordSearchResultsMessage.visibility = View.VISIBLE
                     linerLayoutWordSearchResults.visibility = View.INVISIBLE
@@ -224,7 +224,7 @@ class WordSearchFragment : BaseFragment() {
 
     private fun updateWordSearchResultList() {
         val list = mainViewModel.wordSearchResultList.value
-        if (list.itemList.isEmpty()) return
+        if (list.isEmpty) return
         mainViewModel.updateWordSearchResultList(resultWordColor, resultWordBackgroundColor)
     }
 

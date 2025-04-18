@@ -8,6 +8,9 @@ internal class WordSearchResultYearMonthList {
 
     val itemList: List<WordSearchResultYearMonthListItem>
 
+    val isEmpty get() = itemList.isEmpty()
+    val isNotEmpty get() = itemList.isNotEmpty()
+
     constructor(
         wordSearchResultDayList: WordSearchResultDayList,
         needsNoDiaryMessage: Boolean
@@ -129,7 +132,7 @@ internal class WordSearchResultYearMonthList {
     fun combineDiaryLists(
         additionList: WordSearchResultYearMonthList, needsNoDiaryMessage: Boolean
     ): WordSearchResultYearMonthList {
-        require(additionList.itemList.isNotEmpty())
+        require(additionList.isNotEmpty)
 
         val originalItemList: MutableList<WordSearchResultYearMonthListItem> =
             itemList.toMutableList()
