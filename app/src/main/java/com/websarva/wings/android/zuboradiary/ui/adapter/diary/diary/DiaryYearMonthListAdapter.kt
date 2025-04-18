@@ -71,9 +71,8 @@ internal abstract class DiaryYearMonthListAdapter(
                 if (oldItem !is DiaryYearMonthListItem) throw IllegalStateException()
                 if (newItem !is DiaryYearMonthListItem) throw IllegalStateException()
 
-                // 日
-                if (oldItem.diaryDayList != newItem.diaryDayList) {
-                    Log.d(logTag, "areContentsTheSame()_ChildList_不一致")
+                if (oldItem.areContentsTheSame(newItem)) {
+                    Log.d(logTag, "areContentsTheSame()_不一致")
                     return false
                 }
 

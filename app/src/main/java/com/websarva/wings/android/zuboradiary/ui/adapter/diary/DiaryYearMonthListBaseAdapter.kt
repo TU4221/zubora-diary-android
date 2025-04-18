@@ -167,11 +167,11 @@ internal abstract class DiaryYearMonthListBaseAdapter protected constructor(
                     "areItemsTheSame()_newItem.yearMonth = " + newItem.yearMonth
                 )
 
-                // ViewType
-                if (oldItem.viewType != newItem.viewType) {
-                    Log.d(logTag, "areItemsTheSame()_ViewType不一致")
+                if (oldItem.areItemsTheSame(newItem)) {
+                    Log.d(logTag, "areItemsTheSame()_不一致")
                     return false
                 }
+
                 // HACK:RecyclerViewの初回アイテム表示時にスクロール初期位置がズレる事がある。
                 //      原因はプログレスバーの存在。最初にアイテムを表示する時、読込中の意味を込めてプログレスバーのみを表示させている。
                 //      スクロール読込機能の仕様により、読込データをRecyclerViewに表示する際、アイテムリスト末尾にプログレスバーを追加している。
@@ -180,12 +180,6 @@ internal abstract class DiaryYearMonthListBaseAdapter protected constructor(
                 //      プログレスバー同士が同一アイテムと認識されないようにするために、下記条件を追加して対策。
                 if (oldItem.viewType == ViewType.PROGRESS_INDICATOR) {
                     Log.d(logTag, "areItemsTheSame()_ViewType = ProgressIndicator(不一致)")
-                    return false
-                }
-
-                // 年月
-                if (oldItem.yearMonth != newItem.yearMonth) {
-                    Log.d(logTag, "areItemsTheSame()_YearMonth不一致")
                     return false
                 }
 

@@ -54,8 +54,8 @@ internal abstract class WordSearchResultYearMonthListAdapter(
             if (oldItem !is WordSearchResultYearMonthListItem) throw IllegalStateException()
             if (newItem !is WordSearchResultYearMonthListItem) throw IllegalStateException()
 
-            if (oldItem.wordSearchResultDayList != newItem.wordSearchResultDayList) {
-                Log.d(logTag, "areContentsTheSame()_ChildList_不一致")
+            if (!oldItem.areContentsTheSame(newItem)) {
+                Log.d(logTag, "areContentsTheSame()_不一致")
                 return false
             }
 
