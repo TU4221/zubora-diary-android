@@ -54,38 +54,11 @@ internal abstract class WordSearchResultYearMonthListAdapter(
             if (oldItem !is WordSearchResultYearMonthListItem) throw IllegalStateException()
             if (newItem !is WordSearchResultYearMonthListItem) throw IllegalStateException()
 
-            // 日
-            val oldChildListSize =
-                oldItem.wordSearchResultDayList.itemList.size
-            val newChildListSize =
-                newItem.wordSearchResultDayList.itemList.size
-            if (oldChildListSize != newChildListSize) {
-                Log.d(logTag, "areContentsTheSame()_ChildList_Size不一致")
+            if (oldItem.wordSearchResultDayList != newItem.wordSearchResultDayList) {
+                Log.d(logTag, "areContentsTheSame()_ChildList_不一致")
                 return false
             }
 
-            for (i in 0 until oldChildListSize) {
-                val oldChildListItem =
-                    oldItem.wordSearchResultDayList.itemList[i]
-                val newChildListItem =
-                    newItem.wordSearchResultDayList.itemList[i]
-                Log.d(
-                    logTag,
-                    "areContentsTheSame()_oldChildListItem_Date:" + oldChildListItem.date
-                )
-                Log.d(
-                    logTag,
-                    "areContentsTheSame()_newChildListItem_Date:" + newChildListItem.date
-                )
-
-                if (oldChildListItem != newChildListItem) {
-                    Log.d(
-                        logTag,
-                        "areContentsTheSame()_newChildListItem_不一致"
-                    )
-                    return false
-                }
-            }
             Log.d(logTag, "areContentsTheSame()_全項目一致")
             return true
         }

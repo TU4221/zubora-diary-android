@@ -11,6 +11,17 @@ internal class WordSearchResultDayList {
 
     constructor() : this(ArrayList())
 
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is WordSearchResultDayList) return false
+
+        return itemList == other.itemList
+    }
+
+    override fun hashCode(): Int {
+        return itemList.hashCode()
+    }
+
     fun countDiaries(): Int {
         return itemList.size
     }
