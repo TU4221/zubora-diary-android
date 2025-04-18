@@ -72,22 +72,11 @@ internal abstract class DiaryYearMonthListAdapter(
                 if (newItem !is DiaryYearMonthListItem) throw IllegalStateException()
 
                 // 日
-                val oldChildListSize = oldItem.diaryDayList.itemList.size
-                val newChildListSize = newItem.diaryDayList.itemList.size
-                if (oldChildListSize != newChildListSize) {
-                    Log.d(logTag, "areContentsTheSame()_ChildList_Size不一致")
+                if (oldItem.diaryDayList != newItem.diaryDayList) {
+                    Log.d(logTag, "areContentsTheSame()_ChildList_不一致")
                     return false
                 }
 
-                for (i in 0 until oldChildListSize) {
-                    val oldChildListItem = oldItem.diaryDayList.itemList[i]
-                    val newChildListItem = newItem.diaryDayList.itemList[i]
-
-                    if (oldChildListItem != newChildListItem) {
-                        Log.d(logTag, "areContentsTheSame()_ChildList_不一致")
-                        return false
-                    }
-                }
                 Log.d(logTag, "areContentsTheSame()_全項目一致")
                 return true
             }

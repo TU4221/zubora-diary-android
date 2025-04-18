@@ -14,6 +14,17 @@ internal class DiaryDayList {
         this.itemList = ArrayList()
     }
 
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is DiaryDayList) return false
+
+        return itemList == other.itemList
+    }
+
+    override fun hashCode(): Int {
+        return itemList.hashCode()
+    }
+
     fun countDiaries(): Int {
         return itemList.size
     }
