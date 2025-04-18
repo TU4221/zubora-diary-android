@@ -1,28 +1,16 @@
 package com.websarva.wings.android.zuboradiary.data.preferences
 
-import androidx.datastore.preferences.core.MutablePreferences
-import androidx.datastore.preferences.core.Preferences
-import androidx.datastore.preferences.core.booleanPreferencesKey
-import androidx.datastore.preferences.core.stringPreferencesKey
 import java.time.LocalTime
 
 class ReminderNotificationPreference {
 
-    // MEMO:@Suppress("unused")が不要と警告が発生したので削除したが、"unused"警告が再発する。
-    //      その為、@Suppress("RedundantSuppression")で警告回避。
-    @Suppress("unused", "RedundantSuppression") // MEMO:デフォルトパラメータで使用する為、@Suppressで警告回避。
     companion object {
-        private const val IS_CHECKED_DEFAULT_VALUE = false
-        private const val NOTIFICATION_TIME_DEFAULT_VALUE = ""
+        const val IS_CHECKED_DEFAULT_VALUE = false
+        const val NOTIFICATION_TIME_DEFAULT_VALUE = ""
     }
 
-    private val isCheckedPreferenceKey =
-        booleanPreferencesKey("is_checked_reminder_notification")
-    private val notificationTimePreferenceKey =
-        stringPreferencesKey("reminder_notification_time")
-
     val isChecked: Boolean
-    private val notificationTimeString: String
+    val notificationTimeString: String
 
     val notificationLocalTime: LocalTime?
         get() {
@@ -30,7 +18,6 @@ class ReminderNotificationPreference {
             return LocalTime.parse(notificationTimeString)
         }
 
-    // MEMO:初回読込は"null"が返ってくるので、その場合は初期値を返す。(他のPreferenceValueも同様)
     constructor(isChecked: Boolean, notificationTime: LocalTime? = null) {
         if (isChecked) require(notificationTime != null)
 
@@ -42,35 +29,17 @@ class ReminderNotificationPreference {
         }
     }
 
-    constructor(preferences: Preferences) {
-        var isChecked = preferences[isCheckedPreferenceKey]
-        var notificationTimeString = preferences[notificationTimePreferenceKey]
-        if (isChecked == null || notificationTimeString == null) {
-            isChecked = IS_CHECKED_DEFAULT_VALUE
-            notificationTimeString = NOTIFICATION_TIME_DEFAULT_VALUE
+    constructor(isChecked: Boolean, notificationTimeString: String) {
+        if (isChecked) {
+            // 時間文字列形式確認
+            LocalTime.parse(notificationTimeString)
+        } else {
+            require(notificationTimeString.matches("".toRegex()))
         }
+
         this.isChecked = isChecked
         this.notificationTimeString = notificationTimeString
     }
 
-    @JvmOverloads
-    constructor(
-        isChecked: Boolean = IS_CHECKED_DEFAULT_VALUE,
-        notificationTime: String = NOTIFICATION_TIME_DEFAULT_VALUE
-    ) {
-        if (isChecked) {
-            // 時間文字列形式確認
-            LocalTime.parse(notificationTime)
-        } else {
-            require(notificationTime.matches("".toRegex()))
-        }
-
-        this.isChecked = isChecked
-        this.notificationTimeString = notificationTime
-    }
-
-    fun applyTo(mutablePreferences: MutablePreferences) {
-        mutablePreferences[isCheckedPreferenceKey] = isChecked
-        mutablePreferences[notificationTimePreferenceKey] = notificationTimeString
-    }
+    constructor(): this(IS_CHECKED_DEFAULT_VALUE, NOTIFICATION_TIME_DEFAULT_VALUE)
 }

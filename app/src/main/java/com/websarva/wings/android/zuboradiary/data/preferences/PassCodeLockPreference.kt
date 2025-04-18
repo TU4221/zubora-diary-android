@@ -1,50 +1,23 @@
 package com.websarva.wings.android.zuboradiary.data.preferences
 
-import androidx.datastore.preferences.core.MutablePreferences
-import androidx.datastore.preferences.core.Preferences
-import androidx.datastore.preferences.core.booleanPreferencesKey
-import androidx.datastore.preferences.core.stringPreferencesKey
-
 class PassCodeLockPreference {
 
-    // MEMO:@Suppress("unused")が不要と警告が発生したので削除したが、"unused"警告が再発する。
-    //      その為、@Suppress("RedundantSuppression")で警告回避。
-    @Suppress("unused", "RedundantSuppression") // MEMO:デフォルトパラメータで使用する為、@Suppressで警告回避。
     companion object {
-        private const val IS_CHECKED_DEFAULT_VALUE = false
-        private const val PASS_CODE_DEFAULT_VALUE = ""
+        const val IS_CHECKED_DEFAULT_VALUE = false
+        const val PASS_CODE_DEFAULT_VALUE = ""
     }
-
-    private val isCheckedPreferenceKey = booleanPreferencesKey("is_checked_passcode_lock")
-    private val passcodePreferenceKey = stringPreferencesKey("passcode")
 
     val isChecked: Boolean
     val passCode: String
 
-    // MEMO:初回読込は"null"が返ってくるので、その場合は初期値を返す。(他のPreferenceValueも同様)
-    constructor(preferences: Preferences) {
-        var isChecked = preferences[isCheckedPreferenceKey]
-        var passCode = preferences[passcodePreferenceKey]
-        if (isChecked == null || passCode == null) {
-            isChecked = IS_CHECKED_DEFAULT_VALUE
-            passCode = PASS_CODE_DEFAULT_VALUE
-        }
+    constructor(isChecked: Boolean, passCode: String) {
         require(checkLegalArgument(isChecked, passCode))
 
         this.isChecked = isChecked
         this.passCode = passCode
     }
 
-    @JvmOverloads
-    constructor(
-        isChecked: Boolean = IS_CHECKED_DEFAULT_VALUE,
-        passCode: String = PASS_CODE_DEFAULT_VALUE
-    ) {
-        require(checkLegalArgument(isChecked, passCode))
-
-        this.isChecked = isChecked
-        this.passCode = passCode
-    }
+    constructor(): this(IS_CHECKED_DEFAULT_VALUE, PASS_CODE_DEFAULT_VALUE)
 
     private fun checkLegalArgument(
         isChecked: Boolean,
@@ -55,10 +28,5 @@ class PassCodeLockPreference {
         } else {
             passCode.matches("".toRegex())
         }
-    }
-
-    fun applyTo(mutablePreferences: MutablePreferences) {
-        mutablePreferences[isCheckedPreferenceKey] = isChecked
-        mutablePreferences[passcodePreferenceKey] = passCode
     }
 }

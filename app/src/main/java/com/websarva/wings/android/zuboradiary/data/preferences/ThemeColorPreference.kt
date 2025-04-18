@@ -1,39 +1,28 @@
 package com.websarva.wings.android.zuboradiary.data.preferences
 
-import androidx.datastore.preferences.core.MutablePreferences
-import androidx.datastore.preferences.core.Preferences
-import androidx.datastore.preferences.core.intPreferencesKey
 import com.websarva.wings.android.zuboradiary.data.model.ThemeColor
 
 
 class ThemeColorPreference {
 
-    // MEMO:@Suppress("unused")が不要と警告が発生したので削除したが、"unused"警告が再発する。
-    //      その為、@Suppress("RedundantSuppression")で警告回避。
-    @Suppress("unused", "RedundantSuppression") // MEMO:デフォルトパラメータで使用する為、@Suppressで警告回避。
     companion object {
-        private val THEME_COLOR_DEFAULT_VALUE = ThemeColor.entries[0]
+        val THEME_COLOR_DEFAULT_VALUE = ThemeColor.entries[0].toNumber()
     }
 
-    private val themeColorPreferenceKey = intPreferencesKey("theme_color")
-
-    private val themeColorNumber: Int
+    val themeColorNumber: Int
 
     val themeColor: ThemeColor
         get() = ThemeColor.of(themeColorNumber)
 
-    // MEMO:初回読込は"null"が返ってくるので、その場合は初期値を返す。(他のPreferenceValueも同様)
-    constructor(preferences: Preferences) {
-        this.themeColorNumber =
-            preferences[themeColorPreferenceKey] ?: THEME_COLOR_DEFAULT_VALUE.toNumber()
+    constructor(themeColorNumber: Int) {
+        ThemeColor.of(themeColorNumber)
+
+        this.themeColorNumber = themeColorNumber
     }
 
-    @JvmOverloads
-    constructor(themeColor: ThemeColor = THEME_COLOR_DEFAULT_VALUE) {
+    constructor(themeColor: ThemeColor) {
         this.themeColorNumber = themeColor.toNumber()
     }
 
-    fun applyTo(mutablePreferences: MutablePreferences) {
-        mutablePreferences[themeColorPreferenceKey] = themeColorNumber
-    }
+    constructor(): this(THEME_COLOR_DEFAULT_VALUE)
 }

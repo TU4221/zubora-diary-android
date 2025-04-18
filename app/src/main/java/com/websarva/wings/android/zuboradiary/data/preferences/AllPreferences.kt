@@ -1,19 +1,9 @@
 package com.websarva.wings.android.zuboradiary.data.preferences
 
-import androidx.datastore.preferences.core.Preferences
-
-class AllPreferences(preferences: Preferences) {
-
-    val themeColorPreference: ThemeColorPreference = ThemeColorPreference(preferences)
-
-    val calendarStartDayOfWeekPreference: CalendarStartDayOfWeekPreference =
-        CalendarStartDayOfWeekPreference(preferences)
-
-    val reminderNotificationPreference: ReminderNotificationPreference =
-        ReminderNotificationPreference(preferences)
-
-    val passcodeLockPreference: PassCodeLockPreference = PassCodeLockPreference(preferences)
-
-    val weatherInfoAcquisitionPreference: WeatherInfoAcquisitionPreference =
-        WeatherInfoAcquisitionPreference(preferences)
-}
+data class AllPreferences(
+    val themeColorPreference: ThemeColorPreference,
+    val calendarStartDayOfWeekPreference: CalendarStartDayOfWeekPreference,
+    val reminderNotificationPreference: ReminderNotificationPreference,
+    val passcodeLockPreference: PassCodeLockPreference,
+    val weatherInfoAcquisitionPreference: WeatherInfoAcquisitionPreference,
+)

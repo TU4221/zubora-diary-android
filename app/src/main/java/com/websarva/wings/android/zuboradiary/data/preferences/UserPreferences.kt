@@ -4,9 +4,13 @@ import android.content.Context
 import android.util.Log
 import androidx.datastore.core.DataStore
 import androidx.datastore.core.IOException
+import androidx.datastore.preferences.core.MutablePreferences
 import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.emptyPreferences
+import androidx.datastore.preferences.core.intPreferencesKey
+import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import kotlinx.coroutines.flow.Flow
@@ -23,6 +27,23 @@ class UserPreferences @Inject constructor(private val context: Context) {
 
     private val logTag = createLogTag()
 
+    private val themeColorPreferenceKey = intPreferencesKey("theme_color")
+
+    private val calendarStartDayOfWeekPreferenceKey =
+        intPreferencesKey("calendar_start_day_of_week")
+
+    private val isCheckedReminderNotificationPreferenceKey =
+        booleanPreferencesKey("is_checked_reminder_notification")
+    private val reminderNotificationTimePreferenceKey =
+        stringPreferencesKey("reminder_notification_time")
+
+    private val isCheckedPasscodeLockPreferenceKey =
+        booleanPreferencesKey("is_checked_passcode_lock")
+    private val passcodePreferenceKey = stringPreferencesKey("passcode")
+
+    private val isCheckedWeatherInfoAcquisitionPreferenceKey =
+        booleanPreferencesKey("is_checked_weather_info_acquisition")
+
     @Throws(Throwable::class)
     fun loadAllPreferences(): Flow<AllPreferences> {
         return context.dataStore.data
@@ -35,8 +56,61 @@ class UserPreferences @Inject constructor(private val context: Context) {
                 }
             }
             .map { preferences ->
-                AllPreferences(preferences)
+                AllPreferences(
+                    createThemeColorPreference(preferences),
+                    createCalendarStartDayOfWeekPreference(preferences),
+                    createReminderNotificationPreference(preferences),
+                    createPasscodeLockPreference(preferences),
+                    createWeatherInfoAcquisitionPreference(preferences)
+                )
             }
+    }
+
+    private fun createThemeColorPreference(preferences: Preferences): ThemeColorPreference {
+        val themeColorNumber =
+            preferences[themeColorPreferenceKey]
+                ?: ThemeColorPreference.THEME_COLOR_DEFAULT_VALUE
+        return ThemeColorPreference(themeColorNumber)
+    }
+
+    private fun createCalendarStartDayOfWeekPreference(
+        preferences: Preferences
+    ): CalendarStartDayOfWeekPreference {
+        val dayOfWeekNumber =
+            preferences[calendarStartDayOfWeekPreferenceKey]
+                ?: CalendarStartDayOfWeekPreference.DAY_OF_WEEK_DEFAULT_VALUE
+        return CalendarStartDayOfWeekPreference(dayOfWeekNumber)
+    }
+
+    private fun createReminderNotificationPreference(
+        preferences: Preferences
+    ): ReminderNotificationPreference {
+        var isCheckedReminder = preferences[isCheckedReminderNotificationPreferenceKey]
+        var notificationTimeString = preferences[reminderNotificationTimePreferenceKey]
+        if (isCheckedReminder == null || notificationTimeString == null) {
+            isCheckedReminder = ReminderNotificationPreference.IS_CHECKED_DEFAULT_VALUE
+            notificationTimeString = ReminderNotificationPreference.NOTIFICATION_TIME_DEFAULT_VALUE
+        }
+        return ReminderNotificationPreference(isCheckedReminder, notificationTimeString)
+    }
+
+    private fun createPasscodeLockPreference(preferences: Preferences): PassCodeLockPreference {
+        var isCheckedPasscode = preferences[isCheckedPasscodeLockPreferenceKey]
+        var passCode = preferences[passcodePreferenceKey]
+        if (isCheckedPasscode == null || passCode == null) {
+            isCheckedPasscode = PassCodeLockPreference.IS_CHECKED_DEFAULT_VALUE
+            passCode = PassCodeLockPreference.PASS_CODE_DEFAULT_VALUE
+        }
+        return PassCodeLockPreference(isCheckedPasscode, passCode)
+    }
+
+    private fun createWeatherInfoAcquisitionPreference(
+        preferences: Preferences
+    ): WeatherInfoAcquisitionPreference {
+        val isCheckedWeather =
+            preferences[isCheckedWeatherInfoAcquisitionPreferenceKey]
+                ?: WeatherInfoAcquisitionPreference.IS_CHECKED_DEFAULT_VALUE
+        return WeatherInfoAcquisitionPreference(isCheckedWeather)
     }
 
     @Throws(
@@ -45,8 +119,15 @@ class UserPreferences @Inject constructor(private val context: Context) {
     )
     suspend fun saveThemeColorPreference(value: ThemeColorPreference) {
         context.dataStore.edit { preferences ->
-            value.applyTo(preferences)
+            saveThemeColorPreferenceValue(preferences, value)
         }
+    }
+
+    private fun saveThemeColorPreferenceValue(
+        preferences: MutablePreferences,
+        value: ThemeColorPreference
+    ) {
+        preferences[themeColorPreferenceKey] = value.themeColorNumber
     }
 
     @Throws(
@@ -55,8 +136,15 @@ class UserPreferences @Inject constructor(private val context: Context) {
     )
     suspend fun saveCalendarStartDayOfWeekPreference(value: CalendarStartDayOfWeekPreference) {
         context.dataStore.edit { preferences ->
-            value.applyTo(preferences)
+            saveCalendarStartDayOfWeekPreferenceValue(preferences, value)
         }
+    }
+
+    private fun saveCalendarStartDayOfWeekPreferenceValue(
+        preferences: MutablePreferences,
+        value: CalendarStartDayOfWeekPreference
+    ) {
+        preferences[calendarStartDayOfWeekPreferenceKey] = value.dayOfWeekNumber
     }
 
     @Throws(
@@ -65,8 +153,16 @@ class UserPreferences @Inject constructor(private val context: Context) {
     )
     suspend fun saveReminderNotificationPreference(value: ReminderNotificationPreference) {
         context.dataStore.edit { preferences ->
-            value.applyTo(preferences)
+            saveReminderNotificationPreferenceValue(preferences, value)
         }
+    }
+
+    private fun saveReminderNotificationPreferenceValue(
+        preferences: MutablePreferences,
+        value: ReminderNotificationPreference
+    ) {
+        preferences[isCheckedReminderNotificationPreferenceKey] = value.isChecked
+        preferences[reminderNotificationTimePreferenceKey] = value.notificationTimeString
     }
 
     @Throws(
@@ -75,8 +171,16 @@ class UserPreferences @Inject constructor(private val context: Context) {
     )
     suspend fun savePasscodeLockPreference(value: PassCodeLockPreference) {
         context.dataStore.edit { preferences ->
-            value.applyTo(preferences)
+            savePasscodeLockPreferenceValue(preferences, value)
         }
+    }
+
+    private fun savePasscodeLockPreferenceValue(
+        preferences: MutablePreferences,
+        value: PassCodeLockPreference
+    ) {
+        preferences[isCheckedPasscodeLockPreferenceKey] = value.isChecked
+        preferences[passcodePreferenceKey] = value.passCode
     }
 
     @Throws(
@@ -85,18 +189,24 @@ class UserPreferences @Inject constructor(private val context: Context) {
     )
     suspend fun saveWeatherInfoAcquisitionPreference(value: WeatherInfoAcquisitionPreference) {
         context.dataStore.edit { preferences ->
-            value.applyTo(preferences)
+            saveWeatherInfoAcquisitionPreferenceValue(preferences, value)
         }
     }
 
+    private fun saveWeatherInfoAcquisitionPreferenceValue(
+        preferences: MutablePreferences,
+        value: WeatherInfoAcquisitionPreference
+    ) {
+        preferences[isCheckedWeatherInfoAcquisitionPreferenceKey] = value.isChecked
+    }
 
     suspend fun initializeAllPreferences() {
         context.dataStore.edit { preferences ->
-            ThemeColorPreference().applyTo(preferences)
-            CalendarStartDayOfWeekPreference().applyTo(preferences)
-            ReminderNotificationPreference().applyTo(preferences)
-            PassCodeLockPreference().applyTo(preferences)
-            WeatherInfoAcquisitionPreference().applyTo(preferences)
+            saveThemeColorPreferenceValue(preferences, ThemeColorPreference())
+            saveCalendarStartDayOfWeekPreferenceValue(preferences, CalendarStartDayOfWeekPreference())
+            saveReminderNotificationPreferenceValue(preferences, ReminderNotificationPreference())
+            savePasscodeLockPreferenceValue(preferences, PassCodeLockPreference())
+            saveWeatherInfoAcquisitionPreferenceValue(preferences, WeatherInfoAcquisitionPreference())
         }
     }
 }

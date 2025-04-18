@@ -1,34 +1,16 @@
 package com.websarva.wings.android.zuboradiary.data.preferences
 
-import androidx.datastore.preferences.core.MutablePreferences
-import androidx.datastore.preferences.core.Preferences
-import androidx.datastore.preferences.core.booleanPreferencesKey
-
 class WeatherInfoAcquisitionPreference {
 
-    // MEMO:@Suppress("unused")が不要と警告が発生したので削除したが、"unused"警告が再発する。
-    //      その為、@Suppress("RedundantSuppression")で警告回避。
-    @Suppress("unused", "RedundantSuppression") // MEMO:デフォルトパラメータで使用する為、@Suppressで警告回避。
     companion object {
-        private const val IS_CHECKED_DEFAULT_VALUE = false
+        const val IS_CHECKED_DEFAULT_VALUE = false
     }
-
-    private val isCheckedPreferenceKey =
-        booleanPreferencesKey("is_checked_weather_info_acquisition")
 
     val isChecked: Boolean
 
-    // MEMO:初回読込は"null"が返ってくるので、その場合は初期値を返す。(他のPreferenceValueも同様)
-    constructor(preferences: Preferences) {
-        this.isChecked = preferences[isCheckedPreferenceKey] ?: IS_CHECKED_DEFAULT_VALUE
-    }
-
-    @JvmOverloads
-    constructor(isChecked: Boolean = IS_CHECKED_DEFAULT_VALUE) {
+    constructor(isChecked: Boolean) {
         this.isChecked = isChecked
     }
 
-    fun applyTo(mutablePreferences: MutablePreferences) {
-        mutablePreferences[isCheckedPreferenceKey] = isChecked
-    }
+    constructor(): this(IS_CHECKED_DEFAULT_VALUE)
 }
