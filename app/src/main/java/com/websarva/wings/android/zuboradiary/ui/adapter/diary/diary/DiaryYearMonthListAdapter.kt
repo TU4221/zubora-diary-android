@@ -82,26 +82,9 @@ internal abstract class DiaryYearMonthListAdapter(
                 for (i in 0 until oldChildListSize) {
                     val oldChildListItem = oldItem.diaryDayList.itemList[i]
                     val newChildListItem = newItem.diaryDayList.itemList[i]
-                    if (oldChildListItem.date != newChildListItem.date) {
-                        Log.d(logTag, "areContentsTheSame()_ChildListItem_Date不一致")
-                        return false
-                    }
-                    if (oldChildListItem.title != newChildListItem.title) {
-                        Log.d(logTag, "areContentsTheSame()ChildListItem_Title不一致")
-                        return false
-                    }
-                    if (oldChildListItem.picturePath == null && newChildListItem.picturePath != null) {
-                        Log.d(logTag, "areContentsTheSame()ChildListItem_PicturePath不一致")
-                        return false
-                    }
-                    if (oldChildListItem.picturePath != null && newChildListItem.picturePath == null) {
-                        Log.d(logTag, "areContentsTheSame()ChildListItem_PicturePath不一致")
-                        return false
-                    }
-                    if ((oldChildListItem.picturePath != null/* && newChildListItem.picturePath != null*/)
-                        && (oldChildListItem.picturePath != newChildListItem.picturePath)
-                    ) {
-                        Log.d(logTag, "areContentsTheSame()ChildListItem_PicturePath不一致")
+
+                    if (oldChildListItem != newChildListItem) {
+                        Log.d(logTag, "areContentsTheSame()_ChildList_不一致")
                         return false
                     }
                 }

@@ -89,20 +89,8 @@ internal class WordSearchResultDayListAdapter(
             if (oldItem !is WordSearchResultDayListItem) throw IllegalStateException()
             if (newItem !is WordSearchResultDayListItem) throw IllegalStateException()
 
-            if (oldItem.title != newItem.title) {
-                Log.d(logTag, "areContentsTheSame()_Title不一致")
-                return false
-            }
-            if (oldItem.itemNumber !== newItem.itemNumber) {
-                Log.d(logTag, "areContentsTheSame()_ItemNumber不一致")
-                return false
-            }
-            if (oldItem.itemTitle != newItem.itemTitle) {
-                Log.d(logTag, "areContentsTheSame()_ItemTitle不一致")
-                return false
-            }
-            if (oldItem.itemComment != newItem.itemComment) {
-                Log.d(logTag, "areContentsTheSame()_ItemComment不一致")
+            if (!oldItem.areContentsTheSame(newItem)) {
+                Log.d(logTag, "areContentsTheSame()_不一致")
                 return false
             }
 

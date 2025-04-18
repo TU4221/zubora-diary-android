@@ -76,7 +76,7 @@ internal abstract class DiaryDayListBaseAdapter protected constructor(
             Log.d(logTag, "oldItem_Date = " + oldItem.date)
             Log.d(logTag, "newItem_Date = " + newItem.date)
 
-            return oldItem.date == newItem.date
+            return oldItem.areItemsTheSame(newItem)
         }
     }
 }

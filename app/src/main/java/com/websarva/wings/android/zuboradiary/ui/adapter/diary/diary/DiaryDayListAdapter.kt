@@ -107,15 +107,12 @@ internal class DiaryDayListAdapter(context: Context, recyclerView: RecyclerView,
             if (oldItem !is DiaryDayListItem) throw IllegalStateException()
             if (newItem !is DiaryDayListItem) throw IllegalStateException()
 
-            Log.d(logTag, "DiffUtil.ItemCallback_areContentsTheSame()")
-            if (oldItem.title != newItem.title) {
-                Log.d(logTag, "Title不一致")
+            if (!oldItem.areContentsTheSame(newItem)) {
+                Log.d(logTag, "areContentsTheSame()_全項目不一致")
                 return false
             }
-            if (oldItem.picturePath != newItem.picturePath) {
-                Log.d(logTag, "PicturePath不一致")
-                return false
-            }
+
+            Log.d(logTag, "areContentsTheSame()_全項目一致")
             return true
         }
     }

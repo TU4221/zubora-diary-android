@@ -116,4 +116,34 @@ internal class WordSearchResultDayListItem(
         result[itemCommentKey] = itemComment
         return result
     }
+
+    override fun areContentsTheSame(item: DiaryDayListBaseItem): Boolean {
+        if (this === item) return true
+        if (item !is WordSearchResultDayListItem) return false
+
+        return title == item.title
+                && itemNumber == item.itemNumber
+                && itemTitle == item.itemTitle
+                && itemComment == item.itemComment
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is WordSearchResultDayListItem) return false
+        if (!super.equals(other)) return false
+
+        return title == other.title
+                && itemNumber == other.itemNumber
+                && itemTitle == other.itemTitle
+                && itemComment == other.itemComment
+    }
+
+    override fun hashCode(): Int {
+        var result = super.hashCode()
+        result = 31 * result + title.hashCode()
+        result = 31 * result + itemNumber.hashCode()
+        result = 31 * result + itemTitle.hashCode()
+        result = 31 * result + itemComment.hashCode()
+        return result
+    }
 }

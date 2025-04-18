@@ -78,24 +78,11 @@ internal abstract class WordSearchResultYearMonthListAdapter(
                     "areContentsTheSame()_newChildListItem_Date:" + newChildListItem.date
                 )
 
-                if (oldChildListItem.date != newChildListItem.date) {
-                    Log.d(logTag, "areContentsTheSame()_ChildListItem_Date不一致")
-                    return false
-                }
-                if (oldChildListItem.title != newChildListItem.title) {
-                    Log.d(logTag, "areContentsTheSame()_ChildListItem_Title不一致")
-                    return false
-                }
-                if (oldChildListItem.itemNumber !== newChildListItem.itemNumber) {
-                    Log.d(logTag, "areContentsTheSame()_ChildListItem_ItemNumber不一致")
-                    return false
-                }
-                if (oldChildListItem.itemTitle != newChildListItem.itemTitle) {
-                    Log.d(logTag, "areContentsTheSame()_ChildListItem_ItemTitle不一致")
-                    return false
-                }
-                if (oldChildListItem.itemComment != newChildListItem.itemComment) {
-                    Log.d(logTag, "areContentsTheSame()_ChildListItem_ItemComment不一致")
+                if (oldChildListItem != newChildListItem) {
+                    Log.d(
+                        logTag,
+                        "areContentsTheSame()_newChildListItem_不一致"
+                    )
                     return false
                 }
             }
