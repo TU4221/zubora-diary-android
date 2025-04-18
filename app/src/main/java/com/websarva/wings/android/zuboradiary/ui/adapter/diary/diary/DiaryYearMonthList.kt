@@ -18,7 +18,7 @@ internal class DiaryYearMonthList {
         this.itemList = addLastItem(itemList, needsNoDiaryMessage)
     }
 
-    constructor(itemList: List<DiaryYearMonthListItem>, needsNoDiaryMessage: Boolean) {
+    private constructor(itemList: List<DiaryYearMonthListItem>, needsNoDiaryMessage: Boolean) {
         require(itemList.isNotEmpty())
 
         this.itemList = addLastItem(itemList, needsNoDiaryMessage)
