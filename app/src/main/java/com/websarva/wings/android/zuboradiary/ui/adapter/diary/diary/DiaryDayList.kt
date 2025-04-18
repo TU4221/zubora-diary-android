@@ -4,6 +4,8 @@ internal class DiaryDayList {
 
     val itemList: List<DiaryDayListItem>
 
+    val isNotEmpty get() = itemList.isNotEmpty()
+
     constructor(itemList: List<DiaryDayListItem>) {
         require(itemList.isNotEmpty())
 
@@ -30,7 +32,7 @@ internal class DiaryDayList {
     }
 
     fun combineDiaryDayLists(additionList: DiaryDayList): DiaryDayList {
-        require(additionList.itemList.isNotEmpty())
+        require(additionList.isNotEmpty)
 
         val resultItemList = itemList + additionList.itemList
         return DiaryDayList(resultItemList)

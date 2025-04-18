@@ -16,7 +16,7 @@ internal class DiaryYearMonthListItem : DiaryYearMonthListBaseItem {
        yearMonth,
        DiaryYearMonthListBaseAdapter.ViewType.DIARY
     ) {
-        require(diaryDayList.itemList.isNotEmpty())
+        require(diaryDayList.isNotEmpty)
 
         this.diaryDayList = diaryDayList
     }
