@@ -2,8 +2,9 @@ package com.websarva.wings.android.zuboradiary.ui.adapter.diary.wordsearchresult
 
 internal class WordSearchResultDayList {
 
-    // TODO:下記変数をprivateでカプセル化し、必要なメソッドは本クラスで新規に作成する。(countDiaries()のように)(他のクラスも同様にする)
     val itemList: List<WordSearchResultDayListItem>
+
+    val isNotEmpty get() = itemList.isNotEmpty()
 
     constructor(itemList: List<WordSearchResultDayListItem>) {
         this.itemList = itemList.toList()
@@ -27,7 +28,7 @@ internal class WordSearchResultDayList {
     }
 
     fun combineDiaryDayLists(additionList: WordSearchResultDayList): WordSearchResultDayList {
-        require(additionList.itemList.isNotEmpty())
+        require(additionList.isNotEmpty)
 
         val resultItemList =
             itemList + additionList.itemList
