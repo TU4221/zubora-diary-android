@@ -62,7 +62,7 @@ import java.util.Arrays
 @AndroidEntryPoint
 class DiaryEditFragment : BaseFragment() {
 
-    companion object {
+    internal companion object {
         // Navigation関係
         private val fromClassName = "From" + DiaryEditFragment::class.java.name
         val KEY_EDITED_DIARY_DATE: String = "EditedDiaryDate$fromClassName"
@@ -1234,7 +1234,7 @@ class DiaryEditFragment : BaseFragment() {
         }
     }
 
-    fun attachPicture(uri: Uri) {
+    internal fun attachPicture(uri: Uri) {
         mainViewModel.updatePicturePath(uri)
     }
 }

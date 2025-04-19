@@ -31,7 +31,7 @@ import java.time.LocalTime
 import javax.inject.Inject
 
 @HiltViewModel
-class SettingsViewModel @Inject constructor(
+internal class SettingsViewModel @Inject constructor(
     private val userPreferencesRepository: UserPreferencesRepository,
     private val workerRepository: WorkerRepository,
     private val diaryRepository: DiaryRepository

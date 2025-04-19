@@ -2,7 +2,7 @@ package com.websarva.wings.android.zuboradiary.data.model
 
 import androidx.annotation.FloatRange
 
-class GeoCoordinates(latitude: Double, longitude: Double) {
+internal class GeoCoordinates(latitude: Double, longitude: Double) {
 
     @FloatRange(from = -90.0, to = 90.0)
     val latitude: Double

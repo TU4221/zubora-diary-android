@@ -5,7 +5,7 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 
 @Entity(tableName = "diaries")
-data class DiaryEntity(
+internal data class DiaryEntity(
     @PrimaryKey
     val date: String,
 

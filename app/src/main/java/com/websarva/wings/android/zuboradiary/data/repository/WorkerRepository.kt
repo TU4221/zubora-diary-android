@@ -10,7 +10,7 @@ import java.time.LocalTime
 import java.time.temporal.ChronoUnit
 import java.util.concurrent.TimeUnit
 
-class WorkerRepository (private val workManager: WorkManager) {
+internal class WorkerRepository (private val workManager: WorkManager) {
 
     private val reminderNotificationWorkTag = "ReminderNotification"
     private val reminderNotificationUniqueWorkName = reminderNotificationWorkTag

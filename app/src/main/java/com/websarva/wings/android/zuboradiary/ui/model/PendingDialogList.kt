@@ -1,7 +1,7 @@
 package com.websarva.wings.android.zuboradiary.ui.model
 
 
-class PendingDialogList {
+internal class PendingDialogList {
 
     private val pendingDialogList: List<PendingDialog>
 

@@ -43,7 +43,7 @@ import java.time.LocalDateTime
 @AndroidEntryPoint
 internal class DiaryShowFragment : BaseFragment() {
 
-    companion object {
+    internal companion object {
         // Navigation関係
         private val fromClassName = "From" + DiaryShowFragment::class.java.name
         val KEY_SHOWED_DIARY_DATE: String = "ShowedDiaryDate$fromClassName"
@@ -232,14 +232,14 @@ internal class DiaryShowFragment : BaseFragment() {
         }
     }
 
-    class Weather1Observer(private val context: Context, private val textWeather: TextView) {
+    internal class Weather1Observer(private val context: Context, private val textWeather: TextView) {
 
         fun onChanged(value: Weather) {
             textWeather.text = value.toString(context)
         }
     }
 
-    class Weather2Observer(
+    internal class Weather2Observer(
         private val context: Context,
         private val slush: TextView,
         private val textWeather: TextView
@@ -268,7 +268,7 @@ internal class DiaryShowFragment : BaseFragment() {
         }
     }
 
-    class ConditionObserver(private val context: Context, private val textCondition: TextView) {
+    internal class ConditionObserver(private val context: Context, private val textCondition: TextView) {
 
         fun onChanged(value: Condition) {
             textCondition.text = value.toString(context)
@@ -295,7 +295,7 @@ internal class DiaryShowFragment : BaseFragment() {
         }
     }
 
-    class NumVisibleItemsObserver(private val itemLayouts: Array<LinearLayout>) {
+    internal class NumVisibleItemsObserver(private val itemLayouts: Array<LinearLayout>) {
 
         fun onChanged(value: Int) {
             require(!(value < ItemNumber.MIN_NUMBER || value > ItemNumber.MAX_NUMBER))
@@ -325,7 +325,7 @@ internal class DiaryShowFragment : BaseFragment() {
         }
     }
 
-    class PicturePathObserver(
+    internal class PicturePathObserver(
         context: Context,
         themeColor: ThemeColor,
         private val textPictureTitle: TextView,
@@ -362,7 +362,7 @@ internal class DiaryShowFragment : BaseFragment() {
         }
     }
 
-    class LogObserver(private val context: Context ,private val textLog: TextView) {
+    internal class LogObserver(private val context: Context ,private val textLog: TextView) {
 
         fun onChanged(value: LocalDateTime?) {
             // MEMO:DiaryViewModelを初期化するとDiaryLogにnullが代入されるため、下記"return"を処理。

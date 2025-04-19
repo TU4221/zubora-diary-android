@@ -10,7 +10,7 @@ import com.websarva.wings.android.zuboradiary.data.preferences.UserPreferences
 import com.websarva.wings.android.zuboradiary.data.preferences.WeatherInfoAcquisitionPreference
 import kotlinx.coroutines.flow.Flow
 
-class UserPreferencesRepository(private val userPreferences: UserPreferences) {
+internal class UserPreferencesRepository(private val userPreferences: UserPreferences) {
 
     @Throws(Throwable::class)
     fun loadAllPreferences(): Flow<AllPreferences> {

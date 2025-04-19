@@ -13,7 +13,7 @@ import dagger.hilt.android.HiltAndroidApp
 import javax.inject.Inject
 
 @HiltAndroidApp
-open class ZuboraDiaryApplication : Application(), DefaultLifecycleObserver, Configuration.Provider {
+class ZuboraDiaryApplication : Application(), DefaultLifecycleObserver, Configuration.Provider {
 
     private val logTag = createLogTag()
 

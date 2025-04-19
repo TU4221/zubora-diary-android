@@ -1,5 +1,5 @@
 package com.websarva.wings.android.zuboradiary.data.database
 
-abstract class DiaryListBaseItem {
+internal abstract class DiaryListBaseItem {
     var date: String = ""
 }

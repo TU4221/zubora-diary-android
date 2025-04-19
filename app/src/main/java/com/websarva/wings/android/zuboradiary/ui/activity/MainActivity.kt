@@ -61,7 +61,7 @@ class MainActivity : LoggingActivity() {
     private var isMainActivityLayoutInflated = false
 
     // BottomNavigation
-    var wasSelectedTab = false
+    internal var wasSelectedTab = false
         private set
 
     private val navHostFragment: NavHostFragment
@@ -108,14 +108,14 @@ class MainActivity : LoggingActivity() {
     }
 
     @get:RequiresApi(api = Build.VERSION_CODES.TIRAMISU)
-    val isGrantedPostNotifications
+    internal val isGrantedPostNotifications
         get() = (ActivityCompat.checkSelfPermission(
             this,
             Manifest.permission.POST_NOTIFICATIONS
         )
                 == PackageManager.PERMISSION_GRANTED)
 
-    val isGrantedAccessLocation: Boolean
+    internal val isGrantedAccessLocation: Boolean
         get() {
             val isGrantedAccessFineLocation =
                 (ActivityCompat.checkSelfPermission(
@@ -488,15 +488,15 @@ class MainActivity : LoggingActivity() {
     }
 
     // BottomNavigationタブ選択による画面遷移の遷移先FragmentのTransition設定完了後用リセットメソッド
-    fun clearWasSelectedTab() {
+    internal fun clearWasSelectedTab() {
         wasSelectedTab = false
     }
 
-    fun popBackStackToStartFragment() {
+    internal fun popBackStackToStartFragment() {
         binding.bottomNavigation.selectedItemId = startNavigationMenuItem.itemId
     }
 
-    public override fun onStart() {
+    override fun onStart() {
         super.onStart()
 
         checkPermission()
@@ -518,7 +518,7 @@ class MainActivity : LoggingActivity() {
         }
     }
 
-    fun loadPicturePath() {
+    internal fun loadPicturePath() {
         openDocumentResultLauncher.launch(arrayOf("image/*"))
     }
 

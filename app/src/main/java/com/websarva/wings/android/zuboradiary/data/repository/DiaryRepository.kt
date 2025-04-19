@@ -12,7 +12,7 @@ import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import java.time.LocalDate
 
 
-class DiaryRepository (
+internal class DiaryRepository (
     private val diaryDatabase: DiaryDatabase,
     private val diaryDAO: DiaryDAO,
 ) {

@@ -1,6 +1,6 @@
 package com.websarva.wings.android.zuboradiary.data.preferences
 
-class WeatherInfoAcquisitionPreference {
+internal class WeatherInfoAcquisitionPreference {
 
     companion object {
         const val IS_CHECKED_DEFAULT_VALUE = false

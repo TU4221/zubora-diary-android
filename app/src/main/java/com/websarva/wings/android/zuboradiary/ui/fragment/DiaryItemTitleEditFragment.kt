@@ -28,7 +28,7 @@ import kotlinx.coroutines.launch
 @AndroidEntryPoint
 class DiaryItemTitleEditFragment : BaseFragment() {
 
-    companion object {
+    internal companion object {
         private val fromClassName = "From" + DiaryItemTitleEditFragment::class.java.name
         val KEY_UPDATE_ITEM_NUMBER: String = "UpdateItemNumber$fromClassName"
         val KEY_NEW_ITEM_TITLE: String = "NewItemTitle$fromClassName"

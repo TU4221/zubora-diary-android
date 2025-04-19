@@ -12,7 +12,7 @@ import java.util.Arrays
 //      その為、@Suppress("RedundantSuppression")で警告回避。
 @Suppress("RedundantSuppression")
 // MEMO:constructorは直接使用されていないが必要な為、@Suppressで警告回避。
-enum class ThemeColor @Suppress("unused") constructor(
+internal enum class ThemeColor @Suppress("unused") constructor(
     private val number: Int,
     private val stringResId: Int
 ) {

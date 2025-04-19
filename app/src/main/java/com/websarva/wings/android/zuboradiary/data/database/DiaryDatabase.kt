@@ -14,7 +14,7 @@ import java.time.LocalDate
     version = 1,
     exportSchema = false
 )
-abstract class DiaryDatabase : RoomDatabase() {
+internal abstract class DiaryDatabase : RoomDatabase() {
 
     abstract fun createDiaryDAO(): DiaryDAO
     abstract fun createDiaryItemTitleSelectionHistoryDAO(): DiaryItemTitleSelectionHistoryDAO

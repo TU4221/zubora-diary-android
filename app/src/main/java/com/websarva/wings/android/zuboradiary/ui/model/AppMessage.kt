@@ -4,7 +4,7 @@ import android.content.Context
 import com.websarva.wings.android.zuboradiary.R
 import java.io.Serializable
 
-sealed class AppMessage(
+internal sealed class AppMessage(
     private val dialogTitleStringResId: Int,
     private val dialogMessageStringResId: Int
 ) : Serializable {
@@ -17,7 +17,7 @@ sealed class AppMessage(
     }
 }
 
-sealed class DiaryListAppMessage(
+internal sealed class DiaryListAppMessage(
     dialogTitleStringResId: Int,
     dialogMessageStringResId: Int
 ) : AppMessage(dialogTitleStringResId, dialogMessageStringResId) {
@@ -44,7 +44,7 @@ sealed class DiaryListAppMessage(
     }
 }
 
-sealed class WordSearchAppMessage(
+internal sealed class WordSearchAppMessage(
     dialogTitleStringResId: Int,
     dialogMessageStringResId: Int
 ) : AppMessage(dialogTitleStringResId, dialogMessageStringResId) {
@@ -57,7 +57,7 @@ sealed class WordSearchAppMessage(
     }
 }
 
-sealed class CalendarAppMessage(
+internal sealed class CalendarAppMessage(
     dialogTitleStringResId: Int,
     dialogMessageStringResId: Int
 ) : AppMessage(dialogTitleStringResId, dialogMessageStringResId) {
@@ -78,7 +78,7 @@ sealed class CalendarAppMessage(
 
 }
 
-sealed class SettingsAppMessage(
+internal sealed class SettingsAppMessage(
     dialogTitleStringResId: Int,
     dialogMessageStringResId: Int
 ) : AppMessage(dialogTitleStringResId, dialogMessageStringResId) {
@@ -112,7 +112,7 @@ sealed class SettingsAppMessage(
     }
 }
 
-sealed class DiaryShowAppMessage(
+internal sealed class DiaryShowAppMessage(
     dialogTitleStringResId: Int,
     dialogMessageStringResId: Int
 ) : AppMessage(dialogTitleStringResId, dialogMessageStringResId) {
@@ -133,7 +133,7 @@ sealed class DiaryShowAppMessage(
 
 }
 
-sealed class DiaryEditAppMessage(
+internal sealed class DiaryEditAppMessage(
     dialogTitleStringResId: Int,
     dialogMessageStringResId: Int
 ) : AppMessage(dialogTitleStringResId, dialogMessageStringResId) {
@@ -174,7 +174,7 @@ sealed class DiaryEditAppMessage(
     }
 }
 
-sealed class DiaryItemTitleEditAppMessage(
+internal sealed class DiaryItemTitleEditAppMessage(
     dialogTitleStringResId: Int,
     dialogMessageStringResId: Int
 ) : AppMessage(dialogTitleStringResId, dialogMessageStringResId) {

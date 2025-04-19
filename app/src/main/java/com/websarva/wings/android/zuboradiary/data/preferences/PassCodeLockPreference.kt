@@ -1,6 +1,6 @@
 package com.websarva.wings.android.zuboradiary.data.preferences
 
-class PassCodeLockPreference {
+internal class PassCodeLockPreference {
 
     companion object {
         const val IS_CHECKED_DEFAULT_VALUE = false

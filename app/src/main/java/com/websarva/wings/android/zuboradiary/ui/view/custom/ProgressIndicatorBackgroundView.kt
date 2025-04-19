@@ -5,7 +5,7 @@ import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
 
-class ProgressIndicatorBackgroundView @JvmOverloads constructor(
+internal class ProgressIndicatorBackgroundView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0,

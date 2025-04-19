@@ -6,7 +6,7 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 
 @Dao
-interface DiaryDAO {
+internal interface DiaryDAO {
     // MEMO:@Query使用方法下記参照
     //      https://developer.android.com/reference/kotlin/androidx/room/Query
     @Query("SELECT COUNT(*) FROM diaries")

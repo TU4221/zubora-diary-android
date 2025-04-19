@@ -2,7 +2,7 @@ package com.websarva.wings.android.zuboradiary.data.database
 
 import androidx.room.ColumnInfo
 
-class WordSearchResultListItem : DiaryListBaseItem() {
+internal class WordSearchResultListItem : DiaryListBaseItem() {
 
     var title: String = ""
 

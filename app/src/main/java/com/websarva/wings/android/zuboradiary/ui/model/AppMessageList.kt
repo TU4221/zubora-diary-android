@@ -1,6 +1,6 @@
 package com.websarva.wings.android.zuboradiary.ui.model
 
-class AppMessageList {
+internal class AppMessageList {
 
     private val appMessageList: List<AppMessage>
 

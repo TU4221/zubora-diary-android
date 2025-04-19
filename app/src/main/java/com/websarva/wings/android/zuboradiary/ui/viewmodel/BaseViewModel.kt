@@ -10,7 +10,7 @@ import com.websarva.wings.android.zuboradiary.ui.model.PendingDialogList
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
-abstract class BaseViewModel : ViewModel() {
+internal abstract class BaseViewModel : ViewModel() {
 
     private val logTag = createLogTag()
 

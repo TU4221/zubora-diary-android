@@ -21,9 +21,9 @@ import javax.inject.Inject
 // MEMO:@Suppress("unused")が不要と警告が発生したので削除したが、"unused"警告が再発する。
 //      その為、@Suppress("RedundantSuppression")で警告回避。
 @Suppress( "unused", "RedundantSuppression") //MEMO:警告対策。(初期化してない為、Unusedの警告が表示される)
-val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "settings")
+internal val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "settings")
 
-class UserPreferences @Inject constructor(private val context: Context) {
+internal class UserPreferences @Inject constructor(private val context: Context) {
 
     private val logTag = createLogTag()
 

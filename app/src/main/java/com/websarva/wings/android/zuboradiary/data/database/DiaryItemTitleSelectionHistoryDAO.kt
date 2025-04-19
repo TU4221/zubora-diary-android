@@ -7,7 +7,7 @@ import androidx.room.Query
 import kotlinx.coroutines.flow.Flow
 
 @Dao
-interface DiaryItemTitleSelectionHistoryDAO {
+internal interface DiaryItemTitleSelectionHistoryDAO {
     // @Query使用方法下記参照
     // https://developer.android.com/reference/kotlin/androidx/room/Query
     @Query("SELECT * FROM diary_item_title_selection_history ORDER BY log DESC LIMIT :numTitles OFFSET :offset")

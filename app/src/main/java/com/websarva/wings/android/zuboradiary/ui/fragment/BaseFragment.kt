@@ -50,13 +50,13 @@ abstract class BaseFragment : LoggingFragment() {
 
     private val logTag = createLogTag()
 
-    protected val mainActivity
+    internal val mainActivity
         get() = requireActivity() as MainActivity
 
     // MEMO:ViewModelが無いFragmentに対応できるようにNull許容型とする。
     internal abstract val mainViewModel: BaseViewModel?
 
-    protected lateinit var navController: NavController
+    internal lateinit var navController: NavController
         private set
 
     // MEMO:NavController#currentBackStackEntry()はFragmentライフサイクル状態で取得する値が異なるため、
@@ -68,9 +68,9 @@ abstract class BaseFragment : LoggingFragment() {
     //      委譲プロパティによるViewModel生成は公式が推奨する方法の為、警告を無視する。その為、@Suppressを付与する。
     //      この警告に対応するSuppressネームはなく、"unused"のみでは不要Suppressとなる為、"RedundantSuppression"も追記する。
     @Suppress("unused", "RedundantSuppression")
-    protected val settingsViewModel: SettingsViewModel by activityViewModels()
+    internal val settingsViewModel: SettingsViewModel by activityViewModels()
 
-    protected val themeColor
+    internal val themeColor
         get() = settingsViewModel.themeColor.requireValue()
 
     private var destinationId = 0 // MEMO:Int型は遅延初期化不可
@@ -78,14 +78,14 @@ abstract class BaseFragment : LoggingFragment() {
         val navDestination = navController.currentDestination
         return checkNotNull(navDestination).id
     }
-    protected val canNavigateFragment
+    internal val canNavigateFragment
         get() = destinationId == currentDestinationId
 
     private val addedLifecycleEventObserverList = ArrayList<LifecycleEventObserver>()
 
-    protected var pendingDialogNavigation: PendingDialogNavigation? = null
+    internal var pendingDialogNavigation: PendingDialogNavigation? = null
 
-    protected fun launchAndRepeatOnViewLifeCycleStarted(
+    internal fun launchAndRepeatOnViewLifeCycleStarted(
         block: suspend CoroutineScope.() -> Unit) {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED, block)
@@ -95,7 +95,7 @@ abstract class BaseFragment : LoggingFragment() {
     /**
      * 戻るボタン押下時の処理。
      */
-    protected fun addOnBackPressedCallback(callback: OnBackPressedCallback) {
+    internal fun addOnBackPressedCallback(callback: OnBackPressedCallback) {
         requireActivity().onBackPressedDispatcher.addCallback(this, callback)
     }
 
@@ -114,7 +114,7 @@ abstract class BaseFragment : LoggingFragment() {
     /**
      * BaseFragment#onCreateView()で呼び出される。
      */
-    protected abstract fun initializeDataBinding(
+    internal abstract fun initializeDataBinding(
         themeColorInflater: LayoutInflater, container: ViewGroup
     ): ViewDataBinding
 
@@ -164,7 +164,7 @@ abstract class BaseFragment : LoggingFragment() {
         mainActivity.clearWasSelectedTab()
     }
 
-    protected fun addTransitionListener(listener: Transition.TransitionListener) {
+    internal fun addTransitionListener(listener: Transition.TransitionListener) {
         val enterTransition = checkNotNull(enterTransition) as MaterialSharedAxis
         enterTransition.addListener(listener)
 
@@ -201,16 +201,16 @@ abstract class BaseFragment : LoggingFragment() {
     /**
      * BaseFragment#setUpPreviousFragmentResultReceiver()で呼び出される。
      */
-    protected abstract fun handleOnReceivingResultFromPreviousFragment()
+    internal abstract fun handleOnReceivingResultFromPreviousFragment()
 
-    protected fun <T> receiveResulFromPreviousFragment(key: String): StateFlow<T?> {
+    internal fun <T> receiveResulFromPreviousFragment(key: String): StateFlow<T?> {
         val containsDialogResult = navBackStackEntry.savedStateHandle.contains(key)
         if (!containsDialogResult) return MutableStateFlow<T?>(null)
 
         return navBackStackEntry.savedStateHandle.getStateFlow(key, null)
     }
 
-    protected fun removeResulFromFragment(key: String) {
+    internal fun removeResulFromFragment(key: String) {
         navBackStackEntry.savedStateHandle.remove<Any>(key)
     }
 
@@ -242,21 +242,21 @@ abstract class BaseFragment : LoggingFragment() {
     /**
      * BaseFragment#setUpDialogResultReceiver()で呼び出される。
      */
-    protected abstract fun receiveDialogResults()
+    internal abstract fun receiveDialogResults()
 
     /**
      * BaseFragment#setUpDialogResultReceiver()で呼び出される。
      */
-    protected abstract fun removeDialogResults()
+    internal abstract fun removeDialogResults()
 
-    protected fun <T> receiveResulFromDialog(key: String): T? {
+    internal fun <T> receiveResulFromDialog(key: String): T? {
         val containsDialogResult = navBackStackEntry.savedStateHandle.contains(key)
         if (!containsDialogResult) return null
 
         return navBackStackEntry.savedStateHandle.get<T>(key)
     }
 
-    protected open fun setUpAppMessageDialog() {
+    internal open fun setUpAppMessageDialog() {
         setUpMainAppMessageDialog()
         setUpSettingsAppMessageDialog()
     }
@@ -315,7 +315,7 @@ abstract class BaseFragment : LoggingFragment() {
         }
     }
 
-    protected abstract inner class AppMessageBufferListObserver(private val baseViewModel: BaseViewModel) {
+    internal abstract inner class AppMessageBufferListObserver(private val baseViewModel: BaseViewModel) {
         suspend fun onChanged(value: AppMessageList) {
             if (value.isEmpty) return
 
@@ -342,9 +342,9 @@ abstract class BaseFragment : LoggingFragment() {
      * BaseFragment#showAppMessageDialog()で呼び出される。
      */
     @MainThread
-    protected abstract fun navigateAppMessageDialog(appMessage: AppMessage)
+    internal abstract fun navigateAppMessageDialog(appMessage: AppMessage)
 
-    protected open fun retryAppMessageDialogShow() {
+    internal open fun retryAppMessageDialogShow() {
         retryMainAppMessageDialogShow()
         retrySettingsAppMessageDialogShow()
     }
@@ -357,7 +357,7 @@ abstract class BaseFragment : LoggingFragment() {
         settingsViewModel.triggerAppMessageBufferListObserver()
     }
 
-    protected interface PendingDialogNavigation {
+    internal interface PendingDialogNavigation {
         fun showPendingDialog(pendingDialog: PendingDialog):Boolean
     }
 
@@ -424,5 +424,5 @@ abstract class BaseFragment : LoggingFragment() {
     /**
      * Bindingクラス変数のメモリリーク対策として変数にNullを代入すること。
      */
-    protected abstract fun destroyBinding()
+    internal abstract fun destroyBinding()
 }

@@ -3,7 +3,7 @@ package com.websarva.wings.android.zuboradiary.data.preferences
 import com.websarva.wings.android.zuboradiary.data.model.ThemeColor
 
 
-class ThemeColorPreference {
+internal class ThemeColorPreference {
 
     companion object {
         val THEME_COLOR_DEFAULT_VALUE = ThemeColor.entries[0].toNumber()
