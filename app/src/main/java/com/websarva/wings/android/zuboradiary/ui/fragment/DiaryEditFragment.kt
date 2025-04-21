@@ -156,6 +156,17 @@ class DiaryEditFragment : BaseFragment() {
 
                 mainViewModel.updateItemTitle(itemNumber, value)
 
+                val focusTargetView =
+                    when (itemNumber.value) {
+                        1 -> binding.includeItem1.textInputEditTextTitle
+                        2 -> binding.includeItem2.textInputEditTextTitle
+                        3 -> binding.includeItem3.textInputEditTextTitle
+                        4 -> binding.includeItem4.textInputEditTextTitle
+                        5 -> binding.includeItem5.textInputEditTextTitle
+                        else -> throw IllegalStateException()
+                    }
+               focusTargetView.requestFocus()
+
                 removeResulFromFragment(DiaryItemTitleEditFragment.KEY_NEW_ITEM_TITLE)
                 removeResulFromFragment(DiaryItemTitleEditFragment.KEY_UPDATE_ITEM_NUMBER)
             }
@@ -171,7 +182,6 @@ class DiaryEditFragment : BaseFragment() {
         receiveWeatherInfoFetchDialogResult()
         receiveDiaryItemDeleteDialogResult()
         receiveDiaryPictureDeleteDialogResult()
-        clearFocusAllEditText()
     }
 
     override fun removeDialogResults() {
@@ -513,7 +523,6 @@ class DiaryEditFragment : BaseFragment() {
                 val strWeather = checkNotNull(arrayAdapter.getItem(position)) as String
                 val weather = Weather.of(requireContext(), strWeather)
                 mainViewModel.updateWeather1(weather)
-                binding.autoCompleteTextWeather1.clearFocus()
             }
 
         launchAndRepeatOnViewLifeCycleStarted {
@@ -547,7 +556,6 @@ class DiaryEditFragment : BaseFragment() {
                 val strWeather = checkNotNull(arrayAdapter.getItem(position)) as String
                 val weather = Weather.of(requireContext(), strWeather)
                 mainViewModel.updateWeather2(weather)
-                binding.autoCompleteTextWeather2.clearFocus()
             }
 
         launchAndRepeatOnViewLifeCycleStarted {
@@ -592,7 +600,6 @@ class DiaryEditFragment : BaseFragment() {
                     val strCondition = arrayAdapter.getItem(position) as String
                     val condition = Condition.of(requireContext(), strCondition)
                     mainViewModel.updateCondition(condition)
-                    clearFocus()
                 }
         }
 
@@ -1011,14 +1018,6 @@ class DiaryEditFragment : BaseFragment() {
         val transitionListener =
             textInputConfigurator.createClearButtonSetupTransitionListener(*clearableTextInputLayouts)
         addTransitionListener(transitionListener)
-    }
-
-    private fun clearFocusAllEditText() {
-        val textInputLayoutList = createAllTextInputLayoutList()
-        textInputLayoutList.stream().forEach { x: TextInputLayout ->
-            val editText = checkNotNull(x.editText)
-            editText.clearFocus()
-        }
     }
 
     private fun createAllTextInputLayoutList(): @Unmodifiable List<TextInputLayout> {
