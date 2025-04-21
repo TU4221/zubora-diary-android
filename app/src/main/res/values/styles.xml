@@ -70,6 +70,9 @@
         <item name="android:textColorHint">@color/hint_text_color_on_surface</item>
         <item name="android:inputType">text</item>
     </style>
+    <style name="AppTextInputEditTextActionNextStyle" parent="AppTextInputEditTextStyle">
+        <item name="android:imeOptions">actionNext</item>
+    </style>
     <style name="AppTextInputEditTextMultiLineStyle" parent="AppTextInputEditTextStyle">
         <item name="android:inputType">textMultiLine</item>
         <item name="android:gravity">top</item>
@@ -175,6 +178,7 @@
         <!-- HACK:"android:textColorHint"はTextAppearanceでは反映されない為、Styleに記述 -->
         <item name="android:textColorHint">@color/hint_text_color_on_secondary_container</item>
         <item name="android:inputType">text</item>
+        <item name="android:imeOptions">actionSearch</item>
         <item name="android:background">@null</item>
     </style>
     <style name="WordSearchTextViewTextAppearance" parent="AppTextViewTextAppearance">

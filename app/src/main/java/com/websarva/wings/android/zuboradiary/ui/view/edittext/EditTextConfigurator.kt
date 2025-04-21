@@ -9,8 +9,10 @@ import android.view.MotionEvent
 import android.view.View
 import android.view.View.OnFocusChangeListener
 import android.view.View.OnTouchListener
+import android.view.inputmethod.EditorInfo
 import android.widget.EditText
 import android.widget.ImageButton
+import android.widget.TextView
 import com.websarva.wings.android.zuboradiary.ui.keyboard.KeyboardManager
 import java.util.Arrays
 
@@ -64,22 +66,44 @@ internal open class EditTextConfigurator(private val activity: Activity) {
     }
 
     protected fun setUpKeyboardCloseOnEnter(editText: EditText) {
-        editText.setOnKeyListener(KeyboardCloseOnEnterListener())
+        editText.setOnEditorActionListener(NextOnEnterListener())
     }
 
-    private inner class KeyboardCloseOnEnterListener : View.OnKeyListener {
-        override fun onKey(v: View, keyCode: Int, event: KeyEvent): Boolean {
-            if (event.action != KeyEvent.ACTION_DOWN) return false
-            if (keyCode != KeyEvent.KEYCODE_ENTER) return false
+    private inner class NextOnEnterListener : TextView.OnEditorActionListener {
 
-            val editText = v as EditText
+        override fun onEditorAction(v: TextView?, actionId: Int, event: KeyEvent?): Boolean {
+            v as EditText
+
             // HACK:InputTypeの値が何故か1ズレている。(公式のリファレンスでもズレあり。)(setとgetを駆使してLogで確認確認済み)
-            if (editText.inputType == (InputType.TYPE_TEXT_FLAG_MULTI_LINE + 1)) return false
+            if (v.inputType == (InputType.TYPE_TEXT_FLAG_MULTI_LINE + 1)) return false
 
-            hideKeyboard(v)
-            editText.clearFocus()
+            when (actionId) {
+                EditorInfo.IME_ACTION_DONE -> hideKeyboard(v)
+                EditorInfo.IME_ACTION_NEXT -> {
+                    val nextView = focusNextEditTextView(v)
 
+                    if (nextView?.inputType == InputType.TYPE_NULL) hideKeyboard(v)
+                }
+                EditorInfo.IME_ACTION_SEARCH -> {
+                    hideKeyboard(v)
+                    v.clearFocus()
+                }
+                else -> hideKeyboard(v)
+            }
             return false // MEMO:”return true” だとバックスペースが機能しなくなり入力文字を削除できなくなる。
+        }
+
+        private fun focusNextEditTextView(view: View): EditText? {
+            var offsetView = view
+            var nextView: View?
+            do {
+                nextView = offsetView.focusSearch(View.FOCUS_DOWN)
+                offsetView = nextView
+            } while (nextView !is EditText && nextView != null)
+
+            if (nextView == null || nextView !is EditText) return null
+            nextView.requestFocus()
+            return nextView
         }
     }
 
