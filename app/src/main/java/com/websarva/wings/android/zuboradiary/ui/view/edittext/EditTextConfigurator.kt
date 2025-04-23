@@ -19,8 +19,7 @@ import java.util.Arrays
 internal open class EditTextConfigurator(private val activity: Activity) {
 
     protected fun hideKeyboard(view: View) {
-        val keyboardManager = KeyboardManager(activity)
-        keyboardManager.hideKeyboard(view)
+        KeyboardManager().hideKeyboard(activity, view)
     }
 
     protected fun setUpScrollable(editText: EditText) {

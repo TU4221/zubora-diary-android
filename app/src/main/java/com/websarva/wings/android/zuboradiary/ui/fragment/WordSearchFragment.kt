@@ -96,8 +96,7 @@ class WordSearchFragment : BaseFragment() {
         val searchWord = mainViewModel.searchWord.value
         if (searchWord.isEmpty()) {
             binding.editTextSearchWord.requestFocus()
-            val keyboardManager = KeyboardManager(requireActivity())
-            keyboardManager.showKeyboard(binding.editTextSearchWord)
+            KeyboardManager().showKeyboard(requireActivity(), binding.editTextSearchWord)
         }
 
         launchAndRepeatOnViewLifeCycleStarted {

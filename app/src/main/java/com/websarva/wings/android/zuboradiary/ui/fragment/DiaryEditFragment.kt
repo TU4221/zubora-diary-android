@@ -364,7 +364,7 @@ class DiaryEditFragment : BaseFragment() {
     }
 
     private fun setUpFocusViewScroll() {
-        KeyboardManager(requireActivity()).registerKeyBoredStateListener(this) { isShowed ->
+        KeyboardManager().registerKeyBoredStateListener(this) { isShowed ->
             if (!isShowed) return@registerKeyBoredStateListener
             require(isSoftInputAdjustNothing())
 
