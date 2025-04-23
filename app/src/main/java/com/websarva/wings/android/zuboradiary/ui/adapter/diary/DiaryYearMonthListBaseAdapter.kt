@@ -78,16 +78,7 @@ internal abstract class DiaryYearMonthListBaseAdapter protected constructor(
             ViewType.DIARY.viewTypeNumber -> {
                 val binding =
                     RowDiaryYearMonthListBinding.inflate(themeColorInflater, parent, false)
-                val holder = DiaryYearMonthListViewHolder(binding)
-
-                holder.binding
-                    .recyclerDayList.apply {
-                        // ホルダーアイテムアニメーション設定(build()メソッド内にて理由記載)
-                        // MEMO:子RecyclerViewのアニメーションを共通にする為、親Adapterクラス内で実装。
-                        itemAnimator = null
-                    }
-
-                return holder
+                return DiaryYearMonthListViewHolder(binding)
             }
 
             ViewType.PROGRESS_INDICATOR.viewTypeNumber -> {
@@ -119,11 +110,6 @@ internal abstract class DiaryYearMonthListBaseAdapter protected constructor(
                 binding.textSection.text = diaryDate
                 // 日記リストスクロール時に移動させているので、バインディング時に位置リセット
                 binding.textSection.y = 0f
-
-                // 日記リスト(日)設定
-                // MEMO:日記リスト(年月)のLinearLayoutManagerとは併用できないので、
-                //      日記リスト(日)用のLinearLayoutManagerをインスタンス化する。
-                binding.recyclerDayList.layoutManager = LinearLayoutManager(context)
             }
 
             createDiaryDayList(holder, item)

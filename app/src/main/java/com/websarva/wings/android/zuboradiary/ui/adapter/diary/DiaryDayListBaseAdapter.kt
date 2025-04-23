@@ -5,6 +5,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.websarva.wings.android.zuboradiary.data.model.ThemeColor
@@ -26,7 +27,12 @@ internal abstract class DiaryDayListBaseAdapter protected constructor(
     var onClickItemListener: OnClickItemListener? = null
 
     fun build() {
-        recyclerView.adapter = this
+        recyclerView.apply {
+            adapter = this@DiaryDayListBaseAdapter
+            layoutManager = LinearLayoutManager(context)
+            // MEMO:DiaryYearMonthAdapter#build()内にて理由記載)
+            itemAnimator = null
+        }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
