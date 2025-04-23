@@ -37,7 +37,7 @@ internal class KeyboardManager {
         fragment: Fragment,
         listener: KeyboardStateListener
     ) {
-        val rootView = fragment.view?.rootView ?: throw IllegalArgumentException()
+        val rootView = fragment.view ?: throw IllegalArgumentException()
 
         ViewCompat.setOnApplyWindowInsetsListener(rootView) { _, insets ->
             val isKeyboardVisible = insets.isVisible(WindowInsetsCompat.Type.ime())
