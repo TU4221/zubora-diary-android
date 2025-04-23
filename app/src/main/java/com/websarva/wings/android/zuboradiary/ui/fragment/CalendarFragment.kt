@@ -499,7 +499,6 @@ class CalendarFragment : BaseFragment() {
             diaryShowViewModel.picturePath
                 .collectLatest { value: Uri? ->
                     PicturePathObserver(
-                        requireContext(),
                         themeColor,
                         binding.includeDiaryShow.textAttachedPicture,
                         binding.includeDiaryShow.imageAttachedPicture

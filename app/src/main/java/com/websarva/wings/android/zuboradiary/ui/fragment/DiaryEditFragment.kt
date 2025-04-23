@@ -954,14 +954,11 @@ class DiaryEditFragment : BaseFragment() {
 
     private inner class PicturePathObserver {
         fun onChanged(value: Uri?) {
-            val diaryPictureConfigurator =
-                DiaryPictureConfigurator(
-                    requireContext(),
+            DiaryPictureConfigurator()
+                .setUpPictureOnDiary(
                     binding.imageAttachedPicture,
-                    themeColor.getOnSurfaceVariantColor(requireContext().resources)
-                )
-
-            diaryPictureConfigurator.setUpPictureOnDiary(value)
+                    value,
+                    themeColor.getOnSurfaceVariantColor(requireContext().resources))
             enablePictureDeleteButton(value != null)
         }
 

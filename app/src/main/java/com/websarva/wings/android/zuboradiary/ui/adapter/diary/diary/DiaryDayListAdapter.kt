@@ -67,14 +67,13 @@ internal class DiaryDayListAdapter(context: Context, recyclerView: RecyclerView,
     }
 
     private fun onBindPicture(holder: DiaryDayListViewHolder, item: DiaryDayListItem) {
-        val diaryPictureConfigurator =
-            DiaryPictureConfigurator(
-                context,
+        val pictureUri = item.picturePath
+        DiaryPictureConfigurator()
+            .setUpPictureOnDiaryList(
                 holder.binding.imageAttachedPicture,
+                pictureUri,
                 themeColor.getOnSecondaryContainerColor(context.resources)
             )
-        val pictureUri = item.picturePath
-        diaryPictureConfigurator.setUpPictureOnDiaryList(pictureUri)
     }
 
     override fun onBindDeleteButtonClickListener(

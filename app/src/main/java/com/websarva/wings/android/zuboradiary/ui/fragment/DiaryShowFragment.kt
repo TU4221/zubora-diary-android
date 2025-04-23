@@ -316,7 +316,6 @@ internal class DiaryShowFragment : BaseFragment() {
             mainViewModel.picturePath
                 .collectLatest { value: Uri? ->
                     PicturePathObserver(
-                        requireContext(),
                         themeColor,
                         binding.includeDiaryShow.textAttachedPicture,
                         binding.includeDiaryShow.imageAttachedPicture
@@ -326,18 +325,10 @@ internal class DiaryShowFragment : BaseFragment() {
     }
 
     internal class PicturePathObserver(
-        context: Context,
-        themeColor: ThemeColor,
+        private val themeColor: ThemeColor,
         private val textPictureTitle: TextView,
         private val imageView: ImageView
     ) {
-
-            private val diaryPictureConfigurator: DiaryPictureConfigurator =
-                DiaryPictureConfigurator(
-                    context,
-                    imageView,
-                    themeColor.getOnSurfaceVariantColor(context.resources)
-                )
 
         fun onChanged(value: Uri?) {
             if (value == null) {
@@ -348,7 +339,12 @@ internal class DiaryShowFragment : BaseFragment() {
 
             textPictureTitle.visibility = View.VISIBLE
             imageView.visibility = View.VISIBLE
-            diaryPictureConfigurator.setUpPictureOnDiary(value)
+            DiaryPictureConfigurator()
+                .setUpPictureOnDiary(
+                    imageView,
+                    value,
+                    themeColor.getOnSurfaceVariantColor(imageView.context.resources)
+                )
         }
     }
 
