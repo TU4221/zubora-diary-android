@@ -1,19 +1,21 @@
 package com.websarva.wings.android.zuboradiary.ui.view.imageview
 
+import android.content.Context
 import android.net.Uri
 import android.util.Log
 import android.widget.ImageView
 import androidx.core.content.ContextCompat
 import com.websarva.wings.android.zuboradiary.R
+import com.websarva.wings.android.zuboradiary.data.model.ThemeColor
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 
 internal class DiaryPictureConfigurator {
 
     private val logTag = createLogTag()
 
-    fun setUpPictureOnDiary(imageView: ImageView, uri: Uri?, iconColor: Int) {
+    fun setUpPictureOnDiary(imageView: ImageView, uri: Uri?, themeColor: ThemeColor) {
         if (uri == null) {
-            setUpDefaultIconOnDiary(imageView, iconColor)
+            setUpDefaultIconOnDiary(imageView, themeColor)
             return
         }
 
@@ -24,21 +26,27 @@ internal class DiaryPictureConfigurator {
             Log.e(logTag, "${logMsg}_完了")
         } catch (e: SecurityException) {
             Log.e(logTag, "${logMsg}_失敗", e)
-            setUpPermissionDenialIconOnDiary(imageView, iconColor)
+            setUpPermissionDenialIconOnDiary(imageView, themeColor)
         }
     }
 
-    private fun setUpDefaultIconOnDiary(imageView: ImageView, iconColor: Int) {
-        setUpIcon(imageView, R.drawable.diary_edit_image_ic_photo_library_24px, iconColor)
+    private fun setUpDefaultIconOnDiary(imageView: ImageView, themeColor: ThemeColor) {
+        val iconColorInt = getIconColorOnDiary(imageView.context, themeColor)
+        setUpIcon(imageView, R.drawable.diary_edit_image_ic_photo_library_24px, iconColorInt)
     }
 
-    private fun setUpPermissionDenialIconOnDiary(imageView: ImageView, iconColor: Int) {
-        setUpIcon(imageView, R.drawable.diary_image_ic_hide_image_24px, iconColor)
+    private fun setUpPermissionDenialIconOnDiary(imageView: ImageView, themeColor: ThemeColor) {
+        val iconColorInt = getIconColorOnDiary(imageView.context, themeColor)
+        setUpIcon(imageView, R.drawable.diary_image_ic_hide_image_24px, iconColorInt)
     }
 
-    fun setUpPictureOnDiaryList(imageView: ImageView, uri: Uri?, iconColor: Int) {
+    private fun getIconColorOnDiary(context: Context, themeColor: ThemeColor): Int {
+        return themeColor.getOnSurfaceVariantColor(context.resources)
+    }
+
+    fun setUpPictureOnDiaryList(imageView: ImageView, uri: Uri?, themeColor: ThemeColor) {
         if (uri == null) {
-            setUpDefaultIconOnDiaryList(imageView, iconColor)
+            setUpDefaultIconOnDiaryList(imageView, themeColor)
             return
         }
 
@@ -49,16 +57,22 @@ internal class DiaryPictureConfigurator {
             Log.e(logTag, "${logMsg}_完了")
         } catch (e: SecurityException) {
             Log.e(logTag, "${logMsg}_失敗", e)
-            setUpPermissionDenialIconOnDiaryList(imageView, iconColor)
+            setUpPermissionDenialIconOnDiaryList(imageView, themeColor)
         }
     }
 
-    private fun setUpDefaultIconOnDiaryList(imageView: ImageView, iconColor: Int) {
-        setUpIcon(imageView, R.drawable.ic_image_24px, iconColor)
+    private fun setUpDefaultIconOnDiaryList(imageView: ImageView, themeColor: ThemeColor) {
+        val iconColorInt = getIconColorOnDiaryList(imageView.context, themeColor)
+        setUpIcon(imageView, R.drawable.ic_image_24px, iconColorInt)
     }
 
-    private fun setUpPermissionDenialIconOnDiaryList(imageView: ImageView, iconColor: Int) {
-        setUpIcon(imageView, R.drawable.ic_hide_image_24px, iconColor)
+    private fun setUpPermissionDenialIconOnDiaryList(imageView: ImageView, themeColor: ThemeColor) {
+        val iconColorInt = getIconColorOnDiaryList(imageView.context, themeColor)
+        setUpIcon(imageView, R.drawable.ic_hide_image_24px, iconColorInt)
+    }
+
+    private fun getIconColorOnDiaryList(context: Context, themeColor: ThemeColor): Int {
+        return themeColor.getOnSecondaryContainerColor(context.resources)
     }
 
     private fun setUpIcon(imageView: ImageView, iconResId: Int, iconColor: Int) {

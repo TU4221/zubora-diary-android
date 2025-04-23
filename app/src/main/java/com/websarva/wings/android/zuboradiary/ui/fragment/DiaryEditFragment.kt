@@ -958,7 +958,8 @@ class DiaryEditFragment : BaseFragment() {
                 .setUpPictureOnDiary(
                     binding.imageAttachedPicture,
                     value,
-                    themeColor.getOnSurfaceVariantColor(requireContext().resources))
+                    themeColor
+                )
             enablePictureDeleteButton(value != null)
         }
 

@@ -72,7 +72,7 @@ internal class DiaryDayListAdapter(context: Context, recyclerView: RecyclerView,
             .setUpPictureOnDiaryList(
                 holder.binding.imageAttachedPicture,
                 pictureUri,
-                themeColor.getOnSecondaryContainerColor(context.resources)
+                themeColor
             )
     }
 

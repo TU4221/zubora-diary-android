@@ -343,7 +343,7 @@ internal class DiaryShowFragment : BaseFragment() {
                 .setUpPictureOnDiary(
                     imageView,
                     value,
-                    themeColor.getOnSurfaceVariantColor(imageView.context.resources)
+                    themeColor
                 )
         }
     }
