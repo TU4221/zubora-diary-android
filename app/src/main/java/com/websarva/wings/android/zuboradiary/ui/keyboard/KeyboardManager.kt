@@ -1,6 +1,5 @@
 package com.websarva.wings.android.zuboradiary.ui.keyboard
 
-import android.app.Activity
 import android.content.Context
 import android.util.Log
 import android.view.View
@@ -14,19 +13,19 @@ internal class KeyboardManager {
 
     private val logTag = createLogTag()
 
-    private fun getInputMethodManager(activity: Activity): InputMethodManager {
-        return activity.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+    private fun getInputMethodManager(view: View): InputMethodManager {
+        return view.context?.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
     }
 
-    fun hideKeyboard(activity: Activity, focusView: View) {
+    fun hideKeyboard(focusView: View) {
         Log.d(logTag, "hideKeyboard()")
-        getInputMethodManager(activity)
+        getInputMethodManager(focusView)
             .hideSoftInputFromWindow(focusView.windowToken, InputMethodManager.HIDE_NOT_ALWAYS)
     }
 
-    fun showKeyboard(activity: Activity, focusView: View) {
+    fun showKeyboard(focusView: View) {
         Log.d(logTag, "showKeyboard()")
-        getInputMethodManager(activity).showSoftInput(focusView, InputMethodManager.SHOW_IMPLICIT)
+        getInputMethodManager(focusView).showSoftInput(focusView, InputMethodManager.SHOW_IMPLICIT)
     }
 
     fun interface KeyboardStateListener {

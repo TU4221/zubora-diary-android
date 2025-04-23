@@ -1009,7 +1009,7 @@ class DiaryEditFragment : BaseFragment() {
     }
 
     private fun setupEditText() {
-        val textInputConfigurator = TextInputConfigurator(requireActivity())
+        val textInputConfigurator = TextInputConfigurator()
 
         val allTextInputLayouts = createAllTextInputLayoutList().toTypedArray<TextInputLayout>()
         textInputConfigurator.setUpFocusClearOnClickBackground(

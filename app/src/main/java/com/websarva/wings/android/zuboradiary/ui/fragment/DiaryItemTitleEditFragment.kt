@@ -122,7 +122,7 @@ class DiaryItemTitleEditFragment : BaseFragment() {
     }
 
     private fun setUpItemTitleInputField() {
-        val textInputConfigurator = TextInputConfigurator(requireActivity())
+        val textInputConfigurator = TextInputConfigurator()
         val textInputLayouts = arrayOf(
             binding.textInputLayoutNewItemTitle
         )

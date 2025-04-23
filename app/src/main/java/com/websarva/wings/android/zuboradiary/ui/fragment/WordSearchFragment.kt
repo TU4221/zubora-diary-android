@@ -96,7 +96,7 @@ class WordSearchFragment : BaseFragment() {
         val searchWord = mainViewModel.searchWord.value
         if (searchWord.isEmpty()) {
             binding.editTextSearchWord.requestFocus()
-            KeyboardManager().showKeyboard(requireActivity(), binding.editTextSearchWord)
+            KeyboardManager().showKeyboard(binding.editTextSearchWord)
         }
 
         launchAndRepeatOnViewLifeCycleStarted {
@@ -125,7 +125,7 @@ class WordSearchFragment : BaseFragment() {
         }
 
 
-        val editTextConfigurator = EditTextConfigurator(requireActivity())
+        val editTextConfigurator = EditTextConfigurator()
         editTextConfigurator.setUpFocusClearOnClickBackground(
             binding.viewFullScreenBackground,
             binding.editTextSearchWord

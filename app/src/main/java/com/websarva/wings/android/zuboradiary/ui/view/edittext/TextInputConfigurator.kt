@@ -11,7 +11,7 @@ import com.google.android.material.textfield.TextInputLayout
 import com.websarva.wings.android.zuboradiary.R
 import java.util.Arrays
 
-internal class TextInputConfigurator(activity: Activity) : EditTextConfigurator(activity) {
+internal class TextInputConfigurator() : EditTextConfigurator() {
 
     private fun TextInputLayout.getEditTextNonNull(): EditText {
         return checkNotNull(editText)

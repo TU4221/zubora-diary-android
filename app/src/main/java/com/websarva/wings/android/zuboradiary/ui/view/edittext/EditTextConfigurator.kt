@@ -1,6 +1,5 @@
 package com.websarva.wings.android.zuboradiary.ui.view.edittext
 
-import android.app.Activity
 import android.text.Editable
 import android.text.InputType
 import android.text.TextWatcher
@@ -16,10 +15,10 @@ import android.widget.TextView
 import com.websarva.wings.android.zuboradiary.ui.keyboard.KeyboardManager
 import java.util.Arrays
 
-internal open class EditTextConfigurator(private val activity: Activity) {
+internal open class EditTextConfigurator() {
 
     protected fun hideKeyboard(view: View) {
-        KeyboardManager().hideKeyboard(activity, view)
+        KeyboardManager().hideKeyboard(view)
     }
 
     protected fun setUpScrollable(editText: EditText) {
