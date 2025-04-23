@@ -1,6 +1,5 @@
 package com.websarva.wings.android.zuboradiary.ui.view.edittext
 
-import android.app.Activity
 import android.text.Editable
 import android.text.TextWatcher
 import android.transition.Transition
@@ -11,7 +10,7 @@ import com.google.android.material.textfield.TextInputLayout
 import com.websarva.wings.android.zuboradiary.R
 import java.util.Arrays
 
-internal class TextInputConfigurator() : EditTextConfigurator() {
+internal class TextInputConfigurator : EditTextConfigurator() {
 
     private fun TextInputLayout.getEditTextNonNull(): EditText {
         return checkNotNull(editText)
