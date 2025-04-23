@@ -96,7 +96,7 @@ class DiaryEditFragment : BaseFragment() {
         super.onCreate(savedInstanceState)
 
         pictureUriPermissionManager =
-            object : UriPermissionManager(requireContext()) {
+            object : UriPermissionManager() {
                 override suspend fun checkUsedUriDoesNotExist(uri: Uri): Boolean? {
                     return mainViewModel.checkSavedPicturePathDoesNotExist(uri)
                 }
@@ -987,16 +987,16 @@ class DiaryEditFragment : BaseFragment() {
             pictureUriPermissionManager.apply {
                 if (latestPictureUri == null && loadedPictureUri == null) return@launch
                 if (latestPictureUri != null && loadedPictureUri == null) {
-                    takePersistablePermission(latestPictureUri)
+                    takePersistablePermission(requireContext(), latestPictureUri)
                     return@launch
                 }
                 if (latestPictureUri == null) {
-                    releasePersistablePermission(checkNotNull(loadedPictureUri))
+                    releasePersistablePermission(requireContext(), checkNotNull(loadedPictureUri))
                     return@launch
                 }
                 if (latestPictureUri == loadedPictureUri) return@launch
-                takePersistablePermission(latestPictureUri)
-                releasePersistablePermission(checkNotNull(loadedPictureUri))
+                takePersistablePermission(requireContext(), latestPictureUri)
+                releasePersistablePermission(requireContext(), checkNotNull(loadedPictureUri))
             }
         }
     }
@@ -1004,7 +1004,7 @@ class DiaryEditFragment : BaseFragment() {
     private fun releaseLoadedPictureUriPermission() {
         val loadedPictureUri = mainViewModel.loadedPicturePath.value ?: return
         lifecycleScope.launch(Dispatchers.IO) {
-            pictureUriPermissionManager.releasePersistablePermission(loadedPictureUri)
+            pictureUriPermissionManager.releasePersistablePermission(requireContext(), loadedPictureUri)
         }
     }
 

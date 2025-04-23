@@ -114,7 +114,7 @@ class SettingsFragment : BaseFragment() {
             }
 
         uriPermissionManager =
-            object : UriPermissionManager(requireContext()) {
+            object : UriPermissionManager() {
                 override suspend fun checkUsedUriDoesNotExist(uri: Uri): Boolean {
                     return false // MEMO:本フラグメントではUri権限を個別に解放しないため常時false
                 }
@@ -233,7 +233,7 @@ class SettingsFragment : BaseFragment() {
 
         lifecycleScope.launch(Dispatchers.IO) {
             val isSuccessful = settingsViewModel.deleteAllDiaries()
-            if (isSuccessful) uriPermissionManager.releaseAllPersistablePermission()
+            if (isSuccessful) uriPermissionManager.releaseAllPersistablePermission(requireContext())
         }
     }
 
@@ -255,7 +255,7 @@ class SettingsFragment : BaseFragment() {
 
         lifecycleScope.launch(Dispatchers.IO) {
             val isSuccessful = settingsViewModel.deleteAllData()
-            if (isSuccessful) uriPermissionManager.releaseAllPersistablePermission()
+            if (isSuccessful) uriPermissionManager.releaseAllPersistablePermission(requireContext())
         }
     }
 

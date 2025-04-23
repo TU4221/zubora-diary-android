@@ -67,7 +67,7 @@ internal class DiaryShowFragment : BaseFragment() {
         super.onCreate(savedInstanceState)
 
         pictureUriPermissionManager =
-            object : UriPermissionManager(requireContext()) {
+            object : UriPermissionManager() {
                 override suspend fun checkUsedUriDoesNotExist(uri: Uri): Boolean? {
                     return mainViewModel.checkSavedPicturePathDoesNotExist(uri)
                 }
@@ -143,7 +143,7 @@ internal class DiaryShowFragment : BaseFragment() {
         val pictureUri = mainViewModel.picturePath.value ?: return
 
         lifecycleScope.launch(Dispatchers.IO) {
-            pictureUriPermissionManager.releasePersistablePermission(pictureUri)
+            pictureUriPermissionManager.releasePersistablePermission(requireContext(), pictureUri)
         }
     }
 

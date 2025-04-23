@@ -58,7 +58,7 @@ class DiaryListFragment : BaseFragment() {
         super.onCreate(savedInstanceState)
 
         pictureUriPermissionManager =
-            object : UriPermissionManager(requireContext()) {
+            object : UriPermissionManager() {
                 override suspend fun checkUsedUriDoesNotExist(uri: Uri): Boolean? {
                     return mainViewModel.checkSavedPicturePathDoesNotExist(uri)
                 }
@@ -122,7 +122,8 @@ class DiaryListFragment : BaseFragment() {
             val deleteDiaryPictureUri =
                 receiveResulFromDialog<Uri>(DiaryListDeleteDialogFragment.KEY_DELETE_DIARY_PICTURE_URI)
                     ?: return@launch
-            pictureUriPermissionManager.releasePersistablePermission(deleteDiaryPictureUri)
+            pictureUriPermissionManager
+                .releasePersistablePermission(requireContext(), deleteDiaryPictureUri)
         }
     }
 

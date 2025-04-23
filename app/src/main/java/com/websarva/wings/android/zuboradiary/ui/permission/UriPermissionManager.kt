@@ -1,21 +1,20 @@
 package com.websarva.wings.android.zuboradiary.ui.permission
 
-import android.content.ContentResolver
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.util.Log
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 
-internal abstract class UriPermissionManager(context: Context) {
+internal abstract class UriPermissionManager {
 
     private val logTag = createLogTag()
 
-    private val resolver: ContentResolver = context.contentResolver
-
-    fun takePersistablePermission(uri: Uri) {
+    fun takePersistablePermission(context: Context, uri: Uri) {
         val logMsg = "端末写真使用権限取得"
         Log.d(logTag, "${logMsg}_開始=$uri")
+
+        val resolver = context.contentResolver
         resolver.takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION)
         try {
             resolver.takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION)
@@ -32,10 +31,11 @@ internal abstract class UriPermissionManager(context: Context) {
     abstract suspend fun checkUsedUriDoesNotExist(uri: Uri): Boolean?
 
     // MEMO:Uri先のファイルを削除すると、登録されていたUriPermissionも同時に削除される。
-    suspend fun releasePersistablePermission(uri: Uri) {
+    suspend fun releasePersistablePermission(context: Context, uri: Uri) {
         val logMsg = "端末写真使用権限解放"
         Log.d(logTag, "${logMsg}_開始_URI=$uri")
 
+        val resolver = context.contentResolver
         val permissionList = resolver.persistedUriPermissions
         for (uriPermission in permissionList) {
             val permittedUri = uriPermission.uri
@@ -53,10 +53,11 @@ internal abstract class UriPermissionManager(context: Context) {
         Log.d(logTag, "${logMsg}_完了")
     }
 
-    fun releaseAllPersistablePermission() {
+    fun releaseAllPersistablePermission(context: Context) {
         val logMsg = "端末写真使用権限全解放"
         Log.d(logTag, "${logMsg}_開始")
 
+        val resolver = context.contentResolver
         val permissionList = resolver.persistedUriPermissions
         for (uriPermission in permissionList) {
             val uri = uriPermission.uri
