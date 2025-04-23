@@ -10,6 +10,7 @@ import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import android.view.WindowManager
 import android.view.inputmethod.EditorInfo
 import android.widget.AdapterView
 import android.widget.AdapterView.OnItemClickListener
@@ -49,6 +50,7 @@ import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.DiaryLoadingFai
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.DiaryPictureDeleteDialogFragment
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.DiaryUpdateDialogFragment
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.WeatherInfoFetchingDialogFragment
+import com.websarva.wings.android.zuboradiary.ui.keyboard.KeyboardManager
 import com.websarva.wings.android.zuboradiary.ui.utils.toJapaneseDateString
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
@@ -117,6 +119,7 @@ class DiaryEditFragment : BaseFragment() {
 
         setUpViewModelInitialization()
         setUpPendingDialogObserver()
+        setUpFocusViewScroll()
         setUpDiaryData()
         setUpToolBar()
         setUpDateInputField()
@@ -358,6 +361,31 @@ class DiaryEditFragment : BaseFragment() {
                 return true
             }
         }
+    }
+
+    private fun setUpFocusViewScroll() {
+        KeyboardManager(requireActivity()).registerKeyBoredStateListener(this) { isShowed ->
+            if (!isShowed) return@registerKeyBoredStateListener
+            require(isSoftInputAdjustNothing())
+
+            val focusView = this@DiaryEditFragment.view?.findFocus() ?: return@registerKeyBoredStateListener
+
+            val offset = 800
+            val location = IntArray(2)
+            focusView.getLocationOnScreen(location)
+            val positionY = location[1]
+            val scrollAmount = positionY - offset
+
+            binding.nestedScrollFullScreen.smoothScrollBy(0, scrollAmount)
+        }
+    }
+
+    // MEMO:キーボード表示時、ActivityのLayoutが変更されない設定であるかを確認。
+    private fun isSoftInputAdjustNothing(): Boolean {
+        val softInputAdjust =
+            requireActivity().window.attributes.softInputMode and
+                    WindowManager.LayoutParams.SOFT_INPUT_MASK_ADJUST
+        return softInputAdjust == WindowManager.LayoutParams.SOFT_INPUT_ADJUST_NOTHING
     }
 
     private fun setUpDiaryData() {
