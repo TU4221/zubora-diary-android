@@ -175,7 +175,7 @@ internal class WordSearchViewModel @Inject internal constructor(
         }
     }
 
-    private interface WordSearchResultListCreator {
+    private fun interface WordSearchResultListCreator {
         @Throws(Exception::class)
         suspend fun create(
             spannableStringColor: Int,

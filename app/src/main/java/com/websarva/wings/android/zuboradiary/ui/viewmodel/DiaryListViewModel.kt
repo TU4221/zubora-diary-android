@@ -145,7 +145,7 @@ internal class DiaryListViewModel @Inject constructor(private val diaryRepositor
         }
     }
 
-    private interface DiaryListCreator {
+    private fun interface DiaryListCreator {
         @Throws(Exception::class)
         suspend fun create(): DiaryYearMonthList
     }

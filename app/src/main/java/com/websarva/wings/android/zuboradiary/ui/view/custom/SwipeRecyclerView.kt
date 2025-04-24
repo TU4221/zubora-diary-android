@@ -25,7 +25,7 @@ internal class SwipeRecyclerView @JvmOverloads constructor(
     private var onTouchUpListener: OnTouchUpListener? = null
     private var onPerformClickListener: OnPerformClickListener? = null
 
-    interface OnTouchUpListener {
+    fun interface OnTouchUpListener {
         fun onTouchUp()
     }
 
@@ -33,7 +33,7 @@ internal class SwipeRecyclerView @JvmOverloads constructor(
         onTouchUpListener = listener
     }
 
-    interface OnPerformClickListener {
+    fun interface OnPerformClickListener {
         fun onPerformClick(view: View, event: MotionEvent): Boolean
     }
 
