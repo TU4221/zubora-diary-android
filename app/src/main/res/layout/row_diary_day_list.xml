@@ -42,7 +42,9 @@
             android:gravity="center_vertical"
             android:hint="@string/row_diary_day_list_title_hint"
             android:textAppearance="@style/DiaryListDayTextAppearance"
-            android:textSize="20sp" />
+            android:textSize="20sp"
+            android:maxLines="1"
+            android:ellipsize="end" />
 
         <ImageView
             style="@style/DiaryDayListImageViewStyle"
