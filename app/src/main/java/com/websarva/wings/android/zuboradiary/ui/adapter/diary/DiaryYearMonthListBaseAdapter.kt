@@ -71,8 +71,7 @@ internal abstract class DiaryYearMonthListBaseAdapter protected constructor(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         val inflater = LayoutInflater.from(parent.context)
-        val creator = ThemeColorInflaterCreator(context, inflater, themeColor)
-        val themeColorInflater = creator.create()
+        val themeColorInflater = ThemeColorInflaterCreator().create(inflater, themeColor)
 
         when(viewType) {
             ViewType.DIARY.viewTypeNumber -> {

@@ -120,8 +120,7 @@ abstract class BaseFragment : LoggingFragment() {
 
     // ThemeColorに合わせたインフレーター作成
     private fun createThemeColorInflater(inflater: LayoutInflater): LayoutInflater {
-        val creator = ThemeColorInflaterCreator(requireContext(), inflater, themeColor)
-        return creator.create()
+        return ThemeColorInflaterCreator().create(inflater, themeColor)
     }
 
     private fun setUpFragmentTransitionEffect() {

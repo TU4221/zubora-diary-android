@@ -5,15 +5,13 @@ import android.view.LayoutInflater
 import androidx.appcompat.view.ContextThemeWrapper
 import com.websarva.wings.android.zuboradiary.data.model.ThemeColor
 
-internal class ThemeColorInflaterCreator(
-    private val context: Context,
-    private val inflater: LayoutInflater,
-    private val themeColor: ThemeColor
-) {
+internal class ThemeColorInflaterCreator {
 
-    fun create(): LayoutInflater {
+    fun create(inflater: LayoutInflater, themeColor: ThemeColor): LayoutInflater {
+        val context = inflater.context
         val themeResId = themeColor.themeResId
         val contextWithTheme: Context = ContextThemeWrapper(context, themeResId)
+
         return inflater.cloneInContext(contextWithTheme)
     }
 }

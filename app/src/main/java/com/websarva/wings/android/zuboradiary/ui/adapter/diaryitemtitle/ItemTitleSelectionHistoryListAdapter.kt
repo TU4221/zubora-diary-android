@@ -46,8 +46,7 @@ internal class ItemTitleSelectionHistoryListAdapter
         viewType: Int
     ): ItemTitleSelectionHistoryViewHolder {
         val inflater = LayoutInflater.from(parent.context)
-        val creator = ThemeColorInflaterCreator(context, inflater, themeColor)
-        val themeColorInflater = creator.create()
+        val themeColorInflater = ThemeColorInflaterCreator().create(inflater, themeColor)
         val binding =
             RowItemTitleSelectionHistoryBinding.inflate(themeColorInflater, parent, false)
         return ItemTitleSelectionHistoryViewHolder(binding)

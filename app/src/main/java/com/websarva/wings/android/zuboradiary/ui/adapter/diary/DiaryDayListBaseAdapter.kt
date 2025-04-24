@@ -37,8 +37,7 @@ internal abstract class DiaryDayListBaseAdapter protected constructor(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         val inflater = LayoutInflater.from(parent.context)
-        val creator = ThemeColorInflaterCreator(parent.context, inflater, themeColor)
-        val themeColorInflater = creator.create()
+        val themeColorInflater = ThemeColorInflaterCreator().create(inflater, themeColor)
 
         return onCreateDiaryDayViewHolder(parent, themeColorInflater)
     }

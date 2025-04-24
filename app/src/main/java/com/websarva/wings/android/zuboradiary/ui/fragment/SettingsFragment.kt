@@ -281,11 +281,10 @@ class SettingsFragment : BaseFragment() {
     }
 
     private fun switchViewColor(themeColor: ThemeColor) {
-        val changer =
-            SettingsThemeColorChanger(requireContext(), themeColor)
+        val changer = SettingsThemeColorChanger()
 
-        changer.applyBackgroundColor(binding.viewFullScreenBackground)
-        changer.applyToolbarColor(binding.materialToolbarTopAppBar)
+        changer.applyBackgroundColor(binding.viewFullScreenBackground, themeColor)
+        changer.applyToolbarColor(binding.materialToolbarTopAppBar, themeColor)
 
         changer.applySettingItemSectionColor(
             binding.run {
@@ -296,7 +295,8 @@ class SettingsFragment : BaseFragment() {
                     textSettingsSectionData,
                     textSettingsSectionOther
                 )
-            }
+            },
+            themeColor
         )
 
         changer.applySettingItemIconColor(
@@ -312,7 +312,8 @@ class SettingsFragment : BaseFragment() {
                     includeAllDataDeleteSetting.textTitle,
                     includeOpenSourceLicensesSetting.textTitle
                 )
-            }
+            },
+            themeColor
         )
 
         changer.applyTextColorOnBackground(
@@ -328,7 +329,8 @@ class SettingsFragment : BaseFragment() {
                     includeWeatherInfoAcquisitionSetting.textTitle,
                     includeOpenSourceLicensesSetting.textTitle
                 )
-            }
+            },
+            themeColor
         )
 
         changer.applyRedTextColorOnBackground(
@@ -338,7 +340,8 @@ class SettingsFragment : BaseFragment() {
                     includeAllSettingsInitializationSetting.textTitle,
                     includeAllDataDeleteSetting.textTitle
                 )
-            }
+            },
+            themeColor
         )
 
         changer.applySwitchColor(
@@ -348,7 +351,8 @@ class SettingsFragment : BaseFragment() {
                     includePasscodeLockSetting.materialSwitch,
                     includeWeatherInfoAcquisitionSetting.materialSwitch
                 )
-            }
+            },
+            themeColor
         )
 
         changer.applyDividerColor(
@@ -369,7 +373,8 @@ class SettingsFragment : BaseFragment() {
                     materialDividerOpenSourceLicensesSetting,
                     materialDividerSectionEnd
                 )
-            }
+            },
+            themeColor
         )
     }
 

@@ -174,8 +174,7 @@ class MainActivity : LoggingActivity() {
 
     private fun setUpMainActivityBinding() {
         val themeColor = settingsViewModel.themeColor.requireValue()
-        val creator = ThemeColorInflaterCreator(this, layoutInflater, themeColor)
-        val themeColorInflater = creator.create()
+        val themeColorInflater = ThemeColorInflaterCreator().create(layoutInflater, themeColor)
         _binding = ActivityMainBinding.inflate(themeColorInflater)
         setContentView(binding.root)
         isMainActivityLayoutInflated = true
@@ -262,12 +261,11 @@ class MainActivity : LoggingActivity() {
     }
 
     private fun switchThemeColor(themeColor: ThemeColor) {
-        val changer =
-            ThemeColorChanger(applicationContext, themeColor)
-        changer.applyStatusBarColor(window)
-        changer.applyBackgroundColor(binding.viewFullScreenBackground)
-        changer.applyToolbarColor(binding.materialToolbarTopAppBar)
-        changer.applyBottomNavigationColor(binding.bottomNavigation)
+        val changer = ThemeColorChanger()
+        changer.applyStatusBarColor(window, themeColor)
+        changer.applyBackgroundColor(binding.viewFullScreenBackground, themeColor)
+        changer.applyToolbarColor(binding.materialToolbarTopAppBar, themeColor)
+        changer.applyBottomNavigationColor(binding.bottomNavigation, themeColor)
     }
 
     private fun setUpNavigation() {

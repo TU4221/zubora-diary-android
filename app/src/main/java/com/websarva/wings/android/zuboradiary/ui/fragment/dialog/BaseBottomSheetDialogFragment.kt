@@ -65,8 +65,7 @@ abstract class BaseBottomSheetDialogFragment : BottomSheetDialogFragment() {
         inflater: LayoutInflater,
         themeColor: ThemeColor
     ): LayoutInflater {
-        val creator = ThemeColorInflaterCreator(requireContext(), inflater, themeColor)
-        return creator.create()
+        return ThemeColorInflaterCreator().create(inflater, themeColor)
     }
 
     /**
