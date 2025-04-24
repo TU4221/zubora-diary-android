@@ -411,40 +411,46 @@ class DiaryEditFragment : BaseFragment() {
                 val diaryDate = mainViewModel.date.requireValue()
 
                 //日記保存(日記表示フラグメント起動)。
-                if (item.itemId == R.id.diaryEditToolbarOptionSaveDiary) {
-                    lifecycleScope.launch(Dispatchers.IO) {
-                        val shouldShowDialog =
-                            mainViewModel.shouldShowUpdateConfirmationDialog() ?: return@launch
-                        if (shouldShowDialog) {
-                            withContext(Dispatchers.Main) {
-                                showDiaryUpdateDialog(diaryDate)
-                            }
-                        } else {
-                            val isSuccessful = mainViewModel.saveDiary()
-                            if (isSuccessful) {
-                                updatePictureUriPermission()
+                when (item.itemId) {
+                    R.id.diaryEditToolbarOptionSaveDiary -> {
+                        lifecycleScope.launch(Dispatchers.IO) {
+                            val shouldShowDialog =
+                                mainViewModel.shouldShowUpdateConfirmationDialog() ?: return@launch
+                            if (shouldShowDialog) {
                                 withContext(Dispatchers.Main) {
-                                    showDiaryShowFragment(diaryDate)
+                                    showDiaryUpdateDialog(diaryDate)
+                                }
+                            } else {
+                                val isSuccessful = mainViewModel.saveDiary()
+                                if (isSuccessful) {
+                                    updatePictureUriPermission()
+                                    withContext(Dispatchers.Main) {
+                                        showDiaryShowFragment(diaryDate)
+                                    }
                                 }
                             }
                         }
+                        return@setOnMenuItemClickListener true
                     }
-                    return@setOnMenuItemClickListener true
-                } else if (item.itemId == R.id.diaryEditToolbarOptionDeleteDiary) {
-                    showDiaryDeleteDialog(diaryDate)
-                    return@setOnMenuItemClickListener true
-                } else if (item.itemId == R.id.diaryEditToolbarOptionTest) {
-                    isTesting = true
-                    lifecycleScope.launch(Dispatchers.IO) {
-                        val isSuccessful = mainViewModel.test()
-                        isTesting = false
-                        if (isSuccessful) {
-                            withContext(Dispatchers.Main) {
-                                navController.navigateUp()
+
+                    R.id.diaryEditToolbarOptionDeleteDiary -> {
+                        showDiaryDeleteDialog(diaryDate)
+                        return@setOnMenuItemClickListener true
+                    }
+
+                    R.id.diaryEditToolbarOptionTest -> {
+                        isTesting = true
+                        lifecycleScope.launch(Dispatchers.IO) {
+                            val isSuccessful = mainViewModel.test()
+                            isTesting = false
+                            if (isSuccessful) {
+                                withContext(Dispatchers.Main) {
+                                    navController.navigateUp()
+                                }
                             }
                         }
+                        return@setOnMenuItemClickListener true
                     }
-                    return@setOnMenuItemClickListener true
                 }
                 false
             }
