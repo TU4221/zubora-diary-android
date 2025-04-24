@@ -63,12 +63,12 @@ internal class DiaryStateFlow {
 
     fun update(diaryEntity: DiaryEntity) {
         date.value = LocalDate.parse(diaryEntity.date)
-        val intWeather1 = diaryEntity.weather1
-        weather1.value = Weather.of(intWeather1)
-        val intWeather2 = diaryEntity.weather2
-        weather2.value = Weather.of(intWeather2)
-        val intCondition = diaryEntity.condition
-        condition.value = Condition.of(intCondition)
+        val weatherInt1 = diaryEntity.weather1
+        weather1.value = Weather.of(weatherInt1)
+        val weatherInt2 = diaryEntity.weather2
+        weather2.value = Weather.of(weatherInt2)
+        val conditionInt = diaryEntity.condition
+        condition.value = Condition.of(conditionInt)
         val title = diaryEntity.title
         this.title.value = title
 
