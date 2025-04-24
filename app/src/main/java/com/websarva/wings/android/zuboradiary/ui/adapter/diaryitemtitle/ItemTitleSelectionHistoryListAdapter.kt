@@ -70,7 +70,7 @@ internal class ItemTitleSelectionHistoryListAdapter
         }
     }
 
-    internal fun interface OnClickItemListener {
+    fun interface OnClickItemListener {
         fun onClick(title: String)
     }
 
@@ -78,7 +78,7 @@ internal class ItemTitleSelectionHistoryListAdapter
         this.onClickItemListener = onClickItemListener
     }
 
-    internal fun interface OnClickDeleteButtonListener {
+    fun interface OnClickDeleteButtonListener {
         fun onClick(position: Int, title: String)
     }
 
