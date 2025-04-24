@@ -15,7 +15,7 @@ import android.widget.TextView
 import com.websarva.wings.android.zuboradiary.ui.keyboard.KeyboardManager
 import java.util.Arrays
 
-internal open class EditTextConfigurator() {
+internal open class EditTextConfigurator {
 
     protected fun hideKeyboard(view: View) {
         KeyboardManager().hideKeyboard(view)
