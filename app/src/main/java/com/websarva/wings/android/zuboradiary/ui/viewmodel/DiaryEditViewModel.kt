@@ -19,6 +19,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import java.time.LocalDate
 import java.time.temporal.ChronoUnit
 import javax.inject.Inject
+import kotlin.random.Random
 
 @HiltViewModel
 internal class DiaryEditViewModel @Inject constructor(
@@ -252,7 +253,6 @@ internal class DiaryEditViewModel @Inject constructor(
         }
     }
 
-    // TODO:TestDiariesSaverクラス削除後、public削除。
     suspend fun saveDiary(): Boolean {
         val logMsg = "日記保存"
         Log.i(logTag, "${logMsg}_開始")
@@ -300,7 +300,6 @@ internal class DiaryEditViewModel @Inject constructor(
     }
 
     // 日付関係
-    // TODO:TestDiariesSaverクラス削除後、public削除。
     fun updateDate(date: LocalDate) {
         val previousDate = diaryStateFlow.date.value
 
@@ -432,5 +431,53 @@ internal class DiaryEditViewModel @Inject constructor(
     // MEMO:引数の型をサブクラスに制限
     fun addPendingDialogList(pendingDialog: DiaryEditPendingDialog) {
         super.addPendingDialogList(pendingDialog)
+    }
+
+    // TODO:テスト用の為、最終的に削除
+    suspend fun test(): Boolean {
+        var isSuccess = false
+        val startDate = date.value
+        if (startDate != null) {
+            for (i in 0 until 10) {
+                val savingDate = startDate.minusDays(i.toLong())
+                val isPass = existsSavedDiary(savingDate) ?: return false
+                if (isPass) {
+                    isSuccess = true
+                    continue
+                }
+                diaryStateFlow.initialize()
+                updateDate(savingDate)
+                val weather1Int = Random.nextInt(1, Weather.entries.size)
+                updateWeather1(Weather.of(weather1Int))
+                val weather2Int = Random.nextInt(1, Weather.entries.size)
+                updateWeather2(Weather.of(weather2Int))
+                val conditionInt = Random.nextInt(1, Condition.entries.size)
+                updateCondition(Condition.of(conditionInt))
+                val title = generateRandomAlphanumericString(15)
+                diaryStateFlow.title.value = title
+                val numItems = Random.nextInt(ItemNumber.MIN_NUMBER, ItemNumber.MAX_NUMBER + 1)
+                diaryStateFlow.numVisibleItems.value = numItems
+                for (j in 1..numItems) {
+                    val itemTitle = generateRandomAlphanumericString(15)
+                    val itemComment = generateRandomAlphanumericString(50)
+                    diaryStateFlow.getItemStateFlow(ItemNumber(j)).title.value = itemTitle
+                    diaryStateFlow.getItemStateFlow(ItemNumber(j)).comment.value = itemComment
+                }
+                isSuccess = saveDiary()
+                if (!isSuccess) return false
+            }
+        }
+
+        return isSuccess
+    }
+
+    // TODO:テスト用の為、最終的に削除
+    private fun generateRandomAlphanumericString(length: Int): String {
+        require(length >= 0) { "Length must be non-negative" }
+
+        val allowedChars = ('A'..'Z') + ('a'..'z') + ('0'..'9')
+        return (1..length)
+            .map { allowedChars.random() }
+            .joinToString("")
     }
 }

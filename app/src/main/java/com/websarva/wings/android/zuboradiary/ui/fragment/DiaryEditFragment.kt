@@ -36,7 +36,6 @@ import com.websarva.wings.android.zuboradiary.ui.model.AppMessage
 import com.websarva.wings.android.zuboradiary.ui.model.DiaryEditPendingDialog
 import com.websarva.wings.android.zuboradiary.ui.view.imageview.DiaryPictureConfigurator
 import com.websarva.wings.android.zuboradiary.ui.model.PendingDialog
-import com.websarva.wings.android.zuboradiary.ui.TestDiariesSaver
 import com.websarva.wings.android.zuboradiary.ui.view.edittext.TextInputConfigurator
 import com.websarva.wings.android.zuboradiary.ui.permission.UriPermissionManager
 import com.websarva.wings.android.zuboradiary.ui.utils.requireValue
@@ -92,6 +91,9 @@ class DiaryEditFragment : BaseFragment() {
     // Uri関係
     private lateinit var pictureUriPermissionManager: UriPermissionManager
 
+    // TODO:テスト用の為、最終的に削除
+    private var isTesting = false
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -129,14 +131,6 @@ class DiaryEditFragment : BaseFragment() {
         setUpItemInputField()
         setUpPictureInputField()
         setupEditText()
-
-        // TODO:最終的に削除
-        binding.fabTest.setOnClickListener {
-            val testDiariesSaver = TestDiariesSaver(mainViewModel)
-            lifecycleScope.launch(Dispatchers.IO) {
-                testDiariesSaver.save(28)
-            }
-        }
     }
 
     override fun handleOnReceivingResultFromPreviousFragment() {
@@ -439,6 +433,18 @@ class DiaryEditFragment : BaseFragment() {
                 } else if (item.itemId == R.id.diaryEditToolbarOptionDeleteDiary) {
                     showDiaryDeleteDialog(diaryDate)
                     return@setOnMenuItemClickListener true
+                } else if (item.itemId == R.id.diaryEditToolbarOptionTest) {
+                    isTesting = true
+                    lifecycleScope.launch(Dispatchers.IO) {
+                        val isSuccessful = mainViewModel.test()
+                        isTesting = false
+                        if (isSuccessful) {
+                            withContext(Dispatchers.Main) {
+                                navController.navigateUp()
+                            }
+                        }
+                    }
+                    return@setOnMenuItemClickListener true
                 }
                 false
             }
@@ -460,6 +466,10 @@ class DiaryEditFragment : BaseFragment() {
                     val menu = binding.materialToolbarTopAppBar.menu
                     val deleteMenuItem = menu.findItem(R.id.diaryEditToolbarOptionDeleteDiary)
                     deleteMenuItem.setEnabled(enabledDelete)
+
+                    // TODO:テスト用の為、最終的に削除
+                    val testMenuItem = menu.findItem(R.id.diaryEditToolbarOptionTest)
+                    testMenuItem.setEnabled(!enabledDelete)
                 }
         }
     }
@@ -477,6 +487,7 @@ class DiaryEditFragment : BaseFragment() {
         launchAndRepeatOnViewLifeCycleStarted {
             mainViewModel.date
                 .collectLatest { value: LocalDate? ->
+                    if (isTesting) return@collectLatest
                     DateObserver().onChanged(value)
                 }
         }

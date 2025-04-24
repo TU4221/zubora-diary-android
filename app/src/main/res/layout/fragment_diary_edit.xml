@@ -33,17 +33,6 @@
                 app:menu="@menu/diary_edit_toolbar_menu"
                 tools:title="@string/fragment_diary_edit_toolbar_title_value_tools" />
 
-            <!-- TODO:最終的に削除 -->
-            <com.google.android.material.floatingactionbutton.FloatingActionButton
-                android:id="@+id/fab_test"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="end"
-                android:layout_marginEnd="16dp"
-                android:layout_marginBottom="16dp"
-                android:src="@android:drawable/ic_menu_edit"
-                android:contentDescription="TEST"/>
-
             <androidx.core.widget.NestedScrollView
                 android:id="@+id/nested_scroll_full_screen"
                 android:layout_width="match_parent"

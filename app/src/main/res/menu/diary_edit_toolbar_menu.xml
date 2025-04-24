@@ -14,4 +14,10 @@
         android:title="@string/fragment_diary_edit_toolbar_option_save_diary"
         app:showAsAction="ifRoom" />
 
+    <!-- TODO:テスト用の為、最終的に削除 -->
+    <item
+        android:id="@+id/diaryEditToolbarOptionTest"
+        android:title="@string/fragment_diary_edit_toolbar_option_test"
+        app:showAsAction="never" />
+
 </menu>
