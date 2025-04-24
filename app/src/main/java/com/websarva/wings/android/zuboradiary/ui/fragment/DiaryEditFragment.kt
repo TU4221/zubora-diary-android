@@ -410,7 +410,7 @@ class DiaryEditFragment : BaseFragment() {
             .setOnMenuItemClickListener { item: MenuItem ->
                 val diaryDate = mainViewModel.date.requireValue()
 
-                //日記保存(日記表示フラグメント起動)。
+                // 日記保存、削除
                 when (item.itemId) {
                     R.id.diaryEditToolbarOptionSaveDiary -> {
                         lifecycleScope.launch(Dispatchers.IO) {
