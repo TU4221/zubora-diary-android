@@ -285,8 +285,8 @@ internal class DiaryListViewModel @Inject constructor(private val diaryRepositor
     suspend fun loadNewestSavedDiaryDate(): LocalDate? {
         try {
             val diaryEntity = diaryRepository.loadNewestDiary() ?: return null
-            val strDate = diaryEntity.date
-            return LocalDate.parse(strDate)
+            val dateString = diaryEntity.date
+            return LocalDate.parse(dateString)
         } catch (e: Exception) {
             Log.e(logTag, "最新日記読込_失敗", e)
             addAppMessage(DiaryListAppMessage.DiaryInfoLoadingFailure)
@@ -297,8 +297,8 @@ internal class DiaryListViewModel @Inject constructor(private val diaryRepositor
     suspend fun loadOldestSavedDiaryDate(): LocalDate? {
         try {
             val diaryEntity = diaryRepository.loadOldestDiary() ?: return null
-            val strDate = diaryEntity.date
-            return LocalDate.parse(strDate)
+            val dateString = diaryEntity.date
+            return LocalDate.parse(dateString)
         } catch (e: Exception) {
             Log.e(logTag, "最古日記読込_失敗", e)
             addAppMessage(DiaryListAppMessage.DiaryInfoLoadingFailure)

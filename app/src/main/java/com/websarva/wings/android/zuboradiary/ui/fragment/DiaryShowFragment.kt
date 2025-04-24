@@ -202,8 +202,8 @@ internal class DiaryShowFragment : BaseFragment() {
                     // MEMO:DiaryViewModelを初期化するとDiaryDateにnullが代入されるため、下記"return"を処理。
                     if (value == null) return@collectLatest
 
-                    val stringDate = value.toJapaneseDateString(requireContext())
-                    binding.materialToolbarTopAppBar.title = stringDate
+                    val dateString = value.toJapaneseDateString(requireContext())
+                    binding.materialToolbarTopAppBar.title = dateString
                 }
         }
     }
@@ -364,8 +364,8 @@ internal class DiaryShowFragment : BaseFragment() {
             // MEMO:DiaryViewModelを初期化するとDiaryLogにnullが代入されるため、下記"return"を処理。
             if (value == null) return
 
-            val strDate = value.toJapaneseDateTimeWithSecondsString(context)
-            textLog.text = strDate
+            val dateString = value.toJapaneseDateTimeWithSecondsString(context)
+            textLog.text = dateString
         }
     }
 

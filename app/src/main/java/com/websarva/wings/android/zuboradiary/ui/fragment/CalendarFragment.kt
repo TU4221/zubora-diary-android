@@ -408,8 +408,8 @@ class CalendarFragment : BaseFragment() {
     }
 
     private fun updateToolBarDate(date: LocalDate) {
-        val stringDate = date.toJapaneseDateString(requireContext())
-        binding.materialToolbarTopAppBar.title = stringDate
+        val dateString = date.toJapaneseDateString(requireContext())
+        binding.materialToolbarTopAppBar.title = dateString
     }
 
     // CalendarViewで選択された日付の日記を表示
