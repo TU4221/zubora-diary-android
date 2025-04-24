@@ -321,8 +321,8 @@ abstract class BaseFragment : LoggingFragment() {
             val firstAppMessage = checkNotNull(value.findFirstItem())
             if (!checkAppMessageTargetType(firstAppMessage)) throw IllegalStateException()
             withContext(Dispatchers.Main) {
-                val isSuccess = showAppMessageDialog(firstAppMessage)
-                if (isSuccess) baseViewModel.removeAppMessageBufferListFirstItem()
+                val isSuccessful = showAppMessageDialog(firstAppMessage)
+                if (isSuccessful) baseViewModel.removeAppMessageBufferListFirstItem()
             }
         }
 
@@ -381,8 +381,8 @@ abstract class BaseFragment : LoggingFragment() {
                         //      そこで判断させると再度保留ダイアログが追加されるので、ここに記述する。(重複処理防止)
                         if (!canNavigateFragment) return@withContext
 
-                        val isSuccess = pendingDialogNavigation!!.showPendingDialog(pendingDialog)
-                        if (isSuccess) mainViewModel!!.removePendingDialogListFirstItem()
+                        val isSuccessful = pendingDialogNavigation!!.showPendingDialog(pendingDialog)
+                        if (isSuccessful) mainViewModel!!.removePendingDialogListFirstItem()
                     }
                 }
         }

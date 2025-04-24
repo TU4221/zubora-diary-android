@@ -435,14 +435,14 @@ internal class DiaryEditViewModel @Inject constructor(
 
     // TODO:テスト用の為、最終的に削除
     suspend fun test(): Boolean {
-        var isSuccess = false
+        var isSuccessful = false
         val startDate = date.value
         if (startDate != null) {
             for (i in 0 until 10) {
                 val savingDate = startDate.minusDays(i.toLong())
                 val isPass = existsSavedDiary(savingDate) ?: return false
                 if (isPass) {
-                    isSuccess = true
+                    isSuccessful = true
                     continue
                 }
                 diaryStateFlow.initialize()
@@ -463,12 +463,12 @@ internal class DiaryEditViewModel @Inject constructor(
                     diaryStateFlow.getItemStateFlow(ItemNumber(j)).title.value = itemTitle
                     diaryStateFlow.getItemStateFlow(ItemNumber(j)).comment.value = itemComment
                 }
-                isSuccess = saveDiary()
-                if (!isSuccess) return false
+                isSuccessful = saveDiary()
+                if (!isSuccessful) return false
             }
         }
 
-        return isSuccess
+        return isSuccessful
     }
 
     // TODO:テスト用の為、最終的に削除
