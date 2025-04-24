@@ -1,6 +1,5 @@
 package com.websarva.wings.android.zuboradiary.ui.adapter.diary.wordsearchresult
 
-import android.content.Context
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -15,10 +14,9 @@ import com.websarva.wings.android.zuboradiary.ui.utils.toDiaryListDayOfWeekStrin
 import java.text.NumberFormat
 
 internal class WordSearchResultDayListAdapter(
-    context: Context,
     recyclerView: RecyclerView,
     themeColor: ThemeColor
-) : DiaryDayListBaseAdapter(context, recyclerView, themeColor, DiffUtilItemCallback()) {
+) : DiaryDayListBaseAdapter(recyclerView, themeColor, DiffUtilItemCallback()) {
 
     override fun onCreateDiaryDayViewHolder(
         parent: ViewGroup,
@@ -33,6 +31,7 @@ internal class WordSearchResultDayListAdapter(
         if (holder !is WordSearchResultDayViewHolder) throw IllegalStateException()
 
         val date = item.date
+        val context = holder.binding.root.context
         val dayOfWeekString = date.dayOfWeek.toDiaryListDayOfWeekString(context)
         holder.binding.includeDay.textDayOfWeek.text = dayOfWeekString
         holder.binding.includeDay.textDayOfMonth.text =
@@ -67,7 +66,9 @@ internal class WordSearchResultDayListAdapter(
         item: WordSearchResultDayListItem
     ) {
         holder.binding.apply {
-            val strItemNumber = context.getString(R.string.fragment_word_search_result_item) + item.itemNumber
+            val context = root.context
+            val strItemNumber =
+                context.getString(R.string.fragment_word_search_result_item) + item.itemNumber
             textItemNumber.text = strItemNumber
             textItemTitle.text = item.itemTitle
             textItemComment.text = item.itemComment

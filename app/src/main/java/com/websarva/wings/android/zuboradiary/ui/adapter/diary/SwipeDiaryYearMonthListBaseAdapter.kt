@@ -1,6 +1,5 @@
 package com.websarva.wings.android.zuboradiary.ui.adapter.diary
 
-import android.content.Context
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.websarva.wings.android.zuboradiary.data.model.ThemeColor
@@ -9,11 +8,10 @@ import com.websarva.wings.android.zuboradiary.ui.adapter.diary.diary.DiaryListSi
 // DiaryFragment、WordSearchFragmentの親RecyclerViewのListAdapter。
 // 親RecyclerViewを同じ構成にする為、一つのクラスで両方の子RecyclerViewに対応できるように作成。
 internal abstract class SwipeDiaryYearMonthListBaseAdapter protected constructor(
-    context: Context,
     recyclerView: RecyclerView,
     themeColor: ThemeColor,
     diffUtilItemCallback: DiffUtilItemCallback
-) : DiaryYearMonthListBaseAdapter(context, recyclerView, themeColor, diffUtilItemCallback) {
+) : DiaryYearMonthListBaseAdapter(recyclerView, themeColor, diffUtilItemCallback) {
 
     fun interface OnClickChildItemBackgroundButtonListener {
         fun onClick(item: DiaryDayListBaseItem)

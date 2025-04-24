@@ -1,6 +1,5 @@
 package com.websarva.wings.android.zuboradiary.ui.fragment
 
-import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -140,7 +139,6 @@ class WordSearchFragment : BaseFragment() {
     private fun setUpWordSearchResultList() {
         val wordSearchResultListAdapter =
             WordSearchResultListAdapter(
-                requireContext(),
                 binding.recyclerWordSearchResultList,
                 themeColor
             )
@@ -173,11 +171,10 @@ class WordSearchFragment : BaseFragment() {
     }
 
     private inner class WordSearchResultListAdapter(
-        context: Context,
         recyclerView: RecyclerView,
         themeColor: ThemeColor
     ) :
-        WordSearchResultYearMonthListAdapter(context, recyclerView, themeColor) {
+        WordSearchResultYearMonthListAdapter(recyclerView, themeColor) {
         override fun loadListOnScrollEnd() {
             mainViewModel
                 .loadAdditionWordSearchResultList(resultWordColor, resultWordBackgroundColor)

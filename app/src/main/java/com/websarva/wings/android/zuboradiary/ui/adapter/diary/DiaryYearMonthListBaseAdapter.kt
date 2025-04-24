@@ -1,6 +1,5 @@
 package com.websarva.wings.android.zuboradiary.ui.adapter.diary
 
-import android.content.Context
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -22,7 +21,6 @@ import com.websarva.wings.android.zuboradiary.ui.theme.ThemeColorInflaterCreator
 // DiaryFragment、WordSearchFragmentの親RecyclerViewのListAdapter。
 // 親RecyclerViewを同じ構成にする為、一つのクラスで両方の子RecyclerViewに対応できるように作成。
 internal abstract class DiaryYearMonthListBaseAdapter protected constructor(
-    protected val context: Context,
     protected val recyclerView: RecyclerView,
     protected val themeColor: ThemeColor,
     diffUtilItemCallback: DiffUtilItemCallback
@@ -103,6 +101,7 @@ internal abstract class DiaryYearMonthListBaseAdapter protected constructor(
 
                 // セクションバー設定
                 // 左端に余白を持たせる為、最初にスペースを入力。
+                val context = binding.root.context
                 val diaryDate =
                     ("  " + diaryYearMonth.year + context.getString(R.string.row_diary_year_month_list_section_bar_year)
                             + diaryYearMonth.monthValue + context.getString(R.string.row_diary_year_month_list_section_bar_month))

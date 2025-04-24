@@ -1,6 +1,5 @@
 package com.websarva.wings.android.zuboradiary.ui.adapter.diary.diary
 
-import android.content.Context
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -16,9 +15,8 @@ import com.websarva.wings.android.zuboradiary.ui.adapter.diary.SwipeDiaryDayList
 import com.websarva.wings.android.zuboradiary.ui.utils.toDiaryListDayOfWeekString
 import java.text.NumberFormat
 
-internal class DiaryDayListAdapter(context: Context, recyclerView: RecyclerView, themeColor: ThemeColor)
+internal class DiaryDayListAdapter(recyclerView: RecyclerView, themeColor: ThemeColor)
     : SwipeDiaryDayListBaseAdapter(
-        context,
         recyclerView,
         themeColor,
         DiffUtilItemCallback()
@@ -37,6 +35,7 @@ internal class DiaryDayListAdapter(context: Context, recyclerView: RecyclerView,
         if (holder !is DiaryDayListViewHolder) throw IllegalStateException()
 
         val date = item.date
+        val context = holder.binding.root.context
         val strDayOfWeek = date.dayOfWeek.toDiaryListDayOfWeekString(context)
         holder.binding.includeDay.textDayOfWeek.text = strDayOfWeek
         holder.binding.includeDay.textDayOfMonth.text =

@@ -1,15 +1,13 @@
 package com.websarva.wings.android.zuboradiary.ui.adapter.diary
 
-import android.content.Context
 import androidx.recyclerview.widget.RecyclerView
 import com.websarva.wings.android.zuboradiary.data.model.ThemeColor
 
 internal abstract class SwipeDiaryDayListBaseAdapter protected constructor(
-    context: Context,
     recyclerView: RecyclerView,
     themeColor: ThemeColor,
     diffUtilItemCallback: DiffUtilItemCallback
-) : DiaryDayListBaseAdapter(context, recyclerView, themeColor, diffUtilItemCallback) {
+) : DiaryDayListBaseAdapter(recyclerView, themeColor, diffUtilItemCallback) {
 
     fun interface OnClickDeleteButtonListener {
         fun onClick(item: DiaryDayListBaseItem)

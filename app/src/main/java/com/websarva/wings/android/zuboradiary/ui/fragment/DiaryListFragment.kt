@@ -1,6 +1,5 @@
 package com.websarva.wings.android.zuboradiary.ui.fragment
 
-import android.content.Context
 import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -169,7 +168,6 @@ class DiaryListFragment : BaseFragment() {
         binding.floatingActionButtonDiaryEdit.isEnabled = true
         val diaryListAdapter =
             DiaryListAdapter(
-                requireContext(),
                 binding.recyclerDiaryList,
                 themeColor
             )
@@ -217,10 +215,9 @@ class DiaryListFragment : BaseFragment() {
     }
 
     private inner class DiaryListAdapter(
-        context: Context,
         recyclerView: RecyclerView,
         themeColor: ThemeColor
-    ) : DiaryYearMonthListAdapter(context, recyclerView, themeColor) {
+    ) : DiaryYearMonthListAdapter(recyclerView, themeColor) {
 
         override fun loadListOnScrollEnd() {
             mainViewModel.loadAdditionDiaryList()

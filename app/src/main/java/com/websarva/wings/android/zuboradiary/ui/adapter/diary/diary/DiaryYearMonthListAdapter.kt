@@ -1,6 +1,5 @@
 package com.websarva.wings.android.zuboradiary.ui.adapter.diary.diary
 
-import android.content.Context
 import android.util.Log
 import androidx.recyclerview.widget.RecyclerView
 import com.websarva.wings.android.zuboradiary.data.model.ThemeColor
@@ -13,12 +12,9 @@ import com.websarva.wings.android.zuboradiary.ui.adapter.diary.SwipeDiaryDayList
 import com.websarva.wings.android.zuboradiary.ui.adapter.diary.SwipeDiaryYearMonthListBaseAdapter
 
 internal abstract class DiaryYearMonthListAdapter(
-    context: Context,
     recyclerView: RecyclerView,
     themeColor: ThemeColor
-) : SwipeDiaryYearMonthListBaseAdapter(context, recyclerView, themeColor,
-    DiffUtilItemCallback()
-) {
+) : SwipeDiaryYearMonthListBaseAdapter(recyclerView, themeColor, DiffUtilItemCallback()) {
 
     override fun createDiaryDayList(
         holder: DiaryYearMonthListViewHolder,
@@ -36,7 +32,7 @@ internal abstract class DiaryYearMonthListAdapter(
         holder: DiaryYearMonthListViewHolder
     ): DiaryDayListAdapter {
         val diaryDayListAdapter =
-            DiaryDayListAdapter(context, holder.binding.recyclerDayList, themeColor)
+            DiaryDayListAdapter(holder.binding.recyclerDayList, themeColor)
         return diaryDayListAdapter.apply {
             build()
             onClickItemListener =

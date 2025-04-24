@@ -1,6 +1,5 @@
 package com.websarva.wings.android.zuboradiary.ui.adapter.diary
 
-import android.content.Context
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -13,7 +12,6 @@ import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import com.websarva.wings.android.zuboradiary.ui.theme.ThemeColorInflaterCreator
 
 internal abstract class DiaryDayListBaseAdapter protected constructor(
-    protected val context: Context,
     protected val recyclerView: RecyclerView,
     protected val themeColor: ThemeColor,
     diffUtilItemCallback: DiffUtilItemCallback

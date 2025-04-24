@@ -1,6 +1,5 @@
 package com.websarva.wings.android.zuboradiary.ui.adapter.diary.wordsearchresult
 
-import android.content.Context
 import android.util.Log
 import androidx.recyclerview.widget.RecyclerView
 import com.websarva.wings.android.zuboradiary.data.model.ThemeColor
@@ -11,11 +10,10 @@ import com.websarva.wings.android.zuboradiary.ui.adapter.diary.DiaryYearMonthLis
 import com.websarva.wings.android.zuboradiary.ui.adapter.diary.DiaryYearMonthListBaseItem
 
 internal abstract class WordSearchResultYearMonthListAdapter(
-    context: Context,
     recyclerView: RecyclerView,
     themeColor: ThemeColor
 ) :
-    DiaryYearMonthListBaseAdapter(context, recyclerView, themeColor, DiffUtilItemCallback()) {
+    DiaryYearMonthListBaseAdapter(recyclerView, themeColor, DiffUtilItemCallback()) {
 
     override fun createDiaryDayList(
         holder: DiaryYearMonthListViewHolder, item: DiaryYearMonthListBaseItem
@@ -30,7 +28,7 @@ internal abstract class WordSearchResultYearMonthListAdapter(
         holder: DiaryYearMonthListViewHolder
     ): WordSearchResultDayListAdapter {
         val wordSearchResultDayListAdapter =
-            WordSearchResultDayListAdapter(context, holder.binding.recyclerDayList, themeColor)
+            WordSearchResultDayListAdapter(holder.binding.recyclerDayList, themeColor)
         return wordSearchResultDayListAdapter.apply {
             build()
             onClickItemListener =
