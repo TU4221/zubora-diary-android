@@ -29,7 +29,9 @@ internal class DiaryListViewModel @Inject constructor(private val diaryRepositor
     BaseViewModel() {
 
     companion object {
-        const val NUM_LOADING_ITEMS: Int = 10 //初期読込時の対象リストが画面全体に表示される値にすること。 // TODO:仮数値の為、最後に設定
+        // MEMO:初期読込時の対象リストが画面全体に表示される値にすること。
+        //      アイテム数が少ないと最後尾のプログラスインディケーターが表示される為。
+        const val NUM_LOADING_ITEMS: Int = 14/*日(2週間分)*/
     }
 
     private val logTag = createLogTag()
