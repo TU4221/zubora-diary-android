@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android"
+<layout xmlns:tools="http://schemas.android.com/tools"
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto" >
 
     <data>
@@ -107,39 +108,54 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content" />
 
+                        <!-- HACK:指定layoutファイル内で"tools:ignore="DuplicateIncludedIds""と記述して対応しているのにもかかわらず、
+                                  警告"DuplicateIncludedIds"が表示される為、"tools:ignore="DuplicateIncludedIds""記述。
+                                  (指定layoutファイル内で警告対象となっているID名を使用している別ファイル(layout_settings_item.xml)を
+                                  layoutとして指定しているincludeタグは警告が表示されていない。) -->
                         <include
                             layout="@layout/layout_settings_item_switch"
                             android:id="@+id/include_reminder_notification_setting"
                             app:settingIcon="@{@drawable/ic_notifications_24px}"
                             app:settingTitle="@{@string/fragment_settings_item_title_reminder_notification}"
                             app:isVisibleSettingValue="@{true}"
-                            app:settingValueSwitch="@{settingsViewModel.isCheckedReminderNotification}" />
+                            app:settingValueSwitch="@{settingsViewModel.isCheckedReminderNotification}"
+                            tools:ignore="DuplicateIncludedIds" />
 
                         <com.google.android.material.divider.MaterialDivider
                             android:id="@+id/material_divider_passcode_lock_setting"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content" />
 
+                        <!-- HACK:指定layoutファイル内で"tools:ignore="DuplicateIncludedIds""と記述して対応しているのにもかかわらず、
+                                  警告"DuplicateIncludedIds"が表示される為、"tools:ignore="DuplicateIncludedIds""記述。
+                                  (指定layoutファイル内で警告対象となっているID名を使用している別ファイル(layout_settings_item.xml)を
+                                  layoutとして指定しているincludeタグは警告が表示されていない。) -->
                         <include
                             layout="@layout/layout_settings_item_switch"
                             android:id="@+id/include_passcode_lock_setting"
                             app:settingIcon="@{@drawable/ic_lock_24px}"
                             app:settingTitle="@{@string/fragment_settings_item_title_passcode_lock}"
                             app:isVisibleSettingValue="@{false}"
-                            app:settingValueSwitch="@{settingsViewModel.isCheckedPasscodeLock}" />
+                            app:settingValueSwitch="@{settingsViewModel.isCheckedPasscodeLock}"
+                            tools:ignore="DuplicateIncludedIds" />
 
                         <com.google.android.material.divider.MaterialDivider
                             android:id="@+id/material_divider_weather_info_acquisition_setting"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content" />
 
+                        <!-- HACK:指定layoutファイル内で"tools:ignore="DuplicateIncludedIds""と記述して対応しているのにもかかわらず、
+                                  警告"DuplicateIncludedIds"が表示される為、"tools:ignore="DuplicateIncludedIds""記述。
+                                  (指定layoutファイル内で警告対象となっているID名を使用している別ファイル(layout_settings_item.xml)を
+                                  layoutとして指定しているincludeタグは警告が表示されていない。) -->
                         <include
                             layout="@layout/layout_settings_item_switch"
                             android:id="@+id/include_weather_info_acquisition_setting"
                             app:settingIcon="@{@drawable/ic_sunny_24px}"
                             app:settingTitle="@{@string/fragment_settings_item_title_weather_info_acquisition}"
                             app:isVisibleSettingValue="@{false}"
-                            app:settingValueSwitch="@{settingsViewModel.isCheckedWeatherInfoAcquisition}" />
+                            app:settingValueSwitch="@{settingsViewModel.isCheckedWeatherInfoAcquisition}"
+                            tools:ignore="DuplicateIncludedIds" />
 
                         <!-- HACK:MaterialSwitchを配置したLayoutをincludeタグで複数配置すると、
                                   MaterialSwitchの初期状態が前回表示した本Fragment内のMaterialSwitchの状態に依存する不具合が発生。
@@ -147,9 +163,14 @@
                                   この状態だとCompoundButton.OnCheckedChangeListenerがチェック状態で誤作動する。
                                   includeタグを使用しなければこの不具合は発生しないが、Layoutの再利用性を考慮してincludeタグを使用する。
                                   この不具合を解決する為に、MaterialSwitchが常時false状態となる下記Layoutを追加する。-->
+                        <!-- HACK:指定layoutファイル内で"tools:ignore="DuplicateIncludedIds""と記述して対応しているのにもかかわらず、
+                                  警告"DuplicateIncludedIds"が表示される為、"tools:ignore="DuplicateIncludedIds""記述。
+                                  (指定layoutファイル内で警告対象となっているID名を使用している別ファイル(layout_settings_item.xml)を
+                                  layoutとして指定しているincludeタグは警告が表示されていない。) -->
                         <include
                             layout="@layout/layout_settings_item_switch"
-                            android:visibility="gone"/>
+                            android:visibility="gone"
+                            tools:ignore="DuplicateIncludedIds" />
 
                     </LinearLayout>
 
