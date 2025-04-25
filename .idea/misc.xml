@@ -103,6 +103,7 @@
     <pattern value="com.websarva.wings.android.zuboradiary.ui.list.wordsearch.WordSearchFragment" />
     <pattern value="com.websarva.wings.android.zuboradiary.ui.list.wordsearch.WordSearchViewModel" />
     <pattern value="com.websarva.wings.android.zuboradiary.di.WorkerModule" />
+    <pattern value="com.websarva.wings.android.zuboradiary.ui.viewmodel.DiaryEditViewModel" method="updatePicturePath" />
   </component>
   <component name="ExternalStorageConfigurationManager" enabled="true" />
   <component name="ProjectRootManager" version="2" languageLevel="JDK_21" default="true" project-jdk-name="jbr-21" project-jdk-type="JavaSDK">
