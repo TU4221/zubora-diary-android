@@ -6,7 +6,8 @@
    See https://developer.android.com/about/versions/12/backup-restore
 -->
 <full-backup-content>
-    <!--
+    <!-- MEMO:Room、PreferencesDataStoreで保存したファイルはデフォルトでバックアップ対象の為、現時点では本ファイル記述不要。
+              https://developer.android.com/identity/data/autobackup?hl=ja
    <include domain="sharedpref" path="."/>
    <exclude domain="sharedpref" path="device.xml"/>
 -->

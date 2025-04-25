@@ -5,7 +5,8 @@
 -->
 <data-extraction-rules>
     <cloud-backup>
-        <!-- TODO: Use <include> and <exclude> to control what is backed up.
+        <!-- MEMO:Room、PreferencesDataStoreで保存したファイルはデフォルトでバックアップ対象の為、現時点では本ファイル記述不要。
+                  https://developer.android.com/identity/data/autobackup?hl=ja
         <include .../>
         <exclude .../>
         -->
