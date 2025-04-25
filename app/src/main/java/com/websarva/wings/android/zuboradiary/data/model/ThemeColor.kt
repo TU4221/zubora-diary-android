@@ -263,6 +263,18 @@ internal enum class ThemeColor @Suppress("unused") constructor(
             }
         }
 
+    val timePickerDialogThemeResId: Int
+        get() {
+            return when (this) {
+                WHITE -> R.style.MaterialTimePickerThemeColorWhite
+                BLACK -> R.style.MaterialTimePickerThemeColorBlack
+                RED -> R.style.MaterialTimePickerThemeColorRed
+                BLUE -> R.style.MaterialTimePickerThemeColorBlue
+                GREEN -> R.style.MaterialTimePickerThemeColorGreen
+                YELLOW -> R.style.MaterialTimePickerThemeColorYellow
+            }
+        }
+
     val themeResId: Int
         get() {
             return when (this) {

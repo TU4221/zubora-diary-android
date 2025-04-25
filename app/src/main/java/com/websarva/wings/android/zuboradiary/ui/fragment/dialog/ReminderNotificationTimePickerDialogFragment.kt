@@ -1,14 +1,10 @@
 package com.websarva.wings.android.zuboradiary.ui.fragment.dialog
 
 import android.content.DialogInterface
-import android.view.View
-import android.widget.NumberPicker
-import com.websarva.wings.android.zuboradiary.databinding.DialogFragmentNumberPickersBinding
+import com.google.android.material.timepicker.MaterialTimePicker
 import java.time.LocalTime
-import java.util.Locale
 
-// TODO:MaterialTimePickerに置き換える？
-class ReminderNotificationTimePickerDialogFragment : BaseNumberPickersBottomSheetDialogFragment() {
+class ReminderNotificationTimePickerDialogFragment : BaseTimePickerDialogFragment() {
 
     companion object {
         private val fromClassName =
@@ -19,16 +15,14 @@ class ReminderNotificationTimePickerDialogFragment : BaseNumberPickersBottomShee
         val KEY_SELECTED_TIME: String = "SelectedTIME$fromClassName"
     }
 
-    override fun handleOnPositiveButtonClick() {
-        setResultSelectedYearMonth()
+    override fun setUpInitializationTime(builder: MaterialTimePicker.Builder) {
+        val localTime = LocalTime.now()
+        builder.setHour(localTime.hour)
+        builder.setMinute(localTime.minute)
     }
 
-    private fun setResultSelectedYearMonth() {
+    override fun handleOnPositiveButtonClick(selectedTime: LocalTime) {
         setResult(KEY_SELECTED_BUTTON, DialogInterface.BUTTON_POSITIVE)
-
-        val selectedHourValue = binding.numberPickerFirst.value
-        val selectedMinuteValue = binding.numberPickerSecond.value
-        val selectedTime = LocalTime.of(selectedHourValue, selectedMinuteValue)
         setResult(KEY_SELECTED_TIME, selectedTime)
     }
 
@@ -38,26 +32,5 @@ class ReminderNotificationTimePickerDialogFragment : BaseNumberPickersBottomShee
 
     override fun handleOnCancel() {
         setResult(KEY_SELECTED_BUTTON, DialogInterface.BUTTON_NEGATIVE)
-    }
-
-    override fun setUpNumberPickers(binding: DialogFragmentNumberPickersBinding) {
-        val localTime = LocalTime.now()
-        binding.numberPickerFirst.maxValue = 23
-        binding.numberPickerFirst.minValue = 0
-        binding.numberPickerFirst.setFormatter(ValueFormatter())
-        binding.numberPickerFirst.wrapSelectorWheel = false
-        binding.numberPickerFirst.value = localTime.hour
-        binding.numberPickerSecond.maxValue = 59
-        binding.numberPickerSecond.minValue = 0
-        binding.numberPickerSecond.setFormatter(ValueFormatter())
-        binding.numberPickerSecond.wrapSelectorWheel = false
-        binding.numberPickerSecond.value = localTime.minute
-        binding.numberPickerThird.visibility = View.GONE
-    }
-
-    private class ValueFormatter : NumberPicker.Formatter {
-        override fun format(value: Int): String {
-            return String.format(Locale.getDefault(), "%02d", value)
-        }
     }
 }

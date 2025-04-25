@@ -320,6 +320,34 @@
 
     <!-- ******************************************************************************** -->
 
+    <!-- MaterialTimePickerDialog -->
+    <!-- ******************************************************************************** -->
+    <style name="MaterialTimePickerThemeColorWhite" parent="ThemeOverlay.Material3.MaterialTimePicker">
+        <item name="android:theme">@style/ThemeColorWhite</item>
+    </style>
+
+    <style name="MaterialTimePickerThemeColorBlack" parent="ThemeOverlay.Material3.MaterialTimePicker">
+        <item name="android:theme">@style/ThemeColorBlack</item>
+    </style>
+
+    <style name="MaterialTimePickerThemeColorRed" parent="ThemeOverlay.Material3.MaterialTimePicker">
+        <item name="android:theme">@style/ThemeColorRed</item>
+    </style>
+
+    <style name="MaterialTimePickerThemeColorBlue" parent="ThemeOverlay.Material3.MaterialTimePicker">
+        <item name="android:theme">@style/ThemeColorBlue</item>
+    </style>
+
+    <style name="MaterialTimePickerThemeColorGreen" parent="ThemeOverlay.Material3.MaterialTimePicker">
+        <item name="android:theme">@style/ThemeColorGreen</item>
+    </style>
+
+    <style name="MaterialTimePickerThemeColorYellow" parent="ThemeOverlay.Material3.MaterialTimePicker">
+        <item name="android:theme">@style/ThemeColorYellow</item>
+    </style>
+
+    <!-- ******************************************************************************** -->
+
 
     <!-- MaterialAlertDialog -->
     <!-- ******************************************************************************** -->
