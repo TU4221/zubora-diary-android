@@ -21,9 +21,9 @@ internal class DiaryPictureConfigurator {
 
         val logMsg = "日記添付写真読込"
         try {
-            Log.e(logTag, "${logMsg}_開始")
+            Log.i(logTag, "${logMsg}_開始")
             setUpPicture(imageView, uri)
-            Log.e(logTag, "${logMsg}_完了")
+            Log.i(logTag, "${logMsg}_完了")
         } catch (e: SecurityException) {
             Log.e(logTag, "${logMsg}_失敗", e)
             setUpPermissionDenialIconOnDiary(imageView, themeColor)
@@ -52,9 +52,9 @@ internal class DiaryPictureConfigurator {
 
         val logMsg = "日記リスト添付写真読込"
         try {
-            Log.e(logTag, "${logMsg}_開始")
+            Log.i(logTag, "${logMsg}_開始")
             setUpPicture(imageView, uri)
-            Log.e(logTag, "${logMsg}_完了")
+            Log.i(logTag, "${logMsg}_完了")
         } catch (e: SecurityException) {
             Log.e(logTag, "${logMsg}_失敗", e)
             setUpPermissionDenialIconOnDiaryList(imageView, themeColor)

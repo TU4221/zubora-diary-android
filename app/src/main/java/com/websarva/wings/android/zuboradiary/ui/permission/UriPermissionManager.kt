@@ -12,7 +12,7 @@ internal abstract class UriPermissionManager {
 
     fun takePersistablePermission(context: Context, uri: Uri) {
         val logMsg = "端末写真使用権限取得"
-        Log.d(logTag, "${logMsg}_開始=$uri")
+        Log.i(logTag, "${logMsg}_開始=$uri")
 
         val resolver = context.contentResolver
         resolver.takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION)
@@ -22,7 +22,7 @@ internal abstract class UriPermissionManager {
             Log.e(logTag, "${logMsg}_失敗", e)
             // 対処できないがアプリを落としたくない為、catchのみの処理とする。
         }
-        Log.d(logTag, "${logMsg}_完了")
+        Log.i(logTag, "${logMsg}_完了")
     }
 
     /**
@@ -33,7 +33,7 @@ internal abstract class UriPermissionManager {
     // MEMO:Uri先のファイルを削除すると、登録されていたUriPermissionも同時に削除される。
     suspend fun releasePersistablePermission(context: Context, uri: Uri) {
         val logMsg = "端末写真使用権限解放"
-        Log.d(logTag, "${logMsg}_開始_URI=$uri")
+        Log.i(logTag, "${logMsg}_開始_URI=$uri")
 
         val resolver = context.contentResolver
         val permissionList = resolver.persistedUriPermissions
@@ -50,12 +50,12 @@ internal abstract class UriPermissionManager {
             }
         }
 
-        Log.d(logTag, "${logMsg}_完了")
+        Log.i(logTag, "${logMsg}_完了")
     }
 
     fun releaseAllPersistablePermission(context: Context) {
         val logMsg = "端末写真使用権限全解放"
-        Log.d(logTag, "${logMsg}_開始")
+        Log.i(logTag, "${logMsg}_開始")
 
         val resolver = context.contentResolver
         val permissionList = resolver.persistedUriPermissions
@@ -64,6 +64,6 @@ internal abstract class UriPermissionManager {
             resolver.releasePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION)
         }
 
-        Log.d(logTag, "${logMsg}_完了")
+        Log.i(logTag, "${logMsg}_完了")
     }
 }

@@ -135,7 +135,7 @@ internal class DiaryListViewModel @Inject constructor(private val diaryRepositor
             _diaryList.value = updateDiaryList
             Log.i(logTag, "${logMsg}_完了")
         } catch (e: CancellationException) {
-            Log.e(logTag, "${logMsg}_キャンセル", e)
+            Log.i(logTag, "${logMsg}_キャンセル", e)
             // 処理なし
         } catch (e: Exception) {
             Log.e(logTag, "${logMsg}_失敗", e)

@@ -334,7 +334,7 @@ internal class DiaryEditViewModel @Inject constructor(
         if (!canFetchWeatherInformation(date)) return
 
         val logMsg = "天気情報取得"
-        Log.d(logTag, "${logMsg}_開始")
+        Log.i(logTag, "${logMsg}_開始")
 
         val currentDate = LocalDate.now()
         val betweenDays = ChronoUnit.DAYS.between(date, currentDate)
@@ -367,7 +367,7 @@ internal class DiaryEditViewModel @Inject constructor(
                 )
             }
             addAppMessage(DiaryEditAppMessage.WeatherInfoLoadingFailure)
-            Log.d(logTag, "${logMsg}_失敗")
+            Log.e(logTag, "${logMsg}_失敗")
         }
         _isVisibleUpdateProgressBar.value = false
     }
