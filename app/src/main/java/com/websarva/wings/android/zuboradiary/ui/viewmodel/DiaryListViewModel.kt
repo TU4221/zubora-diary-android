@@ -14,7 +14,6 @@ import com.websarva.wings.android.zuboradiary.ui.utils.requireValue
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
@@ -75,8 +74,6 @@ internal class DiaryListViewModel @Inject constructor(private val diaryRepositor
 
     private val initialSortConditionDate: LocalDate? = null
     private var sortConditionDate: LocalDate? = initialSortConditionDate
-
-    private val isValidityDelay = true // TODO:調整用
 
     override fun initialize() {
         super.initialize()
@@ -157,7 +154,6 @@ internal class DiaryListViewModel @Inject constructor(private val diaryRepositor
         @Throws(Exception::class)
         override suspend fun create(): DiaryYearMonthList {
             showDiaryListFirstItemProgressIndicator()
-            if (isValidityDelay) delay(1000)
             return loadSavedDiaryList(NUM_LOADING_ITEMS, 0)
         }
 
@@ -174,7 +170,6 @@ internal class DiaryListViewModel @Inject constructor(private val diaryRepositor
             val currentDiaryList = _diaryList.requireValue()
             check(currentDiaryList.isNotEmpty)
 
-            if (isValidityDelay) delay(1000)
             val loadingOffset = currentDiaryList.countDiaries()
             val loadedDiaryList =
                 loadSavedDiaryList(NUM_LOADING_ITEMS, loadingOffset)
@@ -193,7 +188,6 @@ internal class DiaryListViewModel @Inject constructor(private val diaryRepositor
 
             _isVisibleUpdateProgressBar.value = true
             try {
-                if (isValidityDelay) delay(3000)
                 var numLoadingItems = currentDiaryList.countDiaries()
                 // HACK:画面全体にリストアイテムが存在しない状態で日記を追加した後にリスト画面に戻ると、
                 //      日記追加前のアイテム数しか表示されない状態となる。また、スクロール更新もできない。

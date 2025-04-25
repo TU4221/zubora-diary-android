@@ -14,7 +14,6 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
@@ -79,8 +78,6 @@ internal class WordSearchViewModel @Inject internal constructor(
     // MEMO:画面回転時の不要な初期化を防ぐ
     private val initialShouldInitializeOnFragmentDestroy = false
     var shouldInitializeOnFragmentDestroy = initialShouldInitializeOnFragmentDestroy
-
-    private val isValidityDelay = true // TODO:調整用
 
     override fun initialize() {
         super.initialize()
@@ -191,7 +188,6 @@ internal class WordSearchViewModel @Inject internal constructor(
             spannableStringBackGroundColor: Int
         ): WordSearchResultYearMonthList {
             showWordSearchResultListFirstItemProgressIndicator()
-            if (isValidityDelay) delay(1000)
             return loadWordSearchResultDiaryList(
                 numLoadingItems,
                 0,
@@ -217,7 +213,6 @@ internal class WordSearchViewModel @Inject internal constructor(
             val currentResultList = _wordSearchResultList.requireValue()
             check(currentResultList.isNotEmpty)
 
-            if (isValidityDelay) delay(1000)
             val loadingOffset = currentResultList.countDiaries()
             val loadedResultList =
                 loadWordSearchResultDiaryList(
@@ -245,7 +240,6 @@ internal class WordSearchViewModel @Inject internal constructor(
 
             _isVisibleUpdateProgressBar.value = true
             try {
-                if (isValidityDelay) delay(3000)
                 var numLoadingItems = currentResultList.countDiaries()
                 // HACK:画面全体にリストアイテムが存在しない状態で日記を追加した後にリスト画面に戻ると、
                 //      日記追加前のアイテム数しか表示されない状態となる。また、スクロール更新もできない。
