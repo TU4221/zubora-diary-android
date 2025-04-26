@@ -4,6 +4,7 @@ import android.app.Dialog
 import android.content.Context
 import android.content.DialogInterface
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -90,6 +91,22 @@ class DiaryEditFragment : BaseFragment() {
 
     // Uri関係
     private lateinit var pictureUriPermissionManager: UriPermissionManager
+
+
+
+    private val screenHeight: Int
+        get() {
+            val windowManager =
+                requireContext().getSystemService(Context.WINDOW_SERVICE) as WindowManager
+            val screenHeight: Int
+            if (Build.VERSION.SDK_INT >= 30) {
+                val bounds = windowManager.currentWindowMetrics.bounds
+                screenHeight = bounds.height()
+            } else {
+                screenHeight = resources.displayMetrics.heightPixels
+            }
+            return screenHeight
+        }
 
     // TODO:テスト用の為、最終的に削除
     private var isTesting = false
@@ -362,9 +379,10 @@ class DiaryEditFragment : BaseFragment() {
             if (!isShowed) return@registerKeyBoredStateListener
             require(isSoftInputAdjustNothing())
 
-            val focusView = this@DiaryEditFragment.view?.findFocus() ?: return@registerKeyBoredStateListener
+            val focusView =
+                this@DiaryEditFragment.view?.findFocus() ?: return@registerKeyBoredStateListener
 
-            val offset = 800
+            val offset = screenHeight / 3
             val location = IntArray(2)
             focusView.getLocationOnScreen(location)
             val positionY = location[1]
