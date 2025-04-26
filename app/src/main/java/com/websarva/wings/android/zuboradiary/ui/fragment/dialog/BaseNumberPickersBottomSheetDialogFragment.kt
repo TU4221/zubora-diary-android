@@ -16,7 +16,7 @@ abstract class BaseNumberPickersBottomSheetDialogFragment : BaseBottomSheetDialo
 
     // View関係
     private var _binding: DialogFragmentNumberPickersBinding? = null
-    protected val binding get() = checkNotNull(_binding)
+    internal val binding get() = checkNotNull(_binding)
 
     override fun createDialogView(
         inflater: LayoutInflater, container: ViewGroup?
@@ -65,7 +65,7 @@ abstract class BaseNumberPickersBottomSheetDialogFragment : BaseBottomSheetDialo
     /**
      * BaseNumberPickersBottomSheetDialogFragment#createDialogView()で呼び出される。
      */
-    protected abstract fun setUpNumberPickers(binding: DialogFragmentNumberPickersBinding)
+    internal abstract fun setUpNumberPickers(binding: DialogFragmentNumberPickersBinding)
 
     override fun onDestroyView() {
         Log.d(logTag, "onDestroyView()")

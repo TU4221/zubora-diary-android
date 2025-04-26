@@ -72,9 +72,9 @@ abstract class BaseBottomSheetDialogFragment : BottomSheetDialogFragment() {
      * 戻り値をtrueにすると、ダイアログ枠外、戻るボタンタッチ時にダイアログをキャンセルすることを可能にする。
      * BaseBottomSheetDialogFragment#onCreateView()で呼び出される。
      */
-    protected abstract fun createDialogView(inflater: LayoutInflater, container: ViewGroup?): View?
+    internal abstract fun createDialogView(inflater: LayoutInflater, container: ViewGroup?): View?
 
-    protected inner class PositiveButtonClickListener : View.OnClickListener {
+    internal inner class PositiveButtonClickListener : View.OnClickListener {
         override fun onClick(v: View) {
             Log.d(logTag, "onClick()_PositiveButton")
             handleOnPositiveButtonClick()
@@ -82,7 +82,7 @@ abstract class BaseBottomSheetDialogFragment : BottomSheetDialogFragment() {
         }
     }
 
-    protected inner class NegativeButtonClickListener : View.OnClickListener {
+    internal inner class NegativeButtonClickListener : View.OnClickListener {
         override fun onClick(v: View) {
             Log.d(logTag, "onClick()_NegativeButton")
             handleOnNegativeButtonClick()
@@ -98,12 +98,12 @@ abstract class BaseBottomSheetDialogFragment : BottomSheetDialogFragment() {
     /**
      * BaseBottomSheetDialogFragment.PositiveButtonClickListener#onClick()で呼び出される。
      */
-    protected abstract fun handleOnPositiveButtonClick()
+    internal abstract fun handleOnPositiveButtonClick()
 
     /**
      * BaseBottomSheetDialogFragment.NegativeButtonClickListener#onClick()で呼び出される。
      */
-    protected abstract fun handleOnNegativeButtonClick()
+    internal abstract fun handleOnNegativeButtonClick()
 
     // ダイアログ枠外タッチ、popBackStack時に処理
     // MEMO:ダイアログフラグメントのCANCEL・DISMISS 処理について、
@@ -119,9 +119,9 @@ abstract class BaseBottomSheetDialogFragment : BottomSheetDialogFragment() {
     /**
      * BaseBottomSheetDialogFragment.onCancel()で呼び出される。
      */
-    protected abstract fun handleOnCancel()
+    internal abstract fun handleOnCancel()
 
-    protected fun setResult(resultKey: String, result: Any?) {
+    internal fun setResult(resultKey: String, result: Any?) {
         val navController = NavHostFragment.findNavController(this)
         val navBackStackEntry = checkNotNull(navController.previousBackStackEntry)
         val savedStateHandle = navBackStackEntry.savedStateHandle

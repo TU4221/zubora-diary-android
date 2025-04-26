@@ -39,7 +39,7 @@ abstract class BaseAlertDialogFragment : DialogFragment() {
         return builder.create()
     }
 
-    protected open fun customizeDialog(builder: MaterialAlertDialogBuilder) {
+    internal open fun customizeDialog(builder: MaterialAlertDialogBuilder) {
         val title = createTitle()
         builder.setTitle(title)
 
@@ -67,22 +67,22 @@ abstract class BaseAlertDialogFragment : DialogFragment() {
     /**
      * BaseAlertDialogFragment.customizeDialog()で呼び出される。
      */
-    protected abstract fun createTitle(): String
+    internal abstract fun createTitle(): String
 
     /**
      * BaseAlertDialogFragment.customizeDialog()で呼び出される。
      */
-    protected abstract fun createMessage(): String
+    internal abstract fun createMessage(): String
 
     /**
      * BaseAlertDialogFragment.customizeDialog()で呼び出される。
      */
-    protected abstract fun handleOnPositiveButtonClick()
+    internal abstract fun handleOnPositiveButtonClick()
 
     /**
      * BaseAlertDialogFragment.customizeDialog()で呼び出される。
      */
-    protected abstract fun handleOnNegativeButtonClick()
+    internal abstract fun handleOnNegativeButtonClick()
 
     // ダイアログ枠外タッチ、popBackStack時に処理
     // MEMO:ダイアログフラグメントのCANCEL・DISMISS 処理について、
@@ -98,9 +98,9 @@ abstract class BaseAlertDialogFragment : DialogFragment() {
     /**
      * BaseAlertDialogFragment.onCancel()で呼び出される。
      */
-    protected abstract fun handleOnCancel()
+    internal abstract fun handleOnCancel()
 
-    protected fun setResult(resultKey: String, result: Any?) {
+    internal fun setResult(resultKey: String, result: Any?) {
         val navController = NavHostFragment.findNavController(this)
         val navBackStackEntry = checkNotNull(navController.previousBackStackEntry)
         val savedStateHandle = navBackStackEntry.savedStateHandle

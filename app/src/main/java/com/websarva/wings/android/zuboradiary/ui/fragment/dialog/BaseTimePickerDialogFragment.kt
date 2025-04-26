@@ -61,7 +61,7 @@ abstract class BaseTimePickerDialogFragment : DialogFragment() {
         return timePicker
     }
 
-    protected abstract fun setUpInitializationTime(builder: MaterialTimePicker.Builder)
+    internal abstract fun setUpInitializationTime(builder: MaterialTimePicker.Builder)
 
     private fun setUpOnClickListener(timePicker: MaterialTimePicker, dummyDialog: Dialog) {
         timePicker.addOnPositiveButtonClickListener { _ ->
@@ -88,14 +88,14 @@ abstract class BaseTimePickerDialogFragment : DialogFragment() {
         }
     }
 
-    protected abstract fun handleOnPositiveButtonClick(selectedTime: LocalTime)
+    internal abstract fun handleOnPositiveButtonClick(selectedTime: LocalTime)
 
-    protected abstract fun handleOnNegativeButtonClick()
+    internal abstract fun handleOnNegativeButtonClick()
 
-    protected abstract fun handleOnCancel()
+    internal abstract fun handleOnCancel()
 
     @Suppress("SameParameterValue")
-    protected fun setResult(resultKey: String, result: Any?) {
+    internal fun setResult(resultKey: String, result: Any?) {
         val navController = NavHostFragment.findNavController(this)
         val navBackStackEntry = checkNotNull(navController.previousBackStackEntry)
         val savedStateHandle = navBackStackEntry.savedStateHandle

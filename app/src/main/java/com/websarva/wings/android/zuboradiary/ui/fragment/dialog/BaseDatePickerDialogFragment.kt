@@ -61,7 +61,7 @@ abstract class BaseDatePickerDialogFragment : DialogFragment() {
         return datePicker
     }
 
-    protected abstract fun createInitialDate(): LocalDate
+    internal abstract fun createInitialDate(): LocalDate
 
     private fun setUpOnClickListener(datePicker: MaterialDatePicker<Long>, dummyDialog: Dialog) {
         datePicker.addOnPositiveButtonClickListener { selection: Long ->
@@ -87,14 +87,14 @@ abstract class BaseDatePickerDialogFragment : DialogFragment() {
         }
     }
 
-    protected abstract fun handleOnPositiveButtonClick(selectedDate: LocalDate)
+    internal abstract fun handleOnPositiveButtonClick(selectedDate: LocalDate)
 
-    protected abstract fun handleOnNegativeButtonClick()
+    internal abstract fun handleOnNegativeButtonClick()
 
-    protected abstract fun handleOnCancel()
+    internal abstract fun handleOnCancel()
 
     @Suppress("SameParameterValue")
-    protected fun setResult(resultKey: String, result: Any?) {
+    internal fun setResult(resultKey: String, result: Any?) {
         val navController = NavHostFragment.findNavController(this)
         val navBackStackEntry = checkNotNull(navController.previousBackStackEntry)
         val savedStateHandle = navBackStackEntry.savedStateHandle
