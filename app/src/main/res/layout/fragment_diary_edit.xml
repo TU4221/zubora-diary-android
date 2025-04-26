@@ -303,8 +303,8 @@
                                 android:layout_gravity="center"
                                 android:layout_margin="@dimen/fragment_diary_edit_picture_margin"
                                 android:contentDescription="@string/fragment_diary_edit_attached_picture_attachment"
-                                android:minHeight="@dimen/fragment_diary_edit_picture_minHeight"
-                                android:scaleType="fitXY"
+                                android:scaleType="fitCenter"
+                                android:adjustViewBounds="true"
                                 android:src="@drawable/diary_edit_image_ic_photo_library_24px"
                                 tools:tint="?attr/colorOnSurfaceVariant" />
 

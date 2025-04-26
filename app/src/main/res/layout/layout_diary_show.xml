@@ -162,8 +162,8 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/layout_diary_show_small_margin_top"
             android:layout_gravity="center"
-            android:minHeight="@dimen/fragment_diary_edit_picture_minHeight"
-            android:scaleType="fitXY"
+            android:scaleType="fitCenter"
+            android:adjustViewBounds="true"
             android:contentDescription="@string/layout_diary_show_attached_picture_description"
             tools:ignore="VisualLintBounds" />
 
