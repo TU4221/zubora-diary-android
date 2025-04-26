@@ -15,7 +15,7 @@
 
     <!-- Toolbar -->
     <!-- MEMO:Rippleの色、Tooltipsの背景色の変更方法が不明の為、AppThemeColorBlackのparentをDarkThemeにして対応。-->
-    <style name="AppToolbarStyle" parent="Widget.Material3.Toolbar.Surface">
+    <style name="AppToolbarStyle" parent="ThemeOverlay.Material3.Toolbar.Surface">
         <item name="android:gravity">center</item>
         <item name="android:minHeight">?attr/actionBarSize</item>
         <item name="titleCentered">true</item>
@@ -109,7 +109,7 @@
     </style>
 
     <!-- Button -->
-    <style name="AppTonalButtonStyle" parent="Widget.Material3.Button.TonalButton">
+    <style name="AppTonalButtonStyle" parent="ThemeOverlay.Material3.Button.TonalButton">
     </style>
 
     <!-- ImageButton -->
@@ -126,10 +126,10 @@
 
 
     <!-- FloatingActionButton -->
-    <style name="AppMainFloatingActionButtonStyle" parent="Widget.Material3.FloatingActionButton.Primary">
+    <style name="AppMainFloatingActionButtonStyle" parent="ThemeOverlay.Material3.FloatingActionButton.Primary">
     </style>
 
-    <style name="AppSubFloatingActionButtonStyle" parent="Widget.Material3.FloatingActionButton.Surface">
+    <style name="AppSubFloatingActionButtonStyle" parent="ThemeOverlay.Material3.FloatingActionButton.Surface">
     </style>
 
     <!-- RecyclerView -->
@@ -262,7 +262,7 @@
     </style>
 
 
-    <style name="BottomSheetTopBarButtonStyle" parent="Widget.AppCompat.Button">
+    <style name="BottomSheetTopBarButtonStyle" parent="ThemeOverlay.Material3.Button">
         <item name="android:background">@drawable/bg_transparent_button</item>
 
         <!-- HACK:"android:textColor"はTextAppearanceでは反映されない為、Styleに記述 -->
