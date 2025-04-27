@@ -765,19 +765,8 @@ class DiaryEditFragment : BaseFragment() {
         val itemNumber: ItemNumber
     ): MotionLayout.TransitionListener {
 
-        val initializeValue = -1
-        var goalStateId = initializeValue
-
         override fun onTransitionStarted(motionLayout: MotionLayout?, startId: Int, endId: Int) {
             Log.d(logTag, "onTransitionStarted()_itemNumber = $itemNumber")
-
-            setUpScroll(motionLayout)
-        }
-
-        // MEMO:startId,endIdはMotionSceneファイル(.xml)で記述したIdが代入される。
-        //      また、motionLayout.currentStateは指定先のIdを取得する。
-        private fun setUpScroll(motionLayout: MotionLayout?) {
-            goalStateId = motionLayout?.currentState ?: return
         }
 
         override fun onTransitionChange(
@@ -796,7 +785,7 @@ class DiaryEditFragment : BaseFragment() {
             Log.d(logTag, "onTransitionCompleted()_itemNumber = $itemNumber")
 
             // 対象項目追加削除後のスクロール処理
-            if (!mainViewModel.shouldJumpItemMotionLayout) scrollOnTransition()
+            if (!mainViewModel.shouldJumpItemMotionLayout) scrollOnTransition(currentId)
 
             // 対象項目欄削除後の処理
             var completedStateLogMsg = "UnknownState"
@@ -810,15 +799,13 @@ class DiaryEditFragment : BaseFragment() {
             }
             Log.d(logTag, "onTransitionCompleted()_CompletedState = $completedStateLogMsg")
 
-            initializeProperty()
-
             if (isMotionLayoutNormalState()) mainViewModel.clearShouldJumpItemMotionLayout()
         }
 
-        private fun scrollOnTransition() {
+        private fun scrollOnTransition(currentId: Int) {
             val itemHeight = binding.includeItem1.linerLayoutDiaryEditItem.height
             val scrollY =
-                when (goalStateId) {
+                when (currentId) {
                     R.id.motion_scene_edit_diary_item_hided_state -> {
                         if (itemNumber.value == mainViewModel.numVisibleItems.value) {
                             - itemHeight
@@ -840,10 +827,6 @@ class DiaryEditFragment : BaseFragment() {
                 mainViewModel.deleteItem(itemNumber)
                 isDeletingItemTransition = false
             }
-        }
-
-        private fun initializeProperty() {
-            goalStateId = initializeValue
         }
 
         override fun onTransitionTrigger(
