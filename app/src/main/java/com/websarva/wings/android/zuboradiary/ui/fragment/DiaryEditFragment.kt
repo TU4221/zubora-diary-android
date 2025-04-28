@@ -137,6 +137,7 @@ class DiaryEditFragment : BaseFragment() {
         super.onViewCreated(view, savedInstanceState)
 
         setUpViewModelInitialization()
+        setUpShowFragmentObserver()
         setUpPendingDialogObserver()
         setUpFocusViewScroll()
         setUpDiaryData()
@@ -215,13 +216,25 @@ class DiaryEditFragment : BaseFragment() {
 
         val date = mainViewModel.date.requireValue()
 
+        val isCheckedWeatherInfoAcquisition =
+            settingsViewModel.isCheckedWeatherInfoAcquisition.requireValue()
+        val geoCoordinates =
+            settingsViewModel.geoCoordinates.value
         if (selectedButton == DialogInterface.BUTTON_POSITIVE) {
             lifecycleScope.launch(Dispatchers.IO) {
-                mainViewModel.prepareDiary(date, true)
+                mainViewModel
+                    .prepareDiary(
+                        date,
+                        true,
+                        isCheckedWeatherInfoAcquisition,
+                        geoCoordinates
+                    )
             }
         } else {
+            if (!isCheckedWeatherInfoAcquisition) return
+
             lifecycleScope.launch(Dispatchers.IO) {
-                DateObserver().fetchWeatherInfo(date)
+                mainViewModel.loadWeatherInfo(date, geoCoordinates)
             }
         }
     }
@@ -282,7 +295,10 @@ class DiaryEditFragment : BaseFragment() {
         val selectedDate =
             receiveResulFromDialog<LocalDate>(DatePickerDialogFragment.KEY_SELECTED_DATE) ?: return
 
-        mainViewModel.updateDate(selectedDate)
+        val isCheckedWeatherInfoAcquisition =
+            settingsViewModel.isCheckedWeatherInfoAcquisition.requireValue()
+        val geoCoordinates = settingsViewModel.geoCoordinates.value
+        mainViewModel.updateDate(selectedDate, isCheckedWeatherInfoAcquisition, geoCoordinates)
     }
 
     private fun receiveWeatherInfoFetchDialogResult() {
@@ -356,6 +372,28 @@ class DiaryEditFragment : BaseFragment() {
         }
     }
 
+    private fun setUpShowFragmentObserver() {
+        launchAndRepeatOnViewLifeCycleStarted {
+            mainViewModel.showDiaryLoadingDialog.collectLatest { value ->
+                if (!value) return@collectLatest
+
+                val date = mainViewModel.date.requireValue()
+                showDiaryLoadingDialog(date)
+                mainViewModel.clearShowDiaryLoadingDialog()
+            }
+        }
+
+        launchAndRepeatOnViewLifeCycleStarted {
+            mainViewModel.showWeatherInfoFetchingDialog.collectLatest { value ->
+                if (!value) return@collectLatest
+
+                val date = mainViewModel.date.requireValue()
+                showWeatherInfoFetchingDialog(date)
+                mainViewModel.clearShowWeatherInfoFetchingDialog()
+            }
+        }
+    }
+
     private fun setUpPendingDialogObserver() {
         pendingDialogNavigation = object : PendingDialogNavigation {
             override fun showPendingDialog(pendingDialog: PendingDialog): Boolean {
@@ -408,8 +446,19 @@ class DiaryEditFragment : BaseFragment() {
         val requiresDiaryLoading =
             DiaryEditFragmentArgs.fromBundle(requireArguments()).requiresDiaryLoading
         lifecycleScope.launch(Dispatchers.IO) {
+            val isCheckedWeatherInfoAcquisition =
+                settingsViewModel.isCheckedWeatherInfoAcquisition.requireValue()
+            val geoCoordinates =
+                settingsViewModel.geoCoordinates.value
             val isSuccessful =
-                mainViewModel.prepareDiary(diaryDate, requiresDiaryLoading, true)
+                mainViewModel
+                    .prepareDiary(
+                        diaryDate,
+                        requiresDiaryLoading,
+                        isCheckedWeatherInfoAcquisition,
+                        geoCoordinates,
+                        true
+                    )
             if (isSuccessful) return@launch
 
             withContext(Dispatchers.Main) {
@@ -511,64 +560,12 @@ class DiaryEditFragment : BaseFragment() {
         launchAndRepeatOnViewLifeCycleStarted {
             mainViewModel.date
                 .collectLatest { value: LocalDate? ->
+                    if (value == null) return@collectLatest
                     if (isTesting) return@collectLatest
-                    DateObserver().onChanged(value)
+
+                    val dateString = value.toJapaneseDateString(requireContext())
+                    binding.textInputEditTextDate.setText(dateString)
                 }
-        }
-    }
-
-    private inner class DateObserver {
-        fun onChanged(value: LocalDate?) {
-            if (value == null) return
-            if (mainViewModel.isShowingItemTitleEditFragment) return
-
-            val dateString = value.toJapaneseDateString(requireContext())
-            binding.textInputEditTextDate.setText(dateString)
-
-            lifecycleScope.launch(Dispatchers.IO) {
-                val shouldShowDialog =
-                    shouldShowDiaryLoadingDialog(value) ?: return@launch
-                if (shouldShowDialog) {
-                    withContext(Dispatchers.Main) {
-                        showDiaryLoadingDialog(value)
-                    }
-                } else {
-                    // 読込確認Dialog表示時は、確認後下記処理を行う。
-                    fetchWeatherInfo(value)
-                }
-            }
-        }
-
-        private suspend fun shouldShowDiaryLoadingDialog(changedDate: LocalDate): Boolean? {
-            if (mainViewModel.isNewDiaryDefaultStatus) {
-                return mainViewModel.existsSavedDiary(changedDate)
-            }
-
-            val previousDate = mainViewModel.previousDate.value
-            val loadedDate = mainViewModel.loadedDate.value
-
-            if (changedDate == previousDate) return false
-            if (changedDate == loadedDate) return false
-            return mainViewModel.existsSavedDiary(changedDate)
-        }
-
-        suspend fun fetchWeatherInfo(changedDate: LocalDate) {
-            if (requiresWeatherInfoFetching(changedDate)) {
-                fetchWeatherInfo(
-                    changedDate,
-                    requiresShowingWeatherInfoFetchingDialog())
-            }
-        }
-
-        private fun requiresWeatherInfoFetching(date: LocalDate): Boolean {
-            val previousDate = mainViewModel.previousDate.value
-            if (!mainViewModel.isNewDiary && previousDate == null) return false
-            return previousDate != date
-        }
-
-        private fun requiresShowingWeatherInfoFetchingDialog(): Boolean {
-            val previousDate = mainViewModel.previousDate.value
-            return previousDate != null
         }
     }
 
@@ -591,6 +588,7 @@ class DiaryEditFragment : BaseFragment() {
         launchAndRepeatOnViewLifeCycleStarted {
             mainViewModel.weather1
                 .collectLatest { value: Weather ->
+                    Log.d("20250428", "Weather collectLatest()")
                     val strWeather = value.toString(requireContext())
                     binding.autoCompleteTextWeather1.setText(strWeather, false)
 
@@ -1086,27 +1084,7 @@ class DiaryEditFragment : BaseFragment() {
         }
     }
 
-    private suspend fun fetchWeatherInfo(date: LocalDate, requestsShowingDialog: Boolean) {
-        // HACK:EditFragment起動時、設定値を参照してから位置情報を取得する為、タイムラグが発生する。
-        //      対策として記憶boolean変数を用意し、true時は位置情報取得処理コードにて天気情報も取得する。
-        val isChecked = settingsViewModel.isCheckedWeatherInfoAcquisition.requireValue()
-        if (!isChecked) return
 
-        if (!settingsViewModel.hasUpdatedGeoCoordinates) {
-            mainViewModel.addWeatherInfoFetchErrorMessage()
-            return
-        }
-
-        // 本フラグメント起動時のみダイアログなしで天気情報取得
-        if (requestsShowingDialog) {
-            withContext(Dispatchers.Main) {
-                showWeatherInfoFetchingDialog(date)
-            }
-        } else {
-            val geoCoordinates = settingsViewModel.geoCoordinates.requireValue()
-            mainViewModel.fetchWeatherInformation(date, geoCoordinates)
-        }
-    }
 
     @MainThread
     private fun showDiaryShowFragment(date: LocalDate) {
@@ -1136,7 +1114,6 @@ class DiaryEditFragment : BaseFragment() {
                 inputItemTitle
             )
         navController.navigate(directions)
-        mainViewModel.updateIsShowingItemTitleEditFragment(true)
     }
 
     @MainThread
@@ -1256,10 +1233,6 @@ class DiaryEditFragment : BaseFragment() {
             val conditionArrayAdapter = createConditionSpinnerAdapter()
             autoCompleteTextCondition.setAdapter(conditionArrayAdapter)
         }
-
-        // HACK:ItemTitleEditFragmentから戻ってきた時に処理させたく箇所を
-        //      変数(DiaryEditViewModel.IsShowingItemTitleEditFragment)で分岐させる。
-        mainViewModel.updateIsShowingItemTitleEditFragment(false)
     }
 
     override fun destroyBinding() {

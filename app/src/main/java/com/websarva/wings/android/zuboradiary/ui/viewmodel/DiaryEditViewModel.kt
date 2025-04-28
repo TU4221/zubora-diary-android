@@ -2,6 +2,7 @@ package com.websarva.wings.android.zuboradiary.ui.viewmodel
 
 import android.net.Uri
 import android.util.Log
+import androidx.lifecycle.viewModelScope
 import com.websarva.wings.android.zuboradiary.data.repository.DiaryRepository
 import com.websarva.wings.android.zuboradiary.data.model.Condition
 import com.websarva.wings.android.zuboradiary.data.model.ItemNumber
@@ -16,6 +17,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.temporal.ChronoUnit
 import javax.inject.Inject
@@ -31,9 +33,7 @@ internal class DiaryEditViewModel @Inject constructor(
 
     // 日記データ関係
     private val initialPreviousDate: LocalDate? = null
-    private val _previousDate = MutableStateFlow(initialPreviousDate)
-    val previousDate
-        get() = _previousDate.asStateFlow()
+    private var previousDate = initialPreviousDate
 
     private val initialLoadedDate: LocalDate? = null
     private val _loadedDate = MutableStateFlow(initialLoadedDate)
@@ -140,10 +140,10 @@ internal class DiaryEditViewModel @Inject constructor(
     var hasPreparedDiary = initialHasPreparedDiary
         private set
 
-    val isNewDiaryDefaultStatus
-        get() = hasPreparedDiary && _previousDate.value == null && _loadedDate.value == null
+    private val isNewDiaryDefaultStatus
+        get() = hasPreparedDiary && previousDate == null && _loadedDate.value == null
 
-    val isNewDiary
+    private val isNewDiary
         get() = _loadedDate.value == null
 
     private val shouldDeleteLoadedDateDiary: Boolean
@@ -171,31 +171,36 @@ internal class DiaryEditViewModel @Inject constructor(
     var shouldJumpItemMotionLayout = initialShouldJumpItemMotionLayout
         private set
 
-    // Fragment切替記憶
-    private val initialIsShowingItemTitleEditFragment = false
-    var isShowingItemTitleEditFragment = initialIsShowingItemTitleEditFragment
-        private set
 
     // MEMO:画面回転時の不要な初期化を防ぐ
     private val initialShouldInitializeOnFragmentDestroy = false
     var shouldInitializeOnFragmentDestroy = initialShouldInitializeOnFragmentDestroy
 
+    private val _showDiaryLoadingDialog = MutableStateFlow(false)
+    val showDiaryLoadingDialog: StateFlow<Boolean>
+        get() = _showDiaryLoadingDialog
+
+    private val _showWeatherInfoFetchingDialog = MutableStateFlow(false)
+    val showWeatherInfoFetchingDialog: StateFlow<Boolean>
+        get() = _showWeatherInfoFetchingDialog
+
     override fun initialize() {
         super.initialize()
-        _previousDate.value = initialPreviousDate
+        previousDate = initialPreviousDate
         _loadedDate.value = initialLoadedDate
         diaryStateFlow.initialize()
         _loadedPicturePath.value = initialLoadedPicturePath
         _isVisibleUpdateProgressBar.value = initialIsVisibleUpdateProgressBar
         hasPreparedDiary = initialHasPreparedDiary
         shouldJumpItemMotionLayout = initialShouldJumpItemMotionLayout
-        isShowingItemTitleEditFragment = initialIsShowingItemTitleEditFragment
         shouldInitializeOnFragmentDestroy = initialShouldInitializeOnFragmentDestroy
     }
 
     suspend fun prepareDiary(
         date: LocalDate,
         shouldLoadDiary: Boolean,
+        requestFetchWeatherInfo: Boolean,
+        geoCoordinates: GeoCoordinates?,
         ignoreAppMessage: Boolean = false
     ): Boolean {
         val logMsg = "日記読込"
@@ -215,7 +220,7 @@ internal class DiaryEditViewModel @Inject constructor(
                 return false
             }
         } else {
-            updateDate(date)
+            updateDate(date, requestFetchWeatherInfo, geoCoordinates)
         }
         hasPreparedDiary = true
         _isVisibleUpdateProgressBar.value = false
@@ -243,7 +248,7 @@ internal class DiaryEditViewModel @Inject constructor(
         return true
     }
 
-    suspend fun existsSavedDiary(date: LocalDate): Boolean? {
+    private suspend fun existsSavedDiary(date: LocalDate): Boolean? {
         try {
             return diaryRepository.existsDiary(date)
         } catch (e: Exception) {
@@ -300,14 +305,58 @@ internal class DiaryEditViewModel @Inject constructor(
     }
 
     // 日付関係
-    fun updateDate(date: LocalDate) {
-        val previousDate = diaryStateFlow.date.value
-
+    fun updateDate(
+        date: LocalDate,
+        requestsFetchWeatherInfo: Boolean = false,
+        geoCoordinates: GeoCoordinates? = null
+    ) {
         // HACK:下記はDiaryStateFlowのDateのsetValue()処理よりも前に処理すること。
         //      (後で処理するとDateのObserverがpreviousDateの更新よりも先に処理される為)
-        _previousDate.value = previousDate
+        this.previousDate = diaryStateFlow.date.value
 
         diaryStateFlow.date.value = date
+
+        viewModelScope.launch {
+            if (shouldShowDiaryLoadingDialog(date)) {
+                _showDiaryLoadingDialog.value = true
+                return@launch
+            }
+
+            if (!requestsFetchWeatherInfo) return@launch
+            loadWeatherInfo(date, geoCoordinates)
+        }
+
+    }
+
+    private suspend fun shouldShowDiaryLoadingDialog(changedDate: LocalDate): Boolean {
+        if (isNewDiaryDefaultStatus) {
+            return existsSavedDiary(changedDate) ?: false
+        }
+
+        val previousDate = previousDate
+        val loadedDate = loadedDate.value
+
+        if (changedDate == previousDate) return false
+        if (changedDate == loadedDate) return false
+        return existsSavedDiary(changedDate) ?: false
+    }
+
+    suspend fun loadWeatherInfo(date: LocalDate, geoCoordinates: GeoCoordinates?) {
+        if (!shouldFetchWeatherInfo(date)) return
+        if (shouldShowWeatherInfoFetchingDialog()) {
+            _showWeatherInfoFetchingDialog.value = true
+            return
+        }
+        fetchWeatherInformation(date, geoCoordinates)
+    }
+
+    private fun shouldFetchWeatherInfo(date: LocalDate): Boolean {
+        if (!isNewDiary && previousDate == null) return false
+        return previousDate != date
+    }
+
+    private fun shouldShowWeatherInfoFetchingDialog(): Boolean {
+        return previousDate != null
     }
 
     // 天気、体調関係
@@ -330,7 +379,12 @@ internal class DiaryEditViewModel @Inject constructor(
     }
 
     // 天気情報関係
-    suspend fun fetchWeatherInformation(date: LocalDate, geoCoordinates: GeoCoordinates) {
+    suspend fun fetchWeatherInformation(date: LocalDate, geoCoordinates: GeoCoordinates?) {
+        if (geoCoordinates == null) {
+            addAppMessage(DiaryEditAppMessage.WeatherInfoLoadingFailure)
+            return
+        }
+
         if (!canFetchWeatherInformation(date)) return
 
         val logMsg = "天気情報取得"
@@ -412,15 +466,6 @@ internal class DiaryEditViewModel @Inject constructor(
         shouldJumpItemMotionLayout = false
     }
 
-    // Fragment切替記憶
-    fun updateIsShowingItemTitleEditFragment(isShowing: Boolean) {
-        isShowingItemTitleEditFragment = isShowing
-    }
-
-    fun addWeatherInfoFetchErrorMessage() {
-        addAppMessage(DiaryEditAppMessage.WeatherInfoLoadingFailure)
-    }
-
     suspend fun shouldShowUpdateConfirmationDialog(): Boolean? {
         if (isLoadedDateEqualToInputDate) return false
         val inputDate = diaryStateFlow.date.requireValue()
@@ -431,6 +476,15 @@ internal class DiaryEditViewModel @Inject constructor(
     // MEMO:引数の型をサブクラスに制限
     fun addPendingDialogList(pendingDialog: DiaryEditPendingDialog) {
         super.addPendingDialogList(pendingDialog)
+    }
+
+    // Fragment表示変数クリア
+    fun clearShowDiaryLoadingDialog() {
+        _showDiaryLoadingDialog.value = false
+    }
+
+    fun clearShowWeatherInfoFetchingDialog() {
+        _showWeatherInfoFetchingDialog.value = false
     }
 
     // TODO:テスト用の為、最終的に削除
