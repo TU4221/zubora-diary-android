@@ -10,6 +10,21 @@ internal abstract class UriPermissionManager {
 
     private val logTag = createLogTag()
 
+    suspend fun handlePersistablePermission(context: Context, action: UriPermissionAction) {
+        when (action) {
+            is UriPermissionAction.Take -> takePersistablePermission(context, action.uri)
+            is UriPermissionAction.Release -> releasePersistablePermission(context, action.uri)
+            is UriPermissionAction.ReleaseAndTake -> {
+                releasePersistablePermission(context, action.releaseUri)
+                takePersistablePermission(context, action.takeUri)
+            }
+            UriPermissionAction.AllRelease -> releaseAllPersistablePermission(context)
+            UriPermissionAction.None -> {
+            // 処理なし
+            }
+        }
+    }
+
     fun takePersistablePermission(context: Context, uri: Uri) {
         val logMsg = "端末写真使用権限取得"
         Log.i(logTag, "${logMsg}_開始=$uri")

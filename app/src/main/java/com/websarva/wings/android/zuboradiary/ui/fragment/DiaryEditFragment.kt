@@ -51,6 +51,7 @@ import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.DiaryPictureDel
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.DiaryUpdateDialogFragment
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.WeatherInfoFetchingDialogFragment
 import com.websarva.wings.android.zuboradiary.ui.keyboard.KeyboardManager
+import com.websarva.wings.android.zuboradiary.ui.permission.UriPermissionAction
 import com.websarva.wings.android.zuboradiary.ui.utils.toJapaneseDateString
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
@@ -91,8 +92,6 @@ class DiaryEditFragment : BaseFragment() {
 
     // Uri関係
     private lateinit var pictureUriPermissionManager: UriPermissionManager
-
-
 
     private val screenHeight: Int
         get() {
@@ -256,14 +255,7 @@ class DiaryEditFragment : BaseFragment() {
         if (selectedButton != DialogInterface.BUTTON_POSITIVE) return
 
         lifecycleScope.launch(Dispatchers.IO) {
-            val isSuccessful = mainViewModel.saveDiary()
-            if (!isSuccessful) return@launch
-
-            updatePictureUriPermission()
-            val date = mainViewModel.date.requireValue()
-            withContext(Dispatchers.Main) {
-                showDiaryShowFragment(date)
-            }
+            mainViewModel.saveDiary(true)
         }
     }
 
@@ -274,18 +266,7 @@ class DiaryEditFragment : BaseFragment() {
         if (selectedButton != DialogInterface.BUTTON_POSITIVE) return
 
         lifecycleScope.launch(Dispatchers.IO) {
-            val isSuccessful = mainViewModel.deleteDiary()
-            if (!isSuccessful) return@launch
-
-            releaseLoadedPictureUriPermission()
-            withContext(Dispatchers.Main) {
-                val navBackStackEntry = checkNotNull(navController.previousBackStackEntry)
-                val destinationId = navBackStackEntry.destination.id
-                if (destinationId == R.id.navigation_diary_show_fragment) {
-                    navController.navigateUp()
-                }
-                backFragment()
-            }
+            mainViewModel.deleteDiary()
         }
 
     }
@@ -374,12 +355,32 @@ class DiaryEditFragment : BaseFragment() {
 
     private fun setUpShowFragmentObserver() {
         launchAndRepeatOnViewLifeCycleStarted {
+            mainViewModel.showDiaryShowFragment.collectLatest { value ->
+                if (!value) return@collectLatest
+
+                val date = mainViewModel.date.requireValue()
+                showDiaryShowFragment(date)
+                mainViewModel.clearShowDiaryShowFragment()
+            }
+        }
+
+        launchAndRepeatOnViewLifeCycleStarted {
             mainViewModel.showDiaryLoadingDialog.collectLatest { value ->
                 if (!value) return@collectLatest
 
                 val date = mainViewModel.date.requireValue()
                 showDiaryLoadingDialog(date)
                 mainViewModel.clearShowDiaryLoadingDialog()
+            }
+        }
+
+        launchAndRepeatOnViewLifeCycleStarted {
+            mainViewModel.showDiaryUpdateDialog.collectLatest { value ->
+                if (!value) return@collectLatest
+
+                val date = mainViewModel.date.requireValue()
+                showDiaryUpdateDialog(date)
+                mainViewModel.clearShowDiaryUpdateDialog()
             }
         }
 
@@ -400,6 +401,20 @@ class DiaryEditFragment : BaseFragment() {
                 val date = mainViewModel.date.requireValue()
                 showDiaryLoadingFailureDialog(date)
                 mainViewModel.clearShowDiaryLoadingFailureDialog()
+            }
+        }
+
+        launchAndRepeatOnViewLifeCycleStarted {
+            mainViewModel.showPreviousFragmentOnDelete.collectLatest { value ->
+                if (!value) return@collectLatest
+
+                val navBackStackEntry = checkNotNull(navController.previousBackStackEntry)
+                val destinationId = navBackStackEntry.destination.id
+                if (destinationId == R.id.navigation_diary_show_fragment) {
+                    navController.navigateUp()
+                }
+                backFragment()
+                mainViewModel.clearShowPreviousFragmentOnDelete()
             }
         }
     }
@@ -484,21 +499,7 @@ class DiaryEditFragment : BaseFragment() {
                 when (item.itemId) {
                     R.id.diaryEditToolbarOptionSaveDiary -> {
                         lifecycleScope.launch(Dispatchers.IO) {
-                            val shouldShowDialog =
-                                mainViewModel.shouldShowUpdateConfirmationDialog() ?: return@launch
-                            if (shouldShowDialog) {
-                                withContext(Dispatchers.Main) {
-                                    showDiaryUpdateDialog(diaryDate)
-                                }
-                            } else {
-                                val isSuccessful = mainViewModel.saveDiary()
-                                if (isSuccessful) {
-                                    updatePictureUriPermission()
-                                    withContext(Dispatchers.Main) {
-                                        showDiaryShowFragment(diaryDate)
-                                    }
-                                }
-                            }
+                            mainViewModel.saveDiary()
                         }
                         return@setOnMenuItemClickListener true
                     }
@@ -969,6 +970,7 @@ class DiaryEditFragment : BaseFragment() {
             }
         }
 
+        setUpPictureUriPermissionActionObserver()
     }
 
     private inner class PicturePathObserver {
@@ -996,32 +998,13 @@ class DiaryEditFragment : BaseFragment() {
         }
     }
 
-    private fun updatePictureUriPermission() {
-        val latestPictureUri = mainViewModel.picturePath.value
-        val loadedPictureUri = mainViewModel.loadedPicturePath.value
-
-        lifecycleScope.launch(Dispatchers.IO) {
-            pictureUriPermissionManager.apply {
-                if (latestPictureUri == null && loadedPictureUri == null) return@launch
-                if (latestPictureUri != null && loadedPictureUri == null) {
-                    takePersistablePermission(requireContext(), latestPictureUri)
-                    return@launch
+    private fun setUpPictureUriPermissionActionObserver() {
+        launchAndRepeatOnViewLifeCycleStarted {
+            mainViewModel.uriPermissionAction
+                .collectLatest { value: UriPermissionAction ->
+                    pictureUriPermissionManager.handlePersistablePermission(requireContext(), value)
+                    mainViewModel.clearUriPermissionAction()
                 }
-                if (latestPictureUri == null) {
-                    releasePersistablePermission(requireContext(), checkNotNull(loadedPictureUri))
-                    return@launch
-                }
-                if (latestPictureUri == loadedPictureUri) return@launch
-                takePersistablePermission(requireContext(), latestPictureUri)
-                releasePersistablePermission(requireContext(), checkNotNull(loadedPictureUri))
-            }
-        }
-    }
-
-    private fun releaseLoadedPictureUriPermission() {
-        val loadedPictureUri = mainViewModel.loadedPicturePath.value ?: return
-        lifecycleScope.launch(Dispatchers.IO) {
-            pictureUriPermissionManager.releasePersistablePermission(requireContext(), loadedPictureUri)
         }
     }
 

@@ -12,6 +12,7 @@ import com.websarva.wings.android.zuboradiary.data.repository.WeatherApiReposito
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import com.websarva.wings.android.zuboradiary.ui.model.DiaryEditAppMessage
 import com.websarva.wings.android.zuboradiary.ui.model.DiaryEditPendingDialog
+import com.websarva.wings.android.zuboradiary.ui.permission.UriPermissionAction
 import com.websarva.wings.android.zuboradiary.ui.utils.requireValue
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -127,9 +128,7 @@ internal class DiaryEditViewModel @Inject constructor(
         get() = diaryStateFlow.picturePath.asStateFlow()
 
     private val initialLoadedPicturePath: Uri? = null
-    private val _loadedPicturePath = MutableStateFlow(initialLoadedPicturePath)
-    val loadedPicturePath
-        get() = _loadedPicturePath.asStateFlow()
+    private var loadedPicturePath = initialLoadedPicturePath
 
     private val initialIsVisibleUpdateProgressBar = false
     private val _isVisibleUpdateProgressBar = MutableStateFlow(initialIsVisibleUpdateProgressBar)
@@ -176,6 +175,12 @@ internal class DiaryEditViewModel @Inject constructor(
     private val initialShouldInitializeOnFragmentDestroy = false
     var shouldInitializeOnFragmentDestroy = initialShouldInitializeOnFragmentDestroy
 
+
+    // Fragment表示
+    private val _showDiaryShowFragment = MutableStateFlow(false)
+    val showDiaryShowFragment: StateFlow<Boolean>
+        get() = _showDiaryShowFragment
+
     private val _showDiaryLoadingDialog = MutableStateFlow(false)
     val showDiaryLoadingDialog: StateFlow<Boolean>
         get() = _showDiaryLoadingDialog
@@ -188,16 +193,32 @@ internal class DiaryEditViewModel @Inject constructor(
     val showDiaryLoadingFailureDialog: StateFlow<Boolean>
         get() = _showDiaryLoadingFailureDialog
 
+    private val _showDiaryUpdateDialog = MutableStateFlow(false)
+    val showDiaryUpdateDialog: StateFlow<Boolean>
+        get() = _showDiaryUpdateDialog
+
+    private val _showPreviousFragmentOnDelete = MutableStateFlow(false)
+    val showPreviousFragmentOnDelete: StateFlow<Boolean>
+        get() = _showPreviousFragmentOnDelete
+
+    // UriPermission管理
+    private val initialUriPermissionAction = UriPermissionAction.None
+    private val _uriPermissionAction =
+        MutableStateFlow<UriPermissionAction>(initialUriPermissionAction)
+    val uriPermissionAction: StateFlow<UriPermissionAction>
+        get() = _uriPermissionAction.asStateFlow()
+
     override fun initialize() {
         super.initialize()
         previousDate = initialPreviousDate
         _loadedDate.value = initialLoadedDate
         diaryStateFlow.initialize()
-        _loadedPicturePath.value = initialLoadedPicturePath
+        loadedPicturePath = initialLoadedPicturePath
         _isVisibleUpdateProgressBar.value = initialIsVisibleUpdateProgressBar
         hasPreparedDiary = initialHasPreparedDiary
         shouldJumpItemMotionLayout = initialShouldJumpItemMotionLayout
         shouldInitializeOnFragmentDestroy = initialShouldInitializeOnFragmentDestroy
+        _uriPermissionAction.value = initialUriPermissionAction
     }
 
     suspend fun prepareDiary(
@@ -251,7 +272,7 @@ internal class DiaryEditViewModel @Inject constructor(
         _loadedDate.value = date
 
         diaryStateFlow.update(diaryEntity)
-        _loadedPicturePath.value = diaryStateFlow.picturePath.value
+        loadedPicturePath = diaryStateFlow.picturePath.value
         return true
     }
 
@@ -265,7 +286,47 @@ internal class DiaryEditViewModel @Inject constructor(
         }
     }
 
-    suspend fun saveDiary(): Boolean {
+    suspend fun saveDiary(shouldIgnoreConfirmationDialog: Boolean = false) {
+        if (!shouldIgnoreConfirmationDialog) {
+            val shouldShowDialog =
+                shouldShowUpdateConfirmationDialog() ?: return
+            if (shouldShowDialog) {
+                _showDiaryUpdateDialog.value = true
+                return
+            }
+        }
+
+        val isSuccessful = saveDiaryToDatabase()
+        if (!isSuccessful) return
+        updatePictureUriPermission()
+        _showDiaryShowFragment.value = true
+    }
+
+    private fun updatePictureUriPermission() {
+        val latestPictureUri = picturePath.value
+        val loadedPictureUri = loadedPicturePath
+
+        if (latestPictureUri == null && loadedPictureUri == null) {
+            _uriPermissionAction.value = UriPermissionAction.None
+            return
+        }
+        if (latestPictureUri != null && loadedPictureUri == null) {
+            _uriPermissionAction.value = UriPermissionAction.Take(latestPictureUri)
+            return
+        }
+        if (latestPictureUri == null) {
+            _uriPermissionAction.value = UriPermissionAction.Release(checkNotNull(loadedPictureUri))
+            return
+        }
+        if (latestPictureUri == loadedPictureUri) {
+            _uriPermissionAction.value = UriPermissionAction.None
+            return
+        }
+        _uriPermissionAction.value =
+            UriPermissionAction.ReleaseAndTake(checkNotNull(loadedPictureUri), latestPictureUri)
+    }
+
+    private suspend fun saveDiaryToDatabase(): Boolean {
         val logMsg = "日記保存"
         Log.i(logTag, "${logMsg}_開始")
 
@@ -294,7 +355,18 @@ internal class DiaryEditViewModel @Inject constructor(
         return true
     }
 
-    suspend fun deleteDiary(): Boolean {
+    suspend fun deleteDiary() {
+        val isSuccessful = deleteDiaryFromDatabase()
+        if (!isSuccessful) return
+
+        if (loadedPicturePath != null) {
+            _uriPermissionAction.value =
+                UriPermissionAction.Release(loadedPicturePath!!)
+        }
+        _showPreviousFragmentOnDelete.value = true
+    }
+
+    private suspend fun deleteDiaryFromDatabase(): Boolean {
         val logMsg = "日記削除"
         Log.i(logTag, "${logMsg}_開始")
         val deleteDate = _loadedDate.requireValue()
@@ -470,7 +542,7 @@ internal class DiaryEditViewModel @Inject constructor(
         shouldJumpItemMotionLayout = false
     }
 
-    suspend fun shouldShowUpdateConfirmationDialog(): Boolean? {
+    private suspend fun shouldShowUpdateConfirmationDialog(): Boolean? {
         if (isLoadedDateEqualToInputDate) return false
         val inputDate = diaryStateFlow.date.requireValue()
         return existsSavedDiary(inputDate)
@@ -483,8 +555,16 @@ internal class DiaryEditViewModel @Inject constructor(
     }
 
     // Fragment表示変数クリア
+    fun clearShowDiaryShowFragment() {
+        _showDiaryShowFragment.value = false
+    }
+
     fun clearShowDiaryLoadingDialog() {
         _showDiaryLoadingDialog.value = false
+    }
+
+    fun clearShowDiaryUpdateDialog() {
+        _showDiaryUpdateDialog.value = false
     }
 
     fun clearShowWeatherInfoFetchingDialog() {
@@ -493,6 +573,15 @@ internal class DiaryEditViewModel @Inject constructor(
 
     fun clearShowDiaryLoadingFailureDialog() {
         _showDiaryLoadingFailureDialog.value = false
+    }
+
+    fun clearShowPreviousFragmentOnDelete() {
+        _showPreviousFragmentOnDelete.value = false
+    }
+
+    // UriPermission
+    fun clearUriPermissionAction() {
+        _uriPermissionAction.value = UriPermissionAction.None
     }
 
     // TODO:テスト用の為、最終的に削除
@@ -525,7 +614,7 @@ internal class DiaryEditViewModel @Inject constructor(
                     diaryStateFlow.getItemStateFlow(ItemNumber(j)).title.value = itemTitle
                     diaryStateFlow.getItemStateFlow(ItemNumber(j)).comment.value = itemComment
                 }
-                isSuccessful = saveDiary()
+                isSuccessful = saveDiaryToDatabase()
                 if (!isSuccessful) return false
             }
         }
