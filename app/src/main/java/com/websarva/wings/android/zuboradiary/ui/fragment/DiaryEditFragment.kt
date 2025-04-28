@@ -392,6 +392,16 @@ class DiaryEditFragment : BaseFragment() {
                 mainViewModel.clearShowWeatherInfoFetchingDialog()
             }
         }
+
+        launchAndRepeatOnViewLifeCycleStarted {
+            mainViewModel.showDiaryLoadingFailureDialog.collectLatest { value ->
+                if (!value) return@collectLatest
+
+                val date = mainViewModel.date.requireValue()
+                showDiaryLoadingFailureDialog(date)
+                mainViewModel.clearShowDiaryLoadingFailureDialog()
+            }
+        }
     }
 
     private fun setUpPendingDialogObserver() {
@@ -445,25 +455,18 @@ class DiaryEditFragment : BaseFragment() {
         val diaryDate = DiaryEditFragmentArgs.fromBundle(requireArguments()).date
         val requiresDiaryLoading =
             DiaryEditFragmentArgs.fromBundle(requireArguments()).requiresDiaryLoading
+        val isCheckedWeatherInfoAcquisition =
+            settingsViewModel.isCheckedWeatherInfoAcquisition.requireValue()
+        val geoCoordinates =
+            settingsViewModel.geoCoordinates.value
         lifecycleScope.launch(Dispatchers.IO) {
-            val isCheckedWeatherInfoAcquisition =
-                settingsViewModel.isCheckedWeatherInfoAcquisition.requireValue()
-            val geoCoordinates =
-                settingsViewModel.geoCoordinates.value
-            val isSuccessful =
-                mainViewModel
-                    .prepareDiary(
-                        diaryDate,
-                        requiresDiaryLoading,
-                        isCheckedWeatherInfoAcquisition,
-                        geoCoordinates,
-                        true
-                    )
-            if (isSuccessful) return@launch
-
-            withContext(Dispatchers.Main) {
-                showDiaryLoadingFailureDialog(diaryDate)
-            }
+            mainViewModel
+                .prepareDiary(
+                    diaryDate,
+                    requiresDiaryLoading,
+                    isCheckedWeatherInfoAcquisition,
+                    geoCoordinates
+                )
         }
     }
 

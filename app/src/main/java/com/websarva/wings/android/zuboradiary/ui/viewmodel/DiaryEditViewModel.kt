@@ -184,6 +184,10 @@ internal class DiaryEditViewModel @Inject constructor(
     val showWeatherInfoFetchingDialog: StateFlow<Boolean>
         get() = _showWeatherInfoFetchingDialog
 
+    private val _showDiaryLoadingFailureDialog = MutableStateFlow(false)
+    val showDiaryLoadingFailureDialog: StateFlow<Boolean>
+        get() = _showDiaryLoadingFailureDialog
+
     override fun initialize() {
         super.initialize()
         previousDate = initialPreviousDate
@@ -200,8 +204,7 @@ internal class DiaryEditViewModel @Inject constructor(
         date: LocalDate,
         shouldLoadDiary: Boolean,
         requestFetchWeatherInfo: Boolean,
-        geoCoordinates: GeoCoordinates?,
-        ignoreAppMessage: Boolean = false
+        geoCoordinates: GeoCoordinates?
     ): Boolean {
         val logMsg = "日記読込"
         Log.i(logTag, "${logMsg}_開始")
@@ -214,7 +217,11 @@ internal class DiaryEditViewModel @Inject constructor(
                 if (!isSuccessful) throw Exception()
             } catch (e: Exception) {
                 Log.e(logTag, "${logMsg}_失敗", e)
-                if (!ignoreAppMessage) addAppMessage(DiaryEditAppMessage.DiaryLoadingFailure)
+                if (hasPreparedDiary) {
+                    addAppMessage(DiaryEditAppMessage.DiaryLoadingFailure)
+                } else {
+                    _showDiaryLoadingFailureDialog.value = true
+                }
                 _isVisibleUpdateProgressBar.value = false
                 shouldJumpItemMotionLayout = false
                 return false
@@ -482,6 +489,10 @@ internal class DiaryEditViewModel @Inject constructor(
 
     fun clearShowWeatherInfoFetchingDialog() {
         _showWeatherInfoFetchingDialog.value = false
+    }
+
+    fun clearShowDiaryLoadingFailureDialog() {
+        _showDiaryLoadingFailureDialog.value = false
     }
 
     // TODO:テスト用の為、最終的に削除
