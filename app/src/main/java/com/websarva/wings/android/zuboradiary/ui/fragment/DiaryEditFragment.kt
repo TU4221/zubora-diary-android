@@ -312,7 +312,7 @@ class DiaryEditFragment : BaseFragment() {
         val loadDiaryDate = mainViewModel.date.requireValue()
         val geoCoordinates = settingsViewModel.geoCoordinates.requireValue()
         lifecycleScope.launch(Dispatchers.IO) {
-            mainViewModel.fetchWeatherInformation(loadDiaryDate, geoCoordinates)
+            mainViewModel.fetchWeatherInfo(loadDiaryDate, geoCoordinates)
         }
     }
 

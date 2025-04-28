@@ -347,7 +347,7 @@ internal class DiaryEditViewModel @Inject constructor(
             _showWeatherInfoFetchingDialog.value = true
             return
         }
-        fetchWeatherInformation(date, geoCoordinates)
+        fetchWeatherInfo(date, geoCoordinates)
     }
 
     private fun shouldFetchWeatherInfo(date: LocalDate): Boolean {
@@ -376,7 +376,7 @@ internal class DiaryEditViewModel @Inject constructor(
     }
 
     // 天気情報関係
-    suspend fun fetchWeatherInformation(date: LocalDate, geoCoordinates: GeoCoordinates?) {
+    suspend fun fetchWeatherInfo(date: LocalDate, geoCoordinates: GeoCoordinates?) {
         if (geoCoordinates == null) {
             addAppMessage(DiaryEditAppMessage.WeatherInfoLoadingFailure)
             return
