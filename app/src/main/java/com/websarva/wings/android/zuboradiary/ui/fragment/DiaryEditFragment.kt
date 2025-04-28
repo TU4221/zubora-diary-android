@@ -1169,14 +1169,10 @@ class DiaryEditFragment : BaseFragment() {
 
     @MainThread
     private fun showWeatherInfoFetchingDialog(date: LocalDate) {
-        if (!mainViewModel.canFetchWeatherInformation(date)) return
         if (!canNavigateFragment) {
             mainViewModel.addPendingDialogList(DiaryEditPendingDialog.WeatherInfoFetching(date))
             return
         }
-
-        // 今日の日付以降は天気情報を取得できないためダイアログ表示不要
-        mainViewModel.canFetchWeatherInformation(date)
 
         val directions =
             DiaryEditFragmentDirections.actionDiaryEditFragmentToWeatherInfoFetchingDialog(date)

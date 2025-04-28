@@ -351,6 +351,7 @@ internal class DiaryEditViewModel @Inject constructor(
     }
 
     private fun shouldFetchWeatherInfo(date: LocalDate): Boolean {
+        if (!weatherApiRepository.canFetchWeatherInfo(date)) return false
         if (!isNewDiary && previousDate == null) return false
         return previousDate != date
     }
@@ -374,10 +375,6 @@ internal class DiaryEditViewModel @Inject constructor(
         diaryStateFlow.condition.value = condition
     }
 
-    fun canFetchWeatherInformation(date: LocalDate): Boolean {
-        return weatherApiRepository.canFetchWeatherInfo(date)
-    }
-
     // 天気情報関係
     suspend fun fetchWeatherInformation(date: LocalDate, geoCoordinates: GeoCoordinates?) {
         if (geoCoordinates == null) {
@@ -385,7 +382,7 @@ internal class DiaryEditViewModel @Inject constructor(
             return
         }
 
-        if (!canFetchWeatherInformation(date)) return
+        if (!weatherApiRepository.canFetchWeatherInfo(date)) return
 
         val logMsg = "天気情報取得"
         Log.i(logTag, "${logMsg}_開始")
