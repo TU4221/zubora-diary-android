@@ -357,7 +357,7 @@ abstract class BaseFragment : LoggingFragment() {
     }
 
     internal interface PendingDialogNavigation {
-        fun showPendingDialog(pendingDialog: PendingDialog):Boolean
+        fun navigatePendingDialog(pendingDialog: PendingDialog):Boolean
     }
 
     private fun setUpPendingDialogObserver() {
@@ -381,7 +381,7 @@ abstract class BaseFragment : LoggingFragment() {
                         //      そこで判断させると再度保留ダイアログが追加されるので、ここに記述する。(重複処理防止)
                         if (!canNavigateFragment) return@withContext
 
-                        val isSuccessful = pendingDialogNavigation!!.showPendingDialog(pendingDialog)
+                        val isSuccessful = pendingDialogNavigation!!.navigatePendingDialog(pendingDialog)
                         if (isSuccessful) mainViewModel!!.removePendingDialogListFirstItem()
                     }
                 }

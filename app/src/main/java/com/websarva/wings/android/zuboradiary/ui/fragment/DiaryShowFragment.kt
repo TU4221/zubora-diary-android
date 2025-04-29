@@ -149,7 +149,7 @@ internal class DiaryShowFragment : BaseFragment() {
 
     private fun setUpPendingDialogObserver() {
         pendingDialogNavigation = object : PendingDialogNavigation {
-            override fun showPendingDialog(pendingDialog: PendingDialog): Boolean {
+            override fun navigatePendingDialog(pendingDialog: PendingDialog): Boolean {
                 if (pendingDialog !is DiaryShowPendingDialog) return false
 
                 when (pendingDialog) {
