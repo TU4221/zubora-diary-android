@@ -51,6 +51,8 @@ import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.DiaryPictureDel
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.DiaryUpdateDialogFragment
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.WeatherInfoFetchingDialogFragment
 import com.websarva.wings.android.zuboradiary.ui.keyboard.KeyboardManager
+import com.websarva.wings.android.zuboradiary.ui.model.navigation.DiaryEditNavigationAction
+import com.websarva.wings.android.zuboradiary.ui.model.navigation.NavigationAction
 import com.websarva.wings.android.zuboradiary.ui.permission.UriPermissionAction
 import com.websarva.wings.android.zuboradiary.ui.utils.toJapaneseDateString
 import dagger.hilt.android.AndroidEntryPoint
@@ -136,7 +138,7 @@ class DiaryEditFragment : BaseFragment() {
         super.onViewCreated(view, savedInstanceState)
 
         setUpViewModelInitialization()
-        setUpShowFragmentObserver()
+        setUpFragmentNavigationEvent()
         setUpPendingDialogObserver()
         setUpFocusViewScroll()
         setUpDiaryData()
@@ -353,68 +355,51 @@ class DiaryEditFragment : BaseFragment() {
         }
     }
 
-    private fun setUpShowFragmentObserver() {
+    private fun setUpFragmentNavigationEvent() {
         launchAndRepeatOnViewLifeCycleStarted {
-            mainViewModel.showDiaryShowFragment.collectLatest { value ->
-                if (!value) return@collectLatest
-
-                val date = mainViewModel.date.requireValue()
-                showDiaryShowFragment(date)
-                mainViewModel.clearShowDiaryShowFragment()
-            }
-        }
-
-        launchAndRepeatOnViewLifeCycleStarted {
-            mainViewModel.showDiaryLoadingDialog.collectLatest { value ->
-                if (!value) return@collectLatest
-
-                val date = mainViewModel.date.requireValue()
-                showDiaryLoadingDialog(date)
-                mainViewModel.clearShowDiaryLoadingDialog()
-            }
-        }
-
-        launchAndRepeatOnViewLifeCycleStarted {
-            mainViewModel.showDiaryUpdateDialog.collectLatest { value ->
-                if (!value) return@collectLatest
-
-                val date = mainViewModel.date.requireValue()
-                showDiaryUpdateDialog(date)
-                mainViewModel.clearShowDiaryUpdateDialog()
-            }
-        }
-
-        launchAndRepeatOnViewLifeCycleStarted {
-            mainViewModel.showWeatherInfoFetchingDialog.collectLatest { value ->
-                if (!value) return@collectLatest
-
-                val date = mainViewModel.date.requireValue()
-                showWeatherInfoFetchingDialog(date)
-                mainViewModel.clearShowWeatherInfoFetchingDialog()
-            }
-        }
-
-        launchAndRepeatOnViewLifeCycleStarted {
-            mainViewModel.showDiaryLoadingFailureDialog.collectLatest { value ->
-                if (!value) return@collectLatest
-
-                val date = mainViewModel.date.requireValue()
-                showDiaryLoadingFailureDialog(date)
-                mainViewModel.clearShowDiaryLoadingFailureDialog()
-            }
-        }
-
-        launchAndRepeatOnViewLifeCycleStarted {
-            mainViewModel.showPreviousFragmentOnDelete.collectLatest { value ->
-                if (!value) return@collectLatest
-
-                val navBackStackEntry = checkNotNull(navController.previousBackStackEntry)
-                val destinationId = navBackStackEntry.destination.id
-                if (destinationId == R.id.navigation_diary_show_fragment) {
-                    navController.navigateUp()
+            mainViewModel.navigationAction.collectLatest { value: NavigationAction ->
+                when (value) {
+                    is DiaryEditNavigationAction.DiaryShowFragment -> {
+                        showDiaryShowFragment(value.date)
+                    }
+                    is DiaryEditNavigationAction.DiaryItemTitleEditFragment -> {
+                        showDiaryItemTitleEditFragment(value.itemNumber, value.itemTitle)
+                    }
+                    is DiaryEditNavigationAction.NavigateDiaryLoadingDialog -> {
+                        showDiaryLoadingDialog(value.date)
+                    }
+                    is DiaryEditNavigationAction.NavigateDiaryLoadingFailureDialog -> {
+                        showDiaryLoadingFailureDialog(value.date)
+                    }
+                    is DiaryEditNavigationAction.NavigateDiaryUpdateDialog -> {
+                        showDiaryUpdateDialog(value.date)
+                    }
+                    is DiaryEditNavigationAction.NavigateDiaryDeleteDialog -> {
+                        showDiaryDeleteDialog(value.date)
+                    }
+                    is DiaryEditNavigationAction.NavigateDatePickerDialog -> {
+                        showDatePickerDialog(value.date)
+                    }
+                    is DiaryEditNavigationAction.NavigateWeatherInfoFetchingDialog -> {
+                        showWeatherInfoFetchingDialog(value.date)
+                    }
+                    is DiaryEditNavigationAction.NavigateDiaryItemDeleteDialog -> {
+                        showDiaryItemDeleteDialog(value.itemNumber)
+                    }
+                    DiaryEditNavigationAction.NavigateDiaryPictureDeleteDialog -> {
+                        showDiaryPictureDeleteDialog()
+                    }
+                    DiaryEditNavigationAction.NavigatePreviousFragmentOnDiaryDelete -> {
+                        backFragmentOnDiaryDelete()
+                    }
+                    NavigationAction.NavigatePreviousFragment -> {
+                        backFragment()
+                    }
+                    NavigationAction.None -> {
+                        // 処理なし
+                    }
                 }
-                backFragment()
-                mainViewModel.clearShowPreviousFragmentOnDelete()
+                mainViewModel.clearNavigationAction()
             }
         }
     }
@@ -1200,6 +1185,16 @@ class DiaryEditFragment : BaseFragment() {
             savedStateHandle[KEY_EDITED_DIARY_DATE] = editedDiaryLocalDate
         }
         navController.navigateUp()
+    }
+
+    @MainThread
+    private fun backFragmentOnDiaryDelete() {
+        val navBackStackEntry = checkNotNull(navController.previousBackStackEntry)
+        val destinationId = navBackStackEntry.destination.id
+        if (destinationId == R.id.navigation_diary_show_fragment) {
+            navController.navigateUp()
+        }
+        backFragment()
     }
 
     override fun onResume() {

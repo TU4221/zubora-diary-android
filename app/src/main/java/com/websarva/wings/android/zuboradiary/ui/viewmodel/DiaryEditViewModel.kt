@@ -12,6 +12,8 @@ import com.websarva.wings.android.zuboradiary.data.repository.WeatherApiReposito
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import com.websarva.wings.android.zuboradiary.ui.model.DiaryEditAppMessage
 import com.websarva.wings.android.zuboradiary.ui.model.DiaryEditPendingDialog
+import com.websarva.wings.android.zuboradiary.ui.model.navigation.DiaryEditNavigationAction
+import com.websarva.wings.android.zuboradiary.ui.model.navigation.NavigationAction
 import com.websarva.wings.android.zuboradiary.ui.permission.UriPermissionAction
 import com.websarva.wings.android.zuboradiary.ui.utils.requireValue
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -177,29 +179,11 @@ internal class DiaryEditViewModel @Inject constructor(
 
 
     // Fragment表示
-    private val _showDiaryShowFragment = MutableStateFlow(false)
-    val showDiaryShowFragment: StateFlow<Boolean>
-        get() = _showDiaryShowFragment
-
-    private val _showDiaryLoadingDialog = MutableStateFlow(false)
-    val showDiaryLoadingDialog: StateFlow<Boolean>
-        get() = _showDiaryLoadingDialog
-
-    private val _showWeatherInfoFetchingDialog = MutableStateFlow(false)
-    val showWeatherInfoFetchingDialog: StateFlow<Boolean>
-        get() = _showWeatherInfoFetchingDialog
-
-    private val _showDiaryLoadingFailureDialog = MutableStateFlow(false)
-    val showDiaryLoadingFailureDialog: StateFlow<Boolean>
-        get() = _showDiaryLoadingFailureDialog
-
-    private val _showDiaryUpdateDialog = MutableStateFlow(false)
-    val showDiaryUpdateDialog: StateFlow<Boolean>
-        get() = _showDiaryUpdateDialog
-
-    private val _showPreviousFragmentOnDelete = MutableStateFlow(false)
-    val showPreviousFragmentOnDelete: StateFlow<Boolean>
-        get() = _showPreviousFragmentOnDelete
+    private val initialNavigationAction = NavigationAction.None
+    private val _navigationAction: MutableStateFlow<NavigationAction> =
+        MutableStateFlow(initialNavigationAction)
+    val navigationAction: StateFlow<NavigationAction>
+        get() = _navigationAction
 
     // UriPermission管理
     private val initialUriPermissionAction = UriPermissionAction.None
@@ -218,6 +202,7 @@ internal class DiaryEditViewModel @Inject constructor(
         hasPreparedDiary = initialHasPreparedDiary
         shouldJumpItemMotionLayout = initialShouldJumpItemMotionLayout
         shouldInitializeOnFragmentDestroy = initialShouldInitializeOnFragmentDestroy
+        _navigationAction.value = initialNavigationAction
         _uriPermissionAction.value = initialUriPermissionAction
     }
 
@@ -241,7 +226,8 @@ internal class DiaryEditViewModel @Inject constructor(
                 if (hasPreparedDiary) {
                     addAppMessage(DiaryEditAppMessage.DiaryLoadingFailure)
                 } else {
-                    _showDiaryLoadingFailureDialog.value = true
+                    _navigationAction.value =
+                        DiaryEditNavigationAction.NavigateDiaryLoadingFailureDialog(date)
                 }
                 _isVisibleUpdateProgressBar.value = false
                 shouldJumpItemMotionLayout = false
@@ -291,7 +277,8 @@ internal class DiaryEditViewModel @Inject constructor(
             val shouldShowDialog =
                 shouldShowUpdateConfirmationDialog() ?: return
             if (shouldShowDialog) {
-                _showDiaryUpdateDialog.value = true
+                _navigationAction.value =
+                    DiaryEditNavigationAction.NavigateDiaryUpdateDialog(date.requireValue())
                 return
             }
         }
@@ -299,7 +286,8 @@ internal class DiaryEditViewModel @Inject constructor(
         val isSuccessful = saveDiaryToDatabase()
         if (!isSuccessful) return
         updatePictureUriPermission()
-        _showDiaryShowFragment.value = true
+        _navigationAction.value =
+            DiaryEditNavigationAction.DiaryShowFragment(date.requireValue())
     }
 
     private fun updatePictureUriPermission() {
@@ -363,7 +351,8 @@ internal class DiaryEditViewModel @Inject constructor(
             _uriPermissionAction.value =
                 UriPermissionAction.Release(loadedPicturePath!!)
         }
-        _showPreviousFragmentOnDelete.value = true
+        _navigationAction.value =
+            DiaryEditNavigationAction.NavigatePreviousFragmentOnDiaryDelete
     }
 
     private suspend fun deleteDiaryFromDatabase(): Boolean {
@@ -397,7 +386,8 @@ internal class DiaryEditViewModel @Inject constructor(
 
         viewModelScope.launch {
             if (shouldShowDiaryLoadingDialog(date)) {
-                _showDiaryLoadingDialog.value = true
+                _navigationAction.value =
+                    DiaryEditNavigationAction.NavigateDiaryLoadingDialog(date)
                 return@launch
             }
 
@@ -423,7 +413,8 @@ internal class DiaryEditViewModel @Inject constructor(
     suspend fun loadWeatherInfo(date: LocalDate, geoCoordinates: GeoCoordinates?) {
         if (!shouldFetchWeatherInfo(date)) return
         if (shouldShowWeatherInfoFetchingDialog()) {
-            _showWeatherInfoFetchingDialog.value = true
+            _navigationAction.value =
+                DiaryEditNavigationAction.NavigateWeatherInfoFetchingDialog(date)
             return
         }
         fetchWeatherInfo(date, geoCoordinates)
@@ -554,29 +545,9 @@ internal class DiaryEditViewModel @Inject constructor(
         super.addPendingDialogList(pendingDialog)
     }
 
-    // Fragment表示変数クリア
-    fun clearShowDiaryShowFragment() {
-        _showDiaryShowFragment.value = false
-    }
-
-    fun clearShowDiaryLoadingDialog() {
-        _showDiaryLoadingDialog.value = false
-    }
-
-    fun clearShowDiaryUpdateDialog() {
-        _showDiaryUpdateDialog.value = false
-    }
-
-    fun clearShowWeatherInfoFetchingDialog() {
-        _showWeatherInfoFetchingDialog.value = false
-    }
-
-    fun clearShowDiaryLoadingFailureDialog() {
-        _showDiaryLoadingFailureDialog.value = false
-    }
-
-    fun clearShowPreviousFragmentOnDelete() {
-        _showPreviousFragmentOnDelete.value = false
+    // Fragment切替変数クリア
+    fun clearNavigationAction() {
+        _navigationAction.value = initialNavigationAction
     }
 
     // UriPermission
