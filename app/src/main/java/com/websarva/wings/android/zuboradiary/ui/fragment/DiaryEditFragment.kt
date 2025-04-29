@@ -247,7 +247,7 @@ class DiaryEditFragment : BaseFragment() {
                 ?: return
         if (selectedButton != Dialog.BUTTON_POSITIVE) return
 
-        backFragment()
+        navigatePreviousFragment()
     }
 
     // 既存日記上書きダイアログフラグメントから結果受取
@@ -360,40 +360,40 @@ class DiaryEditFragment : BaseFragment() {
             mainViewModel.navigationAction.collectLatest { value: NavigationAction ->
                 when (value) {
                     is DiaryEditNavigationAction.DiaryShowFragment -> {
-                        showDiaryShowFragment(value.date)
+                        navigateDiaryShowFragment(value.date)
                     }
                     is DiaryEditNavigationAction.DiaryItemTitleEditFragment -> {
-                        showDiaryItemTitleEditFragment(value.itemNumber, value.itemTitle)
+                        navigateDiaryItemTitleEditFragment(value.itemNumber, value.itemTitle)
                     }
                     is DiaryEditNavigationAction.NavigateDiaryLoadingDialog -> {
-                        showDiaryLoadingDialog(value.date)
+                        navigateDiaryLoadingDialog(value.date)
                     }
                     is DiaryEditNavigationAction.NavigateDiaryLoadingFailureDialog -> {
-                        showDiaryLoadingFailureDialog(value.date)
+                        navigateDiaryLoadingFailureDialog(value.date)
                     }
                     is DiaryEditNavigationAction.NavigateDiaryUpdateDialog -> {
-                        showDiaryUpdateDialog(value.date)
+                        navigateDiaryUpdateDialog(value.date)
                     }
                     is DiaryEditNavigationAction.NavigateDiaryDeleteDialog -> {
-                        showDiaryDeleteDialog(value.date)
+                        navigateDiaryDeleteDialog(value.date)
                     }
                     is DiaryEditNavigationAction.NavigateDatePickerDialog -> {
-                        showDatePickerDialog(value.date)
+                        navigateDatePickerDialog(value.date)
                     }
                     is DiaryEditNavigationAction.NavigateWeatherInfoFetchingDialog -> {
-                        showWeatherInfoFetchingDialog(value.date)
+                        navigateWeatherInfoFetchingDialog(value.date)
                     }
                     is DiaryEditNavigationAction.NavigateDiaryItemDeleteDialog -> {
-                        showDiaryItemDeleteDialog(value.itemNumber)
+                        navigateDiaryItemDeleteDialog(value.itemNumber)
                     }
                     DiaryEditNavigationAction.NavigateDiaryPictureDeleteDialog -> {
-                        showDiaryPictureDeleteDialog()
+                        navigateDiaryPictureDeleteDialog()
                     }
                     DiaryEditNavigationAction.NavigatePreviousFragmentOnDiaryDelete -> {
-                        backFragmentOnDiaryDelete()
+                        navigatePreviousFragmentOnDiaryDelete()
                     }
                     NavigationAction.NavigatePreviousFragment -> {
-                        backFragment()
+                        navigatePreviousFragment()
                     }
                     NavigationAction.None -> {
                         // 処理なし
@@ -411,11 +411,11 @@ class DiaryEditFragment : BaseFragment() {
 
                 when (pendingDialog) {
                     is DiaryEditPendingDialog.DiaryLoading ->
-                        showDiaryLoadingDialog(pendingDialog.date)
+                        navigateDiaryLoadingDialog(pendingDialog.date)
                     is DiaryEditPendingDialog.DiaryLoadingFailure ->
-                        showDiaryLoadingFailureDialog(pendingDialog.date)
+                        navigateDiaryLoadingFailureDialog(pendingDialog.date)
                     is DiaryEditPendingDialog.WeatherInfoFetching ->
-                        showWeatherInfoFetchingDialog(pendingDialog.date)
+                        navigateWeatherInfoFetchingDialog(pendingDialog.date)
                 }
                 return true
             }
@@ -473,7 +473,7 @@ class DiaryEditFragment : BaseFragment() {
     private fun setUpToolBar() {
         binding.materialToolbarTopAppBar
             .setNavigationOnClickListener {
-                backFragment()
+                navigatePreviousFragment()
             }
 
         binding.materialToolbarTopAppBar
@@ -490,7 +490,7 @@ class DiaryEditFragment : BaseFragment() {
                     }
 
                     R.id.diaryEditToolbarOptionDeleteDiary -> {
-                        showDiaryDeleteDialog(diaryDate)
+                        navigateDiaryDeleteDialog(diaryDate)
                         return@setOnMenuItemClickListener true
                     }
 
@@ -542,7 +542,7 @@ class DiaryEditFragment : BaseFragment() {
             inputType = EditorInfo.TYPE_NULL //キーボード非表示設定
             setOnClickListener {
                 val date = mainViewModel.date.requireValue()
-                showDatePickerDialog(date)
+                navigateDatePickerDialog(date)
             }
         }
 
@@ -714,7 +714,7 @@ class DiaryEditFragment : BaseFragment() {
                 // 項目タイトル入力フラグメント起動
                 val inputItemTitle =
                     mainViewModel.getItemTitle(inputItemNumber).value
-                showDiaryItemTitleEditFragment(inputItemNumber, inputItemTitle)
+                navigateDiaryItemTitleEditFragment(inputItemNumber, inputItemTitle)
             }
         }
 
@@ -729,7 +729,7 @@ class DiaryEditFragment : BaseFragment() {
             val deleteItemNumber = ItemNumber(i)
             val itemArrayNumber = i - 1
             imageButtonItemsDelete[itemArrayNumber].setOnClickListener {
-                showDiaryItemDeleteDialog(deleteItemNumber)
+                navigateDiaryItemDeleteDialog(deleteItemNumber)
             }
         }
 
@@ -951,7 +951,7 @@ class DiaryEditFragment : BaseFragment() {
                 mainActivity.loadPicturePath()
             }
             imageButtonAttachedPictureDelete.setOnClickListener {
-                showDiaryPictureDeleteDialog()
+                navigateDiaryPictureDeleteDialog()
             }
         }
 
@@ -1058,7 +1058,7 @@ class DiaryEditFragment : BaseFragment() {
 
 
     @MainThread
-    private fun showDiaryShowFragment(date: LocalDate) {
+    private fun navigateDiaryShowFragment(date: LocalDate) {
         if (!canNavigateFragment) return
 
         val isStartDiaryFragment =
@@ -1073,7 +1073,7 @@ class DiaryEditFragment : BaseFragment() {
     }
 
     @MainThread
-    private fun showDiaryItemTitleEditFragment(
+    private fun navigateDiaryItemTitleEditFragment(
         inputItemNumber: ItemNumber,
         inputItemTitle: String
     ) {
@@ -1088,7 +1088,7 @@ class DiaryEditFragment : BaseFragment() {
     }
 
     @MainThread
-    private fun showDiaryLoadingDialog(date: LocalDate) {
+    private fun navigateDiaryLoadingDialog(date: LocalDate) {
         if (!canNavigateFragment) {
             mainViewModel.addPendingDialogList(DiaryEditPendingDialog.DiaryLoading(date))
             return
@@ -1100,7 +1100,7 @@ class DiaryEditFragment : BaseFragment() {
     }
 
     @MainThread
-    private fun showDiaryLoadingFailureDialog(date: LocalDate) {
+    private fun navigateDiaryLoadingFailureDialog(date: LocalDate) {
         if (!canNavigateFragment) {
             mainViewModel.addPendingDialogList(DiaryEditPendingDialog.DiaryLoadingFailure(date))
             return
@@ -1112,7 +1112,7 @@ class DiaryEditFragment : BaseFragment() {
     }
 
     @MainThread
-    private fun showDiaryUpdateDialog(date: LocalDate) {
+    private fun navigateDiaryUpdateDialog(date: LocalDate) {
         if (!canNavigateFragment) return
 
         val directions =
@@ -1121,7 +1121,7 @@ class DiaryEditFragment : BaseFragment() {
     }
 
     @MainThread
-    private fun showDiaryDeleteDialog(date: LocalDate) {
+    private fun navigateDiaryDeleteDialog(date: LocalDate) {
         if (!canNavigateFragment) return
 
         val directions =
@@ -1130,7 +1130,7 @@ class DiaryEditFragment : BaseFragment() {
     }
 
     @MainThread
-    private fun showDatePickerDialog(date: LocalDate) {
+    private fun navigateDatePickerDialog(date: LocalDate) {
         if (!canNavigateFragment) return
 
         val directions =
@@ -1139,7 +1139,7 @@ class DiaryEditFragment : BaseFragment() {
     }
 
     @MainThread
-    private fun showWeatherInfoFetchingDialog(date: LocalDate) {
+    private fun navigateWeatherInfoFetchingDialog(date: LocalDate) {
         if (!canNavigateFragment) {
             mainViewModel.addPendingDialogList(DiaryEditPendingDialog.WeatherInfoFetching(date))
             return
@@ -1151,7 +1151,7 @@ class DiaryEditFragment : BaseFragment() {
     }
 
     @MainThread
-    private fun showDiaryItemDeleteDialog(itemNumber: ItemNumber) {
+    private fun navigateDiaryItemDeleteDialog(itemNumber: ItemNumber) {
         if (!canNavigateFragment) return
 
         val directions =
@@ -1160,7 +1160,7 @@ class DiaryEditFragment : BaseFragment() {
     }
 
     @MainThread
-    private fun showDiaryPictureDeleteDialog() {
+    private fun navigateDiaryPictureDeleteDialog() {
         if (!canNavigateFragment) return
 
         val directions =
@@ -1176,7 +1176,7 @@ class DiaryEditFragment : BaseFragment() {
     }
 
     @MainThread
-    private fun backFragment() {
+    private fun navigatePreviousFragment() {
         val navBackStackEntry = checkNotNull(navController.previousBackStackEntry)
         val destinationId = navBackStackEntry.destination.id
         if (destinationId == R.id.navigation_calendar_fragment) {
@@ -1188,13 +1188,13 @@ class DiaryEditFragment : BaseFragment() {
     }
 
     @MainThread
-    private fun backFragmentOnDiaryDelete() {
+    private fun navigatePreviousFragmentOnDiaryDelete() {
         val navBackStackEntry = checkNotNull(navController.previousBackStackEntry)
         val destinationId = navBackStackEntry.destination.id
         if (destinationId == R.id.navigation_diary_show_fragment) {
             navController.navigateUp()
         }
-        backFragment()
+        navigatePreviousFragment()
     }
 
     override fun onResume() {
