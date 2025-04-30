@@ -26,8 +26,8 @@ import com.websarva.wings.android.zuboradiary.ui.model.DiaryShowPendingDialog
 import com.websarva.wings.android.zuboradiary.ui.model.PendingDialog
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.DiaryDeleteDialogFragment
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.DiaryLoadingFailureDialogFragment
-import com.websarva.wings.android.zuboradiary.ui.model.navigation.DiaryShowNavigationAction
-import com.websarva.wings.android.zuboradiary.ui.model.navigation.NavigationAction
+import com.websarva.wings.android.zuboradiary.ui.model.action.DiaryShowFragmentAction
+import com.websarva.wings.android.zuboradiary.ui.model.action.FragmentAction
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.DiaryShowViewModel
 import com.websarva.wings.android.zuboradiary.ui.permission.UriPermissionManager
 import com.websarva.wings.android.zuboradiary.ui.utils.toJapaneseDateString
@@ -86,7 +86,7 @@ internal class DiaryShowFragment : BaseFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        setUpFragmentNavigationAction()
+        setUpFragmentAction()
         setUpPendingDialogObserver()
         setUpDiaryData()
         setUpToolBar()
@@ -130,35 +130,35 @@ internal class DiaryShowFragment : BaseFragment() {
         mainViewModel.deleteDiary()
     }
 
-    private fun setUpFragmentNavigationAction() {
+    private fun setUpFragmentAction() {
         launchAndRepeatOnViewLifeCycleStarted {
-            mainViewModel.navigationAction.collectLatest { value: NavigationAction ->
+            mainViewModel.fragmentAction.collectLatest { value: FragmentAction ->
                 when (value) {
-                    is DiaryShowNavigationAction.NavigateDiaryEditFragment -> {
+                    is DiaryShowFragmentAction.NavigateDiaryEditFragment -> {
                         navigateDiaryEditFragment(value.date)
                     }
-                    is DiaryShowNavigationAction.NavigateDiaryLoadingFailureDialog -> {
+                    is DiaryShowFragmentAction.NavigateDiaryLoadingFailureDialog -> {
                         navigateDiaryLoadingFailureDialog(value.date)
                     }
-                    is DiaryShowNavigationAction.NavigateDiaryDeleteDialog -> {
+                    is DiaryShowFragmentAction.NavigateDiaryDeleteDialog -> {
                         navigateDiaryDeleteDialog(value.date)
                     }
-                    is DiaryShowNavigationAction.NavigatePreviousDialogOnDiaryDelete -> {
+                    is DiaryShowFragmentAction.NavigatePreviousDialogOnDiaryDelete -> {
                         pictureUriPermissionManager
                             .handlePersistablePermission(requireContext(), value.uriPermissionAction)
                         navigatePreviousFragment()
                     }
-                    NavigationAction.NavigatePreviousFragment -> {
+                    FragmentAction.NavigatePreviousFragment -> {
                         navigatePreviousFragment()
                     }
-                    NavigationAction.None -> {
+                    FragmentAction.None -> {
                         // 処理なし
                     }
                     else -> {
                         throw IllegalArgumentException()
                     }
                 }
-                mainViewModel.clearNavigationAction()
+                mainViewModel.clearFragmentAction()
             }
         }
     }

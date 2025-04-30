@@ -51,8 +51,8 @@ import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.DiaryPictureDel
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.DiaryUpdateDialogFragment
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.WeatherInfoFetchingDialogFragment
 import com.websarva.wings.android.zuboradiary.ui.keyboard.KeyboardManager
-import com.websarva.wings.android.zuboradiary.ui.model.navigation.DiaryEditNavigationAction
-import com.websarva.wings.android.zuboradiary.ui.model.navigation.NavigationAction
+import com.websarva.wings.android.zuboradiary.ui.model.action.DiaryEditFragmentAction
+import com.websarva.wings.android.zuboradiary.ui.model.action.FragmentAction
 import com.websarva.wings.android.zuboradiary.ui.permission.UriPermissionAction
 import com.websarva.wings.android.zuboradiary.ui.utils.toJapaneseDateString
 import dagger.hilt.android.AndroidEntryPoint
@@ -134,7 +134,7 @@ class DiaryEditFragment : BaseFragment() {
         super.onViewCreated(view, savedInstanceState)
 
         setUpViewModelInitialization()
-        setUpFragmentNavigationEvent()
+        setUpFragmentAction()
         setUpPendingDialogObserver()
         setUpFocusViewScroll()
         setUpDiaryData()
@@ -342,54 +342,54 @@ class DiaryEditFragment : BaseFragment() {
         }
     }
 
-    private fun setUpFragmentNavigationEvent() {
+    private fun setUpFragmentAction() {
         launchAndRepeatOnViewLifeCycleStarted {
-            mainViewModel.navigationAction.collectLatest { value: NavigationAction ->
+            mainViewModel.fragmentAction.collectLatest { value: FragmentAction ->
                 when (value) {
-                    is DiaryEditNavigationAction.DiaryShowFragment -> {
+                    is DiaryEditFragmentAction.DiaryShowFragment -> {
                         navigateDiaryShowFragment(value.date)
                     }
-                    is DiaryEditNavigationAction.DiaryItemTitleEditFragment -> {
+                    is DiaryEditFragmentAction.DiaryItemTitleEditFragment -> {
                         navigateDiaryItemTitleEditFragment(value.itemNumber, value.itemTitle)
                     }
-                    is DiaryEditNavigationAction.NavigateDiaryLoadingDialog -> {
+                    is DiaryEditFragmentAction.NavigateDiaryLoadingDialog -> {
                         navigateDiaryLoadingDialog(value.date)
                     }
-                    is DiaryEditNavigationAction.NavigateDiaryLoadingFailureDialog -> {
+                    is DiaryEditFragmentAction.NavigateDiaryLoadingFailureDialog -> {
                         navigateDiaryLoadingFailureDialog(value.date)
                     }
-                    is DiaryEditNavigationAction.NavigateDiaryUpdateDialog -> {
+                    is DiaryEditFragmentAction.NavigateDiaryUpdateDialog -> {
                         navigateDiaryUpdateDialog(value.date)
                     }
-                    is DiaryEditNavigationAction.NavigateDiaryDeleteDialog -> {
+                    is DiaryEditFragmentAction.NavigateDiaryDeleteDialog -> {
                         navigateDiaryDeleteDialog(value.date)
                     }
-                    is DiaryEditNavigationAction.NavigateDatePickerDialog -> {
+                    is DiaryEditFragmentAction.NavigateDatePickerDialog -> {
                         navigateDatePickerDialog(value.date)
                     }
-                    is DiaryEditNavigationAction.NavigateWeatherInfoFetchingDialog -> {
+                    is DiaryEditFragmentAction.NavigateWeatherInfoFetchingDialog -> {
                         navigateWeatherInfoFetchingDialog(value.date)
                     }
-                    is DiaryEditNavigationAction.NavigateDiaryItemDeleteDialog -> {
+                    is DiaryEditFragmentAction.NavigateDiaryItemDeleteDialog -> {
                         navigateDiaryItemDeleteDialog(value.itemNumber)
                     }
-                    DiaryEditNavigationAction.NavigateDiaryPictureDeleteDialog -> {
+                    DiaryEditFragmentAction.NavigateDiaryPictureDeleteDialog -> {
                         navigateDiaryPictureDeleteDialog()
                     }
-                    DiaryEditNavigationAction.NavigatePreviousFragmentOnDiaryDelete -> {
+                    DiaryEditFragmentAction.NavigatePreviousFragmentOnDiaryDelete -> {
                         navigatePreviousFragmentOnDiaryDelete()
                     }
-                    NavigationAction.NavigatePreviousFragment -> {
+                    FragmentAction.NavigatePreviousFragment -> {
                         navigatePreviousFragment()
                     }
-                    NavigationAction.None -> {
+                    FragmentAction.None -> {
                         // 処理なし
                     }
                     else -> {
                         throw IllegalArgumentException()
                     }
                 }
-                mainViewModel.clearNavigationAction()
+                mainViewModel.clearFragmentAction()
             }
         }
     }

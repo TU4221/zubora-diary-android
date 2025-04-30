@@ -12,8 +12,8 @@ import com.websarva.wings.android.zuboradiary.data.repository.WeatherApiReposito
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import com.websarva.wings.android.zuboradiary.ui.model.DiaryEditAppMessage
 import com.websarva.wings.android.zuboradiary.ui.model.DiaryEditPendingDialog
-import com.websarva.wings.android.zuboradiary.ui.model.navigation.DiaryEditNavigationAction
-import com.websarva.wings.android.zuboradiary.ui.model.navigation.NavigationAction
+import com.websarva.wings.android.zuboradiary.ui.model.action.DiaryEditFragmentAction
+import com.websarva.wings.android.zuboradiary.ui.model.action.FragmentAction
 import com.websarva.wings.android.zuboradiary.ui.permission.UriPermissionAction
 import com.websarva.wings.android.zuboradiary.ui.utils.requireValue
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -180,12 +180,12 @@ internal class DiaryEditViewModel @Inject constructor(
     private val initialShouldInitializeOnFragmentDestroy = false
     var shouldInitializeOnFragmentDestroy = initialShouldInitializeOnFragmentDestroy
 
-    // Fragment表示
-    private val initialNavigationAction = NavigationAction.None
-    private val _navigationAction: MutableStateFlow<NavigationAction> =
-        MutableStateFlow(initialNavigationAction)
-    val navigationAction: StateFlow<NavigationAction>
-        get() = _navigationAction
+    // Fragment処理
+    private val initialFragmentAction = FragmentAction.None
+    private val _fragmentAction: MutableStateFlow<FragmentAction> =
+        MutableStateFlow(initialFragmentAction)
+    val fragmentAction: StateFlow<FragmentAction>
+        get() = _fragmentAction
 
     // UriPermission管理
     private val initialUriPermissionAction = UriPermissionAction.None
@@ -207,7 +207,7 @@ internal class DiaryEditViewModel @Inject constructor(
         _isVisibleProgressIndicator.value = initialIsVisibleProgressIndicator
         shouldJumpItemMotionLayout = initialShouldJumpItemMotionLayout
         shouldInitializeOnFragmentDestroy = initialShouldInitializeOnFragmentDestroy
-        _navigationAction.value = initialNavigationAction
+        _fragmentAction.value = initialFragmentAction
         _uriPermissionAction.value = initialUriPermissionAction
     }
 
@@ -232,8 +232,8 @@ internal class DiaryEditViewModel @Inject constructor(
                     if (hasPreparedDiary) {
                         addAppMessage(DiaryEditAppMessage.DiaryLoadingFailure)
                     } else {
-                        _navigationAction.value =
-                            DiaryEditNavigationAction.NavigateDiaryLoadingFailureDialog(date)
+                        _fragmentAction.value =
+                            DiaryEditFragmentAction.NavigateDiaryLoadingFailureDialog(date)
                     }
                     _isVisibleProgressIndicator.value = false
                     shouldJumpItemMotionLayout = false
@@ -286,8 +286,8 @@ internal class DiaryEditViewModel @Inject constructor(
                     shouldShowUpdateConfirmationDialog() ?: return@launch
                 if (shouldShowDialog) {
                     _isVisibleProgressIndicator.value = false
-                    _navigationAction.value =
-                        DiaryEditNavigationAction.NavigateDiaryUpdateDialog(date.requireValue())
+                    _fragmentAction.value =
+                        DiaryEditFragmentAction.NavigateDiaryUpdateDialog(date.requireValue())
                     return@launch
                 }
             }
@@ -295,8 +295,8 @@ internal class DiaryEditViewModel @Inject constructor(
             val isSuccessful = saveDiaryToDatabase()
             if (!isSuccessful) return@launch
             updatePictureUriPermission()
-            _navigationAction.value =
-                DiaryEditNavigationAction.DiaryShowFragment(date.requireValue())
+            _fragmentAction.value =
+                DiaryEditFragmentAction.DiaryShowFragment(date.requireValue())
             _isVisibleProgressIndicator.value = false
         }
     }
@@ -373,8 +373,8 @@ internal class DiaryEditViewModel @Inject constructor(
                 _uriPermissionAction.value =
                     UriPermissionAction.Release(loadedPicturePath!!)
             }
-            _navigationAction.value =
-                DiaryEditNavigationAction.NavigatePreviousFragmentOnDiaryDelete
+            _fragmentAction.value =
+                DiaryEditFragmentAction.NavigatePreviousFragmentOnDiaryDelete
             _isVisibleProgressIndicator.value = false
         }
     }
@@ -411,8 +411,8 @@ internal class DiaryEditViewModel @Inject constructor(
 
 
             if (shouldShowDiaryLoadingDialog(date)) {
-                _navigationAction.value =
-                    DiaryEditNavigationAction.NavigateDiaryLoadingDialog(date)
+                _fragmentAction.value =
+                    DiaryEditFragmentAction.NavigateDiaryLoadingDialog(date)
                 return@launch
             }
 
@@ -445,8 +445,8 @@ internal class DiaryEditViewModel @Inject constructor(
         viewModelScope.launch(Dispatchers.IO) {
             if (!shouldFetchWeatherInfo(date)) return@launch
             if (!shouldIgnoreConfirmationDialog && shouldShowWeatherInfoFetchingDialog()) {
-                _navigationAction.value =
-                    DiaryEditNavigationAction.NavigateWeatherInfoFetchingDialog(date)
+                _fragmentAction.value =
+                    DiaryEditFragmentAction.NavigateWeatherInfoFetchingDialog(date)
                 _isVisibleProgressIndicator.value = false
                 return@launch
             }
@@ -572,8 +572,8 @@ internal class DiaryEditViewModel @Inject constructor(
         shouldJumpItemMotionLayout = initialShouldJumpItemMotionLayout
     }
 
-    fun clearNavigationAction() {
-        _navigationAction.value = initialNavigationAction
+    fun clearFragmentAction() {
+        _fragmentAction.value = initialFragmentAction
     }
 
     fun clearUriPermissionAction() {
@@ -621,7 +621,7 @@ internal class DiaryEditViewModel @Inject constructor(
                     }
                 }
             }
-            _navigationAction.value = NavigationAction.NavigatePreviousFragment
+            _fragmentAction.value = FragmentAction.NavigatePreviousFragment
             isTesting = false
         }
     }

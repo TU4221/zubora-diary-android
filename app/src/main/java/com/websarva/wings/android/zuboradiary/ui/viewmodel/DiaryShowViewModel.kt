@@ -8,8 +8,8 @@ import com.websarva.wings.android.zuboradiary.data.model.ItemNumber
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import com.websarva.wings.android.zuboradiary.ui.model.DiaryShowAppMessage
 import com.websarva.wings.android.zuboradiary.ui.model.DiaryShowPendingDialog
-import com.websarva.wings.android.zuboradiary.ui.model.navigation.DiaryShowNavigationAction
-import com.websarva.wings.android.zuboradiary.ui.model.navigation.NavigationAction
+import com.websarva.wings.android.zuboradiary.ui.model.action.DiaryShowFragmentAction
+import com.websarva.wings.android.zuboradiary.ui.model.action.FragmentAction
 import com.websarva.wings.android.zuboradiary.ui.permission.UriPermissionAction
 import com.websarva.wings.android.zuboradiary.ui.utils.requireValue
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -67,11 +67,11 @@ internal class DiaryShowViewModel @Inject constructor(private val diaryRepositor
         get() = diaryStateFlow.log.asStateFlow()
 
     // Fragment表示
-    private val initialNavigationAction = NavigationAction.None
-    private val _navigationAction: MutableStateFlow<NavigationAction> =
-        MutableStateFlow(initialNavigationAction)
-    val navigationAction: StateFlow<NavigationAction>
-        get() = _navigationAction
+    private val initialFragmentAction = FragmentAction.None
+    private val _fragmentAction: MutableStateFlow<FragmentAction> =
+        MutableStateFlow(initialFragmentAction)
+    val fragmentAction: StateFlow<FragmentAction>
+        get() = _fragmentAction
 
     override fun initialize() {
         super.initialize()
@@ -89,8 +89,8 @@ internal class DiaryShowViewModel @Inject constructor(private val diaryRepositor
             } catch (e: Exception) {
                 Log.e(logTag, "${logMsg}_失敗", e)
                 if (ignoreAppMessage) {
-                    _navigationAction.value =
-                        DiaryShowNavigationAction.NavigateDiaryLoadingFailureDialog(date)
+                    _fragmentAction.value =
+                        DiaryShowFragmentAction.NavigateDiaryLoadingFailureDialog(date)
                 } else {
                     addAppMessage(DiaryShowAppMessage.DiaryLoadingFailure)
                 }
@@ -116,10 +116,10 @@ internal class DiaryShowViewModel @Inject constructor(private val diaryRepositor
             }
 
             if (picturePath == null) {
-                _navigationAction.value = NavigationAction.NavigatePreviousFragment
+                _fragmentAction.value = FragmentAction.NavigatePreviousFragment
             } else {
-                _navigationAction.value =
-                    DiaryShowNavigationAction
+                _fragmentAction.value =
+                    DiaryShowFragmentAction
                         .NavigatePreviousDialogOnDiaryDelete(
                             UriPermissionAction.Release(picturePath)
                         )
@@ -139,8 +139,8 @@ internal class DiaryShowViewModel @Inject constructor(private val diaryRepositor
         }
     }
 
-    fun clearNavigationAction() {
-        _navigationAction.value = initialNavigationAction
+    fun clearFragmentAction() {
+        _fragmentAction.value = initialFragmentAction
     }
 
     // 表示保留中Dialog追加
