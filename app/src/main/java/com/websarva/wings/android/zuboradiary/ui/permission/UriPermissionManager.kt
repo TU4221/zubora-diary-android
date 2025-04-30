@@ -40,6 +40,7 @@ internal abstract class UriPermissionManager {
         Log.i(logTag, "${logMsg}_完了")
     }
 
+    // TODO:下記Overrideコードを簡潔にできないか検討
     /**
      * 対象Uriが他で使用されていないかを確認するコードを記述すること。権限解放時、このメソッドが処理される。
      */
