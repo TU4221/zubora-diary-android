@@ -428,15 +428,22 @@ internal class DiaryEditViewModel @Inject constructor(
         return existsSavedDiary(changedDate) ?: false
     }
 
-    fun loadWeatherInfo(date: LocalDate, geoCoordinates: GeoCoordinates?) {
+    fun loadWeatherInfo(
+        date: LocalDate,
+        geoCoordinates: GeoCoordinates?,
+        shouldIgnoreConfirmationDialog: Boolean = false
+    ) {
+        _isVisibleUpdateProgressBar.value = true
         viewModelScope.launch(Dispatchers.IO) {
             if (!shouldFetchWeatherInfo(date)) return@launch
-            if (shouldShowWeatherInfoFetchingDialog()) {
+            if (!shouldIgnoreConfirmationDialog && shouldShowWeatherInfoFetchingDialog()) {
                 _navigationAction.value =
                     DiaryEditNavigationAction.NavigateWeatherInfoFetchingDialog(date)
+                _isVisibleUpdateProgressBar.value = false
                 return@launch
             }
             fetchWeatherInfo(date, geoCoordinates)
+            _isVisibleUpdateProgressBar.value = false
         }
     }
 
@@ -466,52 +473,48 @@ internal class DiaryEditViewModel @Inject constructor(
     }
 
     // 天気情報関係
-    fun fetchWeatherInfo(date: LocalDate, geoCoordinates: GeoCoordinates?) {
-        viewModelScope.launch(Dispatchers.IO) {
-            if (geoCoordinates == null) {
-                addAppMessage(DiaryEditAppMessage.WeatherInfoLoadingFailure)
-                return@launch
-            }
+    private suspend fun fetchWeatherInfo(date: LocalDate, geoCoordinates: GeoCoordinates?) {
+        if (geoCoordinates == null) {
+            addAppMessage(DiaryEditAppMessage.WeatherInfoLoadingFailure)
+            return
+        }
 
-            if (!weatherApiRepository.canFetchWeatherInfo(date)) return@launch
+        if (!weatherApiRepository.canFetchWeatherInfo(date)) return
 
-            val logMsg = "天気情報取得"
-            Log.i(logTag, "${logMsg}_開始")
+        val logMsg = "天気情報取得"
+        Log.i(logTag, "${logMsg}_開始")
 
-            val currentDate = LocalDate.now()
-            val betweenDays = ChronoUnit.DAYS.between(date, currentDate)
+        val currentDate = LocalDate.now()
+        val betweenDays = ChronoUnit.DAYS.between(date, currentDate)
 
-            _isVisibleUpdateProgressBar.value = true
-            val response =
-                if (betweenDays == 0L) {
-                    weatherApiRepository.fetchTodayWeatherInfo(geoCoordinates)
-                } else {
-                    weatherApiRepository.fetchPastDayWeatherInfo(
-                        geoCoordinates,
-                        betweenDays.toInt()
-                    )
-                }
-            Log.d(logTag, "fetchWeatherInformation()_code = " + response.code())
-            Log.d(logTag, "fetchWeatherInformation()_message = :" + response.message())
-
-            if (response.isSuccessful) {
-                Log.d(logTag, "fetchWeatherInformation()_body = " + response.body())
-                val result =
-                    response.body()?.toWeatherInfo() ?: throw IllegalStateException()
-                diaryStateFlow.weather1.value = result
-                Log.i(logTag, "${logMsg}_完了")
+        val response =
+            if (betweenDays == 0L) {
+                weatherApiRepository.fetchTodayWeatherInfo(geoCoordinates)
             } else {
-                response.errorBody().use { errorBody ->
-                    val errorBodyString = errorBody?.string() ?: "null"
-                    Log.d(
-                        logTag,
-                        "fetchWeatherInformation()_errorBody = $errorBodyString"
-                    )
-                }
-                addAppMessage(DiaryEditAppMessage.WeatherInfoLoadingFailure)
-                Log.e(logTag, "${logMsg}_失敗")
+                weatherApiRepository.fetchPastDayWeatherInfo(
+                    geoCoordinates,
+                    betweenDays.toInt()
+                )
             }
-            _isVisibleUpdateProgressBar.value = false
+        Log.d(logTag, "fetchWeatherInformation()_code = " + response.code())
+        Log.d(logTag, "fetchWeatherInformation()_message = :" + response.message())
+
+        if (response.isSuccessful) {
+            Log.d(logTag, "fetchWeatherInformation()_body = " + response.body())
+            val result =
+                response.body()?.toWeatherInfo() ?: throw IllegalStateException()
+            diaryStateFlow.weather1.value = result
+            Log.i(logTag, "${logMsg}_完了")
+        } else {
+            response.errorBody().use { errorBody ->
+                val errorBodyString = errorBody?.string() ?: "null"
+                Log.d(
+                    logTag,
+                    "fetchWeatherInformation()_errorBody = $errorBodyString"
+                )
+            }
+            addAppMessage(DiaryEditAppMessage.WeatherInfoLoadingFailure)
+            Log.e(logTag, "${logMsg}_失敗")
         }
     }
 

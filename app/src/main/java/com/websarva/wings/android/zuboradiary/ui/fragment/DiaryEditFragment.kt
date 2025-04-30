@@ -283,7 +283,7 @@ class DiaryEditFragment : BaseFragment() {
 
         val loadDiaryDate = mainViewModel.date.requireValue()
         val geoCoordinates = settingsViewModel.geoCoordinates.requireValue()
-        mainViewModel.fetchWeatherInfo(loadDiaryDate, geoCoordinates)
+        mainViewModel.loadWeatherInfo(loadDiaryDate, geoCoordinates, true)
     }
 
     // 項目削除確認ダイアログフラグメントから結果受取
