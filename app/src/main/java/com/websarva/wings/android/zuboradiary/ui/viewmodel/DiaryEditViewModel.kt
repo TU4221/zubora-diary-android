@@ -296,7 +296,7 @@ internal class DiaryEditViewModel @Inject constructor(
             if (!isSuccessful) return@launch
             updatePictureUriPermission()
             _fragmentAction.value =
-                DiaryEditFragmentAction.DiaryShowFragment(date.requireValue())
+                DiaryEditFragmentAction.NavigateDiaryShowFragment(date.requireValue())
             _isVisibleProgressIndicator.value = false
         }
     }

@@ -346,11 +346,8 @@ class DiaryEditFragment : BaseFragment() {
         launchAndRepeatOnViewLifeCycleStarted {
             mainViewModel.fragmentAction.collectLatest { value: FragmentAction ->
                 when (value) {
-                    is DiaryEditFragmentAction.DiaryShowFragment -> {
+                    is DiaryEditFragmentAction.NavigateDiaryShowFragment -> {
                         navigateDiaryShowFragment(value.date)
-                    }
-                    is DiaryEditFragmentAction.DiaryItemTitleEditFragment -> {
-                        navigateDiaryItemTitleEditFragment(value.itemNumber, value.itemTitle)
                     }
                     is DiaryEditFragmentAction.NavigateDiaryLoadingDialog -> {
                         navigateDiaryLoadingDialog(value.date)
@@ -361,17 +358,8 @@ class DiaryEditFragment : BaseFragment() {
                     is DiaryEditFragmentAction.NavigateDiaryUpdateDialog -> {
                         navigateDiaryUpdateDialog(value.date)
                     }
-                    is DiaryEditFragmentAction.NavigateDiaryDeleteDialog -> {
-                        navigateDiaryDeleteDialog(value.date)
-                    }
-                    is DiaryEditFragmentAction.NavigateDatePickerDialog -> {
-                        navigateDatePickerDialog(value.date)
-                    }
                     is DiaryEditFragmentAction.NavigateWeatherInfoFetchingDialog -> {
                         navigateWeatherInfoFetchingDialog(value.date)
-                    }
-                    is DiaryEditFragmentAction.NavigateDiaryItemDeleteDialog -> {
-                        navigateDiaryItemDeleteDialog(value.itemNumber)
                     }
                     DiaryEditFragmentAction.NavigateDiaryPictureDeleteDialog -> {
                         navigateDiaryPictureDeleteDialog()
