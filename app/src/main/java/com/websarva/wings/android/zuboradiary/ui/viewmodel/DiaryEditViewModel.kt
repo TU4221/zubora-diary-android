@@ -133,10 +133,10 @@ internal class DiaryEditViewModel @Inject constructor(
     private val initialLoadedPicturePath: Uri? = null
     private var loadedPicturePath = initialLoadedPicturePath
 
-    private val initialIsVisibleUpdateProgressBar = false
-    private val _isVisibleUpdateProgressBar = MutableStateFlow(initialIsVisibleUpdateProgressBar)
+    private val initialIsVisibleProgressIndicator = false
+    private val _isVisibleProgressIndicator = MutableStateFlow(initialIsVisibleProgressIndicator)
     val isVisibleUpdateProgressBar
-        get() = _isVisibleUpdateProgressBar.asStateFlow()
+        get() = _isVisibleProgressIndicator.asStateFlow()
 
     private val initialHasPreparedDiary = false
     var hasPreparedDiary = initialHasPreparedDiary
@@ -202,7 +202,7 @@ internal class DiaryEditViewModel @Inject constructor(
         _loadedDate.value = initialLoadedDate
         diaryStateFlow.initialize()
         loadedPicturePath = initialLoadedPicturePath
-        _isVisibleUpdateProgressBar.value = initialIsVisibleUpdateProgressBar
+        _isVisibleProgressIndicator.value = initialIsVisibleProgressIndicator
         hasPreparedDiary = initialHasPreparedDiary
         shouldJumpItemMotionLayout = initialShouldJumpItemMotionLayout
         shouldInitializeOnFragmentDestroy = initialShouldInitializeOnFragmentDestroy
@@ -218,7 +218,7 @@ internal class DiaryEditViewModel @Inject constructor(
     ) {
         val logMsg = "日記読込"
         Log.i(logTag, "${logMsg}_開始")
-        _isVisibleUpdateProgressBar.value = true
+        _isVisibleProgressIndicator.value = true
         viewModelScope.launch(Dispatchers.IO) {
             shouldJumpItemMotionLayout = true
             val previousNumVisibleItems = diaryStateFlow.numVisibleItems.value
@@ -234,7 +234,7 @@ internal class DiaryEditViewModel @Inject constructor(
                         _navigationAction.value =
                             DiaryEditNavigationAction.NavigateDiaryLoadingFailureDialog(date)
                     }
-                    _isVisibleUpdateProgressBar.value = false
+                    _isVisibleProgressIndicator.value = false
                     shouldJumpItemMotionLayout = false
                     return@launch
                 }
@@ -242,7 +242,7 @@ internal class DiaryEditViewModel @Inject constructor(
                 updateDate(date, requestFetchWeatherInfo, geoCoordinates)
             }
             hasPreparedDiary = true
-            _isVisibleUpdateProgressBar.value = false
+            _isVisibleProgressIndicator.value = false
 
             // MEMO:"numVisibleItems"が読込前と同じ時はStateFlowのCollectが起動せず、MotionLayoutが処理されないので、
             //      ”shouldJumpItemMotionLayout”を下記でクリアする。
@@ -278,13 +278,13 @@ internal class DiaryEditViewModel @Inject constructor(
     }
 
     fun saveDiary(shouldIgnoreConfirmationDialog: Boolean = false) {
-        _isVisibleUpdateProgressBar.value = true
+        _isVisibleProgressIndicator.value = true
         viewModelScope.launch(Dispatchers.IO) {
             if (!shouldIgnoreConfirmationDialog) {
                 val shouldShowDialog =
                     shouldShowUpdateConfirmationDialog() ?: return@launch
                 if (shouldShowDialog) {
-                    _isVisibleUpdateProgressBar.value = false
+                    _isVisibleProgressIndicator.value = false
                     _navigationAction.value =
                         DiaryEditNavigationAction.NavigateDiaryUpdateDialog(date.requireValue())
                     return@launch
@@ -296,7 +296,7 @@ internal class DiaryEditViewModel @Inject constructor(
             updatePictureUriPermission()
             _navigationAction.value =
                 DiaryEditNavigationAction.DiaryShowFragment(date.requireValue())
-            _isVisibleUpdateProgressBar.value = false
+            _isVisibleProgressIndicator.value = false
         }
     }
 
@@ -354,11 +354,11 @@ internal class DiaryEditViewModel @Inject constructor(
     }
 
     fun deleteDiary() {
-        _isVisibleUpdateProgressBar.value = true
+        _isVisibleProgressIndicator.value = true
         viewModelScope.launch(Dispatchers.IO) {
             val isSuccessful = deleteDiaryFromDatabase()
             if (!isSuccessful) {
-                _isVisibleUpdateProgressBar.value = false
+                _isVisibleProgressIndicator.value = false
                 return@launch
             }
 
@@ -368,7 +368,7 @@ internal class DiaryEditViewModel @Inject constructor(
             }
             _navigationAction.value =
                 DiaryEditNavigationAction.NavigatePreviousFragmentOnDiaryDelete
-            _isVisibleUpdateProgressBar.value = false
+            _isVisibleProgressIndicator.value = false
         }
     }
 
@@ -433,17 +433,17 @@ internal class DiaryEditViewModel @Inject constructor(
         geoCoordinates: GeoCoordinates?,
         shouldIgnoreConfirmationDialog: Boolean = false
     ) {
-        _isVisibleUpdateProgressBar.value = true
+        _isVisibleProgressIndicator.value = true
         viewModelScope.launch(Dispatchers.IO) {
             if (!shouldFetchWeatherInfo(date)) return@launch
             if (!shouldIgnoreConfirmationDialog && shouldShowWeatherInfoFetchingDialog()) {
                 _navigationAction.value =
                     DiaryEditNavigationAction.NavigateWeatherInfoFetchingDialog(date)
-                _isVisibleUpdateProgressBar.value = false
+                _isVisibleProgressIndicator.value = false
                 return@launch
             }
             fetchWeatherInfo(date, geoCoordinates)
-            _isVisibleUpdateProgressBar.value = false
+            _isVisibleProgressIndicator.value = false
         }
     }
 
