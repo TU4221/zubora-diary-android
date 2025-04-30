@@ -385,6 +385,9 @@ class DiaryEditFragment : BaseFragment() {
                     NavigationAction.None -> {
                         // 処理なし
                     }
+                    else -> {
+                        throw IllegalArgumentException()
+                    }
                 }
                 mainViewModel.clearNavigationAction()
             }

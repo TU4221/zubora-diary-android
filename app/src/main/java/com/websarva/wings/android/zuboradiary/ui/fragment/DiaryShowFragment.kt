@@ -14,7 +14,6 @@ import android.widget.TextView
 import androidx.annotation.MainThread
 import androidx.databinding.ViewDataBinding
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.lifecycleScope
 import com.websarva.wings.android.zuboradiary.R
 import com.websarva.wings.android.zuboradiary.ui.model.AppMessage
 import com.websarva.wings.android.zuboradiary.data.model.Condition
@@ -27,16 +26,15 @@ import com.websarva.wings.android.zuboradiary.ui.model.DiaryShowPendingDialog
 import com.websarva.wings.android.zuboradiary.ui.model.PendingDialog
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.DiaryDeleteDialogFragment
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.DiaryLoadingFailureDialogFragment
+import com.websarva.wings.android.zuboradiary.ui.model.navigation.DiaryShowNavigationAction
+import com.websarva.wings.android.zuboradiary.ui.model.navigation.NavigationAction
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.DiaryShowViewModel
 import com.websarva.wings.android.zuboradiary.ui.permission.UriPermissionManager
 import com.websarva.wings.android.zuboradiary.ui.utils.toJapaneseDateString
 import com.websarva.wings.android.zuboradiary.ui.utils.toJapaneseDateTimeWithSecondsString
 import com.websarva.wings.android.zuboradiary.ui.utils.requireValue
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import java.time.LocalDate
 import java.time.LocalDateTime
 
@@ -88,6 +86,7 @@ internal class DiaryShowFragment : BaseFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        setUpFragmentNavigationAction()
         setUpPendingDialogObserver()
         setUpDiaryData()
         setUpToolBar()
@@ -128,22 +127,39 @@ internal class DiaryShowFragment : BaseFragment() {
                 ?: return
         if (selectedButton != Dialog.BUTTON_POSITIVE) return
 
-        lifecycleScope.launch(Dispatchers.IO) {
-            val isSuccessful = mainViewModel.deleteDiary()
-            if (!isSuccessful) return@launch
-
-            releasePictureUriPermission()
-            withContext(Dispatchers.Main) {
-                navigatePreviousFragment()
-            }
-        }
+        mainViewModel.deleteDiary()
     }
 
-    private fun releasePictureUriPermission() {
-        val pictureUri = mainViewModel.picturePath.value ?: return
-
-        lifecycleScope.launch(Dispatchers.IO) {
-            pictureUriPermissionManager.releasePersistablePermission(requireContext(), pictureUri)
+    private fun setUpFragmentNavigationAction() {
+        launchAndRepeatOnViewLifeCycleStarted {
+            mainViewModel.navigationAction.collectLatest { value: NavigationAction ->
+                when (value) {
+                    is DiaryShowNavigationAction.NavigateDiaryEditFragment -> {
+                        navigateDiaryEditFragment(value.date)
+                    }
+                    is DiaryShowNavigationAction.NavigateDiaryLoadingFailureDialog -> {
+                        navigateDiaryLoadingFailureDialog(value.date)
+                    }
+                    is DiaryShowNavigationAction.NavigateDiaryDeleteDialog -> {
+                        navigateDiaryDeleteDialog(value.date)
+                    }
+                    is DiaryShowNavigationAction.NavigatePreviousDialogOnDiaryDelete -> {
+                        pictureUriPermissionManager
+                            .handlePersistablePermission(requireContext(), value.uriPermissionAction)
+                        navigatePreviousFragment()
+                    }
+                    NavigationAction.NavigatePreviousFragment -> {
+                        navigatePreviousFragment()
+                    }
+                    NavigationAction.None -> {
+                        // 処理なし
+                    }
+                    else -> {
+                        throw IllegalArgumentException()
+                    }
+                }
+                mainViewModel.clearNavigationAction()
+            }
         }
     }
 
@@ -165,15 +181,7 @@ internal class DiaryShowFragment : BaseFragment() {
     private fun setUpDiaryData() {
         mainViewModel.initialize()
         val diaryDate = DiaryShowFragmentArgs.fromBundle(requireArguments()).date
-
-        lifecycleScope.launch(Dispatchers.IO) {
-            val isSuccessful = mainViewModel.loadSavedDiary(diaryDate, true)
-            if (isSuccessful) return@launch
-
-            withContext(Dispatchers.Main) {
-                navigateDiaryLoadingFailureDialog(diaryDate)
-            }
-        }
+        mainViewModel.loadSavedDiary(diaryDate, true)
     }
 
     private fun setUpToolBar() {
@@ -185,7 +193,7 @@ internal class DiaryShowFragment : BaseFragment() {
                 // 日記編集フラグメント起動
                 if (item.itemId == R.id.diaryShowToolbarOptionEditDiary) {
                     val editDiaryDate = mainViewModel.date.requireValue()
-                    navigateDiaryEdit(editDiaryDate)
+                    navigateDiaryEditFragment(editDiaryDate)
                     return@setOnMenuItemClickListener true
                 } else if (item.itemId == R.id.diaryShowToolbarOptionDeleteDiary) {
                     val deleteDiaryDate = mainViewModel.date.requireValue()
@@ -370,7 +378,7 @@ internal class DiaryShowFragment : BaseFragment() {
     }
 
     @MainThread
-    private fun navigateDiaryEdit(date: LocalDate) {
+    private fun navigateDiaryEditFragment(date: LocalDate) {
         if (!canNavigateFragment) return
 
         val directions =

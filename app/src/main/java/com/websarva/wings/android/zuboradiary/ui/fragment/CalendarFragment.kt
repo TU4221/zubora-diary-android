@@ -427,18 +427,10 @@ class CalendarFragment : BaseFragment() {
     }
 
     private fun showDiary(date: LocalDate) {
-        lifecycleScope.launch(Dispatchers.IO) {
-            val isSuccessful = diaryShowViewModel.loadSavedDiary(date)
-            withContext(Dispatchers.Main) {
-                if (isSuccessful) {
-                    binding.apply {
-                        frameLayoutDiaryShow.visibility = View.VISIBLE
-                        textNoDiaryMessage.visibility = View.GONE
-                    }
-                } else {
-                    closeDiary()
-                }
-            }
+        diaryShowViewModel.loadSavedDiary(date)
+        binding.apply {
+            frameLayoutDiaryShow.visibility = View.VISIBLE
+            textNoDiaryMessage.visibility = View.GONE
         }
     }
 
