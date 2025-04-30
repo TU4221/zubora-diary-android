@@ -364,7 +364,11 @@ class DiaryEditFragment : BaseFragment() {
                     DiaryEditFragmentAction.NavigateDiaryPictureDeleteDialog -> {
                         navigateDiaryPictureDeleteDialog()
                     }
-                    DiaryEditFragmentAction.NavigatePreviousFragmentOnDiaryDelete -> {
+                    is DiaryEditFragmentAction.NavigatePreviousFragmentOnDiaryDelete -> {
+                        if (value.uri != null) {
+                            pictureUriPermissionManager
+                                .releasePersistablePermission(requireContext(), value.uri)
+                        }
                         navigatePreviousFragmentOnDiaryDelete()
                     }
                     FragmentAction.NavigatePreviousFragment -> {

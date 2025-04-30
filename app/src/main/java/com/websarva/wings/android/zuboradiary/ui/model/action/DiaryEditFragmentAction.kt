@@ -1,6 +1,6 @@
 package com.websarva.wings.android.zuboradiary.ui.model.action
 
-import com.websarva.wings.android.zuboradiary.data.model.ItemNumber
+import android.net.Uri
 import java.time.LocalDate
 
 internal sealed class DiaryEditFragmentAction : FragmentAction() {
@@ -10,5 +10,5 @@ internal sealed class DiaryEditFragmentAction : FragmentAction() {
     data class NavigateDiaryUpdateDialog(val date: LocalDate) : DiaryEditFragmentAction()
     data class NavigateWeatherInfoFetchingDialog(val date: LocalDate) : DiaryEditFragmentAction()
     data object NavigateDiaryPictureDeleteDialog : DiaryEditFragmentAction()
-    data object NavigatePreviousFragmentOnDiaryDelete : DiaryEditFragmentAction()
+    data class NavigatePreviousFragmentOnDiaryDelete(val uri: Uri?) : DiaryEditFragmentAction()
 }

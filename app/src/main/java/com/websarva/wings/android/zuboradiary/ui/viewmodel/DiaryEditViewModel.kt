@@ -363,18 +363,16 @@ internal class DiaryEditViewModel @Inject constructor(
     fun deleteDiary() {
         _isVisibleProgressIndicator.value = true
         viewModelScope.launch(Dispatchers.IO) {
+            val loadedPictureUri = loadedPicturePath
+
             val isSuccessful = deleteDiaryFromDatabase()
             if (!isSuccessful) {
                 _isVisibleProgressIndicator.value = false
                 return@launch
             }
 
-            if (loadedPicturePath != null) {
-                _uriPermissionAction.value =
-                    UriPermissionAction.Release(loadedPicturePath!!)
-            }
             _fragmentAction.value =
-                DiaryEditFragmentAction.NavigatePreviousFragmentOnDiaryDelete
+                DiaryEditFragmentAction.NavigatePreviousFragmentOnDiaryDelete(loadedPictureUri)
             _isVisibleProgressIndicator.value = false
         }
     }
