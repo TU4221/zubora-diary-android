@@ -65,7 +65,7 @@ internal class DiaryShowViewModel @Inject constructor(private val diaryRepositor
     val log
         get() = diaryStateFlow.log.asStateFlow()
 
-    // Fragment表示
+    // Fragment処理
     private val initialFragmentAction = FragmentAction.None
     private val _fragmentAction: MutableStateFlow<FragmentAction> =
         MutableStateFlow(initialFragmentAction)
@@ -77,48 +77,74 @@ internal class DiaryShowViewModel @Inject constructor(private val diaryRepositor
         diaryStateFlow.initialize()
     }
 
-    fun loadSavedDiary(date: LocalDate, ignoreAppMessage: Boolean = false) {
+    fun onDiaryEditMenuClicked() {
+        val date = diaryStateFlow.date.requireValue()
+        _fragmentAction.value =
+            DiaryShowFragmentAction.NavigateDiaryEditFragment(date)
+    }
+
+    fun onDiaryDeleteMenuClicked() {
+        val date = diaryStateFlow.date.requireValue()
+        _fragmentAction.value =
+            DiaryShowFragmentAction.NavigateDiaryDeleteDialog(date)
+    }
+
+    fun onDiaryDeleteDialogPositiveButtonClicked() {
         viewModelScope.launch(Dispatchers.IO) {
-            val logMsg = "日記読込"
-            Log.i(logTag, "${logMsg}_開始")
-
-            try {
-                val diaryEntity = diaryRepository.loadDiary(date) ?: throw IllegalArgumentException()
-                diaryStateFlow.update(diaryEntity)
-            } catch (e: Exception) {
-                Log.e(logTag, "${logMsg}_失敗", e)
-                if (ignoreAppMessage) {
-                    _fragmentAction.value =
-                        DiaryShowFragmentAction.NavigateDiaryLoadingFailureDialog(date)
-                } else {
-                    addAppMessage(DiaryShowAppMessage.DiaryLoadingFailure)
-                }
-            }
-
-            Log.i(logTag, "${logMsg}_完了")
+            deleteDiary()
         }
     }
 
-    fun deleteDiary() {
+    fun prepareDiaryForDiaryShowFragment(date: LocalDate) {
         viewModelScope.launch(Dispatchers.IO) {
-            val logMsg = "日記削除"
-            Log.i(logTag, "${logMsg}_開始")
-
-            val deleteDate = diaryStateFlow.date.requireValue()
-            val picturePath  = diaryStateFlow.picturePath.value
-            try {
-                diaryRepository.deleteDiary(deleteDate)
-            } catch (e: Exception) {
-                Log.e(logTag, "${logMsg}_失敗", e)
-                addAppMessage(DiaryShowAppMessage.DiaryDeleteFailure)
-                return@launch
-            }
-
-            _fragmentAction.value =
-                DiaryShowFragmentAction
-                    .NavigatePreviousDialogOnDiaryDelete(picturePath)
-            Log.i(logTag, "${logMsg}_完了")
+            loadSavedDiary(date, true)
         }
+    }
+
+    fun prepareDiaryForCalendarFragment(date: LocalDate) {
+        viewModelScope.launch(Dispatchers.IO) {
+            loadSavedDiary(date, false)
+        }
+    }
+
+    private suspend fun loadSavedDiary(date: LocalDate, ignoreAppMessage: Boolean = false) {
+        val logMsg = "日記読込"
+        Log.i(logTag, "${logMsg}_開始")
+
+        try {
+            val diaryEntity = diaryRepository.loadDiary(date) ?: throw IllegalArgumentException()
+            diaryStateFlow.update(diaryEntity)
+        } catch (e: Exception) {
+            Log.e(logTag, "${logMsg}_失敗", e)
+            if (ignoreAppMessage) {
+                _fragmentAction.value =
+                    DiaryShowFragmentAction.NavigateDiaryLoadingFailureDialog(date)
+            } else {
+                addAppMessage(DiaryShowAppMessage.DiaryLoadingFailure)
+            }
+        }
+
+        Log.i(logTag, "${logMsg}_完了")
+    }
+
+    private suspend fun deleteDiary() {
+        val logMsg = "日記削除"
+        Log.i(logTag, "${logMsg}_開始")
+
+        val deleteDate = diaryStateFlow.date.requireValue()
+        val picturePath  = diaryStateFlow.picturePath.value
+        try {
+            diaryRepository.deleteDiary(deleteDate)
+        } catch (e: Exception) {
+            Log.e(logTag, "${logMsg}_失敗", e)
+            addAppMessage(DiaryShowAppMessage.DiaryDeleteFailure)
+            return
+        }
+
+        _fragmentAction.value =
+            DiaryShowFragmentAction
+                .NavigatePreviousDialogOnDiaryDelete(picturePath)
+        Log.i(logTag, "${logMsg}_完了")
     }
 
     // MEMO:存在しないことを確認したいため下記メソッドを否定的処理とする

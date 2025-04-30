@@ -32,7 +32,6 @@ import com.websarva.wings.android.zuboradiary.ui.viewmodel.DiaryShowViewModel
 import com.websarva.wings.android.zuboradiary.ui.permission.UriPermissionManager
 import com.websarva.wings.android.zuboradiary.ui.utils.toJapaneseDateString
 import com.websarva.wings.android.zuboradiary.ui.utils.toJapaneseDateTimeWithSecondsString
-import com.websarva.wings.android.zuboradiary.ui.utils.requireValue
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import java.time.LocalDate
@@ -127,7 +126,7 @@ internal class DiaryShowFragment : BaseFragment() {
                 ?: return
         if (selectedButton != Dialog.BUTTON_POSITIVE) return
 
-        mainViewModel.deleteDiary()
+        mainViewModel.onDiaryDeleteDialogPositiveButtonClicked()
     }
 
     private fun setUpFragmentAction() {
@@ -183,7 +182,7 @@ internal class DiaryShowFragment : BaseFragment() {
     private fun setUpDiaryData() {
         mainViewModel.initialize()
         val diaryDate = DiaryShowFragmentArgs.fromBundle(requireArguments()).date
-        mainViewModel.loadSavedDiary(diaryDate, true)
+        mainViewModel.prepareDiaryForDiaryShowFragment(diaryDate)
     }
 
     private fun setUpToolBar() {
@@ -194,12 +193,10 @@ internal class DiaryShowFragment : BaseFragment() {
             setOnMenuItemClickListener { item: MenuItem ->
                 // 日記編集フラグメント起動
                 if (item.itemId == R.id.diaryShowToolbarOptionEditDiary) {
-                    val editDiaryDate = mainViewModel.date.requireValue()
-                    navigateDiaryEditFragment(editDiaryDate)
+                    mainViewModel.onDiaryEditMenuClicked()
                     return@setOnMenuItemClickListener true
                 } else if (item.itemId == R.id.diaryShowToolbarOptionDeleteDiary) {
-                    val deleteDiaryDate = mainViewModel.date.requireValue()
-                    navigateDiaryDeleteDialog(deleteDiaryDate)
+                    mainViewModel.onDiaryDeleteMenuClicked()
                     return@setOnMenuItemClickListener true
                 }
                 false

@@ -443,7 +443,7 @@ class CalendarFragment : BaseFragment() {
 
     // CalendarViewで選択された日付の日記を表示
     private fun showDiary(date: LocalDate) {
-        diaryShowViewModel.loadSavedDiary(date)
+        diaryShowViewModel.prepareDiaryForCalendarFragment(date)
         binding.apply {
             frameLayoutDiaryShow.visibility = View.VISIBLE
             textNoDiaryMessage.visibility = View.GONE
