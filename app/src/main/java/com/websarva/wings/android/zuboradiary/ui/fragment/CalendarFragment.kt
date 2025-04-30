@@ -37,6 +37,8 @@ import com.websarva.wings.android.zuboradiary.ui.fragment.DiaryShowFragment.NumV
 import com.websarva.wings.android.zuboradiary.ui.fragment.DiaryShowFragment.PicturePathObserver
 import com.websarva.wings.android.zuboradiary.ui.fragment.DiaryShowFragment.Weather1Observer
 import com.websarva.wings.android.zuboradiary.ui.fragment.DiaryShowFragment.Weather2Observer
+import com.websarva.wings.android.zuboradiary.ui.model.action.CalendarFragmentAction
+import com.websarva.wings.android.zuboradiary.ui.model.action.FragmentAction
 import com.websarva.wings.android.zuboradiary.ui.utils.toJapaneseDateString
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.DiaryShowViewModel
 import dagger.hilt.android.AndroidEntryPoint
@@ -52,7 +54,6 @@ import java.time.format.DateTimeFormatter
 import java.util.Arrays
 import java.util.stream.Collectors
 import java.util.stream.Stream
-
 @AndroidEntryPoint
 class CalendarFragment : BaseFragment() {
 
@@ -97,6 +98,7 @@ class CalendarFragment : BaseFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        setUpFragmentAction()
         setUpCalendar()
         setUpDiaryShow()
         setUpFloatActionButton()
@@ -115,7 +117,7 @@ class CalendarFragment : BaseFragment() {
             showedDiaryDate.collectLatest { value: LocalDate? ->
                 value ?: return@collectLatest
 
-                mainViewModel.updateSelectedDate(value)
+                mainViewModel.onCalendarDayClicked(value)
                 removeResulFromFragment(DiaryShowFragment.KEY_SHOWED_DIARY_DATE)
             }
         }
@@ -129,7 +131,7 @@ class CalendarFragment : BaseFragment() {
             editedDiaryDate.collectLatest { value: LocalDate? ->
                 value ?: return@collectLatest
 
-                mainViewModel.updateSelectedDate(value)
+                mainViewModel.onCalendarDayClicked(value)
                 removeResulFromFragment(DiaryEditFragment.KEY_EDITED_DIARY_DATE)
             }
         }
@@ -158,6 +160,34 @@ class CalendarFragment : BaseFragment() {
         }
     }
 
+    private fun setUpFragmentAction() {
+        launchAndRepeatOnViewLifeCycleStarted {
+            mainViewModel.fragmentAction.collectLatest { value: FragmentAction ->
+                when (value) {
+                    is CalendarFragmentAction.ShowDiary -> {
+                        showDiary(value.date)
+                    }
+                    is CalendarFragmentAction.CloseDiary -> {
+                        closeDiary()
+                    }
+                    is CalendarFragmentAction.NavigateDiaryEditFragment -> {
+                        showDiaryEditFragment(value.date, !value.isNewDiary)
+                    }
+                    FragmentAction.NavigatePreviousFragment -> {
+                        navController.navigateUp()
+                    }
+                    FragmentAction.None -> {
+                        // 処理なし
+                    }
+                    else -> {
+                        throw IllegalArgumentException()
+                    }
+                }
+                mainViewModel.clearFragmentAction()
+            }
+        }
+    }
+
     private fun setUpCalendar() {
         val calendar = binding.calendar
 
@@ -175,7 +205,6 @@ class CalendarFragment : BaseFragment() {
                     binding.calendar.notifyDateChanged(value) // 今回選択日付更新
                     scrollCalendar(value)
                     updateToolBarDate(value)
-                    showSelectedDiary(value)
                 }
         }
 
@@ -224,7 +253,7 @@ class CalendarFragment : BaseFragment() {
             val textDay = container.binding.textDay.apply {
                 setOnClickListener {
                     if (calendarDay.position == DayPosition.MonthDate) {
-                        mainViewModel.updateSelectedDate(calendarDay.date)
+                        mainViewModel.onCalendarDayClicked(calendarDay.date)
                     }
                 }
 
@@ -413,19 +442,6 @@ class CalendarFragment : BaseFragment() {
     }
 
     // CalendarViewで選択された日付の日記を表示
-    private fun showSelectedDiary(date: LocalDate) {
-        lifecycleScope.launch(Dispatchers.IO) {
-            val exists = mainViewModel.existsSavedDiary(date)
-            withContext(Dispatchers.Main) {
-                if (exists == true) {
-                    showDiary(date)
-                } else {
-                    closeDiary()
-                }
-            }
-        }
-    }
-
     private fun showDiary(date: LocalDate) {
         diaryShowViewModel.loadSavedDiary(date)
         binding.apply {
@@ -443,6 +459,7 @@ class CalendarFragment : BaseFragment() {
     }
 
     private fun setUpDiaryShow() {
+        mainViewModel.prepareDiaryShowLayout()
 
         launchAndRepeatOnViewLifeCycleStarted {
             diaryShowViewModel.weather1
@@ -518,14 +535,7 @@ class CalendarFragment : BaseFragment() {
 
     private fun setUpFloatActionButton() {
         binding.floatingActionButtonDiaryEdit.setOnClickListener {
-            lifecycleScope.launch(Dispatchers.IO) {
-                val selectedDate = mainViewModel.selectedDate.value
-                val requiresDiaryLoading =
-                    mainViewModel.existsSavedDiary(selectedDate) ?: return@launch
-                withContext(Dispatchers.Main) {
-                    showDiaryEditFragment(selectedDate, requiresDiaryLoading)
-                }
-            }
+            mainViewModel.onDiaryEditButtonClicked()
         }
     }
 
@@ -540,7 +550,7 @@ class CalendarFragment : BaseFragment() {
         if (mainViewModel.selectedDate.value == LocalDate.now()) {
             scrollCalendar(LocalDate.now())
         } else {
-            mainViewModel.updateSelectedDate(LocalDate.now())
+            mainViewModel.onCalendarDayClicked(LocalDate.now())
         }
     }
 
