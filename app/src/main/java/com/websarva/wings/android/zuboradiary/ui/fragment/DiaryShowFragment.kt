@@ -144,8 +144,10 @@ internal class DiaryShowFragment : BaseFragment() {
                         navigateDiaryDeleteDialog(value.date)
                     }
                     is DiaryShowFragmentAction.NavigatePreviousDialogOnDiaryDelete -> {
-                        pictureUriPermissionManager
-                            .handlePersistablePermission(requireContext(), value.uriPermissionAction)
+                        if (value.uri != null) {
+                            pictureUriPermissionManager
+                                .releasePersistablePermission(requireContext(), value.uri)
+                        }
                         navigatePreviousFragment()
                     }
                     FragmentAction.NavigatePreviousFragment -> {

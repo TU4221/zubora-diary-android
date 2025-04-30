@@ -10,7 +10,6 @@ import com.websarva.wings.android.zuboradiary.ui.model.DiaryShowAppMessage
 import com.websarva.wings.android.zuboradiary.ui.model.DiaryShowPendingDialog
 import com.websarva.wings.android.zuboradiary.ui.model.action.DiaryShowFragmentAction
 import com.websarva.wings.android.zuboradiary.ui.model.action.FragmentAction
-import com.websarva.wings.android.zuboradiary.ui.permission.UriPermissionAction
 import com.websarva.wings.android.zuboradiary.ui.utils.requireValue
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -115,15 +114,9 @@ internal class DiaryShowViewModel @Inject constructor(private val diaryRepositor
                 return@launch
             }
 
-            if (picturePath == null) {
-                _fragmentAction.value = FragmentAction.NavigatePreviousFragment
-            } else {
-                _fragmentAction.value =
-                    DiaryShowFragmentAction
-                        .NavigatePreviousDialogOnDiaryDelete(
-                            UriPermissionAction.Release(picturePath)
-                        )
-            }
+            _fragmentAction.value =
+                DiaryShowFragmentAction
+                    .NavigatePreviousDialogOnDiaryDelete(picturePath)
             Log.i(logTag, "${logMsg}_完了")
         }
     }
