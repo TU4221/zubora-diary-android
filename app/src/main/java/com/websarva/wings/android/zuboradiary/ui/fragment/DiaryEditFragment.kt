@@ -53,7 +53,6 @@ import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.WeatherInfoFetc
 import com.websarva.wings.android.zuboradiary.ui.keyboard.KeyboardManager
 import com.websarva.wings.android.zuboradiary.ui.model.action.DiaryEditFragmentAction
 import com.websarva.wings.android.zuboradiary.ui.model.action.FragmentAction
-import com.websarva.wings.android.zuboradiary.ui.permission.UriPermissionAction
 import com.websarva.wings.android.zuboradiary.ui.utils.toJapaneseDateString
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
@@ -347,6 +346,8 @@ class DiaryEditFragment : BaseFragment() {
             mainViewModel.fragmentAction.collectLatest { value: FragmentAction ->
                 when (value) {
                     is DiaryEditFragmentAction.NavigateDiaryShowFragment -> {
+                        pictureUriPermissionManager
+                            .handlePersistablePermission(requireContext(), value.uriPermissionAction)
                         navigateDiaryShowFragment(value.date)
                     }
                     is DiaryEditFragmentAction.NavigateDiaryLoadingDialog -> {
@@ -924,8 +925,6 @@ class DiaryEditFragment : BaseFragment() {
                 navigateDiaryPictureDeleteDialog()
             }
         }
-
-        setUpPictureUriPermissionActionObserver()
     }
 
     private inner class PicturePathObserver {
@@ -950,16 +949,6 @@ class DiaryEditFragment : BaseFragment() {
                 val alphaValue = ResourcesCompat.getFloat(resources, alphaResId)
                 alpha = alphaValue
             }
-        }
-    }
-
-    private fun setUpPictureUriPermissionActionObserver() {
-        launchAndRepeatOnViewLifeCycleStarted {
-            mainViewModel.uriPermissionAction
-                .collectLatest { value: UriPermissionAction ->
-                    pictureUriPermissionManager.handlePersistablePermission(requireContext(), value)
-                    mainViewModel.clearUriPermissionAction()
-                }
         }
     }
 

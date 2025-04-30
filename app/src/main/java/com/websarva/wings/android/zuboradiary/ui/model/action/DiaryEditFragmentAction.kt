@@ -1,10 +1,14 @@
 package com.websarva.wings.android.zuboradiary.ui.model.action
 
 import android.net.Uri
+import com.websarva.wings.android.zuboradiary.ui.permission.UriPermissionAction
 import java.time.LocalDate
 
 internal sealed class DiaryEditFragmentAction : FragmentAction() {
-    data class NavigateDiaryShowFragment(val date: LocalDate) : DiaryEditFragmentAction()
+    data class NavigateDiaryShowFragment(
+        val date: LocalDate,
+        val uriPermissionAction: UriPermissionAction
+    ) : DiaryEditFragmentAction()
     data class NavigateDiaryLoadingDialog(val date: LocalDate) : DiaryEditFragmentAction()
     data class NavigateDiaryLoadingFailureDialog(val date: LocalDate) : DiaryEditFragmentAction()
     data class NavigateDiaryUpdateDialog(val date: LocalDate) : DiaryEditFragmentAction()

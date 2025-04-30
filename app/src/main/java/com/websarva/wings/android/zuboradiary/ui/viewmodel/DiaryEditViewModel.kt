@@ -187,13 +187,6 @@ internal class DiaryEditViewModel @Inject constructor(
     val fragmentAction: StateFlow<FragmentAction>
         get() = _fragmentAction
 
-    // UriPermission管理
-    private val initialUriPermissionAction = UriPermissionAction.None
-    private val _uriPermissionAction =
-        MutableStateFlow<UriPermissionAction>(initialUriPermissionAction)
-    val uriPermissionAction: StateFlow<UriPermissionAction>
-        get() = _uriPermissionAction.asStateFlow()
-
     // TODO:テスト用の為、最終的に削除
     var isTesting = false
 
@@ -208,7 +201,6 @@ internal class DiaryEditViewModel @Inject constructor(
         shouldJumpItemMotionLayout = initialShouldJumpItemMotionLayout
         shouldInitializeOnFragmentDestroy = initialShouldInitializeOnFragmentDestroy
         _fragmentAction.value = initialFragmentAction
-        _uriPermissionAction.value = initialUriPermissionAction
     }
 
     fun prepareDiary(
@@ -294,9 +286,13 @@ internal class DiaryEditViewModel @Inject constructor(
 
             val isSuccessful = saveDiaryToDatabase()
             if (!isSuccessful) return@launch
-            updatePictureUriPermission()
+            val permissionAction = selectPictureUriPermissionAction()
             _fragmentAction.value =
-                DiaryEditFragmentAction.NavigateDiaryShowFragment(date.requireValue())
+                DiaryEditFragmentAction
+                    .NavigateDiaryShowFragment(
+                        date.requireValue(),
+                        permissionAction
+                    )
             _isVisibleProgressIndicator.value = false
         }
     }
@@ -307,28 +303,23 @@ internal class DiaryEditViewModel @Inject constructor(
         return existsSavedDiary(inputDate)
     }
 
-    private fun updatePictureUriPermission() {
+    private fun selectPictureUriPermissionAction(): UriPermissionAction {
         val latestPictureUri = picturePath.value
         val loadedPictureUri = loadedPicturePath
 
         if (latestPictureUri == null && loadedPictureUri == null) {
-            _uriPermissionAction.value = UriPermissionAction.None
-            return
+            return UriPermissionAction.None
         }
         if (latestPictureUri != null && loadedPictureUri == null) {
-            _uriPermissionAction.value = UriPermissionAction.Take(latestPictureUri)
-            return
+            return UriPermissionAction.Take(latestPictureUri)
         }
         if (latestPictureUri == null) {
-            _uriPermissionAction.value = UriPermissionAction.Release(checkNotNull(loadedPictureUri))
-            return
+            return UriPermissionAction.Release(checkNotNull(loadedPictureUri))
         }
         if (latestPictureUri == loadedPictureUri) {
-            _uriPermissionAction.value = UriPermissionAction.None
-            return
+            return UriPermissionAction.None
         }
-        _uriPermissionAction.value =
-            UriPermissionAction.ReleaseAndTake(checkNotNull(loadedPictureUri), latestPictureUri)
+        return UriPermissionAction.ReleaseAndTake(checkNotNull(loadedPictureUri), latestPictureUri)
     }
 
     private suspend fun saveDiaryToDatabase(): Boolean {
@@ -572,10 +563,6 @@ internal class DiaryEditViewModel @Inject constructor(
 
     fun clearFragmentAction() {
         _fragmentAction.value = initialFragmentAction
-    }
-
-    fun clearUriPermissionAction() {
-        _uriPermissionAction.value = UriPermissionAction.None
     }
 
     // TODO:テスト用の為、最終的に削除
