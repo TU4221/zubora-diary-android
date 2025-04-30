@@ -59,7 +59,6 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import org.jetbrains.annotations.Unmodifiable
 import java.time.LocalDate
 import java.util.Arrays
@@ -108,9 +107,6 @@ class DiaryEditFragment : BaseFragment() {
             }
             return screenHeight
         }
-
-    // TODO:テスト用の為、最終的に削除
-    private var isTesting = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -222,15 +218,13 @@ class DiaryEditFragment : BaseFragment() {
         val geoCoordinates =
             settingsViewModel.geoCoordinates.value
         if (selectedButton == DialogInterface.BUTTON_POSITIVE) {
-            lifecycleScope.launch(Dispatchers.IO) {
-                mainViewModel
-                    .prepareDiary(
-                        date,
-                        true,
-                        isCheckedWeatherInfoAcquisition,
-                        geoCoordinates
-                    )
-            }
+            mainViewModel
+                .prepareDiary(
+                    date,
+                    true,
+                    isCheckedWeatherInfoAcquisition,
+                    geoCoordinates
+                )
         } else {
             if (!isCheckedWeatherInfoAcquisition) return
 
@@ -256,9 +250,7 @@ class DiaryEditFragment : BaseFragment() {
             receiveResulFromDialog<Int>(DiaryUpdateDialogFragment.KEY_SELECTED_BUTTON) ?: return
         if (selectedButton != DialogInterface.BUTTON_POSITIVE) return
 
-        lifecycleScope.launch(Dispatchers.IO) {
-            mainViewModel.saveDiary(true)
-        }
+        mainViewModel.saveDiary(true)
     }
 
     // 既存日記上書きダイアログフラグメントから結果受取
@@ -267,10 +259,7 @@ class DiaryEditFragment : BaseFragment() {
             receiveResulFromDialog<Int>(DiaryDeleteDialogFragment.KEY_SELECTED_BUTTON) ?: return
         if (selectedButton != DialogInterface.BUTTON_POSITIVE) return
 
-        lifecycleScope.launch(Dispatchers.IO) {
-            mainViewModel.deleteDiary()
-        }
-
+        mainViewModel.deleteDiary()
     }
 
     // 日付入力ダイアログフラグメントからデータ受取
@@ -294,9 +283,7 @@ class DiaryEditFragment : BaseFragment() {
 
         val loadDiaryDate = mainViewModel.date.requireValue()
         val geoCoordinates = settingsViewModel.geoCoordinates.requireValue()
-        lifecycleScope.launch(Dispatchers.IO) {
-            mainViewModel.fetchWeatherInfo(loadDiaryDate, geoCoordinates)
-        }
+        mainViewModel.fetchWeatherInfo(loadDiaryDate, geoCoordinates)
     }
 
     // 項目削除確認ダイアログフラグメントから結果受取
@@ -460,15 +447,13 @@ class DiaryEditFragment : BaseFragment() {
             settingsViewModel.isCheckedWeatherInfoAcquisition.requireValue()
         val geoCoordinates =
             settingsViewModel.geoCoordinates.value
-        lifecycleScope.launch(Dispatchers.IO) {
-            mainViewModel
-                .prepareDiary(
-                    diaryDate,
-                    requiresDiaryLoading,
-                    isCheckedWeatherInfoAcquisition,
-                    geoCoordinates
-                )
-        }
+        mainViewModel
+            .prepareDiary(
+                diaryDate,
+                requiresDiaryLoading,
+                isCheckedWeatherInfoAcquisition,
+                geoCoordinates
+            )
     }
 
     private fun setUpToolBar() {
@@ -484,9 +469,7 @@ class DiaryEditFragment : BaseFragment() {
                 // 日記保存、削除
                 when (item.itemId) {
                     R.id.diaryEditToolbarOptionSaveDiary -> {
-                        lifecycleScope.launch(Dispatchers.IO) {
-                            mainViewModel.saveDiary()
-                        }
+                        mainViewModel.saveDiary()
                         return@setOnMenuItemClickListener true
                     }
 
@@ -496,16 +479,7 @@ class DiaryEditFragment : BaseFragment() {
                     }
 
                     R.id.diaryEditToolbarOptionTest -> {
-                        isTesting = true
-                        lifecycleScope.launch(Dispatchers.IO) {
-                            val isSuccessful = mainViewModel.test()
-                            isTesting = false
-                            if (isSuccessful) {
-                                withContext(Dispatchers.Main) {
-                                    navController.navigateUp()
-                                }
-                            }
-                        }
+                        mainViewModel.test()
                         return@setOnMenuItemClickListener true
                     }
                 }
@@ -551,7 +525,7 @@ class DiaryEditFragment : BaseFragment() {
             mainViewModel.date
                 .collectLatest { value: LocalDate? ->
                     if (value == null) return@collectLatest
-                    if (isTesting) return@collectLatest
+                    if (mainViewModel.isTesting) return@collectLatest
 
                     val dateString = value.toJapaneseDateString(requireContext())
                     binding.textInputEditTextDate.setText(dateString)

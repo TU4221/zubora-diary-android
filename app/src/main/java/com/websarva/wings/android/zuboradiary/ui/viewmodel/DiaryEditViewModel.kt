@@ -17,6 +17,7 @@ import com.websarva.wings.android.zuboradiary.ui.model.navigation.NavigationActi
 import com.websarva.wings.android.zuboradiary.ui.permission.UriPermissionAction
 import com.websarva.wings.android.zuboradiary.ui.utils.requireValue
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -192,6 +193,9 @@ internal class DiaryEditViewModel @Inject constructor(
     val uriPermissionAction: StateFlow<UriPermissionAction>
         get() = _uriPermissionAction.asStateFlow()
 
+    // TODO:テスト用の為、最終的に削除
+    var isTesting = false
+
     override fun initialize() {
         super.initialize()
         previousDate = initialPreviousDate
@@ -206,47 +210,48 @@ internal class DiaryEditViewModel @Inject constructor(
         _uriPermissionAction.value = initialUriPermissionAction
     }
 
-    suspend fun prepareDiary(
+    fun prepareDiary(
         date: LocalDate,
         shouldLoadDiary: Boolean,
         requestFetchWeatherInfo: Boolean,
         geoCoordinates: GeoCoordinates?
-    ): Boolean {
-        val logMsg = "日記読込"
-        Log.i(logTag, "${logMsg}_開始")
-        _isVisibleUpdateProgressBar.value = true
-        shouldJumpItemMotionLayout = true
-        val previousNumVisibleItems = diaryStateFlow.numVisibleItems.value
-        if (shouldLoadDiary) {
-            try {
-                val isSuccessful = loadSavedDiary(date)
-                if (!isSuccessful) throw Exception()
-            } catch (e: Exception) {
-                Log.e(logTag, "${logMsg}_失敗", e)
-                if (hasPreparedDiary) {
-                    addAppMessage(DiaryEditAppMessage.DiaryLoadingFailure)
-                } else {
-                    _navigationAction.value =
-                        DiaryEditNavigationAction.NavigateDiaryLoadingFailureDialog(date)
+    ) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val logMsg = "日記読込"
+            Log.i(logTag, "${logMsg}_開始")
+            _isVisibleUpdateProgressBar.value = true
+            shouldJumpItemMotionLayout = true
+            val previousNumVisibleItems = diaryStateFlow.numVisibleItems.value
+            if (shouldLoadDiary) {
+                try {
+                    val isSuccessful = loadSavedDiary(date)
+                    if (!isSuccessful) throw Exception()
+                } catch (e: Exception) {
+                    Log.e(logTag, "${logMsg}_失敗", e)
+                    if (hasPreparedDiary) {
+                        addAppMessage(DiaryEditAppMessage.DiaryLoadingFailure)
+                    } else {
+                        _navigationAction.value =
+                            DiaryEditNavigationAction.NavigateDiaryLoadingFailureDialog(date)
+                    }
+                    _isVisibleUpdateProgressBar.value = false
+                    shouldJumpItemMotionLayout = false
+                    return@launch
                 }
-                _isVisibleUpdateProgressBar.value = false
-                shouldJumpItemMotionLayout = false
-                return false
+            } else {
+                updateDate(date, requestFetchWeatherInfo, geoCoordinates)
             }
-        } else {
-            updateDate(date, requestFetchWeatherInfo, geoCoordinates)
-        }
-        hasPreparedDiary = true
-        _isVisibleUpdateProgressBar.value = false
+            hasPreparedDiary = true
+            _isVisibleUpdateProgressBar.value = false
 
-        // MEMO:"numVisibleItems"が読込前と同じ時はStateFlowのCollectが起動せず、MotionLayoutが処理されないので、
-        //      ”shouldJumpItemMotionLayout”を下記でクリアする。
-        if (previousNumVisibleItems == diaryStateFlow.numVisibleItems.value) {
-            shouldJumpItemMotionLayout = false
-        }
+            // MEMO:"numVisibleItems"が読込前と同じ時はStateFlowのCollectが起動せず、MotionLayoutが処理されないので、
+            //      ”shouldJumpItemMotionLayout”を下記でクリアする。
+            if (previousNumVisibleItems == diaryStateFlow.numVisibleItems.value) {
+                shouldJumpItemMotionLayout = false
+            }
 
-        Log.i(logTag, "${logMsg}_完了")
-        return true
+            Log.i(logTag, "${logMsg}_完了")
+        }
     }
 
     @Throws(Exception::class)
@@ -272,22 +277,24 @@ internal class DiaryEditViewModel @Inject constructor(
         }
     }
 
-    suspend fun saveDiary(shouldIgnoreConfirmationDialog: Boolean = false) {
-        if (!shouldIgnoreConfirmationDialog) {
-            val shouldShowDialog =
-                shouldShowUpdateConfirmationDialog() ?: return
-            if (shouldShowDialog) {
-                _navigationAction.value =
-                    DiaryEditNavigationAction.NavigateDiaryUpdateDialog(date.requireValue())
-                return
+    fun saveDiary(shouldIgnoreConfirmationDialog: Boolean = false) {
+        viewModelScope.launch(Dispatchers.IO) {
+            if (!shouldIgnoreConfirmationDialog) {
+                val shouldShowDialog =
+                    shouldShowUpdateConfirmationDialog() ?: return@launch
+                if (shouldShowDialog) {
+                    _navigationAction.value =
+                        DiaryEditNavigationAction.NavigateDiaryUpdateDialog(date.requireValue())
+                    return@launch
+                }
             }
-        }
 
-        val isSuccessful = saveDiaryToDatabase()
-        if (!isSuccessful) return
-        updatePictureUriPermission()
-        _navigationAction.value =
-            DiaryEditNavigationAction.DiaryShowFragment(date.requireValue())
+            val isSuccessful = saveDiaryToDatabase()
+            if (!isSuccessful) return@launch
+            updatePictureUriPermission()
+            _navigationAction.value =
+                DiaryEditNavigationAction.DiaryShowFragment(date.requireValue())
+        }
     }
 
     private fun updatePictureUriPermission() {
@@ -343,16 +350,18 @@ internal class DiaryEditViewModel @Inject constructor(
         return true
     }
 
-    suspend fun deleteDiary() {
-        val isSuccessful = deleteDiaryFromDatabase()
-        if (!isSuccessful) return
+    fun deleteDiary() {
+        viewModelScope.launch(Dispatchers.IO) {
+            val isSuccessful = deleteDiaryFromDatabase()
+            if (!isSuccessful) return@launch
 
-        if (loadedPicturePath != null) {
-            _uriPermissionAction.value =
-                UriPermissionAction.Release(loadedPicturePath!!)
+            if (loadedPicturePath != null) {
+                _uriPermissionAction.value =
+                    UriPermissionAction.Release(loadedPicturePath!!)
+            }
+            _navigationAction.value =
+                DiaryEditNavigationAction.NavigatePreviousFragmentOnDiaryDelete
         }
-        _navigationAction.value =
-            DiaryEditNavigationAction.NavigatePreviousFragmentOnDiaryDelete
     }
 
     private suspend fun deleteDiaryFromDatabase(): Boolean {
@@ -378,13 +387,14 @@ internal class DiaryEditViewModel @Inject constructor(
         requestsFetchWeatherInfo: Boolean = false,
         geoCoordinates: GeoCoordinates? = null
     ) {
-        // HACK:下記はDiaryStateFlowのDateのsetValue()処理よりも前に処理すること。
-        //      (後で処理するとDateのObserverがpreviousDateの更新よりも先に処理される為)
-        this.previousDate = diaryStateFlow.date.value
+        viewModelScope.launch(Dispatchers.IO) {
+            // HACK:下記はDiaryStateFlowのDateのsetValue()処理よりも前に処理すること。
+            //      (後で処理するとDateのObserverがpreviousDateの更新よりも先に処理される為)
+            this@DiaryEditViewModel.previousDate = diaryStateFlow.date.value
 
-        diaryStateFlow.date.value = date
+            diaryStateFlow.date.value = date
 
-        viewModelScope.launch {
+
             if (shouldShowDiaryLoadingDialog(date)) {
                 _navigationAction.value =
                     DiaryEditNavigationAction.NavigateDiaryLoadingDialog(date)
@@ -410,14 +420,16 @@ internal class DiaryEditViewModel @Inject constructor(
         return existsSavedDiary(changedDate) ?: false
     }
 
-    suspend fun loadWeatherInfo(date: LocalDate, geoCoordinates: GeoCoordinates?) {
-        if (!shouldFetchWeatherInfo(date)) return
-        if (shouldShowWeatherInfoFetchingDialog()) {
-            _navigationAction.value =
-                DiaryEditNavigationAction.NavigateWeatherInfoFetchingDialog(date)
-            return
+    fun loadWeatherInfo(date: LocalDate, geoCoordinates: GeoCoordinates?) {
+        viewModelScope.launch(Dispatchers.IO) {
+            if (!shouldFetchWeatherInfo(date)) return@launch
+            if (shouldShowWeatherInfoFetchingDialog()) {
+                _navigationAction.value =
+                    DiaryEditNavigationAction.NavigateWeatherInfoFetchingDialog(date)
+                return@launch
+            }
+            fetchWeatherInfo(date, geoCoordinates)
         }
-        fetchWeatherInfo(date, geoCoordinates)
     }
 
     private fun shouldFetchWeatherInfo(date: LocalDate): Boolean {
@@ -446,51 +458,53 @@ internal class DiaryEditViewModel @Inject constructor(
     }
 
     // 天気情報関係
-    suspend fun fetchWeatherInfo(date: LocalDate, geoCoordinates: GeoCoordinates?) {
-        if (geoCoordinates == null) {
-            addAppMessage(DiaryEditAppMessage.WeatherInfoLoadingFailure)
-            return
-        }
+    fun fetchWeatherInfo(date: LocalDate, geoCoordinates: GeoCoordinates?) {
+        viewModelScope.launch(Dispatchers.IO) {
+            if (geoCoordinates == null) {
+                addAppMessage(DiaryEditAppMessage.WeatherInfoLoadingFailure)
+                return@launch
+            }
 
-        if (!weatherApiRepository.canFetchWeatherInfo(date)) return
+            if (!weatherApiRepository.canFetchWeatherInfo(date)) return@launch
 
-        val logMsg = "天気情報取得"
-        Log.i(logTag, "${logMsg}_開始")
+            val logMsg = "天気情報取得"
+            Log.i(logTag, "${logMsg}_開始")
 
-        val currentDate = LocalDate.now()
-        val betweenDays = ChronoUnit.DAYS.between(date, currentDate)
+            val currentDate = LocalDate.now()
+            val betweenDays = ChronoUnit.DAYS.between(date, currentDate)
 
-        _isVisibleUpdateProgressBar.value = true
-        val response =
-            if (betweenDays == 0L) {
-                weatherApiRepository.fetchTodayWeatherInfo(geoCoordinates)
+            _isVisibleUpdateProgressBar.value = true
+            val response =
+                if (betweenDays == 0L) {
+                    weatherApiRepository.fetchTodayWeatherInfo(geoCoordinates)
+                } else {
+                    weatherApiRepository.fetchPastDayWeatherInfo(
+                        geoCoordinates,
+                        betweenDays.toInt()
+                    )
+                }
+            Log.d(logTag, "fetchWeatherInformation()_code = " + response.code())
+            Log.d(logTag, "fetchWeatherInformation()_message = :" + response.message())
+
+            if (response.isSuccessful) {
+                Log.d(logTag, "fetchWeatherInformation()_body = " + response.body())
+                val result =
+                    response.body()?.toWeatherInfo() ?: throw IllegalStateException()
+                diaryStateFlow.weather1.value = result
+                Log.i(logTag, "${logMsg}_完了")
             } else {
-                weatherApiRepository.fetchPastDayWeatherInfo(
-                    geoCoordinates,
-                    betweenDays.toInt()
-                )
+                response.errorBody().use { errorBody ->
+                    val errorBodyString = errorBody?.string() ?: "null"
+                    Log.d(
+                        logTag,
+                        "fetchWeatherInformation()_errorBody = $errorBodyString"
+                    )
+                }
+                addAppMessage(DiaryEditAppMessage.WeatherInfoLoadingFailure)
+                Log.e(logTag, "${logMsg}_失敗")
             }
-        Log.d(logTag, "fetchWeatherInformation()_code = " + response.code())
-        Log.d(logTag, "fetchWeatherInformation()_message = :" + response.message())
-
-        if (response.isSuccessful) {
-            Log.d(logTag, "fetchWeatherInformation()_body = " + response.body())
-            val result =
-                response.body()?.toWeatherInfo() ?: throw IllegalStateException()
-            diaryStateFlow.weather1.value = result
-            Log.i(logTag, "${logMsg}_完了")
-        } else {
-            response.errorBody().use { errorBody ->
-                val errorBodyString = errorBody?.string() ?: "null"
-                Log.d(
-                    logTag,
-                    "fetchWeatherInformation()_errorBody = $errorBodyString"
-                )
-            }
-            addAppMessage(DiaryEditAppMessage.WeatherInfoLoadingFailure)
-            Log.e(logTag, "${logMsg}_失敗")
+            _isVisibleUpdateProgressBar.value = false
         }
-        _isVisibleUpdateProgressBar.value = false
     }
 
     // 項目関係
@@ -556,41 +570,49 @@ internal class DiaryEditViewModel @Inject constructor(
     }
 
     // TODO:テスト用の為、最終的に削除
-    suspend fun test(): Boolean {
-        var isSuccessful = false
-        val startDate = date.value
-        if (startDate != null) {
-            for (i in 0 until 10) {
-                val savingDate = startDate.minusDays(i.toLong())
-                val isPass = existsSavedDiary(savingDate) ?: return false
-                if (isPass) {
-                    isSuccessful = true
-                    continue
+    fun test() {
+        viewModelScope.launch(Dispatchers.IO) {
+            isTesting = true
+            val startDate = date.value
+            if (startDate != null) {
+                for (i in 0 until 10) {
+                    val savingDate = startDate.minusDays(i.toLong())
+                    val isPass = existsSavedDiary(savingDate)
+                    if (isPass == null) {
+                        isTesting = false
+                        return@launch
+                    }
+                    if (isPass) {
+                        continue
+                    }
+                    diaryStateFlow.initialize()
+                    updateDate(savingDate)
+                    val weather1Int = Random.nextInt(1, Weather.entries.size)
+                    updateWeather1(Weather.of(weather1Int))
+                    val weather2Int = Random.nextInt(1, Weather.entries.size)
+                    updateWeather2(Weather.of(weather2Int))
+                    val conditionInt = Random.nextInt(1, Condition.entries.size)
+                    updateCondition(Condition.of(conditionInt))
+                    val title = generateRandomAlphanumericString(15)
+                    diaryStateFlow.title.value = title
+                    val numItems = Random.nextInt(ItemNumber.MIN_NUMBER, ItemNumber.MAX_NUMBER + 1)
+                    diaryStateFlow.numVisibleItems.value = numItems
+                    for (j in 1..numItems) {
+                        val itemTitle = generateRandomAlphanumericString(15)
+                        val itemComment = generateRandomAlphanumericString(50)
+                        diaryStateFlow.getItemStateFlow(ItemNumber(j)).title.value = itemTitle
+                        diaryStateFlow.getItemStateFlow(ItemNumber(j)).comment.value = itemComment
+                    }
+                    val isSuccessful = saveDiaryToDatabase()
+                    if (!isSuccessful) {
+                        isTesting = false
+                        return@launch
+                    }
                 }
-                diaryStateFlow.initialize()
-                updateDate(savingDate)
-                val weather1Int = Random.nextInt(1, Weather.entries.size)
-                updateWeather1(Weather.of(weather1Int))
-                val weather2Int = Random.nextInt(1, Weather.entries.size)
-                updateWeather2(Weather.of(weather2Int))
-                val conditionInt = Random.nextInt(1, Condition.entries.size)
-                updateCondition(Condition.of(conditionInt))
-                val title = generateRandomAlphanumericString(15)
-                diaryStateFlow.title.value = title
-                val numItems = Random.nextInt(ItemNumber.MIN_NUMBER, ItemNumber.MAX_NUMBER + 1)
-                diaryStateFlow.numVisibleItems.value = numItems
-                for (j in 1..numItems) {
-                    val itemTitle = generateRandomAlphanumericString(15)
-                    val itemComment = generateRandomAlphanumericString(50)
-                    diaryStateFlow.getItemStateFlow(ItemNumber(j)).title.value = itemTitle
-                    diaryStateFlow.getItemStateFlow(ItemNumber(j)).comment.value = itemComment
-                }
-                isSuccessful = saveDiaryToDatabase()
-                if (!isSuccessful) return false
             }
+            _navigationAction.value = NavigationAction.NavigatePreviousFragment
+            isTesting = false
         }
-
-        return isSuccessful
     }
 
     // TODO:テスト用の為、最終的に削除
