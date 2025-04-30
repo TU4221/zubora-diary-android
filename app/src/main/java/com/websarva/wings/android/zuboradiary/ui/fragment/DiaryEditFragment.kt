@@ -450,6 +450,7 @@ class DiaryEditFragment : BaseFragment() {
 
     private fun setUpDiaryData() {
         // 画面表示データ準備
+        // TODO:DiaryItemTitleEditをDialogに変更したら下記コード不要になる
         if (mainViewModel.hasPreparedDiary) return
 
         val diaryDate = DiaryEditFragmentArgs.fromBundle(requireArguments()).date
