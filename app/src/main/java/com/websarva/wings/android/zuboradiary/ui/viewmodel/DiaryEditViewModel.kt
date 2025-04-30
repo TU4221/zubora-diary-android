@@ -216,10 +216,10 @@ internal class DiaryEditViewModel @Inject constructor(
         requestFetchWeatherInfo: Boolean,
         geoCoordinates: GeoCoordinates?
     ) {
+        val logMsg = "日記読込"
+        Log.i(logTag, "${logMsg}_開始")
+        _isVisibleUpdateProgressBar.value = true
         viewModelScope.launch(Dispatchers.IO) {
-            val logMsg = "日記読込"
-            Log.i(logTag, "${logMsg}_開始")
-            _isVisibleUpdateProgressBar.value = true
             shouldJumpItemMotionLayout = true
             val previousNumVisibleItems = diaryStateFlow.numVisibleItems.value
             if (shouldLoadDiary) {
@@ -278,11 +278,13 @@ internal class DiaryEditViewModel @Inject constructor(
     }
 
     fun saveDiary(shouldIgnoreConfirmationDialog: Boolean = false) {
+        _isVisibleUpdateProgressBar.value = true
         viewModelScope.launch(Dispatchers.IO) {
             if (!shouldIgnoreConfirmationDialog) {
                 val shouldShowDialog =
                     shouldShowUpdateConfirmationDialog() ?: return@launch
                 if (shouldShowDialog) {
+                    _isVisibleUpdateProgressBar.value = false
                     _navigationAction.value =
                         DiaryEditNavigationAction.NavigateDiaryUpdateDialog(date.requireValue())
                     return@launch
@@ -294,6 +296,7 @@ internal class DiaryEditViewModel @Inject constructor(
             updatePictureUriPermission()
             _navigationAction.value =
                 DiaryEditNavigationAction.DiaryShowFragment(date.requireValue())
+            _isVisibleUpdateProgressBar.value = false
         }
     }
 
@@ -351,9 +354,13 @@ internal class DiaryEditViewModel @Inject constructor(
     }
 
     fun deleteDiary() {
+        _isVisibleUpdateProgressBar.value = true
         viewModelScope.launch(Dispatchers.IO) {
             val isSuccessful = deleteDiaryFromDatabase()
-            if (!isSuccessful) return@launch
+            if (!isSuccessful) {
+                _isVisibleUpdateProgressBar.value = false
+                return@launch
+            }
 
             if (loadedPicturePath != null) {
                 _uriPermissionAction.value =
@@ -361,6 +368,7 @@ internal class DiaryEditViewModel @Inject constructor(
             }
             _navigationAction.value =
                 DiaryEditNavigationAction.NavigatePreviousFragmentOnDiaryDelete
+            _isVisibleUpdateProgressBar.value = false
         }
     }
 
