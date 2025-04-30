@@ -36,6 +36,10 @@ internal class DiaryEditViewModel @Inject constructor(
     private val logTag = createLogTag()
 
     // 日記データ関係
+    private val initialHasPreparedDiary = false
+    var hasPreparedDiary = initialHasPreparedDiary
+        private set
+
     private val initialPreviousDate: LocalDate? = null
     private var previousDate = initialPreviousDate
 
@@ -43,6 +47,25 @@ internal class DiaryEditViewModel @Inject constructor(
     private val _loadedDate = MutableStateFlow(initialLoadedDate)
     val loadedDate
         get() = _loadedDate.asStateFlow()
+
+    private val isNewDiaryDefaultStatus
+        get() = hasPreparedDiary && previousDate == null && _loadedDate.value == null
+
+    private val isNewDiary
+        get() = _loadedDate.value == null
+
+    private val shouldDeleteLoadedDateDiary: Boolean
+        get() {
+            if (isNewDiary) return false
+            return !isLoadedDateEqualToInputDate
+        }
+
+    private val isLoadedDateEqualToInputDate: Boolean
+        get() {
+            val loadedDate = _loadedDate.value ?: return false
+            val inputDate = diaryStateFlow.date.value
+            return loadedDate == inputDate
+        }
 
     private val diaryStateFlow = DiaryStateFlow()
 
@@ -60,6 +83,14 @@ internal class DiaryEditViewModel @Inject constructor(
 
     val weather2
         get() = diaryStateFlow.weather2.asStateFlow()
+
+    val isEqualWeathers: Boolean
+        get() {
+            val weather1 = diaryStateFlow.weather1.value
+            val weather2 = diaryStateFlow.weather2.value
+
+            return weather1 == weather2
+        }
 
     val condition
         get() = diaryStateFlow.condition.asStateFlow()
@@ -133,51 +164,21 @@ internal class DiaryEditViewModel @Inject constructor(
     private val initialLoadedPicturePath: Uri? = null
     private var loadedPicturePath = initialLoadedPicturePath
 
+    // ProgressIndicator表示
     private val initialIsVisibleProgressIndicator = false
     private val _isVisibleProgressIndicator = MutableStateFlow(initialIsVisibleProgressIndicator)
     val isVisibleUpdateProgressBar
         get() = _isVisibleProgressIndicator.asStateFlow()
 
-    private val initialHasPreparedDiary = false
-    var hasPreparedDiary = initialHasPreparedDiary
-        private set
-
-    private val isNewDiaryDefaultStatus
-        get() = hasPreparedDiary && previousDate == null && _loadedDate.value == null
-
-    private val isNewDiary
-        get() = _loadedDate.value == null
-
-    private val shouldDeleteLoadedDateDiary: Boolean
-        get() {
-            if (isNewDiary) return false
-            return !isLoadedDateEqualToInputDate
-        }
-
-    private val isLoadedDateEqualToInputDate: Boolean
-        get() {
-            val loadedDate = _loadedDate.value ?: return false
-            val inputDate = diaryStateFlow.date.value
-            return loadedDate == inputDate
-        }
-
-    val isEqualWeathers: Boolean
-        get() {
-            val weather1 = diaryStateFlow.weather1.value
-            val weather2 = diaryStateFlow.weather2.value
-
-            return weather1 == weather2
-        }
-
+    // MotionLayout表示関係
     private val initialShouldJumpItemMotionLayout = false
     var shouldJumpItemMotionLayout = initialShouldJumpItemMotionLayout
         private set
 
-
+    // ViewModel初期化関係
     // MEMO:画面回転時の不要な初期化を防ぐ
     private val initialShouldInitializeOnFragmentDestroy = false
     var shouldInitializeOnFragmentDestroy = initialShouldInitializeOnFragmentDestroy
-
 
     // Fragment表示
     private val initialNavigationAction = NavigationAction.None
@@ -198,12 +199,12 @@ internal class DiaryEditViewModel @Inject constructor(
 
     override fun initialize() {
         super.initialize()
+        hasPreparedDiary = initialHasPreparedDiary
         previousDate = initialPreviousDate
         _loadedDate.value = initialLoadedDate
         diaryStateFlow.initialize()
         loadedPicturePath = initialLoadedPicturePath
         _isVisibleProgressIndicator.value = initialIsVisibleProgressIndicator
-        hasPreparedDiary = initialHasPreparedDiary
         shouldJumpItemMotionLayout = initialShouldJumpItemMotionLayout
         shouldInitializeOnFragmentDestroy = initialShouldInitializeOnFragmentDestroy
         _navigationAction.value = initialNavigationAction
@@ -298,6 +299,12 @@ internal class DiaryEditViewModel @Inject constructor(
                 DiaryEditNavigationAction.DiaryShowFragment(date.requireValue())
             _isVisibleProgressIndicator.value = false
         }
+    }
+
+    private suspend fun shouldShowUpdateConfirmationDialog(): Boolean? {
+        if (isLoadedDateEqualToInputDate) return false
+        val inputDate = diaryStateFlow.date.requireValue()
+        return existsSavedDiary(inputDate)
     }
 
     private fun updatePictureUriPermission() {
@@ -428,6 +435,7 @@ internal class DiaryEditViewModel @Inject constructor(
         return existsSavedDiary(changedDate) ?: false
     }
 
+    // 天気情報関係
     fun loadWeatherInfo(
         date: LocalDate,
         geoCoordinates: GeoCoordinates?,
@@ -457,22 +465,6 @@ internal class DiaryEditViewModel @Inject constructor(
         return previousDate != null
     }
 
-    // 天気、体調関係
-    // MEMO:Weather、Conditionsから文字列に変換するにはContextが必要なため、
-    //      Fragment上のLivedDateObserverにて変換した値を受け取る。
-    fun updateWeather1(weather: Weather) {
-        diaryStateFlow.weather1.value = weather
-    }
-
-    fun updateWeather2(weather: Weather) {
-        diaryStateFlow.weather2.value = weather
-    }
-
-    fun updateCondition(condition: Condition) {
-        diaryStateFlow.condition.value = condition
-    }
-
-    // 天気情報関係
     private suspend fun fetchWeatherInfo(date: LocalDate, geoCoordinates: GeoCoordinates?) {
         if (geoCoordinates == null) {
             addAppMessage(DiaryEditAppMessage.WeatherInfoLoadingFailure)
@@ -518,6 +510,21 @@ internal class DiaryEditViewModel @Inject constructor(
         }
     }
 
+    // 天気、体調関係
+    // MEMO:Weather、Conditionsから文字列に変換するにはContextが必要なため、
+    //      Fragment上のLivedDateObserverにて変換した値を受け取る。
+    fun updateWeather1(weather: Weather) {
+        diaryStateFlow.weather1.value = weather
+    }
+
+    fun updateWeather2(weather: Weather) {
+        diaryStateFlow.weather2.value = weather
+    }
+
+    fun updateCondition(condition: Condition) {
+        diaryStateFlow.condition.value = condition
+    }
+
     // 項目関係
     fun incrementVisibleItemsCount() {
         diaryStateFlow.incrementVisibleItemsCount()
@@ -554,28 +561,21 @@ internal class DiaryEditViewModel @Inject constructor(
         }
     }
 
-    fun clearShouldJumpItemMotionLayout() {
-        shouldJumpItemMotionLayout = false
-    }
-
-    private suspend fun shouldShowUpdateConfirmationDialog(): Boolean? {
-        if (isLoadedDateEqualToInputDate) return false
-        val inputDate = diaryStateFlow.date.requireValue()
-        return existsSavedDiary(inputDate)
-    }
-
     // 表示保留中Dialog追加
     // MEMO:引数の型をサブクラスに制限
     fun addPendingDialogList(pendingDialog: DiaryEditPendingDialog) {
         super.addPendingDialogList(pendingDialog)
     }
 
-    // Fragment切替変数クリア
+    // クリアメソッド
+    fun clearShouldJumpItemMotionLayout() {
+        shouldJumpItemMotionLayout = initialShouldJumpItemMotionLayout
+    }
+
     fun clearNavigationAction() {
         _navigationAction.value = initialNavigationAction
     }
 
-    // UriPermission
     fun clearUriPermissionAction() {
         _uriPermissionAction.value = UriPermissionAction.None
     }
