@@ -118,7 +118,7 @@ internal class DiaryShowFragment : BaseFragment() {
                 ?: return
         if (selectedButton != Dialog.BUTTON_POSITIVE) return
 
-        backFragment()
+        navigatePreviousFragment()
     }
 
     // 日記削除確認ダイアログフラグメントからデータ受取
@@ -134,7 +134,7 @@ internal class DiaryShowFragment : BaseFragment() {
 
             releasePictureUriPermission()
             withContext(Dispatchers.Main) {
-                backFragment()
+                navigatePreviousFragment()
             }
         }
     }
@@ -154,7 +154,7 @@ internal class DiaryShowFragment : BaseFragment() {
 
                 when (pendingDialog) {
                     is DiaryShowPendingDialog.DiaryLoadingFailure ->
-                        showDiaryLoadingFailureDialog(pendingDialog.date)
+                        navigateDiaryLoadingFailureDialog(pendingDialog.date)
                 }
                 return true
             }
@@ -171,7 +171,7 @@ internal class DiaryShowFragment : BaseFragment() {
             if (isSuccessful) return@launch
 
             withContext(Dispatchers.Main) {
-                showDiaryLoadingFailureDialog(diaryDate)
+                navigateDiaryLoadingFailureDialog(diaryDate)
             }
         }
     }
@@ -179,17 +179,17 @@ internal class DiaryShowFragment : BaseFragment() {
     private fun setUpToolBar() {
         binding.materialToolbarTopAppBar.apply {
             setNavigationOnClickListener {
-                backFragment()
+                navigatePreviousFragment()
             }
             setOnMenuItemClickListener { item: MenuItem ->
                 // 日記編集フラグメント起動
                 if (item.itemId == R.id.diaryShowToolbarOptionEditDiary) {
                     val editDiaryDate = mainViewModel.date.requireValue()
-                    showDiaryEdit(editDiaryDate)
+                    navigateDiaryEdit(editDiaryDate)
                     return@setOnMenuItemClickListener true
                 } else if (item.itemId == R.id.diaryShowToolbarOptionDeleteDiary) {
                     val deleteDiaryDate = mainViewModel.date.requireValue()
-                    showDiaryDeleteDialog(deleteDiaryDate)
+                    navigateDiaryDeleteDialog(deleteDiaryDate)
                     return@setOnMenuItemClickListener true
                 }
                 false
@@ -370,7 +370,7 @@ internal class DiaryShowFragment : BaseFragment() {
     }
 
     @MainThread
-    private fun showDiaryEdit(date: LocalDate) {
+    private fun navigateDiaryEdit(date: LocalDate) {
         if (!canNavigateFragment) return
 
         val directions =
@@ -383,7 +383,7 @@ internal class DiaryShowFragment : BaseFragment() {
     }
 
     @MainThread
-    private fun showDiaryLoadingFailureDialog(date: LocalDate) {
+    private fun navigateDiaryLoadingFailureDialog(date: LocalDate) {
         if (!canNavigateFragment) {
             mainViewModel.addPendingDialogList(DiaryShowPendingDialog.DiaryLoadingFailure(date))
             return
@@ -395,7 +395,7 @@ internal class DiaryShowFragment : BaseFragment() {
     }
 
     @MainThread
-    private fun showDiaryDeleteDialog(date: LocalDate) {
+    private fun navigateDiaryDeleteDialog(date: LocalDate) {
         if (!canNavigateFragment) return
 
         val directions =
@@ -411,7 +411,7 @@ internal class DiaryShowFragment : BaseFragment() {
     }
 
     @MainThread
-    private fun backFragment() {
+    private fun navigatePreviousFragment() {
         val navBackStackEntry = checkNotNull(navController.previousBackStackEntry)
         val destinationId = navBackStackEntry.destination.id
         if (destinationId == R.id.navigation_calendar_fragment) {
