@@ -22,7 +22,6 @@ import androidx.constraintlayout.motion.widget.MotionLayout
 import androidx.core.content.res.ResourcesCompat
 import androidx.databinding.ViewDataBinding
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination
 import androidx.navigation.NavDirections
@@ -55,9 +54,7 @@ import com.websarva.wings.android.zuboradiary.ui.model.action.DiaryEditFragmentA
 import com.websarva.wings.android.zuboradiary.ui.model.action.FragmentAction
 import com.websarva.wings.android.zuboradiary.ui.utils.toJapaneseDateString
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.launch
 import org.jetbrains.annotations.Unmodifiable
 import java.time.LocalDate
 import java.util.Arrays
@@ -165,7 +162,7 @@ class DiaryEditFragment : BaseFragment() {
                         ).value
                     )
 
-                mainViewModel.updateItemTitle(itemNumber, value)
+                mainViewModel.onReceivedFromItemTitleEditFragment(itemNumber, value)
 
                 val focusTargetView =
                     when (itemNumber.value) {
@@ -210,26 +207,23 @@ class DiaryEditFragment : BaseFragment() {
         val selectedButton =
             receiveResulFromDialog<Int>(DiaryLoadingDialogFragment.KEY_SELECTED_BUTTON) ?: return
 
-        val date = mainViewModel.date.requireValue()
-
+        // TODO:ViewModelにStateFlow変数を持たせる。
         val isCheckedWeatherInfoAcquisition =
             settingsViewModel.isCheckedWeatherInfoAcquisition.requireValue()
         val geoCoordinates =
             settingsViewModel.geoCoordinates.value
         if (selectedButton == DialogInterface.BUTTON_POSITIVE) {
             mainViewModel
-                .prepareDiary(
-                    date,
-                    true,
+                .onDiaryLoadingDialogPositiveButtonClicked(
                     isCheckedWeatherInfoAcquisition,
                     geoCoordinates
                 )
         } else {
-            if (!isCheckedWeatherInfoAcquisition) return
-
-            lifecycleScope.launch(Dispatchers.IO) {
-                mainViewModel.loadWeatherInfo(date, geoCoordinates)
-            }
+            mainViewModel
+                .onDiaryLoadingDialogNegativeButtonClicked(
+                    isCheckedWeatherInfoAcquisition,
+                    geoCoordinates
+                )
         }
     }
 
@@ -240,7 +234,7 @@ class DiaryEditFragment : BaseFragment() {
                 ?: return
         if (selectedButton != Dialog.BUTTON_POSITIVE) return
 
-        navigatePreviousFragment()
+        mainViewModel.onDiaryLoadingFailureDialogPositiveButtonClicked()
     }
 
     // 既存日記上書きダイアログフラグメントから結果受取
@@ -249,7 +243,7 @@ class DiaryEditFragment : BaseFragment() {
             receiveResulFromDialog<Int>(DiaryUpdateDialogFragment.KEY_SELECTED_BUTTON) ?: return
         if (selectedButton != DialogInterface.BUTTON_POSITIVE) return
 
-        mainViewModel.saveDiary(true)
+        mainViewModel.onDiaryUpdateDialogPositiveButtonClicked()
     }
 
     // 既存日記上書きダイアログフラグメントから結果受取
@@ -258,7 +252,7 @@ class DiaryEditFragment : BaseFragment() {
             receiveResulFromDialog<Int>(DiaryDeleteDialogFragment.KEY_SELECTED_BUTTON) ?: return
         if (selectedButton != DialogInterface.BUTTON_POSITIVE) return
 
-        mainViewModel.deleteDiary()
+        mainViewModel.onDiaryDeleteDialogPositiveButtonClicked()
     }
 
     // 日付入力ダイアログフラグメントからデータ受取
@@ -269,7 +263,12 @@ class DiaryEditFragment : BaseFragment() {
         val isCheckedWeatherInfoAcquisition =
             settingsViewModel.isCheckedWeatherInfoAcquisition.requireValue()
         val geoCoordinates = settingsViewModel.geoCoordinates.value
-        mainViewModel.updateDate(selectedDate, isCheckedWeatherInfoAcquisition, geoCoordinates)
+        mainViewModel
+            .onDatePickerDialogPositiveButtonClicked(
+                selectedDate,
+                isCheckedWeatherInfoAcquisition,
+                geoCoordinates
+            )
     }
 
     private fun receiveWeatherInfoFetchDialogResult() {
@@ -280,9 +279,8 @@ class DiaryEditFragment : BaseFragment() {
             ) ?: return
         if (selectedButton != DialogInterface.BUTTON_POSITIVE) return
 
-        val loadDiaryDate = mainViewModel.date.requireValue()
         val geoCoordinates = settingsViewModel.geoCoordinates.requireValue()
-        mainViewModel.loadWeatherInfo(loadDiaryDate, geoCoordinates, true)
+        mainViewModel.onWeatherInfoFetchDialogPositiveButtonClicked(geoCoordinates)
     }
 
     // 項目削除確認ダイアログフラグメントから結果受取
@@ -295,7 +293,7 @@ class DiaryEditFragment : BaseFragment() {
         val numVisibleItems = mainViewModel.numVisibleItems.value
 
         if (deleteItemNumber.value == 1 && numVisibleItems == deleteItemNumber.value) {
-            mainViewModel.deleteItem(deleteItemNumber)
+            mainViewModel.onDiaryItemDeleteDialogPositiveButtonClicked(deleteItemNumber)
         } else {
             isDeletingItemTransition = true
             hideItem(deleteItemNumber, false)
@@ -309,7 +307,7 @@ class DiaryEditFragment : BaseFragment() {
             ) ?: return
         if (selectedButton != DialogInterface.BUTTON_POSITIVE) return
 
-        mainViewModel.deletePicturePath()
+        mainViewModel.onDiaryPictureDeleteDialogPositiveButtonClicked()
     }
 
     private fun setUpViewModelInitialization() {
@@ -350,6 +348,9 @@ class DiaryEditFragment : BaseFragment() {
                             .handlePersistablePermission(requireContext(), value.uriPermissionAction)
                         navigateDiaryShowFragment(value.date)
                     }
+                    is DiaryEditFragmentAction.NavigateDiaryItemTitleEditFragment -> {
+                        navigateDiaryItemTitleEditFragment(value.itemNumber, value.itemTitle)
+                    }
                     is DiaryEditFragmentAction.NavigateDiaryLoadingDialog -> {
                         navigateDiaryLoadingDialog(value.date)
                     }
@@ -359,8 +360,17 @@ class DiaryEditFragment : BaseFragment() {
                     is DiaryEditFragmentAction.NavigateDiaryUpdateDialog -> {
                         navigateDiaryUpdateDialog(value.date)
                     }
+                    is DiaryEditFragmentAction.NavigateDiaryDeleteDialog -> {
+                        navigateDiaryDeleteDialog(value.date)
+                    }
+                    is DiaryEditFragmentAction.NavigateDatePickerDialog -> {
+                        navigateDatePickerDialog(value.date)
+                    }
                     is DiaryEditFragmentAction.NavigateWeatherInfoFetchingDialog -> {
                         navigateWeatherInfoFetchingDialog(value.date)
+                    }
+                    is DiaryEditFragmentAction.NavigateDiaryItemDeleteDialog -> {
+                        navigateDiaryItemDeleteDialog(value.itemNumber)
                     }
                     DiaryEditFragmentAction.NavigateDiaryPictureDeleteDialog -> {
                         navigateDiaryPictureDeleteDialog()
@@ -455,22 +465,20 @@ class DiaryEditFragment : BaseFragment() {
     private fun setUpToolBar() {
         binding.materialToolbarTopAppBar
             .setNavigationOnClickListener {
-                navigatePreviousFragment()
+                mainViewModel.onNavigationClicked()
             }
 
         binding.materialToolbarTopAppBar
             .setOnMenuItemClickListener { item: MenuItem ->
-                val diaryDate = mainViewModel.date.requireValue()
-
                 // 日記保存、削除
                 when (item.itemId) {
                     R.id.diaryEditToolbarOptionSaveDiary -> {
-                        mainViewModel.saveDiary()
+                        mainViewModel.onDiarySaveMenuClicked()
                         return@setOnMenuItemClickListener true
                     }
 
                     R.id.diaryEditToolbarOptionDeleteDiary -> {
-                        navigateDiaryDeleteDialog(diaryDate)
+                        mainViewModel.onDiaryDeleteMenuClicked()
                         return@setOnMenuItemClickListener true
                     }
 
@@ -512,8 +520,7 @@ class DiaryEditFragment : BaseFragment() {
         binding.textInputEditTextDate.apply {
             inputType = EditorInfo.TYPE_NULL //キーボード非表示設定
             setOnClickListener {
-                val date = mainViewModel.date.requireValue()
-                navigateDatePickerDialog(date)
+                mainViewModel.onDateInputFieldClicked()
             }
         }
 
@@ -542,7 +549,7 @@ class DiaryEditFragment : BaseFragment() {
                 val arrayAdapter = listAdapter as ArrayAdapter<*>
                 val strWeather = checkNotNull(arrayAdapter.getItem(position)) as String
                 val weather = Weather.of(requireContext(), strWeather)
-                mainViewModel.updateWeather1(weather)
+                mainViewModel.onWeather1InputFieldItemClicked(weather)
             }
 
         launchAndRepeatOnViewLifeCycleStarted {
@@ -552,6 +559,7 @@ class DiaryEditFragment : BaseFragment() {
                     val strWeather = value.toString(requireContext())
                     binding.autoCompleteTextWeather1.setText(strWeather, false)
 
+                    // TODO:ViewModelに切替用StateFlow変数を用意してCollectで対応
                     // Weather2 Spinner有効無効切替
                     val isEnabled = (value != Weather.UNKNOWN)
                     binding.textInputLayoutWeather2.isEnabled = isEnabled
@@ -576,7 +584,7 @@ class DiaryEditFragment : BaseFragment() {
                 val arrayAdapter = listAdapter as ArrayAdapter<*>
                 val strWeather = checkNotNull(arrayAdapter.getItem(position)) as String
                 val weather = Weather.of(requireContext(), strWeather)
-                mainViewModel.updateWeather2(weather)
+                mainViewModel.onWeather2InputFieldItemClicked(weather)
             }
 
         launchAndRepeatOnViewLifeCycleStarted {
@@ -620,7 +628,7 @@ class DiaryEditFragment : BaseFragment() {
                     val arrayAdapter = listAdapter as ArrayAdapter<*>
                     val strCondition = arrayAdapter.getItem(position) as String
                     val condition = Condition.of(requireContext(), strCondition)
-                    mainViewModel.updateCondition(condition)
+                    mainViewModel.onConditionInputFieldItemClicked(condition)
                 }
         }
 
@@ -682,17 +690,14 @@ class DiaryEditFragment : BaseFragment() {
             textInputEditTextItemsTitle[itemArrayNumber].inputType = EditorInfo.TYPE_NULL //キーボード非表示設定
 
             textInputEditTextItemsTitle[itemArrayNumber].setOnClickListener {
-                // 項目タイトル入力フラグメント起動
-                val inputItemTitle =
-                    mainViewModel.getItemTitle(inputItemNumber).value
-                navigateDiaryItemTitleEditFragment(inputItemNumber, inputItemTitle)
+                mainViewModel.onItemTitleInputFieldClicked(inputItemNumber)
             }
         }
 
         // 項目追加ボタン設定
         binding.imageButtonItemAddition.setOnClickListener {
             binding.imageButtonItemAddition.isEnabled = false
-            mainViewModel.incrementVisibleItemsCount()
+            mainViewModel.onItemAdditionButtonClicked()
         }
 
         // 項目削除ボタン設定
@@ -700,7 +705,7 @@ class DiaryEditFragment : BaseFragment() {
             val deleteItemNumber = ItemNumber(i)
             val itemArrayNumber = i - 1
             imageButtonItemsDelete[itemArrayNumber].setOnClickListener {
-                navigateDiaryItemDeleteDialog(deleteItemNumber)
+                mainViewModel.onItemDeleteButtonClicked(deleteItemNumber)
             }
         }
 
@@ -922,7 +927,7 @@ class DiaryEditFragment : BaseFragment() {
                 mainActivity.loadPicturePath()
             }
             imageButtonAttachedPictureDelete.setOnClickListener {
-                navigateDiaryPictureDeleteDialog()
+                mainViewModel.onAttachedPictureDeleteButtonClicked()
             }
         }
     }

@@ -203,6 +203,139 @@ internal class DiaryEditViewModel @Inject constructor(
         _fragmentAction.value = initialFragmentAction
     }
 
+    // ViewClicked処理
+    fun onDiarySaveMenuClicked() {
+        viewModelScope.launch(Dispatchers.IO) {
+            saveDiary()
+        }
+    }
+
+    fun onDiaryDeleteMenuClicked() {
+        val date = this.date.requireValue()
+        updateFragmentAction(
+            DiaryEditFragmentAction.NavigateDiaryDeleteDialog(date)
+        )
+    }
+
+    fun onNavigationClicked() {
+        updateFragmentAction(FragmentAction.NavigatePreviousFragment)
+    }
+
+    fun onDateInputFieldClicked() {
+        val date = this.date.requireValue()
+        updateFragmentAction(
+            DiaryEditFragmentAction.NavigateDatePickerDialog(date)
+        )
+    }
+
+    fun onWeather1InputFieldItemClicked(weather: Weather) {
+        updateWeather1(weather)
+    }
+
+    fun onWeather2InputFieldItemClicked(weather: Weather) {
+        updateWeather2(weather)
+    }
+
+    fun onConditionInputFieldItemClicked(condition: Condition) {
+        updateCondition(condition)
+    }
+
+    fun onItemTitleInputFieldClicked(itemNumber: ItemNumber) {
+        val itemTitle = getItemTitle(itemNumber).requireValue()
+        updateFragmentAction(
+            DiaryEditFragmentAction.NavigateDiaryItemTitleEditFragment(itemNumber, itemTitle)
+        )
+    }
+
+    fun onItemAdditionButtonClicked() {
+        incrementVisibleItemsCount()
+    }
+
+    fun onItemDeleteButtonClicked(itemNumber: ItemNumber) {
+        updateFragmentAction(
+            DiaryEditFragmentAction.NavigateDiaryItemDeleteDialog(itemNumber)
+        )
+    }
+
+    fun onAttachedPictureDeleteButtonClicked() {
+        updateFragmentAction(
+            DiaryEditFragmentAction.NavigateDiaryPictureDeleteDialog
+        )
+    }
+
+    // DialogButtonClicked処理
+    fun onDiaryLoadingDialogPositiveButtonClicked(
+        requestFetchWeatherInfo: Boolean,
+        geoCoordinates: GeoCoordinates?
+    ) {
+        val date = this.date.requireValue()
+        prepareDiary(
+            date,
+            true,
+            requestFetchWeatherInfo,
+            geoCoordinates
+        )
+    }
+
+    fun onDiaryLoadingDialogNegativeButtonClicked(
+        requestFetchWeatherInfo: Boolean,
+        geoCoordinates: GeoCoordinates?
+    ) {
+        if (!requestFetchWeatherInfo) return
+
+        viewModelScope.launch(Dispatchers.IO) {
+            val date = date.requireValue()
+            loadWeatherInfo(date, geoCoordinates)
+        }
+    }
+
+    fun onDiaryUpdateDialogPositiveButtonClicked() {
+        viewModelScope.launch(Dispatchers.IO) {
+            saveDiary(true)
+        }
+    }
+
+    fun onDiaryDeleteDialogPositiveButtonClicked() {
+        viewModelScope.launch(Dispatchers.IO) {
+            deleteDiary()
+        }
+    }
+
+    fun onDatePickerDialogPositiveButtonClicked(
+        date: LocalDate,
+        requestsFetchWeatherInfo: Boolean = false,
+        geoCoordinates: GeoCoordinates? = null
+    ) {
+        viewModelScope.launch(Dispatchers.IO) {
+            prepareDiaryDate(date, requestsFetchWeatherInfo, geoCoordinates)
+        }
+    }
+
+    fun onDiaryLoadingFailureDialogPositiveButtonClicked() {
+        updateFragmentAction(FragmentAction.NavigatePreviousFragment)
+    }
+
+    fun onWeatherInfoFetchDialogPositiveButtonClicked(geoCoordinates: GeoCoordinates?) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val date = diaryStateFlow.date.requireValue()
+            loadWeatherInfo(date, geoCoordinates, true)
+        }
+    }
+
+    fun onDiaryItemDeleteDialogPositiveButtonClicked(itemNumber: ItemNumber) {
+        deleteItem(itemNumber)
+    }
+
+    fun onDiaryPictureDeleteDialogPositiveButtonClicked() {
+        deletePicturePath()
+    }
+
+    // 他Fragmentからの受取処理
+    fun onReceivedFromItemTitleEditFragment(itemNumber: ItemNumber, itemTitle: String) {
+        updateItemTitle(itemNumber, itemTitle)
+    }
+
+    // データ処理
     fun prepareDiary(
         date: LocalDate,
         shouldLoadDiary: Boolean,
@@ -211,7 +344,7 @@ internal class DiaryEditViewModel @Inject constructor(
     ) {
         val logMsg = "日記読込"
         Log.i(logTag, "${logMsg}_開始")
-        _isVisibleProgressIndicator.value = true
+        updateProgressIndicatorVisibility(true)
         viewModelScope.launch(Dispatchers.IO) {
             shouldJumpItemMotionLayout = true
             val previousNumVisibleItems = diaryStateFlow.numVisibleItems.value
@@ -224,18 +357,19 @@ internal class DiaryEditViewModel @Inject constructor(
                     if (hasPreparedDiary) {
                         addAppMessage(DiaryEditAppMessage.DiaryLoadingFailure)
                     } else {
-                        _fragmentAction.value =
+                        updateFragmentAction(
                             DiaryEditFragmentAction.NavigateDiaryLoadingFailureDialog(date)
+                        )
                     }
-                    _isVisibleProgressIndicator.value = false
+                    updateProgressIndicatorVisibility(false)
                     shouldJumpItemMotionLayout = false
                     return@launch
                 }
             } else {
-                updateDate(date, requestFetchWeatherInfo, geoCoordinates)
+                prepareDiaryDate(date, requestFetchWeatherInfo, geoCoordinates)
             }
             hasPreparedDiary = true
-            _isVisibleProgressIndicator.value = false
+            updateProgressIndicatorVisibility(false)
 
             // MEMO:"numVisibleItems"が読込前と同じ時はStateFlowのCollectが起動せず、MotionLayoutが処理されないので、
             //      ”shouldJumpItemMotionLayout”を下記でクリアする。
@@ -246,6 +380,38 @@ internal class DiaryEditViewModel @Inject constructor(
             Log.i(logTag, "${logMsg}_完了")
         }
     }
+    
+    // TODO:onDateChangedメソッドに変更して、Fragmentの監視から呼び出す？
+    private suspend fun prepareDiaryDate(
+        date: LocalDate,
+        requestsFetchWeatherInfo: Boolean = false,
+        geoCoordinates: GeoCoordinates? = null
+    ) {
+        updateDate(date)
+        
+        if (shouldShowDiaryLoadingDialog(date)) {
+            updateFragmentAction(
+                DiaryEditFragmentAction.NavigateDiaryLoadingDialog(date)
+            )
+            return
+        }
+
+        if (!requestsFetchWeatherInfo) return
+        loadWeatherInfo(date, geoCoordinates)
+    }
+
+    private suspend fun shouldShowDiaryLoadingDialog(changedDate: LocalDate): Boolean {
+        if (isNewDiaryDefaultStatus) {
+            return existsSavedDiary(changedDate) ?: false
+        }
+
+        val previousDate = previousDate
+        val loadedDate = loadedDate.value
+
+        if (changedDate == previousDate) return false
+        if (changedDate == loadedDate) return false
+        return existsSavedDiary(changedDate) ?: false
+    }
 
     @Throws(Exception::class)
     private suspend fun loadSavedDiary(date: LocalDate): Boolean {
@@ -253,7 +419,7 @@ internal class DiaryEditViewModel @Inject constructor(
 
         // HACK:下記はDiaryStateFlow#update()処理よりも前に処理すること。
         //      (後で処理するとDiaryStateFlowのDateのObserverがloadedDateの更新よりも先に処理される為)
-        _loadedDate.value = date
+        updateLoadedDate(date)
 
         diaryStateFlow.update(diaryEntity)
         loadedPicturePath = diaryStateFlow.picturePath.value
@@ -270,31 +436,31 @@ internal class DiaryEditViewModel @Inject constructor(
         }
     }
 
-    fun saveDiary(shouldIgnoreConfirmationDialog: Boolean = false) {
-        _isVisibleProgressIndicator.value = true
-        viewModelScope.launch(Dispatchers.IO) {
-            if (!shouldIgnoreConfirmationDialog) {
-                val shouldShowDialog =
-                    shouldShowUpdateConfirmationDialog() ?: return@launch
-                if (shouldShowDialog) {
-                    _isVisibleProgressIndicator.value = false
-                    _fragmentAction.value =
-                        DiaryEditFragmentAction.NavigateDiaryUpdateDialog(date.requireValue())
-                    return@launch
-                }
+    private suspend fun saveDiary(shouldIgnoreConfirmationDialog: Boolean = false) {
+        updateProgressIndicatorVisibility(true)
+        if (!shouldIgnoreConfirmationDialog) {
+            val shouldShowDialog =
+                shouldShowUpdateConfirmationDialog() ?: return
+            if (shouldShowDialog) {
+                updateProgressIndicatorVisibility(false)
+                updateFragmentAction(
+                    DiaryEditFragmentAction.NavigateDiaryUpdateDialog(date.requireValue())
+                )
+                return
             }
-
-            val isSuccessful = saveDiaryToDatabase()
-            if (!isSuccessful) return@launch
-            val permissionAction = selectPictureUriPermissionAction()
-            _fragmentAction.value =
-                DiaryEditFragmentAction
-                    .NavigateDiaryShowFragment(
-                        date.requireValue(),
-                        permissionAction
-                    )
-            _isVisibleProgressIndicator.value = false
         }
+
+        val isSuccessful = saveDiaryToDatabase()
+        if (!isSuccessful) return
+        val permissionAction = selectPictureUriPermissionAction()
+        updateFragmentAction(
+            DiaryEditFragmentAction
+                .NavigateDiaryShowFragment(
+                    date.requireValue(),
+                    permissionAction
+                )
+        )
+        updateProgressIndicatorVisibility(false)
     }
 
     private suspend fun shouldShowUpdateConfirmationDialog(): Boolean? {
@@ -351,21 +517,20 @@ internal class DiaryEditViewModel @Inject constructor(
         return true
     }
 
-    fun deleteDiary() {
-        _isVisibleProgressIndicator.value = true
-        viewModelScope.launch(Dispatchers.IO) {
-            val loadedPictureUri = loadedPicturePath
+    private suspend fun deleteDiary() {
+        updateProgressIndicatorVisibility(true)
+        val loadedPictureUri = loadedPicturePath
 
-            val isSuccessful = deleteDiaryFromDatabase()
-            if (!isSuccessful) {
-                _isVisibleProgressIndicator.value = false
-                return@launch
-            }
-
-            _fragmentAction.value =
-                DiaryEditFragmentAction.NavigatePreviousFragmentOnDiaryDelete(loadedPictureUri)
-            _isVisibleProgressIndicator.value = false
+        val isSuccessful = deleteDiaryFromDatabase()
+        if (!isSuccessful) {
+            updateProgressIndicatorVisibility(false)
+            return
         }
+
+        updateFragmentAction(
+            DiaryEditFragmentAction.NavigatePreviousFragmentOnDiaryDelete(loadedPictureUri)
+        )
+        updateProgressIndicatorVisibility(false)
     }
 
     private suspend fun deleteDiaryFromDatabase(): Boolean {
@@ -386,62 +551,34 @@ internal class DiaryEditViewModel @Inject constructor(
     }
 
     // 日付関係
-    fun updateDate(
-        date: LocalDate,
-        requestsFetchWeatherInfo: Boolean = false,
-        geoCoordinates: GeoCoordinates? = null
-    ) {
-        viewModelScope.launch(Dispatchers.IO) {
-            // HACK:下記はDiaryStateFlowのDateのsetValue()処理よりも前に処理すること。
-            //      (後で処理するとDateのObserverがpreviousDateの更新よりも先に処理される為)
-            this@DiaryEditViewModel.previousDate = diaryStateFlow.date.value
-
-            diaryStateFlow.date.value = date
-
-
-            if (shouldShowDiaryLoadingDialog(date)) {
-                _fragmentAction.value =
-                    DiaryEditFragmentAction.NavigateDiaryLoadingDialog(date)
-                return@launch
-            }
-
-            if (!requestsFetchWeatherInfo) return@launch
-            loadWeatherInfo(date, geoCoordinates)
-        }
-
+    private fun updateDate(date: LocalDate) {
+        // HACK:下記はDiaryStateFlowのDateのsetValue()処理よりも前に処理すること。
+        //      (後で処理するとDateのObserverがpreviousDateの更新よりも先に処理される為)
+        this@DiaryEditViewModel.previousDate = diaryStateFlow.date.value
+        diaryStateFlow.date.value = date
     }
 
-    private suspend fun shouldShowDiaryLoadingDialog(changedDate: LocalDate): Boolean {
-        if (isNewDiaryDefaultStatus) {
-            return existsSavedDiary(changedDate) ?: false
-        }
-
-        val previousDate = previousDate
-        val loadedDate = loadedDate.value
-
-        if (changedDate == previousDate) return false
-        if (changedDate == loadedDate) return false
-        return existsSavedDiary(changedDate) ?: false
+    private fun updateLoadedDate(date: LocalDate) {
+        _loadedDate.value = date
     }
 
     // 天気情報関係
-    fun loadWeatherInfo(
+    private suspend fun loadWeatherInfo(
         date: LocalDate,
         geoCoordinates: GeoCoordinates?,
         shouldIgnoreConfirmationDialog: Boolean = false
     ) {
-        _isVisibleProgressIndicator.value = true
-        viewModelScope.launch(Dispatchers.IO) {
-            if (!shouldFetchWeatherInfo(date)) return@launch
-            if (!shouldIgnoreConfirmationDialog && shouldShowWeatherInfoFetchingDialog()) {
-                _fragmentAction.value =
-                    DiaryEditFragmentAction.NavigateWeatherInfoFetchingDialog(date)
-                _isVisibleProgressIndicator.value = false
-                return@launch
-            }
-            fetchWeatherInfo(date, geoCoordinates)
-            _isVisibleProgressIndicator.value = false
+        updateProgressIndicatorVisibility(true)
+        if (!shouldFetchWeatherInfo(date)) return
+        if (!shouldIgnoreConfirmationDialog && shouldShowWeatherInfoFetchingDialog()) {
+            updateFragmentAction(
+                DiaryEditFragmentAction.NavigateWeatherInfoFetchingDialog(date)
+            )
+            updateProgressIndicatorVisibility(false)
+            return
         }
+        fetchWeatherInfo(date, geoCoordinates)
+        updateProgressIndicatorVisibility(false)
     }
 
     private fun shouldFetchWeatherInfo(date: LocalDate): Boolean {
@@ -484,7 +621,7 @@ internal class DiaryEditViewModel @Inject constructor(
             Log.d(logTag, "fetchWeatherInformation()_body = " + response.body())
             val result =
                 response.body()?.toWeatherInfo() ?: throw IllegalStateException()
-            diaryStateFlow.weather1.value = result
+            updateWeather1(result)
             Log.i(logTag, "${logMsg}_完了")
         } else {
             response.errorBody().use { errorBody ->
@@ -500,9 +637,7 @@ internal class DiaryEditViewModel @Inject constructor(
     }
 
     // 天気、体調関係
-    // MEMO:Weather、Conditionsから文字列に変換するにはContextが必要なため、
-    //      Fragment上のLivedDateObserverにて変換した値を受け取る。
-    fun updateWeather1(weather: Weather) {
+    private fun updateWeather1(weather: Weather) {
         diaryStateFlow.weather1.value = weather
     }
 
@@ -510,16 +645,16 @@ internal class DiaryEditViewModel @Inject constructor(
         diaryStateFlow.weather2.value = weather
     }
 
-    fun updateCondition(condition: Condition) {
+    private fun updateCondition(condition: Condition) {
         diaryStateFlow.condition.value = condition
     }
 
     // 項目関係
-    fun incrementVisibleItemsCount() {
+    private fun incrementVisibleItemsCount() {
         diaryStateFlow.incrementVisibleItemsCount()
     }
 
-    fun getItemTitle(itemNumber: ItemNumber): StateFlow<String> {
+    private fun getItemTitle(itemNumber: ItemNumber): StateFlow<String> {
         return diaryStateFlow.getItemStateFlow(itemNumber).title
     }
 
@@ -527,7 +662,7 @@ internal class DiaryEditViewModel @Inject constructor(
         diaryStateFlow.deleteItem(itemNumber)
     }
 
-    fun updateItemTitle(itemNumber: ItemNumber, title: String) {
+    private fun updateItemTitle(itemNumber: ItemNumber, title: String) {
         diaryStateFlow.updateItemTitle(itemNumber, title)
     }
 
@@ -535,7 +670,7 @@ internal class DiaryEditViewModel @Inject constructor(
         diaryStateFlow.picturePath.value = uri
     }
 
-    fun deletePicturePath() {
+    private fun deletePicturePath() {
         diaryStateFlow.picturePath.value = null
     }
 
@@ -549,20 +684,30 @@ internal class DiaryEditViewModel @Inject constructor(
             return null
         }
     }
+    
+    // ProgressIndicator関係
+    private fun updateProgressIndicatorVisibility(isVisible: Boolean) {
+        _isVisibleProgressIndicator.value = isVisible
+    } 
 
     // 表示保留中Dialog追加
     // MEMO:引数の型をサブクラスに制限
     fun addPendingDialogList(pendingDialog: DiaryEditPendingDialog) {
         super.addPendingDialogList(pendingDialog)
     }
-
-    // クリアメソッド
-    fun clearShouldJumpItemMotionLayout() {
-        shouldJumpItemMotionLayout = initialShouldJumpItemMotionLayout
+    
+    // FragmentAction関係
+    private fun updateFragmentAction(action: FragmentAction) {
+        _fragmentAction.value = action
     }
 
     fun clearFragmentAction() {
         _fragmentAction.value = initialFragmentAction
+    }
+
+    // クリアメソッド
+    fun clearShouldJumpItemMotionLayout() {
+        shouldJumpItemMotionLayout = initialShouldJumpItemMotionLayout
     }
 
     // TODO:テスト用の為、最終的に削除
