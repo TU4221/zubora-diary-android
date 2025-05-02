@@ -74,7 +74,6 @@ class DiaryEditFragment : BaseFragment() {
     private var _binding: FragmentDiaryEditBinding? = null
     private val binding get() = checkNotNull(_binding)
 
-    private var isDeletingItemTransition = false
     private lateinit var weather2ArrayAdapter: ArrayAdapter<String>
 
     private val motionLayoutTransitionTime = 500 /*ms*/
@@ -290,14 +289,7 @@ class DiaryEditFragment : BaseFragment() {
                 DiaryItemDeleteDialogFragment.KEY_DELETE_ITEM_NUMBER
             ) ?: return
 
-        val numVisibleItems = mainViewModel.numVisibleItems.value
-
-        if (deleteItemNumber.value == 1 && numVisibleItems == deleteItemNumber.value) {
-            mainViewModel.onDiaryItemDeleteDialogPositiveButtonClicked(deleteItemNumber)
-        } else {
-            isDeletingItemTransition = true
-            hideItem(deleteItemNumber, false)
-        }
+        mainViewModel.onDiaryItemDeleteDialogPositiveButtonClicked(deleteItemNumber)
     }
 
     private fun receiveDiaryPictureDeleteDialogResult() {
@@ -381,6 +373,9 @@ class DiaryEditFragment : BaseFragment() {
                                 .releasePersistablePermission(requireContext(), value.uri)
                         }
                         navigatePreviousFragmentOnDiaryDelete()
+                    }
+                    is DiaryEditFragmentAction.HideDiaryItem -> {
+                        hideItem(value.itemNumber, value.isJump)
                     }
                     FragmentAction.NavigatePreviousFragment -> {
                         navigatePreviousFragment()
@@ -754,7 +749,7 @@ class DiaryEditFragment : BaseFragment() {
             var completedStateLogMsg = "UnknownState"
             if (currentId == R.id.motion_scene_edit_diary_item_hided_state) {
                 completedStateLogMsg = "HidedState"
-                deleteItemContents()
+                mainViewModel.onDiaryItemHidedStateTransitionCompleted(itemNumber)
 
             // 対象項目欄追加後の処理
             } else if (currentId == R.id.motion_scene_edit_diary_item_showed_state) {
@@ -783,13 +778,6 @@ class DiaryEditFragment : BaseFragment() {
                 }
             binding.nestedScrollFullScreen
                 .smoothScrollBy(0, scrollY, scrollTimeMotionLayoutTransition)
-        }
-
-        private fun deleteItemContents() {
-            if (isDeletingItemTransition) {
-                mainViewModel.deleteItem(itemNumber)
-                isDeletingItemTransition = false
-            }
         }
 
         override fun onTransitionTrigger(

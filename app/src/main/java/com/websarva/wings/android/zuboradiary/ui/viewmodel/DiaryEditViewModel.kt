@@ -187,6 +187,10 @@ internal class DiaryEditViewModel @Inject constructor(
     val fragmentAction: StateFlow<FragmentAction>
         get() = _fragmentAction
 
+    // フラグ
+    private val initialIsDiaryItemDeleteTransitioning = false
+    private var isDiaryItemDeleteTransitioning = initialIsDiaryItemDeleteTransitioning
+
     // TODO:テスト用の為、最終的に削除
     var isTesting = false
 
@@ -201,6 +205,7 @@ internal class DiaryEditViewModel @Inject constructor(
         shouldJumpItemMotionLayout = initialShouldJumpItemMotionLayout
         shouldInitializeOnFragmentDestroy = initialShouldInitializeOnFragmentDestroy
         _fragmentAction.value = initialFragmentAction
+        isDiaryItemDeleteTransitioning = initialIsDiaryItemDeleteTransitioning
     }
 
     // ViewClicked処理
@@ -323,7 +328,14 @@ internal class DiaryEditViewModel @Inject constructor(
     }
 
     fun onDiaryItemDeleteDialogPositiveButtonClicked(itemNumber: ItemNumber) {
-        deleteItem(itemNumber)
+        val numVisibleItems = numVisibleItems.requireValue()
+
+        if (itemNumber.value == 1 && numVisibleItems == itemNumber.value) {
+            deleteItem(itemNumber)
+        } else {
+            isDiaryItemDeleteTransitioning = true
+            updateFragmentAction(DiaryEditFragmentAction.HideDiaryItem(itemNumber, false))
+        }
     }
 
     fun onDiaryPictureDeleteDialogPositiveButtonClicked() {
@@ -333,6 +345,12 @@ internal class DiaryEditViewModel @Inject constructor(
     // 他Fragmentからの受取処理
     fun onReceivedFromItemTitleEditFragment(itemNumber: ItemNumber, itemTitle: String) {
         updateItemTitle(itemNumber, itemTitle)
+    }
+
+    //
+    fun onDiaryItemHidedStateTransitionCompleted(itemNumber: ItemNumber) {
+        if (isDiaryItemDeleteTransitioning) deleteItem(itemNumber)
+        isDiaryItemDeleteTransitioning = false
     }
 
     // データ処理
@@ -658,7 +676,7 @@ internal class DiaryEditViewModel @Inject constructor(
         return diaryStateFlow.getItemStateFlow(itemNumber).title
     }
 
-    fun deleteItem(itemNumber: ItemNumber) {
+    private fun deleteItem(itemNumber: ItemNumber) {
         diaryStateFlow.deleteItem(itemNumber)
     }
 

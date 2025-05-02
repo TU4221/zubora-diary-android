@@ -23,4 +23,5 @@ internal sealed class DiaryEditFragmentAction : FragmentAction() {
     data class NavigateDiaryItemDeleteDialog(val itemNumber: ItemNumber) : DiaryEditFragmentAction()
     data object NavigateDiaryPictureDeleteDialog : DiaryEditFragmentAction()
     data class NavigatePreviousFragmentOnDiaryDelete(val uri: Uri?) : DiaryEditFragmentAction()
+    data class HideDiaryItem(val itemNumber: ItemNumber, val isJump: Boolean) : DiaryEditFragmentAction()
 }
