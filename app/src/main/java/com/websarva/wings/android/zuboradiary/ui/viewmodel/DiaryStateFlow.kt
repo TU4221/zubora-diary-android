@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import java.time.LocalDate
 import java.time.LocalDateTime
 
+// TODO:DiaryEditViewModelのロジックを含めるか、分離するか検討
 internal class DiaryStateFlow {
 
     companion object {
