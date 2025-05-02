@@ -12,8 +12,10 @@ import com.websarva.wings.android.zuboradiary.data.repository.WeatherApiReposito
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import com.websarva.wings.android.zuboradiary.ui.model.DiaryEditAppMessage
 import com.websarva.wings.android.zuboradiary.ui.model.DiaryEditPendingDialog
+import com.websarva.wings.android.zuboradiary.ui.model.adapter.WeatherAdapterList
 import com.websarva.wings.android.zuboradiary.ui.model.action.DiaryEditFragmentAction
 import com.websarva.wings.android.zuboradiary.ui.model.action.FragmentAction
+import com.websarva.wings.android.zuboradiary.ui.model.adapter.ConditionAdapterList
 import com.websarva.wings.android.zuboradiary.ui.permission.UriPermissionAction
 import com.websarva.wings.android.zuboradiary.ui.utils.requireValue
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -81,10 +83,19 @@ internal class DiaryEditViewModel @Inject constructor(
     val weather1
         get() = diaryStateFlow.weather1.asStateFlow()
 
+    private val initialWeatherAdapterList = WeatherAdapterList()
+    private val _weather1AdapterList = MutableStateFlow(initialWeatherAdapterList)
+    val weather1AdapterList
+        get() = _weather1AdapterList.asStateFlow()
+
     val weather2
         get() = diaryStateFlow.weather2.asStateFlow()
 
-    val isEqualWeathers: Boolean
+    private val _weather2AdapterList = MutableStateFlow(initialWeatherAdapterList)
+    val weather2AdapterList
+        get() = _weather2AdapterList.asStateFlow()
+
+    private val isEqualWeathers: Boolean
         get() {
             val weather1 = diaryStateFlow.weather1.value
             val weather2 = diaryStateFlow.weather2.value
@@ -94,6 +105,11 @@ internal class DiaryEditViewModel @Inject constructor(
 
     val condition
         get() = diaryStateFlow.condition.asStateFlow()
+
+    private val initialConditionAdapterList = ConditionAdapterList()
+    private val _conditionAdapterList = MutableStateFlow(initialConditionAdapterList)
+    val conditionAdapterList
+        get() = _conditionAdapterList.asStateFlow()
 
     val numVisibleItems
         get() = diaryStateFlow.numVisibleItems.asStateFlow()
@@ -200,6 +216,9 @@ internal class DiaryEditViewModel @Inject constructor(
         previousDate = initialPreviousDate
         _loadedDate.value = initialLoadedDate
         diaryStateFlow.initialize()
+        _weather1AdapterList.value = initialWeatherAdapterList
+        _weather2AdapterList.value = initialWeatherAdapterList
+        _conditionAdapterList.value = initialConditionAdapterList
         loadedPicturePath = initialLoadedPicturePath
         _isVisibleProgressIndicator.value = initialIsVisibleProgressIndicator
         shouldJumpItemMotionLayout = initialShouldJumpItemMotionLayout
@@ -348,10 +367,16 @@ internal class DiaryEditViewModel @Inject constructor(
     }
 
     //
+    fun onWeather1Changed() {
+        updateWeather2AdapterList()
+    }
+
     fun onDiaryItemHidedStateTransitionCompleted(itemNumber: ItemNumber) {
         if (isDiaryItemDeleteTransitioning) deleteItem(itemNumber)
         isDiaryItemDeleteTransitioning = false
     }
+
+
 
     // データ処理
     fun prepareDiary(
@@ -657,10 +682,21 @@ internal class DiaryEditViewModel @Inject constructor(
     // 天気、体調関係
     private fun updateWeather1(weather: Weather) {
         diaryStateFlow.weather1.value = weather
+        if (weather == Weather.UNKNOWN || isEqualWeathers) updateWeather2(Weather.UNKNOWN)
     }
 
-    fun updateWeather2(weather: Weather) {
+    private fun updateWeather2(weather: Weather) {
         diaryStateFlow.weather2.value = weather
+    }
+
+    private fun updateWeather2AdapterList() {
+        val weather1 = diaryStateFlow.weather1.requireValue()
+        _weather2AdapterList.value =
+            if (weather1 == Weather.UNKNOWN) {
+                initialWeatherAdapterList
+            } else {
+                WeatherAdapterList(weather1)
+            }
     }
 
     private fun updateCondition(condition: Condition) {
