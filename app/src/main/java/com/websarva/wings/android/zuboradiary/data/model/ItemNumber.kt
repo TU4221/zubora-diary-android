@@ -18,6 +18,13 @@ internal class ItemNumber(value: Int) : Serializable, Comparable<ItemNumber> {
         this.value = value
     }
 
+    fun inc(): ItemNumber {
+        val value = this.value.inc()
+        require(value <= MAX_NUMBER)
+
+        return ItemNumber(value)
+    }
+
     override fun toString(): String {
         return value.toString()
     }

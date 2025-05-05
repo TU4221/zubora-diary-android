@@ -166,7 +166,7 @@ internal class DiaryStateFlow {
         if (itemNumber.value < numVisibleItems) {
             for (i in itemNumber.value until numVisibleItems) {
                 val targetItemNumber = ItemNumber(i)
-                val nextItemNumber = ItemNumber(i + 1)
+                val nextItemNumber = targetItemNumber.inc()
                 getItemStateFlow(targetItemNumber).update(
                     getItemStateFlow(nextItemNumber).title.value,
                     getItemStateFlow(nextItemNumber).comment.value,

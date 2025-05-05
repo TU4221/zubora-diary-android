@@ -157,6 +157,7 @@ class DiaryEditFragment : BaseFragment() {
                 // MEMO:結果がない場合もあるので"return"で返す。
                 if (value == null) return@collectLatest
 
+                // TODO:newItemTitleとitemNumberをひとつにしたデータクラスを用意する
                 val itemNumber =
                     checkNotNull(
                         receiveResulFromPreviousFragment<ItemNumber>(
@@ -771,8 +772,8 @@ class DiaryEditFragment : BaseFragment() {
         }
 
         private fun isNextItemHidedState(): Boolean {
-            val nextItemNumber = itemNumber.value + 1
-            val motionLayout = selectItemMotionLayout(ItemNumber(nextItemNumber))
+            val nextItemNumber = itemNumber.inc()
+            val motionLayout = selectItemMotionLayout(nextItemNumber)
             return motionLayout.currentState == R.id.motion_scene_edit_diary_item_hided_state
         }
 
