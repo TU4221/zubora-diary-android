@@ -7,5 +7,6 @@ internal sealed class DiaryShowFragmentAction : FragmentAction() {
     data class NavigateDiaryEditFragment(val date: LocalDate) : DiaryShowFragmentAction()
     data class NavigateDiaryLoadingFailureDialog(val date: LocalDate) : DiaryShowFragmentAction()
     data class NavigateDiaryDeleteDialog(val date: LocalDate) : DiaryShowFragmentAction()
-    data class NavigatePreviousDialogOnDiaryDelete(val uri: Uri?) : DiaryShowFragmentAction()
+    data class NavigatePreviousFragment(val date: LocalDate) : DiaryEditFragmentAction()
+    data class NavigatePreviousFragmentOnDiaryDelete(val date: LocalDate, val uri: Uri?) : DiaryShowFragmentAction()
 }

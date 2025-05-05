@@ -77,6 +77,11 @@ internal class DiaryShowViewModel @Inject constructor(private val diaryRepositor
         diaryStateFlow.initialize()
     }
 
+    fun onBackPressed() {
+        navigatePreviousFragment()
+    }
+
+    // ViewClicked処理
     fun onDiaryEditMenuClicked() {
         val date = diaryStateFlow.date.requireValue()
         _fragmentAction.value =
@@ -87,6 +92,14 @@ internal class DiaryShowViewModel @Inject constructor(private val diaryRepositor
         val date = diaryStateFlow.date.requireValue()
         _fragmentAction.value =
             DiaryShowFragmentAction.NavigateDiaryDeleteDialog(date)
+    }
+
+    fun onNavigationClicked() {
+        navigatePreviousFragment()
+    }
+
+    fun onDiaryLoadingFailureDialogPositiveButtonClicked() {
+        navigatePreviousFragment()
     }
 
     fun onDiaryDeleteDialogPositiveButtonClicked() {
@@ -131,10 +144,10 @@ internal class DiaryShowViewModel @Inject constructor(private val diaryRepositor
         val logMsg = "日記削除"
         Log.i(logTag, "${logMsg}_開始")
 
-        val deleteDate = diaryStateFlow.date.requireValue()
+        val date = diaryStateFlow.date.requireValue()
         val picturePath  = diaryStateFlow.picturePath.value
         try {
-            diaryRepository.deleteDiary(deleteDate)
+            diaryRepository.deleteDiary(date)
         } catch (e: Exception) {
             Log.e(logTag, "${logMsg}_失敗", e)
             addAppMessage(DiaryShowAppMessage.DiaryDeleteFailure)
@@ -143,7 +156,7 @@ internal class DiaryShowViewModel @Inject constructor(private val diaryRepositor
 
         _fragmentAction.value =
             DiaryShowFragmentAction
-                .NavigatePreviousDialogOnDiaryDelete(picturePath)
+                .NavigatePreviousFragmentOnDiaryDelete(date, picturePath)
         Log.i(logTag, "${logMsg}_完了")
     }
 
@@ -158,8 +171,18 @@ internal class DiaryShowViewModel @Inject constructor(private val diaryRepositor
         }
     }
 
+    // FragmentAction関係
+    private fun updateFragmentAction(action: FragmentAction) {
+        _fragmentAction.value = action
+    }
+
     fun clearFragmentAction() {
         _fragmentAction.value = initialFragmentAction
+    }
+
+    private fun navigatePreviousFragment() {
+        val date = date.requireValue()
+        updateFragmentAction(DiaryShowFragmentAction.NavigatePreviousFragment(date))
     }
 
     // 表示保留中Dialog追加

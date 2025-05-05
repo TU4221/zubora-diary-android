@@ -11,6 +11,7 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.activity.OnBackPressedCallback
 import androidx.annotation.MainThread
 import androidx.databinding.ViewDataBinding
 import androidx.fragment.app.viewModels
@@ -85,6 +86,7 @@ internal class DiaryShowFragment : BaseFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        setUpOnBackPressedCallback()
         setUpFragmentAction()
         setUpPendingDialogObserver()
         setUpDiaryData()
@@ -116,7 +118,7 @@ internal class DiaryShowFragment : BaseFragment() {
                 ?: return
         if (selectedButton != Dialog.BUTTON_POSITIVE) return
 
-        navigatePreviousFragment()
+        mainViewModel.onDiaryLoadingFailureDialogPositiveButtonClicked()
     }
 
     // 日記削除確認ダイアログフラグメントからデータ受取
@@ -127,6 +129,14 @@ internal class DiaryShowFragment : BaseFragment() {
         if (selectedButton != Dialog.BUTTON_POSITIVE) return
 
         mainViewModel.onDiaryDeleteDialogPositiveButtonClicked()
+    }
+
+    private fun setUpOnBackPressedCallback() {
+        addOnBackPressedCallback(object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                mainViewModel.onBackPressed()
+            }
+        })
     }
 
     private fun setUpFragmentAction() {
@@ -142,15 +152,15 @@ internal class DiaryShowFragment : BaseFragment() {
                     is DiaryShowFragmentAction.NavigateDiaryDeleteDialog -> {
                         navigateDiaryDeleteDialog(value.date)
                     }
-                    is DiaryShowFragmentAction.NavigatePreviousDialogOnDiaryDelete -> {
+                    is DiaryShowFragmentAction.NavigatePreviousFragment -> {
+                        navigatePreviousFragment(value.date)
+                    }
+                    is DiaryShowFragmentAction.NavigatePreviousFragmentOnDiaryDelete -> {
                         if (value.uri != null) {
                             pictureUriPermissionManager
                                 .releasePersistablePermission(requireContext(), value.uri)
                         }
-                        navigatePreviousFragment()
-                    }
-                    FragmentAction.NavigatePreviousFragment -> {
-                        navigatePreviousFragment()
+                        navigatePreviousFragment(value.date)
                     }
                     FragmentAction.None -> {
                         // 処理なし
@@ -180,7 +190,6 @@ internal class DiaryShowFragment : BaseFragment() {
 
     // 画面表示データ準備
     private fun setUpDiaryData() {
-        mainViewModel.initialize()
         val diaryDate = DiaryShowFragmentArgs.fromBundle(requireArguments()).date
         mainViewModel.prepareDiaryForDiaryShowFragment(diaryDate)
     }
@@ -188,7 +197,7 @@ internal class DiaryShowFragment : BaseFragment() {
     private fun setUpToolBar() {
         binding.materialToolbarTopAppBar.apply {
             setNavigationOnClickListener {
-                navigatePreviousFragment()
+                mainViewModel.onNavigationClicked()
             }
             setOnMenuItemClickListener { item: MenuItem ->
                 // 日記編集フラグメント起動
@@ -418,13 +427,12 @@ internal class DiaryShowFragment : BaseFragment() {
     }
 
     @MainThread
-    private fun navigatePreviousFragment() {
+    private fun navigatePreviousFragment(date: LocalDate) {
         val navBackStackEntry = checkNotNull(navController.previousBackStackEntry)
         val destinationId = navBackStackEntry.destination.id
         if (destinationId == R.id.navigation_calendar_fragment) {
             val savedStateHandle = navBackStackEntry.savedStateHandle
-            val showedDiaryLocalDate = mainViewModel.date.value
-            savedStateHandle[KEY_SHOWED_DIARY_DATE] = showedDiaryLocalDate
+            savedStateHandle[KEY_SHOWED_DIARY_DATE] = date
         }
         navController.navigateUp()
     }
