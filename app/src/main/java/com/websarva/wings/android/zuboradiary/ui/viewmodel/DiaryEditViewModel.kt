@@ -649,6 +649,7 @@ internal class DiaryEditViewModel @Inject constructor(
             val result =
                 response.body()?.toWeatherInfo() ?: throw IllegalStateException()
             updateWeather1(result)
+            updateWeather2(Weather.UNKNOWN)
             Log.i(logTag, "${logMsg}_完了")
         } else {
             response.errorBody().use { errorBody ->
