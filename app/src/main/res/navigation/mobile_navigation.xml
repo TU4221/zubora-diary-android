@@ -34,7 +34,7 @@
                     android:name="is_start_diary_fragment"
                     app:argType="boolean" />
                 <argument
-                    android:name="requires_diary_loading"
+                    android:name="should_load_diary"
                     app:argType="boolean" />
                 <argument
                     android:name="date"
@@ -125,7 +125,7 @@
                     android:name="is_start_diary_fragment"
                     app:argType="boolean" />
                 <argument
-                    android:name="requires_diary_loading"
+                    android:name="should_load_diary"
                     app:argType="boolean" />
                 <argument
                     android:name="date"
@@ -261,7 +261,7 @@
                     android:name="is_start_diary_fragment"
                     app:argType="boolean" />
                 <argument
-                    android:name="requires_diary_loading"
+                    android:name="should_load_diary"
                     app:argType="boolean" />
                 <argument
                     android:name="date"
@@ -317,7 +317,7 @@
                 android:name="is_start_diary_fragment"
                 app:argType="boolean" />
             <argument
-                android:name="requires_diary_loading"
+                android:name="should_load_diary"
                 app:argType="boolean" />
             <argument
                 android:name="date"

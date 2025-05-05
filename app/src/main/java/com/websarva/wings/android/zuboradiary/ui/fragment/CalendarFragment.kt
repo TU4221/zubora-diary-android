@@ -560,13 +560,13 @@ class CalendarFragment : BaseFragment() {
     }
 
     @MainThread
-    private fun showDiaryEditFragment(date: LocalDate, requiresDiaryLoading: Boolean) {
+    private fun showDiaryEditFragment(date: LocalDate, shouldLoadDiary: Boolean) {
         if (!canNavigateFragment) return
 
         val directions =
             CalendarFragmentDirections.actionNavigationCalendarFragmentToDiaryEditFragment(
                 true,
-                requiresDiaryLoading,
+                shouldLoadDiary,
                 date
             )
         navController.navigate(directions)

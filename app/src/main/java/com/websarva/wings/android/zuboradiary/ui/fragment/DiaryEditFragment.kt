@@ -457,7 +457,7 @@ class DiaryEditFragment : BaseFragment() {
 
         val diaryDate = DiaryEditFragmentArgs.fromBundle(requireArguments()).date
         val requiresDiaryLoading =
-            DiaryEditFragmentArgs.fromBundle(requireArguments()).requiresDiaryLoading
+            DiaryEditFragmentArgs.fromBundle(requireArguments()).shouldLoadDiary
         val isCheckedWeatherInfoAcquisition =
             settingsViewModel.isCheckedWeatherInfoAcquisition.requireValue()
         val geoCoordinates =
