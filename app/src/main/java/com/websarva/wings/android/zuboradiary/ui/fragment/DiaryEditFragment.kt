@@ -16,6 +16,7 @@ import android.view.inputmethod.EditorInfo
 import android.widget.AdapterView
 import android.widget.AdapterView.OnItemClickListener
 import android.widget.ArrayAdapter
+import androidx.activity.OnBackPressedCallback
 import androidx.annotation.MainThread
 import androidx.appcompat.view.ContextThemeWrapper
 import androidx.constraintlayout.motion.widget.MotionLayout
@@ -130,6 +131,7 @@ class DiaryEditFragment : BaseFragment() {
         super.onViewCreated(view, savedInstanceState)
 
         setUpViewModelInitialization()
+        setUpOnBackPressedCallback()
         setUpFragmentAction()
         setUpPendingDialogObserver()
         setUpFocusViewScroll()
@@ -333,6 +335,15 @@ class DiaryEditFragment : BaseFragment() {
         }
     }
 
+    private fun setUpOnBackPressedCallback() {
+        addOnBackPressedCallback(object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                mainViewModel.onBackPressed()
+            }
+
+        })
+    }
+
     private fun setUpFragmentAction() {
         launchAndRepeatOnViewLifeCycleStarted {
             mainViewModel.fragmentAction.collectLatest { value: FragmentAction ->
@@ -369,18 +380,18 @@ class DiaryEditFragment : BaseFragment() {
                     DiaryEditFragmentAction.NavigateDiaryPictureDeleteDialog -> {
                         navigateDiaryPictureDeleteDialog()
                     }
+                    is DiaryEditFragmentAction.NavigatePreviousFragment -> {
+                        navigatePreviousFragment(value.loadedDate)
+                    }
                     is DiaryEditFragmentAction.NavigatePreviousFragmentOnDiaryDelete -> {
                         if (value.uri != null) {
                             pictureUriPermissionManager
                                 .releasePersistablePermission(requireContext(), value.uri)
                         }
-                        navigatePreviousFragmentOnDiaryDelete()
+                        navigatePreviousFragmentOnDiaryDelete(value.loadedDate)
                     }
                     is DiaryEditFragmentAction.HideDiaryItem -> {
                         hideItem(value.itemNumber, value.isJump)
-                    }
-                    FragmentAction.NavigatePreviousFragment -> {
-                        navigatePreviousFragment()
                     }
                     FragmentAction.None -> {
                         // 処理なし
@@ -1117,25 +1128,24 @@ class DiaryEditFragment : BaseFragment() {
     }
 
     @MainThread
-    private fun navigatePreviousFragment() {
+    private fun navigatePreviousFragment(editedDiaryDate: LocalDate?) {
         val navBackStackEntry = checkNotNull(navController.previousBackStackEntry)
         val destinationId = navBackStackEntry.destination.id
         if (destinationId == R.id.navigation_calendar_fragment) {
             val savedStateHandle = navBackStackEntry.savedStateHandle
-            val editedDiaryLocalDate = mainViewModel.loadedDate.value
-            savedStateHandle[KEY_EDITED_DIARY_DATE] = editedDiaryLocalDate
+            savedStateHandle[KEY_EDITED_DIARY_DATE] = editedDiaryDate
         }
         navController.navigateUp()
     }
 
     @MainThread
-    private fun navigatePreviousFragmentOnDiaryDelete() {
+    private fun navigatePreviousFragmentOnDiaryDelete(editedDiaryDate: LocalDate?) {
         val navBackStackEntry = checkNotNull(navController.previousBackStackEntry)
         val destinationId = navBackStackEntry.destination.id
         if (destinationId == R.id.navigation_diary_show_fragment) {
             navController.navigateUp()
         }
-        navigatePreviousFragment()
+        navigatePreviousFragment(editedDiaryDate)
     }
 
     override fun destroyBinding() {

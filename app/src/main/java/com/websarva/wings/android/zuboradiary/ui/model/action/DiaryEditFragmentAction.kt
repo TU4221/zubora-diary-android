@@ -22,6 +22,7 @@ internal sealed class DiaryEditFragmentAction : FragmentAction() {
     data class NavigateWeatherInfoFetchingDialog(val date: LocalDate) : DiaryEditFragmentAction()
     data class NavigateDiaryItemDeleteDialog(val itemNumber: ItemNumber) : DiaryEditFragmentAction()
     data object NavigateDiaryPictureDeleteDialog : DiaryEditFragmentAction()
-    data class NavigatePreviousFragmentOnDiaryDelete(val uri: Uri?) : DiaryEditFragmentAction()
+    data class NavigatePreviousFragment(val loadedDate: LocalDate?) : DiaryEditFragmentAction()
+    data class NavigatePreviousFragmentOnDiaryDelete(val loadedDate: LocalDate?, val uri: Uri?) : DiaryEditFragmentAction()
     data class HideDiaryItem(val itemNumber: ItemNumber, val isJump: Boolean) : DiaryEditFragmentAction()
 }

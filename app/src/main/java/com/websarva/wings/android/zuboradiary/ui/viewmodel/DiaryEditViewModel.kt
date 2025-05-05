@@ -216,6 +216,10 @@ internal class DiaryEditViewModel @Inject constructor(
         _fragmentAction.value = initialFragmentAction
     }
 
+    fun onBackPressed() {
+        navigatePreviousFragment()
+    }
+
     // ViewClicked処理
     fun onDiarySaveMenuClicked() {
         viewModelScope.launch(Dispatchers.IO) {
@@ -231,7 +235,7 @@ internal class DiaryEditViewModel @Inject constructor(
     }
 
     fun onNavigationClicked() {
-        updateFragmentAction(FragmentAction.NavigatePreviousFragment)
+        navigatePreviousFragment()
     }
 
     fun onDateInputFieldClicked() {
@@ -325,7 +329,7 @@ internal class DiaryEditViewModel @Inject constructor(
     }
 
     fun onDiaryLoadingFailureDialogPositiveButtonClicked() {
-        updateFragmentAction(FragmentAction.NavigatePreviousFragment)
+        navigatePreviousFragment()
     }
 
     fun onWeatherInfoFetchDialogPositiveButtonClicked(geoCoordinates: GeoCoordinates?) {
@@ -540,6 +544,7 @@ internal class DiaryEditViewModel @Inject constructor(
 
     private suspend fun deleteDiary() {
         updateProgressIndicatorVisibility(true)
+        val loadedDate = loadedDate.value
         val loadedPictureUri = loadedPicturePath
 
         val isSuccessful = deleteDiaryFromDatabase()
@@ -549,7 +554,8 @@ internal class DiaryEditViewModel @Inject constructor(
         }
 
         updateFragmentAction(
-            DiaryEditFragmentAction.NavigatePreviousFragmentOnDiaryDelete(loadedPictureUri)
+            DiaryEditFragmentAction
+                .NavigatePreviousFragmentOnDiaryDelete(loadedDate, loadedPictureUri)
         )
         updateProgressIndicatorVisibility(false)
     }
@@ -737,6 +743,11 @@ internal class DiaryEditViewModel @Inject constructor(
         _fragmentAction.value = initialFragmentAction
     }
 
+    private fun navigatePreviousFragment() {
+        val loadedDate = loadedDate.value
+        updateFragmentAction(DiaryEditFragmentAction.NavigatePreviousFragment(loadedDate))
+    }
+
     // TODO:テスト用の為、最終的に削除
     fun test() {
         viewModelScope.launch(Dispatchers.IO) {
@@ -778,7 +789,7 @@ internal class DiaryEditViewModel @Inject constructor(
                     }
                 }
             }
-            _fragmentAction.value = FragmentAction.NavigatePreviousFragment
+            navigatePreviousFragment()
             isTesting = false
         }
     }
