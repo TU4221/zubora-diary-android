@@ -78,6 +78,8 @@ class DiaryEditFragment : BaseFragment() {
     private val motionLayoutTransitionTime = 500 /*ms*/
     private val scrollTimeMotionLayoutTransition = 1000 /*ms*/
 
+    private var shouldTransitionItemMotionLayout = false
+
     // ViewModel
     // MEMO:委譲プロパティの委譲先(viewModels())の遅延初期化により"Field is never assigned."と警告が表示される。
     //      委譲プロパティによるViewModel生成は公式が推奨する方法の為、警告を無視する。その為、@Suppressを付与する。
@@ -288,6 +290,7 @@ class DiaryEditFragment : BaseFragment() {
                 DiaryItemDeleteDialogFragment.KEY_DELETE_ITEM_NUMBER
             ) ?: return
 
+        shouldTransitionItemMotionLayout = true
         mainViewModel.onDiaryItemDeleteDialogPositiveButtonClicked(deleteItemNumber)
     }
 
@@ -684,6 +687,7 @@ class DiaryEditFragment : BaseFragment() {
         // 項目追加ボタン設定
         binding.imageButtonItemAddition.setOnClickListener {
             binding.imageButtonItemAddition.isEnabled = false
+            shouldTransitionItemMotionLayout = true
             mainViewModel.onItemAdditionButtonClicked()
         }
 
@@ -734,39 +738,50 @@ class DiaryEditFragment : BaseFragment() {
         override fun onTransitionCompleted(motionLayout: MotionLayout?, currentId: Int) {
             Log.d(logTag, "onTransitionCompleted()_itemNumber = $itemNumber")
 
-            // 対象項目追加削除後のスクロール処理
-            if (!mainViewModel.shouldJumpItemMotionLayout) scrollOnTransition(currentId)
-
             // 対象項目欄削除後の処理
             var completedStateLogMsg = "UnknownState"
             if (currentId == R.id.motion_scene_edit_diary_item_hided_state) {
                 completedStateLogMsg = "HidedState"
-                mainViewModel.onDiaryItemHidedStateTransitionCompleted(itemNumber)
+                if (shouldTransitionItemMotionLayout) {
+                    if (isNextItemHidedState()) scrollOnDiaryItemHided()
+                    mainViewModel.onDiaryItemHidedStateTransitionCompleted(itemNumber)
+                }
 
             // 対象項目欄追加後の処理
             } else if (currentId == R.id.motion_scene_edit_diary_item_showed_state) {
                 completedStateLogMsg = "ShowedState"
+                if (shouldTransitionItemMotionLayout) {
+                    scrollOnDiaryItemShowed()
+                }
             }
             Log.d(logTag, "onTransitionCompleted()_CompletedState = $completedStateLogMsg")
 
-            if (isMotionLayoutNormalState()) mainViewModel.clearShouldJumpItemMotionLayout()
+            shouldTransitionItemMotionLayout = false
         }
 
-        private fun scrollOnTransition(currentId: Int) {
+        private fun isNextItemHidedState(): Boolean {
+            val nextItemNumber = itemNumber.value + 1
+            val motionLayout = selectItemMotionLayout(ItemNumber(nextItemNumber))
+            return motionLayout.currentState == R.id.motion_scene_edit_diary_item_hided_state
+        }
+
+        // 対象項目追加後のスクロール処理
+        private fun scrollOnDiaryItemShowed() {
+            scrollOnDiaryItemTransition(true)
+        }
+
+        // 対象項目削除後のスクロール処理
+        private fun scrollOnDiaryItemHided() {
+            scrollOnDiaryItemTransition(false)
+        }
+
+        private fun scrollOnDiaryItemTransition(isUpDirection: Boolean) {
             val itemHeight = binding.includeItem1.linerLayoutDiaryEditItem.height
             val scrollY =
-                when (currentId) {
-                    R.id.motion_scene_edit_diary_item_hided_state -> {
-                        if (itemNumber.value == mainViewModel.numVisibleItems.value) {
-                            - itemHeight
-                        } else {
-                            0
-                        }
-                    }
-                    R.id.motion_scene_edit_diary_item_showed_state -> {
-                        itemHeight
-                    }
-                    else -> 0
+                if (isUpDirection) {
+                    itemHeight
+                } else {
+                    -itemHeight
                 }
             binding.nestedScrollFullScreen
                 .smoothScrollBy(0, scrollY, scrollTimeMotionLayoutTransition)
@@ -815,7 +830,7 @@ class DiaryEditFragment : BaseFragment() {
             require(!(numItems < ItemNumber.MIN_NUMBER || numItems > ItemNumber.MAX_NUMBER))
 
             // MEMO:削除処理はObserverで適切なモーション削除処理を行うのは難しいのでここでは処理せず、削除ダイアログから処理する。
-            if (!mainViewModel.shouldJumpItemMotionLayout) {
+            if (shouldTransitionItemMotionLayout) {
                 val numShowedItems = countShowedItems()
                 val differenceValue = numItems - numShowedItems
                 if (numItems > numShowedItems && differenceValue == 1) {
@@ -874,24 +889,6 @@ class DiaryEditFragment : BaseFragment() {
             numShowedItems++
         }
         return numShowedItems
-    }
-
-    private fun isMotionLayoutNormalState(): Boolean {
-        for (i in ItemNumber.MIN_NUMBER..ItemNumber.MAX_NUMBER) {
-            val itemNumber = ItemNumber(i)
-            val motionLayout = selectItemMotionLayout(itemNumber)
-
-            val numVisibleItems = mainViewModel.numVisibleItems.value
-            val normalState =
-                if (itemNumber.value <= numVisibleItems) {
-                    R.id.motion_scene_edit_diary_item_showed_state
-                } else {
-                    R.id.motion_scene_edit_diary_item_hided_state
-                }
-
-            if (motionLayout.currentState != normalState) return false
-        }
-        return true
     }
 
     private fun setUpPictureInputField() {

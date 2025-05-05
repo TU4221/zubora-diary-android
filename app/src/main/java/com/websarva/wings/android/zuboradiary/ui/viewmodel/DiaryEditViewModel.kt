@@ -186,11 +186,6 @@ internal class DiaryEditViewModel @Inject constructor(
     val isVisibleUpdateProgressBar
         get() = _isVisibleProgressIndicator.asStateFlow()
 
-    // MotionLayout表示関係
-    private val initialShouldJumpItemMotionLayout = false
-    var shouldJumpItemMotionLayout = initialShouldJumpItemMotionLayout
-        private set
-
     // ViewModel初期化関係
     // MEMO:画面回転時の不要な初期化を防ぐ
     private val initialShouldInitializeOnFragmentDestroy = false
@@ -202,10 +197,6 @@ internal class DiaryEditViewModel @Inject constructor(
         MutableStateFlow(initialFragmentAction)
     val fragmentAction: StateFlow<FragmentAction>
         get() = _fragmentAction
-
-    // フラグ
-    private val initialIsDiaryItemDeleteTransitioning = false
-    private var isDiaryItemDeleteTransitioning = initialIsDiaryItemDeleteTransitioning
 
     // TODO:テスト用の為、最終的に削除
     var isTesting = false
@@ -221,10 +212,8 @@ internal class DiaryEditViewModel @Inject constructor(
         _conditionAdapterList.value = initialConditionAdapterList
         loadedPicturePath = initialLoadedPicturePath
         _isVisibleProgressIndicator.value = initialIsVisibleProgressIndicator
-        shouldJumpItemMotionLayout = initialShouldJumpItemMotionLayout
         shouldInitializeOnFragmentDestroy = initialShouldInitializeOnFragmentDestroy
         _fragmentAction.value = initialFragmentAction
-        isDiaryItemDeleteTransitioning = initialIsDiaryItemDeleteTransitioning
     }
 
     // ViewClicked処理
@@ -352,7 +341,6 @@ internal class DiaryEditViewModel @Inject constructor(
         if (itemNumber.value == 1 && numVisibleItems == itemNumber.value) {
             deleteItem(itemNumber)
         } else {
-            isDiaryItemDeleteTransitioning = true
             updateFragmentAction(DiaryEditFragmentAction.HideDiaryItem(itemNumber, false))
         }
     }
@@ -372,8 +360,7 @@ internal class DiaryEditViewModel @Inject constructor(
     }
 
     fun onDiaryItemHidedStateTransitionCompleted(itemNumber: ItemNumber) {
-        if (isDiaryItemDeleteTransitioning) deleteItem(itemNumber)
-        isDiaryItemDeleteTransitioning = false
+        deleteItem(itemNumber)
     }
 
 
@@ -389,8 +376,6 @@ internal class DiaryEditViewModel @Inject constructor(
         Log.i(logTag, "${logMsg}_開始")
         updateProgressIndicatorVisibility(true)
         viewModelScope.launch(Dispatchers.IO) {
-            shouldJumpItemMotionLayout = true
-            val previousNumVisibleItems = diaryStateFlow.numVisibleItems.value
             if (shouldLoadDiary) {
                 try {
                     val isSuccessful = loadSavedDiary(date)
@@ -405,7 +390,6 @@ internal class DiaryEditViewModel @Inject constructor(
                         )
                     }
                     updateProgressIndicatorVisibility(false)
-                    shouldJumpItemMotionLayout = false
                     return@launch
                 }
             } else {
@@ -413,12 +397,6 @@ internal class DiaryEditViewModel @Inject constructor(
             }
             hasPreparedDiary = true
             updateProgressIndicatorVisibility(false)
-
-            // MEMO:"numVisibleItems"が読込前と同じ時はStateFlowのCollectが起動せず、MotionLayoutが処理されないので、
-            //      ”shouldJumpItemMotionLayout”を下記でクリアする。
-            if (previousNumVisibleItems == diaryStateFlow.numVisibleItems.value) {
-                shouldJumpItemMotionLayout = false
-            }
 
             Log.i(logTag, "${logMsg}_完了")
         }
@@ -757,11 +735,6 @@ internal class DiaryEditViewModel @Inject constructor(
 
     fun clearFragmentAction() {
         _fragmentAction.value = initialFragmentAction
-    }
-
-    // クリアメソッド
-    fun clearShouldJumpItemMotionLayout() {
-        shouldJumpItemMotionLayout = initialShouldJumpItemMotionLayout
     }
 
     // TODO:テスト用の為、最終的に削除
