@@ -391,8 +391,8 @@ class DiaryEditFragment : BaseFragment() {
                         }
                         navigatePreviousFragmentOnDiaryDelete(value.loadedDate)
                     }
-                    is DiaryEditFragmentAction.HideDiaryItem -> {
-                        hideItem(value.itemNumber, value.isJump)
+                    is DiaryEditFragmentAction.TransitionDiaryItemHidedState -> {
+                        hideItem(value.itemNumber, false)
                     }
                     FragmentAction.None -> {
                         // 処理なし

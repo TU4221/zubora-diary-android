@@ -345,7 +345,7 @@ internal class DiaryEditViewModel @Inject constructor(
         if (itemNumber.value == 1 && numVisibleItems == itemNumber.value) {
             deleteItem(itemNumber)
         } else {
-            updateFragmentAction(DiaryEditFragmentAction.HideDiaryItem(itemNumber, false))
+            updateFragmentAction(DiaryEditFragmentAction.TransitionDiaryItemHidedState(itemNumber))
         }
     }
 
