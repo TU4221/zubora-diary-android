@@ -45,38 +45,54 @@ internal class CalendarViewModel @Inject constructor(
         _fragmentAction.value = initialFragmentAction
     }
 
+    // ViewClicked処理
     fun onCalendarDayClicked(date: LocalDate) {
-        viewModelScope.launch(Dispatchers.IO) {
-            updateSelectedDate(date)
-            val exists = existsSavedDiary(date) ?: false
-            if (exists) {
-                _fragmentAction.value = CalendarFragmentAction.ShowDiary(date)
-            } else {
-                _fragmentAction.value = CalendarFragmentAction.CloseDiary
-            }
-        }
+        updateSelectedDate(date)
     }
 
     fun onDiaryEditButtonClicked() {
         viewModelScope.launch(Dispatchers.IO) {
-            val date = _selectedDate.value
-            val exists = existsSavedDiary(date) ?: false
-            val isNewDiary = !exists
-            _fragmentAction.value =
-                CalendarFragmentAction.NavigateDiaryEditFragment(date, isNewDiary)
+            navigateDiaryEditFragment()
         }
     }
 
-    fun prepareDiaryShowLayout() {
-        viewModelScope.launch(Dispatchers.IO) {
-            val date = _selectedDate.value
-            val exists = existsSavedDiary(date) ?: false
-            if (exists) {
-                _fragmentAction.value = CalendarFragmentAction.ShowDiary(date)
-            } else {
-                _fragmentAction.value = CalendarFragmentAction.CloseDiary
-            }
+    fun onNavigationItemReselected() {
+        // MEMO:StateFlowに現在値と同じ値を代入してもCollectメソッドに登録した処理が起動しないため、
+        //      下記条件でカレンダースクロールのみ処理。
+        val today = LocalDate.now()
+        if (selectedDate.value == LocalDate.now()) {
+            updateFragmentAction(
+                CalendarFragmentAction.ScrollCalendar(today)
+            )
+        } else {
+            updateSelectedDate(today)
         }
+    }
+
+    // 他Fragmentからの受取処理
+    fun onDataReceivedFromDiaryShowFragment(date: LocalDate) {
+        updateSelectedDate(date)
+    }
+
+    fun onDataReceivedFromDiaryEditFragment(date: LocalDate) {
+        updateSelectedDate(date)
+    }
+
+    fun onChangedSelectedDate() {
+        viewModelScope.launch(Dispatchers.IO) {
+            prepareDiaryShowLayout()
+        }
+    }
+
+    private suspend fun prepareDiaryShowLayout() {
+        val date = _selectedDate.value
+        val exists = existsSavedDiary(date) ?: false
+        val action = if (exists) {
+            CalendarFragmentAction.ShowDiary(date)
+        } else {
+            CalendarFragmentAction.CloseDiary
+        }
+        updateFragmentAction(action)
     }
 
     private fun updateSelectedDate(date: LocalDate) {
@@ -102,7 +118,21 @@ internal class CalendarViewModel @Inject constructor(
         }
     }
 
+    // FragmentAction関係
+    private fun updateFragmentAction(action: FragmentAction) {
+        _fragmentAction.value = action
+    }
+
     fun clearFragmentAction() {
         _fragmentAction.value = initialFragmentAction
+    }
+
+    private suspend fun navigateDiaryEditFragment() {
+        val date = _selectedDate.value
+        val exists = existsSavedDiary(date) ?: false
+        val isNewDiary = !exists
+        updateFragmentAction(
+            CalendarFragmentAction.NavigateDiaryEditFragment(date, isNewDiary)
+        )
     }
 }

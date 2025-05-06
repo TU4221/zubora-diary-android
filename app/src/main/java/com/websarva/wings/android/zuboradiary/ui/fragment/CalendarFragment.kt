@@ -117,7 +117,7 @@ class CalendarFragment : BaseFragment() {
             showedDiaryDate.collectLatest { value: LocalDate? ->
                 value ?: return@collectLatest
 
-                mainViewModel.onCalendarDayClicked(value)
+                mainViewModel.onDataReceivedFromDiaryShowFragment(value)
                 removeResulFromFragment(DiaryShowFragment.KEY_SHOWED_DIARY_DATE)
             }
         }
@@ -131,7 +131,7 @@ class CalendarFragment : BaseFragment() {
             editedDiaryDate.collectLatest { value: LocalDate? ->
                 value ?: return@collectLatest
 
-                mainViewModel.onCalendarDayClicked(value)
+                mainViewModel.onDataReceivedFromDiaryEditFragment(value)
                 removeResulFromFragment(DiaryEditFragment.KEY_EDITED_DIARY_DATE)
             }
         }
@@ -164,14 +164,17 @@ class CalendarFragment : BaseFragment() {
         launchAndRepeatOnViewLifeCycleStarted {
             mainViewModel.fragmentAction.collectLatest { value: FragmentAction ->
                 when (value) {
+                    is CalendarFragmentAction.NavigateDiaryEditFragment -> {
+                        showDiaryEditFragment(value.date, !value.isNewDiary)
+                    }
                     is CalendarFragmentAction.ShowDiary -> {
                         showDiary(value.date)
                     }
                     is CalendarFragmentAction.CloseDiary -> {
                         closeDiary()
                     }
-                    is CalendarFragmentAction.NavigateDiaryEditFragment -> {
-                        showDiaryEditFragment(value.date, !value.isNewDiary)
+                    is CalendarFragmentAction.ScrollCalendar -> {
+                        scrollCalendar(value.date)
                     }
                     FragmentAction.NavigatePreviousFragment -> {
                         navController.navigateUp()
@@ -202,9 +205,13 @@ class CalendarFragment : BaseFragment() {
         launchAndRepeatOnViewLifeCycleStarted {
             mainViewModel.selectedDate
                 .collectLatest { value: LocalDate ->
+                    val calendarMonthDayBinder =
+                        binding.calendar.dayBinder as CalendarMonthDayBinder
+                    calendarMonthDayBinder.updateSelectedDate(value)
                     binding.calendar.notifyDateChanged(value) // 今回選択日付更新
                     scrollCalendar(value)
                     updateToolBarDate(value)
+                    mainViewModel.onChangedSelectedDate()
                 }
         }
 
@@ -245,8 +252,10 @@ class CalendarFragment : BaseFragment() {
             CalendarMonthHeaderFooterBinder(daysOfWeek, themeColor)
     }
 
-    private inner class CalendarMonthDayBinder(private val themeColor: ThemeColor) :
-        MonthDayBinder<DayViewContainer> {
+    private inner class CalendarMonthDayBinder(
+        private val themeColor: ThemeColor,
+        private var selectedDate: LocalDate = LocalDate.now()
+    ) : MonthDayBinder<DayViewContainer> {
 
         @Suppress("PARAMETER_NAME_CHANGED_ON_OVERRIDE")
         override fun bind(container: DayViewContainer, calendarDay: CalendarDay) {
@@ -280,7 +289,6 @@ class CalendarFragment : BaseFragment() {
             val themeColorChanger =
                 CalendarThemeColorChanger()
 
-            val selectedDate = mainViewModel.selectedDate.value
             val isSelectedDay = calendarDay.date.isEqual(selectedDate)
             val isToday = calendarDay.date.isEqual(LocalDate.now())
 
@@ -341,6 +349,10 @@ class CalendarFragment : BaseFragment() {
 
         override fun create(view: View): DayViewContainer {
             return DayViewContainer(view)
+        }
+
+        fun updateSelectedDate(date: LocalDate) {
+            selectedDate = date
         }
     }
 
@@ -459,8 +471,6 @@ class CalendarFragment : BaseFragment() {
     }
 
     private fun setUpDiaryShow() {
-        mainViewModel.prepareDiaryShowLayout()
-
         launchAndRepeatOnViewLifeCycleStarted {
             diaryShowViewModel.weather1
                 .collectLatest { value: Weather ->
@@ -545,13 +555,7 @@ class CalendarFragment : BaseFragment() {
             scrollToTop()
             return
         }
-        // MEMO:StateFlowに現在値と同じ値を代入してもCollectメソッドに登録した処理が起動しないため、
-        //      下記条件でカレンダースクロールのみ処理。
-        if (mainViewModel.selectedDate.value == LocalDate.now()) {
-            scrollCalendar(LocalDate.now())
-        } else {
-            mainViewModel.onCalendarDayClicked(LocalDate.now())
-        }
+        mainViewModel.onNavigationItemReselected()
     }
 
     // 先頭へ自動スクロール
