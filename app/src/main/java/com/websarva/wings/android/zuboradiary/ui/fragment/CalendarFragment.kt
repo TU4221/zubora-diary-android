@@ -550,7 +550,7 @@ class CalendarFragment : BaseFragment() {
     }
 
     // 選択中ボトムナビゲーションタブを再選択時の処理
-    internal fun processOnReselectNavigationItem() {
+    internal fun onNavigationItemReselected() {
         if (binding.nestedScrollFullScreen.canScrollVertically(-1)) {
             scrollToTop()
             return

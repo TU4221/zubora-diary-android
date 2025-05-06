@@ -476,11 +476,11 @@ class MainActivity : LoggingActivity() {
             if (menuItem.toString() == getString(R.string.title_list)) {
                 if (showedFragment !is DiaryListFragment) return
 
-                showedFragment.processOnReSelectNavigationItem()
+                showedFragment.onNavigationItemReselected()
             } else if (menuItem.toString() == getString(R.string.title_calendar)) {
                 if (showedFragment !is CalendarFragment) return
 
-                showedFragment.processOnReselectNavigationItem()
+                showedFragment.onNavigationItemReselected()
             }
         }
     }

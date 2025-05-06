@@ -331,7 +331,7 @@ class DiaryListFragment : BaseFragment() {
         navController.navigate(directions)
     }
 
-    internal fun processOnReSelectNavigationItem() {
+    internal fun onNavigationItemReselected() {
         scrollDiaryListToFirstPosition()
     }
 
