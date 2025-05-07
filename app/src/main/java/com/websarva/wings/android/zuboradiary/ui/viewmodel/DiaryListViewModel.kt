@@ -10,14 +10,18 @@ import com.websarva.wings.android.zuboradiary.ui.model.DiaryListAppMessage
 import com.websarva.wings.android.zuboradiary.ui.adapter.diary.diary.DiaryDayList
 import com.websarva.wings.android.zuboradiary.ui.adapter.diary.diary.DiaryDayListItem
 import com.websarva.wings.android.zuboradiary.ui.adapter.diary.diary.DiaryYearMonthList
+import com.websarva.wings.android.zuboradiary.ui.model.action.DiaryListFragmentAction
+import com.websarva.wings.android.zuboradiary.ui.model.action.FragmentAction
 import com.websarva.wings.android.zuboradiary.ui.utils.requireValue
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import java.time.LocalDate
+import java.time.Year
 import java.time.YearMonth
 import java.time.temporal.TemporalAdjusters
 import java.util.concurrent.CancellationException
@@ -75,6 +79,13 @@ internal class DiaryListViewModel @Inject constructor(private val diaryRepositor
     private val initialSortConditionDate: LocalDate? = null
     private var sortConditionDate: LocalDate? = initialSortConditionDate
 
+    // Fragment処理
+    private val initialFragmentAction = FragmentAction.None
+    private val _fragmentAction: MutableStateFlow<FragmentAction> =
+        MutableStateFlow(initialFragmentAction)
+    val fragmentAction: StateFlow<FragmentAction>
+        get() = _fragmentAction
+
     override fun initialize() {
         super.initialize()
         diaryListLoadingJob = initialDiaryListLoadingJob
@@ -83,25 +94,79 @@ internal class DiaryListViewModel @Inject constructor(private val diaryRepositor
         shouldUpdateDiaryList = initialShouldUpdateDiaryList
         _isVisibleUpdateProgressBar.value = initialIsVisibleUpdateProgressBar
         sortConditionDate = initialSortConditionDate
+        _fragmentAction.value = initialFragmentAction
     }
 
-    suspend fun loadDiaryListOnSetUp() {
-        val diaryList = this.diaryList.value
-        if (diaryList.isEmpty) {
-            val numSavedDiaries = diaryRepository.countDiaries()
-            if (numSavedDiaries >= 1) loadNewDiaryList()
-        } else {
-            if (!shouldUpdateDiaryList) return
+    // ViewClicked処理
+    fun onWordSearchMenuClicked() {
+        navigateWordSearchFragment()
+    }
 
-            updateDiaryList()
+    fun onNavigationClicked() {
+        viewModelScope.launch(Dispatchers.IO) {
+            navigateStartYearMonthPickerDialog()
         }
     }
 
-    fun loadNewDiaryList() {
+    fun onDiaryListItemClicked(date: LocalDate) {
+        navigateDiaryShowFragment(date)
+    }
+
+    fun onDiaryListItemDeleteButtonClicked(date: LocalDate, uri: Uri?) {
+        navigateDiaryDeleteDialog(date, uri)
+    }
+
+    fun onDiaryEditButtonClicked() {
+        navigateDiaryEditFragment()
+    }
+
+    // View状態処理
+    fun onDiaryListEndScrolled() {
+        loadAdditionDiaryList()
+    }
+
+    fun onDiaryListUpdated() {
+        clearIsLoadingDiaryList()
+    }
+
+    // Fragmentデータ受取処理
+    fun onDataReceivedFromDatePickerDialog(yearMonth: YearMonth) {
+        updateSortConditionDate(yearMonth)
+        updateFragmentAction(DiaryListFragmentAction.ScrollDiaryListTop)
+        loadNewDiaryList()
+    }
+
+    fun onDataReceivedFromDiaryDeleteDialog(date: LocalDate, uri: Uri?) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val isSuccessful = deleteDiary(date)
+            if (!isSuccessful) return@launch
+
+            if (uri == null) return@launch
+            updateFragmentAction(
+                DiaryListFragmentAction.ReleasePersistablePermissionUri(uri)
+            )
+        }
+    }
+
+    fun prepareDiaryList() {
+        viewModelScope.launch(Dispatchers.IO) {
+            val diaryList = diaryList.value
+            if (diaryList.isEmpty) {
+                val numSavedDiaries = diaryRepository.countDiaries()
+                if (numSavedDiaries >= 1) loadNewDiaryList()
+            } else {
+                if (!shouldUpdateDiaryList) return@launch
+
+                updateDiaryList()
+            }
+        }
+    }
+
+    private fun loadNewDiaryList() {
         loadDiaryList(NewDiaryListCreator())
     }
 
-    fun loadAdditionDiaryList() {
+    private fun loadAdditionDiaryList() {
         loadDiaryList(AddedDiaryListCreator())
     }
 
@@ -246,12 +311,12 @@ internal class DiaryListViewModel @Inject constructor(private val diaryRepositor
         return numLoadedDiaries < numExistingDiaries
     }
 
-    fun updateSortConditionDate(yearMonth: YearMonth) {
+    private fun updateSortConditionDate(yearMonth: YearMonth) {
         Log.i(logTag, "日記リスト先頭年月更新 = $yearMonth")
         sortConditionDate = yearMonth.atDay(1).with(TemporalAdjusters.lastDayOfMonth())
     }
 
-    suspend fun deleteDiary(date: LocalDate): Boolean {
+    private suspend fun deleteDiary(date: LocalDate): Boolean {
         val logMsg = "日記削除"
         Log.i(logTag, "${logMsg}_開始")
         try {
@@ -278,7 +343,7 @@ internal class DiaryListViewModel @Inject constructor(private val diaryRepositor
         }
     }
 
-    suspend fun loadNewestSavedDiaryDate(): LocalDate? {
+    private suspend fun loadNewestSavedDiaryDate(): LocalDate? {
         try {
             val diaryEntity = diaryRepository.loadNewestDiary() ?: return null
             val dateString = diaryEntity.date
@@ -290,7 +355,7 @@ internal class DiaryListViewModel @Inject constructor(private val diaryRepositor
         }
     }
 
-    suspend fun loadOldestSavedDiaryDate(): LocalDate? {
+    private suspend fun loadOldestSavedDiaryDate(): LocalDate? {
         try {
             val diaryEntity = diaryRepository.loadOldestDiary() ?: return null
             val dateString = diaryEntity.date
@@ -302,7 +367,45 @@ internal class DiaryListViewModel @Inject constructor(private val diaryRepositor
         }
     }
 
-    fun clearIsLoadingDiaryList() {
+    private fun clearIsLoadingDiaryList() {
         _isLoadingDiaryList.value = false
+    }
+
+    // FragmentAction関係
+    private fun updateFragmentAction(action: FragmentAction) {
+        _fragmentAction.value = action
+    }
+
+    fun clearFragmentAction() {
+        _fragmentAction.value = initialFragmentAction
+    }
+
+    private fun navigateDiaryShowFragment(date: LocalDate) {
+        updateFragmentAction(DiaryListFragmentAction.NavigateDiaryShowFragment(date))
+    }
+
+    private fun navigateDiaryEditFragment() {
+        val today = LocalDate.now()
+        updateFragmentAction(DiaryListFragmentAction.NavigateDiaryEditFragment(today))
+    }
+
+    private fun navigateWordSearchFragment() {
+        updateFragmentAction(DiaryListFragmentAction.NavigateWordSearchFragment)
+    }
+
+    private suspend fun navigateStartYearMonthPickerDialog() {
+        val newestDiaryDate = loadNewestSavedDiaryDate()
+        val oldestDiaryDate = loadOldestSavedDiaryDate()
+        if (newestDiaryDate == null) return
+        if (oldestDiaryDate == null) return
+        val newestYear = Year.of(newestDiaryDate.year)
+        val oldestYear = Year.of(oldestDiaryDate.year)
+        updateFragmentAction(
+            DiaryListFragmentAction.NavigateStartYearMonthPickerDialog(newestYear, oldestYear)
+        )
+    }
+
+    private fun navigateDiaryDeleteDialog(date: LocalDate, uri: Uri?) {
+        updateFragmentAction(DiaryListFragmentAction.NavigateDiaryDeleteDialog(date, uri))
     }
 }

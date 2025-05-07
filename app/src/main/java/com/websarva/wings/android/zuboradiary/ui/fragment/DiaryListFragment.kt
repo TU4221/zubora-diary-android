@@ -9,7 +9,6 @@ import android.view.ViewGroup
 import androidx.annotation.MainThread
 import androidx.databinding.ViewDataBinding
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination
 import androidx.recyclerview.widget.RecyclerView
@@ -28,11 +27,10 @@ import com.websarva.wings.android.zuboradiary.ui.viewmodel.DiaryListViewModel
 import com.websarva.wings.android.zuboradiary.ui.adapter.diary.diary.DiaryYearMonthList
 import com.websarva.wings.android.zuboradiary.ui.adapter.diary.diary.DiaryYearMonthListAdapter
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.StartYearMonthPickerDialogFragment
+import com.websarva.wings.android.zuboradiary.ui.model.action.DiaryListFragmentAction
+import com.websarva.wings.android.zuboradiary.ui.model.action.FragmentAction
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import java.time.LocalDate
 import java.time.Year
 import java.time.YearMonth
@@ -78,6 +76,7 @@ class DiaryListFragment : BaseFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        setUpFragmentAction()
         setUpToolBar()
         setUpFloatActionButton()
         setUpDiaryList()
@@ -103,9 +102,7 @@ class DiaryListFragment : BaseFragment() {
             receiveResulFromDialog<YearMonth>(StartYearMonthPickerDialogFragment.KEY_SELECTED_YEAR_MONTH)
                 ?: return
 
-        mainViewModel.updateSortConditionDate(selectedYearMonth)
-        scrollDiaryListToFirstPosition()
-        mainViewModel.loadNewDiaryList()
+        mainViewModel.onDataReceivedFromDatePickerDialog(selectedYearMonth)
     }
 
     // 日記削除ダイアログフラグメントから結果受取
@@ -113,16 +110,50 @@ class DiaryListFragment : BaseFragment() {
         val deleteDiaryDate =
             receiveResulFromDialog<LocalDate>(DiaryListDeleteDialogFragment.KEY_DELETE_DIARY_DATE)
                 ?: return
+        val deleteDiaryPictureUri =
+            receiveResulFromDialog<Uri>(DiaryListDeleteDialogFragment.KEY_DELETE_DIARY_PICTURE_URI)
 
-        lifecycleScope.launch(Dispatchers.IO) {
-            val isSuccessful = mainViewModel.deleteDiary(deleteDiaryDate)
-            if (!isSuccessful) return@launch
+        mainViewModel.onDataReceivedFromDiaryDeleteDialog(deleteDiaryDate, deleteDiaryPictureUri)
+    }
 
-            val deleteDiaryPictureUri =
-                receiveResulFromDialog<Uri>(DiaryListDeleteDialogFragment.KEY_DELETE_DIARY_PICTURE_URI)
-                    ?: return@launch
-            pictureUriPermissionManager
-                .releasePersistablePermission(requireContext(), deleteDiaryPictureUri)
+    private fun setUpFragmentAction() {
+        launchAndRepeatOnViewLifeCycleStarted {
+            mainViewModel.fragmentAction.collect { value: FragmentAction ->
+                when (value) {
+                    is DiaryListFragmentAction.NavigateDiaryShowFragment -> {
+                        navigateDiaryShowFragment(value.date)
+                    }
+                    is DiaryListFragmentAction.NavigateDiaryEditFragment -> {
+                        navigateDiaryEditFragment()
+                    }
+                    is DiaryListFragmentAction.NavigateWordSearchFragment -> {
+                        navigateWordSearchFragment()
+                    }
+                    is DiaryListFragmentAction.NavigateStartYearMonthPickerDialog -> {
+                        navigateStartYearMonthPickerDialog(value.newestYear, value.oldestYear)
+                    }
+                    is DiaryListFragmentAction.NavigateDiaryDeleteDialog -> {
+                        navigateDiaryDeleteDialog(value.date, value.uri)
+                    }
+                    is DiaryListFragmentAction.ScrollDiaryListTop -> {
+                        scrollDiaryListToFirstPosition()
+                    }
+                    is DiaryListFragmentAction.ReleasePersistablePermissionUri -> {
+                        pictureUriPermissionManager
+                            .releasePersistablePermission(requireContext(), value.uri)
+                    }
+                    FragmentAction.NavigatePreviousFragment -> {
+                        navController.navigateUp()
+                    }
+                    FragmentAction.None -> {
+                        // 処理なし
+                    }
+                    else -> {
+                        throw IllegalArgumentException()
+                    }
+                }
+                mainViewModel.clearFragmentAction()
+            }
         }
     }
 
@@ -130,26 +161,15 @@ class DiaryListFragment : BaseFragment() {
     private fun setUpToolBar() {
         binding.materialToolbarTopAppBar
             .setNavigationOnClickListener {
-                lifecycleScope.launch(Dispatchers.IO) {
-                    // リスト先頭年月切り替えダイアログ起動
-                    val newestDiaryDate = mainViewModel.loadNewestSavedDiaryDate()
-                    val oldestDiaryDate = mainViewModel.loadOldestSavedDiaryDate()
-                    if (newestDiaryDate == null) return@launch
-                    if (oldestDiaryDate == null) return@launch
-
-                    val newestYear = Year.of(newestDiaryDate.year)
-                    val oldestYear = Year.of(oldestDiaryDate.year)
-                    withContext(Dispatchers.Main) {
-                        navigateStartYearMonthPickerDialog(newestYear, oldestYear)
-                    }
-                }
+                // リスト先頭年月切り替えダイアログ起動
+                mainViewModel.onNavigationClicked()
             }
 
         binding.materialToolbarTopAppBar
             .setOnMenuItemClickListener { item: MenuItem ->
                 // ワード検索フラグメント起動
                 if (item.itemId == R.id.diaryListToolbarOptionWordSearch) {
-                    navigateWordSearchFragment()
+                    mainViewModel.onWordSearchMenuClicked()
                     return@setOnMenuItemClickListener true
                 }
                 false
@@ -159,7 +179,7 @@ class DiaryListFragment : BaseFragment() {
     // 新規作成FAB設定
     private fun setUpFloatActionButton() {
         binding.floatingActionButtonDiaryEdit.setOnClickListener {
-            navigateDiaryEditFragment()
+            mainViewModel.onDiaryEditButtonClicked()
         }
     }
 
@@ -175,18 +195,18 @@ class DiaryListFragment : BaseFragment() {
             build()
             onClickChildItemListener =
                 OnClickChildItemListener { item: DiaryDayListBaseItem ->
-                    navigateDiaryShowFragment(item.date)
+                    mainViewModel.onDiaryListItemClicked(item.date)
                 }
             onClickChildItemBackgroundButtonListener =
                 OnClickChildItemBackgroundButtonListener { item: DiaryDayListBaseItem ->
                     if (item !is DiaryDayListItem) throw IllegalStateException()
-                    navigateDiaryDeleteDialog(item.date, item.picturePath)
+                    mainViewModel.onDiaryListItemDeleteButtonClicked(item.date, item.picturePath)
                 }
             registerAdapterDataObserver(
                 object : RecyclerView.AdapterDataObserver() {
 
                     override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
-                        mainViewModel.clearIsLoadingDiaryList()
+                        mainViewModel.onDiaryListUpdated()
                     }
                 }
             )
@@ -207,9 +227,7 @@ class DiaryListFragment : BaseFragment() {
                 }
         }
 
-        lifecycleScope.launch(Dispatchers.IO) {
-            mainViewModel.loadDiaryListOnSetUp()
-        }
+        mainViewModel.prepareDiaryList()
 
         navController.addOnDestinationChangedListener(DiaryListUpdateSetupListener())
     }
@@ -220,7 +238,7 @@ class DiaryListFragment : BaseFragment() {
     ) : DiaryYearMonthListAdapter(recyclerView, themeColor) {
 
         override fun loadListOnScrollEnd() {
-            mainViewModel.loadAdditionDiaryList()
+            mainViewModel.onDiaryListEndScrolled()
         }
 
         override fun canLoadList(): Boolean {
