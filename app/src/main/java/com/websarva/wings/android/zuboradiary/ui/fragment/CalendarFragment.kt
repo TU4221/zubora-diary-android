@@ -2,6 +2,7 @@ package com.websarva.wings.android.zuboradiary.ui.fragment
 
 import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -15,8 +16,10 @@ import androidx.lifecycle.lifecycleScope
 import com.kizitonwose.calendar.core.CalendarDay
 import com.kizitonwose.calendar.core.CalendarMonth
 import com.kizitonwose.calendar.core.DayPosition
+import com.kizitonwose.calendar.view.CalendarView
 import com.kizitonwose.calendar.view.MonthDayBinder
 import com.kizitonwose.calendar.view.MonthHeaderFooterBinder
+import com.kizitonwose.calendar.view.MonthScrollListener
 import com.kizitonwose.calendar.view.ViewContainer
 import com.websarva.wings.android.zuboradiary.R
 import com.websarva.wings.android.zuboradiary.ui.model.AppMessage
@@ -41,6 +44,7 @@ import com.websarva.wings.android.zuboradiary.ui.model.action.CalendarFragmentAc
 import com.websarva.wings.android.zuboradiary.ui.model.action.FragmentAction
 import com.websarva.wings.android.zuboradiary.ui.utils.toJapaneseDateString
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.DiaryShowViewModel
+import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
@@ -176,6 +180,9 @@ class CalendarFragment : BaseFragment() {
                     is CalendarFragmentAction.ScrollCalendar -> {
                         scrollCalendar(value.date)
                     }
+                    is CalendarFragmentAction.SmoothScrollCalendar -> {
+                        smoothScrollCalendar(value.date)
+                    }
                     FragmentAction.NavigatePreviousFragment -> {
                         navController.navigateUp()
                     }
@@ -201,6 +208,7 @@ class CalendarFragment : BaseFragment() {
         val startMonth = currentMonth.minusMonths(60) //現在から過去5年分
         val endMonth = currentMonth.plusMonths(60) //現在から未来5年分
         calendar.setup(startMonth, endMonth, daysOfWeek[0])
+        mainViewModel.prepareCalendar()
 
         launchAndRepeatOnViewLifeCycleStarted {
             mainViewModel.selectedDate
@@ -209,7 +217,6 @@ class CalendarFragment : BaseFragment() {
                         binding.calendar.dayBinder as CalendarMonthDayBinder
                     calendarMonthDayBinder.updateSelectedDate(value)
                     binding.calendar.notifyDateChanged(value) // 今回選択日付更新
-                    scrollCalendar(value)
                     updateToolBarDate(value)
                     mainViewModel.onChangedSelectedDate()
                 }
@@ -417,35 +424,97 @@ class CalendarFragment : BaseFragment() {
         val binding: LayoutCalendarHeaderBinding = LayoutCalendarHeaderBinding.bind(view)
     }
 
-    // カレンダーを指定した日付へ自動スクロール
     private fun scrollCalendar(date: LocalDate) {
         val targetYearMonth = YearMonth.of(date.year, date.monthValue)
-        val currentMonth = binding.calendar.findFirstVisibleMonth()
-        if (currentMonth == null) {
+        binding.calendar.scrollToMonth(targetYearMonth)
+    }
+
+    // カレンダーを指定した日付へ自動スクロール
+    private fun smoothScrollCalendar(date: LocalDate) {
+        val targetYearMonth = YearMonth.of(date.year, date.monthValue)
+        val visibleMonth = binding.calendar.findFirstVisibleMonth()
+        if (visibleMonth == null) {
             binding.calendar.scrollToMonth(targetYearMonth)
             return
         }
 
-        val currentYearMonth = currentMonth.yearMonth
+        val visibleYearMonth = visibleMonth.yearMonth
 
         // MEMO:カレンダーが今日の日付月から遠い月を表示していたらsmoothScrollの処理時間が延びるので、
         //      間にScroll処理を入れる。
-        if (currentYearMonth.isAfter(targetYearMonth)) {
-            val firstSwitchPoint = currentYearMonth.minusMonths(3)
-            val secondSwitchPoint = targetYearMonth.plusMonths(6)
-            if (currentYearMonth.isAfter(secondSwitchPoint)) {
+        if (visibleYearMonth.isAfter(targetYearMonth)) {
+            val firstSwitchPoint = visibleYearMonth.minusMonths(3)
+            val secondSwitchPoint = targetYearMonth.plusMonths(3)
+            if (firstSwitchPoint.isAfter(secondSwitchPoint)) {
+                binding.calendar.monthScrollListener =
+                    MonthLongScrollListener(
+                        binding.calendar,
+                        firstSwitchPoint,
+                        secondSwitchPoint,
+                        targetYearMonth
+                    )
                 binding.calendar.smoothScrollToMonth(firstSwitchPoint)
-                binding.calendar.scrollToMonth(secondSwitchPoint)
+                return
             }
         } else {
-            val firstSwitchPoint = currentYearMonth.plusMonths(3)
-            val secondSwitchPoint = targetYearMonth.minusMonths(6)
-            if (currentYearMonth.isBefore(secondSwitchPoint)) {
+            val firstSwitchPoint = visibleYearMonth.plusMonths(3)
+            val secondSwitchPoint = targetYearMonth.minusMonths(3)
+            if (firstSwitchPoint.isBefore(secondSwitchPoint)) {
+                binding.calendar.monthScrollListener =
+                    MonthLongScrollListener(
+                        binding.calendar,
+                        firstSwitchPoint,
+                        secondSwitchPoint,
+                        targetYearMonth
+                    )
                 binding.calendar.smoothScrollToMonth(firstSwitchPoint)
-                binding.calendar.scrollToMonth(secondSwitchPoint)
+                return
             }
         }
+
+        binding.calendar.monthScrollListener =
+            MisalignedMonthScrollListener(binding.calendar, targetYearMonth)
         binding.calendar.smoothScrollToMonth(targetYearMonth)
+    }
+
+    private class MonthLongScrollListener(
+        private val calendar: CalendarView,
+        private val firstSwitchYearMonth: YearMonth,
+        private val secondSwitchYearMonth: YearMonth,
+        private val targetYearMonth: YearMonth
+    ) : MonthScrollListener {
+        override fun invoke(calendarMonth: CalendarMonth) {
+            if (calendarMonth.yearMonth == firstSwitchYearMonth) {
+                calendar.scrollToMonth(secondSwitchYearMonth)
+                return
+            }
+            calendar.monthScrollListener =
+                MisalignedMonthScrollListener(calendar, targetYearMonth)
+            calendar.smoothScrollToMonth(targetYearMonth)
+        }
+    }
+
+    // HACK:CalendarView#smoothScrollToMonth()を使用してカレンダーをスクロールさせる時、
+    //      表示中カレンダー月と目的カレンダー月の差が5ケ月以上ある状態でsmoothScrollToMonth()を呼び出すと、
+    //      まったく異なるカレンダー月へスクロールする不具合が発生する。
+    //      この不具合はアプリ起動後、一度発生したら発生しなくなる。
+    //      CalendarView#smoothScrollToMonth()、又はscrollToMonth()は、
+    //      CalendarFragment#scrollCalendar()内でしか使用していない為、CalendarViewの不具合の可能性が考えられる。
+    private class MisalignedMonthScrollListener(
+        private val calendar: CalendarView,
+        private val targetYearMonth: YearMonth
+    ) : MonthScrollListener {
+
+        val logTag = createLogTag()
+
+        override fun invoke(calendarMonth: CalendarMonth) {
+            Log.d(logTag, "MisalignedMonthScrollListener_calendarMonth: $calendarMonth")
+            if (calendarMonth.yearMonth == targetYearMonth) {
+                calendar.monthScrollListener = null
+                return
+            }
+            calendar.scrollToMonth(targetYearMonth)
+        }
     }
 
     private fun updateToolBarDate(date: LocalDate) {

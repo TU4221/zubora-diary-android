@@ -60,22 +60,19 @@ internal class CalendarViewModel @Inject constructor(
         // MEMO:StateFlowに現在値と同じ値を代入してもCollectメソッドに登録した処理が起動しないため、
         //      下記条件でカレンダースクロールのみ処理。
         val today = LocalDate.now()
-        if (selectedDate.value == LocalDate.now()) {
-            updateFragmentAction(
-                CalendarFragmentAction.ScrollCalendar(today)
-            )
-        } else {
-            updateSelectedDate(today)
-        }
+        updateSelectedDate(today)
+        updateFragmentAction(CalendarFragmentAction.SmoothScrollCalendar(today))
     }
 
     // 他Fragmentからの受取処理
     fun onDataReceivedFromDiaryShowFragment(date: LocalDate) {
         updateSelectedDate(date)
+        updateFragmentAction(CalendarFragmentAction.ScrollCalendar(date))
     }
 
     fun onDataReceivedFromDiaryEditFragment(date: LocalDate) {
         updateSelectedDate(date)
+        updateFragmentAction(CalendarFragmentAction.ScrollCalendar(date))
     }
 
     fun onChangedSelectedDate() {
@@ -93,6 +90,11 @@ internal class CalendarViewModel @Inject constructor(
             CalendarFragmentAction.CloseDiary
         }
         updateFragmentAction(action)
+    }
+
+    fun prepareCalendar() {
+        val targetDate = selectedDate.value
+        updateFragmentAction(CalendarFragmentAction.ScrollCalendar(targetDate))
     }
 
     private fun updateSelectedDate(date: LocalDate) {

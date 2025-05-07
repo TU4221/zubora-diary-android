@@ -10,4 +10,5 @@ internal sealed class CalendarFragmentAction : FragmentAction() {
     data class ShowDiary(val date: LocalDate) : CalendarFragmentAction()
     data object CloseDiary : CalendarFragmentAction()
     data class ScrollCalendar(val date: LocalDate) : CalendarFragmentAction()
+    data class SmoothScrollCalendar(val date: LocalDate) : CalendarFragmentAction()
 }
