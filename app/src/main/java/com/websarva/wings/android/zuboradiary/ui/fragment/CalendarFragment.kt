@@ -166,7 +166,7 @@ class CalendarFragment : BaseFragment() {
 
     private fun setUpFragmentAction() {
         launchAndRepeatOnViewLifeCycleStarted {
-            mainViewModel.fragmentAction.collectLatest { value: FragmentAction ->
+            mainViewModel.fragmentAction.collect { value: FragmentAction ->
                 when (value) {
                     is CalendarFragmentAction.NavigateDiaryEditFragment -> {
                         navigateDiaryEditFragment(value.date, !value.isNewDiary)

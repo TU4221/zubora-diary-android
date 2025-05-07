@@ -347,7 +347,7 @@ class DiaryEditFragment : BaseFragment() {
 
     private fun setUpFragmentAction() {
         launchAndRepeatOnViewLifeCycleStarted {
-            mainViewModel.fragmentAction.collectLatest { value: FragmentAction ->
+            mainViewModel.fragmentAction.collect { value: FragmentAction ->
                 when (value) {
                     is DiaryEditFragmentAction.NavigateDiaryShowFragment -> {
                         pictureUriPermissionManager

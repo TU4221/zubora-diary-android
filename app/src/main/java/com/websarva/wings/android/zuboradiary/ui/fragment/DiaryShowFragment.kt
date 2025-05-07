@@ -141,7 +141,7 @@ internal class DiaryShowFragment : BaseFragment() {
 
     private fun setUpFragmentAction() {
         launchAndRepeatOnViewLifeCycleStarted {
-            mainViewModel.fragmentAction.collectLatest { value: FragmentAction ->
+            mainViewModel.fragmentAction.collect { value: FragmentAction ->
                 when (value) {
                     is DiaryShowFragmentAction.NavigateDiaryEditFragment -> {
                         navigateDiaryEditFragment(value.date)
