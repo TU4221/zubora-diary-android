@@ -169,7 +169,7 @@ class CalendarFragment : BaseFragment() {
             mainViewModel.fragmentAction.collectLatest { value: FragmentAction ->
                 when (value) {
                     is CalendarFragmentAction.NavigateDiaryEditFragment -> {
-                        showDiaryEditFragment(value.date, !value.isNewDiary)
+                        navigateDiaryEditFragment(value.date, !value.isNewDiary)
                     }
                     is CalendarFragmentAction.ShowDiary -> {
                         showDiary(value.date)
@@ -633,7 +633,7 @@ class CalendarFragment : BaseFragment() {
     }
 
     @MainThread
-    private fun showDiaryEditFragment(date: LocalDate, shouldLoadDiary: Boolean) {
+    private fun navigateDiaryEditFragment(date: LocalDate, shouldLoadDiary: Boolean) {
         if (!canNavigateFragment) return
 
         val directions =
