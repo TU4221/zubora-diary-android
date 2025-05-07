@@ -64,10 +64,6 @@ internal class DiaryListViewModel @Inject constructor(private val diaryRepositor
     val isLoadingDiaryList
         get() = _isLoadingDiaryList.asStateFlow()
 
-    // MEMO:画面回転時の不要なアップデートを防ぐ
-    private val initialShouldUpdateDiaryList = false
-    var shouldUpdateDiaryList = initialShouldUpdateDiaryList
-
     /**
      * データベース読込からRecyclerViewへの反映までを true とする。
      */
@@ -91,7 +87,6 @@ internal class DiaryListViewModel @Inject constructor(private val diaryRepositor
         diaryListLoadingJob = initialDiaryListLoadingJob
         _diaryList.value = initialDiaryList
         _isLoadingDiaryList.value = initialIsLoadingDiaryList
-        shouldUpdateDiaryList = initialShouldUpdateDiaryList
         _isVisibleUpdateProgressBar.value = initialIsVisibleUpdateProgressBar
         sortConditionDate = initialSortConditionDate
         _fragmentAction.value = initialFragmentAction
@@ -155,8 +150,6 @@ internal class DiaryListViewModel @Inject constructor(private val diaryRepositor
                 val numSavedDiaries = diaryRepository.countDiaries()
                 if (numSavedDiaries >= 1) loadNewDiaryList()
             } else {
-                if (!shouldUpdateDiaryList) return@launch
-
                 updateDiaryList()
             }
         }
@@ -172,7 +165,6 @@ internal class DiaryListViewModel @Inject constructor(private val diaryRepositor
 
     private fun updateDiaryList() {
         loadDiaryList(UpdateDiaryListCreator())
-        shouldUpdateDiaryList = false
     }
 
     // MEMO:List読込JobをViewModel側で管理(読込重複防止)
