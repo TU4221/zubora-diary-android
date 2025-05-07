@@ -140,7 +140,7 @@ class DiaryListFragment : BaseFragment() {
                     val newestYear = Year.of(newestDiaryDate.year)
                     val oldestYear = Year.of(oldestDiaryDate.year)
                     withContext(Dispatchers.Main) {
-                        showStartYearMonthPickerDialog(newestYear, oldestYear)
+                        navigateStartYearMonthPickerDialog(newestYear, oldestYear)
                     }
                 }
             }
@@ -149,7 +149,7 @@ class DiaryListFragment : BaseFragment() {
             .setOnMenuItemClickListener { item: MenuItem ->
                 // ワード検索フラグメント起動
                 if (item.itemId == R.id.diaryListToolbarOptionWordSearch) {
-                    showWordSearchFragment()
+                    navigateWordSearchFragment()
                     return@setOnMenuItemClickListener true
                 }
                 false
@@ -159,7 +159,7 @@ class DiaryListFragment : BaseFragment() {
     // 新規作成FAB設定
     private fun setUpFloatActionButton() {
         binding.floatingActionButtonDiaryEdit.setOnClickListener {
-            showEditDiary()
+            navigateEditDiary()
         }
     }
 
@@ -175,12 +175,12 @@ class DiaryListFragment : BaseFragment() {
             build()
             onClickChildItemListener =
                 OnClickChildItemListener { item: DiaryDayListBaseItem ->
-                    showShowDiaryFragment(item.date)
+                    navigateShowDiaryFragment(item.date)
                 }
             onClickChildItemBackgroundButtonListener =
                 OnClickChildItemBackgroundButtonListener { item: DiaryDayListBaseItem ->
                     if (item !is DiaryDayListItem) throw IllegalStateException()
-                    showDiaryDeleteDialog(item.date, item.picturePath)
+                    navigateDiaryDeleteDialog(item.date, item.picturePath)
                 }
             registerAdapterDataObserver(
                 object : RecyclerView.AdapterDataObserver() {
@@ -273,7 +273,7 @@ class DiaryListFragment : BaseFragment() {
     }
 
     @MainThread
-    private fun showEditDiary() {
+    private fun navigateEditDiary() {
         if (!canNavigateFragment) return
 
         val directions =
@@ -286,7 +286,7 @@ class DiaryListFragment : BaseFragment() {
     }
 
     @MainThread
-    private fun showShowDiaryFragment(date: LocalDate) {
+    private fun navigateShowDiaryFragment(date: LocalDate) {
         if (!canNavigateFragment) return
 
         val directions =
@@ -295,7 +295,7 @@ class DiaryListFragment : BaseFragment() {
     }
 
     @MainThread
-    private fun showWordSearchFragment() {
+    private fun navigateWordSearchFragment() {
         if (!canNavigateFragment) return
 
         val directions =
@@ -304,7 +304,7 @@ class DiaryListFragment : BaseFragment() {
     }
 
     @MainThread
-    private fun showStartYearMonthPickerDialog(newestYear: Year, oldestYear: Year) {
+    private fun navigateStartYearMonthPickerDialog(newestYear: Year, oldestYear: Year) {
         if (!canNavigateFragment) return
 
         val directions =
@@ -316,7 +316,7 @@ class DiaryListFragment : BaseFragment() {
     }
 
     @MainThread
-    private fun showDiaryDeleteDialog(date: LocalDate, pictureUri: Uri?) {
+    private fun navigateDiaryDeleteDialog(date: LocalDate, pictureUri: Uri?) {
         if (!canNavigateFragment) return
 
         val directions =

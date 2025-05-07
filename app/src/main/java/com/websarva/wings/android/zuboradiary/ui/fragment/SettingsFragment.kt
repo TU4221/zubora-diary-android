@@ -83,7 +83,7 @@ class SettingsFragment : BaseFragment() {
                     // 再確認
                     val recheck = mainActivity.isGrantedPostNotifications
                     if (isGranted && recheck) {
-                        showReminderNotificationTimePickerDialog()
+                        navigateReminderNotificationTimePickerDialog()
                     } else {
                         binding.includeReminderNotificationSetting.materialSwitch.isChecked = false
                     }
@@ -265,7 +265,7 @@ class SettingsFragment : BaseFragment() {
 
     private fun setUpThemeColorSettingItem() {
         binding.includeThemeColorSetting.textTitle.setOnClickListener {
-            showThemeColorPickerDialog()
+            navigateThemeColorPickerDialog()
         }
 
         launchAndRepeatOnViewLifeCycleStarted {
@@ -382,7 +382,7 @@ class SettingsFragment : BaseFragment() {
         binding.includeCalendarStartDaySetting.textTitle.setOnClickListener {
             val currentCalendarStartDayOfWeek =
                 settingsViewModel.calendarStartDayOfWeek.requireValue()
-            showCalendarStartDayPickerDialog(currentCalendarStartDayOfWeek)
+            navigateCalendarStartDayPickerDialog(currentCalendarStartDayOfWeek)
         }
 
         launchAndRepeatOnViewLifeCycleStarted {
@@ -446,7 +446,7 @@ class SettingsFragment : BaseFragment() {
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                         requestPostNotificationsPermission()
                     } else {
-                        showReminderNotificationTimePickerDialog()
+                        navigateReminderNotificationTimePickerDialog()
                     }
                 } else {
                     lifecycleScope.launch(Dispatchers.IO) {
@@ -459,7 +459,7 @@ class SettingsFragment : BaseFragment() {
         fun requestPostNotificationsPermission() {
             val isGranted = mainActivity.isGrantedPostNotifications
             if (isGranted) {
-                showReminderNotificationTimePickerDialog()
+                navigateReminderNotificationTimePickerDialog()
             } else {
                 val shouldShowRequestPermissionRationale =
                     ActivityCompat.shouldShowRequestPermissionRationale(
@@ -471,7 +471,7 @@ class SettingsFragment : BaseFragment() {
                 } else {
                     binding.includeReminderNotificationSetting.materialSwitch.isChecked = false
                     val permissionName = getString(R.string.fragment_settings_permission_name_notification)
-                    showPermissionDialog(permissionName)
+                    navigatePermissionDialog(permissionName)
                 }
             }
         }
@@ -546,7 +546,7 @@ class SettingsFragment : BaseFragment() {
                             false
                         val permissionName =
                             getString(R.string.fragment_settings_permission_name_location)
-                        showPermissionDialog(permissionName)
+                        navigatePermissionDialog(permissionName)
                     }
                 }
             } else {
@@ -560,7 +560,7 @@ class SettingsFragment : BaseFragment() {
     private fun setUpAllDiariesDeleteSettingItem() {
         binding.includeAllDiariesDeleteSetting.apply {
             textTitle.setOnClickListener {
-                showAllDiariesDeleteDialog()
+                navigateAllDiariesDeleteDialog()
             }
             textValue.visibility = View.GONE
         }
@@ -569,7 +569,7 @@ class SettingsFragment : BaseFragment() {
     private fun setUpAllSettingsInitializationSettingItem() {
         binding.includeAllSettingsInitializationSetting.apply {
             textTitle.setOnClickListener {
-                showAllSettingsInitializationDialog()
+                navigateAllSettingsInitializationDialog()
             }
             textValue.visibility = View.GONE
         }
@@ -578,7 +578,7 @@ class SettingsFragment : BaseFragment() {
     private fun setUpAllDataDeleteSettingItem() {
         binding.includeAllDataDeleteSetting.apply {
             textTitle.setOnClickListener {
-                showAllDataDeleteDialog()
+                navigateAllDataDeleteDialog()
             }
             textValue.visibility = View.GONE
         }
@@ -606,7 +606,7 @@ class SettingsFragment : BaseFragment() {
     }
 
     @MainThread
-    private fun showThemeColorPickerDialog() {
+    private fun navigateThemeColorPickerDialog() {
         if (!canNavigateFragment) return
 
         val directions =
@@ -615,7 +615,7 @@ class SettingsFragment : BaseFragment() {
     }
 
     @MainThread
-    private fun showCalendarStartDayPickerDialog(dayOfWeek: DayOfWeek) {
+    private fun navigateCalendarStartDayPickerDialog(dayOfWeek: DayOfWeek) {
         if (!canNavigateFragment) return
 
         val directions =
@@ -626,7 +626,7 @@ class SettingsFragment : BaseFragment() {
     }
 
     @MainThread
-    private fun showReminderNotificationTimePickerDialog() {
+    private fun navigateReminderNotificationTimePickerDialog() {
         if (!canNavigateFragment) return
 
         val directions =
@@ -635,7 +635,7 @@ class SettingsFragment : BaseFragment() {
     }
 
     @MainThread
-    private fun showPermissionDialog(permissionName: String) {
+    private fun navigatePermissionDialog(permissionName: String) {
         if (!canNavigateFragment) return
 
         val directions =
@@ -644,7 +644,7 @@ class SettingsFragment : BaseFragment() {
     }
 
     @MainThread
-    private fun showAllDiariesDeleteDialog() {
+    private fun navigateAllDiariesDeleteDialog() {
         if (!canNavigateFragment) return
 
         val directions =
@@ -653,7 +653,7 @@ class SettingsFragment : BaseFragment() {
     }
 
     @MainThread
-    private fun showAllSettingsInitializationDialog() {
+    private fun navigateAllSettingsInitializationDialog() {
         if (!canNavigateFragment) return
 
         val directions =
@@ -662,7 +662,7 @@ class SettingsFragment : BaseFragment() {
     }
 
     @MainThread
-    private fun showAllDataDeleteDialog() {
+    private fun navigateAllDataDeleteDialog() {
         if (!canNavigateFragment) return
 
         val directions =

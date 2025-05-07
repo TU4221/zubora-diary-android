@@ -198,7 +198,7 @@ class DiaryItemTitleEditFragment : BaseFragment() {
             )
         }
         itemTitleSelectionHistoryListAdapter.setOnClickDeleteButtonListener { listItemPosition: Int, listItemTitle: String ->
-            this.showDiaryItemTitleDeleteDialog(
+            this.navigateDiaryItemTitleDeleteDialog(
                 listItemPosition,
                 listItemTitle
             )
@@ -226,11 +226,11 @@ class DiaryItemTitleEditFragment : BaseFragment() {
         savedStateHandle[KEY_UPDATE_ITEM_NUMBER] = targetItemNumber
         savedStateHandle[KEY_NEW_ITEM_TITLE] = newItemTitle
 
-        showDiaryEditFragment()
+        navigateDiaryEditFragment()
     }
 
     @MainThread
-    private fun showDiaryEditFragment() {
+    private fun navigateDiaryEditFragment() {
         if (!canNavigateFragment) return
 
         val directions =
@@ -239,7 +239,7 @@ class DiaryItemTitleEditFragment : BaseFragment() {
     }
 
     @MainThread
-    private fun showDiaryItemTitleDeleteDialog(listItemPosition: Int, listItemTitle: String) {
+    private fun navigateDiaryItemTitleDeleteDialog(listItemPosition: Int, listItemTitle: String) {
         require(listItemPosition >= 0)
         if (!canNavigateFragment) return
 

@@ -145,7 +145,7 @@ class WordSearchFragment : BaseFragment() {
         wordSearchResultListAdapter.build()
         wordSearchResultListAdapter.onClickChildItemListener =
             OnClickChildItemListener { item: DiaryDayListBaseItem ->
-                showShowDiaryFragment(item.date)
+                navigateShowDiaryFragment(item.date)
             }
 
         launchAndRepeatOnViewLifeCycleStarted {
@@ -284,7 +284,7 @@ class WordSearchFragment : BaseFragment() {
     }
 
     @MainThread
-    private fun showShowDiaryFragment(date: LocalDate) {
+    private fun navigateShowDiaryFragment(date: LocalDate) {
         if (!canNavigateFragment) return
 
         val directions =
