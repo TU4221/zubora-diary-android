@@ -159,7 +159,7 @@ class DiaryListFragment : BaseFragment() {
     // 新規作成FAB設定
     private fun setUpFloatActionButton() {
         binding.floatingActionButtonDiaryEdit.setOnClickListener {
-            navigateEditDiary()
+            navigateDiaryEditFragment()
         }
     }
 
@@ -175,7 +175,7 @@ class DiaryListFragment : BaseFragment() {
             build()
             onClickChildItemListener =
                 OnClickChildItemListener { item: DiaryDayListBaseItem ->
-                    navigateShowDiaryFragment(item.date)
+                    navigateDiaryShowFragment(item.date)
                 }
             onClickChildItemBackgroundButtonListener =
                 OnClickChildItemBackgroundButtonListener { item: DiaryDayListBaseItem ->
@@ -273,7 +273,7 @@ class DiaryListFragment : BaseFragment() {
     }
 
     @MainThread
-    private fun navigateEditDiary() {
+    private fun navigateDiaryEditFragment() {
         if (!canNavigateFragment) return
 
         val directions =
@@ -286,7 +286,7 @@ class DiaryListFragment : BaseFragment() {
     }
 
     @MainThread
-    private fun navigateShowDiaryFragment(date: LocalDate) {
+    private fun navigateDiaryShowFragment(date: LocalDate) {
         if (!canNavigateFragment) return
 
         val directions =
