@@ -75,12 +75,14 @@ internal class CalendarViewModel @Inject constructor(
         updateFragmentAction(CalendarFragmentAction.ScrollCalendar(date))
     }
 
+    // StateFlow値変更時処理
     fun onChangedSelectedDate() {
         viewModelScope.launch(Dispatchers.IO) {
             prepareDiaryShowLayout()
         }
     }
 
+    // View変更処理
     private suspend fun prepareDiaryShowLayout() {
         val date = _selectedDate.value
         val exists = existsSavedDiary(date) ?: false
@@ -97,6 +99,7 @@ internal class CalendarViewModel @Inject constructor(
         updateFragmentAction(CalendarFragmentAction.ScrollCalendar(targetDate))
     }
 
+    // データ処理
     private fun updateSelectedDate(date: LocalDate) {
         // MEMO:selectedDateと同日付を選択した時、previousSelectedDateと同値となり、
         //      次に他の日付を選択した時にpreviousSelectedDateのcollectedが起動しなくなる。

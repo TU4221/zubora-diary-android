@@ -354,20 +354,19 @@ internal class DiaryEditViewModel @Inject constructor(
     }
 
     // 他Fragmentからの受取処理
-    fun onReceivedFromItemTitleEditFragment(itemNumber: ItemNumber, itemTitle: String) {
+    fun onDataReceivedFromItemTitleEditFragment(itemNumber: ItemNumber, itemTitle: String) {
         updateItemTitle(itemNumber, itemTitle)
     }
 
-    //
+    // StateFlow値変更時処理
     fun onWeather1Changed() {
         updateWeather2AdapterList()
     }
 
+    // MotionLayout変更時処理
     fun onDiaryItemHidedStateTransitionCompleted(itemNumber: ItemNumber) {
         deleteItem(itemNumber)
     }
-
-
 
     // データ処理
     fun prepareDiary(

@@ -165,7 +165,7 @@ class DiaryEditFragment : BaseFragment() {
                         ).value
                     )
 
-                mainViewModel.onReceivedFromItemTitleEditFragment(itemNumber, value)
+                mainViewModel.onDataReceivedFromItemTitleEditFragment(itemNumber, value)
 
                 val focusTargetView =
                     when (itemNumber.value) {

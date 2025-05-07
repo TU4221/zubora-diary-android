@@ -98,6 +98,7 @@ internal class DiaryShowViewModel @Inject constructor(private val diaryRepositor
         navigatePreviousFragment()
     }
 
+    // DialogButtonClicked処理
     fun onDiaryLoadingFailureDialogPositiveButtonClicked() {
         navigatePreviousFragment()
     }
@@ -108,6 +109,7 @@ internal class DiaryShowViewModel @Inject constructor(private val diaryRepositor
         }
     }
 
+    // データ処理
     fun prepareDiaryForDiaryShowFragment(date: LocalDate) {
         viewModelScope.launch(Dispatchers.IO) {
             loadSavedDiary(date, true)
