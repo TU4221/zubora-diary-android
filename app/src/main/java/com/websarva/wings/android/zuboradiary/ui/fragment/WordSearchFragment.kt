@@ -22,6 +22,8 @@ import com.websarva.wings.android.zuboradiary.ui.adapter.diary.DiaryYearMonthLis
 import com.websarva.wings.android.zuboradiary.ui.adapter.diary.DiaryYearMonthListBaseItem
 import com.websarva.wings.android.zuboradiary.ui.adapter.diary.wordsearchresult.WordSearchResultYearMonthList
 import com.websarva.wings.android.zuboradiary.ui.adapter.diary.wordsearchresult.WordSearchResultYearMonthListAdapter
+import com.websarva.wings.android.zuboradiary.ui.model.action.FragmentAction
+import com.websarva.wings.android.zuboradiary.ui.model.action.WordSearchFragmentAction
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.WordSearchViewModel
 import kotlinx.coroutines.flow.collectLatest
 import java.time.LocalDate
@@ -30,9 +32,6 @@ class WordSearchFragment : BaseFragment() {
     // View関係
     private var _binding: FragmentWordSearchBinding? = null
     private val binding get() = checkNotNull(_binding)
-
-    private var resultWordColor = -1 // 検索結果ワード色
-    private var resultWordBackgroundColor = -1 // 検索結果ワードマーカー色
 
     // ViewModel
     // MEMO:委譲プロパティの委譲先(viewModels())の遅延初期化により"Field is never assigned."と警告が表示される。
@@ -63,16 +62,11 @@ class WordSearchFragment : BaseFragment() {
         super.onViewCreated(view, savedInstanceState)
 
         setUpViewModelInitialization()
-        setUpThemeColor()
+        setUpFragmentAction()
         setUpToolBar()
         setUpWordSearchView()
         setUpWordSearchResultList()
         setUpFloatingActionButton()
-    }
-
-    private fun setUpThemeColor() {
-        resultWordColor = themeColor.getOnTertiaryContainerColor(resources)
-        resultWordBackgroundColor = themeColor.getTertiaryContainerColor(resources)
     }
 
     override fun handleOnReceivingResultFromPreviousFragment() {
@@ -91,6 +85,40 @@ class WordSearchFragment : BaseFragment() {
         navController.addOnDestinationChangedListener(ViewModelInitializationSetupListener())
     }
 
+    private fun setUpFragmentAction() {
+        launchAndRepeatOnViewLifeCycleStarted {
+            mainViewModel.fragmentAction.collect { value: FragmentAction ->
+                when (value) {
+                    is WordSearchFragmentAction.NavigateDiaryShowFragment -> {
+                        navigateDiaryShowFragment(value.date)
+                    }
+                    WordSearchFragmentAction.ShowKeyboard -> {
+                        showKeyboard()
+                    }
+                    WordSearchFragmentAction.ShowResultsInitialLayout -> {
+                        showWordSearchResultsInitialLayout()
+                    }
+                    WordSearchFragmentAction.ShowResultsLayout -> {
+                        showWordSearchResultsLayout()
+                    }
+                    WordSearchFragmentAction.ShowNoResultsLayout -> {
+                        showNoWordSearchResultsLayout()
+                    }
+                    FragmentAction.NavigatePreviousFragment -> {
+                        navController.navigateUp()
+                    }
+                    FragmentAction.None -> {
+                        // 処理なし
+                    }
+                    else -> {
+                        throw IllegalArgumentException()
+                    }
+                }
+                mainViewModel.clearFragmentAction()
+            }
+        }
+    }
+
     private fun setUpToolBar() {
         binding.materialToolbarTopAppBar
             .setNavigationOnClickListener {
@@ -99,35 +127,14 @@ class WordSearchFragment : BaseFragment() {
     }
 
     private fun setUpWordSearchView() {
-        val searchWord = mainViewModel.searchWord.value
-        if (searchWord.isEmpty()) {
-            binding.editTextSearchWord.requestFocus()
-            KeyboardManager().showKeyboard(binding.editTextSearchWord)
-        }
+        mainViewModel.prepareKeyboard()
 
         launchAndRepeatOnViewLifeCycleStarted {
             mainViewModel.searchWord
                 .collectLatest { value: String ->
-                    // HACK:キーワードの入力時と確定時に検索Observerが起動してしまい
-                    //      同じキーワードで二重に検索してしまう。防止策として下記条件追加。
-                    if (!mainViewModel.shouldLoadWordSearchResultList) {
-                        if (mainViewModel.shouldUpdateWordSearchResultList) {
-                            updateWordSearchResultList()
-                        }
-                        return@collectLatest
-                    }
+                    if (value.isNotEmpty()) shouldInitializeListAdapter = true
 
-                    // 検索結果表示Viewは別Observerにて表示
-                    if (value.isEmpty()) {
-                        binding.textNoWordSearchResultsMessage.visibility = View.INVISIBLE
-                        binding.linerLayoutWordSearchResults.visibility = View.INVISIBLE
-                        mainViewModel.initialize()
-                    } else {
-                        shouldInitializeListAdapter = true
-                        mainViewModel
-                            .loadNewWordSearchResultList(resultWordColor, resultWordBackgroundColor)
-                    }
-                    mainViewModel.previousSearchWord = value
+                    mainViewModel.onSearchWordChanged()
                 }
         }
 
@@ -142,10 +149,16 @@ class WordSearchFragment : BaseFragment() {
             binding.editTextSearchWord,
             binding.imageButtonSearchWordClear
         )
+        binding.imageButtonSearchWordClear
+            .setOnClickListener {
+                mainViewModel.onSearchWordClearButtonClicked()
+            }
     }
 
     private fun setUpWordSearchResultList() {
         setUpListAdapter()
+
+        binding.floatingActionButtonTopScroll.hide() // MEMO:初回起動用
 
         launchAndRepeatOnViewLifeCycleStarted {
             mainViewModel.wordSearchResultList
@@ -179,7 +192,7 @@ class WordSearchFragment : BaseFragment() {
             build()
             onClickChildItemListener =
                 OnClickChildItemListener { item: DiaryDayListBaseItem ->
-                    navigateDiaryShowFragment(item.date)
+                    mainViewModel.onWordSearchResultListItemClicked(item.date)
                 }
         }
     }
@@ -190,8 +203,7 @@ class WordSearchFragment : BaseFragment() {
     ) :
         WordSearchResultYearMonthListAdapter(recyclerView, themeColor) {
         override fun loadListOnScrollEnd() {
-            mainViewModel
-                .loadAdditionWordSearchResultList(resultWordColor, resultWordBackgroundColor)
+            mainViewModel.onWordSearchResultListEndScrolled()
         }
 
         override fun canLoadList(): Boolean {
@@ -202,25 +214,6 @@ class WordSearchFragment : BaseFragment() {
     private inner class WordSearchResultListObserver :
         Observer<WordSearchResultYearMonthList> {
         override fun onChanged(value: WordSearchResultYearMonthList) {
-            val searchWord = mainViewModel.searchWord.value
-            if (searchWord.isEmpty()) {
-                binding.apply {
-                    floatingActionButtonTopScroll.hide() // MEMO:初回起動用
-                    textNoWordSearchResultsMessage.visibility = View.INVISIBLE
-                    linerLayoutWordSearchResults.visibility = View.INVISIBLE
-                }
-            } else if (value.isEmpty) {
-                binding.apply {
-                    textNoWordSearchResultsMessage.visibility = View.VISIBLE
-                    linerLayoutWordSearchResults.visibility = View.INVISIBLE
-                }
-            } else {
-                binding.apply {
-                    textNoWordSearchResultsMessage.visibility = View.INVISIBLE
-                    linerLayoutWordSearchResults.visibility = View.VISIBLE
-                }
-            }
-
             if (shouldInitializeListAdapter) {
                 shouldInitializeListAdapter = false
                 setUpListAdapter()
@@ -232,13 +225,9 @@ class WordSearchFragment : BaseFragment() {
             val convertedList: List<DiaryYearMonthListBaseItem> =
                 ArrayList<DiaryYearMonthListBaseItem>(value.itemList)
             listAdapter.submitList(convertedList)
-        }
-    }
 
-    private fun updateWordSearchResultList() {
-        val list = mainViewModel.wordSearchResultList.value
-        if (list.isEmpty) return
-        mainViewModel.updateWordSearchResultList(resultWordColor, resultWordBackgroundColor)
+            mainViewModel.onWordSearchResultListChanged()
+        }
     }
 
     private inner class WordSearchResultListUpdateSetupListener
@@ -298,6 +287,32 @@ class WordSearchFragment : BaseFragment() {
         val adapter = binding.recyclerWordSearchResultList.adapter
         val listAdapter = adapter as WordSearchResultYearMonthListAdapter
         listAdapter.scrollToFirstPosition()
+    }
+
+    private fun showKeyboard() {
+        binding.editTextSearchWord.requestFocus()
+        KeyboardManager().showKeyboard(binding.editTextSearchWord)
+    }
+
+    private fun showWordSearchResultsLayout() {
+        binding.apply {
+            textNoWordSearchResultsMessage.visibility = View.INVISIBLE
+            linerLayoutWordSearchResults.visibility = View.VISIBLE
+        }
+    }
+
+    private fun showNoWordSearchResultsLayout() {
+        binding.apply {
+            textNoWordSearchResultsMessage.visibility = View.VISIBLE
+            linerLayoutWordSearchResults.visibility = View.INVISIBLE
+        }
+    }
+
+    private fun showWordSearchResultsInitialLayout() {
+        binding.apply {
+            textNoWordSearchResultsMessage.visibility = View.INVISIBLE
+            linerLayoutWordSearchResults.visibility = View.INVISIBLE
+        }
     }
 
     @MainThread

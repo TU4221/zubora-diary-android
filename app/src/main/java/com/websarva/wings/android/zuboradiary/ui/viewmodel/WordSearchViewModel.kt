@@ -9,14 +9,18 @@ import com.websarva.wings.android.zuboradiary.ui.model.WordSearchAppMessage
 import com.websarva.wings.android.zuboradiary.ui.adapter.diary.wordsearchresult.WordSearchResultDayList
 import com.websarva.wings.android.zuboradiary.ui.adapter.diary.wordsearchresult.WordSearchResultDayListItem
 import com.websarva.wings.android.zuboradiary.ui.adapter.diary.wordsearchresult.WordSearchResultYearMonthList
+import com.websarva.wings.android.zuboradiary.ui.model.action.FragmentAction
+import com.websarva.wings.android.zuboradiary.ui.model.action.WordSearchFragmentAction
 import com.websarva.wings.android.zuboradiary.ui.utils.requireValue
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import java.time.LocalDate
 import javax.inject.Inject
 
 @HiltViewModel
@@ -37,9 +41,9 @@ internal class WordSearchViewModel @Inject internal constructor(
         get() = _searchWord
 
     private val initialPreviousSearchWord = ""
-    var previousSearchWord = initialPreviousSearchWord // 二重検索防止用
+    private var previousSearchWord = initialPreviousSearchWord // 二重検索防止用
 
-    val shouldLoadWordSearchResultList: Boolean
+    private val shouldLoadWordSearchResultList: Boolean
         get() = _searchWord.value != previousSearchWord
 
     private val initialWordSearchResultListLoadingJob: Job? = null
@@ -79,6 +83,13 @@ internal class WordSearchViewModel @Inject internal constructor(
     private val initialShouldInitializeOnFragmentDestroy = false
     var shouldInitializeOnFragmentDestroy = initialShouldInitializeOnFragmentDestroy
 
+    // Fragment処理
+    private val initialFragmentAction = FragmentAction.None
+    private val _fragmentAction: MutableStateFlow<FragmentAction> =
+        MutableStateFlow(initialFragmentAction)
+    val fragmentAction: StateFlow<FragmentAction>
+        get() = _fragmentAction
+
     override fun initialize() {
         super.initialize()
         _searchWord.value = initialSearchWord
@@ -92,54 +103,92 @@ internal class WordSearchViewModel @Inject internal constructor(
         shouldInitializeOnFragmentDestroy = initialShouldInitializeOnFragmentDestroy
     }
 
-    fun loadNewWordSearchResultList(
-        spannableStringColor: Int,
-        spannableStringBackgroundColor: Int
-    ) {
+    // ViewClicked処理
+    fun onSearchWordClearButtonClicked() {
+        clearSearchWord()
+    }
+
+    fun onWordSearchResultListItemClicked(date: LocalDate) {
+        navigateDiaryShowFragment(date)
+    }
+
+    // View状態処理
+    fun onWordSearchResultListEndScrolled() {
+        loadAdditionWordSearchResultList()
+    }
+
+    // Keyboard処理
+    fun prepareKeyboard() {
+        val searchWord = searchWord.value
+        if (searchWord.isEmpty()) updateFragmentAction(WordSearchFragmentAction.ShowKeyboard)
+    }
+
+    // StateFlow値変更時処理
+    fun onSearchWordChanged() {
+        // HACK:キーワードの入力時と確定時に検索Observerが起動してしまい
+        //      同じキーワードで二重に検索してしまう。防止策として下記条件追加。
+        if (!shouldLoadWordSearchResultList) {
+            if (shouldUpdateWordSearchResultList) {
+                val list = wordSearchResultList.value
+                if (list.isEmpty) return
+                updateWordSearchResultList()
+            }
+            return
+        }
+
+        val value = searchWord.value
+        if (value.isEmpty()) {
+            initialize()
+        } else {
+            loadNewWordSearchResultList()
+        }
+
+        previousSearchWord = value
+    }
+
+    fun onWordSearchResultListChanged() {
+        val searchWord = searchWord.value
+        val wordSearchResultList = wordSearchResultList.value
+        if (searchWord.isEmpty()) {
+            updateFragmentAction(WordSearchFragmentAction.ShowResultsInitialLayout)
+        } else if (wordSearchResultList.isEmpty) {
+            updateFragmentAction(WordSearchFragmentAction.ShowNoResultsLayout)
+        } else {
+            updateFragmentAction(WordSearchFragmentAction.ShowResultsLayout)
+        }
+    }
+
+    private fun clearSearchWord() {
+        _searchWord.value = ""
+    }
+
+    private fun loadNewWordSearchResultList() {
         loadWordSearchResultDiaryList(
-            NewWordSearchResultListCreator(),
-            spannableStringColor,
-            spannableStringBackgroundColor
+            NewWordSearchResultListCreator()
         )
     }
 
-    fun loadAdditionWordSearchResultList(
-        spannableStringColor: Int,
-        spannableStringBackgroundColor: Int
-    ) {
+    private fun loadAdditionWordSearchResultList() {
         loadWordSearchResultDiaryList(
-            AddedWordSearchResultListCreator(),
-            spannableStringColor,
-            spannableStringBackgroundColor
+            AddedWordSearchResultListCreator()
         )
     }
 
-    fun updateWordSearchResultList(
-        spannableStringColor: Int,
-        spannableStringBackgroundColor: Int
-    ) {
+    private fun updateWordSearchResultList() {
         loadWordSearchResultDiaryList(
-            UpdateWordSearchResultListCreator(),
-            spannableStringColor,
-            spannableStringBackgroundColor
+            UpdateWordSearchResultListCreator()
         )
         shouldUpdateWordSearchResultList = false
     }
 
     // MEMO:List読込JobをViewModel側で管理(読込重複防止)
     private fun loadWordSearchResultDiaryList(
-        creator: WordSearchResultListCreator,
-        spannableStringColor: Int,
-        spannableStringBackgroundColor: Int
+        creator: WordSearchResultListCreator
     ) {
         cancelPreviousLoading()
         wordSearchResultListLoadingJob =
             viewModelScope.launch(Dispatchers.IO) {
-                createWordSearchResultList(
-                    creator,
-                    spannableStringColor,
-                    spannableStringBackgroundColor
-                )
+                createWordSearchResultList(creator)
             }
     }
 
@@ -150,16 +199,13 @@ internal class WordSearchViewModel @Inject internal constructor(
     }
 
     private suspend fun createWordSearchResultList(
-        resultListCreator: WordSearchResultListCreator,
-        spannableStringColor: Int,
-        spannableStringBackGroundColor: Int
+        resultListCreator: WordSearchResultListCreator
     ) {
         val logMsg = "ワード検索結果読込"
         Log.i(logTag, "${logMsg}_開始")
         val previousResultList = _wordSearchResultList.requireValue()
         try {
-            val updateResultList =
-                resultListCreator.create(spannableStringColor, spannableStringBackGroundColor)
+            val updateResultList = resultListCreator.create()
             _wordSearchResultList.value = updateResultList
             Log.i(logTag, "${logMsg}_完了")
         } catch (e: CancellationException) {
@@ -174,26 +220,15 @@ internal class WordSearchViewModel @Inject internal constructor(
 
     private fun interface WordSearchResultListCreator {
         @Throws(Exception::class)
-        suspend fun create(
-            spannableStringColor: Int,
-            spannableStringBackGroundColor: Int
-        ): WordSearchResultYearMonthList
+        suspend fun create(): WordSearchResultYearMonthList
     }
 
     private inner class NewWordSearchResultListCreator : WordSearchResultListCreator {
 
         @Throws(Exception::class)
-        override suspend fun create(
-            spannableStringColor: Int,
-            spannableStringBackGroundColor: Int
-        ): WordSearchResultYearMonthList {
+        override suspend fun create(): WordSearchResultYearMonthList {
             showWordSearchResultListFirstItemProgressIndicator()
-            return loadWordSearchResultDiaryList(
-                numLoadingItems,
-                0,
-                spannableStringColor,
-                spannableStringBackGroundColor
-            )
+            return loadWordSearchResultDiaryList(numLoadingItems, 0)
         }
 
         private fun showWordSearchResultListFirstItemProgressIndicator() {
@@ -206,21 +241,13 @@ internal class WordSearchViewModel @Inject internal constructor(
     private inner class AddedWordSearchResultListCreator : WordSearchResultListCreator {
 
         @Throws(Exception::class)
-        override suspend fun create(
-            spannableStringColor: Int,
-            spannableStringBackGroundColor: Int
-        ): WordSearchResultYearMonthList {
+        override suspend fun create(): WordSearchResultYearMonthList {
             val currentResultList = _wordSearchResultList.requireValue()
             check(currentResultList.isNotEmpty)
 
             val loadingOffset = currentResultList.countDiaries()
             val loadedResultList =
-                loadWordSearchResultDiaryList(
-                    numLoadingItems,
-                    loadingOffset,
-                    spannableStringColor,
-                    spannableStringBackGroundColor
-                )
+                loadWordSearchResultDiaryList(numLoadingItems, loadingOffset)
             val numLoadedDiaries =
                 currentResultList.countDiaries() + loadedResultList.countDiaries()
             val existsUnloadedDiaries = existsUnloadedDiaries(numLoadedDiaries)
@@ -231,10 +258,7 @@ internal class WordSearchViewModel @Inject internal constructor(
     private inner class UpdateWordSearchResultListCreator : WordSearchResultListCreator {
 
         @Throws(Exception::class)
-        override suspend fun create(
-            spannableStringColor: Int,
-            spannableStringBackGroundColor: Int
-        ): WordSearchResultYearMonthList {
+        override suspend fun create(): WordSearchResultYearMonthList {
             val currentResultList = _wordSearchResultList.requireValue()
             check(currentResultList.isNotEmpty)
 
@@ -247,12 +271,7 @@ internal class WordSearchViewModel @Inject internal constructor(
                 if (numLoadingItems < this@WordSearchViewModel.numLoadingItems) {
                     numLoadingItems = this@WordSearchViewModel.numLoadingItems
                 }
-                return loadWordSearchResultDiaryList(
-                    numLoadingItems,
-                    0,
-                    spannableStringColor,
-                    spannableStringBackGroundColor
-                )
+                return loadWordSearchResultDiaryList(numLoadingItems, 0)
             } finally {
                 _isVisibleUpdateProgressBar.value = false
             }
@@ -262,9 +281,7 @@ internal class WordSearchViewModel @Inject internal constructor(
     @Throws(Exception::class)
     private suspend fun loadWordSearchResultDiaryList(
         numLoadingItems: Int,
-        loadingOffset: Int,
-        spannableStringColor: Int,
-        spannableStringBackGroundColor: Int
+        loadingOffset: Int
     ): WordSearchResultYearMonthList {
         require(numLoadingItems > 0)
         require(loadingOffset >= 0)
@@ -282,12 +299,7 @@ internal class WordSearchViewModel @Inject internal constructor(
         val resultDayListItemList: MutableList<WordSearchResultDayListItem> = ArrayList()
         loadedResultList.stream().forEach { x: WordSearchResultListItem ->
             resultDayListItemList.add(
-                WordSearchResultDayListItem(
-                    x,
-                    searchWord,
-                    spannableStringColor,
-                    spannableStringBackGroundColor
-                )
+                WordSearchResultDayListItem(x, searchWord)
             )
         }
         val resultDayList = WordSearchResultDayList(resultDayListItemList)
@@ -304,5 +316,18 @@ internal class WordSearchViewModel @Inject internal constructor(
         if (numExistingDiaries <= 0) return false
 
         return numLoadedDiaries < numExistingDiaries
+    }
+
+    // FragmentAction関係
+    private fun updateFragmentAction(action: FragmentAction) {
+        _fragmentAction.value = action
+    }
+
+    fun clearFragmentAction() {
+        _fragmentAction.value = initialFragmentAction
+    }
+
+    private fun navigateDiaryShowFragment(date: LocalDate) {
+        updateFragmentAction(WordSearchFragmentAction.NavigateDiaryShowFragment(date))
     }
 }

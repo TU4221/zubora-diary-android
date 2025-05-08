@@ -57,7 +57,8 @@ internal class WordSearchResultDayListAdapter(
         holder: WordSearchResultDayViewHolder,
         item: WordSearchResultDayListItem
     ) {
-        val title = item.title
+        val context = holder.binding.root.context
+        val title = item.createTitleSpannableString(context, themeColor)
         holder.binding.textTitle.text = title
     }
 
@@ -70,8 +71,8 @@ internal class WordSearchResultDayListAdapter(
             val strItemNumber =
                 context.getString(R.string.fragment_word_search_result_item) + item.itemNumber
             textItemNumber.text = strItemNumber
-            textItemTitle.text = item.itemTitle
-            textItemComment.text = item.itemComment
+            textItemTitle.text = item.createItemTitleSpannableString(context, themeColor)
+            textItemComment.text = item.createItemCommentSpannableString(context, themeColor)
         }
 
     }

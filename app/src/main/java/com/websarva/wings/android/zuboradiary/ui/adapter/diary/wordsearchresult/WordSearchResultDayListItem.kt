@@ -1,54 +1,65 @@
 package com.websarva.wings.android.zuboradiary.ui.adapter.diary.wordsearchresult
 
+import android.content.Context
 import android.text.SpannableString
 import android.text.Spanned
 import android.text.style.BackgroundColorSpan
 import android.text.style.ForegroundColorSpan
 import com.websarva.wings.android.zuboradiary.data.database.WordSearchResultListItem
 import com.websarva.wings.android.zuboradiary.data.model.ItemNumber
+import com.websarva.wings.android.zuboradiary.data.model.ThemeColor
 import com.websarva.wings.android.zuboradiary.ui.adapter.diary.DiaryDayListBaseItem
 
 internal class WordSearchResultDayListItem(
     listItem: WordSearchResultListItem,
-    searchWord: String,
-    textColor: Int,
-    backgroundColor: Int
+    searchWord: String
 ) : DiaryDayListBaseItem(listItem) {
 
-    val title: SpannableString
+    private val title: String
     val itemNumber: ItemNumber
-    val itemTitle: SpannableString
-    val itemComment: SpannableString
+    private val itemTitle: String
+    private val itemComment: String
+    private val searchWord: String
 
     private val itemNumberKey = "ItemNumber"
     private val itemTitleKey = "ItemTitle"
     private val itemCommentKey = "ItemComment"
 
     init {
-        val title = listItem.title
-        this.title = toSpannableString(title, searchWord, textColor, backgroundColor)
-
         val diaryItem = extractTargetItem(listItem, searchWord)
         val itemNumber = diaryItem[itemNumberKey] as Int
+
+        this.title = listItem.title
         this.itemNumber = ItemNumber(itemNumber)
+        this.itemTitle = diaryItem[itemTitleKey] as String
+        this.itemComment = diaryItem[itemCommentKey] as String
+        this.searchWord = searchWord
+    }
 
-        val itemTitle = diaryItem[itemTitleKey] as String
-        this.itemTitle = toSpannableString(itemTitle, searchWord, textColor, backgroundColor)
+    fun createTitleSpannableString(context: Context, themeColor: ThemeColor): SpannableString {
+        return toSpannableString(context, title, searchWord, themeColor)
+    }
 
-        val itemComment = diaryItem[itemCommentKey] as String
-        this.itemComment = toSpannableString(itemComment, searchWord, textColor, backgroundColor)
+    fun createItemTitleSpannableString(context: Context, themeColor: ThemeColor): SpannableString {
+        return toSpannableString(context, itemTitle, searchWord, themeColor)
+    }
+
+    fun createItemCommentSpannableString(context: Context, themeColor: ThemeColor): SpannableString {
+        return toSpannableString(context, itemComment, searchWord, themeColor)
     }
 
     // 対象ワードをマーキング
     private fun toSpannableString(
+        context: Context,
         string: String,
         targetWord: String,
-        textColor: Int,
-        backgroundColor: Int
+        themeColor: ThemeColor
     ): SpannableString {
         val spannableString = SpannableString(string)
         var fromIndex = 0
         while (string.indexOf(targetWord, fromIndex) != -1) {
+            val textColor = themeColor.getOnTertiaryContainerColor(context.resources)
+            val backgroundColor = themeColor.getTertiaryContainerColor(context.resources)
             val backgroundColorSpan = BackgroundColorSpan(backgroundColor)
             val foregroundColorSpan = ForegroundColorSpan(textColor)
             val start = string.indexOf(targetWord, fromIndex)
