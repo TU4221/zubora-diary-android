@@ -125,16 +125,17 @@ internal class WordSearchViewModel @Inject internal constructor(
 
     // StateFlow値変更時処理
     fun onSearchWordChanged() {
-        // HACK:キーワードの入力時と確定時に検索Observerが起動してしまい
-        //      同じキーワードで二重に検索してしまう。防止策として下記条件追加。
-        if (!shouldLoadWordSearchResultList) {
-            if (shouldUpdateWordSearchResultList) {
-                val list = wordSearchResultList.value
-                if (list.isEmpty) return
-                updateWordSearchResultList()
-            }
+        if (shouldUpdateWordSearchResultList) {
+            shouldUpdateWordSearchResultList = false
+            val list = wordSearchResultList.value
+            if (list.isEmpty) return
+            updateWordSearchResultList()
             return
         }
+
+        // HACK:キーワードの入力時と確定時に検索Observerが起動してしまい
+        //      同じキーワードで二重に検索してしまう。防止策として下記条件追加。
+        if (!shouldLoadWordSearchResultList) return
 
         val value = searchWord.value
         if (value.isEmpty()) {
@@ -178,7 +179,6 @@ internal class WordSearchViewModel @Inject internal constructor(
         loadWordSearchResultDiaryList(
             UpdateWordSearchResultListCreator()
         )
-        shouldUpdateWordSearchResultList = false
     }
 
     // MEMO:List読込JobをViewModel側で管理(読込重複防止)
