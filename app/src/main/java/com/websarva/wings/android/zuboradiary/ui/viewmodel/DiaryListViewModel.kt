@@ -127,7 +127,6 @@ internal class DiaryListViewModel @Inject constructor(private val diaryRepositor
     // Fragmentデータ受取処理
     fun onDataReceivedFromDatePickerDialog(yearMonth: YearMonth) {
         updateSortConditionDate(yearMonth)
-        updateFragmentAction(DiaryListFragmentAction.ScrollDiaryListTop)
         loadNewDiaryList()
     }
 

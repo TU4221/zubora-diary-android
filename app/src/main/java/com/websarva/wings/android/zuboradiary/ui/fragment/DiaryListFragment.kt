@@ -49,6 +49,13 @@ class DiaryListFragment : BaseFragment() {
     // Uri関係
     private lateinit var pictureUriPermissionManager: UriPermissionManager
 
+    // RecyclerView関係
+    // HACK:RecyclerViewのAdapterにセットするListを全て変更した時、
+    //      変更前のListの内容で初期スクロール位置が定まらない不具合が発生。
+    //      対策としてListを全て変更するタイミングでAdapterを新規でセットする。
+    //      (親子関係でRecyclerViewを使用、又はListAdapterの機能による弊害？)
+    private var shouldInitializeListAdapter = false
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -100,6 +107,7 @@ class DiaryListFragment : BaseFragment() {
             receiveResulFromDialog<YearMonth>(StartYearMonthPickerDialogFragment.KEY_SELECTED_YEAR_MONTH)
                 ?: return
 
+        shouldInitializeListAdapter = true
         mainViewModel.onDataReceivedFromDatePickerDialog(selectedYearMonth)
     }
 
@@ -132,9 +140,6 @@ class DiaryListFragment : BaseFragment() {
                     }
                     is DiaryListFragmentAction.NavigateDiaryDeleteDialog -> {
                         navigateDiaryDeleteDialog(value.date, value.uri)
-                    }
-                    is DiaryListFragmentAction.ScrollDiaryListTop -> {
-                        scrollDiaryListToFirstPosition()
                     }
                     is DiaryListFragmentAction.ReleasePersistablePermissionUri -> {
                         pictureUriPermissionManager
@@ -184,6 +189,28 @@ class DiaryListFragment : BaseFragment() {
     // 日記リスト(年月)設定
     private fun setUpDiaryList() {
         binding.floatingActionButtonDiaryEdit.isEnabled = true
+
+        val diaryListAdapter = setUpListAdapter()
+
+
+        launchAndRepeatOnViewLifeCycleStarted {
+            mainViewModel.diaryList
+                .collectLatest { value: DiaryYearMonthList ->
+                    DiaryListObserver().onChanged(value)
+                }
+        }
+
+        launchAndRepeatOnViewLifeCycleStarted {
+            mainViewModel.isLoadingDiaryList
+                .collectLatest { value: Boolean ->
+                    diaryListAdapter.setSwipeEnabled(!value)
+                }
+        }
+
+        mainViewModel.prepareDiaryList()
+    }
+
+    private fun setUpListAdapter(): DiaryListAdapter {
         val diaryListAdapter =
             DiaryListAdapter(
                 binding.recyclerDiaryList,
@@ -210,22 +237,7 @@ class DiaryListFragment : BaseFragment() {
             )
         }
 
-
-        launchAndRepeatOnViewLifeCycleStarted {
-            mainViewModel.diaryList
-                .collectLatest { value: DiaryYearMonthList ->
-                    DiaryListObserver().onChanged(value)
-                }
-        }
-
-        launchAndRepeatOnViewLifeCycleStarted {
-            mainViewModel.isLoadingDiaryList
-                .collectLatest { value: Boolean ->
-                    diaryListAdapter.setSwipeEnabled(!value)
-                }
-        }
-
-        mainViewModel.prepareDiaryList()
+        return diaryListAdapter
     }
 
     private inner class DiaryListAdapter(
@@ -265,6 +277,12 @@ class DiaryListFragment : BaseFragment() {
         }
 
         private fun setUpList(list: DiaryYearMonthList) {
+
+            if (shouldInitializeListAdapter) {
+                shouldInitializeListAdapter = false
+                setUpListAdapter()
+            }
+
             val convertedItemList: List<DiaryYearMonthListBaseItem> = list.itemList
             val listAdapter = binding.recyclerDiaryList.adapter as DiaryYearMonthListAdapter
             listAdapter.submitList(convertedItemList)

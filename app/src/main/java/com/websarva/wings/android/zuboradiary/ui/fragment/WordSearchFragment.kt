@@ -41,6 +41,13 @@ class WordSearchFragment : BaseFragment() {
     @Suppress("unused", "RedundantSuppression")
     override val mainViewModel: WordSearchViewModel by activityViewModels()
 
+    // RecyclerView関係
+    // HACK:RecyclerViewのAdapterにセットするListを全て変更した時、
+    //      変更前のListの内容で初期スクロール位置が定まらない不具合が発生。
+    //      対策としてListを全て変更するタイミングでAdapterを新規でセットする。
+    //      (親子関係でRecyclerViewを使用、又はListAdapterの機能による弊害？)
+    private var shouldInitializeListAdapter = false
+
     override fun initializeDataBinding(
         themeColorInflater: LayoutInflater, container: ViewGroup
     ): ViewDataBinding {
@@ -116,6 +123,7 @@ class WordSearchFragment : BaseFragment() {
                         binding.linerLayoutWordSearchResults.visibility = View.INVISIBLE
                         mainViewModel.initialize()
                     } else {
+                        shouldInitializeListAdapter = true
                         mainViewModel
                             .loadNewWordSearchResultList(resultWordColor, resultWordBackgroundColor)
                     }
@@ -137,16 +145,7 @@ class WordSearchFragment : BaseFragment() {
     }
 
     private fun setUpWordSearchResultList() {
-        val wordSearchResultListAdapter =
-            WordSearchResultListAdapter(
-                binding.recyclerWordSearchResultList,
-                themeColor
-            )
-        wordSearchResultListAdapter.build()
-        wordSearchResultListAdapter.onClickChildItemListener =
-            OnClickChildItemListener { item: DiaryDayListBaseItem ->
-                navigateDiaryShowFragment(item.date)
-            }
+        setUpListAdapter()
 
         launchAndRepeatOnViewLifeCycleStarted {
             mainViewModel.wordSearchResultList
@@ -170,6 +169,21 @@ class WordSearchFragment : BaseFragment() {
         navController.addOnDestinationChangedListener(WordSearchResultListUpdateSetupListener())
     }
 
+    private fun setUpListAdapter() {
+        val wordSearchResultListAdapter =
+            WordSearchResultListAdapter(
+                binding.recyclerWordSearchResultList,
+                themeColor
+            )
+        wordSearchResultListAdapter.apply {
+            build()
+            onClickChildItemListener =
+                OnClickChildItemListener { item: DiaryDayListBaseItem ->
+                    navigateDiaryShowFragment(item.date)
+                }
+        }
+    }
+
     private inner class WordSearchResultListAdapter(
         recyclerView: RecyclerView,
         themeColor: ThemeColor
@@ -188,11 +202,6 @@ class WordSearchFragment : BaseFragment() {
     private inner class WordSearchResultListObserver :
         Observer<WordSearchResultYearMonthList> {
         override fun onChanged(value: WordSearchResultYearMonthList) {
-            val listAdapter =
-                checkNotNull(
-                    binding.recyclerWordSearchResultList.adapter
-                ) as WordSearchResultYearMonthListAdapter
-
             val searchWord = mainViewModel.searchWord.value
             if (searchWord.isEmpty()) {
                 binding.apply {
@@ -212,6 +221,14 @@ class WordSearchFragment : BaseFragment() {
                 }
             }
 
+            if (shouldInitializeListAdapter) {
+                shouldInitializeListAdapter = false
+                setUpListAdapter()
+            }
+
+            val listAdapter =
+                binding.recyclerWordSearchResultList.adapter
+                        as WordSearchResultYearMonthListAdapter
             val convertedList: List<DiaryYearMonthListBaseItem> =
                 ArrayList<DiaryYearMonthListBaseItem>(value.itemList)
             listAdapter.submitList(convertedList)
