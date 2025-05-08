@@ -224,7 +224,9 @@ class WordSearchFragment : BaseFragment() {
                         as WordSearchResultYearMonthListAdapter
             val convertedList: List<DiaryYearMonthListBaseItem> =
                 ArrayList<DiaryYearMonthListBaseItem>(value.itemList)
-            listAdapter.submitList(convertedList)
+            listAdapter.submitList(convertedList) {
+                mainViewModel.onWordSearchResultListUpdated()
+            }
 
             mainViewModel.onWordSearchResultListChanged()
         }

@@ -49,6 +49,10 @@ internal class WordSearchViewModel @Inject internal constructor(
     private val initialWordSearchResultListLoadingJob: Job? = null
     private var wordSearchResultListLoadingJob: Job? = initialWordSearchResultListLoadingJob // キャンセル用
 
+    // MEMO:RecyclerViewのスクロール時のアイテム追加更新処理の重複防止フラグ
+    private val initialIsWordSearchResultUpdating = false
+    private var isWordSearchResultUpdating = initialIsWordSearchResultUpdating
+
     private val numLoadingItems = DiaryListViewModel.NUM_LOADING_ITEMS
     private val initialWordSearchResultList = WordSearchResultYearMonthList()
     private val _wordSearchResultList = MutableStateFlow(initialWordSearchResultList)
@@ -62,7 +66,12 @@ internal class WordSearchViewModel @Inject internal constructor(
 
     val canLoadWordSearchResultList: Boolean
         get() {
-            val result = wordSearchResultListLoadingJob?.isCompleted ?: true
+            val result =
+                if (isWordSearchResultUpdating) {
+                    false
+                } else {
+                    wordSearchResultListLoadingJob?.isCompleted ?: true
+                }
             Log.d(logTag, "canLoadWordSearchResultList() = $result")
             return result
         }
@@ -96,6 +105,7 @@ internal class WordSearchViewModel @Inject internal constructor(
         previousSearchWord = initialPreviousSearchWord
         cancelPreviousLoading()
         wordSearchResultListLoadingJob = initialWordSearchResultListLoadingJob
+        isWordSearchResultUpdating = initialIsWordSearchResultUpdating
         _wordSearchResultList.value = initialWordSearchResultList
         _numWordSearchResults.value = initialNumWordSearchResults
         shouldUpdateWordSearchResultList = initialShouldUpdateWordSearchResultList
@@ -115,6 +125,10 @@ internal class WordSearchViewModel @Inject internal constructor(
     // View状態処理
     fun onWordSearchResultListEndScrolled() {
         loadAdditionWordSearchResultList()
+    }
+
+    fun onWordSearchResultListUpdated() {
+        clearIsWordSearchResultUpdating()
     }
 
     // Keyboard処理
@@ -170,6 +184,7 @@ internal class WordSearchViewModel @Inject internal constructor(
     }
 
     private fun loadAdditionWordSearchResultList() {
+        if (isWordSearchResultUpdating) return
         loadWordSearchResultDiaryList(
             AddedWordSearchResultListCreator()
         )
@@ -190,6 +205,7 @@ internal class WordSearchViewModel @Inject internal constructor(
             viewModelScope.launch(Dispatchers.IO) {
                 createWordSearchResultList(creator)
             }
+        isWordSearchResultUpdating = true
     }
 
     private fun cancelPreviousLoading() {
@@ -329,5 +345,10 @@ internal class WordSearchViewModel @Inject internal constructor(
 
     private fun navigateDiaryShowFragment(date: LocalDate) {
         updateFragmentAction(WordSearchFragmentAction.NavigateDiaryShowFragment(date))
+    }
+
+    // クリア処理
+    private fun clearIsWordSearchResultUpdating() {
+        isWordSearchResultUpdating = initialIsWordSearchResultUpdating
     }
 }
