@@ -47,18 +47,6 @@ internal class DiaryListViewModel @Inject constructor(private val diaryRepositor
     val diaryList
         get() = _diaryList.asStateFlow()
 
-    val canLoadDiaryList: Boolean
-        get() {
-            val result =
-                if (_isLoadingDiaryList.value) {
-                    false
-                } else {
-                    diaryListLoadingJob?.isCompleted ?: true
-                }
-            Log.d(logTag, "canLoadDiaryList() = $result")
-            return result
-        }
-
     private val initialIsLoadingDiaryList = false
     private var _isLoadingDiaryList = MutableStateFlow(initialIsLoadingDiaryList)
     val isLoadingDiaryList
@@ -159,6 +147,7 @@ internal class DiaryListViewModel @Inject constructor(private val diaryRepositor
     }
 
     private fun loadAdditionDiaryList() {
+        if (isLoadingDiaryList.value) return
         loadDiaryList(AddedDiaryListCreator())
     }
 
@@ -177,7 +166,8 @@ internal class DiaryListViewModel @Inject constructor(private val diaryRepositor
     }
 
     private fun cancelPreviousLoading() {
-        if (!canLoadDiaryList) {
+        val job = diaryListLoadingJob ?: return
+        if (!job.isCompleted) {
             diaryListLoadingJob?.cancel() ?: throw IllegalStateException()
         }
     }

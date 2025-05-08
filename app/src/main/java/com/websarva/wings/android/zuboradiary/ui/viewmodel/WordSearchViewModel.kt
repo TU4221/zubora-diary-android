@@ -64,18 +64,6 @@ internal class WordSearchViewModel @Inject internal constructor(
     val numWordSearchResults
         get() = _numWordSearchResults.asStateFlow()
 
-    val canLoadWordSearchResultList: Boolean
-        get() {
-            val result =
-                if (isWordSearchResultUpdating) {
-                    false
-                } else {
-                    wordSearchResultListLoadingJob?.isCompleted ?: true
-                }
-            Log.d(logTag, "canLoadWordSearchResultList() = $result")
-            return result
-        }
-
     // MEMO:画面回転時の不要なアップデートを防ぐ
     private val initialShouldUpdateWordSearchResultList = false
     var shouldUpdateWordSearchResultList = initialShouldUpdateWordSearchResultList
@@ -209,7 +197,8 @@ internal class WordSearchViewModel @Inject internal constructor(
     }
 
     private fun cancelPreviousLoading() {
-        if (!canLoadWordSearchResultList) {
+        val job = wordSearchResultListLoadingJob ?: return
+        if (!job.isCompleted) {
             wordSearchResultListLoadingJob?.cancel() ?: throw IllegalStateException()
         }
     }

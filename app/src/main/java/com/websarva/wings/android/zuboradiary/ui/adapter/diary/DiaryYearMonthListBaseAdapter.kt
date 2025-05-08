@@ -9,7 +9,6 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import androidx.recyclerview.widget.RecyclerView.AdapterDataObserver
 import com.websarva.wings.android.zuboradiary.R
 import com.websarva.wings.android.zuboradiary.data.model.ThemeColor
 import com.websarva.wings.android.zuboradiary.databinding.RowDiaryYearMonthListBinding
@@ -32,9 +31,6 @@ internal abstract class DiaryYearMonthListBaseAdapter protected constructor(
         fun onClick(item: DiaryDayListBaseItem)
     }
     var onClickChildItemListener: OnClickChildItemListener? = null
-    
-    protected var isLoadingListOnScrolled = false
-        private set
 
     // MEMO:@Suppress("unused")が不要と警告が発生したので削除したが、"unused"警告が再発する。
     //      その為、@Suppress("RedundantSuppression")で警告回避。
@@ -63,8 +59,6 @@ internal abstract class DiaryYearMonthListBaseAdapter protected constructor(
 
             addOnScrollListener(ListAdditionalLoadingOnScrollListener())
         }
-
-        registerAdapterDataObserver(ListLoadingCompleteNotificationAdapterDataObserver())
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
@@ -177,11 +171,6 @@ internal abstract class DiaryYearMonthListBaseAdapter protected constructor(
      */
     abstract fun loadListOnScrollEnd()
 
-    /**
-     * RecyclerViewを最終端までスクロールした時にリストアイテムを追加読込可能か確認するコードを記述すること。
-     */
-    abstract fun canLoadList(): Boolean
-
     // MEMO:読込スクロールをスムーズに処理できるように下記項目を考慮してクラス作成
     //      1. リスト最終アイテムまで見え始める所までスクロールした時に、アイテム追加読込中の目印として最終アイテムの下に
     //         プログレスバーを追加する予定だったが、プログレスバーが追加される前にスクロールしきってしまい、
@@ -194,8 +183,6 @@ internal abstract class DiaryYearMonthListBaseAdapter protected constructor(
     private inner class ListAdditionalLoadingOnScrollListener : RecyclerView.OnScrollListener() {
         override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
             super.onScrolled(recyclerView, dx, dy)
-            if (isLoadingListOnScrolled) return
-            if (!canLoadList()) return
             if (dy < 0) return // MEMO:RecyclerView更新時にも処理できるように "<=" -> "<" とする。(画面回転対応)
 
             val layoutManager = checkNotNull(recyclerView.layoutManager) as LinearLayoutManager
@@ -212,58 +199,7 @@ internal abstract class DiaryYearMonthListBaseAdapter protected constructor(
             val lastItemViewType = recyclerViewAdapter.getItemViewType(lastItemPosition)
             if (lastItemViewType == ViewType.PROGRESS_INDICATOR.viewTypeNumber) {
                 loadListOnScrollEnd()
-                isLoadingListOnScrolled = true
             }
-        }
-    }
-
-    private inner class ListLoadingCompleteNotificationAdapterDataObserver : AdapterDataObserver() {
-        override fun onChanged() {
-            Log.d(logTag, "OnChanged()")
-            super.onChanged()
-            clearIsLoadingListOnScrolled()
-        }
-
-        override fun onItemRangeChanged(positionStart: Int, itemCount: Int) {
-            Log.d(logTag, "onItemRangeChanged()")
-            super.onItemRangeChanged(positionStart, itemCount)
-            clearIsLoadingListOnScrolled()
-        }
-
-        override fun onItemRangeChanged(positionStart: Int, itemCount: Int, payload: Any?) {
-            Log.d(logTag, "onItemRangeChanged()")
-            super.onItemRangeChanged(positionStart, itemCount, payload)
-            clearIsLoadingListOnScrolled()
-        }
-
-        override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
-            Log.d(logTag, "onItemRangeInserted()")
-            super.onItemRangeInserted(positionStart, itemCount)
-            clearIsLoadingListOnScrolled()
-        }
-
-        override fun onItemRangeRemoved(positionStart: Int, itemCount: Int) {
-            Log.d(logTag, "onItemRangeRemoved()")
-            super.onItemRangeRemoved(positionStart, itemCount)
-            clearIsLoadingListOnScrolled()
-        }
-
-        override fun onItemRangeMoved(fromPosition: Int, toPosition: Int, itemCount: Int) {
-            Log.d(logTag, "onItemRangeMoved()")
-            super.onItemRangeMoved(fromPosition, toPosition, itemCount)
-            clearIsLoadingListOnScrolled()
-        }
-
-        override fun onStateRestorationPolicyChanged() {
-            Log.d(logTag, "onStateRestorationPolicyChanged()")
-            super.onStateRestorationPolicyChanged()
-        }
-    }
-
-    private fun clearIsLoadingListOnScrolled() {
-        if (itemCount == 0) return
-        if (getItemViewType(0) != ViewType.PROGRESS_INDICATOR.viewTypeNumber) {
-            isLoadingListOnScrolled = false
         }
     }
 

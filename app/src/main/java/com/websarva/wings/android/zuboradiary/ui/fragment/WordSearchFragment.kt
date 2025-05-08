@@ -205,10 +205,6 @@ class WordSearchFragment : BaseFragment() {
         override fun loadListOnScrollEnd() {
             mainViewModel.onWordSearchResultListEndScrolled()
         }
-
-        override fun canLoadList(): Boolean {
-            return mainViewModel.canLoadWordSearchResultList
-        }
     }
 
     private inner class WordSearchResultListObserver :

@@ -227,14 +227,6 @@ class DiaryListFragment : BaseFragment() {
                     if (item !is DiaryDayListItem) throw IllegalStateException()
                     mainViewModel.onDiaryListItemDeleteButtonClicked(item.date, item.picturePath)
                 }
-            registerAdapterDataObserver(
-                object : RecyclerView.AdapterDataObserver() {
-
-                    override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
-                        mainViewModel.onDiaryListUpdated()
-                    }
-                }
-            )
         }
 
         return diaryListAdapter
@@ -247,10 +239,6 @@ class DiaryListFragment : BaseFragment() {
 
         override fun loadListOnScrollEnd() {
             mainViewModel.onDiaryListEndScrolled()
-        }
-
-        override fun canLoadList(): Boolean {
-            return mainViewModel.canLoadDiaryList
         }
     }
 
@@ -285,7 +273,9 @@ class DiaryListFragment : BaseFragment() {
 
             val convertedItemList: List<DiaryYearMonthListBaseItem> = list.itemList
             val listAdapter = binding.recyclerDiaryList.adapter as DiaryYearMonthListAdapter
-            listAdapter.submitList(convertedItemList)
+            listAdapter.submitList(convertedItemList) {
+                mainViewModel.onDiaryListUpdated()
+            }
         }
     }
 
