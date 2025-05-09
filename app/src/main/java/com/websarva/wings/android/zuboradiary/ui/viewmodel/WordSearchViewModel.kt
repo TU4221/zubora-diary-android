@@ -253,7 +253,7 @@ internal class WordSearchViewModel @Inject internal constructor(
         @Throws(Exception::class)
         override suspend fun create(): WordSearchResultYearMonthList {
             showWordSearchResultListFirstItemProgressIndicator()
-            return loadWordSearchResultDiaryList(numLoadingItems, 0)
+            return loadWordSearchResultDiaryListFromDatabase(numLoadingItems, 0)
         }
 
         private fun showWordSearchResultListFirstItemProgressIndicator() {
@@ -272,7 +272,7 @@ internal class WordSearchViewModel @Inject internal constructor(
 
             val loadingOffset = currentResultList.countDiaries()
             val loadedResultList =
-                loadWordSearchResultDiaryList(numLoadingItems, loadingOffset)
+                loadWordSearchResultDiaryListFromDatabase(numLoadingItems, loadingOffset)
             val numLoadedDiaries =
                 currentResultList.countDiaries() + loadedResultList.countDiaries()
             val existsUnloadedDiaries = existsUnloadedDiaries(numLoadedDiaries)
@@ -296,7 +296,7 @@ internal class WordSearchViewModel @Inject internal constructor(
                 if (numLoadingItems < this@WordSearchViewModel.numLoadingItems) {
                     numLoadingItems = this@WordSearchViewModel.numLoadingItems
                 }
-                return loadWordSearchResultDiaryList(numLoadingItems, 0)
+                return loadWordSearchResultDiaryListFromDatabase(numLoadingItems, 0)
             } finally {
                 _isVisibleUpdateProgressBar.value = false
             }
@@ -304,7 +304,7 @@ internal class WordSearchViewModel @Inject internal constructor(
     }
 
     @Throws(Exception::class)
-    private suspend fun loadWordSearchResultDiaryList(
+    private suspend fun loadWordSearchResultDiaryListFromDatabase(
         numLoadingItems: Int,
         loadingOffset: Int
     ): WordSearchResultYearMonthList {
