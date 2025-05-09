@@ -121,7 +121,7 @@ internal class WordSearchViewModel @Inject internal constructor(
     }
 
     fun onWordSearchResultListUpdated() {
-        clearIsWordSearchResultUpdating()
+        clearIsWordSearchResultLoading()
         clearIsVisibleUpdateProgressBar()
     }
 
@@ -375,7 +375,7 @@ internal class WordSearchViewModel @Inject internal constructor(
         _searchWord.value = initialSearchWord
     }
 
-    private fun clearIsWordSearchResultUpdating() {
+    private fun clearIsWordSearchResultLoading() {
         isWordSearchResultLoading = initialIsWordSearchResultLoading
     }
 
