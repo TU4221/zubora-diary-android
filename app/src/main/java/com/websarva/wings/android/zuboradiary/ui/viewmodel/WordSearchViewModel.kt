@@ -122,6 +122,7 @@ internal class WordSearchViewModel @Inject internal constructor(
 
     fun onWordSearchResultListUpdated() {
         clearIsWordSearchResultUpdating()
+        clearIsVisibleUpdateProgressBar()
     }
 
     // Fragment状態処理
@@ -297,8 +298,9 @@ internal class WordSearchViewModel @Inject internal constructor(
                     numLoadingItems = this@WordSearchViewModel.numLoadingItems
                 }
                 return loadWordSearchResultDiaryListFromDatabase(numLoadingItems, 0)
-            } finally {
-                _isVisibleUpdateProgressBar.value = false
+            } catch (e: Exception) {
+                clearIsVisibleUpdateProgressBar()
+                throw e
             }
         }
     }
@@ -379,5 +381,9 @@ internal class WordSearchViewModel @Inject internal constructor(
 
     private fun clearFragmentAction() {
         _fragmentAction.value = initialFragmentAction
+    }
+
+    private fun clearIsVisibleUpdateProgressBar() {
+        _isVisibleUpdateProgressBar.value = initialIsVisibleUpdateProgressBar
     }
 }
