@@ -61,12 +61,15 @@ class WordSearchFragment : BaseFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        setUpViewModelInitialization()
-        setUpFragmentAction()
         setUpToolBar()
         setUpWordSearchView()
         setUpWordSearchResultList()
         setUpFloatingActionButton()
+
+        setUpFragmentAction()
+        setUpNavDestinationChangedListener()
+
+        mainViewModel.onFragmentViewCreated()
     }
 
     override fun handleOnReceivingResultFromPreviousFragment() {
@@ -81,44 +84,6 @@ class WordSearchFragment : BaseFragment() {
         // LifecycleEventObserverにダイアログからの結果受取処理コードを記述したら、ここに削除処理を記述する。
     }
 
-    private fun setUpViewModelInitialization() {
-        navController.addOnDestinationChangedListener(ViewModelInitializationSetupListener())
-    }
-
-    private fun setUpFragmentAction() {
-        launchAndRepeatOnViewLifeCycleStarted {
-            mainViewModel.fragmentAction.collect { value: FragmentAction ->
-                when (value) {
-                    is WordSearchFragmentAction.NavigateDiaryShowFragment -> {
-                        navigateDiaryShowFragment(value.date)
-                    }
-                    WordSearchFragmentAction.ShowKeyboard -> {
-                        showKeyboard()
-                    }
-                    WordSearchFragmentAction.ShowResultsInitialLayout -> {
-                        showWordSearchResultsInitialLayout()
-                    }
-                    WordSearchFragmentAction.ShowResultsLayout -> {
-                        showWordSearchResultsLayout()
-                    }
-                    WordSearchFragmentAction.ShowNoResultsLayout -> {
-                        showNoWordSearchResultsLayout()
-                    }
-                    FragmentAction.NavigatePreviousFragment -> {
-                        navController.navigateUp()
-                    }
-                    FragmentAction.None -> {
-                        // 処理なし
-                    }
-                    else -> {
-                        throw IllegalArgumentException()
-                    }
-                }
-                mainViewModel.clearFragmentAction()
-            }
-        }
-    }
-
     private fun setUpToolBar() {
         binding.materialToolbarTopAppBar
             .setNavigationOnClickListener {
@@ -127,8 +92,6 @@ class WordSearchFragment : BaseFragment() {
     }
 
     private fun setUpWordSearchView() {
-        mainViewModel.prepareKeyboard()
-
         launchAndRepeatOnViewLifeCycleStarted {
             mainViewModel.searchWord
                 .collectLatest { value: String ->
@@ -178,8 +141,6 @@ class WordSearchFragment : BaseFragment() {
                     binding.textNumWordSearchResults.visibility = visibility
                 }
         }
-
-        navController.addOnDestinationChangedListener(WordSearchResultListUpdateSetupListener())
     }
 
     private fun setUpListAdapter() {
@@ -228,40 +189,6 @@ class WordSearchFragment : BaseFragment() {
         }
     }
 
-    private inner class WordSearchResultListUpdateSetupListener
-        : NavController.OnDestinationChangedListener {
-            override fun onDestinationChanged(
-                controller: NavController,
-                destination: NavDestination,
-                arguments: Bundle?
-            ) {
-                if (destination.id == R.id.navigation_word_search_fragment) return
-
-                if (destination.id == R.id.navigation_diary_show_fragment) {
-                    mainViewModel.shouldUpdateWordSearchResultList = true
-                }
-
-                navController.removeOnDestinationChangedListener(this)
-            }
-    }
-
-    private inner class ViewModelInitializationSetupListener
-        : NavController.OnDestinationChangedListener {
-        override fun onDestinationChanged(
-            controller: NavController,
-            destination: NavDestination,
-            arguments: Bundle?
-        ) {
-            if (destination.id == R.id.navigation_word_search_fragment) return
-
-            if (destination.id != R.id.navigation_diary_show_fragment) {
-                mainViewModel.shouldInitializeOnFragmentDestroy = true
-            }
-
-            navController.removeOnDestinationChangedListener(this)
-        }
-    }
-
     private fun setUpFloatingActionButton() {
         binding.floatingActionButtonTopScroll.setOnClickListener {
             resultListScrollToFirstPosition()
@@ -285,6 +212,40 @@ class WordSearchFragment : BaseFragment() {
         val adapter = binding.recyclerWordSearchResultList.adapter
         val listAdapter = adapter as WordSearchResultYearMonthListAdapter
         listAdapter.scrollToFirstPosition()
+    }
+
+    private fun setUpFragmentAction() {
+        launchAndRepeatOnViewLifeCycleStarted {
+            mainViewModel.fragmentAction.collect { value: FragmentAction ->
+                when (value) {
+                    is WordSearchFragmentAction.NavigateDiaryShowFragment -> {
+                        navigateDiaryShowFragment(value.date)
+                    }
+                    WordSearchFragmentAction.ShowKeyboard -> {
+                        showKeyboard()
+                    }
+                    WordSearchFragmentAction.ShowResultsInitialLayout -> {
+                        showWordSearchResultsInitialLayout()
+                    }
+                    WordSearchFragmentAction.ShowResultsLayout -> {
+                        showWordSearchResultsLayout()
+                    }
+                    WordSearchFragmentAction.ShowNoResultsLayout -> {
+                        showNoWordSearchResultsLayout()
+                    }
+                    FragmentAction.NavigatePreviousFragment -> {
+                        navController.navigateUp()
+                    }
+                    FragmentAction.None -> {
+                        // 処理なし
+                    }
+                    else -> {
+                        throw IllegalArgumentException()
+                    }
+                }
+                mainViewModel.onFragmentActionChanged()
+            }
+        }
     }
 
     private fun showKeyboard() {
@@ -329,6 +290,28 @@ class WordSearchFragment : BaseFragment() {
         navController.navigate(directions)
     }
 
+    private fun setUpNavDestinationChangedListener() {
+        navController.addOnDestinationChangedListener(NavDestinationChangedListener())
+    }
+
+    private inner class NavDestinationChangedListener
+        : NavController.OnDestinationChangedListener {
+        override fun onDestinationChanged(
+            controller: NavController,
+            destination: NavDestination,
+            arguments: Bundle?
+        ) {
+            if (destination.id == R.id.navigation_word_search_fragment) return
+
+            if (destination.id == R.id.navigation_diary_show_fragment) {
+                mainViewModel.onNextFragmentNavigated()
+            }
+
+            mainViewModel.onPreviousFragmentNavigated()
+            navController.removeOnDestinationChangedListener(this)
+        }
+    }
+
     override fun destroyBinding() {
         _binding = null
     }
@@ -336,12 +319,6 @@ class WordSearchFragment : BaseFragment() {
     override fun onDestroy() {
         super.onDestroy()
 
-        // MEMO:WordSearchViewModelのスコープ範囲はActivityになるが、
-        //      WordSearchFragment、DiaryShowFragment、DiaryEditFragment、
-        //      DiaryItemTitleEditFragment表示時のみ ViewModelのプロパティ値を保持できたらよいので、
-        //      WordSearchFragmentを破棄するタイミングでViewModelのプロパティ値を初期化する。
-        mainViewModel.apply {
-            if (shouldInitializeOnFragmentDestroy) initialize()
-        }
+        mainViewModel.onFragmentDestroyed()
     }
 }

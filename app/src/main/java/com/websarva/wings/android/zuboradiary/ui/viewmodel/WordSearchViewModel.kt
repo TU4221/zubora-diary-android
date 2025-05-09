@@ -50,8 +50,8 @@ internal class WordSearchViewModel @Inject internal constructor(
     private var wordSearchResultListLoadingJob: Job? = initialWordSearchResultListLoadingJob // キャンセル用
 
     // MEMO:RecyclerViewのスクロール時のアイテム追加更新処理の重複防止フラグ
-    private val initialIsWordSearchResultUpdating = false
-    private var isWordSearchResultUpdating = initialIsWordSearchResultUpdating
+    private val initialIsWordSearchResultLoading = false
+    private var isWordSearchResultLoading = initialIsWordSearchResultLoading
 
     private val numLoadingItems = DiaryListViewModel.NUM_LOADING_ITEMS
     private val initialWordSearchResultList = WordSearchResultYearMonthList()
@@ -66,7 +66,7 @@ internal class WordSearchViewModel @Inject internal constructor(
 
     // MEMO:画面回転時の不要なアップデートを防ぐ
     private val initialShouldUpdateWordSearchResultList = false
-    var shouldUpdateWordSearchResultList = initialShouldUpdateWordSearchResultList
+    private var shouldUpdateWordSearchResultList = initialShouldUpdateWordSearchResultList
 
     /**
      * データベース読込からRecyclerViewへの反映までを true とする。
@@ -76,9 +76,13 @@ internal class WordSearchViewModel @Inject internal constructor(
     val isVisibleUpdateProgressBar
         get() = _isVisibleUpdateProgressBar.asStateFlow()
 
+    // MEMO:WordSearchViewModelのスコープ範囲はActivityになるが、
+    //      WordSearchFragment、DiaryShowFragment、DiaryEditFragment、
+    //      DiaryItemTitleEditFragment表示時のみ ViewModelのプロパティ値を保持できたらよいので、
+    //      WordSearchFragmentを破棄するタイミングでViewModelのプロパティ値を初期化する。
     // MEMO:画面回転時の不要な初期化を防ぐ
-    private val initialShouldInitializeOnFragmentDestroy = false
-    var shouldInitializeOnFragmentDestroy = initialShouldInitializeOnFragmentDestroy
+    private val initialShouldInitializeOnFragmentDestroyed = false
+    private var shouldInitializeOnFragmentDestroyed = initialShouldInitializeOnFragmentDestroyed
 
     // Fragment処理
     private val initialFragmentAction = FragmentAction.None
@@ -93,15 +97,15 @@ internal class WordSearchViewModel @Inject internal constructor(
         previousSearchWord = initialPreviousSearchWord
         cancelPreviousLoading()
         wordSearchResultListLoadingJob = initialWordSearchResultListLoadingJob
-        isWordSearchResultUpdating = initialIsWordSearchResultUpdating
+        isWordSearchResultLoading = initialIsWordSearchResultLoading
         _wordSearchResultList.value = initialWordSearchResultList
         _numWordSearchResults.value = initialNumWordSearchResults
         shouldUpdateWordSearchResultList = initialShouldUpdateWordSearchResultList
         _isVisibleUpdateProgressBar.value = initialIsVisibleUpdateProgressBar
-        shouldInitializeOnFragmentDestroy = initialShouldInitializeOnFragmentDestroy
+        shouldInitializeOnFragmentDestroyed = initialShouldInitializeOnFragmentDestroyed
     }
 
-    // ViewClicked処理
+    // Viewクリック処理
     fun onSearchWordClearButtonClicked() {
         clearSearchWord()
     }
@@ -112,6 +116,7 @@ internal class WordSearchViewModel @Inject internal constructor(
 
     // View状態処理
     fun onWordSearchResultListEndScrolled() {
+        if (isWordSearchResultLoading) return
         loadAdditionWordSearchResultList()
     }
 
@@ -119,13 +124,24 @@ internal class WordSearchViewModel @Inject internal constructor(
         clearIsWordSearchResultUpdating()
     }
 
-    // Keyboard処理
-    fun prepareKeyboard() {
-        val searchWord = searchWord.value
-        if (searchWord.isEmpty()) updateFragmentAction(WordSearchFragmentAction.ShowKeyboard)
+    // Fragment状態処理
+    fun onNextFragmentNavigated() {
+        shouldUpdateWordSearchResultList = true
     }
 
-    // StateFlow値変更時処理
+    fun onPreviousFragmentNavigated() {
+        shouldInitializeOnFragmentDestroyed = true
+    }
+
+    fun onFragmentViewCreated() {
+        prepareKeyboard()
+    }
+
+    fun onFragmentDestroyed() {
+        if (shouldInitializeOnFragmentDestroyed) initialize()
+    }
+
+    // StateFlow値変更処理
     fun onSearchWordChanged() {
         if (shouldUpdateWordSearchResultList) {
             shouldUpdateWordSearchResultList = false
@@ -153,16 +169,22 @@ internal class WordSearchViewModel @Inject internal constructor(
         val searchWord = searchWord.value
         val wordSearchResultList = wordSearchResultList.value
         if (searchWord.isEmpty()) {
-            updateFragmentAction(WordSearchFragmentAction.ShowResultsInitialLayout)
+            showResultsInitialLayout()
         } else if (wordSearchResultList.isEmpty) {
-            updateFragmentAction(WordSearchFragmentAction.ShowNoResultsLayout)
+            showNoResultsLayout()
         } else {
-            updateFragmentAction(WordSearchFragmentAction.ShowResultsLayout)
+            showResultsLayout()
         }
     }
 
-    private fun clearSearchWord() {
-        _searchWord.value = ""
+    fun onFragmentActionChanged() {
+        clearFragmentAction()
+    }
+
+    // データ処理
+    private fun prepareKeyboard() {
+        val searchWord = searchWord.value
+        if (searchWord.isEmpty()) showKeyboard()
     }
 
     private fun loadNewWordSearchResultList() {
@@ -172,7 +194,6 @@ internal class WordSearchViewModel @Inject internal constructor(
     }
 
     private fun loadAdditionWordSearchResultList() {
-        if (isWordSearchResultUpdating) return
         loadWordSearchResultDiaryList(
             AddedWordSearchResultListCreator()
         )
@@ -184,7 +205,6 @@ internal class WordSearchViewModel @Inject internal constructor(
         )
     }
 
-    // MEMO:List読込JobをViewModel側で管理(読込重複防止)
     private fun loadWordSearchResultDiaryList(
         creator: WordSearchResultListCreator
     ) {
@@ -193,7 +213,7 @@ internal class WordSearchViewModel @Inject internal constructor(
             viewModelScope.launch(Dispatchers.IO) {
                 createWordSearchResultList(creator)
             }
-        isWordSearchResultUpdating = true
+        isWordSearchResultLoading = true
     }
 
     private fun cancelPreviousLoading() {
@@ -323,21 +343,41 @@ internal class WordSearchViewModel @Inject internal constructor(
         return numLoadedDiaries < numExistingDiaries
     }
 
-    // FragmentAction関係
+    // FragmentAction処理
     private fun updateFragmentAction(action: FragmentAction) {
         _fragmentAction.value = action
-    }
-
-    fun clearFragmentAction() {
-        _fragmentAction.value = initialFragmentAction
     }
 
     private fun navigateDiaryShowFragment(date: LocalDate) {
         updateFragmentAction(WordSearchFragmentAction.NavigateDiaryShowFragment(date))
     }
 
+    private fun showKeyboard() {
+        updateFragmentAction(WordSearchFragmentAction.ShowKeyboard)
+    }
+
+    private fun showResultsInitialLayout() {
+        updateFragmentAction(WordSearchFragmentAction.ShowResultsInitialLayout)
+    }
+
+    private fun showResultsLayout() {
+        updateFragmentAction(WordSearchFragmentAction.ShowResultsLayout)
+    }
+
+    private fun showNoResultsLayout() {
+        updateFragmentAction(WordSearchFragmentAction.ShowNoResultsLayout)
+    }
+
     // クリア処理
+    private fun clearSearchWord() {
+        _searchWord.value = initialSearchWord
+    }
+
     private fun clearIsWordSearchResultUpdating() {
-        isWordSearchResultUpdating = initialIsWordSearchResultUpdating
+        isWordSearchResultLoading = initialIsWordSearchResultLoading
+    }
+
+    private fun clearFragmentAction() {
+        _fragmentAction.value = initialFragmentAction
     }
 }
