@@ -22,6 +22,7 @@ import com.websarva.wings.android.zuboradiary.ui.adapter.diary.DiaryYearMonthLis
 import com.websarva.wings.android.zuboradiary.ui.adapter.diary.DiaryYearMonthListBaseItem
 import com.websarva.wings.android.zuboradiary.ui.adapter.diary.wordsearchresult.WordSearchResultYearMonthList
 import com.websarva.wings.android.zuboradiary.ui.adapter.diary.wordsearchresult.WordSearchResultYearMonthListAdapter
+import com.websarva.wings.android.zuboradiary.ui.model.WordSearchStatus
 import com.websarva.wings.android.zuboradiary.ui.model.action.FragmentAction
 import com.websarva.wings.android.zuboradiary.ui.model.action.WordSearchFragmentAction
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.WordSearchViewModel
@@ -66,10 +67,9 @@ class WordSearchFragment : BaseFragment() {
         setUpWordSearchResultList()
         setUpFloatingActionButton()
 
+        setUpWordSearchStatus()
         setUpFragmentAction()
         setUpNavDestinationChangedListener()
-
-        mainViewModel.onFragmentViewCreated()
     }
 
     override fun handleOnReceivingResultFromPreviousFragment() {
@@ -129,18 +129,6 @@ class WordSearchFragment : BaseFragment() {
                     WordSearchResultListObserver().onChanged(value)
                 }
         }
-
-        launchAndRepeatOnViewLifeCycleStarted {
-            mainViewModel.numWordSearchResults
-                .collectLatest { value: Int ->
-                    val visibility = if (value > 0) {
-                        View.VISIBLE
-                    } else {
-                        View.INVISIBLE
-                    }
-                    binding.textNumWordSearchResults.visibility = visibility
-                }
-        }
     }
 
     private fun setUpListAdapter() {
@@ -184,8 +172,6 @@ class WordSearchFragment : BaseFragment() {
             listAdapter.submitList(convertedList) {
                 mainViewModel.onWordSearchResultListUpdated()
             }
-
-            mainViewModel.onWordSearchResultListChanged()
         }
     }
 
@@ -214,37 +200,43 @@ class WordSearchFragment : BaseFragment() {
         listAdapter.scrollToFirstPosition()
     }
 
-    private fun setUpFragmentAction() {
+    private fun setUpWordSearchStatus() {
         launchAndRepeatOnViewLifeCycleStarted {
-            mainViewModel.fragmentAction.collect { value: FragmentAction ->
-                when (value) {
-                    is WordSearchFragmentAction.NavigateDiaryShowFragment -> {
-                        navigateDiaryShowFragment(value.date)
-                    }
-                    WordSearchFragmentAction.ShowKeyboard -> {
-                        showKeyboard()
-                    }
-                    WordSearchFragmentAction.ShowResultsInitialLayout -> {
-                        showWordSearchResultsInitialLayout()
-                    }
-                    WordSearchFragmentAction.ShowResultsLayout -> {
-                        showWordSearchResultsLayout()
-                    }
-                    WordSearchFragmentAction.ShowNoResultsLayout -> {
-                        showNoWordSearchResultsLayout()
-                    }
-                    FragmentAction.NavigatePreviousFragment -> {
-                        navController.navigateUp()
-                    }
-                    FragmentAction.None -> {
-                        // 処理なし
-                    }
-                    else -> {
-                        throw IllegalArgumentException()
+            mainViewModel.wordSearchStatus
+                .collectLatest { value: WordSearchStatus ->
+                    when (value) {
+                        WordSearchStatus.Idle -> showWordSearchIdleLayout()
+                        WordSearchStatus.Searching -> {}
+                        WordSearchStatus.Results -> showWordSearchResultsLayout()
+                        WordSearchStatus.NoResults -> showWordSearchNoResultsLayout()
+                        WordSearchStatus.Updating -> {}
                     }
                 }
-                mainViewModel.onFragmentActionChanged()
-            }
+        }
+    }
+
+    private fun setUpFragmentAction() {
+        launchAndRepeatOnViewLifeCycleStarted {
+            mainViewModel.fragmentAction
+                .collect { value: FragmentAction ->
+                    when (value) {
+                        is WordSearchFragmentAction.NavigateDiaryShowFragment -> {
+                            navigateDiaryShowFragment(value.date)
+                        }
+                        WordSearchFragmentAction.ShowKeyboard -> {
+                            showKeyboard()
+                        }
+                        FragmentAction.NavigatePreviousFragment -> {
+                            navController.navigateUp()
+                        }
+                        FragmentAction.None -> {
+                            // 処理なし
+                        }
+                        else -> {
+                            throw IllegalArgumentException()
+                        }
+                    }
+                }
         }
     }
 
@@ -256,20 +248,23 @@ class WordSearchFragment : BaseFragment() {
     private fun showWordSearchResultsLayout() {
         binding.apply {
             textNoWordSearchResultsMessage.visibility = View.INVISIBLE
+            textNumWordSearchResults.visibility = View.VISIBLE
             linerLayoutWordSearchResults.visibility = View.VISIBLE
         }
     }
 
-    private fun showNoWordSearchResultsLayout() {
+    private fun showWordSearchNoResultsLayout() {
         binding.apply {
             textNoWordSearchResultsMessage.visibility = View.VISIBLE
+            textNumWordSearchResults.visibility = View.INVISIBLE
             linerLayoutWordSearchResults.visibility = View.INVISIBLE
         }
     }
 
-    private fun showWordSearchResultsInitialLayout() {
+    private fun showWordSearchIdleLayout() {
         binding.apply {
             textNoWordSearchResultsMessage.visibility = View.INVISIBLE
+            textNumWordSearchResults.visibility = View.INVISIBLE
             linerLayoutWordSearchResults.visibility = View.INVISIBLE
         }
     }

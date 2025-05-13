@@ -9,6 +9,7 @@ import com.websarva.wings.android.zuboradiary.ui.model.WordSearchAppMessage
 import com.websarva.wings.android.zuboradiary.ui.adapter.diary.wordsearchresult.WordSearchResultDayList
 import com.websarva.wings.android.zuboradiary.ui.adapter.diary.wordsearchresult.WordSearchResultDayListItem
 import com.websarva.wings.android.zuboradiary.ui.adapter.diary.wordsearchresult.WordSearchResultYearMonthList
+import com.websarva.wings.android.zuboradiary.ui.model.WordSearchStatus
 import com.websarva.wings.android.zuboradiary.ui.model.action.FragmentAction
 import com.websarva.wings.android.zuboradiary.ui.model.action.WordSearchFragmentAction
 import com.websarva.wings.android.zuboradiary.ui.utils.requireValue
@@ -16,8 +17,9 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import java.time.LocalDate
@@ -29,6 +31,11 @@ internal class WordSearchViewModel @Inject internal constructor(
 ) : BaseViewModel() {
 
     private val logTag = createLogTag()
+
+    private val initialWordSearchStatus = WordSearchStatus.Idle
+    private val _wordSearchStatus = MutableStateFlow<WordSearchStatus>(initialWordSearchStatus)
+    val  wordSearchStatus
+        get() = _wordSearchStatus.asStateFlow()
 
     private val initialSearchWord = ""
     private val _searchWord = MutableStateFlow(initialSearchWord)
@@ -85,14 +92,13 @@ internal class WordSearchViewModel @Inject internal constructor(
     private var shouldInitializeOnFragmentDestroyed = initialShouldInitializeOnFragmentDestroyed
 
     // Fragment処理
-    private val initialFragmentAction = FragmentAction.None
-    private val _fragmentAction: MutableStateFlow<FragmentAction> =
-        MutableStateFlow(initialFragmentAction)
-    val fragmentAction: StateFlow<FragmentAction>
-        get() = _fragmentAction
+    private val _fragmentAction = MutableSharedFlow<FragmentAction>()
+    val fragmentAction
+        get() = _fragmentAction.asSharedFlow()
 
     override fun initialize() {
         super.initialize()
+        _wordSearchStatus.value = initialWordSearchStatus
         _searchWord.value = initialSearchWord
         previousSearchWord = initialPreviousSearchWord
         cancelPreviousLoading()
@@ -111,7 +117,9 @@ internal class WordSearchViewModel @Inject internal constructor(
     }
 
     fun onWordSearchResultListItemClicked(date: LocalDate) {
-        navigateDiaryShowFragment(date)
+        viewModelScope.launch(Dispatchers.IO) {
+            navigateDiaryShowFragment(date)
+        }
     }
 
     // View状態処理
@@ -134,56 +142,40 @@ internal class WordSearchViewModel @Inject internal constructor(
         shouldInitializeOnFragmentDestroyed = true
     }
 
-    fun onFragmentViewCreated() {
-        prepareKeyboard()
-    }
-
     fun onFragmentDestroyed() {
         if (shouldInitializeOnFragmentDestroyed) initialize()
     }
 
     // StateFlow値変更処理
     fun onSearchWordChanged() {
-        if (shouldUpdateWordSearchResultList) {
-            shouldUpdateWordSearchResultList = false
-            val list = wordSearchResultList.value
-            if (list.isEmpty) return
-            updateWordSearchResultList()
-            return
+        viewModelScope.launch(Dispatchers.IO) {
+            prepareKeyboard()
+
+            if (shouldUpdateWordSearchResultList) {
+                shouldUpdateWordSearchResultList = false
+                val list = wordSearchResultList.value
+                if (list.isEmpty) return@launch
+                updateWordSearchResultList()
+                return@launch
+            }
+
+            // HACK:キーワードの入力時と確定時に検索Observerが起動してしまい
+            //      同じキーワードで二重に検索してしまう。防止策として下記条件追加。
+            if (!shouldLoadWordSearchResultList) return@launch
+
+            val value = searchWord.value
+            if (value.isEmpty()) {
+                clearWordSearchResultList()
+            } else {
+                loadNewWordSearchResultList()
+            }
+
+            previousSearchWord = value
         }
-
-        // HACK:キーワードの入力時と確定時に検索Observerが起動してしまい
-        //      同じキーワードで二重に検索してしまう。防止策として下記条件追加。
-        if (!shouldLoadWordSearchResultList) return
-
-        val value = searchWord.value
-        if (value.isEmpty()) {
-            initialize()
-        } else {
-            loadNewWordSearchResultList()
-        }
-
-        previousSearchWord = value
-    }
-
-    fun onWordSearchResultListChanged() {
-        val searchWord = searchWord.value
-        val wordSearchResultList = wordSearchResultList.value
-        if (searchWord.isEmpty()) {
-            showResultsInitialLayout()
-        } else if (wordSearchResultList.isEmpty) {
-            showNoResultsLayout()
-        } else {
-            showResultsLayout()
-        }
-    }
-
-    fun onFragmentActionChanged() {
-        clearFragmentAction()
     }
 
     // データ処理
-    private fun prepareKeyboard() {
+    private suspend fun prepareKeyboard() {
         val searchWord = searchWord.value
         if (searchWord.isEmpty()) showKeyboard()
     }
@@ -229,10 +221,21 @@ internal class WordSearchViewModel @Inject internal constructor(
     ) {
         val logMsg = "ワード検索結果読込"
         Log.i(logTag, "${logMsg}_開始")
+        if (resultListCreator is UpdateWordSearchResultListCreator) {
+            updateWordSearchStatus(WordSearchStatus.Updating)
+        } else {
+            updateWordSearchStatus(WordSearchStatus.Searching)
+        }
+
         val previousResultList = _wordSearchResultList.requireValue()
         try {
             val updateResultList = resultListCreator.create()
             _wordSearchResultList.value = updateResultList
+            if (updateResultList.isNotEmpty) {
+                updateWordSearchStatus(WordSearchStatus.Results)
+            } else {
+                updateWordSearchStatus(WordSearchStatus.NoResults)
+            }
             Log.i(logTag, "${logMsg}_完了")
         } catch (e: CancellationException) {
             Log.i(logTag, "${logMsg}_キャンセル", e)
@@ -241,6 +244,7 @@ internal class WordSearchViewModel @Inject internal constructor(
             Log.e(logTag, "${logMsg}_失敗", e)
             _wordSearchResultList.value = previousResultList
             addAppMessage(WordSearchAppMessage.SearchResultListLoadingFailure)
+            updateWordSearchStatus(WordSearchStatus.Idle)
         }
     }
 
@@ -345,29 +349,22 @@ internal class WordSearchViewModel @Inject internal constructor(
         return numLoadedDiaries < numExistingDiaries
     }
 
-    // FragmentAction処理
-    private fun updateFragmentAction(action: FragmentAction) {
-        _fragmentAction.value = action
+    // WordSearchStatus更新
+    private fun updateWordSearchStatus(status: WordSearchStatus) {
+        _wordSearchStatus.value = status
     }
 
-    private fun navigateDiaryShowFragment(date: LocalDate) {
+    // FragmentAction処理
+    private suspend fun updateFragmentAction(action: FragmentAction) {
+        _fragmentAction.emit(action)
+    }
+
+    private suspend fun navigateDiaryShowFragment(date: LocalDate) {
         updateFragmentAction(WordSearchFragmentAction.NavigateDiaryShowFragment(date))
     }
 
-    private fun showKeyboard() {
+    private suspend fun showKeyboard() {
         updateFragmentAction(WordSearchFragmentAction.ShowKeyboard)
-    }
-
-    private fun showResultsInitialLayout() {
-        updateFragmentAction(WordSearchFragmentAction.ShowResultsInitialLayout)
-    }
-
-    private fun showResultsLayout() {
-        updateFragmentAction(WordSearchFragmentAction.ShowResultsLayout)
-    }
-
-    private fun showNoResultsLayout() {
-        updateFragmentAction(WordSearchFragmentAction.ShowNoResultsLayout)
     }
 
     // クリア処理
@@ -379,11 +376,16 @@ internal class WordSearchViewModel @Inject internal constructor(
         isWordSearchResultLoading = initialIsWordSearchResultLoading
     }
 
-    private fun clearFragmentAction() {
-        _fragmentAction.value = initialFragmentAction
-    }
-
     private fun clearIsVisibleUpdateProgressBar() {
         _isVisibleUpdateProgressBar.value = initialIsVisibleUpdateProgressBar
+    }
+
+    private fun clearWordSearchResultList() {
+        updateWordSearchStatus(WordSearchStatus.Idle)
+        cancelPreviousLoading()
+        wordSearchResultListLoadingJob = initialWordSearchResultListLoadingJob
+        isWordSearchResultLoading = initialIsWordSearchResultLoading
+        _wordSearchResultList.value = initialWordSearchResultList
+        _numWordSearchResults.value = initialNumWordSearchResults
     }
 }
