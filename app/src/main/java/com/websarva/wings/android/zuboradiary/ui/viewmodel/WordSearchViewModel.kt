@@ -123,6 +123,12 @@ internal class WordSearchViewModel @Inject internal constructor(
     }
 
     // Viewクリック処理
+    fun onNavigationButtonClicked() {
+        viewModelScope.launch(Dispatchers.IO) {
+            updateFragmentAction(FragmentAction.NavigatePreviousFragment)
+        }
+    }
+
     fun onSearchWordClearButtonClicked() {
         clearSearchWord()
     }

@@ -1,8 +1,10 @@
 package com.websarva.wings.android.zuboradiary.ui.view
 
 import android.graphics.drawable.Drawable
+import android.view.View
 import android.widget.TextView
 import androidx.databinding.BindingAdapter
+import com.google.android.material.appbar.MaterialToolbar
 
 internal object BindingAdapters {
     // MEMO:既存"app:drawableStartCompat"は"@drawable/～"を代入すれば反映されるが、
@@ -15,5 +17,11 @@ internal object BindingAdapters {
     fun setDrawableStartCompat(textView: TextView, drawable: Drawable?) {
         if (drawable == null) return
         textView.setCompoundDrawablesRelativeWithIntrinsicBounds(drawable, null, null, null)
+    }
+
+    @JvmStatic
+    @BindingAdapter("onNavigationIconClick")
+    fun setOnNavigationIconClickListener(toolbar: MaterialToolbar, listener: View.OnClickListener) {
+        toolbar.setNavigationOnClickListener(listener)
     }
 }

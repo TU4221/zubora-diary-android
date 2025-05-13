@@ -22,7 +22,6 @@ import com.websarva.wings.android.zuboradiary.ui.adapter.diary.DiaryYearMonthLis
 import com.websarva.wings.android.zuboradiary.ui.adapter.diary.DiaryYearMonthListBaseItem
 import com.websarva.wings.android.zuboradiary.ui.adapter.diary.wordsearchresult.WordSearchResultYearMonthList
 import com.websarva.wings.android.zuboradiary.ui.adapter.diary.wordsearchresult.WordSearchResultYearMonthListAdapter
-import com.websarva.wings.android.zuboradiary.ui.model.WordSearchStatus
 import com.websarva.wings.android.zuboradiary.ui.model.action.FragmentAction
 import com.websarva.wings.android.zuboradiary.ui.model.action.WordSearchFragmentAction
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.WordSearchViewModel
@@ -63,12 +62,10 @@ class WordSearchFragment : BaseFragment() {
         super.onViewCreated(view, savedInstanceState)
 
         setUpKeyboard()
-        setUpToolBar()
         setUpWordSearchView()
         setUpWordSearchResultList()
         setUpFloatingActionButton()
 
-        setUpWordSearchStatus()
         setUpFragmentAction()
         setUpNavDestinationChangedListener()
     }
@@ -94,13 +91,6 @@ class WordSearchFragment : BaseFragment() {
         }
     }
 
-    private fun setUpToolBar() {
-        binding.materialToolbarTopAppBar
-            .setNavigationOnClickListener {
-                navController.navigateUp()
-            }
-    }
-
     private fun setUpWordSearchView() {
         launchAndRepeatOnViewLifeCycleStarted {
             mainViewModel.searchWord
@@ -122,10 +112,6 @@ class WordSearchFragment : BaseFragment() {
             binding.editTextSearchWord,
             binding.imageButtonSearchWordClear
         )
-        binding.imageButtonSearchWordClear
-            .setOnClickListener {
-                mainViewModel.onSearchWordClearButtonClicked()
-            }
     }
 
     private fun setUpWordSearchResultList() {
@@ -210,21 +196,6 @@ class WordSearchFragment : BaseFragment() {
         listAdapter.scrollToFirstPosition()
     }
 
-    private fun setUpWordSearchStatus() {
-        launchAndRepeatOnViewLifeCycleStarted {
-            mainViewModel.wordSearchStatus
-                .collectLatest { value: WordSearchStatus ->
-                    when (value) {
-                        WordSearchStatus.Idle -> showWordSearchIdleLayout()
-                        WordSearchStatus.Searching -> {}
-                        WordSearchStatus.Results -> showWordSearchResultsLayout()
-                        WordSearchStatus.NoResults -> showWordSearchNoResultsLayout()
-                        WordSearchStatus.Updating -> {}
-                    }
-                }
-        }
-    }
-
     private fun setUpFragmentAction() {
         launchAndRepeatOnViewLifeCycleStarted {
             mainViewModel.fragmentAction
@@ -251,30 +222,6 @@ class WordSearchFragment : BaseFragment() {
         binding.editTextSearchWord.requestFocus()
         KeyboardManager().showKeyboard(binding.editTextSearchWord)
         mainViewModel.onShowedKeyboard()
-    }
-
-    private fun showWordSearchResultsLayout() {
-        binding.apply {
-            textNoWordSearchResultsMessage.visibility = View.INVISIBLE
-            textNumWordSearchResults.visibility = View.VISIBLE
-            linerLayoutWordSearchResults.visibility = View.VISIBLE
-        }
-    }
-
-    private fun showWordSearchNoResultsLayout() {
-        binding.apply {
-            textNoWordSearchResultsMessage.visibility = View.VISIBLE
-            textNumWordSearchResults.visibility = View.INVISIBLE
-            linerLayoutWordSearchResults.visibility = View.INVISIBLE
-        }
-    }
-
-    private fun showWordSearchIdleLayout() {
-        binding.apply {
-            textNoWordSearchResultsMessage.visibility = View.INVISIBLE
-            textNumWordSearchResults.visibility = View.INVISIBLE
-            linerLayoutWordSearchResults.visibility = View.INVISIBLE
-        }
     }
 
     @MainThread
