@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.annotation.MainThread
 import androidx.databinding.ViewDataBinding
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
@@ -89,6 +88,12 @@ class WordSearchFragment : BaseFragment() {
                     if (value) showKeyboard()
                 }
         }
+    }
+
+    private fun showKeyboard() {
+        binding.editTextSearchWord.requestFocus()
+        KeyboardManager().showKeyboard(binding.editTextSearchWord)
+        mainViewModel.onShowedKeyboard()
     }
 
     private fun setUpWordSearchView() {
@@ -218,13 +223,6 @@ class WordSearchFragment : BaseFragment() {
         }
     }
 
-    private fun showKeyboard() {
-        binding.editTextSearchWord.requestFocus()
-        KeyboardManager().showKeyboard(binding.editTextSearchWord)
-        mainViewModel.onShowedKeyboard()
-    }
-
-    @MainThread
     private fun navigateDiaryShowFragment(date: LocalDate) {
         if (!canNavigateFragment) return
 
@@ -233,7 +231,6 @@ class WordSearchFragment : BaseFragment() {
         navController.navigate(directions)
     }
 
-    @MainThread
     override fun navigateAppMessageDialog(appMessage: AppMessage) {
         val directions =
             WordSearchFragmentDirections.actionWordSearchFragmentToAppMessageDialog(appMessage)

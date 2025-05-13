@@ -50,9 +50,6 @@ internal class WordSearchViewModel @Inject internal constructor(
     private val initialPreviousSearchWord = ""
     private var previousSearchWord = initialPreviousSearchWord // 二重検索防止用
 
-    private val shouldLoadWordSearchResultList: Boolean
-        get() = _searchWord.value != previousSearchWord
-
     private val initialWordSearchResultListLoadingJob: Job? = null
     private var wordSearchResultListLoadingJob: Job? = initialWordSearchResultListLoadingJob // キャンセル用
 
@@ -75,9 +72,7 @@ internal class WordSearchViewModel @Inject internal constructor(
     private val initialShouldUpdateWordSearchResultList = false
     private var shouldUpdateWordSearchResultList = initialShouldUpdateWordSearchResultList
 
-    /**
-     * データベース読込からRecyclerViewへの反映までを true とする。
-     */
+    // MEMO:データベース読込からRecyclerViewへの反映までを true とする。
     private val initialIsVisibleUpdateProgressBar = false
     private val _isVisibleUpdateProgressBar = MutableStateFlow(initialIsVisibleUpdateProgressBar)
     val isVisibleUpdateProgressBar
@@ -125,7 +120,7 @@ internal class WordSearchViewModel @Inject internal constructor(
     // Viewクリック処理
     fun onNavigationButtonClicked() {
         viewModelScope.launch(Dispatchers.IO) {
-            updateFragmentAction(FragmentAction.NavigatePreviousFragment)
+            _fragmentAction.emit(FragmentAction.NavigatePreviousFragment)
         }
     }
 
@@ -135,7 +130,7 @@ internal class WordSearchViewModel @Inject internal constructor(
 
     fun onWordSearchResultListItemClicked(date: LocalDate) {
         viewModelScope.launch(Dispatchers.IO) {
-            updateFragmentAction(WordSearchFragmentAction.NavigateDiaryShowFragment(date))
+            _fragmentAction.emit(WordSearchFragmentAction.NavigateDiaryShowFragment(date))
         }
     }
 
@@ -182,7 +177,7 @@ internal class WordSearchViewModel @Inject internal constructor(
 
             // HACK:キーワードの入力時と確定時に検索Observerが起動してしまい
             //      同じキーワードで二重に検索してしまう。防止策として下記条件追加。
-            if (!shouldLoadWordSearchResultList) return@launch
+            if (_searchWord.value == previousSearchWord) return@launch
 
             val value = searchWord.value
             if (value.isEmpty()) {
@@ -198,7 +193,7 @@ internal class WordSearchViewModel @Inject internal constructor(
     // データ処理
     private fun prepareKeyboard() {
         val searchWord = searchWord.value
-        if (searchWord.isEmpty()) showKeyboard()
+        if (searchWord.isEmpty()) _shouldShowKeyboard.value = true
     }
 
     private fun loadNewWordSearchResultList() {
@@ -243,9 +238,9 @@ internal class WordSearchViewModel @Inject internal constructor(
         val logMsg = "ワード検索結果読込"
         Log.i(logTag, "${logMsg}_開始")
         if (resultListCreator is UpdateWordSearchResultListCreator) {
-            updateWordSearchStatus(WordSearchStatus.Updating)
+            _wordSearchStatus.value = WordSearchStatus.Updating
         } else {
-            updateWordSearchStatus(WordSearchStatus.Searching)
+            _wordSearchStatus.value = WordSearchStatus.Searching
         }
 
         val previousResultList = _wordSearchResultList.requireValue()
@@ -253,9 +248,9 @@ internal class WordSearchViewModel @Inject internal constructor(
             val updateResultList = resultListCreator.create()
             _wordSearchResultList.value = updateResultList
             if (updateResultList.isNotEmpty) {
-                updateWordSearchStatus(WordSearchStatus.Results)
+                _wordSearchStatus.value = WordSearchStatus.Results
             } else {
-                updateWordSearchStatus(WordSearchStatus.NoResults)
+                _wordSearchStatus.value = WordSearchStatus.NoResults
             }
             Log.i(logTag, "${logMsg}_完了")
         } catch (e: CancellationException) {
@@ -265,7 +260,7 @@ internal class WordSearchViewModel @Inject internal constructor(
             Log.e(logTag, "${logMsg}_失敗", e)
             _wordSearchResultList.value = previousResultList
             addAppMessage(WordSearchAppMessage.SearchResultListLoadingFailure)
-            updateWordSearchStatus(WordSearchStatus.Idle)
+            _wordSearchStatus.value = WordSearchStatus.Idle
         }
     }
 
@@ -370,20 +365,6 @@ internal class WordSearchViewModel @Inject internal constructor(
         return numLoadedDiaries < numExistingDiaries
     }
 
-    // WordSearchStatus更新
-    private fun updateWordSearchStatus(status: WordSearchStatus) {
-        _wordSearchStatus.value = status
-    }
-
-    // FragmentAction処理
-    private suspend fun updateFragmentAction(action: FragmentAction) {
-        _fragmentAction.emit(action)
-    }
-
-    private fun showKeyboard() {
-        _shouldShowKeyboard.value = true
-    }
-
     // クリア処理
     private fun clearSearchWord() {
         _searchWord.value = initialSearchWord
@@ -402,7 +383,7 @@ internal class WordSearchViewModel @Inject internal constructor(
     }
 
     private fun clearWordSearchResultList() {
-        updateWordSearchStatus(WordSearchStatus.Idle)
+        _wordSearchStatus.value = initialWordSearchStatus
         cancelPreviousLoading()
         wordSearchResultListLoadingJob = initialWordSearchResultListLoadingJob
         isWordSearchResultLoading = initialIsWordSearchResultLoading
