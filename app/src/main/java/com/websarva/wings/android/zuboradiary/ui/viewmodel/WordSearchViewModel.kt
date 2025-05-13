@@ -129,7 +129,7 @@ internal class WordSearchViewModel @Inject internal constructor(
 
     fun onWordSearchResultListItemClicked(date: LocalDate) {
         viewModelScope.launch(Dispatchers.IO) {
-            navigateDiaryShowFragment(date)
+            updateFragmentAction(WordSearchFragmentAction.NavigateDiaryShowFragment(date))
         }
     }
 
@@ -372,10 +372,6 @@ internal class WordSearchViewModel @Inject internal constructor(
     // FragmentAction処理
     private suspend fun updateFragmentAction(action: FragmentAction) {
         _fragmentAction.emit(action)
-    }
-
-    private suspend fun navigateDiaryShowFragment(date: LocalDate) {
-        updateFragmentAction(WordSearchFragmentAction.NavigateDiaryShowFragment(date))
     }
 
     private fun showKeyboard() {
