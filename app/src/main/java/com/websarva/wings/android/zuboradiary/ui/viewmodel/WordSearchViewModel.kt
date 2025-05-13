@@ -96,6 +96,16 @@ internal class WordSearchViewModel @Inject internal constructor(
     val fragmentAction
         get() = _fragmentAction.asSharedFlow()
 
+    // 初回キーボード表示
+    // HACK:WordSearchFragment表示時にFragmentActionでキーボードを表示させようとすると、
+    //      SharedFlowが監視する前(フラグメントライフサイクがStarted前)に処理する可能性がある為、表示されないことがある。
+    //      別途StateFlow変数で対応。確実な監視開始タイミングを取得できない為この方法で対応。
+    private val initialShouldShowKeyboard = false
+    private val _shouldShowKeyboard = MutableStateFlow(initialShouldShowKeyboard)
+    val shouldShowKeyboard
+        get() = _shouldShowKeyboard.asStateFlow()
+
+
     override fun initialize() {
         super.initialize()
         _wordSearchStatus.value = initialWordSearchStatus
@@ -109,6 +119,7 @@ internal class WordSearchViewModel @Inject internal constructor(
         shouldUpdateWordSearchResultList = initialShouldUpdateWordSearchResultList
         _isVisibleUpdateProgressBar.value = initialIsVisibleUpdateProgressBar
         shouldInitializeOnFragmentDestroyed = initialShouldInitializeOnFragmentDestroyed
+        _shouldShowKeyboard.value = initialShouldShowKeyboard
     }
 
     // Viewクリック処理
@@ -131,6 +142,10 @@ internal class WordSearchViewModel @Inject internal constructor(
     fun onWordSearchResultListUpdated() {
         clearIsWordSearchResultLoading()
         clearIsVisibleUpdateProgressBar()
+    }
+
+    fun onShowedKeyboard() {
+        clearShouldShowKeyboard()
     }
 
     // Fragment状態処理
@@ -175,7 +190,7 @@ internal class WordSearchViewModel @Inject internal constructor(
     }
 
     // データ処理
-    private suspend fun prepareKeyboard() {
+    private fun prepareKeyboard() {
         val searchWord = searchWord.value
         if (searchWord.isEmpty()) showKeyboard()
     }
@@ -363,8 +378,8 @@ internal class WordSearchViewModel @Inject internal constructor(
         updateFragmentAction(WordSearchFragmentAction.NavigateDiaryShowFragment(date))
     }
 
-    private suspend fun showKeyboard() {
-        updateFragmentAction(WordSearchFragmentAction.ShowKeyboard)
+    private fun showKeyboard() {
+        _shouldShowKeyboard.value = true
     }
 
     // クリア処理
@@ -378,6 +393,10 @@ internal class WordSearchViewModel @Inject internal constructor(
 
     private fun clearIsVisibleUpdateProgressBar() {
         _isVisibleUpdateProgressBar.value = initialIsVisibleUpdateProgressBar
+    }
+
+    private fun clearShouldShowKeyboard() {
+        _shouldShowKeyboard.value = false
     }
 
     private fun clearWordSearchResultList() {

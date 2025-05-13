@@ -62,6 +62,7 @@ class WordSearchFragment : BaseFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        setUpKeyboard()
         setUpToolBar()
         setUpWordSearchView()
         setUpWordSearchResultList()
@@ -82,6 +83,15 @@ class WordSearchFragment : BaseFragment() {
 
     override fun removeDialogResults() {
         // LifecycleEventObserverにダイアログからの結果受取処理コードを記述したら、ここに削除処理を記述する。
+    }
+
+    private fun setUpKeyboard() {
+        launchAndRepeatOnViewLifeCycleStarted {
+            mainViewModel.shouldShowKeyboard
+                .collectLatest { value: Boolean ->
+                    if (value) showKeyboard()
+                }
+        }
     }
 
     private fun setUpToolBar() {
@@ -223,9 +233,6 @@ class WordSearchFragment : BaseFragment() {
                         is WordSearchFragmentAction.NavigateDiaryShowFragment -> {
                             navigateDiaryShowFragment(value.date)
                         }
-                        WordSearchFragmentAction.ShowKeyboard -> {
-                            showKeyboard()
-                        }
                         FragmentAction.NavigatePreviousFragment -> {
                             navController.navigateUp()
                         }
@@ -243,6 +250,7 @@ class WordSearchFragment : BaseFragment() {
     private fun showKeyboard() {
         binding.editTextSearchWord.requestFocus()
         KeyboardManager().showKeyboard(binding.editTextSearchWord)
+        mainViewModel.onShowedKeyboard()
     }
 
     private fun showWordSearchResultsLayout() {

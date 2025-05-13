@@ -4,5 +4,4 @@ import java.time.LocalDate
 
 internal sealed class WordSearchFragmentAction : FragmentAction() {
     data class NavigateDiaryShowFragment(val date: LocalDate) : WordSearchFragmentAction()
-    data object ShowKeyboard : WordSearchFragmentAction()
 }
