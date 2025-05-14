@@ -171,7 +171,7 @@ class WordSearchFragment : BaseFragment() {
             val convertedList: List<DiaryYearMonthListBaseItem> =
                 ArrayList<DiaryYearMonthListBaseItem>(value.itemList)
             listAdapter.submitList(convertedList) {
-                mainViewModel.onWordSearchResultListUpdated()
+                mainViewModel.onWordSearchResultListUpdated(value)
             }
         }
     }

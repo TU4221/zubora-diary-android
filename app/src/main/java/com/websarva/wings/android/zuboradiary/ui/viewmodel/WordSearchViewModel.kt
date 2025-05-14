@@ -53,11 +53,6 @@ internal class WordSearchViewModel @Inject internal constructor(
     private val initialWordSearchResultListLoadingJob: Job? = null
     private var wordSearchResultListLoadingJob: Job? = initialWordSearchResultListLoadingJob // キャンセル用
 
-    // MEMO:RecyclerViewのスクロール時のアイテム追加更新処理の重複防止フラグ
-    private val initialIsLoadingOnWordSearchResultListEndScrolled = false
-    private var isLoadingOnWordSearchResultListEndScrolled =
-        initialIsLoadingOnWordSearchResultListEndScrolled
-
     private val numLoadingItems = DiaryListViewModel.NUM_LOADING_ITEMS
     private val initialWordSearchResultList = WordSearchResultYearMonthList()
     private val _wordSearchResultList = MutableStateFlow(initialWordSearchResultList)
@@ -109,7 +104,6 @@ internal class WordSearchViewModel @Inject internal constructor(
         previousSearchWord = initialPreviousSearchWord
         cancelPreviousLoading()
         wordSearchResultListLoadingJob = initialWordSearchResultListLoadingJob
-        isLoadingOnWordSearchResultListEndScrolled = initialIsLoadingOnWordSearchResultListEndScrolled
         _wordSearchResultList.value = initialWordSearchResultList
         _numWordSearchResults.value = initialNumWordSearchResults
         shouldUpdateWordSearchResultList = initialShouldUpdateWordSearchResultList
@@ -137,14 +131,18 @@ internal class WordSearchViewModel @Inject internal constructor(
 
     // View状態処理
     fun onWordSearchResultListEndScrolled() {
-        if (isLoadingOnWordSearchResultListEndScrolled) return
         loadAdditionWordSearchResultList()
-        isLoadingOnWordSearchResultListEndScrolled = true
     }
 
-    fun onWordSearchResultListUpdated() {
-        clearIsLoadingOnWordSearchResultListEndScrolled()
+    fun onWordSearchResultListUpdated(list: WordSearchResultYearMonthList) {
         clearIsVisibleUpdateProgressBar()
+        if (_searchWord.value.isEmpty()) {
+            _wordSearchStatus.value = WordSearchStatus.Idle
+        } else if (list.isNotEmpty) {
+            _wordSearchStatus.value = WordSearchStatus.Results
+        } else {
+            _wordSearchStatus.value = WordSearchStatus.NoResults
+        }
     }
 
     fun onShowedKeyboard() {
@@ -202,18 +200,22 @@ internal class WordSearchViewModel @Inject internal constructor(
         loadWordSearchResultDiaryList(
             NewWordSearchResultListCreator()
         )
+        _wordSearchStatus.value = WordSearchStatus.Searching
     }
 
     private fun loadAdditionWordSearchResultList() {
+        if (_wordSearchStatus.value == WordSearchStatus.AdditionLoading) return
         loadWordSearchResultDiaryList(
             AddedWordSearchResultListCreator()
         )
+        _wordSearchStatus.value = WordSearchStatus.AdditionLoading
     }
 
     private fun updateWordSearchResultList() {
         loadWordSearchResultDiaryList(
             UpdateWordSearchResultListCreator()
         )
+        _wordSearchStatus.value = WordSearchStatus.Updating
     }
 
     private fun loadWordSearchResultDiaryList(
@@ -238,21 +240,11 @@ internal class WordSearchViewModel @Inject internal constructor(
     ) {
         val logMsg = "ワード検索結果読込"
         Log.i(logTag, "${logMsg}_開始")
-        if (resultListCreator is UpdateWordSearchResultListCreator) {
-            _wordSearchStatus.value = WordSearchStatus.Updating
-        } else {
-            _wordSearchStatus.value = WordSearchStatus.Searching
-        }
 
         val previousResultList = _wordSearchResultList.requireValue()
         try {
             val updateResultList = resultListCreator.create()
             _wordSearchResultList.value = updateResultList
-            if (updateResultList.isNotEmpty) {
-                _wordSearchStatus.value = WordSearchStatus.Results
-            } else {
-                _wordSearchStatus.value = WordSearchStatus.NoResults
-            }
             Log.i(logTag, "${logMsg}_完了")
         } catch (e: CancellationException) {
             Log.i(logTag, "${logMsg}_キャンセル", e)
@@ -261,7 +253,6 @@ internal class WordSearchViewModel @Inject internal constructor(
             Log.e(logTag, "${logMsg}_失敗", e)
             _wordSearchResultList.value = previousResultList
             addAppMessage(WordSearchAppMessage.SearchResultListLoadingFailure)
-            _wordSearchStatus.value = WordSearchStatus.Idle
         }
     }
 
@@ -371,10 +362,6 @@ internal class WordSearchViewModel @Inject internal constructor(
         _searchWord.value = initialSearchWord
     }
 
-    private fun clearIsLoadingOnWordSearchResultListEndScrolled() {
-        isLoadingOnWordSearchResultListEndScrolled = initialIsLoadingOnWordSearchResultListEndScrolled
-    }
-
     private fun clearIsVisibleUpdateProgressBar() {
         _isVisibleUpdateProgressBar.value = initialIsVisibleUpdateProgressBar
     }
@@ -387,7 +374,6 @@ internal class WordSearchViewModel @Inject internal constructor(
         _wordSearchStatus.value = initialWordSearchStatus
         cancelPreviousLoading()
         wordSearchResultListLoadingJob = initialWordSearchResultListLoadingJob
-        isLoadingOnWordSearchResultListEndScrolled = initialIsLoadingOnWordSearchResultListEndScrolled
         _wordSearchResultList.value = initialWordSearchResultList
         _numWordSearchResults.value = initialNumWordSearchResults
     }
