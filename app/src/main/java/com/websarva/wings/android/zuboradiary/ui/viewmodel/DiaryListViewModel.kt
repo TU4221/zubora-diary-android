@@ -53,11 +53,6 @@ internal class DiaryListViewModel @Inject constructor(private val diaryRepositor
     private val _diaryList = MutableStateFlow(initialDiaryList)
     val diaryList
         get() = _diaryList.asStateFlow()
-    
-    private val initialIsLoadingDiaryList = false
-    private var _isLoadingDiaryList = MutableStateFlow(initialIsLoadingDiaryList)
-    val isLoadingDiaryList
-        get() = _isLoadingDiaryList.asStateFlow()
 
     // MEMO:データベース読込からRecyclerViewへの反映までを true とする。
     private val initialIsVisibleUpdateProgressBar = false
@@ -78,7 +73,6 @@ internal class DiaryListViewModel @Inject constructor(private val diaryRepositor
         _diaryListStatus.value = initialDiaryListStatus
         diaryListLoadingJob = initialDiaryListLoadingJob
         _diaryList.value = initialDiaryList
-        _isLoadingDiaryList.value = initialIsLoadingDiaryList
         _isVisibleUpdateProgressBar.value = initialIsVisibleUpdateProgressBar
         sortConditionDate = initialSortConditionDate
     }
@@ -119,8 +113,12 @@ internal class DiaryListViewModel @Inject constructor(private val diaryRepositor
         loadAdditionDiaryList()
     }
 
-    fun onDiaryListUpdated() {
-        clearIsLoadingDiaryList()
+    fun onDiaryListUpdated(list: DiaryYearMonthList) {
+        if (list.isNotEmpty) {
+            _diaryListStatus.value = DiaryListStatus.Results
+        } else {
+            _diaryListStatus.value = DiaryListStatus.NoResults
+        }
     }
 
     fun onFragmentViewCreated() {
@@ -159,15 +157,18 @@ internal class DiaryListViewModel @Inject constructor(private val diaryRepositor
 
     private fun loadNewDiaryList() {
         loadDiaryList(NewDiaryListCreator())
+        _diaryListStatus.value = DiaryListStatus.NewLoading
     }
 
     private fun loadAdditionDiaryList() {
-        if (isLoadingDiaryList.value) return
+        if (_diaryListStatus.value == DiaryListStatus.AdditionLoading) return
         loadDiaryList(AddedDiaryListCreator())
+        _diaryListStatus.value = DiaryListStatus.AdditionLoading
     }
 
     private fun updateDiaryList() {
         loadDiaryList(UpdateDiaryListCreator())
+        _diaryListStatus.value = DiaryListStatus.Updating
     }
 
     private fun loadDiaryList(creator: DiaryListCreator) {
@@ -176,7 +177,6 @@ internal class DiaryListViewModel @Inject constructor(private val diaryRepositor
             viewModelScope.launch(Dispatchers.IO) {
                 createDiaryList(creator)
             }
-        _isLoadingDiaryList.value = true
     }
 
     private fun cancelPreviousLoading() {
@@ -189,20 +189,10 @@ internal class DiaryListViewModel @Inject constructor(private val diaryRepositor
     private suspend fun createDiaryList(creator: DiaryListCreator) {
         val logMsg = "日記リスト読込"
         Log.i(logTag, "${logMsg}_開始")
-        if (creator is UpdateDiaryListCreator) {
-            _diaryListStatus.value = DiaryListStatus.Updating
-        } else {
-            _diaryListStatus.value = DiaryListStatus.Loading
-        }
 
         val previousDiaryList = _diaryList.requireValue()
         try {
             val updateDiaryList = creator.create()
-            if (updateDiaryList.isNotEmpty) {
-                _diaryListStatus.value = DiaryListStatus.Results
-            } else {
-                _diaryListStatus.value = DiaryListStatus.NoResults
-            }
             _diaryList.value = updateDiaryList
             Log.i(logTag, "${logMsg}_完了")
         } catch (e: CancellationException) {
@@ -212,7 +202,6 @@ internal class DiaryListViewModel @Inject constructor(private val diaryRepositor
             Log.e(logTag, "${logMsg}_失敗", e)
             _diaryList.value = previousDiaryList
             addAppMessage(DiaryListAppMessage.DiaryListLoadingFailure)
-            _diaryListStatus.value = DiaryListStatus.Idle
         }
     }
 
@@ -372,10 +361,6 @@ internal class DiaryListViewModel @Inject constructor(private val diaryRepositor
             addAppMessage(DiaryListAppMessage.DiaryInfoLoadingFailure)
             return null
         }
-    }
-
-    private fun clearIsLoadingDiaryList() {
-        _isLoadingDiaryList.value = false
     }
 
     private suspend fun navigateDiaryShowFragment(date: LocalDate) {
