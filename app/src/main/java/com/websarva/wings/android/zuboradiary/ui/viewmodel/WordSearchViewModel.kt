@@ -68,12 +68,6 @@ internal class WordSearchViewModel @Inject internal constructor(
     private val initialShouldUpdateWordSearchResultList = false
     private var shouldUpdateWordSearchResultList = initialShouldUpdateWordSearchResultList
 
-    // MEMO:データベース読込からRecyclerViewへの反映までを true とする。
-    private val initialIsVisibleUpdateProgressBar = false
-    private val _isVisibleUpdateProgressBar = MutableStateFlow(initialIsVisibleUpdateProgressBar)
-    val isVisibleUpdateProgressBar
-        get() = _isVisibleUpdateProgressBar.asStateFlow()
-
     // MEMO:WordSearchViewModelのスコープ範囲はActivityになるが、
     //      WordSearchFragment、DiaryShowFragment、DiaryEditFragment、
     //      DiaryItemTitleEditFragment表示時のみ ViewModelのプロパティ値を保持できたらよいので、
@@ -107,7 +101,6 @@ internal class WordSearchViewModel @Inject internal constructor(
         _wordSearchResultList.value = initialWordSearchResultList
         _numWordSearchResults.value = initialNumWordSearchResults
         shouldUpdateWordSearchResultList = initialShouldUpdateWordSearchResultList
-        _isVisibleUpdateProgressBar.value = initialIsVisibleUpdateProgressBar
         shouldInitializeOnFragmentDestroyed = initialShouldInitializeOnFragmentDestroyed
         _shouldShowKeyboard.value = initialShouldShowKeyboard
     }
@@ -135,7 +128,6 @@ internal class WordSearchViewModel @Inject internal constructor(
     }
 
     fun onWordSearchResultListUpdated(list: WordSearchResultYearMonthList) {
-        clearIsVisibleUpdateProgressBar()
         if (_searchWord.value.isEmpty()) {
             _wordSearchStatus.value = WordSearchStatus.Idle
         } else if (list.isNotEmpty) {
@@ -300,7 +292,6 @@ internal class WordSearchViewModel @Inject internal constructor(
             val currentResultList = _wordSearchResultList.requireValue()
             check(currentResultList.isNotEmpty)
 
-            _isVisibleUpdateProgressBar.value = true
             try {
                 var numLoadingItems = currentResultList.countDiaries()
                 // HACK:画面全体にリストアイテムが存在しない状態で日記を追加した後にリスト画面に戻ると、
@@ -311,7 +302,6 @@ internal class WordSearchViewModel @Inject internal constructor(
                 }
                 return loadWordSearchResultDiaryListFromDatabase(numLoadingItems, 0)
             } catch (e: Exception) {
-                clearIsVisibleUpdateProgressBar()
                 throw e
             }
         }
@@ -360,10 +350,6 @@ internal class WordSearchViewModel @Inject internal constructor(
     // クリア処理
     private fun clearSearchWord() {
         _searchWord.value = initialSearchWord
-    }
-
-    private fun clearIsVisibleUpdateProgressBar() {
-        _isVisibleUpdateProgressBar.value = initialIsVisibleUpdateProgressBar
     }
 
     private fun clearShouldShowKeyboard() {

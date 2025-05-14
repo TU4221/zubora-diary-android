@@ -321,7 +321,7 @@
         <include
             layout="@layout/layout_full_screen_circular_progress_indicator"
             android:id="@+id/include_progress_indicator"
-            app:isVisibleStateFlow="@{diaryEditViewModel.isVisibleUpdateProgressBar}" />
+            app:visibility="@{diaryEditViewModel.isVisibleUpdateProgressBar ? View.VISIBLE : View.INVISIBLE}" />
 
     </FrameLayout>
 

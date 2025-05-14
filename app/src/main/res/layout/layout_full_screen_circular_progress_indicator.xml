@@ -3,16 +3,15 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
-        <import type="android.view.View" />
         <variable
-            name="isVisibleStateFlow"
-            type="kotlinx.coroutines.flow.StateFlow&lt;Boolean>" />
+            name="visibility"
+            type="Integer" />
     </data>
 
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:visibility="@{isVisibleStateFlow ? View.VISIBLE : View.INVISIBLE}"
+        android:visibility="@{visibility}"
         tools:visibility="visible">
 
         <com.websarva.wings.android.zuboradiary.ui.view.custom.ProgressIndicatorBackgroundView

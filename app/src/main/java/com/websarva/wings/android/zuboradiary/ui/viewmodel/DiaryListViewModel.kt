@@ -54,12 +54,6 @@ internal class DiaryListViewModel @Inject constructor(private val diaryRepositor
     val diaryList
         get() = _diaryList.asStateFlow()
 
-    // MEMO:データベース読込からRecyclerViewへの反映までを true とする。
-    private val initialIsVisibleUpdateProgressBar = false
-    private val _isVisibleUpdateProgressBar = MutableStateFlow(initialIsVisibleUpdateProgressBar)
-    val isVisibleUpdateProgressBar
-        get() = _isVisibleUpdateProgressBar.asStateFlow()
-
     private val initialSortConditionDate: LocalDate? = null
     private var sortConditionDate: LocalDate? = initialSortConditionDate
 
@@ -73,7 +67,6 @@ internal class DiaryListViewModel @Inject constructor(private val diaryRepositor
         _diaryListStatus.value = initialDiaryListStatus
         diaryListLoadingJob = initialDiaryListLoadingJob
         _diaryList.value = initialDiaryList
-        _isVisibleUpdateProgressBar.value = initialIsVisibleUpdateProgressBar
         sortConditionDate = initialSortConditionDate
     }
 
@@ -247,19 +240,14 @@ internal class DiaryListViewModel @Inject constructor(private val diaryRepositor
             val currentDiaryList = _diaryList.requireValue()
             check(currentDiaryList.isNotEmpty)
 
-            _isVisibleUpdateProgressBar.value = true
-            try {
-                var numLoadingItems = currentDiaryList.countDiaries()
-                // HACK:画面全体にリストアイテムが存在しない状態で日記を追加した後にリスト画面に戻ると、
-                //      日記追加前のアイテム数しか表示されない状態となる。また、スクロール更新もできない。
-                //      対策として下記コードを記述。
-                if (numLoadingItems < NUM_LOADING_ITEMS) {
-                    numLoadingItems = NUM_LOADING_ITEMS
-                }
-                return loadSavedDiaryList(numLoadingItems, 0)
-            } finally {
-                _isVisibleUpdateProgressBar.value = false
+            var numLoadingItems = currentDiaryList.countDiaries()
+            // HACK:画面全体にリストアイテムが存在しない状態で日記を追加した後にリスト画面に戻ると、
+            //      日記追加前のアイテム数しか表示されない状態となる。また、スクロール更新もできない。
+            //      対策として下記コードを記述。
+            if (numLoadingItems < NUM_LOADING_ITEMS) {
+                numLoadingItems = NUM_LOADING_ITEMS
             }
+            return loadSavedDiaryList(numLoadingItems, 0)
         }
     }
 

@@ -125,7 +125,7 @@
                 <include
                     layout="@layout/layout_full_screen_circular_progress_indicator"
                     android:id="@+id/include_progress_indicator"
-                    app:isVisibleStateFlow="@{word_search_view_model.isVisibleUpdateProgressBar}" />
+                    app:visibility="@{word_search_view_model.wordSearchStatus instanceof WordSearchStatus.Updating ? View.VISIBLE : View.INVISIBLE}" />
 
             </FrameLayout>
 
