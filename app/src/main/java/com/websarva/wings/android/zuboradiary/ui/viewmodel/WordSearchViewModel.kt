@@ -54,8 +54,9 @@ internal class WordSearchViewModel @Inject internal constructor(
     private var wordSearchResultListLoadingJob: Job? = initialWordSearchResultListLoadingJob // キャンセル用
 
     // MEMO:RecyclerViewのスクロール時のアイテム追加更新処理の重複防止フラグ
-    private val initialIsWordSearchResultLoading = false
-    private var isWordSearchResultLoading = initialIsWordSearchResultLoading
+    private val initialIsLoadingOnWordSearchResultListEndScrolled = false
+    private var isLoadingOnWordSearchResultListEndScrolled =
+        initialIsLoadingOnWordSearchResultListEndScrolled
 
     private val numLoadingItems = DiaryListViewModel.NUM_LOADING_ITEMS
     private val initialWordSearchResultList = WordSearchResultYearMonthList()
@@ -108,7 +109,7 @@ internal class WordSearchViewModel @Inject internal constructor(
         previousSearchWord = initialPreviousSearchWord
         cancelPreviousLoading()
         wordSearchResultListLoadingJob = initialWordSearchResultListLoadingJob
-        isWordSearchResultLoading = initialIsWordSearchResultLoading
+        isLoadingOnWordSearchResultListEndScrolled = initialIsLoadingOnWordSearchResultListEndScrolled
         _wordSearchResultList.value = initialWordSearchResultList
         _numWordSearchResults.value = initialNumWordSearchResults
         shouldUpdateWordSearchResultList = initialShouldUpdateWordSearchResultList
@@ -136,12 +137,13 @@ internal class WordSearchViewModel @Inject internal constructor(
 
     // View状態処理
     fun onWordSearchResultListEndScrolled() {
-        if (isWordSearchResultLoading) return
+        if (isLoadingOnWordSearchResultListEndScrolled) return
         loadAdditionWordSearchResultList()
+        isLoadingOnWordSearchResultListEndScrolled = true
     }
 
     fun onWordSearchResultListUpdated() {
-        clearIsWordSearchResultLoading()
+        clearIsLoadingOnWordSearchResultListEndScrolled()
         clearIsVisibleUpdateProgressBar()
     }
 
@@ -222,7 +224,6 @@ internal class WordSearchViewModel @Inject internal constructor(
             viewModelScope.launch(Dispatchers.IO) {
                 createWordSearchResultList(creator)
             }
-        isWordSearchResultLoading = true
     }
 
     private fun cancelPreviousLoading() {
@@ -370,8 +371,8 @@ internal class WordSearchViewModel @Inject internal constructor(
         _searchWord.value = initialSearchWord
     }
 
-    private fun clearIsWordSearchResultLoading() {
-        isWordSearchResultLoading = initialIsWordSearchResultLoading
+    private fun clearIsLoadingOnWordSearchResultListEndScrolled() {
+        isLoadingOnWordSearchResultListEndScrolled = initialIsLoadingOnWordSearchResultListEndScrolled
     }
 
     private fun clearIsVisibleUpdateProgressBar() {
@@ -386,7 +387,7 @@ internal class WordSearchViewModel @Inject internal constructor(
         _wordSearchStatus.value = initialWordSearchStatus
         cancelPreviousLoading()
         wordSearchResultListLoadingJob = initialWordSearchResultListLoadingJob
-        isWordSearchResultLoading = initialIsWordSearchResultLoading
+        isLoadingOnWordSearchResultListEndScrolled = initialIsLoadingOnWordSearchResultListEndScrolled
         _wordSearchResultList.value = initialWordSearchResultList
         _numWordSearchResults.value = initialNumWordSearchResults
     }
