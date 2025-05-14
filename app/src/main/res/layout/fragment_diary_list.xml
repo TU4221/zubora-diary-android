@@ -5,6 +5,7 @@
 
     <data>
         <import type="android.view.View" />
+        <import type="com.websarva.wings.android.zuboradiary.ui.model.DiaryListStatus" />
         <variable
             name="list_view_model"
             type="com.websarva.wings.android.zuboradiary.ui.viewmodel.DiaryListViewModel" />
@@ -33,6 +34,7 @@
                 app:menu="@menu/diary_list_toolbar_menu"
                 app:navigationIcon="@drawable/ic_calendar_month_24px"
                 app:navigationContentDescription="@string/fragment_diary_list_toolbar_navigation_top_year_month_switching"
+                app:onNavigationIconClick="@{() -> list_view_model.onNavigationClicked()}"
                 app:title="@string/fragment_diary_list_toolbar_title"/>
 
             <FrameLayout
@@ -47,7 +49,7 @@
                     android:textAppearance="@style/AppTextViewTextAppearance"
                     android:text="@string/fragment_diary_list_no_saved_diary_message"
                     android:gravity="center"
-                    android:visibility="invisible"
+                    android:visibility="@{list_view_model.diaryListStatus instanceof DiaryListStatus.NoResults ? View.VISIBLE : View.INVISIBLE}"
                     tools:visibility="visible"/>
 
                 <!-- MEMO:スクロールバーを表示させたいが、子RecyclerViewに反応してスクロールバーの長さが安定しない。
@@ -57,7 +59,7 @@
                     android:id="@+id/recycler_diary_list"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:visibility="invisible"
+                    android:visibility="@{!(list_view_model.diaryListStatus instanceof DiaryListStatus.NoResults) ? View.VISIBLE : View.INVISIBLE}"
                     android:scrollbars="none"
                     tools:visibility="visible"/>
 
@@ -80,7 +82,8 @@
             android:layout_marginBottom="@dimen/fab_margin_bottom"
             android:src="@drawable/ic_edit_24px"
             android:contentDescription="@string/fragment_diary_list_fab_new_diary_creation"
-            android:enabled="@{!list_view_model.isVisibleUpdateProgressBar}" />
+            android:enabled="@{!(list_view_model.diaryListStatus instanceof DiaryListStatus.Updating) ? true : false}"
+            android:onClick="@{() -> list_view_model.onDiaryEditButtonClicked()}"/>
 
     </FrameLayout>
 

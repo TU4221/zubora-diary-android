@@ -6,7 +6,6 @@ import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-import androidx.annotation.MainThread
 import androidx.databinding.ViewDataBinding
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.RecyclerView
@@ -83,8 +82,9 @@ class DiaryListFragment : BaseFragment() {
 
         setUpFragmentAction()
         setUpToolBar()
-        setUpFloatActionButton()
         setUpDiaryList()
+
+        mainViewModel.onFragmentViewCreated()
     }
 
     override fun handleOnReceivingResultFromPreviousFragment() {
@@ -148,26 +148,16 @@ class DiaryListFragment : BaseFragment() {
                     FragmentAction.NavigatePreviousFragment -> {
                         navController.navigateUp()
                     }
-                    FragmentAction.None -> {
-                        // 処理なし
-                    }
                     else -> {
                         throw IllegalArgumentException()
                     }
                 }
-                mainViewModel.clearFragmentAction()
             }
         }
     }
 
     // ツールバー設定
     private fun setUpToolBar() {
-        binding.materialToolbarTopAppBar
-            .setNavigationOnClickListener {
-                // リスト先頭年月切り替えダイアログ起動
-                mainViewModel.onNavigationClicked()
-            }
-
         binding.materialToolbarTopAppBar
             .setOnMenuItemClickListener { item: MenuItem ->
                 // ワード検索フラグメント起動
@@ -179,17 +169,8 @@ class DiaryListFragment : BaseFragment() {
             }
     }
 
-    // 新規作成FAB設定
-    private fun setUpFloatActionButton() {
-        binding.floatingActionButtonDiaryEdit.setOnClickListener {
-            mainViewModel.onDiaryEditButtonClicked()
-        }
-    }
-
     // 日記リスト(年月)設定
     private fun setUpDiaryList() {
-        binding.floatingActionButtonDiaryEdit.isEnabled = true
-
         val diaryListAdapter = setUpListAdapter()
 
 
@@ -206,8 +187,6 @@ class DiaryListFragment : BaseFragment() {
                     diaryListAdapter.setSwipeEnabled(!value)
                 }
         }
-
-        mainViewModel.prepareDiaryList()
     }
 
     private fun setUpListAdapter(): DiaryListAdapter {
@@ -244,24 +223,7 @@ class DiaryListFragment : BaseFragment() {
 
     private inner class DiaryListObserver {
         fun onChanged(value: DiaryYearMonthList) {
-            setUpListViewVisibility(value)
             setUpList(value)
-        }
-
-        private fun setUpListViewVisibility(list: DiaryYearMonthList) {
-            val noDiaryMessageVisibility: Int
-            val diaryListVisibility: Int
-            if (list.isEmpty) {
-                noDiaryMessageVisibility = View.VISIBLE
-                diaryListVisibility = View.INVISIBLE
-            } else {
-                noDiaryMessageVisibility = View.INVISIBLE
-                diaryListVisibility = View.VISIBLE
-            }
-            binding.apply {
-                textNoDiaryMessage.visibility = noDiaryMessageVisibility
-                recyclerDiaryList.visibility = diaryListVisibility
-            }
         }
 
         private fun setUpList(list: DiaryYearMonthList) {
@@ -279,7 +241,6 @@ class DiaryListFragment : BaseFragment() {
         }
     }
 
-    @MainThread
     private fun navigateDiaryEditFragment() {
         if (!canNavigateFragment) return
 
@@ -292,7 +253,6 @@ class DiaryListFragment : BaseFragment() {
         navController.navigate(directions)
     }
 
-    @MainThread
     private fun navigateDiaryShowFragment(date: LocalDate) {
         if (!canNavigateFragment) return
 
@@ -301,7 +261,6 @@ class DiaryListFragment : BaseFragment() {
         navController.navigate(directions)
     }
 
-    @MainThread
     private fun navigateWordSearchFragment() {
         if (!canNavigateFragment) return
 
@@ -310,7 +269,6 @@ class DiaryListFragment : BaseFragment() {
         navController.navigate(directions)
     }
 
-    @MainThread
     private fun navigateStartYearMonthPickerDialog(newestYear: Year, oldestYear: Year) {
         if (!canNavigateFragment) return
 
@@ -322,7 +280,6 @@ class DiaryListFragment : BaseFragment() {
         navController.navigate(directions)
     }
 
-    @MainThread
     private fun navigateDiaryDeleteDialog(date: LocalDate, pictureUri: Uri?) {
         if (!canNavigateFragment) return
 
@@ -331,7 +288,6 @@ class DiaryListFragment : BaseFragment() {
         navController.navigate(directions)
     }
 
-    @MainThread
     override fun navigateAppMessageDialog(appMessage: AppMessage) {
         val directions =
             DiaryListFragmentDirections.actionDiaryListFragmentToAppMessageDialog(appMessage)
