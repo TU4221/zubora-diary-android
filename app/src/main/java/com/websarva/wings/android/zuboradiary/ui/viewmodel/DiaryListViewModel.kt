@@ -108,6 +108,7 @@ internal class DiaryListViewModel @Inject constructor(private val diaryRepositor
     // View状態処理
     fun onDiaryListEndScrolled() {
         if (isLoadingOnScrolled) return
+        isLoadingOnScrolled = true
         loadAdditionDiaryList()
     }
 

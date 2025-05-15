@@ -128,6 +128,7 @@ internal class WordSearchViewModel @Inject internal constructor(
     // View状態処理
     fun onWordSearchResultListEndScrolled() {
         if (isLoadingOnScrolled) return
+        isLoadingOnScrolled = true
         loadAdditionWordSearchResultList()
     }
 
