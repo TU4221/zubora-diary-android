@@ -116,7 +116,7 @@ internal class WordSearchViewModel @Inject internal constructor(
     }
 
     fun onSearchWordClearButtonClicked() {
-        clearSearchWord()
+        _searchWord.value = initialSearchWord
     }
 
     fun onWordSearchResultListItemClicked(date: LocalDate) {
@@ -136,7 +136,7 @@ internal class WordSearchViewModel @Inject internal constructor(
     }
 
     fun onShowedKeyboard() {
-        clearShouldShowKeyboard()
+        _shouldShowKeyboard.value = initialShouldShowKeyboard
     }
 
     // Fragment状態処理
@@ -361,15 +361,6 @@ internal class WordSearchViewModel @Inject internal constructor(
         if (numExistingDiaries <= 0) return false
 
         return numLoadedDiaries < numExistingDiaries
-    }
-
-    // クリア処理
-    private fun clearSearchWord() {
-        _searchWord.value = initialSearchWord
-    }
-
-    private fun clearShouldShowKeyboard() {
-        _shouldShowKeyboard.value = false
     }
 
     private fun clearWordSearchResultList() {
