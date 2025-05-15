@@ -90,6 +90,8 @@ internal class WordSearchViewModel @Inject internal constructor(
     val shouldShowKeyboard
         get() = _shouldShowKeyboard.asStateFlow()
 
+    private val initialIsLoadingOnScrolled = false
+    private var isLoadingOnScrolled = initialIsLoadingOnScrolled
 
     override fun initialize() {
         super.initialize()
@@ -103,6 +105,7 @@ internal class WordSearchViewModel @Inject internal constructor(
         shouldUpdateWordSearchResultList = initialShouldUpdateWordSearchResultList
         shouldInitializeOnFragmentDestroyed = initialShouldInitializeOnFragmentDestroyed
         _shouldShowKeyboard.value = initialShouldShowKeyboard
+        isLoadingOnScrolled = initialIsLoadingOnScrolled
     }
 
     // Viewクリック処理
@@ -124,17 +127,12 @@ internal class WordSearchViewModel @Inject internal constructor(
 
     // View状態処理
     fun onWordSearchResultListEndScrolled() {
+        if (isLoadingOnScrolled) return
         loadAdditionWordSearchResultList()
     }
 
-    fun onWordSearchResultListUpdated(list: WordSearchResultYearMonthList) {
-        if (_searchWord.value.isEmpty()) {
-            _wordSearchStatus.value = WordSearchStatus.Idle
-        } else if (list.isNotEmpty) {
-            _wordSearchStatus.value = WordSearchStatus.Results
-        } else {
-            _wordSearchStatus.value = WordSearchStatus.NoResults
-        }
+    fun onWordSearchResultListUpdated() {
+        isLoadingOnScrolled = initialIsLoadingOnScrolled
     }
 
     fun onShowedKeyboard() {
@@ -192,22 +190,18 @@ internal class WordSearchViewModel @Inject internal constructor(
         loadWordSearchResultDiaryList(
             NewWordSearchResultListCreator()
         )
-        _wordSearchStatus.value = WordSearchStatus.Searching
     }
 
     private fun loadAdditionWordSearchResultList() {
-        if (_wordSearchStatus.value == WordSearchStatus.AdditionLoading) return
         loadWordSearchResultDiaryList(
             AddedWordSearchResultListCreator()
         )
-        _wordSearchStatus.value = WordSearchStatus.AdditionLoading
     }
 
     private fun updateWordSearchResultList() {
         loadWordSearchResultDiaryList(
             UpdateWordSearchResultListCreator()
         )
-        _wordSearchStatus.value = WordSearchStatus.Updating
     }
 
     private fun loadWordSearchResultDiaryList(
@@ -235,8 +229,10 @@ internal class WordSearchViewModel @Inject internal constructor(
 
         val previousResultList = _wordSearchResultList.requireValue()
         try {
+            updateWordSearchStatusOnSearchStart(resultListCreator)
             val updateResultList = resultListCreator.create()
             _wordSearchResultList.value = updateResultList
+            updateWordSearchStatusOnSearchFinish(updateResultList)
             Log.i(logTag, "${logMsg}_完了")
         } catch (e: CancellationException) {
             Log.i(logTag, "${logMsg}_キャンセル", e)
@@ -244,8 +240,28 @@ internal class WordSearchViewModel @Inject internal constructor(
         } catch (e: Exception) {
             Log.e(logTag, "${logMsg}_失敗", e)
             _wordSearchResultList.value = previousResultList
+            updateWordSearchStatusOnSearchFinish(previousResultList)
             addAppMessage(WordSearchAppMessage.SearchResultListLoadingFailure)
         }
+    }
+
+    private fun updateWordSearchStatusOnSearchStart(creator: WordSearchResultListCreator) {
+        _wordSearchStatus.value =
+            when (creator) {
+                is NewWordSearchResultListCreator -> WordSearchStatus.Searching
+                is AddedWordSearchResultListCreator -> WordSearchStatus.AdditionLoading
+                is UpdateWordSearchResultListCreator -> WordSearchStatus.Updating
+                else -> throw IllegalArgumentException()
+            }
+    }
+
+    private fun updateWordSearchStatusOnSearchFinish(list: WordSearchResultYearMonthList) {
+        _wordSearchStatus.value =
+            if (list.isNotEmpty) {
+                WordSearchStatus.Results
+            } else {
+                WordSearchStatus.NoResults
+            }
     }
 
     private fun interface WordSearchResultListCreator {
@@ -362,5 +378,6 @@ internal class WordSearchViewModel @Inject internal constructor(
         wordSearchResultListLoadingJob = initialWordSearchResultListLoadingJob
         _wordSearchResultList.value = initialWordSearchResultList
         _numWordSearchResults.value = initialNumWordSearchResults
+        isLoadingOnScrolled = initialIsLoadingOnScrolled
     }
 }

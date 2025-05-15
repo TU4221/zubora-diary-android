@@ -171,7 +171,7 @@ class WordSearchFragment : BaseFragment() {
             val convertedList: List<DiaryYearMonthListBaseItem> =
                 ArrayList<DiaryYearMonthListBaseItem>(value.itemList)
             listAdapter.submitList(convertedList) {
-                mainViewModel.onWordSearchResultListUpdated(value)
+                mainViewModel.onWordSearchResultListUpdated()
             }
         }
     }
@@ -252,9 +252,10 @@ class WordSearchFragment : BaseFragment() {
 
             if (destination.id == R.id.navigation_diary_show_fragment) {
                 mainViewModel.onNextFragmentNavigated()
+            } else {
+                mainViewModel.onPreviousFragmentNavigated()
             }
 
-            mainViewModel.onPreviousFragmentNavigated()
             navController.removeOnDestinationChangedListener(this)
         }
     }
