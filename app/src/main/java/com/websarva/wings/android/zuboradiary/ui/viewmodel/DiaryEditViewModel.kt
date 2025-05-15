@@ -595,7 +595,10 @@ internal class DiaryEditViewModel @Inject constructor(
         shouldIgnoreConfirmationDialog: Boolean = false
     ) {
         updateProgressIndicatorVisibility(true)
-        if (!shouldFetchWeatherInfo(date)) return
+        if (!shouldFetchWeatherInfo(date)) {
+            updateProgressIndicatorVisibility(false)
+            return
+        }
         if (!shouldIgnoreConfirmationDialog && shouldShowWeatherInfoFetchingDialog()) {
             updateFragmentAction(
                 DiaryEditFragmentAction.NavigateWeatherInfoFetchingDialog(date)
