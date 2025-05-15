@@ -108,7 +108,7 @@
                         android:textAppearance="@style/AppTextViewTextAppearance"
                         android:text="@{Integer.toString(word_search_view_model.numWordSearchResults) + @string/fragment_word_search_num_results_message}"
                         android:padding="8dp"
-                        android:visibility="@{word_search_view_model.wordSearchStatus instanceof WordSearchStatus.Results ? View.VISIBLE : View.INVISIBLE}"
+                        android:visibility="@{word_search_view_model.wordSearchStatus instanceof WordSearchStatus.Updating || word_search_view_model.wordSearchStatus instanceof WordSearchStatus.Results ? View.VISIBLE : View.INVISIBLE}"
                         tools:visibility="visible" />
 
                     <!-- MEMO:スクロールバーを表示させたいが、子RecyclerViewに反応してスクロールバーの長さが安定しない。
