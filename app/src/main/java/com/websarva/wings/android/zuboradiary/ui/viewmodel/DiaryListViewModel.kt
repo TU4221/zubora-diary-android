@@ -62,12 +62,16 @@ internal class DiaryListViewModel @Inject constructor(private val diaryRepositor
     val fragmentAction
         get() = _fragmentAction.asSharedFlow()
 
+    private val initialIsLoadingOnScrolled = false
+    private var isLoadingOnScrolled = initialIsLoadingOnScrolled
+
     override fun initialize() {
         super.initialize()
         _diaryListState.value = initialDiaryListState
         diaryListLoadingJob = initialDiaryListLoadingJob
         _diaryList.value = initialDiaryList
         sortConditionDate = initialSortConditionDate
+        isLoadingOnScrolled = initialIsLoadingOnScrolled
     }
 
     // ViewClicked処理
@@ -103,15 +107,12 @@ internal class DiaryListViewModel @Inject constructor(private val diaryRepositor
 
     // View状態処理
     fun onDiaryListEndScrolled() {
+        if (isLoadingOnScrolled) return
         loadAdditionDiaryList()
     }
 
-    fun onDiaryListUpdated(list: DiaryYearMonthList) {
-        if (list.isNotEmpty) {
-            _diaryListState.value = DiaryListState.Results
-        } else {
-            _diaryListState.value = DiaryListState.NoResults
-        }
+    fun onDiaryListUpdated() {
+        isLoadingOnScrolled = initialIsLoadingOnScrolled
     }
 
     fun onFragmentViewCreated() {
@@ -150,18 +151,14 @@ internal class DiaryListViewModel @Inject constructor(private val diaryRepositor
 
     private fun loadNewDiaryList() {
         loadDiaryList(NewDiaryListCreator())
-        _diaryListState.value = DiaryListState.NewLoading
     }
 
     private fun loadAdditionDiaryList() {
-        if (_diaryListState.value == DiaryListState.AdditionLoading) return
         loadDiaryList(AddedDiaryListCreator())
-        _diaryListState.value = DiaryListState.AdditionLoading
     }
 
     private fun updateDiaryList() {
         loadDiaryList(UpdateDiaryListCreator())
-        _diaryListState.value = DiaryListState.Updating
     }
 
     private fun loadDiaryList(creator: DiaryListCreator) {
@@ -185,8 +182,10 @@ internal class DiaryListViewModel @Inject constructor(private val diaryRepositor
 
         val previousDiaryList = _diaryList.requireValue()
         try {
+            updateWordSearchStatusOnListLoadingStart(creator)
             val updateDiaryList = creator.create()
             _diaryList.value = updateDiaryList
+            updateWordSearchStatusOnListLoadingFinish(updateDiaryList)
             Log.i(logTag, "${logMsg}_完了")
         } catch (e: CancellationException) {
             Log.i(logTag, "${logMsg}_キャンセル", e)
@@ -194,8 +193,28 @@ internal class DiaryListViewModel @Inject constructor(private val diaryRepositor
         } catch (e: Exception) {
             Log.e(logTag, "${logMsg}_失敗", e)
             _diaryList.value = previousDiaryList
+            updateWordSearchStatusOnListLoadingFinish(previousDiaryList)
             addAppMessage(DiaryListAppMessage.DiaryListLoadingFailure)
         }
+    }
+
+    private fun updateWordSearchStatusOnListLoadingStart(creator: DiaryListCreator) {
+        _diaryListState.value =
+            when (creator) {
+                is NewDiaryListCreator -> DiaryListState.NewLoading
+                is AddedDiaryListCreator -> DiaryListState.AdditionLoading
+                is UpdateDiaryListCreator -> DiaryListState.Updating
+                else -> throw IllegalArgumentException()
+            }
+    }
+
+    private fun updateWordSearchStatusOnListLoadingFinish(list: DiaryYearMonthList) {
+        _diaryListState.value =
+            if (list.isNotEmpty) {
+                DiaryListState.Results
+            } else {
+                DiaryListState.NoResults
+            }
     }
 
     private fun interface DiaryListCreator {

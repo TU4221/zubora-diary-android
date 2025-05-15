@@ -239,7 +239,7 @@ class DiaryListFragment : BaseFragment() {
             val convertedItemList: List<DiaryYearMonthListBaseItem> = list.itemList
             val listAdapter = binding.recyclerDiaryList.adapter as DiaryYearMonthListAdapter
             listAdapter.submitList(convertedItemList) {
-                mainViewModel.onDiaryListUpdated(list)
+                mainViewModel.onDiaryListUpdated()
             }
         }
     }
