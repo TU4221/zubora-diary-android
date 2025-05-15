@@ -20,8 +20,10 @@ import com.websarva.wings.android.zuboradiary.ui.permission.UriPermissionAction
 import com.websarva.wings.android.zuboradiary.ui.utils.requireValue
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import java.time.LocalDate
@@ -192,11 +194,9 @@ internal class DiaryEditViewModel @Inject constructor(
     var shouldInitializeOnFragmentDestroy = initialShouldInitializeOnFragmentDestroy
 
     // Fragment処理
-    private val initialFragmentAction = FragmentAction.None
-    private val _fragmentAction: MutableStateFlow<FragmentAction> =
-        MutableStateFlow(initialFragmentAction)
-    val fragmentAction: StateFlow<FragmentAction>
-        get() = _fragmentAction
+    private val _fragmentAction= MutableSharedFlow<FragmentAction>()
+    val fragmentAction
+        get() = _fragmentAction.asSharedFlow()
 
     // TODO:テスト用の為、最終的に削除
     var isTesting = false
@@ -213,11 +213,12 @@ internal class DiaryEditViewModel @Inject constructor(
         loadedPicturePath = initialLoadedPicturePath
         _isVisibleProgressIndicator.value = initialIsVisibleProgressIndicator
         shouldInitializeOnFragmentDestroy = initialShouldInitializeOnFragmentDestroy
-        _fragmentAction.value = initialFragmentAction
     }
 
     fun onBackPressed() {
-        navigatePreviousFragment()
+        viewModelScope.launch(Dispatchers.IO) {
+            navigatePreviousFragment()
+        }
     }
 
     // ViewClicked処理
@@ -229,20 +230,27 @@ internal class DiaryEditViewModel @Inject constructor(
 
     fun onDiaryDeleteMenuClicked() {
         val date = this.date.requireValue()
-        updateFragmentAction(
-            DiaryEditFragmentAction.NavigateDiaryDeleteDialog(date)
-        )
+        viewModelScope.launch(Dispatchers.IO) {
+            updateFragmentAction(
+                DiaryEditFragmentAction.NavigateDiaryDeleteDialog(date)
+            )
+        }
+
     }
 
     fun onNavigationClicked() {
-        navigatePreviousFragment()
+        viewModelScope.launch(Dispatchers.IO) {
+            navigatePreviousFragment()
+        }
     }
 
     fun onDateInputFieldClicked() {
         val date = this.date.requireValue()
-        updateFragmentAction(
-            DiaryEditFragmentAction.NavigateDatePickerDialog(date)
-        )
+        viewModelScope.launch(Dispatchers.IO) {
+            updateFragmentAction(
+                DiaryEditFragmentAction.NavigateDatePickerDialog(date)
+            )
+        }
     }
 
     fun onWeather1InputFieldItemClicked(weather: Weather) {
@@ -259,9 +267,11 @@ internal class DiaryEditViewModel @Inject constructor(
 
     fun onItemTitleInputFieldClicked(itemNumber: ItemNumber) {
         val itemTitle = getItemTitle(itemNumber).requireValue()
-        updateFragmentAction(
-            DiaryEditFragmentAction.NavigateDiaryItemTitleEditFragment(itemNumber, itemTitle)
-        )
+        viewModelScope.launch(Dispatchers.IO) {
+            updateFragmentAction(
+                DiaryEditFragmentAction.NavigateDiaryItemTitleEditFragment(itemNumber, itemTitle)
+            )
+        }
     }
 
     fun onItemAdditionButtonClicked() {
@@ -269,15 +279,19 @@ internal class DiaryEditViewModel @Inject constructor(
     }
 
     fun onItemDeleteButtonClicked(itemNumber: ItemNumber) {
-        updateFragmentAction(
-            DiaryEditFragmentAction.NavigateDiaryItemDeleteDialog(itemNumber)
-        )
+        viewModelScope.launch(Dispatchers.IO) {
+            updateFragmentAction(
+                DiaryEditFragmentAction.NavigateDiaryItemDeleteDialog(itemNumber)
+            )
+        }
     }
 
     fun onAttachedPictureDeleteButtonClicked() {
-        updateFragmentAction(
-            DiaryEditFragmentAction.NavigateDiaryPictureDeleteDialog
-        )
+        viewModelScope.launch(Dispatchers.IO) {
+            updateFragmentAction(
+                DiaryEditFragmentAction.NavigateDiaryPictureDeleteDialog
+            )
+        }
     }
 
     // DialogButtonClicked処理
@@ -329,7 +343,9 @@ internal class DiaryEditViewModel @Inject constructor(
     }
 
     fun onDiaryLoadingFailureDialogPositiveButtonClicked() {
-        navigatePreviousFragment()
+        viewModelScope.launch(Dispatchers.IO) {
+            navigatePreviousFragment()
+        }
     }
 
     fun onWeatherInfoFetchDialogPositiveButtonClicked(geoCoordinates: GeoCoordinates?) {
@@ -345,7 +361,11 @@ internal class DiaryEditViewModel @Inject constructor(
         if (itemNumber.value == 1 && numVisibleItems == itemNumber.value) {
             deleteItem(itemNumber)
         } else {
-            updateFragmentAction(DiaryEditFragmentAction.TransitionDiaryItemHidedState(itemNumber))
+            viewModelScope.launch(Dispatchers.IO) {
+                updateFragmentAction(
+                    DiaryEditFragmentAction.TransitionDiaryItemHidedState(itemNumber)
+                )
+            }
         }
     }
 
@@ -738,15 +758,11 @@ internal class DiaryEditViewModel @Inject constructor(
     }
     
     // FragmentAction関係
-    private fun updateFragmentAction(action: FragmentAction) {
-        _fragmentAction.value = action
+    private suspend fun updateFragmentAction(action: FragmentAction) {
+        _fragmentAction.emit(action)
     }
 
-    fun clearFragmentAction() {
-        _fragmentAction.value = initialFragmentAction
-    }
-
-    private fun navigatePreviousFragment() {
+    private suspend fun navigatePreviousFragment() {
         val loadedDate = loadedDate.value
         updateFragmentAction(DiaryEditFragmentAction.NavigatePreviousFragment(loadedDate))
     }

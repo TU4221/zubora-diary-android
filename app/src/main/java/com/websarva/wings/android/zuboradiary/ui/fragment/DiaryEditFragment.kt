@@ -394,14 +394,10 @@ class DiaryEditFragment : BaseFragment() {
                     is DiaryEditFragmentAction.TransitionDiaryItemHidedState -> {
                         hideItem(value.itemNumber, false)
                     }
-                    FragmentAction.None -> {
-                        // 処理なし
-                    }
                     else -> {
                         throw IllegalArgumentException()
                     }
                 }
-                mainViewModel.clearFragmentAction()
             }
         }
     }
