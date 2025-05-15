@@ -6,6 +6,7 @@ internal abstract class DiaryYearMonthListBaseItem {
 
     val yearMonth: YearMonth
     val viewType: DiaryYearMonthListBaseAdapter.ViewType
+    abstract val diaryDayList: DiaryDayBaseList
 
     val isNotDiaryViewType
         get() = viewType != DiaryYearMonthListBaseAdapter.ViewType.DIARY

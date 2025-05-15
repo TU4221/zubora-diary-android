@@ -304,7 +304,7 @@ class DiaryListFragment : BaseFragment() {
     //日記リスト(年月)を自動でトップへスクロールさせるメソッド。
     private fun scrollDiaryListToFirstPosition() {
         val listAdapter = binding.recyclerDiaryList.adapter as DiaryYearMonthListAdapter
-        listAdapter.scrollToFirstPosition()
+        listAdapter.scrollToTop()
     }
 
     override fun destroyBinding() {

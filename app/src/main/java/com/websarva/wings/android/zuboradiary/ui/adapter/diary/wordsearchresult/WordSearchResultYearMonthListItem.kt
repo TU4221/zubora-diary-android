@@ -5,10 +5,11 @@ import com.websarva.wings.android.zuboradiary.ui.adapter.diary.DiaryYearMonthLis
 import java.time.YearMonth
 
 internal class WordSearchResultYearMonthListItem : DiaryYearMonthListBaseItem {
-    val wordSearchResultDayList: WordSearchResultDayList
+
+    override val diaryDayList: WordSearchResultDayList
 
     constructor(viewType: DiaryYearMonthListBaseAdapter.ViewType) : super(viewType) {
-        this.wordSearchResultDayList = WordSearchResultDayList()
+        this.diaryDayList = WordSearchResultDayList()
     }
 
     constructor(
@@ -17,14 +18,14 @@ internal class WordSearchResultYearMonthListItem : DiaryYearMonthListBaseItem {
     ) : super(yearMonth, DiaryYearMonthListBaseAdapter.ViewType.DIARY) {
         require(wordSearchResultDayList.isNotEmpty)
 
-        this.wordSearchResultDayList = wordSearchResultDayList
+        this.diaryDayList = wordSearchResultDayList
     }
 
     override fun areContentsTheSame(item: DiaryYearMonthListBaseItem): Boolean {
         if (this === item) return true
         if (item !is WordSearchResultYearMonthListItem) return false
 
-        return wordSearchResultDayList == item.wordSearchResultDayList
+        return diaryDayList == item.diaryDayList
     }
 
     override fun equals(other: Any?): Boolean {
@@ -32,12 +33,12 @@ internal class WordSearchResultYearMonthListItem : DiaryYearMonthListBaseItem {
         if (other !is WordSearchResultYearMonthListItem) return false
         if (!super.equals(other)) return false
 
-        return wordSearchResultDayList == other.wordSearchResultDayList
+        return diaryDayList == other.diaryDayList
     }
 
     override fun hashCode(): Int {
         var result = super.hashCode()
-        result = 31 * result + wordSearchResultDayList.hashCode()
+        result = 31 * result + diaryDayList.hashCode()
         return result
     }
 }

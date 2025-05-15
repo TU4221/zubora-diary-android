@@ -1,6 +1,8 @@
 package com.websarva.wings.android.zuboradiary.ui.adapter.diary.wordsearchresult
 
-internal class WordSearchResultDayList {
+import com.websarva.wings.android.zuboradiary.ui.adapter.diary.DiaryDayBaseList
+
+internal class WordSearchResultDayList : DiaryDayBaseList {
 
     val itemList: List<WordSearchResultDayListItem>
 
@@ -23,7 +25,7 @@ internal class WordSearchResultDayList {
         return itemList.hashCode()
     }
 
-    fun countDiaries(): Int {
+    override fun countDiaries(): Int {
         return itemList.size
     }
 

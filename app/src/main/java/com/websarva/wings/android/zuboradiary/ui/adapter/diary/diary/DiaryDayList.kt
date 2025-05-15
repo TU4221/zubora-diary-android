@@ -1,6 +1,8 @@
 package com.websarva.wings.android.zuboradiary.ui.adapter.diary.diary
 
-internal class DiaryDayList {
+import com.websarva.wings.android.zuboradiary.ui.adapter.diary.DiaryDayBaseList
+
+internal class DiaryDayList : DiaryDayBaseList {
 
     val itemList: List<DiaryDayListItem>
 
@@ -27,7 +29,7 @@ internal class DiaryDayList {
         return itemList.hashCode()
     }
 
-    fun countDiaries(): Int {
+    override fun countDiaries(): Int {
         return itemList.size
     }
 

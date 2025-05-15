@@ -272,20 +272,59 @@ internal abstract class DiaryYearMonthListBaseAdapter protected constructor(
         secondVisibleViewHolder.binding.textSection.y = 0f // ズレ防止
     }
 
-    fun scrollToFirstPosition() {
+    fun scrollToTop() {
         Log.d(logTag, "scrollToFirstPosition()")
         // HACK:日記リスト(年月)のアイテム数が多い場合、
         //      ユーザーが数多くのアイテムをスクロールした状態でsmoothScrollToPosition(0)を起動すると先頭にたどり着くのに時間がかかる。
         //      その時間を回避する為に先頭付近へジャンプ(scrollToPosition())してからsmoothScrollToPosition()を起動させたかったが、
         //      エミュレーターでは処理落ちで上手く確認できなかった。(プログラムの可能性もある)
-        val layoutManager = recyclerView.layoutManager
-        val linearLayoutManager = layoutManager as LinearLayoutManager
-        val firstVisibleItemPosition = linearLayoutManager.findFirstVisibleItemPosition()
-        val jumpPosition = 2
-        if (firstVisibleItemPosition >= jumpPosition) {
+        val firstVisibleItemPosition = findFirstVisibleItemPosition()
+        val jumpPosition = findJumpItemPosition(firstVisibleItemPosition)
+
+        if (firstVisibleItemPosition > jumpPosition) {
+            recyclerView.addOnScrollListener(
+                object : RecyclerView.OnScrollListener() {
+                    override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+                        super.onScrollStateChanged(recyclerView, newState)
+
+                        if (newState != RecyclerView.SCROLL_STATE_IDLE) return
+
+                        recyclerView.removeOnScrollListener(this)
+                        scrollToFirstPosition()
+                    }
+                }
+            )
             recyclerView.scrollToPosition(jumpPosition)
         }
 
+        scrollToFirstPosition()
+    }
+
+    private fun findFirstVisibleItemPosition(): Int {
+        val layoutManager = recyclerView.layoutManager
+        val linearLayoutManager = layoutManager as LinearLayoutManager
+        return linearLayoutManager.findFirstVisibleItemPosition()
+    }
+
+    private fun findJumpItemPosition(firstVisiblePosition: Int): Int {
+        if (firstVisiblePosition == 0) return 0
+
+        var numInvisibleChildItems = 0
+        var jumpItemPosition = 0
+        for (i in 0 until firstVisiblePosition) {
+            jumpItemPosition = i + 1
+            numInvisibleChildItems += countChildItems(i)
+            if (numInvisibleChildItems >= 14) return jumpItemPosition
+        }
+        return jumpItemPosition
+    }
+
+    private fun countChildItems(adapterPosition: Int): Int {
+        val item = currentList[adapterPosition]
+        return item.diaryDayList.countDiaries()
+    }
+
+    private fun scrollToFirstPosition() {
         // MEMO:RecyclerViewの先頭アイテム(年月)の上部が表示されている状態でRecyclerView#.smoothScrollToPosition(0)を呼び出すと、
         //      先頭アイテムの底部が表示されるようにスクロールしてしまう。対策として、下記条件追加。
         val canScrollUp = recyclerView.canScrollVertically(-1)

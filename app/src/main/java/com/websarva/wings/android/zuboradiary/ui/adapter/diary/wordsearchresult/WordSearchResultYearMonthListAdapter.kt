@@ -21,7 +21,7 @@ internal abstract class WordSearchResultYearMonthListAdapter(
         if (item !is WordSearchResultYearMonthListItem) throw IllegalStateException()
 
         val listAdapter = createWordSearchResultDayListAdapter(holder)
-        listAdapter.submitList(item.wordSearchResultDayList.itemList)
+        listAdapter.submitList(item.diaryDayList.itemList)
     }
 
     private fun createWordSearchResultDayListAdapter(

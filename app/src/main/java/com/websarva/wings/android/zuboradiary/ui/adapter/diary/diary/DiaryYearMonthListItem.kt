@@ -6,7 +6,7 @@ import java.time.YearMonth
 
 internal class DiaryYearMonthListItem : DiaryYearMonthListBaseItem {
 
-    val diaryDayList: DiaryDayList
+    override val diaryDayList: DiaryDayList
 
    constructor(viewType: DiaryYearMonthListBaseAdapter.ViewType) : super(viewType) {
         diaryDayList = DiaryDayList()

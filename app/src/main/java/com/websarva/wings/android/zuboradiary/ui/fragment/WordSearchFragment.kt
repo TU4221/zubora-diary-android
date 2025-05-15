@@ -198,7 +198,7 @@ class WordSearchFragment : BaseFragment() {
     private fun resultListScrollToFirstPosition() {
         val adapter = binding.recyclerWordSearchResultList.adapter
         val listAdapter = adapter as WordSearchResultYearMonthListAdapter
-        listAdapter.scrollToFirstPosition()
+        listAdapter.scrollToTop()
     }
 
     private fun setUpFragmentAction() {

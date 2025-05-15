@@ -123,7 +123,7 @@ internal class WordSearchResultYearMonthList {
         var count = 0
         for (item in itemList) {
             if (item.viewType == DiaryYearMonthListBaseAdapter.ViewType.DIARY) {
-                count += item.wordSearchResultDayList.countDiaries()
+                count += item.diaryDayList.countDiaries()
             }
         }
         return count
@@ -155,8 +155,8 @@ internal class WordSearchResultYearMonthList {
         // 元リストに追加リストの年月が含まれていたらアイテムを足し込む
         if (originalListLastItemYearMonth == additionListFirstItemYearMonth) {
             val originalLastWordSearchResultDayList =
-                originalItemList[originalListLastItemPosition].wordSearchResultDayList
-            val additionWordSearchResultDayList = additionListFirstItem.wordSearchResultDayList
+                originalItemList[originalListLastItemPosition].diaryDayList
+            val additionWordSearchResultDayList = additionListFirstItem.diaryDayList
             val combinedWordSearchResultDayList =
                 originalLastWordSearchResultDayList.combineDiaryDayLists(
                     additionWordSearchResultDayList
