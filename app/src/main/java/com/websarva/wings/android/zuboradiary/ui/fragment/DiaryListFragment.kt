@@ -24,7 +24,7 @@ import com.websarva.wings.android.zuboradiary.ui.viewmodel.DiaryListViewModel
 import com.websarva.wings.android.zuboradiary.ui.adapter.diary.diary.DiaryYearMonthList
 import com.websarva.wings.android.zuboradiary.ui.adapter.diary.diary.DiaryYearMonthListAdapter
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.StartYearMonthPickerDialogFragment
-import com.websarva.wings.android.zuboradiary.ui.model.DiaryListStatus
+import com.websarva.wings.android.zuboradiary.ui.model.state.DiaryListState
 import com.websarva.wings.android.zuboradiary.ui.model.action.DiaryListFragmentAction
 import com.websarva.wings.android.zuboradiary.ui.model.action.FragmentAction
 import dagger.hilt.android.AndroidEntryPoint
@@ -183,10 +183,10 @@ class DiaryListFragment : BaseFragment() {
         }
 
         launchAndRepeatOnViewLifeCycleStarted {
-            mainViewModel.diaryListStatus
-                .collectLatest { value: DiaryListStatus ->
+            mainViewModel.diaryListState
+                .collectLatest { value: DiaryListState ->
                     val isEnabled =
-                        value != DiaryListStatus.AdditionLoading
+                        value != DiaryListState.AdditionLoading
                     diaryListAdapter.setSwipeEnabled(isEnabled)
                 }
         }

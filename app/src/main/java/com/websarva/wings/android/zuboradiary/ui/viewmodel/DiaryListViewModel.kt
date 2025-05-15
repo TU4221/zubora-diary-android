@@ -10,7 +10,7 @@ import com.websarva.wings.android.zuboradiary.ui.model.DiaryListAppMessage
 import com.websarva.wings.android.zuboradiary.ui.adapter.diary.diary.DiaryDayList
 import com.websarva.wings.android.zuboradiary.ui.adapter.diary.diary.DiaryDayListItem
 import com.websarva.wings.android.zuboradiary.ui.adapter.diary.diary.DiaryYearMonthList
-import com.websarva.wings.android.zuboradiary.ui.model.DiaryListStatus
+import com.websarva.wings.android.zuboradiary.ui.model.state.DiaryListState
 import com.websarva.wings.android.zuboradiary.ui.model.action.DiaryListFragmentAction
 import com.websarva.wings.android.zuboradiary.ui.model.action.FragmentAction
 import com.websarva.wings.android.zuboradiary.ui.utils.requireValue
@@ -41,10 +41,10 @@ internal class DiaryListViewModel @Inject constructor(private val diaryRepositor
 
     private val logTag = createLogTag()
 
-    private val initialDiaryListStatus =DiaryListStatus.Idle
-    private val _diaryListStatus = MutableStateFlow<DiaryListStatus>(initialDiaryListStatus)
-    val  diaryListStatus
-        get() = _diaryListStatus.asStateFlow()
+    private val initialDiaryListState = DiaryListState.Idle
+    private val _diaryListState = MutableStateFlow<DiaryListState>(initialDiaryListState)
+    val  diaryListState
+        get() = _diaryListState.asStateFlow()
 
     private val initialDiaryListLoadingJob: Job? = null
     private var diaryListLoadingJob: Job? = initialDiaryListLoadingJob // キャンセル用
@@ -64,7 +64,7 @@ internal class DiaryListViewModel @Inject constructor(private val diaryRepositor
 
     override fun initialize() {
         super.initialize()
-        _diaryListStatus.value = initialDiaryListStatus
+        _diaryListState.value = initialDiaryListState
         diaryListLoadingJob = initialDiaryListLoadingJob
         _diaryList.value = initialDiaryList
         sortConditionDate = initialSortConditionDate
@@ -108,9 +108,9 @@ internal class DiaryListViewModel @Inject constructor(private val diaryRepositor
 
     fun onDiaryListUpdated(list: DiaryYearMonthList) {
         if (list.isNotEmpty) {
-            _diaryListStatus.value = DiaryListStatus.Results
+            _diaryListState.value = DiaryListState.Results
         } else {
-            _diaryListStatus.value = DiaryListStatus.NoResults
+            _diaryListState.value = DiaryListState.NoResults
         }
     }
 
@@ -150,18 +150,18 @@ internal class DiaryListViewModel @Inject constructor(private val diaryRepositor
 
     private fun loadNewDiaryList() {
         loadDiaryList(NewDiaryListCreator())
-        _diaryListStatus.value = DiaryListStatus.NewLoading
+        _diaryListState.value = DiaryListState.NewLoading
     }
 
     private fun loadAdditionDiaryList() {
-        if (_diaryListStatus.value == DiaryListStatus.AdditionLoading) return
+        if (_diaryListState.value == DiaryListState.AdditionLoading) return
         loadDiaryList(AddedDiaryListCreator())
-        _diaryListStatus.value = DiaryListStatus.AdditionLoading
+        _diaryListState.value = DiaryListState.AdditionLoading
     }
 
     private fun updateDiaryList() {
         loadDiaryList(UpdateDiaryListCreator())
-        _diaryListStatus.value = DiaryListStatus.Updating
+        _diaryListState.value = DiaryListState.Updating
     }
 
     private fun loadDiaryList(creator: DiaryListCreator) {

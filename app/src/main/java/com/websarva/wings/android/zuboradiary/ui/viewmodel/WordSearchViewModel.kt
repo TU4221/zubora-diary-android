@@ -9,7 +9,7 @@ import com.websarva.wings.android.zuboradiary.ui.model.WordSearchAppMessage
 import com.websarva.wings.android.zuboradiary.ui.adapter.diary.wordsearchresult.WordSearchResultDayList
 import com.websarva.wings.android.zuboradiary.ui.adapter.diary.wordsearchresult.WordSearchResultDayListItem
 import com.websarva.wings.android.zuboradiary.ui.adapter.diary.wordsearchresult.WordSearchResultYearMonthList
-import com.websarva.wings.android.zuboradiary.ui.model.WordSearchStatus
+import com.websarva.wings.android.zuboradiary.ui.model.state.WordSearchState
 import com.websarva.wings.android.zuboradiary.ui.model.action.FragmentAction
 import com.websarva.wings.android.zuboradiary.ui.model.action.WordSearchFragmentAction
 import com.websarva.wings.android.zuboradiary.ui.utils.requireValue
@@ -32,10 +32,10 @@ internal class WordSearchViewModel @Inject internal constructor(
 
     private val logTag = createLogTag()
 
-    private val initialWordSearchStatus = WordSearchStatus.Idle
-    private val _wordSearchStatus = MutableStateFlow<WordSearchStatus>(initialWordSearchStatus)
-    val  wordSearchStatus
-        get() = _wordSearchStatus.asStateFlow()
+    private val initialWordSearchState = WordSearchState.Idle
+    private val _wordSearchState = MutableStateFlow<WordSearchState>(initialWordSearchState)
+    val  wordSearchState
+        get() = _wordSearchState.asStateFlow()
 
     private val initialSearchWord = ""
     private val _searchWord = MutableStateFlow(initialSearchWord)
@@ -95,7 +95,7 @@ internal class WordSearchViewModel @Inject internal constructor(
 
     override fun initialize() {
         super.initialize()
-        _wordSearchStatus.value = initialWordSearchStatus
+        _wordSearchState.value = initialWordSearchState
         _searchWord.value = initialSearchWord
         previousSearchWord = initialPreviousSearchWord
         cancelPreviousLoading()
@@ -246,21 +246,21 @@ internal class WordSearchViewModel @Inject internal constructor(
     }
 
     private fun updateWordSearchStatusOnSearchStart(creator: WordSearchResultListCreator) {
-        _wordSearchStatus.value =
+        _wordSearchState.value =
             when (creator) {
-                is NewWordSearchResultListCreator -> WordSearchStatus.Searching
-                is AddedWordSearchResultListCreator -> WordSearchStatus.AdditionLoading
-                is UpdateWordSearchResultListCreator -> WordSearchStatus.Updating
+                is NewWordSearchResultListCreator -> WordSearchState.Searching
+                is AddedWordSearchResultListCreator -> WordSearchState.AdditionLoading
+                is UpdateWordSearchResultListCreator -> WordSearchState.Updating
                 else -> throw IllegalArgumentException()
             }
     }
 
     private fun updateWordSearchStatusOnSearchFinish(list: WordSearchResultYearMonthList) {
-        _wordSearchStatus.value =
+        _wordSearchState.value =
             if (list.isNotEmpty) {
-                WordSearchStatus.Results
+                WordSearchState.Results
             } else {
-                WordSearchStatus.NoResults
+                WordSearchState.NoResults
             }
     }
 
@@ -373,7 +373,7 @@ internal class WordSearchViewModel @Inject internal constructor(
     }
 
     private fun clearWordSearchResultList() {
-        _wordSearchStatus.value = initialWordSearchStatus
+        _wordSearchState.value = initialWordSearchState
         cancelPreviousLoading()
         wordSearchResultListLoadingJob = initialWordSearchResultListLoadingJob
         _wordSearchResultList.value = initialWordSearchResultList
