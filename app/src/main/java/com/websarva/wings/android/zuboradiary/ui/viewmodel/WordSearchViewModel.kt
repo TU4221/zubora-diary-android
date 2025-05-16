@@ -289,6 +289,8 @@ internal class WordSearchViewModel @Inject internal constructor(
         }
     }
 
+    // MEMO:文字検索は処理途中でも再度検索できる仕様のため、createWordSearchResultList()処理内で状態更新を行う。
+    //      再度検索時、createWordSearchResultList()処理前に状態更新を行うと一つ前の検索結果状態が上書きされる可能性あり。
     private fun updateWordSearchStatusOnSearchStart(creator: WordSearchResultListCreator) {
         _wordSearchState.value =
             when (creator) {
