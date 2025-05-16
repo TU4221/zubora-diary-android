@@ -40,7 +40,6 @@ import com.websarva.wings.android.zuboradiary.ui.model.PendingDialog
 import com.websarva.wings.android.zuboradiary.ui.view.edittext.TextInputConfigurator
 import com.websarva.wings.android.zuboradiary.ui.permission.UriPermissionManager
 import com.websarva.wings.android.zuboradiary.ui.utils.requireValue
-import com.websarva.wings.android.zuboradiary.ui.viewmodel.DiaryStateFlow
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.DatePickerDialogFragment
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.DiaryDeleteDialogFragment
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.DiaryEditViewModel
@@ -469,11 +468,6 @@ class DiaryEditFragment : BaseFragment() {
 
     private fun setUpToolBar() {
         binding.materialToolbarTopAppBar
-            .setNavigationOnClickListener {
-                mainViewModel.onNavigationClicked()
-            }
-
-        binding.materialToolbarTopAppBar
             .setOnMenuItemClickListener { item: MenuItem ->
                 // 日記保存、削除
                 when (item.itemId) {
@@ -498,16 +492,7 @@ class DiaryEditFragment : BaseFragment() {
         launchAndRepeatOnViewLifeCycleStarted {
             mainViewModel.loadedDate
                 .collectLatest { value: LocalDate? ->
-                    val title: String
-                    val enabledDelete: Boolean
-                    if (value == null) {
-                        title = getString(R.string.fragment_diary_edit_toolbar_title_create_new)
-                        enabledDelete = false
-                    } else {
-                        title = getString(R.string.fragment_diary_edit_toolbar_title_edit)
-                        enabledDelete = true
-                    }
-                    binding.materialToolbarTopAppBar.title = title
+                    val enabledDelete: Boolean = value != null
 
                     val menu = binding.materialToolbarTopAppBar.menu
                     val deleteMenuItem = menu.findItem(R.id.diaryEditToolbarOptionDeleteDiary)
@@ -522,12 +507,9 @@ class DiaryEditFragment : BaseFragment() {
 
     // 日付入力欄設定
     private fun setUpDateInputField() {
-        binding.textInputEditTextDate.apply {
-            inputType = EditorInfo.TYPE_NULL //キーボード非表示設定
-            setOnClickListener {
-                mainViewModel.onDateInputFieldClicked()
-            }
-        }
+        // キーボード非表示設定
+        // MEMO:レイアウトファイルの"android:inputType="none""では設定できない為、下記で設定。
+        binding.textInputEditTextDate.inputType = EditorInfo.TYPE_NULL
 
         launchAndRepeatOnViewLifeCycleStarted {
             mainViewModel.date
@@ -558,11 +540,6 @@ class DiaryEditFragment : BaseFragment() {
                     Log.d("20250428", "Weather collectLatest()")
                     val strWeather = value.toString(requireContext())
                     binding.autoCompleteTextWeather1.setText(strWeather, false)
-
-                    // Weather2 Spinner有効無効切替
-                    val isEnabled = (value != Weather.UNKNOWN)
-                    binding.textInputLayoutWeather2.isEnabled = isEnabled
-                    binding.autoCompleteTextWeather2.isEnabled = isEnabled
 
                     mainViewModel.onWeather1Changed()
                 }
@@ -694,7 +671,6 @@ class DiaryEditFragment : BaseFragment() {
 
         // 項目追加ボタン設定
         binding.imageButtonItemAddition.setOnClickListener {
-            binding.imageButtonItemAddition.isEnabled = false
             shouldTransitionItemMotionLayout = true
             mainViewModel.onItemAdditionButtonClicked()
         }
@@ -719,6 +695,22 @@ class DiaryEditFragment : BaseFragment() {
             mainViewModel.numVisibleItems
                 .collectLatest { value: Int ->
                     NumVisibleItemsObserver().onChanged(value)
+                }
+        }
+
+        // HACK:ViewModel-Layout間のDataBindingで設定する予定だったが、
+        //      三項演算子を使用してのalphaのリソース値が取得できなかった為、下記コードで対応。
+        launchAndRepeatOnViewLifeCycleStarted {
+            mainViewModel.isItemAdditionButtonClickable
+                .collectLatest { value: Boolean ->
+                    val alphaResId =
+                        if (value) {
+                            R.dimen.view_enabled_alpha
+                        } else {
+                            R.dimen.view_disabled_alpha
+                        }
+                    val alpha = ResourcesCompat.getFloat(resources, alphaResId)
+                    binding.imageButtonItemAddition.alpha = alpha
                 }
         }
     }
@@ -760,6 +752,7 @@ class DiaryEditFragment : BaseFragment() {
                 completedStateLogMsg = "ShowedState"
                 if (shouldTransitionItemMotionLayout) {
                     scrollOnDiaryItemShowed()
+                    mainViewModel.onDiaryItemShowedStateTransitionCompleted()
                 }
             }
             Log.d(logTag, "onTransitionCompleted()_CompletedState = $completedStateLogMsg")
@@ -819,19 +812,7 @@ class DiaryEditFragment : BaseFragment() {
 
     private inner class NumVisibleItemsObserver {
         fun onChanged(value: Int) {
-            enableItemAdditionButton(value < DiaryStateFlow.MAX_ITEMS)
             setUpItemsLayout(value)
-        }
-
-        private fun enableItemAdditionButton(enabled: Boolean) {
-            binding.imageButtonItemAddition.isEnabled = enabled
-            val alphaResId = if (enabled) {
-                R.dimen.view_enabled_alpha
-            } else {
-                R.dimen.view_disabled_alpha
-            }
-            val alpha = ResourcesCompat.getFloat(resources, alphaResId)
-            binding.imageButtonItemAddition.alpha = alpha
         }
 
         private fun setUpItemsLayout(numItems: Int) {
@@ -903,42 +884,34 @@ class DiaryEditFragment : BaseFragment() {
         launchAndRepeatOnViewLifeCycleStarted {
             mainViewModel.picturePath
                 .collectLatest { value: Uri? ->
-                    PicturePathObserver().onChanged(value)
+                    DiaryPictureConfigurator()
+                        .setUpPictureOnDiary(
+                            binding.imageAttachedPicture,
+                            value,
+                            themeColor
+                        )
                 }
         }
 
-        binding.apply {
-            imageAttachedPicture.setOnClickListener {
-                mainActivity.loadPicturePath()
-            }
-            imageButtonAttachedPictureDelete.setOnClickListener {
-                mainViewModel.onAttachedPictureDeleteButtonClicked()
-            }
-        }
-    }
-
-    private inner class PicturePathObserver {
-        fun onChanged(value: Uri?) {
-            DiaryPictureConfigurator()
-                .setUpPictureOnDiary(
-                    binding.imageAttachedPicture,
-                    value,
-                    themeColor
-                )
-            enablePictureDeleteButton(value != null)
+        binding.imageAttachedPicture.setOnClickListener {
+            mainViewModel.onAttachedPictureClicked()
+            mainActivity.loadPicturePath()
         }
 
-        private fun enablePictureDeleteButton(enabled: Boolean) {
-            binding.imageButtonAttachedPictureDelete.apply {
-                isEnabled = enabled
-                val alphaResId = if (enabled) {
-                    R.dimen.view_enabled_alpha
-                } else {
-                    R.dimen.view_disabled_alpha
+        // HACK:ViewModel-Layout間のDataBindingで設定する予定だったが、
+        //      三項演算子を使用してのalphaのリソース値が取得できなかった為、下記コードで対応。
+        launchAndRepeatOnViewLifeCycleStarted {
+            mainViewModel.isPicturePathDeleteButtonClickable
+                .collectLatest {value: Boolean ->
+                    val alphaResId =
+                        if (value) {
+                            R.dimen.view_enabled_alpha
+                        } else {
+                            R.dimen.view_disabled_alpha
+                        }
+                    val alphaValue = ResourcesCompat.getFloat(resources, alphaResId)
+                    binding.imageButtonAttachedPictureDelete.alpha = alphaValue
                 }
-                val alphaValue = ResourcesCompat.getFloat(resources, alphaResId)
-                alpha = alphaValue
-            }
         }
     }
 
@@ -1160,7 +1133,7 @@ class DiaryEditFragment : BaseFragment() {
         }
     }
 
-    internal fun attachPicture(uri: Uri) {
-        mainViewModel.updatePicturePath(uri)
+    internal fun attachPicture(uri: Uri?) {
+        mainViewModel.onPicturePathReceivedFromOpenDocument(uri)
     }
 }

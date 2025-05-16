@@ -99,8 +99,6 @@ class MainActivity : LoggingActivity() {
     private val openDocumentResultLauncher = registerForActivityResult(
         ActivityResultContracts.OpenDocument()
     ) { o: Uri? ->
-        if (o == null) return@registerForActivityResult  // 未選択時
-
         val showedFragment = showedFragment
         if (showedFragment is DiaryEditFragment) {
             showedFragment.attachPicture(o)

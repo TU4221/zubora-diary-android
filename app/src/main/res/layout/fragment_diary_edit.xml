@@ -5,6 +5,8 @@
 
     <data>
         <import type="android.view.View" />
+        <import type="com.websarva.wings.android.zuboradiary.data.model.Weather" />
+        <import type="com.websarva.wings.android.zuboradiary.ui.model.state.DiaryEditState" />
         <variable
             name="diaryEditViewModel"
             type="com.websarva.wings.android.zuboradiary.ui.viewmodel.DiaryEditViewModel" />
@@ -30,6 +32,8 @@
                 android:id="@+id/material_toolbar_top_app_bar"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                app:title="@{diaryEditViewModel.loadedDate == null ? @string/fragment_diary_edit_toolbar_title_create_new : @string/fragment_diary_edit_toolbar_title_edit}"
+                app:onNavigationIconClick="@{() -> diaryEditViewModel.onNavigationClicked()}"
                 app:menu="@menu/diary_edit_toolbar_menu"
                 tools:title="@string/fragment_diary_edit_toolbar_title_value_tools" />
 
@@ -68,7 +72,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="@dimen/fragment_diary_edit_margin_top"
-                            android:hint="@string/fragment_diary_edit_date">
+                            android:hint="@string/fragment_diary_edit_date" >
 
                             <com.websarva.wings.android.zuboradiary.ui.view.custom.OneTouchClickTextInputEditText
                                 android:id="@+id/text_input_edit_text_date"
@@ -77,6 +81,7 @@
                                 android:layout_height="wrap_content"
                                 android:textAppearance="@style/AppTextInputEditTextTextAppearance"
                                 android:textSize="@dimen/fragment_diary_edit_text_size"
+                                android:onClick="@{() -> diaryEditViewModel.onDateInputFieldClicked()}"
                                 tools:text="@string/fragment_diary_edit_date_value_tools" />
 
                         </com.google.android.material.textfield.TextInputLayout>
@@ -133,7 +138,8 @@
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
                                 android:layout_marginStart="@dimen/fragment_diary_edit_margin_start"
-                                android:layout_weight="1">
+                                android:layout_weight="1"
+                                android:enabled="@{diaryEditViewModel.weather1 == Weather.UNKNOWN ? false : true}">
 
                                 <!-- MEMO:"android:contentDescription"で代用-->
                                 <AutoCompleteTextView
@@ -143,6 +149,7 @@
                                     android:layout_height="wrap_content"
                                     android:textAppearance="@style/AppAutoCompleteTextViewDropDownTextAppearance"
                                     android:textColor="@color/text_color_on_surface"
+                                    android:enabled="@{diaryEditViewModel.weather1 == Weather.UNKNOWN ? false : true}"
                                     tools:text="@string/fragment_diary_edit_weather_value_tools" />
 
                             </com.google.android.material.textfield.TextInputLayout>
@@ -261,7 +268,8 @@
                             android:layout_gravity="end"
                             android:layout_marginTop="@dimen/fragment_diary_edit_margin_top"
                             android:contentDescription="@string/fragment_diary_edit_item_addition"
-                            android:src="@drawable/ic_add_circle_24px" />
+                            android:src="@drawable/ic_add_circle_24px"
+                            android:clickable="@{diaryEditViewModel.isItemAdditionButtonClickable()}" />
 
                         <LinearLayout
                             android:layout_width="match_parent"
@@ -286,7 +294,9 @@
                                 android:layout_height="@dimen/fragment_diary_edit_delete_button_layout_height"
                                 android:layout_gravity="center_vertical"
                                 android:contentDescription="@string/fragment_diary_edit_attached_picture_delete"
-                                android:src="@drawable/ic_delete_forever_24px" />
+                                android:src="@drawable/ic_delete_forever_24px"
+                                android:clickable="@{diaryEditViewModel.isPicturePathDeleteButtonClickable()}"
+                                android:onClick="@{() -> diaryEditViewModel.onAttachedPictureDeleteButtonClicked()}"/>
 
                         </LinearLayout>
 
