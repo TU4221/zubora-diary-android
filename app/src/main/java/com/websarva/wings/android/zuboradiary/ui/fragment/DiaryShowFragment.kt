@@ -89,13 +89,15 @@ internal class DiaryShowFragment : BaseFragment() {
         setUpOnBackPressedCallback()
         setUpFragmentAction()
         setUpPendingDialogObserver()
-        setUpDiaryData()
         setUpToolBar()
         setUpWeatherLayout()
         setUpConditionLayout()
         setUpItemLayout()
         setUpPicture()
         setUpLogLayout()
+
+        val diaryDate = DiaryShowFragmentArgs.fromBundle(requireArguments()).date
+        mainViewModel.onFragmentViewCreated(diaryDate)
     }
 
     override fun handleOnReceivingResultFromPreviousFragment() {
@@ -182,12 +184,6 @@ internal class DiaryShowFragment : BaseFragment() {
                 return true
             }
         }
-    }
-
-    // 画面表示データ準備
-    private fun setUpDiaryData() {
-        val diaryDate = DiaryShowFragmentArgs.fromBundle(requireArguments()).date
-        mainViewModel.prepareDiaryForDiaryShowFragment(diaryDate)
     }
 
     private fun setUpToolBar() {

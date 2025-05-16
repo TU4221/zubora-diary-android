@@ -126,21 +126,31 @@ internal class DiaryShowViewModel @Inject constructor(private val diaryRepositor
         }
     }
 
-    // データ処理
-    fun prepareDiaryForDiaryShowFragment(date: LocalDate) {
+    // View状態処理
+    fun onCalendarDaySelected(date: LocalDate) {
         _diaryShowState.value = DiaryShowState.Loading
         viewModelScope.launch(Dispatchers.IO) {
-            loadSavedDiary(date, true)
+            prepareDiaryForCalendarFragment(date)
             _diaryShowState.value = DiaryShowState.Idle
         }
     }
 
-    fun prepareDiaryForCalendarFragment(date: LocalDate) {
+    // Fragment状態処理
+    fun onFragmentViewCreated(date: LocalDate) {
         _diaryShowState.value = DiaryShowState.Loading
         viewModelScope.launch(Dispatchers.IO) {
-            loadSavedDiary(date, false)
+            prepareDiaryForDiaryShowFragment(date)
             _diaryShowState.value = DiaryShowState.Idle
         }
+    }
+
+    // データ処理
+    private suspend fun prepareDiaryForDiaryShowFragment(date: LocalDate) {
+        loadSavedDiary(date, true)
+    }
+
+    private suspend fun prepareDiaryForCalendarFragment(date: LocalDate) {
+        loadSavedDiary(date, false)
     }
 
     private suspend fun loadSavedDiary(date: LocalDate, ignoreAppMessage: Boolean = false) {
