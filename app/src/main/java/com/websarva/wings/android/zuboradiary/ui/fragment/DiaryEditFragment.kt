@@ -458,7 +458,7 @@ class DiaryEditFragment : BaseFragment() {
         val geoCoordinates =
             settingsViewModel.geoCoordinates.value
         mainViewModel
-            .prepareDiary(
+            .onDiaryDataSetUp(
                 diaryDate,
                 requiresDiaryLoading,
                 isCheckedWeatherInfoAcquisition,

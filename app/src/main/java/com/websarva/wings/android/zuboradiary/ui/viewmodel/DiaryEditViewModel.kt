@@ -349,12 +349,15 @@ internal class DiaryEditViewModel @Inject constructor(
         geoCoordinates: GeoCoordinates?
     ) {
         val date = this.date.requireValue()
-        prepareDiary(
-            date,
-            true,
-            requestFetchWeatherInfo,
-            geoCoordinates
-        )
+        viewModelScope.launch(Dispatchers.IO) {
+            _diaryEditState.value = DiaryEditState.Loading
+            prepareDiary(
+                date,
+                true,
+                requestFetchWeatherInfo,
+                 geoCoordinates
+            )
+        }
     }
 
     fun onDiaryLoadingDialogNegativeButtonClicked(
@@ -430,6 +433,19 @@ internal class DiaryEditViewModel @Inject constructor(
         }
     }
 
+    // Fragment状態処理
+    fun onDiaryDataSetUp(
+        date: LocalDate,
+        shouldLoadDiary: Boolean,
+        requestFetchWeatherInfo: Boolean,
+        geoCoordinates: GeoCoordinates?
+    ) {
+        _diaryEditState.value = DiaryEditState.Loading
+        viewModelScope.launch(Dispatchers.IO) {
+            prepareDiary(date, shouldLoadDiary, requestFetchWeatherInfo, geoCoordinates)
+        }
+    }
+
     fun onDiaryPictureDeleteDialogPositiveButtonClicked() {
         _diaryEditState.value = DiaryEditState.PictureDeleting
         deletePicturePath()
@@ -468,7 +484,7 @@ internal class DiaryEditViewModel @Inject constructor(
     }
 
     // データ処理
-    fun prepareDiary(
+    private suspend fun prepareDiary(
         date: LocalDate,
         shouldLoadDiary: Boolean,
         requestFetchWeatherInfo: Boolean,
@@ -476,34 +492,31 @@ internal class DiaryEditViewModel @Inject constructor(
     ) {
         val logMsg = "日記読込"
         Log.i(logTag, "${logMsg}_開始")
-        viewModelScope.launch(Dispatchers.IO) {
-            if (shouldLoadDiary) {
-                try {
-                    _diaryEditState.value = DiaryEditState.Loading
-                    val isSuccessful = loadSavedDiary(date)
-                    if (!isSuccessful) throw Exception()
-                } catch (e: Exception) {
-                    Log.e(logTag, "${logMsg}_失敗", e)
-                    if (hasPreparedDiary) {
-                        addAppMessage(DiaryEditAppMessage.DiaryLoadingFailure)
-                    } else {
-                        updateFragmentAction(
-                            DiaryEditFragmentAction.NavigateDiaryLoadingFailureDialog(date)
-                        )
-                    }
-                    return@launch
-                } finally {
-                    _diaryEditState.value = DiaryEditState.Idle
+        if (shouldLoadDiary) {
+            try {
+                val isSuccessful = loadSavedDiary(date)
+                if (!isSuccessful) throw Exception()
+            } catch (e: Exception) {
+                Log.e(logTag, "${logMsg}_失敗", e)
+                if (hasPreparedDiary) {
+                    addAppMessage(DiaryEditAppMessage.DiaryLoadingFailure)
+                } else {
+                    updateFragmentAction(
+                        DiaryEditFragmentAction.NavigateDiaryLoadingFailureDialog(date)
+                    )
                 }
-            } else {
-                _diaryEditState.value = DiaryEditState.WeatherFetching
-                prepareDiaryDate(date, requestFetchWeatherInfo, geoCoordinates)
+                return
+            } finally {
                 _diaryEditState.value = DiaryEditState.Idle
             }
-            hasPreparedDiary = true
-
-            Log.i(logTag, "${logMsg}_完了")
+        } else {
+            _diaryEditState.value = DiaryEditState.WeatherFetching
+            prepareDiaryDate(date, requestFetchWeatherInfo, geoCoordinates)
+            _diaryEditState.value = DiaryEditState.Idle
         }
+        hasPreparedDiary = true
+
+        Log.i(logTag, "${logMsg}_完了")
     }
     
     // TODO:onDateChangedメソッドに変更して、Fragmentの監視から呼び出す？
