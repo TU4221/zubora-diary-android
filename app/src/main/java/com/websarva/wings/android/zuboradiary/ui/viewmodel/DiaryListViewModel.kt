@@ -199,6 +199,8 @@ internal class DiaryListViewModel @Inject constructor(private val diaryRepositor
         }
     }
 
+    // MEMO:日記リスト読込は処理途中でも再読込できる仕様のため、createDiaryList()処理内で状態更新を行う。
+    //      再読込、createDiaryList()処理前に状態更新を行うと一つ前の検索結果状態が上書きされる可能性あり。
     private fun updateWordSearchStatusOnListLoadingStart(creator: DiaryListCreator) {
         _diaryListState.value =
             when (creator) {
