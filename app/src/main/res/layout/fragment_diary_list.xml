@@ -59,7 +59,7 @@
                     android:id="@+id/recycler_diary_list"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:visibility="@{!(list_view_model.diaryListState instanceof DiaryListState.NoResults) ? View.VISIBLE : View.INVISIBLE}"
+                    android:visibility="@{list_view_model.diaryListState instanceof DiaryListState.NoResults ? View.INVISIBLE : View.VISIBLE}"
                     android:scrollbars="none"
                     tools:visibility="visible"/>
 
@@ -82,7 +82,7 @@
             android:layout_marginBottom="@dimen/fab_margin_bottom"
             android:src="@drawable/ic_edit_24px"
             android:contentDescription="@string/fragment_diary_list_fab_new_diary_creation"
-            android:enabled="@{!(list_view_model.diaryListState instanceof DiaryListState.Updating) ? true : false}"
+            android:enabled="@{list_view_model.diaryListState instanceof DiaryListState.Updating ? false : true}"
             android:onClick="@{() -> list_view_model.onDiaryEditButtonClicked()}"/>
 
     </FrameLayout>

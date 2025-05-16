@@ -19,8 +19,12 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 import javax.inject.Inject
@@ -92,6 +96,45 @@ internal class WordSearchViewModel @Inject internal constructor(
 
     private val initialIsLoadingOnScrolled = false
     private var isLoadingOnScrolled = initialIsLoadingOnScrolled
+
+    val isResultsVisible =
+        wordSearchState.map { value: WordSearchState ->
+            when (value) {
+                WordSearchState.Idle,
+                WordSearchState.NoResults -> false
+                else -> true
+            }
+        }.stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = false
+        )
+
+    val isNumResultsVisible =
+        combine(wordSearchState, isResultsVisible) { wordSearchState, isResultsVisible ->
+            if (!isResultsVisible) return@combine false
+
+            when (wordSearchState) {
+                WordSearchState.Searching -> false
+                else -> true
+            }
+        }.stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = false
+        )
+
+    val isNoResultsMessageVisible =
+        wordSearchState.map { value: WordSearchState ->
+            when (value) {
+                WordSearchState.NoResults -> true
+                else -> false
+            }
+        }.stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = false
+        )
 
     override fun initialize() {
         super.initialize()
