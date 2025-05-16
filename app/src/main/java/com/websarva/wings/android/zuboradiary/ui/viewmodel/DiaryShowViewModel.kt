@@ -10,10 +10,12 @@ import com.websarva.wings.android.zuboradiary.ui.model.DiaryShowAppMessage
 import com.websarva.wings.android.zuboradiary.ui.model.DiaryShowPendingDialog
 import com.websarva.wings.android.zuboradiary.ui.model.action.DiaryShowFragmentAction
 import com.websarva.wings.android.zuboradiary.ui.model.action.FragmentAction
+import com.websarva.wings.android.zuboradiary.ui.model.state.DiaryShowState
 import com.websarva.wings.android.zuboradiary.ui.utils.requireValue
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
@@ -25,6 +27,9 @@ internal class DiaryShowViewModel @Inject constructor(private val diaryRepositor
     BaseViewModel() {
 
     private val logTag = createLogTag()
+
+    private val initialDiaryShowState = DiaryShowState.Idle
+    private val _diaryShowState = MutableStateFlow<DiaryShowState>(initialDiaryShowState)
 
     // 日記データ関係
     private val diaryStateFlow = DiaryStateFlow()
@@ -114,21 +119,27 @@ internal class DiaryShowViewModel @Inject constructor(private val diaryRepositor
     }
 
     fun onDiaryDeleteDialogPositiveButtonClicked() {
+        _diaryShowState.value = DiaryShowState.Deleting
         viewModelScope.launch(Dispatchers.IO) {
             deleteDiary()
+            _diaryShowState.value = DiaryShowState.Idle
         }
     }
 
     // データ処理
     fun prepareDiaryForDiaryShowFragment(date: LocalDate) {
+        _diaryShowState.value = DiaryShowState.Loading
         viewModelScope.launch(Dispatchers.IO) {
             loadSavedDiary(date, true)
+            _diaryShowState.value = DiaryShowState.Idle
         }
     }
 
     fun prepareDiaryForCalendarFragment(date: LocalDate) {
+        _diaryShowState.value = DiaryShowState.Loading
         viewModelScope.launch(Dispatchers.IO) {
             loadSavedDiary(date, false)
+            _diaryShowState.value = DiaryShowState.Idle
         }
     }
 
