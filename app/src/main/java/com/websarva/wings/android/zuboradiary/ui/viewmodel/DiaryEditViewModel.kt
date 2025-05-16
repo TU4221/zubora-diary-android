@@ -44,8 +44,8 @@ internal class DiaryEditViewModel @Inject constructor(
 
     private val logTag = createLogTag()
 
-    private val initialDiaryListState = DiaryEditState.Idle
-    private val _diaryEditState = MutableStateFlow<DiaryEditState>(initialDiaryListState)
+    private val initialDiaryEditState = DiaryEditState.Idle
+    private val _diaryEditState = MutableStateFlow<DiaryEditState>(initialDiaryEditState)
 
     // 日記データ関係
     private val initialHasPreparedDiary = false
