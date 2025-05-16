@@ -12,5 +12,5 @@ internal sealed class DiaryEditState {
     data object PictureSelecting : DiaryEditState() // 日記写真選択中
     data object PictureDeleting : DiaryEditState() // 日記写真削除中
 
-    data object WeatherFetching : DiaryEditState() // 日記リスト更新中
+    data object WeatherFetching : DiaryEditState() // 天気情報取得中
 }
