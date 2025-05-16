@@ -162,14 +162,10 @@ internal class DiaryShowFragment : BaseFragment() {
                         }
                         navigatePreviousFragment(value.date)
                     }
-                    FragmentAction.None -> {
-                        // 処理なし
-                    }
                     else -> {
                         throw IllegalArgumentException()
                     }
                 }
-                mainViewModel.clearFragmentAction()
             }
         }
     }
