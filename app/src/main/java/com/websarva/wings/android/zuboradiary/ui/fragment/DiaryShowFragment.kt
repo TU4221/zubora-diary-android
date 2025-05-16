@@ -188,9 +188,6 @@ internal class DiaryShowFragment : BaseFragment() {
 
     private fun setUpToolBar() {
         binding.materialToolbarTopAppBar.apply {
-            setNavigationOnClickListener {
-                mainViewModel.onNavigationClicked()
-            }
             setOnMenuItemClickListener { item: MenuItem ->
                 // 日記編集フラグメント起動
                 if (item.itemId == R.id.diaryShowToolbarOptionEditDiary) {
@@ -233,15 +230,16 @@ internal class DiaryShowFragment : BaseFragment() {
                 .collectLatest { value: Weather ->
                     Weather2Observer(
                         requireContext(),
-                        binding.includeDiaryShow.textWeatherSlush,
                         binding.includeDiaryShow.textWeather2Selected
                     ).onChanged(value)
                 }
         }
     }
 
-    internal class Weather1Observer(private val context: Context, private val textWeather: TextView) {
-
+    internal class Weather1Observer(
+        private val context: Context,
+        private val textWeather: TextView
+    ) {
         fun onChanged(value: Weather) {
             textWeather.text = value.toString(context)
         }
@@ -249,17 +247,9 @@ internal class DiaryShowFragment : BaseFragment() {
 
     internal class Weather2Observer(
         private val context: Context,
-        private val slush: TextView,
         private val textWeather: TextView
     ) {
         fun onChanged(value: Weather) {
-            if (value == Weather.UNKNOWN) {
-                slush.visibility = View.GONE
-                textWeather.visibility = View.GONE
-            } else {
-                slush.visibility = View.VISIBLE
-                textWeather.visibility = View.VISIBLE
-            }
             textWeather.text = value.toString(context)
         }
     }
@@ -325,7 +315,6 @@ internal class DiaryShowFragment : BaseFragment() {
                 .collectLatest { value: Uri? ->
                     PicturePathObserver(
                         themeColor,
-                        binding.includeDiaryShow.textAttachedPicture,
                         binding.includeDiaryShow.imageAttachedPicture
                     ).onChanged(value)
                 }
@@ -334,19 +323,12 @@ internal class DiaryShowFragment : BaseFragment() {
 
     internal class PicturePathObserver(
         private val themeColor: ThemeColor,
-        private val textPictureTitle: TextView,
         private val imageView: ImageView
     ) {
 
         fun onChanged(value: Uri?) {
-            if (value == null) {
-                textPictureTitle.visibility = View.GONE
-                imageView.visibility = View.GONE
-                return
-            }
+            if (value == null) return
 
-            textPictureTitle.visibility = View.VISIBLE
-            imageView.visibility = View.VISIBLE
             DiaryPictureConfigurator()
                 .setUpPictureOnDiary(
                     imageView,

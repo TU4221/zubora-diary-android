@@ -555,7 +555,6 @@ class CalendarFragment : BaseFragment() {
                 .collectLatest { value: Weather ->
                     Weather2Observer(
                         requireContext(),
-                        binding.includeDiaryShow.textWeatherSlush,
                         binding.includeDiaryShow.textWeather2Selected
                     ).onChanged(value)
                 }
@@ -596,7 +595,6 @@ class CalendarFragment : BaseFragment() {
                 .collectLatest { value: Uri? ->
                     PicturePathObserver(
                         themeColor,
-                        binding.includeDiaryShow.textAttachedPicture,
                         binding.includeDiaryShow.imageAttachedPicture
                     ).onChanged(value)
                 }
