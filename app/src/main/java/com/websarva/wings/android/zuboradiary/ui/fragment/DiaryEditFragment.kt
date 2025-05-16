@@ -761,6 +761,7 @@ class DiaryEditFragment : BaseFragment() {
         }
 
         private fun isNextItemHidedState(): Boolean {
+            if (itemNumber.value == ItemNumber.MAX_NUMBER) return true
             val nextItemNumber = itemNumber.inc()
             val motionLayout = selectItemMotionLayout(nextItemNumber)
             return motionLayout.currentState == R.id.motion_scene_edit_diary_item_hided_state
