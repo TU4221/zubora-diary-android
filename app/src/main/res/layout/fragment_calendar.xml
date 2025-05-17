@@ -4,9 +4,14 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
+        <import type="android.view.View" />
+        <import type="com.websarva.wings.android.zuboradiary.ui.model.state.CalendarState" />
         <!-- MEMO:DataBinding時のnameの定義はcamelCaseにすること。
                   上手くビルド(クラス生成)がされない不具合が発生する。
                   https://qiita.com/nanoyatsu/items/afad39a63d42d6fa3ac8 -->
+        <variable
+            name="calendarViewModel"
+            type="com.websarva.wings.android.zuboradiary.ui.viewmodel.CalendarViewModel" />
         <variable
             name="diaryShowViewModel"
             type="com.websarva.wings.android.zuboradiary.ui.viewmodel.DiaryShowViewModel" />
@@ -71,7 +76,8 @@
                             android:id="@+id/frame_layout_diary_show"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:orientation="vertical">
+                            android:orientation="vertical"
+                            android:visibility="@{calendarViewModel.calendarState instanceof CalendarState.DiaryVisible ? View.VISIBLE : View.GONE}" >
 
                             <include
                                 layout="@layout/layout_diary_show"
@@ -88,7 +94,8 @@
                             android:textAppearance="@style/AppTextViewTextAppearance"
                             android:text="@string/fragment_calendar_no_diary_message"
                             android:gravity="center_horizontal|top"
-                            android:paddingTop="16dp"/>
+                            android:paddingTop="16dp"
+                            android:visibility="@{calendarViewModel.calendarState instanceof CalendarState.DiaryHidden ? View.VISIBLE : View.GONE}" />
 
                     </FrameLayout>
 

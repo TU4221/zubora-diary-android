@@ -95,6 +95,7 @@ class CalendarFragment : BaseFragment() {
 
         return binding.apply {
             lifecycleOwner = this@CalendarFragment.viewLifecycleOwner
+            calendarViewModel = this@CalendarFragment.mainViewModel
             diaryShowViewModel = this@CalendarFragment.diaryShowViewModel
         }
     }
@@ -171,11 +172,11 @@ class CalendarFragment : BaseFragment() {
                     is CalendarFragmentAction.NavigateDiaryEditFragment -> {
                         navigateDiaryEditFragment(value.date, !value.isNewDiary)
                     }
-                    is CalendarFragmentAction.ShowDiary -> {
-                        showDiary(value.date)
+                    is CalendarFragmentAction.LoadDiary -> {
+                        loadDiary(value.date)
                     }
-                    is CalendarFragmentAction.CloseDiary -> {
-                        closeDiary()
+                    is CalendarFragmentAction.InitializeDiary -> {
+                        initializeDiary()
                     }
                     is CalendarFragmentAction.ScrollCalendar -> {
                         scrollCalendar(value.date)
@@ -518,20 +519,12 @@ class CalendarFragment : BaseFragment() {
         binding.materialToolbarTopAppBar.title = dateString
     }
 
-    // CalendarViewで選択された日付の日記を表示
-    private fun showDiary(date: LocalDate) {
+    // CalendarViewで選択された日付の日記を読込
+    private fun loadDiary(date: LocalDate) {
         diaryShowViewModel.onCalendarDaySelected(date)
-        binding.apply {
-            frameLayoutDiaryShow.visibility = View.VISIBLE
-            textNoDiaryMessage.visibility = View.GONE
-        }
     }
 
-    private fun closeDiary() {
-        binding.apply {
-            frameLayoutDiaryShow.visibility = View.GONE
-            textNoDiaryMessage.visibility = View.VISIBLE
-        }
+    private fun initializeDiary() {
         diaryShowViewModel.initialize()
     }
 

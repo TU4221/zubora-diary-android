@@ -7,6 +7,7 @@ import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import com.websarva.wings.android.zuboradiary.ui.model.CalendarAppMessage
 import com.websarva.wings.android.zuboradiary.ui.model.action.CalendarFragmentAction
 import com.websarva.wings.android.zuboradiary.ui.model.action.FragmentAction
+import com.websarva.wings.android.zuboradiary.ui.model.state.CalendarState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -24,6 +25,10 @@ internal class CalendarViewModel @Inject constructor(
 
     private val logTag = createLogTag()
 
+    private val initialCalendarState = CalendarState.Idle
+    private val _calendarState = MutableStateFlow<CalendarState>(initialCalendarState)
+    val calendarState get() = _calendarState.asStateFlow()
+
     private val initialSelectedDate = LocalDate.now()
     private val _selectedDate = MutableStateFlow<LocalDate>(initialSelectedDate)
     val selectedDate get() = _selectedDate.asStateFlow()
@@ -39,6 +44,7 @@ internal class CalendarViewModel @Inject constructor(
 
     override fun initialize() {
         super.initialize()
+        _calendarState.value = initialCalendarState
         _selectedDate.value = initialSelectedDate
         _previousSelectedDate.value = initialPreviousSelectedDate
     }
@@ -82,20 +88,25 @@ internal class CalendarViewModel @Inject constructor(
     // StateFlow値変更時処理
     fun onChangedSelectedDate() {
         viewModelScope.launch(Dispatchers.IO) {
-            prepareDiaryShowLayout()
+            prepareDiary()
         }
     }
 
     // View変更処理
-    private suspend fun prepareDiaryShowLayout() {
+    private suspend fun prepareDiary() {
         val date = _selectedDate.value
         val exists = existsSavedDiary(date) ?: false
-        val action = if (exists) {
-            CalendarFragmentAction.ShowDiary(date)
+        if (exists) {
+            _calendarState.value = CalendarState.DiaryVisible
+            _fragmentAction.emit(
+                CalendarFragmentAction.LoadDiary(date)
+            )
         } else {
-            CalendarFragmentAction.CloseDiary
+            _calendarState.value = CalendarState.DiaryHidden
+            _fragmentAction.emit(
+                CalendarFragmentAction.InitializeDiary
+            )
         }
-        _fragmentAction.emit(action)
     }
 
     fun prepareCalendar() {
