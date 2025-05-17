@@ -50,7 +50,7 @@
                 android:textAppearance="@style/AppTextViewTextAppearance"
                 android:text="@string/layout_diary_show_weather_slush"
                 android:textSize="@dimen/layout_diary_show_text_size"
-                android:visibility="@{diaryShowViewModel.weather1 == Weather.UNKNOWN ? View.INVISIBLE : View.VISIBLE}" />
+                android:visibility="@{diaryShowViewModel.isWeather2Visible() ? View.VISIBLE : View.INVISIBLE}" />
 
             <TextView
                 style="@style/AppTextViewStyle"
@@ -59,7 +59,7 @@
                 android:layout_height="wrap_content"
                 android:textAppearance="@style/AppTextViewTextAppearance"
                 android:textSize="@dimen/layout_diary_show_text_size"
-                android:visibility="@{diaryShowViewModel.weather1 == Weather.UNKNOWN ? View.INVISIBLE : View.VISIBLE}"
+                android:visibility="@{diaryShowViewModel.isWeather2Visible() ? View.VISIBLE : View.INVISIBLE}"
                 tools:text="@string/layout_diary_show_weather2_tools_value" />
 
         </LinearLayout>

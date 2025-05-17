@@ -5,6 +5,7 @@ import android.util.Log
 import androidx.lifecycle.viewModelScope
 import com.websarva.wings.android.zuboradiary.data.repository.DiaryRepository
 import com.websarva.wings.android.zuboradiary.data.model.ItemNumber
+import com.websarva.wings.android.zuboradiary.data.model.Weather
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import com.websarva.wings.android.zuboradiary.ui.model.DiaryShowAppMessage
 import com.websarva.wings.android.zuboradiary.ui.model.DiaryShowPendingDialog
@@ -16,8 +17,11 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 import javax.inject.Inject
@@ -39,6 +43,14 @@ internal class DiaryShowViewModel @Inject constructor(private val diaryRepositor
         get() = diaryStateFlow.weather1.asStateFlow()
     val weather2
         get() = diaryStateFlow.weather2.asStateFlow()
+    val isWeather2Visible =
+        combine(weather1, weather2) { weather1, weather2 ->
+            return@combine weather1 != Weather.UNKNOWN && weather2 != Weather.UNKNOWN
+        }.stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = false
+        )
     val condition
         get() = diaryStateFlow.condition.asStateFlow()
     val title
