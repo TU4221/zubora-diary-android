@@ -9,8 +9,9 @@ import com.websarva.wings.android.zuboradiary.ui.model.action.CalendarFragmentAc
 import com.websarva.wings.android.zuboradiary.ui.model.action.FragmentAction
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import java.time.LocalDate
@@ -32,17 +33,14 @@ internal class CalendarViewModel @Inject constructor(
     val previousSelectedDate get() = _previousSelectedDate.asStateFlow()
 
     // Fragment処理
-    private val initialFragmentAction = FragmentAction.None
-    private val _fragmentAction: MutableStateFlow<FragmentAction> =
-        MutableStateFlow(initialFragmentAction)
-    val fragmentAction: StateFlow<FragmentAction>
-        get() = _fragmentAction
+    private val _fragmentAction = MutableSharedFlow<FragmentAction>()
+    val fragmentAction
+        get() = _fragmentAction.asSharedFlow()
 
     override fun initialize() {
         super.initialize()
         _selectedDate.value = initialSelectedDate
         _previousSelectedDate.value = initialPreviousSelectedDate
-        _fragmentAction.value = initialFragmentAction
     }
 
     // ViewClicked処理
@@ -57,22 +55,28 @@ internal class CalendarViewModel @Inject constructor(
     }
 
     fun onNavigationItemReselected() {
-        // MEMO:StateFlowに現在値と同じ値を代入してもCollectメソッドに登録した処理が起動しないため、
-        //      下記条件でカレンダースクロールのみ処理。
-        val today = LocalDate.now()
-        updateSelectedDate(today)
-        updateFragmentAction(CalendarFragmentAction.SmoothScrollCalendar(today))
+        viewModelScope.launch(Dispatchers.IO) {
+            // MEMO:StateFlowに現在値と同じ値を代入してもCollectメソッドに登録した処理が起動しないため、
+            //      下記条件でカレンダースクロールのみ処理。
+            val today = LocalDate.now()
+            updateSelectedDate(today)
+            _fragmentAction.emit(CalendarFragmentAction.SmoothScrollCalendar(today))
+        }
     }
 
     // 他Fragmentからの受取処理
     fun onDataReceivedFromDiaryShowFragment(date: LocalDate) {
-        updateSelectedDate(date)
-        updateFragmentAction(CalendarFragmentAction.ScrollCalendar(date))
+        viewModelScope.launch(Dispatchers.IO) {
+            updateSelectedDate(date)
+            _fragmentAction.emit(CalendarFragmentAction.ScrollCalendar(date))
+        }
     }
 
     fun onDataReceivedFromDiaryEditFragment(date: LocalDate) {
-        updateSelectedDate(date)
-        updateFragmentAction(CalendarFragmentAction.ScrollCalendar(date))
+        viewModelScope.launch(Dispatchers.IO) {
+            updateSelectedDate(date)
+            _fragmentAction.emit(CalendarFragmentAction.ScrollCalendar(date))
+        }
     }
 
     // StateFlow値変更時処理
@@ -91,12 +95,16 @@ internal class CalendarViewModel @Inject constructor(
         } else {
             CalendarFragmentAction.CloseDiary
         }
-        updateFragmentAction(action)
+        _fragmentAction.emit(action)
     }
 
     fun prepareCalendar() {
-        val targetDate = selectedDate.value
-        updateFragmentAction(CalendarFragmentAction.ScrollCalendar(targetDate))
+        viewModelScope.launch(Dispatchers.IO) {
+            val targetDate = selectedDate.value
+            _fragmentAction.emit(
+                CalendarFragmentAction.ScrollCalendar(targetDate)
+            )
+        }
     }
 
     // データ処理
@@ -123,20 +131,11 @@ internal class CalendarViewModel @Inject constructor(
         }
     }
 
-    // FragmentAction関係
-    private fun updateFragmentAction(action: FragmentAction) {
-        _fragmentAction.value = action
-    }
-
-    fun clearFragmentAction() {
-        _fragmentAction.value = initialFragmentAction
-    }
-
     private suspend fun navigateDiaryEditFragment() {
         val date = _selectedDate.value
         val exists = existsSavedDiary(date) ?: false
         val isNewDiary = !exists
-        updateFragmentAction(
+        _fragmentAction.emit(
             CalendarFragmentAction.NavigateDiaryEditFragment(date, isNewDiary)
         )
     }
