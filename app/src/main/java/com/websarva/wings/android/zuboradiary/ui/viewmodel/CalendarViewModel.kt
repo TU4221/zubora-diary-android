@@ -37,6 +37,8 @@ internal class CalendarViewModel @Inject constructor(
     private val _previousSelectedDate = MutableStateFlow<LocalDate?>(initialPreviousSelectedDate)
     val previousSelectedDate get() = _previousSelectedDate.asStateFlow()
 
+    private var shouldSmoothScroll = false
+
     // Fragment処理
     private val _fragmentAction = MutableSharedFlow<FragmentAction>()
     val fragmentAction
@@ -64,9 +66,15 @@ internal class CalendarViewModel @Inject constructor(
         viewModelScope.launch(Dispatchers.IO) {
             // MEMO:StateFlowに現在値と同じ値を代入してもCollectメソッドに登録した処理が起動しないため、
             //      下記条件でカレンダースクロールのみ処理。
+            val selectedDate = _selectedDate.value
             val today = LocalDate.now()
+            if (selectedDate == today) {
+                _fragmentAction.emit(
+                    CalendarFragmentAction.SmoothScrollCalendar(today)
+                )
+            }
+            shouldSmoothScroll = true
             updateSelectedDate(today)
-            _fragmentAction.emit(CalendarFragmentAction.SmoothScrollCalendar(today))
         }
     }
 
@@ -74,14 +82,12 @@ internal class CalendarViewModel @Inject constructor(
     fun onDataReceivedFromDiaryShowFragment(date: LocalDate) {
         viewModelScope.launch(Dispatchers.IO) {
             updateSelectedDate(date)
-            _fragmentAction.emit(CalendarFragmentAction.ScrollCalendar(date))
         }
     }
 
     fun onDataReceivedFromDiaryEditFragment(date: LocalDate) {
         viewModelScope.launch(Dispatchers.IO) {
             updateSelectedDate(date)
-            _fragmentAction.emit(CalendarFragmentAction.ScrollCalendar(date))
         }
     }
 
@@ -95,6 +101,15 @@ internal class CalendarViewModel @Inject constructor(
     // View変更処理
     private suspend fun prepareDiary() {
         val date = _selectedDate.value
+        val action =
+            if (shouldSmoothScroll) {
+                shouldSmoothScroll = false
+                CalendarFragmentAction.SmoothScrollCalendar(date)
+            } else {
+                CalendarFragmentAction.ScrollCalendar(date)
+            }
+        _fragmentAction.emit(action)
+
         val exists = existsSavedDiary(date) ?: false
         if (exists) {
             _calendarState.value = CalendarState.DiaryVisible
@@ -105,15 +120,6 @@ internal class CalendarViewModel @Inject constructor(
             _calendarState.value = CalendarState.DiaryHidden
             _fragmentAction.emit(
                 CalendarFragmentAction.InitializeDiary
-            )
-        }
-    }
-
-    fun prepareCalendar() {
-        viewModelScope.launch(Dispatchers.IO) {
-            val targetDate = selectedDate.value
-            _fragmentAction.emit(
-                CalendarFragmentAction.ScrollCalendar(targetDate)
             )
         }
     }

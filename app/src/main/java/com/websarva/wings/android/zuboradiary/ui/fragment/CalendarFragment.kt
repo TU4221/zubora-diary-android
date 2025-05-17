@@ -205,7 +205,6 @@ class CalendarFragment : BaseFragment() {
         val startMonth = currentMonth.minusMonths(60) //現在から過去5年分
         val endMonth = currentMonth.plusMonths(60) //現在から未来5年分
         calendar.setup(startMonth, endMonth, daysOfWeek[0])
-        mainViewModel.prepareCalendar()
 
         launchAndRepeatOnViewLifeCycleStarted {
             mainViewModel.selectedDate
@@ -423,6 +422,10 @@ class CalendarFragment : BaseFragment() {
 
     private fun scrollCalendar(date: LocalDate) {
         val targetYearMonth = YearMonth.of(date.year, date.monthValue)
+        val visibleMonth = binding.calendar.findFirstVisibleMonth()
+        if (visibleMonth != null && targetYearMonth == visibleMonth.yearMonth) return
+
+        Log.d("20250517", "scrollCalendar()")
         binding.calendar.scrollToMonth(targetYearMonth)
     }
 
@@ -434,6 +437,7 @@ class CalendarFragment : BaseFragment() {
             binding.calendar.scrollToMonth(targetYearMonth)
             return
         }
+        if (targetYearMonth == visibleMonth.yearMonth) return
 
         val visibleYearMonth = visibleMonth.yearMonth
 
