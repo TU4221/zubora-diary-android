@@ -17,15 +17,14 @@ import com.websarva.wings.android.zuboradiary.data.repository.WorkerRepository
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import com.websarva.wings.android.zuboradiary.ui.model.SettingsAppMessage
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.launch
 import java.time.DayOfWeek
 import java.time.LocalTime
 import javax.inject.Inject
@@ -37,27 +36,38 @@ internal class SettingsViewModel @Inject constructor(
     private val diaryRepository: DiaryRepository
 ) : BaseViewModel() {
 
+    private fun <T> Flow<T>.stateIn(initialValue: T): StateFlow<T> {
+        return this.stateIn(viewModelScope, SharingStarted.Eagerly, initialValue)
+    }
+
     private val logTag = createLogTag()
 
     // MEMO:StateFlow型設定値変数の値ははPreferencesDatastoreの値のみを代入したいので、
     //      代入されるまでの間(初回設定値読込中)はnullとする。
     lateinit var themeColor: StateFlow<ThemeColor?>
         private set
+    private lateinit var isThemeColorNotNull: StateFlow<Boolean>
+
     lateinit var calendarStartDayOfWeek: StateFlow<DayOfWeek?>
         private set
+    private lateinit var isCalendarStartDayOfWeekNotNull: StateFlow<Boolean>
+
     lateinit var isCheckedReminderNotification: StateFlow<Boolean?>
         private set
     lateinit var reminderNotificationTime: StateFlow<LocalTime?>
         private set
+    private lateinit var isReminderNotificationNotNull: StateFlow<Boolean>
+
     lateinit var isCheckedPasscodeLock: StateFlow<Boolean?>
         private set
     private lateinit var passcode: StateFlow<String?>
+    private lateinit var isPasscodeLockNotNull: StateFlow<Boolean>
+
     lateinit var isCheckedWeatherInfoAcquisition: StateFlow<Boolean?>
         private set
+    private lateinit var isWeatherInfoAcquisitionNotNull: StateFlow<Boolean>
 
-    private val _isAllSettingsNotNull = MutableStateFlow(false)
-    val isAllSettingsNotNull
-        get() = _isAllSettingsNotNull.asStateFlow()
+    lateinit var isAllSettingsNotNull: StateFlow<Boolean>
 
     private val initialGeoCoordinates = null
     private val _geoCoordinates = MutableStateFlow<GeoCoordinates?>(initialGeoCoordinates)
@@ -95,123 +105,111 @@ internal class SettingsViewModel @Inject constructor(
         setUpReminderNotificationPreferenceValueLoading(allPreferences)
         setUpPasscodeLockPreferenceValueLoading(allPreferences)
         setUpWeatherInfoAcquisitionPreferenceValueLoading(allPreferences)
+        setUpIsAllSettingsNotNull()
     }
 
     private fun setUpThemeColorPreferenceValueLoading(preferences: Flow<AllPreferences>) {
         themeColor =
-            preferences
-                .map { value ->
-                    value.themeColorPreference.themeColor
-                }.stateIn(
-                    viewModelScope,
-                    SharingStarted.Eagerly,
-                    null
-                )
-        setUpSettingValueNotNullCheck(themeColor)
+            preferences.map { value ->
+                value.themeColorPreference.themeColor
+            }.stateIn(null)
+
+        isThemeColorNotNull =
+            themeColor.map { value ->
+                value != null
+            }.stateIn(false)
     }
 
     private fun setUpCalendarStartDayOfWeekPreferenceValueLoading(preferences: Flow<AllPreferences>) {
         calendarStartDayOfWeek =
-            preferences
-                .map { value ->
-                    value.calendarStartDayOfWeekPreference.dayOfWeek
-                }.stateIn(
-                    viewModelScope,
-                    SharingStarted.Eagerly,
-                    null
-                )
-        setUpSettingValueNotNullCheck(calendarStartDayOfWeek)
+            preferences.map { value ->
+                value.calendarStartDayOfWeekPreference.dayOfWeek
+            }.stateIn(null)
+
+        isCalendarStartDayOfWeekNotNull =
+            calendarStartDayOfWeek.map { value ->
+                value != null
+            }.stateIn(false)
     }
 
     private fun setUpReminderNotificationPreferenceValueLoading(preferences: Flow<AllPreferences>) {
         isCheckedReminderNotification =
-            preferences
-                .map { value ->
-                    value.reminderNotificationPreference.isChecked
-                }.stateIn(
-                    viewModelScope,
-                    SharingStarted.Eagerly,
-                    null
-                )
-        setUpSettingValueNotNullCheck(isCheckedReminderNotification)
+            preferences.map { value ->
+                value.reminderNotificationPreference.isChecked
+            }.stateIn(null )
 
         reminderNotificationTime =
-            preferences
-                .map { value ->
-                    value.reminderNotificationPreference.notificationLocalTime
-                }.stateIn(
-                    viewModelScope,
-                    SharingStarted.Eagerly,
-                    null
-                )
-        setUpSettingValueNotNullCheck(reminderNotificationTime)
+            preferences.map { value ->
+                value.reminderNotificationPreference.notificationLocalTime
+            }.stateIn(null)
+
+        isReminderNotificationNotNull =
+            combine(isCheckedReminderNotification, reminderNotificationTime) {
+                    isCheckedReminderNotification, reminderNotificationTime ->
+                if (isCheckedReminderNotification == null) return@combine false
+                return@combine if (isCheckedReminderNotification) {
+                    reminderNotificationTime != null
+                } else {
+                    true
+                }
+            }.stateIn(false)
     }
 
     private fun setUpPasscodeLockPreferenceValueLoading(preferences: Flow<AllPreferences>) {
         isCheckedPasscodeLock =
-            preferences
-                .map { value ->
-                    value.passcodeLockPreference.isChecked
-                }.stateIn(
-                    viewModelScope,
-                    SharingStarted.Eagerly,
-                    null
-                )
-        setUpSettingValueNotNullCheck(isCheckedPasscodeLock)
+            preferences.map { value ->
+                value.passcodeLockPreference.isChecked
+            }.stateIn(null)
 
         passcode =
-            preferences
-                .map { value ->
-                    value.passcodeLockPreference.passCode
-                }.stateIn(
-                    viewModelScope,
-                    SharingStarted.Eagerly,
-                    null
-                )
-        setUpSettingValueNotNullCheck(passcode)
+            preferences.map { value ->
+                value.passcodeLockPreference.passCode
+            }.stateIn(null)
+
+        isPasscodeLockNotNull =
+            combine(isCheckedPasscodeLock, passcode) {
+                    isCheckedPasscodeLock, passcode ->
+                if (isCheckedPasscodeLock == null) return@combine false
+                return@combine if (isCheckedPasscodeLock) {
+                    passcode != null
+                } else {
+                    true
+                }
+            }.stateIn(false)
     }
 
     private fun setUpWeatherInfoAcquisitionPreferenceValueLoading(preferences: Flow<AllPreferences>) {
         isCheckedWeatherInfoAcquisition =
-            preferences
-                .map { value ->
-                    value.weatherInfoAcquisitionPreference.isChecked
-                }.stateIn(
-                    viewModelScope,
-                    SharingStarted.Eagerly,
-                    null
-                )
-        setUpSettingValueNotNullCheck(isCheckedWeatherInfoAcquisition)
+            preferences.map { value ->
+                value.weatherInfoAcquisitionPreference.isChecked
+            }.stateIn(null)
+
+        isWeatherInfoAcquisitionNotNull =
+            isCheckedWeatherInfoAcquisition.map { value ->
+                value != null
+            }.stateIn(false)
     }
 
-    private fun <T> setUpSettingValueNotNullCheck(setting: StateFlow<T?>) {
-        viewModelScope.launch(Dispatchers.IO) {
-            setting.collect { value: T? ->
-                if (_isAllSettingsNotNull.value) return@collect
-                if (value == null) return@collect
-
-                checkAllSettingsNotNull()
-            }
-        }
-    }
-
-    private fun checkAllSettingsNotNull() {
-        _isAllSettingsNotNull.value =
-            themeColor.value != null
-                    && calendarStartDayOfWeek.value != null
-                    && isCheckedReminderNotification.value != null
-                    && checkIsCheckedReminderNotificationNotNull()
-                    && passcode.value != null
-                    && isCheckedWeatherInfoAcquisition.value != null
-    }
-
-    private fun checkIsCheckedReminderNotificationNotNull(): Boolean {
-        val isCheckedReminderNotification = isCheckedReminderNotification.value ?: return false
-        if (isCheckedReminderNotification) {
-            return reminderNotificationTime.value != null
-        }
-
-        return true
+    private fun setUpIsAllSettingsNotNull() {
+        isAllSettingsNotNull =
+            combine(
+                isThemeColorNotNull,
+                isCalendarStartDayOfWeekNotNull,
+                isReminderNotificationNotNull,
+                isPasscodeLockNotNull,
+                isWeatherInfoAcquisitionNotNull
+            ) {
+                    isThemeColorNotNull,
+                    isCalendarStartDayOfWeekNotNull,
+                    isReminderNotificationNotNull,
+                    isPasscodeLockNotNull,
+                    isWeatherInfoAcquisitionNotNull ->
+                return@combine isThemeColorNotNull
+                        && isCalendarStartDayOfWeekNotNull
+                        && isReminderNotificationNotNull
+                        && isPasscodeLockNotNull
+                        && isWeatherInfoAcquisitionNotNull
+            }.stateIn(false)
     }
 
     private fun addSettingLoadingErrorMessage() {
