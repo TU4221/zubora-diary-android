@@ -1,6 +1,8 @@
 package com.websarva.wings.android.zuboradiary.ui.viewmodel
 
+import android.os.Build
 import android.util.Log
+import androidx.annotation.RequiresApi
 import androidx.datastore.core.IOException
 import androidx.lifecycle.viewModelScope
 import com.websarva.wings.android.zuboradiary.data.repository.DiaryRepository
@@ -16,15 +18,22 @@ import com.websarva.wings.android.zuboradiary.data.preferences.WeatherInfoAcquis
 import com.websarva.wings.android.zuboradiary.data.repository.WorkerRepository
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import com.websarva.wings.android.zuboradiary.ui.model.SettingsAppMessage
+import com.websarva.wings.android.zuboradiary.ui.model.action.FragmentAction
+import com.websarva.wings.android.zuboradiary.ui.model.action.SettingsFragmentAction
+import com.websarva.wings.android.zuboradiary.ui.utils.requireValue
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 import java.time.DayOfWeek
 import java.time.LocalTime
 import javax.inject.Inject
@@ -79,6 +88,11 @@ internal class SettingsViewModel @Inject constructor(
 
     private val initialScrollPositionY = 0
     var scrollPositionY = initialScrollPositionY
+
+    // Fragment処理
+    private val _fragmentAction = MutableSharedFlow<FragmentAction>()
+    val fragmentAction
+        get() = _fragmentAction.asSharedFlow()
 
     init {
         setUpPreferencesValueLoading()
@@ -218,14 +232,290 @@ internal class SettingsViewModel @Inject constructor(
         addAppMessage(SettingsAppMessage.SettingLoadingFailure)
     }
 
-    suspend fun saveThemeColor(value: ThemeColor): Boolean {
+    // ViewClicked処理
+    fun onThemeColorSettingButtonClicked() {
+        viewModelScope.launch(Dispatchers.IO) {
+            _fragmentAction.emit(
+                SettingsFragmentAction.NavigateThemeColorPickerDialog
+            )
+        }
+    }
+
+    fun onCalendarStartDayOfWeekSettingButtonClicked() {
+        viewModelScope.launch(Dispatchers.IO) {
+            val dayOfWeek = calendarStartDayOfWeek.requireValue()
+            _fragmentAction.emit(
+                SettingsFragmentAction.NavigateCalendarStartDayPickerDialog(dayOfWeek)
+            )
+        }
+    }
+
+    fun onReminderNotificationSettingCheckedChanged(isChecked: Boolean) {
+        viewModelScope.launch(Dispatchers.IO) {
+            // DateStorePreferences初回読込時の値がtrueの場合、本メソッドが呼び出される。
+            // 初回読込時は処理不要のため下記条件追加。
+            val settingValue = isCheckedReminderNotification.requireValue()
+            if (isChecked == settingValue) return@launch
+
+            if (isChecked) {
+                // MEMO:PostNotificationsはApiLevel33で導入されたPermission。33未満は許可取り不要。
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    _fragmentAction.emit(
+                        SettingsFragmentAction.CheckPostNotificationsPermission
+                    )
+                } else {
+                    _fragmentAction.emit(
+                        SettingsFragmentAction.NavigateReminderNotificationTimePickerDialog
+                    )
+                }
+            } else {
+                saveReminderNotificationInvalid()
+            }
+        }
+
+    }
+
+    fun onPasscodeLockSettingCheckedChanged(isChecked: Boolean) {
+        viewModelScope.launch(Dispatchers.IO) {
+            // DateStorePreferences初回読込時の値がtrueの場合、本メソッドが呼び出される。
+            // 初回読込時は処理不要のため下記条件追加。
+            val settingValue = isCheckedPasscodeLock.requireValue()
+            if (isChecked == settingValue) return@launch
+
+            savePasscodeLock(isChecked)
+        }
+    }
+
+    fun onWeatherInfoAcquisitionSettingCheckedChanged(isChecked: Boolean) {
+        viewModelScope.launch(Dispatchers.IO) {
+            // DateStorePreferences初回読込時の値がtrueの場合、本メソッドが呼び出される。
+            // 初回読込時は処理不要のため下記条件追加。
+            val settingValue = isCheckedWeatherInfoAcquisition.requireValue()
+            if (isChecked == settingValue) return@launch
+
+            if (isChecked) {
+                _fragmentAction.emit(
+                    SettingsFragmentAction.CheckAccessLocationPermission
+                )
+            } else {
+                saveWeatherInfoAcquisition(false)
+            }
+        }
+    }
+
+    fun onAllDiariesDeleteButtonClicked() {
+        viewModelScope.launch(Dispatchers.IO) {
+            _fragmentAction.emit(
+                SettingsFragmentAction.NavigateAllDiariesDeleteDialog
+            )
+        }
+    }
+
+    fun onAllSettingsInitializationButtonClicked() {
+        viewModelScope.launch(Dispatchers.IO) {
+            _fragmentAction.emit(
+                SettingsFragmentAction.NavigateAllSettingsInitializationDialog
+            )
+        }
+    }
+
+    fun onAllDataDeleteButtonClicked() {
+        viewModelScope.launch(Dispatchers.IO) {
+            _fragmentAction.emit(
+                SettingsFragmentAction.NavigateAllDataDeleteDialog
+            )
+        }
+    }
+
+    fun onOpenSourceLicenseButtonClicked() {
+        viewModelScope.launch(Dispatchers.IO) {
+            _fragmentAction.emit(
+                SettingsFragmentAction.NavigateOpenSourceLicensesFragment
+            )
+        }
+    }
+
+    // DialogButton処理
+    fun onThemeColorSettingDialogPositiveButtonClicked(themeColor: ThemeColor) {
+        viewModelScope.launch(Dispatchers.IO) {
+            saveThemeColor(themeColor)
+        }
+    }
+
+    fun onCalendarStartDayOfWeekSettingDialogPositiveButtonClicked(dayOfWeek: DayOfWeek) {
+        viewModelScope.launch(Dispatchers.IO) {
+            saveCalendarStartDayOfWeek(dayOfWeek)
+        }
+    }
+
+    fun onReminderNotificationSettingDialogPositiveButtonClicked(time: LocalTime) {
+        viewModelScope.launch(Dispatchers.IO) {
+            saveReminderNotificationValid(time)
+        }
+    }
+
+    fun onReminderNotificationSettingDialogNegativeButtonClicked() {
+        viewModelScope.launch(Dispatchers.IO) {
+            _fragmentAction.emit(
+                SettingsFragmentAction.TurnOffReminderNotificationSettingSwitch
+            )
+        }
+    }
+
+    fun onAllDiariesDeleteDialogPositiveButtonClicked() {
+        viewModelScope.launch(Dispatchers.IO) {
+            val isSuccessful = deleteAllDiaries()
+            if (isSuccessful) {
+                _fragmentAction.emit(
+                    SettingsFragmentAction.ReleaseAllPersistablePermission
+                )
+            }
+        }
+    }
+
+    fun onAllSettingsInitializationDialogPositiveButtonClicked() {
+        viewModelScope.launch(Dispatchers.IO) {
+            initializeAllSettings()
+        }
+    }
+
+    fun onAllDataDeleteDialogPositiveButtonClicked() {
+        viewModelScope.launch(Dispatchers.IO) {
+            val isSuccessful = deleteAllData()
+            if (isSuccessful) {
+                _fragmentAction.emit(
+                    SettingsFragmentAction.ReleaseAllPersistablePermission
+                )
+            }
+        }
+    }
+
+    // Permission処理
+    @RequiresApi(api = Build.VERSION_CODES.TIRAMISU)
+    fun onPostNotificationsPermissionChecked(isGranted: Boolean) {
+        viewModelScope.launch(Dispatchers.IO) {
+            if (isGranted) {
+                _fragmentAction.emit(
+                    SettingsFragmentAction.NavigateReminderNotificationTimePickerDialog
+                )
+            } else {
+                _fragmentAction.emit(
+                    SettingsFragmentAction.CheckShouldShowRequestPostNotificationsPermissionRationale
+                )
+            }
+        }
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.TIRAMISU)
+    fun onShouldShowRequestPostNotificationsPermissionRationaleChecked(shouldShowRequest: Boolean) {
+        viewModelScope.launch(Dispatchers.IO) {
+            if (shouldShowRequest) {
+                _fragmentAction.emit(
+                    SettingsFragmentAction.ShowRequestPostNotificationsPermissionRationale
+                )
+            } else {
+                _fragmentAction.emit(
+                    SettingsFragmentAction.TurnOffReminderNotificationSettingSwitch
+                )
+                _fragmentAction.emit(
+                    SettingsFragmentAction.NavigateNotificationPermissionDialog
+                )
+            }
+        }
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.TIRAMISU)
+    fun onRequestPostNotificationsPermissionRationaleResultReceived(isGranted: Boolean) {
+        viewModelScope.launch(Dispatchers.IO) {
+            if (isGranted) {
+                _fragmentAction.emit(
+                    SettingsFragmentAction.NavigateReminderNotificationTimePickerDialog
+                )
+            } else {
+                _fragmentAction.emit(
+                    SettingsFragmentAction.TurnOffReminderNotificationSettingSwitch
+                )
+            }
+        }
+    }
+
+    fun onAccessLocationPermissionChecked(isGranted: Boolean) {
+        viewModelScope.launch(Dispatchers.IO) {
+            if (isGranted) {
+                saveWeatherInfoAcquisition(true)
+            } else {
+                _fragmentAction.emit(
+                    SettingsFragmentAction.CheckShouldShowRequestAccessLocationPermissionRationale
+                )
+            }
+        }
+    }
+
+    fun onShouldShowRequestAccessLocationPermissionRationaleChecked(shouldShowRequest: Boolean) {
+        viewModelScope.launch(Dispatchers.IO) {
+            if (shouldShowRequest) {
+                _fragmentAction.emit(
+                    SettingsFragmentAction.ShowRequestAccessLocationPermissionRationale
+                )
+            } else {
+                _fragmentAction.emit(
+                    SettingsFragmentAction.TurnOffWeatherInfoAcquisitionSettingSwitch
+                )
+                _fragmentAction.emit(
+                    SettingsFragmentAction.NavigateLocationPermissionDialog
+                )
+            }
+        }
+    }
+
+    fun onRequestAccessLocationPermissionRationaleResultReceived(isGranted: Boolean) {
+        viewModelScope.launch(Dispatchers.IO) {
+            if (isGranted) {
+                _fragmentAction.emit(
+                    SettingsFragmentAction.NavigateReminderNotificationTimePickerDialog
+                )
+            } else {
+                _fragmentAction.emit(
+                    SettingsFragmentAction.TurnOffReminderNotificationSettingSwitch
+                )
+            }
+
+            if (isGranted) {
+                saveWeatherInfoAcquisition(true)
+            } else {
+                _fragmentAction.emit(
+                    SettingsFragmentAction.TurnOffWeatherInfoAcquisitionSettingSwitch
+                )
+            }
+        }
+    }
+
+    // MEMO:端末設定画面で"許可 -> 無許可"に変更したときの対応コード
+    fun onSetupReminderNotificationSettingFromPermission(isGranted: Boolean) {
+        viewModelScope.launch(Dispatchers.IO) {
+            if (isGranted) return@launch
+
+            saveReminderNotificationInvalid()
+        }
+    }
+
+    // MEMO:端末設定画面で"許可 -> 無許可"に変更したときの対応コード
+    fun onSetupWeatherInfoAcquisitionSettingFromPermission(isGranted: Boolean) {
+        viewModelScope.launch(Dispatchers.IO) {
+            if (isGranted) return@launch
+
+            saveWeatherInfoAcquisition(false)
+        }
+    }
+
+    private suspend fun saveThemeColor(value: ThemeColor): Boolean {
         val preferenceValue = ThemeColorPreference(value)
         return updateSettingValue{
             userPreferencesRepository.saveThemeColorPreference(preferenceValue)
         }
     }
 
-    suspend fun saveCalendarStartDayOfWeek(value: DayOfWeek): Boolean {
+    private suspend fun saveCalendarStartDayOfWeek(value: DayOfWeek): Boolean {
         val preferenceValue =
             CalendarStartDayOfWeekPreference(value)
         return updateSettingValue{
@@ -233,7 +523,7 @@ internal class SettingsViewModel @Inject constructor(
         }
     }
 
-    suspend fun saveReminderNotificationValid(value: LocalTime): Boolean {
+    private suspend fun saveReminderNotificationValid(value: LocalTime): Boolean {
         val preferenceValue =
             ReminderNotificationPreference(true, value)
         return updateSettingValue{
@@ -242,7 +532,7 @@ internal class SettingsViewModel @Inject constructor(
         }
     }
 
-    suspend fun saveReminderNotificationInvalid(): Boolean {
+    private suspend fun saveReminderNotificationInvalid(): Boolean {
         val preferenceValue =
             ReminderNotificationPreference(false, null as LocalTime?)
         return updateSettingValue{
@@ -251,7 +541,7 @@ internal class SettingsViewModel @Inject constructor(
         }
     }
 
-    suspend fun savePasscodeLock(value: Boolean): Boolean {
+    private suspend fun savePasscodeLock(value: Boolean): Boolean {
         val passcode = if (value) {
             "0000" // TODO:仮
         } else {
@@ -264,7 +554,7 @@ internal class SettingsViewModel @Inject constructor(
         }
     }
 
-    suspend fun saveWeatherInfoAcquisition(value: Boolean): Boolean {
+    private suspend fun saveWeatherInfoAcquisition(value: Boolean): Boolean {
         val preferenceValue =
             WeatherInfoAcquisitionPreference(value)
         return updateSettingValue{
@@ -311,7 +601,7 @@ internal class SettingsViewModel @Inject constructor(
         _geoCoordinates.value = initialGeoCoordinates
     }
 
-    suspend fun deleteAllDiaries(): Boolean {
+    private suspend fun deleteAllDiaries(): Boolean {
         try {
             diaryRepository.deleteAllDiaries()
         } catch (e: Exception) {
@@ -322,13 +612,13 @@ internal class SettingsViewModel @Inject constructor(
         return true
     }
 
-    suspend fun initializeAllSettings(): Boolean {
+    private suspend fun initializeAllSettings(): Boolean {
         return updateSettingValue{
             userPreferencesRepository.initializeAllPreferences()
         }
     }
 
-    suspend fun deleteAllData(): Boolean {
+    private suspend fun deleteAllData(): Boolean {
         try {
             diaryRepository.deleteAllData()
         } catch (e: Exception) {

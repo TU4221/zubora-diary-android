@@ -13,6 +13,12 @@
         <variable
             name="settingValue"
             type="kotlinx.coroutines.flow.StateFlow&lt;String>" />
+        <variable
+            name="settingValueVisibility"
+            type="int" />
+        <variable
+            name="onClickListener"
+            type="android.view.View.OnClickListener" />
 
     </data>
 
@@ -34,6 +40,7 @@
             android:layout_gravity="center_vertical"
             android:textAppearance="@style/SettingsItemTextViewTextAppearance"
             android:text="@{settingTitle}"
+            android:onClickListener="@{onClickListener}"
             app:drawableStartCompat="@{settingIcon}"
             tools:text="@string/layout_settings_item_title_tools_value"
             tools:drawableStart="@drawable/ic_settings_24px"
@@ -48,6 +55,7 @@
             android:layout_gravity="end|center_vertical"
             android:textAppearance="@style/SettingsItemValueTextViewTextAppearance"
             android:text="@{settingValue}"
+            android:visibility="@{settingValueVisibility}"
             tools:ignore="DuplicateIncludedIds" />
 
     </FrameLayout>

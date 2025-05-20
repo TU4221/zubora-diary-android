@@ -11,21 +11,17 @@ import android.provider.Settings
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.CompoundButton
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.annotation.MainThread
 import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
 import androidx.databinding.ViewDataBinding
-import androidx.lifecycle.lifecycleScope
 import com.websarva.wings.android.zuboradiary.R
 import com.websarva.wings.android.zuboradiary.ui.model.AppMessage
 import com.websarva.wings.android.zuboradiary.data.model.ThemeColor
 import com.websarva.wings.android.zuboradiary.databinding.FragmentSettingsBinding
 import com.websarva.wings.android.zuboradiary.ui.permission.UriPermissionManager
-import com.websarva.wings.android.zuboradiary.ui.utils.requireValue
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.AllDataDeleteDialogFragment
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.AllDiariesDeleteDialogFragment
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.AllSettingsInitializationDialogFragment
@@ -34,12 +30,12 @@ import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.PermissionDialo
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.ReminderNotificationTimePickerDialogFragment
 import com.websarva.wings.android.zuboradiary.ui.theme.SettingsThemeColorChanger
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.ThemeColorPickerDialogFragment
+import com.websarva.wings.android.zuboradiary.ui.model.action.FragmentAction
+import com.websarva.wings.android.zuboradiary.ui.model.action.SettingsFragmentAction
 import com.websarva.wings.android.zuboradiary.ui.utils.formatToHourMinuteString
 import com.websarva.wings.android.zuboradiary.ui.utils.toCalendarStartDayOfWeekString
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.launch
 import java.time.DayOfWeek
 import java.time.LocalTime
 
@@ -82,11 +78,11 @@ class SettingsFragment : BaseFragment() {
 
                     // 再確認
                     val recheck = mainActivity.isGrantedPostNotifications
-                    if (isGranted && recheck) {
-                        navigateReminderNotificationTimePickerDialog()
-                    } else {
-                        binding.includeReminderNotificationSetting.materialSwitch.isChecked = false
-                    }
+
+                    mainViewModel
+                        .onRequestPostNotificationsPermissionRationaleResultReceived(
+                            isGranted && recheck
+                        )
                 }
         }
 
@@ -103,14 +99,11 @@ class SettingsFragment : BaseFragment() {
 
                 // 再確認
                 val recheck = mainActivity.isGrantedAccessLocation
-                if (isGrantedAll && recheck) {
-                    lifecycleScope.launch(Dispatchers.IO) {
-                        settingsViewModel.saveWeatherInfoAcquisition(true)
-                    }
-                } else {
-                    binding.includeWeatherInfoAcquisitionSetting
-                        .materialSwitch.isChecked = false
-                }
+
+                mainViewModel
+                    .onRequestAccessLocationPermissionRationaleResultReceived(
+                        isGrantedAll && recheck
+                    )
             }
 
         uriPermissionManager =
@@ -140,12 +133,9 @@ class SettingsFragment : BaseFragment() {
         setUpThemeColorSettingItem()
         setUpCalendarStartDaySettingItem()
         setUpReminderNotificationSettingItem()
-        setUpPasscodeLockSettingItem()
         setUpWeatherInfoAcquisitionSettingItem()
-        setUpAllDiariesDeleteSettingItem()
-        setUpAllSettingsInitializationSettingItem()
-        setUpAllDataDeleteSettingItem()
-        setUpOpenSourceLicensesSettingItem()
+
+        setUpFragmentAction()
     }
 
     override fun handleOnReceivingResultFromPreviousFragment() {
@@ -179,9 +169,7 @@ class SettingsFragment : BaseFragment() {
             receiveResulFromDialog<ThemeColor>(ThemeColorPickerDialogFragment.KEY_SELECTED_THEME_COLOR)
                 ?: return
 
-        lifecycleScope.launch(Dispatchers.IO) {
-            settingsViewModel.saveThemeColor(selectedThemeColor)
-        }
+        mainViewModel.onThemeColorSettingDialogPositiveButtonClicked(selectedThemeColor)
     }
 
     // カレンダー開始曜日設定ダイアログフラグメントから結果受取
@@ -190,9 +178,8 @@ class SettingsFragment : BaseFragment() {
             receiveResulFromDialog<DayOfWeek>(CalendarStartDayPickerDialogFragment.KEY_SELECTED_DAY_OF_WEEK)
                 ?: return
 
-        lifecycleScope.launch(Dispatchers.IO) {
-            settingsViewModel.saveCalendarStartDayOfWeek(selectedDayOfWeek)
-        }
+        settingsViewModel
+            .onCalendarStartDayOfWeekSettingDialogPositiveButtonClicked(selectedDayOfWeek)
     }
 
     // リマインダー通知時間設定ダイアログフラグメントから結果受取
@@ -201,7 +188,7 @@ class SettingsFragment : BaseFragment() {
             receiveResulFromDialog<Int>(ReminderNotificationTimePickerDialogFragment.KEY_SELECTED_BUTTON)
                 ?: return
         if (selectedButton != DialogInterface.BUTTON_POSITIVE) {
-            binding.includeReminderNotificationSetting.materialSwitch.isChecked = false
+            mainViewModel.onReminderNotificationSettingDialogNegativeButtonClicked()
             return
         }
 
@@ -211,10 +198,7 @@ class SettingsFragment : BaseFragment() {
                     ReminderNotificationTimePickerDialogFragment.KEY_SELECTED_TIME
                 )
             )
-
-        lifecycleScope.launch(Dispatchers.IO) {
-            settingsViewModel.saveReminderNotificationValid(selectedTime)
-        }
+        mainViewModel.onReminderNotificationSettingDialogPositiveButtonClicked(selectedTime)
     }
 
     // 権限催促ダイアログフラグメントから結果受取
@@ -231,10 +215,7 @@ class SettingsFragment : BaseFragment() {
             receiveResulFromDialog<Int>(AllDiariesDeleteDialogFragment.KEY_SELECTED_BUTTON) ?: return
         if (selectedButton != Dialog.BUTTON_POSITIVE) return
 
-        lifecycleScope.launch(Dispatchers.IO) {
-            val isSuccessful = settingsViewModel.deleteAllDiaries()
-            if (isSuccessful) uriPermissionManager.releaseAllPersistablePermission(requireContext())
-        }
+        mainViewModel.onAllDiariesDeleteDialogPositiveButtonClicked()
     }
 
     private fun receiveAllSettingsInitializationDialogResult() {
@@ -243,9 +224,7 @@ class SettingsFragment : BaseFragment() {
                 ?: return
         if (selectedButton != Dialog.BUTTON_POSITIVE) return
 
-        lifecycleScope.launch(Dispatchers.IO) {
-            settingsViewModel.initializeAllSettings()
-        }
+        mainViewModel.onAllSettingsInitializationDialogPositiveButtonClicked()
     }
 
     private fun receiveAllDataDeleteDialogResult() {
@@ -253,10 +232,7 @@ class SettingsFragment : BaseFragment() {
             receiveResulFromDialog<Int>(AllDataDeleteDialogFragment.KEY_SELECTED_BUTTON) ?: return
         if (selectedButton != Dialog.BUTTON_POSITIVE) return
 
-        lifecycleScope.launch(Dispatchers.IO) {
-            val isSuccessful = settingsViewModel.deleteAllData()
-            if (isSuccessful) uriPermissionManager.releaseAllPersistablePermission(requireContext())
-        }
+        mainViewModel.onAllDataDeleteDialogPositiveButtonClicked()
     }
 
     private fun setUpScrollPosition() {
@@ -264,10 +240,6 @@ class SettingsFragment : BaseFragment() {
     }
 
     private fun setUpThemeColorSettingItem() {
-        binding.includeThemeColorSetting.textTitle.setOnClickListener {
-            navigateThemeColorPickerDialog()
-        }
-
         launchAndRepeatOnViewLifeCycleStarted {
             settingsViewModel.themeColor
                 .collectLatest { value: ThemeColor? ->
@@ -379,12 +351,6 @@ class SettingsFragment : BaseFragment() {
     }
 
     private fun setUpCalendarStartDaySettingItem() {
-        binding.includeCalendarStartDaySetting.textTitle.setOnClickListener {
-            val currentCalendarStartDayOfWeek =
-                settingsViewModel.calendarStartDayOfWeek.requireValue()
-            navigateCalendarStartDayPickerDialog(currentCalendarStartDayOfWeek)
-        }
-
         launchAndRepeatOnViewLifeCycleStarted {
             settingsViewModel.calendarStartDayOfWeek
                 .collectLatest { value: DayOfWeek? ->
@@ -397,23 +363,9 @@ class SettingsFragment : BaseFragment() {
     }
 
     private fun setUpReminderNotificationSettingItem() {
-        binding.includeReminderNotificationSetting.materialSwitch
-            .setOnCheckedChangeListener(
-                ReminderNotificationOnCheckedChangeListener()
-            )
-
-        launchAndRepeatOnViewLifeCycleStarted {
-            settingsViewModel.isCheckedReminderNotification
-                .collectLatest { value: Boolean? ->
-                    value ?: return@collectLatest
-
-                    binding.includeReminderNotificationSetting.textValue.visibility =
-                        if (value) {
-                            View.VISIBLE
-                        } else {
-                            View.INVISIBLE
-                        }
-                }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            val isGranted = mainActivity.isGrantedPostNotifications
+            mainViewModel.onSetupReminderNotificationSettingFromPermission(isGranted)
         }
 
         launchAndRepeatOnViewLifeCycleStarted {
@@ -433,179 +385,87 @@ class SettingsFragment : BaseFragment() {
         }
     }
 
-    private inner class ReminderNotificationOnCheckedChangeListener
-        : CompoundButton.OnCheckedChangeListener {
-            override fun onCheckedChanged(buttonView: CompoundButton, isChecked: Boolean) {
-                // DateStorePreferences初回読込時の値がtrueの場合、本メソッドが呼び出される。
-                // 初回読込時は処理不要のため下記条件追加。
-                val settingValue = settingsViewModel.isCheckedReminderNotification.requireValue()
-                if (isChecked == settingValue) return
+    private fun setUpWeatherInfoAcquisitionSettingItem() {
+        val isGranted = mainActivity.isGrantedAccessLocation
+        mainViewModel.onSetupWeatherInfoAcquisitionSettingFromPermission(isGranted)
+    }
 
-                if (isChecked) {
-                    // MEMO:PostNotificationsはApiLevel33で導入されたPermission。33未満は許可取り不要。
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                        requestPostNotificationsPermission()
-                    } else {
+    private fun setUpFragmentAction() {
+        launchAndRepeatOnViewLifeCycleStarted {
+            mainViewModel.fragmentAction.collect { value: FragmentAction ->
+                when (value) {
+                    is SettingsFragmentAction.NavigateThemeColorPickerDialog -> {
+                        navigateThemeColorPickerDialog()
+                    }
+                    is SettingsFragmentAction.NavigateCalendarStartDayPickerDialog -> {
+                        navigateCalendarStartDayPickerDialog(value.dayOfWeek)
+                    }
+                    is SettingsFragmentAction.NavigateReminderNotificationTimePickerDialog -> {
                         navigateReminderNotificationTimePickerDialog()
                     }
-                } else {
-                    lifecycleScope.launch(Dispatchers.IO) {
-                        settingsViewModel.saveReminderNotificationInvalid()
+                    is SettingsFragmentAction.NavigateNotificationPermissionDialog -> {
+                        navigateNotificationPermissionDialog()
+                    }
+                    is SettingsFragmentAction.NavigateLocationPermissionDialog -> {
+                        navigateLocationPermissionDialog()
+                    }
+                    is SettingsFragmentAction.NavigateAllDiariesDeleteDialog -> {
+                        navigateAllDiariesDeleteDialog()
+                    }
+                    is SettingsFragmentAction.NavigateAllSettingsInitializationDialog -> {
+                        navigateAllSettingsInitializationDialog()
+                    }
+                    is SettingsFragmentAction.NavigateAllDataDeleteDialog -> {
+                        navigateAllDataDeleteDialog()
+                    }
+                    is SettingsFragmentAction.NavigateOpenSourceLicensesFragment -> {
+                        navigateOpenSourceLicensesFragment()
+                    }
+                    is SettingsFragmentAction.ReleaseAllPersistablePermission -> {
+                        uriPermissionManager.releaseAllPersistablePermission(requireContext())
+                    }
+                    is SettingsFragmentAction.CheckPostNotificationsPermission -> {
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                            checkPostNotificationsPermission()
+                        }
+                    }
+                    is SettingsFragmentAction.CheckShouldShowRequestPostNotificationsPermissionRationale -> {
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                            checkShouldShowRequestPostNotificationsPermissionRationale()
+                        }
+                    }
+                    is SettingsFragmentAction.ShowRequestPostNotificationsPermissionRationale -> {
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                            showRequestPostNotificationsPermissionRationale()
+                        }
+                    }
+                    is SettingsFragmentAction.CheckAccessLocationPermission -> {
+                        checkAccessLocationPermission()
+                    }
+                    is SettingsFragmentAction.CheckShouldShowRequestAccessLocationPermissionRationale -> {
+                        checkShouldShowRequestAccessLocationPermissionRationale()
+                    }
+                    is SettingsFragmentAction.ShowRequestAccessLocationPermissionRationale -> {
+                        showRequestAccessLocationPermissionRationale()
+                    }
+                    is SettingsFragmentAction.TurnOffReminderNotificationSettingSwitch -> {
+                        binding.includeReminderNotificationSetting.materialSwitch.isChecked = false
+                    }
+                    is SettingsFragmentAction.TurnOffWeatherInfoAcquisitionSettingSwitch -> {
+                        binding.includeWeatherInfoAcquisitionSetting.materialSwitch.isChecked = false
+                    }
+                    else -> {
+                        throw IllegalArgumentException()
                     }
                 }
             }
-
-        @RequiresApi(api = Build.VERSION_CODES.TIRAMISU)
-        fun requestPostNotificationsPermission() {
-            val isGranted = mainActivity.isGrantedPostNotifications
-            if (isGranted) {
-                navigateReminderNotificationTimePickerDialog()
-            } else {
-                val shouldShowRequestPermissionRationale =
-                    ActivityCompat.shouldShowRequestPermissionRationale(
-                        requireActivity(), Manifest.permission.POST_NOTIFICATIONS
-                    )
-                if (shouldShowRequestPermissionRationale) {
-                    requestPostNotificationsPermissionLauncher
-                        .launch(Manifest.permission.POST_NOTIFICATIONS)
-                } else {
-                    binding.includeReminderNotificationSetting.materialSwitch.isChecked = false
-                    val permissionName = getString(R.string.fragment_settings_permission_name_notification)
-                    navigatePermissionDialog(permissionName)
-                }
-            }
         }
-    }
-
-    private fun setUpPasscodeLockSettingItem() {
-        binding.includePasscodeLockSetting.materialSwitch
-            .setOnCheckedChangeListener { _: CompoundButton, isChecked: Boolean ->
-                // DateStorePreferences初回読込時の値がtrueの場合、本メソッドが呼び出される。
-                // 初回読込時は処理不要のため下記条件追加。
-                val settingValue = settingsViewModel.isCheckedPasscodeLock.requireValue()
-                if (isChecked == settingValue) return@setOnCheckedChangeListener
-
-                lifecycleScope.launch(Dispatchers.IO) {
-                    settingsViewModel.savePasscodeLock(isChecked)
-                }
-            }
-
-        launchAndRepeatOnViewLifeCycleStarted {
-            settingsViewModel.isCheckedPasscodeLock
-                .collectLatest { }
-        }
-    }
-
-    private fun setUpWeatherInfoAcquisitionSettingItem() {
-        // MEMO:端末設定画面で"許可 -> 無許可"に変更したときの対応コード
-        val isGranted = mainActivity.isGrantedAccessLocation
-        if (!isGranted) {
-            lifecycleScope.launch(Dispatchers.IO) {
-                settingsViewModel.saveWeatherInfoAcquisition(false)
-            }
-        }
-
-        binding.includeWeatherInfoAcquisitionSetting.materialSwitch
-            .setOnCheckedChangeListener(
-                WeatherInfoAcquisitionOnCheckedChangeListener()
-            )
-    }
-
-    private inner class WeatherInfoAcquisitionOnCheckedChangeListener
-        : CompoundButton.OnCheckedChangeListener {
-        override fun onCheckedChanged(buttonView: CompoundButton, isChecked: Boolean) {
-            // DateStorePreferences初回読込時の値がtrueの場合、本メソッドが呼び出される。
-            // 初回読込時は処理不要のため下記条件追加。
-            val settingValue = settingsViewModel.isCheckedWeatherInfoAcquisition.requireValue()
-            if (isChecked == settingValue) return
-
-            if (isChecked) {
-                val isGranted = mainActivity.isGrantedAccessLocation
-                if (isGranted) {
-                    lifecycleScope.launch(Dispatchers.IO) {
-                        settingsViewModel.saveWeatherInfoAcquisition(true)
-                    }
-                } else {
-                    binding.includeWeatherInfoAcquisitionSetting.materialSwitch.isChecked = false
-                    val shouldShowRequestPermissionRationale =
-                        ActivityCompat.shouldShowRequestPermissionRationale(
-                            requireActivity(), Manifest.permission.ACCESS_FINE_LOCATION
-                        )
-                                && ActivityCompat.shouldShowRequestPermissionRationale(
-                            requireActivity(), Manifest.permission.ACCESS_COARSE_LOCATION
-                        )
-                    if (shouldShowRequestPermissionRationale) {
-                        val requestPermissions =
-                            arrayOf(
-                                Manifest.permission.ACCESS_FINE_LOCATION,
-                                Manifest.permission.ACCESS_COARSE_LOCATION
-                            )
-                        requestAccessLocationPermissionLauncher.launch(requestPermissions)
-                    } else {
-                        binding.includeWeatherInfoAcquisitionSetting.materialSwitch.isChecked =
-                            false
-                        val permissionName =
-                            getString(R.string.fragment_settings_permission_name_location)
-                        navigatePermissionDialog(permissionName)
-                    }
-                }
-            } else {
-                lifecycleScope.launch(Dispatchers.IO) {
-                    settingsViewModel.saveWeatherInfoAcquisition(false)
-                }
-            }
-        }
-    }
-
-    private fun setUpAllDiariesDeleteSettingItem() {
-        binding.includeAllDiariesDeleteSetting.apply {
-            textTitle.setOnClickListener {
-                navigateAllDiariesDeleteDialog()
-            }
-            textValue.visibility = View.GONE
-        }
-    }
-
-    private fun setUpAllSettingsInitializationSettingItem() {
-        binding.includeAllSettingsInitializationSetting.apply {
-            textTitle.setOnClickListener {
-                navigateAllSettingsInitializationDialog()
-            }
-            textValue.visibility = View.GONE
-        }
-    }
-
-    private fun setUpAllDataDeleteSettingItem() {
-        binding.includeAllDataDeleteSetting.apply {
-            textTitle.setOnClickListener {
-                navigateAllDataDeleteDialog()
-            }
-            textValue.visibility = View.GONE
-        }
-    }
-
-    private fun setUpOpenSourceLicensesSettingItem() {
-        binding.includeOpenSourceLicensesSetting.apply {
-            textTitle.setOnClickListener {
-                showOpenSourceLicensesFragment()
-            }
-            textValue.visibility = View.GONE
-        }
-    }
-
-    private fun showOpenSourceLicensesFragment() {
-        if (!canNavigateFragment) return
-
-        val directions =
-            SettingsFragmentDirections.actionNavigationSettingsFragmentToOpenSourceLicensesFragment()
-        navController.navigate(directions)
     }
 
     private fun saveScrollPosition() {
         settingsViewModel.scrollPositionY = binding.scrollViewSettings.scrollY
     }
 
-    @MainThread
     private fun navigateThemeColorPickerDialog() {
         if (!canNavigateFragment) return
 
@@ -614,7 +474,6 @@ class SettingsFragment : BaseFragment() {
         navController.navigate(directions)
     }
 
-    @MainThread
     private fun navigateCalendarStartDayPickerDialog(dayOfWeek: DayOfWeek) {
         if (!canNavigateFragment) return
 
@@ -625,7 +484,6 @@ class SettingsFragment : BaseFragment() {
         navController.navigate(directions)
     }
 
-    @MainThread
     private fun navigateReminderNotificationTimePickerDialog() {
         if (!canNavigateFragment) return
 
@@ -634,16 +492,24 @@ class SettingsFragment : BaseFragment() {
         navController.navigate(directions)
     }
 
-    @MainThread
-    private fun navigatePermissionDialog(permissionName: String) {
+    private fun navigateNotificationPermissionDialog() {
         if (!canNavigateFragment) return
 
+        val permissionName = getString(R.string.fragment_settings_permission_name_notification)
         val directions =
             SettingsFragmentDirections.actionSettingsFragmentToPermissionDialog(permissionName)
         navController.navigate(directions)
     }
 
-    @MainThread
+    private fun navigateLocationPermissionDialog() {
+        if (!canNavigateFragment) return
+
+        val permissionName = getString(R.string.fragment_settings_permission_name_location)
+        val directions =
+            SettingsFragmentDirections.actionSettingsFragmentToPermissionDialog(permissionName)
+        navController.navigate(directions)
+    }
+
     private fun navigateAllDiariesDeleteDialog() {
         if (!canNavigateFragment) return
 
@@ -652,7 +518,6 @@ class SettingsFragment : BaseFragment() {
         navController.navigate(directions)
     }
 
-    @MainThread
     private fun navigateAllSettingsInitializationDialog() {
         if (!canNavigateFragment) return
 
@@ -661,7 +526,6 @@ class SettingsFragment : BaseFragment() {
         navController.navigate(directions)
     }
 
-    @MainThread
     private fun navigateAllDataDeleteDialog() {
         if (!canNavigateFragment) return
 
@@ -670,10 +534,17 @@ class SettingsFragment : BaseFragment() {
         navController.navigate(directions)
     }
 
-    @MainThread
     override fun navigateAppMessageDialog(appMessage: AppMessage) {
         val directions =
             SettingsFragmentDirections.actionSettingsFragmentToAppMessageDialog(appMessage)
+        navController.navigate(directions)
+    }
+
+    private fun navigateOpenSourceLicensesFragment() {
+        if (!canNavigateFragment) return
+
+        val directions =
+            SettingsFragmentDirections.actionNavigationSettingsFragmentToOpenSourceLicensesFragment()
         navController.navigate(directions)
     }
 
@@ -683,6 +554,51 @@ class SettingsFragment : BaseFragment() {
         intent.setData(uri)
         startActivity(intent)
         onStart()
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.TIRAMISU)
+    private fun checkPostNotificationsPermission() {
+        val isGranted = mainActivity.isGrantedPostNotifications
+        mainViewModel.onPostNotificationsPermissionChecked(isGranted)
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.TIRAMISU)
+    private fun checkShouldShowRequestPostNotificationsPermissionRationale() {
+        val shouldShowRequest =
+            ActivityCompat.shouldShowRequestPermissionRationale(
+                requireActivity(), Manifest.permission.POST_NOTIFICATIONS
+            )
+        mainViewModel.onShouldShowRequestPostNotificationsPermissionRationaleChecked(shouldShowRequest)
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.TIRAMISU)
+    private fun showRequestPostNotificationsPermissionRationale() {
+        requestPostNotificationsPermissionLauncher
+            .launch(Manifest.permission.POST_NOTIFICATIONS)
+    }
+
+    private fun checkAccessLocationPermission() {
+        val isGranted = mainActivity.isGrantedAccessLocation
+        mainViewModel.onAccessLocationPermissionChecked(isGranted)
+    }
+
+    private fun checkShouldShowRequestAccessLocationPermissionRationale() {
+        val shouldShowRequest =
+            ActivityCompat.shouldShowRequestPermissionRationale(
+                requireActivity(), Manifest.permission.ACCESS_FINE_LOCATION
+            ) && ActivityCompat.shouldShowRequestPermissionRationale(
+                requireActivity(), Manifest.permission.ACCESS_COARSE_LOCATION
+            )
+        mainViewModel.onShouldShowRequestAccessLocationPermissionRationaleChecked(shouldShowRequest)
+    }
+
+    private fun showRequestAccessLocationPermissionRationale() {
+        val requestPermissions =
+            arrayOf(
+                Manifest.permission.ACCESS_FINE_LOCATION,
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            )
+        requestAccessLocationPermissionLauncher.launch(requestPermissions)
     }
 
     override fun destroyBinding() {

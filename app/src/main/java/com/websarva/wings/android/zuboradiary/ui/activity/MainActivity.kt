@@ -47,7 +47,6 @@ import com.websarva.wings.android.zuboradiary.ui.fragment.DiaryListFragment
 import com.websarva.wings.android.zuboradiary.ui.fragment.SettingsFragment
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.SettingsViewModel
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
@@ -501,17 +500,12 @@ class MainActivity : LoggingActivity() {
     // MEMO:端末設定画面で"許可 -> 無許可"に変更したときの対応コード
     private fun checkPermission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            if (!isGrantedPostNotifications) {
-                lifecycleScope.launch(Dispatchers.IO) {
-                    settingsViewModel.saveReminderNotificationInvalid()
-                }
-            }
+            settingsViewModel
+                .onSetupReminderNotificationSettingFromPermission(isGrantedPostNotifications)
         }
-        if (!isGrantedAccessLocation) {
-            lifecycleScope.launch(Dispatchers.IO) {
-                settingsViewModel.saveWeatherInfoAcquisition(false)
-            }
-        }
+
+        settingsViewModel
+            .onSetupWeatherInfoAcquisitionSettingFromPermission(isGrantedAccessLocation)
     }
 
     internal fun loadPicturePath() {
