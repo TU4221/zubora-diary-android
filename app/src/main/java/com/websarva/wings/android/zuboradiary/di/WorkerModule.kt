@@ -2,6 +2,7 @@ package com.websarva.wings.android.zuboradiary.di
 
 import android.content.Context
 import androidx.work.WorkManager
+import com.websarva.wings.android.zuboradiary.data.worker.ReminderNotificationWorkManager
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -17,5 +18,13 @@ internal object WorkerModule {
     @Provides
     fun provideWorkManager(@ApplicationContext context: Context): WorkManager {
         return WorkManager.getInstance(context)
+    }
+
+    @Singleton
+    @Provides
+    fun provideReminderNotificationWorkManager(
+        workManager: WorkManager
+    ): ReminderNotificationWorkManager {
+        return ReminderNotificationWorkManager(workManager)
     }
 }
