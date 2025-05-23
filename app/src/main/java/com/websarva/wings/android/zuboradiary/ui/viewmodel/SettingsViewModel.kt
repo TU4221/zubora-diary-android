@@ -459,16 +459,6 @@ internal class SettingsViewModel @Inject constructor(
     fun onRequestAccessLocationPermissionRationaleResultReceived(isGranted: Boolean) {
         viewModelScope.launch(Dispatchers.IO) {
             if (isGranted) {
-                _fragmentAction.emit(
-                    SettingsFragmentAction.NavigateReminderNotificationTimePickerDialog
-                )
-            } else {
-                _fragmentAction.emit(
-                    SettingsFragmentAction.TurnOffReminderNotificationSettingSwitch
-                )
-            }
-
-            if (isGranted) {
                 saveWeatherInfoAcquisition(true)
             } else {
                 _fragmentAction.emit(
