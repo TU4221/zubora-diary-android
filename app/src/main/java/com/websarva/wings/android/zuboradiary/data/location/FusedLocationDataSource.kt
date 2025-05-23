@@ -8,7 +8,7 @@ import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
 import com.google.android.gms.tasks.CancellationTokenSource
 import com.websarva.wings.android.zuboradiary.data.model.GeoCoordinates
-import com.websarva.wings.android.zuboradiary.ui.utils.isGrantedAccessLocation
+import com.websarva.wings.android.zuboradiary.ui.utils.isAccessLocationGranted
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.tasks.await
@@ -33,7 +33,7 @@ internal class FusedLocationDataSource(
         val cancellationTokenSource = CancellationTokenSource()
         return try {
             withContext(Dispatchers.IO) {
-                if (!context.isGrantedAccessLocation()) {
+                if (!context.isAccessLocationGranted()) {
                     Log.i(logTag, "${logMsg}_権限未許可")
                     return@withContext null
                 }

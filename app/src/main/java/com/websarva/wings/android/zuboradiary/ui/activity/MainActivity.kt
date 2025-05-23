@@ -1,7 +1,5 @@
 package com.websarva.wings.android.zuboradiary.ui.activity
 
-import android.Manifest
-import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -11,7 +9,6 @@ import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.annotation.RequiresApi
-import androidx.core.app.ActivityCompat
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
@@ -37,8 +34,8 @@ import com.websarva.wings.android.zuboradiary.ui.utils.requireValue
 import com.websarva.wings.android.zuboradiary.ui.fragment.DiaryEditFragment
 import com.websarva.wings.android.zuboradiary.ui.fragment.DiaryListFragment
 import com.websarva.wings.android.zuboradiary.ui.fragment.SettingsFragment
-import com.websarva.wings.android.zuboradiary.ui.utils.isGrantedAccessLocation
-import com.websarva.wings.android.zuboradiary.ui.utils.isGrantedPostNotifications
+import com.websarva.wings.android.zuboradiary.ui.utils.isAccessLocationGranted
+import com.websarva.wings.android.zuboradiary.ui.utils.isPostNotificationsGranted
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.SettingsViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
@@ -389,11 +386,11 @@ class MainActivity : LoggingActivity() {
     private fun checkPermission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             settingsViewModel
-                .onSetupReminderNotificationSettingFromPermission(isGrantedPostNotifications())
+                .onSetupReminderNotificationSettingFromPermission(isPostNotificationsGranted())
         }
 
         settingsViewModel
-            .onSetupWeatherInfoAcquisitionSettingFromPermission(isGrantedAccessLocation())
+            .onSetupWeatherInfoAcquisitionSettingFromPermission(isAccessLocationGranted())
     }
 
     internal fun loadPicturePath() {

@@ -8,8 +8,8 @@ import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat
 
-internal fun Context.isGrantedAccessLocation(): Boolean {
-    val isGrantedAccessFineLocation =
+internal fun Context.isAccessLocationGranted(): Boolean {
+    val isAccessFineLocationGranted =
         (ContextCompat.checkSelfPermission(
             this,
             Manifest.permission.ACCESS_FINE_LOCATION
@@ -17,10 +17,10 @@ internal fun Context.isGrantedAccessLocation(): Boolean {
                 == PackageManager.PERMISSION_GRANTED)
     Log.d(
         this.javaClass.name,
-        "Context.isGrantedAccessLocation()_isGrantedAccessFineLocation = $isGrantedAccessFineLocation"
+        "Context.isAccessLocationGranted()_isAccessFineLocationGranted = $isAccessFineLocationGranted"
     )
 
-    val isGrantedAccessCoarseLocation =
+    val isAccessCoarseLocationGranted =
         (ContextCompat.checkSelfPermission(
             this,
             Manifest.permission.ACCESS_COARSE_LOCATION
@@ -28,15 +28,15 @@ internal fun Context.isGrantedAccessLocation(): Boolean {
                 == PackageManager.PERMISSION_GRANTED)
     Log.d(
         this.javaClass.name,
-        "Context.isGrantedAccessLocation()_isGrantedAccessCoarseLocation = $isGrantedAccessCoarseLocation"
+        "Context.isAccessLocationGranted()_isAccessCoarseLocationGranted = $isAccessCoarseLocationGranted"
     )
 
-    return isGrantedAccessFineLocation || isGrantedAccessCoarseLocation
+    return isAccessFineLocationGranted || isAccessCoarseLocationGranted
 }
 
 
 @RequiresApi(Build.VERSION_CODES.TIRAMISU)
-internal fun Context.isGrantedPostNotifications(): Boolean {
+internal fun Context.isPostNotificationsGranted(): Boolean {
     val isGranted =
         (ContextCompat.checkSelfPermission(
             this,
@@ -45,7 +45,7 @@ internal fun Context.isGrantedPostNotifications(): Boolean {
                 == PackageManager.PERMISSION_GRANTED)
     Log.d(
         this.javaClass.name,
-        "Context.isGrantedPostNotifications() = $isGranted"
+        "Context.isPostNotificationsGranted() = $isGranted"
     )
     return isGranted
 }

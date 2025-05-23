@@ -54,7 +54,7 @@ import com.websarva.wings.android.zuboradiary.ui.model.adapter.WeatherAdapterLis
 import com.websarva.wings.android.zuboradiary.ui.model.action.DiaryEditFragmentAction
 import com.websarva.wings.android.zuboradiary.ui.model.action.FragmentAction
 import com.websarva.wings.android.zuboradiary.ui.model.adapter.ConditionAdapterList
-import com.websarva.wings.android.zuboradiary.ui.utils.isGrantedAccessLocation
+import com.websarva.wings.android.zuboradiary.ui.utils.isAccessLocationGranted
 import com.websarva.wings.android.zuboradiary.ui.utils.toJapaneseDateString
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
@@ -1098,7 +1098,7 @@ class DiaryEditFragment : BaseFragment() {
 
     private fun checkAccessLocationPermission(date: LocalDate) {
         mainViewModel.onAccessLocationPermissionChecked(
-            requireContext().isGrantedAccessLocation(),
+            requireContext().isAccessLocationGranted(),
             date
         )
     }

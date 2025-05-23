@@ -33,8 +33,8 @@ import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.ThemeColorPicke
 import com.websarva.wings.android.zuboradiary.ui.model.action.FragmentAction
 import com.websarva.wings.android.zuboradiary.ui.model.action.SettingsFragmentAction
 import com.websarva.wings.android.zuboradiary.ui.utils.formatToHourMinuteString
-import com.websarva.wings.android.zuboradiary.ui.utils.isGrantedAccessLocation
-import com.websarva.wings.android.zuboradiary.ui.utils.isGrantedPostNotifications
+import com.websarva.wings.android.zuboradiary.ui.utils.isAccessLocationGranted
+import com.websarva.wings.android.zuboradiary.ui.utils.isPostNotificationsGranted
 import com.websarva.wings.android.zuboradiary.ui.utils.toCalendarStartDayOfWeekString
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
@@ -79,7 +79,7 @@ class SettingsFragment : BaseFragment() {
                 ) { isGranted: Boolean ->
 
                     // 再確認
-                    val recheck = requireContext().isGrantedPostNotifications()
+                    val recheck = requireContext().isPostNotificationsGranted()
 
                     mainViewModel
                         .onRequestPostNotificationsPermissionRationaleResultReceived(
@@ -100,7 +100,7 @@ class SettingsFragment : BaseFragment() {
                 val isGrantedAll = isGrantedAccessFineLocation && isGrantedAccessCoarseLocation
 
                 // 再確認
-                val recheck = requireContext().isGrantedAccessLocation()
+                val recheck = requireContext().isAccessLocationGranted()
 
                 mainViewModel
                     .onRequestAccessLocationPermissionRationaleResultReceived(
@@ -366,7 +366,7 @@ class SettingsFragment : BaseFragment() {
 
     private fun setUpReminderNotificationSettingItem() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            val isGranted = requireContext().isGrantedPostNotifications()
+            val isGranted = requireContext().isPostNotificationsGranted()
             mainViewModel.onSetupReminderNotificationSettingFromPermission(isGranted)
         }
 
@@ -388,7 +388,7 @@ class SettingsFragment : BaseFragment() {
     }
 
     private fun setUpWeatherInfoAcquisitionSettingItem() {
-        val isGranted = requireContext().isGrantedAccessLocation()
+        val isGranted = requireContext().isAccessLocationGranted()
         mainViewModel.onSetupWeatherInfoAcquisitionSettingFromPermission(isGranted)
     }
 
@@ -560,7 +560,7 @@ class SettingsFragment : BaseFragment() {
 
     @RequiresApi(api = Build.VERSION_CODES.TIRAMISU)
     private fun checkPostNotificationsPermission() {
-        val isGranted = requireContext().isGrantedPostNotifications()
+        val isGranted = requireContext().isPostNotificationsGranted()
         mainViewModel.onPostNotificationsPermissionChecked(isGranted)
     }
 
@@ -580,7 +580,7 @@ class SettingsFragment : BaseFragment() {
     }
 
     private fun checkAccessLocationPermission() {
-        val isGranted = requireContext().isGrantedAccessLocation()
+        val isGranted = requireContext().isAccessLocationGranted()
         mainViewModel.onAccessLocationPermissionChecked(isGranted)
     }
 
