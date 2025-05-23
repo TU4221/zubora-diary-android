@@ -212,9 +212,6 @@ class WordSearchFragment : BaseFragment() {
                         FragmentAction.NavigatePreviousFragment -> {
                             navController.navigateUp()
                         }
-                        FragmentAction.None -> {
-                            // 処理なし
-                        }
                         else -> {
                             throw IllegalArgumentException()
                         }
