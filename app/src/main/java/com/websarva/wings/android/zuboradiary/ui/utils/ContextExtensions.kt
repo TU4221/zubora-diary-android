@@ -18,7 +18,7 @@ internal fun Context.isGrantedAccessLocation(): Boolean {
                 == PackageManager.PERMISSION_GRANTED)
     Log.d(
         this.javaClass.name,
-        "isGrantedAccessLocation.get()_FineLocation = $isGrantedAccessFineLocation"
+        "Context.isGrantedAccessLocation()_isGrantedAccessFineLocation = $isGrantedAccessFineLocation"
     )
 
     val isGrantedAccessCoarseLocation =
@@ -29,7 +29,7 @@ internal fun Context.isGrantedAccessLocation(): Boolean {
                 == PackageManager.PERMISSION_GRANTED)
     Log.d(
         this.javaClass.name,
-        "isGrantedAccessLocation.get()_CoarseLocation = $isGrantedAccessCoarseLocation"
+        "Context.isGrantedAccessLocation()_isGrantedAccessCoarseLocation = $isGrantedAccessCoarseLocation"
     )
 
     return isGrantedAccessFineLocation || isGrantedAccessCoarseLocation
