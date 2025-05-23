@@ -9,7 +9,7 @@ import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 
-fun Context.isGrantedAccessLocation(): Boolean {
+internal fun Context.isGrantedAccessLocation(): Boolean {
     val isGrantedAccessFineLocation =
         (ContextCompat.checkSelfPermission(
             this,
@@ -37,7 +37,7 @@ fun Context.isGrantedAccessLocation(): Boolean {
 
 
 @RequiresApi(Build.VERSION_CODES.TIRAMISU)
-fun Context.isGrantedPostNotifications(): Boolean {
+internal fun Context.isGrantedPostNotifications(): Boolean {
     val isGranted =
         (ContextCompat.checkSelfPermission(
             this,
