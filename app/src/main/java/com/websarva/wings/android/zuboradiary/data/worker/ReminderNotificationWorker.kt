@@ -1,14 +1,12 @@
 package com.websarva.wings.android.zuboradiary.data.worker
 
-import android.Manifest
+import android.annotation.SuppressLint
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
-import android.content.pm.PackageManager
 import android.os.Build
 import android.util.Log
-import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.hilt.work.HiltWorker
@@ -18,6 +16,7 @@ import androidx.work.WorkerParameters
 import com.websarva.wings.android.zuboradiary.ZuboraDiaryApplication
 import com.websarva.wings.android.zuboradiary.R
 import com.websarva.wings.android.zuboradiary.data.repository.DiaryRepository
+import com.websarva.wings.android.zuboradiary.ui.utils.isPostNotificationsGranted
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
@@ -84,12 +83,11 @@ internal class ReminderNotificationWorker @AssistedInject constructor(
         return result
     }
 
+    @SuppressLint("MissingPermission")
     private fun showHeadsUpNotification(): Result {
         val isPermission =
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                ActivityCompat.checkSelfPermission(
-                    applicationContext, Manifest.permission.POST_NOTIFICATIONS
-                ) == PackageManager.PERMISSION_GRANTED
+                applicationContext.isPostNotificationsGranted()
             } else {
                 true
             }
