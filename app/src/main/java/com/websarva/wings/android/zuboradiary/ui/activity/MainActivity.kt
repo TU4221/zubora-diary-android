@@ -1,12 +1,10 @@
 package com.websarva.wings.android.zuboradiary.ui.activity
 
 import android.Manifest
-import android.annotation.SuppressLint
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.os.Looper
 import android.util.Log
 import android.view.MenuItem
 import androidx.activity.enableEdgeToEdge
@@ -25,17 +23,11 @@ import androidx.navigation.NavDestination
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.NavigationUI.onNavDestinationSelected
 import androidx.navigation.ui.NavigationUI.setupWithNavController
-import com.google.android.gms.location.LocationCallback
-import com.google.android.gms.location.LocationRequest
-import com.google.android.gms.location.LocationResult
-import com.google.android.gms.location.LocationServices
-import com.google.android.gms.location.Priority
 import com.google.android.material.navigation.NavigationBarView
 import com.google.android.material.navigation.NavigationBarView.OnItemReselectedListener
 import com.google.android.material.transition.platform.MaterialFadeThrough
 import com.websarva.wings.android.zuboradiary.R
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
-import com.websarva.wings.android.zuboradiary.data.model.GeoCoordinates
 import com.websarva.wings.android.zuboradiary.data.model.ThemeColor
 import com.websarva.wings.android.zuboradiary.databinding.ActivityMainBinding
 import com.websarva.wings.android.zuboradiary.ui.theme.ThemeColorInflaterCreator
@@ -45,6 +37,7 @@ import com.websarva.wings.android.zuboradiary.ui.utils.requireValue
 import com.websarva.wings.android.zuboradiary.ui.fragment.DiaryEditFragment
 import com.websarva.wings.android.zuboradiary.ui.fragment.DiaryListFragment
 import com.websarva.wings.android.zuboradiary.ui.fragment.SettingsFragment
+import com.websarva.wings.android.zuboradiary.ui.utils.isGrantedAccessLocation
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.SettingsViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
@@ -91,9 +84,6 @@ class MainActivity : LoggingActivity() {
     @Suppress("unused", "RedundantSuppression")
     private val settingsViewModel: SettingsViewModel by viewModels()
 
-    // 位置情報取得関係
-    private var isListenerSet = false
-
     // ギャラリーから画像取得
     private val openDocumentResultLauncher = registerForActivityResult(
         ActivityResultContracts.OpenDocument()
@@ -112,33 +102,6 @@ class MainActivity : LoggingActivity() {
         )
                 == PackageManager.PERMISSION_GRANTED)
 
-    internal val isGrantedAccessLocation: Boolean
-        get() {
-            val isGrantedAccessFineLocation =
-                (ActivityCompat.checkSelfPermission(
-                    this,
-                    Manifest.permission.ACCESS_FINE_LOCATION
-                )
-                        == PackageManager.PERMISSION_GRANTED)
-            Log.d(
-                logTag,
-                "isGrantedAccessLocation.get()_FineLocation = $isGrantedAccessFineLocation"
-            )
-
-            val isGrantedAccessCoarseLocation =
-                (ActivityCompat.checkSelfPermission(
-                    this,
-                    Manifest.permission.ACCESS_COARSE_LOCATION
-                )
-                        == PackageManager.PERMISSION_GRANTED)
-            Log.d(
-                logTag,
-                "isGrantedAccessLocation.get()_CoarseLocation = $isGrantedAccessCoarseLocation"
-            )
-
-            return isGrantedAccessFineLocation || isGrantedAccessCoarseLocation
-        }
-
     @RequiresApi(Build.VERSION_CODES.Q)
     override fun onCreate(savedInstanceState: Bundle?) {
         installSplashScreen().setKeepOnScreenCondition { !isMainActivityLayoutInflated }
@@ -152,7 +115,6 @@ class MainActivity : LoggingActivity() {
                         if (!value) return@collectLatest
 
                         if (!isMainActivityLayoutInflated) setUpMainActivityBinding()
-                        setUpLocationInfo()
                         setUpThemeColor()
                         setUpNavigation()
                     }
@@ -175,73 +137,6 @@ class MainActivity : LoggingActivity() {
         _binding = ActivityMainBinding.inflate(themeColorInflater)
         setContentView(binding.root)
         isMainActivityLayoutInflated = true
-    }
-
-    private fun setUpLocationInfo() {
-        lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
-                settingsViewModel.isCheckedWeatherInfoAcquisition
-                    .collectLatest { value: Boolean? ->
-                        value ?: return@collectLatest
-
-                        if (value) {
-                            updateLocationInformation()
-                        } else {
-                            settingsViewModel.clearGeoCoordinates()
-                        }
-                    }
-            }
-        }
-    }
-
-    // MEMO:fusedLocationProviderClient.lastLocation()を記述する時、Permission確認コードが必須となるが、
-    //      Permission確認はプロパティで管理する為、@SuppressLintで警告抑制。
-    @SuppressLint("MissingPermission")
-    private fun updateLocationInformation() {
-        if (!isGrantedAccessLocation) return
-
-        val logMsg = "位置情報取得"
-        Log.i(logTag, "${logMsg}_開始")
-
-        val fusedLocationProviderClient =
-            LocationServices.getFusedLocationProviderClient(this)
-        val locationRequest =
-            LocationRequest.Builder(
-                Priority.PRIORITY_BALANCED_POWER_ACCURACY,
-                5000
-            ).build()
-
-        // HACK:FusedLocationProviderClient#requestLocationUpdates()の引数であるLocationCallbackが起動しない不具合が発生。
-        //      lastLocation.addOnSuccessListener()でOnSuccessListenerを追加するとLocationCallbackが起動。
-        //      エミュレータが原因と思われる。また、OnSuccessListenerは一度追加すると解除できないので、
-        //      アプリを起動してから一度のみの追加とする。
-        if (!isListenerSet) {
-            fusedLocationProviderClient.lastLocation.addOnSuccessListener {}
-            isListenerSet = true
-        }
-
-        fusedLocationProviderClient.requestLocationUpdates(
-            locationRequest,
-            object : LocationCallback() {
-                override fun onLocationResult(locationResult: LocationResult) {
-                    Log.d(this@MainActivity.logTag, "onLocationResult()")
-                    super.onLocationResult(locationResult)
-                    // アプリ起動時に一回だけ取得
-                    val location = locationResult.lastLocation
-                    if (location == null) {
-                        Log.d(this@MainActivity.logTag, "${logMsg}_失敗")
-                        return
-                    }
-                    val geoCoordinates =
-                        GeoCoordinates(location.latitude, location.longitude)
-                    settingsViewModel.updateGeoCoordinates(geoCoordinates)
-                    fusedLocationProviderClient.removeLocationUpdates(this)
-
-                    Log.i(this@MainActivity.logTag, "${logMsg}_完了_$location")
-                }
-            },
-            Looper.getMainLooper()
-        )
     }
 
     private fun setUpThemeColor() {
@@ -505,7 +400,7 @@ class MainActivity : LoggingActivity() {
         }
 
         settingsViewModel
-            .onSetupWeatherInfoAcquisitionSettingFromPermission(isGrantedAccessLocation)
+            .onSetupWeatherInfoAcquisitionSettingFromPermission(isGrantedAccessLocation())
     }
 
     internal fun loadPicturePath() {

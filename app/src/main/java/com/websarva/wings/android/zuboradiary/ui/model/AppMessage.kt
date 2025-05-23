@@ -172,6 +172,13 @@ internal sealed class DiaryEditAppMessage(
     ) {
         private fun readResolve(): Any = WeatherInfoLoadingFailure
     }
+
+    data object AccessLocationPermissionRequest :  DiaryEditAppMessage(
+        R.string.dialog_app_message_title_permission_request,
+        R.string.dialog_diary_edit_app_message_access_location_permission_request
+    ) {
+        private fun readResolve(): Any = AccessLocationPermissionRequest
+    }
 }
 
 internal sealed class DiaryItemTitleEditAppMessage(

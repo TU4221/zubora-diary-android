@@ -8,10 +8,14 @@ import com.websarva.wings.android.zuboradiary.data.model.Condition
 import com.websarva.wings.android.zuboradiary.data.model.ItemNumber
 import com.websarva.wings.android.zuboradiary.data.model.Weather
 import com.websarva.wings.android.zuboradiary.data.model.GeoCoordinates
+import com.websarva.wings.android.zuboradiary.data.preferences.AllPreferences
+import com.websarva.wings.android.zuboradiary.data.repository.LocationRepository
+import com.websarva.wings.android.zuboradiary.data.repository.UserPreferencesRepository
 import com.websarva.wings.android.zuboradiary.data.repository.WeatherApiRepository
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import com.websarva.wings.android.zuboradiary.ui.model.DiaryEditAppMessage
 import com.websarva.wings.android.zuboradiary.ui.model.DiaryEditPendingDialog
+import com.websarva.wings.android.zuboradiary.ui.model.action.Action
 import com.websarva.wings.android.zuboradiary.ui.model.adapter.WeatherAdapterList
 import com.websarva.wings.android.zuboradiary.ui.model.action.DiaryEditFragmentAction
 import com.websarva.wings.android.zuboradiary.ui.model.action.FragmentAction
@@ -28,6 +32,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -39,7 +44,9 @@ import kotlin.random.Random
 @HiltViewModel
 internal class DiaryEditViewModel @Inject constructor(
     private val diaryRepository: DiaryRepository,
-    private val weatherApiRepository: WeatherApiRepository
+    private val weatherApiRepository: WeatherApiRepository,
+    private val locationRepository: LocationRepository,
+    private val userPreferencesRepository: UserPreferencesRepository
 ) : BaseViewModel() {
 
     private val logTag = createLogTag()
@@ -239,7 +246,7 @@ internal class DiaryEditViewModel @Inject constructor(
     var shouldInitializeOnFragmentDestroy = initialShouldInitializeOnFragmentDestroy
 
     // Fragment処理
-    private val _fragmentAction= MutableSharedFlow<FragmentAction>()
+    private val _fragmentAction= MutableSharedFlow<Action<FragmentAction>>(replay = 1)
     val fragmentAction
         get() = _fragmentAction.asSharedFlow()
 
@@ -344,33 +351,24 @@ internal class DiaryEditViewModel @Inject constructor(
     }
 
     // DialogButtonClicked処理
-    fun onDiaryLoadingDialogPositiveButtonClicked(
-        requestFetchWeatherInfo: Boolean,
-        geoCoordinates: GeoCoordinates?
-    ) {
+    fun onDiaryLoadingDialogPositiveButtonClicked() {
         val date = this.date.requireValue()
         viewModelScope.launch(Dispatchers.IO) {
             _diaryEditState.value = DiaryEditState.Loading
             prepareDiary(
                 date,
-                true,
-                requestFetchWeatherInfo,
-                 geoCoordinates
+                true
             )
         }
     }
 
-    fun onDiaryLoadingDialogNegativeButtonClicked(
-        requestFetchWeatherInfo: Boolean,
-        geoCoordinates: GeoCoordinates?
-    ) {
-        if (!requestFetchWeatherInfo) return
-
-        _diaryEditState.value = DiaryEditState.WeatherFetching
+    fun onDiaryLoadingDialogNegativeButtonClicked() {
         viewModelScope.launch(Dispatchers.IO) {
+            _diaryEditState.value = DiaryEditState.WeatherFetching
             val date = date.requireValue()
-            loadWeatherInfo(date, geoCoordinates)
-            _diaryEditState.value = DiaryEditState.Idle
+            if (!shouldLoadWeatherInfo(date)) return@launch
+
+            loadWeatherInfo(date)
         }
     }
 
@@ -390,15 +388,10 @@ internal class DiaryEditViewModel @Inject constructor(
         }
     }
 
-    fun onDatePickerDialogPositiveButtonClicked(
-        date: LocalDate,
-        requestsFetchWeatherInfo: Boolean = false,
-        geoCoordinates: GeoCoordinates? = null
-    ) {
+    fun onDatePickerDialogPositiveButtonClicked(date: LocalDate) {
         _diaryEditState.value = DiaryEditState.WeatherFetching
         viewModelScope.launch(Dispatchers.IO) {
-            prepareDiaryDate(date, requestsFetchWeatherInfo, geoCoordinates)
-            _diaryEditState.value = DiaryEditState.Idle
+            prepareDiaryDate(date)
         }
     }
 
@@ -408,12 +401,13 @@ internal class DiaryEditViewModel @Inject constructor(
         }
     }
 
-    fun onWeatherInfoFetchDialogPositiveButtonClicked(geoCoordinates: GeoCoordinates?) {
+    fun onWeatherInfoFetchDialogPositiveButtonClicked() {
         _diaryEditState.value = DiaryEditState.WeatherFetching
         viewModelScope.launch(Dispatchers.IO) {
             val date = diaryStateFlow.date.requireValue()
-            loadWeatherInfo(date, geoCoordinates, true)
-            _diaryEditState.value = DiaryEditState.Idle
+            if (!shouldLoadWeatherInfo(date)) return@launch
+
+            loadWeatherInfo(date, true)
         }
     }
 
@@ -436,13 +430,11 @@ internal class DiaryEditViewModel @Inject constructor(
     // Fragment状態処理
     fun onDiaryDataSetUp(
         date: LocalDate,
-        shouldLoadDiary: Boolean,
-        requestFetchWeatherInfo: Boolean,
-        geoCoordinates: GeoCoordinates?
+        shouldLoadDiary: Boolean
     ) {
         _diaryEditState.value = DiaryEditState.Loading
         viewModelScope.launch(Dispatchers.IO) {
-            prepareDiary(date, shouldLoadDiary, requestFetchWeatherInfo, geoCoordinates)
+            prepareDiary(date, shouldLoadDiary)
         }
     }
 
@@ -483,12 +475,28 @@ internal class DiaryEditViewModel @Inject constructor(
         _diaryEditState.value = DiaryEditState.Idle
     }
 
+    // 権限確認後処理
+    fun onAccessLocationPermissionChecked(isGranted: Boolean, date: LocalDate) {
+        viewModelScope.launch(Dispatchers.IO) {
+            if (isGranted) {
+                val geoCoordinates = fetchCurrentLocation()
+                if (geoCoordinates == null) {
+                    addAppMessage(DiaryEditAppMessage.WeatherInfoLoadingFailure)
+                    _diaryEditState.value = DiaryEditState.Idle
+                    return@launch
+                }
+                fetchWeatherInfo(date, geoCoordinates)
+            } else {
+                addAppMessage(DiaryEditAppMessage.AccessLocationPermissionRequest)
+            }
+            _diaryEditState.value = DiaryEditState.Idle
+        }
+    }
+
     // データ処理
     private suspend fun prepareDiary(
         date: LocalDate,
-        shouldLoadDiary: Boolean,
-        requestFetchWeatherInfo: Boolean,
-        geoCoordinates: GeoCoordinates?
+        shouldLoadDiary: Boolean
     ) {
         val logMsg = "日記読込"
         Log.i(logTag, "${logMsg}_開始")
@@ -511,8 +519,7 @@ internal class DiaryEditViewModel @Inject constructor(
             }
         } else {
             _diaryEditState.value = DiaryEditState.WeatherFetching
-            prepareDiaryDate(date, requestFetchWeatherInfo, geoCoordinates)
-            _diaryEditState.value = DiaryEditState.Idle
+            prepareDiaryDate(date)
         }
         hasPreparedDiary = true
 
@@ -520,22 +527,23 @@ internal class DiaryEditViewModel @Inject constructor(
     }
     
     // TODO:onDateChangedメソッドに変更して、Fragmentの監視から呼び出す？
-    private suspend fun prepareDiaryDate(
-        date: LocalDate,
-        requestsFetchWeatherInfo: Boolean = false,
-        geoCoordinates: GeoCoordinates? = null
-    ) {
+    private suspend fun prepareDiaryDate(date: LocalDate) {
         updateDate(date)
         
         if (shouldShowDiaryLoadingDialog(date)) {
             updateFragmentAction(
                 DiaryEditFragmentAction.NavigateDiaryLoadingDialog(date)
             )
+            _diaryEditState.value = DiaryEditState.Idle
             return
         }
 
-        if (!requestsFetchWeatherInfo) return
-        loadWeatherInfo(date, geoCoordinates)
+        if (!shouldLoadWeatherInfo(date)) {
+            _diaryEditState.value = DiaryEditState.Idle
+            return
+        }
+
+        loadWeatherInfo(date)
     }
 
     private suspend fun shouldShowDiaryLoadingDialog(changedDate: LocalDate): Boolean {
@@ -697,27 +705,37 @@ internal class DiaryEditViewModel @Inject constructor(
     }
 
     // 天気情報関係
+    private suspend fun shouldLoadWeatherInfo(date: LocalDate): Boolean {
+        if (!isWeatherInfoAcquisitionPreferenceChecked()) return false
+        if (!isNewDiary && previousDate == null) return false
+        return previousDate != date
+    }
+
+    private suspend fun isWeatherInfoAcquisitionPreferenceChecked(): Boolean {
+        return userPreferencesRepository
+            .loadAllPreferences()
+            .map { value: AllPreferences ->
+                value.weatherInfoAcquisitionPreference.isChecked
+            }.first()
+    }
+
     private suspend fun loadWeatherInfo(
         date: LocalDate,
-        geoCoordinates: GeoCoordinates?,
         shouldIgnoreConfirmationDialog: Boolean = false
     ) {
-        if (!shouldFetchWeatherInfo(date)) {
+        if (!weatherApiRepository.canFetchWeatherInfo(date)) {
+            _diaryEditState.value = DiaryEditState.Idle
             return
         }
         if (!shouldIgnoreConfirmationDialog && shouldShowWeatherInfoFetchingDialog()) {
             updateFragmentAction(
                 DiaryEditFragmentAction.NavigateWeatherInfoFetchingDialog(date)
             )
+            _diaryEditState.value = DiaryEditState.Idle
             return
         }
-        fetchWeatherInfo(date, geoCoordinates)
-    }
 
-    private fun shouldFetchWeatherInfo(date: LocalDate): Boolean {
-        if (!weatherApiRepository.canFetchWeatherInfo(date)) return false
-        if (!isNewDiary && previousDate == null) return false
-        return previousDate != date
+        updateFragmentAction(DiaryEditFragmentAction.CheckAccessLocationPermission(date))
     }
 
     private fun shouldShowWeatherInfoFetchingDialog(): Boolean {
@@ -768,6 +786,10 @@ internal class DiaryEditViewModel @Inject constructor(
             addAppMessage(DiaryEditAppMessage.WeatherInfoLoadingFailure)
             Log.e(logTag, "${logMsg}_失敗")
         }
+    }
+
+    private suspend fun fetchCurrentLocation(): GeoCoordinates? {
+        return locationRepository.fetchLocation()
     }
 
     // 天気、体調関係
@@ -834,7 +856,9 @@ internal class DiaryEditViewModel @Inject constructor(
     
     // FragmentAction関係
     private suspend fun updateFragmentAction(action: FragmentAction) {
-        _fragmentAction.emit(action)
+        _fragmentAction.emit(
+            Action(action)
+        )
     }
 
     private suspend fun navigatePreviousFragment() {

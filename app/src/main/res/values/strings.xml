@@ -274,6 +274,7 @@
     <!-- AppMessageCommonTitle -->
     <string name="dialog_app_message_title_access_error">アクセスエラー</string>
     <string name="dialog_app_message_title_connection_error">通信エラー</string>
+    <string name="dialog_app_message_title_permission_request">権限が必要です</string>
     <!-- AppMessageCommonMessage -->
     <string name="dialog_app_message_diary_loading_failure">日記の読込に失敗しました。</string>
     <string name="dialog_app_message_diary_delete_failure">日記の削除に失敗しました。</string>
@@ -301,6 +302,7 @@
     <string name="dialog_diary_edit_app_message_diary_delete_failure">@string/dialog_app_message_diary_delete_failure</string>
     <string name="dialog_diary_edit_app_message_diary_info_loading_failure">@string/dialog_app_message_diary_info_loading_failure</string>
     <string name="dialog_diary_edit_app_message_weather_info_loading_failure">天気情報の読込に失敗しました。</string>
+    <string name="dialog_diary_edit_app_message_access_location_permission_request">天気情報を取得するためには位置情報利用権限が必要です。設定画面で権限を有効にしてください。</string>
     <!-- DiaryItemTitleEditAppMessage -->
     <string name="dialog_diary_item_title_edit_app_message_selection_history_loading_failure">選択履歴の読込に失敗しました。</string>
     <string name="dialog_diary_item_title_edit_app_message_selection_history_item_delete_failure">選択履歴の削除に失敗しました。</string>

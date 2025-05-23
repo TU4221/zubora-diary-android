@@ -39,7 +39,6 @@ import com.websarva.wings.android.zuboradiary.ui.view.imageview.DiaryPictureConf
 import com.websarva.wings.android.zuboradiary.ui.model.PendingDialog
 import com.websarva.wings.android.zuboradiary.ui.view.edittext.TextInputConfigurator
 import com.websarva.wings.android.zuboradiary.ui.permission.UriPermissionManager
-import com.websarva.wings.android.zuboradiary.ui.utils.requireValue
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.DatePickerDialogFragment
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.DiaryDeleteDialogFragment
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.DiaryEditViewModel
@@ -50,10 +49,12 @@ import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.DiaryPictureDel
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.DiaryUpdateDialogFragment
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.WeatherInfoFetchingDialogFragment
 import com.websarva.wings.android.zuboradiary.ui.keyboard.KeyboardManager
+import com.websarva.wings.android.zuboradiary.ui.model.action.Action
 import com.websarva.wings.android.zuboradiary.ui.model.adapter.WeatherAdapterList
 import com.websarva.wings.android.zuboradiary.ui.model.action.DiaryEditFragmentAction
 import com.websarva.wings.android.zuboradiary.ui.model.action.FragmentAction
 import com.websarva.wings.android.zuboradiary.ui.model.adapter.ConditionAdapterList
+import com.websarva.wings.android.zuboradiary.ui.utils.isGrantedAccessLocation
 import com.websarva.wings.android.zuboradiary.ui.utils.toJapaneseDateString
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
@@ -209,23 +210,10 @@ class DiaryEditFragment : BaseFragment() {
         val selectedButton =
             receiveResulFromDialog<Int>(DiaryLoadingDialogFragment.KEY_SELECTED_BUTTON) ?: return
 
-        // TODO:ViewModelにStateFlow変数を持たせる。
-        val isCheckedWeatherInfoAcquisition =
-            settingsViewModel.isCheckedWeatherInfoAcquisition.requireValue()
-        val geoCoordinates =
-            settingsViewModel.geoCoordinates.value
         if (selectedButton == DialogInterface.BUTTON_POSITIVE) {
-            mainViewModel
-                .onDiaryLoadingDialogPositiveButtonClicked(
-                    isCheckedWeatherInfoAcquisition,
-                    geoCoordinates
-                )
+            mainViewModel.onDiaryLoadingDialogPositiveButtonClicked()
         } else {
-            mainViewModel
-                .onDiaryLoadingDialogNegativeButtonClicked(
-                    isCheckedWeatherInfoAcquisition,
-                    geoCoordinates
-                )
+            mainViewModel.onDiaryLoadingDialogNegativeButtonClicked()
         }
     }
 
@@ -262,15 +250,7 @@ class DiaryEditFragment : BaseFragment() {
         val selectedDate =
             receiveResulFromDialog<LocalDate>(DatePickerDialogFragment.KEY_SELECTED_DATE) ?: return
 
-        val isCheckedWeatherInfoAcquisition =
-            settingsViewModel.isCheckedWeatherInfoAcquisition.requireValue()
-        val geoCoordinates = settingsViewModel.geoCoordinates.value
-        mainViewModel
-            .onDatePickerDialogPositiveButtonClicked(
-                selectedDate,
-                isCheckedWeatherInfoAcquisition,
-                geoCoordinates
-            )
+        mainViewModel.onDatePickerDialogPositiveButtonClicked(selectedDate)
     }
 
     private fun receiveWeatherInfoFetchDialogResult() {
@@ -281,8 +261,7 @@ class DiaryEditFragment : BaseFragment() {
             ) ?: return
         if (selectedButton != DialogInterface.BUTTON_POSITIVE) return
 
-        val geoCoordinates = settingsViewModel.geoCoordinates.requireValue()
-        mainViewModel.onWeatherInfoFetchDialogPositiveButtonClicked(geoCoordinates)
+        mainViewModel.onWeatherInfoFetchDialogPositiveButtonClicked()
     }
 
     // 項目削除確認ダイアログフラグメントから結果受取
@@ -346,52 +325,56 @@ class DiaryEditFragment : BaseFragment() {
 
     private fun setUpFragmentAction() {
         launchAndRepeatOnViewLifeCycleStarted {
-            mainViewModel.fragmentAction.collect { value: FragmentAction ->
-                when (value) {
+            mainViewModel.fragmentAction.collect { value: Action<FragmentAction> ->
+                val action = value.getContentIfNotHandled() ?: return@collect
+                when (action) {
                     is DiaryEditFragmentAction.NavigateDiaryShowFragment -> {
                         pictureUriPermissionManager
-                            .handlePersistablePermission(requireContext(), value.uriPermissionAction)
-                        navigateDiaryShowFragment(value.date)
+                            .handlePersistablePermission(requireContext(), action.uriPermissionAction)
+                        navigateDiaryShowFragment(action.date)
                     }
                     is DiaryEditFragmentAction.NavigateDiaryItemTitleEditFragment -> {
-                        navigateDiaryItemTitleEditFragment(value.itemNumber, value.itemTitle)
+                        navigateDiaryItemTitleEditFragment(action.itemNumber, action.itemTitle)
                     }
                     is DiaryEditFragmentAction.NavigateDiaryLoadingDialog -> {
-                        navigateDiaryLoadingDialog(value.date)
+                        navigateDiaryLoadingDialog(action.date)
                     }
                     is DiaryEditFragmentAction.NavigateDiaryLoadingFailureDialog -> {
-                        navigateDiaryLoadingFailureDialog(value.date)
+                        navigateDiaryLoadingFailureDialog(action.date)
                     }
                     is DiaryEditFragmentAction.NavigateDiaryUpdateDialog -> {
-                        navigateDiaryUpdateDialog(value.date)
+                        navigateDiaryUpdateDialog(action.date)
                     }
                     is DiaryEditFragmentAction.NavigateDiaryDeleteDialog -> {
-                        navigateDiaryDeleteDialog(value.date)
+                        navigateDiaryDeleteDialog(action.date)
                     }
                     is DiaryEditFragmentAction.NavigateDatePickerDialog -> {
-                        navigateDatePickerDialog(value.date)
+                        navigateDatePickerDialog(action.date)
                     }
                     is DiaryEditFragmentAction.NavigateWeatherInfoFetchingDialog -> {
-                        navigateWeatherInfoFetchingDialog(value.date)
+                        navigateWeatherInfoFetchingDialog(action.date)
                     }
                     is DiaryEditFragmentAction.NavigateDiaryItemDeleteDialog -> {
-                        navigateDiaryItemDeleteDialog(value.itemNumber)
+                        navigateDiaryItemDeleteDialog(action.itemNumber)
                     }
                     DiaryEditFragmentAction.NavigateDiaryPictureDeleteDialog -> {
                         navigateDiaryPictureDeleteDialog()
                     }
                     is DiaryEditFragmentAction.NavigatePreviousFragment -> {
-                        navigatePreviousFragment(value.loadedDate)
+                        navigatePreviousFragment(action.loadedDate)
                     }
                     is DiaryEditFragmentAction.NavigatePreviousFragmentOnDiaryDelete -> {
-                        if (value.uri != null) {
+                        if (action.uri != null) {
                             pictureUriPermissionManager
-                                .releasePersistablePermission(requireContext(), value.uri)
+                                .releasePersistablePermission(requireContext(), action.uri)
                         }
-                        navigatePreviousFragmentOnDiaryDelete(value.loadedDate)
+                        navigatePreviousFragmentOnDiaryDelete(action.loadedDate)
                     }
                     is DiaryEditFragmentAction.TransitionDiaryItemHidedState -> {
-                        hideItem(value.itemNumber, false)
+                        hideItem(action.itemNumber, false)
+                    }
+                    is DiaryEditFragmentAction.CheckAccessLocationPermission -> {
+                        checkAccessLocationPermission(action.date)
                     }
                     else -> {
                         throw IllegalArgumentException()
@@ -453,16 +436,10 @@ class DiaryEditFragment : BaseFragment() {
         val diaryDate = DiaryEditFragmentArgs.fromBundle(requireArguments()).date
         val requiresDiaryLoading =
             DiaryEditFragmentArgs.fromBundle(requireArguments()).shouldLoadDiary
-        val isCheckedWeatherInfoAcquisition =
-            settingsViewModel.isCheckedWeatherInfoAcquisition.requireValue()
-        val geoCoordinates =
-            settingsViewModel.geoCoordinates.value
         mainViewModel
             .onDiaryDataSetUp(
                 diaryDate,
-                requiresDiaryLoading,
-                isCheckedWeatherInfoAcquisition,
-                geoCoordinates
+                requiresDiaryLoading
             )
     }
 
@@ -1117,6 +1094,13 @@ class DiaryEditFragment : BaseFragment() {
             navController.navigateUp()
         }
         navigatePreviousFragment(editedDiaryDate)
+    }
+
+    private fun checkAccessLocationPermission(date: LocalDate) {
+        mainViewModel.onAccessLocationPermissionChecked(
+            requireContext().isGrantedAccessLocation(),
+            date
+        )
     }
 
     override fun destroyBinding() {

@@ -33,6 +33,7 @@ import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.ThemeColorPicke
 import com.websarva.wings.android.zuboradiary.ui.model.action.FragmentAction
 import com.websarva.wings.android.zuboradiary.ui.model.action.SettingsFragmentAction
 import com.websarva.wings.android.zuboradiary.ui.utils.formatToHourMinuteString
+import com.websarva.wings.android.zuboradiary.ui.utils.isGrantedAccessLocation
 import com.websarva.wings.android.zuboradiary.ui.utils.toCalendarStartDayOfWeekString
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
@@ -98,7 +99,7 @@ class SettingsFragment : BaseFragment() {
                 val isGrantedAll = isGrantedAccessFineLocation && isGrantedAccessCoarseLocation
 
                 // 再確認
-                val recheck = mainActivity.isGrantedAccessLocation
+                val recheck = requireContext().isGrantedAccessLocation()
 
                 mainViewModel
                     .onRequestAccessLocationPermissionRationaleResultReceived(
@@ -386,7 +387,7 @@ class SettingsFragment : BaseFragment() {
     }
 
     private fun setUpWeatherInfoAcquisitionSettingItem() {
-        val isGranted = mainActivity.isGrantedAccessLocation
+        val isGranted = requireContext().isGrantedAccessLocation()
         mainViewModel.onSetupWeatherInfoAcquisitionSettingFromPermission(isGranted)
     }
 
@@ -578,7 +579,7 @@ class SettingsFragment : BaseFragment() {
     }
 
     private fun checkAccessLocationPermission() {
-        val isGranted = mainActivity.isGrantedAccessLocation
+        val isGranted = requireContext().isGrantedAccessLocation()
         mainViewModel.onAccessLocationPermissionChecked(isGranted)
     }
 

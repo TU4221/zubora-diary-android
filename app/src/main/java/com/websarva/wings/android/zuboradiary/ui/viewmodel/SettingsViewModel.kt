@@ -6,7 +6,6 @@ import androidx.annotation.RequiresApi
 import androidx.datastore.core.IOException
 import androidx.lifecycle.viewModelScope
 import com.websarva.wings.android.zuboradiary.data.repository.DiaryRepository
-import com.websarva.wings.android.zuboradiary.data.model.GeoCoordinates
 import com.websarva.wings.android.zuboradiary.data.preferences.CalendarStartDayOfWeekPreference
 import com.websarva.wings.android.zuboradiary.data.preferences.PassCodeLockPreference
 import com.websarva.wings.android.zuboradiary.data.preferences.ReminderNotificationPreference
@@ -25,11 +24,9 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
@@ -78,14 +75,6 @@ internal class SettingsViewModel @Inject constructor(
 
     lateinit var isAllSettingsNotNull: StateFlow<Boolean>
 
-    private val initialGeoCoordinates = null
-    private val _geoCoordinates = MutableStateFlow<GeoCoordinates?>(initialGeoCoordinates)
-    val geoCoordinates
-        get() = _geoCoordinates.asStateFlow()
-
-    val hasUpdatedGeoCoordinates
-        get() = _geoCoordinates.value != null
-
     private val initialScrollPositionY = 0
     var scrollPositionY = initialScrollPositionY
 
@@ -101,7 +90,6 @@ internal class SettingsViewModel @Inject constructor(
     override fun initialize() {
         super.initialize()
         setUpPreferencesValueLoading()
-        clearGeoCoordinates()
         scrollPositionY = initialScrollPositionY
     }
 
@@ -591,14 +579,6 @@ internal class SettingsViewModel @Inject constructor(
         if (equalLastAppMessage(SettingsAppMessage.SettingUpdateFailure)) return  // 設定更新エラー通知の重複防止
 
         addAppMessage(SettingsAppMessage.SettingUpdateFailure)
-    }
-
-    fun updateGeoCoordinates(geoCoordinates: GeoCoordinates) {
-        _geoCoordinates.value = geoCoordinates
-    }
-
-    fun clearGeoCoordinates() {
-        _geoCoordinates.value = initialGeoCoordinates
     }
 
     private suspend fun deleteAllDiaries(): Boolean {

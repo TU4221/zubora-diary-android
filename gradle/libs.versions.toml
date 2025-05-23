@@ -5,6 +5,7 @@ ksp = "2.0.21-1.0.27"
 
 appcompat = "1.7.0"
 constraintlayout = "2.2.1"
+coroutinesPlayServices = "1.10.2"
 junit = "4.13.2"
 androidXJunit = "1.2.1"
 espressoCore = "3.6.1"
@@ -48,6 +49,7 @@ androidx-navigation-safe-args-gradle-plugin = { module = "androidx.navigation:na
 
 androidx-appcompat = { module = "androidx.appcompat:appcompat", version.ref = "appcompat" }
 androidx-constraintlayout = { module = "androidx.constraintlayout:constraintlayout", version.ref = "constraintlayout" }
+kotlinx-coroutines-play-services = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-play-services", version.ref = "coroutinesPlayServices" }
 junit = { module = "junit:junit", version.ref = "junit" }
 androidx-junit = { module = "androidx.test.ext:junit", version.ref = "androidXJunit" }
 androidx-espresso-core = { module = "androidx.test.espresso:espresso-core", version.ref = "espressoCore" }

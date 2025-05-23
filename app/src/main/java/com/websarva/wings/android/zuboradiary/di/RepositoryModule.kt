@@ -5,11 +5,13 @@ import com.websarva.wings.android.zuboradiary.data.database.DiaryDAO
 import com.websarva.wings.android.zuboradiary.data.database.DiaryDatabase
 import com.websarva.wings.android.zuboradiary.data.database.DiaryItemTitleSelectionHistoryDAO
 import com.websarva.wings.android.zuboradiary.data.database.DiaryItemTitleSelectionHistoryRepository
+import com.websarva.wings.android.zuboradiary.data.location.FusedLocationDataSource
 import com.websarva.wings.android.zuboradiary.data.repository.DiaryRepository
 import com.websarva.wings.android.zuboradiary.data.repository.WeatherApiRepository
 import com.websarva.wings.android.zuboradiary.data.network.WeatherApiService
 import com.websarva.wings.android.zuboradiary.data.repository.UserPreferencesRepository
 import com.websarva.wings.android.zuboradiary.data.preferences.UserPreferences
+import com.websarva.wings.android.zuboradiary.data.repository.LocationRepository
 import com.websarva.wings.android.zuboradiary.data.repository.WorkerRepository
 import dagger.Module
 import dagger.Provides
@@ -54,5 +56,11 @@ internal object RepositoryModule {
     @Provides
     fun provideWeatherApiRepository(weatherApiService: WeatherApiService): WeatherApiRepository {
         return WeatherApiRepository(weatherApiService)
+    }
+
+    @Singleton
+    @Provides
+    fun provideLocationRepository(fusedLocationDataSource: FusedLocationDataSource): LocationRepository {
+        return LocationRepository(fusedLocationDataSource)
     }
 }
