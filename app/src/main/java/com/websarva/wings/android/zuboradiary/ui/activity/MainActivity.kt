@@ -34,8 +34,6 @@ import com.websarva.wings.android.zuboradiary.ui.utils.requireValue
 import com.websarva.wings.android.zuboradiary.ui.fragment.DiaryEditFragment
 import com.websarva.wings.android.zuboradiary.ui.fragment.DiaryListFragment
 import com.websarva.wings.android.zuboradiary.ui.fragment.SettingsFragment
-import com.websarva.wings.android.zuboradiary.ui.utils.isAccessLocationGranted
-import com.websarva.wings.android.zuboradiary.ui.utils.isPostNotificationsGranted
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.SettingsViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
@@ -374,23 +372,6 @@ class MainActivity : LoggingActivity() {
 
     internal fun popBackStackToStartFragment() {
         binding.bottomNavigation.selectedItemId = startNavigationMenuItem.itemId
-    }
-
-    override fun onStart() {
-        super.onStart()
-
-        checkPermission()
-    }
-
-    // MEMO:端末設定画面で"許可 -> 無許可"に変更したときの対応コード
-    private fun checkPermission() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            settingsViewModel
-                .onSetupReminderNotificationSettingFromPermission(isPostNotificationsGranted())
-        }
-
-        settingsViewModel
-            .onSetupWeatherInfoAcquisitionSettingFromPermission(isAccessLocationGranted())
     }
 
     internal fun loadPicturePath() {

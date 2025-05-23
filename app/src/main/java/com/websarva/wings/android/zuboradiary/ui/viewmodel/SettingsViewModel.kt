@@ -469,7 +469,7 @@ internal class SettingsViewModel @Inject constructor(
     }
 
     // MEMO:端末設定画面で"許可 -> 無許可"に変更したときの対応コード
-    fun onSetupReminderNotificationSettingFromPermission(isGranted: Boolean) {
+    fun onInitializeReminderNotificationSettingFromPermission(isGranted: Boolean) {
         viewModelScope.launch(Dispatchers.IO) {
             if (isGranted) return@launch
 
@@ -478,7 +478,7 @@ internal class SettingsViewModel @Inject constructor(
     }
 
     // MEMO:端末設定画面で"許可 -> 無許可"に変更したときの対応コード
-    fun onSetupWeatherInfoAcquisitionSettingFromPermission(isGranted: Boolean) {
+    fun onInitializeWeatherInfoAcquisitionSettingFromPermission(isGranted: Boolean) {
         viewModelScope.launch(Dispatchers.IO) {
             if (isGranted) return@launch
 

@@ -135,7 +135,6 @@ class SettingsFragment : BaseFragment() {
         setUpThemeColorSettingItem()
         setUpCalendarStartDaySettingItem()
         setUpReminderNotificationSettingItem()
-        setUpWeatherInfoAcquisitionSettingItem()
 
         setUpFragmentAction()
     }
@@ -365,11 +364,6 @@ class SettingsFragment : BaseFragment() {
     }
 
     private fun setUpReminderNotificationSettingItem() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            val isGranted = requireContext().isPostNotificationsGranted()
-            mainViewModel.onSetupReminderNotificationSettingFromPermission(isGranted)
-        }
-
         launchAndRepeatOnViewLifeCycleStarted {
             settingsViewModel.reminderNotificationTime
                 .collectLatest { value: LocalTime? ->
@@ -385,11 +379,6 @@ class SettingsFragment : BaseFragment() {
                     binding.includeReminderNotificationSetting.textValue.text = timeString
                 }
         }
-    }
-
-    private fun setUpWeatherInfoAcquisitionSettingItem() {
-        val isGranted = requireContext().isAccessLocationGranted()
-        mainViewModel.onSetupWeatherInfoAcquisitionSettingFromPermission(isGranted)
     }
 
     private fun setUpFragmentAction() {
@@ -601,6 +590,24 @@ class SettingsFragment : BaseFragment() {
                 Manifest.permission.ACCESS_COARSE_LOCATION
             )
         requestAccessLocationPermissionLauncher.launch(requestPermissions)
+    }
+
+    override fun onStart() {
+        super.onStart()
+        initializeSettingFromPermission()
+    }
+
+    // MEMO:端末設定画面で"許可 -> 無許可"に変更したときの対応コード
+    private fun initializeSettingFromPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            val isPostNotificationsGranted = requireContext().isPostNotificationsGranted()
+            mainViewModel
+                .onInitializeReminderNotificationSettingFromPermission(isPostNotificationsGranted)
+        }
+
+        val isAccessLocationGranted = requireContext().isAccessLocationGranted()
+        mainViewModel
+            .onInitializeWeatherInfoAcquisitionSettingFromPermission(isAccessLocationGranted)
     }
 
     override fun destroyBinding() {
