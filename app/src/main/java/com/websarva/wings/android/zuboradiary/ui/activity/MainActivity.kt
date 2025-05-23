@@ -38,6 +38,7 @@ import com.websarva.wings.android.zuboradiary.ui.fragment.DiaryEditFragment
 import com.websarva.wings.android.zuboradiary.ui.fragment.DiaryListFragment
 import com.websarva.wings.android.zuboradiary.ui.fragment.SettingsFragment
 import com.websarva.wings.android.zuboradiary.ui.utils.isGrantedAccessLocation
+import com.websarva.wings.android.zuboradiary.ui.utils.isGrantedPostNotifications
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.SettingsViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
@@ -93,14 +94,6 @@ class MainActivity : LoggingActivity() {
             showedFragment.attachPicture(o)
         }
     }
-
-    @get:RequiresApi(api = Build.VERSION_CODES.TIRAMISU)
-    internal val isGrantedPostNotifications
-        get() = (ActivityCompat.checkSelfPermission(
-            this,
-            Manifest.permission.POST_NOTIFICATIONS
-        )
-                == PackageManager.PERMISSION_GRANTED)
 
     @RequiresApi(Build.VERSION_CODES.Q)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -396,7 +389,7 @@ class MainActivity : LoggingActivity() {
     private fun checkPermission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             settingsViewModel
-                .onSetupReminderNotificationSettingFromPermission(isGrantedPostNotifications)
+                .onSetupReminderNotificationSettingFromPermission(isGrantedPostNotifications())
         }
 
         settingsViewModel
