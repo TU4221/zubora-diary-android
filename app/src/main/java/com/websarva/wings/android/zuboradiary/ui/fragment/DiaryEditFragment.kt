@@ -686,8 +686,13 @@ class DiaryEditFragment : BaseFragment() {
                         } else {
                             R.dimen.view_disabled_alpha
                         }
-                    val alpha = ResourcesCompat.getFloat(resources, alphaResId)
-                    binding.imageButtonItemAddition.alpha = alpha
+                    val alphaValue = ResourcesCompat.getFloat(resources, alphaResId)
+                    binding.imageButtonItemAddition.apply {
+                        // HACK:Fragment(View)表示タイミングでalphaが反映されない時がある為、post()で対策。
+                        post {
+                            alpha = alphaValue
+                        }
+                    }
                 }
         }
     }
@@ -888,7 +893,12 @@ class DiaryEditFragment : BaseFragment() {
                             R.dimen.view_disabled_alpha
                         }
                     val alphaValue = ResourcesCompat.getFloat(resources, alphaResId)
-                    binding.imageButtonAttachedPictureDelete.alpha = alphaValue
+                    binding.imageButtonAttachedPictureDelete.apply {
+                        // HACK:Fragment(View)表示タイミングでalphaが反映されない時がある為、post()で対策。
+                        post {
+                            alpha = alphaValue
+                        }
+                    }
                 }
         }
     }
