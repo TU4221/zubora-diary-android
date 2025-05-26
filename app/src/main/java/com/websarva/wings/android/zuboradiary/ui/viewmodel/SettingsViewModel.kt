@@ -4,6 +4,7 @@ import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.datastore.core.IOException
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.websarva.wings.android.zuboradiary.data.repository.DiaryRepository
 import com.websarva.wings.android.zuboradiary.data.preferences.CalendarStartDayOfWeekPreference
@@ -29,6 +30,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import java.time.DayOfWeek
@@ -37,10 +39,23 @@ import javax.inject.Inject
 
 @HiltViewModel
 internal class SettingsViewModel @Inject constructor(
+    private val handle: SavedStateHandle,
     private val userPreferencesRepository: UserPreferencesRepository,
     private val workerRepository: WorkerRepository,
     private val diaryRepository: DiaryRepository
 ) : BaseViewModel() {
+
+    // HACK:SavedStateHandleを使用する理由
+    //      プロセスキルでアプリを再起動した時、ActivityのBinding処理とは関係なしにFragmentの処理が始まり、
+    //      Preferencesの格納値の読込が完了する前(onCreateView()の時点)にViewの設定で設定値を参照してしまい、
+    //      例外が発生してしまう問題が発生。
+    //      通常のアプリ起動だとPreferencesの格納値の読込が完了してからActivityのBinding処理を行うようにしている為、
+    //      このような問題は発生しない。各フラグメントにPreferencesの読込完了条件をいれるとコルーチンを使用する等の
+    //      複雑な処理になるため、SavedStateHandleで対応する。
+    companion object {
+        private const val SAVED_THEME_COLOR_STATE_KEY = "savedThemeColorState"
+        private const val SAVED_CALENDAR_START_DAY_OF_WEEK_STATE_KEY = "savedCalendarStartDayOfWeekState"
+    }
 
     private fun <T> Flow<T>.stateIn(initialValue: T): StateFlow<T> {
         return this.stateIn(viewModelScope, SharingStarted.Eagerly, initialValue)
@@ -111,10 +126,13 @@ internal class SettingsViewModel @Inject constructor(
     }
 
     private fun setUpThemeColorPreferenceValueLoading(preferences: Flow<AllPreferences>) {
+        val initialValue = handle.get<ThemeColor>(SAVED_THEME_COLOR_STATE_KEY)
         themeColor =
             preferences.map { value ->
                 value.themeColorPreference.themeColor
-            }.stateIn(null)
+            }.onEach { value: ThemeColor ->
+                handle[SAVED_THEME_COLOR_STATE_KEY] = value
+            }.stateIn(initialValue)
 
         isThemeColorNotNull =
             themeColor.map { value ->
@@ -123,10 +141,13 @@ internal class SettingsViewModel @Inject constructor(
     }
 
     private fun setUpCalendarStartDayOfWeekPreferenceValueLoading(preferences: Flow<AllPreferences>) {
+        val initialValue = handle.get<DayOfWeek>(SAVED_CALENDAR_START_DAY_OF_WEEK_STATE_KEY)
         calendarStartDayOfWeek =
             preferences.map { value ->
                 value.calendarStartDayOfWeekPreference.dayOfWeek
-            }.stateIn(null)
+            }.onEach { value: DayOfWeek ->
+                handle[SAVED_CALENDAR_START_DAY_OF_WEEK_STATE_KEY] = value
+            }.stateIn(initialValue)
 
         isCalendarStartDayOfWeekNotNull =
             calendarStartDayOfWeek.map { value ->
