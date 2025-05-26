@@ -382,6 +382,5 @@ class MainActivity : LoggingActivity() {
         super.onDestroy()
 
         _binding = null
-        isMainActivityLayoutInflated = false
     }
 }
