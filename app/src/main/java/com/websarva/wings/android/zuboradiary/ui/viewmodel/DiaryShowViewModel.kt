@@ -2,6 +2,7 @@ package com.websarva.wings.android.zuboradiary.ui.viewmodel
 
 import android.net.Uri
 import android.util.Log
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.websarva.wings.android.zuboradiary.data.repository.DiaryRepository
 import com.websarva.wings.android.zuboradiary.data.model.ItemNumber
@@ -27,8 +28,10 @@ import java.time.LocalDate
 import javax.inject.Inject
 
 @HiltViewModel
-internal class DiaryShowViewModel @Inject constructor(private val diaryRepository: DiaryRepository) :
-    BaseViewModel() {
+internal class DiaryShowViewModel @Inject constructor(
+    handle: SavedStateHandle,
+    private val diaryRepository: DiaryRepository
+) : BaseViewModel() {
 
     private val logTag = createLogTag()
 
@@ -36,7 +39,7 @@ internal class DiaryShowViewModel @Inject constructor(private val diaryRepositor
     private val _diaryShowState = MutableStateFlow<DiaryShowState>(initialDiaryShowState)
 
     // 日記データ関係
-    private val diaryStateFlow = DiaryStateFlow()
+    private val diaryStateFlow = DiaryStateFlow(viewModelScope, handle)
     val date
         get() = diaryStateFlow.date.asStateFlow()
     val weather1

@@ -2,6 +2,7 @@ package com.websarva.wings.android.zuboradiary.ui.viewmodel
 
 import android.net.Uri
 import android.util.Log
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.websarva.wings.android.zuboradiary.data.repository.DiaryRepository
 import com.websarva.wings.android.zuboradiary.data.model.Condition
@@ -33,7 +34,9 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import java.time.LocalDate
@@ -43,11 +46,21 @@ import kotlin.random.Random
 
 @HiltViewModel
 internal class DiaryEditViewModel @Inject constructor(
+    private val handle: SavedStateHandle,
     private val diaryRepository: DiaryRepository,
     private val weatherApiRepository: WeatherApiRepository,
     private val locationRepository: LocationRepository,
     private val userPreferencesRepository: UserPreferencesRepository
 ) : BaseViewModel() {
+
+    companion object {
+        private const val SAVED_HAS_PREPARED_DIARY_STATE_KEY = "hasPreparedDiary"
+        private const val SAVED_PREVIOUS_DATE_STATE_KEY = "previousDate"
+        private const val SAVED_LOADED_DATE_STATE_KEY = "loadedDate"
+        private const val SAVED_LOADED_PICTURE_PATH_STATE_KEY = "loadedPicturePath"
+        private const val SAVED_SHOULD_INITIALIZE_ON_FRAGMENT_DESTROY_STATE_KEY =
+            "shouldInitializeOnFragmentDestroy"
+    }
 
     private val logTag = createLogTag()
 
@@ -56,14 +69,22 @@ internal class DiaryEditViewModel @Inject constructor(
 
     // 日記データ関係
     private val initialHasPreparedDiary = false
-    var hasPreparedDiary = initialHasPreparedDiary
-        private set
+    var hasPreparedDiary = handle[SAVED_HAS_PREPARED_DIARY_STATE_KEY] ?: initialHasPreparedDiary
+        private set(value) {
+            handle[SAVED_HAS_PREPARED_DIARY_STATE_KEY] = value
+            field = value
+        }
 
     private val initialPreviousDate: LocalDate? = null
-    private var previousDate = initialPreviousDate
+    private var previousDate = handle[SAVED_PREVIOUS_DATE_STATE_KEY] ?: initialPreviousDate
+        private set(value) {
+            handle[SAVED_PREVIOUS_DATE_STATE_KEY] = value
+            field = value
+        }
 
     private val initialLoadedDate: LocalDate? = null
-    private val _loadedDate = MutableStateFlow(initialLoadedDate)
+    private val _loadedDate =
+        MutableStateFlow( handle[SAVED_LOADED_DATE_STATE_KEY] ?: initialLoadedDate)
     val loadedDate
         get() = _loadedDate.asStateFlow()
 
@@ -86,7 +107,7 @@ internal class DiaryEditViewModel @Inject constructor(
             return loadedDate == inputDate
         }
 
-    private val diaryStateFlow = DiaryStateFlow()
+    private val diaryStateFlow = DiaryStateFlow(viewModelScope, handle)
 
     val date
         get() = diaryStateFlow.date.asStateFlow()
@@ -223,7 +244,12 @@ internal class DiaryEditViewModel @Inject constructor(
         )
 
     private val initialLoadedPicturePath: Uri? = null
-    private var loadedPicturePath = initialLoadedPicturePath
+    private var loadedPicturePath =
+        handle[SAVED_LOADED_PICTURE_PATH_STATE_KEY] ?: initialLoadedPicturePath
+        private set(value) {
+            handle[SAVED_LOADED_PICTURE_PATH_STATE_KEY] = value
+            field = value
+        }
 
     // ProgressIndicator表示
     val isVisibleUpdateProgressBar: StateFlow<Boolean> =
@@ -243,7 +269,13 @@ internal class DiaryEditViewModel @Inject constructor(
     // ViewModel初期化関係
     // MEMO:画面回転時の不要な初期化を防ぐ
     private val initialShouldInitializeOnFragmentDestroy = false
-    var shouldInitializeOnFragmentDestroy = initialShouldInitializeOnFragmentDestroy
+    var shouldInitializeOnFragmentDestroy =
+        handle[SAVED_SHOULD_INITIALIZE_ON_FRAGMENT_DESTROY_STATE_KEY]
+            ?: initialShouldInitializeOnFragmentDestroy
+        set(value) {
+            handle[SAVED_SHOULD_INITIALIZE_ON_FRAGMENT_DESTROY_STATE_KEY] = value
+            field = value
+        }
 
     // Fragment処理
     private val _fragmentAction= MutableSharedFlow<Action<FragmentAction>>(replay = 1)
@@ -252,6 +284,12 @@ internal class DiaryEditViewModel @Inject constructor(
 
     // TODO:テスト用の為、最終的に削除
     var isTesting = false
+
+    init {
+        _loadedDate.onEach {
+            handle[SAVED_LOADED_DATE_STATE_KEY] = it
+        }.launchIn(viewModelScope)
+    }
 
     override fun initialize() {
         super.initialize()
