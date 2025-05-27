@@ -6,6 +6,8 @@ import com.websarva.wings.android.zuboradiary.data.model.GeoCoordinates
 import com.websarva.wings.android.zuboradiary.data.network.WeatherApiData
 import com.websarva.wings.android.zuboradiary.data.network.WeatherApiService
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import retrofit2.Response
 import java.time.LocalDate
 import java.time.temporal.ChronoUnit
@@ -25,7 +27,6 @@ internal class WeatherApiRepository (private val weatherApiService: WeatherApiSe
     private val queryDiaryParameter = "weather_code"
     private val queryTimeZoneParameter = "Asia/Tokyo"
 
-
     fun canFetchWeatherInfo(date: LocalDate): Boolean {
         val currentDate = LocalDate.now()
 
@@ -41,14 +42,16 @@ internal class WeatherApiRepository (private val weatherApiService: WeatherApiSe
     }
 
     suspend fun fetchTodayWeatherInfo(geoCoordinates: GeoCoordinates): Response<WeatherApiData> {
-        return weatherApiService.getWeather(
-            geoCoordinates.latitude.toString(),
-            geoCoordinates.longitude.toString(),
-            queryDiaryParameter,
-            queryTimeZoneParameter,
-            "0",  /*today*/
-            "1" /*1日分*/
-        )
+        return withContext(Dispatchers.IO) {
+            weatherApiService.getWeather(
+                geoCoordinates.latitude.toString(),
+                geoCoordinates.longitude.toString(),
+                queryDiaryParameter,
+                queryTimeZoneParameter,
+                "0",  /*today*/
+                "1" /*1日分*/
+            )
+        }
     }
 
     suspend fun fetchPastDayWeatherInfo(
@@ -59,13 +62,15 @@ internal class WeatherApiRepository (private val weatherApiService: WeatherApiSe
         require(numPastDays >= MIN_PAST_DAYS)
         require(numPastDays <= MAX_PAST_DAYS)
 
-        return weatherApiService.getWeather(
-            geoCoordinates.latitude.toString(),
-            geoCoordinates.longitude.toString(),
-            queryDiaryParameter,
-            queryTimeZoneParameter,
-            numPastDays.toString(),
-            "0" /*1日分(過去日から1日分取得する場合"0"を代入)*/
-        )
+        return withContext(Dispatchers.IO) {
+            weatherApiService.getWeather(
+                geoCoordinates.latitude.toString(),
+                geoCoordinates.longitude.toString(),
+                queryDiaryParameter,
+                queryTimeZoneParameter,
+                numPastDays.toString(),
+                "0" /*1日分(過去日から1日分取得する場合"0"を代入)*/
+            )
+        }
     }
 }

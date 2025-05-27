@@ -9,6 +9,8 @@ import com.websarva.wings.android.zuboradiary.data.database.DiaryItemTitleSelect
 import com.websarva.wings.android.zuboradiary.data.database.DiaryListItem
 import com.websarva.wings.android.zuboradiary.data.database.WordSearchResultListItem
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import java.time.LocalDate
 
 
@@ -20,31 +22,46 @@ internal class DiaryRepository (
     private val logTag = createLogTag()
 
     suspend fun countDiaries(): Int {
-        return diaryDAO.countDiaries()
+        return withContext(Dispatchers.IO) {
+            diaryDAO.countDiaries()
+        }
+
     }
 
     suspend fun countDiaries(date: LocalDate): Int {
-        return diaryDAO.countDiaries(date.toString())
+        return withContext(Dispatchers.IO) {
+            diaryDAO.countDiaries(date.toString())
+        }
     }
 
     suspend fun existsDiary(date: LocalDate): Boolean {
-        return diaryDAO.existsDiary(date.toString())
+        return withContext(Dispatchers.IO) {
+            diaryDAO.existsDiary(date.toString())
+        }
     }
 
     suspend fun existsPicturePath(uri: Uri): Boolean {
-        return diaryDAO.existsPicturePath(uri.toString())
+        return withContext(Dispatchers.IO) {
+            diaryDAO.existsPicturePath(uri.toString())
+        }
     }
 
     suspend fun loadDiary(date: LocalDate): DiaryEntity? {
-        return diaryDAO.selectDiary(date.toString())
+        return withContext(Dispatchers.IO) {
+            diaryDAO.selectDiary(date.toString())
+        }
     }
 
     suspend fun loadNewestDiary(): DiaryEntity? {
-        return diaryDAO.selectNewestDiary()
+        return withContext(Dispatchers.IO) {
+            diaryDAO.selectNewestDiary()
+        }
     }
 
     suspend fun loadOldestDiary(): DiaryEntity? {
-        return diaryDAO.selectOldestDiary()
+        return withContext(Dispatchers.IO) {
+            diaryDAO.selectOldestDiary()
+        }
     }
 
     suspend fun loadDiaryList(
@@ -56,15 +73,19 @@ internal class DiaryRepository (
         require(num >= 1)
         require(offset >= 0)
 
-        return if (date == null) {
-            diaryDAO.selectDiaryListOrderByDateDesc(num, offset)
-        } else {
-            diaryDAO.selectDiaryListOrderByDateDesc(num, offset, date.toString())
+        return withContext(Dispatchers.IO) {
+            if (date == null) {
+                diaryDAO.selectDiaryListOrderByDateDesc(num, offset)
+            } else {
+                diaryDAO.selectDiaryListOrderByDateDesc(num, offset, date.toString())
+            }
         }
     }
 
     suspend fun countWordSearchResultDiaries(searchWord: String): Int {
-        return diaryDAO.countWordSearchResults(searchWord)
+        return withContext(Dispatchers.IO) {
+            diaryDAO.countWordSearchResults(searchWord)
+        }
     }
 
     suspend fun loadWordSearchResultDiaryList(
@@ -75,32 +96,44 @@ internal class DiaryRepository (
         require(num >= 1)
         require(offset >= 0)
 
-        return diaryDAO.selectWordSearchResultListOrderByDateDesc(num, offset, searchWord)
+        return withContext(Dispatchers.IO) {
+            diaryDAO.selectWordSearchResultListOrderByDateDesc(num, offset, searchWord)
+        }
     }
 
     suspend fun saveDiary(
         diaryEntity: DiaryEntity,
         updateTitleList: List<DiaryItemTitleSelectionHistoryItemEntity>
     ) {
-        diaryDatabase.saveDiary(diaryEntity, updateTitleList)
+        withContext(Dispatchers.IO) {
+            diaryDatabase.saveDiary(diaryEntity, updateTitleList)
+        }
     }
 
     suspend fun deleteAndSaveDiary(
         deleteDiaryDate: LocalDate, createDiaryEntity: DiaryEntity,
         updateTitleList: List<DiaryItemTitleSelectionHistoryItemEntity>
     ) {
-        diaryDatabase.deleteAndSaveDiary(deleteDiaryDate, createDiaryEntity, updateTitleList)
+        withContext(Dispatchers.IO) {
+            diaryDatabase.deleteAndSaveDiary(deleteDiaryDate, createDiaryEntity, updateTitleList)
+        }
     }
 
     suspend fun deleteDiary(date: LocalDate) {
-        diaryDAO.deleteDiary(date.toString())
+        withContext(Dispatchers.IO) {
+            diaryDAO.deleteDiary(date.toString())
+        }
     }
 
     suspend fun deleteAllDiaries() {
-        diaryDAO.deleteAllDiaries()
+        withContext(Dispatchers.IO) {
+            diaryDAO.deleteAllDiaries()
+        }
     }
 
     suspend fun deleteAllData() {
-        diaryDatabase.deleteAllData()
+        withContext(Dispatchers.IO) {
+            diaryDatabase.deleteAllData()
+        }
     }
 }

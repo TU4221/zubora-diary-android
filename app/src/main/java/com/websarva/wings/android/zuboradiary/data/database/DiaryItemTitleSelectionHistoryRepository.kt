@@ -1,6 +1,8 @@
 package com.websarva.wings.android.zuboradiary.data.database
 
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.withContext
 
 internal class DiaryItemTitleSelectionHistoryRepository (
     private val diaryItemTitleSelectionHistoryDAO: DiaryItemTitleSelectionHistoryDAO
@@ -16,6 +18,8 @@ internal class DiaryItemTitleSelectionHistoryRepository (
     }
 
     suspend fun deleteSelectionHistoryItem(title: String) {
-        return diaryItemTitleSelectionHistoryDAO.deleteHistoryItem(title)
+        withContext(Dispatchers.IO) {
+            diaryItemTitleSelectionHistoryDAO.deleteHistoryItem(title)
+        }
     }
 }

@@ -21,7 +21,6 @@ import com.websarva.wings.android.zuboradiary.ui.adapter.diaryitemtitle.Selectio
 import com.websarva.wings.android.zuboradiary.ui.view.edittext.TextInputConfigurator
 import com.websarva.wings.android.zuboradiary.ui.utils.requireValue
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
@@ -96,7 +95,7 @@ class DiaryItemTitleEditFragment : BaseFragment() {
                     )
                 )
 
-            lifecycleScope.launch(Dispatchers.IO) {
+            lifecycleScope.launch {
                 mainViewModel
                     .deleteDiaryItemTitleSelectionHistoryItem(deleteListItemPosition)
             }

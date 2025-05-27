@@ -9,7 +9,6 @@ import com.websarva.wings.android.zuboradiary.ui.model.DiaryItemTitleEditAppMess
 import com.websarva.wings.android.zuboradiary.ui.adapter.diaryitemtitle.SelectionHistoryList
 import com.websarva.wings.android.zuboradiary.ui.adapter.diaryitemtitle.SelectionHistoryListItem
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
@@ -60,7 +59,7 @@ internal class DiaryItemTitleEditViewModel @Inject constructor(
         val logMsg = "日記項目タイトル選択履歴読込"
         Log.i(logTag, "${logMsg}_開始")
 
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             try {
                 diaryItemTitleSelectionHistoryRepository
                     .loadSelectionHistory(maxLoadedItemTitles, 0)

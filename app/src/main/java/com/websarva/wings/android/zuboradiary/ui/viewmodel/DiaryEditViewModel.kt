@@ -39,6 +39,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.time.LocalDate
 import java.time.temporal.ChronoUnit
 import javax.inject.Inject
@@ -305,7 +306,7 @@ internal class DiaryEditViewModel @Inject constructor(
     }
 
     fun onBackPressed() {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             navigatePreviousFragment()
         }
     }
@@ -313,7 +314,7 @@ internal class DiaryEditViewModel @Inject constructor(
     // ViewClicked処理
     fun onDiarySaveMenuClicked() {
         _diaryEditState.value = DiaryEditState.Saving
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             saveDiary()
             _diaryEditState.value = DiaryEditState.Idle
         }
@@ -322,7 +323,7 @@ internal class DiaryEditViewModel @Inject constructor(
     fun onDiaryDeleteMenuClicked() {
         _diaryEditState.value = DiaryEditState.Deleting
         val date = this.date.requireValue()
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             updateFragmentAction(
                 DiaryEditFragmentAction.NavigateDiaryDeleteDialog(date)
             )
@@ -332,14 +333,14 @@ internal class DiaryEditViewModel @Inject constructor(
     }
 
     fun onNavigationClicked() {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             navigatePreviousFragment()
         }
     }
 
     fun onDateInputFieldClicked() {
         val date = this.date.requireValue()
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             updateFragmentAction(
                 DiaryEditFragmentAction.NavigateDatePickerDialog(date)
             )
@@ -360,7 +361,7 @@ internal class DiaryEditViewModel @Inject constructor(
 
     fun onItemTitleInputFieldClicked(itemNumber: ItemNumber) {
         val itemTitle = getItemTitle(itemNumber).requireValue()
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             updateFragmentAction(
                 DiaryEditFragmentAction.NavigateDiaryItemTitleEditFragment(itemNumber, itemTitle)
             )
@@ -373,7 +374,7 @@ internal class DiaryEditViewModel @Inject constructor(
     }
 
     fun onItemDeleteButtonClicked(itemNumber: ItemNumber) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             updateFragmentAction(
                 DiaryEditFragmentAction.NavigateDiaryItemDeleteDialog(itemNumber)
             )
@@ -381,7 +382,7 @@ internal class DiaryEditViewModel @Inject constructor(
     }
 
     fun onAttachedPictureDeleteButtonClicked() {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             updateFragmentAction(
                 DiaryEditFragmentAction.NavigateDiaryPictureDeleteDialog
             )
@@ -391,7 +392,7 @@ internal class DiaryEditViewModel @Inject constructor(
     // DialogButtonClicked処理
     fun onDiaryLoadingDialogPositiveButtonClicked() {
         val date = this.date.requireValue()
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             _diaryEditState.value = DiaryEditState.Loading
             prepareDiary(
                 date,
@@ -401,7 +402,7 @@ internal class DiaryEditViewModel @Inject constructor(
     }
 
     fun onDiaryLoadingDialogNegativeButtonClicked() {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             _diaryEditState.value = DiaryEditState.WeatherFetching
             val date = date.requireValue()
             if (!shouldLoadWeatherInfo(date)) return@launch
@@ -412,7 +413,7 @@ internal class DiaryEditViewModel @Inject constructor(
 
     fun onDiaryUpdateDialogPositiveButtonClicked() {
         _diaryEditState.value = DiaryEditState.Saving
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             saveDiary(true)
             _diaryEditState.value = DiaryEditState.Idle
         }
@@ -420,7 +421,7 @@ internal class DiaryEditViewModel @Inject constructor(
 
     fun onDiaryDeleteDialogPositiveButtonClicked() {
         _diaryEditState.value = DiaryEditState.Deleting
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             deleteDiary()
             _diaryEditState.value = DiaryEditState.Idle
         }
@@ -428,20 +429,20 @@ internal class DiaryEditViewModel @Inject constructor(
 
     fun onDatePickerDialogPositiveButtonClicked(date: LocalDate) {
         _diaryEditState.value = DiaryEditState.WeatherFetching
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             prepareDiaryDate(date)
         }
     }
 
     fun onDiaryLoadingFailureDialogPositiveButtonClicked() {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             navigatePreviousFragment()
         }
     }
 
     fun onWeatherInfoFetchDialogPositiveButtonClicked() {
         _diaryEditState.value = DiaryEditState.WeatherFetching
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             val date = diaryStateFlow.date.requireValue()
             if (!shouldLoadWeatherInfo(date)) return@launch
 
@@ -457,7 +458,7 @@ internal class DiaryEditViewModel @Inject constructor(
             deleteItem(itemNumber)
             _diaryEditState.value = DiaryEditState.Idle
         } else {
-            viewModelScope.launch(Dispatchers.IO) {
+            viewModelScope.launch {
                 updateFragmentAction(
                     DiaryEditFragmentAction.TransitionDiaryItemHidedState(itemNumber)
                 )
@@ -471,7 +472,7 @@ internal class DiaryEditViewModel @Inject constructor(
         shouldLoadDiary: Boolean
     ) {
         _diaryEditState.value = DiaryEditState.Loading
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             prepareDiary(date, shouldLoadDiary)
         }
     }
@@ -515,7 +516,7 @@ internal class DiaryEditViewModel @Inject constructor(
 
     // 権限確認後処理
     fun onAccessLocationPermissionChecked(isGranted: Boolean, date: LocalDate) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             if (isGranted) {
                 val geoCoordinates = fetchCurrentLocation()
                 if (geoCoordinates == null) {
@@ -750,11 +751,13 @@ internal class DiaryEditViewModel @Inject constructor(
     }
 
     private suspend fun isWeatherInfoAcquisitionPreferenceChecked(): Boolean {
-        return userPreferencesRepository
-            .loadAllPreferences()
-            .map { value: AllPreferences ->
-                value.weatherInfoAcquisitionPreference.isChecked
-            }.first()
+        return withContext(Dispatchers.IO) {
+            userPreferencesRepository
+                .loadAllPreferences()
+                .map { value: AllPreferences ->
+                    value.weatherInfoAcquisitionPreference.isChecked
+                }.first()
+        }
     }
 
     private suspend fun loadWeatherInfo(
@@ -906,7 +909,7 @@ internal class DiaryEditViewModel @Inject constructor(
 
     // TODO:テスト用の為、最終的に削除
     fun test() {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             isTesting = true
             val startDate = date.value
             if (startDate != null) {

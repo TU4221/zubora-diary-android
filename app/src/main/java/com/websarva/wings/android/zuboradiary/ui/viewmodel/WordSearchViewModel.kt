@@ -15,7 +15,6 @@ import com.websarva.wings.android.zuboradiary.ui.model.action.WordSearchFragment
 import com.websarva.wings.android.zuboradiary.ui.utils.requireValue
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CancellationException
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -153,7 +152,7 @@ internal class WordSearchViewModel @Inject internal constructor(
 
     // Viewクリック処理
     fun onNavigationButtonClicked() {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             _fragmentAction.emit(FragmentAction.NavigatePreviousFragment)
         }
     }
@@ -163,7 +162,7 @@ internal class WordSearchViewModel @Inject internal constructor(
     }
 
     fun onWordSearchResultListItemClicked(date: LocalDate) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             _fragmentAction.emit(WordSearchFragmentAction.NavigateDiaryShowFragment(date))
         }
     }
@@ -198,7 +197,7 @@ internal class WordSearchViewModel @Inject internal constructor(
 
     // StateFlow値変更処理
     fun onSearchWordChanged() {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             prepareKeyboard()
 
             if (shouldUpdateWordSearchResultList) {
@@ -253,7 +252,7 @@ internal class WordSearchViewModel @Inject internal constructor(
     ) {
         cancelPreviousLoading()
         wordSearchResultListLoadingJob =
-            viewModelScope.launch(Dispatchers.IO) {
+            viewModelScope.launch {
                 createWordSearchResultList(creator)
             }
     }

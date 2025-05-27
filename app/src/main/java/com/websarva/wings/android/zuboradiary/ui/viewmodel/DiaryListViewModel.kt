@@ -15,7 +15,6 @@ import com.websarva.wings.android.zuboradiary.ui.model.action.DiaryListFragmentA
 import com.websarva.wings.android.zuboradiary.ui.model.action.FragmentAction
 import com.websarva.wings.android.zuboradiary.ui.utils.requireValue
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -76,31 +75,31 @@ internal class DiaryListViewModel @Inject constructor(private val diaryRepositor
 
     // ViewClicked処理
     fun onWordSearchMenuClicked() {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             navigateWordSearchFragment()
         }
     }
 
     fun onNavigationClicked() {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             navigateStartYearMonthPickerDialog()
         }
     }
 
     fun onDiaryListItemClicked(date: LocalDate) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             navigateDiaryShowFragment(date)
         }
     }
 
     fun onDiaryListItemDeleteButtonClicked(date: LocalDate, uri: Uri?) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             navigateDiaryDeleteDialog(date, uri)
         }
     }
 
     fun onDiaryEditButtonClicked() {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             navigateDiaryEditFragment()
         }
     }
@@ -127,7 +126,7 @@ internal class DiaryListViewModel @Inject constructor(private val diaryRepositor
     }
 
     fun onDataReceivedFromDiaryDeleteDialog(date: LocalDate, uri: Uri?) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             val isSuccessful = deleteDiary(date)
             if (!isSuccessful) return@launch
 
@@ -139,7 +138,7 @@ internal class DiaryListViewModel @Inject constructor(private val diaryRepositor
     }
 
     private fun prepareDiaryList() {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             val diaryList = diaryList.value
             if (diaryList.isEmpty) {
                 val numSavedDiaries = diaryRepository.countDiaries()
@@ -165,7 +164,7 @@ internal class DiaryListViewModel @Inject constructor(private val diaryRepositor
     private fun loadDiaryList(creator: DiaryListCreator) {
         cancelPreviousLoading()
         diaryListLoadingJob =
-            viewModelScope.launch(Dispatchers.IO) {
+            viewModelScope.launch {
                 createDiaryList(creator)
             }
     }

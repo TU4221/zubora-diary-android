@@ -22,7 +22,6 @@ import com.websarva.wings.android.zuboradiary.ui.model.action.FragmentAction
 import com.websarva.wings.android.zuboradiary.ui.model.action.SettingsFragmentAction
 import com.websarva.wings.android.zuboradiary.ui.utils.requireValue
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -243,7 +242,7 @@ internal class SettingsViewModel @Inject constructor(
 
     // ViewClicked処理
     fun onThemeColorSettingButtonClicked() {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             _fragmentAction.emit(
                 SettingsFragmentAction.NavigateThemeColorPickerDialog
             )
@@ -251,7 +250,7 @@ internal class SettingsViewModel @Inject constructor(
     }
 
     fun onCalendarStartDayOfWeekSettingButtonClicked() {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             val dayOfWeek = calendarStartDayOfWeek.requireValue()
             _fragmentAction.emit(
                 SettingsFragmentAction.NavigateCalendarStartDayPickerDialog(dayOfWeek)
@@ -260,7 +259,7 @@ internal class SettingsViewModel @Inject constructor(
     }
 
     fun onReminderNotificationSettingCheckedChanged(isChecked: Boolean) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             // DateStorePreferences初回読込時の値がtrueの場合、本メソッドが呼び出される。
             // 初回読込時は処理不要のため下記条件追加。
             val settingValue = isCheckedReminderNotification.requireValue()
@@ -285,7 +284,7 @@ internal class SettingsViewModel @Inject constructor(
     }
 
     fun onPasscodeLockSettingCheckedChanged(isChecked: Boolean) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             // DateStorePreferences初回読込時の値がtrueの場合、本メソッドが呼び出される。
             // 初回読込時は処理不要のため下記条件追加。
             val settingValue = isCheckedPasscodeLock.requireValue()
@@ -296,7 +295,7 @@ internal class SettingsViewModel @Inject constructor(
     }
 
     fun onWeatherInfoAcquisitionSettingCheckedChanged(isChecked: Boolean) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             // DateStorePreferences初回読込時の値がtrueの場合、本メソッドが呼び出される。
             // 初回読込時は処理不要のため下記条件追加。
             val settingValue = isCheckedWeatherInfoAcquisition.requireValue()
@@ -313,7 +312,7 @@ internal class SettingsViewModel @Inject constructor(
     }
 
     fun onAllDiariesDeleteButtonClicked() {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             _fragmentAction.emit(
                 SettingsFragmentAction.NavigateAllDiariesDeleteDialog
             )
@@ -321,7 +320,7 @@ internal class SettingsViewModel @Inject constructor(
     }
 
     fun onAllSettingsInitializationButtonClicked() {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             _fragmentAction.emit(
                 SettingsFragmentAction.NavigateAllSettingsInitializationDialog
             )
@@ -329,7 +328,7 @@ internal class SettingsViewModel @Inject constructor(
     }
 
     fun onAllDataDeleteButtonClicked() {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             _fragmentAction.emit(
                 SettingsFragmentAction.NavigateAllDataDeleteDialog
             )
@@ -337,7 +336,7 @@ internal class SettingsViewModel @Inject constructor(
     }
 
     fun onOpenSourceLicenseButtonClicked() {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             _fragmentAction.emit(
                 SettingsFragmentAction.NavigateOpenSourceLicensesFragment
             )
@@ -346,25 +345,25 @@ internal class SettingsViewModel @Inject constructor(
 
     // DialogButton処理
     fun onThemeColorSettingDialogPositiveButtonClicked(themeColor: ThemeColor) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             saveThemeColor(themeColor)
         }
     }
 
     fun onCalendarStartDayOfWeekSettingDialogPositiveButtonClicked(dayOfWeek: DayOfWeek) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             saveCalendarStartDayOfWeek(dayOfWeek)
         }
     }
 
     fun onReminderNotificationSettingDialogPositiveButtonClicked(time: LocalTime) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             saveReminderNotificationValid(time)
         }
     }
 
     fun onReminderNotificationSettingDialogNegativeButtonClicked() {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             _fragmentAction.emit(
                 SettingsFragmentAction.TurnOffReminderNotificationSettingSwitch
             )
@@ -372,7 +371,7 @@ internal class SettingsViewModel @Inject constructor(
     }
 
     fun onAllDiariesDeleteDialogPositiveButtonClicked() {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             val isSuccessful = deleteAllDiaries()
             if (isSuccessful) {
                 _fragmentAction.emit(
@@ -383,13 +382,13 @@ internal class SettingsViewModel @Inject constructor(
     }
 
     fun onAllSettingsInitializationDialogPositiveButtonClicked() {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             initializeAllSettings()
         }
     }
 
     fun onAllDataDeleteDialogPositiveButtonClicked() {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             val isSuccessful = deleteAllData()
             if (isSuccessful) {
                 _fragmentAction.emit(
@@ -402,7 +401,7 @@ internal class SettingsViewModel @Inject constructor(
     // Permission処理
     @RequiresApi(api = Build.VERSION_CODES.TIRAMISU)
     fun onPostNotificationsPermissionChecked(isGranted: Boolean) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             if (isGranted) {
                 _fragmentAction.emit(
                     SettingsFragmentAction.NavigateReminderNotificationTimePickerDialog
@@ -417,7 +416,7 @@ internal class SettingsViewModel @Inject constructor(
 
     @RequiresApi(api = Build.VERSION_CODES.TIRAMISU)
     fun onShouldShowRequestPostNotificationsPermissionRationaleChecked(shouldShowRequest: Boolean) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             if (shouldShowRequest) {
                 _fragmentAction.emit(
                     SettingsFragmentAction.ShowRequestPostNotificationsPermissionRationale
@@ -435,7 +434,7 @@ internal class SettingsViewModel @Inject constructor(
 
     @RequiresApi(api = Build.VERSION_CODES.TIRAMISU)
     fun onRequestPostNotificationsPermissionRationaleResultReceived(isGranted: Boolean) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             if (isGranted) {
                 _fragmentAction.emit(
                     SettingsFragmentAction.NavigateReminderNotificationTimePickerDialog
@@ -449,7 +448,7 @@ internal class SettingsViewModel @Inject constructor(
     }
 
     fun onAccessLocationPermissionChecked(isGranted: Boolean) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             if (isGranted) {
                 saveWeatherInfoAcquisition(true)
             } else {
@@ -461,7 +460,7 @@ internal class SettingsViewModel @Inject constructor(
     }
 
     fun onShouldShowRequestAccessLocationPermissionRationaleChecked(shouldShowRequest: Boolean) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             if (shouldShowRequest) {
                 _fragmentAction.emit(
                     SettingsFragmentAction.ShowRequestAccessLocationPermissionRationale
@@ -478,7 +477,7 @@ internal class SettingsViewModel @Inject constructor(
     }
 
     fun onRequestAccessLocationPermissionRationaleResultReceived(isGranted: Boolean) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             if (isGranted) {
                 saveWeatherInfoAcquisition(true)
             } else {
@@ -491,7 +490,7 @@ internal class SettingsViewModel @Inject constructor(
 
     // MEMO:端末設定画面で"許可 -> 無許可"に変更したときの対応コード
     fun onInitializeReminderNotificationSettingFromPermission(isGranted: Boolean) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             if (isGranted) return@launch
 
             saveReminderNotificationInvalid()
@@ -500,7 +499,7 @@ internal class SettingsViewModel @Inject constructor(
 
     // MEMO:端末設定画面で"許可 -> 無許可"に変更したときの対応コード
     fun onInitializeWeatherInfoAcquisitionSettingFromPermission(isGranted: Boolean) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             if (isGranted) return@launch
 
             saveWeatherInfoAcquisition(false)

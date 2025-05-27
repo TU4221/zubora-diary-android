@@ -8,7 +8,9 @@ import com.websarva.wings.android.zuboradiary.data.preferences.ReminderNotificat
 import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColorPreference
 import com.websarva.wings.android.zuboradiary.data.preferences.UserPreferences
 import com.websarva.wings.android.zuboradiary.data.preferences.WeatherInfoAcquisitionPreference
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.withContext
 
 internal class UserPreferencesRepository(private val userPreferences: UserPreferences) {
 
@@ -22,7 +24,9 @@ internal class UserPreferencesRepository(private val userPreferences: UserPrefer
         Exception::class
     )
     suspend fun saveThemeColorPreference(preference: ThemeColorPreference) {
-        userPreferences.saveThemeColorPreference(preference)
+        withContext(Dispatchers.IO) {
+            userPreferences.saveThemeColorPreference(preference)
+        }
     }
 
     @Throws(
@@ -30,7 +34,9 @@ internal class UserPreferencesRepository(private val userPreferences: UserPrefer
         Exception::class
     )
     suspend fun saveCalendarStartDayOfWeekPreference(preference: CalendarStartDayOfWeekPreference) {
-        return userPreferences.saveCalendarStartDayOfWeekPreference(preference)
+        withContext(Dispatchers.IO) {
+            userPreferences.saveCalendarStartDayOfWeekPreference(preference)
+        }
     }
 
     @Throws(
@@ -38,7 +44,9 @@ internal class UserPreferencesRepository(private val userPreferences: UserPrefer
         Exception::class
     )
     suspend fun saveReminderNotificationPreference(preference: ReminderNotificationPreference) {
-        return userPreferences.saveReminderNotificationPreference(preference)
+        withContext(Dispatchers.IO) {
+            userPreferences.saveReminderNotificationPreference(preference)
+        }
     }
 
     @Throws(
@@ -46,7 +54,9 @@ internal class UserPreferencesRepository(private val userPreferences: UserPrefer
         Exception::class
     )
     suspend fun savePasscodeLockPreference(preference: PassCodeLockPreference) {
-        return userPreferences.savePasscodeLockPreference(preference)
+        withContext(Dispatchers.IO) {
+            userPreferences.savePasscodeLockPreference(preference)
+        }
     }
 
     @Throws(
@@ -54,7 +64,9 @@ internal class UserPreferencesRepository(private val userPreferences: UserPrefer
         Exception::class
     )
     suspend fun saveWeatherInfoAcquisitionPreference(preference: WeatherInfoAcquisitionPreference) {
-        return userPreferences.saveWeatherInfoAcquisitionPreference(preference)
+        withContext(Dispatchers.IO) {
+            userPreferences.saveWeatherInfoAcquisitionPreference(preference)
+        }
     }
 
     @Throws(
@@ -62,6 +74,8 @@ internal class UserPreferencesRepository(private val userPreferences: UserPrefer
         Exception::class
     )
     suspend fun initializeAllPreferences() {
-        return userPreferences.initializeAllPreferences()
+        withContext(Dispatchers.IO) {
+            userPreferences.initializeAllPreferences()
+        }
     }
 }

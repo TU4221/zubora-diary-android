@@ -15,7 +15,6 @@ import com.websarva.wings.android.zuboradiary.ui.model.action.FragmentAction
 import com.websarva.wings.android.zuboradiary.ui.model.state.DiaryShowState
 import com.websarva.wings.android.zuboradiary.ui.utils.requireValue
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -96,7 +95,7 @@ internal class DiaryShowViewModel @Inject constructor(
     }
 
     fun onBackPressed() {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             navigatePreviousFragment()
         }
     }
@@ -104,7 +103,7 @@ internal class DiaryShowViewModel @Inject constructor(
     // ViewClicked処理
     fun onDiaryEditMenuClicked() {
         val date = diaryStateFlow.date.requireValue()
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             _fragmentAction.emit(
                 DiaryShowFragmentAction.NavigateDiaryEditFragment(date)
             )
@@ -113,7 +112,7 @@ internal class DiaryShowViewModel @Inject constructor(
 
     fun onDiaryDeleteMenuClicked() {
         val date = diaryStateFlow.date.requireValue()
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             _fragmentAction.emit(
                 DiaryShowFragmentAction.NavigateDiaryDeleteDialog(date)
             )
@@ -121,21 +120,21 @@ internal class DiaryShowViewModel @Inject constructor(
     }
 
     fun onNavigationClicked() {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             navigatePreviousFragment()
         }
     }
 
     // DialogButtonClicked処理
     fun onDiaryLoadingFailureDialogPositiveButtonClicked() {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             navigatePreviousFragment()
         }
     }
 
     fun onDiaryDeleteDialogPositiveButtonClicked() {
         _diaryShowState.value = DiaryShowState.Deleting
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             deleteDiary()
             _diaryShowState.value = DiaryShowState.Idle
         }
@@ -144,7 +143,7 @@ internal class DiaryShowViewModel @Inject constructor(
     // View状態処理
     fun onCalendarDaySelected(date: LocalDate) {
         _diaryShowState.value = DiaryShowState.Loading
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             prepareDiaryForCalendarFragment(date)
             _diaryShowState.value = DiaryShowState.Idle
         }
@@ -153,7 +152,7 @@ internal class DiaryShowViewModel @Inject constructor(
     // Fragment状態処理
     fun onFragmentViewCreated(date: LocalDate) {
         _diaryShowState.value = DiaryShowState.Loading
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             prepareDiaryForDiaryShowFragment(date)
             _diaryShowState.value = DiaryShowState.Idle
         }
