@@ -1,6 +1,5 @@
 package com.websarva.wings.android.zuboradiary.di
 
-import androidx.work.WorkManager
 import com.websarva.wings.android.zuboradiary.data.database.DiaryDAO
 import com.websarva.wings.android.zuboradiary.data.database.DiaryDatabase
 import com.websarva.wings.android.zuboradiary.data.database.DiaryItemTitleSelectionHistoryDAO
@@ -12,7 +11,9 @@ import com.websarva.wings.android.zuboradiary.data.network.WeatherApiService
 import com.websarva.wings.android.zuboradiary.data.repository.UserPreferencesRepository
 import com.websarva.wings.android.zuboradiary.data.preferences.UserPreferences
 import com.websarva.wings.android.zuboradiary.data.repository.LocationRepository
+import com.websarva.wings.android.zuboradiary.data.repository.UriRepository
 import com.websarva.wings.android.zuboradiary.data.repository.WorkerRepository
+import com.websarva.wings.android.zuboradiary.data.uri.UriPermissionDataSource
 import com.websarva.wings.android.zuboradiary.data.worker.ReminderNotificationWorkManager
 import dagger.Module
 import dagger.Provides
@@ -63,5 +64,14 @@ internal object RepositoryModule {
     @Provides
     fun provideLocationRepository(fusedLocationDataSource: FusedLocationDataSource): LocationRepository {
         return LocationRepository(fusedLocationDataSource)
+    }
+
+    @Singleton
+    @Provides
+    fun provideUriRepository(
+        uriPermissionDataSource: UriPermissionDataSource,
+        diaryDAO: DiaryDAO
+    ): UriRepository {
+        return UriRepository(uriPermissionDataSource, diaryDAO)
     }
 }

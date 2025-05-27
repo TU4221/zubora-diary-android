@@ -5,6 +5,7 @@ import android.util.Log
 import androidx.lifecycle.viewModelScope
 import com.websarva.wings.android.zuboradiary.data.database.DiaryListItem
 import com.websarva.wings.android.zuboradiary.data.repository.DiaryRepository
+import com.websarva.wings.android.zuboradiary.data.repository.UriRepository
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import com.websarva.wings.android.zuboradiary.ui.model.DiaryListAppMessage
 import com.websarva.wings.android.zuboradiary.ui.adapter.diary.diary.DiaryDayList
@@ -29,8 +30,10 @@ import java.util.concurrent.CancellationException
 import javax.inject.Inject
 
 @HiltViewModel
-internal class DiaryListViewModel @Inject constructor(private val diaryRepository: DiaryRepository) :
-    BaseViewModel() {
+internal class DiaryListViewModel @Inject constructor(
+    private val diaryRepository: DiaryRepository,
+    private val uriRepository: UriRepository
+) : BaseViewModel() {
 
     companion object {
         // MEMO:初期読込時の対象リストが画面全体に表示される値にすること。
@@ -131,9 +134,7 @@ internal class DiaryListViewModel @Inject constructor(private val diaryRepositor
             if (!isSuccessful) return@launch
 
             if (uri == null) return@launch
-            _fragmentAction.emit(
-                DiaryListFragmentAction.ReleasePersistablePermissionUri(uri)
-            )
+            uriRepository.releasePersistablePermission(uri)
         }
     }
 
@@ -335,17 +336,6 @@ internal class DiaryListViewModel @Inject constructor(private val diaryRepositor
         updateDiaryList()
         Log.i(logTag, "${logMsg}_完了")
         return true
-    }
-
-    // MEMO:存在しないことを確認したいため下記メソッドを否定的処理とする
-    suspend fun checkSavedPicturePathDoesNotExist(uri: Uri): Boolean? {
-        try {
-            return !diaryRepository.existsPicturePath(uri)
-        } catch (e: Exception) {
-            Log.e(logTag, "端末写真URI使用状況確認_失敗", e)
-            addAppMessage(DiaryListAppMessage.DiaryInfoLoadingFailure)
-            return null
-        }
     }
 
     private suspend fun loadNewestSavedDiaryDate(): LocalDate? {

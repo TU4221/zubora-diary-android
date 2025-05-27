@@ -11,6 +11,7 @@ import com.websarva.wings.android.zuboradiary.data.model.Weather
 import com.websarva.wings.android.zuboradiary.data.model.GeoCoordinates
 import com.websarva.wings.android.zuboradiary.data.preferences.AllPreferences
 import com.websarva.wings.android.zuboradiary.data.repository.LocationRepository
+import com.websarva.wings.android.zuboradiary.data.repository.UriRepository
 import com.websarva.wings.android.zuboradiary.data.repository.UserPreferencesRepository
 import com.websarva.wings.android.zuboradiary.data.repository.WeatherApiRepository
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
@@ -22,7 +23,6 @@ import com.websarva.wings.android.zuboradiary.ui.model.action.DiaryEditFragmentA
 import com.websarva.wings.android.zuboradiary.ui.model.action.FragmentAction
 import com.websarva.wings.android.zuboradiary.ui.model.adapter.ConditionAdapterList
 import com.websarva.wings.android.zuboradiary.ui.model.state.DiaryEditState
-import com.websarva.wings.android.zuboradiary.ui.permission.UriPermissionAction
 import com.websarva.wings.android.zuboradiary.ui.utils.requireValue
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -51,7 +51,8 @@ internal class DiaryEditViewModel @Inject constructor(
     private val diaryRepository: DiaryRepository,
     private val weatherApiRepository: WeatherApiRepository,
     private val locationRepository: LocationRepository,
-    private val userPreferencesRepository: UserPreferencesRepository
+    private val userPreferencesRepository: UserPreferencesRepository,
+    private val uriRepository: UriRepository
 ) : BaseViewModel() {
 
     companion object {
@@ -635,12 +636,12 @@ internal class DiaryEditViewModel @Inject constructor(
 
         val isSuccessful = saveDiaryToDatabase()
         if (!isSuccessful) return
-        val permissionAction = selectPictureUriPermissionAction()
+
+        updatePictureUriPermissionOnDiarySaved()
         updateFragmentAction(
             DiaryEditFragmentAction
                 .NavigateDiaryShowFragment(
-                    date.requireValue(),
-                    permissionAction
+                    date.requireValue()
                 )
         )
     }
@@ -651,23 +652,25 @@ internal class DiaryEditViewModel @Inject constructor(
         return existsSavedDiary(inputDate)
     }
 
-    private fun selectPictureUriPermissionAction(): UriPermissionAction {
+    private suspend fun updatePictureUriPermissionOnDiarySaved() {
         val latestPictureUri = picturePath.value
         val loadedPictureUri = loadedPicturePath
 
         if (latestPictureUri == null && loadedPictureUri == null) {
-            return UriPermissionAction.None
+            return
         }
         if (latestPictureUri != null && loadedPictureUri == null) {
-            return UriPermissionAction.Take(latestPictureUri)
+            return uriRepository.takePersistablePermission(latestPictureUri)
         }
         if (latestPictureUri == null) {
-            return UriPermissionAction.Release(checkNotNull(loadedPictureUri))
+            return uriRepository.releasePersistablePermission(checkNotNull(loadedPictureUri))
         }
         if (latestPictureUri == loadedPictureUri) {
-            return UriPermissionAction.None
+            return
         }
-        return UriPermissionAction.ReleaseAndTake(checkNotNull(loadedPictureUri), latestPictureUri)
+
+        uriRepository.releasePersistablePermission(checkNotNull(loadedPictureUri))
+        uriRepository.takePersistablePermission(latestPictureUri)
     }
 
     private suspend fun saveDiaryToDatabase(): Boolean {
@@ -708,9 +711,10 @@ internal class DiaryEditViewModel @Inject constructor(
             return
         }
 
+        if (loadedPictureUri != null) uriRepository.releasePersistablePermission(loadedPictureUri)
         updateFragmentAction(
             DiaryEditFragmentAction
-                .NavigatePreviousFragmentOnDiaryDelete(loadedDate, loadedPictureUri)
+                .NavigatePreviousFragmentOnDiaryDelete(loadedDate)
         )
     }
 
@@ -876,17 +880,6 @@ internal class DiaryEditViewModel @Inject constructor(
 
     private fun deletePicturePath() {
         diaryStateFlow.picturePath.value = null
-    }
-
-    // MEMO:存在しないことを確認したいため下記メソッドを否定的処理とする
-    suspend fun checkSavedPicturePathDoesNotExist(uri: Uri): Boolean? {
-        try {
-            return !diaryRepository.existsPicturePath(uri)
-        } catch (e: Exception) {
-            Log.e(logTag, "端末写真URI使用状況確認_失敗", e)
-            addAppMessage(DiaryEditAppMessage.DiaryInfoLoadingFailure)
-            return null
-        }
     }
 
     // 表示保留中Dialog追加

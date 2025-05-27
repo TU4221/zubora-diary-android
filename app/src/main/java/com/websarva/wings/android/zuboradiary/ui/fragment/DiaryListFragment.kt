@@ -13,7 +13,6 @@ import com.websarva.wings.android.zuboradiary.R
 import com.websarva.wings.android.zuboradiary.ui.model.AppMessage
 import com.websarva.wings.android.zuboradiary.data.model.ThemeColor
 import com.websarva.wings.android.zuboradiary.databinding.FragmentDiaryListBinding
-import com.websarva.wings.android.zuboradiary.ui.permission.UriPermissionManager
 import com.websarva.wings.android.zuboradiary.ui.adapter.diary.DiaryDayListBaseItem
 import com.websarva.wings.android.zuboradiary.ui.adapter.diary.DiaryYearMonthListBaseAdapter.OnClickChildItemListener
 import com.websarva.wings.android.zuboradiary.ui.adapter.diary.DiaryYearMonthListBaseItem
@@ -46,26 +45,12 @@ class DiaryListFragment : BaseFragment() {
     @Suppress("unused", "RedundantSuppression")
     override val mainViewModel: DiaryListViewModel by activityViewModels()
 
-    // Uri関係
-    private lateinit var pictureUriPermissionManager: UriPermissionManager
-
     // RecyclerView関係
     // HACK:RecyclerViewのAdapterにセットするListを全て変更した時、
     //      変更前のListの内容で初期スクロール位置が定まらない不具合が発生。
     //      対策としてListを全て変更するタイミングでAdapterを新規でセットする。
     //      (親子関係でRecyclerViewを使用、又はListAdapterの機能による弊害？)
     private var shouldInitializeListAdapter = false
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-        pictureUriPermissionManager =
-            object : UriPermissionManager() {
-                override suspend fun checkUsedUriDoesNotExist(uri: Uri): Boolean? {
-                    return mainViewModel.checkSavedPicturePathDoesNotExist(uri)
-                }
-            }
-    }
 
     override fun initializeDataBinding(
         themeColorInflater: LayoutInflater, container: ViewGroup
@@ -141,10 +126,6 @@ class DiaryListFragment : BaseFragment() {
                     }
                     is DiaryListFragmentAction.NavigateDiaryDeleteDialog -> {
                         navigateDiaryDeleteDialog(value.date, value.uri)
-                    }
-                    is DiaryListFragmentAction.ReleasePersistablePermissionUri -> {
-                        pictureUriPermissionManager
-                            .releasePersistablePermission(requireContext(), value.uri)
                     }
                     FragmentAction.NavigatePreviousFragment -> {
                         navController.navigateUp()

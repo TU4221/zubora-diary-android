@@ -15,6 +15,7 @@ import com.websarva.wings.android.zuboradiary.data.preferences.AllPreferences
 import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColorPreference
 import com.websarva.wings.android.zuboradiary.data.repository.UserPreferencesRepository
 import com.websarva.wings.android.zuboradiary.data.preferences.WeatherInfoAcquisitionPreference
+import com.websarva.wings.android.zuboradiary.data.repository.UriRepository
 import com.websarva.wings.android.zuboradiary.data.repository.WorkerRepository
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import com.websarva.wings.android.zuboradiary.ui.model.SettingsAppMessage
@@ -41,7 +42,8 @@ internal class SettingsViewModel @Inject constructor(
     private val handle: SavedStateHandle,
     private val userPreferencesRepository: UserPreferencesRepository,
     private val workerRepository: WorkerRepository,
-    private val diaryRepository: DiaryRepository
+    private val diaryRepository: DiaryRepository,
+    private val uriRepository: UriRepository
 ) : BaseViewModel() {
 
     // HACK:SavedStateHandleを使用する理由
@@ -373,11 +375,9 @@ internal class SettingsViewModel @Inject constructor(
     fun onAllDiariesDeleteDialogPositiveButtonClicked() {
         viewModelScope.launch {
             val isSuccessful = deleteAllDiaries()
-            if (isSuccessful) {
-                _fragmentAction.emit(
-                    SettingsFragmentAction.ReleaseAllPersistablePermission
-                )
-            }
+            if (!isSuccessful) return@launch
+
+            uriRepository.releaseAllPersistablePermission()
         }
     }
 
@@ -390,11 +390,9 @@ internal class SettingsViewModel @Inject constructor(
     fun onAllDataDeleteDialogPositiveButtonClicked() {
         viewModelScope.launch {
             val isSuccessful = deleteAllData()
-            if (isSuccessful) {
-                _fragmentAction.emit(
-                    SettingsFragmentAction.ReleaseAllPersistablePermission
-                )
-            }
+            if (!isSuccessful) return@launch
+
+            uriRepository.releaseAllPersistablePermission()
         }
     }
 

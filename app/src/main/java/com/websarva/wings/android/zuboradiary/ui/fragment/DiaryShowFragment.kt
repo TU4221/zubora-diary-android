@@ -29,7 +29,6 @@ import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.DiaryLoadingFai
 import com.websarva.wings.android.zuboradiary.ui.model.action.DiaryShowFragmentAction
 import com.websarva.wings.android.zuboradiary.ui.model.action.FragmentAction
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.DiaryShowViewModel
-import com.websarva.wings.android.zuboradiary.ui.permission.UriPermissionManager
 import com.websarva.wings.android.zuboradiary.ui.utils.toJapaneseDateString
 import com.websarva.wings.android.zuboradiary.ui.utils.toJapaneseDateTimeWithSecondsString
 import dagger.hilt.android.AndroidEntryPoint
@@ -56,20 +55,6 @@ internal class DiaryShowFragment : BaseFragment() {
     //      この警告に対応するSuppressネームはなく、"unused"のみでは不要Suppressとなる為、"RedundantSuppression"も追記する。
     @Suppress("unused", "RedundantSuppression")
     override val mainViewModel: DiaryShowViewModel by viewModels()
-
-    // Uri関係
-    private lateinit var pictureUriPermissionManager: UriPermissionManager
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-        pictureUriPermissionManager =
-            object : UriPermissionManager() {
-                override suspend fun checkUsedUriDoesNotExist(uri: Uri): Boolean? {
-                    return mainViewModel.checkSavedPicturePathDoesNotExist(uri)
-                }
-            }
-    }
 
     override fun initializeDataBinding(
         themeColorInflater: LayoutInflater, container: ViewGroup
@@ -157,10 +142,6 @@ internal class DiaryShowFragment : BaseFragment() {
                         navigatePreviousFragment(value.date)
                     }
                     is DiaryShowFragmentAction.NavigatePreviousFragmentOnDiaryDelete -> {
-                        if (value.uri != null) {
-                            pictureUriPermissionManager
-                                .releasePersistablePermission(requireContext(), value.uri)
-                        }
                         navigatePreviousFragment(value.date)
                     }
                     else -> {

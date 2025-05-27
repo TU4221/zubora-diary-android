@@ -37,7 +37,6 @@ import com.websarva.wings.android.zuboradiary.ui.model.DiaryEditPendingDialog
 import com.websarva.wings.android.zuboradiary.ui.view.imageview.DiaryPictureConfigurator
 import com.websarva.wings.android.zuboradiary.ui.model.PendingDialog
 import com.websarva.wings.android.zuboradiary.ui.view.edittext.TextInputConfigurator
-import com.websarva.wings.android.zuboradiary.ui.permission.UriPermissionManager
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.DatePickerDialogFragment
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.DiaryDeleteDialogFragment
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.DiaryEditViewModel
@@ -87,9 +86,6 @@ class DiaryEditFragment : BaseFragment() {
     @Suppress("unused", "RedundantSuppression")
     override val mainViewModel: DiaryEditViewModel by activityViewModels()
 
-    // Uri関係
-    private lateinit var pictureUriPermissionManager: UriPermissionManager
-
     private val screenHeight: Int
         get() {
             val windowManager =
@@ -103,17 +99,6 @@ class DiaryEditFragment : BaseFragment() {
             }
             return screenHeight
         }
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-        pictureUriPermissionManager =
-            object : UriPermissionManager() {
-                override suspend fun checkUsedUriDoesNotExist(uri: Uri): Boolean? {
-                    return mainViewModel.checkSavedPicturePathDoesNotExist(uri)
-                }
-            }
-    }
 
     override fun initializeDataBinding(
         themeColorInflater: LayoutInflater, container: ViewGroup
@@ -328,8 +313,6 @@ class DiaryEditFragment : BaseFragment() {
                 val action = value.getContentIfNotHandled() ?: return@collect
                 when (action) {
                     is DiaryEditFragmentAction.NavigateDiaryShowFragment -> {
-                        pictureUriPermissionManager
-                            .handlePersistablePermission(requireContext(), action.uriPermissionAction)
                         navigateDiaryShowFragment(action.date)
                     }
                     is DiaryEditFragmentAction.NavigateDiaryItemTitleEditFragment -> {
@@ -363,10 +346,6 @@ class DiaryEditFragment : BaseFragment() {
                         navigatePreviousFragment(action.loadedDate)
                     }
                     is DiaryEditFragmentAction.NavigatePreviousFragmentOnDiaryDelete -> {
-                        if (action.uri != null) {
-                            pictureUriPermissionManager
-                                .releasePersistablePermission(requireContext(), action.uri)
-                        }
                         navigatePreviousFragmentOnDiaryDelete(action.loadedDate)
                     }
                     is DiaryEditFragmentAction.TransitionDiaryItemHidedState -> {

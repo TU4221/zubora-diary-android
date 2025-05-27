@@ -21,7 +21,6 @@ import com.websarva.wings.android.zuboradiary.R
 import com.websarva.wings.android.zuboradiary.ui.model.AppMessage
 import com.websarva.wings.android.zuboradiary.data.model.ThemeColor
 import com.websarva.wings.android.zuboradiary.databinding.FragmentSettingsBinding
-import com.websarva.wings.android.zuboradiary.ui.permission.UriPermissionManager
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.AllDataDeleteDialogFragment
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.AllDiariesDeleteDialogFragment
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.AllSettingsInitializationDialogFragment
@@ -56,9 +55,6 @@ class SettingsFragment : BaseFragment() {
     // ActivityResultLauncher関係
     private lateinit var requestPostNotificationsPermissionLauncher: ActivityResultLauncher<String>
     private lateinit var requestAccessLocationPermissionLauncher: ActivityResultLauncher<Array<String>>
-
-    // Uri関係
-    private lateinit var uriPermissionManager: UriPermissionManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -106,13 +102,6 @@ class SettingsFragment : BaseFragment() {
                     .onRequestAccessLocationPermissionRationaleResultReceived(
                         isGrantedAll && recheck
                     )
-            }
-
-        uriPermissionManager =
-            object : UriPermissionManager() {
-                override suspend fun checkUsedUriDoesNotExist(uri: Uri): Boolean {
-                    return false // MEMO:本フラグメントではUri権限を個別に解放しないため常時false
-                }
             }
     }
 
@@ -411,9 +400,6 @@ class SettingsFragment : BaseFragment() {
                     }
                     is SettingsFragmentAction.NavigateOpenSourceLicensesFragment -> {
                         navigateOpenSourceLicensesFragment()
-                    }
-                    is SettingsFragmentAction.ReleaseAllPersistablePermission -> {
-                        uriPermissionManager.releaseAllPersistablePermission(requireContext())
                     }
                     is SettingsFragmentAction.CheckPostNotificationsPermission -> {
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {

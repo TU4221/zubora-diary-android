@@ -13,5 +13,4 @@ internal sealed class DiaryListFragmentAction : FragmentAction() {
         val oldestYear: Year
     ) : DiaryListFragmentAction()
     data class NavigateDiaryDeleteDialog(val date: LocalDate, val uri: Uri?) : DiaryListFragmentAction()
-    data class ReleasePersistablePermissionUri(val uri: Uri) : DiaryListFragmentAction()
 }

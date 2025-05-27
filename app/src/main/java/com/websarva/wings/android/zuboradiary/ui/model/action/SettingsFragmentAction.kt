@@ -14,7 +14,6 @@ internal sealed class SettingsFragmentAction : FragmentAction() {
     data object NavigateAllSettingsInitializationDialog : SettingsFragmentAction()
     data object NavigateAllDataDeleteDialog : SettingsFragmentAction()
     data object NavigateOpenSourceLicensesFragment : SettingsFragmentAction()
-    data object ReleaseAllPersistablePermission : SettingsFragmentAction()
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     data object CheckPostNotificationsPermission : SettingsFragmentAction()
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)

@@ -1,12 +1,12 @@
 package com.websarva.wings.android.zuboradiary.ui.viewmodel
 
-import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.websarva.wings.android.zuboradiary.data.repository.DiaryRepository
 import com.websarva.wings.android.zuboradiary.data.model.ItemNumber
 import com.websarva.wings.android.zuboradiary.data.model.Weather
+import com.websarva.wings.android.zuboradiary.data.repository.UriRepository
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import com.websarva.wings.android.zuboradiary.ui.model.DiaryShowAppMessage
 import com.websarva.wings.android.zuboradiary.ui.model.DiaryShowPendingDialog
@@ -29,7 +29,8 @@ import javax.inject.Inject
 @HiltViewModel
 internal class DiaryShowViewModel @Inject constructor(
     handle: SavedStateHandle,
-    private val diaryRepository: DiaryRepository
+    private val diaryRepository: DiaryRepository,
+    private val uriRepository: UriRepository
 ) : BaseViewModel() {
 
     private val logTag = createLogTag()
@@ -202,22 +203,12 @@ internal class DiaryShowViewModel @Inject constructor(
             return
         }
 
+        if (picturePath != null) uriRepository.releasePersistablePermission(picturePath)
         _fragmentAction.emit(
             DiaryShowFragmentAction
-                .NavigatePreviousFragmentOnDiaryDelete(date, picturePath)
+                .NavigatePreviousFragmentOnDiaryDelete(date)
         )
         Log.i(logTag, "${logMsg}_完了")
-    }
-
-    // MEMO:存在しないことを確認したいため下記メソッドを否定的処理とする
-    suspend fun checkSavedPicturePathDoesNotExist(uri: Uri): Boolean? {
-        try {
-            return !diaryRepository.existsPicturePath(uri)
-        } catch (e: Exception) {
-            Log.e(logTag, "端末写真URI使用状況確認_失敗", e)
-            addAppMessage(DiaryShowAppMessage.DiaryLoadingFailure)
-            return null
-        }
     }
 
     // FragmentAction関係
