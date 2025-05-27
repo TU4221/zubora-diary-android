@@ -17,7 +17,6 @@ import android.widget.AdapterView
 import android.widget.AdapterView.OnItemClickListener
 import android.widget.ArrayAdapter
 import androidx.activity.OnBackPressedCallback
-import androidx.annotation.MainThread
 import androidx.appcompat.view.ContextThemeWrapper
 import androidx.constraintlayout.motion.widget.MotionLayout
 import androidx.core.content.res.ResourcesCompat
@@ -965,9 +964,6 @@ class DiaryEditFragment : BaseFragment() {
         }
     }
 
-
-
-    @MainThread
     private fun navigateDiaryShowFragment(date: LocalDate) {
         if (!canNavigateFragment) return
 
@@ -982,7 +978,6 @@ class DiaryEditFragment : BaseFragment() {
         navController.navigate(directions)
     }
 
-    @MainThread
     private fun navigateDiaryItemTitleEditFragment(
         inputItemNumber: ItemNumber,
         inputItemTitle: String
@@ -997,7 +992,6 @@ class DiaryEditFragment : BaseFragment() {
         navController.navigate(directions)
     }
 
-    @MainThread
     private fun navigateDiaryLoadingDialog(date: LocalDate) {
         if (!canNavigateFragment) {
             mainViewModel.addPendingDialogList(DiaryEditPendingDialog.DiaryLoading(date))
@@ -1009,7 +1003,6 @@ class DiaryEditFragment : BaseFragment() {
         navController.navigate(directions)
     }
 
-    @MainThread
     private fun navigateDiaryLoadingFailureDialog(date: LocalDate) {
         if (!canNavigateFragment) {
             mainViewModel.addPendingDialogList(DiaryEditPendingDialog.DiaryLoadingFailure(date))
@@ -1021,7 +1014,6 @@ class DiaryEditFragment : BaseFragment() {
         navController.navigate(directions)
     }
 
-    @MainThread
     private fun navigateDiaryUpdateDialog(date: LocalDate) {
         if (!canNavigateFragment) return
 
@@ -1030,7 +1022,6 @@ class DiaryEditFragment : BaseFragment() {
         navController.navigate(directions)
     }
 
-    @MainThread
     private fun navigateDiaryDeleteDialog(date: LocalDate) {
         if (!canNavigateFragment) return
 
@@ -1039,7 +1030,6 @@ class DiaryEditFragment : BaseFragment() {
         navController.navigate(directions)
     }
 
-    @MainThread
     private fun navigateDatePickerDialog(date: LocalDate) {
         if (!canNavigateFragment) return
 
@@ -1048,7 +1038,6 @@ class DiaryEditFragment : BaseFragment() {
         navController.navigate(directions)
     }
 
-    @MainThread
     private fun navigateWeatherInfoFetchingDialog(date: LocalDate) {
         if (!canNavigateFragment) {
             mainViewModel.addPendingDialogList(DiaryEditPendingDialog.WeatherInfoFetching(date))
@@ -1060,7 +1049,6 @@ class DiaryEditFragment : BaseFragment() {
         navController.navigate(directions)
     }
 
-    @MainThread
     private fun navigateDiaryItemDeleteDialog(itemNumber: ItemNumber) {
         if (!canNavigateFragment) return
 
@@ -1069,7 +1057,6 @@ class DiaryEditFragment : BaseFragment() {
         navController.navigate(directions)
     }
 
-    @MainThread
     private fun navigateDiaryPictureDeleteDialog() {
         if (!canNavigateFragment) return
 
@@ -1078,14 +1065,12 @@ class DiaryEditFragment : BaseFragment() {
         navController.navigate(directions)
     }
 
-    @MainThread
     override fun navigateAppMessageDialog(appMessage: AppMessage) {
         val action: NavDirections =
             DiaryEditFragmentDirections.actionDiaryEditFragmentToAppMessageDialog(appMessage)
         navController.navigate(action)
     }
 
-    @MainThread
     private fun navigatePreviousFragment(editedDiaryDate: LocalDate?) {
         val navBackStackEntry = checkNotNull(navController.previousBackStackEntry)
         val destinationId = navBackStackEntry.destination.id
@@ -1096,7 +1081,6 @@ class DiaryEditFragment : BaseFragment() {
         navController.navigateUp()
     }
 
-    @MainThread
     private fun navigatePreviousFragmentOnDiaryDelete(editedDiaryDate: LocalDate?) {
         val navBackStackEntry = checkNotNull(navController.previousBackStackEntry)
         val destinationId = navBackStackEntry.destination.id

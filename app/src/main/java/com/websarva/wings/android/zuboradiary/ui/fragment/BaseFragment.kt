@@ -7,7 +7,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.OnBackPressedCallback
-import androidx.annotation.MainThread
 import androidx.databinding.ViewDataBinding
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
@@ -329,7 +328,6 @@ abstract class BaseFragment : LoggingFragment() {
         protected abstract fun checkAppMessageTargetType(appMessage: AppMessage): Boolean
     }
 
-    @MainThread
     private fun showAppMessageDialog(appMessage: AppMessage): Boolean {
         if (!canNavigateFragment) return false
 
@@ -340,7 +338,6 @@ abstract class BaseFragment : LoggingFragment() {
     /**
      * BaseFragment#showAppMessageDialog()で呼び出される。
      */
-    @MainThread
     internal abstract fun navigateAppMessageDialog(appMessage: AppMessage)
 
     internal open fun retryAppMessageDialogShow() {

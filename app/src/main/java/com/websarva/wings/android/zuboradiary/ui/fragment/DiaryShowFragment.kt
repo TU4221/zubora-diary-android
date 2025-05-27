@@ -12,7 +12,6 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.activity.OnBackPressedCallback
-import androidx.annotation.MainThread
 import androidx.databinding.ViewDataBinding
 import androidx.fragment.app.viewModels
 import com.websarva.wings.android.zuboradiary.R
@@ -359,7 +358,6 @@ internal class DiaryShowFragment : BaseFragment() {
         }
     }
 
-    @MainThread
     private fun navigateDiaryEditFragment(date: LocalDate) {
         if (!canNavigateFragment) return
 
@@ -372,7 +370,6 @@ internal class DiaryShowFragment : BaseFragment() {
         navController.navigate(directions)
     }
 
-    @MainThread
     private fun navigateDiaryLoadingFailureDialog(date: LocalDate) {
         if (!canNavigateFragment) {
             mainViewModel.addPendingDialogList(DiaryShowPendingDialog.DiaryLoadingFailure(date))
@@ -384,7 +381,6 @@ internal class DiaryShowFragment : BaseFragment() {
         navController.navigate(directions)
     }
 
-    @MainThread
     private fun navigateDiaryDeleteDialog(date: LocalDate) {
         if (!canNavigateFragment) return
 
@@ -393,14 +389,12 @@ internal class DiaryShowFragment : BaseFragment() {
         navController.navigate(directions)
     }
 
-    @MainThread
     override fun navigateAppMessageDialog(appMessage: AppMessage) {
         val directions =
             DiaryShowFragmentDirections.actionDiaryShowFragmentToAppMessageDialog(appMessage)
         navController.navigate(directions)
     }
 
-    @MainThread
     private fun navigatePreviousFragment(date: LocalDate) {
         val navBackStackEntry = checkNotNull(navController.previousBackStackEntry)
         val destinationId = navBackStackEntry.destination.id

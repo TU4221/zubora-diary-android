@@ -7,7 +7,6 @@ import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.annotation.MainThread
 import androidx.databinding.ViewDataBinding
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
@@ -228,7 +227,6 @@ class DiaryItemTitleEditFragment : BaseFragment() {
         navigateDiaryEditFragment()
     }
 
-    @MainThread
     private fun navigateDiaryEditFragment() {
         if (!canNavigateFragment) return
 
@@ -237,7 +235,6 @@ class DiaryItemTitleEditFragment : BaseFragment() {
         navController.navigate(directions)
     }
 
-    @MainThread
     private fun navigateDiaryItemTitleDeleteDialog(listItemPosition: Int, listItemTitle: String) {
         require(listItemPosition >= 0)
         if (!canNavigateFragment) return
@@ -250,7 +247,6 @@ class DiaryItemTitleEditFragment : BaseFragment() {
         navController.navigate(directions)
     }
 
-    @MainThread
     override fun navigateAppMessageDialog(appMessage: AppMessage) {
         val directions =
             DiaryItemTitleEditFragmentDirections.actionDiaryItemTitleEditFragmentToAppMessageDialog(
