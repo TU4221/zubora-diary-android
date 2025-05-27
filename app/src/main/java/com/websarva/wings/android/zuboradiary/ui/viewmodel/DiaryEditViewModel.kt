@@ -656,21 +656,14 @@ internal class DiaryEditViewModel @Inject constructor(
         val latestPictureUri = picturePath.value
         val loadedPictureUri = loadedPicturePath
 
-        if (latestPictureUri == null && loadedPictureUri == null) {
-            return
+        if (latestPictureUri == loadedPictureUri) return
+
+        if (loadedPictureUri != null) {
+            uriRepository.releasePersistablePermission(loadedPictureUri)
         }
-        if (latestPictureUri != null && loadedPictureUri == null) {
+        if (latestPictureUri != null) {
             return uriRepository.takePersistablePermission(latestPictureUri)
         }
-        if (latestPictureUri == null) {
-            return uriRepository.releasePersistablePermission(checkNotNull(loadedPictureUri))
-        }
-        if (latestPictureUri == loadedPictureUri) {
-            return
-        }
-
-        uriRepository.releasePersistablePermission(checkNotNull(loadedPictureUri))
-        uriRepository.takePersistablePermission(latestPictureUri)
     }
 
     private suspend fun saveDiaryToDatabase(): Boolean {
