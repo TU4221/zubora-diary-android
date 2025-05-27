@@ -389,7 +389,7 @@ internal class DiaryShowFragment : BaseFragment() {
         navController.navigate(directions)
     }
 
-    override fun navigateAppMessageDialog(appMessage: AppMessage) {
+    override fun onNavigateAppMessageDialog(appMessage: AppMessage) {
         val directions =
             DiaryShowFragmentDirections.actionDiaryShowFragmentToAppMessageDialog(appMessage)
         navController.navigate(directions)

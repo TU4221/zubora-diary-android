@@ -634,7 +634,7 @@ class CalendarFragment : BaseFragment() {
         navController.navigate(directions)
     }
 
-    override fun navigateAppMessageDialog(appMessage: AppMessage) {
+    override fun onNavigateAppMessageDialog(appMessage: AppMessage) {
         val directions =
             CalendarFragmentDirections.actionCalendarFragmentToAppMessageDialog(appMessage)
         navController.navigate(directions)

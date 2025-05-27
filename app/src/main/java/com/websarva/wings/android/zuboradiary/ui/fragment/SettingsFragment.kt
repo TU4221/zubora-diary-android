@@ -525,7 +525,7 @@ class SettingsFragment : BaseFragment() {
         navController.navigate(directions)
     }
 
-    override fun navigateAppMessageDialog(appMessage: AppMessage) {
+    override fun onNavigateAppMessageDialog(appMessage: AppMessage) {
         val directions =
             SettingsFragmentDirections.actionSettingsFragmentToAppMessageDialog(appMessage)
         navController.navigate(directions)

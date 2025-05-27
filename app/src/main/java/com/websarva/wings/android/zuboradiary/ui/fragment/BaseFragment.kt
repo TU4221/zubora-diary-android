@@ -320,7 +320,7 @@ abstract class BaseFragment : LoggingFragment() {
             val firstAppMessage = checkNotNull(value.findFirstItem())
             if (!checkAppMessageTargetType(firstAppMessage)) throw IllegalStateException()
             withContext(Dispatchers.Main) {
-                val isSuccessful = showAppMessageDialog(firstAppMessage)
+                val isSuccessful = navigateAppMessageDialog(firstAppMessage)
                 if (isSuccessful) baseViewModel.removeAppMessageBufferListFirstItem()
             }
         }
@@ -328,17 +328,17 @@ abstract class BaseFragment : LoggingFragment() {
         protected abstract fun checkAppMessageTargetType(appMessage: AppMessage): Boolean
     }
 
-    private fun showAppMessageDialog(appMessage: AppMessage): Boolean {
+    private fun navigateAppMessageDialog(appMessage: AppMessage): Boolean {
         if (!canNavigateFragment) return false
 
-        navigateAppMessageDialog(appMessage)
+        onNavigateAppMessageDialog(appMessage)
         return true
     }
 
     /**
      * BaseFragment#showAppMessageDialog()で呼び出される。
      */
-    internal abstract fun navigateAppMessageDialog(appMessage: AppMessage)
+    internal abstract fun onNavigateAppMessageDialog(appMessage: AppMessage)
 
     internal open fun retryAppMessageDialogShow() {
         retryMainAppMessageDialogShow()

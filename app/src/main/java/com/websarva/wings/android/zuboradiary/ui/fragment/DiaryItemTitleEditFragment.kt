@@ -247,7 +247,7 @@ class DiaryItemTitleEditFragment : BaseFragment() {
         navController.navigate(directions)
     }
 
-    override fun navigateAppMessageDialog(appMessage: AppMessage) {
+    override fun onNavigateAppMessageDialog(appMessage: AppMessage) {
         val directions =
             DiaryItemTitleEditFragmentDirections.actionDiaryItemTitleEditFragmentToAppMessageDialog(
                 appMessage

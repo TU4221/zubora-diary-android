@@ -228,7 +228,7 @@ class WordSearchFragment : BaseFragment() {
         navController.navigate(directions)
     }
 
-    override fun navigateAppMessageDialog(appMessage: AppMessage) {
+    override fun onNavigateAppMessageDialog(appMessage: AppMessage) {
         val directions =
             WordSearchFragmentDirections.actionWordSearchFragmentToAppMessageDialog(appMessage)
         navController.navigate(directions)

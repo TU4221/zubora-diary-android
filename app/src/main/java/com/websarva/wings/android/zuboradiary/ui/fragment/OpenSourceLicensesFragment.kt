@@ -94,7 +94,7 @@ class OpenSourceLicensesFragment: BaseFragment() {
         // 処理なし
     }
 
-    override fun navigateAppMessageDialog(appMessage: AppMessage) {
+    override fun onNavigateAppMessageDialog(appMessage: AppMessage) {
         // 処理なし
     }
 
