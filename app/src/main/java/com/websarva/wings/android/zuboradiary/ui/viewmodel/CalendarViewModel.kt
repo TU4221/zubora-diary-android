@@ -9,7 +9,6 @@ import com.websarva.wings.android.zuboradiary.ui.model.action.CalendarFragmentAc
 import com.websarva.wings.android.zuboradiary.ui.model.action.FragmentAction
 import com.websarva.wings.android.zuboradiary.ui.model.state.CalendarState
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -57,13 +56,13 @@ internal class CalendarViewModel @Inject constructor(
     }
 
     fun onDiaryEditButtonClicked() {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             navigateDiaryEditFragment()
         }
     }
 
     fun onNavigationItemReselected() {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             // MEMO:StateFlowに現在値と同じ値を代入してもCollectメソッドに登録した処理が起動しないため、
             //      下記条件でカレンダースクロールのみ処理。
             val selectedDate = _selectedDate.value
@@ -80,20 +79,16 @@ internal class CalendarViewModel @Inject constructor(
 
     // 他Fragmentからの受取処理
     fun onDataReceivedFromDiaryShowFragment(date: LocalDate) {
-        viewModelScope.launch(Dispatchers.IO) {
-            updateSelectedDate(date)
-        }
+        updateSelectedDate(date)
     }
 
     fun onDataReceivedFromDiaryEditFragment(date: LocalDate) {
-        viewModelScope.launch(Dispatchers.IO) {
-            updateSelectedDate(date)
-        }
+        updateSelectedDate(date)
     }
 
     // StateFlow値変更時処理
     fun onChangedSelectedDate() {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             prepareDiary()
         }
     }

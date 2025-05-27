@@ -338,7 +338,7 @@ class CalendarFragment : BaseFragment() {
         private fun setUpCalendarDayDotVisibility(calendarDay: CalendarDay, viewCalendarDayDot: View) {
             val localDate = calendarDay.date
 
-            lifecycleScope.launch(Dispatchers.IO) {
+            lifecycleScope.launch {
                 val exists = mainViewModel.existsSavedDiary(localDate)
                 withContext(Dispatchers.Main) {
                     if (exists == true) {
