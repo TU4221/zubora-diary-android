@@ -5,9 +5,8 @@ import com.websarva.wings.android.zuboradiary.data.database.DiaryDAO
 import com.websarva.wings.android.zuboradiary.data.uri.UriPermissionDataSource
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import javax.inject.Inject
 
-internal class UriRepository @Inject constructor(
+internal class UriRepository (
     private val dataSource: UriPermissionDataSource,
     private val diaryDao: DiaryDAO
 ) {
