@@ -406,7 +406,10 @@ internal class DiaryEditViewModel @Inject constructor(
         viewModelScope.launch {
             _diaryEditState.value = DiaryEditState.WeatherFetching
             val date = date.requireValue()
-            if (!shouldLoadWeatherInfo(date)) return@launch
+            if (!shouldLoadWeatherInfo(date)) {
+                _diaryEditState.value = DiaryEditState.Idle
+                return@launch
+            }
 
             loadWeatherInfo(date)
         }
