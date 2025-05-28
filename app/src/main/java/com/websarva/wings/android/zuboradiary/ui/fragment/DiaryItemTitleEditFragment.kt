@@ -17,6 +17,7 @@ import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.DiaryItemTitleD
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.DiaryItemTitleEditViewModel
 import com.websarva.wings.android.zuboradiary.ui.adapter.diaryitemtitle.ItemTitleSelectionHistoryListAdapter
 import com.websarva.wings.android.zuboradiary.ui.adapter.diaryitemtitle.SelectionHistoryList
+import com.websarva.wings.android.zuboradiary.ui.model.result.ItemTitleEditResult
 import com.websarva.wings.android.zuboradiary.ui.view.edittext.TextInputConfigurator
 import com.websarva.wings.android.zuboradiary.ui.utils.requireValue
 import dagger.hilt.android.AndroidEntryPoint
@@ -28,8 +29,7 @@ class DiaryItemTitleEditFragment : BaseFragment() {
 
     internal companion object {
         private val fromClassName = "From" + DiaryItemTitleEditFragment::class.java.name
-        val KEY_UPDATE_ITEM_NUMBER: String = "UpdateItemNumber$fromClassName"
-        val KEY_NEW_ITEM_TITLE: String = "NewItemTitle$fromClassName"
+        val KEY_RESULT: String = "Result$fromClassName"
     }
 
     // View関係
@@ -221,8 +221,11 @@ class DiaryItemTitleEditFragment : BaseFragment() {
 
         val navBackStackEntry = checkNotNull(navController.previousBackStackEntry)
         val savedStateHandle = navBackStackEntry.savedStateHandle
-        savedStateHandle[KEY_UPDATE_ITEM_NUMBER] = targetItemNumber
-        savedStateHandle[KEY_NEW_ITEM_TITLE] = newItemTitle
+        savedStateHandle[KEY_RESULT] =
+            ItemTitleEditResult(
+                targetItemNumber,
+                newItemTitle
+            )
 
         navigateDiaryEditFragment()
     }

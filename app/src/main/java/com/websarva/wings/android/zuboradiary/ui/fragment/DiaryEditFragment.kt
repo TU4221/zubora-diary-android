@@ -51,6 +51,7 @@ import com.websarva.wings.android.zuboradiary.ui.model.adapter.WeatherAdapterLis
 import com.websarva.wings.android.zuboradiary.ui.model.action.DiaryEditFragmentAction
 import com.websarva.wings.android.zuboradiary.ui.model.action.FragmentAction
 import com.websarva.wings.android.zuboradiary.ui.model.adapter.ConditionAdapterList
+import com.websarva.wings.android.zuboradiary.ui.model.result.ItemTitleEditResult
 import com.websarva.wings.android.zuboradiary.ui.utils.isAccessLocationGranted
 import com.websarva.wings.android.zuboradiary.ui.utils.toJapaneseDateString
 import dagger.hilt.android.AndroidEntryPoint
@@ -131,27 +132,20 @@ class DiaryEditFragment : BaseFragment() {
 
     override fun handleOnReceivingResultFromPreviousFragment() {
         // DiaryItemTitleEditFragmentから編集結果受取
-
-        val newItemTitle =
-            receiveResulFromPreviousFragment<String>(DiaryItemTitleEditFragment.KEY_NEW_ITEM_TITLE)
+        val itemTitleEditResult =
+            receiveResulFromPreviousFragment<ItemTitleEditResult>(
+                DiaryItemTitleEditFragment.KEY_RESULT
+            )
 
         launchAndRepeatOnViewLifeCycleStarted {
-            newItemTitle.collectLatest { value: String? ->
+            itemTitleEditResult.collectLatest { value: ItemTitleEditResult? ->
                 // MEMO:結果がない場合もあるので"return"で返す。
                 if (value == null) return@collectLatest
 
-                // TODO:newItemTitleとitemNumberをひとつにしたデータクラスを用意する
-                val itemNumber =
-                    checkNotNull(
-                        receiveResulFromPreviousFragment<ItemNumber>(
-                            DiaryItemTitleEditFragment.KEY_UPDATE_ITEM_NUMBER
-                        ).value
-                    )
-
-                mainViewModel.onDataReceivedFromItemTitleEditFragment(itemNumber, value)
+                mainViewModel.onDataReceivedFromItemTitleEditFragment(value.itemNumber, value.title)
 
                 val focusTargetView =
-                    when (itemNumber.value) {
+                    when (value.itemNumber.value) {
                         1 -> binding.includeItem1.textInputEditTextTitle
                         2 -> binding.includeItem2.textInputEditTextTitle
                         3 -> binding.includeItem3.textInputEditTextTitle
@@ -159,10 +153,9 @@ class DiaryEditFragment : BaseFragment() {
                         5 -> binding.includeItem5.textInputEditTextTitle
                         else -> throw IllegalStateException()
                     }
-               focusTargetView.requestFocus()
+                focusTargetView.requestFocus()
 
-                removeResulFromFragment(DiaryItemTitleEditFragment.KEY_NEW_ITEM_TITLE)
-                removeResulFromFragment(DiaryItemTitleEditFragment.KEY_UPDATE_ITEM_NUMBER)
+                removeResulFromFragment(DiaryItemTitleEditFragment.KEY_RESULT)
             }
         }
     }
