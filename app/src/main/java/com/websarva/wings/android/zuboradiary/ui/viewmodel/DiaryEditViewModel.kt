@@ -371,7 +371,10 @@ internal class DiaryEditViewModel @Inject constructor(
 
     fun onItemAdditionButtonClicked() {
         _diaryEditState.value = DiaryEditState.ItemAdding
-        incrementVisibleItemsCount()
+        viewModelScope.launch {
+            updateFragmentAction(DiaryEditFragmentAction.ItemAddition)
+            incrementVisibleItemsCount()
+        }
     }
 
     fun onItemDeleteButtonClicked(itemNumber: ItemNumber) {

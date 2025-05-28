@@ -276,7 +276,8 @@
                             android:layout_marginTop="@dimen/fragment_diary_edit_margin_top"
                             android:contentDescription="@string/fragment_diary_edit_item_addition"
                             android:src="@{diaryEditViewModel.isItemAdditionButtonClickable() ? @drawable/ic_add_circle_24px : @drawable/ic_add_circle_disabled_24px}"
-                            android:clickable="@{diaryEditViewModel.isItemAdditionButtonClickable()}" />
+                            android:clickable="@{diaryEditViewModel.isItemAdditionButtonClickable()}"
+                            android:onClick="@{() -> diaryEditViewModel.onItemAdditionButtonClicked()}"/>
 
                         <LinearLayout
                             android:layout_width="match_parent"

@@ -353,6 +353,9 @@ class DiaryEditFragment : BaseFragment() {
                     is DiaryEditFragmentAction.CheckAccessLocationPermission -> {
                         checkAccessLocationPermission(action.date)
                     }
+                    is DiaryEditFragmentAction.ItemAddition -> {
+                        shouldTransitionItemMotionLayout = true
+                    }
                     else -> {
                         throw IllegalArgumentException()
                     }
@@ -621,12 +624,6 @@ class DiaryEditFragment : BaseFragment() {
             textInputEditTextItemsTitle[itemArrayNumber].setOnClickListener {
                 mainViewModel.onItemTitleInputFieldClicked(inputItemNumber)
             }
-        }
-
-        // 項目追加ボタン設定
-        binding.imageButtonItemAddition.setOnClickListener {
-            shouldTransitionItemMotionLayout = true
-            mainViewModel.onItemAdditionButtonClicked()
         }
 
         // 項目削除ボタン設定

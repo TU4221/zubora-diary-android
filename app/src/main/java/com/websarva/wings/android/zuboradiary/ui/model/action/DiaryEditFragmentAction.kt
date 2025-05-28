@@ -21,4 +21,5 @@ internal sealed class DiaryEditFragmentAction : FragmentAction() {
     data class NavigatePreviousFragmentOnDiaryDelete(val loadedDate: LocalDate?) : DiaryEditFragmentAction()
     data class TransitionDiaryItemHidedState(val itemNumber: ItemNumber) : DiaryEditFragmentAction()
     data class CheckAccessLocationPermission(val date: LocalDate) : DiaryEditFragmentAction()
+    data object ItemAddition : DiaryEditFragmentAction()
 }
