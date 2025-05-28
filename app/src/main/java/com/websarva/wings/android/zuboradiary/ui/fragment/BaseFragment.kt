@@ -209,7 +209,7 @@ abstract class BaseFragment : LoggingFragment() {
     }
 
     internal fun removeResulFromFragment(key: String) {
-        navBackStackEntry.savedStateHandle.remove<Any>(key)
+        navBackStackEntry.savedStateHandle[key] = null
     }
 
     private fun setUpDialogResultReceiver() {
