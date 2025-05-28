@@ -19,7 +19,6 @@ import android.widget.ArrayAdapter
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.view.ContextThemeWrapper
 import androidx.constraintlayout.motion.widget.MotionLayout
-import androidx.core.content.res.ResourcesCompat
 import androidx.databinding.ViewDataBinding
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.NavController
@@ -652,27 +651,6 @@ class DiaryEditFragment : BaseFragment() {
                     NumVisibleItemsObserver().onChanged(value)
                 }
         }
-
-        // HACK:ViewModel-Layout間のDataBindingで設定する予定だったが、
-        //      三項演算子を使用してのalphaのリソース値が取得できなかった為、下記コードで対応。
-        launchAndRepeatOnViewLifeCycleStarted {
-            mainViewModel.isItemAdditionButtonClickable
-                .collectLatest { value: Boolean ->
-                    val alphaResId =
-                        if (value) {
-                            R.dimen.view_enabled_alpha
-                        } else {
-                            R.dimen.view_disabled_alpha
-                        }
-                    val alphaValue = ResourcesCompat.getFloat(resources, alphaResId)
-                    binding.imageButtonItemAddition.apply {
-                        // HACK:Fragment(View)表示タイミングでalphaが反映されない時がある為、post()で対策。
-                        post {
-                            alpha = alphaValue
-                        }
-                    }
-                }
-        }
     }
 
     private inner class ItemMotionLayoutListener(
@@ -857,27 +835,6 @@ class DiaryEditFragment : BaseFragment() {
         binding.imageAttachedPicture.setOnClickListener {
             mainViewModel.onAttachedPictureClicked()
             mainActivity.loadPicturePath()
-        }
-
-        // HACK:ViewModel-Layout間のDataBindingで設定する予定だったが、
-        //      三項演算子を使用してのalphaのリソース値が取得できなかった為、下記コードで対応。
-        launchAndRepeatOnViewLifeCycleStarted {
-            mainViewModel.isPicturePathDeleteButtonClickable
-                .collectLatest {value: Boolean ->
-                    val alphaResId =
-                        if (value) {
-                            R.dimen.view_enabled_alpha
-                        } else {
-                            R.dimen.view_disabled_alpha
-                        }
-                    val alphaValue = ResourcesCompat.getFloat(resources, alphaResId)
-                    binding.imageButtonAttachedPictureDelete.apply {
-                        // HACK:Fragment(View)表示タイミングでalphaが反映されない時がある為、post()で対策。
-                        post {
-                            alpha = alphaValue
-                        }
-                    }
-                }
         }
     }
 

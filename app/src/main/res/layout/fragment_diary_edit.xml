@@ -260,6 +260,13 @@
                             app:titleMutableStateFlow="@{diaryEditViewModel.item5TitleMutable}"
                             tools:ignore="DuplicateIncludedIds" />
 
+                        <!--
+                            HACK:"android:src"のdrawableファイルを三項演算子で切り換えている理由
+                                 "android:alpha"の値を三項演算子(or FlowCollect)で切り換えようとしていたが、
+                                 高速で条件が切り替わった時に処理されず切替前の状態のまま表示されることがある為、
+                                 "android:src"でdrawable毎切り換えるように対応した。
+                            補足：三項演算子を使用してのalphaのリソース値は取得できなかった。
+                        -->
                         <ImageButton
                             android:id="@+id/image_button_item_addition"
                             style="@style/AppImageButtonStyle"
@@ -268,7 +275,7 @@
                             android:layout_gravity="end"
                             android:layout_marginTop="@dimen/fragment_diary_edit_margin_top"
                             android:contentDescription="@string/fragment_diary_edit_item_addition"
-                            android:src="@drawable/ic_add_circle_24px"
+                            android:src="@{diaryEditViewModel.isItemAdditionButtonClickable() ? @drawable/ic_add_circle_24px : @drawable/ic_add_circle_disabled_24px}"
                             android:clickable="@{diaryEditViewModel.isItemAdditionButtonClickable()}" />
 
                         <LinearLayout
@@ -287,6 +294,15 @@
                                 android:textAppearance="@style/AppTextViewTextAppearance"
                                 android:textSize="@dimen/fragment_diary_edit_text_size" />
 
+                            <!--
+                                HACK:"android:src"のdrawableファイルを三項演算子で切り換えている理由
+                                     "android:alpha"の値を三項演算子(or FlowCollect)で切り換えようとしていたが、
+                                     高速で条件が切り替わった時に処理されず切替前の状態のまま表示されることがある為、
+                                     "android:src"でdrawable毎切り換えるように対応した。
+                                     Fragment表示から表示日記データの読込が完了したタイミングで、
+                                     false->trueに高速で切り替わる。
+                                補足：三項演算子を使用してのalphaのリソース値は取得できなかった。
+                            -->
                             <ImageButton
                                 android:id="@+id/image_button_attached_picture_delete"
                                 style="@style/AppImageButtonStyle"
@@ -294,7 +310,7 @@
                                 android:layout_height="@dimen/fragment_diary_edit_delete_button_layout_height"
                                 android:layout_gravity="center_vertical"
                                 android:contentDescription="@string/fragment_diary_edit_attached_picture_delete"
-                                android:src="@drawable/ic_delete_forever_24px"
+                                android:src="@{diaryEditViewModel.isPicturePathDeleteButtonClickable() ? @drawable/ic_delete_forever_24px : @drawable/ic_delete_forever_disabled_24px}"
                                 android:clickable="@{diaryEditViewModel.isPicturePathDeleteButtonClickable()}"
                                 android:onClick="@{() -> diaryEditViewModel.onAttachedPictureDeleteButtonClicked()}"/>
 
