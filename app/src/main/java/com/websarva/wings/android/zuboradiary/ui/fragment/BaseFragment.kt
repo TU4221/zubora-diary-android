@@ -184,9 +184,8 @@ abstract class BaseFragment : LoggingFragment() {
         destinationId = currentDestinationId
 
         initializeFragmentResultReceiver()
-        setUpDialogResultReceiver()
         setUpAppMessageDialog()
-        setUpPendingDialogObserver()
+        setUpPendingDialog()
         setUpNavBackStackEntryLifecycleObserverDispose()
     }
 
@@ -216,8 +215,12 @@ abstract class BaseFragment : LoggingFragment() {
         }
     }
 
-    private fun setUpDialogResultReceiver() {
+    private fun addNavBackStackEntryLifecycleObserver(observer: LifecycleEventObserver) {
+        navBackStackEntry.lifecycle.addObserver(observer)
+        addedLifecycleEventObserverList.add(observer)
+    }
 
+    internal open fun setUpAppMessageDialog() {
         val lifecycleEventObserver =
             LifecycleEventObserver { _, event: Lifecycle.Event ->
                 // MEMO:Dialog表示中:Lifecycle.Event.ON_PAUSE
@@ -227,22 +230,15 @@ abstract class BaseFragment : LoggingFragment() {
                     retryAppMessageDialogShow()
                 }
             }
-
         addNavBackStackEntryLifecycleObserver(lifecycleEventObserver)
-    }
 
-    private fun addNavBackStackEntryLifecycleObserver(observer: LifecycleEventObserver) {
-        navBackStackEntry.lifecycle.addObserver(observer)
-        addedLifecycleEventObserverList.add(observer)
-    }
-
-    internal open fun setUpAppMessageDialog() {
         setUpMainAppMessageDialog()
         setUpSettingsAppMessageDialog()
     }
 
     private fun setUpMainAppMessageDialog() {
         mainViewModel ?: return
+
         launchAndRepeatOnViewLifeCycleStarted {
             mainViewModel!!.appMessageBufferList
                 .collectLatest { value: AppMessageList ->
@@ -339,7 +335,7 @@ abstract class BaseFragment : LoggingFragment() {
         fun navigatePendingDialog(pendingDialog: PendingDialog):Boolean
     }
 
-    private fun setUpPendingDialogObserver() {
+    private fun setUpPendingDialog() {
         mainViewModel ?: return
 
         addNavBackStackEntryLifecycleObserver { _, event: Lifecycle.Event ->
