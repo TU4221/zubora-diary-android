@@ -33,6 +33,7 @@ import com.websarva.wings.android.zuboradiary.ui.model.DiaryEditPendingDialog
 import com.websarva.wings.android.zuboradiary.ui.model.DiaryShowPendingDialog
 import com.websarva.wings.android.zuboradiary.ui.model.PendingDialog
 import com.websarva.wings.android.zuboradiary.ui.model.PendingDialogList
+import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.BaseViewModel
 import com.websarva.wings.android.zuboradiary.ui.theme.ThemeColorInflaterCreator
 import com.websarva.wings.android.zuboradiary.ui.utils.requireValue
@@ -183,11 +184,30 @@ abstract class BaseFragment : LoggingFragment() {
         navBackStackEntry = checkNotNull(navController.currentBackStackEntry)
         destinationId = currentDestinationId
 
+        initializeFragmentResultReceiver()
         setUpPreviousFragmentResultReceiver()
         setUpDialogResultReceiver()
         setUpAppMessageDialog()
         setUpPendingDialogObserver()
         setUpNavBackStackEntryLifecycleObserverDispose()
+    }
+
+    /**
+     *  setUpFragmentResultReceiver()、setUpDialogResultReceiver()を使用してフラグメント、ダイアログからの結果の処理内容を設定する
+     * */
+    internal abstract fun initializeFragmentResultReceiver()
+
+    internal fun <T> setUpDialogResultReceiver(key: String, block: (DialogResult<T>) -> Unit) {
+        val savedStateHandle = navBackStackEntry.savedStateHandle
+        val result = savedStateHandle.getStateFlow(key, null)
+        launchAndRepeatOnViewLifeCycleStarted {
+            result.collectLatest { value: DialogResult<T>? ->
+                if (value == null) return@collectLatest
+                block(value)
+
+                savedStateHandle[key] = null
+            }
+        }
     }
 
     // MEMO:Fragment、DialogFragmentからの結果受け取り方法
@@ -220,11 +240,6 @@ abstract class BaseFragment : LoggingFragment() {
                 //      Dialog非表示中:Lifecycle.Event.ON_RESUME
                 if (event == Lifecycle.Event.ON_RESUME) {
                     Log.d(logTag, "Lifecycle.Event.ON_RESUME")
-                    receiveDialogResults()
-                    // MEMO:Results残留防止。"ON_RESUME"で呼び出される為、
-                    //      削除しないと端末ホーム画面からのアプリ再表示時に受取メソッドが処理される。
-                    removeDialogResults()
-
                     retryAppMessageDialogShow()
                 }
             }
@@ -235,23 +250,6 @@ abstract class BaseFragment : LoggingFragment() {
     private fun addNavBackStackEntryLifecycleObserver(observer: LifecycleEventObserver) {
         navBackStackEntry.lifecycle.addObserver(observer)
         addedLifecycleEventObserverList.add(observer)
-    }
-
-    /**
-     * BaseFragment#setUpDialogResultReceiver()で呼び出される。
-     */
-    internal abstract fun receiveDialogResults()
-
-    /**
-     * BaseFragment#setUpDialogResultReceiver()で呼び出される。
-     */
-    internal abstract fun removeDialogResults()
-
-    internal fun <T> receiveResulFromDialog(key: String): T? {
-        val containsDialogResult = navBackStackEntry.savedStateHandle.contains(key)
-        if (!containsDialogResult) return null
-
-        return navBackStackEntry.savedStateHandle.get<T>(key)
     }
 
     internal open fun setUpAppMessageDialog() {

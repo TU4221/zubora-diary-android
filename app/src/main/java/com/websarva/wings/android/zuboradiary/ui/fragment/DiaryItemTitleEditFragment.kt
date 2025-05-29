@@ -62,6 +62,10 @@ class DiaryItemTitleEditFragment : BaseFragment() {
         setUpItemTitleSelectionHistory()
     }
 
+    override fun initializeFragmentResultReceiver() {
+        setUpDiaryItemTitleDeleteDialogResultReceiver()
+    }
+
     override fun handleOnReceivingResultFromPreviousFragment() {
         // EditDiaryFragmentからデータ受取
         val targetItemNumber =
@@ -71,35 +75,27 @@ class DiaryItemTitleEditFragment : BaseFragment() {
         mainViewModel.updateDiaryItemTitle(targetItemNumber, targetItemTitle)
     }
 
-    override fun receiveDialogResults() {
-        receiveDiaryItemTitleDeleteDialogResult()
-    }
-
-    override fun removeDialogResults() {
-        removeResulFromFragment(DiaryItemTitleDeleteDialogFragment.KEY_RESULT)
-    }
-
     // 履歴項目削除確認ダイアログからの結果受取
-    private fun receiveDiaryItemTitleDeleteDialogResult() {
-        val result =
-            receiveResulFromDialog<DialogResult<Int>>(DiaryItemTitleDeleteDialogFragment.KEY_RESULT)
-                ?: return
-
-        when (result) {
-            is DialogResult.Positive<Int> -> {
-                val deleteListItemPosition = result.data
-                lifecycleScope.launch {
-                    mainViewModel
-                        .deleteDiaryItemTitleSelectionHistoryItem(deleteListItemPosition)
+    private fun setUpDiaryItemTitleDeleteDialogResultReceiver() {
+        setUpDialogResultReceiver<Int>(
+            DiaryItemTitleDeleteDialogFragment.KEY_RESULT
+        ) { result ->
+            when (result) {
+                is DialogResult.Positive<Int> -> {
+                    val deleteListItemPosition = result.data
+                    lifecycleScope.launch {
+                        mainViewModel
+                            .deleteDiaryItemTitleSelectionHistoryItem(deleteListItemPosition)
+                    }
                 }
-            }
-            DialogResult.Negative,
-            DialogResult.Cancel -> {
-                val adapter =
-                    checkNotNull(
-                        binding.recyclerItemTitleSelectionHistory.adapter
-                    ) as ItemTitleSelectionHistoryListAdapter
-                adapter.closeSwipedItem()
+                DialogResult.Negative,
+                DialogResult.Cancel -> {
+                    val adapter =
+                        checkNotNull(
+                            binding.recyclerItemTitleSelectionHistory.adapter
+                        ) as ItemTitleSelectionHistoryListAdapter
+                    adapter.closeSwipedItem()
+                }
             }
         }
     }

@@ -25,7 +25,6 @@ import com.websarva.wings.android.zuboradiary.ui.model.DiaryShowPendingDialog
 import com.websarva.wings.android.zuboradiary.ui.model.PendingDialog
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.DiaryDeleteDialogFragment
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.DiaryLoadingFailureDialogFragment
-import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
 import com.websarva.wings.android.zuboradiary.ui.model.action.DiaryShowFragmentAction
 import com.websarva.wings.android.zuboradiary.ui.model.action.FragmentAction
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.DiaryShowViewModel
@@ -84,35 +83,31 @@ internal class DiaryShowFragment : BaseFragment() {
         mainViewModel.onFragmentViewCreated(diaryDate)
     }
 
+    override fun initializeFragmentResultReceiver() {
+        setUpDiaryLoadingFailureDialogResultReceiver()
+        setUpDiaryDeleteDialogResultReceiver()
+    }
+
     override fun handleOnReceivingResultFromPreviousFragment() {
         // 処理なし
     }
 
-    override fun receiveDialogResults() {
-        receiveDiaryLoadingFailureDialogResult()
-        receiveDiaryDeleteDialogResult()
-    }
-
-    override fun removeDialogResults() {
-        removeResulFromFragment(DiaryDeleteDialogFragment.KEY_RESULT)
-    }
-
     // 日記読込失敗確認ダイアログフラグメントからデータ受取
-    private fun receiveDiaryLoadingFailureDialogResult() {
-        val result =
-            receiveResulFromDialog<DialogResult<Unit>>(DiaryLoadingFailureDialogFragment.KEY_RESULT)
-                ?: return
-
-        mainViewModel.onDiaryLoadingFailureDialogResultReceived(result)
+    private fun setUpDiaryLoadingFailureDialogResultReceiver() {
+        setUpDialogResultReceiver(
+            DiaryLoadingFailureDialogFragment.KEY_RESULT
+        ) { result ->
+            mainViewModel.onDiaryLoadingFailureDialogResultReceived(result)
+        }
     }
 
     // 日記削除確認ダイアログフラグメントからデータ受取
-    private fun receiveDiaryDeleteDialogResult() {
-        val result =
-            receiveResulFromDialog<DialogResult<Unit>>(DiaryDeleteDialogFragment.KEY_RESULT)
-                ?: return
-
-        mainViewModel.onDiaryDeleteDialogResultReceived(result)
+    private fun setUpDiaryDeleteDialogResultReceiver() {
+        setUpDialogResultReceiver(
+            DiaryDeleteDialogFragment.KEY_RESULT
+        ) { result ->
+            mainViewModel.onDiaryDeleteDialogResultReceived(result)
+        }
     }
 
     private fun setUpOnBackPressedCallback() {

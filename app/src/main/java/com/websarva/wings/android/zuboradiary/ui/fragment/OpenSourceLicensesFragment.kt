@@ -82,15 +82,11 @@ class OpenSourceLicensesFragment: BaseFragment() {
             }
     }
 
+    override fun initializeFragmentResultReceiver() {
+        // 処理なし
+    }
+
     override fun handleOnReceivingResultFromPreviousFragment() {
-        // 処理なし
-    }
-
-    override fun receiveDialogResults() {
-        // 処理なし
-    }
-
-    override fun removeDialogResults() {
         // 処理なし
     }
 

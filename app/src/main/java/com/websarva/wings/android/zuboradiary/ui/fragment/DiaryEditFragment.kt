@@ -159,105 +159,99 @@ class DiaryEditFragment : BaseFragment() {
         }
     }
 
-    override fun receiveDialogResults() {
-        receiveDiaryLoadingDialogResult()
-        receiveDiaryLoadingFailureDialogResult()
-        receiveDiaryUpdateDialogResult()
-        receiveDiaryDeleteDialogResult()
-        receiveDatePickerDialogResult()
-        receiveWeatherInfoFetchDialogResult()
-        receiveDiaryItemDeleteDialogResult()
-        receiveDiaryPictureDeleteDialogResult()
-    }
-
-    override fun removeDialogResults() {
-        removeResulFromFragment(DiaryLoadingDialogFragment.KEY_RESULT)
-        removeResulFromFragment(DiaryUpdateDialogFragment.KEY_RESULT)
-        removeResulFromFragment(DiaryDeleteDialogFragment.KEY_RESULT)
-        removeResulFromFragment(DatePickerDialogFragment.KEY_RESULT)
-        removeResulFromFragment(WeatherInfoFetchingDialogFragment.KEY_RESULT)
-        removeResulFromFragment(DiaryItemDeleteDialogFragment.KEY_RESULT)
-        removeResulFromFragment(DiaryPictureDeleteDialogFragment.KEY_RESULT)
+    override fun initializeFragmentResultReceiver() {
+        setUpDiaryLoadingDialogResultReceiver()
+        setUpDiaryLoadingFailureDialogResultReceiver()
+        setUpDiaryUpdateDialogResultReceiver()
+        setUpDiaryDeleteDialogResultReceiver()
+        setUpDatePickerDialogResultReceiver()
+        setUpWeatherInfoFetchDialogResultReceiver()
+        setUpDiaryItemDeleteDialogResultReceiver()
+        setUpDiaryPictureDeleteDialogResultReceiver()
     }
 
     // 既存日記読込ダイアログフラグメントから結果受取
-    private fun receiveDiaryLoadingDialogResult() {
-        val result =
-            receiveResulFromDialog<DialogResult<String>>(DiaryLoadingDialogFragment.KEY_RESULT) ?: return
-
-        mainViewModel.onDiaryLoadingDialogResultReceived(result)
+    private fun setUpDiaryLoadingDialogResultReceiver() {
+        setUpDialogResultReceiver(
+            DiaryLoadingDialogFragment.KEY_RESULT
+        ) { result ->
+            mainViewModel.onDiaryLoadingDialogResultReceived(result)
+        }
     }
 
     // 日記読込失敗確認ダイアログフラグメントから結果受取
-    private fun receiveDiaryLoadingFailureDialogResult() {
-        val result =
-            receiveResulFromDialog<DialogResult<Unit>>(DiaryLoadingFailureDialogFragment.KEY_RESULT)
-                ?: return
-
-        mainViewModel.onDiaryLoadingFailureDialogResultReceived(result)
+    private fun setUpDiaryLoadingFailureDialogResultReceiver() {
+        setUpDialogResultReceiver(
+            DiaryLoadingFailureDialogFragment.KEY_RESULT
+        ) { result ->
+            mainViewModel.onDiaryLoadingFailureDialogResultReceived(result)
+        }
     }
 
     // 既存日記上書きダイアログフラグメントから結果受取
-    private fun receiveDiaryUpdateDialogResult() {
-        val result =
-            receiveResulFromDialog<DialogResult<Unit>>(DiaryUpdateDialogFragment.KEY_RESULT) ?: return
-
-        mainViewModel.onDiaryUpdateDialogResultReceived(result)
+    private fun setUpDiaryUpdateDialogResultReceiver() {
+        setUpDialogResultReceiver(
+            DiaryUpdateDialogFragment.KEY_RESULT
+        ) { result ->
+            mainViewModel.onDiaryUpdateDialogResultReceived(result)
+        }
     }
 
     // 既存日記上書きダイアログフラグメントから結果受取
-    private fun receiveDiaryDeleteDialogResult() {
-        val result =
-            receiveResulFromDialog<DialogResult<Unit>>(DiaryDeleteDialogFragment.KEY_RESULT) ?: return
-
-        mainViewModel.onDiaryDeleteDialogResultReceived(result)
+    private fun setUpDiaryDeleteDialogResultReceiver() {
+        setUpDialogResultReceiver(
+            DiaryDeleteDialogFragment.KEY_RESULT
+        ) { result ->
+            mainViewModel.onDiaryDeleteDialogResultReceived(result)
+        }
     }
 
     // 日付入力ダイアログフラグメントからデータ受取
-    private fun receiveDatePickerDialogResult() {
-        val result =
-            receiveResulFromDialog<DialogResult<LocalDate>>(DatePickerDialogFragment.KEY_RESULT) ?: return
-
-        mainViewModel.onDatePickerDialogResultReceived(result)
+    private fun setUpDatePickerDialogResultReceiver() {
+        setUpDialogResultReceiver(
+            DatePickerDialogFragment.KEY_RESULT
+        ) { result ->
+            mainViewModel.onDatePickerDialogResultReceived(result)
+        }
     }
 
-    private fun receiveWeatherInfoFetchDialogResult() {
-        // 天気情報読込ダイアログフラグメントから結果受取
-        val result =
-            receiveResulFromDialog<DialogResult<Unit>>(
-                WeatherInfoFetchingDialogFragment.KEY_RESULT
-            ) ?: return
-        mainViewModel.onWeatherInfoFetchDialogResultReceived(result)
+    // 天気情報読込ダイアログフラグメントから結果受取
+    private fun setUpWeatherInfoFetchDialogResultReceiver() {
+        setUpDialogResultReceiver(
+            WeatherInfoFetchingDialogFragment.KEY_RESULT
+        ) { result ->
+            mainViewModel.onWeatherInfoFetchDialogResultReceived(result)
+        }
     }
 
     // 項目削除確認ダイアログフラグメントから結果受取
-    private fun receiveDiaryItemDeleteDialogResult() {
-        val result =
-            receiveResulFromDialog<DialogResult<ItemNumber>>(
-                DiaryItemDeleteDialogFragment.KEY_RESULT
-            ) ?: return
+    private fun setUpDiaryItemDeleteDialogResultReceiver() {
+        setUpDialogResultReceiver(
+            DiaryItemDeleteDialogFragment.KEY_RESULT
+        ) { result ->
 
-        // TODO:シールドクラス Action -> Event に変更してから下記コードの処理方法を検討する。
-        when (result) {
-            is DialogResult.Positive<ItemNumber> -> {
-                shouldTransitionItemMotionLayout = true
+            // TODO:シールドクラス Action -> Event に変更してから下記コードの処理方法を検討する。
+            when (result) {
+                is DialogResult.Positive<ItemNumber> -> {
+                    shouldTransitionItemMotionLayout = true
+                }
+
+                DialogResult.Negative,
+                DialogResult.Cancel -> {
+                    // 処理なし
+                }
             }
-            DialogResult.Negative,
-            DialogResult.Cancel -> {
-                // 処理なし
-            }
+
+            mainViewModel.onDiaryItemDeleteDialogResultReceived(result)
         }
-
-        mainViewModel.onDiaryItemDeleteDialogResultReceived(result)
     }
 
-    private fun receiveDiaryPictureDeleteDialogResult() {
-        val result =
-            receiveResulFromDialog<DialogResult<Unit>>(
-                DiaryPictureDeleteDialogFragment.KEY_RESULT
-            ) ?: return
-
-        mainViewModel.onDiaryPictureDeleteDialogResultReceived(result)
+    private fun setUpDiaryPictureDeleteDialogResultReceiver() {
+        setUpDialogResultReceiver(
+            DiaryPictureDeleteDialogFragment.KEY_RESULT
+        ) { result ->
+            mainViewModel.onDiaryPictureDeleteDialogResultReceived(result)
+        }
     }
 
     private fun setUpViewModelInitialization() {
@@ -301,7 +295,9 @@ class DiaryEditFragment : BaseFragment() {
     private fun setUpFragmentAction() {
         launchAndRepeatOnViewLifeCycleStarted {
             mainViewModel.fragmentAction.collect { value: Action<FragmentAction> ->
-                val action = value.getContentIfNotHandled() ?: return@collect
+                val action = value.getContentIfNotHandled()
+                Log.d("20250529", action.toString())
+                action ?: return@collect
                 when (action) {
                     is DiaryEditFragmentAction.NavigateDiaryShowFragment -> {
                         navigateDiaryShowFragment(action.date)
@@ -890,7 +886,7 @@ class DiaryEditFragment : BaseFragment() {
     }
 
     private fun navigateDiaryShowFragment(date: LocalDate) {
-        if (!canNavigateFragment) return
+        //if (!canNavigateFragment) return
 
         val isStartDiaryFragment =
             DiaryEditFragmentArgs.fromBundle(requireArguments()).isStartDiaryFragment
@@ -1003,6 +999,7 @@ class DiaryEditFragment : BaseFragment() {
             val savedStateHandle = navBackStackEntry.savedStateHandle
             savedStateHandle[KEY_EDITED_DIARY_DATE] = editedDiaryDate
         }
+        Log.d("20250529", "navigatePreviousFragment()_navigateUp()")
         navController.navigateUp()
     }
 

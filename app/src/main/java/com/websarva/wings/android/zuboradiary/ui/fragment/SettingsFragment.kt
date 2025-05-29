@@ -127,11 +127,7 @@ class SettingsFragment : BaseFragment() {
         setUpFragmentAction()
     }
 
-    override fun handleOnReceivingResultFromPreviousFragment() {
-        // 処理なし
-    }
-
-    override fun receiveDialogResults() {
+    override fun initializeFragmentResultReceiver() {
         receiveThemeColorPickerDialogResult()
         receiveCalendarStartDayPickerDialogResult()
         receiveReminderNotificationTimePickerDialogResult()
@@ -141,87 +137,77 @@ class SettingsFragment : BaseFragment() {
         receiveAllDataDeleteDialogResult()
     }
 
-    override fun removeDialogResults() {
-        removeResulFromFragment(ThemeColorPickerDialogFragment.KEY_RESULT)
-        removeResulFromFragment(CalendarStartDayPickerDialogFragment.KEY_RESULT)
-        removeResulFromFragment(ReminderNotificationTimePickerDialogFragment.KEY_RESULT)
-        removeResulFromFragment(PermissionDialogFragment.KEY_RESULT)
-        removeResulFromFragment(AllDiariesDeleteDialogFragment.KEY_RESULT)
-        removeResulFromFragment(AllSettingsInitializationDialogFragment.KEY_RESULT)
-        removeResulFromFragment(AllDataDeleteDialogFragment.KEY_RESULT)
+    override fun handleOnReceivingResultFromPreviousFragment() {
+        // 処理なし
     }
 
     // テーマカラー設定ダイアログフラグメントから結果受取
     private fun receiveThemeColorPickerDialogResult() {
-        val result =
-            receiveResulFromDialog<DialogResult<ThemeColor>>(ThemeColorPickerDialogFragment.KEY_RESULT)
-                ?: return
-
-       mainViewModel.onThemeColorSettingDialogResultReceived(result)
+        setUpDialogResultReceiver(
+            ThemeColorPickerDialogFragment.KEY_RESULT
+        ) { result ->
+            mainViewModel.onThemeColorSettingDialogResultReceived(result)
+        }
     }
 
     // カレンダー開始曜日設定ダイアログフラグメントから結果受取
     private fun receiveCalendarStartDayPickerDialogResult() {
-        val result =
-            receiveResulFromDialog<DialogResult<DayOfWeek>>(
-                CalendarStartDayPickerDialogFragment.KEY_RESULT
-            ) ?: return
-
-        mainViewModel.onCalendarStartDayOfWeekSettingDialogResultReceived(result)
+        setUpDialogResultReceiver(
+            CalendarStartDayPickerDialogFragment.KEY_RESULT
+        ) { result ->
+            mainViewModel.onCalendarStartDayOfWeekSettingDialogResultReceived(result)
+        }
     }
 
     // リマインダー通知時間設定ダイアログフラグメントから結果受取
     private fun receiveReminderNotificationTimePickerDialogResult() {
-        val result =
-            receiveResulFromDialog<DialogResult<LocalTime>>(
-                ReminderNotificationTimePickerDialogFragment.KEY_RESULT
-            ) ?: return
-
-        mainViewModel.onReminderNotificationSettingDialogResultReceived(result)
+        setUpDialogResultReceiver(
+            ReminderNotificationTimePickerDialogFragment.KEY_RESULT
+        ) { result ->
+            mainViewModel.onReminderNotificationSettingDialogResultReceived(result)
+        }
     }
 
     // 権限催促ダイアログフラグメントから結果受取
     private fun receivePermissionDialogResult() {
-        val result =
-            receiveResulFromDialog<DialogResult<Unit>>(PermissionDialogFragment.KEY_RESULT) ?: return
-
-        // TODO:シールドクラス Action -> Event に変更してから下記コードの処理方法を検討する。
-        when (result) {
-            is DialogResult.Positive<Unit> -> {
-                showApplicationDetailsSettings()
-            }
-            DialogResult.Negative,
-            DialogResult.Cancel -> {
-                // 処理なし
+        setUpDialogResultReceiver(
+            PermissionDialogFragment.KEY_RESULT
+        ) { result: DialogResult<Unit> ->
+            // TODO:シールドクラス Action -> Event に変更してから下記コードの処理方法を検討する。
+            when (result) {
+                is DialogResult.Positive<Unit> -> {
+                    showApplicationDetailsSettings()
+                }
+                DialogResult.Negative,
+                DialogResult.Cancel -> {
+                    // 処理なし
+                }
             }
         }
     }
 
     private fun receiveAllDiariesDeleteDialogResult() {
-        val result =
-            receiveResulFromDialog<DialogResult<Unit>>(
-                AllDiariesDeleteDialogFragment.KEY_RESULT
-            ) ?: return
-
-        mainViewModel.onAllDiariesDeleteDialogResultReceived(result)
+        setUpDialogResultReceiver(
+            AllDiariesDeleteDialogFragment.KEY_RESULT
+        ) { result ->
+            mainViewModel.onAllDiariesDeleteDialogResultReceived(result)
+        }
     }
 
     private fun receiveAllSettingsInitializationDialogResult() {
-        val result =
-            receiveResulFromDialog<DialogResult<Unit>>(
-                AllSettingsInitializationDialogFragment.KEY_RESULT
-            ) ?: return
-
-        mainViewModel.onAllSettingsInitializationDialogResultReceived(result)
+        setUpDialogResultReceiver(
+            AllSettingsInitializationDialogFragment.KEY_RESULT
+        ) { result ->
+            mainViewModel.onAllSettingsInitializationDialogResultReceived(result)
+        }
     }
 
     private fun receiveAllDataDeleteDialogResult() {
-        val result =
-            receiveResulFromDialog<DialogResult<Unit>>(
-                AllDataDeleteDialogFragment.KEY_RESULT
-            ) ?: return
-
-        mainViewModel.onAllDataDeleteDialogResultReceived(result)
+        setUpDialogResultReceiver(
+            AllDataDeleteDialogFragment.KEY_RESULT
+        ) { result ->
+            mainViewModel.onAllDataDeleteDialogResultReceived(result)
+        }
     }
 
     private fun setUpScrollPosition() {

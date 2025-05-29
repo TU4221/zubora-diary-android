@@ -108,6 +108,10 @@ class CalendarFragment : BaseFragment() {
         setUpFloatActionButton()
     }
 
+    override fun initializeFragmentResultReceiver() {
+        // TODO:保留
+    }
+
     override fun handleOnReceivingResultFromPreviousFragment() {
         receivingDiaryShowFragmentResult()
         receivingDiaryEditFragmentResult()
@@ -139,14 +143,6 @@ class CalendarFragment : BaseFragment() {
                 removeResulFromFragment(DiaryEditFragment.KEY_EDITED_DIARY_DATE)
             }
         }
-    }
-
-    override fun receiveDialogResults() {
-        // 処理なし
-    }
-
-    override fun removeDialogResults() {
-        // 処理なし
     }
 
     override fun setUpAppMessageDialog() {

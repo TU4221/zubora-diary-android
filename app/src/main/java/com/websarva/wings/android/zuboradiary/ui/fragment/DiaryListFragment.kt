@@ -27,7 +27,6 @@ import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
 import com.websarva.wings.android.zuboradiary.ui.model.state.DiaryListState
 import com.websarva.wings.android.zuboradiary.ui.model.action.DiaryListFragmentAction
 import com.websarva.wings.android.zuboradiary.ui.model.action.FragmentAction
-import com.websarva.wings.android.zuboradiary.ui.model.result.DiaryListItemDeleteResult
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import java.time.LocalDate
@@ -75,49 +74,42 @@ class DiaryListFragment : BaseFragment() {
         mainViewModel.onFragmentViewCreated()
     }
 
+    override fun initializeFragmentResultReceiver() {
+        setUpDatePickerDialogResultReceiver()
+        setUpDiaryDeleteDialogResultReceiver()
+    }
+
     override fun handleOnReceivingResultFromPreviousFragment() {
         // 処理なし
     }
 
-    override fun receiveDialogResults() {
-        receiveDatePickerDialogResults()
-        receiveDiaryDeleteDialogResults()
-    }
-
-    override fun removeDialogResults() {
-        removeResulFromFragment(StartYearMonthPickerDialogFragment.KEY_RESULT)
-        removeResulFromFragment(DiaryListDeleteDialogFragment.KEY_RESULT)
-    }
-
     // 日付入力ダイアログフラグメントから結果受取
-    private fun receiveDatePickerDialogResults() {
-        val result =
-            receiveResulFromDialog<DialogResult<YearMonth>>(
-                StartYearMonthPickerDialogFragment.KEY_RESULT
-            ) ?: return
+    private fun setUpDatePickerDialogResultReceiver() {
+        setUpDialogResultReceiver(
+            StartYearMonthPickerDialogFragment.KEY_RESULT
+        ) { result ->
+            // TODO:シールドクラス Action -> Event に変更してから下記コードの処理方法を検討する。
+            when (result) {
+                is DialogResult.Positive<YearMonth> -> {
+                    shouldInitializeListAdapter = true
+                }
+                DialogResult.Negative,
+                DialogResult.Cancel -> {
+                    // 処理なし
+                }
+            }
 
-        // TODO:シールドクラス Action -> Event に変更してから下記コードの処理方法を検討する。
-        when (result) {
-            is DialogResult.Positive<YearMonth> -> {
-                shouldInitializeListAdapter = true
-            }
-            DialogResult.Negative,
-            DialogResult.Cancel -> {
-                // 処理なし
-            }
+            mainViewModel.onDatePickerDialogResultReceived(result)
         }
-
-        mainViewModel.onDatePickerDialogResultReceived(result)
     }
 
     // 日記削除ダイアログフラグメントから結果受取
-    private fun receiveDiaryDeleteDialogResults() {
-        val result =
-            receiveResulFromDialog<DialogResult<DiaryListItemDeleteResult>>(
-                DiaryListDeleteDialogFragment.KEY_RESULT
-            ) ?: return
-
-        mainViewModel.onDiaryDeleteDialogResultReceived(result)
+    private fun setUpDiaryDeleteDialogResultReceiver() {
+        setUpDialogResultReceiver(
+            DiaryListDeleteDialogFragment.KEY_RESULT
+        ) { result ->
+            mainViewModel.onDiaryDeleteDialogResultReceived(result)
+        }
     }
 
     private fun setUpFragmentAction() {
