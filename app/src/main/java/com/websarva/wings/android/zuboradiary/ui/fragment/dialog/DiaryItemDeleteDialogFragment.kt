@@ -1,13 +1,14 @@
 package com.websarva.wings.android.zuboradiary.ui.fragment.dialog
 
 import com.websarva.wings.android.zuboradiary.R
+import com.websarva.wings.android.zuboradiary.ui.fragment.RESULT_KEY_PREFIX
+import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
 
 class DiaryItemDeleteDialogFragment : BaseAlertDialogFragment() {
 
     companion object {
-        private val fromClassName = "From" + DiaryItemDeleteDialogFragment::class.java.name
         @JvmField
-        val KEY_DELETE_ITEM_NUMBER: String = "DeleteItemNumber$fromClassName"
+        val KEY_RESULT = RESULT_KEY_PREFIX + DiaryItemDeleteDialogFragment::class.java.name
     }
 
     override fun createTitle(): String {
@@ -25,14 +26,14 @@ class DiaryItemDeleteDialogFragment : BaseAlertDialogFragment() {
     override fun handleOnPositiveButtonClick() {
         val deleteItemNumber =
             DiaryItemDeleteDialogFragmentArgs.fromBundle(requireArguments()).itemNumber
-        setResult(KEY_DELETE_ITEM_NUMBER, deleteItemNumber)
+        setResult(KEY_RESULT, DialogResult.Positive(deleteItemNumber))
     }
 
     override fun handleOnNegativeButtonClick() {
-        setResult(KEY_DELETE_ITEM_NUMBER, null)
+        setResult(KEY_RESULT, DialogResult.Negative)
     }
 
     override fun handleOnCancel() {
-        setResult(KEY_DELETE_ITEM_NUMBER, null)
+        setResult(KEY_RESULT, DialogResult.Cancel)
     }
 }

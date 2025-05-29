@@ -1,6 +1,5 @@
 package com.websarva.wings.android.zuboradiary.ui.fragment
 
-import android.app.Dialog
 import android.content.Context
 import android.net.Uri
 import android.os.Bundle
@@ -26,6 +25,7 @@ import com.websarva.wings.android.zuboradiary.ui.model.DiaryShowPendingDialog
 import com.websarva.wings.android.zuboradiary.ui.model.PendingDialog
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.DiaryDeleteDialogFragment
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.DiaryLoadingFailureDialogFragment
+import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
 import com.websarva.wings.android.zuboradiary.ui.model.action.DiaryShowFragmentAction
 import com.websarva.wings.android.zuboradiary.ui.model.action.FragmentAction
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.DiaryShowViewModel
@@ -94,27 +94,41 @@ internal class DiaryShowFragment : BaseFragment() {
     }
 
     override fun removeDialogResults() {
-        removeResulFromFragment(DiaryDeleteDialogFragment.KEY_SELECTED_BUTTON)
+        removeResulFromFragment(DiaryDeleteDialogFragment.KEY_RESULT)
     }
 
     // 日記読込失敗確認ダイアログフラグメントからデータ受取
     private fun receiveDiaryLoadingFailureDialogResult() {
-        val selectedButton =
-            receiveResulFromDialog<Int>(DiaryLoadingFailureDialogFragment.KEY_SELECTED_BUTTON)
+        val result =
+            receiveResulFromDialog<DialogResult<Unit>>(DiaryLoadingFailureDialogFragment.KEY_RESULT)
                 ?: return
-        if (selectedButton != Dialog.BUTTON_POSITIVE) return
 
-        mainViewModel.onDiaryLoadingFailureDialogPositiveButtonClicked()
+        when (result) {
+            is DialogResult.Positive<Unit> -> {
+                mainViewModel.onDiaryLoadingFailureDialogPositiveButtonClicked()
+            }
+            DialogResult.Negative,
+            DialogResult.Cancel -> {
+                return
+            }
+        }
     }
 
     // 日記削除確認ダイアログフラグメントからデータ受取
     private fun receiveDiaryDeleteDialogResult() {
-        val selectedButton =
-            receiveResulFromDialog<Int>(DiaryDeleteDialogFragment.KEY_SELECTED_BUTTON)
+        val result =
+            receiveResulFromDialog<DialogResult<Unit>>(DiaryDeleteDialogFragment.KEY_RESULT)
                 ?: return
-        if (selectedButton != Dialog.BUTTON_POSITIVE) return
 
-        mainViewModel.onDiaryDeleteDialogPositiveButtonClicked()
+        when (result) {
+            is DialogResult.Positive<Unit> -> {
+                mainViewModel.onDiaryDeleteDialogPositiveButtonClicked()
+            }
+            DialogResult.Negative,
+            DialogResult.Cancel -> {
+                return
+            }
+        }
     }
 
     private fun setUpOnBackPressedCallback() {

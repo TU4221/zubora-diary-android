@@ -1,8 +1,6 @@
 package com.websarva.wings.android.zuboradiary.ui.fragment
 
 import android.Manifest
-import android.app.Dialog
-import android.content.DialogInterface
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
@@ -29,6 +27,7 @@ import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.PermissionDialo
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.ReminderNotificationTimePickerDialogFragment
 import com.websarva.wings.android.zuboradiary.ui.theme.SettingsThemeColorChanger
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.ThemeColorPickerDialogFragment
+import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
 import com.websarva.wings.android.zuboradiary.ui.model.action.FragmentAction
 import com.websarva.wings.android.zuboradiary.ui.model.action.SettingsFragmentAction
 import com.websarva.wings.android.zuboradiary.ui.utils.formatToHourMinuteString
@@ -143,86 +142,135 @@ class SettingsFragment : BaseFragment() {
     }
 
     override fun removeDialogResults() {
-        removeResulFromFragment(ThemeColorPickerDialogFragment.KEY_SELECTED_THEME_COLOR)
-        removeResulFromFragment(CalendarStartDayPickerDialogFragment.KEY_SELECTED_DAY_OF_WEEK)
-        removeResulFromFragment(ReminderNotificationTimePickerDialogFragment.KEY_SELECTED_BUTTON)
-        removeResulFromFragment(ReminderNotificationTimePickerDialogFragment.KEY_SELECTED_TIME)
-        removeResulFromFragment(PermissionDialogFragment.KEY_SELECTED_BUTTON)
-        removeResulFromFragment(AllDiariesDeleteDialogFragment.KEY_SELECTED_BUTTON)
-        removeResulFromFragment(AllSettingsInitializationDialogFragment.KEY_SELECTED_BUTTON)
-        removeResulFromFragment(AllDataDeleteDialogFragment.KEY_SELECTED_BUTTON)
+        removeResulFromFragment(ThemeColorPickerDialogFragment.KEY_RESULT)
+        removeResulFromFragment(CalendarStartDayPickerDialogFragment.KEY_RESULT)
+        removeResulFromFragment(ReminderNotificationTimePickerDialogFragment.KEY_RESULT)
+        removeResulFromFragment(PermissionDialogFragment.KEY_RESULT)
+        removeResulFromFragment(AllDiariesDeleteDialogFragment.KEY_RESULT)
+        removeResulFromFragment(AllSettingsInitializationDialogFragment.KEY_RESULT)
+        removeResulFromFragment(AllDataDeleteDialogFragment.KEY_RESULT)
     }
 
     // テーマカラー設定ダイアログフラグメントから結果受取
     private fun receiveThemeColorPickerDialogResult() {
-        val selectedThemeColor =
-            receiveResulFromDialog<ThemeColor>(ThemeColorPickerDialogFragment.KEY_SELECTED_THEME_COLOR)
+        val result =
+            receiveResulFromDialog<DialogResult<ThemeColor>>(ThemeColorPickerDialogFragment.KEY_RESULT)
                 ?: return
 
-        mainViewModel.onThemeColorSettingDialogPositiveButtonClicked(selectedThemeColor)
+        when (result) {
+            is DialogResult.Positive<ThemeColor> -> {
+                mainViewModel.onThemeColorSettingDialogPositiveButtonClicked(result.data)
+            }
+            DialogResult.Negative,
+            DialogResult.Cancel -> {
+                return
+            }
+        }
     }
 
     // カレンダー開始曜日設定ダイアログフラグメントから結果受取
     private fun receiveCalendarStartDayPickerDialogResult() {
-        val selectedDayOfWeek =
-            receiveResulFromDialog<DayOfWeek>(CalendarStartDayPickerDialogFragment.KEY_SELECTED_DAY_OF_WEEK)
-                ?: return
+        val result =
+            receiveResulFromDialog<DialogResult<DayOfWeek>>(
+                CalendarStartDayPickerDialogFragment.KEY_RESULT
+            ) ?: return
 
-        settingsViewModel
-            .onCalendarStartDayOfWeekSettingDialogPositiveButtonClicked(selectedDayOfWeek)
+        when (result) {
+            is DialogResult.Positive<DayOfWeek> -> {
+                settingsViewModel
+                    .onCalendarStartDayOfWeekSettingDialogPositiveButtonClicked(result.data)
+            }
+            DialogResult.Negative,
+            DialogResult.Cancel -> {
+                return
+            }
+        }
     }
 
     // リマインダー通知時間設定ダイアログフラグメントから結果受取
     private fun receiveReminderNotificationTimePickerDialogResult() {
-        val selectedButton =
-            receiveResulFromDialog<Int>(ReminderNotificationTimePickerDialogFragment.KEY_SELECTED_BUTTON)
-                ?: return
-        if (selectedButton != DialogInterface.BUTTON_POSITIVE) {
-            mainViewModel.onReminderNotificationSettingDialogNegativeButtonClicked()
-            return
-        }
+        val result =
+            receiveResulFromDialog<DialogResult<LocalTime>>(
+                ReminderNotificationTimePickerDialogFragment.KEY_RESULT
+            ) ?: return
 
-        val selectedTime =
-            checkNotNull(
-                receiveResulFromDialog<LocalTime>(
-                    ReminderNotificationTimePickerDialogFragment.KEY_SELECTED_TIME
-                )
-            )
-        mainViewModel.onReminderNotificationSettingDialogPositiveButtonClicked(selectedTime)
+        when (result) {
+            is DialogResult.Positive<LocalTime> -> {
+                mainViewModel.onReminderNotificationSettingDialogPositiveButtonClicked(result.data)
+            }
+            DialogResult.Negative,
+            DialogResult.Cancel -> {
+                mainViewModel.onReminderNotificationSettingDialogNegativeButtonClicked()
+                return
+            }
+        }
     }
 
     // 権限催促ダイアログフラグメントから結果受取
     private fun receivePermissionDialogResult() {
-        val selectedButton =
-            receiveResulFromDialog<Int>(PermissionDialogFragment.KEY_SELECTED_BUTTON) ?: return
-        if (selectedButton != Dialog.BUTTON_POSITIVE) return
+        val result =
+            receiveResulFromDialog<DialogResult<Unit>>(PermissionDialogFragment.KEY_RESULT) ?: return
 
-        showApplicationDetailsSettings()
+        when (result) {
+            is DialogResult.Positive<Unit> -> {
+                showApplicationDetailsSettings()
+            }
+            DialogResult.Negative,
+            DialogResult.Cancel -> {
+                return
+            }
+        }
     }
 
     private fun receiveAllDiariesDeleteDialogResult() {
-        val selectedButton =
-            receiveResulFromDialog<Int>(AllDiariesDeleteDialogFragment.KEY_SELECTED_BUTTON) ?: return
-        if (selectedButton != Dialog.BUTTON_POSITIVE) return
+        val result =
+            receiveResulFromDialog<DialogResult<Unit>>(
+                AllDiariesDeleteDialogFragment.KEY_RESULT
+            ) ?: return
 
-        mainViewModel.onAllDiariesDeleteDialogPositiveButtonClicked()
+        when (result) {
+            is DialogResult.Positive<Unit> -> {
+                mainViewModel.onAllDiariesDeleteDialogPositiveButtonClicked()
+            }
+            DialogResult.Negative,
+            DialogResult.Cancel -> {
+                return
+            }
+        }
     }
 
     private fun receiveAllSettingsInitializationDialogResult() {
-        val selectedButton =
-            receiveResulFromDialog<Int>(AllSettingsInitializationDialogFragment.KEY_SELECTED_BUTTON)
-                ?: return
-        if (selectedButton != Dialog.BUTTON_POSITIVE) return
+        val result =
+            receiveResulFromDialog<DialogResult<Unit>>(
+                AllSettingsInitializationDialogFragment.KEY_RESULT
+            ) ?: return
 
-        mainViewModel.onAllSettingsInitializationDialogPositiveButtonClicked()
+        when (result) {
+            is DialogResult.Positive<Unit> -> {
+                mainViewModel.onAllSettingsInitializationDialogPositiveButtonClicked()
+            }
+            DialogResult.Negative,
+            DialogResult.Cancel -> {
+                return
+            }
+        }
     }
 
     private fun receiveAllDataDeleteDialogResult() {
-        val selectedButton =
-            receiveResulFromDialog<Int>(AllDataDeleteDialogFragment.KEY_SELECTED_BUTTON) ?: return
-        if (selectedButton != Dialog.BUTTON_POSITIVE) return
+        val result =
+            receiveResulFromDialog<DialogResult<Unit>>(
+                AllDataDeleteDialogFragment.KEY_RESULT
+            ) ?: return
 
-        mainViewModel.onAllDataDeleteDialogPositiveButtonClicked()
+        when (result) {
+            is DialogResult.Positive<Unit> -> {
+                mainViewModel.onAllDataDeleteDialogPositiveButtonClicked()
+            }
+            DialogResult.Negative,
+            DialogResult.Cancel -> {
+                return
+            }
+        }
     }
 
     private fun setUpScrollPosition() {

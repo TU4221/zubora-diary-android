@@ -1,14 +1,14 @@
 package com.websarva.wings.android.zuboradiary.ui.fragment.dialog
 
-import android.content.DialogInterface
 import com.websarva.wings.android.zuboradiary.R
+import com.websarva.wings.android.zuboradiary.ui.fragment.RESULT_KEY_PREFIX
+import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
 
 class PermissionDialogFragment : BaseAlertDialogFragment() {
 
     companion object {
-        private val FROM_CLASS_NAME = "From" + PermissionDialogFragment::class.java.name
         @JvmField
-        val KEY_SELECTED_BUTTON: String = "SelectedButton$FROM_CLASS_NAME"
+        val KEY_RESULT = RESULT_KEY_PREFIX + PermissionDialogFragment::class.java.name
     }
 
     override fun createTitle(): String {
@@ -24,14 +24,14 @@ class PermissionDialogFragment : BaseAlertDialogFragment() {
     }
 
     override fun handleOnPositiveButtonClick() {
-        setResult(KEY_SELECTED_BUTTON, DialogInterface.BUTTON_POSITIVE)
+        setResult(KEY_RESULT, DialogResult.Positive(Unit))
     }
 
     override fun handleOnNegativeButtonClick() {
-        setResult(KEY_SELECTED_BUTTON, DialogInterface.BUTTON_NEGATIVE)
+        setResult(KEY_RESULT, DialogResult.Negative)
     }
 
     override fun handleOnCancel() {
-        setResult(KEY_SELECTED_BUTTON, DialogInterface.BUTTON_NEGATIVE)
+        setResult(KEY_RESULT, DialogResult.Cancel)
     }
 }

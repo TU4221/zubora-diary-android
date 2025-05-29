@@ -13,6 +13,7 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.websarva.wings.android.zuboradiary.data.model.ThemeColor
+import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import com.websarva.wings.android.zuboradiary.ui.theme.ThemeColorInflaterCreator
 import com.websarva.wings.android.zuboradiary.ui.utils.requireValue
@@ -121,7 +122,7 @@ abstract class BaseBottomSheetDialogFragment : BottomSheetDialogFragment() {
      */
     internal abstract fun handleOnCancel()
 
-    internal fun setResult(resultKey: String, result: Any?) {
+    internal fun <T> setResult(resultKey: String, result: DialogResult<T>) {
         val navController = NavHostFragment.findNavController(this)
         val navBackStackEntry = checkNotNull(navController.previousBackStackEntry)
         val savedStateHandle = navBackStackEntry.savedStateHandle

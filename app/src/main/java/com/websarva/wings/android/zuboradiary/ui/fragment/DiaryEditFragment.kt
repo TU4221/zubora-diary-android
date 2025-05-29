@@ -1,8 +1,6 @@
 package com.websarva.wings.android.zuboradiary.ui.fragment
 
-import android.app.Dialog
 import android.content.Context
-import android.content.DialogInterface
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -46,6 +44,7 @@ import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.DiaryPictureDel
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.DiaryUpdateDialogFragment
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.WeatherInfoFetchingDialogFragment
 import com.websarva.wings.android.zuboradiary.ui.keyboard.KeyboardManager
+import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
 import com.websarva.wings.android.zuboradiary.ui.model.action.Action
 import com.websarva.wings.android.zuboradiary.ui.model.adapter.WeatherAdapterList
 import com.websarva.wings.android.zuboradiary.ui.model.action.DiaryEditFragmentAction
@@ -172,93 +171,150 @@ class DiaryEditFragment : BaseFragment() {
     }
 
     override fun removeDialogResults() {
-        removeResulFromFragment(DiaryLoadingDialogFragment.KEY_SELECTED_BUTTON)
-        removeResulFromFragment(DiaryUpdateDialogFragment.KEY_SELECTED_BUTTON)
-        removeResulFromFragment(DiaryDeleteDialogFragment.KEY_SELECTED_BUTTON)
-        removeResulFromFragment(DatePickerDialogFragment.KEY_SELECTED_DATE)
-        removeResulFromFragment(WeatherInfoFetchingDialogFragment.KEY_SELECTED_BUTTON)
-        removeResulFromFragment(DiaryItemDeleteDialogFragment.KEY_DELETE_ITEM_NUMBER)
-        removeResulFromFragment(DiaryPictureDeleteDialogFragment.KEY_SELECTED_BUTTON)
+        removeResulFromFragment(DiaryLoadingDialogFragment.KEY_RESULT)
+        removeResulFromFragment(DiaryUpdateDialogFragment.KEY_RESULT)
+        removeResulFromFragment(DiaryDeleteDialogFragment.KEY_RESULT)
+        removeResulFromFragment(DatePickerDialogFragment.KEY_RESULT)
+        removeResulFromFragment(WeatherInfoFetchingDialogFragment.KEY_RESULT)
+        removeResulFromFragment(DiaryItemDeleteDialogFragment.KEY_RESULT)
+        removeResulFromFragment(DiaryPictureDeleteDialogFragment.KEY_RESULT)
     }
 
     // 既存日記読込ダイアログフラグメントから結果受取
     private fun receiveDiaryLoadingDialogResult() {
-        val selectedButton =
-            receiveResulFromDialog<Int>(DiaryLoadingDialogFragment.KEY_SELECTED_BUTTON) ?: return
-
-        if (selectedButton == DialogInterface.BUTTON_POSITIVE) {
-            mainViewModel.onDiaryLoadingDialogPositiveButtonClicked()
-        } else {
-            mainViewModel.onDiaryLoadingDialogNegativeButtonClicked()
+        val result =
+            receiveResulFromDialog<DialogResult<String>>(DiaryLoadingDialogFragment.KEY_RESULT) ?: return
+        when (result) {
+            is DialogResult.Positive<String> -> {
+                mainViewModel.onDiaryLoadingDialogPositiveButtonClicked()
+            }
+            DialogResult.Negative,
+            DialogResult.Cancel -> {
+                mainViewModel.onDiaryLoadingDialogNegativeButtonClicked()
+            }
         }
     }
 
     // 日記読込失敗確認ダイアログフラグメントから結果受取
     private fun receiveDiaryLoadingFailureDialogResult() {
-        val selectedButton =
-            receiveResulFromDialog<Int>(DiaryLoadingFailureDialogFragment.KEY_SELECTED_BUTTON)
+        val result =
+            receiveResulFromDialog<DialogResult<Unit>>(DiaryLoadingFailureDialogFragment.KEY_RESULT)
                 ?: return
-        if (selectedButton != Dialog.BUTTON_POSITIVE) return
 
-        mainViewModel.onDiaryLoadingFailureDialogPositiveButtonClicked()
+        when (result) {
+            is DialogResult.Positive<Unit> -> {
+                mainViewModel.onDiaryLoadingFailureDialogPositiveButtonClicked()
+            }
+            DialogResult.Negative,
+            DialogResult.Cancel -> {
+                return
+            }
+        }
     }
 
     // 既存日記上書きダイアログフラグメントから結果受取
     private fun receiveDiaryUpdateDialogResult() {
-        val selectedButton =
-            receiveResulFromDialog<Int>(DiaryUpdateDialogFragment.KEY_SELECTED_BUTTON) ?: return
-        if (selectedButton != DialogInterface.BUTTON_POSITIVE) return
+        val result =
+            receiveResulFromDialog<DialogResult<Unit>>(DiaryUpdateDialogFragment.KEY_RESULT) ?: return
 
-        mainViewModel.onDiaryUpdateDialogPositiveButtonClicked()
+        when (result) {
+            is DialogResult.Positive<Unit> -> {
+                mainViewModel.onDiaryUpdateDialogPositiveButtonClicked()
+            }
+            DialogResult.Negative,
+            DialogResult.Cancel -> {
+                return
+            }
+        }
     }
 
     // 既存日記上書きダイアログフラグメントから結果受取
     private fun receiveDiaryDeleteDialogResult() {
-        val selectedButton =
-            receiveResulFromDialog<Int>(DiaryDeleteDialogFragment.KEY_SELECTED_BUTTON) ?: return
-        if (selectedButton != DialogInterface.BUTTON_POSITIVE) return
+        val result =
+            receiveResulFromDialog<DialogResult<Unit>>(DiaryDeleteDialogFragment.KEY_RESULT) ?: return
 
-        mainViewModel.onDiaryDeleteDialogPositiveButtonClicked()
+        when (result) {
+            is DialogResult.Positive<Unit> -> {
+                mainViewModel.onDiaryDeleteDialogPositiveButtonClicked()
+            }
+            DialogResult.Negative,
+            DialogResult.Cancel -> {
+                return
+            }
+        }
     }
 
     // 日付入力ダイアログフラグメントからデータ受取
     private fun receiveDatePickerDialogResult() {
-        val selectedDate =
-            receiveResulFromDialog<LocalDate>(DatePickerDialogFragment.KEY_SELECTED_DATE) ?: return
+        val result =
+            receiveResulFromDialog<DialogResult<LocalDate>>(DatePickerDialogFragment.KEY_RESULT) ?: return
 
-        mainViewModel.onDatePickerDialogPositiveButtonClicked(selectedDate)
+
+
+        when (result) {
+            is DialogResult.Positive<LocalDate> -> {
+                mainViewModel.onDatePickerDialogPositiveButtonClicked(result.data)
+            }
+            DialogResult.Negative,
+            DialogResult.Cancel -> {
+                return
+            }
+        }
     }
 
     private fun receiveWeatherInfoFetchDialogResult() {
         // 天気情報読込ダイアログフラグメントから結果受取
-        val selectedButton =
-            receiveResulFromDialog<Int>(
-                WeatherInfoFetchingDialogFragment.KEY_SELECTED_BUTTON
+        val result =
+            receiveResulFromDialog<DialogResult<Unit>>(
+                WeatherInfoFetchingDialogFragment.KEY_RESULT
             ) ?: return
-        if (selectedButton != DialogInterface.BUTTON_POSITIVE) return
 
-        mainViewModel.onWeatherInfoFetchDialogPositiveButtonClicked()
+
+        when (result) {
+            is DialogResult.Positive<Unit> -> {
+                mainViewModel.onWeatherInfoFetchDialogPositiveButtonClicked()
+            }
+            DialogResult.Negative,
+            DialogResult.Cancel -> {
+                return
+            }
+        }
     }
 
     // 項目削除確認ダイアログフラグメントから結果受取
     private fun receiveDiaryItemDeleteDialogResult() {
-        val deleteItemNumber =
-            receiveResulFromDialog<ItemNumber>(
-                DiaryItemDeleteDialogFragment.KEY_DELETE_ITEM_NUMBER
+        val result =
+            receiveResulFromDialog<DialogResult<ItemNumber>>(
+                DiaryItemDeleteDialogFragment.KEY_RESULT
             ) ?: return
 
-        shouldTransitionItemMotionLayout = true
-        mainViewModel.onDiaryItemDeleteDialogPositiveButtonClicked(deleteItemNumber)
+        when (result) {
+            is DialogResult.Positive<ItemNumber> -> {
+                shouldTransitionItemMotionLayout = true
+                mainViewModel.onDiaryItemDeleteDialogPositiveButtonClicked(result.data)
+            }
+            DialogResult.Negative,
+            DialogResult.Cancel -> {
+                return
+            }
+        }
     }
 
     private fun receiveDiaryPictureDeleteDialogResult() {
-        val selectedButton =
-            receiveResulFromDialog<Int>(
-                DiaryPictureDeleteDialogFragment.KEY_SELECTED_BUTTON
+        val result =
+            receiveResulFromDialog<DialogResult<Unit>>(
+                DiaryPictureDeleteDialogFragment.KEY_RESULT
             ) ?: return
-        if (selectedButton != DialogInterface.BUTTON_POSITIVE) return
 
-        mainViewModel.onDiaryPictureDeleteDialogPositiveButtonClicked()
+        when (result) {
+            is DialogResult.Positive<Unit> -> {
+                mainViewModel.onDiaryPictureDeleteDialogPositiveButtonClicked()
+            }
+            DialogResult.Negative,
+            DialogResult.Cancel -> {
+                return
+            }
+        }
     }
 
     private fun setUpViewModelInitialization() {

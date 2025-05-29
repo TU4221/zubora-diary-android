@@ -9,6 +9,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.NavHostFragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.websarva.wings.android.zuboradiary.R
+import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import com.websarva.wings.android.zuboradiary.ui.utils.requireValue
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.SettingsViewModel
@@ -100,11 +101,10 @@ abstract class BaseAlertDialogFragment : DialogFragment() {
      */
     internal abstract fun handleOnCancel()
 
-    internal fun setResult(resultKey: String, result: Any?) {
+    internal fun <T> setResult(resultKey: String, result: DialogResult<T>) {
         val navController = NavHostFragment.findNavController(this)
         val navBackStackEntry = checkNotNull(navController.previousBackStackEntry)
         val savedStateHandle = navBackStackEntry.savedStateHandle
-
         savedStateHandle[resultKey] = result
     }
 }

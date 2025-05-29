@@ -1,16 +1,14 @@
 package com.websarva.wings.android.zuboradiary.ui.fragment.dialog
 
-import android.content.DialogInterface
 import com.websarva.wings.android.zuboradiary.R
+import com.websarva.wings.android.zuboradiary.ui.fragment.RESULT_KEY_PREFIX
+import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
 
 class DiaryItemTitleDeleteDialogFragment : BaseAlertDialogFragment() {
 
     companion object {
-        private val fromClassName = "From" + DiaryItemTitleDeleteDialogFragment::class.java.name
         @JvmField
-        val KEY_SELECTED_BUTTON: String = "SelectedButton$fromClassName"
-        @JvmField
-        val KEY_DELETE_LIST_ITEM_POSITION: String = "DeleteItemPosition$fromClassName"
+        val KEY_RESULT = RESULT_KEY_PREFIX + DiaryItemTitleDeleteDialogFragment::class.java.name
     }
 
     override fun createTitle(): String {
@@ -26,22 +24,16 @@ class DiaryItemTitleDeleteDialogFragment : BaseAlertDialogFragment() {
     }
 
     override fun handleOnPositiveButtonClick() {
-        setResults(DialogInterface.BUTTON_POSITIVE)
+        val deleteListItemPosition =
+            DiaryItemTitleDeleteDialogFragmentArgs.fromBundle(requireArguments()).itemPosition
+        setResult(KEY_RESULT, DialogResult.Positive(deleteListItemPosition))
     }
 
     override fun handleOnNegativeButtonClick() {
-        setResults(DialogInterface.BUTTON_NEGATIVE)
+        setResult(KEY_RESULT, DialogResult.Negative)
     }
 
     override fun handleOnCancel() {
-        setResults(DialogInterface.BUTTON_NEGATIVE)
-    }
-
-    private fun setResults(status: Int) {
-        setResult(KEY_SELECTED_BUTTON, status)
-
-        val deleteListItemPosition =
-            DiaryItemTitleDeleteDialogFragmentArgs.fromBundle(requireArguments()).itemPosition
-        setResult(KEY_DELETE_LIST_ITEM_POSITION, deleteListItemPosition)
+        setResult(KEY_RESULT, DialogResult.Cancel)
     }
 }

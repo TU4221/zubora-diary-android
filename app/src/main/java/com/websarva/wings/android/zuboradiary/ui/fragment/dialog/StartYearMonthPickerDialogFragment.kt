@@ -2,15 +2,16 @@ package com.websarva.wings.android.zuboradiary.ui.fragment.dialog
 
 import android.view.View
 import com.websarva.wings.android.zuboradiary.databinding.DialogFragmentNumberPickersBinding
+import com.websarva.wings.android.zuboradiary.ui.fragment.RESULT_KEY_PREFIX
+import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
 import java.time.LocalDate
 import java.time.YearMonth
 
 class StartYearMonthPickerDialogFragment : BaseNumberPickersBottomSheetDialogFragment() {
 
     companion object {
-        private val fromClassName = "From" + StartYearMonthPickerDialogFragment::class.java.name
         @JvmField
-        val KEY_SELECTED_YEAR_MONTH: String = "SelectedYearMonth$fromClassName"
+        val KEY_RESULT = RESULT_KEY_PREFIX + StartYearMonthPickerDialogFragment::class.java.name
     }
 
     override fun handleOnPositiveButtonClick() {
@@ -22,15 +23,15 @@ class StartYearMonthPickerDialogFragment : BaseNumberPickersBottomSheetDialogFra
         val selectedMonth = binding.numberPickerSecond.value
         val selectedYearMonth = YearMonth.of(selectedYear, selectedMonth)
 
-        setResult(KEY_SELECTED_YEAR_MONTH, selectedYearMonth)
+        setResult(KEY_RESULT, DialogResult.Positive(selectedYearMonth))
     }
 
     override fun handleOnNegativeButtonClick() {
-        setResult(KEY_SELECTED_YEAR_MONTH, null)
+        setResult(KEY_RESULT, DialogResult.Negative)
     }
 
     override fun handleOnCancel() {
-        setResult(KEY_SELECTED_YEAR_MONTH, null)
+        setResult(KEY_RESULT, DialogResult.Cancel)
     }
 
     override fun setUpNumberPickers(binding: DialogFragmentNumberPickersBinding) {

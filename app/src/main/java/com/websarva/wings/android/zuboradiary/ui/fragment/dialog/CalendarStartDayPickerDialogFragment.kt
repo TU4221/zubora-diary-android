@@ -2,15 +2,16 @@ package com.websarva.wings.android.zuboradiary.ui.fragment.dialog
 
 import android.view.View
 import com.websarva.wings.android.zuboradiary.databinding.DialogFragmentNumberPickersBinding
+import com.websarva.wings.android.zuboradiary.ui.fragment.RESULT_KEY_PREFIX
+import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
 import com.websarva.wings.android.zuboradiary.ui.utils.toCalendarStartDayOfWeekString
 import java.time.DayOfWeek
 
 class CalendarStartDayPickerDialogFragment : BaseNumberPickersBottomSheetDialogFragment() {
 
     companion object {
-        private val FROM_CLASS_NAME = "From" + CalendarStartDayPickerDialogFragment::class.java.name
         @JvmField
-        val KEY_SELECTED_DAY_OF_WEEK: String = "SelectedDayOfWeek$FROM_CLASS_NAME"
+        val KEY_RESULT = RESULT_KEY_PREFIX + CalendarStartDayPickerDialogFragment::class.java.name
     }
 
     override fun handleOnPositiveButtonClick() {
@@ -25,15 +26,15 @@ class CalendarStartDayPickerDialogFragment : BaseNumberPickersBottomSheetDialogF
         } else {
             DayOfWeek.of(selectedValue)
         }
-        setResult(KEY_SELECTED_DAY_OF_WEEK, selectedDayOfWeek)
+        setResult(KEY_RESULT, DialogResult.Positive(selectedDayOfWeek))
     }
 
     override fun handleOnNegativeButtonClick() {
-        setResult(KEY_SELECTED_DAY_OF_WEEK, null)
+        setResult(KEY_RESULT, DialogResult.Negative)
     }
 
     override fun handleOnCancel() {
-        setResult(KEY_SELECTED_DAY_OF_WEEK, null)
+        setResult(KEY_RESULT, DialogResult.Cancel)
     }
 
     override fun setUpNumberPickers(binding: DialogFragmentNumberPickersBinding) {

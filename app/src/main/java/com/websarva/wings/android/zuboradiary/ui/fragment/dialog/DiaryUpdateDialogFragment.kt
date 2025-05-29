@@ -1,15 +1,15 @@
 package com.websarva.wings.android.zuboradiary.ui.fragment.dialog
 
-import android.content.DialogInterface
 import com.websarva.wings.android.zuboradiary.R
+import com.websarva.wings.android.zuboradiary.ui.fragment.RESULT_KEY_PREFIX
+import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
 import com.websarva.wings.android.zuboradiary.ui.utils.toJapaneseDateString
 
 class DiaryUpdateDialogFragment : BaseAlertDialogFragment() {
 
     companion object {
-        private val fromClassName = "From" + DiaryUpdateDialogFragment::class.java.name
         @JvmField
-        val KEY_SELECTED_BUTTON: String = "SelectedButton$fromClassName"
+        val KEY_RESULT = RESULT_KEY_PREFIX + DiaryUpdateDialogFragment::class.java.name
     }
 
     override fun createTitle(): String {
@@ -24,14 +24,14 @@ class DiaryUpdateDialogFragment : BaseAlertDialogFragment() {
     }
 
     override fun handleOnPositiveButtonClick() {
-        setResult(KEY_SELECTED_BUTTON, DialogInterface.BUTTON_POSITIVE)
+        setResult(KEY_RESULT, DialogResult.Positive(Unit))
     }
 
     override fun handleOnNegativeButtonClick() {
-        setResult(KEY_SELECTED_BUTTON, DialogInterface.BUTTON_NEGATIVE)
+        setResult(KEY_RESULT, DialogResult.Negative)
     }
 
     override fun handleOnCancel() {
-        setResult(KEY_SELECTED_BUTTON, DialogInterface.BUTTON_NEGATIVE)
+        setResult(KEY_RESULT, DialogResult.Cancel)
     }
 }

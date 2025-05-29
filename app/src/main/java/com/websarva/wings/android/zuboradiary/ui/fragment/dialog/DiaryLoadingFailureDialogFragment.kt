@@ -1,16 +1,16 @@
 package com.websarva.wings.android.zuboradiary.ui.fragment.dialog
 
-import android.content.DialogInterface
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.websarva.wings.android.zuboradiary.R
+import com.websarva.wings.android.zuboradiary.ui.fragment.RESULT_KEY_PREFIX
+import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
 import com.websarva.wings.android.zuboradiary.ui.utils.toJapaneseDateString
 
 class DiaryLoadingFailureDialogFragment : BaseAlertDialogFragment() {
 
     companion object {
-        private val fromClassName = "From" + DiaryLoadingFailureDialogFragment::class.java.name
         @JvmField
-        val KEY_SELECTED_BUTTON: String = "SelectedButton$fromClassName"
+        val KEY_RESULT = RESULT_KEY_PREFIX + DiaryLoadingFailureDialogFragment::class.java.name
     }
 
     override fun createTitle(): String {
@@ -25,7 +25,7 @@ class DiaryLoadingFailureDialogFragment : BaseAlertDialogFragment() {
     }
 
     override fun handleOnPositiveButtonClick() {
-        setResult(KEY_SELECTED_BUTTON, DialogInterface.BUTTON_POSITIVE)
+        setResult(KEY_RESULT, DialogResult.Positive(Unit))
     }
 
     override fun handleOnNegativeButtonClick() {
@@ -33,7 +33,7 @@ class DiaryLoadingFailureDialogFragment : BaseAlertDialogFragment() {
     }
 
     override fun handleOnCancel() {
-        setResult(KEY_SELECTED_BUTTON, DialogInterface.BUTTON_POSITIVE)
+        setResult(KEY_RESULT, DialogResult.Cancel)
     }
 
     override fun customizeDialog(builder: MaterialAlertDialogBuilder) {

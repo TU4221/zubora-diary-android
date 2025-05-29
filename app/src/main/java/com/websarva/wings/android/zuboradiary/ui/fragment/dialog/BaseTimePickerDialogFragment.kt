@@ -9,6 +9,7 @@ import androidx.navigation.fragment.NavHostFragment
 import com.google.android.material.timepicker.MaterialTimePicker
 import com.google.android.material.timepicker.MaterialTimePicker.INPUT_MODE_CLOCK
 import com.google.android.material.timepicker.TimeFormat
+import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import com.websarva.wings.android.zuboradiary.ui.utils.requireValue
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.SettingsViewModel
@@ -95,7 +96,7 @@ abstract class BaseTimePickerDialogFragment : DialogFragment() {
     internal abstract fun handleOnCancel()
 
     @Suppress("SameParameterValue")
-    internal fun setResult(resultKey: String, result: Any?) {
+    internal fun <T> setResult(resultKey: String, result: DialogResult<T>) {
         val navController = NavHostFragment.findNavController(this)
         val navBackStackEntry = checkNotNull(navController.previousBackStackEntry)
         val savedStateHandle = navBackStackEntry.savedStateHandle

@@ -1,6 +1,5 @@
 package com.websarva.wings.android.zuboradiary.ui.fragment
 
-import android.content.DialogInterface
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -17,6 +16,7 @@ import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.DiaryItemTitleD
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.DiaryItemTitleEditViewModel
 import com.websarva.wings.android.zuboradiary.ui.adapter.diaryitemtitle.ItemTitleSelectionHistoryListAdapter
 import com.websarva.wings.android.zuboradiary.ui.adapter.diaryitemtitle.SelectionHistoryList
+import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
 import com.websarva.wings.android.zuboradiary.ui.model.result.ItemTitleEditResult
 import com.websarva.wings.android.zuboradiary.ui.view.edittext.TextInputConfigurator
 import com.websarva.wings.android.zuboradiary.ui.utils.requireValue
@@ -76,34 +76,31 @@ class DiaryItemTitleEditFragment : BaseFragment() {
     }
 
     override fun removeDialogResults() {
-        removeResulFromFragment(DiaryItemTitleDeleteDialogFragment.KEY_SELECTED_BUTTON)
-        removeResulFromFragment(DiaryItemTitleDeleteDialogFragment.KEY_DELETE_LIST_ITEM_POSITION)
+        removeResulFromFragment(DiaryItemTitleDeleteDialogFragment.KEY_RESULT)
     }
 
     // 履歴項目削除確認ダイアログからの結果受取
     private fun receiveDiaryItemTitleDeleteDialogResult() {
-        val selectedButton =
-            receiveResulFromDialog<Int>(DiaryItemTitleDeleteDialogFragment.KEY_SELECTED_BUTTON)
+        val result =
+            receiveResulFromDialog<DialogResult<Int>>(DiaryItemTitleDeleteDialogFragment.KEY_RESULT)
                 ?: return
 
-        if (selectedButton == DialogInterface.BUTTON_POSITIVE) {
-            val deleteListItemPosition =
-                checkNotNull(
-                    receiveResulFromDialog<Int>(
-                        DiaryItemTitleDeleteDialogFragment.KEY_DELETE_LIST_ITEM_POSITION
-                    )
-                )
-
-            lifecycleScope.launch {
-                mainViewModel
-                    .deleteDiaryItemTitleSelectionHistoryItem(deleteListItemPosition)
+        when (result) {
+            is DialogResult.Positive<Int> -> {
+                val deleteListItemPosition = result.data
+                lifecycleScope.launch {
+                    mainViewModel
+                        .deleteDiaryItemTitleSelectionHistoryItem(deleteListItemPosition)
+                }
             }
-        } else {
-            val adapter =
-                checkNotNull(
-                    binding.recyclerItemTitleSelectionHistory.adapter
-                ) as ItemTitleSelectionHistoryListAdapter
-            adapter.closeSwipedItem()
+            DialogResult.Negative,
+            DialogResult.Cancel -> {
+                val adapter =
+                    checkNotNull(
+                        binding.recyclerItemTitleSelectionHistory.adapter
+                    ) as ItemTitleSelectionHistoryListAdapter
+                adapter.closeSwipedItem()
+            }
         }
     }
 

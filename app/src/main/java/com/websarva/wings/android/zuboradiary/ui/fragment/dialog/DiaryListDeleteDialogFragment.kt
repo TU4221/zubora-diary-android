@@ -1,18 +1,17 @@
 package com.websarva.wings.android.zuboradiary.ui.fragment.dialog
 
-import android.net.Uri
 import com.websarva.wings.android.zuboradiary.R
+import com.websarva.wings.android.zuboradiary.ui.fragment.RESULT_KEY_PREFIX
+import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
+import com.websarva.wings.android.zuboradiary.ui.model.result.DiaryListItemDeleteResult
 import com.websarva.wings.android.zuboradiary.ui.utils.toJapaneseDateString
-import java.time.LocalDate
+
 
 class DiaryListDeleteDialogFragment : BaseAlertDialogFragment() {
 
     companion object {
-        private val fromClassName = "From" + DiaryListDeleteDialogFragment::class.java.name
         @JvmField
-        val KEY_DELETE_DIARY_DATE: String = "DeleteDiaryDate$fromClassName"
-        @JvmField
-        val KEY_DELETE_DIARY_PICTURE_URI: String = "DeleteDiaryPictureUri$fromClassName"
+        val KEY_RESULT = RESULT_KEY_PREFIX + DiaryListDeleteDialogFragment::class.java.name
     }
 
     override fun createTitle(): String {
@@ -31,19 +30,15 @@ class DiaryListDeleteDialogFragment : BaseAlertDialogFragment() {
             DiaryListDeleteDialogFragmentArgs.fromBundle(requireArguments()).date
         val deleteDiaryPictureUri =
             DiaryListDeleteDialogFragmentArgs.fromBundle(requireArguments()).pictureUri
-        setResults(deleteDiaryDate, deleteDiaryPictureUri)
+        val resultData = DiaryListItemDeleteResult(deleteDiaryDate, deleteDiaryPictureUri)
+        setResult(KEY_RESULT, DialogResult.Positive(resultData))
     }
 
     override fun handleOnNegativeButtonClick() {
-        setResults()
+        setResult(KEY_RESULT, DialogResult.Negative)
     }
 
     override fun handleOnCancel() {
-        setResults()
-    }
-
-    private fun setResults(date: LocalDate? = null, pictureUri: Uri? = null) {
-        setResult(KEY_DELETE_DIARY_DATE, date)
-        setResult(KEY_DELETE_DIARY_PICTURE_URI, pictureUri)
+        setResult(KEY_RESULT, DialogResult.Cancel)
     }
 }
