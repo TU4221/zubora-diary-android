@@ -96,18 +96,18 @@ class DiaryListFragment : BaseFragment() {
                 StartYearMonthPickerDialogFragment.KEY_RESULT
             ) ?: return
 
-
-
+        // TODO:シールドクラス Action -> Event に変更してから下記コードの処理方法を検討する。
         when (result) {
             is DialogResult.Positive<YearMonth> -> {
                 shouldInitializeListAdapter = true
-                mainViewModel.onDataReceivedFromDatePickerDialog(result.data)
             }
             DialogResult.Negative,
             DialogResult.Cancel -> {
-                return
+                // 処理なし
             }
         }
+
+        mainViewModel.onDatePickerDialogResultReceived(result)
     }
 
     // 日記削除ダイアログフラグメントから結果受取
@@ -117,19 +117,7 @@ class DiaryListFragment : BaseFragment() {
                 DiaryListDeleteDialogFragment.KEY_RESULT
             ) ?: return
 
-        when (result) {
-            is DialogResult.Positive<DiaryListItemDeleteResult> -> {
-                mainViewModel
-                    .onDataReceivedFromDiaryDeleteDialog(
-                        result.data.date,
-                        result.data.uri
-                    )
-            }
-            DialogResult.Negative,
-            DialogResult.Cancel -> {
-                return
-            }
-        }
+        mainViewModel.onDiaryDeleteDialogResultReceived(result)
     }
 
     private fun setUpFragmentAction() {

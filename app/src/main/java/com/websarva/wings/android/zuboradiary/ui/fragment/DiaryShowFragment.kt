@@ -103,15 +103,7 @@ internal class DiaryShowFragment : BaseFragment() {
             receiveResulFromDialog<DialogResult<Unit>>(DiaryLoadingFailureDialogFragment.KEY_RESULT)
                 ?: return
 
-        when (result) {
-            is DialogResult.Positive<Unit> -> {
-                mainViewModel.onDiaryLoadingFailureDialogPositiveButtonClicked()
-            }
-            DialogResult.Negative,
-            DialogResult.Cancel -> {
-                return
-            }
-        }
+        mainViewModel.onDiaryLoadingFailureDialogResultReceived(result)
     }
 
     // 日記削除確認ダイアログフラグメントからデータ受取
@@ -120,15 +112,7 @@ internal class DiaryShowFragment : BaseFragment() {
             receiveResulFromDialog<DialogResult<Unit>>(DiaryDeleteDialogFragment.KEY_RESULT)
                 ?: return
 
-        when (result) {
-            is DialogResult.Positive<Unit> -> {
-                mainViewModel.onDiaryDeleteDialogPositiveButtonClicked()
-            }
-            DialogResult.Negative,
-            DialogResult.Cancel -> {
-                return
-            }
-        }
+        mainViewModel.onDiaryDeleteDialogResultReceived(result)
     }
 
     private fun setUpOnBackPressedCallback() {

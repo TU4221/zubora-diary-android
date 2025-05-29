@@ -12,6 +12,7 @@ import com.websarva.wings.android.zuboradiary.ui.model.DiaryShowAppMessage
 import com.websarva.wings.android.zuboradiary.ui.model.DiaryShowPendingDialog
 import com.websarva.wings.android.zuboradiary.ui.model.action.DiaryShowFragmentAction
 import com.websarva.wings.android.zuboradiary.ui.model.action.FragmentAction
+import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
 import com.websarva.wings.android.zuboradiary.ui.model.state.DiaryShowState
 import com.websarva.wings.android.zuboradiary.ui.utils.requireValue
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -126,14 +127,32 @@ internal class DiaryShowViewModel @Inject constructor(
         }
     }
 
-    // DialogButtonClicked処理
-    fun onDiaryLoadingFailureDialogPositiveButtonClicked() {
-        viewModelScope.launch {
-            navigatePreviousFragment()
+    // Fragmentからの結果受取処理
+    fun onDiaryLoadingFailureDialogResultReceived(result: DialogResult<Unit>) {
+        when (result) {
+            is DialogResult.Positive<Unit>,
+            DialogResult.Negative,
+            DialogResult.Cancel -> {
+                viewModelScope.launch {
+                    navigatePreviousFragment()
+                }
+            }
         }
     }
 
-    fun onDiaryDeleteDialogPositiveButtonClicked() {
+    fun onDiaryDeleteDialogResultReceived(result: DialogResult<Unit>) {
+        when (result) {
+            is DialogResult.Positive<Unit> -> {
+                onDiaryDeleteDialogPositiveResultReceived()
+            }
+            DialogResult.Negative,
+            DialogResult.Cancel -> {
+                // 処理なし
+            }
+        }
+    }
+
+    private fun onDiaryDeleteDialogPositiveResultReceived() {
         _diaryShowState.value = DiaryShowState.Deleting
         viewModelScope.launch {
             deleteDiary()

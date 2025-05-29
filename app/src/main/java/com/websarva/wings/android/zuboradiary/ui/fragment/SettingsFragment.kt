@@ -157,15 +157,7 @@ class SettingsFragment : BaseFragment() {
             receiveResulFromDialog<DialogResult<ThemeColor>>(ThemeColorPickerDialogFragment.KEY_RESULT)
                 ?: return
 
-        when (result) {
-            is DialogResult.Positive<ThemeColor> -> {
-                mainViewModel.onThemeColorSettingDialogPositiveButtonClicked(result.data)
-            }
-            DialogResult.Negative,
-            DialogResult.Cancel -> {
-                return
-            }
-        }
+       mainViewModel.onThemeColorSettingDialogResultReceived(result)
     }
 
     // カレンダー開始曜日設定ダイアログフラグメントから結果受取
@@ -175,16 +167,7 @@ class SettingsFragment : BaseFragment() {
                 CalendarStartDayPickerDialogFragment.KEY_RESULT
             ) ?: return
 
-        when (result) {
-            is DialogResult.Positive<DayOfWeek> -> {
-                settingsViewModel
-                    .onCalendarStartDayOfWeekSettingDialogPositiveButtonClicked(result.data)
-            }
-            DialogResult.Negative,
-            DialogResult.Cancel -> {
-                return
-            }
-        }
+        mainViewModel.onCalendarStartDayOfWeekSettingDialogResultReceived(result)
     }
 
     // リマインダー通知時間設定ダイアログフラグメントから結果受取
@@ -194,16 +177,7 @@ class SettingsFragment : BaseFragment() {
                 ReminderNotificationTimePickerDialogFragment.KEY_RESULT
             ) ?: return
 
-        when (result) {
-            is DialogResult.Positive<LocalTime> -> {
-                mainViewModel.onReminderNotificationSettingDialogPositiveButtonClicked(result.data)
-            }
-            DialogResult.Negative,
-            DialogResult.Cancel -> {
-                mainViewModel.onReminderNotificationSettingDialogNegativeButtonClicked()
-                return
-            }
-        }
+        mainViewModel.onReminderNotificationSettingDialogResultReceived(result)
     }
 
     // 権限催促ダイアログフラグメントから結果受取
@@ -211,13 +185,14 @@ class SettingsFragment : BaseFragment() {
         val result =
             receiveResulFromDialog<DialogResult<Unit>>(PermissionDialogFragment.KEY_RESULT) ?: return
 
+        // TODO:シールドクラス Action -> Event に変更してから下記コードの処理方法を検討する。
         when (result) {
             is DialogResult.Positive<Unit> -> {
                 showApplicationDetailsSettings()
             }
             DialogResult.Negative,
             DialogResult.Cancel -> {
-                return
+                // 処理なし
             }
         }
     }
@@ -228,15 +203,7 @@ class SettingsFragment : BaseFragment() {
                 AllDiariesDeleteDialogFragment.KEY_RESULT
             ) ?: return
 
-        when (result) {
-            is DialogResult.Positive<Unit> -> {
-                mainViewModel.onAllDiariesDeleteDialogPositiveButtonClicked()
-            }
-            DialogResult.Negative,
-            DialogResult.Cancel -> {
-                return
-            }
-        }
+        mainViewModel.onAllDiariesDeleteDialogResultReceived(result)
     }
 
     private fun receiveAllSettingsInitializationDialogResult() {
@@ -245,15 +212,7 @@ class SettingsFragment : BaseFragment() {
                 AllSettingsInitializationDialogFragment.KEY_RESULT
             ) ?: return
 
-        when (result) {
-            is DialogResult.Positive<Unit> -> {
-                mainViewModel.onAllSettingsInitializationDialogPositiveButtonClicked()
-            }
-            DialogResult.Negative,
-            DialogResult.Cancel -> {
-                return
-            }
-        }
+        mainViewModel.onAllSettingsInitializationDialogResultReceived(result)
     }
 
     private fun receiveAllDataDeleteDialogResult() {
@@ -262,15 +221,7 @@ class SettingsFragment : BaseFragment() {
                 AllDataDeleteDialogFragment.KEY_RESULT
             ) ?: return
 
-        when (result) {
-            is DialogResult.Positive<Unit> -> {
-                mainViewModel.onAllDataDeleteDialogPositiveButtonClicked()
-            }
-            DialogResult.Negative,
-            DialogResult.Cancel -> {
-                return
-            }
-        }
+        mainViewModel.onAllDataDeleteDialogResultReceived(result)
     }
 
     private fun setUpScrollPosition() {

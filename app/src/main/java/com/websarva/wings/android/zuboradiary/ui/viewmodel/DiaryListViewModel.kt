@@ -14,6 +14,8 @@ import com.websarva.wings.android.zuboradiary.ui.adapter.diary.diary.DiaryYearMo
 import com.websarva.wings.android.zuboradiary.ui.model.state.DiaryListState
 import com.websarva.wings.android.zuboradiary.ui.model.action.DiaryListFragmentAction
 import com.websarva.wings.android.zuboradiary.ui.model.action.FragmentAction
+import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
+import com.websarva.wings.android.zuboradiary.ui.model.result.DiaryListItemDeleteResult
 import com.websarva.wings.android.zuboradiary.ui.utils.requireValue
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
@@ -122,13 +124,40 @@ internal class DiaryListViewModel @Inject constructor(
         prepareDiaryList()
     }
 
-    // Fragmentデータ受取処理
-    fun onDataReceivedFromDatePickerDialog(yearMonth: YearMonth) {
+    // Fragmentからの結果受取処理
+    fun onDatePickerDialogResultReceived(result: DialogResult<YearMonth>) {
+        when (result) {
+            is DialogResult.Positive<YearMonth> -> {
+                onDatePickerDialogPositiveResultReceived(result.data)
+            }
+            DialogResult.Negative,
+            DialogResult.Cancel -> {
+                // 処理なし
+            }
+        }
+    }
+
+    private fun onDatePickerDialogPositiveResultReceived(yearMonth: YearMonth) {
         updateSortConditionDate(yearMonth)
         loadNewDiaryList()
     }
 
-    fun onDataReceivedFromDiaryDeleteDialog(date: LocalDate, uri: Uri?) {
+    fun onDiaryDeleteDialogResultReceived(result: DialogResult<DiaryListItemDeleteResult>) {
+        when (result) {
+            is DialogResult.Positive<DiaryListItemDeleteResult> -> {
+                onDiaryDeleteDialogPositiveResultReceived(
+                    result.data.date,
+                    result.data.uri
+                )
+            }
+            DialogResult.Negative,
+            DialogResult.Cancel -> {
+                // 処理なし
+            }
+        }
+    }
+
+    private fun onDiaryDeleteDialogPositiveResultReceived(date: LocalDate, uri: Uri?) {
         viewModelScope.launch {
             val isSuccessful = deleteDiary(date)
             if (!isSuccessful) return@launch

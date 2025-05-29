@@ -21,6 +21,7 @@ import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import com.websarva.wings.android.zuboradiary.ui.model.SettingsAppMessage
 import com.websarva.wings.android.zuboradiary.ui.model.action.FragmentAction
 import com.websarva.wings.android.zuboradiary.ui.model.action.SettingsFragmentAction
+import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
 import com.websarva.wings.android.zuboradiary.ui.utils.requireValue
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
@@ -345,26 +346,63 @@ internal class SettingsViewModel @Inject constructor(
         }
     }
 
-    // DialogButton処理
-    fun onThemeColorSettingDialogPositiveButtonClicked(themeColor: ThemeColor) {
+    // Fragmentからの結果受取処理
+    fun onThemeColorSettingDialogResultReceived(result: DialogResult<ThemeColor>) {
+        when (result) {
+            is DialogResult.Positive<ThemeColor> -> {
+                onThemeColorSettingDialogPositiveResultReceived(result.data)
+            }
+            DialogResult.Negative,
+            DialogResult.Cancel -> {
+                // 処理なし
+            }
+        }
+    }
+
+    private fun onThemeColorSettingDialogPositiveResultReceived(themeColor: ThemeColor) {
         viewModelScope.launch {
             saveThemeColor(themeColor)
         }
     }
 
-    fun onCalendarStartDayOfWeekSettingDialogPositiveButtonClicked(dayOfWeek: DayOfWeek) {
+    fun onCalendarStartDayOfWeekSettingDialogResultReceived(result: DialogResult<DayOfWeek>) {
+        when (result) {
+            is DialogResult.Positive<DayOfWeek> -> {
+                onCalendarStartDayOfWeekSettingDialogPositiveResultReceived(result.data)
+            }
+            DialogResult.Negative,
+            DialogResult.Cancel -> {
+                // 処理なし
+            }
+        }
+    }
+
+    private fun onCalendarStartDayOfWeekSettingDialogPositiveResultReceived(dayOfWeek: DayOfWeek) {
         viewModelScope.launch {
             saveCalendarStartDayOfWeek(dayOfWeek)
         }
     }
 
-    fun onReminderNotificationSettingDialogPositiveButtonClicked(time: LocalTime) {
+    fun onReminderNotificationSettingDialogResultReceived(result: DialogResult<LocalTime>) {
+        when (result) {
+            is DialogResult.Positive<LocalTime> -> {
+                onReminderNotificationSettingDialogPositiveResultReceived(result.data)
+            }
+            DialogResult.Negative,
+            DialogResult.Cancel -> {
+                onReminderNotificationSettingDialogNegativeResultReceived()
+                return
+            }
+        }
+    }
+
+    private fun onReminderNotificationSettingDialogPositiveResultReceived(time: LocalTime) {
         viewModelScope.launch {
             saveReminderNotificationValid(time)
         }
     }
 
-    fun onReminderNotificationSettingDialogNegativeButtonClicked() {
+    private fun onReminderNotificationSettingDialogNegativeResultReceived() {
         viewModelScope.launch {
             _fragmentAction.emit(
                 SettingsFragmentAction.TurnOffReminderNotificationSettingSwitch
@@ -372,7 +410,19 @@ internal class SettingsViewModel @Inject constructor(
         }
     }
 
-    fun onAllDiariesDeleteDialogPositiveButtonClicked() {
+    fun onAllDiariesDeleteDialogResultReceived(result: DialogResult<Unit>) {
+        when (result) {
+            is DialogResult.Positive<Unit> -> {
+                onAllDiariesDeleteDialogPositiveResultReceived()
+            }
+            DialogResult.Negative,
+            DialogResult.Cancel -> {
+                return
+            }
+        }
+    }
+
+    private fun onAllDiariesDeleteDialogPositiveResultReceived() {
         viewModelScope.launch {
             val isSuccessful = deleteAllDiaries()
             if (!isSuccessful) return@launch
@@ -381,13 +431,37 @@ internal class SettingsViewModel @Inject constructor(
         }
     }
 
-    fun onAllSettingsInitializationDialogPositiveButtonClicked() {
+    fun onAllSettingsInitializationDialogResultReceived(result: DialogResult<Unit>) {
+        when (result) {
+            is DialogResult.Positive<Unit> -> {
+                onAllSettingsInitializationDialogPositiveResultReceived()
+            }
+            DialogResult.Negative,
+            DialogResult.Cancel -> {
+                return
+            }
+        }
+    }
+
+    private fun onAllSettingsInitializationDialogPositiveResultReceived() {
         viewModelScope.launch {
             initializeAllSettings()
         }
     }
 
-    fun onAllDataDeleteDialogPositiveButtonClicked() {
+    fun onAllDataDeleteDialogResultReceived(result: DialogResult<Unit>) {
+        when (result) {
+            is DialogResult.Positive<Unit> -> {
+                onAllDataDeleteDialogPositiveResultReceived()
+            }
+            DialogResult.Negative,
+            DialogResult.Cancel -> {
+                return
+            }
+        }
+    }
+
+    private fun onAllDataDeleteDialogPositiveResultReceived() {
         viewModelScope.launch {
             val isSuccessful = deleteAllData()
             if (!isSuccessful) return@launch

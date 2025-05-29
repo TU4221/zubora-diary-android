@@ -22,6 +22,7 @@ import com.websarva.wings.android.zuboradiary.ui.model.adapter.WeatherAdapterLis
 import com.websarva.wings.android.zuboradiary.ui.model.action.DiaryEditFragmentAction
 import com.websarva.wings.android.zuboradiary.ui.model.action.FragmentAction
 import com.websarva.wings.android.zuboradiary.ui.model.adapter.ConditionAdapterList
+import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
 import com.websarva.wings.android.zuboradiary.ui.model.state.DiaryEditState
 import com.websarva.wings.android.zuboradiary.ui.utils.requireValue
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -393,8 +394,20 @@ internal class DiaryEditViewModel @Inject constructor(
         }
     }
 
-    // DialogButtonClicked処理
-    fun onDiaryLoadingDialogPositiveButtonClicked() {
+    // Fragmentデータ受取処理
+    fun onDiaryLoadingDialogResultReceived(result: DialogResult<String>) {
+        when (result) {
+            is DialogResult.Positive<String> -> {
+                onDiaryLoadingDialogPositiveResultReceived()
+            }
+            DialogResult.Negative,
+            DialogResult.Cancel -> {
+                onDiaryLoadingDialogNegativeResultReceived()
+            }
+        }
+    }
+
+    private fun onDiaryLoadingDialogPositiveResultReceived() {
         val date = this.date.requireValue()
         viewModelScope.launch {
             _diaryEditState.value = DiaryEditState.Loading
@@ -405,7 +418,7 @@ internal class DiaryEditViewModel @Inject constructor(
         }
     }
 
-    fun onDiaryLoadingDialogNegativeButtonClicked() {
+    private fun onDiaryLoadingDialogNegativeResultReceived() {
         viewModelScope.launch {
             _diaryEditState.value = DiaryEditState.WeatherFetching
             val date = date.requireValue()
@@ -418,7 +431,19 @@ internal class DiaryEditViewModel @Inject constructor(
         }
     }
 
-    fun onDiaryUpdateDialogPositiveButtonClicked() {
+    fun onDiaryUpdateDialogResultReceived(result: DialogResult<Unit>) {
+        when (result) {
+            is DialogResult.Positive<Unit> -> {
+                onDiaryUpdateDialogPositiveResultReceived()
+            }
+            DialogResult.Negative,
+            DialogResult.Cancel -> {
+                // 処理なし
+            }
+        }
+    }
+
+    private fun onDiaryUpdateDialogPositiveResultReceived() {
         _diaryEditState.value = DiaryEditState.Saving
         viewModelScope.launch {
             saveDiary(true)
@@ -426,7 +451,19 @@ internal class DiaryEditViewModel @Inject constructor(
         }
     }
 
-    fun onDiaryDeleteDialogPositiveButtonClicked() {
+    fun onDiaryDeleteDialogResultReceived(result: DialogResult<Unit>) {
+        when (result) {
+            is DialogResult.Positive<Unit> -> {
+                onDiaryDeleteDialogPositiveResultReceived()
+            }
+            DialogResult.Negative,
+            DialogResult.Cancel -> {
+                // 処理なし
+            }
+        }
+    }
+
+    private fun onDiaryDeleteDialogPositiveResultReceived() {
         _diaryEditState.value = DiaryEditState.Deleting
         viewModelScope.launch {
             deleteDiary()
@@ -434,20 +471,50 @@ internal class DiaryEditViewModel @Inject constructor(
         }
     }
 
-    fun onDatePickerDialogPositiveButtonClicked(date: LocalDate) {
+    fun onDatePickerDialogResultReceived(result: DialogResult<LocalDate>) {
+        when (result) {
+            is DialogResult.Positive<LocalDate> -> {
+                onDatePickerDialogPositiveResultReceived(result.data)
+            }
+            DialogResult.Negative,
+            DialogResult.Cancel -> {
+                // 処理なし
+            }
+        }
+    }
+
+    private fun onDatePickerDialogPositiveResultReceived(date: LocalDate) {
         _diaryEditState.value = DiaryEditState.WeatherFetching
         viewModelScope.launch {
             prepareDiaryDate(date)
         }
     }
 
-    fun onDiaryLoadingFailureDialogPositiveButtonClicked() {
-        viewModelScope.launch {
-            navigatePreviousFragment()
+    fun onDiaryLoadingFailureDialogResultReceived(result: DialogResult<Unit>) {
+        when (result) {
+            is DialogResult.Positive<Unit>,
+            DialogResult.Negative,
+            DialogResult.Cancel -> {
+                viewModelScope.launch {
+                    navigatePreviousFragment()
+                }
+            }
         }
     }
 
-    fun onWeatherInfoFetchDialogPositiveButtonClicked() {
+    fun onWeatherInfoFetchDialogResultReceived(result: DialogResult<Unit>) {
+        when (result) {
+            is DialogResult.Positive<Unit> -> {
+                onWeatherInfoFetchDialogPositiveResultReceived()
+            }
+            DialogResult.Negative,
+            DialogResult.Cancel -> {
+                // 処理なし
+            }
+        }
+    }
+
+    private fun onWeatherInfoFetchDialogPositiveResultReceived() {
         _diaryEditState.value = DiaryEditState.WeatherFetching
         viewModelScope.launch {
             val date = diaryStateFlow.date.requireValue()
@@ -457,7 +524,19 @@ internal class DiaryEditViewModel @Inject constructor(
         }
     }
 
-    fun onDiaryItemDeleteDialogPositiveButtonClicked(itemNumber: ItemNumber) {
+    fun onDiaryItemDeleteDialogResultReceived(result: DialogResult<ItemNumber>) {
+        when (result) {
+            is DialogResult.Positive<ItemNumber> -> {
+                onDiaryItemDeleteDialogPositiveResultReceived(result.data)
+            }
+            DialogResult.Negative,
+            DialogResult.Cancel -> {
+                // 処理なし
+            }
+        }
+    }
+
+    private fun onDiaryItemDeleteDialogPositiveResultReceived(itemNumber: ItemNumber) {
         _diaryEditState.value = DiaryEditState.ItemDeleting
         val numVisibleItems = numVisibleItems.requireValue()
 
@@ -473,6 +552,35 @@ internal class DiaryEditViewModel @Inject constructor(
         }
     }
 
+    fun onDiaryPictureDeleteDialogResultReceived(result: DialogResult<Unit>) {
+        when (result) {
+            is DialogResult.Positive<Unit> -> {
+                onDiaryPictureDeleteDialogPositiveResultReceived()
+            }
+            DialogResult.Negative,
+            DialogResult.Cancel -> {
+                // 処理なし
+            }
+        }
+    }
+
+    private fun onDiaryPictureDeleteDialogPositiveResultReceived() {
+        _diaryEditState.value = DiaryEditState.PictureDeleting
+        deletePicturePath()
+        _diaryEditState.value = DiaryEditState.Idle
+    }
+
+    fun onDataReceivedFromItemTitleEditFragment(itemNumber: ItemNumber, itemTitle: String) {
+        updateItemTitle(itemNumber, itemTitle)
+    }
+
+    fun onPicturePathReceivedFromOpenDocument(uri: Uri?) {
+        // MEMO:未選択時null
+        if (uri != null) diaryStateFlow.picturePath.value = uri
+
+        _diaryEditState.value = DiaryEditState.Idle
+    }
+
     // Fragment状態処理
     fun onDiaryDataSetUp(
         date: LocalDate,
@@ -484,26 +592,8 @@ internal class DiaryEditViewModel @Inject constructor(
         }
     }
 
-    fun onDiaryPictureDeleteDialogPositiveButtonClicked() {
-        _diaryEditState.value = DiaryEditState.PictureDeleting
-        deletePicturePath()
-        _diaryEditState.value = DiaryEditState.Idle
-    }
-
     fun onAttachedPictureClicked() {
         _diaryEditState.value = DiaryEditState.PictureSelecting
-    }
-
-    // 他Fragmentからの受取処理
-    fun onDataReceivedFromItemTitleEditFragment(itemNumber: ItemNumber, itemTitle: String) {
-        updateItemTitle(itemNumber, itemTitle)
-    }
-
-    fun onPicturePathReceivedFromOpenDocument(uri: Uri?) {
-        // MEMO:未選択時null
-        if (uri != null) diaryStateFlow.picturePath.value = uri
-
-        _diaryEditState.value = DiaryEditState.Idle
     }
 
     // StateFlow値変更時処理
