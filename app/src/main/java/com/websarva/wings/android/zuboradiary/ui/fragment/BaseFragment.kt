@@ -34,14 +34,13 @@ import com.websarva.wings.android.zuboradiary.ui.model.DiaryShowPendingDialog
 import com.websarva.wings.android.zuboradiary.ui.model.PendingDialog
 import com.websarva.wings.android.zuboradiary.ui.model.PendingDialogList
 import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
+import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.BaseViewModel
 import com.websarva.wings.android.zuboradiary.ui.theme.ThemeColorInflaterCreator
 import com.websarva.wings.android.zuboradiary.ui.utils.requireValue
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.SettingsViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -185,7 +184,6 @@ abstract class BaseFragment : LoggingFragment() {
         destinationId = currentDestinationId
 
         initializeFragmentResultReceiver()
-        setUpPreviousFragmentResultReceiver()
         setUpDialogResultReceiver()
         setUpAppMessageDialog()
         setUpPendingDialogObserver()
@@ -197,39 +195,25 @@ abstract class BaseFragment : LoggingFragment() {
      * */
     internal abstract fun initializeFragmentResultReceiver()
 
+    internal fun <T> setUpFragmentResultReceiver(key: String, block: (FragmentResult<T>) -> Unit) {
+        setUpFragmentResultReceiverInternal(key, block)
+    }
+
     internal fun <T> setUpDialogResultReceiver(key: String, block: (DialogResult<T>) -> Unit) {
+        setUpFragmentResultReceiverInternal(key, block)
+    }
+
+    private fun <R> setUpFragmentResultReceiverInternal(key: String, block: (R) -> Unit) {
         val savedStateHandle = navBackStackEntry.savedStateHandle
         val result = savedStateHandle.getStateFlow(key, null)
         launchAndRepeatOnViewLifeCycleStarted {
-            result.collectLatest { value: DialogResult<T>? ->
+            result.collectLatest { value: R? ->
                 if (value == null) return@collectLatest
                 block(value)
 
                 savedStateHandle[key] = null
             }
         }
-    }
-
-    // MEMO:Fragment、DialogFragmentからの結果受け取り方法
-    //      https://developer.android.com/guide/navigation/use-graph/programmatic?hl=ja
-    private fun setUpPreviousFragmentResultReceiver() {
-        handleOnReceivingResultFromPreviousFragment()
-    }
-
-    /**
-     * BaseFragment#setUpPreviousFragmentResultReceiver()で呼び出される。
-     */
-    internal abstract fun handleOnReceivingResultFromPreviousFragment()
-
-    internal fun <T> receiveResulFromPreviousFragment(key: String): StateFlow<T?> {
-        val containsDialogResult = navBackStackEntry.savedStateHandle.contains(key)
-        if (!containsDialogResult) return MutableStateFlow<T?>(null)
-
-        return navBackStackEntry.savedStateHandle.getStateFlow(key, null)
-    }
-
-    internal fun removeResulFromFragment(key: String) {
-        navBackStackEntry.savedStateHandle[key] = null
     }
 
     private fun setUpDialogResultReceiver() {

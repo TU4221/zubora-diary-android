@@ -73,10 +73,6 @@ class WordSearchFragment : BaseFragment() {
         // 処理なし
     }
 
-    override fun handleOnReceivingResultFromPreviousFragment() {
-        // 処理なし
-    }
-
     private fun setUpKeyboard() {
         launchAndRepeatOnViewLifeCycleStarted {
             mainViewModel.shouldShowKeyboard

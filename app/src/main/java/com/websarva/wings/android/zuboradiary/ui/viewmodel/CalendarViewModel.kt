@@ -7,6 +7,7 @@ import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import com.websarva.wings.android.zuboradiary.ui.model.CalendarAppMessage
 import com.websarva.wings.android.zuboradiary.ui.model.action.CalendarFragmentAction
 import com.websarva.wings.android.zuboradiary.ui.model.action.FragmentAction
+import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
 import com.websarva.wings.android.zuboradiary.ui.model.state.CalendarState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -77,13 +78,23 @@ internal class CalendarViewModel @Inject constructor(
         }
     }
 
-    // 他Fragmentからの受取処理
-    fun onDataReceivedFromDiaryShowFragment(date: LocalDate) {
-        updateSelectedDate(date)
+    // Fragmentからの結果受取処理
+    fun onDiaryShowFragmentResultReceived(result: FragmentResult<LocalDate>) {
+        when (result) {
+            is FragmentResult.Some -> updateSelectedDate(result.data)
+            FragmentResult.None -> {
+                // 処理なし
+            }
+        }
     }
 
-    fun onDataReceivedFromDiaryEditFragment(date: LocalDate) {
-        updateSelectedDate(date)
+    fun onDataReceivedFromDiaryEditFragment(result: FragmentResult<LocalDate>) {
+        when (result) {
+            is FragmentResult.Some -> updateSelectedDate(result.data)
+            FragmentResult.None -> {
+                // 処理なし
+            }
+        }
     }
 
     // StateFlow値変更時処理

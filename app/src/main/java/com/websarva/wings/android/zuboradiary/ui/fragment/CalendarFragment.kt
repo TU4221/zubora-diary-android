@@ -109,39 +109,23 @@ class CalendarFragment : BaseFragment() {
     }
 
     override fun initializeFragmentResultReceiver() {
-        // TODO:保留
+        setUpDiaryShowFragmentResultReceiver()
+        setUpDiaryEditFragmentResultReceiver()
     }
 
-    override fun handleOnReceivingResultFromPreviousFragment() {
-        receivingDiaryShowFragmentResult()
-        receivingDiaryEditFragmentResult()
-    }
-
-    private fun receivingDiaryShowFragmentResult() {
-        val showedDiaryDate =
-            receiveResulFromPreviousFragment<LocalDate>(DiaryShowFragment.KEY_SHOWED_DIARY_DATE)
-
-        launchAndRepeatOnViewLifeCycleStarted {
-            showedDiaryDate.collectLatest { value: LocalDate? ->
-                value ?: return@collectLatest
-
-                mainViewModel.onDataReceivedFromDiaryShowFragment(value)
-                removeResulFromFragment(DiaryShowFragment.KEY_SHOWED_DIARY_DATE)
-            }
+    private fun setUpDiaryShowFragmentResultReceiver() {
+        setUpFragmentResultReceiver(
+            DiaryShowFragment.KEY_RESULT
+        ) { result ->
+            mainViewModel.onDiaryShowFragmentResultReceived(result)
         }
     }
 
-    private fun receivingDiaryEditFragmentResult() {
-        val editedDiaryDate =
-            receiveResulFromPreviousFragment<LocalDate>(DiaryEditFragment.KEY_EDITED_DIARY_DATE)
-
-        launchAndRepeatOnViewLifeCycleStarted {
-            editedDiaryDate.collectLatest { value: LocalDate? ->
-                value ?: return@collectLatest
-
-                mainViewModel.onDataReceivedFromDiaryEditFragment(value)
-                removeResulFromFragment(DiaryEditFragment.KEY_EDITED_DIARY_DATE)
-            }
+    private fun setUpDiaryEditFragmentResultReceiver() {
+        setUpFragmentResultReceiver(
+            DiaryEditFragment.KEY_RESULT
+        ) { result ->
+            mainViewModel.onDataReceivedFromDiaryEditFragment(result)
         }
     }
 

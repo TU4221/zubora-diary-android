@@ -27,6 +27,7 @@ import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.DiaryDeleteDial
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.DiaryLoadingFailureDialogFragment
 import com.websarva.wings.android.zuboradiary.ui.model.action.DiaryShowFragmentAction
 import com.websarva.wings.android.zuboradiary.ui.model.action.FragmentAction
+import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.DiaryShowViewModel
 import com.websarva.wings.android.zuboradiary.ui.utils.toJapaneseDateString
 import com.websarva.wings.android.zuboradiary.ui.utils.toJapaneseDateTimeWithSecondsString
@@ -40,8 +41,7 @@ internal class DiaryShowFragment : BaseFragment() {
 
     internal companion object {
         // Navigation関係
-        private val fromClassName = "From" + DiaryShowFragment::class.java.name
-        val KEY_SHOWED_DIARY_DATE: String = "ShowedDiaryDate$fromClassName"
+        val KEY_RESULT = RESULT_KEY_PREFIX + DiaryShowFragment::class.java.name
     }
 
     // View関係
@@ -86,10 +86,6 @@ internal class DiaryShowFragment : BaseFragment() {
     override fun initializeFragmentResultReceiver() {
         setUpDiaryLoadingFailureDialogResultReceiver()
         setUpDiaryDeleteDialogResultReceiver()
-    }
-
-    override fun handleOnReceivingResultFromPreviousFragment() {
-        // 処理なし
     }
 
     // 日記読込失敗確認ダイアログフラグメントからデータ受取
@@ -372,10 +368,13 @@ internal class DiaryShowFragment : BaseFragment() {
     private fun navigatePreviousFragment(date: LocalDate) {
         val navBackStackEntry = checkNotNull(navController.previousBackStackEntry)
         val destinationId = navBackStackEntry.destination.id
-        if (destinationId == R.id.navigation_calendar_fragment) {
-            val savedStateHandle = navBackStackEntry.savedStateHandle
-            savedStateHandle[KEY_SHOWED_DIARY_DATE] = date
-        }
+        val savedStateHandle = navBackStackEntry.savedStateHandle
+        savedStateHandle[KEY_RESULT] =
+            if (destinationId == R.id.navigation_calendar_fragment) {
+                FragmentResult.Some(date)
+            } else {
+                FragmentResult.None
+            }
         navController.navigateUp()
     }
 

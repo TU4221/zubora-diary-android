@@ -50,6 +50,7 @@ import com.websarva.wings.android.zuboradiary.ui.model.adapter.WeatherAdapterLis
 import com.websarva.wings.android.zuboradiary.ui.model.action.DiaryEditFragmentAction
 import com.websarva.wings.android.zuboradiary.ui.model.action.FragmentAction
 import com.websarva.wings.android.zuboradiary.ui.model.adapter.ConditionAdapterList
+import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
 import com.websarva.wings.android.zuboradiary.ui.model.result.ItemTitleEditResult
 import com.websarva.wings.android.zuboradiary.ui.utils.isAccessLocationGranted
 import com.websarva.wings.android.zuboradiary.ui.utils.toJapaneseDateString
@@ -63,8 +64,7 @@ class DiaryEditFragment : BaseFragment() {
 
     internal companion object {
         // Navigation関係
-        private val fromClassName = "From" + DiaryEditFragment::class.java.name
-        val KEY_EDITED_DIARY_DATE: String = "EditedDiaryDate$fromClassName"
+        val KEY_RESULT = RESULT_KEY_PREFIX + DiaryEditFragment::class.java.name
     }
 
     private val logTag = createLogTag()
@@ -129,37 +129,8 @@ class DiaryEditFragment : BaseFragment() {
         setupEditText()
     }
 
-    override fun handleOnReceivingResultFromPreviousFragment() {
-        // DiaryItemTitleEditFragmentから編集結果受取
-        val itemTitleEditResult =
-            receiveResulFromPreviousFragment<ItemTitleEditResult>(
-                DiaryItemTitleEditFragment.KEY_RESULT
-            )
-
-        launchAndRepeatOnViewLifeCycleStarted {
-            itemTitleEditResult.collectLatest { value: ItemTitleEditResult? ->
-                // MEMO:結果がない場合もあるので"return"で返す。
-                if (value == null) return@collectLatest
-
-                mainViewModel.onDataReceivedFromItemTitleEditFragment(value.itemNumber, value.title)
-
-                val focusTargetView =
-                    when (value.itemNumber.value) {
-                        1 -> binding.includeItem1.textInputEditTextTitle
-                        2 -> binding.includeItem2.textInputEditTextTitle
-                        3 -> binding.includeItem3.textInputEditTextTitle
-                        4 -> binding.includeItem4.textInputEditTextTitle
-                        5 -> binding.includeItem5.textInputEditTextTitle
-                        else -> throw IllegalStateException()
-                    }
-                focusTargetView.requestFocus()
-
-                removeResulFromFragment(DiaryItemTitleEditFragment.KEY_RESULT)
-            }
-        }
-    }
-
     override fun initializeFragmentResultReceiver() {
+        setUpDiaryItemTitleEditFragmentResultReceiver()
         setUpDiaryLoadingDialogResultReceiver()
         setUpDiaryLoadingFailureDialogResultReceiver()
         setUpDiaryUpdateDialogResultReceiver()
@@ -168,6 +139,35 @@ class DiaryEditFragment : BaseFragment() {
         setUpWeatherInfoFetchDialogResultReceiver()
         setUpDiaryItemDeleteDialogResultReceiver()
         setUpDiaryPictureDeleteDialogResultReceiver()
+    }
+
+    // DiaryItemTitleEditFragmentから編集結果受取
+    private fun setUpDiaryItemTitleEditFragmentResultReceiver() {
+        setUpFragmentResultReceiver(
+            DiaryItemTitleEditFragment.KEY_RESULT
+        ) { result: FragmentResult<ItemTitleEditResult> ->
+
+            // TODO:シールドクラス Action -> Event に変更してから下記コードの処理方法を検討する。
+            when (result) {
+                is FragmentResult.Some -> {
+                    val focusTargetView =
+                        when (result.data.itemNumber.value) {
+                            1 -> binding.includeItem1.textInputEditTextTitle
+                            2 -> binding.includeItem2.textInputEditTextTitle
+                            3 -> binding.includeItem3.textInputEditTextTitle
+                            4 -> binding.includeItem4.textInputEditTextTitle
+                            5 -> binding.includeItem5.textInputEditTextTitle
+                            else -> throw IllegalStateException()
+                        }
+                    focusTargetView.requestFocus()
+                }
+                FragmentResult.None -> {
+                    // 処理なし
+                }
+            }
+
+            mainViewModel.onItemTitleEditFragmentResultReceived(result)
+        }
     }
 
     // 既存日記読込ダイアログフラグメントから結果受取
@@ -995,10 +995,13 @@ class DiaryEditFragment : BaseFragment() {
     private fun navigatePreviousFragment(editedDiaryDate: LocalDate?) {
         val navBackStackEntry = checkNotNull(navController.previousBackStackEntry)
         val destinationId = navBackStackEntry.destination.id
-        if (destinationId == R.id.navigation_calendar_fragment) {
-            val savedStateHandle = navBackStackEntry.savedStateHandle
-            savedStateHandle[KEY_EDITED_DIARY_DATE] = editedDiaryDate
-        }
+        val savedStateHandle = navBackStackEntry.savedStateHandle
+        savedStateHandle[KEY_RESULT] =
+            if (destinationId == R.id.navigation_calendar_fragment) {
+                FragmentResult.Some(editedDiaryDate)
+            } else {
+                FragmentResult.None
+            }
         Log.d("20250529", "navigatePreviousFragment()_navigateUp()")
         navController.navigateUp()
     }

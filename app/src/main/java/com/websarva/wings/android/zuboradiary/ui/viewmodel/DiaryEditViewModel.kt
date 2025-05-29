@@ -23,6 +23,8 @@ import com.websarva.wings.android.zuboradiary.ui.model.action.DiaryEditFragmentA
 import com.websarva.wings.android.zuboradiary.ui.model.action.FragmentAction
 import com.websarva.wings.android.zuboradiary.ui.model.adapter.ConditionAdapterList
 import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
+import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
+import com.websarva.wings.android.zuboradiary.ui.model.result.ItemTitleEditResult
 import com.websarva.wings.android.zuboradiary.ui.model.state.DiaryEditState
 import com.websarva.wings.android.zuboradiary.ui.utils.requireValue
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -394,7 +396,7 @@ internal class DiaryEditViewModel @Inject constructor(
         }
     }
 
-    // Fragmentデータ受取処理
+    // Fragmentからの結果受取処理
     fun onDiaryLoadingDialogResultReceived(result: DialogResult<String>) {
         when (result) {
             is DialogResult.Positive<String> -> {
@@ -570,8 +572,18 @@ internal class DiaryEditViewModel @Inject constructor(
         _diaryEditState.value = DiaryEditState.Idle
     }
 
-    fun onDataReceivedFromItemTitleEditFragment(itemNumber: ItemNumber, itemTitle: String) {
-        updateItemTitle(itemNumber, itemTitle)
+    fun onItemTitleEditFragmentResultReceived(result: FragmentResult<ItemTitleEditResult>) {
+        when (result) {
+            is FragmentResult.Some -> {
+                updateItemTitle(
+                    result.data.itemNumber,
+                    result.data.title
+                )
+            }
+            FragmentResult.None -> {
+                // 処理なし
+            }
+        }
     }
 
     fun onPicturePathReceivedFromOpenDocument(uri: Uri?) {

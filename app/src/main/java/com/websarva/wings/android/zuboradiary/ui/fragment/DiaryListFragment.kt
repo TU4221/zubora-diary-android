@@ -79,10 +79,6 @@ class DiaryListFragment : BaseFragment() {
         setUpDiaryDeleteDialogResultReceiver()
     }
 
-    override fun handleOnReceivingResultFromPreviousFragment() {
-        // 処理なし
-    }
-
     // 日付入力ダイアログフラグメントから結果受取
     private fun setUpDatePickerDialogResultReceiver() {
         setUpDialogResultReceiver(

@@ -137,10 +137,6 @@ class SettingsFragment : BaseFragment() {
         receiveAllDataDeleteDialogResult()
     }
 
-    override fun handleOnReceivingResultFromPreviousFragment() {
-        // 処理なし
-    }
-
     // テーマカラー設定ダイアログフラグメントから結果受取
     private fun receiveThemeColorPickerDialogResult() {
         setUpDialogResultReceiver(

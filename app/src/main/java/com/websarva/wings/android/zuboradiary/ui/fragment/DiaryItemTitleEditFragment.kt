@@ -17,6 +17,7 @@ import com.websarva.wings.android.zuboradiary.ui.viewmodel.DiaryItemTitleEditVie
 import com.websarva.wings.android.zuboradiary.ui.adapter.diaryitemtitle.ItemTitleSelectionHistoryListAdapter
 import com.websarva.wings.android.zuboradiary.ui.adapter.diaryitemtitle.SelectionHistoryList
 import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
+import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
 import com.websarva.wings.android.zuboradiary.ui.model.result.ItemTitleEditResult
 import com.websarva.wings.android.zuboradiary.ui.view.edittext.TextInputConfigurator
 import com.websarva.wings.android.zuboradiary.ui.utils.requireValue
@@ -28,8 +29,8 @@ import kotlinx.coroutines.launch
 class DiaryItemTitleEditFragment : BaseFragment() {
 
     internal companion object {
-        private val fromClassName = "From" + DiaryItemTitleEditFragment::class.java.name
-        val KEY_RESULT: String = "Result$fromClassName"
+        // Navigation関係
+        val KEY_RESULT = RESULT_KEY_PREFIX + DiaryItemTitleEditFragment::class.java.name
     }
 
     // View関係
@@ -57,6 +58,7 @@ class DiaryItemTitleEditFragment : BaseFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        receiveDiaryItemTitleEditData()
         setUpToolBar()
         setUpItemTitleInputField()
         setUpItemTitleSelectionHistory()
@@ -64,15 +66,6 @@ class DiaryItemTitleEditFragment : BaseFragment() {
 
     override fun initializeFragmentResultReceiver() {
         setUpDiaryItemTitleDeleteDialogResultReceiver()
-    }
-
-    override fun handleOnReceivingResultFromPreviousFragment() {
-        // EditDiaryFragmentからデータ受取
-        val targetItemNumber =
-            DiaryItemTitleEditFragmentArgs.fromBundle(requireArguments()).itemNumber
-        val targetItemTitle =
-            DiaryItemTitleEditFragmentArgs.fromBundle(requireArguments()).itemTitle
-        mainViewModel.updateDiaryItemTitle(targetItemNumber, targetItemTitle)
     }
 
     // 履歴項目削除確認ダイアログからの結果受取
@@ -98,6 +91,15 @@ class DiaryItemTitleEditFragment : BaseFragment() {
                 }
             }
         }
+    }
+
+    // EditDiaryFragmentからデータ受取
+    private fun receiveDiaryItemTitleEditData() {
+        val targetItemNumber =
+            DiaryItemTitleEditFragmentArgs.fromBundle(requireArguments()).itemNumber
+        val targetItemTitle =
+            DiaryItemTitleEditFragmentArgs.fromBundle(requireArguments()).itemTitle
+        mainViewModel.updateDiaryItemTitle(targetItemNumber, targetItemTitle)
     }
 
     private fun setUpToolBar() {
@@ -215,11 +217,12 @@ class DiaryItemTitleEditFragment : BaseFragment() {
         val navBackStackEntry = checkNotNull(navController.previousBackStackEntry)
         val savedStateHandle = navBackStackEntry.savedStateHandle
         savedStateHandle[KEY_RESULT] =
-            ItemTitleEditResult(
-                targetItemNumber,
-                newItemTitle
+            FragmentResult.Some(
+                ItemTitleEditResult(
+                    targetItemNumber,
+                    newItemTitle
+                )
             )
-
         navigateDiaryEditFragment()
     }
 
