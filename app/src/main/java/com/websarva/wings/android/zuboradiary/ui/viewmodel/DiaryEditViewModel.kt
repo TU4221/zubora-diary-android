@@ -343,6 +343,7 @@ internal class DiaryEditViewModel @Inject constructor(
         }
     }
 
+    // TODO:クリック時2回処理される。OneTouchClickTextInputEditTextが原因と思われるので修正する。
     fun onDateInputFieldClicked() {
         val date = this.date.requireValue()
         viewModelScope.launch {
