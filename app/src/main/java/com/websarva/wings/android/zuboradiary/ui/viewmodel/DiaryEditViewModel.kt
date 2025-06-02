@@ -16,7 +16,6 @@ import com.websarva.wings.android.zuboradiary.data.repository.UserPreferencesRep
 import com.websarva.wings.android.zuboradiary.data.repository.WeatherApiRepository
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import com.websarva.wings.android.zuboradiary.ui.model.DiaryEditAppMessage
-import com.websarva.wings.android.zuboradiary.ui.model.DiaryEditPendingDialog
 import com.websarva.wings.android.zuboradiary.ui.model.action.Action
 import com.websarva.wings.android.zuboradiary.ui.model.adapter.WeatherAdapterList
 import com.websarva.wings.android.zuboradiary.ui.model.action.DiaryEditFragmentAction
@@ -985,12 +984,6 @@ internal class DiaryEditViewModel @Inject constructor(
 
     private fun deletePicturePath() {
         diaryStateFlow.picturePath.value = null
-    }
-
-    // 表示保留中Dialog追加
-    // MEMO:引数の型をサブクラスに制限
-    fun addPendingDialogList(pendingDialog: DiaryEditPendingDialog) {
-        super.addPendingDialogList(pendingDialog)
     }
     
     // FragmentAction関係

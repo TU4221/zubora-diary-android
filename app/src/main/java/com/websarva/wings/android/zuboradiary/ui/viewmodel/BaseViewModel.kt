@@ -5,8 +5,6 @@ import androidx.lifecycle.ViewModel
 import com.websarva.wings.android.zuboradiary.ui.model.AppMessageList
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import com.websarva.wings.android.zuboradiary.ui.model.AppMessage
-import com.websarva.wings.android.zuboradiary.ui.model.PendingDialog
-import com.websarva.wings.android.zuboradiary.ui.model.PendingDialogList
 import com.websarva.wings.android.zuboradiary.ui.model.navigation.NavigationCommand
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -21,19 +19,12 @@ internal abstract class BaseViewModel : ViewModel() {
     val appMessageBufferList
         get() = _appMessageBufferList.asStateFlow()
 
-    // 表示保留中Dialog
-    private val initialPendingDialogList = PendingDialogList()
-    private val _pendingDialogList = MutableStateFlow(initialPendingDialogList)
-    val pendingDialogList
-        get() = _pendingDialogList.asStateFlow()
-
     // 表示保留中Navigation
     private val _pendingNavigationCommand =
         MutableStateFlow<NavigationCommand>(NavigationCommand.None)
 
     open fun initialize() {
         Log.d(logTag, "initialize()")
-        _pendingDialogList.value = initialPendingDialogList
     }
 
     protected fun addAppMessage(appMessage: AppMessage) {
@@ -60,33 +51,6 @@ internal abstract class BaseViewModel : ViewModel() {
         Log.d(logTag, "equalLastAppMessage()")
         val currentList = _appMessageBufferList.value
         return currentList.equalLastItem(appMessage)
-    }
-
-    // 表示保留中Dialog
-    // HACK:特定のViewModelからPendingDialogを追加するときは対象のPendingDialogのみを受取たい為、
-    //      下記メソッドのアクセス修飾子をprotectedにしてサブクラスに引数の制限を託す。
-    /**
-     * 本メソッドを本クラス以外のクラス(Fragment等)から使用する場合は、サブクラスで本メソッドを呼び出すメソッドを作成すること。
-     * 作成したメソッドの引数の型は対象のPendingDialogクラスのサブクラスを指定すること。
-     * */
-    protected fun addPendingDialogList(pendingDialog: PendingDialog) {
-        Log.d(logTag, "addPendingDialogList()")
-        val currentList = _pendingDialogList.value
-        val updateList = currentList.add(pendingDialog)
-        _pendingDialogList.value = updateList
-    }
-
-    fun triggerPendingDialogListObserver() {
-        Log.d(logTag, "triggerPendingDialogListObserver()")
-        val currentList = _pendingDialogList.value
-        _pendingDialogList.value = PendingDialogList(currentList)
-    }
-
-    fun removePendingDialogListFirstItem() {
-        Log.d(logTag, "removePendingDialogListFirstItem()")
-        val currentList = _pendingDialogList.value
-        val updateList = currentList.removeFirstItem()
-        _pendingDialogList.value = updateList
     }
 
     abstract fun onBackPressed()

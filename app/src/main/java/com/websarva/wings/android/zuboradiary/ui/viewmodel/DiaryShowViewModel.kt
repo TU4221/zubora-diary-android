@@ -9,7 +9,6 @@ import com.websarva.wings.android.zuboradiary.data.model.Weather
 import com.websarva.wings.android.zuboradiary.data.repository.UriRepository
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import com.websarva.wings.android.zuboradiary.ui.model.DiaryShowAppMessage
-import com.websarva.wings.android.zuboradiary.ui.model.DiaryShowPendingDialog
 import com.websarva.wings.android.zuboradiary.ui.model.action.DiaryShowFragmentAction
 import com.websarva.wings.android.zuboradiary.ui.model.action.FragmentAction
 import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
@@ -243,11 +242,5 @@ internal class DiaryShowViewModel @Inject constructor(
                     FragmentResult.Some(date)
                 )
         )
-    }
-
-    // 表示保留中Dialog追加
-    // MEMO:引数の型をサブクラスに制限
-    fun addPendingDialogList(pendingDialog: DiaryShowPendingDialog) {
-        super.addPendingDialogList(pendingDialog)
     }
 }

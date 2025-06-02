@@ -29,10 +29,6 @@ import com.websarva.wings.android.zuboradiary.ui.model.DiaryListAppMessage
 import com.websarva.wings.android.zuboradiary.ui.model.DiaryShowAppMessage
 import com.websarva.wings.android.zuboradiary.ui.model.SettingsAppMessage
 import com.websarva.wings.android.zuboradiary.ui.model.WordSearchAppMessage
-import com.websarva.wings.android.zuboradiary.ui.model.DiaryEditPendingDialog
-import com.websarva.wings.android.zuboradiary.ui.model.DiaryShowPendingDialog
-import com.websarva.wings.android.zuboradiary.ui.model.PendingDialog
-import com.websarva.wings.android.zuboradiary.ui.model.PendingDialogList
 import com.websarva.wings.android.zuboradiary.ui.model.navigation.NavigationCommand
 import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
 import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
@@ -82,8 +78,6 @@ abstract class BaseFragment : LoggingFragment() {
         get() = destinationId == currentDestinationId
 
     private val addedLifecycleEventObserverList = ArrayList<LifecycleEventObserver>()
-
-    internal var pendingDialogNavigation: PendingDialogNavigation? = null
 
     internal fun launchAndRepeatOnViewLifeCycleStarted(
         block: suspend CoroutineScope.() -> Unit) {
@@ -179,7 +173,6 @@ abstract class BaseFragment : LoggingFragment() {
 
         initializeFragmentResultReceiver()
         setUpAppMessageDialog()
-        setUpPendingDialog()
         setUpNavBackStackEntryLifecycleObserverDispose()
         setUpPendingNavigationCollector()
         registerOnBackPressedCallback()
@@ -325,49 +318,6 @@ abstract class BaseFragment : LoggingFragment() {
 
     private fun retrySettingsAppMessageDialogShow() {
         settingsViewModel.triggerAppMessageBufferListObserver()
-    }
-
-    internal interface PendingDialogNavigation {
-        fun navigatePendingDialog(pendingDialog: PendingDialog):Boolean
-    }
-
-    private fun setUpPendingDialog() {
-        mainViewModel ?: return
-
-        addNavBackStackEntryLifecycleObserver { _, event: Lifecycle.Event ->
-            if (event == Lifecycle.Event.ON_RESUME) {
-                mainViewModel!!.triggerPendingDialogListObserver()
-            }
-        }
-
-        launchAndRepeatOnViewLifeCycleStarted {
-            mainViewModel!!.pendingDialogList
-                .collectLatest { value: PendingDialogList ->
-                    val pendingDialog = value.findFirstItem() ?: return@collectLatest
-                    pendingDialogNavigation ?: throw IllegalStateException()
-                    if (!checkPendingDialogTargetType(pendingDialog)) throw IllegalStateException()
-
-                    withContext(Dispatchers.Main) {
-                        // MEMO:下記条件はスパークラスのFragment切替メソッドに含まれているが、
-                        //      そこで判断させると再度保留ダイアログが追加されるので、ここに記述する。(重複処理防止)
-                        if (!canNavigateFragment) return@withContext
-
-                        val isSuccessful = pendingDialogNavigation!!.navigatePendingDialog(pendingDialog)
-                        if (isSuccessful) mainViewModel!!.removePendingDialogListFirstItem()
-                    }
-                }
-        }
-    }
-
-    private fun checkPendingDialogTargetType(pendingDialog: PendingDialog): Boolean {
-        return when (pendingDialog) {
-            is DiaryShowPendingDialog -> {
-                (this@BaseFragment is DiaryShowFragment)
-            }
-            is DiaryEditPendingDialog -> {
-                (this@BaseFragment is DiaryEditFragment)
-            }
-        }
     }
 
     // MEMO:removeで削除しないと再度Fragment(前回表示Fragmentと同インスタンスの場合)を表示した時、Observerが重複する。

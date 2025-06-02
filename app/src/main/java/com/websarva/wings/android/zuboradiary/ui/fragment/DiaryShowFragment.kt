@@ -20,8 +20,6 @@ import com.websarva.wings.android.zuboradiary.data.model.Weather
 import com.websarva.wings.android.zuboradiary.data.model.ThemeColor
 import com.websarva.wings.android.zuboradiary.databinding.FragmentDiaryShowBinding
 import com.websarva.wings.android.zuboradiary.ui.view.imageview.DiaryPictureConfigurator
-import com.websarva.wings.android.zuboradiary.ui.model.DiaryShowPendingDialog
-import com.websarva.wings.android.zuboradiary.ui.model.PendingDialog
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.DiaryDeleteDialogFragment
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.DiaryLoadingFailureDialogFragment
 import com.websarva.wings.android.zuboradiary.ui.model.action.DiaryShowFragmentAction
@@ -70,7 +68,6 @@ internal class DiaryShowFragment : BaseFragment() {
         super.onViewCreated(view, savedInstanceState)
 
         setUpFragmentAction()
-        setUpPendingDialogObserver()
         setUpToolBar()
         setUpWeatherLayout()
         setUpConditionLayout()
@@ -133,20 +130,6 @@ internal class DiaryShowFragment : BaseFragment() {
                         throw IllegalArgumentException()
                     }
                 }
-            }
-        }
-    }
-
-    private fun setUpPendingDialogObserver() {
-        pendingDialogNavigation = object : PendingDialogNavigation {
-            override fun navigatePendingDialog(pendingDialog: PendingDialog): Boolean {
-                if (pendingDialog !is DiaryShowPendingDialog) return false
-
-                when (pendingDialog) {
-                    is DiaryShowPendingDialog.DiaryLoadingFailure ->
-                        navigateDiaryLoadingFailureDialog(pendingDialog.date)
-                }
-                return true
             }
         }
     }

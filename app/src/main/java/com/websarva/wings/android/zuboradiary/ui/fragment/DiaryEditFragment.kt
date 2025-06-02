@@ -28,9 +28,7 @@ import com.websarva.wings.android.zuboradiary.data.model.Weather
 import com.websarva.wings.android.zuboradiary.databinding.FragmentDiaryEditBinding
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import com.websarva.wings.android.zuboradiary.ui.model.AppMessage
-import com.websarva.wings.android.zuboradiary.ui.model.DiaryEditPendingDialog
 import com.websarva.wings.android.zuboradiary.ui.view.imageview.DiaryPictureConfigurator
-import com.websarva.wings.android.zuboradiary.ui.model.PendingDialog
 import com.websarva.wings.android.zuboradiary.ui.view.edittext.TextInputConfigurator
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.DatePickerDialogFragment
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.DiaryDeleteDialogFragment
@@ -114,7 +112,6 @@ class DiaryEditFragment : BaseFragment() {
 
         setUpViewModelInitialization()
         setUpFragmentAction()
-        setUpPendingDialogObserver()
         setUpFocusViewScroll()
         setUpDiaryData()
         setUpToolBar()
@@ -342,24 +339,6 @@ class DiaryEditFragment : BaseFragment() {
                         throw IllegalArgumentException()
                     }
                 }
-            }
-        }
-    }
-
-    private fun setUpPendingDialogObserver() {
-        pendingDialogNavigation = object : PendingDialogNavigation {
-            override fun navigatePendingDialog(pendingDialog: PendingDialog): Boolean {
-                if (pendingDialog !is DiaryEditPendingDialog) return false
-
-                when (pendingDialog) {
-                    is DiaryEditPendingDialog.DiaryLoading ->
-                        navigateDiaryLoadingDialog(pendingDialog.date)
-                    is DiaryEditPendingDialog.DiaryLoadingFailure ->
-                        navigateDiaryLoadingFailureDialog(pendingDialog.date)
-                    is DiaryEditPendingDialog.WeatherInfoFetching ->
-                        navigateWeatherInfoFetchingDialog(pendingDialog.date)
-                }
-                return true
             }
         }
     }
