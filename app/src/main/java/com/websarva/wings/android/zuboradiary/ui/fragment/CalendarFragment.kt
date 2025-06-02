@@ -7,7 +7,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
-import androidx.activity.OnBackPressedCallback
 import androidx.databinding.ViewDataBinding
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
@@ -41,6 +40,7 @@ import com.websarva.wings.android.zuboradiary.ui.fragment.DiaryShowFragment.Weat
 import com.websarva.wings.android.zuboradiary.ui.fragment.DiaryShowFragment.Weather2Observer
 import com.websarva.wings.android.zuboradiary.ui.model.action.CalendarFragmentAction
 import com.websarva.wings.android.zuboradiary.ui.model.action.FragmentAction
+import com.websarva.wings.android.zuboradiary.ui.model.navigation.NavigationCommand
 import com.websarva.wings.android.zuboradiary.ui.utils.toJapaneseDateString
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.DiaryShowViewModel
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
@@ -75,16 +75,6 @@ class CalendarFragment : BaseFragment() {
     //      (CalendarViewModelにDiaryShowViewModelと重複するデータは持たせない)
     @Suppress("unused", "RedundantSuppression")
     private val diaryShowViewModel: DiaryShowViewModel by viewModels()
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-        addOnBackPressedCallback(object : OnBackPressedCallback(true) {
-            override fun handleOnBackPressed() {
-                mainActivity.popBackStackToStartFragment()
-            }
-        })
-    }
 
     override fun initializeDataBinding(
         themeColorInflater: LayoutInflater,
@@ -164,7 +154,7 @@ class CalendarFragment : BaseFragment() {
                         smoothScrollCalendar(value.date)
                     }
                     FragmentAction.NavigatePreviousFragment -> {
-                        navController.navigateUp()
+                        mainActivity.popBackStackToStartFragment()
                     }
                     else -> {
                         throw IllegalArgumentException()
@@ -603,21 +593,19 @@ class CalendarFragment : BaseFragment() {
     }
 
     private fun navigateDiaryEditFragment(date: LocalDate, shouldLoadDiary: Boolean) {
-        if (!canNavigateFragment) return
-
         val directions =
             CalendarFragmentDirections.actionNavigationCalendarFragmentToDiaryEditFragment(
                 true,
                 shouldLoadDiary,
                 date
             )
-        navController.navigate(directions)
+        navigateFragment(NavigationCommand.To(directions))
     }
 
     override fun onNavigateAppMessageDialog(appMessage: AppMessage) {
         val directions =
             CalendarFragmentDirections.actionCalendarFragmentToAppMessageDialog(appMessage)
-        navController.navigate(directions)
+        navigateFragment(NavigationCommand.To(directions))
     }
 
     override fun retryAppMessageDialogShow() {

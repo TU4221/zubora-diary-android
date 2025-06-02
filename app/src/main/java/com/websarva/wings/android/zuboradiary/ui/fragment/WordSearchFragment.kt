@@ -23,6 +23,7 @@ import com.websarva.wings.android.zuboradiary.ui.adapter.diary.wordsearchresult.
 import com.websarva.wings.android.zuboradiary.ui.adapter.diary.wordsearchresult.WordSearchResultYearMonthListAdapter
 import com.websarva.wings.android.zuboradiary.ui.model.action.FragmentAction
 import com.websarva.wings.android.zuboradiary.ui.model.action.WordSearchFragmentAction
+import com.websarva.wings.android.zuboradiary.ui.model.navigation.NavigationCommand
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.WordSearchViewModel
 import kotlinx.coroutines.flow.collectLatest
 import java.time.LocalDate
@@ -202,7 +203,7 @@ class WordSearchFragment : BaseFragment() {
                             navigateDiaryShowFragment(value.date)
                         }
                         FragmentAction.NavigatePreviousFragment -> {
-                            navController.navigateUp()
+                            navigatePreviousFragment()
                         }
                         else -> {
                             throw IllegalArgumentException()
@@ -213,17 +214,15 @@ class WordSearchFragment : BaseFragment() {
     }
 
     private fun navigateDiaryShowFragment(date: LocalDate) {
-        if (!canNavigateFragment) return
-
         val directions =
             WordSearchFragmentDirections.actionNavigationWordSearchFragmentToDiaryShowFragment(date)
-        navController.navigate(directions)
+        navigateFragment(NavigationCommand.To(directions))
     }
 
     override fun onNavigateAppMessageDialog(appMessage: AppMessage) {
         val directions =
             WordSearchFragmentDirections.actionWordSearchFragmentToAppMessageDialog(appMessage)
-        navController.navigate(directions)
+        navigateFragment(NavigationCommand.To(directions))
     }
 
     private fun setUpNavDestinationChangedListener() {

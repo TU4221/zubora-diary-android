@@ -16,6 +16,7 @@ import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.DiaryItemTitleD
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.DiaryItemTitleEditViewModel
 import com.websarva.wings.android.zuboradiary.ui.adapter.diaryitemtitle.ItemTitleSelectionHistoryListAdapter
 import com.websarva.wings.android.zuboradiary.ui.adapter.diaryitemtitle.SelectionHistoryList
+import com.websarva.wings.android.zuboradiary.ui.model.navigation.NavigationCommand
 import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
 import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
 import com.websarva.wings.android.zuboradiary.ui.model.result.ItemTitleEditResult
@@ -110,7 +111,7 @@ class DiaryItemTitleEditFragment : BaseFragment() {
                     R.string.fragment_diary_item_title_edit_toolbar_second_title
                 )
             title = toolBarTitle
-            setNavigationOnClickListener { navController.navigateUp() }
+            setNavigationOnClickListener { navigatePreviousFragment() }
         }
     }
 
@@ -227,23 +228,20 @@ class DiaryItemTitleEditFragment : BaseFragment() {
     }
 
     private fun navigateDiaryEditFragment() {
-        if (!canNavigateFragment) return
-
         val directions =
             DiaryItemTitleEditFragmentDirections.actionDiaryItemTitleEditFragmentToDiaryEditFragment()
-        navController.navigate(directions)
+        navigateFragment(NavigationCommand.To(directions))
     }
 
     private fun navigateDiaryItemTitleDeleteDialog(listItemPosition: Int, listItemTitle: String) {
         require(listItemPosition >= 0)
-        if (!canNavigateFragment) return
 
         val directions =
             DiaryItemTitleEditFragmentDirections.actionDiaryItemTitleEditFragmentToDiaryItemTitleDeleteDialog(
                 listItemPosition,
                 listItemTitle
             )
-        navController.navigate(directions)
+        navigateFragment(NavigationCommand.To(directions))
     }
 
     override fun onNavigateAppMessageDialog(appMessage: AppMessage) {
@@ -251,7 +249,7 @@ class DiaryItemTitleEditFragment : BaseFragment() {
             DiaryItemTitleEditFragmentDirections.actionDiaryItemTitleEditFragmentToAppMessageDialog(
                 appMessage
             )
-        navController.navigate(directions)
+        navigateFragment(NavigationCommand.To(directions))
     }
 
     override fun destroyBinding() {

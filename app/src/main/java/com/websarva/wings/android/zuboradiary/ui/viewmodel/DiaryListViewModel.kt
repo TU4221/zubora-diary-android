@@ -78,6 +78,13 @@ internal class DiaryListViewModel @Inject constructor(
         isLoadingOnScrolled = initialIsLoadingOnScrolled
     }
 
+    // BackPressed(戻るボタン)処理
+    override fun onBackPressed() {
+        viewModelScope.launch {
+            _fragmentAction.emit(FragmentAction.NavigatePreviousFragment)
+        }
+    }
+
     // ViewClicked処理
     fun onWordSearchMenuClicked() {
         viewModelScope.launch {

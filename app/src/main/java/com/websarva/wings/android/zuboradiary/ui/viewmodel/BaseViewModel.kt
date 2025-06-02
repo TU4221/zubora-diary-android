@@ -7,6 +7,7 @@ import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import com.websarva.wings.android.zuboradiary.ui.model.AppMessage
 import com.websarva.wings.android.zuboradiary.ui.model.PendingDialog
 import com.websarva.wings.android.zuboradiary.ui.model.PendingDialogList
+import com.websarva.wings.android.zuboradiary.ui.model.navigation.NavigationCommand
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
@@ -25,6 +26,10 @@ internal abstract class BaseViewModel : ViewModel() {
     private val _pendingDialogList = MutableStateFlow(initialPendingDialogList)
     val pendingDialogList
         get() = _pendingDialogList.asStateFlow()
+
+    // 表示保留中Navigation
+    private val _pendingNavigationCommand =
+        MutableStateFlow<NavigationCommand>(NavigationCommand.None)
 
     open fun initialize() {
         Log.d(logTag, "initialize()")
@@ -82,5 +87,22 @@ internal abstract class BaseViewModel : ViewModel() {
         val currentList = _pendingDialogList.value
         val updateList = currentList.removeFirstItem()
         _pendingDialogList.value = updateList
+    }
+
+    abstract fun onBackPressed()
+
+    val pendingNavigationCommand
+        get() = _pendingNavigationCommand.asStateFlow()
+
+    fun onFragmentNavigationFailed(command: NavigationCommand) {
+        _pendingNavigationCommand.value = command
+    }
+
+    fun onPendingFragmentNavigationCompleted() {
+        _pendingNavigationCommand.value = NavigationCommand.None
+    }
+
+    fun onPendingFragmentNavigationFailed() {
+        _pendingNavigationCommand.value = NavigationCommand.None
     }
 }

@@ -27,6 +27,7 @@ import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
 import com.websarva.wings.android.zuboradiary.ui.model.state.DiaryListState
 import com.websarva.wings.android.zuboradiary.ui.model.action.DiaryListFragmentAction
 import com.websarva.wings.android.zuboradiary.ui.model.action.FragmentAction
+import com.websarva.wings.android.zuboradiary.ui.model.navigation.NavigationCommand
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import java.time.LocalDate
@@ -128,7 +129,7 @@ class DiaryListFragment : BaseFragment() {
                         navigateDiaryDeleteDialog(value.date, value.uri)
                     }
                     FragmentAction.NavigatePreviousFragment -> {
-                        navController.navigateUp()
+                        navigatePreviousFragment()
                     }
                     else -> {
                         throw IllegalArgumentException()
@@ -226,56 +227,46 @@ class DiaryListFragment : BaseFragment() {
     }
 
     private fun navigateDiaryEditFragment() {
-        if (!canNavigateFragment) return
-
         val directions =
             DiaryListFragmentDirections.actionNavigationDiaryListFragmentToDiaryEditFragment(
                 true,
                 false,
                 LocalDate.now()
             )
-        navController.navigate(directions)
+        navigateFragment(NavigationCommand.To(directions))
     }
 
     private fun navigateDiaryShowFragment(date: LocalDate) {
-        if (!canNavigateFragment) return
-
         val directions =
             DiaryListFragmentDirections.actionNavigationDiaryListFragmentToDiaryShowFragment(date)
-        navController.navigate(directions)
+        navigateFragment(NavigationCommand.To(directions))
     }
 
     private fun navigateWordSearchFragment() {
-        if (!canNavigateFragment) return
-
         val directions =
             DiaryListFragmentDirections.actionNavigationDiaryListFragmentToWordSearchFragment()
-        navController.navigate(directions)
+        navigateFragment(NavigationCommand.To(directions))
     }
 
     private fun navigateStartYearMonthPickerDialog(newestYear: Year, oldestYear: Year) {
-        if (!canNavigateFragment) return
-
         val directions =
             DiaryListFragmentDirections.actionDiaryListFragmentToStartYearMonthPickerDialog(
                 newestYear,
                 oldestYear
             )
-        navController.navigate(directions)
+        navigateFragment(NavigationCommand.To(directions))
     }
 
     private fun navigateDiaryDeleteDialog(date: LocalDate, pictureUri: Uri?) {
-        if (!canNavigateFragment) return
-
         val directions =
             DiaryListFragmentDirections.actionDiaryListFragmentToDiaryDeleteDialog(date, pictureUri)
-        navController.navigate(directions)
+        navigateFragment(NavigationCommand.To(directions))
     }
 
     override fun onNavigateAppMessageDialog(appMessage: AppMessage) {
         val directions =
             DiaryListFragmentDirections.actionDiaryListFragmentToAppMessageDialog(appMessage)
-        navController.navigate(directions)
+        navigateFragment(NavigationCommand.To(directions))
     }
 
     internal fun onNavigationItemReselected() {

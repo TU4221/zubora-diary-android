@@ -55,6 +55,11 @@ internal class DiaryItemTitleEditViewModel @Inject constructor(
         setUpItemTitleSelectionHistoryList()
     }
 
+    // BackPressed(戻るボタン)処理
+    override fun onBackPressed() {
+        // TODO("Not yet implemented")
+    }
+
     private fun setUpItemTitleSelectionHistoryList() {
         val logMsg = "日記項目タイトル選択履歴読込"
         Log.i(logTag, "${logMsg}_開始")

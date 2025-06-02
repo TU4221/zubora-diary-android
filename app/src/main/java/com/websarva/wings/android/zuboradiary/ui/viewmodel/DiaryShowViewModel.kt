@@ -13,6 +13,7 @@ import com.websarva.wings.android.zuboradiary.ui.model.DiaryShowPendingDialog
 import com.websarva.wings.android.zuboradiary.ui.model.action.DiaryShowFragmentAction
 import com.websarva.wings.android.zuboradiary.ui.model.action.FragmentAction
 import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
+import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
 import com.websarva.wings.android.zuboradiary.ui.model.state.DiaryShowState
 import com.websarva.wings.android.zuboradiary.ui.utils.requireValue
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -96,7 +97,8 @@ internal class DiaryShowViewModel @Inject constructor(
         diaryStateFlow.initialize()
     }
 
-    fun onBackPressed() {
+    // BackPressed(戻るボタン)処理
+    override fun onBackPressed() {
         viewModelScope.launch {
             navigatePreviousFragment()
         }
@@ -225,7 +227,9 @@ internal class DiaryShowViewModel @Inject constructor(
         if (picturePath != null) uriRepository.releasePersistablePermission(picturePath)
         _fragmentAction.emit(
             DiaryShowFragmentAction
-                .NavigatePreviousFragmentOnDiaryDelete(date)
+                .NavigatePreviousFragmentOnDiaryDelete(
+                    FragmentResult.Some(date)
+                )
         )
         Log.i(logTag, "${logMsg}_完了")
     }
@@ -234,7 +238,10 @@ internal class DiaryShowViewModel @Inject constructor(
     private suspend fun navigatePreviousFragment() {
         val date = date.requireValue()
         _fragmentAction.emit(
-            DiaryShowFragmentAction.NavigatePreviousFragment(date)
+            DiaryShowFragmentAction
+                .NavigatePreviousFragment(
+                    FragmentResult.Some(date)
+                )
         )
     }
 

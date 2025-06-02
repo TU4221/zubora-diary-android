@@ -14,14 +14,12 @@ import android.view.inputmethod.EditorInfo
 import android.widget.AdapterView
 import android.widget.AdapterView.OnItemClickListener
 import android.widget.ArrayAdapter
-import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.view.ContextThemeWrapper
 import androidx.constraintlayout.motion.widget.MotionLayout
 import androidx.databinding.ViewDataBinding
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination
-import androidx.navigation.NavDirections
 import com.google.android.material.textfield.TextInputLayout
 import com.websarva.wings.android.zuboradiary.R
 import com.websarva.wings.android.zuboradiary.data.model.Condition
@@ -50,6 +48,7 @@ import com.websarva.wings.android.zuboradiary.ui.model.adapter.WeatherAdapterLis
 import com.websarva.wings.android.zuboradiary.ui.model.action.DiaryEditFragmentAction
 import com.websarva.wings.android.zuboradiary.ui.model.action.FragmentAction
 import com.websarva.wings.android.zuboradiary.ui.model.adapter.ConditionAdapterList
+import com.websarva.wings.android.zuboradiary.ui.model.navigation.NavigationCommand
 import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
 import com.websarva.wings.android.zuboradiary.ui.model.result.ItemTitleEditResult
 import com.websarva.wings.android.zuboradiary.ui.utils.isAccessLocationGranted
@@ -114,7 +113,6 @@ class DiaryEditFragment : BaseFragment() {
         super.onViewCreated(view, savedInstanceState)
 
         setUpViewModelInitialization()
-        setUpOnBackPressedCallback()
         setUpFragmentAction()
         setUpPendingDialogObserver()
         setUpFocusViewScroll()
@@ -283,15 +281,6 @@ class DiaryEditFragment : BaseFragment() {
         }
     }
 
-    private fun setUpOnBackPressedCallback() {
-        addOnBackPressedCallback(object : OnBackPressedCallback(true) {
-            override fun handleOnBackPressed() {
-                mainViewModel.onBackPressed()
-            }
-
-        })
-    }
-
     private fun setUpFragmentAction() {
         launchAndRepeatOnViewLifeCycleStarted {
             mainViewModel.fragmentAction.collect { value: Action<FragmentAction> ->
@@ -330,10 +319,10 @@ class DiaryEditFragment : BaseFragment() {
                         navigateDiaryPictureDeleteDialog()
                     }
                     is DiaryEditFragmentAction.NavigatePreviousFragment -> {
-                        navigatePreviousFragment(action.loadedDate)
+                        navigatePreviousFragment(action.result)
                     }
                     is DiaryEditFragmentAction.NavigatePreviousFragmentOnDiaryDelete -> {
-                        navigatePreviousFragmentOnDiaryDelete(action.loadedDate)
+                        navigatePreviousFragmentOnDiaryDelete(action.result)
                     }
                     is DiaryEditFragmentAction.TransitionDiaryItemHidedState -> {
                         hideItem(action.itemNumber, false)
@@ -343,6 +332,11 @@ class DiaryEditFragment : BaseFragment() {
                     }
                     is DiaryEditFragmentAction.ItemAddition -> {
                         shouldTransitionItemMotionLayout = true
+                    }
+                    is FragmentAction.NavigatePreviousFragment -> {
+                        // MEMO:"DiaryEditFragmentAction.NavigatePreviousFragment"を使用する為、
+                        //      "FragmentAction.NavigatePreviousFragment"処理不要。
+                        throw IllegalArgumentException()
                     }
                     else -> {
                         throw IllegalArgumentException()
@@ -886,133 +880,105 @@ class DiaryEditFragment : BaseFragment() {
     }
 
     private fun navigateDiaryShowFragment(date: LocalDate) {
-        //if (!canNavigateFragment) return
-
+        // 循環型画面遷移を成立させるためにPopup対象Fragmentが異なるdirectionsを切り替える。
+        // TODO:下記条件変更(isStartDiaryFragmentを受け取らず、NavBackStackの状態から判断する)
         val isStartDiaryFragment =
             DiaryEditFragmentArgs.fromBundle(requireArguments()).isStartDiaryFragment
-        // 循環型画面遷移を成立させるためにPopup対象Fragmentが異なるdirectionsを切り替える。
+
         val directions = if (isStartDiaryFragment) {
             DiaryEditFragmentDirections.actionDiaryEditFragmentToDiaryShowFragmentPattern2(date)
         } else {
             DiaryEditFragmentDirections.actionDiaryEditFragmentToDiaryShowFragmentPattern1(date)
         }
-        navController.navigate(directions)
+        navigateFragment(NavigationCommand.To(directions))
     }
 
     private fun navigateDiaryItemTitleEditFragment(
         inputItemNumber: ItemNumber,
         inputItemTitle: String
     ) {
-        if (!canNavigateFragment) return
-
         val directions =
             DiaryEditFragmentDirections.actionDiaryEditFragmentToSelectItemTitleFragment(
                 inputItemNumber,
                 inputItemTitle
             )
-        navController.navigate(directions)
+        navigateFragment(NavigationCommand.To(directions))
     }
 
     private fun navigateDiaryLoadingDialog(date: LocalDate) {
-        if (!canNavigateFragment) {
-            mainViewModel.addPendingDialogList(DiaryEditPendingDialog.DiaryLoading(date))
-            return
-        }
-
         val directions =
             DiaryEditFragmentDirections.actionDiaryEditFragmentToDiaryLoadingDialog(date)
-        navController.navigate(directions)
+        navigateFragment(NavigationCommand.To(directions))
     }
 
     private fun navigateDiaryLoadingFailureDialog(date: LocalDate) {
-        if (!canNavigateFragment) {
-            mainViewModel.addPendingDialogList(DiaryEditPendingDialog.DiaryLoadingFailure(date))
-            return
-        }
-
         val directions =
             DiaryEditFragmentDirections.actionDiaryEditFragmentToDiaryLoadingFailureDialog(date)
-        navController.navigate(directions)
+        navigateFragment(NavigationCommand.To(directions))
     }
 
     private fun navigateDiaryUpdateDialog(date: LocalDate) {
-        if (!canNavigateFragment) return
-
         val directions =
             DiaryEditFragmentDirections.actionDiaryEditFragmentToDiaryUpdateDialog(date)
-        navController.navigate(directions)
+        navigateFragment(NavigationCommand.To(directions))
     }
 
     private fun navigateDiaryDeleteDialog(date: LocalDate) {
-        if (!canNavigateFragment) return
-
         val directions =
             DiaryEditFragmentDirections.actionDiaryEditFragmentToDiaryDeleteDialog(date)
-        navController.navigate(directions)
+        navigateFragment(NavigationCommand.To(directions))
     }
 
     private fun navigateDatePickerDialog(date: LocalDate) {
-        if (!canNavigateFragment) return
-
         val directions =
             DiaryEditFragmentDirections.actionDiaryEditFragmentToDatePickerDialog(date)
-        navController.navigate(directions)
+        navigateFragment(NavigationCommand.To(directions))
     }
 
     private fun navigateWeatherInfoFetchingDialog(date: LocalDate) {
-        if (!canNavigateFragment) {
-            mainViewModel.addPendingDialogList(DiaryEditPendingDialog.WeatherInfoFetching(date))
-            return
-        }
-
         val directions =
             DiaryEditFragmentDirections.actionDiaryEditFragmentToWeatherInfoFetchingDialog(date)
-        navController.navigate(directions)
+        navigateFragment(NavigationCommand.To(directions))
     }
 
     private fun navigateDiaryItemDeleteDialog(itemNumber: ItemNumber) {
-        if (!canNavigateFragment) return
-
         val directions =
             DiaryEditFragmentDirections.actionDiaryEditFragmentToDiaryItemDeleteDialog(itemNumber)
-        navController.navigate(directions)
+        navigateFragment(NavigationCommand.To(directions))
     }
 
     private fun navigateDiaryPictureDeleteDialog() {
-        if (!canNavigateFragment) return
-
         val directions =
             DiaryEditFragmentDirections.actionDiaryEditFragmentToDiaryPictureDeleteDialog()
-        navController.navigate(directions)
+        navigateFragment(NavigationCommand.To(directions))
     }
 
     override fun onNavigateAppMessageDialog(appMessage: AppMessage) {
-        val action: NavDirections =
+        val directions =
             DiaryEditFragmentDirections.actionDiaryEditFragmentToAppMessageDialog(appMessage)
-        navController.navigate(action)
+        navigateFragment(NavigationCommand.To(directions))
     }
 
-    private fun navigatePreviousFragment(editedDiaryDate: LocalDate?) {
-        val navBackStackEntry = checkNotNull(navController.previousBackStackEntry)
-        val destinationId = navBackStackEntry.destination.id
-        val savedStateHandle = navBackStackEntry.savedStateHandle
-        savedStateHandle[KEY_RESULT] =
-            if (destinationId == R.id.navigation_calendar_fragment) {
-                FragmentResult.Some(editedDiaryDate)
-            } else {
-                FragmentResult.None
+    private fun navigatePreviousFragment(result: FragmentResult<LocalDate>) {
+        navigateFragment(NavigationCommand.Up(KEY_RESULT, result))
+    }
+
+    private fun navigatePreviousFragmentOnDiaryDelete(result: FragmentResult.Some<LocalDate>) {
+        val destinationId =
+            try {
+                navController.getBackStackEntry(R.id.navigation_calendar_fragment)
+                R.id.navigation_calendar_fragment
+            } catch (e: IllegalArgumentException) {
+                R.id.navigation_diary_list_fragment
             }
-        Log.d("20250529", "navigatePreviousFragment()_navigateUp()")
-        navController.navigateUp()
-    }
-
-    private fun navigatePreviousFragmentOnDiaryDelete(editedDiaryDate: LocalDate?) {
-        val navBackStackEntry = checkNotNull(navController.previousBackStackEntry)
-        val destinationId = navBackStackEntry.destination.id
-        if (destinationId == R.id.navigation_diary_show_fragment) {
-            navController.navigateUp()
-        }
-        navigatePreviousFragment(editedDiaryDate)
+        navigateFragment(
+            NavigationCommand.PopTo(
+                destinationId,
+                false,
+                KEY_RESULT,
+                result
+            )
+        )
     }
 
     private fun checkAccessLocationPermission(date: LocalDate) {

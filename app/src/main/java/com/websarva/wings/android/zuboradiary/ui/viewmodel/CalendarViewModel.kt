@@ -51,6 +51,13 @@ internal class CalendarViewModel @Inject constructor(
         _previousSelectedDate.value = initialPreviousSelectedDate
     }
 
+    // BackPressed(戻るボタン)処理
+    override fun onBackPressed() {
+        viewModelScope.launch {
+            _fragmentAction.emit(FragmentAction.NavigatePreviousFragment)
+        }
+    }
+
     // ViewClicked処理
     fun onCalendarDayClicked(date: LocalDate) {
         updateSelectedDate(date)

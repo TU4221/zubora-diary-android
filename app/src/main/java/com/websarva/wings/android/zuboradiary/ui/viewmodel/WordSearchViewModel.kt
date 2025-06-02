@@ -150,6 +150,13 @@ internal class WordSearchViewModel @Inject internal constructor(
         isLoadingOnScrolled = initialIsLoadingOnScrolled
     }
 
+    // BackPressed(戻るボタン)処理
+    override fun onBackPressed() {
+        viewModelScope.launch {
+            _fragmentAction.emit(FragmentAction.NavigatePreviousFragment)
+        }
+    }
+
     // Viewクリック処理
     fun onNavigationButtonClicked() {
         viewModelScope.launch {

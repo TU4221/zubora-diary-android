@@ -10,7 +10,6 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
-import androidx.activity.OnBackPressedCallback
 import androidx.databinding.ViewDataBinding
 import androidx.fragment.app.viewModels
 import com.websarva.wings.android.zuboradiary.R
@@ -27,6 +26,7 @@ import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.DiaryDeleteDial
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.DiaryLoadingFailureDialogFragment
 import com.websarva.wings.android.zuboradiary.ui.model.action.DiaryShowFragmentAction
 import com.websarva.wings.android.zuboradiary.ui.model.action.FragmentAction
+import com.websarva.wings.android.zuboradiary.ui.model.navigation.NavigationCommand
 import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.DiaryShowViewModel
 import com.websarva.wings.android.zuboradiary.ui.utils.toJapaneseDateString
@@ -69,7 +69,6 @@ internal class DiaryShowFragment : BaseFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        setUpOnBackPressedCallback()
         setUpFragmentAction()
         setUpPendingDialogObserver()
         setUpToolBar()
@@ -106,14 +105,6 @@ internal class DiaryShowFragment : BaseFragment() {
         }
     }
 
-    private fun setUpOnBackPressedCallback() {
-        addOnBackPressedCallback(object : OnBackPressedCallback(true) {
-            override fun handleOnBackPressed() {
-                mainViewModel.onBackPressed()
-            }
-        })
-    }
-
     private fun setUpFragmentAction() {
         launchAndRepeatOnViewLifeCycleStarted {
             mainViewModel.fragmentAction.collect { value: FragmentAction ->
@@ -128,10 +119,15 @@ internal class DiaryShowFragment : BaseFragment() {
                         navigateDiaryDeleteDialog(value.date)
                     }
                     is DiaryShowFragmentAction.NavigatePreviousFragment -> {
-                        navigatePreviousFragment(value.date)
+                        navigatePreviousFragment(value.result)
                     }
                     is DiaryShowFragmentAction.NavigatePreviousFragmentOnDiaryDelete -> {
-                        navigatePreviousFragment(value.date)
+                        navigatePreviousFragment(value.result)
+                    }
+                    is FragmentAction.NavigatePreviousFragment -> {
+                        // MEMO:"DiaryEditFragmentAction.NavigatePreviousFragment"を使用する為、
+                        //      "FragmentAction.NavigatePreviousFragment"処理不要。
+                        throw IllegalArgumentException()
                     }
                     else -> {
                         throw IllegalArgumentException()
@@ -329,53 +325,35 @@ internal class DiaryShowFragment : BaseFragment() {
     }
 
     private fun navigateDiaryEditFragment(date: LocalDate) {
-        if (!canNavigateFragment) return
-
         val directions =
             DiaryShowFragmentDirections.actionNavigationDiaryShowFragmentToDiaryEditFragment(
                 false,
                 true,
                 date
             )
-        navController.navigate(directions)
+        navigateFragment(NavigationCommand.To(directions))
     }
 
     private fun navigateDiaryLoadingFailureDialog(date: LocalDate) {
-        if (!canNavigateFragment) {
-            mainViewModel.addPendingDialogList(DiaryShowPendingDialog.DiaryLoadingFailure(date))
-            return
-        }
-
         val directions =
             DiaryShowFragmentDirections.actionDiaryShowFragmentToDiaryLoadingFailureDialog(date)
-        navController.navigate(directions)
+        navigateFragment(NavigationCommand.To(directions))
     }
 
     private fun navigateDiaryDeleteDialog(date: LocalDate) {
-        if (!canNavigateFragment) return
-
         val directions =
             DiaryShowFragmentDirections.actionDiaryShowFragmentToDiaryDeleteDialog(date)
-        navController.navigate(directions)
+        navigateFragment(NavigationCommand.To(directions))
     }
 
     override fun onNavigateAppMessageDialog(appMessage: AppMessage) {
         val directions =
             DiaryShowFragmentDirections.actionDiaryShowFragmentToAppMessageDialog(appMessage)
-        navController.navigate(directions)
+        navigateFragment(NavigationCommand.To(directions))
     }
 
-    private fun navigatePreviousFragment(date: LocalDate) {
-        val navBackStackEntry = checkNotNull(navController.previousBackStackEntry)
-        val destinationId = navBackStackEntry.destination.id
-        val savedStateHandle = navBackStackEntry.savedStateHandle
-        savedStateHandle[KEY_RESULT] =
-            if (destinationId == R.id.navigation_calendar_fragment) {
-                FragmentResult.Some(date)
-            } else {
-                FragmentResult.None
-            }
-        navController.navigateUp()
+    private fun navigatePreviousFragment(result: FragmentResult.Some<LocalDate>) {
+        navigateFragment(NavigationCommand.Up(KEY_RESULT, result))
     }
 
     override fun destroyBinding() {

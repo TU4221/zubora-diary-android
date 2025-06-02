@@ -33,6 +33,7 @@ import com.websarva.wings.android.zuboradiary.ui.model.DiaryEditPendingDialog
 import com.websarva.wings.android.zuboradiary.ui.model.DiaryShowPendingDialog
 import com.websarva.wings.android.zuboradiary.ui.model.PendingDialog
 import com.websarva.wings.android.zuboradiary.ui.model.PendingDialogList
+import com.websarva.wings.android.zuboradiary.ui.model.navigation.NavigationCommand
 import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
 import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.BaseViewModel
@@ -77,7 +78,7 @@ abstract class BaseFragment : LoggingFragment() {
         val navDestination = navController.currentDestination
         return checkNotNull(navDestination).id
     }
-    internal val canNavigateFragment
+    private val canNavigateFragment
         get() = destinationId == currentDestinationId
 
     private val addedLifecycleEventObserverList = ArrayList<LifecycleEventObserver>()
@@ -89,13 +90,6 @@ abstract class BaseFragment : LoggingFragment() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED, block)
         }
-    }
-
-    /**
-     * 戻るボタン押下時の処理。
-     */
-    internal fun addOnBackPressedCallback(callback: OnBackPressedCallback) {
-        requireActivity().onBackPressedDispatcher.addCallback(this, callback)
     }
 
     override fun onCreateView(
@@ -187,6 +181,8 @@ abstract class BaseFragment : LoggingFragment() {
         setUpAppMessageDialog()
         setUpPendingDialog()
         setUpNavBackStackEntryLifecycleObserverDispose()
+        setUpPendingNavigationCollector()
+        registerOnBackPressedCallback()
     }
 
     /**
@@ -387,6 +383,93 @@ abstract class BaseFragment : LoggingFragment() {
                     addedLifecycleEventObserverList.clear()
                 }
             })
+    }
+
+
+    private fun setUpPendingNavigationCollector() {
+        mainViewModel ?: return
+
+        navBackStackEntry.lifecycleScope.launch {
+            navBackStackEntry.repeatOnLifecycle(Lifecycle.State.RESUMED) {
+                mainViewModel!!.pendingNavigationCommand
+                    .collectLatest { value ->
+                        Log.d("20250530", "collect()_$value")
+                        when (value) {
+                            NavigationCommand.None -> {
+                                // 処理なし
+                            }
+                            else -> {
+                                if (!canNavigateFragment) {
+                                    mainViewModel!!.onPendingFragmentNavigationFailed()
+                                    return@collectLatest
+                                }
+
+                                navigateFragment(value)
+                                mainViewModel!!.onPendingFragmentNavigationCompleted()
+                            }
+                        }
+                    }
+            }
+        }
+    }
+
+    internal fun navigateFragment(command: NavigationCommand) {
+        mainViewModel ?: return
+
+        if (!canNavigateFragment) {
+            mainViewModel!!.onFragmentNavigationFailed(command)
+            return
+        }
+
+        when (command) {
+            is NavigationCommand.To -> {
+                navController.navigate(command.directions)
+            }
+            is NavigationCommand.Up<*> -> {
+                if (command.resultKey != null) {
+                    val previousBackStackEntry = checkNotNull(navController.previousBackStackEntry)
+                    previousBackStackEntry.savedStateHandle[command.resultKey] = command.result
+                }
+                navController.navigateUp()
+            }
+            is NavigationCommand.Pop<*> -> {
+                if (command.resultKey != null) {
+                    val previousBackStackEntry = checkNotNull(navController.previousBackStackEntry)
+                    previousBackStackEntry.savedStateHandle[command.resultKey] = command.result
+                }
+                navController.popBackStack()
+            }
+            is NavigationCommand.PopTo<*> -> {
+                if (command.resultKey != null) {
+                    val previousBackStackEntry = navController.getBackStackEntry(command.destinationId)
+                    previousBackStackEntry.savedStateHandle[command.resultKey] = command.result
+                }
+                navController.popBackStack(command.destinationId, command.inclusive)
+            }
+            NavigationCommand.None -> {
+                // 処理なし
+            }
+        }
+    }
+
+    internal open fun navigatePreviousFragment() {
+        navigateFragment(NavigationCommand.Up<Nothing>())
+    }
+
+    private fun registerOnBackPressedCallback() {
+        requireActivity().onBackPressedDispatcher
+            .addCallback(
+                viewLifecycleOwner,
+                object : OnBackPressedCallback(true) {
+                    override fun handleOnBackPressed() {
+                        if (mainViewModel == null) {
+                            navigatePreviousFragment()
+                        } else {
+                            mainViewModel!!.onBackPressed()
+                        }
+                    }
+                }
+            )
     }
 
     override fun onDestroyView() {

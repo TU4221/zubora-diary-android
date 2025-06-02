@@ -9,7 +9,6 @@ import android.provider.Settings
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
@@ -30,6 +29,7 @@ import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.ThemeColorPicke
 import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
 import com.websarva.wings.android.zuboradiary.ui.model.action.FragmentAction
 import com.websarva.wings.android.zuboradiary.ui.model.action.SettingsFragmentAction
+import com.websarva.wings.android.zuboradiary.ui.model.navigation.NavigationCommand
 import com.websarva.wings.android.zuboradiary.ui.utils.formatToHourMinuteString
 import com.websarva.wings.android.zuboradiary.ui.utils.isAccessLocationGranted
 import com.websarva.wings.android.zuboradiary.ui.utils.isPostNotificationsGranted
@@ -57,12 +57,6 @@ class SettingsFragment : BaseFragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        addOnBackPressedCallback(object : OnBackPressedCallback(true) {
-            override fun handleOnBackPressed() {
-                mainActivity.popBackStackToStartFragment()
-            }
-        })
 
         // ActivityResultLauncher設定
         // 通知権限取得結果処理
@@ -412,6 +406,9 @@ class SettingsFragment : BaseFragment() {
                     is SettingsFragmentAction.TurnOffWeatherInfoAcquisitionSettingSwitch -> {
                         binding.includeWeatherInfoAcquisitionSetting.materialSwitch.isChecked = false
                     }
+                    FragmentAction.NavigatePreviousFragment -> {
+                        mainActivity.popBackStackToStartFragment()
+                    }
                     else -> {
                         throw IllegalArgumentException()
                     }
@@ -425,85 +422,67 @@ class SettingsFragment : BaseFragment() {
     }
 
     private fun navigateThemeColorPickerDialog() {
-        if (!canNavigateFragment) return
-
         val directions =
             SettingsFragmentDirections.actionNavigationSettingsFragmentToThemeColorPickerDialog()
-        navController.navigate(directions)
+        navigateFragment(NavigationCommand.To(directions))
     }
 
     private fun navigateCalendarStartDayPickerDialog(dayOfWeek: DayOfWeek) {
-        if (!canNavigateFragment) return
-
         val directions =
             SettingsFragmentDirections.actionNavigationSettingsFragmentToCalendarStartDayPickerDialog(
                 dayOfWeek
             )
-        navController.navigate(directions)
+        navigateFragment(NavigationCommand.To(directions))
     }
 
     private fun navigateReminderNotificationTimePickerDialog() {
-        if (!canNavigateFragment) return
-
         val directions =
             SettingsFragmentDirections.actionNavigationSettingsFragmentToReminderNotificationTimePickerDialog()
-        navController.navigate(directions)
+        navigateFragment(NavigationCommand.To(directions))
     }
 
     private fun navigateNotificationPermissionDialog() {
-        if (!canNavigateFragment) return
-
         val permissionName = getString(R.string.fragment_settings_permission_name_notification)
         val directions =
             SettingsFragmentDirections.actionSettingsFragmentToPermissionDialog(permissionName)
-        navController.navigate(directions)
+        navigateFragment(NavigationCommand.To(directions))
     }
 
     private fun navigateLocationPermissionDialog() {
-        if (!canNavigateFragment) return
-
         val permissionName = getString(R.string.fragment_settings_permission_name_location)
         val directions =
             SettingsFragmentDirections.actionSettingsFragmentToPermissionDialog(permissionName)
-        navController.navigate(directions)
+        navigateFragment(NavigationCommand.To(directions))
     }
 
     private fun navigateAllDiariesDeleteDialog() {
-        if (!canNavigateFragment) return
-
         val directions =
             SettingsFragmentDirections.actionSettingsFragmentToAllDiariesDeleteDialog()
-        navController.navigate(directions)
+        navigateFragment(NavigationCommand.To(directions))
     }
 
     private fun navigateAllSettingsInitializationDialog() {
-        if (!canNavigateFragment) return
-
         val directions =
             SettingsFragmentDirections.actionSettingsFragmentToAllSettingsInitializationDialog()
-        navController.navigate(directions)
+        navigateFragment(NavigationCommand.To(directions))
     }
 
     private fun navigateAllDataDeleteDialog() {
-        if (!canNavigateFragment) return
-
         val directions =
             SettingsFragmentDirections.actionSettingsFragmentToAllDataDeleteDialog()
-        navController.navigate(directions)
+        navigateFragment(NavigationCommand.To(directions))
     }
 
     override fun onNavigateAppMessageDialog(appMessage: AppMessage) {
         val directions =
             SettingsFragmentDirections.actionSettingsFragmentToAppMessageDialog(appMessage)
-        navController.navigate(directions)
+        navigateFragment(NavigationCommand.To(directions))
     }
 
     private fun navigateOpenSourceLicensesFragment() {
-        if (!canNavigateFragment) return
-
         val directions =
             SettingsFragmentDirections.actionNavigationSettingsFragmentToOpenSourceLicensesFragment()
-        navController.navigate(directions)
+        navigateFragment(NavigationCommand.To(directions))
     }
 
     private fun showApplicationDetailsSettings() {

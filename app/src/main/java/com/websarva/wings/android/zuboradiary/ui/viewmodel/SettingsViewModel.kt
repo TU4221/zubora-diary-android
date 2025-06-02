@@ -243,6 +243,13 @@ internal class SettingsViewModel @Inject constructor(
         addAppMessage(SettingsAppMessage.SettingLoadingFailure)
     }
 
+    // BackPressed(戻るボタン)処理
+    override fun onBackPressed() {
+        viewModelScope.launch {
+            _fragmentAction.emit(FragmentAction.NavigatePreviousFragment)
+        }
+    }
+
     // ViewClicked処理
     fun onThemeColorSettingButtonClicked() {
         viewModelScope.launch {

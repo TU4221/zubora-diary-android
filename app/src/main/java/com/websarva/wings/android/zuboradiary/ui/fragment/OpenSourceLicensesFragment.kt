@@ -78,7 +78,7 @@ class OpenSourceLicensesFragment: BaseFragment() {
     private fun setUpToolBar() {
         binding.materialToolbarTopAppBar
             .setNavigationOnClickListener {
-                navController.navigateUp()
+                navigatePreviousFragment()
             }
     }
 

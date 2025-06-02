@@ -309,7 +309,8 @@ internal class DiaryEditViewModel @Inject constructor(
         shouldInitializeOnFragmentDestroy = initialShouldInitializeOnFragmentDestroy
     }
 
-    fun onBackPressed() {
+    // BackPressed(戻るボタン)処理
+    override fun onBackPressed() {
         viewModelScope.launch {
             navigatePreviousFragment()
         }
@@ -804,7 +805,7 @@ internal class DiaryEditViewModel @Inject constructor(
     }
 
     private suspend fun deleteDiary() {
-        val loadedDate = loadedDate.value
+        val loadedDate = loadedDate.requireValue()
         val loadedPictureUri = loadedPicturePath
 
         val isSuccessful = deleteDiaryFromDatabase()
@@ -815,7 +816,9 @@ internal class DiaryEditViewModel @Inject constructor(
         if (loadedPictureUri != null) uriRepository.releasePersistablePermission(loadedPictureUri)
         updateFragmentAction(
             DiaryEditFragmentAction
-                .NavigatePreviousFragmentOnDiaryDelete(loadedDate)
+                .NavigatePreviousFragmentOnDiaryDelete(
+                    FragmentResult.Some(loadedDate)
+                )
         )
     }
 
@@ -998,7 +1001,13 @@ internal class DiaryEditViewModel @Inject constructor(
 
     private suspend fun navigatePreviousFragment() {
         val loadedDate = loadedDate.value
-        updateFragmentAction(DiaryEditFragmentAction.NavigatePreviousFragment(loadedDate))
+        val result =
+            if (loadedDate == null) {
+                FragmentResult.None
+            } else {
+                FragmentResult.Some(loadedDate)
+            }
+        updateFragmentAction(DiaryEditFragmentAction.NavigatePreviousFragment(result))
     }
 
     // TODO:テスト用の為、最終的に削除
