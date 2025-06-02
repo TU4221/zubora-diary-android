@@ -29,7 +29,7 @@ internal class DiaryShowViewModel @Inject constructor(
     handle: SavedStateHandle,
     private val diaryRepository: DiaryRepository,
     private val uriRepository: UriRepository
-) : BaseViewModel() {
+) : BaseViewModel<DiaryShowEvent, DiaryShowAppMessage>() {
 
     private val logTag = createLogTag()
 

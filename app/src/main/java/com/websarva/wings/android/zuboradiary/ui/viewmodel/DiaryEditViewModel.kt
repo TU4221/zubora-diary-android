@@ -51,7 +51,7 @@ internal class DiaryEditViewModel @Inject constructor(
     private val locationRepository: LocationRepository,
     private val userPreferencesRepository: UserPreferencesRepository,
     private val uriRepository: UriRepository
-) : BaseViewModel() {
+) : BaseViewModel<DiaryEditEvent, DiaryEditAppMessage>() {
 
     companion object {
         private const val SAVED_HAS_PREPARED_DIARY_STATE_KEY = "hasPreparedDiary"

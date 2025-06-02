@@ -10,7 +10,6 @@ import com.websarva.wings.android.zuboradiary.ui.adapter.diary.wordsearchresult.
 import com.websarva.wings.android.zuboradiary.ui.adapter.diary.wordsearchresult.WordSearchResultDayListItem
 import com.websarva.wings.android.zuboradiary.ui.adapter.diary.wordsearchresult.WordSearchResultYearMonthList
 import com.websarva.wings.android.zuboradiary.ui.model.state.WordSearchState
-import com.websarva.wings.android.zuboradiary.ui.model.event.ViewModelEvent
 import com.websarva.wings.android.zuboradiary.ui.model.event.WordSearchEvent
 import com.websarva.wings.android.zuboradiary.ui.utils.requireValue
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -29,7 +28,7 @@ import javax.inject.Inject
 @HiltViewModel
 internal class WordSearchViewModel @Inject internal constructor(
     private val diaryRepository: DiaryRepository
-) : BaseViewModel() {
+) : BaseViewModel<WordSearchEvent, WordSearchAppMessage>() {
 
     private val logTag = createLogTag()
 
@@ -146,14 +145,14 @@ internal class WordSearchViewModel @Inject internal constructor(
     // BackPressed(戻るボタン)処理
     override fun onBackPressed() {
         viewModelScope.launch {
-            emitViewModelEvent(ViewModelEvent.NavigatePreviousFragment)
+            emitNavigatePreviousFragmentEvent()
         }
     }
 
     // Viewクリック処理
     fun onNavigationButtonClicked() {
         viewModelScope.launch {
-            emitViewModelEvent(ViewModelEvent.NavigatePreviousFragment)
+            emitNavigatePreviousFragmentEvent()
         }
     }
 

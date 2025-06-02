@@ -7,6 +7,6 @@ internal sealed class DiaryShowEvent : ViewModelEvent() {
     data class NavigateDiaryEditFragment(val date: LocalDate) : DiaryShowEvent()
     data class NavigateDiaryLoadingFailureDialog(val date: LocalDate) : DiaryShowEvent()
     data class NavigateDiaryDeleteDialog(val date: LocalDate) : DiaryShowEvent()
-    data class NavigatePreviousFragment(val result: FragmentResult.Some<LocalDate>) : DiaryEditEvent()
+    data class NavigatePreviousFragment(val result: FragmentResult.Some<LocalDate>) : DiaryShowEvent()
     data class NavigatePreviousFragmentOnDiaryDelete(val result: FragmentResult.Some<LocalDate>) : DiaryShowEvent()
 }

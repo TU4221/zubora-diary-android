@@ -8,6 +8,7 @@ import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import com.websarva.wings.android.zuboradiary.ui.model.DiaryItemTitleEditAppMessage
 import com.websarva.wings.android.zuboradiary.ui.adapter.diaryitemtitle.SelectionHistoryList
 import com.websarva.wings.android.zuboradiary.ui.adapter.diaryitemtitle.SelectionHistoryListItem
+import com.websarva.wings.android.zuboradiary.ui.model.event.DiaryItemTitleEditEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -20,7 +21,7 @@ import javax.inject.Inject
 @HiltViewModel
 internal class DiaryItemTitleEditViewModel @Inject constructor(
     private val diaryItemTitleSelectionHistoryRepository: DiaryItemTitleSelectionHistoryRepository
-) : BaseViewModel() {
+) : BaseViewModel<DiaryItemTitleEditEvent, DiaryItemTitleEditAppMessage>() {
 
     private val logTag = createLogTag()
 

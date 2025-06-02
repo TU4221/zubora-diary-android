@@ -13,7 +13,6 @@ import com.websarva.wings.android.zuboradiary.ui.adapter.diary.diary.DiaryDayLis
 import com.websarva.wings.android.zuboradiary.ui.adapter.diary.diary.DiaryYearMonthList
 import com.websarva.wings.android.zuboradiary.ui.model.state.DiaryListState
 import com.websarva.wings.android.zuboradiary.ui.model.event.DiaryListEvent
-import com.websarva.wings.android.zuboradiary.ui.model.event.ViewModelEvent
 import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
 import com.websarva.wings.android.zuboradiary.ui.model.result.DiaryListItemDeleteResult
 import com.websarva.wings.android.zuboradiary.ui.utils.requireValue
@@ -33,7 +32,7 @@ import javax.inject.Inject
 internal class DiaryListViewModel @Inject constructor(
     private val diaryRepository: DiaryRepository,
     private val uriRepository: UriRepository
-) : BaseViewModel() {
+) : BaseViewModel<DiaryListEvent, DiaryListAppMessage>() {
 
     companion object {
         // MEMO:初期読込時の対象リストが画面全体に表示される値にすること。
@@ -74,7 +73,7 @@ internal class DiaryListViewModel @Inject constructor(
     // BackPressed(戻るボタン)処理
     override fun onBackPressed() {
         viewModelScope.launch {
-            emitViewModelEvent(ViewModelEvent.NavigatePreviousFragment)
+            emitNavigatePreviousFragmentEvent()
         }
     }
 

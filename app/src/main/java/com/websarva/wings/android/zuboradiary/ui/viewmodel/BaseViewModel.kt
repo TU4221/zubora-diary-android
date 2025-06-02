@@ -4,13 +4,6 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import com.websarva.wings.android.zuboradiary.ui.model.AppMessage
-import com.websarva.wings.android.zuboradiary.ui.model.CalendarAppMessage
-import com.websarva.wings.android.zuboradiary.ui.model.DiaryEditAppMessage
-import com.websarva.wings.android.zuboradiary.ui.model.DiaryItemTitleEditAppMessage
-import com.websarva.wings.android.zuboradiary.ui.model.DiaryListAppMessage
-import com.websarva.wings.android.zuboradiary.ui.model.DiaryShowAppMessage
-import com.websarva.wings.android.zuboradiary.ui.model.SettingsAppMessage
-import com.websarva.wings.android.zuboradiary.ui.model.WordSearchAppMessage
 import com.websarva.wings.android.zuboradiary.ui.model.event.ConsumableEvent
 import com.websarva.wings.android.zuboradiary.ui.model.event.ViewModelEvent
 import com.websarva.wings.android.zuboradiary.ui.model.navigation.NavigationCommand
@@ -19,7 +12,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 
-internal abstract class BaseViewModel : ViewModel() {
+internal abstract class BaseViewModel<E: ViewModelEvent, M: AppMessage> : ViewModel() {
 
     private val logTag = createLogTag()
 
@@ -34,32 +27,28 @@ internal abstract class BaseViewModel : ViewModel() {
         Log.d(logTag, "initialize()")
     }
 
-    protected suspend fun emitViewModelEvent(event: ViewModelEvent) {
+    protected suspend fun emitViewModelEvent(event: E) {
         _viewModelEvent.emit(
             ConsumableEvent(event)
         )
     }
 
-    protected suspend fun emitAppMessageEvent(appMessage: AppMessage) {
-        if (checkAppMessageTargetType(appMessage)) throw IllegalArgumentException()
-
-        emitViewModelEvent(
-            ViewModelEvent.NavigateAppMessage(
-                appMessage
+    protected suspend fun emitNavigatePreviousFragmentEvent() {
+        _viewModelEvent.emit(
+            ConsumableEvent(
+                ViewModelEvent.NavigatePreviousFragment
             )
         )
     }
 
-    private fun checkAppMessageTargetType(appMessage: AppMessage): Boolean {
-        return when (appMessage) {
-            is DiaryListAppMessage -> this@BaseViewModel is DiaryListViewModel
-            is WordSearchAppMessage -> this@BaseViewModel is WordSearchViewModel
-            is CalendarAppMessage -> this@BaseViewModel is CalendarViewModel
-            is SettingsAppMessage -> this@BaseViewModel is SettingsViewModel
-            is DiaryShowAppMessage -> this@BaseViewModel is DiaryShowViewModel
-            is DiaryEditAppMessage -> this@BaseViewModel is DiaryEditViewModel
-            is DiaryItemTitleEditAppMessage -> this@BaseViewModel is DiaryItemTitleEditViewModel
-        }
+    protected suspend fun emitAppMessageEvent(appMessage: M) {
+        _viewModelEvent.emit(
+            ConsumableEvent(
+                ViewModelEvent.NavigateAppMessage(
+                    appMessage
+                )
+            )
+        )
     }
 
     abstract fun onBackPressed()

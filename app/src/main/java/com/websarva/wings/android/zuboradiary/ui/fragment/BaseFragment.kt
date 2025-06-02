@@ -41,7 +41,7 @@ abstract class BaseFragment : LoggingFragment() {
         get() = requireActivity() as MainActivity
 
     // MEMO:ViewModelが無いFragmentに対応できるようにNull許容型とする。
-    internal abstract val mainViewModel: BaseViewModel?
+    internal abstract val mainViewModel: BaseViewModel<out ViewModelEvent, out AppMessage>?
 
     internal lateinit var navController: NavController
         private set

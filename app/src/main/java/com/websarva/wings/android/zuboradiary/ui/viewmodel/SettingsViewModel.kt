@@ -19,7 +19,6 @@ import com.websarva.wings.android.zuboradiary.data.repository.UriRepository
 import com.websarva.wings.android.zuboradiary.data.repository.WorkerRepository
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import com.websarva.wings.android.zuboradiary.ui.model.SettingsAppMessage
-import com.websarva.wings.android.zuboradiary.ui.model.event.ViewModelEvent
 import com.websarva.wings.android.zuboradiary.ui.model.event.SettingsEvent
 import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
 import com.websarva.wings.android.zuboradiary.ui.utils.requireValue
@@ -43,7 +42,7 @@ internal class SettingsViewModel @Inject constructor(
     private val workerRepository: WorkerRepository,
     private val diaryRepository: DiaryRepository,
     private val uriRepository: UriRepository
-) : BaseViewModel() {
+) : BaseViewModel<SettingsEvent, SettingsAppMessage>() {
 
     // HACK:SavedStateHandleを使用する理由
     //      プロセスキルでアプリを再起動した時、ActivityのBinding処理とは関係なしにFragmentの処理が始まり、
@@ -235,7 +234,7 @@ internal class SettingsViewModel @Inject constructor(
     // BackPressed(戻るボタン)処理
     override fun onBackPressed() {
         viewModelScope.launch {
-            emitViewModelEvent(ViewModelEvent.NavigatePreviousFragment)
+            emitNavigatePreviousFragmentEvent()
         }
     }
 

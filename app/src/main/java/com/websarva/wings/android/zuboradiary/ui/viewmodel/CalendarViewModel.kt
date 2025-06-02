@@ -6,7 +6,6 @@ import com.websarva.wings.android.zuboradiary.data.repository.DiaryRepository
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import com.websarva.wings.android.zuboradiary.ui.model.CalendarAppMessage
 import com.websarva.wings.android.zuboradiary.ui.model.event.CalendarEvent
-import com.websarva.wings.android.zuboradiary.ui.model.event.ViewModelEvent
 import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
 import com.websarva.wings.android.zuboradiary.ui.model.state.CalendarState
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -19,7 +18,7 @@ import javax.inject.Inject
 @HiltViewModel
 internal class CalendarViewModel @Inject constructor(
     private val diaryRepository: DiaryRepository
-) : BaseViewModel() {
+) : BaseViewModel<CalendarEvent, CalendarAppMessage>() {
 
     private val logTag = createLogTag()
 
@@ -47,7 +46,7 @@ internal class CalendarViewModel @Inject constructor(
     // BackPressed(戻るボタン)処理
     override fun onBackPressed() {
         viewModelScope.launch {
-            emitViewModelEvent(ViewModelEvent.NavigatePreviousFragment)
+            emitNavigatePreviousFragmentEvent()
         }
     }
 
