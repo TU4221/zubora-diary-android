@@ -27,8 +27,8 @@ import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.ReminderNotific
 import com.websarva.wings.android.zuboradiary.ui.theme.SettingsThemeColorChanger
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.ThemeColorPickerDialogFragment
 import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
-import com.websarva.wings.android.zuboradiary.ui.model.action.FragmentAction
-import com.websarva.wings.android.zuboradiary.ui.model.action.SettingsFragmentAction
+import com.websarva.wings.android.zuboradiary.ui.model.event.ViewModelEvent
+import com.websarva.wings.android.zuboradiary.ui.model.event.SettingsEvent
 import com.websarva.wings.android.zuboradiary.ui.model.navigation.NavigationCommand
 import com.websarva.wings.android.zuboradiary.ui.utils.formatToHourMinuteString
 import com.websarva.wings.android.zuboradiary.ui.utils.isAccessLocationGranted
@@ -118,7 +118,7 @@ class SettingsFragment : BaseFragment() {
         setUpCalendarStartDaySettingItem()
         setUpReminderNotificationSettingItem()
 
-        setUpFragmentAction()
+        setUpViewModelEvent()
     }
 
     override fun initializeFragmentResultReceiver() {
@@ -345,68 +345,68 @@ class SettingsFragment : BaseFragment() {
         }
     }
 
-    private fun setUpFragmentAction() {
+    private fun setUpViewModelEvent() {
         launchAndRepeatOnViewLifeCycleStarted {
-            mainViewModel.fragmentAction.collect { value: FragmentAction ->
+            mainViewModel.event.collect { value: ViewModelEvent ->
                 when (value) {
-                    is SettingsFragmentAction.NavigateThemeColorPickerDialog -> {
+                    is SettingsEvent.NavigateThemeColorPickerDialog -> {
                         navigateThemeColorPickerDialog()
                     }
-                    is SettingsFragmentAction.NavigateCalendarStartDayPickerDialog -> {
+                    is SettingsEvent.NavigateCalendarStartDayPickerDialog -> {
                         navigateCalendarStartDayPickerDialog(value.dayOfWeek)
                     }
-                    is SettingsFragmentAction.NavigateReminderNotificationTimePickerDialog -> {
+                    is SettingsEvent.NavigateReminderNotificationTimePickerDialog -> {
                         navigateReminderNotificationTimePickerDialog()
                     }
-                    is SettingsFragmentAction.NavigateNotificationPermissionDialog -> {
+                    is SettingsEvent.NavigateNotificationPermissionDialog -> {
                         navigateNotificationPermissionDialog()
                     }
-                    is SettingsFragmentAction.NavigateLocationPermissionDialog -> {
+                    is SettingsEvent.NavigateLocationPermissionDialog -> {
                         navigateLocationPermissionDialog()
                     }
-                    is SettingsFragmentAction.NavigateAllDiariesDeleteDialog -> {
+                    is SettingsEvent.NavigateAllDiariesDeleteDialog -> {
                         navigateAllDiariesDeleteDialog()
                     }
-                    is SettingsFragmentAction.NavigateAllSettingsInitializationDialog -> {
+                    is SettingsEvent.NavigateAllSettingsInitializationDialog -> {
                         navigateAllSettingsInitializationDialog()
                     }
-                    is SettingsFragmentAction.NavigateAllDataDeleteDialog -> {
+                    is SettingsEvent.NavigateAllDataDeleteDialog -> {
                         navigateAllDataDeleteDialog()
                     }
-                    is SettingsFragmentAction.NavigateOpenSourceLicensesFragment -> {
+                    is SettingsEvent.NavigateOpenSourceLicensesFragment -> {
                         navigateOpenSourceLicensesFragment()
                     }
-                    is SettingsFragmentAction.CheckPostNotificationsPermission -> {
+                    is SettingsEvent.CheckPostNotificationsPermission -> {
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                             checkPostNotificationsPermission()
                         }
                     }
-                    is SettingsFragmentAction.CheckShouldShowRequestPostNotificationsPermissionRationale -> {
+                    is SettingsEvent.CheckShouldShowRequestPostNotificationsPermissionRationale -> {
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                             checkShouldShowRequestPostNotificationsPermissionRationale()
                         }
                     }
-                    is SettingsFragmentAction.ShowRequestPostNotificationsPermissionRationale -> {
+                    is SettingsEvent.ShowRequestPostNotificationsPermissionRationale -> {
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                             showRequestPostNotificationsPermissionRationale()
                         }
                     }
-                    is SettingsFragmentAction.CheckAccessLocationPermission -> {
+                    is SettingsEvent.CheckAccessLocationPermission -> {
                         checkAccessLocationPermission()
                     }
-                    is SettingsFragmentAction.CheckShouldShowRequestAccessLocationPermissionRationale -> {
+                    is SettingsEvent.CheckShouldShowRequestAccessLocationPermissionRationale -> {
                         checkShouldShowRequestAccessLocationPermissionRationale()
                     }
-                    is SettingsFragmentAction.ShowRequestAccessLocationPermissionRationale -> {
+                    is SettingsEvent.ShowRequestAccessLocationPermissionRationale -> {
                         showRequestAccessLocationPermissionRationale()
                     }
-                    is SettingsFragmentAction.TurnOffReminderNotificationSettingSwitch -> {
+                    is SettingsEvent.TurnOffReminderNotificationSettingSwitch -> {
                         binding.includeReminderNotificationSetting.materialSwitch.isChecked = false
                     }
-                    is SettingsFragmentAction.TurnOffWeatherInfoAcquisitionSettingSwitch -> {
+                    is SettingsEvent.TurnOffWeatherInfoAcquisitionSettingSwitch -> {
                         binding.includeWeatherInfoAcquisitionSetting.materialSwitch.isChecked = false
                     }
-                    FragmentAction.NavigatePreviousFragment -> {
+                    ViewModelEvent.NavigatePreviousFragment -> {
                         mainActivity.popBackStackToStartFragment()
                     }
                     else -> {

@@ -22,8 +22,8 @@ import com.websarva.wings.android.zuboradiary.databinding.FragmentDiaryShowBindi
 import com.websarva.wings.android.zuboradiary.ui.view.imageview.DiaryPictureConfigurator
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.DiaryDeleteDialogFragment
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.DiaryLoadingFailureDialogFragment
-import com.websarva.wings.android.zuboradiary.ui.model.action.DiaryShowFragmentAction
-import com.websarva.wings.android.zuboradiary.ui.model.action.FragmentAction
+import com.websarva.wings.android.zuboradiary.ui.model.event.DiaryShowEvent
+import com.websarva.wings.android.zuboradiary.ui.model.event.ViewModelEvent
 import com.websarva.wings.android.zuboradiary.ui.model.navigation.NavigationCommand
 import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.DiaryShowViewModel
@@ -67,7 +67,7 @@ internal class DiaryShowFragment : BaseFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        setUpFragmentAction()
+        setUpViewModelEvent()
         setUpToolBar()
         setUpWeatherLayout()
         setUpConditionLayout()
@@ -102,26 +102,26 @@ internal class DiaryShowFragment : BaseFragment() {
         }
     }
 
-    private fun setUpFragmentAction() {
+    private fun setUpViewModelEvent() {
         launchAndRepeatOnViewLifeCycleStarted {
-            mainViewModel.fragmentAction.collect { value: FragmentAction ->
+            mainViewModel.event.collect { value: ViewModelEvent ->
                 when (value) {
-                    is DiaryShowFragmentAction.NavigateDiaryEditFragment -> {
+                    is DiaryShowEvent.NavigateDiaryEditFragment -> {
                         navigateDiaryEditFragment(value.date)
                     }
-                    is DiaryShowFragmentAction.NavigateDiaryLoadingFailureDialog -> {
+                    is DiaryShowEvent.NavigateDiaryLoadingFailureDialog -> {
                         navigateDiaryLoadingFailureDialog(value.date)
                     }
-                    is DiaryShowFragmentAction.NavigateDiaryDeleteDialog -> {
+                    is DiaryShowEvent.NavigateDiaryDeleteDialog -> {
                         navigateDiaryDeleteDialog(value.date)
                     }
-                    is DiaryShowFragmentAction.NavigatePreviousFragment -> {
+                    is DiaryShowEvent.NavigatePreviousFragment -> {
                         navigatePreviousFragment(value.result)
                     }
-                    is DiaryShowFragmentAction.NavigatePreviousFragmentOnDiaryDelete -> {
+                    is DiaryShowEvent.NavigatePreviousFragmentOnDiaryDelete -> {
                         navigatePreviousFragment(value.result)
                     }
-                    is FragmentAction.NavigatePreviousFragment -> {
+                    is ViewModelEvent.NavigatePreviousFragment -> {
                         // MEMO:"DiaryEditFragmentAction.NavigatePreviousFragment"を使用する為、
                         //      "FragmentAction.NavigatePreviousFragment"処理不要。
                         throw IllegalArgumentException()

@@ -12,8 +12,8 @@ import com.websarva.wings.android.zuboradiary.ui.adapter.diary.diary.DiaryDayLis
 import com.websarva.wings.android.zuboradiary.ui.adapter.diary.diary.DiaryDayListItem
 import com.websarva.wings.android.zuboradiary.ui.adapter.diary.diary.DiaryYearMonthList
 import com.websarva.wings.android.zuboradiary.ui.model.state.DiaryListState
-import com.websarva.wings.android.zuboradiary.ui.model.action.DiaryListFragmentAction
-import com.websarva.wings.android.zuboradiary.ui.model.action.FragmentAction
+import com.websarva.wings.android.zuboradiary.ui.model.event.DiaryListEvent
+import com.websarva.wings.android.zuboradiary.ui.model.event.ViewModelEvent
 import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
 import com.websarva.wings.android.zuboradiary.ui.model.result.DiaryListItemDeleteResult
 import com.websarva.wings.android.zuboradiary.ui.utils.requireValue
@@ -61,10 +61,10 @@ internal class DiaryListViewModel @Inject constructor(
     private val initialSortConditionDate: LocalDate? = null
     private var sortConditionDate: LocalDate? = initialSortConditionDate
 
-    // Fragment処理
-    private val _fragmentAction = MutableSharedFlow<FragmentAction>()
-    val fragmentAction
-        get() = _fragmentAction.asSharedFlow()
+    // ViewModelEvent
+    private val _event = MutableSharedFlow<ViewModelEvent>()
+    val event
+        get() = _event.asSharedFlow()
 
     private val initialIsLoadingOnScrolled = false
     private var isLoadingOnScrolled = initialIsLoadingOnScrolled
@@ -81,7 +81,7 @@ internal class DiaryListViewModel @Inject constructor(
     // BackPressed(戻るボタン)処理
     override fun onBackPressed() {
         viewModelScope.launch {
-            _fragmentAction.emit(FragmentAction.NavigatePreviousFragment)
+            _event.emit(ViewModelEvent.NavigatePreviousFragment)
         }
     }
 
@@ -399,16 +399,16 @@ internal class DiaryListViewModel @Inject constructor(
     }
 
     private suspend fun navigateDiaryShowFragment(date: LocalDate) {
-        _fragmentAction.emit(DiaryListFragmentAction.NavigateDiaryShowFragment(date))
+        _event.emit(DiaryListEvent.NavigateDiaryShowFragment(date))
     }
 
     private suspend fun navigateDiaryEditFragment() {
         val today = LocalDate.now()
-        _fragmentAction.emit(DiaryListFragmentAction.NavigateDiaryEditFragment(today))
+        _event.emit(DiaryListEvent.NavigateDiaryEditFragment(today))
     }
 
     private suspend fun navigateWordSearchFragment() {
-        _fragmentAction.emit(DiaryListFragmentAction.NavigateWordSearchFragment)
+        _event.emit(DiaryListEvent.NavigateWordSearchFragment)
     }
 
     private suspend fun navigateStartYearMonthPickerDialog() {
@@ -418,12 +418,12 @@ internal class DiaryListViewModel @Inject constructor(
         if (oldestDiaryDate == null) return
         val newestYear = Year.of(newestDiaryDate.year)
         val oldestYear = Year.of(oldestDiaryDate.year)
-        _fragmentAction.emit(
-            DiaryListFragmentAction.NavigateStartYearMonthPickerDialog(newestYear, oldestYear)
+        _event.emit(
+            DiaryListEvent.NavigateStartYearMonthPickerDialog(newestYear, oldestYear)
         )
     }
 
     private suspend fun navigateDiaryDeleteDialog(date: LocalDate, uri: Uri?) {
-        _fragmentAction.emit(DiaryListFragmentAction.NavigateDiaryDeleteDialog(date, uri))
+        _event.emit(DiaryListEvent.NavigateDiaryDeleteDialog(date, uri))
     }
 }

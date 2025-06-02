@@ -25,8 +25,8 @@ import com.websarva.wings.android.zuboradiary.ui.adapter.diary.diary.DiaryYearMo
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.StartYearMonthPickerDialogFragment
 import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
 import com.websarva.wings.android.zuboradiary.ui.model.state.DiaryListState
-import com.websarva.wings.android.zuboradiary.ui.model.action.DiaryListFragmentAction
-import com.websarva.wings.android.zuboradiary.ui.model.action.FragmentAction
+import com.websarva.wings.android.zuboradiary.ui.model.event.DiaryListEvent
+import com.websarva.wings.android.zuboradiary.ui.model.event.ViewModelEvent
 import com.websarva.wings.android.zuboradiary.ui.model.navigation.NavigationCommand
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
@@ -68,7 +68,7 @@ class DiaryListFragment : BaseFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        setUpFragmentAction()
+        setUpViewModelEvent()
         setUpToolBar()
         setUpDiaryList()
 
@@ -109,26 +109,26 @@ class DiaryListFragment : BaseFragment() {
         }
     }
 
-    private fun setUpFragmentAction() {
+    private fun setUpViewModelEvent() {
         launchAndRepeatOnViewLifeCycleStarted {
-            mainViewModel.fragmentAction.collect { value: FragmentAction ->
+            mainViewModel.event.collect { value: ViewModelEvent ->
                 when (value) {
-                    is DiaryListFragmentAction.NavigateDiaryShowFragment -> {
+                    is DiaryListEvent.NavigateDiaryShowFragment -> {
                         navigateDiaryShowFragment(value.date)
                     }
-                    is DiaryListFragmentAction.NavigateDiaryEditFragment -> {
+                    is DiaryListEvent.NavigateDiaryEditFragment -> {
                         navigateDiaryEditFragment()
                     }
-                    is DiaryListFragmentAction.NavigateWordSearchFragment -> {
+                    is DiaryListEvent.NavigateWordSearchFragment -> {
                         navigateWordSearchFragment()
                     }
-                    is DiaryListFragmentAction.NavigateStartYearMonthPickerDialog -> {
+                    is DiaryListEvent.NavigateStartYearMonthPickerDialog -> {
                         navigateStartYearMonthPickerDialog(value.newestYear, value.oldestYear)
                     }
-                    is DiaryListFragmentAction.NavigateDiaryDeleteDialog -> {
+                    is DiaryListEvent.NavigateDiaryDeleteDialog -> {
                         navigateDiaryDeleteDialog(value.date, value.uri)
                     }
-                    FragmentAction.NavigatePreviousFragment -> {
+                    ViewModelEvent.NavigatePreviousFragment -> {
                         navigatePreviousFragment()
                     }
                     else -> {

@@ -41,10 +41,10 @@ import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.DiaryUpdateDial
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.WeatherInfoFetchingDialogFragment
 import com.websarva.wings.android.zuboradiary.ui.keyboard.KeyboardManager
 import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
-import com.websarva.wings.android.zuboradiary.ui.model.action.Action
+import com.websarva.wings.android.zuboradiary.ui.model.event.ConsumableEvent
 import com.websarva.wings.android.zuboradiary.ui.model.adapter.WeatherAdapterList
-import com.websarva.wings.android.zuboradiary.ui.model.action.DiaryEditFragmentAction
-import com.websarva.wings.android.zuboradiary.ui.model.action.FragmentAction
+import com.websarva.wings.android.zuboradiary.ui.model.event.DiaryEditEvent
+import com.websarva.wings.android.zuboradiary.ui.model.event.ViewModelEvent
 import com.websarva.wings.android.zuboradiary.ui.model.adapter.ConditionAdapterList
 import com.websarva.wings.android.zuboradiary.ui.model.navigation.NavigationCommand
 import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
@@ -111,7 +111,7 @@ class DiaryEditFragment : BaseFragment() {
         super.onViewCreated(view, savedInstanceState)
 
         setUpViewModelInitialization()
-        setUpFragmentAction()
+        setUpViewModelEvent()
         setUpFocusViewScroll()
         setUpDiaryData()
         setUpToolBar()
@@ -278,59 +278,59 @@ class DiaryEditFragment : BaseFragment() {
         }
     }
 
-    private fun setUpFragmentAction() {
+    private fun setUpViewModelEvent() {
         launchAndRepeatOnViewLifeCycleStarted {
-            mainViewModel.fragmentAction.collect { value: Action<FragmentAction> ->
+            mainViewModel.fragmentAction.collect { value: ConsumableEvent<ViewModelEvent> ->
                 val action = value.getContentIfNotHandled()
                 Log.d("20250529", action.toString())
                 action ?: return@collect
                 when (action) {
-                    is DiaryEditFragmentAction.NavigateDiaryShowFragment -> {
+                    is DiaryEditEvent.NavigateDiaryShowFragment -> {
                         navigateDiaryShowFragment(action.date)
                     }
-                    is DiaryEditFragmentAction.NavigateDiaryItemTitleEditFragment -> {
+                    is DiaryEditEvent.NavigateDiaryItemTitleEditFragment -> {
                         navigateDiaryItemTitleEditFragment(action.itemNumber, action.itemTitle)
                     }
-                    is DiaryEditFragmentAction.NavigateDiaryLoadingDialog -> {
+                    is DiaryEditEvent.NavigateDiaryLoadingDialog -> {
                         navigateDiaryLoadingDialog(action.date)
                     }
-                    is DiaryEditFragmentAction.NavigateDiaryLoadingFailureDialog -> {
+                    is DiaryEditEvent.NavigateDiaryLoadingFailureDialog -> {
                         navigateDiaryLoadingFailureDialog(action.date)
                     }
-                    is DiaryEditFragmentAction.NavigateDiaryUpdateDialog -> {
+                    is DiaryEditEvent.NavigateDiaryUpdateDialog -> {
                         navigateDiaryUpdateDialog(action.date)
                     }
-                    is DiaryEditFragmentAction.NavigateDiaryDeleteDialog -> {
+                    is DiaryEditEvent.NavigateDiaryDeleteDialog -> {
                         navigateDiaryDeleteDialog(action.date)
                     }
-                    is DiaryEditFragmentAction.NavigateDatePickerDialog -> {
+                    is DiaryEditEvent.NavigateDatePickerDialog -> {
                         navigateDatePickerDialog(action.date)
                     }
-                    is DiaryEditFragmentAction.NavigateWeatherInfoFetchingDialog -> {
+                    is DiaryEditEvent.NavigateWeatherInfoFetchingDialog -> {
                         navigateWeatherInfoFetchingDialog(action.date)
                     }
-                    is DiaryEditFragmentAction.NavigateDiaryItemDeleteDialog -> {
+                    is DiaryEditEvent.NavigateDiaryItemDeleteDialog -> {
                         navigateDiaryItemDeleteDialog(action.itemNumber)
                     }
-                    DiaryEditFragmentAction.NavigateDiaryPictureDeleteDialog -> {
+                    DiaryEditEvent.NavigateDiaryPictureDeleteDialog -> {
                         navigateDiaryPictureDeleteDialog()
                     }
-                    is DiaryEditFragmentAction.NavigatePreviousFragment -> {
+                    is DiaryEditEvent.NavigatePreviousFragment -> {
                         navigatePreviousFragment(action.result)
                     }
-                    is DiaryEditFragmentAction.NavigatePreviousFragmentOnDiaryDelete -> {
+                    is DiaryEditEvent.NavigatePreviousFragmentOnDiaryDelete -> {
                         navigatePreviousFragmentOnDiaryDelete(action.result)
                     }
-                    is DiaryEditFragmentAction.TransitionDiaryItemHidedState -> {
+                    is DiaryEditEvent.TransitionDiaryItemHidedState -> {
                         hideItem(action.itemNumber, false)
                     }
-                    is DiaryEditFragmentAction.CheckAccessLocationPermission -> {
+                    is DiaryEditEvent.CheckAccessLocationPermission -> {
                         checkAccessLocationPermission(action.date)
                     }
-                    is DiaryEditFragmentAction.ItemAddition -> {
+                    is DiaryEditEvent.ItemAddition -> {
                         shouldTransitionItemMotionLayout = true
                     }
-                    is FragmentAction.NavigatePreviousFragment -> {
+                    is ViewModelEvent.NavigatePreviousFragment -> {
                         // MEMO:"DiaryEditFragmentAction.NavigatePreviousFragment"を使用する為、
                         //      "FragmentAction.NavigatePreviousFragment"処理不要。
                         throw IllegalArgumentException()

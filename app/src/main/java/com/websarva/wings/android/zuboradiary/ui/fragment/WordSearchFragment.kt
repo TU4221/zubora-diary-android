@@ -21,8 +21,8 @@ import com.websarva.wings.android.zuboradiary.ui.adapter.diary.DiaryYearMonthLis
 import com.websarva.wings.android.zuboradiary.ui.adapter.diary.DiaryYearMonthListBaseItem
 import com.websarva.wings.android.zuboradiary.ui.adapter.diary.wordsearchresult.WordSearchResultYearMonthList
 import com.websarva.wings.android.zuboradiary.ui.adapter.diary.wordsearchresult.WordSearchResultYearMonthListAdapter
-import com.websarva.wings.android.zuboradiary.ui.model.action.FragmentAction
-import com.websarva.wings.android.zuboradiary.ui.model.action.WordSearchFragmentAction
+import com.websarva.wings.android.zuboradiary.ui.model.event.ViewModelEvent
+import com.websarva.wings.android.zuboradiary.ui.model.event.WordSearchEvent
 import com.websarva.wings.android.zuboradiary.ui.model.navigation.NavigationCommand
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.WordSearchViewModel
 import kotlinx.coroutines.flow.collectLatest
@@ -66,7 +66,7 @@ class WordSearchFragment : BaseFragment() {
         setUpWordSearchResultList()
         setUpFloatingActionButton()
 
-        setUpFragmentAction()
+        setUpViewModelEvent()
         setUpNavDestinationChangedListener()
     }
 
@@ -194,15 +194,15 @@ class WordSearchFragment : BaseFragment() {
         listAdapter.scrollToTop()
     }
 
-    private fun setUpFragmentAction() {
+    private fun setUpViewModelEvent() {
         launchAndRepeatOnViewLifeCycleStarted {
-            mainViewModel.fragmentAction
-                .collect { value: FragmentAction ->
+            mainViewModel.event
+                .collect { value: ViewModelEvent ->
                     when (value) {
-                        is WordSearchFragmentAction.NavigateDiaryShowFragment -> {
+                        is WordSearchEvent.NavigateDiaryShowFragment -> {
                             navigateDiaryShowFragment(value.date)
                         }
-                        FragmentAction.NavigatePreviousFragment -> {
+                        ViewModelEvent.NavigatePreviousFragment -> {
                             navigatePreviousFragment()
                         }
                         else -> {

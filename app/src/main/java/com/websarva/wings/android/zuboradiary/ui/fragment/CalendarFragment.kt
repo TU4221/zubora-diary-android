@@ -38,8 +38,8 @@ import com.websarva.wings.android.zuboradiary.ui.fragment.DiaryShowFragment.NumV
 import com.websarva.wings.android.zuboradiary.ui.fragment.DiaryShowFragment.PicturePathObserver
 import com.websarva.wings.android.zuboradiary.ui.fragment.DiaryShowFragment.Weather1Observer
 import com.websarva.wings.android.zuboradiary.ui.fragment.DiaryShowFragment.Weather2Observer
-import com.websarva.wings.android.zuboradiary.ui.model.action.CalendarFragmentAction
-import com.websarva.wings.android.zuboradiary.ui.model.action.FragmentAction
+import com.websarva.wings.android.zuboradiary.ui.model.event.CalendarEvent
+import com.websarva.wings.android.zuboradiary.ui.model.event.ViewModelEvent
 import com.websarva.wings.android.zuboradiary.ui.model.navigation.NavigationCommand
 import com.websarva.wings.android.zuboradiary.ui.utils.toJapaneseDateString
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.DiaryShowViewModel
@@ -92,7 +92,7 @@ class CalendarFragment : BaseFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        setUpFragmentAction()
+        setUpViewModelEvent()
         setUpCalendar()
         setUpDiaryShow()
         setUpFloatActionButton()
@@ -134,26 +134,26 @@ class CalendarFragment : BaseFragment() {
         }
     }
 
-    private fun setUpFragmentAction() {
+    private fun setUpViewModelEvent() {
         launchAndRepeatOnViewLifeCycleStarted {
-            mainViewModel.fragmentAction.collect { value: FragmentAction ->
+            mainViewModel.event.collect { value: ViewModelEvent ->
                 when (value) {
-                    is CalendarFragmentAction.NavigateDiaryEditFragment -> {
+                    is CalendarEvent.NavigateDiaryEditFragment -> {
                         navigateDiaryEditFragment(value.date, !value.isNewDiary)
                     }
-                    is CalendarFragmentAction.LoadDiary -> {
+                    is CalendarEvent.LoadDiary -> {
                         loadDiary(value.date)
                     }
-                    is CalendarFragmentAction.InitializeDiary -> {
+                    is CalendarEvent.InitializeDiary -> {
                         initializeDiary()
                     }
-                    is CalendarFragmentAction.ScrollCalendar -> {
+                    is CalendarEvent.ScrollCalendar -> {
                         scrollCalendar(value.date)
                     }
-                    is CalendarFragmentAction.SmoothScrollCalendar -> {
+                    is CalendarEvent.SmoothScrollCalendar -> {
                         smoothScrollCalendar(value.date)
                     }
-                    FragmentAction.NavigatePreviousFragment -> {
+                    ViewModelEvent.NavigatePreviousFragment -> {
                         mainActivity.popBackStackToStartFragment()
                     }
                     else -> {

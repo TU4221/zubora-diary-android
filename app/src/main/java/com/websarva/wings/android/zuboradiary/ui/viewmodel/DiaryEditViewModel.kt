@@ -16,10 +16,10 @@ import com.websarva.wings.android.zuboradiary.data.repository.UserPreferencesRep
 import com.websarva.wings.android.zuboradiary.data.repository.WeatherApiRepository
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import com.websarva.wings.android.zuboradiary.ui.model.DiaryEditAppMessage
-import com.websarva.wings.android.zuboradiary.ui.model.action.Action
+import com.websarva.wings.android.zuboradiary.ui.model.event.ConsumableEvent
 import com.websarva.wings.android.zuboradiary.ui.model.adapter.WeatherAdapterList
-import com.websarva.wings.android.zuboradiary.ui.model.action.DiaryEditFragmentAction
-import com.websarva.wings.android.zuboradiary.ui.model.action.FragmentAction
+import com.websarva.wings.android.zuboradiary.ui.model.event.DiaryEditEvent
+import com.websarva.wings.android.zuboradiary.ui.model.event.ViewModelEvent
 import com.websarva.wings.android.zuboradiary.ui.model.adapter.ConditionAdapterList
 import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
 import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
@@ -281,10 +281,10 @@ internal class DiaryEditViewModel @Inject constructor(
             field = value
         }
 
-    // Fragment処理
-    private val _fragmentAction= MutableSharedFlow<Action<FragmentAction>>(replay = 1)
+    // ViewModelEvent
+    private val _event= MutableSharedFlow<ConsumableEvent<ViewModelEvent>>(replay = 1)
     val fragmentAction
-        get() = _fragmentAction.asSharedFlow()
+        get() = _event.asSharedFlow()
 
     // TODO:テスト用の為、最終的に削除
     var isTesting = false
@@ -329,7 +329,7 @@ internal class DiaryEditViewModel @Inject constructor(
         val date = this.date.requireValue()
         viewModelScope.launch {
             updateFragmentAction(
-                DiaryEditFragmentAction.NavigateDiaryDeleteDialog(date)
+                DiaryEditEvent.NavigateDiaryDeleteDialog(date)
             )
             _diaryEditState.value = DiaryEditState.Idle
         }
@@ -347,7 +347,7 @@ internal class DiaryEditViewModel @Inject constructor(
         val date = this.date.requireValue()
         viewModelScope.launch {
             updateFragmentAction(
-                DiaryEditFragmentAction.NavigateDatePickerDialog(date)
+                DiaryEditEvent.NavigateDatePickerDialog(date)
             )
         }
     }
@@ -368,7 +368,7 @@ internal class DiaryEditViewModel @Inject constructor(
         val itemTitle = getItemTitle(itemNumber).requireValue()
         viewModelScope.launch {
             updateFragmentAction(
-                DiaryEditFragmentAction.NavigateDiaryItemTitleEditFragment(itemNumber, itemTitle)
+                DiaryEditEvent.NavigateDiaryItemTitleEditFragment(itemNumber, itemTitle)
             )
         }
     }
@@ -376,7 +376,7 @@ internal class DiaryEditViewModel @Inject constructor(
     fun onItemAdditionButtonClicked() {
         _diaryEditState.value = DiaryEditState.ItemAdding
         viewModelScope.launch {
-            updateFragmentAction(DiaryEditFragmentAction.ItemAddition)
+            updateFragmentAction(DiaryEditEvent.ItemAddition)
             incrementVisibleItemsCount()
         }
     }
@@ -384,7 +384,7 @@ internal class DiaryEditViewModel @Inject constructor(
     fun onItemDeleteButtonClicked(itemNumber: ItemNumber) {
         viewModelScope.launch {
             updateFragmentAction(
-                DiaryEditFragmentAction.NavigateDiaryItemDeleteDialog(itemNumber)
+                DiaryEditEvent.NavigateDiaryItemDeleteDialog(itemNumber)
             )
         }
     }
@@ -392,7 +392,7 @@ internal class DiaryEditViewModel @Inject constructor(
     fun onAttachedPictureDeleteButtonClicked() {
         viewModelScope.launch {
             updateFragmentAction(
-                DiaryEditFragmentAction.NavigateDiaryPictureDeleteDialog
+                DiaryEditEvent.NavigateDiaryPictureDeleteDialog
             )
         }
     }
@@ -549,7 +549,7 @@ internal class DiaryEditViewModel @Inject constructor(
         } else {
             viewModelScope.launch {
                 updateFragmentAction(
-                    DiaryEditFragmentAction.TransitionDiaryItemHidedState(itemNumber)
+                    DiaryEditEvent.TransitionDiaryItemHidedState(itemNumber)
                 )
             }
         }
@@ -659,7 +659,7 @@ internal class DiaryEditViewModel @Inject constructor(
                     addAppMessage(DiaryEditAppMessage.DiaryLoadingFailure)
                 } else {
                     updateFragmentAction(
-                        DiaryEditFragmentAction.NavigateDiaryLoadingFailureDialog(date)
+                        DiaryEditEvent.NavigateDiaryLoadingFailureDialog(date)
                     )
                 }
                 return
@@ -681,7 +681,7 @@ internal class DiaryEditViewModel @Inject constructor(
         
         if (shouldShowDiaryLoadingDialog(date)) {
             updateFragmentAction(
-                DiaryEditFragmentAction.NavigateDiaryLoadingDialog(date)
+                DiaryEditEvent.NavigateDiaryLoadingDialog(date)
             )
             _diaryEditState.value = DiaryEditState.Idle
             return
@@ -737,7 +737,7 @@ internal class DiaryEditViewModel @Inject constructor(
                 shouldShowUpdateConfirmationDialog() ?: return
             if (shouldShowDialog) {
                 updateFragmentAction(
-                    DiaryEditFragmentAction.NavigateDiaryUpdateDialog(date.requireValue())
+                    DiaryEditEvent.NavigateDiaryUpdateDialog(date.requireValue())
                 )
                 return
             }
@@ -748,7 +748,7 @@ internal class DiaryEditViewModel @Inject constructor(
 
         updatePictureUriPermissionOnDiarySaved()
         updateFragmentAction(
-            DiaryEditFragmentAction
+            DiaryEditEvent
                 .NavigateDiaryShowFragment(
                     date.requireValue()
                 )
@@ -815,7 +815,7 @@ internal class DiaryEditViewModel @Inject constructor(
 
         if (loadedPictureUri != null) uriRepository.releasePersistablePermission(loadedPictureUri)
         updateFragmentAction(
-            DiaryEditFragmentAction
+            DiaryEditEvent
                 .NavigatePreviousFragmentOnDiaryDelete(
                     FragmentResult.Some(loadedDate)
                 )
@@ -878,13 +878,13 @@ internal class DiaryEditViewModel @Inject constructor(
         }
         if (!shouldIgnoreConfirmationDialog && shouldShowWeatherInfoFetchingDialog()) {
             updateFragmentAction(
-                DiaryEditFragmentAction.NavigateWeatherInfoFetchingDialog(date)
+                DiaryEditEvent.NavigateWeatherInfoFetchingDialog(date)
             )
             _diaryEditState.value = DiaryEditState.Idle
             return
         }
 
-        updateFragmentAction(DiaryEditFragmentAction.CheckAccessLocationPermission(date))
+        updateFragmentAction(DiaryEditEvent.CheckAccessLocationPermission(date))
     }
 
     private fun shouldShowWeatherInfoFetchingDialog(): Boolean {
@@ -987,9 +987,9 @@ internal class DiaryEditViewModel @Inject constructor(
     }
     
     // FragmentAction関係
-    private suspend fun updateFragmentAction(action: FragmentAction) {
-        _fragmentAction.emit(
-            Action(action)
+    private suspend fun updateFragmentAction(action: ViewModelEvent) {
+        _event.emit(
+            ConsumableEvent(action)
         )
     }
 
@@ -1001,7 +1001,7 @@ internal class DiaryEditViewModel @Inject constructor(
             } else {
                 FragmentResult.Some(loadedDate)
             }
-        updateFragmentAction(DiaryEditFragmentAction.NavigatePreviousFragment(result))
+        updateFragmentAction(DiaryEditEvent.NavigatePreviousFragment(result))
     }
 
     // TODO:テスト用の為、最終的に削除

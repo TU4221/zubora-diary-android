@@ -5,8 +5,8 @@ import androidx.lifecycle.viewModelScope
 import com.websarva.wings.android.zuboradiary.data.repository.DiaryRepository
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import com.websarva.wings.android.zuboradiary.ui.model.CalendarAppMessage
-import com.websarva.wings.android.zuboradiary.ui.model.action.CalendarFragmentAction
-import com.websarva.wings.android.zuboradiary.ui.model.action.FragmentAction
+import com.websarva.wings.android.zuboradiary.ui.model.event.CalendarEvent
+import com.websarva.wings.android.zuboradiary.ui.model.event.ViewModelEvent
 import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
 import com.websarva.wings.android.zuboradiary.ui.model.state.CalendarState
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -39,10 +39,10 @@ internal class CalendarViewModel @Inject constructor(
 
     private var shouldSmoothScroll = false
 
-    // Fragment処理
-    private val _fragmentAction = MutableSharedFlow<FragmentAction>()
-    val fragmentAction
-        get() = _fragmentAction.asSharedFlow()
+    // ViewModelEvent
+    private val _event = MutableSharedFlow<ViewModelEvent>()
+    val event
+        get() = _event.asSharedFlow()
 
     override fun initialize() {
         super.initialize()
@@ -54,7 +54,7 @@ internal class CalendarViewModel @Inject constructor(
     // BackPressed(戻るボタン)処理
     override fun onBackPressed() {
         viewModelScope.launch {
-            _fragmentAction.emit(FragmentAction.NavigatePreviousFragment)
+            _event.emit(ViewModelEvent.NavigatePreviousFragment)
         }
     }
 
@@ -76,8 +76,8 @@ internal class CalendarViewModel @Inject constructor(
             val selectedDate = _selectedDate.value
             val today = LocalDate.now()
             if (selectedDate == today) {
-                _fragmentAction.emit(
-                    CalendarFragmentAction.SmoothScrollCalendar(today)
+                _event.emit(
+                    CalendarEvent.SmoothScrollCalendar(today)
                 )
             }
             shouldSmoothScroll = true
@@ -117,22 +117,22 @@ internal class CalendarViewModel @Inject constructor(
         val action =
             if (shouldSmoothScroll) {
                 shouldSmoothScroll = false
-                CalendarFragmentAction.SmoothScrollCalendar(date)
+                CalendarEvent.SmoothScrollCalendar(date)
             } else {
-                CalendarFragmentAction.ScrollCalendar(date)
+                CalendarEvent.ScrollCalendar(date)
             }
-        _fragmentAction.emit(action)
+        _event.emit(action)
 
         val exists = existsSavedDiary(date) ?: false
         if (exists) {
             _calendarState.value = CalendarState.DiaryVisible
-            _fragmentAction.emit(
-                CalendarFragmentAction.LoadDiary(date)
+            _event.emit(
+                CalendarEvent.LoadDiary(date)
             )
         } else {
             _calendarState.value = CalendarState.DiaryHidden
-            _fragmentAction.emit(
-                CalendarFragmentAction.InitializeDiary
+            _event.emit(
+                CalendarEvent.InitializeDiary
             )
         }
     }
@@ -165,8 +165,8 @@ internal class CalendarViewModel @Inject constructor(
         val date = _selectedDate.value
         val exists = existsSavedDiary(date) ?: false
         val isNewDiary = !exists
-        _fragmentAction.emit(
-            CalendarFragmentAction.NavigateDiaryEditFragment(date, isNewDiary)
+        _event.emit(
+            CalendarEvent.NavigateDiaryEditFragment(date, isNewDiary)
         )
     }
 }

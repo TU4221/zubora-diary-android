@@ -19,8 +19,8 @@ import com.websarva.wings.android.zuboradiary.data.repository.UriRepository
 import com.websarva.wings.android.zuboradiary.data.repository.WorkerRepository
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import com.websarva.wings.android.zuboradiary.ui.model.SettingsAppMessage
-import com.websarva.wings.android.zuboradiary.ui.model.action.FragmentAction
-import com.websarva.wings.android.zuboradiary.ui.model.action.SettingsFragmentAction
+import com.websarva.wings.android.zuboradiary.ui.model.event.ViewModelEvent
+import com.websarva.wings.android.zuboradiary.ui.model.event.SettingsEvent
 import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
 import com.websarva.wings.android.zuboradiary.ui.utils.requireValue
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -95,10 +95,10 @@ internal class SettingsViewModel @Inject constructor(
     private val initialScrollPositionY = 0
     var scrollPositionY = initialScrollPositionY
 
-    // Fragment処理
-    private val _fragmentAction = MutableSharedFlow<FragmentAction>()
-    val fragmentAction
-        get() = _fragmentAction.asSharedFlow()
+    // ViewModelEvent
+    private val _event = MutableSharedFlow<ViewModelEvent>()
+    val event
+        get() = _event.asSharedFlow()
 
     init {
         setUpPreferencesValueLoading()
@@ -246,15 +246,15 @@ internal class SettingsViewModel @Inject constructor(
     // BackPressed(戻るボタン)処理
     override fun onBackPressed() {
         viewModelScope.launch {
-            _fragmentAction.emit(FragmentAction.NavigatePreviousFragment)
+            _event.emit(ViewModelEvent.NavigatePreviousFragment)
         }
     }
 
     // ViewClicked処理
     fun onThemeColorSettingButtonClicked() {
         viewModelScope.launch {
-            _fragmentAction.emit(
-                SettingsFragmentAction.NavigateThemeColorPickerDialog
+            _event.emit(
+                SettingsEvent.NavigateThemeColorPickerDialog
             )
         }
     }
@@ -262,8 +262,8 @@ internal class SettingsViewModel @Inject constructor(
     fun onCalendarStartDayOfWeekSettingButtonClicked() {
         viewModelScope.launch {
             val dayOfWeek = calendarStartDayOfWeek.requireValue()
-            _fragmentAction.emit(
-                SettingsFragmentAction.NavigateCalendarStartDayPickerDialog(dayOfWeek)
+            _event.emit(
+                SettingsEvent.NavigateCalendarStartDayPickerDialog(dayOfWeek)
             )
         }
     }
@@ -278,12 +278,12 @@ internal class SettingsViewModel @Inject constructor(
             if (isChecked) {
                 // MEMO:PostNotificationsはApiLevel33で導入されたPermission。33未満は許可取り不要。
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                    _fragmentAction.emit(
-                        SettingsFragmentAction.CheckPostNotificationsPermission
+                    _event.emit(
+                        SettingsEvent.CheckPostNotificationsPermission
                     )
                 } else {
-                    _fragmentAction.emit(
-                        SettingsFragmentAction.NavigateReminderNotificationTimePickerDialog
+                    _event.emit(
+                        SettingsEvent.NavigateReminderNotificationTimePickerDialog
                     )
                 }
             } else {
@@ -312,8 +312,8 @@ internal class SettingsViewModel @Inject constructor(
             if (isChecked == settingValue) return@launch
 
             if (isChecked) {
-                _fragmentAction.emit(
-                    SettingsFragmentAction.CheckAccessLocationPermission
+                _event.emit(
+                    SettingsEvent.CheckAccessLocationPermission
                 )
             } else {
                 saveWeatherInfoAcquisition(false)
@@ -323,32 +323,32 @@ internal class SettingsViewModel @Inject constructor(
 
     fun onAllDiariesDeleteButtonClicked() {
         viewModelScope.launch {
-            _fragmentAction.emit(
-                SettingsFragmentAction.NavigateAllDiariesDeleteDialog
+            _event.emit(
+                SettingsEvent.NavigateAllDiariesDeleteDialog
             )
         }
     }
 
     fun onAllSettingsInitializationButtonClicked() {
         viewModelScope.launch {
-            _fragmentAction.emit(
-                SettingsFragmentAction.NavigateAllSettingsInitializationDialog
+            _event.emit(
+                SettingsEvent.NavigateAllSettingsInitializationDialog
             )
         }
     }
 
     fun onAllDataDeleteButtonClicked() {
         viewModelScope.launch {
-            _fragmentAction.emit(
-                SettingsFragmentAction.NavigateAllDataDeleteDialog
+            _event.emit(
+                SettingsEvent.NavigateAllDataDeleteDialog
             )
         }
     }
 
     fun onOpenSourceLicenseButtonClicked() {
         viewModelScope.launch {
-            _fragmentAction.emit(
-                SettingsFragmentAction.NavigateOpenSourceLicensesFragment
+            _event.emit(
+                SettingsEvent.NavigateOpenSourceLicensesFragment
             )
         }
     }
@@ -411,8 +411,8 @@ internal class SettingsViewModel @Inject constructor(
 
     private fun onReminderNotificationSettingDialogNegativeResultReceived() {
         viewModelScope.launch {
-            _fragmentAction.emit(
-                SettingsFragmentAction.TurnOffReminderNotificationSettingSwitch
+            _event.emit(
+                SettingsEvent.TurnOffReminderNotificationSettingSwitch
             )
         }
     }
@@ -482,12 +482,12 @@ internal class SettingsViewModel @Inject constructor(
     fun onPostNotificationsPermissionChecked(isGranted: Boolean) {
         viewModelScope.launch {
             if (isGranted) {
-                _fragmentAction.emit(
-                    SettingsFragmentAction.NavigateReminderNotificationTimePickerDialog
+                _event.emit(
+                    SettingsEvent.NavigateReminderNotificationTimePickerDialog
                 )
             } else {
-                _fragmentAction.emit(
-                    SettingsFragmentAction.CheckShouldShowRequestPostNotificationsPermissionRationale
+                _event.emit(
+                    SettingsEvent.CheckShouldShowRequestPostNotificationsPermissionRationale
                 )
             }
         }
@@ -497,15 +497,15 @@ internal class SettingsViewModel @Inject constructor(
     fun onShouldShowRequestPostNotificationsPermissionRationaleChecked(shouldShowRequest: Boolean) {
         viewModelScope.launch {
             if (shouldShowRequest) {
-                _fragmentAction.emit(
-                    SettingsFragmentAction.ShowRequestPostNotificationsPermissionRationale
+                _event.emit(
+                    SettingsEvent.ShowRequestPostNotificationsPermissionRationale
                 )
             } else {
-                _fragmentAction.emit(
-                    SettingsFragmentAction.TurnOffReminderNotificationSettingSwitch
+                _event.emit(
+                    SettingsEvent.TurnOffReminderNotificationSettingSwitch
                 )
-                _fragmentAction.emit(
-                    SettingsFragmentAction.NavigateNotificationPermissionDialog
+                _event.emit(
+                    SettingsEvent.NavigateNotificationPermissionDialog
                 )
             }
         }
@@ -515,12 +515,12 @@ internal class SettingsViewModel @Inject constructor(
     fun onRequestPostNotificationsPermissionRationaleResultReceived(isGranted: Boolean) {
         viewModelScope.launch {
             if (isGranted) {
-                _fragmentAction.emit(
-                    SettingsFragmentAction.NavigateReminderNotificationTimePickerDialog
+                _event.emit(
+                    SettingsEvent.NavigateReminderNotificationTimePickerDialog
                 )
             } else {
-                _fragmentAction.emit(
-                    SettingsFragmentAction.TurnOffReminderNotificationSettingSwitch
+                _event.emit(
+                    SettingsEvent.TurnOffReminderNotificationSettingSwitch
                 )
             }
         }
@@ -531,8 +531,8 @@ internal class SettingsViewModel @Inject constructor(
             if (isGranted) {
                 saveWeatherInfoAcquisition(true)
             } else {
-                _fragmentAction.emit(
-                    SettingsFragmentAction.CheckShouldShowRequestAccessLocationPermissionRationale
+                _event.emit(
+                    SettingsEvent.CheckShouldShowRequestAccessLocationPermissionRationale
                 )
             }
         }
@@ -541,15 +541,15 @@ internal class SettingsViewModel @Inject constructor(
     fun onShouldShowRequestAccessLocationPermissionRationaleChecked(shouldShowRequest: Boolean) {
         viewModelScope.launch {
             if (shouldShowRequest) {
-                _fragmentAction.emit(
-                    SettingsFragmentAction.ShowRequestAccessLocationPermissionRationale
+                _event.emit(
+                    SettingsEvent.ShowRequestAccessLocationPermissionRationale
                 )
             } else {
-                _fragmentAction.emit(
-                    SettingsFragmentAction.TurnOffWeatherInfoAcquisitionSettingSwitch
+                _event.emit(
+                    SettingsEvent.TurnOffWeatherInfoAcquisitionSettingSwitch
                 )
-                _fragmentAction.emit(
-                    SettingsFragmentAction.NavigateLocationPermissionDialog
+                _event.emit(
+                    SettingsEvent.NavigateLocationPermissionDialog
                 )
             }
         }
@@ -560,8 +560,8 @@ internal class SettingsViewModel @Inject constructor(
             if (isGranted) {
                 saveWeatherInfoAcquisition(true)
             } else {
-                _fragmentAction.emit(
-                    SettingsFragmentAction.TurnOffWeatherInfoAcquisitionSettingSwitch
+                _event.emit(
+                    SettingsEvent.TurnOffWeatherInfoAcquisitionSettingSwitch
                 )
             }
         }

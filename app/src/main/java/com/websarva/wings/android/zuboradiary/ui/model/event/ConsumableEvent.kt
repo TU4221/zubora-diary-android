@@ -1,6 +1,6 @@
-package com.websarva.wings.android.zuboradiary.ui.model.action
+package com.websarva.wings.android.zuboradiary.ui.model.event
 
-internal class Action<out T>(private val content: T) {
+internal class ConsumableEvent<out T>(private val content: T) {
 
     private var hasBeenHandled = false
 

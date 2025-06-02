@@ -10,8 +10,8 @@ import com.websarva.wings.android.zuboradiary.ui.adapter.diary.wordsearchresult.
 import com.websarva.wings.android.zuboradiary.ui.adapter.diary.wordsearchresult.WordSearchResultDayListItem
 import com.websarva.wings.android.zuboradiary.ui.adapter.diary.wordsearchresult.WordSearchResultYearMonthList
 import com.websarva.wings.android.zuboradiary.ui.model.state.WordSearchState
-import com.websarva.wings.android.zuboradiary.ui.model.action.FragmentAction
-import com.websarva.wings.android.zuboradiary.ui.model.action.WordSearchFragmentAction
+import com.websarva.wings.android.zuboradiary.ui.model.event.ViewModelEvent
+import com.websarva.wings.android.zuboradiary.ui.model.event.WordSearchEvent
 import com.websarva.wings.android.zuboradiary.ui.utils.requireValue
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CancellationException
@@ -79,10 +79,10 @@ internal class WordSearchViewModel @Inject internal constructor(
     private val initialShouldInitializeOnFragmentDestroyed = false
     private var shouldInitializeOnFragmentDestroyed = initialShouldInitializeOnFragmentDestroyed
 
-    // Fragment処理
-    private val _fragmentAction = MutableSharedFlow<FragmentAction>()
-    val fragmentAction
-        get() = _fragmentAction.asSharedFlow()
+    // ViewModelEvent
+    private val _event = MutableSharedFlow<ViewModelEvent>()
+    val event
+        get() = _event.asSharedFlow()
 
     // 初回キーボード表示
     // HACK:WordSearchFragment表示時にFragmentActionでキーボードを表示させようとすると、
@@ -153,14 +153,14 @@ internal class WordSearchViewModel @Inject internal constructor(
     // BackPressed(戻るボタン)処理
     override fun onBackPressed() {
         viewModelScope.launch {
-            _fragmentAction.emit(FragmentAction.NavigatePreviousFragment)
+            _event.emit(ViewModelEvent.NavigatePreviousFragment)
         }
     }
 
     // Viewクリック処理
     fun onNavigationButtonClicked() {
         viewModelScope.launch {
-            _fragmentAction.emit(FragmentAction.NavigatePreviousFragment)
+            _event.emit(ViewModelEvent.NavigatePreviousFragment)
         }
     }
 
@@ -170,7 +170,7 @@ internal class WordSearchViewModel @Inject internal constructor(
 
     fun onWordSearchResultListItemClicked(date: LocalDate) {
         viewModelScope.launch {
-            _fragmentAction.emit(WordSearchFragmentAction.NavigateDiaryShowFragment(date))
+            _event.emit(WordSearchEvent.NavigateDiaryShowFragment(date))
         }
     }
 
