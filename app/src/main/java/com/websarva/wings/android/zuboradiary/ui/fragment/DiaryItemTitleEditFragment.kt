@@ -16,6 +16,7 @@ import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.DiaryItemTitleD
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.DiaryItemTitleEditViewModel
 import com.websarva.wings.android.zuboradiary.ui.adapter.diaryitemtitle.ItemTitleSelectionHistoryListAdapter
 import com.websarva.wings.android.zuboradiary.ui.adapter.diaryitemtitle.SelectionHistoryList
+import com.websarva.wings.android.zuboradiary.ui.model.event.ViewModelEvent
 import com.websarva.wings.android.zuboradiary.ui.model.navigation.NavigationCommand
 import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
 import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
@@ -90,6 +91,20 @@ class DiaryItemTitleEditFragment : BaseFragment() {
                         ) as ItemTitleSelectionHistoryListAdapter
                     adapter.closeSwipedItem()
                 }
+            }
+        }
+    }
+
+    override fun onMainViewModelEventReceived(event: ViewModelEvent) {
+        when (event) {
+            ViewModelEvent.NavigatePreviousFragment -> {
+                navigatePreviousFragment()
+            }
+            is ViewModelEvent.NavigateAppMessage -> {
+                navigateAppMessageDialog(event.message)
+            }
+            else -> {
+                throw IllegalArgumentException()
             }
         }
     }
@@ -244,7 +259,7 @@ class DiaryItemTitleEditFragment : BaseFragment() {
         navigateFragment(NavigationCommand.To(directions))
     }
 
-    override fun onNavigateAppMessageDialog(appMessage: AppMessage) {
+    override fun navigateAppMessageDialog(appMessage: AppMessage) {
         val directions =
             DiaryItemTitleEditFragmentDirections.actionDiaryItemTitleEditFragmentToAppMessageDialog(
                 appMessage

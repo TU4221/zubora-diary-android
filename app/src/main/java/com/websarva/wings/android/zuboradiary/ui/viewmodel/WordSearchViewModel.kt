@@ -16,10 +16,8 @@ import com.websarva.wings.android.zuboradiary.ui.utils.requireValue
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
@@ -78,11 +76,6 @@ internal class WordSearchViewModel @Inject internal constructor(
     // MEMO:画面回転時の不要な初期化を防ぐ
     private val initialShouldInitializeOnFragmentDestroyed = false
     private var shouldInitializeOnFragmentDestroyed = initialShouldInitializeOnFragmentDestroyed
-
-    // ViewModelEvent
-    private val _event = MutableSharedFlow<ViewModelEvent>()
-    val event
-        get() = _event.asSharedFlow()
 
     // 初回キーボード表示
     // HACK:WordSearchFragment表示時にFragmentActionでキーボードを表示させようとすると、
@@ -153,14 +146,14 @@ internal class WordSearchViewModel @Inject internal constructor(
     // BackPressed(戻るボタン)処理
     override fun onBackPressed() {
         viewModelScope.launch {
-            _event.emit(ViewModelEvent.NavigatePreviousFragment)
+            emitViewModelEvent(ViewModelEvent.NavigatePreviousFragment)
         }
     }
 
     // Viewクリック処理
     fun onNavigationButtonClicked() {
         viewModelScope.launch {
-            _event.emit(ViewModelEvent.NavigatePreviousFragment)
+            emitViewModelEvent(ViewModelEvent.NavigatePreviousFragment)
         }
     }
 
@@ -170,7 +163,7 @@ internal class WordSearchViewModel @Inject internal constructor(
 
     fun onWordSearchResultListItemClicked(date: LocalDate) {
         viewModelScope.launch {
-            _event.emit(WordSearchEvent.NavigateDiaryShowFragment(date))
+            emitViewModelEvent(WordSearchEvent.NavigateDiaryShowFragment(date))
         }
     }
 
@@ -291,7 +284,7 @@ internal class WordSearchViewModel @Inject internal constructor(
             Log.e(logTag, "${logMsg}_失敗", e)
             _wordSearchResultList.value = previousResultList
             updateWordSearchStatusOnSearchFinish(previousResultList)
-            addAppMessage(WordSearchAppMessage.SearchResultListLoadingFailure)
+            emitAppMessageEvent(WordSearchAppMessage.SearchResultListLoadingFailure)
         }
     }
 

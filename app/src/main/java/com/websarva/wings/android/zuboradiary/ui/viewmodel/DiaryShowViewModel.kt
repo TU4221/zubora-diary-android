@@ -10,16 +10,13 @@ import com.websarva.wings.android.zuboradiary.data.repository.UriRepository
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import com.websarva.wings.android.zuboradiary.ui.model.DiaryShowAppMessage
 import com.websarva.wings.android.zuboradiary.ui.model.event.DiaryShowEvent
-import com.websarva.wings.android.zuboradiary.ui.model.event.ViewModelEvent
 import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
 import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
 import com.websarva.wings.android.zuboradiary.ui.model.state.DiaryShowState
 import com.websarva.wings.android.zuboradiary.ui.utils.requireValue
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
@@ -86,11 +83,6 @@ internal class DiaryShowViewModel @Inject constructor(
     val log
         get() = diaryStateFlow.log.asStateFlow()
 
-    // ViewModelEvent
-    private val _event = MutableSharedFlow<ViewModelEvent>()
-    val event
-        get() = _event.asSharedFlow()
-
     override fun initialize() {
         super.initialize()
         diaryStateFlow.initialize()
@@ -107,7 +99,7 @@ internal class DiaryShowViewModel @Inject constructor(
     fun onDiaryEditMenuClicked() {
         val date = diaryStateFlow.date.requireValue()
         viewModelScope.launch {
-            _event.emit(
+            emitViewModelEvent(
                 DiaryShowEvent.NavigateDiaryEditFragment(date)
             )
         }
@@ -116,7 +108,7 @@ internal class DiaryShowViewModel @Inject constructor(
     fun onDiaryDeleteMenuClicked() {
         val date = diaryStateFlow.date.requireValue()
         viewModelScope.launch {
-            _event.emit(
+            emitViewModelEvent(
                 DiaryShowEvent.NavigateDiaryDeleteDialog(date)
             )
         }
@@ -198,11 +190,11 @@ internal class DiaryShowViewModel @Inject constructor(
         } catch (e: Exception) {
             Log.e(logTag, "${logMsg}_失敗", e)
             if (ignoreAppMessage) {
-                _event.emit(
+                emitViewModelEvent(
                     DiaryShowEvent.NavigateDiaryLoadingFailureDialog(date)
                 )
             } else {
-                addAppMessage(DiaryShowAppMessage.DiaryLoadingFailure)
+                emitAppMessageEvent(DiaryShowAppMessage.DiaryLoadingFailure)
             }
         }
 
@@ -219,12 +211,12 @@ internal class DiaryShowViewModel @Inject constructor(
             diaryRepository.deleteDiary(date)
         } catch (e: Exception) {
             Log.e(logTag, "${logMsg}_失敗", e)
-            addAppMessage(DiaryShowAppMessage.DiaryDeleteFailure)
+            emitAppMessageEvent(DiaryShowAppMessage.DiaryDeleteFailure)
             return
         }
 
         if (picturePath != null) uriRepository.releasePersistablePermission(picturePath)
-        _event.emit(
+        emitViewModelEvent(
             DiaryShowEvent
                 .NavigatePreviousFragmentOnDiaryDelete(
                     FragmentResult.Some(date)
@@ -236,7 +228,7 @@ internal class DiaryShowViewModel @Inject constructor(
     // FragmentAction関係
     private suspend fun navigatePreviousFragment() {
         val date = date.requireValue()
-        _event.emit(
+        emitViewModelEvent(
             DiaryShowEvent
                 .NavigatePreviousFragment(
                     FragmentResult.Some(date)

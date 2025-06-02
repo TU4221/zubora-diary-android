@@ -41,7 +41,6 @@ import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.DiaryUpdateDial
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.WeatherInfoFetchingDialogFragment
 import com.websarva.wings.android.zuboradiary.ui.keyboard.KeyboardManager
 import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
-import com.websarva.wings.android.zuboradiary.ui.model.event.ConsumableEvent
 import com.websarva.wings.android.zuboradiary.ui.model.adapter.WeatherAdapterList
 import com.websarva.wings.android.zuboradiary.ui.model.event.DiaryEditEvent
 import com.websarva.wings.android.zuboradiary.ui.model.event.ViewModelEvent
@@ -111,7 +110,6 @@ class DiaryEditFragment : BaseFragment() {
         super.onViewCreated(view, savedInstanceState)
 
         setUpViewModelInitialization()
-        setUpViewModelEvent()
         setUpFocusViewScroll()
         setUpDiaryData()
         setUpToolBar()
@@ -249,6 +247,67 @@ class DiaryEditFragment : BaseFragment() {
         }
     }
 
+    override fun onMainViewModelEventReceived(event: ViewModelEvent) {
+        when (event) {
+            is DiaryEditEvent.NavigateDiaryShowFragment -> {
+                navigateDiaryShowFragment(event.date)
+            }
+            is DiaryEditEvent.NavigateDiaryItemTitleEditFragment -> {
+                navigateDiaryItemTitleEditFragment(event.itemNumber, event.itemTitle)
+            }
+            is DiaryEditEvent.NavigateDiaryLoadingDialog -> {
+                navigateDiaryLoadingDialog(event.date)
+            }
+            is DiaryEditEvent.NavigateDiaryLoadingFailureDialog -> {
+                navigateDiaryLoadingFailureDialog(event.date)
+            }
+            is DiaryEditEvent.NavigateDiaryUpdateDialog -> {
+                navigateDiaryUpdateDialog(event.date)
+            }
+            is DiaryEditEvent.NavigateDiaryDeleteDialog -> {
+                navigateDiaryDeleteDialog(event.date)
+            }
+            is DiaryEditEvent.NavigateDatePickerDialog -> {
+                navigateDatePickerDialog(event.date)
+            }
+            is DiaryEditEvent.NavigateWeatherInfoFetchingDialog -> {
+                navigateWeatherInfoFetchingDialog(event.date)
+            }
+            is DiaryEditEvent.NavigateDiaryItemDeleteDialog -> {
+                navigateDiaryItemDeleteDialog(event.itemNumber)
+            }
+            DiaryEditEvent.NavigateDiaryPictureDeleteDialog -> {
+                navigateDiaryPictureDeleteDialog()
+            }
+            is DiaryEditEvent.NavigatePreviousFragment -> {
+                navigatePreviousFragment(event.result)
+            }
+            is DiaryEditEvent.NavigatePreviousFragmentOnDiaryDelete -> {
+                navigatePreviousFragmentOnDiaryDelete(event.result)
+            }
+            is DiaryEditEvent.TransitionDiaryItemHidedState -> {
+                hideItem(event.itemNumber, false)
+            }
+            is DiaryEditEvent.CheckAccessLocationPermission -> {
+                checkAccessLocationPermission(event.date)
+            }
+            is DiaryEditEvent.ItemAddition -> {
+                shouldTransitionItemMotionLayout = true
+            }
+            is ViewModelEvent.NavigatePreviousFragment -> {
+                // MEMO:"DiaryEditEvent.NavigatePreviousFragment"を使用する為、
+                //      "ViewModelEvent.NavigatePreviousFragment"処理不要。
+                throw IllegalArgumentException()
+            }
+            is ViewModelEvent.NavigateAppMessage -> {
+                navigateAppMessageDialog(event.message)
+            }
+            else -> {
+                throw IllegalArgumentException()
+            }
+        }
+    }
+
     private fun setUpViewModelInitialization() {
         navController.addOnDestinationChangedListener(ViewModelInitializationSetupListener())
     }
@@ -275,71 +334,6 @@ class DiaryEditFragment : BaseFragment() {
             }
 
             navController.removeOnDestinationChangedListener(this)
-        }
-    }
-
-    private fun setUpViewModelEvent() {
-        launchAndRepeatOnViewLifeCycleStarted {
-            mainViewModel.fragmentAction.collect { value: ConsumableEvent<ViewModelEvent> ->
-                val action = value.getContentIfNotHandled()
-                Log.d("20250529", action.toString())
-                action ?: return@collect
-                when (action) {
-                    is DiaryEditEvent.NavigateDiaryShowFragment -> {
-                        navigateDiaryShowFragment(action.date)
-                    }
-                    is DiaryEditEvent.NavigateDiaryItemTitleEditFragment -> {
-                        navigateDiaryItemTitleEditFragment(action.itemNumber, action.itemTitle)
-                    }
-                    is DiaryEditEvent.NavigateDiaryLoadingDialog -> {
-                        navigateDiaryLoadingDialog(action.date)
-                    }
-                    is DiaryEditEvent.NavigateDiaryLoadingFailureDialog -> {
-                        navigateDiaryLoadingFailureDialog(action.date)
-                    }
-                    is DiaryEditEvent.NavigateDiaryUpdateDialog -> {
-                        navigateDiaryUpdateDialog(action.date)
-                    }
-                    is DiaryEditEvent.NavigateDiaryDeleteDialog -> {
-                        navigateDiaryDeleteDialog(action.date)
-                    }
-                    is DiaryEditEvent.NavigateDatePickerDialog -> {
-                        navigateDatePickerDialog(action.date)
-                    }
-                    is DiaryEditEvent.NavigateWeatherInfoFetchingDialog -> {
-                        navigateWeatherInfoFetchingDialog(action.date)
-                    }
-                    is DiaryEditEvent.NavigateDiaryItemDeleteDialog -> {
-                        navigateDiaryItemDeleteDialog(action.itemNumber)
-                    }
-                    DiaryEditEvent.NavigateDiaryPictureDeleteDialog -> {
-                        navigateDiaryPictureDeleteDialog()
-                    }
-                    is DiaryEditEvent.NavigatePreviousFragment -> {
-                        navigatePreviousFragment(action.result)
-                    }
-                    is DiaryEditEvent.NavigatePreviousFragmentOnDiaryDelete -> {
-                        navigatePreviousFragmentOnDiaryDelete(action.result)
-                    }
-                    is DiaryEditEvent.TransitionDiaryItemHidedState -> {
-                        hideItem(action.itemNumber, false)
-                    }
-                    is DiaryEditEvent.CheckAccessLocationPermission -> {
-                        checkAccessLocationPermission(action.date)
-                    }
-                    is DiaryEditEvent.ItemAddition -> {
-                        shouldTransitionItemMotionLayout = true
-                    }
-                    is ViewModelEvent.NavigatePreviousFragment -> {
-                        // MEMO:"DiaryEditFragmentAction.NavigatePreviousFragment"を使用する為、
-                        //      "FragmentAction.NavigatePreviousFragment"処理不要。
-                        throw IllegalArgumentException()
-                    }
-                    else -> {
-                        throw IllegalArgumentException()
-                    }
-                }
-            }
         }
     }
 
@@ -932,7 +926,7 @@ class DiaryEditFragment : BaseFragment() {
         navigateFragment(NavigationCommand.To(directions))
     }
 
-    override fun onNavigateAppMessageDialog(appMessage: AppMessage) {
+    override fun navigateAppMessageDialog(appMessage: AppMessage) {
         val directions =
             DiaryEditFragmentDirections.actionDiaryEditFragmentToAppMessageDialog(appMessage)
         navigateFragment(NavigationCommand.To(directions))

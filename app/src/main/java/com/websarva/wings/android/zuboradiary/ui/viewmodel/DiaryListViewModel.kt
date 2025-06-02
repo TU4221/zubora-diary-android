@@ -19,9 +19,7 @@ import com.websarva.wings.android.zuboradiary.ui.model.result.DiaryListItemDelet
 import com.websarva.wings.android.zuboradiary.ui.utils.requireValue
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import java.time.LocalDate
@@ -61,11 +59,6 @@ internal class DiaryListViewModel @Inject constructor(
     private val initialSortConditionDate: LocalDate? = null
     private var sortConditionDate: LocalDate? = initialSortConditionDate
 
-    // ViewModelEvent
-    private val _event = MutableSharedFlow<ViewModelEvent>()
-    val event
-        get() = _event.asSharedFlow()
-
     private val initialIsLoadingOnScrolled = false
     private var isLoadingOnScrolled = initialIsLoadingOnScrolled
 
@@ -81,7 +74,7 @@ internal class DiaryListViewModel @Inject constructor(
     // BackPressed(戻るボタン)処理
     override fun onBackPressed() {
         viewModelScope.launch {
-            _event.emit(ViewModelEvent.NavigatePreviousFragment)
+            emitViewModelEvent(ViewModelEvent.NavigatePreviousFragment)
         }
     }
 
@@ -231,7 +224,7 @@ internal class DiaryListViewModel @Inject constructor(
             Log.e(logTag, "${logMsg}_失敗", e)
             _diaryList.value = previousDiaryList
             updateWordSearchStatusOnListLoadingFinish(previousDiaryList)
-            addAppMessage(DiaryListAppMessage.DiaryListLoadingFailure)
+            emitAppMessageEvent(DiaryListAppMessage.DiaryListLoadingFailure)
         }
     }
 
@@ -365,7 +358,7 @@ internal class DiaryListViewModel @Inject constructor(
             diaryRepository.deleteDiary(date)
         } catch (e: Exception) {
             Log.e(logTag, "${logMsg}_失敗", e)
-            addAppMessage(DiaryListAppMessage.DiaryDeleteFailure)
+            emitAppMessageEvent(DiaryListAppMessage.DiaryDeleteFailure)
             return false
         }
 
@@ -381,7 +374,7 @@ internal class DiaryListViewModel @Inject constructor(
             return LocalDate.parse(dateString)
         } catch (e: Exception) {
             Log.e(logTag, "最新日記読込_失敗", e)
-            addAppMessage(DiaryListAppMessage.DiaryInfoLoadingFailure)
+            emitAppMessageEvent(DiaryListAppMessage.DiaryInfoLoadingFailure)
             return null
         }
     }
@@ -393,22 +386,22 @@ internal class DiaryListViewModel @Inject constructor(
             return LocalDate.parse(dateString)
         } catch (e: Exception) {
             Log.e(logTag, "最古日記読込_失敗", e)
-            addAppMessage(DiaryListAppMessage.DiaryInfoLoadingFailure)
+            emitAppMessageEvent(DiaryListAppMessage.DiaryInfoLoadingFailure)
             return null
         }
     }
 
     private suspend fun navigateDiaryShowFragment(date: LocalDate) {
-        _event.emit(DiaryListEvent.NavigateDiaryShowFragment(date))
+        emitViewModelEvent(DiaryListEvent.NavigateDiaryShowFragment(date))
     }
 
     private suspend fun navigateDiaryEditFragment() {
         val today = LocalDate.now()
-        _event.emit(DiaryListEvent.NavigateDiaryEditFragment(today))
+        emitViewModelEvent(DiaryListEvent.NavigateDiaryEditFragment(today))
     }
 
     private suspend fun navigateWordSearchFragment() {
-        _event.emit(DiaryListEvent.NavigateWordSearchFragment)
+        emitViewModelEvent(DiaryListEvent.NavigateWordSearchFragment)
     }
 
     private suspend fun navigateStartYearMonthPickerDialog() {
@@ -418,12 +411,12 @@ internal class DiaryListViewModel @Inject constructor(
         if (oldestDiaryDate == null) return
         val newestYear = Year.of(newestDiaryDate.year)
         val oldestYear = Year.of(oldestDiaryDate.year)
-        _event.emit(
+        emitViewModelEvent(
             DiaryListEvent.NavigateStartYearMonthPickerDialog(newestYear, oldestYear)
         )
     }
 
     private suspend fun navigateDiaryDeleteDialog(date: LocalDate, uri: Uri?) {
-        _event.emit(DiaryListEvent.NavigateDiaryDeleteDialog(date, uri))
+        emitViewModelEvent(DiaryListEvent.NavigateDiaryDeleteDialog(date, uri))
     }
 }

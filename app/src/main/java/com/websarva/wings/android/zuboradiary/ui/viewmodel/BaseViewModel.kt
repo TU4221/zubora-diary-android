@@ -2,22 +2,29 @@ package com.websarva.wings.android.zuboradiary.ui.viewmodel
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
-import com.websarva.wings.android.zuboradiary.ui.model.AppMessageList
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import com.websarva.wings.android.zuboradiary.ui.model.AppMessage
+import com.websarva.wings.android.zuboradiary.ui.model.CalendarAppMessage
+import com.websarva.wings.android.zuboradiary.ui.model.DiaryEditAppMessage
+import com.websarva.wings.android.zuboradiary.ui.model.DiaryItemTitleEditAppMessage
+import com.websarva.wings.android.zuboradiary.ui.model.DiaryListAppMessage
+import com.websarva.wings.android.zuboradiary.ui.model.DiaryShowAppMessage
+import com.websarva.wings.android.zuboradiary.ui.model.SettingsAppMessage
+import com.websarva.wings.android.zuboradiary.ui.model.WordSearchAppMessage
+import com.websarva.wings.android.zuboradiary.ui.model.event.ConsumableEvent
+import com.websarva.wings.android.zuboradiary.ui.model.event.ViewModelEvent
 import com.websarva.wings.android.zuboradiary.ui.model.navigation.NavigationCommand
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 
 internal abstract class BaseViewModel : ViewModel() {
 
     private val logTag = createLogTag()
 
-    // MEMO:ViewModelのスコープ範囲がActivityの時に各プロパティを初期化できるように抽象メソッドinitialize()を用意しているが、
-    //      appMessageBufferListに関しては主にエラー表示となるため、ViewModelの初期化時のみの初期化する。
-    private val _appMessageBufferList = MutableStateFlow(AppMessageList())
-    val appMessageBufferList
-        get() = _appMessageBufferList.asStateFlow()
+    private val _viewModelEvent = MutableSharedFlow<ConsumableEvent<ViewModelEvent>>(replay = 1)
+    val viewModelEvent = _viewModelEvent.asSharedFlow()
 
     // 表示保留中Navigation
     private val _pendingNavigationCommand =
@@ -27,30 +34,32 @@ internal abstract class BaseViewModel : ViewModel() {
         Log.d(logTag, "initialize()")
     }
 
-    protected fun addAppMessage(appMessage: AppMessage) {
-        Log.d(logTag, "addAppMessage()")
-        val currentList = requireNotNull(_appMessageBufferList.value)
-        val updateList = currentList.add(appMessage)
-        _appMessageBufferList.value = updateList
+    protected suspend fun emitViewModelEvent(event: ViewModelEvent) {
+        _viewModelEvent.emit(
+            ConsumableEvent(event)
+        )
     }
 
-    fun triggerAppMessageBufferListObserver() {
-        Log.d(logTag, "triggerAppMessageBufferListObserver()")
-        val currentList = _appMessageBufferList.value
-        _appMessageBufferList.value = AppMessageList(currentList)
+    protected suspend fun emitAppMessageEvent(appMessage: AppMessage) {
+        if (checkAppMessageTargetType(appMessage)) throw IllegalArgumentException()
+
+        emitViewModelEvent(
+            ViewModelEvent.NavigateAppMessage(
+                appMessage
+            )
+        )
     }
 
-    fun removeAppMessageBufferListFirstItem() {
-        Log.d(logTag, "removeAppMessageBufferListFirstItem()")
-        val currentList = _appMessageBufferList.value
-        val updateList = currentList.removeFirstItem()
-        _appMessageBufferList.value = updateList
-    }
-
-    protected fun equalLastAppMessage(appMessage: AppMessage): Boolean {
-        Log.d(logTag, "equalLastAppMessage()")
-        val currentList = _appMessageBufferList.value
-        return currentList.equalLastItem(appMessage)
+    private fun checkAppMessageTargetType(appMessage: AppMessage): Boolean {
+        return when (appMessage) {
+            is DiaryListAppMessage -> this@BaseViewModel is DiaryListViewModel
+            is WordSearchAppMessage -> this@BaseViewModel is WordSearchViewModel
+            is CalendarAppMessage -> this@BaseViewModel is CalendarViewModel
+            is SettingsAppMessage -> this@BaseViewModel is SettingsViewModel
+            is DiaryShowAppMessage -> this@BaseViewModel is DiaryShowViewModel
+            is DiaryEditAppMessage -> this@BaseViewModel is DiaryEditViewModel
+            is DiaryItemTitleEditAppMessage -> this@BaseViewModel is DiaryItemTitleEditViewModel
+        }
     }
 
     abstract fun onBackPressed()

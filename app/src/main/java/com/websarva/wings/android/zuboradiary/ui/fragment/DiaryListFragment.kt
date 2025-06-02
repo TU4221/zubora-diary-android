@@ -68,7 +68,6 @@ class DiaryListFragment : BaseFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        setUpViewModelEvent()
         setUpToolBar()
         setUpDiaryList()
 
@@ -109,32 +108,31 @@ class DiaryListFragment : BaseFragment() {
         }
     }
 
-    private fun setUpViewModelEvent() {
-        launchAndRepeatOnViewLifeCycleStarted {
-            mainViewModel.event.collect { value: ViewModelEvent ->
-                when (value) {
-                    is DiaryListEvent.NavigateDiaryShowFragment -> {
-                        navigateDiaryShowFragment(value.date)
-                    }
-                    is DiaryListEvent.NavigateDiaryEditFragment -> {
-                        navigateDiaryEditFragment()
-                    }
-                    is DiaryListEvent.NavigateWordSearchFragment -> {
-                        navigateWordSearchFragment()
-                    }
-                    is DiaryListEvent.NavigateStartYearMonthPickerDialog -> {
-                        navigateStartYearMonthPickerDialog(value.newestYear, value.oldestYear)
-                    }
-                    is DiaryListEvent.NavigateDiaryDeleteDialog -> {
-                        navigateDiaryDeleteDialog(value.date, value.uri)
-                    }
-                    ViewModelEvent.NavigatePreviousFragment -> {
-                        navigatePreviousFragment()
-                    }
-                    else -> {
-                        throw IllegalArgumentException()
-                    }
-                }
+    override fun onMainViewModelEventReceived(event: ViewModelEvent) {
+        when (event) {
+            is DiaryListEvent.NavigateDiaryShowFragment -> {
+                navigateDiaryShowFragment(event.date)
+            }
+            is DiaryListEvent.NavigateDiaryEditFragment -> {
+                navigateDiaryEditFragment()
+            }
+            is DiaryListEvent.NavigateWordSearchFragment -> {
+                navigateWordSearchFragment()
+            }
+            is DiaryListEvent.NavigateStartYearMonthPickerDialog -> {
+                navigateStartYearMonthPickerDialog(event.newestYear, event.oldestYear)
+            }
+            is DiaryListEvent.NavigateDiaryDeleteDialog -> {
+                navigateDiaryDeleteDialog(event.date, event.uri)
+            }
+            ViewModelEvent.NavigatePreviousFragment -> {
+                navigatePreviousFragment()
+            }
+            is ViewModelEvent.NavigateAppMessage -> {
+                navigateAppMessageDialog(event.message)
+            }
+            else -> {
+                throw IllegalArgumentException()
             }
         }
     }
@@ -263,7 +261,7 @@ class DiaryListFragment : BaseFragment() {
         navigateFragment(NavigationCommand.To(directions))
     }
 
-    override fun onNavigateAppMessageDialog(appMessage: AppMessage) {
+    override fun navigateAppMessageDialog(appMessage: AppMessage) {
         val directions =
             DiaryListFragmentDirections.actionDiaryListFragmentToAppMessageDialog(appMessage)
         navigateFragment(NavigationCommand.To(directions))

@@ -81,7 +81,7 @@ internal class DiaryItemTitleEditViewModel @Inject constructor(
                 Log.i(logTag, "${logMsg}_完了")
             } catch (e: Exception) {
                 Log.e(logTag, "${logMsg}_失敗", e)
-                addAppMessage(DiaryItemTitleEditAppMessage.ItemTitleHistoryLoadingFailure)
+                emitAppMessageEvent(DiaryItemTitleEditAppMessage.ItemTitleHistoryLoadingFailure)
             }
         }
     }
@@ -107,7 +107,7 @@ internal class DiaryItemTitleEditViewModel @Inject constructor(
             diaryItemTitleSelectionHistoryRepository.deleteSelectionHistoryItem(deleteTitle)
         } catch (e: Exception) {
             Log.e(logTag, "${logMsg}_失敗", e)
-            addAppMessage(DiaryItemTitleEditAppMessage.ItemTitleHistoryDeleteFailure)
+            emitAppMessageEvent(DiaryItemTitleEditAppMessage.ItemTitleHistoryDeleteFailure)
             return false
         }
 

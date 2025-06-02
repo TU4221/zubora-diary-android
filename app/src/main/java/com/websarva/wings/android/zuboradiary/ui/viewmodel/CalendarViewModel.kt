@@ -10,9 +10,7 @@ import com.websarva.wings.android.zuboradiary.ui.model.event.ViewModelEvent
 import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
 import com.websarva.wings.android.zuboradiary.ui.model.state.CalendarState
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import java.time.LocalDate
@@ -39,11 +37,6 @@ internal class CalendarViewModel @Inject constructor(
 
     private var shouldSmoothScroll = false
 
-    // ViewModelEvent
-    private val _event = MutableSharedFlow<ViewModelEvent>()
-    val event
-        get() = _event.asSharedFlow()
-
     override fun initialize() {
         super.initialize()
         _calendarState.value = initialCalendarState
@@ -54,7 +47,7 @@ internal class CalendarViewModel @Inject constructor(
     // BackPressed(戻るボタン)処理
     override fun onBackPressed() {
         viewModelScope.launch {
-            _event.emit(ViewModelEvent.NavigatePreviousFragment)
+            emitViewModelEvent(ViewModelEvent.NavigatePreviousFragment)
         }
     }
 
@@ -76,7 +69,7 @@ internal class CalendarViewModel @Inject constructor(
             val selectedDate = _selectedDate.value
             val today = LocalDate.now()
             if (selectedDate == today) {
-                _event.emit(
+                emitViewModelEvent(
                     CalendarEvent.SmoothScrollCalendar(today)
                 )
             }
@@ -121,17 +114,17 @@ internal class CalendarViewModel @Inject constructor(
             } else {
                 CalendarEvent.ScrollCalendar(date)
             }
-        _event.emit(action)
+        emitViewModelEvent(action)
 
         val exists = existsSavedDiary(date) ?: false
         if (exists) {
             _calendarState.value = CalendarState.DiaryVisible
-            _event.emit(
+            emitViewModelEvent(
                 CalendarEvent.LoadDiary(date)
             )
         } else {
             _calendarState.value = CalendarState.DiaryHidden
-            _event.emit(
+            emitViewModelEvent(
                 CalendarEvent.InitializeDiary
             )
         }
@@ -152,11 +145,8 @@ internal class CalendarViewModel @Inject constructor(
         try {
             return diaryRepository.existsDiary(date)
         } catch (e: Exception) {
-            // MEMO:CalendarViewModel#hasDiary()はカレンダー日数分連続で処理する為、
-            //      エラーが連続で発生した場合、膨大なエラーを記録してしまう。これを回避する為に下記コードを記述。
-            if (equalLastAppMessage(CalendarAppMessage.DiaryLoadingFailure)) return false
             Log.e(logTag, "日記既存確認_失敗", e)
-            addAppMessage(CalendarAppMessage.DiaryInfoLoadingFailure)
+            emitAppMessageEvent(CalendarAppMessage.DiaryInfoLoadingFailure)
             return null
         }
     }
@@ -165,7 +155,7 @@ internal class CalendarViewModel @Inject constructor(
         val date = _selectedDate.value
         val exists = existsSavedDiary(date) ?: false
         val isNewDiary = !exists
-        _event.emit(
+        emitViewModelEvent(
             CalendarEvent.NavigateDiaryEditFragment(date, isNewDiary)
         )
     }

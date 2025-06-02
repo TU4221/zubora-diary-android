@@ -67,7 +67,6 @@ internal class DiaryShowFragment : BaseFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        setUpViewModelEvent()
         setUpToolBar()
         setUpWeatherLayout()
         setUpConditionLayout()
@@ -102,34 +101,33 @@ internal class DiaryShowFragment : BaseFragment() {
         }
     }
 
-    private fun setUpViewModelEvent() {
-        launchAndRepeatOnViewLifeCycleStarted {
-            mainViewModel.event.collect { value: ViewModelEvent ->
-                when (value) {
-                    is DiaryShowEvent.NavigateDiaryEditFragment -> {
-                        navigateDiaryEditFragment(value.date)
-                    }
-                    is DiaryShowEvent.NavigateDiaryLoadingFailureDialog -> {
-                        navigateDiaryLoadingFailureDialog(value.date)
-                    }
-                    is DiaryShowEvent.NavigateDiaryDeleteDialog -> {
-                        navigateDiaryDeleteDialog(value.date)
-                    }
-                    is DiaryShowEvent.NavigatePreviousFragment -> {
-                        navigatePreviousFragment(value.result)
-                    }
-                    is DiaryShowEvent.NavigatePreviousFragmentOnDiaryDelete -> {
-                        navigatePreviousFragment(value.result)
-                    }
-                    is ViewModelEvent.NavigatePreviousFragment -> {
-                        // MEMO:"DiaryEditFragmentAction.NavigatePreviousFragment"を使用する為、
-                        //      "FragmentAction.NavigatePreviousFragment"処理不要。
-                        throw IllegalArgumentException()
-                    }
-                    else -> {
-                        throw IllegalArgumentException()
-                    }
-                }
+    override fun onMainViewModelEventReceived(event: ViewModelEvent) {
+        when (event) {
+            is DiaryShowEvent.NavigateDiaryEditFragment -> {
+                navigateDiaryEditFragment(event.date)
+            }
+            is DiaryShowEvent.NavigateDiaryLoadingFailureDialog -> {
+                navigateDiaryLoadingFailureDialog(event.date)
+            }
+            is DiaryShowEvent.NavigateDiaryDeleteDialog -> {
+                navigateDiaryDeleteDialog(event.date)
+            }
+            is DiaryShowEvent.NavigatePreviousFragment -> {
+                navigatePreviousFragment(event.result)
+            }
+            is DiaryShowEvent.NavigatePreviousFragmentOnDiaryDelete -> {
+                navigatePreviousFragment(event.result)
+            }
+            is ViewModelEvent.NavigatePreviousFragment -> {
+                // MEMO:"DiaryShowEvent.NavigatePreviousFragment"を使用する為、
+                //      "ViewModelEvent.NavigatePreviousFragment"処理不要。
+                throw IllegalArgumentException()
+            }
+            is ViewModelEvent.NavigateAppMessage -> {
+                navigateAppMessageDialog(event.message)
+            }
+            else -> {
+                throw IllegalArgumentException()
             }
         }
     }
@@ -329,7 +327,7 @@ internal class DiaryShowFragment : BaseFragment() {
         navigateFragment(NavigationCommand.To(directions))
     }
 
-    override fun onNavigateAppMessageDialog(appMessage: AppMessage) {
+    override fun navigateAppMessageDialog(appMessage: AppMessage) {
         val directions =
             DiaryShowFragmentDirections.actionDiaryShowFragmentToAppMessageDialog(appMessage)
         navigateFragment(NavigationCommand.To(directions))

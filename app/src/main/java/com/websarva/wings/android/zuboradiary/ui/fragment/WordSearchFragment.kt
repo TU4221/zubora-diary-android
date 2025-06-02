@@ -66,12 +66,28 @@ class WordSearchFragment : BaseFragment() {
         setUpWordSearchResultList()
         setUpFloatingActionButton()
 
-        setUpViewModelEvent()
         setUpNavDestinationChangedListener()
     }
 
     override fun initializeFragmentResultReceiver() {
         // 処理なし
+    }
+
+    override fun onMainViewModelEventReceived(event: ViewModelEvent) {
+        when (event) {
+            is WordSearchEvent.NavigateDiaryShowFragment -> {
+                navigateDiaryShowFragment(event.date)
+            }
+            ViewModelEvent.NavigatePreviousFragment -> {
+                navigatePreviousFragment()
+            }
+            is ViewModelEvent.NavigateAppMessage -> {
+                navigateAppMessageDialog(event.message)
+            }
+            else -> {
+                throw IllegalArgumentException()
+            }
+        }
     }
 
     private fun setUpKeyboard() {
@@ -194,32 +210,13 @@ class WordSearchFragment : BaseFragment() {
         listAdapter.scrollToTop()
     }
 
-    private fun setUpViewModelEvent() {
-        launchAndRepeatOnViewLifeCycleStarted {
-            mainViewModel.event
-                .collect { value: ViewModelEvent ->
-                    when (value) {
-                        is WordSearchEvent.NavigateDiaryShowFragment -> {
-                            navigateDiaryShowFragment(value.date)
-                        }
-                        ViewModelEvent.NavigatePreviousFragment -> {
-                            navigatePreviousFragment()
-                        }
-                        else -> {
-                            throw IllegalArgumentException()
-                        }
-                    }
-                }
-        }
-    }
-
     private fun navigateDiaryShowFragment(date: LocalDate) {
         val directions =
             WordSearchFragmentDirections.actionNavigationWordSearchFragmentToDiaryShowFragment(date)
         navigateFragment(NavigationCommand.To(directions))
     }
 
-    override fun onNavigateAppMessageDialog(appMessage: AppMessage) {
+    override fun navigateAppMessageDialog(appMessage: AppMessage) {
         val directions =
             WordSearchFragmentDirections.actionWordSearchFragmentToAppMessageDialog(appMessage)
         navigateFragment(NavigationCommand.To(directions))

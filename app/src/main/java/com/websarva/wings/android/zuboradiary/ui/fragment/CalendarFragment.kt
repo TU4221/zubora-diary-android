@@ -21,8 +21,6 @@ import com.kizitonwose.calendar.view.MonthScrollListener
 import com.kizitonwose.calendar.view.ViewContainer
 import com.websarva.wings.android.zuboradiary.R
 import com.websarva.wings.android.zuboradiary.ui.model.AppMessage
-import com.websarva.wings.android.zuboradiary.ui.model.AppMessageList
-import com.websarva.wings.android.zuboradiary.ui.model.DiaryShowAppMessage
 import com.websarva.wings.android.zuboradiary.data.model.Condition
 import com.websarva.wings.android.zuboradiary.data.model.Weather
 import com.websarva.wings.android.zuboradiary.data.model.ThemeColor
@@ -92,7 +90,6 @@ class CalendarFragment : BaseFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        setUpViewModelEvent()
         setUpCalendar()
         setUpDiaryShow()
         setUpFloatActionButton()
@@ -119,47 +116,31 @@ class CalendarFragment : BaseFragment() {
         }
     }
 
-    override fun setUpAppMessageDialog() {
-        super.setUpAppMessageDialog()
-
-        launchAndRepeatOnViewLifeCycleStarted {
-            diaryShowViewModel.appMessageBufferList
-                .collectLatest { value: AppMessageList ->
-                    object : AppMessageBufferListObserver(diaryShowViewModel){
-                        override fun checkAppMessageTargetType(appMessage: AppMessage): Boolean {
-                            return appMessage is DiaryShowAppMessage
-                        }
-                    }.onChanged(value)
-                }
-        }
-    }
-
-    private fun setUpViewModelEvent() {
-        launchAndRepeatOnViewLifeCycleStarted {
-            mainViewModel.event.collect { value: ViewModelEvent ->
-                when (value) {
-                    is CalendarEvent.NavigateDiaryEditFragment -> {
-                        navigateDiaryEditFragment(value.date, !value.isNewDiary)
-                    }
-                    is CalendarEvent.LoadDiary -> {
-                        loadDiary(value.date)
-                    }
-                    is CalendarEvent.InitializeDiary -> {
-                        initializeDiary()
-                    }
-                    is CalendarEvent.ScrollCalendar -> {
-                        scrollCalendar(value.date)
-                    }
-                    is CalendarEvent.SmoothScrollCalendar -> {
-                        smoothScrollCalendar(value.date)
-                    }
-                    ViewModelEvent.NavigatePreviousFragment -> {
-                        mainActivity.popBackStackToStartFragment()
-                    }
-                    else -> {
-                        throw IllegalArgumentException()
-                    }
-                }
+    override fun onMainViewModelEventReceived(event: ViewModelEvent) {
+        when (event) {
+            is CalendarEvent.NavigateDiaryEditFragment -> {
+                navigateDiaryEditFragment(event.date, !event.isNewDiary)
+            }
+            is CalendarEvent.LoadDiary -> {
+                loadDiary(event.date)
+            }
+            is CalendarEvent.InitializeDiary -> {
+                initializeDiary()
+            }
+            is CalendarEvent.ScrollCalendar -> {
+                scrollCalendar(event.date)
+            }
+            is CalendarEvent.SmoothScrollCalendar -> {
+                smoothScrollCalendar(event.date)
+            }
+            ViewModelEvent.NavigatePreviousFragment -> {
+                mainActivity.popBackStackToStartFragment()
+            }
+            is ViewModelEvent.NavigateAppMessage -> {
+                navigateAppMessageDialog(event.message)
+            }
+            else -> {
+                throw IllegalArgumentException()
             }
         }
     }
@@ -228,6 +209,8 @@ class CalendarFragment : BaseFragment() {
         private val themeColor: ThemeColor,
         private var selectedDate: LocalDate = LocalDate.now()
     ) : MonthDayBinder<DayViewContainer> {
+
+        private var isDiaryInfoLoadingFailure = false
 
         @Suppress("PARAMETER_NAME_CHANGED_ON_OVERRIDE")
         override fun bind(container: DayViewContainer, calendarDay: CalendarDay) {
@@ -305,15 +288,23 @@ class CalendarFragment : BaseFragment() {
         }
 
         private fun setUpCalendarDayDotVisibility(calendarDay: CalendarDay, viewCalendarDayDot: View) {
+            if (isDiaryInfoLoadingFailure) {
+                viewCalendarDayDot.visibility = View.INVISIBLE
+                return
+            }
+
             val localDate = calendarDay.date
 
             lifecycleScope.launch {
                 val exists = mainViewModel.existsSavedDiary(localDate)
                 withContext(Dispatchers.Main) {
-                    if (exists == true) {
-                        viewCalendarDayDot.visibility = View.VISIBLE
-                    } else {
-                        viewCalendarDayDot.visibility = View.INVISIBLE
+                    when (exists) {
+                        true -> viewCalendarDayDot.visibility = View.VISIBLE
+                        false -> viewCalendarDayDot.visibility = View.INVISIBLE
+                        null -> {
+                            isDiaryInfoLoadingFailure = true
+                            viewCalendarDayDot.visibility = View.INVISIBLE
+                        }
                     }
                 }
             }
@@ -602,15 +593,10 @@ class CalendarFragment : BaseFragment() {
         navigateFragment(NavigationCommand.To(directions))
     }
 
-    override fun onNavigateAppMessageDialog(appMessage: AppMessage) {
+    override fun navigateAppMessageDialog(appMessage: AppMessage) {
         val directions =
             CalendarFragmentDirections.actionCalendarFragmentToAppMessageDialog(appMessage)
         navigateFragment(NavigationCommand.To(directions))
-    }
-
-    override fun retryAppMessageDialogShow() {
-        super.retryAppMessageDialogShow()
-        diaryShowViewModel.triggerAppMessageBufferListObserver()
     }
 
     override fun destroyBinding() {

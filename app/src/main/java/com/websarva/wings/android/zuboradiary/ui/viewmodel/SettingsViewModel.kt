@@ -25,10 +25,8 @@ import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
 import com.websarva.wings.android.zuboradiary.ui.utils.requireValue
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
@@ -95,11 +93,6 @@ internal class SettingsViewModel @Inject constructor(
     private val initialScrollPositionY = 0
     var scrollPositionY = initialScrollPositionY
 
-    // ViewModelEvent
-    private val _event = MutableSharedFlow<ViewModelEvent>()
-    val event
-        get() = _event.asSharedFlow()
-
     init {
         setUpPreferencesValueLoading()
     }
@@ -116,7 +109,9 @@ internal class SettingsViewModel @Inject constructor(
             allPreferences = userPreferencesRepository.loadAllPreferences()
         } catch (e: Throwable) {
             Log.e(logTag, "アプリ設定値読込_失敗", e)
-            addSettingLoadingErrorMessage()
+            viewModelScope.launch {
+                emitAppMessageEvent(SettingsAppMessage.SettingLoadingFailure)
+            }
             return
         }
         setUpThemeColorPreferenceValueLoading(allPreferences)
@@ -237,23 +232,17 @@ internal class SettingsViewModel @Inject constructor(
             }.stateIn(false)
     }
 
-    private fun addSettingLoadingErrorMessage() {
-        if (equalLastAppMessage(SettingsAppMessage.SettingLoadingFailure)) return  // 設定更新エラー通知の重複防止
-
-        addAppMessage(SettingsAppMessage.SettingLoadingFailure)
-    }
-
     // BackPressed(戻るボタン)処理
     override fun onBackPressed() {
         viewModelScope.launch {
-            _event.emit(ViewModelEvent.NavigatePreviousFragment)
+            emitViewModelEvent(ViewModelEvent.NavigatePreviousFragment)
         }
     }
 
     // ViewClicked処理
     fun onThemeColorSettingButtonClicked() {
         viewModelScope.launch {
-            _event.emit(
+            emitViewModelEvent(
                 SettingsEvent.NavigateThemeColorPickerDialog
             )
         }
@@ -262,7 +251,7 @@ internal class SettingsViewModel @Inject constructor(
     fun onCalendarStartDayOfWeekSettingButtonClicked() {
         viewModelScope.launch {
             val dayOfWeek = calendarStartDayOfWeek.requireValue()
-            _event.emit(
+            emitViewModelEvent(
                 SettingsEvent.NavigateCalendarStartDayPickerDialog(dayOfWeek)
             )
         }
@@ -278,11 +267,11 @@ internal class SettingsViewModel @Inject constructor(
             if (isChecked) {
                 // MEMO:PostNotificationsはApiLevel33で導入されたPermission。33未満は許可取り不要。
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                    _event.emit(
+                    emitViewModelEvent(
                         SettingsEvent.CheckPostNotificationsPermission
                     )
                 } else {
-                    _event.emit(
+                    emitViewModelEvent(
                         SettingsEvent.NavigateReminderNotificationTimePickerDialog
                     )
                 }
@@ -312,7 +301,7 @@ internal class SettingsViewModel @Inject constructor(
             if (isChecked == settingValue) return@launch
 
             if (isChecked) {
-                _event.emit(
+                emitViewModelEvent(
                     SettingsEvent.CheckAccessLocationPermission
                 )
             } else {
@@ -323,7 +312,7 @@ internal class SettingsViewModel @Inject constructor(
 
     fun onAllDiariesDeleteButtonClicked() {
         viewModelScope.launch {
-            _event.emit(
+            emitViewModelEvent(
                 SettingsEvent.NavigateAllDiariesDeleteDialog
             )
         }
@@ -331,7 +320,7 @@ internal class SettingsViewModel @Inject constructor(
 
     fun onAllSettingsInitializationButtonClicked() {
         viewModelScope.launch {
-            _event.emit(
+            emitViewModelEvent(
                 SettingsEvent.NavigateAllSettingsInitializationDialog
             )
         }
@@ -339,7 +328,7 @@ internal class SettingsViewModel @Inject constructor(
 
     fun onAllDataDeleteButtonClicked() {
         viewModelScope.launch {
-            _event.emit(
+            emitViewModelEvent(
                 SettingsEvent.NavigateAllDataDeleteDialog
             )
         }
@@ -347,7 +336,7 @@ internal class SettingsViewModel @Inject constructor(
 
     fun onOpenSourceLicenseButtonClicked() {
         viewModelScope.launch {
-            _event.emit(
+            emitViewModelEvent(
                 SettingsEvent.NavigateOpenSourceLicensesFragment
             )
         }
@@ -411,7 +400,7 @@ internal class SettingsViewModel @Inject constructor(
 
     private fun onReminderNotificationSettingDialogNegativeResultReceived() {
         viewModelScope.launch {
-            _event.emit(
+            emitViewModelEvent(
                 SettingsEvent.TurnOffReminderNotificationSettingSwitch
             )
         }
@@ -482,11 +471,11 @@ internal class SettingsViewModel @Inject constructor(
     fun onPostNotificationsPermissionChecked(isGranted: Boolean) {
         viewModelScope.launch {
             if (isGranted) {
-                _event.emit(
+                emitViewModelEvent(
                     SettingsEvent.NavigateReminderNotificationTimePickerDialog
                 )
             } else {
-                _event.emit(
+                emitViewModelEvent(
                     SettingsEvent.CheckShouldShowRequestPostNotificationsPermissionRationale
                 )
             }
@@ -497,14 +486,14 @@ internal class SettingsViewModel @Inject constructor(
     fun onShouldShowRequestPostNotificationsPermissionRationaleChecked(shouldShowRequest: Boolean) {
         viewModelScope.launch {
             if (shouldShowRequest) {
-                _event.emit(
+                emitViewModelEvent(
                     SettingsEvent.ShowRequestPostNotificationsPermissionRationale
                 )
             } else {
-                _event.emit(
+                emitViewModelEvent(
                     SettingsEvent.TurnOffReminderNotificationSettingSwitch
                 )
-                _event.emit(
+                emitViewModelEvent(
                     SettingsEvent.NavigateNotificationPermissionDialog
                 )
             }
@@ -515,11 +504,11 @@ internal class SettingsViewModel @Inject constructor(
     fun onRequestPostNotificationsPermissionRationaleResultReceived(isGranted: Boolean) {
         viewModelScope.launch {
             if (isGranted) {
-                _event.emit(
+                emitViewModelEvent(
                     SettingsEvent.NavigateReminderNotificationTimePickerDialog
                 )
             } else {
-                _event.emit(
+                emitViewModelEvent(
                     SettingsEvent.TurnOffReminderNotificationSettingSwitch
                 )
             }
@@ -531,7 +520,7 @@ internal class SettingsViewModel @Inject constructor(
             if (isGranted) {
                 saveWeatherInfoAcquisition(true)
             } else {
-                _event.emit(
+                emitViewModelEvent(
                     SettingsEvent.CheckShouldShowRequestAccessLocationPermissionRationale
                 )
             }
@@ -541,14 +530,14 @@ internal class SettingsViewModel @Inject constructor(
     fun onShouldShowRequestAccessLocationPermissionRationaleChecked(shouldShowRequest: Boolean) {
         viewModelScope.launch {
             if (shouldShowRequest) {
-                _event.emit(
+                emitViewModelEvent(
                     SettingsEvent.ShowRequestAccessLocationPermissionRationale
                 )
             } else {
-                _event.emit(
+                emitViewModelEvent(
                     SettingsEvent.TurnOffWeatherInfoAcquisitionSettingSwitch
                 )
-                _event.emit(
+                emitViewModelEvent(
                     SettingsEvent.NavigateLocationPermissionDialog
                 )
             }
@@ -560,7 +549,7 @@ internal class SettingsViewModel @Inject constructor(
             if (isGranted) {
                 saveWeatherInfoAcquisition(true)
             } else {
-                _event.emit(
+                emitViewModelEvent(
                     SettingsEvent.TurnOffWeatherInfoAcquisitionSettingSwitch
                 )
             }
@@ -654,20 +643,14 @@ internal class SettingsViewModel @Inject constructor(
             updateProcess.update()
         } catch (e: IOException) {
             Log.e(logTag, "アプリ設定値更新_失敗", e)
-            addSettingUpdateErrorMessage()
+            emitAppMessageEvent(SettingsAppMessage.SettingUpdateFailure)
             return false
         } catch (e: Exception) {
             Log.e(logTag, "アプリ設定値更新_失敗", e)
-            addSettingUpdateErrorMessage()
+            emitAppMessageEvent(SettingsAppMessage.SettingUpdateFailure)
             return false
         }
         return true
-    }
-
-    private fun addSettingUpdateErrorMessage() {
-        if (equalLastAppMessage(SettingsAppMessage.SettingUpdateFailure)) return  // 設定更新エラー通知の重複防止
-
-        addAppMessage(SettingsAppMessage.SettingUpdateFailure)
     }
 
     private suspend fun deleteAllDiaries(): Boolean {
@@ -675,7 +658,7 @@ internal class SettingsViewModel @Inject constructor(
             diaryRepository.deleteAllDiaries()
         } catch (e: Exception) {
             Log.e(logTag, "全日記削除_失敗", e)
-            addAppMessage(SettingsAppMessage.AllDiaryDeleteFailure)
+            emitAppMessageEvent(SettingsAppMessage.AllDiaryDeleteFailure)
             return false
         }
         return true
@@ -692,7 +675,7 @@ internal class SettingsViewModel @Inject constructor(
             diaryRepository.deleteAllData()
         } catch (e: Exception) {
             Log.e(logTag, "アプリ全データ削除_失敗", e)
-            addAppMessage(SettingsAppMessage.AllDataDeleteFailure)
+            emitAppMessageEvent(SettingsAppMessage.AllDataDeleteFailure)
             return false
         }
         return initializeAllSettings()

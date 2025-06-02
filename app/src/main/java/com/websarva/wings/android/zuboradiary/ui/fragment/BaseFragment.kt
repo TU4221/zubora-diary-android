@@ -10,7 +10,6 @@ import androidx.activity.OnBackPressedCallback
 import androidx.databinding.ViewDataBinding
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.NavBackStackEntry
@@ -19,16 +18,10 @@ import androidx.navigation.fragment.NavHostFragment
 import com.google.android.material.transition.platform.MaterialFadeThrough
 import com.google.android.material.transition.platform.MaterialSharedAxis
 import com.websarva.wings.android.zuboradiary.ui.activity.MainActivity
-import com.websarva.wings.android.zuboradiary.ui.model.AppMessageList
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import com.websarva.wings.android.zuboradiary.ui.model.AppMessage
-import com.websarva.wings.android.zuboradiary.ui.model.CalendarAppMessage
-import com.websarva.wings.android.zuboradiary.ui.model.DiaryEditAppMessage
-import com.websarva.wings.android.zuboradiary.ui.model.DiaryItemTitleEditAppMessage
-import com.websarva.wings.android.zuboradiary.ui.model.DiaryListAppMessage
-import com.websarva.wings.android.zuboradiary.ui.model.DiaryShowAppMessage
-import com.websarva.wings.android.zuboradiary.ui.model.SettingsAppMessage
-import com.websarva.wings.android.zuboradiary.ui.model.WordSearchAppMessage
+import com.websarva.wings.android.zuboradiary.ui.model.event.ConsumableEvent
+import com.websarva.wings.android.zuboradiary.ui.model.event.ViewModelEvent
 import com.websarva.wings.android.zuboradiary.ui.model.navigation.NavigationCommand
 import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
 import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
@@ -37,10 +30,8 @@ import com.websarva.wings.android.zuboradiary.ui.theme.ThemeColorInflaterCreator
 import com.websarva.wings.android.zuboradiary.ui.utils.requireValue
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.SettingsViewModel
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 abstract class BaseFragment : LoggingFragment() {
 
@@ -76,8 +67,6 @@ abstract class BaseFragment : LoggingFragment() {
     }
     private val canNavigateFragment
         get() = destinationId == currentDestinationId
-
-    private val addedLifecycleEventObserverList = ArrayList<LifecycleEventObserver>()
 
     internal fun launchAndRepeatOnViewLifeCycleStarted(
         block: suspend CoroutineScope.() -> Unit) {
@@ -172,8 +161,7 @@ abstract class BaseFragment : LoggingFragment() {
         destinationId = currentDestinationId
 
         initializeFragmentResultReceiver()
-        setUpAppMessageDialog()
-        setUpNavBackStackEntryLifecycleObserverDispose()
+        setUpViewModelEvent()
         setUpPendingNavigationCollector()
         registerOnBackPressedCallback()
     }
@@ -204,137 +192,47 @@ abstract class BaseFragment : LoggingFragment() {
         }
     }
 
-    private fun addNavBackStackEntryLifecycleObserver(observer: LifecycleEventObserver) {
-        navBackStackEntry.lifecycle.addObserver(observer)
-        addedLifecycleEventObserverList.add(observer)
+    private fun setUpViewModelEvent() {
+        setUpMainViewModelEvent()
+        setUpSettingsViewModelEvent()
     }
 
-    internal open fun setUpAppMessageDialog() {
-        val lifecycleEventObserver =
-            LifecycleEventObserver { _, event: Lifecycle.Event ->
-                // MEMO:Dialog表示中:Lifecycle.Event.ON_PAUSE
-                //      Dialog非表示中:Lifecycle.Event.ON_RESUME
-                if (event == Lifecycle.Event.ON_RESUME) {
-                    Log.d(logTag, "Lifecycle.Event.ON_RESUME")
-                    retryAppMessageDialogShow()
-                }
-            }
-        addNavBackStackEntryLifecycleObserver(lifecycleEventObserver)
-
-        setUpMainAppMessageDialog()
-        setUpSettingsAppMessageDialog()
-    }
-
-    private fun setUpMainAppMessageDialog() {
+    private fun setUpMainViewModelEvent() {
         mainViewModel ?: return
 
         launchAndRepeatOnViewLifeCycleStarted {
-            mainViewModel!!.appMessageBufferList
-                .collectLatest { value: AppMessageList ->
-                    MainAppMessageBufferListObserver(mainViewModel!!).onChanged(value)
+            mainViewModel!!.viewModelEvent
+                .collect { value: ConsumableEvent<ViewModelEvent> ->
+                    val event = value.getContentIfNotHandled()
+                    Log.d(logTag, "ViewModelEvent_Collect(): $event")
+                    event ?: return@collect
+                    onMainViewModelEventReceived(event)
                 }
         }
     }
 
-    private inner class MainAppMessageBufferListObserver(viewModel: BaseViewModel)
-        : AppMessageBufferListObserver(viewModel) {
+    internal abstract fun onMainViewModelEventReceived(event: ViewModelEvent)
 
-        override fun checkAppMessageTargetType(appMessage: AppMessage): Boolean {
-            when (appMessage) {
-                is DiaryListAppMessage -> {
-                    return (this@BaseFragment is DiaryListFragment)
-                }
-                is WordSearchAppMessage -> {
-                    return (this@BaseFragment is WordSearchFragment)
-                }
-                is CalendarAppMessage -> {
-                    return (this@BaseFragment is CalendarFragment)
-                }
-                is SettingsAppMessage -> {
-                    return (this@BaseFragment is SettingsFragment)
-                }
-                is DiaryShowAppMessage -> {
-                    return (this@BaseFragment is DiaryShowFragment)
-                }
-                is DiaryEditAppMessage -> {
-                    return (this@BaseFragment is DiaryEditFragment)
-                }
-                is DiaryItemTitleEditAppMessage -> {
-                    return (this@BaseFragment is DiaryItemTitleEditFragment)
-                }
-                else -> return false
-            }
-        }
-    }
+    private fun setUpSettingsViewModelEvent() {
+        if (mainViewModel == settingsViewModel) return
 
-    private fun setUpSettingsAppMessageDialog() {
         launchAndRepeatOnViewLifeCycleStarted {
-            settingsViewModel.appMessageBufferList
-                .collectLatest { value: AppMessageList ->
-                    object : AppMessageBufferListObserver(settingsViewModel) {
-                        override fun checkAppMessageTargetType(appMessage: AppMessage): Boolean {
-                            return appMessage is SettingsAppMessage
+            settingsViewModel.viewModelEvent
+                .collect { value: ConsumableEvent<ViewModelEvent> ->
+                    val event = value.getContentIfNotHandled()
+                    Log.d(logTag, "SettingsViewModelEvent_Collect(): $event")
+                    event ?: return@collect
+                    when (event) {
+                        is ViewModelEvent.NavigateAppMessage -> {
+                            navigateAppMessageDialog(event.message)
                         }
-                    }.onChanged(value)
-                }
-        }
-    }
-
-    internal abstract inner class AppMessageBufferListObserver(private val baseViewModel: BaseViewModel) {
-        suspend fun onChanged(value: AppMessageList) {
-            if (value.isEmpty) return
-
-            val firstAppMessage = checkNotNull(value.findFirstItem())
-            if (!checkAppMessageTargetType(firstAppMessage)) throw IllegalStateException()
-            withContext(Dispatchers.Main) {
-                val isSuccessful = navigateAppMessageDialog(firstAppMessage)
-                if (isSuccessful) baseViewModel.removeAppMessageBufferListFirstItem()
-            }
-        }
-
-        protected abstract fun checkAppMessageTargetType(appMessage: AppMessage): Boolean
-    }
-
-    private fun navigateAppMessageDialog(appMessage: AppMessage): Boolean {
-        if (!canNavigateFragment) return false
-
-        onNavigateAppMessageDialog(appMessage)
-        return true
-    }
-
-    /**
-     * BaseFragment#showAppMessageDialog()で呼び出される。
-     */
-    internal abstract fun onNavigateAppMessageDialog(appMessage: AppMessage)
-
-    internal open fun retryAppMessageDialogShow() {
-        retryMainAppMessageDialogShow()
-        retrySettingsAppMessageDialogShow()
-    }
-
-    private fun retryMainAppMessageDialogShow() {
-        mainViewModel?.triggerAppMessageBufferListObserver() ?: return
-    }
-
-    private fun retrySettingsAppMessageDialogShow() {
-        settingsViewModel.triggerAppMessageBufferListObserver()
-    }
-
-    // MEMO:removeで削除しないと再度Fragment(前回表示Fragmentと同インスタンスの場合)を表示した時、Observerが重複する。
-    private fun setUpNavBackStackEntryLifecycleObserverDispose() {
-        viewLifecycleOwner.lifecycle
-            .addObserver(LifecycleEventObserver { _, event: Lifecycle.Event ->
-                if (event == Lifecycle.Event.ON_DESTROY) {
-                    Log.d(logTag, "Lifecycle.Event.ON_DESTROY")
-
-                    for (observer in addedLifecycleEventObserverList) {
-                        navBackStackEntry.lifecycle.removeObserver(observer)
+                        else -> {
+                            throw IllegalArgumentException()
+                        }
                     }
-                    addedLifecycleEventObserverList.clear()
                 }
-            })
+        }
     }
-
 
     private fun setUpPendingNavigationCollector() {
         mainViewModel ?: return
@@ -405,6 +303,8 @@ abstract class BaseFragment : LoggingFragment() {
     internal open fun navigatePreviousFragment() {
         navigateFragment(NavigationCommand.Up<Nothing>())
     }
+
+    internal abstract fun navigateAppMessageDialog(appMessage: AppMessage)
 
     private fun registerOnBackPressedCallback() {
         requireActivity().onBackPressedDispatcher

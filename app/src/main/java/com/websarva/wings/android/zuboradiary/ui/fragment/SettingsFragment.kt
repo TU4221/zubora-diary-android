@@ -117,8 +117,6 @@ class SettingsFragment : BaseFragment() {
         setUpThemeColorSettingItem()
         setUpCalendarStartDaySettingItem()
         setUpReminderNotificationSettingItem()
-
-        setUpViewModelEvent()
     }
 
     override fun initializeFragmentResultReceiver() {
@@ -197,6 +195,77 @@ class SettingsFragment : BaseFragment() {
             AllDataDeleteDialogFragment.KEY_RESULT
         ) { result ->
             mainViewModel.onAllDataDeleteDialogResultReceived(result)
+        }
+    }
+
+    override fun onMainViewModelEventReceived(event: ViewModelEvent) {
+        when (event) {
+            is SettingsEvent.NavigateThemeColorPickerDialog -> {
+                navigateThemeColorPickerDialog()
+            }
+            is SettingsEvent.NavigateCalendarStartDayPickerDialog -> {
+                navigateCalendarStartDayPickerDialog(event.dayOfWeek)
+            }
+            is SettingsEvent.NavigateReminderNotificationTimePickerDialog -> {
+                navigateReminderNotificationTimePickerDialog()
+            }
+            is SettingsEvent.NavigateNotificationPermissionDialog -> {
+                navigateNotificationPermissionDialog()
+            }
+            is SettingsEvent.NavigateLocationPermissionDialog -> {
+                navigateLocationPermissionDialog()
+            }
+            is SettingsEvent.NavigateAllDiariesDeleteDialog -> {
+                navigateAllDiariesDeleteDialog()
+            }
+            is SettingsEvent.NavigateAllSettingsInitializationDialog -> {
+                navigateAllSettingsInitializationDialog()
+            }
+            is SettingsEvent.NavigateAllDataDeleteDialog -> {
+                navigateAllDataDeleteDialog()
+            }
+            is SettingsEvent.NavigateOpenSourceLicensesFragment -> {
+                navigateOpenSourceLicensesFragment()
+            }
+            is SettingsEvent.CheckPostNotificationsPermission -> {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    checkPostNotificationsPermission()
+                }
+            }
+            is SettingsEvent.CheckShouldShowRequestPostNotificationsPermissionRationale -> {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    checkShouldShowRequestPostNotificationsPermissionRationale()
+                }
+            }
+            is SettingsEvent.ShowRequestPostNotificationsPermissionRationale -> {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    showRequestPostNotificationsPermissionRationale()
+                }
+            }
+            is SettingsEvent.CheckAccessLocationPermission -> {
+                checkAccessLocationPermission()
+            }
+            is SettingsEvent.CheckShouldShowRequestAccessLocationPermissionRationale -> {
+                checkShouldShowRequestAccessLocationPermissionRationale()
+            }
+            is SettingsEvent.ShowRequestAccessLocationPermissionRationale -> {
+                showRequestAccessLocationPermissionRationale()
+            }
+            is SettingsEvent.TurnOffReminderNotificationSettingSwitch -> {
+                binding.includeReminderNotificationSetting.materialSwitch.isChecked = false
+            }
+            is SettingsEvent.TurnOffWeatherInfoAcquisitionSettingSwitch -> {
+                binding.includeWeatherInfoAcquisitionSetting.materialSwitch.isChecked = false
+            }
+            ViewModelEvent.NavigatePreviousFragment -> {
+                mainActivity.popBackStackToStartFragment()
+            }
+            is ViewModelEvent.NavigateAppMessage -> {
+                navigateAppMessageDialog(event.message)
+            }
+            else -> {
+                throw IllegalArgumentException()
+            }
         }
     }
 
@@ -345,78 +414,6 @@ class SettingsFragment : BaseFragment() {
         }
     }
 
-    private fun setUpViewModelEvent() {
-        launchAndRepeatOnViewLifeCycleStarted {
-            mainViewModel.event.collect { value: ViewModelEvent ->
-                when (value) {
-                    is SettingsEvent.NavigateThemeColorPickerDialog -> {
-                        navigateThemeColorPickerDialog()
-                    }
-                    is SettingsEvent.NavigateCalendarStartDayPickerDialog -> {
-                        navigateCalendarStartDayPickerDialog(value.dayOfWeek)
-                    }
-                    is SettingsEvent.NavigateReminderNotificationTimePickerDialog -> {
-                        navigateReminderNotificationTimePickerDialog()
-                    }
-                    is SettingsEvent.NavigateNotificationPermissionDialog -> {
-                        navigateNotificationPermissionDialog()
-                    }
-                    is SettingsEvent.NavigateLocationPermissionDialog -> {
-                        navigateLocationPermissionDialog()
-                    }
-                    is SettingsEvent.NavigateAllDiariesDeleteDialog -> {
-                        navigateAllDiariesDeleteDialog()
-                    }
-                    is SettingsEvent.NavigateAllSettingsInitializationDialog -> {
-                        navigateAllSettingsInitializationDialog()
-                    }
-                    is SettingsEvent.NavigateAllDataDeleteDialog -> {
-                        navigateAllDataDeleteDialog()
-                    }
-                    is SettingsEvent.NavigateOpenSourceLicensesFragment -> {
-                        navigateOpenSourceLicensesFragment()
-                    }
-                    is SettingsEvent.CheckPostNotificationsPermission -> {
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                            checkPostNotificationsPermission()
-                        }
-                    }
-                    is SettingsEvent.CheckShouldShowRequestPostNotificationsPermissionRationale -> {
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                            checkShouldShowRequestPostNotificationsPermissionRationale()
-                        }
-                    }
-                    is SettingsEvent.ShowRequestPostNotificationsPermissionRationale -> {
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                            showRequestPostNotificationsPermissionRationale()
-                        }
-                    }
-                    is SettingsEvent.CheckAccessLocationPermission -> {
-                        checkAccessLocationPermission()
-                    }
-                    is SettingsEvent.CheckShouldShowRequestAccessLocationPermissionRationale -> {
-                        checkShouldShowRequestAccessLocationPermissionRationale()
-                    }
-                    is SettingsEvent.ShowRequestAccessLocationPermissionRationale -> {
-                        showRequestAccessLocationPermissionRationale()
-                    }
-                    is SettingsEvent.TurnOffReminderNotificationSettingSwitch -> {
-                        binding.includeReminderNotificationSetting.materialSwitch.isChecked = false
-                    }
-                    is SettingsEvent.TurnOffWeatherInfoAcquisitionSettingSwitch -> {
-                        binding.includeWeatherInfoAcquisitionSetting.materialSwitch.isChecked = false
-                    }
-                    ViewModelEvent.NavigatePreviousFragment -> {
-                        mainActivity.popBackStackToStartFragment()
-                    }
-                    else -> {
-                        throw IllegalArgumentException()
-                    }
-                }
-            }
-        }
-    }
-
     private fun saveScrollPosition() {
         settingsViewModel.scrollPositionY = binding.scrollViewSettings.scrollY
     }
@@ -473,7 +470,7 @@ class SettingsFragment : BaseFragment() {
         navigateFragment(NavigationCommand.To(directions))
     }
 
-    override fun onNavigateAppMessageDialog(appMessage: AppMessage) {
+    override fun navigateAppMessageDialog(appMessage: AppMessage) {
         val directions =
             SettingsFragmentDirections.actionSettingsFragmentToAppMessageDialog(appMessage)
         navigateFragment(NavigationCommand.To(directions))

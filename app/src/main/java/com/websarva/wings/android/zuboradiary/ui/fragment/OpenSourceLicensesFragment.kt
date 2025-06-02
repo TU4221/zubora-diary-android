@@ -15,6 +15,7 @@ import com.mikepenz.aboutlibraries.ui.compose.m3.LibrariesContainer
 import com.mikepenz.aboutlibraries.ui.compose.m3.LibraryDefaults
 import com.websarva.wings.android.zuboradiary.ui.model.AppMessage
 import com.websarva.wings.android.zuboradiary.databinding.FragmentOpenSourceLicensesBinding
+import com.websarva.wings.android.zuboradiary.ui.model.event.ViewModelEvent
 
 class OpenSourceLicensesFragment: BaseFragment() {
 
@@ -86,7 +87,11 @@ class OpenSourceLicensesFragment: BaseFragment() {
         // 処理なし
     }
 
-    override fun onNavigateAppMessageDialog(appMessage: AppMessage) {
+    override fun onMainViewModelEventReceived(event: ViewModelEvent) {
+        // 処理なし
+    }
+
+    override fun navigateAppMessageDialog(appMessage: AppMessage) {
         // 処理なし
     }
 
