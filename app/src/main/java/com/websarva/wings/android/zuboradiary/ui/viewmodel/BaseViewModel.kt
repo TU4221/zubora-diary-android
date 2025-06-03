@@ -24,14 +24,17 @@ internal abstract class BaseViewModel<E: ViewModelEvent, M: AppMessage, S: ViewM
     private val _viewModelState = MutableStateFlow<ViewModelState>(initialViewModelState)
     val viewModelState get() = _viewModelState.asStateFlow()
 
-
     // 表示保留中Navigation
+    private val initialPendingNavigationCommand = NavigationCommand.None
     private val _pendingNavigationCommand =
-        MutableStateFlow<NavigationCommand>(NavigationCommand.None)
+        MutableStateFlow<NavigationCommand>(initialPendingNavigationCommand)
+    val pendingNavigationCommand
+        get() = _pendingNavigationCommand.asStateFlow()
 
     open fun initialize() {
         Log.d(logTag, "initialize()")
         _viewModelState.value = initialViewModelState
+        _pendingNavigationCommand.value = initialPendingNavigationCommand
     }
 
     protected suspend fun emitViewModelEvent(event: E) {
@@ -67,9 +70,6 @@ internal abstract class BaseViewModel<E: ViewModelEvent, M: AppMessage, S: ViewM
     }
 
     abstract fun onBackPressed()
-
-    val pendingNavigationCommand
-        get() = _pendingNavigationCommand.asStateFlow()
 
     fun onFragmentNavigationFailed(command: NavigationCommand) {
         _pendingNavigationCommand.value = command
