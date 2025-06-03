@@ -18,7 +18,7 @@ internal abstract class BaseViewModel<E: ViewModelEvent, M: AppMessage, S: ViewM
     private val logTag = createLogTag()
 
     private val _viewModelEvent = MutableSharedFlow<ConsumableEvent<ViewModelEvent>>(replay = 1)
-    val viewModelEvent = _viewModelEvent.asSharedFlow()
+    val viewModelEvent get() = _viewModelEvent.asSharedFlow()
 
     private val initialViewModelState = ViewModelState.Idle
     private val _viewModelState = MutableStateFlow<ViewModelState>(initialViewModelState)
