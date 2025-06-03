@@ -23,6 +23,7 @@ import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
 import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
 import com.websarva.wings.android.zuboradiary.ui.model.result.ItemTitleEditResult
 import com.websarva.wings.android.zuboradiary.ui.model.state.DiaryEditState
+import com.websarva.wings.android.zuboradiary.ui.model.state.ViewModelState
 import com.websarva.wings.android.zuboradiary.ui.utils.requireValue
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -51,7 +52,7 @@ internal class DiaryEditViewModel @Inject constructor(
     private val locationRepository: LocationRepository,
     private val userPreferencesRepository: UserPreferencesRepository,
     private val uriRepository: UriRepository
-) : BaseViewModel<DiaryEditEvent, DiaryEditAppMessage>() {
+) : BaseViewModel<DiaryEditEvent, DiaryEditAppMessage, DiaryEditState>() {
 
     companion object {
         private const val SAVED_HAS_PREPARED_DIARY_STATE_KEY = "hasPreparedDiary"
@@ -63,9 +64,6 @@ internal class DiaryEditViewModel @Inject constructor(
     }
 
     private val logTag = createLogTag()
-
-    private val initialDiaryEditState = DiaryEditState.Idle
-    private val _diaryEditState = MutableStateFlow<DiaryEditState>(initialDiaryEditState)
 
     // 日記データ関係
     private val initialHasPreparedDiary = false
@@ -213,9 +211,9 @@ internal class DiaryEditViewModel @Inject constructor(
         get() = diaryStateFlow.getItemStateFlow(ItemNumber(5)).comment
 
     val isItemAdditionButtonClickable =
-        combine(_diaryEditState, numVisibleItems) { state, numVisibleItems ->
+        combine(viewModelState, numVisibleItems) { state, numVisibleItems ->
             return@combine when (state) {
-                DiaryEditState.Idle -> {
+                ViewModelState.Idle -> {
                     numVisibleItems < 5
                 }
                 else -> false
@@ -230,9 +228,9 @@ internal class DiaryEditViewModel @Inject constructor(
         get() = diaryStateFlow.picturePath.asStateFlow()
 
     val isPicturePathDeleteButtonClickable =
-        combine(_diaryEditState, picturePath) { state, picturePath ->
+        combine(viewModelState, picturePath) { state, picturePath ->
             return@combine when (state) {
-                DiaryEditState.Idle -> {
+                ViewModelState.Idle -> {
                     picturePath != null
                 }
                 else -> false
@@ -253,9 +251,9 @@ internal class DiaryEditViewModel @Inject constructor(
 
     // ProgressIndicator表示
     val isVisibleUpdateProgressBar: StateFlow<Boolean> =
-        _diaryEditState.map { state ->
+        viewModelState.map { state ->
             return@map when (state) {
-                DiaryEditState.Idle,
+                ViewModelState.Idle,
                 DiaryEditState.ItemAdding,
                 DiaryEditState.ItemDeleting -> false
                 else -> true
@@ -308,21 +306,21 @@ internal class DiaryEditViewModel @Inject constructor(
 
     // ViewClicked処理
     fun onDiarySaveMenuClicked() {
-        _diaryEditState.value = DiaryEditState.Saving
+        updateViewModelState(DiaryEditState.Saving)
         viewModelScope.launch {
             saveDiary()
-            _diaryEditState.value = DiaryEditState.Idle
+            updateViewModelIdleState()
         }
     }
 
     fun onDiaryDeleteMenuClicked() {
-        _diaryEditState.value = DiaryEditState.Deleting
+        updateViewModelState(DiaryEditState.Deleting)
         val date = this.date.requireValue()
         viewModelScope.launch {
             emitViewModelEvent(
                 DiaryEditEvent.NavigateDiaryDeleteDialog(date)
             )
-            _diaryEditState.value = DiaryEditState.Idle
+            updateViewModelIdleState()
         }
 
     }
@@ -365,7 +363,7 @@ internal class DiaryEditViewModel @Inject constructor(
     }
 
     fun onItemAdditionButtonClicked() {
-        _diaryEditState.value = DiaryEditState.ItemAdding
+        updateViewModelState(DiaryEditState.ItemAdding)
         viewModelScope.launch {
             emitViewModelEvent(DiaryEditEvent.ItemAddition)
             incrementVisibleItemsCount()
@@ -404,7 +402,7 @@ internal class DiaryEditViewModel @Inject constructor(
     private fun onDiaryLoadingDialogPositiveResultReceived() {
         val date = this.date.requireValue()
         viewModelScope.launch {
-            _diaryEditState.value = DiaryEditState.Loading
+            updateViewModelState(DiaryEditState.Loading)
             prepareDiary(
                 date,
                 true
@@ -414,10 +412,10 @@ internal class DiaryEditViewModel @Inject constructor(
 
     private fun onDiaryLoadingDialogNegativeResultReceived() {
         viewModelScope.launch {
-            _diaryEditState.value = DiaryEditState.WeatherFetching
+            updateViewModelState(DiaryEditState.WeatherFetching)
             val date = date.requireValue()
             if (!shouldLoadWeatherInfo(date)) {
-                _diaryEditState.value = DiaryEditState.Idle
+                updateViewModelIdleState()
                 return@launch
             }
 
@@ -438,10 +436,10 @@ internal class DiaryEditViewModel @Inject constructor(
     }
 
     private fun onDiaryUpdateDialogPositiveResultReceived() {
-        _diaryEditState.value = DiaryEditState.Saving
+        updateViewModelState(DiaryEditState.Saving)
         viewModelScope.launch {
             saveDiary(true)
-            _diaryEditState.value = DiaryEditState.Idle
+            updateViewModelIdleState()
         }
     }
 
@@ -458,10 +456,10 @@ internal class DiaryEditViewModel @Inject constructor(
     }
 
     private fun onDiaryDeleteDialogPositiveResultReceived() {
-        _diaryEditState.value = DiaryEditState.Deleting
+        updateViewModelState(DiaryEditState.Deleting)
         viewModelScope.launch {
             deleteDiary()
-            _diaryEditState.value = DiaryEditState.Idle
+            updateViewModelIdleState()
         }
     }
 
@@ -478,7 +476,7 @@ internal class DiaryEditViewModel @Inject constructor(
     }
 
     private fun onDatePickerDialogPositiveResultReceived(date: LocalDate) {
-        _diaryEditState.value = DiaryEditState.WeatherFetching
+        updateViewModelState(DiaryEditState.WeatherFetching)
         viewModelScope.launch {
             prepareDiaryDate(date)
         }
@@ -509,7 +507,7 @@ internal class DiaryEditViewModel @Inject constructor(
     }
 
     private fun onWeatherInfoFetchDialogPositiveResultReceived() {
-        _diaryEditState.value = DiaryEditState.WeatherFetching
+        updateViewModelState(DiaryEditState.WeatherFetching)
         viewModelScope.launch {
             val date = diaryStateFlow.date.requireValue()
             if (!shouldLoadWeatherInfo(date)) return@launch
@@ -531,12 +529,12 @@ internal class DiaryEditViewModel @Inject constructor(
     }
 
     private fun onDiaryItemDeleteDialogPositiveResultReceived(itemNumber: ItemNumber) {
-        _diaryEditState.value = DiaryEditState.ItemDeleting
+        updateViewModelState(DiaryEditState.ItemDeleting)
         val numVisibleItems = numVisibleItems.requireValue()
 
         if (itemNumber.value == 1 && numVisibleItems == itemNumber.value) {
             deleteItem(itemNumber)
-            _diaryEditState.value = DiaryEditState.Idle
+            updateViewModelIdleState()
         } else {
             viewModelScope.launch {
                 emitViewModelEvent(
@@ -559,9 +557,9 @@ internal class DiaryEditViewModel @Inject constructor(
     }
 
     private fun onDiaryPictureDeleteDialogPositiveResultReceived() {
-        _diaryEditState.value = DiaryEditState.PictureDeleting
+        updateViewModelState(DiaryEditState.PictureDeleting)
         deletePicturePath()
-        _diaryEditState.value = DiaryEditState.Idle
+        updateViewModelIdleState()
     }
 
     fun onItemTitleEditFragmentResultReceived(result: FragmentResult<ItemTitleEditResult>) {
@@ -582,7 +580,7 @@ internal class DiaryEditViewModel @Inject constructor(
         // MEMO:未選択時null
         if (uri != null) diaryStateFlow.picturePath.value = uri
 
-        _diaryEditState.value = DiaryEditState.Idle
+        updateViewModelIdleState()
     }
 
     // Fragment状態処理
@@ -590,14 +588,14 @@ internal class DiaryEditViewModel @Inject constructor(
         date: LocalDate,
         shouldLoadDiary: Boolean
     ) {
-        _diaryEditState.value = DiaryEditState.Loading
+        updateViewModelState(DiaryEditState.Loading)
         viewModelScope.launch {
             prepareDiary(date, shouldLoadDiary)
         }
     }
 
     fun onAttachedPictureClicked() {
-        _diaryEditState.value = DiaryEditState.PictureSelecting
+        updateViewModelState(DiaryEditState.PictureSelecting)
     }
 
     // StateFlow値変更時処理
@@ -608,11 +606,11 @@ internal class DiaryEditViewModel @Inject constructor(
     // MotionLayout変更時処理
     fun onDiaryItemHidedStateTransitionCompleted(itemNumber: ItemNumber) {
         deleteItem(itemNumber)
-        _diaryEditState.value = DiaryEditState.Idle
+        updateViewModelIdleState()
     }
 
     fun onDiaryItemShowedStateTransitionCompleted() {
-        _diaryEditState.value = DiaryEditState.Idle
+        updateViewModelIdleState()
     }
 
     // 権限確認後処理
@@ -622,14 +620,14 @@ internal class DiaryEditViewModel @Inject constructor(
                 val geoCoordinates = fetchCurrentLocation()
                 if (geoCoordinates == null) {
                     emitAppMessageEvent(DiaryEditAppMessage.WeatherInfoLoadingFailure)
-                    _diaryEditState.value = DiaryEditState.Idle
+                    updateViewModelIdleState()
                     return@launch
                 }
                 fetchWeatherInfo(date, geoCoordinates)
             } else {
                 emitAppMessageEvent(DiaryEditAppMessage.AccessLocationPermissionRequest)
             }
-            _diaryEditState.value = DiaryEditState.Idle
+            updateViewModelIdleState()
         }
     }
 
@@ -655,10 +653,10 @@ internal class DiaryEditViewModel @Inject constructor(
                 }
                 return
             } finally {
-                _diaryEditState.value = DiaryEditState.Idle
+                updateViewModelIdleState()
             }
         } else {
-            _diaryEditState.value = DiaryEditState.WeatherFetching
+            updateViewModelState(DiaryEditState.WeatherFetching)
             prepareDiaryDate(date)
         }
         hasPreparedDiary = true
@@ -674,12 +672,12 @@ internal class DiaryEditViewModel @Inject constructor(
             emitViewModelEvent(
                 DiaryEditEvent.NavigateDiaryLoadingDialog(date)
             )
-            _diaryEditState.value = DiaryEditState.Idle
+            updateViewModelIdleState()
             return
         }
 
         if (!shouldLoadWeatherInfo(date)) {
-            _diaryEditState.value = DiaryEditState.Idle
+            updateViewModelIdleState()
             return
         }
 
@@ -864,14 +862,14 @@ internal class DiaryEditViewModel @Inject constructor(
         shouldIgnoreConfirmationDialog: Boolean = false
     ) {
         if (!weatherApiRepository.canFetchWeatherInfo(date)) {
-            _diaryEditState.value = DiaryEditState.Idle
+            updateViewModelIdleState()
             return
         }
         if (!shouldIgnoreConfirmationDialog && shouldShowWeatherInfoFetchingDialog()) {
             emitViewModelEvent(
                 DiaryEditEvent.NavigateWeatherInfoFetchingDialog(date)
             )
-            _diaryEditState.value = DiaryEditState.Idle
+            updateViewModelIdleState()
             return
         }
 

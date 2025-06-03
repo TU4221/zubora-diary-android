@@ -7,17 +7,23 @@ import com.websarva.wings.android.zuboradiary.ui.model.AppMessage
 import com.websarva.wings.android.zuboradiary.ui.model.event.ConsumableEvent
 import com.websarva.wings.android.zuboradiary.ui.model.event.ViewModelEvent
 import com.websarva.wings.android.zuboradiary.ui.model.navigation.NavigationCommand
+import com.websarva.wings.android.zuboradiary.ui.model.state.ViewModelState
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 
-internal abstract class BaseViewModel<E: ViewModelEvent, M: AppMessage> : ViewModel() {
+internal abstract class BaseViewModel<E: ViewModelEvent, M: AppMessage, S: ViewModelState> : ViewModel() {
 
     private val logTag = createLogTag()
 
     private val _viewModelEvent = MutableSharedFlow<ConsumableEvent<ViewModelEvent>>(replay = 1)
     val viewModelEvent = _viewModelEvent.asSharedFlow()
+
+    private val initialViewModelState = ViewModelState.Idle
+    private val _viewModelState = MutableStateFlow<ViewModelState>(initialViewModelState)
+    val viewModelState get() = _viewModelState.asStateFlow()
+
 
     // 表示保留中Navigation
     private val _pendingNavigationCommand =
@@ -25,6 +31,7 @@ internal abstract class BaseViewModel<E: ViewModelEvent, M: AppMessage> : ViewMo
 
     open fun initialize() {
         Log.d(logTag, "initialize()")
+        _viewModelState.value = initialViewModelState
     }
 
     protected suspend fun emitViewModelEvent(event: E) {
@@ -49,6 +56,14 @@ internal abstract class BaseViewModel<E: ViewModelEvent, M: AppMessage> : ViewMo
                 )
             )
         )
+    }
+
+    protected fun updateViewModelState(state: S) {
+        _viewModelState.value = state
+    }
+
+    protected fun updateViewModelIdleState() {
+        _viewModelState.value = ViewModelState.Idle
     }
 
     abstract fun onBackPressed()

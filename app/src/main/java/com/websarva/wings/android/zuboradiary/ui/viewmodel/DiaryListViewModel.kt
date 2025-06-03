@@ -32,7 +32,7 @@ import javax.inject.Inject
 internal class DiaryListViewModel @Inject constructor(
     private val diaryRepository: DiaryRepository,
     private val uriRepository: UriRepository
-) : BaseViewModel<DiaryListEvent, DiaryListAppMessage>() {
+) : BaseViewModel<DiaryListEvent, DiaryListAppMessage, DiaryListState>() {
 
     companion object {
         // MEMO:初期読込時の対象リストが画面全体に表示される値にすること。
@@ -41,11 +41,6 @@ internal class DiaryListViewModel @Inject constructor(
     }
 
     private val logTag = createLogTag()
-
-    private val initialDiaryListState = DiaryListState.Idle
-    private val _diaryListState = MutableStateFlow<DiaryListState>(initialDiaryListState)
-    val  diaryListState
-        get() = _diaryListState.asStateFlow()
 
     private val initialDiaryListLoadingJob: Job? = null
     private var diaryListLoadingJob: Job? = initialDiaryListLoadingJob // キャンセル用
@@ -63,7 +58,6 @@ internal class DiaryListViewModel @Inject constructor(
 
     override fun initialize() {
         super.initialize()
-        _diaryListState.value = initialDiaryListState
         diaryListLoadingJob = initialDiaryListLoadingJob
         _diaryList.value = initialDiaryList
         sortConditionDate = initialSortConditionDate
@@ -230,22 +224,24 @@ internal class DiaryListViewModel @Inject constructor(
     // MEMO:日記リスト読込は処理途中でも再読込できる仕様のため、createDiaryList()処理内で状態更新を行う。
     //      再読込、createDiaryList()処理前に状態更新を行うと一つ前の検索結果状態が上書きされる可能性あり。
     private fun updateWordSearchStatusOnListLoadingStart(creator: DiaryListCreator) {
-        _diaryListState.value =
+         val state =
             when (creator) {
                 is NewDiaryListCreator -> DiaryListState.NewLoading
                 is AddedDiaryListCreator -> DiaryListState.AdditionLoading
                 is UpdateDiaryListCreator -> DiaryListState.Updating
                 else -> throw IllegalArgumentException()
             }
+        updateViewModelState(state)
     }
 
     private fun updateWordSearchStatusOnListLoadingFinish(list: DiaryYearMonthList) {
-        _diaryListState.value =
+        val state =
             if (list.isNotEmpty) {
                 DiaryListState.Results
             } else {
                 DiaryListState.NoResults
             }
+        updateViewModelState(state)
     }
 
     private fun interface DiaryListCreator {

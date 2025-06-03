@@ -15,7 +15,6 @@ import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
 import com.websarva.wings.android.zuboradiary.ui.model.state.DiaryShowState
 import com.websarva.wings.android.zuboradiary.ui.utils.requireValue
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
@@ -29,12 +28,9 @@ internal class DiaryShowViewModel @Inject constructor(
     handle: SavedStateHandle,
     private val diaryRepository: DiaryRepository,
     private val uriRepository: UriRepository
-) : BaseViewModel<DiaryShowEvent, DiaryShowAppMessage>() {
+) : BaseViewModel<DiaryShowEvent, DiaryShowAppMessage, DiaryShowState>() {
 
     private val logTag = createLogTag()
-
-    private val initialDiaryShowState = DiaryShowState.Idle
-    private val _diaryShowState = MutableStateFlow<DiaryShowState>(initialDiaryShowState)
 
     // 日記データ関係
     private val diaryStateFlow = DiaryStateFlow(viewModelScope, handle)
@@ -146,28 +142,28 @@ internal class DiaryShowViewModel @Inject constructor(
     }
 
     private fun onDiaryDeleteDialogPositiveResultReceived() {
-        _diaryShowState.value = DiaryShowState.Deleting
+        updateViewModelState(DiaryShowState.Deleting)
         viewModelScope.launch {
             deleteDiary()
-            _diaryShowState.value = DiaryShowState.Idle
+            updateViewModelIdleState()
         }
     }
 
     // View状態処理
     fun onCalendarDaySelected(date: LocalDate) {
-        _diaryShowState.value = DiaryShowState.Loading
+        updateViewModelState(DiaryShowState.Loading)
         viewModelScope.launch {
             prepareDiaryForCalendarFragment(date)
-            _diaryShowState.value = DiaryShowState.Idle
+            updateViewModelIdleState()
         }
     }
 
     // Fragment状態処理
     fun onFragmentViewCreated(date: LocalDate) {
-        _diaryShowState.value = DiaryShowState.Loading
+        updateViewModelState(DiaryShowState.Loading)
         viewModelScope.launch {
             prepareDiaryForDiaryShowFragment(date)
-            _diaryShowState.value = DiaryShowState.Idle
+            updateViewModelIdleState()
         }
     }
 

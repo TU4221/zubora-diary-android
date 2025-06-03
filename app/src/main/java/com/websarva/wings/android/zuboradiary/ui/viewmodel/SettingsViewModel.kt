@@ -21,6 +21,7 @@ import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import com.websarva.wings.android.zuboradiary.ui.model.SettingsAppMessage
 import com.websarva.wings.android.zuboradiary.ui.model.event.SettingsEvent
 import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
+import com.websarva.wings.android.zuboradiary.ui.model.state.SettingsState
 import com.websarva.wings.android.zuboradiary.ui.utils.requireValue
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
@@ -42,7 +43,7 @@ internal class SettingsViewModel @Inject constructor(
     private val workerRepository: WorkerRepository,
     private val diaryRepository: DiaryRepository,
     private val uriRepository: UriRepository
-) : BaseViewModel<SettingsEvent, SettingsAppMessage>() {
+) : BaseViewModel<SettingsEvent, SettingsAppMessage, SettingsState>() {
 
     // HACK:SavedStateHandleを使用する理由
     //      プロセスキルでアプリを再起動した時、ActivityのBinding処理とは関係なしにFragmentの処理が始まり、

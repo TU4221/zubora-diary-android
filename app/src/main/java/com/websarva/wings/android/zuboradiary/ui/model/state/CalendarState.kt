@@ -1,7 +1,6 @@
 package com.websarva.wings.android.zuboradiary.ui.model.state
 
-internal sealed class CalendarState {
-    data object Idle : CalendarState()
+internal sealed class CalendarState : ViewModelState() {
     data object DiaryVisible : CalendarState() // 日記表示
     data object DiaryHidden : CalendarState() // 日記非表示
 }

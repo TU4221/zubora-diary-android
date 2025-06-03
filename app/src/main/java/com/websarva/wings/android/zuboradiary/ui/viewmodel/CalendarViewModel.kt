@@ -18,13 +18,9 @@ import javax.inject.Inject
 @HiltViewModel
 internal class CalendarViewModel @Inject constructor(
     private val diaryRepository: DiaryRepository
-) : BaseViewModel<CalendarEvent, CalendarAppMessage>() {
+) : BaseViewModel<CalendarEvent, CalendarAppMessage, CalendarState>() {
 
     private val logTag = createLogTag()
-
-    private val initialCalendarState = CalendarState.Idle
-    private val _calendarState = MutableStateFlow<CalendarState>(initialCalendarState)
-    val calendarState get() = _calendarState.asStateFlow()
 
     private val initialSelectedDate = LocalDate.now()
     private val _selectedDate = MutableStateFlow<LocalDate>(initialSelectedDate)
@@ -38,7 +34,6 @@ internal class CalendarViewModel @Inject constructor(
 
     override fun initialize() {
         super.initialize()
-        _calendarState.value = initialCalendarState
         _selectedDate.value = initialSelectedDate
         _previousSelectedDate.value = initialPreviousSelectedDate
     }
@@ -117,12 +112,12 @@ internal class CalendarViewModel @Inject constructor(
 
         val exists = existsSavedDiary(date) ?: false
         if (exists) {
-            _calendarState.value = CalendarState.DiaryVisible
+            updateViewModelState(CalendarState.DiaryVisible)
             emitViewModelEvent(
                 CalendarEvent.LoadDiary(date)
             )
         } else {
-            _calendarState.value = CalendarState.DiaryHidden
+            updateViewModelState(CalendarState.DiaryHidden)
             emitViewModelEvent(
                 CalendarEvent.InitializeDiary
             )

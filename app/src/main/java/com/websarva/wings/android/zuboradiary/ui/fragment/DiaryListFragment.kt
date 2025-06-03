@@ -163,8 +163,8 @@ class DiaryListFragment : BaseFragment() {
         }
 
         launchAndRepeatOnViewLifeCycleStarted {
-            mainViewModel.diaryListState
-                .collectLatest { value: DiaryListState ->
+            mainViewModel.viewModelState
+                .collectLatest { value ->
                     val isEnabled =
                         value != DiaryListState.AdditionLoading
                     diaryListAdapter.setSwipeEnabled(isEnabled)
