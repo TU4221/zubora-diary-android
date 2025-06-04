@@ -55,6 +55,12 @@ internal open class ThemeColorChanger {
         WindowInsetsControllerCompat(window, window.decorView).isAppearanceLightStatusBars = isLight
     }
 
+    fun applyNavigationBarColor(window: Window, themeColor: ThemeColor) {
+        // ナビゲエーションバーのアイコンの色を変更
+        val isLight = themeColor.isAppearanceLightStatusBars
+        WindowInsetsControllerCompat(window, window.decorView).isAppearanceLightNavigationBars = isLight
+    }
+
     fun applyBottomNavigationColor(
         bottomNavigationView: BottomNavigationView,
         themeColor: ThemeColor
