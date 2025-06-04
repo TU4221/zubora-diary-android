@@ -323,7 +323,6 @@ class MainActivity : LoggingActivity() {
                 R.id.navigation_diary_list_fragment,
                 R.id.navigation_calendar_fragment,
                 R.id.navigation_settings_fragment,
-                R.id.navigation_open_source_licenses_fragment,
                 R.id.navigation_word_search_fragment,
                 R.id.navigation_diary_show_fragment,
                 R.id.navigation_diary_edit_fragment,

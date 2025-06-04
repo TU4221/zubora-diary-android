@@ -236,9 +236,10 @@
             android:name="com.websarva.wings.android.zuboradiary.ui.fragment.dialog.AllDataDeleteDialogFragment">
         </dialog>
 
-        <fragment
+        <dialog
             android:id="@+id/navigation_open_source_licenses_fragment"
-            android:name="com.websarva.wings.android.zuboradiary.ui.fragment.OpenSourceLicensesFragment" />
+            android:name="com.websarva.wings.android.zuboradiary.ui.fragment.dialog.OpenSourceLicensesDialogFragment" >
+        </dialog>
 
     </navigation>
 

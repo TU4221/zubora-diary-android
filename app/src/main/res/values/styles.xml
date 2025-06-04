@@ -384,4 +384,20 @@
     </style>
 
     <!-- ******************************************************************************** -->
+
+
+    <!-- MaterialFullScreenDialog -->
+    <!-- ******************************************************************************** -->
+    <style name="MaterialFullScreenDialogTheme" parent="ThemeOverlay.Material3.Dialog">
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowFullscreen">false</item>
+        <item name="android:windowIsFloating">false</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+
+        <!-- MEMO:下記はEdgeToEdgeに対応できるように設定 -->
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+    </style>
+
+    <!-- ******************************************************************************** -->
 </resources>
