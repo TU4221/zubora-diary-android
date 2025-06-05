@@ -35,6 +35,7 @@
                 app:title="@{diaryEditViewModel.loadedDate == null ? @string/fragment_diary_edit_toolbar_title_create_new : @string/fragment_diary_edit_toolbar_title_edit}"
                 app:onNavigationIconClick="@{() -> diaryEditViewModel.onNavigationClicked()}"
                 app:menu="@menu/diary_edit_toolbar_menu"
+                app:applyStatusBarTopPadding="@{true}"
                 tools:title="@string/fragment_diary_edit_toolbar_title_value_tools" />
 
             <androidx.core.widget.NestedScrollView

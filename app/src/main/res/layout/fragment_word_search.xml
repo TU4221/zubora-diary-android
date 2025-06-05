@@ -29,7 +29,8 @@
 
             <FrameLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                app:applyStatusBarTopPadding="@{true}" >
 
                 <com.google.android.material.appbar.MaterialToolbar
                     style="@style/AppToolbarNavBackStyle"

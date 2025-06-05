@@ -35,7 +35,8 @@
                 app:navigationIcon="@drawable/ic_calendar_month_24px"
                 app:navigationContentDescription="@string/fragment_diary_list_toolbar_navigation_top_year_month_switching"
                 app:onNavigationIconClick="@{() -> list_view_model.onNavigationClicked()}"
-                app:title="@string/fragment_diary_list_toolbar_title"/>
+                app:title="@string/fragment_diary_list_toolbar_title"
+                app:applyStatusBarTopPadding="@{true}"/>
 
             <FrameLayout
                 android:layout_width="match_parent"

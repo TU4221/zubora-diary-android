@@ -20,7 +20,6 @@
         <item name="android:minHeight">?attr/actionBarSize</item>
         <item name="titleCentered">true</item>
         <item name="popupTheme">@style/AppToolbarPopupMenuStyle</item>
-        <item name="android:fitsSystemWindows">true</item>
     </style>
     <style name="AppToolbarNavBackStyle" parent="AppToolbarStyle">
         <item name="navigationIcon">@drawable/ic_arrow_back_24px</item>

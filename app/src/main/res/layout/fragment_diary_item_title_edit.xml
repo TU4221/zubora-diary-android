@@ -29,6 +29,7 @@
                 android:id="@+id/material_toolbar_top_app_bar"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                app:applyStatusBarTopPadding="@{true}"
                 tools:title="@string/fragment_diary_item_title_edit_toolbar_title_tools_value"/>
 
             <LinearLayout

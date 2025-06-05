@@ -1,61 +1,65 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <View
-        style="@style/AppFragmentBackgroundViewStyle"
-        android:id="@+id/view_full_screen_background"
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        android:layout_height="match_parent">
 
-    <com.google.android.material.appbar.MaterialToolbar
-        style="@style/AppToolbarStyle"
-        android:id="@+id/material_toolbar_top_app_bar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
-
-        <androidx.fragment.app.FragmentContainerView
-            android:id="@+id/fragment_nav_host"
-            android:name="androidx.navigation.fragment.NavHostFragment"
+        <View
+            style="@style/AppFragmentBackgroundViewStyle"
+            android:id="@+id/view_full_screen_background"
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            app:defaultNavHost="true"
-            app:navGraph="@navigation/mobile_navigation" />
+            android:layout_height="match_parent" />
 
-        <androidx.constraintlayout.motion.widget.MotionLayout
-            android:id="@+id/motion_layout_bottom_navigation"
+        <com.google.android.material.appbar.MaterialToolbar
+            style="@style/AppToolbarStyle"
+            android:id="@+id/material_toolbar_top_app_bar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:layoutDescription="@xml/motion_scene_activity_main_bottom_navigation">
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:applyStatusBarTopPadding="@{true}" />
 
-            <!-- MEMO:MotionLayoutタグ内にLayoutタグがないとMotionLayoutが機能しない。 -->
-            <LinearLayout
-                android:id="@+id/linear_layout_bottom_navigation"
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <androidx.fragment.app.FragmentContainerView
+                android:id="@+id/fragment_nav_host"
+                android:name="androidx.navigation.fragment.NavHostFragment"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                app:defaultNavHost="true"
+                app:navGraph="@navigation/mobile_navigation" />
 
-                <com.google.android.material.bottomnavigation.BottomNavigationView
-                    android:id="@+id/bottom_navigation"
+            <androidx.constraintlayout.motion.widget.MotionLayout
+                android:id="@+id/motion_layout_bottom_navigation"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layoutDescription="@xml/motion_scene_activity_main_bottom_navigation">
+
+                <!-- MEMO:MotionLayoutタグ内にLayoutタグがないとMotionLayoutが機能しない。 -->
+                <LinearLayout
+                    android:id="@+id/linear_layout_bottom_navigation"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:fitsSystemWindows="true"
-                    app:menu="@menu/bottom_nav_menu" />
+                    android:layout_height="wrap_content">
 
-            </LinearLayout>
+                    <com.google.android.material.bottomnavigation.BottomNavigationView
+                        android:id="@+id/bottom_navigation"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:fitsSystemWindows="true"
+                        app:menu="@menu/bottom_nav_menu" />
 
-        </androidx.constraintlayout.motion.widget.MotionLayout>
+                </LinearLayout>
 
-    </LinearLayout>
+            </androidx.constraintlayout.motion.widget.MotionLayout>
 
-</FrameLayout>
+        </LinearLayout>
+
+    </FrameLayout>
+</layout>

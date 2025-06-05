@@ -36,6 +36,7 @@
                 android:layout_height="wrap_content"
                 app:onNavigationIconClick="@{() -> diaryShowViewModel.onNavigationClicked()}"
                 app:menu="@menu/diary_show_toolbar_menu"
+                app:applyStatusBarTopPadding="@{true}"
                 tools:title="@string/fragment_diary_show_toolbar_title"/>
 
             <androidx.core.widget.NestedScrollView
