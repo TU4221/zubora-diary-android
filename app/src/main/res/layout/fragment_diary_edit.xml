@@ -8,7 +8,7 @@
         <import type="com.websarva.wings.android.zuboradiary.data.model.Weather" />
         <import type="com.websarva.wings.android.zuboradiary.ui.model.state.DiaryEditState" />
         <variable
-            name="diaryEditViewModel"
+            name="viewModel"
             type="com.websarva.wings.android.zuboradiary.ui.viewmodel.DiaryEditViewModel" />
     </data>
 
@@ -32,8 +32,8 @@
                 android:id="@+id/material_toolbar_top_app_bar"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:title="@{diaryEditViewModel.loadedDate == null ? @string/fragment_diary_edit_toolbar_title_create_new : @string/fragment_diary_edit_toolbar_title_edit}"
-                app:onNavigationIconClick="@{() -> diaryEditViewModel.onNavigationClicked()}"
+                app:title="@{viewModel.loadedDate == null ? @string/fragment_diary_edit_toolbar_title_create_new : @string/fragment_diary_edit_toolbar_title_edit}"
+                app:onNavigationIconClick="@{() -> viewModel.onNavigationClicked()}"
                 app:menu="@menu/diary_edit_toolbar_menu"
                 app:applyStatusBarTopPadding="@{true}"
                 tools:title="@string/fragment_diary_edit_toolbar_title_value_tools" />
@@ -64,8 +64,8 @@
                              日付入力欄はダイアログフラグメントを使用して入力する為、android:text は「1.」を記述する。
                              「2.」の双方向データバイディングを記述した場合、ダイアログで変数値を変更した時に Observer が2回起動する。
 
-                             1. android:text="@{diaryEditViewModel.date}"
-                             2. android:text="@={diaryEditViewModel.date}"
+                             1. android:text="@{viewModel.date}"
+                             2. android:text="@={viewModel.date}"
                               -->
                         <com.google.android.material.textfield.TextInputLayout
                             android:id="@+id/text_input_layout_date"
@@ -82,7 +82,7 @@
                                 android:layout_height="wrap_content"
                                 android:textAppearance="@style/AppTextInputEditTextTextAppearance"
                                 android:textSize="@dimen/fragment_diary_edit_text_size"
-                                android:onClick="@{() -> diaryEditViewModel.onDateInputFieldClicked()}"
+                                android:onClick="@{() -> viewModel.onDateInputFieldClicked()}"
                                 tools:text="@string/fragment_diary_edit_date_value_tools" />
 
                         </com.google.android.material.textfield.TextInputLayout>
@@ -140,7 +140,7 @@
                                 android:layout_height="wrap_content"
                                 android:layout_marginStart="@dimen/fragment_diary_edit_margin_start"
                                 android:layout_weight="1"
-                                android:enabled="@{diaryEditViewModel.weather1 == Weather.UNKNOWN ? false : true}">
+                                android:enabled="@{viewModel.weather1 == Weather.UNKNOWN ? false : true}">
 
                                 <!-- MEMO:"android:contentDescription"で代用-->
                                 <AutoCompleteTextView
@@ -150,7 +150,7 @@
                                     android:layout_height="wrap_content"
                                     android:textAppearance="@style/AppAutoCompleteTextViewDropDownTextAppearance"
                                     android:textColor="@color/text_color_on_surface"
-                                    android:enabled="@{diaryEditViewModel.weather1 == Weather.UNKNOWN ? false : true}"
+                                    android:enabled="@{viewModel.weather1 == Weather.UNKNOWN ? false : true}"
                                     tools:text="@string/fragment_diary_edit_weather_value_tools" />
 
                             </com.google.android.material.textfield.TextInputLayout>
@@ -217,7 +217,7 @@
                                 android:layout_height="wrap_content"
                                 android:hint="@string/fragment_diary_edit_title_hint"
                                 android:maxLength="@integer/fragment_diary_edit_title_max_length"
-                                android:text="@={diaryEditViewModel.titleMutableStateFlow}"
+                                android:text="@={viewModel.titleMutableStateFlow}"
                                 android:textAppearance="@style/AppTextInputEditTextTextAppearance"
                                 android:textSize="@dimen/fragment_diary_edit_text_size"
                                 tools:ignore="DuplicateSpeakableTextCheck" />
@@ -227,38 +227,38 @@
                         <include
                             android:id="@+id/include_item_1"
                             layout="@layout/layout_diary_edit_item"
-                            app:commentMutableStateFlow="@{diaryEditViewModel.item1CommentMutable}"
+                            app:commentMutableStateFlow="@{viewModel.item1CommentMutable}"
                             app:itemNumber="@{@string/fragment_diary_edit_item_1}"
-                            app:titleMutableStateFlow="@{diaryEditViewModel.item1TitleMutable}" />
+                            app:titleMutableStateFlow="@{viewModel.item1TitleMutable}" />
 
                         <include
                             android:id="@+id/include_item_2"
                             layout="@layout/layout_diary_edit_item"
-                            app:commentMutableStateFlow="@{diaryEditViewModel.item2CommentMutable}"
+                            app:commentMutableStateFlow="@{viewModel.item2CommentMutable}"
                             app:itemNumber="@{@string/fragment_diary_edit_item_2}"
-                            app:titleMutableStateFlow="@{diaryEditViewModel.item2TitleMutable}" />
+                            app:titleMutableStateFlow="@{viewModel.item2TitleMutable}" />
 
                         <include
                             android:id="@+id/include_item_3"
                             layout="@layout/layout_diary_edit_item"
-                            app:commentMutableStateFlow="@{diaryEditViewModel.item3CommentMutable}"
+                            app:commentMutableStateFlow="@{viewModel.item3CommentMutable}"
                             app:itemNumber="@{@string/fragment_diary_edit_item_3}"
-                            app:titleMutableStateFlow="@{diaryEditViewModel.item3TitleMutable}" />
+                            app:titleMutableStateFlow="@{viewModel.item3TitleMutable}" />
 
                         <include
                             android:id="@+id/include_item_4"
                             layout="@layout/layout_diary_edit_item"
-                            app:commentMutableStateFlow="@{diaryEditViewModel.item4CommentMutable}"
+                            app:commentMutableStateFlow="@{viewModel.item4CommentMutable}"
                             app:itemNumber="@{@string/fragment_diary_edit_item_4}"
-                            app:titleMutableStateFlow="@{diaryEditViewModel.item4TitleMutable}" />
+                            app:titleMutableStateFlow="@{viewModel.item4TitleMutable}" />
 
                         <!-- MEMO:ViewBindingを使用している為、tools:ignore="DuplicateIncludedIds"記述 -->
                         <include
                             android:id="@+id/include_item_5"
                             layout="@layout/layout_diary_edit_item"
-                            app:commentMutableStateFlow="@{diaryEditViewModel.item5CommentMutable}"
+                            app:commentMutableStateFlow="@{viewModel.item5CommentMutable}"
                             app:itemNumber="@{@string/fragment_diary_edit_item_5}"
-                            app:titleMutableStateFlow="@{diaryEditViewModel.item5TitleMutable}"
+                            app:titleMutableStateFlow="@{viewModel.item5TitleMutable}"
                             tools:ignore="DuplicateIncludedIds" />
 
                         <!--
@@ -276,9 +276,9 @@
                             android:layout_gravity="end"
                             android:layout_marginTop="@dimen/fragment_diary_edit_margin_top"
                             android:contentDescription="@string/fragment_diary_edit_item_addition"
-                            android:src="@{diaryEditViewModel.isItemAdditionButtonClickable() ? @drawable/ic_add_circle_24px : @drawable/ic_add_circle_disabled_24px}"
-                            android:clickable="@{diaryEditViewModel.isItemAdditionButtonClickable()}"
-                            android:onClick="@{() -> diaryEditViewModel.onItemAdditionButtonClicked()}"/>
+                            android:src="@{viewModel.isItemAdditionButtonClickable() ? @drawable/ic_add_circle_24px : @drawable/ic_add_circle_disabled_24px}"
+                            android:clickable="@{viewModel.isItemAdditionButtonClickable()}"
+                            android:onClick="@{() -> viewModel.onItemAdditionButtonClicked()}"/>
 
                         <LinearLayout
                             android:layout_width="match_parent"
@@ -312,9 +312,9 @@
                                 android:layout_height="@dimen/fragment_diary_edit_delete_button_layout_height"
                                 android:layout_gravity="center_vertical"
                                 android:contentDescription="@string/fragment_diary_edit_attached_picture_delete"
-                                android:src="@{diaryEditViewModel.isPicturePathDeleteButtonClickable() ? @drawable/ic_delete_forever_24px : @drawable/ic_delete_forever_disabled_24px}"
-                                android:clickable="@{diaryEditViewModel.isPicturePathDeleteButtonClickable()}"
-                                android:onClick="@{() -> diaryEditViewModel.onAttachedPictureDeleteButtonClicked()}"/>
+                                android:src="@{viewModel.isPicturePathDeleteButtonClickable() ? @drawable/ic_delete_forever_24px : @drawable/ic_delete_forever_disabled_24px}"
+                                android:clickable="@{viewModel.isPicturePathDeleteButtonClickable()}"
+                                android:onClick="@{() -> viewModel.onAttachedPictureDeleteButtonClicked()}"/>
 
                         </LinearLayout>
 
@@ -349,7 +349,7 @@
         <include
             layout="@layout/layout_full_screen_circular_progress_indicator"
             android:id="@+id/include_progress_indicator"
-            app:visibility="@{diaryEditViewModel.isVisibleUpdateProgressBar ? View.VISIBLE : View.INVISIBLE}" />
+            app:visibility="@{viewModel.isVisibleUpdateProgressBar ? View.VISIBLE : View.INVISIBLE}" />
 
     </FrameLayout>
 

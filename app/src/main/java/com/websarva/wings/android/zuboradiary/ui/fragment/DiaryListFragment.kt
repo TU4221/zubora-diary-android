@@ -56,7 +56,7 @@ class DiaryListFragment : BaseFragment<FragmentDiaryListBinding>() {
         return FragmentDiaryListBinding.inflate(themeColorInflater, container, false)
             .apply {
                 lifecycleOwner = this@DiaryListFragment.viewLifecycleOwner
-                listViewModel = mainViewModel
+                viewModel = mainViewModel
             }
     }
 

@@ -96,7 +96,7 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding>() {
         return FragmentDiaryEditBinding.inflate(themeColorInflater, container, false)
             .apply {
                 lifecycleOwner = this@DiaryEditFragment.viewLifecycleOwner
-                diaryEditViewModel = mainViewModel
+                viewModel = mainViewModel
             }
     }
 

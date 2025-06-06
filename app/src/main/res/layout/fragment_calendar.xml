@@ -83,7 +83,7 @@
                             <include
                                 layout="@layout/layout_diary_show"
                                 android:id="@+id/include_diary_show"
-                                app:diaryShowViewModel="@{diaryShowViewModel}" />
+                                app:viewModel="@{diaryShowViewModel}" />
 
                         </FrameLayout>
 

@@ -7,7 +7,7 @@
         <import type="android.view.View" />
         <import type="com.websarva.wings.android.zuboradiary.ui.model.state.WordSearchState" />
         <variable
-            name="word_search_view_model"
+            name="viewModel"
             type="com.websarva.wings.android.zuboradiary.ui.viewmodel.WordSearchViewModel" />
 
     </data>
@@ -37,7 +37,7 @@
                     android:id="@+id/material_toolbar_top_app_bar"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    app:onNavigationIconClick="@{() -> word_search_view_model.onNavigationButtonClicked()}" />
+                    app:onNavigationIconClick="@{() -> viewModel.onNavigationButtonClicked()}" />
 
                 <FrameLayout
                     android:layout_width="match_parent"
@@ -59,7 +59,7 @@
                         android:paddingStart="16dp"
                         android:paddingEnd="48dp"
                         android:textAppearance="@style/WordSearchTextViewTextAppearance"
-                        android:text="@={word_search_view_model.searchWordMutableStateFlow}"
+                        android:text="@={viewModel.searchWordMutableStateFlow}"
                         android:hint="@string/fragment_word_search_input_field_hint"
                         android:textSize="16sp" />
 
@@ -71,7 +71,7 @@
                         android:layout_gravity="center_vertical|end"
                         android:layout_marginHorizontal="8dp"
                         android:contentDescription="@string/fragment_word_search_input_field_clear"
-                        android:onClick="@{() -> word_search_view_model.onSearchWordClearButtonClicked()}" />
+                        android:onClick="@{() -> viewModel.onSearchWordClearButtonClicked()}" />
 
                 </FrameLayout>
 
@@ -90,7 +90,7 @@
                     android:text="@string/fragment_word_search_no_results_message"
                     android:gravity="center_horizontal"
                     android:paddingTop="100dp"
-                    android:visibility="@{word_search_view_model.isNoResultsMessageVisible ? View.VISIBLE : View.INVISIBLE}"
+                    android:visibility="@{viewModel.isNoResultsMessageVisible ? View.VISIBLE : View.INVISIBLE}"
                     tools:visibility="visible"/>
 
                 <LinearLayout
@@ -98,7 +98,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:orientation="vertical"
-                    android:visibility="@{word_search_view_model.isResultsVisible ? View.VISIBLE : View.INVISIBLE}"
+                    android:visibility="@{viewModel.isResultsVisible ? View.VISIBLE : View.INVISIBLE}"
                     tools:visibility="visible" >
 
                     <TextView
@@ -107,9 +107,9 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:textAppearance="@style/AppTextViewTextAppearance"
-                        android:text="@{Integer.toString(word_search_view_model.numWordSearchResults) + @string/fragment_word_search_num_results_message}"
+                        android:text="@{Integer.toString(viewModel.numWordSearchResults) + @string/fragment_word_search_num_results_message}"
                         android:padding="8dp"
-                        android:visibility="@{word_search_view_model.isNumResultsVisible ? View.VISIBLE : View.INVISIBLE}"
+                        android:visibility="@{viewModel.isNumResultsVisible ? View.VISIBLE : View.INVISIBLE}"
                         tools:visibility="visible" />
 
                     <!-- MEMO:スクロールバーを表示させたいが、子RecyclerViewに反応してスクロールバーの長さが安定しない。
@@ -126,7 +126,7 @@
                 <include
                     layout="@layout/layout_full_screen_circular_progress_indicator"
                     android:id="@+id/include_progress_indicator"
-                    app:visibility="@{word_search_view_model.viewModelState instanceof WordSearchState.Updating ? View.VISIBLE : View.INVISIBLE}" />
+                    app:visibility="@{viewModel.viewModelState instanceof WordSearchState.Updating ? View.VISIBLE : View.INVISIBLE}" />
 
             </FrameLayout>
 
@@ -142,7 +142,7 @@
             android:layout_marginBottom="@dimen/fab_margin_bottom"
             android:src="@drawable/ic_arrow_upward_24px"
             android:contentDescription="@string/fragment_word_search_fab_top_scroll"
-            android:enabled="@{word_search_view_model.viewModelState instanceof WordSearchState.Updating ? false : true}"/>
+            android:enabled="@{viewModel.viewModelState instanceof WordSearchState.Updating ? false : true}"/>
 
     </FrameLayout>
 

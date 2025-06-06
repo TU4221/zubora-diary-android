@@ -7,7 +7,7 @@
         <import type="android.view.View" />
         <import type="com.websarva.wings.android.zuboradiary.ui.model.state.DiaryListState" />
         <variable
-            name="list_view_model"
+            name="viewModel"
             type="com.websarva.wings.android.zuboradiary.ui.viewmodel.DiaryListViewModel" />
     </data>
 
@@ -34,7 +34,7 @@
                 app:menu="@menu/diary_list_toolbar_menu"
                 app:navigationIcon="@drawable/ic_calendar_month_24px"
                 app:navigationContentDescription="@string/fragment_diary_list_toolbar_navigation_top_year_month_switching"
-                app:onNavigationIconClick="@{() -> list_view_model.onNavigationClicked()}"
+                app:onNavigationIconClick="@{() -> viewModel.onNavigationClicked()}"
                 app:title="@string/fragment_diary_list_toolbar_title"
                 app:applyStatusBarTopPadding="@{true}"/>
 
@@ -50,7 +50,7 @@
                     android:textAppearance="@style/AppTextViewTextAppearance"
                     android:text="@string/fragment_diary_list_no_saved_diary_message"
                     android:gravity="center"
-                    android:visibility="@{list_view_model.viewModelState instanceof DiaryListState.NoResults ? View.VISIBLE : View.INVISIBLE}"
+                    android:visibility="@{viewModel.viewModelState instanceof DiaryListState.NoResults ? View.VISIBLE : View.INVISIBLE}"
                     tools:visibility="visible"/>
 
                 <!-- MEMO:スクロールバーを表示させたいが、子RecyclerViewに反応してスクロールバーの長さが安定しない。
@@ -60,14 +60,14 @@
                     android:id="@+id/recycler_diary_list"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:visibility="@{list_view_model.viewModelState instanceof DiaryListState.NoResults ? View.INVISIBLE : View.VISIBLE}"
+                    android:visibility="@{viewModel.viewModelState instanceof DiaryListState.NoResults ? View.INVISIBLE : View.VISIBLE}"
                     android:scrollbars="none"
                     tools:visibility="visible"/>
 
                 <include
                     layout="@layout/layout_full_screen_circular_progress_indicator"
                     android:id="@+id/include_progress_indicator"
-                    app:visibility="@{list_view_model.viewModelState instanceof DiaryListState.Updating ? View.VISIBLE : View.INVISIBLE}" />
+                    app:visibility="@{viewModel.viewModelState instanceof DiaryListState.Updating ? View.VISIBLE : View.INVISIBLE}" />
 
             </FrameLayout>
 
@@ -83,8 +83,8 @@
             android:layout_marginBottom="@dimen/fab_margin_bottom"
             android:src="@drawable/ic_edit_24px"
             android:contentDescription="@string/fragment_diary_list_fab_new_diary_creation"
-            android:enabled="@{list_view_model.viewModelState instanceof DiaryListState.Updating ? false : true}"
-            android:onClick="@{() -> list_view_model.onDiaryEditButtonClicked()}"/>
+            android:enabled="@{viewModel.viewModelState instanceof DiaryListState.Updating ? false : true}"
+            android:onClick="@{() -> viewModel.onDiaryEditButtonClicked()}"/>
 
     </FrameLayout>
 

@@ -10,7 +10,7 @@
                   上手くビルド(クラス生成)がされない不具合が発生する。
                   https://qiita.com/nanoyatsu/items/afad39a63d42d6fa3ac8 -->
         <variable
-            name="diaryShowViewModel"
+            name="viewModel"
             type="com.websarva.wings.android.zuboradiary.ui.viewmodel.DiaryShowViewModel" />
     </data>
 
@@ -34,7 +34,7 @@
                 android:id="@+id/material_toolbar_top_app_bar"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:onNavigationIconClick="@{() -> diaryShowViewModel.onNavigationClicked()}"
+                app:onNavigationIconClick="@{() -> viewModel.onNavigationClicked()}"
                 app:menu="@menu/diary_show_toolbar_menu"
                 app:applyStatusBarTopPadding="@{true}"
                 tools:title="@string/fragment_diary_show_toolbar_title"/>
@@ -53,7 +53,7 @@
                     <include
                         layout="@layout/layout_diary_show"
                         android:id="@+id/include_diary_show"
-                        app:diaryShowViewModel="@{diaryShowViewModel}" />
+                        app:viewModel="@{viewModel}" />
 
                 </FrameLayout>
 

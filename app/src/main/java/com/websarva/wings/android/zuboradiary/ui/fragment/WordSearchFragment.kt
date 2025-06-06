@@ -49,7 +49,7 @@ class WordSearchFragment : BaseFragment<FragmentWordSearchBinding>() {
         return FragmentWordSearchBinding.inflate(themeColorInflater, container, false)
             .apply {
                 lifecycleOwner = this@WordSearchFragment.viewLifecycleOwner
-                wordSearchViewModel = mainViewModel
+                viewModel = mainViewModel
             }
     }
 
