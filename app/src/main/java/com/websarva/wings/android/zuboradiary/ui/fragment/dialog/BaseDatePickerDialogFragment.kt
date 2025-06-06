@@ -5,9 +5,7 @@ import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.activityViewModels
-import androidx.navigation.fragment.NavHostFragment
 import com.google.android.material.datepicker.MaterialDatePicker
-import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import com.websarva.wings.android.zuboradiary.ui.utils.requireValue
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.SettingsViewModel
@@ -98,13 +96,4 @@ abstract class BaseDatePickerDialogFragment : DialogFragment() {
     internal abstract fun handleOnNegativeButtonClick()
 
     internal abstract fun handleOnCancel()
-
-    @Suppress("SameParameterValue")
-    internal fun <T> setResult(resultKey: String, result: DialogResult<T>) {
-        val navController = NavHostFragment.findNavController(this)
-        val navBackStackEntry = checkNotNull(navController.previousBackStackEntry)
-        val savedStateHandle = navBackStackEntry.savedStateHandle
-
-        savedStateHandle[resultKey] = result
-    }
 }

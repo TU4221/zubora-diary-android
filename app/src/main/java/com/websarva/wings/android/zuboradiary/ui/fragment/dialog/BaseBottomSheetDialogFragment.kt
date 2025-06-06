@@ -13,7 +13,6 @@ import androidx.viewbinding.ViewBinding
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
-import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import com.websarva.wings.android.zuboradiary.ui.theme.ThemeColorInflaterCreator
 import com.websarva.wings.android.zuboradiary.ui.utils.enableEdgeToEdge
@@ -110,13 +109,5 @@ abstract class BaseBottomSheetDialogFragment<T: ViewBinding> : BottomSheetDialog
         Log.d(logTag, "onDestroyView()")
         super.onDestroyView()
         _binding = null
-    }
-
-    internal fun <T> setResult(resultKey: String, result: DialogResult<T>) {
-        val navController = NavHostFragment.findNavController(this)
-        val navBackStackEntry = checkNotNull(navController.previousBackStackEntry)
-        val savedStateHandle = navBackStackEntry.savedStateHandle
-
-        savedStateHandle[resultKey] = result
     }
 }
