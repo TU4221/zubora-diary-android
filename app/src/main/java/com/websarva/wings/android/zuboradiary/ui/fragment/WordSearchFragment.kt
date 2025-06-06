@@ -48,7 +48,7 @@ class WordSearchFragment : BaseFragment<FragmentWordSearchBinding>() {
     ): FragmentWordSearchBinding {
         return FragmentWordSearchBinding.inflate(themeColorInflater, container, false)
             .apply {
-                lifecycleOwner = this@WordSearchFragment.viewLifecycleOwner
+                lifecycleOwner = viewLifecycleOwner
                 viewModel = mainViewModel
             }
     }

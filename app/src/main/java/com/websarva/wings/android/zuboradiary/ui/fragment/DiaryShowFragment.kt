@@ -53,7 +53,7 @@ internal class DiaryShowFragment : BaseFragment<FragmentDiaryShowBinding>() {
     ): FragmentDiaryShowBinding {
         return FragmentDiaryShowBinding.inflate(themeColorInflater, container, false)
             .apply {
-                lifecycleOwner = this@DiaryShowFragment.viewLifecycleOwner
+                lifecycleOwner = viewLifecycleOwner
                 viewModel = mainViewModel
             }
     }

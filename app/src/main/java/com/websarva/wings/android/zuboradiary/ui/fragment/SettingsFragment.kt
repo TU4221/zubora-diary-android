@@ -99,7 +99,7 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>() {
     ): FragmentSettingsBinding {
         return FragmentSettingsBinding.inflate(themeColorInflater, container, false)
             .apply {
-                lifecycleOwner = this@SettingsFragment.viewLifecycleOwner
+                lifecycleOwner = viewLifecycleOwner
                 viewModel = mainViewModel
             }
     }

@@ -75,8 +75,8 @@ class CalendarFragment : BaseFragment<FragmentCalendarBinding>() {
     ): FragmentCalendarBinding {
         return FragmentCalendarBinding.inflate(themeColorInflater, container, false)
             .apply {
-                lifecycleOwner = this@CalendarFragment.viewLifecycleOwner
-                calendarViewModel = this@CalendarFragment.mainViewModel
+                lifecycleOwner = viewLifecycleOwner
+                calendarViewModel = mainViewModel
                 diaryShowViewModel = this@CalendarFragment.diaryShowViewModel
             }
     }

@@ -46,7 +46,7 @@ class DiaryItemTitleEditFragment : BaseFragment<FragmentDiaryItemTitleEditBindin
     ): FragmentDiaryItemTitleEditBinding {
         return FragmentDiaryItemTitleEditBinding.inflate(themeColorInflater, container, false)
             .apply {
-                lifecycleOwner = this@DiaryItemTitleEditFragment.viewLifecycleOwner
+                lifecycleOwner = viewLifecycleOwner
                 viewModel = mainViewModel
             }
     }
