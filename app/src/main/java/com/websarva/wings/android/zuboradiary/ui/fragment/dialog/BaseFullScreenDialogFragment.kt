@@ -4,10 +4,10 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.databinding.ViewDataBinding
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
+import androidx.viewbinding.ViewBinding
 import com.websarva.wings.android.zuboradiary.R
 import com.websarva.wings.android.zuboradiary.data.model.ThemeColor
 import com.websarva.wings.android.zuboradiary.ui.theme.ThemeColorInflaterCreator
@@ -15,7 +15,7 @@ import com.websarva.wings.android.zuboradiary.ui.utils.enableEdgeToEdge
 import com.websarva.wings.android.zuboradiary.ui.utils.requireValue
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.SettingsViewModel
 
-abstract class BaseFullScreenDialogFragment<T: ViewDataBinding>: DialogFragment() {
+abstract class BaseFullScreenDialogFragment<T: ViewBinding>: DialogFragment() {
 
     // View関係
     private var _binding: T? = null
