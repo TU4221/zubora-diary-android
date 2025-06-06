@@ -49,13 +49,13 @@ internal open class ThemeColorChanger {
         applyTextViewsColorOnlyText(textViewList, onSurfaceColor)
     }
 
-    fun applyStatusBarColor(window: Window, themeColor: ThemeColor) {
+    fun applyStatusBarIconColor(window: Window, themeColor: ThemeColor) {
         // ステータスバーのアイコンの色を変更(白 or 灰)
         val isLight = themeColor.isAppearanceLightStatusBars
         WindowInsetsControllerCompat(window, window.decorView).isAppearanceLightStatusBars = isLight
     }
 
-    fun applyNavigationBarColor(window: Window, themeColor: ThemeColor) {
+    fun applyNavigationBarIconColor(window: Window, themeColor: ThemeColor) {
         // ナビゲエーションバーのアイコンの色を変更
         val isLight = themeColor.isAppearanceLightStatusBars
         WindowInsetsControllerCompat(window, window.decorView).isAppearanceLightNavigationBars = isLight

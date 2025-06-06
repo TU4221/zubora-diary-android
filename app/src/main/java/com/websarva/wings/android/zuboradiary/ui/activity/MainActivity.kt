@@ -143,8 +143,8 @@ class MainActivity : LoggingActivity() {
 
     private fun switchThemeColor(themeColor: ThemeColor) {
         val changer = ThemeColorChanger()
-        changer.applyStatusBarColor(window, themeColor)
-        changer.applyNavigationBarColor(window, themeColor)
+        changer.applyStatusBarIconColor(window, themeColor)
+        changer.applyNavigationBarIconColor(window, themeColor)
         changer.applyBackgroundColor(binding.viewFullScreenBackground, themeColor)
         changer.applyToolbarColor(binding.materialToolbarTopAppBar, themeColor)
         changer.applyBottomNavigationColor(binding.bottomNavigation, themeColor)

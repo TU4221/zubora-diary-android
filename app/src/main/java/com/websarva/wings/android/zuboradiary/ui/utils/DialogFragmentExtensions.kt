@@ -22,5 +22,5 @@ private fun setUpEdgeToEdge(window: Window) {
 
 private fun setUpStatusBarAndNavigationBarIconColor(window: Window, themeColor: ThemeColor) {
     val changer = ThemeColorChanger()
-    changer.applyNavigationBarColor(window, themeColor)
+    changer.applyNavigationBarIconColor(window, themeColor)
 }
