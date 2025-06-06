@@ -87,7 +87,7 @@ abstract class BaseFragment<T: ViewBinding> : LoggingFragment() {
 
         setUpFragmentTransitionEffect()
 
-        val themeColorInflater = createThemeColorInflater(inflater)
+        val themeColorInflater = ThemeColorInflaterCreator().create(inflater, themeColor)
         _binding = createViewBinding(themeColorInflater, requireNotNull(container))
         return binding.root
     }
@@ -98,11 +98,6 @@ abstract class BaseFragment<T: ViewBinding> : LoggingFragment() {
     internal abstract fun createViewBinding(
         themeColorInflater: LayoutInflater, container: ViewGroup
     ): T
-
-    // ThemeColorに合わせたインフレーター作成
-    private fun createThemeColorInflater(inflater: LayoutInflater): LayoutInflater {
-        return ThemeColorInflaterCreator().create(inflater, themeColor)
-    }
 
     private fun setUpFragmentTransitionEffect() {
         // FROM:遷移元 TO:遷移先

@@ -9,7 +9,6 @@ import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import androidx.viewbinding.ViewBinding
 import com.websarva.wings.android.zuboradiary.R
-import com.websarva.wings.android.zuboradiary.data.model.ThemeColor
 import com.websarva.wings.android.zuboradiary.ui.theme.ThemeColorInflaterCreator
 import com.websarva.wings.android.zuboradiary.ui.utils.enableEdgeToEdge
 import com.websarva.wings.android.zuboradiary.ui.utils.requireValue
@@ -38,17 +37,9 @@ abstract class BaseFullScreenDialogFragment<T: ViewBinding>: DialogFragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View? {
-        val themeColorInflater = createThemeColorInflater(inflater, themeColor)
+        val themeColorInflater = ThemeColorInflaterCreator().create(inflater, themeColor)
         _binding = createViewBinding(themeColorInflater, container)
         return binding.root
-    }
-
-    // ThemeColorに合わせたインフレーター作成
-    private fun createThemeColorInflater(
-        inflater: LayoutInflater,
-        themeColor: ThemeColor
-    ): LayoutInflater {
-        return ThemeColorInflaterCreator().create(inflater, themeColor)
     }
 
     internal abstract fun createViewBinding(inflater: LayoutInflater, container: ViewGroup?): T
