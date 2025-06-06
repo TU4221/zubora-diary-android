@@ -321,4 +321,16 @@ internal enum class ThemeColor @Suppress("unused") constructor(
                 YELLOW -> R.style.MaterialAlertDialogThemeColorYellow
             }
         }
+
+    val bottomSheetDialogThemeResId: Int
+        get() {
+            return when (this) {
+                WHITE -> R.style.AppBottomSheetDialogThemeColorWhite
+                BLACK -> R.style.AppBottomSheetDialogThemeColorBlack
+                RED -> R.style.AppBottomSheetDialogThemeColorRed
+                BLUE -> R.style.AppBottomSheetDialogThemeColorBlue
+                GREEN -> R.style.AppBottomSheetDialogThemeColorGreen
+                YELLOW -> R.style.AppBottomSheetDialogThemeColorYellow
+            }
+        }
 }

@@ -2,6 +2,13 @@
 <resources>
     <!-- Common -->
     <!-- *************************************************************************************** -->
+
+    <!-- RootView -->
+    <!-- MEMO:Viewのデフォルトスタイルなし -->
+    <style name="AppRootViewStyle">
+        <item name="android:background">?attr/colorSurface</item>
+    </style>
+
     <!-- View -->
     <!-- MEMO:Viewのデフォルトスタイルなし -->
     <style name="AppFragmentBackgroundViewStyle">
@@ -256,6 +263,63 @@
 
     <!-- BottomSheetsCommon -->
     <!-- ******************************************************************************** -->
+
+    <style name="AppBaseBottomSheetDialogStyle" parent="ThemeOverlay.Material3.BottomSheetDialog">
+        <!-- MEMO:下記はEdgeToEdgeに対応できるように設定 -->
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+    </style>
+
+    <style name="AppBottomSheetDialogThemeColorWhite" parent="AppBaseBottomSheetDialogStyle">
+        <item name="bottomSheetStyle">@style/AppModalBottomSheetThemeColorWhite</item>
+    </style>
+
+    <style name="AppBottomSheetDialogThemeColorBlack" parent="AppBaseBottomSheetDialogStyle">
+        <item name="bottomSheetStyle">@style/AppModalBottomSheetThemeColorBlack</item>
+    </style>
+
+    <style name="AppBottomSheetDialogThemeColorRed" parent="AppBaseBottomSheetDialogStyle">
+        <item name="bottomSheetStyle">@style/AppModalBottomSheetThemeColorRed</item>
+    </style>
+
+    <style name="AppBottomSheetDialogThemeColorBlue" parent="AppBaseBottomSheetDialogStyle">
+        <item name="bottomSheetStyle">@style/AppModalBottomSheetThemeColorBlue</item>
+    </style>
+
+    <style name="AppBottomSheetDialogThemeColorGreen" parent="AppBaseBottomSheetDialogStyle">
+        <item name="bottomSheetStyle">@style/AppModalBottomSheetThemeColorGreen</item>
+    </style>
+
+    <style name="AppBottomSheetDialogThemeColorYellow" parent="AppBaseBottomSheetDialogStyle">
+        <item name="bottomSheetStyle">@style/AppModalBottomSheetThemeColorYellow</item>
+    </style>
+
+    <style name="AppBaseModalBottomSheetStyle" parent="Widget.Material3.BottomSheet.Modal">
+    </style>
+
+    <style name="AppModalBottomSheetThemeColorWhite" parent="AppBaseModalBottomSheetStyle">
+        <item name="backgroundTint">@color/md_theme_color_white_surface</item>
+    </style>
+
+    <style name="AppModalBottomSheetThemeColorBlack" parent="AppBaseModalBottomSheetStyle">
+        <item name="backgroundTint">@color/md_theme_color_black_surface</item>
+    </style>
+
+    <style name="AppModalBottomSheetThemeColorRed" parent="AppBaseModalBottomSheetStyle">
+        <item name="backgroundTint">@color/md_theme_color_red_surface</item>
+    </style>
+
+    <style name="AppModalBottomSheetThemeColorBlue" parent="AppBaseModalBottomSheetStyle">
+        <item name="backgroundTint">@color/md_theme_color_blue_surface</item>
+    </style>
+
+    <style name="AppModalBottomSheetThemeColorGreen" parent="AppBaseModalBottomSheetStyle">
+        <item name="backgroundTint">@color/md_theme_color_green_surface</item>
+    </style>
+
+    <style name="AppModalBottomSheetThemeColorYellow" parent="AppBaseModalBottomSheetStyle">
+        <item name="backgroundTint">@color/md_theme_color_yellow_surface</item>
+    </style>
+
     <style name="BottomSheetTopBarBackgroundLayoutStyle" >
         <item name="android:background">?colorSecondaryContainer</item>
     </style>
