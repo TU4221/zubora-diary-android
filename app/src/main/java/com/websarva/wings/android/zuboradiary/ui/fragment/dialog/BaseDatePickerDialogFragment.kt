@@ -14,6 +14,7 @@ import com.websarva.wings.android.zuboradiary.ui.viewmodel.SettingsViewModel
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
+import java.time.ZoneOffset
 
 
 abstract class BaseDatePickerDialogFragment : DialogFragment() {
@@ -51,8 +52,12 @@ abstract class BaseDatePickerDialogFragment : DialogFragment() {
         builder.setTheme(themeResId)
 
         val initialDate = createInitialDate()
+        // MEMO：MaterialDatePickerはUTC基準の為UTC基準で変換
         val initialEpochMilli =
-            initialDate.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
+            initialDate
+                .atStartOfDay(ZoneOffset.UTC) // UTCでのその日の始まりの時刻(00:00)を取得
+                .toInstant() // UTC基準の時点に変換
+                .toEpochMilli()
         builder.setSelection(initialEpochMilli)
 
         val datePicker = builder.build()
