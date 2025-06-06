@@ -5,6 +5,7 @@ import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.MenuItem
+import android.view.Window
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
@@ -113,10 +114,11 @@ class MainActivity : LoggingActivity() {
     // MEMO:EdgeToEdge対応。下記ページ参照。
     //      https://developer.android.com/develop/ui/views/layout/edge-to-edge?hl=ja
     //      https://developer.android.com/codelabs/edge-to-edge?hl=ja#2
-    @RequiresApi(Build.VERSION_CODES.Q)
     private fun setUpEdgeToEdge() {
         enableEdgeToEdge()
-        window.isNavigationBarContrastEnforced = false
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            window.isNavigationBarContrastEnforced = false
+        }
     }
 
     private fun setUpMainActivityBinding() {
