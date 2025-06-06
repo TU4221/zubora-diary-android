@@ -107,7 +107,6 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        setUpScrollPosition()
         setUpThemeColorSettingItem()
         setUpCalendarStartDaySettingItem()
         setUpReminderNotificationSettingItem()
@@ -263,10 +262,6 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>() {
         }
     }
 
-    private fun setUpScrollPosition() {
-        binding.scrollViewSettings.scrollY = settingsViewModel.scrollPositionY
-    }
-
     private fun setUpThemeColorSettingItem() {
         launchAndRepeatOnViewLifeCycleStarted {
             settingsViewModel.themeColor
@@ -406,10 +401,6 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>() {
                     binding.includeReminderNotificationSetting.textValue.text = timeString
                 }
         }
-    }
-
-    private fun saveScrollPosition() {
-        settingsViewModel.scrollPositionY = binding.scrollViewSettings.scrollY
     }
 
     private fun navigateThemeColorPickerDialog() {

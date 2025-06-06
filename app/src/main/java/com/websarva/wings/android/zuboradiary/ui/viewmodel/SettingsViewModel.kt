@@ -90,9 +90,6 @@ internal class SettingsViewModel @Inject constructor(
 
     lateinit var isAllSettingsNotNull: StateFlow<Boolean>
 
-    private val initialScrollPositionY = 0
-    var scrollPositionY = initialScrollPositionY
-
     init {
         setUpPreferencesValueLoading()
     }
@@ -100,7 +97,6 @@ internal class SettingsViewModel @Inject constructor(
     override fun initialize() {
         super.initialize()
         setUpPreferencesValueLoading()
-        scrollPositionY = initialScrollPositionY
     }
 
     private fun setUpPreferencesValueLoading() {
