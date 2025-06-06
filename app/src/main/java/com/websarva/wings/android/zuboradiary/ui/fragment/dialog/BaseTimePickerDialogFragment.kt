@@ -24,7 +24,7 @@ abstract class BaseTimePickerDialogFragment : DialogFragment() {
     //      委譲プロパティによるViewModel生成は公式が推奨する方法の為、警告を無視する。その為、@Suppressを付与する。
     //      この警告に対応するSuppressネームはなく、"unused"のみでは不要Suppressとなる為、"RedundantSuppression"も追記する。
     @Suppress("unused", "RedundantSuppression")
-    internal val settingsViewModel: SettingsViewModel by activityViewModels()
+    private val settingsViewModel: SettingsViewModel by activityViewModels()
 
     private val themeColor
         get() = settingsViewModel.themeColor.requireValue()
