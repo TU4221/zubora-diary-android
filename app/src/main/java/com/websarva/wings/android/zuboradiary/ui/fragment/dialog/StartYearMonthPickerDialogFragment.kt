@@ -1,7 +1,6 @@
 package com.websarva.wings.android.zuboradiary.ui.fragment.dialog
 
 import android.view.View
-import com.websarva.wings.android.zuboradiary.databinding.DialogFragmentNumberPickersBinding
 import com.websarva.wings.android.zuboradiary.ui.fragment.RESULT_KEY_PREFIX
 import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
 import java.time.LocalDate
@@ -34,7 +33,7 @@ class StartYearMonthPickerDialogFragment : BaseNumberPickersBottomSheetDialogFra
         setResult(KEY_RESULT, DialogResult.Cancel)
     }
 
-    override fun setUpNumberPickers(binding: DialogFragmentNumberPickersBinding) {
+    override fun setUpNumberPickers() {
         val today = LocalDate.now()
         val maxYear =
             StartYearMonthPickerDialogFragmentArgs.fromBundle(requireArguments()).maxYear

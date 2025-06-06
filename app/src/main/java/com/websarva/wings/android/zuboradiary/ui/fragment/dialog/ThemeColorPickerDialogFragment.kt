@@ -2,7 +2,6 @@ package com.websarva.wings.android.zuboradiary.ui.fragment.dialog
 
 import android.view.View
 import com.websarva.wings.android.zuboradiary.data.model.ThemeColor
-import com.websarva.wings.android.zuboradiary.databinding.DialogFragmentNumberPickersBinding
 import com.websarva.wings.android.zuboradiary.ui.fragment.RESULT_KEY_PREFIX
 import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
 
@@ -32,7 +31,7 @@ class ThemeColorPickerDialogFragment : BaseNumberPickersBottomSheetDialogFragmen
         setResult(KEY_RESULT, DialogResult.Cancel)
     }
 
-    override fun setUpNumberPickers(binding: DialogFragmentNumberPickersBinding) {
+    override fun setUpNumberPickers() {
         val maxNumThemeColors = ThemeColor.entries.size
         binding.numberPickerFirst.maxValue = maxNumThemeColors - 1
         binding.numberPickerFirst.minValue = 0

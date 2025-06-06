@@ -2,6 +2,7 @@ package com.websarva.wings.android.zuboradiary.ui.fragment.dialog
 
 import android.content.Context
 import android.os.Build
+import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -10,25 +11,18 @@ import androidx.appcompat.view.ContextThemeWrapper
 import com.websarva.wings.android.zuboradiary.databinding.DialogFragmentNumberPickersBinding
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 
-abstract class BaseNumberPickersBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
+abstract class BaseNumberPickersBottomSheetDialogFragment
+    : BaseBottomSheetDialogFragment<DialogFragmentNumberPickersBinding>() {
 
     private val logTag = createLogTag()
 
-    // View関係
-    private var _binding: DialogFragmentNumberPickersBinding? = null
-    internal val binding get() = checkNotNull(_binding)
-
-    override fun createDialogView(
-        inflater: LayoutInflater, container: ViewGroup?
-    ): View {
+    override fun createViewDataBinding(
+        inflater: LayoutInflater,
+        container: ViewGroup?
+    ): DialogFragmentNumberPickersBinding {
         Log.d(logTag, "createDialogView()")
 
-        _binding = createBinding(inflater, container)
-        return binding.apply {
-            buttonDecision.setOnClickListener(PositiveButtonClickListener())
-            buttonCancel.setOnClickListener(NegativeButtonClickListener())
-            setUpNumberPickers(this)
-        }.root
+        return createBinding(inflater, container)
     }
 
     private fun createBinding(
@@ -43,14 +37,30 @@ abstract class BaseNumberPickersBottomSheetDialogFragment : BaseBottomSheetDialo
         val contextWithTheme: Context = ContextThemeWrapper(requireActivity(), themeResId)
         val cloneInflater = inflater.cloneInContext(contextWithTheme)
 
-        val binding =
-            DialogFragmentNumberPickersBinding.inflate(cloneInflater, container, false)
-
-        setUpNumberPickerTextColor(binding)
-
-        return binding
+        return DialogFragmentNumberPickersBinding
+            .inflate(cloneInflater, container, false)
     }
 
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        binding.apply {
+            buttonDecision.setOnClickListener {
+                Log.d(logTag, "onClick()_PositiveButton")
+                handleOnPositiveButtonClick()
+                navigatePreviousFragment()
+            }
+            buttonCancel.setOnClickListener {
+                Log.d(logTag, "onClick()_NegativeButton")
+                handleOnNegativeButtonClick()
+                navigatePreviousFragment()
+            }
+            setUpNumberPickerTextColor(binding)
+            setUpNumberPickers()
+        }
+    }
+
+    // HACK:NumberPickerの値はThemeが適用されず、TextColorはApiLevel29以上からしか変更できない。
     private fun setUpNumberPickerTextColor(binding: DialogFragmentNumberPickersBinding) {
         if (Build.VERSION.SDK_INT >= 29) {
             val onSurfaceVariantColor = themeColor.getOnSurfaceVariantColor(resources)
@@ -63,13 +73,17 @@ abstract class BaseNumberPickersBottomSheetDialogFragment : BaseBottomSheetDialo
     }
 
     /**
+     * BaseBottomSheetDialogFragment.PositiveButtonClickListener#onClick()で呼び出される。
+     */
+    internal abstract fun handleOnPositiveButtonClick()
+
+    /**
+     * BaseBottomSheetDialogFragment.NegativeButtonClickListener#onClick()で呼び出される。
+     */
+    internal abstract fun handleOnNegativeButtonClick()
+
+    /**
      * BaseNumberPickersBottomSheetDialogFragment#createDialogView()で呼び出される。
      */
-    internal abstract fun setUpNumberPickers(binding: DialogFragmentNumberPickersBinding)
-
-    override fun onDestroyView() {
-        Log.d(logTag, "onDestroyView()")
-        super.onDestroyView()
-        _binding = null
-    }
+    internal abstract fun setUpNumberPickers()
 }

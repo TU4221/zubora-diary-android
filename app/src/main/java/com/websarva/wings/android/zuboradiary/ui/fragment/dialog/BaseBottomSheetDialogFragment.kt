@@ -9,10 +9,10 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.NavHostFragment
+import androidx.viewbinding.ViewBinding
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
-import com.websarva.wings.android.zuboradiary.data.model.ThemeColor
 import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import com.websarva.wings.android.zuboradiary.ui.theme.ThemeColorInflaterCreator
@@ -20,9 +20,13 @@ import com.websarva.wings.android.zuboradiary.ui.utils.enableEdgeToEdge
 import com.websarva.wings.android.zuboradiary.ui.utils.requireValue
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.SettingsViewModel
 
-abstract class BaseBottomSheetDialogFragment : BottomSheetDialogFragment() {
+abstract class BaseBottomSheetDialogFragment<T: ViewBinding> : BottomSheetDialogFragment() {
 
     private val logTag = createLogTag()
+
+    // View関係
+    private var _binding: T? = null
+    internal val binding get() = checkNotNull(_binding)
 
     // MEMO:委譲プロパティの委譲先(viewModels())の遅延初期化により"Field is never assigned."と警告が表示される。
     //      委譲プロパティによるViewModel生成は公式が推奨する方法の為、警告を無視する。その為、@Suppressを付与する。
@@ -57,8 +61,10 @@ abstract class BaseBottomSheetDialogFragment : BottomSheetDialogFragment() {
 
         setUpDialogCancelFunction()
 
-        val themeColorInflater = createThemeColorInflater(inflater, themeColor)
-        return createDialogView(themeColorInflater, container)
+        val themeColorInflater =
+            ThemeColorInflaterCreator().create(inflater, themeColor)
+        _binding = createViewDataBinding(themeColorInflater, container)
+        return binding.root
     }
 
     private fun setUpDialogCancelFunction() {
@@ -68,19 +74,10 @@ abstract class BaseBottomSheetDialogFragment : BottomSheetDialogFragment() {
         isCancelable = true
     }
 
-    // ThemeColorに合わせたインフレーター作成
-    private fun createThemeColorInflater(
-        inflater: LayoutInflater,
-        themeColor: ThemeColor
-    ): LayoutInflater {
-        return ThemeColorInflaterCreator().create(inflater, themeColor)
-    }
-
     /**
-     * 戻り値をtrueにすると、ダイアログ枠外、戻るボタンタッチ時にダイアログをキャンセルすることを可能にする。
      * BaseBottomSheetDialogFragment#onCreateView()で呼び出される。
      */
-    internal abstract fun createDialogView(inflater: LayoutInflater, container: ViewGroup?): View?
+    internal abstract fun createViewDataBinding(inflater: LayoutInflater, container: ViewGroup?): T
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -88,36 +85,10 @@ abstract class BaseBottomSheetDialogFragment : BottomSheetDialogFragment() {
         enableEdgeToEdge(themeColor)
     }
 
-    internal inner class PositiveButtonClickListener : View.OnClickListener {
-        override fun onClick(v: View) {
-            Log.d(logTag, "onClick()_PositiveButton")
-            handleOnPositiveButtonClick()
-            closeDialog()
-        }
-    }
-
-    internal inner class NegativeButtonClickListener : View.OnClickListener {
-        override fun onClick(v: View) {
-            Log.d(logTag, "onClick()_NegativeButton")
-            handleOnNegativeButtonClick()
-            closeDialog()
-        }
-    }
-
-    private fun closeDialog() {
+    internal fun navigatePreviousFragment() {
         val navController = NavHostFragment.findNavController(this)
         navController.navigateUp()
     }
-
-    /**
-     * BaseBottomSheetDialogFragment.PositiveButtonClickListener#onClick()で呼び出される。
-     */
-    internal abstract fun handleOnPositiveButtonClick()
-
-    /**
-     * BaseBottomSheetDialogFragment.NegativeButtonClickListener#onClick()で呼び出される。
-     */
-    internal abstract fun handleOnNegativeButtonClick()
 
     // ダイアログ枠外タッチ、popBackStack時に処理
     // MEMO:ダイアログフラグメントのCANCEL・DISMISS 処理について、
@@ -134,6 +105,12 @@ abstract class BaseBottomSheetDialogFragment : BottomSheetDialogFragment() {
      * BaseBottomSheetDialogFragment.onCancel()で呼び出される。
      */
     internal abstract fun handleOnCancel()
+
+    override fun onDestroyView() {
+        Log.d(logTag, "onDestroyView()")
+        super.onDestroyView()
+        _binding = null
+    }
 
     internal fun <T> setResult(resultKey: String, result: DialogResult<T>) {
         val navController = NavHostFragment.findNavController(this)

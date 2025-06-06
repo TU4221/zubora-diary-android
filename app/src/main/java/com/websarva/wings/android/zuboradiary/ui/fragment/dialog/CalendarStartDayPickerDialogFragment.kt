@@ -37,7 +37,7 @@ class CalendarStartDayPickerDialogFragment : BaseNumberPickersBottomSheetDialogF
         setResult(KEY_RESULT, DialogResult.Cancel)
     }
 
-    override fun setUpNumberPickers(binding: DialogFragmentNumberPickersBinding) {
+    override fun setUpNumberPickers() {
         val maxNumDaysOfWeek = DayOfWeek.entries.size
         binding.numberPickerFirst.maxValue = maxNumDaysOfWeek - 1
         binding.numberPickerFirst.minValue = 0
