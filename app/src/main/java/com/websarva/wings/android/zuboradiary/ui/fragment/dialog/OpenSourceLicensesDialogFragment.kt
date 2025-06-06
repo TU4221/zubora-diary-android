@@ -16,7 +16,7 @@ import com.websarva.wings.android.zuboradiary.databinding.FragmentOpenSourceLice
 
 class OpenSourceLicensesDialogFragment: BaseFullScreenDialogFragment<FragmentOpenSourceLicensesBinding>() {
 
-    override fun createViewDataBinding(
+    override fun createViewBinding(
         inflater: LayoutInflater,
         container: ViewGroup?
     ): FragmentOpenSourceLicensesBinding {

@@ -48,7 +48,7 @@ internal class DiaryShowFragment : BaseFragment<FragmentDiaryShowBinding>() {
     @Suppress("unused", "RedundantSuppression")
     override val mainViewModel: DiaryShowViewModel by viewModels()
 
-    override fun initializeDataBinding(
+    override fun createViewBinding(
         themeColorInflater: LayoutInflater, container: ViewGroup
     ): FragmentDiaryShowBinding {
         return FragmentDiaryShowBinding.inflate(themeColorInflater, container, false)

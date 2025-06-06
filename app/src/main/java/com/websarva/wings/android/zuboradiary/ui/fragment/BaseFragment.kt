@@ -88,14 +88,14 @@ abstract class BaseFragment<T: ViewBinding> : LoggingFragment() {
         setUpFragmentTransitionEffect()
 
         val themeColorInflater = createThemeColorInflater(inflater)
-        _binding = initializeDataBinding(themeColorInflater, requireNotNull(container))
+        _binding = createViewBinding(themeColorInflater, requireNotNull(container))
         return binding.root
     }
 
     /**
      * BaseFragment#onCreateView()で呼び出される。
      */
-    internal abstract fun initializeDataBinding(
+    internal abstract fun createViewBinding(
         themeColorInflater: LayoutInflater, container: ViewGroup
     ): T
 

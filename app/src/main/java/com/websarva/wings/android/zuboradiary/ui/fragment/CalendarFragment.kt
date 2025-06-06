@@ -69,7 +69,7 @@ class CalendarFragment : BaseFragment<FragmentCalendarBinding>() {
     @Suppress("unused", "RedundantSuppression")
     private val diaryShowViewModel: DiaryShowViewModel by viewModels()
 
-    override fun initializeDataBinding(
+    override fun createViewBinding(
         themeColorInflater: LayoutInflater,
         container: ViewGroup
     ): FragmentCalendarBinding {

@@ -16,23 +16,15 @@ abstract class BaseNumberPickersBottomSheetDialogFragment
 
     private val logTag = createLogTag()
 
-    override fun createViewDataBinding(
+    override fun createViewBinding(
         inflater: LayoutInflater,
         container: ViewGroup?
     ): DialogFragmentNumberPickersBinding {
-        Log.d(logTag, "createDialogView()")
 
-        return createBinding(inflater, container)
-    }
-
-    private fun createBinding(
-        inflater: LayoutInflater, container: ViewGroup?
-    ): DialogFragmentNumberPickersBinding {
         // HACK:下記理由から、ThemeColor#getNumberPickerBottomSheetDialogThemeResId()から
         //      ThemeResIdを取得してInflaterを再作成。
         //      ・NumberPickerの値はThemeが適用されず、TextColorはApiLevel29以上からしか変更できない。
         //      ・ThemeColorBlackの時は背景が黒となり、NumberPickerの値が見えない。
-
         val themeResId = themeColor.numberPickerBottomSheetDialogThemeResId
         val contextWithTheme: Context = ContextThemeWrapper(requireActivity(), themeResId)
         val cloneInflater = inflater.cloneInContext(contextWithTheme)

@@ -93,7 +93,7 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>() {
             }
     }
 
-    override fun initializeDataBinding(
+    override fun createViewBinding(
         themeColorInflater: LayoutInflater,
         container: ViewGroup
     ): FragmentSettingsBinding {

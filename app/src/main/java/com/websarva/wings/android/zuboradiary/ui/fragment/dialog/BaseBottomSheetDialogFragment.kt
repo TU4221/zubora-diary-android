@@ -63,7 +63,7 @@ abstract class BaseBottomSheetDialogFragment<T: ViewBinding> : BottomSheetDialog
 
         val themeColorInflater =
             ThemeColorInflaterCreator().create(inflater, themeColor)
-        _binding = createViewDataBinding(themeColorInflater, container)
+        _binding = createViewBinding(themeColorInflater, container)
         return binding.root
     }
 
@@ -77,7 +77,7 @@ abstract class BaseBottomSheetDialogFragment<T: ViewBinding> : BottomSheetDialog
     /**
      * BaseBottomSheetDialogFragment#onCreateView()で呼び出される。
      */
-    internal abstract fun createViewDataBinding(inflater: LayoutInflater, container: ViewGroup?): T
+    internal abstract fun createViewBinding(inflater: LayoutInflater, container: ViewGroup?): T
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)

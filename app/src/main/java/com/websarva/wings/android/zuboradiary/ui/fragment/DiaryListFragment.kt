@@ -50,7 +50,7 @@ class DiaryListFragment : BaseFragment<FragmentDiaryListBinding>() {
     //      (親子関係でRecyclerViewを使用、又はListAdapterの機能による弊害？)
     private var shouldInitializeListAdapter = false
 
-    override fun initializeDataBinding(
+    override fun createViewBinding(
         themeColorInflater: LayoutInflater, container: ViewGroup
     ): FragmentDiaryListBinding {
         return FragmentDiaryListBinding.inflate(themeColorInflater, container, false)

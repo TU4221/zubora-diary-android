@@ -39,7 +39,7 @@ abstract class BaseFullScreenDialogFragment<T: ViewBinding>: DialogFragment() {
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View? {
         val themeColorInflater = createThemeColorInflater(inflater, themeColor)
-        _binding = createViewDataBinding(themeColorInflater, container)
+        _binding = createViewBinding(themeColorInflater, container)
         return binding.root
     }
 
@@ -51,7 +51,7 @@ abstract class BaseFullScreenDialogFragment<T: ViewBinding>: DialogFragment() {
         return ThemeColorInflaterCreator().create(inflater, themeColor)
     }
 
-    internal abstract fun createViewDataBinding(inflater: LayoutInflater, container: ViewGroup?): T
+    internal abstract fun createViewBinding(inflater: LayoutInflater, container: ViewGroup?): T
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)

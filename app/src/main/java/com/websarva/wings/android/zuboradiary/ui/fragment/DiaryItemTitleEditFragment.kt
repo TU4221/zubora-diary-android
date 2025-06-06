@@ -41,7 +41,7 @@ class DiaryItemTitleEditFragment : BaseFragment<FragmentDiaryItemTitleEditBindin
     @Suppress("unused", "RedundantSuppression")
     override val mainViewModel: DiaryItemTitleEditViewModel by viewModels()
 
-    override fun initializeDataBinding(
+    override fun createViewBinding(
         themeColorInflater: LayoutInflater, container: ViewGroup
     ): FragmentDiaryItemTitleEditBinding {
         return FragmentDiaryItemTitleEditBinding.inflate(themeColorInflater, container, false)

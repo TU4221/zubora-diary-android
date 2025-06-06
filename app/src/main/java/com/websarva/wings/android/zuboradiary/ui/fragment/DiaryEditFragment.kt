@@ -90,7 +90,7 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding>() {
             return screenHeight
         }
 
-    override fun initializeDataBinding(
+    override fun createViewBinding(
         themeColorInflater: LayoutInflater, container: ViewGroup
     ): FragmentDiaryEditBinding {
         return FragmentDiaryEditBinding.inflate(themeColorInflater, container, false)
