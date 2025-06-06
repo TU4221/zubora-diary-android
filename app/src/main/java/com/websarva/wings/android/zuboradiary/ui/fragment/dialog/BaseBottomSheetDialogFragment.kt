@@ -2,13 +2,11 @@ package com.websarva.wings.android.zuboradiary.ui.fragment.dialog
 
 import android.app.Dialog
 import android.content.DialogInterface
-import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.view.WindowCompat
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.NavHostFragment
 import com.google.android.material.bottomsheet.BottomSheetBehavior
@@ -16,9 +14,9 @@ import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.websarva.wings.android.zuboradiary.data.model.ThemeColor
 import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
-import com.websarva.wings.android.zuboradiary.ui.theme.ThemeColorChanger
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import com.websarva.wings.android.zuboradiary.ui.theme.ThemeColorInflaterCreator
+import com.websarva.wings.android.zuboradiary.ui.utils.enableEdgeToEdge
 import com.websarva.wings.android.zuboradiary.ui.utils.requireValue
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.SettingsViewModel
 
@@ -86,24 +84,8 @@ abstract class BaseBottomSheetDialogFragment : BottomSheetDialogFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        setUpEdgeToEdge()
-        setUpStatusBarAndNavigationBarIconColor()
-    }
 
-    private fun setUpEdgeToEdge() {
-        dialog?.window?.let {
-            WindowCompat.setDecorFitsSystemWindows(it, false)
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                it.isNavigationBarContrastEnforced = false
-            }
-        }
-    }
-
-    private fun setUpStatusBarAndNavigationBarIconColor() {
-        dialog?.window?.let {
-            val changer = ThemeColorChanger()
-            changer.applyNavigationBarColor(it, themeColor)
-        }
+        enableEdgeToEdge(themeColor)
     }
 
     internal inner class PositiveButtonClickListener : View.OnClickListener {

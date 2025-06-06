@@ -1,19 +1,17 @@
 package com.websarva.wings.android.zuboradiary.ui.fragment.dialog
 
-import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.view.WindowCompat
 import androidx.databinding.ViewDataBinding
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import com.websarva.wings.android.zuboradiary.R
 import com.websarva.wings.android.zuboradiary.data.model.ThemeColor
-import com.websarva.wings.android.zuboradiary.ui.theme.ThemeColorChanger
 import com.websarva.wings.android.zuboradiary.ui.theme.ThemeColorInflaterCreator
+import com.websarva.wings.android.zuboradiary.ui.utils.enableEdgeToEdge
 import com.websarva.wings.android.zuboradiary.ui.utils.requireValue
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.SettingsViewModel
 
@@ -57,25 +55,7 @@ abstract class BaseFullScreenDialogFragment<T: ViewDataBinding>: DialogFragment(
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        setUpEdgeToEdge()
-        setUpStatusBarAndNavigationBarIconColor()
-    }
-
-    private fun setUpEdgeToEdge() {
-        dialog?.window?.let {
-            WindowCompat.setDecorFitsSystemWindows(it, false)
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                it.isNavigationBarContrastEnforced = false
-            }
-        }
-    }
-
-    private fun setUpStatusBarAndNavigationBarIconColor() {
-        dialog?.window?.let {
-            val changer = ThemeColorChanger()
-            changer.applyStatusBarColor(it, themeColor)
-            changer.applyNavigationBarColor(it, themeColor)
-        }
+        enableEdgeToEdge(themeColor)
     }
 
     override fun onStart() {
