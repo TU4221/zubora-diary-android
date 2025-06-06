@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.databinding.ViewDataBinding
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
 import androidx.navigation.NavController
@@ -28,10 +27,7 @@ import com.websarva.wings.android.zuboradiary.ui.viewmodel.WordSearchViewModel
 import kotlinx.coroutines.flow.collectLatest
 import java.time.LocalDate
 
-class WordSearchFragment : BaseFragment() {
-    // View関係
-    private var _binding: FragmentWordSearchBinding? = null
-    private val binding get() = checkNotNull(_binding)
+class WordSearchFragment : BaseFragment<FragmentWordSearchBinding>() {
 
     // ViewModel
     // MEMO:委譲プロパティの委譲先(viewModels())の遅延初期化により"Field is never assigned."と警告が表示される。
@@ -49,13 +45,12 @@ class WordSearchFragment : BaseFragment() {
 
     override fun initializeDataBinding(
         themeColorInflater: LayoutInflater, container: ViewGroup
-    ): ViewDataBinding {
-        _binding = FragmentWordSearchBinding.inflate(themeColorInflater, container, false)
-
-        return binding.apply {
-            lifecycleOwner = this@WordSearchFragment.viewLifecycleOwner
-            wordSearchViewModel = mainViewModel
-        }
+    ): FragmentWordSearchBinding {
+        return FragmentWordSearchBinding.inflate(themeColorInflater, container, false)
+            .apply {
+                lifecycleOwner = this@WordSearchFragment.viewLifecycleOwner
+                wordSearchViewModel = mainViewModel
+            }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -243,10 +238,6 @@ class WordSearchFragment : BaseFragment() {
 
             navController.removeOnDestinationChangedListener(this)
         }
-    }
-
-    override fun destroyBinding() {
-        _binding = null
     }
 
     override fun onDestroy() {

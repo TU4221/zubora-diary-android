@@ -13,7 +13,6 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
-import androidx.databinding.ViewDataBinding
 import com.websarva.wings.android.zuboradiary.R
 import com.websarva.wings.android.zuboradiary.ui.model.AppMessage
 import com.websarva.wings.android.zuboradiary.data.model.ThemeColor
@@ -40,11 +39,7 @@ import java.time.DayOfWeek
 import java.time.LocalTime
 
 @AndroidEntryPoint
-class SettingsFragment : BaseFragment() {
-
-    // View関係
-    private var _binding: FragmentSettingsBinding? = null
-    private val binding get() = checkNotNull(_binding)
+class SettingsFragment : BaseFragment<FragmentSettingsBinding>() {
 
     // ViewModel
     // MEMO:本FragmentのMainViewModelはSettingsViewModelになる為、BaseFragmentのSettingsViewModel変数を取得。
@@ -101,13 +96,12 @@ class SettingsFragment : BaseFragment() {
     override fun initializeDataBinding(
         themeColorInflater: LayoutInflater,
         container: ViewGroup
-    ): ViewDataBinding {
-        _binding = FragmentSettingsBinding.inflate(themeColorInflater, container, false)
-
-        return binding.apply {
-            lifecycleOwner = this@SettingsFragment.viewLifecycleOwner
-            settingsViewModel = this@SettingsFragment.settingsViewModel
-        }
+    ): FragmentSettingsBinding {
+        return FragmentSettingsBinding.inflate(themeColorInflater, container, false)
+            .apply {
+                lifecycleOwner = this@SettingsFragment.viewLifecycleOwner
+                settingsViewModel = this@SettingsFragment.settingsViewModel
+            }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -551,10 +545,5 @@ class SettingsFragment : BaseFragment() {
         val isAccessLocationGranted = requireContext().isAccessLocationGranted()
         mainViewModel
             .onInitializeWeatherInfoAcquisitionSettingFromPermission(isAccessLocationGranted)
-    }
-
-    override fun destroyBinding() {
-        saveScrollPosition()
-        _binding = null
     }
 }

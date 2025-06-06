@@ -7,7 +7,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.OnBackPressedCallback
-import androidx.databinding.ViewDataBinding
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -15,6 +14,7 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
+import androidx.viewbinding.ViewBinding
 import com.google.android.material.transition.platform.MaterialFadeThrough
 import com.google.android.material.transition.platform.MaterialSharedAxis
 import com.websarva.wings.android.zuboradiary.ui.activity.MainActivity
@@ -34,12 +34,16 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
-abstract class BaseFragment : LoggingFragment() {
+abstract class BaseFragment<T: ViewBinding> : LoggingFragment() {
 
     private val logTag = createLogTag()
 
     internal val mainActivity
         get() = requireActivity() as MainActivity
+
+    // View関係
+    private var _binding: T? = null
+    internal val binding get() = checkNotNull(_binding)
 
     // MEMO:ViewModelが無いFragmentに対応できるようにNull許容型とする。
     internal abstract val mainViewModel: BaseViewModel<out ViewModelEvent, out AppMessage, out ViewModelState>?
@@ -84,8 +88,8 @@ abstract class BaseFragment : LoggingFragment() {
         setUpFragmentTransitionEffect()
 
         val themeColorInflater = createThemeColorInflater(inflater)
-        val dataBinding = initializeDataBinding(themeColorInflater, requireNotNull(container))
-        return dataBinding.root
+        _binding = initializeDataBinding(themeColorInflater, requireNotNull(container))
+        return binding.root
     }
 
     /**
@@ -93,7 +97,7 @@ abstract class BaseFragment : LoggingFragment() {
      */
     internal abstract fun initializeDataBinding(
         themeColorInflater: LayoutInflater, container: ViewGroup
-    ): ViewDataBinding
+    ): T
 
     // ThemeColorに合わせたインフレーター作成
     private fun createThemeColorInflater(inflater: LayoutInflater): LayoutInflater {
@@ -326,11 +330,6 @@ abstract class BaseFragment : LoggingFragment() {
     override fun onDestroyView() {
         super.onDestroyView()
 
-        destroyBinding()
+        _binding = null
     }
-
-    /**
-     * Bindingクラス変数のメモリリーク対策として変数にNullを代入すること。
-     */
-    internal abstract fun destroyBinding()
 }

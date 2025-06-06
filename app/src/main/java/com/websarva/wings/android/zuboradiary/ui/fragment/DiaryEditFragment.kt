@@ -16,7 +16,6 @@ import android.widget.AdapterView.OnItemClickListener
 import android.widget.ArrayAdapter
 import androidx.appcompat.view.ContextThemeWrapper
 import androidx.constraintlayout.motion.widget.MotionLayout
-import androidx.databinding.ViewDataBinding
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination
@@ -56,7 +55,7 @@ import org.jetbrains.annotations.Unmodifiable
 import java.time.LocalDate
 
 @AndroidEntryPoint
-class DiaryEditFragment : BaseFragment() {
+class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding>() {
 
     internal companion object {
         // Navigation関係
@@ -64,10 +63,6 @@ class DiaryEditFragment : BaseFragment() {
     }
 
     private val logTag = createLogTag()
-
-    // View関係
-    private var _binding: FragmentDiaryEditBinding? = null
-    private val binding get() = checkNotNull(_binding)
 
     private val motionLayoutTransitionTime = 500 /*ms*/
     private val scrollTimeMotionLayoutTransition = 1000 /*ms*/
@@ -97,13 +92,12 @@ class DiaryEditFragment : BaseFragment() {
 
     override fun initializeDataBinding(
         themeColorInflater: LayoutInflater, container: ViewGroup
-    ): ViewDataBinding {
-        _binding = FragmentDiaryEditBinding.inflate(themeColorInflater, container, false)
-
-        return binding.apply {
-            lifecycleOwner = this@DiaryEditFragment.viewLifecycleOwner
-            diaryEditViewModel = mainViewModel
-        }
+    ): FragmentDiaryEditBinding {
+        return FragmentDiaryEditBinding.inflate(themeColorInflater, container, false)
+            .apply {
+                lifecycleOwner = this@DiaryEditFragment.viewLifecycleOwner
+                diaryEditViewModel = mainViewModel
+            }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -959,10 +953,6 @@ class DiaryEditFragment : BaseFragment() {
             requireContext().isAccessLocationGranted(),
             date
         )
-    }
-
-    override fun destroyBinding() {
-        _binding = null
     }
 
     override fun onDestroy() {

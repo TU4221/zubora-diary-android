@@ -7,7 +7,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
-import androidx.databinding.ViewDataBinding
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
@@ -56,11 +55,7 @@ import java.util.Arrays
 import java.util.stream.Collectors
 import java.util.stream.Stream
 @AndroidEntryPoint
-class CalendarFragment : BaseFragment() {
-
-    // View関係
-    private var _binding: FragmentCalendarBinding? = null
-    private val binding get() = checkNotNull(_binding)
+class CalendarFragment : BaseFragment<FragmentCalendarBinding>() {
 
     // ViewModel
     // MEMO:委譲プロパティの委譲先(viewModels())の遅延初期化により"Field is never assigned."と警告が表示される。
@@ -77,14 +72,13 @@ class CalendarFragment : BaseFragment() {
     override fun initializeDataBinding(
         themeColorInflater: LayoutInflater,
         container: ViewGroup
-    ): ViewDataBinding {
-        _binding = FragmentCalendarBinding.inflate(themeColorInflater, container, false)
-
-        return binding.apply {
-            lifecycleOwner = this@CalendarFragment.viewLifecycleOwner
-            calendarViewModel = this@CalendarFragment.mainViewModel
-            diaryShowViewModel = this@CalendarFragment.diaryShowViewModel
-        }
+    ): FragmentCalendarBinding {
+        return FragmentCalendarBinding.inflate(themeColorInflater, container, false)
+            .apply {
+                lifecycleOwner = this@CalendarFragment.viewLifecycleOwner
+                calendarViewModel = this@CalendarFragment.mainViewModel
+                diaryShowViewModel = this@CalendarFragment.diaryShowViewModel
+            }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -597,9 +591,5 @@ class CalendarFragment : BaseFragment() {
         val directions =
             CalendarFragmentDirections.actionCalendarFragmentToAppMessageDialog(appMessage)
         navigateFragment(NavigationCommand.To(directions))
-    }
-
-    override fun destroyBinding() {
-        _binding = null
     }
 }

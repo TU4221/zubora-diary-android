@@ -6,7 +6,6 @@ import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.databinding.ViewDataBinding
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.websarva.wings.android.zuboradiary.R
@@ -28,16 +27,12 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
-class DiaryItemTitleEditFragment : BaseFragment() {
+class DiaryItemTitleEditFragment : BaseFragment<FragmentDiaryItemTitleEditBinding>() {
 
     internal companion object {
         // Navigation関係
         val KEY_RESULT = RESULT_KEY_PREFIX + DiaryItemTitleEditFragment::class.java.name
     }
-
-    // View関係
-    private var _binding: FragmentDiaryItemTitleEditBinding? = null
-    private val binding get() = checkNotNull(_binding)
 
     // ViewModel
     // MEMO:委譲プロパティの委譲先(viewModels())の遅延初期化により"Field is never assigned."と警告が表示される。
@@ -48,13 +43,12 @@ class DiaryItemTitleEditFragment : BaseFragment() {
 
     override fun initializeDataBinding(
         themeColorInflater: LayoutInflater, container: ViewGroup
-    ): ViewDataBinding {
-        _binding = FragmentDiaryItemTitleEditBinding.inflate(themeColorInflater, container, false)
-
-        return binding.apply {
-            lifecycleOwner = this@DiaryItemTitleEditFragment.viewLifecycleOwner
-            diaryItemTitleEditViewModel = mainViewModel
-        }
+    ): FragmentDiaryItemTitleEditBinding {
+        return FragmentDiaryItemTitleEditBinding.inflate(themeColorInflater, container, false)
+            .apply {
+                lifecycleOwner = this@DiaryItemTitleEditFragment.viewLifecycleOwner
+                diaryItemTitleEditViewModel = mainViewModel
+            }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -265,9 +259,5 @@ class DiaryItemTitleEditFragment : BaseFragment() {
                 appMessage
             )
         navigateFragment(NavigationCommand.To(directions))
-    }
-
-    override fun destroyBinding() {
-        _binding = null
     }
 }

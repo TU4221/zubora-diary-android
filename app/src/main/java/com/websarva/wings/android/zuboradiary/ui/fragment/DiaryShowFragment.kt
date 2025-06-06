@@ -10,7 +10,6 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
-import androidx.databinding.ViewDataBinding
 import androidx.fragment.app.viewModels
 import com.websarva.wings.android.zuboradiary.R
 import com.websarva.wings.android.zuboradiary.ui.model.AppMessage
@@ -35,16 +34,12 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 
 @AndroidEntryPoint
-internal class DiaryShowFragment : BaseFragment() {
+internal class DiaryShowFragment : BaseFragment<FragmentDiaryShowBinding>() {
 
     internal companion object {
         // Navigation関係
         val KEY_RESULT = RESULT_KEY_PREFIX + DiaryShowFragment::class.java.name
     }
-
-    // View関係
-    private var _binding: FragmentDiaryShowBinding? = null
-    private val binding get() = checkNotNull(_binding)
 
     // ViewModel
     // MEMO:委譲プロパティの委譲先(viewModels())の遅延初期化により"Field is never assigned."と警告が表示される。
@@ -55,13 +50,12 @@ internal class DiaryShowFragment : BaseFragment() {
 
     override fun initializeDataBinding(
         themeColorInflater: LayoutInflater, container: ViewGroup
-    ): ViewDataBinding {
-        _binding = FragmentDiaryShowBinding.inflate(themeColorInflater, container, false)
-
-        return binding.apply {
-            lifecycleOwner = this@DiaryShowFragment.viewLifecycleOwner
-            diaryShowViewModel = mainViewModel
-        }
+    ): FragmentDiaryShowBinding {
+        return FragmentDiaryShowBinding.inflate(themeColorInflater, container, false)
+            .apply {
+                lifecycleOwner = this@DiaryShowFragment.viewLifecycleOwner
+                diaryShowViewModel = mainViewModel
+            }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -335,9 +329,5 @@ internal class DiaryShowFragment : BaseFragment() {
 
     private fun navigatePreviousFragment(result: FragmentResult.Some<LocalDate>) {
         navigateFragment(NavigationCommand.Up(KEY_RESULT, result))
-    }
-
-    override fun destroyBinding() {
-        _binding = null
     }
 }

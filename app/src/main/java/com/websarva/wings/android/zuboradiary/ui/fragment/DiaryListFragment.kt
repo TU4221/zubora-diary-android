@@ -6,7 +6,6 @@ import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-import androidx.databinding.ViewDataBinding
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.RecyclerView
 import com.websarva.wings.android.zuboradiary.R
@@ -35,10 +34,7 @@ import java.time.Year
 import java.time.YearMonth
 
 @AndroidEntryPoint
-class DiaryListFragment : BaseFragment() {
-    // View関係
-    private var _binding: FragmentDiaryListBinding? = null
-    private val binding get() = checkNotNull(_binding)
+class DiaryListFragment : BaseFragment<FragmentDiaryListBinding>() {
 
     // ViewModel
     // MEMO:委譲プロパティの委譲先(viewModels())の遅延初期化により"Field is never assigned."と警告が表示される。
@@ -56,13 +52,12 @@ class DiaryListFragment : BaseFragment() {
 
     override fun initializeDataBinding(
         themeColorInflater: LayoutInflater, container: ViewGroup
-    ): ViewDataBinding {
-        _binding = FragmentDiaryListBinding.inflate(themeColorInflater, container, false)
-
-        return binding.apply {
-            lifecycleOwner = this@DiaryListFragment.viewLifecycleOwner
-            listViewModel = mainViewModel
-        }
+    ): FragmentDiaryListBinding {
+        return FragmentDiaryListBinding.inflate(themeColorInflater, container, false)
+            .apply {
+                lifecycleOwner = this@DiaryListFragment.viewLifecycleOwner
+                listViewModel = mainViewModel
+            }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -275,9 +270,5 @@ class DiaryListFragment : BaseFragment() {
     private fun scrollDiaryListToFirstPosition() {
         val listAdapter = binding.recyclerDiaryList.adapter as DiaryYearMonthListAdapter
         listAdapter.scrollToTop()
-    }
-
-    override fun destroyBinding() {
-        _binding = null
     }
 }
