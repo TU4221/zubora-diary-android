@@ -75,7 +75,7 @@
         <item name="android:overScrollMode">ifContentScrolls</item>
     </style>
     <style name="AppTextInputEditTextNoInputStyle" parent="AppTextInputEditTextStyle">
-        <item name="android:inputType">none</item>
+        <item name="android:focusable">false</item> <!-- MEMO:一回のタッチでクリック処理を起動 -->
         <item name="android:cursorVisible">false</item>
     </style>
     <style name="AppTextInputEditTextTextAppearance" parent="TextAppearance.AppCompat.Medium.Inverse">

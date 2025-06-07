@@ -10,7 +10,6 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
-import android.view.inputmethod.EditorInfo
 import android.widget.AdapterView
 import android.widget.AdapterView.OnItemClickListener
 import android.widget.ArrayAdapter
@@ -413,10 +412,6 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding>() {
 
     // 日付入力欄設定
     private fun setUpDateInputField() {
-        // キーボード非表示設定
-        // MEMO:レイアウトファイルの"android:inputType="none""では設定できない為、下記で設定。
-        binding.textInputEditTextDate.inputType = EditorInfo.TYPE_NULL
-
         launchAndRepeatOnViewLifeCycleStarted {
             mainViewModel.date
                 .collectLatest { value: LocalDate? ->
@@ -568,8 +563,6 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding>() {
         for (i in ItemNumber.MIN_NUMBER..ItemNumber.MAX_NUMBER) {
             val inputItemNumber = ItemNumber(i)
             val itemArrayNumber = i - 1
-            textInputEditTextItemsTitle[itemArrayNumber].inputType = EditorInfo.TYPE_NULL //キーボード非表示設定
-
             textInputEditTextItemsTitle[itemArrayNumber].setOnClickListener {
                 mainViewModel.onItemTitleInputFieldClicked(inputItemNumber)
             }
