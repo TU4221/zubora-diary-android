@@ -278,7 +278,7 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>() {
     private fun switchViewColor(themeColor: ThemeColor) {
         val changer = SettingsThemeColorChanger()
 
-        changer.applyBackgroundColor(binding.viewFullScreenBackground, themeColor)
+        changer.applyBackgroundColor(binding.root, themeColor)
         changer.applyToolbarColor(binding.materialToolbarTopAppBar, themeColor)
 
         changer.applySettingItemSectionColor(

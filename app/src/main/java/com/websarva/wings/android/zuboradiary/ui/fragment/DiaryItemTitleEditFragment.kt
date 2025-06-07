@@ -131,7 +131,7 @@ class DiaryItemTitleEditFragment : BaseFragment<FragmentDiaryItemTitleEditBindin
         )
         textInputConfigurator.setUpKeyboardCloseOnEnter(*textInputLayouts)
         textInputConfigurator.setUpFocusClearOnClickBackground(
-            binding.viewFullScreenBackground,
+            binding.root,
             *textInputLayouts
         )
         val transitionListener =

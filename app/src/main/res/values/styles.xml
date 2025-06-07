@@ -9,17 +9,6 @@
         <item name="android:background">?attr/colorSurface</item>
     </style>
 
-    <!-- View -->
-    <!-- MEMO:Viewのデフォルトスタイルなし -->
-    <style name="AppFragmentBackgroundViewStyle">
-        <item name="android:background">?attr/colorSurface</item>
-    </style>
-
-    <!-- MEMO:Layout系のデフォルトスタイルなし -->
-    <style name="FragmentBackgroundLayoutStyle" parent="AppFragmentBackgroundViewStyle">
-    </style>
-
-
     <!-- Toolbar -->
     <!-- MEMO:Rippleの色、Tooltipsの背景色の変更方法が不明の為、AppThemeColorBlackのparentをDarkThemeにして対応。-->
     <style name="AppToolbarStyle" parent="ThemeOverlay.Material3.Toolbar.Surface">

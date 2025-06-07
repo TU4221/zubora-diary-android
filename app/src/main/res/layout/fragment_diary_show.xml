@@ -15,14 +15,9 @@
     </data>
 
     <FrameLayout
+        style="@style/AppRootViewStyle"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
-
-        <View
-            style="@style/AppFragmentBackgroundViewStyle"
-            android:id="@+id/view_full_screen_background"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent" />
 
         <LinearLayout
             android:layout_width="match_parent"
