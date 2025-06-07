@@ -786,7 +786,7 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding>() {
             *allTextInputLayouts
         )
 
-        textInputConfigurator.setUpKeyboardCloseOnEnter(binding.textInputLayoutTitle)
+        textInputConfigurator.setUpKeyboardCloseOnEnter(binding.textInputEditTextTitle)
 
         val scrollableTextInputLayouts =
             binding.run {

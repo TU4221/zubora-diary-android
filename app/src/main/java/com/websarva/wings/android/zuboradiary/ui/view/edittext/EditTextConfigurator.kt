@@ -76,7 +76,10 @@ internal open class EditTextConfigurator {
             if (v.inputType == (InputType.TYPE_TEXT_FLAG_MULTI_LINE + 1)) return false
 
             when (actionId) {
-                EditorInfo.IME_ACTION_DONE -> hideKeyboard(v)
+                EditorInfo.IME_ACTION_DONE -> {
+                    hideKeyboard(v)
+                    v.clearFocus()
+                }
                 EditorInfo.IME_ACTION_NEXT -> {
                     val nextView = focusNextEditTextView(v)
 

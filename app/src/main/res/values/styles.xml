@@ -65,8 +65,8 @@
         <item name="android:textColorHint">@color/hint_text_color_on_surface</item>
         <item name="android:inputType">text</item>
     </style>
-    <style name="AppTextInputEditTextActionNextStyle" parent="AppTextInputEditTextStyle">
-        <item name="android:imeOptions">actionNext</item>
+    <style name="AppTextInputEditTextActionDoneStyle" parent="AppTextInputEditTextStyle">
+        <item name="android:imeOptions">actionDone</item>
     </style>
     <style name="AppTextInputEditTextMultiLineStyle" parent="AppTextInputEditTextStyle">
         <item name="android:inputType">textMultiLine</item>
