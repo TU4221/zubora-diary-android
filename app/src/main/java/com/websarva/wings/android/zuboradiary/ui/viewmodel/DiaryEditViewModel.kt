@@ -14,6 +14,7 @@ import com.websarva.wings.android.zuboradiary.data.repository.LocationRepository
 import com.websarva.wings.android.zuboradiary.data.repository.UriRepository
 import com.websarva.wings.android.zuboradiary.data.repository.UserPreferencesRepository
 import com.websarva.wings.android.zuboradiary.data.repository.WeatherApiRepository
+import com.websarva.wings.android.zuboradiary.data.usecase.diary.ReleaseUriPermissionUseCase
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import com.websarva.wings.android.zuboradiary.ui.model.DiaryEditAppMessage
 import com.websarva.wings.android.zuboradiary.ui.model.adapter.WeatherAdapterList
@@ -51,7 +52,8 @@ internal class DiaryEditViewModel @Inject constructor(
     private val weatherApiRepository: WeatherApiRepository,
     private val locationRepository: LocationRepository,
     private val userPreferencesRepository: UserPreferencesRepository,
-    private val uriRepository: UriRepository
+    private val uriRepository: UriRepository,
+    private val releaseUriPermissionUseCase: ReleaseUriPermissionUseCase
 ) : BaseViewModel<DiaryEditEvent, DiaryEditAppMessage, DiaryEditState>() {
 
     companion object {
@@ -757,7 +759,7 @@ internal class DiaryEditViewModel @Inject constructor(
         if (latestPictureUri == loadedPictureUri) return
 
         if (loadedPictureUri != null) {
-            uriRepository.releasePersistablePermission(loadedPictureUri)
+            releaseUriPermissionUseCase(loadedPictureUri)
         }
         if (latestPictureUri != null) {
             return uriRepository.takePersistablePermission(latestPictureUri)
@@ -802,7 +804,7 @@ internal class DiaryEditViewModel @Inject constructor(
             return
         }
 
-        if (loadedPictureUri != null) uriRepository.releasePersistablePermission(loadedPictureUri)
+        releaseUriPermissionUseCase.invoke(loadedPictureUri)
         emitViewModelEvent(
             DiaryEditEvent
                 .NavigatePreviousFragmentOnDiaryDelete(

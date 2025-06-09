@@ -6,7 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.websarva.wings.android.zuboradiary.data.repository.DiaryRepository
 import com.websarva.wings.android.zuboradiary.data.model.ItemNumber
 import com.websarva.wings.android.zuboradiary.data.model.Weather
-import com.websarva.wings.android.zuboradiary.data.repository.UriRepository
+import com.websarva.wings.android.zuboradiary.data.usecase.diary.ReleaseUriPermissionUseCase
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import com.websarva.wings.android.zuboradiary.ui.model.DiaryShowAppMessage
 import com.websarva.wings.android.zuboradiary.ui.model.event.DiaryShowEvent
@@ -27,7 +27,7 @@ import javax.inject.Inject
 internal class DiaryShowViewModel @Inject constructor(
     handle: SavedStateHandle,
     private val diaryRepository: DiaryRepository,
-    private val uriRepository: UriRepository
+    private val releaseUriPermissionUseCase: ReleaseUriPermissionUseCase
 ) : BaseViewModel<DiaryShowEvent, DiaryShowAppMessage, DiaryShowState>() {
 
     private val logTag = createLogTag()
@@ -211,7 +211,8 @@ internal class DiaryShowViewModel @Inject constructor(
             return
         }
 
-        if (picturePath != null) uriRepository.releasePersistablePermission(picturePath)
+
+        releaseUriPermissionUseCase(picturePath)
         emitViewModelEvent(
             DiaryShowEvent
                 .NavigatePreviousFragmentOnDiaryDelete(

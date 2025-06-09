@@ -5,7 +5,7 @@ import android.util.Log
 import androidx.lifecycle.viewModelScope
 import com.websarva.wings.android.zuboradiary.data.database.DiaryListItem
 import com.websarva.wings.android.zuboradiary.data.repository.DiaryRepository
-import com.websarva.wings.android.zuboradiary.data.repository.UriRepository
+import com.websarva.wings.android.zuboradiary.data.usecase.diary.ReleaseUriPermissionUseCase
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import com.websarva.wings.android.zuboradiary.ui.model.DiaryListAppMessage
 import com.websarva.wings.android.zuboradiary.ui.adapter.diary.diary.DiaryDayList
@@ -31,7 +31,7 @@ import javax.inject.Inject
 @HiltViewModel
 internal class DiaryListViewModel @Inject constructor(
     private val diaryRepository: DiaryRepository,
-    private val uriRepository: UriRepository
+    private val releaseUriPermissionUseCase: ReleaseUriPermissionUseCase
 ) : BaseViewModel<DiaryListEvent, DiaryListAppMessage, DiaryListState>() {
 
     companion object {
@@ -155,8 +155,7 @@ internal class DiaryListViewModel @Inject constructor(
             val isSuccessful = deleteDiary(date)
             if (!isSuccessful) return@launch
 
-            if (uri == null) return@launch
-            uriRepository.releasePersistablePermission(uri)
+            releaseUriPermissionUseCase(uri)
         }
     }
 

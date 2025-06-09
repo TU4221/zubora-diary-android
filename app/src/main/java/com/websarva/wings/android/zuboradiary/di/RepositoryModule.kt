@@ -69,9 +69,8 @@ internal object RepositoryModule {
     @Singleton
     @Provides
     fun provideUriRepository(
-        uriPermissionDataSource: UriPermissionDataSource,
-        diaryDAO: DiaryDAO
+        uriPermissionDataSource: UriPermissionDataSource
     ): UriRepository {
-        return UriRepository(uriPermissionDataSource, diaryDAO)
+        return UriRepository(uriPermissionDataSource)
     }
 }
