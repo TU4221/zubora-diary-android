@@ -2,6 +2,7 @@ package com.websarva.wings.android.zuboradiary.di
 
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
+import com.websarva.wings.android.zuboradiary.data.network.WeatherApiDataSource
 import com.websarva.wings.android.zuboradiary.data.network.WeatherApiService
 import dagger.Module
 import dagger.Provides
@@ -46,5 +47,11 @@ internal object NetworkModule {
     @Provides
     fun provideWeatherApiService(retrofit: Retrofit): WeatherApiService {
         return retrofit.create(WeatherApiService::class.java)
+    }
+
+    @Singleton
+    @Provides
+    fun provideWeatherApiDataSource(weatherApiService: WeatherApiService): WeatherApiDataSource {
+        return WeatherApiDataSource(weatherApiService)
     }
 }
