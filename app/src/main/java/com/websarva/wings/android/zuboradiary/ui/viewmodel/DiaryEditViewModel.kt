@@ -4,16 +4,20 @@ import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
+import com.websarva.wings.android.zuboradiary.data.exception.LocationAccessFailedException
+import com.websarva.wings.android.zuboradiary.data.exception.LocationPermissionException
+import com.websarva.wings.android.zuboradiary.data.exception.WeatherInfoDateOutOfRangeException
+import com.websarva.wings.android.zuboradiary.data.exception.WeatherInfoFetchFailedException
 import com.websarva.wings.android.zuboradiary.data.repository.DiaryRepository
 import com.websarva.wings.android.zuboradiary.data.model.Condition
 import com.websarva.wings.android.zuboradiary.data.model.ItemNumber
 import com.websarva.wings.android.zuboradiary.data.model.Weather
-import com.websarva.wings.android.zuboradiary.data.model.GeoCoordinates
+import com.websarva.wings.android.zuboradiary.data.model.UseCaseResult
 import com.websarva.wings.android.zuboradiary.data.preferences.AllPreferences
-import com.websarva.wings.android.zuboradiary.data.repository.LocationRepository
 import com.websarva.wings.android.zuboradiary.data.repository.UriRepository
 import com.websarva.wings.android.zuboradiary.data.repository.UserPreferencesRepository
-import com.websarva.wings.android.zuboradiary.data.repository.WeatherApiRepository
+import com.websarva.wings.android.zuboradiary.data.usecase.diary.CheckWeatherInfoFetchabilityUseCase
+import com.websarva.wings.android.zuboradiary.data.usecase.diary.FetchWeatherInfoUseCase
 import com.websarva.wings.android.zuboradiary.data.usecase.diary.ReleaseUriPermissionUseCase
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import com.websarva.wings.android.zuboradiary.ui.model.DiaryEditAppMessage
@@ -41,7 +45,6 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.time.LocalDate
-import java.time.temporal.ChronoUnit
 import javax.inject.Inject
 import kotlin.random.Random
 
@@ -49,11 +52,11 @@ import kotlin.random.Random
 internal class DiaryEditViewModel @Inject constructor(
     private val handle: SavedStateHandle,
     private val diaryRepository: DiaryRepository,
-    private val weatherApiRepository: WeatherApiRepository,
-    private val locationRepository: LocationRepository,
     private val userPreferencesRepository: UserPreferencesRepository,
     private val uriRepository: UriRepository,
-    private val releaseUriPermissionUseCase: ReleaseUriPermissionUseCase
+    private val releaseUriPermissionUseCase: ReleaseUriPermissionUseCase,
+    private val checkWeatherInfoFetchabilityUseCase: CheckWeatherInfoFetchabilityUseCase,
+    private val fetchWeatherInfoUseCase: FetchWeatherInfoUseCase
 ) : BaseViewModel<DiaryEditEvent, DiaryEditAppMessage, DiaryEditState>() {
 
     companion object {
@@ -618,16 +621,27 @@ internal class DiaryEditViewModel @Inject constructor(
     // 権限確認後処理
     fun onAccessLocationPermissionChecked(isGranted: Boolean, date: LocalDate) {
         viewModelScope.launch {
-            if (isGranted) {
-                val geoCoordinates = fetchCurrentLocation()
-                if (geoCoordinates == null) {
-                    emitAppMessageEvent(DiaryEditAppMessage.WeatherInfoLoadingFailure)
-                    updateViewModelIdleState()
-                    return@launch
+            when (val result = fetchWeatherInfoUseCase(isGranted, date)) {
+                is UseCaseResult.Success -> {
+                    updateWeather1(result.value)
+                    updateWeather2(Weather.UNKNOWN)
                 }
-                fetchWeatherInfo(date, geoCoordinates)
-            } else {
-                emitAppMessageEvent(DiaryEditAppMessage.AccessLocationPermissionRequest)
+                is UseCaseResult.Error -> {
+                    when (result.exception) {
+                        is LocationPermissionException -> {
+                            emitAppMessageEvent(DiaryEditAppMessage.AccessLocationPermissionRequest)
+                        }
+                        is LocationAccessFailedException -> {
+                            emitAppMessageEvent(DiaryEditAppMessage.WeatherInfoLoadingFailure)
+                        }
+                        is WeatherInfoDateOutOfRangeException -> {
+                            emitAppMessageEvent(DiaryEditAppMessage.WeatherInfoDateOutOfRange)
+                        }
+                        is WeatherInfoFetchFailedException -> {
+                            emitAppMessageEvent(DiaryEditAppMessage.WeatherInfoLoadingFailure)
+                        }
+                    }
+                }
             }
             updateViewModelIdleState()
         }
@@ -863,10 +877,19 @@ internal class DiaryEditViewModel @Inject constructor(
         date: LocalDate,
         shouldIgnoreConfirmationDialog: Boolean = false
     ) {
-        if (!weatherApiRepository.canFetchWeatherInfo(date)) {
-            updateViewModelIdleState()
-            return
+        when (val result = checkWeatherInfoFetchabilityUseCase(date)) {
+            is UseCaseResult.Success -> {
+                if (!result.value) {
+                    updateViewModelIdleState()
+                    return
+                }
+            }
+            is UseCaseResult.Error -> {
+                updateViewModelIdleState()
+                return
+            }
         }
+
         if (!shouldIgnoreConfirmationDialog && shouldShowWeatherInfoFetchingDialog()) {
             emitViewModelEvent(
                 DiaryEditEvent.NavigateWeatherInfoFetchingDialog(date)
@@ -880,56 +903,6 @@ internal class DiaryEditViewModel @Inject constructor(
 
     private fun shouldShowWeatherInfoFetchingDialog(): Boolean {
         return previousDate != null
-    }
-
-    private suspend fun fetchWeatherInfo(date: LocalDate, geoCoordinates: GeoCoordinates?) {
-        if (geoCoordinates == null) {
-            emitAppMessageEvent(DiaryEditAppMessage.WeatherInfoLoadingFailure)
-            return
-        }
-
-        if (!weatherApiRepository.canFetchWeatherInfo(date)) return
-
-        val logMsg = "天気情報取得"
-        Log.i(logTag, "${logMsg}_開始")
-
-        val currentDate = LocalDate.now()
-        val betweenDays = ChronoUnit.DAYS.between(date, currentDate)
-
-        val response =
-            if (betweenDays == 0L) {
-                weatherApiRepository.fetchTodayWeatherInfo(geoCoordinates)
-            } else {
-                weatherApiRepository.fetchPastDayWeatherInfo(
-                    geoCoordinates,
-                    betweenDays.toInt()
-                )
-            }
-        Log.d(logTag, "fetchWeatherInformation()_code = " + response.code())
-        Log.d(logTag, "fetchWeatherInformation()_message = :" + response.message())
-
-        if (response.isSuccessful) {
-            Log.d(logTag, "fetchWeatherInformation()_body = " + response.body())
-            val result =
-                response.body()?.toWeatherInfo() ?: throw IllegalStateException()
-            updateWeather1(result)
-            updateWeather2(Weather.UNKNOWN)
-            Log.i(logTag, "${logMsg}_完了")
-        } else {
-            response.errorBody().use { errorBody ->
-                val errorBodyString = errorBody?.string() ?: "null"
-                Log.d(
-                    logTag,
-                    "fetchWeatherInformation()_errorBody = $errorBodyString"
-                )
-            }
-            emitAppMessageEvent(DiaryEditAppMessage.WeatherInfoLoadingFailure)
-            Log.e(logTag, "${logMsg}_失敗")
-        }
-    }
-
-    private suspend fun fetchCurrentLocation(): GeoCoordinates? {
-        return locationRepository.fetchLocation()
     }
 
     // 天気、体調関係

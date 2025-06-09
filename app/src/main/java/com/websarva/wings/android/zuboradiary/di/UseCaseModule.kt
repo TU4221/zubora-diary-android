@@ -1,8 +1,12 @@
 package com.websarva.wings.android.zuboradiary.di
 
 import com.websarva.wings.android.zuboradiary.data.repository.DiaryRepository
+import com.websarva.wings.android.zuboradiary.data.repository.LocationRepository
 import com.websarva.wings.android.zuboradiary.data.repository.UriRepository
+import com.websarva.wings.android.zuboradiary.data.repository.WeatherApiRepository
 import com.websarva.wings.android.zuboradiary.data.usecase.diary.CheckDiaryExistsUseCase
+import com.websarva.wings.android.zuboradiary.data.usecase.diary.CheckWeatherInfoFetchabilityUseCase
+import com.websarva.wings.android.zuboradiary.data.usecase.diary.FetchWeatherInfoUseCase
 import com.websarva.wings.android.zuboradiary.data.usecase.diary.ReleaseUriPermissionUseCase
 import dagger.Module
 import dagger.Provides
@@ -29,5 +33,27 @@ internal object UseCaseModule {
         diaryRepository: DiaryRepository
     ): ReleaseUriPermissionUseCase {
         return ReleaseUriPermissionUseCase(uriRepository, diaryRepository)
+    }
+
+    @Singleton
+    @Provides
+    fun provideCheckWeatherInfoFetchabilityUseCase(
+        weatherApiRepository: WeatherApiRepository
+    ): CheckWeatherInfoFetchabilityUseCase {
+        return CheckWeatherInfoFetchabilityUseCase(weatherApiRepository)
+    }
+
+    @Singleton
+    @Provides
+    fun provideFetchWeatherInfoUseCase(
+        weatherApiRepository: WeatherApiRepository,
+        locationRepository: LocationRepository,
+        checkWeatherInfoFetchabilityUseCase: CheckWeatherInfoFetchabilityUseCase
+    ): FetchWeatherInfoUseCase {
+        return FetchWeatherInfoUseCase(
+            weatherApiRepository,
+            locationRepository,
+            checkWeatherInfoFetchabilityUseCase
+        )
     }
 }
