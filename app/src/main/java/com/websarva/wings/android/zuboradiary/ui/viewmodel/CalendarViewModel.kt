@@ -1,9 +1,7 @@
 package com.websarva.wings.android.zuboradiary.ui.viewmodel
 
-import android.util.Log
 import androidx.lifecycle.viewModelScope
-import com.websarva.wings.android.zuboradiary.data.repository.DiaryRepository
-import com.websarva.wings.android.zuboradiary.utils.createLogTag
+import com.websarva.wings.android.zuboradiary.data.usecase.diary.CheckDiaryExistsUseCase
 import com.websarva.wings.android.zuboradiary.ui.model.CalendarAppMessage
 import com.websarva.wings.android.zuboradiary.ui.model.event.CalendarEvent
 import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
@@ -17,10 +15,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 internal class CalendarViewModel @Inject constructor(
-    private val diaryRepository: DiaryRepository
+    private val checkDiaryExistsUseCase: CheckDiaryExistsUseCase
 ) : BaseViewModel<CalendarEvent, CalendarAppMessage, CalendarState>() {
-
-    private val logTag = createLogTag()
 
     private val initialSelectedDate = LocalDate.now()
     private val _selectedDate = MutableStateFlow<LocalDate>(initialSelectedDate)
@@ -137,9 +133,8 @@ internal class CalendarViewModel @Inject constructor(
 
     suspend fun existsSavedDiary(date: LocalDate): Boolean? {
         try {
-            return diaryRepository.existsDiary(date)
+            return checkDiaryExistsUseCase(date)
         } catch (e: Exception) {
-            Log.e(logTag, "日記既存確認_失敗", e)
             emitAppMessageEvent(CalendarAppMessage.DiaryInfoLoadingFailure)
             return null
         }
