@@ -1,4 +1,4 @@
-package com.websarva.wings.android.zuboradiary.data.usecase.diary
+package com.websarva.wings.android.zuboradiary.data.usecase.uri
 
 import android.net.Uri
 import com.websarva.wings.android.zuboradiary.data.repository.DiaryRepository

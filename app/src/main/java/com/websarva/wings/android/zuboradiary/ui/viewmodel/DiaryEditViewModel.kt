@@ -16,7 +16,7 @@ import com.websarva.wings.android.zuboradiary.data.model.UseCaseResult
 import com.websarva.wings.android.zuboradiary.data.repository.UriRepository
 import com.websarva.wings.android.zuboradiary.data.usecase.diary.CanFetchWeatherInfoUseCase
 import com.websarva.wings.android.zuboradiary.data.usecase.diary.FetchWeatherInfoUseCase
-import com.websarva.wings.android.zuboradiary.data.usecase.diary.ReleaseUriPermissionUseCase
+import com.websarva.wings.android.zuboradiary.data.usecase.uri.ReleaseUriPermissionUseCase
 import com.websarva.wings.android.zuboradiary.data.usecase.settings.IsWeatherInfoAcquisitionEnabledUseCase
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import com.websarva.wings.android.zuboradiary.ui.model.DiaryEditAppMessage

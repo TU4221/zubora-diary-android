@@ -7,7 +7,7 @@ import com.websarva.wings.android.zuboradiary.data.repository.WeatherApiReposito
 import com.websarva.wings.android.zuboradiary.data.usecase.diary.DoesDiaryExistUseCase
 import com.websarva.wings.android.zuboradiary.data.usecase.diary.CanFetchWeatherInfoUseCase
 import com.websarva.wings.android.zuboradiary.data.usecase.diary.FetchWeatherInfoUseCase
-import com.websarva.wings.android.zuboradiary.data.usecase.diary.ReleaseUriPermissionUseCase
+import com.websarva.wings.android.zuboradiary.data.usecase.uri.ReleaseUriPermissionUseCase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
