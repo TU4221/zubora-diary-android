@@ -814,7 +814,7 @@ internal class DiaryEditViewModel @Inject constructor(
             return
         }
 
-        releaseUriPermissionUseCase.invoke(loadedPictureUri)
+        releaseUriPermissionUseCase(loadedPictureUri)
         emitViewModelEvent(
             DiaryEditEvent
                 .NavigatePreviousFragmentOnDiaryDelete(
