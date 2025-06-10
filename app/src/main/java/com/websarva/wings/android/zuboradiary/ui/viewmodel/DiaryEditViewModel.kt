@@ -13,12 +13,11 @@ import com.websarva.wings.android.zuboradiary.data.model.Condition
 import com.websarva.wings.android.zuboradiary.data.model.ItemNumber
 import com.websarva.wings.android.zuboradiary.data.model.Weather
 import com.websarva.wings.android.zuboradiary.data.model.UseCaseResult
-import com.websarva.wings.android.zuboradiary.data.preferences.AllPreferences
 import com.websarva.wings.android.zuboradiary.data.repository.UriRepository
-import com.websarva.wings.android.zuboradiary.data.repository.UserPreferencesRepository
 import com.websarva.wings.android.zuboradiary.data.usecase.diary.CheckWeatherInfoFetchabilityUseCase
 import com.websarva.wings.android.zuboradiary.data.usecase.diary.FetchWeatherInfoUseCase
 import com.websarva.wings.android.zuboradiary.data.usecase.diary.ReleaseUriPermissionUseCase
+import com.websarva.wings.android.zuboradiary.data.usecase.settings.IsWeatherInfoAcquisitionEnabledUseCase
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import com.websarva.wings.android.zuboradiary.ui.model.DiaryEditAppMessage
 import com.websarva.wings.android.zuboradiary.ui.model.adapter.WeatherAdapterList
@@ -31,19 +30,16 @@ import com.websarva.wings.android.zuboradiary.ui.model.state.DiaryEditState
 import com.websarva.wings.android.zuboradiary.ui.model.state.ViewModelState
 import com.websarva.wings.android.zuboradiary.ui.utils.requireValue
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import java.time.LocalDate
 import javax.inject.Inject
 import kotlin.random.Random
@@ -52,9 +48,9 @@ import kotlin.random.Random
 internal class DiaryEditViewModel @Inject constructor(
     private val handle: SavedStateHandle,
     private val diaryRepository: DiaryRepository,
-    private val userPreferencesRepository: UserPreferencesRepository,
     private val uriRepository: UriRepository,
     private val releaseUriPermissionUseCase: ReleaseUriPermissionUseCase,
+    private val isWeatherInfoAcquisitionEnabledUseCase: IsWeatherInfoAcquisitionEnabledUseCase,
     private val checkWeatherInfoFetchabilityUseCase: CheckWeatherInfoFetchabilityUseCase,
     private val fetchWeatherInfoUseCase: FetchWeatherInfoUseCase
 ) : BaseViewModel<DiaryEditEvent, DiaryEditAppMessage, DiaryEditState>() {
@@ -858,19 +854,12 @@ internal class DiaryEditViewModel @Inject constructor(
 
     // 天気情報関係
     private suspend fun shouldLoadWeatherInfo(date: LocalDate): Boolean {
-        if (!isWeatherInfoAcquisitionPreferenceChecked()) return false
+        when (val result = isWeatherInfoAcquisitionEnabledUseCase()) {
+            is UseCaseResult.Success -> if (!result.value) return false
+            is UseCaseResult.Error -> return false
+        }
         if (!isNewDiary && previousDate == null) return false
         return previousDate != date
-    }
-
-    private suspend fun isWeatherInfoAcquisitionPreferenceChecked(): Boolean {
-        return withContext(Dispatchers.IO) {
-            userPreferencesRepository
-                .loadAllPreferences()
-                .map { value: AllPreferences ->
-                    value.weatherInfoAcquisitionPreference.isChecked
-                }.first()
-        }
     }
 
     private suspend fun loadWeatherInfo(
