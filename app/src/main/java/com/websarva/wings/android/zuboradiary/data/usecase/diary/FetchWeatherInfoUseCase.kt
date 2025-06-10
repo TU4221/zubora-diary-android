@@ -43,23 +43,37 @@ internal class FetchWeatherInfoUseCase(
     }
 
     private suspend fun fetchCurrentLocation(): GeoCoordinates {
+        val logMsg = "位置情報取得_"
+        Log.i(logTag, "${logMsg}開始")
         return try {
-            locationRepository.fetchLocation() ?: throw LocationAccessFailedException()
+            val result = locationRepository.fetchLocation()
+            requireNotNull(result)
+            Log.i(logTag, "${logMsg}完了")
+            result
         } catch (e: Exception) {
+            Log.e(logTag, "${logMsg}失敗")
             throw LocationAccessFailedException(e)
         }
     }
 
     private suspend fun fetchWeatherInfo(date: LocalDate, geoCoordinates: GeoCoordinates): Weather {
+        val logMsg = "天気情報取得_"
+        Log.i(logTag, "${logMsg}開始")
+
         when (val result = canFetchWeatherInfoUseCase(date)) {
             is UseCaseResult.Success -> {
-                if (!result.value) throw WeatherInfoDateOutOfRangeException()
+                if (!result.value) {
+                    val e = WeatherInfoDateOutOfRangeException()
+                    Log.i(logTag, "${logMsg}指定日範囲外", e)
+                    throw e
+                }
             }
-            is UseCaseResult.Error -> throw WeatherInfoDateRangeCheckFailedException(result.exception)
+            is UseCaseResult.Error -> {
+                val e = WeatherInfoDateRangeCheckFailedException(result.exception)
+                Log.i(logTag, "${logMsg}取得可能確認失敗", e)
+                throw e
+            }
         }
-
-        val logMsg = "天気情報取得"
-        Log.i(logTag, "${logMsg}_開始")
 
         val currentDate = LocalDate.now()
         val betweenDays = ChronoUnit.DAYS.between(date, currentDate)
@@ -75,17 +89,18 @@ internal class FetchWeatherInfoUseCase(
                     )
                 }
             } catch (e: Exception) {
+                Log.e(logTag, "${logMsg}失敗", e)
                 throw WeatherInfoFetchFailedException(e)
             }
         Log.d(logTag, "fetchWeatherInformation()_code = " + response.code())
         Log.d(logTag, "fetchWeatherInformation()_message = :" + response.message())
 
-        if (response.isSuccessful) {
+        return if (response.isSuccessful) {
             Log.d(logTag, "fetchWeatherInformation()_body = " + response.body())
             val result =
-                response.body()?.toWeatherInfo() ?: throw IllegalStateException()
-            Log.i(logTag, "${logMsg}_完了")
-            return result
+                response.body()?.toWeatherInfo() ?: throw NullPointerException()
+            Log.i(logTag, "${logMsg}完了")
+            result
         } else {
             response.errorBody().use { errorBody ->
                 val errorBodyString = errorBody?.string() ?: "null"
@@ -94,8 +109,9 @@ internal class FetchWeatherInfoUseCase(
                     "fetchWeatherInformation()_errorBody = $errorBodyString"
                 )
             }
-            Log.e(logTag, "${logMsg}_失敗")
-            throw WeatherInfoFetchFailedException()
+            val e = WeatherInfoFetchFailedException()
+            Log.e(logTag, "${logMsg}失敗", e)
+            throw e
         }
     }
 }
