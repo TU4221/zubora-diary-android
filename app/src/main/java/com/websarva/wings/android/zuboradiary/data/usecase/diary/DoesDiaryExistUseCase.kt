@@ -6,7 +6,7 @@ import com.websarva.wings.android.zuboradiary.data.repository.DiaryRepository
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import java.time.LocalDate
 
-internal class CheckDiaryExistsUseCase(
+internal class DoesDiaryExistUseCase(
     private val diaryRepository: DiaryRepository
 ) {
 

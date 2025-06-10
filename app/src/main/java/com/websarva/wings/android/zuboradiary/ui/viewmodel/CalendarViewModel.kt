@@ -2,7 +2,7 @@ package com.websarva.wings.android.zuboradiary.ui.viewmodel
 
 import androidx.lifecycle.viewModelScope
 import com.websarva.wings.android.zuboradiary.data.model.UseCaseResult
-import com.websarva.wings.android.zuboradiary.data.usecase.diary.CheckDiaryExistsUseCase
+import com.websarva.wings.android.zuboradiary.data.usecase.diary.DoesDiaryExistUseCase
 import com.websarva.wings.android.zuboradiary.ui.model.CalendarAppMessage
 import com.websarva.wings.android.zuboradiary.ui.model.event.CalendarEvent
 import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
@@ -16,7 +16,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 internal class CalendarViewModel @Inject constructor(
-    private val checkDiaryExistsUseCase: CheckDiaryExistsUseCase
+    private val doesDiaryExistUseCase: DoesDiaryExistUseCase
 ) : BaseViewModel<CalendarEvent, CalendarAppMessage, CalendarState>() {
 
     private val initialSelectedDate = LocalDate.now()
@@ -134,7 +134,7 @@ internal class CalendarViewModel @Inject constructor(
 
     // MEMO:呼び出し元で通信エラーが判断できるように戻り値をNullableとする。
     suspend fun existsSavedDiary(date: LocalDate): Boolean? {
-        when (val result = checkDiaryExistsUseCase(date)) {
+        when (val result = doesDiaryExistUseCase(date)) {
             is UseCaseResult.Success -> return result.value
             is UseCaseResult.Error -> {
                 emitAppMessageEvent(CalendarAppMessage.DiaryInfoLoadingFailure)

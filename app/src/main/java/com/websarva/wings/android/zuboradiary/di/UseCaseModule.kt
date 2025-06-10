@@ -4,7 +4,7 @@ import com.websarva.wings.android.zuboradiary.data.repository.DiaryRepository
 import com.websarva.wings.android.zuboradiary.data.repository.LocationRepository
 import com.websarva.wings.android.zuboradiary.data.repository.UriRepository
 import com.websarva.wings.android.zuboradiary.data.repository.WeatherApiRepository
-import com.websarva.wings.android.zuboradiary.data.usecase.diary.CheckDiaryExistsUseCase
+import com.websarva.wings.android.zuboradiary.data.usecase.diary.DoesDiaryExistUseCase
 import com.websarva.wings.android.zuboradiary.data.usecase.diary.CanFetchWeatherInfoUseCase
 import com.websarva.wings.android.zuboradiary.data.usecase.diary.FetchWeatherInfoUseCase
 import com.websarva.wings.android.zuboradiary.data.usecase.diary.ReleaseUriPermissionUseCase
@@ -22,8 +22,8 @@ internal object UseCaseModule {
     @Provides
     fun provideCheckDiaryExistsUseCase(
         diaryRepository: DiaryRepository
-    ): CheckDiaryExistsUseCase {
-        return CheckDiaryExistsUseCase(diaryRepository)
+    ): DoesDiaryExistUseCase {
+        return DoesDiaryExistUseCase(diaryRepository)
     }
 
     @Singleton
