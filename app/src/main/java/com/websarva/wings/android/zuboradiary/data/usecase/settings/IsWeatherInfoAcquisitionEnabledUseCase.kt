@@ -18,7 +18,7 @@ internal class IsWeatherInfoAcquisitionEnabledUseCase(
 
     suspend operator fun invoke(): UseCaseResult<Boolean> {
         val logMsg = "天気情報取得設定値取得"
-        Log.e(logTag, "${logMsg}_開始")
+        Log.i(logTag, "${logMsg}_開始")
         return try {
             // TODO:first()処理方法をプロジェクトで統一する。
             val value =
@@ -29,7 +29,7 @@ internal class IsWeatherInfoAcquisitionEnabledUseCase(
                             value.weatherInfoAcquisitionPreference.isChecked
                         }.first()
                 }
-            Log.e(logTag, "${logMsg}_完了")
+            Log.i(logTag, "${logMsg}_完了")
             UseCaseResult.Success(value)
         } catch (e: Exception) {
             Log.e(logTag, "${logMsg}_失敗", e)
