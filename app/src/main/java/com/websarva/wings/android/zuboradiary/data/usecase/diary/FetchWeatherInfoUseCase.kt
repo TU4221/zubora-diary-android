@@ -18,7 +18,7 @@ import java.time.temporal.ChronoUnit
 internal class FetchWeatherInfoUseCase(
     private val weatherApiRepository: WeatherApiRepository,
     private val locationRepository: LocationRepository,
-    private val checkWeatherInfoFetchabilityUseCase: CheckWeatherInfoFetchabilityUseCase
+    private val canFetchWeatherInfoUseCase: CanFetchWeatherInfoUseCase
 ) {
 
     private val logTag = createLogTag()
@@ -51,7 +51,7 @@ internal class FetchWeatherInfoUseCase(
     }
 
     private suspend fun fetchWeatherInfo(date: LocalDate, geoCoordinates: GeoCoordinates): Weather {
-        when (val result = checkWeatherInfoFetchabilityUseCase(date)) {
+        when (val result = canFetchWeatherInfoUseCase(date)) {
             is UseCaseResult.Success -> {
                 if (!result.value) throw WeatherInfoDateOutOfRangeException()
             }

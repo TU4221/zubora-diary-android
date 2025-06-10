@@ -14,7 +14,7 @@ import com.websarva.wings.android.zuboradiary.data.model.ItemNumber
 import com.websarva.wings.android.zuboradiary.data.model.Weather
 import com.websarva.wings.android.zuboradiary.data.model.UseCaseResult
 import com.websarva.wings.android.zuboradiary.data.repository.UriRepository
-import com.websarva.wings.android.zuboradiary.data.usecase.diary.CheckWeatherInfoFetchabilityUseCase
+import com.websarva.wings.android.zuboradiary.data.usecase.diary.CanFetchWeatherInfoUseCase
 import com.websarva.wings.android.zuboradiary.data.usecase.diary.FetchWeatherInfoUseCase
 import com.websarva.wings.android.zuboradiary.data.usecase.diary.ReleaseUriPermissionUseCase
 import com.websarva.wings.android.zuboradiary.data.usecase.settings.IsWeatherInfoAcquisitionEnabledUseCase
@@ -51,7 +51,7 @@ internal class DiaryEditViewModel @Inject constructor(
     private val uriRepository: UriRepository,
     private val releaseUriPermissionUseCase: ReleaseUriPermissionUseCase,
     private val isWeatherInfoAcquisitionEnabledUseCase: IsWeatherInfoAcquisitionEnabledUseCase,
-    private val checkWeatherInfoFetchabilityUseCase: CheckWeatherInfoFetchabilityUseCase,
+    private val canFetchWeatherInfoUseCase: CanFetchWeatherInfoUseCase,
     private val fetchWeatherInfoUseCase: FetchWeatherInfoUseCase
 ) : BaseViewModel<DiaryEditEvent, DiaryEditAppMessage, DiaryEditState>() {
 
@@ -866,7 +866,7 @@ internal class DiaryEditViewModel @Inject constructor(
         date: LocalDate,
         shouldIgnoreConfirmationDialog: Boolean = false
     ) {
-        when (val result = checkWeatherInfoFetchabilityUseCase(date)) {
+        when (val result = canFetchWeatherInfoUseCase(date)) {
             is UseCaseResult.Success -> {
                 if (!result.value) {
                     updateViewModelIdleState()
