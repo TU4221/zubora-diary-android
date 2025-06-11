@@ -114,18 +114,23 @@ internal class SaveDiaryUseCase(
         loadedPicturePath: Uri?
     ) {
         if (loadedPicturePath != null) {
-            try {
-                releaseUriPermissionUseCase(loadedPicturePath)
-            } catch (e: Exception) {
-                throw SaveDiaryUseCaseException.UpdateUriPermissionFailedException(e)
+            when (val result = releaseUriPermissionUseCase(loadedPicturePath)) {
+                is UseCaseResult2.Success -> {
+                    // 処理なし
+                }
+                is UseCaseResult2.Error -> {
+                    throw SaveDiaryUseCaseException.UpdateUriPermissionFailedException(result.exception)
+                }
             }
         }
 
-        try {
-            takeUriPermissionUseCase(savedPicturePath)
-        } catch (e: Exception) {
-            throw SaveDiaryUseCaseException.UpdateUriPermissionFailedException(e)
+        when (val result = takeUriPermissionUseCase(savedPicturePath)) {
+            is UseCaseResult2.Success -> {
+                // 処理なし
+            }
+            is UseCaseResult2.Error -> {
+                throw SaveDiaryUseCaseException.UpdateUriPermissionFailedException(result.exception)
+            }
         }
-
     }
 }
