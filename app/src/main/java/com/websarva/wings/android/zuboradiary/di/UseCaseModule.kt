@@ -23,7 +23,7 @@ internal object UseCaseModule {
 
     @Singleton
     @Provides
-    fun provideCheckDiaryExistsUseCase(
+    fun provideDoesDiaryExistUseCase(
         diaryRepository: DiaryRepository
     ): DoesDiaryExistUseCase {
         return DoesDiaryExistUseCase(diaryRepository)
@@ -48,7 +48,7 @@ internal object UseCaseModule {
 
     @Singleton
     @Provides
-    fun provideCheckWeatherInfoFetchabilityUseCase(
+    fun provideCanFetchWeatherInfoUseCase(
         weatherApiRepository: WeatherApiRepository
     ): CanFetchWeatherInfoUseCase {
         return CanFetchWeatherInfoUseCase(weatherApiRepository)
