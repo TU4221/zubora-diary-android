@@ -4,10 +4,7 @@ import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
-import com.websarva.wings.android.zuboradiary.data.exception.LocationAccessFailedException
-import com.websarva.wings.android.zuboradiary.data.exception.LocationPermissionException
-import com.websarva.wings.android.zuboradiary.data.exception.WeatherInfoDateOutOfRangeException
-import com.websarva.wings.android.zuboradiary.data.exception.WeatherInfoFetchFailedException
+import com.websarva.wings.android.zuboradiary.data.exception.FetchWeatherInfoException
 import com.websarva.wings.android.zuboradiary.data.repository.DiaryRepository
 import com.websarva.wings.android.zuboradiary.data.model.Condition
 import com.websarva.wings.android.zuboradiary.data.model.ItemNumber
@@ -631,23 +628,26 @@ internal class DiaryEditViewModel @Inject constructor(
     fun onAccessLocationPermissionChecked(isGranted: Boolean, date: LocalDate) {
         viewModelScope.launch {
             when (val result = fetchWeatherInfoUseCase(isGranted, date)) {
-                is UseCaseResult.Success -> {
+                is UseCaseResult2.Success -> {
                     updateWeather1(result.value)
                     updateWeather2(Weather.UNKNOWN)
                 }
-                is UseCaseResult.Error -> {
+                is UseCaseResult2.Error -> {
                     when (result.exception) {
-                        is LocationPermissionException -> {
+                        is FetchWeatherInfoException.LocationPermissionException -> {
                             emitAppMessageEvent(DiaryEditAppMessage.AccessLocationPermissionRequest)
                         }
-                        is LocationAccessFailedException -> {
+                        is FetchWeatherInfoException.LocationAccessFailedException -> {
                             emitAppMessageEvent(DiaryEditAppMessage.WeatherInfoLoadingFailure)
                         }
-                        is WeatherInfoDateOutOfRangeException -> {
+                        is FetchWeatherInfoException.WeatherInfoDateOutOfRangeException -> {
                             emitAppMessageEvent(DiaryEditAppMessage.WeatherInfoDateOutOfRange)
                         }
-                        is WeatherInfoFetchFailedException -> {
+                        is FetchWeatherInfoException.WeatherInfoFetchFailedException -> {
                             emitAppMessageEvent(DiaryEditAppMessage.WeatherInfoLoadingFailure)
+                        }
+                        is FetchWeatherInfoException.WeatherInfoDateRangeCheckFailedException -> {
+                            // 処理無し
                         }
                     }
                 }
