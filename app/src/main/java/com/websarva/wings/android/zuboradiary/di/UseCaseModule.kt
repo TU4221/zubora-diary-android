@@ -6,8 +6,11 @@ import com.websarva.wings.android.zuboradiary.data.repository.UriRepository
 import com.websarva.wings.android.zuboradiary.data.repository.WeatherApiRepository
 import com.websarva.wings.android.zuboradiary.data.usecase.diary.DoesDiaryExistUseCase
 import com.websarva.wings.android.zuboradiary.data.usecase.diary.CanFetchWeatherInfoUseCase
+import com.websarva.wings.android.zuboradiary.data.usecase.diary.ShouldRequestDiaryUpdateConfirmationUseCase
 import com.websarva.wings.android.zuboradiary.data.usecase.diary.FetchWeatherInfoUseCase
+import com.websarva.wings.android.zuboradiary.data.usecase.diary.SaveDiaryUseCase
 import com.websarva.wings.android.zuboradiary.data.usecase.uri.ReleaseUriPermissionUseCase
+import com.websarva.wings.android.zuboradiary.data.usecase.uri.TakeUriPermissionUseCase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -24,6 +27,14 @@ internal object UseCaseModule {
         diaryRepository: DiaryRepository
     ): DoesDiaryExistUseCase {
         return DoesDiaryExistUseCase(diaryRepository)
+    }
+
+    @Singleton
+    @Provides
+    fun provideTakeUriPermissionUseCase(
+        uriRepository: UriRepository
+    ): TakeUriPermissionUseCase {
+        return TakeUriPermissionUseCase(uriRepository)
     }
 
     @Singleton
@@ -54,6 +65,30 @@ internal object UseCaseModule {
             weatherApiRepository,
             locationRepository,
             canFetchWeatherInfoUseCase
+        )
+    }
+
+    @Singleton
+    @Provides
+    fun provideShouldRequestDiaryUpdateConfirmationUseCase(
+        doesDiaryExistUseCase: DoesDiaryExistUseCase
+    ): ShouldRequestDiaryUpdateConfirmationUseCase {
+        return ShouldRequestDiaryUpdateConfirmationUseCase(
+            doesDiaryExistUseCase
+        )
+    }
+
+    @Singleton
+    @Provides
+    fun provideSaveDiaryUseCase(
+        diaryRepository: DiaryRepository,
+        takeUriPermissionUseCase: TakeUriPermissionUseCase,
+        releaseUriPermissionUseCase: ReleaseUriPermissionUseCase,
+    ): SaveDiaryUseCase {
+        return SaveDiaryUseCase(
+            diaryRepository,
+            takeUriPermissionUseCase,
+            releaseUriPermissionUseCase
         )
     }
 }

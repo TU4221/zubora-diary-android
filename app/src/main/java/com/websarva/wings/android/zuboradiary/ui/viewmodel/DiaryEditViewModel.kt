@@ -13,9 +13,11 @@ import com.websarva.wings.android.zuboradiary.data.model.Condition
 import com.websarva.wings.android.zuboradiary.data.model.ItemNumber
 import com.websarva.wings.android.zuboradiary.data.model.Weather
 import com.websarva.wings.android.zuboradiary.data.model.UseCaseResult
-import com.websarva.wings.android.zuboradiary.data.repository.UriRepository
+import com.websarva.wings.android.zuboradiary.data.model.UseCaseResult2
 import com.websarva.wings.android.zuboradiary.data.usecase.diary.CanFetchWeatherInfoUseCase
+import com.websarva.wings.android.zuboradiary.data.usecase.diary.ShouldRequestDiaryUpdateConfirmationUseCase
 import com.websarva.wings.android.zuboradiary.data.usecase.diary.FetchWeatherInfoUseCase
+import com.websarva.wings.android.zuboradiary.data.usecase.diary.SaveDiaryUseCase
 import com.websarva.wings.android.zuboradiary.data.usecase.uri.ReleaseUriPermissionUseCase
 import com.websarva.wings.android.zuboradiary.data.usecase.settings.IsWeatherInfoAcquisitionEnabledUseCase
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
@@ -48,7 +50,8 @@ import kotlin.random.Random
 internal class DiaryEditViewModel @Inject constructor(
     private val handle: SavedStateHandle,
     private val diaryRepository: DiaryRepository,
-    private val uriRepository: UriRepository,
+    private val shouldRequestDiaryUpdateConfirmationUseCase: ShouldRequestDiaryUpdateConfirmationUseCase,
+    private val saveDiaryUseCase: SaveDiaryUseCase,
     private val releaseUriPermissionUseCase: ReleaseUriPermissionUseCase,
     private val isWeatherInfoAcquisitionEnabledUseCase: IsWeatherInfoAcquisitionEnabledUseCase,
     private val canFetchWeatherInfoUseCase: CanFetchWeatherInfoUseCase,
@@ -92,19 +95,6 @@ internal class DiaryEditViewModel @Inject constructor(
 
     private val isNewDiary
         get() = _loadedDate.value == null
-
-    private val shouldDeleteLoadedDateDiary: Boolean
-        get() {
-            if (isNewDiary) return false
-            return !isLoadedDateEqualToInputDate
-        }
-
-    private val isLoadedDateEqualToInputDate: Boolean
-        get() {
-            val loadedDate = _loadedDate.value ?: return false
-            val inputDate = diaryStateFlow.date.value
-            return loadedDate == inputDate
-        }
 
     private val diaryStateFlow = DiaryStateFlow(viewModelScope, handle)
 
@@ -309,7 +299,30 @@ internal class DiaryEditViewModel @Inject constructor(
     fun onDiarySaveMenuClicked() {
         updateViewModelState(DiaryEditState.Saving)
         viewModelScope.launch {
-            saveDiary()
+            val result =
+                shouldRequestDiaryUpdateConfirmationUseCase(
+                    date.requireValue(),
+                    loadedDate.value
+                )
+
+            when (result) {
+                is UseCaseResult2.Success -> {
+                    if (result.value) {
+                        emitViewModelEvent(
+                            DiaryEditEvent.NavigateDiaryUpdateDialog(date.requireValue())
+                        )
+                        return@launch
+                    }
+                }
+                is UseCaseResult2.Error -> {
+                    emitAppMessageEvent(
+                        DiaryEditAppMessage.DiarySavingFailure
+                    )
+                    return@launch
+                }
+            }
+
+            processDiarySave()
             updateViewModelIdleState()
         }
     }
@@ -439,7 +452,7 @@ internal class DiaryEditViewModel @Inject constructor(
     private fun onDiaryUpdateDialogPositiveResultReceived() {
         updateViewModelState(DiaryEditState.Saving)
         viewModelScope.launch {
-            saveDiary(true)
+            processDiarySave()
             updateViewModelIdleState()
         }
     }
@@ -732,77 +745,35 @@ internal class DiaryEditViewModel @Inject constructor(
         }
     }
 
-    private suspend fun saveDiary(shouldIgnoreConfirmationDialog: Boolean = false) {
-        if (!shouldIgnoreConfirmationDialog) {
-            val shouldShowDialog =
-                shouldShowUpdateConfirmationDialog() ?: return
-            if (shouldShowDialog) {
-                emitViewModelEvent(
-                    DiaryEditEvent.NavigateDiaryUpdateDialog(date.requireValue())
-                )
-                return
-            }
-        }
-
-        val isSuccessful = saveDiaryToDatabase()
-        if (!isSuccessful) return
-
-        updatePictureUriPermissionOnDiarySaved()
-        emitViewModelEvent(
-            DiaryEditEvent
-                .NavigateDiaryShowFragment(
-                    date.requireValue()
-                )
-        )
-    }
-
-    private suspend fun shouldShowUpdateConfirmationDialog(): Boolean? {
-        if (isLoadedDateEqualToInputDate) return false
-        val inputDate = diaryStateFlow.date.requireValue()
-        return existsSavedDiary(inputDate)
-    }
-
-    private suspend fun updatePictureUriPermissionOnDiarySaved() {
-        val latestPictureUri = picturePath.value
-        val loadedPictureUri = loadedPicturePath
-
-        if (latestPictureUri == loadedPictureUri) return
-
-        if (loadedPictureUri != null) {
-            releaseUriPermissionUseCase(loadedPictureUri)
-        }
-        if (latestPictureUri != null) {
-            return uriRepository.takePersistablePermission(latestPictureUri)
-        }
-    }
-
-    private suspend fun saveDiaryToDatabase(): Boolean {
-        val logMsg = "日記保存"
-        Log.i(logTag, "${logMsg}_開始")
+    private suspend fun processDiarySave() {
+        val logMsg = "日記保存_"
+        Log.i(logTag, "${logMsg}開始")
 
         val diaryEntity = diaryStateFlow.createDiaryEntity()
         val diaryItemTitleSelectionHistoryItemEntityList =
             diaryStateFlow.createDiaryItemTitleSelectionHistoryItemEntityList()
-        try {
-            if (shouldDeleteLoadedDateDiary) {
-                diaryRepository
-                    .deleteAndSaveDiary(
-                        _loadedDate.requireValue(),
-                        diaryEntity,
-                        diaryItemTitleSelectionHistoryItemEntityList
-                    )
-            } else {
-                diaryRepository
-                    .saveDiary(diaryEntity, diaryItemTitleSelectionHistoryItemEntityList)
+        val result =
+            saveDiaryUseCase(
+                diaryEntity,
+                diaryItemTitleSelectionHistoryItemEntityList,
+                _loadedDate.value,
+                loadedPicturePath
+            )
+        when (result) {
+            is UseCaseResult2.Success -> {
+                Log.i(logTag, "${logMsg}完了")
+                emitViewModelEvent(
+                    DiaryEditEvent
+                        .NavigateDiaryShowFragment(
+                            date.requireValue()
+                        )
+                )
             }
-        } catch (e: Exception) {
-            Log.e(logTag, "${logMsg}_失敗", e)
-            emitAppMessageEvent(DiaryEditAppMessage.DiarySavingFailure)
-            return false
+            is UseCaseResult2.Error -> {
+                Log.e(logTag, "${logMsg}失敗")
+                emitAppMessageEvent(DiaryEditAppMessage.DiarySavingFailure)
+            }
         }
-
-        Log.i(logTag, "${logMsg}_完了")
-        return true
     }
 
     private suspend fun deleteDiary() {
@@ -984,10 +955,26 @@ internal class DiaryEditViewModel @Inject constructor(
                         diaryStateFlow.getItemStateFlow(ItemNumber(j)).title.value = itemTitle
                         diaryStateFlow.getItemStateFlow(ItemNumber(j)).comment.value = itemComment
                     }
-                    val isSuccessful = saveDiaryToDatabase()
-                    if (!isSuccessful) {
-                        isTesting = false
-                        return@launch
+
+
+                    val diaryEntity = diaryStateFlow.createDiaryEntity()
+                    val diaryItemTitleSelectionHistoryItemEntityList =
+                        diaryStateFlow.createDiaryItemTitleSelectionHistoryItemEntityList()
+                    val result =
+                        saveDiaryUseCase(
+                            diaryEntity,
+                            diaryItemTitleSelectionHistoryItemEntityList,
+                            _loadedDate.value,
+                            loadedPicturePath
+                        )
+                    when (result) {
+                        is UseCaseResult2.Success -> {
+                            // 処理なし
+                        }
+                        is UseCaseResult2.Error -> {
+                            isTesting = false
+                            return@launch
+                        }
                     }
                 }
             }
