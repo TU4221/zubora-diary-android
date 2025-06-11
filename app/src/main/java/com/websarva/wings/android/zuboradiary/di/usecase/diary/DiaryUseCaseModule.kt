@@ -1,8 +1,7 @@
-package com.websarva.wings.android.zuboradiary.di
+package com.websarva.wings.android.zuboradiary.di.usecase.diary
 
 import com.websarva.wings.android.zuboradiary.data.repository.DiaryRepository
 import com.websarva.wings.android.zuboradiary.data.repository.LocationRepository
-import com.websarva.wings.android.zuboradiary.data.repository.UriRepository
 import com.websarva.wings.android.zuboradiary.data.repository.WeatherApiRepository
 import com.websarva.wings.android.zuboradiary.data.usecase.diary.DoesDiaryExistUseCase
 import com.websarva.wings.android.zuboradiary.data.usecase.diary.CanFetchWeatherInfoUseCase
@@ -19,7 +18,7 @@ import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
-internal object UseCaseModule {
+internal object DiaryUseCaseModule {
 
     @Singleton
     @Provides
@@ -27,23 +26,6 @@ internal object UseCaseModule {
         diaryRepository: DiaryRepository
     ): DoesDiaryExistUseCase {
         return DoesDiaryExistUseCase(diaryRepository)
-    }
-
-    @Singleton
-    @Provides
-    fun provideTakeUriPermissionUseCase(
-        uriRepository: UriRepository
-    ): TakeUriPermissionUseCase {
-        return TakeUriPermissionUseCase(uriRepository)
-    }
-
-    @Singleton
-    @Provides
-    fun provideReleaseUriPermissionUseCase(
-        uriRepository: UriRepository,
-        diaryRepository: DiaryRepository
-    ): ReleaseUriPermissionUseCase {
-        return ReleaseUriPermissionUseCase(uriRepository, diaryRepository)
     }
 
     @Singleton
