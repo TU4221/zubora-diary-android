@@ -5,6 +5,7 @@ import com.websarva.wings.android.zuboradiary.data.repository.LocationRepository
 import com.websarva.wings.android.zuboradiary.data.repository.WeatherApiRepository
 import com.websarva.wings.android.zuboradiary.data.usecase.diary.DoesDiaryExistUseCase
 import com.websarva.wings.android.zuboradiary.data.usecase.diary.CanLoadWeatherInfoUseCase
+import com.websarva.wings.android.zuboradiary.data.usecase.diary.DeleteDiaryUseCase
 import com.websarva.wings.android.zuboradiary.data.usecase.diary.ShouldRequestDiaryUpdateConfirmationUseCase
 import com.websarva.wings.android.zuboradiary.data.usecase.diary.LoadWeatherInfoUseCase
 import com.websarva.wings.android.zuboradiary.data.usecase.diary.SaveDiaryUseCase
@@ -70,6 +71,18 @@ internal object DiaryUseCaseModule {
         return SaveDiaryUseCase(
             diaryRepository,
             takeUriPermissionUseCase,
+            releaseUriPermissionUseCase
+        )
+    }
+
+    @Singleton
+    @Provides
+    fun provideDeleteDiaryUseCase(
+        diaryRepository: DiaryRepository,
+        releaseUriPermissionUseCase: ReleaseUriPermissionUseCase,
+    ): DeleteDiaryUseCase {
+        return DeleteDiaryUseCase(
+            diaryRepository,
             releaseUriPermissionUseCase
         )
     }

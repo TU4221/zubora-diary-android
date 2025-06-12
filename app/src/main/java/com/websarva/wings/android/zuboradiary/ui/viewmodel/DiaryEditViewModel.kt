@@ -11,10 +11,11 @@ import com.websarva.wings.android.zuboradiary.data.model.ItemNumber
 import com.websarva.wings.android.zuboradiary.data.model.Weather
 import com.websarva.wings.android.zuboradiary.data.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.data.usecase.diary.CanLoadWeatherInfoUseCase
+import com.websarva.wings.android.zuboradiary.data.usecase.diary.DeleteDiaryUseCase
 import com.websarva.wings.android.zuboradiary.data.usecase.diary.ShouldRequestDiaryUpdateConfirmationUseCase
 import com.websarva.wings.android.zuboradiary.data.usecase.diary.LoadWeatherInfoUseCase
 import com.websarva.wings.android.zuboradiary.data.usecase.diary.SaveDiaryUseCase
-import com.websarva.wings.android.zuboradiary.data.usecase.uri.ReleaseUriPermissionUseCase
+import com.websarva.wings.android.zuboradiary.data.usecase.diary.error.DeleteDiaryError
 import com.websarva.wings.android.zuboradiary.data.usecase.settings.IsWeatherInfoAcquisitionEnabledUseCase
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import com.websarva.wings.android.zuboradiary.ui.model.DiaryEditAppMessage
@@ -48,7 +49,7 @@ internal class DiaryEditViewModel @Inject constructor(
     private val diaryRepository: DiaryRepository,
     private val shouldRequestDiaryUpdateConfirmationUseCase: ShouldRequestDiaryUpdateConfirmationUseCase,
     private val saveDiaryUseCase: SaveDiaryUseCase,
-    private val releaseUriPermissionUseCase: ReleaseUriPermissionUseCase,
+    private val deleteDiaryUseCase: DeleteDiaryUseCase,
     private val isWeatherInfoAcquisitionEnabledUseCase: IsWeatherInfoAcquisitionEnabledUseCase,
     private val canLoadWeatherInfoUseCase: CanLoadWeatherInfoUseCase,
     private val loadWeatherInfoUseCase: LoadWeatherInfoUseCase
@@ -467,7 +468,7 @@ internal class DiaryEditViewModel @Inject constructor(
     private fun onDiaryDeleteDialogPositiveResultReceived() {
         updateViewModelState(DiaryEditState.Deleting)
         viewModelScope.launch {
-            deleteDiary()
+            processDiaryDelete()
             updateViewModelIdleState()
         }
     }
@@ -771,39 +772,41 @@ internal class DiaryEditViewModel @Inject constructor(
         }
     }
 
-    private suspend fun deleteDiary() {
+    private suspend fun processDiaryDelete() {
+        val logMsg = "日記削除_"
+        Log.i(logTag, "${logMsg}開始")
+
         val loadedDate = loadedDate.requireValue()
         val loadedPictureUri = loadedPicturePath
 
-        val isSuccessful = deleteDiaryFromDatabase()
-        if (!isSuccessful) {
-            return
-        }
-
-        releaseUriPermissionUseCase(loadedPictureUri)
-        emitViewModelEvent(
-            DiaryEditEvent
-                .NavigatePreviousFragmentOnDiaryDelete(
-                    FragmentResult.Some(loadedDate)
+        when (val result = deleteDiaryUseCase(loadedDate, loadedPictureUri)) {
+            is UseCaseResult.Success -> {
+                Log.i(logTag, "${logMsg}完了")
+                emitViewModelEvent(
+                    DiaryEditEvent
+                        .NavigatePreviousFragmentOnDiaryDelete(
+                            FragmentResult.Some(loadedDate)
+                        )
                 )
-        )
-    }
-
-    private suspend fun deleteDiaryFromDatabase(): Boolean {
-        val logMsg = "日記削除"
-        Log.i(logTag, "${logMsg}_開始")
-        val deleteDate = _loadedDate.requireValue()
-
-        try {
-            diaryRepository.deleteDiary(deleteDate)
-        } catch (e: Exception) {
-            Log.e(logTag, "${logMsg}_失敗", e)
-            emitAppMessageEvent(DiaryEditAppMessage.DiaryDeleteFailure)
-            return false
+            }
+            is UseCaseResult.Error -> {
+                when (result.error) {
+                    is DeleteDiaryError.DeleteDiary -> {
+                        Log.e(logTag, "${logMsg}失敗")
+                        emitAppMessageEvent(DiaryEditAppMessage.DiaryDeleteFailure)
+                    }
+                    is DeleteDiaryError.ReleaseUriPermission -> {
+                        Log.i(logTag, "${logMsg}完了(Uri開放失敗)")
+                        emitViewModelEvent(
+                            DiaryEditEvent
+                                .NavigatePreviousFragmentOnDiaryDelete(
+                                    FragmentResult.Some(loadedDate)
+                                )
+                        )
+                    }
+                }
+            }
         }
-
-        Log.i(logTag, "${logMsg}_完了")
-        return true
     }
 
     // 日付関係
