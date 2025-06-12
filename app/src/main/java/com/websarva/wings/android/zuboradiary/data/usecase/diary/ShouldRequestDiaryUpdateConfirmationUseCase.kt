@@ -19,7 +19,10 @@ internal class ShouldRequestDiaryUpdateConfirmationUseCase(
         val logMsg = "日記更新確認必要確認_"
         Log.i(logTag, "${logMsg}開始")
 
-        if (inputDate == loadedDate) return UseCaseResult.Success(false)
+        if (inputDate == loadedDate) {
+            Log.i(logTag, "${logMsg}完了")
+            return UseCaseResult.Success(false)
+        }
 
         return when (val result = doesDiaryExistUseCase(inputDate)) {
             is UseCaseResult.Success -> {
