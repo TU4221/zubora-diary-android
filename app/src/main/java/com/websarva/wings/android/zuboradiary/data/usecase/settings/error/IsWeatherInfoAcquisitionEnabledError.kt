@@ -10,7 +10,7 @@ internal sealed class IsWeatherInfoAcquisitionEnabledError(
     class LoadSettings(
         cause: Throwable? = null
     ) : IsWeatherInfoAcquisitionEnabledError(
-        "天気情報取得設定確認に失敗しました。",
+        "天気情報取得設定読込に失敗しました。",
         cause
     )
 }
