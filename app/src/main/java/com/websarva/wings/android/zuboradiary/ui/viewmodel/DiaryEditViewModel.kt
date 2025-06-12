@@ -5,13 +5,13 @@ import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.websarva.wings.android.zuboradiary.data.usecase.diary.error.FetchWeatherInfoError
-import com.websarva.wings.android.zuboradiary.data.repository.DiaryRepository
 import com.websarva.wings.android.zuboradiary.data.model.Condition
 import com.websarva.wings.android.zuboradiary.data.model.ItemNumber
 import com.websarva.wings.android.zuboradiary.data.model.Weather
 import com.websarva.wings.android.zuboradiary.data.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.data.usecase.diary.CanLoadWeatherInfoUseCase
 import com.websarva.wings.android.zuboradiary.data.usecase.diary.DeleteDiaryUseCase
+import com.websarva.wings.android.zuboradiary.data.usecase.diary.DoesDiaryExistUseCase
 import com.websarva.wings.android.zuboradiary.data.usecase.diary.LoadDiaryUseCase
 import com.websarva.wings.android.zuboradiary.data.usecase.diary.ShouldRequestDiaryUpdateConfirmationUseCase
 import com.websarva.wings.android.zuboradiary.data.usecase.diary.LoadWeatherInfoUseCase
@@ -48,7 +48,6 @@ import kotlin.random.Random
 @HiltViewModel
 internal class DiaryEditViewModel @Inject constructor(
     private val handle: SavedStateHandle,
-    private val diaryRepository: DiaryRepository,
     private val shouldRequestDiaryLoadingConfirmationUseCase: ShouldRequestDiaryLoadingConfirmationUseCase,
     private val shouldRequestDiaryUpdateConfirmationUseCase: ShouldRequestDiaryUpdateConfirmationUseCase,
     private val shouldRequestWeatherInfoConfirmationUseCase: ShouldRequestWeatherInfoConfirmationUseCase,
@@ -56,7 +55,8 @@ internal class DiaryEditViewModel @Inject constructor(
     private val saveDiaryUseCase: SaveDiaryUseCase,
     private val deleteDiaryUseCase: DeleteDiaryUseCase,
     private val canLoadWeatherInfoUseCase: CanLoadWeatherInfoUseCase,
-    private val loadWeatherInfoUseCase: LoadWeatherInfoUseCase
+    private val loadWeatherInfoUseCase: LoadWeatherInfoUseCase,
+    private val doesDiaryExistUseCase: DoesDiaryExistUseCase
 ) : BaseViewModel<DiaryEditEvent, DiaryEditAppMessage, DiaryEditState>() {
 
     companion object {
@@ -90,9 +90,6 @@ internal class DiaryEditViewModel @Inject constructor(
         MutableStateFlow( handle[SAVED_LOADED_DATE_STATE_KEY] ?: initialLoadedDate)
     val loadedDate
         get() = _loadedDate.asStateFlow()
-
-    private val isNewDiaryDefaultStatus
-        get() = hasPreparedDiary && previousDate == null && _loadedDate.value == null
 
     private val diaryStateFlow = DiaryStateFlow(viewModelScope, handle)
 
@@ -722,7 +719,7 @@ internal class DiaryEditViewModel @Inject constructor(
         val result = shouldRequestDiaryLoadingConfirmationUseCase(date, previousDate, loadedDate)
         when (result) {
             is UseCaseResult.Success -> {
-                if (shouldShowDiaryLoadingDialog(date)) {
+                if (result.value) {
                     emitViewModelEvent(
                         DiaryEditEvent.NavigateDiaryLoadingDialog(date)
                     )
@@ -748,29 +745,6 @@ internal class DiaryEditViewModel @Inject constructor(
             is UseCaseResult.Error -> {
                 // TODO:emitAppMessageEvent() 日記情報の読込に失敗しました。
             }
-        }
-    }
-
-    private suspend fun shouldShowDiaryLoadingDialog(changedDate: LocalDate): Boolean {
-        if (isNewDiaryDefaultStatus) {
-            return existsSavedDiary(changedDate) ?: false
-        }
-
-        val previousDate = previousDate
-        val loadedDate = loadedDate.value
-
-        if (changedDate == previousDate) return false
-        if (changedDate == loadedDate) return false
-        return existsSavedDiary(changedDate) ?: false
-    }
-
-    private suspend fun existsSavedDiary(date: LocalDate): Boolean? {
-        try {
-            return diaryRepository.existsDiary(date)
-        } catch (e: Exception) {
-            Log.e(logTag, "日記既存確認_失敗", e)
-            emitAppMessageEvent(DiaryEditAppMessage.WeatherInfoLoadingFailure)
-            return null
         }
     }
 
@@ -951,13 +925,16 @@ internal class DiaryEditViewModel @Inject constructor(
             if (startDate != null) {
                 for (i in 0 until 10) {
                     val savingDate = startDate.minusDays(i.toLong())
-                    val isPass = existsSavedDiary(savingDate)
-                    if (isPass == null) {
-                        isTesting = false
-                        return@launch
-                    }
-                    if (isPass) {
-                        continue
+
+                    when (val result = doesDiaryExistUseCase(savingDate)) {
+                        is UseCaseResult.Success -> {
+                            if (result.value) continue
+                        }
+                        is UseCaseResult.Error -> {
+                            // TODO:emitAppMessageEvent() 日記情報の読込に失敗しました。
+                            isTesting = false
+                            return@launch
+                        }
                     }
                     diaryStateFlow.initialize()
                     updateDate(savingDate)
