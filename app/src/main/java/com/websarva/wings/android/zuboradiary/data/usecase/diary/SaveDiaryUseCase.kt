@@ -31,7 +31,7 @@ internal class SaveDiaryUseCase(
         Log.i(logTag, "${logMsg}開始")
 
         try {
-            saveDiaryToDatabase(
+            saveDiary(
                 diaryEntity,
                 diaryItemTitleSelectionHistoryItemEntityList,
                 /*loadedDiaryEntity*/loadedDate
@@ -39,7 +39,7 @@ internal class SaveDiaryUseCase(
 
             val savedPicturePath = Uri.parse(diaryEntity.picturePath) 
             /*val loadedDate = Uri.parse(loadedDiaryEntity.picturePath)*/
-            updatePictureUriPermission(
+            managePictureUriPermission(
                 savedPicturePath,
                 loadedPicturePath
             )
@@ -52,13 +52,13 @@ internal class SaveDiaryUseCase(
         return UseCaseResult.Success(Unit)
     }
 
-    private suspend fun saveDiaryToDatabase(
+    private suspend fun saveDiary(
         diaryEntity: DiaryEntity,
         diaryItemTitleSelectionHistoryItemEntityList: List<DiaryItemTitleSelectionHistoryItemEntity>,
         /*loadedDiaryEntity: DiaryEntity?*/
         loadedDate: LocalDate?
     ) {
-        val logMsg = "データベース更新_"
+        val logMsg = "日記データ保存_"
         Log.i(logTag, "${logMsg}開始")
 
         try {
@@ -91,7 +91,7 @@ internal class SaveDiaryUseCase(
         return inputDate != loadedDate
     }
 
-    private suspend fun updatePictureUriPermission(
+    private suspend fun managePictureUriPermission(
         savedPicturePath: Uri,
         loadedPicturePath: Uri?
     ) {
