@@ -17,8 +17,8 @@ import com.websarva.wings.android.zuboradiary.data.usecase.diary.ShouldRequestDi
 import com.websarva.wings.android.zuboradiary.data.usecase.diary.LoadWeatherInfoUseCase
 import com.websarva.wings.android.zuboradiary.data.usecase.diary.SaveDiaryUseCase
 import com.websarva.wings.android.zuboradiary.data.usecase.diary.ShouldRequestDiaryLoadingConfirmationUseCase
+import com.websarva.wings.android.zuboradiary.data.usecase.diary.ShouldRequestWeatherInfoConfirmationUseCase
 import com.websarva.wings.android.zuboradiary.data.usecase.diary.error.DeleteDiaryError
-import com.websarva.wings.android.zuboradiary.data.usecase.settings.IsWeatherInfoAcquisitionEnabledUseCase
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import com.websarva.wings.android.zuboradiary.ui.model.DiaryEditAppMessage
 import com.websarva.wings.android.zuboradiary.ui.model.adapter.WeatherAdapterList
@@ -51,10 +51,10 @@ internal class DiaryEditViewModel @Inject constructor(
     private val diaryRepository: DiaryRepository,
     private val shouldRequestDiaryLoadingConfirmationUseCase: ShouldRequestDiaryLoadingConfirmationUseCase,
     private val shouldRequestDiaryUpdateConfirmationUseCase: ShouldRequestDiaryUpdateConfirmationUseCase,
+    private val shouldRequestWeatherInfoConfirmationUseCase: ShouldRequestWeatherInfoConfirmationUseCase,
     private val loadDiaryUseCase: LoadDiaryUseCase,
     private val saveDiaryUseCase: SaveDiaryUseCase,
     private val deleteDiaryUseCase: DeleteDiaryUseCase,
-    private val isWeatherInfoAcquisitionEnabledUseCase: IsWeatherInfoAcquisitionEnabledUseCase,
     private val canLoadWeatherInfoUseCase: CanLoadWeatherInfoUseCase,
     private val loadWeatherInfoUseCase: LoadWeatherInfoUseCase
 ) : BaseViewModel<DiaryEditEvent, DiaryEditAppMessage, DiaryEditState>() {
@@ -93,9 +93,6 @@ internal class DiaryEditViewModel @Inject constructor(
 
     private val isNewDiaryDefaultStatus
         get() = hasPreparedDiary && previousDate == null && _loadedDate.value == null
-
-    private val isNewDiary
-        get() = _loadedDate.value == null
 
     private val diaryStateFlow = DiaryStateFlow(viewModelScope, handle)
 
@@ -427,13 +424,23 @@ internal class DiaryEditViewModel @Inject constructor(
     private fun onDiaryLoadingDialogNegativeResultReceived() {
         viewModelScope.launch {
             updateViewModelState(DiaryEditState.WeatherFetching)
-            val date = date.requireValue()
-            if (!shouldLoadWeatherInfo(date)) {
-                updateViewModelIdleState()
-                return@launch
-            }
 
-            loadWeatherInfo(date)
+            val date = date.requireValue()
+            val previousDate = previousDate
+            val loadedDate = loadedDate.value
+            val result = shouldRequestWeatherInfoConfirmationUseCase(date, previousDate, loadedDate)
+            when (result) {
+                is UseCaseResult.Success -> {
+                    if (result.value) {
+                        loadWeatherInfo(date)
+                    } else {
+                        updateViewModelIdleState()
+                    }
+                }
+                is UseCaseResult.Error -> {
+                    // TODO:emitAppMessageEvent() 日記情報の読込に失敗しました。
+                }
+            }
         }
     }
 
@@ -523,10 +530,18 @@ internal class DiaryEditViewModel @Inject constructor(
     private fun onWeatherInfoFetchDialogPositiveResultReceived() {
         updateViewModelState(DiaryEditState.WeatherFetching)
         viewModelScope.launch {
-            val date = diaryStateFlow.date.requireValue()
-            if (!shouldLoadWeatherInfo(date)) return@launch
-
-            loadWeatherInfo(date, true)
+            val date = date.requireValue()
+            val previousDate = previousDate
+            val loadedDate = loadedDate.value
+            val result = shouldRequestWeatherInfoConfirmationUseCase(date, previousDate, loadedDate)
+            when (result) {
+                is UseCaseResult.Success -> {
+                    if (result.value) loadWeatherInfo(date, true)
+                }
+                is UseCaseResult.Error -> {
+                    // TODO:emitAppMessageEvent() 日記情報の読込に失敗しました。
+                }
+            }
         }
     }
 
@@ -720,12 +735,20 @@ internal class DiaryEditViewModel @Inject constructor(
             }
         }
 
-        if (!shouldLoadWeatherInfo(date)) {
-            updateViewModelIdleState()
-            return
+        val weatherResult =
+            shouldRequestWeatherInfoConfirmationUseCase(date, previousDate, loadedDate)
+        when (weatherResult) {
+            is UseCaseResult.Success -> {
+                if (weatherResult.value) {
+                    loadWeatherInfo(date)
+                } else {
+                    updateViewModelIdleState()
+                }
+            }
+            is UseCaseResult.Error -> {
+                // TODO:emitAppMessageEvent() 日記情報の読込に失敗しました。
+            }
         }
-
-        loadWeatherInfo(date)
     }
 
     private suspend fun shouldShowDiaryLoadingDialog(changedDate: LocalDate): Boolean {
@@ -832,15 +855,6 @@ internal class DiaryEditViewModel @Inject constructor(
     }
 
     // 天気情報関係
-    private suspend fun shouldLoadWeatherInfo(date: LocalDate): Boolean {
-        when (val result = isWeatherInfoAcquisitionEnabledUseCase()) {
-            is UseCaseResult.Success -> if (!result.value) return false
-            is UseCaseResult.Error -> return false
-        }
-        if (!isNewDiary && previousDate == null) return false
-        return previousDate != date
-    }
-
     private suspend fun loadWeatherInfo(
         date: LocalDate,
         shouldIgnoreConfirmationDialog: Boolean = false
