@@ -4,16 +4,15 @@ import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
-import com.websarva.wings.android.zuboradiary.data.exception.FetchWeatherInfoException
+import com.websarva.wings.android.zuboradiary.data.usecase.diary.error.FetchWeatherInfoError
 import com.websarva.wings.android.zuboradiary.data.repository.DiaryRepository
 import com.websarva.wings.android.zuboradiary.data.model.Condition
 import com.websarva.wings.android.zuboradiary.data.model.ItemNumber
 import com.websarva.wings.android.zuboradiary.data.model.Weather
-import com.websarva.wings.android.zuboradiary.data.model.UseCaseResult
-import com.websarva.wings.android.zuboradiary.data.model.UseCaseResult2
-import com.websarva.wings.android.zuboradiary.data.usecase.diary.CanFetchWeatherInfoUseCase
+import com.websarva.wings.android.zuboradiary.data.usecase.UseCaseResult
+import com.websarva.wings.android.zuboradiary.data.usecase.diary.CanLoadWeatherInfoUseCase
 import com.websarva.wings.android.zuboradiary.data.usecase.diary.ShouldRequestDiaryUpdateConfirmationUseCase
-import com.websarva.wings.android.zuboradiary.data.usecase.diary.FetchWeatherInfoUseCase
+import com.websarva.wings.android.zuboradiary.data.usecase.diary.LoadWeatherInfoUseCase
 import com.websarva.wings.android.zuboradiary.data.usecase.diary.SaveDiaryUseCase
 import com.websarva.wings.android.zuboradiary.data.usecase.uri.ReleaseUriPermissionUseCase
 import com.websarva.wings.android.zuboradiary.data.usecase.settings.IsWeatherInfoAcquisitionEnabledUseCase
@@ -51,8 +50,8 @@ internal class DiaryEditViewModel @Inject constructor(
     private val saveDiaryUseCase: SaveDiaryUseCase,
     private val releaseUriPermissionUseCase: ReleaseUriPermissionUseCase,
     private val isWeatherInfoAcquisitionEnabledUseCase: IsWeatherInfoAcquisitionEnabledUseCase,
-    private val canFetchWeatherInfoUseCase: CanFetchWeatherInfoUseCase,
-    private val fetchWeatherInfoUseCase: FetchWeatherInfoUseCase
+    private val canLoadWeatherInfoUseCase: CanLoadWeatherInfoUseCase,
+    private val loadWeatherInfoUseCase: LoadWeatherInfoUseCase
 ) : BaseViewModel<DiaryEditEvent, DiaryEditAppMessage, DiaryEditState>() {
 
     companion object {
@@ -303,7 +302,7 @@ internal class DiaryEditViewModel @Inject constructor(
                 )
 
             when (result) {
-                is UseCaseResult2.Success -> {
+                is UseCaseResult.Success -> {
                     if (result.value) {
                         emitViewModelEvent(
                             DiaryEditEvent.NavigateDiaryUpdateDialog(date.requireValue())
@@ -311,7 +310,7 @@ internal class DiaryEditViewModel @Inject constructor(
                         return@launch
                     }
                 }
-                is UseCaseResult2.Error -> {
+                is UseCaseResult.Error -> {
                     emitAppMessageEvent(
                         DiaryEditAppMessage.DiarySavingFailure
                     )
@@ -627,27 +626,24 @@ internal class DiaryEditViewModel @Inject constructor(
     // 権限確認後処理
     fun onAccessLocationPermissionChecked(isGranted: Boolean, date: LocalDate) {
         viewModelScope.launch {
-            when (val result = fetchWeatherInfoUseCase(isGranted, date)) {
-                is UseCaseResult2.Success -> {
+            when (val result = loadWeatherInfoUseCase(isGranted, date)) {
+                is UseCaseResult.Success -> {
                     updateWeather1(result.value)
                     updateWeather2(Weather.UNKNOWN)
                 }
-                is UseCaseResult2.Error -> {
-                    when (result.exception) {
-                        is FetchWeatherInfoException.LocationPermissionException -> {
+                is UseCaseResult.Error -> {
+                    when (result.error) {
+                        is FetchWeatherInfoError.LocationPermissionNotGranted -> {
                             emitAppMessageEvent(DiaryEditAppMessage.AccessLocationPermissionRequest)
                         }
-                        is FetchWeatherInfoException.LocationAccessFailedException -> {
+                        is FetchWeatherInfoError.AccessLocation -> {
                             emitAppMessageEvent(DiaryEditAppMessage.WeatherInfoLoadingFailure)
                         }
-                        is FetchWeatherInfoException.WeatherInfoDateOutOfRangeException -> {
+                        is FetchWeatherInfoError.WeatherInfoDateOutOfRange -> {
                             emitAppMessageEvent(DiaryEditAppMessage.WeatherInfoDateOutOfRange)
                         }
-                        is FetchWeatherInfoException.WeatherInfoFetchFailedException -> {
+                        is FetchWeatherInfoError.LoadWeatherInfo -> {
                             emitAppMessageEvent(DiaryEditAppMessage.WeatherInfoLoadingFailure)
-                        }
-                        is FetchWeatherInfoException.WeatherInfoDateRangeCheckFailedException -> {
-                            // 処理無し
                         }
                     }
                 }
@@ -760,7 +756,7 @@ internal class DiaryEditViewModel @Inject constructor(
                 loadedPicturePath
             )
         when (result) {
-            is UseCaseResult2.Success -> {
+            is UseCaseResult.Success -> {
                 Log.i(logTag, "${logMsg}完了")
                 emitViewModelEvent(
                     DiaryEditEvent
@@ -769,7 +765,7 @@ internal class DiaryEditViewModel @Inject constructor(
                         )
                 )
             }
-            is UseCaseResult2.Error -> {
+            is UseCaseResult.Error -> {
                 Log.e(logTag, "${logMsg}失敗")
                 emitAppMessageEvent(DiaryEditAppMessage.DiarySavingFailure)
             }
@@ -837,7 +833,7 @@ internal class DiaryEditViewModel @Inject constructor(
         date: LocalDate,
         shouldIgnoreConfirmationDialog: Boolean = false
     ) {
-        when (val result = canFetchWeatherInfoUseCase(date)) {
+        when (val result = canLoadWeatherInfoUseCase(date)) {
             is UseCaseResult.Success -> {
                 if (!result.value) {
                     updateViewModelIdleState()
@@ -968,10 +964,10 @@ internal class DiaryEditViewModel @Inject constructor(
                             loadedPicturePath
                         )
                     when (result) {
-                        is UseCaseResult2.Success -> {
+                        is UseCaseResult.Success -> {
                             // 処理なし
                         }
-                        is UseCaseResult2.Error -> {
+                        is UseCaseResult.Error -> {
                             isTesting = false
                             return@launch
                         }

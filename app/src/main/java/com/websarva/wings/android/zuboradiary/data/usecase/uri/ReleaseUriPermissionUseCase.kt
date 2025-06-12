@@ -1,48 +1,44 @@
 package com.websarva.wings.android.zuboradiary.data.usecase.uri
 
 import android.net.Uri
-import com.websarva.wings.android.zuboradiary.data.exception.UseCaseException
-import com.websarva.wings.android.zuboradiary.data.model.UseCaseResult2
+import android.util.Log
+import com.websarva.wings.android.zuboradiary.data.usecase.uri.error.ReleaseUriPermissionError
+import com.websarva.wings.android.zuboradiary.data.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.data.repository.DiaryRepository
 import com.websarva.wings.android.zuboradiary.data.repository.UriRepository
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
+import com.websarva.wings.android.zuboradiary.utils.createLogTag
 
 internal class ReleaseUriPermissionUseCase(
     private val uriRepository: UriRepository,
     private val diaryRepository: DiaryRepository
 ) {
 
-    sealed class ReleaseUriPermissionUseCaseException(
-        message: String,
-        cause: Throwable? = null
-    ) : UseCaseException(message, cause) {
+    private val logTag = createLogTag()
 
-        class FailedException(
-            cause: Throwable?
-        ) : ReleaseUriPermissionUseCaseException(
-            "Uri権限解放に失敗しました。",
-            cause
-        )
-    }
+    suspend operator fun invoke(uri: Uri?): UseCaseResult<Unit, ReleaseUriPermissionError> {
+        val logMsg = "Uri権限解放_"
+        Log.i(logTag, "${logMsg}開始")
 
-    suspend operator fun invoke(uri: Uri?): UseCaseResult2<Unit, ReleaseUriPermissionUseCaseException> {
-        if (uri == null) return UseCaseResult2.Success(Unit)
+        if (uri == null) return UseCaseResult.Success(Unit)
 
-        val existsPicturePath =
-            withContext(Dispatchers.IO) {
-                diaryRepository.existsPicturePath(uri)
-            }
-        if (existsPicturePath) return UseCaseResult2.Success(Unit)
+        try {
+            val existsPicturePath = diaryRepository.existsPicturePath(uri)
+            if (existsPicturePath) return UseCaseResult.Success(Unit)
+        } catch (e: Exception) {
+            val error = ReleaseUriPermissionError.CheckUriUsage(e)
+            Log.e(logTag, "${logMsg}失敗", error)
+            return UseCaseResult.Error(error)
+        }
 
         try {
             uriRepository.releasePersistablePermission(uri)
         } catch (e: Exception) {
-            return UseCaseResult2.Error(
-                ReleaseUriPermissionUseCaseException.FailedException(e)
-            )
+            val error = ReleaseUriPermissionError.ReleaseUriPermission(e)
+            Log.e(logTag, "${logMsg}失敗", error)
+            return UseCaseResult.Error(error)
         }
 
-        return UseCaseResult2.Success(Unit)
+        Log.i(logTag, "${logMsg}完了")
+        return UseCaseResult.Success(Unit)
     }
 }

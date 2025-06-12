@@ -4,8 +4,8 @@ import android.net.Uri
 import android.util.Log
 import com.websarva.wings.android.zuboradiary.data.database.DiaryEntity
 import com.websarva.wings.android.zuboradiary.data.database.DiaryItemTitleSelectionHistoryItemEntity
-import com.websarva.wings.android.zuboradiary.data.exception.UseCaseException
-import com.websarva.wings.android.zuboradiary.data.model.UseCaseResult2
+import com.websarva.wings.android.zuboradiary.data.usecase.diary.error.SaveDiaryError
+import com.websarva.wings.android.zuboradiary.data.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.data.repository.DiaryRepository
 import com.websarva.wings.android.zuboradiary.data.usecase.uri.ReleaseUriPermissionUseCase
 import com.websarva.wings.android.zuboradiary.data.usecase.uri.TakeUriPermissionUseCase
@@ -19,26 +19,6 @@ internal class SaveDiaryUseCase(
 ) {
 
     private val logTag = createLogTag()
-    
-    sealed class SaveDiaryUseCaseException(
-        message: String,
-        cause: Throwable? = null
-    ) : UseCaseException(message, cause) {
-        
-        class SaveDiaryFailedException(
-            cause: Throwable?
-        ) : SaveDiaryUseCaseException(
-            "日記の保存に失敗しました。",
-            cause
-        )
-
-        class UpdateUriPermissionFailedException(
-            cause: Throwable?
-        ) : SaveDiaryUseCaseException(
-            "日記添付画像のUri権限取得に失敗しました。",
-            cause
-        )
-    }
 
     suspend operator fun invoke(
         diaryEntity: DiaryEntity,
@@ -46,7 +26,9 @@ internal class SaveDiaryUseCase(
         /*loadedDiaryEntity: DiaryEntity?*/
         loadedDate: LocalDate?,
         loadedPicturePath: Uri?
-    ): UseCaseResult2<Unit, SaveDiaryUseCaseException> {
+    ): UseCaseResult<Unit, SaveDiaryError> {
+        val logMsg = "日記保存_"
+        Log.i(logTag, "${logMsg}開始")
 
         try {
             saveDiaryToDatabase(
@@ -61,12 +43,13 @@ internal class SaveDiaryUseCase(
                 savedPicturePath,
                 loadedPicturePath
             )
-        } catch (e: SaveDiaryUseCaseException) {
-            return UseCaseResult2.Error(e)
+        } catch (e: SaveDiaryError) {
+            Log.e(logTag, "${logMsg}失敗", e)
+            return UseCaseResult.Error(e)
         }
 
-        Result
-        return UseCaseResult2.Success(Unit)
+        Log.e(logTag, "${logMsg}完了")
+        return UseCaseResult.Success(Unit)
     }
 
     private suspend fun saveDiaryToDatabase(
@@ -75,8 +58,8 @@ internal class SaveDiaryUseCase(
         /*loadedDiaryEntity: DiaryEntity?*/
         loadedDate: LocalDate?
     ) {
-        val logMsg = "日記保存"
-        Log.i(logTag, "${logMsg}_開始")
+        val logMsg = "データベース更新_"
+        Log.i(logTag, "${logMsg}開始")
 
         try {
             val saveDate = LocalDate.parse(diaryEntity.date)
@@ -93,11 +76,10 @@ internal class SaveDiaryUseCase(
                     .saveDiary(diaryEntity, diaryItemTitleSelectionHistoryItemEntityList)
             }
         } catch (e: Exception) {
-            Log.e(logTag, "${logMsg}_失敗", e)
-            throw SaveDiaryUseCaseException.SaveDiaryFailedException(e)
+            throw SaveDiaryError.SaveDiary(e)
         }
 
-        Log.i(logTag, "${logMsg}_完了")
+        Log.i(logTag, "${logMsg}完了")
     }
 
     private fun shouldDeleteLoadedDateDiary(
@@ -113,24 +95,28 @@ internal class SaveDiaryUseCase(
         savedPicturePath: Uri,
         loadedPicturePath: Uri?
     ) {
+        val logMsg = "画像Uri権限管理_"
+        Log.i(logTag, "${logMsg}開始")
+
         if (loadedPicturePath != null) {
             when (val result = releaseUriPermissionUseCase(loadedPicturePath)) {
-                is UseCaseResult2.Success -> {
+                is UseCaseResult.Success -> {
                     // 処理なし
                 }
-                is UseCaseResult2.Error -> {
-                    throw SaveDiaryUseCaseException.UpdateUriPermissionFailedException(result.exception)
+                is UseCaseResult.Error -> {
+                    throw SaveDiaryError.ManageUriPermission(result.error)
                 }
             }
         }
 
         when (val result = takeUriPermissionUseCase(savedPicturePath)) {
-            is UseCaseResult2.Success -> {
+            is UseCaseResult.Success -> {
                 // 処理なし
             }
-            is UseCaseResult2.Error -> {
-                throw SaveDiaryUseCaseException.UpdateUriPermissionFailedException(result.exception)
+            is UseCaseResult.Error -> {
+                throw SaveDiaryError.ManageUriPermission(result.error)
             }
         }
+        Log.i(logTag, "${logMsg}完了")
     }
 }

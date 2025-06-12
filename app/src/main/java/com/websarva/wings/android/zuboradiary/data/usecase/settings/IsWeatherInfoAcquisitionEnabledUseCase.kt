@@ -1,7 +1,8 @@
 package com.websarva.wings.android.zuboradiary.data.usecase.settings
 
 import android.util.Log
-import com.websarva.wings.android.zuboradiary.data.model.UseCaseResult
+import com.websarva.wings.android.zuboradiary.data.usecase.settings.error.IsWeatherInfoAcquisitionEnabledError
+import com.websarva.wings.android.zuboradiary.data.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.data.preferences.AllPreferences
 import com.websarva.wings.android.zuboradiary.data.repository.UserPreferencesRepository
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
@@ -16,9 +17,10 @@ internal class IsWeatherInfoAcquisitionEnabledUseCase(
 
     private val logTag = createLogTag()
 
-    suspend operator fun invoke(): UseCaseResult<Boolean> {
-        val logMsg = "天気情報取得設定値取得"
-        Log.i(logTag, "${logMsg}_開始")
+    suspend operator fun invoke(): UseCaseResult<Boolean, IsWeatherInfoAcquisitionEnabledError> {
+        val logMsg = "天気情報取得設定確認_"
+        Log.i(logTag, "${logMsg}開始")
+
         return try {
             // TODO:first()処理方法をプロジェクトで統一する。
             val value =
@@ -29,11 +31,12 @@ internal class IsWeatherInfoAcquisitionEnabledUseCase(
                             value.weatherInfoAcquisitionPreference.isChecked
                         }.first()
                 }
-            Log.i(logTag, "${logMsg}_完了")
+            Log.i(logTag, "${logMsg}完了")
             UseCaseResult.Success(value)
         } catch (e: Exception) {
-            Log.e(logTag, "${logMsg}_失敗", e)
-            UseCaseResult.Error(e)
+            val error = IsWeatherInfoAcquisitionEnabledError.LoadSettings(e)
+            Log.e(logTag, "${logMsg}失敗", error)
+            UseCaseResult.Error(error)
         }
     }
 }

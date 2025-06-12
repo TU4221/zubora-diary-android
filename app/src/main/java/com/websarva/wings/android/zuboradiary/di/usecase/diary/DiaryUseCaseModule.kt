@@ -4,9 +4,9 @@ import com.websarva.wings.android.zuboradiary.data.repository.DiaryRepository
 import com.websarva.wings.android.zuboradiary.data.repository.LocationRepository
 import com.websarva.wings.android.zuboradiary.data.repository.WeatherApiRepository
 import com.websarva.wings.android.zuboradiary.data.usecase.diary.DoesDiaryExistUseCase
-import com.websarva.wings.android.zuboradiary.data.usecase.diary.CanFetchWeatherInfoUseCase
+import com.websarva.wings.android.zuboradiary.data.usecase.diary.CanLoadWeatherInfoUseCase
 import com.websarva.wings.android.zuboradiary.data.usecase.diary.ShouldRequestDiaryUpdateConfirmationUseCase
-import com.websarva.wings.android.zuboradiary.data.usecase.diary.FetchWeatherInfoUseCase
+import com.websarva.wings.android.zuboradiary.data.usecase.diary.LoadWeatherInfoUseCase
 import com.websarva.wings.android.zuboradiary.data.usecase.diary.SaveDiaryUseCase
 import com.websarva.wings.android.zuboradiary.data.usecase.uri.ReleaseUriPermissionUseCase
 import com.websarva.wings.android.zuboradiary.data.usecase.uri.TakeUriPermissionUseCase
@@ -30,23 +30,23 @@ internal object DiaryUseCaseModule {
 
     @Singleton
     @Provides
-    fun provideCanFetchWeatherInfoUseCase(
+    fun provideCanLoadWeatherInfoUseCase(
         weatherApiRepository: WeatherApiRepository
-    ): CanFetchWeatherInfoUseCase {
-        return CanFetchWeatherInfoUseCase(weatherApiRepository)
+    ): CanLoadWeatherInfoUseCase {
+        return CanLoadWeatherInfoUseCase(weatherApiRepository)
     }
 
     @Singleton
     @Provides
-    fun provideFetchWeatherInfoUseCase(
+    fun provideLoadWeatherInfoUseCase(
         weatherApiRepository: WeatherApiRepository,
         locationRepository: LocationRepository,
-        canFetchWeatherInfoUseCase: CanFetchWeatherInfoUseCase
-    ): FetchWeatherInfoUseCase {
-        return FetchWeatherInfoUseCase(
+        canLoadWeatherInfoUseCase: CanLoadWeatherInfoUseCase
+    ): LoadWeatherInfoUseCase {
+        return LoadWeatherInfoUseCase(
             weatherApiRepository,
             locationRepository,
-            canFetchWeatherInfoUseCase
+            canLoadWeatherInfoUseCase
         )
     }
 

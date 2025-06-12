@@ -1,10 +1,9 @@
 package com.websarva.wings.android.zuboradiary.data.usecase.diary
 
 import android.util.Log
-import com.websarva.wings.android.zuboradiary.data.exception.FetchWeatherInfoException
+import com.websarva.wings.android.zuboradiary.data.usecase.diary.error.FetchWeatherInfoError
 import com.websarva.wings.android.zuboradiary.data.model.GeoCoordinates
-import com.websarva.wings.android.zuboradiary.data.model.UseCaseResult
-import com.websarva.wings.android.zuboradiary.data.model.UseCaseResult2
+import com.websarva.wings.android.zuboradiary.data.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.data.model.Weather
 import com.websarva.wings.android.zuboradiary.data.repository.LocationRepository
 import com.websarva.wings.android.zuboradiary.data.repository.WeatherApiRepository
@@ -12,31 +11,33 @@ import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import java.time.LocalDate
 import java.time.temporal.ChronoUnit
 
-internal class FetchWeatherInfoUseCase(
+internal class LoadWeatherInfoUseCase(
     private val weatherApiRepository: WeatherApiRepository,
     private val locationRepository: LocationRepository,
-    private val canFetchWeatherInfoUseCase: CanFetchWeatherInfoUseCase
+    private val canLoadWeatherInfoUseCase: CanLoadWeatherInfoUseCase
 ) {
 
     private val logTag = createLogTag()
 
-    suspend operator fun invoke(isGranted: Boolean, date: LocalDate): UseCaseResult2<Weather, FetchWeatherInfoException> {
-        if (!isGranted) return UseCaseResult2.Error(FetchWeatherInfoException.LocationPermissionException())
+    suspend operator fun invoke(isGranted: Boolean, date: LocalDate): UseCaseResult<Weather, FetchWeatherInfoError> {
+        val logMsg = "天気情報取得_"
+        Log.i(logTag, "${logMsg}開始")
 
-        val geoCoordinates =
-            try {
-                fetchCurrentLocation()
-            } catch (e: FetchWeatherInfoException) {
-                return UseCaseResult2.Error(e)
-            }
+        if (!isGranted) {
+            val error = FetchWeatherInfoError.LocationPermissionNotGranted()
+            Log.e(logTag, "${logMsg}位置情報権限未取得", error)
+            return UseCaseResult.Error(error)
+        }
 
-        val weather =
-            try {
-                fetchWeatherInfo(date, geoCoordinates)
-            } catch (e: FetchWeatherInfoException) {
-                return UseCaseResult2.Error(e)
-            }
-        return UseCaseResult2.Success(weather)
+        try {
+            val geoCoordinates =fetchCurrentLocation()
+            val weather = fetchWeatherInfo(date, geoCoordinates)
+            Log.i(logTag, "${logMsg}完了")
+            return UseCaseResult.Success(weather)
+        } catch (e: FetchWeatherInfoError) {
+            Log.e(logTag, "${logMsg}失敗", e)
+            return UseCaseResult.Error(e)
+        }
     }
 
     private suspend fun fetchCurrentLocation(): GeoCoordinates {
@@ -48,31 +49,22 @@ internal class FetchWeatherInfoUseCase(
             Log.i(logTag, "${logMsg}完了")
             result
         } catch (e: Exception) {
-            Log.e(logTag, "${logMsg}失敗")
-            throw FetchWeatherInfoException.LocationAccessFailedException(e)
+            throw FetchWeatherInfoError.AccessLocation(e)
         }
     }
 
     private suspend fun fetchWeatherInfo(date: LocalDate, geoCoordinates: GeoCoordinates): Weather {
-        val logMsg = "天気情報取得_"
+        val logMsg = "天気情報Api通信_"
         Log.i(logTag, "${logMsg}開始")
 
-        when (val result = canFetchWeatherInfoUseCase(date)) {
+        when (val result = canLoadWeatherInfoUseCase(date)) {
             is UseCaseResult.Success -> {
                 if (!result.value) {
-                    val e =
-                        FetchWeatherInfoException
-                            .WeatherInfoDateOutOfRangeException()
-                    Log.i(logTag, "${logMsg}指定日範囲外", e)
-                    throw e
+                    throw FetchWeatherInfoError.WeatherInfoDateOutOfRange()
                 }
             }
             is UseCaseResult.Error -> {
-                val e =
-                    FetchWeatherInfoException
-                        .WeatherInfoDateRangeCheckFailedException(result.exception)
-                Log.i(logTag, "${logMsg}取得可能確認失敗", e)
-                throw e
+                // 処理不要
             }
         }
 
@@ -90,8 +82,7 @@ internal class FetchWeatherInfoUseCase(
                     )
                 }
             } catch (e: Exception) {
-                Log.e(logTag, "${logMsg}失敗", e)
-                throw FetchWeatherInfoException.WeatherInfoFetchFailedException(e)
+                throw FetchWeatherInfoError.LoadWeatherInfo(e)
             }
         Log.d(logTag, "fetchWeatherInformation()_code = " + response.code())
         Log.d(logTag, "fetchWeatherInformation()_message = :" + response.message())
@@ -110,9 +101,7 @@ internal class FetchWeatherInfoUseCase(
                     "fetchWeatherInformation()_errorBody = $errorBodyString"
                 )
             }
-            val e = FetchWeatherInfoException.WeatherInfoFetchFailedException()
-            Log.e(logTag, "${logMsg}失敗", e)
-            throw e
+            throw FetchWeatherInfoError.LoadWeatherInfo()
         }
     }
 }
