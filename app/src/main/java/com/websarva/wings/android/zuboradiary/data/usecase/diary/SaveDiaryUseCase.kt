@@ -37,7 +37,12 @@ internal class SaveDiaryUseCase(
                 /*loadedDiaryEntity*/loadedDate
             )
 
-            val savedPicturePath = Uri.parse(diaryEntity.picturePath) 
+            val savedPicturePath =
+                if (diaryEntity.picturePath.isEmpty()) {
+                    null
+                } else {
+                    Uri.parse(diaryEntity.picturePath)
+                }
             /*val loadedDate = Uri.parse(loadedDiaryEntity.picturePath)*/
             managePictureUriPermission(
                 savedPicturePath,
@@ -92,7 +97,7 @@ internal class SaveDiaryUseCase(
     }
 
     private suspend fun managePictureUriPermission(
-        savedPicturePath: Uri,
+        savedPicturePath: Uri?,
         loadedPicturePath: Uri?
     ) {
         val logMsg = "画像Uri権限管理_"
@@ -109,14 +114,17 @@ internal class SaveDiaryUseCase(
             }
         }
 
-        when (val result = takeUriPermissionUseCase(savedPicturePath)) {
-            is UseCaseResult.Success -> {
-                // 処理なし
-            }
-            is UseCaseResult.Error -> {
-                throw SaveDiaryError.ManageUriPermission(result.error)
+        if (savedPicturePath != null) {
+            when (val result = takeUriPermissionUseCase(savedPicturePath)) {
+                is UseCaseResult.Success -> {
+                    // 処理なし
+                }
+                is UseCaseResult.Error -> {
+                    throw SaveDiaryError.ManageUriPermission(result.error)
+                }
             }
         }
+
         Log.i(logTag, "${logMsg}完了")
     }
 }
