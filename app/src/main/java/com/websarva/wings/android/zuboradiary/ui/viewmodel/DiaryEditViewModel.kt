@@ -16,6 +16,7 @@ import com.websarva.wings.android.zuboradiary.data.usecase.diary.LoadDiaryUseCas
 import com.websarva.wings.android.zuboradiary.data.usecase.diary.ShouldRequestDiaryUpdateConfirmationUseCase
 import com.websarva.wings.android.zuboradiary.data.usecase.diary.LoadWeatherInfoUseCase
 import com.websarva.wings.android.zuboradiary.data.usecase.diary.SaveDiaryUseCase
+import com.websarva.wings.android.zuboradiary.data.usecase.diary.ShouldRequestDiaryLoadingConfirmationUseCase
 import com.websarva.wings.android.zuboradiary.data.usecase.diary.error.DeleteDiaryError
 import com.websarva.wings.android.zuboradiary.data.usecase.settings.IsWeatherInfoAcquisitionEnabledUseCase
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
@@ -48,6 +49,7 @@ import kotlin.random.Random
 internal class DiaryEditViewModel @Inject constructor(
     private val handle: SavedStateHandle,
     private val diaryRepository: DiaryRepository,
+    private val shouldRequestDiaryLoadingConfirmationUseCase: ShouldRequestDiaryLoadingConfirmationUseCase,
     private val shouldRequestDiaryUpdateConfirmationUseCase: ShouldRequestDiaryUpdateConfirmationUseCase,
     private val loadDiaryUseCase: LoadDiaryUseCase,
     private val saveDiaryUseCase: SaveDiaryUseCase,
@@ -699,13 +701,23 @@ internal class DiaryEditViewModel @Inject constructor(
     // TODO:onDateChangedメソッドに変更して、Fragmentの監視から呼び出す？
     private suspend fun prepareDiaryDate(date: LocalDate) {
         updateDate(date)
-        
-        if (shouldShowDiaryLoadingDialog(date)) {
-            emitViewModelEvent(
-                DiaryEditEvent.NavigateDiaryLoadingDialog(date)
-            )
-            updateViewModelIdleState()
-            return
+
+        val previousDate = previousDate
+        val loadedDate = loadedDate.value
+        val result = shouldRequestDiaryLoadingConfirmationUseCase(date, previousDate, loadedDate)
+        when (result) {
+            is UseCaseResult.Success -> {
+                if (shouldShowDiaryLoadingDialog(date)) {
+                    emitViewModelEvent(
+                        DiaryEditEvent.NavigateDiaryLoadingDialog(date)
+                    )
+                    updateViewModelIdleState()
+                    return
+                }
+            }
+            is UseCaseResult.Error -> {
+                // 処理なし
+            }
         }
 
         if (!shouldLoadWeatherInfo(date)) {
