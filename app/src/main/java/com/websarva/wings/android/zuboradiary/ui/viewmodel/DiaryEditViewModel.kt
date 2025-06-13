@@ -292,33 +292,10 @@ internal class DiaryEditViewModel @Inject constructor(
 
     // ViewClicked処理
     fun onDiarySaveMenuClicked() {
-        updateViewModelState(DiaryEditState.Saving)
         viewModelScope.launch {
-            val result =
-                shouldRequestDiaryUpdateConfirmationUseCase(
-                    date.requireValue(),
-                    loadedDate.value
-                )
-
-            when (result) {
-                is UseCaseResult.Success -> {
-                    if (result.value) {
-                        emitViewModelEvent(
-                            DiaryEditEvent.NavigateDiaryUpdateDialog(date.requireValue())
-                        )
-                        return@launch
-                    }
-                }
-                is UseCaseResult.Error -> {
-                    emitAppMessageEvent(
-                        DiaryEditAppMessage.DiarySavingFailure
-                    )
-                    return@launch
-                }
+            requestDiaryUpdateConfirmation {
+                processDiarySave()
             }
-
-            processDiarySave()
-            updateViewModelIdleState()
         }
     }
 
@@ -812,6 +789,31 @@ internal class DiaryEditViewModel @Inject constructor(
                         )
                     }
                 }
+            }
+        }
+    }
+
+    private suspend fun requestDiaryUpdateConfirmation(
+        onConfirmationNotNeeded: suspend () -> Unit
+    ) {
+        updateViewModelState(DiaryEditState.Saving)
+        val date = date.requireValue()
+        val loadedDate = loadedDate.value
+        when (val result = shouldRequestDiaryUpdateConfirmationUseCase(date, loadedDate)) {
+            is UseCaseResult.Success -> {
+                if (result.value) {
+                    emitViewModelEvent(
+                        DiaryEditEvent.NavigateDiaryUpdateDialog(date)
+                    )
+                } else {
+                    onConfirmationNotNeeded()
+                }
+            }
+            is UseCaseResult.Error -> {
+                emitAppMessageEvent(
+                    DiaryEditAppMessage.DiarySavingFailure
+                )
+                updateViewModelIdleState()
             }
         }
     }
