@@ -691,36 +691,20 @@ internal class DiaryEditViewModel @Inject constructor(
     private suspend fun prepareDiaryDate(date: LocalDate) {
         updateDate(date)
 
-        val previousDate = previousDate
-        val loadedDate = loadedDate.value
-        val result = shouldRequestDiaryLoadingConfirmationUseCase(date, previousDate, loadedDate)
-        when (result) {
-            is UseCaseResult.Success -> {
-                if (result.value) {
-                    emitViewModelEvent(
-                        DiaryEditEvent.NavigateDiaryLoadingDialog(date)
-                    )
-                    updateViewModelIdleState()
-                    return
+        requestDiaryLoadingConfirmation(date) {
+            val weatherResult =
+                shouldRequestWeatherInfoConfirmationUseCase(date, previousDate, loadedDate.value)
+            when (weatherResult) {
+                is UseCaseResult.Success -> {
+                    if (weatherResult.value) {
+                        loadWeatherInfo(date)
+                    } else {
+                        updateViewModelIdleState()
+                    }
                 }
-            }
-            is UseCaseResult.Error -> {
-                // 処理なし
-            }
-        }
-
-        val weatherResult =
-            shouldRequestWeatherInfoConfirmationUseCase(date, previousDate, loadedDate)
-        when (weatherResult) {
-            is UseCaseResult.Success -> {
-                if (weatherResult.value) {
-                    loadWeatherInfo(date)
-                } else {
-                    updateViewModelIdleState()
+                is UseCaseResult.Error -> {
+                    // TODO:emitAppMessageEvent() 日記情報の読込に失敗しました。
                 }
-            }
-            is UseCaseResult.Error -> {
-                // TODO:emitAppMessageEvent() 日記情報の読込に失敗しました。
             }
         }
     }
@@ -789,6 +773,30 @@ internal class DiaryEditViewModel @Inject constructor(
                         )
                     }
                 }
+            }
+        }
+    }
+
+    private suspend fun requestDiaryLoadingConfirmation(
+        date: LocalDate,
+        onConfirmationNotNeeded: suspend () -> Unit
+    ) {
+        val previousDate = previousDate
+        val loadedDate = loadedDate.value
+        val result = shouldRequestDiaryLoadingConfirmationUseCase(date, previousDate, loadedDate)
+        when (result) {
+            is UseCaseResult.Success -> {
+                if (result.value) {
+                    emitViewModelEvent(
+                        DiaryEditEvent.NavigateDiaryLoadingDialog(date)
+                    )
+                } else {
+                    onConfirmationNotNeeded()
+                }
+            }
+            is UseCaseResult.Error -> {
+                // TODO:emitAppMessageEvent() 日記情報の読込に失敗しました。
+                updateViewModelIdleState()
             }
         }
     }
