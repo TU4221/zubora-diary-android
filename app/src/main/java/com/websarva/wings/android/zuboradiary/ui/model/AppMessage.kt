@@ -159,6 +159,13 @@ internal sealed class DiaryEditAppMessage(
         private fun readResolve(): Any = DiaryDeleteFailure
     }
 
+    data object DiaryInfoLoadingFailure :  DiaryEditAppMessage(
+        R.string.dialog_app_message_title_access_error,
+        R.string.dialog_diary_edit_app_message_diary_info_loading_failure
+    ) {
+        private fun readResolve(): Any = DiaryInfoLoadingFailure
+    }
+
     data object WeatherInfoLoadingFailure :  DiaryEditAppMessage(
         R.string.dialog_app_message_title_connection_error,
         R.string.dialog_diary_edit_app_message_weather_info_loading_failure
@@ -176,6 +183,13 @@ internal sealed class DiaryEditAppMessage(
     data object AccessLocationPermissionRequest :  DiaryEditAppMessage(
         R.string.dialog_app_message_title_permission_request,
         R.string.dialog_diary_edit_app_message_access_location_permission_request
+    ) {
+        private fun readResolve(): Any = AccessLocationPermissionRequest
+    }
+
+    data object SettingLoadingFailure :  DiaryEditAppMessage(
+        R.string.dialog_app_message_title_access_error,
+        R.string.dialog_diary_edit_app_message_setting_loading_failure
     ) {
         private fun readResolve(): Any = AccessLocationPermissionRequest
     }

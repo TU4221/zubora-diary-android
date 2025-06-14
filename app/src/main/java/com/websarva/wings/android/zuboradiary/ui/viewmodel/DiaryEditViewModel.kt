@@ -752,8 +752,8 @@ internal class DiaryEditViewModel @Inject constructor(
                 }
             }
             is UseCaseResult.Error -> {
-                // TODO:emitAppMessageEvent() 日記情報の読込に失敗しました。
                 updateViewModelIdleState()
+                emitAppMessageEvent(DiaryEditAppMessage.DiaryInfoLoadingFailure)
             }
         }
     }
@@ -804,7 +804,7 @@ internal class DiaryEditViewModel @Inject constructor(
             }
             is UseCaseResult.Error -> {
                 updateViewModelIdleState()
-                // TODO:emitAppMessageEvent() 日記情報の読込に失敗しました。
+                emitAppMessageEvent(DiaryEditAppMessage.DiaryInfoLoadingFailure)
             }
         }
     }
@@ -832,7 +832,7 @@ internal class DiaryEditViewModel @Inject constructor(
                 onResult(result.value)
             }
             is UseCaseResult.Error -> {
-                // TODO:emitAppMessageEvent() 設定の読込に失敗しました。
+                emitAppMessageEvent(DiaryEditAppMessage.SettingLoadingFailure)
             }
         }
     }
@@ -953,7 +953,7 @@ internal class DiaryEditViewModel @Inject constructor(
                             if (result.value) continue
                         }
                         is UseCaseResult.Error -> {
-                            // TODO:emitAppMessageEvent() 日記情報の読込に失敗しました。
+                            emitAppMessageEvent(DiaryEditAppMessage.DiaryInfoLoadingFailure)
                             isTesting = false
                             return@launch
                         }
