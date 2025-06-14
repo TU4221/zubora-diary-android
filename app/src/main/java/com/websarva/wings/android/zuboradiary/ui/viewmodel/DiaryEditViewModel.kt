@@ -782,36 +782,16 @@ internal class DiaryEditViewModel @Inject constructor(
         }
     }
 
-    // 天気情報関係
-    private suspend fun checkPermissionBeforeWeatherInfoLoading() {
-        emitViewModelEvent(DiaryEditEvent.CheckAccessLocationPermission)
-    }
-
-    private suspend fun loadWeatherInfo(isGranted: Boolean) {
-        updateViewModelState(DiaryEditState.WeatherFetching)
-        val date = date.requireValue()
-        val result = loadWeatherInfoUseCase(isGranted, date)
-        updateViewModelIdleState()
-        when (result) {
+    // 天気情報取得関係
+    private suspend fun checkWeatherInfoAcquisitionEnabled(
+        onResult: suspend (Boolean) -> Unit
+    ) {
+        when (val result = isWeatherInfoAcquisitionEnabledUseCase()) {
             is UseCaseResult.Success -> {
-                updateWeather1(result.value)
-                updateWeather2(Weather.UNKNOWN)
+                onResult(result.value)
             }
             is UseCaseResult.Error -> {
-                when (result.error) {
-                    is FetchWeatherInfoError.LocationPermissionNotGranted -> {
-                        emitAppMessageEvent(DiaryEditAppMessage.AccessLocationPermissionRequest)
-                    }
-                    is FetchWeatherInfoError.AccessLocation -> {
-                        emitAppMessageEvent(DiaryEditAppMessage.WeatherInfoLoadingFailure)
-                    }
-                    is FetchWeatherInfoError.WeatherInfoDateOutOfRange -> {
-                        emitAppMessageEvent(DiaryEditAppMessage.WeatherInfoDateOutOfRange)
-                    }
-                    is FetchWeatherInfoError.LoadWeatherInfo -> {
-                        emitAppMessageEvent(DiaryEditAppMessage.WeatherInfoLoadingFailure)
-                    }
-                }
+                emitAppMessageEvent(DiaryEditAppMessage.SettingLoadingFailure)
             }
         }
     }
@@ -857,15 +837,35 @@ internal class DiaryEditViewModel @Inject constructor(
         }
     }
 
-    private suspend fun checkWeatherInfoAcquisitionEnabled(
-        onResult: suspend (Boolean) -> Unit
-    ) {
-        when (val result = isWeatherInfoAcquisitionEnabledUseCase()) {
+    private suspend fun checkPermissionBeforeWeatherInfoLoading() {
+        emitViewModelEvent(DiaryEditEvent.CheckAccessLocationPermission)
+    }
+
+    private suspend fun loadWeatherInfo(isGranted: Boolean) {
+        updateViewModelState(DiaryEditState.WeatherFetching)
+        val date = date.requireValue()
+        val result = loadWeatherInfoUseCase(isGranted, date)
+        updateViewModelIdleState()
+        when (result) {
             is UseCaseResult.Success -> {
-                onResult(result.value)
+                updateWeather1(result.value)
+                updateWeather2(Weather.UNKNOWN)
             }
             is UseCaseResult.Error -> {
-                emitAppMessageEvent(DiaryEditAppMessage.SettingLoadingFailure)
+                when (result.error) {
+                    is FetchWeatherInfoError.LocationPermissionNotGranted -> {
+                        emitAppMessageEvent(DiaryEditAppMessage.AccessLocationPermissionRequest)
+                    }
+                    is FetchWeatherInfoError.AccessLocation -> {
+                        emitAppMessageEvent(DiaryEditAppMessage.WeatherInfoLoadingFailure)
+                    }
+                    is FetchWeatherInfoError.WeatherInfoDateOutOfRange -> {
+                        emitAppMessageEvent(DiaryEditAppMessage.WeatherInfoDateOutOfRange)
+                    }
+                    is FetchWeatherInfoError.LoadWeatherInfo -> {
+                        emitAppMessageEvent(DiaryEditAppMessage.WeatherInfoLoadingFailure)
+                    }
+                }
             }
         }
     }
