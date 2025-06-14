@@ -21,6 +21,6 @@ internal sealed class DiaryEditEvent : ViewModelEvent() {
     data class NavigatePreviousFragment(val result: FragmentResult<LocalDate>) : DiaryEditEvent()
     data class NavigatePreviousFragmentOnDiaryDelete(val result: FragmentResult.Some<LocalDate>) : DiaryEditEvent()
     data class TransitionDiaryItemHidedState(val itemNumber: ItemNumber) : DiaryEditEvent()
-    data class CheckAccessLocationPermission(val date: LocalDate) : DiaryEditEvent()
+    data object CheckAccessLocationPermission : DiaryEditEvent()
     data object ItemAddition : DiaryEditEvent()
 }

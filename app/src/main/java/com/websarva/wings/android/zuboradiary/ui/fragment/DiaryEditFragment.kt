@@ -282,7 +282,7 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding>() {
                 hideItem(event.itemNumber, false)
             }
             is DiaryEditEvent.CheckAccessLocationPermission -> {
-                checkAccessLocationPermission(event.date)
+                checkAccessLocationPermission()
             }
             is DiaryEditEvent.ItemAddition -> {
                 shouldTransitionItemMotionLayout = true
@@ -941,10 +941,9 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding>() {
         )
     }
 
-    private fun checkAccessLocationPermission(date: LocalDate) {
+    private fun checkAccessLocationPermission() {
         mainViewModel.onAccessLocationPermissionChecked(
-            requireContext().isAccessLocationGranted(),
-            date
+            requireContext().isAccessLocationGranted()
         )
     }
 

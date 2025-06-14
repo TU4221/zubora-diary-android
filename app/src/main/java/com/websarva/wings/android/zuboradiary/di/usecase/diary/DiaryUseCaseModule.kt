@@ -10,9 +10,9 @@ import com.websarva.wings.android.zuboradiary.data.usecase.diary.LoadDiaryUseCas
 import com.websarva.wings.android.zuboradiary.data.usecase.diary.ShouldRequestDiaryUpdateConfirmationUseCase
 import com.websarva.wings.android.zuboradiary.data.usecase.diary.LoadWeatherInfoUseCase
 import com.websarva.wings.android.zuboradiary.data.usecase.diary.SaveDiaryUseCase
+import com.websarva.wings.android.zuboradiary.data.usecase.diary.ShouldLoadWeatherInfoUseCase
 import com.websarva.wings.android.zuboradiary.data.usecase.diary.ShouldRequestDiaryLoadingConfirmationUseCase
 import com.websarva.wings.android.zuboradiary.data.usecase.diary.ShouldRequestWeatherInfoConfirmationUseCase
-import com.websarva.wings.android.zuboradiary.data.usecase.settings.IsWeatherInfoAcquisitionEnabledUseCase
 import com.websarva.wings.android.zuboradiary.data.usecase.uri.ReleaseUriPermissionUseCase
 import com.websarva.wings.android.zuboradiary.data.usecase.uri.TakeUriPermissionUseCase
 import dagger.Module
@@ -78,11 +78,9 @@ internal object DiaryUseCaseModule {
     @Singleton
     @Provides
     fun provideShouldRequestWeatherInfoConfirmationUseCase(
-        isWeatherInfoAcquisitionEnabledUseCase: IsWeatherInfoAcquisitionEnabledUseCase
+        shouldLoadWeatherInfoUseCase: ShouldLoadWeatherInfoUseCase
     ): ShouldRequestWeatherInfoConfirmationUseCase {
-        return ShouldRequestWeatherInfoConfirmationUseCase(
-            isWeatherInfoAcquisitionEnabledUseCase
-        )
+        return ShouldRequestWeatherInfoConfirmationUseCase(shouldLoadWeatherInfoUseCase)
     }
 
     @Singleton
@@ -117,5 +115,11 @@ internal object DiaryUseCaseModule {
             diaryRepository,
             releaseUriPermissionUseCase
         )
+    }
+
+    @Singleton
+    @Provides
+    fun provideShouldLoadWeatherInfoUseCase(): ShouldLoadWeatherInfoUseCase {
+        return ShouldLoadWeatherInfoUseCase()
     }
 }
