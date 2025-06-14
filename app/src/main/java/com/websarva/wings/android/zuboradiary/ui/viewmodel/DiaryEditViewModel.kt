@@ -559,10 +559,9 @@ internal class DiaryEditViewModel @Inject constructor(
         }
     }
 
+    // MEMO:未選択時null
     fun onPicturePathReceivedFromOpenDocument(uri: Uri?) {
-        // MEMO:未選択時null
-        if (uri != null) diaryStateFlow.picturePath.value = uri
-
+        updatePicturePath(uri)
         updateViewModelIdleState()
     }
 
@@ -924,9 +923,15 @@ internal class DiaryEditViewModel @Inject constructor(
         diaryStateFlow.updateItemTitle(itemNumber, title)
     }
 
+    // 添付写真関係
+    private fun updatePicturePath(uri: Uri?) {
+        diaryStateFlow.picturePath.value = uri
+    }
+
     private fun deletePicturePath() {
         diaryStateFlow.picturePath.value = null
     }
+
 
     private suspend fun navigatePreviousFragment() {
         val loadedDate = loadedDate.value
