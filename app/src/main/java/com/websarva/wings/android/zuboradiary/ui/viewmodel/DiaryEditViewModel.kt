@@ -782,6 +782,40 @@ internal class DiaryEditViewModel @Inject constructor(
         }
     }
 
+    // 天気情報関係
+    private suspend fun checkPermissionBeforeWeatherInfoLoading() {
+        emitViewModelEvent(DiaryEditEvent.CheckAccessLocationPermission)
+    }
+
+    private suspend fun loadWeatherInfo(isGranted: Boolean) {
+        updateViewModelState(DiaryEditState.WeatherFetching)
+        val date = date.requireValue()
+        val result = loadWeatherInfoUseCase(isGranted, date)
+        updateViewModelIdleState()
+        when (result) {
+            is UseCaseResult.Success -> {
+                updateWeather1(result.value)
+                updateWeather2(Weather.UNKNOWN)
+            }
+            is UseCaseResult.Error -> {
+                when (result.error) {
+                    is FetchWeatherInfoError.LocationPermissionNotGranted -> {
+                        emitAppMessageEvent(DiaryEditAppMessage.AccessLocationPermissionRequest)
+                    }
+                    is FetchWeatherInfoError.AccessLocation -> {
+                        emitAppMessageEvent(DiaryEditAppMessage.WeatherInfoLoadingFailure)
+                    }
+                    is FetchWeatherInfoError.WeatherInfoDateOutOfRange -> {
+                        emitAppMessageEvent(DiaryEditAppMessage.WeatherInfoDateOutOfRange)
+                    }
+                    is FetchWeatherInfoError.LoadWeatherInfo -> {
+                        emitAppMessageEvent(DiaryEditAppMessage.WeatherInfoLoadingFailure)
+                    }
+                }
+            }
+        }
+    }
+
     private suspend fun requestWeatherInfoConfirmation(
         onConfirmationNotNeeded: suspend () -> Unit
     ) {
@@ -846,40 +880,6 @@ internal class DiaryEditViewModel @Inject constructor(
 
     private fun updateLoadedDate(date: LocalDate) {
         _loadedDate.value = date
-    }
-
-    // 天気情報関係
-    private suspend fun checkPermissionBeforeWeatherInfoLoading() {
-        emitViewModelEvent(DiaryEditEvent.CheckAccessLocationPermission)
-    }
-
-    private suspend fun loadWeatherInfo(isGranted: Boolean) {
-        updateViewModelState(DiaryEditState.WeatherFetching)
-        val date = date.requireValue()
-        val result = loadWeatherInfoUseCase(isGranted, date)
-        updateViewModelIdleState()
-        when (result) {
-            is UseCaseResult.Success -> {
-                updateWeather1(result.value)
-                updateWeather2(Weather.UNKNOWN)
-            }
-            is UseCaseResult.Error -> {
-                when (result.error) {
-                    is FetchWeatherInfoError.LocationPermissionNotGranted -> {
-                        emitAppMessageEvent(DiaryEditAppMessage.AccessLocationPermissionRequest)
-                    }
-                    is FetchWeatherInfoError.AccessLocation -> {
-                        emitAppMessageEvent(DiaryEditAppMessage.WeatherInfoLoadingFailure)
-                    }
-                    is FetchWeatherInfoError.WeatherInfoDateOutOfRange -> {
-                        emitAppMessageEvent(DiaryEditAppMessage.WeatherInfoDateOutOfRange)
-                    }
-                    is FetchWeatherInfoError.LoadWeatherInfo -> {
-                        emitAppMessageEvent(DiaryEditAppMessage.WeatherInfoLoadingFailure)
-                    }
-                }
-            }
-        }
     }
 
     // 天気、体調関係
