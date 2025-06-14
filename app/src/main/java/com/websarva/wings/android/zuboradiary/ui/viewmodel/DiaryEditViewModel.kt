@@ -74,7 +74,7 @@ internal class DiaryEditViewModel @Inject constructor(
 
     // 日記データ関係
     private val initialHasPreparedDiary = false
-    var hasPreparedDiary = handle[SAVED_HAS_PREPARED_DIARY_STATE_KEY] ?: initialHasPreparedDiary
+    private var hasPreparedDiary = handle[SAVED_HAS_PREPARED_DIARY_STATE_KEY] ?: initialHasPreparedDiary
         private set(value) {
             handle[SAVED_HAS_PREPARED_DIARY_STATE_KEY] = value
             field = value
@@ -296,7 +296,7 @@ internal class DiaryEditViewModel @Inject constructor(
     fun onDiarySaveMenuClicked() {
         viewModelScope.launch {
             requestDiaryUpdateConfirmation {
-                processDiarySave()
+                saveDiary()
             }
         }
     }
@@ -390,10 +390,7 @@ internal class DiaryEditViewModel @Inject constructor(
         val date = this.date.requireValue()
         viewModelScope.launch {
             updateViewModelState(DiaryEditState.Loading)
-            prepareDiary(
-                date,
-                true
-            )
+            loadDiary(date)
         }
     }
 
@@ -424,7 +421,7 @@ internal class DiaryEditViewModel @Inject constructor(
     private fun onDiaryUpdateDialogPositiveResultReceived() {
         updateViewModelState(DiaryEditState.Saving)
         viewModelScope.launch {
-            processDiarySave()
+            saveDiary()
             updateViewModelIdleState()
         }
     }
@@ -444,7 +441,7 @@ internal class DiaryEditViewModel @Inject constructor(
     private fun onDiaryDeleteDialogPositiveResultReceived() {
         updateViewModelState(DiaryEditState.Deleting)
         viewModelScope.launch {
-            processDiaryDelete()
+            deleteDiary()
             updateViewModelIdleState()
         }
     }
@@ -602,51 +599,27 @@ internal class DiaryEditViewModel @Inject constructor(
         }
     }
 
-    // データ処理
+    // 日記データ処理関係
     private suspend fun prepareDiary(
         date: LocalDate,
         shouldLoadDiary: Boolean
     ) {
-        val logMsg = "日記読込"
-        Log.i(logTag, "${logMsg}_開始")
+        if (hasPreparedDiary) return
+
         if (shouldLoadDiary) {
-
-            when (val result = loadDiaryUseCase(date)) {
-                is UseCaseResult.Success -> {
-                    val diaryEntity = result.value
-
-                    // HACK:下記はDiaryStateFlow#update()処理よりも前に処理すること。
-                    //      (後で処理するとDiaryStateFlowのDateのObserverがloadedDateの更新よりも先に処理される為)
-                    updateLoadedDate(date)
-
-                    diaryStateFlow.update(diaryEntity)
-                    loadedPicturePath = diaryStateFlow.picturePath.value
-                }
-                is UseCaseResult.Error -> {
-                    Log.e(logTag, "${logMsg}_失敗", result.error)
-                    if (hasPreparedDiary) {
-                        emitAppMessageEvent(DiaryEditAppMessage.DiaryLoadingFailure)
-                    } else {
-                        emitViewModelEvent(
-                            DiaryEditEvent.NavigateDiaryLoadingFailureDialog(date)
-                        )
-                    }
-                }
-            }
-            updateViewModelIdleState()
+            loadDiary(date)
         } else {
             prepareDiaryDate(date)
         }
 
         hasPreparedDiary = true
-
-        Log.i(logTag, "${logMsg}_完了")
     }
-    
-    // TODO:onDateChangedメソッドに変更して、Fragmentの監視から呼び出す？
+
     private suspend fun prepareDiaryDate(date: LocalDate) {
         updateDate(date)
 
+        // MEMO:下記処理をdate(StateFlow)変数のCollectorから呼び出すと、
+        //      画面回転時にも不要に呼び出してしまう為、下記にて処理。
         updateViewModelState(DiaryEditState.Loading)
         requestDiaryLoadingConfirmation(date) {
 
@@ -665,7 +638,37 @@ internal class DiaryEditViewModel @Inject constructor(
         }
     }
 
-    private suspend fun processDiarySave() {
+    private suspend fun loadDiary(date: LocalDate) {
+        val logMsg = "日記読込"
+        Log.i(logTag, "${logMsg}_開始")
+
+        updateViewModelState(DiaryEditState.Loading)
+        when (val result = loadDiaryUseCase(date)) {
+            is UseCaseResult.Success -> {
+                val diaryEntity = result.value
+
+                // HACK:下記はDiaryStateFlow#update()処理よりも前に処理すること。
+                //      (後で処理するとDiaryStateFlowのDateのObserverがloadedDateの更新よりも先に処理される為)
+                updateLoadedDate(date)
+
+                diaryStateFlow.update(diaryEntity)
+                loadedPicturePath = diaryStateFlow.picturePath.value
+            }
+            is UseCaseResult.Error -> {
+                Log.e(logTag, "${logMsg}_失敗", result.error)
+                if (hasPreparedDiary) {
+                    emitAppMessageEvent(DiaryEditAppMessage.DiaryLoadingFailure)
+                } else {
+                    emitViewModelEvent(
+                        DiaryEditEvent.NavigateDiaryLoadingFailureDialog(date)
+                    )
+                }
+            }
+        }
+        updateViewModelIdleState()
+    }
+
+    private suspend fun saveDiary() {
         val logMsg = "日記保存_"
         Log.i(logTag, "${logMsg}開始")
 
@@ -696,7 +699,7 @@ internal class DiaryEditViewModel @Inject constructor(
         }
     }
 
-    private suspend fun processDiaryDelete() {
+    private suspend fun deleteDiary() {
         val logMsg = "日記削除_"
         Log.i(logTag, "${logMsg}開始")
 
