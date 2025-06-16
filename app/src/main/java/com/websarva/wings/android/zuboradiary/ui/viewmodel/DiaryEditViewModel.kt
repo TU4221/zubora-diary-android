@@ -827,6 +827,8 @@ internal class DiaryEditViewModel @Inject constructor(
     }
 
     // 天気情報取得関係
+    // TODO:コールバック構成の代替案を検討する。(他処理メソッドも同様に)
+    // TODO:State更新タイミングの代替案を検討する。(他処理メソッドも同様に)
     private suspend fun processWeatherInfoAcquisition(date: LocalDate, previousDate: LocalDate?) {
         checkWeatherInfoAcquisitionEnabled { isEnabled ->
             if (!isEnabled) {
