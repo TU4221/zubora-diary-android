@@ -2,6 +2,7 @@ package com.websarva.wings.android.zuboradiary.ui.viewmodel
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import com.websarva.wings.android.zuboradiary.ui.model.AppMessage
 import com.websarva.wings.android.zuboradiary.ui.model.event.ConsumableEvent
@@ -10,8 +11,12 @@ import com.websarva.wings.android.zuboradiary.ui.model.navigation.NavigationComm
 import com.websarva.wings.android.zuboradiary.ui.model.state.ViewModelState
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 
 internal abstract class BaseViewModel<E: ViewModelEvent, M: AppMessage, S: ViewModelState> : ViewModel() {
 
@@ -23,7 +28,16 @@ internal abstract class BaseViewModel<E: ViewModelEvent, M: AppMessage, S: ViewM
     private val initialViewModelState = ViewModelState.Idle
     private val _viewModelState = MutableStateFlow<ViewModelState>(initialViewModelState)
     val viewModelState get() = _viewModelState.asStateFlow()
-    val isProcessing get() = viewModelState.value != ViewModelState.Idle
+    // TODO:下記が必要か最後に判断
+    val isProcessingStateFlow: StateFlow<Boolean> =
+        _viewModelState
+            .map { state -> state != ViewModelState.Idle }
+            .stateIn(
+                scope = viewModelScope,
+                started = SharingStarted.WhileSubscribed(5000),
+                initialValue = false
+            )
+    val isProcessing get() = isProcessingStateFlow.value
 
     // 表示保留中Navigation
     private val initialPendingNavigationCommand = NavigationCommand.None
