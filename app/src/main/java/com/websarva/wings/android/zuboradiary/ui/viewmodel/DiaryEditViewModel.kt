@@ -830,41 +830,22 @@ internal class DiaryEditViewModel @Inject constructor(
     }
 
     // 天気情報取得関係
-    private suspend fun processWeatherInfoAcquisition(date: LocalDate, previousDate: LocalDate?) {
-        checkWeatherInfoAcquisitionEnabled { isEnabled ->
-            if (!isEnabled) {
-                updateViewModelIdleState()
-                return@checkWeatherInfoAcquisitionEnabled
-            }
-
-            requestWeatherInfoConfirmation(
-                date,
-                previousDate
-            ) {
-
-                checkShouldLoadWeatherInfo(
-                    date,
-                    previousDate
-                ) { shouldLoad ->
-                    if (!shouldLoad) {
-                        updateViewModelIdleState()
-                        return@checkShouldLoadWeatherInfo
-                    }
-
-                    val parameters = WeatherInfoAcquisitionParameters(date)
-                    checkPermissionBeforeWeatherInfoAcquisition(parameters)
-                }
-            }
-        }
-    }
-
-    private suspend fun checkWeatherInfoAcquisitionEnabled(
-        onResult: suspend (Boolean) -> Unit
+    private suspend fun processWeatherInfoAcquisition(
+        date: LocalDate,
+        previousDate: LocalDate?
     ) {
         updateViewModelState(DiaryEditState.WeatherFetching)
         when (val result = isWeatherInfoAcquisitionEnabledUseCase()) {
             is UseCaseResult.Success -> {
-                onResult(result.value)
+                if (!result.value) {
+                    updateViewModelIdleState()
+                    return
+                }
+
+                requestWeatherInfoConfirmation(
+                    date,
+                    previousDate
+                )
             }
             is UseCaseResult.Error -> {
                 emitAppMessageEvent(DiaryEditAppMessage.SettingLoadingFailure)
@@ -875,10 +856,8 @@ internal class DiaryEditViewModel @Inject constructor(
 
     private suspend fun requestWeatherInfoConfirmation(
         date: LocalDate,
-        previousDate: LocalDate?,
-        onConfirmationNotNeeded: suspend () -> Unit
+        previousDate: LocalDate?
     ) {
-        updateViewModelState(DiaryEditState.WeatherFetching)
         val result =
             shouldRequestWeatherInfoConfirmationUseCase(date, previousDate)
         when (result) {
@@ -890,7 +869,10 @@ internal class DiaryEditViewModel @Inject constructor(
                     )
                     updateViewModelIdleState()
                 } else {
-                    onConfirmationNotNeeded()
+                    checkShouldLoadWeatherInfo(
+                        date,
+                        previousDate
+                    )
                 }
             }
             is UseCaseResult.Error -> {
@@ -902,19 +884,22 @@ internal class DiaryEditViewModel @Inject constructor(
 
     private suspend fun checkShouldLoadWeatherInfo(
         date: LocalDate,
-        previousDate: LocalDate?,
-        onResult: suspend (Boolean) -> Unit
+        previousDate: LocalDate?
     ) {
-        updateViewModelState(DiaryEditState.WeatherFetching)
         when (val result = shouldLoadWeatherInfoUseCase(date, previousDate)) {
             is UseCaseResult.Success -> {
-                onResult(result.value)
+                if (!result.value) {
+                    updateViewModelIdleState()
+                    return
+                }
+
+                val parameters = WeatherInfoAcquisitionParameters(date)
+                checkPermissionBeforeWeatherInfoAcquisition(parameters)
             }
             is UseCaseResult.Error -> {
                 // Errorにならないため処理不要
             }
         }
-
     }
 
     private suspend fun checkPermissionBeforeWeatherInfoAcquisition(
