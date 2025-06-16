@@ -1,7 +1,7 @@
 package com.websarva.wings.android.zuboradiary.di.usecase.settings
 
 import com.websarva.wings.android.zuboradiary.data.repository.UserPreferencesRepository
-import com.websarva.wings.android.zuboradiary.data.usecase.settings.IsWeatherInfoAcquisitionEnabledUseCase
+import com.websarva.wings.android.zuboradiary.domain.usecase.settings.IsWeatherInfoAcquisitionEnabledUseCase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

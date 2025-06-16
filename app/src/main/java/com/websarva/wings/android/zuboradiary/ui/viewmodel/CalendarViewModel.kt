@@ -1,8 +1,8 @@
 package com.websarva.wings.android.zuboradiary.ui.viewmodel
 
 import androidx.lifecycle.viewModelScope
-import com.websarva.wings.android.zuboradiary.data.usecase.UseCaseResult
-import com.websarva.wings.android.zuboradiary.data.usecase.diary.DoesDiaryExistUseCase
+import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
+import com.websarva.wings.android.zuboradiary.domain.usecase.diary.DoesDiaryExistUseCase
 import com.websarva.wings.android.zuboradiary.ui.model.CalendarAppMessage
 import com.websarva.wings.android.zuboradiary.ui.model.event.CalendarEvent
 import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult

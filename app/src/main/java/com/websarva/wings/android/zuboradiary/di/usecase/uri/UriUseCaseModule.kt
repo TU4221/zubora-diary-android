@@ -2,8 +2,8 @@ package com.websarva.wings.android.zuboradiary.di.usecase.uri
 
 import com.websarva.wings.android.zuboradiary.data.repository.DiaryRepository
 import com.websarva.wings.android.zuboradiary.data.repository.UriRepository
-import com.websarva.wings.android.zuboradiary.data.usecase.uri.ReleaseUriPermissionUseCase
-import com.websarva.wings.android.zuboradiary.data.usecase.uri.TakeUriPermissionUseCase
+import com.websarva.wings.android.zuboradiary.domain.usecase.uri.ReleaseUriPermissionUseCase
+import com.websarva.wings.android.zuboradiary.domain.usecase.uri.TakeUriPermissionUseCase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
