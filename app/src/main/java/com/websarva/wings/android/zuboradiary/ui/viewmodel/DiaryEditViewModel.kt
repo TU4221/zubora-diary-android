@@ -301,6 +301,7 @@ internal class DiaryEditViewModel @Inject constructor(
 
     // ViewClicked処理
     fun onDiarySaveMenuClicked() {
+        if (isProcessing) return
 
         val diaryEntity = diaryStateFlow.createDiaryEntity()
         val diaryItemTitleSelectionHistoryItemEntityList =
@@ -328,11 +329,14 @@ internal class DiaryEditViewModel @Inject constructor(
     }
 
     fun onDiaryDeleteMenuClicked() {
+        if (isProcessing) return
+
         val parameters =
             DiaryDeleteParameters(
                 loadedDate.requireValue(),
                 loadedPicturePath
             )
+
         viewModelScope.launch {
             emitViewModelEvent(
                 DiaryEditEvent.NavigateDiaryDeleteDialog(parameters)
@@ -342,13 +346,18 @@ internal class DiaryEditViewModel @Inject constructor(
     }
 
     fun onNavigationClicked() {
+        if (isProcessing) return
+
         viewModelScope.launch {
             navigatePreviousFragment()
         }
     }
 
     fun onDateInputFieldClicked() {
+        if (isProcessing) return
+
         val date = this.date.requireValue()
+
         viewModelScope.launch {
             emitViewModelEvent(
                 DiaryEditEvent.NavigateDatePickerDialog(date)
@@ -369,7 +378,10 @@ internal class DiaryEditViewModel @Inject constructor(
     }
 
     fun onItemTitleInputFieldClicked(itemNumber: ItemNumber) {
+        if (isProcessing) return
+
         val itemTitle = getItemTitle(itemNumber).requireValue()
+
         viewModelScope.launch {
             emitViewModelEvent(
                 DiaryEditEvent.NavigateDiaryItemTitleEditFragment(itemNumber, itemTitle)
@@ -378,12 +390,16 @@ internal class DiaryEditViewModel @Inject constructor(
     }
 
     fun onItemAdditionButtonClicked() {
+        if (isProcessing) return
+
         viewModelScope.launch {
             addDiaryItem()
         }
     }
 
     fun onItemDeleteButtonClicked(itemNumber: ItemNumber) {
+        if (isProcessing) return
+
         viewModelScope.launch {
             val parameters = DiaryItemDeleteParameters(itemNumber)
             emitViewModelEvent(
@@ -393,6 +409,8 @@ internal class DiaryEditViewModel @Inject constructor(
     }
 
     fun onAttachedPictureDeleteButtonClicked() {
+        if (isProcessing) return
+
         viewModelScope.launch {
             emitViewModelEvent(
                 DiaryEditEvent.NavigateDiaryPictureDeleteDialog

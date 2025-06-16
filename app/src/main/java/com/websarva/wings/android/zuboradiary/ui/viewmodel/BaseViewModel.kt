@@ -23,6 +23,7 @@ internal abstract class BaseViewModel<E: ViewModelEvent, M: AppMessage, S: ViewM
     private val initialViewModelState = ViewModelState.Idle
     private val _viewModelState = MutableStateFlow<ViewModelState>(initialViewModelState)
     val viewModelState get() = _viewModelState.asStateFlow()
+    val isProcessing get() = viewModelState.value != ViewModelState.Idle
 
     // 表示保留中Navigation
     private val initialPendingNavigationCommand = NavigationCommand.None
