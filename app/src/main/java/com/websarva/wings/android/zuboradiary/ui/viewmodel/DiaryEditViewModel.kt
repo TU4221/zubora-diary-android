@@ -328,7 +328,6 @@ internal class DiaryEditViewModel @Inject constructor(
     }
 
     fun onDiaryDeleteMenuClicked() {
-        updateViewModelState(DiaryEditState.Deleting)
         val parameters =
             DiaryDeleteParameters(
                 loadedDate.requireValue(),
@@ -338,7 +337,6 @@ internal class DiaryEditViewModel @Inject constructor(
             emitViewModelEvent(
                 DiaryEditEvent.NavigateDiaryDeleteDialog(parameters)
             )
-            updateViewModelIdleState()
         }
 
     }
@@ -380,10 +378,8 @@ internal class DiaryEditViewModel @Inject constructor(
     }
 
     fun onItemAdditionButtonClicked() {
-        updateViewModelState(DiaryEditState.ItemAdding)
         viewModelScope.launch {
-            emitViewModelEvent(DiaryEditEvent.ItemAddition)
-            incrementVisibleItemsCount()
+            addDiaryItem()
         }
     }
 
@@ -418,11 +414,8 @@ internal class DiaryEditViewModel @Inject constructor(
     }
 
     private fun onDiaryLoadingDialogPositiveResultReceived(parameters: DiaryLoadingParameters) {
-
         val date = parameters.date
-
         viewModelScope.launch {
-            updateViewModelState(DiaryEditState.Loading)
             loadDiary(date)
         }
     }
@@ -434,7 +427,10 @@ internal class DiaryEditViewModel @Inject constructor(
 
         viewModelScope.launch {
             checkWeatherInfoAcquisitionEnabled { isEnabled ->
-                if (!isEnabled) return@checkWeatherInfoAcquisitionEnabled
+                if (!isEnabled) {
+                    updateViewModelIdleState()
+                    return@checkWeatherInfoAcquisitionEnabled
+                }
 
                 requestWeatherInfoConfirmation(
                     date,
@@ -459,14 +455,11 @@ internal class DiaryEditViewModel @Inject constructor(
     }
 
     private fun onDiaryUpdateDialogPositiveResultReceived(parameters: DiaryUpdateParameters) {
-        updateViewModelState(DiaryEditState.Saving)
-
         val diaryEntity = parameters.diaryEntity
         val diaryItemTitleSelectionHistoryItemEntityList =
             parameters.diaryItemTitleSelectionHistoryItemEntityList
         val loadedDate = parameters.loadedDate
         val loadedPicturePath = parameters.loadedPicturePath
-
         viewModelScope.launch {
             saveDiary(
                 diaryEntity,
@@ -474,7 +467,6 @@ internal class DiaryEditViewModel @Inject constructor(
                 loadedDate,
                 loadedPicturePath
             )
-            updateViewModelIdleState()
         }
     }
 
@@ -491,14 +483,10 @@ internal class DiaryEditViewModel @Inject constructor(
     }
 
     private fun onDiaryDeleteDialogPositiveResultReceived(parameters: DiaryDeleteParameters) {
-        updateViewModelState(DiaryEditState.Deleting)
-
         val loadedDate = parameters.loadedDate
         val loadedPicturePath = parameters.loadedPicturePath
-
         viewModelScope.launch {
             deleteDiary(loadedDate, loadedPicturePath)
-            updateViewModelIdleState()
         }
     }
 
@@ -515,10 +503,7 @@ internal class DiaryEditViewModel @Inject constructor(
     }
 
     private fun onDatePickerDialogPositiveResultReceived(date: LocalDate) {
-        updateViewModelState(DiaryEditState.WeatherFetching)
-
         val loadedDate = _loadedDate.value
-
         viewModelScope.launch {
             prepareDiaryDate(date, loadedDate)
         }
@@ -551,7 +536,6 @@ internal class DiaryEditViewModel @Inject constructor(
     private fun onWeatherInfoFetchDialogPositiveResultReceived(
         parameters: WeatherInfoAcquisitionParameters
     ) {
-        updateViewModelState(DiaryEditState.WeatherFetching)
         viewModelScope.launch {
             checkPermissionBeforeWeatherInfoAcquisition(parameters)
         }
@@ -570,20 +554,9 @@ internal class DiaryEditViewModel @Inject constructor(
     }
 
     private fun onDiaryItemDeleteDialogPositiveResultReceived(parameters: DiaryItemDeleteParameters) {
-        updateViewModelState(DiaryEditState.ItemDeleting)
-
         val itemNumber = parameters.itemNumber
-        val numVisibleItems = numVisibleItems.requireValue()
-
-        if (itemNumber.value == 1 && numVisibleItems == itemNumber.value) {
-            deleteItem(itemNumber)
-            updateViewModelIdleState()
-        } else {
-            viewModelScope.launch {
-                emitViewModelEvent(
-                    DiaryEditEvent.TransitionDiaryItemHidedState(itemNumber)
-                )
-            }
+        viewModelScope.launch {
+            requestDiaryItemDeleteTransition(itemNumber)
         }
     }
 
@@ -633,7 +606,6 @@ internal class DiaryEditViewModel @Inject constructor(
 
         val loadedDate = _loadedDate.value
 
-        updateViewModelState(DiaryEditState.Loading)
         viewModelScope.launch {
             prepareDiary(date, loadedDate, shouldLoadDiary)
         }
@@ -651,7 +623,6 @@ internal class DiaryEditViewModel @Inject constructor(
     // MotionLayout変更時処理
     fun onDiaryItemHidedStateTransitionCompleted(itemNumber: ItemNumber) {
         deleteItem(itemNumber)
-        updateViewModelIdleState()
     }
 
     fun onDiaryItemShowedStateTransitionCompleted() {
@@ -693,16 +664,17 @@ internal class DiaryEditViewModel @Inject constructor(
         loadedDate: LocalDate?,
     ) {
         updateDate(date)
-
         val previousDate = previousDate
 
         // MEMO:下記処理をdate(StateFlow)変数のCollectorから呼び出すと、
         //      画面回転時にも不要に呼び出してしまう為、下記にて処理。
-        updateViewModelState(DiaryEditState.Loading)
         requestDiaryLoadingConfirmation(date, previousDate, loadedDate) {
 
             checkWeatherInfoAcquisitionEnabled { isEnabled ->
-                if (!isEnabled) return@checkWeatherInfoAcquisitionEnabled
+                if (!isEnabled) {
+                    updateViewModelIdleState()
+                    return@checkWeatherInfoAcquisitionEnabled
+                }
 
                 requestWeatherInfoConfirmation(
                     date,
@@ -713,7 +685,10 @@ internal class DiaryEditViewModel @Inject constructor(
                         date,
                         previousDate
                     ) { shouldLoad ->
-                        if (!shouldLoad) return@checkShouldLoadWeatherInfo
+                        if (!shouldLoad) {
+                            updateViewModelIdleState()
+                            return@checkShouldLoadWeatherInfo
+                        }
 
                         val parameters = WeatherInfoAcquisitionParameters(date)
                         checkPermissionBeforeWeatherInfoAcquisition(parameters)
@@ -762,6 +737,7 @@ internal class DiaryEditViewModel @Inject constructor(
         val logMsg = "日記保存_"
         Log.i(logTag, "${logMsg}開始")
 
+        updateViewModelState(DiaryEditState.Saving)
         val result =
             saveDiaryUseCase(
                 diaryEntity,
@@ -784,6 +760,7 @@ internal class DiaryEditViewModel @Inject constructor(
                 emitAppMessageEvent(DiaryEditAppMessage.DiarySavingFailure)
             }
         }
+        updateViewModelIdleState()
     }
 
     private suspend fun deleteDiary(
@@ -793,6 +770,7 @@ internal class DiaryEditViewModel @Inject constructor(
         val logMsg = "日記削除_"
         Log.i(logTag, "${logMsg}開始")
 
+        updateViewModelState(DiaryEditState.Deleting)
         when (val result = deleteDiaryUseCase(loadedDate, loadedPicturePath)) {
             is UseCaseResult.Success -> {
                 Log.i(logTag, "${logMsg}完了")
@@ -821,6 +799,7 @@ internal class DiaryEditViewModel @Inject constructor(
                 }
             }
         }
+        updateViewModelIdleState()
     }
 
     private suspend fun requestDiaryLoadingConfirmation(
@@ -829,6 +808,7 @@ internal class DiaryEditViewModel @Inject constructor(
         loadedDate: LocalDate?,
         onConfirmationNotNeeded: suspend () -> Unit
     ) {
+        updateViewModelState(DiaryEditState.Loading)
         val result = shouldRequestDiaryLoadingConfirmationUseCase(date, previousDate, loadedDate)
         when (result) {
             is UseCaseResult.Success -> {
@@ -839,13 +819,14 @@ internal class DiaryEditViewModel @Inject constructor(
                             parameters
                         )
                     )
+                    updateViewModelIdleState()
                 } else {
                     onConfirmationNotNeeded()
                 }
             }
             is UseCaseResult.Error -> {
-                updateViewModelIdleState()
                 emitAppMessageEvent(DiaryEditAppMessage.DiaryInfoLoadingFailure)
+                updateViewModelIdleState()
             }
         }
     }
@@ -871,6 +852,7 @@ internal class DiaryEditViewModel @Inject constructor(
                     emitViewModelEvent(
                         DiaryEditEvent.NavigateDiaryUpdateDialog(parameters)
                     )
+                    updateViewModelIdleState()
                 } else {
                     onConfirmationNotNeeded()
                 }
@@ -888,12 +870,14 @@ internal class DiaryEditViewModel @Inject constructor(
     private suspend fun checkWeatherInfoAcquisitionEnabled(
         onResult: suspend (Boolean) -> Unit
     ) {
+        updateViewModelState(DiaryEditState.WeatherFetching)
         when (val result = isWeatherInfoAcquisitionEnabledUseCase()) {
             is UseCaseResult.Success -> {
                 onResult(result.value)
             }
             is UseCaseResult.Error -> {
                 emitAppMessageEvent(DiaryEditAppMessage.SettingLoadingFailure)
+                updateViewModelIdleState()
             }
         }
     }
@@ -913,14 +897,14 @@ internal class DiaryEditViewModel @Inject constructor(
                     emitViewModelEvent(
                         DiaryEditEvent.NavigateWeatherInfoFetchingDialog(parameters)
                     )
-                } else {
                     updateViewModelIdleState()
+                } else {
                     onConfirmationNotNeeded()
                 }
             }
             is UseCaseResult.Error -> {
-                updateViewModelIdleState()
                 emitAppMessageEvent(DiaryEditAppMessage.DiaryInfoLoadingFailure)
+                updateViewModelIdleState()
             }
         }
     }
@@ -930,6 +914,7 @@ internal class DiaryEditViewModel @Inject constructor(
         previousDate: LocalDate?,
         onResult: suspend (Boolean) -> Unit
     ) {
+        updateViewModelState(DiaryEditState.WeatherFetching)
         when (val result = shouldLoadWeatherInfoUseCase(date, previousDate)) {
             is UseCaseResult.Success -> {
                 onResult(result.value)
@@ -938,6 +923,7 @@ internal class DiaryEditViewModel @Inject constructor(
                 // Errorにならないため処理不要
             }
         }
+
     }
 
     private suspend fun checkPermissionBeforeWeatherInfoAcquisition(
@@ -953,9 +939,7 @@ internal class DiaryEditViewModel @Inject constructor(
         date: LocalDate
     ) {
         updateViewModelState(DiaryEditState.WeatherFetching)
-        val result = loadWeatherInfoUseCase(isGranted, date)
-        updateViewModelIdleState()
-        when (result) {
+        when (val result = loadWeatherInfoUseCase(isGranted, date)) {
             is UseCaseResult.Success -> {
                 updateWeather1(result.value)
                 updateWeather2(Weather.UNKNOWN)
@@ -977,6 +961,7 @@ internal class DiaryEditViewModel @Inject constructor(
                 }
             }
         }
+        updateViewModelIdleState()
     }
 
     // 日付関係
@@ -1016,20 +1001,38 @@ internal class DiaryEditViewModel @Inject constructor(
     }
 
     // 項目関係
-    private fun incrementVisibleItemsCount() {
-        diaryStateFlow.incrementVisibleItemsCount()
-    }
-
     private fun getItemTitle(itemNumber: ItemNumber): StateFlow<String> {
         return diaryStateFlow.getItemStateFlow(itemNumber).title
     }
 
+    private suspend fun addDiaryItem() {
+        updateViewModelState(DiaryEditState.ItemAdding)
+        emitViewModelEvent(DiaryEditEvent.ItemAddition)
+        diaryStateFlow.incrementVisibleItemsCount()
+    }
+
     private fun deleteItem(itemNumber: ItemNumber) {
+        updateViewModelState(DiaryEditState.ItemDeleting)
         diaryStateFlow.deleteItem(itemNumber)
+        updateViewModelIdleState()
     }
 
     private fun updateItemTitle(itemNumber: ItemNumber, title: String) {
         diaryStateFlow.updateItemTitle(itemNumber, title)
+    }
+
+    private suspend fun requestDiaryItemDeleteTransition(itemNumber: ItemNumber) {
+        val numVisibleItems = numVisibleItems.requireValue()
+
+        updateViewModelState(DiaryEditState.ItemDeleting)
+        if (itemNumber.value == 1 && numVisibleItems == itemNumber.value) {
+            deleteItem(itemNumber)
+        } else {
+            emitViewModelEvent(
+                DiaryEditEvent.TransitionDiaryItemHidedState(itemNumber)
+            )
+        }
+        //updateViewModelIdleState() MEMO:deleteItem(itemNumber)でIdleStateに更新する為、不要。
     }
 
     // 添付写真関係
