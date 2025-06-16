@@ -426,19 +426,7 @@ internal class DiaryEditViewModel @Inject constructor(
         val previousDate = previousDate
 
         viewModelScope.launch {
-            checkWeatherInfoAcquisitionEnabled { isEnabled ->
-                if (!isEnabled) {
-                    updateViewModelIdleState()
-                    return@checkWeatherInfoAcquisitionEnabled
-                }
-
-                requestWeatherInfoConfirmation(
-                    date,
-                    previousDate
-                ) {
-                    // 処理なし
-                }
-            }
+            processWeatherInfoAcquisition(date, previousDate)
         }
     }
 
@@ -669,32 +657,7 @@ internal class DiaryEditViewModel @Inject constructor(
         // MEMO:下記処理をdate(StateFlow)変数のCollectorから呼び出すと、
         //      画面回転時にも不要に呼び出してしまう為、下記にて処理。
         requestDiaryLoadingConfirmation(date, previousDate, loadedDate) {
-
-            checkWeatherInfoAcquisitionEnabled { isEnabled ->
-                if (!isEnabled) {
-                    updateViewModelIdleState()
-                    return@checkWeatherInfoAcquisitionEnabled
-                }
-
-                requestWeatherInfoConfirmation(
-                    date,
-                    previousDate
-                ) {
-
-                    checkShouldLoadWeatherInfo(
-                        date,
-                        previousDate
-                    ) { shouldLoad ->
-                        if (!shouldLoad) {
-                            updateViewModelIdleState()
-                            return@checkShouldLoadWeatherInfo
-                        }
-
-                        val parameters = WeatherInfoAcquisitionParameters(date)
-                        checkPermissionBeforeWeatherInfoAcquisition(parameters)
-                    }
-                }
-            }
+            processWeatherInfoAcquisition(date, previousDate)
         }
     }
 
@@ -867,6 +830,34 @@ internal class DiaryEditViewModel @Inject constructor(
     }
 
     // 天気情報取得関係
+    private suspend fun processWeatherInfoAcquisition(date: LocalDate, previousDate: LocalDate?) {
+        checkWeatherInfoAcquisitionEnabled { isEnabled ->
+            if (!isEnabled) {
+                updateViewModelIdleState()
+                return@checkWeatherInfoAcquisitionEnabled
+            }
+
+            requestWeatherInfoConfirmation(
+                date,
+                previousDate
+            ) {
+
+                checkShouldLoadWeatherInfo(
+                    date,
+                    previousDate
+                ) { shouldLoad ->
+                    if (!shouldLoad) {
+                        updateViewModelIdleState()
+                        return@checkShouldLoadWeatherInfo
+                    }
+
+                    val parameters = WeatherInfoAcquisitionParameters(date)
+                    checkPermissionBeforeWeatherInfoAcquisition(parameters)
+                }
+            }
+        }
+    }
+
     private suspend fun checkWeatherInfoAcquisitionEnabled(
         onResult: suspend (Boolean) -> Unit
     ) {
