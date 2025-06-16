@@ -561,9 +561,7 @@ internal class DiaryEditViewModel @Inject constructor(
     }
 
     private fun onDiaryPictureDeleteDialogPositiveResultReceived() {
-        updateViewModelState(DiaryEditState.PictureDeleting)
         deletePicturePath()
-        updateViewModelIdleState()
     }
 
     fun onItemTitleEditFragmentResultReceived(result: FragmentResult<ItemTitleEditResult>) {
@@ -583,7 +581,6 @@ internal class DiaryEditViewModel @Inject constructor(
     // MEMO:未選択時null
     fun onPicturePathReceivedFromOpenDocument(uri: Uri?) {
         updatePicturePath(uri)
-        updateViewModelIdleState()
     }
 
     // Fragment状態処理
@@ -1014,10 +1011,13 @@ internal class DiaryEditViewModel @Inject constructor(
     // 添付写真関係
     private fun updatePicturePath(uri: Uri?) {
         diaryStateFlow.picturePath.value = uri
+        updateViewModelIdleState()
     }
 
     private fun deletePicturePath() {
+        updateViewModelState(DiaryEditState.PictureDeleting)
         diaryStateFlow.picturePath.value = null
+        updateViewModelIdleState()
     }
 
 
