@@ -17,14 +17,16 @@ class WeatherInfoFetchingDialogFragment : BaseAlertDialogFragment() {
     }
 
     override fun createMessage(): String {
-        val loadingDiaryDate =
-            WeatherInfoFetchingDialogFragmentArgs.fromBundle(requireArguments()).date
-        val dateString = loadingDiaryDate.toJapaneseDateString(requireContext())
+        val date =
+            WeatherInfoFetchingDialogFragmentArgs.fromBundle(requireArguments()).parameters.date
+        val dateString = date.toJapaneseDateString(requireContext())
         return dateString + getString(R.string.dialog_weather_info_fetching_message)
     }
 
     override fun handleOnPositiveButtonClick() {
-        setResult(KEY_RESULT, DialogResult.Positive(Unit))
+        val parameters =
+            WeatherInfoFetchingDialogFragmentArgs.fromBundle(requireArguments()).parameters
+        setResult(KEY_RESULT, DialogResult.Positive(parameters))
     }
 
     override fun handleOnNegativeButtonClick() {

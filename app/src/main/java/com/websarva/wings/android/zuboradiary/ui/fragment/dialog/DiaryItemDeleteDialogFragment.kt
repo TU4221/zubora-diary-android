@@ -17,16 +17,16 @@ class DiaryItemDeleteDialogFragment : BaseAlertDialogFragment() {
 
     override fun createMessage(): String {
         val deleteItemNumber =
-            DiaryItemDeleteDialogFragmentArgs.fromBundle(requireArguments()).itemNumber
+            DiaryItemDeleteDialogFragmentArgs.fromBundle(requireArguments()).parameters.itemNumber
         return getString(R.string.dialog_diary_item_delete_first_message) + deleteItemNumber + getString(
             R.string.dialog_diary_item_delete_second_message
         )
     }
 
     override fun handleOnPositiveButtonClick() {
-        val deleteItemNumber =
-            DiaryItemDeleteDialogFragmentArgs.fromBundle(requireArguments()).itemNumber
-        setResult(KEY_RESULT, DialogResult.Positive(deleteItemNumber))
+        val parameters =
+            DiaryItemDeleteDialogFragmentArgs.fromBundle(requireArguments()).parameters
+        setResult(KEY_RESULT, DialogResult.Positive(parameters))
     }
 
     override fun handleOnNegativeButtonClick() {

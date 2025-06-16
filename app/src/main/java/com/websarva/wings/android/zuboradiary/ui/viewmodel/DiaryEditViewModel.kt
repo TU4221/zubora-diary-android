@@ -4,6 +4,8 @@ import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
+import com.websarva.wings.android.zuboradiary.data.database.DiaryEntity
+import com.websarva.wings.android.zuboradiary.data.database.DiaryItemTitleSelectionHistoryItemEntity
 import com.websarva.wings.android.zuboradiary.data.usecase.diary.error.FetchWeatherInfoError
 import com.websarva.wings.android.zuboradiary.data.model.Condition
 import com.websarva.wings.android.zuboradiary.data.model.ItemNumber
@@ -25,6 +27,11 @@ import com.websarva.wings.android.zuboradiary.ui.model.DiaryEditAppMessage
 import com.websarva.wings.android.zuboradiary.ui.model.adapter.WeatherAdapterList
 import com.websarva.wings.android.zuboradiary.ui.model.event.DiaryEditEvent
 import com.websarva.wings.android.zuboradiary.ui.model.adapter.ConditionAdapterList
+import com.websarva.wings.android.zuboradiary.ui.model.parameters.DiaryDeleteParameters
+import com.websarva.wings.android.zuboradiary.ui.model.parameters.DiaryItemDeleteParameters
+import com.websarva.wings.android.zuboradiary.ui.model.parameters.DiaryLoadingParameters
+import com.websarva.wings.android.zuboradiary.ui.model.parameters.DiaryUpdateParameters
+import com.websarva.wings.android.zuboradiary.ui.model.parameters.WeatherInfoAcquisitionParameters
 import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
 import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
 import com.websarva.wings.android.zuboradiary.ui.model.result.ItemTitleEditResult
@@ -294,19 +301,42 @@ internal class DiaryEditViewModel @Inject constructor(
 
     // ViewClicked処理
     fun onDiarySaveMenuClicked() {
+
+        val diaryEntity = diaryStateFlow.createDiaryEntity()
+        val diaryItemTitleSelectionHistoryItemEntityList =
+            diaryStateFlow.createDiaryItemTitleSelectionHistoryItemEntityList()
+        val date = date.requireValue()
+        val loadedDate = _loadedDate.value
+        val loadedPicturePath = loadedPicturePath
+
         viewModelScope.launch {
-            requestDiaryUpdateConfirmation {
-                saveDiary()
+            requestDiaryUpdateConfirmation(
+                date,
+                diaryEntity,
+                diaryItemTitleSelectionHistoryItemEntityList,
+                loadedDate,
+                loadedPicturePath
+            ) {
+                saveDiary(
+                    diaryEntity,
+                    diaryItemTitleSelectionHistoryItemEntityList,
+                    loadedDate,
+                    loadedPicturePath
+                )
             }
         }
     }
 
     fun onDiaryDeleteMenuClicked() {
         updateViewModelState(DiaryEditState.Deleting)
-        val date = this.date.requireValue()
+        val parameters =
+            DiaryDeleteParameters(
+                loadedDate.requireValue(),
+                loadedPicturePath
+            )
         viewModelScope.launch {
             emitViewModelEvent(
-                DiaryEditEvent.NavigateDiaryDeleteDialog(date)
+                DiaryEditEvent.NavigateDiaryDeleteDialog(parameters)
             )
             updateViewModelIdleState()
         }
@@ -359,8 +389,9 @@ internal class DiaryEditViewModel @Inject constructor(
 
     fun onItemDeleteButtonClicked(itemNumber: ItemNumber) {
         viewModelScope.launch {
+            val parameters = DiaryItemDeleteParameters(itemNumber)
             emitViewModelEvent(
-                DiaryEditEvent.NavigateDiaryItemDeleteDialog(itemNumber)
+                DiaryEditEvent.NavigateDiaryItemDeleteDialog(parameters)
             )
         }
     }
@@ -374,20 +405,22 @@ internal class DiaryEditViewModel @Inject constructor(
     }
 
     // Fragmentからの結果受取処理
-    fun onDiaryLoadingDialogResultReceived(result: DialogResult<String>) {
+    fun onDiaryLoadingDialogResultReceived(result: DialogResult<DiaryLoadingParameters>) {
         when (result) {
-            is DialogResult.Positive<String> -> {
-                onDiaryLoadingDialogPositiveResultReceived()
+            is DialogResult.Positive<DiaryLoadingParameters> -> {
+                onDiaryLoadingDialogPositiveResultReceived(result.data)
             }
-            DialogResult.Negative,
-            DialogResult.Cancel -> {
+            is DialogResult.Negative,
+            is DialogResult.Cancel -> {
                 onDiaryLoadingDialogNegativeResultReceived()
             }
         }
     }
 
-    private fun onDiaryLoadingDialogPositiveResultReceived() {
-        val date = this.date.requireValue()
+    private fun onDiaryLoadingDialogPositiveResultReceived(parameters: DiaryLoadingParameters) {
+
+        val date = parameters.date
+
         viewModelScope.launch {
             updateViewModelState(DiaryEditState.Loading)
             loadDiary(date)
@@ -395,21 +428,28 @@ internal class DiaryEditViewModel @Inject constructor(
     }
 
     private fun onDiaryLoadingDialogNegativeResultReceived() {
+
+        val date = date.requireValue()
+        val previousDate = previousDate
+
         viewModelScope.launch {
             checkWeatherInfoAcquisitionEnabled { isEnabled ->
                 if (!isEnabled) return@checkWeatherInfoAcquisitionEnabled
 
-                requestWeatherInfoConfirmation {
+                requestWeatherInfoConfirmation(
+                    date,
+                    previousDate
+                ) {
                     // 処理なし
                 }
             }
         }
     }
 
-    fun onDiaryUpdateDialogResultReceived(result: DialogResult<Unit>) {
+    fun onDiaryUpdateDialogResultReceived(result: DialogResult<DiaryUpdateParameters>) {
         when (result) {
-            is DialogResult.Positive<Unit> -> {
-                onDiaryUpdateDialogPositiveResultReceived()
+            is DialogResult.Positive<DiaryUpdateParameters> -> {
+                onDiaryUpdateDialogPositiveResultReceived(result.data)
             }
             DialogResult.Negative,
             DialogResult.Cancel -> {
@@ -418,18 +458,30 @@ internal class DiaryEditViewModel @Inject constructor(
         }
     }
 
-    private fun onDiaryUpdateDialogPositiveResultReceived() {
+    private fun onDiaryUpdateDialogPositiveResultReceived(parameters: DiaryUpdateParameters) {
         updateViewModelState(DiaryEditState.Saving)
+
+        val diaryEntity = parameters.diaryEntity
+        val diaryItemTitleSelectionHistoryItemEntityList =
+            parameters.diaryItemTitleSelectionHistoryItemEntityList
+        val loadedDate = parameters.loadedDate
+        val loadedPicturePath = parameters.loadedPicturePath
+
         viewModelScope.launch {
-            saveDiary()
+            saveDiary(
+                diaryEntity,
+                diaryItemTitleSelectionHistoryItemEntityList,
+                loadedDate,
+                loadedPicturePath
+            )
             updateViewModelIdleState()
         }
     }
 
-    fun onDiaryDeleteDialogResultReceived(result: DialogResult<Unit>) {
+    fun onDiaryDeleteDialogResultReceived(result: DialogResult<DiaryDeleteParameters>) {
         when (result) {
-            is DialogResult.Positive<Unit> -> {
-                onDiaryDeleteDialogPositiveResultReceived()
+            is DialogResult.Positive<DiaryDeleteParameters> -> {
+                onDiaryDeleteDialogPositiveResultReceived(result.data)
             }
             DialogResult.Negative,
             DialogResult.Cancel -> {
@@ -438,10 +490,14 @@ internal class DiaryEditViewModel @Inject constructor(
         }
     }
 
-    private fun onDiaryDeleteDialogPositiveResultReceived() {
+    private fun onDiaryDeleteDialogPositiveResultReceived(parameters: DiaryDeleteParameters) {
         updateViewModelState(DiaryEditState.Deleting)
+
+        val loadedDate = parameters.loadedDate
+        val loadedPicturePath = parameters.loadedPicturePath
+
         viewModelScope.launch {
-            deleteDiary()
+            deleteDiary(loadedDate, loadedPicturePath)
             updateViewModelIdleState()
         }
     }
@@ -460,8 +516,11 @@ internal class DiaryEditViewModel @Inject constructor(
 
     private fun onDatePickerDialogPositiveResultReceived(date: LocalDate) {
         updateViewModelState(DiaryEditState.WeatherFetching)
+
+        val loadedDate = _loadedDate.value
+
         viewModelScope.launch {
-            prepareDiaryDate(date)
+            prepareDiaryDate(date, loadedDate)
         }
     }
 
@@ -477,10 +536,10 @@ internal class DiaryEditViewModel @Inject constructor(
         }
     }
 
-    fun onWeatherInfoFetchDialogResultReceived(result: DialogResult<Unit>) {
+    fun onWeatherInfoFetchDialogResultReceived(result: DialogResult<WeatherInfoAcquisitionParameters>) {
         when (result) {
-            is DialogResult.Positive<Unit> -> {
-                onWeatherInfoFetchDialogPositiveResultReceived()
+            is DialogResult.Positive<WeatherInfoAcquisitionParameters> -> {
+                onWeatherInfoFetchDialogPositiveResultReceived(result.data)
             }
             DialogResult.Negative,
             DialogResult.Cancel -> {
@@ -489,16 +548,18 @@ internal class DiaryEditViewModel @Inject constructor(
         }
     }
 
-    private fun onWeatherInfoFetchDialogPositiveResultReceived() {
+    private fun onWeatherInfoFetchDialogPositiveResultReceived(
+        parameters: WeatherInfoAcquisitionParameters
+    ) {
         updateViewModelState(DiaryEditState.WeatherFetching)
         viewModelScope.launch {
-            checkPermissionBeforeWeatherInfoLoading()
+            checkPermissionBeforeWeatherInfoAcquisition(parameters)
         }
     }
 
-    fun onDiaryItemDeleteDialogResultReceived(result: DialogResult<ItemNumber>) {
+    fun onDiaryItemDeleteDialogResultReceived(result: DialogResult<DiaryItemDeleteParameters>) {
         when (result) {
-            is DialogResult.Positive<ItemNumber> -> {
+            is DialogResult.Positive<DiaryItemDeleteParameters> -> {
                 onDiaryItemDeleteDialogPositiveResultReceived(result.data)
             }
             DialogResult.Negative,
@@ -508,8 +569,10 @@ internal class DiaryEditViewModel @Inject constructor(
         }
     }
 
-    private fun onDiaryItemDeleteDialogPositiveResultReceived(itemNumber: ItemNumber) {
+    private fun onDiaryItemDeleteDialogPositiveResultReceived(parameters: DiaryItemDeleteParameters) {
         updateViewModelState(DiaryEditState.ItemDeleting)
+
+        val itemNumber = parameters.itemNumber
         val numVisibleItems = numVisibleItems.requireValue()
 
         if (itemNumber.value == 1 && numVisibleItems == itemNumber.value) {
@@ -567,9 +630,12 @@ internal class DiaryEditViewModel @Inject constructor(
         date: LocalDate,
         shouldLoadDiary: Boolean
     ) {
+
+        val loadedDate = _loadedDate.value
+
         updateViewModelState(DiaryEditState.Loading)
         viewModelScope.launch {
-            prepareDiary(date, shouldLoadDiary)
+            prepareDiary(date, loadedDate, shouldLoadDiary)
         }
     }
 
@@ -593,15 +659,22 @@ internal class DiaryEditViewModel @Inject constructor(
     }
 
     // 権限確認後処理
-    fun onAccessLocationPermissionChecked(isGranted: Boolean) {
+    fun onAccessLocationPermissionChecked(
+        isGranted: Boolean,
+        parameters: WeatherInfoAcquisitionParameters
+    ) {
+
+        val date = parameters.date
+
         viewModelScope.launch {
-            loadWeatherInfo(isGranted)
+            loadWeatherInfo(isGranted, date)
         }
     }
 
     // 日記データ処理関係
     private suspend fun prepareDiary(
         date: LocalDate,
+        loadedDate: LocalDate?,
         shouldLoadDiary: Boolean
     ) {
         if (hasPreparedDiary) return
@@ -609,29 +682,41 @@ internal class DiaryEditViewModel @Inject constructor(
         if (shouldLoadDiary) {
             loadDiary(date)
         } else {
-            prepareDiaryDate(date)
+            prepareDiaryDate(date, loadedDate)
         }
 
         hasPreparedDiary = true
     }
 
-    private suspend fun prepareDiaryDate(date: LocalDate) {
+    private suspend fun prepareDiaryDate(
+        date: LocalDate,
+        loadedDate: LocalDate?,
+    ) {
         updateDate(date)
+
+        val previousDate = previousDate
 
         // MEMO:下記処理をdate(StateFlow)変数のCollectorから呼び出すと、
         //      画面回転時にも不要に呼び出してしまう為、下記にて処理。
         updateViewModelState(DiaryEditState.Loading)
-        requestDiaryLoadingConfirmation(date) {
+        requestDiaryLoadingConfirmation(date, previousDate, loadedDate) {
 
             checkWeatherInfoAcquisitionEnabled { isEnabled ->
                 if (!isEnabled) return@checkWeatherInfoAcquisitionEnabled
 
-                requestWeatherInfoConfirmation {
+                requestWeatherInfoConfirmation(
+                    date,
+                    previousDate
+                ) {
 
-                    checkShouldLoadWeatherInfo { shouldLoad ->
+                    checkShouldLoadWeatherInfo(
+                        date,
+                        previousDate
+                    ) { shouldLoad ->
                         if (!shouldLoad) return@checkShouldLoadWeatherInfo
 
-                        checkPermissionBeforeWeatherInfoLoading()
+                        val parameters = WeatherInfoAcquisitionParameters(date)
+                        checkPermissionBeforeWeatherInfoAcquisition(parameters)
                     }
                 }
             }
@@ -668,18 +753,20 @@ internal class DiaryEditViewModel @Inject constructor(
         updateViewModelIdleState()
     }
 
-    private suspend fun saveDiary() {
+    private suspend fun saveDiary(
+        diaryEntity: DiaryEntity,
+        diaryItemTitleSelectionHistoryItemEntityList: List<DiaryItemTitleSelectionHistoryItemEntity>,
+        loadedDate: LocalDate?,
+        loadedPicturePath: Uri?
+    ) {
         val logMsg = "日記保存_"
         Log.i(logTag, "${logMsg}開始")
 
-        val diaryEntity = diaryStateFlow.createDiaryEntity()
-        val diaryItemTitleSelectionHistoryItemEntityList =
-            diaryStateFlow.createDiaryItemTitleSelectionHistoryItemEntityList()
         val result =
             saveDiaryUseCase(
                 diaryEntity,
                 diaryItemTitleSelectionHistoryItemEntityList,
-                _loadedDate.value,
+                loadedDate,
                 loadedPicturePath
             )
         when (result) {
@@ -688,7 +775,7 @@ internal class DiaryEditViewModel @Inject constructor(
                 emitViewModelEvent(
                     DiaryEditEvent
                         .NavigateDiaryShowFragment(
-                            date.requireValue()
+                            LocalDate.parse(diaryEntity.date)
                         )
                 )
             }
@@ -699,14 +786,14 @@ internal class DiaryEditViewModel @Inject constructor(
         }
     }
 
-    private suspend fun deleteDiary() {
+    private suspend fun deleteDiary(
+        loadedDate: LocalDate,
+        loadedPicturePath: Uri?
+    ) {
         val logMsg = "日記削除_"
         Log.i(logTag, "${logMsg}開始")
 
-        val loadedDate = loadedDate.requireValue()
-        val loadedPictureUri = loadedPicturePath
-
-        when (val result = deleteDiaryUseCase(loadedDate, loadedPictureUri)) {
+        when (val result = deleteDiaryUseCase(loadedDate, loadedPicturePath)) {
             is UseCaseResult.Success -> {
                 Log.i(logTag, "${logMsg}完了")
                 emitViewModelEvent(
@@ -738,16 +825,19 @@ internal class DiaryEditViewModel @Inject constructor(
 
     private suspend fun requestDiaryLoadingConfirmation(
         date: LocalDate,
+        previousDate: LocalDate?,
+        loadedDate: LocalDate?,
         onConfirmationNotNeeded: suspend () -> Unit
     ) {
-        val previousDate = previousDate
-        val loadedDate = loadedDate.value
         val result = shouldRequestDiaryLoadingConfirmationUseCase(date, previousDate, loadedDate)
         when (result) {
             is UseCaseResult.Success -> {
                 if (result.value) {
+                    val parameters = DiaryLoadingParameters(date)
                     emitViewModelEvent(
-                        DiaryEditEvent.NavigateDiaryLoadingDialog(date)
+                        DiaryEditEvent.NavigateDiaryLoadingDialog(
+                            parameters
+                        )
                     )
                 } else {
                     onConfirmationNotNeeded()
@@ -761,16 +851,25 @@ internal class DiaryEditViewModel @Inject constructor(
     }
 
     private suspend fun requestDiaryUpdateConfirmation(
+        date: LocalDate,
+        diaryEntity: DiaryEntity,
+        diaryItemTitleSelectionHistoryItemEntityList: List<DiaryItemTitleSelectionHistoryItemEntity>,
+        loadedDate: LocalDate?,
+        loadedPicturePath: Uri?,
         onConfirmationNotNeeded: suspend () -> Unit
     ) {
         updateViewModelState(DiaryEditState.Saving)
-        val date = date.requireValue()
-        val loadedDate = loadedDate.value
         when (val result = shouldRequestDiaryUpdateConfirmationUseCase(date, loadedDate)) {
             is UseCaseResult.Success -> {
                 if (result.value) {
+                    val parameters = DiaryUpdateParameters(
+                        diaryEntity,
+                        diaryItemTitleSelectionHistoryItemEntityList,
+                        loadedDate,
+                        loadedPicturePath
+                    )
                     emitViewModelEvent(
-                        DiaryEditEvent.NavigateDiaryUpdateDialog(date)
+                        DiaryEditEvent.NavigateDiaryUpdateDialog(parameters)
                     )
                 } else {
                     onConfirmationNotNeeded()
@@ -800,18 +899,19 @@ internal class DiaryEditViewModel @Inject constructor(
     }
 
     private suspend fun requestWeatherInfoConfirmation(
+        date: LocalDate,
+        previousDate: LocalDate?,
         onConfirmationNotNeeded: suspend () -> Unit
     ) {
         updateViewModelState(DiaryEditState.WeatherFetching)
-        val date = date.requireValue()
-        val previousDate = previousDate
         val result =
             shouldRequestWeatherInfoConfirmationUseCase(date, previousDate)
         when (result) {
             is UseCaseResult.Success -> {
                 if (result.value) {
+                    val parameters = WeatherInfoAcquisitionParameters(date)
                     emitViewModelEvent(
-                        DiaryEditEvent.NavigateWeatherInfoFetchingDialog(date)
+                        DiaryEditEvent.NavigateWeatherInfoFetchingDialog(parameters)
                     )
                 } else {
                     updateViewModelIdleState()
@@ -826,10 +926,10 @@ internal class DiaryEditViewModel @Inject constructor(
     }
 
     private suspend fun checkShouldLoadWeatherInfo(
+        date: LocalDate,
+        previousDate: LocalDate?,
         onResult: suspend (Boolean) -> Unit
     ) {
-        val date = date.requireValue()
-        val previousDate = previousDate
         when (val result = shouldLoadWeatherInfoUseCase(date, previousDate)) {
             is UseCaseResult.Success -> {
                 onResult(result.value)
@@ -840,13 +940,19 @@ internal class DiaryEditViewModel @Inject constructor(
         }
     }
 
-    private suspend fun checkPermissionBeforeWeatherInfoLoading() {
-        emitViewModelEvent(DiaryEditEvent.CheckAccessLocationPermission)
+    private suspend fun checkPermissionBeforeWeatherInfoAcquisition(
+        parameters: WeatherInfoAcquisitionParameters
+    ) {
+        emitViewModelEvent(
+            DiaryEditEvent.CheckAccessLocationPermissionBeforeWeatherInfoAcquisition(parameters)
+        )
     }
 
-    private suspend fun loadWeatherInfo(isGranted: Boolean) {
+    private suspend fun loadWeatherInfo(
+        isGranted: Boolean,
+        date: LocalDate
+    ) {
         updateViewModelState(DiaryEditState.WeatherFetching)
-        val date = date.requireValue()
         val result = loadWeatherInfoUseCase(isGranted, date)
         updateViewModelIdleState()
         when (result) {

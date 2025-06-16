@@ -10,6 +10,7 @@ import com.websarva.wings.android.zuboradiary.data.usecase.uri.ReleaseUriPermiss
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import com.websarva.wings.android.zuboradiary.ui.model.DiaryShowAppMessage
 import com.websarva.wings.android.zuboradiary.ui.model.event.DiaryShowEvent
+import com.websarva.wings.android.zuboradiary.ui.model.parameters.DiaryDeleteParameters
 import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
 import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
 import com.websarva.wings.android.zuboradiary.ui.model.state.DiaryShowState
@@ -103,9 +104,11 @@ internal class DiaryShowViewModel @Inject constructor(
 
     fun onDiaryDeleteMenuClicked() {
         val date = diaryStateFlow.date.requireValue()
+        val picturePath = diaryStateFlow.picturePath.value
         viewModelScope.launch {
+            val parameters = DiaryDeleteParameters(date, picturePath)
             emitViewModelEvent(
-                DiaryShowEvent.NavigateDiaryDeleteDialog(date)
+                DiaryShowEvent.NavigateDiaryDeleteDialog(parameters)
             )
         }
     }

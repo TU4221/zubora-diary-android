@@ -24,6 +24,7 @@ import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.DiaryLoadingFai
 import com.websarva.wings.android.zuboradiary.ui.model.event.DiaryShowEvent
 import com.websarva.wings.android.zuboradiary.ui.model.event.ViewModelEvent
 import com.websarva.wings.android.zuboradiary.ui.model.navigation.NavigationCommand
+import com.websarva.wings.android.zuboradiary.ui.model.parameters.DiaryDeleteParameters
 import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.DiaryShowViewModel
 import com.websarva.wings.android.zuboradiary.ui.utils.toJapaneseDateString
@@ -104,7 +105,7 @@ internal class DiaryShowFragment : BaseFragment<FragmentDiaryShowBinding>() {
                 navigateDiaryLoadingFailureDialog(event.date)
             }
             is DiaryShowEvent.NavigateDiaryDeleteDialog -> {
-                navigateDiaryDeleteDialog(event.date)
+                navigateDiaryDeleteDialog(event.parameters)
             }
             is DiaryShowEvent.NavigatePreviousFragment -> {
                 navigatePreviousFragment(event.result)
@@ -315,9 +316,9 @@ internal class DiaryShowFragment : BaseFragment<FragmentDiaryShowBinding>() {
         navigateFragment(NavigationCommand.To(directions))
     }
 
-    private fun navigateDiaryDeleteDialog(date: LocalDate) {
+    private fun navigateDiaryDeleteDialog(parameters: DiaryDeleteParameters) {
         val directions =
-            DiaryShowFragmentDirections.actionDiaryShowFragmentToDiaryDeleteDialog(date)
+            DiaryShowFragmentDirections.actionDiaryShowFragmentToDiaryDeleteDialog(parameters)
         navigateFragment(NavigationCommand.To(directions))
     }
 

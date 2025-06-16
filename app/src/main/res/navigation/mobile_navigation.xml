@@ -299,8 +299,8 @@
             android:id="@+id/navigation_diary_delete_dialog_for_diary_show_fragment"
             android:name="com.websarva.wings.android.zuboradiary.ui.fragment.dialog.DiaryDeleteDialogFragment">
             <argument
-                android:name="date"
-                app:argType="java.time.LocalDate" />
+                android:name="parameters"
+                app:argType="com.websarva.wings.android.zuboradiary.ui.model.parameters.DiaryDeleteParameters" />
         </dialog>
 
     </navigation>
@@ -394,8 +394,8 @@
             android:id="@+id/navigation_diary_loading_dialog"
             android:name="com.websarva.wings.android.zuboradiary.ui.fragment.dialog.DiaryLoadingDialogFragment">
             <argument
-                android:name="date"
-                app:argType="java.time.LocalDate" />
+                android:name="parameters"
+                app:argType="com.websarva.wings.android.zuboradiary.ui.model.parameters.DiaryLoadingParameters" />
         </dialog>
 
         <dialog
@@ -410,16 +410,16 @@
             android:id="@+id/navigation_diary_update_dialog"
             android:name="com.websarva.wings.android.zuboradiary.ui.fragment.dialog.DiaryUpdateDialogFragment">
             <argument
-                android:name="date"
-                app:argType="java.time.LocalDate" />
+                android:name="parameters"
+                app:argType="com.websarva.wings.android.zuboradiary.ui.model.parameters.DiaryUpdateParameters" />
         </dialog>
 
         <dialog
             android:id="@+id/navigation_diary_delete_dialog_for_diary_edit_fragment"
             android:name="com.websarva.wings.android.zuboradiary.ui.fragment.dialog.DiaryDeleteDialogFragment">
             <argument
-                android:name="date"
-                app:argType="java.time.LocalDate" />
+                android:name="parameters"
+                app:argType="com.websarva.wings.android.zuboradiary.ui.model.parameters.DiaryDeleteParameters" />
         </dialog>
 
         <dialog
@@ -434,16 +434,16 @@
             android:id="@+id/navigation_weather_info_fetching_dialog"
             android:name="com.websarva.wings.android.zuboradiary.ui.fragment.dialog.WeatherInfoFetchingDialogFragment">
             <argument
-                android:name="date"
-                app:argType="java.time.LocalDate" />
+                android:name="parameters"
+                app:argType="com.websarva.wings.android.zuboradiary.ui.model.parameters.WeatherInfoAcquisitionParameters" />
         </dialog>
 
         <dialog
             android:id="@+id/navigation_diary_item_delete_dialog"
             android:name="com.websarva.wings.android.zuboradiary.ui.fragment.dialog.DiaryItemDeleteDialogFragment">
             <argument
-                android:name="item_number"
-                app:argType="com.websarva.wings.android.zuboradiary.data.model.ItemNumber" />
+                android:name="parameters"
+                app:argType="com.websarva.wings.android.zuboradiary.ui.model.parameters.DiaryItemDeleteParameters" />
         </dialog>
 
         <dialog

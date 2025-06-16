@@ -44,6 +44,11 @@ import com.websarva.wings.android.zuboradiary.ui.model.event.DiaryEditEvent
 import com.websarva.wings.android.zuboradiary.ui.model.event.ViewModelEvent
 import com.websarva.wings.android.zuboradiary.ui.model.adapter.ConditionAdapterList
 import com.websarva.wings.android.zuboradiary.ui.model.navigation.NavigationCommand
+import com.websarva.wings.android.zuboradiary.ui.model.parameters.DiaryDeleteParameters
+import com.websarva.wings.android.zuboradiary.ui.model.parameters.DiaryItemDeleteParameters
+import com.websarva.wings.android.zuboradiary.ui.model.parameters.DiaryLoadingParameters
+import com.websarva.wings.android.zuboradiary.ui.model.parameters.DiaryUpdateParameters
+import com.websarva.wings.android.zuboradiary.ui.model.parameters.WeatherInfoAcquisitionParameters
 import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
 import com.websarva.wings.android.zuboradiary.ui.model.result.ItemTitleEditResult
 import com.websarva.wings.android.zuboradiary.ui.utils.isAccessLocationGranted
@@ -218,7 +223,7 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding>() {
 
             // TODO:シールドクラス Action -> Event に変更してから下記コードの処理方法を検討する。
             when (result) {
-                is DialogResult.Positive<ItemNumber> -> {
+                is DialogResult.Positive -> {
                     shouldTransitionItemMotionLayout = true
                 }
 
@@ -249,25 +254,25 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding>() {
                 navigateDiaryItemTitleEditFragment(event.itemNumber, event.itemTitle)
             }
             is DiaryEditEvent.NavigateDiaryLoadingDialog -> {
-                navigateDiaryLoadingDialog(event.date)
+                navigateDiaryLoadingDialog(event.parameters)
             }
             is DiaryEditEvent.NavigateDiaryLoadingFailureDialog -> {
                 navigateDiaryLoadingFailureDialog(event.date)
             }
             is DiaryEditEvent.NavigateDiaryUpdateDialog -> {
-                navigateDiaryUpdateDialog(event.date)
+                navigateDiaryUpdateDialog(event.parameters)
             }
             is DiaryEditEvent.NavigateDiaryDeleteDialog -> {
-                navigateDiaryDeleteDialog(event.date)
+                navigateDiaryDeleteDialog(event.parameters)
             }
             is DiaryEditEvent.NavigateDatePickerDialog -> {
                 navigateDatePickerDialog(event.date)
             }
             is DiaryEditEvent.NavigateWeatherInfoFetchingDialog -> {
-                navigateWeatherInfoFetchingDialog(event.date)
+                navigateWeatherInfoFetchingDialog(event.parameters)
             }
             is DiaryEditEvent.NavigateDiaryItemDeleteDialog -> {
-                navigateDiaryItemDeleteDialog(event.itemNumber)
+                navigateDiaryItemDeleteDialog(event.parameters)
             }
             DiaryEditEvent.NavigateDiaryPictureDeleteDialog -> {
                 navigateDiaryPictureDeleteDialog()
@@ -281,8 +286,8 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding>() {
             is DiaryEditEvent.TransitionDiaryItemHidedState -> {
                 hideItem(event.itemNumber, false)
             }
-            is DiaryEditEvent.CheckAccessLocationPermission -> {
-                checkAccessLocationPermission()
+            is DiaryEditEvent.CheckAccessLocationPermissionBeforeWeatherInfoAcquisition -> {
+                checkAccessLocationPermissionBeforeWeatherInfoAcquisition(event.parameters)
             }
             is DiaryEditEvent.ItemAddition -> {
                 shouldTransitionItemMotionLayout = true
@@ -862,9 +867,9 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding>() {
         navigateFragment(NavigationCommand.To(directions))
     }
 
-    private fun navigateDiaryLoadingDialog(date: LocalDate) {
+    private fun navigateDiaryLoadingDialog(parameters: DiaryLoadingParameters) {
         val directions =
-            DiaryEditFragmentDirections.actionDiaryEditFragmentToDiaryLoadingDialog(date)
+            DiaryEditFragmentDirections.actionDiaryEditFragmentToDiaryLoadingDialog(parameters)
         navigateFragment(NavigationCommand.To(directions))
     }
 
@@ -874,15 +879,15 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding>() {
         navigateFragment(NavigationCommand.To(directions))
     }
 
-    private fun navigateDiaryUpdateDialog(date: LocalDate) {
+    private fun navigateDiaryUpdateDialog(parameters: DiaryUpdateParameters) {
         val directions =
-            DiaryEditFragmentDirections.actionDiaryEditFragmentToDiaryUpdateDialog(date)
+            DiaryEditFragmentDirections.actionDiaryEditFragmentToDiaryUpdateDialog(parameters)
         navigateFragment(NavigationCommand.To(directions))
     }
 
-    private fun navigateDiaryDeleteDialog(date: LocalDate) {
+    private fun navigateDiaryDeleteDialog(parameters: DiaryDeleteParameters) {
         val directions =
-            DiaryEditFragmentDirections.actionDiaryEditFragmentToDiaryDeleteDialog(date)
+            DiaryEditFragmentDirections.actionDiaryEditFragmentToDiaryDeleteDialog(parameters)
         navigateFragment(NavigationCommand.To(directions))
     }
 
@@ -892,15 +897,15 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding>() {
         navigateFragment(NavigationCommand.To(directions))
     }
 
-    private fun navigateWeatherInfoFetchingDialog(date: LocalDate) {
+    private fun navigateWeatherInfoFetchingDialog(parameters: WeatherInfoAcquisitionParameters) {
         val directions =
-            DiaryEditFragmentDirections.actionDiaryEditFragmentToWeatherInfoFetchingDialog(date)
+            DiaryEditFragmentDirections.actionDiaryEditFragmentToWeatherInfoFetchingDialog(parameters)
         navigateFragment(NavigationCommand.To(directions))
     }
 
-    private fun navigateDiaryItemDeleteDialog(itemNumber: ItemNumber) {
+    private fun navigateDiaryItemDeleteDialog(parameters: DiaryItemDeleteParameters) {
         val directions =
-            DiaryEditFragmentDirections.actionDiaryEditFragmentToDiaryItemDeleteDialog(itemNumber)
+            DiaryEditFragmentDirections.actionDiaryEditFragmentToDiaryItemDeleteDialog(parameters)
         navigateFragment(NavigationCommand.To(directions))
     }
 
@@ -938,9 +943,12 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding>() {
         )
     }
 
-    private fun checkAccessLocationPermission() {
+    private fun checkAccessLocationPermissionBeforeWeatherInfoAcquisition(
+        parameters: WeatherInfoAcquisitionParameters
+    ) {
         mainViewModel.onAccessLocationPermissionChecked(
-            requireContext().isAccessLocationGranted()
+            requireContext().isAccessLocationGranted(),
+            parameters
         )
     }
 
