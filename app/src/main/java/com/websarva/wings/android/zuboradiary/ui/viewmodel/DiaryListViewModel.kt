@@ -3,8 +3,8 @@ package com.websarva.wings.android.zuboradiary.ui.viewmodel
 import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.viewModelScope
-import com.websarva.wings.android.zuboradiary.data.database.DiaryListItem
 import com.websarva.wings.android.zuboradiary.data.repository.DiaryRepository
+import com.websarva.wings.android.zuboradiary.domain.model.DiaryListItem
 import com.websarva.wings.android.zuboradiary.domain.usecase.uri.ReleaseUriPermissionUseCase
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import com.websarva.wings.android.zuboradiary.ui.model.DiaryListAppMessage
@@ -314,11 +314,12 @@ internal class DiaryListViewModel @Inject constructor(
         if (loadedDiaryList.isEmpty()) return DiaryYearMonthList()
 
         val diaryDayListItemList: MutableList<DiaryDayListItem> = ArrayList()
-        loadedDiaryList.stream().forEach { x: DiaryListItem ->
-            diaryDayListItemList.add(
-                DiaryDayListItem(x)
-            )
-        }
+        loadedDiaryList.stream()
+            .forEach { x: DiaryListItem ->
+                diaryDayListItemList.add(
+                    DiaryDayListItem(x)
+                )
+            }
         val diaryDayList = DiaryDayList(diaryDayListItemList)
         val existsUnloadedDiaries = existsUnloadedDiaries(diaryDayList.countDiaries())
         return DiaryYearMonthList(diaryDayList, !existsUnloadedDiaries)
@@ -363,9 +364,8 @@ internal class DiaryListViewModel @Inject constructor(
 
     private suspend fun loadNewestSavedDiaryDate(): LocalDate? {
         try {
-            val diaryEntity = diaryRepository.loadNewestDiary() ?: return null
-            val dateString = diaryEntity.date
-            return LocalDate.parse(dateString)
+            val diary = diaryRepository.loadNewestDiary() ?: return null
+            return  diary.date
         } catch (e: Exception) {
             Log.e(logTag, "最新日記読込_失敗", e)
             emitAppMessageEvent(DiaryListAppMessage.DiaryInfoLoadingFailure)
@@ -375,9 +375,8 @@ internal class DiaryListViewModel @Inject constructor(
 
     private suspend fun loadOldestSavedDiaryDate(): LocalDate? {
         try {
-            val diaryEntity = diaryRepository.loadOldestDiary() ?: return null
-            val dateString = diaryEntity.date
-            return LocalDate.parse(dateString)
+            val diary = diaryRepository.loadOldestDiary() ?: return null
+            return diary.date
         } catch (e: Exception) {
             Log.e(logTag, "最古日記読込_失敗", e)
             emitAppMessageEvent(DiaryListAppMessage.DiaryInfoLoadingFailure)

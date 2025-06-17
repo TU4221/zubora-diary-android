@@ -1,9 +1,9 @@
 package com.websarva.wings.android.zuboradiary.domain.usecase.diary
 
 import android.util.Log
-import com.websarva.wings.android.zuboradiary.data.database.DiaryEntity
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.data.repository.DiaryRepository
+import com.websarva.wings.android.zuboradiary.domain.model.Diary
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.error.DeleteDiaryError
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.error.LoadDiaryError
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
@@ -17,7 +17,7 @@ internal class LoadDiaryUseCase(
 
     suspend operator fun invoke(
         date: LocalDate
-    ): UseCaseResult<DiaryEntity, DeleteDiaryError> {
+    ): UseCaseResult<Diary, DeleteDiaryError> {
         val logMsg = "日記読込_"
         Log.i(logTag, "${logMsg}開始")
 

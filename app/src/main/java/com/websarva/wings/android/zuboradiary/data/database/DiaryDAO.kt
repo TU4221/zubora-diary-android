@@ -34,14 +34,14 @@ internal interface DiaryDAO {
     suspend fun selectDiaryListOrderByDateDesc(
         num: Int,
         offset: Int
-    ): List<DiaryListItem>
+    ): List<DiaryListItemData>
 
     @Query("SELECT date, title, picturePath FROM diaries WHERE date < :startDate ORDER BY date DESC LIMIT :num OFFSET :offset")
     suspend fun selectDiaryListOrderByDateDesc(
         num: Int,
         offset: Int,
         startDate: String
-    ): List<DiaryListItem>
+    ): List<DiaryListItemData>
 
     @Query(
         ("SELECT COUNT(*) " +
@@ -84,7 +84,7 @@ internal interface DiaryDAO {
         num: Int,
         offset: Int,
         word: String
-    ): List<WordSearchResultListItem>
+    ): List<WordSearchResultListItemData>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertDiary(diaryEntity: DiaryEntity)

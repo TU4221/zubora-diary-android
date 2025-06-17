@@ -3,7 +3,7 @@ package com.websarva.wings.android.zuboradiary.ui.viewmodel
 import android.util.Log
 import androidx.lifecycle.viewModelScope
 import com.websarva.wings.android.zuboradiary.data.repository.DiaryRepository
-import com.websarva.wings.android.zuboradiary.data.database.WordSearchResultListItem
+import com.websarva.wings.android.zuboradiary.domain.model.WordSearchResultListItem
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import com.websarva.wings.android.zuboradiary.ui.model.WordSearchAppMessage
 import com.websarva.wings.android.zuboradiary.ui.adapter.diary.wordsearchresult.WordSearchResultDayList

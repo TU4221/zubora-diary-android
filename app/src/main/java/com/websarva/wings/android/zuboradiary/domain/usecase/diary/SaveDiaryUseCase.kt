@@ -2,16 +2,17 @@ package com.websarva.wings.android.zuboradiary.domain.usecase.diary
 
 import android.net.Uri
 import android.util.Log
-import com.websarva.wings.android.zuboradiary.data.database.DiaryEntity
-import com.websarva.wings.android.zuboradiary.data.database.DiaryItemTitleSelectionHistoryItemEntity
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.error.SaveDiaryError
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.data.repository.DiaryRepository
+import com.websarva.wings.android.zuboradiary.domain.model.Diary
+import com.websarva.wings.android.zuboradiary.domain.model.DiaryItemTitleSelectionHistoryItem
 import com.websarva.wings.android.zuboradiary.domain.usecase.uri.ReleaseUriPermissionUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.uri.TakeUriPermissionUseCase
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import java.time.LocalDate
 
+// TODO:コメントアウト最終的に削除
 internal class SaveDiaryUseCase(
     private val diaryRepository: DiaryRepository,
     private val takeUriPermissionUseCase: TakeUriPermissionUseCase,
@@ -21,8 +22,8 @@ internal class SaveDiaryUseCase(
     private val logTag = createLogTag()
 
     suspend operator fun invoke(
-        diaryEntity: DiaryEntity,
-        diaryItemTitleSelectionHistoryItemEntityList: List<DiaryItemTitleSelectionHistoryItemEntity>,
+        diary: Diary,
+        diaryItemTitleSelectionHistoryItemList: List<DiaryItemTitleSelectionHistoryItem>,
         /*loadedDiaryEntity: DiaryEntity?*/
         loadedDate: LocalDate?,
         loadedPicturePath: Uri?
@@ -32,17 +33,12 @@ internal class SaveDiaryUseCase(
 
         try {
             saveDiary(
-                diaryEntity,
-                diaryItemTitleSelectionHistoryItemEntityList,
+                diary,
+                diaryItemTitleSelectionHistoryItemList,
                 /*loadedDiaryEntity*/loadedDate
             )
 
-            val savedPicturePath =
-                if (diaryEntity.picturePath.isEmpty()) {
-                    null
-                } else {
-                    Uri.parse(diaryEntity.picturePath)
-                }
+            val savedPicturePath = diary.picturePath
             /*val loadedDate = Uri.parse(loadedDiaryEntity.picturePath)*/
             managePictureUriPermission(
                 savedPicturePath,
@@ -58,8 +54,8 @@ internal class SaveDiaryUseCase(
     }
 
     private suspend fun saveDiary(
-        diaryEntity: DiaryEntity,
-        diaryItemTitleSelectionHistoryItemEntityList: List<DiaryItemTitleSelectionHistoryItemEntity>,
+        diary: Diary,
+        diaryItemTitleSelectionHistoryItemList: List<DiaryItemTitleSelectionHistoryItem>,
         /*loadedDiaryEntity: DiaryEntity?*/
         loadedDate: LocalDate?
     ) {
@@ -67,18 +63,18 @@ internal class SaveDiaryUseCase(
         Log.i(logTag, "${logMsg}開始")
 
         try {
-            val saveDate = LocalDate.parse(diaryEntity.date)
+            val saveDate = diary.date
             /*val loadedDate = LocalDate.parse(loadedDiaryEntity.date)*/
             if (shouldDeleteLoadedDateDiary(saveDate, loadedDate)) {
                 diaryRepository
                     .deleteAndSaveDiary(
                         requireNotNull(loadedDate),
-                        diaryEntity,
-                        diaryItemTitleSelectionHistoryItemEntityList
+                        diary,
+                        diaryItemTitleSelectionHistoryItemList
                     )
             } else {
                 diaryRepository
-                    .saveDiary(diaryEntity, diaryItemTitleSelectionHistoryItemEntityList)
+                    .saveDiary(diary, diaryItemTitleSelectionHistoryItemList)
             }
         } catch (e: Exception) {
             throw SaveDiaryError.SaveDiary(e)

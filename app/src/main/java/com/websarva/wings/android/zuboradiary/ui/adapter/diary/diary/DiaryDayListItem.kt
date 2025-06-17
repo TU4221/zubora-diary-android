@@ -1,23 +1,14 @@
 package com.websarva.wings.android.zuboradiary.ui.adapter.diary.diary
 
 import android.net.Uri
-import com.websarva.wings.android.zuboradiary.data.database.DiaryListItem
+import com.websarva.wings.android.zuboradiary.domain.model.DiaryListItem
 import com.websarva.wings.android.zuboradiary.ui.adapter.diary.DiaryDayListBaseItem
 
 internal class DiaryDayListItem(listItem: DiaryListItem) :
-    DiaryDayListBaseItem(listItem) {
+    DiaryDayListBaseItem(listItem.date) {
 
     val title: String = listItem.title
-    val picturePath: Uri?
-
-    init {
-        val picturePath = listItem.picturePath
-        if (picturePath.isEmpty()) {
-            this.picturePath = null
-        } else {
-            this.picturePath = Uri.parse(picturePath)
-        }
-    }
+    val picturePath: Uri? = listItem.picturePath
 
     override fun areContentsTheSame(item: DiaryDayListBaseItem): Boolean {
         if (this === item) return true

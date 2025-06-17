@@ -4,10 +4,12 @@ import android.net.Uri
 import android.util.Log
 import com.websarva.wings.android.zuboradiary.data.database.DiaryDAO
 import com.websarva.wings.android.zuboradiary.data.database.DiaryDatabase
-import com.websarva.wings.android.zuboradiary.data.database.DiaryEntity
-import com.websarva.wings.android.zuboradiary.data.database.DiaryItemTitleSelectionHistoryItemEntity
-import com.websarva.wings.android.zuboradiary.data.database.DiaryListItem
-import com.websarva.wings.android.zuboradiary.data.database.WordSearchResultListItem
+import com.websarva.wings.android.zuboradiary.data.mapper.toDataModel
+import com.websarva.wings.android.zuboradiary.data.mapper.toDomainModel
+import com.websarva.wings.android.zuboradiary.domain.model.Diary
+import com.websarva.wings.android.zuboradiary.domain.model.DiaryItemTitleSelectionHistoryItem
+import com.websarva.wings.android.zuboradiary.domain.model.DiaryListItem
+import com.websarva.wings.android.zuboradiary.domain.model.WordSearchResultListItem
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -46,21 +48,21 @@ internal class DiaryRepository (
         }
     }
 
-    suspend fun loadDiary(date: LocalDate): DiaryEntity? {
+    suspend fun loadDiary(date: LocalDate): Diary? {
         return withContext(Dispatchers.IO) {
-            diaryDAO.selectDiary(date.toString())
+            diaryDAO.selectDiary(date.toString())?.toDomainModel()
         }
     }
 
-    suspend fun loadNewestDiary(): DiaryEntity? {
+    suspend fun loadNewestDiary(): Diary? {
         return withContext(Dispatchers.IO) {
-            diaryDAO.selectNewestDiary()
+            diaryDAO.selectNewestDiary()?.toDomainModel()
         }
     }
 
-    suspend fun loadOldestDiary(): DiaryEntity? {
+    suspend fun loadOldestDiary(): Diary? {
         return withContext(Dispatchers.IO) {
-            diaryDAO.selectOldestDiary()
+            diaryDAO.selectOldestDiary()?.toDomainModel()
         }
     }
 
@@ -75,9 +77,13 @@ internal class DiaryRepository (
 
         return withContext(Dispatchers.IO) {
             if (date == null) {
-                diaryDAO.selectDiaryListOrderByDateDesc(num, offset)
+                diaryDAO
+                    .selectDiaryListOrderByDateDesc(num, offset)
+                    .map { it.toDomainModel() }
             } else {
-                diaryDAO.selectDiaryListOrderByDateDesc(num, offset, date.toString())
+                diaryDAO
+                    .selectDiaryListOrderByDateDesc(num, offset, date.toString())
+                    .map { it.toDomainModel() }
             }
         }
     }
@@ -98,24 +104,33 @@ internal class DiaryRepository (
 
         return withContext(Dispatchers.IO) {
             diaryDAO.selectWordSearchResultListOrderByDateDesc(num, offset, searchWord)
+                .map { it.toDomainModel() }
         }
     }
 
     suspend fun saveDiary(
-        diaryEntity: DiaryEntity,
-        updateTitleList: List<DiaryItemTitleSelectionHistoryItemEntity>
+        diary: Diary,
+        historyItemList: List<DiaryItemTitleSelectionHistoryItem>
     ) {
         withContext(Dispatchers.IO) {
-            diaryDatabase.saveDiary(diaryEntity, updateTitleList)
+            diaryDatabase.saveDiary(
+                diary.toDataModel(),
+                historyItemList.map { it.toDataModel() }
+            )
         }
     }
 
     suspend fun deleteAndSaveDiary(
-        deleteDiaryDate: LocalDate, createDiaryEntity: DiaryEntity,
-        updateTitleList: List<DiaryItemTitleSelectionHistoryItemEntity>
+        deleteDiaryDate: LocalDate,
+        newDiary: Diary,
+        historyItemList: List<DiaryItemTitleSelectionHistoryItem>
     ) {
         withContext(Dispatchers.IO) {
-            diaryDatabase.deleteAndSaveDiary(deleteDiaryDate, createDiaryEntity, updateTitleList)
+            diaryDatabase.deleteAndSaveDiary(
+                deleteDiaryDate,
+                newDiary.toDataModel(),
+                historyItemList.map { it.toDataModel() }
+            )
         }
     }
 

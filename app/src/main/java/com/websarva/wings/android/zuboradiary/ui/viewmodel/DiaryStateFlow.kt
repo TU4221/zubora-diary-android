@@ -2,11 +2,11 @@ package com.websarva.wings.android.zuboradiary.ui.viewmodel
 
 import android.net.Uri
 import androidx.lifecycle.SavedStateHandle
-import com.websarva.wings.android.zuboradiary.data.database.DiaryEntity
-import com.websarva.wings.android.zuboradiary.data.database.DiaryItemTitleSelectionHistoryItemEntity
 import com.websarva.wings.android.zuboradiary.data.model.Condition
 import com.websarva.wings.android.zuboradiary.data.model.ItemNumber
 import com.websarva.wings.android.zuboradiary.data.model.Weather
+import com.websarva.wings.android.zuboradiary.domain.model.Diary
+import com.websarva.wings.android.zuboradiary.domain.model.DiaryItemTitleSelectionHistoryItem
 import com.websarva.wings.android.zuboradiary.ui.utils.requireValue
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -108,35 +108,31 @@ internal class DiaryStateFlow(scope: CoroutineScope, handle: SavedStateHandle) {
         log.value = initialLog
     }
 
-    fun update(diaryEntity: DiaryEntity) {
-        date.value = LocalDate.parse(diaryEntity.date)
-        val weatherInt1 = diaryEntity.weather1
-        weather1.value = Weather.of(weatherInt1)
-        val weatherInt2 = diaryEntity.weather2
-        weather2.value = Weather.of(weatherInt2)
-        val conditionInt = diaryEntity.condition
-        condition.value = Condition.of(conditionInt)
-        val title = diaryEntity.title
-        this.title.value = title
+    fun update(diary: Diary) {
+        date.value = diary.date
+        weather1.value = diary.weather1
+        weather2.value = diary.weather2
+        condition.value = diary.condition
+        title.value = diary.title
 
-        val item1Title = diaryEntity.item1Title
-        val item1Comment = diaryEntity.item1Comment
+        val item1Title = diary.item1Title
+        val item1Comment = diary.item1Comment
         items[0].update(item1Title, item1Comment)
 
-        val item2Title = diaryEntity.item2Title
-        val item2Comment = diaryEntity.item2Comment
+        val item2Title = diary.item2Title
+        val item2Comment = diary.item2Comment
         items[1].update(item2Title, item2Comment)
 
-        val item3Title = diaryEntity.item3Title
-        val item3Comment = diaryEntity.item3Comment
+        val item3Title = diary.item3Title
+        val item3Comment = diary.item3Comment
         items[2].update(item3Title, item3Comment)
 
-        val item4Title = diaryEntity.item4Title
-        val item4Comment = diaryEntity.item4Comment
+        val item4Title = diary.item4Title
+        val item4Comment = diary.item4Comment
         items[3].update(item4Title, item4Comment)
 
-        val item5Title = diaryEntity.item5Title
-        val item5Comment = diaryEntity.item5Comment
+        val item5Title = diary.item5Title
+        val item5Comment = diary.item5Comment
         items[4].update(item5Title, item5Comment)
 
         var numVisibleItems = items.size
@@ -150,23 +146,17 @@ internal class DiaryStateFlow(scope: CoroutineScope, handle: SavedStateHandle) {
         }
         this.numVisibleItems.value = numVisibleItems
 
-        val uriString = diaryEntity.picturePath
-        if (uriString.isEmpty()) {
-            picturePath.value = null
-        } else {
-            picturePath.value = Uri.parse(uriString)
-        }
-
-        log.value = LocalDateTime.parse(diaryEntity.log)
+        picturePath.value = diary.picturePath
+        log.value = diary.log
     }
 
-    fun createDiaryEntity(): DiaryEntity {
-        return DiaryEntity(
-            date.value?.toString() ?:throw IllegalStateException("日付なし(null)"),
-            LocalDateTime.now().toString(),
-            weather1.value.toNumber(),
-            weather2.value.toNumber(),
-            condition.value.toNumber(),
+    fun createDiary(): Diary {
+        return Diary(
+            date.value ?:throw IllegalStateException("日付なし(null)"),
+            LocalDateTime.now(),
+            weather1.value,
+            weather2.value,
+            condition.value,
             title.value.trim(),
             items[0].title.value.trim(),
             items[0].comment.value.trim(),
@@ -178,20 +168,20 @@ internal class DiaryStateFlow(scope: CoroutineScope, handle: SavedStateHandle) {
             items[3].comment.value.trim(),
             items[4].title.value.trim(),
             items[4].comment.value.trim(),
-            picturePath.value?.toString() ?:"",
+            picturePath.value
             )
     }
 
-    fun createDiaryItemTitleSelectionHistoryItemEntityList(): List<DiaryItemTitleSelectionHistoryItemEntity> {
-        val list: MutableList<DiaryItemTitleSelectionHistoryItemEntity> = ArrayList()
+    fun createDiaryItemTitleSelectionHistoryList(): List<DiaryItemTitleSelectionHistoryItem> {
+        val list: MutableList<DiaryItemTitleSelectionHistoryItem> = ArrayList()
         for (i in 0 until MAX_ITEMS) {
             val itemTitle = items[i].title.value
             val itemTitleUpdateLog = items[i].titleUpdateLog.value ?: continue
             if (itemTitle.matches("\\S+.*".toRegex())) {
                 val item =
-                    DiaryItemTitleSelectionHistoryItemEntity(
+                    DiaryItemTitleSelectionHistoryItem(
                         itemTitle,
-                        itemTitleUpdateLog.toString()
+                        itemTitleUpdateLog
                     )
                 list.add(item)
             }

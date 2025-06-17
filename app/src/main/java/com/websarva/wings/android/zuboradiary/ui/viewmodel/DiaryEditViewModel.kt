@@ -4,12 +4,12 @@ import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
-import com.websarva.wings.android.zuboradiary.data.database.DiaryEntity
-import com.websarva.wings.android.zuboradiary.data.database.DiaryItemTitleSelectionHistoryItemEntity
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.error.FetchWeatherInfoError
 import com.websarva.wings.android.zuboradiary.data.model.Condition
 import com.websarva.wings.android.zuboradiary.data.model.ItemNumber
 import com.websarva.wings.android.zuboradiary.data.model.Weather
+import com.websarva.wings.android.zuboradiary.domain.model.Diary
+import com.websarva.wings.android.zuboradiary.domain.model.DiaryItemTitleSelectionHistoryItem
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.DeleteDiaryUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.DoesDiaryExistUseCase
@@ -303,9 +303,9 @@ internal class DiaryEditViewModel @Inject constructor(
     fun onDiarySaveMenuClicked() {
         if (isProcessing) return
 
-        val diaryEntity = diaryStateFlow.createDiaryEntity()
-        val diaryItemTitleSelectionHistoryItemEntityList =
-            diaryStateFlow.createDiaryItemTitleSelectionHistoryItemEntityList()
+        val diary = diaryStateFlow.createDiary()
+        val diaryItemTitleSelectionHistoryList =
+            diaryStateFlow.createDiaryItemTitleSelectionHistoryList()
         val date = date.requireValue()
         val loadedDate = _loadedDate.value
         val loadedPicturePath = loadedPicturePath
@@ -313,14 +313,14 @@ internal class DiaryEditViewModel @Inject constructor(
         viewModelScope.launch {
             requestDiaryUpdateConfirmation(
                 date,
-                diaryEntity,
-                diaryItemTitleSelectionHistoryItemEntityList,
+                diary,
+                diaryItemTitleSelectionHistoryList,
                 loadedDate,
                 loadedPicturePath
             ) {
                 saveDiary(
-                    diaryEntity,
-                    diaryItemTitleSelectionHistoryItemEntityList,
+                    diary,
+                    diaryItemTitleSelectionHistoryList,
                     loadedDate,
                     loadedPicturePath
                 )
@@ -461,15 +461,15 @@ internal class DiaryEditViewModel @Inject constructor(
     }
 
     private fun onDiaryUpdateDialogPositiveResultReceived(parameters: DiaryUpdateParameters) {
-        val diaryEntity = parameters.diaryEntity
-        val diaryItemTitleSelectionHistoryItemEntityList =
-            parameters.diaryItemTitleSelectionHistoryItemEntityList
+        val diary = parameters.diary
+        val diaryItemTitleSelectionHistoryList =
+            parameters.diaryItemTitleSelectionHistoryItemList
         val loadedDate = parameters.loadedDate
         val loadedPicturePath = parameters.loadedPicturePath
         viewModelScope.launch {
             saveDiary(
-                diaryEntity,
-                diaryItemTitleSelectionHistoryItemEntityList,
+                diary,
+                diaryItemTitleSelectionHistoryList,
                 loadedDate,
                 loadedPicturePath
             )
@@ -683,13 +683,13 @@ internal class DiaryEditViewModel @Inject constructor(
         updateViewModelState(DiaryEditState.Loading)
         when (val result = loadDiaryUseCase(date)) {
             is UseCaseResult.Success -> {
-                val diaryEntity = result.value
+                val diary = result.value
 
                 // HACK:下記はDiaryStateFlow#update()処理よりも前に処理すること。
                 //      (後で処理するとDiaryStateFlowのDateのObserverがloadedDateの更新よりも先に処理される為)
                 updateLoadedDate(date)
 
-                diaryStateFlow.update(diaryEntity)
+                diaryStateFlow.update(diary)
                 loadedPicturePath = diaryStateFlow.picturePath.value
             }
             is UseCaseResult.Error -> {
@@ -707,8 +707,8 @@ internal class DiaryEditViewModel @Inject constructor(
     }
 
     private suspend fun saveDiary(
-        diaryEntity: DiaryEntity,
-        diaryItemTitleSelectionHistoryItemEntityList: List<DiaryItemTitleSelectionHistoryItemEntity>,
+        diary: Diary,
+        diaryItemTitleSelectionHistoryItemList: List<DiaryItemTitleSelectionHistoryItem>,
         loadedDate: LocalDate?,
         loadedPicturePath: Uri?
     ) {
@@ -718,8 +718,8 @@ internal class DiaryEditViewModel @Inject constructor(
         updateViewModelState(DiaryEditState.Saving)
         val result =
             saveDiaryUseCase(
-                diaryEntity,
-                diaryItemTitleSelectionHistoryItemEntityList,
+                diary,
+                diaryItemTitleSelectionHistoryItemList,
                 loadedDate,
                 loadedPicturePath
             )
@@ -728,9 +728,7 @@ internal class DiaryEditViewModel @Inject constructor(
                 Log.i(logTag, "${logMsg}完了")
                 emitViewModelEvent(
                     DiaryEditEvent
-                        .NavigateDiaryShowFragment(
-                            LocalDate.parse(diaryEntity.date)
-                        )
+                        .NavigateDiaryShowFragment(diary.date)
                 )
             }
             is UseCaseResult.Error -> {
@@ -811,8 +809,8 @@ internal class DiaryEditViewModel @Inject constructor(
 
     private suspend fun requestDiaryUpdateConfirmation(
         date: LocalDate,
-        diaryEntity: DiaryEntity,
-        diaryItemTitleSelectionHistoryItemEntityList: List<DiaryItemTitleSelectionHistoryItemEntity>,
+        diary: Diary,
+        diaryItemTitleSelectionHistoryItemList: List<DiaryItemTitleSelectionHistoryItem>,
         loadedDate: LocalDate?,
         loadedPicturePath: Uri?,
         onConfirmationNotNeeded: suspend () -> Unit
@@ -822,8 +820,8 @@ internal class DiaryEditViewModel @Inject constructor(
             is UseCaseResult.Success -> {
                 if (result.value) {
                     val parameters = DiaryUpdateParameters(
-                        diaryEntity,
-                        diaryItemTitleSelectionHistoryItemEntityList,
+                        diary,
+                        diaryItemTitleSelectionHistoryItemList,
                         loadedDate,
                         loadedPicturePath
                     )
@@ -1106,13 +1104,13 @@ internal class DiaryEditViewModel @Inject constructor(
                     }
 
 
-                    val diaryEntity = diaryStateFlow.createDiaryEntity()
-                    val diaryItemTitleSelectionHistoryItemEntityList =
-                        diaryStateFlow.createDiaryItemTitleSelectionHistoryItemEntityList()
+                    val diary = diaryStateFlow.createDiary()
+                    val diaryItemTitleSelectionHistoryList =
+                        diaryStateFlow.createDiaryItemTitleSelectionHistoryList()
                     val result =
                         saveDiaryUseCase(
-                            diaryEntity,
-                            diaryItemTitleSelectionHistoryItemEntityList,
+                            diary,
+                            diaryItemTitleSelectionHistoryList,
                             _loadedDate.value,
                             loadedPicturePath
                         )
