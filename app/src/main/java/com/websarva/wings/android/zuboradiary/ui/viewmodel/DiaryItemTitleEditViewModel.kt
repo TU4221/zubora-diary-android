@@ -12,11 +12,12 @@ import com.websarva.wings.android.zuboradiary.ui.model.event.DiaryItemTitleEditE
 import com.websarva.wings.android.zuboradiary.ui.model.state.DiaryItemTitleEditState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
@@ -42,8 +43,7 @@ internal class DiaryItemTitleEditViewModel @Inject constructor(
     val itemTitleMutable get() = _itemTitle
 
     private val initialItemTitleSelectionHistoryList = SelectionHistoryList(emptyList())
-    private val _itemTitleSelectionHistoryList = MutableStateFlow(initialItemTitleSelectionHistoryList)
-    val itemTitleSelectionHistoryList = _itemTitleSelectionHistoryList.asStateFlow()
+    lateinit var itemTitleSelectionHistoryList: StateFlow<SelectionHistoryList>
 
     init {
         setUpItemTitleSelectionHistoryList()
@@ -53,7 +53,6 @@ internal class DiaryItemTitleEditViewModel @Inject constructor(
         super.initialize()
         _itemNumber.value = initialItemNumber
         _itemTitle.value = initialItemTitle
-        _itemTitleSelectionHistoryList.value = initialItemTitleSelectionHistoryList
         setUpItemTitleSelectionHistoryList()
     }
 
@@ -66,26 +65,21 @@ internal class DiaryItemTitleEditViewModel @Inject constructor(
         val logMsg = "日記項目タイトル選択履歴読込"
         Log.i(logTag, "${logMsg}_開始")
 
-        viewModelScope.launch {
-            try {
-                diaryItemTitleSelectionHistoryRepository
-                    .loadSelectionHistory(maxLoadedItemTitles, 0)
-                    .map { list ->
-                        SelectionHistoryList(
-                            list.map { item ->
-                                SelectionHistoryListItem(item)
-                            }
-                        )
-                    }.stateIn(this)
-                    .collectLatest { selectionHistoryList ->
-                        _itemTitleSelectionHistoryList.value = selectionHistoryList
-                    }
-                Log.i(logTag, "${logMsg}_完了")
-            } catch (e: Exception) {
-                Log.e(logTag, "${logMsg}_失敗", e)
-                emitAppMessageEvent(DiaryItemTitleEditAppMessage.ItemTitleHistoryLoadingFailure)
-            }
-        }
+        itemTitleSelectionHistoryList =
+            diaryItemTitleSelectionHistoryRepository
+                .loadSelectionHistory(maxLoadedItemTitles, 0).catch {
+                    emitAppMessageEvent(DiaryItemTitleEditAppMessage.ItemTitleHistoryLoadingFailure)
+                }.map { list ->
+                    SelectionHistoryList(
+                        list.map { item ->
+                            SelectionHistoryListItem(item)
+                        }
+                    )
+                }.stateIn(
+                    scope = viewModelScope,
+                    started = SharingStarted.WhileSubscribed(5000),
+                    initialValue = initialItemTitleSelectionHistoryList
+                )
     }
 
     fun updateDiaryItemTitle(itemNumber: ItemNumber, itemTitle: String) {
