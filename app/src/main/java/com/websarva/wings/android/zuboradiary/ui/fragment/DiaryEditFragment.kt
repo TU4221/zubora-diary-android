@@ -24,6 +24,7 @@ import com.websarva.wings.android.zuboradiary.data.model.Condition
 import com.websarva.wings.android.zuboradiary.data.model.ItemNumber
 import com.websarva.wings.android.zuboradiary.data.model.Weather
 import com.websarva.wings.android.zuboradiary.databinding.FragmentDiaryEditBinding
+import com.websarva.wings.android.zuboradiary.domain.model.Diary
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import com.websarva.wings.android.zuboradiary.ui.model.AppMessage
 import com.websarva.wings.android.zuboradiary.ui.view.imageview.DiaryPictureConfigurator
@@ -397,17 +398,17 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding>() {
             }
 
         launchAndRepeatOnViewLifeCycleStarted {
-            mainViewModel.loadedDate
-                .collectLatest { value: LocalDate? ->
-                    val enabledDelete: Boolean = value != null
+            mainViewModel.loadedDiary
+                .collectLatest { value: Diary? ->
+                    val isDeleteEnabled = value != null
 
                     val menu = binding.materialToolbarTopAppBar.menu
                     val deleteMenuItem = menu.findItem(R.id.diaryEditToolbarOptionDeleteDiary)
-                    deleteMenuItem.setEnabled(enabledDelete)
+                    deleteMenuItem.setEnabled(isDeleteEnabled)
 
                     // TODO:テスト用の為、最終的に削除
                     val testMenuItem = menu.findItem(R.id.diaryEditToolbarOptionTest)
-                    testMenuItem.setEnabled(!enabledDelete)
+                    testMenuItem.setEnabled(!isDeleteEnabled)
                 }
         }
     }

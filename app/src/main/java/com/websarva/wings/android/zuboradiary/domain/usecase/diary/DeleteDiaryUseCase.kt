@@ -16,6 +16,7 @@ internal class DeleteDiaryUseCase(
 
     private val logTag = createLogTag()
 
+    // MEMO:日記表示、編集フラグメント以外からも削除できるように下記引数とする。
     suspend operator fun invoke(
         loadedDate: LocalDate,
         loadedPicturePath: Uri?

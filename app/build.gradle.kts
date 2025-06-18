@@ -26,6 +26,9 @@ plugins {
 
     // AboutLibraries機能追加
     alias(libs.plugins.aboutLibraries)
+
+    // カスタムクラスのSavedStateHandle対応機能追加
+    id("kotlin-parcelize")
 }
 
 android {

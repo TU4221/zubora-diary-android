@@ -1,11 +1,14 @@
 package com.websarva.wings.android.zuboradiary.domain.model
 
 import android.net.Uri
+import android.os.Parcelable
 import com.websarva.wings.android.zuboradiary.data.model.Condition
 import com.websarva.wings.android.zuboradiary.data.model.Weather
+import kotlinx.parcelize.Parcelize
 import java.time.LocalDate
 import java.time.LocalDateTime
 
+@Parcelize // MEMO:"@Parcelize"でSavedStateHandle対応
 internal data class Diary(
     val date: LocalDate,
     val log: LocalDateTime,
@@ -24,4 +27,4 @@ internal data class Diary(
     val item5Title: String,
     val item5Comment: String,
     val picturePath: Uri?
-)
+) : Parcelable

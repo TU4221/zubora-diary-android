@@ -12,7 +12,6 @@ import com.websarva.wings.android.zuboradiary.domain.usecase.uri.TakeUriPermissi
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import java.time.LocalDate
 
-// TODO:コメントアウト最終的に削除
 internal class SaveDiaryUseCase(
     private val diaryRepository: DiaryRepository,
     private val takeUriPermissionUseCase: TakeUriPermissionUseCase,
@@ -24,22 +23,22 @@ internal class SaveDiaryUseCase(
     suspend operator fun invoke(
         diary: Diary,
         diaryItemTitleSelectionHistoryItemList: List<DiaryItemTitleSelectionHistoryItem>,
-        /*loadedDiaryEntity: DiaryEntity?*/
-        loadedDate: LocalDate?,
-        loadedPicturePath: Uri?
+        loadedDiary: Diary?
     ): UseCaseResult<Unit, SaveDiaryError> {
         val logMsg = "日記保存_"
         Log.i(logTag, "${logMsg}開始")
 
+
         try {
+            val loadedDate = loadedDiary?.date
             saveDiary(
                 diary,
                 diaryItemTitleSelectionHistoryItemList,
-                /*loadedDiaryEntity*/loadedDate
+                loadedDate
             )
 
             val savedPicturePath = diary.picturePath
-            /*val loadedDate = Uri.parse(loadedDiaryEntity.picturePath)*/
+            val loadedPicturePath = loadedDiary?.picturePath
             managePictureUriPermission(
                 savedPicturePath,
                 loadedPicturePath
@@ -64,7 +63,6 @@ internal class SaveDiaryUseCase(
 
         try {
             val saveDate = diary.date
-            /*val loadedDate = LocalDate.parse(loadedDiaryEntity.date)*/
             if (shouldDeleteLoadedDateDiary(saveDate, loadedDate)) {
                 diaryRepository
                     .deleteAndSaveDiary(
