@@ -12,6 +12,7 @@ import com.websarva.wings.android.zuboradiary.domain.usecase.diary.LoadWeatherIn
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.SaveDiaryUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.ShouldLoadWeatherInfoUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.ShouldRequestDiaryLoadingConfirmationUseCase
+import com.websarva.wings.android.zuboradiary.domain.usecase.diary.ShouldRequestExitWithoutDiarySavingConfirmationUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.ShouldRequestWeatherInfoConfirmationUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.uri.ReleaseUriPermissionUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.uri.TakeUriPermissionUseCase
@@ -122,4 +123,9 @@ internal object DiaryUseCaseModule {
     fun provideShouldLoadWeatherInfoUseCase(): ShouldLoadWeatherInfoUseCase {
         return ShouldLoadWeatherInfoUseCase()
     }
+
+    @Singleton
+    @Provides
+    fun provideShouldRequestExitWithoutDiarySavingConfirmationUseCase() =
+        ShouldRequestExitWithoutDiarySavingConfirmationUseCase()
 }

@@ -204,6 +204,10 @@
     <string name="dialog_diary_update_title">警告</string>
     <string name="dialog_diary_update_message">の日記は既に保存されています。保存された日記を上書きしますか。</string>
 
+    <!-- ExitWithoutDiarySavingDialog -->
+    <string name="dialog_exit_without_diary_saving_title">警告</string>
+    <string name="dialog_exit_without_diary_saving_message">編集した内容は保存されません。このまま編集を終了してもよろしいですか。</string>
+
     <!-- WeatherInfoFetchingDialog -->
     <string name="dialog_weather_info_fetching_title">確認</string>
     <string name="dialog_weather_info_fetching_message">の天気情報を取得しますか。</string>

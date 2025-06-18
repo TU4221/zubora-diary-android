@@ -5,6 +5,7 @@ import com.websarva.wings.android.zuboradiary.ui.model.parameters.DiaryDeletePar
 import com.websarva.wings.android.zuboradiary.ui.model.parameters.DiaryItemDeleteParameters
 import com.websarva.wings.android.zuboradiary.ui.model.parameters.DiaryLoadingParameters
 import com.websarva.wings.android.zuboradiary.ui.model.parameters.DiaryUpdateParameters
+import com.websarva.wings.android.zuboradiary.ui.model.parameters.NavigatePreviousParameters
 import com.websarva.wings.android.zuboradiary.ui.model.parameters.WeatherInfoAcquisitionParameters
 import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
 import java.time.LocalDate
@@ -23,6 +24,7 @@ internal sealed class DiaryEditEvent : ViewModelEvent() {
     data class NavigateWeatherInfoFetchingDialog(val parameters: WeatherInfoAcquisitionParameters) : DiaryEditEvent()
     data class NavigateDiaryItemDeleteDialog(val parameters: DiaryItemDeleteParameters) : DiaryEditEvent()
     data object NavigateDiaryPictureDeleteDialog : DiaryEditEvent()
+    data class NavigateExitWithoutDiarySavingConfirmationDialog(val parameters: NavigatePreviousParameters) : DiaryEditEvent()
     data class NavigatePreviousFragment(val result: FragmentResult<LocalDate>) : DiaryEditEvent()
     data class NavigatePreviousFragmentOnDiaryDelete(val result: FragmentResult.Some<LocalDate>) : DiaryEditEvent()
     data class TransitionDiaryItemHidedState(val itemNumber: ItemNumber) : DiaryEditEvent()

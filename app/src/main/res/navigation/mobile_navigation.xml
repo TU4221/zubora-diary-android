@@ -381,6 +381,10 @@
                 app:destination="@id/navigation_diary_picture_delete_dialog"/>
 
             <action
+                android:id="@+id/action_diary_edit_fragment_to_exit_without_diary_saving_confirmation_dialog"
+                app:destination="@id/navigation_exit_without_diary_saving_dialog"/>
+
+            <action
                 android:id="@+id/action_diary_edit_fragment_to_app_message_dialog"
                 app:destination="@id/navigation_app_message_dialog">
                 <argument
@@ -449,6 +453,14 @@
         <dialog
             android:id="@+id/navigation_diary_picture_delete_dialog"
             android:name="com.websarva.wings.android.zuboradiary.ui.fragment.dialog.DiaryPictureDeleteDialogFragment">
+        </dialog>
+
+        <dialog
+            android:id="@+id/navigation_exit_without_diary_saving_dialog"
+            android:name="com.websarva.wings.android.zuboradiary.ui.fragment.dialog.ExitWithoutDiarySavingDialogFragment">
+            <argument
+                android:name="parameters"
+                app:argType="com.websarva.wings.android.zuboradiary.ui.model.parameters.NavigatePreviousParameters" />
         </dialog>
 
         <fragment

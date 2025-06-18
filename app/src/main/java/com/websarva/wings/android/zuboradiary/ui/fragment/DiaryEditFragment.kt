@@ -37,6 +37,7 @@ import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.DiaryLoadingDia
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.DiaryLoadingFailureDialogFragment
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.DiaryPictureDeleteDialogFragment
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.DiaryUpdateDialogFragment
+import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.ExitWithoutDiarySavingDialogFragment
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.WeatherInfoFetchingDialogFragment
 import com.websarva.wings.android.zuboradiary.ui.keyboard.KeyboardManager
 import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
@@ -49,6 +50,7 @@ import com.websarva.wings.android.zuboradiary.ui.model.parameters.DiaryDeletePar
 import com.websarva.wings.android.zuboradiary.ui.model.parameters.DiaryItemDeleteParameters
 import com.websarva.wings.android.zuboradiary.ui.model.parameters.DiaryLoadingParameters
 import com.websarva.wings.android.zuboradiary.ui.model.parameters.DiaryUpdateParameters
+import com.websarva.wings.android.zuboradiary.ui.model.parameters.NavigatePreviousParameters
 import com.websarva.wings.android.zuboradiary.ui.model.parameters.WeatherInfoAcquisitionParameters
 import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
 import com.websarva.wings.android.zuboradiary.ui.model.result.ItemTitleEditResult
@@ -131,6 +133,7 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding>() {
         setUpWeatherInfoFetchDialogResultReceiver()
         setUpDiaryItemDeleteDialogResultReceiver()
         setUpDiaryPictureDeleteDialogResultReceiver()
+        setUpExitWithoutDiarySavingDialogResultReceiver()
     }
 
     // DiaryItemTitleEditFragmentから編集結果受取
@@ -246,6 +249,14 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding>() {
         }
     }
 
+    private fun setUpExitWithoutDiarySavingDialogResultReceiver() {
+        setUpDialogResultReceiver(
+            ExitWithoutDiarySavingDialogFragment.KEY_RESULT
+        ) { result ->
+            mainViewModel.onExitWithoutDiarySavingDialogResultReceived(result)
+        }
+    }
+
     override fun onMainViewModelEventReceived(event: ViewModelEvent) {
         when (event) {
             is DiaryEditEvent.NavigateDiaryShowFragment -> {
@@ -277,6 +288,9 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding>() {
             }
             DiaryEditEvent.NavigateDiaryPictureDeleteDialog -> {
                 navigateDiaryPictureDeleteDialog()
+            }
+            is DiaryEditEvent.NavigateExitWithoutDiarySavingConfirmationDialog -> {
+                navigateExitWithoutDiarySavingConfirmationDialog(event.parameters)
             }
             is DiaryEditEvent.NavigatePreviousFragment -> {
                 navigatePreviousFragment(event.result)
@@ -919,6 +933,15 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding>() {
     override fun navigateAppMessageDialog(appMessage: AppMessage) {
         val directions =
             DiaryEditFragmentDirections.actionDiaryEditFragmentToAppMessageDialog(appMessage)
+        navigateFragment(NavigationCommand.To(directions))
+    }
+
+    private fun navigateExitWithoutDiarySavingConfirmationDialog(
+        parameters: NavigatePreviousParameters
+    ) {
+        val directions =
+            DiaryEditFragmentDirections
+                .actionDiaryEditFragmentToExitWithoutDiarySavingConfirmationDialog(parameters)
         navigateFragment(NavigationCommand.To(directions))
     }
 

@@ -19,6 +19,7 @@ import com.websarva.wings.android.zuboradiary.domain.usecase.diary.LoadWeatherIn
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.SaveDiaryUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.ShouldLoadWeatherInfoUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.ShouldRequestDiaryLoadingConfirmationUseCase
+import com.websarva.wings.android.zuboradiary.domain.usecase.diary.ShouldRequestExitWithoutDiarySavingConfirmationUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.ShouldRequestWeatherInfoConfirmationUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.error.DeleteDiaryError
 import com.websarva.wings.android.zuboradiary.domain.usecase.settings.IsWeatherInfoAcquisitionEnabledUseCase
@@ -31,6 +32,7 @@ import com.websarva.wings.android.zuboradiary.ui.model.parameters.DiaryDeletePar
 import com.websarva.wings.android.zuboradiary.ui.model.parameters.DiaryItemDeleteParameters
 import com.websarva.wings.android.zuboradiary.ui.model.parameters.DiaryLoadingParameters
 import com.websarva.wings.android.zuboradiary.ui.model.parameters.DiaryUpdateParameters
+import com.websarva.wings.android.zuboradiary.ui.model.parameters.NavigatePreviousParameters
 import com.websarva.wings.android.zuboradiary.ui.model.parameters.WeatherInfoAcquisitionParameters
 import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
 import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
@@ -56,6 +58,7 @@ import kotlin.random.Random
 @HiltViewModel
 internal class DiaryEditViewModel @Inject constructor(
     private val handle: SavedStateHandle,
+    private val shouldRequestExitWithoutDiarySavingConfirmationUseCase: ShouldRequestExitWithoutDiarySavingConfirmationUseCase,
     private val shouldRequestDiaryLoadingConfirmationUseCase: ShouldRequestDiaryLoadingConfirmationUseCase,
     private val shouldRequestDiaryUpdateConfirmationUseCase: ShouldRequestDiaryUpdateConfirmationUseCase,
     private val shouldRequestWeatherInfoConfirmationUseCase: ShouldRequestWeatherInfoConfirmationUseCase,
@@ -282,8 +285,12 @@ internal class DiaryEditViewModel @Inject constructor(
 
     // BackPressed(戻るボタン)処理
     override fun onBackPressed() {
+        if (isProcessing) return
+
+        val diary = diaryStateFlow.createDiary()
+        val loadedDiary = _loadedDiary.value
         viewModelScope.launch {
-            navigatePreviousFragment()
+            handleBackNavigation(diary, loadedDiary)
         }
     }
 
@@ -330,8 +337,10 @@ internal class DiaryEditViewModel @Inject constructor(
     fun onNavigationClicked() {
         if (isProcessing) return
 
+        val diary = diaryStateFlow.createDiary()
+        val loadedDiary = _loadedDiary.value
         viewModelScope.launch {
-            navigatePreviousFragment()
+            handleBackNavigation(diary, loadedDiary)
         }
     }
 
@@ -501,7 +510,7 @@ internal class DiaryEditViewModel @Inject constructor(
             DialogResult.Negative,
             DialogResult.Cancel -> {
                 viewModelScope.launch {
-                    navigatePreviousFragment()
+                    navigatePreviousFragment(null)
                 }
             }
         }
@@ -560,6 +569,23 @@ internal class DiaryEditViewModel @Inject constructor(
 
     private fun onDiaryPictureDeleteDialogPositiveResultReceived() {
         deletePicturePath()
+    }
+
+    fun onExitWithoutDiarySavingDialogResultReceived(
+        result: DialogResult<NavigatePreviousParameters>
+    ) {
+        when (result) {
+            is DialogResult.Positive<NavigatePreviousParameters> -> {
+                val loadedDiary = result.data.loadedDiary
+                viewModelScope.launch {
+                    navigatePreviousFragment(loadedDiary)
+                }
+            }
+            DialogResult.Negative,
+            DialogResult.Cancel -> {
+                // 処理なし
+            }
+        }
     }
 
     fun onItemTitleEditFragmentResultReceived(result: FragmentResult<ItemTitleEditResult>) {
@@ -1027,14 +1053,48 @@ internal class DiaryEditViewModel @Inject constructor(
         updateViewModelIdleState()
     }
 
+    private suspend fun handleBackNavigation(
+        diary: Diary,
+        loadedDiary: Diary?
+    ) {
+        requestExitWithoutDiarySavingConfirmation(
+            diary,
+            loadedDiary
+        ) { shouldRequest ->
+            if (shouldRequest) {
+                val parameters = NavigatePreviousParameters(loadedDiary)
+                emitViewModelEvent(
+                    DiaryEditEvent
+                        .NavigateExitWithoutDiarySavingConfirmationDialog(parameters)
+                )
+            } else {
+                navigatePreviousFragment(loadedDiary)
+            }
+        }
+    }
 
-    private suspend fun navigatePreviousFragment() {
-        val loadedDate = _loadedDiary.value?.date
+    private suspend fun requestExitWithoutDiarySavingConfirmation(
+        diary: Diary,
+        loadedDiary: Diary?,
+        onResult: suspend (Boolean) -> Unit
+    ) {
+        val result = shouldRequestExitWithoutDiarySavingConfirmationUseCase(diary, loadedDiary)
+        when (result) {
+            is UseCaseResult.Success<Boolean> -> {
+                onResult(result.value)
+            }
+            is UseCaseResult.Error -> {
+                // 処理不要
+            }
+        }
+    }
+
+    private suspend fun navigatePreviousFragment(loadedDiary: Diary?) {
         val result =
-            if (loadedDate == null) {
+            if (loadedDiary == null) {
                 FragmentResult.None
             } else {
-                FragmentResult.Some(loadedDate)
+                FragmentResult.Some(loadedDiary.date)
             }
         emitViewModelEvent(DiaryEditEvent.NavigatePreviousFragment(result))
     }
@@ -1099,7 +1159,8 @@ internal class DiaryEditViewModel @Inject constructor(
                     }
                 }
             }
-            navigatePreviousFragment()
+            val loadedDiary = _loadedDiary.value
+            navigatePreviousFragment(loadedDiary)
             isTesting = false
         }
     }
