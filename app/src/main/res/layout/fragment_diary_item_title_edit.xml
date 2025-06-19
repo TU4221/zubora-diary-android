@@ -39,7 +39,6 @@
                     android:id="@+id/text_input_layout_new_item_title"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/fragment_diary_item_title_edit_margin_top"
                     android:hint="@string/fragment_diary_item_title_edit_new_item_title"
                     app:counterEnabled="true"
                     app:counterMaxLength="@integer/fragment_diary_item_title_edit_item_title_max_length"
