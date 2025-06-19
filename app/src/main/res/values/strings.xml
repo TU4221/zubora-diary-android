@@ -169,6 +169,7 @@
     <string name="fragment_diary_edit_toolbar_option_save_diary">日記保存</string>
     <string name="fragment_diary_edit_toolbar_option_delete_diary">日記削除</string>
     <string name="fragment_diary_edit_toolbar_option_test">テスト</string> <!-- TODO:テスト用の為、最終的に削除 -->
+    <string name="fragment_diary_edit_editing_diary">編集対象日記：%s</string>
     <string name="fragment_diary_edit_date">日付</string>
     <string name="fragment_diary_edit_date_value_tools">2012/12/12(日)</string>
     <string name="fragment_diary_edit_weather">天気</string>

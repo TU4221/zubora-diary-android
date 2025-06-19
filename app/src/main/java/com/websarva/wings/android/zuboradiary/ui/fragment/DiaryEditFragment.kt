@@ -420,6 +420,9 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding>() {
                     val deleteMenuItem = menu.findItem(R.id.diaryEditToolbarOptionDeleteDiary)
                     deleteMenuItem.setEnabled(isDeleteEnabled)
 
+                    val dateString = value?.date?.toJapaneseDateString(requireContext())
+                    mainViewModel.onLoadedDiaryChangedUpdateEditingDiaryDateString(dateString)
+
                     // TODO:テスト用の為、最終的に削除
                     val testMenuItem = menu.findItem(R.id.diaryEditToolbarOptionTest)
                     testMenuItem.setEnabled(!isDeleteEnabled)

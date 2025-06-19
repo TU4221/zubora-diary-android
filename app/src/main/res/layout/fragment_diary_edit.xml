@@ -55,6 +55,18 @@
                         android:layout_marginBottom="@dimen/fragment_margin_bottom"
                         android:orientation="vertical">
 
+                        <TextView
+                            android:id="@+id/text_editing_diary"
+                            style="@style/AppTextViewStyle"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_vertical|end"
+                            android:text="@{String.format(@string/fragment_diary_edit_editing_diary, viewModel.editingDiaryDateString)}"
+                            android:textAppearance="@style/AppTextViewTextAppearance"
+                            android:textSize="@dimen/fragment_diary_edit_small_text_size"
+                            android:visibility="@{viewModel.loadedDiary == null ? View.INVISIBLE : View.VISIBLE}"
+                            tools:text="編集日記：2025年6月19日(木)"/>
+
                         <!-- 注意
                              日付入力欄はダイアログフラグメントを使用して入力する為、android:text は「1.」を記述する。
                              「2.」の双方向データバイディングを記述した場合、ダイアログで変数値を変更した時に Observer が2回起動する。

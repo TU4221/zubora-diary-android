@@ -100,6 +100,10 @@ internal class DiaryEditViewModel @Inject constructor(
     private val _loadedDiary = MutableStateFlow(handle[SAVED_LOADED_DIARY_KEY] ?: initialLoadedDiary)
     val loadedDiary = _loadedDiary.asStateFlow()
 
+    private val initialDiaryDateString = ""
+    private val _editingDiaryDateString = MutableStateFlow(initialDiaryDateString)
+    val editingDiaryDateString = _editingDiaryDateString.asStateFlow()
+
     private val diaryStateFlow = DiaryStateFlow(viewModelScope, handle)
 
     val date
@@ -276,6 +280,7 @@ internal class DiaryEditViewModel @Inject constructor(
         hasPreparedDiary = initialHasPreparedDiary
         previousDate = initialPreviousDate
         _loadedDiary.value = initialLoadedDiary
+        _editingDiaryDateString.value = initialDiaryDateString
         diaryStateFlow.initialize()
         _weather1AdapterList.value = initialWeatherAdapterList
         _weather2AdapterList.value = initialWeatherAdapterList
@@ -625,6 +630,10 @@ internal class DiaryEditViewModel @Inject constructor(
     // StateFlow値変更時処理
     fun onWeather1Changed() {
         updateWeather2AdapterList()
+    }
+
+    fun onLoadedDiaryChangedUpdateEditingDiaryDateString(dateString: String?) {
+        _editingDiaryDateString.value = dateString ?: initialDiaryDateString
     }
 
     // MotionLayout変更時処理
