@@ -35,6 +35,11 @@
                 app:applyStatusBarTopPadding="@{true}"
                 tools:title="@string/fragment_calendar_month_header_tools_value"/>
 
+            <com.google.android.material.divider.MaterialDivider
+                android:id="@+id/material_divider_toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
             <androidx.core.widget.NestedScrollView
                 android:id="@+id/nested_scroll_full_screen"
                 android:layout_width="match_parent"
