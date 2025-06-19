@@ -279,7 +279,11 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>() {
         val changer = SettingsThemeColorChanger()
 
         changer.applyBackgroundColor(binding.root, themeColor)
-        changer.applyToolbarColor(binding.materialToolbarTopAppBar, themeColor)
+        changer.applyToolbarColor(
+            binding.materialToolbarTopAppBar,
+            themeColor,
+            binding.appBarLayout
+        )
 
         changer.applySettingItemSectionColor(
             binding.run {

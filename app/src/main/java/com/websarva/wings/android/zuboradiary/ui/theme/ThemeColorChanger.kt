@@ -8,6 +8,7 @@ import android.view.Window
 import android.widget.TextView
 import androidx.core.graphics.drawable.DrawableCompat
 import androidx.core.view.WindowInsetsControllerCompat
+import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.divider.MaterialDivider
@@ -129,7 +130,7 @@ internal open class ThemeColorChanger {
             ColorStateList.valueOf(secondaryContainerColor)
     }
 
-    fun applyToolbarColor(toolbar: MaterialToolbar, themeColor: ThemeColor) {
+    fun applyToolbarColor(toolbar: MaterialToolbar, themeColor: ThemeColor, appBarLayout: AppBarLayout? = null) {
         val resources = toolbar.requireResources()
 
         val surfaceColor = themeColor.getSurfaceColor(resources)
@@ -139,6 +140,8 @@ internal open class ThemeColorChanger {
         toolbar.setTitleTextColor(onSurfaceColor)
         applyToolbarMenuColor(toolbar, onSurfaceColor)
         applyToolbarNavigationIconColor(toolbar, onSurfaceVariantColor)
+
+        appBarLayout?.setBackgroundColor(surfaceColor)
     }
 
     private fun applyToolbarNavigationIconColor(toolbar: MaterialToolbar, color: Int) {

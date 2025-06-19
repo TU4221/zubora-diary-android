@@ -146,7 +146,7 @@ class MainActivity : LoggingActivity() {
         changer.applyStatusBarIconColor(window, themeColor)
         changer.applyNavigationBarIconColor(window, themeColor)
         changer.applyBackgroundColor(binding.root, themeColor)
-        changer.applyToolbarColor(binding.materialToolbarTopAppBar, themeColor)
+        changer.applyToolbarColor(binding.materialToolbarTopAppBar, themeColor, binding.appBarLayout)
         changer.applyBottomNavigationColor(binding.bottomNavigation, themeColor)
     }
 

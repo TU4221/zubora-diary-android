@@ -9,6 +9,11 @@
         <item name="android:background">?attr/colorSurface</item>
     </style>
 
+    <!-- AppBarLayout -->
+    <style name="AppAppBarLayout" parent="Widget.Material3.AppBarLayout">
+        <item name="android:fitsSystemWindows">true</item>
+    </style>
+
     <!-- Toolbar -->
     <!-- MEMO:Rippleの色、Tooltipsの背景色の変更方法が不明の為、AppThemeColorBlackのparentをDarkThemeにして対応。-->
     <style name="AppToolbarStyle" parent="ThemeOverlay.Material3.Toolbar.Surface">

@@ -21,17 +21,23 @@
             android:layout_height="match_parent"
             android:orientation="vertical">
 
-            <com.google.android.material.appbar.MaterialToolbar
-                style="@style/AppToolbarStyle"
-                android:id="@+id/material_toolbar_top_app_bar"
+            <com.google.android.material.appbar.AppBarLayout
+                style="@style/AppAppBarLayout"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:menu="@menu/diary_list_toolbar_menu"
-                app:navigationIcon="@drawable/ic_calendar_month_24px"
-                app:navigationContentDescription="@string/fragment_diary_list_toolbar_navigation_top_year_month_switching"
-                app:onNavigationIconClick="@{() -> viewModel.onNavigationClicked()}"
-                app:title="@string/fragment_diary_list_toolbar_title"
-                app:applyStatusBarTopPadding="@{true}"/>
+                android:layout_height="wrap_content" >
+
+                <com.google.android.material.appbar.MaterialToolbar
+                    style="@style/AppToolbarStyle"
+                    android:id="@+id/material_toolbar_top_app_bar"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:menu="@menu/diary_list_toolbar_menu"
+                    app:navigationIcon="@drawable/ic_calendar_month_24px"
+                    app:navigationContentDescription="@string/fragment_diary_list_toolbar_navigation_top_year_month_switching"
+                    app:onNavigationIconClick="@{() -> viewModel.onNavigationClicked()}"
+                    app:title="@string/fragment_diary_list_toolbar_title" />
+
+            </com.google.android.material.appbar.AppBarLayout>
 
             <FrameLayout
                 android:layout_width="match_parent"
