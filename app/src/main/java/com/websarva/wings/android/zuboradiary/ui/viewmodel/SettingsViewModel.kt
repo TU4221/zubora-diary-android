@@ -38,7 +38,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 internal class SettingsViewModel @Inject constructor(
-    private val handle: SavedStateHandle,
+    private val handle: SavedStateHandle, // MEMO:システムの初期化によるプロセスの終了からの復元用
     private val userPreferencesRepository: UserPreferencesRepository,
     private val workerRepository: WorkerRepository,
     private val diaryRepository: DiaryRepository,

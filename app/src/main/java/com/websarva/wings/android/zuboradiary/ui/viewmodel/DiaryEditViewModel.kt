@@ -57,7 +57,7 @@ import kotlin.random.Random
 
 @HiltViewModel
 internal class DiaryEditViewModel @Inject constructor(
-    private val handle: SavedStateHandle,
+    private val handle: SavedStateHandle, // MEMO:システムの初期化によるプロセスの終了からの復元用
     private val shouldRequestExitWithoutDiarySavingConfirmationUseCase: ShouldRequestExitWithoutDiarySavingConfirmationUseCase,
     private val shouldRequestDiaryLoadingConfirmationUseCase: ShouldRequestDiaryLoadingConfirmationUseCase,
     private val shouldRequestDiaryUpdateConfirmationUseCase: ShouldRequestDiaryUpdateConfirmationUseCase,
