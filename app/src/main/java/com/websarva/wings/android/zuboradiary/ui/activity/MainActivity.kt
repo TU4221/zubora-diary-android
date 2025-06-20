@@ -27,10 +27,8 @@ import com.websarva.wings.android.zuboradiary.data.model.ThemeColor
 import com.websarva.wings.android.zuboradiary.databinding.ActivityMainBinding
 import com.websarva.wings.android.zuboradiary.ui.theme.ThemeColorInflaterCreator
 import com.websarva.wings.android.zuboradiary.ui.theme.ThemeColorChanger
-import com.websarva.wings.android.zuboradiary.ui.fragment.CalendarFragment
 import com.websarva.wings.android.zuboradiary.ui.utils.requireValue
-import com.websarva.wings.android.zuboradiary.ui.fragment.DiaryListFragment
-import com.websarva.wings.android.zuboradiary.ui.fragment.SettingsFragment
+import com.websarva.wings.android.zuboradiary.ui.fragment.common.RequiresBottomNavigation
 import com.websarva.wings.android.zuboradiary.ui.fragment.common.ReselectableFragment
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.SettingsViewModel
 import dagger.hilt.android.AndroidEntryPoint
@@ -195,12 +193,7 @@ class MainActivity : LoggingActivity() {
             }
 
             private fun isFragmentWithBottomNavigation(f: Fragment): Boolean {
-                return when(f) {
-                    is DiaryListFragment,
-                    is CalendarFragment,
-                    is SettingsFragment -> true
-                    else -> false
-                }
+                return f is RequiresBottomNavigation
             }
 
             private fun switchEnabledNavigation(isEnabled: Boolean) {

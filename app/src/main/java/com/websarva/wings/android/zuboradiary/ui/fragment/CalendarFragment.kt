@@ -35,6 +35,7 @@ import com.websarva.wings.android.zuboradiary.ui.fragment.DiaryShowFragment.NumV
 import com.websarva.wings.android.zuboradiary.ui.fragment.DiaryShowFragment.PicturePathObserver
 import com.websarva.wings.android.zuboradiary.ui.fragment.DiaryShowFragment.Weather1Observer
 import com.websarva.wings.android.zuboradiary.ui.fragment.DiaryShowFragment.Weather2Observer
+import com.websarva.wings.android.zuboradiary.ui.fragment.common.RequiresBottomNavigation
 import com.websarva.wings.android.zuboradiary.ui.fragment.common.ReselectableFragment
 import com.websarva.wings.android.zuboradiary.ui.model.event.CalendarEvent
 import com.websarva.wings.android.zuboradiary.ui.model.event.ViewModelEvent
@@ -56,7 +57,10 @@ import java.util.Arrays
 import java.util.stream.Collectors
 import java.util.stream.Stream
 @AndroidEntryPoint
-class CalendarFragment : BaseFragment<FragmentCalendarBinding>(), ReselectableFragment {
+class CalendarFragment :
+    BaseFragment<FragmentCalendarBinding>(),
+    ReselectableFragment,
+    RequiresBottomNavigation {
 
     // ViewModel
     // MEMO:委譲プロパティの委譲先(viewModels())の遅延初期化により"Field is never assigned."と警告が表示される。

@@ -17,6 +17,7 @@ import com.websarva.wings.android.zuboradiary.R
 import com.websarva.wings.android.zuboradiary.ui.model.AppMessage
 import com.websarva.wings.android.zuboradiary.data.model.ThemeColor
 import com.websarva.wings.android.zuboradiary.databinding.FragmentSettingsBinding
+import com.websarva.wings.android.zuboradiary.ui.fragment.common.RequiresBottomNavigation
 import com.websarva.wings.android.zuboradiary.ui.fragment.common.ReselectableFragment
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.AllDataDeleteDialogFragment
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.AllDiariesDeleteDialogFragment
@@ -40,7 +41,10 @@ import java.time.DayOfWeek
 import java.time.LocalTime
 
 @AndroidEntryPoint
-class SettingsFragment : BaseFragment<FragmentSettingsBinding>(), ReselectableFragment {
+class SettingsFragment :
+    BaseFragment<FragmentSettingsBinding>(),
+    ReselectableFragment,
+    RequiresBottomNavigation {
 
     // ViewModel
     // MEMO:本FragmentのMainViewModelはSettingsViewModelになる為、BaseFragmentのSettingsViewModel変数を取得。
