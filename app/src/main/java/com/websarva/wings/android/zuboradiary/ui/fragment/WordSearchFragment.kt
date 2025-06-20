@@ -4,7 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination
@@ -24,9 +24,11 @@ import com.websarva.wings.android.zuboradiary.ui.model.event.ViewModelEvent
 import com.websarva.wings.android.zuboradiary.ui.model.event.WordSearchEvent
 import com.websarva.wings.android.zuboradiary.ui.model.navigation.NavigationCommand
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.WordSearchViewModel
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import java.time.LocalDate
 
+@AndroidEntryPoint
 class WordSearchFragment : BaseFragment<FragmentWordSearchBinding>() {
 
     // ViewModel
@@ -34,7 +36,7 @@ class WordSearchFragment : BaseFragment<FragmentWordSearchBinding>() {
     //      委譲プロパティによるViewModel生成は公式が推奨する方法の為、警告を無視する。その為、@Suppressを付与する。
     //      この警告に対応するSuppressネームはなく、"unused"のみでは不要Suppressとなる為、"RedundantSuppression"も追記する。
     @Suppress("unused", "RedundantSuppression")
-    override val mainViewModel: WordSearchViewModel by activityViewModels()
+    override val mainViewModel: WordSearchViewModel by viewModels()
 
     // RecyclerView関係
     // HACK:RecyclerViewのAdapterにセットするListを全て変更した時、
@@ -232,17 +234,9 @@ class WordSearchFragment : BaseFragment<FragmentWordSearchBinding>() {
 
             if (destination.id == R.id.navigation_diary_show_fragment) {
                 mainViewModel.onNextFragmentNavigated()
-            } else {
-                mainViewModel.onPreviousFragmentNavigated()
             }
 
             navController.removeOnDestinationChangedListener(this)
         }
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-
-        mainViewModel.onFragmentDestroyed()
     }
 }

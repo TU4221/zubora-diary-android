@@ -64,14 +64,6 @@ internal class WordSearchViewModel @Inject internal constructor(
     private val initialShouldUpdateWordSearchResultList = false
     private var shouldUpdateWordSearchResultList = initialShouldUpdateWordSearchResultList
 
-    // MEMO:WordSearchViewModelのスコープ範囲はActivityになるが、
-    //      WordSearchFragment、DiaryShowFragment、DiaryEditFragment、
-    //      DiaryItemTitleEditFragment表示時のみ ViewModelのプロパティ値を保持できたらよいので、
-    //      WordSearchFragmentを破棄するタイミングでViewModelのプロパティ値を初期化する。
-    // MEMO:画面回転時の不要な初期化を防ぐ
-    private val initialShouldInitializeOnFragmentDestroyed = false
-    private var shouldInitializeOnFragmentDestroyed = initialShouldInitializeOnFragmentDestroyed
-
     // 初回キーボード表示
     // HACK:WordSearchFragment表示時にFragmentActionでキーボードを表示させようとすると、
     //      SharedFlowが監視する前(フラグメントライフサイクがStarted前)に処理する可能性がある為、表示されないことがある。
@@ -132,7 +124,6 @@ internal class WordSearchViewModel @Inject internal constructor(
         _wordSearchResultList.value = initialWordSearchResultList
         _numWordSearchResults.value = initialNumWordSearchResults
         shouldUpdateWordSearchResultList = initialShouldUpdateWordSearchResultList
-        shouldInitializeOnFragmentDestroyed = initialShouldInitializeOnFragmentDestroyed
         _shouldShowKeyboard.value = initialShouldShowKeyboard
         isLoadingOnScrolled = initialIsLoadingOnScrolled
     }
@@ -179,14 +170,6 @@ internal class WordSearchViewModel @Inject internal constructor(
     // Fragment状態処理
     fun onNextFragmentNavigated() {
         shouldUpdateWordSearchResultList = true
-    }
-
-    fun onPreviousFragmentNavigated() {
-        shouldInitializeOnFragmentDestroyed = true
-    }
-
-    fun onFragmentDestroyed() {
-        if (shouldInitializeOnFragmentDestroyed) initialize()
     }
 
     // StateFlow値変更処理
