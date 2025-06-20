@@ -6,21 +6,21 @@
     <Transition
         motion:constraintSetEnd="@id/motion_scene_bottom_navigation_hided_state"
         motion:constraintSetStart="@id/motion_scene_bottom_navigation_showed_state"
-        motion:duration="500"/>
+        motion:duration="300"/>
 
     <ConstraintSet android:id="@+id/motion_scene_bottom_navigation_showed_state">
         <Constraint
             android:id="@+id/linear_layout_bottom_navigation"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            motion:visibilityMode="ignore"/>
+            motion:layout_constraintTop_toTopOf="parent"/>
     </ConstraintSet>
 
     <ConstraintSet android:id="@+id/motion_scene_bottom_navigation_hided_state">
         <Constraint
             android:id="@+id/linear_layout_bottom_navigation"
             android:layout_width="match_parent"
-            android:layout_height="0.1dp"
-            motion:visibilityMode="ignore"/>
+            android:layout_height="wrap_content"
+            motion:layout_constraintTop_toBottomOf="parent"/>
     </ConstraintSet>
 </MotionScene>
