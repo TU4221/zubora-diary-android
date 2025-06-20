@@ -46,17 +46,17 @@ internal interface DiaryDAO {
     @Query(
         ("SELECT COUNT(*) " +
                 "FROM diaries " +
-                "WHERE title LIKE '%' || :word || '%' " +
-                "OR item_1_title LIKE '%' || :word || '%'" +
-                "OR item_1_comment LIKE '%' || :word || '%'" +
-                "OR item_2_title LIKE '%' || :word || '%'" +
-                "OR item_2_comment LIKE '%' || :word || '%'" +
-                "OR item_3_title LIKE '%' || :word || '%'" +
-                "OR item_3_comment LIKE '%' || :word || '%'" +
-                "OR item_4_title LIKE '%' || :word || '%'" +
-                "OR item_4_comment LIKE '%' || :word || '%'" +
-                "OR item_5_title LIKE '%' || :word || '%'" +
-                "OR item_5_comment LIKE '%' || :word || '%'")
+                "WHERE title GLOB '*' || :word || '*' " +
+                "OR item_1_title GLOB '*' || :word || '*'" +
+                "OR item_1_comment GLOB '*' || :word || '*'" +
+                "OR item_2_title GLOB '*' || :word || '*'" +
+                "OR item_2_comment GLOB '*' || :word || '*'" +
+                "OR item_3_title GLOB '*' || :word || '*'" +
+                "OR item_3_comment GLOB '*' || :word || '*'" +
+                "OR item_4_title GLOB '*' || :word || '*'" +
+                "OR item_4_comment GLOB '*' || :word || '*'" +
+                "OR item_5_title GLOB '*' || :word || '*'" +
+                "OR item_5_comment GLOB '*' || :word || '*'")
     )
     suspend fun countWordSearchResults(word: String): Int
 
@@ -67,17 +67,17 @@ internal interface DiaryDAO {
                 "item_4_title, item_4_comment, " +
                 "item_5_title, item_5_comment " +
                 "FROM diaries " +
-                "WHERE title LIKE '%' || :word || '%' " +
-                "OR item_1_title LIKE '%' || :word || '%'" +
-                "OR item_1_comment LIKE '%' || :word || '%'" +
-                "OR item_2_title LIKE '%' || :word || '%'" +
-                "OR item_2_comment LIKE '%' || :word || '%'" +
-                "OR item_3_title LIKE '%' || :word || '%'" +
-                "OR item_3_comment LIKE '%' || :word || '%'" +
-                "OR item_4_title LIKE '%' || :word || '%'" +
-                "OR item_4_comment LIKE '%' || :word || '%'" +
-                "OR item_5_title LIKE '%' || :word || '%'" +
-                "OR item_5_comment LIKE '%' || :word || '%'" +
+                "WHERE title GLOB '*' || :word || '*' " +
+                "OR item_1_title GLOB '*' || :word || '*'" +
+                "OR item_1_comment GLOB '*' || :word || '*'" +
+                "OR item_2_title GLOB '*' || :word || '*'" +
+                "OR item_2_comment GLOB '*' || :word || '*'" +
+                "OR item_3_title GLOB '*' || :word || '*'" +
+                "OR item_3_comment GLOB '*' || :word || '*'" +
+                "OR item_4_title GLOB '*' || :word || '*'" +
+                "OR item_4_comment GLOB '*' || :word || '*'" +
+                "OR item_5_title GLOB '*' || :word || '*'" +
+                "OR item_5_comment GLOB '*' || :word || '*'" +
                 "ORDER BY date DESC LIMIT :num OFFSET :offset")
     )
     suspend fun selectWordSearchResultListOrderByDateDesc(
