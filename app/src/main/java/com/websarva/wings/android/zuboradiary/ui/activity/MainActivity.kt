@@ -4,17 +4,18 @@ import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.MenuItem
+import android.view.View
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.annotation.RequiresApi
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.NavController
-import androidx.navigation.NavDestination
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.NavigationUI.onNavDestinationSelected
 import androidx.navigation.ui.NavigationUI.setupWithNavController
@@ -151,11 +152,9 @@ class MainActivity : LoggingActivity() {
         startNavigationMenuItem = selectedBottomNavigationMenuItem
 
         setUpEnabledNavigationSwitchFunction()
+        setUpBottomNavigationStateSwitchFunction()
         bottomNavigationView.setOnItemSelectedListener(CustomOnItemSelectedListener(navController))
         bottomNavigationView.setOnItemReselectedListener(CustomOnItemReselectedListener())
-        navController.addOnDestinationChangedListener(
-            BottomNavigationStateOnDestinationChangedListener()
-        )
     }
 
     // MEMO:タブ選択で下記の様な画面遷移を行う時、Bを表示中にタブ選択でAを表示させようとすると、
@@ -203,6 +202,35 @@ class MainActivity : LoggingActivity() {
                     menu.getItem(i).setEnabled(isEnabled)
                 }
             }
+    }
+
+    private fun setUpBottomNavigationStateSwitchFunction() {
+        navFragmentManager.registerFragmentLifecycleCallbacks(
+            BottomNavigationStateSwitchCallbacks(),
+            false
+        )
+    }
+
+    private inner class BottomNavigationStateSwitchCallbacks :
+        FragmentManager.FragmentLifecycleCallbacks() {
+        override fun onFragmentViewCreated(
+            fm: FragmentManager,
+            f: Fragment,
+            v: View,
+            savedInstanceState: Bundle?
+        ) {
+            super.onFragmentViewCreated(fm, f, v, savedInstanceState)
+
+            if (f is DialogFragment) return
+
+            val motionResId =
+                if (f is RequiresBottomNavigation) {
+                    R.id.motion_scene_bottom_navigation_showed_state
+                } else {
+                    R.id.motion_scene_bottom_navigation_hided_state
+                }
+            binding.motionLayoutBottomNavigation.transitionToState(motionResId)
+        }
     }
 
     private inner class CustomOnItemSelectedListener(private val navController: NavController):
@@ -268,65 +296,6 @@ class MainActivity : LoggingActivity() {
 
             //* B-2 → C-2 : Exit → Enter
             //* C-2 → B-2 : Exit → Enter
-        }
-    }
-
-    private inner class BottomNavigationStateOnDestinationChangedListener:
-        NavController.OnDestinationChangedListener {
-        override fun onDestinationChanged(
-            controller: NavController,
-            destination: NavDestination,
-            arguments: Bundle?
-        ) {
-            val motionResId =
-                if (needsBottomNavigationView(controller, destination)) {
-                    R.id.motion_scene_bottom_navigation_showed_state
-                } else {
-                    R.id.motion_scene_bottom_navigation_hided_state
-                }
-            binding.motionLayoutBottomNavigation.transitionToState(motionResId)
-        }
-
-        private fun needsBottomNavigationView(
-            navController: NavController,
-            navDestination: NavDestination
-        ): Boolean {
-            if (isFragment(navDestination)) {
-                return (isFragmentWithBottomNavigation(navDestination))
-            }
-
-            // Fragment以外(Dialog)表示中は一つ前のFragmentを元に判断
-            val previousNavBackStackEntry = checkNotNull(navController.previousBackStackEntry)
-            val previousNavDestination = previousNavBackStackEntry.destination
-            return isFragmentWithBottomNavigation(previousNavDestination)
-        }
-
-        private fun isFragment(navDestination: NavDestination): Boolean {
-            return when (navDestination.id) {
-                R.id.navigation_diary_list_fragment,
-                R.id.navigation_calendar_fragment,
-                R.id.navigation_settings_fragment,
-                R.id.navigation_word_search_fragment,
-                R.id.navigation_diary_show_fragment,
-                R.id.navigation_diary_edit_fragment,
-                R.id.navigation_diary_item_title_edit_fragment -> true
-                else -> false
-            }
-        }
-
-        private fun isFragmentWithBottomNavigation(navDestination: NavDestination): Boolean {
-            // MEMO:下記理由より、対象FragmentはBottomNavigationViewの各タブ先頭のFragmentのみとする。
-            //      ・標準のNavigation機能は各タブ毎にFragment状態を保存しない為。
-            //        例)WordSearchFragment
-            //              -> CalendarFragment
-            //              -> WordSearchFragment(onCreate()から処理)
-            //              ViewModelが初期化される為検索状態が保持されない。保持することも出来るが複雑になるため避ける。
-            return when (navDestination.id) {
-                R.id.navigation_diary_list_fragment,
-                R.id.navigation_calendar_fragment,
-                R.id.navigation_settings_fragment -> true
-                else -> false
-            }
         }
     }
 
