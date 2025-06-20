@@ -352,6 +352,7 @@
                                 android:scaleType="fitCenter"
                                 android:adjustViewBounds="true"
                                 android:src="@drawable/diary_edit_image_ic_photo_library_24px"
+                                android:onClick="@{() -> viewModel.onAttachedPictureClicked()}"
                                 tools:tint="?attr/colorOnSurfaceVariant" />
 
                         </FrameLayout>

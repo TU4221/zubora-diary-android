@@ -1,12 +1,10 @@
 package com.websarva.wings.android.zuboradiary.ui.activity
 
-import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.MenuItem
 import androidx.activity.enableEdgeToEdge
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.annotation.RequiresApi
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
@@ -31,7 +29,6 @@ import com.websarva.wings.android.zuboradiary.ui.theme.ThemeColorInflaterCreator
 import com.websarva.wings.android.zuboradiary.ui.theme.ThemeColorChanger
 import com.websarva.wings.android.zuboradiary.ui.fragment.CalendarFragment
 import com.websarva.wings.android.zuboradiary.ui.utils.requireValue
-import com.websarva.wings.android.zuboradiary.ui.fragment.DiaryEditFragment
 import com.websarva.wings.android.zuboradiary.ui.fragment.DiaryListFragment
 import com.websarva.wings.android.zuboradiary.ui.fragment.SettingsFragment
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.SettingsViewModel
@@ -79,16 +76,6 @@ class MainActivity : LoggingActivity() {
     //      この警告に対応するSuppressネームはなく、"unused"のみでは不要Suppressとなる為、"RedundantSuppression"も追記する。
     @Suppress("unused", "RedundantSuppression")
     private val settingsViewModel: SettingsViewModel by viewModels()
-
-    // ギャラリーから画像取得
-    private val openDocumentResultLauncher = registerForActivityResult(
-        ActivityResultContracts.OpenDocument()
-    ) { o: Uri? ->
-        val showedFragment = showedFragment
-        if (showedFragment is DiaryEditFragment) {
-            showedFragment.attachPicture(o)
-        }
-    }
 
     @RequiresApi(Build.VERSION_CODES.Q)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -373,10 +360,6 @@ class MainActivity : LoggingActivity() {
 
     internal fun popBackStackToStartFragment() {
         binding.bottomNavigation.selectedItemId = startNavigationMenuItem.itemId
-    }
-
-    internal fun loadPicturePath() {
-        openDocumentResultLauncher.launch(arrayOf("image/*"))
     }
 
     override fun onDestroy() {

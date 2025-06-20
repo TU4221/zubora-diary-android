@@ -30,4 +30,5 @@ internal sealed class DiaryEditEvent : ViewModelEvent() {
     data class TransitionDiaryItemHidedState(val itemNumber: ItemNumber) : DiaryEditEvent()
     data class CheckAccessLocationPermissionBeforeWeatherInfoAcquisition(val parameters: WeatherInfoAcquisitionParameters) : DiaryEditEvent()
     data object ItemAddition : DiaryEditEvent()
+    data object SelectPicture : DiaryEditEvent()
 }

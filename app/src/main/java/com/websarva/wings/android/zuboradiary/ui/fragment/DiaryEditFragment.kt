@@ -13,6 +13,7 @@ import android.view.WindowManager
 import android.widget.AdapterView
 import android.widget.AdapterView.OnItemClickListener
 import android.widget.ArrayAdapter
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.view.ContextThemeWrapper
 import androidx.constraintlayout.motion.widget.MotionLayout
 import androidx.fragment.app.activityViewModels
@@ -96,6 +97,13 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding>() {
             }
             return screenHeight
         }
+
+    // MEMO:端末ギャラリーから画像Uri取得。
+    private val openDocumentResultLauncher = registerForActivityResult(
+        ActivityResultContracts.OpenDocument()
+    ) { uri: Uri? ->
+        mainViewModel.onOpenDocumentResultPicturePathReceived(uri)
+    }
 
     override fun createViewBinding(
         themeColorInflater: LayoutInflater, container: ViewGroup
@@ -306,6 +314,9 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding>() {
             }
             is DiaryEditEvent.ItemAddition -> {
                 shouldTransitionItemMotionLayout = true
+            }
+            is DiaryEditEvent.SelectPicture -> {
+                openDocumentResultLauncher.launch(arrayOf("image/*"))
             }
             is ViewModelEvent.NavigatePreviousFragment -> {
                 // MEMO:"DiaryEditEvent.NavigatePreviousFragment"を使用する為、
@@ -790,11 +801,6 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding>() {
                         )
                 }
         }
-
-        binding.imageAttachedPicture.setOnClickListener {
-            mainViewModel.onAttachedPictureClicked()
-            mainActivity.loadPicturePath()
-        }
     }
 
     private fun setupEditText() {
@@ -988,9 +994,5 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding>() {
         mainViewModel.apply {
             if (shouldInitializeOnFragmentDestroy) initialize()
         }
-    }
-
-    internal fun attachPicture(uri: Uri?) {
-        mainViewModel.onPicturePathReceivedFromOpenDocument(uri)
     }
 }

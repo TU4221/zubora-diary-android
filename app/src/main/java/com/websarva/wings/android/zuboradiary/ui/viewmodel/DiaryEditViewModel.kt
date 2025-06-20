@@ -414,6 +414,14 @@ internal class DiaryEditViewModel @Inject constructor(
         }
     }
 
+    fun onAttachedPictureClicked() {
+        if (isProcessing) return
+
+        viewModelScope.launch {
+            selectPicture()
+        }
+    }
+
     // Fragmentからの結果受取処理
     fun onDiaryLoadingDialogResultReceived(result: DialogResult<DiaryLoadingParameters>) {
         when (result) {
@@ -608,7 +616,7 @@ internal class DiaryEditViewModel @Inject constructor(
     }
 
     // MEMO:未選択時null
-    fun onPicturePathReceivedFromOpenDocument(uri: Uri?) {
+    fun onOpenDocumentResultPicturePathReceived(uri: Uri?) {
         updatePicturePath(uri)
     }
 
@@ -621,10 +629,6 @@ internal class DiaryEditViewModel @Inject constructor(
         viewModelScope.launch {
             prepareDiary(date, loadedDate, shouldLoadDiary)
         }
-    }
-
-    fun onAttachedPictureClicked() {
-        updateViewModelState(DiaryEditState.PictureSelecting)
     }
 
     // StateFlow値変更時処理
@@ -1051,6 +1055,11 @@ internal class DiaryEditViewModel @Inject constructor(
     }
 
     // 添付写真関係
+    private suspend fun selectPicture() {
+        updateViewModelState(DiaryEditState.PictureSelecting)
+        emitViewModelEvent(DiaryEditEvent.SelectPicture)
+    }
+
     private fun updatePicturePath(uri: Uri?) {
         diaryStateFlow.picturePath.value = uri
         updateViewModelIdleState()
