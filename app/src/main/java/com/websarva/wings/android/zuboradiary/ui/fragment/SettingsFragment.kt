@@ -17,6 +17,7 @@ import com.websarva.wings.android.zuboradiary.R
 import com.websarva.wings.android.zuboradiary.ui.model.AppMessage
 import com.websarva.wings.android.zuboradiary.data.model.ThemeColor
 import com.websarva.wings.android.zuboradiary.databinding.FragmentSettingsBinding
+import com.websarva.wings.android.zuboradiary.ui.fragment.common.ReselectableFragment
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.AllDataDeleteDialogFragment
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.AllDiariesDeleteDialogFragment
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.AllSettingsInitializationDialogFragment
@@ -39,7 +40,7 @@ import java.time.DayOfWeek
 import java.time.LocalTime
 
 @AndroidEntryPoint
-class SettingsFragment : BaseFragment<FragmentSettingsBinding>() {
+class SettingsFragment : BaseFragment<FragmentSettingsBinding>(), ReselectableFragment {
 
     // ViewModel
     // MEMO:本FragmentのMainViewModelはSettingsViewModelになる為、BaseFragmentのSettingsViewModel変数を取得。
@@ -540,5 +541,13 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>() {
         val isAccessLocationGranted = requireContext().isAccessLocationGranted()
         mainViewModel
             .onInitializeWeatherInfoAcquisitionSettingFromPermission(isAccessLocationGranted)
+    }
+
+    override fun onBottomNavigationItemReselected() {
+        scrollToTop()
+    }
+
+    private fun scrollToTop() {
+        binding.scrollViewSettings.smoothScrollTo(0, 0)
     }
 }

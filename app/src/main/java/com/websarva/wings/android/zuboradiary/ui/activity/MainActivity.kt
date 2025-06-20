@@ -31,6 +31,7 @@ import com.websarva.wings.android.zuboradiary.ui.fragment.CalendarFragment
 import com.websarva.wings.android.zuboradiary.ui.utils.requireValue
 import com.websarva.wings.android.zuboradiary.ui.fragment.DiaryListFragment
 import com.websarva.wings.android.zuboradiary.ui.fragment.SettingsFragment
+import com.websarva.wings.android.zuboradiary.ui.fragment.common.ReselectableFragment
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.SettingsViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
@@ -339,17 +340,10 @@ class MainActivity : LoggingActivity() {
     private inner class CustomOnItemReselectedListener : OnItemReselectedListener {
         override fun onNavigationItemReselected(menuItem: MenuItem) {
             val showedFragment = showedFragment
+            if (showedFragment !is ReselectableFragment) return
 
             Log.i(logTag, "ボトムナビゲーション_リセレクト")
-            if (menuItem.toString() == getString(R.string.title_list)) {
-                if (showedFragment !is DiaryListFragment) return
-
-                showedFragment.onNavigationItemReselected()
-            } else if (menuItem.toString() == getString(R.string.title_calendar)) {
-                if (showedFragment !is CalendarFragment) return
-
-                showedFragment.onNavigationItemReselected()
-            }
+            showedFragment.onBottomNavigationItemReselected()
         }
     }
 

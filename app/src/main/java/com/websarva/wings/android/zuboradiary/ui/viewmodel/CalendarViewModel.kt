@@ -53,7 +53,7 @@ internal class CalendarViewModel @Inject constructor(
         }
     }
 
-    fun onNavigationItemReselected() {
+    fun onBottomNavigationItemReselected() {
         viewModelScope.launch {
             // MEMO:StateFlowに現在値と同じ値を代入してもCollectメソッドに登録した処理が起動しないため、
             //      下記条件でカレンダースクロールのみ処理。

@@ -21,6 +21,7 @@ import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.DiaryListDelete
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.DiaryListViewModel
 import com.websarva.wings.android.zuboradiary.ui.adapter.diary.diary.DiaryYearMonthList
 import com.websarva.wings.android.zuboradiary.ui.adapter.diary.diary.DiaryYearMonthListAdapter
+import com.websarva.wings.android.zuboradiary.ui.fragment.common.ReselectableFragment
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.StartYearMonthPickerDialogFragment
 import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
 import com.websarva.wings.android.zuboradiary.ui.model.state.DiaryListState
@@ -34,7 +35,7 @@ import java.time.Year
 import java.time.YearMonth
 
 @AndroidEntryPoint
-class DiaryListFragment : BaseFragment<FragmentDiaryListBinding>() {
+class DiaryListFragment : BaseFragment<FragmentDiaryListBinding>(), ReselectableFragment {
 
     // ViewModel
     // MEMO:委譲プロパティの委譲先(viewModels())の遅延初期化により"Field is never assigned."と警告が表示される。
@@ -262,11 +263,10 @@ class DiaryListFragment : BaseFragment<FragmentDiaryListBinding>() {
         navigateFragment(NavigationCommand.To(directions))
     }
 
-    internal fun onNavigationItemReselected() {
+    override fun onBottomNavigationItemReselected() {
         scrollDiaryListToFirstPosition()
     }
 
-    //日記リスト(年月)を自動でトップへスクロールさせるメソッド。
     private fun scrollDiaryListToFirstPosition() {
         val listAdapter = binding.recyclerDiaryList.adapter as DiaryYearMonthListAdapter
         listAdapter.scrollToTop()
