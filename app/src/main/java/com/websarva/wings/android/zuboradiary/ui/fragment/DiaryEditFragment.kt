@@ -389,13 +389,13 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding>() {
 
     private fun setUpDiaryData() {
         // 画面表示データ準備
-        val diaryDate = DiaryEditFragmentArgs.fromBundle(requireArguments()).date
-        val requiresDiaryLoading =
+        val diaryDate = DiaryEditFragmentArgs.fromBundle(requireArguments()).diaryDate
+        val shouldLoadDiary =
             DiaryEditFragmentArgs.fromBundle(requireArguments()).shouldLoadDiary
         mainViewModel
             .onDiaryDataSetUp(
                 diaryDate,
-                requiresDiaryLoading
+                shouldLoadDiary
             )
     }
 
