@@ -16,7 +16,7 @@ import android.widget.ArrayAdapter
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.view.ContextThemeWrapper
 import androidx.constraintlayout.motion.widget.MotionLayout
-import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination
 import com.google.android.material.textfield.TextInputLayout
@@ -82,7 +82,7 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding>() {
     //      委譲プロパティによるViewModel生成は公式が推奨する方法の為、警告を無視する。その為、@Suppressを付与する。
     //      この警告に対応するSuppressネームはなく、"unused"のみでは不要Suppressとなる為、"RedundantSuppression"も追記する。
     @Suppress("unused", "RedundantSuppression")
-    override val mainViewModel: DiaryEditViewModel by activityViewModels()
+    override val mainViewModel: DiaryEditViewModel by viewModels()
 
     private val screenHeight: Int
         get() {
