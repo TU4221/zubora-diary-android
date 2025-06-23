@@ -60,7 +60,7 @@ internal class FusedLocationDataSource(
             }
         } catch (e: Exception) {
             Log.e(logTag, "${logMsg}_失敗", e)
-            return null
+            throw e
         } finally {
             cancellationTokenSource.cancel()
         }
