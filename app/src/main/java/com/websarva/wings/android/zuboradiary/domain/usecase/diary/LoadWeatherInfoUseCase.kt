@@ -25,6 +25,13 @@ internal class LoadWeatherInfoUseCase(
         val logMsg = "天気情報取得_"
         Log.i(logTag, "${logMsg}開始")
 
+        val canLoadWeatherInfo = canLoadWeatherInfo(date)
+        if (!canLoadWeatherInfo) {
+            return UseCaseResult.Error(
+                FetchWeatherInfoError.WeatherInfoDateOutOfRange()
+            )
+        }
+
         if (!isGranted) {
             val error = FetchWeatherInfoError.LocationPermissionNotGranted()
             Log.e(logTag, "${logMsg}位置情報権限未取得", error)
@@ -39,6 +46,18 @@ internal class LoadWeatherInfoUseCase(
         } catch (e: FetchWeatherInfoError) {
             Log.e(logTag, "${logMsg}失敗", e)
             return UseCaseResult.Error(e)
+        }
+    }
+
+    private fun canLoadWeatherInfo(date: LocalDate): Boolean {
+        return when (val result = canLoadWeatherInfoUseCase(date)) {
+            is UseCaseResult.Success -> {
+                result.value
+            }
+            is UseCaseResult.Error -> {
+                // canLoadWeatherInfoUseCaseは常時Successの為、処理不要。
+                false
+            }
         }
     }
 
@@ -57,17 +76,6 @@ internal class LoadWeatherInfoUseCase(
     private suspend fun fetchWeatherInfo(date: LocalDate, geoCoordinates: GeoCoordinates): Weather {
         val logMsg = "天気情報Api通信_"
         Log.i(logTag, "${logMsg}開始")
-
-        when (val result = canLoadWeatherInfoUseCase(date)) {
-            is UseCaseResult.Success -> {
-                if (!result.value) {
-                    throw FetchWeatherInfoError.WeatherInfoDateOutOfRange()
-                }
-            }
-            is UseCaseResult.Error -> {
-                // 処理不要
-            }
-        }
 
         val currentDate = LocalDate.now()
         val betweenDays = ChronoUnit.DAYS.between(date, currentDate)
