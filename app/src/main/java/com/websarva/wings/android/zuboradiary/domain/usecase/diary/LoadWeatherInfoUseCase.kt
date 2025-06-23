@@ -81,7 +81,7 @@ internal class LoadWeatherInfoUseCase(
         val betweenDays = ChronoUnit.DAYS.between(date, currentDate)
 
         return try {
-            if (betweenDays == 0L) {
+            val result = if (betweenDays == 0L) {
                 weatherApiRepository.fetchTodayWeatherInfo(geoCoordinates)
             } else {
                 weatherApiRepository.fetchPastDayWeatherInfo(
@@ -89,7 +89,10 @@ internal class LoadWeatherInfoUseCase(
                     betweenDays.toInt()
                 )
             }
+            Log.i(logTag, "${logMsg}完了")
+            result
         } catch (e: WeatherInfoError.LoadWeatherInfo) {
+            Log.i(logTag, "${logMsg}失敗")
             throw FetchWeatherInfoError.LoadWeatherInfo(e)
         }
     }
