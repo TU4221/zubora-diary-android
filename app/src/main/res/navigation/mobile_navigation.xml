@@ -265,7 +265,7 @@
                     android:name="should_load_diary"
                     app:argType="boolean" />
                 <argument
-                    android:name="date"
+                    android:name="diary_date"
                     app:argType="java.time.LocalDate" />
             </action>
 
