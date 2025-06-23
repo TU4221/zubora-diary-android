@@ -16,14 +16,13 @@ internal class UriPermissionDataSource (
         val logMsg = "端末写真使用権限取得"
         Log.i(logTag, "${logMsg}_開始=$uri")
 
-        resolver.takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION)
         try {
             resolver.takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION)
-        } catch (e: SecurityException) {
+        } catch (e :Exception) {
             Log.e(logTag, "${logMsg}_失敗", e)
-            // 対処できないがアプリを落としたくない為、catchのみの処理とする。
-            return
+            throw e
         }
+
         Log.i(logTag, "${logMsg}_完了")
     }
 
@@ -41,10 +40,9 @@ internal class UriPermissionDataSource (
             if (permittedUriString == targetUriString) {
                 try {
                     resolver.releasePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION)
-                } catch (e: SecurityException) {
+                } catch (e: Exception) {
                     Log.e(logTag, "${logMsg}_失敗", e)
-                    // 対処できないがアプリを落としたくない為、catchのみの処理とする。
-                    return
+                    throw e
                 }
                 break
             }
@@ -53,6 +51,7 @@ internal class UriPermissionDataSource (
         Log.i(logTag, "${logMsg}_完了")
     }
 
+    // TODO:UseCaseで処理するように変更
     fun releaseAllPersistablePermission() {
         val logMsg = "端末写真使用権限全解放"
         Log.i(logTag, "${logMsg}_開始")

@@ -6,6 +6,7 @@ import com.websarva.wings.android.zuboradiary.domain.usecase.uri.error.ReleaseUr
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.data.repository.DiaryRepository
 import com.websarva.wings.android.zuboradiary.data.repository.UriRepository
+import com.websarva.wings.android.zuboradiary.domain.usecase.uri.error.UriError
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 
 internal class ReleaseUriPermissionUseCase(
@@ -32,7 +33,7 @@ internal class ReleaseUriPermissionUseCase(
 
         try {
             uriRepository.releasePersistablePermission(uri)
-        } catch (e: Exception) {
+        } catch (e: UriError.ReleasePermission) {
             val error = ReleaseUriPermissionError.ReleaseUriPermission(e)
             Log.e(logTag, "${logMsg}失敗", error)
             return UseCaseResult.Error(error)
