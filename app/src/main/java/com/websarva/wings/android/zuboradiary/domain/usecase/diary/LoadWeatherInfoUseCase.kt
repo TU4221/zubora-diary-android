@@ -8,6 +8,7 @@ import com.websarva.wings.android.zuboradiary.data.model.Weather
 import com.websarva.wings.android.zuboradiary.data.repository.LocationRepository
 import com.websarva.wings.android.zuboradiary.data.repository.WeatherApiRepository
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.error.LocationError
+import com.websarva.wings.android.zuboradiary.domain.usecase.diary.error.WeatherInfoError
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import java.time.LocalDate
 import java.time.temporal.ChronoUnit
@@ -71,37 +72,17 @@ internal class LoadWeatherInfoUseCase(
         val currentDate = LocalDate.now()
         val betweenDays = ChronoUnit.DAYS.between(date, currentDate)
 
-        val response =
-            try {
-                if (betweenDays == 0L) {
-                    weatherApiRepository.fetchTodayWeatherInfo(geoCoordinates)
-                } else {
-                    weatherApiRepository.fetchPastDayWeatherInfo(
-                        geoCoordinates,
-                        betweenDays.toInt()
-                    )
-                }
-            } catch (e: Exception) {
-                throw FetchWeatherInfoError.LoadWeatherInfo(e)
-            }
-        Log.d(logTag, "fetchWeatherInformation()_code = " + response.code())
-        Log.d(logTag, "fetchWeatherInformation()_message = :" + response.message())
-
-        return if (response.isSuccessful) {
-            Log.d(logTag, "fetchWeatherInformation()_body = " + response.body())
-            val result =
-                response.body()?.toWeatherInfo() ?: throw NullPointerException()
-            Log.i(logTag, "${logMsg}完了")
-            result
-        } else {
-            response.errorBody().use { errorBody ->
-                val errorBodyString = errorBody?.string() ?: "null"
-                Log.d(
-                    logTag,
-                    "fetchWeatherInformation()_errorBody = $errorBodyString"
+        return try {
+            if (betweenDays == 0L) {
+                weatherApiRepository.fetchTodayWeatherInfo(geoCoordinates)
+            } else {
+                weatherApiRepository.fetchPastDayWeatherInfo(
+                    geoCoordinates,
+                    betweenDays.toInt()
                 )
             }
-            throw FetchWeatherInfoError.LoadWeatherInfo()
+        } catch (e: WeatherInfoError.LoadWeatherInfo) {
+            throw FetchWeatherInfoError.LoadWeatherInfo(e)
         }
     }
 }

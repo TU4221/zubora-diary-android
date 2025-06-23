@@ -2,7 +2,9 @@ package com.websarva.wings.android.zuboradiary.data.network
 
 import android.util.Log
 import androidx.annotation.IntRange
+import androidx.datastore.core.IOException
 import com.websarva.wings.android.zuboradiary.data.model.GeoCoordinates
+import com.websarva.wings.android.zuboradiary.data.model.Weather
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import retrofit2.Response
 import java.time.LocalDate
@@ -37,32 +39,57 @@ internal class WeatherApiDataSource(private val weatherApiService: WeatherApiSer
         return result
     }
 
-    suspend fun fetchTodayWeatherInfo(geoCoordinates: GeoCoordinates): Response<WeatherApiData> {
-        return weatherApiService.getWeather(
-            geoCoordinates.latitude.toString(),
-            geoCoordinates.longitude.toString(),
-            queryDiaryParameter,
-            queryTimeZoneParameter,
-            "0",  /*today*/
-            "1" /*1日分*/
-        )
+    suspend fun fetchTodayWeatherInfo(geoCoordinates: GeoCoordinates): Weather {
+        val response =
+            weatherApiService.getWeather(
+                geoCoordinates.latitude.toString(),
+                geoCoordinates.longitude.toString(),
+                queryDiaryParameter,
+                queryTimeZoneParameter,
+                "0",  /*today*/
+                "1" /*1日分*/
+            )
+        return toWeatherInfo(response)
     }
 
     suspend fun fetchPastDayWeatherInfo(
         geoCoordinates: GeoCoordinates,
         @IntRange(from = MIN_PAST_DAYS.toLong(), to = MAX_PAST_DAYS.toLong())
         numPastDays: Int
-    ): Response<WeatherApiData> {
+    ): Weather {
         require(numPastDays >= MIN_PAST_DAYS)
         require(numPastDays <= MAX_PAST_DAYS)
 
-        return weatherApiService.getWeather(
-            geoCoordinates.latitude.toString(),
-            geoCoordinates.longitude.toString(),
-            queryDiaryParameter,
-            queryTimeZoneParameter,
-            numPastDays.toString(),
-            "0" /*1日分(過去日から1日分取得する場合"0"を代入)*/
-        )
+        val response =
+            weatherApiService.getWeather(
+                geoCoordinates.latitude.toString(),
+                geoCoordinates.longitude.toString(),
+                queryDiaryParameter,
+                queryTimeZoneParameter,
+                numPastDays.toString(),
+                "0" /*1日分(過去日から1日分取得する場合"0"を代入)*/
+            )
+        return toWeatherInfo(response)
+    }
+
+    private fun toWeatherInfo(response: Response<WeatherApiData>): Weather {
+        Log.d(logTag, "code = " + response.code())
+        Log.d(logTag, "message = :" + response.message())
+
+        return if (response.isSuccessful) {
+            Log.d(logTag, "body = " + response.body())
+            val result =
+                response.body()?.toWeatherInfo() ?: throw IllegalStateException()
+            result
+        } else {
+            response.errorBody().use { errorBody ->
+                val errorBodyString = errorBody?.string() ?: "null"
+                Log.d(
+                    logTag,
+                    "errorBody = $errorBodyString"
+                )
+            }
+            throw IOException()
+        }
     }
 }

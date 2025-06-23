@@ -2,13 +2,13 @@ package com.websarva.wings.android.zuboradiary.data.repository
 
 import androidx.annotation.IntRange
 import com.websarva.wings.android.zuboradiary.data.model.GeoCoordinates
-import com.websarva.wings.android.zuboradiary.data.network.WeatherApiData
+import com.websarva.wings.android.zuboradiary.data.model.Weather
 import com.websarva.wings.android.zuboradiary.data.network.WeatherApiDataSource
 import com.websarva.wings.android.zuboradiary.data.network.WeatherApiDataSource.Companion.MAX_PAST_DAYS
 import com.websarva.wings.android.zuboradiary.data.network.WeatherApiDataSource.Companion.MIN_PAST_DAYS
+import com.websarva.wings.android.zuboradiary.domain.usecase.diary.error.WeatherInfoError
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import retrofit2.Response
 import java.time.LocalDate
 
 internal class WeatherApiRepository (private val weatherApiDataSource: WeatherApiDataSource) {
@@ -17,17 +17,23 @@ internal class WeatherApiRepository (private val weatherApiDataSource: WeatherAp
         return weatherApiDataSource.canFetchWeatherInfo(date)
     }
 
-    suspend fun fetchTodayWeatherInfo(geoCoordinates: GeoCoordinates): Response<WeatherApiData> {
+    @Throws(WeatherInfoError.LoadWeatherInfo::class)
+    suspend fun fetchTodayWeatherInfo(geoCoordinates: GeoCoordinates): Weather {
         return withContext(Dispatchers.IO) {
-            weatherApiDataSource.fetchTodayWeatherInfo(geoCoordinates)
+            try {
+                weatherApiDataSource.fetchTodayWeatherInfo(geoCoordinates)
+            } catch (e: Exception) {
+                throw WeatherInfoError.LoadWeatherInfo(e)
+            }
         }
     }
 
+    @Throws(WeatherInfoError.LoadWeatherInfo::class)
     suspend fun fetchPastDayWeatherInfo(
         geoCoordinates: GeoCoordinates,
         @IntRange(from = MIN_PAST_DAYS.toLong(), to = MAX_PAST_DAYS.toLong())
         numPastDays: Int
-    ): Response<WeatherApiData> {
+    ): Weather {
         return withContext(Dispatchers.IO) {
             weatherApiDataSource.fetchPastDayWeatherInfo(geoCoordinates, numPastDays)
         }
