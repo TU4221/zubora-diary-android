@@ -12,6 +12,7 @@ import com.websarva.wings.android.zuboradiary.ui.utils.isAccessLocationGranted
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withTimeoutOrNull
+import java.util.concurrent.TimeoutException
 
 internal class FusedLocationDataSource(
     private val context: Context
@@ -25,14 +26,15 @@ internal class FusedLocationDataSource(
     // MEMO:fusedLocationProviderClient.lastLocation()を記述する時、Permission確認コードが必須となるが、
     //      Permission確認はプロパティで管理する為、@SuppressLintで警告抑制。
     @SuppressLint("MissingPermission")
-    suspend fun fetchCurrentLocation(timeoutMillis: Long = 10000L): GeoCoordinates? {
+    @Throws(FusedLocationAccessException::class)
+    suspend fun fetchCurrentLocation(timeoutMillis: Long = 10000L): GeoCoordinates {
         val logMsg = "現在位置取得"
         Log.i(logTag, "${logMsg}_開始")
         val cancellationTokenSource = CancellationTokenSource()
         try {
             if (!context.isAccessLocationGranted()) {
                 Log.i(logTag, "${logMsg}_権限未許可")
-                return null
+                throw SecurityException()
             }
             return withTimeoutOrNull(timeoutMillis) {
                 val locationRequest =
@@ -56,11 +58,17 @@ internal class FusedLocationDataSource(
                 return@withTimeoutOrNull GeoCoordinates(location.latitude, location.longitude)
             } ?: run {
                 Log.w(logTag, "${logMsg}_失敗_location:null")
-                return@run null
+                throw TimeoutException()
             }
-        } catch (e: Exception) {
+        } catch (e: SecurityException) {
             Log.e(logTag, "${logMsg}_失敗", e)
-            throw e
+            throw FusedLocationAccessException(e)
+        } catch (e: IllegalStateException) {
+            Log.e(logTag, "${logMsg}_失敗", e)
+            throw FusedLocationAccessException(e)
+        } catch (e: TimeoutException) {
+            Log.e(logTag, "${logMsg}_失敗", e)
+            throw FusedLocationAccessException(e)
         } finally {
             cancellationTokenSource.cancel()
         }

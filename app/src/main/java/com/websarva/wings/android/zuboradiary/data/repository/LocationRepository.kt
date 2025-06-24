@@ -1,5 +1,6 @@
 package com.websarva.wings.android.zuboradiary.data.repository
 
+import com.websarva.wings.android.zuboradiary.data.location.FusedLocationAccessException
 import com.websarva.wings.android.zuboradiary.data.location.FusedLocationDataSource
 import com.websarva.wings.android.zuboradiary.data.model.GeoCoordinates
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.error.LocationError
@@ -12,8 +13,8 @@ internal class LocationRepository (private val dataSource: FusedLocationDataSour
     suspend fun fetchLocation(): GeoCoordinates {
         return withContext(Dispatchers.IO) {
             try {
-                dataSource.fetchCurrentLocation() ?: throw NullPointerException()
-            } catch (e: Exception) {
+                dataSource.fetchCurrentLocation()
+            } catch (e: FusedLocationAccessException) {
                 throw LocationError.AccessLocation(e)
             }
         }
