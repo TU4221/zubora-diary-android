@@ -1,5 +1,6 @@
-package com.websarva.wings.android.zuboradiary.data.database
+package com.websarva.wings.android.zuboradiary.data.repository
 
+import com.websarva.wings.android.zuboradiary.data.database.DiaryItemTitleSelectionHistoryDAO
 import com.websarva.wings.android.zuboradiary.data.mapper.toDomainModel
 import com.websarva.wings.android.zuboradiary.domain.model.DiaryItemTitleSelectionHistoryItem
 import kotlinx.coroutines.Dispatchers

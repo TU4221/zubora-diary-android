@@ -3,7 +3,7 @@ package com.websarva.wings.android.zuboradiary.di
 import com.websarva.wings.android.zuboradiary.data.database.DiaryDAO
 import com.websarva.wings.android.zuboradiary.data.database.DiaryDatabase
 import com.websarva.wings.android.zuboradiary.data.database.DiaryItemTitleSelectionHistoryDAO
-import com.websarva.wings.android.zuboradiary.data.database.DiaryItemTitleSelectionHistoryRepository
+import com.websarva.wings.android.zuboradiary.data.repository.DiaryItemTitleSelectionHistoryRepository
 import com.websarva.wings.android.zuboradiary.data.location.FusedLocationDataSource
 import com.websarva.wings.android.zuboradiary.data.network.WeatherApiDataSource
 import com.websarva.wings.android.zuboradiary.data.repository.DiaryRepository
