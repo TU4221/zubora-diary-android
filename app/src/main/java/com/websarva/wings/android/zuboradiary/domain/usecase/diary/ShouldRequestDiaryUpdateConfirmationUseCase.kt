@@ -1,8 +1,8 @@
 package com.websarva.wings.android.zuboradiary.domain.usecase.diary
 
 import android.util.Log
-import com.websarva.wings.android.zuboradiary.domain.usecase.diary.error.ShouldRequestDiaryUpdateConfirmationError
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
+import com.websarva.wings.android.zuboradiary.domain.usecase.diary.error.DiaryError
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import java.time.LocalDate
 
@@ -15,7 +15,7 @@ internal class ShouldRequestDiaryUpdateConfirmationUseCase(
     suspend operator fun invoke(
         inputDate: LocalDate,
         loadedDate: LocalDate?
-    ): UseCaseResult<Boolean, ShouldRequestDiaryUpdateConfirmationError> {
+    ): UseCaseResult<Boolean, DiaryError.CheckDiaryExistence> {
         val logMsg = "日記更新確認必要確認_"
         Log.i(logTag, "${logMsg}開始")
 
@@ -30,11 +30,8 @@ internal class ShouldRequestDiaryUpdateConfirmationUseCase(
                 UseCaseResult.Success(result.value)
             }
             is UseCaseResult.Error -> {
-                val error =
-                    ShouldRequestDiaryUpdateConfirmationError
-                        .CheckDiaryExistence(result.error)
-                Log.e(logTag, "${logMsg}失敗", error)
-                UseCaseResult.Error(error)
+                Log.e(logTag, "${logMsg}失敗",result.error)
+                UseCaseResult.Error(result.error)
             }
         }
     }

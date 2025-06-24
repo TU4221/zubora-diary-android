@@ -7,6 +7,7 @@ import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.data.repository.DiaryRepository
 import com.websarva.wings.android.zuboradiary.domain.model.Diary
 import com.websarva.wings.android.zuboradiary.domain.model.DiaryItemTitleSelectionHistoryItem
+import com.websarva.wings.android.zuboradiary.domain.usecase.diary.error.DiaryError
 import com.websarva.wings.android.zuboradiary.domain.usecase.uri.ReleaseUriPermissionUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.uri.TakeUriPermissionUseCase
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
@@ -61,22 +62,27 @@ internal class SaveDiaryUseCase(
         val logMsg = "日記データ保存_"
         Log.i(logTag, "${logMsg}開始")
 
-        try {
-            val saveDate = diary.date
-            if (shouldDeleteLoadedDateDiary(saveDate, loadedDate)) {
+        val saveDate = diary.date
+        if (shouldDeleteLoadedDateDiary(saveDate, loadedDate)) {
+            try {
                 diaryRepository
                     .deleteAndSaveDiary(
                         requireNotNull(loadedDate),
                         diary,
                         diaryItemTitleSelectionHistoryItemList
                     )
-            } else {
+            } catch (e: DiaryError.DeleteAndSaveDiary) {
+                throw SaveDiaryError.SaveDiary(e)
+            }
+        } else {
+            try {
                 diaryRepository
                     .saveDiary(diary, diaryItemTitleSelectionHistoryItemList)
+            } catch (e: DiaryError.SaveDiary) {
+                throw SaveDiaryError.SaveDiary(e)
             }
-        } catch (e: Exception) {
-            throw SaveDiaryError.SaveDiary(e)
         }
+
 
         Log.i(logTag, "${logMsg}完了")
     }

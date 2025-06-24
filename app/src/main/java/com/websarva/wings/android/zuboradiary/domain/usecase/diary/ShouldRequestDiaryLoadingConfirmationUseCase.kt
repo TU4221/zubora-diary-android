@@ -2,7 +2,7 @@ package com.websarva.wings.android.zuboradiary.domain.usecase.diary
 
 import android.util.Log
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
-import com.websarva.wings.android.zuboradiary.domain.usecase.diary.error.ShouldRequestDiaryLoadingConfirmationError
+import com.websarva.wings.android.zuboradiary.domain.usecase.diary.error.DiaryError
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import java.time.LocalDate
 
@@ -16,7 +16,7 @@ internal class ShouldRequestDiaryLoadingConfirmationUseCase(
         inputDate: LocalDate,
         previousDate: LocalDate?,
         loadedDate: LocalDate?
-    ): UseCaseResult<Boolean, ShouldRequestDiaryLoadingConfirmationError> {
+    ): UseCaseResult<Boolean, DiaryError.CheckDiaryExistence> {
         val logMsg = "日記読込確認必要確認_"
         Log.i(logTag, "${logMsg}開始")
 
@@ -35,10 +35,8 @@ internal class ShouldRequestDiaryLoadingConfirmationUseCase(
                 UseCaseResult.Success(result.value)
             }
             is UseCaseResult.Error -> {
-                val error =
-                    ShouldRequestDiaryLoadingConfirmationError.CheckDiaryExistence(result.error)
-                Log.e(logTag, "${logMsg}失敗", error)
-                UseCaseResult.Error(error)
+                Log.e(logTag, "${logMsg}失敗", result.error)
+                UseCaseResult.Error(result.error)
             }
         }
     }

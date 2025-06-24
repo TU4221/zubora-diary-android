@@ -10,10 +10,12 @@ import com.websarva.wings.android.zuboradiary.domain.model.Diary
 import com.websarva.wings.android.zuboradiary.domain.model.DiaryItemTitleSelectionHistoryItem
 import com.websarva.wings.android.zuboradiary.domain.model.DiaryListItem
 import com.websarva.wings.android.zuboradiary.domain.model.WordSearchResultListItem
+import com.websarva.wings.android.zuboradiary.domain.usecase.diary.error.DiaryError
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.time.LocalDate
+import kotlin.Throws
 
 
 internal class DiaryRepository (
@@ -23,49 +25,85 @@ internal class DiaryRepository (
 
     private val logTag = createLogTag()
 
+    @Throws(DiaryError.CountDiaries::class)
     suspend fun countDiaries(): Int {
         return withContext(Dispatchers.IO) {
-            diaryDAO.countDiaries()
+            try {
+                diaryDAO.countDiaries()
+            } catch (e: Exception) {
+                throw DiaryError.CountDiaries(e)
+            }
         }
 
     }
 
+    @Throws(DiaryError.CountDiaries::class)
     suspend fun countDiaries(date: LocalDate): Int {
         return withContext(Dispatchers.IO) {
-            diaryDAO.countDiaries(date.toString())
+            try {
+                diaryDAO.countDiaries(date.toString())
+            } catch (e: Exception) {
+                throw DiaryError.CountDiaries(e)
+            }
         }
     }
 
+    @Throws(DiaryError.CheckDiaryExistence::class)
     suspend fun existsDiary(date: LocalDate): Boolean {
         return withContext(Dispatchers.IO) {
-            diaryDAO.existsDiary(date.toString())
+            try {
+                diaryDAO.existsDiary(date.toString())
+            } catch (e: Exception) {
+                throw DiaryError.CheckDiaryExistence(e)
+            }
         }
     }
 
+    @Throws(DiaryError.CheckPicturePathUsage::class)
     suspend fun existsPicturePath(uri: Uri): Boolean {
         return withContext(Dispatchers.IO) {
-            diaryDAO.existsPicturePath(uri.toString())
+            try {
+                diaryDAO.existsPicturePath(uri.toString())
+            } catch (e: Exception) {
+                throw DiaryError.CheckPicturePathUsage(e)
+            }
         }
     }
 
+    @Throws(DiaryError.LoadDiary::class)
     suspend fun loadDiary(date: LocalDate): Diary? {
         return withContext(Dispatchers.IO) {
-            diaryDAO.selectDiary(date.toString())?.toDomainModel()
+            try {
+                diaryDAO.selectDiary(date.toString())?.toDomainModel()
+            } catch (e: Exception) {
+                throw DiaryError.LoadDiary(e)
+            }
         }
     }
 
+    @Throws(DiaryError.LoadDiary::class)
     suspend fun loadNewestDiary(): Diary? {
         return withContext(Dispatchers.IO) {
-            diaryDAO.selectNewestDiary()?.toDomainModel()
+            try {
+                diaryDAO.selectNewestDiary()?.toDomainModel()
+            } catch (e: Exception) {
+                throw DiaryError.LoadDiary(e)
+            }
         }
     }
 
+    @Throws(DiaryError.LoadDiary::class)
     suspend fun loadOldestDiary(): Diary? {
         return withContext(Dispatchers.IO) {
-            diaryDAO.selectOldestDiary()?.toDomainModel()
+            try {
+                diaryDAO.selectOldestDiary()?.toDomainModel()
+            } catch (e: Exception) {
+                throw DiaryError.LoadDiary(e)
+            }
         }
     }
 
+    @Throws(DiaryError.LoadDiaryList::class)
     suspend fun loadDiaryList(
         num: Int,
         offset: Int,
@@ -76,24 +114,34 @@ internal class DiaryRepository (
         require(offset >= 0)
 
         return withContext(Dispatchers.IO) {
-            if (date == null) {
-                diaryDAO
-                    .selectDiaryListOrderByDateDesc(num, offset)
-                    .map { it.toDomainModel() }
-            } else {
-                diaryDAO
-                    .selectDiaryListOrderByDateDesc(num, offset, date.toString())
-                    .map { it.toDomainModel() }
+            try {
+                if (date == null) {
+                    diaryDAO
+                        .selectDiaryListOrderByDateDesc(num, offset)
+                        .map { it.toDomainModel() }
+                } else {
+                    diaryDAO
+                        .selectDiaryListOrderByDateDesc(num, offset, date.toString())
+                        .map { it.toDomainModel() }
+                }
+            } catch (e: Exception) {
+                throw DiaryError.LoadDiaryList(e)
             }
         }
     }
 
+    @Throws(DiaryError.CountDiaries::class)
     suspend fun countWordSearchResultDiaries(searchWord: String): Int {
         return withContext(Dispatchers.IO) {
-            diaryDAO.countWordSearchResults(searchWord)
+            try {
+                diaryDAO.countWordSearchResults(searchWord)
+            } catch (e: Exception) {
+                throw DiaryError.CountDiaries(e)
+            }
         }
     }
 
+    @Throws(DiaryError.LoadDiaryList::class)
     suspend fun loadWordSearchResultDiaryList(
         num: Int,
         offset: Int,
@@ -103,52 +151,82 @@ internal class DiaryRepository (
         require(offset >= 0)
 
         return withContext(Dispatchers.IO) {
-            diaryDAO.selectWordSearchResultListOrderByDateDesc(num, offset, searchWord)
-                .map { it.toDomainModel() }
+            try {
+                diaryDAO
+                    .selectWordSearchResultListOrderByDateDesc(num, offset, searchWord)
+                    .map { it.toDomainModel() }
+            } catch (e: Exception) {
+                throw DiaryError.LoadDiaryList(e)
+            }
         }
     }
 
+    @Throws(DiaryError.SaveDiary::class)
     suspend fun saveDiary(
         diary: Diary,
         historyItemList: List<DiaryItemTitleSelectionHistoryItem>
     ) {
         withContext(Dispatchers.IO) {
-            diaryDatabase.saveDiary(
-                diary.toDataModel(),
-                historyItemList.map { it.toDataModel() }
-            )
+            try {
+                diaryDatabase.saveDiary(
+                    diary.toDataModel(),
+                    historyItemList.map { it.toDataModel() }
+                )
+            } catch (e: Exception) {
+                throw DiaryError.SaveDiary(e)
+            }
         }
     }
 
+    @Throws(DiaryError.DeleteAndSaveDiary::class)
     suspend fun deleteAndSaveDiary(
         deleteDiaryDate: LocalDate,
         newDiary: Diary,
         historyItemList: List<DiaryItemTitleSelectionHistoryItem>
     ) {
         withContext(Dispatchers.IO) {
-            diaryDatabase.deleteAndSaveDiary(
-                deleteDiaryDate,
-                newDiary.toDataModel(),
-                historyItemList.map { it.toDataModel() }
-            )
+            try {
+                diaryDatabase.deleteAndSaveDiary(
+                    deleteDiaryDate,
+                    newDiary.toDataModel(),
+                    historyItemList.map { it.toDataModel() }
+                )
+            } catch (e: Exception) {
+                throw DiaryError.DeleteAndSaveDiary(e)
+            }
         }
     }
 
+    @Throws(DiaryError.DeleteDiary::class)
     suspend fun deleteDiary(date: LocalDate) {
         withContext(Dispatchers.IO) {
-            diaryDAO.deleteDiary(date.toString())
+            try {
+                diaryDAO.deleteDiary(date.toString())
+            } catch (e: Exception) {
+                throw DiaryError.DeleteDiary(e)
+            }
         }
     }
 
+    @Throws(DiaryError.DeleteAllDiaries::class)
     suspend fun deleteAllDiaries() {
         withContext(Dispatchers.IO) {
-            diaryDAO.deleteAllDiaries()
+            try {
+                diaryDAO.deleteAllDiaries()
+            } catch (e: Exception) {
+                throw DiaryError.DeleteAllDiaries(e)
+            }
         }
     }
 
+    @Throws(DiaryError.DeleteAllData::class)
     suspend fun deleteAllData() {
         withContext(Dispatchers.IO) {
-            diaryDatabase.deleteAllData()
+            try {
+                diaryDatabase.deleteAllData()
+            } catch (e: Exception) {
+                throw DiaryError.DeleteAllData(e)
+            }
         }
     }
 }
