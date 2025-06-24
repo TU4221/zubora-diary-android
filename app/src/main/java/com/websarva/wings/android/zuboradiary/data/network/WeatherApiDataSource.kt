@@ -7,8 +7,11 @@ import com.websarva.wings.android.zuboradiary.data.model.GeoCoordinates
 import com.websarva.wings.android.zuboradiary.data.model.Weather
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import retrofit2.Response
+import java.net.ConnectException
+import java.net.UnknownHostException
 import java.time.LocalDate
 import java.time.temporal.ChronoUnit
+import javax.net.ssl.SSLException
 
 internal class WeatherApiDataSource(private val weatherApiService: WeatherApiService) {
 
@@ -39,19 +42,47 @@ internal class WeatherApiDataSource(private val weatherApiService: WeatherApiSer
         return result
     }
 
+    @Throws(WeatherApiAccessException::class)
+    private suspend fun <R> executeWebApiOperation(
+        operation: suspend () -> R
+    ): R {
+        return try {
+            operation()
+        } catch (e: UnknownHostException) {
+            // DNS解決に失敗した場合 (例: インターネット接続なし、ホスト名間違い)
+            throw WeatherApiAccessException(e)
+        } catch (e: ConnectException) {
+            // サーバーへのTCP接続に失敗した場合 (例: サーバーダウン、ポートが開いていない)
+            throw WeatherApiAccessException(e)
+        } catch (e: java.net.SocketTimeoutException) {
+            // 接続または読み取りタイムアウト
+            throw WeatherApiAccessException(e)
+        } catch (e: SSLException) {
+            // SSL/TLS ハンドシェイクエラー
+            throw WeatherApiAccessException(e)
+        } catch (e: IOException) {
+            // 上記以外の一般的なI/Oエラー (例: 予期せぬ接続切断など)
+            throw WeatherApiAccessException(e)
+        }
+    }
+
+    @Throws(WeatherApiAccessException::class)
     suspend fun fetchTodayWeatherInfo(geoCoordinates: GeoCoordinates): Weather {
         val response =
-            weatherApiService.getWeather(
-                geoCoordinates.latitude.toString(),
-                geoCoordinates.longitude.toString(),
-                queryDiaryParameter,
-                queryTimeZoneParameter,
-                "0",  /*today*/
-                "1" /*1日分*/
-            )
+            executeWebApiOperation {
+                weatherApiService.getWeather(
+                    geoCoordinates.latitude.toString(),
+                    geoCoordinates.longitude.toString(),
+                    queryDiaryParameter,
+                    queryTimeZoneParameter,
+                    "0",  /*today*/
+                    "1" /*1日分*/
+                )
+            }
         return toWeatherInfo(response)
     }
 
+    @Throws(WeatherApiAccessException::class)
     suspend fun fetchPastDayWeatherInfo(
         geoCoordinates: GeoCoordinates,
         @IntRange(from = MIN_PAST_DAYS.toLong(), to = MAX_PAST_DAYS.toLong())
@@ -61,17 +92,20 @@ internal class WeatherApiDataSource(private val weatherApiService: WeatherApiSer
         require(numPastDays <= MAX_PAST_DAYS)
 
         val response =
-            weatherApiService.getWeather(
-                geoCoordinates.latitude.toString(),
-                geoCoordinates.longitude.toString(),
-                queryDiaryParameter,
-                queryTimeZoneParameter,
-                numPastDays.toString(),
-                "0" /*1日分(過去日から1日分取得する場合"0"を代入)*/
-            )
+            executeWebApiOperation {
+                weatherApiService.getWeather(
+                    geoCoordinates.latitude.toString(),
+                    geoCoordinates.longitude.toString(),
+                    queryDiaryParameter,
+                    queryTimeZoneParameter,
+                    numPastDays.toString(),
+                    "0" /*1日分(過去日から1日分取得する場合"0"を代入)*/
+                )
+            }
         return toWeatherInfo(response)
     }
 
+    @Throws(WeatherApiAccessException::class)
     private fun toWeatherInfo(response: Response<WeatherApiData>): Weather {
         Log.d(logTag, "code = " + response.code())
         Log.d(logTag, "message = :" + response.message())
@@ -82,6 +116,7 @@ internal class WeatherApiDataSource(private val weatherApiService: WeatherApiSer
                 response.body()?.toWeatherInfo() ?: throw IllegalStateException()
             result
         } else {
+            // HTTPエラー (4xx, 5xx)
             response.errorBody().use { errorBody ->
                 val errorBodyString = errorBody?.string() ?: "null"
                 Log.d(
@@ -89,7 +124,7 @@ internal class WeatherApiDataSource(private val weatherApiService: WeatherApiSer
                     "errorBody = $errorBodyString"
                 )
             }
-            throw IOException()
+            throw WeatherApiAccessException(IOException())
         }
     }
 }

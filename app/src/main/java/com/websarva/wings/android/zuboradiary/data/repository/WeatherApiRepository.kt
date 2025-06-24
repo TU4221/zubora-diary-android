@@ -3,6 +3,7 @@ package com.websarva.wings.android.zuboradiary.data.repository
 import androidx.annotation.IntRange
 import com.websarva.wings.android.zuboradiary.data.model.GeoCoordinates
 import com.websarva.wings.android.zuboradiary.data.model.Weather
+import com.websarva.wings.android.zuboradiary.data.network.WeatherApiAccessException
 import com.websarva.wings.android.zuboradiary.data.network.WeatherApiDataSource
 import com.websarva.wings.android.zuboradiary.data.network.WeatherApiDataSource.Companion.MAX_PAST_DAYS
 import com.websarva.wings.android.zuboradiary.data.network.WeatherApiDataSource.Companion.MIN_PAST_DAYS
@@ -22,7 +23,7 @@ internal class WeatherApiRepository (private val weatherApiDataSource: WeatherAp
         return withContext(Dispatchers.IO) {
             try {
                 weatherApiDataSource.fetchTodayWeatherInfo(geoCoordinates)
-            } catch (e: Exception) {
+            } catch (e: WeatherApiAccessException) {
                 throw WeatherInfoError.LoadWeatherInfo(e)
             }
         }
@@ -35,7 +36,11 @@ internal class WeatherApiRepository (private val weatherApiDataSource: WeatherAp
         numPastDays: Int
     ): Weather {
         return withContext(Dispatchers.IO) {
-            weatherApiDataSource.fetchPastDayWeatherInfo(geoCoordinates, numPastDays)
+            try {
+                weatherApiDataSource.fetchPastDayWeatherInfo(geoCoordinates, numPastDays)
+            } catch (e: WeatherApiAccessException) {
+                throw WeatherInfoError.LoadWeatherInfo(e)
+            }
         }
     }
 }
