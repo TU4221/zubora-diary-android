@@ -2,8 +2,8 @@ package com.websarva.wings.android.zuboradiary.ui.viewmodel
 
 import android.util.Log
 import androidx.lifecycle.viewModelScope
-import com.websarva.wings.android.zuboradiary.data.repository.DiaryItemTitleSelectionHistoryRepository
 import com.websarva.wings.android.zuboradiary.data.model.ItemNumber
+import com.websarva.wings.android.zuboradiary.data.repository.DiaryRepository
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import com.websarva.wings.android.zuboradiary.ui.model.DiaryItemTitleEditAppMessage
 import com.websarva.wings.android.zuboradiary.ui.adapter.diaryitemtitle.SelectionHistoryList
@@ -22,7 +22,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 internal class DiaryItemTitleEditViewModel @Inject constructor(
-    private val diaryItemTitleSelectionHistoryRepository: DiaryItemTitleSelectionHistoryRepository
+    private val diaryRepository: DiaryRepository
 ) : BaseViewModel<DiaryItemTitleEditEvent, DiaryItemTitleEditAppMessage, DiaryItemTitleEditState>() {
 
     private val logTag = createLogTag()
@@ -66,7 +66,7 @@ internal class DiaryItemTitleEditViewModel @Inject constructor(
         Log.i(logTag, "${logMsg}_開始")
 
         itemTitleSelectionHistoryList =
-            diaryItemTitleSelectionHistoryRepository
+            diaryRepository
                 .loadSelectionHistory(maxLoadedItemTitles, 0).catch {
                     emitAppMessageEvent(DiaryItemTitleEditAppMessage.ItemTitleHistoryLoadingFailure)
                 }.map { list ->
@@ -100,7 +100,7 @@ internal class DiaryItemTitleEditViewModel @Inject constructor(
         val deleteItem = currentList.itemList[deletePosition]
         val deleteTitle = deleteItem.title
         try {
-            diaryItemTitleSelectionHistoryRepository.deleteSelectionHistoryItem(deleteTitle)
+            diaryRepository.deleteSelectionHistoryItem(deleteTitle)
         } catch (e: Exception) {
             Log.e(logTag, "${logMsg}_失敗", e)
             emitAppMessageEvent(DiaryItemTitleEditAppMessage.ItemTitleHistoryDeleteFailure)

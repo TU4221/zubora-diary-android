@@ -1,7 +1,6 @@
 package com.websarva.wings.android.zuboradiary.di
 
 import com.websarva.wings.android.zuboradiary.data.database.DiaryDataSource
-import com.websarva.wings.android.zuboradiary.data.repository.DiaryItemTitleSelectionHistoryRepository
 import com.websarva.wings.android.zuboradiary.data.location.FusedLocationDataSource
 import com.websarva.wings.android.zuboradiary.data.network.WeatherApiDataSource
 import com.websarva.wings.android.zuboradiary.data.repository.DiaryRepository
@@ -29,14 +28,6 @@ internal object RepositoryModule {
         diaryDataSource: DiaryDataSource
     ): DiaryRepository {
         return DiaryRepository(diaryDataSource)
-    }
-
-    @Singleton
-    @Provides
-    fun provideEditDiarySelectItemTitleRepository(
-        diaryDataSource: DiaryDataSource
-    ): DiaryItemTitleSelectionHistoryRepository {
-        return DiaryItemTitleSelectionHistoryRepository(diaryDataSource)
     }
 
     @Singleton

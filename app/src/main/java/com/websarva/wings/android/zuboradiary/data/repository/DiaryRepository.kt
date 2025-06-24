@@ -10,9 +10,12 @@ import com.websarva.wings.android.zuboradiary.domain.model.Diary
 import com.websarva.wings.android.zuboradiary.domain.model.DiaryItemTitleSelectionHistoryItem
 import com.websarva.wings.android.zuboradiary.domain.model.DiaryListItem
 import com.websarva.wings.android.zuboradiary.domain.model.WordSearchResultListItem
+import com.websarva.wings.android.zuboradiary.domain.model.error.DiaryItemTitleSelectionHistoryError
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.error.DiaryError
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import java.time.LocalDate
 import kotlin.Throws
@@ -219,6 +222,35 @@ internal class DiaryRepository (
                 diaryDataSource.deleteAllData()
             } catch (e: DataBaseAccessException) {
                 throw DiaryError.DeleteAllData(e)
+            }
+        }
+    }
+
+    @Throws(DiaryItemTitleSelectionHistoryError.LoadSelectionHistory::class)
+    fun loadSelectionHistory(
+        num: Int, offset: Int
+    ): Flow<List<DiaryItemTitleSelectionHistoryItem>> {
+        require(num >= 1)
+        require(offset >= 0)
+
+        return try {
+            diaryDataSource
+                .selectHistoryListOrderByLogDesc(num, offset)
+                .map { list ->
+                    list.map { it.toDomainModel() }
+                }
+        } catch (e: DataBaseAccessException) {
+            throw DiaryItemTitleSelectionHistoryError.LoadSelectionHistory(e)
+        }
+    }
+
+    @Throws(DiaryItemTitleSelectionHistoryError.DeleteSelectionHistoryItem::class)
+    suspend fun deleteSelectionHistoryItem(title: String) {
+        withContext(Dispatchers.IO) {
+            try {
+                diaryDataSource.deleteHistoryItem(title)
+            } catch (e: DataBaseAccessException) {
+                throw DiaryItemTitleSelectionHistoryError.DeleteSelectionHistoryItem(e)
             }
         }
     }
