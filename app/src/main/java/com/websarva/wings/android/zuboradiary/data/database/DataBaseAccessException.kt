@@ -1,5 +1,7 @@
 package com.websarva.wings.android.zuboradiary.data.database
 
+import com.websarva.wings.android.zuboradiary.data.model.DataException
+
 internal class DataBaseAccessException (
     cause: Throwable? = null
-) : Exception("データベースへのアクセスに失敗しました。", cause)
+) : DataException("データベースへのアクセスに失敗しました。", cause)
