@@ -2,8 +2,8 @@ package com.websarva.wings.android.zuboradiary.data.repository
 
 import android.net.Uri
 import android.util.Log
-import com.websarva.wings.android.zuboradiary.data.database.DiaryDAO
-import com.websarva.wings.android.zuboradiary.data.database.DiaryDatabase
+import com.websarva.wings.android.zuboradiary.data.database.DataBaseAccessException
+import com.websarva.wings.android.zuboradiary.data.database.DiaryDataSource
 import com.websarva.wings.android.zuboradiary.data.mapper.toDataModel
 import com.websarva.wings.android.zuboradiary.data.mapper.toDomainModel
 import com.websarva.wings.android.zuboradiary.domain.model.Diary
@@ -19,8 +19,7 @@ import kotlin.Throws
 
 
 internal class DiaryRepository (
-    private val diaryDatabase: DiaryDatabase,
-    private val diaryDAO: DiaryDAO,
+    private val diaryDataSource: DiaryDataSource
 ) {
 
     private val logTag = createLogTag()
@@ -29,8 +28,8 @@ internal class DiaryRepository (
     suspend fun countDiaries(): Int {
         return withContext(Dispatchers.IO) {
             try {
-                diaryDAO.countDiaries()
-            } catch (e: Exception) {
+                diaryDataSource.countDiaries()
+            } catch (e: DataBaseAccessException) {
                 throw DiaryError.CountDiaries(e)
             }
         }
@@ -41,8 +40,8 @@ internal class DiaryRepository (
     suspend fun countDiaries(date: LocalDate): Int {
         return withContext(Dispatchers.IO) {
             try {
-                diaryDAO.countDiaries(date.toString())
-            } catch (e: Exception) {
+                diaryDataSource.countDiaries(date)
+            } catch (e: DataBaseAccessException) {
                 throw DiaryError.CountDiaries(e)
             }
         }
@@ -52,8 +51,8 @@ internal class DiaryRepository (
     suspend fun existsDiary(date: LocalDate): Boolean {
         return withContext(Dispatchers.IO) {
             try {
-                diaryDAO.existsDiary(date.toString())
-            } catch (e: Exception) {
+                diaryDataSource.existsDiary(date)
+            } catch (e: DataBaseAccessException) {
                 throw DiaryError.CheckDiaryExistence(e)
             }
         }
@@ -63,8 +62,8 @@ internal class DiaryRepository (
     suspend fun existsPicturePath(uri: Uri): Boolean {
         return withContext(Dispatchers.IO) {
             try {
-                diaryDAO.existsPicturePath(uri.toString())
-            } catch (e: Exception) {
+                diaryDataSource.existsPicturePath(uri)
+            } catch (e: DataBaseAccessException) {
                 throw DiaryError.CheckPicturePathUsage(e)
             }
         }
@@ -74,8 +73,8 @@ internal class DiaryRepository (
     suspend fun loadDiary(date: LocalDate): Diary? {
         return withContext(Dispatchers.IO) {
             try {
-                diaryDAO.selectDiary(date.toString())?.toDomainModel()
-            } catch (e: Exception) {
+                diaryDataSource.selectDiary(date)?.toDomainModel()
+            } catch (e: DataBaseAccessException) {
                 throw DiaryError.LoadDiary(e)
             }
         }
@@ -85,8 +84,8 @@ internal class DiaryRepository (
     suspend fun loadNewestDiary(): Diary? {
         return withContext(Dispatchers.IO) {
             try {
-                diaryDAO.selectNewestDiary()?.toDomainModel()
-            } catch (e: Exception) {
+                diaryDataSource.selectNewestDiary()?.toDomainModel()
+            } catch (e: DataBaseAccessException) {
                 throw DiaryError.LoadDiary(e)
             }
         }
@@ -96,8 +95,8 @@ internal class DiaryRepository (
     suspend fun loadOldestDiary(): Diary? {
         return withContext(Dispatchers.IO) {
             try {
-                diaryDAO.selectOldestDiary()?.toDomainModel()
-            } catch (e: Exception) {
+                diaryDataSource.selectOldestDiary()?.toDomainModel()
+            } catch (e: DataBaseAccessException) {
                 throw DiaryError.LoadDiary(e)
             }
         }
@@ -115,16 +114,10 @@ internal class DiaryRepository (
 
         return withContext(Dispatchers.IO) {
             try {
-                if (date == null) {
-                    diaryDAO
-                        .selectDiaryListOrderByDateDesc(num, offset)
-                        .map { it.toDomainModel() }
-                } else {
-                    diaryDAO
-                        .selectDiaryListOrderByDateDesc(num, offset, date.toString())
-                        .map { it.toDomainModel() }
-                }
-            } catch (e: Exception) {
+                diaryDataSource
+                    .selectDiaryListOrderByDateDesc(num, offset, date)
+                    .map { it.toDomainModel() }
+            } catch (e: DataBaseAccessException) {
                 throw DiaryError.LoadDiaryList(e)
             }
         }
@@ -134,8 +127,8 @@ internal class DiaryRepository (
     suspend fun countWordSearchResultDiaries(searchWord: String): Int {
         return withContext(Dispatchers.IO) {
             try {
-                diaryDAO.countWordSearchResults(searchWord)
-            } catch (e: Exception) {
+                diaryDataSource.countWordSearchResults(searchWord)
+            } catch (e: DataBaseAccessException) {
                 throw DiaryError.CountDiaries(e)
             }
         }
@@ -152,10 +145,10 @@ internal class DiaryRepository (
 
         return withContext(Dispatchers.IO) {
             try {
-                diaryDAO
+                diaryDataSource
                     .selectWordSearchResultListOrderByDateDesc(num, offset, searchWord)
                     .map { it.toDomainModel() }
-            } catch (e: Exception) {
+            } catch (e: DataBaseAccessException) {
                 throw DiaryError.LoadDiaryList(e)
             }
         }
@@ -168,11 +161,11 @@ internal class DiaryRepository (
     ) {
         withContext(Dispatchers.IO) {
             try {
-                diaryDatabase.saveDiary(
+                diaryDataSource.saveDiary(
                     diary.toDataModel(),
                     historyItemList.map { it.toDataModel() }
                 )
-            } catch (e: Exception) {
+            } catch (e: DataBaseAccessException) {
                 throw DiaryError.SaveDiary(e)
             }
         }
@@ -186,12 +179,12 @@ internal class DiaryRepository (
     ) {
         withContext(Dispatchers.IO) {
             try {
-                diaryDatabase.deleteAndSaveDiary(
+                diaryDataSource.deleteAndSaveDiary(
                     deleteDiaryDate,
                     newDiary.toDataModel(),
                     historyItemList.map { it.toDataModel() }
                 )
-            } catch (e: Exception) {
+            } catch (e: DataBaseAccessException) {
                 throw DiaryError.DeleteAndSaveDiary(e)
             }
         }
@@ -201,8 +194,8 @@ internal class DiaryRepository (
     suspend fun deleteDiary(date: LocalDate) {
         withContext(Dispatchers.IO) {
             try {
-                diaryDAO.deleteDiary(date.toString())
-            } catch (e: Exception) {
+                diaryDataSource.deleteDiary(date)
+            } catch (e: DataBaseAccessException) {
                 throw DiaryError.DeleteDiary(e)
             }
         }
@@ -212,8 +205,8 @@ internal class DiaryRepository (
     suspend fun deleteAllDiaries() {
         withContext(Dispatchers.IO) {
             try {
-                diaryDAO.deleteAllDiaries()
-            } catch (e: Exception) {
+                diaryDataSource.deleteAllDiaries()
+            } catch (e: DataBaseAccessException) {
                 throw DiaryError.DeleteAllDiaries(e)
             }
         }
@@ -223,8 +216,8 @@ internal class DiaryRepository (
     suspend fun deleteAllData() {
         withContext(Dispatchers.IO) {
             try {
-                diaryDatabase.deleteAllData()
-            } catch (e: Exception) {
+                diaryDataSource.deleteAllData()
+            } catch (e: DataBaseAccessException) {
                 throw DiaryError.DeleteAllData(e)
             }
         }

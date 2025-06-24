@@ -3,6 +3,7 @@ package com.websarva.wings.android.zuboradiary.di
 import android.content.Context
 import androidx.room.Room.databaseBuilder
 import com.websarva.wings.android.zuboradiary.data.database.DiaryDAO
+import com.websarva.wings.android.zuboradiary.data.database.DiaryDataSource
 import com.websarva.wings.android.zuboradiary.data.database.DiaryDatabase
 import com.websarva.wings.android.zuboradiary.data.database.DiaryItemTitleSelectionHistoryDAO
 import dagger.Module
@@ -32,5 +33,19 @@ internal object DatabaseModule {
     @Provides
     fun provideSelectedItemTitlesHistoryDAO(diaryDatabase: DiaryDatabase): DiaryItemTitleSelectionHistoryDAO {
         return diaryDatabase.createDiaryItemTitleSelectionHistoryDAO()
+    }
+
+    @Singleton
+    @Provides
+    fun provideDiaryDataSource(
+        diaryDatabase: DiaryDatabase,
+        diaryDAO: DiaryDAO,
+        diaryItemTitleSelectionHistoryDAO: DiaryItemTitleSelectionHistoryDAO
+    ): DiaryDataSource {
+        return DiaryDataSource(
+            diaryDatabase,
+            diaryDAO,
+            diaryItemTitleSelectionHistoryDAO
+        )
     }
 }

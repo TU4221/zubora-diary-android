@@ -1,7 +1,7 @@
 package com.websarva.wings.android.zuboradiary.data.repository
 
-import android.database.sqlite.SQLiteException
-import com.websarva.wings.android.zuboradiary.data.database.DiaryItemTitleSelectionHistoryDAO
+import com.websarva.wings.android.zuboradiary.data.database.DataBaseAccessException
+import com.websarva.wings.android.zuboradiary.data.database.DiaryDataSource
 import com.websarva.wings.android.zuboradiary.data.mapper.toDomainModel
 import com.websarva.wings.android.zuboradiary.domain.model.DiaryItemTitleSelectionHistoryItem
 import com.websarva.wings.android.zuboradiary.domain.model.error.DiaryItemTitleSelectionHistoryError
@@ -11,7 +11,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 
 internal class DiaryItemTitleSelectionHistoryRepository (
-    private val diaryItemTitleSelectionHistoryDAO: DiaryItemTitleSelectionHistoryDAO
+    private val diaryDataSource: DiaryDataSource
 ) {
 
     @Throws(DiaryItemTitleSelectionHistoryError.LoadSelectionHistory::class)
@@ -22,14 +22,12 @@ internal class DiaryItemTitleSelectionHistoryRepository (
         require(offset >= 0)
 
         return try {
-            diaryItemTitleSelectionHistoryDAO
+            diaryDataSource
                 .selectHistoryListOrderByLogDesc(num, offset)
                 .map { list ->
                     list.map { it.toDomainModel() }
                 }
-        } catch (e: SQLiteException) {
-            throw DiaryItemTitleSelectionHistoryError.LoadSelectionHistory(e)
-        } catch (e: IllegalStateException) {
+        } catch (e: DataBaseAccessException) {
             throw DiaryItemTitleSelectionHistoryError.LoadSelectionHistory(e)
         }
     }
@@ -38,10 +36,8 @@ internal class DiaryItemTitleSelectionHistoryRepository (
     suspend fun deleteSelectionHistoryItem(title: String) {
         withContext(Dispatchers.IO) {
             try {
-                diaryItemTitleSelectionHistoryDAO.deleteHistoryItem(title)
-            } catch (e: SQLiteException) {
-                throw DiaryItemTitleSelectionHistoryError.DeleteSelectionHistoryItem(e)
-            } catch (e: IllegalStateException) {
+                diaryDataSource.deleteHistoryItem(title)
+            } catch (e: DataBaseAccessException) {
                 throw DiaryItemTitleSelectionHistoryError.DeleteSelectionHistoryItem(e)
             }
         }

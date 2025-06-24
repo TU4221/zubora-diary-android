@@ -1,8 +1,6 @@
 package com.websarva.wings.android.zuboradiary.di
 
-import com.websarva.wings.android.zuboradiary.data.database.DiaryDAO
-import com.websarva.wings.android.zuboradiary.data.database.DiaryDatabase
-import com.websarva.wings.android.zuboradiary.data.database.DiaryItemTitleSelectionHistoryDAO
+import com.websarva.wings.android.zuboradiary.data.database.DiaryDataSource
 import com.websarva.wings.android.zuboradiary.data.repository.DiaryItemTitleSelectionHistoryRepository
 import com.websarva.wings.android.zuboradiary.data.location.FusedLocationDataSource
 import com.websarva.wings.android.zuboradiary.data.network.WeatherApiDataSource
@@ -28,18 +26,17 @@ internal object RepositoryModule {
     @Singleton
     @Provides
     fun provideDiaryRepository(
-        diaryDatabase: DiaryDatabase,
-        diaryDAO: DiaryDAO
+        diaryDataSource: DiaryDataSource
     ): DiaryRepository {
-        return DiaryRepository(diaryDatabase, diaryDAO)
+        return DiaryRepository(diaryDataSource)
     }
 
     @Singleton
     @Provides
     fun provideEditDiarySelectItemTitleRepository(
-        diaryItemTitleSelectionHistoryDAO: DiaryItemTitleSelectionHistoryDAO
+        diaryDataSource: DiaryDataSource
     ): DiaryItemTitleSelectionHistoryRepository {
-        return DiaryItemTitleSelectionHistoryRepository(diaryItemTitleSelectionHistoryDAO)
+        return DiaryItemTitleSelectionHistoryRepository(diaryDataSource)
     }
 
     @Singleton
