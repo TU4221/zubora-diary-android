@@ -9,13 +9,26 @@ import java.time.LocalTime
 import java.time.temporal.ChronoUnit
 import java.util.concurrent.TimeUnit
 
-internal class ReminderNotificationWorkManager (private val workManager: WorkManager)  {
+internal class ReminderNotificationWorkManager(private val workManager: WorkManager) {
 
     private val reminderNotificationWorkTag = "ReminderNotification"
     private val reminderNotificationUniqueWorkName = reminderNotificationWorkTag
 
     private val logTag = createLogTag()
 
+    @Throws(WorkProfileAccessException::class)
+    private fun executeWorkOperation(
+        operation: () -> Unit
+    ) {
+        try {
+            operation()
+        } catch (e: IllegalStateException) {
+            // WorkManagerが未初期化、または内部状態が不正な場合に発生しうるためキャッチ
+            throw WorkProfileAccessException(e)
+        }
+    }
+
+    @Throws(WorkProfileAccessException::class)
     fun registerReminderNotificationWorker(settingTime: LocalTime) {
         cancelReminderNotificationWorker()
 
@@ -31,11 +44,13 @@ internal class ReminderNotificationWorkManager (private val workManager: WorkMan
                 .addTag(reminderNotificationWorkTag)
                 .setInitialDelay(initialDelaySeconds, TimeUnit.SECONDS)
                 .build()
-        workManager.enqueueUniquePeriodicWork(
-            reminderNotificationUniqueWorkName,
-            ExistingPeriodicWorkPolicy.CANCEL_AND_REENQUEUE,
-            request
-        )
+        executeWorkOperation {
+            workManager.enqueueUniquePeriodicWork(
+                reminderNotificationUniqueWorkName,
+                ExistingPeriodicWorkPolicy.CANCEL_AND_REENQUEUE,
+                request
+            )
+        }
     }
 
     private fun calculationBetweenSeconds(startTime: LocalTime, endTime: LocalTime): Long {
@@ -46,10 +61,13 @@ internal class ReminderNotificationWorkManager (private val workManager: WorkMan
         return betweenSeconds
     }
 
+    @Throws(WorkProfileAccessException::class)
     fun cancelReminderNotificationWorker() {
-        workManager.apply {
-            cancelAllWorkByTag(reminderNotificationWorkTag)
-            cancelUniqueWork(reminderNotificationUniqueWorkName)
+        executeWorkOperation {
+            workManager.apply {
+                cancelAllWorkByTag(reminderNotificationWorkTag)
+                cancelUniqueWork(reminderNotificationUniqueWorkName)
+            }
         }
     }
 }
