@@ -44,7 +44,6 @@ internal class UserPreferences @Inject constructor(private val context: Context)
     private val isCheckedWeatherInfoAcquisitionPreferenceKey =
         booleanPreferencesKey("is_checked_weather_info_acquisition")
 
-    @Throws(Throwable::class)
     fun loadAllPreferences(): Flow<AllPreferences> {
         return context.dataStore.data
             .catch { cause ->
@@ -113,12 +112,22 @@ internal class UserPreferences @Inject constructor(private val context: Context)
         return WeatherInfoAcquisitionPreference(isCheckedWeather)
     }
 
-    @Throws(
-        IOException::class,
-        Exception::class
-    )
+    @Throws(UserPreferencesAccessException::class)
+    private suspend fun executeDataStoreEditOperation(
+        operation: suspend (MutablePreferences) -> Unit
+    ): Preferences {
+        return try {
+            context.dataStore.edit { preferences ->
+                operation(preferences)
+            }
+        } catch (e: IOException) {
+            throw UserPreferencesAccessException(e)
+        }
+    }
+
+    @Throws(UserPreferencesAccessException::class)
     suspend fun saveThemeColorPreference(value: ThemeColorPreference) {
-        context.dataStore.edit { preferences ->
+        executeDataStoreEditOperation { preferences ->
             saveThemeColorPreferenceValue(preferences, value)
         }
     }
@@ -130,12 +139,9 @@ internal class UserPreferences @Inject constructor(private val context: Context)
         preferences[themeColorPreferenceKey] = value.themeColorNumber
     }
 
-    @Throws(
-        IOException::class,
-        Exception::class
-    )
+    @Throws(UserPreferencesAccessException::class)
     suspend fun saveCalendarStartDayOfWeekPreference(value: CalendarStartDayOfWeekPreference) {
-        context.dataStore.edit { preferences ->
+        executeDataStoreEditOperation { preferences ->
             saveCalendarStartDayOfWeekPreferenceValue(preferences, value)
         }
     }
@@ -147,12 +153,9 @@ internal class UserPreferences @Inject constructor(private val context: Context)
         preferences[calendarStartDayOfWeekPreferenceKey] = value.dayOfWeekNumber
     }
 
-    @Throws(
-        IOException::class,
-        Exception::class
-    )
+    @Throws(UserPreferencesAccessException::class)
     suspend fun saveReminderNotificationPreference(value: ReminderNotificationPreference) {
-        context.dataStore.edit { preferences ->
+        executeDataStoreEditOperation { preferences ->
             saveReminderNotificationPreferenceValue(preferences, value)
         }
     }
@@ -165,12 +168,9 @@ internal class UserPreferences @Inject constructor(private val context: Context)
         preferences[reminderNotificationTimePreferenceKey] = value.notificationTimeString
     }
 
-    @Throws(
-        IOException::class,
-        Exception::class
-    )
+    @Throws(UserPreferencesAccessException::class)
     suspend fun savePasscodeLockPreference(value: PassCodeLockPreference) {
-        context.dataStore.edit { preferences ->
+        executeDataStoreEditOperation { preferences ->
             savePasscodeLockPreferenceValue(preferences, value)
         }
     }
@@ -183,12 +183,9 @@ internal class UserPreferences @Inject constructor(private val context: Context)
         preferences[passcodePreferenceKey] = value.passCode
     }
 
-    @Throws(
-        IOException::class,
-        Exception::class
-    )
+    @Throws(UserPreferencesAccessException::class)
     suspend fun saveWeatherInfoAcquisitionPreference(value: WeatherInfoAcquisitionPreference) {
-        context.dataStore.edit { preferences ->
+        executeDataStoreEditOperation { preferences ->
             saveWeatherInfoAcquisitionPreferenceValue(preferences, value)
         }
     }
@@ -201,7 +198,7 @@ internal class UserPreferences @Inject constructor(private val context: Context)
     }
 
     suspend fun initializeAllPreferences() {
-        context.dataStore.edit { preferences ->
+        executeDataStoreEditOperation { preferences ->
             saveThemeColorPreferenceValue(preferences, ThemeColorPreference())
             saveCalendarStartDayOfWeekPreferenceValue(preferences, CalendarStartDayOfWeekPreference())
             saveReminderNotificationPreferenceValue(preferences, ReminderNotificationPreference())
