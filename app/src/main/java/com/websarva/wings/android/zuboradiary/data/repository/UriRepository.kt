@@ -2,6 +2,7 @@ package com.websarva.wings.android.zuboradiary.data.repository
 
 import android.net.Uri
 import com.websarva.wings.android.zuboradiary.data.uri.UriPermissionDataSource
+import com.websarva.wings.android.zuboradiary.data.uri.UriPermissionOperationException
 import com.websarva.wings.android.zuboradiary.domain.usecase.uri.error.UriError
 
 internal class UriRepository (
@@ -12,23 +13,26 @@ internal class UriRepository (
     fun takePersistablePermission(uri: Uri) {
         try {
             dataSource.takePersistablePermission(uri)
-        } catch (e: RuntimeException) {
+        } catch (e: UriPermissionOperationException) {
             throw UriError.TakePermission(e)
         }
     }
 
     @Throws(UriError.ReleasePermission::class)
     fun releasePersistablePermission(uri: Uri) {
-        dataSource.releasePersistablePermission(uri)
         try {
-            dataSource.takePersistablePermission(uri)
-        } catch (e: RuntimeException) {
+            dataSource.releasePersistablePermission(uri)
+        } catch (e: UriPermissionOperationException) {
             throw UriError.ReleasePermission(e)
         }
     }
 
-    // TODO:UseCaseで処理するように変更
+    @Throws(UriError.ReleasePermission::class)
     fun releaseAllPersistablePermission() {
-        dataSource.releaseAllPersistablePermission()
+        try {
+            dataSource.releaseAllPersistablePermission()
+        } catch (e: UriPermissionOperationException) {
+            throw UriError.ReleasePermission(e)
+        }
     }
 }

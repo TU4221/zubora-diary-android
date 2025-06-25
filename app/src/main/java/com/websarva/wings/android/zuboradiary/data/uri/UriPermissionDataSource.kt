@@ -12,21 +12,31 @@ internal class UriPermissionDataSource (
 
     private val logTag = createLogTag()
 
+    @Throws(UriPermissionOperationException::class)
+    private fun executeUriPermissionOperation(
+        operation: () -> Unit
+    ) {
+        try {
+            operation()
+        } catch (e: SecurityException) {
+            throw UriPermissionOperationException(e)
+        }
+    }
+
+    @Throws(UriPermissionOperationException::class)
     fun takePersistablePermission(uri: Uri) {
         val logMsg = "端末写真使用権限取得"
         Log.i(logTag, "${logMsg}_開始=$uri")
 
-        try {
+        executeUriPermissionOperation {
             resolver.takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION)
-        } catch (e :Exception) {
-            Log.e(logTag, "${logMsg}_失敗", e)
-            throw e
         }
 
         Log.i(logTag, "${logMsg}_完了")
     }
 
     // MEMO:Uri先のファイルを削除すると、登録されていたUriPermissionも同時に削除される。
+    @Throws(UriPermissionOperationException::class)
     fun releasePersistablePermission(uri: Uri) {
         val logMsg = "端末写真使用権限解放"
         Log.i(logTag, "${logMsg}_開始_URI=$uri")
@@ -38,11 +48,8 @@ internal class UriPermissionDataSource (
             val targetUriString = uri.toString()
 
             if (permittedUriString == targetUriString) {
-                try {
+                executeUriPermissionOperation {
                     resolver.releasePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION)
-                } catch (e: Exception) {
-                    Log.e(logTag, "${logMsg}_失敗", e)
-                    throw e
                 }
                 break
             }
@@ -51,7 +58,7 @@ internal class UriPermissionDataSource (
         Log.i(logTag, "${logMsg}_完了")
     }
 
-    // TODO:UseCaseで処理するように変更
+    @Throws(UriPermissionOperationException::class)
     fun releaseAllPersistablePermission() {
         val logMsg = "端末写真使用権限全解放"
         Log.i(logTag, "${logMsg}_開始")
@@ -59,12 +66,8 @@ internal class UriPermissionDataSource (
         val permissionList = resolver.persistedUriPermissions
         for (uriPermission in permissionList) {
             val uri = uriPermission.uri
-            try {
+            executeUriPermissionOperation {
                 resolver.releasePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION)
-            } catch (e: SecurityException) {
-                Log.e(logTag, "${logMsg}_失敗", e)
-                // 対処できないがアプリを落としたくない為、catchのみの処理とする。
-                return
             }
         }
 
