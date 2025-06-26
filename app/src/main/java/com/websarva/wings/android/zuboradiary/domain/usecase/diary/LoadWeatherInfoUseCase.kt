@@ -1,7 +1,7 @@
 package com.websarva.wings.android.zuboradiary.domain.usecase.diary
 
 import android.util.Log
-import com.websarva.wings.android.zuboradiary.domain.usecase.diary.error.FetchWeatherInfoError
+import com.websarva.wings.android.zuboradiary.domain.usecase.exception.AcquireWeatherInfoUseCaseException
 import com.websarva.wings.android.zuboradiary.data.model.GeoCoordinates
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.data.model.Weather
@@ -9,6 +9,7 @@ import com.websarva.wings.android.zuboradiary.data.repository.LocationRepository
 import com.websarva.wings.android.zuboradiary.data.repository.WeatherApiRepository
 import com.websarva.wings.android.zuboradiary.domain.exception.weather.AcquireWeatherInfoFailedException
 import com.websarva.wings.android.zuboradiary.domain.exception.location.ObtainCurrentLocationFailedException
+import com.websarva.wings.android.zuboradiary.domain.usecase.DefaultUseCaseResult
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import java.time.LocalDate
 import java.time.temporal.ChronoUnit
@@ -21,21 +22,21 @@ internal class LoadWeatherInfoUseCase(
 
     private val logTag = createLogTag()
 
-    suspend operator fun invoke(isGranted: Boolean, date: LocalDate): UseCaseResult<Weather, FetchWeatherInfoError> {
+    suspend operator fun invoke(isGranted: Boolean, date: LocalDate): DefaultUseCaseResult<Weather> {
         val logMsg = "天気情報取得_"
         Log.i(logTag, "${logMsg}開始")
 
         val canLoadWeatherInfo = canLoadWeatherInfo(date)
         if (!canLoadWeatherInfo) {
-            return UseCaseResult.Error(
-                FetchWeatherInfoError.WeatherInfoDateOutOfRange()
+            return UseCaseResult.Failure(
+                AcquireWeatherInfoUseCaseException.WeatherInfoDateOutOfRange()
             )
         }
 
         if (!isGranted) {
-            val error = FetchWeatherInfoError.LocationPermissionNotGranted()
+            val error = AcquireWeatherInfoUseCaseException.LocationPermissionNotGranted()
             Log.e(logTag, "${logMsg}位置情報権限未取得", error)
-            return UseCaseResult.Error(error)
+            return UseCaseResult.Failure(error)
         }
 
         try {
@@ -43,9 +44,9 @@ internal class LoadWeatherInfoUseCase(
             val weather = fetchWeatherInfo(date, geoCoordinates)
             Log.i(logTag, "${logMsg}完了")
             return UseCaseResult.Success(weather)
-        } catch (e: FetchWeatherInfoError) {
+        } catch (e: AcquireWeatherInfoUseCaseException) {
             Log.e(logTag, "${logMsg}失敗", e)
-            return UseCaseResult.Error(e)
+            return UseCaseResult.Failure(e)
         }
     }
 
@@ -54,7 +55,7 @@ internal class LoadWeatherInfoUseCase(
             is UseCaseResult.Success -> {
                 result.value
             }
-            is UseCaseResult.Error -> {
+            is UseCaseResult.Failure -> {
                 // canLoadWeatherInfoUseCaseは常時Successの為、処理不要。
                 false
             }
@@ -69,7 +70,7 @@ internal class LoadWeatherInfoUseCase(
             Log.i(logTag, "${logMsg}完了")
             result
         } catch (e: ObtainCurrentLocationFailedException) {
-            throw FetchWeatherInfoError.AccessLocation(e)
+            throw AcquireWeatherInfoUseCaseException.AccessLocationFailed(e)
         }
     }
 
@@ -93,7 +94,7 @@ internal class LoadWeatherInfoUseCase(
             result
         } catch (e: AcquireWeatherInfoFailedException) {
             Log.i(logTag, "${logMsg}失敗")
-            throw FetchWeatherInfoError.LoadWeatherInfo(e)
+            throw AcquireWeatherInfoUseCaseException.AcquireWeatherInfoFailed(e)
         }
     }
 }

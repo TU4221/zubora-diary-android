@@ -136,7 +136,7 @@ internal class CalendarViewModel @Inject constructor(
     suspend fun existsSavedDiary(date: LocalDate): Boolean? {
         when (val result = doesDiaryExistUseCase(date)) {
             is UseCaseResult.Success -> return result.value
-            is UseCaseResult.Error -> {
+            is UseCaseResult.Failure -> {
                 emitAppMessageEvent(CalendarAppMessage.DiaryInfoLoadingFailure)
                 return null
             }

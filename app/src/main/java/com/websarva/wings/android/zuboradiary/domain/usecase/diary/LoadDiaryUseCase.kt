@@ -5,6 +5,7 @@ import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.data.repository.DiaryRepository
 import com.websarva.wings.android.zuboradiary.domain.exception.diary.LoadDiaryFailedException
 import com.websarva.wings.android.zuboradiary.domain.model.Diary
+import com.websarva.wings.android.zuboradiary.domain.usecase.DefaultUseCaseResult
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import java.time.LocalDate
 
@@ -16,7 +17,7 @@ internal class LoadDiaryUseCase(
 
     suspend operator fun invoke(
         date: LocalDate
-    ): UseCaseResult<Diary, LoadDiaryFailedException> {
+    ): DefaultUseCaseResult<Diary> {
         val logMsg = "日記読込_"
         Log.i(logTag, "${logMsg}開始")
 
@@ -27,7 +28,7 @@ internal class LoadDiaryUseCase(
             return UseCaseResult.Success(diary)
         } catch (e: LoadDiaryFailedException) {
             Log.e(logTag, "${logMsg}失敗", e)
-            return UseCaseResult.Error(e)
+            return UseCaseResult.Failure(e)
         }
     }
 }

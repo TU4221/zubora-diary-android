@@ -28,7 +28,7 @@ internal class ShouldRequestWeatherInfoConfirmationUseCase(
                 Log.i(logTag, "${logMsg}完了")
                 return UseCaseResult.Success(result.value)
             }
-            is UseCaseResult.Error -> {
+            is UseCaseResult.Failure -> {
                 // 処理不要
             }
         }

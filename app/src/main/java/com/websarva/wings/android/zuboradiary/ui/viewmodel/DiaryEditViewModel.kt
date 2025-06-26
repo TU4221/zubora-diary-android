@@ -4,7 +4,7 @@ import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
-import com.websarva.wings.android.zuboradiary.domain.usecase.diary.error.FetchWeatherInfoError
+import com.websarva.wings.android.zuboradiary.domain.usecase.exception.AcquireWeatherInfoUseCaseException
 import com.websarva.wings.android.zuboradiary.data.model.Condition
 import com.websarva.wings.android.zuboradiary.data.model.ItemNumber
 import com.websarva.wings.android.zuboradiary.data.model.Weather
@@ -21,7 +21,7 @@ import com.websarva.wings.android.zuboradiary.domain.usecase.diary.ShouldLoadWea
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.ShouldRequestDiaryLoadingConfirmationUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.ShouldRequestExitWithoutDiarySavingConfirmationUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.ShouldRequestWeatherInfoConfirmationUseCase
-import com.websarva.wings.android.zuboradiary.domain.usecase.diary.error.DeleteDiaryError
+import com.websarva.wings.android.zuboradiary.domain.usecase.exception.DeleteDiaryUseCaseException
 import com.websarva.wings.android.zuboradiary.domain.usecase.settings.IsWeatherInfoAcquisitionEnabledUseCase
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import com.websarva.wings.android.zuboradiary.ui.model.DiaryEditAppMessage
@@ -708,8 +708,8 @@ internal class DiaryEditViewModel @Inject constructor(
 
                 diaryStateFlow.update(diary)
             }
-            is UseCaseResult.Error -> {
-                Log.e(logTag, "${logMsg}_失敗", result.error)
+            is UseCaseResult.Failure -> {
+                Log.e(logTag, "${logMsg}_失敗", result.exception)
                 if (hasPreparedDiary) {
                     emitAppMessageEvent(DiaryEditAppMessage.DiaryLoadingFailure)
                 } else {
@@ -749,7 +749,7 @@ internal class DiaryEditViewModel @Inject constructor(
                         .NavigateDiaryShowFragment(diary.date)
                 )
             }
-            is UseCaseResult.Error -> {
+            is UseCaseResult.Failure -> {
                 Log.e(logTag, "${logMsg}失敗")
                 emitAppMessageEvent(DiaryEditAppMessage.DiarySavingFailure)
             }
@@ -775,13 +775,13 @@ internal class DiaryEditViewModel @Inject constructor(
                         )
                 )
             }
-            is UseCaseResult.Error -> {
-                when (result.error) {
-                    is DeleteDiaryError.DeleteDiary -> {
+            is UseCaseResult.Failure -> {
+                when (result.exception) {
+                    is DeleteDiaryUseCaseException.DeleteDiaryFailed -> {
                         Log.e(logTag, "${logMsg}失敗")
                         emitAppMessageEvent(DiaryEditAppMessage.DiaryDeleteFailure)
                     }
-                    is DeleteDiaryError.ReleaseUriPermission -> {
+                    is DeleteDiaryUseCaseException.RevokePersistentAccessUriFailed -> {
                         Log.i(logTag, "${logMsg}完了(Uri開放失敗)")
                         emitViewModelEvent(
                             DiaryEditEvent
@@ -818,7 +818,7 @@ internal class DiaryEditViewModel @Inject constructor(
                     onConfirmationNotNeeded()
                 }
             }
-            is UseCaseResult.Error -> {
+            is UseCaseResult.Failure -> {
                 emitAppMessageEvent(DiaryEditAppMessage.DiaryInfoLoadingFailure)
                 updateViewModelIdleState()
             }
@@ -850,7 +850,7 @@ internal class DiaryEditViewModel @Inject constructor(
                     onConfirmationNotNeeded()
                 }
             }
-            is UseCaseResult.Error -> {
+            is UseCaseResult.Failure -> {
                 emitAppMessageEvent(
                     DiaryEditAppMessage.DiarySavingFailure
                 )
@@ -898,7 +898,7 @@ internal class DiaryEditViewModel @Inject constructor(
             is UseCaseResult.Success -> {
                 onResult(result.value)
             }
-            is UseCaseResult.Error -> {
+            is UseCaseResult.Failure -> {
                 emitAppMessageEvent(DiaryEditAppMessage.SettingLoadingFailure)
                 updateViewModelIdleState()
             }
@@ -925,7 +925,7 @@ internal class DiaryEditViewModel @Inject constructor(
                     onConfirmationNotNeeded()
                 }
             }
-            is UseCaseResult.Error -> {
+            is UseCaseResult.Failure -> {
                 emitAppMessageEvent(DiaryEditAppMessage.DiaryInfoLoadingFailure)
                 updateViewModelIdleState()
             }
@@ -942,7 +942,7 @@ internal class DiaryEditViewModel @Inject constructor(
             is UseCaseResult.Success -> {
                 onResult(result.value)
             }
-            is UseCaseResult.Error -> {
+            is UseCaseResult.Failure -> {
                 // Errorにならないため処理不要
             }
         }
@@ -967,18 +967,18 @@ internal class DiaryEditViewModel @Inject constructor(
                 updateWeather1(result.value)
                 updateWeather2(Weather.UNKNOWN)
             }
-            is UseCaseResult.Error -> {
-                when (result.error) {
-                    is FetchWeatherInfoError.LocationPermissionNotGranted -> {
+            is UseCaseResult.Failure -> {
+                when (result.exception) {
+                    is AcquireWeatherInfoUseCaseException.LocationPermissionNotGranted -> {
                         emitAppMessageEvent(DiaryEditAppMessage.AccessLocationPermissionRequest)
                     }
-                    is FetchWeatherInfoError.AccessLocation -> {
+                    is AcquireWeatherInfoUseCaseException.AccessLocationFailed -> {
                         emitAppMessageEvent(DiaryEditAppMessage.WeatherInfoLoadingFailure)
                     }
-                    is FetchWeatherInfoError.WeatherInfoDateOutOfRange -> {
+                    is AcquireWeatherInfoUseCaseException.WeatherInfoDateOutOfRange -> {
                         emitAppMessageEvent(DiaryEditAppMessage.WeatherInfoDateOutOfRange)
                     }
-                    is FetchWeatherInfoError.LoadWeatherInfo -> {
+                    is AcquireWeatherInfoUseCaseException.AcquireWeatherInfoFailed -> {
                         emitAppMessageEvent(DiaryEditAppMessage.WeatherInfoLoadingFailure)
                     }
                 }
@@ -1101,7 +1101,7 @@ internal class DiaryEditViewModel @Inject constructor(
             is UseCaseResult.Success<Boolean> -> {
                 onResult(result.value)
             }
-            is UseCaseResult.Error -> {
+            is UseCaseResult.Failure -> {
                 // 処理不要
             }
         }
@@ -1130,7 +1130,7 @@ internal class DiaryEditViewModel @Inject constructor(
                         is UseCaseResult.Success -> {
                             if (result.value) continue
                         }
-                        is UseCaseResult.Error -> {
+                        is UseCaseResult.Failure -> {
                             emitAppMessageEvent(DiaryEditAppMessage.DiaryInfoLoadingFailure)
                             isTesting = false
                             return@launch
@@ -1170,7 +1170,7 @@ internal class DiaryEditViewModel @Inject constructor(
                         is UseCaseResult.Success -> {
                             // 処理なし
                         }
-                        is UseCaseResult.Error -> {
+                        is UseCaseResult.Failure -> {
                             isTesting = false
                             return@launch
                         }

@@ -5,7 +5,7 @@ import android.util.Log
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.data.repository.DiaryRepository
 import com.websarva.wings.android.zuboradiary.domain.exception.diary.DeleteDiaryFailedException
-import com.websarva.wings.android.zuboradiary.domain.usecase.diary.error.DeleteDiaryError
+import com.websarva.wings.android.zuboradiary.domain.usecase.exception.DeleteDiaryUseCaseException
 import com.websarva.wings.android.zuboradiary.domain.usecase.uri.ReleaseUriPermissionUseCase
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import java.time.LocalDate
@@ -21,16 +21,16 @@ internal class DeleteDiaryUseCase(
     suspend operator fun invoke(
         loadedDate: LocalDate,
         loadedPicturePath: Uri?
-    ): UseCaseResult<Unit, DeleteDiaryError> {
+    ): UseCaseResult<Unit, DeleteDiaryUseCaseException> {
         val logMsg = "日記削除_"
         Log.i(logTag, "${logMsg}開始")
 
         try {
             deleteDiary(loadedDate)
             if (loadedPicturePath != null) releasePictureUriPermission(loadedPicturePath)
-        } catch (e: DeleteDiaryError) {
+        } catch (e: DeleteDiaryUseCaseException) {
             Log.e(logTag, "${logMsg}失敗", e)
-            return UseCaseResult.Error(e)
+            return UseCaseResult.Failure(e)
         }
 
         Log.i(logTag, "${logMsg}完了")
@@ -46,7 +46,7 @@ internal class DeleteDiaryUseCase(
         try {
             diaryRepository.deleteDiary(date)
         } catch (e: DeleteDiaryFailedException) {
-            throw DeleteDiaryError.DeleteDiary(e)
+            throw DeleteDiaryUseCaseException.DeleteDiaryFailed(e)
         }
 
         Log.i(logTag, "${logMsg}完了")
@@ -62,8 +62,8 @@ internal class DeleteDiaryUseCase(
             is UseCaseResult.Success -> {
                 // 処理なし
             }
-            is UseCaseResult.Error -> {
-                throw DeleteDiaryError.ReleaseUriPermission(result.error)
+            is UseCaseResult.Failure -> {
+                throw DeleteDiaryUseCaseException.RevokePersistentAccessUriFailed(result.exception)
             }
         }
 

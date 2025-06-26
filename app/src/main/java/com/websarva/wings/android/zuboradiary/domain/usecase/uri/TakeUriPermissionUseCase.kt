@@ -4,7 +4,8 @@ import android.net.Uri
 import android.util.Log
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.data.repository.UriRepository
-import com.websarva.wings.android.zuboradiary.domain.usecase.uri.error.UriError
+import com.websarva.wings.android.zuboradiary.domain.exception.uri.EnsurePersistentAccessUriFailedException
+import com.websarva.wings.android.zuboradiary.domain.usecase.DefaultUseCaseResult
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 
 // TODO: [画像表示の永続化改善] 現在は画像URIを直接参照しているが、以下の課題があるため、
@@ -36,7 +37,7 @@ internal class TakeUriPermissionUseCase(
 
     private val logTag = createLogTag()
 
-    operator fun invoke(uri: Uri): UseCaseResult<Unit, UriError.TakePermission> {
+    operator fun invoke(uri: Uri): DefaultUseCaseResult<Unit> {
         val logMsg = "Uri権限取得_"
         Log.i(logTag, "${logMsg}開始")
 
@@ -44,9 +45,9 @@ internal class TakeUriPermissionUseCase(
             uriRepository.takePersistablePermission(uri)
             Log.i(logTag, "${logMsg}完了")
             UseCaseResult.Success(Unit)
-        } catch (e: UriError.TakePermission) {
+        } catch (e: EnsurePersistentAccessUriFailedException) {
             Log.e(logTag, "${logMsg}失敗", e)
-            UseCaseResult.Error(e)
+            UseCaseResult.Failure(e)
         }
     }
 }

@@ -2,12 +2,13 @@ package com.websarva.wings.android.zuboradiary.domain.usecase.diary
 
 import android.net.Uri
 import android.util.Log
-import com.websarva.wings.android.zuboradiary.domain.usecase.diary.error.SaveDiaryError
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.data.repository.DiaryRepository
+import com.websarva.wings.android.zuboradiary.domain.exception.DomainException
 import com.websarva.wings.android.zuboradiary.domain.exception.diary.SaveDiaryFailedException
 import com.websarva.wings.android.zuboradiary.domain.model.Diary
 import com.websarva.wings.android.zuboradiary.domain.model.DiaryItemTitleSelectionHistoryItem
+import com.websarva.wings.android.zuboradiary.domain.usecase.DefaultUseCaseResult
 import com.websarva.wings.android.zuboradiary.domain.usecase.uri.ReleaseUriPermissionUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.uri.TakeUriPermissionUseCase
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
@@ -25,7 +26,7 @@ internal class SaveDiaryUseCase(
         diary: Diary,
         diaryItemTitleSelectionHistoryItemList: List<DiaryItemTitleSelectionHistoryItem>,
         loadedDiary: Diary?
-    ): UseCaseResult<Unit, SaveDiaryError> {
+    ): DefaultUseCaseResult<Unit> {
         val logMsg = "日記保存_"
         Log.i(logTag, "${logMsg}開始")
 
@@ -44,9 +45,9 @@ internal class SaveDiaryUseCase(
                 savedPicturePath,
                 loadedPicturePath
             )
-        } catch (e: SaveDiaryError) {
+        } catch (e: DomainException) {
             Log.e(logTag, "${logMsg}失敗", e)
-            return UseCaseResult.Error(e)
+            return UseCaseResult.Failure(e)
         }
 
         Log.e(logTag, "${logMsg}完了")
@@ -65,29 +66,22 @@ internal class SaveDiaryUseCase(
 
         val saveDate = diary.date
         if (shouldDeleteLoadedDateDiary(saveDate, loadedDate)) {
-            try {
-                diaryRepository
-                    .deleteAndSaveDiary(
-                        requireNotNull(loadedDate),
-                        diary,
-                        diaryItemTitleSelectionHistoryItemList
-                    )
-            } catch (e: SaveDiaryFailedException) {
-                throw SaveDiaryError.SaveDiary(e)
-            }
+            diaryRepository
+                .deleteAndSaveDiary(
+                    requireNotNull(loadedDate),
+                    diary,
+                    diaryItemTitleSelectionHistoryItemList
+                )
         } else {
-            try {
-                diaryRepository
-                    .saveDiary(diary, diaryItemTitleSelectionHistoryItemList)
-            } catch (e: SaveDiaryFailedException) {
-                throw SaveDiaryError.SaveDiary(e)
-            }
+            diaryRepository
+                .saveDiary(diary, diaryItemTitleSelectionHistoryItemList)
         }
 
 
         Log.i(logTag, "${logMsg}完了")
     }
 
+    @Throws(DomainException::class)
     private fun shouldDeleteLoadedDateDiary(
         inputDate: LocalDate,
         loadedDate: LocalDate?
@@ -96,6 +90,7 @@ internal class SaveDiaryUseCase(
 
         return inputDate != loadedDate
     }
+
 
     private suspend fun managePictureUriPermission(
         savedPicturePath: Uri?,
@@ -109,8 +104,8 @@ internal class SaveDiaryUseCase(
                 is UseCaseResult.Success -> {
                     // 処理なし
                 }
-                is UseCaseResult.Error -> {
-                    throw SaveDiaryError.ManageUriPermission(result.error)
+                is UseCaseResult.Failure -> {
+                    throw result.exception
                 }
             }
         }
@@ -120,8 +115,8 @@ internal class SaveDiaryUseCase(
                 is UseCaseResult.Success -> {
                     // 処理なし
                 }
-                is UseCaseResult.Error -> {
-                    throw SaveDiaryError.ManageUriPermission(result.error)
+                is UseCaseResult.Failure -> {
+                    throw result.exception
                 }
             }
         }
