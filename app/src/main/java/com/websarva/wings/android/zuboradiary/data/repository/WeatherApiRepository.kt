@@ -7,7 +7,7 @@ import com.websarva.wings.android.zuboradiary.data.network.WeatherApiAccessExcep
 import com.websarva.wings.android.zuboradiary.data.network.WeatherApiDataSource
 import com.websarva.wings.android.zuboradiary.data.network.WeatherApiDataSource.Companion.MAX_PAST_DAYS
 import com.websarva.wings.android.zuboradiary.data.network.WeatherApiDataSource.Companion.MIN_PAST_DAYS
-import com.websarva.wings.android.zuboradiary.domain.usecase.diary.error.WeatherInfoError
+import com.websarva.wings.android.zuboradiary.domain.exception.weather.AcquireWeatherInfoFailedException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.time.LocalDate
@@ -18,18 +18,18 @@ internal class WeatherApiRepository (private val weatherApiDataSource: WeatherAp
         return weatherApiDataSource.canFetchWeatherInfo(date)
     }
 
-    @Throws(WeatherInfoError.LoadWeatherInfo::class)
+    @Throws(AcquireWeatherInfoFailedException::class)
     suspend fun fetchTodayWeatherInfo(geoCoordinates: GeoCoordinates): Weather {
         return withContext(Dispatchers.IO) {
             try {
                 weatherApiDataSource.fetchTodayWeatherInfo(geoCoordinates)
             } catch (e: WeatherApiAccessException) {
-                throw WeatherInfoError.LoadWeatherInfo(e)
+                throw AcquireWeatherInfoFailedException(e)
             }
         }
     }
 
-    @Throws(WeatherInfoError.LoadWeatherInfo::class)
+    @Throws(AcquireWeatherInfoFailedException::class)
     suspend fun fetchPastDayWeatherInfo(
         geoCoordinates: GeoCoordinates,
         @IntRange(from = MIN_PAST_DAYS.toLong(), to = MAX_PAST_DAYS.toLong())
@@ -39,7 +39,7 @@ internal class WeatherApiRepository (private val weatherApiDataSource: WeatherAp
             try {
                 weatherApiDataSource.fetchPastDayWeatherInfo(geoCoordinates, numPastDays)
             } catch (e: WeatherApiAccessException) {
-                throw WeatherInfoError.LoadWeatherInfo(e)
+                throw AcquireWeatherInfoFailedException(e)
             }
         }
     }

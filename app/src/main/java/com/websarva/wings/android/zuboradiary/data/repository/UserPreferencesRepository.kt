@@ -8,7 +8,12 @@ import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColorPrefere
 import com.websarva.wings.android.zuboradiary.data.preferences.UserPreferences
 import com.websarva.wings.android.zuboradiary.data.preferences.UserPreferencesAccessException
 import com.websarva.wings.android.zuboradiary.data.preferences.WeatherInfoAcquisitionPreference
-import com.websarva.wings.android.zuboradiary.domain.model.error.UserSettingsError
+import com.websarva.wings.android.zuboradiary.domain.exception.settings.InitializeSettingsFailedException
+import com.websarva.wings.android.zuboradiary.domain.exception.settings.UpdateCalendarStartDayOfWeekSettingFailedException
+import com.websarva.wings.android.zuboradiary.domain.exception.settings.UpdatePassCodeSettingFailedException
+import com.websarva.wings.android.zuboradiary.domain.exception.settings.UpdateReminderNotificationSettingFailedException
+import com.websarva.wings.android.zuboradiary.domain.exception.settings.UpdateThemeColorSettingFailedException
+import com.websarva.wings.android.zuboradiary.domain.exception.settings.UpdateWeatherInfoAcquisitionSettingFailedException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
@@ -19,58 +24,77 @@ internal class UserPreferencesRepository(private val userPreferences: UserPrefer
         return userPreferences.loadAllPreferences()
     }
 
-    @Throws(UserSettingsError.UpdateSettings::class)
-    private suspend fun executePreferenceUpdate(
-        updateOperation: suspend () -> Unit // 実行したい更新処理をラムダとして受け取る
-    ){
-        return try {
-            withContext(Dispatchers.IO) {
-                updateOperation()
-            }
-        } catch (e: UserPreferencesAccessException) {
-            throw UserSettingsError.UpdateSettings(e)
-        }
-    }
-
-    @Throws(UserSettingsError.UpdateSettings::class)
+    @Throws(UpdateThemeColorSettingFailedException::class)
     suspend fun saveThemeColorPreference(preference: ThemeColorPreference) {
-        executePreferenceUpdate {
-            userPreferences.saveThemeColorPreference(preference)
+        withContext(Dispatchers.IO) {
+            try {
+                userPreferences.saveThemeColorPreference(preference)
+            } catch (e: UserPreferencesAccessException) {
+                throw UpdateThemeColorSettingFailedException(preference.themeColor, e)
+            }
         }
     }
 
-    @Throws(UserSettingsError.UpdateSettings::class)
+    @Throws(UpdateCalendarStartDayOfWeekSettingFailedException::class)
     suspend fun saveCalendarStartDayOfWeekPreference(preference: CalendarStartDayOfWeekPreference) {
-        executePreferenceUpdate {
-            userPreferences.saveCalendarStartDayOfWeekPreference(preference)
+        withContext(Dispatchers.IO) {
+            try {
+                userPreferences.saveCalendarStartDayOfWeekPreference(preference)
+            } catch (e: UserPreferencesAccessException) {
+                throw UpdateCalendarStartDayOfWeekSettingFailedException(preference.dayOfWeek,e)
+            }
         }
     }
 
-    @Throws(UserSettingsError.UpdateSettings::class)
+    @Throws(UpdateReminderNotificationSettingFailedException::class)
     suspend fun saveReminderNotificationPreference(preference: ReminderNotificationPreference) {
-        executePreferenceUpdate {
-            userPreferences.saveReminderNotificationPreference(preference)
+        withContext(Dispatchers.IO) {
+            try {
+                userPreferences.saveReminderNotificationPreference(preference)
+            } catch (e: UserPreferencesAccessException) {
+                throw UpdateReminderNotificationSettingFailedException(
+                    preference.isChecked,
+                    preference.notificationLocalTime,
+                    e
+                )
+            }
         }
     }
 
-    @Throws(UserSettingsError.UpdateSettings::class)
+    @Throws(UpdatePassCodeSettingFailedException::class)
     suspend fun savePasscodeLockPreference(preference: PassCodeLockPreference) {
-        executePreferenceUpdate {
-            userPreferences.savePasscodeLockPreference(preference)
+        withContext(Dispatchers.IO) {
+            try {
+                userPreferences.savePasscodeLockPreference(preference)
+            } catch (e: UserPreferencesAccessException) {
+                throw UpdatePassCodeSettingFailedException(
+                    preference.isChecked,
+                    preference.passCode,
+                    e
+                )
+            }
         }
     }
 
-    @Throws(UserSettingsError.UpdateSettings::class)
+    @Throws(UpdateWeatherInfoAcquisitionSettingFailedException::class)
     suspend fun saveWeatherInfoAcquisitionPreference(preference: WeatherInfoAcquisitionPreference) {
-        executePreferenceUpdate {
-            userPreferences.saveWeatherInfoAcquisitionPreference(preference)
+        withContext(Dispatchers.IO) {
+            try {
+                userPreferences.saveWeatherInfoAcquisitionPreference(preference)
+            } catch (e: UserPreferencesAccessException) {
+                throw UpdateWeatherInfoAcquisitionSettingFailedException(preference.isChecked, e)
+            }
         }
     }
 
-    @Throws(UserSettingsError.UpdateSettings::class)
+    @Throws(InitializeSettingsFailedException::class)
     suspend fun initializeAllPreferences() {
-        executePreferenceUpdate {
-            userPreferences.initializeAllPreferences()
+        withContext(Dispatchers.IO) {
+            try {
+                userPreferences.initializeAllPreferences()
+            } catch (e: UserPreferencesAccessException) {
+                throw InitializeSettingsFailedException(e)
+            }
         }
     }
 }

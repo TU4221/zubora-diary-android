@@ -3,7 +3,6 @@ package com.websarva.wings.android.zuboradiary.data.database
 import android.database.sqlite.SQLiteException
 import android.net.Uri
 import android.util.Log
-import com.websarva.wings.android.zuboradiary.domain.model.error.DiaryItemTitleSelectionHistoryError
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import kotlinx.coroutines.flow.Flow
 import java.time.LocalDate
@@ -194,7 +193,7 @@ internal class DiaryDataSource(
         }
     }
 
-    @Throws(DiaryItemTitleSelectionHistoryError.DeleteSelectionHistoryItem::class)
+    @Throws(DataBaseAccessException::class)
     suspend fun deleteHistoryItem(title: String) {
         return executeSuspendDbOperation {
             diaryItemTitleSelectionHistoryDAO.deleteHistoryItem(title)

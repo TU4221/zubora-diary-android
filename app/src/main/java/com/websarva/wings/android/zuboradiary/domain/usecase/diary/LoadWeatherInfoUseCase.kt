@@ -7,8 +7,8 @@ import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.data.model.Weather
 import com.websarva.wings.android.zuboradiary.data.repository.LocationRepository
 import com.websarva.wings.android.zuboradiary.data.repository.WeatherApiRepository
-import com.websarva.wings.android.zuboradiary.domain.usecase.diary.error.LocationError
-import com.websarva.wings.android.zuboradiary.domain.usecase.diary.error.WeatherInfoError
+import com.websarva.wings.android.zuboradiary.domain.exception.weather.AcquireWeatherInfoFailedException
+import com.websarva.wings.android.zuboradiary.domain.exception.location.ObtainCurrentLocationFailedException
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import java.time.LocalDate
 import java.time.temporal.ChronoUnit
@@ -68,7 +68,7 @@ internal class LoadWeatherInfoUseCase(
             val result = locationRepository.fetchLocation()
             Log.i(logTag, "${logMsg}完了")
             result
-        } catch (e: LocationError.AccessLocation) {
+        } catch (e: ObtainCurrentLocationFailedException) {
             throw FetchWeatherInfoError.AccessLocation(e)
         }
     }
@@ -91,7 +91,7 @@ internal class LoadWeatherInfoUseCase(
             }
             Log.i(logTag, "${logMsg}完了")
             result
-        } catch (e: WeatherInfoError.LoadWeatherInfo) {
+        } catch (e: AcquireWeatherInfoFailedException) {
             Log.i(logTag, "${logMsg}失敗")
             throw FetchWeatherInfoError.LoadWeatherInfo(e)
         }

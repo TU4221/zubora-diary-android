@@ -4,8 +4,8 @@ import android.net.Uri
 import android.util.Log
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.data.repository.DiaryRepository
+import com.websarva.wings.android.zuboradiary.domain.exception.diary.DeleteDiaryFailedException
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.error.DeleteDiaryError
-import com.websarva.wings.android.zuboradiary.domain.usecase.diary.error.DiaryError
 import com.websarva.wings.android.zuboradiary.domain.usecase.uri.ReleaseUriPermissionUseCase
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import java.time.LocalDate
@@ -45,7 +45,7 @@ internal class DeleteDiaryUseCase(
 
         try {
             diaryRepository.deleteDiary(date)
-        } catch (e: DiaryError.DeleteDiary) {
+        } catch (e: DeleteDiaryFailedException) {
             throw DeleteDiaryError.DeleteDiary(e)
         }
 

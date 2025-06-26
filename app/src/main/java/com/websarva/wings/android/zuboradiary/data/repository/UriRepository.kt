@@ -3,36 +3,38 @@ package com.websarva.wings.android.zuboradiary.data.repository
 import android.net.Uri
 import com.websarva.wings.android.zuboradiary.data.uri.UriPermissionDataSource
 import com.websarva.wings.android.zuboradiary.data.uri.UriPermissionOperationException
-import com.websarva.wings.android.zuboradiary.domain.usecase.uri.error.UriError
+import com.websarva.wings.android.zuboradiary.domain.exception.uri.EnsurePersistentAccessUriFailedException
+import com.websarva.wings.android.zuboradiary.domain.exception.uri.RevokePersistentAccessAllUriFailedException
+import com.websarva.wings.android.zuboradiary.domain.exception.uri.RevokePersistentAccessUriFailedException
 
 internal class UriRepository (
     private val dataSource: UriPermissionDataSource
 ) {
 
-    @Throws(UriError.TakePermission::class)
+    @Throws(EnsurePersistentAccessUriFailedException::class)
     fun takePersistablePermission(uri: Uri) {
         try {
             dataSource.takePersistablePermission(uri)
         } catch (e: UriPermissionOperationException) {
-            throw UriError.TakePermission(e)
+            throw EnsurePersistentAccessUriFailedException(uri, e)
         }
     }
 
-    @Throws(UriError.ReleasePermission::class)
+    @Throws(RevokePersistentAccessUriFailedException::class)
     fun releasePersistablePermission(uri: Uri) {
         try {
             dataSource.releasePersistablePermission(uri)
         } catch (e: UriPermissionOperationException) {
-            throw UriError.ReleasePermission(e)
+            throw RevokePersistentAccessUriFailedException(uri, e)
         }
     }
 
-    @Throws(UriError.ReleasePermission::class)
+    @Throws(RevokePersistentAccessAllUriFailedException::class)
     fun releaseAllPersistablePermission() {
         try {
             dataSource.releaseAllPersistablePermission()
         } catch (e: UriPermissionOperationException) {
-            throw UriError.ReleasePermission(e)
+            throw RevokePersistentAccessAllUriFailedException(e)
         }
     }
 }

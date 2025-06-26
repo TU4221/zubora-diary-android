@@ -4,18 +4,18 @@ import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseError
 
 internal sealed class DeleteDiaryError(
     message: String,
-    cause: Throwable? = null
+    cause: Throwable
 ) : UseCaseError(message, cause) {
 
     class DeleteDiary(
-        cause: Throwable? = null
+        cause: Throwable
     ) : DeleteDiaryError(
         "日記削除に失敗しました。",
         cause
     )
 
     class ReleaseUriPermission(
-        cause: Throwable?
+        cause: Throwable
     ) : DeleteDiaryError(
         "Uri権限解放に失敗しました。",
         cause

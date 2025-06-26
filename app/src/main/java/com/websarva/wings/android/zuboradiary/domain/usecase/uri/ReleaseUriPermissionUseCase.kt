@@ -6,7 +6,7 @@ import com.websarva.wings.android.zuboradiary.domain.usecase.uri.error.ReleaseUr
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.data.repository.DiaryRepository
 import com.websarva.wings.android.zuboradiary.data.repository.UriRepository
-import com.websarva.wings.android.zuboradiary.domain.usecase.diary.error.DiaryError
+import com.websarva.wings.android.zuboradiary.domain.exception.diary.CheckDiaryPicturePathUsedFailedException
 import com.websarva.wings.android.zuboradiary.domain.usecase.uri.error.UriError
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 
@@ -26,7 +26,7 @@ internal class ReleaseUriPermissionUseCase(
         try {
             val existsPicturePath = diaryRepository.existsPicturePath(uri)
             if (existsPicturePath) return UseCaseResult.Success(Unit)
-        } catch (e: DiaryError.CheckPicturePathUsage) {
+        } catch (e: CheckDiaryPicturePathUsedFailedException) {
             val error = ReleaseUriPermissionError.CheckUriUsage(e)
             Log.e(logTag, "${logMsg}失敗", error)
             return UseCaseResult.Error(error)

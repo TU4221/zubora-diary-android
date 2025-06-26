@@ -1,8 +1,8 @@
-package com.websarva.wings.android.zuboradiary.domain.usecase
+package com.websarva.wings.android.zuboradiary.domain.exception.diary
 
 import com.websarva.wings.android.zuboradiary.domain.exception.DomainException
 
-internal open class UseCaseError(
+internal class LoadDiaryFailedException (
     message: String,
-    cause: Throwable?
+    cause: Throwable
 ) : DomainException(message, cause)

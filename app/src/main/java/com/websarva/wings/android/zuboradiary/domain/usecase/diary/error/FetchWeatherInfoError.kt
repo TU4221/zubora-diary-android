@@ -7,29 +7,20 @@ internal sealed class FetchWeatherInfoError(
     cause: Throwable? = null
 ) : UseCaseError(message, cause) {
 
-    class LocationPermissionNotGranted(
-        cause: Throwable? = null
-    ) : FetchWeatherInfoError(
-            "位置情報取得権限が未取得です。",
-            cause
-        )
+    class LocationPermissionNotGranted : FetchWeatherInfoError("位置情報取得権限が未取得です。")
 
     class AccessLocation(
-        cause: Throwable? = null
+        cause: Throwable
     ) : FetchWeatherInfoError(
         "位置情報取得に失敗しました。",
         cause
     )
 
-    class WeatherInfoDateOutOfRange(
-        cause: Throwable? = null
-    ) : FetchWeatherInfoError(
-        "選択した日付は、天気情報を取得できる範囲を超えています。 ",
-        cause
-    )
+    class WeatherInfoDateOutOfRange :
+        FetchWeatherInfoError("選択した日付は、天気情報を取得できる範囲を超えています。 ")
 
     class LoadWeatherInfo(
-        cause: Throwable? = null
+        cause: Throwable
     ) : FetchWeatherInfoError(
         "天気情報取得に失敗しました。",
         cause
