@@ -16,7 +16,7 @@ internal class IsWeatherInfoAcquisitionEnabledUseCase(
 
     private val logTag = createLogTag()
 
-    suspend operator fun invoke(): UseCaseResult<Boolean, Nothing> {
+    suspend operator fun invoke(): UseCaseResult.Success<Boolean> {
         val logMsg = "天気情報取得設定確認_"
         Log.i(logTag, "${logMsg}開始")
 

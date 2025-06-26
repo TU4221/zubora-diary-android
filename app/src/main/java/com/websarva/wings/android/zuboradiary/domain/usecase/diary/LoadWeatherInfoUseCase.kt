@@ -26,8 +26,7 @@ internal class LoadWeatherInfoUseCase(
         val logMsg = "天気情報取得_"
         Log.i(logTag, "${logMsg}開始")
 
-        val canLoadWeatherInfo = canLoadWeatherInfo(date)
-        if (!canLoadWeatherInfo) {
+        if (!canLoadWeatherInfoUseCase(date).value) {
             return UseCaseResult.Failure(
                 AcquireWeatherInfoUseCaseException.WeatherInfoDateOutOfRange()
             )
@@ -47,18 +46,6 @@ internal class LoadWeatherInfoUseCase(
         } catch (e: AcquireWeatherInfoUseCaseException) {
             Log.e(logTag, "${logMsg}失敗", e)
             return UseCaseResult.Failure(e)
-        }
-    }
-
-    private fun canLoadWeatherInfo(date: LocalDate): Boolean {
-        return when (val result = canLoadWeatherInfoUseCase(date)) {
-            is UseCaseResult.Success -> {
-                result.value
-            }
-            is UseCaseResult.Failure -> {
-                // canLoadWeatherInfoUseCaseは常時Successの為、処理不要。
-                false
-            }
         }
     }
 

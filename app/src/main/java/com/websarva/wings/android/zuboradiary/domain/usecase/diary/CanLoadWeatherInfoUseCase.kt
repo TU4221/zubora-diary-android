@@ -12,7 +12,7 @@ internal class CanLoadWeatherInfoUseCase(
 
     private val logTag = createLogTag()
 
-    operator fun invoke(date: LocalDate): UseCaseResult<Boolean, Nothing> {
+    operator fun invoke(date: LocalDate): UseCaseResult.Success<Boolean> {
         val logMsg = "天気情報取得可能日確認_"
         Log.i(logTag, "${logMsg}開始")
         val canFetch = weatherApiRepository.canFetchWeatherInfo(date)

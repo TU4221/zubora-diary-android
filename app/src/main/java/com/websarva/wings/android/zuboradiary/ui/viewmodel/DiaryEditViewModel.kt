@@ -863,45 +863,26 @@ internal class DiaryEditViewModel @Inject constructor(
     // TODO:コールバック構成の代替案を検討する。(他処理メソッドも同様に)
     // TODO:State更新タイミングの代替案を検討する。(他処理メソッドも同様に)
     private suspend fun processWeatherInfoAcquisition(date: LocalDate, previousDate: LocalDate?) {
-        checkWeatherInfoAcquisitionEnabled { isEnabled ->
-            if (!isEnabled) {
-                updateViewModelIdleState()
-                return@checkWeatherInfoAcquisitionEnabled
-            }
-
-            requestWeatherInfoConfirmation(
-                date,
-                previousDate
-            ) {
-
-                checkShouldLoadWeatherInfo(
-                    date,
-                    previousDate
-                ) { shouldLoad ->
-                    if (!shouldLoad) {
-                        updateViewModelIdleState()
-                        return@checkShouldLoadWeatherInfo
-                    }
-
-                    val parameters = WeatherInfoAcquisitionParameters(date)
-                    checkPermissionBeforeWeatherInfoAcquisition(parameters)
-                }
-            }
-        }
-    }
-
-    private suspend fun checkWeatherInfoAcquisitionEnabled(
-        onResult: suspend (Boolean) -> Unit
-    ) {
         updateViewModelState(DiaryEditState.WeatherFetching)
-        when (val result = isWeatherInfoAcquisitionEnabledUseCase()) {
-            is UseCaseResult.Success -> {
-                onResult(result.value)
-            }
-            is UseCaseResult.Failure -> {
-                emitAppMessageEvent(DiaryEditAppMessage.SettingLoadingFailure)
+        val isEnabled = isWeatherInfoAcquisitionEnabledUseCase().value
+        if (!isEnabled) {
+            updateViewModelIdleState()
+            return
+        }
+
+        requestWeatherInfoConfirmation(
+            date,
+            previousDate
+        ) {
+
+            val shouldLoad = shouldLoadWeatherInfoUseCase(date, previousDate).value
+            if (!shouldLoad) {
                 updateViewModelIdleState()
+                return@requestWeatherInfoConfirmation
             }
+
+            val parameters = WeatherInfoAcquisitionParameters(date)
+            checkPermissionBeforeWeatherInfoAcquisition(parameters)
         }
     }
 
@@ -913,40 +894,15 @@ internal class DiaryEditViewModel @Inject constructor(
         updateViewModelState(DiaryEditState.WeatherFetching)
         val result =
             shouldRequestWeatherInfoConfirmationUseCase(date, previousDate)
-        when (result) {
-            is UseCaseResult.Success -> {
-                if (result.value) {
-                    val parameters = WeatherInfoAcquisitionParameters(date)
-                    emitViewModelEvent(
-                        DiaryEditEvent.NavigateWeatherInfoFetchingDialog(parameters)
-                    )
-                    updateViewModelIdleState()
-                } else {
-                    onConfirmationNotNeeded()
-                }
-            }
-            is UseCaseResult.Failure -> {
-                emitAppMessageEvent(DiaryEditAppMessage.DiaryInfoLoadingFailure)
-                updateViewModelIdleState()
-            }
+        if (result.value) {
+            val parameters = WeatherInfoAcquisitionParameters(date)
+            emitViewModelEvent(
+                DiaryEditEvent.NavigateWeatherInfoFetchingDialog(parameters)
+            )
+            updateViewModelIdleState()
+        } else {
+            onConfirmationNotNeeded()
         }
-    }
-
-    private suspend fun checkShouldLoadWeatherInfo(
-        date: LocalDate,
-        previousDate: LocalDate?,
-        onResult: suspend (Boolean) -> Unit
-    ) {
-        updateViewModelState(DiaryEditState.WeatherFetching)
-        when (val result = shouldLoadWeatherInfoUseCase(date, previousDate)) {
-            is UseCaseResult.Success -> {
-                onResult(result.value)
-            }
-            is UseCaseResult.Failure -> {
-                // Errorにならないため処理不要
-            }
-        }
-
     }
 
     private suspend fun checkPermissionBeforeWeatherInfoAcquisition(
@@ -1075,35 +1031,16 @@ internal class DiaryEditViewModel @Inject constructor(
         diary: Diary,
         loadedDiary: Diary?
     ) {
-        requestExitWithoutDiarySavingConfirmation(
-            diary,
-            loadedDiary
-        ) { shouldRequest ->
-            if (shouldRequest) {
-                val parameters = NavigatePreviousParameters(loadedDiary)
-                emitViewModelEvent(
-                    DiaryEditEvent
-                        .NavigateExitWithoutDiarySavingConfirmationDialog(parameters)
-                )
-            } else {
-                navigatePreviousFragment(loadedDiary)
-            }
-        }
-    }
-
-    private suspend fun requestExitWithoutDiarySavingConfirmation(
-        diary: Diary,
-        loadedDiary: Diary?,
-        onResult: suspend (Boolean) -> Unit
-    ) {
-        val result = shouldRequestExitWithoutDiarySavingConfirmationUseCase(diary, loadedDiary)
-        when (result) {
-            is UseCaseResult.Success<Boolean> -> {
-                onResult(result.value)
-            }
-            is UseCaseResult.Failure -> {
-                // 処理不要
-            }
+        val shouldRequest =
+            shouldRequestExitWithoutDiarySavingConfirmationUseCase(diary, loadedDiary).value
+        if (shouldRequest) {
+            val parameters = NavigatePreviousParameters(loadedDiary)
+            emitViewModelEvent(
+                DiaryEditEvent
+                    .NavigateExitWithoutDiarySavingConfirmationDialog(parameters)
+            )
+        } else {
+            navigatePreviousFragment(loadedDiary)
         }
     }
 

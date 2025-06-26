@@ -12,7 +12,7 @@ internal class ShouldLoadWeatherInfoUseCase {
     operator fun invoke(
         inputDate: LocalDate,
         previousDate: LocalDate?
-    ): UseCaseResult<Boolean, Nothing> {
+    ): UseCaseResult.Success<Boolean> {
         val logMsg = "天気情報取得要確認_"
         Log.i(logTag, "${logMsg}開始")
 

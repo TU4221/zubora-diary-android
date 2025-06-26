@@ -14,7 +14,7 @@ internal class ShouldRequestWeatherInfoConfirmationUseCase(
     operator fun invoke(
         inputDate: LocalDate,
         previousDate: LocalDate?
-    ): UseCaseResult<Boolean, Nothing> {
+    ): UseCaseResult.Success<Boolean> {
         val logMsg = "天気情報取得確認要求確認_"
         Log.i(logTag, "${logMsg}開始")
 
@@ -23,17 +23,8 @@ internal class ShouldRequestWeatherInfoConfirmationUseCase(
             return UseCaseResult.Success(false)
         }
 
-        when (val result = shouldLoadWeatherInfoUseCase(inputDate, previousDate)) {
-            is UseCaseResult.Success -> {
-                Log.i(logTag, "${logMsg}完了")
-                return UseCaseResult.Success(result.value)
-            }
-            is UseCaseResult.Failure -> {
-                // 処理不要
-            }
-        }
-
+        val result = shouldLoadWeatherInfoUseCase(inputDate, previousDate)
         Log.i(logTag, "${logMsg}完了")
-        return UseCaseResult.Success(false)
+        return UseCaseResult.Success(result.value)
     }
 }

@@ -186,13 +186,6 @@ internal sealed class DiaryEditAppMessage(
     ) {
         private fun readResolve(): Any = AccessLocationPermissionRequest
     }
-
-    data object SettingLoadingFailure :  DiaryEditAppMessage(
-        R.string.dialog_app_message_title_access_error,
-        R.string.dialog_diary_edit_app_message_setting_loading_failure
-    ) {
-        private fun readResolve(): Any = AccessLocationPermissionRequest
-    }
 }
 
 internal sealed class DiaryItemTitleEditAppMessage(
