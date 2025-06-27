@@ -89,6 +89,8 @@ internal class DiaryShowViewModel @Inject constructor(
 
     // BackPressed(戻るボタン)処理
     override fun onBackPressed() {
+        if (isProcessing) return
+
         viewModelScope.launch {
             navigatePreviousFragment()
         }
@@ -96,6 +98,8 @@ internal class DiaryShowViewModel @Inject constructor(
 
     // ViewClicked処理
     fun onDiaryEditMenuClicked() {
+        if (isProcessing) return
+
         val date = diaryStateFlow.date.requireValue()
         viewModelScope.launch {
             emitViewModelEvent(
@@ -105,6 +109,8 @@ internal class DiaryShowViewModel @Inject constructor(
     }
 
     fun onDiaryDeleteMenuClicked() {
+        if (isProcessing) return
+
         val date = diaryStateFlow.date.requireValue()
         val picturePath = diaryStateFlow.picturePath.value
         viewModelScope.launch {
@@ -116,6 +122,8 @@ internal class DiaryShowViewModel @Inject constructor(
     }
 
     fun onNavigationClicked() {
+        if (isProcessing) return
+
         viewModelScope.launch {
             navigatePreviousFragment()
         }
@@ -147,16 +155,13 @@ internal class DiaryShowViewModel @Inject constructor(
     }
 
     private fun onDiaryDeleteDialogPositiveResultReceived() {
-        updateViewModelState(DiaryShowState.Deleting)
         viewModelScope.launch {
             deleteDiary()
-            updateViewModelIdleState()
         }
     }
 
     // View状態処理
     fun onCalendarDaySelected(date: LocalDate) {
-        updateViewModelState(DiaryShowState.Loading)
         viewModelScope.launch {
             prepareDiaryForCalendarFragment(date)
             updateViewModelIdleState()
@@ -165,10 +170,8 @@ internal class DiaryShowViewModel @Inject constructor(
 
     // Fragment状態処理
     fun onFragmentViewCreated(date: LocalDate) {
-        updateViewModelState(DiaryShowState.Loading)
         viewModelScope.launch {
             prepareDiaryForDiaryShowFragment(date)
-            updateViewModelIdleState()
         }
     }
 
@@ -185,8 +188,10 @@ internal class DiaryShowViewModel @Inject constructor(
         val logMsg = "日記読込"
         Log.i(logTag, "${logMsg}_開始")
 
+        updateViewModelState(DiaryShowState.Loading)
         when (val result = fetchDiaryUseCase(date)) {
             is UseCaseResult.Success -> {
+                Log.i(logTag, "${logMsg}_完了")
                 val diary = result.value
                 diaryStateFlow.update(diary)
             }
@@ -201,8 +206,7 @@ internal class DiaryShowViewModel @Inject constructor(
                 }
             }
         }
-
-        Log.i(logTag, "${logMsg}_完了")
+        updateViewModelIdleState()
     }
 
     private suspend fun deleteDiary() {
@@ -212,6 +216,7 @@ internal class DiaryShowViewModel @Inject constructor(
         val date = diaryStateFlow.date.requireValue()
         val picturePath  = diaryStateFlow.picturePath.value
 
+        updateViewModelState(DiaryShowState.Deleting)
         when (val result = deleteDiaryUseCase(date, picturePath)) {
             is UseCaseResult.Success -> {
                 Log.i(logTag, "${logMsg}_完了")
@@ -239,6 +244,7 @@ internal class DiaryShowViewModel @Inject constructor(
                 }
             }
         }
+        updateViewModelIdleState()
     }
 
     // FragmentAction関係
