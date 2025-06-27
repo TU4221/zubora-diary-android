@@ -138,7 +138,7 @@ internal class DiaryShowViewModel @Inject constructor(
             DialogResult.Negative,
             DialogResult.Cancel -> {
                 viewModelScope.launch {
-                    navigatePreviousFragment(null)
+                    navigatePreviousFragment()
                 }
             }
         }
@@ -240,12 +240,12 @@ internal class DiaryShowViewModel @Inject constructor(
     }
 
     // FragmentAction関係
-    private suspend fun navigatePreviousFragment(date: LocalDate?) {
+    private suspend fun navigatePreviousFragment(loadedDiaryDate: LocalDate? = null) {
         val result =
-            if (date == null) {
+            if (loadedDiaryDate == null) {
                 FragmentResult.None
             } else {
-                FragmentResult.Some(date)
+                FragmentResult.Some(loadedDiaryDate)
             }
         emitViewModelEvent(
             DiaryShowEvent
