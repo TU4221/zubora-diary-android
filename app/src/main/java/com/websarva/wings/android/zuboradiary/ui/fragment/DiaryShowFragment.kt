@@ -110,9 +110,6 @@ internal class DiaryShowFragment : BaseFragment<FragmentDiaryShowBinding>() {
             is DiaryShowEvent.NavigatePreviousFragment -> {
                 navigatePreviousFragment(event.result)
             }
-            is DiaryShowEvent.NavigatePreviousFragmentOnDiaryDelete -> {
-                navigatePreviousFragment(event.result)
-            }
             is ViewModelEvent.NavigatePreviousFragment -> {
                 // MEMO:"DiaryShowEvent.NavigatePreviousFragment"を使用する為、
                 //      "ViewModelEvent.NavigatePreviousFragment"処理不要。
@@ -328,7 +325,7 @@ internal class DiaryShowFragment : BaseFragment<FragmentDiaryShowBinding>() {
         navigateFragment(NavigationCommand.To(directions))
     }
 
-    private fun navigatePreviousFragment(result: FragmentResult.Some<LocalDate>) {
+    private fun navigatePreviousFragment(result: FragmentResult<LocalDate>) {
         navigateFragment(NavigationCommand.Up(KEY_RESULT, result))
     }
 }
