@@ -48,17 +48,18 @@ internal class CalendarViewModel @Inject constructor(
     }
 
     fun onDiaryEditButtonClicked() {
+        val date = _selectedDate.value
         viewModelScope.launch {
-            navigateDiaryEditFragment()
+            navigateDiaryEditFragment(date)
         }
     }
 
     fun onBottomNavigationItemReselected() {
+        val selectedDate = _selectedDate.value
+        val today = LocalDate.now()
         viewModelScope.launch {
             // MEMO:StateFlowに現在値と同じ値を代入してもCollectメソッドに登録した処理が起動しないため、
             //      下記条件でカレンダースクロールのみ処理。
-            val selectedDate = _selectedDate.value
-            val today = LocalDate.now()
             if (selectedDate == today) {
                 emitViewModelEvent(
                     CalendarEvent.SmoothScrollCalendar(today)
@@ -89,15 +90,14 @@ internal class CalendarViewModel @Inject constructor(
     }
 
     // StateFlow値変更時処理
-    fun onChangedSelectedDate() {
+    fun onChangedSelectedDate(date: LocalDate) {
         viewModelScope.launch {
-            prepareDiary()
+            prepareDiary(date)
         }
     }
 
     // View変更処理
-    private suspend fun prepareDiary() {
-        val date = _selectedDate.value
+    private suspend fun prepareDiary(date: LocalDate) {
         val action =
             if (shouldSmoothScroll) {
                 shouldSmoothScroll = false
@@ -143,8 +143,7 @@ internal class CalendarViewModel @Inject constructor(
         }
     }
 
-    private suspend fun navigateDiaryEditFragment() {
-        val date = _selectedDate.value
+    private suspend fun navigateDiaryEditFragment(date: LocalDate) {
         val exists = existsSavedDiary(date) ?: false
         val isNewDiary = !exists
         emitViewModelEvent(

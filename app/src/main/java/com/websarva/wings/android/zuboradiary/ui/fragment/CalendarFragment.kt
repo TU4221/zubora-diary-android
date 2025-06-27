@@ -163,7 +163,7 @@ class CalendarFragment :
                     calendarMonthDayBinder.updateSelectedDate(value)
                     binding.calendar.notifyDateChanged(value) // 今回選択日付更新
                     updateToolBarDate(value)
-                    mainViewModel.onChangedSelectedDate()
+                    mainViewModel.onChangedSelectedDate(value)
                 }
         }
 
