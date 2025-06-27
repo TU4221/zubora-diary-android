@@ -7,12 +7,11 @@ import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.data.model.Weather
 import com.websarva.wings.android.zuboradiary.data.repository.LocationRepository
 import com.websarva.wings.android.zuboradiary.data.repository.WeatherInfoRepository
-import com.websarva.wings.android.zuboradiary.domain.exception.weather.FetchWeatherInfoFailedException
+import com.websarva.wings.android.zuboradiary.domain.exception.weather.FetchWeatherInfoException
 import com.websarva.wings.android.zuboradiary.domain.exception.location.FetchCurrentLocationFailedException
 import com.websarva.wings.android.zuboradiary.domain.usecase.DefaultUseCaseResult
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import java.time.LocalDate
-import java.time.temporal.ChronoUnit
 
 internal class FetchWeatherInfoUseCase(
     private val weatherInfoRepository: WeatherInfoRepository,
@@ -28,7 +27,7 @@ internal class FetchWeatherInfoUseCase(
 
         if (!canFetchWeatherInfoUseCase(date).value) {
             return UseCaseResult.Failure(
-                FetchWeatherInfoUseCaseException.WeatherInfoDateOutOfRange()
+                FetchWeatherInfoUseCaseException.WeatherInfoDateOutOfRange(date)
             )
         }
 
@@ -62,26 +61,21 @@ internal class FetchWeatherInfoUseCase(
     }
 
     private suspend fun fetchWeatherInfo(date: LocalDate, geoCoordinates: GeoCoordinates): Weather {
-        val logMsg = "天気情報Api通信_"
+        val logMsg = "天気情報取得_"
         Log.i(logTag, "${logMsg}開始")
 
-        val currentDate = LocalDate.now()
-        val betweenDays = ChronoUnit.DAYS.between(date, currentDate)
-
         return try {
-            val result = if (betweenDays == 0L) {
-                weatherInfoRepository.fetchTodayWeatherInfo(geoCoordinates)
-            } else {
-                weatherInfoRepository.fetchPastDayWeatherInfo(
-                    geoCoordinates,
-                    betweenDays.toInt()
-                )
-            }
+            val result = weatherInfoRepository.fetchWeatherInfo(date, geoCoordinates)
             Log.i(logTag, "${logMsg}完了")
             result
-        } catch (e: FetchWeatherInfoFailedException) {
-            Log.i(logTag, "${logMsg}失敗")
-            throw FetchWeatherInfoUseCaseException.FetchWeatherInfoFailed(e)
+        } catch (e: FetchWeatherInfoException) {
+            Log.e(logTag, "${logMsg}失敗")
+            when (e) {
+                is FetchWeatherInfoException.ApiAccessFailed ->
+                    throw FetchWeatherInfoUseCaseException.FetchWeatherInfoFailed(e)
+                is FetchWeatherInfoException.DateOutOfRange ->
+                    throw FetchWeatherInfoUseCaseException.WeatherInfoDateOutOfRange(date, e)
+            }
         }
     }
 }

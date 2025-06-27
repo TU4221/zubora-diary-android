@@ -28,6 +28,19 @@ internal class WeatherApiDataSource(private val weatherApiService: WeatherApiSer
     private val queryDiaryParameter = "weather_code"
     private val queryTimeZoneParameter = "Asia/Tokyo"
 
+    @Throws(WeatherApiException::class)
+    suspend fun fetchWeatherInfo(date: LocalDate, geoCoordinates: GeoCoordinates): Weather {
+        if (!canFetchWeatherInfo(date)) throw WeatherApiException.DateOutOfRange(date)
+
+        val currentDate = LocalDate.now()
+        return if (date == currentDate) {
+            fetchTodayWeatherInfo(geoCoordinates)
+        } else {
+            val betweenDays = ChronoUnit.DAYS.between(date, currentDate).toInt()
+            fetchPastDayWeatherInfo(geoCoordinates, betweenDays)
+        }
+    }
+
     fun canFetchWeatherInfo(date: LocalDate): Boolean {
         val currentDate = LocalDate.now()
 
@@ -42,7 +55,7 @@ internal class WeatherApiDataSource(private val weatherApiService: WeatherApiSer
         return result
     }
 
-    @Throws(WeatherApiAccessException::class)
+    @Throws(WeatherApiException.ApiAccessFailed::class)
     private suspend fun <R> executeWebApiOperation(
         operation: suspend () -> R
     ): R {
@@ -50,23 +63,23 @@ internal class WeatherApiDataSource(private val weatherApiService: WeatherApiSer
             operation()
         } catch (e: UnknownHostException) {
             // DNS解決に失敗した場合 (例: インターネット接続なし、ホスト名間違い)
-            throw WeatherApiAccessException(e)
+            throw WeatherApiException.ApiAccessFailed(e)
         } catch (e: ConnectException) {
             // サーバーへのTCP接続に失敗した場合 (例: サーバーダウン、ポートが開いていない)
-            throw WeatherApiAccessException(e)
+            throw WeatherApiException.ApiAccessFailed(e)
         } catch (e: java.net.SocketTimeoutException) {
             // 接続または読み取りタイムアウト
-            throw WeatherApiAccessException(e)
+            throw WeatherApiException.ApiAccessFailed(e)
         } catch (e: SSLException) {
             // SSL/TLS ハンドシェイクエラー
-            throw WeatherApiAccessException(e)
+            throw WeatherApiException.ApiAccessFailed(e)
         } catch (e: IOException) {
             // 上記以外の一般的なI/Oエラー (例: 予期せぬ接続切断など)
-            throw WeatherApiAccessException(e)
+            throw WeatherApiException.ApiAccessFailed(e)
         }
     }
 
-    @Throws(WeatherApiAccessException::class)
+    @Throws(WeatherApiException.ApiAccessFailed::class)
     suspend fun fetchTodayWeatherInfo(geoCoordinates: GeoCoordinates): Weather {
         val response =
             executeWebApiOperation {
@@ -82,7 +95,7 @@ internal class WeatherApiDataSource(private val weatherApiService: WeatherApiSer
         return toWeatherInfo(response)
     }
 
-    @Throws(WeatherApiAccessException::class)
+    @Throws(WeatherApiException.ApiAccessFailed::class)
     suspend fun fetchPastDayWeatherInfo(
         geoCoordinates: GeoCoordinates,
         @IntRange(from = MIN_PAST_DAYS.toLong(), to = MAX_PAST_DAYS.toLong())
@@ -105,7 +118,7 @@ internal class WeatherApiDataSource(private val weatherApiService: WeatherApiSer
         return toWeatherInfo(response)
     }
 
-    @Throws(WeatherApiAccessException::class)
+    @Throws(WeatherApiException.ApiAccessFailed::class)
     private fun toWeatherInfo(response: Response<WeatherApiData>): Weather {
         Log.d(logTag, "code = " + response.code())
         Log.d(logTag, "message = :" + response.message())
@@ -124,7 +137,7 @@ internal class WeatherApiDataSource(private val weatherApiService: WeatherApiSer
                     "errorBody = $errorBodyString"
                 )
             }
-            throw WeatherApiAccessException(IOException())
+            throw WeatherApiException.ApiAccessFailed(IOException())
         }
     }
 }

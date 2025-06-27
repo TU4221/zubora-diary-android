@@ -1,5 +1,7 @@
 package com.websarva.wings.android.zuboradiary.domain.usecase.exception
 
+import java.time.LocalDate
+
 internal sealed class FetchWeatherInfoUseCaseException(
     message: String,
     cause: Throwable? = null
@@ -14,8 +16,10 @@ internal sealed class FetchWeatherInfoUseCaseException(
         cause
     )
 
-    class WeatherInfoDateOutOfRange :
-        FetchWeatherInfoUseCaseException("選択した日付は、天気情報を取得できる範囲を超えています。 ")
+    class WeatherInfoDateOutOfRange(
+        date: LocalDate,
+        cause: Throwable? = null
+    ) : FetchWeatherInfoUseCaseException("指定した日付 '$date' は、天気情報を取得できる範囲を超えています。", cause)
 
     class FetchWeatherInfoFailed(
         cause: Throwable
