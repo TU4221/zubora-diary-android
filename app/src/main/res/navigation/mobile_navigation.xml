@@ -369,8 +369,8 @@
                 app:destination="@id/navigation_date_picker_dialog"/>
 
             <action
-                android:id="@+id/action_diary_edit_fragment_to_weather_info_fetching_dialog"
-                app:destination="@id/navigation_weather_info_fetching_dialog"/>
+                android:id="@+id/action_diary_edit_fragment_to_weather_info_fetch_dialog"
+                app:destination="@id/navigation_weather_info_fetch_dialog"/>
 
             <action
                 android:id="@+id/action_diary_edit_fragment_to_diary_item_delete_dialog"
@@ -435,11 +435,11 @@
         </dialog>
 
         <dialog
-            android:id="@+id/navigation_weather_info_fetching_dialog"
-            android:name="com.websarva.wings.android.zuboradiary.ui.fragment.dialog.WeatherInfoFetchingDialogFragment">
+            android:id="@+id/navigation_weather_info_fetch_dialog"
+            android:name="com.websarva.wings.android.zuboradiary.ui.fragment.dialog.WeatherInfoFetchDialogFragment">
             <argument
                 android:name="parameters"
-                app:argType="com.websarva.wings.android.zuboradiary.ui.model.parameters.WeatherInfoAcquisitionParameters" />
+                app:argType="com.websarva.wings.android.zuboradiary.ui.model.parameters.WeatherInfoFetchParameters" />
         </dialog>
 
         <dialog

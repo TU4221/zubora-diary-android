@@ -7,13 +7,13 @@ import com.websarva.wings.android.zuboradiary.data.preferences.ReminderNotificat
 import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColorPreference
 import com.websarva.wings.android.zuboradiary.data.preferences.UserPreferences
 import com.websarva.wings.android.zuboradiary.data.preferences.UserPreferencesAccessException
-import com.websarva.wings.android.zuboradiary.data.preferences.WeatherInfoAcquisitionPreference
+import com.websarva.wings.android.zuboradiary.data.preferences.WeatherInfoFetchPreference
 import com.websarva.wings.android.zuboradiary.domain.exception.settings.InitializeSettingsFailedException
 import com.websarva.wings.android.zuboradiary.domain.exception.settings.UpdateCalendarStartDayOfWeekSettingFailedException
 import com.websarva.wings.android.zuboradiary.domain.exception.settings.UpdatePassCodeSettingFailedException
 import com.websarva.wings.android.zuboradiary.domain.exception.settings.UpdateReminderNotificationSettingFailedException
 import com.websarva.wings.android.zuboradiary.domain.exception.settings.UpdateThemeColorSettingFailedException
-import com.websarva.wings.android.zuboradiary.domain.exception.settings.UpdateWeatherInfoAcquisitionSettingFailedException
+import com.websarva.wings.android.zuboradiary.domain.exception.settings.UpdateWeatherInfoFetchSettingFailedException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
@@ -76,13 +76,13 @@ internal class UserPreferencesRepository(private val userPreferences: UserPrefer
         }
     }
 
-    @Throws(UpdateWeatherInfoAcquisitionSettingFailedException::class)
-    suspend fun saveWeatherInfoAcquisitionPreference(preference: WeatherInfoAcquisitionPreference) {
+    @Throws(UpdateWeatherInfoFetchSettingFailedException::class)
+    suspend fun saveWeatherInfoFetchPreference(preference: WeatherInfoFetchPreference) {
         withContext(Dispatchers.IO) {
             try {
-                userPreferences.saveWeatherInfoAcquisitionPreference(preference)
+                userPreferences.saveWeatherInfoFetchPreference(preference)
             } catch (e: UserPreferencesAccessException) {
-                throw UpdateWeatherInfoAcquisitionSettingFailedException(preference.isChecked, e)
+                throw UpdateWeatherInfoFetchSettingFailedException(preference.isChecked, e)
             }
         }
     }

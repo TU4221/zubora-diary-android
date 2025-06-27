@@ -14,7 +14,7 @@ import com.websarva.wings.android.zuboradiary.data.model.ThemeColor
 import com.websarva.wings.android.zuboradiary.data.preferences.AllPreferences
 import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColorPreference
 import com.websarva.wings.android.zuboradiary.data.repository.UserPreferencesRepository
-import com.websarva.wings.android.zuboradiary.data.preferences.WeatherInfoAcquisitionPreference
+import com.websarva.wings.android.zuboradiary.data.preferences.WeatherInfoFetchPreference
 import com.websarva.wings.android.zuboradiary.data.repository.UriRepository
 import com.websarva.wings.android.zuboradiary.data.repository.WorkerRepository
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
@@ -84,9 +84,9 @@ internal class SettingsViewModel @Inject constructor(
     private lateinit var passcode: StateFlow<String?>
     private lateinit var isPasscodeLockNotNull: StateFlow<Boolean>
 
-    lateinit var isCheckedWeatherInfoAcquisition: StateFlow<Boolean?>
+    lateinit var isCheckedWeatherInfoFetch: StateFlow<Boolean?>
         private set
-    private lateinit var isWeatherInfoAcquisitionNotNull: StateFlow<Boolean>
+    private lateinit var isWeatherInfoFetchNotNull: StateFlow<Boolean>
 
     lateinit var isAllSettingsNotNull: StateFlow<Boolean>
 
@@ -114,7 +114,7 @@ internal class SettingsViewModel @Inject constructor(
         setUpCalendarStartDayOfWeekPreferenceValueLoading(allPreferences)
         setUpReminderNotificationPreferenceValueLoading(allPreferences)
         setUpPasscodeLockPreferenceValueLoading(allPreferences)
-        setUpWeatherInfoAcquisitionPreferenceValueLoading(allPreferences)
+        setUpWeatherInfoFetchPreferenceValueLoading(allPreferences)
         setUpIsAllSettingsNotNull()
     }
 
@@ -194,14 +194,14 @@ internal class SettingsViewModel @Inject constructor(
             }.stateIn(false)
     }
 
-    private fun setUpWeatherInfoAcquisitionPreferenceValueLoading(preferences: Flow<AllPreferences>) {
-        isCheckedWeatherInfoAcquisition =
+    private fun setUpWeatherInfoFetchPreferenceValueLoading(preferences: Flow<AllPreferences>) {
+        isCheckedWeatherInfoFetch =
             preferences.map { value ->
-                value.weatherInfoAcquisitionPreference.isChecked
+                value.weatherInfoFetchPreference.isChecked
             }.stateIn(null)
 
-        isWeatherInfoAcquisitionNotNull =
-            isCheckedWeatherInfoAcquisition.map { value ->
+        isWeatherInfoFetchNotNull =
+            isCheckedWeatherInfoFetch.map { value ->
                 value != null
             }.stateIn(false)
     }
@@ -213,18 +213,18 @@ internal class SettingsViewModel @Inject constructor(
                 isCalendarStartDayOfWeekNotNull,
                 isReminderNotificationNotNull,
                 isPasscodeLockNotNull,
-                isWeatherInfoAcquisitionNotNull
+                isWeatherInfoFetchNotNull
             ) {
                     isThemeColorNotNull,
                     isCalendarStartDayOfWeekNotNull,
                     isReminderNotificationNotNull,
                     isPasscodeLockNotNull,
-                    isWeatherInfoAcquisitionNotNull ->
+                    isWeatherInfoFetchNotNull ->
                 return@combine isThemeColorNotNull
                         && isCalendarStartDayOfWeekNotNull
                         && isReminderNotificationNotNull
                         && isPasscodeLockNotNull
-                        && isWeatherInfoAcquisitionNotNull
+                        && isWeatherInfoFetchNotNull
             }.stateIn(false)
     }
 
@@ -289,11 +289,11 @@ internal class SettingsViewModel @Inject constructor(
         }
     }
 
-    fun onWeatherInfoAcquisitionSettingCheckedChanged(isChecked: Boolean) {
+    fun onWeatherInfoFetchSettingCheckedChanged(isChecked: Boolean) {
         viewModelScope.launch {
             // DateStorePreferences初回読込時の値がtrueの場合、本メソッドが呼び出される。
             // 初回読込時は処理不要のため下記条件追加。
-            val settingValue = isCheckedWeatherInfoAcquisition.requireValue()
+            val settingValue = isCheckedWeatherInfoFetch.requireValue()
             if (isChecked == settingValue) return@launch
 
             if (isChecked) {
@@ -301,7 +301,7 @@ internal class SettingsViewModel @Inject constructor(
                     SettingsEvent.CheckAccessLocationPermission
                 )
             } else {
-                saveWeatherInfoAcquisition(false)
+                saveWeatherInfoFetch(false)
             }
         }
     }
@@ -514,7 +514,7 @@ internal class SettingsViewModel @Inject constructor(
     fun onAccessLocationPermissionChecked(isGranted: Boolean) {
         viewModelScope.launch {
             if (isGranted) {
-                saveWeatherInfoAcquisition(true)
+                saveWeatherInfoFetch(true)
             } else {
                 emitViewModelEvent(
                     SettingsEvent.CheckShouldShowRequestAccessLocationPermissionRationale
@@ -531,7 +531,7 @@ internal class SettingsViewModel @Inject constructor(
                 )
             } else {
                 emitViewModelEvent(
-                    SettingsEvent.TurnOffWeatherInfoAcquisitionSettingSwitch
+                    SettingsEvent.TurnOffWeatherInfoFetchSettingSwitch
                 )
                 emitViewModelEvent(
                     SettingsEvent.NavigateLocationPermissionDialog
@@ -543,10 +543,10 @@ internal class SettingsViewModel @Inject constructor(
     fun onRequestAccessLocationPermissionRationaleResultReceived(isGranted: Boolean) {
         viewModelScope.launch {
             if (isGranted) {
-                saveWeatherInfoAcquisition(true)
+                saveWeatherInfoFetch(true)
             } else {
                 emitViewModelEvent(
-                    SettingsEvent.TurnOffWeatherInfoAcquisitionSettingSwitch
+                    SettingsEvent.TurnOffWeatherInfoFetchSettingSwitch
                 )
             }
         }
@@ -562,11 +562,11 @@ internal class SettingsViewModel @Inject constructor(
     }
 
     // MEMO:端末設定画面で"許可 -> 無許可"に変更したときの対応コード
-    fun onInitializeWeatherInfoAcquisitionSettingFromPermission(isGranted: Boolean) {
+    fun onInitializeWeatherInfoFetchSettingFromPermission(isGranted: Boolean) {
         viewModelScope.launch {
             if (isGranted) return@launch
 
-            saveWeatherInfoAcquisition(false)
+            saveWeatherInfoFetch(false)
         }
     }
 
@@ -616,11 +616,11 @@ internal class SettingsViewModel @Inject constructor(
         }
     }
 
-    private suspend fun saveWeatherInfoAcquisition(value: Boolean): Boolean {
+    private suspend fun saveWeatherInfoFetch(value: Boolean): Boolean {
         val preferenceValue =
-            WeatherInfoAcquisitionPreference(value)
+            WeatherInfoFetchPreference(value)
         return updateSettingValue{
-            userPreferencesRepository.saveWeatherInfoAcquisitionPreference(preferenceValue)
+            userPreferencesRepository.saveWeatherInfoFetchPreference(preferenceValue)
         }
     }
 

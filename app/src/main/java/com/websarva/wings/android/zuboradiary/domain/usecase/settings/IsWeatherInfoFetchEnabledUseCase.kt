@@ -10,7 +10,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 
-internal class IsWeatherInfoAcquisitionEnabledUseCase(
+internal class IsWeatherInfoFetchEnabledUseCase(
     private val userPreferencesRepository: UserPreferencesRepository
 ) {
 
@@ -26,7 +26,7 @@ internal class IsWeatherInfoAcquisitionEnabledUseCase(
                 userPreferencesRepository
                     .loadAllPreferences()
                     .map { value: AllPreferences ->
-                        value.weatherInfoAcquisitionPreference.isChecked
+                        value.weatherInfoFetchPreference.isChecked
                     }.first()
             }
         Log.i(logTag, "${logMsg}完了")

@@ -14,15 +14,15 @@ import com.websarva.wings.android.zuboradiary.domain.exception.diary.DeleteAllDi
 import com.websarva.wings.android.zuboradiary.domain.exception.diary.CountDiariesFailedException
 import com.websarva.wings.android.zuboradiary.domain.exception.diary.DeleteDiaryFailedException
 import com.websarva.wings.android.zuboradiary.domain.exception.diary.CheckDiaryExistenceFailedException
-import com.websarva.wings.android.zuboradiary.domain.exception.diary.LoadDiaryListFailedException
-import com.websarva.wings.android.zuboradiary.domain.exception.diary.LoadDiaryFailedException
+import com.websarva.wings.android.zuboradiary.domain.exception.diary.FetchDiaryListFailedException
+import com.websarva.wings.android.zuboradiary.domain.exception.diary.FetchDiaryFailedException
 import com.websarva.wings.android.zuboradiary.domain.exception.diary.CheckDiaryPicturePathUsedFailedException
 import com.websarva.wings.android.zuboradiary.domain.exception.diary.SaveDiaryFailedException
 import com.websarva.wings.android.zuboradiary.domain.exception.diary.CountWordSearchResultFailedException
 import com.websarva.wings.android.zuboradiary.domain.exception.diary.DeleteAllDataFailedException
 import com.websarva.wings.android.zuboradiary.domain.exception.diary.DeleteDiaryItemTitleSelectionHistoryItemFailedException
-import com.websarva.wings.android.zuboradiary.domain.exception.diary.LoadDiaryItemTitleSelectionHistoryFailedException
-import com.websarva.wings.android.zuboradiary.domain.exception.diary.LoadWordSearchResultListFailedException
+import com.websarva.wings.android.zuboradiary.domain.exception.diary.FetchDiaryItemTitleSelectionHistoryFailedException
+import com.websarva.wings.android.zuboradiary.domain.exception.diary.FetchWordSearchResultListFailedException
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -83,46 +83,46 @@ internal class DiaryRepository (
         }
     }
 
-    @Throws(LoadDiaryFailedException::class)
-    suspend fun loadDiary(date: LocalDate): Diary? {
+    @Throws(FetchDiaryFailedException::class)
+    suspend fun fetchDiary(date: LocalDate): Diary? {
         return withContext(Dispatchers.IO) {
             try {
                 diaryDataSource.selectDiary(date)?.toDomainModel()
             } catch (e: DataBaseAccessException) {
-                throw LoadDiaryFailedException("日付 '$date' の日記の読み込みに失敗しました。", e)
+                throw FetchDiaryFailedException("日付 '$date' の日記の取得に失敗しました。", e)
             }
         }
     }
 
-    @Throws(LoadDiaryFailedException::class)
-    suspend fun loadNewestDiary(): Diary? {
+    @Throws(FetchDiaryFailedException::class)
+    suspend fun fetchNewestDiary(): Diary? {
         return withContext(Dispatchers.IO) {
             try {
                 diaryDataSource.selectNewestDiary()?.toDomainModel()
             } catch (e: DataBaseAccessException) {
-                throw LoadDiaryFailedException("最新の日記の読み込みに失敗しました。", e)
+                throw FetchDiaryFailedException("最新の日記の取得に失敗しました。", e)
             }
         }
     }
 
-    @Throws(LoadDiaryFailedException::class)
-    suspend fun loadOldestDiary(): Diary? {
+    @Throws(FetchDiaryFailedException::class)
+    suspend fun fetchOldestDiary(): Diary? {
         return withContext(Dispatchers.IO) {
             try {
                 diaryDataSource.selectOldestDiary()?.toDomainModel()
             } catch (e: DataBaseAccessException) {
-                throw LoadDiaryFailedException("最古の日記の読み込みに失敗しました。", e)
+                throw FetchDiaryFailedException("最古の日記の取得に失敗しました。", e)
             }
         }
     }
 
-    @Throws(LoadDiaryListFailedException::class)
-    suspend fun loadDiaryList(
+    @Throws(FetchDiaryListFailedException::class)
+    suspend fun fetchDiaryList(
         num: Int,
         offset: Int,
         date: LocalDate?
     ): List<DiaryListItem> {
-        Log.d(logTag, "loadDiaryList(num = $num, offset = $offset, date = $date)")
+        Log.d(logTag, "fetchDiaryList(num = $num, offset = $offset, date = $date)")
         require(num >= 1)
         require(offset >= 0)
 
@@ -132,7 +132,7 @@ internal class DiaryRepository (
                     .selectDiaryListOrderByDateDesc(num, offset, date)
                     .map { it.toDomainModel() }
             } catch (e: DataBaseAccessException) {
-                throw LoadDiaryListFailedException(e)
+                throw FetchDiaryListFailedException(e)
             }
         }
     }
@@ -148,7 +148,7 @@ internal class DiaryRepository (
         }
     }
 
-    @Throws(LoadWordSearchResultListFailedException::class)
+    @Throws(FetchWordSearchResultListFailedException::class)
     suspend fun loadWordSearchResultDiaryList(
         num: Int,
         offset: Int,
@@ -163,7 +163,7 @@ internal class DiaryRepository (
                     .selectWordSearchResultListOrderByDateDesc(num, offset, searchWord)
                     .map { it.toDomainModel() }
             } catch (e: DataBaseAccessException) {
-                throw LoadWordSearchResultListFailedException(searchWord, e)
+                throw FetchWordSearchResultListFailedException(searchWord, e)
             }
         }
     }
@@ -237,8 +237,8 @@ internal class DiaryRepository (
         }
     }
 
-    @Throws(LoadDiaryItemTitleSelectionHistoryFailedException::class)
-    fun loadSelectionHistory(
+    @Throws(FetchDiaryItemTitleSelectionHistoryFailedException::class)
+    fun fetchDiaryItemTitleSelectionHistory(
         num: Int, offset: Int
     ): Flow<List<DiaryItemTitleSelectionHistoryItem>> {
         require(num >= 1)
@@ -251,12 +251,12 @@ internal class DiaryRepository (
                     list.map { it.toDomainModel() }
                 }
         } catch (e: DataBaseAccessException) {
-            throw LoadDiaryItemTitleSelectionHistoryFailedException(e)
+            throw FetchDiaryItemTitleSelectionHistoryFailedException(e)
         }
     }
 
     @Throws(DeleteDiaryItemTitleSelectionHistoryItemFailedException::class)
-    suspend fun deleteSelectionHistoryItem(title: String) {
+    suspend fun deleteDiaryItemTitleSelectionHistoryItem(title: String) {
         withContext(Dispatchers.IO) {
             try {
                 diaryDataSource.deleteHistoryItem(title)

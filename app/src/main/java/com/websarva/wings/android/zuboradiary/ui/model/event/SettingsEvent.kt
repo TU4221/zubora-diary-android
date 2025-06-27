@@ -24,5 +24,5 @@ internal sealed class SettingsEvent : ViewModelEvent() {
     data object CheckShouldShowRequestAccessLocationPermissionRationale : SettingsEvent()
     data object ShowRequestAccessLocationPermissionRationale : SettingsEvent()
     data object TurnOffReminderNotificationSettingSwitch : SettingsEvent()
-    data object TurnOffWeatherInfoAcquisitionSettingSwitch : SettingsEvent()
+    data object TurnOffWeatherInfoFetchSettingSwitch : SettingsEvent()
 }

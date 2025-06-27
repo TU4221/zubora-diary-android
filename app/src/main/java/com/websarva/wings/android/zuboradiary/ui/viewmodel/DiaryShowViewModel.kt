@@ -184,7 +184,7 @@ internal class DiaryShowViewModel @Inject constructor(
         Log.i(logTag, "${logMsg}_開始")
 
         try {
-            val diary = diaryRepository.loadDiary(date) ?: throw IllegalArgumentException()
+            val diary = diaryRepository.fetchDiary(date) ?: throw IllegalArgumentException()
             diaryStateFlow.update(diary)
         } catch (e: Exception) {
             Log.e(logTag, "${logMsg}_失敗", e)

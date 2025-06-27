@@ -96,7 +96,7 @@ internal class DiaryDataSource(
         offset: Int,
         date: LocalDate?
     ): List<DiaryListItemData> {
-        Log.d(logTag, "loadDiaryList(num = $num, offset = $offset, date = $date)")
+        Log.d(logTag, "selectDiaryList(num = $num, offset = $offset, date = $date)")
         require(num >= 1)
         require(offset >= 0)
 

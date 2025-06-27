@@ -41,8 +41,8 @@ internal class UserPreferences @Inject constructor(private val context: Context)
         booleanPreferencesKey("is_checked_passcode_lock")
     private val passcodePreferenceKey = stringPreferencesKey("passcode")
 
-    private val isCheckedWeatherInfoAcquisitionPreferenceKey =
-        booleanPreferencesKey("is_checked_weather_info_acquisition")
+    private val isCheckedWeatherInfoFetchPreferenceKey =
+        booleanPreferencesKey("is_checked_weather_info_fetch")
 
     fun loadAllPreferences(): Flow<AllPreferences> {
         return context.dataStore.data
@@ -60,7 +60,7 @@ internal class UserPreferences @Inject constructor(private val context: Context)
                     createCalendarStartDayOfWeekPreference(preferences),
                     createReminderNotificationPreference(preferences),
                     createPasscodeLockPreference(preferences),
-                    createWeatherInfoAcquisitionPreference(preferences)
+                    createWeatherInfoFetchPreference(preferences)
                 )
             }
     }
@@ -103,13 +103,13 @@ internal class UserPreferences @Inject constructor(private val context: Context)
         return PassCodeLockPreference(isCheckedPasscode, passCode)
     }
 
-    private fun createWeatherInfoAcquisitionPreference(
+    private fun createWeatherInfoFetchPreference(
         preferences: Preferences
-    ): WeatherInfoAcquisitionPreference {
+    ): WeatherInfoFetchPreference {
         val isCheckedWeather =
-            preferences[isCheckedWeatherInfoAcquisitionPreferenceKey]
-                ?: WeatherInfoAcquisitionPreference.IS_CHECKED_DEFAULT_VALUE
-        return WeatherInfoAcquisitionPreference(isCheckedWeather)
+            preferences[isCheckedWeatherInfoFetchPreferenceKey]
+                ?: WeatherInfoFetchPreference.IS_CHECKED_DEFAULT_VALUE
+        return WeatherInfoFetchPreference(isCheckedWeather)
     }
 
     @Throws(UserPreferencesAccessException::class)
@@ -184,17 +184,17 @@ internal class UserPreferences @Inject constructor(private val context: Context)
     }
 
     @Throws(UserPreferencesAccessException::class)
-    suspend fun saveWeatherInfoAcquisitionPreference(value: WeatherInfoAcquisitionPreference) {
+    suspend fun saveWeatherInfoFetchPreference(value: WeatherInfoFetchPreference) {
         executeDataStoreEditOperation { preferences ->
-            saveWeatherInfoAcquisitionPreferenceValue(preferences, value)
+            saveWeatherInfoFetchPreferenceValue(preferences, value)
         }
     }
 
-    private fun saveWeatherInfoAcquisitionPreferenceValue(
+    private fun saveWeatherInfoFetchPreferenceValue(
         preferences: MutablePreferences,
-        value: WeatherInfoAcquisitionPreference
+        value: WeatherInfoFetchPreference
     ) {
-        preferences[isCheckedWeatherInfoAcquisitionPreferenceKey] = value.isChecked
+        preferences[isCheckedWeatherInfoFetchPreferenceKey] = value.isChecked
     }
 
     suspend fun initializeAllPreferences() {
@@ -203,7 +203,7 @@ internal class UserPreferences @Inject constructor(private val context: Context)
             saveCalendarStartDayOfWeekPreferenceValue(preferences, CalendarStartDayOfWeekPreference())
             saveReminderNotificationPreferenceValue(preferences, ReminderNotificationPreference())
             savePasscodeLockPreferenceValue(preferences, PassCodeLockPreference())
-            saveWeatherInfoAcquisitionPreferenceValue(preferences, WeatherInfoAcquisitionPreference())
+            saveWeatherInfoFetchPreferenceValue(preferences, WeatherInfoFetchPreference())
         }
     }
 }

@@ -67,7 +67,7 @@ internal class DiaryItemTitleEditViewModel @Inject constructor(
 
         itemTitleSelectionHistoryList =
             diaryRepository
-                .loadSelectionHistory(maxLoadedItemTitles, 0).catch {
+                .fetchDiaryItemTitleSelectionHistory(maxLoadedItemTitles, 0).catch {
                     emitAppMessageEvent(DiaryItemTitleEditAppMessage.ItemTitleHistoryLoadingFailure)
                 }.map { list ->
                     SelectionHistoryList(
@@ -100,7 +100,7 @@ internal class DiaryItemTitleEditViewModel @Inject constructor(
         val deleteItem = currentList.itemList[deletePosition]
         val deleteTitle = deleteItem.title
         try {
-            diaryRepository.deleteSelectionHistoryItem(deleteTitle)
+            diaryRepository.deleteDiaryItemTitleSelectionHistoryItem(deleteTitle)
         } catch (e: Exception) {
             Log.e(logTag, "${logMsg}_失敗", e)
             emitAppMessageEvent(DiaryItemTitleEditAppMessage.ItemTitleHistoryDeleteFailure)

@@ -149,7 +149,7 @@
                             tools:ignore="DuplicateIncludedIds" />
 
                         <com.google.android.material.divider.MaterialDivider
-                            android:id="@+id/material_divider_weather_info_acquisition_setting"
+                            android:id="@+id/material_divider_weather_info_fetch_setting"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content" />
 
@@ -159,12 +159,12 @@
                                   layoutとして指定しているincludeタグは警告が表示されていない。) -->
                         <include
                             layout="@layout/layout_settings_item_switch"
-                            android:id="@+id/include_weather_info_acquisition_setting"
+                            android:id="@+id/include_weather_info_fetch_setting"
                             app:settingIcon="@{@drawable/ic_sunny_24px}"
-                            app:settingTitle="@{@string/fragment_settings_item_title_weather_info_acquisition}"
-                            app:settingValueSwitch="@{viewModel.isCheckedWeatherInfoAcquisition}"
+                            app:settingTitle="@{@string/fragment_settings_item_title_weather_info_fetch}"
+                            app:settingValueSwitch="@{viewModel.isCheckedWeatherInfoFetch}"
                             app:settingValueVisibility="@{View.GONE}"
-                            app:onCheckedChangeListener="@{(_, isChecked) -> viewModel.onWeatherInfoAcquisitionSettingCheckedChanged(isChecked)}"
+                            app:onCheckedChangeListener="@{(_, isChecked) -> viewModel.onWeatherInfoFetchSettingCheckedChanged(isChecked)}"
                             tools:ignore="DuplicateIncludedIds" />
 
                         <!-- HACK:MaterialSwitchを配置したLayoutをincludeタグで複数配置すると、

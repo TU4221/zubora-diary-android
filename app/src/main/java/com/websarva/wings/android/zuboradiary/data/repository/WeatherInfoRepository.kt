@@ -7,29 +7,29 @@ import com.websarva.wings.android.zuboradiary.data.network.WeatherApiAccessExcep
 import com.websarva.wings.android.zuboradiary.data.network.WeatherApiDataSource
 import com.websarva.wings.android.zuboradiary.data.network.WeatherApiDataSource.Companion.MAX_PAST_DAYS
 import com.websarva.wings.android.zuboradiary.data.network.WeatherApiDataSource.Companion.MIN_PAST_DAYS
-import com.websarva.wings.android.zuboradiary.domain.exception.weather.AcquireWeatherInfoFailedException
+import com.websarva.wings.android.zuboradiary.domain.exception.weather.FetchWeatherInfoFailedException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.time.LocalDate
 
-internal class WeatherApiRepository (private val weatherApiDataSource: WeatherApiDataSource) {
+internal class WeatherInfoRepository (private val weatherApiDataSource: WeatherApiDataSource) {
 
     fun canFetchWeatherInfo(date: LocalDate): Boolean {
         return weatherApiDataSource.canFetchWeatherInfo(date)
     }
 
-    @Throws(AcquireWeatherInfoFailedException::class)
+    @Throws(FetchWeatherInfoFailedException::class)
     suspend fun fetchTodayWeatherInfo(geoCoordinates: GeoCoordinates): Weather {
         return withContext(Dispatchers.IO) {
             try {
                 weatherApiDataSource.fetchTodayWeatherInfo(geoCoordinates)
             } catch (e: WeatherApiAccessException) {
-                throw AcquireWeatherInfoFailedException(e)
+                throw FetchWeatherInfoFailedException(e)
             }
         }
     }
 
-    @Throws(AcquireWeatherInfoFailedException::class)
+    @Throws(FetchWeatherInfoFailedException::class)
     suspend fun fetchPastDayWeatherInfo(
         geoCoordinates: GeoCoordinates,
         @IntRange(from = MIN_PAST_DAYS.toLong(), to = MAX_PAST_DAYS.toLong())
@@ -39,7 +39,7 @@ internal class WeatherApiRepository (private val weatherApiDataSource: WeatherAp
             try {
                 weatherApiDataSource.fetchPastDayWeatherInfo(geoCoordinates, numPastDays)
             } catch (e: WeatherApiAccessException) {
-                throw AcquireWeatherInfoFailedException(e)
+                throw FetchWeatherInfoFailedException(e)
             }
         }
     }

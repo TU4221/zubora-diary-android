@@ -5,7 +5,7 @@ import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import java.time.LocalDate
 
-internal class ShouldLoadWeatherInfoUseCase {
+internal class ShouldFetchWeatherInfoUseCase {
 
     private val logTag = createLogTag()
 

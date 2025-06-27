@@ -2,7 +2,7 @@ package com.websarva.wings.android.zuboradiary.domain.exception.weather
 
 import com.websarva.wings.android.zuboradiary.domain.exception.DomainException
 
-internal class AcquireWeatherInfoFailedException (
+internal class FetchWeatherInfoFailedException (
     /*date: LocalDate,*/
     cause: Throwable
     // TODO:天気情報の取得時、ドメイン側では日付の指定で取得できるように修正する。

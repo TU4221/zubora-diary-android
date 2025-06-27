@@ -5,5 +5,5 @@ internal data class AllPreferences(
     val calendarStartDayOfWeekPreference: CalendarStartDayOfWeekPreference,
     val reminderNotificationPreference: ReminderNotificationPreference,
     val passcodeLockPreference: PassCodeLockPreference,
-    val weatherInfoAcquisitionPreference: WeatherInfoAcquisitionPreference,
+    val weatherInfoFetchPreference: WeatherInfoFetchPreference,
 )

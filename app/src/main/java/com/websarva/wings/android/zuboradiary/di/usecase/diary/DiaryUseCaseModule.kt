@@ -2,16 +2,16 @@ package com.websarva.wings.android.zuboradiary.di.usecase.diary
 
 import com.websarva.wings.android.zuboradiary.data.repository.DiaryRepository
 import com.websarva.wings.android.zuboradiary.data.repository.LocationRepository
-import com.websarva.wings.android.zuboradiary.data.repository.WeatherApiRepository
+import com.websarva.wings.android.zuboradiary.data.repository.WeatherInfoRepository
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.DoesDiaryExistUseCase
-import com.websarva.wings.android.zuboradiary.domain.usecase.diary.CanLoadWeatherInfoUseCase
+import com.websarva.wings.android.zuboradiary.domain.usecase.diary.CanFetchWeatherInfoUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.DeleteDiaryUseCase
-import com.websarva.wings.android.zuboradiary.domain.usecase.diary.LoadDiaryUseCase
+import com.websarva.wings.android.zuboradiary.domain.usecase.diary.FetchDiaryUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.ShouldRequestDiaryUpdateConfirmationUseCase
-import com.websarva.wings.android.zuboradiary.domain.usecase.diary.LoadWeatherInfoUseCase
+import com.websarva.wings.android.zuboradiary.domain.usecase.diary.FetchWeatherInfoUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.SaveDiaryUseCase
-import com.websarva.wings.android.zuboradiary.domain.usecase.diary.ShouldLoadWeatherInfoUseCase
-import com.websarva.wings.android.zuboradiary.domain.usecase.diary.ShouldRequestDiaryLoadingConfirmationUseCase
+import com.websarva.wings.android.zuboradiary.domain.usecase.diary.ShouldFetchWeatherInfoUseCase
+import com.websarva.wings.android.zuboradiary.domain.usecase.diary.ShouldRequestDiaryFetchConfirmationUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.ShouldRequestExitWithoutDiarySavingConfirmationUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.ShouldRequestWeatherInfoConfirmationUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.uri.ReleaseUriPermissionUseCase
@@ -36,32 +36,32 @@ internal object DiaryUseCaseModule {
 
     @Singleton
     @Provides
-    fun provideCanLoadWeatherInfoUseCase(
-        weatherApiRepository: WeatherApiRepository
-    ): CanLoadWeatherInfoUseCase {
-        return CanLoadWeatherInfoUseCase(weatherApiRepository)
+    fun provideCanFetchWeatherInfoUseCase(
+        weatherInfoRepository: WeatherInfoRepository
+    ): CanFetchWeatherInfoUseCase {
+        return CanFetchWeatherInfoUseCase(weatherInfoRepository)
     }
 
     @Singleton
     @Provides
-    fun provideLoadWeatherInfoUseCase(
-        weatherApiRepository: WeatherApiRepository,
+    fun provideFetchWeatherInfoUseCase(
+        weatherInfoRepository: WeatherInfoRepository,
         locationRepository: LocationRepository,
-        canLoadWeatherInfoUseCase: CanLoadWeatherInfoUseCase
-    ): LoadWeatherInfoUseCase {
-        return LoadWeatherInfoUseCase(
-            weatherApiRepository,
+        canFetchWeatherInfoUseCase: CanFetchWeatherInfoUseCase
+    ): FetchWeatherInfoUseCase {
+        return FetchWeatherInfoUseCase(
+            weatherInfoRepository,
             locationRepository,
-            canLoadWeatherInfoUseCase
+            canFetchWeatherInfoUseCase
         )
     }
 
     @Singleton
     @Provides
-    fun provideShouldRequestDiaryLoadingConfirmationUseCase(
+    fun provideShouldRequestDiaryFetchConfirmationUseCase(
         doesDiaryExistUseCase: DoesDiaryExistUseCase
-    ): ShouldRequestDiaryLoadingConfirmationUseCase {
-        return ShouldRequestDiaryLoadingConfirmationUseCase(
+    ): ShouldRequestDiaryFetchConfirmationUseCase {
+        return ShouldRequestDiaryFetchConfirmationUseCase(
             doesDiaryExistUseCase
         )
     }
@@ -79,17 +79,17 @@ internal object DiaryUseCaseModule {
     @Singleton
     @Provides
     fun provideShouldRequestWeatherInfoConfirmationUseCase(
-        shouldLoadWeatherInfoUseCase: ShouldLoadWeatherInfoUseCase
+        shouldFetchWeatherInfoUseCase: ShouldFetchWeatherInfoUseCase
     ): ShouldRequestWeatherInfoConfirmationUseCase {
-        return ShouldRequestWeatherInfoConfirmationUseCase(shouldLoadWeatherInfoUseCase)
+        return ShouldRequestWeatherInfoConfirmationUseCase(shouldFetchWeatherInfoUseCase)
     }
 
     @Singleton
     @Provides
-    fun provideLoadDiaryUseCase(
+    fun provideFetchDiaryUseCase(
         diaryRepository: DiaryRepository
-    ): LoadDiaryUseCase {
-        return LoadDiaryUseCase(diaryRepository)
+    ): FetchDiaryUseCase {
+        return FetchDiaryUseCase(diaryRepository)
     }
 
     @Singleton
@@ -120,8 +120,8 @@ internal object DiaryUseCaseModule {
 
     @Singleton
     @Provides
-    fun provideShouldLoadWeatherInfoUseCase(): ShouldLoadWeatherInfoUseCase {
-        return ShouldLoadWeatherInfoUseCase()
+    fun provideShouldFetchWeatherInfoUseCase(): ShouldFetchWeatherInfoUseCase {
+        return ShouldFetchWeatherInfoUseCase()
     }
 
     @Singleton

@@ -305,7 +305,7 @@ internal class DiaryListViewModel @Inject constructor(
         require(loadingOffset >= 0)
 
         val loadedDiaryList =
-            diaryRepository.loadDiaryList(
+            diaryRepository.fetchDiaryList(
                 numLoadingItems,
                 loadingOffset,
                 sortConditionDate
@@ -364,7 +364,7 @@ internal class DiaryListViewModel @Inject constructor(
 
     private suspend fun loadNewestSavedDiaryDate(): LocalDate? {
         try {
-            val diary = diaryRepository.loadNewestDiary() ?: return null
+            val diary = diaryRepository.fetchNewestDiary() ?: return null
             return  diary.date
         } catch (e: Exception) {
             Log.e(logTag, "最新日記読込_失敗", e)
@@ -375,7 +375,7 @@ internal class DiaryListViewModel @Inject constructor(
 
     private suspend fun loadOldestSavedDiaryDate(): LocalDate? {
         try {
-            val diary = diaryRepository.loadOldestDiary() ?: return null
+            val diary = diaryRepository.fetchOldestDiary() ?: return null
             return diary.date
         } catch (e: Exception) {
             Log.e(logTag, "最古日記読込_失敗", e)

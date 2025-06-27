@@ -252,8 +252,8 @@ class SettingsFragment :
             is SettingsEvent.TurnOffReminderNotificationSettingSwitch -> {
                 binding.includeReminderNotificationSetting.materialSwitch.isChecked = false
             }
-            is SettingsEvent.TurnOffWeatherInfoAcquisitionSettingSwitch -> {
-                binding.includeWeatherInfoAcquisitionSetting.materialSwitch.isChecked = false
+            is SettingsEvent.TurnOffWeatherInfoFetchSettingSwitch -> {
+                binding.includeWeatherInfoFetchSetting.materialSwitch.isChecked = false
             }
             ViewModelEvent.NavigatePreviousFragment -> {
                 mainActivity.popBackStackToStartFragment()
@@ -310,7 +310,7 @@ class SettingsFragment :
                     includeCalendarStartDaySetting.textTitle,
                     includeReminderNotificationSetting.textTitle,
                     includePasscodeLockSetting.textTitle,
-                    includeWeatherInfoAcquisitionSetting.textTitle,
+                    includeWeatherInfoFetchSetting.textTitle,
                     includeAllDiariesDeleteSetting.textTitle,
                     includeAllSettingsInitializationSetting.textTitle,
                     includeAllDataDeleteSetting.textTitle,
@@ -330,7 +330,7 @@ class SettingsFragment :
                     includeReminderNotificationSetting.textTitle,
                     includeReminderNotificationSetting.textValue,
                     includePasscodeLockSetting.textTitle,
-                    includeWeatherInfoAcquisitionSetting.textTitle,
+                    includeWeatherInfoFetchSetting.textTitle,
                     includeOpenSourceLicensesSetting.textTitle
                 )
             },
@@ -353,7 +353,7 @@ class SettingsFragment :
                 listOf(
                     includeReminderNotificationSetting.materialSwitch,
                     includePasscodeLockSetting.materialSwitch,
-                    includeWeatherInfoAcquisitionSetting.materialSwitch
+                    includeWeatherInfoFetchSetting.materialSwitch
                 )
             },
             themeColor
@@ -368,7 +368,7 @@ class SettingsFragment :
                     materialDividerCalendarStartDaySetting,
                     materialDividerReminderNotificationSetting,
                     materialDividerPasscodeLockSetting,
-                    materialDividerWeatherInfoAcquisitionSetting,
+                    materialDividerWeatherInfoFetchSetting,
                     materialDividerSectionData,
                     materialDividerAllDiariesDeleteSetting,
                     materialDividerAllSettingsInitializationSetting,
@@ -544,7 +544,7 @@ class SettingsFragment :
 
         val isAccessLocationGranted = requireContext().isAccessLocationGranted()
         mainViewModel
-            .onInitializeWeatherInfoAcquisitionSettingFromPermission(isAccessLocationGranted)
+            .onInitializeWeatherInfoFetchSettingFromPermission(isAccessLocationGranted)
     }
 
     override fun onBottomNavigationItemReselected() {

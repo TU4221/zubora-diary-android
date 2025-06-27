@@ -1,7 +1,7 @@
 package com.websarva.wings.android.zuboradiary.di.usecase.settings
 
 import com.websarva.wings.android.zuboradiary.data.repository.UserPreferencesRepository
-import com.websarva.wings.android.zuboradiary.domain.usecase.settings.IsWeatherInfoAcquisitionEnabledUseCase
+import com.websarva.wings.android.zuboradiary.domain.usecase.settings.IsWeatherInfoFetchEnabledUseCase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -14,9 +14,9 @@ internal object SettingsUseCaseModule {
 
     @Singleton
     @Provides
-    fun provideIsWeatherInfoAcquisitionEnabledUseCase(
+    fun provideIsWeatherInfoFetchEnabledUseCase(
         userPreferencesRepository: UserPreferencesRepository
-    ): IsWeatherInfoAcquisitionEnabledUseCase {
-        return IsWeatherInfoAcquisitionEnabledUseCase(userPreferencesRepository)
+    ): IsWeatherInfoFetchEnabledUseCase {
+        return IsWeatherInfoFetchEnabledUseCase(userPreferencesRepository)
     }
 }

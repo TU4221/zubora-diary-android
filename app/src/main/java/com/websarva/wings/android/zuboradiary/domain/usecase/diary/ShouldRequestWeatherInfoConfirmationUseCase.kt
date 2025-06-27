@@ -6,7 +6,7 @@ import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import java.time.LocalDate
 
 internal class ShouldRequestWeatherInfoConfirmationUseCase(
-    val shouldLoadWeatherInfoUseCase: ShouldLoadWeatherInfoUseCase
+    val shouldFetchWeatherInfoUseCase: ShouldFetchWeatherInfoUseCase
 ) {
 
     private val logTag = createLogTag()
@@ -23,7 +23,7 @@ internal class ShouldRequestWeatherInfoConfirmationUseCase(
             return UseCaseResult.Success(false)
         }
 
-        val result = shouldLoadWeatherInfoUseCase(inputDate, previousDate)
+        val result = shouldFetchWeatherInfoUseCase(inputDate, previousDate)
         Log.i(logTag, "${logMsg}完了")
         return UseCaseResult.Success(result.value)
     }

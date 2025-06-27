@@ -138,11 +138,11 @@ internal sealed class DiaryEditAppMessage(
     dialogMessageStringResId: Int
 ) : AppMessage(dialogTitleStringResId, dialogMessageStringResId) {
 
-    data object DiaryLoadingFailure :  DiaryEditAppMessage(
+    data object DiaryFetchFailure :  DiaryEditAppMessage(
         R.string.dialog_app_message_title_access_error,
         R.string.dialog_diary_edit_app_message_diary_loading_failure
     ) {
-        private fun readResolve(): Any = DiaryLoadingFailure
+        private fun readResolve(): Any = DiaryFetchFailure
     }
 
     data object DiarySavingFailure :  DiaryEditAppMessage(
@@ -166,18 +166,18 @@ internal sealed class DiaryEditAppMessage(
         private fun readResolve(): Any = DiaryInfoLoadingFailure
     }
 
-    data object WeatherInfoLoadingFailure :  DiaryEditAppMessage(
+    data object WeatherInfoFetchFailure :  DiaryEditAppMessage(
         R.string.dialog_app_message_title_connection_error,
-        R.string.dialog_diary_edit_app_message_weather_info_loading_failure
+        R.string.dialog_diary_edit_app_message_weather_info_fetch_failure
     ) {
-        private fun readResolve(): Any = WeatherInfoLoadingFailure
+        private fun readResolve(): Any = WeatherInfoFetchFailure
     }
 
     data object WeatherInfoDateOutOfRange :  DiaryEditAppMessage(
         R.string.dialog_app_message_title_hint,
         R.string.dialog_diary_edit_app_message_weather_info_date_out_of_range
     ) {
-        private fun readResolve(): Any = WeatherInfoLoadingFailure
+        private fun readResolve(): Any = WeatherInfoFetchFailure
     }
 
     data object AccessLocationPermissionRequest :  DiaryEditAppMessage(

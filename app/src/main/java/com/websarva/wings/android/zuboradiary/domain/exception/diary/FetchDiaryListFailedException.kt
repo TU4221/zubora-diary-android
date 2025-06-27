@@ -2,7 +2,6 @@ package com.websarva.wings.android.zuboradiary.domain.exception.diary
 
 import com.websarva.wings.android.zuboradiary.domain.exception.DomainException
 
-internal class LoadDiaryFailedException (
-    message: String,
+internal class FetchDiaryListFailedException (
     cause: Throwable
-) : DomainException(message, cause)
+) : DomainException("日記リストの取得に失敗しました。", cause)
