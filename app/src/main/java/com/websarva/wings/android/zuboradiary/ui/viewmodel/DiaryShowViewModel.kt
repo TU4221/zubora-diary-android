@@ -3,10 +3,12 @@ package com.websarva.wings.android.zuboradiary.ui.viewmodel
 import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
-import com.websarva.wings.android.zuboradiary.data.repository.DiaryRepository
 import com.websarva.wings.android.zuboradiary.data.model.ItemNumber
 import com.websarva.wings.android.zuboradiary.data.model.Weather
-import com.websarva.wings.android.zuboradiary.domain.usecase.uri.ReleaseUriPermissionUseCase
+import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
+import com.websarva.wings.android.zuboradiary.domain.usecase.diary.DeleteDiaryUseCase
+import com.websarva.wings.android.zuboradiary.domain.usecase.diary.FetchDiaryUseCase
+import com.websarva.wings.android.zuboradiary.domain.usecase.exception.DeleteDiaryUseCaseException
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import com.websarva.wings.android.zuboradiary.ui.model.DiaryShowAppMessage
 import com.websarva.wings.android.zuboradiary.ui.model.event.DiaryShowEvent
@@ -27,8 +29,8 @@ import javax.inject.Inject
 @HiltViewModel
 internal class DiaryShowViewModel @Inject constructor(
     handle: SavedStateHandle,
-    private val diaryRepository: DiaryRepository,
-    private val releaseUriPermissionUseCase: ReleaseUriPermissionUseCase
+    private val fetchDiaryUseCase: FetchDiaryUseCase,
+    private val deleteDiaryUseCase: DeleteDiaryUseCase
 ) : BaseViewModel<DiaryShowEvent, DiaryShowAppMessage, DiaryShowState>() {
 
     private val logTag = createLogTag()
@@ -183,17 +185,20 @@ internal class DiaryShowViewModel @Inject constructor(
         val logMsg = "日記読込"
         Log.i(logTag, "${logMsg}_開始")
 
-        try {
-            val diary = diaryRepository.fetchDiary(date) ?: throw IllegalArgumentException()
-            diaryStateFlow.update(diary)
-        } catch (e: Exception) {
-            Log.e(logTag, "${logMsg}_失敗", e)
-            if (ignoreAppMessage) {
-                emitViewModelEvent(
-                    DiaryShowEvent.NavigateDiaryLoadingFailureDialog(date)
-                )
-            } else {
-                emitAppMessageEvent(DiaryShowAppMessage.DiaryLoadingFailure)
+        when (val result = fetchDiaryUseCase(date)) {
+            is UseCaseResult.Success -> {
+                val diary = result.value
+                diaryStateFlow.update(diary)
+            }
+            is UseCaseResult.Failure -> {
+                Log.e(logTag, "${logMsg}_失敗", result.exception)
+                if (ignoreAppMessage) {
+                    emitViewModelEvent(
+                        DiaryShowEvent.NavigateDiaryLoadingFailureDialog(date)
+                    )
+                } else {
+                    emitAppMessageEvent(DiaryShowAppMessage.DiaryLoadingFailure)
+                }
             }
         }
 
@@ -206,23 +211,34 @@ internal class DiaryShowViewModel @Inject constructor(
 
         val date = diaryStateFlow.date.requireValue()
         val picturePath  = diaryStateFlow.picturePath.value
-        try {
-            diaryRepository.deleteDiary(date)
-        } catch (e: Exception) {
-            Log.e(logTag, "${logMsg}_失敗", e)
-            emitAppMessageEvent(DiaryShowAppMessage.DiaryDeleteFailure)
-            return
-        }
 
-
-        releaseUriPermissionUseCase(picturePath)
-        emitViewModelEvent(
-            DiaryShowEvent
-                .NavigatePreviousFragmentOnDiaryDelete(
-                    FragmentResult.Some(date)
+        when (val result = deleteDiaryUseCase(date, picturePath)) {
+            is UseCaseResult.Success -> {
+                Log.i(logTag, "${logMsg}_完了")
+                emitViewModelEvent(
+                    DiaryShowEvent
+                        .NavigatePreviousFragmentOnDiaryDelete(
+                            FragmentResult.Some(date)
+                        )
                 )
-        )
-        Log.i(logTag, "${logMsg}_完了")
+            }
+            is UseCaseResult.Failure -> {
+                Log.e(logTag, "${logMsg}_失敗", result.exception)
+                when (result.exception) {
+                    is DeleteDiaryUseCaseException.DeleteDiaryFailed -> {
+                        emitAppMessageEvent(DiaryShowAppMessage.DiaryDeleteFailure)
+                    }
+                    is DeleteDiaryUseCaseException.RevokePersistentAccessUriFailed -> {
+                        emitViewModelEvent(
+                            DiaryShowEvent
+                                .NavigatePreviousFragmentOnDiaryDelete(
+                                    FragmentResult.Some(date)
+                                )
+                        )
+                    }
+                }
+            }
+        }
     }
 
     // FragmentAction関係
