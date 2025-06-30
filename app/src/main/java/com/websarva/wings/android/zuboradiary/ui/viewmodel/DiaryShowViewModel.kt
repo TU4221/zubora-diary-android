@@ -18,11 +18,9 @@ import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
 import com.websarva.wings.android.zuboradiary.ui.model.state.DiaryShowState
 import com.websarva.wings.android.zuboradiary.ui.utils.requireValue
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 import javax.inject.Inject
@@ -50,10 +48,9 @@ internal class DiaryShowViewModel @Inject constructor(
                     DiaryShowState.LoadError -> false
                 }
             }
-            .stateIn(
-                scope = viewModelScope,
-                started = SharingStarted.WhileSubscribed(5000),
-                initialValue = false
+            .stateInDefault(
+                viewModelScope,
+                false
             )
 
     // 日記データ関係
@@ -67,10 +64,9 @@ internal class DiaryShowViewModel @Inject constructor(
     val isWeather2Visible =
         combine(weather1, weather2) { weather1, weather2 ->
             return@combine weather1 != Weather.UNKNOWN && weather2 != Weather.UNKNOWN
-        }.stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5000),
-            initialValue = false
+        }.stateInDefault(
+            viewModelScope,
+            false
         )
     val condition
         get() = diaryStateFlow.condition.asStateFlow()

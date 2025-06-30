@@ -41,14 +41,12 @@ import com.websarva.wings.android.zuboradiary.ui.model.state.DiaryEditState
 import com.websarva.wings.android.zuboradiary.ui.utils.requireValue
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 import javax.inject.Inject
@@ -251,10 +249,9 @@ internal class DiaryEditViewModel @Inject constructor(
                 DiaryEditState.ItemDeleting,
                 DiaryEditState.PictureSelecting -> false
             }
-        }.stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5000),
-            initialValue = false
+        }.stateInDefault(
+            viewModelScope,
+            false
         )
 
     val picturePath
@@ -278,10 +275,9 @@ internal class DiaryEditViewModel @Inject constructor(
                 DiaryEditState.ItemDeleting,
                 DiaryEditState.PictureSelecting -> false
             }
-        }.stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5000),
-            initialValue = false
+        }.stateInDefault(
+            viewModelScope,
+            false
         )
 
     // ProgressIndicator表示
@@ -301,10 +297,9 @@ internal class DiaryEditViewModel @Inject constructor(
                 DiaryEditState.ItemAdding,
                 DiaryEditState.ItemDeleting -> false
             }
-        }.stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5000),
-            initialValue = false
+        }.stateInDefault(
+            viewModelScope,
+            false
         )
 
     // ViewModel初期化関係
