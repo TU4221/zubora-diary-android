@@ -11,7 +11,6 @@ import com.websarva.wings.android.zuboradiary.ui.adapter.diary.wordsearchresult.
 import com.websarva.wings.android.zuboradiary.ui.adapter.diary.wordsearchresult.WordSearchResultYearMonthList
 import com.websarva.wings.android.zuboradiary.ui.model.state.WordSearchState
 import com.websarva.wings.android.zuboradiary.ui.model.event.WordSearchEvent
-import com.websarva.wings.android.zuboradiary.ui.model.state.ViewModelState
 import com.websarva.wings.android.zuboradiary.ui.utils.requireValue
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CancellationException
@@ -29,9 +28,29 @@ import javax.inject.Inject
 @HiltViewModel
 internal class WordSearchViewModel @Inject internal constructor(
     private val diaryRepository: DiaryRepository
-) : BaseViewModel<WordSearchEvent, WordSearchAppMessage, WordSearchState>() {
+) : BaseViewModel<WordSearchEvent, WordSearchAppMessage, WordSearchState>(
+    WordSearchState.Idle
+) {
 
     private val logTag = createLogTag()
+
+    override val isProcessingState =
+        viewModelState
+            .map { state ->
+                // TODO:保留
+                when (state) {
+                    WordSearchState.Searching,
+                    WordSearchState.AdditionLoading,
+                    WordSearchState.Updating -> true
+
+                    WordSearchState.Idle,
+                    WordSearchState.Results,
+                    WordSearchState.NoResults -> false
+                }
+            }.stateInDefault(
+                viewModelScope,
+                false
+            )
 
     private val initialSearchWord = ""
     private val _searchWord = MutableStateFlow(initialSearchWord)
@@ -79,7 +98,7 @@ internal class WordSearchViewModel @Inject internal constructor(
     val isResultsVisible =
         viewModelState.map { value ->
             when (value) {
-                ViewModelState.Idle,
+                WordSearchState.Idle,
                 WordSearchState.NoResults -> false
                 else -> true
             }
@@ -388,7 +407,7 @@ internal class WordSearchViewModel @Inject internal constructor(
     }
 
     private fun clearWordSearchResultList() {
-        updateViewModelIdleState()
+        updateViewModelState(WordSearchState.Idle)
         cancelPreviousLoading()
         wordSearchResultListLoadingJob = initialWordSearchResultListLoadingJob
         _wordSearchResultList.value = initialWordSearchResultList

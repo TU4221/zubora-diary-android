@@ -20,6 +20,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.Year
@@ -32,7 +33,9 @@ import javax.inject.Inject
 internal class DiaryListViewModel @Inject constructor(
     private val diaryRepository: DiaryRepository,
     private val releaseUriPermissionUseCase: ReleaseUriPermissionUseCase
-) : BaseViewModel<DiaryListEvent, DiaryListAppMessage, DiaryListState>() {
+) : BaseViewModel<DiaryListEvent, DiaryListAppMessage, DiaryListState>(
+    DiaryListState.Idle
+) {
 
     companion object {
         // MEMO:初期読込時の対象リストが画面全体に表示される値にすること。
@@ -41,6 +44,24 @@ internal class DiaryListViewModel @Inject constructor(
     }
 
     private val logTag = createLogTag()
+
+    override val isProcessingState =
+        viewModelState
+            .map { state ->
+                // TODO:保留
+                when (state) {
+                    DiaryListState.NewLoading,
+                    DiaryListState.AdditionLoading,
+                    DiaryListState.Updating -> true
+
+                    DiaryListState.Idle,
+                    DiaryListState.NoResults,
+                    DiaryListState.Results -> false
+                }
+            }.stateInDefault(
+                viewModelScope,
+                false
+            )
 
     private val initialDiaryListLoadingJob: Job? = null
     private var diaryListLoadingJob: Job? = initialDiaryListLoadingJob // キャンセル用

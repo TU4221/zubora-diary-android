@@ -9,7 +9,9 @@ import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
 import com.websarva.wings.android.zuboradiary.ui.model.state.CalendarState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 import javax.inject.Inject
@@ -17,7 +19,25 @@ import javax.inject.Inject
 @HiltViewModel
 internal class CalendarViewModel @Inject constructor(
     private val doesDiaryExistUseCase: DoesDiaryExistUseCase
-) : BaseViewModel<CalendarEvent, CalendarAppMessage, CalendarState>() {
+) : BaseViewModel<CalendarEvent, CalendarAppMessage, CalendarState>(
+    CalendarState.Idle
+) {
+
+    override val isProcessingState: StateFlow<Boolean>
+        get() =
+            viewModelState
+                .map { state ->
+                    when (state) {
+                        // TODO:保留
+                        CalendarState.Idle,
+                        CalendarState.DiaryHidden,
+                        CalendarState.DiaryVisible -> false
+                    }
+                }.stateInDefault(
+                    viewModelScope,
+                    false
+                )
+
 
     private val initialSelectedDate = LocalDate.now()
     private val _selectedDate = MutableStateFlow<LocalDate>(initialSelectedDate)

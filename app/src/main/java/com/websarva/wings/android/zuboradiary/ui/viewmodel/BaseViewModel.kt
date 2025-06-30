@@ -2,42 +2,47 @@ package com.websarva.wings.android.zuboradiary.ui.viewmodel
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import com.websarva.wings.android.zuboradiary.ui.model.AppMessage
 import com.websarva.wings.android.zuboradiary.ui.model.event.ConsumableEvent
 import com.websarva.wings.android.zuboradiary.ui.model.event.ViewModelEvent
 import com.websarva.wings.android.zuboradiary.ui.model.navigation.NavigationCommand
 import com.websarva.wings.android.zuboradiary.ui.model.state.ViewModelState
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 
-internal abstract class BaseViewModel<E: ViewModelEvent, M: AppMessage, S: ViewModelState> : ViewModel() {
+internal abstract class BaseViewModel<E: ViewModelEvent, M: AppMessage, S: ViewModelState>(
+    private val initialViewModelState: S
+) : ViewModel() {
+
+    fun <T> Flow<T>.stateInDefault(
+        scope: CoroutineScope,
+        initialValue: T
+    ): StateFlow<T> {
+        return this.stateIn(
+            scope = scope,
+            started = SharingStarted.WhileSubscribed(5000L),
+            initialValue = initialValue
+        )
+    }
 
     private val logTag = createLogTag()
 
     private val _viewModelEvent = MutableSharedFlow<ConsumableEvent<ViewModelEvent>>(replay = 1)
     val viewModelEvent get() = _viewModelEvent.asSharedFlow()
 
-    private val initialViewModelState = ViewModelState.Idle
-    private val _viewModelState = MutableStateFlow<ViewModelState>(initialViewModelState)
+    private val _viewModelState = MutableStateFlow(initialViewModelState)
     val viewModelState get() = _viewModelState.asStateFlow()
-    // TODO:下記が必要か最後に判断
-    val isProcessingStateFlow: StateFlow<Boolean> =
-        _viewModelState
-            .map { state -> state != ViewModelState.Idle }
-            .stateIn(
-                scope = viewModelScope,
-                started = SharingStarted.WhileSubscribed(5000),
-                initialValue = false
-            )
-    val isProcessing get() = isProcessingStateFlow.value
+
+    abstract val isProcessingState: StateFlow<Boolean>
+    val isProcessing get() = isProcessingState.value
 
     // 表示保留中Navigation
     private val initialPendingNavigationCommand = NavigationCommand.None
@@ -78,10 +83,6 @@ internal abstract class BaseViewModel<E: ViewModelEvent, M: AppMessage, S: ViewM
 
     protected fun updateViewModelState(state: S) {
         _viewModelState.value = state
-    }
-
-    protected fun updateViewModelIdleState() {
-        _viewModelState.value = ViewModelState.Idle
     }
 
     abstract fun onBackPressed()

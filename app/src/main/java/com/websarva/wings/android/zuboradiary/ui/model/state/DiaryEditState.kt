@@ -1,6 +1,8 @@
 package com.websarva.wings.android.zuboradiary.ui.model.state
 
-internal sealed class DiaryEditState : ViewModelState() {
+internal sealed class DiaryEditState : ViewModelState {
+    data object Idle: DiaryEditState() // 初期状態
+
     data object Loading : DiaryEditState() // 読込中
     data object Saving : DiaryEditState() // 保存中
     data object Deleting : DiaryEditState() // 削除中

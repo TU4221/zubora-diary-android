@@ -43,7 +43,9 @@ internal class SettingsViewModel @Inject constructor(
     private val workerRepository: WorkerRepository,
     private val diaryRepository: DiaryRepository,
     private val uriRepository: UriRepository
-) : BaseViewModel<SettingsEvent, SettingsAppMessage, SettingsState>() {
+) : BaseViewModel<SettingsEvent, SettingsAppMessage, SettingsState>(
+    SettingsState.Idle
+) {
 
     // HACK:SavedStateHandleを使用する理由
     //      プロセスキルでアプリを再起動した時、ActivityのBinding処理とは関係なしにFragmentの処理が始まり、
@@ -62,6 +64,18 @@ internal class SettingsViewModel @Inject constructor(
     }
 
     private val logTag = createLogTag()
+
+    override val isProcessingState =
+        viewModelState
+            .map { state ->
+                // TODO:保留
+                when (state) {
+                    SettingsState.Idle -> false
+                }
+            }.stateInDefault(
+                viewModelScope,
+                false
+            )
 
     // MEMO:StateFlow型設定値変数の値ははPreferencesDatastoreの値のみを代入したいので、
     //      代入されるまでの間(初回設定値読込中)はnullとする。

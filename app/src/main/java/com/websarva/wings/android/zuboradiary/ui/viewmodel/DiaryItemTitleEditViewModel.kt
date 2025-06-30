@@ -23,9 +23,23 @@ import javax.inject.Inject
 @HiltViewModel
 internal class DiaryItemTitleEditViewModel @Inject constructor(
     private val diaryRepository: DiaryRepository
-) : BaseViewModel<DiaryItemTitleEditEvent, DiaryItemTitleEditAppMessage, DiaryItemTitleEditState>() {
+) : BaseViewModel<DiaryItemTitleEditEvent, DiaryItemTitleEditAppMessage, DiaryItemTitleEditState>(
+    DiaryItemTitleEditState.Idle
+) {
 
     private val logTag = createLogTag()
+
+    override val isProcessingState =
+        viewModelState
+            .map { state ->
+                // TODO:保留
+                when (state) {
+                    DiaryItemTitleEditState.Idle -> false
+                }
+            }.stateInDefault(
+                viewModelScope,
+                false
+            )
 
     private val maxLoadedItemTitles = 50
 
