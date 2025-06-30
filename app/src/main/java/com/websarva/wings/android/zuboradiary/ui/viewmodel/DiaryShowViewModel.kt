@@ -116,7 +116,7 @@ internal class DiaryShowViewModel @Inject constructor(
 
     // ViewClicked処理
     fun onDiaryEditMenuClicked() {
-        if (isProcessing) return
+        if (viewModelState.value != DiaryShowState.LoadSuccess) return
 
         val date = diaryStateFlow.date.requireValue()
         viewModelScope.launch {
@@ -127,8 +127,7 @@ internal class DiaryShowViewModel @Inject constructor(
     }
 
     fun onDiaryDeleteMenuClicked() {
-        if (isProcessing) return
-        check(viewModelState.value == DiaryShowState.LoadSuccess)
+        if (viewModelState.value != DiaryShowState.LoadSuccess) return
 
         val date = diaryStateFlow.date.requireValue()
         val picturePath = diaryStateFlow.picturePath.value
@@ -165,6 +164,8 @@ internal class DiaryShowViewModel @Inject constructor(
     }
 
     fun onDiaryDeleteDialogResultReceived(result: DialogResult<Unit>) {
+        check(viewModelState.value == DiaryShowState.LoadSuccess)
+
         when (result) {
             is DialogResult.Positive<Unit> -> {
                 onDiaryDeleteDialogPositiveResultReceived()
