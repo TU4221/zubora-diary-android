@@ -737,7 +737,31 @@ internal class DiaryEditViewModel @Inject constructor(
     // SavedStateHandle対応State更新
     private fun updateDiaryEditViewModelState(state: DiaryEditState) {
         updateViewModelState(state)
-        handle[SAVED_VIEW_MODEL_STATE_KEY] = state
+
+        // MEMO:アプリ再起動後も安全に復元できる安定したUI状態のみをSavedStateHandleに保存する。
+        //      LoadingやSavingなど、非同期処理中の一時的な状態を保存すると、
+        //      再起動時に処理が中断されたままUIが固まる可能性があるため除外する。
+        when (state) {
+            DiaryEditState.Idle,
+            DiaryEditState.Editing,
+            DiaryEditState.LoadError,
+            DiaryEditState.SelectingPicture -> {
+                // MEMO:これらの状態はユーザーインタラクションが可能、または明確な結果を示しているため保存対象とする。
+                handle[SAVED_VIEW_MODEL_STATE_KEY] = state
+            }
+
+            DiaryEditState.CheckingDiaryInfo,
+            DiaryEditState.Loading,
+            DiaryEditState.Saving,
+            DiaryEditState.Deleting,
+            DiaryEditState.CheckingWeatherAvailability,
+            DiaryEditState.FetchingWeatherInfo,
+            DiaryEditState.AddingItem,
+            DiaryEditState.DeletingItem -> {
+                // MEMO:これらの一時的な処理中状態は、再起動後に意味をなさなくなるか、
+                //      UIを不適切な状態でロックする可能性があるため保存しない。
+            }
+        }
     }
 
     // 日記データ処理関係
