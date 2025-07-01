@@ -31,6 +31,8 @@ import com.websarva.wings.android.zuboradiary.ui.theme.ThemeColorChanger
 import com.websarva.wings.android.zuboradiary.ui.utils.requireValue
 import com.websarva.wings.android.zuboradiary.ui.fragment.common.RequiresBottomNavigation
 import com.websarva.wings.android.zuboradiary.ui.fragment.common.ReselectableFragment
+import com.websarva.wings.android.zuboradiary.ui.model.state.MainActivityUiState
+import com.websarva.wings.android.zuboradiary.ui.viewmodel.MainActivityViewModel
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.SettingsViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
@@ -44,6 +46,7 @@ class MainActivity : LoggingActivity() {
     private var _binding: ActivityMainBinding? = null
     private val binding get() = checkNotNull(_binding)
     private var isMainActivityLayoutInflated = false
+    private var shouldJumpToInitialState = true
 
     // BottomNavigation
     internal var wasSelectedTab = false
@@ -75,6 +78,8 @@ class MainActivity : LoggingActivity() {
     //      委譲プロパティによるViewModel生成は公式が推奨する方法の為、警告を無視する。その為、@Suppressを付与する。
     //      この警告に対応するSuppressネームはなく、"unused"のみでは不要Suppressとなる為、"RedundantSuppression"も追記する。
     @Suppress("unused", "RedundantSuppression")
+    private val mainActivityViewModel: MainActivityViewModel by viewModels()
+    @Suppress("unused", "RedundantSuppression")
     private val settingsViewModel: SettingsViewModel by viewModels()
 
     @RequiresApi(Build.VERSION_CODES.Q)
@@ -83,6 +88,7 @@ class MainActivity : LoggingActivity() {
         setUpEdgeToEdge()
         super.onCreate(savedInstanceState)
 
+        setUpFragmentLifeCycleCallBacks()
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.CREATED) {
                 settingsViewModel.isAllSettingsNotNull
@@ -90,6 +96,7 @@ class MainActivity : LoggingActivity() {
                         if (!value) return@collectLatest
 
                         if (!isMainActivityLayoutInflated) setUpMainActivityBinding()
+                        setUpUiState()
                         setUpThemeColor()
                         setUpNavigation()
                     }
@@ -107,12 +114,119 @@ class MainActivity : LoggingActivity() {
         }
     }
 
+    private fun setUpFragmentLifeCycleCallBacks() {
+        // MEMO:Bindingインフレート後にCallbacksを登録していたが、インフレートのタイミングでFragmentが作成され
+        //      Resume状態となる為、下記方法でインフレート前からCallbacksが処理されるように対応。
+        //      また、"recursive = true"の理由は、NavHostFragmentからFragmentManagerを取得してCallBacksを
+        //      登録しようとするにはコードが複雑になり、設定変更等によるアプリ再起動時を考慮すると登録タイミングが複雑になる為。
+        supportFragmentManager.apply {
+            registerFragmentLifecycleCallbacks(BottomNavigationEnabledSwitchCallbacks(), true)
+            registerFragmentLifecycleCallbacks(BottomNavigationStateSwitchCallbacks(), true)
+        }
+    }
+
+    // MEMO:タブ選択で下記の様な画面遷移を行う時、Bを表示中にタブ選択でAを表示させようとすると、
+    //      BのFragmentが消えた後、AのFragmentが表示されない不具合が生じる。
+    //      (何も表示されない状態)
+    //      これを回避するために、遷移先のFragmentが表示しきるまで、タブ選択できないようにする。
+    //      Fragment A → B → A
+    private inner class BottomNavigationEnabledSwitchCallbacks :
+        FragmentManager.FragmentLifecycleCallbacks() {
+
+        override fun onFragmentResumed(fm: FragmentManager, f: Fragment) {
+            super.onFragmentPaused(fm, f)
+            if (f.parentFragment !is NavHostFragment) return
+
+            if (isFragmentWithBottomNavigation(f)) {
+                mainActivityViewModel.switchBottomNavigationEnabled(true)
+            }
+        }
+
+        override fun onFragmentPaused(fm: FragmentManager, f: Fragment) {
+            super.onFragmentPaused(fm, f)
+            if (f.parentFragment !is NavHostFragment) return
+
+            if (isFragmentWithBottomNavigation(f)) {
+                mainActivityViewModel.switchBottomNavigationEnabled(false)
+            }
+        }
+
+        private fun isFragmentWithBottomNavigation(f: Fragment): Boolean {
+            return f is RequiresBottomNavigation
+        }
+    }
+
+    private inner class BottomNavigationStateSwitchCallbacks :
+        FragmentManager.FragmentLifecycleCallbacks() {
+        override fun onFragmentViewCreated(
+            fm: FragmentManager,
+            f: Fragment,
+            v: View,
+            savedInstanceState: Bundle?
+        ) {
+            super.onFragmentViewCreated(fm, f, v, savedInstanceState)
+            if (f.parentFragment !is NavHostFragment) return
+
+            if (f is DialogFragment) return
+
+            if (f is RequiresBottomNavigation) {
+                mainActivityViewModel.showBottomNavigation()
+            } else {
+                mainActivityViewModel.hideBottomNavigation()
+            }
+        }
+    }
+
     private fun setUpMainActivityBinding() {
         val themeColor = settingsViewModel.themeColor.requireValue()
         val themeColorInflater = ThemeColorInflaterCreator().create(layoutInflater, themeColor)
         _binding = ActivityMainBinding.inflate(themeColorInflater)
         setContentView(binding.root)
         isMainActivityLayoutInflated = true
+    }
+
+    private fun setUpUiState() {
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                mainActivityViewModel.uiState
+                    .collectLatest { state ->
+                        switchBottomNavigationState(state)
+                        switchBottomNavigationEnabled(state)
+                    }
+            }
+        }
+    }
+
+    private fun switchBottomNavigationState(state: MainActivityUiState) {
+        val motionResId =
+            when (state) {
+                is MainActivityUiState.ShowingBottomNavigation -> {
+                    R.id.motion_scene_bottom_navigation_showed_state
+                }
+                is MainActivityUiState.HidingBottomNavigation -> {
+                    R.id.motion_scene_bottom_navigation_hided_state
+                }
+            }
+
+        if (shouldJumpToInitialState) {
+            shouldJumpToInitialState = false
+            binding.motionLayoutBottomNavigation.jumpToState(motionResId)
+        } else {
+            // HACK:BottomNavigationViewを非表示から表示に変更した時Viewが一瞬ぶれる為、下記コードで対策。
+            binding.motionLayoutBottomNavigation.apply {
+                post {
+                    transitionToState(motionResId)
+                }
+            }
+        }
+    }
+
+    private fun switchBottomNavigationEnabled(state: MainActivityUiState) {
+        val menu = binding.bottomNavigation.menu
+        val size = menu.size()
+        for (i in 0 until size) {
+            menu.getItem(i).setEnabled(state.isBottomNavigationEnabled)
+        }
     }
 
     private fun setUpThemeColor() {
@@ -151,86 +265,8 @@ class MainActivity : LoggingActivity() {
         // ボトムナビゲーションのデフォルト選択アイテム情報取得
         startNavigationMenuItem = selectedBottomNavigationMenuItem
 
-        setUpEnabledNavigationSwitchFunction()
-        setUpBottomNavigationStateSwitchFunction()
         bottomNavigationView.setOnItemSelectedListener(CustomOnItemSelectedListener(navController))
         bottomNavigationView.setOnItemReselectedListener(CustomOnItemReselectedListener())
-    }
-
-    // MEMO:タブ選択で下記の様な画面遷移を行う時、Bを表示中にタブ選択でAを表示させようとすると、
-    //      BのFragmentが消えた後、AのFragmentが表示されない不具合が生じる。
-    //      (何も表示されない状態)
-    //      これを回避するために、遷移先のFragmentが表示しきるまで、タブ選択できないようにする。
-    //      Fragment A → B → A
-    private fun setUpEnabledNavigationSwitchFunction() {
-        navFragmentManager.registerFragmentLifecycleCallbacks(
-            BottomNavigationEnabledSwitchCallbacks(),
-            false
-        )
-    }
-
-    private inner class BottomNavigationEnabledSwitchCallbacks :
-        FragmentManager.FragmentLifecycleCallbacks() {
-
-            init {
-                // HACK:StartFragmentの最初のResumedの時点では、onFragmentResumed()が呼び出されない。
-                //      理由は本クラスのインスタンスをActivity#onResume()よりも後に設定している為。
-                //      本クラスはbinding変数を参照しているため、Activity#onCreate()で設定せずに、
-                //      SettingViewModelの設定値の読込が完了してから設定している。
-                //      有効状態から始めれるように初期化タイミングで有効処理するように対応。
-                switchEnabledNavigation(true)
-            }
-
-            override fun onFragmentResumed(fm: FragmentManager, f: Fragment) {
-                super.onFragmentPaused(fm, f)
-                if (isFragmentWithBottomNavigation(f)) switchEnabledNavigation(true)
-            }
-
-            override fun onFragmentPaused(fm: FragmentManager, f: Fragment) {
-                super.onFragmentPaused(fm, f)
-                if (isFragmentWithBottomNavigation(f)) switchEnabledNavigation(false)
-            }
-
-            private fun isFragmentWithBottomNavigation(f: Fragment): Boolean {
-                return f is RequiresBottomNavigation
-            }
-
-            private fun switchEnabledNavigation(isEnabled: Boolean) {
-                val menu = binding.bottomNavigation.menu
-                val size = menu.size()
-                for (i in 0 until size) {
-                    menu.getItem(i).setEnabled(isEnabled)
-                }
-            }
-    }
-
-    private fun setUpBottomNavigationStateSwitchFunction() {
-        navFragmentManager.registerFragmentLifecycleCallbacks(
-            BottomNavigationStateSwitchCallbacks(),
-            false
-        )
-    }
-
-    private inner class BottomNavigationStateSwitchCallbacks :
-        FragmentManager.FragmentLifecycleCallbacks() {
-        override fun onFragmentViewCreated(
-            fm: FragmentManager,
-            f: Fragment,
-            v: View,
-            savedInstanceState: Bundle?
-        ) {
-            super.onFragmentViewCreated(fm, f, v, savedInstanceState)
-
-            if (f is DialogFragment) return
-
-            val motionResId =
-                if (f is RequiresBottomNavigation) {
-                    R.id.motion_scene_bottom_navigation_showed_state
-                } else {
-                    R.id.motion_scene_bottom_navigation_hided_state
-                }
-            binding.motionLayoutBottomNavigation.transitionToState(motionResId)
-        }
     }
 
     private inner class CustomOnItemSelectedListener(private val navController: NavController):
