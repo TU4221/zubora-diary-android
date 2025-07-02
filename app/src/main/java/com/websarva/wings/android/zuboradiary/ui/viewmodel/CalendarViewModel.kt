@@ -17,6 +17,7 @@ import kotlinx.coroutines.launch
 import java.time.LocalDate
 import javax.inject.Inject
 
+// TODO:DiaryShowViewModelをCalendarViewModelに含めるか検討する
 @HiltViewModel
 internal class CalendarViewModel @Inject constructor(
     private val doesDiaryExistUseCase: DoesDiaryExistUseCase
