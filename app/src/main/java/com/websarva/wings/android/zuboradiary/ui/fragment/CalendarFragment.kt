@@ -89,6 +89,7 @@ class CalendarFragment :
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        setUpUiState()
         setUpCalendar()
         setUpDiaryShow()
         setUpFloatActionButton()
@@ -141,6 +142,15 @@ class CalendarFragment :
             else -> {
                 throw IllegalArgumentException()
             }
+        }
+    }
+
+    private fun setUpUiState() {
+        launchAndRepeatOnViewLifeCycleStarted {
+            diaryShowViewModel.uiState
+                .collectLatest { value ->
+                    mainViewModel.onChangedDiaryShowViewModelState(value)
+                }
         }
     }
 

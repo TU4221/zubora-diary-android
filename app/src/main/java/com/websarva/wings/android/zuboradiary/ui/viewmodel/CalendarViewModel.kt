@@ -7,6 +7,7 @@ import com.websarva.wings.android.zuboradiary.ui.model.CalendarAppMessage
 import com.websarva.wings.android.zuboradiary.ui.model.event.CalendarEvent
 import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
 import com.websarva.wings.android.zuboradiary.ui.model.state.CalendarState
+import com.websarva.wings.android.zuboradiary.ui.model.state.DiaryShowState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -28,10 +29,13 @@ internal class CalendarViewModel @Inject constructor(
             uiState
                 .map { state ->
                     when (state) {
-                        // TODO:保留
+                        CalendarState.LoadingDiary,
+                        CalendarState.LoadingDiaryInfo -> true
+
                         CalendarState.Idle,
-                        CalendarState.HidingDiary,
-                        CalendarState.ShowingDiary -> false
+                        CalendarState.LoadDiarySuccess,
+                        CalendarState.LoadError,
+                        CalendarState.NoDiary -> false
                     }
                 }.stateInDefault(
                     viewModelScope,
@@ -57,6 +61,8 @@ internal class CalendarViewModel @Inject constructor(
 
     // BackPressed(戻るボタン)処理
     override fun onBackPressed() {
+        if (isProcessing) return
+
         viewModelScope.launch {
             emitNavigatePreviousFragmentEvent()
         }
@@ -64,10 +70,14 @@ internal class CalendarViewModel @Inject constructor(
 
     // ViewClicked処理
     fun onCalendarDayClicked(date: LocalDate) {
+        if (isProcessing) return
+
         updateSelectedDate(date)
     }
 
     fun onDiaryEditButtonClicked() {
+        if (isProcessing) return
+
         val date = _selectedDate.value
         viewModelScope.launch {
             navigateDiaryEditFragment(date)
@@ -75,6 +85,8 @@ internal class CalendarViewModel @Inject constructor(
     }
 
     fun onBottomNavigationItemReselected() {
+        if (isProcessing) return
+
         val selectedDate = _selectedDate.value
         val today = LocalDate.now()
         viewModelScope.launch {
@@ -116,6 +128,19 @@ internal class CalendarViewModel @Inject constructor(
         }
     }
 
+    fun onChangedDiaryShowViewModelState(state: DiaryShowState) {
+        when (state) {
+            DiaryShowState.Loading -> updateUiState(CalendarState.LoadingDiary)
+            DiaryShowState.LoadSuccess -> updateUiState(CalendarState.LoadDiarySuccess)
+            DiaryShowState.LoadError -> updateUiState(CalendarState.LoadError)
+
+            DiaryShowState.Idle,
+            DiaryShowState.Deleting -> {
+                // MEMO:CalendarFragmentからの日記削除機能は無いため、処理不要
+            }
+        }
+    }
+
     // View変更処理
     private suspend fun prepareDiary(date: LocalDate) {
         val action =
@@ -129,12 +154,11 @@ internal class CalendarViewModel @Inject constructor(
 
         val exists = existsSavedDiary(date) ?: false
         if (exists) {
-            updateUiState(CalendarState.ShowingDiary)
             emitViewModelEvent(
                 CalendarEvent.LoadDiary(date)
             )
         } else {
-            updateUiState(CalendarState.HidingDiary)
+            updateUiState(CalendarState.NoDiary)
             emitViewModelEvent(
                 CalendarEvent.InitializeDiary
             )
