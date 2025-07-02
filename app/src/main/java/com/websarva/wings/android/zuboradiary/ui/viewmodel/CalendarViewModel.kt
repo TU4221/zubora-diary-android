@@ -30,8 +30,8 @@ internal class CalendarViewModel @Inject constructor(
                     when (state) {
                         // TODO:保留
                         CalendarState.Idle,
-                        CalendarState.DiaryHidden,
-                        CalendarState.DiaryVisible -> false
+                        CalendarState.HidingDiary,
+                        CalendarState.ShowingDiary -> false
                     }
                 }.stateInDefault(
                     viewModelScope,
@@ -129,12 +129,12 @@ internal class CalendarViewModel @Inject constructor(
 
         val exists = existsSavedDiary(date) ?: false
         if (exists) {
-            updateUiState(CalendarState.DiaryVisible)
+            updateUiState(CalendarState.ShowingDiary)
             emitViewModelEvent(
                 CalendarEvent.LoadDiary(date)
             )
         } else {
-            updateUiState(CalendarState.DiaryHidden)
+            updateUiState(CalendarState.HidingDiary)
             emitViewModelEvent(
                 CalendarEvent.InitializeDiary
             )
