@@ -3,9 +3,16 @@ package com.websarva.wings.android.zuboradiary.ui.viewmodel
 import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.viewModelScope
-import com.websarva.wings.android.zuboradiary.data.repository.DiaryRepository
+import com.websarva.wings.android.zuboradiary.domain.exception.DomainException
 import com.websarva.wings.android.zuboradiary.domain.model.DiaryListItem
-import com.websarva.wings.android.zuboradiary.domain.usecase.uri.ReleaseUriPermissionUseCase
+import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
+import com.websarva.wings.android.zuboradiary.domain.usecase.diary.CheckUnloadedDiariesExistUseCase
+import com.websarva.wings.android.zuboradiary.domain.usecase.diary.CountDiariesUseCase
+import com.websarva.wings.android.zuboradiary.domain.usecase.diary.DeleteDiaryUseCase
+import com.websarva.wings.android.zuboradiary.domain.usecase.diary.FetchNewestDiaryUseCase
+import com.websarva.wings.android.zuboradiary.domain.usecase.diary.FetchOldestDiaryUseCase
+import com.websarva.wings.android.zuboradiary.domain.usecase.diary.FetchDiaryListUseCase
+import com.websarva.wings.android.zuboradiary.domain.usecase.exception.DeleteDiaryUseCaseException
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import com.websarva.wings.android.zuboradiary.ui.model.DiaryListAppMessage
 import com.websarva.wings.android.zuboradiary.ui.adapter.diary.diary.DiaryDayList
@@ -31,8 +38,12 @@ import javax.inject.Inject
 
 @HiltViewModel
 internal class DiaryListViewModel @Inject constructor(
-    private val diaryRepository: DiaryRepository,
-    private val releaseUriPermissionUseCase: ReleaseUriPermissionUseCase
+    private val countDiariesUseCase: CountDiariesUseCase,
+    private val fetchDiaryListUseCase: FetchDiaryListUseCase,
+    private val checkUnloadedDiariesExistUseCase: CheckUnloadedDiariesExistUseCase,
+    private val deleteDiaryUseCase: DeleteDiaryUseCase,
+    private val fetchNewestDiaryUseCase: FetchNewestDiaryUseCase,
+    private val fetchOldestDiaryUseCase: FetchOldestDiaryUseCase
 ) : BaseViewModel<DiaryListEvent, DiaryListAppMessage, DiaryListState>(
     DiaryListState.Idle
 ) {
@@ -173,22 +184,36 @@ internal class DiaryListViewModel @Inject constructor(
 
     private fun onDiaryDeleteDialogPositiveResultReceived(date: LocalDate, uri: Uri?) {
         viewModelScope.launch {
-            val isSuccessful = deleteDiary(date)
-            if (!isSuccessful) return@launch
-
-            releaseUriPermissionUseCase(uri)
+            deleteDiary(date, uri)
         }
     }
 
     private fun prepareDiaryList() {
         viewModelScope.launch {
+            val logMsg = "日記リスト準備"
+            Log.i(logTag, "${logMsg}_開始")
             val diaryList = diaryList.value
             if (diaryList.isEmpty) {
-                val numSavedDiaries = diaryRepository.countDiaries()
-                if (numSavedDiaries >= 1) loadNewDiaryList()
+                try {
+                    val numSavedDiaries = countSavedDiaries()
+                    if (numSavedDiaries >= 1) loadNewDiaryList()
+                } catch (e: DomainException) {
+                    Log.e(logTag, "${logMsg}_失敗", e)
+                    emitAppMessageEvent(DiaryListAppMessage.DiaryListLoadingFailure)
+                    return@launch
+                }
             } else {
                 updateDiaryList()
             }
+            Log.i(logTag, "${logMsg}_完了")
+        }
+    }
+
+    @Throws(DomainException::class)
+    private suspend fun countSavedDiaries(): Int{
+        when (val result = countDiariesUseCase()) {
+            is UseCaseResult.Success -> return result.value
+            is UseCaseResult.Failure -> throw result.exception
         }
     }
 
@@ -233,7 +258,7 @@ internal class DiaryListViewModel @Inject constructor(
         } catch (e: CancellationException) {
             Log.i(logTag, "${logMsg}_キャンセル", e)
             // 処理なし
-        } catch (e: Exception) {
+        } catch (e: DomainException) {
             Log.e(logTag, "${logMsg}_失敗", e)
             _diaryList.value = previousDiaryList
             updateWordSearchStatusOnListLoadingFinish(previousDiaryList)
@@ -265,13 +290,13 @@ internal class DiaryListViewModel @Inject constructor(
     }
 
     private fun interface DiaryListCreator {
-        @Throws(Exception::class)
+        @Throws(DomainException::class)
         suspend fun create(): DiaryYearMonthList
     }
 
     private inner class NewDiaryListCreator : DiaryListCreator {
 
-        @Throws(Exception::class)
+        @Throws(DomainException::class)
         override suspend fun create(): DiaryYearMonthList {
             showDiaryListFirstItemProgressIndicator()
             return loadSavedDiaryList(NUM_LOADING_ITEMS, 0)
@@ -285,7 +310,7 @@ internal class DiaryListViewModel @Inject constructor(
 
     private inner class AddedDiaryListCreator : DiaryListCreator {
 
-        @Throws(CancellationException::class)
+        @Throws(DomainException::class)
         override suspend fun create(): DiaryYearMonthList {
             val currentDiaryList = _diaryList.requireValue()
             check(currentDiaryList.isNotEmpty)
@@ -301,7 +326,7 @@ internal class DiaryListViewModel @Inject constructor(
 
     private inner class UpdateDiaryListCreator : DiaryListCreator {
 
-        @Throws(Exception::class)
+        @Throws(DomainException::class)
         override suspend fun create(): DiaryYearMonthList {
             val currentDiaryList = _diaryList.requireValue()
             check(currentDiaryList.isNotEmpty)
@@ -317,20 +342,22 @@ internal class DiaryListViewModel @Inject constructor(
         }
     }
 
-    @Throws(Exception::class)
+    @Throws(DomainException::class)
     private suspend fun loadSavedDiaryList(
         numLoadingItems: Int,
         loadingOffset: Int
     ): DiaryYearMonthList {
-        require(numLoadingItems > 0)
-        require(loadingOffset >= 0)
-
-        val loadedDiaryList =
-            diaryRepository.fetchDiaryList(
+        val result =
+            fetchDiaryListUseCase(
                 numLoadingItems,
                 loadingOffset,
                 sortConditionDate
             )
+        val loadedDiaryList =
+            when (result) {
+                is UseCaseResult.Success -> result.value
+                is UseCaseResult.Failure -> throw result.exception
+            }
 
         if (loadedDiaryList.isEmpty()) return DiaryYearMonthList()
 
@@ -346,20 +373,14 @@ internal class DiaryListViewModel @Inject constructor(
         return DiaryYearMonthList(diaryDayList, !existsUnloadedDiaries)
     }
 
-    @Throws(Exception::class)
+    @Throws(DomainException::class)
     private suspend fun existsUnloadedDiaries(numLoadedDiaries: Int): Boolean {
-        val numExistingDiaries =
-            if (sortConditionDate == null) {
-                diaryRepository.countDiaries()
-            } else {
-                diaryRepository.countDiaries(
-                    checkNotNull(sortConditionDate)
-                )
-            }
-
-        if (numExistingDiaries <= 0) return false
-
-        return numLoadedDiaries < numExistingDiaries
+        val result =
+            checkUnloadedDiariesExistUseCase(numLoadedDiaries, sortConditionDate)
+        when (result) {
+            is UseCaseResult.Success -> return result.value
+            is UseCaseResult.Failure -> throw result.exception
+        }
     }
 
     private fun updateSortConditionDate(yearMonth: YearMonth) {
@@ -367,41 +388,48 @@ internal class DiaryListViewModel @Inject constructor(
         sortConditionDate = yearMonth.atDay(1).with(TemporalAdjusters.lastDayOfMonth())
     }
 
-    private suspend fun deleteDiary(date: LocalDate): Boolean {
+    private suspend fun deleteDiary(date: LocalDate, uri: Uri?) {
         val logMsg = "日記削除"
         Log.i(logTag, "${logMsg}_開始")
-        try {
-            diaryRepository.deleteDiary(date)
-        } catch (e: Exception) {
-            Log.e(logTag, "${logMsg}_失敗", e)
-            emitAppMessageEvent(DiaryListAppMessage.DiaryDeleteFailure)
-            return false
-        }
 
-        updateDiaryList()
-        Log.i(logTag, "${logMsg}_完了")
-        return true
+        when (val result = deleteDiaryUseCase(date, uri)) {
+            is UseCaseResult.Success -> {
+                updateDiaryList()
+                Log.i(logTag, "${logMsg}_完了")
+            }
+            is UseCaseResult.Failure -> {
+                Log.e(logTag, "${logMsg}_失敗", result.exception)
+                when (result.exception) {
+                    is DeleteDiaryUseCaseException.DeleteDiaryFailed -> {
+                        emitAppMessageEvent(DiaryListAppMessage.DiaryDeleteFailure)
+                    }
+                    is DeleteDiaryUseCaseException.RevokePersistentAccessUriFailed -> {
+                        updateDiaryList()
+                    }
+                }
+            }
+        }
     }
 
     private suspend fun loadNewestSavedDiaryDate(): LocalDate? {
-        try {
-            val diary = diaryRepository.fetchNewestDiary() ?: return null
-            return  diary.date
-        } catch (e: Exception) {
-            Log.e(logTag, "最新日記読込_失敗", e)
-            emitAppMessageEvent(DiaryListAppMessage.DiaryInfoLoadingFailure)
-            return null
+        when (val result = fetchNewestDiaryUseCase()) {
+            is UseCaseResult.Success -> return result.value?.date
+            is UseCaseResult.Failure -> {
+                Log.e(logTag, "最新日記読込_失敗", result.exception)
+                emitAppMessageEvent(DiaryListAppMessage.DiaryInfoLoadingFailure)
+                return null
+            }
         }
     }
 
     private suspend fun loadOldestSavedDiaryDate(): LocalDate? {
-        try {
-            val diary = diaryRepository.fetchOldestDiary() ?: return null
-            return diary.date
-        } catch (e: Exception) {
-            Log.e(logTag, "最古日記読込_失敗", e)
-            emitAppMessageEvent(DiaryListAppMessage.DiaryInfoLoadingFailure)
-            return null
+        when (val result = fetchOldestDiaryUseCase()) {
+            is UseCaseResult.Success -> return result.value?.date
+            is UseCaseResult.Failure -> {
+                Log.e(logTag, "最古日記読込_失敗", result.exception)
+                emitAppMessageEvent(DiaryListAppMessage.DiaryInfoLoadingFailure)
+                return null
+            }
         }
     }
 

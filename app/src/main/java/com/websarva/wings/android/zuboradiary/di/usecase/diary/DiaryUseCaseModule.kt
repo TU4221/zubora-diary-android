@@ -5,10 +5,15 @@ import com.websarva.wings.android.zuboradiary.data.repository.LocationRepository
 import com.websarva.wings.android.zuboradiary.data.repository.WeatherInfoRepository
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.DoesDiaryExistUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.CanFetchWeatherInfoUseCase
+import com.websarva.wings.android.zuboradiary.domain.usecase.diary.CheckUnloadedDiariesExistUseCase
+import com.websarva.wings.android.zuboradiary.domain.usecase.diary.CountDiariesUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.DeleteDiaryUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.FetchDiaryUseCase
+import com.websarva.wings.android.zuboradiary.domain.usecase.diary.FetchNewestDiaryUseCase
+import com.websarva.wings.android.zuboradiary.domain.usecase.diary.FetchOldestDiaryUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.ShouldRequestDiaryUpdateConfirmationUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.FetchWeatherInfoUseCase
+import com.websarva.wings.android.zuboradiary.domain.usecase.diary.FetchDiaryListUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.SaveDiaryUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.ShouldFetchWeatherInfoUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.ShouldRequestDiaryFetchConfirmationUseCase
@@ -21,7 +26,6 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
-
 @Module
 @InstallIn(SingletonComponent::class)
 internal object DiaryUseCaseModule {
@@ -128,4 +132,29 @@ internal object DiaryUseCaseModule {
     @Provides
     fun provideShouldRequestExitWithoutDiarySavingConfirmationUseCase() =
         ShouldRequestExitWithoutDiarySavingConfirmationUseCase()
+
+    @Singleton
+    @Provides
+    fun provideFetchDiaryListUseCase(diaryRepository: DiaryRepository) =
+        FetchDiaryListUseCase(diaryRepository)
+
+    @Singleton
+    @Provides
+    fun provideCountDiariesUseCase(diaryRepository: DiaryRepository) =
+        CountDiariesUseCase(diaryRepository)
+
+    @Singleton
+    @Provides
+    fun provideCheckUnloadedDiariesExistUseCase(countDiariesUseCase:CountDiariesUseCase) =
+        CheckUnloadedDiariesExistUseCase(countDiariesUseCase)
+
+    @Singleton
+    @Provides
+    fun provideFetchNewestDiaryUseCase(diaryRepository: DiaryRepository) =
+        FetchNewestDiaryUseCase(diaryRepository)
+
+    @Singleton
+    @Provides
+    fun provideFetchOldestDiaryUseCase(diaryRepository: DiaryRepository): FetchOldestDiaryUseCase =
+        FetchOldestDiaryUseCase(diaryRepository)
 }
