@@ -2,7 +2,7 @@ package com.websarva.wings.android.zuboradiary.ui.model.state
 
 internal sealed class MainActivityUiState(
     open val isBottomNavigationEnabled: Boolean
-) {
+) : UiState {
 
     data class ShowingBottomNavigation(
         override val isBottomNavigationEnabled: Boolean
