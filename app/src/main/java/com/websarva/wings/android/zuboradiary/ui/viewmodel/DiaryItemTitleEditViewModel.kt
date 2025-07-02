@@ -30,7 +30,7 @@ internal class DiaryItemTitleEditViewModel @Inject constructor(
     private val logTag = createLogTag()
 
     override val isProcessingState =
-        viewModelState
+        uiState
             .map { state ->
                 // TODO:保留
                 when (state) {

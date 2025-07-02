@@ -35,7 +35,7 @@ internal class WordSearchViewModel @Inject internal constructor(
     private val logTag = createLogTag()
 
     override val isProcessingState =
-        viewModelState
+        uiState
             .map { state ->
                 // TODO:保留
                 when (state) {
@@ -96,7 +96,7 @@ internal class WordSearchViewModel @Inject internal constructor(
     private var isLoadingOnScrolled = initialIsLoadingOnScrolled
 
     val isResultsVisible =
-        viewModelState.map { value ->
+        uiState.map { value ->
             when (value) {
                 WordSearchState.Idle,
                 WordSearchState.NoResults -> false
@@ -109,7 +109,7 @@ internal class WordSearchViewModel @Inject internal constructor(
         )
 
     val isNumResultsVisible =
-        combine(viewModelState, isResultsVisible) { viewModelState, isResultsVisible ->
+        combine(uiState, isResultsVisible) { viewModelState, isResultsVisible ->
             if (!isResultsVisible) return@combine false
 
             when (viewModelState) {
@@ -123,7 +123,7 @@ internal class WordSearchViewModel @Inject internal constructor(
         )
 
     val isNoResultsMessageVisible =
-        viewModelState.map { value ->
+        uiState.map { value ->
             when (value) {
                 WordSearchState.NoResults -> true
                 else -> false
@@ -294,7 +294,7 @@ internal class WordSearchViewModel @Inject internal constructor(
                 is UpdateWordSearchResultListCreator -> WordSearchState.Updating
                 else -> throw IllegalArgumentException()
             }
-        updateViewModelState(state)
+        updateUiState(state)
     }
 
     private fun updateWordSearchStatusOnSearchFinish(list: WordSearchResultYearMonthList) {
@@ -304,7 +304,7 @@ internal class WordSearchViewModel @Inject internal constructor(
             } else {
                 WordSearchState.NoResults
             }
-        updateViewModelState(state)
+        updateUiState(state)
     }
 
     private fun interface WordSearchResultListCreator {
@@ -407,7 +407,7 @@ internal class WordSearchViewModel @Inject internal constructor(
     }
 
     private fun clearWordSearchResultList() {
-        updateViewModelState(WordSearchState.Idle)
+        updateUiState(WordSearchState.Idle)
         cancelPreviousLoading()
         wordSearchResultListLoadingJob = initialWordSearchResultListLoadingJob
         _wordSearchResultList.value = initialWordSearchResultList

@@ -4,7 +4,7 @@ import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
-internal sealed class DiaryEditState : ViewModelState, Parcelable {
+internal sealed class DiaryEditState : UiState, Parcelable {
     data object Idle: DiaryEditState() // 初期状態
     data object Editing : DiaryEditState() // 編集中
 

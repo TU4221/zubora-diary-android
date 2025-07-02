@@ -25,7 +25,7 @@ internal class CalendarViewModel @Inject constructor(
 
     override val isProcessingState: StateFlow<Boolean>
         get() =
-            viewModelState
+            uiState
                 .map { state ->
                     when (state) {
                         // TODO:保留
@@ -129,12 +129,12 @@ internal class CalendarViewModel @Inject constructor(
 
         val exists = existsSavedDiary(date) ?: false
         if (exists) {
-            updateViewModelState(CalendarState.DiaryVisible)
+            updateUiState(CalendarState.DiaryVisible)
             emitViewModelEvent(
                 CalendarEvent.LoadDiary(date)
             )
         } else {
-            updateViewModelState(CalendarState.DiaryHidden)
+            updateUiState(CalendarState.DiaryHidden)
             emitViewModelEvent(
                 CalendarEvent.InitializeDiary
             )

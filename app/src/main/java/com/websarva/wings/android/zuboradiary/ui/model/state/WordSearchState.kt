@@ -1,6 +1,6 @@
 package com.websarva.wings.android.zuboradiary.ui.model.state
 
-internal sealed class WordSearchState : ViewModelState {
+internal sealed class WordSearchState : UiState {
     data object Idle: WordSearchState() // 初期状態
     data object Searching : WordSearchState() // 検索中
     data object AdditionLoading : WordSearchState() // 検索結果追加読込

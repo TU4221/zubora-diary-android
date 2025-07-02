@@ -7,7 +7,7 @@ import com.websarva.wings.android.zuboradiary.ui.model.AppMessage
 import com.websarva.wings.android.zuboradiary.ui.model.event.ConsumableEvent
 import com.websarva.wings.android.zuboradiary.ui.model.event.ViewModelEvent
 import com.websarva.wings.android.zuboradiary.ui.model.navigation.NavigationCommand
-import com.websarva.wings.android.zuboradiary.ui.model.state.ViewModelState
+import com.websarva.wings.android.zuboradiary.ui.model.state.UiState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -18,8 +18,8 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.stateIn
 
-internal abstract class BaseViewModel<E: ViewModelEvent, M: AppMessage, S: ViewModelState>(
-    private val initialViewModelState: S
+internal abstract class BaseViewModel<E: ViewModelEvent, M: AppMessage, S: UiState>(
+    private val initialViewUiState: S
 ) : ViewModel() {
 
     fun <T> Flow<T>.stateInDefault(
@@ -38,8 +38,8 @@ internal abstract class BaseViewModel<E: ViewModelEvent, M: AppMessage, S: ViewM
     private val _viewModelEvent = MutableSharedFlow<ConsumableEvent<ViewModelEvent>>(replay = 1)
     val viewModelEvent get() = _viewModelEvent.asSharedFlow()
 
-    private val _viewModelState = MutableStateFlow(initialViewModelState)
-    val viewModelState get() = _viewModelState.asStateFlow()
+    private val _uiState = MutableStateFlow(initialViewUiState)
+    val uiState get() = _uiState.asStateFlow()
 
     abstract val isProcessingState: StateFlow<Boolean>
     val isProcessing get() = isProcessingState.value
@@ -53,7 +53,7 @@ internal abstract class BaseViewModel<E: ViewModelEvent, M: AppMessage, S: ViewM
 
     open fun initialize() {
         Log.d(logTag, "initialize()")
-        _viewModelState.value = initialViewModelState
+        _uiState.value = initialViewUiState
         _pendingNavigationCommand.value = initialPendingNavigationCommand
     }
 
@@ -81,8 +81,8 @@ internal abstract class BaseViewModel<E: ViewModelEvent, M: AppMessage, S: ViewM
         )
     }
 
-    protected fun updateViewModelState(state: S) {
-        _viewModelState.value = state
+    protected fun updateUiState(state: S) {
+        _uiState.value = state
     }
 
     abstract fun onBackPressed()

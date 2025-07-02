@@ -46,7 +46,7 @@ internal class DiaryListViewModel @Inject constructor(
     private val logTag = createLogTag()
 
     override val isProcessingState =
-        viewModelState
+        uiState
             .map { state ->
                 // TODO:保留
                 when (state) {
@@ -251,7 +251,7 @@ internal class DiaryListViewModel @Inject constructor(
                 is UpdateDiaryListCreator -> DiaryListState.Updating
                 else -> throw IllegalArgumentException()
             }
-        updateViewModelState(state)
+        updateUiState(state)
     }
 
     private fun updateWordSearchStatusOnListLoadingFinish(list: DiaryYearMonthList) {
@@ -261,7 +261,7 @@ internal class DiaryListViewModel @Inject constructor(
             } else {
                 DiaryListState.NoResults
             }
-        updateViewModelState(state)
+        updateUiState(state)
     }
 
     private fun interface DiaryListCreator {

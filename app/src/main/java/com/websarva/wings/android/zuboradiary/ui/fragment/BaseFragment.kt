@@ -25,7 +25,7 @@ import com.websarva.wings.android.zuboradiary.ui.model.event.ViewModelEvent
 import com.websarva.wings.android.zuboradiary.ui.model.navigation.NavigationCommand
 import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
 import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
-import com.websarva.wings.android.zuboradiary.ui.model.state.ViewModelState
+import com.websarva.wings.android.zuboradiary.ui.model.state.UiState
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.BaseViewModel
 import com.websarva.wings.android.zuboradiary.ui.theme.ThemeColorInflaterCreator
 import com.websarva.wings.android.zuboradiary.ui.utils.requireValue
@@ -46,7 +46,7 @@ abstract class BaseFragment<T: ViewBinding> : LoggingFragment() {
     internal val binding get() = checkNotNull(_binding)
 
     // MEMO:ViewModelが無いFragmentに対応できるようにNull許容型とする。
-    internal abstract val mainViewModel: BaseViewModel<out ViewModelEvent, out AppMessage, out ViewModelState>?
+    internal abstract val mainViewModel: BaseViewModel<out ViewModelEvent, out AppMessage, out UiState>?
 
     internal lateinit var navController: NavController
         private set

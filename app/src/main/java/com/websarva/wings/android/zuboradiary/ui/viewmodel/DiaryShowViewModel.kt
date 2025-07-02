@@ -37,7 +37,7 @@ internal class DiaryShowViewModel @Inject constructor(
     private val logTag = createLogTag()
 
     override val isProcessingState =
-        viewModelState
+        uiState
             .map { state ->
                 when (state) {
                     DiaryShowState.Loading,
@@ -116,7 +116,7 @@ internal class DiaryShowViewModel @Inject constructor(
 
     // ViewClicked処理
     fun onDiaryEditMenuClicked() {
-        if (viewModelState.value != DiaryShowState.LoadSuccess) return
+        if (uiState.value != DiaryShowState.LoadSuccess) return
 
         val date = diaryStateFlow.date.requireValue()
         viewModelScope.launch {
@@ -127,7 +127,7 @@ internal class DiaryShowViewModel @Inject constructor(
     }
 
     fun onDiaryDeleteMenuClicked() {
-        if (viewModelState.value != DiaryShowState.LoadSuccess) return
+        if (uiState.value != DiaryShowState.LoadSuccess) return
 
         val date = diaryStateFlow.date.requireValue()
         val picturePath = diaryStateFlow.picturePath.value
@@ -150,7 +150,7 @@ internal class DiaryShowViewModel @Inject constructor(
 
     // Fragmentからの結果受取処理
     fun onDiaryLoadingFailureDialogResultReceived(result: DialogResult<Unit>) {
-        check(viewModelState.value == DiaryShowState.LoadError)
+        check(uiState.value == DiaryShowState.LoadError)
 
         when (result) {
             is DialogResult.Positive<Unit>,
@@ -164,7 +164,7 @@ internal class DiaryShowViewModel @Inject constructor(
     }
 
     fun onDiaryDeleteDialogResultReceived(result: DialogResult<Unit>) {
-        check(viewModelState.value == DiaryShowState.LoadSuccess)
+        check(uiState.value == DiaryShowState.LoadSuccess)
 
         when (result) {
             is DialogResult.Positive<Unit> -> {
@@ -172,7 +172,7 @@ internal class DiaryShowViewModel @Inject constructor(
             }
             DialogResult.Negative,
             DialogResult.Cancel -> {
-                check(viewModelState.value == DiaryShowState.LoadSuccess)
+                check(uiState.value == DiaryShowState.LoadSuccess)
             }
         }
     }
@@ -192,7 +192,7 @@ internal class DiaryShowViewModel @Inject constructor(
 
     // Fragment状態処理
     fun onFragmentViewCreated(date: LocalDate) {
-        if (viewModelState.value != DiaryShowState.Idle) return
+        if (uiState.value != DiaryShowState.Idle) return
 
         viewModelScope.launch {
             prepareDiaryForDiaryShowFragment(date)
@@ -212,17 +212,17 @@ internal class DiaryShowViewModel @Inject constructor(
         val logMsg = "日記読込"
         Log.i(logTag, "${logMsg}_開始")
 
-        updateViewModelState(DiaryShowState.Loading)
+        updateUiState(DiaryShowState.Loading)
         when (val result = fetchDiaryUseCase(date)) {
             is UseCaseResult.Success -> {
                 Log.i(logTag, "${logMsg}_完了")
-                updateViewModelState(DiaryShowState.LoadSuccess)
+                updateUiState(DiaryShowState.LoadSuccess)
                 val diary = result.value
                 diaryStateFlow.update(diary)
             }
             is UseCaseResult.Failure -> {
                 Log.e(logTag, "${logMsg}_失敗", result.exception)
-                updateViewModelState(DiaryShowState.LoadError)
+                updateUiState(DiaryShowState.LoadError)
                 if (ignoreAppMessage) {
                     emitViewModelEvent(
                         DiaryShowEvent.NavigateDiaryLoadingFailureDialog(date)
@@ -241,7 +241,7 @@ internal class DiaryShowViewModel @Inject constructor(
         val date = diaryStateFlow.date.requireValue()
         val picturePath  = diaryStateFlow.picturePath.value
 
-        updateViewModelState(DiaryShowState.Deleting)
+        updateUiState(DiaryShowState.Deleting)
         when (val result = deleteDiaryUseCase(date, picturePath)) {
             is UseCaseResult.Success -> {
                 Log.i(logTag, "${logMsg}_完了")
@@ -251,7 +251,7 @@ internal class DiaryShowViewModel @Inject constructor(
                 Log.e(logTag, "${logMsg}_失敗", result.exception)
                 when (result.exception) {
                     is DeleteDiaryUseCaseException.DeleteDiaryFailed -> {
-                        updateViewModelState(DiaryShowState.LoadSuccess)
+                        updateUiState(DiaryShowState.LoadSuccess)
                         emitAppMessageEvent(DiaryShowAppMessage.DiaryDeleteFailure)
                     }
                     is DeleteDiaryUseCaseException.RevokePersistentAccessUriFailed -> {
@@ -264,7 +264,7 @@ internal class DiaryShowViewModel @Inject constructor(
 
     // FragmentAction関係
     private suspend fun navigatePreviousFragment(loadedDiaryDate: LocalDate? = null) {
-        updateViewModelState(DiaryShowState.Idle)
+        updateUiState(DiaryShowState.Idle)
         val result =
             if (loadedDiaryDate == null) {
                 FragmentResult.None

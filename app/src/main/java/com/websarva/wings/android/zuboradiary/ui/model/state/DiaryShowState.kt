@@ -1,6 +1,6 @@
 package com.websarva.wings.android.zuboradiary.ui.model.state
 
-internal sealed class DiaryShowState : ViewModelState {
+internal sealed class DiaryShowState : UiState {
     data object Idle: DiaryShowState() // 初期状態
 
     data object Loading : DiaryShowState()

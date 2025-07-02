@@ -163,7 +163,7 @@ class DiaryListFragment :
         }
 
         launchAndRepeatOnViewLifeCycleStarted {
-            mainViewModel.viewModelState
+            mainViewModel.uiState
                 .collectLatest { value ->
                     val isEnabled =
                         value != DiaryListState.AdditionLoading
