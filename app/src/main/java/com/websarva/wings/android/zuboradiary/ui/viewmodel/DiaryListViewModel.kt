@@ -106,31 +106,38 @@ internal class DiaryListViewModel @Inject constructor(
     // ViewClicked処理
     fun onWordSearchMenuClicked() {
         viewModelScope.launch {
-            navigateWordSearchFragment()
+            emitViewModelEvent(DiaryListEvent.NavigateWordSearchFragment)
         }
     }
 
     fun onNavigationClicked() {
         viewModelScope.launch {
-            navigateStartYearMonthPickerDialog()
+            val newestDiaryDate = loadNewestSavedDiaryDate() ?: LocalDate.now()
+            val oldestDiaryDate = loadOldestSavedDiaryDate() ?: LocalDate.now()
+            val newestYear = Year.of(newestDiaryDate.year)
+            val oldestYear = Year.of(oldestDiaryDate.year)
+            emitViewModelEvent(
+                DiaryListEvent.NavigateStartYearMonthPickerDialog(newestYear, oldestYear)
+            )
         }
     }
 
     fun onDiaryListItemClicked(date: LocalDate) {
         viewModelScope.launch {
-            navigateDiaryShowFragment(date)
+            emitViewModelEvent(DiaryListEvent.NavigateDiaryShowFragment(date))
         }
     }
 
     fun onDiaryListItemDeleteButtonClicked(date: LocalDate, uri: Uri?) {
         viewModelScope.launch {
-            navigateDiaryDeleteDialog(date, uri)
+            emitViewModelEvent(DiaryListEvent.NavigateDiaryDeleteDialog(date, uri))
         }
     }
 
     fun onDiaryEditButtonClicked() {
         viewModelScope.launch {
-            navigateDiaryEditFragment()
+            val today = LocalDate.now()
+            emitViewModelEvent(DiaryListEvent.NavigateDiaryEditFragment(today))
         }
     }
 
@@ -249,11 +256,6 @@ internal class DiaryListViewModel @Inject constructor(
         }
     }
 
-    private fun showDiaryListFirstItemProgressIndicator() {
-        val list = DiaryYearMonthList(false)
-        _diaryList.value = list
-    }
-
     private suspend fun loadAdditionDiaryList(currentList: DiaryYearMonthList) {
         loadDiaryList(DiaryListState.LoadingAdditionDiaryList, currentList) {
             check(currentList.isNotEmpty)
@@ -290,6 +292,20 @@ internal class DiaryListViewModel @Inject constructor(
         currentList: DiaryYearMonthList,
         processLoading: suspend (DiaryYearMonthList) -> DiaryYearMonthList
     ) {
+        require(
+            when (state) {
+                DiaryListState.LoadingNewDiaryList,
+                DiaryListState.LoadingAdditionDiaryList,
+                DiaryListState.UpdatingDiaryList -> true
+
+                DiaryListState.Idle,
+                DiaryListState.DeletingDiary,
+                DiaryListState.LoadingDiaryInfo,
+                DiaryListState.NoResults,
+                DiaryListState.ShowingDiaryList -> false
+            }
+        )
+
         val logMsg = "日記リスト読込"
         Log.i(logTag, "${logMsg}_開始")
 
@@ -318,6 +334,11 @@ internal class DiaryListViewModel @Inject constructor(
                 DiaryListState.NoResults
             }
         updateUiState(state)
+    }
+
+    private fun showDiaryListFirstItemProgressIndicator() {
+        val list = DiaryYearMonthList(false)
+        _diaryList.value = list
     }
 
     @Throws(DomainException::class)
@@ -412,32 +433,5 @@ internal class DiaryListViewModel @Inject constructor(
                 return null
             }
         }
-    }
-
-    private suspend fun navigateDiaryShowFragment(date: LocalDate) {
-        emitViewModelEvent(DiaryListEvent.NavigateDiaryShowFragment(date))
-    }
-
-    private suspend fun navigateDiaryEditFragment() {
-        val today = LocalDate.now()
-        emitViewModelEvent(DiaryListEvent.NavigateDiaryEditFragment(today))
-    }
-
-    private suspend fun navigateWordSearchFragment() {
-        emitViewModelEvent(DiaryListEvent.NavigateWordSearchFragment)
-    }
-
-    private suspend fun navigateStartYearMonthPickerDialog() {
-        val newestDiaryDate = loadNewestSavedDiaryDate() ?: LocalDate.now()
-        val oldestDiaryDate = loadOldestSavedDiaryDate() ?: LocalDate.now()
-        val newestYear = Year.of(newestDiaryDate.year)
-        val oldestYear = Year.of(oldestDiaryDate.year)
-        emitViewModelEvent(
-            DiaryListEvent.NavigateStartYearMonthPickerDialog(newestYear, oldestYear)
-        )
-    }
-
-    private suspend fun navigateDiaryDeleteDialog(date: LocalDate, uri: Uri?) {
-        emitViewModelEvent(DiaryListEvent.NavigateDiaryDeleteDialog(date, uri))
     }
 }
