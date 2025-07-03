@@ -68,7 +68,7 @@
                 <include
                     layout="@layout/layout_full_screen_circular_progress_indicator"
                     android:id="@+id/include_progress_indicator"
-                    app:visibility="@{viewModel.uiState instanceof DiaryListState.Updating ? View.VISIBLE : View.INVISIBLE}" />
+                    app:visibility="@{viewModel.uiState instanceof DiaryListState.UpdatingDiaryList ? View.VISIBLE : View.INVISIBLE}" />
 
             </FrameLayout>
 
@@ -84,7 +84,7 @@
             android:layout_marginBottom="@dimen/fab_margin_bottom"
             android:src="@drawable/ic_edit_24px"
             android:contentDescription="@string/fragment_diary_list_fab_new_diary_creation"
-            android:enabled="@{viewModel.uiState instanceof DiaryListState.Updating ? false : true}"
+            android:enabled="@{viewModel.uiState instanceof DiaryListState.UpdatingDiaryList ? false : true}"
             android:onClick="@{() -> viewModel.onDiaryEditButtonClicked()}"/>
 
     </FrameLayout>

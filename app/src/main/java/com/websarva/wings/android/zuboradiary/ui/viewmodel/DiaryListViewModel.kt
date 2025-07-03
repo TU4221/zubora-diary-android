@@ -58,15 +58,16 @@ internal class DiaryListViewModel @Inject constructor(
     override val isProcessingState =
         uiState
             .map { state ->
-                // TODO:保留
                 when (state) {
-                    DiaryListState.NewLoading,
-                    DiaryListState.AdditionLoading,
-                    DiaryListState.Updating -> true
+                    DiaryListState.LoadingDiaryInfo,
+                    DiaryListState.LoadingNewDiaryList,
+                    DiaryListState.LoadingAdditionDiaryList,
+                    DiaryListState.UpdatingDiaryList,
+                    DiaryListState.DeletingDiary -> true
 
                     DiaryListState.Idle,
                     DiaryListState.NoResults,
-                    DiaryListState.Results -> false
+                    DiaryListState.ShowingDiaryList -> false
                 }
             }.stateInDefault(
                 viewModelScope,
@@ -213,12 +214,14 @@ internal class DiaryListViewModel @Inject constructor(
         val logMsg = "日記リスト準備"
         Log.i(logTag, "${logMsg}_開始")
         if (currentList.isEmpty) {
+            updateUiState(DiaryListState.LoadingDiaryInfo)
             try {
                 val numSavedDiaries = countSavedDiaries()
+                updateUiStateForDiaryList(currentList)
                 if (numSavedDiaries >= 1) loadNewDiaryList(currentList)
             } catch (e: CancellationException) {
                 Log.i(logTag, "${logMsg}_キャンセル", e)
-                // 処理なし
+                updateUiStateForDiaryList(currentList)
             } catch (e: DomainException) {
                 Log.e(logTag, "${logMsg}_失敗", e)
                 emitAppMessageEvent(DiaryListAppMessage.DiaryListLoadingFailure)
@@ -239,7 +242,7 @@ internal class DiaryListViewModel @Inject constructor(
     }
 
     private suspend fun loadNewDiaryList(currentList: DiaryYearMonthList) {
-        loadDiaryList(DiaryListState.NewLoading, currentList) {
+        loadDiaryList(DiaryListState.LoadingNewDiaryList, currentList) {
             showDiaryListFirstItemProgressIndicator()
             val value = fetchDiaryList(NUM_LOADING_ITEMS, 0)
             toUiDiaryList(value)
@@ -252,7 +255,7 @@ internal class DiaryListViewModel @Inject constructor(
     }
 
     private suspend fun loadAdditionDiaryList(currentList: DiaryYearMonthList) {
-        loadDiaryList(DiaryListState.AdditionLoading, currentList) {
+        loadDiaryList(DiaryListState.LoadingAdditionDiaryList, currentList) {
             check(currentList.isNotEmpty)
 
             val loadingOffset = currentList.countDiaries()
@@ -267,7 +270,7 @@ internal class DiaryListViewModel @Inject constructor(
     }
 
     private suspend fun updateDiaryList(currentList: DiaryYearMonthList) {
-        loadDiaryList(DiaryListState.Updating, currentList) {
+        loadDiaryList(DiaryListState.UpdatingDiaryList, currentList) {
             check(currentList.isNotEmpty)
 
             var numLoadingItems = currentList.countDiaries()
@@ -294,23 +297,23 @@ internal class DiaryListViewModel @Inject constructor(
         try {
             val updateDiaryList = processLoading(currentList)
             _diaryList.value = updateDiaryList
-            updateWordSearchStatusOnListLoadingFinish(updateDiaryList)
+            updateUiStateForDiaryList(updateDiaryList)
             Log.i(logTag, "${logMsg}_完了")
         } catch (e: CancellationException) {
             Log.i(logTag, "${logMsg}_キャンセル", e)
-            // 処理なし
+            updateUiStateForDiaryList(currentList)
         } catch (e: DomainException) {
             Log.e(logTag, "${logMsg}_失敗", e)
             _diaryList.value = currentList
-            updateWordSearchStatusOnListLoadingFinish(currentList)
+            updateUiStateForDiaryList(currentList)
             emitAppMessageEvent(DiaryListAppMessage.DiaryListLoadingFailure)
         }
     }
 
-    private fun updateWordSearchStatusOnListLoadingFinish(list: DiaryYearMonthList) {
+    private fun updateUiStateForDiaryList(list: DiaryYearMonthList) {
         val state =
             if (list.isNotEmpty) {
-                DiaryListState.Results
+                DiaryListState.ShowingDiaryList
             } else {
                 DiaryListState.NoResults
             }
@@ -368,6 +371,7 @@ internal class DiaryListViewModel @Inject constructor(
         val logMsg = "日記削除"
         Log.i(logTag, "${logMsg}_開始")
 
+        updateUiState(DiaryListState.DeletingDiary)
         when (val result = deleteDiaryUseCase(date, uri)) {
             is UseCaseResult.Success -> {
                 updateDiaryList(currentList)
@@ -377,6 +381,7 @@ internal class DiaryListViewModel @Inject constructor(
                 Log.e(logTag, "${logMsg}_失敗", result.exception)
                 when (result.exception) {
                     is DeleteDiaryUseCaseException.DeleteDiaryFailed -> {
+                        updateUiStateForDiaryList(currentList)
                         emitAppMessageEvent(DiaryListAppMessage.DiaryDeleteFailure)
                     }
                     is DeleteDiaryUseCaseException.RevokePersistentAccessUriFailed -> {

@@ -166,7 +166,7 @@ class DiaryListFragment :
             mainViewModel.uiState
                 .collectLatest { value ->
                     val isEnabled =
-                        value != DiaryListState.AdditionLoading
+                        value != DiaryListState.LoadingAdditionDiaryList
                     diaryListAdapter.setSwipeEnabled(isEnabled)
                 }
         }
