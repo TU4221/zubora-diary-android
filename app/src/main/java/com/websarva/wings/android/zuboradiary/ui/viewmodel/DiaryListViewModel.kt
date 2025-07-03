@@ -216,6 +216,9 @@ internal class DiaryListViewModel @Inject constructor(
             try {
                 val numSavedDiaries = countSavedDiaries()
                 if (numSavedDiaries >= 1) loadNewDiaryList(currentList)
+            } catch (e: CancellationException) {
+                Log.i(logTag, "${logMsg}_キャンセル", e)
+                // 処理なし
             } catch (e: DomainException) {
                 Log.e(logTag, "${logMsg}_失敗", e)
                 emitAppMessageEvent(DiaryListAppMessage.DiaryListLoadingFailure)
@@ -236,24 +239,60 @@ internal class DiaryListViewModel @Inject constructor(
     }
 
     private suspend fun loadNewDiaryList(currentList: DiaryYearMonthList) {
-        loadDiaryList(NewDiaryListCreator(), currentList)
+        loadDiaryList(DiaryListState.NewLoading, currentList) {
+            showDiaryListFirstItemProgressIndicator()
+            val value = fetchDiaryList(NUM_LOADING_ITEMS, 0)
+            toUiDiaryList(value)
+        }
+    }
+
+    private fun showDiaryListFirstItemProgressIndicator() {
+        val list = DiaryYearMonthList(false)
+        _diaryList.value = list
     }
 
     private suspend fun loadAdditionDiaryList(currentList: DiaryYearMonthList) {
-        loadDiaryList(AddedDiaryListCreator(), currentList)
+        loadDiaryList(DiaryListState.AdditionLoading, currentList) {
+            check(currentList.isNotEmpty)
+
+            val loadingOffset = currentList.countDiaries()
+            val value = fetchDiaryList(NUM_LOADING_ITEMS, loadingOffset)
+            val loadedList = toUiDiaryList(value)
+
+            val numLoadedDiaries = currentList.countDiaries() + loadedList.countDiaries()
+            val existsUnloadedDiaries = existsUnloadedDiaries(numLoadedDiaries)
+
+            currentList.combineDiaryLists(loadedList, !existsUnloadedDiaries)
+        }
     }
 
     private suspend fun updateDiaryList(currentList: DiaryYearMonthList) {
-        loadDiaryList(UpdateDiaryListCreator(), currentList)
+        loadDiaryList(DiaryListState.Updating, currentList) {
+            check(currentList.isNotEmpty)
+
+            var numLoadingItems = currentList.countDiaries()
+            // HACK:画面全体にリストアイテムが存在しない状態で日記を追加した後にリスト画面に戻ると、
+            //      日記追加前のアイテム数しか表示されない状態となる。また、スクロール更新もできない。
+            //      対策として下記コードを記述。
+            if (numLoadingItems < NUM_LOADING_ITEMS) {
+                numLoadingItems = NUM_LOADING_ITEMS
+            }
+            val value = fetchDiaryList(numLoadingItems, 0)
+            toUiDiaryList(value)
+        }
     }
 
-    private suspend fun loadDiaryList(creator: DiaryListCreator, currentList: DiaryYearMonthList) {
+    private suspend fun loadDiaryList(
+        state: DiaryListState,
+        currentList: DiaryYearMonthList,
+        processLoading: suspend (DiaryYearMonthList) -> DiaryYearMonthList
+    ) {
         val logMsg = "日記リスト読込"
         Log.i(logTag, "${logMsg}_開始")
 
+        updateUiState(state)
         try {
-            updateWordSearchStatusOnListLoadingStart(creator)
-            val updateDiaryList = creator.create(currentList)
+            val updateDiaryList = processLoading(currentList)
             _diaryList.value = updateDiaryList
             updateWordSearchStatusOnListLoadingFinish(updateDiaryList)
             Log.i(logTag, "${logMsg}_完了")
@@ -268,19 +307,6 @@ internal class DiaryListViewModel @Inject constructor(
         }
     }
 
-    // MEMO:日記リスト読込は処理途中でも再読込できる仕様のため、createDiaryList()処理内で状態更新を行う。
-    //      再読込、createDiaryList()処理前に状態更新を行うと一つ前の検索結果状態が上書きされる可能性あり。
-    private fun updateWordSearchStatusOnListLoadingStart(creator: DiaryListCreator) {
-         val state =
-            when (creator) {
-                is NewDiaryListCreator -> DiaryListState.NewLoading
-                is AddedDiaryListCreator -> DiaryListState.AdditionLoading
-                is UpdateDiaryListCreator -> DiaryListState.Updating
-                else -> throw IllegalArgumentException()
-            }
-        updateUiState(state)
-    }
-
     private fun updateWordSearchStatusOnListLoadingFinish(list: DiaryYearMonthList) {
         val state =
             if (list.isNotEmpty) {
@@ -291,78 +317,28 @@ internal class DiaryListViewModel @Inject constructor(
         updateUiState(state)
     }
 
-    private fun interface DiaryListCreator {
-        @Throws(DomainException::class)
-        suspend fun create(currentList: DiaryYearMonthList): DiaryYearMonthList
-    }
-
-    private inner class NewDiaryListCreator : DiaryListCreator {
-
-        @Throws(DomainException::class)
-        override suspend fun create(currentList: DiaryYearMonthList): DiaryYearMonthList {
-            showDiaryListFirstItemProgressIndicator()
-            return loadSavedDiaryList(NUM_LOADING_ITEMS, 0)
-        }
-
-        private fun showDiaryListFirstItemProgressIndicator() {
-            val list = DiaryYearMonthList(false)
-            _diaryList.value = list
-        }
-    }
-
-    private inner class AddedDiaryListCreator : DiaryListCreator {
-
-        @Throws(DomainException::class)
-        override suspend fun create(currentList: DiaryYearMonthList): DiaryYearMonthList {
-            check(currentList.isNotEmpty)
-
-            val loadingOffset = currentList.countDiaries()
-            val loadedDiaryList =
-                loadSavedDiaryList(NUM_LOADING_ITEMS, loadingOffset)
-            val numLoadedDiaries = currentList.countDiaries() + loadedDiaryList.countDiaries()
-            val existsUnloadedDiaries = existsUnloadedDiaries(numLoadedDiaries)
-            return currentList.combineDiaryLists(loadedDiaryList, !existsUnloadedDiaries)
-        }
-    }
-
-    private inner class UpdateDiaryListCreator : DiaryListCreator {
-
-        @Throws(DomainException::class)
-        override suspend fun create(currentList: DiaryYearMonthList): DiaryYearMonthList {
-            check(currentList.isNotEmpty)
-
-            var numLoadingItems = currentList.countDiaries()
-            // HACK:画面全体にリストアイテムが存在しない状態で日記を追加した後にリスト画面に戻ると、
-            //      日記追加前のアイテム数しか表示されない状態となる。また、スクロール更新もできない。
-            //      対策として下記コードを記述。
-            if (numLoadingItems < NUM_LOADING_ITEMS) {
-                numLoadingItems = NUM_LOADING_ITEMS
-            }
-            return loadSavedDiaryList(numLoadingItems, 0)
-        }
-    }
-
     @Throws(DomainException::class)
-    private suspend fun loadSavedDiaryList(
+    private suspend fun fetchDiaryList(
         numLoadingItems: Int,
         loadingOffset: Int
-    ): DiaryYearMonthList {
+    ): List<DiaryListItem> {
         val result =
             fetchDiaryListUseCase(
                 numLoadingItems,
                 loadingOffset,
                 sortConditionDate
             )
-        val loadedDiaryList =
-            when (result) {
-                is UseCaseResult.Success -> result.value
-                is UseCaseResult.Failure -> throw result.exception
-            }
+        when (result) {
+            is UseCaseResult.Success -> return result.value
+            is UseCaseResult.Failure -> throw result.exception
+        }
+    }
 
-        if (loadedDiaryList.isEmpty()) return DiaryYearMonthList()
+    private suspend fun toUiDiaryList(diaryList: List<DiaryListItem>): DiaryYearMonthList {
+        if (diaryList.isEmpty()) return DiaryYearMonthList()
 
         val diaryDayListItemList: MutableList<DiaryDayListItem> = ArrayList()
-        loadedDiaryList.stream()
+        diaryList.stream()
             .forEach { x: DiaryListItem ->
                 diaryDayListItemList.add(
                     DiaryDayListItem(x)
