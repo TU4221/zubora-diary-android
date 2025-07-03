@@ -181,7 +181,12 @@ internal class WordSearchViewModel @Inject internal constructor(
     fun onWordSearchResultListEndScrolled() {
         if (isLoadingOnScrolled) return
         isLoadingOnScrolled = true
-        loadAdditionWordSearchResultList()
+
+        cancelPreviousLoading()
+        wordSearchResultListLoadingJob =
+            viewModelScope.launch {
+                loadAdditionWordSearchResultList()
+            }
     }
 
     fun onWordSearchResultListUpdated() {
@@ -199,30 +204,32 @@ internal class WordSearchViewModel @Inject internal constructor(
 
     // StateFlow値変更処理
     fun onSearchWordChanged() {
-        viewModelScope.launch {
-            prepareKeyboard()
+        cancelPreviousLoading()
+        wordSearchResultListLoadingJob =
+            viewModelScope.launch {
+                prepareKeyboard()
 
-            if (shouldUpdateWordSearchResultList) {
-                shouldUpdateWordSearchResultList = false
-                val list = wordSearchResultList.value
-                if (list.isEmpty) return@launch
-                updateWordSearchResultList()
-                return@launch
+                if (shouldUpdateWordSearchResultList) {
+                    shouldUpdateWordSearchResultList = false
+                    val list = wordSearchResultList.value
+                    if (list.isEmpty) return@launch
+                    updateWordSearchResultList()
+                    return@launch
+                }
+
+                // HACK:キーワードの入力時と確定時に検索Observerが起動してしまい
+                //      同じキーワードで二重に検索してしまう。防止策として下記条件追加。
+                if (_searchWord.value == previousSearchWord) return@launch
+
+                val value = searchWord.value
+                if (value.isEmpty()) {
+                    clearWordSearchResultList()
+                } else {
+                    loadNewWordSearchResultList()
+                }
+
+                previousSearchWord = value
             }
-
-            // HACK:キーワードの入力時と確定時に検索Observerが起動してしまい
-            //      同じキーワードで二重に検索してしまう。防止策として下記条件追加。
-            if (_searchWord.value == previousSearchWord) return@launch
-
-            val value = searchWord.value
-            if (value.isEmpty()) {
-                clearWordSearchResultList()
-            } else {
-                loadNewWordSearchResultList()
-            }
-
-            previousSearchWord = value
-        }
     }
 
     // データ処理
@@ -231,39 +238,33 @@ internal class WordSearchViewModel @Inject internal constructor(
         if (searchWord.isEmpty()) _shouldShowKeyboard.value = true
     }
 
-    private fun loadNewWordSearchResultList() {
+    private suspend fun loadNewWordSearchResultList() {
         loadWordSearchResultDiaryList(
             NewWordSearchResultListCreator()
         )
     }
 
-    private fun loadAdditionWordSearchResultList() {
+    private suspend fun loadAdditionWordSearchResultList() {
         loadWordSearchResultDiaryList(
             AddedWordSearchResultListCreator()
         )
     }
 
-    private fun updateWordSearchResultList() {
+    private suspend fun updateWordSearchResultList() {
         loadWordSearchResultDiaryList(
             UpdateWordSearchResultListCreator()
         )
     }
 
-    private fun loadWordSearchResultDiaryList(
+    private suspend fun loadWordSearchResultDiaryList(
         creator: WordSearchResultListCreator
     ) {
-        cancelPreviousLoading()
-        wordSearchResultListLoadingJob =
-            viewModelScope.launch {
-                createWordSearchResultList(creator)
-            }
+        createWordSearchResultList(creator)
     }
 
     private fun cancelPreviousLoading() {
         val job = wordSearchResultListLoadingJob ?: return
-        if (!job.isCompleted) {
-            wordSearchResultListLoadingJob?.cancel() ?: throw IllegalStateException()
-        }
+        if (!job.isCompleted) job.cancel()
     }
 
     private suspend fun createWordSearchResultList(
@@ -323,7 +324,7 @@ internal class WordSearchViewModel @Inject internal constructor(
         @Throws(Exception::class)
         override suspend fun create(): WordSearchResultYearMonthList {
             showWordSearchResultListFirstItemProgressIndicator()
-            val value = loadWordSearchResultDiaryListFromDatabase(numLoadingItems, 0)
+            val value = fetchWordSearchResultDiaryList(numLoadingItems, 0)
             return toUiWordSearchResultList(value)
         }
 
@@ -343,7 +344,7 @@ internal class WordSearchViewModel @Inject internal constructor(
 
             val loadingOffset = currentResultList.countDiaries()
             val value =
-                loadWordSearchResultDiaryListFromDatabase(numLoadingItems, loadingOffset)
+                fetchWordSearchResultDiaryList(numLoadingItems, loadingOffset)
             val loadedResultList = toUiWordSearchResultList(value)
             val numLoadedDiaries =
                 currentResultList.countDiaries() + loadedResultList.countDiaries()
@@ -367,7 +368,7 @@ internal class WordSearchViewModel @Inject internal constructor(
                 if (numLoadingItems < this@WordSearchViewModel.numLoadingItems) {
                     numLoadingItems = this@WordSearchViewModel.numLoadingItems
                 }
-                val value = loadWordSearchResultDiaryListFromDatabase(numLoadingItems, 0)
+                val value = fetchWordSearchResultDiaryList(numLoadingItems, 0)
                 return toUiWordSearchResultList(value)
             } catch (e: Exception) {
                 throw e
@@ -376,7 +377,7 @@ internal class WordSearchViewModel @Inject internal constructor(
     }
 
     @Throws(DomainException::class)
-    private suspend fun loadWordSearchResultDiaryListFromDatabase(
+    private suspend fun fetchWordSearchResultDiaryList(
         numLoadingItems: Int,
         loadingOffset: Int
     ): List<WordSearchResultListItem> {
