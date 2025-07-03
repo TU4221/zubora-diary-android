@@ -428,10 +428,8 @@ internal class DiaryListViewModel @Inject constructor(
     }
 
     private suspend fun navigateStartYearMonthPickerDialog() {
-        val newestDiaryDate = loadNewestSavedDiaryDate()
-        val oldestDiaryDate = loadOldestSavedDiaryDate()
-        if (newestDiaryDate == null) return
-        if (oldestDiaryDate == null) return
+        val newestDiaryDate = loadNewestSavedDiaryDate() ?: LocalDate.now()
+        val oldestDiaryDate = loadOldestSavedDiaryDate() ?: LocalDate.now()
         val newestYear = Year.of(newestDiaryDate.year)
         val oldestYear = Year.of(oldestDiaryDate.year)
         emitViewModelEvent(
