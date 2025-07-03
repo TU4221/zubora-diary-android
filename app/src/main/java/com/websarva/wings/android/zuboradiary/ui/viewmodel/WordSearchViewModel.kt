@@ -15,7 +15,6 @@ import com.websarva.wings.android.zuboradiary.ui.adapter.diary.wordsearchresult.
 import com.websarva.wings.android.zuboradiary.ui.adapter.diary.wordsearchresult.WordSearchResultYearMonthList
 import com.websarva.wings.android.zuboradiary.ui.model.state.WordSearchState
 import com.websarva.wings.android.zuboradiary.ui.model.event.WordSearchEvent
-import com.websarva.wings.android.zuboradiary.ui.utils.requireValue
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
@@ -182,10 +181,12 @@ internal class WordSearchViewModel @Inject internal constructor(
         if (isLoadingOnScrolled) return
         isLoadingOnScrolled = true
 
+        val currentResultList = _wordSearchResultList.value
+        val searchWord = _searchWord.value
         cancelPreviousLoading()
         wordSearchResultListLoadingJob =
             viewModelScope.launch {
-                loadAdditionWordSearchResultList()
+                loadAdditionWordSearchResultList(currentResultList, searchWord)
             }
     }
 
@@ -203,29 +204,29 @@ internal class WordSearchViewModel @Inject internal constructor(
     }
 
     // StateFlow値変更処理
-    fun onSearchWordChanged() {
+    fun onSearchWordChanged(value: String) {
+        val currentResultList = _wordSearchResultList.value
+
         cancelPreviousLoading()
         wordSearchResultListLoadingJob =
             viewModelScope.launch {
-                prepareKeyboard()
+                prepareKeyboard(value)
 
                 if (shouldUpdateWordSearchResultList) {
                     shouldUpdateWordSearchResultList = false
-                    val list = wordSearchResultList.value
-                    if (list.isEmpty) return@launch
-                    updateWordSearchResultList()
+                    if (currentResultList.isEmpty) return@launch
+                    updateWordSearchResultList(currentResultList, value)
                     return@launch
                 }
 
                 // HACK:キーワードの入力時と確定時に検索Observerが起動してしまい
                 //      同じキーワードで二重に検索してしまう。防止策として下記条件追加。
-                if (_searchWord.value == previousSearchWord) return@launch
+                if (value == previousSearchWord) return@launch
 
-                val value = searchWord.value
                 if (value.isEmpty()) {
                     clearWordSearchResultList()
                 } else {
-                    loadNewWordSearchResultList()
+                    loadNewWordSearchResultList(currentResultList, value)
                 }
 
                 previousSearchWord = value
@@ -233,33 +234,32 @@ internal class WordSearchViewModel @Inject internal constructor(
     }
 
     // データ処理
-    private fun prepareKeyboard() {
-        val searchWord = searchWord.value
+    private fun prepareKeyboard(searchWord: String) {
         if (searchWord.isEmpty()) _shouldShowKeyboard.value = true
     }
 
-    private suspend fun loadNewWordSearchResultList() {
-        loadWordSearchResultDiaryList(
-            NewWordSearchResultListCreator()
+    private suspend fun loadNewWordSearchResultList(currentResultList: WordSearchResultYearMonthList, searchWord: String) {
+        createWordSearchResultList(
+            NewWordSearchResultListCreator(),
+            currentResultList,
+            searchWord
         )
     }
 
-    private suspend fun loadAdditionWordSearchResultList() {
-        loadWordSearchResultDiaryList(
-            AddedWordSearchResultListCreator()
+    private suspend fun loadAdditionWordSearchResultList(currentResultList: WordSearchResultYearMonthList, searchWord: String) {
+        createWordSearchResultList(
+            AddedWordSearchResultListCreator(),
+            currentResultList,
+            searchWord
         )
     }
 
-    private suspend fun updateWordSearchResultList() {
-        loadWordSearchResultDiaryList(
-            UpdateWordSearchResultListCreator()
+    private suspend fun updateWordSearchResultList(currentResultList: WordSearchResultYearMonthList, searchWord: String) {
+        createWordSearchResultList(
+            UpdateWordSearchResultListCreator(),
+            currentResultList,
+            searchWord
         )
-    }
-
-    private suspend fun loadWordSearchResultDiaryList(
-        creator: WordSearchResultListCreator
-    ) {
-        createWordSearchResultList(creator)
     }
 
     private fun cancelPreviousLoading() {
@@ -268,15 +268,16 @@ internal class WordSearchViewModel @Inject internal constructor(
     }
 
     private suspend fun createWordSearchResultList(
-        resultListCreator: WordSearchResultListCreator
+        resultListCreator: WordSearchResultListCreator,
+        currentResultList: WordSearchResultYearMonthList,
+        searchWord: String
     ) {
         val logMsg = "ワード検索結果読込"
         Log.i(logTag, "${logMsg}_開始")
 
-        val previousResultList = _wordSearchResultList.requireValue()
         try {
             updateWordSearchStatusOnSearchStart(resultListCreator)
-            val updateResultList = resultListCreator.create()
+            val updateResultList = resultListCreator.create(currentResultList, searchWord)
             _wordSearchResultList.value = updateResultList
             updateWordSearchStatusOnSearchFinish(updateResultList)
             Log.i(logTag, "${logMsg}_完了")
@@ -285,8 +286,8 @@ internal class WordSearchViewModel @Inject internal constructor(
             // 処理なし
         } catch (e: Exception) {
             Log.e(logTag, "${logMsg}_失敗", e)
-            _wordSearchResultList.value = previousResultList
-            updateWordSearchStatusOnSearchFinish(previousResultList)
+            _wordSearchResultList.value = currentResultList
+            updateWordSearchStatusOnSearchFinish(currentResultList)
             emitAppMessageEvent(WordSearchAppMessage.SearchResultListLoadingFailure)
         }
     }
@@ -316,16 +317,17 @@ internal class WordSearchViewModel @Inject internal constructor(
 
     private fun interface WordSearchResultListCreator {
         @Throws(Exception::class)
-        suspend fun create(): WordSearchResultYearMonthList
+        suspend fun create(currentResultList: WordSearchResultYearMonthList, searchWord: String): WordSearchResultYearMonthList
     }
 
     private inner class NewWordSearchResultListCreator : WordSearchResultListCreator {
 
         @Throws(Exception::class)
-        override suspend fun create(): WordSearchResultYearMonthList {
+        override suspend fun create(currentResultList: WordSearchResultYearMonthList, searchWord: String): WordSearchResultYearMonthList {
             showWordSearchResultListFirstItemProgressIndicator()
-            val value = fetchWordSearchResultDiaryList(numLoadingItems, 0)
-            return toUiWordSearchResultList(value)
+            val value =
+                fetchWordSearchResultDiaryList(numLoadingItems, 0, searchWord)
+            return toUiWordSearchResultList(value, searchWord)
         }
 
         private fun showWordSearchResultListFirstItemProgressIndicator() {
@@ -338,17 +340,17 @@ internal class WordSearchViewModel @Inject internal constructor(
     private inner class AddedWordSearchResultListCreator : WordSearchResultListCreator {
 
         @Throws(Exception::class)
-        override suspend fun create(): WordSearchResultYearMonthList {
-            val currentResultList = _wordSearchResultList.requireValue()
+        override suspend fun create(currentResultList: WordSearchResultYearMonthList, searchWord: String): WordSearchResultYearMonthList {
             check(currentResultList.isNotEmpty)
 
             val loadingOffset = currentResultList.countDiaries()
             val value =
-                fetchWordSearchResultDiaryList(numLoadingItems, loadingOffset)
-            val loadedResultList = toUiWordSearchResultList(value)
+                fetchWordSearchResultDiaryList(numLoadingItems, loadingOffset, searchWord)
+            val loadedResultList = toUiWordSearchResultList(value, searchWord)
             val numLoadedDiaries =
                 currentResultList.countDiaries() + loadedResultList.countDiaries()
-            val existsUnloadedDiaries = existsUnloadedDiaries(numLoadedDiaries)
+            val existsUnloadedDiaries =
+                existsUnloadedDiaries(searchWord, numLoadedDiaries)
             return currentResultList.combineDiaryLists(loadedResultList, !existsUnloadedDiaries)
         }
     }
@@ -356,8 +358,7 @@ internal class WordSearchViewModel @Inject internal constructor(
     private inner class UpdateWordSearchResultListCreator : WordSearchResultListCreator {
 
         @Throws(Exception::class)
-        override suspend fun create(): WordSearchResultYearMonthList {
-            val currentResultList = _wordSearchResultList.requireValue()
+        override suspend fun create(currentResultList: WordSearchResultYearMonthList, searchWord: String): WordSearchResultYearMonthList {
             check(currentResultList.isNotEmpty)
 
             try {
@@ -368,8 +369,13 @@ internal class WordSearchViewModel @Inject internal constructor(
                 if (numLoadingItems < this@WordSearchViewModel.numLoadingItems) {
                     numLoadingItems = this@WordSearchViewModel.numLoadingItems
                 }
-                val value = fetchWordSearchResultDiaryList(numLoadingItems, 0)
-                return toUiWordSearchResultList(value)
+                val value =
+                    fetchWordSearchResultDiaryList(
+                        numLoadingItems,
+                        0,
+                        searchWord
+                    )
+                return toUiWordSearchResultList(value, searchWord)
             } catch (e: Exception) {
                 throw e
             }
@@ -379,14 +385,14 @@ internal class WordSearchViewModel @Inject internal constructor(
     @Throws(DomainException::class)
     private suspend fun fetchWordSearchResultDiaryList(
         numLoadingItems: Int,
-        loadingOffset: Int
+        loadingOffset: Int,
+        searchWord: String
     ): List<WordSearchResultListItem> {
         require(numLoadingItems > 0)
         require(loadingOffset >= 0)
 
-        _numWordSearchResults.value = countWordSearchResultDiaries()
+        _numWordSearchResults.value = countWordSearchResultDiaries(searchWord)
 
-        val searchWord = _searchWord.requireValue()
         val result =
             fetchWordSearchResultDiaryListUseCase(
                 numLoadingItems,
@@ -401,11 +407,11 @@ internal class WordSearchViewModel @Inject internal constructor(
 
     @Throws(DomainException::class)
     private suspend fun toUiWordSearchResultList(
-        list: List<WordSearchResultListItem>
+        list: List<WordSearchResultListItem>,
+        searchWord: String
     ): WordSearchResultYearMonthList {
         if (list.isEmpty()) return WordSearchResultYearMonthList()
 
-        val searchWord = _searchWord.requireValue()
         val resultDayListItemList: MutableList<WordSearchResultDayListItem> = ArrayList()
         list.stream().forEach { x: WordSearchResultListItem ->
             resultDayListItemList.add(
@@ -413,13 +419,16 @@ internal class WordSearchViewModel @Inject internal constructor(
             )
         }
         val resultDayList = WordSearchResultDayList(resultDayListItemList)
-        val existsUnloadedDiaries = existsUnloadedDiaries(resultDayList.countDiaries())
+        val existsUnloadedDiaries =
+            existsUnloadedDiaries(
+                searchWord,
+                resultDayList.countDiaries()
+            )
         return WordSearchResultYearMonthList(resultDayList, !existsUnloadedDiaries)
     }
 
     @Throws(DomainException::class)
-    private suspend fun countWordSearchResultDiaries(): Int {
-        val searchWord = _searchWord.requireValue()
+    private suspend fun countWordSearchResultDiaries(searchWord: String): Int {
         when (val result = countWordSearchResultDiariesUseCase(searchWord)) {
             is UseCaseResult.Success -> return result.value
             is UseCaseResult.Failure -> throw result.exception
@@ -427,8 +436,7 @@ internal class WordSearchViewModel @Inject internal constructor(
     }
 
     @Throws(DomainException::class)
-    private suspend fun existsUnloadedDiaries(numLoadedDiaries: Int): Boolean {
-        val searchWord = _searchWord.requireValue()
+    private suspend fun existsUnloadedDiaries(searchWord: String, numLoadedDiaries: Int): Boolean {
         val result = checkUnloadedWordSearchResultDiariesExistUseCase(searchWord, numLoadedDiaries)
         when (result) {
             is UseCaseResult.Success -> return result.value

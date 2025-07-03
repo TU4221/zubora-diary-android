@@ -108,7 +108,7 @@ class WordSearchFragment : BaseFragment<FragmentWordSearchBinding>() {
                 .collectLatest { value: String ->
                     if (value.isNotEmpty()) shouldInitializeListAdapter = true
 
-                    mainViewModel.onSearchWordChanged()
+                    mainViewModel.onSearchWordChanged(value)
                 }
         }
 
