@@ -323,7 +323,8 @@ internal class WordSearchViewModel @Inject internal constructor(
         @Throws(Exception::class)
         override suspend fun create(): WordSearchResultYearMonthList {
             showWordSearchResultListFirstItemProgressIndicator()
-            return loadWordSearchResultDiaryListFromDatabase(numLoadingItems, 0)
+            val value = loadWordSearchResultDiaryListFromDatabase(numLoadingItems, 0)
+            return toUiWordSearchResultList(value)
         }
 
         private fun showWordSearchResultListFirstItemProgressIndicator() {
@@ -341,8 +342,9 @@ internal class WordSearchViewModel @Inject internal constructor(
             check(currentResultList.isNotEmpty)
 
             val loadingOffset = currentResultList.countDiaries()
-            val loadedResultList =
+            val value =
                 loadWordSearchResultDiaryListFromDatabase(numLoadingItems, loadingOffset)
+            val loadedResultList = toUiWordSearchResultList(value)
             val numLoadedDiaries =
                 currentResultList.countDiaries() + loadedResultList.countDiaries()
             val existsUnloadedDiaries = existsUnloadedDiaries(numLoadedDiaries)
@@ -365,7 +367,8 @@ internal class WordSearchViewModel @Inject internal constructor(
                 if (numLoadingItems < this@WordSearchViewModel.numLoadingItems) {
                     numLoadingItems = this@WordSearchViewModel.numLoadingItems
                 }
-                return loadWordSearchResultDiaryListFromDatabase(numLoadingItems, 0)
+                val value = loadWordSearchResultDiaryListFromDatabase(numLoadingItems, 0)
+                return toUiWordSearchResultList(value)
             } catch (e: Exception) {
                 throw e
             }
@@ -376,9 +379,11 @@ internal class WordSearchViewModel @Inject internal constructor(
     private suspend fun loadWordSearchResultDiaryListFromDatabase(
         numLoadingItems: Int,
         loadingOffset: Int
-    ): WordSearchResultYearMonthList {
+    ): List<WordSearchResultListItem> {
         require(numLoadingItems > 0)
         require(loadingOffset >= 0)
+
+        _numWordSearchResults.value = countWordSearchResultDiaries()
 
         val searchWord = _searchWord.requireValue()
         val result =
@@ -387,21 +392,25 @@ internal class WordSearchViewModel @Inject internal constructor(
                 loadingOffset,
                 searchWord
             )
-        val loadedResultList =
-            when (result) {
-                is UseCaseResult.Success -> result.value
-                is UseCaseResult.Failure -> throw result.exception
-            }
+        return when (result) {
+            is UseCaseResult.Success -> result.value
+            is UseCaseResult.Failure -> throw result.exception
+        }
+    }
 
-        if (loadedResultList.isEmpty()) return WordSearchResultYearMonthList()
+    @Throws(DomainException::class)
+    private suspend fun toUiWordSearchResultList(
+        list: List<WordSearchResultListItem>
+    ): WordSearchResultYearMonthList {
+        if (list.isEmpty()) return WordSearchResultYearMonthList()
 
+        val searchWord = _searchWord.requireValue()
         val resultDayListItemList: MutableList<WordSearchResultDayListItem> = ArrayList()
-        loadedResultList.stream().forEach { x: WordSearchResultListItem ->
+        list.stream().forEach { x: WordSearchResultListItem ->
             resultDayListItemList.add(
                 WordSearchResultDayListItem(x, searchWord)
             )
         }
-        _numWordSearchResults.value = countWordSearchResultDiaries()
         val resultDayList = WordSearchResultDayList(resultDayListItemList)
         val existsUnloadedDiaries = existsUnloadedDiaries(resultDayList.countDiaries())
         return WordSearchResultYearMonthList(resultDayList, !existsUnloadedDiaries)
