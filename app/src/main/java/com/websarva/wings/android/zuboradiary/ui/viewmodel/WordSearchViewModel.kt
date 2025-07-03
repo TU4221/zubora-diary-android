@@ -19,11 +19,9 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 import javax.inject.Inject
@@ -107,10 +105,9 @@ internal class WordSearchViewModel @Inject internal constructor(
                 WordSearchState.NoResults -> false
                 else -> true
             }
-        }.stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5000),
-            initialValue = false
+        }.stateInDefault(
+            viewModelScope,
+            false
         )
 
     val isNumResultsVisible =
@@ -121,10 +118,9 @@ internal class WordSearchViewModel @Inject internal constructor(
                 WordSearchState.Searching -> false
                 else -> true
             }
-        }.stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5000),
-            initialValue = false
+        }.stateInDefault(
+            viewModelScope,
+            false
         )
 
     val isNoResultsMessageVisible =
@@ -133,10 +129,9 @@ internal class WordSearchViewModel @Inject internal constructor(
                 WordSearchState.NoResults -> true
                 else -> false
             }
-        }.stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5000),
-            initialValue = false
+        }.stateInDefault(
+            viewModelScope,
+            false
         )
 
     override fun initialize() {
