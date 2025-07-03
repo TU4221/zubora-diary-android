@@ -358,6 +358,7 @@ internal class DiaryListViewModel @Inject constructor(
         }
     }
 
+    @Throws(DomainException::class)
     private suspend fun toUiDiaryList(diaryList: List<DiaryListItem>): DiaryYearMonthList {
         if (diaryList.isEmpty()) return DiaryYearMonthList()
 
