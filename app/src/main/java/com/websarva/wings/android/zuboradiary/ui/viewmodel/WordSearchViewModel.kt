@@ -2,8 +2,12 @@ package com.websarva.wings.android.zuboradiary.ui.viewmodel
 
 import android.util.Log
 import androidx.lifecycle.viewModelScope
-import com.websarva.wings.android.zuboradiary.data.repository.DiaryRepository
+import com.websarva.wings.android.zuboradiary.domain.exception.DomainException
 import com.websarva.wings.android.zuboradiary.domain.model.WordSearchResultListItem
+import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
+import com.websarva.wings.android.zuboradiary.domain.usecase.diary.CheckUnloadedWordSearchResultDiariesExistUseCase
+import com.websarva.wings.android.zuboradiary.domain.usecase.diary.CountWordSearchResultDiariesUseCase
+import com.websarva.wings.android.zuboradiary.domain.usecase.diary.FetchWordSearchResultDiaryListUseCase
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import com.websarva.wings.android.zuboradiary.ui.model.WordSearchAppMessage
 import com.websarva.wings.android.zuboradiary.ui.adapter.diary.wordsearchresult.WordSearchResultDayList
@@ -27,7 +31,9 @@ import javax.inject.Inject
 
 @HiltViewModel
 internal class WordSearchViewModel @Inject internal constructor(
-    private val diaryRepository: DiaryRepository
+    private val fetchWordSearchResultDiaryListUseCase: FetchWordSearchResultDiaryListUseCase,
+    private val countWordSearchResultDiariesUseCase: CountWordSearchResultDiariesUseCase,
+    private val checkUnloadedWordSearchResultDiariesExistUseCase: CheckUnloadedWordSearchResultDiariesExistUseCase
 ) : BaseViewModel<WordSearchEvent, WordSearchAppMessage, WordSearchState>(
     WordSearchState.Idle
 ) {
@@ -366,7 +372,7 @@ internal class WordSearchViewModel @Inject internal constructor(
         }
     }
 
-    @Throws(Exception::class)
+    @Throws(DomainException::class)
     private suspend fun loadWordSearchResultDiaryListFromDatabase(
         numLoadingItems: Int,
         loadingOffset: Int
@@ -375,12 +381,17 @@ internal class WordSearchViewModel @Inject internal constructor(
         require(loadingOffset >= 0)
 
         val searchWord = _searchWord.requireValue()
-        val loadedResultList =
-            diaryRepository.loadWordSearchResultDiaryList(
+        val result =
+            fetchWordSearchResultDiaryListUseCase(
                 numLoadingItems,
                 loadingOffset,
                 searchWord
             )
+        val loadedResultList =
+            when (result) {
+                is UseCaseResult.Success -> result.value
+                is UseCaseResult.Failure -> throw result.exception
+            }
 
         if (loadedResultList.isEmpty()) return WordSearchResultYearMonthList()
 
@@ -390,20 +401,29 @@ internal class WordSearchViewModel @Inject internal constructor(
                 WordSearchResultDayListItem(x, searchWord)
             )
         }
+        _numWordSearchResults.value = countWordSearchResultDiaries()
         val resultDayList = WordSearchResultDayList(resultDayListItemList)
         val existsUnloadedDiaries = existsUnloadedDiaries(resultDayList.countDiaries())
         return WordSearchResultYearMonthList(resultDayList, !existsUnloadedDiaries)
     }
 
-    @Throws(Exception::class)
+    @Throws(DomainException::class)
+    private suspend fun countWordSearchResultDiaries(): Int {
+        val searchWord = _searchWord.requireValue()
+        when (val result = countWordSearchResultDiariesUseCase(searchWord)) {
+            is UseCaseResult.Success -> return result.value
+            is UseCaseResult.Failure -> throw result.exception
+        }
+    }
+
+    @Throws(DomainException::class)
     private suspend fun existsUnloadedDiaries(numLoadedDiaries: Int): Boolean {
         val searchWord = _searchWord.requireValue()
-
-        val numExistingDiaries = diaryRepository.countWordSearchResultDiaries(searchWord)
-        _numWordSearchResults.value = numExistingDiaries
-        if (numExistingDiaries <= 0) return false
-
-        return numLoadedDiaries < numExistingDiaries
+        val result = checkUnloadedWordSearchResultDiariesExistUseCase(searchWord, numLoadedDiaries)
+        when (result) {
+            is UseCaseResult.Success -> return result.value
+            is UseCaseResult.Failure -> throw result.exception
+        }
     }
 
     private fun clearWordSearchResultList() {

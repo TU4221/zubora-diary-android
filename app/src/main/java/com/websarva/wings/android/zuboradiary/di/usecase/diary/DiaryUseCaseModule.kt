@@ -6,7 +6,9 @@ import com.websarva.wings.android.zuboradiary.data.repository.WeatherInfoReposit
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.DoesDiaryExistUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.CanFetchWeatherInfoUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.CheckUnloadedDiariesExistUseCase
+import com.websarva.wings.android.zuboradiary.domain.usecase.diary.CheckUnloadedWordSearchResultDiariesExistUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.CountDiariesUseCase
+import com.websarva.wings.android.zuboradiary.domain.usecase.diary.CountWordSearchResultDiariesUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.DeleteDiaryUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.FetchDiaryUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.FetchNewestDiaryUseCase
@@ -14,6 +16,7 @@ import com.websarva.wings.android.zuboradiary.domain.usecase.diary.FetchOldestDi
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.ShouldRequestDiaryUpdateConfirmationUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.FetchWeatherInfoUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.FetchDiaryListUseCase
+import com.websarva.wings.android.zuboradiary.domain.usecase.diary.FetchWordSearchResultDiaryListUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.SaveDiaryUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.ShouldFetchWeatherInfoUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.ShouldRequestDiaryFetchConfirmationUseCase
@@ -157,4 +160,20 @@ internal object DiaryUseCaseModule {
     @Provides
     fun provideFetchOldestDiaryUseCase(diaryRepository: DiaryRepository): FetchOldestDiaryUseCase =
         FetchOldestDiaryUseCase(diaryRepository)
+
+    @Singleton
+    @Provides
+    fun provideFetchWordSearchResultDiaryListUseCase(diaryRepository: DiaryRepository) =
+        FetchWordSearchResultDiaryListUseCase(diaryRepository)
+
+    @Singleton
+    @Provides
+    fun provideCountWordSearchResultDiariesUseCase(diaryRepository: DiaryRepository) =
+        CountWordSearchResultDiariesUseCase(diaryRepository)
+
+    @Singleton
+    @Provides
+    fun provideCheckUnloadedWordSearchResultDiariesExistUseCase(
+        countWordSearchResultDiariesUseCase: CountWordSearchResultDiariesUseCase
+    ) = CheckUnloadedWordSearchResultDiariesExistUseCase(countWordSearchResultDiariesUseCase)
 }
