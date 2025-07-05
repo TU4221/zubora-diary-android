@@ -20,7 +20,6 @@ import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import java.time.LocalDate
@@ -92,9 +91,13 @@ internal class WordSearchViewModel @Inject internal constructor(
     val isResultsVisible =
         uiState.map { value ->
             when (value) {
+                WordSearchState.Searching,
+                WordSearchState.AdditionLoading,
+                WordSearchState.Updating,
+                WordSearchState.ShowingResultList -> true
+
                 WordSearchState.Idle,
                 WordSearchState.NoResults -> false
-                else -> true
             }
         }.stateInDefault(
             viewModelScope,
@@ -102,12 +105,15 @@ internal class WordSearchViewModel @Inject internal constructor(
         )
 
     val isNumResultsVisible =
-        combine(uiState, isResultsVisible) { viewModelState, isResultsVisible ->
-            if (!isResultsVisible) return@combine false
+        uiState.map { value ->
+            when (value) {
+                WordSearchState.AdditionLoading,
+                WordSearchState.Updating,
+                WordSearchState.ShowingResultList -> true
 
-            when (viewModelState) {
-                WordSearchState.Searching -> false
-                else -> true
+                WordSearchState.Idle,
+                WordSearchState.Searching,
+                WordSearchState.NoResults -> false
             }
         }.stateInDefault(
             viewModelScope,
@@ -118,7 +124,12 @@ internal class WordSearchViewModel @Inject internal constructor(
         uiState.map { value ->
             when (value) {
                 WordSearchState.NoResults -> true
-                else -> false
+
+                WordSearchState.Idle,
+                WordSearchState.Searching,
+                WordSearchState.AdditionLoading,
+                WordSearchState.Updating,
+                WordSearchState.ShowingResultList -> false
             }
         }.stateInDefault(
             viewModelScope,
