@@ -40,7 +40,6 @@ internal class WordSearchViewModel @Inject internal constructor(
     override val isProcessingState =
         uiState
             .map { state ->
-                // TODO:保留
                 when (state) {
                     WordSearchState.Searching,
                     WordSearchState.AdditionLoading,
