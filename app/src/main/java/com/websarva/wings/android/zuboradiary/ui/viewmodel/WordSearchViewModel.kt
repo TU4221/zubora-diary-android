@@ -81,7 +81,8 @@ internal class WordSearchViewModel @Inject internal constructor(
     val numWordSearchResults
         get() = _numWordSearchResults.asStateFlow()
 
-    // MEMO:画面回転時の不要なアップデートを防ぐ
+    // MEMO:二重検索防止変数(previousSearchWord)で画面回転、画面再表示時の不要なアップデートを防いでいるが、
+    //      他Fragmentから戻ってきた時の更新ができなくなるため、下記変数にて対応できるようにする。
     private val initialShouldUpdateWordSearchResultList = false
     private var shouldUpdateWordSearchResultList = initialShouldUpdateWordSearchResultList
 
@@ -199,8 +200,8 @@ internal class WordSearchViewModel @Inject internal constructor(
                     return@launch
                 }
 
-                // HACK:キーワードの入力時と確定時に検索Observerが起動してしまい
-                //      同じキーワードで二重に検索してしまう。防止策として下記条件追加。
+                // HACK:画面再表示時(Pause -> Resume)にCollectorが起動してしまい
+                //      同じキーワードで不必要に検索してしまう。防止策として下記条件追加。
                 if (value == previousSearchWord) return@launch
 
                 if (value.isEmpty()) {
@@ -311,7 +312,7 @@ internal class WordSearchViewModel @Inject internal constructor(
             }
         )
 
-        val logMsg = "ワード検索結果読込"
+        val logMsg = "ワード検索結果読込($state)"
         Log.i(logTag, "${logMsg}_開始")
 
         updateUiState(state)

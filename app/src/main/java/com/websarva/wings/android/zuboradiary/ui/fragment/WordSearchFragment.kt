@@ -6,10 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
-import androidx.navigation.NavController
-import androidx.navigation.NavDestination
 import androidx.recyclerview.widget.RecyclerView
-import com.websarva.wings.android.zuboradiary.R
 import com.websarva.wings.android.zuboradiary.ui.model.AppMessage
 import com.websarva.wings.android.zuboradiary.data.model.ThemeColor
 import com.websarva.wings.android.zuboradiary.databinding.FragmentWordSearchBinding
@@ -61,8 +58,6 @@ class WordSearchFragment : BaseFragment<FragmentWordSearchBinding>() {
         setUpWordSearchView()
         setUpWordSearchResultList()
         setUpFloatingActionButton()
-
-        setUpNavDestinationChangedListener()
     }
 
     override fun initializeFragmentResultReceiver() {
@@ -198,6 +193,7 @@ class WordSearchFragment : BaseFragment<FragmentWordSearchBinding>() {
         val directions =
             WordSearchFragmentDirections.actionNavigationWordSearchFragmentToDiaryShowFragment(date)
         navigateFragment(NavigationCommand.To(directions))
+        mainViewModel.onNextFragmentNavigated()
     }
 
     override fun navigateAppMessageDialog(appMessage: AppMessage) {
@@ -209,26 +205,5 @@ class WordSearchFragment : BaseFragment<FragmentWordSearchBinding>() {
     private fun showKeyboard() {
         binding.editTextSearchWord.requestFocus()
         KeyboardManager().showKeyboard(binding.editTextSearchWord)
-    }
-
-    private fun setUpNavDestinationChangedListener() {
-        navController.addOnDestinationChangedListener(NavDestinationChangedListener())
-    }
-
-    private inner class NavDestinationChangedListener
-        : NavController.OnDestinationChangedListener {
-        override fun onDestinationChanged(
-            controller: NavController,
-            destination: NavDestination,
-            arguments: Bundle?
-        ) {
-            if (destination.id == R.id.navigation_word_search_fragment) return
-
-            if (destination.id == R.id.navigation_diary_show_fragment) {
-                mainViewModel.onNextFragmentNavigated()
-            }
-
-            navController.removeOnDestinationChangedListener(this)
-        }
     }
 }

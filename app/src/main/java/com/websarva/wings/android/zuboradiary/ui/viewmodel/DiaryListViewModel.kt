@@ -82,6 +82,10 @@ internal class DiaryListViewModel @Inject constructor(
     val diaryList
         get() = _diaryList.asStateFlow()
 
+    // MEMO:画面回転時の不要なアップデートを防ぐ
+    private val initialShouldUpdateDiaryList = false
+    private var shouldUpdateDiaryList = initialShouldUpdateDiaryList
+
     private val initialSortConditionDate: LocalDate? = null
     private var sortConditionDate: LocalDate? = initialSortConditionDate
 
@@ -92,6 +96,7 @@ internal class DiaryListViewModel @Inject constructor(
         super.initialize()
         diaryListLoadingJob = initialDiaryListLoadingJob
         _diaryList.value = initialDiaryList
+        shouldUpdateDiaryList = initialShouldUpdateDiaryList
         sortConditionDate = initialSortConditionDate
         isLoadingOnScrolled = initialIsLoadingOnScrolled
     }
@@ -205,6 +210,11 @@ internal class DiaryListViewModel @Inject constructor(
         }
     }
 
+    // Fragment状態処理
+    fun onNextFragmentNavigated() {
+        shouldUpdateDiaryList = true
+    }
+
     private fun onDiaryDeleteDialogPositiveResultReceived(date: LocalDate, uri: Uri?) {
         val currentList = _diaryList.value
         viewModelScope.launch {
@@ -220,7 +230,7 @@ internal class DiaryListViewModel @Inject constructor(
     private suspend fun prepareDiaryList(currentList: DiaryYearMonthList) {
         val logMsg = "日記リスト準備"
         Log.i(logTag, "${logMsg}_開始")
-        if (currentList.isEmpty) {
+        if (uiState.value == DiaryListState.Idle) {
             updateUiState(DiaryListState.LoadingDiaryInfo)
             try {
                 val numSavedDiaries = countSavedDiaries()
@@ -235,7 +245,10 @@ internal class DiaryListViewModel @Inject constructor(
                 return
             }
         } else {
-            updateDiaryList(currentList)
+            if (shouldUpdateDiaryList) {
+                shouldUpdateDiaryList = false
+                if (currentList.isNotEmpty) updateDiaryList(currentList)
+            }
         }
         Log.i(logTag, "${logMsg}_完了")
     }
@@ -315,7 +328,7 @@ internal class DiaryListViewModel @Inject constructor(
             }
         )
 
-        val logMsg = "日記リスト読込"
+        val logMsg = "日記リスト読込($state)"
         Log.i(logTag, "${logMsg}_開始")
 
         updateUiState(state)

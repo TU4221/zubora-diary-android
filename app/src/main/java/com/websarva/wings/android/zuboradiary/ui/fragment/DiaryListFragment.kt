@@ -232,18 +232,21 @@ class DiaryListFragment :
                 LocalDate.now()
             )
         navigateFragment(NavigationCommand.To(directions))
+        mainViewModel.onNextFragmentNavigated()
     }
 
     private fun navigateDiaryShowFragment(date: LocalDate) {
         val directions =
             DiaryListFragmentDirections.actionNavigationDiaryListFragmentToDiaryShowFragment(date)
         navigateFragment(NavigationCommand.To(directions))
+        mainViewModel.onNextFragmentNavigated()
     }
 
     private fun navigateWordSearchFragment() {
         val directions =
             DiaryListFragmentDirections.actionNavigationDiaryListFragmentToWordSearchFragment()
         navigateFragment(NavigationCommand.To(directions))
+        mainViewModel.onNextFragmentNavigated()
     }
 
     private fun navigateStartYearMonthPickerDialog(newestYear: Year, oldestYear: Year) {
