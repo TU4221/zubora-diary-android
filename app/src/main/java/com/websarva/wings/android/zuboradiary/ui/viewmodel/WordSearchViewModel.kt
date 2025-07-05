@@ -233,74 +233,120 @@ internal class WordSearchViewModel @Inject internal constructor(
         if (searchWord.isEmpty()) _shouldShowKeyboard.value = true
     }
 
-    private suspend fun loadNewWordSearchResultList(currentResultList: WordSearchResultYearMonthList, searchWord: String) {
-        createWordSearchResultList(
-            NewWordSearchResultListCreator(),
-            currentResultList,
-            searchWord
-        )
-    }
-
-    private suspend fun loadAdditionWordSearchResultList(currentResultList: WordSearchResultYearMonthList, searchWord: String) {
-        createWordSearchResultList(
-            AddedWordSearchResultListCreator(),
-            currentResultList,
-            searchWord
-        )
-    }
-
-    private suspend fun updateWordSearchResultList(currentResultList: WordSearchResultYearMonthList, searchWord: String) {
-        createWordSearchResultList(
-            UpdateWordSearchResultListCreator(),
-            currentResultList,
-            searchWord
-        )
-    }
-
     private fun cancelPreviousLoading() {
         val job = wordSearchResultListLoadingJob ?: return
         if (!job.isCompleted) job.cancel()
     }
 
-    private suspend fun createWordSearchResultList(
-        resultListCreator: WordSearchResultListCreator,
+    private suspend fun loadNewWordSearchResultList(
         currentResultList: WordSearchResultYearMonthList,
         searchWord: String
     ) {
+        loadWordSearchResultList(
+            WordSearchState.Searching,
+            currentResultList,
+            searchWord
+        ) { _, lambdaWordSearch ->
+            showWordSearchResultListFirstItemProgressIndicator()
+            val value =
+                fetchWordSearchResultDiaryList(numLoadingItems, 0, lambdaWordSearch)
+            toUiWordSearchResultList(value, lambdaWordSearch)
+        }
+    }
+
+    private suspend fun loadAdditionWordSearchResultList(
+        currentResultList: WordSearchResultYearMonthList,
+        searchWord: String
+    ) {
+        loadWordSearchResultList(
+            WordSearchState.AdditionLoading,
+            currentResultList,
+            searchWord
+        ) { lambdaCurrentList, lambdaWordSearch ->
+            check(lambdaCurrentList.isNotEmpty)
+
+            val loadingOffset = lambdaCurrentList.countDiaries()
+            val value =
+                fetchWordSearchResultDiaryList(numLoadingItems, loadingOffset, lambdaWordSearch)
+            val loadedResultList = toUiWordSearchResultList(value, lambdaWordSearch)
+            val numLoadedDiaries =
+                lambdaCurrentList.countDiaries() + loadedResultList.countDiaries()
+            val existsUnloadedDiaries =
+                existsUnloadedDiaries(lambdaWordSearch, numLoadedDiaries)
+            lambdaCurrentList.combineDiaryLists(loadedResultList, !existsUnloadedDiaries)
+        }
+    }
+
+    private suspend fun updateWordSearchResultList(
+        currentResultList: WordSearchResultYearMonthList,
+        searchWord: String
+    ) {
+        loadWordSearchResultList(
+            WordSearchState.Updating,
+            currentResultList,
+            searchWord
+        ) { lambdaCurrentList, lambdaWordSearch ->
+            check(lambdaCurrentList.isNotEmpty)
+
+            var numLoadingItems = lambdaCurrentList.countDiaries()
+            // HACK:画面全体にリストアイテムが存在しない状態で日記を追加した後にリスト画面に戻ると、
+            //      日記追加前のアイテム数しか表示されない状態となる。また、スクロール更新もできない。
+            //      対策として下記コードを記述。
+            if (numLoadingItems < this@WordSearchViewModel.numLoadingItems) {
+                numLoadingItems = this@WordSearchViewModel.numLoadingItems
+            }
+            val value =
+                fetchWordSearchResultDiaryList(
+                    numLoadingItems,
+                    0,
+                    lambdaWordSearch
+                )
+            toUiWordSearchResultList(value, lambdaWordSearch)
+        }
+    }
+
+    private suspend fun loadWordSearchResultList(
+        state: WordSearchState,
+        currentResultList: WordSearchResultYearMonthList,
+        searchWord: String,
+        processLoading: suspend (
+            currentResultList: WordSearchResultYearMonthList,
+            searchWord: String
+        ) -> WordSearchResultYearMonthList
+    ) {
+        require(
+            when (state) {
+                WordSearchState.Searching,
+                WordSearchState.AdditionLoading,
+                WordSearchState.Updating -> true
+
+                WordSearchState.Idle,
+                WordSearchState.NoResults,
+                WordSearchState.Results -> false
+            }
+        )
+
         val logMsg = "ワード検索結果読込"
         Log.i(logTag, "${logMsg}_開始")
 
+        updateUiState(state)
         try {
-            updateWordSearchStatusOnSearchStart(resultListCreator)
-            val updateResultList = resultListCreator.create(currentResultList, searchWord)
+            val updateResultList = processLoading(currentResultList, searchWord)
             _wordSearchResultList.value = updateResultList
-            updateWordSearchStatusOnSearchFinish(updateResultList)
+            updateUiStateForResultList(updateResultList)
             Log.i(logTag, "${logMsg}_完了")
         } catch (e: CancellationException) {
             Log.i(logTag, "${logMsg}_キャンセル", e)
-            // 処理なし
+            updateUiStateForResultList(currentResultList)
         } catch (e: Exception) {
             Log.e(logTag, "${logMsg}_失敗", e)
             _wordSearchResultList.value = currentResultList
-            updateWordSearchStatusOnSearchFinish(currentResultList)
+            updateUiStateForResultList(currentResultList)
             emitAppMessageEvent(WordSearchAppMessage.SearchResultListLoadingFailure)
         }
     }
 
-    // MEMO:文字検索は処理途中でも再度検索できる仕様のため、createWordSearchResultList()処理内で状態更新を行う。
-    //      再度検索時、createWordSearchResultList()処理前に状態更新を行うと一つ前の検索結果状態が上書きされる可能性あり。
-    private fun updateWordSearchStatusOnSearchStart(creator: WordSearchResultListCreator) {
-        val state =
-            when (creator) {
-                is NewWordSearchResultListCreator -> WordSearchState.Searching
-                is AddedWordSearchResultListCreator -> WordSearchState.AdditionLoading
-                is UpdateWordSearchResultListCreator -> WordSearchState.Updating
-                else -> throw IllegalArgumentException()
-            }
-        updateUiState(state)
-    }
-
-    private fun updateWordSearchStatusOnSearchFinish(list: WordSearchResultYearMonthList) {
+    private fun updateUiStateForResultList(list: WordSearchResultYearMonthList) {
         val state =
             if (list.isNotEmpty) {
                 WordSearchState.Results
@@ -310,71 +356,10 @@ internal class WordSearchViewModel @Inject internal constructor(
         updateUiState(state)
     }
 
-    private fun interface WordSearchResultListCreator {
-        @Throws(Exception::class)
-        suspend fun create(currentResultList: WordSearchResultYearMonthList, searchWord: String): WordSearchResultYearMonthList
-    }
-
-    private inner class NewWordSearchResultListCreator : WordSearchResultListCreator {
-
-        @Throws(Exception::class)
-        override suspend fun create(currentResultList: WordSearchResultYearMonthList, searchWord: String): WordSearchResultYearMonthList {
-            showWordSearchResultListFirstItemProgressIndicator()
-            val value =
-                fetchWordSearchResultDiaryList(numLoadingItems, 0, searchWord)
-            return toUiWordSearchResultList(value, searchWord)
-        }
-
-        private fun showWordSearchResultListFirstItemProgressIndicator() {
-            val list = WordSearchResultYearMonthList(false)
-            _wordSearchResultList.value = list
-            _numWordSearchResults.value = 0
-        }
-    }
-
-    private inner class AddedWordSearchResultListCreator : WordSearchResultListCreator {
-
-        @Throws(Exception::class)
-        override suspend fun create(currentResultList: WordSearchResultYearMonthList, searchWord: String): WordSearchResultYearMonthList {
-            check(currentResultList.isNotEmpty)
-
-            val loadingOffset = currentResultList.countDiaries()
-            val value =
-                fetchWordSearchResultDiaryList(numLoadingItems, loadingOffset, searchWord)
-            val loadedResultList = toUiWordSearchResultList(value, searchWord)
-            val numLoadedDiaries =
-                currentResultList.countDiaries() + loadedResultList.countDiaries()
-            val existsUnloadedDiaries =
-                existsUnloadedDiaries(searchWord, numLoadedDiaries)
-            return currentResultList.combineDiaryLists(loadedResultList, !existsUnloadedDiaries)
-        }
-    }
-
-    private inner class UpdateWordSearchResultListCreator : WordSearchResultListCreator {
-
-        @Throws(Exception::class)
-        override suspend fun create(currentResultList: WordSearchResultYearMonthList, searchWord: String): WordSearchResultYearMonthList {
-            check(currentResultList.isNotEmpty)
-
-            try {
-                var numLoadingItems = currentResultList.countDiaries()
-                // HACK:画面全体にリストアイテムが存在しない状態で日記を追加した後にリスト画面に戻ると、
-                //      日記追加前のアイテム数しか表示されない状態となる。また、スクロール更新もできない。
-                //      対策として下記コードを記述。
-                if (numLoadingItems < this@WordSearchViewModel.numLoadingItems) {
-                    numLoadingItems = this@WordSearchViewModel.numLoadingItems
-                }
-                val value =
-                    fetchWordSearchResultDiaryList(
-                        numLoadingItems,
-                        0,
-                        searchWord
-                    )
-                return toUiWordSearchResultList(value, searchWord)
-            } catch (e: Exception) {
-                throw e
-            }
-        }
+    private fun showWordSearchResultListFirstItemProgressIndicator() {
+        val list = WordSearchResultYearMonthList(false)
+        _wordSearchResultList.value = list
+        _numWordSearchResults.value = 0
     }
 
     @Throws(DomainException::class)
