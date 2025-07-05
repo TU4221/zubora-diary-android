@@ -66,7 +66,7 @@ internal class DiaryListViewModel @Inject constructor(
                     DiaryListState.DeletingDiary -> true
 
                     DiaryListState.Idle,
-                    DiaryListState.NoResults,
+                    DiaryListState.NoDiaries,
                     DiaryListState.ShowingDiaryList -> false
                 }
             }.stateInDefault(
@@ -224,13 +224,13 @@ internal class DiaryListViewModel @Inject constructor(
             updateUiState(DiaryListState.LoadingDiaryInfo)
             try {
                 val numSavedDiaries = countSavedDiaries()
-                updateUiStateForDiaryList(currentList)
                 if (numSavedDiaries >= 1) loadNewDiaryList(currentList)
             } catch (e: CancellationException) {
                 Log.i(logTag, "${logMsg}_キャンセル", e)
                 updateUiStateForDiaryList(currentList)
             } catch (e: DomainException) {
                 Log.e(logTag, "${logMsg}_失敗", e)
+                updateUiStateForDiaryList(currentList)
                 emitAppMessageEvent(DiaryListAppMessage.DiaryListLoadingFailure)
                 return
             }
@@ -249,7 +249,10 @@ internal class DiaryListViewModel @Inject constructor(
     }
 
     private suspend fun loadNewDiaryList(currentList: DiaryYearMonthList) {
-        loadDiaryList(DiaryListState.LoadingNewDiaryList, currentList) {
+        loadDiaryList(
+            DiaryListState.LoadingNewDiaryList,
+            currentList
+        ) { _ ->
             showDiaryListFirstItemProgressIndicator()
             val value = fetchDiaryList(NUM_LOADING_ITEMS, 0)
             toUiDiaryList(value)
@@ -257,25 +260,31 @@ internal class DiaryListViewModel @Inject constructor(
     }
 
     private suspend fun loadAdditionDiaryList(currentList: DiaryYearMonthList) {
-        loadDiaryList(DiaryListState.LoadingAdditionDiaryList, currentList) {
-            check(currentList.isNotEmpty)
+        loadDiaryList(
+            DiaryListState.LoadingAdditionDiaryList,
+            currentList
+        ) { lambdaCurrentList ->
+            check(lambdaCurrentList.isNotEmpty)
 
-            val loadingOffset = currentList.countDiaries()
+            val loadingOffset = lambdaCurrentList.countDiaries()
             val value = fetchDiaryList(NUM_LOADING_ITEMS, loadingOffset)
             val loadedList = toUiDiaryList(value)
 
-            val numLoadedDiaries = currentList.countDiaries() + loadedList.countDiaries()
+            val numLoadedDiaries = lambdaCurrentList.countDiaries() + loadedList.countDiaries()
             val existsUnloadedDiaries = existsUnloadedDiaries(numLoadedDiaries)
 
-            currentList.combineDiaryLists(loadedList, !existsUnloadedDiaries)
+            lambdaCurrentList.combineDiaryLists(loadedList, !existsUnloadedDiaries)
         }
     }
 
     private suspend fun updateDiaryList(currentList: DiaryYearMonthList) {
-        loadDiaryList(DiaryListState.UpdatingDiaryList, currentList) {
-            check(currentList.isNotEmpty)
+        loadDiaryList(
+            DiaryListState.UpdatingDiaryList,
+            currentList
+        ) { lambdaCurrentList ->
+            check(lambdaCurrentList.isNotEmpty)
 
-            var numLoadingItems = currentList.countDiaries()
+            var numLoadingItems = lambdaCurrentList.countDiaries()
             // HACK:画面全体にリストアイテムが存在しない状態で日記を追加した後にリスト画面に戻ると、
             //      日記追加前のアイテム数しか表示されない状態となる。また、スクロール更新もできない。
             //      対策として下記コードを記述。
@@ -301,7 +310,7 @@ internal class DiaryListViewModel @Inject constructor(
                 DiaryListState.Idle,
                 DiaryListState.DeletingDiary,
                 DiaryListState.LoadingDiaryInfo,
-                DiaryListState.NoResults,
+                DiaryListState.NoDiaries,
                 DiaryListState.ShowingDiaryList -> false
             }
         )
@@ -331,7 +340,7 @@ internal class DiaryListViewModel @Inject constructor(
             if (list.isNotEmpty) {
                 DiaryListState.ShowingDiaryList
             } else {
-                DiaryListState.NoResults
+                DiaryListState.NoDiaries
             }
         updateUiState(state)
     }

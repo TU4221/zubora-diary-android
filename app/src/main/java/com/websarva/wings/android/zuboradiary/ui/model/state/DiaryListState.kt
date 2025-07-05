@@ -11,5 +11,5 @@ internal sealed class DiaryListState : UiState {
     data object DeletingDiary : DiaryListState() // 日記削除中
 
     data object ShowingDiaryList : DiaryListState() // 日記リスト表示
-    data object NoResults : DiaryListState() // 日記なし
+    data object NoDiaries : DiaryListState() // 日記なし
 }
