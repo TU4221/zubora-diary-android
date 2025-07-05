@@ -344,9 +344,7 @@ internal class WordSearchViewModel @Inject internal constructor(
     }
 
     private fun showWordSearchResultListFirstItemProgressIndicator() {
-        val list = WordSearchResultYearMonthList(false)
-        _wordSearchResultList.value = list
-        _numWordSearchResults.value = 0
+        _wordSearchResultList.value = WordSearchResultYearMonthList(false)
     }
 
     @Throws(DomainException::class)
