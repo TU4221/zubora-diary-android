@@ -47,7 +47,7 @@ internal class WordSearchViewModel @Inject internal constructor(
                     WordSearchState.Updating -> true
 
                     WordSearchState.Idle,
-                    WordSearchState.Results,
+                    WordSearchState.ShowingResultList,
                     WordSearchState.NoResults -> false
                 }
             }.stateInDefault(
@@ -322,7 +322,7 @@ internal class WordSearchViewModel @Inject internal constructor(
 
                 WordSearchState.Idle,
                 WordSearchState.NoResults,
-                WordSearchState.Results -> false
+                WordSearchState.ShowingResultList -> false
             }
         )
 
@@ -349,7 +349,7 @@ internal class WordSearchViewModel @Inject internal constructor(
     private fun updateUiStateForResultList(list: WordSearchResultYearMonthList) {
         val state =
             if (list.isNotEmpty) {
-                WordSearchState.Results
+                WordSearchState.ShowingResultList
             } else {
                 WordSearchState.NoResults
             }
