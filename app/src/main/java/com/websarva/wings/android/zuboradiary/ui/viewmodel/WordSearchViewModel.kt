@@ -331,8 +331,9 @@ internal class WordSearchViewModel @Inject internal constructor(
 
         updateUiState(state)
         try {
+            _numWordSearchResults.value = countWordSearchResultDiaries(searchWord)
             val updateResultList = processLoading(currentResultList, searchWord)
-            _wordSearchResultList.value = updateResultList
+            _wordSearchResultList.value = processLoading(currentResultList, searchWord)
             updateUiStateForResultList(updateResultList)
             Log.i(logTag, "${logMsg}_完了")
         } catch (e: CancellationException) {
@@ -370,8 +371,6 @@ internal class WordSearchViewModel @Inject internal constructor(
     ): List<WordSearchResultListItem> {
         require(numLoadingItems > 0)
         require(loadingOffset >= 0)
-
-        _numWordSearchResults.value = countWordSearchResultDiaries(searchWord)
 
         val result =
             fetchWordSearchResultDiaryListUseCase(
