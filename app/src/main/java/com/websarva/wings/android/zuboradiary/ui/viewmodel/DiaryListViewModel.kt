@@ -264,7 +264,7 @@ internal class DiaryListViewModel @Inject constructor(
             DiaryListState.LoadingAdditionDiaryList,
             currentList
         ) { lambdaCurrentList ->
-            check(lambdaCurrentList.isNotEmpty)
+            require(lambdaCurrentList.isNotEmpty)
 
             val loadingOffset = lambdaCurrentList.countDiaries()
             val value = fetchDiaryList(NUM_LOADING_ITEMS, loadingOffset)
@@ -282,7 +282,7 @@ internal class DiaryListViewModel @Inject constructor(
             DiaryListState.UpdatingDiaryList,
             currentList
         ) { lambdaCurrentList ->
-            check(lambdaCurrentList.isNotEmpty)
+            require(lambdaCurrentList.isNotEmpty)
 
             var numLoadingItems = lambdaCurrentList.countDiaries()
             // HACK:画面全体にリストアイテムが存在しない状態で日記を追加した後にリスト画面に戻ると、

@@ -263,7 +263,7 @@ internal class WordSearchViewModel @Inject internal constructor(
             currentResultList,
             searchWord
         ) { lambdaCurrentList, lambdaWordSearch ->
-            check(lambdaCurrentList.isNotEmpty)
+            require(lambdaCurrentList.isNotEmpty)
 
             val loadingOffset = lambdaCurrentList.countDiaries()
             val value =
@@ -286,7 +286,7 @@ internal class WordSearchViewModel @Inject internal constructor(
             currentResultList,
             searchWord
         ) { lambdaCurrentList, lambdaWordSearch ->
-            check(lambdaCurrentList.isNotEmpty)
+            require(lambdaCurrentList.isNotEmpty)
 
             var numLoadingItems = lambdaCurrentList.countDiaries()
             // HACK:画面全体にリストアイテムが存在しない状態で日記を追加した後にリスト画面に戻ると、
