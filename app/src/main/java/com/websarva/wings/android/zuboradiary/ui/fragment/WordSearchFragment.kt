@@ -58,7 +58,6 @@ class WordSearchFragment : BaseFragment<FragmentWordSearchBinding>() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        setUpKeyboard()
         setUpWordSearchView()
         setUpWordSearchResultList()
         setUpFloatingActionButton()
@@ -75,6 +74,9 @@ class WordSearchFragment : BaseFragment<FragmentWordSearchBinding>() {
             is WordSearchEvent.NavigateDiaryShowFragment -> {
                 navigateDiaryShowFragment(event.date)
             }
+            WordSearchEvent.ShowKeyboard -> {
+                showKeyboard()
+            }
             ViewModelEvent.NavigatePreviousFragment -> {
                 navigatePreviousFragment()
             }
@@ -85,21 +87,6 @@ class WordSearchFragment : BaseFragment<FragmentWordSearchBinding>() {
                 throw IllegalArgumentException()
             }
         }
-    }
-
-    private fun setUpKeyboard() {
-        launchAndRepeatOnViewLifeCycleStarted {
-            mainViewModel.shouldShowKeyboard
-                .collectLatest { value: Boolean ->
-                    if (value) showKeyboard()
-                }
-        }
-    }
-
-    private fun showKeyboard() {
-        binding.editTextSearchWord.requestFocus()
-        KeyboardManager().showKeyboard(binding.editTextSearchWord)
-        mainViewModel.onShowedKeyboard()
     }
 
     private fun setUpWordSearchView() {
@@ -217,6 +204,11 @@ class WordSearchFragment : BaseFragment<FragmentWordSearchBinding>() {
         val directions =
             WordSearchFragmentDirections.actionWordSearchFragmentToAppMessageDialog(appMessage)
         navigateFragment(NavigationCommand.To(directions))
+    }
+
+    private fun showKeyboard() {
+        binding.editTextSearchWord.requestFocus()
+        KeyboardManager().showKeyboard(binding.editTextSearchWord)
     }
 
     private fun setUpNavDestinationChangedListener() {

@@ -85,15 +85,6 @@ internal class WordSearchViewModel @Inject internal constructor(
     private val initialShouldUpdateWordSearchResultList = false
     private var shouldUpdateWordSearchResultList = initialShouldUpdateWordSearchResultList
 
-    // 初回キーボード表示
-    // HACK:WordSearchFragment表示時にFragmentActionでキーボードを表示させようとすると、
-    //      SharedFlowが監視する前(フラグメントライフサイクがStarted前)に処理する可能性がある為、表示されないことがある。
-    //      別途StateFlow変数で対応。確実な監視開始タイミングを取得できない為この方法で対応。
-    private val initialShouldShowKeyboard = false
-    private val _shouldShowKeyboard = MutableStateFlow(initialShouldShowKeyboard)
-    val shouldShowKeyboard
-        get() = _shouldShowKeyboard.asStateFlow()
-
     private val initialIsLoadingOnScrolled = false
     private var isLoadingOnScrolled = initialIsLoadingOnScrolled
 
@@ -142,7 +133,6 @@ internal class WordSearchViewModel @Inject internal constructor(
         _wordSearchResultList.value = initialWordSearchResultList
         _numWordSearchResults.value = initialNumWordSearchResults
         shouldUpdateWordSearchResultList = initialShouldUpdateWordSearchResultList
-        _shouldShowKeyboard.value = initialShouldShowKeyboard
         isLoadingOnScrolled = initialIsLoadingOnScrolled
     }
 
@@ -188,10 +178,6 @@ internal class WordSearchViewModel @Inject internal constructor(
         isLoadingOnScrolled = initialIsLoadingOnScrolled
     }
 
-    fun onShowedKeyboard() {
-        _shouldShowKeyboard.value = initialShouldShowKeyboard
-    }
-
     // Fragment状態処理
     fun onNextFragmentNavigated() {
         shouldUpdateWordSearchResultList = true
@@ -228,8 +214,8 @@ internal class WordSearchViewModel @Inject internal constructor(
     }
 
     // データ処理
-    private fun prepareKeyboard(searchWord: String) {
-        if (searchWord.isEmpty()) _shouldShowKeyboard.value = true
+    private suspend fun prepareKeyboard(searchWord: String) {
+        if (searchWord.isEmpty()) emitViewModelEvent(WordSearchEvent.ShowKeyboard)
     }
 
     private fun cancelPreviousLoading() {
