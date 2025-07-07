@@ -1,0 +1,105 @@
+package com.websarva.wings.android.zuboradiary.domain.usecase.settings
+
+import android.util.Log
+import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
+import com.websarva.wings.android.zuboradiary.data.preferences.AllPreferences
+import com.websarva.wings.android.zuboradiary.data.preferences.ReminderNotificationPreference
+import com.websarva.wings.android.zuboradiary.data.repository.UserPreferencesRepository
+import com.websarva.wings.android.zuboradiary.data.repository.WorkerRepository
+import com.websarva.wings.android.zuboradiary.domain.exception.DomainException
+import com.websarva.wings.android.zuboradiary.domain.exception.reminder.CancelReminderNotificationFailedException
+import com.websarva.wings.android.zuboradiary.domain.exception.reminder.RegisterReminderNotificationFailedException
+import com.websarva.wings.android.zuboradiary.domain.exception.settings.UpdateReminderNotificationSettingFailedException
+import com.websarva.wings.android.zuboradiary.domain.usecase.DefaultUseCaseResult
+import com.websarva.wings.android.zuboradiary.utils.createLogTag
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.withContext
+import java.time.LocalTime
+
+internal class SaveReminderNotificationSettingUseCase(
+    private val userPreferencesRepository: UserPreferencesRepository,
+    private val workerRepository: WorkerRepository
+) {
+
+    private val logTag = createLogTag()
+
+    suspend operator fun invoke(
+        isChecked: Boolean,
+        notificationTime: LocalTime? = null
+    ): DefaultUseCaseResult<Unit> {
+        val logMsg = "リマインダー通知設定保存_"
+        Log.i(logTag, "${logMsg}開始")
+
+        try {
+            if (isChecked) {
+                requireNotNull(notificationTime)
+
+                saveReminderNotificationValid(notificationTime)
+            } else {
+                saveReminderNotificationInvalid()
+            }
+        } catch (e: DomainException) {
+            Log.e(logTag, "${logMsg}失敗")
+            return UseCaseResult.Failure(e)
+        }
+
+        Log.i(logTag, "${logMsg}完了")
+        return UseCaseResult.Success(Unit)
+    }
+
+    @Throws(
+        UpdateReminderNotificationSettingFailedException::class,
+        RegisterReminderNotificationFailedException::class
+    )
+    private suspend fun saveReminderNotificationValid(notificationTime: LocalTime) {
+        try {
+            val preferenceValue = ReminderNotificationPreference(true, notificationTime)
+            userPreferencesRepository.saveReminderNotificationPreference(preferenceValue)
+            workerRepository.registerReminderNotificationWorker(notificationTime)
+        } catch (e: UpdateReminderNotificationSettingFailedException) {
+            throw e
+        } catch (e: RegisterReminderNotificationFailedException) {
+            try {
+                val preferenceValue = ReminderNotificationPreference(false)
+                userPreferencesRepository.saveReminderNotificationPreference(preferenceValue)
+            } catch (e: UpdateReminderNotificationSettingFailedException) {
+                throw e
+            }
+            throw e
+        }
+    }
+
+    @Throws(
+        UpdateReminderNotificationSettingFailedException::class,
+        CancelReminderNotificationFailedException::class
+    )
+    private suspend fun saveReminderNotificationInvalid() {
+        val backupSettingValue = fetchCurrentReminderNotificationSetting()
+        try {
+            val preferenceValue = ReminderNotificationPreference(false)
+            userPreferencesRepository.saveReminderNotificationPreference(preferenceValue)
+            workerRepository.cancelReminderNotificationWorker()
+        } catch (e: UpdateReminderNotificationSettingFailedException) {
+            throw e
+        } catch (e: CancelReminderNotificationFailedException) {
+            try {
+                userPreferencesRepository.saveReminderNotificationPreference(backupSettingValue)
+            } catch (e: UpdateReminderNotificationSettingFailedException) {
+                throw e
+            }
+            throw e
+        }
+    }
+
+    private suspend fun fetchCurrentReminderNotificationSetting(): ReminderNotificationPreference {
+        return withContext(Dispatchers.IO) {
+            userPreferencesRepository
+                .loadAllPreferences()
+                .map { value: AllPreferences ->
+                    return@map value.reminderNotificationPreference
+                }.first()
+        }
+    }
+}

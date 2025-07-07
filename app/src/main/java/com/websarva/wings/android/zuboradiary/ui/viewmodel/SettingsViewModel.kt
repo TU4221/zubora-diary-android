@@ -3,20 +3,23 @@ package com.websarva.wings.android.zuboradiary.ui.viewmodel
 import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
-import androidx.datastore.core.IOException
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
-import com.websarva.wings.android.zuboradiary.data.repository.DiaryRepository
-import com.websarva.wings.android.zuboradiary.data.preferences.CalendarStartDayOfWeekPreference
-import com.websarva.wings.android.zuboradiary.data.preferences.PassCodeLockPreference
-import com.websarva.wings.android.zuboradiary.data.preferences.ReminderNotificationPreference
 import com.websarva.wings.android.zuboradiary.data.model.ThemeColor
 import com.websarva.wings.android.zuboradiary.data.preferences.AllPreferences
-import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColorPreference
-import com.websarva.wings.android.zuboradiary.data.repository.UserPreferencesRepository
-import com.websarva.wings.android.zuboradiary.data.preferences.WeatherInfoFetchPreference
-import com.websarva.wings.android.zuboradiary.data.repository.UriRepository
-import com.websarva.wings.android.zuboradiary.data.repository.WorkerRepository
+import com.websarva.wings.android.zuboradiary.domain.usecase.DefaultUseCaseResult
+import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
+import com.websarva.wings.android.zuboradiary.domain.usecase.exception.DeleteAllDataUseCaseException
+import com.websarva.wings.android.zuboradiary.domain.usecase.exception.DeleteAllDiariesUseCaseException
+import com.websarva.wings.android.zuboradiary.domain.usecase.settings.DeleteAllDataUseCase
+import com.websarva.wings.android.zuboradiary.domain.usecase.settings.DeleteAllDiariesUseCase
+import com.websarva.wings.android.zuboradiary.domain.usecase.settings.FetchAllSettingsValueUseCase
+import com.websarva.wings.android.zuboradiary.domain.usecase.settings.SaveCalendarStartDayOfWeekUseCase
+import com.websarva.wings.android.zuboradiary.domain.usecase.settings.SavePasscodeLockSettingUseCase
+import com.websarva.wings.android.zuboradiary.domain.usecase.settings.SaveReminderNotificationSettingUseCase
+import com.websarva.wings.android.zuboradiary.domain.usecase.settings.SaveThemeColorSettingUseCase
+import com.websarva.wings.android.zuboradiary.domain.usecase.settings.SaveWeatherInfoFetchSettingUseCase
+import com.websarva.wings.android.zuboradiary.domain.usecase.settings.InitializeAllSettingsUseCase
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import com.websarva.wings.android.zuboradiary.ui.model.SettingsAppMessage
 import com.websarva.wings.android.zuboradiary.ui.model.event.SettingsEvent
@@ -39,10 +42,15 @@ import javax.inject.Inject
 @HiltViewModel
 internal class SettingsViewModel @Inject constructor(
     private val handle: SavedStateHandle, // MEMO:システムの初期化によるプロセスの終了からの復元用
-    private val userPreferencesRepository: UserPreferencesRepository,
-    private val workerRepository: WorkerRepository,
-    private val diaryRepository: DiaryRepository,
-    private val uriRepository: UriRepository
+    private val initializeAllSettingsUseCase: InitializeAllSettingsUseCase,
+    private val fetchAllSettingsValueUseCase: FetchAllSettingsValueUseCase,
+    private val saveThemeColorSettingUseCase: SaveThemeColorSettingUseCase,
+    private val saveCalendarStartDayOfWeekUseCase: SaveCalendarStartDayOfWeekUseCase,
+    private val saveReminderNotificationSettingUseCase: SaveReminderNotificationSettingUseCase,
+    private val savePasscodeLockSettingUseCase: SavePasscodeLockSettingUseCase,
+    private val saveWeatherInfoFetchSettingUseCase: SaveWeatherInfoFetchSettingUseCase,
+    private val deleteAllDiariesUseCase: DeleteAllDiariesUseCase,
+    private val deleteAllDataUseCase: DeleteAllDataUseCase,
 ) : BaseViewModel<SettingsEvent, SettingsAppMessage, SettingsState>(
     SettingsState.Idle
 ) {
@@ -114,16 +122,7 @@ internal class SettingsViewModel @Inject constructor(
     }
 
     private fun setUpPreferencesValueLoading() {
-        val allPreferences: Flow<AllPreferences>
-        try {
-            allPreferences = userPreferencesRepository.loadAllPreferences()
-        } catch (e: Throwable) {
-            Log.e(logTag, "アプリ設定値読込_失敗", e)
-            viewModelScope.launch {
-                emitAppMessageEvent(SettingsAppMessage.SettingLoadingFailure)
-            }
-            return
-        }
+        val allPreferences = fetchAllSettingsValueUseCase().value
         setUpThemeColorPreferenceValueLoading(allPreferences)
         setUpCalendarStartDayOfWeekPreferenceValueLoading(allPreferences)
         setUpReminderNotificationPreferenceValueLoading(allPreferences)
@@ -430,10 +429,7 @@ internal class SettingsViewModel @Inject constructor(
 
     private fun onAllDiariesDeleteDialogPositiveResultReceived() {
         viewModelScope.launch {
-            val isSuccessful = deleteAllDiaries()
-            if (!isSuccessful) return@launch
-
-            uriRepository.releaseAllPersistablePermission()
+            deleteAllDiaries()
         }
     }
 
@@ -469,10 +465,7 @@ internal class SettingsViewModel @Inject constructor(
 
     private fun onAllDataDeleteDialogPositiveResultReceived() {
         viewModelScope.launch {
-            val isSuccessful = deleteAllData()
-            if (!isSuccessful) return@launch
-
-            uriRepository.releaseAllPersistablePermission()
+            deleteAllData()
         }
     }
 
@@ -584,110 +577,103 @@ internal class SettingsViewModel @Inject constructor(
         }
     }
 
-    private suspend fun saveThemeColor(value: ThemeColor): Boolean {
-        val preferenceValue = ThemeColorPreference(value)
-        return updateSettingValue{
-            userPreferencesRepository.saveThemeColorPreference(preferenceValue)
+    private suspend fun saveThemeColor(value: ThemeColor) {
+        executeSettingUpdate {
+            saveThemeColorSettingUseCase(value)
         }
     }
 
-    private suspend fun saveCalendarStartDayOfWeek(value: DayOfWeek): Boolean {
-        val preferenceValue =
-            CalendarStartDayOfWeekPreference(value)
-        return updateSettingValue{
-            userPreferencesRepository.saveCalendarStartDayOfWeekPreference(preferenceValue)
+    private suspend fun saveCalendarStartDayOfWeek(value: DayOfWeek) {
+        executeSettingUpdate {
+            saveCalendarStartDayOfWeekUseCase(value)
         }
     }
 
-    private suspend fun saveReminderNotificationValid(value: LocalTime): Boolean {
-        val preferenceValue =
-            ReminderNotificationPreference(true, value)
-        return updateSettingValue{
-            userPreferencesRepository.saveReminderNotificationPreference(preferenceValue)
-            workerRepository.registerReminderNotificationWorker(value)
+    private suspend fun saveReminderNotificationValid(value: LocalTime) {
+        executeSettingUpdate {
+            saveReminderNotificationSettingUseCase(true, value)
         }
     }
 
-    private suspend fun saveReminderNotificationInvalid(): Boolean {
-        val preferenceValue =
-            ReminderNotificationPreference(false, null as LocalTime?)
-        return updateSettingValue{
-            userPreferencesRepository.saveReminderNotificationPreference(preferenceValue)
-            workerRepository.cancelReminderNotificationWorker()
+    private suspend fun saveReminderNotificationInvalid() {
+        executeSettingUpdate {
+            saveReminderNotificationSettingUseCase(false)
         }
     }
 
-    private suspend fun savePasscodeLock(value: Boolean): Boolean {
+    private suspend fun savePasscodeLock(value: Boolean) {
         val passcode = if (value) {
             "0000" // TODO:仮
         } else {
             ""
         }
 
-        val preferenceValue = PassCodeLockPreference(value, passcode)
-        return updateSettingValue{
-            userPreferencesRepository.savePasscodeLockPreference(preferenceValue)
+        executeSettingUpdate {
+            savePasscodeLockSettingUseCase(value, passcode)
         }
     }
 
-    private suspend fun saveWeatherInfoFetch(value: Boolean): Boolean {
-        val preferenceValue =
-            WeatherInfoFetchPreference(value)
-        return updateSettingValue{
-            userPreferencesRepository.saveWeatherInfoFetchPreference(preferenceValue)
+    private suspend fun saveWeatherInfoFetch(value: Boolean) {
+        executeSettingUpdate {
+            saveWeatherInfoFetchSettingUseCase(value)
         }
     }
 
-    private fun interface SettingUpdateProcess {
-        @Throws(
-            IOException::class,
-            Exception::class
-        )
-        suspend fun update()
-    }
-
-    private suspend fun updateSettingValue(
-        updateProcess: SettingUpdateProcess
-    ): Boolean {
-        try {
-            updateProcess.update()
-        } catch (e: IOException) {
-            Log.e(logTag, "アプリ設定値更新_失敗", e)
-            emitAppMessageEvent(SettingsAppMessage.SettingUpdateFailure)
-            return false
-        } catch (e: Exception) {
-            Log.e(logTag, "アプリ設定値更新_失敗", e)
-            emitAppMessageEvent(SettingsAppMessage.SettingUpdateFailure)
-            return false
-        }
-        return true
-    }
-
-    private suspend fun deleteAllDiaries(): Boolean {
-        try {
-            diaryRepository.deleteAllDiaries()
-        } catch (e: Exception) {
-            Log.e(logTag, "全日記削除_失敗", e)
-            emitAppMessageEvent(SettingsAppMessage.AllDiaryDeleteFailure)
-            return false
-        }
-        return true
-    }
-
-    private suspend fun initializeAllSettings(): Boolean {
-        return updateSettingValue{
-            userPreferencesRepository.initializeAllPreferences()
+    private suspend fun executeSettingUpdate(
+        process: suspend () -> DefaultUseCaseResult<Unit>
+    ) {
+        when (val result = process()) {
+            is UseCaseResult.Success -> {
+                // 処理なし
+            }
+            is UseCaseResult.Failure -> {
+                Log.e(logTag, "アプリ設定値更新_失敗", result.exception)
+                emitAppMessageEvent(SettingsAppMessage.SettingUpdateFailure)
+            }
         }
     }
 
-    private suspend fun deleteAllData(): Boolean {
-        try {
-            diaryRepository.deleteAllData()
-        } catch (e: Exception) {
-            Log.e(logTag, "アプリ全データ削除_失敗", e)
-            emitAppMessageEvent(SettingsAppMessage.AllDataDeleteFailure)
-            return false
+    private suspend fun deleteAllDiaries() {
+        when (val result = deleteAllDiariesUseCase()) {
+            is UseCaseResult.Success -> {
+                // 処理なし
+            }
+            is UseCaseResult.Failure -> {
+                Log.e(logTag, "全日記削除_失敗", result.exception)
+                when (result.exception) {
+                    is DeleteAllDiariesUseCaseException.DeleteAllDiariesFailed -> {
+                        emitAppMessageEvent(SettingsAppMessage.AllDiaryDeleteFailure)
+                    }
+                    is DeleteAllDiariesUseCaseException.RevokeAllPersistentAccessUriFailed -> {
+                        // 処理なし
+                    }
+                }
+            }
         }
-        return initializeAllSettings()
+    }
+
+    private suspend fun initializeAllSettings() {
+        executeSettingUpdate {
+            initializeAllSettingsUseCase()
+        }
+    }
+
+    private suspend fun deleteAllData() {
+        when (val result = deleteAllDataUseCase()) {
+            is UseCaseResult.Success -> {
+                // 処理なし
+            }
+            is UseCaseResult.Failure -> {
+                Log.e(logTag, "アプリ全データ削除_失敗", result.exception)
+                when (result.exception) {
+                    is DeleteAllDataUseCaseException.DeleteAllDataFailed -> {
+                        emitAppMessageEvent(SettingsAppMessage.AllDataDeleteFailure)
+                    }
+                    is DeleteAllDataUseCaseException.RevokeAllPersistentAccessUriFailed -> {
+                        // 処理なし
+                    }
+                }
+            }
+        }
     }
 }
