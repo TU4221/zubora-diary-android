@@ -7,6 +7,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.websarva.wings.android.zuboradiary.data.model.ThemeColor
 import com.websarva.wings.android.zuboradiary.data.preferences.AllPreferences
+import com.websarva.wings.android.zuboradiary.data.preferences.UserPreferencesLoadingResult
 import com.websarva.wings.android.zuboradiary.domain.usecase.DefaultUseCaseResult
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.domain.usecase.exception.DeleteAllDataUseCaseException
@@ -126,7 +127,20 @@ internal class SettingsViewModel @Inject constructor(
 
     private fun setUpPreferencesValueLoading() {
         updateUiState(SettingsState.LoadingAllSettings)
-        val allPreferences = fetchAllSettingsValueUseCase().value
+        val allPreferences =
+            fetchAllSettingsValueUseCase()
+                .value
+                .map { fetchResult ->
+                    when (fetchResult) {
+                        is UserPreferencesLoadingResult.Success -> {
+                            fetchResult.preferences
+                        }
+                        is UserPreferencesLoadingResult.Failure -> {
+                            emitAppMessageEvent(SettingsAppMessage.SettingLoadingFailure)
+                            fetchResult.fallbackPreferences
+                        }
+                    }
+                }
         setUpThemeColorPreferenceValueLoading(allPreferences)
         setUpCalendarStartDayOfWeekPreferenceValueLoading(allPreferences)
         setUpReminderNotificationPreferenceValueLoading(allPreferences)

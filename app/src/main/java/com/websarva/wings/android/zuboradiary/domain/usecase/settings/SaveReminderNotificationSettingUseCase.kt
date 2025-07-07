@@ -3,6 +3,7 @@ package com.websarva.wings.android.zuboradiary.domain.usecase.settings
 import android.util.Log
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.data.preferences.AllPreferences
+import com.websarva.wings.android.zuboradiary.data.preferences.UserPreferencesLoadingResult
 import com.websarva.wings.android.zuboradiary.data.preferences.ReminderNotificationPreference
 import com.websarva.wings.android.zuboradiary.data.repository.UserPreferencesRepository
 import com.websarva.wings.android.zuboradiary.data.repository.WorkerRepository
@@ -97,7 +98,17 @@ internal class SaveReminderNotificationSettingUseCase(
         return withContext(Dispatchers.IO) {
             userPreferencesRepository
                 .loadAllPreferences()
-                .map { value: AllPreferences ->
+                .map { value: UserPreferencesLoadingResult ->
+                    val allPreferences = when (value) {
+                        is UserPreferencesLoadingResult.Success -> {
+                            value.preferences
+                        }
+                        is UserPreferencesLoadingResult.Failure -> {
+                            value.fallbackPreferences
+                        }
+                    }
+                    allPreferences
+                }.map { value: AllPreferences ->
                     return@map value.reminderNotificationPreference
                 }.first()
         }

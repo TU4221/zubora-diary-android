@@ -44,25 +44,33 @@ internal class UserPreferences @Inject constructor(private val context: Context)
     private val isCheckedWeatherInfoFetchPreferenceKey =
         booleanPreferencesKey("is_checked_weather_info_fetch")
 
-    fun loadAllPreferences(): Flow<AllPreferences> {
+    fun loadAllPreferences(): Flow<UserPreferencesLoadingResult> {
         return context.dataStore.data
-            .catch { cause ->
-                if (cause is IOException) {
-                    Log.e(logTag, "アプリ設定値読込_失敗", cause)
-                    emit(emptyPreferences())
-                } else {
-                    throw cause
-                }
-            }
             .map { preferences ->
-                AllPreferences(
-                    createThemeColorPreference(preferences),
-                    createCalendarStartDayOfWeekPreference(preferences),
-                    createReminderNotificationPreference(preferences),
-                    createPasscodeLockPreference(preferences),
-                    createWeatherInfoFetchPreference(preferences)
-                )
+                UserPreferencesLoadingResult
+                    .Success(
+                        createAllPreferences(preferences)
+                    )
+            }.catch { cause ->
+                Log.e(logTag, "アプリ設定値読込_失敗", cause)
+                if (cause !is IOException) throw cause
+
+                UserPreferencesLoadingResult
+                    .Failure(
+                        UserPreferencesAccessException(cause),
+                        createAllPreferences(emptyPreferences())
+                    )
             }
+    }
+
+    private fun createAllPreferences(preferences: Preferences): AllPreferences {
+        return AllPreferences(
+            createThemeColorPreference(preferences),
+            createCalendarStartDayOfWeekPreference(preferences),
+            createReminderNotificationPreference(preferences),
+            createPasscodeLockPreference(preferences),
+            createWeatherInfoFetchPreference(preferences)
+        )
     }
 
     private fun createThemeColorPreference(preferences: Preferences): ThemeColorPreference {

@@ -1,7 +1,7 @@
 package com.websarva.wings.android.zuboradiary.domain.usecase.settings
 
 import android.util.Log
-import com.websarva.wings.android.zuboradiary.data.preferences.AllPreferences
+import com.websarva.wings.android.zuboradiary.data.preferences.UserPreferencesLoadingResult
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.data.repository.UserPreferencesRepository
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
@@ -13,7 +13,7 @@ internal class FetchAllSettingsValueUseCase(
 
     private val logTag = createLogTag()
 
-    operator fun invoke(): UseCaseResult.Success<Flow<AllPreferences>> {
+    operator fun invoke(): UseCaseResult.Success<Flow<UserPreferencesLoadingResult>> {
         val logMsg = "全設定値取得_"
         Log.i(logTag, "${logMsg}開始")
 

@@ -1,8 +1,8 @@
 package com.websarva.wings.android.zuboradiary.data.repository
 
-import com.websarva.wings.android.zuboradiary.data.preferences.AllPreferences
 import com.websarva.wings.android.zuboradiary.data.preferences.CalendarStartDayOfWeekPreference
 import com.websarva.wings.android.zuboradiary.data.preferences.PassCodeLockPreference
+import com.websarva.wings.android.zuboradiary.data.preferences.UserPreferencesLoadingResult
 import com.websarva.wings.android.zuboradiary.data.preferences.ReminderNotificationPreference
 import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColorPreference
 import com.websarva.wings.android.zuboradiary.data.preferences.UserPreferences
@@ -20,7 +20,7 @@ import kotlinx.coroutines.withContext
 
 internal class UserPreferencesRepository(private val userPreferences: UserPreferences) {
 
-    fun loadAllPreferences(): Flow<AllPreferences> {
+    fun loadAllPreferences(): Flow<UserPreferencesLoadingResult> {
         return userPreferences.loadAllPreferences()
     }
 
