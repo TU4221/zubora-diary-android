@@ -76,8 +76,11 @@ internal class SettingsViewModel @Inject constructor(
     override val isProcessingState =
         uiState
             .map { state ->
-                // TODO:保留
                 when (state) {
+                    SettingsState.LoadingAllSettings,
+                    SettingsState.DeletingAllData,
+                    SettingsState.DeletingAllDiaries -> true
+
                     SettingsState.Idle -> false
                 }
             }.stateInDefault(
@@ -122,6 +125,7 @@ internal class SettingsViewModel @Inject constructor(
     }
 
     private fun setUpPreferencesValueLoading() {
+        updateUiState(SettingsState.LoadingAllSettings)
         val allPreferences = fetchAllSettingsValueUseCase().value
         setUpThemeColorPreferenceValueLoading(allPreferences)
         setUpCalendarStartDayOfWeekPreferenceValueLoading(allPreferences)
@@ -238,6 +242,8 @@ internal class SettingsViewModel @Inject constructor(
                         && isReminderNotificationNotNull
                         && isPasscodeLockNotNull
                         && isWeatherInfoFetchNotNull
+            }.onEach { value ->
+                if (value) updateUiState(SettingsState.Idle)
             }.stateIn(false)
     }
 
@@ -635,11 +641,13 @@ internal class SettingsViewModel @Inject constructor(
     }
 
     private suspend fun deleteAllDiaries() {
+        updateUiState(SettingsState.DeletingAllDiaries)
         when (val result = deleteAllDiariesUseCase()) {
             is UseCaseResult.Success -> {
-                // 処理なし
+                updateUiState(SettingsState.Idle)
             }
             is UseCaseResult.Failure -> {
+                updateUiState(SettingsState.Idle)
                 Log.e(logTag, "全日記削除_失敗", result.exception)
                 when (result.exception) {
                     is DeleteAllDiariesUseCaseException.DeleteAllDiariesFailed -> {
@@ -660,12 +668,14 @@ internal class SettingsViewModel @Inject constructor(
     }
 
     private suspend fun deleteAllData() {
+        updateUiState(SettingsState.DeletingAllData)
         when (val result = deleteAllDataUseCase()) {
             is UseCaseResult.Success -> {
-                // 処理なし
+                updateUiState(SettingsState.Idle)
             }
             is UseCaseResult.Failure -> {
                 Log.e(logTag, "アプリ全データ削除_失敗", result.exception)
+                updateUiState(SettingsState.Idle)
                 when (result.exception) {
                     is DeleteAllDataUseCaseException.DeleteAllDataFailed -> {
                         emitAppMessageEvent(SettingsAppMessage.AllDataDeleteFailure)

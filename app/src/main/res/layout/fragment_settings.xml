@@ -5,6 +5,7 @@
 
     <data>
         <import type="android.view.View" />
+        <import type="com.websarva.wings.android.zuboradiary.ui.model.state.SettingsState"/>
         <variable
             name="viewModel"
             type="com.websarva.wings.android.zuboradiary.ui.viewmodel.SettingsViewModel" />
@@ -303,6 +304,11 @@
             </ScrollView>
 
         </LinearLayout>
+
+        <include
+            layout="@layout/layout_full_screen_circular_progress_indicator"
+            android:id="@+id/include_progress_indicator"
+            app:visibility="@{viewModel.uiState instanceof SettingsState.Idle ? View.INVISIBLE : View.VISIBLE}" />
 
     </FrameLayout>
 
