@@ -258,8 +258,9 @@ internal class SettingsViewModel @Inject constructor(
     }
 
     fun onCalendarStartDayOfWeekSettingButtonClicked() {
+        val dayOfWeek = calendarStartDayOfWeek.requireValue()
+
         viewModelScope.launch {
-            val dayOfWeek = calendarStartDayOfWeek.requireValue()
             emitViewModelEvent(
                 SettingsEvent.NavigateCalendarStartDayPickerDialog(dayOfWeek)
             )
@@ -267,12 +268,12 @@ internal class SettingsViewModel @Inject constructor(
     }
 
     fun onReminderNotificationSettingCheckedChanged(isChecked: Boolean) {
-        viewModelScope.launch {
-            // DateStorePreferences初回読込時の値がtrueの場合、本メソッドが呼び出される。
-            // 初回読込時は処理不要のため下記条件追加。
-            val settingValue = isCheckedReminderNotification.requireValue()
-            if (isChecked == settingValue) return@launch
+        // DateStorePreferences初回読込時の値がtrueの場合、本メソッドが呼び出される。
+        // 初回読込時は処理不要のため下記条件追加。
+        val settingValue = isCheckedReminderNotification.requireValue()
+        if (isChecked == settingValue) return
 
+        viewModelScope.launch {
             if (isChecked) {
                 // MEMO:PostNotificationsはApiLevel33で導入されたPermission。33未満は許可取り不要。
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -292,23 +293,23 @@ internal class SettingsViewModel @Inject constructor(
     }
 
     fun onPasscodeLockSettingCheckedChanged(isChecked: Boolean) {
-        viewModelScope.launch {
-            // DateStorePreferences初回読込時の値がtrueの場合、本メソッドが呼び出される。
-            // 初回読込時は処理不要のため下記条件追加。
-            val settingValue = isCheckedPasscodeLock.requireValue()
-            if (isChecked == settingValue) return@launch
+        // DateStorePreferences初回読込時の値がtrueの場合、本メソッドが呼び出される。
+        // 初回読込時は処理不要のため下記条件追加。
+        val settingValue = isCheckedPasscodeLock.requireValue()
+        if (isChecked == settingValue) return
 
+        viewModelScope.launch {
             savePasscodeLock(isChecked)
         }
     }
 
     fun onWeatherInfoFetchSettingCheckedChanged(isChecked: Boolean) {
-        viewModelScope.launch {
-            // DateStorePreferences初回読込時の値がtrueの場合、本メソッドが呼び出される。
-            // 初回読込時は処理不要のため下記条件追加。
-            val settingValue = isCheckedWeatherInfoFetch.requireValue()
-            if (isChecked == settingValue) return@launch
+        // DateStorePreferences初回読込時の値がtrueの場合、本メソッドが呼び出される。
+        // 初回読込時は処理不要のため下記条件追加。
+        val settingValue = isCheckedWeatherInfoFetch.requireValue()
+        if (isChecked == settingValue) return
 
+        viewModelScope.launch {
             if (isChecked) {
                 emitViewModelEvent(
                     SettingsEvent.CheckAccessLocationPermission
