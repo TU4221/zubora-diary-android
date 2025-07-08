@@ -82,7 +82,9 @@ internal class SettingsViewModel @Inject constructor(
                     SettingsState.DeletingAllData,
                     SettingsState.DeletingAllDiaries -> true
 
-                    SettingsState.Idle -> false
+                    SettingsState.Idle,
+                    SettingsState.LoadAllSettingsSuccess,
+                    SettingsState.LoadAllSettingsFailure -> false
                 }
             }.stateInDefault(
                 viewModelScope,
@@ -133,9 +135,11 @@ internal class SettingsViewModel @Inject constructor(
                 .map { fetchResult ->
                     when (fetchResult) {
                         is UserPreferencesLoadingResult.Success -> {
+                            updateUiState(SettingsState.LoadAllSettingsSuccess)
                             fetchResult.preferences
                         }
                         is UserPreferencesLoadingResult.Failure -> {
+                            updateUiState(SettingsState.LoadAllSettingsFailure)
                             emitAppMessageEvent(SettingsAppMessage.SettingLoadingFailure)
                             fetchResult.fallbackPreferences
                         }
@@ -256,8 +260,6 @@ internal class SettingsViewModel @Inject constructor(
                         && isReminderNotificationNotNull
                         && isPasscodeLockNotNull
                         && isWeatherInfoFetchNotNull
-            }.onEach { value ->
-                if (value) updateUiState(SettingsState.Idle)
             }.stateIn(false)
     }
 
@@ -269,7 +271,28 @@ internal class SettingsViewModel @Inject constructor(
     }
 
     // ViewClicked処理
+    private fun canExecuteSettingsOperation(): Boolean {
+        when (uiState.value) {
+            SettingsState.LoadAllSettingsFailure -> {
+                viewModelScope.launch {
+                    emitAppMessageEvent(SettingsAppMessage.SettingsNotLoadedRetryRestart)
+                }
+                return false
+            }
+            SettingsState.LoadAllSettingsSuccess -> {
+                return true
+            }
+
+            SettingsState.Idle,
+            SettingsState.LoadingAllSettings,
+            SettingsState.DeletingAllData,
+            SettingsState.DeletingAllDiaries -> return false
+        }
+    }
+
     fun onThemeColorSettingButtonClicked() {
+        if (!canExecuteSettingsOperation()) return
+
         viewModelScope.launch {
             emitViewModelEvent(
                 SettingsEvent.NavigateThemeColorPickerDialog
@@ -278,8 +301,9 @@ internal class SettingsViewModel @Inject constructor(
     }
 
     fun onCalendarStartDayOfWeekSettingButtonClicked() {
-        val dayOfWeek = calendarStartDayOfWeek.requireValue()
+        if (!canExecuteSettingsOperation()) return
 
+        val dayOfWeek = calendarStartDayOfWeek.requireValue()
         viewModelScope.launch {
             emitViewModelEvent(
                 SettingsEvent.NavigateCalendarStartDayPickerDialog(dayOfWeek)
@@ -292,6 +316,13 @@ internal class SettingsViewModel @Inject constructor(
         // 初回読込時は処理不要のため下記条件追加。
         val settingValue = isCheckedReminderNotification.requireValue()
         if (isChecked == settingValue) return
+
+        if (!canExecuteSettingsOperation()) {
+            viewModelScope.launch {
+                emitViewModelEvent(SettingsEvent.TurnOffReminderNotificationSettingSwitch)
+            }
+            return
+        }
 
         viewModelScope.launch {
             if (isChecked) {
@@ -318,6 +349,13 @@ internal class SettingsViewModel @Inject constructor(
         val settingValue = isCheckedPasscodeLock.requireValue()
         if (isChecked == settingValue) return
 
+        if (!canExecuteSettingsOperation()) {
+            viewModelScope.launch {
+                emitViewModelEvent(SettingsEvent.TurnOffPasscodeLockSettingSwitch)
+            }
+            return
+        }
+
         viewModelScope.launch {
             savePasscodeLock(isChecked)
         }
@@ -328,6 +366,13 @@ internal class SettingsViewModel @Inject constructor(
         // 初回読込時は処理不要のため下記条件追加。
         val settingValue = isCheckedWeatherInfoFetch.requireValue()
         if (isChecked == settingValue) return
+
+        if (!canExecuteSettingsOperation()) {
+            viewModelScope.launch {
+                emitViewModelEvent(SettingsEvent.TurnOffWeatherInfoFetchSettingSwitch)
+            }
+            return
+        }
 
         viewModelScope.launch {
             if (isChecked) {
@@ -341,6 +386,8 @@ internal class SettingsViewModel @Inject constructor(
     }
 
     fun onAllDiariesDeleteButtonClicked() {
+        if (!canExecuteSettingsOperation()) return
+
         viewModelScope.launch {
             emitViewModelEvent(
                 SettingsEvent.NavigateAllDiariesDeleteDialog
@@ -349,6 +396,8 @@ internal class SettingsViewModel @Inject constructor(
     }
 
     fun onAllSettingsInitializationButtonClicked() {
+        if (!canExecuteSettingsOperation()) return
+
         viewModelScope.launch {
             emitViewModelEvent(
                 SettingsEvent.NavigateAllSettingsInitializationDialog
@@ -357,6 +406,8 @@ internal class SettingsViewModel @Inject constructor(
     }
 
     fun onAllDataDeleteButtonClicked() {
+        if (!canExecuteSettingsOperation()) return
+
         viewModelScope.launch {
             emitViewModelEvent(
                 SettingsEvent.NavigateAllDataDeleteDialog
@@ -599,27 +650,28 @@ internal class SettingsViewModel @Inject constructor(
     }
 
     private suspend fun saveThemeColor(value: ThemeColor) {
-        executeSettingUpdate {
-            saveThemeColorSettingUseCase(value)
-        }
+        executeSettingUpdate(
+            { saveThemeColorSettingUseCase(value) }
+        )
     }
 
     private suspend fun saveCalendarStartDayOfWeek(value: DayOfWeek) {
-        executeSettingUpdate {
-            saveCalendarStartDayOfWeekUseCase(value)
-        }
+        executeSettingUpdate(
+            { saveCalendarStartDayOfWeekUseCase(value) }
+        )
     }
 
     private suspend fun saveReminderNotificationValid(value: LocalTime) {
-        executeSettingUpdate {
-            saveReminderNotificationSettingUseCase(true, value)
-        }
+        executeSettingUpdate (
+            { saveReminderNotificationSettingUseCase(true, value) }
+        )
     }
 
     private suspend fun saveReminderNotificationInvalid() {
-        executeSettingUpdate {
-            saveReminderNotificationSettingUseCase(false)
-        }
+        executeSettingUpdate(
+            { saveReminderNotificationSettingUseCase(false) },
+            { emitViewModelEvent(SettingsEvent.TurnOffReminderNotificationSettingSwitch) }
+        )
     }
 
     private suspend fun savePasscodeLock(value: Boolean) {
@@ -629,19 +681,22 @@ internal class SettingsViewModel @Inject constructor(
             ""
         }
 
-        executeSettingUpdate {
-            savePasscodeLockSettingUseCase(value, passcode)
-        }
+        executeSettingUpdate (
+            { savePasscodeLockSettingUseCase(value, passcode) },
+            { emitViewModelEvent(SettingsEvent.TurnOffPasscodeLockSettingSwitch) }
+        )
     }
 
     private suspend fun saveWeatherInfoFetch(value: Boolean) {
-        executeSettingUpdate {
-            saveWeatherInfoFetchSettingUseCase(value)
-        }
+        executeSettingUpdate(
+            { saveWeatherInfoFetchSettingUseCase(value) },
+            { emitViewModelEvent(SettingsEvent.TurnOffWeatherInfoFetchSettingSwitch) }
+        )
     }
 
     private suspend fun executeSettingUpdate(
-        process: suspend () -> DefaultUseCaseResult<Unit>
+        process: suspend () -> DefaultUseCaseResult<Unit>,
+        onFailure: (suspend () -> Unit)? = null
     ) {
         when (val result = process()) {
             is UseCaseResult.Success -> {
@@ -649,6 +704,7 @@ internal class SettingsViewModel @Inject constructor(
             }
             is UseCaseResult.Failure -> {
                 Log.e(logTag, "アプリ設定値更新_失敗", result.exception)
+                if (onFailure != null) onFailure()
                 emitAppMessageEvent(SettingsAppMessage.SettingUpdateFailure)
             }
         }
@@ -658,10 +714,10 @@ internal class SettingsViewModel @Inject constructor(
         updateUiState(SettingsState.DeletingAllDiaries)
         when (val result = deleteAllDiariesUseCase()) {
             is UseCaseResult.Success -> {
-                updateUiState(SettingsState.Idle)
+                updateUiState(SettingsState.LoadAllSettingsSuccess)
             }
             is UseCaseResult.Failure -> {
-                updateUiState(SettingsState.Idle)
+                updateUiState(SettingsState.LoadAllSettingsSuccess)
                 Log.e(logTag, "全日記削除_失敗", result.exception)
                 when (result.exception) {
                     is DeleteAllDiariesUseCaseException.DeleteAllDiariesFailed -> {
@@ -676,20 +732,20 @@ internal class SettingsViewModel @Inject constructor(
     }
 
     private suspend fun initializeAllSettings() {
-        executeSettingUpdate {
-            initializeAllSettingsUseCase()
-        }
+        executeSettingUpdate(
+            { initializeAllSettingsUseCase() }
+        )
     }
 
     private suspend fun deleteAllData() {
         updateUiState(SettingsState.DeletingAllData)
         when (val result = deleteAllDataUseCase()) {
             is UseCaseResult.Success -> {
-                updateUiState(SettingsState.Idle)
+                updateUiState(SettingsState.LoadAllSettingsSuccess)
             }
             is UseCaseResult.Failure -> {
                 Log.e(logTag, "アプリ全データ削除_失敗", result.exception)
-                updateUiState(SettingsState.Idle)
+                updateUiState(SettingsState.LoadAllSettingsSuccess)
                 when (result.exception) {
                     is DeleteAllDataUseCaseException.DeleteAllDataFailed -> {
                         emitAppMessageEvent(SettingsAppMessage.AllDataDeleteFailure)

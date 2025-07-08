@@ -297,6 +297,7 @@
     <string name="dialog_calendar_app_message_diary_info_loading_failure">@string/dialog_app_message_diary_info_loading_failure</string>
     <!-- SettingsAppMessage -->
     <string name="dialog_settings_app_message_setting_loading_failure">@string/dialog_app_message_setting_loading_failure</string>
+    <string name="dialog_settings_app_message_settings_not_loaded_retry_restart">設定の読み込みに失敗しています。アプリを再起動してください。</string>
     <string name="dialog_settings_app_message_setting_update_failure">設定の更新に失敗しました。</string>
     <string name="dialog_settings_app_message_all_diary_delete_failure">全ての日記の削除に失敗しました。</string>
     <string name="dialog_settings_app_message_all_data_delete_failure">全てのデータの削除に失敗しました。</string>

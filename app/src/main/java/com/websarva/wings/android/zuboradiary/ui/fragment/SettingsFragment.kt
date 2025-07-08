@@ -252,6 +252,9 @@ class SettingsFragment :
             is SettingsEvent.TurnOffReminderNotificationSettingSwitch -> {
                 binding.includeReminderNotificationSetting.materialSwitch.isChecked = false
             }
+            is SettingsEvent.TurnOffPasscodeLockSettingSwitch -> {
+                binding.includePasscodeLockSetting.materialSwitch.isChecked = false
+            }
             is SettingsEvent.TurnOffWeatherInfoFetchSettingSwitch -> {
                 binding.includeWeatherInfoFetchSetting.materialSwitch.isChecked = false
             }

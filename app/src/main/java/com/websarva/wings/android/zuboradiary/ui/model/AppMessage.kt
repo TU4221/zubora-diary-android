@@ -83,10 +83,16 @@ internal sealed class SettingsAppMessage(
     dialogMessageStringResId: Int
 ) : AppMessage(dialogTitleStringResId, dialogMessageStringResId) {
 
-    // TODO:削除保留(最終的に不要か判断して削除)
     data object SettingLoadingFailure :  SettingsAppMessage(
         R.string.dialog_app_message_title_access_error,
         R.string.dialog_settings_app_message_setting_loading_failure
+    ) {
+        private fun readResolve(): Any = SettingLoadingFailure
+    }
+
+    data object SettingsNotLoadedRetryRestart :  SettingsAppMessage(
+        R.string.dialog_app_message_title_hint,
+        R.string.dialog_settings_app_message_settings_not_loaded_retry_restart
     ) {
         private fun readResolve(): Any = SettingLoadingFailure
     }

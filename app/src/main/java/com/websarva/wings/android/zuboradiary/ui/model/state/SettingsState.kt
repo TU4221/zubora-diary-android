@@ -2,7 +2,11 @@ package com.websarva.wings.android.zuboradiary.ui.model.state
 
 internal sealed class SettingsState : UiState {
     data object Idle: SettingsState() // 初期状態
+
     data object LoadingAllSettings: SettingsState() // 全設定読込中
+    data object LoadAllSettingsSuccess: SettingsState() // 全設定読込成功
+    data object LoadAllSettingsFailure: SettingsState() // 全設定読込失敗
+
     data object DeletingAllData: SettingsState() // 全アプリデータ削除中
     data object DeletingAllDiaries: SettingsState() // 全日記削除中
 
