@@ -47,19 +47,23 @@ internal class UserPreferences @Inject constructor(private val context: Context)
     fun loadAllPreferences(): Flow<UserPreferencesLoadingResult> {
         return context.dataStore.data
             .map { preferences ->
-                UserPreferencesLoadingResult
-                    .Success(
-                        createAllPreferences(preferences)
-                    )
+                val result =
+                    UserPreferencesLoadingResult
+                        .Success(
+                            createAllPreferences(preferences)
+                        ) as UserPreferencesLoadingResult
+                return@map result
             }.catch { cause ->
                 Log.e(logTag, "アプリ設定値読込_失敗", cause)
                 if (cause !is IOException) throw cause
 
-                UserPreferencesLoadingResult
-                    .Failure(
-                        UserPreferencesAccessException(cause),
-                        createAllPreferences(emptyPreferences())
-                    )
+                emit(
+                    UserPreferencesLoadingResult
+                        .Failure(
+                            UserPreferencesAccessException(cause),
+                            createAllPreferences(emptyPreferences())
+                        )
+                )
             }
     }
 
