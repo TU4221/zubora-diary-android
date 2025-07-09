@@ -4,4 +4,4 @@ import com.websarva.wings.android.zuboradiary.data.model.DataException
 
 internal class UserPreferencesAccessException (
     cause: Throwable? = null
-) : DataException("ユーザー情報へのアクセスに失敗しました。", cause)
+) : DataException("ユーザー設定へのアクセスに失敗しました。", cause)

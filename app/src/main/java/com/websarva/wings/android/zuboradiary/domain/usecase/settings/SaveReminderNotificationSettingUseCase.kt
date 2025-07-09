@@ -2,15 +2,15 @@ package com.websarva.wings.android.zuboradiary.domain.usecase.settings
 
 import android.util.Log
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
-import com.websarva.wings.android.zuboradiary.data.preferences.ReminderNotificationPreference
-import com.websarva.wings.android.zuboradiary.data.preferences.UserPreferenceFlowResult
-import com.websarva.wings.android.zuboradiary.data.preferences.UserPreferencesAccessException
+import com.websarva.wings.android.zuboradiary.domain.model.settings.ReminderNotificationSetting
 import com.websarva.wings.android.zuboradiary.data.repository.UserPreferencesRepository
 import com.websarva.wings.android.zuboradiary.data.repository.WorkerRepository
 import com.websarva.wings.android.zuboradiary.domain.exception.DomainException
 import com.websarva.wings.android.zuboradiary.domain.exception.reminder.CancelReminderNotificationFailedException
 import com.websarva.wings.android.zuboradiary.domain.exception.reminder.RegisterReminderNotificationFailedException
 import com.websarva.wings.android.zuboradiary.domain.exception.settings.UpdateReminderNotificationSettingFailedException
+import com.websarva.wings.android.zuboradiary.domain.exception.settings.UserSettingsAccessException
+import com.websarva.wings.android.zuboradiary.domain.model.settings.UserSettingFlowResult
 import com.websarva.wings.android.zuboradiary.domain.usecase.DefaultUseCaseResult
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import kotlinx.coroutines.Dispatchers
@@ -56,14 +56,14 @@ internal class SaveReminderNotificationSettingUseCase(
     )
     private suspend fun saveReminderNotificationValid(notificationTime: LocalTime) {
         try {
-            val preferenceValue = ReminderNotificationPreference(true, notificationTime)
+            val preferenceValue = ReminderNotificationSetting(true, notificationTime)
             userPreferencesRepository.saveReminderNotificationPreference(preferenceValue)
             workerRepository.registerReminderNotificationWorker(notificationTime)
         } catch (e: UpdateReminderNotificationSettingFailedException) {
             throw e
         } catch (e: RegisterReminderNotificationFailedException) {
             try {
-                val preferenceValue = ReminderNotificationPreference(false)
+                val preferenceValue = ReminderNotificationSetting(false)
                 userPreferencesRepository.saveReminderNotificationPreference(preferenceValue)
             } catch (e: UpdateReminderNotificationSettingFailedException) {
                 throw e
@@ -74,12 +74,13 @@ internal class SaveReminderNotificationSettingUseCase(
 
     @Throws(
         UpdateReminderNotificationSettingFailedException::class,
-        CancelReminderNotificationFailedException::class
+        CancelReminderNotificationFailedException::class,
+        UserSettingsAccessException::class
     )
     private suspend fun saveReminderNotificationInvalid() {
         val backupSettingValue = fetchCurrentReminderNotificationSetting()
         try {
-            val preferenceValue = ReminderNotificationPreference(false)
+            val preferenceValue = ReminderNotificationSetting(false)
             userPreferencesRepository.saveReminderNotificationPreference(preferenceValue)
             workerRepository.cancelReminderNotificationWorker()
         } catch (e: UpdateReminderNotificationSettingFailedException) {
@@ -94,16 +95,15 @@ internal class SaveReminderNotificationSettingUseCase(
         }
     }
 
-    // TODO:DomainExceptionに置換
-    @Throws(UserPreferencesAccessException::class)
-    private suspend fun fetchCurrentReminderNotificationSetting(): ReminderNotificationPreference {
+    @Throws(UserSettingsAccessException::class)
+    private suspend fun fetchCurrentReminderNotificationSetting(): ReminderNotificationSetting {
         return withContext(Dispatchers.IO) {
             userPreferencesRepository
                 .fetchReminderNotificationPreference()
-                .map { value: UserPreferenceFlowResult<ReminderNotificationPreference> ->
+                .map { value: UserSettingFlowResult<ReminderNotificationSetting> ->
                     when (value) {
-                        is UserPreferenceFlowResult.Success -> value.preference
-                        is UserPreferenceFlowResult.Failure -> throw value.exception
+                        is UserSettingFlowResult.Success -> value.setting
+                        is UserSettingFlowResult.Failure -> throw value.exception
                     }
                 }.first()
         }

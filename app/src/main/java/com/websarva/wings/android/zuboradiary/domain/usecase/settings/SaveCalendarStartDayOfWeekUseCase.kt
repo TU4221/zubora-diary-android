@@ -1,7 +1,7 @@
 package com.websarva.wings.android.zuboradiary.domain.usecase.settings
 
 import android.util.Log
-import com.websarva.wings.android.zuboradiary.data.preferences.CalendarStartDayOfWeekPreference
+import com.websarva.wings.android.zuboradiary.domain.model.settings.CalendarStartDayOfWeekSetting
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.data.repository.UserPreferencesRepository
 import com.websarva.wings.android.zuboradiary.domain.exception.settings.UpdateCalendarStartDayOfWeekSettingFailedException
@@ -22,7 +22,7 @@ internal class SaveCalendarStartDayOfWeekUseCase(
         Log.i(logTag, "${logMsg}開始")
 
         try {
-            val preferenceValue = CalendarStartDayOfWeekPreference(dayOfWeek)
+            val preferenceValue = CalendarStartDayOfWeekSetting(dayOfWeek)
             userPreferencesRepository.saveCalendarStartDayOfWeekPreference(preferenceValue)
         } catch (e: UpdateCalendarStartDayOfWeekSettingFailedException) {
             Log.e(logTag, "${logMsg}失敗")

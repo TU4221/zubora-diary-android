@@ -2,8 +2,8 @@ package com.websarva.wings.android.zuboradiary.domain.usecase.settings
 
 import android.util.Log
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
-import com.websarva.wings.android.zuboradiary.data.preferences.UserPreferenceFlowResult
-import com.websarva.wings.android.zuboradiary.data.preferences.WeatherInfoFetchPreference
+import com.websarva.wings.android.zuboradiary.domain.model.settings.UserSettingFlowResult
+import com.websarva.wings.android.zuboradiary.domain.model.settings.WeatherInfoFetchSetting
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
@@ -24,13 +24,13 @@ internal class IsWeatherInfoFetchEnabledUseCase(
         val value =
             withContext(Dispatchers.IO) {
                 fetchWeatherInfoFetchSettingUseCase().value
-                    .map { value: UserPreferenceFlowResult<WeatherInfoFetchPreference> ->
+                    .map { value: UserSettingFlowResult<WeatherInfoFetchSetting> ->
                          when (value) {
-                            is UserPreferenceFlowResult.Success -> {
-                                value.preference.isChecked
+                            is UserSettingFlowResult.Success -> {
+                                value.setting.isChecked
                             }
-                            is UserPreferenceFlowResult.Failure -> {
-                                value.fallbackPreference.isChecked
+                            is UserSettingFlowResult.Failure -> {
+                                value.fallbackSetting.isChecked
                             }
                          }
                     }.first()

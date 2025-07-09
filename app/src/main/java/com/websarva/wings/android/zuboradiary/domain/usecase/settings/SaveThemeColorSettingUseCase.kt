@@ -3,7 +3,7 @@ package com.websarva.wings.android.zuboradiary.domain.usecase.settings
 import android.util.Log
 import com.websarva.wings.android.zuboradiary.data.model.ThemeColor
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
-import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColorPreference
+import com.websarva.wings.android.zuboradiary.domain.model.settings.ThemeColorSetting
 import com.websarva.wings.android.zuboradiary.data.repository.UserPreferencesRepository
 import com.websarva.wings.android.zuboradiary.domain.exception.settings.UpdateThemeColorSettingFailedException
 import com.websarva.wings.android.zuboradiary.domain.usecase.DefaultUseCaseResult
@@ -22,7 +22,7 @@ internal class SaveThemeColorSettingUseCase(
         Log.i(logTag, "${logMsg}開始")
 
         try {
-            val preferenceValue = ThemeColorPreference(themeColor)
+            val preferenceValue = ThemeColorSetting(themeColor)
             userPreferencesRepository.saveThemeColorPreference(preferenceValue)
         } catch (e: UpdateThemeColorSettingFailedException) {
             Log.e(logTag, "${logMsg}失敗")

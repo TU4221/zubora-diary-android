@@ -1,0 +1,7 @@
+package com.websarva.wings.android.zuboradiary.domain.model.settings
+
+import com.websarva.wings.android.zuboradiary.data.model.ThemeColor
+
+internal data class ThemeColorSetting(
+    val themeColor: ThemeColor
+) : UserSetting

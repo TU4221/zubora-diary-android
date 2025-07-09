@@ -100,7 +100,7 @@ internal class UserPreferences @Inject constructor(
     private fun createThemeColorPreference(preferences: Preferences): ThemeColorPreference {
         val themeColorNumber =
             preferences[themeColorPreferenceKey]
-                ?: ThemeColorPreference.THEME_COLOR_DEFAULT_VALUE
+                ?: return ThemeColorPreference()
         return ThemeColorPreference(themeColorNumber)
     }
 
@@ -128,7 +128,7 @@ internal class UserPreferences @Inject constructor(
     ): CalendarStartDayOfWeekPreference {
         val dayOfWeekNumber =
             preferences[calendarStartDayOfWeekPreferenceKey]
-                ?: CalendarStartDayOfWeekPreference.DAY_OF_WEEK_DEFAULT_VALUE
+                ?: return CalendarStartDayOfWeekPreference()
         return CalendarStartDayOfWeekPreference(dayOfWeekNumber)
     }
 
@@ -154,17 +154,17 @@ internal class UserPreferences @Inject constructor(
     private fun createReminderNotificationPreference(
         preferences: Preferences
     ): ReminderNotificationPreference {
-        var isCheckedReminder = preferences[isCheckedReminderNotificationPreferenceKey]
-        var notificationTimeString = preferences[reminderNotificationTimePreferenceKey]
-        if (isCheckedReminder == null || notificationTimeString == null) {
-            isCheckedReminder = ReminderNotificationPreference.IS_CHECKED_DEFAULT_VALUE
-            notificationTimeString = ReminderNotificationPreference.NOTIFICATION_TIME_DEFAULT_VALUE
-        }
+        val isCheckedReminder =
+            preferences[isCheckedReminderNotificationPreferenceKey]
+                ?: return ReminderNotificationPreference()
+        val notificationTimeString =
+            preferences[reminderNotificationTimePreferenceKey]
+                ?: return ReminderNotificationPreference()
         return ReminderNotificationPreference(isCheckedReminder, notificationTimeString)
     }
 
     fun fetchPasscodeLockPreference():
-            Flow<UserPreferenceFlowResult<PassCodeLockPreference>> {
+            Flow<UserPreferenceFlowResult<PasscodeLockPreference>> {
         return userPreferencesFlow.map { result ->
             when (result) {
                 is UserPreferencesFetchResult.Success -> {
@@ -182,14 +182,11 @@ internal class UserPreferences @Inject constructor(
         }
     }
 
-    private fun createPasscodeLockPreference(preferences: Preferences): PassCodeLockPreference {
-        var isCheckedPasscode = preferences[isCheckedPasscodeLockPreferenceKey]
-        var passCode = preferences[passcodePreferenceKey]
-        if (isCheckedPasscode == null || passCode == null) {
-            isCheckedPasscode = PassCodeLockPreference.IS_CHECKED_DEFAULT_VALUE
-            passCode = PassCodeLockPreference.PASS_CODE_DEFAULT_VALUE
-        }
-        return PassCodeLockPreference(isCheckedPasscode, passCode)
+    private fun createPasscodeLockPreference(preferences: Preferences): PasscodeLockPreference {
+        val isCheckedPasscode =
+            preferences[isCheckedPasscodeLockPreferenceKey] ?: return PasscodeLockPreference()
+        val passCode = preferences[passcodePreferenceKey] ?: return PasscodeLockPreference()
+        return PasscodeLockPreference(isCheckedPasscode, passCode)
     }
 
     fun fetchWeatherInfoFetchPreference():
@@ -216,7 +213,7 @@ internal class UserPreferences @Inject constructor(
     ): WeatherInfoFetchPreference {
         val isCheckedWeather =
             preferences[isCheckedWeatherInfoFetchPreferenceKey]
-                ?: WeatherInfoFetchPreference.IS_CHECKED_DEFAULT_VALUE
+                ?: return WeatherInfoFetchPreference()
         return WeatherInfoFetchPreference(isCheckedWeather)
     }
 
@@ -277,7 +274,7 @@ internal class UserPreferences @Inject constructor(
     }
 
     @Throws(UserPreferencesAccessException::class)
-    suspend fun savePasscodeLockPreference(value: PassCodeLockPreference) {
+    suspend fun savePasscodeLockPreference(value: PasscodeLockPreference) {
         executeDataStoreEditOperation { preferences ->
             savePasscodeLockPreferenceValue(preferences, value)
         }
@@ -285,10 +282,10 @@ internal class UserPreferences @Inject constructor(
 
     private fun savePasscodeLockPreferenceValue(
         preferences: MutablePreferences,
-        value: PassCodeLockPreference
+        value: PasscodeLockPreference
     ) {
         preferences[isCheckedPasscodeLockPreferenceKey] = value.isChecked
-        preferences[passcodePreferenceKey] = value.passCode
+        preferences[passcodePreferenceKey] = value.passcode
     }
 
     @Throws(UserPreferencesAccessException::class)
@@ -310,7 +307,7 @@ internal class UserPreferences @Inject constructor(
             saveThemeColorPreferenceValue(preferences, ThemeColorPreference())
             saveCalendarStartDayOfWeekPreferenceValue(preferences, CalendarStartDayOfWeekPreference())
             saveReminderNotificationPreferenceValue(preferences, ReminderNotificationPreference())
-            savePasscodeLockPreferenceValue(preferences, PassCodeLockPreference())
+            savePasscodeLockPreferenceValue(preferences, PasscodeLockPreference())
             saveWeatherInfoFetchPreferenceValue(preferences, WeatherInfoFetchPreference())
         }
     }

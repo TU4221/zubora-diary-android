@@ -2,7 +2,7 @@ package com.websarva.wings.android.zuboradiary.domain.usecase.settings
 
 import android.util.Log
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
-import com.websarva.wings.android.zuboradiary.data.preferences.PassCodeLockPreference
+import com.websarva.wings.android.zuboradiary.domain.model.settings.PasscodeLockSetting
 import com.websarva.wings.android.zuboradiary.data.repository.UserPreferencesRepository
 import com.websarva.wings.android.zuboradiary.domain.exception.settings.UpdatePassCodeSettingFailedException
 import com.websarva.wings.android.zuboradiary.domain.usecase.DefaultUseCaseResult
@@ -22,7 +22,7 @@ internal class SavePasscodeLockSettingUseCase(
         Log.i(logTag, "${logMsg}開始")
 
         try {
-            val preferenceValue = PassCodeLockPreference(isChecked, passcode)
+            val preferenceValue = PasscodeLockSetting(isChecked, passcode)
             userPreferencesRepository.savePasscodeLockPreference(preferenceValue)
         } catch (e: UpdatePassCodeSettingFailedException) {
             Log.e(logTag, "${logMsg}失敗")

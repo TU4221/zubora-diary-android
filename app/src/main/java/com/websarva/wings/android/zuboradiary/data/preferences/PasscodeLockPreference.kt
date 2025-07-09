@@ -1,6 +1,6 @@
 package com.websarva.wings.android.zuboradiary.data.preferences
 
-internal class ReminderNotificationPreference(
+internal class PasscodeLockPreference(
     val isChecked: Boolean = false,
-    val notificationTimeString: String = ""
+    val passcode: String = ""
 ) : UserPreference

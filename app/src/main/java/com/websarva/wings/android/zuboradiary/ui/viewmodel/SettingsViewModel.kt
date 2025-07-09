@@ -6,7 +6,7 @@ import androidx.annotation.RequiresApi
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.websarva.wings.android.zuboradiary.data.model.ThemeColor
-import com.websarva.wings.android.zuboradiary.data.preferences.UserPreferenceFlowResult
+import com.websarva.wings.android.zuboradiary.domain.model.settings.UserSettingFlowResult
 import com.websarva.wings.android.zuboradiary.domain.usecase.DefaultUseCaseResult
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.domain.usecase.exception.DeleteAllDataUseCaseException
@@ -183,13 +183,13 @@ internal class SettingsViewModel @Inject constructor(
                 .value
                 .map {
                     when (it) {
-                        is UserPreferenceFlowResult.Success -> {
+                        is UserSettingFlowResult.Success -> {
                             onUserSettingsFetchSuccess()
-                            it.preference.themeColor
+                            it.setting.themeColor
                         }
-                        is UserPreferenceFlowResult.Failure -> {
+                        is UserSettingFlowResult.Failure -> {
                             onUserSettingsFetchFailure()
-                            it.fallbackPreference.themeColor
+                            it.fallbackSetting.themeColor
                         }
                     }
                 }.stateIn(initialValue)
@@ -207,8 +207,8 @@ internal class SettingsViewModel @Inject constructor(
                 .value
                 .map {
                     when (it) {
-                        is UserPreferenceFlowResult.Success -> it.preference.dayOfWeek
-                        is UserPreferenceFlowResult.Failure -> it.fallbackPreference.dayOfWeek
+                        is UserSettingFlowResult.Success -> it.setting.dayOfWeek
+                        is UserSettingFlowResult.Failure -> it.fallbackSetting.dayOfWeek
                     }
                 }.stateIn(initialValue)
 
@@ -224,8 +224,8 @@ internal class SettingsViewModel @Inject constructor(
                 .value
                 .map {
                     when (it) {
-                        is UserPreferenceFlowResult.Success -> it.preference.isChecked
-                        is UserPreferenceFlowResult.Failure -> it.fallbackPreference.isChecked
+                        is UserSettingFlowResult.Success -> it.setting.isChecked
+                        is UserSettingFlowResult.Failure -> it.fallbackSetting.isChecked
                     }
                 }.stateIn(null )
 
@@ -234,8 +234,8 @@ internal class SettingsViewModel @Inject constructor(
                 .value
                 .map {
                     when (it) {
-                        is UserPreferenceFlowResult.Success -> it.preference.notificationLocalTime
-                        is UserPreferenceFlowResult.Failure -> it.fallbackPreference.notificationLocalTime
+                        is UserSettingFlowResult.Success -> it.setting.notificationTime
+                        is UserSettingFlowResult.Failure -> it.fallbackSetting.notificationTime
                     }
                 }.stateIn(null)
 
@@ -257,10 +257,10 @@ internal class SettingsViewModel @Inject constructor(
                 .value
                 .map {
                     when (it) {
-                        is UserPreferenceFlowResult.Success -> {
-                            it.preference.isChecked
+                        is UserSettingFlowResult.Success -> {
+                            it.setting.isChecked
                         }
-                        is UserPreferenceFlowResult.Failure -> it.fallbackPreference.isChecked
+                        is UserSettingFlowResult.Failure -> it.fallbackSetting.isChecked
                     }
                 }.stateIn(null )
 
@@ -269,8 +269,8 @@ internal class SettingsViewModel @Inject constructor(
                 .value
                 .map {
                     when (it) {
-                        is UserPreferenceFlowResult.Success -> it.preference.passCode
-                        is UserPreferenceFlowResult.Failure -> it.fallbackPreference.passCode
+                        is UserSettingFlowResult.Success -> it.setting.passCode
+                        is UserSettingFlowResult.Failure -> it.fallbackSetting.passCode
                     }
                 }.stateIn(null )
 
@@ -292,8 +292,8 @@ internal class SettingsViewModel @Inject constructor(
                 .value
                 .map {
                     when (it) {
-                        is UserPreferenceFlowResult.Success -> it.preference.isChecked
-                        is UserPreferenceFlowResult.Failure -> it.fallbackPreference.isChecked
+                        is UserSettingFlowResult.Success -> it.setting.isChecked
+                        is UserSettingFlowResult.Failure -> it.fallbackSetting.isChecked
                     }
                 }.stateIn(null)
 
