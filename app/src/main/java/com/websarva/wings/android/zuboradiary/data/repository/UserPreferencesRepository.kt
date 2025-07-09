@@ -2,9 +2,9 @@ package com.websarva.wings.android.zuboradiary.data.repository
 
 import com.websarva.wings.android.zuboradiary.data.preferences.CalendarStartDayOfWeekPreference
 import com.websarva.wings.android.zuboradiary.data.preferences.PassCodeLockPreference
-import com.websarva.wings.android.zuboradiary.data.preferences.UserPreferencesLoadingResult
 import com.websarva.wings.android.zuboradiary.data.preferences.ReminderNotificationPreference
 import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColorPreference
+import com.websarva.wings.android.zuboradiary.data.preferences.UserPreferenceFlowResult
 import com.websarva.wings.android.zuboradiary.data.preferences.UserPreferences
 import com.websarva.wings.android.zuboradiary.data.preferences.UserPreferencesAccessException
 import com.websarva.wings.android.zuboradiary.data.preferences.WeatherInfoFetchPreference
@@ -20,8 +20,28 @@ import kotlinx.coroutines.withContext
 
 internal class UserPreferencesRepository(private val userPreferences: UserPreferences) {
 
-    fun loadAllPreferences(): Flow<UserPreferencesLoadingResult> {
-        return userPreferences.loadAllPreferences()
+    fun fetchThemeColorPreference(): Flow<UserPreferenceFlowResult<ThemeColorPreference>> {
+        return userPreferences.fetchThemeColorPreference()
+    }
+
+    fun fetchCalendarStartDayOfWeekPreference():
+            Flow<UserPreferenceFlowResult<CalendarStartDayOfWeekPreference>> {
+        return userPreferences.fetchCalendarStartDayOfWeekPreference()
+    }
+
+    fun fetchReminderNotificationPreference():
+            Flow<UserPreferenceFlowResult<ReminderNotificationPreference>> {
+        return userPreferences.fetchReminderNotificationPreference()
+    }
+
+    fun fetchPasscodeLockPreference():
+            Flow<UserPreferenceFlowResult<PassCodeLockPreference>> {
+        return userPreferences.fetchPasscodeLockPreference()
+    }
+
+    fun fetchWeatherInfoFetchPreference():
+            Flow<UserPreferenceFlowResult<WeatherInfoFetchPreference>> {
+        return userPreferences.fetchWeatherInfoFetchPreference()
     }
 
     @Throws(UpdateThemeColorSettingFailedException::class)

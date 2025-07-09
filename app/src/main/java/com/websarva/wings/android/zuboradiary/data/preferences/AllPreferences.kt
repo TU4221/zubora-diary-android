@@ -6,4 +6,4 @@ internal data class AllPreferences(
     val reminderNotificationPreference: ReminderNotificationPreference,
     val passcodeLockPreference: PassCodeLockPreference,
     val weatherInfoFetchPreference: WeatherInfoFetchPreference,
-)
+) : UserPreference

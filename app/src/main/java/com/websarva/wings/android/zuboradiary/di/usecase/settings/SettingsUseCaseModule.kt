@@ -5,7 +5,11 @@ import com.websarva.wings.android.zuboradiary.data.repository.UserPreferencesRep
 import com.websarva.wings.android.zuboradiary.data.repository.WorkerRepository
 import com.websarva.wings.android.zuboradiary.domain.usecase.settings.DeleteAllDataUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.settings.DeleteAllDiariesUseCase
-import com.websarva.wings.android.zuboradiary.domain.usecase.settings.FetchAllSettingsValueUseCase
+import com.websarva.wings.android.zuboradiary.domain.usecase.settings.FetchCalendarStartDayOfWeekSettingUseCase
+import com.websarva.wings.android.zuboradiary.domain.usecase.settings.FetchPasscodeLockSettingUseCase
+import com.websarva.wings.android.zuboradiary.domain.usecase.settings.FetchReminderNotificationSettingUseCase
+import com.websarva.wings.android.zuboradiary.domain.usecase.settings.FetchThemeColorSettingUseCase
+import com.websarva.wings.android.zuboradiary.domain.usecase.settings.FetchWeatherInfoFetchSettingUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.settings.InitializeAllSettingsUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.settings.IsWeatherInfoFetchEnabledUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.settings.SaveCalendarStartDayOfWeekUseCase
@@ -43,10 +47,42 @@ internal object SettingsUseCaseModule {
 
     @Singleton
     @Provides
-    fun provideFetchAllSettingsValueUseCase(
+    fun provideFetchCalendarStartDayOfWeekSettingUseCase(
         userPreferencesRepository: UserPreferencesRepository
-    ): FetchAllSettingsValueUseCase {
-        return FetchAllSettingsValueUseCase(userPreferencesRepository)
+    ): FetchCalendarStartDayOfWeekSettingUseCase {
+        return FetchCalendarStartDayOfWeekSettingUseCase(userPreferencesRepository)
+    }
+
+    @Singleton
+    @Provides
+    fun provideFetchPasscodeLockSettingUseCase(
+        userPreferencesRepository: UserPreferencesRepository
+    ): FetchPasscodeLockSettingUseCase {
+        return FetchPasscodeLockSettingUseCase(userPreferencesRepository)
+    }
+
+    @Singleton
+    @Provides
+    fun provideFetchReminderNotificationSettingUseCase(
+        userPreferencesRepository: UserPreferencesRepository
+    ): FetchReminderNotificationSettingUseCase {
+        return FetchReminderNotificationSettingUseCase(userPreferencesRepository)
+    }
+
+    @Singleton
+    @Provides
+    fun provideFetchThemeColorSettingUseCase(
+        userPreferencesRepository: UserPreferencesRepository
+    ): FetchThemeColorSettingUseCase {
+        return FetchThemeColorSettingUseCase(userPreferencesRepository)
+    }
+
+    @Singleton
+    @Provides
+    fun provideFetchWeatherInfoFetchSettingUseCase(
+        userPreferencesRepository: UserPreferencesRepository
+    ): FetchWeatherInfoFetchSettingUseCase {
+        return FetchWeatherInfoFetchSettingUseCase(userPreferencesRepository)
     }
 
     @Singleton
@@ -60,9 +96,9 @@ internal object SettingsUseCaseModule {
     @Singleton
     @Provides
     fun provideIsWeatherInfoFetchEnabledUseCase(
-        userPreferencesRepository: UserPreferencesRepository
+        fetchWeatherInfoFetchSettingUseCase: FetchWeatherInfoFetchSettingUseCase
     ): IsWeatherInfoFetchEnabledUseCase {
-        return IsWeatherInfoFetchEnabledUseCase(userPreferencesRepository)
+        return IsWeatherInfoFetchEnabledUseCase(fetchWeatherInfoFetchSettingUseCase)
     }
 
     @Singleton

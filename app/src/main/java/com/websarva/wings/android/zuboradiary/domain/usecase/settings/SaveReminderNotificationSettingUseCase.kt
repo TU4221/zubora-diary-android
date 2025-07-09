@@ -2,9 +2,9 @@ package com.websarva.wings.android.zuboradiary.domain.usecase.settings
 
 import android.util.Log
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
-import com.websarva.wings.android.zuboradiary.data.preferences.AllPreferences
-import com.websarva.wings.android.zuboradiary.data.preferences.UserPreferencesLoadingResult
 import com.websarva.wings.android.zuboradiary.data.preferences.ReminderNotificationPreference
+import com.websarva.wings.android.zuboradiary.data.preferences.UserPreferenceFlowResult
+import com.websarva.wings.android.zuboradiary.data.preferences.UserPreferencesAccessException
 import com.websarva.wings.android.zuboradiary.data.repository.UserPreferencesRepository
 import com.websarva.wings.android.zuboradiary.data.repository.WorkerRepository
 import com.websarva.wings.android.zuboradiary.domain.exception.DomainException
@@ -94,22 +94,17 @@ internal class SaveReminderNotificationSettingUseCase(
         }
     }
 
+    // TODO:DomainExceptionに置換
+    @Throws(UserPreferencesAccessException::class)
     private suspend fun fetchCurrentReminderNotificationSetting(): ReminderNotificationPreference {
         return withContext(Dispatchers.IO) {
             userPreferencesRepository
-                .loadAllPreferences()
-                .map { value: UserPreferencesLoadingResult ->
-                    val allPreferences = when (value) {
-                        is UserPreferencesLoadingResult.Success -> {
-                            value.preferences
-                        }
-                        is UserPreferencesLoadingResult.Failure -> {
-                            value.fallbackPreferences
-                        }
+                .fetchReminderNotificationPreference()
+                .map { value: UserPreferenceFlowResult<ReminderNotificationPreference> ->
+                    when (value) {
+                        is UserPreferenceFlowResult.Success -> value.preference
+                        is UserPreferenceFlowResult.Failure -> throw value.exception
                     }
-                    allPreferences
-                }.map { value: AllPreferences ->
-                    return@map value.reminderNotificationPreference
                 }.first()
         }
     }

@@ -6,15 +6,18 @@ import androidx.annotation.RequiresApi
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.websarva.wings.android.zuboradiary.data.model.ThemeColor
-import com.websarva.wings.android.zuboradiary.data.preferences.AllPreferences
-import com.websarva.wings.android.zuboradiary.data.preferences.UserPreferencesLoadingResult
+import com.websarva.wings.android.zuboradiary.data.preferences.UserPreferenceFlowResult
 import com.websarva.wings.android.zuboradiary.domain.usecase.DefaultUseCaseResult
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.domain.usecase.exception.DeleteAllDataUseCaseException
 import com.websarva.wings.android.zuboradiary.domain.usecase.exception.DeleteAllDiariesUseCaseException
 import com.websarva.wings.android.zuboradiary.domain.usecase.settings.DeleteAllDataUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.settings.DeleteAllDiariesUseCase
-import com.websarva.wings.android.zuboradiary.domain.usecase.settings.FetchAllSettingsValueUseCase
+import com.websarva.wings.android.zuboradiary.domain.usecase.settings.FetchCalendarStartDayOfWeekSettingUseCase
+import com.websarva.wings.android.zuboradiary.domain.usecase.settings.FetchPasscodeLockSettingUseCase
+import com.websarva.wings.android.zuboradiary.domain.usecase.settings.FetchReminderNotificationSettingUseCase
+import com.websarva.wings.android.zuboradiary.domain.usecase.settings.FetchThemeColorSettingUseCase
+import com.websarva.wings.android.zuboradiary.domain.usecase.settings.FetchWeatherInfoFetchSettingUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.settings.SaveCalendarStartDayOfWeekUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.settings.SavePasscodeLockSettingUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.settings.SaveReminderNotificationSettingUseCase
@@ -33,7 +36,6 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import java.time.DayOfWeek
@@ -44,7 +46,11 @@ import javax.inject.Inject
 internal class SettingsViewModel @Inject constructor(
     private val handle: SavedStateHandle, // MEMO:システムの初期化によるプロセスの終了からの復元用
     private val initializeAllSettingsUseCase: InitializeAllSettingsUseCase,
-    private val fetchAllSettingsValueUseCase: FetchAllSettingsValueUseCase,
+    private val fetchThemeColorSettingUseCase: FetchThemeColorSettingUseCase,
+    private val fetchCalendarStartDayOfWeekSettingUseCase: FetchCalendarStartDayOfWeekSettingUseCase,
+    private val fetchReminderNotificationSettingUseCase: FetchReminderNotificationSettingUseCase,
+    private val fetchPasscodeLockSettingUseCase: FetchPasscodeLockSettingUseCase,
+    private val fetchWeatherInfoFetchSettingUseCase: FetchWeatherInfoFetchSettingUseCase,
     private val saveThemeColorSettingUseCase: SaveThemeColorSettingUseCase,
     private val saveCalendarStartDayOfWeekUseCase: SaveCalendarStartDayOfWeekUseCase,
     private val saveReminderNotificationSettingUseCase: SaveReminderNotificationSettingUseCase,
@@ -129,38 +135,64 @@ internal class SettingsViewModel @Inject constructor(
 
     private fun setUpPreferencesValueLoading() {
         updateUiState(SettingsState.LoadingAllSettings)
-        val allPreferences =
-            fetchAllSettingsValueUseCase()
-                .value
-                .map { fetchResult ->
-                    when (fetchResult) {
-                        is UserPreferencesLoadingResult.Success -> {
-                            updateUiState(SettingsState.LoadAllSettingsSuccess)
-                            fetchResult.preferences
-                        }
-                        is UserPreferencesLoadingResult.Failure -> {
-                            updateUiState(SettingsState.LoadAllSettingsFailure)
-                            emitAppMessageEvent(SettingsAppMessage.SettingLoadingFailure)
-                            fetchResult.fallbackPreferences
-                        }
-                    }
-                }
-        setUpThemeColorPreferenceValueLoading(allPreferences)
-        setUpCalendarStartDayOfWeekPreferenceValueLoading(allPreferences)
-        setUpReminderNotificationPreferenceValueLoading(allPreferences)
-        setUpPasscodeLockPreferenceValueLoading(allPreferences)
-        setUpWeatherInfoFetchPreferenceValueLoading(allPreferences)
+        setUpThemeColorPreferenceValueLoading()
+        setUpCalendarStartDayOfWeekPreferenceValueLoading()
+        setUpReminderNotificationPreferenceValueLoading()
+        setUpPasscodeLockPreferenceValueLoading()
+        setUpWeatherInfoFetchPreferenceValueLoading()
         setUpIsAllSettingsNotNull()
     }
 
-    private fun setUpThemeColorPreferenceValueLoading(preferences: Flow<AllPreferences>) {
+    private fun onUserSettingsFetchSuccess() {
+        when (uiState.value) {
+            SettingsState.LoadingAllSettings -> {
+                updateUiState(SettingsState.LoadAllSettingsSuccess)
+            }
+
+            SettingsState.Idle,
+            SettingsState.DeletingAllData,
+            SettingsState.DeletingAllDiaries,
+            SettingsState.LoadAllSettingsFailure,
+            SettingsState.LoadAllSettingsSuccess -> {
+                // 処理なし
+            }
+        }
+    }
+
+    private suspend fun onUserSettingsFetchFailure() {
+        when (uiState.value) {
+            SettingsState.LoadingAllSettings,
+            SettingsState.LoadAllSettingsSuccess -> {
+                updateUiState(SettingsState.LoadAllSettingsFailure)
+                emitAppMessageEvent(SettingsAppMessage.SettingLoadingFailure)
+            }
+
+            SettingsState.Idle,
+            SettingsState.DeletingAllData,
+            SettingsState.DeletingAllDiaries,
+            SettingsState.LoadAllSettingsFailure -> {
+                // 処理なし
+            }
+        }
+    }
+
+    private fun setUpThemeColorPreferenceValueLoading() {
         val initialValue = handle.get<ThemeColor>(SAVED_THEME_COLOR_STATE_KEY)
         themeColor =
-            preferences.map { value ->
-                value.themeColorPreference.themeColor
-            }.onEach { value: ThemeColor ->
-                handle[SAVED_THEME_COLOR_STATE_KEY] = value
-            }.stateIn(initialValue)
+            fetchThemeColorSettingUseCase()
+                .value
+                .map {
+                    when (it) {
+                        is UserPreferenceFlowResult.Success -> {
+                            onUserSettingsFetchSuccess()
+                            it.preference.themeColor
+                        }
+                        is UserPreferenceFlowResult.Failure -> {
+                            onUserSettingsFetchFailure()
+                            it.fallbackPreference.themeColor
+                        }
+                    }
+                }.stateIn(initialValue)
 
         isThemeColorNotNull =
             themeColor.map { value ->
@@ -168,14 +200,17 @@ internal class SettingsViewModel @Inject constructor(
             }.stateIn(false)
     }
 
-    private fun setUpCalendarStartDayOfWeekPreferenceValueLoading(preferences: Flow<AllPreferences>) {
+    private fun setUpCalendarStartDayOfWeekPreferenceValueLoading() {
         val initialValue = handle.get<DayOfWeek>(SAVED_CALENDAR_START_DAY_OF_WEEK_STATE_KEY)
         calendarStartDayOfWeek =
-            preferences.map { value ->
-                value.calendarStartDayOfWeekPreference.dayOfWeek
-            }.onEach { value: DayOfWeek ->
-                handle[SAVED_CALENDAR_START_DAY_OF_WEEK_STATE_KEY] = value
-            }.stateIn(initialValue)
+            fetchCalendarStartDayOfWeekSettingUseCase()
+                .value
+                .map {
+                    when (it) {
+                        is UserPreferenceFlowResult.Success -> it.preference.dayOfWeek
+                        is UserPreferenceFlowResult.Failure -> it.fallbackPreference.dayOfWeek
+                    }
+                }.stateIn(initialValue)
 
         isCalendarStartDayOfWeekNotNull =
             calendarStartDayOfWeek.map { value ->
@@ -183,16 +218,26 @@ internal class SettingsViewModel @Inject constructor(
             }.stateIn(false)
     }
 
-    private fun setUpReminderNotificationPreferenceValueLoading(preferences: Flow<AllPreferences>) {
+    private fun setUpReminderNotificationPreferenceValueLoading() {
         isCheckedReminderNotification =
-            preferences.map { value ->
-                value.reminderNotificationPreference.isChecked
-            }.stateIn(null )
+            fetchReminderNotificationSettingUseCase()
+                .value
+                .map {
+                    when (it) {
+                        is UserPreferenceFlowResult.Success -> it.preference.isChecked
+                        is UserPreferenceFlowResult.Failure -> it.fallbackPreference.isChecked
+                    }
+                }.stateIn(null )
 
         reminderNotificationTime =
-            preferences.map { value ->
-                value.reminderNotificationPreference.notificationLocalTime
-            }.stateIn(null)
+            fetchReminderNotificationSettingUseCase()
+                .value
+                .map {
+                    when (it) {
+                        is UserPreferenceFlowResult.Success -> it.preference.notificationLocalTime
+                        is UserPreferenceFlowResult.Failure -> it.fallbackPreference.notificationLocalTime
+                    }
+                }.stateIn(null)
 
         isReminderNotificationNotNull =
             combine(isCheckedReminderNotification, reminderNotificationTime) {
@@ -206,16 +251,28 @@ internal class SettingsViewModel @Inject constructor(
             }.stateIn(false)
     }
 
-    private fun setUpPasscodeLockPreferenceValueLoading(preferences: Flow<AllPreferences>) {
+    private fun setUpPasscodeLockPreferenceValueLoading() {
         isCheckedPasscodeLock =
-            preferences.map { value ->
-                value.passcodeLockPreference.isChecked
-            }.stateIn(null)
+            fetchPasscodeLockSettingUseCase()
+                .value
+                .map {
+                    when (it) {
+                        is UserPreferenceFlowResult.Success -> {
+                            it.preference.isChecked
+                        }
+                        is UserPreferenceFlowResult.Failure -> it.fallbackPreference.isChecked
+                    }
+                }.stateIn(null )
 
         passcode =
-            preferences.map { value ->
-                value.passcodeLockPreference.passCode
-            }.stateIn(null)
+            fetchPasscodeLockSettingUseCase()
+                .value
+                .map {
+                    when (it) {
+                        is UserPreferenceFlowResult.Success -> it.preference.passCode
+                        is UserPreferenceFlowResult.Failure -> it.fallbackPreference.passCode
+                    }
+                }.stateIn(null )
 
         isPasscodeLockNotNull =
             combine(isCheckedPasscodeLock, passcode) {
@@ -229,11 +286,16 @@ internal class SettingsViewModel @Inject constructor(
             }.stateIn(false)
     }
 
-    private fun setUpWeatherInfoFetchPreferenceValueLoading(preferences: Flow<AllPreferences>) {
+    private fun setUpWeatherInfoFetchPreferenceValueLoading() {
         isCheckedWeatherInfoFetch =
-            preferences.map { value ->
-                value.weatherInfoFetchPreference.isChecked
-            }.stateIn(null)
+            fetchWeatherInfoFetchSettingUseCase()
+                .value
+                .map {
+                    when (it) {
+                        is UserPreferenceFlowResult.Success -> it.preference.isChecked
+                        is UserPreferenceFlowResult.Failure -> it.fallbackPreference.isChecked
+                    }
+                }.stateIn(null)
 
         isWeatherInfoFetchNotNull =
             isCheckedWeatherInfoFetch.map { value ->

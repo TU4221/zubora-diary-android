@@ -3,7 +3,7 @@ package com.websarva.wings.android.zuboradiary.data.preferences
 import java.time.DayOfWeek
 
 
-internal class CalendarStartDayOfWeekPreference {
+internal class CalendarStartDayOfWeekPreference : UserPreference {
 
     companion object {
         val DAY_OF_WEEK_DEFAULT_VALUE = DayOfWeek.SUNDAY.value

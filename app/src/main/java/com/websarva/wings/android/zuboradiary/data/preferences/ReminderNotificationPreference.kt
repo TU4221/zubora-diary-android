@@ -2,7 +2,7 @@ package com.websarva.wings.android.zuboradiary.data.preferences
 
 import java.time.LocalTime
 
-internal class ReminderNotificationPreference {
+internal class ReminderNotificationPreference : UserPreference {
 
     companion object {
         const val IS_CHECKED_DEFAULT_VALUE = false

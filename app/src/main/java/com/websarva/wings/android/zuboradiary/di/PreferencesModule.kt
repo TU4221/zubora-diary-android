@@ -7,6 +7,7 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import kotlinx.coroutines.CoroutineScope
 import javax.inject.Singleton
 
 
@@ -17,7 +18,10 @@ internal object PreferencesModule {
 
     @Singleton
     @Provides
-    fun provideUserPreferences(@ApplicationContext context: Context): UserPreferences {
-        return UserPreferences(context)
+    fun provideUserPreferences(
+        @ApplicationContext context: Context,
+        @ApplicationScope appScope: CoroutineScope
+    ): UserPreferences {
+        return UserPreferences(context, appScope)
     }
 }

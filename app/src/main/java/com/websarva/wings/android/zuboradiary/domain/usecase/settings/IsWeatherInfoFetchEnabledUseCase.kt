@@ -2,9 +2,8 @@ package com.websarva.wings.android.zuboradiary.domain.usecase.settings
 
 import android.util.Log
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
-import com.websarva.wings.android.zuboradiary.data.preferences.AllPreferences
-import com.websarva.wings.android.zuboradiary.data.preferences.UserPreferencesLoadingResult
-import com.websarva.wings.android.zuboradiary.data.repository.UserPreferencesRepository
+import com.websarva.wings.android.zuboradiary.data.preferences.UserPreferenceFlowResult
+import com.websarva.wings.android.zuboradiary.data.preferences.WeatherInfoFetchPreference
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
@@ -12,7 +11,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 
 internal class IsWeatherInfoFetchEnabledUseCase(
-    private val userPreferencesRepository: UserPreferencesRepository
+    private val fetchWeatherInfoFetchSettingUseCase: FetchWeatherInfoFetchSettingUseCase
 ) {
 
     private val logTag = createLogTag()
@@ -24,20 +23,16 @@ internal class IsWeatherInfoFetchEnabledUseCase(
         // TODO:first()処理方法をプロジェクトで統一する。
         val value =
             withContext(Dispatchers.IO) {
-                userPreferencesRepository
-                    .loadAllPreferences()
-                    .map { value: UserPreferencesLoadingResult ->
-                         val allPreferences = when (value) {
-                            is UserPreferencesLoadingResult.Success -> {
-                                value.preferences
+                fetchWeatherInfoFetchSettingUseCase().value
+                    .map { value: UserPreferenceFlowResult<WeatherInfoFetchPreference> ->
+                         when (value) {
+                            is UserPreferenceFlowResult.Success -> {
+                                value.preference.isChecked
                             }
-                            is UserPreferencesLoadingResult.Failure -> {
-                                value.fallbackPreferences
+                            is UserPreferenceFlowResult.Failure -> {
+                                value.fallbackPreference.isChecked
                             }
                          }
-                        allPreferences
-                    }.map { value: AllPreferences ->
-                        value.weatherInfoFetchPreference.isChecked
                     }.first()
             }
         Log.i(logTag, "${logMsg}完了")
