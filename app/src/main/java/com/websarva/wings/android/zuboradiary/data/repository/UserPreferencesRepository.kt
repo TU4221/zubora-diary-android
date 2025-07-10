@@ -115,14 +115,14 @@ internal class UserPreferencesRepository(private val userPreferences: UserPrefer
                 when (result) {
                     is UserPreferenceFlowResult.Success -> {
                         UserSettingFlowResult.Success(
-                            WeatherInfoFetchSetting(result.preference.isChecked)
+                            WeatherInfoFetchSetting(result.preference.isEnabled)
                         )
                     }
 
                     is UserPreferenceFlowResult.Failure -> {
                         UserSettingFlowResult.Failure(
                             UserSettingsAccessException(result.exception),
-                            WeatherInfoFetchSetting(result.fallbackPreference.isChecked)
+                            WeatherInfoFetchSetting(result.fallbackPreference.isEnabled)
                         )
                     }
                 }
@@ -161,7 +161,7 @@ internal class UserPreferencesRepository(private val userPreferences: UserPrefer
                 userPreferences.saveReminderNotificationPreference(preference)
             } catch (e: UserPreferencesAccessException) {
                 throw UpdateReminderNotificationSettingFailedException(
-                    setting.isChecked,
+                    setting.isEnabled,
                     when (setting) {
                         is ReminderNotificationSetting.Enabled -> setting.notificationTime
                         ReminderNotificationSetting.Disabled -> null
@@ -180,7 +180,7 @@ internal class UserPreferencesRepository(private val userPreferences: UserPrefer
                 userPreferences.savePasscodeLockPreference(preference)
             } catch (e: UserPreferencesAccessException) {
                 throw UpdatePassCodeSettingFailedException(
-                    setting.isChecked,
+                    setting.isEnabled,
                     when (setting) {
                         is PasscodeLockSetting.Enabled -> setting.passcode
                         PasscodeLockSetting.Disabled -> ""
@@ -198,7 +198,7 @@ internal class UserPreferencesRepository(private val userPreferences: UserPrefer
                 val preference = setting.toDataModel()
                 userPreferences.saveWeatherInfoFetchPreference(preference)
             } catch (e: UserPreferencesAccessException) {
-                throw UpdateWeatherInfoFetchSettingFailedException(setting.isChecked, e)
+                throw UpdateWeatherInfoFetchSettingFailedException(setting.isEnabled, e)
             }
         }
     }

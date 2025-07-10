@@ -4,7 +4,7 @@ import com.websarva.wings.android.zuboradiary.data.preferences.PasscodeLockPrefe
 import com.websarva.wings.android.zuboradiary.domain.model.settings.PasscodeLockSetting
 
 internal fun PasscodeLockPreference.toDomainModel(): PasscodeLockSetting {
-    return if (isChecked) {
+    return if (isEnabled) {
         PasscodeLockSetting.Enabled(passcode)
     } else {
         PasscodeLockSetting.Disabled
@@ -13,7 +13,7 @@ internal fun PasscodeLockPreference.toDomainModel(): PasscodeLockSetting {
 
 internal fun PasscodeLockSetting.toDataModel(): PasscodeLockPreference {
     return when (this) {
-        is PasscodeLockSetting.Enabled -> PasscodeLockPreference(isChecked, passcode)
-        PasscodeLockSetting.Disabled -> PasscodeLockPreference(isChecked)
+        is PasscodeLockSetting.Enabled -> PasscodeLockPreference(isEnabled, passcode)
+        PasscodeLockSetting.Disabled -> PasscodeLockPreference(isEnabled)
     }
 }

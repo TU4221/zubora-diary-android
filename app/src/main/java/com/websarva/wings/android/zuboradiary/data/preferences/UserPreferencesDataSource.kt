@@ -40,17 +40,17 @@ internal class UserPreferences @Inject constructor(
     private val calendarStartDayOfWeekPreferenceKey =
         intPreferencesKey("calendar_start_day_of_week")
 
-    private val isCheckedReminderNotificationPreferenceKey =
-        booleanPreferencesKey("is_checked_reminder_notification")
+    private val isEnabledReminderNotificationPreferenceKey =
+        booleanPreferencesKey("is_enabled_reminder_notification")
     private val reminderNotificationTimePreferenceKey =
         stringPreferencesKey("reminder_notification_time")
 
-    private val isCheckedPasscodeLockPreferenceKey =
-        booleanPreferencesKey("is_checked_passcode_lock")
+    private val isEnabledPasscodeLockPreferenceKey =
+        booleanPreferencesKey("is_enabled_passcode_lock")
     private val passcodePreferenceKey = stringPreferencesKey("passcode")
 
-    private val isCheckedWeatherInfoFetchPreferenceKey =
-        booleanPreferencesKey("is_checked_weather_info_fetch")
+    private val isEnabledWeatherInfoFetchPreferenceKey =
+        booleanPreferencesKey("is_enabled_weather_info_fetch")
 
     private val userPreferencesFlow =
         context.dataStore.data
@@ -154,13 +154,13 @@ internal class UserPreferences @Inject constructor(
     private fun createReminderNotificationPreference(
         preferences: Preferences
     ): ReminderNotificationPreference {
-        val isCheckedReminder =
-            preferences[isCheckedReminderNotificationPreferenceKey]
+        val isEnabled =
+            preferences[isEnabledReminderNotificationPreferenceKey]
                 ?: return ReminderNotificationPreference()
         val notificationTimeString =
             preferences[reminderNotificationTimePreferenceKey]
                 ?: return ReminderNotificationPreference()
-        return ReminderNotificationPreference(isCheckedReminder, notificationTimeString)
+        return ReminderNotificationPreference(isEnabled, notificationTimeString)
     }
 
     fun fetchPasscodeLockPreference():
@@ -183,10 +183,10 @@ internal class UserPreferences @Inject constructor(
     }
 
     private fun createPasscodeLockPreference(preferences: Preferences): PasscodeLockPreference {
-        val isCheckedPasscode =
-            preferences[isCheckedPasscodeLockPreferenceKey] ?: return PasscodeLockPreference()
+        val isEnabled =
+            preferences[isEnabledPasscodeLockPreferenceKey] ?: return PasscodeLockPreference()
         val passCode = preferences[passcodePreferenceKey] ?: return PasscodeLockPreference()
-        return PasscodeLockPreference(isCheckedPasscode, passCode)
+        return PasscodeLockPreference(isEnabled, passCode)
     }
 
     fun fetchWeatherInfoFetchPreference():
@@ -211,10 +211,10 @@ internal class UserPreferences @Inject constructor(
     private fun createWeatherInfoFetchPreference(
         preferences: Preferences
     ): WeatherInfoFetchPreference {
-        val isCheckedWeather =
-            preferences[isCheckedWeatherInfoFetchPreferenceKey]
+        val isEnabled =
+            preferences[isEnabledWeatherInfoFetchPreferenceKey]
                 ?: return WeatherInfoFetchPreference()
-        return WeatherInfoFetchPreference(isCheckedWeather)
+        return WeatherInfoFetchPreference(isEnabled)
     }
 
     @Throws(UserPreferencesAccessException::class)
@@ -269,7 +269,7 @@ internal class UserPreferences @Inject constructor(
         preferences: MutablePreferences,
         value: ReminderNotificationPreference
     ) {
-        preferences[isCheckedReminderNotificationPreferenceKey] = value.isChecked
+        preferences[isEnabledReminderNotificationPreferenceKey] = value.isEnabled
         preferences[reminderNotificationTimePreferenceKey] = value.notificationTimeString
     }
 
@@ -284,7 +284,7 @@ internal class UserPreferences @Inject constructor(
         preferences: MutablePreferences,
         value: PasscodeLockPreference
     ) {
-        preferences[isCheckedPasscodeLockPreferenceKey] = value.isChecked
+        preferences[isEnabledPasscodeLockPreferenceKey] = value.isEnabled
         preferences[passcodePreferenceKey] = value.passcode
     }
 
@@ -299,7 +299,7 @@ internal class UserPreferences @Inject constructor(
         preferences: MutablePreferences,
         value: WeatherInfoFetchPreference
     ) {
-        preferences[isCheckedWeatherInfoFetchPreferenceKey] = value.isChecked
+        preferences[isEnabledWeatherInfoFetchPreferenceKey] = value.isEnabled
     }
 
     suspend fun initializeAllPreferences() {

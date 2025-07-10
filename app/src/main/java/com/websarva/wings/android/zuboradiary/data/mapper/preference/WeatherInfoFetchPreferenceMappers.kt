@@ -4,9 +4,9 @@ import com.websarva.wings.android.zuboradiary.data.preferences.WeatherInfoFetchP
 import com.websarva.wings.android.zuboradiary.domain.model.settings.WeatherInfoFetchSetting
 
 internal fun WeatherInfoFetchPreference.toDomainModel(): WeatherInfoFetchSetting {
-    return WeatherInfoFetchSetting(isChecked)
+    return WeatherInfoFetchSetting(isEnabled)
 }
 
 internal fun WeatherInfoFetchSetting.toDataModel(): WeatherInfoFetchPreference {
-    return WeatherInfoFetchPreference(isChecked)
+    return WeatherInfoFetchPreference(isEnabled)
 }

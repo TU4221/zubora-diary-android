@@ -66,10 +66,10 @@ internal class SettingsViewModel @Inject constructor(
 
     // HACK:SavedStateHandleを使用する理由
     //      プロセスキルでアプリを再起動した時、ActivityのBinding処理とは関係なしにFragmentの処理が始まり、
-    //      Preferencesの格納値の読込が完了する前(onCreateView()の時点)にViewの設定で設定値を参照してしまい、
+    //      DateSourceからの読込が完了する前(onCreateView()の時点)にViewの設定で設定値を参照してしまい、
     //      例外が発生してしまう問題が発生。
-    //      通常のアプリ起動だとPreferencesの格納値の読込が完了してからActivityのBinding処理を行うようにしている為、
-    //      このような問題は発生しない。各フラグメントにPreferencesの読込完了条件をいれるとコルーチンを使用する等の
+    //      通常のアプリ起動だとDateSourceからの読込が完了してからActivityのBinding処理を行うようにしている為、
+    //      このような問題は発生しない。各フラグメントにDateSourceからの読込完了条件をいれるとコルーチンを使用する等の
     //      複雑な処理になるため、SavedStateHandleで対応する。
     companion object {
         private const val SAVED_THEME_COLOR_STATE_KEY = "savedThemeColorState"
@@ -99,7 +99,7 @@ internal class SettingsViewModel @Inject constructor(
                 false
             )
 
-    // MEMO:StateFlow型設定値変数の値ははPreferencesDatastoreの値のみを代入したいので、
+    // MEMO:StateFlow型設定値変数の値はデータソースからの値のみを代入したいので、
     //      代入されるまでの間(初回設定値読込中)はnullとする。
     lateinit var themeColor: StateFlow<ThemeColor?>
         private set
@@ -127,21 +127,21 @@ internal class SettingsViewModel @Inject constructor(
     lateinit var isAllSettingsNotNull: StateFlow<Boolean>
 
     init {
-        setUpPreferencesValueLoading()
+        setUpSettingsValue()
     }
 
     override fun initialize() {
         super.initialize()
-        setUpPreferencesValueLoading()
+        setUpSettingsValue()
     }
 
-    private fun setUpPreferencesValueLoading() {
+    private fun setUpSettingsValue() {
         updateUiState(SettingsState.LoadingAllSettings)
-        setUpThemeColorPreferenceValueLoading()
-        setUpCalendarStartDayOfWeekPreferenceValueLoading()
-        setUpReminderNotificationPreferenceValueLoading()
-        setUpPasscodeLockPreferenceValueLoading()
-        setUpWeatherInfoFetchPreferenceValueLoading()
+        setUpThemeColorSettingValue()
+        setUpCalendarStartDayOfWeekSettingValue()
+        setUpReminderNotificationSettingValue()
+        setUpPasscodeLockSettingValue()
+        setUpWeatherInfoFetchSettingValue()
         setUpIsAllSettingsNotNull()
     }
 
@@ -178,7 +178,7 @@ internal class SettingsViewModel @Inject constructor(
         }
     }
 
-    private fun setUpThemeColorPreferenceValueLoading() {
+    private fun setUpThemeColorSettingValue() {
         val initialValue = handle.get<ThemeColor>(SAVED_THEME_COLOR_STATE_KEY)
         themeColor =
             fetchThemeColorSettingUseCase()
@@ -202,7 +202,7 @@ internal class SettingsViewModel @Inject constructor(
             }.stateIn(false)
     }
 
-    private fun setUpCalendarStartDayOfWeekPreferenceValueLoading() {
+    private fun setUpCalendarStartDayOfWeekSettingValue() {
         val initialValue = handle.get<DayOfWeek>(SAVED_CALENDAR_START_DAY_OF_WEEK_STATE_KEY)
         calendarStartDayOfWeek =
             fetchCalendarStartDayOfWeekSettingUseCase()
@@ -220,14 +220,14 @@ internal class SettingsViewModel @Inject constructor(
             }.stateIn(false)
     }
 
-    private fun setUpReminderNotificationPreferenceValueLoading() {
+    private fun setUpReminderNotificationSettingValue() {
         isCheckedReminderNotification =
             fetchReminderNotificationSettingUseCase()
                 .value
                 .map {
                     when (it) {
-                        is UserSettingFlowResult.Success -> it.setting.isChecked
-                        is UserSettingFlowResult.Failure -> it.fallbackSetting.isChecked
+                        is UserSettingFlowResult.Success -> it.setting.isEnabled
+                        is UserSettingFlowResult.Failure -> it.fallbackSetting.isEnabled
                     }
                 }.stateIn(null )
 
@@ -263,16 +263,16 @@ internal class SettingsViewModel @Inject constructor(
             }.stateIn(false)
     }
 
-    private fun setUpPasscodeLockPreferenceValueLoading() {
+    private fun setUpPasscodeLockSettingValue() {
         isCheckedPasscodeLock =
             fetchPasscodeLockSettingUseCase()
                 .value
                 .map {
                     when (it) {
                         is UserSettingFlowResult.Success -> {
-                            it.setting.isChecked
+                            it.setting.isEnabled
                         }
-                        is UserSettingFlowResult.Failure -> it.fallbackSetting.isChecked
+                        is UserSettingFlowResult.Failure -> it.fallbackSetting.isEnabled
                     }
                 }.stateIn(null )
 
@@ -308,14 +308,14 @@ internal class SettingsViewModel @Inject constructor(
             }.stateIn(false)
     }
 
-    private fun setUpWeatherInfoFetchPreferenceValueLoading() {
+    private fun setUpWeatherInfoFetchSettingValue() {
         isCheckedWeatherInfoFetch =
             fetchWeatherInfoFetchSettingUseCase()
                 .value
                 .map {
                     when (it) {
-                        is UserSettingFlowResult.Success -> it.setting.isChecked
-                        is UserSettingFlowResult.Failure -> it.fallbackSetting.isChecked
+                        is UserSettingFlowResult.Success -> it.setting.isEnabled
+                        is UserSettingFlowResult.Failure -> it.fallbackSetting.isEnabled
                     }
                 }.stateIn(null)
 
@@ -396,7 +396,7 @@ internal class SettingsViewModel @Inject constructor(
     }
 
     fun onReminderNotificationSettingCheckedChanged(isChecked: Boolean) {
-        // DateStorePreferences初回読込時の値がtrueの場合、本メソッドが呼び出される。
+        // DateSourceからの初回読込時の値がtrueの場合、本メソッドが呼び出される。
         // 初回読込時は処理不要のため下記条件追加。
         val settingValue = isCheckedReminderNotification.requireValue()
         if (isChecked == settingValue) return
@@ -428,7 +428,7 @@ internal class SettingsViewModel @Inject constructor(
     }
 
     fun onPasscodeLockSettingCheckedChanged(isChecked: Boolean) {
-        // DateStorePreferences初回読込時の値がtrueの場合、本メソッドが呼び出される。
+        // DateSourceからの初回読込時の値がtrueの場合、本メソッドが呼び出される。
         // 初回読込時は処理不要のため下記条件追加。
         val settingValue = isCheckedPasscodeLock.requireValue()
         if (isChecked == settingValue) return
@@ -446,7 +446,7 @@ internal class SettingsViewModel @Inject constructor(
     }
 
     fun onWeatherInfoFetchSettingCheckedChanged(isChecked: Boolean) {
-        // DateStorePreferences初回読込時の値がtrueの場合、本メソッドが呼び出される。
+        // DateSourceからの初回読込時の値がtrueの場合、本メソッドが呼び出される。
         // 初回読込時は処理不要のため下記条件追加。
         val settingValue = isCheckedWeatherInfoFetch.requireValue()
         if (isChecked == settingValue) return

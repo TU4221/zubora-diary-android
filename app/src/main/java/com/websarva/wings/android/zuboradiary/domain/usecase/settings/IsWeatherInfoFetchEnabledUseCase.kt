@@ -27,10 +27,10 @@ internal class IsWeatherInfoFetchEnabledUseCase(
                     .map { value: UserSettingFlowResult<WeatherInfoFetchSetting> ->
                          when (value) {
                             is UserSettingFlowResult.Success -> {
-                                value.setting.isChecked
+                                value.setting.isEnabled
                             }
                             is UserSettingFlowResult.Failure -> {
-                                value.fallbackSetting.isChecked
+                                value.fallbackSetting.isEnabled
                             }
                          }
                     }.first()

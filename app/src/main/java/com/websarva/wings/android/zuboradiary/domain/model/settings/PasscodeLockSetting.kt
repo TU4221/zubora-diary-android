@@ -2,7 +2,7 @@ package com.websarva.wings.android.zuboradiary.domain.model.settings
 
 // MEMO:パスコードは有効の時のみ必要になる為、下記シールドクラスで対応。
 internal sealed class PasscodeLockSetting(
-    val isChecked: Boolean,
+    val isEnabled: Boolean,
 ) : UserSetting {
 
     data class Enabled(val passcode: String) : PasscodeLockSetting(true) {

@@ -8,7 +8,7 @@ import java.time.DateTimeException
 import java.time.LocalTime
 
 internal fun ReminderNotificationPreference.toDomainModel(): ReminderNotificationSetting {
-    return if (isChecked) {
+    return if (isEnabled) {
         try {
             val notificationTime = LocalTime.parse(notificationTimeString)
             ReminderNotificationSetting.Enabled(notificationTime)
@@ -24,10 +24,10 @@ internal fun ReminderNotificationPreference.toDomainModel(): ReminderNotificatio
 internal fun ReminderNotificationSetting.toDataModel(): ReminderNotificationPreference {
     return when (this) {
         is ReminderNotificationSetting.Enabled -> {
-            ReminderNotificationPreference(isChecked, notificationTime.toString())
+            ReminderNotificationPreference(isEnabled, notificationTime.toString())
         }
         ReminderNotificationSetting.Disabled -> {
-            ReminderNotificationPreference(isChecked)
+            ReminderNotificationPreference(isEnabled)
         }
     }
 }
