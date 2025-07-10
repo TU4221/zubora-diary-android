@@ -56,14 +56,14 @@ internal class SaveReminderNotificationSettingUseCase(
     )
     private suspend fun saveReminderNotificationValid(notificationTime: LocalTime) {
         try {
-            val preferenceValue = ReminderNotificationSetting(true, notificationTime)
+            val preferenceValue = ReminderNotificationSetting.Enabled(notificationTime)
             userPreferencesRepository.saveReminderNotificationPreference(preferenceValue)
             workerRepository.registerReminderNotificationWorker(notificationTime)
         } catch (e: UpdateReminderNotificationSettingFailedException) {
             throw e
         } catch (e: RegisterReminderNotificationFailedException) {
             try {
-                val preferenceValue = ReminderNotificationSetting(false)
+                val preferenceValue = ReminderNotificationSetting.Disabled
                 userPreferencesRepository.saveReminderNotificationPreference(preferenceValue)
             } catch (e: UpdateReminderNotificationSettingFailedException) {
                 throw e
@@ -80,7 +80,7 @@ internal class SaveReminderNotificationSettingUseCase(
     private suspend fun saveReminderNotificationInvalid() {
         val backupSettingValue = fetchCurrentReminderNotificationSetting()
         try {
-            val preferenceValue = ReminderNotificationSetting(false)
+            val preferenceValue = ReminderNotificationSetting.Disabled
             userPreferencesRepository.saveReminderNotificationPreference(preferenceValue)
             workerRepository.cancelReminderNotificationWorker()
         } catch (e: UpdateReminderNotificationSettingFailedException) {

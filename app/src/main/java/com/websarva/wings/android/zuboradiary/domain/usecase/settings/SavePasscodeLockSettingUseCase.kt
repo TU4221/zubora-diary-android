@@ -22,7 +22,12 @@ internal class SavePasscodeLockSettingUseCase(
         Log.i(logTag, "${logMsg}開始")
 
         try {
-            val preferenceValue = PasscodeLockSetting(isChecked, passcode)
+            val preferenceValue =
+                if (isChecked) {
+                    PasscodeLockSetting.Enabled(passcode)
+                } else {
+                    PasscodeLockSetting.Disabled
+                }
             userPreferencesRepository.savePasscodeLockPreference(preferenceValue)
         } catch (e: UpdatePassCodeSettingFailedException) {
             Log.e(logTag, "${logMsg}失敗")

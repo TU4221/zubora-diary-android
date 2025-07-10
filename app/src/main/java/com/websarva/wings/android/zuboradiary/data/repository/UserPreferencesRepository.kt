@@ -94,20 +94,14 @@ internal class UserPreferencesRepository(private val userPreferences: UserPrefer
                 when (result) {
                     is UserPreferenceFlowResult.Success -> {
                         UserSettingFlowResult.Success(
-                            PasscodeLockSetting(
-                                result.preference.isChecked,
-                                result.preference.passcode
-                            )
+                            result.preference.toDomainModel()
                         )
                     }
 
                     is UserPreferenceFlowResult.Failure -> {
                         UserSettingFlowResult.Failure(
                             UserSettingsAccessException(result.exception),
-                            PasscodeLockSetting(
-                                result.fallbackPreference.isChecked,
-                                result.fallbackPreference.passcode
-                            )
+                            result.fallbackPreference.toDomainModel()
                         )
                     }
                 }
@@ -168,7 +162,10 @@ internal class UserPreferencesRepository(private val userPreferences: UserPrefer
             } catch (e: UserPreferencesAccessException) {
                 throw UpdateReminderNotificationSettingFailedException(
                     setting.isChecked,
-                    setting.notificationTime,
+                    when (setting) {
+                        is ReminderNotificationSetting.Enabled -> setting.notificationTime
+                        ReminderNotificationSetting.Disabled -> null
+                    },
                     e
                 )
             }
@@ -184,7 +181,10 @@ internal class UserPreferencesRepository(private val userPreferences: UserPrefer
             } catch (e: UserPreferencesAccessException) {
                 throw UpdatePassCodeSettingFailedException(
                     setting.isChecked,
-                    setting.passCode,
+                    when (setting) {
+                        is PasscodeLockSetting.Enabled -> setting.passcode
+                        PasscodeLockSetting.Disabled -> ""
+                    },
                     e
                 )
             }

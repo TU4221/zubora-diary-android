@@ -5,12 +5,12 @@ import java.time.LocalTime
 
 internal class UpdateReminderNotificationSettingFailedException(
     isEnabled: Boolean,
-    time: LocalTime?,
+    time: LocalTime? = null,
     cause: Throwable
 ) : DomainException(
     "リマインダー通知設定 '${
         if (isEnabled) {
-            "有効 '$time'"
+            "有効 '${time ?: ""}'"
         } else {
             "無効"
         }

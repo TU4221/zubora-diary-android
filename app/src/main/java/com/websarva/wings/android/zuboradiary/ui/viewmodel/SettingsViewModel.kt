@@ -6,6 +6,8 @@ import androidx.annotation.RequiresApi
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.websarva.wings.android.zuboradiary.data.model.ThemeColor
+import com.websarva.wings.android.zuboradiary.domain.model.settings.PasscodeLockSetting
+import com.websarva.wings.android.zuboradiary.domain.model.settings.ReminderNotificationSetting
 import com.websarva.wings.android.zuboradiary.domain.model.settings.UserSettingFlowResult
 import com.websarva.wings.android.zuboradiary.domain.usecase.DefaultUseCaseResult
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
@@ -234,8 +236,18 @@ internal class SettingsViewModel @Inject constructor(
                 .value
                 .map {
                     when (it) {
-                        is UserSettingFlowResult.Success -> it.setting.notificationTime
-                        is UserSettingFlowResult.Failure -> it.fallbackSetting.notificationTime
+                        is UserSettingFlowResult.Success -> {
+                            when (it.setting) {
+                                is ReminderNotificationSetting.Enabled -> it.setting.notificationTime
+                                ReminderNotificationSetting.Disabled -> null
+                            }
+                        }
+                        is UserSettingFlowResult.Failure -> {
+                            when (it.fallbackSetting) {
+                                is ReminderNotificationSetting.Enabled -> it.fallbackSetting.notificationTime
+                                ReminderNotificationSetting.Disabled -> null
+                            }
+                        }
                     }
                 }.stateIn(null)
 
@@ -269,8 +281,18 @@ internal class SettingsViewModel @Inject constructor(
                 .value
                 .map {
                     when (it) {
-                        is UserSettingFlowResult.Success -> it.setting.passCode
-                        is UserSettingFlowResult.Failure -> it.fallbackSetting.passCode
+                        is UserSettingFlowResult.Success -> {
+                            when (it.setting) {
+                                is PasscodeLockSetting.Enabled -> it.setting.passcode
+                                PasscodeLockSetting.Disabled -> null
+                            }
+                        }
+                        is UserSettingFlowResult.Failure -> {
+                            when (it.fallbackSetting) {
+                                is PasscodeLockSetting.Enabled -> it.fallbackSetting.passcode
+                                PasscodeLockSetting.Disabled -> null
+                            }
+                        }
                     }
                 }.stateIn(null )
 
