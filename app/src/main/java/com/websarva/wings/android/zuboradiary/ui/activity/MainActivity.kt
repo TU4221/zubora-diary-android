@@ -90,7 +90,7 @@ class MainActivity : LoggingActivity() {
 
         setUpFragmentLifeCycleCallBacks()
         lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.CREATED) {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
                 settingsViewModel.themeColor.filterNotNull()
                     .collectLatest { value: ThemeColor ->
                         if (isMainActivityLayoutInflated) return@collectLatest
