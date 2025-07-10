@@ -37,6 +37,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import java.time.DayOfWeek
@@ -185,6 +186,8 @@ internal class SettingsViewModel @Inject constructor(
                             it.fallbackSetting.themeColor
                         }
                     }
+                }.onEach { value: ThemeColor ->
+                    handle[SAVED_THEME_COLOR_STATE_KEY] = value
                 }.stateIn(initialValue)
     }
 
@@ -198,6 +201,8 @@ internal class SettingsViewModel @Inject constructor(
                         is UserSettingFlowResult.Success -> it.setting.dayOfWeek
                         is UserSettingFlowResult.Failure -> it.fallbackSetting.dayOfWeek
                     }
+                }.onEach { value: DayOfWeek ->
+                    handle[SAVED_CALENDAR_START_DAY_OF_WEEK_STATE_KEY] = value
                 }.stateIn(initialValue)
     }
 
