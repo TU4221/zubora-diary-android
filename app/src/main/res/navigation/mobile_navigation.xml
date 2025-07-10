@@ -469,7 +469,7 @@
             tools:layout="@layout/fragment_diary_item_title_edit" >
             <argument
                 android:name="item_number"
-                app:argType="com.websarva.wings.android.zuboradiary.data.model.ItemNumber" />
+                app:argType="com.websarva.wings.android.zuboradiary.domain.model.ItemNumber" />
             <argument
                 android:name="item_title"
                 app:argType="string" />
