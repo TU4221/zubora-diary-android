@@ -21,7 +21,7 @@ import com.kizitonwose.calendar.view.ViewContainer
 import com.websarva.wings.android.zuboradiary.R
 import com.websarva.wings.android.zuboradiary.ui.model.AppMessage
 import com.websarva.wings.android.zuboradiary.domain.model.Condition
-import com.websarva.wings.android.zuboradiary.data.model.Weather
+import com.websarva.wings.android.zuboradiary.domain.model.Weather
 import com.websarva.wings.android.zuboradiary.data.model.ThemeColor
 import com.websarva.wings.android.zuboradiary.databinding.FragmentCalendarBinding
 import com.websarva.wings.android.zuboradiary.databinding.LayoutCalendarDayBinding

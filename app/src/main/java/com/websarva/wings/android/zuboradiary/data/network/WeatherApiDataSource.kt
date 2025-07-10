@@ -4,7 +4,6 @@ import android.util.Log
 import androidx.annotation.FloatRange
 import androidx.annotation.IntRange
 import androidx.datastore.core.IOException
-import com.websarva.wings.android.zuboradiary.data.model.Weather
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import retrofit2.Response
 import java.net.ConnectException
@@ -35,7 +34,7 @@ internal class WeatherApiDataSource(private val weatherApiService: WeatherApiSer
         latitude: Double,
         @FloatRange(from = -180.0, to = 180.0)
         longitude: Double
-    ): Weather {
+    ): WeatherApiData {
         require(latitude >= -90)
         require(latitude <= 90)
         require(longitude >= -180)
@@ -96,7 +95,7 @@ internal class WeatherApiDataSource(private val weatherApiService: WeatherApiSer
         latitude: Double,
         @FloatRange(from = -180.0, to = 180.0)
         longitude: Double
-    ): Weather {
+    ): WeatherApiData {
         val response =
             executeWebApiOperation {
                 weatherApiService.getWeather(
@@ -108,7 +107,7 @@ internal class WeatherApiDataSource(private val weatherApiService: WeatherApiSer
                     "1" /*1日分*/
                 )
             }
-        return toWeatherInfo(response)
+        return toWeatherApiData(response)
     }
 
     @Throws(WeatherApiException.ApiAccessFailed::class)
@@ -119,7 +118,7 @@ internal class WeatherApiDataSource(private val weatherApiService: WeatherApiSer
         longitude: Double,
         @IntRange(from = MIN_PAST_DAYS.toLong(), to = MAX_PAST_DAYS.toLong())
         numPastDays: Int
-    ): Weather {
+    ): WeatherApiData {
         require(numPastDays >= MIN_PAST_DAYS)
         require(numPastDays <= MAX_PAST_DAYS)
 
@@ -134,18 +133,19 @@ internal class WeatherApiDataSource(private val weatherApiService: WeatherApiSer
                     "0" /*1日分(過去日から1日分取得する場合"0"を代入)*/
                 )
             }
-        return toWeatherInfo(response)
+        return toWeatherApiData(response)
     }
 
     @Throws(WeatherApiException.ApiAccessFailed::class)
-    private fun toWeatherInfo(response: Response<WeatherApiData>): Weather {
+    private fun toWeatherApiData(response: Response<WeatherApiData>): WeatherApiData {
         Log.d(logTag, "code = " + response.code())
         Log.d(logTag, "message = :" + response.message())
 
         return if (response.isSuccessful) {
             Log.d(logTag, "body = " + response.body())
             val result =
-                response.body()?.toWeatherInfo() ?: throw IllegalStateException()
+                response.body()
+                    ?: throw WeatherApiException.ApiAccessFailed(IOException())
             result
         } else {
             // HTTPエラー (4xx, 5xx)

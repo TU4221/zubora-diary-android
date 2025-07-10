@@ -3,7 +3,7 @@ package com.websarva.wings.android.zuboradiary.domain.usecase.diary
 import android.util.Log
 import com.websarva.wings.android.zuboradiary.domain.usecase.exception.FetchWeatherInfoUseCaseException
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
-import com.websarva.wings.android.zuboradiary.data.model.Weather
+import com.websarva.wings.android.zuboradiary.domain.model.Weather
 import com.websarva.wings.android.zuboradiary.data.repository.WeatherInfoRepository
 import com.websarva.wings.android.zuboradiary.domain.exception.weather.FetchWeatherInfoException
 import com.websarva.wings.android.zuboradiary.domain.usecase.DefaultUseCaseResult

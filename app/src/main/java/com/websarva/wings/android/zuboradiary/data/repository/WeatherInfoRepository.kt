@@ -2,7 +2,8 @@ package com.websarva.wings.android.zuboradiary.data.repository
 
 import com.websarva.wings.android.zuboradiary.data.location.FusedLocationAccessException
 import com.websarva.wings.android.zuboradiary.data.location.FusedLocationDataSource
-import com.websarva.wings.android.zuboradiary.data.model.Weather
+import com.websarva.wings.android.zuboradiary.data.mapper.weather.toDomainModel
+import com.websarva.wings.android.zuboradiary.domain.model.Weather
 import com.websarva.wings.android.zuboradiary.data.network.WeatherApiDataSource
 import com.websarva.wings.android.zuboradiary.data.network.WeatherApiException
 import com.websarva.wings.android.zuboradiary.domain.exception.weather.FetchWeatherInfoException
@@ -24,7 +25,9 @@ internal class WeatherInfoRepository (
         return withContext(Dispatchers.IO) {
             try {
                 val location = fusedLocationDataSource.fetchCurrentLocation()
-                weatherApiDataSource.fetchWeatherInfo(date, location.latitude, location.longitude)
+                weatherApiDataSource
+                    .fetchWeatherInfo(date, location.latitude, location.longitude)
+                    .toDomainModel()
             } catch (e: FusedLocationAccessException) {
                 throw FetchWeatherInfoException.AccessLocationFailed(e)
             } catch (e: WeatherApiException) {

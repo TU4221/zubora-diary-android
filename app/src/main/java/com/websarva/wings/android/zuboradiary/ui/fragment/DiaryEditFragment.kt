@@ -23,7 +23,7 @@ import com.google.android.material.textfield.TextInputLayout
 import com.websarva.wings.android.zuboradiary.R
 import com.websarva.wings.android.zuboradiary.domain.model.Condition
 import com.websarva.wings.android.zuboradiary.domain.model.ItemNumber
-import com.websarva.wings.android.zuboradiary.data.model.Weather
+import com.websarva.wings.android.zuboradiary.domain.model.Weather
 import com.websarva.wings.android.zuboradiary.databinding.FragmentDiaryEditBinding
 import com.websarva.wings.android.zuboradiary.domain.model.Diary
 import com.websarva.wings.android.zuboradiary.utils.createLogTag

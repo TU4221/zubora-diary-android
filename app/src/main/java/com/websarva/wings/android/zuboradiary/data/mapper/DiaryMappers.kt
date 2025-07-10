@@ -3,7 +3,7 @@ package com.websarva.wings.android.zuboradiary.data.mapper
 import android.net.Uri
 import com.websarva.wings.android.zuboradiary.data.database.DiaryEntity
 import com.websarva.wings.android.zuboradiary.domain.model.Condition
-import com.websarva.wings.android.zuboradiary.data.model.Weather
+import com.websarva.wings.android.zuboradiary.domain.model.Weather
 import com.websarva.wings.android.zuboradiary.domain.model.Diary
 import java.time.LocalDate
 import java.time.LocalDateTime

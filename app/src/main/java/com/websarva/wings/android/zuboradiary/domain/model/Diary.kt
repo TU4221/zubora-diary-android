@@ -2,7 +2,6 @@ package com.websarva.wings.android.zuboradiary.domain.model
 
 import android.net.Uri
 import android.os.Parcelable
-import com.websarva.wings.android.zuboradiary.data.model.Weather
 import kotlinx.parcelize.Parcelize
 import java.time.LocalDate
 import java.time.LocalDateTime

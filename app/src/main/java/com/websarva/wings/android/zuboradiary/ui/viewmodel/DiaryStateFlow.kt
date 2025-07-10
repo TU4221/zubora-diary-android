@@ -4,7 +4,7 @@ import android.net.Uri
 import androidx.lifecycle.SavedStateHandle
 import com.websarva.wings.android.zuboradiary.domain.model.Condition
 import com.websarva.wings.android.zuboradiary.domain.model.ItemNumber
-import com.websarva.wings.android.zuboradiary.data.model.Weather
+import com.websarva.wings.android.zuboradiary.domain.model.Weather
 import com.websarva.wings.android.zuboradiary.domain.model.Diary
 import com.websarva.wings.android.zuboradiary.domain.model.DiaryItemTitleSelectionHistoryItem
 import com.websarva.wings.android.zuboradiary.ui.utils.requireValue

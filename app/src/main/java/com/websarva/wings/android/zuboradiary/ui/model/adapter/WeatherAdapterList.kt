@@ -1,7 +1,7 @@
 package com.websarva.wings.android.zuboradiary.ui.model.adapter
 
 import android.content.Context
-import com.websarva.wings.android.zuboradiary.data.model.Weather
+import com.websarva.wings.android.zuboradiary.domain.model.Weather
 
 internal class WeatherAdapterList {
 
