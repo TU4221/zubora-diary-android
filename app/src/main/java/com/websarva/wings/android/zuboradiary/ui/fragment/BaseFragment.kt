@@ -32,6 +32,7 @@ import com.websarva.wings.android.zuboradiary.ui.utils.requireValue
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.SettingsViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.launch
 
 abstract class BaseFragment<T: ViewBinding> : LoggingFragment() {
@@ -183,8 +184,7 @@ abstract class BaseFragment<T: ViewBinding> : LoggingFragment() {
         val savedStateHandle = navBackStackEntry.savedStateHandle
         val result = savedStateHandle.getStateFlow(key, null)
         launchAndRepeatOnViewLifeCycleStarted {
-            result.collectLatest { value: R? ->
-                if (value == null) return@collectLatest
+            result.filterNotNull().collectLatest { value: R ->
                 block(value)
 
                 savedStateHandle[key] = null

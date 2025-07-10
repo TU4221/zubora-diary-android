@@ -230,10 +230,8 @@ class MainActivity : LoggingActivity() {
     private fun setUpThemeColor() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
-                settingsViewModel.themeColor
-                    .collectLatest { themeColor: ThemeColor? ->
-                        themeColor ?: return@collectLatest
-
+                settingsViewModel.themeColor.filterNotNull()
+                    .collectLatest { themeColor: ThemeColor ->
                         switchThemeColor(themeColor)
                     }
             }

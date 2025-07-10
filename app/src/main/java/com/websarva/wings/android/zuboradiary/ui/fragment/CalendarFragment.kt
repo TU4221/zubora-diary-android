@@ -46,6 +46,7 @@ import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.time.DayOfWeek
@@ -178,11 +179,8 @@ class CalendarFragment :
         }
 
         launchAndRepeatOnViewLifeCycleStarted {
-            mainViewModel.previousSelectedDate
-                .collectLatest { value: LocalDate? ->
-                    // MEMO:一度も日付選択をしていない場合はnullが代入されている。
-                    if (value == null) return@collectLatest
-
+            mainViewModel.previousSelectedDate.filterNotNull()
+                .collectLatest { value: LocalDate ->
                     binding.calendar.notifyDateChanged(value) // 前回選択日付更新
                 }
         }
@@ -553,6 +551,9 @@ class CalendarFragment :
         }
 
         launchAndRepeatOnViewLifeCycleStarted {
+            // MEMO:添付画像がないときはnullとなり、デフォルト画像をセットする。
+            //      nullの時ImageView自体は非表示となるためデフォルト画像をセットする意味はないが、
+            //      クリアという意味合いでデフォルト画像をセットする。
             diaryShowViewModel.picturePath
                 .collectLatest { value: Uri? ->
                     PicturePathObserver(
@@ -563,10 +564,12 @@ class CalendarFragment :
         }
 
         launchAndRepeatOnViewLifeCycleStarted {
-            diaryShowViewModel.log
-                .collectLatest { value: LocalDateTime? ->
-                    LogObserver(requireContext(), binding.includeDiaryShow.textLogValue)
-                        .onChanged(value)
+            diaryShowViewModel.log.filterNotNull()
+                .collectLatest { value: LocalDateTime ->
+                    LogObserver(
+                        requireContext(),
+                        binding.includeDiaryShow.textLogValue
+                    ).onChanged(value)
                 }
         }
 

@@ -37,6 +37,7 @@ import com.websarva.wings.android.zuboradiary.ui.utils.isPostNotificationsGrante
 import com.websarva.wings.android.zuboradiary.ui.utils.toCalendarStartDayOfWeekString
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.filterNotNull
 import java.time.DayOfWeek
 import java.time.LocalTime
 
@@ -272,10 +273,8 @@ class SettingsFragment :
 
     private fun setUpThemeColorSettingItem() {
         launchAndRepeatOnViewLifeCycleStarted {
-            settingsViewModel.themeColor
-                .collectLatest { value: ThemeColor? ->
-                    value ?: return@collectLatest
-
+            settingsViewModel.themeColor.filterNotNull()
+                .collectLatest { value: ThemeColor ->
                     val strThemeColor = value.toSting(requireContext())
                     binding.includeThemeColorSetting.textValue.text = strThemeColor
                     switchViewColor(value)
@@ -387,10 +386,8 @@ class SettingsFragment :
 
     private fun setUpCalendarStartDaySettingItem() {
         launchAndRepeatOnViewLifeCycleStarted {
-            settingsViewModel.calendarStartDayOfWeek
-                .collectLatest { value: DayOfWeek? ->
-                    value ?: return@collectLatest
-
+            settingsViewModel.calendarStartDayOfWeek.filterNotNull()
+                .collectLatest { value: DayOfWeek ->
                     val strDayOfWeek = value.toCalendarStartDayOfWeekString(requireContext())
                     binding.includeCalendarStartDaySetting.textValue.text = strDayOfWeek
                 }
@@ -401,9 +398,7 @@ class SettingsFragment :
         launchAndRepeatOnViewLifeCycleStarted {
             settingsViewModel.reminderNotificationTime
                 .collectLatest { value: LocalTime? ->
-                    // MEMO:未設定の場合nullが代入される。
-                    //      その為、nullはエラーではないので下記メソッドの処理は不要(処理するとループする)
-                    //      "SettingsViewModel#isCheckedReminderNotificationSetting()"
+                    // MEMO:無効状態の場合nullが代入される。
                     if (value == null) {
                         binding.includeReminderNotificationSetting.textValue.text = ""
                         return@collectLatest

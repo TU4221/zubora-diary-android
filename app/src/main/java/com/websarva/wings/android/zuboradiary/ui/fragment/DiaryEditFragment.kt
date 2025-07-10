@@ -59,6 +59,7 @@ import com.websarva.wings.android.zuboradiary.ui.utils.isAccessLocationGranted
 import com.websarva.wings.android.zuboradiary.ui.utils.toJapaneseDateString
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.filterNotNull
 import org.jetbrains.annotations.Unmodifiable
 import java.time.LocalDate
 
@@ -98,7 +99,7 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding>() {
             return screenHeight
         }
 
-    // MEMO:端末ギャラリーから画像Uri取得。
+    // MEMO:端末ギャラリーから画像Uri取得。画像未選択時、nullを受け取る。
     private val openDocumentResultLauncher = registerForActivityResult(
         ActivityResultContracts.OpenDocument()
     ) { uri: Uri? ->
@@ -425,6 +426,7 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding>() {
         launchAndRepeatOnViewLifeCycleStarted {
             mainViewModel.loadedDiary
                 .collectLatest { value: Diary? ->
+                    // MEMO:日記新規作成時はnullとなり、新規作成状態と判断する。
                     val isDeleteEnabled = value != null
 
                     val menu = binding.materialToolbarTopAppBar.menu
@@ -444,9 +446,8 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding>() {
     // 日付入力欄設定
     private fun setUpDateInputField() {
         launchAndRepeatOnViewLifeCycleStarted {
-            mainViewModel.date
-                .collectLatest { value: LocalDate? ->
-                    if (value == null) return@collectLatest
+            mainViewModel.date.filterNotNull()
+                .collectLatest { value: LocalDate ->
                     if (mainViewModel.isTesting) return@collectLatest
 
                     val dateString = value.toJapaneseDateString(requireContext())
@@ -793,6 +794,7 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding>() {
         launchAndRepeatOnViewLifeCycleStarted {
             mainViewModel.picturePath
                 .collectLatest { value: Uri? ->
+                    // MEMO:添付画像がないときはnullとなり、デフォルト画像をセットする。
                     DiaryPictureConfigurator()
                         .setUpPictureOnDiary(
                             binding.imageAttachedPicture,

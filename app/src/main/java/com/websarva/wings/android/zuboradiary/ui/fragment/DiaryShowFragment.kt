@@ -31,6 +31,7 @@ import com.websarva.wings.android.zuboradiary.ui.utils.toJapaneseDateString
 import com.websarva.wings.android.zuboradiary.ui.utils.toJapaneseDateTimeWithSecondsString
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.filterNotNull
 import java.time.LocalDate
 import java.time.LocalDateTime
 
@@ -140,11 +141,8 @@ internal class DiaryShowFragment : BaseFragment<FragmentDiaryShowBinding>() {
         }
 
         launchAndRepeatOnViewLifeCycleStarted {
-            mainViewModel.date
-                .collectLatest { value: LocalDate? ->
-                    // MEMO:DiaryViewModelを初期化するとDiaryDateにnullが代入されるため、下記"return"を処理。
-                    if (value == null) return@collectLatest
-
+            mainViewModel.date.filterNotNull()
+                .collectLatest { value: LocalDate ->
                     val dateString = value.toJapaneseDateString(requireContext())
                     binding.materialToolbarTopAppBar.title = dateString
                 }
@@ -251,6 +249,9 @@ internal class DiaryShowFragment : BaseFragment<FragmentDiaryShowBinding>() {
         launchAndRepeatOnViewLifeCycleStarted {
             mainViewModel.picturePath
                 .collectLatest { value: Uri? ->
+                    // MEMO:添付画像がないときはnullとなり、デフォルト画像をセットする。
+                    //      nullの時ImageView自体は非表示となるためデフォルト画像をセットする意味はないが、
+                    //      クリアという意味合いでデフォルト画像をセットする。
                     PicturePathObserver(
                         themeColor,
                         binding.includeDiaryShow.imageAttachedPicture
@@ -265,8 +266,6 @@ internal class DiaryShowFragment : BaseFragment<FragmentDiaryShowBinding>() {
     ) {
 
         fun onChanged(value: Uri?) {
-            if (value == null) return
-
             DiaryPictureConfigurator()
                 .setUpPictureOnDiary(
                     imageView,
@@ -278,20 +277,19 @@ internal class DiaryShowFragment : BaseFragment<FragmentDiaryShowBinding>() {
 
     private fun setUpLogLayout() {
         launchAndRepeatOnViewLifeCycleStarted {
-            mainViewModel.log
-                .collectLatest { value: LocalDateTime? ->
-                    LogObserver(requireContext(), binding.includeDiaryShow.textLogValue)
-                        .onChanged(value)
+            mainViewModel.log.filterNotNull()
+                .collectLatest { value: LocalDateTime ->
+                    LogObserver(
+                        requireContext(),
+                        binding.includeDiaryShow.textLogValue
+                    ).onChanged(value)
                 }
         }
     }
 
     internal class LogObserver(private val context: Context ,private val textLog: TextView) {
 
-        fun onChanged(value: LocalDateTime?) {
-            // MEMO:DiaryViewModelを初期化するとDiaryLogにnullが代入されるため、下記"return"を処理。
-            if (value == null) return
-
+        fun onChanged(value: LocalDateTime) {
             val dateString = value.toJapaneseDateTimeWithSecondsString(context)
             textLog.text = dateString
         }
