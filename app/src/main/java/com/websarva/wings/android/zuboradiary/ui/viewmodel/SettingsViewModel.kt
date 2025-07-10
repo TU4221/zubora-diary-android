@@ -36,7 +36,6 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -103,28 +102,21 @@ internal class SettingsViewModel @Inject constructor(
     //      代入されるまでの間(初回設定値読込中)はnullとする。
     lateinit var themeColor: StateFlow<ThemeColor?>
         private set
-    private lateinit var isThemeColorNotNull: StateFlow<Boolean>
 
     lateinit var calendarStartDayOfWeek: StateFlow<DayOfWeek?>
         private set
-    private lateinit var isCalendarStartDayOfWeekNotNull: StateFlow<Boolean>
 
     lateinit var isCheckedReminderNotification: StateFlow<Boolean?>
         private set
     lateinit var reminderNotificationTime: StateFlow<LocalTime?>
         private set
-    private lateinit var isReminderNotificationNotNull: StateFlow<Boolean>
 
     lateinit var isCheckedPasscodeLock: StateFlow<Boolean?>
         private set
     private lateinit var passcode: StateFlow<String?>
-    private lateinit var isPasscodeLockNotNull: StateFlow<Boolean>
 
     lateinit var isCheckedWeatherInfoFetch: StateFlow<Boolean?>
         private set
-    private lateinit var isWeatherInfoFetchNotNull: StateFlow<Boolean>
-
-    lateinit var isAllSettingsNotNull: StateFlow<Boolean>
 
     init {
         setUpSettingsValue()
@@ -142,7 +134,6 @@ internal class SettingsViewModel @Inject constructor(
         setUpReminderNotificationSettingValue()
         setUpPasscodeLockSettingValue()
         setUpWeatherInfoFetchSettingValue()
-        setUpIsAllSettingsNotNull()
     }
 
     private fun onUserSettingsFetchSuccess() {
@@ -195,11 +186,6 @@ internal class SettingsViewModel @Inject constructor(
                         }
                     }
                 }.stateIn(initialValue)
-
-        isThemeColorNotNull =
-            themeColor.map { value ->
-                value != null
-            }.stateIn(false)
     }
 
     private fun setUpCalendarStartDayOfWeekSettingValue() {
@@ -213,11 +199,6 @@ internal class SettingsViewModel @Inject constructor(
                         is UserSettingFlowResult.Failure -> it.fallbackSetting.dayOfWeek
                     }
                 }.stateIn(initialValue)
-
-        isCalendarStartDayOfWeekNotNull =
-            calendarStartDayOfWeek.map { value ->
-                value != null
-            }.stateIn(false)
     }
 
     private fun setUpReminderNotificationSettingValue() {
@@ -250,17 +231,6 @@ internal class SettingsViewModel @Inject constructor(
                         }
                     }
                 }.stateIn(null)
-
-        isReminderNotificationNotNull =
-            combine(isCheckedReminderNotification, reminderNotificationTime) {
-                    isCheckedReminderNotification, reminderNotificationTime ->
-                if (isCheckedReminderNotification == null) return@combine false
-                return@combine if (isCheckedReminderNotification) {
-                    reminderNotificationTime != null
-                } else {
-                    true
-                }
-            }.stateIn(false)
     }
 
     private fun setUpPasscodeLockSettingValue() {
@@ -295,17 +265,6 @@ internal class SettingsViewModel @Inject constructor(
                         }
                     }
                 }.stateIn(null )
-
-        isPasscodeLockNotNull =
-            combine(isCheckedPasscodeLock, passcode) {
-                    isCheckedPasscodeLock, passcode ->
-                if (isCheckedPasscodeLock == null) return@combine false
-                return@combine if (isCheckedPasscodeLock) {
-                    passcode != null
-                } else {
-                    true
-                }
-            }.stateIn(false)
     }
 
     private fun setUpWeatherInfoFetchSettingValue() {
@@ -318,33 +277,6 @@ internal class SettingsViewModel @Inject constructor(
                         is UserSettingFlowResult.Failure -> it.fallbackSetting.isEnabled
                     }
                 }.stateIn(null)
-
-        isWeatherInfoFetchNotNull =
-            isCheckedWeatherInfoFetch.map { value ->
-                value != null
-            }.stateIn(false)
-    }
-
-    private fun setUpIsAllSettingsNotNull() {
-        isAllSettingsNotNull =
-            combine(
-                isThemeColorNotNull,
-                isCalendarStartDayOfWeekNotNull,
-                isReminderNotificationNotNull,
-                isPasscodeLockNotNull,
-                isWeatherInfoFetchNotNull
-            ) {
-                    isThemeColorNotNull,
-                    isCalendarStartDayOfWeekNotNull,
-                    isReminderNotificationNotNull,
-                    isPasscodeLockNotNull,
-                    isWeatherInfoFetchNotNull ->
-                return@combine isThemeColorNotNull
-                        && isCalendarStartDayOfWeekNotNull
-                        && isReminderNotificationNotNull
-                        && isPasscodeLockNotNull
-                        && isWeatherInfoFetchNotNull
-            }.stateIn(false)
     }
 
     // BackPressed(戻るボタン)処理

@@ -28,7 +28,6 @@ import com.websarva.wings.android.zuboradiary.data.model.ThemeColor
 import com.websarva.wings.android.zuboradiary.databinding.ActivityMainBinding
 import com.websarva.wings.android.zuboradiary.ui.theme.ThemeColorInflaterCreator
 import com.websarva.wings.android.zuboradiary.ui.theme.ThemeColorChanger
-import com.websarva.wings.android.zuboradiary.ui.utils.requireValue
 import com.websarva.wings.android.zuboradiary.ui.fragment.common.RequiresBottomNavigation
 import com.websarva.wings.android.zuboradiary.ui.fragment.common.ReselectableFragment
 import com.websarva.wings.android.zuboradiary.ui.model.state.MainActivityUiState
@@ -36,6 +35,7 @@ import com.websarva.wings.android.zuboradiary.ui.viewmodel.MainActivityViewModel
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.SettingsViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
@@ -91,11 +91,11 @@ class MainActivity : LoggingActivity() {
         setUpFragmentLifeCycleCallBacks()
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.CREATED) {
-                settingsViewModel.isAllSettingsNotNull
-                    .collectLatest { value: Boolean ->
-                        if (!value) return@collectLatest
-
-                        if (!isMainActivityLayoutInflated) setUpMainActivityBinding()
+                settingsViewModel.themeColor.filterNotNull()
+                    .collectLatest { value: ThemeColor ->
+                        if (isMainActivityLayoutInflated) return@collectLatest
+                        setUpMainActivityBinding(value)
+                        isMainActivityLayoutInflated = true
                         setUpUiState()
                         setUpThemeColor()
                         setUpNavigation()
@@ -177,12 +177,10 @@ class MainActivity : LoggingActivity() {
         }
     }
 
-    private fun setUpMainActivityBinding() {
-        val themeColor = settingsViewModel.themeColor.requireValue()
+    private fun setUpMainActivityBinding(themeColor: ThemeColor) {
         val themeColorInflater = ThemeColorInflaterCreator().create(layoutInflater, themeColor)
         _binding = ActivityMainBinding.inflate(themeColorInflater)
         setContentView(binding.root)
-        isMainActivityLayoutInflated = true
     }
 
     private fun setUpUiState() {
