@@ -1,9 +1,9 @@
 package com.websarva.wings.android.zuboradiary.data.network
 
 import android.util.Log
+import androidx.annotation.FloatRange
 import androidx.annotation.IntRange
 import androidx.datastore.core.IOException
-import com.websarva.wings.android.zuboradiary.data.model.GeoCoordinates
 import com.websarva.wings.android.zuboradiary.data.model.Weather
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import retrofit2.Response
@@ -29,15 +29,26 @@ internal class WeatherApiDataSource(private val weatherApiService: WeatherApiSer
     private val queryTimeZoneParameter = "Asia/Tokyo"
 
     @Throws(WeatherApiException::class)
-    suspend fun fetchWeatherInfo(date: LocalDate, geoCoordinates: GeoCoordinates): Weather {
+    suspend fun fetchWeatherInfo(
+        date: LocalDate,
+        @FloatRange(from = -90.0, to = 90.0)
+        latitude: Double,
+        @FloatRange(from = -180.0, to = 180.0)
+        longitude: Double
+    ): Weather {
+        require(latitude >= -90)
+        require(latitude <= 90)
+        require(longitude >= -180)
+        require(longitude <= 180)
+
         if (!canFetchWeatherInfo(date)) throw WeatherApiException.DateOutOfRange(date)
 
         val currentDate = LocalDate.now()
         return if (date == currentDate) {
-            fetchTodayWeatherInfo(geoCoordinates)
+            fetchTodayWeatherInfo(latitude, longitude)
         } else {
             val betweenDays = ChronoUnit.DAYS.between(date, currentDate).toInt()
-            fetchPastDayWeatherInfo(geoCoordinates, betweenDays)
+            fetchPastDayWeatherInfo(latitude, longitude, betweenDays)
         }
     }
 
@@ -80,12 +91,17 @@ internal class WeatherApiDataSource(private val weatherApiService: WeatherApiSer
     }
 
     @Throws(WeatherApiException.ApiAccessFailed::class)
-    suspend fun fetchTodayWeatherInfo(geoCoordinates: GeoCoordinates): Weather {
+    suspend fun fetchTodayWeatherInfo(
+        @FloatRange(from = -90.0, to = 90.0)
+        latitude: Double,
+        @FloatRange(from = -180.0, to = 180.0)
+        longitude: Double
+    ): Weather {
         val response =
             executeWebApiOperation {
                 weatherApiService.getWeather(
-                    geoCoordinates.latitude.toString(),
-                    geoCoordinates.longitude.toString(),
+                    latitude.toString(),
+                    longitude.toString(),
                     queryDiaryParameter,
                     queryTimeZoneParameter,
                     "0",  /*today*/
@@ -97,7 +113,10 @@ internal class WeatherApiDataSource(private val weatherApiService: WeatherApiSer
 
     @Throws(WeatherApiException.ApiAccessFailed::class)
     suspend fun fetchPastDayWeatherInfo(
-        geoCoordinates: GeoCoordinates,
+        @FloatRange(from = -90.0, to = 90.0)
+        latitude: Double,
+        @FloatRange(from = -180.0, to = 180.0)
+        longitude: Double,
         @IntRange(from = MIN_PAST_DAYS.toLong(), to = MAX_PAST_DAYS.toLong())
         numPastDays: Int
     ): Weather {
@@ -107,8 +126,8 @@ internal class WeatherApiDataSource(private val weatherApiService: WeatherApiSer
         val response =
             executeWebApiOperation {
                 weatherApiService.getWeather(
-                    geoCoordinates.latitude.toString(),
-                    geoCoordinates.longitude.toString(),
+                    latitude.toString(),
+                    longitude.toString(),
                     queryDiaryParameter,
                     queryTimeZoneParameter,
                     numPastDays.toString(),

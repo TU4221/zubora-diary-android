@@ -7,7 +7,6 @@ import com.websarva.wings.android.zuboradiary.data.repository.DiaryRepository
 import com.websarva.wings.android.zuboradiary.data.repository.WeatherInfoRepository
 import com.websarva.wings.android.zuboradiary.data.repository.UserPreferencesRepository
 import com.websarva.wings.android.zuboradiary.data.preferences.UserPreferences
-import com.websarva.wings.android.zuboradiary.data.repository.LocationRepository
 import com.websarva.wings.android.zuboradiary.data.repository.UriRepository
 import com.websarva.wings.android.zuboradiary.data.repository.WorkerRepository
 import com.websarva.wings.android.zuboradiary.data.uri.UriPermissionDataSource
@@ -44,14 +43,11 @@ internal object RepositoryModule {
 
     @Singleton
     @Provides
-    fun provideWeatherApiRepository(weatherApiDataSource: WeatherApiDataSource): WeatherInfoRepository {
-        return WeatherInfoRepository(weatherApiDataSource)
-    }
-
-    @Singleton
-    @Provides
-    fun provideLocationRepository(fusedLocationDataSource: FusedLocationDataSource): LocationRepository {
-        return LocationRepository(fusedLocationDataSource)
+    fun provideWeatherApiRepository(
+        weatherApiDataSource: WeatherApiDataSource,
+        fusedLocationDataSource: FusedLocationDataSource
+    ): WeatherInfoRepository {
+        return WeatherInfoRepository(weatherApiDataSource, fusedLocationDataSource)
     }
 
     @Singleton

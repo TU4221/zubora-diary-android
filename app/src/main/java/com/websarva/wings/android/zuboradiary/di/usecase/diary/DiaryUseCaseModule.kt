@@ -1,7 +1,6 @@
 package com.websarva.wings.android.zuboradiary.di.usecase.diary
 
 import com.websarva.wings.android.zuboradiary.data.repository.DiaryRepository
-import com.websarva.wings.android.zuboradiary.data.repository.LocationRepository
 import com.websarva.wings.android.zuboradiary.data.repository.WeatherInfoRepository
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.DoesDiaryExistUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.CanFetchWeatherInfoUseCase
@@ -53,12 +52,10 @@ internal object DiaryUseCaseModule {
     @Provides
     fun provideFetchWeatherInfoUseCase(
         weatherInfoRepository: WeatherInfoRepository,
-        locationRepository: LocationRepository,
         canFetchWeatherInfoUseCase: CanFetchWeatherInfoUseCase
     ): FetchWeatherInfoUseCase {
         return FetchWeatherInfoUseCase(
             weatherInfoRepository,
-            locationRepository,
             canFetchWeatherInfoUseCase
         )
     }

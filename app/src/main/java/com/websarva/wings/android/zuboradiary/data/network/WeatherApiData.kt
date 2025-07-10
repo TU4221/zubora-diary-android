@@ -2,7 +2,6 @@ package com.websarva.wings.android.zuboradiary.data.network
 
 import android.util.Log
 import com.squareup.moshi.Json
-import com.websarva.wings.android.zuboradiary.data.model.GeoCoordinates
 import com.websarva.wings.android.zuboradiary.data.model.Weather
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 
@@ -20,9 +19,6 @@ internal data class WeatherApiData @Suppress("unused") constructor(
     private val logTag = createLogTag()
 
     fun toWeatherInfo(): Weather {
-        // GeoCoordinatesのコンストラクタを使用してlatitude、longitudeの値チェック
-        GeoCoordinates(latitude.toDouble(), longitude.toDouble())
-
         Log.d(logTag, "toWeatherInfo()_latitude = $latitude, longitude = $longitude")
         if (daily.times.isNotEmpty()
             && daily.weatherCodes.isNotEmpty()

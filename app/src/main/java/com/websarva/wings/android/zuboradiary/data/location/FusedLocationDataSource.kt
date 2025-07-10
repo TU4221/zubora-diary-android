@@ -2,12 +2,12 @@ package com.websarva.wings.android.zuboradiary.data.location
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.location.Location
 import android.util.Log
 import com.google.android.gms.location.CurrentLocationRequest
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
 import com.google.android.gms.tasks.CancellationTokenSource
-import com.websarva.wings.android.zuboradiary.data.model.GeoCoordinates
 import com.websarva.wings.android.zuboradiary.ui.utils.isAccessLocationGranted
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import kotlinx.coroutines.tasks.await
@@ -27,7 +27,7 @@ internal class FusedLocationDataSource(
     //      Permission確認はプロパティで管理する為、@SuppressLintで警告抑制。
     @SuppressLint("MissingPermission")
     @Throws(FusedLocationAccessException::class)
-    suspend fun fetchCurrentLocation(timeoutMillis: Long = 10000L): GeoCoordinates {
+    suspend fun fetchCurrentLocation(timeoutMillis: Long = 10000L): Location {
         val logMsg = "現在位置取得"
         Log.i(logTag, "${logMsg}_開始")
         val cancellationTokenSource = CancellationTokenSource()
@@ -55,7 +55,7 @@ internal class FusedLocationDataSource(
                 } else {
                     Log.i(logTag, "${logMsg}_完了_location:$location")
                 }
-                return@withTimeoutOrNull GeoCoordinates(location.latitude, location.longitude)
+                return@withTimeoutOrNull location
             } ?: run {
                 Log.w(logTag, "${logMsg}_失敗_location:null")
                 throw TimeoutException()

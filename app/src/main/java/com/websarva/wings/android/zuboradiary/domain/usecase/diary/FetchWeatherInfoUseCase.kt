@@ -2,20 +2,16 @@ package com.websarva.wings.android.zuboradiary.domain.usecase.diary
 
 import android.util.Log
 import com.websarva.wings.android.zuboradiary.domain.usecase.exception.FetchWeatherInfoUseCaseException
-import com.websarva.wings.android.zuboradiary.data.model.GeoCoordinates
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.data.model.Weather
-import com.websarva.wings.android.zuboradiary.data.repository.LocationRepository
 import com.websarva.wings.android.zuboradiary.data.repository.WeatherInfoRepository
 import com.websarva.wings.android.zuboradiary.domain.exception.weather.FetchWeatherInfoException
-import com.websarva.wings.android.zuboradiary.domain.exception.location.FetchCurrentLocationFailedException
 import com.websarva.wings.android.zuboradiary.domain.usecase.DefaultUseCaseResult
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import java.time.LocalDate
 
 internal class FetchWeatherInfoUseCase(
     private val weatherInfoRepository: WeatherInfoRepository,
-    private val locationRepository: LocationRepository,
     private val canFetchWeatherInfoUseCase: CanFetchWeatherInfoUseCase
 ) {
 
@@ -38,8 +34,7 @@ internal class FetchWeatherInfoUseCase(
         }
 
         try {
-            val geoCoordinates =fetchCurrentLocation()
-            val weather = fetchWeatherInfo(date, geoCoordinates)
+            val weather = fetchWeatherInfo(date)
             Log.i(logTag, "${logMsg}完了")
             return UseCaseResult.Success(weather)
         } catch (e: FetchWeatherInfoUseCaseException) {
@@ -48,29 +43,19 @@ internal class FetchWeatherInfoUseCase(
         }
     }
 
-    private suspend fun fetchCurrentLocation(): GeoCoordinates {
-        val logMsg = "位置情報取得_"
-        Log.i(logTag, "${logMsg}開始")
-        return try {
-            val result = locationRepository.fetchCurrentLocation()
-            Log.i(logTag, "${logMsg}完了")
-            result
-        } catch (e: FetchCurrentLocationFailedException) {
-            throw FetchWeatherInfoUseCaseException.AccessLocationFailed(e)
-        }
-    }
-
-    private suspend fun fetchWeatherInfo(date: LocalDate, geoCoordinates: GeoCoordinates): Weather {
+    private suspend fun fetchWeatherInfo(date: LocalDate): Weather {
         val logMsg = "天気情報取得_"
         Log.i(logTag, "${logMsg}開始")
 
         return try {
-            val result = weatherInfoRepository.fetchWeatherInfo(date, geoCoordinates)
+            val result = weatherInfoRepository.fetchWeatherInfo(date)
             Log.i(logTag, "${logMsg}完了")
             result
         } catch (e: FetchWeatherInfoException) {
             Log.e(logTag, "${logMsg}失敗")
             when (e) {
+                is FetchWeatherInfoException.AccessLocationFailed ->
+                    throw FetchWeatherInfoUseCaseException.AccessLocationFailed(e)
                 is FetchWeatherInfoException.ApiAccessFailed ->
                     throw FetchWeatherInfoUseCaseException.FetchWeatherInfoFailed(e)
                 is FetchWeatherInfoException.DateOutOfRange ->

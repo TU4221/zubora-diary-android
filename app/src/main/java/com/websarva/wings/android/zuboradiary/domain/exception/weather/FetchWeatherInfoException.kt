@@ -8,6 +8,10 @@ internal sealed class FetchWeatherInfoException (
     cause: Throwable
 ) : DomainException(message, cause) {
 
+    class AccessLocationFailed (
+        cause: Throwable
+    ) : FetchWeatherInfoException("位置情報の取得に失敗しました。", cause)
+
     class ApiAccessFailed (
         date: LocalDate,
         cause: Throwable
