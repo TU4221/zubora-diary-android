@@ -1,11 +1,9 @@
 package com.websarva.wings.android.zuboradiary.data.preferences
 
-import com.websarva.wings.android.zuboradiary.data.model.DataException
-
 internal sealed class UserPreferencesException (
     message: String,
     cause: Throwable? = null
-) : DataException(message, cause) {
+) : Exception(message, cause) {
 
     class DataStoreAccessFailed(
         cause: Throwable? = null
