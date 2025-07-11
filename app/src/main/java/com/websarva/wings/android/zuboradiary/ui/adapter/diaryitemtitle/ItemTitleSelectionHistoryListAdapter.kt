@@ -7,7 +7,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.ListAdapter
-import com.websarva.wings.android.zuboradiary.data.model.ThemeColor
+import com.websarva.wings.android.zuboradiary.domain.model.ThemeColor
 import com.websarva.wings.android.zuboradiary.databinding.RowBackgroundDeleteButtonFullWideBinding
 import com.websarva.wings.android.zuboradiary.databinding.RowItemTitleSelectionHistoryBinding
 import com.websarva.wings.android.zuboradiary.ui.adapter.LeftSwipeSimpleCallback

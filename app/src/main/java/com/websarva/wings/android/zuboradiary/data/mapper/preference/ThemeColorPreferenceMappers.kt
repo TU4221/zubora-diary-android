@@ -1,6 +1,6 @@
 package com.websarva.wings.android.zuboradiary.data.mapper.preference
 
-import com.websarva.wings.android.zuboradiary.data.model.ThemeColor
+import com.websarva.wings.android.zuboradiary.domain.model.ThemeColor
 import com.websarva.wings.android.zuboradiary.data.preferences.ThemeColorPreference
 import com.websarva.wings.android.zuboradiary.domain.model.settings.ThemeColorSetting
 

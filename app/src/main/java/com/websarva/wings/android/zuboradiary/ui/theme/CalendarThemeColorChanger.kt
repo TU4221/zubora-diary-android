@@ -5,7 +5,7 @@ import android.view.View
 import android.widget.TextView
 import androidx.core.content.res.ResourcesCompat
 import com.websarva.wings.android.zuboradiary.R
-import com.websarva.wings.android.zuboradiary.data.model.ThemeColor
+import com.websarva.wings.android.zuboradiary.domain.model.ThemeColor
 
 internal class CalendarThemeColorChanger : ThemeColorChanger() {
 

@@ -1,6 +1,6 @@
 package com.websarva.wings.android.zuboradiary.domain.exception.settings
 
-import com.websarva.wings.android.zuboradiary.data.model.ThemeColor
+import com.websarva.wings.android.zuboradiary.domain.model.ThemeColor
 import com.websarva.wings.android.zuboradiary.domain.exception.DomainException
 
 internal class UpdateThemeColorSettingFailedException(

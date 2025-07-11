@@ -1,7 +1,7 @@
 package com.websarva.wings.android.zuboradiary.ui.adapter.diary
 
 import androidx.recyclerview.widget.RecyclerView
-import com.websarva.wings.android.zuboradiary.data.model.ThemeColor
+import com.websarva.wings.android.zuboradiary.domain.model.ThemeColor
 
 internal abstract class SwipeDiaryDayListBaseAdapter protected constructor(
     recyclerView: RecyclerView,

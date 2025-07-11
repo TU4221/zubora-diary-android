@@ -4,7 +4,7 @@ import android.os.Build
 import android.view.Window
 import androidx.core.view.WindowCompat
 import androidx.fragment.app.DialogFragment
-import com.websarva.wings.android.zuboradiary.data.model.ThemeColor
+import com.websarva.wings.android.zuboradiary.domain.model.ThemeColor
 import com.websarva.wings.android.zuboradiary.ui.theme.ThemeColorChanger
 
 internal fun DialogFragment.enableEdgeToEdge(themeColor: ThemeColor) {

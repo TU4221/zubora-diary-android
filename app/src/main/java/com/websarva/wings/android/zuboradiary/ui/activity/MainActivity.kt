@@ -24,7 +24,7 @@ import com.google.android.material.navigation.NavigationBarView.OnItemReselected
 import com.google.android.material.transition.platform.MaterialFadeThrough
 import com.websarva.wings.android.zuboradiary.R
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
-import com.websarva.wings.android.zuboradiary.data.model.ThemeColor
+import com.websarva.wings.android.zuboradiary.domain.model.ThemeColor
 import com.websarva.wings.android.zuboradiary.databinding.ActivityMainBinding
 import com.websarva.wings.android.zuboradiary.ui.theme.ThemeColorInflaterCreator
 import com.websarva.wings.android.zuboradiary.ui.theme.ThemeColorChanger
