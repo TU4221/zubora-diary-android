@@ -9,8 +9,8 @@ import com.websarva.wings.android.zuboradiary.domain.exception.DomainException
 import com.websarva.wings.android.zuboradiary.domain.exception.reminder.CancelReminderNotificationFailedException
 import com.websarva.wings.android.zuboradiary.domain.exception.reminder.RegisterReminderNotificationFailedException
 import com.websarva.wings.android.zuboradiary.domain.exception.settings.UpdateReminderNotificationSettingFailedException
-import com.websarva.wings.android.zuboradiary.domain.exception.settings.UserSettingsAccessException
-import com.websarva.wings.android.zuboradiary.domain.model.settings.UserSettingFlowResult
+import com.websarva.wings.android.zuboradiary.domain.exception.settings.UserSettingsException
+import com.websarva.wings.android.zuboradiary.domain.model.settings.UserSettingDataSourceResult
 import com.websarva.wings.android.zuboradiary.domain.usecase.DefaultUseCaseResult
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import kotlinx.coroutines.Dispatchers
@@ -75,7 +75,7 @@ internal class SaveReminderNotificationSettingUseCase(
     @Throws(
         UpdateReminderNotificationSettingFailedException::class,
         CancelReminderNotificationFailedException::class,
-        UserSettingsAccessException::class
+        UserSettingsException::class
     )
     private suspend fun saveReminderNotificationInvalid() {
         val backupSettingValue = fetchCurrentReminderNotificationSetting()
@@ -95,15 +95,15 @@ internal class SaveReminderNotificationSettingUseCase(
         }
     }
 
-    @Throws(UserSettingsAccessException::class)
+    @Throws(UserSettingsException::class)
     private suspend fun fetchCurrentReminderNotificationSetting(): ReminderNotificationSetting {
         return withContext(Dispatchers.IO) {
             userPreferencesRepository
                 .fetchReminderNotificationPreference()
-                .map { value: UserSettingFlowResult<ReminderNotificationSetting> ->
+                .map { value: UserSettingDataSourceResult<ReminderNotificationSetting> ->
                     when (value) {
-                        is UserSettingFlowResult.Success -> value.setting
-                        is UserSettingFlowResult.Failure -> throw value.exception
+                        is UserSettingDataSourceResult.Success -> value.setting
+                        is UserSettingDataSourceResult.Failure -> throw value.exception
                     }
                 }.first()
         }

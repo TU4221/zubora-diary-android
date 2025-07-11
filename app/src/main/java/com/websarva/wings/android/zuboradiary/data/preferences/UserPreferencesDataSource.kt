@@ -8,7 +8,6 @@ import androidx.datastore.preferences.core.MutablePreferences
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
-import androidx.datastore.preferences.core.emptyPreferences
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
@@ -68,10 +67,7 @@ internal class UserPreferences @Inject constructor(
 
                 emit(
                     UserPreferencesFetchResult
-                        .Failure(
-                            UserPreferencesAccessException(cause),
-                            emptyPreferences()
-                        )
+                        .Failure(UserPreferencesException.DataStoreAccessFailed(cause))
                 )
             }.stateIn(
                 appScope,
@@ -83,24 +79,24 @@ internal class UserPreferences @Inject constructor(
         return userPreferencesFlow.map { result ->
             when (result) {
                 is UserPreferencesFetchResult.Success -> {
-                    UserPreferenceFlowResult.Success(
-                        createThemeColorPreference(result.preferences)
-                    )
+                    val preference = createThemeColorPreference(result.preferences)
+                    if (preference != null) {
+                        UserPreferenceFlowResult.Success(preference)
+                    } else {
+                        UserPreferenceFlowResult.Failure(
+                            UserPreferencesException.DataNotFoundException("テーマカラー")
+                        )
+                    }
                 }
                 is UserPreferencesFetchResult.Failure -> {
-                    UserPreferenceFlowResult.Failure(
-                        result.exception,
-                        createThemeColorPreference(result.fallbackPreferences)
-                    )
+                    UserPreferenceFlowResult.Failure(result.exception)
                 }
             }
         }
     }
 
-    private fun createThemeColorPreference(preferences: Preferences): ThemeColorPreference {
-        val themeColorNumber =
-            preferences[themeColorPreferenceKey]
-                ?: return ThemeColorPreference()
+    private fun createThemeColorPreference(preferences: Preferences): ThemeColorPreference? {
+        val themeColorNumber = preferences[themeColorPreferenceKey] ?: return null
         return ThemeColorPreference(themeColorNumber)
     }
 
@@ -109,14 +105,18 @@ internal class UserPreferences @Inject constructor(
         return userPreferencesFlow.map { result ->
             when (result) {
                 is UserPreferencesFetchResult.Success -> {
-                    UserPreferenceFlowResult.Success(
-                        createCalendarStartDayOfWeekPreference(result.preferences)
-                    )
+                    val preference = createCalendarStartDayOfWeekPreference(result.preferences)
+                    if (preference != null) {
+                        UserPreferenceFlowResult.Success(preference)
+                    } else {
+                        UserPreferenceFlowResult.Failure(
+                            UserPreferencesException.DataNotFoundException("カレンダー開始曜日")
+                        )
+                    }
                 }
                 is UserPreferencesFetchResult.Failure -> {
                     UserPreferenceFlowResult.Failure(
-                        result.exception,
-                        createCalendarStartDayOfWeekPreference(result.fallbackPreferences)
+                        result.exception
                     )
                 }
             }
@@ -125,10 +125,9 @@ internal class UserPreferences @Inject constructor(
 
     private fun createCalendarStartDayOfWeekPreference(
         preferences: Preferences
-    ): CalendarStartDayOfWeekPreference {
+    ): CalendarStartDayOfWeekPreference? {
         val dayOfWeekNumber =
-            preferences[calendarStartDayOfWeekPreferenceKey]
-                ?: return CalendarStartDayOfWeekPreference()
+            preferences[calendarStartDayOfWeekPreferenceKey] ?: return null
         return CalendarStartDayOfWeekPreference(dayOfWeekNumber)
     }
 
@@ -137,14 +136,18 @@ internal class UserPreferences @Inject constructor(
         return userPreferencesFlow.map { result ->
             when (result) {
                 is UserPreferencesFetchResult.Success -> {
-                    UserPreferenceFlowResult.Success(
-                        createReminderNotificationPreference(result.preferences)
-                    )
+                    val preference = createReminderNotificationPreference(result.preferences)
+                    if (preference != null) {
+                        UserPreferenceFlowResult.Success(preference)
+                    } else {
+                        UserPreferenceFlowResult.Failure(
+                            UserPreferencesException.DataNotFoundException("リマインダー通知")
+                        )
+                    }
                 }
                 is UserPreferencesFetchResult.Failure -> {
                     UserPreferenceFlowResult.Failure(
-                        result.exception,
-                        createReminderNotificationPreference(result.fallbackPreferences)
+                        result.exception
                     )
                 }
             }
@@ -153,13 +156,11 @@ internal class UserPreferences @Inject constructor(
 
     private fun createReminderNotificationPreference(
         preferences: Preferences
-    ): ReminderNotificationPreference {
+    ): ReminderNotificationPreference? {
         val isEnabled =
-            preferences[isEnabledReminderNotificationPreferenceKey]
-                ?: return ReminderNotificationPreference()
+            preferences[isEnabledReminderNotificationPreferenceKey] ?: return null
         val notificationTimeString =
-            preferences[reminderNotificationTimePreferenceKey]
-                ?: return ReminderNotificationPreference()
+            preferences[reminderNotificationTimePreferenceKey] ?: return null
         return ReminderNotificationPreference(isEnabled, notificationTimeString)
     }
 
@@ -168,24 +169,27 @@ internal class UserPreferences @Inject constructor(
         return userPreferencesFlow.map { result ->
             when (result) {
                 is UserPreferencesFetchResult.Success -> {
-                    UserPreferenceFlowResult.Success(
-                        createPasscodeLockPreference(result.preferences)
-                    )
+                    val preference = createPasscodeLockPreference(result.preferences)
+                    if (preference != null) {
+                        UserPreferenceFlowResult.Success(preference)
+                    } else {
+                        UserPreferenceFlowResult.Failure(
+                            UserPreferencesException.DataNotFoundException("パスコードロック")
+                        )
+                    }
                 }
                 is UserPreferencesFetchResult.Failure -> {
                     UserPreferenceFlowResult.Failure(
-                        result.exception,
-                        createPasscodeLockPreference(result.fallbackPreferences)
+                        result.exception
                     )
                 }
             }
         }
     }
 
-    private fun createPasscodeLockPreference(preferences: Preferences): PasscodeLockPreference {
-        val isEnabled =
-            preferences[isEnabledPasscodeLockPreferenceKey] ?: return PasscodeLockPreference()
-        val passCode = preferences[passcodePreferenceKey] ?: return PasscodeLockPreference()
+    private fun createPasscodeLockPreference(preferences: Preferences): PasscodeLockPreference? {
+        val isEnabled = preferences[isEnabledPasscodeLockPreferenceKey] ?: return null
+        val passCode = preferences[passcodePreferenceKey] ?: return null
         return PasscodeLockPreference(isEnabled, passCode)
     }
 
@@ -194,15 +198,17 @@ internal class UserPreferences @Inject constructor(
         return userPreferencesFlow.map { result ->
             when (result) {
                 is UserPreferencesFetchResult.Success -> {
-                    UserPreferenceFlowResult.Success(
-                        createWeatherInfoFetchPreference(result.preferences)
-                    )
+                    val preference = createWeatherInfoFetchPreference(result.preferences)
+                    if (preference != null) {
+                        UserPreferenceFlowResult.Success(preference)
+                    } else {
+                        UserPreferenceFlowResult.Failure(
+                            UserPreferencesException.DataNotFoundException("天気情報取得")
+                        )
+                    }
                 }
                 is UserPreferencesFetchResult.Failure -> {
-                    UserPreferenceFlowResult.Failure(
-                        result.exception,
-                        createWeatherInfoFetchPreference(result.fallbackPreferences)
-                    )
+                    UserPreferenceFlowResult.Failure(result.exception)
                 }
             }
         }
@@ -210,14 +216,12 @@ internal class UserPreferences @Inject constructor(
 
     private fun createWeatherInfoFetchPreference(
         preferences: Preferences
-    ): WeatherInfoFetchPreference {
-        val isEnabled =
-            preferences[isEnabledWeatherInfoFetchPreferenceKey]
-                ?: return WeatherInfoFetchPreference()
+    ): WeatherInfoFetchPreference? {
+        val isEnabled = preferences[isEnabledWeatherInfoFetchPreferenceKey] ?: return null
         return WeatherInfoFetchPreference(isEnabled)
     }
 
-    @Throws(UserPreferencesAccessException::class)
+    @Throws(UserPreferencesException.DataStoreAccessFailed::class)
     private suspend fun executeDataStoreEditOperation(
         operation: suspend (MutablePreferences) -> Unit
     ): Preferences {
@@ -226,11 +230,11 @@ internal class UserPreferences @Inject constructor(
                 operation(preferences)
             }
         } catch (e: IOException) {
-            throw UserPreferencesAccessException(e)
+            throw UserPreferencesException.DataStoreAccessFailed(e)
         }
     }
 
-    @Throws(UserPreferencesAccessException::class)
+    @Throws(UserPreferencesException.DataStoreAccessFailed::class)
     suspend fun saveThemeColorPreference(value: ThemeColorPreference) {
         executeDataStoreEditOperation { preferences ->
             saveThemeColorPreferenceValue(preferences, value)
@@ -244,7 +248,7 @@ internal class UserPreferences @Inject constructor(
         preferences[themeColorPreferenceKey] = value.themeColorNumber
     }
 
-    @Throws(UserPreferencesAccessException::class)
+    @Throws(UserPreferencesException.DataStoreAccessFailed::class)
     suspend fun saveCalendarStartDayOfWeekPreference(value: CalendarStartDayOfWeekPreference) {
         executeDataStoreEditOperation { preferences ->
             saveCalendarStartDayOfWeekPreferenceValue(preferences, value)
@@ -258,7 +262,7 @@ internal class UserPreferences @Inject constructor(
         preferences[calendarStartDayOfWeekPreferenceKey] = value.dayOfWeekNumber
     }
 
-    @Throws(UserPreferencesAccessException::class)
+    @Throws(UserPreferencesException.DataStoreAccessFailed::class)
     suspend fun saveReminderNotificationPreference(value: ReminderNotificationPreference) {
         executeDataStoreEditOperation { preferences ->
             saveReminderNotificationPreferenceValue(preferences, value)
@@ -273,7 +277,7 @@ internal class UserPreferences @Inject constructor(
         preferences[reminderNotificationTimePreferenceKey] = value.notificationTimeString
     }
 
-    @Throws(UserPreferencesAccessException::class)
+    @Throws(UserPreferencesException.DataStoreAccessFailed::class)
     suspend fun savePasscodeLockPreference(value: PasscodeLockPreference) {
         executeDataStoreEditOperation { preferences ->
             savePasscodeLockPreferenceValue(preferences, value)
@@ -288,7 +292,7 @@ internal class UserPreferences @Inject constructor(
         preferences[passcodePreferenceKey] = value.passcode
     }
 
-    @Throws(UserPreferencesAccessException::class)
+    @Throws(UserPreferencesException.DataStoreAccessFailed::class)
     suspend fun saveWeatherInfoFetchPreference(value: WeatherInfoFetchPreference) {
         executeDataStoreEditOperation { preferences ->
             saveWeatherInfoFetchPreferenceValue(preferences, value)
@@ -300,15 +304,5 @@ internal class UserPreferences @Inject constructor(
         value: WeatherInfoFetchPreference
     ) {
         preferences[isEnabledWeatherInfoFetchPreferenceKey] = value.isEnabled
-    }
-
-    suspend fun initializeAllPreferences() {
-        executeDataStoreEditOperation { preferences ->
-            saveThemeColorPreferenceValue(preferences, ThemeColorPreference())
-            saveCalendarStartDayOfWeekPreferenceValue(preferences, CalendarStartDayOfWeekPreference())
-            saveReminderNotificationPreferenceValue(preferences, ReminderNotificationPreference())
-            savePasscodeLockPreferenceValue(preferences, PasscodeLockPreference())
-            saveWeatherInfoFetchPreferenceValue(preferences, WeatherInfoFetchPreference())
-        }
     }
 }

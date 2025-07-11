@@ -8,16 +8,15 @@ import com.websarva.wings.android.zuboradiary.domain.model.settings.ReminderNoti
 import com.websarva.wings.android.zuboradiary.domain.model.settings.ThemeColorSetting
 import com.websarva.wings.android.zuboradiary.data.preferences.UserPreferenceFlowResult
 import com.websarva.wings.android.zuboradiary.data.preferences.UserPreferences
-import com.websarva.wings.android.zuboradiary.data.preferences.UserPreferencesAccessException
+import com.websarva.wings.android.zuboradiary.data.preferences.UserPreferencesException
 import com.websarva.wings.android.zuboradiary.domain.model.settings.WeatherInfoFetchSetting
-import com.websarva.wings.android.zuboradiary.domain.exception.settings.InitializeSettingsFailedException
 import com.websarva.wings.android.zuboradiary.domain.exception.settings.UpdateCalendarStartDayOfWeekSettingFailedException
 import com.websarva.wings.android.zuboradiary.domain.exception.settings.UpdatePassCodeSettingFailedException
 import com.websarva.wings.android.zuboradiary.domain.exception.settings.UpdateReminderNotificationSettingFailedException
 import com.websarva.wings.android.zuboradiary.domain.exception.settings.UpdateThemeColorSettingFailedException
 import com.websarva.wings.android.zuboradiary.domain.exception.settings.UpdateWeatherInfoFetchSettingFailedException
-import com.websarva.wings.android.zuboradiary.domain.exception.settings.UserSettingsAccessException
-import com.websarva.wings.android.zuboradiary.domain.model.settings.UserSettingFlowResult
+import com.websarva.wings.android.zuboradiary.domain.exception.settings.UserSettingsException
+import com.websarva.wings.android.zuboradiary.domain.model.settings.UserSettingDataSourceResult
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -25,20 +24,19 @@ import kotlinx.coroutines.withContext
 
 internal class UserPreferencesRepository(private val userPreferences: UserPreferences) {
 
-    fun fetchThemeColorPreference(): Flow<UserSettingFlowResult<ThemeColorSetting>> {
+    fun fetchThemeColorPreference(): Flow<UserSettingDataSourceResult<ThemeColorSetting>> {
         return userPreferences.fetchThemeColorPreference()
             .map { result ->
                 when (result) {
                     is UserPreferenceFlowResult.Success -> {
-                        UserSettingFlowResult.Success(
+                        UserSettingDataSourceResult.Success(
                             result.preference.toDomainModel()
                         )
                     }
 
                     is UserPreferenceFlowResult.Failure -> {
-                        UserSettingFlowResult.Failure(
-                            UserSettingsAccessException(result.exception),
-                            result.fallbackPreference.toDomainModel()
+                        UserSettingDataSourceResult.Failure(
+                            mapPreferenceExceptionToSettingsException(result.exception)
                         )
                     }
                 }
@@ -46,20 +44,19 @@ internal class UserPreferencesRepository(private val userPreferences: UserPrefer
     }
 
     fun fetchCalendarStartDayOfWeekPreference():
-            Flow<UserSettingFlowResult<CalendarStartDayOfWeekSetting>> {
+            Flow<UserSettingDataSourceResult<CalendarStartDayOfWeekSetting>> {
         return userPreferences.fetchCalendarStartDayOfWeekPreference()
             .map { result ->
                 when (result) {
                     is UserPreferenceFlowResult.Success -> {
-                        UserSettingFlowResult.Success(
+                        UserSettingDataSourceResult.Success(
                             result.preference.toDomainModel()
                         )
                     }
 
                     is UserPreferenceFlowResult.Failure -> {
-                        UserSettingFlowResult.Failure(
-                            UserSettingsAccessException(result.exception),
-                            result.fallbackPreference.toDomainModel()
+                        UserSettingDataSourceResult.Failure(
+                            mapPreferenceExceptionToSettingsException(result.exception)
                         )
                     }
                 }
@@ -67,20 +64,19 @@ internal class UserPreferencesRepository(private val userPreferences: UserPrefer
     }
 
     fun fetchReminderNotificationPreference():
-            Flow<UserSettingFlowResult<ReminderNotificationSetting>> {
+            Flow<UserSettingDataSourceResult<ReminderNotificationSetting>> {
         return userPreferences.fetchReminderNotificationPreference()
             .map { result ->
                 when (result) {
                     is UserPreferenceFlowResult.Success -> {
-                        UserSettingFlowResult.Success(
+                        UserSettingDataSourceResult.Success(
                             result.preference.toDomainModel()
                         )
                     }
 
                     is UserPreferenceFlowResult.Failure -> {
-                        UserSettingFlowResult.Failure(
-                            UserSettingsAccessException(result.exception),
-                            result.fallbackPreference.toDomainModel()
+                        UserSettingDataSourceResult.Failure(
+                            mapPreferenceExceptionToSettingsException(result.exception)
                         )
                     }
                 }
@@ -88,20 +84,19 @@ internal class UserPreferencesRepository(private val userPreferences: UserPrefer
     }
 
     fun fetchPasscodeLockPreference():
-            Flow<UserSettingFlowResult<PasscodeLockSetting>> {
+            Flow<UserSettingDataSourceResult<PasscodeLockSetting>> {
         return userPreferences.fetchPasscodeLockPreference()
             .map { result ->
                 when (result) {
                     is UserPreferenceFlowResult.Success -> {
-                        UserSettingFlowResult.Success(
+                        UserSettingDataSourceResult.Success(
                             result.preference.toDomainModel()
                         )
                     }
 
                     is UserPreferenceFlowResult.Failure -> {
-                        UserSettingFlowResult.Failure(
-                            UserSettingsAccessException(result.exception),
-                            result.fallbackPreference.toDomainModel()
+                        UserSettingDataSourceResult.Failure(
+                            mapPreferenceExceptionToSettingsException(result.exception)
                         )
                     }
                 }
@@ -109,24 +104,36 @@ internal class UserPreferencesRepository(private val userPreferences: UserPrefer
     }
 
     fun fetchWeatherInfoFetchPreference():
-            Flow<UserSettingFlowResult<WeatherInfoFetchSetting>> {
+            Flow<UserSettingDataSourceResult<WeatherInfoFetchSetting>> {
         return userPreferences.fetchWeatherInfoFetchPreference()
             .map { result ->
                 when (result) {
                     is UserPreferenceFlowResult.Success -> {
-                        UserSettingFlowResult.Success(
+                        UserSettingDataSourceResult.Success(
                             WeatherInfoFetchSetting(result.preference.isEnabled)
                         )
                     }
 
                     is UserPreferenceFlowResult.Failure -> {
-                        UserSettingFlowResult.Failure(
-                            UserSettingsAccessException(result.exception),
-                            WeatherInfoFetchSetting(result.fallbackPreference.isEnabled)
+                        UserSettingDataSourceResult.Failure(
+                            mapPreferenceExceptionToSettingsException(result.exception)
                         )
                     }
                 }
             }
+    }
+
+    private fun mapPreferenceExceptionToSettingsException(
+        preferenceException: UserPreferencesException
+    ): UserSettingsException {
+        return when (preferenceException) {
+            is UserPreferencesException.DataStoreAccessFailed -> {
+                UserSettingsException.AccessFailed(preferenceException)
+            }
+            is UserPreferencesException.DataNotFoundException -> {
+                UserSettingsException.DataNotFoundException(preferenceException)
+            }
+        }
     }
 
     @Throws(UpdateThemeColorSettingFailedException::class)
@@ -135,7 +142,7 @@ internal class UserPreferencesRepository(private val userPreferences: UserPrefer
             try {
                 val preference = setting.toDataModel()
                 userPreferences.saveThemeColorPreference(preference)
-            } catch (e: UserPreferencesAccessException) {
+            } catch (e: UserPreferencesException.DataStoreAccessFailed) {
                 throw UpdateThemeColorSettingFailedException(setting.themeColor, e)
             }
         }
@@ -147,7 +154,7 @@ internal class UserPreferencesRepository(private val userPreferences: UserPrefer
             try {
                 val preference = setting.toDataModel()
                 userPreferences.saveCalendarStartDayOfWeekPreference(preference)
-            } catch (e: UserPreferencesAccessException) {
+            } catch (e: UserPreferencesException.DataStoreAccessFailed) {
                 throw UpdateCalendarStartDayOfWeekSettingFailedException(setting.dayOfWeek,e)
             }
         }
@@ -159,7 +166,7 @@ internal class UserPreferencesRepository(private val userPreferences: UserPrefer
             try {
                 val preference = setting.toDataModel()
                 userPreferences.saveReminderNotificationPreference(preference)
-            } catch (e: UserPreferencesAccessException) {
+            } catch (e: UserPreferencesException.DataStoreAccessFailed) {
                 throw UpdateReminderNotificationSettingFailedException(
                     setting.isEnabled,
                     when (setting) {
@@ -178,7 +185,7 @@ internal class UserPreferencesRepository(private val userPreferences: UserPrefer
             try {
                 val preference = setting.toDataModel()
                 userPreferences.savePasscodeLockPreference(preference)
-            } catch (e: UserPreferencesAccessException) {
+            } catch (e: UserPreferencesException.DataStoreAccessFailed) {
                 throw UpdatePassCodeSettingFailedException(
                     setting.isEnabled,
                     when (setting) {
@@ -197,19 +204,8 @@ internal class UserPreferencesRepository(private val userPreferences: UserPrefer
             try {
                 val preference = setting.toDataModel()
                 userPreferences.saveWeatherInfoFetchPreference(preference)
-            } catch (e: UserPreferencesAccessException) {
+            } catch (e: UserPreferencesException.DataStoreAccessFailed) {
                 throw UpdateWeatherInfoFetchSettingFailedException(setting.isEnabled, e)
-            }
-        }
-    }
-
-    @Throws(InitializeSettingsFailedException::class)
-    suspend fun initializeAllPreferences() {
-        withContext(Dispatchers.IO) {
-            try {
-                userPreferences.initializeAllPreferences()
-            } catch (e: UserPreferencesAccessException) {
-                throw InitializeSettingsFailedException(e)
             }
         }
     }

@@ -8,7 +8,7 @@ import androidx.lifecycle.viewModelScope
 import com.websarva.wings.android.zuboradiary.data.model.ThemeColor
 import com.websarva.wings.android.zuboradiary.domain.model.settings.PasscodeLockSetting
 import com.websarva.wings.android.zuboradiary.domain.model.settings.ReminderNotificationSetting
-import com.websarva.wings.android.zuboradiary.domain.model.settings.UserSettingFlowResult
+import com.websarva.wings.android.zuboradiary.domain.model.settings.UserSettingResult
 import com.websarva.wings.android.zuboradiary.domain.usecase.DefaultUseCaseResult
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.domain.usecase.exception.DeleteAllDataUseCaseException
@@ -177,11 +177,11 @@ internal class SettingsViewModel @Inject constructor(
                 .value
                 .map {
                     when (it) {
-                        is UserSettingFlowResult.Success -> {
+                        is UserSettingResult.Success -> {
                             onUserSettingsFetchSuccess()
                             it.setting.themeColor
                         }
-                        is UserSettingFlowResult.Failure -> {
+                        is UserSettingResult.Failure -> {
                             onUserSettingsFetchFailure()
                             it.fallbackSetting.themeColor
                         }
@@ -198,8 +198,8 @@ internal class SettingsViewModel @Inject constructor(
                 .value
                 .map {
                     when (it) {
-                        is UserSettingFlowResult.Success -> it.setting.dayOfWeek
-                        is UserSettingFlowResult.Failure -> it.fallbackSetting.dayOfWeek
+                        is UserSettingResult.Success -> it.setting.dayOfWeek
+                        is UserSettingResult.Failure -> it.fallbackSetting.dayOfWeek
                     }
                 }.onEach { value: DayOfWeek ->
                     handle[SAVED_CALENDAR_START_DAY_OF_WEEK_STATE_KEY] = value
@@ -212,8 +212,8 @@ internal class SettingsViewModel @Inject constructor(
                 .value
                 .map {
                     when (it) {
-                        is UserSettingFlowResult.Success -> it.setting.isEnabled
-                        is UserSettingFlowResult.Failure -> it.fallbackSetting.isEnabled
+                        is UserSettingResult.Success -> it.setting.isEnabled
+                        is UserSettingResult.Failure -> it.fallbackSetting.isEnabled
                     }
                 }.stateIn(null )
 
@@ -222,13 +222,13 @@ internal class SettingsViewModel @Inject constructor(
                 .value
                 .map {
                     when (it) {
-                        is UserSettingFlowResult.Success -> {
+                        is UserSettingResult.Success -> {
                             when (it.setting) {
                                 is ReminderNotificationSetting.Enabled -> it.setting.notificationTime
                                 ReminderNotificationSetting.Disabled -> null
                             }
                         }
-                        is UserSettingFlowResult.Failure -> {
+                        is UserSettingResult.Failure -> {
                             when (it.fallbackSetting) {
                                 is ReminderNotificationSetting.Enabled -> it.fallbackSetting.notificationTime
                                 ReminderNotificationSetting.Disabled -> null
@@ -244,10 +244,10 @@ internal class SettingsViewModel @Inject constructor(
                 .value
                 .map {
                     when (it) {
-                        is UserSettingFlowResult.Success -> {
+                        is UserSettingResult.Success -> {
                             it.setting.isEnabled
                         }
-                        is UserSettingFlowResult.Failure -> it.fallbackSetting.isEnabled
+                        is UserSettingResult.Failure -> it.fallbackSetting.isEnabled
                     }
                 }.stateIn(null )
 
@@ -256,13 +256,13 @@ internal class SettingsViewModel @Inject constructor(
                 .value
                 .map {
                     when (it) {
-                        is UserSettingFlowResult.Success -> {
+                        is UserSettingResult.Success -> {
                             when (it.setting) {
                                 is PasscodeLockSetting.Enabled -> it.setting.passcode
                                 PasscodeLockSetting.Disabled -> null
                             }
                         }
-                        is UserSettingFlowResult.Failure -> {
+                        is UserSettingResult.Failure -> {
                             when (it.fallbackSetting) {
                                 is PasscodeLockSetting.Enabled -> it.fallbackSetting.passcode
                                 PasscodeLockSetting.Disabled -> null
@@ -278,8 +278,8 @@ internal class SettingsViewModel @Inject constructor(
                 .value
                 .map {
                     when (it) {
-                        is UserSettingFlowResult.Success -> it.setting.isEnabled
-                        is UserSettingFlowResult.Failure -> it.fallbackSetting.isEnabled
+                        is UserSettingResult.Success -> it.setting.isEnabled
+                        is UserSettingResult.Failure -> it.fallbackSetting.isEnabled
                     }
                 }.stateIn(null)
     }

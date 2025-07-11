@@ -14,6 +14,6 @@ internal fun PasscodeLockPreference.toDomainModel(): PasscodeLockSetting {
 internal fun PasscodeLockSetting.toDataModel(): PasscodeLockPreference {
     return when (this) {
         is PasscodeLockSetting.Enabled -> PasscodeLockPreference(isEnabled, passcode)
-        PasscodeLockSetting.Disabled -> PasscodeLockPreference(isEnabled)
+        PasscodeLockSetting.Disabled -> PasscodeLockPreference(isEnabled, "")
     }
 }

@@ -4,8 +4,5 @@ import androidx.datastore.preferences.core.Preferences
 
 internal sealed class UserPreferencesFetchResult {
     data class Success(val preferences: Preferences) : UserPreferencesFetchResult()
-    data class Failure(
-        val exception: UserPreferencesAccessException,
-        val fallbackPreferences: Preferences
-    ) : UserPreferencesFetchResult()
+    data class Failure(val exception: UserPreferencesException) : UserPreferencesFetchResult()
 }

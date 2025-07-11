@@ -2,7 +2,7 @@ package com.websarva.wings.android.zuboradiary.domain.usecase.settings
 
 import android.util.Log
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
-import com.websarva.wings.android.zuboradiary.domain.model.settings.UserSettingFlowResult
+import com.websarva.wings.android.zuboradiary.domain.model.settings.UserSettingResult
 import com.websarva.wings.android.zuboradiary.domain.model.settings.WeatherInfoFetchSetting
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import kotlinx.coroutines.Dispatchers
@@ -24,12 +24,12 @@ internal class IsWeatherInfoFetchEnabledUseCase(
         val value =
             withContext(Dispatchers.IO) {
                 fetchWeatherInfoFetchSettingUseCase().value
-                    .map { value: UserSettingFlowResult<WeatherInfoFetchSetting> ->
+                    .map { value: UserSettingResult<WeatherInfoFetchSetting> ->
                          when (value) {
-                            is UserSettingFlowResult.Success -> {
+                            is UserSettingResult.Success -> {
                                 value.setting.isEnabled
                             }
-                            is UserSettingFlowResult.Failure -> {
+                            is UserSettingResult.Failure -> {
                                 value.fallbackSetting.isEnabled
                             }
                          }

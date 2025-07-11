@@ -27,7 +27,7 @@ internal fun ReminderNotificationSetting.toDataModel(): ReminderNotificationPref
             ReminderNotificationPreference(isEnabled, notificationTime.toString())
         }
         ReminderNotificationSetting.Disabled -> {
-            ReminderNotificationPreference(isEnabled)
+            ReminderNotificationPreference(isEnabled, "")
         }
     }
 }
