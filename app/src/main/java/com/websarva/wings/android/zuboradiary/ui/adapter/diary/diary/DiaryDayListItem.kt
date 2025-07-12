@@ -8,7 +8,12 @@ internal class DiaryDayListItem(listItem: DiaryListItem) :
     DiaryDayListBaseItem(listItem.date) {
 
     val title: String = listItem.title
-    val picturePath: Uri? = listItem.picturePath
+    val picturePath: Uri? =
+        if (listItem.imageUriString.isEmpty()) {
+            null
+        } else {
+            Uri.parse(listItem.imageUriString)
+        }
 
     override fun areContentsTheSame(item: DiaryDayListBaseItem): Boolean {
         if (this === item) return true
