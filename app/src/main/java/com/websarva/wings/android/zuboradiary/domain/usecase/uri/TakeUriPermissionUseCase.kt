@@ -1,6 +1,5 @@
 package com.websarva.wings.android.zuboradiary.domain.usecase.uri
 
-import android.net.Uri
 import android.util.Log
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.data.repository.UriRepository
@@ -37,12 +36,12 @@ internal class TakeUriPermissionUseCase(
 
     private val logTag = createLogTag()
 
-    operator fun invoke(uri: Uri): DefaultUseCaseResult<Unit> {
+    operator fun invoke(uriString: String): DefaultUseCaseResult<Unit> {
         val logMsg = "Uri権限取得_"
         Log.i(logTag, "${logMsg}開始")
 
         return try {
-            uriRepository.takePersistablePermission(uri)
+            uriRepository.takePersistablePermission(uriString)
             Log.i(logTag, "${logMsg}完了")
             UseCaseResult.Success(Unit)
         } catch (e: EnsurePersistentAccessUriFailedException) {

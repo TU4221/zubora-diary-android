@@ -1,7 +1,6 @@
 package com.websarva.wings.android.zuboradiary.data.database
 
 import android.database.sqlite.SQLiteException
-import android.net.Uri
 import android.util.Log
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import kotlinx.coroutines.flow.Flow
@@ -63,9 +62,9 @@ internal class DiaryDataSource(
     }
 
     @Throws(DataBaseAccessException::class)
-    suspend fun existsPicturePath(uri: Uri): Boolean {
+    suspend fun existsPicturePath(uriString: String): Boolean {
         return executeSuspendDbOperation {
-            diaryDAO.existsPicturePath(uri.toString())
+            diaryDAO.existsPicturePath(uriString)
         }
     }
 

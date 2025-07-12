@@ -1,6 +1,5 @@
 package com.websarva.wings.android.zuboradiary.data.mapper
 
-import android.net.Uri
 import com.websarva.wings.android.zuboradiary.data.database.DiaryEntity
 import com.websarva.wings.android.zuboradiary.domain.model.Condition
 import com.websarva.wings.android.zuboradiary.domain.model.Weather
@@ -9,12 +8,6 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 
 internal fun DiaryEntity.toDomainModel(): Diary {
-    val uri =
-        if (picturePath.isEmpty()) {
-            null
-        } else {
-            Uri.parse(picturePath)
-        }
     return Diary(
         LocalDate.parse(date),
         LocalDateTime.parse(log),
@@ -32,7 +25,7 @@ internal fun DiaryEntity.toDomainModel(): Diary {
         item4Comment,
         item5Title,
         item5Comment,
-        uri
+        picturePath
     )
 }
 
@@ -54,6 +47,6 @@ internal fun Diary.toDataModel(): DiaryEntity {
         item4Comment,
         item5Title,
         item5Comment,
-        picturePath?.toString() ?: ""
+        picturePath
     )
 }

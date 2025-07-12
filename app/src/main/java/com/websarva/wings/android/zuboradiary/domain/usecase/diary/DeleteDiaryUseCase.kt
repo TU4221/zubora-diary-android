@@ -1,6 +1,5 @@
 package com.websarva.wings.android.zuboradiary.domain.usecase.diary
 
-import android.net.Uri
 import android.util.Log
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.data.repository.DiaryRepository
@@ -20,14 +19,14 @@ internal class DeleteDiaryUseCase(
     // MEMO:日記表示、編集フラグメント以外からも削除できるように下記引数とする。
     suspend operator fun invoke(
         loadedDate: LocalDate,
-        loadedPicturePath: Uri?
+        loadedPicturePath: String
     ): UseCaseResult<Unit, DeleteDiaryUseCaseException> {
         val logMsg = "日記削除_"
         Log.i(logTag, "${logMsg}開始")
 
         try {
             deleteDiary(loadedDate)
-            if (loadedPicturePath != null) releasePictureUriPermission(loadedPicturePath)
+            if (loadedPicturePath.isNotEmpty()) releasePictureUriPermission(loadedPicturePath)
         } catch (e: DeleteDiaryUseCaseException) {
             Log.e(logTag, "${logMsg}失敗", e)
             return UseCaseResult.Failure(e)
@@ -53,7 +52,7 @@ internal class DeleteDiaryUseCase(
     }
 
     private suspend fun releasePictureUriPermission(
-        picturePath: Uri
+        picturePath: String
     ) {
         val logMsg = "画像Uri権限解放_"
         Log.i(logTag, "${logMsg}開始")

@@ -239,7 +239,7 @@ internal class DiaryShowViewModel @Inject constructor(
         Log.i(logTag, "${logMsg}_開始")
 
         val date = diaryStateFlow.date.requireValue()
-        val picturePath  = diaryStateFlow.picturePath.value
+        val picturePath  = diaryStateFlow.picturePath.value?.toString() ?: ""
 
         updateUiState(DiaryShowState.Deleting)
         when (val result = deleteDiaryUseCase(date, picturePath)) {

@@ -416,7 +416,8 @@ internal class DiaryListViewModel @Inject constructor(
         Log.i(logTag, "${logMsg}_開始")
 
         updateUiState(DiaryListState.DeletingDiary)
-        when (val result = deleteDiaryUseCase(date, uri)) {
+        val uriString = uri?.toString() ?: ""
+        when (val result = deleteDiaryUseCase(date, uriString)) {
             is UseCaseResult.Success -> {
                 updateDiaryList(currentList)
                 Log.i(logTag, "${logMsg}_完了")

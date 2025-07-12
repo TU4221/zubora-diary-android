@@ -146,7 +146,7 @@ internal class DiaryStateFlow(scope: CoroutineScope, handle: SavedStateHandle) {
         }
         this.numVisibleItems.value = numVisibleItems
 
-        picturePath.value = diary.picturePath
+        picturePath.value = Uri.parse(diary.picturePath)
         log.value = diary.log
     }
 
@@ -168,7 +168,7 @@ internal class DiaryStateFlow(scope: CoroutineScope, handle: SavedStateHandle) {
             items[3].comment.value.trim(),
             items[4].title.value.trim(),
             items[4].comment.value.trim(),
-            picturePath.value
+            picturePath.value.toString()
             )
     }
 

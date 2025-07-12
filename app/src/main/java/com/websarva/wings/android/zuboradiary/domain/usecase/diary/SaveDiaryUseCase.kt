@@ -1,6 +1,5 @@
 package com.websarva.wings.android.zuboradiary.domain.usecase.diary
 
-import android.net.Uri
 import android.util.Log
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.data.repository.DiaryRepository
@@ -93,13 +92,13 @@ internal class SaveDiaryUseCase(
 
 
     private suspend fun managePictureUriPermission(
-        savedPicturePath: Uri?,
-        loadedPicturePath: Uri?
+        savedPicturePath: String,
+        loadedPicturePath: String?
     ) {
         val logMsg = "画像Uri権限管理_"
         Log.i(logTag, "${logMsg}開始")
 
-        if (loadedPicturePath != null) {
+        if (loadedPicturePath?.isNotEmpty() == true) {
             when (val result = releaseUriPermissionUseCase(loadedPicturePath)) {
                 is UseCaseResult.Success -> {
                     // 処理なし
@@ -110,7 +109,7 @@ internal class SaveDiaryUseCase(
             }
         }
 
-        if (savedPicturePath != null) {
+        if (savedPicturePath.isNotEmpty()) {
             when (val result = takeUriPermissionUseCase(savedPicturePath)) {
                 is UseCaseResult.Success -> {
                     // 処理なし

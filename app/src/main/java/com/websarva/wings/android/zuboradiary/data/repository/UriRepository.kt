@@ -12,7 +12,8 @@ internal class UriRepository (
 ) {
 
     @Throws(EnsurePersistentAccessUriFailedException::class)
-    fun takePersistablePermission(uri: Uri) {
+    fun takePersistablePermission(uriString: String) {
+        val uri = Uri.parse(uriString)
         try {
             dataSource.takePersistablePermission(uri)
         } catch (e: UriPermissionOperationException) {
@@ -21,7 +22,8 @@ internal class UriRepository (
     }
 
     @Throws(RevokePersistentAccessUriFailedException::class)
-    fun releasePersistablePermission(uri: Uri) {
+    fun releasePersistablePermission(uriString: String) {
+        val uri = Uri.parse(uriString)
         try {
             dataSource.releasePersistablePermission(uri)
         } catch (e: UriPermissionOperationException) {

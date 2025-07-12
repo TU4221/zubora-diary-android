@@ -1,6 +1,5 @@
 package com.websarva.wings.android.zuboradiary.data.repository
 
-import android.net.Uri
 import android.util.Log
 import com.websarva.wings.android.zuboradiary.data.database.DataBaseAccessException
 import com.websarva.wings.android.zuboradiary.data.database.DiaryDataSource
@@ -73,12 +72,12 @@ internal class DiaryRepository (
     }
 
     @Throws(CheckDiaryPicturePathUsedFailedException::class)
-    suspend fun existsPicturePath(uri: Uri): Boolean {
+    suspend fun existsPicturePath(uriString: String): Boolean {
         return withContext(Dispatchers.IO) {
             try {
-                diaryDataSource.existsPicturePath(uri)
+                diaryDataSource.existsPicturePath(uriString)
             } catch (e: DataBaseAccessException) {
-                throw CheckDiaryPicturePathUsedFailedException(uri, e)
+                throw CheckDiaryPicturePathUsedFailedException(uriString, e)
             }
         }
     }

@@ -1,6 +1,5 @@
 package com.websarva.wings.android.zuboradiary.domain.model
 
-import android.net.Uri
 import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
 import java.time.LocalDate
@@ -24,7 +23,7 @@ internal data class Diary(
     val item4Comment: String,
     val item5Title: String,
     val item5Comment: String,
-    val picturePath: Uri?
+    val picturePath: String
 ) : Parcelable {
 
     /**

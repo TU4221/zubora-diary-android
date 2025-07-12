@@ -371,7 +371,7 @@ internal class DiaryEditViewModel @Inject constructor(
 
         val loadedDiary = _loadedDiary.value ?: return
         val loadedDate = loadedDiary.date
-        val loadedPicturePath = loadedDiary.picturePath
+        val loadedPicturePath = Uri.parse(loadedDiary.picturePath)
         val parameters = DiaryDeleteParameters(loadedDate, loadedPicturePath)
 
         viewModelScope.launch {
@@ -867,7 +867,8 @@ internal class DiaryEditViewModel @Inject constructor(
         Log.i(logTag, "${logMsg}開始")
 
         updateDiaryEditViewModelState(DiaryEditState.Deleting)
-        when (val result = deleteDiaryUseCase(loadedDate, loadedPicturePath)) {
+        val loadedPictureUriString = loadedPicturePath?.toString() ?: ""
+        when (val result = deleteDiaryUseCase(loadedDate, loadedPictureUriString)) {
             is UseCaseResult.Success -> {
                 Log.i(logTag, "${logMsg}完了")
                 updateDiaryEditViewModelState(DiaryEditState.Idle)
