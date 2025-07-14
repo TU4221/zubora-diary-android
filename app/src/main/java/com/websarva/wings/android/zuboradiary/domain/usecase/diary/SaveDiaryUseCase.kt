@@ -102,13 +102,13 @@ internal class SaveDiaryUseCase(
         uriString: String?
     ) {
         val logMsg = "画像Uri権限取消_"
-        Log.i(logTag, "${logMsg}開始")
 
         if (uriString == null) {
             Log.i(logTag, "${logMsg}不要")
             return
         }
 
+        Log.i(logTag, "${logMsg}開始")
         when (val result = releaseUriPermissionUseCase(uriString)) {
             is UseCaseResult.Success -> {
                 // 処理なし
@@ -126,13 +126,13 @@ internal class SaveDiaryUseCase(
         uriString: String?
     ) {
         val logMsg = "画像Uri権限確保_"
-        Log.i(logTag, "${logMsg}開始")
 
         if (uriString == null) {
             Log.i(logTag, "${logMsg}不要")
             return
         }
 
+        Log.i(logTag, "${logMsg}開始")
         when (val result = takeUriPermissionUseCase(uriString)) {
             is UseCaseResult.Success -> {
                 // 処理なし
