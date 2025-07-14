@@ -10,7 +10,7 @@ import com.websarva.wings.android.zuboradiary.domain.exception.reminder.CancelRe
 import com.websarva.wings.android.zuboradiary.domain.exception.reminder.RegisterReminderNotificationFailedException
 import com.websarva.wings.android.zuboradiary.domain.exception.settings.UpdateReminderNotificationSettingFailedException
 import com.websarva.wings.android.zuboradiary.domain.exception.settings.UserSettingsException
-import com.websarva.wings.android.zuboradiary.domain.model.settings.UserSettingDataSourceResult
+import com.websarva.wings.android.zuboradiary.domain.model.settings.UserSettingResult
 import com.websarva.wings.android.zuboradiary.domain.usecase.DefaultUseCaseResult
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import kotlinx.coroutines.Dispatchers
@@ -21,7 +21,8 @@ import java.time.LocalTime
 
 internal class SaveReminderNotificationSettingUseCase(
     private val userPreferencesRepository: UserPreferencesRepository,
-    private val workerRepository: WorkerRepository
+    private val workerRepository: WorkerRepository,
+    private val fetchReminderNotificationSettingUseCase: FetchReminderNotificationSettingUseCase
 ) {
 
     private val logTag = createLogTag()
@@ -98,12 +99,11 @@ internal class SaveReminderNotificationSettingUseCase(
     @Throws(UserSettingsException::class)
     private suspend fun fetchCurrentReminderNotificationSetting(): ReminderNotificationSetting {
         return withContext(Dispatchers.IO) {
-            userPreferencesRepository
-                .fetchReminderNotificationPreference()
-                .map { value: UserSettingDataSourceResult<ReminderNotificationSetting> ->
-                    when (value) {
-                        is UserSettingDataSourceResult.Success -> value.setting
-                        is UserSettingDataSourceResult.Failure -> throw value.exception
+            fetchReminderNotificationSettingUseCase().value
+                .map { result: UserSettingResult<ReminderNotificationSetting> ->
+                    when (result) {
+                        is UserSettingResult.Success -> result.setting
+                        is UserSettingResult.Failure -> throw result.exception
                     }
                 }.first()
         }

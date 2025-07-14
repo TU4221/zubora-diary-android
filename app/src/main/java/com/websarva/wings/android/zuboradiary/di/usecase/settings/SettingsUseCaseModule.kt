@@ -121,9 +121,14 @@ internal object SettingsUseCaseModule {
     @Provides
     fun provideSaveReminderNotificationSettingUseCase(
         userPreferencesRepository: UserPreferencesRepository,
-        workerRepository: WorkerRepository
+        workerRepository: WorkerRepository,
+        fetchReminderNotificationSettingUseCase: FetchReminderNotificationSettingUseCase
     ): SaveReminderNotificationSettingUseCase {
-        return SaveReminderNotificationSettingUseCase(userPreferencesRepository, workerRepository)
+        return SaveReminderNotificationSettingUseCase(
+            userPreferencesRepository,
+            workerRepository,
+            fetchReminderNotificationSettingUseCase
+        )
     }
 
     @Singleton
