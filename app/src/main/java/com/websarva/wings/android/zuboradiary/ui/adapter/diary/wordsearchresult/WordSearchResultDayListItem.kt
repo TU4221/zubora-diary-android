@@ -104,21 +104,24 @@ internal class WordSearchResultDayListItem(
         var itemTitle = ""
         var itemComment = ""
         for (i in itemTitles.indices) {
-            if (itemTitles[i].matches(regex.toRegex())
-                || itemComments[i].matches(regex.toRegex())
+            val targetItemTitle = itemTitles[i] ?: continue
+            val targetItemComment = itemComments[i] ?: continue
+
+            if (targetItemTitle.matches(regex.toRegex())
+                || targetItemComment.matches(regex.toRegex())
             ) {
                 itemNumber = i + 1
-                itemTitle = itemTitles[i]
-                itemComment = itemComments[i]
+                itemTitle = targetItemTitle
+                itemComment = targetItemComment
                 break
             }
+        }
 
-            // 対象アイテムが無かった場合、アイテムNo.1を抽出
-            if (i == (itemTitles.size - 1)) {
-                itemNumber = 1
-                itemTitle = itemTitles[0]
-                itemComment = itemComments[0]
-            }
+        // 検索ワードが項目タイトル、コメントに含まれていない場合、アイテムNo.1を抽出
+        if (itemNumber == 0) {
+            itemNumber = 1
+            itemTitle = itemTitles[0] ?: throw IllegalStateException()
+            itemComment = itemComments[0] ?: throw IllegalStateException()
         }
 
         val result: MutableMap<String, Any> = HashMap()

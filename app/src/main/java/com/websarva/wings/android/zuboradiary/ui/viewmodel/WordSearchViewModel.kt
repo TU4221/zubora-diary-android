@@ -383,6 +383,7 @@ internal class WordSearchViewModel @Inject internal constructor(
         list: List<WordSearchResultListItem>,
         searchWord: String
     ): WordSearchResultYearMonthList {
+        Log.d("20250714", list.toString())
         if (list.isEmpty()) return WordSearchResultYearMonthList()
 
         val resultDayListItemList: MutableList<WordSearchResultDayListItem> = ArrayList()

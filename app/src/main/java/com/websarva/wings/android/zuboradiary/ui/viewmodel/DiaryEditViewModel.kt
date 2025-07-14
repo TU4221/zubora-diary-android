@@ -1065,7 +1065,7 @@ internal class DiaryEditViewModel @Inject constructor(
     }
 
     // 項目関係
-    private fun getItemTitle(itemNumber: ItemNumber): StateFlow<String> {
+    private fun getItemTitle(itemNumber: ItemNumber): StateFlow<String?> {
         return diaryStateFlow.getItemStateFlow(itemNumber).title
     }
 

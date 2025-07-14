@@ -158,16 +158,18 @@ internal class DiaryStateFlow(scope: CoroutineScope, handle: SavedStateHandle) {
             weather2.value,
             condition.value,
             title.value.trim(),
-            items[0].title.value.trim(),
-            items[0].comment.value.trim(),
-            items[1].title.value.trim(),
-            items[1].comment.value.trim(),
-            items[2].title.value.trim(),
-            items[2].comment.value.trim(),
-            items[3].title.value.trim(),
-            items[3].comment.value.trim(),
-            items[4].title.value.trim(),
-            items[4].comment.value.trim(),
+            items[0].title.value?.trim()
+                ?: throw IllegalStateException("項目1タイトルなし(null)"),
+            items[0].comment.value?.trim()
+                ?: throw IllegalStateException("項目1コメントなし(null)"),
+            items[1].title.value?.trim(),
+            items[1].comment.value?.trim(),
+            items[2].title.value?.trim(),
+            items[2].comment.value?.trim(),
+            items[3].title.value?.trim(),
+            items[3].comment.value?.trim(),
+            items[4].title.value?.trim(),
+            items[4].comment.value?.trim(),
             imageUri.value?.toString()
             )
     }
@@ -175,7 +177,7 @@ internal class DiaryStateFlow(scope: CoroutineScope, handle: SavedStateHandle) {
     fun createDiaryItemTitleSelectionHistoryList(): List<DiaryItemTitleSelectionHistoryItem> {
         val list: MutableList<DiaryItemTitleSelectionHistoryItem> = ArrayList()
         for (i in 0 until MAX_ITEMS) {
-            val itemTitle = items[i].title.value
+            val itemTitle = items[i].title.value ?: continue
             val itemTitleUpdateLog = items[i].titleUpdateLog.value ?: continue
             if (itemTitle.matches("\\S+.*".toRegex())) {
                 val item =
@@ -193,6 +195,7 @@ internal class DiaryStateFlow(scope: CoroutineScope, handle: SavedStateHandle) {
         val numVisibleItems = numVisibleItems.requireValue()
         val incrementedNumVisibleItems = numVisibleItems + 1
         this.numVisibleItems.value = incrementedNumVisibleItems
+        items[incrementedNumVisibleItems - 1].update("", "")
     }
 
     fun deleteItem(itemNumber: ItemNumber) {
@@ -244,11 +247,11 @@ internal class DiaryStateFlow(scope: CoroutineScope, handle: SavedStateHandle) {
 
         // MEMO:双方向DataBindingが必要の為、MutableStateFlow変数はアクセス修飾子をpublicとする。
         //      StateFlow変数を用意しても意味がないので作成しない。
-        private val initialTitle = ""
+        private val initialTitle = if (itemNumber == 1) "" else null
         val title =
             MutableStateFlow(handle[SAVED_ITEM_TITLE_STATE_KEY+ itemNumber] ?: initialTitle)
 
-        private val initialComment = ""
+        private val initialComment = if (itemNumber == 1) "" else null
         val comment =
             MutableStateFlow(handle[SAVED_ITEM_COMMENT_STATE_KEY+ itemNumber] ?: initialComment)
 
@@ -284,10 +287,15 @@ internal class DiaryStateFlow(scope: CoroutineScope, handle: SavedStateHandle) {
         }
 
         fun update(
-            title: String,
-            comment: String,
+            title: String?,
+            comment: String?,
             titleUpdateLog: LocalDateTime? = initialUpdateLog
         ) {
+            require(
+                (title == null && comment == null && titleUpdateLog == null)
+                        || (title != null && comment != null)
+            )
+
             this.title.value = title
             this.comment.value = comment
             this.titleUpdateLog.value = titleUpdateLog
@@ -300,8 +308,8 @@ internal class DiaryStateFlow(scope: CoroutineScope, handle: SavedStateHandle) {
 
         val isEmpty: Boolean
             get() {
-                val title = this.title.value
-                val comment = this.comment.value
+                val title = this.title.value ?: return true
+                val comment = this.comment.value ?: return true
                 return title.isEmpty() && comment.isEmpty()
             }
     }

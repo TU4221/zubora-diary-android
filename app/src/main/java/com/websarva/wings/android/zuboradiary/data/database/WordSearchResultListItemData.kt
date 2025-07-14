@@ -13,26 +13,26 @@ internal data class WordSearchResultListItemData(
     val item1Comment: String,
 
     @ColumnInfo(name = "item_2_title")
-    val item2Title: String,
+    val item2Title: String?,
 
     @ColumnInfo(name = "item_2_comment")
-    val item2Comment: String,
+    val item2Comment: String?,
 
     @ColumnInfo(name = "item_3_title")
-    val item3Title: String,
+    val item3Title: String?,
 
     @ColumnInfo(name = "item_3_comment")
-    val item3Comment: String,
+    val item3Comment: String?,
 
     @ColumnInfo(name = "item_4_title")
-    val item4Title: String,
+    val item4Title: String?,
 
     @ColumnInfo(name = "item_4_comment")
-    val item4Comment: String,
+    val item4Comment: String?,
 
     @ColumnInfo(name = "item_5_title")
-    val item5Title: String,
+    val item5Title: String?,
 
     @ColumnInfo(name = "item_5_comment")
-    val item5Comment: String
+    val item5Comment: String?
 )
