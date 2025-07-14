@@ -63,7 +63,6 @@ internal class SaveDiaryUseCase(
     private suspend fun saveDiary(
         diary: Diary,
         diaryItemTitleSelectionHistoryItemList: List<DiaryItemTitleSelectionHistoryItem>,
-        /*loadedDiaryEntity: DiaryEntity?*/
         loadedDate: LocalDate?
     ) {
         val logMsg = "日記データ保存_"
@@ -89,7 +88,6 @@ internal class SaveDiaryUseCase(
         Log.i(logTag, "${logMsg}完了")
     }
 
-    @Throws(DomainException::class)
     private fun shouldDeleteLoadedDateDiary(
         inputDate: LocalDate,
         loadedDate: LocalDate?
@@ -98,7 +96,6 @@ internal class SaveDiaryUseCase(
 
         return inputDate != loadedDate
     }
-
 
     @Throws(DomainException::class)
     private suspend fun releaseLoadedImageUriPermission(
