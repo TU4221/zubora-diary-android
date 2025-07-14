@@ -43,6 +43,8 @@ internal class DiaryShowFragment : BaseFragment<FragmentDiaryShowBinding>() {
         val KEY_RESULT = RESULT_KEY_PREFIX + DiaryShowFragment::class.java.name
     }
 
+    override val destinationId = R.id.navigation_diary_show_fragment
+
     // ViewModel
     // MEMO:委譲プロパティの委譲先(viewModels())の遅延初期化により"Field is never assigned."と警告が表示される。
     //      委譲プロパティによるViewModel生成は公式が推奨する方法の為、警告を無視する。その為、@Suppressを付与する。

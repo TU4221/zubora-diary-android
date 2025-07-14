@@ -47,6 +47,8 @@ class SettingsFragment :
     ReselectableFragment,
     RequiresBottomNavigation {
 
+    override val destinationId = R.id.navigation_settings_fragment
+
     // ViewModel
     // MEMO:本FragmentのMainViewModelはSettingsViewModelになる為、BaseFragmentのSettingsViewModel変数を取得。
     override val mainViewModel

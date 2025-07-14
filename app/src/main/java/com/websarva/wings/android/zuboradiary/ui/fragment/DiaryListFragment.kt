@@ -2,6 +2,7 @@ package com.websarva.wings.android.zuboradiary.ui.fragment
 
 import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
@@ -40,6 +41,8 @@ class DiaryListFragment :
     BaseFragment<FragmentDiaryListBinding>(),
     ReselectableFragment,
     RequiresBottomNavigation {
+
+    override val destinationId = R.id.navigation_diary_list_fragment
 
     // ViewModel
     // MEMO:委譲プロパティの委譲先(viewModels())の遅延初期化により"Field is never assigned."と警告が表示される。
@@ -84,6 +87,7 @@ class DiaryListFragment :
         setUpDialogResultReceiver(
             StartYearMonthPickerDialogFragment.KEY_RESULT
         ) { result ->
+            Log.d("20250714", "DatePickerDialogResultReceive")
             // TODO:シールドクラス Action -> Event に変更してから下記コードの処理方法を検討する。
             when (result) {
                 is DialogResult.Positive<YearMonth> -> {
@@ -225,6 +229,7 @@ class DiaryListFragment :
     }
 
     private fun navigateDiaryEditFragment() {
+        Log.d("20250714", "navigateDiaryEditFragment()")
         val directions =
             DiaryListFragmentDirections.actionNavigationDiaryListFragmentToDiaryEditFragment(
                 true,
@@ -235,18 +240,21 @@ class DiaryListFragment :
     }
 
     private fun navigateDiaryShowFragment(date: LocalDate) {
+        Log.d("20250714", "navigateDiaryShowFragment()")
         val directions =
             DiaryListFragmentDirections.actionNavigationDiaryListFragmentToDiaryShowFragment(date)
         navigateFragment(NavigationCommand.To(directions))
     }
 
     private fun navigateWordSearchFragment() {
+        Log.d("20250714", "navigateWordSearchFragment()")
         val directions =
             DiaryListFragmentDirections.actionNavigationDiaryListFragmentToWordSearchFragment()
         navigateFragment(NavigationCommand.To(directions))
     }
 
     private fun navigateStartYearMonthPickerDialog(newestYear: Year, oldestYear: Year) {
+        Log.d("20250714", "navigateStartYearMonthPickerDialog()")
         val directions =
             DiaryListFragmentDirections.actionDiaryListFragmentToStartYearMonthPickerDialog(
                 newestYear,
@@ -256,6 +264,7 @@ class DiaryListFragment :
     }
 
     private fun navigateDiaryDeleteDialog(date: LocalDate, imageUri: Uri?) {
+        Log.d("20250714", "navigateDiaryDeleteDialog")
         val directions =
             DiaryListFragmentDirections.actionDiaryListFragmentToDiaryDeleteDialog(date, imageUri)
         navigateFragment(NavigationCommand.To(directions))

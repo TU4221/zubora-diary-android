@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.RecyclerView
+import com.websarva.wings.android.zuboradiary.R
 import com.websarva.wings.android.zuboradiary.ui.model.AppMessage
 import com.websarva.wings.android.zuboradiary.domain.model.ThemeColor
 import com.websarva.wings.android.zuboradiary.databinding.FragmentWordSearchBinding
@@ -27,6 +28,8 @@ import java.time.LocalDate
 
 @AndroidEntryPoint
 class WordSearchFragment : BaseFragment<FragmentWordSearchBinding>() {
+
+    override val destinationId = R.id.navigation_word_search_fragment
 
     // ViewModel
     // MEMO:委譲プロパティの委譲先(viewModels())の遅延初期化により"Field is never assigned."と警告が表示される。

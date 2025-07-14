@@ -66,7 +66,7 @@ abstract class BaseFragment<T: ViewBinding> : LoggingFragment() {
     internal val themeColor
         get() = settingsViewModel.themeColor.requireValue()
 
-    private var destinationId = 0 // MEMO:Int型は遅延初期化不可
+    internal abstract val destinationId: Int
     private val currentDestinationId: Int get() {
         val navDestination = navController.currentDestination
         return checkNotNull(navDestination).id
@@ -158,8 +158,7 @@ abstract class BaseFragment<T: ViewBinding> : LoggingFragment() {
         super.onViewCreated(view, savedInstanceState)
 
         navController = NavHostFragment.findNavController(this)
-        navBackStackEntry = checkNotNull(navController.currentBackStackEntry)
-        destinationId = currentDestinationId
+        navBackStackEntry = navController.getBackStackEntry(destinationId)
 
         initializeFragmentResultReceiver()
         setUpViewModelEvent()
@@ -182,6 +181,7 @@ abstract class BaseFragment<T: ViewBinding> : LoggingFragment() {
 
     private fun <R> setUpFragmentResultReceiverInternal(key: String, block: (R) -> Unit) {
         val savedStateHandle = navBackStackEntry.savedStateHandle
+        Log.d("20250714", "navBackStackEntry:$navBackStackEntry, savedStateHandle: $savedStateHandle")
         val result = savedStateHandle.getStateFlow(key, null)
         launchAndRepeatOnViewLifeCycleStarted {
             result.filterNotNull().collectLatest { value: R ->
@@ -264,6 +264,7 @@ abstract class BaseFragment<T: ViewBinding> : LoggingFragment() {
     internal fun navigateFragment(command: NavigationCommand) {
         mainViewModel ?: return
 
+        Log.d("20250714", "canNavigateFragment:$canNavigateFragment")
         if (!canNavigateFragment) {
             mainViewModel!!.onFragmentNavigationFailed(command)
             return
