@@ -3,7 +3,7 @@ package com.websarva.wings.android.zuboradiary.domain.usecase.uri
 import android.util.Log
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.data.repository.UriRepository
-import com.websarva.wings.android.zuboradiary.domain.exception.uri.EnsurePersistentAccessUriFailedException
+import com.websarva.wings.android.zuboradiary.domain.exception.uri.TakePersistableUriPermissionFailedException
 import com.websarva.wings.android.zuboradiary.domain.usecase.DefaultUseCaseResult
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 
@@ -30,21 +30,21 @@ import com.websarva.wings.android.zuboradiary.utils.createLogTag
 //       - 既存データのマイグレーション方法（もしあれば）。
 //       - サムネイルのキャッシュ管理（不要になったサムネイルの削除ロジックなど）。
 //       - 元画像へのフルアクセスが必要な場合のフォールバック（例: 高解像度表示時）。
-internal class TakeUriPermissionUseCase(
+internal class TakePersistableUriPermissionUseCase(
     private val uriRepository: UriRepository
 ) {
 
     private val logTag = createLogTag()
 
     operator fun invoke(uriString: String): DefaultUseCaseResult<Unit> {
-        val logMsg = "Uri権限取得_"
+        val logMsg = "URIの永続的権限取得_"
         Log.i(logTag, "${logMsg}開始_$uriString")
 
         return try {
-            uriRepository.takePersistablePermission(uriString)
+            uriRepository.takePersistableUriPermission(uriString)
             Log.i(logTag, "${logMsg}完了")
             UseCaseResult.Success(Unit)
-        } catch (e: EnsurePersistentAccessUriFailedException) {
+        } catch (e: TakePersistableUriPermissionFailedException) {
             Log.e(logTag, "${logMsg}失敗", e)
             UseCaseResult.Failure(e)
         }

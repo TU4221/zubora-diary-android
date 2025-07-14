@@ -21,8 +21,8 @@ import com.websarva.wings.android.zuboradiary.domain.usecase.diary.ShouldFetchWe
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.ShouldRequestDiaryFetchConfirmationUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.ShouldRequestExitWithoutDiarySavingConfirmationUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.ShouldRequestWeatherInfoConfirmationUseCase
-import com.websarva.wings.android.zuboradiary.domain.usecase.uri.ReleaseUriPermissionUseCase
-import com.websarva.wings.android.zuboradiary.domain.usecase.uri.TakeUriPermissionUseCase
+import com.websarva.wings.android.zuboradiary.domain.usecase.uri.ReleasePersistableUriPermissionUseCase
+import com.websarva.wings.android.zuboradiary.domain.usecase.uri.TakePersistableUriPermissionUseCase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -100,13 +100,13 @@ internal object DiaryUseCaseModule {
     @Provides
     fun provideSaveDiaryUseCase(
         diaryRepository: DiaryRepository,
-        takeUriPermissionUseCase: TakeUriPermissionUseCase,
-        releaseUriPermissionUseCase: ReleaseUriPermissionUseCase,
+        takePersistableUriPermissionUseCase: TakePersistableUriPermissionUseCase,
+        releasePersistableUriPermissionUseCase: ReleasePersistableUriPermissionUseCase,
     ): SaveDiaryUseCase {
         return SaveDiaryUseCase(
             diaryRepository,
-            takeUriPermissionUseCase,
-            releaseUriPermissionUseCase
+            takePersistableUriPermissionUseCase,
+            releasePersistableUriPermissionUseCase
         )
     }
 
@@ -114,11 +114,11 @@ internal object DiaryUseCaseModule {
     @Provides
     fun provideDeleteDiaryUseCase(
         diaryRepository: DiaryRepository,
-        releaseUriPermissionUseCase: ReleaseUriPermissionUseCase,
+        releasePersistableUriPermissionUseCase: ReleasePersistableUriPermissionUseCase,
     ): DeleteDiaryUseCase {
         return DeleteDiaryUseCase(
             diaryRepository,
-            releaseUriPermissionUseCase
+            releasePersistableUriPermissionUseCase
         )
     }
 

@@ -17,7 +17,7 @@ import com.websarva.wings.android.zuboradiary.domain.usecase.settings.SavePassco
 import com.websarva.wings.android.zuboradiary.domain.usecase.settings.SaveReminderNotificationSettingUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.settings.SaveThemeColorSettingUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.settings.SaveWeatherInfoFetchSettingUseCase
-import com.websarva.wings.android.zuboradiary.domain.usecase.uri.ReleaseAllUriPermissionUseCase
+import com.websarva.wings.android.zuboradiary.domain.usecase.uri.ReleaseAllPersistableUriPermissionUseCase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -31,18 +31,18 @@ internal object SettingsUseCaseModule {
     @Provides
     fun provideDeleteAllDataUseCase(
         diaryRepository: DiaryRepository,
-        releaseAllUriPermissionUseCase: ReleaseAllUriPermissionUseCase
+        releaseAllPersistableUriPermissionUseCase: ReleaseAllPersistableUriPermissionUseCase
     ): DeleteAllDataUseCase {
-        return DeleteAllDataUseCase(diaryRepository, releaseAllUriPermissionUseCase)
+        return DeleteAllDataUseCase(diaryRepository, releaseAllPersistableUriPermissionUseCase)
     }
 
     @Singleton
     @Provides
     fun provideDeleteAllDiariesUseCase(
         diaryRepository: DiaryRepository,
-        releaseAllUriPermissionUseCase: ReleaseAllUriPermissionUseCase
+        releaseAllPersistableUriPermissionUseCase: ReleaseAllPersistableUriPermissionUseCase
     ): DeleteAllDiariesUseCase {
-        return DeleteAllDiariesUseCase(diaryRepository, releaseAllUriPermissionUseCase)
+        return DeleteAllDiariesUseCase(diaryRepository, releaseAllPersistableUriPermissionUseCase)
     }
 
     @Singleton

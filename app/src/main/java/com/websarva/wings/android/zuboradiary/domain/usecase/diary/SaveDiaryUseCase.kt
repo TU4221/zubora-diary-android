@@ -8,15 +8,15 @@ import com.websarva.wings.android.zuboradiary.domain.exception.diary.SaveDiaryFa
 import com.websarva.wings.android.zuboradiary.domain.model.Diary
 import com.websarva.wings.android.zuboradiary.domain.model.DiaryItemTitleSelectionHistoryItem
 import com.websarva.wings.android.zuboradiary.domain.usecase.DefaultUseCaseResult
-import com.websarva.wings.android.zuboradiary.domain.usecase.uri.ReleaseUriPermissionUseCase
-import com.websarva.wings.android.zuboradiary.domain.usecase.uri.TakeUriPermissionUseCase
+import com.websarva.wings.android.zuboradiary.domain.usecase.uri.ReleasePersistableUriPermissionUseCase
+import com.websarva.wings.android.zuboradiary.domain.usecase.uri.TakePersistableUriPermissionUseCase
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import java.time.LocalDate
 
 internal class SaveDiaryUseCase(
     private val diaryRepository: DiaryRepository,
-    private val takeUriPermissionUseCase: TakeUriPermissionUseCase,
-    private val releaseUriPermissionUseCase: ReleaseUriPermissionUseCase,
+    private val takePersistableUriPermissionUseCase: TakePersistableUriPermissionUseCase,
+    private val releasePersistableUriPermissionUseCase: ReleasePersistableUriPermissionUseCase,
 ) {
 
     private val logTag = createLogTag()
@@ -101,7 +101,7 @@ internal class SaveDiaryUseCase(
     private suspend fun releaseLoadedImageUriPermission(
         uriString: String?
     ) {
-        val logMsg = "画像Uri権限取消_"
+        val logMsg = "画像URIの永続的権限解放_"
 
         if (uriString == null) {
             Log.i(logTag, "${logMsg}不要")
@@ -109,7 +109,7 @@ internal class SaveDiaryUseCase(
         }
 
         Log.i(logTag, "${logMsg}開始")
-        when (val result = releaseUriPermissionUseCase(uriString)) {
+        when (val result = releasePersistableUriPermissionUseCase(uriString)) {
             is UseCaseResult.Success -> {
                 // 処理なし
             }
@@ -125,7 +125,7 @@ internal class SaveDiaryUseCase(
     private fun takeSavedImageUriPermission(
         uriString: String?
     ) {
-        val logMsg = "画像Uri権限確保_"
+        val logMsg = "画像URIの永続的権限取得_"
 
         if (uriString == null) {
             Log.i(logTag, "${logMsg}不要")
@@ -133,7 +133,7 @@ internal class SaveDiaryUseCase(
         }
 
         Log.i(logTag, "${logMsg}開始")
-        when (val result = takeUriPermissionUseCase(uriString)) {
+        when (val result = takePersistableUriPermissionUseCase(uriString)) {
             is UseCaseResult.Success -> {
                 // 処理なし
             }

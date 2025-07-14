@@ -2,41 +2,41 @@ package com.websarva.wings.android.zuboradiary.data.repository
 
 import android.net.Uri
 import com.websarva.wings.android.zuboradiary.data.uri.UriPermissionDataSource
-import com.websarva.wings.android.zuboradiary.data.uri.UriPermissionOperationException
-import com.websarva.wings.android.zuboradiary.domain.exception.uri.EnsurePersistentAccessUriFailedException
-import com.websarva.wings.android.zuboradiary.domain.exception.uri.RevokePersistentAccessAllUriFailedException
-import com.websarva.wings.android.zuboradiary.domain.exception.uri.RevokePersistentAccessUriFailedException
+import com.websarva.wings.android.zuboradiary.data.uri.PersistableUriPermissionOperationException
+import com.websarva.wings.android.zuboradiary.domain.exception.uri.TakePersistableUriPermissionFailedException
+import com.websarva.wings.android.zuboradiary.domain.exception.uri.ReleaseAllPersistableUriPermissionFailedException
+import com.websarva.wings.android.zuboradiary.domain.exception.uri.ReleasePersistableUriPermissionFailedException
 
 internal class UriRepository (
     private val dataSource: UriPermissionDataSource
 ) {
 
-    @Throws(EnsurePersistentAccessUriFailedException::class)
-    fun takePersistablePermission(uriString: String) {
+    @Throws(TakePersistableUriPermissionFailedException::class)
+    fun takePersistableUriPermission(uriString: String) {
         val uri = Uri.parse(uriString)
         try {
-            dataSource.takePersistablePermission(uri)
-        } catch (e: UriPermissionOperationException) {
-            throw EnsurePersistentAccessUriFailedException(uri, e)
+            dataSource.takePersistableUriPermission(uri)
+        } catch (e: PersistableUriPermissionOperationException) {
+            throw TakePersistableUriPermissionFailedException(uri, e)
         }
     }
 
-    @Throws(RevokePersistentAccessUriFailedException::class)
-    fun releasePersistablePermission(uriString: String) {
+    @Throws(ReleasePersistableUriPermissionFailedException::class)
+    fun releasePersistableUriPermission(uriString: String) {
         val uri = Uri.parse(uriString)
         try {
-            dataSource.releasePersistablePermission(uri)
-        } catch (e: UriPermissionOperationException) {
-            throw RevokePersistentAccessUriFailedException(uri, e)
+            dataSource.releasePersistableUriPermission(uri)
+        } catch (e: PersistableUriPermissionOperationException) {
+            throw ReleasePersistableUriPermissionFailedException(uri, e)
         }
     }
 
-    @Throws(RevokePersistentAccessAllUriFailedException::class)
-    fun releaseAllPersistablePermission() {
+    @Throws(ReleaseAllPersistableUriPermissionFailedException::class)
+    fun releaseAllPersistableUriPermission() {
         try {
-            dataSource.releaseAllPersistablePermission()
-        } catch (e: UriPermissionOperationException) {
-            throw RevokePersistentAccessAllUriFailedException(e)
+            dataSource.releaseAllPersistableUriPermission()
+        } catch (e: PersistableUriPermissionOperationException) {
+            throw ReleaseAllPersistableUriPermissionFailedException(e)
         }
     }
 }

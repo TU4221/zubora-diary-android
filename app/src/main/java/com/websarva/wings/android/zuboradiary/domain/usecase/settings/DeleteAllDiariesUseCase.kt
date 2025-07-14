@@ -5,12 +5,12 @@ import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.data.repository.DiaryRepository
 import com.websarva.wings.android.zuboradiary.domain.exception.diary.DeleteAllDiariesFailedException
 import com.websarva.wings.android.zuboradiary.domain.usecase.exception.DeleteAllDiariesUseCaseException
-import com.websarva.wings.android.zuboradiary.domain.usecase.uri.ReleaseAllUriPermissionUseCase
+import com.websarva.wings.android.zuboradiary.domain.usecase.uri.ReleaseAllPersistableUriPermissionUseCase
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 
 internal class DeleteAllDiariesUseCase(
     private val diaryRepository: DiaryRepository,
-    private val releaseAllUriPermissionUseCase: ReleaseAllUriPermissionUseCase,
+    private val releaseAllPersistableUriPermissionUseCase: ReleaseAllPersistableUriPermissionUseCase,
 ) {
 
     private val logTag = createLogTag()
@@ -45,18 +45,18 @@ internal class DeleteAllDiariesUseCase(
         Log.i(logTag, "${logMsg}完了")
     }
 
-    @Throws(DeleteAllDiariesUseCaseException.RevokeAllPersistentAccessUriFailed::class)
+    @Throws(DeleteAllDiariesUseCaseException.ReleaseAllPersistableUriPermissionFailed::class)
     private fun releaseAllImageUriPermission() {
-        val logMsg = "全画像Uri権限解放_"
+        val logMsg = "全永続的URI権限解放_"
         Log.i(logTag, "${logMsg}開始")
 
-        when (val result = releaseAllUriPermissionUseCase()) {
+        when (val result = releaseAllPersistableUriPermissionUseCase()) {
             is UseCaseResult.Success -> {
                 // 処理なし
             }
             is UseCaseResult.Failure -> {
                 throw DeleteAllDiariesUseCaseException
-                    .RevokeAllPersistentAccessUriFailed(result.exception)
+                    .ReleaseAllPersistableUriPermissionFailed(result.exception)
             }
         }
 

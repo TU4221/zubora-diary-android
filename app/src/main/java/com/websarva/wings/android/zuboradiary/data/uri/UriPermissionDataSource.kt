@@ -12,23 +12,23 @@ internal class UriPermissionDataSource (
 
     private val logTag = createLogTag()
 
-    @Throws(UriPermissionOperationException::class)
-    private fun executeUriPermissionOperation(
+    @Throws(PersistableUriPermissionOperationException::class)
+    private fun executePersistableUriPermissionOperation(
         operation: () -> Unit
     ) {
         try {
             operation()
         } catch (e: SecurityException) {
-            throw UriPermissionOperationException(e)
+            throw PersistableUriPermissionOperationException(e)
         }
     }
 
-    @Throws(UriPermissionOperationException::class)
-    fun takePersistablePermission(uri: Uri) {
+    @Throws(PersistableUriPermissionOperationException::class)
+    fun takePersistableUriPermission(uri: Uri) {
         val logMsg = "端末写真使用権限取得"
         Log.i(logTag, "${logMsg}_開始=$uri")
 
-        executeUriPermissionOperation {
+        executePersistableUriPermissionOperation {
             resolver.takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION)
         }
 
@@ -36,8 +36,8 @@ internal class UriPermissionDataSource (
     }
 
     // MEMO:Uri先のファイルを削除すると、登録されていたUriPermissionも同時に削除される。
-    @Throws(UriPermissionOperationException::class)
-    fun releasePersistablePermission(uri: Uri) {
+    @Throws(PersistableUriPermissionOperationException::class)
+    fun releasePersistableUriPermission(uri: Uri) {
         val logMsg = "端末写真使用権限解放"
         Log.i(logTag, "${logMsg}_開始_URI=$uri")
 
@@ -48,7 +48,7 @@ internal class UriPermissionDataSource (
             val targetUriString = uri.toString()
 
             if (permittedUriString == targetUriString) {
-                executeUriPermissionOperation {
+                executePersistableUriPermissionOperation {
                     resolver.releasePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION)
                 }
                 break
@@ -58,15 +58,15 @@ internal class UriPermissionDataSource (
         Log.i(logTag, "${logMsg}_完了")
     }
 
-    @Throws(UriPermissionOperationException::class)
-    fun releaseAllPersistablePermission() {
+    @Throws(PersistableUriPermissionOperationException::class)
+    fun releaseAllPersistableUriPermission() {
         val logMsg = "端末写真使用権限全解放"
         Log.i(logTag, "${logMsg}_開始")
 
         val permissionList = resolver.persistedUriPermissions
         for (uriPermission in permissionList) {
             val uri = uriPermission.uri
-            executeUriPermissionOperation {
+            executePersistableUriPermissionOperation {
                 resolver.releasePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION)
             }
         }

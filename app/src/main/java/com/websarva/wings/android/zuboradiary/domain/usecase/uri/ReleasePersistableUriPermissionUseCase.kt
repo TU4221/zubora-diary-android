@@ -5,11 +5,11 @@ import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.data.repository.DiaryRepository
 import com.websarva.wings.android.zuboradiary.data.repository.UriRepository
 import com.websarva.wings.android.zuboradiary.domain.exception.diary.CheckDiaryImageUriUsedFailedException
-import com.websarva.wings.android.zuboradiary.domain.exception.uri.RevokePersistentAccessUriFailedException
+import com.websarva.wings.android.zuboradiary.domain.exception.uri.ReleasePersistableUriPermissionFailedException
 import com.websarva.wings.android.zuboradiary.domain.usecase.DefaultUseCaseResult
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 
-internal class ReleaseUriPermissionUseCase(
+internal class ReleasePersistableUriPermissionUseCase(
     private val uriRepository: UriRepository,
     private val diaryRepository: DiaryRepository
 ) {
@@ -17,7 +17,7 @@ internal class ReleaseUriPermissionUseCase(
     private val logTag = createLogTag()
 
     suspend operator fun invoke(uriString: String): DefaultUseCaseResult<Unit> {
-        val logMsg = "Uri権限解放_"
+        val logMsg = "URIの永続的権限解放_"
         Log.i(logTag, "${logMsg}開始")
 
         try {
@@ -29,8 +29,8 @@ internal class ReleaseUriPermissionUseCase(
         }
 
         try {
-            uriRepository.releasePersistablePermission(uriString)
-        } catch (e: RevokePersistentAccessUriFailedException) {
+            uriRepository.releasePersistableUriPermission(uriString)
+        } catch (e: ReleasePersistableUriPermissionFailedException) {
             Log.e(logTag, "${logMsg}失敗", e)
             return UseCaseResult.Failure(e)
         }

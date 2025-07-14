@@ -744,7 +744,7 @@ internal class SettingsViewModel @Inject constructor(
                     is DeleteAllDiariesUseCaseException.DeleteAllDiariesFailed -> {
                         emitAppMessageEvent(SettingsAppMessage.AllDiaryDeleteFailure)
                     }
-                    is DeleteAllDiariesUseCaseException.RevokeAllPersistentAccessUriFailed -> {
+                    is DeleteAllDiariesUseCaseException.ReleaseAllPersistableUriPermissionFailed -> {
                         // 処理なし
                     }
                 }
@@ -771,7 +771,7 @@ internal class SettingsViewModel @Inject constructor(
                     is DeleteAllDataUseCaseException.DeleteAllDataFailed -> {
                         emitAppMessageEvent(SettingsAppMessage.AllDataDeleteFailure)
                     }
-                    is DeleteAllDataUseCaseException.RevokeAllPersistentAccessUriFailed -> {
+                    is DeleteAllDataUseCaseException.ReleaseAllPersistableUriPermissionFailed -> {
                         // 処理なし
                     }
                 }

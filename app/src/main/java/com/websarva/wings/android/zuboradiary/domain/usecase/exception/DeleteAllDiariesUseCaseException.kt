@@ -12,10 +12,10 @@ internal sealed class DeleteAllDiariesUseCaseException(
         cause
     )
 
-    class RevokeAllPersistentAccessUriFailed(
+    class ReleaseAllPersistableUriPermissionFailed(
         cause: Throwable
     ) : DeleteAllDiariesUseCaseException(
-        "全てのUriの永続的なアクセス権の取り消しに失敗しました。",
+        "全ての永続的URI権限の解放に失敗しました。",
         cause
     )
 }

@@ -3,7 +3,7 @@ package com.websarva.wings.android.zuboradiary.domain.exception.uri
 import android.net.Uri
 import com.websarva.wings.android.zuboradiary.domain.exception.DomainException
 
-internal class EnsurePersistentAccessUriFailedException(
+internal class TakePersistableUriPermissionFailedException(
     uri: Uri,
     cause: Throwable
-) : DomainException("Uri '$uri' の永続的なアクセス権の確保に失敗しました。", cause)
+) : DomainException("URI '$uri' の永続的URI権限の取得に失敗しました。", cause)
