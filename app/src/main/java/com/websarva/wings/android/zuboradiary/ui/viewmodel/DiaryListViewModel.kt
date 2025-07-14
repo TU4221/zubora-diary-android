@@ -7,7 +7,6 @@ import com.websarva.wings.android.zuboradiary.domain.exception.DomainException
 import com.websarva.wings.android.zuboradiary.domain.model.DiaryListItem
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.CheckUnloadedDiariesExistUseCase
-import com.websarva.wings.android.zuboradiary.domain.usecase.diary.CountDiariesUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.DeleteDiaryUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.FetchNewestDiaryUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.FetchOldestDiaryUseCase
@@ -36,7 +35,6 @@ import javax.inject.Inject
 
 @HiltViewModel
 internal class DiaryListViewModel @Inject constructor(
-    private val countDiariesUseCase: CountDiariesUseCase,
     private val fetchDiaryListUseCase: FetchDiaryListUseCase,
     private val checkUnloadedDiariesExistUseCase: CheckUnloadedDiariesExistUseCase,
     private val deleteDiaryUseCase: DeleteDiaryUseCase,
@@ -232,8 +230,7 @@ internal class DiaryListViewModel @Inject constructor(
         if (uiState.value == DiaryListState.Idle) {
             updateUiState(DiaryListState.LoadingDiaryInfo)
             try {
-                val numSavedDiaries = countSavedDiaries()
-                if (numSavedDiaries >= 1) loadNewDiaryList(currentList)
+                loadNewDiaryList(currentList)
             } catch (e: CancellationException) {
                 Log.i(logTag, "${logMsg}_キャンセル", e)
                 updateUiStateForDiaryList(currentList)
@@ -246,18 +243,14 @@ internal class DiaryListViewModel @Inject constructor(
         } else {
             if (shouldUpdateDiaryList) {
                 shouldUpdateDiaryList = false
-                if (currentList.isNotEmpty) updateDiaryList(currentList)
+                if (currentList.isEmpty) {
+                    loadNewDiaryList(currentList)
+                } else {
+                    updateDiaryList(currentList)
+                }
             }
         }
         Log.i(logTag, "${logMsg}_完了")
-    }
-
-    @Throws(DomainException::class)
-    private suspend fun countSavedDiaries(): Int{
-        when (val result = countDiariesUseCase()) {
-            is UseCaseResult.Success -> return result.value
-            is UseCaseResult.Failure -> throw result.exception
-        }
     }
 
     private suspend fun loadNewDiaryList(currentList: DiaryYearMonthList) {
