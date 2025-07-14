@@ -29,7 +29,6 @@ internal class SaveDiaryUseCase(
         val logMsg = "日記保存_"
         Log.i(logTag, "${logMsg}開始")
 
-
         try {
             val loadedDate = loadedDiary?.date
             saveDiary(
@@ -37,16 +36,23 @@ internal class SaveDiaryUseCase(
                 diaryItemTitleSelectionHistoryItemList,
                 loadedDate
             )
-
-            val savedImageUriString = diary.imageUriString
-            val loadedImageUriString = loadedDiary?.imageUriString
-            manageImageUriPermission(
-                savedImageUriString,
-                loadedImageUriString
-            )
-        } catch (e: DomainException) {
+        } catch (e: SaveDiaryFailedException) {
             Log.e(logTag, "${logMsg}失敗", e)
             return UseCaseResult.Failure(e)
+        }
+
+        try {
+            releaseLoadedImageUriPermission(loadedDiary?.imageUriString)
+        } catch (e: DomainException) {
+            // MEMO:Uri権限の取り消しに失敗しても日記保存がメインの為、成功とみなす。
+            Log.e(logTag, "${logMsg}Uri権限取消失敗", e)
+        }
+
+        try {
+            takeSavedImageUriPermission(diary.imageUriString)
+        } catch (e: DomainException) {
+            Log.e(logTag, "${logMsg}Uri権限確保失敗", e)
+            // MEMO:Uri権限の確保に失敗しても日記保存がメインの為、成功とみなす。
         }
 
         Log.e(logTag, "${logMsg}完了")
@@ -64,18 +70,21 @@ internal class SaveDiaryUseCase(
         Log.i(logTag, "${logMsg}開始")
 
         val saveDate = diary.date
-        if (shouldDeleteLoadedDateDiary(saveDate, loadedDate)) {
-            diaryRepository
-                .deleteAndSaveDiary(
-                    requireNotNull(loadedDate),
-                    diary,
-                    diaryItemTitleSelectionHistoryItemList
-                )
-        } else {
-            diaryRepository
-                .saveDiary(diary, diaryItemTitleSelectionHistoryItemList)
+        try {
+            if (shouldDeleteLoadedDateDiary(saveDate, loadedDate)) {
+                diaryRepository
+                    .deleteAndSaveDiary(
+                        requireNotNull(loadedDate),
+                        diary,
+                        diaryItemTitleSelectionHistoryItemList
+                    )
+            } else {
+                diaryRepository
+                    .saveDiary(diary, diaryItemTitleSelectionHistoryItemList)
+            }
+        } catch (e: SaveDiaryFailedException) {
+            throw e
         }
-
 
         Log.i(logTag, "${logMsg}完了")
     }
@@ -91,32 +100,48 @@ internal class SaveDiaryUseCase(
     }
 
 
-    private suspend fun manageImageUriPermission(
-        savedImageUriString: String?,
-        loadedImageUriString: String?
+    @Throws(DomainException::class)
+    private suspend fun releaseLoadedImageUriPermission(
+        uriString: String?
     ) {
-        val logMsg = "画像Uri権限管理_"
+        val logMsg = "画像Uri権限取消_"
         Log.i(logTag, "${logMsg}開始")
 
-        if (loadedImageUriString != null) {
-            when (val result = releaseUriPermissionUseCase(loadedImageUriString)) {
-                is UseCaseResult.Success -> {
-                    // 処理なし
-                }
-                is UseCaseResult.Failure -> {
-                    throw result.exception
-                }
+        if (uriString == null) {
+            Log.i(logTag, "${logMsg}不要")
+            return
+        }
+
+        when (val result = releaseUriPermissionUseCase(uriString)) {
+            is UseCaseResult.Success -> {
+                // 処理なし
+            }
+            is UseCaseResult.Failure -> {
+                throw result.exception
             }
         }
 
-        if (savedImageUriString != null) {
-            when (val result = takeUriPermissionUseCase(savedImageUriString)) {
-                is UseCaseResult.Success -> {
-                    // 処理なし
-                }
-                is UseCaseResult.Failure -> {
-                    throw result.exception
-                }
+        Log.i(logTag, "${logMsg}完了")
+    }
+
+    @Throws(DomainException::class)
+    private fun takeSavedImageUriPermission(
+        uriString: String?
+    ) {
+        val logMsg = "画像Uri権限確保_"
+        Log.i(logTag, "${logMsg}開始")
+
+        if (uriString == null) {
+            Log.i(logTag, "${logMsg}不要")
+            return
+        }
+
+        when (val result = takeUriPermissionUseCase(uriString)) {
+            is UseCaseResult.Success -> {
+                // 処理なし
+            }
+            is UseCaseResult.Failure -> {
+                throw result.exception
             }
         }
 
