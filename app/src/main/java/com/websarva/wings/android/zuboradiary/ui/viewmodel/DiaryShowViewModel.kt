@@ -94,8 +94,8 @@ internal class DiaryShowViewModel @Inject constructor(
         get() = diaryStateFlow.getItemStateFlow(ItemNumber(4)).comment.asStateFlow()
     val item5Comment
         get() = diaryStateFlow.getItemStateFlow(ItemNumber(5)).comment.asStateFlow()
-    val picturePath
-        get() = diaryStateFlow.picturePath.asStateFlow()
+    val imageUri
+        get() = diaryStateFlow.imageUri.asStateFlow()
     val log
         get() = diaryStateFlow.log.asStateFlow()
 
@@ -130,9 +130,9 @@ internal class DiaryShowViewModel @Inject constructor(
         if (uiState.value != DiaryShowState.LoadSuccess) return
 
         val date = diaryStateFlow.date.requireValue()
-        val picturePath = diaryStateFlow.picturePath.value
+        val imageUri = diaryStateFlow.imageUri.value
         viewModelScope.launch {
-            val parameters = DiaryDeleteParameters(date, picturePath)
+            val parameters = DiaryDeleteParameters(date, imageUri)
             emitViewModelEvent(
                 DiaryShowEvent.NavigateDiaryDeleteDialog(parameters)
             )
@@ -239,10 +239,10 @@ internal class DiaryShowViewModel @Inject constructor(
         Log.i(logTag, "${logMsg}_開始")
 
         val date = diaryStateFlow.date.requireValue()
-        val picturePath  = diaryStateFlow.picturePath.value?.toString() ?: ""
+        val imageUriString  = diaryStateFlow.imageUri.value?.toString()
 
         updateUiState(DiaryShowState.Deleting)
-        when (val result = deleteDiaryUseCase(date, picturePath)) {
+        when (val result = deleteDiaryUseCase(date, imageUriString)) {
             is UseCaseResult.Success -> {
                 Log.i(logTag, "${logMsg}_完了")
                 navigatePreviousFragment(date)

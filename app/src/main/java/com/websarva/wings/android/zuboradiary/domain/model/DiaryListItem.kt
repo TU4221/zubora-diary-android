@@ -5,5 +5,5 @@ import java.time.LocalDate
 internal data class DiaryListItem(
     val date: LocalDate,
     val title: String,
-    val imageUriString: String
+    val imageUriString: String?
 )

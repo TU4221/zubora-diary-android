@@ -17,7 +17,7 @@ internal sealed class DiaryEditState : UiState, Parcelable {
     data object AddingItem : DiaryEditState() // 日記項目追加中
     data object DeletingItem : DiaryEditState() // 日記項目削除中
 
-    data object SelectingPicture : DiaryEditState() // 日記写真選択中
+    data object SelectingImage : DiaryEditState() // 日記写真選択中
 
     data object CheckingWeatherAvailability : DiaryEditState() // 天気情報取得可否確認中
     data object FetchingWeatherInfo : DiaryEditState() // 天気情報取得中

@@ -27,7 +27,7 @@ internal class DiaryStateFlow(scope: CoroutineScope, handle: SavedStateHandle) {
         private const val SAVED_CONDITION_STATE_KEY = "condition"
         private const val SAVED_TITLE_STATE_KEY = "title"
         private const val SAVED_NUM_VISIBLE_ITEMS_STATE_KEY = "numVisibleItems"
-        private const val SAVED_PICTURE_PATH_STATE_KEY = "picturePath"
+        private const val SAVED_IMAGE_URI_STATE_KEY = "imageUri"
         private const val SAVED_LOG_STATE_KEY = "log"
     }
 
@@ -55,10 +55,10 @@ internal class DiaryStateFlow(scope: CoroutineScope, handle: SavedStateHandle) {
 
     private val items = Array(MAX_ITEMS) { i -> DiaryItemStateFlow(scope, handle, i + 1)}
 
-    private val initialPicturePath = null
-    val picturePath =
+    private val initialImageUri = null
+    val imageUri =
         MutableStateFlow<Uri?>( // MEMO:初期化時Uri有無が未定の為、null許容型とする。
-            handle[SAVED_PICTURE_PATH_STATE_KEY] ?: initialPicturePath
+            handle[SAVED_IMAGE_URI_STATE_KEY] ?: initialImageUri
         )
 
     private val initialLog = null
@@ -86,8 +86,8 @@ internal class DiaryStateFlow(scope: CoroutineScope, handle: SavedStateHandle) {
         numVisibleItems.onEach {
             handle[SAVED_NUM_VISIBLE_ITEMS_STATE_KEY] = it
         }.launchIn(scope)
-        picturePath.onEach {
-            handle[SAVED_PICTURE_PATH_STATE_KEY] = it
+        imageUri.onEach {
+            handle[SAVED_IMAGE_URI_STATE_KEY] = it
         }.launchIn(scope)
         log.onEach {
             handle[SAVED_LOG_STATE_KEY] = it
@@ -104,7 +104,7 @@ internal class DiaryStateFlow(scope: CoroutineScope, handle: SavedStateHandle) {
         for (item in items) {
             item.initialize()
         }
-        picturePath.value = initialPicturePath
+        imageUri.value = initialImageUri
         log.value = initialLog
     }
 
@@ -146,7 +146,7 @@ internal class DiaryStateFlow(scope: CoroutineScope, handle: SavedStateHandle) {
         }
         this.numVisibleItems.value = numVisibleItems
 
-        picturePath.value = Uri.parse(diary.picturePath)
+        imageUri.value = diary.imageUriString?.let { Uri.parse(it) }
         log.value = diary.log
     }
 
@@ -168,7 +168,7 @@ internal class DiaryStateFlow(scope: CoroutineScope, handle: SavedStateHandle) {
             items[3].comment.value.trim(),
             items[4].title.value.trim(),
             items[4].comment.value.trim(),
-            picturePath.value.toString()
+            imageUri.value?.toString()
             )
     }
 

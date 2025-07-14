@@ -51,5 +51,6 @@ internal data class DiaryEntity(
     @ColumnInfo(name = "item_5_comment")
     val item5Comment: String,
 
-    val picturePath: String
+    @ColumnInfo(name = "image_uri")
+    val imageUriString: String?
 )

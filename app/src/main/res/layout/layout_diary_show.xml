@@ -146,29 +146,29 @@
 
         <TextView
             style="@style/AppTextViewStyle"
-            android:id="@+id/text_attached_picture"
+            android:id="@+id/text_attached_image"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/layout_diary_show_large_margin_top"
             android:layout_gravity="center_vertical"
-            android:text="@string/layout_diary_show_attached_picture"
+            android:text="@string/layout_diary_show_attached_image"
             android:textAppearance="@style/AppTextViewTextAppearance"
             android:textSize="@dimen/layout_diary_show_small_text_size"
-            android:visibility="@{viewModel.picturePath == null ? View.GONE : View.VISIBLE}" />
+            android:visibility="@{viewModel.imageUri == null ? View.GONE : View.VISIBLE}" />
 
         <!-- MEMO:本レイアウトはincludeタグ使用先でスクロール機能を用意してもらう前提のため、警告"partially hidden in layout"
                   を"tools:ignore="VisualLintBounds""で無視する。 -->
         <ImageView
             style="@style/AppImageViewStyle"
-            android:id="@+id/image_attached_picture"
+            android:id="@+id/image_attached_image"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/layout_diary_show_small_margin_top"
             android:layout_gravity="center"
             android:scaleType="fitCenter"
             android:adjustViewBounds="true"
-            android:contentDescription="@string/layout_diary_show_attached_picture_description"
-            android:visibility="@{viewModel.picturePath == null ? View.GONE : View.VISIBLE}"
+            android:contentDescription="@string/layout_diary_show_attached_image_description"
+            android:visibility="@{viewModel.imageUri == null ? View.GONE : View.VISIBLE}"
             tools:ignore="VisualLintBounds" />
 
         <TextView

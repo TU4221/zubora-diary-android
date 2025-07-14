@@ -38,11 +38,11 @@ internal class SaveDiaryUseCase(
                 loadedDate
             )
 
-            val savedPicturePath = diary.picturePath
-            val loadedPicturePath = loadedDiary?.picturePath
-            managePictureUriPermission(
-                savedPicturePath,
-                loadedPicturePath
+            val savedImageUriString = diary.imageUriString
+            val loadedImageUriString = loadedDiary?.imageUriString
+            manageImageUriPermission(
+                savedImageUriString,
+                loadedImageUriString
             )
         } catch (e: DomainException) {
             Log.e(logTag, "${logMsg}失敗", e)
@@ -91,15 +91,15 @@ internal class SaveDiaryUseCase(
     }
 
 
-    private suspend fun managePictureUriPermission(
-        savedPicturePath: String,
-        loadedPicturePath: String?
+    private suspend fun manageImageUriPermission(
+        savedImageUriString: String?,
+        loadedImageUriString: String?
     ) {
         val logMsg = "画像Uri権限管理_"
         Log.i(logTag, "${logMsg}開始")
 
-        if (loadedPicturePath?.isNotEmpty() == true) {
-            when (val result = releaseUriPermissionUseCase(loadedPicturePath)) {
+        if (loadedImageUriString != null) {
+            when (val result = releaseUriPermissionUseCase(loadedImageUriString)) {
                 is UseCaseResult.Success -> {
                     // 処理なし
                 }
@@ -109,8 +109,8 @@ internal class SaveDiaryUseCase(
             }
         }
 
-        if (savedPicturePath.isNotEmpty()) {
-            when (val result = takeUriPermissionUseCase(savedPicturePath)) {
+        if (savedImageUriString != null) {
+            when (val result = takeUriPermissionUseCase(savedImageUriString)) {
                 is UseCaseResult.Success -> {
                     // 処理なし
                 }

@@ -78,7 +78,7 @@
                 app:argType="java.time.LocalDate" />
 
             <argument
-                android:name="picture_uri"
+                android:name="image_uri"
                 app:argType="android.net.Uri"
                 app:nullable="true" />
         </dialog>
@@ -377,8 +377,8 @@
                 app:destination="@id/navigation_diary_item_delete_dialog"/>
 
             <action
-                android:id="@+id/action_diary_edit_fragment_to_diary_picture_delete_dialog"
-                app:destination="@id/navigation_diary_picture_delete_dialog"/>
+                android:id="@+id/action_diary_edit_fragment_to_diary_image_delete_dialog"
+                app:destination="@id/navigation_diary_image_delete_dialog"/>
 
             <action
                 android:id="@+id/action_diary_edit_fragment_to_exit_without_diary_saving_confirmation_dialog"
@@ -451,8 +451,8 @@
         </dialog>
 
         <dialog
-            android:id="@+id/navigation_diary_picture_delete_dialog"
-            android:name="com.websarva.wings.android.zuboradiary.ui.fragment.dialog.DiaryPictureDeleteDialogFragment">
+            android:id="@+id/navigation_diary_image_delete_dialog"
+            android:name="com.websarva.wings.android.zuboradiary.ui.fragment.dialog.DiaryImageDeleteDialogFragment">
         </dialog>
 
         <dialog

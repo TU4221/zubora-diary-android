@@ -15,7 +15,7 @@ import com.websarva.wings.android.zuboradiary.domain.exception.diary.DeleteDiary
 import com.websarva.wings.android.zuboradiary.domain.exception.diary.CheckDiaryExistenceFailedException
 import com.websarva.wings.android.zuboradiary.domain.exception.diary.FetchDiaryListFailedException
 import com.websarva.wings.android.zuboradiary.domain.exception.diary.FetchDiaryFailedException
-import com.websarva.wings.android.zuboradiary.domain.exception.diary.CheckDiaryPicturePathUsedFailedException
+import com.websarva.wings.android.zuboradiary.domain.exception.diary.CheckDiaryImageUriUsedFailedException
 import com.websarva.wings.android.zuboradiary.domain.exception.diary.SaveDiaryFailedException
 import com.websarva.wings.android.zuboradiary.domain.exception.diary.CountWordSearchResultFailedException
 import com.websarva.wings.android.zuboradiary.domain.exception.diary.DeleteAllDataFailedException
@@ -71,13 +71,13 @@ internal class DiaryRepository (
         }
     }
 
-    @Throws(CheckDiaryPicturePathUsedFailedException::class)
-    suspend fun existsPicturePath(uriString: String): Boolean {
+    @Throws(CheckDiaryImageUriUsedFailedException::class)
+    suspend fun existsImageUri(uriString: String): Boolean {
         return withContext(Dispatchers.IO) {
             try {
-                diaryDataSource.existsPicturePath(uriString)
+                diaryDataSource.existsImageUri(uriString)
             } catch (e: DataBaseAccessException) {
-                throw CheckDiaryPicturePathUsedFailedException(uriString, e)
+                throw CheckDiaryImageUriUsedFailedException(uriString, e)
             }
         }
     }

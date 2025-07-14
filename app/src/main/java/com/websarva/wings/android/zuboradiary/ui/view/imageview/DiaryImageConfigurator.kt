@@ -9,11 +9,11 @@ import com.websarva.wings.android.zuboradiary.R
 import com.websarva.wings.android.zuboradiary.domain.model.ThemeColor
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 
-internal class DiaryPictureConfigurator {
+internal class DiaryImageConfigurator {
 
     private val logTag = createLogTag()
 
-    fun setUpPictureOnDiary(imageView: ImageView, uri: Uri?, themeColor: ThemeColor) {
+    fun setUpImageOnDiary(imageView: ImageView, uri: Uri?, themeColor: ThemeColor) {
         if (uri == null) {
             setUpDefaultIconOnDiary(imageView, themeColor)
             return
@@ -22,7 +22,7 @@ internal class DiaryPictureConfigurator {
         val logMsg = "日記添付写真読込"
         try {
             Log.i(logTag, "${logMsg}_開始")
-            setUpPicture(imageView, uri)
+            setUpImage(imageView, uri)
             Log.i(logTag, "${logMsg}_完了")
         } catch (e: SecurityException) {
             Log.e(logTag, "${logMsg}_失敗", e)
@@ -44,7 +44,7 @@ internal class DiaryPictureConfigurator {
         return themeColor.getOnSurfaceVariantColor(context.resources)
     }
 
-    fun setUpPictureOnDiaryList(imageView: ImageView, uri: Uri?, themeColor: ThemeColor) {
+    fun setUpImageOnDiaryList(imageView: ImageView, uri: Uri?, themeColor: ThemeColor) {
         if (uri == null) {
             setUpDefaultIconOnDiaryList(imageView, themeColor)
             return
@@ -53,7 +53,7 @@ internal class DiaryPictureConfigurator {
         val logMsg = "日記リスト添付写真読込"
         try {
             Log.i(logTag, "${logMsg}_開始")
-            setUpPicture(imageView, uri)
+            setUpImage(imageView, uri)
             Log.i(logTag, "${logMsg}_完了")
         } catch (e: SecurityException) {
             Log.e(logTag, "${logMsg}_失敗", e)
@@ -88,8 +88,8 @@ internal class DiaryPictureConfigurator {
         imageView.setColorFilter(iconColor)
     }
 
-    private fun setUpPicture(imageView: ImageView, pictureUri: Uri) {
-        imageView.setImageURI(pictureUri)
+    private fun setUpImage(imageView: ImageView, uri: Uri) {
+        imageView.setImageURI(uri)
         imageView.colorFilter = null
     }
 }

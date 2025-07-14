@@ -187,7 +187,7 @@ class DiaryListFragment :
             onClickChildItemBackgroundButtonListener =
                 OnClickChildItemBackgroundButtonListener { item: DiaryDayListBaseItem ->
                     if (item !is DiaryDayListItem) throw IllegalStateException()
-                    mainViewModel.onDiaryListItemDeleteButtonClicked(item.date, item.picturePath)
+                    mainViewModel.onDiaryListItemDeleteButtonClicked(item.date, item.imageUri)
                 }
         }
 
@@ -258,9 +258,9 @@ class DiaryListFragment :
         navigateFragment(NavigationCommand.To(directions))
     }
 
-    private fun navigateDiaryDeleteDialog(date: LocalDate, pictureUri: Uri?) {
+    private fun navigateDiaryDeleteDialog(date: LocalDate, imageUri: Uri?) {
         val directions =
-            DiaryListFragmentDirections.actionDiaryListFragmentToDiaryDeleteDialog(date, pictureUri)
+            DiaryListFragmentDirections.actionDiaryListFragmentToDiaryDeleteDialog(date, imageUri)
         navigateFragment(NavigationCommand.To(directions))
     }
 

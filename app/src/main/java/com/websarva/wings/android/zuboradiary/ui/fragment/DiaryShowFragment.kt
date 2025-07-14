@@ -18,7 +18,7 @@ import com.websarva.wings.android.zuboradiary.domain.model.ItemNumber
 import com.websarva.wings.android.zuboradiary.domain.model.Weather
 import com.websarva.wings.android.zuboradiary.domain.model.ThemeColor
 import com.websarva.wings.android.zuboradiary.databinding.FragmentDiaryShowBinding
-import com.websarva.wings.android.zuboradiary.ui.view.imageview.DiaryPictureConfigurator
+import com.websarva.wings.android.zuboradiary.ui.view.imageview.DiaryImageConfigurator
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.DiaryDeleteDialogFragment
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.DiaryLoadingFailureDialogFragment
 import com.websarva.wings.android.zuboradiary.ui.model.event.DiaryShowEvent
@@ -67,7 +67,7 @@ internal class DiaryShowFragment : BaseFragment<FragmentDiaryShowBinding>() {
         setUpWeatherLayout()
         setUpConditionLayout()
         setUpItemLayout()
-        setUpPicture()
+        setUpImage()
         setUpLogLayout()
 
         val diaryDate = DiaryShowFragmentArgs.fromBundle(requireArguments()).date
@@ -245,29 +245,29 @@ internal class DiaryShowFragment : BaseFragment<FragmentDiaryShowBinding>() {
         }
     }
 
-    private fun setUpPicture() {
+    private fun setUpImage() {
         launchAndRepeatOnViewLifeCycleStarted {
-            mainViewModel.picturePath
+            mainViewModel.imageUri
                 .collectLatest { value: Uri? ->
                     // MEMO:添付画像がないときはnullとなり、デフォルト画像をセットする。
                     //      nullの時ImageView自体は非表示となるためデフォルト画像をセットする意味はないが、
                     //      クリアという意味合いでデフォルト画像をセットする。
-                    PicturePathObserver(
+                    ImageUriObserver(
                         themeColor,
-                        binding.includeDiaryShow.imageAttachedPicture
+                        binding.includeDiaryShow.imageAttachedImage
                     ).onChanged(value)
                 }
         }
     }
 
-    internal class PicturePathObserver(
+    internal class ImageUriObserver(
         private val themeColor: ThemeColor,
         private val imageView: ImageView
     ) {
 
         fun onChanged(value: Uri?) {
-            DiaryPictureConfigurator()
-                .setUpPictureOnDiary(
+            DiaryImageConfigurator()
+                .setUpImageOnDiary(
                     imageView,
                     value,
                     themeColor

@@ -62,9 +62,9 @@ internal class DiaryDataSource(
     }
 
     @Throws(DataBaseAccessException::class)
-    suspend fun existsPicturePath(uriString: String): Boolean {
+    suspend fun existsImageUri(uriString: String): Boolean {
         return executeSuspendDbOperation {
-            diaryDAO.existsPicturePath(uriString)
+            diaryDAO.existsImageUri(uriString)
         }
     }
 

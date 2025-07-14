@@ -38,7 +38,7 @@ internal class TakeUriPermissionUseCase(
 
     operator fun invoke(uriString: String): DefaultUseCaseResult<Unit> {
         val logMsg = "Uri権限取得_"
-        Log.i(logTag, "${logMsg}開始")
+        Log.i(logTag, "${logMsg}開始_$uriString")
 
         return try {
             uriRepository.takePersistablePermission(uriString)

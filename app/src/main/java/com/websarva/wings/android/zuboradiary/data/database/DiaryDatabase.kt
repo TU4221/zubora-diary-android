@@ -11,7 +11,7 @@ import java.time.LocalDate
         autoMigrations = {@AutoMigration(from = 3, to = 4, spec = DiaryDatabase.MyAutoMigration.class)})*/
 @Database(
     entities = [DiaryEntity::class, DiaryItemTitleSelectionHistoryItemEntity::class],
-    version = 1,
+    version = 5,
     exportSchema = false
 )
 internal abstract class DiaryDatabase : RoomDatabase() {

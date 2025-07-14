@@ -28,9 +28,9 @@ class DiaryListDeleteDialogFragment : BaseAlertDialogFragment() {
 
         val deleteDiaryDate =
             DiaryListDeleteDialogFragmentArgs.fromBundle(requireArguments()).date
-        val deleteDiaryPictureUri =
-            DiaryListDeleteDialogFragmentArgs.fromBundle(requireArguments()).pictureUri
-        val resultData = DiaryListItemDeleteResult(deleteDiaryDate, deleteDiaryPictureUri)
+        val deleteDiaryImageUri =
+            DiaryListDeleteDialogFragmentArgs.fromBundle(requireArguments()).imageUri
+        val resultData = DiaryListItemDeleteResult(deleteDiaryDate, deleteDiaryImageUri)
         setResult(KEY_RESULT, DialogResult.Positive(resultData))
     }
 

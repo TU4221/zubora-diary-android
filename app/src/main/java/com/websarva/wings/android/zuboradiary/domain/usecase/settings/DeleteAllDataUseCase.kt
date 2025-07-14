@@ -21,7 +21,7 @@ internal class DeleteAllDataUseCase(
 
         try {
             deleteAllData()
-            releaseAllPictureUriPermission()
+            releaseAllImageUriPermission()
         } catch (e: DeleteAllDataUseCaseException) {
             Log.e(logTag, "${logMsg}失敗", e)
             return UseCaseResult.Failure(e)
@@ -46,7 +46,7 @@ internal class DeleteAllDataUseCase(
     }
 
     @Throws(DeleteAllDataUseCaseException.RevokeAllPersistentAccessUriFailed::class)
-    private fun releaseAllPictureUriPermission() {
+    private fun releaseAllImageUriPermission() {
         val logMsg = "全画像Uri権限解放_"
         Log.i(logTag, "${logMsg}開始")
 

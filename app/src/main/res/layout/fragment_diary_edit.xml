@@ -305,12 +305,12 @@
                             android:orientation="horizontal">
 
                             <TextView
-                                android:id="@+id/text_attached_picture"
+                                android:id="@+id/text_attached_image"
                                 style="@style/AppTextViewStyle"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_gravity="center_vertical"
-                                android:text="@string/fragment_diary_edit_attached_picture"
+                                android:text="@string/fragment_diary_edit_attached_image"
                                 android:textAppearance="@style/AppTextViewTextAppearance"
                                 android:textSize="@dimen/fragment_diary_edit_text_size" />
 
@@ -324,15 +324,15 @@
                                 補足：三項演算子を使用してのalphaのリソース値は取得できなかった。
                             -->
                             <ImageButton
-                                android:id="@+id/image_button_attached_picture_delete"
+                                android:id="@+id/image_button_attached_image_delete"
                                 style="@style/AppImageButtonStyle"
                                 android:layout_width="@dimen/fragment_diary_edit_delete_button_layout_width"
                                 android:layout_height="@dimen/fragment_diary_edit_delete_button_layout_height"
                                 android:layout_gravity="center_vertical"
-                                android:contentDescription="@string/fragment_diary_edit_attached_picture_delete"
-                                android:src="@{viewModel.isPicturePathDeleteButtonClickable() ? @drawable/ic_delete_forever_24px : @drawable/ic_delete_forever_disabled_24px}"
-                                android:clickable="@{viewModel.isPicturePathDeleteButtonClickable()}"
-                                android:onClick="@{() -> viewModel.onAttachedPictureDeleteButtonClicked()}"/>
+                                android:contentDescription="@string/fragment_diary_edit_attached_image_delete"
+                                android:src="@{viewModel.isImageDeleteButtonClickable() ? @drawable/ic_delete_forever_24px : @drawable/ic_delete_forever_disabled_24px}"
+                                android:clickable="@{viewModel.isImageDeleteButtonClickable()}"
+                                android:onClick="@{() -> viewModel.onAttachedImageDeleteButtonClicked()}"/>
 
                         </LinearLayout>
 
@@ -342,17 +342,17 @@
                             android:background="@drawable/diary_edit_image_bg_rounded_rectangle_image">
 
                             <ImageView
-                                android:id="@+id/image_attached_picture"
+                                android:id="@+id/image_attached_image"
                                 style="@style/AppImageViewStyle"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:layout_gravity="center"
-                                android:layout_margin="@dimen/fragment_diary_edit_picture_margin"
-                                android:contentDescription="@string/fragment_diary_edit_attached_picture_attachment"
+                                android:layout_margin="@dimen/fragment_diary_edit_image_margin"
+                                android:contentDescription="@string/fragment_diary_edit_attached_image_attachment"
                                 android:scaleType="fitCenter"
                                 android:adjustViewBounds="true"
                                 android:src="@drawable/diary_edit_image_ic_photo_library_24px"
-                                android:onClick="@{() -> viewModel.onAttachedPictureClicked()}"
+                                android:onClick="@{() -> viewModel.onAttachedImageClicked()}"
                                 tools:tint="?attr/colorOnSurfaceVariant" />
 
                         </FrameLayout>

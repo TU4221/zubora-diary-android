@@ -32,7 +32,7 @@ import com.websarva.wings.android.zuboradiary.ui.utils.requireValue
 import com.websarva.wings.android.zuboradiary.ui.fragment.DiaryShowFragment.ConditionObserver
 import com.websarva.wings.android.zuboradiary.ui.fragment.DiaryShowFragment.LogObserver
 import com.websarva.wings.android.zuboradiary.ui.fragment.DiaryShowFragment.NumVisibleItemsObserver
-import com.websarva.wings.android.zuboradiary.ui.fragment.DiaryShowFragment.PicturePathObserver
+import com.websarva.wings.android.zuboradiary.ui.fragment.DiaryShowFragment.ImageUriObserver
 import com.websarva.wings.android.zuboradiary.ui.fragment.DiaryShowFragment.Weather1Observer
 import com.websarva.wings.android.zuboradiary.ui.fragment.DiaryShowFragment.Weather2Observer
 import com.websarva.wings.android.zuboradiary.ui.fragment.common.RequiresBottomNavigation
@@ -554,11 +554,11 @@ class CalendarFragment :
             // MEMO:添付画像がないときはnullとなり、デフォルト画像をセットする。
             //      nullの時ImageView自体は非表示となるためデフォルト画像をセットする意味はないが、
             //      クリアという意味合いでデフォルト画像をセットする。
-            diaryShowViewModel.picturePath
+            diaryShowViewModel.imageUri
                 .collectLatest { value: Uri? ->
-                    PicturePathObserver(
+                    ImageUriObserver(
                         themeColor,
-                        binding.includeDiaryShow.imageAttachedPicture
+                        binding.includeDiaryShow.imageAttachedImage
                     ).onChanged(value)
                 }
         }

@@ -90,7 +90,7 @@ internal class DiaryEditViewModel @Inject constructor(
                     DiaryEditState.Deleting,
                     DiaryEditState.AddingItem,
                     DiaryEditState.DeletingItem,
-                    DiaryEditState.SelectingPicture,
+                    DiaryEditState.SelectingImage,
                     DiaryEditState.CheckingWeatherAvailability,
                     DiaryEditState.FetchingWeatherInfo -> true
 
@@ -242,21 +242,21 @@ internal class DiaryEditViewModel @Inject constructor(
                 DiaryEditState.FetchingWeatherInfo,
                 DiaryEditState.AddingItem,
                 DiaryEditState.DeletingItem,
-                DiaryEditState.SelectingPicture -> false
+                DiaryEditState.SelectingImage -> false
             }
         }.stateInDefault(
             viewModelScope,
             false
         )
 
-    val picturePath
-        get() = diaryStateFlow.picturePath.asStateFlow()
+    val imageUri
+        get() = diaryStateFlow.imageUri.asStateFlow()
 
-    val isPicturePathDeleteButtonClickable =
-        combine(uiState, picturePath) { state, picturePath ->
+    val isImageDeleteButtonClickable =
+        combine(uiState, imageUri) { state, imageUri ->
             return@combine when (state) {
                 DiaryEditState.Editing -> {
-                    picturePath != null
+                    imageUri != null
                 }
 
                 DiaryEditState.Idle,
@@ -269,7 +269,7 @@ internal class DiaryEditViewModel @Inject constructor(
                 DiaryEditState.FetchingWeatherInfo,
                 DiaryEditState.AddingItem,
                 DiaryEditState.DeletingItem,
-                DiaryEditState.SelectingPicture -> false
+                DiaryEditState.SelectingImage -> false
             }
         }.stateInDefault(
             viewModelScope,
@@ -286,7 +286,7 @@ internal class DiaryEditViewModel @Inject constructor(
                 DiaryEditState.Deleting,
                 DiaryEditState.CheckingWeatherAvailability,
                 DiaryEditState.FetchingWeatherInfo,
-                DiaryEditState.SelectingPicture -> true
+                DiaryEditState.SelectingImage -> true
 
                 DiaryEditState.Idle,
                 DiaryEditState.Editing,
@@ -371,8 +371,9 @@ internal class DiaryEditViewModel @Inject constructor(
 
         val loadedDiary = _loadedDiary.value ?: return
         val loadedDate = loadedDiary.date
-        val loadedPicturePath = Uri.parse(loadedDiary.picturePath)
-        val parameters = DiaryDeleteParameters(loadedDate, loadedPicturePath)
+        val loadedImageUri = loadedDiary.imageUriString?.let { Uri.parse(it) }
+
+        val parameters = DiaryDeleteParameters(loadedDate, loadedImageUri)
 
         viewModelScope.launch {
             emitViewModelEvent(
@@ -447,21 +448,21 @@ internal class DiaryEditViewModel @Inject constructor(
         }
     }
 
-    fun onAttachedPictureDeleteButtonClicked() {
+    fun onAttachedImageDeleteButtonClicked() {
         if (uiState.value != DiaryEditState.Editing) return
 
         viewModelScope.launch {
             emitViewModelEvent(
-                DiaryEditEvent.NavigateDiaryPictureDeleteDialog
+                DiaryEditEvent.NavigateDiaryImageDeleteDialog
             )
         }
     }
 
-    fun onAttachedPictureClicked() {
+    fun onAttachedImageClicked() {
         if (uiState.value != DiaryEditState.Editing) return
 
         viewModelScope.launch {
-            selectPicture()
+            selectImage()
         }
     }
 
@@ -541,9 +542,9 @@ internal class DiaryEditViewModel @Inject constructor(
 
     private fun onDiaryDeleteDialogPositiveResultReceived(parameters: DiaryDeleteParameters) {
         val loadedDate = parameters.loadedDate
-        val loadedPicturePath = parameters.loadedPicturePath
+        val loadedImageUri = parameters.loadedImageUri
         viewModelScope.launch {
-            deleteDiary(loadedDate, loadedPicturePath)
+            deleteDiary(loadedDate, loadedImageUri)
         }
     }
 
@@ -625,12 +626,12 @@ internal class DiaryEditViewModel @Inject constructor(
         }
     }
 
-    fun onDiaryPictureDeleteDialogResultReceived(result: DialogResult<Unit>) {
+    fun onDiaryImageDeleteDialogResultReceived(result: DialogResult<Unit>) {
         check(uiState.value == DiaryEditState.Editing)
 
         when (result) {
             is DialogResult.Positive<Unit> -> {
-                onDiaryPictureDeleteDialogPositiveResultReceived()
+                onDiaryImageDeleteDialogPositiveResultReceived()
             }
             DialogResult.Negative,
             DialogResult.Cancel -> {
@@ -639,8 +640,8 @@ internal class DiaryEditViewModel @Inject constructor(
         }
     }
 
-    private fun onDiaryPictureDeleteDialogPositiveResultReceived() {
-        deletePicturePath()
+    private fun onDiaryImageDeleteDialogPositiveResultReceived() {
+        deleteImageUri()
     }
 
     fun onExitWithoutDiarySavingDialogResultReceived(
@@ -679,10 +680,10 @@ internal class DiaryEditViewModel @Inject constructor(
     }
 
     // MEMO:未選択時null
-    fun onOpenDocumentResultPicturePathReceived(uri: Uri?) {
-        check(uiState.value == DiaryEditState.SelectingPicture)
+    fun onOpenDocumentResultImageUriReceived(uri: Uri?) {
+        check(uiState.value == DiaryEditState.SelectingImage)
 
-        updatePicturePath(uri)
+        updateImageUri(uri)
     }
 
     // Fragment状態処理
@@ -745,7 +746,7 @@ internal class DiaryEditViewModel @Inject constructor(
             DiaryEditState.Idle,
             DiaryEditState.Editing,
             DiaryEditState.LoadError,
-            DiaryEditState.SelectingPicture -> {
+            DiaryEditState.SelectingImage -> {
                 // MEMO:これらの状態はユーザーインタラクションが可能、または明確な結果を示しているため保存対象とする。
                 handle[SAVED_VIEW_MODEL_STATE_KEY] = state
             }
@@ -861,14 +862,14 @@ internal class DiaryEditViewModel @Inject constructor(
 
     private suspend fun deleteDiary(
         loadedDate: LocalDate,
-        loadedPicturePath: Uri?
+        loadedImageUri: Uri?
     ) {
         val logMsg = "日記削除_"
         Log.i(logTag, "${logMsg}開始")
 
         updateDiaryEditViewModelState(DiaryEditState.Deleting)
-        val loadedPictureUriString = loadedPicturePath?.toString() ?: ""
-        when (val result = deleteDiaryUseCase(loadedDate, loadedPictureUriString)) {
+        val loadedImageUriString = loadedImageUri?.toString()
+        when (val result = deleteDiaryUseCase(loadedDate, loadedImageUriString)) {
             is UseCaseResult.Success -> {
                 Log.i(logTag, "${logMsg}完了")
                 updateDiaryEditViewModelState(DiaryEditState.Idle)
@@ -1112,19 +1113,19 @@ internal class DiaryEditViewModel @Inject constructor(
         //updateViewModelIdleState() MEMO:deleteItem(itemNumber)でIdleStateに更新する為、不要。
     }
 
-    // 添付写真関係
-    private suspend fun selectPicture() {
-        updateDiaryEditViewModelState(DiaryEditState.SelectingPicture)
-        emitViewModelEvent(DiaryEditEvent.SelectPicture)
+    // 添付画像関係
+    private suspend fun selectImage() {
+        updateDiaryEditViewModelState(DiaryEditState.SelectingImage)
+        emitViewModelEvent(DiaryEditEvent.SelectImage)
     }
 
-    private fun updatePicturePath(uri: Uri?) {
-        diaryStateFlow.picturePath.value = uri
+    private fun updateImageUri(uri: Uri?) {
+        diaryStateFlow.imageUri.value = uri
         updateDiaryEditViewModelState(DiaryEditState.Editing)
     }
 
-    private fun deletePicturePath() {
-        diaryStateFlow.picturePath.value = null
+    private fun deleteImageUri() {
+        diaryStateFlow.imageUri.value = null
     }
 
     private suspend fun handleBackNavigation(

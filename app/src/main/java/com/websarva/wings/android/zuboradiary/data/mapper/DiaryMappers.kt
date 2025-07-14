@@ -25,7 +25,7 @@ internal fun DiaryEntity.toDomainModel(): Diary {
         item4Comment,
         item5Title,
         item5Comment,
-        picturePath
+        imageUriString
     )
 }
 
@@ -47,6 +47,6 @@ internal fun Diary.toDataModel(): DiaryEntity {
         item4Comment,
         item5Title,
         item5Comment,
-        picturePath
+        imageUriString
     )
 }

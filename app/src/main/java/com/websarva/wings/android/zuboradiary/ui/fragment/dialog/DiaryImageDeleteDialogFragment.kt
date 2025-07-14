@@ -4,19 +4,19 @@ import com.websarva.wings.android.zuboradiary.R
 import com.websarva.wings.android.zuboradiary.ui.fragment.RESULT_KEY_PREFIX
 import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
 
-class DiaryPictureDeleteDialogFragment : BaseAlertDialogFragment() {
+class DiaryImageDeleteDialogFragment : BaseAlertDialogFragment() {
 
     companion object {
         @JvmField
-        val KEY_RESULT = RESULT_KEY_PREFIX + DiaryPictureDeleteDialogFragment::class.java.name
+        val KEY_RESULT = RESULT_KEY_PREFIX + DiaryImageDeleteDialogFragment::class.java.name
     }
 
     override fun createTitle(): String {
-        return getString(R.string.dialog_diary_attached_picture_delete_title)
+        return getString(R.string.dialog_diary_attached_image_delete_title)
     }
 
     override fun createMessage(): String {
-        return getString(R.string.dialog_diary_attached_picture_delete_message)
+        return getString(R.string.dialog_diary_attached_image_delete_message)
     }
 
     override fun handleOnPositiveButtonClick() {

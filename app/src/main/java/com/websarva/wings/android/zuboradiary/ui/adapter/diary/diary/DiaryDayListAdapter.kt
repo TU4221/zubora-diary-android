@@ -7,7 +7,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.websarva.wings.android.zuboradiary.domain.model.ThemeColor
 import com.websarva.wings.android.zuboradiary.databinding.RowDiaryDayListBinding
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
-import com.websarva.wings.android.zuboradiary.ui.view.imageview.DiaryPictureConfigurator
+import com.websarva.wings.android.zuboradiary.ui.view.imageview.DiaryImageConfigurator
 import com.websarva.wings.android.zuboradiary.ui.adapter.LeftSwipeSimpleCallback.LeftSwipeViewHolder
 import com.websarva.wings.android.zuboradiary.ui.adapter.diary.DiaryDayListBaseAdapter
 import com.websarva.wings.android.zuboradiary.ui.adapter.diary.DiaryDayListBaseItem
@@ -57,7 +57,7 @@ internal class DiaryDayListAdapter(recyclerView: RecyclerView, themeColor: Theme
         if (item !is DiaryDayListItem) throw IllegalStateException()
 
         onBindTitle(holder, item)
-        onBindPicture(holder, item)
+        onBindImage(holder, item)
     }
 
     private fun onBindTitle(holder: DiaryDayListViewHolder, item: DiaryDayListItem) {
@@ -65,12 +65,12 @@ internal class DiaryDayListAdapter(recyclerView: RecyclerView, themeColor: Theme
         holder.binding.textTitle.text = title
     }
 
-    private fun onBindPicture(holder: DiaryDayListViewHolder, item: DiaryDayListItem) {
-        val pictureUri = item.picturePath
-        DiaryPictureConfigurator()
-            .setUpPictureOnDiaryList(
-                holder.binding.imageAttachedPicture,
-                pictureUri,
+    private fun onBindImage(holder: DiaryDayListViewHolder, item: DiaryDayListItem) {
+        val imageUri = item.imageUri
+        DiaryImageConfigurator()
+            .setUpImageOnDiaryList(
+                holder.binding.imageAttachedImage,
+                imageUri,
                 themeColor
             )
     }

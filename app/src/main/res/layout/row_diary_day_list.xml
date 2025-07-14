@@ -48,14 +48,14 @@
 
         <ImageView
             style="@style/DiaryDayListImageViewStyle"
-            android:id="@+id/image_attached_picture"
+            android:id="@+id/image_attached_image"
             android:layout_width="0dp"
             android:layout_height="@dimen/row_diary_day_list_image_height"
             android:layout_weight="1"
             android:layout_gravity="center_vertical"
             android:foregroundGravity="center_vertical"
             android:scaleType="fitXY"
-            android:contentDescription="@string/row_diary_day_list_picture_description"
+            android:contentDescription="@string/row_diary_day_list_image_description"
             android:src="@drawable/ic_image_24px"
             tools:tint="?attr/colorOnSecondaryContainer"/>
 

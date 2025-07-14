@@ -8,6 +8,6 @@ internal fun DiaryListItemData.toDomainModel(): DiaryListItem {
     return DiaryListItem(
         LocalDate.parse(date),
         title,
-        picturePath
+        imageUriString
     )
 }

@@ -18,8 +18,8 @@ internal interface DiaryDAO {
     @Query("SELECT EXISTS (SELECT 1 FROM diaries WHERE date = :date)")
     suspend fun existsDiary(date: String): Boolean
 
-    @Query("SELECT EXISTS (SELECT 1 FROM diaries WHERE picturePath = :uri)")
-    suspend fun existsPicturePath(uri: String): Boolean
+    @Query("SELECT EXISTS (SELECT 1 FROM diaries WHERE image_uri = :uriString)")
+    suspend fun existsImageUri(uriString: String): Boolean
 
     @Query("SELECT * FROM diaries WHERE date = :date")
     suspend fun selectDiary(date: String): DiaryEntity?
@@ -30,13 +30,13 @@ internal interface DiaryDAO {
     @Query("SELECT * FROM diaries ORDER BY date ASC LIMIT 1 OFFSET 0")
     suspend fun selectOldestDiary(): DiaryEntity?
 
-    @Query("SELECT date, title, picturePath FROM diaries ORDER BY date DESC LIMIT :num OFFSET :offset")
+    @Query("SELECT date, title, image_uri FROM diaries ORDER BY date DESC LIMIT :num OFFSET :offset")
     suspend fun selectDiaryListOrderByDateDesc(
         num: Int,
         offset: Int
     ): List<DiaryListItemData>
 
-    @Query("SELECT date, title, picturePath FROM diaries WHERE date < :startDate ORDER BY date DESC LIMIT :num OFFSET :offset")
+    @Query("SELECT date, title, image_uri FROM diaries WHERE date < :startDate ORDER BY date DESC LIMIT :num OFFSET :offset")
     suspend fun selectDiaryListOrderByDateDesc(
         num: Int,
         offset: Int,

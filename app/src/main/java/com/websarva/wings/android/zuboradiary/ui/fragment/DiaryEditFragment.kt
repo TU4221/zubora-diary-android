@@ -28,7 +28,7 @@ import com.websarva.wings.android.zuboradiary.databinding.FragmentDiaryEditBindi
 import com.websarva.wings.android.zuboradiary.domain.model.Diary
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import com.websarva.wings.android.zuboradiary.ui.model.AppMessage
-import com.websarva.wings.android.zuboradiary.ui.view.imageview.DiaryPictureConfigurator
+import com.websarva.wings.android.zuboradiary.ui.view.imageview.DiaryImageConfigurator
 import com.websarva.wings.android.zuboradiary.ui.view.edittext.TextInputConfigurator
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.DatePickerDialogFragment
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.DiaryDeleteDialogFragment
@@ -36,7 +36,7 @@ import com.websarva.wings.android.zuboradiary.ui.viewmodel.DiaryEditViewModel
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.DiaryItemDeleteDialogFragment
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.DiaryLoadingDialogFragment
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.DiaryLoadingFailureDialogFragment
-import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.DiaryPictureDeleteDialogFragment
+import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.DiaryImageDeleteDialogFragment
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.DiaryUpdateDialogFragment
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.ExitWithoutDiarySavingDialogFragment
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.WeatherInfoFetchDialogFragment
@@ -103,7 +103,7 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding>() {
     private val openDocumentResultLauncher = registerForActivityResult(
         ActivityResultContracts.OpenDocument()
     ) { uri: Uri? ->
-        mainViewModel.onOpenDocumentResultPicturePathReceived(uri)
+        mainViewModel.onOpenDocumentResultImageUriReceived(uri)
     }
 
     override fun createViewBinding(
@@ -128,7 +128,7 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding>() {
         setUpConditionInputField()
         setUpTitleInputField()
         setUpItemInputField()
-        setUpPictureInputField()
+        setUpImageInputField()
         setupEditText()
     }
 
@@ -141,7 +141,7 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding>() {
         setUpDatePickerDialogResultReceiver()
         setUpWeatherInfoFetchDialogResultReceiver()
         setUpDiaryItemDeleteDialogResultReceiver()
-        setUpDiaryPictureDeleteDialogResultReceiver()
+        setUpDiaryImageDeleteDialogResultReceiver()
         setUpExitWithoutDiarySavingDialogResultReceiver()
     }
 
@@ -250,11 +250,11 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding>() {
         }
     }
 
-    private fun setUpDiaryPictureDeleteDialogResultReceiver() {
+    private fun setUpDiaryImageDeleteDialogResultReceiver() {
         setUpDialogResultReceiver(
-            DiaryPictureDeleteDialogFragment.KEY_RESULT
+            DiaryImageDeleteDialogFragment.KEY_RESULT
         ) { result ->
-            mainViewModel.onDiaryPictureDeleteDialogResultReceived(result)
+            mainViewModel.onDiaryImageDeleteDialogResultReceived(result)
         }
     }
 
@@ -295,8 +295,8 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding>() {
             is DiaryEditEvent.NavigateDiaryItemDeleteDialog -> {
                 navigateDiaryItemDeleteDialog(event.parameters)
             }
-            DiaryEditEvent.NavigateDiaryPictureDeleteDialog -> {
-                navigateDiaryPictureDeleteDialog()
+            DiaryEditEvent.NavigateDiaryImageDeleteDialog -> {
+                navigateDiaryImageDeleteDialog()
             }
             is DiaryEditEvent.NavigateExitWithoutDiarySavingConfirmationDialog -> {
                 navigateExitWithoutDiarySavingConfirmationDialog(event.parameters)
@@ -316,7 +316,7 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding>() {
             is DiaryEditEvent.ItemAddition -> {
                 shouldTransitionItemMotionLayout = true
             }
-            is DiaryEditEvent.SelectPicture -> {
+            is DiaryEditEvent.SelectImage -> {
                 openDocumentResultLauncher.launch(arrayOf("image/*"))
             }
             is ViewModelEvent.NavigatePreviousFragment -> {
@@ -350,7 +350,7 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding>() {
                 || destination.id == R.id.navigation_diary_delete_dialog_for_diary_edit_fragment
                 || destination.id == R.id.navigation_diary_item_delete_dialog
                 || destination.id == R.id.navigation_diary_loading_dialog
-                || destination.id == R.id.navigation_diary_picture_delete_dialog
+                || destination.id == R.id.navigation_diary_image_delete_dialog
                 || destination.id == R.id.navigation_diary_update_dialog
                 || destination.id == R.id.navigation_weather_info_fetch_dialog) return
 
@@ -790,14 +790,14 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding>() {
         return numShowedItems
     }
 
-    private fun setUpPictureInputField() {
+    private fun setUpImageInputField() {
         launchAndRepeatOnViewLifeCycleStarted {
-            mainViewModel.picturePath
+            mainViewModel.imageUri
                 .collectLatest { value: Uri? ->
                     // MEMO:添付画像がないときはnullとなり、デフォルト画像をセットする。
-                    DiaryPictureConfigurator()
-                        .setUpPictureOnDiary(
-                            binding.imageAttachedPicture,
+                    DiaryImageConfigurator()
+                        .setUpImageOnDiary(
+                            binding.imageAttachedImage,
                             value,
                             themeColor
                         )
@@ -936,9 +936,9 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding>() {
         navigateFragment(NavigationCommand.To(directions))
     }
 
-    private fun navigateDiaryPictureDeleteDialog() {
+    private fun navigateDiaryImageDeleteDialog() {
         val directions =
-            DiaryEditFragmentDirections.actionDiaryEditFragmentToDiaryPictureDeleteDialog()
+            DiaryEditFragmentDirections.actionDiaryEditFragmentToDiaryImageDeleteDialog()
         navigateFragment(NavigationCommand.To(directions))
     }
 

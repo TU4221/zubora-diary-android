@@ -23,7 +23,7 @@ internal data class Diary(
     val item4Comment: String,
     val item5Title: String,
     val item5Comment: String,
-    val picturePath: String
+    val imageUriString: String?
 ) : Parcelable {
 
     /**
@@ -55,6 +55,6 @@ internal data class Diary(
                 this.item4Comment == other.item4Comment &&
                 this.item5Title == other.item5Title &&
                 this.item5Comment == other.item5Comment &&
-                this.picturePath == other.picturePath
+                this.imageUriString == other.imageUriString
     }
 }

@@ -19,14 +19,14 @@ internal class DeleteDiaryUseCase(
     // MEMO:日記表示、編集フラグメント以外からも削除できるように下記引数とする。
     suspend operator fun invoke(
         loadedDate: LocalDate,
-        loadedPicturePath: String
+        loadedImageUriString: String?
     ): UseCaseResult<Unit, DeleteDiaryUseCaseException> {
         val logMsg = "日記削除_"
         Log.i(logTag, "${logMsg}開始")
 
         try {
             deleteDiary(loadedDate)
-            if (loadedPicturePath.isNotEmpty()) releasePictureUriPermission(loadedPicturePath)
+            if (loadedImageUriString != null) releaseImageUriPermission(loadedImageUriString)
         } catch (e: DeleteDiaryUseCaseException) {
             Log.e(logTag, "${logMsg}失敗", e)
             return UseCaseResult.Failure(e)
@@ -51,13 +51,13 @@ internal class DeleteDiaryUseCase(
         Log.i(logTag, "${logMsg}完了")
     }
 
-    private suspend fun releasePictureUriPermission(
-        picturePath: String
+    private suspend fun releaseImageUriPermission(
+        imageUriString: String
     ) {
         val logMsg = "画像Uri権限解放_"
         Log.i(logTag, "${logMsg}開始")
 
-        when (val result = releaseUriPermissionUseCase(picturePath)) {
+        when (val result = releaseUriPermissionUseCase(imageUriString)) {
             is UseCaseResult.Success -> {
                 // 処理なし
             }

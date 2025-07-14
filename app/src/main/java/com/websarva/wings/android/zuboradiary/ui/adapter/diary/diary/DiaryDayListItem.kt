@@ -8,18 +8,13 @@ internal class DiaryDayListItem(listItem: DiaryListItem) :
     DiaryDayListBaseItem(listItem.date) {
 
     val title: String = listItem.title
-    val picturePath: Uri? =
-        if (listItem.imageUriString.isEmpty()) {
-            null
-        } else {
-            Uri.parse(listItem.imageUriString)
-        }
+    val imageUri: Uri? = listItem.imageUriString?.let { Uri.parse(it) }
 
     override fun areContentsTheSame(item: DiaryDayListBaseItem): Boolean {
         if (this === item) return true
         if (item !is DiaryDayListItem) return false
 
-        return title == item.title && picturePath == item.picturePath
+        return title == item.title && imageUri == item.imageUri
     }
 
     override fun equals(other: Any?): Boolean {
@@ -27,13 +22,13 @@ internal class DiaryDayListItem(listItem: DiaryListItem) :
         if (other !is DiaryDayListItem) return false
         if (!super.equals(other)) return false
 
-        return title == other.title && picturePath == other.picturePath
+        return title == other.title && imageUri == other.imageUri
     }
 
     override fun hashCode(): Int {
         var result = super.hashCode()
         result = 31 * result + title.hashCode()
-        result = 31 * result + (picturePath?.hashCode() ?: 0)
+        result = 31 * result + (imageUri?.hashCode() ?: 0)
         return result
     }
 }
