@@ -79,7 +79,7 @@ internal class DiaryListViewModel @Inject constructor(
     val diaryList
         get() = _diaryList.asStateFlow()
 
-    // MEMO:画面回転時の不要なアップデートを防ぐ
+    // MEMO:画面遷移、回転時の更新フラグ
     private val initialShouldUpdateDiaryList = false
     private var shouldUpdateDiaryList = initialShouldUpdateDiaryList
 
@@ -160,6 +160,7 @@ internal class DiaryListViewModel @Inject constructor(
         isLoadingOnScrolled = initialIsLoadingOnScrolled
     }
 
+    // Fragment状態処理
     fun onFragmentViewCreated() {
         val currentList = _diaryList.value
         cancelPreviousLoading()
@@ -167,6 +168,10 @@ internal class DiaryListViewModel @Inject constructor(
             viewModelScope.launch {
                 prepareDiaryList(currentList)
             }
+    }
+
+    fun onFragmentDestroyView() {
+        shouldUpdateDiaryList = true
     }
 
     // Fragmentからの結果受取処理
@@ -205,11 +210,6 @@ internal class DiaryListViewModel @Inject constructor(
                 // 処理なし
             }
         }
-    }
-
-    // Fragment状態処理
-    fun onNextFragmentNavigated() {
-        shouldUpdateDiaryList = true
     }
 
     private fun onDiaryDeleteDialogPositiveResultReceived(date: LocalDate, uri: Uri?) {

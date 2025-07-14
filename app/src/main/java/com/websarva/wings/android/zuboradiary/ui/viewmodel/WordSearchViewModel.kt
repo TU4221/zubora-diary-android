@@ -80,8 +80,7 @@ internal class WordSearchViewModel @Inject internal constructor(
     val numWordSearchResults
         get() = _numWordSearchResults.asStateFlow()
 
-    // MEMO:二重検索防止変数(previousSearchWord)で画面回転、画面再表示時の不要なアップデートを防いでいるが、
-    //      他Fragmentから戻ってきた時の更新ができなくなるため、下記変数にて対応できるようにする。
+    // MEMO:画面遷移、回転時の更新フラグ
     private val initialShouldUpdateWordSearchResultList = false
     private var shouldUpdateWordSearchResultList = initialShouldUpdateWordSearchResultList
 
@@ -191,7 +190,7 @@ internal class WordSearchViewModel @Inject internal constructor(
     }
 
     // Fragment状態処理
-    fun onNextFragmentNavigated() {
+    fun onFragmentDestroyView() {
         shouldUpdateWordSearchResultList = true
     }
 

@@ -193,7 +193,6 @@ class WordSearchFragment : BaseFragment<FragmentWordSearchBinding>() {
         val directions =
             WordSearchFragmentDirections.actionNavigationWordSearchFragmentToDiaryShowFragment(date)
         navigateFragment(NavigationCommand.To(directions))
-        mainViewModel.onNextFragmentNavigated()
     }
 
     override fun navigateAppMessageDialog(appMessage: AppMessage) {
@@ -205,5 +204,10 @@ class WordSearchFragment : BaseFragment<FragmentWordSearchBinding>() {
     private fun showKeyboard() {
         binding.editTextSearchWord.requestFocus()
         KeyboardManager().showKeyboard(binding.editTextSearchWord)
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        mainViewModel.onFragmentDestroyView()
     }
 }
