@@ -15,7 +15,8 @@ import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.websarva.wings.android.zuboradiary.ZuboraDiaryApplication
 import com.websarva.wings.android.zuboradiary.R
-import com.websarva.wings.android.zuboradiary.data.repository.DiaryRepository
+import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
+import com.websarva.wings.android.zuboradiary.domain.usecase.diary.DoesDiaryExistUseCase
 import com.websarva.wings.android.zuboradiary.ui.utils.isPostNotificationsGranted
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import dagger.assisted.Assisted
@@ -26,7 +27,7 @@ import java.time.LocalDate
 internal class ReminderNotificationWorker @AssistedInject constructor(
     @Assisted context: Context,
     @Assisted workerParams: WorkerParameters,
-    private val diaryRepository: DiaryRepository
+    private val doesDiaryExistUseCase: DoesDiaryExistUseCase
 ) : CoroutineWorker(context, workerParams) {
 
     private val logTag = createLogTag()
@@ -63,24 +64,16 @@ internal class ReminderNotificationWorker @AssistedInject constructor(
     override suspend fun doWork(): Result {
         val application = applicationContext as ZuboraDiaryApplication
         if (application.isAppInForeground) return Result.success()
-
-        val hasWriteTodayDiary: Boolean
-        try {
-            hasWriteTodayDiary = existsSavedTodayDiary()
-        } catch (e: Exception) {
-            Log.e(logTag, "本日付日記既存確認_失敗", e)
-            return Result.failure()
-        }
-        if (hasWriteTodayDiary) return Result.success()
+        if (existsSavedTodayDiary()) return Result.success()
 
         return showHeadsUpNotification()
     }
 
-    @Throws(Exception::class)
     private suspend fun existsSavedTodayDiary(): Boolean {
-        val result = diaryRepository.existsDiary(LocalDate.now())
-        Log.d(logTag, "existsSavedTodayDiary() = $result")
-        return result
+        return when (val result = doesDiaryExistUseCase(LocalDate.now())) {
+            is UseCaseResult.Success -> result.value
+            is UseCaseResult.Failure -> false
+        }
     }
 
     @SuppressLint("MissingPermission")
