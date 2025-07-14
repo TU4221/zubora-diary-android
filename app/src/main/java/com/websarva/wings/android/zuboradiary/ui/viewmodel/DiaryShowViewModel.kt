@@ -8,7 +8,6 @@ import com.websarva.wings.android.zuboradiary.domain.model.Weather
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.DeleteDiaryUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.FetchDiaryUseCase
-import com.websarva.wings.android.zuboradiary.domain.usecase.exception.DeleteDiaryUseCaseException
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import com.websarva.wings.android.zuboradiary.ui.model.DiaryShowAppMessage
 import com.websarva.wings.android.zuboradiary.ui.model.event.DiaryShowEvent
@@ -249,15 +248,8 @@ internal class DiaryShowViewModel @Inject constructor(
             }
             is UseCaseResult.Failure -> {
                 Log.e(logTag, "${logMsg}_失敗", result.exception)
-                when (result.exception) {
-                    is DeleteDiaryUseCaseException.DeleteDiaryFailed -> {
-                        updateUiState(DiaryShowState.LoadSuccess)
-                        emitAppMessageEvent(DiaryShowAppMessage.DiaryDeleteFailure)
-                    }
-                    is DeleteDiaryUseCaseException.RevokePersistentAccessUriFailed -> {
-                        navigatePreviousFragment(date)
-                    }
-                }
+                updateUiState(DiaryShowState.LoadSuccess)
+                emitAppMessageEvent(DiaryShowAppMessage.DiaryDeleteFailure)
             }
         }
     }

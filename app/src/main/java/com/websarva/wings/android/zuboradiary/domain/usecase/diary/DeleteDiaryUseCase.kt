@@ -3,8 +3,9 @@ package com.websarva.wings.android.zuboradiary.domain.usecase.diary
 import android.util.Log
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.data.repository.DiaryRepository
+import com.websarva.wings.android.zuboradiary.domain.exception.DomainException
 import com.websarva.wings.android.zuboradiary.domain.exception.diary.DeleteDiaryFailedException
-import com.websarva.wings.android.zuboradiary.domain.usecase.exception.DeleteDiaryUseCaseException
+import com.websarva.wings.android.zuboradiary.domain.usecase.DefaultUseCaseResult
 import com.websarva.wings.android.zuboradiary.domain.usecase.uri.ReleaseUriPermissionUseCase
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import java.time.LocalDate
@@ -20,22 +21,29 @@ internal class DeleteDiaryUseCase(
     suspend operator fun invoke(
         loadedDate: LocalDate,
         loadedImageUriString: String?
-    ): UseCaseResult<Unit, DeleteDiaryUseCaseException> {
+    ): DefaultUseCaseResult<Unit> {
         val logMsg = "日記削除_"
         Log.i(logTag, "${logMsg}開始")
 
         try {
             deleteDiary(loadedDate)
-            if (loadedImageUriString != null) releaseImageUriPermission(loadedImageUriString)
-        } catch (e: DeleteDiaryUseCaseException) {
+        } catch (e: DeleteDiaryFailedException) {
             Log.e(logTag, "${logMsg}失敗", e)
             return UseCaseResult.Failure(e)
+        }
+
+        try {
+            releaseImageUriPermission(loadedImageUriString)
+        } catch (e: DomainException) {
+            Log.e(logTag, "${logMsg}失敗", e)
+            // MEMO:Uri権限の取り消しに失敗しても日記保存がメインの為、成功とみなす。
         }
 
         Log.i(logTag, "${logMsg}完了")
         return UseCaseResult.Success(Unit)
     }
 
+    @Throws(DeleteDiaryFailedException::class)
     private suspend fun deleteDiary(
         date: LocalDate
     ) {
@@ -45,24 +53,30 @@ internal class DeleteDiaryUseCase(
         try {
             diaryRepository.deleteDiary(date)
         } catch (e: DeleteDiaryFailedException) {
-            throw DeleteDiaryUseCaseException.DeleteDiaryFailed(e)
+            throw e
         }
 
         Log.i(logTag, "${logMsg}完了")
     }
 
+    @Throws(DomainException::class)
     private suspend fun releaseImageUriPermission(
-        imageUriString: String
+        uriString: String?
     ) {
         val logMsg = "画像Uri権限解放_"
-        Log.i(logTag, "${logMsg}開始")
 
-        when (val result = releaseUriPermissionUseCase(imageUriString)) {
+        if (uriString == null) {
+            Log.i(logTag, "${logMsg}不要")
+            return
+        }
+
+        Log.i(logTag, "${logMsg}開始")
+        when (val result = releaseUriPermissionUseCase(uriString)) {
             is UseCaseResult.Success -> {
                 // 処理なし
             }
             is UseCaseResult.Failure -> {
-                throw DeleteDiaryUseCaseException.RevokePersistentAccessUriFailed(result.exception)
+                throw result.exception
             }
         }
 

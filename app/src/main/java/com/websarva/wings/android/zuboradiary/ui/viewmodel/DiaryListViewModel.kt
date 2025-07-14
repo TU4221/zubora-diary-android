@@ -12,7 +12,6 @@ import com.websarva.wings.android.zuboradiary.domain.usecase.diary.DeleteDiaryUs
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.FetchNewestDiaryUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.FetchOldestDiaryUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.FetchDiaryListUseCase
-import com.websarva.wings.android.zuboradiary.domain.usecase.exception.DeleteDiaryUseCaseException
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import com.websarva.wings.android.zuboradiary.ui.model.DiaryListAppMessage
 import com.websarva.wings.android.zuboradiary.ui.adapter.diary.diary.DiaryDayList
@@ -424,15 +423,8 @@ internal class DiaryListViewModel @Inject constructor(
             }
             is UseCaseResult.Failure -> {
                 Log.e(logTag, "${logMsg}_失敗", result.exception)
-                when (result.exception) {
-                    is DeleteDiaryUseCaseException.DeleteDiaryFailed -> {
-                        updateUiStateForDiaryList(currentList)
-                        emitAppMessageEvent(DiaryListAppMessage.DiaryDeleteFailure)
-                    }
-                    is DeleteDiaryUseCaseException.RevokePersistentAccessUriFailed -> {
-                        updateDiaryList(currentList)
-                    }
-                }
+                updateUiStateForDiaryList(currentList)
+                emitAppMessageEvent(DiaryListAppMessage.DiaryDeleteFailure)
             }
         }
     }

@@ -21,7 +21,6 @@ import com.websarva.wings.android.zuboradiary.domain.usecase.diary.ShouldFetchWe
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.ShouldRequestDiaryFetchConfirmationUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.ShouldRequestExitWithoutDiarySavingConfirmationUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.ShouldRequestWeatherInfoConfirmationUseCase
-import com.websarva.wings.android.zuboradiary.domain.usecase.exception.DeleteDiaryUseCaseException
 import com.websarva.wings.android.zuboradiary.domain.usecase.settings.IsWeatherInfoFetchEnabledUseCase
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import com.websarva.wings.android.zuboradiary.ui.model.DiaryEditAppMessage
@@ -869,7 +868,7 @@ internal class DiaryEditViewModel @Inject constructor(
 
         updateDiaryEditViewModelState(DiaryEditState.Deleting)
         val loadedImageUriString = loadedImageUri?.toString()
-        when (val result = deleteDiaryUseCase(loadedDate, loadedImageUriString)) {
+        when (deleteDiaryUseCase(loadedDate, loadedImageUriString)) {
             is UseCaseResult.Success -> {
                 Log.i(logTag, "${logMsg}完了")
                 updateDiaryEditViewModelState(DiaryEditState.Idle)
@@ -881,23 +880,9 @@ internal class DiaryEditViewModel @Inject constructor(
                 )
             }
             is UseCaseResult.Failure -> {
-                when (result.exception) {
-                    is DeleteDiaryUseCaseException.DeleteDiaryFailed -> {
-                        Log.e(logTag, "${logMsg}失敗")
-                        updateDiaryEditViewModelState(DiaryEditState.Editing)
-                        emitAppMessageEvent(DiaryEditAppMessage.DiaryDeleteFailure)
-                    }
-                    is DeleteDiaryUseCaseException.RevokePersistentAccessUriFailed -> {
-                        Log.i(logTag, "${logMsg}完了(Uri開放失敗)")
-                        updateDiaryEditViewModelState(DiaryEditState.Idle)
-                        emitViewModelEvent(
-                            DiaryEditEvent
-                                .NavigatePreviousFragmentOnDiaryDelete(
-                                    FragmentResult.Some(loadedDate)
-                                )
-                        )
-                    }
-                }
+                Log.e(logTag, "${logMsg}失敗")
+                updateDiaryEditViewModelState(DiaryEditState.Editing)
+                emitAppMessageEvent(DiaryEditAppMessage.DiaryDeleteFailure)
             }
         }
     }
