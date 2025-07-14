@@ -335,7 +335,7 @@ internal class WordSearchViewModel @Inject internal constructor(
         } catch (e: CancellationException) {
             Log.i(logTag, "${logMsg}_キャンセル", e)
             updateUiStateForResultList(currentResultList)
-        } catch (e: Exception) {
+        } catch (e: DomainException) {
             Log.e(logTag, "${logMsg}_失敗", e)
             _wordSearchResultList.value = currentResultList
             updateUiStateForResultList(currentResultList)
