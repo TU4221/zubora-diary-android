@@ -3,7 +3,10 @@ package com.websarva.wings.android.zuboradiary.ui.viewmodel
 import android.util.Log
 import androidx.lifecycle.viewModelScope
 import com.websarva.wings.android.zuboradiary.domain.model.ItemNumber
-import com.websarva.wings.android.zuboradiary.data.repository.DiaryRepository
+import com.websarva.wings.android.zuboradiary.domain.exception.diary.FetchDiaryItemTitleSelectionHistoryFailedException
+import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
+import com.websarva.wings.android.zuboradiary.domain.usecase.diary.DeleteDiaryItemTitleSelectionHistoryItemUseCase
+import com.websarva.wings.android.zuboradiary.domain.usecase.diary.FetchDiaryItemTitleSelectionHistoryUseCase
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import com.websarva.wings.android.zuboradiary.ui.model.DiaryItemTitleEditAppMessage
 import com.websarva.wings.android.zuboradiary.ui.adapter.diaryitemtitle.SelectionHistoryList
@@ -12,17 +15,16 @@ import com.websarva.wings.android.zuboradiary.ui.model.event.DiaryItemTitleEditE
 import com.websarva.wings.android.zuboradiary.ui.model.state.DiaryItemTitleEditState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.stateIn
 import javax.inject.Inject
 
 @HiltViewModel
 internal class DiaryItemTitleEditViewModel @Inject constructor(
-    private val diaryRepository: DiaryRepository
+    private val fetchDiaryItemTitleSelectionHistoryUseCase: FetchDiaryItemTitleSelectionHistoryUseCase,
+    private val deleteDiaryItemTitleSelectionHistoryItemUseCase: DeleteDiaryItemTitleSelectionHistoryItemUseCase
 ) : BaseViewModel<DiaryItemTitleEditEvent, DiaryItemTitleEditAppMessage, DiaryItemTitleEditState>(
     DiaryItemTitleEditState.Idle
 ) {
@@ -40,8 +42,6 @@ internal class DiaryItemTitleEditViewModel @Inject constructor(
                 viewModelScope,
                 false
             )
-
-    private val maxLoadedItemTitles = 50
 
     private val initialItemNumber: ItemNumber? = null
     private val _itemNumber = MutableStateFlow(initialItemNumber)
@@ -80,19 +80,25 @@ internal class DiaryItemTitleEditViewModel @Inject constructor(
         Log.i(logTag, "${logMsg}_開始")
 
         itemTitleSelectionHistoryList =
-            diaryRepository
-                .fetchDiaryItemTitleSelectionHistory(maxLoadedItemTitles, 0).catch {
-                    emitAppMessageEvent(DiaryItemTitleEditAppMessage.ItemTitleHistoryLoadingFailure)
+            fetchDiaryItemTitleSelectionHistoryUseCase().value
+                .catch {
+                    when (it) {
+                        is FetchDiaryItemTitleSelectionHistoryFailedException -> {
+                            emitAppMessageEvent(
+                                DiaryItemTitleEditAppMessage.ItemTitleHistoryLoadingFailure
+                            )
+                        }
+                        else -> throw it
+                    }
                 }.map { list ->
                     SelectionHistoryList(
                         list.map { item ->
                             SelectionHistoryListItem(item)
                         }
                     )
-                }.stateIn(
-                    scope = viewModelScope,
-                    started = SharingStarted.WhileSubscribed(5000),
-                    initialValue = initialItemTitleSelectionHistoryList
+                }.stateInDefault(
+                    viewModelScope,
+                    initialItemTitleSelectionHistoryList
                 )
     }
 
@@ -101,7 +107,7 @@ internal class DiaryItemTitleEditViewModel @Inject constructor(
         _itemTitle.value = itemTitle
     }
 
-    suspend fun deleteDiaryItemTitleSelectionHistoryItem(deletePosition: Int): Boolean {
+    suspend fun deleteDiaryItemTitleSelectionHistoryItem(deletePosition: Int) {
         require(deletePosition >= 0)
 
         val logMsg = "日記項目タイトル選択履歴アイテム削除"
@@ -113,15 +119,16 @@ internal class DiaryItemTitleEditViewModel @Inject constructor(
 
         val deleteItem = currentList.itemList[deletePosition]
         val deleteTitle = deleteItem.title
-        try {
-            diaryRepository.deleteDiaryItemTitleSelectionHistoryItem(deleteTitle)
-        } catch (e: Exception) {
-            Log.e(logTag, "${logMsg}_失敗", e)
-            emitAppMessageEvent(DiaryItemTitleEditAppMessage.ItemTitleHistoryDeleteFailure)
-            return false
+        val result = deleteDiaryItemTitleSelectionHistoryItemUseCase(deleteTitle)
+        when (result) {
+            is UseCaseResult.Success -> {
+                Log.i(logTag, "${logMsg}_完了")
+                // 処理なし
+            }
+            is UseCaseResult.Failure -> {
+                Log.e(logTag, "${logMsg}_失敗")
+                emitAppMessageEvent(DiaryItemTitleEditAppMessage.ItemTitleHistoryDeleteFailure)
+            }
         }
-
-        Log.i(logTag, "${logMsg}_完了")
-        return true
     }
 }

@@ -25,6 +25,7 @@ import com.websarva.wings.android.zuboradiary.domain.exception.diary.FetchWordSe
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import java.time.LocalDate
@@ -236,22 +237,23 @@ internal class DiaryRepository (
         }
     }
 
-    @Throws(FetchDiaryItemTitleSelectionHistoryFailedException::class)
+    /**
+     * @throws FetchDiaryItemTitleSelectionHistoryFailedException
+     */
     fun fetchDiaryItemTitleSelectionHistory(
         num: Int, offset: Int
     ): Flow<List<DiaryItemTitleSelectionHistoryItem>> {
         require(num >= 1)
         require(offset >= 0)
 
-        return try {
-            diaryDataSource
-                .selectHistoryListOrderByLogDesc(num, offset)
-                .map { list ->
-                    list.map { it.toDomainModel() }
-                }
-        } catch (e: DataBaseAccessException) {
-            throw FetchDiaryItemTitleSelectionHistoryFailedException(e)
-        }
+        return diaryDataSource
+            .selectHistoryListOrderByLogDesc(num, offset)
+            .catch {
+                throw FetchDiaryItemTitleSelectionHistoryFailedException(it)
+            }
+            .map { list ->
+                list.map { it.toDomainModel() }
+            }
     }
 
     @Throws(DeleteDiaryItemTitleSelectionHistoryItemFailedException::class)

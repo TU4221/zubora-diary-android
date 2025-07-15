@@ -4,6 +4,7 @@ import android.database.sqlite.SQLiteException
 import android.util.Log
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.catch
 import java.time.LocalDate
 
 internal class DiaryDataSource(
@@ -27,16 +28,18 @@ internal class DiaryDataSource(
         }
     }
 
-    @Throws(DataBaseAccessException::class)
-    private fun <R> executeDbOperation(
-        operation: () -> R
-    ): R {
-        return try {
-            operation()
-        } catch (e: SQLiteException) {
-            throw DataBaseAccessException(e)
-        } catch (e: IllegalStateException) {
-            throw DataBaseAccessException(e)
+    /**
+     * Flowのストリーム内で発生する特定のデータベース関連例外を
+     * [DataBaseAccessException] にラップして再スローします。
+     * その他の例外はそのまま再スローします。
+     */
+    private fun <T> Flow<T>.wrapDatabaseExceptions(): Flow<T> {
+        return this.catch { exception -> // 'this' は拡張対象のFlowインスタンスを指す
+            when (exception) {
+                is SQLiteException,
+                is IllegalStateException -> throw DataBaseAccessException(exception)
+                else -> throw exception
+            }
         }
     }
 
@@ -179,17 +182,18 @@ internal class DiaryDataSource(
         }
     }
 
-    @Throws(DataBaseAccessException::class)
+    /**
+     * @throws DataBaseAccessException
+     */
     fun selectHistoryListOrderByLogDesc(
         num: Int, offset: Int
     ): Flow<List<DiaryItemTitleSelectionHistoryItemEntity>> {
         require(num >= 1)
         require(offset >= 0)
 
-        return executeDbOperation {
-            diaryItemTitleSelectionHistoryDAO
-                .selectHistoryListOrderByLogDesc(num, offset)
-        }
+        return diaryItemTitleSelectionHistoryDAO
+            .selectHistoryListOrderByLogDesc(num, offset)
+            .wrapDatabaseExceptions()
     }
 
     @Throws(DataBaseAccessException::class)
