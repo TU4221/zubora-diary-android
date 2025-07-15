@@ -19,6 +19,7 @@ import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.NavigationUI.onNavDestinationSelected
 import androidx.navigation.ui.NavigationUI.setupWithNavController
+import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.navigation.NavigationBarView
 import com.google.android.material.navigation.NavigationBarView.OnItemReselectedListener
 import com.google.android.material.transition.platform.MaterialFadeThrough
@@ -63,15 +64,6 @@ class MainActivity : LoggingActivity() {
 
     private val showedFragment: Fragment
         get() = navFragmentManager.fragments[0]
-
-    private val selectedBottomNavigationMenuItem: MenuItem
-        get() {
-            val bottomNavigationView = binding.bottomNavigation
-            val selectedItemId = bottomNavigationView.selectedItemId
-            return bottomNavigationView.menu.findItem(selectedItemId)
-        }
-
-    private lateinit var startNavigationMenuItem: MenuItem
 
     // ViewModel
     // MEMO:委譲プロパティの委譲先(viewModels())の遅延初期化により"Field is never assigned."と警告が表示される。
@@ -258,21 +250,25 @@ class MainActivity : LoggingActivity() {
         val navController = navHostFragment.navController
         setupWithNavController(bottomNavigationView, navController)
 
-        // ボトムナビゲーションのデフォルト選択アイテム情報取得
-        startNavigationMenuItem = selectedBottomNavigationMenuItem
-
-        bottomNavigationView.setOnItemSelectedListener(CustomOnItemSelectedListener(navController))
-        bottomNavigationView.setOnItemReselectedListener(CustomOnItemReselectedListener())
+        bottomNavigationView.apply {
+            setOnItemSelectedListener(
+                CustomOnItemSelectedListener(this, navController)
+            )
+            setOnItemReselectedListener(CustomOnItemReselectedListener())
+        }
     }
 
-    private inner class CustomOnItemSelectedListener(private val navController: NavController):
-        NavigationBarView.OnItemSelectedListener {
+    private inner class CustomOnItemSelectedListener(
+        private val bottomNavigationView: BottomNavigationView,
+        private val navController: NavController
+    ) : NavigationBarView.OnItemSelectedListener {
 
-        private var previousItemSelected: MenuItem
-
-        init {
-            previousItemSelected = selectedBottomNavigationMenuItem
-        }
+        private val selectedBottomNavigationMenuItem: MenuItem
+            get() {
+                return bottomNavigationView.run {
+                    menu.findItem(selectedItemId)
+                }
+            }
 
         // MEMO:下記動作を行った時にタブのアイコンが更新されない問題があるため、
         //      新しく"OnItemSelectedListener"をセットする。
@@ -286,11 +282,10 @@ class MainActivity : LoggingActivity() {
         //      本不具合は発生しないが、対策コードは残しておく。)
         override fun onNavigationItemSelected(menuItem: MenuItem): Boolean {
             // BottomNavigationのタブ選択による画面遷移
-            if (previousItemSelected === menuItem) return true
+            if (selectedBottomNavigationMenuItem === menuItem) return true
 
             Log.i(logTag, "ボトムナビゲーション_フラグメント切替")
             wasSelectedTab = true
-            previousItemSelected = menuItem
 
             setUpFragmentTransition()
             onNavDestinationSelected(menuItem, navController)
@@ -347,7 +342,10 @@ class MainActivity : LoggingActivity() {
     }
 
     internal fun popBackStackToStartFragment() {
-        binding.bottomNavigation.selectedItemId = startNavigationMenuItem.itemId
+        binding.bottomNavigation.apply {
+            selectedItemId =
+                menu.getItem(0).itemId // 初期メニューアイテム(アプリ起動で最初に選択されているアイテム)
+        }
     }
 
     override fun onDestroy() {
