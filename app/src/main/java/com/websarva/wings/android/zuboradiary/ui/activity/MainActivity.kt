@@ -7,7 +7,6 @@ import android.view.MenuItem
 import android.view.View
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
-import androidx.annotation.RequiresApi
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
@@ -74,7 +73,6 @@ class MainActivity : LoggingActivity() {
     @Suppress("unused", "RedundantSuppression")
     private val settingsViewModel: SettingsViewModel by viewModels()
 
-    @RequiresApi(Build.VERSION_CODES.Q)
     override fun onCreate(savedInstanceState: Bundle?) {
         installSplashScreen().setKeepOnScreenCondition { !isMainActivityLayoutInflated }
         setUpEdgeToEdge()
