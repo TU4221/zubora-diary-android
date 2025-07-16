@@ -123,8 +123,6 @@ class DiaryItemTitleEditFragment : BaseFragment<FragmentDiaryItemTitleEditBindin
                 binding.materialToolbarTopAppBar.title = toolbarTitle
             }
         }
-        binding.materialToolbarTopAppBar
-            .setNavigationOnClickListener { mainViewModel.onNavigationClicked() }
     }
 
     private fun setUpItemTitleInputField() {
@@ -140,11 +138,6 @@ class DiaryItemTitleEditFragment : BaseFragment<FragmentDiaryItemTitleEditBindin
         val transitionListener =
             textInputConfigurator.createClearButtonSetupTransitionListener(*textInputLayouts)
         addTransitionListener(transitionListener)
-
-        binding.buttonNewItemTitleSelection
-            .setOnClickListener {
-                mainViewModel.onNewDiaryItemTitleSelectionButtonClicked()
-            }
 
         launchAndRepeatOnViewLifeCycleStarted {
             mainViewModel.itemTitle.collectLatest {
