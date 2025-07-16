@@ -75,7 +75,8 @@
                     android:layout_marginTop="@dimen/fragment_diary_item_title_edit_margin_top"
                     android:layout_gravity="center_horizontal"
                     android:text="@string/fragment_diary_item_title_edit_new_item_title_selection_button"
-                    android:textSize="@dimen/fragment_diary_item_title_edit_text_size" />
+                    android:textSize="@dimen/fragment_diary_item_title_edit_text_size"
+                    android:enabled="@{viewModel.isNewItemTitleSelectionEnabled()}"/>
 
             </LinearLayout>
 

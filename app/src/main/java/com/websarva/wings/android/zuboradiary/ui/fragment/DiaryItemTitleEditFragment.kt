@@ -1,8 +1,6 @@
 package com.websarva.wings.android.zuboradiary.ui.fragment
 
 import android.os.Bundle
-import android.text.Editable
-import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -143,9 +141,6 @@ class DiaryItemTitleEditFragment : BaseFragment<FragmentDiaryItemTitleEditBindin
             textInputConfigurator.createClearButtonSetupTransitionListener(*textInputLayouts)
         addTransitionListener(transitionListener)
 
-        val editText = checkNotNull(binding.textInputLayoutNewItemTitle.editText)
-        editText.addTextChangedListener(InputItemTitleErrorWatcher())
-
         binding.buttonNewItemTitleSelection
             .setOnClickListener {
                 mainViewModel.onNewDiaryItemTitleSelectionButtonClicked()
@@ -153,40 +148,19 @@ class DiaryItemTitleEditFragment : BaseFragment<FragmentDiaryItemTitleEditBindin
 
         launchAndRepeatOnViewLifeCycleStarted {
             mainViewModel.itemTitle.collectLatest {
-                binding.buttonNewItemTitleSelection.isEnabled = it.isNotEmpty()
+                mainViewModel.onItemTitleChanged(it)
             }
         }
-    }
 
-    private inner class InputItemTitleErrorWatcher : TextWatcher {
-        override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {
-            // 処理なし
-        }
-
-        override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
-            binding.apply {
-                val title = s.toString()
-                if (title.isEmpty()) {
-                    textInputLayoutNewItemTitle.error =
-                        getString(R.string.fragment_diary_item_title_edit_new_item_title_input_field_error_message_empty)
-                    buttonNewItemTitleSelection.isEnabled = false
-                    return
-                }
-                // 先頭が空白文字(\\s)
-                if (title.matches("\\s+.*".toRegex())) {
-                    textInputLayoutNewItemTitle.error =
-                        getString(R.string.fragment_diary_item_title_edit_new_item_title_input_field_error_message_initial_char_unmatched)
-                    buttonNewItemTitleSelection.isEnabled = false
-                    return
-                }
-                textInputLayoutNewItemTitle.error = null
-                buttonNewItemTitleSelection.isEnabled = true
+        launchAndRepeatOnViewLifeCycleStarted {
+            mainViewModel.itemTitleErrorMessageResId.collectLatest {
+                binding.textInputLayoutNewItemTitle.error =
+                    if (it != null && it != 0) {
+                        getString(it)
+                    } else {
+                        null
+                    }
             }
-
-        }
-
-        override fun afterTextChanged(s: Editable) {
-            // 処理なし
         }
     }
 
