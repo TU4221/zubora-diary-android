@@ -66,7 +66,7 @@ internal class ItemTitleSelectionHistoryListAdapter
             if (onClickDeleteButtonListener == null) return@setOnClickListener
 
             // MEMO:onBindViewHolder()の引数であるpositionを使用すると警告がでる。
-            checkNotNull(onClickDeleteButtonListener).onClick(holder.bindingAdapterPosition, title)
+            checkNotNull(onClickDeleteButtonListener).onClick(title)
         }
     }
 
@@ -79,7 +79,7 @@ internal class ItemTitleSelectionHistoryListAdapter
     }
 
     fun interface OnClickDeleteButtonListener {
-        fun onClick(position: Int, title: String)
+        fun onClick(title: String)
     }
 
     fun setOnClickDeleteButtonListener(onClickDeleteButtonListener: OnClickDeleteButtonListener) {

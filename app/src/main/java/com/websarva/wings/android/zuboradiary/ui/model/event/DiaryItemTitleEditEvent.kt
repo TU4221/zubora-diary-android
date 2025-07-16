@@ -1,11 +1,11 @@
 package com.websarva.wings.android.zuboradiary.ui.model.event
 
 import com.websarva.wings.android.zuboradiary.domain.model.ItemNumber
+import com.websarva.wings.android.zuboradiary.ui.model.parameters.DiaryItemTitleSelectionHistoryItemDeleteParameters
 
 internal sealed class DiaryItemTitleEditEvent : ViewModelEvent() {
     data class NavigateSelectionHistoryItemDeleteDialog(
-        val itemPosition: Int,
-        val itemTitle: String
+        val parameters: DiaryItemTitleSelectionHistoryItemDeleteParameters
     ) : DiaryItemTitleEditEvent()
     data object CloseSwipedItem : DiaryItemTitleEditEvent()
     data class CompleteEdit(

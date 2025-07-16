@@ -18,6 +18,7 @@ import com.websarva.wings.android.zuboradiary.ui.adapter.diaryitemtitle.Selectio
 import com.websarva.wings.android.zuboradiary.ui.model.event.DiaryItemTitleEditEvent
 import com.websarva.wings.android.zuboradiary.ui.model.event.ViewModelEvent
 import com.websarva.wings.android.zuboradiary.ui.model.navigation.NavigationCommand
+import com.websarva.wings.android.zuboradiary.ui.model.parameters.DiaryItemTitleSelectionHistoryItemDeleteParameters
 import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
 import com.websarva.wings.android.zuboradiary.ui.model.result.ItemTitleEditResult
 import com.websarva.wings.android.zuboradiary.ui.view.edittext.TextInputConfigurator
@@ -91,8 +92,7 @@ class DiaryItemTitleEditFragment : BaseFragment<FragmentDiaryItemTitleEditBindin
             }
             is DiaryItemTitleEditEvent.NavigateSelectionHistoryItemDeleteDialog -> {
                 navigateDiaryItemTitleDeleteDialog(
-                    event.itemPosition,
-                    event.itemTitle
+                    event.parameters
                 )
             }
 
@@ -205,13 +205,13 @@ class DiaryItemTitleEditFragment : BaseFragment<FragmentDiaryItemTitleEditBindin
         itemTitleSelectionHistoryListAdapter.setOnClickItemListener { itemTitle: String ->
             mainViewModel.onDiaryItemTitleSelectionHistoryItemClicked(itemTitle)
         }
-        itemTitleSelectionHistoryListAdapter.setOnClickDeleteButtonListener { listItemPosition: Int, listItemTitle: String ->
-            mainViewModel
-                .onDiaryItemTitleSelectionHistoryItemDeleteButtonClicked(
-                    listItemPosition,
-                    listItemTitle
-                )
-        }
+        itemTitleSelectionHistoryListAdapter
+            .setOnClickDeleteButtonListener { itemTitle: String ->
+                mainViewModel
+                    .onDiaryItemTitleSelectionHistoryItemDeleteButtonClicked(
+                        itemTitle
+                    )
+            }
 
         // 選択履歴読込・表示
         launchAndRepeatOnViewLifeCycleStarted {
@@ -246,14 +246,14 @@ class DiaryItemTitleEditFragment : BaseFragment<FragmentDiaryItemTitleEditBindin
         navigateFragment(NavigationCommand.To(directions))
     }
 
-    private fun navigateDiaryItemTitleDeleteDialog(listItemPosition: Int, listItemTitle: String) {
-        require(listItemPosition >= 0)
-
+    private fun navigateDiaryItemTitleDeleteDialog(
+        parameters: DiaryItemTitleSelectionHistoryItemDeleteParameters
+    ) {
         val directions =
-            DiaryItemTitleEditFragmentDirections.actionDiaryItemTitleEditFragmentToDiaryItemTitleDeleteDialog(
-                listItemPosition,
-                listItemTitle
-            )
+            DiaryItemTitleEditFragmentDirections
+                .actionDiaryItemTitleEditFragmentToDiaryItemTitleDeleteDialog(
+                    parameters
+                )
         navigateFragment(NavigationCommand.To(directions))
     }
 

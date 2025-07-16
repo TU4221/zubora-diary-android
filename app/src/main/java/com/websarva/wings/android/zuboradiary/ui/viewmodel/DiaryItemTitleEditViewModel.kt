@@ -12,6 +12,7 @@ import com.websarva.wings.android.zuboradiary.ui.model.DiaryItemTitleEditAppMess
 import com.websarva.wings.android.zuboradiary.ui.adapter.diaryitemtitle.SelectionHistoryList
 import com.websarva.wings.android.zuboradiary.ui.adapter.diaryitemtitle.SelectionHistoryListItem
 import com.websarva.wings.android.zuboradiary.ui.model.event.DiaryItemTitleEditEvent
+import com.websarva.wings.android.zuboradiary.ui.model.parameters.DiaryItemTitleSelectionHistoryItemDeleteParameters
 import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
 import com.websarva.wings.android.zuboradiary.ui.model.state.DiaryItemTitleEditState
 import com.websarva.wings.android.zuboradiary.ui.utils.requireValue
@@ -111,13 +112,12 @@ internal class DiaryItemTitleEditViewModel @Inject constructor(
         }
     }
 
-    fun onDiaryItemTitleSelectionHistoryItemDeleteButtonClicked(itemPosition: Int, itemTitle: String) {
+    fun onDiaryItemTitleSelectionHistoryItemDeleteButtonClicked(itemTitle: String) {
         viewModelScope.launch {
             emitViewModelEvent(
                 DiaryItemTitleEditEvent
                     .NavigateSelectionHistoryItemDeleteDialog(
-                        itemPosition,
-                        itemTitle
+                        DiaryItemTitleSelectionHistoryItemDeleteParameters(itemTitle)
                     )
             )
         }
@@ -130,7 +130,9 @@ internal class DiaryItemTitleEditViewModel @Inject constructor(
         updateDiaryItemTitle(itemNumber, itemTitle)
     }
 
-    fun onDiaryItemTitleSelectionHistoryDeleteDialogResultReceived(result: DialogResult<Int>) {
+    fun onDiaryItemTitleSelectionHistoryDeleteDialogResultReceived(
+        result: DialogResult<DiaryItemTitleSelectionHistoryItemDeleteParameters>
+    ) {
         when (result) {
             is DialogResult.Positive -> {
                 onDiaryItemTitleSelectionHistoryDeleteDialogPositiveResultReceived(result.data)
@@ -142,13 +144,10 @@ internal class DiaryItemTitleEditViewModel @Inject constructor(
         }
     }
 
-    private fun onDiaryItemTitleSelectionHistoryDeleteDialogPositiveResultReceived(deletePosition: Int) {
-        val currentList = itemTitleSelectionHistoryList.value
-        val listSize = currentList.itemList.size
-        require(deletePosition < listSize)
-
-        val deleteItem = currentList.itemList[deletePosition]
-        val deleteTitle = deleteItem.title
+    private fun onDiaryItemTitleSelectionHistoryDeleteDialogPositiveResultReceived(
+        parameters: DiaryItemTitleSelectionHistoryItemDeleteParameters
+    ) {
+        val deleteTitle = parameters.itemTitle
         viewModelScope.launch {
             deleteDiaryItemTitleSelectionHistoryItem(deleteTitle)
         }
