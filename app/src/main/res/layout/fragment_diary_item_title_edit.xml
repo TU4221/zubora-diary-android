@@ -4,6 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
+        <import type="android.view.View" />
+        <import type="com.websarva.wings.android.zuboradiary.ui.model.state.DiaryItemTitleEditState" />
         <variable
             name="viewModel"
             type="com.websarva.wings.android.zuboradiary.ui.viewmodel.DiaryItemTitleEditViewModel" />
@@ -93,12 +95,30 @@
                 android:text="@string/fragment_diary_item_title_edit_title_selection_history"
                 android:textSize="@dimen/fragment_diary_item_title_edit_text_size" />
 
-            <com.websarva.wings.android.zuboradiary.ui.view.custom.SwipeRecyclerView
-                style="@style/AppRecyclerViewStyle"
-                android:id="@+id/recycler_item_title_selection_history"
+            <FrameLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_marginTop="@dimen/fragment_diary_item_title_edit_margin_top" />
+                android:layout_height="match_parent">
+
+                <TextView
+                    style="@style/AppTextViewStyle"
+                    android:id="@+id/text_no_diary_item_title_selection_history_message"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:textAppearance="@style/AppTextViewTextAppearance"
+                    android:text="@string/fragment_diary_item_title_edit_no_diary_item_title_selection_history_message"
+                    android:gravity="center"
+                    android:visibility="@{viewModel.uiState instanceof DiaryItemTitleEditState.NoSelectionHistory ? View.VISIBLE : View.GONE}" />
+
+                <com.websarva.wings.android.zuboradiary.ui.view.custom.SwipeRecyclerView
+                    style="@style/AppRecyclerViewStyle"
+                    android:id="@+id/recycler_item_title_selection_history"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginTop="@dimen/fragment_diary_item_title_edit_margin_top"
+                    android:visibility="@{viewModel.uiState instanceof DiaryItemTitleEditState.NoSelectionHistory ? View.GONE : View.VISIBLE}" />
+
+            </FrameLayout>
+
         </LinearLayout>
 
     </FrameLayout>

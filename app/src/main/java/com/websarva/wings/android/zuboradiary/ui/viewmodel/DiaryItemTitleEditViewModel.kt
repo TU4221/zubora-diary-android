@@ -40,9 +40,12 @@ internal class DiaryItemTitleEditViewModel @Inject constructor(
     override val isProcessingState =
         uiState
             .map { state ->
-                // TODO:保留
                 when (state) {
-                    DiaryItemTitleEditState.Idle -> false
+                    DiaryItemTitleEditState.LoadingSelectionHistory -> true
+
+                    DiaryItemTitleEditState.Idle,
+                    DiaryItemTitleEditState.NoSelectionHistory,
+                    DiaryItemTitleEditState.ShowingSelectionHistory -> false
                 }
             }.stateInDefault(
                 viewModelScope,
@@ -187,6 +190,7 @@ internal class DiaryItemTitleEditViewModel @Inject constructor(
         val logMsg = "日記項目タイトル選択履歴読込"
         Log.i(logTag, "${logMsg}_開始")
 
+        updateUiState(DiaryItemTitleEditState.LoadingSelectionHistory)
         itemTitleSelectionHistoryList =
             fetchDiaryItemTitleSelectionHistoryUseCase().value
                 .catch {
@@ -199,6 +203,11 @@ internal class DiaryItemTitleEditViewModel @Inject constructor(
                         else -> throw it
                     }
                 }.map { list ->
+                    if (list.isEmpty()) {
+                        updateUiState(DiaryItemTitleEditState.NoSelectionHistory)
+                    } else {
+                        updateUiState(DiaryItemTitleEditState.ShowingSelectionHistory)
+                    }
                     SelectionHistoryList(
                         list.map { item ->
                             SelectionHistoryListItem(item)
