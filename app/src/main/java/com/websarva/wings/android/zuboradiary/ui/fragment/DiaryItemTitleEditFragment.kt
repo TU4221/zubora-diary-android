@@ -20,10 +20,10 @@ import com.websarva.wings.android.zuboradiary.ui.model.navigation.NavigationComm
 import com.websarva.wings.android.zuboradiary.ui.model.parameters.DiaryItemTitleSelectionHistoryItemDeleteParameters
 import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
 import com.websarva.wings.android.zuboradiary.ui.model.DiaryItemTitle
-import com.websarva.wings.android.zuboradiary.ui.utils.requireValue
 import com.websarva.wings.android.zuboradiary.ui.view.edittext.TextInputConfigurator
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.filterNotNull
 
 @AndroidEntryPoint
 class DiaryItemTitleEditFragment : BaseFragment<FragmentDiaryItemTitleEditBinding>() {
@@ -115,15 +115,18 @@ class DiaryItemTitleEditFragment : BaseFragment<FragmentDiaryItemTitleEditBindin
     }
 
     private fun setUpToolBar() {
-        binding.materialToolbarTopAppBar.apply {
-            val targetItemNumber = mainViewModel.itemNumber.requireValue()
-            val toolBarTitle =
-                getString(R.string.fragment_diary_item_title_edit_toolbar_first_title) + targetItemNumber + getString(
-                    R.string.fragment_diary_item_title_edit_toolbar_second_title
-                )
-            title = toolBarTitle
-            setNavigationOnClickListener { mainViewModel.onNavigationClicked() }
+        launchAndRepeatOnViewLifeCycleStarted {
+            mainViewModel.itemNumber.filterNotNull().collectLatest { itemNumber ->
+                val toolbarTitle =
+                    getString(
+                        R.string.fragment_diary_item_title_edit_toolbar_title,
+                        itemNumber
+                    )
+                binding.materialToolbarTopAppBar.title = toolbarTitle
+            }
         }
+        binding.materialToolbarTopAppBar
+            .setNavigationOnClickListener { mainViewModel.onNavigationClicked() }
     }
 
     private fun setUpItemTitleInputField() {
