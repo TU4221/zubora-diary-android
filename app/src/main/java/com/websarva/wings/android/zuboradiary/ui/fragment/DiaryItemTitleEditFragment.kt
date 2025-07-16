@@ -10,7 +10,6 @@ import androidx.fragment.app.viewModels
 import com.websarva.wings.android.zuboradiary.R
 import com.websarva.wings.android.zuboradiary.ui.model.AppMessage
 import com.websarva.wings.android.zuboradiary.databinding.FragmentDiaryItemTitleEditBinding
-import com.websarva.wings.android.zuboradiary.domain.model.ItemNumber
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.DiaryItemTitleDeleteDialogFragment
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.DiaryItemTitleEditViewModel
 import com.websarva.wings.android.zuboradiary.ui.adapter.diaryitemtitle.ItemTitleSelectionHistoryListAdapter
@@ -21,8 +20,8 @@ import com.websarva.wings.android.zuboradiary.ui.model.navigation.NavigationComm
 import com.websarva.wings.android.zuboradiary.ui.model.parameters.DiaryItemTitleSelectionHistoryItemDeleteParameters
 import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
 import com.websarva.wings.android.zuboradiary.ui.model.DiaryItemTitle
-import com.websarva.wings.android.zuboradiary.ui.view.edittext.TextInputConfigurator
 import com.websarva.wings.android.zuboradiary.ui.utils.requireValue
+import com.websarva.wings.android.zuboradiary.ui.view.edittext.TextInputConfigurator
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 
@@ -86,8 +85,7 @@ class DiaryItemTitleEditFragment : BaseFragment<FragmentDiaryItemTitleEditBindin
             }
             is DiaryItemTitleEditEvent.CompleteEdit -> {
                 completeItemTitleEdit(
-                    event.itemNumber,
-                    event.itemTitle
+                    event.diaryItemTitle
                 )
             }
             is DiaryItemTitleEditEvent.NavigateSelectionHistoryItemDeleteDialog -> {
@@ -222,16 +220,10 @@ class DiaryItemTitleEditFragment : BaseFragment<FragmentDiaryItemTitleEditBindin
     }
 
     // DiaryItemTitleEditFragmentを閉じる
-    private fun completeItemTitleEdit(itemNumber: ItemNumber, newItemTitle: String) {
+    private fun completeItemTitleEdit(diaryItemTitle: DiaryItemTitle) {
         val navBackStackEntry = checkNotNull(navController.previousBackStackEntry)
         val savedStateHandle = navBackStackEntry.savedStateHandle
-        savedStateHandle[KEY_RESULT] =
-            FragmentResult.Some(
-                DiaryItemTitle(
-                    itemNumber,
-                    newItemTitle
-                )
-            )
+        savedStateHandle[KEY_RESULT] = FragmentResult.Some(diaryItemTitle)
         navigateDiaryEditFragment()
     }
 

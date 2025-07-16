@@ -94,8 +94,10 @@ internal class DiaryItemTitleEditViewModel @Inject constructor(
         viewModelScope.launch {
             emitViewModelEvent(
                 DiaryItemTitleEditEvent.CompleteEdit(
-                    itemNumber,
-                    itemTitle
+                    DiaryItemTitle(
+                        itemNumber,
+                        itemTitle
+                    )
                 )
             )
         }
@@ -106,8 +108,10 @@ internal class DiaryItemTitleEditViewModel @Inject constructor(
         viewModelScope.launch {
             emitViewModelEvent(
                 DiaryItemTitleEditEvent.CompleteEdit(
-                    itemNumber,
-                    itemTitle
+                    DiaryItemTitle(
+                        itemNumber,
+                        itemTitle
+                    )
                 )
             )
         }
