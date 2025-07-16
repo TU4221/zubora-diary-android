@@ -110,15 +110,10 @@ class DiaryItemTitleEditFragment : BaseFragment<FragmentDiaryItemTitleEditBindin
 
     // EditDiaryFragmentからデータ受取
     private fun receiveDiaryItemTitleEditData() {
-        val targetItemNumber =
-            DiaryItemTitleEditFragmentArgs.fromBundle(requireArguments()).itemNumber
-        val targetItemTitle =
-            DiaryItemTitleEditFragmentArgs.fromBundle(requireArguments()).itemTitle
+        val diaryItemTitle =
+            DiaryItemTitleEditFragmentArgs.fromBundle(requireArguments()).diaryItemTitle
         mainViewModel
-            .onDiaryItemTitleDataReceivedFromPreviousFragment(
-                targetItemNumber,
-                targetItemTitle
-            )
+            .onDiaryItemTitleDataReceivedFromPreviousFragment(diaryItemTitle)
     }
 
     private fun setUpToolBar() {

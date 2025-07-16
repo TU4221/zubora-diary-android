@@ -423,7 +423,9 @@ internal class DiaryEditViewModel @Inject constructor(
 
         viewModelScope.launch {
             emitViewModelEvent(
-                DiaryEditEvent.NavigateDiaryItemTitleEditFragment(itemNumber, itemTitle)
+                DiaryEditEvent.NavigateDiaryItemTitleEditFragment(
+                    DiaryItemTitle(itemNumber, itemTitle)
+                )
             )
         }
     }

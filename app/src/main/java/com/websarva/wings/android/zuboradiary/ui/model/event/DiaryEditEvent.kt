@@ -1,6 +1,7 @@
 package com.websarva.wings.android.zuboradiary.ui.model.event
 
 import com.websarva.wings.android.zuboradiary.domain.model.ItemNumber
+import com.websarva.wings.android.zuboradiary.ui.model.DiaryItemTitle
 import com.websarva.wings.android.zuboradiary.ui.model.parameters.DiaryDeleteParameters
 import com.websarva.wings.android.zuboradiary.ui.model.parameters.DiaryItemDeleteParameters
 import com.websarva.wings.android.zuboradiary.ui.model.parameters.DiaryLoadingParameters
@@ -12,10 +13,7 @@ import java.time.LocalDate
 
 internal sealed class DiaryEditEvent : ViewModelEvent() {
     data class NavigateDiaryShowFragment(val date: LocalDate) : DiaryEditEvent()
-    data class NavigateDiaryItemTitleEditFragment(
-        val itemNumber: ItemNumber,
-        val itemTitle: String
-    ) : DiaryEditEvent()
+    data class NavigateDiaryItemTitleEditFragment(val diaryItemTitle: DiaryItemTitle) : DiaryEditEvent()
     data class NavigateDiaryLoadingDialog(val parameters: DiaryLoadingParameters) : DiaryEditEvent()
     data class NavigateDiaryLoadingFailureDialog(val date: LocalDate) : DiaryEditEvent()
     data class NavigateDiaryUpdateDialog(val parameters: DiaryUpdateParameters) : DiaryEditEvent()

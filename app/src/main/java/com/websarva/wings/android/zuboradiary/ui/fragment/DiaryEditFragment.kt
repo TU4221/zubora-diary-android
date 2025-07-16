@@ -274,7 +274,7 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding>() {
                 navigateDiaryShowFragment(event.date)
             }
             is DiaryEditEvent.NavigateDiaryItemTitleEditFragment -> {
-                navigateDiaryItemTitleEditFragment(event.itemNumber, event.itemTitle)
+                navigateDiaryItemTitleEditFragment(event.diaryItemTitle)
             }
             is DiaryEditEvent.NavigateDiaryLoadingDialog -> {
                 navigateDiaryLoadingDialog(event.parameters)
@@ -883,14 +883,10 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding>() {
         navigateFragment(NavigationCommand.To(directions))
     }
 
-    private fun navigateDiaryItemTitleEditFragment(
-        inputItemNumber: ItemNumber,
-        inputItemTitle: String
-    ) {
+    private fun navigateDiaryItemTitleEditFragment(diaryItemTitle: DiaryItemTitle) {
         val directions =
             DiaryEditFragmentDirections.actionDiaryEditFragmentToSelectItemTitleFragment(
-                inputItemNumber,
-                inputItemTitle
+                diaryItemTitle
             )
         navigateFragment(NavigationCommand.To(directions))
     }

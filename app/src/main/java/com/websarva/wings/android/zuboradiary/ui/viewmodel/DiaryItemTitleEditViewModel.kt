@@ -11,6 +11,7 @@ import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import com.websarva.wings.android.zuboradiary.ui.model.DiaryItemTitleEditAppMessage
 import com.websarva.wings.android.zuboradiary.ui.adapter.diaryitemtitle.SelectionHistoryList
 import com.websarva.wings.android.zuboradiary.ui.adapter.diaryitemtitle.SelectionHistoryListItem
+import com.websarva.wings.android.zuboradiary.ui.model.DiaryItemTitle
 import com.websarva.wings.android.zuboradiary.ui.model.event.DiaryItemTitleEditEvent
 import com.websarva.wings.android.zuboradiary.ui.model.parameters.DiaryItemTitleSelectionHistoryItemDeleteParameters
 import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
@@ -123,10 +124,9 @@ internal class DiaryItemTitleEditViewModel @Inject constructor(
         }
     }
 
-    fun onDiaryItemTitleDataReceivedFromPreviousFragment(
-        itemNumber: ItemNumber,
-        itemTitle: String
-    ) {
+    fun onDiaryItemTitleDataReceivedFromPreviousFragment(diaryItemTitle: DiaryItemTitle) {
+        val itemNumber = diaryItemTitle.itemNumber
+        val itemTitle = diaryItemTitle.title
         updateDiaryItemTitle(itemNumber, itemTitle)
     }
 
