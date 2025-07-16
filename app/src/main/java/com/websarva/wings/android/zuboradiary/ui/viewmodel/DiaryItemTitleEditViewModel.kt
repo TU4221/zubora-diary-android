@@ -12,13 +12,16 @@ import com.websarva.wings.android.zuboradiary.ui.model.DiaryItemTitleEditAppMess
 import com.websarva.wings.android.zuboradiary.ui.adapter.diaryitemtitle.SelectionHistoryList
 import com.websarva.wings.android.zuboradiary.ui.adapter.diaryitemtitle.SelectionHistoryListItem
 import com.websarva.wings.android.zuboradiary.ui.model.event.DiaryItemTitleEditEvent
+import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
 import com.websarva.wings.android.zuboradiary.ui.model.state.DiaryItemTitleEditState
+import com.websarva.wings.android.zuboradiary.ui.utils.requireValue
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
@@ -72,7 +75,91 @@ internal class DiaryItemTitleEditViewModel @Inject constructor(
 
     // BackPressed(戻るボタン)処理
     override fun onBackPressed() {
-        // TODO("Not yet implemented")
+        viewModelScope.launch {
+            emitNavigatePreviousFragmentEvent()
+        }
+    }
+
+    fun onNavigationClicked() {
+        viewModelScope.launch {
+            emitNavigatePreviousFragmentEvent()
+        }
+    }
+
+    fun onNewDiaryItemTitleSelectionButtonClicked() {
+        val itemNumber = _itemNumber.requireValue()
+        val itemTitle = _itemTitle.value
+        viewModelScope.launch {
+            emitViewModelEvent(
+                DiaryItemTitleEditEvent.CompleteEdit(
+                    itemNumber,
+                    itemTitle
+                )
+            )
+        }
+    }
+
+    fun onDiaryItemTitleSelectionHistoryItemClicked(itemTitle: String) {
+        val itemNumber = _itemNumber.requireValue()
+        viewModelScope.launch {
+            emitViewModelEvent(
+                DiaryItemTitleEditEvent.CompleteEdit(
+                    itemNumber,
+                    itemTitle
+                )
+            )
+        }
+    }
+
+    fun onDiaryItemTitleSelectionHistoryItemDeleteButtonClicked(itemPosition: Int, itemTitle: String) {
+        viewModelScope.launch {
+            emitViewModelEvent(
+                DiaryItemTitleEditEvent
+                    .NavigateSelectionHistoryItemDeleteDialog(
+                        itemPosition,
+                        itemTitle
+                    )
+            )
+        }
+    }
+
+    fun onDiaryItemTitleDataReceivedFromPreviousFragment(
+        itemNumber: ItemNumber,
+        itemTitle: String
+    ) {
+        updateDiaryItemTitle(itemNumber, itemTitle)
+    }
+
+    fun onDiaryItemTitleSelectionHistoryDeleteDialogResultReceived(result: DialogResult<Int>) {
+        when (result) {
+            is DialogResult.Positive -> {
+                onDiaryItemTitleSelectionHistoryDeleteDialogPositiveResultReceived(result.data)
+            }
+            DialogResult.Negative,
+            DialogResult.Cancel -> {
+                onDiaryItemTitleSelectionHistoryDeleteDialogNegativeResultReceived()
+            }
+        }
+    }
+
+    private fun onDiaryItemTitleSelectionHistoryDeleteDialogPositiveResultReceived(deletePosition: Int) {
+        val currentList = itemTitleSelectionHistoryList.value
+        val listSize = currentList.itemList.size
+        require(deletePosition < listSize)
+
+        val deleteItem = currentList.itemList[deletePosition]
+        val deleteTitle = deleteItem.title
+        viewModelScope.launch {
+            deleteDiaryItemTitleSelectionHistoryItem(deleteTitle)
+        }
+    }
+
+    private fun onDiaryItemTitleSelectionHistoryDeleteDialogNegativeResultReceived() {
+        viewModelScope.launch {
+            emitViewModelEvent(
+                DiaryItemTitleEditEvent.CloseSwipedItem
+            )
+        }
     }
 
     private fun setUpItemTitleSelectionHistoryList() {
@@ -102,23 +189,15 @@ internal class DiaryItemTitleEditViewModel @Inject constructor(
                 )
     }
 
-    fun updateDiaryItemTitle(itemNumber: ItemNumber, itemTitle: String) {
+    private fun updateDiaryItemTitle(itemNumber: ItemNumber, itemTitle: String) {
         _itemNumber.value = itemNumber
         _itemTitle.value = itemTitle
     }
 
-    suspend fun deleteDiaryItemTitleSelectionHistoryItem(deletePosition: Int) {
-        require(deletePosition >= 0)
-
+    private suspend fun deleteDiaryItemTitleSelectionHistoryItem(deleteTitle: String) {
         val logMsg = "日記項目タイトル選択履歴アイテム削除"
         Log.i(logTag, "${logMsg}_開始")
 
-        val currentList = itemTitleSelectionHistoryList.value
-        val listSize = currentList.itemList.size
-        require(deletePosition < listSize)
-
-        val deleteItem = currentList.itemList[deletePosition]
-        val deleteTitle = deleteItem.title
         val result = deleteDiaryItemTitleSelectionHistoryItemUseCase(deleteTitle)
         when (result) {
             is UseCaseResult.Success -> {

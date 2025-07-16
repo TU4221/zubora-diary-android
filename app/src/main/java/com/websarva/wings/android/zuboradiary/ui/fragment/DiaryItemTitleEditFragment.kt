@@ -7,24 +7,23 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.lifecycleScope
 import com.websarva.wings.android.zuboradiary.R
 import com.websarva.wings.android.zuboradiary.ui.model.AppMessage
 import com.websarva.wings.android.zuboradiary.databinding.FragmentDiaryItemTitleEditBinding
+import com.websarva.wings.android.zuboradiary.domain.model.ItemNumber
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.DiaryItemTitleDeleteDialogFragment
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.DiaryItemTitleEditViewModel
 import com.websarva.wings.android.zuboradiary.ui.adapter.diaryitemtitle.ItemTitleSelectionHistoryListAdapter
 import com.websarva.wings.android.zuboradiary.ui.adapter.diaryitemtitle.SelectionHistoryList
+import com.websarva.wings.android.zuboradiary.ui.model.event.DiaryItemTitleEditEvent
 import com.websarva.wings.android.zuboradiary.ui.model.event.ViewModelEvent
 import com.websarva.wings.android.zuboradiary.ui.model.navigation.NavigationCommand
-import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
 import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
 import com.websarva.wings.android.zuboradiary.ui.model.result.ItemTitleEditResult
 import com.websarva.wings.android.zuboradiary.ui.view.edittext.TextInputConfigurator
 import com.websarva.wings.android.zuboradiary.ui.utils.requireValue
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class DiaryItemTitleEditFragment : BaseFragment<FragmentDiaryItemTitleEditBinding>() {
@@ -68,31 +67,35 @@ class DiaryItemTitleEditFragment : BaseFragment<FragmentDiaryItemTitleEditBindin
 
     // 履歴項目削除確認ダイアログからの結果受取
     private fun setUpDiaryItemTitleDeleteDialogResultReceiver() {
-        setUpDialogResultReceiver<Int>(
+        setUpDialogResultReceiver(
             DiaryItemTitleDeleteDialogFragment.KEY_RESULT
         ) { result ->
-            when (result) {
-                is DialogResult.Positive<Int> -> {
-                    val deleteListItemPosition = result.data
-                    lifecycleScope.launch {
-                        mainViewModel
-                            .deleteDiaryItemTitleSelectionHistoryItem(deleteListItemPosition)
-                    }
-                }
-                DialogResult.Negative,
-                DialogResult.Cancel -> {
-                    val adapter =
-                        checkNotNull(
-                            binding.recyclerItemTitleSelectionHistory.adapter
-                        ) as ItemTitleSelectionHistoryListAdapter
-                    adapter.closeSwipedItem()
-                }
-            }
+            mainViewModel.onDiaryItemTitleSelectionHistoryDeleteDialogResultReceived(result)
         }
     }
 
     override fun onMainViewModelEventReceived(event: ViewModelEvent) {
         when (event) {
+            DiaryItemTitleEditEvent.CloseSwipedItem -> {
+                val adapter =
+                    checkNotNull(
+                        binding.recyclerItemTitleSelectionHistory.adapter
+                    ) as ItemTitleSelectionHistoryListAdapter
+                adapter.closeSwipedItem()
+            }
+            is DiaryItemTitleEditEvent.CompleteEdit -> {
+                completeItemTitleEdit(
+                    event.itemNumber,
+                    event.itemTitle
+                )
+            }
+            is DiaryItemTitleEditEvent.NavigateSelectionHistoryItemDeleteDialog -> {
+                navigateDiaryItemTitleDeleteDialog(
+                    event.itemPosition,
+                    event.itemTitle
+                )
+            }
+
             ViewModelEvent.NavigatePreviousFragment -> {
                 navigatePreviousFragment()
             }
@@ -111,7 +114,11 @@ class DiaryItemTitleEditFragment : BaseFragment<FragmentDiaryItemTitleEditBindin
             DiaryItemTitleEditFragmentArgs.fromBundle(requireArguments()).itemNumber
         val targetItemTitle =
             DiaryItemTitleEditFragmentArgs.fromBundle(requireArguments()).itemTitle
-        mainViewModel.updateDiaryItemTitle(targetItemNumber, targetItemTitle)
+        mainViewModel
+            .onDiaryItemTitleDataReceivedFromPreviousFragment(
+                targetItemNumber,
+                targetItemTitle
+            )
     }
 
     private fun setUpToolBar() {
@@ -122,7 +129,7 @@ class DiaryItemTitleEditFragment : BaseFragment<FragmentDiaryItemTitleEditBindin
                     R.string.fragment_diary_item_title_edit_toolbar_second_title
                 )
             title = toolBarTitle
-            setNavigationOnClickListener { navigatePreviousFragment() }
+            setNavigationOnClickListener { mainViewModel.onNavigationClicked() }
         }
     }
 
@@ -143,17 +150,15 @@ class DiaryItemTitleEditFragment : BaseFragment<FragmentDiaryItemTitleEditBindin
         val editText = checkNotNull(binding.textInputLayoutNewItemTitle.editText)
         editText.addTextChangedListener(InputItemTitleErrorWatcher())
 
-        binding.buttonNewItemTitleSelection.apply {
-            setOnClickListener {
-                val isError = !binding.textInputLayoutNewItemTitle.error.isNullOrEmpty()
-                if (isError) return@setOnClickListener
-
-                val title = mainViewModel.itemTitle.value
-                completeItemTitleEdit(title)
+        binding.buttonNewItemTitleSelection
+            .setOnClickListener {
+                mainViewModel.onNewDiaryItemTitleSelectionButtonClicked()
             }
 
-            val isEnabled = editText.text.toString().isNotEmpty()
-            this.isEnabled = isEnabled
+        launchAndRepeatOnViewLifeCycleStarted {
+            mainViewModel.itemTitle.collectLatest {
+                binding.buttonNewItemTitleSelection.isEnabled = it.isNotEmpty()
+            }
         }
     }
 
@@ -197,16 +202,15 @@ class DiaryItemTitleEditFragment : BaseFragment<FragmentDiaryItemTitleEditBindin
                 themeColor
             )
         itemTitleSelectionHistoryListAdapter.build()
-        itemTitleSelectionHistoryListAdapter.setOnClickItemListener { newItemTitle: String ->
-            this.completeItemTitleEdit(
-                newItemTitle
-            )
+        itemTitleSelectionHistoryListAdapter.setOnClickItemListener { itemTitle: String ->
+            mainViewModel.onDiaryItemTitleSelectionHistoryItemClicked(itemTitle)
         }
         itemTitleSelectionHistoryListAdapter.setOnClickDeleteButtonListener { listItemPosition: Int, listItemTitle: String ->
-            this.navigateDiaryItemTitleDeleteDialog(
-                listItemPosition,
-                listItemTitle
-            )
+            mainViewModel
+                .onDiaryItemTitleSelectionHistoryItemDeleteButtonClicked(
+                    listItemPosition,
+                    listItemTitle
+                )
         }
 
         // 選択履歴読込・表示
@@ -223,15 +227,13 @@ class DiaryItemTitleEditFragment : BaseFragment<FragmentDiaryItemTitleEditBindin
     }
 
     // DiaryItemTitleEditFragmentを閉じる
-    private fun completeItemTitleEdit(newItemTitle: String) {
-        val targetItemNumber = mainViewModel.itemNumber.requireValue()
-
+    private fun completeItemTitleEdit(itemNumber: ItemNumber, newItemTitle: String) {
         val navBackStackEntry = checkNotNull(navController.previousBackStackEntry)
         val savedStateHandle = navBackStackEntry.savedStateHandle
         savedStateHandle[KEY_RESULT] =
             FragmentResult.Some(
                 ItemTitleEditResult(
-                    targetItemNumber,
+                    itemNumber,
                     newItemTitle
                 )
             )
