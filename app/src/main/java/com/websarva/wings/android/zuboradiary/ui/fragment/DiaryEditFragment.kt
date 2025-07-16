@@ -54,7 +54,7 @@ import com.websarva.wings.android.zuboradiary.ui.model.parameters.DiaryUpdatePar
 import com.websarva.wings.android.zuboradiary.ui.model.parameters.NavigatePreviousParameters
 import com.websarva.wings.android.zuboradiary.ui.model.parameters.WeatherInfoFetchParameters
 import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
-import com.websarva.wings.android.zuboradiary.ui.model.result.ItemTitleEditResult
+import com.websarva.wings.android.zuboradiary.ui.model.DiaryItemTitle
 import com.websarva.wings.android.zuboradiary.ui.utils.isAccessLocationGranted
 import com.websarva.wings.android.zuboradiary.ui.utils.toJapaneseDateString
 import dagger.hilt.android.AndroidEntryPoint
@@ -151,7 +151,7 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding>() {
     private fun setUpDiaryItemTitleEditFragmentResultReceiver() {
         setUpFragmentResultReceiver(
             DiaryItemTitleEditFragment.KEY_RESULT
-        ) { result: FragmentResult<ItemTitleEditResult> ->
+        ) { result: FragmentResult<DiaryItemTitle> ->
 
             // TODO:シールドクラス Action -> Event に変更してから下記コードの処理方法を検討する。
             when (result) {

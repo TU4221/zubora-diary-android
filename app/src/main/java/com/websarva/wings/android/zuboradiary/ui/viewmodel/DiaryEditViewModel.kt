@@ -35,7 +35,7 @@ import com.websarva.wings.android.zuboradiary.ui.model.parameters.NavigatePrevio
 import com.websarva.wings.android.zuboradiary.ui.model.parameters.WeatherInfoFetchParameters
 import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
 import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
-import com.websarva.wings.android.zuboradiary.ui.model.result.ItemTitleEditResult
+import com.websarva.wings.android.zuboradiary.ui.model.DiaryItemTitle
 import com.websarva.wings.android.zuboradiary.ui.model.state.DiaryEditState
 import com.websarva.wings.android.zuboradiary.ui.utils.requireValue
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -662,7 +662,7 @@ internal class DiaryEditViewModel @Inject constructor(
         }
     }
 
-    fun onItemTitleEditFragmentResultReceived(result: FragmentResult<ItemTitleEditResult>) {
+    fun onItemTitleEditFragmentResultReceived(result: FragmentResult<DiaryItemTitle>) {
         check(uiState.value == DiaryEditState.Editing)
 
         when (result) {

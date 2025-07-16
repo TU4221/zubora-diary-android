@@ -20,7 +20,7 @@ import com.websarva.wings.android.zuboradiary.ui.model.event.ViewModelEvent
 import com.websarva.wings.android.zuboradiary.ui.model.navigation.NavigationCommand
 import com.websarva.wings.android.zuboradiary.ui.model.parameters.DiaryItemTitleSelectionHistoryItemDeleteParameters
 import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
-import com.websarva.wings.android.zuboradiary.ui.model.result.ItemTitleEditResult
+import com.websarva.wings.android.zuboradiary.ui.model.DiaryItemTitle
 import com.websarva.wings.android.zuboradiary.ui.view.edittext.TextInputConfigurator
 import com.websarva.wings.android.zuboradiary.ui.utils.requireValue
 import dagger.hilt.android.AndroidEntryPoint
@@ -232,7 +232,7 @@ class DiaryItemTitleEditFragment : BaseFragment<FragmentDiaryItemTitleEditBindin
         val savedStateHandle = navBackStackEntry.savedStateHandle
         savedStateHandle[KEY_RESULT] =
             FragmentResult.Some(
-                ItemTitleEditResult(
+                DiaryItemTitle(
                     itemNumber,
                     newItemTitle
                 )
