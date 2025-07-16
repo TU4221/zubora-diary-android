@@ -74,13 +74,8 @@
             android:id="@+id/navigation_diary_delete_dialog_for_diary_list_fragment"
             android:name="com.websarva.wings.android.zuboradiary.ui.fragment.dialog.DiaryListDeleteDialogFragment">
             <argument
-                android:name="date"
-                app:argType="java.time.LocalDate" />
-
-            <argument
-                android:name="image_uri"
-                app:argType="android.net.Uri"
-                app:nullable="true" />
+                android:name="parameters"
+                app:argType="com.websarva.wings.android.zuboradiary.ui.model.parameters.DiaryDeleteParameters" />
         </dialog>
 
         <fragment

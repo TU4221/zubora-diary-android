@@ -1,6 +1,5 @@
 package com.websarva.wings.android.zuboradiary.ui.fragment
 
-import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -30,6 +29,7 @@ import com.websarva.wings.android.zuboradiary.ui.model.state.DiaryListState
 import com.websarva.wings.android.zuboradiary.ui.model.event.DiaryListEvent
 import com.websarva.wings.android.zuboradiary.ui.model.event.ViewModelEvent
 import com.websarva.wings.android.zuboradiary.ui.model.navigation.NavigationCommand
+import com.websarva.wings.android.zuboradiary.ui.model.parameters.DiaryDeleteParameters
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import java.time.LocalDate
@@ -127,7 +127,7 @@ class DiaryListFragment :
                 navigateStartYearMonthPickerDialog(event.newestYear, event.oldestYear)
             }
             is DiaryListEvent.NavigateDiaryDeleteDialog -> {
-                navigateDiaryDeleteDialog(event.date, event.uri)
+                navigateDiaryDeleteDialog(event.parameters)
             }
             ViewModelEvent.NavigatePreviousFragment -> {
                 navigatePreviousFragment()
@@ -263,10 +263,10 @@ class DiaryListFragment :
         navigateFragment(NavigationCommand.To(directions))
     }
 
-    private fun navigateDiaryDeleteDialog(date: LocalDate, imageUri: Uri?) {
+    private fun navigateDiaryDeleteDialog(parameters: DiaryDeleteParameters) {
         Log.d("20250714", "navigateDiaryDeleteDialog")
         val directions =
-            DiaryListFragmentDirections.actionDiaryListFragmentToDiaryDeleteDialog(date, imageUri)
+            DiaryListFragmentDirections.actionDiaryListFragmentToDiaryDeleteDialog(parameters)
         navigateFragment(NavigationCommand.To(directions))
     }
 

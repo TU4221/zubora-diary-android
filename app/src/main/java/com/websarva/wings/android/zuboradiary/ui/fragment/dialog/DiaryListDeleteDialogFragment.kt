@@ -3,7 +3,6 @@ package com.websarva.wings.android.zuboradiary.ui.fragment.dialog
 import com.websarva.wings.android.zuboradiary.R
 import com.websarva.wings.android.zuboradiary.ui.fragment.RESULT_KEY_PREFIX
 import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
-import com.websarva.wings.android.zuboradiary.ui.model.result.DiaryListItemDeleteResult
 import com.websarva.wings.android.zuboradiary.ui.utils.toJapaneseDateString
 
 
@@ -19,19 +18,16 @@ class DiaryListDeleteDialogFragment : BaseAlertDialogFragment() {
     }
 
     override fun createMessage(): String {
-        val date = DiaryListDeleteDialogFragmentArgs.fromBundle(requireArguments()).date
+        val date = DiaryListDeleteDialogFragmentArgs.fromBundle(requireArguments()).parameters.loadedDate
         val dateString = date.toJapaneseDateString(requireContext())
         return dateString + getString(R.string.dialog_diary_delete_message)
     }
 
     override fun handleOnPositiveButtonClick() {
 
-        val deleteDiaryDate =
-            DiaryListDeleteDialogFragmentArgs.fromBundle(requireArguments()).date
-        val deleteDiaryImageUri =
-            DiaryListDeleteDialogFragmentArgs.fromBundle(requireArguments()).imageUri
-        val resultData = DiaryListItemDeleteResult(deleteDiaryDate, deleteDiaryImageUri)
-        setResult(KEY_RESULT, DialogResult.Positive(resultData))
+        val parameters =
+            DiaryListDeleteDialogFragmentArgs.fromBundle(requireArguments()).parameters
+        setResult(KEY_RESULT, DialogResult.Positive(parameters))
     }
 
     override fun handleOnNegativeButtonClick() {

@@ -18,8 +18,8 @@ import com.websarva.wings.android.zuboradiary.ui.adapter.diary.diary.DiaryDayLis
 import com.websarva.wings.android.zuboradiary.ui.adapter.diary.diary.DiaryYearMonthList
 import com.websarva.wings.android.zuboradiary.ui.model.state.DiaryListState
 import com.websarva.wings.android.zuboradiary.ui.model.event.DiaryListEvent
+import com.websarva.wings.android.zuboradiary.ui.model.parameters.DiaryDeleteParameters
 import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
-import com.websarva.wings.android.zuboradiary.ui.model.result.DiaryListItemDeleteResult
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -132,7 +132,11 @@ internal class DiaryListViewModel @Inject constructor(
 
     fun onDiaryListItemDeleteButtonClicked(date: LocalDate, uri: Uri?) {
         viewModelScope.launch {
-            emitViewModelEvent(DiaryListEvent.NavigateDiaryDeleteDialog(date, uri))
+            emitViewModelEvent(
+                DiaryListEvent.NavigateDiaryDeleteDialog(
+                    DiaryDeleteParameters(date, uri)
+                )
+            )
         }
     }
 
@@ -197,12 +201,12 @@ internal class DiaryListViewModel @Inject constructor(
             }
     }
 
-    fun onDiaryDeleteDialogResultReceived(result: DialogResult<DiaryListItemDeleteResult>) {
+    fun onDiaryDeleteDialogResultReceived(result: DialogResult<DiaryDeleteParameters>) {
         when (result) {
-            is DialogResult.Positive<DiaryListItemDeleteResult> -> {
+            is DialogResult.Positive<DiaryDeleteParameters> -> {
                 onDiaryDeleteDialogPositiveResultReceived(
-                    result.data.date,
-                    result.data.uri
+                    result.data.loadedDate,
+                    result.data.loadedImageUri
                 )
             }
             DialogResult.Negative,
