@@ -13,8 +13,8 @@ import androidx.viewbinding.ViewBinding
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import com.websarva.wings.android.zuboradiary.ui.fragment.FragmentHelper
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
-import com.websarva.wings.android.zuboradiary.ui.theme.ThemeColorInflaterCreator
 import com.websarva.wings.android.zuboradiary.ui.utils.enableEdgeToEdge
 import com.websarva.wings.android.zuboradiary.ui.utils.requireValue
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.SettingsViewModel
@@ -32,6 +32,8 @@ abstract class BaseBottomSheetDialogFragment<T: ViewBinding> : BottomSheetDialog
     //      この警告に対応するSuppressネームはなく、"unused"のみでは不要Suppressとなる為、"RedundantSuppression"も追記する。
     @Suppress("unused", "RedundantSuppression")
     private val settingsViewModel: SettingsViewModel by activityViewModels()
+
+    private val fragmentHelper = FragmentHelper()
 
     internal val themeColor
         get() = settingsViewModel.themeColor.requireValue()
@@ -60,8 +62,7 @@ abstract class BaseBottomSheetDialogFragment<T: ViewBinding> : BottomSheetDialog
 
         setUpDialogCancelFunction()
 
-        val themeColorInflater =
-            ThemeColorInflaterCreator().create(inflater, themeColor)
+        val themeColorInflater = fragmentHelper.createThemeColorInflater(inflater, themeColor)
         _binding = createViewBinding(themeColorInflater, container)
         return binding.root
     }

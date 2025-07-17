@@ -9,7 +9,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import androidx.viewbinding.ViewBinding
 import com.websarva.wings.android.zuboradiary.R
-import com.websarva.wings.android.zuboradiary.ui.theme.ThemeColorInflaterCreator
+import com.websarva.wings.android.zuboradiary.ui.fragment.FragmentHelper
 import com.websarva.wings.android.zuboradiary.ui.utils.enableEdgeToEdge
 import com.websarva.wings.android.zuboradiary.ui.utils.requireValue
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.SettingsViewModel
@@ -26,6 +26,8 @@ abstract class BaseFullScreenDialogFragment<T: ViewBinding>: DialogFragment() {
     @Suppress("unused", "RedundantSuppression")
     private val settingsViewModel: SettingsViewModel by activityViewModels()
 
+    private val fragmentHelper = FragmentHelper()
+
     internal val themeColor
         get() = settingsViewModel.themeColor.requireValue()
 
@@ -37,7 +39,7 @@ abstract class BaseFullScreenDialogFragment<T: ViewBinding>: DialogFragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View? {
-        val themeColorInflater = ThemeColorInflaterCreator().create(inflater, themeColor)
+        val themeColorInflater = fragmentHelper.createThemeColorInflater(inflater, themeColor)
         _binding = createViewBinding(themeColorInflater, container)
         return binding.root
     }
