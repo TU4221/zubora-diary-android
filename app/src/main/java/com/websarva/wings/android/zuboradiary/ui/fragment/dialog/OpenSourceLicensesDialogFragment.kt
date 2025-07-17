@@ -14,7 +14,7 @@ import com.mikepenz.aboutlibraries.ui.compose.m3.LibrariesContainer
 import com.mikepenz.aboutlibraries.ui.compose.m3.LibraryDefaults
 import com.websarva.wings.android.zuboradiary.databinding.FragmentOpenSourceLicensesBinding
 
-class OpenSourceLicensesDialogFragment: BaseFullScreenDialogFragment<FragmentOpenSourceLicensesBinding>() {
+class OpenSourceLicensesDialogFragment: BaseSimpleFullScreenDialogFragment<FragmentOpenSourceLicensesBinding>() {
 
     override fun createViewBinding(
         inflater: LayoutInflater,

@@ -1,70 +1,121 @@
 package com.websarva.wings.android.zuboradiary.ui.fragment.dialog
 
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
-import androidx.fragment.app.DialogFragment
-import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import androidx.viewbinding.ViewBinding
-import com.websarva.wings.android.zuboradiary.R
-import com.websarva.wings.android.zuboradiary.ui.fragment.FragmentHelper
-import com.websarva.wings.android.zuboradiary.ui.utils.enableEdgeToEdge
-import com.websarva.wings.android.zuboradiary.ui.utils.requireValue
-import com.websarva.wings.android.zuboradiary.ui.viewmodel.SettingsViewModel
+import com.websarva.wings.android.zuboradiary.ui.model.AppMessage
+import com.websarva.wings.android.zuboradiary.ui.model.event.ViewModelEvent
+import com.websarva.wings.android.zuboradiary.ui.model.navigation.NavigationCommand
+import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
+import com.websarva.wings.android.zuboradiary.ui.model.state.UiState
+import com.websarva.wings.android.zuboradiary.ui.viewmodel.BaseViewModel
+import kotlinx.coroutines.CoroutineScope
 
-abstract class BaseFullScreenDialogFragment<T: ViewBinding>: DialogFragment() {
+abstract class BaseFullScreenDialogFragment<T: ViewBinding>: BaseSimpleFullScreenDialogFragment<T>() {
 
-    // View関係
-    private var _binding: T? = null
-    internal val binding get() = checkNotNull(_binding)
+    internal abstract val mainViewModel: BaseViewModel<out ViewModelEvent, out AppMessage, out UiState>
 
-    // MEMO:委譲プロパティの委譲先(viewModels())の遅延初期化により"Field is never assigned."と警告が表示される。
-    //      委譲プロパティによるViewModel生成は公式が推奨する方法の為、警告を無視する。その為、@Suppressを付与する。
-    //      この警告に対応するSuppressネームはなく、"unused"のみでは不要Suppressとなる為、"RedundantSuppression"も追記する。
-    @Suppress("unused", "RedundantSuppression")
-    private val settingsViewModel: SettingsViewModel by activityViewModels()
+    internal abstract val destinationId: Int
 
-    private val fragmentHelper = FragmentHelper()
-
-    internal val themeColor
-        get() = settingsViewModel.themeColor.requireValue()
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setStyle(STYLE_NORMAL, R.style.MaterialFullScreenDialogTheme)
+    internal fun launchAndRepeatOnViewLifeCycleStarted(
+        block: suspend CoroutineScope.() -> Unit
+    ) {
+        fragmentHelper.launchAndRepeatOnViewLifeCycleStarted(this, block)
     }
-
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
-    ): View? {
-        val themeColorInflater = fragmentHelper.createThemeColorInflater(inflater, themeColor)
-        _binding = createViewBinding(themeColorInflater, container)
-        return binding.root
-    }
-
-    internal abstract fun createViewBinding(inflater: LayoutInflater, container: ViewGroup?): T
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        enableEdgeToEdge(themeColor)
+
+        initializeFragmentResultReceiver()
+        setUpViewModelEvent()
+        setUpPendingNavigationCollector()
+        registerOnBackPressedCallback()
     }
 
-    override fun onStart() {
-        super.onStart()
-        dialog?.window?.setLayout(
-            ViewGroup.LayoutParams.MATCH_PARENT,
-            ViewGroup.LayoutParams.MATCH_PARENT
+    /**
+     *  setUpFragmentResultReceiver()、setUpDialogResultReceiver()を使用してフラグメント、ダイアログからの結果の処理内容を設定する
+     * */
+    internal abstract fun initializeFragmentResultReceiver()
+
+    internal fun <T> setUpDialogResultReceiver(key: String, block: (DialogResult<T>) -> Unit) {
+        setUpFragmentResultReceiverInternal(key, block)
+    }
+
+    private fun <R> setUpFragmentResultReceiverInternal(key: String, block: (R) -> Unit) {
+        fragmentHelper
+            .setUpFragmentResultReceiverInternal(
+                this,
+                findNavController(),
+                destinationId,
+                key,
+                block
+            )
+    }
+
+    private fun setUpViewModelEvent() {
+        setUpMainViewModelEvent()
+        setUpSettingsViewModelEvent()
+    }
+
+    private fun setUpMainViewModelEvent() {
+        fragmentHelper
+            .setUpMainViewModelEvent(
+                this,
+                mainViewModel,
+                ::onMainViewModelEventReceived
+            )
+    }
+
+    internal abstract fun onMainViewModelEventReceived(event: ViewModelEvent)
+
+    private fun setUpSettingsViewModelEvent() {
+        fragmentHelper.setUpSettingsViewModelEvent(
+            this,
+            mainViewModel,
+            settingsViewModel,
+            ::navigateAppMessageDialog
         )
     }
 
-    override fun onDestroyView() {
-        _binding = null
-        super.onDestroyView()
+    private fun setUpPendingNavigationCollector() {
+        fragmentHelper
+            .setUpPendingNavigationCollector(
+                findNavController(),
+                destinationId,
+                mainViewModel,
+                ::navigateFragment
+            )
     }
 
-    internal fun navigatePreviousFragment() {
-        findNavController().navigateUp()
+    internal fun navigateFragment(command: NavigationCommand) {
+        fragmentHelper
+            .navigateFragment(
+                findNavController(),
+                destinationId,
+                mainViewModel,
+                command
+            )
+    }
+
+    override fun navigatePreviousFragment() {
+        fragmentHelper
+            .navigatePreviousFragment(
+                findNavController(),
+                destinationId,
+                mainViewModel
+            )
+    }
+
+    internal abstract fun navigateAppMessageDialog(appMessage: AppMessage)
+
+    private fun registerOnBackPressedCallback() {
+        fragmentHelper
+            .registerOnBackPressedCallback(
+                this,
+                findNavController(),
+                destinationId,
+                mainViewModel
+            )
     }
 }
