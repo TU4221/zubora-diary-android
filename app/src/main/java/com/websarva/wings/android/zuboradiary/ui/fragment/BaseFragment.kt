@@ -212,7 +212,7 @@ abstract class BaseFragment<T: ViewBinding> : LoggingFragment() {
             )
     }
 
-    internal open fun navigatePreviousFragment() {
+    internal fun navigatePreviousFragment() {
         fragmentHelper
             .navigatePreviousFragment(
                 navController,
