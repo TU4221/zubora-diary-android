@@ -64,11 +64,9 @@ internal class FragmentHelper {
 
     fun setUpMainViewModelEvent(
         fragment: Fragment,
-        mainViewModel: BaseViewModel<out ViewModelEvent, out AppMessage, out UiState>?,
+        mainViewModel: BaseViewModel<out ViewModelEvent, out AppMessage, out UiState>,
         onEventReceived: (ViewModelEvent) -> Unit
     ) {
-        mainViewModel ?: return
-
         launchAndRepeatOnViewLifeCycleStarted(fragment) {
             mainViewModel.viewModelEvent
                 .collect { value: ConsumableEvent<ViewModelEvent> ->
@@ -83,7 +81,7 @@ internal class FragmentHelper {
 
     fun setUpSettingsViewModelEvent(
         fragment: Fragment,
-        mainViewModel: BaseViewModel<out ViewModelEvent, out AppMessage, out UiState>?,
+        mainViewModel: BaseViewModel<out ViewModelEvent, out AppMessage, out UiState>,
         settingsViewModel: SettingsViewModel,
         onAppMessageNavigationEventReceived: (AppMessage) -> Unit
     ) {
@@ -110,11 +108,9 @@ internal class FragmentHelper {
     fun setUpPendingNavigationCollector(
         navController: NavController,
         navDestinationId: Int,
-        mainViewModel: BaseViewModel<out ViewModelEvent, out AppMessage, out UiState>?,
+        mainViewModel: BaseViewModel<out ViewModelEvent, out AppMessage, out UiState>,
         onNavigationCommandReceived: (NavigationCommand) -> Unit
     ) {
-        mainViewModel ?: return
-
         val navBackStackEntry = navController.getBackStackEntry(navDestinationId)
         navBackStackEntry.lifecycleScope.launch {
             navBackStackEntry.repeatOnLifecycle(Lifecycle.State.RESUMED) {
@@ -142,11 +138,9 @@ internal class FragmentHelper {
     fun navigateFragment(
         navController: NavController,
         fragmentDestinationId: Int,
-        mainViewModel: BaseViewModel<out ViewModelEvent, out AppMessage, out UiState>?,
+        mainViewModel: BaseViewModel<out ViewModelEvent, out AppMessage, out UiState>,
         command: NavigationCommand,
     ) {
-        mainViewModel ?: return
-
         if (!canNavigateFragment(navController, fragmentDestinationId)) {
             mainViewModel.onFragmentNavigationFailed(command)
             return
@@ -194,7 +188,7 @@ internal class FragmentHelper {
     fun navigatePreviousFragment(
         navController: NavController,
         fragmentDestinationId: Int,
-        mainViewModel: BaseViewModel<out ViewModelEvent, out AppMessage, out UiState>?
+        mainViewModel: BaseViewModel<out ViewModelEvent, out AppMessage, out UiState>
     ) {
         navigateFragment(
             navController,
@@ -208,22 +202,18 @@ internal class FragmentHelper {
         fragment: Fragment,
         navController: NavController,
         fragmentDestinationId: Int,
-        mainViewModel: BaseViewModel<out ViewModelEvent, out AppMessage, out UiState>?
+        mainViewModel: BaseViewModel<out ViewModelEvent, out AppMessage, out UiState>
     ) {
         fragment.requireActivity().onBackPressedDispatcher
             .addCallback(
                 fragment.viewLifecycleOwner,
                 object : OnBackPressedCallback(true) {
                     override fun handleOnBackPressed() {
-                        if (mainViewModel == null) {
-                            navigatePreviousFragment(
-                                navController,
-                                fragmentDestinationId,
-                                null
-                            )
-                        } else {
-                            mainViewModel.onBackPressed()
-                        }
+                        navigatePreviousFragment(
+                            navController,
+                            fragmentDestinationId,
+                            mainViewModel
+                        )
                     }
                 }
             )

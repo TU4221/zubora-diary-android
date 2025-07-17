@@ -35,8 +35,7 @@ abstract class BaseFragment<T: ViewBinding> : LoggingFragment() {
     private var _binding: T? = null
     internal val binding get() = checkNotNull(_binding)
 
-    // MEMO:ViewModelが無いFragmentに対応できるようにNull許容型とする。
-    internal abstract val mainViewModel: BaseViewModel<out ViewModelEvent, out AppMessage, out UiState>?
+    internal abstract val mainViewModel: BaseViewModel<out ViewModelEvent, out AppMessage, out UiState>
 
     internal lateinit var navController: NavController
         private set
