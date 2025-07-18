@@ -15,6 +15,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.NavController
+import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.NavigationUI.onNavDestinationSelected
 import androidx.navigation.ui.NavigationUI.setupWithNavController
@@ -241,11 +242,7 @@ class MainActivity : LoggingActivity() {
         // Navigation設定
         // 参考:https://inside.luchegroup.com/entry/2023/05/08/113236
         val bottomNavigationView = binding.bottomNavigation
-        val navHostFragment =
-            checkNotNull(
-                supportFragmentManager.findFragmentById(R.id.fragment_nav_host)
-            ) as NavHostFragment
-        val navController = navHostFragment.navController
+        val navController = findNavController(R.id.fragment_nav_host)
         setupWithNavController(bottomNavigationView, navController)
 
         bottomNavigationView.apply {

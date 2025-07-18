@@ -17,6 +17,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.view.ContextThemeWrapper
 import androidx.constraintlayout.motion.widget.MotionLayout
 import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.findNavController
 import com.google.android.material.textfield.TextInputLayout
 import com.websarva.wings.android.zuboradiary.R
 import com.websarva.wings.android.zuboradiary.domain.model.Condition
@@ -911,7 +912,7 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding>() {
     private fun navigatePreviousFragmentOnDiaryDelete(result: FragmentResult.Some<LocalDate>) {
         val destinationId =
             try {
-                navController.getBackStackEntry(R.id.navigation_calendar_fragment)
+                findNavController().getBackStackEntry(R.id.navigation_calendar_fragment)
                 R.id.navigation_calendar_fragment
             } catch (e: IllegalArgumentException) {
                 R.id.navigation_diary_list_fragment

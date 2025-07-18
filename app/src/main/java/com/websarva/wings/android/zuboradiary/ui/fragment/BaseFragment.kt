@@ -6,8 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
-import androidx.navigation.NavController
-import androidx.navigation.fragment.NavHostFragment
+import androidx.navigation.fragment.findNavController
 import androidx.viewbinding.ViewBinding
 import com.google.android.material.transition.platform.MaterialFadeThrough
 import com.google.android.material.transition.platform.MaterialSharedAxis
@@ -42,9 +41,6 @@ abstract class BaseFragment<T: ViewBinding> : LoggingFragment() {
     //      この警告に対応するSuppressネームはなく、"unused"のみでは不要Suppressとなる為、"RedundantSuppression"も追記する。
     @Suppress("unused", "RedundantSuppression")
     internal val settingsViewModel: SettingsViewModel by activityViewModels()
-
-    internal lateinit var navController: NavController
-        private set
 
     internal abstract val destinationId: Int
 
@@ -135,8 +131,6 @@ abstract class BaseFragment<T: ViewBinding> : LoggingFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        navController = NavHostFragment.findNavController(this)
-
         initializeFragmentResultReceiver()
         setUpViewModelEvent()
         setUpPendingNavigationCollector()
@@ -160,7 +154,7 @@ abstract class BaseFragment<T: ViewBinding> : LoggingFragment() {
         fragmentHelper
             .setUpFragmentResultReceiverInternal(
                 this,
-                navController,
+                findNavController(),
                 destinationId,
                 key,
                 block
@@ -195,7 +189,7 @@ abstract class BaseFragment<T: ViewBinding> : LoggingFragment() {
     private fun setUpPendingNavigationCollector() {
         fragmentHelper
             .setUpPendingNavigationCollector(
-                navController,
+                findNavController(),
                 destinationId,
                 mainViewModel,
                 ::navigateFragment
@@ -205,7 +199,7 @@ abstract class BaseFragment<T: ViewBinding> : LoggingFragment() {
     internal fun navigateFragment(command: NavigationCommand) {
         fragmentHelper
             .navigateFragment(
-                navController,
+                findNavController(),
                 destinationId,
                 mainViewModel,
                 command
@@ -215,7 +209,7 @@ abstract class BaseFragment<T: ViewBinding> : LoggingFragment() {
     internal fun navigatePreviousFragment() {
         fragmentHelper
             .navigatePreviousFragment(
-                navController,
+                findNavController(),
                 destinationId,
                 mainViewModel
             )
@@ -227,7 +221,7 @@ abstract class BaseFragment<T: ViewBinding> : LoggingFragment() {
         fragmentHelper
             .registerOnBackPressedCallback(
                 this,
-                navController,
+                findNavController(),
                 destinationId,
                 mainViewModel
             )

@@ -8,7 +8,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
-import androidx.navigation.fragment.NavHostFragment
+import androidx.navigation.fragment.findNavController
 import androidx.viewbinding.ViewBinding
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
@@ -86,8 +86,7 @@ abstract class BaseBottomSheetDialogFragment<T: ViewBinding> : BottomSheetDialog
     }
 
     internal fun navigatePreviousFragment() {
-        val navController = NavHostFragment.findNavController(this)
-        navController.navigateUp()
+        findNavController().navigateUp()
     }
 
     // ダイアログ枠外タッチ、popBackStack時に処理
