@@ -73,8 +73,6 @@ internal class DiaryEditViewModel @Inject constructor(
         private const val SAVED_VIEW_MODEL_STATE_KEY = "viewModelState"
         private const val SAVED_PREVIOUS_DATE_STATE_KEY = "previousDate"
         private const val SAVED_LOADED_DIARY_KEY = "loadedDiary"
-        private const val SAVED_SHOULD_INITIALIZE_ON_FRAGMENT_DESTROY_STATE_KEY =
-            "shouldInitializeOnFragmentDestroy"
     }
 
     private val logTag = createLogTag()
@@ -298,17 +296,6 @@ internal class DiaryEditViewModel @Inject constructor(
             false
         )
 
-    // ViewModel初期化関係
-    // MEMO:画面回転時の不要な初期化を防ぐ
-    private val initialShouldInitializeOnFragmentDestroy = false
-    var shouldInitializeOnFragmentDestroy =
-        handle[SAVED_SHOULD_INITIALIZE_ON_FRAGMENT_DESTROY_STATE_KEY]
-            ?: initialShouldInitializeOnFragmentDestroy
-        set(value) {
-            handle[SAVED_SHOULD_INITIALIZE_ON_FRAGMENT_DESTROY_STATE_KEY] = value
-            field = value
-        }
-
     // TODO:テスト用の為、最終的に削除
     var isTesting = false
 
@@ -327,7 +314,6 @@ internal class DiaryEditViewModel @Inject constructor(
         _weather1AdapterList.value = initialWeatherAdapterList
         _weather2AdapterList.value = initialWeatherAdapterList
         _conditionAdapterList.value = initialConditionAdapterList
-        shouldInitializeOnFragmentDestroy = initialShouldInitializeOnFragmentDestroy
     }
 
     // BackPressed(戻るボタン)処理

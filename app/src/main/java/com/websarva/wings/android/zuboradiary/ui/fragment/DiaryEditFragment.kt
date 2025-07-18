@@ -17,8 +17,6 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.view.ContextThemeWrapper
 import androidx.constraintlayout.motion.widget.MotionLayout
 import androidx.fragment.app.viewModels
-import androidx.navigation.NavController
-import androidx.navigation.NavDestination
 import com.google.android.material.textfield.TextInputLayout
 import com.websarva.wings.android.zuboradiary.R
 import com.websarva.wings.android.zuboradiary.domain.model.Condition
@@ -122,7 +120,6 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding>() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        setUpViewModelInitialization()
         setUpFocusViewScroll()
         setUpDiaryData()
         setUpToolBar()
@@ -333,35 +330,6 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding>() {
             else -> {
                 throw IllegalArgumentException()
             }
-        }
-    }
-
-    private fun setUpViewModelInitialization() {
-        navController.addOnDestinationChangedListener(ViewModelInitializationSetupListener())
-    }
-
-    private inner class ViewModelInitializationSetupListener
-        : NavController.OnDestinationChangedListener {
-        override fun onDestinationChanged(
-            controller: NavController,
-            destination: NavDestination,
-            arguments: Bundle?
-        ) {
-            // MEMO:本Fragment、Dialog、DiaryItemTitleEditFragment以外のFragmentへ切り替わった時のみViewModelを初期化する。
-            if (destination.id == R.id.navigation_diary_edit_fragment
-                || destination.id == R.id.navigation_date_picker_dialog
-                || destination.id == R.id.navigation_diary_delete_dialog_for_diary_edit_fragment
-                || destination.id == R.id.navigation_diary_item_delete_dialog
-                || destination.id == R.id.navigation_diary_loading_dialog
-                || destination.id == R.id.navigation_diary_image_delete_dialog
-                || destination.id == R.id.navigation_diary_update_dialog
-                || destination.id == R.id.navigation_weather_info_fetch_dialog) return
-
-            if (destination.id != R.id.navigation_diary_item_title_edit_dialog) {
-                mainViewModel.shouldInitializeOnFragmentDestroy = true
-            }
-
-            navController.removeOnDestinationChangedListener(this)
         }
     }
 
@@ -985,16 +953,5 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding>() {
             requireContext().isAccessLocationGranted(),
             parameters
         )
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-
-        // MEMO:DiaryEditViewModelのスコープ範囲はActivityになるが、
-        //      DiaryEditFragment、DiaryItemTitleEditFragment表示時のみViewModelのプロパティ値を保持できたらよいので、
-        //      DiaryEditFragmentを破棄するタイミングでViewModelのプロパティ値を初期化する。
-        mainViewModel.apply {
-            if (shouldInitializeOnFragmentDestroy) initialize()
-        }
     }
 }
