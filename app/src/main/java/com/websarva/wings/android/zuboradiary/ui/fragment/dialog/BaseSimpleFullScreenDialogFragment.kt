@@ -10,6 +10,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.viewbinding.ViewBinding
 import com.websarva.wings.android.zuboradiary.R
 import com.websarva.wings.android.zuboradiary.ui.fragment.FragmentHelper
+import com.websarva.wings.android.zuboradiary.ui.theme.ThemeColorChanger
 import com.websarva.wings.android.zuboradiary.ui.utils.enableEdgeToEdge
 import com.websarva.wings.android.zuboradiary.ui.utils.requireValue
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.SettingsViewModel
@@ -49,6 +50,8 @@ abstract class BaseSimpleFullScreenDialogFragment<T: ViewBinding>: DialogFragmen
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         enableEdgeToEdge(themeColor)
+        val dialogWindow = checkNotNull(dialog?.window)
+        ThemeColorChanger().applyStatusBarIconColor(dialogWindow, themeColor)
     }
 
     override fun onStart() {
