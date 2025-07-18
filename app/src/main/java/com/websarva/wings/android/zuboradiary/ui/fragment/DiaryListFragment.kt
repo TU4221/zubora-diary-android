@@ -232,7 +232,6 @@ class DiaryListFragment :
         Log.d("20250714", "navigateDiaryEditFragment()")
         val directions =
             DiaryListFragmentDirections.actionNavigationDiaryListFragmentToDiaryEditFragment(
-                true,
                 false,
                 LocalDate.now()
             )

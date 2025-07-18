@@ -586,7 +586,6 @@ class CalendarFragment :
     private fun navigateDiaryEditFragment(date: LocalDate, shouldLoadDiary: Boolean) {
         val directions =
             CalendarFragmentDirections.actionNavigationCalendarFragmentToDiaryEditFragment(
-                true,
                 shouldLoadDiary,
                 date
             )

@@ -31,9 +31,6 @@
                 android:id="@+id/action_navigation_diary_list_fragment_to_diary_edit_fragment"
                 app:destination="@id/nested_navigation_diary_edit">
                 <argument
-                    android:name="is_start_diary_fragment"
-                    app:argType="boolean" />
-                <argument
                     android:name="should_load_diary"
                     app:argType="boolean" />
                 <argument
@@ -116,9 +113,6 @@
             <action
                 android:id="@+id/action_navigation_calendar_fragment_to_diary_edit_fragment"
                 app:destination="@id/nested_navigation_diary_edit">
-                <argument
-                    android:name="is_start_diary_fragment"
-                    app:argType="boolean" />
                 <argument
                     android:name="should_load_diary"
                     app:argType="boolean" />
@@ -254,9 +248,6 @@
                 android:id="@+id/action_navigation_diary_show_fragment_to_diary_edit_fragment"
                 app:destination="@id/nested_navigation_diary_edit">
                 <argument
-                    android:name="is_start_diary_fragment"
-                    app:argType="boolean" />
-                <argument
                     android:name="should_load_diary"
                     app:argType="boolean" />
                 <argument
@@ -310,9 +301,6 @@
             tools:layout="@layout/fragment_diary_edit"
             android:label="@string/title_settings" >
             <argument
-                android:name="is_start_diary_fragment"
-                app:argType="boolean" />
-            <argument
                 android:name="should_load_diary"
                 app:argType="boolean" />
             <argument
@@ -324,7 +312,7 @@
                 app:destination="@id/navigation_diary_item_title_edit_dialog"/>
 
             <action
-                android:id="@+id/action_diary_edit_fragment_to_diary_show_fragment_pattern_1"
+                android:id="@+id/action_diary_edit_fragment_to_diary_show_fragment_pop_up_to_diary_show"
                 app:destination="@id/nested_navigation_diary_show"
                 app:popUpTo="@id/navigation_diary_show_fragment"
                 app:popUpToInclusive="true">
@@ -334,7 +322,7 @@
             </action>
 
             <action
-                android:id="@+id/action_diary_edit_fragment_to_diary_show_fragment_pattern_2"
+                android:id="@+id/action_diary_edit_fragment_to_diary_show_fragment_pop_up_to_diary_edit"
                 app:destination="@id/nested_navigation_diary_show"
                 app:popUpTo="@id/navigation_diary_edit_fragment"
                 app:popUpToInclusive="true">

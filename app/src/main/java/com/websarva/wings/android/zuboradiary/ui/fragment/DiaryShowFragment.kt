@@ -300,7 +300,6 @@ internal class DiaryShowFragment : BaseFragment<FragmentDiaryShowBinding>() {
     private fun navigateDiaryEditFragment(date: LocalDate) {
         val directions =
             DiaryShowFragmentDirections.actionNavigationDiaryShowFragmentToDiaryEditFragment(
-                false,
                 true,
                 date
             )

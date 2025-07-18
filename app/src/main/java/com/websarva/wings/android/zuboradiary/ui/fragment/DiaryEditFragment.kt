@@ -821,14 +821,18 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding>() {
 
     private fun navigateDiaryShowFragment(date: LocalDate) {
         // 循環型画面遷移を成立させるためにPopup対象Fragmentが異なるdirectionsを切り替える。
-        // TODO:下記条件変更(isStartDiaryFragmentを受け取らず、NavBackStackの状態から判断する)
-        val isStartDiaryFragment =
-            DiaryEditFragmentArgs.fromBundle(requireArguments()).isStartDiaryFragment
+        val containsDiaryShowFragment =
+            try {
+                findNavController().getBackStackEntry(R.id.navigation_diary_show_fragment)
+                true
+            } catch (e: IllegalArgumentException) {
+                false
+            }
 
-        val directions = if (isStartDiaryFragment) {
-            DiaryEditFragmentDirections.actionDiaryEditFragmentToDiaryShowFragmentPattern2(date)
+        val directions = if (containsDiaryShowFragment) {
+            DiaryEditFragmentDirections.actionDiaryEditFragmentToDiaryShowFragmentPopUpToDiaryShow(date)
         } else {
-            DiaryEditFragmentDirections.actionDiaryEditFragmentToDiaryShowFragmentPattern1(date)
+            DiaryEditFragmentDirections.actionDiaryEditFragmentToDiaryShowFragmentPopUpToDiaryEdit(date)
         }
         navigateFragment(NavigationCommand.To(directions))
     }
