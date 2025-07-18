@@ -150,26 +150,6 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding>() {
         setUpFragmentResultReceiver(
             DiaryItemTitleEditDialog.KEY_RESULT
         ) { result: FragmentResult<DiaryItemTitle> ->
-
-            // TODO:シールドクラス Action -> Event に変更してから下記コードの処理方法を検討する。
-            when (result) {
-                is FragmentResult.Some -> {
-                    val focusTargetView =
-                        when (result.data.itemNumber.value) {
-                            1 -> binding.includeItem1.textInputEditTextTitle
-                            2 -> binding.includeItem2.textInputEditTextTitle
-                            3 -> binding.includeItem3.textInputEditTextTitle
-                            4 -> binding.includeItem4.textInputEditTextTitle
-                            5 -> binding.includeItem5.textInputEditTextTitle
-                            else -> throw IllegalStateException()
-                        }
-                    focusTargetView.requestFocus()
-                }
-                FragmentResult.None -> {
-                    // 処理なし
-                }
-            }
-
             mainViewModel.onItemTitleEditFragmentResultReceived(result)
         }
     }
