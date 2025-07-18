@@ -320,8 +320,8 @@
                 app:argType="java.time.LocalDate" />
 
             <action
-                android:id="@+id/action_diary_edit_fragment_to_select_item_title_fragment"
-                app:destination="@id/navigation_diary_item_title_edit_fragment"/>
+                android:id="@+id/action_diary_edit_fragment_to_diary_item_title_edit_dialog"
+                app:destination="@id/navigation_diary_item_title_edit_dialog"/>
 
             <action
                 android:id="@+id/action_diary_edit_fragment_to_diary_show_fragment_pattern_1"
@@ -458,32 +458,32 @@
                 app:argType="com.websarva.wings.android.zuboradiary.ui.model.parameters.NavigatePreviousParameters" />
         </dialog>
 
-        <fragment
-            android:id="@+id/navigation_diary_item_title_edit_fragment"
-            android:name="com.websarva.wings.android.zuboradiary.ui.fragment.DiaryItemTitleEditFragment"
-            tools:layout="@layout/fragment_diary_item_title_edit" >
+        <dialog
+            android:id="@+id/navigation_diary_item_title_edit_dialog"
+            android:name="com.websarva.wings.android.zuboradiary.ui.fragment.dialog.DiaryItemTitleEditDialog"
+            tools:layout="@layout/dialog_diary_item_title_edit" >
             <argument
                 android:name="diary_item_title"
                 app:argType="com.websarva.wings.android.zuboradiary.ui.model.DiaryItemTitle" />
 
             <action
-                android:id="@+id/action_diary_item_title_edit_fragment_to_diary_edit_fragment"
+                android:id="@+id/action_diary_item_title_edit_dialog_to_diary_edit_fragment"
                 app:popUpTo="@id/navigation_diary_edit_fragment"
                 app:popUpToInclusive="false"/>
 
             <action
-                android:id="@+id/action_diary_item_title_edit_fragment_to_diary_item_title_delete_dialog"
+                android:id="@+id/action_diary_item_title_edit_dialog_to_diary_item_title_delete_dialog"
                 app:destination="@id/navigation_diary_item_title_delete_dialog"/>
 
             <action
-                android:id="@+id/action_diary_item_title_edit_fragment_to_app_message_dialog"
+                android:id="@+id/action_diary_item_title_edit_dialog_to_app_message_dialog"
                 app:destination="@id/navigation_app_message_dialog">
                 <argument
                     android:name="app_message"
                     app:argType="com.websarva.wings.android.zuboradiary.ui.model.AppMessage" />
             </action>
 
-        </fragment>
+        </dialog>
 
         <dialog
             android:id="@+id/navigation_diary_item_title_delete_dialog"

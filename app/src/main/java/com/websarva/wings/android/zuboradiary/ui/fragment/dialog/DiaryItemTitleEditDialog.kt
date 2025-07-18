@@ -1,17 +1,20 @@
-package com.websarva.wings.android.zuboradiary.ui.fragment
+package com.websarva.wings.android.zuboradiary.ui.fragment.dialog
 
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.findNavController
+import com.google.android.material.textfield.TextInputLayout
 import com.websarva.wings.android.zuboradiary.R
+import com.websarva.wings.android.zuboradiary.databinding.DialogDiaryItemTitleEditBinding
 import com.websarva.wings.android.zuboradiary.ui.model.AppMessage
-import com.websarva.wings.android.zuboradiary.databinding.FragmentDiaryItemTitleEditBinding
-import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.DiaryItemTitleDeleteDialogFragment
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.DiaryItemTitleEditViewModel
 import com.websarva.wings.android.zuboradiary.ui.adapter.diaryitemtitle.ItemTitleSelectionHistoryListAdapter
 import com.websarva.wings.android.zuboradiary.ui.adapter.diaryitemtitle.SelectionHistoryList
+import com.websarva.wings.android.zuboradiary.ui.fragment.RESULT_KEY_PREFIX
 import com.websarva.wings.android.zuboradiary.ui.model.event.DiaryItemTitleEditEvent
 import com.websarva.wings.android.zuboradiary.ui.model.event.ViewModelEvent
 import com.websarva.wings.android.zuboradiary.ui.model.navigation.NavigationCommand
@@ -24,14 +27,14 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.filterNotNull
 
 @AndroidEntryPoint
-class DiaryItemTitleEditFragment : BaseFragment<FragmentDiaryItemTitleEditBinding>() {
+class DiaryItemTitleEditDialog : BaseFullScreenDialogFragment<DialogDiaryItemTitleEditBinding>() {
 
     internal companion object {
         // Navigation関係
-        val KEY_RESULT = RESULT_KEY_PREFIX + DiaryItemTitleEditFragment::class.java.name
+        val KEY_RESULT = RESULT_KEY_PREFIX + DiaryItemTitleEditDialog::class.java.name
     }
 
-    override val destinationId = R.id.navigation_diary_item_title_edit_fragment
+    override val destinationId = R.id.navigation_diary_item_title_edit_dialog
 
     // ViewModel
     // MEMO:委譲プロパティの委譲先(viewModels())の遅延初期化により"Field is never assigned."と警告が表示される。
@@ -41,9 +44,9 @@ class DiaryItemTitleEditFragment : BaseFragment<FragmentDiaryItemTitleEditBindin
     override val mainViewModel: DiaryItemTitleEditViewModel by viewModels()
 
     override fun createViewBinding(
-        themeColorInflater: LayoutInflater, container: ViewGroup
-    ): FragmentDiaryItemTitleEditBinding {
-        return FragmentDiaryItemTitleEditBinding.inflate(themeColorInflater, container, false)
+        themeColorInflater: LayoutInflater, container: ViewGroup?
+    ): DialogDiaryItemTitleEditBinding {
+        return DialogDiaryItemTitleEditBinding.inflate(themeColorInflater, container, false)
             .apply {
                 lifecycleOwner = viewLifecycleOwner
                 viewModel = mainViewModel
@@ -107,7 +110,7 @@ class DiaryItemTitleEditFragment : BaseFragment<FragmentDiaryItemTitleEditBindin
     // EditDiaryFragmentからデータ受取
     private fun receiveDiaryItemTitleEditData() {
         val diaryItemTitle =
-            DiaryItemTitleEditFragmentArgs.fromBundle(requireArguments()).diaryItemTitle
+            DiaryItemTitleEditDialogArgs.fromBundle(requireArguments()).diaryItemTitle
         mainViewModel
             .onDiaryItemTitleDataReceivedFromPreviousFragment(diaryItemTitle)
     }
@@ -135,9 +138,26 @@ class DiaryItemTitleEditFragment : BaseFragment<FragmentDiaryItemTitleEditBindin
             binding.root,
             *textInputLayouts
         )
-        val transitionListener =
-            textInputConfigurator.createClearButtonSetupTransitionListener(*textInputLayouts)
-        addTransitionListener(transitionListener)
+
+        binding.textInputLayoutNewItemTitle.apply {
+            // TODO:下記条件は仮で記述。DiaryEditFragmentの入力欄との兼ね合いを考慮して検討する。デフォルトクリアボタンはアイコンは引用できる？
+            if (true) {
+                endIconMode = TextInputLayout.END_ICON_CLEAR_TEXT
+            } else {
+                endIconMode = TextInputLayout.END_ICON_CUSTOM
+                val editText = checkNotNull(editText)
+                setEndIconDrawable(R.drawable.ic_cancel_24px)
+                isEndIconVisible = editText.text.toString().isNotEmpty()
+                setEndIconOnClickListener {
+                    editText.setText("")
+                }
+                editText.addTextChangedListener(
+                    onTextChanged = { text, _, _, _ ->
+                        isEndIconVisible = text.toString().isNotEmpty()
+                    }
+                )
+            }
+        }
 
         launchAndRepeatOnViewLifeCycleStarted {
             mainViewModel.itemTitle.collectLatest {
@@ -189,9 +209,9 @@ class DiaryItemTitleEditFragment : BaseFragment<FragmentDiaryItemTitleEditBindin
         }
     }
 
-    // DiaryItemTitleEditFragmentを閉じる
+    // DiaryItemTitleEditDialogを閉じる
     private fun completeItemTitleEdit(diaryItemTitle: DiaryItemTitle) {
-        val navBackStackEntry = checkNotNull(navController.previousBackStackEntry)
+        val navBackStackEntry = checkNotNull(findNavController().previousBackStackEntry)
         val savedStateHandle = navBackStackEntry.savedStateHandle
         savedStateHandle[KEY_RESULT] = FragmentResult.Some(diaryItemTitle)
         navigateDiaryEditFragment()
@@ -199,7 +219,7 @@ class DiaryItemTitleEditFragment : BaseFragment<FragmentDiaryItemTitleEditBindin
 
     private fun navigateDiaryEditFragment() {
         val directions =
-            DiaryItemTitleEditFragmentDirections.actionDiaryItemTitleEditFragmentToDiaryEditFragment()
+            DiaryItemTitleEditDialogDirections.actionDiaryItemTitleEditDialogToDiaryEditFragment()
         navigateFragment(NavigationCommand.To(directions))
     }
 
@@ -207,16 +227,15 @@ class DiaryItemTitleEditFragment : BaseFragment<FragmentDiaryItemTitleEditBindin
         parameters: DiaryItemTitleSelectionHistoryItemDeleteParameters
     ) {
         val directions =
-            DiaryItemTitleEditFragmentDirections
-                .actionDiaryItemTitleEditFragmentToDiaryItemTitleDeleteDialog(
-                    parameters
-                )
+            DiaryItemTitleEditDialogDirections.actionDiaryItemTitleEditDialogToDiaryItemTitleDeleteDialog(
+                parameters
+            )
         navigateFragment(NavigationCommand.To(directions))
     }
 
     override fun navigateAppMessageDialog(appMessage: AppMessage) {
         val directions =
-            DiaryItemTitleEditFragmentDirections.actionDiaryItemTitleEditFragmentToAppMessageDialog(
+            DiaryItemTitleEditDialogDirections.actionDiaryItemTitleEditDialogToAppMessageDialog(
                 appMessage
             )
         navigateFragment(NavigationCommand.To(directions))

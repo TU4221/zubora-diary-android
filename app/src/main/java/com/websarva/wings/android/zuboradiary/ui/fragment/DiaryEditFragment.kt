@@ -37,6 +37,7 @@ import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.DiaryItemDelete
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.DiaryLoadingDialogFragment
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.DiaryLoadingFailureDialogFragment
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.DiaryImageDeleteDialogFragment
+import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.DiaryItemTitleEditDialog
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.DiaryUpdateDialogFragment
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.ExitWithoutDiarySavingDialogFragment
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.WeatherInfoFetchDialogFragment
@@ -150,7 +151,7 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding>() {
     // DiaryItemTitleEditFragmentから編集結果受取
     private fun setUpDiaryItemTitleEditFragmentResultReceiver() {
         setUpFragmentResultReceiver(
-            DiaryItemTitleEditFragment.KEY_RESULT
+            DiaryItemTitleEditDialog.KEY_RESULT
         ) { result: FragmentResult<DiaryItemTitle> ->
 
             // TODO:シールドクラス Action -> Event に変更してから下記コードの処理方法を検討する。
@@ -356,7 +357,7 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding>() {
                 || destination.id == R.id.navigation_diary_update_dialog
                 || destination.id == R.id.navigation_weather_info_fetch_dialog) return
 
-            if (destination.id != R.id.navigation_diary_item_title_edit_fragment) {
+            if (destination.id != R.id.navigation_diary_item_title_edit_dialog) {
                 mainViewModel.shouldInitializeOnFragmentDestroy = true
             }
 
@@ -885,7 +886,7 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding>() {
 
     private fun navigateDiaryItemTitleEditFragment(diaryItemTitle: DiaryItemTitle) {
         val directions =
-            DiaryEditFragmentDirections.actionDiaryEditFragmentToSelectItemTitleFragment(
+            DiaryEditFragmentDirections.actionDiaryEditFragmentToDiaryItemTitleEditDialog(
                 diaryItemTitle
             )
         navigateFragment(NavigationCommand.To(directions))
