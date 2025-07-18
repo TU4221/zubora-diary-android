@@ -214,13 +214,7 @@ class DiaryItemTitleEditDialog : BaseFullScreenDialogFragment<DialogDiaryItemTit
         val navBackStackEntry = checkNotNull(findNavController().previousBackStackEntry)
         val savedStateHandle = navBackStackEntry.savedStateHandle
         savedStateHandle[KEY_RESULT] = FragmentResult.Some(diaryItemTitle)
-        navigateDiaryEditFragment()
-    }
-
-    private fun navigateDiaryEditFragment() {
-        val directions =
-            DiaryItemTitleEditDialogDirections.actionDiaryItemTitleEditDialogToDiaryEditFragment()
-        navigateFragment(NavigationCommand.To(directions))
+        navigatePreviousFragment()
     }
 
     private fun navigateDiaryItemTitleDeleteDialog(
