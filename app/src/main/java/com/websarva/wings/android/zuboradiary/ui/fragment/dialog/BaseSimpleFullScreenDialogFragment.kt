@@ -45,7 +45,10 @@ abstract class BaseSimpleFullScreenDialogFragment<T: ViewBinding>: DialogFragmen
         return binding.root
     }
 
-    internal abstract fun createViewBinding(inflater: LayoutInflater, container: ViewGroup?): T
+    internal abstract fun createViewBinding(
+        themeColorInflater: LayoutInflater,
+        container: ViewGroup?
+    ): T
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)

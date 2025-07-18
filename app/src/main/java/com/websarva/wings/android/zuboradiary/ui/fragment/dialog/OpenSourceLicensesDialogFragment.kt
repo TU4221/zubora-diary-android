@@ -17,10 +17,10 @@ import com.websarva.wings.android.zuboradiary.databinding.FragmentOpenSourceLice
 class OpenSourceLicensesDialogFragment: BaseSimpleFullScreenDialogFragment<FragmentOpenSourceLicensesBinding>() {
 
     override fun createViewBinding(
-        inflater: LayoutInflater,
+        themeColorInflater: LayoutInflater,
         container: ViewGroup?
     ): FragmentOpenSourceLicensesBinding {
-        return FragmentOpenSourceLicensesBinding.inflate(inflater, container, false)
+        return FragmentOpenSourceLicensesBinding.inflate(themeColorInflater, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
