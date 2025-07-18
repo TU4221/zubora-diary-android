@@ -57,6 +57,10 @@
         <item name="expandedHintEnabled">false</item>
         <item name="endIconTint">?colorOnSurfaceVariant</item>
     </style>
+    <style name="AppTextInputLayoutClearTextStyle" parent="AppTextInputLayoutOutlinedBoxStyle">
+        <item name="endIconMode">clear_text</item>
+        <item name="endIconDrawable">@drawable/ic_cancel_24px</item>
+    </style>
 
     <style name="AppTextInputLayoutDropdownMenuStyle" parent="Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu">
         <item name="expandedHintEnabled">false</item>

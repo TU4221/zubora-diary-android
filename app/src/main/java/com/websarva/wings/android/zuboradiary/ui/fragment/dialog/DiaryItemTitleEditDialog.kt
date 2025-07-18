@@ -4,10 +4,8 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
-import com.google.android.material.textfield.TextInputLayout
 import com.websarva.wings.android.zuboradiary.R
 import com.websarva.wings.android.zuboradiary.databinding.DialogDiaryItemTitleEditBinding
 import com.websarva.wings.android.zuboradiary.ui.model.AppMessage
@@ -138,26 +136,6 @@ class DiaryItemTitleEditDialog : BaseFullScreenDialogFragment<DialogDiaryItemTit
             binding.root,
             *textInputLayouts
         )
-
-        binding.textInputLayoutNewItemTitle.apply {
-            // TODO:下記条件は仮で記述。DiaryEditFragmentの入力欄との兼ね合いを考慮して検討する。デフォルトクリアボタンはアイコンは引用できる？
-            if (true) {
-                endIconMode = TextInputLayout.END_ICON_CLEAR_TEXT
-            } else {
-                endIconMode = TextInputLayout.END_ICON_CUSTOM
-                val editText = checkNotNull(editText)
-                setEndIconDrawable(R.drawable.ic_cancel_24px)
-                isEndIconVisible = editText.text.toString().isNotEmpty()
-                setEndIconOnClickListener {
-                    editText.setText("")
-                }
-                editText.addTextChangedListener(
-                    onTextChanged = { text, _, _, _ ->
-                        isEndIconVisible = text.toString().isNotEmpty()
-                    }
-                )
-            }
-        }
 
         launchAndRepeatOnViewLifeCycleStarted {
             mainViewModel.itemTitle.collectLatest {
