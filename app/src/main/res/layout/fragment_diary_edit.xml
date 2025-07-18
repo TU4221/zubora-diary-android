@@ -214,7 +214,7 @@
                         <!-- MEMO:ViewBindingを使用している為、tools:ignore="DuplicateIncludedIds"記述 -->
                         <com.google.android.material.textfield.TextInputLayout
                             android:id="@+id/text_input_layout_title"
-                            style="@style/AppTextInputLayoutOutlinedBoxStyle"
+                            style="@style/AppTextInputLayoutClearTextStyle"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="@dimen/fragment_diary_edit_margin_top"

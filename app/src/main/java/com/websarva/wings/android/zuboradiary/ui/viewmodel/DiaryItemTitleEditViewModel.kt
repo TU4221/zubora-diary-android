@@ -13,6 +13,7 @@ import com.websarva.wings.android.zuboradiary.ui.model.DiaryItemTitleEditAppMess
 import com.websarva.wings.android.zuboradiary.ui.adapter.diaryitemtitle.SelectionHistoryList
 import com.websarva.wings.android.zuboradiary.ui.adapter.diaryitemtitle.SelectionHistoryListItem
 import com.websarva.wings.android.zuboradiary.ui.model.DiaryItemTitle
+import com.websarva.wings.android.zuboradiary.ui.model.InputTextValidateResult
 import com.websarva.wings.android.zuboradiary.ui.model.event.DiaryItemTitleEditEvent
 import com.websarva.wings.android.zuboradiary.ui.model.parameters.DiaryItemTitleSelectionHistoryItemDeleteParameters
 import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
@@ -65,18 +66,16 @@ internal class DiaryItemTitleEditViewModel @Inject constructor(
      * */
     val itemTitleMutable get() = _itemTitle
 
-
-    private val initialIsNewItemTitleSelectionEnabled = false
-    private val _isNewItemTitleSelectionEnabled =
-        MutableStateFlow(initialIsNewItemTitleSelectionEnabled)
-    val isNewItemTitleSelectionEnabled
-        get() = _isNewItemTitleSelectionEnabled.asStateFlow()
-
     private val initialItemTitleErrorMessageResId = null
     private val _itemTitleErrorMessageResId =
         MutableStateFlow<Int?>(initialItemTitleErrorMessageResId)
     val itemTitleErrorMessageResId
         get() = _itemTitleErrorMessageResId.asStateFlow()
+
+    val isNewItemTitleSelectionEnabled =
+        _itemTitleErrorMessageResId
+            .map { it == null }
+            .stateInDefault(viewModelScope, false)
 
     private val initialItemTitleSelectionHistoryList = SelectionHistoryList(emptyList())
     lateinit var itemTitleSelectionHistoryList: StateFlow<SelectionHistoryList>
@@ -109,14 +108,7 @@ internal class DiaryItemTitleEditViewModel @Inject constructor(
         val itemNumber = _itemNumber.requireValue()
         val itemTitle = _itemTitle.value
         viewModelScope.launch {
-            emitViewModelEvent(
-                DiaryItemTitleEditEvent.CompleteEdit(
-                    DiaryItemTitle(
-                        itemNumber,
-                        itemTitle
-                    )
-                )
-            )
+            completeItemTitleEdit(itemNumber, itemTitle)
         }
     }
 
@@ -183,7 +175,7 @@ internal class DiaryItemTitleEditViewModel @Inject constructor(
     }
 
     fun onItemTitleChanged(title: String) {
-        validateItemTitleInputField(title)
+        clearNewDiaryItemTitleErrorMessage(title)
     }
 
     private fun setUpItemTitleSelectionHistoryList() {
@@ -224,23 +216,52 @@ internal class DiaryItemTitleEditViewModel @Inject constructor(
         _itemTitle.value = itemTitle
     }
 
-    private fun validateItemTitleInputField(title: String) {
-        if (title.isEmpty()) {
-            _itemTitleErrorMessageResId.value =
-                R.string.fragment_diary_item_title_edit_new_item_title_input_field_error_message_empty
-            _isNewItemTitleSelectionEnabled.value = false
-            return
+    private suspend fun completeItemTitleEdit(itemNumber: ItemNumber, itemTitle: String) {
+        when (val result = validateNewDiaryItemTitleSelectable(itemTitle)) {
+            InputTextValidateResult.Valid -> {
+                val diaryItemTitle = DiaryItemTitle(itemNumber, itemTitle)
+                emitViewModelEvent(
+                    DiaryItemTitleEditEvent.CompleteEdit(
+                        diaryItemTitle
+                    )
+                )
+            }
+            is InputTextValidateResult.Invalid -> {
+                _itemTitleErrorMessageResId.value = result.errorMessageResId
+            }
         }
-        // 先頭が空白文字(\\s)
-        if (title.matches("\\s+.*".toRegex())) {
-            _itemTitleErrorMessageResId.value =
-                R.string.fragment_diary_item_title_edit_new_item_title_input_field_error_message_initial_char_unmatched
-            _isNewItemTitleSelectionEnabled.value = false
-            return
+    }
+
+    private fun clearNewDiaryItemTitleErrorMessage(itemTitle: String) {
+        if (_itemTitleErrorMessageResId.value == null) return
+
+        when (val result =validateNewDiaryItemTitleSelectable(itemTitle)) {
+            InputTextValidateResult.Valid -> {
+                _itemTitleErrorMessageResId.value = null
+            }
+            is InputTextValidateResult.Invalid -> {
+                _itemTitleErrorMessageResId.value = result.errorMessageResId
+                return
+            }
+        }
+    }
+
+    private fun validateNewDiaryItemTitleSelectable(title: String): InputTextValidateResult {
+        // 空欄
+        if (title.isEmpty()) {
+            return InputTextValidateResult.Invalid(
+                R.string.fragment_diary_item_title_edit_new_item_title_input_field_error_message_empty
+            )
         }
 
-        _itemTitleErrorMessageResId.value = null
-        _isNewItemTitleSelectionEnabled.value = true
+        // 先頭が空白文字(\\s)
+        if (title.matches("\\s+.*".toRegex())) {
+            return InputTextValidateResult.Invalid(
+                R.string.fragment_diary_item_title_edit_new_item_title_input_field_error_message_initial_char_unmatched
+            )
+        }
+
+        return InputTextValidateResult.Valid
     }
 
     private suspend fun deleteDiaryItemTitleSelectionHistoryItem(deleteTitle: String) {
