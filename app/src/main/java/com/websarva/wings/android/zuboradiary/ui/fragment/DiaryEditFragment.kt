@@ -780,21 +780,6 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding>() {
             }
 
         textInputConfigurator.setUpScrollable(*scrollableTextInputLayouts)
-
-        val clearableTextInputLayouts =
-            binding.run {
-                arrayOf(
-                    textInputLayoutTitle,
-                    includeItem1.textInputLayoutTitle,
-                    includeItem2.textInputLayoutTitle,
-                    includeItem3.textInputLayoutTitle,
-                    includeItem4.textInputLayoutTitle,
-                    includeItem5.textInputLayoutTitle,
-                )
-            }
-        val transitionListener =
-            textInputConfigurator.createClearButtonSetupTransitionListener(*clearableTextInputLayouts)
-        addTransitionListener(transitionListener)
     }
 
     private fun createAllTextInputLayoutList(): @Unmodifiable List<TextInputLayout> {

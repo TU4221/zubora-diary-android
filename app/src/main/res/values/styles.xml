@@ -61,6 +61,9 @@
         <item name="endIconMode">clear_text</item>
         <item name="endIconDrawable">@drawable/ic_cancel_24px</item>
     </style>
+    <style name="AppPersistentClearIconTextInputLayoutStyle" parent="AppTextInputLayoutOutlinedBoxStyle">
+        <item name="endIconDrawable">@drawable/ic_cancel_24px</item>
+    </style>
 
     <style name="AppTextInputLayoutDropdownMenuStyle" parent="Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu">
         <item name="expandedHintEnabled">false</item>
