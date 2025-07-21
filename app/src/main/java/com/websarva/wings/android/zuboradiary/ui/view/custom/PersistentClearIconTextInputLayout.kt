@@ -15,7 +15,7 @@ import com.websarva.wings.android.zuboradiary.R
 internal class PersistentClearIconTextInputLayout @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
-    defStyleAttr: Int = 0
+    defStyleAttr: Int = com.google.android.material.R.attr.textInputStyle
 ) : TextInputLayout(context, attrs, defStyleAttr) {
     init {
         endIconMode = END_ICON_CUSTOM
