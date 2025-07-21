@@ -108,10 +108,23 @@ internal open class EditTextConfigurator {
         }
     }
 
-    fun setUpFocusClearOnClickBackground(background: View, vararg editTexts: EditText) {
-        background.setOnClickListener { v: View ->
-            hideKeyboard(v)
-            Arrays.stream(editTexts).forEach { obj: EditText -> obj.clearFocus() }
+    fun setUpFocusClearOnClickBackground(background: View) {
+        // MEMO:BackGroundViewのクリック処理で自身にフォーカスを当てるには、isFocusableInTouchModeを有効にした状態で
+        //      requestFocus()を呼び出す必要がある。isFocusableInTouchModeを有効にしたままBackGroundViewをタッチすると、
+        //      クリック処理は行われず、フォーカスのみがあてられる。そのためキーボードが非表示にならず、
+        //      BackGroundViewにあわせたキーボードに切り替わる。フォーカスされた状態で再度タッチするとクリック処理が行われる。
+        //      上記を踏まえて下記コードで対応。
+        background.apply {
+            isClickable = true
+            isFocusable = true
+            setOnClickListener { v: View ->
+                hideKeyboard(v)
+
+                isFocusableInTouchMode = true
+                v.requestFocus()
+                v.clearFocus()
+                isFocusableInTouchMode = false
+            }
         }
     }
 

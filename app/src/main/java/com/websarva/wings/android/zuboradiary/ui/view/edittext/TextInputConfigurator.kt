@@ -3,7 +3,6 @@ package com.websarva.wings.android.zuboradiary.ui.view.edittext
 import android.text.Editable
 import android.text.TextWatcher
 import android.transition.Transition
-import android.view.View
 import android.widget.EditText
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
@@ -29,16 +28,6 @@ internal class TextInputConfigurator : EditTextConfigurator() {
             val editText = x.getEditTextNonNull()
             setUpKeyboardCloseOnEnter(editText)
         }
-    }
-
-    fun setUpFocusClearOnClickBackground(background: View, vararg textInputLayouts: TextInputLayout) {
-        val editTextList: MutableList<EditText> = ArrayList()
-        Arrays.stream(textInputLayouts).forEach { x: TextInputLayout ->
-            val editText = x.getEditTextNonNull()
-            editTextList.add(editText)
-        }
-        val editTexts = editTextList.toTypedArray<EditText>()
-        setUpFocusClearOnClickBackground(background, *editTexts)
     }
 
     /**

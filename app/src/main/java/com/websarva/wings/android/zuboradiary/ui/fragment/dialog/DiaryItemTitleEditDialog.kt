@@ -132,10 +132,7 @@ class DiaryItemTitleEditDialog : BaseFullScreenDialogFragment<DialogDiaryItemTit
             binding.textInputLayoutNewItemTitle
         )
         textInputConfigurator.setUpKeyboardCloseOnEnter(*textInputLayouts)
-        textInputConfigurator.setUpFocusClearOnClickBackground(
-            binding.root,
-            *textInputLayouts
-        )
+        textInputConfigurator.setUpFocusClearOnClickBackground(binding.root)
 
         launchAndRepeatOnViewLifeCycleStarted {
             mainViewModel.itemTitle.collectLatest {
