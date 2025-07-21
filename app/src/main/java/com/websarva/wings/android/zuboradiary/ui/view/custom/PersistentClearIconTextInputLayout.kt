@@ -20,8 +20,8 @@ internal class PersistentClearIconTextInputLayout @JvmOverloads constructor(
     init {
         endIconMode = END_ICON_CUSTOM
 
-        // TODO:"com.google.android.material.R"から参照したいが、AndroidStudioの不具合で参照できないため、
-        //      仮でアプリのRクラスから参照。
+        // MEMO:"com.google.android.material.R"内は変更、削除される可能性がある為、参照すを控えるように警告が表示される。
+        //      その為、アプリで用意したキャンセルアイコンをセットする。
         setEndIconDrawable(R.drawable.ic_cancel_24px)
 
         addOnEditTextAttachedListener {
