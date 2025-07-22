@@ -55,7 +55,6 @@ import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
 import com.websarva.wings.android.zuboradiary.ui.model.DiaryItemTitle
 import com.websarva.wings.android.zuboradiary.ui.utils.isAccessLocationGranted
 import com.websarva.wings.android.zuboradiary.ui.utils.toJapaneseDateString
-import com.websarva.wings.android.zuboradiary.ui.view.edittext.EditTextConfigurator
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.filterNotNull
@@ -128,7 +127,6 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding>() {
         setUpTitleInputField()
         setUpItemInputField()
         setUpImageInputField()
-        setupEditText()
     }
 
     override fun initializeFragmentResultReceiver() {
@@ -753,11 +751,6 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding>() {
                         )
                 }
         }
-    }
-
-    private fun setupEditText() {
-        val textInputConfigurator = EditTextConfigurator()
-        textInputConfigurator.setUpFocusClearOnClickBackground(binding.viewNestedScrollBackground)
     }
 
     private fun navigateDiaryShowFragment(date: LocalDate) {
