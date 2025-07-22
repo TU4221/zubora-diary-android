@@ -760,7 +760,6 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding>() {
     private fun setupEditText() {
         val textInputConfigurator = TextInputConfigurator()
         textInputConfigurator.setUpFocusClearOnClickBackground(binding.viewNestedScrollBackground)
-        textInputConfigurator.setUpKeyboardCloseOnEnter(binding.textInputEditTextTitle)
     }
 
     private fun createAllTextInputLayoutList(): @Unmodifiable List<TextInputLayout> {
