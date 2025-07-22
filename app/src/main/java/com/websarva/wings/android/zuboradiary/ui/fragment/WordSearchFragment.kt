@@ -11,7 +11,6 @@ import com.websarva.wings.android.zuboradiary.R
 import com.websarva.wings.android.zuboradiary.ui.model.AppMessage
 import com.websarva.wings.android.zuboradiary.domain.model.ThemeColor
 import com.websarva.wings.android.zuboradiary.databinding.FragmentWordSearchBinding
-import com.websarva.wings.android.zuboradiary.ui.view.edittext.EditTextConfigurator
 import com.websarva.wings.android.zuboradiary.ui.keyboard.KeyboardManager
 import com.websarva.wings.android.zuboradiary.ui.adapter.diary.DiaryDayListBaseItem
 import com.websarva.wings.android.zuboradiary.ui.adapter.diary.DiaryYearMonthListBaseAdapter.OnClickChildItemListener
@@ -96,13 +95,6 @@ class WordSearchFragment : BaseFragment<FragmentWordSearchBinding>() {
                     mainViewModel.onSearchWordChanged(value)
                 }
         }
-
-
-        val editTextConfigurator = EditTextConfigurator()
-        editTextConfigurator.setUpClearButton(
-            binding.editTextSearchWord,
-            binding.imageButtonSearchWordClear
-        )
     }
 
     private fun setUpWordSearchResultList() {
@@ -200,8 +192,8 @@ class WordSearchFragment : BaseFragment<FragmentWordSearchBinding>() {
     }
 
     private fun showKeyboard() {
-        binding.editTextSearchWord.requestFocus()
-        KeyboardManager().showKeyboard(binding.editTextSearchWord)
+        binding.textInputEditTextSearchWord.requestFocus()
+        KeyboardManager().showKeyboard(binding.textInputEditTextSearchWord)
     }
 
     override fun onDestroyView() {

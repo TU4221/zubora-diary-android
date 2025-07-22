@@ -50,31 +50,21 @@
                         android:layout_marginHorizontal="48dp"
                         android:background="@drawable/bg_word_search_input_bar">
 
-                        <com.websarva.wings.android.zuboradiary.ui.view.custom.DoneActionEditText
-                            style="@style/WordSearchTextViewStyle"
-                            android:id="@+id/edit_text_search_word"
+                        <com.google.android.material.textfield.TextInputLayout
+                            style="@style/WordSearchTextInputLayoutStyle"
+                            android:id="@+id/text_input_layout_search_word"
                             android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center"
-                            android:minHeight="48dp"
-                            android:autofillHints="false"
-                            android:paddingVertical="8dp"
-                            android:paddingStart="16dp"
-                            android:paddingEnd="48dp"
-                            android:textAppearance="@style/WordSearchTextViewTextAppearance"
-                            android:text="@={viewModel.searchWordMutableStateFlow}"
-                            android:hint="@string/fragment_word_search_input_field_hint"
-                            android:textSize="16sp" />
+                            android:layout_height="wrap_content" >
 
-                        <ImageButton
-                            style="@style/WordSearchImageButtonStyle"
-                            android:id="@+id/image_button_search_word_clear"
-                            android:layout_width="48dp"
-                            android:layout_height="48dp"
-                            android:layout_gravity="center_vertical|end"
-                            android:layout_marginHorizontal="8dp"
-                            android:contentDescription="@string/fragment_word_search_input_field_clear"
-                            android:onClick="@{() -> viewModel.onSearchWordClearButtonClicked()}" />
+                            <com.websarva.wings.android.zuboradiary.ui.view.custom.DoneActionTextInputEditText
+                                style="@style/WordSearchTextInputEditTextStyle"
+                                android:id="@+id/text_input_edit_text_search_word"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:textAppearance="@style/WordSearchTextInputEditTextTextAppearance"
+                                android:text="@={viewModel.searchWordMutableStateFlow}" />
+
+                        </com.google.android.material.textfield.TextInputLayout>
 
                     </FrameLayout>
 

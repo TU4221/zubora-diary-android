@@ -1,8 +1,6 @@
 package com.websarva.wings.android.zuboradiary.ui.view.edittext
 
-import android.text.Editable
 import android.text.InputType
-import android.text.TextWatcher
 import android.view.KeyEvent
 import android.view.MotionEvent
 import android.view.View
@@ -10,7 +8,6 @@ import android.view.View.OnFocusChangeListener
 import android.view.View.OnTouchListener
 import android.view.inputmethod.EditorInfo
 import android.widget.EditText
-import android.widget.ImageButton
 import android.widget.TextView
 import com.websarva.wings.android.zuboradiary.ui.keyboard.KeyboardManager
 
@@ -100,30 +97,5 @@ internal class EditTextConfigurator {
             nextView.requestFocus()
             return nextView
         }
-    }
-
-    fun setUpClearButton(editText: EditText, clearButton: ImageButton) {
-        editText.addTextChangedListener(object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {
-                // 処理なし
-            }
-
-            override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
-                val isVisible = s.toString().isNotEmpty()
-                val visibility = if (isVisible) {
-                    View.VISIBLE
-                } else {
-                    View.INVISIBLE
-                }
-                clearButton.visibility = visibility
-            }
-
-            override fun afterTextChanged(s: Editable) {
-                // 処理なし
-            }
-        })
-
-        clearButton.visibility = View.INVISIBLE
-        clearButton.setOnClickListener { editText.setText("") }
     }
 }

@@ -41,20 +41,6 @@
         <!--<item name="android:textColorHint">@color/text_hint_color_on_background</item>-->
     </style>
 
-    <!-- DoneActionEditText -->
-    <style name="DoneActionEditTextStyle" parent="Widget.AppCompat.EditText">
-        <item name="android:imeOptions">actionDone</item>
-        <item name="android:inputType">text</item>
-    </style>
-    <style name="AppDoneActionEditTextStyle" parent="DoneActionEditTextStyle">
-        <!-- HACK:"android:textColorHint"はTextAppearanceでは反映されない為、Styleに記述 -->
-        <item name="android:textColorHint">@color/hint_text_color_on_surface</item>
-    </style>
-    <style name="AppDoneActionEditTextTextAppearance" parent="TextAppearance.AppCompat.Small">
-        <item name="android:textColor">@color/text_color_on_surface</item>
-        <!--<item name="android:textColorHint">@color/text_hint_color_on_background</item>-->
-    </style>
-
     <style name="AppDropDownTextViewStyle" parent="AppTextViewStyle">
         <item name="android:gravity">center_vertical</item>
         <item name="android:paddingStart">?android:attr/listPreferredItemPaddingStart</item>
@@ -222,20 +208,25 @@
     </style>
 
     <!-- 検索バー -->
-    <style name="WordSearchTextViewStyle" parent="AppDoneActionEditTextStyle">
-        <!-- HACK:"android:textColorHint"はTextAppearanceでは反映されない為、Styleに記述 -->
-        <item name="android:textColorHint">@color/hint_text_color_on_secondary_container</item>
-        <item name="android:imeOptions">actionSearch</item>
-        <item name="android:background">@null</item>
-    </style>
-    <style name="WordSearchTextViewTextAppearance" parent="AppDoneActionEditTextTextAppearance">
-        <item name="android:textColor">@color/text_color_on_secondary_container</item>
-        <!--<item name="android:textColorHint">@color/hint_text_color_on_secondary_container</item>-->
+    <style name="WordSearchTextInputLayoutStyle" parent="AppTextInputLayoutClearTextStyle">
+        <item name="endIconTint">?colorOnSecondaryContainer</item>
+        <item name="hintEnabled">false</item>
+        <item name="boxBackgroundMode">none</item>
     </style>
 
-    <style name="WordSearchImageButtonStyle" parent="AppImageButtonStyle">
-        <item name="tint">?colorOnSecondaryContainer</item>
-        <item name="android:src">@drawable/ic_cancel_24px</item>
+    <style name="WordSearchTextInputEditTextStyle" parent="AppDoneActionTextInputEditTextStyle">
+        <item name="android:textColor">@color/text_color_on_secondary_container</item>
+        <item name="android:textColorHint">@color/hint_text_color_on_secondary_container</item>
+        <item name="android:imeOptions">actionSearch</item>
+        <item name="android:hint">@string/fragment_word_search_input_field_hint</item>
+    </style>
+    <style name="WordSearchTextInputEditTextTextAppearance" parent="TextAppearance.AppCompat.Medium.Inverse">
+        <!-- HACK:下記属性はTextAppearanceでは反映されない為、Styleに記述 -->
+        <!--
+        <item name="android:textColor">@color/text_color_on_secondary_container</item>
+        <item name="android:textColorHint">@color/hint_text_color_on_secondary_container</item>
+        -->
+        <item name="android:textSize">16sp</item>
     </style>
     <!-- ******************************************************************************** -->
 

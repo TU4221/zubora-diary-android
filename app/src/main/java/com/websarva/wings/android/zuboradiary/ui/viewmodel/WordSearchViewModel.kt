@@ -161,10 +161,6 @@ internal class WordSearchViewModel @Inject internal constructor(
         }
     }
 
-    fun onSearchWordClearButtonClicked() {
-        _searchWord.value = initialSearchWord
-    }
-
     fun onWordSearchResultListItemClicked(date: LocalDate) {
         viewModelScope.launch {
             emitViewModelEvent(WordSearchEvent.NavigateDiaryShowFragment(date))

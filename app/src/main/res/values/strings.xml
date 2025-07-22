@@ -30,7 +30,6 @@
 
     <!-- fragment_word_search -->
     <string name="fragment_word_search_input_field_hint">検索ワード入力</string>
-    <string name="fragment_word_search_input_field_clear">検索ワードクリア</string>
     <string name="fragment_word_search_no_results_message">一致するものが見つかりません。</string>
     <string name="fragment_word_search_num_results_message">件見つかりました。</string>
     <string name="fragment_word_search_result_item">項目</string>
