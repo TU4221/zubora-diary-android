@@ -13,11 +13,10 @@ import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.TextView
 import com.websarva.wings.android.zuboradiary.ui.keyboard.KeyboardManager
-import java.util.Arrays
 
-internal open class EditTextConfigurator {
+internal class EditTextConfigurator {
 
-    protected fun hideKeyboard(view: View) {
+     private fun hideKeyboard(view: View) {
         KeyboardManager().hideKeyboard(view)
     }
 
@@ -58,12 +57,7 @@ internal open class EditTextConfigurator {
         }
     }
 
-    fun setUpKeyboardCloseOnEnter(vararg editTexts: EditText) {
-        Arrays.stream(editTexts)
-            .forEach { editText: EditText -> this.setUpKeyboardCloseOnEnter(editText) }
-    }
-
-    protected fun setUpKeyboardCloseOnEnter(editText: EditText) {
+    fun setUpKeyboardCloseOnEnter(editText: EditText) {
         editText.setOnEditorActionListener(NextOnEnterListener())
     }
 

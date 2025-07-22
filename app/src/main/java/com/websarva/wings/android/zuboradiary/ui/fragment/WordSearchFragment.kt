@@ -100,7 +100,6 @@ class WordSearchFragment : BaseFragment<FragmentWordSearchBinding>() {
 
         val editTextConfigurator = EditTextConfigurator()
         editTextConfigurator.setUpFocusClearOnClickBackground(binding.root)
-        editTextConfigurator.setUpKeyboardCloseOnEnter(binding.editTextSearchWord)
         editTextConfigurator.setUpClearButton(
             binding.editTextSearchWord,
             binding.imageButtonSearchWordClear

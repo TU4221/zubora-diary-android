@@ -19,7 +19,7 @@ import com.websarva.wings.android.zuboradiary.ui.model.navigation.NavigationComm
 import com.websarva.wings.android.zuboradiary.ui.model.parameters.DiaryItemTitleSelectionHistoryItemDeleteParameters
 import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
 import com.websarva.wings.android.zuboradiary.ui.model.DiaryItemTitle
-import com.websarva.wings.android.zuboradiary.ui.view.edittext.TextInputConfigurator
+import com.websarva.wings.android.zuboradiary.ui.view.edittext.EditTextConfigurator
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.filterNotNull
@@ -127,11 +127,7 @@ class DiaryItemTitleEditDialog : BaseFullScreenDialogFragment<DialogDiaryItemTit
     }
 
     private fun setUpItemTitleInputField() {
-        val textInputConfigurator = TextInputConfigurator()
-        val textInputLayouts = arrayOf(
-            binding.textInputLayoutNewItemTitle
-        )
-        textInputConfigurator.setUpKeyboardCloseOnEnter(*textInputLayouts)
+        val textInputConfigurator = EditTextConfigurator()
         textInputConfigurator.setUpFocusClearOnClickBackground(binding.root)
 
         launchAndRepeatOnViewLifeCycleStarted {
