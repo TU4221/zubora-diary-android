@@ -101,12 +101,12 @@
                 app:counterEnabled="true"
                 app:counterMaxLength="@integer/layout_diary_edit_item_comment_max_length">
 
-                <com.google.android.material.textfield.TextInputEditText
-                    style="@style/AppTextInputEditTextMultiLineStyle"
+                <com.websarva.wings.android.zuboradiary.ui.view.custom.ScrollableMultiLineTextInputEditText
+                    style="@style/AppScrollableMultiLineTextInputEditTextStyle"
                     android:id="@+id/text_input_edit_text_comment"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:textAppearance="@style/AppTextInputEditTextTextAppearance"
+                    android:textAppearance="@style/AppScrollableMultiLineTextInputEditTextTextAppearance"
                     android:text="@={commentMutableStateFlow}"
                     android:textSize="@dimen/layout_diary_edit_item_text_size"
                     android:hint="@string/layout_diary_edit_item_comment_hint"

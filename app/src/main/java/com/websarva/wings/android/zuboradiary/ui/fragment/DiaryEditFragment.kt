@@ -759,23 +759,8 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding>() {
 
     private fun setupEditText() {
         val textInputConfigurator = TextInputConfigurator()
-
         textInputConfigurator.setUpFocusClearOnClickBackground(binding.viewNestedScrollBackground)
-
         textInputConfigurator.setUpKeyboardCloseOnEnter(binding.textInputEditTextTitle)
-
-        val scrollableTextInputLayouts =
-            binding.run {
-                arrayOf(
-                    includeItem1.textInputLayoutComment,
-                    includeItem2.textInputLayoutComment,
-                    includeItem3.textInputLayoutComment,
-                    includeItem4.textInputLayoutComment,
-                    includeItem5.textInputLayoutComment,
-                )
-            }
-
-        textInputConfigurator.setUpScrollable(*scrollableTextInputLayouts)
     }
 
     private fun createAllTextInputLayoutList(): @Unmodifiable List<TextInputLayout> {

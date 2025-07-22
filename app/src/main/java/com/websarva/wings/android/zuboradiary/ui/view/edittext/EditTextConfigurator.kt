@@ -21,7 +21,7 @@ internal open class EditTextConfigurator {
         KeyboardManager().hideKeyboard(view)
     }
 
-    protected fun setUpScrollable(editText: EditText) {
+    fun setUpScrollable(editText: EditText) {
         editText.onFocusChangeListener = EditTextScrollableOnFocusChangeListener()
     }
 

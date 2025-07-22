@@ -15,13 +15,6 @@ internal class TextInputConfigurator : EditTextConfigurator() {
         return checkNotNull(editText)
     }
 
-    fun setUpScrollable(vararg textInputLayouts: TextInputLayout) {
-        Arrays.stream(textInputLayouts).forEach { x: TextInputLayout ->
-            val editText = x.getEditTextNonNull()
-            setUpScrollable(editText)
-        }
-    }
-
     fun setUpKeyboardCloseOnEnter(vararg textInputLayouts: TextInputLayout) {
         // 入力欄エンターキー押下時の処理。
         Arrays.stream(textInputLayouts).forEach { x: TextInputLayout ->
