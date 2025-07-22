@@ -18,7 +18,6 @@ import androidx.appcompat.view.ContextThemeWrapper
 import androidx.constraintlayout.motion.widget.MotionLayout
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
-import com.google.android.material.textfield.TextInputLayout
 import com.websarva.wings.android.zuboradiary.R
 import com.websarva.wings.android.zuboradiary.domain.model.Condition
 import com.websarva.wings.android.zuboradiary.domain.model.ItemNumber
@@ -60,7 +59,6 @@ import com.websarva.wings.android.zuboradiary.ui.view.edittext.EditTextConfigura
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.filterNotNull
-import org.jetbrains.annotations.Unmodifiable
 import java.time.LocalDate
 
 @AndroidEntryPoint
@@ -760,28 +758,6 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding>() {
     private fun setupEditText() {
         val textInputConfigurator = EditTextConfigurator()
         textInputConfigurator.setUpFocusClearOnClickBackground(binding.viewNestedScrollBackground)
-    }
-
-    private fun createAllTextInputLayoutList(): @Unmodifiable List<TextInputLayout> {
-        return binding.run {
-            listOf(
-                textInputLayoutDate,
-                textInputLayoutWeather1,
-                textInputLayoutWeather2,
-                textInputLayoutCondition,
-                textInputLayoutTitle,
-                includeItem1.textInputLayoutTitle,
-                includeItem1.textInputLayoutComment,
-                includeItem2.textInputLayoutTitle,
-                includeItem2.textInputLayoutComment,
-                includeItem3.textInputLayoutTitle,
-                includeItem3.textInputLayoutComment,
-                includeItem4.textInputLayoutTitle,
-                includeItem4.textInputLayoutComment,
-                includeItem5.textInputLayoutTitle,
-                includeItem5.textInputLayoutComment
-            )
-        }
     }
 
     private fun navigateDiaryShowFragment(date: LocalDate) {
