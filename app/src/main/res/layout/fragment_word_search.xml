@@ -46,7 +46,7 @@
                         android:layout_marginHorizontal="48dp"
                         android:background="@drawable/bg_word_search_input_bar">
 
-                        <EditText
+                        <com.websarva.wings.android.zuboradiary.ui.view.custom.DoneActionEditText
                             style="@style/WordSearchTextViewStyle"
                             android:id="@+id/edit_text_search_word"
                             android:layout_width="match_parent"

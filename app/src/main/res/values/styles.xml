@@ -41,6 +41,20 @@
         <!--<item name="android:textColorHint">@color/text_hint_color_on_background</item>-->
     </style>
 
+    <!-- DoneActionEditText -->
+    <style name="DoneActionEditTextStyle" parent="Widget.AppCompat.EditText">
+        <item name="android:imeOptions">actionDone</item>
+        <item name="android:inputType">text</item>
+    </style>
+    <style name="AppDoneActionEditTextStyle" parent="DoneActionEditTextStyle">
+        <!-- HACK:"android:textColorHint"はTextAppearanceでは反映されない為、Styleに記述 -->
+        <item name="android:textColorHint">@color/hint_text_color_on_surface</item>
+    </style>
+    <style name="AppDoneActionEditTextTextAppearance" parent="TextAppearance.AppCompat.Small">
+        <item name="android:textColor">@color/text_color_on_surface</item>
+        <!--<item name="android:textColorHint">@color/text_hint_color_on_background</item>-->
+    </style>
+
     <style name="AppDropDownTextViewStyle" parent="AppTextViewStyle">
         <item name="android:gravity">center_vertical</item>
         <item name="android:paddingStart">?android:attr/listPreferredItemPaddingStart</item>
@@ -208,14 +222,13 @@
     </style>
 
     <!-- 検索バー -->
-    <style name="WordSearchTextViewStyle" parent="AppTextViewStyle">
+    <style name="WordSearchTextViewStyle" parent="AppDoneActionEditTextStyle">
         <!-- HACK:"android:textColorHint"はTextAppearanceでは反映されない為、Styleに記述 -->
         <item name="android:textColorHint">@color/hint_text_color_on_secondary_container</item>
-        <item name="android:inputType">text</item>
         <item name="android:imeOptions">actionSearch</item>
         <item name="android:background">@null</item>
     </style>
-    <style name="WordSearchTextViewTextAppearance" parent="AppTextViewTextAppearance">
+    <style name="WordSearchTextViewTextAppearance" parent="AppDoneActionEditTextTextAppearance">
         <item name="android:textColor">@color/text_color_on_secondary_container</item>
         <!--<item name="android:textColorHint">@color/hint_text_color_on_secondary_container</item>-->
     </style>
