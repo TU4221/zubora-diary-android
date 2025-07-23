@@ -8,19 +8,16 @@
             type="Integer" />
     </data>
 
+    <!-- 背景タップで下のViewが反応しないように'android:clickable="true"'とする。 -->
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:background="?attr/colorSecondaryContainer"
+        android:alpha="0.5"
+        android:focusable="true"
+        android:clickable="true"
         android:visibility="@{visibility}"
         tools:visibility="visible">
-
-        <com.websarva.wings.android.zuboradiary.ui.view.custom.ProgressIndicatorBackgroundView
-            android:id="@+id/view_background"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="?attr/colorSecondaryContainer"
-            android:alpha="0.5"
-            android:focusableInTouchMode="false"/>
 
         <com.google.android.material.progressindicator.CircularProgressIndicator
             style="@style/AppMediumCircularProgressIndicatorStyle"
