@@ -22,17 +22,15 @@ internal class ClearFocusBackgroundView @JvmOverloads constructor (
         //      クリック処理は行われず、フォーカスのみがあてられる。そのためキーボードが非表示にならず、
         //      BackGroundViewにあわせたキーボードに切り替わる。フォーカスされた状態で再度タッチするとクリック処理が行われる。
         //      上記を踏まえて下記コードで対応。
-        background.apply {
-            isClickable = true
-            isFocusable = true
-            setOnClickListener { v: View ->
-                KeyboardManager().hideKeyboard(v)
+        isClickable = true
+        isFocusable = true
+        setOnClickListener { v: View ->
+            KeyboardManager().hideKeyboard(v)
 
-                isFocusableInTouchMode = true
-                v.requestFocus()
-                v.clearFocus()
-                isFocusableInTouchMode = false
-            }
+            isFocusableInTouchMode = true
+            v.requestFocus()
+            v.clearFocus()
+            isFocusableInTouchMode = false
         }
     }
 }
