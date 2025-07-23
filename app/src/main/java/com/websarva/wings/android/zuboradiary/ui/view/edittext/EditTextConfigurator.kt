@@ -63,8 +63,10 @@ internal class EditTextConfigurator {
         override fun onEditorAction(v: TextView?, actionId: Int, event: KeyEvent?): Boolean {
             v as EditText
 
-            // HACK:InputTypeの値が何故か1ズレている。(公式のリファレンスでもズレあり。)(setとgetを駆使してLogで確認確認済み)
-            if (v.inputType == (InputType.TYPE_TEXT_FLAG_MULTI_LINE + 1)) return false
+            // android:inputType="textMultiLine"
+            if (
+                v.inputType == (InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_MULTI_LINE)
+                ) return false
 
             when (actionId) {
                 EditorInfo.IME_ACTION_DONE -> {

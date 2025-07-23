@@ -62,12 +62,12 @@
                     app:counterMaxLength="@integer/fragment_diary_item_title_edit_item_title_max_length"
                     app:errorEnabled="true">
 
-                    <com.websarva.wings.android.zuboradiary.ui.view.custom.DoneActionTextInputEditText
-                        style="@style/AppDoneActionTextInputEditTextStyle"
+                    <com.websarva.wings.android.zuboradiary.ui.view.custom.ImeActionHandlingTextInputEditText
+                        style="@style/AppImeDoneActionHandlingTextInputEditTextStyle"
                         android:id="@+id/text_input_edit_text_new_item_title"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:textAppearance="@style/AppDoneActionTextInputEditTextTextAppearance"
+                        android:textAppearance="@style/AppImeActionHandlingTextInputEditTextTextAppearance"
                         android:hint="@string/fragment_diary_item_title_edit_new_item_title_hint"
                         android:maxLength="@integer/fragment_diary_item_title_edit_item_title_max_length"
                         android:text="@={viewModel.itemTitleMutable}"

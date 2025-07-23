@@ -4,10 +4,9 @@ import android.content.Context
 import android.text.InputType
 import android.util.AttributeSet
 import android.view.View
-import com.google.android.material.textfield.TextInputEditText
 import com.websarva.wings.android.zuboradiary.ui.view.edittext.EditTextConfigurator
 
-internal class ScrollableMultiLineTextInputEditText : TextInputEditText {
+internal class ScrollableMultiLineTextInputEditText : ImeActionHandlingTextInputEditText {
 
     // MEMO:デフォルトスタイル属性 (defStyleAttr) を指定せずにインスタンス化する場合のコンストラクタ。
     //      スーパークラスが自身のデフォルトスタイルを適用する。
@@ -28,7 +27,6 @@ internal class ScrollableMultiLineTextInputEditText : TextInputEditText {
         EditTextConfigurator()
             .apply {
                 setUpScrollable(this@ScrollableMultiLineTextInputEditText)
-                setUpKeyboardCloseOnEnter(this@ScrollableMultiLineTextInputEditText)
             }
     }
 }

@@ -227,15 +227,15 @@
                                       この警告に対応すると項目1～5のタイトル、コメント入力欄のTextInputLayoutの
                                       hint属性も変更する必要がある為、警告を無視することにした。
                                       (項目1～5のタイトル、コメント入力欄はincludeタグで複製している為、警告は表示されない)-->
-                            <com.websarva.wings.android.zuboradiary.ui.view.custom.DoneActionTextInputEditText
+                            <com.websarva.wings.android.zuboradiary.ui.view.custom.ImeActionHandlingTextInputEditText
                                 android:id="@+id/text_input_edit_text_title"
-                                style="@style/AppDoneActionTextInputEditTextStyle"
+                                style="@style/AppImeDoneActionHandlingTextInputEditTextStyle"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:hint="@string/fragment_diary_edit_title_hint"
                                 android:maxLength="@integer/fragment_diary_edit_title_max_length"
                                 android:text="@={viewModel.titleMutableStateFlow}"
-                                android:textAppearance="@style/AppDoneActionTextInputEditTextTextAppearance"
+                                android:textAppearance="@style/AppImeActionHandlingTextInputEditTextTextAppearance"
                                 android:textSize="@dimen/fragment_diary_edit_text_size"
                                 tools:ignore="DuplicateSpeakableTextCheck" />
 

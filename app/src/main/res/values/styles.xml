@@ -89,12 +89,16 @@
         -->
     </style>
 
-    <!-- DoneEnterTextInputEditText -->
-    <style name="AppDoneActionTextInputEditTextStyle" parent="Widget.Material3.TextInputEditText.OutlinedBox">
+    <!-- ImeActionHandlingTextInputEditText -->
+    <style name="AppImeActionHandlingTextInputEditTextStyle" parent="Widget.Material3.TextInputEditText.OutlinedBox">
         <item name="android:textColor">@color/text_color_on_surface</item>
         <item name="android:textColorHint">@color/hint_text_color_on_surface</item>
     </style>
-    <style name="AppDoneActionTextInputEditTextTextAppearance" parent="TextAppearance.AppCompat.Medium.Inverse">
+    <style name="AppImeDoneActionHandlingTextInputEditTextStyle" parent="AppImeActionHandlingTextInputEditTextStyle">
+        <item name="android:imeOptions">actionDone</item>
+        <item name="android:inputType">text</item>
+    </style>
+    <style name="AppImeActionHandlingTextInputEditTextTextAppearance" parent="TextAppearance.AppCompat.Medium.Inverse">
         <!-- HACK:下記属性はTextAppearanceでは反映されない為、Styleに記述 -->
         <!--
         <item name="android:textColor">@color/text_color_on_surface</item>
@@ -103,14 +107,14 @@
     </style>
 
     <!-- ScrollableMultiLineTextInputEditText -->
-    <style name="AppScrollableMultiLineTextInputEditTextStyle" parent="Widget.Material3.TextInputEditText.OutlinedBox">
+    <style name="AppScrollableMultiLineTextInputEditTextStyle" parent="AppImeActionHandlingTextInputEditTextStyle">
         <item name="android:textColor">@color/text_color_on_surface</item>
         <item name="android:textColorHint">@color/hint_text_color_on_surface</item>
 
         <item name="android:gravity">top</item>
         <item name="android:scrollbars">vertical</item>
     </style>
-    <style name="AppScrollableMultiLineTextInputEditTextTextAppearance" parent="TextAppearance.AppCompat.Medium.Inverse">
+    <style name="AppScrollableMultiLineTextInputEditTextTextAppearance" parent="AppImeActionHandlingTextInputEditTextTextAppearance">
         <!-- HACK:下記属性はTextAppearanceでは反映されない為、Styleに記述 -->
         <!--
         <item name="android:textColor">@color/text_color_on_surface</item>
@@ -206,10 +210,11 @@
         <item name="boxBackgroundMode">none</item>
     </style>
 
-    <style name="WordSearchTextInputEditTextStyle" parent="AppDoneActionTextInputEditTextStyle">
+    <style name="WordSearchTextInputEditTextStyle" parent="AppImeActionHandlingTextInputEditTextStyle">
         <item name="android:textColor">@color/text_color_on_secondary_container</item>
         <item name="android:textColorHint">@color/hint_text_color_on_secondary_container</item>
         <item name="android:imeOptions">actionSearch</item>
+        <item name="android:inputType">text</item>
         <item name="android:hint">@string/fragment_word_search_input_field_hint</item>
     </style>
     <style name="WordSearchTextInputEditTextTextAppearance" parent="TextAppearance.AppCompat.Medium.Inverse">

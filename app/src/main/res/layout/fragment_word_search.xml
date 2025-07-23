@@ -56,7 +56,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content" >
 
-                            <com.websarva.wings.android.zuboradiary.ui.view.custom.DoneActionTextInputEditText
+                            <com.websarva.wings.android.zuboradiary.ui.view.custom.ImeActionHandlingTextInputEditText
                                 style="@style/WordSearchTextInputEditTextStyle"
                                 android:id="@+id/text_input_edit_text_search_word"
                                 android:layout_width="match_parent"
