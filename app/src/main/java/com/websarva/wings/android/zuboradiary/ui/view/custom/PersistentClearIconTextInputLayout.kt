@@ -12,11 +12,21 @@ import com.websarva.wings.android.zuboradiary.R
  * このカスタム TextInputLayout は、EditText のフォーカス状態に関わらず、
  * テキストが存在する限り常にカスタムのクリアアイコンを表示し続けるようにする。
  */
-internal class PersistentClearIconTextInputLayout @JvmOverloads constructor(
-    context: Context,
-    attrs: AttributeSet? = null,
-    defStyleAttr: Int = com.google.android.material.R.attr.textInputStyle
-) : TextInputLayout(context, attrs, defStyleAttr) {
+internal class PersistentClearIconTextInputLayout : TextInputLayout {
+
+    // MEMO:デフォルトスタイル属性 (defStyleAttr) を指定せずにインスタンス化する場合のコンストラクタ。
+    //      スーパークラスが自身のデフォルトスタイルを適用する。
+    @JvmOverloads constructor(
+        context: Context,
+        attrs: AttributeSet? = null,
+    ) : super(context, attrs)
+
+    constructor(
+        context: Context,
+        attrs: AttributeSet? = null,
+        defStyleAttr: Int
+    ) : super(context, attrs, defStyleAttr)
+
     init {
         endIconMode = END_ICON_CUSTOM
 

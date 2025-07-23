@@ -10,11 +10,20 @@ import androidx.recyclerview.widget.RecyclerView
 //      ・`OnTouchListener#onTouch()` should call `View#performClick` when a click is detected
 //      ・`RecyclerView` has `setOnTouchListener` called on it but does not override `performClick`
 //      参照:
-internal class SwipeRecyclerView @JvmOverloads constructor(
-    context: Context,
-    attrs: AttributeSet? = null,
-    defStyleAttr: Int = 0
-) : RecyclerView(context, attrs, defStyleAttr) {
+internal class SwipeRecyclerView : RecyclerView {
+
+    // MEMO:デフォルトスタイル属性 (defStyleAttr) を指定せずにインスタンス化する場合のコンストラクタ。
+    //      スーパークラスが自身のデフォルトスタイルを適用する。
+    @JvmOverloads constructor(
+        context: Context,
+        attrs: AttributeSet? = null
+    ) : super(context, attrs)
+
+    constructor(
+        context: Context,
+        attrs: AttributeSet? = null,
+        defStyleAttr: Int
+    ) : super(context, attrs, defStyleAttr)
 
     private val initializeMotionEvent = null
     private var motionEvent: MotionEvent? = initializeMotionEvent

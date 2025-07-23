@@ -90,11 +90,7 @@
     </style>
 
     <!-- DoneEnterTextInputEditText -->
-    <style name="DoneActionTextInputEditTextStyle" parent="Widget.Material3.TextInputEditText.OutlinedBox">
-        <item name="android:imeOptions">actionDone</item>
-        <item name="android:inputType">text</item>
-    </style>
-    <style name="AppDoneActionTextInputEditTextStyle" parent="DoneActionTextInputEditTextStyle">
+    <style name="AppDoneActionTextInputEditTextStyle" parent="Widget.Material3.TextInputEditText.OutlinedBox">
         <item name="android:textColor">@color/text_color_on_surface</item>
         <item name="android:textColorHint">@color/hint_text_color_on_surface</item>
     </style>
@@ -107,11 +103,7 @@
     </style>
 
     <!-- ScrollableMultiLineTextInputEditText -->
-    <style name="ScrollableMultiLineTextInputEditTextStyle" parent="Widget.Material3.TextInputEditText.OutlinedBox">
-        <item name="android:inputType">textMultiLine</item>
-        <item name="android:overScrollMode">ifContentScrolls</item>
-    </style>
-    <style name="AppScrollableMultiLineTextInputEditTextStyle" parent="ScrollableMultiLineTextInputEditTextStyle">
+    <style name="AppScrollableMultiLineTextInputEditTextStyle" parent="Widget.Material3.TextInputEditText.OutlinedBox">
         <item name="android:textColor">@color/text_color_on_surface</item>
         <item name="android:textColorHint">@color/hint_text_color_on_surface</item>
 
