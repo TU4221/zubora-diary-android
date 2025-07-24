@@ -76,7 +76,7 @@ internal class SettingsViewModel @Inject constructor(
         private const val SAVED_CALENDAR_START_DAY_OF_WEEK_STATE_KEY = "savedCalendarStartDayOfWeekState"
     }
 
-    private fun <T> Flow<T>.stateIn(initialValue: T): StateFlow<T> {
+    private fun <T> Flow<T>.stateInEagerly(initialValue: T): StateFlow<T> {
         return this.stateIn(viewModelScope, SharingStarted.Eagerly, initialValue)
     }
 
@@ -94,7 +94,7 @@ internal class SettingsViewModel @Inject constructor(
                     SettingsState.LoadAllSettingsSuccess,
                     SettingsState.LoadAllSettingsFailure -> false
                 }
-            }.stateInDefault(
+            }.stateInWhileSubscribed(
                 false
             )
 
@@ -187,7 +187,7 @@ internal class SettingsViewModel @Inject constructor(
                     }
                 }.onEach { value: ThemeColor ->
                     handle[SAVED_THEME_COLOR_STATE_KEY] = value
-                }.stateIn(initialValue)
+                }.stateInEagerly(initialValue)
     }
 
     private fun setUpCalendarStartDayOfWeekSettingValue() {
@@ -202,7 +202,7 @@ internal class SettingsViewModel @Inject constructor(
                     }
                 }.onEach { value: DayOfWeek ->
                     handle[SAVED_CALENDAR_START_DAY_OF_WEEK_STATE_KEY] = value
-                }.stateIn(initialValue)
+                }.stateInEagerly(initialValue)
     }
 
     private fun setUpReminderNotificationSettingValue() {
@@ -214,7 +214,7 @@ internal class SettingsViewModel @Inject constructor(
                         is UserSettingResult.Success -> it.setting.isEnabled
                         is UserSettingResult.Failure -> it.fallbackSetting.isEnabled
                     }
-                }.stateIn(null )
+                }.stateInEagerly(null )
 
         reminderNotificationTime =
             fetchReminderNotificationSettingUseCase()
@@ -234,7 +234,7 @@ internal class SettingsViewModel @Inject constructor(
                             }
                         }
                     }
-                }.stateIn(null)
+                }.stateInEagerly(null)
     }
 
     private fun setUpPasscodeLockSettingValue() {
@@ -248,7 +248,7 @@ internal class SettingsViewModel @Inject constructor(
                         }
                         is UserSettingResult.Failure -> it.fallbackSetting.isEnabled
                     }
-                }.stateIn(null )
+                }.stateInEagerly(null )
 
         passcode =
             fetchPasscodeLockSettingUseCase()
@@ -268,7 +268,7 @@ internal class SettingsViewModel @Inject constructor(
                             }
                         }
                     }
-                }.stateIn(null )
+                }.stateInEagerly(null )
     }
 
     private fun setUpWeatherInfoFetchSettingValue() {
@@ -280,7 +280,7 @@ internal class SettingsViewModel @Inject constructor(
                         is UserSettingResult.Success -> it.setting.isEnabled
                         is UserSettingResult.Failure -> it.fallbackSetting.isEnabled
                     }
-                }.stateIn(null)
+                }.stateInEagerly(null)
     }
 
     // BackPressed(戻るボタン)処理

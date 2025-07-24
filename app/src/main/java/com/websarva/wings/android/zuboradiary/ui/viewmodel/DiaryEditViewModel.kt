@@ -95,7 +95,7 @@ internal class DiaryEditViewModel @Inject constructor(
                     DiaryEditState.LoadError,
                     DiaryEditState.Editing -> false
                 }
-            }.stateInDefault(
+            }.stateInWhileSubscribed(
                 false
             )
 
@@ -118,7 +118,7 @@ internal class DiaryEditViewModel @Inject constructor(
                 DiaryEditState.Editing,
                 DiaryEditState.LoadError -> false
             }
-        }.stateInDefault(
+        }.stateInWhileSubscribed(
             false
         )
 
@@ -262,7 +262,7 @@ internal class DiaryEditViewModel @Inject constructor(
                 DiaryEditState.DeletingItem,
                 DiaryEditState.SelectingImage -> false
             }
-        }.stateInDefault(
+        }.stateInWhileSubscribed(
             false
         )
 
@@ -288,7 +288,7 @@ internal class DiaryEditViewModel @Inject constructor(
                 DiaryEditState.DeletingItem,
                 DiaryEditState.SelectingImage -> false
             }
-        }.stateInDefault(
+        }.stateInWhileSubscribed(
             false
         )
 

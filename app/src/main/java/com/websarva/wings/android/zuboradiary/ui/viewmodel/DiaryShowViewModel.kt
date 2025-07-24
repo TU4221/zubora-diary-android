@@ -47,7 +47,7 @@ internal class DiaryShowViewModel @Inject constructor(
                     DiaryShowState.LoadError -> false
                 }
             }
-            .stateInDefault(
+            .stateInWhileSubscribed(
                 false
             )
 
@@ -62,7 +62,7 @@ internal class DiaryShowViewModel @Inject constructor(
     val isWeather2Visible =
         combine(weather1, weather2) { weather1, weather2 ->
             return@combine weather1 != Weather.UNKNOWN && weather2 != Weather.UNKNOWN
-        }.stateInDefault(
+        }.stateInWhileSubscribed(
             false
         )
     val condition

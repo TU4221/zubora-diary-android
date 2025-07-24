@@ -66,7 +66,7 @@ internal class DiaryListViewModel @Inject constructor(
                     DiaryListState.NoDiaries,
                     DiaryListState.ShowingDiaryList -> false
                 }
-            }.stateInDefault(
+            }.stateInWhileSubscribed(
                 false
             )
 
@@ -85,7 +85,7 @@ internal class DiaryListViewModel @Inject constructor(
                     DiaryListState.NoDiaries,
                     DiaryListState.ShowingDiaryList -> false
                 }
-            }.stateInDefault(
+            }.stateInWhileSubscribed(
                 false
             )
 

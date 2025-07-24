@@ -37,7 +37,7 @@ internal class CalendarViewModel @Inject constructor(
                     CalendarState.LoadError,
                     CalendarState.NoDiary -> false
                 }
-            }.stateInDefault(
+            }.stateInWhileSubscribed(
                 false
             )
 

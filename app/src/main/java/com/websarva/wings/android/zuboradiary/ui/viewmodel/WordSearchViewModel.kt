@@ -48,7 +48,7 @@ internal class WordSearchViewModel @Inject internal constructor(
                     WordSearchState.ShowingResultList,
                     WordSearchState.NoResults -> false
                 }
-            }.stateInDefault(
+            }.stateInWhileSubscribed(
                 false
             )
 
@@ -65,7 +65,7 @@ internal class WordSearchViewModel @Inject internal constructor(
                     WordSearchState.ShowingResultList,
                     WordSearchState.NoResults -> false
                 }
-            }.stateInDefault(
+            }.stateInWhileSubscribed(
                 false
             )
 
@@ -114,7 +114,7 @@ internal class WordSearchViewModel @Inject internal constructor(
                 WordSearchState.Idle,
                 WordSearchState.NoResults -> false
             }
-        }.stateInDefault(
+        }.stateInWhileSubscribed(
             false
         )
 
@@ -129,7 +129,7 @@ internal class WordSearchViewModel @Inject internal constructor(
                 WordSearchState.Searching,
                 WordSearchState.NoResults -> false
             }
-        }.stateInDefault(
+        }.stateInWhileSubscribed(
             false
         )
 
@@ -144,7 +144,7 @@ internal class WordSearchViewModel @Inject internal constructor(
                 WordSearchState.Updating,
                 WordSearchState.ShowingResultList -> false
             }
-        }.stateInDefault(
+        }.stateInWhileSubscribed(
             false
         )
 

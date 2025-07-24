@@ -22,13 +22,13 @@ internal abstract class BaseViewModel<E: ViewModelEvent, M: AppMessage, S: UiSta
     private val initialViewUiState: S
 ) : ViewModel() {
 
-    fun <T> Flow<T>.stateInDefault(
+    fun <T> Flow<T>.stateInWhileSubscribed(
         initialValue: T
     ): StateFlow<T> {
         return this.stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5000L),
-            initialValue = initialValue
+            viewModelScope,
+            SharingStarted.WhileSubscribed(5000L),
+            initialValue
         )
     }
 
