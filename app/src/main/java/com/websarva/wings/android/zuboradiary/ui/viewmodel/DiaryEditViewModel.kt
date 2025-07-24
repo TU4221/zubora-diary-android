@@ -100,6 +100,29 @@ internal class DiaryEditViewModel @Inject constructor(
                 false
             )
 
+    override val isProgressIndicatorVisible =
+        uiState.map { state ->
+            return@map when (state) {
+                DiaryEditState.CheckingDiaryInfo,
+                DiaryEditState.Loading,
+                DiaryEditState.Saving,
+                DiaryEditState.Deleting,
+                DiaryEditState.CheckingWeatherAvailability,
+                DiaryEditState.FetchingWeatherInfo,
+                DiaryEditState.SelectingImage -> true
+
+                // DataSourceにアクセスしない処理
+                DiaryEditState.AddingItem,
+                DiaryEditState.DeletingItem -> false
+
+                DiaryEditState.Idle,
+                DiaryEditState.Editing,
+                DiaryEditState.LoadError -> false
+            }
+        }.stateInDefault(
+            viewModelScope,
+            false
+        )
 
     // 日記データ関係
     private val initialPreviousDate: LocalDate? = null
@@ -267,29 +290,6 @@ internal class DiaryEditViewModel @Inject constructor(
                 DiaryEditState.AddingItem,
                 DiaryEditState.DeletingItem,
                 DiaryEditState.SelectingImage -> false
-            }
-        }.stateInDefault(
-            viewModelScope,
-            false
-        )
-
-    // ProgressIndicator表示
-    val isVisibleUpdateProgressBar: StateFlow<Boolean> =
-        uiState.map { state ->
-            return@map when (state) {
-                DiaryEditState.CheckingDiaryInfo,
-                DiaryEditState.Loading,
-                DiaryEditState.Saving,
-                DiaryEditState.Deleting,
-                DiaryEditState.CheckingWeatherAvailability,
-                DiaryEditState.FetchingWeatherInfo,
-                DiaryEditState.SelectingImage -> true
-
-                DiaryEditState.Idle,
-                DiaryEditState.Editing,
-                DiaryEditState.LoadError,
-                DiaryEditState.AddingItem,
-                DiaryEditState.DeletingItem -> false
             }
         }.stateInDefault(
             viewModelScope,

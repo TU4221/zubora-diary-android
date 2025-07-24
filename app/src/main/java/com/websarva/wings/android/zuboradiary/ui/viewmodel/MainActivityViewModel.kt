@@ -7,11 +7,15 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 
 internal class MainActivityViewModel : ViewModel() {
+
     private val _uiState =
         MutableStateFlow<MainActivityUiState>(
             MainActivityUiState.ShowingBottomNavigation(false)
         )
     val uiState get() = _uiState.asStateFlow()
+
+    private val _isProgressIndicatorVisible = MutableStateFlow(false)
+    val isProgressIndicatorVisible get() = _isProgressIndicatorVisible.asStateFlow()
 
     fun showBottomNavigation() {
         _uiState.update {
@@ -35,5 +39,13 @@ internal class MainActivityViewModel : ViewModel() {
                     value.copy(isEnabled)
                 }
             }
+    }
+
+    fun onRequestShowProgressIndicator() {
+        _isProgressIndicatorVisible.value = true
+    }
+
+    fun onRequestHideProgressIndicator() {
+        _isProgressIndicatorVisible.value = false
     }
 }

@@ -71,6 +71,26 @@ internal class DiaryListViewModel @Inject constructor(
                 false
             )
 
+    override val isProgressIndicatorVisible =
+        uiState
+            .map { state ->
+                when (state) {
+                    DiaryListState.LoadingDiaryInfo,
+                    DiaryListState.UpdatingDiaryList,
+                    DiaryListState.DeletingDiary -> true
+
+                    DiaryListState.LoadingNewDiaryList,
+                    DiaryListState.LoadingAdditionDiaryList -> false
+
+                    DiaryListState.Idle,
+                    DiaryListState.NoDiaries,
+                    DiaryListState.ShowingDiaryList -> false
+                }
+            }.stateInDefault(
+                viewModelScope,
+                false
+            )
+
     private val initialDiaryListLoadingJob: Job? = null
     private var diaryListLoadingJob: Job? = initialDiaryListLoadingJob // キャンセル用
 

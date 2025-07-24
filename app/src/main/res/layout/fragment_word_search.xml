@@ -118,11 +118,6 @@
 
                 </LinearLayout>
 
-                <include
-                    layout="@layout/layout_full_screen_circular_progress_indicator"
-                    android:id="@+id/include_progress_indicator"
-                    app:visibility="@{viewModel.uiState instanceof WordSearchState.Updating ? View.VISIBLE : View.INVISIBLE}" />
-
             </FrameLayout>
 
         </LinearLayout>

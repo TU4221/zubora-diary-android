@@ -53,6 +53,24 @@ internal class WordSearchViewModel @Inject internal constructor(
                 false
             )
 
+    override val isProgressIndicatorVisible =
+        uiState
+            .map { state ->
+                when (state) {
+                    WordSearchState.Updating -> true
+
+                    WordSearchState.Searching,
+                    WordSearchState.AdditionLoading -> false
+
+                    WordSearchState.Idle,
+                    WordSearchState.ShowingResultList,
+                    WordSearchState.NoResults -> false
+                }
+            }.stateInDefault(
+                viewModelScope,
+                false
+            )
+
     private val initialSearchWord = ""
     private val _searchWord = MutableStateFlow(initialSearchWord)
     val searchWord

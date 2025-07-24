@@ -44,6 +44,8 @@ internal abstract class BaseViewModel<E: ViewModelEvent, M: AppMessage, S: UiSta
     abstract val isProcessingState: StateFlow<Boolean>
     val isProcessing get() = isProcessingState.value
 
+    open val isProgressIndicatorVisible get() = isProcessingState
+
     // 表示保留中Navigation
     private val initialPendingNavigationCommand = NavigationCommand.None
     private val _pendingNavigationCommand =

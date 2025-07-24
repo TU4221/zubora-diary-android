@@ -2,6 +2,14 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
+    <data>
+        <import type="android.view.View" />
+        <import type="com.websarva.wings.android.zuboradiary.ui.model.state.DiaryListState" />
+        <variable
+            name="viewModel"
+            type="com.websarva.wings.android.zuboradiary.ui.viewmodel.MainActivityViewModel" />
+    </data>
+
     <FrameLayout
         style="@style/AppRootViewStyle"
         android:layout_width="match_parent"
@@ -58,6 +66,11 @@
             </androidx.constraintlayout.motion.widget.MotionLayout>
 
         </LinearLayout>
+
+        <include
+            layout="@layout/layout_full_screen_circular_progress_indicator"
+            android:id="@+id/include_progress_indicator"
+            app:visibility="@{viewModel.isProgressIndicatorVisible ? View.VISIBLE : View.INVISIBLE}" />
 
     </FrameLayout>
 </layout>

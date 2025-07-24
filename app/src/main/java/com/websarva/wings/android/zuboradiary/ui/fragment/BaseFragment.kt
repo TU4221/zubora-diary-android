@@ -20,8 +20,10 @@ import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
 import com.websarva.wings.android.zuboradiary.ui.model.state.UiState
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.BaseViewModel
 import com.websarva.wings.android.zuboradiary.ui.utils.requireValue
+import com.websarva.wings.android.zuboradiary.ui.viewmodel.MainActivityViewModel
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.SettingsViewModel
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.collectLatest
 
 abstract class BaseFragment<T: ViewBinding> : LoggingFragment() {
 
@@ -39,6 +41,8 @@ abstract class BaseFragment<T: ViewBinding> : LoggingFragment() {
     // MEMO:委譲プロパティの委譲先(viewModels())の遅延初期化により"Field is never assigned."と警告が表示される。
     //      委譲プロパティによるViewModel生成は公式が推奨する方法の為、警告を無視する。その為、@Suppressを付与する。
     //      この警告に対応するSuppressネームはなく、"unused"のみでは不要Suppressとなる為、"RedundantSuppression"も追記する。
+    @Suppress("unused", "RedundantSuppression")
+    private val mainActivityViewModel: MainActivityViewModel by activityViewModels()
     @Suppress("unused", "RedundantSuppression")
     internal val settingsViewModel: SettingsViewModel by activityViewModels()
 
@@ -134,6 +138,7 @@ abstract class BaseFragment<T: ViewBinding> : LoggingFragment() {
         initializeFragmentResultReceiver()
         setUpViewModelEvent()
         setUpPendingNavigationCollector()
+        setUpProgressIndicator()
         registerOnBackPressedCallback()
     }
 
@@ -194,6 +199,18 @@ abstract class BaseFragment<T: ViewBinding> : LoggingFragment() {
                 mainViewModel,
                 ::navigateFragment
             )
+    }
+
+    private fun setUpProgressIndicator() {
+        launchAndRepeatOnViewLifeCycleStarted {
+            mainViewModel.isProgressIndicatorVisible.collectLatest {
+                if (it) {
+                    mainActivityViewModel.onRequestShowProgressIndicator()
+                } else {
+                    mainActivityViewModel.onRequestHideProgressIndicator()
+                }
+            }
+        }
     }
 
     internal fun navigateFragment(command: NavigationCommand) {

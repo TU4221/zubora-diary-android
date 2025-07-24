@@ -170,7 +170,11 @@ class MainActivity : LoggingActivity() {
 
     private fun setUpMainActivityBinding(themeColor: ThemeColor) {
         val themeColorInflater = ThemeColorInflaterCreator().create(layoutInflater, themeColor)
-        _binding = ActivityMainBinding.inflate(themeColorInflater)
+        _binding =
+            ActivityMainBinding.inflate(themeColorInflater).apply {
+                viewModel = mainActivityViewModel
+                lifecycleOwner = this@MainActivity
+            }
         setContentView(binding.root)
     }
 
