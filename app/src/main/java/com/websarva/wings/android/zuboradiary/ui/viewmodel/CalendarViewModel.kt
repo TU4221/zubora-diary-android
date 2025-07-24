@@ -25,22 +25,21 @@ internal class CalendarViewModel @Inject constructor(
     CalendarState.Idle
 ) {
 
-    override val isProcessingState: StateFlow<Boolean>
-        get() =
-            uiState
-                .map { state ->
-                    when (state) {
-                        CalendarState.LoadingDiary,
-                        CalendarState.LoadingDiaryInfo -> true
+    override val isProcessingState: StateFlow<Boolean> =
+        uiState
+            .map { state ->
+                when (state) {
+                    CalendarState.LoadingDiary,
+                    CalendarState.LoadingDiaryInfo -> true
 
-                        CalendarState.Idle,
-                        CalendarState.LoadDiarySuccess,
-                        CalendarState.LoadError,
-                        CalendarState.NoDiary -> false
-                    }
-                }.stateInDefault(
-                    false
-                )
+                    CalendarState.Idle,
+                    CalendarState.LoadDiarySuccess,
+                    CalendarState.LoadError,
+                    CalendarState.NoDiary -> false
+                }
+            }.stateInDefault(
+                false
+            )
 
 
     private val initialSelectedDate = LocalDate.now()
