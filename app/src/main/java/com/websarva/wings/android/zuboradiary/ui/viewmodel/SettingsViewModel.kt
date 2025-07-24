@@ -95,7 +95,6 @@ internal class SettingsViewModel @Inject constructor(
                     SettingsState.LoadAllSettingsFailure -> false
                 }
             }.stateInDefault(
-                viewModelScope,
                 false
             )
 

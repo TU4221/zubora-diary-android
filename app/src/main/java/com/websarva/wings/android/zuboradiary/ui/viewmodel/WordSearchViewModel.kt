@@ -49,7 +49,6 @@ internal class WordSearchViewModel @Inject internal constructor(
                     WordSearchState.NoResults -> false
                 }
             }.stateInDefault(
-                viewModelScope,
                 false
             )
 
@@ -67,7 +66,6 @@ internal class WordSearchViewModel @Inject internal constructor(
                     WordSearchState.NoResults -> false
                 }
             }.stateInDefault(
-                viewModelScope,
                 false
             )
 
@@ -117,7 +115,6 @@ internal class WordSearchViewModel @Inject internal constructor(
                 WordSearchState.NoResults -> false
             }
         }.stateInDefault(
-            viewModelScope,
             false
         )
 
@@ -133,7 +130,6 @@ internal class WordSearchViewModel @Inject internal constructor(
                 WordSearchState.NoResults -> false
             }
         }.stateInDefault(
-            viewModelScope,
             false
         )
 
@@ -149,7 +145,6 @@ internal class WordSearchViewModel @Inject internal constructor(
                 WordSearchState.ShowingResultList -> false
             }
         }.stateInDefault(
-            viewModelScope,
             false
         )
 

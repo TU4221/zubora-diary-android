@@ -39,7 +39,6 @@ internal class CalendarViewModel @Inject constructor(
                         CalendarState.NoDiary -> false
                     }
                 }.stateInDefault(
-                    viewModelScope,
                     false
                 )
 

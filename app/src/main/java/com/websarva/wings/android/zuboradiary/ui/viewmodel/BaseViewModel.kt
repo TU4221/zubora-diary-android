@@ -2,13 +2,13 @@ package com.websarva.wings.android.zuboradiary.ui.viewmodel
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import com.websarva.wings.android.zuboradiary.ui.model.AppMessage
 import com.websarva.wings.android.zuboradiary.ui.model.event.ConsumableEvent
 import com.websarva.wings.android.zuboradiary.ui.model.event.ViewModelEvent
 import com.websarva.wings.android.zuboradiary.ui.model.navigation.NavigationCommand
 import com.websarva.wings.android.zuboradiary.ui.model.state.UiState
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -23,11 +23,10 @@ internal abstract class BaseViewModel<E: ViewModelEvent, M: AppMessage, S: UiSta
 ) : ViewModel() {
 
     fun <T> Flow<T>.stateInDefault(
-        scope: CoroutineScope,
         initialValue: T
     ): StateFlow<T> {
         return this.stateIn(
-            scope = scope,
+            scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5000L),
             initialValue = initialValue
         )

@@ -67,7 +67,6 @@ internal class DiaryListViewModel @Inject constructor(
                     DiaryListState.ShowingDiaryList -> false
                 }
             }.stateInDefault(
-                viewModelScope,
                 false
             )
 
@@ -87,7 +86,6 @@ internal class DiaryListViewModel @Inject constructor(
                     DiaryListState.ShowingDiaryList -> false
                 }
             }.stateInDefault(
-                viewModelScope,
                 false
             )
 

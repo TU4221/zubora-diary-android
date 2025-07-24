@@ -48,7 +48,6 @@ internal class DiaryShowViewModel @Inject constructor(
                 }
             }
             .stateInDefault(
-                viewModelScope,
                 false
             )
 
@@ -64,7 +63,6 @@ internal class DiaryShowViewModel @Inject constructor(
         combine(weather1, weather2) { weather1, weather2 ->
             return@combine weather1 != Weather.UNKNOWN && weather2 != Weather.UNKNOWN
         }.stateInDefault(
-            viewModelScope,
             false
         )
     val condition

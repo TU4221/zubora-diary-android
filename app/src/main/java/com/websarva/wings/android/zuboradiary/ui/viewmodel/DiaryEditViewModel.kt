@@ -96,7 +96,6 @@ internal class DiaryEditViewModel @Inject constructor(
                     DiaryEditState.Editing -> false
                 }
             }.stateInDefault(
-                viewModelScope,
                 false
             )
 
@@ -120,7 +119,6 @@ internal class DiaryEditViewModel @Inject constructor(
                 DiaryEditState.LoadError -> false
             }
         }.stateInDefault(
-            viewModelScope,
             false
         )
 
@@ -265,7 +263,6 @@ internal class DiaryEditViewModel @Inject constructor(
                 DiaryEditState.SelectingImage -> false
             }
         }.stateInDefault(
-            viewModelScope,
             false
         )
 
@@ -292,7 +289,6 @@ internal class DiaryEditViewModel @Inject constructor(
                 DiaryEditState.SelectingImage -> false
             }
         }.stateInDefault(
-            viewModelScope,
             false
         )
 

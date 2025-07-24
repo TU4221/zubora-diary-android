@@ -49,7 +49,6 @@ internal class DiaryItemTitleEditViewModel @Inject constructor(
                     DiaryItemTitleEditState.ShowingSelectionHistory -> false
                 }
             }.stateInDefault(
-                viewModelScope,
                 false
             )
 
@@ -75,7 +74,7 @@ internal class DiaryItemTitleEditViewModel @Inject constructor(
     val isNewItemTitleSelectionEnabled =
         _itemTitleErrorMessageResId
             .map { it == null }
-            .stateInDefault(viewModelScope, false)
+            .stateInDefault(false)
 
     private val initialItemTitleSelectionHistoryList = SelectionHistoryList(emptyList())
     lateinit var itemTitleSelectionHistoryList: StateFlow<SelectionHistoryList>
@@ -206,7 +205,6 @@ internal class DiaryItemTitleEditViewModel @Inject constructor(
                         }
                     )
                 }.stateInDefault(
-                    viewModelScope,
                     initialItemTitleSelectionHistoryList
                 )
     }
