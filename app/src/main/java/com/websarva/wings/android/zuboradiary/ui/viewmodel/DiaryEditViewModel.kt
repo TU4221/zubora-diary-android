@@ -36,6 +36,7 @@ import com.websarva.wings.android.zuboradiary.ui.model.parameters.WeatherInfoFet
 import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
 import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
 import com.websarva.wings.android.zuboradiary.ui.model.DiaryItemTitle
+import com.websarva.wings.android.zuboradiary.ui.model.event.CommonViewModelEvent
 import com.websarva.wings.android.zuboradiary.ui.model.state.DiaryEditState
 import com.websarva.wings.android.zuboradiary.ui.utils.requireValue
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -310,6 +311,26 @@ internal class DiaryEditViewModel @Inject constructor(
         _weather1AdapterList.value = initialWeatherAdapterList
         _weather2AdapterList.value = initialWeatherAdapterList
         _conditionAdapterList.value = initialConditionAdapterList
+    }
+
+    override suspend fun emitNavigatePreviousFragmentEvent() {
+        viewModelScope.launch {
+            emitViewModelEvent(
+                DiaryEditEvent.CommonEvent(
+                    CommonViewModelEvent.NavigatePreviousFragment
+                )
+            )
+        }
+    }
+
+    override suspend fun emitAppMessageEvent(appMessage: DiaryEditAppMessage) {
+        viewModelScope.launch {
+            emitViewModelEvent(
+                DiaryEditEvent.CommonEvent(
+                    CommonViewModelEvent.NavigateAppMessage(appMessage)
+                )
+            )
+        }
     }
 
     // BackPressed(戻るボタン)処理

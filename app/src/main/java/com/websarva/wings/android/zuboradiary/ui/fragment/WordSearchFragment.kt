@@ -17,7 +17,7 @@ import com.websarva.wings.android.zuboradiary.ui.adapter.diary.DiaryYearMonthLis
 import com.websarva.wings.android.zuboradiary.ui.adapter.diary.DiaryYearMonthListBaseItem
 import com.websarva.wings.android.zuboradiary.ui.adapter.diary.wordsearchresult.WordSearchResultYearMonthList
 import com.websarva.wings.android.zuboradiary.ui.adapter.diary.wordsearchresult.WordSearchResultYearMonthListAdapter
-import com.websarva.wings.android.zuboradiary.ui.model.event.ViewModelEvent
+import com.websarva.wings.android.zuboradiary.ui.model.event.CommonViewModelEvent
 import com.websarva.wings.android.zuboradiary.ui.model.event.WordSearchEvent
 import com.websarva.wings.android.zuboradiary.ui.model.navigation.NavigationCommand
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.WordSearchViewModel
@@ -26,7 +26,7 @@ import kotlinx.coroutines.flow.collectLatest
 import java.time.LocalDate
 
 @AndroidEntryPoint
-class WordSearchFragment : BaseFragment<FragmentWordSearchBinding>() {
+class WordSearchFragment : BaseFragment<FragmentWordSearchBinding, WordSearchEvent>() {
 
     override val destinationId = R.id.navigation_word_search_fragment
 
@@ -66,7 +66,7 @@ class WordSearchFragment : BaseFragment<FragmentWordSearchBinding>() {
         // 処理なし
     }
 
-    override fun onMainViewModelEventReceived(event: ViewModelEvent) {
+    override fun onMainViewModelEventReceived(event: WordSearchEvent) {
         when (event) {
             is WordSearchEvent.NavigateDiaryShowFragment -> {
                 navigateDiaryShowFragment(event.date)
@@ -74,14 +74,15 @@ class WordSearchFragment : BaseFragment<FragmentWordSearchBinding>() {
             WordSearchEvent.ShowKeyboard -> {
                 showKeyboard()
             }
-            ViewModelEvent.NavigatePreviousFragment -> {
-                navigatePreviousFragment()
-            }
-            is ViewModelEvent.NavigateAppMessage -> {
-                navigateAppMessageDialog(event.message)
-            }
-            else -> {
-                throw IllegalArgumentException()
+            is WordSearchEvent.CommonEvent -> {
+                when(event.event) {
+                    CommonViewModelEvent.NavigatePreviousFragment -> {
+                        navigatePreviousFragment()
+                    }
+                    is CommonViewModelEvent.NavigateAppMessage -> {
+                        navigateAppMessageDialog(event.event.message)
+                    }
+                }
             }
         }
     }

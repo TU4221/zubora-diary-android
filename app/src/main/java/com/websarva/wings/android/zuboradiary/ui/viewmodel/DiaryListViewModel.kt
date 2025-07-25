@@ -16,6 +16,7 @@ import com.websarva.wings.android.zuboradiary.ui.model.DiaryListAppMessage
 import com.websarva.wings.android.zuboradiary.ui.adapter.diary.diary.DiaryDayList
 import com.websarva.wings.android.zuboradiary.ui.adapter.diary.diary.DiaryDayListItem
 import com.websarva.wings.android.zuboradiary.ui.adapter.diary.diary.DiaryYearMonthList
+import com.websarva.wings.android.zuboradiary.ui.model.event.CommonViewModelEvent
 import com.websarva.wings.android.zuboradiary.ui.model.state.DiaryListState
 import com.websarva.wings.android.zuboradiary.ui.model.event.DiaryListEvent
 import com.websarva.wings.android.zuboradiary.ui.model.parameters.DiaryDeleteParameters
@@ -114,6 +115,26 @@ internal class DiaryListViewModel @Inject constructor(
         shouldUpdateDiaryList = initialShouldUpdateDiaryList
         sortConditionDate = initialSortConditionDate
         isLoadingOnScrolled = initialIsLoadingOnScrolled
+    }
+
+    override suspend fun emitNavigatePreviousFragmentEvent() {
+        viewModelScope.launch {
+            emitViewModelEvent(
+                DiaryListEvent.CommonEvent(
+                    CommonViewModelEvent.NavigatePreviousFragment
+                )
+            )
+        }
+    }
+
+    override suspend fun emitAppMessageEvent(appMessage: DiaryListAppMessage) {
+        viewModelScope.launch {
+            emitViewModelEvent(
+                DiaryListEvent.CommonEvent(
+                    CommonViewModelEvent.NavigateAppMessage(appMessage)
+                )
+            )
+        }
     }
 
     // BackPressed(戻るボタン)処理

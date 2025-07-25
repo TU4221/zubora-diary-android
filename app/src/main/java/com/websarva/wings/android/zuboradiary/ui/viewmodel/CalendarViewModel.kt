@@ -5,6 +5,7 @@ import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.DoesDiaryExistUseCase
 import com.websarva.wings.android.zuboradiary.ui.model.CalendarAppMessage
 import com.websarva.wings.android.zuboradiary.ui.model.event.CalendarEvent
+import com.websarva.wings.android.zuboradiary.ui.model.event.CommonViewModelEvent
 import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
 import com.websarva.wings.android.zuboradiary.ui.model.state.CalendarState
 import com.websarva.wings.android.zuboradiary.ui.model.state.DiaryShowState
@@ -56,6 +57,26 @@ internal class CalendarViewModel @Inject constructor(
         super.initialize()
         _selectedDate.value = initialSelectedDate
         _previousSelectedDate.value = initialPreviousSelectedDate
+    }
+
+    override suspend fun emitNavigatePreviousFragmentEvent() {
+        viewModelScope.launch {
+            emitViewModelEvent(
+                CalendarEvent.CommonEvent(
+                    CommonViewModelEvent.NavigatePreviousFragment
+                )
+            )
+        }
+    }
+
+    override suspend fun emitAppMessageEvent(appMessage: CalendarAppMessage) {
+        viewModelScope.launch {
+            emitViewModelEvent(
+                CalendarEvent.CommonEvent(
+                    CommonViewModelEvent.NavigateAppMessage(appMessage)
+                )
+            )
+        }
     }
 
     // BackPressed(戻るボタン)処理

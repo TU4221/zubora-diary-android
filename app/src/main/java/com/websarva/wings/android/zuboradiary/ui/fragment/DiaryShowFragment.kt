@@ -21,8 +21,8 @@ import com.websarva.wings.android.zuboradiary.databinding.FragmentDiaryShowBindi
 import com.websarva.wings.android.zuboradiary.ui.view.imageview.DiaryImageConfigurator
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.DiaryDeleteDialogFragment
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.DiaryLoadingFailureDialogFragment
+import com.websarva.wings.android.zuboradiary.ui.model.event.CommonViewModelEvent
 import com.websarva.wings.android.zuboradiary.ui.model.event.DiaryShowEvent
-import com.websarva.wings.android.zuboradiary.ui.model.event.ViewModelEvent
 import com.websarva.wings.android.zuboradiary.ui.model.navigation.NavigationCommand
 import com.websarva.wings.android.zuboradiary.ui.model.parameters.DiaryDeleteParameters
 import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
@@ -36,7 +36,7 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 
 @AndroidEntryPoint
-internal class DiaryShowFragment : BaseFragment<FragmentDiaryShowBinding>() {
+internal class DiaryShowFragment : BaseFragment<FragmentDiaryShowBinding, DiaryShowEvent>() {
 
     internal companion object {
         // Navigation関係
@@ -99,7 +99,7 @@ internal class DiaryShowFragment : BaseFragment<FragmentDiaryShowBinding>() {
         }
     }
 
-    override fun onMainViewModelEventReceived(event: ViewModelEvent) {
+    override fun onMainViewModelEventReceived(event: DiaryShowEvent) {
         when (event) {
             is DiaryShowEvent.NavigateDiaryEditFragment -> {
                 navigateDiaryEditFragment(event.date)
@@ -113,16 +113,17 @@ internal class DiaryShowFragment : BaseFragment<FragmentDiaryShowBinding>() {
             is DiaryShowEvent.NavigatePreviousFragment -> {
                 navigatePreviousFragment(event.result)
             }
-            is ViewModelEvent.NavigatePreviousFragment -> {
-                // MEMO:"DiaryShowEvent.NavigatePreviousFragment"を使用する為、
-                //      "ViewModelEvent.NavigatePreviousFragment"処理不要。
-                throw IllegalArgumentException()
-            }
-            is ViewModelEvent.NavigateAppMessage -> {
-                navigateAppMessageDialog(event.message)
-            }
-            else -> {
-                throw IllegalArgumentException()
+            is DiaryShowEvent.CommonEvent -> {
+                when(event.event) {
+                    CommonViewModelEvent.NavigatePreviousFragment -> {
+                        // MEMO:"DiaryShowEvent.NavigatePreviousFragment"を使用する為、
+                        //      "ViewModelEvent.NavigatePreviousFragment"処理不要。
+                        throw IllegalArgumentException()
+                    }
+                    is CommonViewModelEvent.NavigateAppMessage -> {
+                        navigateAppMessageDialog(event.event.message)
+                    }
+                }
             }
         }
     }

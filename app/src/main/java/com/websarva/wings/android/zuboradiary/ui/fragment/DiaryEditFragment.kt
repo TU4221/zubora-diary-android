@@ -42,7 +42,6 @@ import com.websarva.wings.android.zuboradiary.ui.keyboard.KeyboardManager
 import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
 import com.websarva.wings.android.zuboradiary.ui.model.adapter.WeatherAdapterList
 import com.websarva.wings.android.zuboradiary.ui.model.event.DiaryEditEvent
-import com.websarva.wings.android.zuboradiary.ui.model.event.ViewModelEvent
 import com.websarva.wings.android.zuboradiary.ui.model.adapter.ConditionAdapterList
 import com.websarva.wings.android.zuboradiary.ui.model.navigation.NavigationCommand
 import com.websarva.wings.android.zuboradiary.ui.model.parameters.DiaryDeleteParameters
@@ -53,6 +52,7 @@ import com.websarva.wings.android.zuboradiary.ui.model.parameters.NavigatePrevio
 import com.websarva.wings.android.zuboradiary.ui.model.parameters.WeatherInfoFetchParameters
 import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
 import com.websarva.wings.android.zuboradiary.ui.model.DiaryItemTitle
+import com.websarva.wings.android.zuboradiary.ui.model.event.CommonViewModelEvent
 import com.websarva.wings.android.zuboradiary.ui.utils.isAccessLocationGranted
 import com.websarva.wings.android.zuboradiary.ui.utils.toJapaneseDateString
 import dagger.hilt.android.AndroidEntryPoint
@@ -61,7 +61,7 @@ import kotlinx.coroutines.flow.filterNotNull
 import java.time.LocalDate
 
 @AndroidEntryPoint
-class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding>() {
+class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditEvent>() {
 
     internal companion object {
         // Navigation関係
@@ -243,7 +243,7 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding>() {
         }
     }
 
-    override fun onMainViewModelEventReceived(event: ViewModelEvent) {
+    override fun onMainViewModelEventReceived(event: DiaryEditEvent) {
         when (event) {
             is DiaryEditEvent.NavigateDiaryShowFragment -> {
                 navigateDiaryShowFragment(event.date)
@@ -296,16 +296,17 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding>() {
             is DiaryEditEvent.SelectImage -> {
                 openDocumentResultLauncher.launch(arrayOf("image/*"))
             }
-            is ViewModelEvent.NavigatePreviousFragment -> {
-                // MEMO:"DiaryEditEvent.NavigatePreviousFragment"を使用する為、
-                //      "ViewModelEvent.NavigatePreviousFragment"処理不要。
-                throw IllegalArgumentException()
-            }
-            is ViewModelEvent.NavigateAppMessage -> {
-                navigateAppMessageDialog(event.message)
-            }
-            else -> {
-                throw IllegalArgumentException()
+            is DiaryEditEvent.CommonEvent -> {
+                when(event.event) {
+                    CommonViewModelEvent.NavigatePreviousFragment -> {
+                        // MEMO:"DiaryEditEvent.NavigatePreviousFragment"を使用する為、
+                        //      "ViewModelEvent.NavigatePreviousFragment"処理不要。
+                        throw IllegalArgumentException()
+                    }
+                    is CommonViewModelEvent.NavigateAppMessage -> {
+                        navigateAppMessageDialog(event.event.message)
+                    }
+                }
             }
         }
     }

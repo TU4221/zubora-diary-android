@@ -25,7 +25,7 @@ import com.websarva.wings.android.zuboradiary.ui.viewmodel.SettingsViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.collectLatest
 
-abstract class BaseFragment<T: ViewBinding> : LoggingFragment() {
+abstract class BaseFragment<T: ViewBinding, E : ViewModelEvent> : LoggingFragment() {
 
     private val logTag = createLogTag()
 
@@ -36,7 +36,7 @@ abstract class BaseFragment<T: ViewBinding> : LoggingFragment() {
     private var _binding: T? = null
     internal val binding get() = checkNotNull(_binding)
 
-    internal abstract val mainViewModel: BaseViewModel<out ViewModelEvent, out AppMessage, out UiState>
+    internal abstract val mainViewModel: BaseViewModel<E, out AppMessage, out UiState>
 
     // MEMO:委譲プロパティの委譲先(viewModels())の遅延初期化により"Field is never assigned."と警告が表示される。
     //      委譲プロパティによるViewModel生成は公式が推奨する方法の為、警告を無視する。その為、@Suppressを付与する。
@@ -180,7 +180,7 @@ abstract class BaseFragment<T: ViewBinding> : LoggingFragment() {
             )
     }
 
-    internal abstract fun onMainViewModelEventReceived(event: ViewModelEvent)
+    internal abstract fun onMainViewModelEventReceived(event: E)
 
     private fun setUpSettingsViewModelEvent() {
         fragmentHelper.setUpSettingsViewModelEvent(

@@ -12,9 +12,9 @@ import com.websarva.wings.android.zuboradiary.ui.model.state.UiState
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.BaseViewModel
 import kotlinx.coroutines.CoroutineScope
 
-abstract class BaseFullScreenDialogFragment<T: ViewBinding>: BaseSimpleFullScreenDialogFragment<T>() {
+abstract class BaseFullScreenDialogFragment<T: ViewBinding, E: ViewModelEvent>: BaseSimpleFullScreenDialogFragment<T>() {
 
-    internal abstract val mainViewModel: BaseViewModel<out ViewModelEvent, out AppMessage, out UiState>
+    internal abstract val mainViewModel: BaseViewModel<E, out AppMessage, out UiState>
 
     internal abstract val destinationId: Int
 
@@ -67,7 +67,7 @@ abstract class BaseFullScreenDialogFragment<T: ViewBinding>: BaseSimpleFullScree
             )
     }
 
-    internal abstract fun onMainViewModelEventReceived(event: ViewModelEvent)
+    internal abstract fun onMainViewModelEventReceived(event: E)
 
     private fun setUpSettingsViewModelEvent() {
         fragmentHelper.setUpSettingsViewModelEvent(

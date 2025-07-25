@@ -38,7 +38,7 @@ import com.websarva.wings.android.zuboradiary.ui.fragment.DiaryShowFragment.Weat
 import com.websarva.wings.android.zuboradiary.ui.fragment.common.RequiresBottomNavigation
 import com.websarva.wings.android.zuboradiary.ui.fragment.common.ReselectableFragment
 import com.websarva.wings.android.zuboradiary.ui.model.event.CalendarEvent
-import com.websarva.wings.android.zuboradiary.ui.model.event.ViewModelEvent
+import com.websarva.wings.android.zuboradiary.ui.model.event.CommonViewModelEvent
 import com.websarva.wings.android.zuboradiary.ui.model.navigation.NavigationCommand
 import com.websarva.wings.android.zuboradiary.ui.utils.toJapaneseDateString
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.DiaryShowViewModel
@@ -59,7 +59,7 @@ import java.util.stream.Collectors
 import java.util.stream.Stream
 @AndroidEntryPoint
 class CalendarFragment :
-    BaseFragment<FragmentCalendarBinding>(),
+    BaseFragment<FragmentCalendarBinding, CalendarEvent>(),
     ReselectableFragment,
     RequiresBottomNavigation {
 
@@ -119,7 +119,7 @@ class CalendarFragment :
         }
     }
 
-    override fun onMainViewModelEventReceived(event: ViewModelEvent) {
+    override fun onMainViewModelEventReceived(event: CalendarEvent) {
         when (event) {
             is CalendarEvent.NavigateDiaryEditFragment -> {
                 navigateDiaryEditFragment(event.date, !event.isNewDiary)
@@ -136,14 +136,15 @@ class CalendarFragment :
             is CalendarEvent.SmoothScrollCalendar -> {
                 smoothScrollCalendar(event.date)
             }
-            ViewModelEvent.NavigatePreviousFragment -> {
-                mainActivity.popBackStackToStartFragment()
-            }
-            is ViewModelEvent.NavigateAppMessage -> {
-                navigateAppMessageDialog(event.message)
-            }
-            else -> {
-                throw IllegalArgumentException()
+            is CalendarEvent.CommonEvent -> {
+                when(event.wrappedEvent) {
+                    CommonViewModelEvent.NavigatePreviousFragment -> {
+                        mainActivity.popBackStackToStartFragment()
+                    }
+                    is CommonViewModelEvent.NavigateAppMessage -> {
+                        navigateAppMessageDialog(event.wrappedEvent.message)
+                    }
+                }
             }
         }
     }

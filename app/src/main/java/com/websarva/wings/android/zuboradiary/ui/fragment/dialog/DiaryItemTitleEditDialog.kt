@@ -14,17 +14,18 @@ import com.websarva.wings.android.zuboradiary.ui.adapter.diaryitemtitle.ItemTitl
 import com.websarva.wings.android.zuboradiary.ui.adapter.diaryitemtitle.SelectionHistoryList
 import com.websarva.wings.android.zuboradiary.ui.fragment.RESULT_KEY_PREFIX
 import com.websarva.wings.android.zuboradiary.ui.model.event.DiaryItemTitleEditEvent
-import com.websarva.wings.android.zuboradiary.ui.model.event.ViewModelEvent
 import com.websarva.wings.android.zuboradiary.ui.model.navigation.NavigationCommand
 import com.websarva.wings.android.zuboradiary.ui.model.parameters.DiaryItemTitleSelectionHistoryItemDeleteParameters
 import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
 import com.websarva.wings.android.zuboradiary.ui.model.DiaryItemTitle
+import com.websarva.wings.android.zuboradiary.ui.model.event.CommonViewModelEvent
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.filterNotNull
 
 @AndroidEntryPoint
-class DiaryItemTitleEditDialog : BaseFullScreenDialogFragment<DialogDiaryItemTitleEditBinding>() {
+class DiaryItemTitleEditDialog :
+    BaseFullScreenDialogFragment<DialogDiaryItemTitleEditBinding, DiaryItemTitleEditEvent>() {
 
     internal companion object {
         // Navigation関係
@@ -72,7 +73,7 @@ class DiaryItemTitleEditDialog : BaseFullScreenDialogFragment<DialogDiaryItemTit
         }
     }
 
-    override fun onMainViewModelEventReceived(event: ViewModelEvent) {
+    override fun onMainViewModelEventReceived(event: DiaryItemTitleEditEvent) {
         when (event) {
             DiaryItemTitleEditEvent.CloseSwipedItem -> {
                 val adapter =
@@ -91,15 +92,15 @@ class DiaryItemTitleEditDialog : BaseFullScreenDialogFragment<DialogDiaryItemTit
                     event.parameters
                 )
             }
-
-            ViewModelEvent.NavigatePreviousFragment -> {
-                navigatePreviousFragment()
-            }
-            is ViewModelEvent.NavigateAppMessage -> {
-                navigateAppMessageDialog(event.message)
-            }
-            else -> {
-                throw IllegalArgumentException()
+            is DiaryItemTitleEditEvent.CommonEvent -> {
+                when(event.event) {
+                    CommonViewModelEvent.NavigatePreviousFragment -> {
+                        navigatePreviousFragment()
+                    }
+                    is CommonViewModelEvent.NavigateAppMessage -> {
+                        navigateAppMessageDialog(event.event.message)
+                    }
+                }
             }
         }
     }

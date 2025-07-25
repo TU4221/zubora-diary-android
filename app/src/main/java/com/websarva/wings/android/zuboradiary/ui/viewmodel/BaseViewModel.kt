@@ -34,7 +34,7 @@ internal abstract class BaseViewModel<E: ViewModelEvent, M: AppMessage, S: UiSta
 
     private val logTag = createLogTag()
 
-    private val _viewModelEvent = MutableSharedFlow<ConsumableEvent<ViewModelEvent>>(replay = 1)
+    private val _viewModelEvent = MutableSharedFlow<ConsumableEvent<E>>(replay = 1)
     val viewModelEvent get() = _viewModelEvent.asSharedFlow()
 
     private val _uiState = MutableStateFlow(initialViewUiState)
@@ -64,23 +64,9 @@ internal abstract class BaseViewModel<E: ViewModelEvent, M: AppMessage, S: UiSta
         )
     }
 
-    protected suspend fun emitNavigatePreviousFragmentEvent() {
-        _viewModelEvent.emit(
-            ConsumableEvent(
-                ViewModelEvent.NavigatePreviousFragment
-            )
-        )
-    }
+    protected abstract suspend fun emitNavigatePreviousFragmentEvent()
 
-    protected suspend fun emitAppMessageEvent(appMessage: M) {
-        _viewModelEvent.emit(
-            ConsumableEvent(
-                ViewModelEvent.NavigateAppMessage(
-                    appMessage
-                )
-            )
-        )
-    }
+    protected abstract suspend fun emitAppMessageEvent(appMessage: M)
 
     protected fun updateUiState(state: S) {
         _uiState.value = state

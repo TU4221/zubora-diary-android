@@ -14,6 +14,7 @@ import com.websarva.wings.android.zuboradiary.ui.adapter.diaryitemtitle.Selectio
 import com.websarva.wings.android.zuboradiary.ui.adapter.diaryitemtitle.SelectionHistoryListItem
 import com.websarva.wings.android.zuboradiary.ui.model.DiaryItemTitle
 import com.websarva.wings.android.zuboradiary.ui.model.InputTextValidateResult
+import com.websarva.wings.android.zuboradiary.ui.model.event.CommonViewModelEvent
 import com.websarva.wings.android.zuboradiary.ui.model.event.DiaryItemTitleEditEvent
 import com.websarva.wings.android.zuboradiary.ui.model.parameters.DiaryItemTitleSelectionHistoryItemDeleteParameters
 import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
@@ -88,6 +89,26 @@ internal class DiaryItemTitleEditViewModel @Inject constructor(
         _itemNumber.value = initialItemNumber
         _itemTitle.value = initialItemTitle
         setUpItemTitleSelectionHistoryList()
+    }
+
+    override suspend fun emitNavigatePreviousFragmentEvent() {
+        viewModelScope.launch {
+            emitViewModelEvent(
+                DiaryItemTitleEditEvent.CommonEvent(
+                    CommonViewModelEvent.NavigatePreviousFragment
+                )
+            )
+        }
+    }
+
+    override suspend fun emitAppMessageEvent(appMessage: DiaryItemTitleEditAppMessage) {
+        viewModelScope.launch {
+            emitViewModelEvent(
+                DiaryItemTitleEditEvent.CommonEvent(
+                    CommonViewModelEvent.NavigateAppMessage(appMessage)
+                )
+            )
+        }
     }
 
     // BackPressed(戻るボタン)処理

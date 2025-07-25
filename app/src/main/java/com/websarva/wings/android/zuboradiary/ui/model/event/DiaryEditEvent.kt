@@ -11,22 +11,24 @@ import com.websarva.wings.android.zuboradiary.ui.model.parameters.WeatherInfoFet
 import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
 import java.time.LocalDate
 
-internal sealed class DiaryEditEvent : ViewModelEvent() {
-    data class NavigateDiaryShowFragment(val date: LocalDate) : DiaryEditEvent()
-    data class NavigateDiaryItemTitleEditFragment(val diaryItemTitle: DiaryItemTitle) : DiaryEditEvent()
-    data class NavigateDiaryLoadingDialog(val parameters: DiaryLoadingParameters) : DiaryEditEvent()
-    data class NavigateDiaryLoadingFailureDialog(val date: LocalDate) : DiaryEditEvent()
-    data class NavigateDiaryUpdateDialog(val parameters: DiaryUpdateParameters) : DiaryEditEvent()
-    data class NavigateDiaryDeleteDialog(val parameters: DiaryDeleteParameters) : DiaryEditEvent()
-    data class NavigateDatePickerDialog(val date: LocalDate) : DiaryEditEvent()
-    data class NavigateWeatherInfoFetchDialog(val parameters: WeatherInfoFetchParameters) : DiaryEditEvent()
-    data class NavigateDiaryItemDeleteDialog(val parameters: DiaryItemDeleteParameters) : DiaryEditEvent()
-    data object NavigateDiaryImageDeleteDialog : DiaryEditEvent()
-    data class NavigateExitWithoutDiarySavingConfirmationDialog(val parameters: NavigatePreviousParameters) : DiaryEditEvent()
-    data class NavigatePreviousFragment(val result: FragmentResult<LocalDate>) : DiaryEditEvent()
-    data class NavigatePreviousFragmentOnDiaryDelete(val result: FragmentResult.Some<LocalDate>) : DiaryEditEvent()
-    data class TransitionDiaryItemHidedState(val itemNumber: ItemNumber) : DiaryEditEvent()
-    data class CheckAccessLocationPermissionBeforeWeatherInfoFetch(val parameters: WeatherInfoFetchParameters) : DiaryEditEvent()
-    data object ItemAddition : DiaryEditEvent()
-    data object SelectImage : DiaryEditEvent()
+sealed class DiaryEditEvent : ViewModelEvent {
+    internal data class NavigateDiaryShowFragment(val date: LocalDate) : DiaryEditEvent()
+    internal data class NavigateDiaryItemTitleEditFragment(val diaryItemTitle: DiaryItemTitle) : DiaryEditEvent()
+    internal data class NavigateDiaryLoadingDialog(val parameters: DiaryLoadingParameters) : DiaryEditEvent()
+    internal data class NavigateDiaryLoadingFailureDialog(val date: LocalDate) : DiaryEditEvent()
+    internal data class NavigateDiaryUpdateDialog(val parameters: DiaryUpdateParameters) : DiaryEditEvent()
+    internal data class NavigateDiaryDeleteDialog(val parameters: DiaryDeleteParameters) : DiaryEditEvent()
+    internal data class NavigateDatePickerDialog(val date: LocalDate) : DiaryEditEvent()
+    internal data class NavigateWeatherInfoFetchDialog(val parameters: WeatherInfoFetchParameters) : DiaryEditEvent()
+    internal data class NavigateDiaryItemDeleteDialog(val parameters: DiaryItemDeleteParameters) : DiaryEditEvent()
+    internal data object NavigateDiaryImageDeleteDialog : DiaryEditEvent()
+    internal data class NavigateExitWithoutDiarySavingConfirmationDialog(val parameters: NavigatePreviousParameters) : DiaryEditEvent()
+    internal data class NavigatePreviousFragment(val result: FragmentResult<LocalDate>) : DiaryEditEvent()
+    internal data class NavigatePreviousFragmentOnDiaryDelete(val result: FragmentResult.Some<LocalDate>) : DiaryEditEvent()
+    internal data class TransitionDiaryItemHidedState(val itemNumber: ItemNumber) : DiaryEditEvent()
+    internal data class CheckAccessLocationPermissionBeforeWeatherInfoFetch(val parameters: WeatherInfoFetchParameters) : DiaryEditEvent()
+    internal data object ItemAddition : DiaryEditEvent()
+    internal data object SelectImage : DiaryEditEvent()
+
+    internal data class CommonEvent(val event: CommonViewModelEvent) : DiaryEditEvent()
 }

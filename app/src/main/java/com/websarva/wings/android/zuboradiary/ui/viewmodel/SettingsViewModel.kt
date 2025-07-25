@@ -28,6 +28,7 @@ import com.websarva.wings.android.zuboradiary.domain.usecase.settings.SaveWeathe
 import com.websarva.wings.android.zuboradiary.domain.usecase.settings.InitializeAllSettingsUseCase
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import com.websarva.wings.android.zuboradiary.ui.model.SettingsAppMessage
+import com.websarva.wings.android.zuboradiary.ui.model.event.CommonViewModelEvent
 import com.websarva.wings.android.zuboradiary.ui.model.event.SettingsEvent
 import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
 import com.websarva.wings.android.zuboradiary.ui.model.state.SettingsState
@@ -125,6 +126,26 @@ internal class SettingsViewModel @Inject constructor(
     override fun initialize() {
         super.initialize()
         setUpSettingsValue()
+    }
+
+    override suspend fun emitNavigatePreviousFragmentEvent() {
+        viewModelScope.launch {
+            emitViewModelEvent(
+                SettingsEvent.CommonEvent(
+                    CommonViewModelEvent.NavigatePreviousFragment
+                )
+            )
+        }
+    }
+
+    override suspend fun emitAppMessageEvent(appMessage: SettingsAppMessage) {
+        viewModelScope.launch {
+            emitViewModelEvent(
+                SettingsEvent.CommonEvent(
+                    CommonViewModelEvent.NavigateAppMessage(appMessage)
+                )
+            )
+        }
     }
 
     private fun setUpSettingsValue() {

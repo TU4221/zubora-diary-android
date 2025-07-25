@@ -27,8 +27,8 @@ import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.PermissionDialo
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.ReminderNotificationTimePickerDialogFragment
 import com.websarva.wings.android.zuboradiary.ui.theme.SettingsThemeColorChanger
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.ThemeColorPickerDialogFragment
+import com.websarva.wings.android.zuboradiary.ui.model.event.CommonViewModelEvent
 import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
-import com.websarva.wings.android.zuboradiary.ui.model.event.ViewModelEvent
 import com.websarva.wings.android.zuboradiary.ui.model.event.SettingsEvent
 import com.websarva.wings.android.zuboradiary.ui.model.navigation.NavigationCommand
 import com.websarva.wings.android.zuboradiary.ui.utils.formatToHourMinuteString
@@ -43,7 +43,7 @@ import java.time.LocalTime
 
 @AndroidEntryPoint
 class SettingsFragment :
-    BaseFragment<FragmentSettingsBinding>(),
+    BaseFragment<FragmentSettingsBinding, SettingsEvent>(),
     ReselectableFragment,
     RequiresBottomNavigation {
 
@@ -199,7 +199,7 @@ class SettingsFragment :
         }
     }
 
-    override fun onMainViewModelEventReceived(event: ViewModelEvent) {
+    override fun onMainViewModelEventReceived(event: SettingsEvent) {
         when (event) {
             is SettingsEvent.NavigateThemeColorPickerDialog -> {
                 navigateThemeColorPickerDialog()
@@ -261,14 +261,15 @@ class SettingsFragment :
             is SettingsEvent.TurnOffWeatherInfoFetchSettingSwitch -> {
                 binding.includeWeatherInfoFetchSetting.materialSwitch.isChecked = false
             }
-            ViewModelEvent.NavigatePreviousFragment -> {
-                mainActivity.popBackStackToStartFragment()
-            }
-            is ViewModelEvent.NavigateAppMessage -> {
-                navigateAppMessageDialog(event.message)
-            }
-            else -> {
-                throw IllegalArgumentException()
+            is SettingsEvent.CommonEvent -> {
+                when(event.event) {
+                    CommonViewModelEvent.NavigatePreviousFragment -> {
+                        mainActivity.popBackStackToStartFragment()
+                    }
+                    is CommonViewModelEvent.NavigateAppMessage -> {
+                        navigateAppMessageDialog(event.event.message)
+                    }
+                }
             }
         }
     }

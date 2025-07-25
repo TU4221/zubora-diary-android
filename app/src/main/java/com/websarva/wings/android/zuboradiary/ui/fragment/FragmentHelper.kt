@@ -10,7 +10,9 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.NavController
 import com.websarva.wings.android.zuboradiary.domain.model.ThemeColor
 import com.websarva.wings.android.zuboradiary.ui.model.AppMessage
+import com.websarva.wings.android.zuboradiary.ui.model.event.CommonViewModelEvent
 import com.websarva.wings.android.zuboradiary.ui.model.event.ConsumableEvent
+import com.websarva.wings.android.zuboradiary.ui.model.event.SettingsEvent
 import com.websarva.wings.android.zuboradiary.ui.model.event.ViewModelEvent
 import com.websarva.wings.android.zuboradiary.ui.model.navigation.NavigationCommand
 import com.websarva.wings.android.zuboradiary.ui.model.state.UiState
@@ -62,14 +64,14 @@ internal class FragmentHelper {
         }
     }
 
-    fun setUpMainViewModelEvent(
+    fun <E: ViewModelEvent> setUpMainViewModelEvent(
         fragment: Fragment,
-        mainViewModel: BaseViewModel<out ViewModelEvent, out AppMessage, out UiState>,
-        onEventReceived: (ViewModelEvent) -> Unit
+        mainViewModel: BaseViewModel<E, out AppMessage, out UiState>,
+        onEventReceived: (E) -> Unit
     ) {
         launchAndRepeatOnViewLifeCycleStarted(fragment) {
             mainViewModel.viewModelEvent
-                .collect { value: ConsumableEvent<ViewModelEvent> ->
+                .collect { value: ConsumableEvent<E> ->
                     val event = value.getContentIfNotHandled()
                     Log.d(logTag, "ViewModelEvent_Collect(): $event")
                     event ?: return@collect
@@ -89,13 +91,20 @@ internal class FragmentHelper {
 
         launchAndRepeatOnViewLifeCycleStarted(fragment) {
             settingsViewModel.viewModelEvent
-                .collect { value: ConsumableEvent<ViewModelEvent> ->
+                .collect { value: ConsumableEvent<SettingsEvent> ->
                     val event = value.getContentIfNotHandled()
                     Log.d(logTag, "SettingsViewModelEvent_Collect(): $event")
                     event ?: return@collect
                     when (event) {
-                        is ViewModelEvent.NavigateAppMessage -> {
-                            onAppMessageNavigationEventReceived(event.message)
+                        is SettingsEvent.CommonEvent -> {
+                            when (event.event) {
+                                is CommonViewModelEvent.NavigateAppMessage -> {
+                                    onAppMessageNavigationEventReceived(event.event.message)
+                                }
+                                else -> {
+                                    throw IllegalArgumentException()
+                                }
+                            }
                         }
                         else -> {
                             throw IllegalArgumentException()

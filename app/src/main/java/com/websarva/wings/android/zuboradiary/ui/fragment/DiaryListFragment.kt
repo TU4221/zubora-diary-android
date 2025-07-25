@@ -24,10 +24,10 @@ import com.websarva.wings.android.zuboradiary.ui.adapter.diary.diary.DiaryYearMo
 import com.websarva.wings.android.zuboradiary.ui.fragment.common.RequiresBottomNavigation
 import com.websarva.wings.android.zuboradiary.ui.fragment.common.ReselectableFragment
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.StartYearMonthPickerDialogFragment
+import com.websarva.wings.android.zuboradiary.ui.model.event.CommonViewModelEvent
 import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
 import com.websarva.wings.android.zuboradiary.ui.model.state.DiaryListState
 import com.websarva.wings.android.zuboradiary.ui.model.event.DiaryListEvent
-import com.websarva.wings.android.zuboradiary.ui.model.event.ViewModelEvent
 import com.websarva.wings.android.zuboradiary.ui.model.navigation.NavigationCommand
 import com.websarva.wings.android.zuboradiary.ui.model.parameters.DiaryDeleteParameters
 import dagger.hilt.android.AndroidEntryPoint
@@ -38,7 +38,7 @@ import java.time.YearMonth
 
 @AndroidEntryPoint
 class DiaryListFragment :
-    BaseFragment<FragmentDiaryListBinding>(),
+    BaseFragment<FragmentDiaryListBinding, DiaryListEvent>(),
     ReselectableFragment,
     RequiresBottomNavigation {
 
@@ -112,7 +112,7 @@ class DiaryListFragment :
         }
     }
 
-    override fun onMainViewModelEventReceived(event: ViewModelEvent) {
+    override fun onMainViewModelEventReceived(event: DiaryListEvent) {
         when (event) {
             is DiaryListEvent.NavigateDiaryShowFragment -> {
                 navigateDiaryShowFragment(event.date)
@@ -129,14 +129,15 @@ class DiaryListFragment :
             is DiaryListEvent.NavigateDiaryDeleteDialog -> {
                 navigateDiaryDeleteDialog(event.parameters)
             }
-            ViewModelEvent.NavigatePreviousFragment -> {
-                navigatePreviousFragment()
-            }
-            is ViewModelEvent.NavigateAppMessage -> {
-                navigateAppMessageDialog(event.message)
-            }
-            else -> {
-                throw IllegalArgumentException()
+            is DiaryListEvent.CommonEvent -> {
+                when(event.event) {
+                    CommonViewModelEvent.NavigatePreviousFragment -> {
+                        navigatePreviousFragment()
+                    }
+                    is CommonViewModelEvent.NavigateAppMessage -> {
+                        navigateAppMessageDialog(event.event.message)
+                    }
+                }
             }
         }
     }
