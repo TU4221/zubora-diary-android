@@ -223,25 +223,24 @@ abstract class BaseFragment<T: ViewBinding, E : UiEvent> : LoggingFragment() {
             )
     }
 
-    internal fun navigatePreviousFragment() {
+    internal fun navigatePreviousFragment(
+        resultKey: String? = null,
+        result: FragmentResult<*> = FragmentResult.None
+    ) {
         fragmentHelper
             .navigatePreviousFragment(
                 findNavController(),
                 destinationId,
-                mainViewModel
+                mainViewModel,
+                resultKey,
+                result
             )
     }
 
     internal abstract fun navigateAppMessageDialog(appMessage: AppMessage)
 
     private fun registerOnBackPressedCallback() {
-        fragmentHelper
-            .registerOnBackPressedCallback(
-                this,
-                findNavController(),
-                destinationId,
-                mainViewModel
-            )
+        fragmentHelper.registerOnBackPressedCallback(this, mainViewModel)
     }
 
     override fun onDestroyView() {

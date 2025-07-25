@@ -15,6 +15,7 @@ import com.websarva.wings.android.zuboradiary.ui.model.event.ConsumableEvent
 import com.websarva.wings.android.zuboradiary.ui.model.event.SettingsEvent
 import com.websarva.wings.android.zuboradiary.ui.model.event.UiEvent
 import com.websarva.wings.android.zuboradiary.ui.model.navigation.NavigationCommand
+import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
 import com.websarva.wings.android.zuboradiary.ui.model.state.UiState
 import com.websarva.wings.android.zuboradiary.ui.theme.ThemeColorInflaterCreator
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.BaseViewModel
@@ -197,20 +198,26 @@ internal class FragmentHelper {
     fun navigatePreviousFragment(
         navController: NavController,
         fragmentDestinationId: Int,
-        mainViewModel: BaseViewModel<out UiEvent, out AppMessage, out UiState>
+        mainViewModel: BaseViewModel<out UiEvent, out AppMessage, out UiState>,
+        resultKey: String?,
+        result: FragmentResult<*>
     ) {
+        val command =
+            if (resultKey == null) {
+                NavigationCommand.Up()
+            } else {
+                NavigationCommand.Up(resultKey, result)
+            }
         navigateFragment(
             navController,
             fragmentDestinationId,
             mainViewModel,
-            NavigationCommand.Up<Nothing>()
+            command
         )
     }
 
     fun registerOnBackPressedCallback(
         fragment: Fragment,
-        navController: NavController,
-        fragmentDestinationId: Int,
         mainViewModel: BaseViewModel<out UiEvent, out AppMessage, out UiState>
     ) {
         fragment.requireActivity().onBackPressedDispatcher
@@ -218,11 +225,7 @@ internal class FragmentHelper {
                 fragment.viewLifecycleOwner,
                 object : OnBackPressedCallback(true) {
                     override fun handleOnBackPressed() {
-                        navigatePreviousFragment(
-                            navController,
-                            fragmentDestinationId,
-                            mainViewModel
-                        )
+                        mainViewModel.onBackPressed()
                     }
                 }
             )

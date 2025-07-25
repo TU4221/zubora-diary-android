@@ -296,7 +296,7 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditEvent>
             is DiaryEditEvent.CommonEvent -> {
                 when(event.event) {
                     is CommonUiEvent.NavigatePreviousFragment<*> -> {
-                        navigatePreviousFragment(event.event.result)
+                        navigatePreviousFragment(KEY_RESULT, event.event.result)
                     }
                     is CommonUiEvent.NavigateAppMessage -> {
                         navigateAppMessageDialog(event.event.message)
@@ -837,10 +837,6 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditEvent>
             DiaryEditFragmentDirections
                 .actionDiaryEditFragmentToExitWithoutDiarySavingConfirmationDialog(parameters)
         navigateFragment(NavigationCommand.To(directions))
-    }
-
-    private fun navigatePreviousFragment(result: FragmentResult<*>) {
-        navigateFragment(NavigationCommand.Up(KEY_RESULT, result))
     }
 
     private fun navigatePreviousFragmentOnDiaryDelete(result: FragmentResult.Some<LocalDate>) {

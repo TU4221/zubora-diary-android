@@ -59,11 +59,11 @@ internal class CalendarViewModel @Inject constructor(
         _previousSelectedDate.value = initialPreviousSelectedDate
     }
 
-    override suspend fun emitNavigatePreviousFragmentEvent() {
+    override suspend fun emitNavigatePreviousFragmentEvent(result: FragmentResult<*>) {
         viewModelScope.launch {
             emitUiEvent(
                 CalendarEvent.CommonEvent(
-                    CommonUiEvent.NavigatePreviousFragment<Nothing>()
+                    CommonUiEvent.NavigatePreviousFragment(result)
                 )
             )
         }

@@ -16,6 +16,7 @@ import com.websarva.wings.android.zuboradiary.ui.adapter.diary.wordsearchresult.
 import com.websarva.wings.android.zuboradiary.ui.model.event.CommonUiEvent
 import com.websarva.wings.android.zuboradiary.ui.model.state.WordSearchState
 import com.websarva.wings.android.zuboradiary.ui.model.event.WordSearchEvent
+import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
@@ -161,11 +162,11 @@ internal class WordSearchViewModel @Inject internal constructor(
         isLoadingOnScrolled = initialIsLoadingOnScrolled
     }
 
-    override suspend fun emitNavigatePreviousFragmentEvent() {
+    override suspend fun emitNavigatePreviousFragmentEvent(result: FragmentResult<*>) {
         viewModelScope.launch {
             emitUiEvent(
                 WordSearchEvent.CommonEvent(
-                    CommonUiEvent.NavigatePreviousFragment<Nothing>()
+                    CommonUiEvent.NavigatePreviousFragment(result)
                 )
             )
         }

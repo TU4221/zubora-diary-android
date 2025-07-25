@@ -70,7 +70,7 @@ abstract class BaseSimpleFullScreenDialogFragment<T: ViewBinding>: DialogFragmen
         super.onDestroyView()
     }
 
-    internal open fun navigatePreviousFragment() {
+    internal fun navigatePreviousFragment() {
         findNavController().navigateUp()
     }
 }

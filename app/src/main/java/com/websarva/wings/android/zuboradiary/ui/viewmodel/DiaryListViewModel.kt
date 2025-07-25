@@ -21,6 +21,7 @@ import com.websarva.wings.android.zuboradiary.ui.model.state.DiaryListState
 import com.websarva.wings.android.zuboradiary.ui.model.event.DiaryListEvent
 import com.websarva.wings.android.zuboradiary.ui.model.parameters.DiaryDeleteParameters
 import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
+import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -117,11 +118,11 @@ internal class DiaryListViewModel @Inject constructor(
         isLoadingOnScrolled = initialIsLoadingOnScrolled
     }
 
-    override suspend fun emitNavigatePreviousFragmentEvent() {
+    override suspend fun emitNavigatePreviousFragmentEvent(result: FragmentResult<*>) {
         viewModelScope.launch {
             emitUiEvent(
                 DiaryListEvent.CommonEvent(
-                    CommonUiEvent.NavigatePreviousFragment<Nothing>()
+                    CommonUiEvent.NavigatePreviousFragment(result)
                 )
             )
         }

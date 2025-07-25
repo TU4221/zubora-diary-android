@@ -313,11 +313,11 @@ internal class DiaryEditViewModel @Inject constructor(
         _conditionAdapterList.value = initialConditionAdapterList
     }
 
-    override suspend fun emitNavigatePreviousFragmentEvent() {
+    override suspend fun emitNavigatePreviousFragmentEvent(result: FragmentResult<*>) {
         viewModelScope.launch {
             emitUiEvent(
                 DiaryEditEvent.CommonEvent(
-                    CommonUiEvent.NavigatePreviousFragment<Nothing>()
+                    CommonUiEvent.NavigatePreviousFragment(result)
                 )
             )
         }
@@ -1143,11 +1143,7 @@ internal class DiaryEditViewModel @Inject constructor(
             } else {
                 FragmentResult.Some(loadedDiary.date)
             }
-        emitUiEvent(
-            DiaryEditEvent.CommonEvent(
-                CommonUiEvent.NavigatePreviousFragment(result)
-            )
-        )
+        emitNavigatePreviousFragmentEvent(result)
     }
 
     // TODO:テスト用の為、最終的に削除

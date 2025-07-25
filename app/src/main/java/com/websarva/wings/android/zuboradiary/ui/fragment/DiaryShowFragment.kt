@@ -25,7 +25,6 @@ import com.websarva.wings.android.zuboradiary.ui.model.event.CommonUiEvent
 import com.websarva.wings.android.zuboradiary.ui.model.event.DiaryShowEvent
 import com.websarva.wings.android.zuboradiary.ui.model.navigation.NavigationCommand
 import com.websarva.wings.android.zuboradiary.ui.model.parameters.DiaryDeleteParameters
-import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.DiaryShowViewModel
 import com.websarva.wings.android.zuboradiary.ui.utils.toJapaneseDateString
 import com.websarva.wings.android.zuboradiary.ui.utils.toJapaneseDateTimeWithSecondsString
@@ -113,7 +112,7 @@ class DiaryShowFragment : BaseFragment<FragmentDiaryShowBinding, DiaryShowEvent>
             is DiaryShowEvent.CommonEvent -> {
                 when(event.event) {
                     is CommonUiEvent.NavigatePreviousFragment<*> -> {
-                        navigatePreviousFragment(event.event.result)
+                        navigatePreviousFragment(KEY_RESULT, event.event.result)
                     }
                     is CommonUiEvent.NavigateAppMessage -> {
                         navigateAppMessageDialog(event.event.message)
@@ -318,9 +317,5 @@ class DiaryShowFragment : BaseFragment<FragmentDiaryShowBinding, DiaryShowEvent>
         val directions =
             DiaryShowFragmentDirections.actionDiaryShowFragmentToAppMessageDialog(appMessage)
         navigateFragment(NavigationCommand.To(directions))
-    }
-
-    private fun navigatePreviousFragment(result: FragmentResult<*>) {
-        navigateFragment(NavigationCommand.Up(KEY_RESULT, result))
     }
 }

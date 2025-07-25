@@ -18,6 +18,7 @@ import com.websarva.wings.android.zuboradiary.ui.model.event.CommonUiEvent
 import com.websarva.wings.android.zuboradiary.ui.model.event.DiaryItemTitleEditEvent
 import com.websarva.wings.android.zuboradiary.ui.model.parameters.DiaryItemTitleSelectionHistoryItemDeleteParameters
 import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
+import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
 import com.websarva.wings.android.zuboradiary.ui.model.state.DiaryItemTitleEditState
 import com.websarva.wings.android.zuboradiary.ui.utils.requireValue
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -91,11 +92,11 @@ internal class DiaryItemTitleEditViewModel @Inject constructor(
         setUpItemTitleSelectionHistoryList()
     }
 
-    override suspend fun emitNavigatePreviousFragmentEvent() {
+    override suspend fun emitNavigatePreviousFragmentEvent(result: FragmentResult<*>) {
         viewModelScope.launch {
             emitUiEvent(
                 DiaryItemTitleEditEvent.CommonEvent(
-                    CommonUiEvent.NavigatePreviousFragment<Nothing>()
+                    CommonUiEvent.NavigatePreviousFragment(result)
                 )
             )
         }

@@ -8,6 +8,7 @@ import com.websarva.wings.android.zuboradiary.ui.model.AppMessage
 import com.websarva.wings.android.zuboradiary.ui.model.event.ConsumableEvent
 import com.websarva.wings.android.zuboradiary.ui.model.event.UiEvent
 import com.websarva.wings.android.zuboradiary.ui.model.navigation.NavigationCommand
+import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
 import com.websarva.wings.android.zuboradiary.ui.model.state.UiState
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -64,7 +65,9 @@ internal abstract class BaseViewModel<E: UiEvent, M: AppMessage, S: UiState>(
         )
     }
 
-    protected abstract suspend fun emitNavigatePreviousFragmentEvent()
+    protected abstract suspend fun emitNavigatePreviousFragmentEvent(
+        result: FragmentResult<*> = FragmentResult.None
+    )
 
     protected abstract suspend fun emitAppMessageEvent(appMessage: M)
 

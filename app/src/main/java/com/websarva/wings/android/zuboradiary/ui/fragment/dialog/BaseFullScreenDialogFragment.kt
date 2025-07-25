@@ -8,6 +8,7 @@ import com.websarva.wings.android.zuboradiary.ui.model.AppMessage
 import com.websarva.wings.android.zuboradiary.ui.model.event.UiEvent
 import com.websarva.wings.android.zuboradiary.ui.model.navigation.NavigationCommand
 import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
+import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
 import com.websarva.wings.android.zuboradiary.ui.model.state.UiState
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.BaseViewModel
 import kotlinx.coroutines.CoroutineScope
@@ -98,24 +99,23 @@ abstract class BaseFullScreenDialogFragment<T: ViewBinding, E: UiEvent>: BaseSim
             )
     }
 
-    override fun navigatePreviousFragment() {
+    internal fun navigatePreviousFragment(
+        resultKey: String? = null,
+        result: FragmentResult<*> = FragmentResult.None
+    ) {
         fragmentHelper
             .navigatePreviousFragment(
                 findNavController(),
                 destinationId,
-                mainViewModel
+                mainViewModel,
+                resultKey,
+                result
             )
     }
 
     internal abstract fun navigateAppMessageDialog(appMessage: AppMessage)
 
     private fun registerOnBackPressedCallback() {
-        fragmentHelper
-            .registerOnBackPressedCallback(
-                this,
-                findNavController(),
-                destinationId,
-                mainViewModel
-            )
+        fragmentHelper.registerOnBackPressedCallback(this, mainViewModel)
     }
 }

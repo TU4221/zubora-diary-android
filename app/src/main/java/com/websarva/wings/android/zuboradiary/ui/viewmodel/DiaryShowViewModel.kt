@@ -102,11 +102,11 @@ internal class DiaryShowViewModel @Inject constructor(
         diaryStateFlow.initialize()
     }
 
-    override suspend fun emitNavigatePreviousFragmentEvent() {
+    override suspend fun emitNavigatePreviousFragmentEvent(result: FragmentResult<*>) {
         viewModelScope.launch {
             emitUiEvent(
                 DiaryShowEvent.CommonEvent(
-                    CommonUiEvent.NavigatePreviousFragment<Nothing>()
+                    CommonUiEvent.NavigatePreviousFragment(result)
                 )
             )
         }
@@ -282,12 +282,6 @@ internal class DiaryShowViewModel @Inject constructor(
             } else {
                 FragmentResult.Some(loadedDiaryDate)
             }
-        emitUiEvent(
-            DiaryShowEvent.CommonEvent(
-                    CommonUiEvent.NavigatePreviousFragment(
-                        result
-                    )
-                )
-        )
+        emitNavigatePreviousFragmentEvent(result)
     }
 }
