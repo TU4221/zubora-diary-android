@@ -165,7 +165,7 @@ internal class WordSearchViewModel @Inject internal constructor(
         viewModelScope.launch {
             emitUiEvent(
                 WordSearchEvent.CommonEvent(
-                    CommonUiEvent.NavigatePreviousFragment
+                    CommonUiEvent.NavigatePreviousFragment<Nothing>()
                 )
             )
         }

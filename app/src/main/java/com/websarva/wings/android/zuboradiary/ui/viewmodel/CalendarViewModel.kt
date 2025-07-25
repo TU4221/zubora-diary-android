@@ -63,7 +63,7 @@ internal class CalendarViewModel @Inject constructor(
         viewModelScope.launch {
             emitUiEvent(
                 CalendarEvent.CommonEvent(
-                    CommonUiEvent.NavigatePreviousFragment
+                    CommonUiEvent.NavigatePreviousFragment<Nothing>()
                 )
             )
         }

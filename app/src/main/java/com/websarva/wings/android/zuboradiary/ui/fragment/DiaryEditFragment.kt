@@ -278,9 +278,6 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditEvent>
             is DiaryEditEvent.NavigateExitWithoutDiarySavingConfirmationDialog -> {
                 navigateExitWithoutDiarySavingConfirmationDialog(event.parameters)
             }
-            is DiaryEditEvent.NavigatePreviousFragment -> {
-                navigatePreviousFragment(event.result)
-            }
             is DiaryEditEvent.NavigatePreviousFragmentOnDiaryDelete -> {
                 navigatePreviousFragmentOnDiaryDelete(event.result)
             }
@@ -298,10 +295,8 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditEvent>
             }
             is DiaryEditEvent.CommonEvent -> {
                 when(event.event) {
-                    CommonUiEvent.NavigatePreviousFragment -> {
-                        // MEMO:"DiaryEditEvent.NavigatePreviousFragment"を使用する為、
-                        //      "ViewModelEvent.NavigatePreviousFragment"処理不要。
-                        throw IllegalArgumentException()
+                    is CommonUiEvent.NavigatePreviousFragment<*> -> {
+                        navigatePreviousFragment(event.event.result)
                     }
                     is CommonUiEvent.NavigateAppMessage -> {
                         navigateAppMessageDialog(event.event.message)
@@ -844,7 +839,7 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditEvent>
         navigateFragment(NavigationCommand.To(directions))
     }
 
-    private fun navigatePreviousFragment(result: FragmentResult<LocalDate>) {
+    private fun navigatePreviousFragment(result: FragmentResult<*>) {
         navigateFragment(NavigationCommand.Up(KEY_RESULT, result))
     }
 

@@ -131,7 +131,7 @@ class DiaryListFragment :
             }
             is DiaryListEvent.CommonEvent -> {
                 when(event.event) {
-                    CommonUiEvent.NavigatePreviousFragment -> {
+                    is CommonUiEvent.NavigatePreviousFragment<*> -> {
                         navigatePreviousFragment()
                     }
                     is CommonUiEvent.NavigateAppMessage -> {

@@ -110,15 +110,10 @@ class DiaryShowFragment : BaseFragment<FragmentDiaryShowBinding, DiaryShowEvent>
             is DiaryShowEvent.NavigateDiaryDeleteDialog -> {
                 navigateDiaryDeleteDialog(event.parameters)
             }
-            is DiaryShowEvent.NavigatePreviousFragment -> {
-                navigatePreviousFragment(event.result)
-            }
             is DiaryShowEvent.CommonEvent -> {
                 when(event.event) {
-                    CommonUiEvent.NavigatePreviousFragment -> {
-                        // MEMO:"DiaryShowEvent.NavigatePreviousFragment"を使用する為、
-                        //      "ViewModelEvent.NavigatePreviousFragment"処理不要。
-                        throw IllegalArgumentException()
+                    is CommonUiEvent.NavigatePreviousFragment<*> -> {
+                        navigatePreviousFragment(event.event.result)
                     }
                     is CommonUiEvent.NavigateAppMessage -> {
                         navigateAppMessageDialog(event.event.message)
@@ -325,7 +320,7 @@ class DiaryShowFragment : BaseFragment<FragmentDiaryShowBinding, DiaryShowEvent>
         navigateFragment(NavigationCommand.To(directions))
     }
 
-    private fun navigatePreviousFragment(result: FragmentResult<LocalDate>) {
+    private fun navigatePreviousFragment(result: FragmentResult<*>) {
         navigateFragment(NavigationCommand.Up(KEY_RESULT, result))
     }
 }

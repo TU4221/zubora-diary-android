@@ -106,7 +106,7 @@ internal class DiaryShowViewModel @Inject constructor(
         viewModelScope.launch {
             emitUiEvent(
                 DiaryShowEvent.CommonEvent(
-                    CommonUiEvent.NavigatePreviousFragment
+                    CommonUiEvent.NavigatePreviousFragment<Nothing>()
                 )
             )
         }
@@ -283,9 +283,10 @@ internal class DiaryShowViewModel @Inject constructor(
                 FragmentResult.Some(loadedDiaryDate)
             }
         emitUiEvent(
-            DiaryShowEvent
-                .NavigatePreviousFragment(
-                    result
+            DiaryShowEvent.CommonEvent(
+                    CommonUiEvent.NavigatePreviousFragment(
+                        result
+                    )
                 )
         )
     }

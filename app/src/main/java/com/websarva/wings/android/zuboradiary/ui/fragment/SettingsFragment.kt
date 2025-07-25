@@ -263,7 +263,7 @@ class SettingsFragment :
             }
             is SettingsEvent.CommonEvent -> {
                 when(event.event) {
-                    CommonUiEvent.NavigatePreviousFragment -> {
+                    is CommonUiEvent.NavigatePreviousFragment<*> -> {
                         mainActivity.popBackStackToStartFragment()
                     }
                     is CommonUiEvent.NavigateAppMessage -> {

@@ -95,7 +95,7 @@ internal class DiaryItemTitleEditViewModel @Inject constructor(
         viewModelScope.launch {
             emitUiEvent(
                 DiaryItemTitleEditEvent.CommonEvent(
-                    CommonUiEvent.NavigatePreviousFragment
+                    CommonUiEvent.NavigatePreviousFragment<Nothing>()
                 )
             )
         }

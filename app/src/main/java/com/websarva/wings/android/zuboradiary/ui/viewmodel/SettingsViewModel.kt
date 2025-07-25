@@ -132,7 +132,7 @@ internal class SettingsViewModel @Inject constructor(
         viewModelScope.launch {
             emitUiEvent(
                 SettingsEvent.CommonEvent(
-                    CommonUiEvent.NavigatePreviousFragment
+                    CommonUiEvent.NavigatePreviousFragment<Nothing>()
                 )
             )
         }

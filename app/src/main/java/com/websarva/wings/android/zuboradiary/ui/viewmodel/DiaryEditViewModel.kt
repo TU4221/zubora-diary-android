@@ -317,7 +317,7 @@ internal class DiaryEditViewModel @Inject constructor(
         viewModelScope.launch {
             emitUiEvent(
                 DiaryEditEvent.CommonEvent(
-                    CommonUiEvent.NavigatePreviousFragment
+                    CommonUiEvent.NavigatePreviousFragment<Nothing>()
                 )
             )
         }
@@ -1143,7 +1143,11 @@ internal class DiaryEditViewModel @Inject constructor(
             } else {
                 FragmentResult.Some(loadedDiary.date)
             }
-        emitUiEvent(DiaryEditEvent.NavigatePreviousFragment(result))
+        emitUiEvent(
+            DiaryEditEvent.CommonEvent(
+                CommonUiEvent.NavigatePreviousFragment(result)
+            )
+        )
     }
 
     // TODO:テスト用の為、最終的に削除

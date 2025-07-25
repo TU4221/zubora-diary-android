@@ -121,7 +121,7 @@ internal class DiaryListViewModel @Inject constructor(
         viewModelScope.launch {
             emitUiEvent(
                 DiaryListEvent.CommonEvent(
-                    CommonUiEvent.NavigatePreviousFragment
+                    CommonUiEvent.NavigatePreviousFragment<Nothing>()
                 )
             )
         }
