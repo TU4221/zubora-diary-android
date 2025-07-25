@@ -262,12 +262,12 @@ class SettingsFragment :
                 binding.includeWeatherInfoFetchSetting.materialSwitch.isChecked = false
             }
             is SettingsEvent.CommonEvent -> {
-                when(event.event) {
+                when(event.wrappedEvent) {
                     is CommonUiEvent.NavigatePreviousFragment<*> -> {
                         mainActivity.popBackStackToStartFragment()
                     }
                     is CommonUiEvent.NavigateAppMessage -> {
-                        navigateAppMessageDialog(event.event.message)
+                        navigateAppMessageDialog(event.wrappedEvent.message)
                     }
                 }
             }

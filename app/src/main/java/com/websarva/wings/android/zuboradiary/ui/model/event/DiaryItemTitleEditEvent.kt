@@ -10,5 +10,5 @@ sealed class DiaryItemTitleEditEvent : UiEvent {
     internal data object CloseSwipedItem : DiaryItemTitleEditEvent()
     internal data class CompleteEdit(val diaryItemTitle: DiaryItemTitle) : DiaryItemTitleEditEvent()
 
-    internal data class CommonEvent(val event: CommonUiEvent) : DiaryItemTitleEditEvent()
+    internal data class CommonEvent(val wrappedEvent: CommonUiEvent) : DiaryItemTitleEditEvent()
 }

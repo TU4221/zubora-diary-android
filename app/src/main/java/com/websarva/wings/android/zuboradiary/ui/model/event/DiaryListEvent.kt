@@ -14,5 +14,5 @@ sealed class DiaryListEvent : UiEvent {
     ) : DiaryListEvent()
     internal data class NavigateDiaryDeleteDialog(val parameters: DiaryDeleteParameters) : DiaryListEvent()
 
-    internal data class CommonEvent(val event: CommonUiEvent) : DiaryListEvent()
+    internal data class CommonEvent(val wrappedEvent: CommonUiEvent) : DiaryListEvent()
 }

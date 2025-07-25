@@ -98,9 +98,9 @@ internal class FragmentHelper {
                     event ?: return@collect
                     when (event) {
                         is SettingsEvent.CommonEvent -> {
-                            when (event.event) {
+                            when (event.wrappedEvent) {
                                 is CommonUiEvent.NavigateAppMessage -> {
-                                    onAppMessageNavigationUiEventReceived(event.event.message)
+                                    onAppMessageNavigationUiEventReceived(event.wrappedEvent.message)
                                 }
                                 else -> {
                                     throw IllegalArgumentException()

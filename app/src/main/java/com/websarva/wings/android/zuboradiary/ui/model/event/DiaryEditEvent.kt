@@ -29,5 +29,5 @@ sealed class DiaryEditEvent : UiEvent {
     internal data object ItemAddition : DiaryEditEvent()
     internal data object SelectImage : DiaryEditEvent()
 
-    internal data class CommonEvent(val event: CommonUiEvent) : DiaryEditEvent()
+    internal data class CommonEvent(val wrappedEvent: CommonUiEvent) : DiaryEditEvent()
 }

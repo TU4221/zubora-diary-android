@@ -8,5 +8,5 @@ sealed class DiaryShowEvent : UiEvent {
     internal data class NavigateDiaryLoadingFailureDialog(val date: LocalDate) : DiaryShowEvent()
     internal data class NavigateDiaryDeleteDialog(val parameters: DiaryDeleteParameters) : DiaryShowEvent()
 
-    internal data class CommonEvent(val event: CommonUiEvent) : DiaryShowEvent()
+    internal data class CommonEvent(val wrappedEvent: CommonUiEvent) : DiaryShowEvent()
 }

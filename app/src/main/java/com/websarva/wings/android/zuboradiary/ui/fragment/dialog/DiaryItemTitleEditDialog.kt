@@ -93,12 +93,12 @@ class DiaryItemTitleEditDialog :
                 )
             }
             is DiaryItemTitleEditEvent.CommonEvent -> {
-                when(event.event) {
+                when(event.wrappedEvent) {
                     is CommonUiEvent.NavigatePreviousFragment<*> -> {
                         navigatePreviousFragment()
                     }
                     is CommonUiEvent.NavigateAppMessage -> {
-                        navigateAppMessageDialog(event.event.message)
+                        navigateAppMessageDialog(event.wrappedEvent.message)
                     }
                 }
             }
