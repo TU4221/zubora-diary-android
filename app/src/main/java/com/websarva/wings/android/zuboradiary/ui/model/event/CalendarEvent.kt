@@ -2,7 +2,7 @@ package com.websarva.wings.android.zuboradiary.ui.model.event
 
 import java.time.LocalDate
 
-sealed class CalendarEvent : ViewModelEvent {
+sealed class CalendarEvent : UiEvent {
     internal data class NavigateDiaryEditFragment(
         val date: LocalDate,
         val isNewDiary: Boolean
@@ -12,5 +12,5 @@ sealed class CalendarEvent : ViewModelEvent {
     internal data class ScrollCalendar(val date: LocalDate) : CalendarEvent()
     internal data class SmoothScrollCalendar(val date: LocalDate) : CalendarEvent()
 
-    internal data class CommonEvent(val wrappedEvent: CommonViewModelEvent) : CalendarEvent()
+    internal data class CommonEvent(val wrappedEvent: CommonUiEvent) : CalendarEvent()
 }

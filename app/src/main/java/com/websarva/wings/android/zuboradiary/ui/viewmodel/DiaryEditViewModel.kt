@@ -36,7 +36,7 @@ import com.websarva.wings.android.zuboradiary.ui.model.parameters.WeatherInfoFet
 import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
 import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
 import com.websarva.wings.android.zuboradiary.ui.model.DiaryItemTitle
-import com.websarva.wings.android.zuboradiary.ui.model.event.CommonViewModelEvent
+import com.websarva.wings.android.zuboradiary.ui.model.event.CommonUiEvent
 import com.websarva.wings.android.zuboradiary.ui.model.state.DiaryEditState
 import com.websarva.wings.android.zuboradiary.ui.utils.requireValue
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -315,9 +315,9 @@ internal class DiaryEditViewModel @Inject constructor(
 
     override suspend fun emitNavigatePreviousFragmentEvent() {
         viewModelScope.launch {
-            emitViewModelEvent(
+            emitUiEvent(
                 DiaryEditEvent.CommonEvent(
-                    CommonViewModelEvent.NavigatePreviousFragment
+                    CommonUiEvent.NavigatePreviousFragment
                 )
             )
         }
@@ -325,9 +325,9 @@ internal class DiaryEditViewModel @Inject constructor(
 
     override suspend fun emitAppMessageEvent(appMessage: DiaryEditAppMessage) {
         viewModelScope.launch {
-            emitViewModelEvent(
+            emitUiEvent(
                 DiaryEditEvent.CommonEvent(
-                    CommonViewModelEvent.NavigateAppMessage(appMessage)
+                    CommonUiEvent.NavigateAppMessage(appMessage)
                 )
             )
         }
@@ -378,7 +378,7 @@ internal class DiaryEditViewModel @Inject constructor(
         val parameters = DiaryDeleteParameters(loadedDate, loadedImageUri)
 
         viewModelScope.launch {
-            emitViewModelEvent(
+            emitUiEvent(
                 DiaryEditEvent.NavigateDiaryDeleteDialog(parameters)
             )
         }
@@ -401,7 +401,7 @@ internal class DiaryEditViewModel @Inject constructor(
         val date = this.date.requireValue()
 
         viewModelScope.launch {
-            emitViewModelEvent(
+            emitUiEvent(
                 DiaryEditEvent.NavigateDatePickerDialog(date)
             )
         }
@@ -425,7 +425,7 @@ internal class DiaryEditViewModel @Inject constructor(
         val itemTitle = getItemTitle(itemNumber).requireValue()
 
         viewModelScope.launch {
-            emitViewModelEvent(
+            emitUiEvent(
                 DiaryEditEvent.NavigateDiaryItemTitleEditFragment(
                     DiaryItemTitle(itemNumber, itemTitle)
                 )
@@ -446,7 +446,7 @@ internal class DiaryEditViewModel @Inject constructor(
 
         viewModelScope.launch {
             val parameters = DiaryItemDeleteParameters(itemNumber)
-            emitViewModelEvent(
+            emitUiEvent(
                 DiaryEditEvent.NavigateDiaryItemDeleteDialog(parameters)
             )
         }
@@ -456,7 +456,7 @@ internal class DiaryEditViewModel @Inject constructor(
         if (uiState.value != DiaryEditState.Editing) return
 
         viewModelScope.launch {
-            emitViewModelEvent(
+            emitUiEvent(
                 DiaryEditEvent.NavigateDiaryImageDeleteDialog
             )
         }
@@ -817,7 +817,7 @@ internal class DiaryEditViewModel @Inject constructor(
                 Log.e(logTag, "${logMsg}_失敗", result.exception)
                 if (previousState == DiaryEditState.Idle) {
                     updateDiaryEditViewModelState(DiaryEditState.LoadError)
-                    emitViewModelEvent(
+                    emitUiEvent(
                         DiaryEditEvent.NavigateDiaryLoadingFailureDialog(date)
                     )
                 } else {
@@ -851,7 +851,7 @@ internal class DiaryEditViewModel @Inject constructor(
             is UseCaseResult.Success -> {
                 Log.i(logTag, "${logMsg}完了")
                 updateDiaryEditViewModelState(DiaryEditState.Idle)
-                emitViewModelEvent(
+                emitUiEvent(
                     DiaryEditEvent
                         .NavigateDiaryShowFragment(diary.date)
                 )
@@ -877,7 +877,7 @@ internal class DiaryEditViewModel @Inject constructor(
             is UseCaseResult.Success -> {
                 Log.i(logTag, "${logMsg}完了")
                 updateDiaryEditViewModelState(DiaryEditState.Idle)
-                emitViewModelEvent(
+                emitUiEvent(
                     DiaryEditEvent
                         .NavigatePreviousFragmentOnDiaryDelete(
                             FragmentResult.Some(loadedDate)
@@ -905,7 +905,7 @@ internal class DiaryEditViewModel @Inject constructor(
                 updateDiaryEditViewModelState(DiaryEditState.Editing)
                 if (result.value) {
                     val parameters = DiaryLoadingParameters(date)
-                    emitViewModelEvent(
+                    emitUiEvent(
                         DiaryEditEvent.NavigateDiaryLoadingDialog(
                             parameters
                         )
@@ -939,7 +939,7 @@ internal class DiaryEditViewModel @Inject constructor(
                         diaryItemTitleSelectionHistoryItemList,
                         loadedDiary
                     )
-                    emitViewModelEvent(
+                    emitUiEvent(
                         DiaryEditEvent.NavigateDiaryUpdateDialog(parameters)
                     )
                 } else {
@@ -990,7 +990,7 @@ internal class DiaryEditViewModel @Inject constructor(
             shouldRequestWeatherInfoConfirmationUseCase(date, previousDate)
         if (result.value) {
             val parameters = WeatherInfoFetchParameters(date)
-            emitViewModelEvent(
+            emitUiEvent(
                 DiaryEditEvent.NavigateWeatherInfoFetchDialog(parameters)
             )
         } else {
@@ -1001,7 +1001,7 @@ internal class DiaryEditViewModel @Inject constructor(
     private suspend fun checkPermissionBeforeWeatherInfoFetch(
         parameters: WeatherInfoFetchParameters
     ) {
-        emitViewModelEvent(
+        emitUiEvent(
             DiaryEditEvent.CheckAccessLocationPermissionBeforeWeatherInfoFetch(parameters)
         )
     }
@@ -1076,7 +1076,7 @@ internal class DiaryEditViewModel @Inject constructor(
 
     private suspend fun addDiaryItem() {
         updateDiaryEditViewModelState(DiaryEditState.AddingItem)
-        emitViewModelEvent(DiaryEditEvent.ItemAddition)
+        emitUiEvent(DiaryEditEvent.ItemAddition)
         diaryStateFlow.incrementVisibleItemsCount()
     }
 
@@ -1096,7 +1096,7 @@ internal class DiaryEditViewModel @Inject constructor(
         if (itemNumber.value == 1 && numVisibleItems == itemNumber.value) {
             deleteItem(itemNumber)
         } else {
-            emitViewModelEvent(
+            emitUiEvent(
                 DiaryEditEvent.TransitionDiaryItemHidedState(itemNumber)
             )
         }
@@ -1106,7 +1106,7 @@ internal class DiaryEditViewModel @Inject constructor(
     // 添付画像関係
     private suspend fun selectImage() {
         updateDiaryEditViewModelState(DiaryEditState.SelectingImage)
-        emitViewModelEvent(DiaryEditEvent.SelectImage)
+        emitUiEvent(DiaryEditEvent.SelectImage)
     }
 
     private fun updateImageUri(uri: Uri?) {
@@ -1126,7 +1126,7 @@ internal class DiaryEditViewModel @Inject constructor(
             shouldRequestExitWithoutDiarySavingConfirmationUseCase(diary, loadedDiary).value
         if (shouldRequest) {
             val parameters = NavigatePreviousParameters(loadedDiary)
-            emitViewModelEvent(
+            emitUiEvent(
                 DiaryEditEvent
                     .NavigateExitWithoutDiarySavingConfirmationDialog(parameters)
             )
@@ -1143,7 +1143,7 @@ internal class DiaryEditViewModel @Inject constructor(
             } else {
                 FragmentResult.Some(loadedDiary.date)
             }
-        emitViewModelEvent(DiaryEditEvent.NavigatePreviousFragment(result))
+        emitUiEvent(DiaryEditEvent.NavigatePreviousFragment(result))
     }
 
     // TODO:テスト用の為、最終的に削除

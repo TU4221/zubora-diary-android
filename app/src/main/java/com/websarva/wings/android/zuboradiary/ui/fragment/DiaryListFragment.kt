@@ -24,7 +24,7 @@ import com.websarva.wings.android.zuboradiary.ui.adapter.diary.diary.DiaryYearMo
 import com.websarva.wings.android.zuboradiary.ui.fragment.common.RequiresBottomNavigation
 import com.websarva.wings.android.zuboradiary.ui.fragment.common.ReselectableFragment
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.StartYearMonthPickerDialogFragment
-import com.websarva.wings.android.zuboradiary.ui.model.event.CommonViewModelEvent
+import com.websarva.wings.android.zuboradiary.ui.model.event.CommonUiEvent
 import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
 import com.websarva.wings.android.zuboradiary.ui.model.state.DiaryListState
 import com.websarva.wings.android.zuboradiary.ui.model.event.DiaryListEvent
@@ -112,7 +112,7 @@ class DiaryListFragment :
         }
     }
 
-    override fun onMainViewModelEventReceived(event: DiaryListEvent) {
+    override fun onMainUiEventReceived(event: DiaryListEvent) {
         when (event) {
             is DiaryListEvent.NavigateDiaryShowFragment -> {
                 navigateDiaryShowFragment(event.date)
@@ -131,10 +131,10 @@ class DiaryListFragment :
             }
             is DiaryListEvent.CommonEvent -> {
                 when(event.event) {
-                    CommonViewModelEvent.NavigatePreviousFragment -> {
+                    CommonUiEvent.NavigatePreviousFragment -> {
                         navigatePreviousFragment()
                     }
-                    is CommonViewModelEvent.NavigateAppMessage -> {
+                    is CommonUiEvent.NavigateAppMessage -> {
                         navigateAppMessageDialog(event.event.message)
                     }
                 }

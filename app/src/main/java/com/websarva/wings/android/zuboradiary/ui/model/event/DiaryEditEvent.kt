@@ -11,7 +11,7 @@ import com.websarva.wings.android.zuboradiary.ui.model.parameters.WeatherInfoFet
 import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
 import java.time.LocalDate
 
-sealed class DiaryEditEvent : ViewModelEvent {
+sealed class DiaryEditEvent : UiEvent {
     internal data class NavigateDiaryShowFragment(val date: LocalDate) : DiaryEditEvent()
     internal data class NavigateDiaryItemTitleEditFragment(val diaryItemTitle: DiaryItemTitle) : DiaryEditEvent()
     internal data class NavigateDiaryLoadingDialog(val parameters: DiaryLoadingParameters) : DiaryEditEvent()
@@ -30,5 +30,5 @@ sealed class DiaryEditEvent : ViewModelEvent {
     internal data object ItemAddition : DiaryEditEvent()
     internal data object SelectImage : DiaryEditEvent()
 
-    internal data class CommonEvent(val event: CommonViewModelEvent) : DiaryEditEvent()
+    internal data class CommonEvent(val event: CommonUiEvent) : DiaryEditEvent()
 }

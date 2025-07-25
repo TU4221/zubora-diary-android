@@ -6,7 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import com.websarva.wings.android.zuboradiary.ui.model.AppMessage
 import com.websarva.wings.android.zuboradiary.ui.model.event.ConsumableEvent
-import com.websarva.wings.android.zuboradiary.ui.model.event.ViewModelEvent
+import com.websarva.wings.android.zuboradiary.ui.model.event.UiEvent
 import com.websarva.wings.android.zuboradiary.ui.model.navigation.NavigationCommand
 import com.websarva.wings.android.zuboradiary.ui.model.state.UiState
 import kotlinx.coroutines.flow.Flow
@@ -18,7 +18,7 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.stateIn
 
-internal abstract class BaseViewModel<E: ViewModelEvent, M: AppMessage, S: UiState>(
+internal abstract class BaseViewModel<E: UiEvent, M: AppMessage, S: UiState>(
     private val initialViewUiState: S
 ) : ViewModel() {
 
@@ -34,8 +34,8 @@ internal abstract class BaseViewModel<E: ViewModelEvent, M: AppMessage, S: UiSta
 
     private val logTag = createLogTag()
 
-    private val _viewModelEvent = MutableSharedFlow<ConsumableEvent<E>>(replay = 1)
-    val viewModelEvent get() = _viewModelEvent.asSharedFlow()
+    private val _uiEvent = MutableSharedFlow<ConsumableEvent<E>>(replay = 1)
+    val uiEvent get() = _uiEvent.asSharedFlow()
 
     private val _uiState = MutableStateFlow(initialViewUiState)
     val uiState get() = _uiState.asStateFlow()
@@ -58,8 +58,8 @@ internal abstract class BaseViewModel<E: ViewModelEvent, M: AppMessage, S: UiSta
         _pendingNavigationCommand.value = initialPendingNavigationCommand
     }
 
-    protected suspend fun emitViewModelEvent(event: E) {
-        _viewModelEvent.emit(
+    protected suspend fun emitUiEvent(event: E) {
+        _uiEvent.emit(
             ConsumableEvent(event)
         )
     }

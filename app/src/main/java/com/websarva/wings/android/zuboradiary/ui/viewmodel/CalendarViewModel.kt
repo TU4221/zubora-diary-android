@@ -5,7 +5,7 @@ import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.DoesDiaryExistUseCase
 import com.websarva.wings.android.zuboradiary.ui.model.CalendarAppMessage
 import com.websarva.wings.android.zuboradiary.ui.model.event.CalendarEvent
-import com.websarva.wings.android.zuboradiary.ui.model.event.CommonViewModelEvent
+import com.websarva.wings.android.zuboradiary.ui.model.event.CommonUiEvent
 import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
 import com.websarva.wings.android.zuboradiary.ui.model.state.CalendarState
 import com.websarva.wings.android.zuboradiary.ui.model.state.DiaryShowState
@@ -61,9 +61,9 @@ internal class CalendarViewModel @Inject constructor(
 
     override suspend fun emitNavigatePreviousFragmentEvent() {
         viewModelScope.launch {
-            emitViewModelEvent(
+            emitUiEvent(
                 CalendarEvent.CommonEvent(
-                    CommonViewModelEvent.NavigatePreviousFragment
+                    CommonUiEvent.NavigatePreviousFragment
                 )
             )
         }
@@ -71,9 +71,9 @@ internal class CalendarViewModel @Inject constructor(
 
     override suspend fun emitAppMessageEvent(appMessage: CalendarAppMessage) {
         viewModelScope.launch {
-            emitViewModelEvent(
+            emitUiEvent(
                 CalendarEvent.CommonEvent(
-                    CommonViewModelEvent.NavigateAppMessage(appMessage)
+                    CommonUiEvent.NavigateAppMessage(appMessage)
                 )
             )
         }
@@ -113,7 +113,7 @@ internal class CalendarViewModel @Inject constructor(
             // MEMO:StateFlowに現在値と同じ値を代入してもCollectメソッドに登録した処理が起動しないため、
             //      下記条件でカレンダースクロールのみ処理。
             if (selectedDate == today) {
-                emitViewModelEvent(
+                emitUiEvent(
                     CalendarEvent.SmoothScrollCalendar(today)
                 )
             }
@@ -170,16 +170,16 @@ internal class CalendarViewModel @Inject constructor(
             } else {
                 CalendarEvent.ScrollCalendar(date)
             }
-        emitViewModelEvent(action)
+        emitUiEvent(action)
 
         val exists = existsSavedDiary(date) ?: false
         if (exists) {
-            emitViewModelEvent(
+            emitUiEvent(
                 CalendarEvent.LoadDiary(date)
             )
         } else {
             updateUiState(CalendarState.NoDiary)
-            emitViewModelEvent(
+            emitUiEvent(
                 CalendarEvent.InitializeDiary
             )
         }
@@ -210,7 +210,7 @@ internal class CalendarViewModel @Inject constructor(
     private suspend fun navigateDiaryEditFragment(date: LocalDate) {
         val exists = existsSavedDiary(date) ?: false
         val isNewDiary = !exists
-        emitViewModelEvent(
+        emitUiEvent(
             CalendarEvent.NavigateDiaryEditFragment(date, isNewDiary)
         )
     }

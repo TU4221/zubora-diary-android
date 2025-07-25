@@ -5,14 +5,14 @@ import android.view.View
 import androidx.navigation.fragment.findNavController
 import androidx.viewbinding.ViewBinding
 import com.websarva.wings.android.zuboradiary.ui.model.AppMessage
-import com.websarva.wings.android.zuboradiary.ui.model.event.ViewModelEvent
+import com.websarva.wings.android.zuboradiary.ui.model.event.UiEvent
 import com.websarva.wings.android.zuboradiary.ui.model.navigation.NavigationCommand
 import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
 import com.websarva.wings.android.zuboradiary.ui.model.state.UiState
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.BaseViewModel
 import kotlinx.coroutines.CoroutineScope
 
-abstract class BaseFullScreenDialogFragment<T: ViewBinding, E: ViewModelEvent>: BaseSimpleFullScreenDialogFragment<T>() {
+abstract class BaseFullScreenDialogFragment<T: ViewBinding, E: UiEvent>: BaseSimpleFullScreenDialogFragment<T>() {
 
     internal abstract val mainViewModel: BaseViewModel<E, out AppMessage, out UiState>
 
@@ -28,7 +28,7 @@ abstract class BaseFullScreenDialogFragment<T: ViewBinding, E: ViewModelEvent>: 
         super.onViewCreated(view, savedInstanceState)
 
         initializeFragmentResultReceiver()
-        setUpViewModelEvent()
+        setUpUiEvent()
         setUpPendingNavigationCollector()
         registerOnBackPressedCallback()
     }
@@ -53,24 +53,24 @@ abstract class BaseFullScreenDialogFragment<T: ViewBinding, E: ViewModelEvent>: 
             )
     }
 
-    private fun setUpViewModelEvent() {
-        setUpMainViewModelEvent()
-        setUpSettingsViewModelEvent()
+    private fun setUpUiEvent() {
+        setUpMainUiEvent()
+        setUpSettingsUiEvent()
     }
 
-    private fun setUpMainViewModelEvent() {
+    private fun setUpMainUiEvent() {
         fragmentHelper
-            .setUpMainViewModelEvent(
+            .setUpMainUiEvent(
                 this,
                 mainViewModel,
-                ::onMainViewModelEventReceived
+                ::onMainUiEventReceived
             )
     }
 
-    internal abstract fun onMainViewModelEventReceived(event: E)
+    internal abstract fun onMainUiEventReceived(event: E)
 
-    private fun setUpSettingsViewModelEvent() {
-        fragmentHelper.setUpSettingsViewModelEvent(
+    private fun setUpSettingsUiEvent() {
+        fragmentHelper.setUpSettingsUiEvent(
             this,
             mainViewModel,
             settingsViewModel,

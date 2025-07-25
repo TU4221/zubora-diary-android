@@ -18,7 +18,7 @@ import com.websarva.wings.android.zuboradiary.ui.model.navigation.NavigationComm
 import com.websarva.wings.android.zuboradiary.ui.model.parameters.DiaryItemTitleSelectionHistoryItemDeleteParameters
 import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
 import com.websarva.wings.android.zuboradiary.ui.model.DiaryItemTitle
-import com.websarva.wings.android.zuboradiary.ui.model.event.CommonViewModelEvent
+import com.websarva.wings.android.zuboradiary.ui.model.event.CommonUiEvent
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.filterNotNull
@@ -73,7 +73,7 @@ class DiaryItemTitleEditDialog :
         }
     }
 
-    override fun onMainViewModelEventReceived(event: DiaryItemTitleEditEvent) {
+    override fun onMainUiEventReceived(event: DiaryItemTitleEditEvent) {
         when (event) {
             DiaryItemTitleEditEvent.CloseSwipedItem -> {
                 val adapter =
@@ -94,10 +94,10 @@ class DiaryItemTitleEditDialog :
             }
             is DiaryItemTitleEditEvent.CommonEvent -> {
                 when(event.event) {
-                    CommonViewModelEvent.NavigatePreviousFragment -> {
+                    CommonUiEvent.NavigatePreviousFragment -> {
                         navigatePreviousFragment()
                     }
-                    is CommonViewModelEvent.NavigateAppMessage -> {
+                    is CommonUiEvent.NavigateAppMessage -> {
                         navigateAppMessageDialog(event.event.message)
                     }
                 }

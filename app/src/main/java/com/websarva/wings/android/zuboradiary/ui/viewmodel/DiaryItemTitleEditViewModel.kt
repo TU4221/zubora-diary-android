@@ -14,7 +14,7 @@ import com.websarva.wings.android.zuboradiary.ui.adapter.diaryitemtitle.Selectio
 import com.websarva.wings.android.zuboradiary.ui.adapter.diaryitemtitle.SelectionHistoryListItem
 import com.websarva.wings.android.zuboradiary.ui.model.DiaryItemTitle
 import com.websarva.wings.android.zuboradiary.ui.model.InputTextValidateResult
-import com.websarva.wings.android.zuboradiary.ui.model.event.CommonViewModelEvent
+import com.websarva.wings.android.zuboradiary.ui.model.event.CommonUiEvent
 import com.websarva.wings.android.zuboradiary.ui.model.event.DiaryItemTitleEditEvent
 import com.websarva.wings.android.zuboradiary.ui.model.parameters.DiaryItemTitleSelectionHistoryItemDeleteParameters
 import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
@@ -93,9 +93,9 @@ internal class DiaryItemTitleEditViewModel @Inject constructor(
 
     override suspend fun emitNavigatePreviousFragmentEvent() {
         viewModelScope.launch {
-            emitViewModelEvent(
+            emitUiEvent(
                 DiaryItemTitleEditEvent.CommonEvent(
-                    CommonViewModelEvent.NavigatePreviousFragment
+                    CommonUiEvent.NavigatePreviousFragment
                 )
             )
         }
@@ -103,9 +103,9 @@ internal class DiaryItemTitleEditViewModel @Inject constructor(
 
     override suspend fun emitAppMessageEvent(appMessage: DiaryItemTitleEditAppMessage) {
         viewModelScope.launch {
-            emitViewModelEvent(
+            emitUiEvent(
                 DiaryItemTitleEditEvent.CommonEvent(
-                    CommonViewModelEvent.NavigateAppMessage(appMessage)
+                    CommonUiEvent.NavigateAppMessage(appMessage)
                 )
             )
         }
@@ -135,7 +135,7 @@ internal class DiaryItemTitleEditViewModel @Inject constructor(
     fun onDiaryItemTitleSelectionHistoryItemClicked(itemTitle: String) {
         val itemNumber = _itemNumber.requireValue()
         viewModelScope.launch {
-            emitViewModelEvent(
+            emitUiEvent(
                 DiaryItemTitleEditEvent.CompleteEdit(
                     DiaryItemTitle(
                         itemNumber,
@@ -148,7 +148,7 @@ internal class DiaryItemTitleEditViewModel @Inject constructor(
 
     fun onDiaryItemTitleSelectionHistoryItemDeleteButtonClicked(itemTitle: String) {
         viewModelScope.launch {
-            emitViewModelEvent(
+            emitUiEvent(
                 DiaryItemTitleEditEvent
                     .NavigateSelectionHistoryItemDeleteDialog(
                         DiaryItemTitleSelectionHistoryItemDeleteParameters(itemTitle)
@@ -188,7 +188,7 @@ internal class DiaryItemTitleEditViewModel @Inject constructor(
 
     private fun onDiaryItemTitleSelectionHistoryDeleteDialogNegativeResultReceived() {
         viewModelScope.launch {
-            emitViewModelEvent(
+            emitUiEvent(
                 DiaryItemTitleEditEvent.CloseSwipedItem
             )
         }
@@ -239,7 +239,7 @@ internal class DiaryItemTitleEditViewModel @Inject constructor(
         when (val result = validateNewDiaryItemTitleSelectable(itemTitle)) {
             InputTextValidateResult.Valid -> {
                 val diaryItemTitle = DiaryItemTitle(itemNumber, itemTitle)
-                emitViewModelEvent(
+                emitUiEvent(
                     DiaryItemTitleEditEvent.CompleteEdit(
                         diaryItemTitle
                     )

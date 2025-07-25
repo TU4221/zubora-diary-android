@@ -10,7 +10,7 @@ import com.websarva.wings.android.zuboradiary.domain.usecase.diary.DeleteDiaryUs
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.FetchDiaryUseCase
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import com.websarva.wings.android.zuboradiary.ui.model.DiaryShowAppMessage
-import com.websarva.wings.android.zuboradiary.ui.model.event.CommonViewModelEvent
+import com.websarva.wings.android.zuboradiary.ui.model.event.CommonUiEvent
 import com.websarva.wings.android.zuboradiary.ui.model.event.DiaryShowEvent
 import com.websarva.wings.android.zuboradiary.ui.model.parameters.DiaryDeleteParameters
 import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
@@ -104,9 +104,9 @@ internal class DiaryShowViewModel @Inject constructor(
 
     override suspend fun emitNavigatePreviousFragmentEvent() {
         viewModelScope.launch {
-            emitViewModelEvent(
+            emitUiEvent(
                 DiaryShowEvent.CommonEvent(
-                    CommonViewModelEvent.NavigatePreviousFragment
+                    CommonUiEvent.NavigatePreviousFragment
                 )
             )
         }
@@ -114,9 +114,9 @@ internal class DiaryShowViewModel @Inject constructor(
 
     override suspend fun emitAppMessageEvent(appMessage: DiaryShowAppMessage) {
         viewModelScope.launch {
-            emitViewModelEvent(
+            emitUiEvent(
                 DiaryShowEvent.CommonEvent(
-                    CommonViewModelEvent.NavigateAppMessage(appMessage)
+                    CommonUiEvent.NavigateAppMessage(appMessage)
                 )
             )
         }
@@ -138,7 +138,7 @@ internal class DiaryShowViewModel @Inject constructor(
 
         val date = diaryStateFlow.date.requireValue()
         viewModelScope.launch {
-            emitViewModelEvent(
+            emitUiEvent(
                 DiaryShowEvent.NavigateDiaryEditFragment(date)
             )
         }
@@ -151,7 +151,7 @@ internal class DiaryShowViewModel @Inject constructor(
         val imageUri = diaryStateFlow.imageUri.value
         viewModelScope.launch {
             val parameters = DiaryDeleteParameters(date, imageUri)
-            emitViewModelEvent(
+            emitUiEvent(
                 DiaryShowEvent.NavigateDiaryDeleteDialog(parameters)
             )
         }
@@ -242,7 +242,7 @@ internal class DiaryShowViewModel @Inject constructor(
                 Log.e(logTag, "${logMsg}_失敗", result.exception)
                 updateUiState(DiaryShowState.LoadError)
                 if (ignoreAppMessage) {
-                    emitViewModelEvent(
+                    emitUiEvent(
                         DiaryShowEvent.NavigateDiaryLoadingFailureDialog(date)
                     )
                 } else {
@@ -282,7 +282,7 @@ internal class DiaryShowViewModel @Inject constructor(
             } else {
                 FragmentResult.Some(loadedDiaryDate)
             }
-        emitViewModelEvent(
+        emitUiEvent(
             DiaryShowEvent
                 .NavigatePreviousFragment(
                     result

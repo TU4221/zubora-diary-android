@@ -28,7 +28,7 @@ import com.websarva.wings.android.zuboradiary.domain.usecase.settings.SaveWeathe
 import com.websarva.wings.android.zuboradiary.domain.usecase.settings.InitializeAllSettingsUseCase
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import com.websarva.wings.android.zuboradiary.ui.model.SettingsAppMessage
-import com.websarva.wings.android.zuboradiary.ui.model.event.CommonViewModelEvent
+import com.websarva.wings.android.zuboradiary.ui.model.event.CommonUiEvent
 import com.websarva.wings.android.zuboradiary.ui.model.event.SettingsEvent
 import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
 import com.websarva.wings.android.zuboradiary.ui.model.state.SettingsState
@@ -130,9 +130,9 @@ internal class SettingsViewModel @Inject constructor(
 
     override suspend fun emitNavigatePreviousFragmentEvent() {
         viewModelScope.launch {
-            emitViewModelEvent(
+            emitUiEvent(
                 SettingsEvent.CommonEvent(
-                    CommonViewModelEvent.NavigatePreviousFragment
+                    CommonUiEvent.NavigatePreviousFragment
                 )
             )
         }
@@ -140,9 +140,9 @@ internal class SettingsViewModel @Inject constructor(
 
     override suspend fun emitAppMessageEvent(appMessage: SettingsAppMessage) {
         viewModelScope.launch {
-            emitViewModelEvent(
+            emitUiEvent(
                 SettingsEvent.CommonEvent(
-                    CommonViewModelEvent.NavigateAppMessage(appMessage)
+                    CommonUiEvent.NavigateAppMessage(appMessage)
                 )
             )
         }
@@ -335,7 +335,7 @@ internal class SettingsViewModel @Inject constructor(
         if (!canExecuteSettingsOperation()) return
 
         viewModelScope.launch {
-            emitViewModelEvent(
+            emitUiEvent(
                 SettingsEvent.NavigateThemeColorPickerDialog
             )
         }
@@ -346,7 +346,7 @@ internal class SettingsViewModel @Inject constructor(
 
         val dayOfWeek = calendarStartDayOfWeek.requireValue()
         viewModelScope.launch {
-            emitViewModelEvent(
+            emitUiEvent(
                 SettingsEvent.NavigateCalendarStartDayPickerDialog(dayOfWeek)
             )
         }
@@ -360,7 +360,7 @@ internal class SettingsViewModel @Inject constructor(
 
         if (!canExecuteSettingsOperation()) {
             viewModelScope.launch {
-                emitViewModelEvent(SettingsEvent.TurnOffReminderNotificationSettingSwitch)
+                emitUiEvent(SettingsEvent.TurnOffReminderNotificationSettingSwitch)
             }
             return
         }
@@ -369,11 +369,11 @@ internal class SettingsViewModel @Inject constructor(
             if (isChecked) {
                 // MEMO:PostNotificationsはApiLevel33で導入されたPermission。33未満は許可取り不要。
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                    emitViewModelEvent(
+                    emitUiEvent(
                         SettingsEvent.CheckPostNotificationsPermission
                     )
                 } else {
-                    emitViewModelEvent(
+                    emitUiEvent(
                         SettingsEvent.NavigateReminderNotificationTimePickerDialog
                     )
                 }
@@ -392,7 +392,7 @@ internal class SettingsViewModel @Inject constructor(
 
         if (!canExecuteSettingsOperation()) {
             viewModelScope.launch {
-                emitViewModelEvent(SettingsEvent.TurnOffPasscodeLockSettingSwitch)
+                emitUiEvent(SettingsEvent.TurnOffPasscodeLockSettingSwitch)
             }
             return
         }
@@ -410,14 +410,14 @@ internal class SettingsViewModel @Inject constructor(
 
         if (!canExecuteSettingsOperation()) {
             viewModelScope.launch {
-                emitViewModelEvent(SettingsEvent.TurnOffWeatherInfoFetchSettingSwitch)
+                emitUiEvent(SettingsEvent.TurnOffWeatherInfoFetchSettingSwitch)
             }
             return
         }
 
         viewModelScope.launch {
             if (isChecked) {
-                emitViewModelEvent(
+                emitUiEvent(
                     SettingsEvent.CheckAccessLocationPermission
                 )
             } else {
@@ -430,7 +430,7 @@ internal class SettingsViewModel @Inject constructor(
         if (!canExecuteSettingsOperation()) return
 
         viewModelScope.launch {
-            emitViewModelEvent(
+            emitUiEvent(
                 SettingsEvent.NavigateAllDiariesDeleteDialog
             )
         }
@@ -440,7 +440,7 @@ internal class SettingsViewModel @Inject constructor(
         if (!canExecuteSettingsOperation()) return
 
         viewModelScope.launch {
-            emitViewModelEvent(
+            emitUiEvent(
                 SettingsEvent.NavigateAllSettingsInitializationDialog
             )
         }
@@ -450,7 +450,7 @@ internal class SettingsViewModel @Inject constructor(
         if (!canExecuteSettingsOperation()) return
 
         viewModelScope.launch {
-            emitViewModelEvent(
+            emitUiEvent(
                 SettingsEvent.NavigateAllDataDeleteDialog
             )
         }
@@ -458,7 +458,7 @@ internal class SettingsViewModel @Inject constructor(
 
     fun onOpenSourceLicenseButtonClicked() {
         viewModelScope.launch {
-            emitViewModelEvent(
+            emitUiEvent(
                 SettingsEvent.NavigateOpenSourceLicensesFragment
             )
         }
@@ -522,7 +522,7 @@ internal class SettingsViewModel @Inject constructor(
 
     private fun onReminderNotificationSettingDialogNegativeResultReceived() {
         viewModelScope.launch {
-            emitViewModelEvent(
+            emitUiEvent(
                 SettingsEvent.TurnOffReminderNotificationSettingSwitch
             )
         }
@@ -587,11 +587,11 @@ internal class SettingsViewModel @Inject constructor(
     fun onPostNotificationsPermissionChecked(isGranted: Boolean) {
         viewModelScope.launch {
             if (isGranted) {
-                emitViewModelEvent(
+                emitUiEvent(
                     SettingsEvent.NavigateReminderNotificationTimePickerDialog
                 )
             } else {
-                emitViewModelEvent(
+                emitUiEvent(
                     SettingsEvent.CheckShouldShowRequestPostNotificationsPermissionRationale
                 )
             }
@@ -602,14 +602,14 @@ internal class SettingsViewModel @Inject constructor(
     fun onShouldShowRequestPostNotificationsPermissionRationaleChecked(shouldShowRequest: Boolean) {
         viewModelScope.launch {
             if (shouldShowRequest) {
-                emitViewModelEvent(
+                emitUiEvent(
                     SettingsEvent.ShowRequestPostNotificationsPermissionRationale
                 )
             } else {
-                emitViewModelEvent(
+                emitUiEvent(
                     SettingsEvent.TurnOffReminderNotificationSettingSwitch
                 )
-                emitViewModelEvent(
+                emitUiEvent(
                     SettingsEvent.NavigateNotificationPermissionDialog
                 )
             }
@@ -620,11 +620,11 @@ internal class SettingsViewModel @Inject constructor(
     fun onRequestPostNotificationsPermissionRationaleResultReceived(isGranted: Boolean) {
         viewModelScope.launch {
             if (isGranted) {
-                emitViewModelEvent(
+                emitUiEvent(
                     SettingsEvent.NavigateReminderNotificationTimePickerDialog
                 )
             } else {
-                emitViewModelEvent(
+                emitUiEvent(
                     SettingsEvent.TurnOffReminderNotificationSettingSwitch
                 )
             }
@@ -636,7 +636,7 @@ internal class SettingsViewModel @Inject constructor(
             if (isGranted) {
                 saveWeatherInfoFetch(true)
             } else {
-                emitViewModelEvent(
+                emitUiEvent(
                     SettingsEvent.CheckShouldShowRequestAccessLocationPermissionRationale
                 )
             }
@@ -646,14 +646,14 @@ internal class SettingsViewModel @Inject constructor(
     fun onShouldShowRequestAccessLocationPermissionRationaleChecked(shouldShowRequest: Boolean) {
         viewModelScope.launch {
             if (shouldShowRequest) {
-                emitViewModelEvent(
+                emitUiEvent(
                     SettingsEvent.ShowRequestAccessLocationPermissionRationale
                 )
             } else {
-                emitViewModelEvent(
+                emitUiEvent(
                     SettingsEvent.TurnOffWeatherInfoFetchSettingSwitch
                 )
-                emitViewModelEvent(
+                emitUiEvent(
                     SettingsEvent.NavigateLocationPermissionDialog
                 )
             }
@@ -665,7 +665,7 @@ internal class SettingsViewModel @Inject constructor(
             if (isGranted) {
                 saveWeatherInfoFetch(true)
             } else {
-                emitViewModelEvent(
+                emitUiEvent(
                     SettingsEvent.TurnOffWeatherInfoFetchSettingSwitch
                 )
             }
@@ -711,7 +711,7 @@ internal class SettingsViewModel @Inject constructor(
     private suspend fun saveReminderNotificationInvalid() {
         executeSettingUpdate(
             { saveReminderNotificationSettingUseCase(false) },
-            { emitViewModelEvent(SettingsEvent.TurnOffReminderNotificationSettingSwitch) }
+            { emitUiEvent(SettingsEvent.TurnOffReminderNotificationSettingSwitch) }
         )
     }
 
@@ -724,14 +724,14 @@ internal class SettingsViewModel @Inject constructor(
 
         executeSettingUpdate (
             { savePasscodeLockSettingUseCase(value, passcode) },
-            { emitViewModelEvent(SettingsEvent.TurnOffPasscodeLockSettingSwitch) }
+            { emitUiEvent(SettingsEvent.TurnOffPasscodeLockSettingSwitch) }
         )
     }
 
     private suspend fun saveWeatherInfoFetch(value: Boolean) {
         executeSettingUpdate(
             { saveWeatherInfoFetchSettingUseCase(value) },
-            { emitViewModelEvent(SettingsEvent.TurnOffWeatherInfoFetchSettingSwitch) }
+            { emitUiEvent(SettingsEvent.TurnOffWeatherInfoFetchSettingSwitch) }
         )
     }
 

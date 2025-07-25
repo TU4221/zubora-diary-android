@@ -16,7 +16,7 @@ import com.websarva.wings.android.zuboradiary.ui.model.DiaryListAppMessage
 import com.websarva.wings.android.zuboradiary.ui.adapter.diary.diary.DiaryDayList
 import com.websarva.wings.android.zuboradiary.ui.adapter.diary.diary.DiaryDayListItem
 import com.websarva.wings.android.zuboradiary.ui.adapter.diary.diary.DiaryYearMonthList
-import com.websarva.wings.android.zuboradiary.ui.model.event.CommonViewModelEvent
+import com.websarva.wings.android.zuboradiary.ui.model.event.CommonUiEvent
 import com.websarva.wings.android.zuboradiary.ui.model.state.DiaryListState
 import com.websarva.wings.android.zuboradiary.ui.model.event.DiaryListEvent
 import com.websarva.wings.android.zuboradiary.ui.model.parameters.DiaryDeleteParameters
@@ -119,9 +119,9 @@ internal class DiaryListViewModel @Inject constructor(
 
     override suspend fun emitNavigatePreviousFragmentEvent() {
         viewModelScope.launch {
-            emitViewModelEvent(
+            emitUiEvent(
                 DiaryListEvent.CommonEvent(
-                    CommonViewModelEvent.NavigatePreviousFragment
+                    CommonUiEvent.NavigatePreviousFragment
                 )
             )
         }
@@ -129,9 +129,9 @@ internal class DiaryListViewModel @Inject constructor(
 
     override suspend fun emitAppMessageEvent(appMessage: DiaryListAppMessage) {
         viewModelScope.launch {
-            emitViewModelEvent(
+            emitUiEvent(
                 DiaryListEvent.CommonEvent(
-                    CommonViewModelEvent.NavigateAppMessage(appMessage)
+                    CommonUiEvent.NavigateAppMessage(appMessage)
                 )
             )
         }
@@ -147,7 +147,7 @@ internal class DiaryListViewModel @Inject constructor(
     // ViewClicked処理
     fun onWordSearchMenuClicked() {
         viewModelScope.launch {
-            emitViewModelEvent(DiaryListEvent.NavigateWordSearchFragment)
+            emitUiEvent(DiaryListEvent.NavigateWordSearchFragment)
         }
     }
 
@@ -157,7 +157,7 @@ internal class DiaryListViewModel @Inject constructor(
             val oldestDiaryDate = loadOldestSavedDiaryDate() ?: LocalDate.now()
             val newestYear = Year.of(newestDiaryDate.year)
             val oldestYear = Year.of(oldestDiaryDate.year)
-            emitViewModelEvent(
+            emitUiEvent(
                 DiaryListEvent.NavigateStartYearMonthPickerDialog(newestYear, oldestYear)
             )
         }
@@ -165,13 +165,13 @@ internal class DiaryListViewModel @Inject constructor(
 
     fun onDiaryListItemClicked(date: LocalDate) {
         viewModelScope.launch {
-            emitViewModelEvent(DiaryListEvent.NavigateDiaryShowFragment(date))
+            emitUiEvent(DiaryListEvent.NavigateDiaryShowFragment(date))
         }
     }
 
     fun onDiaryListItemDeleteButtonClicked(date: LocalDate, uri: Uri?) {
         viewModelScope.launch {
-            emitViewModelEvent(
+            emitUiEvent(
                 DiaryListEvent.NavigateDiaryDeleteDialog(
                     DiaryDeleteParameters(date, uri)
                 )
@@ -182,7 +182,7 @@ internal class DiaryListViewModel @Inject constructor(
     fun onDiaryEditButtonClicked() {
         viewModelScope.launch {
             val today = LocalDate.now()
-            emitViewModelEvent(DiaryListEvent.NavigateDiaryEditFragment(today))
+            emitUiEvent(DiaryListEvent.NavigateDiaryEditFragment(today))
         }
     }
 

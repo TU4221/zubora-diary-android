@@ -4,7 +4,7 @@ import com.websarva.wings.android.zuboradiary.ui.model.parameters.DiaryDeletePar
 import java.time.LocalDate
 import java.time.Year
 
-sealed class DiaryListEvent : ViewModelEvent {
+sealed class DiaryListEvent : UiEvent {
     internal data class NavigateDiaryShowFragment(val date: LocalDate) : DiaryListEvent()
     internal data class NavigateDiaryEditFragment(val date: LocalDate) : DiaryListEvent()
     internal data object NavigateWordSearchFragment : DiaryListEvent()
@@ -14,5 +14,5 @@ sealed class DiaryListEvent : ViewModelEvent {
     ) : DiaryListEvent()
     internal data class NavigateDiaryDeleteDialog(val parameters: DiaryDeleteParameters) : DiaryListEvent()
 
-    internal data class CommonEvent(val event: CommonViewModelEvent) : DiaryListEvent()
+    internal data class CommonEvent(val event: CommonUiEvent) : DiaryListEvent()
 }

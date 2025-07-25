@@ -21,7 +21,7 @@ import com.websarva.wings.android.zuboradiary.databinding.FragmentDiaryShowBindi
 import com.websarva.wings.android.zuboradiary.ui.view.imageview.DiaryImageConfigurator
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.DiaryDeleteDialogFragment
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.DiaryLoadingFailureDialogFragment
-import com.websarva.wings.android.zuboradiary.ui.model.event.CommonViewModelEvent
+import com.websarva.wings.android.zuboradiary.ui.model.event.CommonUiEvent
 import com.websarva.wings.android.zuboradiary.ui.model.event.DiaryShowEvent
 import com.websarva.wings.android.zuboradiary.ui.model.navigation.NavigationCommand
 import com.websarva.wings.android.zuboradiary.ui.model.parameters.DiaryDeleteParameters
@@ -99,7 +99,7 @@ class DiaryShowFragment : BaseFragment<FragmentDiaryShowBinding, DiaryShowEvent>
         }
     }
 
-    override fun onMainViewModelEventReceived(event: DiaryShowEvent) {
+    override fun onMainUiEventReceived(event: DiaryShowEvent) {
         when (event) {
             is DiaryShowEvent.NavigateDiaryEditFragment -> {
                 navigateDiaryEditFragment(event.date)
@@ -115,12 +115,12 @@ class DiaryShowFragment : BaseFragment<FragmentDiaryShowBinding, DiaryShowEvent>
             }
             is DiaryShowEvent.CommonEvent -> {
                 when(event.event) {
-                    CommonViewModelEvent.NavigatePreviousFragment -> {
+                    CommonUiEvent.NavigatePreviousFragment -> {
                         // MEMO:"DiaryShowEvent.NavigatePreviousFragment"を使用する為、
                         //      "ViewModelEvent.NavigatePreviousFragment"処理不要。
                         throw IllegalArgumentException()
                     }
-                    is CommonViewModelEvent.NavigateAppMessage -> {
+                    is CommonUiEvent.NavigateAppMessage -> {
                         navigateAppMessageDialog(event.event.message)
                     }
                 }

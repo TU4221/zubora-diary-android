@@ -27,7 +27,7 @@ import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.PermissionDialo
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.ReminderNotificationTimePickerDialogFragment
 import com.websarva.wings.android.zuboradiary.ui.theme.SettingsThemeColorChanger
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.ThemeColorPickerDialogFragment
-import com.websarva.wings.android.zuboradiary.ui.model.event.CommonViewModelEvent
+import com.websarva.wings.android.zuboradiary.ui.model.event.CommonUiEvent
 import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
 import com.websarva.wings.android.zuboradiary.ui.model.event.SettingsEvent
 import com.websarva.wings.android.zuboradiary.ui.model.navigation.NavigationCommand
@@ -199,7 +199,7 @@ class SettingsFragment :
         }
     }
 
-    override fun onMainViewModelEventReceived(event: SettingsEvent) {
+    override fun onMainUiEventReceived(event: SettingsEvent) {
         when (event) {
             is SettingsEvent.NavigateThemeColorPickerDialog -> {
                 navigateThemeColorPickerDialog()
@@ -263,10 +263,10 @@ class SettingsFragment :
             }
             is SettingsEvent.CommonEvent -> {
                 when(event.event) {
-                    CommonViewModelEvent.NavigatePreviousFragment -> {
+                    CommonUiEvent.NavigatePreviousFragment -> {
                         mainActivity.popBackStackToStartFragment()
                     }
-                    is CommonViewModelEvent.NavigateAppMessage -> {
+                    is CommonUiEvent.NavigateAppMessage -> {
                         navigateAppMessageDialog(event.event.message)
                     }
                 }

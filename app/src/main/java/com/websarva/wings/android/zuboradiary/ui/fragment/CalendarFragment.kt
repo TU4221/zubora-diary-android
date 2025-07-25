@@ -38,7 +38,7 @@ import com.websarva.wings.android.zuboradiary.ui.fragment.DiaryShowFragment.Weat
 import com.websarva.wings.android.zuboradiary.ui.fragment.common.RequiresBottomNavigation
 import com.websarva.wings.android.zuboradiary.ui.fragment.common.ReselectableFragment
 import com.websarva.wings.android.zuboradiary.ui.model.event.CalendarEvent
-import com.websarva.wings.android.zuboradiary.ui.model.event.CommonViewModelEvent
+import com.websarva.wings.android.zuboradiary.ui.model.event.CommonUiEvent
 import com.websarva.wings.android.zuboradiary.ui.model.navigation.NavigationCommand
 import com.websarva.wings.android.zuboradiary.ui.utils.toJapaneseDateString
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.DiaryShowViewModel
@@ -119,7 +119,7 @@ class CalendarFragment :
         }
     }
 
-    override fun onMainViewModelEventReceived(event: CalendarEvent) {
+    override fun onMainUiEventReceived(event: CalendarEvent) {
         when (event) {
             is CalendarEvent.NavigateDiaryEditFragment -> {
                 navigateDiaryEditFragment(event.date, !event.isNewDiary)
@@ -138,10 +138,10 @@ class CalendarFragment :
             }
             is CalendarEvent.CommonEvent -> {
                 when(event.wrappedEvent) {
-                    CommonViewModelEvent.NavigatePreviousFragment -> {
+                    CommonUiEvent.NavigatePreviousFragment -> {
                         mainActivity.popBackStackToStartFragment()
                     }
-                    is CommonViewModelEvent.NavigateAppMessage -> {
+                    is CommonUiEvent.NavigateAppMessage -> {
                         navigateAppMessageDialog(event.wrappedEvent.message)
                     }
                 }

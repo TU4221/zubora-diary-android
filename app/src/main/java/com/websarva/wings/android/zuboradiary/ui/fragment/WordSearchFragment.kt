@@ -17,7 +17,7 @@ import com.websarva.wings.android.zuboradiary.ui.adapter.diary.DiaryYearMonthLis
 import com.websarva.wings.android.zuboradiary.ui.adapter.diary.DiaryYearMonthListBaseItem
 import com.websarva.wings.android.zuboradiary.ui.adapter.diary.wordsearchresult.WordSearchResultYearMonthList
 import com.websarva.wings.android.zuboradiary.ui.adapter.diary.wordsearchresult.WordSearchResultYearMonthListAdapter
-import com.websarva.wings.android.zuboradiary.ui.model.event.CommonViewModelEvent
+import com.websarva.wings.android.zuboradiary.ui.model.event.CommonUiEvent
 import com.websarva.wings.android.zuboradiary.ui.model.event.WordSearchEvent
 import com.websarva.wings.android.zuboradiary.ui.model.navigation.NavigationCommand
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.WordSearchViewModel
@@ -66,7 +66,7 @@ class WordSearchFragment : BaseFragment<FragmentWordSearchBinding, WordSearchEve
         // 処理なし
     }
 
-    override fun onMainViewModelEventReceived(event: WordSearchEvent) {
+    override fun onMainUiEventReceived(event: WordSearchEvent) {
         when (event) {
             is WordSearchEvent.NavigateDiaryShowFragment -> {
                 navigateDiaryShowFragment(event.date)
@@ -76,10 +76,10 @@ class WordSearchFragment : BaseFragment<FragmentWordSearchBinding, WordSearchEve
             }
             is WordSearchEvent.CommonEvent -> {
                 when(event.event) {
-                    CommonViewModelEvent.NavigatePreviousFragment -> {
+                    CommonUiEvent.NavigatePreviousFragment -> {
                         navigatePreviousFragment()
                     }
-                    is CommonViewModelEvent.NavigateAppMessage -> {
+                    is CommonUiEvent.NavigateAppMessage -> {
                         navigateAppMessageDialog(event.event.message)
                     }
                 }

@@ -10,10 +10,10 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.NavController
 import com.websarva.wings.android.zuboradiary.domain.model.ThemeColor
 import com.websarva.wings.android.zuboradiary.ui.model.AppMessage
-import com.websarva.wings.android.zuboradiary.ui.model.event.CommonViewModelEvent
+import com.websarva.wings.android.zuboradiary.ui.model.event.CommonUiEvent
 import com.websarva.wings.android.zuboradiary.ui.model.event.ConsumableEvent
 import com.websarva.wings.android.zuboradiary.ui.model.event.SettingsEvent
-import com.websarva.wings.android.zuboradiary.ui.model.event.ViewModelEvent
+import com.websarva.wings.android.zuboradiary.ui.model.event.UiEvent
 import com.websarva.wings.android.zuboradiary.ui.model.navigation.NavigationCommand
 import com.websarva.wings.android.zuboradiary.ui.model.state.UiState
 import com.websarva.wings.android.zuboradiary.ui.theme.ThemeColorInflaterCreator
@@ -64,42 +64,42 @@ internal class FragmentHelper {
         }
     }
 
-    fun <E: ViewModelEvent> setUpMainViewModelEvent(
+    fun <E: UiEvent> setUpMainUiEvent(
         fragment: Fragment,
         mainViewModel: BaseViewModel<E, out AppMessage, out UiState>,
-        onEventReceived: (E) -> Unit
+        onUiEventReceived: (E) -> Unit
     ) {
         launchAndRepeatOnViewLifeCycleStarted(fragment) {
-            mainViewModel.viewModelEvent
+            mainViewModel.uiEvent
                 .collect { value: ConsumableEvent<E> ->
                     val event = value.getContentIfNotHandled()
-                    Log.d(logTag, "ViewModelEvent_Collect(): $event")
+                    Log.d(logTag, "UiEvent_Collect(): $event")
                     event ?: return@collect
 
-                    onEventReceived(event)
+                    onUiEventReceived(event)
                 }
         }
     }
 
-    fun setUpSettingsViewModelEvent(
+    fun setUpSettingsUiEvent(
         fragment: Fragment,
-        mainViewModel: BaseViewModel<out ViewModelEvent, out AppMessage, out UiState>,
+        mainViewModel: BaseViewModel<out UiEvent, out AppMessage, out UiState>,
         settingsViewModel: SettingsViewModel,
-        onAppMessageNavigationEventReceived: (AppMessage) -> Unit
+        onAppMessageNavigationUiEventReceived: (AppMessage) -> Unit
     ) {
         if (mainViewModel == settingsViewModel) return
 
         launchAndRepeatOnViewLifeCycleStarted(fragment) {
-            settingsViewModel.viewModelEvent
+            settingsViewModel.uiEvent
                 .collect { value: ConsumableEvent<SettingsEvent> ->
                     val event = value.getContentIfNotHandled()
-                    Log.d(logTag, "SettingsViewModelEvent_Collect(): $event")
+                    Log.d(logTag, "SettingsUiEvent_Collect(): $event")
                     event ?: return@collect
                     when (event) {
                         is SettingsEvent.CommonEvent -> {
                             when (event.event) {
-                                is CommonViewModelEvent.NavigateAppMessage -> {
-                                    onAppMessageNavigationEventReceived(event.event.message)
+                                is CommonUiEvent.NavigateAppMessage -> {
+                                    onAppMessageNavigationUiEventReceived(event.event.message)
                                 }
                                 else -> {
                                     throw IllegalArgumentException()
@@ -117,7 +117,7 @@ internal class FragmentHelper {
     fun setUpPendingNavigationCollector(
         navController: NavController,
         navDestinationId: Int,
-        mainViewModel: BaseViewModel<out ViewModelEvent, out AppMessage, out UiState>,
+        mainViewModel: BaseViewModel<out UiEvent, out AppMessage, out UiState>,
         onNavigationCommandReceived: (NavigationCommand) -> Unit
     ) {
         val navBackStackEntry = navController.getBackStackEntry(navDestinationId)
@@ -147,7 +147,7 @@ internal class FragmentHelper {
     fun navigateFragment(
         navController: NavController,
         fragmentDestinationId: Int,
-        mainViewModel: BaseViewModel<out ViewModelEvent, out AppMessage, out UiState>,
+        mainViewModel: BaseViewModel<out UiEvent, out AppMessage, out UiState>,
         command: NavigationCommand,
     ) {
         if (!canNavigateFragment(navController, fragmentDestinationId)) {
@@ -197,7 +197,7 @@ internal class FragmentHelper {
     fun navigatePreviousFragment(
         navController: NavController,
         fragmentDestinationId: Int,
-        mainViewModel: BaseViewModel<out ViewModelEvent, out AppMessage, out UiState>
+        mainViewModel: BaseViewModel<out UiEvent, out AppMessage, out UiState>
     ) {
         navigateFragment(
             navController,
@@ -211,7 +211,7 @@ internal class FragmentHelper {
         fragment: Fragment,
         navController: NavController,
         fragmentDestinationId: Int,
-        mainViewModel: BaseViewModel<out ViewModelEvent, out AppMessage, out UiState>
+        mainViewModel: BaseViewModel<out UiEvent, out AppMessage, out UiState>
     ) {
         fragment.requireActivity().onBackPressedDispatcher
             .addCallback(

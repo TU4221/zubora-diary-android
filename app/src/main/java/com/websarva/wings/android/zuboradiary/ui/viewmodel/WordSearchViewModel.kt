@@ -13,7 +13,7 @@ import com.websarva.wings.android.zuboradiary.ui.model.WordSearchAppMessage
 import com.websarva.wings.android.zuboradiary.ui.adapter.diary.wordsearchresult.WordSearchResultDayList
 import com.websarva.wings.android.zuboradiary.ui.adapter.diary.wordsearchresult.WordSearchResultDayListItem
 import com.websarva.wings.android.zuboradiary.ui.adapter.diary.wordsearchresult.WordSearchResultYearMonthList
-import com.websarva.wings.android.zuboradiary.ui.model.event.CommonViewModelEvent
+import com.websarva.wings.android.zuboradiary.ui.model.event.CommonUiEvent
 import com.websarva.wings.android.zuboradiary.ui.model.state.WordSearchState
 import com.websarva.wings.android.zuboradiary.ui.model.event.WordSearchEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -163,9 +163,9 @@ internal class WordSearchViewModel @Inject internal constructor(
 
     override suspend fun emitNavigatePreviousFragmentEvent() {
         viewModelScope.launch {
-            emitViewModelEvent(
+            emitUiEvent(
                 WordSearchEvent.CommonEvent(
-                    CommonViewModelEvent.NavigatePreviousFragment
+                    CommonUiEvent.NavigatePreviousFragment
                 )
             )
         }
@@ -173,9 +173,9 @@ internal class WordSearchViewModel @Inject internal constructor(
 
     override suspend fun emitAppMessageEvent(appMessage: WordSearchAppMessage) {
         viewModelScope.launch {
-            emitViewModelEvent(
+            emitUiEvent(
                 WordSearchEvent.CommonEvent(
-                    CommonViewModelEvent.NavigateAppMessage(appMessage)
+                    CommonUiEvent.NavigateAppMessage(appMessage)
                 )
             )
         }
@@ -197,7 +197,7 @@ internal class WordSearchViewModel @Inject internal constructor(
 
     fun onWordSearchResultListItemClicked(date: LocalDate) {
         viewModelScope.launch {
-            emitViewModelEvent(WordSearchEvent.NavigateDiaryShowFragment(date))
+            emitUiEvent(WordSearchEvent.NavigateDiaryShowFragment(date))
         }
     }
 
@@ -256,7 +256,7 @@ internal class WordSearchViewModel @Inject internal constructor(
 
     // データ処理
     private suspend fun prepareKeyboard(searchWord: String) {
-        if (searchWord.isEmpty()) emitViewModelEvent(WordSearchEvent.ShowKeyboard)
+        if (searchWord.isEmpty()) emitUiEvent(WordSearchEvent.ShowKeyboard)
     }
 
     private fun cancelPreviousLoading() {

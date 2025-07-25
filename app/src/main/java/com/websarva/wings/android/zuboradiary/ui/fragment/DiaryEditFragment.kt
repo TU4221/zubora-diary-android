@@ -52,7 +52,7 @@ import com.websarva.wings.android.zuboradiary.ui.model.parameters.NavigatePrevio
 import com.websarva.wings.android.zuboradiary.ui.model.parameters.WeatherInfoFetchParameters
 import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
 import com.websarva.wings.android.zuboradiary.ui.model.DiaryItemTitle
-import com.websarva.wings.android.zuboradiary.ui.model.event.CommonViewModelEvent
+import com.websarva.wings.android.zuboradiary.ui.model.event.CommonUiEvent
 import com.websarva.wings.android.zuboradiary.ui.utils.isAccessLocationGranted
 import com.websarva.wings.android.zuboradiary.ui.utils.toJapaneseDateString
 import dagger.hilt.android.AndroidEntryPoint
@@ -243,7 +243,7 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditEvent>
         }
     }
 
-    override fun onMainViewModelEventReceived(event: DiaryEditEvent) {
+    override fun onMainUiEventReceived(event: DiaryEditEvent) {
         when (event) {
             is DiaryEditEvent.NavigateDiaryShowFragment -> {
                 navigateDiaryShowFragment(event.date)
@@ -298,12 +298,12 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditEvent>
             }
             is DiaryEditEvent.CommonEvent -> {
                 when(event.event) {
-                    CommonViewModelEvent.NavigatePreviousFragment -> {
+                    CommonUiEvent.NavigatePreviousFragment -> {
                         // MEMO:"DiaryEditEvent.NavigatePreviousFragment"を使用する為、
                         //      "ViewModelEvent.NavigatePreviousFragment"処理不要。
                         throw IllegalArgumentException()
                     }
-                    is CommonViewModelEvent.NavigateAppMessage -> {
+                    is CommonUiEvent.NavigateAppMessage -> {
                         navigateAppMessageDialog(event.event.message)
                     }
                 }

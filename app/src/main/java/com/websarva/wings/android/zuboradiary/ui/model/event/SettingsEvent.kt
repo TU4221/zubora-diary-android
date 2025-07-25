@@ -4,7 +4,7 @@ import android.os.Build
 import androidx.annotation.RequiresApi
 import java.time.DayOfWeek
 
-sealed class SettingsEvent : ViewModelEvent {
+sealed class SettingsEvent : UiEvent {
     internal data object NavigateThemeColorPickerDialog : SettingsEvent()
     internal data class NavigateCalendarStartDayPickerDialog(val dayOfWeek: DayOfWeek) : SettingsEvent()
     internal data object NavigateReminderNotificationTimePickerDialog : SettingsEvent()
@@ -27,5 +27,5 @@ sealed class SettingsEvent : ViewModelEvent {
     internal data object TurnOffPasscodeLockSettingSwitch : SettingsEvent()
     internal data object TurnOffWeatherInfoFetchSettingSwitch : SettingsEvent()
 
-    internal data class CommonEvent(val event: CommonViewModelEvent) : SettingsEvent()
+    internal data class CommonEvent(val event: CommonUiEvent) : SettingsEvent()
 }

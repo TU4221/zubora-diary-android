@@ -13,7 +13,7 @@ import com.google.android.material.transition.platform.MaterialSharedAxis
 import com.websarva.wings.android.zuboradiary.ui.activity.MainActivity
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import com.websarva.wings.android.zuboradiary.ui.model.AppMessage
-import com.websarva.wings.android.zuboradiary.ui.model.event.ViewModelEvent
+import com.websarva.wings.android.zuboradiary.ui.model.event.UiEvent
 import com.websarva.wings.android.zuboradiary.ui.model.navigation.NavigationCommand
 import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
 import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
@@ -25,7 +25,7 @@ import com.websarva.wings.android.zuboradiary.ui.viewmodel.SettingsViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.collectLatest
 
-abstract class BaseFragment<T: ViewBinding, E : ViewModelEvent> : LoggingFragment() {
+abstract class BaseFragment<T: ViewBinding, E : UiEvent> : LoggingFragment() {
 
     private val logTag = createLogTag()
 
@@ -136,7 +136,7 @@ abstract class BaseFragment<T: ViewBinding, E : ViewModelEvent> : LoggingFragmen
         super.onViewCreated(view, savedInstanceState)
 
         initializeFragmentResultReceiver()
-        setUpViewModelEvent()
+        setUpUiEvent()
         setUpPendingNavigationCollector()
         setUpProgressIndicator()
         registerOnBackPressedCallback()
@@ -166,24 +166,24 @@ abstract class BaseFragment<T: ViewBinding, E : ViewModelEvent> : LoggingFragmen
             )
     }
 
-    private fun setUpViewModelEvent() {
-        setUpMainViewModelEvent()
-        setUpSettingsViewModelEvent()
+    private fun setUpUiEvent() {
+        setUpMainUiEvent()
+        setUpSettingsUiEvent()
     }
 
-    private fun setUpMainViewModelEvent() {
+    private fun setUpMainUiEvent() {
         fragmentHelper
-            .setUpMainViewModelEvent(
+            .setUpMainUiEvent(
                 this,
                 mainViewModel,
-                ::onMainViewModelEventReceived
+                ::onMainUiEventReceived
             )
     }
 
-    internal abstract fun onMainViewModelEventReceived(event: E)
+    internal abstract fun onMainUiEventReceived(event: E)
 
-    private fun setUpSettingsViewModelEvent() {
-        fragmentHelper.setUpSettingsViewModelEvent(
+    private fun setUpSettingsUiEvent() {
+        fragmentHelper.setUpSettingsUiEvent(
             this,
             mainViewModel,
             settingsViewModel,
