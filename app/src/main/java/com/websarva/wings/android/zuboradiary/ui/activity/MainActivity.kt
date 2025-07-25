@@ -344,7 +344,7 @@ class MainActivity : LoggingActivity() {
     //      これは遷移エフェクトの設定方法の都合によるものになる。
     //      これを避け、ユーザーがタブを再選択した際と同じ挙動(正しいエフェクト)で開始Fragmentに戻すために、
     //      このメソッドを使用する。
-    internal fun popBackStackToStartFragment() {
+    internal fun navigateToStartTab() {
         binding.bottomNavigation.apply {
             selectedItemId =
                 menu.getItem(0).itemId // 初期メニューアイテム(アプリ起動で最初に選択されているアイテム)

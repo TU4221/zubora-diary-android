@@ -139,7 +139,7 @@ class CalendarFragment :
             is CalendarEvent.CommonEvent -> {
                 when(event.wrappedEvent) {
                     is CommonUiEvent.NavigatePreviousFragment<*> -> {
-                        mainActivity.popBackStackToStartFragment()
+                        mainActivity.navigateToStartTab()
                     }
                     is CommonUiEvent.NavigateAppMessage -> {
                         navigateAppMessageDialog(event.wrappedEvent.message)
