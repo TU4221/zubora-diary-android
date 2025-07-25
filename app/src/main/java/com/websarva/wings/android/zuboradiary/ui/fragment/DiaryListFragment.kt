@@ -132,7 +132,10 @@ class DiaryListFragment :
             is DiaryListEvent.CommonEvent -> {
                 when(event.wrappedEvent) {
                     is CommonUiEvent.NavigatePreviousFragment<*> -> {
-                        navigatePreviousFragment()
+                        //navigatePreviousFragment()
+                        navigateFragment(
+                            NavigationCommand.Pop<Nothing>()
+                        )
                     }
                     is CommonUiEvent.NavigateAppMessage -> {
                         navigateAppMessageDialog(event.wrappedEvent.message)

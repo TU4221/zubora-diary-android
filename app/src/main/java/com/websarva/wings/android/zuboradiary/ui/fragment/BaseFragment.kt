@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
+import androidx.navigation.NavGraph
 import androidx.navigation.fragment.findNavController
 import androidx.viewbinding.ViewBinding
 import com.google.android.material.transition.platform.MaterialFadeThrough
@@ -47,6 +48,14 @@ abstract class BaseFragment<T: ViewBinding, E : UiEvent> : LoggingFragment() {
     internal val settingsViewModel: SettingsViewModel by activityViewModels()
 
     internal abstract val destinationId: Int
+    private val isNavigationStartFragment: Boolean
+        get() {
+            val topLevelGraph = findNavController().graph
+            val nestedStartGraphId = topLevelGraph.startDestinationId
+            val nestedStartGraph = topLevelGraph.findNode(nestedStartGraphId) as NavGraph
+            val startDestinationId = nestedStartGraph.startDestinationId
+            return destinationId == startDestinationId
+        }
 
     private val fragmentHelper = FragmentHelper()
 
@@ -139,7 +148,7 @@ abstract class BaseFragment<T: ViewBinding, E : UiEvent> : LoggingFragment() {
         setUpUiEvent()
         setUpPendingNavigationCollector()
         setUpProgressIndicator()
-        registerOnBackPressedCallback()
+        if (!isNavigationStartFragment) registerOnBackPressedCallback()
     }
 
     /**

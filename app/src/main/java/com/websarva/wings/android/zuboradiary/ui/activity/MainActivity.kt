@@ -340,6 +340,10 @@ class MainActivity : LoggingActivity() {
         wasSelectedTab = false
     }
 
+    // MEMO:BottomNavigationView経由のFragment間でNavigateUpすると、意図しない遷移エフェクトになる。
+    //      これは遷移エフェクトの設定方法の都合によるものになる。
+    //      これを避け、ユーザーがタブを再選択した際と同じ挙動(正しいエフェクト)で開始Fragmentに戻すために、
+    //      このメソッドを使用する。
     internal fun popBackStackToStartFragment() {
         binding.bottomNavigation.apply {
             selectedItemId =
