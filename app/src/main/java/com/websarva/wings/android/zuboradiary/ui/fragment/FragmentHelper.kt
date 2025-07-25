@@ -225,6 +225,9 @@ internal class FragmentHelper {
                 fragment.viewLifecycleOwner,
                 object : OnBackPressedCallback(true) {
                     override fun handleOnBackPressed() {
+                        if (fragment.viewLifecycleOwner
+                                .lifecycle.currentState != Lifecycle.State.RESUMED) return
+
                         mainViewModel.onBackPressed()
                     }
                 }
