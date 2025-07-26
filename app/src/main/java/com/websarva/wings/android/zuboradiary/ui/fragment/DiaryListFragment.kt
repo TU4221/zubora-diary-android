@@ -132,10 +132,7 @@ class DiaryListFragment :
             is DiaryListEvent.CommonEvent -> {
                 when(event.wrappedEvent) {
                     is CommonUiEvent.NavigatePreviousFragment<*> -> {
-                        //navigatePreviousFragment()
-                        navigateFragmentOnce(
-                            NavigationCommand.Pop<Nothing>()
-                        )
+                        navigatePreviousFragment()
                     }
                     is CommonUiEvent.NavigateAppMessage -> {
                         navigateAppMessageDialog(event.wrappedEvent.message)
@@ -276,7 +273,7 @@ class DiaryListFragment :
     override fun navigateAppMessageDialog(appMessage: AppMessage) {
         val directions =
             DiaryListFragmentDirections.actionDiaryListFragmentToAppMessageDialog(appMessage)
-        navigateFragmentWithRetry(NavigationCommand.To(directions))
+        navigateFragmentOnce(NavigationCommand.To(directions))
     }
 
     override fun onBottomNavigationItemReselected() {
