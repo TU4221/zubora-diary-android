@@ -205,8 +205,7 @@ abstract class BaseFragment<T: ViewBinding, E : UiEvent> : LoggingFragment() {
             .setUpPendingNavigationCollector(
                 findNavController(),
                 destinationId,
-                mainViewModel,
-                ::navigateFragmentWithRetry
+                mainViewModel
             )
     }
 

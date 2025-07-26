@@ -118,28 +118,25 @@ internal class FragmentHelper {
     fun setUpPendingNavigationCollector(
         navController: NavController,
         navDestinationId: Int,
-        mainViewModel: BaseViewModel<out UiEvent, out AppMessage, out UiState>,
-        onNavigationCommandReceived: (NavigationCommand) -> Unit
+        mainViewModel: BaseViewModel<out UiEvent, out AppMessage, out UiState>
     ) {
         val navBackStackEntry = navController.getBackStackEntry(navDestinationId)
         navBackStackEntry.lifecycleScope.launch {
             navBackStackEntry.repeatOnLifecycle(Lifecycle.State.RESUMED) {
-                mainViewModel.pendingNavigationCommand
+                mainViewModel.pendingNavigationCommandList
                     .collectLatest { value ->
-                        when (value) {
-                            NavigationCommand.None -> {
-                                // 処理なし
-                            }
-                            else -> {
-                                if (!canNavigateFragment(navController, navDestinationId)) {
-                                    mainViewModel.onPendingFragmentNavigationFailed()
-                                    return@collectLatest
-                                }
+                        if (value.isEmpty()) return@collectLatest
 
-                                onNavigationCommandReceived(value)
-                                mainViewModel.onPendingFragmentNavigationCompleted()
-                            }
-                        }
+                        val firstCommand = value.first()
+                        val isNavigationSuccessful =
+                            navigateFragmentOnce(
+                                navController,
+                                navDestinationId,
+                                firstCommand
+                            )
+                        if (!isNavigationSuccessful) return@collectLatest
+
+                        mainViewModel.onPendingFragmentNavigationCompleted(firstCommand)
                     }
             }
         }
@@ -149,8 +146,8 @@ internal class FragmentHelper {
         navController: NavController,
         fragmentDestinationId: Int,
         command: NavigationCommand,
-    ) {
-        executeFragmentNavigation(
+    ): Boolean {
+        return executeFragmentNavigation(
             navController,
             fragmentDestinationId,
             command
@@ -163,6 +160,7 @@ internal class FragmentHelper {
         mainViewModel: BaseViewModel<out UiEvent, out AppMessage, out UiState>,
         command: NavigationCommand,
     ) {
+        Log.d("20250726", "navigateFragmentWithRetry")
         executeFragmentNavigation(
             navController,
             fragmentDestinationId,
@@ -177,10 +175,10 @@ internal class FragmentHelper {
         fragmentDestinationId: Int,
         command: NavigationCommand,
         onCannotNavigate: () -> Unit = {}
-    ) {
+    ): Boolean {
         if (!canNavigateFragment(navController, fragmentDestinationId)) {
             onCannotNavigate()
-            return
+            return false
         }
 
         when (command) {
@@ -208,10 +206,8 @@ internal class FragmentHelper {
                 }
                 navController.popBackStack(command.destinationId, command.inclusive)
             }
-            NavigationCommand.None -> {
-                // 処理なし
-            }
         }
+        return true
     }
 
     private fun canNavigateFragment(

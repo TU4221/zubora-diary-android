@@ -84,8 +84,7 @@ abstract class BaseFullScreenDialogFragment<T: ViewBinding, E: UiEvent>: BaseSim
             .setUpPendingNavigationCollector(
                 findNavController(),
                 destinationId,
-                mainViewModel,
-                ::navigateFragmentWithRetry
+                mainViewModel
             )
     }
 
