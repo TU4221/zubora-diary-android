@@ -183,13 +183,13 @@ class WordSearchFragment : BaseFragment<FragmentWordSearchBinding, WordSearchEve
     private fun navigateDiaryShowFragment(date: LocalDate) {
         val directions =
             WordSearchFragmentDirections.actionNavigationWordSearchFragmentToDiaryShowFragment(date)
-        navigateFragment(NavigationCommand.To(directions))
+        navigateFragmentOnce(NavigationCommand.To(directions))
     }
 
     override fun navigateAppMessageDialog(appMessage: AppMessage) {
         val directions =
             WordSearchFragmentDirections.actionWordSearchFragmentToAppMessageDialog(appMessage)
-        navigateFragment(NavigationCommand.To(directions))
+        navigateFragmentWithRetry(NavigationCommand.To(directions))
     }
 
     private fun showKeyboard() {

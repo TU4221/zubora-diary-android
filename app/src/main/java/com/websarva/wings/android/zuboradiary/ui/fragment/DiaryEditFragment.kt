@@ -764,7 +764,7 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditEvent>
         } else {
             DiaryEditFragmentDirections.actionDiaryEditFragmentToDiaryShowFragmentPopUpToDiaryEdit(date)
         }
-        navigateFragment(NavigationCommand.To(directions))
+        navigateFragmentOnce(NavigationCommand.To(directions))
     }
 
     private fun navigateDiaryItemTitleEditFragment(diaryItemTitle: DiaryItemTitle) {
@@ -772,62 +772,62 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditEvent>
             DiaryEditFragmentDirections.actionDiaryEditFragmentToDiaryItemTitleEditDialog(
                 diaryItemTitle
             )
-        navigateFragment(NavigationCommand.To(directions))
+        navigateFragmentOnce(NavigationCommand.To(directions))
     }
 
     private fun navigateDiaryLoadingDialog(parameters: DiaryLoadingParameters) {
         val directions =
             DiaryEditFragmentDirections.actionDiaryEditFragmentToDiaryLoadingDialog(parameters)
-        navigateFragment(NavigationCommand.To(directions))
+        navigateFragmentOnce(NavigationCommand.To(directions))
     }
 
     private fun navigateDiaryLoadingFailureDialog(date: LocalDate) {
         val directions =
             DiaryEditFragmentDirections.actionDiaryEditFragmentToDiaryLoadingFailureDialog(date)
-        navigateFragment(NavigationCommand.To(directions))
+        navigateFragmentOnce(NavigationCommand.To(directions))
     }
 
     private fun navigateDiaryUpdateDialog(parameters: DiaryUpdateParameters) {
         val directions =
             DiaryEditFragmentDirections.actionDiaryEditFragmentToDiaryUpdateDialog(parameters)
-        navigateFragment(NavigationCommand.To(directions))
+        navigateFragmentOnce(NavigationCommand.To(directions))
     }
 
     private fun navigateDiaryDeleteDialog(parameters: DiaryDeleteParameters) {
         val directions =
             DiaryEditFragmentDirections.actionDiaryEditFragmentToDiaryDeleteDialog(parameters)
-        navigateFragment(NavigationCommand.To(directions))
+        navigateFragmentOnce(NavigationCommand.To(directions))
     }
 
     private fun navigateDatePickerDialog(date: LocalDate) {
         val directions =
             DiaryEditFragmentDirections.actionDiaryEditFragmentToDatePickerDialog(date)
-        navigateFragment(NavigationCommand.To(directions))
+        navigateFragmentOnce(NavigationCommand.To(directions))
     }
 
     private fun navigateWeatherInfoFetchDialog(parameters: WeatherInfoFetchParameters) {
         val directions =
             DiaryEditFragmentDirections
                 .actionDiaryEditFragmentToWeatherInfoFetchDialog(parameters)
-        navigateFragment(NavigationCommand.To(directions))
+        navigateFragmentOnce(NavigationCommand.To(directions))
     }
 
     private fun navigateDiaryItemDeleteDialog(parameters: DiaryItemDeleteParameters) {
         val directions =
             DiaryEditFragmentDirections.actionDiaryEditFragmentToDiaryItemDeleteDialog(parameters)
-        navigateFragment(NavigationCommand.To(directions))
+        navigateFragmentOnce(NavigationCommand.To(directions))
     }
 
     private fun navigateDiaryImageDeleteDialog() {
         val directions =
             DiaryEditFragmentDirections.actionDiaryEditFragmentToDiaryImageDeleteDialog()
-        navigateFragment(NavigationCommand.To(directions))
+        navigateFragmentOnce(NavigationCommand.To(directions))
     }
 
     override fun navigateAppMessageDialog(appMessage: AppMessage) {
         val directions =
             DiaryEditFragmentDirections.actionDiaryEditFragmentToAppMessageDialog(appMessage)
-        navigateFragment(NavigationCommand.To(directions))
+        navigateFragmentWithRetry(NavigationCommand.To(directions))
     }
 
     private fun navigateExitWithoutDiarySavingConfirmationDialog(
@@ -836,7 +836,7 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditEvent>
         val directions =
             DiaryEditFragmentDirections
                 .actionDiaryEditFragmentToExitWithoutDiarySavingConfirmationDialog(parameters)
-        navigateFragment(NavigationCommand.To(directions))
+        navigateFragmentOnce(NavigationCommand.To(directions))
     }
 
     private fun navigatePreviousFragmentOnDiaryDelete(result: FragmentResult.Some<LocalDate>) {
@@ -847,7 +847,7 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditEvent>
             } catch (e: IllegalArgumentException) {
                 R.id.navigation_diary_list_fragment
             }
-        navigateFragment(
+        navigateFragmentOnce(
             NavigationCommand.PopTo(
                 destinationId,
                 false,

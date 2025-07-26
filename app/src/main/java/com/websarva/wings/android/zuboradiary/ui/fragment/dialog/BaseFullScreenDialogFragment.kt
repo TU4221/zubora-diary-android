@@ -85,13 +85,22 @@ abstract class BaseFullScreenDialogFragment<T: ViewBinding, E: UiEvent>: BaseSim
                 findNavController(),
                 destinationId,
                 mainViewModel,
-                ::navigateFragment
+                ::navigateFragmentWithRetry
             )
     }
 
-    internal fun navigateFragment(command: NavigationCommand) {
+    internal fun navigateFragmentOnce(command: NavigationCommand) {
         fragmentHelper
-            .navigateFragment(
+            .navigateFragmentOnce(
+                findNavController(),
+                destinationId,
+                command
+            )
+    }
+
+    internal fun navigateFragmentWithRetry(command: NavigationCommand) {
+        fragmentHelper
+            .navigateFragmentWithRetry(
                 findNavController(),
                 destinationId,
                 mainViewModel,
@@ -107,7 +116,6 @@ abstract class BaseFullScreenDialogFragment<T: ViewBinding, E: UiEvent>: BaseSim
             .navigatePreviousFragment(
                 findNavController(),
                 destinationId,
-                mainViewModel,
                 resultKey,
                 result
             )

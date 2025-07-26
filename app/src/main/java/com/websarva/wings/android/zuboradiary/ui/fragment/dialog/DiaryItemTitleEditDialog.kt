@@ -192,7 +192,7 @@ class DiaryItemTitleEditDialog :
             DiaryItemTitleEditDialogDirections.actionDiaryItemTitleEditDialogToDiaryItemTitleDeleteDialog(
                 parameters
             )
-        navigateFragment(NavigationCommand.To(directions))
+        navigateFragmentOnce(NavigationCommand.To(directions))
     }
 
     override fun navigateAppMessageDialog(appMessage: AppMessage) {
@@ -200,6 +200,6 @@ class DiaryItemTitleEditDialog :
             DiaryItemTitleEditDialogDirections.actionDiaryItemTitleEditDialogToAppMessageDialog(
                 appMessage
             )
-        navigateFragment(NavigationCommand.To(directions))
+        navigateFragmentWithRetry(NavigationCommand.To(directions))
     }
 }

@@ -416,7 +416,7 @@ class SettingsFragment :
     private fun navigateThemeColorPickerDialog() {
         val directions =
             SettingsFragmentDirections.actionNavigationSettingsFragmentToThemeColorPickerDialog()
-        navigateFragment(NavigationCommand.To(directions))
+        navigateFragmentOnce(NavigationCommand.To(directions))
     }
 
     private fun navigateCalendarStartDayPickerDialog(dayOfWeek: DayOfWeek) {
@@ -424,57 +424,57 @@ class SettingsFragment :
             SettingsFragmentDirections.actionNavigationSettingsFragmentToCalendarStartDayPickerDialog(
                 dayOfWeek
             )
-        navigateFragment(NavigationCommand.To(directions))
+        navigateFragmentOnce(NavigationCommand.To(directions))
     }
 
     private fun navigateReminderNotificationTimePickerDialog() {
         val directions =
             SettingsFragmentDirections.actionNavigationSettingsFragmentToReminderNotificationTimePickerDialog()
-        navigateFragment(NavigationCommand.To(directions))
+        navigateFragmentOnce(NavigationCommand.To(directions))
     }
 
     private fun navigateNotificationPermissionDialog() {
         val permissionName = getString(R.string.fragment_settings_permission_name_notification)
         val directions =
             SettingsFragmentDirections.actionSettingsFragmentToPermissionDialog(permissionName)
-        navigateFragment(NavigationCommand.To(directions))
+        navigateFragmentOnce(NavigationCommand.To(directions))
     }
 
     private fun navigateLocationPermissionDialog() {
         val permissionName = getString(R.string.fragment_settings_permission_name_location)
         val directions =
             SettingsFragmentDirections.actionSettingsFragmentToPermissionDialog(permissionName)
-        navigateFragment(NavigationCommand.To(directions))
+        navigateFragmentOnce(NavigationCommand.To(directions))
     }
 
     private fun navigateAllDiariesDeleteDialog() {
         val directions =
             SettingsFragmentDirections.actionSettingsFragmentToAllDiariesDeleteDialog()
-        navigateFragment(NavigationCommand.To(directions))
+        navigateFragmentOnce(NavigationCommand.To(directions))
     }
 
     private fun navigateAllSettingsInitializationDialog() {
         val directions =
             SettingsFragmentDirections.actionSettingsFragmentToAllSettingsInitializationDialog()
-        navigateFragment(NavigationCommand.To(directions))
+        navigateFragmentOnce(NavigationCommand.To(directions))
     }
 
     private fun navigateAllDataDeleteDialog() {
         val directions =
             SettingsFragmentDirections.actionSettingsFragmentToAllDataDeleteDialog()
-        navigateFragment(NavigationCommand.To(directions))
+        navigateFragmentOnce(NavigationCommand.To(directions))
     }
 
     override fun navigateAppMessageDialog(appMessage: AppMessage) {
         val directions =
             SettingsFragmentDirections.actionSettingsFragmentToAppMessageDialog(appMessage)
-        navigateFragment(NavigationCommand.To(directions))
+        navigateFragmentWithRetry(NavigationCommand.To(directions))
     }
 
     private fun navigateOpenSourceLicensesFragment() {
         val directions =
             SettingsFragmentDirections.actionNavigationSettingsFragmentToOpenSourceLicensesFragment()
-        navigateFragment(NavigationCommand.To(directions))
+        navigateFragmentOnce(NavigationCommand.To(directions))
     }
 
     private fun showApplicationDetailsSettings() {

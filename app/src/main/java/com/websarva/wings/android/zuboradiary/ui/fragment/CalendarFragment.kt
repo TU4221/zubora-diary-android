@@ -590,13 +590,13 @@ class CalendarFragment :
                 shouldLoadDiary,
                 date
             )
-        navigateFragment(NavigationCommand.To(directions))
+        navigateFragmentOnce(NavigationCommand.To(directions))
     }
 
     override fun navigateAppMessageDialog(appMessage: AppMessage) {
         val directions =
             CalendarFragmentDirections.actionCalendarFragmentToAppMessageDialog(appMessage)
-        navigateFragment(NavigationCommand.To(directions))
+        navigateFragmentWithRetry(NavigationCommand.To(directions))
     }
 
     override fun onBottomNavigationItemReselected() {

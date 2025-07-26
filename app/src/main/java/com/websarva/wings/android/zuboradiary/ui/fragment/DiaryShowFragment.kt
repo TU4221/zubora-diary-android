@@ -298,24 +298,24 @@ class DiaryShowFragment : BaseFragment<FragmentDiaryShowBinding, DiaryShowEvent>
                 true,
                 date
             )
-        navigateFragment(NavigationCommand.To(directions))
+        navigateFragmentOnce(NavigationCommand.To(directions))
     }
 
     private fun navigateDiaryLoadingFailureDialog(date: LocalDate) {
         val directions =
             DiaryShowFragmentDirections.actionDiaryShowFragmentToDiaryLoadingFailureDialog(date)
-        navigateFragment(NavigationCommand.To(directions))
+        navigateFragmentOnce(NavigationCommand.To(directions))
     }
 
     private fun navigateDiaryDeleteDialog(parameters: DiaryDeleteParameters) {
         val directions =
             DiaryShowFragmentDirections.actionDiaryShowFragmentToDiaryDeleteDialog(parameters)
-        navigateFragment(NavigationCommand.To(directions))
+        navigateFragmentOnce(NavigationCommand.To(directions))
     }
 
     override fun navigateAppMessageDialog(appMessage: AppMessage) {
         val directions =
             DiaryShowFragmentDirections.actionDiaryShowFragmentToAppMessageDialog(appMessage)
-        navigateFragment(NavigationCommand.To(directions))
+        navigateFragmentWithRetry(NavigationCommand.To(directions))
     }
 }

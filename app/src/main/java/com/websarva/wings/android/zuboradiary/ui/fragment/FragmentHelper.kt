@@ -145,14 +145,41 @@ internal class FragmentHelper {
         }
     }
 
-    fun navigateFragment(
+    fun navigateFragmentOnce(
+        navController: NavController,
+        fragmentDestinationId: Int,
+        command: NavigationCommand,
+    ) {
+        executeFragmentNavigation(
+            navController,
+            fragmentDestinationId,
+            command
+        )
+    }
+
+    fun navigateFragmentWithRetry(
         navController: NavController,
         fragmentDestinationId: Int,
         mainViewModel: BaseViewModel<out UiEvent, out AppMessage, out UiState>,
         command: NavigationCommand,
     ) {
-        if (!canNavigateFragment(navController, fragmentDestinationId)) {
+        executeFragmentNavigation(
+            navController,
+            fragmentDestinationId,
+            command
+        ) {
             mainViewModel.onFragmentNavigationFailed(command)
+        }
+    }
+
+    private fun executeFragmentNavigation(
+        navController: NavController,
+        fragmentDestinationId: Int,
+        command: NavigationCommand,
+        onCannotNavigate: () -> Unit = {}
+    ) {
+        if (!canNavigateFragment(navController, fragmentDestinationId)) {
+            onCannotNavigate()
             return
         }
 
@@ -198,7 +225,6 @@ internal class FragmentHelper {
     fun navigatePreviousFragment(
         navController: NavController,
         fragmentDestinationId: Int,
-        mainViewModel: BaseViewModel<out UiEvent, out AppMessage, out UiState>,
         resultKey: String?,
         result: FragmentResult<*>
     ) {
@@ -208,10 +234,9 @@ internal class FragmentHelper {
             } else {
                 NavigationCommand.Up(resultKey, result)
             }
-        navigateFragment(
+        navigateFragmentOnce(
             navController,
             fragmentDestinationId,
-            mainViewModel,
             command
         )
     }

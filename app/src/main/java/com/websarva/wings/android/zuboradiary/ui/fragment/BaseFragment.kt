@@ -206,7 +206,7 @@ abstract class BaseFragment<T: ViewBinding, E : UiEvent> : LoggingFragment() {
                 findNavController(),
                 destinationId,
                 mainViewModel,
-                ::navigateFragment
+                ::navigateFragmentWithRetry
             )
     }
 
@@ -222,9 +222,18 @@ abstract class BaseFragment<T: ViewBinding, E : UiEvent> : LoggingFragment() {
         }
     }
 
-    internal fun navigateFragment(command: NavigationCommand) {
+    internal fun navigateFragmentOnce(command: NavigationCommand) {
         fragmentHelper
-            .navigateFragment(
+            .navigateFragmentOnce(
+                findNavController(),
+                destinationId,
+                command
+            )
+    }
+
+    internal fun navigateFragmentWithRetry(command: NavigationCommand) {
+        fragmentHelper
+            .navigateFragmentWithRetry(
                 findNavController(),
                 destinationId,
                 mainViewModel,
@@ -240,7 +249,6 @@ abstract class BaseFragment<T: ViewBinding, E : UiEvent> : LoggingFragment() {
             .navigatePreviousFragment(
                 findNavController(),
                 destinationId,
-                mainViewModel,
                 resultKey,
                 result
             )

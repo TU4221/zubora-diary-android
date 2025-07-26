@@ -133,7 +133,7 @@ class DiaryListFragment :
                 when(event.wrappedEvent) {
                     is CommonUiEvent.NavigatePreviousFragment<*> -> {
                         //navigatePreviousFragment()
-                        navigateFragment(
+                        navigateFragmentOnce(
                             NavigationCommand.Pop<Nothing>()
                         )
                     }
@@ -239,21 +239,21 @@ class DiaryListFragment :
                 false,
                 LocalDate.now()
             )
-        navigateFragment(NavigationCommand.To(directions))
+        navigateFragmentOnce(NavigationCommand.To(directions))
     }
 
     private fun navigateDiaryShowFragment(date: LocalDate) {
         Log.d("20250714", "navigateDiaryShowFragment()")
         val directions =
             DiaryListFragmentDirections.actionNavigationDiaryListFragmentToDiaryShowFragment(date)
-        navigateFragment(NavigationCommand.To(directions))
+        navigateFragmentOnce(NavigationCommand.To(directions))
     }
 
     private fun navigateWordSearchFragment() {
         Log.d("20250714", "navigateWordSearchFragment()")
         val directions =
             DiaryListFragmentDirections.actionNavigationDiaryListFragmentToWordSearchFragment()
-        navigateFragment(NavigationCommand.To(directions))
+        navigateFragmentOnce(NavigationCommand.To(directions))
     }
 
     private fun navigateStartYearMonthPickerDialog(newestYear: Year, oldestYear: Year) {
@@ -263,20 +263,20 @@ class DiaryListFragment :
                 newestYear,
                 oldestYear
             )
-        navigateFragment(NavigationCommand.To(directions))
+        navigateFragmentOnce(NavigationCommand.To(directions))
     }
 
     private fun navigateDiaryDeleteDialog(parameters: DiaryDeleteParameters) {
         Log.d("20250714", "navigateDiaryDeleteDialog")
         val directions =
             DiaryListFragmentDirections.actionDiaryListFragmentToDiaryDeleteDialog(parameters)
-        navigateFragment(NavigationCommand.To(directions))
+        navigateFragmentOnce(NavigationCommand.To(directions))
     }
 
     override fun navigateAppMessageDialog(appMessage: AppMessage) {
         val directions =
             DiaryListFragmentDirections.actionDiaryListFragmentToAppMessageDialog(appMessage)
-        navigateFragment(NavigationCommand.To(directions))
+        navigateFragmentWithRetry(NavigationCommand.To(directions))
     }
 
     override fun onBottomNavigationItemReselected() {
