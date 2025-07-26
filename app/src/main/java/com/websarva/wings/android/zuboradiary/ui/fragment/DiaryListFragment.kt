@@ -273,7 +273,7 @@ class DiaryListFragment :
     override fun navigateAppMessageDialog(appMessage: AppMessage) {
         val directions =
             DiaryListFragmentDirections.actionDiaryListFragmentToAppMessageDialog(appMessage)
-        navigateFragmentOnce(NavigationCommand.To(directions))
+        navigateFragmentWithRetry(NavigationCommand.To(directions))
     }
 
     override fun onBottomNavigationItemReselected() {
