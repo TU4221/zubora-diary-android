@@ -850,7 +850,7 @@ internal class DiaryEditViewModel @Inject constructor(
         when (result) {
             is UseCaseResult.Success -> {
                 Log.i(logTag, "${logMsg}完了")
-                updateDiaryEditViewModelState(DiaryEditState.Idle)
+                updateDiaryEditViewModelState(DiaryEditState.Editing)
                 emitUiEvent(
                     DiaryEditEvent
                         .NavigateDiaryShowFragment(diary.date)
@@ -876,7 +876,7 @@ internal class DiaryEditViewModel @Inject constructor(
         when (deleteDiaryUseCase(loadedDate, loadedImageUriString)) {
             is UseCaseResult.Success -> {
                 Log.i(logTag, "${logMsg}完了")
-                updateDiaryEditViewModelState(DiaryEditState.Idle)
+                updateDiaryEditViewModelState(DiaryEditState.Editing)
                 emitUiEvent(
                     DiaryEditEvent
                         .NavigatePreviousFragmentOnDiaryDelete(
@@ -1100,7 +1100,8 @@ internal class DiaryEditViewModel @Inject constructor(
                 DiaryEditEvent.TransitionDiaryItemHidedState(itemNumber)
             )
         }
-        //updateViewModelIdleState() MEMO:deleteItem(itemNumber)でIdleStateに更新する為、不要。
+        // MEMO:deleteItem(itemNumber)でEditingStateに更新する為、下記コード不要。
+        //updateDiaryEditViewModelState(DiaryEditState.Editing)
     }
 
     // 添付画像関係
@@ -1136,7 +1137,6 @@ internal class DiaryEditViewModel @Inject constructor(
     }
 
     private suspend fun navigatePreviousFragment(loadedDiary: Diary? = null) {
-        updateDiaryEditViewModelState(DiaryEditState.Idle)
         val result =
             if (loadedDiary == null) {
                 FragmentResult.None
