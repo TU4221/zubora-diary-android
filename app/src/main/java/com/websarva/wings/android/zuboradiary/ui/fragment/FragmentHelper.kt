@@ -157,6 +157,7 @@ internal class FragmentHelper {
         fragmentDestinationId: Int,
         command: NavigationCommand,
     ): Boolean {
+        Log.d(logTag, "リトライなし画面遷移開始")
         return executeFragmentNavigation(
             navController,
             fragmentDestinationId,
@@ -170,7 +171,7 @@ internal class FragmentHelper {
         mainViewModel: BaseViewModel<out UiEvent, out AppMessage, out UiState>,
         command: NavigationCommand,
     ) {
-        Log.d("20250726", "navigateFragmentWithRetry")
+        Log.d(logTag, "リトライあり画面遷移開始")
         executeFragmentNavigation(
             navController,
             fragmentDestinationId,
@@ -187,10 +188,12 @@ internal class FragmentHelper {
         onCannotNavigate: () -> Unit = {}
     ): Boolean {
         if (!canNavigateFragment(navController, fragmentDestinationId)) {
+            Log.d(logTag, "画面遷移不可_$command")
             onCannotNavigate()
             return false
         }
 
+        Log.d(logTag, "画面遷移ナビゲーション起動_$command")
         when (command) {
             is NavigationCommand.To -> {
                 navController.navigate(command.directions)
