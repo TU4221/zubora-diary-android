@@ -153,7 +153,7 @@ class CalendarFragment :
         launchAndRepeatOnViewLifeCycleStarted {
             diaryShowViewModel.uiState
                 .collectLatest { value ->
-                    mainViewModel.onChangedDiaryShowViewModelState(value)
+                    mainViewModel.onChangedDiaryShowUiState(value)
                 }
         }
     }

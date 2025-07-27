@@ -148,7 +148,7 @@ internal class CalendarViewModel @Inject constructor(
         }
     }
 
-    fun onChangedDiaryShowViewModelState(state: DiaryShowState) {
+    fun onChangedDiaryShowUiState(state: DiaryShowState) {
         when (state) {
             DiaryShowState.Loading -> updateUiState(CalendarState.LoadingDiary)
             DiaryShowState.LoadSuccess -> updateUiState(CalendarState.LoadDiarySuccess)
