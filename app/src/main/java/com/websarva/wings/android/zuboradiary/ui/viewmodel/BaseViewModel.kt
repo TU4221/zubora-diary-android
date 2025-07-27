@@ -8,6 +8,7 @@ import com.websarva.wings.android.zuboradiary.ui.model.AppMessage
 import com.websarva.wings.android.zuboradiary.ui.model.event.ConsumableEvent
 import com.websarva.wings.android.zuboradiary.ui.model.event.UiEvent
 import com.websarva.wings.android.zuboradiary.ui.model.navigation.NavigationCommand
+import com.websarva.wings.android.zuboradiary.ui.model.navigation.PendingNavigationCommand
 import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
 import com.websarva.wings.android.zuboradiary.ui.model.state.UiState
 import kotlinx.coroutines.flow.Flow
@@ -48,7 +49,7 @@ internal abstract class BaseViewModel<E: UiEvent, M: AppMessage, S: UiState>(
     open val isProgressIndicatorVisible get() = isProcessingState
 
     // 表示保留中Navigation
-    private val initialPendingNavigationCommandList = emptyList<NavigationCommand>()
+    private val initialPendingNavigationCommandList = emptyList<PendingNavigationCommand>()
     private val _pendingNavigationCommandList = MutableStateFlow(initialPendingNavigationCommandList)
     val pendingNavigationCommandList
         get() = _pendingNavigationCommandList.asStateFlow()
@@ -78,10 +79,22 @@ internal abstract class BaseViewModel<E: UiEvent, M: AppMessage, S: UiState>(
     abstract fun onBackPressed()
 
     fun onFragmentNavigationFailed(command: NavigationCommand) {
-        _pendingNavigationCommandList.update { it + command }
+        _pendingNavigationCommandList.update { it + PendingNavigationCommand(command) }
     }
 
-    fun onPendingFragmentNavigationCompleted(command: NavigationCommand) {
+    fun onPendingFragmentNavigationCompleted(command: PendingNavigationCommand) {
         _pendingNavigationCommandList.update { it - command }
+    }
+
+    fun onPendingFragmentNavigationFailed(command: PendingNavigationCommand) {
+        _pendingNavigationCommandList.update { list ->
+            list.map { commandInList ->
+                if (commandInList == command) {
+                    commandInList.incrementRetryCount()
+                } else {
+                    commandInList
+                }
+            }
+        }
     }
 }
