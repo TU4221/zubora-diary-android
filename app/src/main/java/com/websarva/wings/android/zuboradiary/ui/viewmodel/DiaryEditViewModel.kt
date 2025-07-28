@@ -135,6 +135,9 @@ internal class DiaryEditViewModel @Inject constructor(
     private val _loadedDiary = MutableStateFlow(handle[SAVED_LOADED_DIARY_KEY] ?: initialLoadedDiary)
     val loadedDiary = _loadedDiary.asStateFlow()
 
+    private val initialOriginalDiary: Diary? = null
+    private var originalDiary = initialOriginalDiary
+
     private val initialDiaryDateString = ""
     private val _editingDiaryDateString = MutableStateFlow(initialDiaryDateString)
     val editingDiaryDateString = _editingDiaryDateString.asStateFlow()
@@ -306,6 +309,7 @@ internal class DiaryEditViewModel @Inject constructor(
         super.initialize()
         previousDate = initialPreviousDate
         _loadedDiary.value = initialLoadedDiary
+        originalDiary = initialOriginalDiary
         _editingDiaryDateString.value = initialDiaryDateString
         diaryStateFlow.initialize()
         _weather1AdapterList.value = initialWeatherAdapterList
@@ -338,9 +342,9 @@ internal class DiaryEditViewModel @Inject constructor(
         if (isProcessing) return
 
         val diary = diaryStateFlow.createDiary()
-        val loadedDiary = _loadedDiary.value
+        val originalDiary = originalDiary
         viewModelScope.launch {
-            handleBackNavigation(diary, loadedDiary)
+            handleBackNavigation(diary, originalDiary)
         }
     }
 
@@ -389,9 +393,9 @@ internal class DiaryEditViewModel @Inject constructor(
         if (uiState.value != DiaryEditState.Editing) return
 
         val diary = diaryStateFlow.createDiary()
-        val loadedDiary = _loadedDiary.value
+        val originalDiary = originalDiary
         viewModelScope.launch {
-            handleBackNavigation(diary, loadedDiary)
+            handleBackNavigation(diary, originalDiary)
         }
     }
 
@@ -489,6 +493,7 @@ internal class DiaryEditViewModel @Inject constructor(
         val date = parameters.date
         viewModelScope.launch {
             loadDiary(date)
+            updateOriginalDiary(diaryStateFlow.createDiary())
         }
     }
 
@@ -655,9 +660,9 @@ internal class DiaryEditViewModel @Inject constructor(
 
         when (result) {
             is DialogResult.Positive<NavigatePreviousParameters> -> {
-                val loadedDiary = result.data.loadedDiary
+                val originalDiary = result.data.originalDiary
                 viewModelScope.launch {
-                    navigatePreviousFragment(loadedDiary)
+                    navigatePreviousFragment(originalDiary)
                 }
             }
             DialogResult.Negative,
@@ -780,6 +785,7 @@ internal class DiaryEditViewModel @Inject constructor(
         } else {
             prepareDiaryDate(date, loadedDate)
         }
+        updateOriginalDiary(diaryStateFlow.createDiary())
     }
 
     private suspend fun prepareDiaryDate(
@@ -830,6 +836,10 @@ internal class DiaryEditViewModel @Inject constructor(
 
     private fun updateLoadedDiary(diary: Diary) {
         _loadedDiary.value = diary
+    }
+
+    private fun updateOriginalDiary(diary: Diary) {
+        originalDiary = diary
     }
 
     private suspend fun saveDiary(
@@ -1121,27 +1131,27 @@ internal class DiaryEditViewModel @Inject constructor(
 
     private suspend fun handleBackNavigation(
         diary: Diary,
-        loadedDiary: Diary?
+        originalDiary: Diary?
     ) {
         val shouldRequest =
-            shouldRequestExitWithoutDiarySavingConfirmationUseCase(diary, loadedDiary).value
+            shouldRequestExitWithoutDiarySavingConfirmationUseCase(diary, originalDiary).value
         if (shouldRequest) {
-            val parameters = NavigatePreviousParameters(loadedDiary)
+            val parameters = NavigatePreviousParameters(originalDiary)
             emitUiEvent(
                 DiaryEditEvent
                     .NavigateExitWithoutDiarySavingConfirmationDialog(parameters)
             )
         } else {
-            navigatePreviousFragment(loadedDiary)
+            navigatePreviousFragment(originalDiary)
         }
     }
 
-    private suspend fun navigatePreviousFragment(loadedDiary: Diary? = null) {
+    private suspend fun navigatePreviousFragment(originalDiary: Diary? = null) {
         val result =
-            if (loadedDiary == null) {
+            if (originalDiary == null) {
                 FragmentResult.None
             } else {
-                FragmentResult.Some(loadedDiary.date)
+                FragmentResult.Some(originalDiary.date)
             }
         emitNavigatePreviousFragmentEvent(result)
     }
@@ -1206,8 +1216,7 @@ internal class DiaryEditViewModel @Inject constructor(
                     }
                 }
             }
-            val loadedDiary = _loadedDiary.value
-            navigatePreviousFragment(loadedDiary)
+            navigatePreviousFragment(originalDiary)
             isTesting = false
         }
     }

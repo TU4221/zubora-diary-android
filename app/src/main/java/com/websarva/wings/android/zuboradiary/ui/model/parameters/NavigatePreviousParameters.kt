@@ -5,5 +5,5 @@ import java.io.Serializable
 
 // MEMO:日記表示、編集フラグメント以外からも削除できるように下記データ構成とする。
 internal data class NavigatePreviousParameters(
-    val loadedDiary: Diary?
+    val originalDiary: Diary?
 ) : Serializable
