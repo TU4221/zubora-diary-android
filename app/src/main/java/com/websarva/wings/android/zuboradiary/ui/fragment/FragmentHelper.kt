@@ -48,20 +48,24 @@ internal class FragmentHelper {
     }
 
     fun <R> setUpFragmentResultReceiverInternal(
-        fragment: Fragment,
         navController: NavController,
         fragmentDestinationId: Int,
         key: String,
         block: (R) -> Unit
     ) {
-        val backStackEntry = navController.getBackStackEntry(fragmentDestinationId)
-        val savedStateHandle = backStackEntry.savedStateHandle
+        val navBackStackEntry = navController.getBackStackEntry(fragmentDestinationId)
+        val savedStateHandle = navBackStackEntry.savedStateHandle
         val result = savedStateHandle.getStateFlow(key, null)
-        launchAndRepeatOnViewLifeCycleStarted(fragment) {
-            result.filterNotNull().collectLatest { value: R ->
-                block(value)
 
-                savedStateHandle[key] = null
+        // MEMO:対象デスティネーションがRESUMEDになった際に、他の画面からの結果を安全に受け取り処理するため、
+        //      NavBackStackEntryのライフサイクルを使用。これにより、結果処理後の画面遷移も適切なタイミングで行える。
+        navBackStackEntry.lifecycleScope.launch {
+            navBackStackEntry.repeatOnLifecycle(Lifecycle.State.RESUMED) {
+                result.filterNotNull().collectLatest { value: R ->
+                    block(value)
+
+                    savedStateHandle[key] = null
+                }
             }
         }
     }

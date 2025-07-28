@@ -167,7 +167,6 @@ abstract class BaseFragment<T: ViewBinding, E : UiEvent> : LoggingFragment() {
     private fun <R> setUpFragmentResultReceiverInternal(key: String, block: (R) -> Unit) {
         fragmentHelper
             .setUpFragmentResultReceiverInternal(
-                this,
                 findNavController(),
                 destinationId,
                 key,

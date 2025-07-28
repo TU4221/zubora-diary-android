@@ -46,7 +46,6 @@ abstract class BaseFullScreenDialogFragment<T: ViewBinding, E: UiEvent>: BaseSim
     private fun <R> setUpFragmentResultReceiverInternal(key: String, block: (R) -> Unit) {
         fragmentHelper
             .setUpFragmentResultReceiverInternal(
-                this,
                 findNavController(),
                 destinationId,
                 key,
