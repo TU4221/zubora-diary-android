@@ -31,7 +31,7 @@ import com.websarva.wings.android.zuboradiary.ui.model.parameters.DiaryDeletePar
 import com.websarva.wings.android.zuboradiary.ui.model.parameters.DiaryItemDeleteParameters
 import com.websarva.wings.android.zuboradiary.ui.model.parameters.DiaryLoadingParameters
 import com.websarva.wings.android.zuboradiary.ui.model.parameters.DiaryUpdateParameters
-import com.websarva.wings.android.zuboradiary.ui.model.parameters.NavigatePreviousParameters
+import com.websarva.wings.android.zuboradiary.ui.model.parameters.NavigatePreviousParametersForDiaryEdit
 import com.websarva.wings.android.zuboradiary.ui.model.parameters.WeatherInfoFetchParameters
 import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
 import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
@@ -654,12 +654,12 @@ internal class DiaryEditViewModel @Inject constructor(
     }
 
     fun onExitWithoutDiarySavingDialogResultReceived(
-        result: DialogResult<NavigatePreviousParameters>
+        result: DialogResult<NavigatePreviousParametersForDiaryEdit>
     ) {
         check(uiState.value == DiaryEditState.Editing)
 
         when (result) {
-            is DialogResult.Positive<NavigatePreviousParameters> -> {
+            is DialogResult.Positive<NavigatePreviousParametersForDiaryEdit> -> {
                 val originalDiary = result.data.originalDiary
                 viewModelScope.launch {
                     navigatePreviousFragment(originalDiary)
@@ -1136,7 +1136,7 @@ internal class DiaryEditViewModel @Inject constructor(
         val shouldRequest =
             shouldRequestExitWithoutDiarySavingConfirmationUseCase(diary, originalDiary).value
         if (shouldRequest) {
-            val parameters = NavigatePreviousParameters(originalDiary)
+            val parameters = NavigatePreviousParametersForDiaryEdit(originalDiary)
             emitUiEvent(
                 DiaryEditEvent
                     .NavigateExitWithoutDiarySavingConfirmationDialog(parameters)

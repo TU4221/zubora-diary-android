@@ -48,7 +48,7 @@ import com.websarva.wings.android.zuboradiary.ui.model.parameters.DiaryDeletePar
 import com.websarva.wings.android.zuboradiary.ui.model.parameters.DiaryItemDeleteParameters
 import com.websarva.wings.android.zuboradiary.ui.model.parameters.DiaryLoadingParameters
 import com.websarva.wings.android.zuboradiary.ui.model.parameters.DiaryUpdateParameters
-import com.websarva.wings.android.zuboradiary.ui.model.parameters.NavigatePreviousParameters
+import com.websarva.wings.android.zuboradiary.ui.model.parameters.NavigatePreviousParametersForDiaryEdit
 import com.websarva.wings.android.zuboradiary.ui.model.parameters.WeatherInfoFetchParameters
 import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
 import com.websarva.wings.android.zuboradiary.ui.model.DiaryItemTitle
@@ -831,7 +831,7 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditEvent>
     }
 
     private fun navigateExitWithoutDiarySavingConfirmationDialog(
-        parameters: NavigatePreviousParameters
+        parameters: NavigatePreviousParametersForDiaryEdit
     ) {
         val directions =
             DiaryEditFragmentDirections
