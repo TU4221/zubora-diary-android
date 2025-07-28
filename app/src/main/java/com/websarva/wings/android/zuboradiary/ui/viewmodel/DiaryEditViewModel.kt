@@ -73,6 +73,7 @@ internal class DiaryEditViewModel @Inject constructor(
     companion object {
         private const val SAVED_VIEW_MODEL_STATE_KEY = "uiState"
         private const val SAVED_PREVIOUS_DATE_STATE_KEY = "previousDate"
+        private const val SAVED_ORIGINAL_DIARY_KEY = "originalDiary"
         private const val SAVED_LOADED_DIARY_KEY = "loadedDiary"
     }
 
@@ -136,7 +137,11 @@ internal class DiaryEditViewModel @Inject constructor(
     val loadedDiary = _loadedDiary.asStateFlow()
 
     private val initialOriginalDiary: Diary? = null
-    private var originalDiary = initialOriginalDiary
+    private var originalDiary = handle[SAVED_ORIGINAL_DIARY_KEY] ?: initialOriginalDiary
+        private set(value) {
+            handle[SAVED_ORIGINAL_DIARY_KEY] = value
+            field = value
+        }
 
     private val initialDiaryDateString = ""
     private val _editingDiaryDateString = MutableStateFlow(initialDiaryDateString)
