@@ -2,9 +2,7 @@ package com.websarva.wings.android.zuboradiary.ui.viewmodel
 
 import android.net.Uri
 import androidx.lifecycle.SavedStateHandle
-import com.websarva.wings.android.zuboradiary.domain.model.Condition
 import com.websarva.wings.android.zuboradiary.domain.model.ItemNumber
-import com.websarva.wings.android.zuboradiary.domain.model.Weather
 import com.websarva.wings.android.zuboradiary.domain.model.Diary
 import com.websarva.wings.android.zuboradiary.domain.model.DiaryItemTitleSelectionHistoryItem
 import com.websarva.wings.android.zuboradiary.ui.utils.requireValue
@@ -31,37 +29,46 @@ internal class DiaryStateFlow(scope: CoroutineScope, handle: SavedStateHandle) {
         private const val SAVED_LOG_STATE_KEY = "log"
     }
 
+    private val initialDiary = Diary()
+
     // MEMO:双方向DataBindingが必要の為、MutableStateFlow変数はアクセス修飾子をpublicとする。
     //      StateFlow変数を用意しても意味がないので作成しない。
-    private val initialDate = null
+    private val initialDate = null // MEMO:日付選択機能(前回選択日付機能)関係でinitialDiaryの日付はnullとする。
     val date =
         MutableStateFlow<LocalDate?>(
             handle[SAVED_DATE_STATE_KEY] ?: initialDate // MEMO:初期化時日付が未定の為、null許容型とする。
         )
 
-    private val initialWeather = Weather.UNKNOWN
+    private val initialWeather = initialDiary.weather1
     val weather1 = MutableStateFlow(handle[SAVED_WEATHER_1_STATE_KEY] ?: initialWeather)
     val weather2 = MutableStateFlow(handle[SAVED_WEATHER_2_STATE_KEY] ?: initialWeather)
 
-    private val initialCondition = Condition.UNKNOWN
+    private val initialCondition = initialDiary.condition
     val condition = MutableStateFlow(handle[SAVED_CONDITION_STATE_KEY] ?: initialCondition)
 
-    private val initialTitle = ""
+    private val initialTitle = initialDiary.title
     val title = MutableStateFlow(handle[SAVED_TITLE_STATE_KEY] ?: initialTitle)
 
-    private val initialNumVisibleItems = 1
+    private val initialNumVisibleItems = run {
+        var count = 1
+        if (initialDiary.item2Title != null) count++
+        if (initialDiary.item3Title != null) count++
+        if (initialDiary.item4Title != null) count++
+        if (initialDiary.item5Title != null) count++
+        count
+    }
     val numVisibleItems =
         MutableStateFlow(handle[SAVED_NUM_VISIBLE_ITEMS_STATE_KEY] ?: initialNumVisibleItems)
 
     private val items = Array(MAX_ITEMS) { i -> DiaryItemStateFlow(scope, handle, i + 1)}
 
-    private val initialImageUri = null
+    private val initialImageUri = initialDiary.imageUriString?.let { Uri.parse(it) }
     val imageUri =
-        MutableStateFlow<Uri?>( // MEMO:初期化時Uri有無が未定の為、null許容型とする。
+        MutableStateFlow(
             handle[SAVED_IMAGE_URI_STATE_KEY] ?: initialImageUri
         )
 
-    private val initialLog = null
+    private val initialLog = null // MEMO:Logは保存記録の意味合となるため日記新規作成時を考慮してnullとする。
     val log =
         MutableStateFlow<LocalDateTime?>( // MEMO:初期化時日付有無が未定の為、null許容型とする。
             handle[SAVED_LOG_STATE_KEY] ?: initialLog

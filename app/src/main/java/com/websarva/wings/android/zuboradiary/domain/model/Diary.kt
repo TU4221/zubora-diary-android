@@ -7,24 +7,58 @@ import java.time.LocalDateTime
 
 @Parcelize // MEMO:"@Parcelize"でSavedStateHandle対応
 internal data class Diary(
-    val date: LocalDate,
-    val log: LocalDateTime,
-    val weather1: Weather,
-    val weather2: Weather,
-    val condition: Condition,
-    val title: String,
-    val item1Title: String,
-    val item1Comment: String,
-    val item2Title: String?,
-    val item2Comment: String?,
-    val item3Title: String?,
-    val item3Comment: String?,
-    val item4Title: String?,
-    val item4Comment: String?,
-    val item5Title: String?,
-    val item5Comment: String?,
-    val imageUriString: String?
+    val date: LocalDate = LocalDate.now(),
+    val log: LocalDateTime = LocalDateTime.now(),
+    val weather1: Weather = Weather.UNKNOWN,
+    val weather2: Weather = Weather.UNKNOWN,
+    val condition: Condition = Condition.UNKNOWN,
+    val title: String = "",
+    val item1Title: String = "",
+    val item1Comment: String = "",
+    val item2Title: String? = null,
+    val item2Comment: String? = null,
+    val item3Title: String? = null,
+    val item3Comment: String? = null,
+    val item4Title: String? = null,
+    val item4Comment: String? = null,
+    val item5Title: String? = null,
+    val item5Comment: String? = null,
+    val imageUriString: String? = null
 ) : Parcelable {
+
+    init {
+        val items = listOf(
+            item1Title to item1Comment,
+            item2Title to item2Comment,
+            item3Title to item3Comment,
+            item4Title to item4Comment,
+            item5Title to item5Comment
+        )
+        for (i in 1 until items.size) {
+            val currentItemNumber = i + 1
+            val currentTitle = items[i].first
+            val currentComment = items[i].second
+            val previousItemNumber = currentItemNumber - 1
+            val previousTitle = items[i - 1].first
+
+            if (currentTitle == null && currentComment == null) continue
+            if (currentTitle == null) {
+                throw IllegalArgumentException(
+                    "item$currentItemNumber}Titleがnullの為、item${currentItemNumber}Commentもnullであるべきです。"
+                )
+            }
+            if (currentComment == null) {
+                throw IllegalArgumentException(
+                    "item${currentItemNumber}Commentがnullの為、item${currentItemNumber}Titleもnullであるべきです。"
+                )
+            }
+            if (previousTitle == null) {
+                throw IllegalArgumentException(
+                    "item${previousItemNumber}がnullの為、item${currentItemNumber}もnullであるべきです。"
+                )
+            }
+        }
+    }
 
     /**
      * Diaryオブジェクトの内容を比較します。
