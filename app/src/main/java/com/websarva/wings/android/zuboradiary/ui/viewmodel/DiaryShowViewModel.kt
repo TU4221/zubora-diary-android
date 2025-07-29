@@ -274,13 +274,13 @@ internal class DiaryShowViewModel @Inject constructor(
     }
 
     // FragmentAction関係
-    private suspend fun navigatePreviousFragment(loadedDiaryDate: LocalDate? = null) {
+    private suspend fun navigatePreviousFragment(diaryDate: LocalDate? = null) {
         updateUiState(DiaryShowState.Idle)
         val result =
-            if (loadedDiaryDate == null) {
+            if (diaryDate == null) {
                 FragmentResult.None
             } else {
-                FragmentResult.Some(loadedDiaryDate)
+                FragmentResult.Some(diaryDate)
             }
         emitNavigatePreviousFragmentEvent(result)
     }

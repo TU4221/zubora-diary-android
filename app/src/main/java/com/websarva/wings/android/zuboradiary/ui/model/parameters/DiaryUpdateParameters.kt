@@ -7,5 +7,6 @@ import java.io.Serializable
 internal data class DiaryUpdateParameters(
     val diary: Diary,
     val diaryItemTitleSelectionHistoryItemList: List<DiaryItemTitleSelectionHistoryItem>,
-    val loadedDiary: Diary?
+    val originalDiary: Diary,
+    val isNewDiary: Boolean
 ) : Serializable

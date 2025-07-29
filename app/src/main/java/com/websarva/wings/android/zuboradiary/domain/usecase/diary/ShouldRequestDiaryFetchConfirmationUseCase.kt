@@ -15,7 +15,8 @@ internal class ShouldRequestDiaryFetchConfirmationUseCase(
     suspend operator fun invoke(
         inputDate: LocalDate,
         previousDate: LocalDate?,
-        loadedDate: LocalDate?
+        originalDate: LocalDate,
+        isNewDiary: Boolean
     ): DefaultUseCaseResult<Boolean> {
         val logMsg = "日記取得確認必要確認_"
         Log.i(logTag, "${logMsg}開始")
@@ -24,7 +25,7 @@ internal class ShouldRequestDiaryFetchConfirmationUseCase(
             Log.i(logTag, "${logMsg}完了")
             return UseCaseResult.Success(false)
         }
-        if (inputDate == loadedDate) {
+        if (!isNewDiary && inputDate == originalDate) {
             Log.i(logTag, "${logMsg}完了")
             return UseCaseResult.Success(false)
         }

@@ -18,7 +18,7 @@ class DiaryDeleteDialogFragment : BaseAlertDialogFragment() {
 
     override fun createMessage(): String {
         val diaryDate =
-            DiaryDeleteDialogFragmentArgs.fromBundle(requireArguments()).parameters.loadedDate
+            DiaryDeleteDialogFragmentArgs.fromBundle(requireArguments()).parameters.date
         val diaryDateString = diaryDate.toJapaneseDateString(requireContext())
         return diaryDateString + getString(R.string.dialog_diary_delete_message)
     }

@@ -23,7 +23,6 @@ import com.websarva.wings.android.zuboradiary.domain.model.Condition
 import com.websarva.wings.android.zuboradiary.domain.model.ItemNumber
 import com.websarva.wings.android.zuboradiary.domain.model.Weather
 import com.websarva.wings.android.zuboradiary.databinding.FragmentDiaryEditBinding
-import com.websarva.wings.android.zuboradiary.domain.model.Diary
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import com.websarva.wings.android.zuboradiary.ui.model.AppMessage
 import com.websarva.wings.android.zuboradiary.ui.view.imageview.DiaryImageConfigurator
@@ -368,21 +367,26 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditEvent>
             }
 
         launchAndRepeatOnViewLifeCycleStarted {
-            mainViewModel.loadedDiary
-                .collectLatest { value: Diary? ->
+            mainViewModel.isNewDiary
+                .collectLatest { value: Boolean ->
                     // MEMO:日記新規作成時はnullとなり、新規作成状態と判断する。
-                    val isDeleteEnabled = value != null
+                    val isDeleteEnabled = !value
 
                     val menu = binding.materialToolbarTopAppBar.menu
                     val deleteMenuItem = menu.findItem(R.id.diaryEditToolbarOptionDeleteDiary)
                     deleteMenuItem.setEnabled(isDeleteEnabled)
 
-                    val dateString = value?.date?.toJapaneseDateString(requireContext())
-                    mainViewModel.onLoadedDiaryChangedUpdateEditingDiaryDateString(dateString)
-
                     // TODO:テスト用の為、最終的に削除
                     val testMenuItem = menu.findItem(R.id.diaryEditToolbarOptionTest)
                     testMenuItem.setEnabled(!isDeleteEnabled)
+                }
+        }
+
+        launchAndRepeatOnViewLifeCycleStarted {
+            mainViewModel.editingDiaryDate
+                .collectLatest { value: LocalDate? ->
+                    val dateString = value?.toJapaneseDateString(requireContext())
+                    mainViewModel.onOriginalDiaryDateChangedUpdateEditingDiaryDateString(dateString)
                 }
         }
     }

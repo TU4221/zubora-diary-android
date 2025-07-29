@@ -24,17 +24,18 @@ internal class SaveDiaryUseCase(
     suspend operator fun invoke(
         diary: Diary,
         diaryItemTitleSelectionHistoryItemList: List<DiaryItemTitleSelectionHistoryItem>,
-        loadedDiary: Diary?
+        originalDiary: Diary,
+        isNewDiary: Boolean
     ): DefaultUseCaseResult<Unit> {
         val logMsg = "日記保存_"
         Log.i(logTag, "${logMsg}開始")
 
         try {
-            val loadedDate = loadedDiary?.date
             saveDiary(
                 diary,
                 diaryItemTitleSelectionHistoryItemList,
-                loadedDate
+                originalDiary.date,
+                isNewDiary
             )
         } catch (e: SaveDiaryFailedException) {
             Log.e(logTag, "${logMsg}失敗", e)
@@ -42,7 +43,7 @@ internal class SaveDiaryUseCase(
         }
 
         try {
-            releaseLoadedImageUriPermission(loadedDiary?.imageUriString)
+            releaseImageUriPermission(originalDiary.imageUriString)
         } catch (e: DomainException) {
             // MEMO:Uri権限の取り消しに失敗しても日記保存がメインの為、成功とみなす。
             Log.e(logTag, "${logMsg}Uri権限取消失敗", e)
@@ -63,17 +64,18 @@ internal class SaveDiaryUseCase(
     private suspend fun saveDiary(
         diary: Diary,
         diaryItemTitleSelectionHistoryItemList: List<DiaryItemTitleSelectionHistoryItem>,
-        loadedDate: LocalDate?
+        originalDate: LocalDate,
+        isNewDiary: Boolean
     ) {
         val logMsg = "日記データ保存_"
         Log.i(logTag, "${logMsg}開始")
 
         val saveDate = diary.date
         try {
-            if (shouldDeleteLoadedDateDiary(saveDate, loadedDate)) {
+            if (shouldDeleteOriginalDateDiary(saveDate, originalDate, isNewDiary)) {
                 diaryRepository
                     .deleteAndSaveDiary(
-                        requireNotNull(loadedDate),
+                        originalDate,
                         diary,
                         diaryItemTitleSelectionHistoryItemList
                     )
@@ -88,17 +90,18 @@ internal class SaveDiaryUseCase(
         Log.i(logTag, "${logMsg}完了")
     }
 
-    private fun shouldDeleteLoadedDateDiary(
+    private fun shouldDeleteOriginalDateDiary(
         inputDate: LocalDate,
-        loadedDate: LocalDate?
+        originalDate: LocalDate,
+        isNewDiary: Boolean
     ): Boolean {
-        loadedDate ?: return false
+        if (isNewDiary) return false
 
-        return inputDate != loadedDate
+        return inputDate != originalDate
     }
 
     @Throws(DomainException::class)
-    private suspend fun releaseLoadedImageUriPermission(
+    private suspend fun releaseImageUriPermission(
         uriString: String?
     ) {
         val logMsg = "画像URIの永続的権限解放_"

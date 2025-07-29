@@ -248,8 +248,8 @@ internal class DiaryListViewModel @Inject constructor(
         when (result) {
             is DialogResult.Positive<DiaryDeleteParameters> -> {
                 onDiaryDeleteDialogPositiveResultReceived(
-                    result.data.loadedDate,
-                    result.data.loadedImageUri
+                    result.data.date,
+                    result.data.imageUri
                 )
             }
             DialogResult.Negative,

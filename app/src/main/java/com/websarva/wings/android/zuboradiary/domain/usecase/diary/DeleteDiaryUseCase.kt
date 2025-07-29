@@ -19,21 +19,21 @@ internal class DeleteDiaryUseCase(
 
     // MEMO:日記表示、編集フラグメント以外からも削除できるように下記引数とする。
     suspend operator fun invoke(
-        loadedDate: LocalDate,
-        loadedImageUriString: String?
+        date: LocalDate,
+        imageUriString: String?
     ): DefaultUseCaseResult<Unit> {
         val logMsg = "日記削除_"
         Log.i(logTag, "${logMsg}開始")
 
         try {
-            deleteDiary(loadedDate)
+            deleteDiary(date)
         } catch (e: DeleteDiaryFailedException) {
             Log.e(logTag, "${logMsg}失敗", e)
             return UseCaseResult.Failure(e)
         }
 
         try {
-            releaseImageUriPermission(loadedImageUriString)
+            releaseImageUriPermission(imageUriString)
         } catch (e: DomainException) {
             Log.e(logTag, "${logMsg}失敗", e)
             // MEMO:Uri権限の取り消しに失敗しても日記保存がメインの為、成功とみなす。

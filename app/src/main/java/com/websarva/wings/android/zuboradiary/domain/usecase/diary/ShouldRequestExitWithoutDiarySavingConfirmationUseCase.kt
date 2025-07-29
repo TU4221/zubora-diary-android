@@ -11,17 +11,12 @@ internal class ShouldRequestExitWithoutDiarySavingConfirmationUseCase {
 
     operator fun invoke(
         editedDiary: Diary,
-        originalDiary: Diary?
+        originalDiary: Diary
     ): UseCaseResult.Success<Boolean> {
         val logMsg = "日記未保存終了確認_"
         Log.i(logTag, "${logMsg}開始")
 
-        val boolean =
-            if (originalDiary == null) {
-                false
-            } else {
-                !editedDiary.isContentEqualToIgnoringLog(originalDiary)
-            }
+        val boolean = !editedDiary.isContentEqualToIgnoringLog(originalDiary)
         Log.i(logTag, "${logMsg}完了")
         return UseCaseResult.Success(boolean)
     }

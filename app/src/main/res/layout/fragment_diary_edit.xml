@@ -32,7 +32,7 @@
                     android:id="@+id/material_toolbar_top_app_bar"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    app:title="@{viewModel.loadedDiary == null ? @string/fragment_diary_edit_toolbar_title_create_new : @string/fragment_diary_edit_toolbar_title_edit}"
+                    app:title="@{viewModel.isNewDiary ? @string/fragment_diary_edit_toolbar_title_create_new : @string/fragment_diary_edit_toolbar_title_edit}"
                     app:onNavigationIconClick="@{() -> viewModel.onNavigationClicked()}"
                     app:menu="@menu/diary_edit_toolbar_menu"
                     tools:title="@string/fragment_diary_edit_toolbar_title_value_tools" />
@@ -74,7 +74,7 @@
                             android:text="@{String.format(@string/fragment_diary_edit_editing_diary, viewModel.editingDiaryDateString)}"
                             android:textAppearance="@style/AppTextViewTextAppearance"
                             android:textSize="@dimen/fragment_diary_edit_small_text_size"
-                            android:visibility="@{viewModel.loadedDiary == null ? View.INVISIBLE : View.VISIBLE}"
+                            android:visibility="@{viewModel.editingDiaryDateString == null ? View.INVISIBLE : View.VISIBLE}"
                             tools:text="編集日記：2025年6月19日(木)"/>
 
                         <!-- 注意

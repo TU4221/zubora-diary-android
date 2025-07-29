@@ -14,12 +14,15 @@ internal class ShouldRequestDiaryUpdateConfirmationUseCase(
 
     suspend operator fun invoke(
         inputDate: LocalDate,
-        loadedDate: LocalDate?
+        originalDate: LocalDate,
+        isNewDiary: Boolean
     ): DefaultUseCaseResult<Boolean> {
         val logMsg = "日記更新確認必要確認_"
         Log.i(logTag, "${logMsg}開始")
 
-        if (inputDate == loadedDate) {
+
+
+        if (!isNewDiary && inputDate == originalDate) {
             Log.i(logTag, "${logMsg}完了")
             return UseCaseResult.Success(false)
         }
