@@ -15,7 +15,6 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.NavController
-import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.NavigationUI.onNavDestinationSelected
 import androidx.navigation.ui.NavigationUI.setupWithNavController
@@ -246,7 +245,14 @@ class MainActivity : LoggingActivity() {
         // Navigation設定
         // 参考:https://inside.luchegroup.com/entry/2023/05/08/113236
         val bottomNavigationView = binding.bottomNavigation
-        val navController = findNavController(R.id.fragment_nav_host)
+        val navHostFragment =
+            checkNotNull(
+                supportFragmentManager.findFragmentById(R.id.fragment_nav_host)
+            ) as NavHostFragment
+        // MEMO:Activity#findNavController()でNavControllerを取得する場合、
+        //      アプリ設定(権限等)変更時でのアプリ再起動時にNavControllerの取得に失敗する為、
+        //      NavHostFragmentから取得する。
+        val navController = navHostFragment.navController
         setupWithNavController(bottomNavigationView, navController)
 
         bottomNavigationView.apply {
