@@ -148,7 +148,7 @@ internal class DiaryEditViewModel @Inject constructor(
     private val _editingDiaryDateString = MutableStateFlow<String?>(initialDiaryDateString)
     val editingDiaryDateString = _editingDiaryDateString.asStateFlow()
 
-    private val diaryStateFlow = DiaryStateFlow(viewModelScope, handle)
+    private val diaryStateFlow = DiaryEditStateFlow(viewModelScope, handle)
 
     val date
         get() = diaryStateFlow.date.asStateFlow()

@@ -1,53 +1,36 @@
 package com.websarva.wings.android.zuboradiary.ui.viewmodel
 
 import android.net.Uri
-import androidx.lifecycle.SavedStateHandle
 import com.websarva.wings.android.zuboradiary.domain.model.ItemNumber
 import com.websarva.wings.android.zuboradiary.domain.model.Diary
-import com.websarva.wings.android.zuboradiary.domain.model.DiaryItemTitleSelectionHistoryItem
-import com.websarva.wings.android.zuboradiary.ui.utils.requireValue
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
 import java.time.LocalDate
 import java.time.LocalDateTime
 
 // TODO:DiaryEditViewModelのロジックを含めるか、分離するか検討
-internal class DiaryStateFlow(scope: CoroutineScope, handle: SavedStateHandle) {
+internal open class DiaryStateFlow {
 
     companion object {
         const val MAX_ITEMS: Int = ItemNumber.MAX_NUMBER
-
-        private const val SAVED_DATE_STATE_KEY = "date"
-        private const val SAVED_WEATHER_1_STATE_KEY = "weather1"
-        private const val SAVED_WEATHER_2_STATE_KEY = "weather2"
-        private const val SAVED_CONDITION_STATE_KEY = "condition"
-        private const val SAVED_TITLE_STATE_KEY = "title"
-        private const val SAVED_NUM_VISIBLE_ITEMS_STATE_KEY = "numVisibleItems"
-        private const val SAVED_IMAGE_URI_STATE_KEY = "imageUri"
-        private const val SAVED_LOG_STATE_KEY = "log"
     }
 
     private val initialDiary = Diary()
 
     // MEMO:双方向DataBindingが必要の為、MutableStateFlow変数はアクセス修飾子をpublicとする。
     //      StateFlow変数を用意しても意味がないので作成しない。
-    private val initialDate = null // MEMO:日付選択機能(前回選択日付機能)関係でinitialDiaryの日付はnullとする。
-    val date =
-        MutableStateFlow<LocalDate?>(
-            handle[SAVED_DATE_STATE_KEY] ?: initialDate // MEMO:初期化時日付が未定の為、null許容型とする。
-        )
+    protected val initialDate = null // MEMO:日付選択機能(前回選択日付機能)関係でinitialDiaryの日付はnullとする。
+    open val date =
+        MutableStateFlow<LocalDate?>(initialDate) // MEMO:初期化時日付が未定の為、null許容型とする。
 
-    private val initialWeather = initialDiary.weather1
-    val weather1 = MutableStateFlow(handle[SAVED_WEATHER_1_STATE_KEY] ?: initialWeather)
-    val weather2 = MutableStateFlow(handle[SAVED_WEATHER_2_STATE_KEY] ?: initialWeather)
+    protected val initialWeather = initialDiary.weather1
+    open val weather1 = MutableStateFlow(initialWeather)
+    open val weather2 = MutableStateFlow(initialWeather)
 
-    private val initialCondition = initialDiary.condition
-    val condition = MutableStateFlow(handle[SAVED_CONDITION_STATE_KEY] ?: initialCondition)
+    protected val initialCondition = initialDiary.condition
+    open val condition = MutableStateFlow(initialCondition)
 
-    private val initialTitle = initialDiary.title
-    val title = MutableStateFlow(handle[SAVED_TITLE_STATE_KEY] ?: initialTitle)
+    protected val initialTitle = initialDiary.title
+    open val title = MutableStateFlow(initialTitle)
 
     private val initialNumVisibleItems = run {
         var count = 1
@@ -57,49 +40,17 @@ internal class DiaryStateFlow(scope: CoroutineScope, handle: SavedStateHandle) {
         if (initialDiary.item5Title != null) count++
         count
     }
-    val numVisibleItems =
-        MutableStateFlow(handle[SAVED_NUM_VISIBLE_ITEMS_STATE_KEY] ?: initialNumVisibleItems)
+    open val numVisibleItems = MutableStateFlow(initialNumVisibleItems)
 
-    private val items = Array(MAX_ITEMS) { i -> DiaryItemStateFlow(scope, handle, i + 1)}
+    protected open val items: Array<out DiaryItemStateFlow> =
+        Array(MAX_ITEMS) { i -> DiaryItemStateFlow(i + 1)}
 
-    private val initialImageUri = initialDiary.imageUriString?.let { Uri.parse(it) }
-    val imageUri =
-        MutableStateFlow(
-            handle[SAVED_IMAGE_URI_STATE_KEY] ?: initialImageUri
-        )
+    protected val initialImageUri = initialDiary.imageUriString?.let { Uri.parse(it) }
+    open val imageUri = MutableStateFlow(initialImageUri)
 
-    private val initialLog = null // MEMO:Logは保存記録の意味合となるため日記新規作成時を考慮してnullとする。
-    val log =
-        MutableStateFlow<LocalDateTime?>( // MEMO:初期化時日付有無が未定の為、null許容型とする。
-            handle[SAVED_LOG_STATE_KEY] ?: initialLog
-        )
-
-    init {
-        date.onEach {
-            handle[SAVED_DATE_STATE_KEY] = it
-        }.launchIn(scope)
-        weather1.onEach {
-            handle[SAVED_WEATHER_1_STATE_KEY] = it
-        }.launchIn(scope)
-        weather2.onEach {
-            handle[SAVED_WEATHER_2_STATE_KEY] = it
-        }.launchIn(scope)
-        condition.onEach {
-            handle[SAVED_CONDITION_STATE_KEY] = it
-        }.launchIn(scope)
-        title.onEach {
-            handle[SAVED_TITLE_STATE_KEY] = it
-        }.launchIn(scope)
-        numVisibleItems.onEach {
-            handle[SAVED_NUM_VISIBLE_ITEMS_STATE_KEY] = it
-        }.launchIn(scope)
-        imageUri.onEach {
-            handle[SAVED_IMAGE_URI_STATE_KEY] = it
-        }.launchIn(scope)
-        log.onEach {
-            handle[SAVED_LOG_STATE_KEY] = it
-        }.launchIn(scope)
-    }
+    protected val initialLog = null // MEMO:Logは保存記録の意味合となるため日記新規作成時を考慮してnullとする。
+    open val log =
+        MutableStateFlow<LocalDateTime?>(initialLog) // MEMO:初期化時日付有無が未定の為、null許容型とする。
 
     fun initialize() {
         date.value = initialDate
@@ -157,130 +108,32 @@ internal class DiaryStateFlow(scope: CoroutineScope, handle: SavedStateHandle) {
         log.value = diary.log
     }
 
-    fun createDiary(): Diary {
-        return Diary(
-            date.value ?:throw IllegalStateException("日付なし(null)"),
-            LocalDateTime.now(),
-            weather1.value,
-            weather2.value,
-            condition.value,
-            title.value.trim(),
-            items[0].title.value?.trim()
-                ?: throw IllegalStateException("項目1タイトルなし(null)"),
-            items[0].comment.value?.trim()
-                ?: throw IllegalStateException("項目1コメントなし(null)"),
-            items[1].title.value?.trim(),
-            items[1].comment.value?.trim(),
-            items[2].title.value?.trim(),
-            items[2].comment.value?.trim(),
-            items[3].title.value?.trim(),
-            items[3].comment.value?.trim(),
-            items[4].title.value?.trim(),
-            items[4].comment.value?.trim(),
-            imageUri.value?.toString()
-            )
-    }
-
-    fun createDiaryItemTitleSelectionHistoryList(): List<DiaryItemTitleSelectionHistoryItem> {
-        val list: MutableList<DiaryItemTitleSelectionHistoryItem> = ArrayList()
-        for (i in 0 until MAX_ITEMS) {
-            val itemTitle = items[i].title.value ?: continue
-            val itemTitleUpdateLog = items[i].titleUpdateLog.value ?: continue
-            if (itemTitle.matches("\\S+.*".toRegex())) {
-                val item =
-                    DiaryItemTitleSelectionHistoryItem(
-                        itemTitle,
-                        itemTitleUpdateLog
-                    )
-                list.add(item)
-            }
-        }
-        return list
-    }
-
-    fun incrementVisibleItemsCount() {
-        val numVisibleItems = numVisibleItems.requireValue()
-        val incrementedNumVisibleItems = numVisibleItems + 1
-        this.numVisibleItems.value = incrementedNumVisibleItems
-        items[incrementedNumVisibleItems - 1].update("", "")
-    }
-
-    fun deleteItem(itemNumber: ItemNumber) {
-        getItemStateFlow(itemNumber).initialize()
-        val numVisibleItems = numVisibleItems.value
-
-        if (itemNumber.value < numVisibleItems) {
-            for (i in itemNumber.value until numVisibleItems) {
-                val targetItemNumber = ItemNumber(i)
-                val nextItemNumber = targetItemNumber.inc()
-                getItemStateFlow(targetItemNumber).update(
-                    getItemStateFlow(nextItemNumber).title.value,
-                    getItemStateFlow(nextItemNumber).comment.value,
-                    getItemStateFlow(nextItemNumber).titleUpdateLog.value
-                )
-                getItemStateFlow(nextItemNumber).initialize()
-            }
-        }
-
-        if (numVisibleItems > ItemNumber.MIN_NUMBER) {
-            val decrementedNumVisibleItems = numVisibleItems - 1
-            this.numVisibleItems.value = decrementedNumVisibleItems
-        }
-    }
-
-    fun updateItemTitle(itemNumber: ItemNumber, title: String) {
-        getItemStateFlow(itemNumber).updateItemTitle(title)
-    }
-
     fun getItemStateFlow(itemNumber: ItemNumber): DiaryItemStateFlow {
         val arrayNumber = itemNumber.value - 1
         return items[arrayNumber]
     }
 
-    class DiaryItemStateFlow(
-        scope: CoroutineScope,
-        handle: SavedStateHandle,
-        val itemNumber: Int
-    ) {
+    open class DiaryItemStateFlow(val itemNumber: Int) {
 
         companion object {
             private const val MIN_ITEM_NUMBER = ItemNumber.MIN_NUMBER
             private const val MAX_ITEM_NUMBER = ItemNumber.MAX_NUMBER
-
-            private const val SAVED_ITEM_TITLE_STATE_KEY = "itemTitle"
-            private const val SAVED_ITEM_COMMENT_STATE_KEY = "itemComment"
-            private const val SAVED_ITEM_UPDATE_LOG_STATE_KEY = "itemUpdateLog"
         }
 
         // MEMO:双方向DataBindingが必要の為、MutableStateFlow変数はアクセス修飾子をpublicとする。
         //      StateFlow変数を用意しても意味がないので作成しない。
-        private val initialTitle = if (itemNumber == 1) "" else null
-        val title =
-            MutableStateFlow(handle[SAVED_ITEM_TITLE_STATE_KEY+ itemNumber] ?: initialTitle)
+        protected val initialTitle = if (itemNumber == 1) "" else null
+        open val title = MutableStateFlow(initialTitle)
 
-        private val initialComment = if (itemNumber == 1) "" else null
-        val comment =
-            MutableStateFlow(handle[SAVED_ITEM_COMMENT_STATE_KEY+ itemNumber] ?: initialComment)
+        protected val initialComment = if (itemNumber == 1) "" else null
+        open val comment = MutableStateFlow(initialComment)
 
         // MEMO:初期化時日付有無が未定、タイトル未更新のケースがある為、null許容型とする。
-        private val initialUpdateLog = null
-        val titleUpdateLog =
-            MutableStateFlow<LocalDateTime?>(
-                handle[SAVED_ITEM_UPDATE_LOG_STATE_KEY+ itemNumber] ?: initialUpdateLog
-            )
+        protected val initialUpdateLog = null
+        open val titleUpdateLog = MutableStateFlow<LocalDateTime?>(initialUpdateLog)
 
         init {
             require(isItemNumberInRange(itemNumber))
-
-            title.onEach {
-                handle[SAVED_ITEM_TITLE_STATE_KEY+ itemNumber] = it
-            }.launchIn(scope)
-            comment.onEach {
-                handle[SAVED_ITEM_COMMENT_STATE_KEY+ itemNumber] = it
-            }.launchIn(scope)
-            titleUpdateLog.onEach {
-                handle[SAVED_ITEM_UPDATE_LOG_STATE_KEY+ itemNumber] = it
-            }.launchIn(scope)
         }
 
         private fun isItemNumberInRange(itemNumber: Int): Boolean {
