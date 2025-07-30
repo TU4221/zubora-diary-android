@@ -36,7 +36,7 @@ internal interface DiaryDAO {
         offset: Int
     ): List<DiaryListItemData>
 
-    @Query("SELECT date, title, image_uri FROM diaries WHERE date < :startDate ORDER BY date DESC LIMIT :num OFFSET :offset")
+    @Query("SELECT date, title, image_uri FROM diaries WHERE date <= :startDate ORDER BY date DESC LIMIT :num OFFSET :offset")
     suspend fun selectDiaryListOrderByDateDesc(
         num: Int,
         offset: Int,
