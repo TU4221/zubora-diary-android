@@ -20,7 +20,6 @@ internal class IsWeatherInfoFetchEnabledUseCase(
         val logMsg = "天気情報取得設定確認_"
         Log.i(logTag, "${logMsg}開始")
 
-        // TODO:first()処理方法をプロジェクトで統一する。
         val value =
             withContext(Dispatchers.IO) {
                 fetchWeatherInfoFetchSettingUseCase().value
