@@ -42,6 +42,7 @@ class WordSearchFragment : BaseFragment<FragmentWordSearchBinding, WordSearchEve
     //      変更前のListの内容で初期スクロール位置が定まらない不具合が発生。
     //      対策としてListを全て変更するタイミングでAdapterを新規でセットする。
     //      (親子関係でRecyclerViewを使用、又はListAdapterの機能による弊害？)
+    // TODO:下記変数による処理を無効化しても上記不具合の確認ができない為、開発最後に必要か判断
     private var shouldInitializeListAdapter = false
 
     override fun createViewBinding(
@@ -141,7 +142,7 @@ class WordSearchFragment : BaseFragment<FragmentWordSearchBinding, WordSearchEve
         override fun onChanged(value: WordSearchResultYearMonthList) {
             if (shouldInitializeListAdapter) {
                 shouldInitializeListAdapter = false
-                setUpListAdapter()
+                //setUpListAdapter()
             }
 
             val listAdapter =

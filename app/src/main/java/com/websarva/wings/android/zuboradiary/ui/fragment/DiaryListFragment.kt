@@ -56,6 +56,7 @@ class DiaryListFragment :
     //      変更前のListの内容で初期スクロール位置が定まらない不具合が発生。
     //      対策としてListを全て変更するタイミングでAdapterを新規でセットする。
     //      (親子関係でRecyclerViewを使用、又はListAdapterの機能による弊害？)
+    // TODO:下記変数による処理を無効化しても上記不具合の確認ができない為、開発最後に必要か判断
     private var shouldInitializeListAdapter = false
 
     override fun createViewBinding(
@@ -89,6 +90,7 @@ class DiaryListFragment :
         ) { result ->
             Log.d("20250714", "DatePickerDialogResultReceive")
             // TODO:シールドクラス Action -> Event に変更してから下記コードの処理方法を検討する。
+            //      shouldInitializeListAdapterの必要性がないかもしれない。(変数宣言元のコメント参照)
             when (result) {
                 is DialogResult.Positive<YearMonth> -> {
                     shouldInitializeListAdapter = true
@@ -218,7 +220,7 @@ class DiaryListFragment :
 
             if (shouldInitializeListAdapter) {
                 shouldInitializeListAdapter = false
-                setUpListAdapter()
+                //setUpListAdapter()
             }
 
             val convertedItemList: List<DiaryYearMonthListBaseItem> = list.itemList
