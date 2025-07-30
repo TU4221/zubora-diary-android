@@ -583,6 +583,26 @@ internal class SettingsViewModel @Inject constructor(
         }
     }
 
+    fun onPermissionDialogResultReceived(result: DialogResult<Unit>) {
+        when (result) {
+            is DialogResult.Positive<Unit> -> {
+                onPermissionDialogPositiveResultReceived()
+            }
+            DialogResult.Negative,
+            DialogResult.Cancel -> {
+                return
+            }
+        }
+    }
+
+    private fun onPermissionDialogPositiveResultReceived() {
+        viewModelScope.launch {
+            emitUiEvent(
+                SettingsEvent.ShowApplicationDetailsSettings
+            )
+        }
+    }
+
     // Permission処理
     @RequiresApi(api = Build.VERSION_CODES.TIRAMISU)
     fun onPostNotificationsPermissionChecked(isGranted: Boolean) {

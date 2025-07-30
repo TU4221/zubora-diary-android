@@ -162,16 +162,7 @@ class SettingsFragment :
         setUpDialogResultReceiver(
             PermissionDialogFragment.KEY_RESULT
         ) { result: DialogResult<Unit> ->
-            // TODO:シールドクラス Action -> Event に変更してから下記コードの処理方法を検討する。
-            when (result) {
-                is DialogResult.Positive<Unit> -> {
-                    showApplicationDetailsSettings()
-                }
-                DialogResult.Negative,
-                DialogResult.Cancel -> {
-                    // 処理なし
-                }
-            }
+            mainViewModel.onPermissionDialogResultReceived(result)
         }
     }
 
@@ -260,6 +251,9 @@ class SettingsFragment :
             }
             is SettingsEvent.TurnOffWeatherInfoFetchSettingSwitch -> {
                 binding.includeWeatherInfoFetchSetting.materialSwitch.isChecked = false
+            }
+            is SettingsEvent.ShowApplicationDetailsSettings -> {
+                showApplicationDetailsSettings()
             }
             is SettingsEvent.CommonEvent -> {
                 when(event.wrappedEvent) {

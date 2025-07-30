@@ -26,6 +26,7 @@ sealed class SettingsEvent : UiEvent {
     internal data object TurnOffReminderNotificationSettingSwitch : SettingsEvent()
     internal data object TurnOffPasscodeLockSettingSwitch : SettingsEvent()
     internal data object TurnOffWeatherInfoFetchSettingSwitch : SettingsEvent()
+    internal data object ShowApplicationDetailsSettings : SettingsEvent()
 
     internal data class CommonEvent(val wrappedEvent: CommonUiEvent) : SettingsEvent()
 }
