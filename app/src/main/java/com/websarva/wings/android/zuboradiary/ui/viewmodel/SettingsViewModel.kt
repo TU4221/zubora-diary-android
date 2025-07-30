@@ -774,9 +774,15 @@ internal class SettingsViewModel @Inject constructor(
     }
 
     private suspend fun initializeAllSettings() {
-        executeSettingUpdate(
-            { initializeAllSettingsUseCase() }
-        )
+        when (val result = initializeAllSettingsUseCase()) {
+            is UseCaseResult.Success -> {
+                // 処理なし
+            }
+            is UseCaseResult.Failure -> {
+                Log.e(logTag, "全設定初期化_失敗", result.exception)
+                emitAppMessageEvent(SettingsAppMessage.AllSettingsInitializationFailure)
+            }
+        }
     }
 
     private suspend fun deleteAllData() {
@@ -794,6 +800,9 @@ internal class SettingsViewModel @Inject constructor(
                     }
                     is DeleteAllDataUseCaseException.ReleaseAllPersistableUriPermissionFailed -> {
                         // 処理なし
+                    }
+                    is DeleteAllDataUseCaseException.InitializeAllSettingsFailed -> {
+                        emitAppMessageEvent(SettingsAppMessage.AllSettingsInitializationFailure)
                     }
                 }
             }

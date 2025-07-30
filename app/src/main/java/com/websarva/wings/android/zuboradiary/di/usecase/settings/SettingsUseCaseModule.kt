@@ -31,9 +31,14 @@ internal object SettingsUseCaseModule {
     @Provides
     fun provideDeleteAllDataUseCase(
         diaryRepository: DiaryRepository,
-        releaseAllPersistableUriPermissionUseCase: ReleaseAllPersistableUriPermissionUseCase
+        releaseAllPersistableUriPermissionUseCase: ReleaseAllPersistableUriPermissionUseCase,
+        initializeAllSettingsUseCase: InitializeAllSettingsUseCase
     ): DeleteAllDataUseCase {
-        return DeleteAllDataUseCase(diaryRepository, releaseAllPersistableUriPermissionUseCase)
+        return DeleteAllDataUseCase(
+            diaryRepository,
+            releaseAllPersistableUriPermissionUseCase,
+            initializeAllSettingsUseCase
+        )
     }
 
     @Singleton

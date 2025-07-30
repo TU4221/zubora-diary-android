@@ -11,6 +11,7 @@ import com.websarva.wings.android.zuboradiary.utils.createLogTag
 internal class DeleteAllDataUseCase(
     private val diaryRepository: DiaryRepository,
     private val releaseAllPersistableUriPermissionUseCase: ReleaseAllPersistableUriPermissionUseCase,
+    private val initializeAllSettingsUseCase: InitializeAllSettingsUseCase
 ) {
 
     private val logTag = createLogTag()
@@ -22,6 +23,7 @@ internal class DeleteAllDataUseCase(
         try {
             deleteAllData()
             releaseAllImageUriPermission()
+            initializeAllSettings()
         } catch (e: DeleteAllDataUseCaseException) {
             Log.e(logTag, "${logMsg}失敗", e)
             return UseCaseResult.Failure(e)
@@ -57,6 +59,24 @@ internal class DeleteAllDataUseCase(
             is UseCaseResult.Failure -> {
                 throw DeleteAllDataUseCaseException
                     .ReleaseAllPersistableUriPermissionFailed(result.exception)
+            }
+        }
+
+        Log.i(logTag, "${logMsg}完了")
+    }
+
+    @Throws(DeleteAllDataUseCaseException.InitializeAllSettingsFailed::class)
+    private suspend fun initializeAllSettings() {
+        val logMsg = "全設定初期化_"
+        Log.i(logTag, "${logMsg}開始")
+
+        when (val result = initializeAllSettingsUseCase()) {
+            is UseCaseResult.Success -> {
+                // 処理なし
+            }
+            is UseCaseResult.Failure -> {
+                throw DeleteAllDataUseCaseException
+                    .InitializeAllSettingsFailed(result.exception)
             }
         }
 

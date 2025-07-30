@@ -299,6 +299,7 @@
     <string name="dialog_settings_app_message_settings_not_loaded_retry_restart">設定の読み込みに失敗しています。アプリを再起動してください。</string>
     <string name="dialog_settings_app_message_setting_update_failure">設定の更新に失敗しました。</string>
     <string name="dialog_settings_app_message_all_diary_delete_failure">全ての日記の削除に失敗しました。</string>
+    <string name="dialog_settings_app_message_all_settings_initialization_failure">全設定の初期化に失敗しました。</string>
     <string name="dialog_settings_app_message_all_data_delete_failure">全てのデータの削除に失敗しました。</string>
     <!-- DiaryShowAppMessage -->
     <string name="dialog_diary_show_app_message_diary_loading_failure">@string/dialog_app_message_diary_loading_failure</string>

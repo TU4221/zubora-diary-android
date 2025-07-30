@@ -18,4 +18,11 @@ internal sealed class DeleteAllDataUseCaseException(
         "全ての永続的URI権限の解放に失敗しました。",
         cause
     )
+
+    class InitializeAllSettingsFailed(
+        cause: Throwable
+    ) : DeleteAllDataUseCaseException(
+        "全ての設定の初期化に失敗しました。",
+        cause
+    )
 }

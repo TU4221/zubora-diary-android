@@ -111,6 +111,13 @@ internal sealed class SettingsAppMessage(
         private fun readResolve(): Any = AllDiaryDeleteFailure
     }
 
+    data object AllSettingsInitializationFailure :  SettingsAppMessage(
+        R.string.dialog_app_message_title_access_error,
+        R.string.dialog_settings_app_message_all_settings_initialization_failure
+    ) {
+        private fun readResolve(): Any = SettingUpdateFailure
+    }
+
     data object AllDataDeleteFailure :  SettingsAppMessage(
         R.string.dialog_app_message_title_access_error,
         R.string.dialog_settings_app_message_all_data_delete_failure
