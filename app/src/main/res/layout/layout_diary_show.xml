@@ -8,7 +8,7 @@
         <import type="com.websarva.wings.android.zuboradiary.domain.model.Weather" />
         <variable
             name="viewModel"
-            type="com.websarva.wings.android.zuboradiary.ui.viewmodel.DiaryShowViewModel" />
+            type="com.websarva.wings.android.zuboradiary.ui.viewmodel.common.BaseDiaryShowViewModel" />
     </data>
 
     <!-- MEMO:本レイアウトをincludeタグで参照する場合はincludeタグ使用先でスクロール機能を持たせること。 -->

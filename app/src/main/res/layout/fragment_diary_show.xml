@@ -12,6 +12,10 @@
         <variable
             name="viewModel"
             type="com.websarva.wings.android.zuboradiary.ui.viewmodel.DiaryShowViewModel" />
+        <!-- MEMO:レイアウトファイルではアップキャストが不可能な為、下記変数で対応 -->
+        <variable
+            name="baseDiaryShowViewModel"
+            type="com.websarva.wings.android.zuboradiary.ui.viewmodel.common.BaseDiaryShowViewModel" />
     </data>
 
     <FrameLayout
@@ -59,7 +63,7 @@
                     <include
                         layout="@layout/layout_diary_show"
                         android:id="@+id/include_diary_show"
-                        app:viewModel="@{viewModel}" />
+                        app:viewModel="@{baseDiaryShowViewModel}" />
 
                 </FrameLayout>
 

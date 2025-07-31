@@ -10,11 +10,12 @@
                   上手くビルド(クラス生成)がされない不具合が発生する。
                   https://qiita.com/nanoyatsu/items/afad39a63d42d6fa3ac8 -->
         <variable
-            name="calendarViewModel"
+            name="viewModel"
             type="com.websarva.wings.android.zuboradiary.ui.viewmodel.CalendarViewModel" />
+        <!-- MEMO:レイアウトファイルではアップキャストが不可能な為、下記変数で対応 -->
         <variable
-            name="diaryShowViewModel"
-            type="com.websarva.wings.android.zuboradiary.ui.viewmodel.DiaryShowViewModel" />
+            name="baseDiaryShowViewModel"
+            type="com.websarva.wings.android.zuboradiary.ui.viewmodel.common.BaseDiaryShowViewModel" />
     </data>
 
     <FrameLayout
@@ -83,12 +84,12 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:orientation="vertical"
-                            android:visibility="@{calendarViewModel.uiState instanceof CalendarState.LoadDiarySuccess ? View.VISIBLE : View.GONE}" >
+                            android:visibility="@{viewModel.uiState instanceof CalendarState.LoadDiarySuccess ? View.VISIBLE : View.GONE}" >
 
                             <include
                                 layout="@layout/layout_diary_show"
                                 android:id="@+id/include_diary_show"
-                                app:viewModel="@{diaryShowViewModel}" />
+                                app:viewModel="@{baseDiaryShowViewModel}" />
 
                         </FrameLayout>
 
@@ -98,10 +99,10 @@
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
                             android:textAppearance="@style/AppTextViewTextAppearance"
-                            android:text="@{calendarViewModel.uiState instanceof CalendarState.LoadError ? @string/fragment_calendar_diary_Loading_failure_message : @string/fragment_calendar_no_diary_message}"
+                            android:text="@{viewModel.uiState instanceof CalendarState.LoadError ? @string/fragment_calendar_diary_Loading_failure_message : @string/fragment_calendar_no_diary_message}"
                             android:gravity="center_horizontal|top"
                             android:paddingTop="16dp"
-                            android:visibility="@{calendarViewModel.uiState instanceof CalendarState.NoDiary || calendarViewModel.uiState instanceof CalendarState.LoadError ? View.VISIBLE : View.GONE}" />
+                            android:visibility="@{viewModel.uiState instanceof CalendarState.NoDiary || viewModel.uiState instanceof CalendarState.LoadError ? View.VISIBLE : View.GONE}" />
 
                     </FrameLayout>
 

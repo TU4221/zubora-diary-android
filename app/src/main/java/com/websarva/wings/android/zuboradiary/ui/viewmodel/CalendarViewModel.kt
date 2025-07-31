@@ -1,16 +1,17 @@
 package com.websarva.wings.android.zuboradiary.ui.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.viewModelScope
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.DoesDiaryExistUseCase
+import com.websarva.wings.android.zuboradiary.domain.usecase.diary.FetchDiaryUseCase
 import com.websarva.wings.android.zuboradiary.ui.model.CalendarAppMessage
-import com.websarva.wings.android.zuboradiary.ui.model.DiaryShowAppMessage
 import com.websarva.wings.android.zuboradiary.ui.model.event.CalendarEvent
 import com.websarva.wings.android.zuboradiary.ui.model.event.CommonUiEvent
-import com.websarva.wings.android.zuboradiary.ui.model.event.DiaryShowEvent
 import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
 import com.websarva.wings.android.zuboradiary.ui.model.state.CalendarState
-import com.websarva.wings.android.zuboradiary.ui.model.state.DiaryShowState
+import com.websarva.wings.android.zuboradiary.ui.viewmodel.common.BaseDiaryShowViewModel
+import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -20,13 +21,15 @@ import kotlinx.coroutines.launch
 import java.time.LocalDate
 import javax.inject.Inject
 
-// TODO:DiaryShowViewModelをCalendarViewModelに含めるか検討する
 @HiltViewModel
 internal class CalendarViewModel @Inject constructor(
-    private val doesDiaryExistUseCase: DoesDiaryExistUseCase
-) : BaseViewModel<CalendarEvent, CalendarAppMessage, CalendarState>(
+    private val doesDiaryExistUseCase: DoesDiaryExistUseCase,
+    private val fetchDiaryUseCase: FetchDiaryUseCase
+) : BaseDiaryShowViewModel<CalendarEvent, CalendarAppMessage, CalendarState>(
     CalendarState.Idle
 ) {
+
+    val logTag = createLogTag()
 
     override val isProcessingState: StateFlow<Boolean> =
         uiState
@@ -150,51 +153,6 @@ internal class CalendarViewModel @Inject constructor(
         }
     }
 
-    fun onChangedDiaryShowUiState(state: DiaryShowState) {
-        when (state) {
-            DiaryShowState.Loading -> updateUiState(CalendarState.LoadingDiary)
-            DiaryShowState.LoadSuccess -> updateUiState(CalendarState.LoadDiarySuccess)
-            DiaryShowState.LoadError -> updateUiState(CalendarState.LoadError)
-
-            DiaryShowState.Idle,
-            DiaryShowState.Deleting -> {
-                // MEMO:CalendarFragmentでは不要のStateの為、処理不要
-            }
-        }
-    }
-
-    fun onChangedDiaryShowUiEvent(event: DiaryShowEvent) {
-        when (event) {
-            is DiaryShowEvent.CommonEvent -> {
-                when (val wrappedEvent = event.wrappedEvent) {
-                    is CommonUiEvent.NavigateAppMessage -> {
-                        val message = wrappedEvent.message
-                        if (message !is DiaryShowAppMessage) return
-
-                        when (message) {
-                            DiaryShowAppMessage.DiaryLoadingFailure -> {
-                                viewModelScope.launch {
-                                    emitAppMessageEvent(CalendarAppMessage.DiaryLoadingFailure)
-                                }
-                            }
-                            DiaryShowAppMessage.DiaryDeleteFailure -> {
-                                // MEMO:CalendarFragmentでは不要のEventの為、処理不要
-                            }
-                        }
-                    }
-                    is CommonUiEvent.NavigatePreviousFragment<*> -> {
-                    }
-                }
-            }
-
-            is DiaryShowEvent.NavigateDiaryDeleteDialog,
-            is DiaryShowEvent.NavigateDiaryEditFragment,
-            is DiaryShowEvent.NavigateDiaryLoadingFailureDialog -> {
-                // MEMO:CalendarFragmentでは不要のEventの為、処理不要
-            }
-        }
-    }
-
     // View変更処理
     private suspend fun prepareDiary(date: LocalDate) {
         val action =
@@ -208,18 +166,36 @@ internal class CalendarViewModel @Inject constructor(
 
         val exists = existsSavedDiary(date) ?: false
         if (exists) {
-            emitUiEvent(
-                CalendarEvent.LoadDiary(date)
-            )
+            loadSavedDiary(date)
         } else {
             updateUiState(CalendarState.NoDiary)
-            emitUiEvent(
-                CalendarEvent.InitializeDiary
-            )
+            diaryStateFlow.initialize()
         }
     }
 
     // データ処理
+    override suspend fun loadSavedDiary(date: LocalDate) {
+        val logMsg = "日記読込"
+        Log.i(logTag, "${logMsg}_開始")
+
+        updateUiState(CalendarState.LoadingDiary)
+        when (val result = fetchDiaryUseCase(date)) {
+            is UseCaseResult.Success -> {
+                Log.i(logTag, "${logMsg}_完了")
+                updateUiState(CalendarState.LoadDiarySuccess)
+                val diary = result.value
+                diaryStateFlow.update(diary)
+            }
+            is UseCaseResult.Failure -> {
+                Log.e(logTag, "${logMsg}_失敗", result.exception)
+                updateUiState(CalendarState.LoadError)
+                emitAppMessageEvent(
+                    CalendarAppMessage.DiaryLoadingFailure
+                )
+            }
+        }
+    }
+
     private fun updateSelectedDate(date: LocalDate) {
         // MEMO:selectedDateと同日付を選択した時、previousSelectedDateと同値となり、
         //      次に他の日付を選択した時にpreviousSelectedDateのcollectedが起動しなくなる。

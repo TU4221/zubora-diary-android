@@ -58,6 +58,7 @@ class DiaryShowFragment : BaseFragment<FragmentDiaryShowBinding, DiaryShowEvent>
             .apply {
                 lifecycleOwner = viewLifecycleOwner
                 viewModel = mainViewModel
+                baseDiaryShowViewModel = mainViewModel
             }
     }
 

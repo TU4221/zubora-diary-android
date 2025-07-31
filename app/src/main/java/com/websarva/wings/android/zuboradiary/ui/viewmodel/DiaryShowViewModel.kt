@@ -2,9 +2,6 @@ package com.websarva.wings.android.zuboradiary.ui.viewmodel
 
 import android.util.Log
 import androidx.lifecycle.viewModelScope
-import com.websarva.wings.android.zuboradiary.domain.exception.DomainException
-import com.websarva.wings.android.zuboradiary.domain.model.ItemNumber
-import com.websarva.wings.android.zuboradiary.domain.model.Weather
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.DeleteDiaryUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.FetchDiaryUseCase
@@ -17,9 +14,8 @@ import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
 import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
 import com.websarva.wings.android.zuboradiary.ui.model.state.DiaryShowState
 import com.websarva.wings.android.zuboradiary.ui.utils.requireValue
+import com.websarva.wings.android.zuboradiary.ui.viewmodel.common.BaseDiaryShowViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import java.time.LocalDate
@@ -29,7 +25,7 @@ import javax.inject.Inject
 internal class DiaryShowViewModel @Inject constructor(
     private val fetchDiaryUseCase: FetchDiaryUseCase,
     private val deleteDiaryUseCase: DeleteDiaryUseCase
-) : BaseViewModel<DiaryShowEvent, DiaryShowAppMessage, DiaryShowState>(
+) : BaseDiaryShowViewModel<DiaryShowEvent, DiaryShowAppMessage, DiaryShowState>(
     DiaryShowState.Idle
 ) {
 
@@ -50,56 +46,6 @@ internal class DiaryShowViewModel @Inject constructor(
             .stateInWhileSubscribed(
                 false
             )
-
-    // 日記データ関係
-    private val diaryStateFlow = DiaryStateFlow()
-    val date
-        get() = diaryStateFlow.date.asStateFlow()
-    val weather1
-        get() = diaryStateFlow.weather1.asStateFlow()
-    val weather2
-        get() = diaryStateFlow.weather2.asStateFlow()
-    val isWeather2Visible =
-        combine(weather1, weather2) { weather1, weather2 ->
-            return@combine weather1 != Weather.UNKNOWN && weather2 != Weather.UNKNOWN
-        }.stateInWhileSubscribed(
-            false
-        )
-    val condition
-        get() = diaryStateFlow.condition.asStateFlow()
-    val title
-        get() = diaryStateFlow.title.asStateFlow()
-    val numVisibleItems
-        get() = diaryStateFlow.numVisibleItems.asStateFlow()
-    val item1Title
-        get() = diaryStateFlow.getItemStateFlow(ItemNumber(1)).title.asStateFlow()
-    val item2Title
-        get() = diaryStateFlow.getItemStateFlow(ItemNumber(2)).title.asStateFlow()
-    val item3Title
-        get() = diaryStateFlow.getItemStateFlow(ItemNumber(3)).title.asStateFlow()
-    val item4Title
-        get() = diaryStateFlow.getItemStateFlow(ItemNumber(4)).title.asStateFlow()
-    val item5Title
-        get() = diaryStateFlow.getItemStateFlow(ItemNumber(5)).title.asStateFlow()
-    val item1Comment
-        get() = diaryStateFlow.getItemStateFlow(ItemNumber(1)).comment.asStateFlow()
-    val item2Comment
-        get() = diaryStateFlow.getItemStateFlow(ItemNumber(2)).comment.asStateFlow()
-    val item3Comment
-        get() = diaryStateFlow.getItemStateFlow(ItemNumber(3)).comment.asStateFlow()
-    val item4Comment
-        get() = diaryStateFlow.getItemStateFlow(ItemNumber(4)).comment.asStateFlow()
-    val item5Comment
-        get() = diaryStateFlow.getItemStateFlow(ItemNumber(5)).comment.asStateFlow()
-    val imageUri
-        get() = diaryStateFlow.imageUri.asStateFlow()
-    val log
-        get() = diaryStateFlow.log.asStateFlow()
-
-    override fun initialize() {
-        super.initialize()
-        diaryStateFlow.initialize()
-    }
 
     override suspend fun emitNavigatePreviousFragmentEvent(result: FragmentResult<*>) {
         viewModelScope.launch {
@@ -200,43 +146,17 @@ internal class DiaryShowViewModel @Inject constructor(
         }
     }
 
-    // View状態処理
-    fun onCalendarDaySelected(date: LocalDate) {
-        viewModelScope.launch {
-            prepareDiaryForCalendarFragment(date)
-        }
-    }
-
     // Fragment状態処理
     fun onFragmentViewCreated(date: LocalDate) {
         if (uiState.value != DiaryShowState.Idle) return
 
         viewModelScope.launch {
-            prepareDiaryForDiaryShowFragment(date)
+            loadSavedDiary(date)
         }
     }
 
     // データ処理
-    private suspend fun prepareDiaryForDiaryShowFragment(date: LocalDate) {
-        loadSavedDiary(date) {
-            emitUiEvent(
-                DiaryShowEvent.NavigateDiaryLoadingFailureDialog(date)
-            )
-        }
-    }
-
-    private suspend fun prepareDiaryForCalendarFragment(date: LocalDate) {
-        loadSavedDiary(date) {
-            emitAppMessageEvent(
-                DiaryShowAppMessage.DiaryLoadingFailure
-            )
-        }
-    }
-
-    private suspend fun loadSavedDiary(
-        date: LocalDate,
-        onFailure: suspend (DomainException) -> Unit
-    ) {
+    override suspend fun loadSavedDiary(date: LocalDate) {
         val logMsg = "日記読込"
         Log.i(logTag, "${logMsg}_開始")
 
@@ -251,7 +171,9 @@ internal class DiaryShowViewModel @Inject constructor(
             is UseCaseResult.Failure -> {
                 Log.e(logTag, "${logMsg}_失敗", result.exception)
                 updateUiState(DiaryShowState.LoadError)
-                onFailure(result.exception)
+                emitUiEvent(
+                    DiaryShowEvent.NavigateDiaryLoadingFailureDialog(date)
+                )
             }
         }
     }

@@ -8,7 +8,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.fragment.app.activityViewModels
-import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.kizitonwose.calendar.core.CalendarDay
 import com.kizitonwose.calendar.core.CalendarMonth
@@ -41,7 +40,6 @@ import com.websarva.wings.android.zuboradiary.ui.model.event.CalendarEvent
 import com.websarva.wings.android.zuboradiary.ui.model.event.CommonUiEvent
 import com.websarva.wings.android.zuboradiary.ui.model.navigation.NavigationCommand
 import com.websarva.wings.android.zuboradiary.ui.utils.toJapaneseDateString
-import com.websarva.wings.android.zuboradiary.ui.viewmodel.DiaryShowViewModel
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
@@ -72,11 +70,6 @@ class CalendarFragment :
     @Suppress("unused", "RedundantSuppression")
     override val mainViewModel: CalendarViewModel by activityViewModels()
 
-    // MEMO:CalendarFragment内にDiaryShowFragmentと同等のものを表示する為、DiaryShowViewModelを使用する。
-    //      (CalendarViewModelにDiaryShowViewModelと重複するデータは持たせない)
-    @Suppress("unused", "RedundantSuppression")
-    private val diaryShowViewModel: DiaryShowViewModel by viewModels()
-
     override fun createViewBinding(
         themeColorInflater: LayoutInflater,
         container: ViewGroup
@@ -84,16 +77,14 @@ class CalendarFragment :
         return FragmentCalendarBinding.inflate(themeColorInflater, container, false)
             .apply {
                 lifecycleOwner = viewLifecycleOwner
-                calendarViewModel = mainViewModel
-                diaryShowViewModel = this@CalendarFragment.diaryShowViewModel
+                viewModel = mainViewModel
+                baseDiaryShowViewModel = mainViewModel
             }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        setUpUiStateFromDiaryShowViewModel()
-        setUpUiEventFromDiaryShowViewModel()
         setUpCalendar()
         setUpDiaryShow()
         setUpFloatActionButton()
@@ -125,12 +116,6 @@ class CalendarFragment :
             is CalendarEvent.NavigateDiaryEditFragment -> {
                 navigateDiaryEditFragment(event.date, !event.isNewDiary)
             }
-            is CalendarEvent.LoadDiary -> {
-                loadDiary(event.date)
-            }
-            is CalendarEvent.InitializeDiary -> {
-                initializeDiary()
-            }
             is CalendarEvent.ScrollCalendar -> {
                 scrollCalendar(event.date)
             }
@@ -148,25 +133,6 @@ class CalendarFragment :
                 }
             }
         }
-    }
-
-    private fun setUpUiStateFromDiaryShowViewModel() {
-        launchAndRepeatOnViewLifeCycleStarted {
-            diaryShowViewModel.uiState
-                .collectLatest { value ->
-                    mainViewModel.onChangedDiaryShowUiState(value)
-                }
-        }
-    }
-
-    private fun setUpUiEventFromDiaryShowViewModel() {
-        fragmentHelper
-            .setUpMainUiEvent(
-                this,
-                diaryShowViewModel
-            ) { event ->
-                mainViewModel.onChangedDiaryShowUiEvent(event)
-            }
     }
 
     private fun setUpCalendar() {
@@ -504,18 +470,9 @@ class CalendarFragment :
         binding.materialToolbarTopAppBar.title = dateString
     }
 
-    // CalendarViewで選択された日付の日記を読込
-    private fun loadDiary(date: LocalDate) {
-        diaryShowViewModel.onCalendarDaySelected(date)
-    }
-
-    private fun initializeDiary() {
-        diaryShowViewModel.initialize()
-    }
-
     private fun setUpDiaryShow() {
         launchAndRepeatOnViewLifeCycleStarted {
-            diaryShowViewModel.weather1
+            mainViewModel.weather1
                 .collectLatest { value: Weather ->
                     Weather1Observer(
                         requireContext(),
@@ -525,7 +482,7 @@ class CalendarFragment :
         }
 
         launchAndRepeatOnViewLifeCycleStarted {
-            diaryShowViewModel.weather2
+            mainViewModel.weather2
                 .collectLatest { value: Weather ->
                     Weather2Observer(
                         requireContext(),
@@ -536,7 +493,7 @@ class CalendarFragment :
         }
 
         launchAndRepeatOnViewLifeCycleStarted {
-            diaryShowViewModel.condition
+            mainViewModel.condition
                 .collectLatest { value: Condition ->
                     ConditionObserver(
                         requireContext(),
@@ -558,7 +515,7 @@ class CalendarFragment :
                     )
                 }
 
-            diaryShowViewModel.numVisibleItems
+            mainViewModel.numVisibleItems
                 .collectLatest { value: Int ->
                     NumVisibleItemsObserver(itemLayouts).onChanged(value)
                 }
@@ -568,7 +525,7 @@ class CalendarFragment :
             // MEMO:添付画像がないときはnullとなり、デフォルト画像をセットする。
             //      nullの時ImageView自体は非表示となるためデフォルト画像をセットする意味はないが、
             //      クリアという意味合いでデフォルト画像をセットする。
-            diaryShowViewModel.imageUri
+            mainViewModel.imageUri
                 .collectLatest { value: Uri? ->
                     ImageUriObserver(
                         themeColor,
@@ -578,7 +535,7 @@ class CalendarFragment :
         }
 
         launchAndRepeatOnViewLifeCycleStarted {
-            diaryShowViewModel.log.filterNotNull()
+            mainViewModel.log.filterNotNull()
                 .collectLatest { value: LocalDateTime ->
                     LogObserver(
                         requireContext(),
