@@ -2,6 +2,7 @@ package com.websarva.wings.android.zuboradiary.ui.viewmodel
 
 import android.util.Log
 import androidx.lifecycle.viewModelScope
+import com.websarva.wings.android.zuboradiary.domain.exception.DomainException
 import com.websarva.wings.android.zuboradiary.domain.model.ItemNumber
 import com.websarva.wings.android.zuboradiary.domain.model.Weather
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
@@ -217,14 +218,25 @@ internal class DiaryShowViewModel @Inject constructor(
 
     // データ処理
     private suspend fun prepareDiaryForDiaryShowFragment(date: LocalDate) {
-        loadSavedDiary(date, true)
+        loadSavedDiary(date) {
+            emitUiEvent(
+                DiaryShowEvent.NavigateDiaryLoadingFailureDialog(date)
+            )
+        }
     }
 
     private suspend fun prepareDiaryForCalendarFragment(date: LocalDate) {
-        loadSavedDiary(date, false)
+        loadSavedDiary(date) {
+            emitAppMessageEvent(
+                DiaryShowAppMessage.DiaryLoadingFailure
+            )
+        }
     }
 
-    private suspend fun loadSavedDiary(date: LocalDate, ignoreAppMessage: Boolean = false) {
+    private suspend fun loadSavedDiary(
+        date: LocalDate,
+        onFailure: suspend (DomainException) -> Unit
+    ) {
         val logMsg = "日記読込"
         Log.i(logTag, "${logMsg}_開始")
 
@@ -239,13 +251,7 @@ internal class DiaryShowViewModel @Inject constructor(
             is UseCaseResult.Failure -> {
                 Log.e(logTag, "${logMsg}_失敗", result.exception)
                 updateUiState(DiaryShowState.LoadError)
-                if (ignoreAppMessage) {
-                    emitUiEvent(
-                        DiaryShowEvent.NavigateDiaryLoadingFailureDialog(date)
-                    )
-                } else {
-                    emitAppMessageEvent(DiaryShowAppMessage.DiaryLoadingFailure)
-                }
+                onFailure(result.exception)
             }
         }
     }

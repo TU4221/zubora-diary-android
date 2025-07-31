@@ -57,7 +57,7 @@ abstract class BaseFragment<T: ViewBinding, E : UiEvent> : LoggingFragment() {
             return destinationId == startDestinationId
         }
 
-    private val fragmentHelper = FragmentHelper()
+    internal val fragmentHelper = FragmentHelper()
 
     internal val themeColor
         get() = settingsViewModel.themeColor.requireValue()

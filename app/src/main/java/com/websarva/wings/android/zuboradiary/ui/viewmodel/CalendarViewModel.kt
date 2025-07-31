@@ -4,8 +4,10 @@ import androidx.lifecycle.viewModelScope
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.DoesDiaryExistUseCase
 import com.websarva.wings.android.zuboradiary.ui.model.CalendarAppMessage
+import com.websarva.wings.android.zuboradiary.ui.model.DiaryShowAppMessage
 import com.websarva.wings.android.zuboradiary.ui.model.event.CalendarEvent
 import com.websarva.wings.android.zuboradiary.ui.model.event.CommonUiEvent
+import com.websarva.wings.android.zuboradiary.ui.model.event.DiaryShowEvent
 import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
 import com.websarva.wings.android.zuboradiary.ui.model.state.CalendarState
 import com.websarva.wings.android.zuboradiary.ui.model.state.DiaryShowState
@@ -156,7 +158,39 @@ internal class CalendarViewModel @Inject constructor(
 
             DiaryShowState.Idle,
             DiaryShowState.Deleting -> {
-                // MEMO:CalendarFragmentからの日記削除機能は無いため、処理不要
+                // MEMO:CalendarFragmentでは不要のStateの為、処理不要
+            }
+        }
+    }
+
+    fun onChangedDiaryShowUiEvent(event: DiaryShowEvent) {
+        when (event) {
+            is DiaryShowEvent.CommonEvent -> {
+                when (val wrappedEvent = event.wrappedEvent) {
+                    is CommonUiEvent.NavigateAppMessage -> {
+                        val message = wrappedEvent.message
+                        if (message !is DiaryShowAppMessage) return
+
+                        when (message) {
+                            DiaryShowAppMessage.DiaryLoadingFailure -> {
+                                viewModelScope.launch {
+                                    emitAppMessageEvent(CalendarAppMessage.DiaryLoadingFailure)
+                                }
+                            }
+                            DiaryShowAppMessage.DiaryDeleteFailure -> {
+                                // MEMO:CalendarFragmentでは不要のEventの為、処理不要
+                            }
+                        }
+                    }
+                    is CommonUiEvent.NavigatePreviousFragment<*> -> {
+                    }
+                }
+            }
+
+            is DiaryShowEvent.NavigateDiaryDeleteDialog,
+            is DiaryShowEvent.NavigateDiaryEditFragment,
+            is DiaryShowEvent.NavigateDiaryLoadingFailureDialog -> {
+                // MEMO:CalendarFragmentでは不要のEventの為、処理不要
             }
         }
     }

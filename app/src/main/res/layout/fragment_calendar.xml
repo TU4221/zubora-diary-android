@@ -83,7 +83,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:orientation="vertical"
-                            android:visibility="@{calendarViewModel.uiState instanceof CalendarState.NoDiary ? View.GONE : View.VISIBLE}" >
+                            android:visibility="@{calendarViewModel.uiState instanceof CalendarState.LoadDiarySuccess ? View.VISIBLE : View.GONE}" >
 
                             <include
                                 layout="@layout/layout_diary_show"
@@ -94,14 +94,14 @@
 
                         <TextView
                             style="@style/AppTextViewStyle"
-                            android:id="@+id/text_no_diary_message"
+                            android:id="@+id/text_diary_message"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
                             android:textAppearance="@style/AppTextViewTextAppearance"
-                            android:text="@string/fragment_calendar_no_diary_message"
+                            android:text="@{calendarViewModel.uiState instanceof CalendarState.LoadError ? @string/fragment_calendar_diary_Loading_failure_message : @string/fragment_calendar_no_diary_message}"
                             android:gravity="center_horizontal|top"
                             android:paddingTop="16dp"
-                            android:visibility="@{calendarViewModel.uiState instanceof CalendarState.NoDiary ? View.VISIBLE : View.GONE}" />
+                            android:visibility="@{calendarViewModel.uiState instanceof CalendarState.NoDiary || calendarViewModel.uiState instanceof CalendarState.LoadError ? View.VISIBLE : View.GONE}" />
 
                     </FrameLayout>
 
