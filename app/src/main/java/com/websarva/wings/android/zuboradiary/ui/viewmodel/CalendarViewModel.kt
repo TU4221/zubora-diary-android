@@ -154,6 +154,12 @@ internal class CalendarViewModel @Inject constructor(
     }
 
     // View変更処理
+    fun onCalendarDayDotVisibilityCheck(date: LocalDate) {
+        viewModelScope.launch {
+            processCalendarDayDotUpdate(date)
+        }
+    }
+
     private suspend fun prepareDiary(date: LocalDate) {
         val action =
             if (shouldSmoothScroll) {
@@ -164,7 +170,7 @@ internal class CalendarViewModel @Inject constructor(
             }
         emitUiEvent(action)
 
-        val exists = existsSavedDiary(date) ?: false
+        val exists = existsSavedDiary(date)
         if (exists) {
             loadSavedDiary(date)
         } else {
@@ -206,19 +212,25 @@ internal class CalendarViewModel @Inject constructor(
         _selectedDate.value = date
     }
 
+    private suspend fun processCalendarDayDotUpdate(date: LocalDate) {
+        emitUiEvent(
+            CalendarEvent.UpdateCalendarDayDotVisibility(date, existsSavedDiary(date))
+        )
+    }
+
     // MEMO:呼び出し元で通信エラーが判断できるように戻り値をNullableとする。
-    suspend fun existsSavedDiary(date: LocalDate): Boolean? {
+    private suspend fun existsSavedDiary(date: LocalDate): Boolean {
         when (val result = doesDiaryExistUseCase(date)) {
             is UseCaseResult.Success -> return result.value
             is UseCaseResult.Failure -> {
                 emitAppMessageEvent(CalendarAppMessage.DiaryInfoLoadingFailure)
-                return null
+                return false
             }
         }
     }
 
     private suspend fun navigateDiaryEditFragment(date: LocalDate) {
-        val exists = existsSavedDiary(date) ?: false
+        val exists = existsSavedDiary(date)
         val isNewDiary = !exists
         emitUiEvent(
             CalendarEvent.NavigateDiaryEditFragment(date, isNewDiary)

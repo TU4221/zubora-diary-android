@@ -8,8 +8,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.LifecycleCoroutineScope
-import androidx.lifecycle.lifecycleScope
 import com.kizitonwose.calendar.core.CalendarDay
 import com.kizitonwose.calendar.core.CalendarMonth
 import com.kizitonwose.calendar.core.DayPosition
@@ -43,11 +41,8 @@ import com.websarva.wings.android.zuboradiary.ui.model.navigation.NavigationComm
 import com.websarva.wings.android.zuboradiary.ui.utils.toJapaneseDateString
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -123,6 +118,9 @@ class CalendarFragment :
             is CalendarEvent.SmoothScrollCalendar -> {
                 smoothScrollCalendar(event.date)
             }
+            is CalendarEvent.UpdateCalendarDayDotVisibility -> {
+                updateCalendarDayDotVisibility(event.date, event.isVisible)
+            }
             is CalendarEvent.CommonEvent -> {
                 when(event.wrappedEvent) {
                     is CommonUiEvent.NavigatePreviousFragment<*> -> {
@@ -192,10 +190,8 @@ class CalendarFragment :
             CalendarMonthDayBinder(
                 themeColor,
                 { date: LocalDate -> mainViewModel.onCalendarDayClicked(date) },
-                viewLifecycleOwner.lifecycleScope,
-                { date: LocalDate -> mainViewModel.existsSavedDiary(date) }
+                { date: LocalDate -> mainViewModel.onCalendarDayDotVisibilityCheck(date) }
             )
-
 
         val format = getString(R.string.fragment_calendar_month_header_format)
         binding.calendar.monthHeaderBinder =
@@ -205,12 +201,12 @@ class CalendarFragment :
     private class CalendarMonthDayBinder(
         private val themeColor: ThemeColor,
         private val onDateClick: (date: LocalDate) -> Unit,
-        private val lifecycleScope: LifecycleCoroutineScope,
-        private val processDiaryExistCheck: suspend (date: LocalDate) -> Boolean?
+        private val processDiaryExistCheck: (date: LocalDate) -> Unit
     ) : MonthDayBinder<DayViewContainer> {
 
         private var selectedDate: LocalDate = LocalDate.now()
-        private var isDiaryInfoLoadingFailure = false
+
+        private val dayDotVisibilityCache = mutableMapOf<LocalDate, Boolean>()
 
         @Suppress("PARAMETER_NAME_CHANGED_ON_OVERRIDE")
         override fun bind(container: DayViewContainer, calendarDay: CalendarDay) {
@@ -288,26 +284,15 @@ class CalendarFragment :
         }
 
         private fun setUpCalendarDayDotVisibility(calendarDay: CalendarDay, viewCalendarDayDot: View) {
-            if (isDiaryInfoLoadingFailure) {
-                viewCalendarDayDot.visibility = View.INVISIBLE
-                return
-            }
-
             val localDate = calendarDay.date
-
-            lifecycleScope.launch {
-                val exists = processDiaryExistCheck(localDate)
-                withContext(Dispatchers.Main) {
-                    when (exists) {
-                        true -> viewCalendarDayDot.visibility = View.VISIBLE
-                        false -> viewCalendarDayDot.visibility = View.INVISIBLE
-                        null -> {
-                            isDiaryInfoLoadingFailure = true
-                            viewCalendarDayDot.visibility = View.INVISIBLE
-                        }
-                    }
+            val boolean = dayDotVisibilityCache[localDate]
+            viewCalendarDayDot.visibility =
+                if (boolean == null) {
+                    processDiaryExistCheck(localDate)
+                    View.INVISIBLE
+                } else {
+                    if (boolean) View.VISIBLE else View.INVISIBLE
                 }
-            }
         }
 
         override fun create(view: View): DayViewContainer {
@@ -316,6 +301,10 @@ class CalendarFragment :
 
         fun updateSelectedDate(date: LocalDate) {
             selectedDate = date
+        }
+
+        fun updateDayDotVisibilityCache(date: LocalDate, isVisible: Boolean) {
+            dayDotVisibilityCache[date] = isVisible
         }
     }
 
@@ -563,6 +552,12 @@ class CalendarFragment :
         binding.floatingActionButtonDiaryEdit.setOnClickListener {
             mainViewModel.onDiaryEditButtonClicked()
         }
+    }
+
+    private fun updateCalendarDayDotVisibility(date: LocalDate, isVisible: Boolean) {
+        val calendarMonthDayBinder = binding.calendar.dayBinder as CalendarMonthDayBinder
+        calendarMonthDayBinder.updateDayDotVisibilityCache(date, isVisible)
+        binding.calendar.notifyDateChanged(date)
     }
 
     private fun navigateDiaryEditFragment(date: LocalDate, shouldLoadDiary: Boolean) {
