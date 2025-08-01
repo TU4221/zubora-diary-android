@@ -1,10 +1,13 @@
 package com.websarva.wings.android.zuboradiary.ui.view
 
 import android.graphics.drawable.Drawable
+import android.util.Log
 import android.view.View
+import android.view.ViewGroup
 import android.widget.TextView
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.updateLayoutParams
 import androidx.core.view.updatePadding
 import androidx.databinding.BindingAdapter
 import com.google.android.material.appbar.MaterialToolbar
@@ -57,6 +60,30 @@ internal object BindingAdapters {
             ) { view, insets ->
                 val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
                 view.updatePadding(top = systemBars.top)
+                WindowInsetsCompat.CONSUMED
+            }
+        }
+    }
+
+    @JvmStatic
+    @BindingAdapter("applyNavigationBarBottomMargin")
+    fun applyNavigationBarBottomMargin(view: View, apply: Boolean) {
+        if (!apply) return
+
+        val initialViewBottomMargin =
+            (view.layoutParams as ViewGroup.MarginLayoutParams).bottomMargin
+        view.apply {
+            ViewCompat.setOnApplyWindowInsetsListener(
+                this
+            ) { view, windowInsets ->
+                val insets =
+                    windowInsets.getInsets(
+                        WindowInsetsCompat.Type.systemBars()
+                                or WindowInsetsCompat.Type.displayCutout()
+                    )
+                view.updateLayoutParams<ViewGroup.MarginLayoutParams> {
+                    bottomMargin = initialViewBottomMargin + insets.bottom
+                }
                 WindowInsetsCompat.CONSUMED
             }
         }
