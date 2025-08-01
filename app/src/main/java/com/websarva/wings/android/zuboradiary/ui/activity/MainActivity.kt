@@ -284,6 +284,7 @@ class MainActivity : LoggingActivity() {
         }
     }
 
+    // TODO:このListenerが必要か最後に検討
     private class CustomOnItemSelectedListener(
         private val bottomNavigationView: BottomNavigationView,
         private val navController: NavController,
