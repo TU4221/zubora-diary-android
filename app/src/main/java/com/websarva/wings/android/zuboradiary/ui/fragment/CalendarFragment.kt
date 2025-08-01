@@ -27,12 +27,11 @@ import com.websarva.wings.android.zuboradiary.databinding.LayoutCalendarHeaderBi
 import com.websarva.wings.android.zuboradiary.ui.theme.CalendarThemeColorChanger
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.CalendarViewModel
 import com.websarva.wings.android.zuboradiary.ui.utils.requireValue
-import com.websarva.wings.android.zuboradiary.ui.fragment.DiaryShowFragment.ConditionObserver
-import com.websarva.wings.android.zuboradiary.ui.fragment.DiaryShowFragment.LogObserver
-import com.websarva.wings.android.zuboradiary.ui.fragment.DiaryShowFragment.NumVisibleItemsObserver
-import com.websarva.wings.android.zuboradiary.ui.fragment.DiaryShowFragment.ImageUriObserver
-import com.websarva.wings.android.zuboradiary.ui.fragment.DiaryShowFragment.Weather1Observer
-import com.websarva.wings.android.zuboradiary.ui.fragment.DiaryShowFragment.Weather2Observer
+import com.websarva.wings.android.zuboradiary.ui.fragment.common.DiaryConditionTextUpdater
+import com.websarva.wings.android.zuboradiary.ui.fragment.common.DiaryImageUpdater
+import com.websarva.wings.android.zuboradiary.ui.fragment.common.DiaryItemsVisibilityUpdater
+import com.websarva.wings.android.zuboradiary.ui.fragment.common.DiaryLogTextUpdater
+import com.websarva.wings.android.zuboradiary.ui.fragment.common.DiaryWeatherTextUpdater
 import com.websarva.wings.android.zuboradiary.ui.fragment.common.RequiresBottomNavigation
 import com.websarva.wings.android.zuboradiary.ui.fragment.common.ReselectableFragment
 import com.websarva.wings.android.zuboradiary.ui.model.event.CalendarEvent
@@ -476,20 +475,24 @@ class CalendarFragment :
         launchAndRepeatOnViewLifeCycleStarted {
             mainViewModel.weather1
                 .collectLatest { value: Weather ->
-                    Weather1Observer(
-                        requireContext(),
-                        binding.includeDiaryShow.textWeather1Selected
-                    ).onChanged(value)
+                    DiaryWeatherTextUpdater()
+                        .update(
+                            requireContext(),
+                            binding.includeDiaryShow.textWeather1Selected,
+                            value
+                        )
                 }
         }
 
         launchAndRepeatOnViewLifeCycleStarted {
             mainViewModel.weather2
                 .collectLatest { value: Weather ->
-                    Weather2Observer(
-                        requireContext(),
-                        binding.includeDiaryShow.textWeather2Selected
-                    ).onChanged(value)
+                    DiaryWeatherTextUpdater()
+                        .update(
+                            requireContext(),
+                            binding.includeDiaryShow.textWeather2Selected,
+                            value
+                        )
                 }
 
         }
@@ -497,10 +500,12 @@ class CalendarFragment :
         launchAndRepeatOnViewLifeCycleStarted {
             mainViewModel.condition
                 .collectLatest { value: Condition ->
-                    ConditionObserver(
-                        requireContext(),
-                        binding.includeDiaryShow.textConditionSelected
-                    ).onChanged(value)
+                    DiaryConditionTextUpdater()
+                        .update(
+                            requireContext(),
+                            binding.includeDiaryShow.textConditionSelected,
+                            value
+                        )
                 }
         }
 
@@ -519,7 +524,11 @@ class CalendarFragment :
 
             mainViewModel.numVisibleItems
                 .collectLatest { value: Int ->
-                    NumVisibleItemsObserver(itemLayouts).onChanged(value)
+                    DiaryItemsVisibilityUpdater()
+                        .update(
+                            itemLayouts,
+                            value
+                        )
                 }
         }
 
@@ -529,20 +538,24 @@ class CalendarFragment :
             //      クリアという意味合いでデフォルト画像をセットする。
             mainViewModel.imageUri
                 .collectLatest { value: Uri? ->
-                    ImageUriObserver(
-                        themeColor,
-                        binding.includeDiaryShow.imageAttachedImage
-                    ).onChanged(value)
+                    DiaryImageUpdater()
+                        .update(
+                            themeColor,
+                            binding.includeDiaryShow.imageAttachedImage,
+                            value
+                        )
                 }
         }
 
         launchAndRepeatOnViewLifeCycleStarted {
             mainViewModel.log.filterNotNull()
                 .collectLatest { value: LocalDateTime ->
-                    LogObserver(
-                        requireContext(),
-                        binding.includeDiaryShow.textLogValue
-                    ).onChanged(value)
+                    DiaryLogTextUpdater()
+                        .update(
+                            requireContext(),
+                            binding.includeDiaryShow.textLogValue,
+                            value
+                        )
                 }
         }
 

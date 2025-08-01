@@ -1,24 +1,22 @@
 package com.websarva.wings.android.zuboradiary.ui.fragment
 
-import android.content.Context
 import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
-import android.widget.LinearLayout
-import android.widget.TextView
 import androidx.fragment.app.viewModels
 import com.websarva.wings.android.zuboradiary.R
 import com.websarva.wings.android.zuboradiary.ui.model.AppMessage
 import com.websarva.wings.android.zuboradiary.domain.model.Condition
-import com.websarva.wings.android.zuboradiary.domain.model.ItemNumber
 import com.websarva.wings.android.zuboradiary.domain.model.Weather
-import com.websarva.wings.android.zuboradiary.domain.model.ThemeColor
 import com.websarva.wings.android.zuboradiary.databinding.FragmentDiaryShowBinding
-import com.websarva.wings.android.zuboradiary.ui.view.imageview.DiaryImageConfigurator
+import com.websarva.wings.android.zuboradiary.ui.fragment.common.DiaryConditionTextUpdater
+import com.websarva.wings.android.zuboradiary.ui.fragment.common.DiaryImageUpdater
+import com.websarva.wings.android.zuboradiary.ui.fragment.common.DiaryItemsVisibilityUpdater
+import com.websarva.wings.android.zuboradiary.ui.fragment.common.DiaryLogTextUpdater
+import com.websarva.wings.android.zuboradiary.ui.fragment.common.DiaryWeatherTextUpdater
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.DiaryDeleteDialogFragment
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.DiaryLoadingFailureDialogFragment
 import com.websarva.wings.android.zuboradiary.ui.model.event.CommonUiEvent
@@ -27,7 +25,6 @@ import com.websarva.wings.android.zuboradiary.ui.model.navigation.NavigationComm
 import com.websarva.wings.android.zuboradiary.ui.model.parameters.DiaryDeleteParameters
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.DiaryShowViewModel
 import com.websarva.wings.android.zuboradiary.ui.utils.toJapaneseDateString
-import com.websarva.wings.android.zuboradiary.ui.utils.toJapaneseDateTimeWithSecondsString
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.filterNotNull
@@ -152,39 +149,25 @@ class DiaryShowFragment : BaseFragment<FragmentDiaryShowBinding, DiaryShowEvent>
         launchAndRepeatOnViewLifeCycleStarted {
             mainViewModel.weather1
                 .collectLatest { value: Weather ->
-                    Weather1Observer(
-                        requireContext(),
-                        binding.includeDiaryShow.textWeather1Selected
-                    ).onChanged(value)
+                    DiaryWeatherTextUpdater()
+                        .update(
+                            requireContext(),
+                            binding.includeDiaryShow.textWeather1Selected,
+                            value
+                        )
                 }
         }
 
         launchAndRepeatOnViewLifeCycleStarted {
             mainViewModel.weather2
                 .collectLatest { value: Weather ->
-                    Weather2Observer(
-                        requireContext(),
-                        binding.includeDiaryShow.textWeather2Selected
-                    ).onChanged(value)
+                    DiaryWeatherTextUpdater()
+                        .update(
+                            requireContext(),
+                            binding.includeDiaryShow.textWeather2Selected,
+                            value
+                        )
                 }
-        }
-    }
-
-    internal class Weather1Observer(
-        private val context: Context,
-        private val textWeather: TextView
-    ) {
-        fun onChanged(value: Weather) {
-            textWeather.text = value.toString(context)
-        }
-    }
-
-    internal class Weather2Observer(
-        private val context: Context,
-        private val textWeather: TextView
-    ) {
-        fun onChanged(value: Weather) {
-            textWeather.text = value.toString(context)
         }
     }
 
@@ -192,20 +175,17 @@ class DiaryShowFragment : BaseFragment<FragmentDiaryShowBinding, DiaryShowEvent>
         launchAndRepeatOnViewLifeCycleStarted {
             mainViewModel.condition
                 .collectLatest { value: Condition ->
-                    ConditionObserver(
-                        requireContext(),
-                        binding.includeDiaryShow.textConditionSelected
-                    ).onChanged(value)
+                    DiaryConditionTextUpdater()
+                        .update(
+                            requireContext(),
+                            binding.includeDiaryShow.textConditionSelected,
+                            value
+                        )
                 }
         }
     }
 
-    internal class ConditionObserver(private val context: Context, private val textCondition: TextView) {
 
-        fun onChanged(value: Condition) {
-            textCondition.text = value.toString(context)
-        }
-    }
 
     private fun setUpItemLayout() {
         launchAndRepeatOnViewLifeCycleStarted {
@@ -222,24 +202,12 @@ class DiaryShowFragment : BaseFragment<FragmentDiaryShowBinding, DiaryShowEvent>
 
             mainViewModel.numVisibleItems
                 .collectLatest { value: Int ->
-                    NumVisibleItemsObserver(itemLayouts).onChanged(value)
+                    DiaryItemsVisibilityUpdater()
+                        .update(
+                            itemLayouts,
+                            value
+                        )
                 }
-        }
-    }
-
-    internal class NumVisibleItemsObserver(private val itemLayouts: Array<LinearLayout>) {
-
-        fun onChanged(value: Int) {
-            require(!(value < ItemNumber.MIN_NUMBER || value > ItemNumber.MAX_NUMBER))
-
-            for (i in ItemNumber.MIN_NUMBER..ItemNumber.MAX_NUMBER) {
-                val itemArrayNumber = i - 1
-                if (i <= value) {
-                    itemLayouts[itemArrayNumber].visibility = View.VISIBLE
-                } else {
-                    itemLayouts[itemArrayNumber].visibility = View.GONE
-                }
-            }
         }
     }
 
@@ -250,46 +218,29 @@ class DiaryShowFragment : BaseFragment<FragmentDiaryShowBinding, DiaryShowEvent>
                     // MEMO:添付画像がないときはnullとなり、デフォルト画像をセットする。
                     //      nullの時ImageView自体は非表示となるためデフォルト画像をセットする意味はないが、
                     //      クリアという意味合いでデフォルト画像をセットする。
-                    ImageUriObserver(
-                        themeColor,
-                        binding.includeDiaryShow.imageAttachedImage
-                    ).onChanged(value)
+                    DiaryImageUpdater()
+                        .update(
+                            themeColor,
+                            binding.includeDiaryShow.imageAttachedImage,
+                            value
+                        )
                 }
         }
     }
 
-    internal class ImageUriObserver(
-        private val themeColor: ThemeColor,
-        private val imageView: ImageView
-    ) {
 
-        fun onChanged(value: Uri?) {
-            DiaryImageConfigurator()
-                .setUpImageOnDiary(
-                    imageView,
-                    value,
-                    themeColor
-                )
-        }
-    }
 
     private fun setUpLogLayout() {
         launchAndRepeatOnViewLifeCycleStarted {
             mainViewModel.log.filterNotNull()
                 .collectLatest { value: LocalDateTime ->
-                    LogObserver(
-                        requireContext(),
-                        binding.includeDiaryShow.textLogValue
-                    ).onChanged(value)
+                    DiaryLogTextUpdater()
+                        .update(
+                            requireContext(),
+                            binding.includeDiaryShow.textLogValue,
+                            value
+                        )
                 }
-        }
-    }
-
-    internal class LogObserver(private val context: Context ,private val textLog: TextView) {
-
-        fun onChanged(value: LocalDateTime) {
-            val dateString = value.toJapaneseDateTimeWithSecondsString(context)
-            textLog.text = dateString
         }
     }
 
