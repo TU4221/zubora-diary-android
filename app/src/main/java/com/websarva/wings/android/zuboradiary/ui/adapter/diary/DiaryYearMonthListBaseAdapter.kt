@@ -213,25 +213,23 @@ internal abstract class DiaryYearMonthListBaseAdapter protected constructor(
                     override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                         super.onScrolled(recyclerView, dx, dy)
 
-                        updateVisibleSectionBarPosition()
+                        updateVisibleSectionBarPosition(recyclerView)
                     }
                 }
             )
-            addOnLayoutChangeListener { _, _, _, _, _, _, _, _, _ ->
-                updateVisibleSectionBarPosition()
+            addOnLayoutChangeListener { v, _, _, _, _, _, _, _, _ ->
+                updateVisibleSectionBarPosition(v as RecyclerView)
             }
         }
     }
 
-    private fun updateVisibleSectionBarPosition() {
-        val layoutManager = recyclerView.layoutManager as LinearLayoutManager
-        layoutManager.apply {
-            updateFirstVisibleSectionBarPosition(this)
-            updateSecondVisibleSectionBarPosition(this)
-        }
+    private fun updateVisibleSectionBarPosition(recyclerView: RecyclerView) {
+        updateFirstVisibleSectionBarPosition(recyclerView)
+        updateSecondVisibleSectionBarPosition(recyclerView)
     }
 
-    private fun updateFirstVisibleSectionBarPosition(layoutManager: LinearLayoutManager) {
+    private fun updateFirstVisibleSectionBarPosition(recyclerView: RecyclerView) {
+        val layoutManager = recyclerView.layoutManager as LinearLayoutManager
 
         val firstVisibleItemPosition = layoutManager.findFirstVisibleItemPosition()
         // MEMO:RecyclerViewが空の時nullとなる。
@@ -239,35 +237,36 @@ internal abstract class DiaryYearMonthListBaseAdapter protected constructor(
             recyclerView.findViewHolderForAdapterPosition(firstVisibleItemPosition) ?: return
         if (firstVisibleViewHolder !is DiaryYearMonthListViewHolder) return
 
-        firstVisibleViewHolder.apply {
-            val firstVisibleItemView = checkNotNull(layoutManager.getChildAt(0))
-            val secondVisibleItemView = layoutManager.getChildAt(1)
 
-            val firstVisibleItemViewPositionY = firstVisibleItemView.y
-            if (secondVisibleItemView == null) {
-                binding.textSection.y = -(firstVisibleItemViewPositionY)
-                return
-            }
 
-            val sectionHeight = binding.textSection.height
-            val secondVisibleItemViewPositionY = secondVisibleItemView.y
-            val betweenSectionsMargin = binding.recyclerDayList.paddingBottom
-            val border = sectionHeight + betweenSectionsMargin
-            if (secondVisibleItemViewPositionY >= border) {
-                binding.textSection.y = -(firstVisibleItemViewPositionY)
-            } else {
-                if (secondVisibleItemViewPositionY < betweenSectionsMargin) {
-                    binding.textSection.y = 0f
-                } else if (binding.textSection.y == 0f) {
-                    binding.textSection.y = -(firstVisibleItemViewPositionY) - sectionHeight
-                }
-            }
+        val firstVisibleItemView = checkNotNull(layoutManager.getChildAt(0))
+        val secondVisibleItemView = layoutManager.getChildAt(1)
+        val textSection = firstVisibleViewHolder.binding.textSection
+
+        val firstVisibleItemViewPositionY = firstVisibleItemView.y
+        if (secondVisibleItemView == null) {
+            textSection.y = -(firstVisibleItemViewPositionY)
+            return
         }
 
-
+        val sectionHeight = textSection.height
+        val secondVisibleItemViewPositionY = secondVisibleItemView.y
+        val betweenSectionsMargin =
+            firstVisibleViewHolder.binding.recyclerDayList.paddingBottom
+        val border = sectionHeight + betweenSectionsMargin
+        if (secondVisibleItemViewPositionY >= border) {
+            textSection.y = -(firstVisibleItemViewPositionY)
+        } else {
+            if (secondVisibleItemViewPositionY < betweenSectionsMargin) {
+                textSection.y = 0f
+            } else if (textSection.y == 0f) {
+                textSection.y = -(firstVisibleItemViewPositionY) - sectionHeight
+            }
+        }
     }
 
-    private fun updateSecondVisibleSectionBarPosition(layoutManager: LinearLayoutManager) {
+    private fun updateSecondVisibleSectionBarPosition(recyclerView: RecyclerView) {
+        val layoutManager = recyclerView.layoutManager as LinearLayoutManager
         val firstVisibleItemPosition = layoutManager.findFirstVisibleItemPosition()
         val secondVisibleViewHolder =
             recyclerView.findViewHolderForAdapterPosition(firstVisibleItemPosition + 1) ?: return
