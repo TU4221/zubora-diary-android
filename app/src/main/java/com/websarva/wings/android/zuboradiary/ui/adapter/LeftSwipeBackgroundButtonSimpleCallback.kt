@@ -22,50 +22,43 @@ internal open class LeftSwipeBackgroundButtonSimpleCallback(recyclerView: SwipeR
 
     override fun build() {
         super.build()
-        recyclerView.setOnPerformClickListener(
-            LeftSwipeBackgroundButtonRecyclerViewOnPerformClickListener()
-        )
+        recyclerView.setOnPerformClickListener { view, event ->
+            onClickSwipedViewHolder(view, event)
+        }
     }
 
-    private inner class LeftSwipeBackgroundButtonRecyclerViewOnPerformClickListener
-        : SwipeRecyclerView.OnPerformClickListener {
-        override fun onPerformClick(view: View, event: MotionEvent): Boolean {
-            return onClickSwipedViewHolder(view, event)
+    private fun onClickSwipedViewHolder(v: View, event: MotionEvent): Boolean {
+        // タッチViewHolder取得
+        val childView = recyclerView.findChildViewUnder(event.x, event.y) ?: return false
+
+        val adapterPosition = recyclerView.getChildAdapterPosition(childView)
+        val viewHolder =
+            recyclerView.findViewHolderForAdapterPosition(adapterPosition)
+        val leftSwipeViewHolder = viewHolder as LeftSwipeViewHolder
+
+        val tolerance = (3 * v.resources.displayMetrics.density).toInt() // スワイプ位置誤差許容値
+        val foregroundView = leftSwipeViewHolder.foregroundView
+        val backgroundButtonView = leftSwipeViewHolder.backgroundButtonView
+
+        // アニメーション中無効
+        if (!foregroundView.isClickable) return false
+        // スワイプ状態でない
+        if (foregroundView.translationX > -backgroundButtonView.width + tolerance) return false
+
+        val rect = Rect()
+        backgroundButtonView.getGlobalVisibleRect(rect)
+        // 背面ボタン押下時処理
+        if (rect.contains(event.rawX.toInt(), event.rawY.toInt())) {
+            backgroundButtonView.performClick()
+            closeSwipedViewHolder(adapterPosition)
+            return true
         }
-
-        private fun onClickSwipedViewHolder(v: View, event: MotionEvent): Boolean {
-            // タッチViewHolder取得
-            val childView = recyclerView.findChildViewUnder(event.x, event.y) ?: return false
-
-            val adapterPosition = recyclerView.getChildAdapterPosition(childView)
-            val viewHolder =
-                recyclerView.findViewHolderForAdapterPosition(adapterPosition)
-            val leftSwipeViewHolder = viewHolder as LeftSwipeViewHolder
-
-            val tolerance = (3 * v.resources.displayMetrics.density).toInt() // スワイプ位置誤差許容値
-            val foregroundView = leftSwipeViewHolder.foregroundView
-            val backgroundButtonView = leftSwipeViewHolder.backgroundButtonView
-
-            // アニメーション中無効
-            if (!foregroundView.isClickable) return false
-            // スワイプ状態でない
-            if (foregroundView.translationX > -backgroundButtonView.width + tolerance) return false
-
-            val rect = Rect()
-            backgroundButtonView.getGlobalVisibleRect(rect)
-            // 背面ボタン押下時処理
-            if (rect.contains(event.rawX.toInt(), event.rawY.toInt())) {
-                backgroundButtonView.performClick()
-                closeSwipedViewHolder(adapterPosition)
-                return true
-            }
-            // スワイプアイテム押下時処理
-            if (swipedAdapterPosition == adapterPosition) {
-                closeSwipedViewHolder(adapterPosition)
-                return true
-            }
-            return false
+        // スワイプアイテム押下時処理
+        if (swipedAdapterPosition == adapterPosition) {
+            closeSwipedViewHolder(adapterPosition)
+            return true
         }
+        return false
     }
 
     // MEMO:スワイプ時、タッチ状態を継続したままRecyclerViewを更新するとonSwiped()が起動するが、

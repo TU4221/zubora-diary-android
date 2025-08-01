@@ -7,10 +7,8 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
-import androidx.recyclerview.widget.RecyclerView
 import com.websarva.wings.android.zuboradiary.R
 import com.websarva.wings.android.zuboradiary.ui.model.AppMessage
-import com.websarva.wings.android.zuboradiary.domain.model.ThemeColor
 import com.websarva.wings.android.zuboradiary.databinding.FragmentDiaryListBinding
 import com.websarva.wings.android.zuboradiary.ui.adapter.diary.DiaryDayListBaseItem
 import com.websarva.wings.android.zuboradiary.ui.adapter.diary.DiaryYearMonthListBaseAdapter.OnClickChildItemListener
@@ -165,7 +163,16 @@ class DiaryListFragment :
         launchAndRepeatOnViewLifeCycleStarted {
             mainViewModel.diaryList
                 .collectLatest { value: DiaryYearMonthList ->
-                    DiaryListObserver().onChanged(value)
+                    if (shouldInitializeListAdapter) {
+                        shouldInitializeListAdapter = false
+                        //setUpListAdapter()
+                    }
+
+                    val convertedItemList: List<DiaryYearMonthListBaseItem> = value.itemList
+                    val listAdapter = binding.recyclerDiaryList.adapter as DiaryYearMonthListAdapter
+                    listAdapter.submitList(convertedItemList) {
+                        mainViewModel.onDiaryListUpdated()
+                    }
                 }
         }
 
@@ -179,13 +186,15 @@ class DiaryListFragment :
         }
     }
 
-    private fun setUpListAdapter(): DiaryListAdapter {
+    private fun setUpListAdapter(): DiaryYearMonthListAdapter {
         val diaryListAdapter =
-            DiaryListAdapter(
-                binding.recyclerDiaryList,
-                themeColor
-            )
-        diaryListAdapter.apply {
+            object : DiaryYearMonthListAdapter(binding.recyclerDiaryList, themeColor) {
+                override fun loadListOnScrollEnd() {
+                    mainViewModel.onDiaryListEndScrolled()
+                }
+            }
+
+        return diaryListAdapter.apply {
             build()
             onClickChildItemListener =
                 OnClickChildItemListener { item: DiaryDayListBaseItem ->
@@ -196,38 +205,6 @@ class DiaryListFragment :
                     if (item !is DiaryDayListItem) throw IllegalStateException()
                     mainViewModel.onDiaryListItemDeleteButtonClicked(item.date, item.imageUri)
                 }
-        }
-
-        return diaryListAdapter
-    }
-
-    private inner class DiaryListAdapter(
-        recyclerView: RecyclerView,
-        themeColor: ThemeColor
-    ) : DiaryYearMonthListAdapter(recyclerView, themeColor) {
-
-        override fun loadListOnScrollEnd() {
-            mainViewModel.onDiaryListEndScrolled()
-        }
-    }
-
-    private inner class DiaryListObserver {
-        fun onChanged(value: DiaryYearMonthList) {
-            setUpList(value)
-        }
-
-        private fun setUpList(list: DiaryYearMonthList) {
-
-            if (shouldInitializeListAdapter) {
-                shouldInitializeListAdapter = false
-                //setUpListAdapter()
-            }
-
-            val convertedItemList: List<DiaryYearMonthListBaseItem> = list.itemList
-            val listAdapter = binding.recyclerDiaryList.adapter as DiaryYearMonthListAdapter
-            listAdapter.submitList(convertedItemList) {
-                mainViewModel.onDiaryListUpdated()
-            }
         }
     }
 

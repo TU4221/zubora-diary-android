@@ -13,10 +13,6 @@ import com.websarva.wings.android.zuboradiary.ui.keyboard.KeyboardManager
 
 internal class EditTextConfigurator {
 
-     private fun hideKeyboard(view: View) {
-        KeyboardManager().hideKeyboard(view)
-    }
-
     fun setUpScrollable(editText: EditText) {
         editText.onFocusChangeListener = EditTextScrollableOnFocusChangeListener()
     }
@@ -58,7 +54,7 @@ internal class EditTextConfigurator {
         editText.setOnEditorActionListener(NextOnEnterListener())
     }
 
-    private inner class NextOnEnterListener : TextView.OnEditorActionListener {
+    private class NextOnEnterListener : TextView.OnEditorActionListener {
 
         override fun onEditorAction(v: TextView?, actionId: Int, event: KeyEvent?): Boolean {
             v as EditText
@@ -68,21 +64,22 @@ internal class EditTextConfigurator {
                 v.inputType == (InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_MULTI_LINE)
                 ) return false
 
+            val keyboardManager = KeyboardManager()
             when (actionId) {
                 EditorInfo.IME_ACTION_DONE -> {
-                    hideKeyboard(v)
+                    keyboardManager.hideKeyboard(v)
                     v.clearFocus()
                 }
                 EditorInfo.IME_ACTION_NEXT -> {
                     val nextView = focusNextEditTextView(v)
 
-                    if (nextView?.inputType == InputType.TYPE_NULL) hideKeyboard(v)
+                    if (nextView?.inputType == InputType.TYPE_NULL) keyboardManager.hideKeyboard(v)
                 }
                 EditorInfo.IME_ACTION_SEARCH -> {
-                    hideKeyboard(v)
+                    keyboardManager.hideKeyboard(v)
                     v.clearFocus()
                 }
-                else -> hideKeyboard(v)
+                else -> keyboardManager.hideKeyboard(v)
             }
             return false // MEMO:”return true” だとバックスペースが機能しなくなり入力文字を削除できなくなる。
         }

@@ -13,9 +13,11 @@ import android.view.WindowManager
 import android.widget.AdapterView
 import android.widget.AdapterView.OnItemClickListener
 import android.widget.ArrayAdapter
+import android.widget.LinearLayout
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.view.ContextThemeWrapper
 import androidx.constraintlayout.motion.widget.MotionLayout
+import androidx.core.widget.NestedScrollView
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.websarva.wings.android.zuboradiary.R
@@ -66,10 +68,7 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditEvent>
         val KEY_RESULT = RESULT_KEY_PREFIX + DiaryEditFragment::class.java.name
     }
 
-    private val logTag = createLogTag()
-
     private val motionLayoutTransitionTime = 500 /*ms*/
-    private val scrollTimeMotionLayoutTransition = 1000 /*ms*/
 
     private lateinit var itemMotionLayoutListeners: Array<ItemMotionLayoutListener>
 
@@ -551,7 +550,15 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditEvent>
             Array(arraySize) { init ->
                 val itemNumber = ItemNumber(init + 1)
                 val itemMotionLayout = selectItemMotionLayout(itemNumber)
-                val itemMotionLayoutListener = ItemMotionLayoutListener(itemNumber)
+                val itemMotionLayoutListener =
+                    ItemMotionLayoutListener(
+                        itemNumber,
+                        binding.includeItem1.linerLayoutDiaryEditItem,
+                        binding.nestedScrollFullScreen,
+                        { mainViewModel.onDiaryItemHidedStateTransitionCompleted(it) },
+                        { mainViewModel.onDiaryItemShowedStateTransitionCompleted() },
+                        { selectItemMotionLayout(it) }
+                    )
                 itemMotionLayout.setTransitionListener(itemMotionLayoutListener)
                 itemMotionLayoutListener
             }
@@ -559,14 +566,23 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditEvent>
         launchAndRepeatOnViewLifeCycleStarted {
             mainViewModel.numVisibleItems
                 .collectLatest { value: Int ->
-                    NumVisibleItemsObserver().onChanged(value)
+                    setUpItemsLayout(value)
                 }
         }
     }
 
-    private inner class ItemMotionLayoutListener(
-        val itemNumber: ItemNumber
+    private class ItemMotionLayoutListener(
+        private val itemNumber: ItemNumber,
+        private val itemLayout: LinearLayout,
+        private val scrollView: NestedScrollView,
+        private val onHidedStateTransitionCompleted: (ItemNumber) -> Unit,
+        private val onShowedStateTransitionCompleted: (ItemNumber) -> Unit,
+        private val processItemMotionLayoutSelection: (ItemNumber) -> MotionLayout,
     ): MotionLayout.TransitionListener {
+
+        private val logTag = createLogTag()
+
+        private val scrollTimeMotionLayoutTransition = 1000 /*ms*/
 
         private var isTriggeredBySmooth = false
 
@@ -603,7 +619,7 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditEvent>
                 completedStateLogMsg = "HidedState"
                 if (isTriggeredBySmooth) {
                     if (isNextItemHidedState()) scrollOnDiaryItemHided()
-                    mainViewModel.onDiaryItemHidedStateTransitionCompleted(itemNumber)
+                    onHidedStateTransitionCompleted(itemNumber)
                 }
 
             // 対象項目欄追加後の処理
@@ -611,7 +627,7 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditEvent>
                 completedStateLogMsg = "ShowedState"
                 if (isTriggeredBySmooth) {
                     scrollOnDiaryItemShowed()
-                    mainViewModel.onDiaryItemShowedStateTransitionCompleted()
+                    onShowedStateTransitionCompleted(itemNumber)
                 }
             }
             Log.d(logTag, "onTransitionCompleted()_CompletedState = $completedStateLogMsg")
@@ -622,7 +638,7 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditEvent>
         private fun isNextItemHidedState(): Boolean {
             if (itemNumber.value == ItemNumber.MAX_NUMBER) return true
             val nextItemNumber = itemNumber.inc()
-            val motionLayout = selectItemMotionLayout(nextItemNumber)
+            val motionLayout = processItemMotionLayoutSelection(nextItemNumber)
             return motionLayout.currentState == R.id.motion_scene_edit_diary_item_hided_state
         }
 
@@ -637,15 +653,15 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditEvent>
         }
 
         private fun scrollOnDiaryItemTransition(isUpDirection: Boolean) {
-            val itemHeight = binding.includeItem1.linerLayoutDiaryEditItem.height
+            val itemHeight = itemLayout.height
             val scrollY =
                 if (isUpDirection) {
                     itemHeight
                 } else {
                     -itemHeight
                 }
-            binding.nestedScrollFullScreen
-                .smoothScrollBy(0, scrollY, scrollTimeMotionLayoutTransition)
+            Log.d("20250801", "scrollOnDiaryItemTransition(${isUpDirection})_scrollView:${scrollView}_itemHeight:${itemHeight}")
+            scrollView.smoothScrollBy(0, scrollY, scrollTimeMotionLayoutTransition)
         }
 
         override fun onTransitionTrigger(
@@ -675,32 +691,26 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditEvent>
         return itemMotionLayoutListeners[arrayNumber]
     }
 
-    private inner class NumVisibleItemsObserver {
-        fun onChanged(value: Int) {
-            setUpItemsLayout(value)
+    private fun setUpItemsLayout(numItems: Int) {
+        require(!(numItems < ItemNumber.MIN_NUMBER || numItems > ItemNumber.MAX_NUMBER))
+
+        // MEMO:削除処理はObserverで適切なモーション削除処理を行うのは難しいのでここでは処理せず、削除ダイアログから処理する。
+        if (shouldTransitionItemMotionLayout) {
+            shouldTransitionItemMotionLayout = false
+            val numShowedItems = countShowedItems()
+            val differenceValue = numItems - numShowedItems
+            if (numItems > numShowedItems && differenceValue == 1) {
+                showItem(ItemNumber(numItems), false)
+                return
+            }
         }
 
-        private fun setUpItemsLayout(numItems: Int) {
-            require(!(numItems < ItemNumber.MIN_NUMBER || numItems > ItemNumber.MAX_NUMBER))
-
-            // MEMO:削除処理はObserverで適切なモーション削除処理を行うのは難しいのでここでは処理せず、削除ダイアログから処理する。
-            if (shouldTransitionItemMotionLayout) {
-                shouldTransitionItemMotionLayout = false
-                val numShowedItems = countShowedItems()
-                val differenceValue = numItems - numShowedItems
-                if (numItems > numShowedItems && differenceValue == 1) {
-                    showItem(ItemNumber(numItems), false)
-                    return
-                }
-            }
-
-            for (i in ItemNumber.MIN_NUMBER..ItemNumber.MAX_NUMBER) {
-                val itemNumber = ItemNumber(i)
-                if (itemNumber.value <= numItems) {
-                    showItem(itemNumber, true)
-                } else {
-                    hideItem(itemNumber, true)
-                }
+        for (i in ItemNumber.MIN_NUMBER..ItemNumber.MAX_NUMBER) {
+            val itemNumber = ItemNumber(i)
+            if (itemNumber.value <= numItems) {
+                showItem(itemNumber, true)
+            } else {
+                hideItem(itemNumber, true)
             }
         }
     }

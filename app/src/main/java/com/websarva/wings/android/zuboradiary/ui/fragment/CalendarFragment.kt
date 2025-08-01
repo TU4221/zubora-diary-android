@@ -8,6 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.LifecycleCoroutineScope
 import androidx.lifecycle.lifecycleScope
 import com.kizitonwose.calendar.core.CalendarDay
 import com.kizitonwose.calendar.core.CalendarMonth
@@ -187,16 +188,28 @@ class CalendarFragment :
 
     // カレンダーBind設定
     private fun configureCalendarBinders(daysOfWeek: List<DayOfWeek>, themeColor: ThemeColor) {
-        binding.calendar.dayBinder = CalendarMonthDayBinder(themeColor)
+        binding.calendar.dayBinder =
+            CalendarMonthDayBinder(
+                themeColor,
+                { date: LocalDate -> mainViewModel.onCalendarDayClicked(date) },
+                viewLifecycleOwner.lifecycleScope,
+                { date: LocalDate -> mainViewModel.existsSavedDiary(date) }
+            )
+
+
+        val format = getString(R.string.fragment_calendar_month_header_format)
         binding.calendar.monthHeaderBinder =
-            CalendarMonthHeaderFooterBinder(daysOfWeek, themeColor)
+            CalendarMonthHeaderFooterBinder(daysOfWeek, themeColor, format)
     }
 
-    private inner class CalendarMonthDayBinder(
+    private class CalendarMonthDayBinder(
         private val themeColor: ThemeColor,
-        private var selectedDate: LocalDate = LocalDate.now()
+        private val onDateClick: (date: LocalDate) -> Unit,
+        private val lifecycleScope: LifecycleCoroutineScope,
+        private val processDiaryExistCheck: suspend (date: LocalDate) -> Boolean?
     ) : MonthDayBinder<DayViewContainer> {
 
+        private var selectedDate: LocalDate = LocalDate.now()
         private var isDiaryInfoLoadingFailure = false
 
         @Suppress("PARAMETER_NAME_CHANGED_ON_OVERRIDE")
@@ -204,7 +217,7 @@ class CalendarFragment :
             val textDay = container.binding.textDay.apply {
                 setOnClickListener {
                     if (calendarDay.position == DayPosition.MonthDate) {
-                        mainViewModel.onCalendarDayClicked(calendarDay.date)
+                        onDateClick(calendarDay.date)
                     }
                 }
 
@@ -283,7 +296,7 @@ class CalendarFragment :
             val localDate = calendarDay.date
 
             lifecycleScope.launch {
-                val exists = mainViewModel.existsSavedDiary(localDate)
+                val exists = processDiaryExistCheck(localDate)
                 withContext(Dispatchers.Main) {
                     when (exists) {
                         true -> viewCalendarDayDot.visibility = View.VISIBLE
@@ -306,16 +319,16 @@ class CalendarFragment :
         }
     }
 
-    private inner class CalendarMonthHeaderFooterBinder(
+    private class CalendarMonthHeaderFooterBinder(
         private val daysOfWeek: List<DayOfWeek>,
-        private val themeColor: ThemeColor
+        private val themeColor: ThemeColor,
+        private val headerDateFormat: String
     ) : MonthHeaderFooterBinder<MonthViewContainer> {
 
         @Suppress("PARAMETER_NAME_CHANGED_ON_OVERRIDE")
         override fun bind(container: MonthViewContainer, calendarMonth: CalendarMonth) {
             // カレンダーの年月表示設定
-            val format = getString(R.string.fragment_calendar_month_header_format)
-            val formatter = DateTimeFormatter.ofPattern(format)
+            val formatter = DateTimeFormatter.ofPattern(headerDateFormat)
             val stringYearMonth = calendarMonth.yearMonth.format(formatter)
             container.binding.textYearMonth.text = stringYearMonth
 

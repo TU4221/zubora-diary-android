@@ -5,11 +5,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.RecyclerView
 import com.websarva.wings.android.zuboradiary.R
 import com.websarva.wings.android.zuboradiary.ui.model.AppMessage
-import com.websarva.wings.android.zuboradiary.domain.model.ThemeColor
 import com.websarva.wings.android.zuboradiary.databinding.FragmentWordSearchBinding
 import com.websarva.wings.android.zuboradiary.ui.keyboard.KeyboardManager
 import com.websarva.wings.android.zuboradiary.ui.adapter.diary.DiaryDayListBaseItem
@@ -107,52 +105,40 @@ class WordSearchFragment : BaseFragment<FragmentWordSearchBinding, WordSearchEve
         launchAndRepeatOnViewLifeCycleStarted {
             mainViewModel.wordSearchResultList
                 .collectLatest { value: WordSearchResultYearMonthList ->
-                    WordSearchResultListObserver().onChanged(value)
+                    if (shouldInitializeListAdapter) {
+                        shouldInitializeListAdapter = false
+                        //setUpListAdapter()
+                    }
+
+                    val listAdapter =
+                        binding.recyclerWordSearchResultList.adapter
+                                as WordSearchResultYearMonthListAdapter
+                    val convertedList: List<DiaryYearMonthListBaseItem> =
+                        ArrayList<DiaryYearMonthListBaseItem>(value.itemList)
+                    listAdapter.submitList(convertedList) {
+                        mainViewModel.onWordSearchResultListUpdated()
+                    }
                 }
         }
     }
 
     private fun setUpListAdapter() {
         val wordSearchResultListAdapter =
-            WordSearchResultListAdapter(
+            object : WordSearchResultYearMonthListAdapter(
                 binding.recyclerWordSearchResultList,
                 themeColor
-            )
+            ) {
+                override fun loadListOnScrollEnd() {
+                    mainViewModel.onWordSearchResultListEndScrolled()
+                }
+            }
+
         wordSearchResultListAdapter.apply {
             build()
             onClickChildItemListener =
                 OnClickChildItemListener { item: DiaryDayListBaseItem ->
                     mainViewModel.onWordSearchResultListItemClicked(item.date)
                 }
-        }
-    }
-
-    private inner class WordSearchResultListAdapter(
-        recyclerView: RecyclerView,
-        themeColor: ThemeColor
-    ) :
-        WordSearchResultYearMonthListAdapter(recyclerView, themeColor) {
-        override fun loadListOnScrollEnd() {
-            mainViewModel.onWordSearchResultListEndScrolled()
-        }
-    }
-
-    private inner class WordSearchResultListObserver :
-        Observer<WordSearchResultYearMonthList> {
-        override fun onChanged(value: WordSearchResultYearMonthList) {
-            if (shouldInitializeListAdapter) {
-                shouldInitializeListAdapter = false
-                //setUpListAdapter()
-            }
-
-            val listAdapter =
-                binding.recyclerWordSearchResultList.adapter
-                        as WordSearchResultYearMonthListAdapter
-            val convertedList: List<DiaryYearMonthListBaseItem> =
-                ArrayList<DiaryYearMonthListBaseItem>(value.itemList)
-            listAdapter.submitList(convertedList) {
-                mainViewModel.onWordSearchResultListUpdated()
-            }
         }
     }
 

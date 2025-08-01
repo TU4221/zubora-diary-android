@@ -2,8 +2,6 @@ package com.websarva.wings.android.zuboradiary.ui.adapter.diary
 
 import android.util.Log
 import android.view.LayoutInflater
-import android.view.View
-import android.view.View.OnLayoutChangeListener
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -54,10 +52,13 @@ internal abstract class DiaryYearMonthListBaseAdapter protected constructor(
             //           年月のアイテムのサイズ変更にアニメーションが発生せず全体的に違和感となるアニメーションになってしまう。
             //      問題2.最終アイテムまで到達し、ProgressBarが消えた後にセクションバーがその分ずれる)
             itemAnimator = null
-            addOnScrollListener(SectionBarTranslationOnScrollListener())
-            addOnLayoutChangeListener(SectionBarInitializationOnLayoutChangeListener())
+            setupSectionBar(this)
 
-            addOnScrollListener(ListAdditionalLoadingOnScrollListener())
+            addOnScrollListener(
+                ListAdditionalLoadingOnScrollListener {
+                    loadListOnScrollEnd()
+                }
+            )
         }
     }
 
@@ -180,7 +181,9 @@ internal abstract class DiaryYearMonthListBaseAdapter protected constructor(
     //      2. スクロール読込開始条件として、データベースの読込処理状態を監視していたが、読込完了からRecyclerViewへ
     //         反映されるまでの間にタイムラグがあるため、その間にスクロール読込開始条件が揃って読込処理が重複してしまう。
     //         これを解消するために独自のフラグを用意した。
-    private inner class ListAdditionalLoadingOnScrollListener : RecyclerView.OnScrollListener() {
+    private class ListAdditionalLoadingOnScrollListener(
+        val processListAdditionalLoading: () -> Unit
+    ) : RecyclerView.OnScrollListener() {
         override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
             super.onScrolled(recyclerView, dx, dy)
             if (dy < 0) return // MEMO:RecyclerView更新時にも処理できるように "<=" -> "<" とする。(画面回転対応)
@@ -198,25 +201,25 @@ internal abstract class DiaryYearMonthListBaseAdapter protected constructor(
             val recyclerViewAdapter = checkNotNull(recyclerView.adapter)
             val lastItemViewType = recyclerViewAdapter.getItemViewType(lastItemPosition)
             if (lastItemViewType == ViewType.PROGRESS_INDICATOR.viewTypeNumber) {
-                loadListOnScrollEnd()
+                processListAdditionalLoading()
             }
         }
     }
 
-    private inner class SectionBarTranslationOnScrollListener : RecyclerView.OnScrollListener() {
-        override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-            super.onScrolled(recyclerView, dx, dy)
+    private fun setupSectionBar(recyclerView: RecyclerView) {
+        recyclerView.apply {
+            addOnScrollListener(
+                object : RecyclerView.OnScrollListener() {
+                    override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                        super.onScrolled(recyclerView, dx, dy)
 
-            updateVisibleSectionBarPosition()
-        }
-    }
-
-    private inner class SectionBarInitializationOnLayoutChangeListener : OnLayoutChangeListener {
-        override fun onLayoutChange(
-            v: View, left: Int, top: Int, right: Int, bottom: Int,
-            oldLeft: Int, oldTop: Int, oldRight: Int, oldBottom: Int
-        ) {
-            updateVisibleSectionBarPosition()
+                        updateVisibleSectionBarPosition()
+                    }
+                }
+            )
+            addOnLayoutChangeListener { _, _, _, _, _, _, _, _, _ ->
+                updateVisibleSectionBarPosition()
+            }
         }
     }
 

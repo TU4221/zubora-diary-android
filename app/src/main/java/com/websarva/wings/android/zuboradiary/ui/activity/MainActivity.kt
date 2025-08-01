@@ -20,7 +20,6 @@ import androidx.navigation.ui.NavigationUI.onNavDestinationSelected
 import androidx.navigation.ui.NavigationUI.setupWithNavController
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.navigation.NavigationBarView
-import com.google.android.material.navigation.NavigationBarView.OnItemReselectedListener
 import com.google.android.material.transition.platform.MaterialFadeThrough
 import com.websarva.wings.android.zuboradiary.R
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
@@ -110,8 +109,23 @@ class MainActivity : LoggingActivity() {
         //      また、"recursive = true"の理由は、NavHostFragmentからFragmentManagerを取得してCallBacksを
         //      登録しようとするにはコードが複雑になり、設定変更等によるアプリ再起動時を考慮すると登録タイミングが複雑になる為。
         supportFragmentManager.apply {
-            registerFragmentLifecycleCallbacks(BottomNavigationEnabledSwitchCallbacks(), true)
-            registerFragmentLifecycleCallbacks(BottomNavigationStateSwitchCallbacks(), true)
+            registerFragmentLifecycleCallbacks(
+                BottomNavigationEnabledSwitchCallbacks { isEnabled ->
+                    mainActivityViewModel.switchBottomNavigationEnabled(isEnabled)
+                },
+                true
+            )
+
+            registerFragmentLifecycleCallbacks(
+                BottomNavigationStateSwitchCallbacks { isVisible ->
+                    if (isVisible) {
+                        mainActivityViewModel.showBottomNavigation()
+                    } else {
+                        mainActivityViewModel.hideBottomNavigation()
+                    }
+                },
+                true
+            )
         }
     }
 
@@ -120,15 +134,16 @@ class MainActivity : LoggingActivity() {
     //      (何も表示されない状態)
     //      これを回避するために、遷移先のFragmentが表示しきるまで、タブ選択できないようにする。
     //      Fragment A → B → A
-    private inner class BottomNavigationEnabledSwitchCallbacks :
-        FragmentManager.FragmentLifecycleCallbacks() {
+    private class BottomNavigationEnabledSwitchCallbacks(
+        private val processBottomNavigationEnabled: (isEnabled: Boolean) -> Unit
+    ) : FragmentManager.FragmentLifecycleCallbacks() {
 
         override fun onFragmentResumed(fm: FragmentManager, f: Fragment) {
             super.onFragmentPaused(fm, f)
             if (f.parentFragment !is NavHostFragment) return
 
             if (isFragmentWithBottomNavigation(f)) {
-                mainActivityViewModel.switchBottomNavigationEnabled(true)
+                processBottomNavigationEnabled(true)
             }
         }
 
@@ -137,7 +152,7 @@ class MainActivity : LoggingActivity() {
             if (f.parentFragment !is NavHostFragment) return
 
             if (isFragmentWithBottomNavigation(f)) {
-                mainActivityViewModel.switchBottomNavigationEnabled(false)
+                processBottomNavigationEnabled(false)
             }
         }
 
@@ -146,8 +161,9 @@ class MainActivity : LoggingActivity() {
         }
     }
 
-    private inner class BottomNavigationStateSwitchCallbacks :
-        FragmentManager.FragmentLifecycleCallbacks() {
+    private class BottomNavigationStateSwitchCallbacks(
+        private val processBottomNavigationVisibilityState: (isVisible: Boolean) -> Unit
+    ) : FragmentManager.FragmentLifecycleCallbacks() {
         override fun onFragmentViewCreated(
             fm: FragmentManager,
             f: Fragment,
@@ -159,11 +175,7 @@ class MainActivity : LoggingActivity() {
 
             if (f is DialogFragment) return
 
-            if (f is RequiresBottomNavigation) {
-                mainActivityViewModel.showBottomNavigation()
-            } else {
-                mainActivityViewModel.hideBottomNavigation()
-            }
+            processBottomNavigationVisibilityState(f is RequiresBottomNavigation)
         }
     }
 
@@ -257,15 +269,25 @@ class MainActivity : LoggingActivity() {
 
         bottomNavigationView.apply {
             setOnItemSelectedListener(
-                CustomOnItemSelectedListener(this, navController)
+                CustomOnItemSelectedListener(this, navController) {
+                    wasSelectedTab = true
+                    setUpFragmentTransition()
+                }
             )
-            setOnItemReselectedListener(CustomOnItemReselectedListener())
+            setOnItemReselectedListener {
+                val showedFragment = showedFragment
+                if (showedFragment !is ReselectableFragment) return@setOnItemReselectedListener
+
+                Log.i(logTag, "ボトムナビゲーション_リセレクト")
+                showedFragment.onBottomNavigationItemReselected()
+            }
         }
     }
 
-    private inner class CustomOnItemSelectedListener(
+    private class CustomOnItemSelectedListener(
         private val bottomNavigationView: BottomNavigationView,
-        private val navController: NavController
+        private val navController: NavController,
+        private val onItemSelected: () -> Unit
     ) : NavigationBarView.OnItemSelectedListener {
 
         private val selectedBottomNavigationMenuItem: MenuItem
@@ -289,56 +311,43 @@ class MainActivity : LoggingActivity() {
             // BottomNavigationのタブ選択による画面遷移
             if (selectedBottomNavigationMenuItem === menuItem) return true
 
-            Log.i(logTag, "ボトムナビゲーション_フラグメント切替")
-            wasSelectedTab = true
-
-            setUpFragmentTransition()
+            onItemSelected()
             onNavDestinationSelected(menuItem, navController)
             return true
         }
-
-        private fun setUpFragmentTransition() {
-            // 表示中のFragmentを取得し、Transitionを設定
-            val showedFragment = showedFragment
-            showedFragment.exitTransition = MaterialFadeThrough()
-            showedFragment.returnTransition = MaterialFadeThrough()
-
-            // MEMO:NavigationUI.onNavDestinationSelected()による、
-            //      Fragment切替時の対象Transitionパターン表(StartDestination:A-1)
-            //* A-1 → B-1 : Exit → Enter
-            //* B-1 → A-1 : Return → Reenter
-
-            //* A-2 → B-1 : Exit → Enter
-            //* B-1 → A-2 : Exit → Enter
-
-            //* B-2 → A-1 : Return → Reenter
-            //* A-1 → B-2 : Exit → Enter
-
-            //* A-2 → B-2 : Exit → Enter
-            //* B-2 → A-2 : Exit → Enter
-
-            //* B-1 → C-1 : Exit → Enter
-            //* C-1 → B-1 : Exit → Enter
-
-            //* B-2 → C-1 : Exit → Enter
-            //* C-1 → B-2 : Exit → Enter
-
-            //* C-2 → B-1 : Exit → Enter
-            //* B-1 → C-2 : Exit → Enter
-
-            //* B-2 → C-2 : Exit → Enter
-            //* C-2 → B-2 : Exit → Enter
-        }
     }
 
-    private inner class CustomOnItemReselectedListener : OnItemReselectedListener {
-        override fun onNavigationItemReselected(menuItem: MenuItem) {
-            val showedFragment = showedFragment
-            if (showedFragment !is ReselectableFragment) return
+    private fun setUpFragmentTransition() {
+        // 表示中のFragmentを取得し、Transitionを設定
+        val showedFragment = showedFragment
+        showedFragment.exitTransition = MaterialFadeThrough()
+        showedFragment.returnTransition = MaterialFadeThrough()
 
-            Log.i(logTag, "ボトムナビゲーション_リセレクト")
-            showedFragment.onBottomNavigationItemReselected()
-        }
+        // MEMO:NavigationUI.onNavDestinationSelected()による、
+        //      Fragment切替時の対象Transitionパターン表(StartDestination:A-1)
+        //* A-1 → B-1 : Exit → Enter
+        //* B-1 → A-1 : Return → Reenter
+
+        //* A-2 → B-1 : Exit → Enter
+        //* B-1 → A-2 : Exit → Enter
+
+        //* B-2 → A-1 : Return → Reenter
+        //* A-1 → B-2 : Exit → Enter
+
+        //* A-2 → B-2 : Exit → Enter
+        //* B-2 → A-2 : Exit → Enter
+
+        //* B-1 → C-1 : Exit → Enter
+        //* C-1 → B-1 : Exit → Enter
+
+        //* B-2 → C-1 : Exit → Enter
+        //* C-1 → B-2 : Exit → Enter
+
+        //* C-2 → B-1 : Exit → Enter
+        //* B-1 → C-2 : Exit → Enter
+
+        //* B-2 → C-2 : Exit → Enter
+        //* C-2 → B-2 : Exit → Enter
     }
 
     // BottomNavigationタブ選択による画面遷移の遷移先FragmentのTransition設定完了後用リセットメソッド

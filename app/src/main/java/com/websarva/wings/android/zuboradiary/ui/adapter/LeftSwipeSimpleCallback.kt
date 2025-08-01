@@ -42,11 +42,11 @@ internal open class LeftSwipeSimpleCallback(protected val recyclerView: SwipeRec
     open fun build() {
         itemTouchHelper = ItemTouchHelper(this)
         itemTouchHelper.attachToRecyclerView(recyclerView)
-        recyclerView.setOnTouchUpListener(LeftSwipeRecyclerViewOnTouchUpListener())
+        setUpLeftSwipeItem()
     }
 
-    private inner class LeftSwipeRecyclerViewOnTouchUpListener : SwipeRecyclerView.OnTouchUpListener {
-        override fun onTouchUp() {
+    private fun setUpLeftSwipeItem() {
+        recyclerView.setOnTouchUpListener {
             clearInvalidSwipeViewHolder()
         }
     }
@@ -54,7 +54,7 @@ internal open class LeftSwipeSimpleCallback(protected val recyclerView: SwipeRec
     // MEMO:スワイプクローズアニメーション開始時にfalseとなり、終了時にtrueとなるようにしているが、
     //      終了時にタッチ中の場合はfalseのままとしているため、ここでtrueにする。
     //      理由は"InvalidSwipeAdapterPosition"書き込みコード参照。
-    protected fun clearInvalidSwipeViewHolder() {
+    private fun clearInvalidSwipeViewHolder() {
         if (invalidSwipeAdapterPosition == initializePosition) return
 
         val lockedViewHolder =
