@@ -3,7 +3,7 @@ package com.websarva.wings.android.zuboradiary.domain.usecase.settings
 import android.util.Log
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.data.repository.DiaryRepository
-import com.websarva.wings.android.zuboradiary.domain.exception.diary.DeleteAllDiariesFailedException
+import com.websarva.wings.android.zuboradiary.domain.exception.diary.AllDiariesDeletionFailureException
 import com.websarva.wings.android.zuboradiary.domain.usecase.exception.DeleteAllDiariesUseCaseException
 import com.websarva.wings.android.zuboradiary.domain.usecase.uri.ReleaseAllPersistableUriPermissionUseCase
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
@@ -31,21 +31,21 @@ internal class DeleteAllDiariesUseCase(
         return UseCaseResult.Success(Unit)
     }
 
-    @Throws(DeleteAllDiariesUseCaseException.DeleteAllDiariesFailed::class)
+    @Throws(DeleteAllDiariesUseCaseException.AllDiariesDeletionFailure::class)
     private suspend fun deleteAllDiaries() {
         val logMsg = "全日記データ削除_"
         Log.i(logTag, "${logMsg}開始")
 
         try {
             diaryRepository.deleteAllDiaries()
-        } catch (e: DeleteAllDiariesFailedException) {
-            throw DeleteAllDiariesUseCaseException.DeleteAllDiariesFailed(e)
+        } catch (e: AllDiariesDeletionFailureException) {
+            throw DeleteAllDiariesUseCaseException.AllDiariesDeletionFailure(e)
         }
 
         Log.i(logTag, "${logMsg}完了")
     }
 
-    @Throws(DeleteAllDiariesUseCaseException.ReleaseAllPersistableUriPermissionFailed::class)
+    @Throws(DeleteAllDiariesUseCaseException.AllPersistableUriPermissionReleaseFailure::class)
     private fun releaseAllImageUriPermission() {
         val logMsg = "全永続的URI権限解放_"
         Log.i(logTag, "${logMsg}開始")
@@ -56,7 +56,7 @@ internal class DeleteAllDiariesUseCase(
             }
             is UseCaseResult.Failure -> {
                 throw DeleteAllDiariesUseCaseException
-                    .ReleaseAllPersistableUriPermissionFailed(result.exception)
+                    .AllPersistableUriPermissionReleaseFailure(result.exception)
             }
         }
 

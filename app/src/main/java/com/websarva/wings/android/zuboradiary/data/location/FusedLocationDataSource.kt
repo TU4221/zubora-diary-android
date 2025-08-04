@@ -26,7 +26,7 @@ internal class FusedLocationDataSource(
     // MEMO:fusedLocationProviderClient.lastLocation()を記述する時、Permission確認コードが必須となるが、
     //      Permission確認はプロパティで管理する為、@SuppressLintで警告抑制。
     @SuppressLint("MissingPermission")
-    @Throws(FusedLocationAccessException::class)
+    @Throws(FusedLocationAccessFailureException::class)
     suspend fun fetchCurrentLocation(timeoutMillis: Long = 10000L): Location {
         val logMsg = "現在位置取得"
         Log.i(logTag, "${logMsg}_開始")
@@ -62,13 +62,13 @@ internal class FusedLocationDataSource(
             }
         } catch (e: SecurityException) {
             Log.e(logTag, "${logMsg}_失敗", e)
-            throw FusedLocationAccessException(e)
+            throw FusedLocationAccessFailureException(e)
         } catch (e: IllegalStateException) {
             Log.e(logTag, "${logMsg}_失敗", e)
-            throw FusedLocationAccessException(e)
+            throw FusedLocationAccessFailureException(e)
         } catch (e: TimeoutException) {
             Log.e(logTag, "${logMsg}_失敗", e)
-            throw FusedLocationAccessException(e)
+            throw FusedLocationAccessFailureException(e)
         } finally {
             cancellationTokenSource.cancel()
         }

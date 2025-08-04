@@ -5,7 +5,7 @@ import com.websarva.wings.android.zuboradiary.domain.usecase.exception.FetchWeat
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.domain.model.Weather
 import com.websarva.wings.android.zuboradiary.data.repository.WeatherInfoRepository
-import com.websarva.wings.android.zuboradiary.domain.exception.weather.FetchWeatherInfoException
+import com.websarva.wings.android.zuboradiary.domain.exception.weather.WeatherInfoFetchException
 import com.websarva.wings.android.zuboradiary.domain.usecase.DefaultUseCaseResult
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import java.time.LocalDate
@@ -51,14 +51,14 @@ internal class FetchWeatherInfoUseCase(
             val result = weatherInfoRepository.fetchWeatherInfo(date)
             Log.i(logTag, "${logMsg}完了")
             result
-        } catch (e: FetchWeatherInfoException) {
+        } catch (e: WeatherInfoFetchException) {
             Log.e(logTag, "${logMsg}失敗")
             when (e) {
-                is FetchWeatherInfoException.AccessLocationFailed ->
-                    throw FetchWeatherInfoUseCaseException.AccessLocationFailed(e)
-                is FetchWeatherInfoException.ApiAccessFailed ->
-                    throw FetchWeatherInfoUseCaseException.FetchWeatherInfoFailed(e)
-                is FetchWeatherInfoException.DateOutOfRange ->
+                is WeatherInfoFetchException.AccessLocationFailure ->
+                    throw FetchWeatherInfoUseCaseException.LocationAccessFailure(e)
+                is WeatherInfoFetchException.ApiAccessFailure ->
+                    throw FetchWeatherInfoUseCaseException.WeatherInfoFetchFailure(e)
+                is WeatherInfoFetchException.DateOutOfRange ->
                     throw FetchWeatherInfoUseCaseException.WeatherInfoDateOutOfRange(date, e)
             }
         }

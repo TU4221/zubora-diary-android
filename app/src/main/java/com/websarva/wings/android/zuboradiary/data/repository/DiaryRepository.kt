@@ -1,7 +1,7 @@
 package com.websarva.wings.android.zuboradiary.data.repository
 
 import android.util.Log
-import com.websarva.wings.android.zuboradiary.data.database.DataBaseAccessException
+import com.websarva.wings.android.zuboradiary.data.database.DataBaseAccessFailureException
 import com.websarva.wings.android.zuboradiary.data.database.DiaryDataSource
 import com.websarva.wings.android.zuboradiary.data.mapper.toDataModel
 import com.websarva.wings.android.zuboradiary.data.mapper.toDomainModel
@@ -9,19 +9,19 @@ import com.websarva.wings.android.zuboradiary.domain.model.Diary
 import com.websarva.wings.android.zuboradiary.domain.model.DiaryItemTitleSelectionHistoryItem
 import com.websarva.wings.android.zuboradiary.domain.model.DiaryListItem
 import com.websarva.wings.android.zuboradiary.domain.model.WordSearchResultListItem
-import com.websarva.wings.android.zuboradiary.domain.exception.diary.DeleteAllDiariesFailedException
-import com.websarva.wings.android.zuboradiary.domain.exception.diary.CountDiariesFailedException
-import com.websarva.wings.android.zuboradiary.domain.exception.diary.DeleteDiaryFailedException
-import com.websarva.wings.android.zuboradiary.domain.exception.diary.CheckDiaryExistenceFailedException
-import com.websarva.wings.android.zuboradiary.domain.exception.diary.FetchDiaryListFailedException
-import com.websarva.wings.android.zuboradiary.domain.exception.diary.FetchDiaryFailedException
-import com.websarva.wings.android.zuboradiary.domain.exception.diary.CheckDiaryImageUriUsedFailedException
-import com.websarva.wings.android.zuboradiary.domain.exception.diary.SaveDiaryFailedException
-import com.websarva.wings.android.zuboradiary.domain.exception.diary.CountWordSearchResultFailedException
-import com.websarva.wings.android.zuboradiary.domain.exception.diary.DeleteAllDataFailedException
-import com.websarva.wings.android.zuboradiary.domain.exception.diary.DeleteDiaryItemTitleSelectionHistoryItemFailedException
-import com.websarva.wings.android.zuboradiary.domain.exception.diary.FetchDiaryItemTitleSelectionHistoryFailedException
-import com.websarva.wings.android.zuboradiary.domain.exception.diary.FetchWordSearchResultListFailedException
+import com.websarva.wings.android.zuboradiary.domain.exception.diary.AllDiariesDeletionFailureException
+import com.websarva.wings.android.zuboradiary.domain.exception.diary.DiaryCountFailureException
+import com.websarva.wings.android.zuboradiary.domain.exception.diary.DiaryDeletionFailureException
+import com.websarva.wings.android.zuboradiary.domain.exception.diary.DiaryExistenceCheckFailureException
+import com.websarva.wings.android.zuboradiary.domain.exception.diary.DiaryListFetchFailureException
+import com.websarva.wings.android.zuboradiary.domain.exception.diary.DiaryFetchFailureException
+import com.websarva.wings.android.zuboradiary.domain.exception.diary.DiaryImageUriUsageCheckFailureException
+import com.websarva.wings.android.zuboradiary.domain.exception.diary.DiarySaveFailureException
+import com.websarva.wings.android.zuboradiary.domain.exception.diary.WordSearchResultCountFailureException
+import com.websarva.wings.android.zuboradiary.domain.exception.diary.AllDataDeletionFailureException
+import com.websarva.wings.android.zuboradiary.domain.exception.diary.DiaryItemTitleSelectionHistoryItemDeletionFailureException
+import com.websarva.wings.android.zuboradiary.domain.exception.diary.DiaryItemTitleSelectionHistoryFetchFailureException
+import com.websarva.wings.android.zuboradiary.domain.exception.diary.WordSearchResultListFetchFailureException
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -38,85 +38,85 @@ internal class DiaryRepository (
 
     private val logTag = createLogTag()
 
-    @Throws(CountDiariesFailedException::class)
+    @Throws(DiaryCountFailureException::class)
     suspend fun countDiaries(): Int {
         return withContext(Dispatchers.IO) {
             try {
                 diaryDataSource.countDiaries()
-            } catch (e: DataBaseAccessException) {
-                throw CountDiariesFailedException(e)
+            } catch (e: DataBaseAccessFailureException) {
+                throw DiaryCountFailureException(e)
             }
         }
 
     }
 
-    @Throws(CountDiariesFailedException::class)
+    @Throws(DiaryCountFailureException::class)
     suspend fun countDiaries(date: LocalDate): Int {
         return withContext(Dispatchers.IO) {
             try {
                 diaryDataSource.countDiaries(date)
-            } catch (e: DataBaseAccessException) {
-                throw CountDiariesFailedException(e)
+            } catch (e: DataBaseAccessFailureException) {
+                throw DiaryCountFailureException(e)
             }
         }
     }
 
-    @Throws(CheckDiaryExistenceFailedException::class)
+    @Throws(DiaryExistenceCheckFailureException::class)
     suspend fun existsDiary(date: LocalDate): Boolean {
         return withContext(Dispatchers.IO) {
             try {
                 diaryDataSource.existsDiary(date)
-            } catch (e: DataBaseAccessException) {
-                throw CheckDiaryExistenceFailedException(date, e)
+            } catch (e: DataBaseAccessFailureException) {
+                throw DiaryExistenceCheckFailureException(date, e)
             }
         }
     }
 
-    @Throws(CheckDiaryImageUriUsedFailedException::class)
+    @Throws(DiaryImageUriUsageCheckFailureException::class)
     suspend fun existsImageUri(uriString: String): Boolean {
         return withContext(Dispatchers.IO) {
             try {
                 diaryDataSource.existsImageUri(uriString)
-            } catch (e: DataBaseAccessException) {
-                throw CheckDiaryImageUriUsedFailedException(uriString, e)
+            } catch (e: DataBaseAccessFailureException) {
+                throw DiaryImageUriUsageCheckFailureException(uriString, e)
             }
         }
     }
 
-    @Throws(FetchDiaryFailedException::class)
+    @Throws(DiaryFetchFailureException::class)
     suspend fun fetchDiary(date: LocalDate): Diary? {
         return withContext(Dispatchers.IO) {
             try {
                 diaryDataSource.selectDiary(date)?.toDomainModel()
-            } catch (e: DataBaseAccessException) {
-                throw FetchDiaryFailedException("日付 '$date' の日記の取得に失敗しました。", e)
+            } catch (e: DataBaseAccessFailureException) {
+                throw DiaryFetchFailureException("日付 '$date' の日記の取得に失敗しました。", e)
             }
         }
     }
 
-    @Throws(FetchDiaryFailedException::class)
+    @Throws(DiaryFetchFailureException::class)
     suspend fun fetchNewestDiary(): Diary? {
         return withContext(Dispatchers.IO) {
             try {
                 diaryDataSource.selectNewestDiary()?.toDomainModel()
-            } catch (e: DataBaseAccessException) {
-                throw FetchDiaryFailedException("最新の日記の取得に失敗しました。", e)
+            } catch (e: DataBaseAccessFailureException) {
+                throw DiaryFetchFailureException("最新の日記の取得に失敗しました。", e)
             }
         }
     }
 
-    @Throws(FetchDiaryFailedException::class)
+    @Throws(DiaryFetchFailureException::class)
     suspend fun fetchOldestDiary(): Diary? {
         return withContext(Dispatchers.IO) {
             try {
                 diaryDataSource.selectOldestDiary()?.toDomainModel()
-            } catch (e: DataBaseAccessException) {
-                throw FetchDiaryFailedException("最古の日記の取得に失敗しました。", e)
+            } catch (e: DataBaseAccessFailureException) {
+                throw DiaryFetchFailureException("最古の日記の取得に失敗しました。", e)
             }
         }
     }
 
-    @Throws(FetchDiaryListFailedException::class)
+    @Throws(DiaryListFetchFailureException::class)
     suspend fun fetchDiaryList(
         num: Int,
         offset: Int,
@@ -131,24 +131,24 @@ internal class DiaryRepository (
                 diaryDataSource
                     .selectDiaryListOrderByDateDesc(num, offset, date)
                     .map { it.toDomainModel() }
-            } catch (e: DataBaseAccessException) {
-                throw FetchDiaryListFailedException(e)
+            } catch (e: DataBaseAccessFailureException) {
+                throw DiaryListFetchFailureException(e)
             }
         }
     }
 
-    @Throws(CountWordSearchResultFailedException::class)
+    @Throws(WordSearchResultCountFailureException::class)
     suspend fun countWordSearchResultDiaries(searchWord: String): Int {
         return withContext(Dispatchers.IO) {
             try {
                 diaryDataSource.countWordSearchResults(searchWord)
-            } catch (e: DataBaseAccessException) {
-                throw CountWordSearchResultFailedException(searchWord, e)
+            } catch (e: DataBaseAccessFailureException) {
+                throw WordSearchResultCountFailureException(searchWord, e)
             }
         }
     }
 
-    @Throws(FetchWordSearchResultListFailedException::class)
+    @Throws(WordSearchResultListFetchFailureException::class)
     suspend fun loadWordSearchResultDiaryList(
         num: Int,
         offset: Int,
@@ -162,13 +162,13 @@ internal class DiaryRepository (
                 diaryDataSource
                     .selectWordSearchResultListOrderByDateDesc(num, offset, searchWord)
                     .map { it.toDomainModel() }
-            } catch (e: DataBaseAccessException) {
-                throw FetchWordSearchResultListFailedException(searchWord, e)
+            } catch (e: DataBaseAccessFailureException) {
+                throw WordSearchResultListFetchFailureException(searchWord, e)
             }
         }
     }
 
-    @Throws(SaveDiaryFailedException::class)
+    @Throws(DiarySaveFailureException::class)
     suspend fun saveDiary(
         diary: Diary,
         historyItemList: List<DiaryItemTitleSelectionHistoryItem>
@@ -179,13 +179,13 @@ internal class DiaryRepository (
                     diary.toDataModel(),
                     historyItemList.map { it.toDataModel() }
                 )
-            } catch (e: DataBaseAccessException) {
-                throw SaveDiaryFailedException(diary.date, e)
+            } catch (e: DataBaseAccessFailureException) {
+                throw DiarySaveFailureException(diary.date, e)
             }
         }
     }
 
-    @Throws(SaveDiaryFailedException::class)
+    @Throws(DiarySaveFailureException::class)
     suspend fun deleteAndSaveDiary(
         deleteDiaryDate: LocalDate,
         newDiary: Diary,
@@ -198,47 +198,47 @@ internal class DiaryRepository (
                     newDiary.toDataModel(),
                     historyItemList.map { it.toDataModel() }
                 )
-            } catch (e: DataBaseAccessException) {
-                throw SaveDiaryFailedException(newDiary.date, e)
+            } catch (e: DataBaseAccessFailureException) {
+                throw DiarySaveFailureException(newDiary.date, e)
             }
         }
     }
 
-    @Throws(DeleteDiaryFailedException::class)
+    @Throws(DiaryDeletionFailureException::class)
     suspend fun deleteDiary(date: LocalDate) {
         withContext(Dispatchers.IO) {
             try {
                 diaryDataSource.deleteDiary(date)
-            } catch (e: DataBaseAccessException) {
-                throw DeleteDiaryFailedException(date, e)
+            } catch (e: DataBaseAccessFailureException) {
+                throw DiaryDeletionFailureException(date, e)
             }
         }
     }
 
-    @Throws(DeleteAllDiariesFailedException::class)
+    @Throws(AllDiariesDeletionFailureException::class)
     suspend fun deleteAllDiaries() {
         withContext(Dispatchers.IO) {
             try {
                 diaryDataSource.deleteAllDiaries()
-            } catch (e: DataBaseAccessException) {
-                throw DeleteAllDiariesFailedException(e)
+            } catch (e: DataBaseAccessFailureException) {
+                throw AllDiariesDeletionFailureException(e)
             }
         }
     }
 
-    @Throws(DeleteAllDataFailedException::class)
+    @Throws(AllDataDeletionFailureException::class)
     suspend fun deleteAllData() {
         withContext(Dispatchers.IO) {
             try {
                 diaryDataSource.deleteAllData()
-            } catch (e: DataBaseAccessException) {
-                throw DeleteAllDataFailedException(e)
+            } catch (e: DataBaseAccessFailureException) {
+                throw AllDataDeletionFailureException(e)
             }
         }
     }
 
     /**
-     * @throws FetchDiaryItemTitleSelectionHistoryFailedException
+     * @throws DiaryItemTitleSelectionHistoryFetchFailureException
      */
     fun fetchDiaryItemTitleSelectionHistory(
         num: Int, offset: Int
@@ -249,20 +249,20 @@ internal class DiaryRepository (
         return diaryDataSource
             .selectHistoryListOrderByLogDesc(num, offset)
             .catch {
-                throw FetchDiaryItemTitleSelectionHistoryFailedException(it)
+                throw DiaryItemTitleSelectionHistoryFetchFailureException(it)
             }
             .map { list ->
                 list.map { it.toDomainModel() }
             }
     }
 
-    @Throws(DeleteDiaryItemTitleSelectionHistoryItemFailedException::class)
+    @Throws(DiaryItemTitleSelectionHistoryItemDeletionFailureException::class)
     suspend fun deleteDiaryItemTitleSelectionHistoryItem(title: String) {
         withContext(Dispatchers.IO) {
             try {
                 diaryDataSource.deleteHistoryItem(title)
-            } catch (e: DataBaseAccessException) {
-                throw DeleteDiaryItemTitleSelectionHistoryItemFailedException(title, e)
+            } catch (e: DataBaseAccessFailureException) {
+                throw DiaryItemTitleSelectionHistoryItemDeletionFailureException(title, e)
             }
         }
     }

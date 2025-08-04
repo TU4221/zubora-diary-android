@@ -7,11 +7,11 @@ internal sealed class UserSettingsException (
     cause: Throwable? = null
 ) : DomainException(message, cause) {
 
-    class AccessFailed(
+    class AccessFailure(
         cause: Throwable? = null
     ) : UserSettingsException("ユーザー設定へのアクセスに失敗しました。", cause)
 
-    class DataNotFoundException(
+    class DataNotFound(
         cause: Throwable? = null
     ) : UserSettingsException("指定されたユーザー設定のデータが存在しません。", cause)
 }

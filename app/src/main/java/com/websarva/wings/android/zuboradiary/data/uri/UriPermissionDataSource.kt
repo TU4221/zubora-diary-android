@@ -12,18 +12,18 @@ internal class UriPermissionDataSource (
 
     private val logTag = createLogTag()
 
-    @Throws(PersistableUriPermissionOperationException::class)
+    @Throws(PersistableUriPermissionOperationFailureException::class)
     private fun executePersistableUriPermissionOperation(
         operation: () -> Unit
     ) {
         try {
             operation()
         } catch (e: SecurityException) {
-            throw PersistableUriPermissionOperationException(e)
+            throw PersistableUriPermissionOperationFailureException(e)
         }
     }
 
-    @Throws(PersistableUriPermissionOperationException::class)
+    @Throws(PersistableUriPermissionOperationFailureException::class)
     fun takePersistableUriPermission(uri: Uri) {
         val logMsg = "端末写真使用権限取得"
         Log.i(logTag, "${logMsg}_開始=$uri")
@@ -36,7 +36,7 @@ internal class UriPermissionDataSource (
     }
 
     // MEMO:Uri先のファイルを削除すると、登録されていたUriPermissionも同時に削除される。
-    @Throws(PersistableUriPermissionOperationException::class)
+    @Throws(PersistableUriPermissionOperationFailureException::class)
     fun releasePersistableUriPermission(uri: Uri) {
         val logMsg = "端末写真使用権限解放"
         Log.i(logTag, "${logMsg}_開始_URI=$uri")
@@ -58,7 +58,7 @@ internal class UriPermissionDataSource (
         Log.i(logTag, "${logMsg}_完了")
     }
 
-    @Throws(PersistableUriPermissionOperationException::class)
+    @Throws(PersistableUriPermissionOperationFailureException::class)
     fun releaseAllPersistableUriPermission() {
         val logMsg = "端末写真使用権限全解放"
         Log.i(logTag, "${logMsg}_開始")

@@ -5,7 +5,7 @@ import com.websarva.wings.android.zuboradiary.domain.model.ThemeColor
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.domain.model.settings.ThemeColorSetting
 import com.websarva.wings.android.zuboradiary.data.repository.UserPreferencesRepository
-import com.websarva.wings.android.zuboradiary.domain.exception.settings.UpdateThemeColorSettingFailedException
+import com.websarva.wings.android.zuboradiary.domain.exception.settings.ThemeColorSettingUpdateFailureException
 import com.websarva.wings.android.zuboradiary.domain.usecase.DefaultUseCaseResult
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 
@@ -24,7 +24,7 @@ internal class SaveThemeColorSettingUseCase(
         try {
             val preferenceValue = ThemeColorSetting(themeColor)
             userPreferencesRepository.saveThemeColorPreference(preferenceValue)
-        } catch (e: UpdateThemeColorSettingFailedException) {
+        } catch (e: ThemeColorSettingUpdateFailureException) {
             Log.e(logTag, "${logMsg}失敗")
             return UseCaseResult.Failure(e)
         }

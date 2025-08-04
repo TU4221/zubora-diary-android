@@ -4,8 +4,8 @@ import android.util.Log
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.data.repository.DiaryRepository
 import com.websarva.wings.android.zuboradiary.data.repository.UriRepository
-import com.websarva.wings.android.zuboradiary.domain.exception.diary.CheckDiaryImageUriUsedFailedException
-import com.websarva.wings.android.zuboradiary.domain.exception.uri.ReleasePersistableUriPermissionFailedException
+import com.websarva.wings.android.zuboradiary.domain.exception.diary.DiaryImageUriUsageCheckFailureException
+import com.websarva.wings.android.zuboradiary.domain.exception.uri.PersistableUriPermissionReleaseFailureException
 import com.websarva.wings.android.zuboradiary.domain.usecase.DefaultUseCaseResult
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 
@@ -23,14 +23,14 @@ internal class ReleasePersistableUriPermissionUseCase(
         try {
             val existsImageUri = diaryRepository.existsImageUri(uriString)
             if (existsImageUri) return UseCaseResult.Success(Unit)
-        } catch (e: CheckDiaryImageUriUsedFailedException) {
+        } catch (e: DiaryImageUriUsageCheckFailureException) {
             Log.e(logTag, "${logMsg}失敗", e)
             return UseCaseResult.Failure(e)
         }
 
         try {
             uriRepository.releasePersistableUriPermission(uriString)
-        } catch (e: ReleasePersistableUriPermissionFailedException) {
+        } catch (e: PersistableUriPermissionReleaseFailureException) {
             Log.e(logTag, "${logMsg}失敗", e)
             return UseCaseResult.Failure(e)
         }

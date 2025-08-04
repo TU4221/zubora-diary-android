@@ -3,7 +3,7 @@ package com.websarva.wings.android.zuboradiary.domain.exception.settings
 import com.websarva.wings.android.zuboradiary.domain.exception.DomainException
 import java.time.LocalTime
 
-internal class UpdateReminderNotificationSettingFailedException(
+internal class ReminderNotificationSettingUpdateFailureException(
     isEnabled: Boolean,
     time: LocalTime? = null,
     cause: Throwable

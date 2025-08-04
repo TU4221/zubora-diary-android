@@ -4,7 +4,7 @@ import android.util.Log
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.domain.model.settings.WeatherInfoFetchSetting
 import com.websarva.wings.android.zuboradiary.data.repository.UserPreferencesRepository
-import com.websarva.wings.android.zuboradiary.domain.exception.settings.UpdatePassCodeSettingFailedException
+import com.websarva.wings.android.zuboradiary.domain.exception.settings.PassCodeSettingUpdateFailureException
 import com.websarva.wings.android.zuboradiary.domain.usecase.DefaultUseCaseResult
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 
@@ -23,7 +23,7 @@ internal class SaveWeatherInfoFetchSettingUseCase(
         try {
             val preferenceValue = WeatherInfoFetchSetting(isChecked)
             userPreferencesRepository.saveWeatherInfoFetchPreference(preferenceValue)
-        } catch (e: UpdatePassCodeSettingFailedException) {
+        } catch (e: PassCodeSettingUpdateFailureException) {
             Log.e(logTag, "${logMsg}失敗")
             return UseCaseResult.Failure(e)
         }

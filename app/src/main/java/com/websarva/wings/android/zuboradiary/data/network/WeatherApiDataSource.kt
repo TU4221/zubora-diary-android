@@ -65,7 +65,7 @@ internal class WeatherApiDataSource(private val weatherApiService: WeatherApiSer
         return result
     }
 
-    @Throws(WeatherApiException.ApiAccessFailed::class)
+    @Throws(WeatherApiException.ApiAccessFailure::class)
     private suspend fun <R> executeWebApiOperation(
         operation: suspend () -> R
     ): R {
@@ -73,23 +73,23 @@ internal class WeatherApiDataSource(private val weatherApiService: WeatherApiSer
             operation()
         } catch (e: UnknownHostException) {
             // DNS解決に失敗した場合 (例: インターネット接続なし、ホスト名間違い)
-            throw WeatherApiException.ApiAccessFailed(e)
+            throw WeatherApiException.ApiAccessFailure(e)
         } catch (e: ConnectException) {
             // サーバーへのTCP接続に失敗した場合 (例: サーバーダウン、ポートが開いていない)
-            throw WeatherApiException.ApiAccessFailed(e)
+            throw WeatherApiException.ApiAccessFailure(e)
         } catch (e: java.net.SocketTimeoutException) {
             // 接続または読み取りタイムアウト
-            throw WeatherApiException.ApiAccessFailed(e)
+            throw WeatherApiException.ApiAccessFailure(e)
         } catch (e: SSLException) {
             // SSL/TLS ハンドシェイクエラー
-            throw WeatherApiException.ApiAccessFailed(e)
+            throw WeatherApiException.ApiAccessFailure(e)
         } catch (e: IOException) {
             // 上記以外の一般的なI/Oエラー (例: 予期せぬ接続切断など)
-            throw WeatherApiException.ApiAccessFailed(e)
+            throw WeatherApiException.ApiAccessFailure(e)
         }
     }
 
-    @Throws(WeatherApiException.ApiAccessFailed::class)
+    @Throws(WeatherApiException.ApiAccessFailure::class)
     suspend fun fetchTodayWeatherInfo(
         @FloatRange(from = -90.0, to = 90.0)
         latitude: Double,
@@ -110,7 +110,7 @@ internal class WeatherApiDataSource(private val weatherApiService: WeatherApiSer
         return toWeatherApiData(response)
     }
 
-    @Throws(WeatherApiException.ApiAccessFailed::class)
+    @Throws(WeatherApiException.ApiAccessFailure::class)
     suspend fun fetchPastDayWeatherInfo(
         @FloatRange(from = -90.0, to = 90.0)
         latitude: Double,
@@ -136,7 +136,7 @@ internal class WeatherApiDataSource(private val weatherApiService: WeatherApiSer
         return toWeatherApiData(response)
     }
 
-    @Throws(WeatherApiException.ApiAccessFailed::class)
+    @Throws(WeatherApiException.ApiAccessFailure::class)
     private fun toWeatherApiData(response: Response<WeatherApiData>): WeatherApiData {
         Log.d(logTag, "code = " + response.code())
         Log.d(logTag, "message = :" + response.message())
@@ -145,7 +145,7 @@ internal class WeatherApiDataSource(private val weatherApiService: WeatherApiSer
             Log.d(logTag, "body = " + response.body())
             val result =
                 response.body()
-                    ?: throw WeatherApiException.ApiAccessFailed(IOException())
+                    ?: throw WeatherApiException.ApiAccessFailure(IOException())
             result
         } else {
             // HTTPエラー (4xx, 5xx)
@@ -156,7 +156,7 @@ internal class WeatherApiDataSource(private val weatherApiService: WeatherApiSer
                     "errorBody = $errorBodyString"
                 )
             }
-            throw WeatherApiException.ApiAccessFailed(IOException())
+            throw WeatherApiException.ApiAccessFailure(IOException())
         }
     }
 }

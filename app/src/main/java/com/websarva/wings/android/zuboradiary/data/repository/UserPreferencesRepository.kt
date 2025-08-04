@@ -10,11 +10,11 @@ import com.websarva.wings.android.zuboradiary.data.preferences.UserPreferenceFlo
 import com.websarva.wings.android.zuboradiary.data.preferences.UserPreferences
 import com.websarva.wings.android.zuboradiary.data.preferences.UserPreferencesException
 import com.websarva.wings.android.zuboradiary.domain.model.settings.WeatherInfoFetchSetting
-import com.websarva.wings.android.zuboradiary.domain.exception.settings.UpdateCalendarStartDayOfWeekSettingFailedException
-import com.websarva.wings.android.zuboradiary.domain.exception.settings.UpdatePassCodeSettingFailedException
-import com.websarva.wings.android.zuboradiary.domain.exception.settings.UpdateReminderNotificationSettingFailedException
-import com.websarva.wings.android.zuboradiary.domain.exception.settings.UpdateThemeColorSettingFailedException
-import com.websarva.wings.android.zuboradiary.domain.exception.settings.UpdateWeatherInfoFetchSettingFailedException
+import com.websarva.wings.android.zuboradiary.domain.exception.settings.CalendarStartDayOfWeekSettingUpdateFailureException
+import com.websarva.wings.android.zuboradiary.domain.exception.settings.PassCodeSettingUpdateFailureException
+import com.websarva.wings.android.zuboradiary.domain.exception.settings.ReminderNotificationSettingUpdateFailureException
+import com.websarva.wings.android.zuboradiary.domain.exception.settings.ThemeColorSettingUpdateFailureException
+import com.websarva.wings.android.zuboradiary.domain.exception.settings.WeatherInfoFetchSettingUpdateFailureException
 import com.websarva.wings.android.zuboradiary.domain.exception.settings.UserSettingsException
 import com.websarva.wings.android.zuboradiary.domain.model.settings.UserSettingDataSourceResult
 import kotlinx.coroutines.Dispatchers
@@ -127,47 +127,47 @@ internal class UserPreferencesRepository(private val userPreferences: UserPrefer
         preferenceException: UserPreferencesException
     ): UserSettingsException {
         return when (preferenceException) {
-            is UserPreferencesException.DataStoreAccessFailed -> {
-                UserSettingsException.AccessFailed(preferenceException)
+            is UserPreferencesException.DataStoreAccessFailure -> {
+                UserSettingsException.AccessFailure(preferenceException)
             }
-            is UserPreferencesException.DataNotFoundException -> {
-                UserSettingsException.DataNotFoundException(preferenceException)
+            is UserPreferencesException.DataNotFound -> {
+                UserSettingsException.DataNotFound(preferenceException)
             }
         }
     }
 
-    @Throws(UpdateThemeColorSettingFailedException::class)
+    @Throws(ThemeColorSettingUpdateFailureException::class)
     suspend fun saveThemeColorPreference(setting: ThemeColorSetting) {
         withContext(Dispatchers.IO) {
             try {
                 val preference = setting.toDataModel()
                 userPreferences.saveThemeColorPreference(preference)
-            } catch (e: UserPreferencesException.DataStoreAccessFailed) {
-                throw UpdateThemeColorSettingFailedException(setting.themeColor, e)
+            } catch (e: UserPreferencesException.DataStoreAccessFailure) {
+                throw ThemeColorSettingUpdateFailureException(setting.themeColor, e)
             }
         }
     }
 
-    @Throws(UpdateCalendarStartDayOfWeekSettingFailedException::class)
+    @Throws(CalendarStartDayOfWeekSettingUpdateFailureException::class)
     suspend fun saveCalendarStartDayOfWeekPreference(setting: CalendarStartDayOfWeekSetting) {
         withContext(Dispatchers.IO) {
             try {
                 val preference = setting.toDataModel()
                 userPreferences.saveCalendarStartDayOfWeekPreference(preference)
-            } catch (e: UserPreferencesException.DataStoreAccessFailed) {
-                throw UpdateCalendarStartDayOfWeekSettingFailedException(setting.dayOfWeek,e)
+            } catch (e: UserPreferencesException.DataStoreAccessFailure) {
+                throw CalendarStartDayOfWeekSettingUpdateFailureException(setting.dayOfWeek,e)
             }
         }
     }
 
-    @Throws(UpdateReminderNotificationSettingFailedException::class)
+    @Throws(ReminderNotificationSettingUpdateFailureException::class)
     suspend fun saveReminderNotificationPreference(setting: ReminderNotificationSetting) {
         withContext(Dispatchers.IO) {
             try {
                 val preference = setting.toDataModel()
                 userPreferences.saveReminderNotificationPreference(preference)
-            } catch (e: UserPreferencesException.DataStoreAccessFailed) {
-                throw UpdateReminderNotificationSettingFailedException(
+            } catch (e: UserPreferencesException.DataStoreAccessFailure) {
+                throw ReminderNotificationSettingUpdateFailureException(
                     setting.isEnabled,
                     when (setting) {
                         is ReminderNotificationSetting.Enabled -> setting.notificationTime
@@ -179,14 +179,14 @@ internal class UserPreferencesRepository(private val userPreferences: UserPrefer
         }
     }
 
-    @Throws(UpdatePassCodeSettingFailedException::class)
+    @Throws(PassCodeSettingUpdateFailureException::class)
     suspend fun savePasscodeLockPreference(setting: PasscodeLockSetting) {
         withContext(Dispatchers.IO) {
             try {
                 val preference = setting.toDataModel()
                 userPreferences.savePasscodeLockPreference(preference)
-            } catch (e: UserPreferencesException.DataStoreAccessFailed) {
-                throw UpdatePassCodeSettingFailedException(
+            } catch (e: UserPreferencesException.DataStoreAccessFailure) {
+                throw PassCodeSettingUpdateFailureException(
                     setting.isEnabled,
                     when (setting) {
                         is PasscodeLockSetting.Enabled -> setting.passcode
@@ -198,14 +198,14 @@ internal class UserPreferencesRepository(private val userPreferences: UserPrefer
         }
     }
 
-    @Throws(UpdateWeatherInfoFetchSettingFailedException::class)
+    @Throws(WeatherInfoFetchSettingUpdateFailureException::class)
     suspend fun saveWeatherInfoFetchPreference(setting: WeatherInfoFetchSetting) {
         withContext(Dispatchers.IO) {
             try {
                 val preference = setting.toDataModel()
                 userPreferences.saveWeatherInfoFetchPreference(preference)
-            } catch (e: UserPreferencesException.DataStoreAccessFailed) {
-                throw UpdateWeatherInfoFetchSettingFailedException(setting.isEnabled, e)
+            } catch (e: UserPreferencesException.DataStoreAccessFailure) {
+                throw WeatherInfoFetchSettingUpdateFailureException(setting.isEnabled, e)
             }
         }
     }

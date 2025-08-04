@@ -3,7 +3,7 @@ package com.websarva.wings.android.zuboradiary.domain.usecase.diary
 import android.util.Log
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.data.repository.DiaryRepository
-import com.websarva.wings.android.zuboradiary.domain.exception.diary.FetchDiaryListFailedException
+import com.websarva.wings.android.zuboradiary.domain.exception.diary.DiaryListFetchFailureException
 import com.websarva.wings.android.zuboradiary.domain.model.DiaryListItem
 import com.websarva.wings.android.zuboradiary.domain.usecase.DefaultUseCaseResult
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
@@ -34,7 +34,7 @@ internal class FetchDiaryListUseCase(
                 )
             Log.i(logTag, "${logMsg}完了")
             return UseCaseResult.Success(loadedDiaryList)
-        } catch (e: FetchDiaryListFailedException) {
+        } catch (e: DiaryListFetchFailureException) {
             Log.e(logTag, "${logMsg}失敗", e)
             return UseCaseResult.Failure(e)
         }

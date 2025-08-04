@@ -782,10 +782,10 @@ internal class SettingsViewModel @Inject constructor(
                 updateUiState(SettingsState.LoadAllSettingsSuccess)
                 Log.e(logTag, "全日記削除_失敗", result.exception)
                 when (result.exception) {
-                    is DeleteAllDiariesUseCaseException.DeleteAllDiariesFailed -> {
+                    is DeleteAllDiariesUseCaseException.AllDiariesDeletionFailure -> {
                         emitAppMessageEvent(SettingsAppMessage.AllDiaryDeleteFailure)
                     }
-                    is DeleteAllDiariesUseCaseException.ReleaseAllPersistableUriPermissionFailed -> {
+                    is DeleteAllDiariesUseCaseException.AllPersistableUriPermissionReleaseFailure -> {
                         // 処理なし
                     }
                 }
@@ -815,13 +815,13 @@ internal class SettingsViewModel @Inject constructor(
                 Log.e(logTag, "アプリ全データ削除_失敗", result.exception)
                 updateUiState(SettingsState.LoadAllSettingsSuccess)
                 when (result.exception) {
-                    is DeleteAllDataUseCaseException.DeleteAllDataFailed -> {
+                    is DeleteAllDataUseCaseException.AllDataDeletionFailure -> {
                         emitAppMessageEvent(SettingsAppMessage.AllDataDeleteFailure)
                     }
-                    is DeleteAllDataUseCaseException.ReleaseAllPersistableUriPermissionFailed -> {
+                    is DeleteAllDataUseCaseException.AllPersistableUriPermissionReleaseFailure -> {
                         // 処理なし
                     }
-                    is DeleteAllDataUseCaseException.InitializeAllSettingsFailed -> {
+                    is DeleteAllDataUseCaseException.AllSettingsInitializationFailure -> {
                         emitAppMessageEvent(SettingsAppMessage.AllSettingsInitializationFailure)
                     }
                 }

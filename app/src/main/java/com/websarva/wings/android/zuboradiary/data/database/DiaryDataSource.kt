@@ -15,84 +15,84 @@ internal class DiaryDataSource(
 
     private val logTag = createLogTag()
 
-    @Throws(DataBaseAccessException::class)
+    @Throws(DataBaseAccessFailureException::class)
     private suspend fun <R> executeSuspendDbOperation(
         operation: suspend () -> R
     ): R {
         return try {
             operation()
         } catch (e: SQLiteException) {
-            throw DataBaseAccessException(e)
+            throw DataBaseAccessFailureException(e)
         } catch (e: IllegalStateException) {
-            throw DataBaseAccessException(e)
+            throw DataBaseAccessFailureException(e)
         }
     }
 
     /**
      * Flowのストリーム内で発生する特定のデータベース関連例外を
-     * [DataBaseAccessException] にラップして再スローします。
+     * [DataBaseAccessFailureException] にラップして再スローします。
      * その他の例外はそのまま再スローします。
      */
     private fun <T> Flow<T>.wrapDatabaseExceptions(): Flow<T> {
         return this.catch { exception -> // 'this' は拡張対象のFlowインスタンスを指す
             when (exception) {
                 is SQLiteException,
-                is IllegalStateException -> throw DataBaseAccessException(exception)
+                is IllegalStateException -> throw DataBaseAccessFailureException(exception)
                 else -> throw exception
             }
         }
     }
 
-    @Throws(DataBaseAccessException::class)
+    @Throws(DataBaseAccessFailureException::class)
     suspend fun countDiaries(): Int {
         return executeSuspendDbOperation {
             diaryDAO.countDiaries()
         }
     }
 
-    @Throws(DataBaseAccessException::class)
+    @Throws(DataBaseAccessFailureException::class)
     suspend fun countDiaries(date: LocalDate): Int {
         return executeSuspendDbOperation {
             diaryDAO.countDiaries(date.toString())
         }
     }
 
-    @Throws(DataBaseAccessException::class)
+    @Throws(DataBaseAccessFailureException::class)
     suspend fun existsDiary(date: LocalDate): Boolean {
         return executeSuspendDbOperation {
             diaryDAO.existsDiary(date.toString())
         }
     }
 
-    @Throws(DataBaseAccessException::class)
+    @Throws(DataBaseAccessFailureException::class)
     suspend fun existsImageUri(uriString: String): Boolean {
         return executeSuspendDbOperation {
             diaryDAO.existsImageUri(uriString)
         }
     }
 
-    @Throws(DataBaseAccessException::class)
+    @Throws(DataBaseAccessFailureException::class)
     suspend fun selectDiary(date: LocalDate): DiaryEntity? {
         return executeSuspendDbOperation {
             diaryDAO.selectDiary(date.toString())
         }
     }
 
-    @Throws(DataBaseAccessException::class)
+    @Throws(DataBaseAccessFailureException::class)
     suspend fun selectNewestDiary(): DiaryEntity? {
         return executeSuspendDbOperation {
             diaryDAO.selectNewestDiary()
         }
     }
 
-    @Throws(DataBaseAccessException::class)
+    @Throws(DataBaseAccessFailureException::class)
     suspend fun selectOldestDiary(): DiaryEntity? {
         return executeSuspendDbOperation {
             diaryDAO.selectOldestDiary()
         }
     }
 
-    @Throws(DataBaseAccessException::class)
+    @Throws(DataBaseAccessFailureException::class)
     suspend fun selectDiaryListOrderByDateDesc(
         num: Int,
         offset: Int,
@@ -111,14 +111,14 @@ internal class DiaryDataSource(
         }
     }
 
-    @Throws(DataBaseAccessException::class)
+    @Throws(DataBaseAccessFailureException::class)
     suspend fun countWordSearchResults(searchWord: String): Int {
         return executeSuspendDbOperation {
             diaryDAO.countWordSearchResults(searchWord)
         }
     }
 
-    @Throws(DataBaseAccessException::class)
+    @Throws(DataBaseAccessFailureException::class)
     suspend fun selectWordSearchResultListOrderByDateDesc(
         num: Int,
         offset: Int,
@@ -133,7 +133,7 @@ internal class DiaryDataSource(
         }
     }
 
-    @Throws(DataBaseAccessException::class)
+    @Throws(DataBaseAccessFailureException::class)
     suspend fun saveDiary(
         diary: DiaryEntity,
         historyItemList: List<DiaryItemTitleSelectionHistoryItemEntity>
@@ -146,7 +146,7 @@ internal class DiaryDataSource(
         }
     }
 
-    @Throws(DataBaseAccessException::class)
+    @Throws(DataBaseAccessFailureException::class)
     suspend fun deleteAndSaveDiary(
         deleteDiaryDate: LocalDate,
         newDiary: DiaryEntity,
@@ -161,21 +161,21 @@ internal class DiaryDataSource(
         }
     }
 
-    @Throws(DataBaseAccessException::class)
+    @Throws(DataBaseAccessFailureException::class)
     suspend fun deleteDiary(date: LocalDate) {
         executeSuspendDbOperation {
             diaryDAO.deleteDiary(date.toString())
         }
     }
 
-    @Throws(DataBaseAccessException::class)
+    @Throws(DataBaseAccessFailureException::class)
     suspend fun deleteAllDiaries() {
         executeSuspendDbOperation {
             diaryDAO.deleteAllDiaries()
         }
     }
 
-    @Throws(DataBaseAccessException::class)
+    @Throws(DataBaseAccessFailureException::class)
     suspend fun deleteAllData() {
         executeSuspendDbOperation {
             diaryDatabase.deleteAllData()
@@ -183,7 +183,7 @@ internal class DiaryDataSource(
     }
 
     /**
-     * @throws DataBaseAccessException
+     * @throws DataBaseAccessFailureException
      */
     fun selectHistoryListOrderByLogDesc(
         num: Int, offset: Int
@@ -196,7 +196,7 @@ internal class DiaryDataSource(
             .wrapDatabaseExceptions()
     }
 
-    @Throws(DataBaseAccessException::class)
+    @Throws(DataBaseAccessFailureException::class)
     suspend fun deleteHistoryItem(title: String) {
         return executeSuspendDbOperation {
             diaryItemTitleSelectionHistoryDAO.deleteHistoryItem(title)

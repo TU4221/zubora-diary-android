@@ -4,7 +4,7 @@ import android.util.Log
 import androidx.lifecycle.viewModelScope
 import com.websarva.wings.android.zuboradiary.R
 import com.websarva.wings.android.zuboradiary.domain.model.ItemNumber
-import com.websarva.wings.android.zuboradiary.domain.exception.diary.FetchDiaryItemTitleSelectionHistoryFailedException
+import com.websarva.wings.android.zuboradiary.domain.exception.diary.DiaryItemTitleSelectionHistoryFetchFailureException
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.DeleteDiaryItemTitleSelectionHistoryItemUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.FetchDiaryItemTitleSelectionHistoryUseCase
@@ -208,7 +208,7 @@ internal class DiaryItemTitleEditViewModel @Inject constructor(
             fetchDiaryItemTitleSelectionHistoryUseCase().value
                 .catch {
                     when (it) {
-                        is FetchDiaryItemTitleSelectionHistoryFailedException -> {
+                        is DiaryItemTitleSelectionHistoryFetchFailureException -> {
                             emitAppMessageEvent(
                                 DiaryItemTitleEditAppMessage.ItemTitleHistoryLoadingFailure
                             )

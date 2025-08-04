@@ -4,7 +4,7 @@ import android.util.Log
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.data.repository.DiaryRepository
 import com.websarva.wings.android.zuboradiary.domain.exception.DomainException
-import com.websarva.wings.android.zuboradiary.domain.exception.diary.SaveDiaryFailedException
+import com.websarva.wings.android.zuboradiary.domain.exception.diary.DiarySaveFailureException
 import com.websarva.wings.android.zuboradiary.domain.model.Diary
 import com.websarva.wings.android.zuboradiary.domain.model.DiaryItemTitleSelectionHistoryItem
 import com.websarva.wings.android.zuboradiary.domain.usecase.DefaultUseCaseResult
@@ -37,7 +37,7 @@ internal class SaveDiaryUseCase(
                 originalDiary.date,
                 isNewDiary
             )
-        } catch (e: SaveDiaryFailedException) {
+        } catch (e: DiarySaveFailureException) {
             Log.e(logTag, "${logMsg}失敗", e)
             return UseCaseResult.Failure(e)
         }
@@ -60,7 +60,7 @@ internal class SaveDiaryUseCase(
         return UseCaseResult.Success(Unit)
     }
 
-    @Throws(SaveDiaryFailedException::class)
+    @Throws(DiarySaveFailureException::class)
     private suspend fun saveDiary(
         diary: Diary,
         diaryItemTitleSelectionHistoryItemList: List<DiaryItemTitleSelectionHistoryItem>,
@@ -83,7 +83,7 @@ internal class SaveDiaryUseCase(
                 diaryRepository
                     .saveDiary(diary, diaryItemTitleSelectionHistoryItemList)
             }
-        } catch (e: SaveDiaryFailedException) {
+        } catch (e: DiarySaveFailureException) {
             throw e
         }
 

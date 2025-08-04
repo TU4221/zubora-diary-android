@@ -7,7 +7,7 @@ internal sealed class WeatherApiException (
     cause: Throwable? = null
 ) : Exception(message, cause) {
 
-    class ApiAccessFailed (
+    class ApiAccessFailure (
         cause: Throwable? = null
     ) : WeatherApiException("天気情報取得Apiのアクセスに失敗しました。", cause)
 

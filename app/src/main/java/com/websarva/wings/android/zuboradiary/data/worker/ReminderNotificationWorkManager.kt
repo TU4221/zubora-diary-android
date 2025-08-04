@@ -16,7 +16,7 @@ internal class ReminderNotificationWorkManager(private val workManager: WorkMana
 
     private val logTag = createLogTag()
 
-    @Throws(WorkProfileAccessException::class)
+    @Throws(WorkProfileAccessFailureException::class)
     private fun executeWorkOperation(
         operation: () -> Unit
     ) {
@@ -24,11 +24,11 @@ internal class ReminderNotificationWorkManager(private val workManager: WorkMana
             operation()
         } catch (e: IllegalStateException) {
             // WorkManagerが未初期化、または内部状態が不正な場合に発生しうるためキャッチ
-            throw WorkProfileAccessException(e)
+            throw WorkProfileAccessFailureException(e)
         }
     }
 
-    @Throws(WorkProfileAccessException::class)
+    @Throws(WorkProfileAccessFailureException::class)
     fun registerReminderNotificationWorker(settingTime: LocalTime) {
         cancelReminderNotificationWorker()
 
@@ -61,7 +61,7 @@ internal class ReminderNotificationWorkManager(private val workManager: WorkMana
         return betweenSeconds
     }
 
-    @Throws(WorkProfileAccessException::class)
+    @Throws(WorkProfileAccessFailureException::class)
     fun cancelReminderNotificationWorker() {
         executeWorkOperation {
             workManager.apply {

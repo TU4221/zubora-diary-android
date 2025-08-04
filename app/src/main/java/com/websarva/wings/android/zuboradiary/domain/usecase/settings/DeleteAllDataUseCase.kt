@@ -3,7 +3,7 @@ package com.websarva.wings.android.zuboradiary.domain.usecase.settings
 import android.util.Log
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.data.repository.DiaryRepository
-import com.websarva.wings.android.zuboradiary.domain.exception.diary.DeleteAllDataFailedException
+import com.websarva.wings.android.zuboradiary.domain.exception.diary.AllDataDeletionFailureException
 import com.websarva.wings.android.zuboradiary.domain.usecase.exception.DeleteAllDataUseCaseException
 import com.websarva.wings.android.zuboradiary.domain.usecase.uri.ReleaseAllPersistableUriPermissionUseCase
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
@@ -33,21 +33,21 @@ internal class DeleteAllDataUseCase(
         return UseCaseResult.Success(Unit)
     }
 
-    @Throws(DeleteAllDataUseCaseException.DeleteAllDataFailed::class)
+    @Throws(DeleteAllDataUseCaseException.AllDataDeletionFailure::class)
     private suspend fun deleteAllData() {
         val logMsg = "全データ削除_"
         Log.i(logTag, "${logMsg}開始")
 
         try {
             diaryRepository.deleteAllData()
-        } catch (e: DeleteAllDataFailedException) {
-            throw DeleteAllDataUseCaseException.DeleteAllDataFailed(e)
+        } catch (e: AllDataDeletionFailureException) {
+            throw DeleteAllDataUseCaseException.AllDataDeletionFailure(e)
         }
 
         Log.i(logTag, "${logMsg}完了")
     }
 
-    @Throws(DeleteAllDataUseCaseException.ReleaseAllPersistableUriPermissionFailed::class)
+    @Throws(DeleteAllDataUseCaseException.AllPersistableUriPermissionReleaseFailure::class)
     private fun releaseAllImageUriPermission() {
         val logMsg = "全永続的URI権限解放_"
         Log.i(logTag, "${logMsg}開始")
@@ -58,14 +58,14 @@ internal class DeleteAllDataUseCase(
             }
             is UseCaseResult.Failure -> {
                 throw DeleteAllDataUseCaseException
-                    .ReleaseAllPersistableUriPermissionFailed(result.exception)
+                    .AllPersistableUriPermissionReleaseFailure(result.exception)
             }
         }
 
         Log.i(logTag, "${logMsg}完了")
     }
 
-    @Throws(DeleteAllDataUseCaseException.InitializeAllSettingsFailed::class)
+    @Throws(DeleteAllDataUseCaseException.AllSettingsInitializationFailure::class)
     private suspend fun initializeAllSettings() {
         val logMsg = "全設定初期化_"
         Log.i(logTag, "${logMsg}開始")
@@ -76,7 +76,7 @@ internal class DeleteAllDataUseCase(
             }
             is UseCaseResult.Failure -> {
                 throw DeleteAllDataUseCaseException
-                    .InitializeAllSettingsFailed(result.exception)
+                    .AllSettingsInitializationFailure(result.exception)
             }
         }
 

@@ -32,13 +32,13 @@ internal class FetchCalendarStartDayOfWeekSettingUseCase(
                         is UserSettingDataSourceResult.Failure -> {
                             val defaultSettingValue = CalendarStartDayOfWeekSetting()
                             when (result.exception) {
-                                is UserSettingsException.AccessFailed -> {
+                                is UserSettingsException.AccessFailure -> {
                                     UserSettingResult.Failure(
                                         result.exception,
                                         defaultSettingValue
                                     )
                                 }
-                                is UserSettingsException.DataNotFoundException -> {
+                                is UserSettingsException.DataNotFound -> {
                                     UserSettingResult.Success(
                                         CalendarStartDayOfWeekSetting()
                                     )

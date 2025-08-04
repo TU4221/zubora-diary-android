@@ -2,7 +2,7 @@ package com.websarva.wings.android.zuboradiary.domain.exception.settings
 
 import com.websarva.wings.android.zuboradiary.domain.exception.DomainException
 
-internal class UpdatePassCodeSettingFailedException(
+internal class PassCodeSettingUpdateFailureException(
     isEnabled: Boolean,
     passCode: String,
     cause: Throwable

@@ -9,7 +9,7 @@ internal sealed class FetchWeatherInfoUseCaseException(
 
     class LocationPermissionNotGranted : FetchWeatherInfoUseCaseException("位置情報取得権限が未取得です。")
 
-    class AccessLocationFailed(
+    class LocationAccessFailure(
         cause: Throwable
     ) : FetchWeatherInfoUseCaseException(
         "位置情報取得に失敗しました。",
@@ -21,7 +21,7 @@ internal sealed class FetchWeatherInfoUseCaseException(
         cause: Throwable? = null
     ) : FetchWeatherInfoUseCaseException("指定した日付 '$date' は、天気情報を取得できる範囲を超えています。", cause)
 
-    class FetchWeatherInfoFailed(
+    class WeatherInfoFetchFailure(
         cause: Throwable
     ) : FetchWeatherInfoUseCaseException(
         "天気情報取得に失敗しました。",

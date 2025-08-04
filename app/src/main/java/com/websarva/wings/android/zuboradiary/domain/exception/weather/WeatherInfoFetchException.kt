@@ -1,0 +1,24 @@
+package com.websarva.wings.android.zuboradiary.domain.exception.weather
+
+import com.websarva.wings.android.zuboradiary.domain.exception.DomainException
+import java.time.LocalDate
+
+internal sealed class WeatherInfoFetchException (
+    message: String,
+    cause: Throwable
+) : DomainException(message, cause) {
+
+    class AccessLocationFailure (
+        cause: Throwable
+    ) : WeatherInfoFetchException("位置情報の取得に失敗しました。", cause)
+
+    class ApiAccessFailure (
+        date: LocalDate,
+        cause: Throwable
+    ) : WeatherInfoFetchException("日付 '$date' の天気情報の取得に失敗しました。", cause)
+
+    class DateOutOfRange (
+        date: LocalDate,
+        cause: Throwable
+    ) : WeatherInfoFetchException("指定した日付 '$date' は、天気情報を取得できる範囲を超えています。", cause)
+}

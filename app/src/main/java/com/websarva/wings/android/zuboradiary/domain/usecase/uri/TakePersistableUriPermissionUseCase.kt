@@ -3,7 +3,7 @@ package com.websarva.wings.android.zuboradiary.domain.usecase.uri
 import android.util.Log
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.data.repository.UriRepository
-import com.websarva.wings.android.zuboradiary.domain.exception.uri.TakePersistableUriPermissionFailedException
+import com.websarva.wings.android.zuboradiary.domain.exception.uri.PersistableUriPermissionTakeFailureException
 import com.websarva.wings.android.zuboradiary.domain.usecase.DefaultUseCaseResult
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 
@@ -44,7 +44,7 @@ internal class TakePersistableUriPermissionUseCase(
             uriRepository.takePersistableUriPermission(uriString)
             Log.i(logTag, "${logMsg}完了")
             UseCaseResult.Success(Unit)
-        } catch (e: TakePersistableUriPermissionFailedException) {
+        } catch (e: PersistableUriPermissionTakeFailureException) {
             Log.e(logTag, "${logMsg}失敗", e)
             UseCaseResult.Failure(e)
         }

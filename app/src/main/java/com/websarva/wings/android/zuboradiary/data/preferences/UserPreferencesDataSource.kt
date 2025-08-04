@@ -67,7 +67,7 @@ internal class UserPreferences @Inject constructor(
 
                 emit(
                     UserPreferencesFetchResult
-                        .Failure(UserPreferencesException.DataStoreAccessFailed(cause))
+                        .Failure(UserPreferencesException.DataStoreAccessFailure(cause))
                 )
             }.stateIn(
                 appScope,
@@ -84,7 +84,7 @@ internal class UserPreferences @Inject constructor(
                         UserPreferenceFlowResult.Success(preference)
                     } else {
                         UserPreferenceFlowResult.Failure(
-                            UserPreferencesException.DataNotFoundException("テーマカラー")
+                            UserPreferencesException.DataNotFound("テーマカラー")
                         )
                     }
                 }
@@ -110,7 +110,7 @@ internal class UserPreferences @Inject constructor(
                         UserPreferenceFlowResult.Success(preference)
                     } else {
                         UserPreferenceFlowResult.Failure(
-                            UserPreferencesException.DataNotFoundException("カレンダー開始曜日")
+                            UserPreferencesException.DataNotFound("カレンダー開始曜日")
                         )
                     }
                 }
@@ -141,7 +141,7 @@ internal class UserPreferences @Inject constructor(
                         UserPreferenceFlowResult.Success(preference)
                     } else {
                         UserPreferenceFlowResult.Failure(
-                            UserPreferencesException.DataNotFoundException("リマインダー通知")
+                            UserPreferencesException.DataNotFound("リマインダー通知")
                         )
                     }
                 }
@@ -174,7 +174,7 @@ internal class UserPreferences @Inject constructor(
                         UserPreferenceFlowResult.Success(preference)
                     } else {
                         UserPreferenceFlowResult.Failure(
-                            UserPreferencesException.DataNotFoundException("パスコードロック")
+                            UserPreferencesException.DataNotFound("パスコードロック")
                         )
                     }
                 }
@@ -203,7 +203,7 @@ internal class UserPreferences @Inject constructor(
                         UserPreferenceFlowResult.Success(preference)
                     } else {
                         UserPreferenceFlowResult.Failure(
-                            UserPreferencesException.DataNotFoundException("天気情報取得")
+                            UserPreferencesException.DataNotFound("天気情報取得")
                         )
                     }
                 }
@@ -221,7 +221,7 @@ internal class UserPreferences @Inject constructor(
         return WeatherInfoFetchPreference(isEnabled)
     }
 
-    @Throws(UserPreferencesException.DataStoreAccessFailed::class)
+    @Throws(UserPreferencesException.DataStoreAccessFailure::class)
     private suspend fun executeDataStoreEditOperation(
         operation: suspend (MutablePreferences) -> Unit
     ): Preferences {
@@ -230,11 +230,11 @@ internal class UserPreferences @Inject constructor(
                 operation(preferences)
             }
         } catch (e: IOException) {
-            throw UserPreferencesException.DataStoreAccessFailed(e)
+            throw UserPreferencesException.DataStoreAccessFailure(e)
         }
     }
 
-    @Throws(UserPreferencesException.DataStoreAccessFailed::class)
+    @Throws(UserPreferencesException.DataStoreAccessFailure::class)
     suspend fun saveThemeColorPreference(value: ThemeColorPreference) {
         executeDataStoreEditOperation { preferences ->
             saveThemeColorPreferenceValue(preferences, value)
@@ -248,7 +248,7 @@ internal class UserPreferences @Inject constructor(
         preferences[themeColorPreferenceKey] = value.themeColorNumber
     }
 
-    @Throws(UserPreferencesException.DataStoreAccessFailed::class)
+    @Throws(UserPreferencesException.DataStoreAccessFailure::class)
     suspend fun saveCalendarStartDayOfWeekPreference(value: CalendarStartDayOfWeekPreference) {
         executeDataStoreEditOperation { preferences ->
             saveCalendarStartDayOfWeekPreferenceValue(preferences, value)
@@ -262,7 +262,7 @@ internal class UserPreferences @Inject constructor(
         preferences[calendarStartDayOfWeekPreferenceKey] = value.dayOfWeekNumber
     }
 
-    @Throws(UserPreferencesException.DataStoreAccessFailed::class)
+    @Throws(UserPreferencesException.DataStoreAccessFailure::class)
     suspend fun saveReminderNotificationPreference(value: ReminderNotificationPreference) {
         executeDataStoreEditOperation { preferences ->
             saveReminderNotificationPreferenceValue(preferences, value)
@@ -277,7 +277,7 @@ internal class UserPreferences @Inject constructor(
         preferences[reminderNotificationTimePreferenceKey] = value.notificationTimeString
     }
 
-    @Throws(UserPreferencesException.DataStoreAccessFailed::class)
+    @Throws(UserPreferencesException.DataStoreAccessFailure::class)
     suspend fun savePasscodeLockPreference(value: PasscodeLockPreference) {
         executeDataStoreEditOperation { preferences ->
             savePasscodeLockPreferenceValue(preferences, value)
@@ -292,7 +292,7 @@ internal class UserPreferences @Inject constructor(
         preferences[passcodePreferenceKey] = value.passcode
     }
 
-    @Throws(UserPreferencesException.DataStoreAccessFailed::class)
+    @Throws(UserPreferencesException.DataStoreAccessFailure::class)
     suspend fun saveWeatherInfoFetchPreference(value: WeatherInfoFetchPreference) {
         executeDataStoreEditOperation { preferences ->
             saveWeatherInfoFetchPreferenceValue(preferences, value)

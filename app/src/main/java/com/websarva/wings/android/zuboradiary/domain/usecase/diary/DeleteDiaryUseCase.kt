@@ -4,7 +4,7 @@ import android.util.Log
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.data.repository.DiaryRepository
 import com.websarva.wings.android.zuboradiary.domain.exception.DomainException
-import com.websarva.wings.android.zuboradiary.domain.exception.diary.DeleteDiaryFailedException
+import com.websarva.wings.android.zuboradiary.domain.exception.diary.DiaryDeletionFailureException
 import com.websarva.wings.android.zuboradiary.domain.usecase.DefaultUseCaseResult
 import com.websarva.wings.android.zuboradiary.domain.usecase.uri.ReleasePersistableUriPermissionUseCase
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
@@ -27,7 +27,7 @@ internal class DeleteDiaryUseCase(
 
         try {
             deleteDiary(date)
-        } catch (e: DeleteDiaryFailedException) {
+        } catch (e: DiaryDeletionFailureException) {
             Log.e(logTag, "${logMsg}失敗", e)
             return UseCaseResult.Failure(e)
         }
@@ -43,7 +43,7 @@ internal class DeleteDiaryUseCase(
         return UseCaseResult.Success(Unit)
     }
 
-    @Throws(DeleteDiaryFailedException::class)
+    @Throws(DiaryDeletionFailureException::class)
     private suspend fun deleteDiary(
         date: LocalDate
     ) {
@@ -52,7 +52,7 @@ internal class DeleteDiaryUseCase(
 
         try {
             diaryRepository.deleteDiary(date)
-        } catch (e: DeleteDiaryFailedException) {
+        } catch (e: DiaryDeletionFailureException) {
             throw e
         }
 

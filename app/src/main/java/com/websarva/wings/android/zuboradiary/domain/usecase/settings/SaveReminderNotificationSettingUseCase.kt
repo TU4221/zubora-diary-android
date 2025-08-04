@@ -6,9 +6,9 @@ import com.websarva.wings.android.zuboradiary.domain.model.settings.ReminderNoti
 import com.websarva.wings.android.zuboradiary.data.repository.UserPreferencesRepository
 import com.websarva.wings.android.zuboradiary.data.repository.WorkerRepository
 import com.websarva.wings.android.zuboradiary.domain.exception.DomainException
-import com.websarva.wings.android.zuboradiary.domain.exception.reminder.CancelReminderNotificationFailedException
-import com.websarva.wings.android.zuboradiary.domain.exception.reminder.RegisterReminderNotificationFailedException
-import com.websarva.wings.android.zuboradiary.domain.exception.settings.UpdateReminderNotificationSettingFailedException
+import com.websarva.wings.android.zuboradiary.domain.exception.reminder.ReminderNotificationCancellationFailureException
+import com.websarva.wings.android.zuboradiary.domain.exception.reminder.ReminderNotificationRegistrationFailureException
+import com.websarva.wings.android.zuboradiary.domain.exception.settings.ReminderNotificationSettingUpdateFailureException
 import com.websarva.wings.android.zuboradiary.domain.exception.settings.UserSettingsException
 import com.websarva.wings.android.zuboradiary.domain.model.settings.UserSettingResult
 import com.websarva.wings.android.zuboradiary.domain.usecase.DefaultUseCaseResult
@@ -52,21 +52,21 @@ internal class SaveReminderNotificationSettingUseCase(
     }
 
     @Throws(
-        UpdateReminderNotificationSettingFailedException::class,
-        RegisterReminderNotificationFailedException::class
+        ReminderNotificationSettingUpdateFailureException::class,
+        ReminderNotificationRegistrationFailureException::class
     )
     private suspend fun saveReminderNotificationValid(notificationTime: LocalTime) {
         try {
             val preferenceValue = ReminderNotificationSetting.Enabled(notificationTime)
             userPreferencesRepository.saveReminderNotificationPreference(preferenceValue)
             workerRepository.registerReminderNotificationWorker(notificationTime)
-        } catch (e: UpdateReminderNotificationSettingFailedException) {
+        } catch (e: ReminderNotificationSettingUpdateFailureException) {
             throw e
-        } catch (e: RegisterReminderNotificationFailedException) {
+        } catch (e: ReminderNotificationRegistrationFailureException) {
             try {
                 val preferenceValue = ReminderNotificationSetting.Disabled
                 userPreferencesRepository.saveReminderNotificationPreference(preferenceValue)
-            } catch (e: UpdateReminderNotificationSettingFailedException) {
+            } catch (e: ReminderNotificationSettingUpdateFailureException) {
                 throw e
             }
             throw e
@@ -74,8 +74,8 @@ internal class SaveReminderNotificationSettingUseCase(
     }
 
     @Throws(
-        UpdateReminderNotificationSettingFailedException::class,
-        CancelReminderNotificationFailedException::class,
+        ReminderNotificationSettingUpdateFailureException::class,
+        ReminderNotificationCancellationFailureException::class,
         UserSettingsException::class
     )
     private suspend fun saveReminderNotificationInvalid() {
@@ -84,12 +84,12 @@ internal class SaveReminderNotificationSettingUseCase(
             val preferenceValue = ReminderNotificationSetting.Disabled
             userPreferencesRepository.saveReminderNotificationPreference(preferenceValue)
             workerRepository.cancelReminderNotificationWorker()
-        } catch (e: UpdateReminderNotificationSettingFailedException) {
+        } catch (e: ReminderNotificationSettingUpdateFailureException) {
             throw e
-        } catch (e: CancelReminderNotificationFailedException) {
+        } catch (e: ReminderNotificationCancellationFailureException) {
             try {
                 userPreferencesRepository.saveReminderNotificationPreference(backupSettingValue)
-            } catch (e: UpdateReminderNotificationSettingFailedException) {
+            } catch (e: ReminderNotificationSettingUpdateFailureException) {
                 throw e
             }
             throw e

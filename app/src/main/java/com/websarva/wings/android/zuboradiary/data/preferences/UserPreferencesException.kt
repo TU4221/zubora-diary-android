@@ -5,11 +5,11 @@ internal sealed class UserPreferencesException (
     cause: Throwable? = null
 ) : Exception(message, cause) {
 
-    class DataStoreAccessFailed(
+    class DataStoreAccessFailure(
         cause: Throwable? = null
     ) : UserPreferencesException("データストアへのアクセスに失敗しました。", cause)
 
-    class DataNotFoundException(
+    class DataNotFound(
         preferenceName: String,
         cause: Throwable? = null
     ) : UserPreferencesException("ユーザー設定($preferenceName)のデータが存在しません。", cause)

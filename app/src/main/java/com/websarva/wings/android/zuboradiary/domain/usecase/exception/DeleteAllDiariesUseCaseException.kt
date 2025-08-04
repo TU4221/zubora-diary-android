@@ -5,14 +5,14 @@ internal sealed class DeleteAllDiariesUseCaseException(
     cause: Throwable
 ) : UseCaseException(message, cause) {
 
-    class DeleteAllDiariesFailed(
+    class AllDiariesDeletionFailure(
         cause: Throwable
     ) : DeleteAllDiariesUseCaseException(
         "全日記の削除に失敗しました。",
         cause
     )
 
-    class ReleaseAllPersistableUriPermissionFailed(
+    class AllPersistableUriPermissionReleaseFailure(
         cause: Throwable
     ) : DeleteAllDiariesUseCaseException(
         "全ての永続的URI権限の解放に失敗しました。",
