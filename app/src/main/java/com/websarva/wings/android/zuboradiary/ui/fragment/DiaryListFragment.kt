@@ -268,4 +268,14 @@ class DiaryListFragment :
         super.onDestroyView()
         mainViewModel.onFragmentDestroyView()
     }
+
+    override fun clearViewBindings() {
+        binding.materialToolbarTopAppBar.setOnMenuItemClickListener(null)
+        binding.recyclerDiaryList.apply {
+            val listAdapter = adapter as DiaryYearMonthListAdapter
+            listAdapter.clearRecyclerViewBindings()
+        }
+
+        super.clearViewBindings()
+    }
 }

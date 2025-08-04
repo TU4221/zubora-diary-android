@@ -107,7 +107,12 @@ abstract class BaseBottomSheetDialogFragment<T: ViewBinding> : BottomSheetDialog
 
     override fun onDestroyView() {
         Log.d(logTag, "onDestroyView()")
+        clearViewBindings()
+
         super.onDestroyView()
+    }
+
+    private fun clearViewBindings() {
         _binding = null
     }
 }

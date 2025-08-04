@@ -92,4 +92,14 @@ abstract class BaseTimePickerDialogFragment : DialogFragment() {
     internal abstract fun handleOnNegativeButtonClick()
 
     internal abstract fun handleOnCancel()
+
+    override fun onDestroyView() {
+        clearViewBindings()
+
+        super.onDestroyView()
+    }
+
+    private fun clearViewBindings() {
+        // TODO:TimePickerのOnPositiveButtonClickListenerをクリアする必要があるか確認
+    }
 }

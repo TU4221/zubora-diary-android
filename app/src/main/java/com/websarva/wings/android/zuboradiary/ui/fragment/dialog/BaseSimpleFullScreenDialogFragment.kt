@@ -66,8 +66,13 @@ abstract class BaseSimpleFullScreenDialogFragment<T: ViewBinding>: DialogFragmen
     }
 
     override fun onDestroyView() {
-        _binding = null
         super.onDestroyView()
+
+        clearViewBindings()
+    }
+
+    internal open fun clearViewBindings() {
+        _binding = null
     }
 
     internal fun navigatePreviousFragment() {

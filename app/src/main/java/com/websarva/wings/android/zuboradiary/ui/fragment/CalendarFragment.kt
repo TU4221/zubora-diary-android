@@ -195,6 +195,8 @@ class CalendarFragment :
         val format = getString(R.string.fragment_calendar_month_header_format)
         binding.calendar.monthHeaderBinder =
             CalendarMonthHeaderFooterBinder(daysOfWeek, themeColor, format)
+
+        binding.calendar.setOnClickListener {  }
     }
 
     private class CalendarMonthDayBinder(
@@ -214,7 +216,7 @@ class CalendarFragment :
                     if (calendarDay.position == DayPosition.MonthDate) {
                         onDateClick(calendarDay.date)
                     }
-                }
+                }.let {  }
 
                 // 数値設定
                 val day = calendarDay.date.dayOfMonth.toString()
@@ -598,5 +600,15 @@ class CalendarFragment :
 
     private fun scrollToTop() {
         binding.nestedScrollFullScreen.smoothScrollTo(0, 0)
+    }
+
+    override fun clearViewBindings() {
+        binding.calendar.apply {
+            monthScrollListener = null
+            dayBinder = null
+            monthHeaderBinder = null
+        }
+
+        super.clearViewBindings()
     }
 }

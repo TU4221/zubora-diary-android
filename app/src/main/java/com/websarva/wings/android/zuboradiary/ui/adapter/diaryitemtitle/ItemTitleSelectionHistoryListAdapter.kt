@@ -41,6 +41,17 @@ internal class ItemTitleSelectionHistoryListAdapter
         leftSwipeSimpleCallback.build()
     }
 
+    fun clearViewBindings() {
+        recyclerView.apply {
+            adapter = null
+            layoutManager = null
+            for (i in 0 until itemDecorationCount) {
+                removeItemDecorationAt(0)
+            }
+        }
+        leftSwipeSimpleCallback.clearViewBindings()
+    }
+
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int

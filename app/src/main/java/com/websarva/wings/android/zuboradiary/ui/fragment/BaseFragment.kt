@@ -259,8 +259,12 @@ abstract class BaseFragment<T: ViewBinding, E : UiEvent> : LoggingFragment() {
     }
 
     override fun onDestroyView() {
-        super.onDestroyView()
+        clearViewBindings()
 
+        super.onDestroyView()
+    }
+
+    internal open fun clearViewBindings() {
         _binding = null
     }
 }

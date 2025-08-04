@@ -45,6 +45,10 @@ internal open class LeftSwipeSimpleCallback(protected val recyclerView: SwipeRec
         setUpLeftSwipeItem()
     }
 
+    fun clearViewBindings() {
+        itemTouchHelper.attachToRecyclerView(null)
+    }
+
     private fun setUpLeftSwipeItem() {
         recyclerView.setOnTouchUpListener {
             clearInvalidSwipeViewHolder()

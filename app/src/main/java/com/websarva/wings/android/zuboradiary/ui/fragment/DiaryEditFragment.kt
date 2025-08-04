@@ -461,6 +461,7 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditEvent>
     private fun setUpConditionInputField() {
         binding.autoCompleteTextCondition.onItemClickListener =
             OnItemClickListener { _: AdapterView<*>?, _: View?, position: Int, _: Long ->
+                // TODO:引数からで取得できないか確認。(取得できるようならclearViewBindingsからリスナ解除処理削除)
                 val listAdapter = binding.autoCompleteTextCondition.adapter
                 val arrayAdapter = listAdapter as ArrayAdapter<*>
                 val strCondition = arrayAdapter.getItem(position) as String
@@ -892,5 +893,13 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditEvent>
             requireContext().isAccessLocationGranted(),
             parameters
         )
+    }
+
+    override fun clearViewBindings() {
+        binding.autoCompleteTextCondition.onItemClickListener = null
+        binding.autoCompleteTextWeather1.onItemClickListener = null
+        binding.autoCompleteTextWeather2.onItemClickListener = null
+
+        super.clearViewBindings()
     }
 }

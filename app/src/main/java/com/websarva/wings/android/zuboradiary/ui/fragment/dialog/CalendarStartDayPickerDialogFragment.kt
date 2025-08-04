@@ -19,6 +19,7 @@ class CalendarStartDayPickerDialogFragment : BaseNumberPickersBottomSheetDialogF
     }
 
     private fun setResultSelectedDayOfWeek() {
+        // TODO:handleOnPositiveButtonClick()の引数から選択値を受け取るように変更
         val selectedValue = binding.numberPickerFirst.value
         // MEMO:DayOfWeekはMonday～Sundayの値が1～7となる。Sundayを先頭に表示させたいため、下記コード記述。
         val selectedDayOfWeek = if (selectedValue == 0) {

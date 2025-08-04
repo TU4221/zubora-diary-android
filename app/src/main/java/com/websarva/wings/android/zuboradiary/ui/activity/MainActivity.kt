@@ -370,6 +370,14 @@ class MainActivity : LoggingActivity() {
     override fun onDestroy() {
         super.onDestroy()
 
+        clearViewBindings()
+    }
+
+    private fun clearViewBindings() {
+        binding.bottomNavigation.apply {
+            setOnItemSelectedListener(null)
+            setOnItemReselectedListener(null)
+        }
         _binding = null
     }
 }

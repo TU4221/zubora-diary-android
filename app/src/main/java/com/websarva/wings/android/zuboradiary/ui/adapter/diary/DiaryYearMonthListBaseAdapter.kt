@@ -2,6 +2,7 @@ package com.websarva.wings.android.zuboradiary.ui.adapter.diary
 
 import android.util.Log
 import android.view.LayoutInflater
+import android.view.View.OnLayoutChangeListener
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -15,6 +16,8 @@ import com.websarva.wings.android.zuboradiary.databinding.RowProgressBarBinding
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import com.websarva.wings.android.zuboradiary.ui.theme.ThemeColorInflaterCreator
 
+// TODO:ViewHolderのViewに設定されたリスナを解除するように変更。
+// TODO:ViewHolderにのBindメソッドを用意してメソッド内でBindするように変更。
 // DiaryFragment、WordSearchFragmentの親RecyclerViewのListAdapter。
 // 親RecyclerViewを同じ構成にする為、一つのクラスで両方の子RecyclerViewに対応できるように作成。
 internal abstract class DiaryYearMonthListBaseAdapter protected constructor(
@@ -24,6 +27,8 @@ internal abstract class DiaryYearMonthListBaseAdapter protected constructor(
 ) : ListAdapter<DiaryYearMonthListBaseItem, RecyclerView.ViewHolder>(diffUtilItemCallback) {
 
     private val logTag = createLogTag()
+
+    private var onLayoutChangeListener: OnLayoutChangeListener? = null
 
     fun interface OnClickChildItemListener {
         fun onClick(item: DiaryDayListBaseItem)
@@ -59,6 +64,13 @@ internal abstract class DiaryYearMonthListBaseAdapter protected constructor(
                     loadListOnScrollEnd()
                 }
             )
+        }
+    }
+
+    fun clearRecyclerViewBindings() {
+        recyclerView.apply {
+            adapter = null
+            layoutManager = null
         }
     }
 
@@ -217,9 +229,11 @@ internal abstract class DiaryYearMonthListBaseAdapter protected constructor(
                     }
                 }
             )
-            addOnLayoutChangeListener { v, _, _, _, _, _, _, _, _ ->
-                updateVisibleSectionBarPosition(v as RecyclerView)
-            }
+            onLayoutChangeListener =
+                OnLayoutChangeListener { v, _, _, _, _, _, _, _, _ ->
+                    updateVisibleSectionBarPosition(v as RecyclerView)
+                }
+            addOnLayoutChangeListener(onLayoutChangeListener)
         }
     }
 
