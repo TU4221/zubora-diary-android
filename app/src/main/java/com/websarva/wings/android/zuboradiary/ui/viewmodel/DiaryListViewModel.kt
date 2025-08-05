@@ -323,8 +323,6 @@ internal class DiaryListViewModel @Inject constructor(
             DiaryListState.UpdatingDiaryList,
             currentList
         ) { lambdaCurrentList ->
-            require(lambdaCurrentList.isNotEmpty)
-
             var numLoadingItems = lambdaCurrentList.countDiaries()
             // HACK:画面全体にリストアイテムが存在しない状態で日記を追加した後にリスト画面に戻ると、
             //      日記追加前のアイテム数しか表示されない状態となる。また、スクロール更新もできない。

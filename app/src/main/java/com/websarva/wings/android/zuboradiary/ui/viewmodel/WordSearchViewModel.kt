@@ -308,7 +308,6 @@ internal class WordSearchViewModel @Inject internal constructor(
             currentResultList,
             searchWord
         ) { lambdaCurrentList, lambdaWordSearch ->
-            require(lambdaCurrentList.isNotEmpty)
 
             var numLoadingItems = lambdaCurrentList.countDiaries()
             // HACK:画面全体にリストアイテムが存在しない状態で日記を追加した後にリスト画面に戻ると、
