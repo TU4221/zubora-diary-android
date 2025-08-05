@@ -1,6 +1,7 @@
 package com.websarva.wings.android.zuboradiary.ui.viewmodel
 
 import android.util.Log
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.DeleteDiaryUseCase
@@ -23,11 +24,17 @@ import javax.inject.Inject
 
 @HiltViewModel
 internal class DiaryShowViewModel @Inject constructor(
+    handle: SavedStateHandle,
     private val fetchDiaryUseCase: FetchDiaryUseCase,
     private val deleteDiaryUseCase: DeleteDiaryUseCase
 ) : BaseDiaryShowViewModel<DiaryShowEvent, DiaryShowAppMessage, DiaryShowState>(
     DiaryShowState.Idle
 ) {
+
+    companion object {
+        // 呼び出し元のFragmentから受け取る引数のキー
+        private const val DATE_ARGUMENT_KEY = "date"
+    }
 
     private val logTag = createLogTag()
 
@@ -46,6 +53,17 @@ internal class DiaryShowViewModel @Inject constructor(
             .stateInWhileSubscribed(
                 false
             )
+
+    init {
+        initializeDiaryData(handle)
+    }
+
+    private fun initializeDiaryData(handle: SavedStateHandle) {
+        val date = handle.get<LocalDate>(DATE_ARGUMENT_KEY) ?: throw IllegalArgumentException()
+        viewModelScope.launch {
+            loadSavedDiary(date)
+        }
+    }
 
     override suspend fun emitNavigatePreviousFragmentEvent(result: FragmentResult<*>) {
         viewModelScope.launch {
@@ -143,16 +161,6 @@ internal class DiaryShowViewModel @Inject constructor(
     private fun handleDiaryDeleteDialogPositiveResult() {
         viewModelScope.launch {
             deleteDiary()
-        }
-    }
-
-    // Fragment状態処理
-    // TODO:初期化ブロックで処理
-    fun onFragmentViewCreated(date: LocalDate) {
-        if (uiState.value != DiaryShowState.Idle) return
-
-        viewModelScope.launch {
-            loadSavedDiary(date)
         }
     }
 

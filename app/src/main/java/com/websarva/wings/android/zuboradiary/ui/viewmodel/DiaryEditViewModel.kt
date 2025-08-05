@@ -54,7 +54,7 @@ import kotlin.random.Random
 
 @HiltViewModel
 internal class DiaryEditViewModel @Inject constructor(
-    private val handle: SavedStateHandle, // MEMO:システムの初期化によるプロセスの終了からの復元用
+    private val handle: SavedStateHandle,
     private val shouldRequestExitWithoutDiarySavingConfirmationUseCase: ShouldRequestExitWithoutDiarySavingConfirmationUseCase,
     private val shouldRequestDiaryFetchConfirmationUseCase: ShouldRequestDiaryFetchConfirmationUseCase,
     private val shouldRequestDiaryUpdateConfirmationUseCase: ShouldRequestDiaryUpdateConfirmationUseCase,
@@ -71,6 +71,12 @@ internal class DiaryEditViewModel @Inject constructor(
 ) {
 
     companion object {
+        // 呼び出し元のFragmentから受け取る引数のキー
+        private const val DIARY_DATE_ARGUMENT_KEY = "diary_date"
+        private const val SHOULD_LOAD_DIARY_ARGUMENT_KEY = "should_load_diary"
+
+        // ViewModel状態保存キー
+        // MEMO:システムの初期化によるプロセスの終了から(アプリ設定変更からのアプリ再起動時)の復元用
         private const val SAVED_VIEW_MODEL_STATE_KEY = "uiState"
         private const val SAVED_PREVIOUS_DATE_STATE_KEY = "previousDate"
         private const val SAVED_ORIGINAL_DIARY_KEY = "originalDiary"
@@ -306,6 +312,24 @@ internal class DiaryEditViewModel @Inject constructor(
     var isTesting = false
 
     init {
+        initializeDiaryData(handle)
+        setUpStateSavingObservers()
+    }
+
+    private fun initializeDiaryData(handle: SavedStateHandle) {
+        // MEMO:下記条件はアプリ設定変更時のアプリ再起動時の不要初期化対策
+        if (uiState.value != DiaryEditState.Idle) return
+
+        val date =
+            handle.get<LocalDate>(DIARY_DATE_ARGUMENT_KEY) ?: throw IllegalArgumentException()
+        val shouldLoadDiary =
+            handle.get<Boolean>(SHOULD_LOAD_DIARY_ARGUMENT_KEY) ?: throw IllegalArgumentException()
+        viewModelScope.launch {
+            prepareDiary(date, shouldLoadDiary)
+        }
+    }
+
+    private fun setUpStateSavingObservers() {
         _isNewDiary.onEach {
             handle[SAVED_IS_NEW_DIARY_KEY] = it
         }.launchIn(viewModelScope)
@@ -710,19 +734,6 @@ internal class DiaryEditViewModel @Inject constructor(
         check(uiState.value == DiaryEditState.SelectingImage)
 
         updateImageUri(uri)
-    }
-
-    // Fragment状態処理
-    // TODO:初期化ブロックで処理
-    fun onDiaryPrepare(
-        date: LocalDate,
-        shouldLoadDiary: Boolean
-    ) {
-        if (uiState.value != DiaryEditState.Idle) return
-
-        viewModelScope.launch {
-            prepareDiary(date, shouldLoadDiary)
-        }
     }
 
     // StateFlow値変更時処理

@@ -68,9 +68,6 @@ class DiaryShowFragment : BaseFragment<FragmentDiaryShowBinding, DiaryShowEvent>
         setUpItemLayout()
         setUpImage()
         setUpLogLayout()
-
-        val diaryDate = DiaryShowFragmentArgs.fromBundle(requireArguments()).date
-        mainViewModel.onFragmentViewCreated(diaryDate)
     }
 
     override fun initializeFragmentResultReceiver() {

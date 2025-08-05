@@ -118,7 +118,6 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditEvent>
         super.onViewCreated(view, savedInstanceState)
 
         setUpFocusViewScroll()
-        setUpDiaryData()
         setUpToolBar()
         setUpDateInputField()
         setUpWeatherInputField()
@@ -316,18 +315,6 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditEvent>
             requireActivity().window.attributes.softInputMode and
                     WindowManager.LayoutParams.SOFT_INPUT_MASK_ADJUST
         return softInputAdjust == WindowManager.LayoutParams.SOFT_INPUT_ADJUST_NOTHING
-    }
-
-    private fun setUpDiaryData() {
-        // 画面表示データ準備
-        val diaryDate = DiaryEditFragmentArgs.fromBundle(requireArguments()).diaryDate
-        val shouldLoadDiary =
-            DiaryEditFragmentArgs.fromBundle(requireArguments()).shouldLoadDiary
-        mainViewModel
-            .onDiaryPrepare(
-                diaryDate,
-                shouldLoadDiary
-            )
     }
 
     private fun setUpToolBar() {
