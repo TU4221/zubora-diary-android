@@ -1,4 +1,4 @@
-package com.websarva.wings.android.zuboradiary.ui.viewmodel
+package com.websarva.wings.android.zuboradiary.ui.viewmodel.common
 
 import android.util.Log
 import androidx.lifecycle.SavedStateHandle
@@ -57,7 +57,7 @@ internal class DiaryEditStateFlow(scope: CoroutineScope, handle: SavedStateHandl
         MutableStateFlow(handle[SAVED_NUM_VISIBLE_ITEMS_STATE_KEY] ?: initialNumVisibleItems)
 
     override val items =
-        Array(MAX_ITEMS) { i -> DiaryItemStateFlow(scope, handle, i + 1)}
+        Array(MAX_ITEMS) { i -> DiaryItemStateFlow(scope, handle, i + 1) }
 
     override val imageUri =
         MutableStateFlow(
@@ -187,26 +187,26 @@ internal class DiaryEditStateFlow(scope: CoroutineScope, handle: SavedStateHandl
         // MEMO:双方向DataBindingが必要の為、MutableStateFlow変数はアクセス修飾子をpublicとする。
         //      StateFlow変数を用意しても意味がないので作成しない。
         override val title =
-            MutableStateFlow(handle[SAVED_ITEM_TITLE_STATE_KEY+ itemNumber] ?: initialTitle)
+            MutableStateFlow(handle[SAVED_ITEM_TITLE_STATE_KEY + itemNumber] ?: initialTitle)
 
         override val comment =
-            MutableStateFlow(handle[SAVED_ITEM_COMMENT_STATE_KEY+ itemNumber] ?: initialComment)
+            MutableStateFlow(handle[SAVED_ITEM_COMMENT_STATE_KEY + itemNumber] ?: initialComment)
 
         // MEMO:初期化時日付有無が未定、タイトル未更新のケースがある為、null許容型とする。
         override val titleUpdateLog =
             MutableStateFlow<LocalDateTime?>(
-                handle[SAVED_ITEM_UPDATE_LOG_STATE_KEY+ itemNumber] ?: initialUpdateLog
+                handle[SAVED_ITEM_UPDATE_LOG_STATE_KEY + itemNumber] ?: initialUpdateLog
             )
 
         init {
             title.onEach {
-                handle[SAVED_ITEM_TITLE_STATE_KEY+ itemNumber] = it
+                handle[SAVED_ITEM_TITLE_STATE_KEY + itemNumber] = it
             }.launchIn(scope)
             comment.onEach {
-                handle[SAVED_ITEM_COMMENT_STATE_KEY+ itemNumber] = it
+                handle[SAVED_ITEM_COMMENT_STATE_KEY + itemNumber] = it
             }.launchIn(scope)
             titleUpdateLog.onEach {
-                handle[SAVED_ITEM_UPDATE_LOG_STATE_KEY+ itemNumber] = it
+                handle[SAVED_ITEM_UPDATE_LOG_STATE_KEY + itemNumber] = it
             }.launchIn(scope)
         }
     }

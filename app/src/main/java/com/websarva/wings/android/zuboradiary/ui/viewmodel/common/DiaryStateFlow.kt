@@ -1,4 +1,4 @@
-package com.websarva.wings.android.zuboradiary.ui.viewmodel
+package com.websarva.wings.android.zuboradiary.ui.viewmodel.common
 
 import android.net.Uri
 import com.websarva.wings.android.zuboradiary.domain.model.ItemNumber
@@ -42,7 +42,7 @@ internal open class DiaryStateFlow {
     open val numVisibleItems = MutableStateFlow(initialNumVisibleItems)
 
     protected open val items: Array<out DiaryItemStateFlow> =
-        Array(MAX_ITEMS) { i -> DiaryItemStateFlow(i + 1)}
+        Array(MAX_ITEMS) { i -> DiaryItemStateFlow(i + 1) }
 
     protected val initialImageUri = initialDiary.imageUriString?.let { Uri.parse(it) }
     open val imageUri = MutableStateFlow(initialImageUri)

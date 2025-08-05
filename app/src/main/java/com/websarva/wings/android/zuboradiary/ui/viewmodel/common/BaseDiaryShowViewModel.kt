@@ -5,8 +5,6 @@ import com.websarva.wings.android.zuboradiary.domain.model.Weather
 import com.websarva.wings.android.zuboradiary.ui.model.AppMessage
 import com.websarva.wings.android.zuboradiary.ui.model.event.UiEvent
 import com.websarva.wings.android.zuboradiary.ui.model.state.UiState
-import com.websarva.wings.android.zuboradiary.ui.viewmodel.BaseViewModel
-import com.websarva.wings.android.zuboradiary.ui.viewmodel.DiaryStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import java.time.LocalDate

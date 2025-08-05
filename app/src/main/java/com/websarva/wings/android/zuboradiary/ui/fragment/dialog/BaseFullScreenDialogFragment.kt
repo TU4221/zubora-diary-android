@@ -10,7 +10,7 @@ import com.websarva.wings.android.zuboradiary.ui.model.navigation.NavigationComm
 import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
 import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
 import com.websarva.wings.android.zuboradiary.ui.model.state.UiState
-import com.websarva.wings.android.zuboradiary.ui.viewmodel.BaseViewModel
+import com.websarva.wings.android.zuboradiary.ui.viewmodel.common.BaseViewModel
 import kotlinx.coroutines.CoroutineScope
 
 abstract class BaseFullScreenDialogFragment<T: ViewBinding, E: UiEvent>: BaseSimpleFullScreenDialogFragment<T>() {

@@ -1,4 +1,4 @@
-package com.websarva.wings.android.zuboradiary.ui.viewmodel
+package com.websarva.wings.android.zuboradiary.ui.viewmodel.common
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
