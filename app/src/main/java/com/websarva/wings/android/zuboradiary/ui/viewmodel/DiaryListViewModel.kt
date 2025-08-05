@@ -109,6 +109,32 @@ internal class DiaryListViewModel @Inject constructor(
     private val initialIsLoadingOnScrolled = false
     private var isLoadingOnScrolled = initialIsLoadingOnScrolled
 
+    init {
+        initializeDiaryListData()
+    }
+
+    private fun initializeDiaryListData() {
+        if (uiState.value != DiaryListState.Idle) return
+
+        val currentList = _diaryList.value
+        viewModelScope.launch {
+            val logMsg = "日記リスト準備"
+            Log.i(logTag, "${logMsg}_開始")
+            try {
+                loadNewDiaryList(currentList)
+            } catch (e: CancellationException) {
+                Log.i(logTag, "${logMsg}_キャンセル", e)
+                updateUiStateForDiaryList(currentList)
+            } catch (e: DomainException) {
+                Log.e(logTag, "${logMsg}_失敗", e)
+                updateUiStateForDiaryList(currentList)
+                emitAppMessageEvent(DiaryListAppMessage.DiaryListLoadingFailure)
+                return@launch
+            }
+            Log.i(logTag, "${logMsg}_完了")
+        }
+    }
+
     override fun initialize() {
         super.initialize()
         diaryListLoadingJob = initialDiaryListLoadingJob
@@ -207,19 +233,22 @@ internal class DiaryListViewModel @Inject constructor(
         isLoadingOnScrolled = initialIsLoadingOnScrolled
     }
 
-    // Fragment状態処理
-    // TODO:初期化ブロックで処理
-    fun onDiaryListPrepare() {
+    // Ui状態処理
+    fun onUiReady() {
+        if (!shouldUpdateDiaryList) return
+        shouldUpdateDiaryList = false
+        if (uiState.value == DiaryListState.ShowingDiaryList) return
+        if (isProcessing) return
+
         val currentList = _diaryList.value
         cancelPreviousLoading()
         diaryListLoadingJob =
             viewModelScope.launch {
-                prepareDiaryList(currentList)
+                updateDiaryList(currentList)
             }
     }
 
-    // TODO:他FragmentのResult受取で処理
-    fun onFragmentDestroyView() {
+    fun onUiGone() {
         shouldUpdateDiaryList = true
     }
 
@@ -272,35 +301,6 @@ internal class DiaryListViewModel @Inject constructor(
     private fun cancelPreviousLoading() {
         val job = diaryListLoadingJob ?: return
         if (!job.isCompleted) job.cancel()
-    }
-
-    private suspend fun prepareDiaryList(currentList: DiaryYearMonthList) {
-        val logMsg = "日記リスト準備"
-        Log.i(logTag, "${logMsg}_開始")
-        if (uiState.value == DiaryListState.Idle) {
-            updateUiState(DiaryListState.LoadingDiaryInfo)
-            try {
-                loadNewDiaryList(currentList)
-            } catch (e: CancellationException) {
-                Log.i(logTag, "${logMsg}_キャンセル", e)
-                updateUiStateForDiaryList(currentList)
-            } catch (e: DomainException) {
-                Log.e(logTag, "${logMsg}_失敗", e)
-                updateUiStateForDiaryList(currentList)
-                emitAppMessageEvent(DiaryListAppMessage.DiaryListLoadingFailure)
-                return
-            }
-        } else {
-            if (shouldUpdateDiaryList) {
-                shouldUpdateDiaryList = false
-                if (currentList.isEmpty) {
-                    loadNewDiaryList(currentList)
-                } else {
-                    updateDiaryList(currentList)
-                }
-            }
-        }
-        Log.i(logTag, "${logMsg}_完了")
     }
 
     private suspend fun loadNewDiaryList(currentList: DiaryYearMonthList) {

@@ -73,7 +73,7 @@ class DiaryListFragment :
         setUpToolBar()
         setUpDiaryList()
 
-        mainViewModel.onDiaryListPrepare()
+        mainViewModel.onUiReady()
     }
 
     override fun initializeFragmentResultReceiver() {
@@ -266,7 +266,8 @@ class DiaryListFragment :
 
     override fun onDestroyView() {
         super.onDestroyView()
-        mainViewModel.onFragmentDestroyView()
+
+        mainViewModel.onUiGone()
     }
 
     override fun clearViewBindings() {

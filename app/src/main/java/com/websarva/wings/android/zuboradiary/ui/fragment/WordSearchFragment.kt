@@ -59,6 +59,8 @@ class WordSearchFragment : BaseFragment<FragmentWordSearchBinding, WordSearchEve
         setUpWordSearchView()
         setUpWordSearchResultList()
         setUpFloatingActionButton()
+
+        mainViewModel.onUiReady()
     }
 
     override fun initializeFragmentResultReceiver() {
@@ -186,7 +188,7 @@ class WordSearchFragment : BaseFragment<FragmentWordSearchBinding, WordSearchEve
 
     override fun onDestroyView() {
         super.onDestroyView()
-        mainViewModel.onFragmentDestroyView()
+        mainViewModel.onUiGone()
     }
 
     override fun clearViewBindings() {

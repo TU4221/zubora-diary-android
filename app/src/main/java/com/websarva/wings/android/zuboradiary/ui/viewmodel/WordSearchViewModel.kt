@@ -220,31 +220,41 @@ internal class WordSearchViewModel @Inject internal constructor(
         isLoadingOnScrolled = initialIsLoadingOnScrolled
     }
 
-    // Fragment状態処理
-    fun onFragmentDestroyView() {
+    // Ui状態処理
+    fun onUiReady() {
+        if (!shouldUpdateWordSearchResultList) return
+        shouldUpdateWordSearchResultList = false
+        if (uiState.value == WordSearchState.Idle) return
+        if (isProcessing) return
+
+        val currentResultList = _wordSearchResultList.value
+        val currentSearchWord = _searchWord.value
+
+        cancelPreviousLoading()
+        wordSearchResultListLoadingJob =
+            viewModelScope.launch {
+                updateWordSearchResultList(currentResultList, currentSearchWord)
+            }
+    }
+
+    fun onUiGone() {
         shouldUpdateWordSearchResultList = true
     }
 
     // StateFlow値変更時処理
     fun onSearchWordChanged(value: String) {
-        val currentResultList = _wordSearchResultList.value
+        viewModelScope.launch {
+            prepareKeyboard(value)
+        }
 
+        // HACK:画面再表示時(Pause -> Resume)にCollectorが起動してしまい
+        //      同じキーワードで不必要に検索してしまう。防止策として下記条件追加。
+        if (value == previousSearchWord) return
+
+        val currentResultList = _wordSearchResultList.value
         cancelPreviousLoading()
         wordSearchResultListLoadingJob =
             viewModelScope.launch {
-                prepareKeyboard(value)
-
-                if (shouldUpdateWordSearchResultList) {
-                    shouldUpdateWordSearchResultList = false
-                    if (currentResultList.isEmpty) return@launch
-                    updateWordSearchResultList(currentResultList, value)
-                    return@launch
-                }
-
-                // HACK:画面再表示時(Pause -> Resume)にCollectorが起動してしまい
-                //      同じキーワードで不必要に検索してしまう。防止策として下記条件追加。
-                if (value == previousSearchWord) return@launch
-
                 if (value.isEmpty()) {
                     clearWordSearchResultList()
                 } else {
