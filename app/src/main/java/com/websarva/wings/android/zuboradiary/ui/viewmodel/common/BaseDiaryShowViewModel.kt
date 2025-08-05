@@ -61,10 +61,5 @@ internal abstract class BaseDiaryShowViewModel<E : UiEvent, M : AppMessage, S : 
     val log
         get() = diaryStateFlow.log.asStateFlow()
 
-    override fun initialize() {
-        super.initialize()
-        diaryStateFlow.initialize()
-    }
-
     protected abstract suspend fun loadSavedDiary(date: LocalDate)
 }

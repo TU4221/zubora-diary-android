@@ -124,11 +124,6 @@ internal class SettingsViewModel @Inject constructor(
         setUpSettingsValue()
     }
 
-    override fun initialize() {
-        super.initialize()
-        setUpSettingsValue()
-    }
-
     override suspend fun emitNavigatePreviousFragmentEvent(result: FragmentResult<*>) {
         viewModelScope.launch {
             emitUiEvent(

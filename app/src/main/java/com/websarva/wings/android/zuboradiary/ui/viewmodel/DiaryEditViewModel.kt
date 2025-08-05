@@ -131,27 +131,23 @@ internal class DiaryEditViewModel @Inject constructor(
         )
 
     // 日記データ関係
-    private val initialPreviousDate: LocalDate? = null
-    private var previousDate = handle[SAVED_PREVIOUS_DATE_STATE_KEY] ?: initialPreviousDate
+    private var previousDate: LocalDate? = handle[SAVED_PREVIOUS_DATE_STATE_KEY]
         private set(value) {
             handle[SAVED_PREVIOUS_DATE_STATE_KEY] = value
             field = value
         }
 
-    private val initialIsNewDiary = false
-    private val _isNewDiary = MutableStateFlow(handle[SAVED_IS_NEW_DIARY_KEY] ?: initialIsNewDiary)
+    private val _isNewDiary = MutableStateFlow(handle[SAVED_IS_NEW_DIARY_KEY] ?: false)
     val isNewDiary = _isNewDiary.asStateFlow()
 
-    private val initialOriginalDiary: Diary? = null
-    private val _originalDiary = MutableStateFlow(handle[SAVED_ORIGINAL_DIARY_KEY] ?: initialOriginalDiary)
+    private val _originalDiary = MutableStateFlow<Diary?>(handle[SAVED_ORIGINAL_DIARY_KEY])
 
     val editingDiaryDate =
         combine(_isNewDiary, _originalDiary) { isNewDiary, originalDiary ->
             return@combine if (isNewDiary) null else originalDiary?.date
         }.stateInWhileSubscribed(null)
 
-    private val initialDiaryDateString = null
-    private val _editingDiaryDateString = MutableStateFlow<String?>(initialDiaryDateString)
+    private val _editingDiaryDateString = MutableStateFlow<String?>(null)
     val editingDiaryDateString = _editingDiaryDateString.asStateFlow()
 
     private val diaryStateFlow = DiaryEditStateFlow(viewModelScope, handle)
@@ -191,8 +187,7 @@ internal class DiaryEditViewModel @Inject constructor(
     val condition
         get() = diaryStateFlow.condition.asStateFlow()
 
-    private val initialConditionAdapterList = ConditionAdapterList()
-    private val _conditionAdapterList = MutableStateFlow(initialConditionAdapterList)
+    private val _conditionAdapterList = MutableStateFlow(ConditionAdapterList())
     val conditionAdapterList
         get() = _conditionAdapterList.asStateFlow()
 
@@ -337,18 +332,6 @@ internal class DiaryEditViewModel @Inject constructor(
         _originalDiary.onEach {
             handle[SAVED_ORIGINAL_DIARY_KEY] = it
         }.launchIn(viewModelScope)
-    }
-
-    override fun initialize() {
-        super.initialize()
-        previousDate = initialPreviousDate
-        _isNewDiary.value = initialIsNewDiary
-        _originalDiary.value = initialOriginalDiary
-        _editingDiaryDateString.value = initialDiaryDateString
-        diaryStateFlow.initialize()
-        _weather1AdapterList.value = initialWeatherAdapterList
-        _weather2AdapterList.value = initialWeatherAdapterList
-        _conditionAdapterList.value = initialConditionAdapterList
     }
 
     override suspend fun emitNavigatePreviousFragmentEvent(result: FragmentResult<*>) {
@@ -742,7 +725,7 @@ internal class DiaryEditViewModel @Inject constructor(
     }
 
     fun onOriginalDiaryDateChanged(dateString: String?) {
-        _editingDiaryDateString.value = dateString ?: initialDiaryDateString
+        _editingDiaryDateString.value = dateString
     }
 
     // MotionLayout変更時処理

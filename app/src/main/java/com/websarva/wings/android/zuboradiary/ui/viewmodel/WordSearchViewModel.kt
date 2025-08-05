@@ -71,8 +71,7 @@ internal class WordSearchViewModel @Inject internal constructor(
                 false
             )
 
-    private val initialSearchWord = ""
-    private val _searchWord = MutableStateFlow(initialSearchWord)
+    private val _searchWord = MutableStateFlow("")
     val searchWord
         get() = _searchWord.asStateFlow()
     /**
@@ -81,8 +80,7 @@ internal class WordSearchViewModel @Inject internal constructor(
     val searchWordMutableStateFlow: MutableStateFlow<String>
         get() = _searchWord
 
-    private val initialPreviousSearchWord = ""
-    private var previousSearchWord = initialPreviousSearchWord // 二重検索防止用
+    private var previousSearchWord = "" // 二重検索防止用
 
     private val initialWordSearchResultListLoadingJob: Job? = null
     private var wordSearchResultListLoadingJob: Job? = initialWordSearchResultListLoadingJob // キャンセル用
@@ -99,8 +97,7 @@ internal class WordSearchViewModel @Inject internal constructor(
         get() = _numWordSearchResults.asStateFlow()
 
     // MEMO:画面遷移、回転時の更新フラグ
-    private val initialShouldUpdateWordSearchResultList = false
-    private var shouldUpdateWordSearchResultList = initialShouldUpdateWordSearchResultList
+    private var shouldUpdateWordSearchResultList = false
 
     private val initialIsLoadingOnScrolled = false
     private var isLoadingOnScrolled = initialIsLoadingOnScrolled
@@ -149,18 +146,6 @@ internal class WordSearchViewModel @Inject internal constructor(
         }.stateInWhileSubscribed(
             false
         )
-
-    override fun initialize() {
-        super.initialize()
-        _searchWord.value = initialSearchWord
-        previousSearchWord = initialPreviousSearchWord
-        cancelPreviousLoading()
-        wordSearchResultListLoadingJob = initialWordSearchResultListLoadingJob
-        _wordSearchResultList.value = initialWordSearchResultList
-        _numWordSearchResults.value = initialNumWordSearchResults
-        shouldUpdateWordSearchResultList = initialShouldUpdateWordSearchResultList
-        isLoadingOnScrolled = initialIsLoadingOnScrolled
-    }
 
     override suspend fun emitNavigatePreviousFragmentEvent(result: FragmentResult<*>) {
         viewModelScope.launch {
@@ -217,7 +202,7 @@ internal class WordSearchViewModel @Inject internal constructor(
     }
 
     fun onWordSearchResultListUpdateCompleted() {
-        isLoadingOnScrolled = initialIsLoadingOnScrolled
+        isLoadingOnScrolled = false
     }
 
     // Ui状態処理

@@ -48,21 +48,13 @@ internal class CalendarViewModel @Inject constructor(
             )
 
 
-    private val initialSelectedDate = LocalDate.now()
-    private val _selectedDate = MutableStateFlow<LocalDate>(initialSelectedDate)
+    private val _selectedDate = MutableStateFlow<LocalDate>(LocalDate.now())
     val selectedDate get() = _selectedDate.asStateFlow()
 
-    private val initialPreviousSelectedDate = null
-    private val _previousSelectedDate = MutableStateFlow<LocalDate?>(initialPreviousSelectedDate)
+    private val _previousSelectedDate = MutableStateFlow<LocalDate?>(null)
     val previousSelectedDate get() = _previousSelectedDate.asStateFlow()
 
     private var shouldSmoothScroll = false
-
-    override fun initialize() {
-        super.initialize()
-        _selectedDate.value = initialSelectedDate
-        _previousSelectedDate.value = initialPreviousSelectedDate
-    }
 
     override suspend fun emitNavigatePreviousFragmentEvent(result: FragmentResult<*>) {
         viewModelScope.launch {

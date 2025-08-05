@@ -91,23 +91,18 @@ internal class DiaryListViewModel @Inject constructor(
                 false
             )
 
-    private val initialDiaryListLoadingJob: Job? = null
-    private var diaryListLoadingJob: Job? = initialDiaryListLoadingJob // キャンセル用
+    private var diaryListLoadingJob: Job? = null // キャンセル用
 
-    private val initialDiaryList = DiaryYearMonthList()
-    private val _diaryList = MutableStateFlow(initialDiaryList)
+    private val _diaryList = MutableStateFlow(DiaryYearMonthList())
     val diaryList
         get() = _diaryList.asStateFlow()
 
     // MEMO:画面遷移、回転時の更新フラグ
-    private val initialShouldUpdateDiaryList = false
-    private var shouldUpdateDiaryList = initialShouldUpdateDiaryList
+    private var shouldUpdateDiaryList = false
 
-    private val initialSortConditionDate: LocalDate? = null
-    private var sortConditionDate: LocalDate? = initialSortConditionDate
+    private var sortConditionDate: LocalDate? = null
 
-    private val initialIsLoadingOnScrolled = false
-    private var isLoadingOnScrolled = initialIsLoadingOnScrolled
+    private var isLoadingOnScrolled = false
 
     init {
         initializeDiaryListData()
@@ -133,15 +128,6 @@ internal class DiaryListViewModel @Inject constructor(
             }
             Log.i(logTag, "${logMsg}_完了")
         }
-    }
-
-    override fun initialize() {
-        super.initialize()
-        diaryListLoadingJob = initialDiaryListLoadingJob
-        _diaryList.value = initialDiaryList
-        shouldUpdateDiaryList = initialShouldUpdateDiaryList
-        sortConditionDate = initialSortConditionDate
-        isLoadingOnScrolled = initialIsLoadingOnScrolled
     }
 
     override suspend fun emitNavigatePreviousFragmentEvent(result: FragmentResult<*>) {
@@ -230,7 +216,7 @@ internal class DiaryListViewModel @Inject constructor(
     }
 
     fun onDiaryListUpdateCompleted() {
-        isLoadingOnScrolled = initialIsLoadingOnScrolled
+        isLoadingOnScrolled = false
     }
 
     // Ui状態処理

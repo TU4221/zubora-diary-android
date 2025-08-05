@@ -1,6 +1,5 @@
 package com.websarva.wings.android.zuboradiary.ui.viewmodel
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
@@ -22,7 +21,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 
 internal abstract class BaseViewModel<E: UiEvent, M: AppMessage, S: UiState>(
-    private val initialViewUiState: S
+    initialViewUiState: S
 ) : ViewModel() {
 
     fun <T> Flow<T>.stateInWhileSubscribed(
@@ -49,16 +48,10 @@ internal abstract class BaseViewModel<E: UiEvent, M: AppMessage, S: UiState>(
     open val isProgressIndicatorVisible get() = isProcessingState
 
     // 表示保留中Navigation
-    private val initialPendingNavigationCommandList = emptyList<PendingNavigationCommand>()
-    private val _pendingNavigationCommandList = MutableStateFlow(initialPendingNavigationCommandList)
+    private val _pendingNavigationCommandList =
+        MutableStateFlow(emptyList<PendingNavigationCommand>())
     val pendingNavigationCommandList
         get() = _pendingNavigationCommandList.asStateFlow()
-
-    open fun initialize() {
-        Log.d(logTag, "initialize()")
-        _uiState.value = initialViewUiState
-        _pendingNavigationCommandList.value = initialPendingNavigationCommandList
-    }
 
     protected suspend fun emitUiEvent(event: E) {
         _uiEvent.emit(
