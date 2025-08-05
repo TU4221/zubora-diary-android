@@ -73,7 +73,7 @@ class DiaryListFragment :
         setUpToolBar()
         setUpDiaryList()
 
-        mainViewModel.onFragmentViewCreated()
+        mainViewModel.onDiaryListPrepare()
     }
 
     override fun initializeFragmentResultReceiver() {
@@ -148,7 +148,7 @@ class DiaryListFragment :
             .setOnMenuItemClickListener { item: MenuItem ->
                 // ワード検索フラグメント起動
                 if (item.itemId == R.id.diaryListToolbarOptionWordSearch) {
-                    mainViewModel.onWordSearchMenuClicked()
+                    mainViewModel.onWordSearchMenuClick()
                     return@setOnMenuItemClickListener true
                 }
                 false
@@ -171,7 +171,7 @@ class DiaryListFragment :
                     val convertedItemList: List<DiaryYearMonthListBaseItem> = value.itemList
                     val listAdapter = binding.recyclerDiaryList.adapter as DiaryYearMonthListAdapter
                     listAdapter.submitList(convertedItemList) {
-                        mainViewModel.onDiaryListUpdated()
+                        mainViewModel.onDiaryListUpdateCompleted()
                     }
                 }
         }
@@ -198,12 +198,12 @@ class DiaryListFragment :
             build()
             onClickChildItemListener =
                 OnClickChildItemListener { item: DiaryDayListBaseItem ->
-                    mainViewModel.onDiaryListItemClicked(item.date)
+                    mainViewModel.onDiaryListItemClick(item.date)
                 }
             onClickChildItemBackgroundButtonListener =
                 OnClickChildItemBackgroundButtonListener { item: DiaryDayListBaseItem ->
                     if (item !is DiaryDayListItem) throw IllegalStateException()
-                    mainViewModel.onDiaryListItemDeleteButtonClicked(item.date, item.imageUri)
+                    mainViewModel.onDiaryListItemDeleteButtonClick(item.date, item.imageUri)
                 }
         }
     }

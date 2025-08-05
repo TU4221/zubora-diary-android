@@ -312,7 +312,7 @@ internal class SettingsViewModel @Inject constructor(
         }
     }
 
-    // ViewClicked処理
+    // Viewクリック処理
     private fun canExecuteSettingsOperation(): Boolean {
         when (uiState.value) {
             SettingsState.LoadAllSettingsFailure -> {
@@ -332,7 +332,7 @@ internal class SettingsViewModel @Inject constructor(
         }
     }
 
-    fun onThemeColorSettingButtonClicked() {
+    fun onThemeColorSettingButtonClick() {
         if (!canExecuteSettingsOperation()) return
 
         viewModelScope.launch {
@@ -342,7 +342,7 @@ internal class SettingsViewModel @Inject constructor(
         }
     }
 
-    fun onCalendarStartDayOfWeekSettingButtonClicked() {
+    fun onCalendarStartDayOfWeekSettingButtonClick() {
         if (!canExecuteSettingsOperation()) return
 
         val dayOfWeek = calendarStartDayOfWeek.requireValue()
@@ -353,7 +353,7 @@ internal class SettingsViewModel @Inject constructor(
         }
     }
 
-    fun onReminderNotificationSettingCheckedChanged(isChecked: Boolean) {
+    fun onReminderNotificationSettingCheckedChange(isChecked: Boolean) {
         // DateSourceからの初回読込時の値がtrueの場合、本メソッドが呼び出される。
         // 初回読込時は処理不要のため下記条件追加。
         val settingValue = isCheckedReminderNotification.requireValue()
@@ -385,7 +385,7 @@ internal class SettingsViewModel @Inject constructor(
 
     }
 
-    fun onPasscodeLockSettingCheckedChanged(isChecked: Boolean) {
+    fun onPasscodeLockSettingCheckedChange(isChecked: Boolean) {
         // DateSourceからの初回読込時の値がtrueの場合、本メソッドが呼び出される。
         // 初回読込時は処理不要のため下記条件追加。
         val settingValue = isCheckedPasscodeLock.requireValue()
@@ -403,7 +403,7 @@ internal class SettingsViewModel @Inject constructor(
         }
     }
 
-    fun onWeatherInfoFetchSettingCheckedChanged(isChecked: Boolean) {
+    fun onWeatherInfoFetchSettingCheckedChange(isChecked: Boolean) {
         // DateSourceからの初回読込時の値がtrueの場合、本メソッドが呼び出される。
         // 初回読込時は処理不要のため下記条件追加。
         val settingValue = isCheckedWeatherInfoFetch.requireValue()
@@ -427,7 +427,7 @@ internal class SettingsViewModel @Inject constructor(
         }
     }
 
-    fun onAllDiariesDeleteButtonClicked() {
+    fun onAllDiariesDeleteButtonClick() {
         if (!canExecuteSettingsOperation()) return
 
         viewModelScope.launch {
@@ -437,7 +437,7 @@ internal class SettingsViewModel @Inject constructor(
         }
     }
 
-    fun onAllSettingsInitializationButtonClicked() {
+    fun onAllSettingsInitializationButtonClick() {
         if (!canExecuteSettingsOperation()) return
 
         viewModelScope.launch {
@@ -447,7 +447,7 @@ internal class SettingsViewModel @Inject constructor(
         }
     }
 
-    fun onAllDataDeleteButtonClicked() {
+    fun onAllDataDeleteButtonClick() {
         if (!canExecuteSettingsOperation()) return
 
         viewModelScope.launch {
@@ -457,7 +457,7 @@ internal class SettingsViewModel @Inject constructor(
         }
     }
 
-    fun onOpenSourceLicenseButtonClicked() {
+    fun onOpenSourceLicenseButtonClick() {
         viewModelScope.launch {
             emitUiEvent(
                 SettingsEvent.NavigateOpenSourceLicensesFragment
@@ -469,7 +469,7 @@ internal class SettingsViewModel @Inject constructor(
     fun onThemeColorSettingDialogResultReceived(result: DialogResult<ThemeColor>) {
         when (result) {
             is DialogResult.Positive<ThemeColor> -> {
-                onThemeColorSettingDialogPositiveResultReceived(result.data)
+                handleThemeColorSettingDialogPositiveResult(result.data)
             }
             DialogResult.Negative,
             DialogResult.Cancel -> {
@@ -478,7 +478,7 @@ internal class SettingsViewModel @Inject constructor(
         }
     }
 
-    private fun onThemeColorSettingDialogPositiveResultReceived(themeColor: ThemeColor) {
+    private fun handleThemeColorSettingDialogPositiveResult(themeColor: ThemeColor) {
         viewModelScope.launch {
             saveThemeColor(themeColor)
         }
@@ -487,7 +487,7 @@ internal class SettingsViewModel @Inject constructor(
     fun onCalendarStartDayOfWeekSettingDialogResultReceived(result: DialogResult<DayOfWeek>) {
         when (result) {
             is DialogResult.Positive<DayOfWeek> -> {
-                onCalendarStartDayOfWeekSettingDialogPositiveResultReceived(result.data)
+                handleCalendarStartDayOfWeekSettingDialogPositiveResult(result.data)
             }
             DialogResult.Negative,
             DialogResult.Cancel -> {
@@ -496,7 +496,7 @@ internal class SettingsViewModel @Inject constructor(
         }
     }
 
-    private fun onCalendarStartDayOfWeekSettingDialogPositiveResultReceived(dayOfWeek: DayOfWeek) {
+    private fun handleCalendarStartDayOfWeekSettingDialogPositiveResult(dayOfWeek: DayOfWeek) {
         viewModelScope.launch {
             saveCalendarStartDayOfWeek(dayOfWeek)
         }
@@ -505,23 +505,23 @@ internal class SettingsViewModel @Inject constructor(
     fun onReminderNotificationSettingDialogResultReceived(result: DialogResult<LocalTime>) {
         when (result) {
             is DialogResult.Positive<LocalTime> -> {
-                onReminderNotificationSettingDialogPositiveResultReceived(result.data)
+                handleReminderNotificationSettingDialogPositiveResult(result.data)
             }
             DialogResult.Negative,
             DialogResult.Cancel -> {
-                onReminderNotificationSettingDialogNegativeResultReceived()
+                handleReminderNotificationSettingDialogNegativeResult()
                 return
             }
         }
     }
 
-    private fun onReminderNotificationSettingDialogPositiveResultReceived(time: LocalTime) {
+    private fun handleReminderNotificationSettingDialogPositiveResult(time: LocalTime) {
         viewModelScope.launch {
             saveReminderNotificationValid(time)
         }
     }
 
-    private fun onReminderNotificationSettingDialogNegativeResultReceived() {
+    private fun handleReminderNotificationSettingDialogNegativeResult() {
         viewModelScope.launch {
             emitUiEvent(
                 SettingsEvent.TurnOffReminderNotificationSettingSwitch
@@ -532,7 +532,7 @@ internal class SettingsViewModel @Inject constructor(
     fun onAllDiariesDeleteDialogResultReceived(result: DialogResult<Unit>) {
         when (result) {
             is DialogResult.Positive<Unit> -> {
-                onAllDiariesDeleteDialogPositiveResultReceived()
+                handleAllDiariesDeleteDialogPositiveResult()
             }
             DialogResult.Negative,
             DialogResult.Cancel -> {
@@ -541,7 +541,7 @@ internal class SettingsViewModel @Inject constructor(
         }
     }
 
-    private fun onAllDiariesDeleteDialogPositiveResultReceived() {
+    private fun handleAllDiariesDeleteDialogPositiveResult() {
         viewModelScope.launch {
             deleteAllDiaries()
         }
@@ -550,7 +550,7 @@ internal class SettingsViewModel @Inject constructor(
     fun onAllSettingsInitializationDialogResultReceived(result: DialogResult<Unit>) {
         when (result) {
             is DialogResult.Positive<Unit> -> {
-                onAllSettingsInitializationDialogPositiveResultReceived()
+                handleAllSettingsInitializationDialogPositiveResult()
             }
             DialogResult.Negative,
             DialogResult.Cancel -> {
@@ -559,7 +559,7 @@ internal class SettingsViewModel @Inject constructor(
         }
     }
 
-    private fun onAllSettingsInitializationDialogPositiveResultReceived() {
+    private fun handleAllSettingsInitializationDialogPositiveResult() {
         viewModelScope.launch {
             initializeAllSettings()
         }
@@ -568,7 +568,7 @@ internal class SettingsViewModel @Inject constructor(
     fun onAllDataDeleteDialogResultReceived(result: DialogResult<Unit>) {
         when (result) {
             is DialogResult.Positive<Unit> -> {
-                onAllDataDeleteDialogPositiveResultReceived()
+                handleAllDataDeleteDialogPositiveResult()
             }
             DialogResult.Negative,
             DialogResult.Cancel -> {
@@ -577,7 +577,7 @@ internal class SettingsViewModel @Inject constructor(
         }
     }
 
-    private fun onAllDataDeleteDialogPositiveResultReceived() {
+    private fun handleAllDataDeleteDialogPositiveResult() {
         viewModelScope.launch {
             deleteAllData()
         }
@@ -586,7 +586,7 @@ internal class SettingsViewModel @Inject constructor(
     fun onPermissionDialogResultReceived(result: DialogResult<Unit>) {
         when (result) {
             is DialogResult.Positive<Unit> -> {
-                onPermissionDialogPositiveResultReceived()
+                handlePermissionDialogPositiveResult()
             }
             DialogResult.Negative,
             DialogResult.Cancel -> {
@@ -595,7 +595,7 @@ internal class SettingsViewModel @Inject constructor(
         }
     }
 
-    private fun onPermissionDialogPositiveResultReceived() {
+    private fun handlePermissionDialogPositiveResult() {
         viewModelScope.launch {
             emitUiEvent(
                 SettingsEvent.ShowApplicationDetailsSettings
@@ -694,7 +694,7 @@ internal class SettingsViewModel @Inject constructor(
     }
 
     // MEMO:端末設定画面で"許可 -> 無許可"に変更したときの対応コード
-    fun onInitializeReminderNotificationSettingFromPermission(isGranted: Boolean) {
+    fun onEnsureReminderNotificationSettingMatchesPermission(isGranted: Boolean) {
         viewModelScope.launch {
             if (isGranted) return@launch
 
@@ -703,7 +703,7 @@ internal class SettingsViewModel @Inject constructor(
     }
 
     // MEMO:端末設定画面で"許可 -> 無許可"に変更したときの対応コード
-    fun onInitializeWeatherInfoFetchSettingFromPermission(isGranted: Boolean) {
+    fun onEnsureWeatherInfoFetchSettingMatchesPermission(isGranted: Boolean) {
         viewModelScope.launch {
             if (isGranted) return@launch
 

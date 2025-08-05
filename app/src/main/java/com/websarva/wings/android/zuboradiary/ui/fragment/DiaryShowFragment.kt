@@ -125,10 +125,10 @@ class DiaryShowFragment : BaseFragment<FragmentDiaryShowBinding, DiaryShowEvent>
             setOnMenuItemClickListener { item: MenuItem ->
                 // 日記編集フラグメント起動
                 if (item.itemId == R.id.diaryShowToolbarOptionEditDiary) {
-                    mainViewModel.onDiaryEditMenuClicked()
+                    mainViewModel.onDiaryEditMenuClick()
                     return@setOnMenuItemClickListener true
                 } else if (item.itemId == R.id.diaryShowToolbarOptionDeleteDiary) {
-                    mainViewModel.onDiaryDeleteMenuClicked()
+                    mainViewModel.onDiaryDeleteMenuClick()
                     return@setOnMenuItemClickListener true
                 }
                 false

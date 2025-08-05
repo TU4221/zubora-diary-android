@@ -534,12 +534,12 @@ class SettingsFragment :
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             val isPostNotificationsGranted = requireContext().isPostNotificationsGranted()
             mainViewModel
-                .onInitializeReminderNotificationSettingFromPermission(isPostNotificationsGranted)
+                .onEnsureReminderNotificationSettingMatchesPermission(isPostNotificationsGranted)
         }
 
         val isAccessLocationGranted = requireContext().isAccessLocationGranted()
         mainViewModel
-            .onInitializeWeatherInfoFetchSettingFromPermission(isAccessLocationGranted)
+            .onEnsureWeatherInfoFetchSettingMatchesPermission(isAccessLocationGranted)
     }
 
     override fun onBottomNavigationItemReselected() {

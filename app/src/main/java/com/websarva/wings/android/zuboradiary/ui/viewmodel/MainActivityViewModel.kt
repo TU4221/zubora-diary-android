@@ -17,19 +17,17 @@ internal class MainActivityViewModel : ViewModel() {
     private val _isProgressIndicatorVisible = MutableStateFlow(false)
     val isProgressIndicatorVisible get() = _isProgressIndicatorVisible.asStateFlow()
 
-    fun showBottomNavigation() {
+    fun onRequestBottomNavigationStateChange(isVisible: Boolean) {
         _uiState.update {
-            MainActivityUiState.ShowingBottomNavigation(it.isBottomNavigationEnabled)
+            if (isVisible) {
+                MainActivityUiState.ShowingBottomNavigation(it.isBottomNavigationEnabled)
+            } else {
+                MainActivityUiState.HidingBottomNavigation(it.isBottomNavigationEnabled)
+            }
         }
     }
 
-    fun hideBottomNavigation() {
-        _uiState.update {
-            MainActivityUiState.HidingBottomNavigation(it.isBottomNavigationEnabled)
-        }
-    }
-
-    fun switchBottomNavigationEnabled(isEnabled: Boolean) {
+    fun onRequestBottomNavigationEnabledChange(isEnabled: Boolean) {
         _uiState.value  =
             when (val value = _uiState.value) {
                 is MainActivityUiState.ShowingBottomNavigation -> {
@@ -41,11 +39,7 @@ internal class MainActivityViewModel : ViewModel() {
             }
     }
 
-    fun onRequestShowProgressIndicator() {
-        _isProgressIndicatorVisible.value = true
-    }
-
-    fun onRequestHideProgressIndicator() {
-        _isProgressIndicatorVisible.value = false
+    fun onFragmentProgressVisibilityChanged(isVisible: Boolean) {
+        _isProgressIndicatorVisible.value = isVisible
     }
 }

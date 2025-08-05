@@ -33,7 +33,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     app:title="@{viewModel.isNewDiary ? @string/fragment_diary_edit_toolbar_title_create_new : @string/fragment_diary_edit_toolbar_title_edit}"
-                    app:onNavigationIconClick="@{() -> viewModel.onNavigationClicked()}"
+                    app:onNavigationIconClick="@{() -> viewModel.onNavigationClick()}"
                     app:menu="@menu/diary_edit_toolbar_menu"
                     tools:title="@string/fragment_diary_edit_toolbar_title_value_tools" />
 
@@ -99,7 +99,7 @@
                                 android:layout_height="wrap_content"
                                 android:textAppearance="@style/AppTextInputEditTextTextAppearance"
                                 android:textSize="@dimen/fragment_diary_edit_text_size"
-                                android:onClick="@{() -> viewModel.onDateInputFieldClicked()}"
+                                android:onClick="@{() -> viewModel.onDateInputFieldClick()}"
                                 tools:text="@string/fragment_diary_edit_date_value_tools" />
 
                         </com.google.android.material.textfield.TextInputLayout>
@@ -295,7 +295,7 @@
                             android:contentDescription="@string/fragment_diary_edit_item_addition"
                             android:src="@{viewModel.isItemAdditionButtonClickable() ? @drawable/ic_add_circle_24px : @drawable/ic_add_circle_disabled_24px}"
                             android:clickable="@{viewModel.isItemAdditionButtonClickable()}"
-                            android:onClick="@{() -> viewModel.onItemAdditionButtonClicked()}"/>
+                            android:onClick="@{() -> viewModel.onItemAdditionButtonClick()}"/>
 
                         <LinearLayout
                             android:layout_width="match_parent"
@@ -331,7 +331,7 @@
                                 android:contentDescription="@string/fragment_diary_edit_attached_image_delete"
                                 android:src="@{viewModel.isImageDeleteButtonClickable() ? @drawable/ic_delete_forever_24px : @drawable/ic_delete_forever_disabled_24px}"
                                 android:clickable="@{viewModel.isImageDeleteButtonClickable()}"
-                                android:onClick="@{() -> viewModel.onAttachedImageDeleteButtonClicked()}"/>
+                                android:onClick="@{() -> viewModel.onAttachedImageDeleteButtonClick()}"/>
 
                         </LinearLayout>
 
@@ -351,7 +351,7 @@
                                 android:scaleType="fitCenter"
                                 android:adjustViewBounds="true"
                                 android:src="@drawable/diary_edit_image_ic_photo_library_24px"
-                                android:onClick="@{() -> viewModel.onAttachedImageClicked()}"
+                                android:onClick="@{() -> viewModel.onAttachedImageClick()}"
                                 tools:tint="?attr/colorOnSurfaceVariant" />
 
                         </FrameLayout>

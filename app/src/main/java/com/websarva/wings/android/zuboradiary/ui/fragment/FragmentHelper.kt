@@ -147,9 +147,9 @@ internal class FragmentHelper {
                                 firstPendingCommand.command
                             )
                         if (isNavigationSuccessful) {
-                            mainViewModel.onPendingFragmentNavigationCompleted(firstPendingCommand)
+                            mainViewModel.onPendingFragmentNavigationComplete(firstPendingCommand)
                         } else {
-                            mainViewModel.onPendingFragmentNavigationFailed(firstPendingCommand)
+                            mainViewModel.onPendingFragmentNavigationFailure(firstPendingCommand)
                         }
                     }
             }
@@ -181,7 +181,7 @@ internal class FragmentHelper {
             fragmentDestinationId,
             command
         ) {
-            mainViewModel.onFragmentNavigationFailed(command)
+            mainViewModel.onFragmentNavigationFailure(command)
         }
     }
 

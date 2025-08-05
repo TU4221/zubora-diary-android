@@ -111,18 +111,14 @@ class MainActivity : LoggingActivity() {
         supportFragmentManager.apply {
             registerFragmentLifecycleCallbacks(
                 BottomNavigationEnabledSwitchCallbacks { isEnabled ->
-                    mainActivityViewModel.switchBottomNavigationEnabled(isEnabled)
+                    mainActivityViewModel.onRequestBottomNavigationEnabledChange(isEnabled)
                 },
                 true
             )
 
             registerFragmentLifecycleCallbacks(
                 BottomNavigationStateSwitchCallbacks { isVisible ->
-                    if (isVisible) {
-                        mainActivityViewModel.showBottomNavigation()
-                    } else {
-                        mainActivityViewModel.hideBottomNavigation()
-                    }
+                    mainActivityViewModel.onRequestBottomNavigationStateChange(isVisible)
                 },
                 true
             )

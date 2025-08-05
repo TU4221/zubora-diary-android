@@ -110,7 +110,7 @@ class DiaryItemTitleEditDialog :
         val diaryItemTitle =
             DiaryItemTitleEditDialogArgs.fromBundle(requireArguments()).diaryItemTitle
         mainViewModel
-            .onDiaryItemTitleDataReceivedFromPreviousFragment(diaryItemTitle)
+            .onDiaryItemTitleDataReceived(diaryItemTitle)
     }
 
     private fun setUpToolBar() {
@@ -154,12 +154,12 @@ class DiaryItemTitleEditDialog :
             )
         itemTitleSelectionHistoryListAdapter.build()
         itemTitleSelectionHistoryListAdapter.setOnClickItemListener { itemTitle: String ->
-            mainViewModel.onDiaryItemTitleSelectionHistoryItemClicked(itemTitle)
+            mainViewModel.onDiaryItemTitleSelectionHistoryItemClick(itemTitle)
         }
         itemTitleSelectionHistoryListAdapter
             .setOnClickDeleteButtonListener { itemTitle: String ->
                 mainViewModel
-                    .onDiaryItemTitleSelectionHistoryItemDeleteButtonClicked(
+                    .onDiaryItemTitleSelectionHistoryItemDeleteButtonClick(
                         itemTitle
                     )
             }

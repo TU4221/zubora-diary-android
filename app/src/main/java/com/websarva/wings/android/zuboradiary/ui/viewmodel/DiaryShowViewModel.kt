@@ -77,8 +77,8 @@ internal class DiaryShowViewModel @Inject constructor(
         }
     }
 
-    // ViewClicked処理
-    fun onDiaryEditMenuClicked() {
+    // Viewクリック処理
+    fun onDiaryEditMenuClick() {
         if (uiState.value != DiaryShowState.LoadSuccess) return
 
         val date = diaryStateFlow.date.requireValue()
@@ -89,7 +89,7 @@ internal class DiaryShowViewModel @Inject constructor(
         }
     }
 
-    fun onDiaryDeleteMenuClicked() {
+    fun onDiaryDeleteMenuClick() {
         if (uiState.value != DiaryShowState.LoadSuccess) return
 
         val date = diaryStateFlow.date.requireValue()
@@ -102,7 +102,7 @@ internal class DiaryShowViewModel @Inject constructor(
         }
     }
 
-    fun onNavigationClicked() {
+    fun onNavigationIconClick() {
         if (isProcessing) return
 
         val date = diaryStateFlow.date.requireValue()
@@ -131,7 +131,7 @@ internal class DiaryShowViewModel @Inject constructor(
 
         when (result) {
             is DialogResult.Positive<Unit> -> {
-                onDiaryDeleteDialogPositiveResultReceived()
+                handleDiaryDeleteDialogPositiveResult()
             }
             DialogResult.Negative,
             DialogResult.Cancel -> {
@@ -140,13 +140,14 @@ internal class DiaryShowViewModel @Inject constructor(
         }
     }
 
-    private fun onDiaryDeleteDialogPositiveResultReceived() {
+    private fun handleDiaryDeleteDialogPositiveResult() {
         viewModelScope.launch {
             deleteDiary()
         }
     }
 
     // Fragment状態処理
+    // TODO:初期化ブロックで処理
     fun onFragmentViewCreated(date: LocalDate) {
         if (uiState.value != DiaryShowState.Idle) return
 

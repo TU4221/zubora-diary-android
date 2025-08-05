@@ -324,7 +324,7 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditEvent>
         val shouldLoadDiary =
             DiaryEditFragmentArgs.fromBundle(requireArguments()).shouldLoadDiary
         mainViewModel
-            .onDiaryDataSetUp(
+            .onDiaryPrepare(
                 diaryDate,
                 shouldLoadDiary
             )
@@ -336,12 +336,12 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditEvent>
                 // 日記保存、削除
                 when (item.itemId) {
                     R.id.diaryEditToolbarOptionSaveDiary -> {
-                        mainViewModel.onDiarySaveMenuClicked()
+                        mainViewModel.onDiarySaveMenuClick()
                         return@setOnMenuItemClickListener true
                     }
 
                     R.id.diaryEditToolbarOptionDeleteDiary -> {
-                        mainViewModel.onDiaryDeleteMenuClicked()
+                        mainViewModel.onDiaryDeleteMenuClick()
                         return@setOnMenuItemClickListener true
                     }
 
@@ -373,7 +373,7 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditEvent>
             mainViewModel.editingDiaryDate
                 .collectLatest { value: LocalDate? ->
                     val dateString = value?.toJapaneseDateString(requireContext())
-                    mainViewModel.onOriginalDiaryDateChangedUpdateEditingDiaryDateString(dateString)
+                    mainViewModel.onOriginalDiaryDateChanged(dateString)
                 }
         }
     }
@@ -399,7 +399,7 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditEvent>
                 val arrayAdapter = listAdapter as ArrayAdapter<*>
                 val strWeather = checkNotNull(arrayAdapter.getItem(position)) as String
                 val weather = Weather.of(requireContext(), strWeather)
-                mainViewModel.onWeather1InputFieldItemClicked(weather)
+                mainViewModel.onWeather1InputFieldItemClick(weather)
             }
 
         launchAndRepeatOnViewLifeCycleStarted {
@@ -426,7 +426,7 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditEvent>
                 val arrayAdapter = listAdapter as ArrayAdapter<*>
                 val strWeather = checkNotNull(arrayAdapter.getItem(position)) as String
                 val weather = Weather.of(requireContext(), strWeather)
-                mainViewModel.onWeather2InputFieldItemClicked(weather)
+                mainViewModel.onWeather2InputFieldItemClick(weather)
             }
 
         launchAndRepeatOnViewLifeCycleStarted {
@@ -466,7 +466,7 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditEvent>
                 val arrayAdapter = listAdapter as ArrayAdapter<*>
                 val strCondition = arrayAdapter.getItem(position) as String
                 val condition = Condition.of(requireContext(), strCondition)
-                mainViewModel.onConditionInputFieldItemClicked(condition)
+                mainViewModel.onConditionInputFieldItemClick(condition)
             }
 
 
@@ -532,7 +532,7 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditEvent>
             val inputItemNumber = ItemNumber(i)
             val itemArrayNumber = i - 1
             textInputEditTextItemsTitle[itemArrayNumber].setOnClickListener {
-                mainViewModel.onItemTitleInputFieldClicked(inputItemNumber)
+                mainViewModel.onItemTitleInputFieldClick(inputItemNumber)
             }
         }
 
@@ -541,7 +541,7 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditEvent>
             val deleteItemNumber = ItemNumber(i)
             val itemArrayNumber = i - 1
             imageButtonItemsDelete[itemArrayNumber].setOnClickListener {
-                mainViewModel.onItemDeleteButtonClicked(deleteItemNumber)
+                mainViewModel.onItemDeleteButtonClick(deleteItemNumber)
             }
         }
 

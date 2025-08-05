@@ -190,13 +190,13 @@ internal class WordSearchViewModel @Inject internal constructor(
     }
 
     // Viewクリック処理
-    fun onNavigationButtonClicked() {
+    fun onNavigationIconButtonClick() {
         viewModelScope.launch {
             emitNavigatePreviousFragmentEvent()
         }
     }
 
-    fun onWordSearchResultListItemClicked(date: LocalDate) {
+    fun onWordSearchResultListItemClick(date: LocalDate) {
         viewModelScope.launch {
             emitUiEvent(WordSearchEvent.NavigateDiaryShowFragment(date))
         }
@@ -216,7 +216,7 @@ internal class WordSearchViewModel @Inject internal constructor(
             }
     }
 
-    fun onWordSearchResultListUpdated() {
+    fun onWordSearchResultListUpdateCompleted() {
         isLoadingOnScrolled = initialIsLoadingOnScrolled
     }
 
@@ -225,7 +225,7 @@ internal class WordSearchViewModel @Inject internal constructor(
         shouldUpdateWordSearchResultList = true
     }
 
-    // StateFlow値変更処理
+    // StateFlow値変更時処理
     fun onSearchWordChanged(value: String) {
         val currentResultList = _wordSearchResultList.value
 

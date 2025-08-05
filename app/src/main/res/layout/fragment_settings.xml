@@ -76,7 +76,7 @@
                             android:id="@+id/include_theme_color_setting"
                             app:settingIcon="@{@drawable/ic_palette_24px}"
                             app:settingTitle="@{@string/fragment_settings_item_title_theme_color}"
-                            app:onClickListener="@{() -> viewModel.onThemeColorSettingButtonClicked()}" />
+                            app:onClickListener="@{() -> viewModel.onThemeColorSettingButtonClick()}" />
 
                     </LinearLayout>
 
@@ -109,7 +109,7 @@
                             android:id="@+id/include_calendar_start_day_setting"
                             app:settingIcon="@{@drawable/ic_calendar_month_24px}"
                             app:settingTitle="@{@string/fragment_settings_item_title_calendar_start_day}"
-                            app:onClickListener="@{() -> viewModel.onCalendarStartDayOfWeekSettingButtonClicked()}" />
+                            app:onClickListener="@{() -> viewModel.onCalendarStartDayOfWeekSettingButtonClick()}" />
 
                         <com.google.android.material.divider.MaterialDivider
                             android:id="@+id/material_divider_reminder_notification_setting"
@@ -127,7 +127,7 @@
                             app:settingTitle="@{@string/fragment_settings_item_title_reminder_notification}"
                             app:settingValueVisibility="@{viewModel.isCheckedReminderNotification() ? View.VISIBLE : View.GONE}"
                             app:settingValueSwitch="@{viewModel.isCheckedReminderNotification}"
-                            app:onCheckedChangeListener="@{(_, isChecked) -> viewModel.onReminderNotificationSettingCheckedChanged(isChecked)}"
+                            app:onCheckedChangeListener="@{(_, isChecked) -> viewModel.onReminderNotificationSettingCheckedChange(isChecked)}"
                             tools:ignore="DuplicateIncludedIds" />
 
                         <com.google.android.material.divider.MaterialDivider
@@ -146,7 +146,7 @@
                             app:settingTitle="@{@string/fragment_settings_item_title_passcode_lock}"
                             app:settingValueVisibility="@{View.GONE}"
                             app:settingValueSwitch="@{viewModel.isCheckedPasscodeLock}"
-                            app:onCheckedChangeListener="@{(_, isChecked) -> viewModel.onPasscodeLockSettingCheckedChanged(isChecked)}"
+                            app:onCheckedChangeListener="@{(_, isChecked) -> viewModel.onPasscodeLockSettingCheckedChange(isChecked)}"
                             tools:ignore="DuplicateIncludedIds" />
 
                         <com.google.android.material.divider.MaterialDivider
@@ -165,7 +165,7 @@
                             app:settingTitle="@{@string/fragment_settings_item_title_weather_info_fetch}"
                             app:settingValueSwitch="@{viewModel.isCheckedWeatherInfoFetch}"
                             app:settingValueVisibility="@{View.GONE}"
-                            app:onCheckedChangeListener="@{(_, isChecked) -> viewModel.onWeatherInfoFetchSettingCheckedChanged(isChecked)}"
+                            app:onCheckedChangeListener="@{(_, isChecked) -> viewModel.onWeatherInfoFetchSettingCheckedChange(isChecked)}"
                             tools:ignore="DuplicateIncludedIds" />
 
                         <!-- HACK:MaterialSwitchを配置したLayoutをincludeタグで複数配置すると、
@@ -215,7 +215,7 @@
                             app:settingIcon="@{@drawable/ic_delete_forever_24px}"
                             app:settingTitle="@{@string/fragment_settings_item_title_all_diaries_delete}"
                             app:settingValueVisibility="@{View.GONE}"
-                            app:onClickListener="@{() -> viewModel.onAllDiariesDeleteButtonClicked()}" />
+                            app:onClickListener="@{() -> viewModel.onAllDiariesDeleteButtonClick()}" />
 
                         <com.google.android.material.divider.MaterialDivider
                             android:id="@+id/material_divider_all_settings_initialization_setting"
@@ -228,7 +228,7 @@
                             app:settingIcon="@{@drawable/ic_reset_settings_24px}"
                             app:settingTitle="@{@string/fragment_settings_item_title_all_settings_initialization}"
                             app:settingValueVisibility="@{View.GONE}"
-                            app:onClickListener="@{() -> viewModel.onAllSettingsInitializationButtonClicked()}" />
+                            app:onClickListener="@{() -> viewModel.onAllSettingsInitializationButtonClick()}" />
 
                         <com.google.android.material.divider.MaterialDivider
                             android:id="@+id/material_divider_all_data_delete_setting"
@@ -241,7 +241,7 @@
                             app:settingIcon="@{@drawable/ic_delete_forever_24px}"
                             app:settingTitle="@{@string/fragment_settings_item_title_all_data_delete}"
                             app:settingValueVisibility="@{View.GONE}"
-                            app:onClickListener="@{() -> viewModel.onAllDataDeleteButtonClicked()}" />
+                            app:onClickListener="@{() -> viewModel.onAllDataDeleteButtonClick()}" />
 
                     </LinearLayout>
 
@@ -275,7 +275,7 @@
                             app:settingIcon="@{@drawable/ic_copyright_24dp}"
                             app:settingTitle="@{@string/fragment_settings_item_title_open_source_licenses}"
                             app:settingValueVisibility="@{View.GONE}"
-                            app:onClickListener="@{() -> viewModel.onOpenSourceLicenseButtonClicked()}" />
+                            app:onClickListener="@{() -> viewModel.onOpenSourceLicenseButtonClick()}" />
 
                     </LinearLayout>
 

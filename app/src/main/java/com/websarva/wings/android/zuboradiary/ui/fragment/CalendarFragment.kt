@@ -102,7 +102,7 @@ class CalendarFragment :
         setUpFragmentResultReceiver(
             DiaryEditFragment.KEY_RESULT
         ) { result ->
-            mainViewModel.onDataReceivedFromDiaryEditFragment(result)
+            mainViewModel.onDiaryEditFragmentResultReceived(result)
         }
     }
 
@@ -152,7 +152,7 @@ class CalendarFragment :
                     calendarMonthDayBinder.updateSelectedDate(value)
                     binding.calendar.notifyDateChanged(value) // 今回選択日付更新
                     updateToolBarDate(value)
-                    mainViewModel.onChangedSelectedDate(value)
+                    mainViewModel.onSelectedDateChanged(value)
                 }
         }
 
@@ -188,7 +188,7 @@ class CalendarFragment :
         binding.calendar.dayBinder =
             CalendarMonthDayBinder(
                 themeColor,
-                { date: LocalDate -> mainViewModel.onCalendarDayClicked(date) },
+                { date: LocalDate -> mainViewModel.onCalendarDayClick(date) },
                 { date: LocalDate -> mainViewModel.onCalendarDayDotVisibilityCheck(date) }
             )
 
@@ -565,7 +565,7 @@ class CalendarFragment :
 
     private fun setUpFloatActionButton() {
         binding.floatingActionButtonDiaryEdit.setOnClickListener {
-            mainViewModel.onDiaryEditButtonClicked()
+            mainViewModel.onDiaryEditButtonClick()
         }
     }
 
@@ -595,7 +595,7 @@ class CalendarFragment :
             scrollToTop()
             return
         }
-        mainViewModel.onBottomNavigationItemReselected()
+        mainViewModel.onBottomNavigationItemReselect()
     }
 
     private fun scrollToTop() {

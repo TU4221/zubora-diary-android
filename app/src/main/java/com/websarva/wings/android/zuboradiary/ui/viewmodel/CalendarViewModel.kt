@@ -93,14 +93,14 @@ internal class CalendarViewModel @Inject constructor(
         }
     }
 
-    // ViewClicked処理
-    fun onCalendarDayClicked(date: LocalDate) {
+    // Viewクリック処理
+    fun onCalendarDayClick(date: LocalDate) {
         if (isProcessing) return
 
         updateSelectedDate(date)
     }
 
-    fun onDiaryEditButtonClicked() {
+    fun onDiaryEditButtonClick() {
         if (isProcessing) return
 
         val date = _selectedDate.value
@@ -109,7 +109,7 @@ internal class CalendarViewModel @Inject constructor(
         }
     }
 
-    fun onBottomNavigationItemReselected() {
+    fun onBottomNavigationItemReselect() {
         if (isProcessing) return
 
         val selectedDate = _selectedDate.value
@@ -137,7 +137,7 @@ internal class CalendarViewModel @Inject constructor(
         }
     }
 
-    fun onDataReceivedFromDiaryEditFragment(result: FragmentResult<LocalDate>) {
+    fun onDiaryEditFragmentResultReceived(result: FragmentResult<LocalDate>) {
         when (result) {
             is FragmentResult.Some -> updateSelectedDate(result.data)
             FragmentResult.None -> {
@@ -147,19 +147,20 @@ internal class CalendarViewModel @Inject constructor(
     }
 
     // StateFlow値変更時処理
-    fun onChangedSelectedDate(date: LocalDate) {
+    fun onSelectedDateChanged(date: LocalDate) {
         viewModelScope.launch {
             prepareDiary(date)
         }
     }
 
-    // View変更処理
+    // View状態処理
     fun onCalendarDayDotVisibilityCheck(date: LocalDate) {
         viewModelScope.launch {
             processCalendarDayDotUpdate(date)
         }
     }
 
+    // データ処理
     private suspend fun prepareDiary(date: LocalDate) {
         val action =
             if (shouldSmoothScroll) {
@@ -179,7 +180,6 @@ internal class CalendarViewModel @Inject constructor(
         }
     }
 
-    // データ処理
     override suspend fun loadSavedDiary(date: LocalDate) {
         val logMsg = "日記読込"
         Log.i(logTag, "${logMsg}_開始")

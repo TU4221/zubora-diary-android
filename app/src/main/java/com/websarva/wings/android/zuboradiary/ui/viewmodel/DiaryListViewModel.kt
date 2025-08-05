@@ -148,14 +148,14 @@ internal class DiaryListViewModel @Inject constructor(
         }
     }
 
-    // ViewClicked処理
-    fun onWordSearchMenuClicked() {
+    // Viewクリック処理
+    fun onWordSearchMenuClick() {
         viewModelScope.launch {
             emitUiEvent(DiaryListEvent.NavigateWordSearchFragment)
         }
     }
 
-    fun onNavigationClicked() {
+    fun onNavigationIconClick() {
         viewModelScope.launch {
             val newestDiaryDate = loadNewestSavedDiaryDate() ?: LocalDate.now()
             val oldestDiaryDate = loadOldestSavedDiaryDate() ?: LocalDate.now()
@@ -167,13 +167,13 @@ internal class DiaryListViewModel @Inject constructor(
         }
     }
 
-    fun onDiaryListItemClicked(date: LocalDate) {
+    fun onDiaryListItemClick(date: LocalDate) {
         viewModelScope.launch {
             emitUiEvent(DiaryListEvent.NavigateDiaryShowFragment(date))
         }
     }
 
-    fun onDiaryListItemDeleteButtonClicked(date: LocalDate, uri: Uri?) {
+    fun onDiaryListItemDeleteButtonClick(date: LocalDate, uri: Uri?) {
         viewModelScope.launch {
             emitUiEvent(
                 DiaryListEvent.NavigateDiaryDeleteDialog(
@@ -183,7 +183,7 @@ internal class DiaryListViewModel @Inject constructor(
         }
     }
 
-    fun onDiaryEditButtonClicked() {
+    fun onDiaryEditButtonClick() {
         viewModelScope.launch {
             val today = LocalDate.now()
             emitUiEvent(DiaryListEvent.NavigateDiaryEditFragment(today))
@@ -203,12 +203,13 @@ internal class DiaryListViewModel @Inject constructor(
             }
     }
 
-    fun onDiaryListUpdated() {
+    fun onDiaryListUpdateCompleted() {
         isLoadingOnScrolled = initialIsLoadingOnScrolled
     }
 
     // Fragment状態処理
-    fun onFragmentViewCreated() {
+    // TODO:初期化ブロックで処理
+    fun onDiaryListPrepare() {
         val currentList = _diaryList.value
         cancelPreviousLoading()
         diaryListLoadingJob =
@@ -217,6 +218,7 @@ internal class DiaryListViewModel @Inject constructor(
             }
     }
 
+    // TODO:他FragmentのResult受取で処理
     fun onFragmentDestroyView() {
         shouldUpdateDiaryList = true
     }
@@ -225,7 +227,7 @@ internal class DiaryListViewModel @Inject constructor(
     fun onDatePickerDialogResultReceived(result: DialogResult<YearMonth>) {
         when (result) {
             is DialogResult.Positive<YearMonth> -> {
-                onDatePickerDialogPositiveResultReceived(result.data)
+                handleDatePickerDialogPositiveResult(result.data)
             }
             DialogResult.Negative,
             DialogResult.Cancel -> {
@@ -234,7 +236,7 @@ internal class DiaryListViewModel @Inject constructor(
         }
     }
 
-    private fun onDatePickerDialogPositiveResultReceived(yearMonth: YearMonth) {
+    private fun handleDatePickerDialogPositiveResult(yearMonth: YearMonth) {
         updateSortConditionDate(yearMonth)
         val currentList = _diaryList.value
         cancelPreviousLoading()
@@ -247,7 +249,7 @@ internal class DiaryListViewModel @Inject constructor(
     fun onDiaryDeleteDialogResultReceived(result: DialogResult<DiaryDeleteParameters>) {
         when (result) {
             is DialogResult.Positive<DiaryDeleteParameters> -> {
-                onDiaryDeleteDialogPositiveResultReceived(
+                handleDiaryDeleteDialogPositiveResult(
                     result.data.date,
                     result.data.imageUri
                 )
@@ -259,13 +261,14 @@ internal class DiaryListViewModel @Inject constructor(
         }
     }
 
-    private fun onDiaryDeleteDialogPositiveResultReceived(date: LocalDate, uri: Uri?) {
+    private fun handleDiaryDeleteDialogPositiveResult(date: LocalDate, uri: Uri?) {
         val currentList = _diaryList.value
         viewModelScope.launch {
             deleteDiary(date, uri, currentList)
         }
     }
 
+    // データ処理
     private fun cancelPreviousLoading() {
         val job = diaryListLoadingJob ?: return
         if (!job.isCompleted) job.cancel()

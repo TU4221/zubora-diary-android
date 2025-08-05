@@ -116,7 +116,7 @@ class WordSearchFragment : BaseFragment<FragmentWordSearchBinding, WordSearchEve
                     val convertedList: List<DiaryYearMonthListBaseItem> =
                         ArrayList<DiaryYearMonthListBaseItem>(value.itemList)
                     listAdapter.submitList(convertedList) {
-                        mainViewModel.onWordSearchResultListUpdated()
+                        mainViewModel.onWordSearchResultListUpdateCompleted()
                     }
                 }
         }
@@ -137,7 +137,7 @@ class WordSearchFragment : BaseFragment<FragmentWordSearchBinding, WordSearchEve
             build()
             onClickChildItemListener =
                 OnClickChildItemListener { item: DiaryDayListBaseItem ->
-                    mainViewModel.onWordSearchResultListItemClicked(item.date)
+                    mainViewModel.onWordSearchResultListItemClick(item.date)
                 }
         }
     }

@@ -358,8 +358,8 @@ internal class DiaryEditViewModel @Inject constructor(
         }
     }
 
-    // ViewClicked処理
-    fun onDiarySaveMenuClicked() {
+    // Viewクリック処理
+    fun onDiarySaveMenuClick() {
         if (uiState.value != DiaryEditState.Editing) return
 
         val diary = diaryStateFlow.createDiary()
@@ -385,7 +385,7 @@ internal class DiaryEditViewModel @Inject constructor(
         }
     }
 
-    fun onDiaryDeleteMenuClicked() {
+    fun onDiaryDeleteMenuClick() {
         if (uiState.value != DiaryEditState.Editing) return
         val isNewDiary = _isNewDiary.value
         if (isNewDiary) return
@@ -404,7 +404,7 @@ internal class DiaryEditViewModel @Inject constructor(
 
     }
 
-    fun onNavigationClicked() {
+    fun onNavigationClick() {
         if (uiState.value != DiaryEditState.Editing) return
 
         val diary = diaryStateFlow.createDiary()
@@ -414,7 +414,7 @@ internal class DiaryEditViewModel @Inject constructor(
         }
     }
 
-    fun onDateInputFieldClicked() {
+    fun onDateInputFieldClick() {
         if (uiState.value != DiaryEditState.Editing) return
 
         val date = this.date.requireValue()
@@ -426,19 +426,19 @@ internal class DiaryEditViewModel @Inject constructor(
         }
     }
 
-    fun onWeather1InputFieldItemClicked(weather: Weather) {
+    fun onWeather1InputFieldItemClick(weather: Weather) {
         updateWeather1(weather)
     }
 
-    fun onWeather2InputFieldItemClicked(weather: Weather) {
+    fun onWeather2InputFieldItemClick(weather: Weather) {
         updateWeather2(weather)
     }
 
-    fun onConditionInputFieldItemClicked(condition: Condition) {
+    fun onConditionInputFieldItemClick(condition: Condition) {
         updateCondition(condition)
     }
 
-    fun onItemTitleInputFieldClicked(itemNumber: ItemNumber) {
+    fun onItemTitleInputFieldClick(itemNumber: ItemNumber) {
         if (uiState.value != DiaryEditState.Editing) return
 
         val itemTitle = getItemTitle(itemNumber).requireValue()
@@ -452,7 +452,7 @@ internal class DiaryEditViewModel @Inject constructor(
         }
     }
 
-    fun onItemAdditionButtonClicked() {
+    fun onItemAdditionButtonClick() {
         if (uiState.value != DiaryEditState.Editing) return
 
         viewModelScope.launch {
@@ -460,7 +460,7 @@ internal class DiaryEditViewModel @Inject constructor(
         }
     }
 
-    fun onItemDeleteButtonClicked(itemNumber: ItemNumber) {
+    fun onItemDeleteButtonClick(itemNumber: ItemNumber) {
         if (uiState.value != DiaryEditState.Editing) return
 
         viewModelScope.launch {
@@ -471,7 +471,7 @@ internal class DiaryEditViewModel @Inject constructor(
         }
     }
 
-    fun onAttachedImageDeleteButtonClicked() {
+    fun onAttachedImageDeleteButtonClick() {
         if (uiState.value != DiaryEditState.Editing) return
 
         viewModelScope.launch {
@@ -481,7 +481,7 @@ internal class DiaryEditViewModel @Inject constructor(
         }
     }
 
-    fun onAttachedImageClicked() {
+    fun onAttachedImageClick() {
         if (uiState.value != DiaryEditState.Editing) return
 
         viewModelScope.launch {
@@ -495,23 +495,23 @@ internal class DiaryEditViewModel @Inject constructor(
 
         when (result) {
             is DialogResult.Positive<DiaryLoadingParameters> -> {
-                onDiaryLoadingDialogPositiveResultReceived(result.data)
+                handleDiaryLoadingDialogPositiveResult(result.data)
             }
             is DialogResult.Negative,
             is DialogResult.Cancel -> {
-                onDiaryLoadingDialogNegativeResultReceived()
+                handleDiaryLoadingDialogNegativeResult()
             }
         }
     }
 
-    private fun onDiaryLoadingDialogPositiveResultReceived(parameters: DiaryLoadingParameters) {
+    private fun handleDiaryLoadingDialogPositiveResult(parameters: DiaryLoadingParameters) {
         val date = parameters.date
         viewModelScope.launch {
             prepareDiary(date, true)
         }
     }
 
-    private fun onDiaryLoadingDialogNegativeResultReceived() {
+    private fun handleDiaryLoadingDialogNegativeResult() {
 
         val date = date.requireValue()
         val previousDate = previousDate
@@ -526,7 +526,7 @@ internal class DiaryEditViewModel @Inject constructor(
 
         when (result) {
             is DialogResult.Positive<DiaryUpdateParameters> -> {
-                onDiaryUpdateDialogPositiveResultReceived(result.data)
+                handleDiaryUpdateDialogPositiveResult(result.data)
             }
             DialogResult.Negative,
             DialogResult.Cancel -> {
@@ -535,7 +535,7 @@ internal class DiaryEditViewModel @Inject constructor(
         }
     }
 
-    private fun onDiaryUpdateDialogPositiveResultReceived(parameters: DiaryUpdateParameters) {
+    private fun handleDiaryUpdateDialogPositiveResult(parameters: DiaryUpdateParameters) {
         val diary = parameters.diary
         val diaryItemTitleSelectionHistoryList =
             parameters.diaryItemTitleSelectionHistoryItemList
@@ -556,7 +556,7 @@ internal class DiaryEditViewModel @Inject constructor(
 
         when (result) {
             is DialogResult.Positive<DiaryDeleteParameters> -> {
-                onDiaryDeleteDialogPositiveResultReceived(result.data)
+                handleDiaryDeleteDialogPositiveResult(result.data)
             }
             DialogResult.Negative,
             DialogResult.Cancel -> {
@@ -565,7 +565,7 @@ internal class DiaryEditViewModel @Inject constructor(
         }
     }
 
-    private fun onDiaryDeleteDialogPositiveResultReceived(parameters: DiaryDeleteParameters) {
+    private fun handleDiaryDeleteDialogPositiveResult(parameters: DiaryDeleteParameters) {
         val date = parameters.date
         val imageUri = parameters.imageUri
         viewModelScope.launch {
@@ -578,7 +578,7 @@ internal class DiaryEditViewModel @Inject constructor(
 
         when (result) {
             is DialogResult.Positive<LocalDate> -> {
-                onDatePickerDialogPositiveResultReceived(result.data)
+                handleDatePickerDialogPositiveResult(result.data)
             }
             DialogResult.Negative,
             DialogResult.Cancel -> {
@@ -587,7 +587,7 @@ internal class DiaryEditViewModel @Inject constructor(
         }
     }
 
-    private fun onDatePickerDialogPositiveResultReceived(date: LocalDate) {
+    private fun handleDatePickerDialogPositiveResult(date: LocalDate) {
         val originalDate = _originalDiary.requireValue().date
         val isNewDiary = _isNewDiary.value
         viewModelScope.launch {
@@ -614,7 +614,7 @@ internal class DiaryEditViewModel @Inject constructor(
 
         when (result) {
             is DialogResult.Positive<WeatherInfoFetchParameters> -> {
-                onWeatherInfoFetchDialogPositiveResultReceived(result.data)
+                handleWeatherInfoFetchDialogPositiveResult(result.data)
             }
             DialogResult.Negative,
             DialogResult.Cancel -> {
@@ -623,7 +623,7 @@ internal class DiaryEditViewModel @Inject constructor(
         }
     }
 
-    private fun onWeatherInfoFetchDialogPositiveResultReceived(
+    private fun handleWeatherInfoFetchDialogPositiveResult(
         parameters: WeatherInfoFetchParameters
     ) {
         viewModelScope.launch {
@@ -636,7 +636,7 @@ internal class DiaryEditViewModel @Inject constructor(
 
         when (result) {
             is DialogResult.Positive<DiaryItemDeleteParameters> -> {
-                onDiaryItemDeleteDialogPositiveResultReceived(result.data)
+                handleDiaryItemDeleteDialogPositiveResult(result.data)
             }
             DialogResult.Negative,
             DialogResult.Cancel -> {
@@ -645,7 +645,7 @@ internal class DiaryEditViewModel @Inject constructor(
         }
     }
 
-    private fun onDiaryItemDeleteDialogPositiveResultReceived(parameters: DiaryItemDeleteParameters) {
+    private fun handleDiaryItemDeleteDialogPositiveResult(parameters: DiaryItemDeleteParameters) {
         val itemNumber = parameters.itemNumber
         viewModelScope.launch {
             requestDiaryItemDeleteTransition(itemNumber)
@@ -657,7 +657,7 @@ internal class DiaryEditViewModel @Inject constructor(
 
         when (result) {
             is DialogResult.Positive<Unit> -> {
-                onDiaryImageDeleteDialogPositiveResultReceived()
+                handleDiaryImageDeleteDialogPositiveResult()
             }
             DialogResult.Negative,
             DialogResult.Cancel -> {
@@ -666,7 +666,7 @@ internal class DiaryEditViewModel @Inject constructor(
         }
     }
 
-    private fun onDiaryImageDeleteDialogPositiveResultReceived() {
+    private fun handleDiaryImageDeleteDialogPositiveResult() {
         deleteImageUri()
     }
 
@@ -713,7 +713,8 @@ internal class DiaryEditViewModel @Inject constructor(
     }
 
     // Fragment状態処理
-    fun onDiaryDataSetUp(
+    // TODO:初期化ブロックで処理
+    fun onDiaryPrepare(
         date: LocalDate,
         shouldLoadDiary: Boolean
     ) {
@@ -729,7 +730,7 @@ internal class DiaryEditViewModel @Inject constructor(
         updateWeather2AdapterList()
     }
 
-    fun onOriginalDiaryDateChangedUpdateEditingDiaryDateString(dateString: String?) {
+    fun onOriginalDiaryDateChanged(dateString: String?) {
         _editingDiaryDateString.value = dateString ?: initialDiaryDateString
     }
 
@@ -790,7 +791,7 @@ internal class DiaryEditViewModel @Inject constructor(
         }
     }
 
-    // 日記データ処理関係
+    // データ処理
     private suspend fun prepareDiary(
         date: LocalDate,
         shouldLoadDiary: Boolean

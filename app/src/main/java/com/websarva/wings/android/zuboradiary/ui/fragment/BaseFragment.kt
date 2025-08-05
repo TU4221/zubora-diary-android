@@ -211,11 +211,7 @@ abstract class BaseFragment<T: ViewBinding, E : UiEvent> : LoggingFragment() {
     private fun setUpProgressIndicator() {
         launchAndRepeatOnViewLifeCycleStarted {
             mainViewModel.isProgressIndicatorVisible.collectLatest {
-                if (it) {
-                    mainActivityViewModel.onRequestShowProgressIndicator()
-                } else {
-                    mainActivityViewModel.onRequestHideProgressIndicator()
-                }
+                mainActivityViewModel.onFragmentProgressVisibilityChanged(it)
             }
         }
     }

@@ -119,13 +119,14 @@ internal class DiaryItemTitleEditViewModel @Inject constructor(
         }
     }
 
-    fun onNavigationClicked() {
+    // Viewクリック処理
+    fun onNavigationIconClick() {
         viewModelScope.launch {
             emitNavigatePreviousFragmentEvent()
         }
     }
 
-    fun onNewDiaryItemTitleSelectionButtonClicked() {
+    fun onNewDiaryItemTitleSelectionButtonClick() {
         val itemNumber = _itemNumber.requireValue()
         val itemTitle = _itemTitle.value
         viewModelScope.launch {
@@ -133,7 +134,7 @@ internal class DiaryItemTitleEditViewModel @Inject constructor(
         }
     }
 
-    fun onDiaryItemTitleSelectionHistoryItemClicked(itemTitle: String) {
+    fun onDiaryItemTitleSelectionHistoryItemClick(itemTitle: String) {
         val itemNumber = _itemNumber.requireValue()
         viewModelScope.launch {
             emitUiEvent(
@@ -147,7 +148,7 @@ internal class DiaryItemTitleEditViewModel @Inject constructor(
         }
     }
 
-    fun onDiaryItemTitleSelectionHistoryItemDeleteButtonClicked(itemTitle: String) {
+    fun onDiaryItemTitleSelectionHistoryItemDeleteButtonClick(itemTitle: String) {
         viewModelScope.launch {
             emitUiEvent(
                 DiaryItemTitleEditEvent
@@ -158,7 +159,8 @@ internal class DiaryItemTitleEditViewModel @Inject constructor(
         }
     }
 
-    fun onDiaryItemTitleDataReceivedFromPreviousFragment(diaryItemTitle: DiaryItemTitle) {
+    // Fragmentからの結果受取処理
+    fun onDiaryItemTitleDataReceived(diaryItemTitle: DiaryItemTitle) {
         val itemNumber = diaryItemTitle.itemNumber
         val itemTitle = diaryItemTitle.title
         updateDiaryItemTitle(itemNumber, itemTitle)
@@ -169,16 +171,16 @@ internal class DiaryItemTitleEditViewModel @Inject constructor(
     ) {
         when (result) {
             is DialogResult.Positive -> {
-                onDiaryItemTitleSelectionHistoryDeleteDialogPositiveResultReceived(result.data)
+                handleDiaryItemTitleSelectionHistoryDeleteDialogPositiveResult(result.data)
             }
             DialogResult.Negative,
             DialogResult.Cancel -> {
-                onDiaryItemTitleSelectionHistoryDeleteDialogNegativeResultReceived()
+                handleDiaryItemTitleSelectionHistoryDeleteDialogNegativeResult()
             }
         }
     }
 
-    private fun onDiaryItemTitleSelectionHistoryDeleteDialogPositiveResultReceived(
+    private fun handleDiaryItemTitleSelectionHistoryDeleteDialogPositiveResult(
         parameters: DiaryItemTitleSelectionHistoryItemDeleteParameters
     ) {
         val deleteTitle = parameters.itemTitle
@@ -187,7 +189,7 @@ internal class DiaryItemTitleEditViewModel @Inject constructor(
         }
     }
 
-    private fun onDiaryItemTitleSelectionHistoryDeleteDialogNegativeResultReceived() {
+    private fun handleDiaryItemTitleSelectionHistoryDeleteDialogNegativeResult() {
         viewModelScope.launch {
             emitUiEvent(
                 DiaryItemTitleEditEvent.CloseSwipedItem
@@ -195,10 +197,12 @@ internal class DiaryItemTitleEditViewModel @Inject constructor(
         }
     }
 
+    // StateFlow値変更時処理
     fun onItemTitleChanged(title: String) {
         clearNewDiaryItemTitleErrorMessage(title)
     }
 
+    // データ処理
     private fun setUpItemTitleSelectionHistoryList() {
         val logMsg = "日記項目タイトル選択履歴読込"
         Log.i(logTag, "${logMsg}_開始")
