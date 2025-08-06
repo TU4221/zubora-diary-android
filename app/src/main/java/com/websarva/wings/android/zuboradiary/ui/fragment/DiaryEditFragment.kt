@@ -780,7 +780,7 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditEvent>
         } else {
             DiaryEditFragmentDirections.actionDiaryEditFragmentToDiaryShowFragmentPopUpToDiaryEdit(date)
         }
-        navigateFragmentOnce(NavigationCommand.To(directions))
+        navigateFragmentWithRetry(NavigationCommand.To(directions))
     }
 
     private fun navigateDiaryItemTitleEditFragment(diaryItemTitle: DiaryItemTitle) {
