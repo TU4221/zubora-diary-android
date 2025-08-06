@@ -1179,7 +1179,7 @@ internal class DiaryEditViewModel @Inject constructor(
         }
     }
 
-    private suspend fun navigatePreviousFragment(originalDiary: Diary? = null) {
+    private suspend fun navigatePreviousFragment(originalDiary: Diary?) {
         val result =
             if (originalDiary == null) {
                 FragmentResult.None
