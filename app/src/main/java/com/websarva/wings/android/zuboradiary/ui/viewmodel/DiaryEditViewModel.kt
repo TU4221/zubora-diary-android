@@ -463,8 +463,8 @@ internal class DiaryEditViewModel @Inject constructor(
     }
 
     fun onItemTitleInputFieldClick(itemNumber: ItemNumber) {
-        if (uiState.value != DiaryEditState.AddingItem) return
-        if (uiState.value != DiaryEditState.DeletingItem) return
+        if (uiState.value == DiaryEditState.AddingItem) return
+        if (uiState.value == DiaryEditState.DeletingItem) return
 
         val itemTitle = getItemTitle(itemNumber).requireValue()
 
