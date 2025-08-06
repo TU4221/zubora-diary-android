@@ -792,7 +792,6 @@ internal class DiaryEditViewModel @Inject constructor(
             updateDate(date)
             updateIsNewDiary(true)
         }
-        updateOriginalDiary(diaryStateFlow.createDiary())
         if (!shouldLoadDiary) {
             val previousDate = previousDate
             val originalDate = _originalDiary.requireValue().date
@@ -817,6 +816,7 @@ internal class DiaryEditViewModel @Inject constructor(
                 updateUiState(DiaryEditState.Editing)
                 val diary = result.value
                 diaryStateFlow.update(diary)
+                updateOriginalDiary(diaryStateFlow.createDiary())
             }
             is UseCaseResult.Failure -> {
                 Log.e(logTag, "${logMsg}_失敗", result.exception)
