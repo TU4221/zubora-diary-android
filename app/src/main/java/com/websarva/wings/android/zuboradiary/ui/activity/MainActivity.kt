@@ -201,10 +201,10 @@ class MainActivity : LoggingActivity() {
         val motionResId =
             when (state) {
                 is MainActivityUiState.ShowingBottomNavigation -> {
-                    R.id.motion_scene_bottom_navigation_showed_state
+                    R.id.motion_scene_bottom_navigation_visible_state
                 }
                 is MainActivityUiState.HidingBottomNavigation -> {
-                    R.id.motion_scene_bottom_navigation_hided_state
+                    R.id.motion_scene_bottom_navigation_invisible_state
                 }
             }
 

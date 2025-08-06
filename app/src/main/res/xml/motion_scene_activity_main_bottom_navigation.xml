@@ -4,11 +4,11 @@
     xmlns:motion="http://schemas.android.com/apk/res-auto">
 
     <Transition
-        motion:constraintSetEnd="@id/motion_scene_bottom_navigation_hided_state"
-        motion:constraintSetStart="@id/motion_scene_bottom_navigation_showed_state"
+        motion:constraintSetEnd="@id/motion_scene_bottom_navigation_invisible_state"
+        motion:constraintSetStart="@id/motion_scene_bottom_navigation_visible_state"
         motion:duration="300"/>
 
-    <ConstraintSet android:id="@+id/motion_scene_bottom_navigation_showed_state">
+    <ConstraintSet android:id="@+id/motion_scene_bottom_navigation_visible_state">
         <Constraint
             android:id="@+id/linear_layout_bottom_navigation"
             android:layout_width="match_parent"
@@ -16,7 +16,7 @@
             motion:layout_constraintTop_toTopOf="parent"/>
     </ConstraintSet>
 
-    <ConstraintSet android:id="@+id/motion_scene_bottom_navigation_hided_state">
+    <ConstraintSet android:id="@+id/motion_scene_bottom_navigation_invisible_state">
         <Constraint
             android:id="@+id/linear_layout_bottom_navigation"
             android:layout_width="match_parent"
