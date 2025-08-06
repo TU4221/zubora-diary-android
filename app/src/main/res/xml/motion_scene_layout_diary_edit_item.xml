@@ -4,10 +4,10 @@
     xmlns:motion="http://schemas.android.com/apk/res-auto">
 
     <Transition
-        motion:constraintSetEnd="@id/motion_scene_edit_diary_item_hided_state"
-        motion:constraintSetStart="@id/motion_scene_edit_diary_item_showed_state"/>
+        motion:constraintSetEnd="@id/motion_scene_edit_diary_item_invisible_state"
+        motion:constraintSetStart="@id/motion_scene_edit_diary_item_visible_state"/>
 
-    <ConstraintSet android:id="@+id/motion_scene_edit_diary_item_showed_state">
+    <ConstraintSet android:id="@+id/motion_scene_edit_diary_item_visible_state">
         <Constraint
             android:id="@+id/liner_layout_diary_edit_item"
             android:layout_width="match_parent"
@@ -15,7 +15,7 @@
             motion:visibilityMode="ignore"/>
     </ConstraintSet>
 
-    <ConstraintSet android:id="@+id/motion_scene_edit_diary_item_hided_state">
+    <ConstraintSet android:id="@+id/motion_scene_edit_diary_item_invisible_state">
         <Constraint
             android:id="@+id/liner_layout_diary_edit_item"
             android:layout_width="match_parent"

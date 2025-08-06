@@ -726,13 +726,13 @@ internal class DiaryEditViewModel @Inject constructor(
     }
 
     // MotionLayout変更時処理
-    fun onDiaryItemHidedStateTransitionCompleted(itemNumber: ItemNumber) {
+    fun onDiaryItemInvisibleStateTransitionCompleted(itemNumber: ItemNumber) {
         check(uiState.value == DiaryEditState.DeletingItem)
 
         deleteItem(itemNumber)
     }
 
-    fun onDiaryItemShowedStateTransitionCompleted() {
+    fun onDiaryItemVisibleStateTransitionCompleted() {
         check(uiState.value == DiaryEditState.AddingItem)
 
         updateUiState(DiaryEditState.Editing)
@@ -1140,7 +1140,7 @@ internal class DiaryEditViewModel @Inject constructor(
             deleteItem(itemNumber)
         } else {
             emitUiEvent(
-                DiaryEditEvent.TransitionDiaryItemHidedState(itemNumber)
+                DiaryEditEvent.TransitionDiaryItemToInvisibleState(itemNumber)
             )
         }
         // MEMO:deleteItem(itemNumber)でEditingStateに更新する為、下記コード不要。

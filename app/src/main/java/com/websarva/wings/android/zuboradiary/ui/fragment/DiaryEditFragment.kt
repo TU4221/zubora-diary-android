@@ -269,8 +269,8 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditEvent>
             is DiaryEditEvent.NavigatePreviousFragmentOnInitialDiaryLoadFailed -> {
                 navigatePreviousFragmentWithRetry(KEY_RESULT, event.result)
             }
-            is DiaryEditEvent.TransitionDiaryItemHidedState -> {
-                hideItem(event.itemNumber, false)
+            is DiaryEditEvent.TransitionDiaryItemToInvisibleState -> {
+                transitionDiaryItemToInvisible(event.itemNumber, false)
             }
             is DiaryEditEvent.CheckAccessLocationPermissionBeforeWeatherInfoFetch -> {
                 checkAccessLocationPermissionBeforeWeatherInfoFetch(event.parameters)
@@ -546,8 +546,8 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditEvent>
                         itemNumber,
                         binding.includeItem1.linerLayoutDiaryEditItem,
                         binding.nestedScrollFullScreen,
-                        { mainViewModel.onDiaryItemHidedStateTransitionCompleted(it) },
-                        { mainViewModel.onDiaryItemShowedStateTransitionCompleted() },
+                        { mainViewModel.onDiaryItemInvisibleStateTransitionCompleted(it) },
+                        { mainViewModel.onDiaryItemVisibleStateTransitionCompleted() },
                         { selectItemMotionLayout(it) }
                     )
                 itemMotionLayout.setTransitionListener(itemMotionLayoutListener)
@@ -566,8 +566,8 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditEvent>
         private val itemNumber: ItemNumber,
         private val itemLayout: LinearLayout,
         private val scrollView: NestedScrollView,
-        private val onHidedStateTransitionCompleted: (ItemNumber) -> Unit,
-        private val onShowedStateTransitionCompleted: (ItemNumber) -> Unit,
+        private val onDiaryItemTransitionToInvisibleCompleted: (ItemNumber) -> Unit,
+        private val onDiaryItemTransitionToVisibleCompleted: (ItemNumber) -> Unit,
         private val processItemMotionLayoutSelection: (ItemNumber) -> MotionLayout,
     ): MotionLayout.TransitionListener {
 
@@ -606,19 +606,19 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditEvent>
 
             // 対象項目欄削除後の処理
             var completedStateLogMsg = "UnknownState"
-            if (currentId == R.id.motion_scene_edit_diary_item_hided_state) {
-                completedStateLogMsg = "HidedState"
+            if (currentId == R.id.motion_scene_edit_diary_item_invisible_state) {
+                completedStateLogMsg = "InvisibleState"
                 if (isTriggeredBySmooth) {
-                    if (isNextItemHidedState()) scrollOnDiaryItemHided()
-                    onHidedStateTransitionCompleted(itemNumber)
+                    if (isNextItemInvisibleState()) scrollOnDiaryItemTransitionToInvisible()
+                    onDiaryItemTransitionToInvisibleCompleted(itemNumber)
                 }
 
             // 対象項目欄追加後の処理
-            } else if (currentId == R.id.motion_scene_edit_diary_item_showed_state) {
-                completedStateLogMsg = "ShowedState"
+            } else if (currentId == R.id.motion_scene_edit_diary_item_visible_state) {
+                completedStateLogMsg = "VisibleState"
                 if (isTriggeredBySmooth) {
-                    scrollOnDiaryItemShowed()
-                    onShowedStateTransitionCompleted(itemNumber)
+                    scrollOnDiaryItemTransitionToVisible()
+                    onDiaryItemTransitionToVisibleCompleted(itemNumber)
                 }
             }
             Log.d(logTag, "onTransitionCompleted()_CompletedState = $completedStateLogMsg")
@@ -626,20 +626,20 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditEvent>
             isTriggeredBySmooth = false
         }
 
-        private fun isNextItemHidedState(): Boolean {
+        private fun isNextItemInvisibleState(): Boolean {
             if (itemNumber.value == ItemNumber.MAX_NUMBER) return true
             val nextItemNumber = itemNumber.inc()
             val motionLayout = processItemMotionLayoutSelection(nextItemNumber)
-            return motionLayout.currentState == R.id.motion_scene_edit_diary_item_hided_state
+            return motionLayout.currentState == R.id.motion_scene_edit_diary_item_invisible_state
         }
 
         // 対象項目追加後のスクロール処理
-        private fun scrollOnDiaryItemShowed() {
+        private fun scrollOnDiaryItemTransitionToVisible() {
             scrollOnDiaryItemTransition(true)
         }
 
         // 対象項目削除後のスクロール処理
-        private fun scrollOnDiaryItemHided() {
+        private fun scrollOnDiaryItemTransitionToInvisible() {
             scrollOnDiaryItemTransition(false)
         }
 
@@ -688,10 +688,10 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditEvent>
         // MEMO:削除処理はObserverで適切なモーション削除処理を行うのは難しいのでここでは処理せず、削除ダイアログから処理する。
         if (shouldTransitionItemMotionLayout) {
             shouldTransitionItemMotionLayout = false
-            val numShowedItems = countShowedItems()
-            val differenceValue = numItems - numShowedItems
-            if (numItems > numShowedItems && differenceValue == 1) {
-                showItem(ItemNumber(numItems), false)
+            val numVisibleItems = countVisibleItems()
+            val differenceValue = numItems - numVisibleItems
+            if (numItems > numVisibleItems && differenceValue == 1) {
+                transitionDiaryItemToVisible(ItemNumber(numItems), false)
                 return
             }
         }
@@ -699,58 +699,58 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditEvent>
         for (i in ItemNumber.MIN_NUMBER..ItemNumber.MAX_NUMBER) {
             val itemNumber = ItemNumber(i)
             if (itemNumber.value <= numItems) {
-                showItem(itemNumber, true)
+                transitionDiaryItemToVisible(itemNumber, true)
             } else {
-                hideItem(itemNumber, true)
+                transitionDiaryItemToInvisible(itemNumber, true)
             }
         }
     }
 
-    private fun hideItem(itemNumber: ItemNumber, isJump: Boolean) {
+    private fun transitionDiaryItemToInvisible(itemNumber: ItemNumber, isJump: Boolean) {
         val itemMotionLayoutListener = selectItemMotionLayoutListener(itemNumber)
         val itemMotionLayout = selectItemMotionLayout(itemNumber)
         if (isJump) {
             itemMotionLayoutListener.markTransitionAsJump()
             itemMotionLayout
-                .jumpToState(R.id.motion_scene_edit_diary_item_hided_state)
+                .jumpToState(R.id.motion_scene_edit_diary_item_invisible_state)
         } else {
             itemMotionLayoutListener.markTransitionAsSmooth()
             itemMotionLayout
                 .transitionToState(
-                    R.id.motion_scene_edit_diary_item_hided_state,
+                    R.id.motion_scene_edit_diary_item_invisible_state,
                     motionLayoutTransitionTime
                 )
         }
     }
 
-    private fun showItem(itemNumber: ItemNumber, isJump: Boolean) {
+    private fun transitionDiaryItemToVisible(itemNumber: ItemNumber, isJump: Boolean) {
         val itemMotionLayoutListener = selectItemMotionLayoutListener(itemNumber)
         val itemMotionLayout = selectItemMotionLayout(itemNumber)
         if (isJump) {
             itemMotionLayoutListener.markTransitionAsJump()
             itemMotionLayout
-                .jumpToState(R.id.motion_scene_edit_diary_item_showed_state)
+                .jumpToState(R.id.motion_scene_edit_diary_item_visible_state)
         } else {
             itemMotionLayoutListener.markTransitionAsSmooth()
             itemMotionLayout
                 .transitionToState(
-                    R.id.motion_scene_edit_diary_item_showed_state,
+                    R.id.motion_scene_edit_diary_item_visible_state,
                     motionLayoutTransitionTime
                 )
         }
     }
 
-    private fun countShowedItems(): Int {
-        var numShowedItems = 0
+    private fun countVisibleItems(): Int {
+        var numVisibleItems = 0
         for (i in ItemNumber.MIN_NUMBER..ItemNumber.MAX_NUMBER) {
             val itemNumber = ItemNumber(i)
             val motionLayout = selectItemMotionLayout(itemNumber)
-            if (motionLayout.currentState != R.id.motion_scene_edit_diary_item_showed_state) {
+            if (motionLayout.currentState != R.id.motion_scene_edit_diary_item_visible_state) {
                 continue
             }
-            numShowedItems++
+            numVisibleItems++
         }
-        return numShowedItems
+        return numVisibleItems
     }
 
     private fun setUpImageInputField() {
