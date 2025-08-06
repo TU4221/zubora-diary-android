@@ -60,7 +60,7 @@ class MainActivity : LoggingActivity() {
     private val navFragmentManager: FragmentManager
         get() = navHostFragment.childFragmentManager
 
-    private val showedFragment: Fragment
+    private val currentFragment: Fragment
         get() = navFragmentManager.fragments[0]
 
     // ViewModel
@@ -271,11 +271,11 @@ class MainActivity : LoggingActivity() {
                 }
             )
             setOnItemReselectedListener {
-                val showedFragment = showedFragment
-                if (showedFragment !is ReselectableFragment) return@setOnItemReselectedListener
+                val currentFragment = currentFragment
+                if (currentFragment !is ReselectableFragment) return@setOnItemReselectedListener
 
                 Log.i(logTag, "ボトムナビゲーション_リセレクト")
-                showedFragment.onBottomNavigationItemReselected()
+                currentFragment.onBottomNavigationItemReselected()
             }
         }
     }
@@ -316,9 +316,10 @@ class MainActivity : LoggingActivity() {
 
     private fun setUpFragmentTransition() {
         // 表示中のFragmentを取得し、Transitionを設定
-        val showedFragment = showedFragment
-        showedFragment.exitTransition = MaterialFadeThrough()
-        showedFragment.returnTransition = MaterialFadeThrough()
+        currentFragment.apply {
+            exitTransition = MaterialFadeThrough()
+            returnTransition = MaterialFadeThrough()
+        }
 
         // MEMO:NavigationUI.onNavDestinationSelected()による、
         //      Fragment切替時の対象Transitionパターン表(StartDestination:A-1)
