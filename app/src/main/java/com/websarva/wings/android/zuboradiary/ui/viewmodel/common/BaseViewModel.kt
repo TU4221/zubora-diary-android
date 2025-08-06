@@ -65,7 +65,7 @@ internal abstract class BaseViewModel<E: UiEvent, M: AppMessage, S: UiState>(
 
     protected abstract suspend fun emitAppMessageEvent(appMessage: M)
 
-    protected fun updateUiState(state: S) {
+    protected open fun updateUiState(state: S) {
         _uiState.value = state
     }
 

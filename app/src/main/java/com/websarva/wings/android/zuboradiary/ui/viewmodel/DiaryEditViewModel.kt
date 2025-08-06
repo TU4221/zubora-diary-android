@@ -733,7 +733,7 @@ internal class DiaryEditViewModel @Inject constructor(
     fun onDiaryItemShowedStateTransitionCompleted() {
         check(uiState.value == DiaryEditState.AddingItem)
 
-        updateDiaryEditUiState(DiaryEditState.Editing)
+        updateUiState(DiaryEditState.Editing)
     }
 
     // 権限確認後処理
@@ -749,8 +749,8 @@ internal class DiaryEditViewModel @Inject constructor(
     }
 
     // SavedStateHandle対応State更新
-    private fun updateDiaryEditUiState(state: DiaryEditState) {
-        updateUiState(state)
+    override fun updateUiState(state: DiaryEditState) {
+        super.updateUiState(state)
 
         // MEMO:アプリ再起動後も安全に復元できる安定したUI状態のみをSavedStateHandleに保存する。
         //      LoadingやSavingなど、非同期処理中の一時的な状態を保存すると、
@@ -809,22 +809,22 @@ internal class DiaryEditViewModel @Inject constructor(
         Log.i(logTag, "${logMsg}_開始")
 
         val previousState = uiState.value
-        updateDiaryEditUiState(DiaryEditState.Loading)
+        updateUiState(DiaryEditState.Loading)
         when (val result = fetchDiaryUseCase(date)) {
             is UseCaseResult.Success -> {
-                updateDiaryEditUiState(DiaryEditState.Editing)
+                updateUiState(DiaryEditState.Editing)
                 val diary = result.value
                 diaryStateFlow.update(diary)
             }
             is UseCaseResult.Failure -> {
                 Log.e(logTag, "${logMsg}_失敗", result.exception)
                 if (previousState == DiaryEditState.Idle) {
-                    updateDiaryEditUiState(DiaryEditState.LoadError)
+                    updateUiState(DiaryEditState.LoadError)
                     emitUiEvent(
                         DiaryEditEvent.NavigateDiaryLoadingFailureDialog(date)
                     )
                 } else {
-                    updateDiaryEditUiState(DiaryEditState.Editing)
+                    updateUiState(DiaryEditState.Editing)
                     emitAppMessageEvent(DiaryEditAppMessage.DiaryFetchFailure)
                 }
             }
@@ -848,7 +848,7 @@ internal class DiaryEditViewModel @Inject constructor(
         val logMsg = "日記保存_"
         Log.i(logTag, "${logMsg}開始")
 
-        updateDiaryEditUiState(DiaryEditState.Saving)
+        updateUiState(DiaryEditState.Saving)
         val result =
             saveDiaryUseCase(
                 diary,
@@ -859,7 +859,7 @@ internal class DiaryEditViewModel @Inject constructor(
         when (result) {
             is UseCaseResult.Success -> {
                 Log.i(logTag, "${logMsg}完了")
-                updateDiaryEditUiState(DiaryEditState.Editing)
+                updateUiState(DiaryEditState.Editing)
                 emitUiEvent(
                     DiaryEditEvent
                         .NavigateDiaryShowFragment(diary.date)
@@ -867,7 +867,7 @@ internal class DiaryEditViewModel @Inject constructor(
             }
             is UseCaseResult.Failure -> {
                 Log.e(logTag, "${logMsg}失敗")
-                updateDiaryEditUiState(DiaryEditState.Editing)
+                updateUiState(DiaryEditState.Editing)
                 emitAppMessageEvent(DiaryEditAppMessage.DiarySavingFailure)
             }
         }
@@ -880,12 +880,12 @@ internal class DiaryEditViewModel @Inject constructor(
         val logMsg = "日記削除_"
         Log.i(logTag, "${logMsg}開始")
 
-        updateDiaryEditUiState(DiaryEditState.Deleting)
+        updateUiState(DiaryEditState.Deleting)
         val imageUriString = imageUri?.toString()
         when (deleteDiaryUseCase(date, imageUriString)) {
             is UseCaseResult.Success -> {
                 Log.i(logTag, "${logMsg}完了")
-                updateDiaryEditUiState(DiaryEditState.Editing)
+                updateUiState(DiaryEditState.Editing)
                 emitUiEvent(
                     DiaryEditEvent
                         .NavigatePreviousFragmentOnDiaryDelete(
@@ -895,7 +895,7 @@ internal class DiaryEditViewModel @Inject constructor(
             }
             is UseCaseResult.Failure -> {
                 Log.e(logTag, "${logMsg}失敗")
-                updateDiaryEditUiState(DiaryEditState.Editing)
+                updateUiState(DiaryEditState.Editing)
                 emitAppMessageEvent(DiaryEditAppMessage.DiaryDeleteFailure)
             }
         }
@@ -919,12 +919,12 @@ internal class DiaryEditViewModel @Inject constructor(
         isNewDiary: Boolean,
         onConfirmationNotNeeded: suspend () -> Unit
     ) {
-        updateDiaryEditUiState(DiaryEditState.CheckingDiaryInfo)
+        updateUiState(DiaryEditState.CheckingDiaryInfo)
         val result =
             shouldRequestDiaryFetchConfirmationUseCase(date, previousDate, originalDate, isNewDiary)
         when (result) {
             is UseCaseResult.Success -> {
-                updateDiaryEditUiState(DiaryEditState.Editing)
+                updateUiState(DiaryEditState.Editing)
                 if (result.value) {
                     val parameters = DiaryLoadingParameters(date)
                     emitUiEvent(
@@ -937,7 +937,7 @@ internal class DiaryEditViewModel @Inject constructor(
                 }
             }
             is UseCaseResult.Failure -> {
-                updateDiaryEditUiState(DiaryEditState.Editing)
+                updateUiState(DiaryEditState.Editing)
                 emitAppMessageEvent(DiaryEditAppMessage.DiaryInfoLoadingFailure)
             }
         }
@@ -950,12 +950,12 @@ internal class DiaryEditViewModel @Inject constructor(
         isNewDiary: Boolean,
         onConfirmationNotNeeded: suspend () -> Unit
     ) {
-        updateDiaryEditUiState(DiaryEditState.CheckingDiaryInfo)
+        updateUiState(DiaryEditState.CheckingDiaryInfo)
         val date = diary.date
         val originalDate = originalDiary.date
         when (val result = shouldRequestDiaryUpdateConfirmationUseCase(date, originalDate, isNewDiary)) {
             is UseCaseResult.Success -> {
-                updateDiaryEditUiState(DiaryEditState.Editing)
+                updateUiState(DiaryEditState.Editing)
                 if (result.value) {
                     val parameters = DiaryUpdateParameters(
                         diary,
@@ -971,7 +971,7 @@ internal class DiaryEditViewModel @Inject constructor(
                 }
             }
             is UseCaseResult.Failure -> {
-                updateDiaryEditUiState(DiaryEditState.Editing)
+                updateUiState(DiaryEditState.Editing)
                 emitAppMessageEvent(
                     DiaryEditAppMessage.DiarySavingFailure
                 )
@@ -983,9 +983,9 @@ internal class DiaryEditViewModel @Inject constructor(
     // TODO:コールバック構成の代替案を検討する。(他処理メソッドも同様に)
     // TODO:State更新タイミングの代替案を検討する。(他処理メソッドも同様に)
     private suspend fun processWeatherInfoFetch(date: LocalDate, previousDate: LocalDate?) {
-        updateDiaryEditUiState(DiaryEditState.CheckingWeatherAvailability)
+        updateUiState(DiaryEditState.CheckingWeatherAvailability)
         val isEnabled = isWeatherInfoFetchEnabledUseCase().value
-        updateDiaryEditUiState(DiaryEditState.Editing)
+        updateUiState(DiaryEditState.Editing)
         if (!isEnabled) {
             return
         }
@@ -1034,15 +1034,15 @@ internal class DiaryEditViewModel @Inject constructor(
         isGranted: Boolean,
         date: LocalDate
     ) {
-        updateDiaryEditUiState(DiaryEditState.FetchingWeatherInfo)
+        updateUiState(DiaryEditState.FetchingWeatherInfo)
         when (val result = fetchWeatherInfoUseCase(isGranted, date)) {
             is UseCaseResult.Success -> {
-                updateDiaryEditUiState(DiaryEditState.Editing)
+                updateUiState(DiaryEditState.Editing)
                 updateWeather1(result.value)
                 updateWeather2(Weather.UNKNOWN)
             }
             is UseCaseResult.Failure -> {
-                updateDiaryEditUiState(DiaryEditState.Editing)
+                updateUiState(DiaryEditState.Editing)
                 when (result.exception) {
                     is FetchWeatherInfoUseCaseException.LocationPermissionNotGranted -> {
                         emitAppMessageEvent(DiaryEditAppMessage.AccessLocationPermissionRequest)
@@ -1116,14 +1116,14 @@ internal class DiaryEditViewModel @Inject constructor(
     }
 
     private suspend fun addDiaryItem() {
-        updateDiaryEditUiState(DiaryEditState.AddingItem)
+        updateUiState(DiaryEditState.AddingItem)
         emitUiEvent(DiaryEditEvent.ItemAddition)
         diaryStateFlow.incrementVisibleItemsCount()
     }
 
     private fun deleteItem(itemNumber: ItemNumber) {
         diaryStateFlow.deleteItem(itemNumber)
-        updateDiaryEditUiState(DiaryEditState.Editing)
+        updateUiState(DiaryEditState.Editing)
     }
 
     private fun updateItemTitle(itemNumber: ItemNumber, title: String) {
@@ -1133,7 +1133,7 @@ internal class DiaryEditViewModel @Inject constructor(
     private suspend fun requestDiaryItemDeleteTransition(itemNumber: ItemNumber) {
         val numVisibleItems = numVisibleItems.requireValue()
 
-        updateDiaryEditUiState(DiaryEditState.DeletingItem)
+        updateUiState(DiaryEditState.DeletingItem)
         if (itemNumber.value == 1 && numVisibleItems == itemNumber.value) {
             deleteItem(itemNumber)
         } else {
@@ -1142,18 +1142,18 @@ internal class DiaryEditViewModel @Inject constructor(
             )
         }
         // MEMO:deleteItem(itemNumber)でEditingStateに更新する為、下記コード不要。
-        //updateDiaryEditUiState(DiaryEditState.Editing)
+        //updateUiState(DiaryEditState.Editing)
     }
 
     // 添付画像関係
     private suspend fun selectImage() {
-        updateDiaryEditUiState(DiaryEditState.SelectingImage)
+        updateUiState(DiaryEditState.SelectingImage)
         emitUiEvent(DiaryEditEvent.SelectImage)
     }
 
     private fun updateImageUri(uri: Uri?) {
         diaryStateFlow.imageUri.value = uri
-        updateDiaryEditUiState(DiaryEditState.Editing)
+        updateUiState(DiaryEditState.Editing)
     }
 
     private fun deleteImageUri() {
