@@ -235,16 +235,30 @@ abstract class BaseFragment<T: ViewBinding, E : UiEvent> : LoggingFragment() {
             )
     }
 
-    internal fun navigatePreviousFragment(
+    internal fun navigatePreviousFragmentOnce(
         resultKey: String? = null,
         result: FragmentResult<*> = FragmentResult.None
     ) {
         fragmentHelper
-            .navigatePreviousFragment(
+            .navigatePreviousFragmentOnce(
                 findNavController(),
                 destinationId,
                 resultKey,
                 result
+            )
+    }
+
+    internal fun navigatePreviousFragmentWithRetry(
+        resultKey: String? = null,
+        result: FragmentResult<*> = FragmentResult.None
+    ) {
+        fragmentHelper
+            .navigatePreviousFragmentWithRetry(
+                findNavController(),
+                destinationId,
+                resultKey,
+                result,
+                mainViewModel
             )
     }
 

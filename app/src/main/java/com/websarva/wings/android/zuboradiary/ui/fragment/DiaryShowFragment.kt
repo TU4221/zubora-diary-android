@@ -107,7 +107,7 @@ class DiaryShowFragment : BaseFragment<FragmentDiaryShowBinding, DiaryShowEvent>
             is DiaryShowEvent.CommonEvent -> {
                 when(event.wrappedEvent) {
                     is CommonUiEvent.NavigatePreviousFragment<*> -> {
-                        navigatePreviousFragment(KEY_RESULT, event.wrappedEvent.result)
+                        navigatePreviousFragmentOnce(KEY_RESULT, event.wrappedEvent.result)
                     }
                     is CommonUiEvent.NavigateAppMessage -> {
                         navigateAppMessageDialog(event.wrappedEvent.message)

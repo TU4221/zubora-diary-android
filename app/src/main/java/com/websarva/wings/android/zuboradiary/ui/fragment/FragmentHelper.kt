@@ -235,23 +235,43 @@ internal class FragmentHelper {
         return fragmentDestinationId == currentDestination.id
     }
 
-    fun navigatePreviousFragment(
+    fun navigatePreviousFragmentOnce(
         navController: NavController,
         fragmentDestinationId: Int,
         resultKey: String?,
         result: FragmentResult<*>
     ) {
-        val command =
-            if (resultKey == null) {
-                NavigationCommand.Up()
-            } else {
-                NavigationCommand.Up(resultKey, result)
-            }
         navigateFragmentOnce(
             navController,
             fragmentDestinationId,
-            command
+            createPreviousFragmentCommand(resultKey, result)
         )
+    }
+
+    fun navigatePreviousFragmentWithRetry(
+        navController: NavController,
+        fragmentDestinationId: Int,
+        resultKey: String?,
+        result: FragmentResult<*>,
+        mainViewModel: BaseViewModel<out UiEvent, out AppMessage, out UiState>,
+    ) {
+        navigateFragmentWithRetry(
+            navController,
+            fragmentDestinationId,
+            mainViewModel,
+            createPreviousFragmentCommand(resultKey, result)
+        )
+    }
+
+    private fun createPreviousFragmentCommand(
+        resultKey: String?,
+        result: FragmentResult<*>,
+        ): NavigationCommand {
+         return if (resultKey == null) {
+             NavigationCommand.Up<Nothing>()
+         } else {
+             NavigationCommand.Up(resultKey, result)
+         }
     }
 
     fun registerOnBackPressedCallback(

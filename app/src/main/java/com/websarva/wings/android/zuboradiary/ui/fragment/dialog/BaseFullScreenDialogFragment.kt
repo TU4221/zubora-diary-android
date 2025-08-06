@@ -111,7 +111,7 @@ abstract class BaseFullScreenDialogFragment<T: ViewBinding, E: UiEvent>: BaseSim
         result: FragmentResult<*> = FragmentResult.None
     ) {
         fragmentHelper
-            .navigatePreviousFragment(
+            .navigatePreviousFragmentOnce(
                 findNavController(),
                 destinationId,
                 resultKey,

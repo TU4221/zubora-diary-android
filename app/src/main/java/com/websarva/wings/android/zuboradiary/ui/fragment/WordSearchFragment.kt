@@ -78,7 +78,7 @@ class WordSearchFragment : BaseFragment<FragmentWordSearchBinding, WordSearchEve
             is WordSearchEvent.CommonEvent -> {
                 when(event.wrappedEvent) {
                     is CommonUiEvent.NavigatePreviousFragment<*> -> {
-                        navigatePreviousFragment()
+                        navigatePreviousFragmentOnce()
                     }
                     is CommonUiEvent.NavigateAppMessage -> {
                         navigateAppMessageDialog(event.wrappedEvent.message)

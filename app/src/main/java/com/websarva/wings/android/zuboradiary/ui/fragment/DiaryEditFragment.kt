@@ -281,7 +281,7 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditEvent>
             is DiaryEditEvent.CommonEvent -> {
                 when(event.wrappedEvent) {
                     is CommonUiEvent.NavigatePreviousFragment<*> -> {
-                        navigatePreviousFragment(KEY_RESULT, event.wrappedEvent.result)
+                        navigatePreviousFragmentOnce(KEY_RESULT, event.wrappedEvent.result)
                     }
                     is CommonUiEvent.NavigateAppMessage -> {
                         navigateAppMessageDialog(event.wrappedEvent.message)
