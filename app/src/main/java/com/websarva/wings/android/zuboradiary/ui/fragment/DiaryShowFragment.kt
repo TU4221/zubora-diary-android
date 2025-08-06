@@ -104,6 +104,13 @@ class DiaryShowFragment : BaseFragment<FragmentDiaryShowBinding, DiaryShowEvent>
             is DiaryShowEvent.NavigateDiaryDeleteDialog -> {
                 navigateDiaryDeleteDialog(event.parameters)
             }
+            is DiaryShowEvent.NavigatePreviousFragmentOnDiaryDeleted -> {
+                navigatePreviousFragmentWithRetry(KEY_RESULT, event.result)
+            }
+            is DiaryShowEvent.NavigatePreviousFragmentOnDiaryLoadFailed -> {
+                navigatePreviousFragmentWithRetry(KEY_RESULT, event.result)
+            }
+
             is DiaryShowEvent.CommonEvent -> {
                 when(event.wrappedEvent) {
                     is CommonUiEvent.NavigatePreviousFragment<*> -> {

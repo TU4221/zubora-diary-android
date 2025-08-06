@@ -266,6 +266,9 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditEvent>
             is DiaryEditEvent.NavigatePreviousFragmentOnDiaryDelete -> {
                 navigatePreviousFragmentOnDiaryDelete(event.result)
             }
+            is DiaryEditEvent.NavigatePreviousFragmentOnInitialDiaryLoadFailed -> {
+                navigatePreviousFragmentWithRetry(KEY_RESULT, event.result)
+            }
             is DiaryEditEvent.TransitionDiaryItemHidedState -> {
                 hideItem(event.itemNumber, false)
             }
@@ -863,7 +866,7 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditEvent>
             } catch (e: IllegalArgumentException) {
                 R.id.navigation_diary_list_fragment
             }
-        navigateFragmentOnce(
+        navigateFragmentWithRetry(
             NavigationCommand.PopTo(
                 destinationId,
                 false,

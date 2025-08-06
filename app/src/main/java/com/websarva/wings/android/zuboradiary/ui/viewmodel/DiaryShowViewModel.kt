@@ -129,7 +129,7 @@ internal class DiaryShowViewModel @Inject constructor(
             DialogResult.Negative,
             DialogResult.Cancel -> {
                 viewModelScope.launch {
-                    navigatePreviousFragment()
+                    navigatePreviousFragmentOnDiaryLoadFailed()
                 }
             }
         }
@@ -187,7 +187,7 @@ internal class DiaryShowViewModel @Inject constructor(
         when (val result = deleteDiaryUseCase(date, imageUriString)) {
             is UseCaseResult.Success -> {
                 Log.i(logTag, "${logMsg}_完了")
-                navigatePreviousFragment(date)
+                navigatePreviousFragmentOnDiaryDeleted(date)
             }
             is UseCaseResult.Failure -> {
                 Log.e(logTag, "${logMsg}_失敗", result.exception)
@@ -198,14 +198,26 @@ internal class DiaryShowViewModel @Inject constructor(
     }
 
     // FragmentAction関係
-    private suspend fun navigatePreviousFragment(diaryDate: LocalDate? = null) {
+    private suspend fun navigatePreviousFragment(diaryDate: LocalDate) {
         updateUiState(DiaryShowState.Idle)
-        val result =
-            if (diaryDate == null) {
-                FragmentResult.None
-            } else {
+        emitNavigatePreviousFragmentEvent(
+            FragmentResult.Some(diaryDate)
+        )
+    }
+
+    private suspend fun navigatePreviousFragmentOnDiaryDeleted(diaryDate: LocalDate) {
+        updateUiState(DiaryShowState.Idle)
+        emitUiEvent(
+            DiaryShowEvent.NavigatePreviousFragmentOnDiaryDeleted(
                 FragmentResult.Some(diaryDate)
-            }
-        emitNavigatePreviousFragmentEvent(result)
+            )
+        )
+    }
+
+    private suspend fun navigatePreviousFragmentOnDiaryLoadFailed() {
+        updateUiState(DiaryShowState.Idle)
+        emitUiEvent(
+            DiaryShowEvent.NavigatePreviousFragmentOnDiaryLoadFailed()
+        )
     }
 }

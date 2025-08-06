@@ -617,7 +617,9 @@ internal class DiaryEditViewModel @Inject constructor(
             DialogResult.Negative,
             DialogResult.Cancel -> {
                 viewModelScope.launch {
-                    navigatePreviousFragment()
+                    emitUiEvent(
+                        DiaryEditEvent.NavigatePreviousFragmentOnInitialDiaryLoadFailed()
+                    )
                 }
             }
         }
