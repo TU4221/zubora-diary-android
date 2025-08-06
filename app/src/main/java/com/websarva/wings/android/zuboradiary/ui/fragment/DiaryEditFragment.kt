@@ -295,8 +295,8 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditEvent>
     }
 
     private fun setUpFocusViewScroll() {
-        KeyboardManager().registerKeyBoredStateListener(this) { isShowed ->
-            if (!isShowed) return@registerKeyBoredStateListener
+        KeyboardManager().registerKeyBoredStateListener(this) { isVisible ->
+            if (!isVisible) return@registerKeyBoredStateListener
             require(isSoftInputAdjustNothing())
 
             val focusView =

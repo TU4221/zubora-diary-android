@@ -29,7 +29,7 @@ internal class KeyboardManager {
     }
 
     fun interface KeyboardStateListener {
-        fun onVisibilityChanged(isShowed: Boolean)
+        fun onVisibilityChanged(isVisible: Boolean)
     }
 
     fun registerKeyBoredStateListener(
