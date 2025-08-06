@@ -87,8 +87,6 @@ internal class DiaryShowViewModel @Inject constructor(
 
     // BackPressed(戻るボタン)処理
     override fun onBackPressed() {
-        if (isProcessing) return
-
         val date = diaryStateFlow.date.requireValue()
         viewModelScope.launch {
             navigatePreviousFragment(date)
@@ -97,8 +95,6 @@ internal class DiaryShowViewModel @Inject constructor(
 
     // Viewクリック処理
     fun onDiaryEditMenuClick() {
-        if (uiState.value != DiaryShowState.LoadSuccess) return
-
         val date = diaryStateFlow.date.requireValue()
         viewModelScope.launch {
             emitUiEvent(
@@ -121,8 +117,6 @@ internal class DiaryShowViewModel @Inject constructor(
     }
 
     fun onNavigationIconClick() {
-        if (isProcessing) return
-
         val date = diaryStateFlow.date.requireValue()
         viewModelScope.launch {
             navigatePreviousFragment(date)
@@ -130,10 +124,7 @@ internal class DiaryShowViewModel @Inject constructor(
     }
 
     // Fragmentからの結果受取処理
-    fun onDiaryLoadingFailureDialogResultReceived(result: DialogResult<Unit>) {
-        check(uiState.value == DiaryShowState.LoadError)
-
-        when (result) {
+    fun onDiaryLoadingFailureDialogResultReceived(result: DialogResult<Unit>) {when (result) {
             is DialogResult.Positive<Unit>,
             DialogResult.Negative,
             DialogResult.Cancel -> {
@@ -145,8 +136,6 @@ internal class DiaryShowViewModel @Inject constructor(
     }
 
     fun onDiaryDeleteDialogResultReceived(result: DialogResult<Unit>) {
-        check(uiState.value == DiaryShowState.LoadSuccess)
-
         when (result) {
             is DialogResult.Positive<Unit> -> {
                 handleDiaryDeleteDialogPositiveResult()

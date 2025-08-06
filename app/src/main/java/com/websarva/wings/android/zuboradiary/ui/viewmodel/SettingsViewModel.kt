@@ -101,6 +101,26 @@ internal class SettingsViewModel @Inject constructor(
                 false
             )
 
+
+    private val canExecuteSettingsOperation: Boolean
+        get() {
+            return when (uiState.value) {
+                SettingsState.LoadAllSettingsSuccess -> true
+
+                SettingsState.Idle,
+                SettingsState.LoadingAllSettings,
+                SettingsState.DeletingAllDiaries,
+                SettingsState.DeletingAllData -> false
+
+                SettingsState.LoadAllSettingsFailure -> {
+                    viewModelScope.launch {
+                        emitAppMessageEvent(SettingsAppMessage.SettingsNotLoadedRetryRestart)
+                    }
+                    false
+                }
+            }
+        }
+
     // MEMO:StateFlow型設定値変数の値はデータソースからの値のみを代入したいので、
     //      代入されるまでの間(初回設定値読込中)はnullとする。
     lateinit var themeColor: StateFlow<ThemeColor?>
@@ -309,27 +329,8 @@ internal class SettingsViewModel @Inject constructor(
     }
 
     // Viewクリック処理
-    private fun canExecuteSettingsOperation(): Boolean {
-        when (uiState.value) {
-            SettingsState.LoadAllSettingsFailure -> {
-                viewModelScope.launch {
-                    emitAppMessageEvent(SettingsAppMessage.SettingsNotLoadedRetryRestart)
-                }
-                return false
-            }
-            SettingsState.LoadAllSettingsSuccess -> {
-                return true
-            }
-
-            SettingsState.Idle,
-            SettingsState.LoadingAllSettings,
-            SettingsState.DeletingAllData,
-            SettingsState.DeletingAllDiaries -> return false
-        }
-    }
-
     fun onThemeColorSettingButtonClick() {
-        if (!canExecuteSettingsOperation()) return
+        if (!canExecuteSettingsOperation) return
 
         viewModelScope.launch {
             emitUiEvent(
@@ -339,7 +340,7 @@ internal class SettingsViewModel @Inject constructor(
     }
 
     fun onCalendarStartDayOfWeekSettingButtonClick() {
-        if (!canExecuteSettingsOperation()) return
+        if (!canExecuteSettingsOperation) return
 
         val dayOfWeek = calendarStartDayOfWeek.requireValue()
         viewModelScope.launch {
@@ -355,7 +356,7 @@ internal class SettingsViewModel @Inject constructor(
         val settingValue = isCheckedReminderNotification.requireValue()
         if (isChecked == settingValue) return
 
-        if (!canExecuteSettingsOperation()) {
+        if (!canExecuteSettingsOperation) {
             viewModelScope.launch {
                 emitUiEvent(SettingsEvent.TurnOffReminderNotificationSettingSwitch)
             }
@@ -387,7 +388,7 @@ internal class SettingsViewModel @Inject constructor(
         val settingValue = isCheckedPasscodeLock.requireValue()
         if (isChecked == settingValue) return
 
-        if (!canExecuteSettingsOperation()) {
+        if (!canExecuteSettingsOperation) {
             viewModelScope.launch {
                 emitUiEvent(SettingsEvent.TurnOffPasscodeLockSettingSwitch)
             }
@@ -405,7 +406,7 @@ internal class SettingsViewModel @Inject constructor(
         val settingValue = isCheckedWeatherInfoFetch.requireValue()
         if (isChecked == settingValue) return
 
-        if (!canExecuteSettingsOperation()) {
+        if (!canExecuteSettingsOperation) {
             viewModelScope.launch {
                 emitUiEvent(SettingsEvent.TurnOffWeatherInfoFetchSettingSwitch)
             }
@@ -424,7 +425,7 @@ internal class SettingsViewModel @Inject constructor(
     }
 
     fun onAllDiariesDeleteButtonClick() {
-        if (!canExecuteSettingsOperation()) return
+        if (!canExecuteSettingsOperation) return
 
         viewModelScope.launch {
             emitUiEvent(
@@ -434,7 +435,7 @@ internal class SettingsViewModel @Inject constructor(
     }
 
     fun onAllSettingsInitializationButtonClick() {
-        if (!canExecuteSettingsOperation()) return
+        if (!canExecuteSettingsOperation) return
 
         viewModelScope.launch {
             emitUiEvent(
@@ -444,7 +445,7 @@ internal class SettingsViewModel @Inject constructor(
     }
 
     fun onAllDataDeleteButtonClick() {
-        if (!canExecuteSettingsOperation()) return
+        if (!canExecuteSettingsOperation) return
 
         viewModelScope.launch {
             emitUiEvent(

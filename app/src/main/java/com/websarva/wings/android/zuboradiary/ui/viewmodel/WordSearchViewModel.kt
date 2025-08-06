@@ -210,8 +210,7 @@ internal class WordSearchViewModel @Inject internal constructor(
     fun onUiReady() {
         if (!shouldUpdateWordSearchResultList) return
         shouldUpdateWordSearchResultList = false
-        if (uiState.value == WordSearchState.Idle) return
-        if (isProcessing) return
+        if (uiState.value != WordSearchState.ShowingResultList) return
 
         val currentResultList = _wordSearchResultList.value
         val currentSearchWord = _searchWord.value

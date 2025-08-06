@@ -78,8 +78,6 @@ internal class CalendarViewModel @Inject constructor(
 
     // BackPressed(戻るボタン)処理
     override fun onBackPressed() {
-        if (isProcessing) return
-
         viewModelScope.launch {
             emitNavigatePreviousFragmentEvent()
         }
@@ -87,14 +85,10 @@ internal class CalendarViewModel @Inject constructor(
 
     // Viewクリック処理
     fun onCalendarDayClick(date: LocalDate) {
-        if (isProcessing) return
-
         updateSelectedDate(date)
     }
 
     fun onDiaryEditButtonClick() {
-        if (isProcessing) return
-
         val date = _selectedDate.value
         viewModelScope.launch {
             navigateDiaryEditFragment(date)
@@ -102,8 +96,6 @@ internal class CalendarViewModel @Inject constructor(
     }
 
     fun onBottomNavigationItemReselect() {
-        if (isProcessing) return
-
         val selectedDate = _selectedDate.value
         val today = LocalDate.now()
         viewModelScope.launch {

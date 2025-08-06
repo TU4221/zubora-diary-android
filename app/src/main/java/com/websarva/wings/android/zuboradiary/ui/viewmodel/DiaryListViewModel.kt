@@ -187,6 +187,8 @@ internal class DiaryListViewModel @Inject constructor(
     }
 
     fun onDiaryListItemDeleteButtonClick(date: LocalDate, uri: Uri?) {
+        if (uiState.value != DiaryListState.ShowingDiaryList) return
+
         viewModelScope.launch {
             emitUiEvent(
                 DiaryListEvent.NavigateDiaryDeleteDialog(
@@ -224,8 +226,7 @@ internal class DiaryListViewModel @Inject constructor(
     fun onUiReady() {
         if (!shouldUpdateDiaryList) return
         shouldUpdateDiaryList = false
-        if (uiState.value == DiaryListState.ShowingDiaryList) return
-        if (isProcessing) return
+        if (uiState.value != DiaryListState.ShowingDiaryList) return
 
         val currentList = _diaryList.value
         cancelPreviousLoading()
