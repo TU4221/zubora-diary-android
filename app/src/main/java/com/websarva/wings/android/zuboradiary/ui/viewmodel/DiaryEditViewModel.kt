@@ -87,28 +87,6 @@ internal class DiaryEditViewModel @Inject constructor(
 
     private val logTag = createLogTag()
 
-    override val isProcessingState =
-        uiState
-            .map { state ->
-                when (state) {
-                    DiaryEditState.CheckingDiaryInfo,
-                    DiaryEditState.Loading,
-                    DiaryEditState.Saving,
-                    DiaryEditState.Deleting,
-                    DiaryEditState.AddingItem,
-                    DiaryEditState.DeletingItem,
-                    DiaryEditState.SelectingImage,
-                    DiaryEditState.CheckingWeatherAvailability,
-                    DiaryEditState.FetchingWeatherInfo -> true
-
-                    DiaryEditState.Idle,
-                    DiaryEditState.LoadError,
-                    DiaryEditState.Editing -> false
-                }
-            }.stateInWhileSubscribed(
-                false
-            )
-
     override val isProgressIndicatorVisible =
         uiState.map { state ->
             return@map when (state) {

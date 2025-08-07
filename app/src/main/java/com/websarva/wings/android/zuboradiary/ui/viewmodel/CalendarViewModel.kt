@@ -31,7 +31,7 @@ internal class CalendarViewModel @Inject constructor(
 
     val logTag = createLogTag()
 
-    override val isProcessingState: StateFlow<Boolean> =
+    override val isProgressIndicatorVisible =
         uiState
             .map { state ->
                 when (state) {

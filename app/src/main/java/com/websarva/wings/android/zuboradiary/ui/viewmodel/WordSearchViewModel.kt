@@ -39,22 +39,6 @@ internal class WordSearchViewModel @Inject internal constructor(
 
     private val logTag = createLogTag()
 
-    override val isProcessingState =
-        uiState
-            .map { state ->
-                when (state) {
-                    WordSearchState.Searching,
-                    WordSearchState.AdditionLoading,
-                    WordSearchState.Updating -> true
-
-                    WordSearchState.Idle,
-                    WordSearchState.ShowingResultList,
-                    WordSearchState.NoResults -> false
-                }
-            }.stateInWhileSubscribed(
-                false
-            )
-
     override val isProgressIndicatorVisible =
         uiState
             .map { state ->

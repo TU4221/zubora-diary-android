@@ -41,7 +41,7 @@ internal class DiaryItemTitleEditViewModel @Inject constructor(
 
     private val logTag = createLogTag()
 
-    override val isProcessingState =
+    override val isProgressIndicatorVisible =
         uiState
             .map { state ->
                 when (state) {
