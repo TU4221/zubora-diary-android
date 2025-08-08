@@ -69,15 +69,15 @@ internal abstract class BaseViewModel<E: UiEvent, M: AppMessage, S: UiState>(
     abstract fun onBackPressed()
 
     fun onFragmentNavigationFailure(command: NavigationCommand) {
-        _pendingNavigationCommandList.update { it + PendingNavigationCommand(command) }
+        updatePendingNavigationCommandList { it + PendingNavigationCommand(command) }
     }
 
     fun onPendingFragmentNavigationComplete(command: PendingNavigationCommand) {
-        _pendingNavigationCommandList.update { it - command }
+        updatePendingNavigationCommandList { it - command }
     }
 
     fun onPendingFragmentNavigationFailure(command: PendingNavigationCommand) {
-        _pendingNavigationCommandList.update { list ->
+        updatePendingNavigationCommandList { list ->
             list.map { commandInList ->
                 if (commandInList == command) {
                     commandInList.incrementRetryCount()
@@ -86,5 +86,11 @@ internal abstract class BaseViewModel<E: UiEvent, M: AppMessage, S: UiState>(
                 }
             }
         }
+    }
+
+    private fun updatePendingNavigationCommandList(
+        function: (List<PendingNavigationCommand>) -> List<PendingNavigationCommand>
+    ) {
+        _pendingNavigationCommandList.update(function)
     }
 }

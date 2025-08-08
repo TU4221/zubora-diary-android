@@ -692,15 +692,16 @@ internal class DiaryEditViewModel @Inject constructor(
     // MEMO:未選択時null
     fun onOpenDocumentResultImageUriReceived(uri: Uri?) {
         updateImageUri(uri)
+        updateUiState(DiaryEditState.Editing)
     }
 
     // StateFlow値変更時処理
     fun onWeather1Changed() {
-        updateWeather2AdapterList()
+        refreshWeather2OptionsBasedOnWeather1()
     }
 
     fun onOriginalDiaryDateChanged(dateString: String?) {
-        _editingDiaryDateString.value = dateString
+        updateEditingDiaryDateString(dateString)
     }
 
     // MotionLayout変更時処理
@@ -725,36 +726,6 @@ internal class DiaryEditViewModel @Inject constructor(
 
         viewModelScope.launch {
             fetchWeatherInfo(isGranted, date)
-        }
-    }
-
-    // SavedStateHandle対応State更新
-    override fun updateUiState(state: DiaryEditState) {
-        super.updateUiState(state)
-
-        // MEMO:アプリ再起動後も安全に復元できる安定したUI状態のみをSavedStateHandleに保存する。
-        //      LoadingやSavingなど、非同期処理中の一時的な状態を保存すると、
-        //      再起動時に処理が中断されたままUIが固まる可能性があるため除外する。
-        when (state) {
-            DiaryEditState.Idle,
-            DiaryEditState.Editing,
-            DiaryEditState.LoadError,
-            DiaryEditState.SelectingImage -> {
-                // MEMO:これらの状態はユーザーインタラクションが可能、または明確な結果を示しているため保存対象とする。
-                handle[SAVED_VIEW_MODEL_STATE_KEY] = state
-            }
-
-            DiaryEditState.CheckingDiaryInfo,
-            DiaryEditState.Loading,
-            DiaryEditState.Saving,
-            DiaryEditState.Deleting,
-            DiaryEditState.CheckingWeatherAvailability,
-            DiaryEditState.FetchingWeatherInfo,
-            DiaryEditState.AddingItem,
-            DiaryEditState.DeletingItem -> {
-                // MEMO:これらの一時的な処理中状態は、再起動後に意味をなさなくなるか、
-                //      UIを不適切な状態でロックする可能性があるため保存しない。
-            }
         }
     }
 
@@ -809,14 +780,6 @@ internal class DiaryEditViewModel @Inject constructor(
                 }
             }
         }
-    }
-
-    private fun updateIsNewDiary(boolean: Boolean) {
-        _isNewDiary.value = boolean
-    }
-
-    private fun updateOriginalDiary(diary: Diary) {
-        _originalDiary.value = diary
     }
 
     private suspend fun saveDiary(
@@ -1059,35 +1022,16 @@ internal class DiaryEditViewModel @Inject constructor(
         )
     }
 
-    private fun updateDate(date: LocalDate) {
-        // HACK:下記はDiaryStateFlowのDateのsetValue()処理よりも前に処理すること。
-        //      (後で処理するとDateのObserverがpreviousDateの更新よりも先に処理される為)
-        this@DiaryEditViewModel.previousDate = diaryStateFlow.date.value
-        diaryStateFlow.date.value = date
-    }
-
     // 天気、体調関係
-    private fun updateWeather1(weather: Weather) {
-        diaryStateFlow.weather1.value = weather
-        if (weather == Weather.UNKNOWN || isEqualWeathers) updateWeather2(Weather.UNKNOWN)
-    }
-
-    private fun updateWeather2(weather: Weather) {
-        diaryStateFlow.weather2.value = weather
-    }
-
-    private fun updateWeather2AdapterList() {
+    private fun refreshWeather2OptionsBasedOnWeather1() {
         val weather1 = diaryStateFlow.weather1.requireValue()
-        _weather2AdapterList.value =
+        val newWeather2AdapterList =
             if (weather1 == Weather.UNKNOWN) {
                 initialWeatherAdapterList
             } else {
                 WeatherAdapterList(weather1)
             }
-    }
-
-    private fun updateCondition(condition: Condition) {
-        diaryStateFlow.condition.value = condition
+        updateWeather2AdapterList(newWeather2AdapterList)
     }
 
     // 項目関係
@@ -1104,10 +1048,6 @@ internal class DiaryEditViewModel @Inject constructor(
     private fun deleteItem(itemNumber: ItemNumber) {
         diaryStateFlow.deleteItem(itemNumber)
         updateUiState(DiaryEditState.Editing)
-    }
-
-    private fun updateItemTitle(itemNumber: ItemNumber, title: String) {
-        diaryStateFlow.updateItemTitle(itemNumber, title)
     }
 
     private suspend fun requestDiaryItemDeleteTransition(itemNumber: ItemNumber) {
@@ -1131,13 +1071,8 @@ internal class DiaryEditViewModel @Inject constructor(
         emitUiEvent(DiaryEditEvent.SelectImage)
     }
 
-    private fun updateImageUri(uri: Uri?) {
-        diaryStateFlow.imageUri.value = uri
-        updateUiState(DiaryEditState.Editing)
-    }
-
     private fun deleteImageUri() {
-        diaryStateFlow.imageUri.value = null
+        updateImageUri(null)
     }
 
     private suspend fun handleBackNavigation(
@@ -1165,6 +1100,96 @@ internal class DiaryEditViewModel @Inject constructor(
                 FragmentResult.Some(originalDiary.date)
             }
         emitNavigatePreviousFragmentEvent(result)
+    }
+
+    // SavedStateHandle対応State更新
+    override fun updateUiState(state: DiaryEditState) {
+        super.updateUiState(state)
+
+        // MEMO:アプリ再起動後も安全に復元できる安定したUI状態のみをSavedStateHandleに保存する。
+        //      LoadingやSavingなど、非同期処理中の一時的な状態を保存すると、
+        //      再起動時に処理が中断されたままUIが固まる可能性があるため除外する。
+        when (state) {
+            DiaryEditState.Idle,
+            DiaryEditState.Editing,
+            DiaryEditState.LoadError,
+            DiaryEditState.SelectingImage -> {
+                // MEMO:これらの状態はユーザーインタラクションが可能、または明確な結果を示しているため保存対象とする。
+                handle[SAVED_VIEW_MODEL_STATE_KEY] = state
+            }
+
+            DiaryEditState.CheckingDiaryInfo,
+            DiaryEditState.Loading,
+            DiaryEditState.Saving,
+            DiaryEditState.Deleting,
+            DiaryEditState.CheckingWeatherAvailability,
+            DiaryEditState.FetchingWeatherInfo,
+            DiaryEditState.AddingItem,
+            DiaryEditState.DeletingItem -> {
+                // MEMO:これらの一時的な処理中状態は、再起動後に意味をなさなくなるか、
+                //      UIを不適切な状態でロックする可能性があるため保存しない。
+            }
+        }
+    }
+
+    private fun updateDate(date: LocalDate) {
+        // HACK:下記はDiaryStateFlowのDateのsetValue()処理よりも前に処理すること。
+        //      (後で処理するとDateのObserverがpreviousDateの更新よりも先に処理される為)
+        updatePreviousDate(diaryStateFlow.date.value)
+        diaryStateFlow.date.value = date
+    }
+
+    private fun updateTitle(title: String) {
+        diaryStateFlow.title.value = title
+    }
+
+    private fun updateWeather1(weather: Weather) {
+        diaryStateFlow.weather1.value = weather
+        if (weather == Weather.UNKNOWN || isEqualWeathers) updateWeather2(Weather.UNKNOWN)
+    }
+
+    private fun updateWeather2(weather: Weather) {
+        diaryStateFlow.weather2.value = weather
+    }
+
+    private fun updateCondition(condition: Condition) {
+        diaryStateFlow.condition.value = condition
+    }
+
+    private fun updateNumVisibleItems(num: Int) {
+        diaryStateFlow.numVisibleItems.value = num
+    }
+
+    private fun updateItemTitle(itemNumber: ItemNumber, title: String) {
+        diaryStateFlow.updateItemTitle(itemNumber, title)
+    }
+
+    private fun updateItemComment(itemNumber: ItemNumber, comment: String) {
+        diaryStateFlow.getItemStateFlow(itemNumber).comment.value = comment
+    }
+
+    private fun updateImageUri(imageUri: Uri?) {
+        diaryStateFlow.imageUri.value = imageUri
+    }
+
+    private fun updateIsNewDiary(isNew: Boolean) {
+        _isNewDiary.value = isNew
+    }
+
+    private fun updateOriginalDiary(diary: Diary?) {
+        _originalDiary.value = diary
+    }
+
+    private fun updatePreviousDate(date: LocalDate?) {
+        previousDate = date
+    }
+
+    private fun updateEditingDiaryDateString(dateString: String?) {
+        _editingDiaryDateString.value = dateString
+    }
+
+    private fun updateWeather2AdapterList(adapterList: WeatherAdapterList) {
+        _weather2AdapterList.value = adapterList
     }
 
     // TODO:テスト用の為、最終的に削除
@@ -1195,12 +1220,14 @@ internal class DiaryEditViewModel @Inject constructor(
                     val conditionInt = Random.nextInt(1, Condition.entries.size)
                     updateCondition(Condition.of(conditionInt))
                     val title = generateRandomAlphanumericString(15)
-                    diaryStateFlow.title.value = title
+                    updateTitle(title)
                     val numItems = Random.nextInt(ItemNumber.MIN_NUMBER, ItemNumber.MAX_NUMBER + 1)
-                    diaryStateFlow.numVisibleItems.value = numItems
+                    updateNumVisibleItems(numItems)
                     for (j in 1..numItems) {
                         val itemTitle = generateRandomAlphanumericString(15)
                         val itemComment = generateRandomAlphanumericString(50)
+                        updateItemTitle(ItemNumber(j), itemTitle)
+                        updateItemComment(ItemNumber(j), itemComment)
                         diaryStateFlow.getItemStateFlow(ItemNumber(j)).title.value = itemTitle
                         diaryStateFlow.getItemStateFlow(ItemNumber(j)).comment.value = itemComment
                     }

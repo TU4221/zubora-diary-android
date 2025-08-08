@@ -152,8 +152,10 @@ internal class DiaryItemTitleEditViewModel @Inject constructor(
     // Fragmentからの結果受取処理
     fun onDiaryItemTitleDataReceived(diaryItemTitle: DiaryItemTitle) {
         val itemNumber = diaryItemTitle.itemNumber
+        updateItemNumber(itemNumber)
+
         val itemTitle = diaryItemTitle.title
-        updateDiaryItemTitle(itemNumber, itemTitle)
+        updateItemTitle(itemTitle)
     }
 
     fun onDiaryItemTitleSelectionHistoryDeleteDialogResultReceived(
@@ -225,11 +227,6 @@ internal class DiaryItemTitleEditViewModel @Inject constructor(
                 )
     }
 
-    private fun updateDiaryItemTitle(itemNumber: ItemNumber, itemTitle: String) {
-        _itemNumber.value = itemNumber
-        _itemTitle.value = itemTitle
-    }
-
     private suspend fun completeItemTitleEdit(itemNumber: ItemNumber, itemTitle: String) {
         when (val result = validateNewDiaryItemTitleSelectable(itemTitle)) {
             InputTextValidateResult.Valid -> {
@@ -241,7 +238,7 @@ internal class DiaryItemTitleEditViewModel @Inject constructor(
                 )
             }
             is InputTextValidateResult.Invalid -> {
-                _itemTitleErrorMessageResId.value = result.errorMessageResId
+                updateItemTitleErrorMessageResId(result.errorMessageResId)
             }
         }
     }
@@ -251,10 +248,10 @@ internal class DiaryItemTitleEditViewModel @Inject constructor(
 
         when (val result =validateNewDiaryItemTitleSelectable(itemTitle)) {
             InputTextValidateResult.Valid -> {
-                _itemTitleErrorMessageResId.value = null
+                updateItemTitleErrorMessageResId(null)
             }
             is InputTextValidateResult.Invalid -> {
-                _itemTitleErrorMessageResId.value = result.errorMessageResId
+                updateItemTitleErrorMessageResId(result.errorMessageResId)
                 return
             }
         }
@@ -293,5 +290,17 @@ internal class DiaryItemTitleEditViewModel @Inject constructor(
                 emitAppMessageEvent(DiaryItemTitleEditAppMessage.ItemTitleHistoryDeleteFailure)
             }
         }
+    }
+
+    private fun updateItemNumber(itemNumber: ItemNumber?) {
+        _itemNumber.value = itemNumber
+    }
+
+    private fun updateItemTitle(itemTitle: String) {
+        _itemTitle.value = itemTitle
+    }
+
+    private fun updateItemTitleErrorMessageResId(errorMessageResId: Int?) {
+        _itemTitleErrorMessageResId.value = errorMessageResId
     }
 }

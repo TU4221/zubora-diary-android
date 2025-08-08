@@ -1,8 +1,10 @@
 package com.websarva.wings.android.zuboradiary.ui.viewmodel.common
 
 import android.net.Uri
+import com.websarva.wings.android.zuboradiary.domain.model.Condition
 import com.websarva.wings.android.zuboradiary.domain.model.ItemNumber
 import com.websarva.wings.android.zuboradiary.domain.model.Diary
+import com.websarva.wings.android.zuboradiary.domain.model.Weather
 import kotlinx.coroutines.flow.MutableStateFlow
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -52,64 +54,104 @@ internal open class DiaryStateFlow {
         MutableStateFlow<LocalDateTime?>(initialLog) // MEMO:初期化時日付有無が未定の為、null許容型とする。
 
     fun initialize() {
-        date.value = initialDate
-        weather1.value = initialWeather
-        weather2.value = initialWeather
-        condition.value = initialCondition
-        title.value = initialTitle
-        numVisibleItems.value = initialNumVisibleItems
+        updateDate(initialDate)
+        updateWeather1(initialWeather)
+        updateWeather2(initialWeather)
+        updateCondition(initialCondition)
+        updateTitle(initialTitle)
+        updateNumVisibleItems(initialNumVisibleItems)
         for (item in items) {
             item.initialize()
         }
-        imageUri.value = initialImageUri
-        log.value = initialLog
-    }
-
-    fun update(diary: Diary) {
-        date.value = diary.date
-        weather1.value = diary.weather1
-        weather2.value = diary.weather2
-        condition.value = diary.condition
-        title.value = diary.title
-
-        val item1Title = diary.item1Title
-        val item1Comment = diary.item1Comment
-        items[0].update(item1Title, item1Comment)
-
-        val item2Title = diary.item2Title
-        val item2Comment = diary.item2Comment
-        items[1].update(item2Title, item2Comment)
-
-        val item3Title = diary.item3Title
-        val item3Comment = diary.item3Comment
-        items[2].update(item3Title, item3Comment)
-
-        val item4Title = diary.item4Title
-        val item4Comment = diary.item4Comment
-        items[3].update(item4Title, item4Comment)
-
-        val item5Title = diary.item5Title
-        val item5Comment = diary.item5Comment
-        items[4].update(item5Title, item5Comment)
-
-        var numVisibleItems = items.size
-        val maxArrayNumber = numVisibleItems - 1
-        for (i in maxArrayNumber downTo 1) {
-            if (items[i].isEmpty) {
-                numVisibleItems--
-            } else {
-                break
-            }
-        }
-        this.numVisibleItems.value = numVisibleItems
-
-        imageUri.value = diary.imageUriString?.let { Uri.parse(it) }
-        log.value = diary.log
+        updateImageUri(initialImageUri)
+        updateLog(initialLog)
     }
 
     fun getItemStateFlow(itemNumber: ItemNumber): DiaryItemStateFlow {
         val arrayNumber = itemNumber.value - 1
         return items[arrayNumber]
+    }
+
+    fun update(diary: Diary) {
+        diary.run {
+            updateDate(date)
+            updateWeather1(weather1)
+            updateWeather2(weather2)
+            updateCondition(condition)
+            updateTitle(title)
+
+            updateItem(ItemNumber(1), item1Title, item1Comment)
+            updateItem(ItemNumber(2), item2Title, item2Comment)
+            updateItem(ItemNumber(3), item3Title, item3Comment)
+            updateItem(ItemNumber(4), item4Title, item4Comment)
+            updateItem(ItemNumber(5), item5Title, item5Comment)
+
+            var numVisibleItems = items.size
+            val maxArrayNumber = numVisibleItems - 1
+            for (i in maxArrayNumber downTo 1) {
+                if (items[i].isEmpty) {
+                    numVisibleItems--
+                } else {
+                    break
+                }
+            }
+            updateNumVisibleItems(numVisibleItems)
+
+            updateImageUri(imageUriString?.let { Uri.parse(it) })
+            updateLog(log)
+        }
+    }
+
+    private fun updateDate(date: LocalDate?) {
+        this.date.value = date
+    }
+
+    private fun updateWeather1(weather: Weather) {
+        this.weather1.value = weather
+    }
+
+    private fun updateWeather2(weather: Weather) {
+        this.weather2.value = weather
+    }
+
+    private fun updateCondition(condition: Condition) {
+        this.condition.value = condition
+    }
+
+    private fun updateTitle(title: String) {
+        this.title.value = title
+    }
+
+    protected fun updateItem(
+        itemNumber: ItemNumber,
+        title: String?,
+        comment: String?,
+        titleUpdateLog: LocalDateTime? = null
+    ) {
+        if (titleUpdateLog == null) {
+            getItemStateFlow(itemNumber).update(title, comment)
+        } else {
+            getItemStateFlow(itemNumber).update(title, comment, titleUpdateLog)
+        }
+    }
+
+    protected fun updateItemTitleWithTimestamp(
+        itemNumber: ItemNumber,
+        title: String
+    ) {
+        getItemStateFlow(itemNumber).updateTitleWithTimestamp(title)
+    }
+
+    protected fun updateNumVisibleItems(count: Int) {
+        this.numVisibleItems.value = count
+    }
+
+    private fun updateImageUri(imageUri: Uri?) {
+        this.imageUri.value = imageUri
+    }
+
+    private fun updateLog(log: LocalDateTime?) {
+        this.log.value = log
     }
 
     open class DiaryItemStateFlow(val itemNumber: Int) {
@@ -124,12 +166,18 @@ internal open class DiaryStateFlow {
         protected val initialTitle = if (itemNumber == 1) "" else null
         open val title = MutableStateFlow(initialTitle)
 
+        protected val initialTitleUpdateLog = null
+        open val titleUpdateLog = MutableStateFlow<LocalDateTime?>(initialTitleUpdateLog)
+
         protected val initialComment = if (itemNumber == 1) "" else null
         open val comment = MutableStateFlow(initialComment)
 
-        // MEMO:初期化時日付有無が未定、タイトル未更新のケースがある為、null許容型とする。
-        protected val initialUpdateLog = null
-        open val titleUpdateLog = MutableStateFlow<LocalDateTime?>(initialUpdateLog)
+        val isEmpty: Boolean
+            get() {
+                val title = this.title.value ?: return true
+                val comment = this.comment.value ?: return true
+                return title.isEmpty() && comment.isEmpty()
+            }
 
         init {
             require(isItemNumberInRange(itemNumber))
@@ -140,36 +188,41 @@ internal open class DiaryStateFlow {
         }
 
         fun initialize() {
-            title.value = initialTitle
-            comment.value = initialComment
-            titleUpdateLog.value = initialUpdateLog
+            updateTitle(initialTitle)
+            updateComment(initialComment)
+            updateTitleUpdateLog(initialTitleUpdateLog)
         }
 
         fun update(
             title: String?,
             comment: String?,
-            titleUpdateLog: LocalDateTime? = initialUpdateLog
+            titleUpdateLog: LocalDateTime? = initialTitleUpdateLog
         ) {
             require(
                 (title == null && comment == null && titleUpdateLog == null)
                         || (title != null && comment != null)
             )
 
+            updateTitle(title)
+            updateComment(comment)
+            updateTitleUpdateLog(titleUpdateLog)
+        }
+
+        fun updateTitleWithTimestamp(title: String) {
             this.title.value = title
+            this.titleUpdateLog.value = LocalDateTime.now()
+        }
+
+        private fun updateTitle(title: String?) {
+            this.title.value = title
+        }
+
+        private fun updateComment(comment: String?) {
             this.comment.value = comment
-            this.titleUpdateLog.value = titleUpdateLog
         }
 
-        fun updateItemTitle(title: String) {
-            this.title.value = title
-            titleUpdateLog.value = LocalDateTime.now()
+        private fun updateTitleUpdateLog(log: LocalDateTime?) {
+            this.titleUpdateLog.value = log
         }
-
-        val isEmpty: Boolean
-            get() {
-                val title = this.title.value ?: return true
-                val comment = this.comment.value ?: return true
-                return title.isEmpty() && comment.isEmpty()
-            }
     }
 }

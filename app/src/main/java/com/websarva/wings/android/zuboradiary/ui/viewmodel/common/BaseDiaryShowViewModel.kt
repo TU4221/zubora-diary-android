@@ -1,5 +1,6 @@
 package com.websarva.wings.android.zuboradiary.ui.viewmodel.common
 
+import com.websarva.wings.android.zuboradiary.domain.model.Diary
 import com.websarva.wings.android.zuboradiary.domain.model.ItemNumber
 import com.websarva.wings.android.zuboradiary.domain.model.Weather
 import com.websarva.wings.android.zuboradiary.ui.model.AppMessage
@@ -59,5 +60,13 @@ internal abstract class BaseDiaryShowViewModel<E : UiEvent, M : AppMessage, S : 
     val log
         get() = diaryStateFlow.log.asStateFlow()
 
+    protected fun initializeDiary() {
+        diaryStateFlow.initialize()
+    }
+
     protected abstract suspend fun loadSavedDiary(date: LocalDate)
+
+    protected fun updateDiary(diary: Diary) {
+        diaryStateFlow.update(diary)
+    }
 }

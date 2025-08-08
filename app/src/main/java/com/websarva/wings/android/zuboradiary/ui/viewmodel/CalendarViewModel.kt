@@ -14,7 +14,6 @@ import com.websarva.wings.android.zuboradiary.ui.viewmodel.common.BaseDiaryShowV
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
@@ -106,7 +105,8 @@ internal class CalendarViewModel @Inject constructor(
                     CalendarEvent.SmoothScrollCalendar(today)
                 )
             }
-            shouldSmoothScroll = true
+
+            updateShouldSmoothScroll(true)
             updateSelectedDate(today)
         }
     }
@@ -148,7 +148,7 @@ internal class CalendarViewModel @Inject constructor(
     private suspend fun prepareDiary(date: LocalDate) {
         val action =
             if (shouldSmoothScroll) {
-                shouldSmoothScroll = false
+                updateShouldSmoothScroll(false)
                 CalendarEvent.SmoothScrollCalendar(date)
             } else {
                 CalendarEvent.ScrollCalendar(date)
@@ -160,7 +160,7 @@ internal class CalendarViewModel @Inject constructor(
             loadSavedDiary(date)
         } else {
             updateUiState(CalendarState.NoDiary)
-            diaryStateFlow.initialize()
+            initializeDiary()
         }
     }
 
@@ -174,7 +174,7 @@ internal class CalendarViewModel @Inject constructor(
                 Log.i(logTag, "${logMsg}_完了")
                 updateUiState(CalendarState.LoadDiarySuccess)
                 val diary = result.value
-                diaryStateFlow.update(diary)
+                updateDiary(diary)
             }
             is UseCaseResult.Failure -> {
                 Log.e(logTag, "${logMsg}_失敗", result.exception)
@@ -184,16 +184,6 @@ internal class CalendarViewModel @Inject constructor(
                 )
             }
         }
-    }
-
-    private fun updateSelectedDate(date: LocalDate) {
-        // MEMO:selectedDateと同日付を選択した時、previousSelectedDateと同値となり、
-        //      次に他の日付を選択した時にpreviousSelectedDateのcollectedが起動しなくなる。
-        //      下記条件で対策。
-        if (date == _selectedDate.value) return
-
-        _previousSelectedDate.value = _selectedDate.value
-        _selectedDate.value = date
     }
 
     private suspend fun processCalendarDayDotUpdate(date: LocalDate) {
@@ -219,5 +209,23 @@ internal class CalendarViewModel @Inject constructor(
         emitUiEvent(
             CalendarEvent.NavigateDiaryEditFragment(date, isNewDiary)
         )
+    }
+
+    private fun updateSelectedDate(date: LocalDate) {
+        // MEMO:selectedDateと同日付を選択した時、previousSelectedDateと同値となり、
+        //      次に他の日付を選択した時にpreviousSelectedDateのcollectedが起動しなくなる。
+        //      下記条件で対策。
+        if (date == _selectedDate.value) return
+
+        updatePreviousSelectedDate(_selectedDate.value)
+        _selectedDate.value = date
+    }
+
+    private fun updatePreviousSelectedDate(date: LocalDate?) {
+        _previousSelectedDate.value = date
+    }
+
+    private fun updateShouldSmoothScroll(shouldScroll: Boolean) {
+        shouldSmoothScroll = shouldScroll
     }
 }

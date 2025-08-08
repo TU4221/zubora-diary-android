@@ -175,7 +175,7 @@ internal class WordSearchViewModel @Inject internal constructor(
     // View状態処理
     fun onWordSearchResultListEndScrolled() {
         if (isLoadingOnScrolled) return
-        isLoadingOnScrolled = true
+        updateIsLoadingOnScrolled(true)
 
         val currentResultList = _wordSearchResultList.value
         val searchWord = _searchWord.value
@@ -187,13 +187,13 @@ internal class WordSearchViewModel @Inject internal constructor(
     }
 
     fun onWordSearchResultListUpdateCompleted() {
-        isLoadingOnScrolled = false
+        updateIsLoadingOnScrolled(false)
     }
 
     // Ui状態処理
     fun onUiReady() {
         if (!shouldUpdateWordSearchResultList) return
-        shouldUpdateWordSearchResultList = false
+        updateShouldUpdateWordSearchResultList(false)
         if (uiState.value != WordSearchState.ShowingResultList) return
 
         val currentResultList = _wordSearchResultList.value
@@ -207,7 +207,7 @@ internal class WordSearchViewModel @Inject internal constructor(
     }
 
     fun onUiGone() {
-        shouldUpdateWordSearchResultList = true
+        updateShouldUpdateWordSearchResultList(true)
     }
 
     // StateFlow値変更時処理
@@ -230,7 +230,7 @@ internal class WordSearchViewModel @Inject internal constructor(
                     loadNewWordSearchResultList(currentResultList, value)
                 }
 
-                previousSearchWord = value
+                updatePreviousSearchWord(value)
             }
     }
 
@@ -336,9 +336,13 @@ internal class WordSearchViewModel @Inject internal constructor(
 
         updateUiState(state)
         try {
-            _numWordSearchResults.value = countWordSearchResultDiaries(searchWord)
+            updateNumWordSearchResults(
+                countWordSearchResultDiaries(searchWord)
+            )
             val updateResultList = processLoading(currentResultList, searchWord)
-            _wordSearchResultList.value = processLoading(currentResultList, searchWord)
+            updateWordSearchResultList(
+                processLoading(currentResultList, searchWord)
+            )
             updateUiStateForResultList(updateResultList)
             Log.i(logTag, "${logMsg}_完了")
         } catch (e: CancellationException) {
@@ -346,7 +350,7 @@ internal class WordSearchViewModel @Inject internal constructor(
             updateUiStateForResultList(currentResultList)
         } catch (e: DomainException) {
             Log.e(logTag, "${logMsg}_失敗", e)
-            _wordSearchResultList.value = currentResultList
+            updateWordSearchResultList(currentResultList)
             updateUiStateForResultList(currentResultList)
             emitAppMessageEvent(WordSearchAppMessage.SearchResultListLoadingFailure)
         }
@@ -363,7 +367,9 @@ internal class WordSearchViewModel @Inject internal constructor(
     }
 
     private fun showWordSearchResultListFirstItemProgressIndicator() {
-        _wordSearchResultList.value = WordSearchResultYearMonthList(false)
+        updateWordSearchResultList(
+            WordSearchResultYearMonthList(false)
+        )
     }
 
     @Throws(DomainException::class)
@@ -431,8 +437,28 @@ internal class WordSearchViewModel @Inject internal constructor(
         updateUiState(WordSearchState.Idle)
         cancelPreviousLoading()
         wordSearchResultListLoadingJob = initialWordSearchResultListLoadingJob
-        _wordSearchResultList.value = initialWordSearchResultList
-        _numWordSearchResults.value = initialNumWordSearchResults
-        isLoadingOnScrolled = initialIsLoadingOnScrolled
+        updateWordSearchResultList(initialWordSearchResultList)
+        updateNumWordSearchResults(initialNumWordSearchResults)
+        updateIsLoadingOnScrolled(initialIsLoadingOnScrolled)
+    }
+
+    private fun updatePreviousSearchWord(searchWord: String) {
+        previousSearchWord = searchWord
+    }
+
+    private fun updateWordSearchResultList(list: WordSearchResultYearMonthList) {
+        _wordSearchResultList.value = list
+    }
+
+    private fun updateNumWordSearchResults(count: Int) {
+        _numWordSearchResults.value = count
+    }
+
+    private fun updateShouldUpdateWordSearchResultList(shouldUpdate: Boolean) {
+        shouldUpdateWordSearchResultList = shouldUpdate
+    }
+
+    private fun updateIsLoadingOnScrolled(isLoading: Boolean) {
+        isLoadingOnScrolled = isLoading
     }
 }

@@ -166,7 +166,7 @@ internal class DiaryShowViewModel @Inject constructor(
                 Log.i(logTag, "${logMsg}_完了")
                 updateUiState(DiaryShowState.LoadSuccess)
                 val diary = result.value
-                diaryStateFlow.update(diary)
+                updateDiary(diary)
             }
             is UseCaseResult.Failure -> {
                 Log.e(logTag, "${logMsg}_失敗", result.exception)

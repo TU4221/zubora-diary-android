@@ -141,8 +141,8 @@ internal class DiaryEditStateFlow(scope: CoroutineScope, handle: SavedStateHandl
         val numVisibleItems = numVisibleItems.requireValue()
         val incrementedNumVisibleItems = numVisibleItems + 1
         Log.d("20250729", "incrementVisibleItemsCount()_$incrementedNumVisibleItems")
-        this.numVisibleItems.value = incrementedNumVisibleItems
-        items[incrementedNumVisibleItems - 1].update("", "")
+        updateNumVisibleItems(incrementedNumVisibleItems)
+        updateItem(ItemNumber(incrementedNumVisibleItems), "", "")
     }
 
     fun deleteItem(itemNumber: ItemNumber) {
@@ -153,7 +153,9 @@ internal class DiaryEditStateFlow(scope: CoroutineScope, handle: SavedStateHandl
             for (i in itemNumber.value until numVisibleItems) {
                 val targetItemNumber = ItemNumber(i)
                 val nextItemNumber = targetItemNumber.inc()
-                getItemStateFlow(targetItemNumber).update(
+
+                updateItem(
+                    targetItemNumber,
                     getItemStateFlow(nextItemNumber).title.value,
                     getItemStateFlow(nextItemNumber).comment.value,
                     getItemStateFlow(nextItemNumber).titleUpdateLog.value
@@ -164,12 +166,12 @@ internal class DiaryEditStateFlow(scope: CoroutineScope, handle: SavedStateHandl
 
         if (numVisibleItems > ItemNumber.MIN_NUMBER) {
             val decrementedNumVisibleItems = numVisibleItems - 1
-            this.numVisibleItems.value = decrementedNumVisibleItems
+            updateNumVisibleItems(decrementedNumVisibleItems)
         }
     }
 
     fun updateItemTitle(itemNumber: ItemNumber, title: String) {
-        getItemStateFlow(itemNumber).updateItemTitle(title)
+        updateItemTitleWithTimestamp(itemNumber, title)
     }
 
     class DiaryItemStateFlow(
@@ -195,7 +197,7 @@ internal class DiaryEditStateFlow(scope: CoroutineScope, handle: SavedStateHandl
         // MEMO:初期化時日付有無が未定、タイトル未更新のケースがある為、null許容型とする。
         override val titleUpdateLog =
             MutableStateFlow<LocalDateTime?>(
-                handle[SAVED_ITEM_UPDATE_LOG_STATE_KEY + itemNumber] ?: initialUpdateLog
+                handle[SAVED_ITEM_UPDATE_LOG_STATE_KEY + itemNumber] ?: initialTitleUpdateLog
             )
 
         init {
