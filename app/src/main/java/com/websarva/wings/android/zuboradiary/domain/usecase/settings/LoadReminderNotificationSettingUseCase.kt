@@ -11,19 +11,19 @@ import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
-internal class FetchReminderNotificationSettingUseCase(
+internal class LoadReminderNotificationSettingUseCase(
     private val userPreferencesRepository: UserPreferencesRepository
 ) {
 
     private val logTag = createLogTag()
 
     operator fun invoke(): UseCaseResult.Success<Flow<UserSettingResult<ReminderNotificationSetting>>> {
-        val logMsg = "リマインダー通知設定取得_"
+        val logMsg = "リマインダー通知設定読込_"
         Log.i(logTag, "${logMsg}開始")
 
         val value =
             userPreferencesRepository
-                .fetchReminderNotificationPreference()
+                .loadReminderNotificationPreference()
                 .map { result: UserSettingDataSourceResult<ReminderNotificationSetting> ->
                     when (result) {
                         is UserSettingDataSourceResult.Success -> {

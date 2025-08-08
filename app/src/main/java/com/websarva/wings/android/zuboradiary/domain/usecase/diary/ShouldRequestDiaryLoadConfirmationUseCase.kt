@@ -6,7 +6,7 @@ import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import java.time.LocalDate
 
-internal class ShouldRequestDiaryFetchConfirmationUseCase(
+internal class ShouldRequestDiaryLoadConfirmationUseCase(
     private val doesDiaryExistUseCase: DoesDiaryExistUseCase
 ) {
 
@@ -18,7 +18,7 @@ internal class ShouldRequestDiaryFetchConfirmationUseCase(
         originalDate: LocalDate,
         isNewDiary: Boolean
     ): DefaultUseCaseResult<Boolean> {
-        val logMsg = "日記取得確認必要確認_"
+        val logMsg = "日記読込確認必要確認_"
         Log.i(logTag, "${logMsg}開始")
 
         if (inputDate == previousDate) {

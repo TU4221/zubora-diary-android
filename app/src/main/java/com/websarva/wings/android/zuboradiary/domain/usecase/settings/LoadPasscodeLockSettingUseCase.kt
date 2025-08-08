@@ -11,19 +11,19 @@ import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
-internal class FetchPasscodeLockSettingUseCase(
+internal class LoadPasscodeLockSettingUseCase(
     private val userPreferencesRepository: UserPreferencesRepository
 ) {
 
     private val logTag = createLogTag()
 
     operator fun invoke(): UseCaseResult.Success<Flow<UserSettingResult<PasscodeLockSetting>>> {
-        val logMsg = "パスコードロック設定取得_"
+        val logMsg = "パスコードロック設定読込_"
         Log.i(logTag, "${logMsg}開始")
 
         val value =
             userPreferencesRepository
-                .fetchPasscodeLockPreference()
+                .loadPasscodeLockPreference()
                 .map { result: UserSettingDataSourceResult<PasscodeLockSetting> ->
                     when (result) {
                         is UserSettingDataSourceResult.Success -> {

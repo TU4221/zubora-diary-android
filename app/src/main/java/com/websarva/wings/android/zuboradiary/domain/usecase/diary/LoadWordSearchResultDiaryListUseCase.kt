@@ -3,12 +3,12 @@ package com.websarva.wings.android.zuboradiary.domain.usecase.diary
 import android.util.Log
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.data.repository.DiaryRepository
-import com.websarva.wings.android.zuboradiary.domain.exception.diary.DiaryListFetchFailureException
+import com.websarva.wings.android.zuboradiary.domain.exception.diary.DiaryListLoadFailureException
 import com.websarva.wings.android.zuboradiary.domain.model.WordSearchResultListItem
 import com.websarva.wings.android.zuboradiary.domain.usecase.DefaultUseCaseResult
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 
-internal class FetchWordSearchResultDiaryListUseCase(
+internal class LoadWordSearchResultDiaryListUseCase(
     private val diaryRepository: DiaryRepository
 ) {
 
@@ -34,7 +34,7 @@ internal class FetchWordSearchResultDiaryListUseCase(
                 )
             Log.i(logTag, "${logMsg}完了")
             return UseCaseResult.Success(wordSearchResultList)
-        } catch (e: DiaryListFetchFailureException) {
+        } catch (e: DiaryListLoadFailureException) {
             Log.e(logTag, "${logMsg}失敗", e)
             return UseCaseResult.Failure(e)
         }

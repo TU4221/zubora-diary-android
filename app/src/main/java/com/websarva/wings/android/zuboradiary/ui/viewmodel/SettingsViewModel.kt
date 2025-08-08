@@ -15,11 +15,11 @@ import com.websarva.wings.android.zuboradiary.domain.usecase.exception.DeleteAll
 import com.websarva.wings.android.zuboradiary.domain.usecase.exception.DeleteAllDiariesUseCaseException
 import com.websarva.wings.android.zuboradiary.domain.usecase.settings.DeleteAllDataUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.settings.DeleteAllDiariesUseCase
-import com.websarva.wings.android.zuboradiary.domain.usecase.settings.FetchCalendarStartDayOfWeekSettingUseCase
-import com.websarva.wings.android.zuboradiary.domain.usecase.settings.FetchPasscodeLockSettingUseCase
-import com.websarva.wings.android.zuboradiary.domain.usecase.settings.FetchReminderNotificationSettingUseCase
-import com.websarva.wings.android.zuboradiary.domain.usecase.settings.FetchThemeColorSettingUseCase
-import com.websarva.wings.android.zuboradiary.domain.usecase.settings.FetchWeatherInfoFetchSettingUseCase
+import com.websarva.wings.android.zuboradiary.domain.usecase.settings.LoadCalendarStartDayOfWeekSettingUseCase
+import com.websarva.wings.android.zuboradiary.domain.usecase.settings.LoadPasscodeLockSettingUseCase
+import com.websarva.wings.android.zuboradiary.domain.usecase.settings.LoadReminderNotificationSettingUseCase
+import com.websarva.wings.android.zuboradiary.domain.usecase.settings.LoadThemeColorSettingUseCase
+import com.websarva.wings.android.zuboradiary.domain.usecase.settings.LoadWeatherInfoFetchSettingUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.settings.SaveCalendarStartDayOfWeekUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.settings.SavePasscodeLockSettingUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.settings.SaveReminderNotificationSettingUseCase
@@ -51,11 +51,11 @@ import javax.inject.Inject
 internal class SettingsViewModel @Inject constructor(
     private val handle: SavedStateHandle, // MEMO:システムの初期化によるプロセスの終了からの復元用
     private val initializeAllSettingsUseCase: InitializeAllSettingsUseCase,
-    private val fetchThemeColorSettingUseCase: FetchThemeColorSettingUseCase,
-    private val fetchCalendarStartDayOfWeekSettingUseCase: FetchCalendarStartDayOfWeekSettingUseCase,
-    private val fetchReminderNotificationSettingUseCase: FetchReminderNotificationSettingUseCase,
-    private val fetchPasscodeLockSettingUseCase: FetchPasscodeLockSettingUseCase,
-    private val fetchWeatherInfoFetchSettingUseCase: FetchWeatherInfoFetchSettingUseCase,
+    private val loadThemeColorSettingUseCase: LoadThemeColorSettingUseCase,
+    private val loadCalendarStartDayOfWeekSettingUseCase: LoadCalendarStartDayOfWeekSettingUseCase,
+    private val loadReminderNotificationSettingUseCase: LoadReminderNotificationSettingUseCase,
+    private val loadPasscodeLockSettingUseCase: LoadPasscodeLockSettingUseCase,
+    private val loadWeatherInfoFetchSettingUseCase: LoadWeatherInfoFetchSettingUseCase,
     private val saveThemeColorSettingUseCase: SaveThemeColorSettingUseCase,
     private val saveCalendarStartDayOfWeekUseCase: SaveCalendarStartDayOfWeekUseCase,
     private val saveReminderNotificationSettingUseCase: SaveReminderNotificationSettingUseCase,
@@ -210,7 +210,7 @@ internal class SettingsViewModel @Inject constructor(
     private fun setUpThemeColorSettingValue() {
         val initialValue = handle.get<ThemeColor>(SAVED_THEME_COLOR_STATE_KEY)
         themeColor =
-            fetchThemeColorSettingUseCase()
+            loadThemeColorSettingUseCase()
                 .value
                 .map {
                     when (it) {
@@ -231,7 +231,7 @@ internal class SettingsViewModel @Inject constructor(
     private fun setUpCalendarStartDayOfWeekSettingValue() {
         val initialValue = handle.get<DayOfWeek>(SAVED_CALENDAR_START_DAY_OF_WEEK_STATE_KEY)
         calendarStartDayOfWeek =
-            fetchCalendarStartDayOfWeekSettingUseCase()
+            loadCalendarStartDayOfWeekSettingUseCase()
                 .value
                 .map {
                     when (it) {
@@ -245,7 +245,7 @@ internal class SettingsViewModel @Inject constructor(
 
     private fun setUpReminderNotificationSettingValue() {
         isCheckedReminderNotification =
-            fetchReminderNotificationSettingUseCase()
+            loadReminderNotificationSettingUseCase()
                 .value
                 .map {
                     when (it) {
@@ -255,7 +255,7 @@ internal class SettingsViewModel @Inject constructor(
                 }.stateInEagerly(null )
 
         reminderNotificationTime =
-            fetchReminderNotificationSettingUseCase()
+            loadReminderNotificationSettingUseCase()
                 .value
                 .map {
                     when (it) {
@@ -277,7 +277,7 @@ internal class SettingsViewModel @Inject constructor(
 
     private fun setUpPasscodeLockSettingValue() {
         isCheckedPasscodeLock =
-            fetchPasscodeLockSettingUseCase()
+            loadPasscodeLockSettingUseCase()
                 .value
                 .map {
                     when (it) {
@@ -289,7 +289,7 @@ internal class SettingsViewModel @Inject constructor(
                 }.stateInEagerly(null )
 
         passcode =
-            fetchPasscodeLockSettingUseCase()
+            loadPasscodeLockSettingUseCase()
                 .value
                 .map {
                     when (it) {
@@ -311,7 +311,7 @@ internal class SettingsViewModel @Inject constructor(
 
     private fun setUpWeatherInfoFetchSettingValue() {
         isCheckedWeatherInfoFetch =
-            fetchWeatherInfoFetchSettingUseCase()
+            loadWeatherInfoFetchSettingUseCase()
                 .value
                 .map {
                     when (it) {

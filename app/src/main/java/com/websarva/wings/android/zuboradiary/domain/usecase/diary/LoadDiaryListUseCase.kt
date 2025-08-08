@@ -3,13 +3,13 @@ package com.websarva.wings.android.zuboradiary.domain.usecase.diary
 import android.util.Log
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.data.repository.DiaryRepository
-import com.websarva.wings.android.zuboradiary.domain.exception.diary.DiaryListFetchFailureException
+import com.websarva.wings.android.zuboradiary.domain.exception.diary.DiaryListLoadFailureException
 import com.websarva.wings.android.zuboradiary.domain.model.DiaryListItem
 import com.websarva.wings.android.zuboradiary.domain.usecase.DefaultUseCaseResult
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import java.time.LocalDate
 
-internal class FetchDiaryListUseCase(
+internal class LoadDiaryListUseCase(
     private val diaryRepository: DiaryRepository
 ) {
 
@@ -27,14 +27,14 @@ internal class FetchDiaryListUseCase(
 
         try {
             val loadedDiaryList =
-                diaryRepository.fetchDiaryList(
+                diaryRepository.loadDiaryList(
                     numLoadingItems,
                     loadingOffset,
                     startDate
                 )
             Log.i(logTag, "${logMsg}完了")
             return UseCaseResult.Success(loadedDiaryList)
-        } catch (e: DiaryListFetchFailureException) {
+        } catch (e: DiaryListLoadFailureException) {
             Log.e(logTag, "${logMsg}失敗", e)
             return UseCaseResult.Failure(e)
         }

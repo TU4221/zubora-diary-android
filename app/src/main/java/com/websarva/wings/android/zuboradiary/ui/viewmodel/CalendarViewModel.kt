@@ -4,7 +4,7 @@ import android.util.Log
 import androidx.lifecycle.viewModelScope
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.DoesDiaryExistUseCase
-import com.websarva.wings.android.zuboradiary.domain.usecase.diary.FetchDiaryUseCase
+import com.websarva.wings.android.zuboradiary.domain.usecase.diary.LoadDiaryUseCase
 import com.websarva.wings.android.zuboradiary.ui.model.CalendarAppMessage
 import com.websarva.wings.android.zuboradiary.ui.model.event.CalendarEvent
 import com.websarva.wings.android.zuboradiary.ui.model.event.CommonUiEvent
@@ -23,7 +23,7 @@ import javax.inject.Inject
 @HiltViewModel
 internal class CalendarViewModel @Inject constructor(
     private val doesDiaryExistUseCase: DoesDiaryExistUseCase,
-    private val fetchDiaryUseCase: FetchDiaryUseCase
+    private val loadDiaryUseCase: LoadDiaryUseCase
 ) : BaseDiaryShowViewModel<CalendarEvent, CalendarAppMessage, CalendarState>(
     CalendarState.Idle
 ) {
@@ -169,7 +169,7 @@ internal class CalendarViewModel @Inject constructor(
         Log.i(logTag, "${logMsg}_開始")
 
         updateUiState(CalendarState.LoadingDiary)
-        when (val result = fetchDiaryUseCase(date)) {
+        when (val result = loadDiaryUseCase(date)) {
             is UseCaseResult.Success -> {
                 Log.i(logTag, "${logMsg}_完了")
                 updateUiState(CalendarState.LoadDiarySuccess)

@@ -13,12 +13,12 @@ import com.websarva.wings.android.zuboradiary.domain.model.DiaryItemTitleSelecti
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.DeleteDiaryUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.DoesDiaryExistUseCase
-import com.websarva.wings.android.zuboradiary.domain.usecase.diary.FetchDiaryUseCase
+import com.websarva.wings.android.zuboradiary.domain.usecase.diary.LoadDiaryUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.ShouldRequestDiaryUpdateConfirmationUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.FetchWeatherInfoUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.SaveDiaryUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.ShouldFetchWeatherInfoUseCase
-import com.websarva.wings.android.zuboradiary.domain.usecase.diary.ShouldRequestDiaryFetchConfirmationUseCase
+import com.websarva.wings.android.zuboradiary.domain.usecase.diary.ShouldRequestDiaryLoadConfirmationUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.ShouldRequestExitWithoutDiarySavingConfirmationUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.ShouldRequestWeatherInfoConfirmationUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.settings.IsWeatherInfoFetchEnabledUseCase
@@ -58,10 +58,10 @@ import kotlin.random.Random
 internal class DiaryEditViewModel @Inject constructor(
     private val handle: SavedStateHandle,
     private val shouldRequestExitWithoutDiarySavingConfirmationUseCase: ShouldRequestExitWithoutDiarySavingConfirmationUseCase,
-    private val shouldRequestDiaryFetchConfirmationUseCase: ShouldRequestDiaryFetchConfirmationUseCase,
+    private val shouldRequestDiaryLoadConfirmationUseCase: ShouldRequestDiaryLoadConfirmationUseCase,
     private val shouldRequestDiaryUpdateConfirmationUseCase: ShouldRequestDiaryUpdateConfirmationUseCase,
     private val shouldRequestWeatherInfoConfirmationUseCase: ShouldRequestWeatherInfoConfirmationUseCase,
-    private val fetchDiaryUseCase: FetchDiaryUseCase,
+    private val loadDiaryUseCase: LoadDiaryUseCase,
     private val saveDiaryUseCase: SaveDiaryUseCase,
     private val deleteDiaryUseCase: DeleteDiaryUseCase,
     private val isWeatherInfoFetchEnabledUseCase: IsWeatherInfoFetchEnabledUseCase,
@@ -762,7 +762,7 @@ internal class DiaryEditViewModel @Inject constructor(
 
         val previousState = uiState.value
         updateUiState(DiaryEditState.Loading)
-        when (val result = fetchDiaryUseCase(date)) {
+        when (val result = loadDiaryUseCase(date)) {
             is UseCaseResult.Success -> {
                 updateUiState(DiaryEditState.Editing)
                 val diary = result.value
@@ -779,7 +779,7 @@ internal class DiaryEditViewModel @Inject constructor(
                     )
                 } else {
                     updateUiState(DiaryEditState.Editing)
-                    emitAppMessageEvent(DiaryEditAppMessage.DiaryFetchFailure)
+                    emitAppMessageEvent(DiaryEditAppMessage.DiaryLoadFailure)
                 }
             }
         }
@@ -867,7 +867,7 @@ internal class DiaryEditViewModel @Inject constructor(
     ) {
         updateUiState(DiaryEditState.CheckingDiaryInfo)
         val result =
-            shouldRequestDiaryFetchConfirmationUseCase(date, previousDate, originalDate, isNewDiary)
+            shouldRequestDiaryLoadConfirmationUseCase(date, previousDate, originalDate, isNewDiary)
         when (result) {
             is UseCaseResult.Success -> {
                 updateUiState(DiaryEditState.Editing)

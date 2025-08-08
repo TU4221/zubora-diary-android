@@ -4,10 +4,10 @@ import android.util.Log
 import androidx.lifecycle.viewModelScope
 import com.websarva.wings.android.zuboradiary.R
 import com.websarva.wings.android.zuboradiary.domain.model.ItemNumber
-import com.websarva.wings.android.zuboradiary.domain.exception.diary.DiaryItemTitleSelectionHistoryFetchFailureException
+import com.websarva.wings.android.zuboradiary.domain.exception.diary.DiaryItemTitleSelectionHistoryLoadFailureException
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.DeleteDiaryItemTitleSelectionHistoryItemUseCase
-import com.websarva.wings.android.zuboradiary.domain.usecase.diary.FetchDiaryItemTitleSelectionHistoryUseCase
+import com.websarva.wings.android.zuboradiary.domain.usecase.diary.LoadDiaryItemTitleSelectionHistoryUseCase
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import com.websarva.wings.android.zuboradiary.ui.model.DiaryItemTitleEditAppMessage
 import com.websarva.wings.android.zuboradiary.ui.adapter.diaryitemtitle.SelectionHistoryList
@@ -33,7 +33,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 internal class DiaryItemTitleEditViewModel @Inject constructor(
-    private val fetchDiaryItemTitleSelectionHistoryUseCase: FetchDiaryItemTitleSelectionHistoryUseCase,
+    private val loadDiaryItemTitleSelectionHistoryUseCase: LoadDiaryItemTitleSelectionHistoryUseCase,
     private val deleteDiaryItemTitleSelectionHistoryItemUseCase: DeleteDiaryItemTitleSelectionHistoryItemUseCase
 ) : BaseViewModel<DiaryItemTitleEditEvent, DiaryItemTitleEditAppMessage, DiaryItemTitleEditState>(
     DiaryItemTitleEditState.Idle
@@ -201,10 +201,10 @@ internal class DiaryItemTitleEditViewModel @Inject constructor(
 
         updateUiState(DiaryItemTitleEditState.LoadingSelectionHistory)
         itemTitleSelectionHistoryList =
-            fetchDiaryItemTitleSelectionHistoryUseCase().value
+            loadDiaryItemTitleSelectionHistoryUseCase().value
                 .catch {
                     when (it) {
-                        is DiaryItemTitleSelectionHistoryFetchFailureException -> {
+                        is DiaryItemTitleSelectionHistoryLoadFailureException -> {
                             emitAppMessageEvent(
                                 DiaryItemTitleEditAppMessage.ItemTitleHistoryLoadingFailure
                             )

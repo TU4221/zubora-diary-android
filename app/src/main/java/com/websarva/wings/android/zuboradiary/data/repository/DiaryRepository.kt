@@ -13,15 +13,15 @@ import com.websarva.wings.android.zuboradiary.domain.exception.diary.AllDiariesD
 import com.websarva.wings.android.zuboradiary.domain.exception.diary.DiaryCountFailureException
 import com.websarva.wings.android.zuboradiary.domain.exception.diary.DiaryDeletionFailureException
 import com.websarva.wings.android.zuboradiary.domain.exception.diary.DiaryExistenceCheckFailureException
-import com.websarva.wings.android.zuboradiary.domain.exception.diary.DiaryListFetchFailureException
-import com.websarva.wings.android.zuboradiary.domain.exception.diary.DiaryFetchFailureException
+import com.websarva.wings.android.zuboradiary.domain.exception.diary.DiaryListLoadFailureException
+import com.websarva.wings.android.zuboradiary.domain.exception.diary.DiaryLoadFailureException
 import com.websarva.wings.android.zuboradiary.domain.exception.diary.DiaryImageUriUsageCheckFailureException
 import com.websarva.wings.android.zuboradiary.domain.exception.diary.DiarySaveFailureException
 import com.websarva.wings.android.zuboradiary.domain.exception.diary.WordSearchResultCountFailureException
 import com.websarva.wings.android.zuboradiary.domain.exception.diary.AllDataDeletionFailureException
 import com.websarva.wings.android.zuboradiary.domain.exception.diary.DiaryItemTitleSelectionHistoryItemDeletionFailureException
-import com.websarva.wings.android.zuboradiary.domain.exception.diary.DiaryItemTitleSelectionHistoryFetchFailureException
-import com.websarva.wings.android.zuboradiary.domain.exception.diary.WordSearchResultListFetchFailureException
+import com.websarva.wings.android.zuboradiary.domain.exception.diary.DiaryItemTitleSelectionHistoryLoadFailureException
+import com.websarva.wings.android.zuboradiary.domain.exception.diary.WordSearchResultListLoadFailureException
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -83,46 +83,46 @@ internal class DiaryRepository (
         }
     }
 
-    @Throws(DiaryFetchFailureException::class)
-    suspend fun fetchDiary(date: LocalDate): Diary? {
+    @Throws(DiaryLoadFailureException::class)
+    suspend fun loadDiary(date: LocalDate): Diary? {
         return withContext(Dispatchers.IO) {
             try {
                 diaryDataSource.selectDiary(date)?.toDomainModel()
             } catch (e: DataBaseAccessFailureException) {
-                throw DiaryFetchFailureException("日付 '$date' の日記の取得に失敗しました。", e)
+                throw DiaryLoadFailureException("日付 '$date' の日記の読込に失敗しました。", e)
             }
         }
     }
 
-    @Throws(DiaryFetchFailureException::class)
-    suspend fun fetchNewestDiary(): Diary? {
+    @Throws(DiaryLoadFailureException::class)
+    suspend fun loadNewestDiary(): Diary? {
         return withContext(Dispatchers.IO) {
             try {
                 diaryDataSource.selectNewestDiary()?.toDomainModel()
             } catch (e: DataBaseAccessFailureException) {
-                throw DiaryFetchFailureException("最新の日記の取得に失敗しました。", e)
+                throw DiaryLoadFailureException("最新の日記の読込に失敗しました。", e)
             }
         }
     }
 
-    @Throws(DiaryFetchFailureException::class)
-    suspend fun fetchOldestDiary(): Diary? {
+    @Throws(DiaryLoadFailureException::class)
+    suspend fun loadOldestDiary(): Diary? {
         return withContext(Dispatchers.IO) {
             try {
                 diaryDataSource.selectOldestDiary()?.toDomainModel()
             } catch (e: DataBaseAccessFailureException) {
-                throw DiaryFetchFailureException("最古の日記の取得に失敗しました。", e)
+                throw DiaryLoadFailureException("最古の日記の読込に失敗しました。", e)
             }
         }
     }
 
-    @Throws(DiaryListFetchFailureException::class)
-    suspend fun fetchDiaryList(
+    @Throws(DiaryListLoadFailureException::class)
+    suspend fun loadDiaryList(
         num: Int,
         offset: Int,
         date: LocalDate?
     ): List<DiaryListItem> {
-        Log.d(logTag, "fetchDiaryList(num = $num, offset = $offset, date = $date)")
+        Log.d(logTag, "loadDiaryList(num = $num, offset = $offset, date = $date)")
         require(num >= 1)
         require(offset >= 0)
 
@@ -132,7 +132,7 @@ internal class DiaryRepository (
                     .selectDiaryListOrderByDateDesc(num, offset, date)
                     .map { it.toDomainModel() }
             } catch (e: DataBaseAccessFailureException) {
-                throw DiaryListFetchFailureException(e)
+                throw DiaryListLoadFailureException(e)
             }
         }
     }
@@ -148,7 +148,7 @@ internal class DiaryRepository (
         }
     }
 
-    @Throws(WordSearchResultListFetchFailureException::class)
+    @Throws(WordSearchResultListLoadFailureException::class)
     suspend fun loadWordSearchResultDiaryList(
         num: Int,
         offset: Int,
@@ -163,7 +163,7 @@ internal class DiaryRepository (
                     .selectWordSearchResultListOrderByDateDesc(num, offset, searchWord)
                     .map { it.toDomainModel() }
             } catch (e: DataBaseAccessFailureException) {
-                throw WordSearchResultListFetchFailureException(searchWord, e)
+                throw WordSearchResultListLoadFailureException(searchWord, e)
             }
         }
     }
@@ -238,9 +238,9 @@ internal class DiaryRepository (
     }
 
     /**
-     * @throws DiaryItemTitleSelectionHistoryFetchFailureException
+     * @throws DiaryItemTitleSelectionHistoryLoadFailureException
      */
-    fun fetchDiaryItemTitleSelectionHistory(
+    fun loadDiaryItemTitleSelectionHistory(
         num: Int, offset: Int
     ): Flow<List<DiaryItemTitleSelectionHistoryItem>> {
         require(num >= 1)
@@ -249,7 +249,7 @@ internal class DiaryRepository (
         return diaryDataSource
             .selectHistoryListOrderByLogDesc(num, offset)
             .catch {
-                throw DiaryItemTitleSelectionHistoryFetchFailureException(it)
+                throw DiaryItemTitleSelectionHistoryLoadFailureException(it)
             }
             .map { list ->
                 list.map { it.toDomainModel() }

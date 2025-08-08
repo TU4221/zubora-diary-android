@@ -10,17 +10,17 @@ import com.websarva.wings.android.zuboradiary.domain.usecase.diary.CountDiariesU
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.CountWordSearchResultDiariesUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.DeleteDiaryItemTitleSelectionHistoryItemUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.DeleteDiaryUseCase
-import com.websarva.wings.android.zuboradiary.domain.usecase.diary.FetchDiaryItemTitleSelectionHistoryUseCase
-import com.websarva.wings.android.zuboradiary.domain.usecase.diary.FetchDiaryUseCase
-import com.websarva.wings.android.zuboradiary.domain.usecase.diary.FetchNewestDiaryUseCase
-import com.websarva.wings.android.zuboradiary.domain.usecase.diary.FetchOldestDiaryUseCase
+import com.websarva.wings.android.zuboradiary.domain.usecase.diary.LoadDiaryItemTitleSelectionHistoryUseCase
+import com.websarva.wings.android.zuboradiary.domain.usecase.diary.LoadDiaryUseCase
+import com.websarva.wings.android.zuboradiary.domain.usecase.diary.LoadNewestDiaryUseCase
+import com.websarva.wings.android.zuboradiary.domain.usecase.diary.LoadOldestDiaryUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.ShouldRequestDiaryUpdateConfirmationUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.FetchWeatherInfoUseCase
-import com.websarva.wings.android.zuboradiary.domain.usecase.diary.FetchDiaryListUseCase
-import com.websarva.wings.android.zuboradiary.domain.usecase.diary.FetchWordSearchResultDiaryListUseCase
+import com.websarva.wings.android.zuboradiary.domain.usecase.diary.LoadDiaryListUseCase
+import com.websarva.wings.android.zuboradiary.domain.usecase.diary.LoadWordSearchResultDiaryListUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.SaveDiaryUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.ShouldFetchWeatherInfoUseCase
-import com.websarva.wings.android.zuboradiary.domain.usecase.diary.ShouldRequestDiaryFetchConfirmationUseCase
+import com.websarva.wings.android.zuboradiary.domain.usecase.diary.ShouldRequestDiaryLoadConfirmationUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.ShouldRequestExitWithoutDiarySavingConfirmationUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.ShouldRequestWeatherInfoConfirmationUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.uri.ReleasePersistableUriPermissionUseCase
@@ -64,10 +64,10 @@ internal object DiaryUseCaseModule {
 
     @Singleton
     @Provides
-    fun provideShouldRequestDiaryFetchConfirmationUseCase(
+    fun provideShouldRequestDiaryLoadConfirmationUseCase(
         doesDiaryExistUseCase: DoesDiaryExistUseCase
-    ): ShouldRequestDiaryFetchConfirmationUseCase {
-        return ShouldRequestDiaryFetchConfirmationUseCase(
+    ): ShouldRequestDiaryLoadConfirmationUseCase {
+        return ShouldRequestDiaryLoadConfirmationUseCase(
             doesDiaryExistUseCase
         )
     }
@@ -92,10 +92,10 @@ internal object DiaryUseCaseModule {
 
     @Singleton
     @Provides
-    fun provideFetchDiaryUseCase(
+    fun provideLoadDiaryUseCase(
         diaryRepository: DiaryRepository
-    ): FetchDiaryUseCase {
-        return FetchDiaryUseCase(diaryRepository)
+    ): LoadDiaryUseCase {
+        return LoadDiaryUseCase(diaryRepository)
     }
 
     @Singleton
@@ -137,8 +137,8 @@ internal object DiaryUseCaseModule {
 
     @Singleton
     @Provides
-    fun provideFetchDiaryListUseCase(diaryRepository: DiaryRepository) =
-        FetchDiaryListUseCase(diaryRepository)
+    fun provideLoadDiaryListUseCase(diaryRepository: DiaryRepository) =
+        LoadDiaryListUseCase(diaryRepository)
 
     @Singleton
     @Provides
@@ -152,18 +152,18 @@ internal object DiaryUseCaseModule {
 
     @Singleton
     @Provides
-    fun provideFetchNewestDiaryUseCase(diaryRepository: DiaryRepository) =
-        FetchNewestDiaryUseCase(diaryRepository)
+    fun provideLoadNewestDiaryUseCase(diaryRepository: DiaryRepository) =
+        LoadNewestDiaryUseCase(diaryRepository)
 
     @Singleton
     @Provides
-    fun provideFetchOldestDiaryUseCase(diaryRepository: DiaryRepository): FetchOldestDiaryUseCase =
-        FetchOldestDiaryUseCase(diaryRepository)
+    fun provideLoadOldestDiaryUseCase(diaryRepository: DiaryRepository): LoadOldestDiaryUseCase =
+        LoadOldestDiaryUseCase(diaryRepository)
 
     @Singleton
     @Provides
-    fun provideFetchWordSearchResultDiaryListUseCase(diaryRepository: DiaryRepository) =
-        FetchWordSearchResultDiaryListUseCase(diaryRepository)
+    fun provideLoadWordSearchResultDiaryListUseCase(diaryRepository: DiaryRepository) =
+        LoadWordSearchResultDiaryListUseCase(diaryRepository)
 
     @Singleton
     @Provides
@@ -184,7 +184,7 @@ internal object DiaryUseCaseModule {
 
     @Singleton
     @Provides
-    fun provideFetchDiaryItemTitleSelectionHistoryUseCase(
+    fun provideLoadDiaryItemTitleSelectionHistoryUseCase(
         diaryRepository: DiaryRepository
-    ) = FetchDiaryItemTitleSelectionHistoryUseCase(diaryRepository)
+    ) = LoadDiaryItemTitleSelectionHistoryUseCase(diaryRepository)
 }

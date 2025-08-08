@@ -24,8 +24,8 @@ import kotlinx.coroutines.withContext
 
 internal class UserPreferencesRepository(private val userPreferences: UserPreferences) {
 
-    fun fetchThemeColorPreference(): Flow<UserSettingDataSourceResult<ThemeColorSetting>> {
-        return userPreferences.fetchThemeColorPreference()
+    fun loadThemeColorPreference(): Flow<UserSettingDataSourceResult<ThemeColorSetting>> {
+        return userPreferences.loadThemeColorPreference()
             .map { result ->
                 when (result) {
                     is UserPreferenceFlowResult.Success -> {
@@ -43,9 +43,9 @@ internal class UserPreferencesRepository(private val userPreferences: UserPrefer
             }
     }
 
-    fun fetchCalendarStartDayOfWeekPreference():
+    fun loadCalendarStartDayOfWeekPreference():
             Flow<UserSettingDataSourceResult<CalendarStartDayOfWeekSetting>> {
-        return userPreferences.fetchCalendarStartDayOfWeekPreference()
+        return userPreferences.loadCalendarStartDayOfWeekPreference()
             .map { result ->
                 when (result) {
                     is UserPreferenceFlowResult.Success -> {
@@ -63,9 +63,9 @@ internal class UserPreferencesRepository(private val userPreferences: UserPrefer
             }
     }
 
-    fun fetchReminderNotificationPreference():
+    fun loadReminderNotificationPreference():
             Flow<UserSettingDataSourceResult<ReminderNotificationSetting>> {
-        return userPreferences.fetchReminderNotificationPreference()
+        return userPreferences.loadReminderNotificationPreference()
             .map { result ->
                 when (result) {
                     is UserPreferenceFlowResult.Success -> {
@@ -83,9 +83,9 @@ internal class UserPreferencesRepository(private val userPreferences: UserPrefer
             }
     }
 
-    fun fetchPasscodeLockPreference():
+    fun loadPasscodeLockPreference():
             Flow<UserSettingDataSourceResult<PasscodeLockSetting>> {
-        return userPreferences.fetchPasscodeLockPreference()
+        return userPreferences.loadPasscodeLockPreference()
             .map { result ->
                 when (result) {
                     is UserPreferenceFlowResult.Success -> {
@@ -103,9 +103,9 @@ internal class UserPreferencesRepository(private val userPreferences: UserPrefer
             }
     }
 
-    fun fetchWeatherInfoFetchPreference():
+    fun loadWeatherInfoFetchPreference():
             Flow<UserSettingDataSourceResult<WeatherInfoFetchSetting>> {
-        return userPreferences.fetchWeatherInfoFetchPreference()
+        return userPreferences.loadWeatherInfoFetchPreference()
             .map { result ->
                 when (result) {
                     is UserPreferenceFlowResult.Success -> {

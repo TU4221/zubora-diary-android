@@ -1,7 +1,7 @@
 package com.websarva.wings.android.zuboradiary.domain.usecase.settings
 
 import android.util.Log
-import com.websarva.wings.android.zuboradiary.domain.model.settings.ThemeColorSetting
+import com.websarva.wings.android.zuboradiary.domain.model.settings.CalendarStartDayOfWeekSetting
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.data.repository.UserPreferencesRepository
 import com.websarva.wings.android.zuboradiary.domain.exception.settings.UserSettingsException
@@ -11,26 +11,26 @@ import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
-internal class FetchThemeColorSettingUseCase(
+internal class LoadCalendarStartDayOfWeekSettingUseCase(
     private val userPreferencesRepository: UserPreferencesRepository
 ) {
 
     private val logTag = createLogTag()
 
-    operator fun invoke(): UseCaseResult.Success<Flow<UserSettingResult<ThemeColorSetting>>> {
-        val logMsg = "テーマカラー設定取得_"
+    operator fun invoke(): UseCaseResult.Success<Flow<UserSettingResult<CalendarStartDayOfWeekSetting>>> {
+        val logMsg = "カレンダー開始曜日設定読込_"
         Log.i(logTag, "${logMsg}開始")
 
         val value =
             userPreferencesRepository
-                .fetchThemeColorPreference()
-                .map { result: UserSettingDataSourceResult<ThemeColorSetting> ->
+                .loadCalendarStartDayOfWeekPreference()
+                .map { result: UserSettingDataSourceResult<CalendarStartDayOfWeekSetting> ->
                     when (result) {
                         is UserSettingDataSourceResult.Success -> {
                             UserSettingResult.Success(result.setting)
                         }
                         is UserSettingDataSourceResult.Failure -> {
-                            val defaultSettingValue = ThemeColorSetting()
+                            val defaultSettingValue = CalendarStartDayOfWeekSetting()
                             when (result.exception) {
                                 is UserSettingsException.AccessFailure -> {
                                     UserSettingResult.Failure(
@@ -40,7 +40,7 @@ internal class FetchThemeColorSettingUseCase(
                                 }
                                 is UserSettingsException.DataNotFound -> {
                                     UserSettingResult.Success(
-                                        defaultSettingValue
+                                        CalendarStartDayOfWeekSetting()
                                     )
                                 }
                             }

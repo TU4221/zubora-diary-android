@@ -22,7 +22,7 @@ import java.time.LocalTime
 internal class SaveReminderNotificationSettingUseCase(
     private val userPreferencesRepository: UserPreferencesRepository,
     private val workerRepository: WorkerRepository,
-    private val fetchReminderNotificationSettingUseCase: FetchReminderNotificationSettingUseCase
+    private val loadReminderNotificationSettingUseCase: LoadReminderNotificationSettingUseCase
 ) {
 
     private val logTag = createLogTag()
@@ -99,7 +99,7 @@ internal class SaveReminderNotificationSettingUseCase(
     @Throws(UserSettingsException::class)
     private suspend fun fetchCurrentReminderNotificationSetting(): ReminderNotificationSetting {
         return withContext(Dispatchers.IO) {
-            fetchReminderNotificationSettingUseCase().value
+            loadReminderNotificationSettingUseCase().value
                 .map { result: UserSettingResult<ReminderNotificationSetting> ->
                     when (result) {
                         is UserSettingResult.Success -> result.setting

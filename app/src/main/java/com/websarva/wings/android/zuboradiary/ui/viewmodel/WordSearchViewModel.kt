@@ -7,7 +7,7 @@ import com.websarva.wings.android.zuboradiary.domain.model.WordSearchResultListI
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.CheckUnloadedWordSearchResultDiariesExistUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.CountWordSearchResultDiariesUseCase
-import com.websarva.wings.android.zuboradiary.domain.usecase.diary.FetchWordSearchResultDiaryListUseCase
+import com.websarva.wings.android.zuboradiary.domain.usecase.diary.LoadWordSearchResultDiaryListUseCase
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import com.websarva.wings.android.zuboradiary.ui.model.WordSearchAppMessage
 import com.websarva.wings.android.zuboradiary.ui.adapter.diary.wordsearchresult.WordSearchResultDayList
@@ -30,7 +30,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 internal class WordSearchViewModel @Inject internal constructor(
-    private val fetchWordSearchResultDiaryListUseCase: FetchWordSearchResultDiaryListUseCase,
+    private val loadWordSearchResultDiaryListUseCase: LoadWordSearchResultDiaryListUseCase,
     private val countWordSearchResultDiariesUseCase: CountWordSearchResultDiariesUseCase,
     private val checkUnloadedWordSearchResultDiariesExistUseCase: CheckUnloadedWordSearchResultDiariesExistUseCase
 ) : BaseViewModel<WordSearchEvent, WordSearchAppMessage, WordSearchState>(
@@ -255,7 +255,7 @@ internal class WordSearchViewModel @Inject internal constructor(
         ) { _, lambdaWordSearch ->
             showWordSearchResultListFirstItemProgressIndicator()
             val value =
-                fetchWordSearchResultDiaryList(numLoadingItems, 0, lambdaWordSearch)
+                loadWordSearchResultDiaryList(numLoadingItems, 0, lambdaWordSearch)
             toUiWordSearchResultList(value, lambdaWordSearch)
         }
     }
@@ -273,7 +273,7 @@ internal class WordSearchViewModel @Inject internal constructor(
 
             val loadingOffset = lambdaCurrentList.countDiaries()
             val value =
-                fetchWordSearchResultDiaryList(numLoadingItems, loadingOffset, lambdaWordSearch)
+                loadWordSearchResultDiaryList(numLoadingItems, loadingOffset, lambdaWordSearch)
             val loadedResultList = toUiWordSearchResultList(value, lambdaWordSearch)
             val numLoadedDiaries =
                 lambdaCurrentList.countDiaries() + loadedResultList.countDiaries()
@@ -301,7 +301,7 @@ internal class WordSearchViewModel @Inject internal constructor(
                 numLoadingItems = this@WordSearchViewModel.numLoadingItems
             }
             val value =
-                fetchWordSearchResultDiaryList(
+                loadWordSearchResultDiaryList(
                     numLoadingItems,
                     0,
                     lambdaWordSearch
@@ -373,7 +373,7 @@ internal class WordSearchViewModel @Inject internal constructor(
     }
 
     @Throws(DomainException::class)
-    private suspend fun fetchWordSearchResultDiaryList(
+    private suspend fun loadWordSearchResultDiaryList(
         numLoadingItems: Int,
         loadingOffset: Int,
         searchWord: String
@@ -382,7 +382,7 @@ internal class WordSearchViewModel @Inject internal constructor(
         require(loadingOffset >= 0)
 
         val result =
-            fetchWordSearchResultDiaryListUseCase(
+            loadWordSearchResultDiaryListUseCase(
                 numLoadingItems,
                 loadingOffset,
                 searchWord

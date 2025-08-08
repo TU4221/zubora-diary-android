@@ -11,7 +11,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 
 internal class IsWeatherInfoFetchEnabledUseCase(
-    private val fetchWeatherInfoFetchSettingUseCase: FetchWeatherInfoFetchSettingUseCase
+    private val loadWeatherInfoFetchSettingUseCase: LoadWeatherInfoFetchSettingUseCase
 ) {
 
     private val logTag = createLogTag()
@@ -22,7 +22,7 @@ internal class IsWeatherInfoFetchEnabledUseCase(
 
         val value =
             withContext(Dispatchers.IO) {
-                fetchWeatherInfoFetchSettingUseCase().value
+                loadWeatherInfoFetchSettingUseCase().value
                     .map { value: UserSettingResult<WeatherInfoFetchSetting> ->
                          when (value) {
                             is UserSettingResult.Success -> {

@@ -8,9 +8,9 @@ import com.websarva.wings.android.zuboradiary.domain.model.DiaryListItem
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.CheckUnloadedDiariesExistUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.DeleteDiaryUseCase
-import com.websarva.wings.android.zuboradiary.domain.usecase.diary.FetchNewestDiaryUseCase
-import com.websarva.wings.android.zuboradiary.domain.usecase.diary.FetchOldestDiaryUseCase
-import com.websarva.wings.android.zuboradiary.domain.usecase.diary.FetchDiaryListUseCase
+import com.websarva.wings.android.zuboradiary.domain.usecase.diary.LoadNewestDiaryUseCase
+import com.websarva.wings.android.zuboradiary.domain.usecase.diary.LoadOldestDiaryUseCase
+import com.websarva.wings.android.zuboradiary.domain.usecase.diary.LoadDiaryListUseCase
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import com.websarva.wings.android.zuboradiary.ui.model.DiaryListAppMessage
 import com.websarva.wings.android.zuboradiary.ui.adapter.diary.diary.DiaryDayList
@@ -38,11 +38,11 @@ import javax.inject.Inject
 
 @HiltViewModel
 internal class DiaryListViewModel @Inject constructor(
-    private val fetchDiaryListUseCase: FetchDiaryListUseCase,
+    private val loadDiaryListUseCase: LoadDiaryListUseCase,
     private val checkUnloadedDiariesExistUseCase: CheckUnloadedDiariesExistUseCase,
     private val deleteDiaryUseCase: DeleteDiaryUseCase,
-    private val fetchNewestDiaryUseCase: FetchNewestDiaryUseCase,
-    private val fetchOldestDiaryUseCase: FetchOldestDiaryUseCase
+    private val loadNewestDiaryUseCase: LoadNewestDiaryUseCase,
+    private val loadOldestDiaryUseCase: LoadOldestDiaryUseCase
 ) : BaseViewModel<DiaryListEvent, DiaryListAppMessage, DiaryListState>(
     DiaryListState.Idle
 ) {
@@ -279,7 +279,7 @@ internal class DiaryListViewModel @Inject constructor(
             currentList
         ) { _ ->
             showDiaryListFirstItemProgressIndicator()
-            val value = fetchDiaryList(NUM_LOADING_ITEMS, 0)
+            val value = loadDiaryList(NUM_LOADING_ITEMS, 0)
             toUiDiaryList(value)
         }
     }
@@ -292,7 +292,7 @@ internal class DiaryListViewModel @Inject constructor(
             require(lambdaCurrentList.isNotEmpty)
 
             val loadingOffset = lambdaCurrentList.countDiaries()
-            val value = fetchDiaryList(NUM_LOADING_ITEMS, loadingOffset)
+            val value = loadDiaryList(NUM_LOADING_ITEMS, loadingOffset)
             val loadedList = toUiDiaryList(value)
 
             val numLoadedDiaries = lambdaCurrentList.countDiaries() + loadedList.countDiaries()
@@ -314,7 +314,7 @@ internal class DiaryListViewModel @Inject constructor(
             if (numLoadingItems < NUM_LOADING_ITEMS) {
                 numLoadingItems = NUM_LOADING_ITEMS
             }
-            val value = fetchDiaryList(numLoadingItems, 0)
+            val value = loadDiaryList(numLoadingItems, 0)
             toUiDiaryList(value)
         }
     }
@@ -364,12 +364,12 @@ internal class DiaryListViewModel @Inject constructor(
     }
 
     @Throws(DomainException::class)
-    private suspend fun fetchDiaryList(
+    private suspend fun loadDiaryList(
         numLoadingItems: Int,
         loadingOffset: Int
     ): List<DiaryListItem> {
         val result =
-            fetchDiaryListUseCase(
+            loadDiaryListUseCase(
                 numLoadingItems,
                 loadingOffset,
                 sortConditionDate
@@ -426,7 +426,7 @@ internal class DiaryListViewModel @Inject constructor(
     }
 
     private suspend fun loadNewestSavedDiaryDate(): LocalDate? {
-        when (val result = fetchNewestDiaryUseCase()) {
+        when (val result = loadNewestDiaryUseCase()) {
             is UseCaseResult.Success -> return result.value?.date
             is UseCaseResult.Failure -> {
                 Log.e(logTag, "最新日記読込_失敗", result.exception)
@@ -437,7 +437,7 @@ internal class DiaryListViewModel @Inject constructor(
     }
 
     private suspend fun loadOldestSavedDiaryDate(): LocalDate? {
-        when (val result = fetchOldestDiaryUseCase()) {
+        when (val result = loadOldestDiaryUseCase()) {
             is UseCaseResult.Success -> return result.value?.date
             is UseCaseResult.Failure -> {
                 Log.e(logTag, "最古日記読込_失敗", result.exception)

@@ -5,7 +5,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.DeleteDiaryUseCase
-import com.websarva.wings.android.zuboradiary.domain.usecase.diary.FetchDiaryUseCase
+import com.websarva.wings.android.zuboradiary.domain.usecase.diary.LoadDiaryUseCase
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import com.websarva.wings.android.zuboradiary.ui.model.DiaryShowAppMessage
 import com.websarva.wings.android.zuboradiary.ui.model.event.CommonUiEvent
@@ -25,7 +25,7 @@ import javax.inject.Inject
 @HiltViewModel
 internal class DiaryShowViewModel @Inject constructor(
     handle: SavedStateHandle,
-    private val fetchDiaryUseCase: FetchDiaryUseCase,
+    private val loadDiaryUseCase: LoadDiaryUseCase,
     private val deleteDiaryUseCase: DeleteDiaryUseCase
 ) : BaseDiaryShowViewModel<DiaryShowEvent, DiaryShowAppMessage, DiaryShowState>(
     DiaryShowState.Idle
@@ -161,7 +161,7 @@ internal class DiaryShowViewModel @Inject constructor(
         Log.i(logTag, "${logMsg}_開始")
 
         updateUiState(DiaryShowState.Loading)
-        when (val result = fetchDiaryUseCase(date)) {
+        when (val result = loadDiaryUseCase(date)) {
             is UseCaseResult.Success -> {
                 Log.i(logTag, "${logMsg}_完了")
                 updateUiState(DiaryShowState.LoadSuccess)

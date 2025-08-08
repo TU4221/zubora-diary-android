@@ -152,11 +152,11 @@ internal sealed class DiaryEditAppMessage(
     dialogMessageStringResId: Int
 ) : AppMessage(dialogTitleStringResId, dialogMessageStringResId) {
 
-    data object DiaryFetchFailure :  DiaryEditAppMessage(
+    data object DiaryLoadFailure :  DiaryEditAppMessage(
         R.string.dialog_app_message_title_access_error,
         R.string.dialog_diary_edit_app_message_diary_loading_failure
     ) {
-        private fun readResolve(): Any = DiaryFetchFailure
+        private fun readResolve(): Any = DiaryLoadFailure
     }
 
     data object DiarySavingFailure :  DiaryEditAppMessage(

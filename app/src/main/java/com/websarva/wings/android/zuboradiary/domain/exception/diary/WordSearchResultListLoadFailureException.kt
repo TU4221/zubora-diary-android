@@ -2,7 +2,7 @@ package com.websarva.wings.android.zuboradiary.domain.exception.diary
 
 import com.websarva.wings.android.zuboradiary.domain.exception.DomainException
 
-internal class WordSearchResultListFetchFailureException (
+internal class WordSearchResultListLoadFailureException (
     searchWord: String,
     cause: Throwable
-) : DomainException("'$searchWord' の検索結果の取得に失敗しました。", cause)
+) : DomainException("'$searchWord' の検索結果の読込に失敗しました。", cause)

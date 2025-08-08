@@ -56,17 +56,17 @@ internal class UserPreferences @Inject constructor(
             .map { preferences ->
                 Log.e(logTag, "アプリ設定値読込_成功_$preferences")
                 val result =
-                    UserPreferencesFetchResult
+                    UserPreferencesLoadResult
                         .Success(
                             preferences
-                        ) as UserPreferencesFetchResult
+                        ) as UserPreferencesLoadResult
                 return@map result
             }.catch { cause ->
                 Log.e(logTag, "アプリ設定値読込_失敗", cause)
                 if (cause !is IOException) throw cause
 
                 emit(
-                    UserPreferencesFetchResult
+                    UserPreferencesLoadResult
                         .Failure(UserPreferencesException.DataStoreAccessFailure(cause))
                 )
             }.stateIn(
@@ -75,10 +75,10 @@ internal class UserPreferences @Inject constructor(
                 null
             ).filterNotNull()
 
-    fun fetchThemeColorPreference(): Flow<UserPreferenceFlowResult<ThemeColorPreference>> {
+    fun loadThemeColorPreference(): Flow<UserPreferenceFlowResult<ThemeColorPreference>> {
         return userPreferencesFlow.map { result ->
             when (result) {
-                is UserPreferencesFetchResult.Success -> {
+                is UserPreferencesLoadResult.Success -> {
                     val preference = createThemeColorPreference(result.preferences)
                     if (preference != null) {
                         UserPreferenceFlowResult.Success(preference)
@@ -88,7 +88,7 @@ internal class UserPreferences @Inject constructor(
                         )
                     }
                 }
-                is UserPreferencesFetchResult.Failure -> {
+                is UserPreferencesLoadResult.Failure -> {
                     UserPreferenceFlowResult.Failure(result.exception)
                 }
             }
@@ -100,11 +100,11 @@ internal class UserPreferences @Inject constructor(
         return ThemeColorPreference(themeColorNumber)
     }
 
-    fun fetchCalendarStartDayOfWeekPreference():
+    fun loadCalendarStartDayOfWeekPreference():
             Flow<UserPreferenceFlowResult<CalendarStartDayOfWeekPreference>> {
         return userPreferencesFlow.map { result ->
             when (result) {
-                is UserPreferencesFetchResult.Success -> {
+                is UserPreferencesLoadResult.Success -> {
                     val preference = createCalendarStartDayOfWeekPreference(result.preferences)
                     if (preference != null) {
                         UserPreferenceFlowResult.Success(preference)
@@ -114,7 +114,7 @@ internal class UserPreferences @Inject constructor(
                         )
                     }
                 }
-                is UserPreferencesFetchResult.Failure -> {
+                is UserPreferencesLoadResult.Failure -> {
                     UserPreferenceFlowResult.Failure(
                         result.exception
                     )
@@ -131,11 +131,11 @@ internal class UserPreferences @Inject constructor(
         return CalendarStartDayOfWeekPreference(dayOfWeekNumber)
     }
 
-    fun fetchReminderNotificationPreference():
+    fun loadReminderNotificationPreference():
             Flow<UserPreferenceFlowResult<ReminderNotificationPreference>> {
         return userPreferencesFlow.map { result ->
             when (result) {
-                is UserPreferencesFetchResult.Success -> {
+                is UserPreferencesLoadResult.Success -> {
                     val preference = createReminderNotificationPreference(result.preferences)
                     if (preference != null) {
                         UserPreferenceFlowResult.Success(preference)
@@ -145,7 +145,7 @@ internal class UserPreferences @Inject constructor(
                         )
                     }
                 }
-                is UserPreferencesFetchResult.Failure -> {
+                is UserPreferencesLoadResult.Failure -> {
                     UserPreferenceFlowResult.Failure(
                         result.exception
                     )
@@ -164,11 +164,11 @@ internal class UserPreferences @Inject constructor(
         return ReminderNotificationPreference(isEnabled, notificationTimeString)
     }
 
-    fun fetchPasscodeLockPreference():
+    fun loadPasscodeLockPreference():
             Flow<UserPreferenceFlowResult<PasscodeLockPreference>> {
         return userPreferencesFlow.map { result ->
             when (result) {
-                is UserPreferencesFetchResult.Success -> {
+                is UserPreferencesLoadResult.Success -> {
                     val preference = createPasscodeLockPreference(result.preferences)
                     if (preference != null) {
                         UserPreferenceFlowResult.Success(preference)
@@ -178,7 +178,7 @@ internal class UserPreferences @Inject constructor(
                         )
                     }
                 }
-                is UserPreferencesFetchResult.Failure -> {
+                is UserPreferencesLoadResult.Failure -> {
                     UserPreferenceFlowResult.Failure(
                         result.exception
                     )
@@ -193,11 +193,11 @@ internal class UserPreferences @Inject constructor(
         return PasscodeLockPreference(isEnabled, passCode)
     }
 
-    fun fetchWeatherInfoFetchPreference():
+    fun loadWeatherInfoFetchPreference():
             Flow<UserPreferenceFlowResult<WeatherInfoFetchPreference>> {
         return userPreferencesFlow.map { result ->
             when (result) {
-                is UserPreferencesFetchResult.Success -> {
+                is UserPreferencesLoadResult.Success -> {
                     val preference = createWeatherInfoFetchPreference(result.preferences)
                     if (preference != null) {
                         UserPreferenceFlowResult.Success(preference)
@@ -207,7 +207,7 @@ internal class UserPreferences @Inject constructor(
                         )
                     }
                 }
-                is UserPreferencesFetchResult.Failure -> {
+                is UserPreferencesLoadResult.Failure -> {
                     UserPreferenceFlowResult.Failure(result.exception)
                 }
             }
