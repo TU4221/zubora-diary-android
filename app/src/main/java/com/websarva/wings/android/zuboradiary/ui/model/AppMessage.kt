@@ -22,11 +22,11 @@ internal sealed class DiaryListAppMessage(
     dialogMessageStringResId: Int
 ) : AppMessage(dialogTitleStringResId, dialogMessageStringResId) {
 
-    data object DiaryListLoadingFailure :  DiaryListAppMessage(
+    data object DiaryListLoadFailure :  DiaryListAppMessage(
         R.string.dialog_app_message_title_access_error,
-        R.string.dialog_diary_list_app_message_diary_list_loading_failure
+        R.string.dialog_diary_list_app_message_diary_list_load_failure
     ) {
-        private fun readResolve(): Any = DiaryListLoadingFailure
+        private fun readResolve(): Any = DiaryListLoadFailure
     }
 
     data object DiaryDeleteFailure :  DiaryListAppMessage(
@@ -36,11 +36,11 @@ internal sealed class DiaryListAppMessage(
         private fun readResolve(): Any = DiaryDeleteFailure
     }
 
-    data object DiaryInfoLoadingFailure :  DiaryListAppMessage(
+    data object DiaryInfoLoadFailure :  DiaryListAppMessage(
         R.string.dialog_app_message_title_access_error,
-        R.string.dialog_diary_list_app_message_diary_info_loading_failure
+        R.string.dialog_diary_list_app_message_diary_info_load_failure
     ) {
-        private fun readResolve(): Any = DiaryInfoLoadingFailure
+        private fun readResolve(): Any = DiaryInfoLoadFailure
     }
 }
 
@@ -49,11 +49,11 @@ internal sealed class WordSearchAppMessage(
     dialogMessageStringResId: Int
 ) : AppMessage(dialogTitleStringResId, dialogMessageStringResId) {
 
-    data object SearchResultListLoadingFailure :  WordSearchAppMessage(
+    data object SearchResultListLoadFailure :  WordSearchAppMessage(
         R.string.dialog_app_message_title_access_error,
-        R.string.dialog_word_search_app_message_search_result_list_loading_failure
+        R.string.dialog_word_search_app_message_search_result_list_load_failure
     ) {
-        private fun readResolve(): Any = SearchResultListLoadingFailure
+        private fun readResolve(): Any = SearchResultListLoadFailure
     }
 }
 
@@ -62,18 +62,18 @@ internal sealed class CalendarAppMessage(
     dialogMessageStringResId: Int
 ) : AppMessage(dialogTitleStringResId, dialogMessageStringResId) {
 
-    data object DiaryLoadingFailure :  CalendarAppMessage(
+    data object DiaryLoadFailure :  CalendarAppMessage(
         R.string.dialog_app_message_title_access_error,
-        R.string.dialog_calendar_app_message_diary_loading_failure
+        R.string.dialog_calendar_app_message_diary_load_failure
     ) {
-        private fun readResolve(): Any = DiaryLoadingFailure
+        private fun readResolve(): Any = DiaryLoadFailure
     }
 
-    data object DiaryInfoLoadingFailure :  CalendarAppMessage(
+    data object DiaryInfoLoadFailure :  CalendarAppMessage(
         R.string.dialog_app_message_title_access_error,
-        R.string.dialog_calendar_app_message_diary_info_loading_failure
+        R.string.dialog_calendar_app_message_diary_info_load_failure
     ) {
-        private fun readResolve(): Any = DiaryInfoLoadingFailure
+        private fun readResolve(): Any = DiaryInfoLoadFailure
     }
 
 }
@@ -83,18 +83,18 @@ internal sealed class SettingsAppMessage(
     dialogMessageStringResId: Int
 ) : AppMessage(dialogTitleStringResId, dialogMessageStringResId) {
 
-    data object SettingLoadingFailure :  SettingsAppMessage(
+    data object SettingLoadFailure :  SettingsAppMessage(
         R.string.dialog_app_message_title_access_error,
-        R.string.dialog_settings_app_message_setting_loading_failure
+        R.string.dialog_settings_app_message_setting_load_failure
     ) {
-        private fun readResolve(): Any = SettingLoadingFailure
+        private fun readResolve(): Any = SettingLoadFailure
     }
 
     data object SettingsNotLoadedRetryRestart :  SettingsAppMessage(
         R.string.dialog_app_message_title_hint,
         R.string.dialog_settings_app_message_settings_not_loaded_retry_restart
     ) {
-        private fun readResolve(): Any = SettingLoadingFailure
+        private fun readResolve(): Any = SettingLoadFailure
     }
 
     data object SettingUpdateFailure :  SettingsAppMessage(
@@ -131,11 +131,11 @@ internal sealed class DiaryShowAppMessage(
     dialogMessageStringResId: Int
 ) : AppMessage(dialogTitleStringResId, dialogMessageStringResId) {
 
-    data object DiaryLoadingFailure :  DiaryShowAppMessage(
+    data object DiaryLoadFailure :  DiaryShowAppMessage(
         R.string.dialog_app_message_title_access_error,
-        R.string.dialog_diary_show_app_message_diary_loading_failure
+        R.string.dialog_diary_show_app_message_diary_load_failure
     ) {
-        private fun readResolve(): Any = DiaryLoadingFailure
+        private fun readResolve(): Any = DiaryLoadFailure
     }
 
     data object DiaryDeleteFailure :  DiaryShowAppMessage(
@@ -154,16 +154,16 @@ internal sealed class DiaryEditAppMessage(
 
     data object DiaryLoadFailure :  DiaryEditAppMessage(
         R.string.dialog_app_message_title_access_error,
-        R.string.dialog_diary_edit_app_message_diary_loading_failure
+        R.string.dialog_diary_edit_app_message_diary_load_failure
     ) {
         private fun readResolve(): Any = DiaryLoadFailure
     }
 
-    data object DiarySavingFailure :  DiaryEditAppMessage(
+    data object DiarySaveFailure :  DiaryEditAppMessage(
         R.string.dialog_app_message_title_access_error,
-        R.string.dialog_diary_edit_app_message_diary_saving_failure
+        R.string.dialog_diary_edit_app_message_diary_save_failure
     ) {
-        private fun readResolve(): Any = DiarySavingFailure
+        private fun readResolve(): Any = DiarySaveFailure
     }
 
     data object DiaryDeleteFailure :  DiaryEditAppMessage(
@@ -173,11 +173,11 @@ internal sealed class DiaryEditAppMessage(
         private fun readResolve(): Any = DiaryDeleteFailure
     }
 
-    data object DiaryInfoLoadingFailure :  DiaryEditAppMessage(
+    data object DiaryInfoLoadFailure :  DiaryEditAppMessage(
         R.string.dialog_app_message_title_access_error,
-        R.string.dialog_diary_edit_app_message_diary_info_loading_failure
+        R.string.dialog_diary_edit_app_message_diary_info_load_failure
     ) {
-        private fun readResolve(): Any = DiaryInfoLoadingFailure
+        private fun readResolve(): Any = DiaryInfoLoadFailure
     }
 
     data object WeatherInfoFetchFailure :  DiaryEditAppMessage(
@@ -207,11 +207,11 @@ internal sealed class DiaryItemTitleEditAppMessage(
     dialogMessageStringResId: Int
 ) : AppMessage(dialogTitleStringResId, dialogMessageStringResId) {
 
-    data object ItemTitleHistoryLoadingFailure :  DiaryItemTitleEditAppMessage(
+    data object ItemTitleHistoryLoadFailure :  DiaryItemTitleEditAppMessage(
         R.string.dialog_app_message_title_access_error,
-        R.string.dialog_diary_item_title_edit_app_message_selection_history_loading_failure
+        R.string.dialog_diary_item_title_edit_app_message_selection_history_load_failure
     ) {
-        private fun readResolve(): Any = ItemTitleHistoryLoadingFailure
+        private fun readResolve(): Any = ItemTitleHistoryLoadFailure
     }
 
 

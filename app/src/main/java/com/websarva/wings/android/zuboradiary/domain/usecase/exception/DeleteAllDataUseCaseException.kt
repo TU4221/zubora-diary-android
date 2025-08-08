@@ -5,7 +5,7 @@ internal sealed class DeleteAllDataUseCaseException(
     cause: Throwable
 ) : UseCaseException(message, cause) {
 
-    class AllDataDeletionFailure(
+    class AllDataDeleteFailure(
         cause: Throwable
     ) : DeleteAllDataUseCaseException(
         "全データの削除に失敗しました。",

@@ -3,7 +3,7 @@ package com.websarva.wings.android.zuboradiary.domain.usecase.diary
 import android.util.Log
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.data.repository.DiaryRepository
-import com.websarva.wings.android.zuboradiary.domain.exception.diary.DiaryItemTitleSelectionHistoryItemDeletionFailureException
+import com.websarva.wings.android.zuboradiary.domain.exception.diary.DiaryItemTitleSelectionHistoryItemDeleteFailureException
 import com.websarva.wings.android.zuboradiary.domain.usecase.DefaultUseCaseResult
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 
@@ -22,7 +22,7 @@ internal class DeleteDiaryItemTitleSelectionHistoryItemUseCase(
 
         try {
             diaryRepository.deleteDiaryItemTitleSelectionHistoryItem(deleteTitle)
-        } catch (e: DiaryItemTitleSelectionHistoryItemDeletionFailureException) {
+        } catch (e: DiaryItemTitleSelectionHistoryItemDeleteFailureException) {
             Log.e(logTag, "${logMsg}失敗", e)
             return UseCaseResult.Failure(e)
         }

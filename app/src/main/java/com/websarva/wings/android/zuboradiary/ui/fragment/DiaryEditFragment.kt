@@ -32,12 +32,12 @@ import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.DatePickerDialo
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.DiaryDeleteDialogFragment
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.DiaryEditViewModel
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.DiaryItemDeleteDialogFragment
-import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.DiaryLoadingDialogFragment
-import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.DiaryLoadingFailureDialogFragment
+import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.DiaryLoadDialogFragment
+import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.DiaryLoadFailureDialogFragment
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.DiaryImageDeleteDialogFragment
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.DiaryItemTitleEditDialog
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.DiaryUpdateDialogFragment
-import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.ExitWithoutDiarySavingDialogFragment
+import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.ExitWithoutDiarySaveDialogFragment
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.WeatherInfoFetchDialogFragment
 import com.websarva.wings.android.zuboradiary.ui.keyboard.KeyboardManager
 import com.websarva.wings.android.zuboradiary.ui.model.adapter.WeatherAdapterList
@@ -46,7 +46,7 @@ import com.websarva.wings.android.zuboradiary.ui.model.adapter.ConditionAdapterL
 import com.websarva.wings.android.zuboradiary.ui.model.navigation.NavigationCommand
 import com.websarva.wings.android.zuboradiary.ui.model.parameters.DiaryDeleteParameters
 import com.websarva.wings.android.zuboradiary.ui.model.parameters.DiaryItemDeleteParameters
-import com.websarva.wings.android.zuboradiary.ui.model.parameters.DiaryLoadingParameters
+import com.websarva.wings.android.zuboradiary.ui.model.parameters.DiaryLoadParameters
 import com.websarva.wings.android.zuboradiary.ui.model.parameters.DiaryUpdateParameters
 import com.websarva.wings.android.zuboradiary.ui.model.parameters.NavigatePreviousParametersForDiaryEdit
 import com.websarva.wings.android.zuboradiary.ui.model.parameters.WeatherInfoFetchParameters
@@ -129,15 +129,15 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditEvent>
 
     override fun initializeFragmentResultReceiver() {
         setUpDiaryItemTitleEditFragmentResultReceiver()
-        setUpDiaryLoadingDialogResultReceiver()
-        setUpDiaryLoadingFailureDialogResultReceiver()
+        setUpDiaryLoadDialogResultReceiver()
+        setUpDiaryLoadFailureDialogResultReceiver()
         setUpDiaryUpdateDialogResultReceiver()
         setUpDiaryDeleteDialogResultReceiver()
         setUpDatePickerDialogResultReceiver()
         setUpWeatherInfoFetchDialogResultReceiver()
         setUpDiaryItemDeleteDialogResultReceiver()
         setUpDiaryImageDeleteDialogResultReceiver()
-        setUpExitWithoutDiarySavingDialogResultReceiver()
+        setUpExitWithoutDiarySaveDialogResultReceiver()
     }
 
     // DiaryItemTitleEditFragmentから編集結果受取
@@ -150,20 +150,20 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditEvent>
     }
 
     // 既存日記読込ダイアログフラグメントから結果受取
-    private fun setUpDiaryLoadingDialogResultReceiver() {
+    private fun setUpDiaryLoadDialogResultReceiver() {
         setUpDialogResultReceiver(
-            DiaryLoadingDialogFragment.KEY_RESULT
+            DiaryLoadDialogFragment.KEY_RESULT
         ) { result ->
-            mainViewModel.onDiaryLoadingDialogResultReceived(result)
+            mainViewModel.onDiaryLoadDialogResultReceived(result)
         }
     }
 
     // 日記読込失敗確認ダイアログフラグメントから結果受取
-    private fun setUpDiaryLoadingFailureDialogResultReceiver() {
+    private fun setUpDiaryLoadFailureDialogResultReceiver() {
         setUpDialogResultReceiver(
-            DiaryLoadingFailureDialogFragment.KEY_RESULT
+            DiaryLoadFailureDialogFragment.KEY_RESULT
         ) { result ->
-            mainViewModel.onDiaryLoadingFailureDialogResultReceived(result)
+            mainViewModel.onDiaryLoadFailureDialogResultReceived(result)
         }
     }
 
@@ -220,11 +220,11 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditEvent>
         }
     }
 
-    private fun setUpExitWithoutDiarySavingDialogResultReceiver() {
+    private fun setUpExitWithoutDiarySaveDialogResultReceiver() {
         setUpDialogResultReceiver(
-            ExitWithoutDiarySavingDialogFragment.KEY_RESULT
+            ExitWithoutDiarySaveDialogFragment.KEY_RESULT
         ) { result ->
-            mainViewModel.onExitWithoutDiarySavingDialogResultReceived(result)
+            mainViewModel.onExitWithoutDiarySaveDialogResultReceived(result)
         }
     }
 
@@ -236,11 +236,11 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditEvent>
             is DiaryEditEvent.NavigateDiaryItemTitleEditFragment -> {
                 navigateDiaryItemTitleEditFragment(event.diaryItemTitle)
             }
-            is DiaryEditEvent.NavigateDiaryLoadingDialog -> {
-                navigateDiaryLoadingDialog(event.parameters)
+            is DiaryEditEvent.NavigateDiaryLoadDialog -> {
+                navigateDiaryLoadDialog(event.parameters)
             }
-            is DiaryEditEvent.NavigateDiaryLoadingFailureDialog -> {
-                navigateDiaryLoadingFailureDialog(event.date)
+            is DiaryEditEvent.NavigateDiaryLoadFailureDialog -> {
+                navigateDiaryLoadFailureDialog(event.date)
             }
             is DiaryEditEvent.NavigateDiaryUpdateDialog -> {
                 navigateDiaryUpdateDialog(event.parameters)
@@ -260,8 +260,8 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditEvent>
             DiaryEditEvent.NavigateDiaryImageDeleteDialog -> {
                 navigateDiaryImageDeleteDialog()
             }
-            is DiaryEditEvent.NavigateExitWithoutDiarySavingConfirmationDialog -> {
-                navigateExitWithoutDiarySavingConfirmationDialog(event.parameters)
+            is DiaryEditEvent.NavigateExitWithoutDiarySaveConfirmationDialog -> {
+                navigateExitWithoutDiarySaveConfirmationDialog(event.parameters)
             }
             is DiaryEditEvent.NavigatePreviousFragmentOnDiaryDelete -> {
                 navigatePreviousFragmentOnDiaryDelete(event.result)
@@ -794,15 +794,15 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditEvent>
         navigateFragmentOnce(NavigationCommand.To(directions))
     }
 
-    private fun navigateDiaryLoadingDialog(parameters: DiaryLoadingParameters) {
+    private fun navigateDiaryLoadDialog(parameters: DiaryLoadParameters) {
         val directions =
-            DiaryEditFragmentDirections.actionDiaryEditFragmentToDiaryLoadingDialog(parameters)
+            DiaryEditFragmentDirections.actionDiaryEditFragmentToDiaryLoadDialog(parameters)
         navigateFragmentOnce(NavigationCommand.To(directions))
     }
 
-    private fun navigateDiaryLoadingFailureDialog(date: LocalDate) {
+    private fun navigateDiaryLoadFailureDialog(date: LocalDate) {
         val directions =
-            DiaryEditFragmentDirections.actionDiaryEditFragmentToDiaryLoadingFailureDialog(date)
+            DiaryEditFragmentDirections.actionDiaryEditFragmentToDiaryLoadFailureDialog(date)
         navigateFragmentOnce(NavigationCommand.To(directions))
     }
 
@@ -849,12 +849,12 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditEvent>
         navigateFragmentWithRetry(NavigationCommand.To(directions))
     }
 
-    private fun navigateExitWithoutDiarySavingConfirmationDialog(
+    private fun navigateExitWithoutDiarySaveConfirmationDialog(
         parameters: NavigatePreviousParametersForDiaryEdit
     ) {
         val directions =
             DiaryEditFragmentDirections
-                .actionDiaryEditFragmentToExitWithoutDiarySavingConfirmationDialog(parameters)
+                .actionDiaryEditFragmentToExitWithoutDiarySaveConfirmationDialog(parameters)
         navigateFragmentOnce(NavigationCommand.To(directions))
     }
 

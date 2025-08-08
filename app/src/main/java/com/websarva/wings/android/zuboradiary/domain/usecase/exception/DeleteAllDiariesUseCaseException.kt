@@ -5,7 +5,7 @@ internal sealed class DeleteAllDiariesUseCaseException(
     cause: Throwable
 ) : UseCaseException(message, cause) {
 
-    class AllDiariesDeletionFailure(
+    class AllDiariesDeleteFailure(
         cause: Throwable
     ) : DeleteAllDiariesUseCaseException(
         "全日記の削除に失敗しました。",

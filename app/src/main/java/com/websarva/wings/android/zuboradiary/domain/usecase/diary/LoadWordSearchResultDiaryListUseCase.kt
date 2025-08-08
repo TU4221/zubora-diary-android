@@ -15,21 +15,21 @@ internal class LoadWordSearchResultDiaryListUseCase(
     private val logTag = createLogTag()
 
     suspend operator fun invoke(
-        numLoadingItems: Int,
-        loadingOffset: Int,
+        numLoadItems: Int,
+        loadOffset: Int,
         searchWord: String
     ): DefaultUseCaseResult<List<WordSearchResultListItem>> {
         val logMsg = "日記リスト読込_"
         Log.i(logTag, "${logMsg}開始")
-        require(numLoadingItems >= 1)
-        require(loadingOffset >= 0)
+        require(numLoadItems >= 1)
+        require(loadOffset >= 0)
         require(searchWord.isNotEmpty())
 
         try {
             val wordSearchResultList =
                 diaryRepository.loadWordSearchResultDiaryList(
-                    numLoadingItems,
-                    loadingOffset,
+                    numLoadItems,
+                    loadOffset,
                     searchWord
                 )
             Log.i(logTag, "${logMsg}完了")

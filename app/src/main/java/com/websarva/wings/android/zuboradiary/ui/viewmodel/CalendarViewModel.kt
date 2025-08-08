@@ -180,7 +180,7 @@ internal class CalendarViewModel @Inject constructor(
                 Log.e(logTag, "${logMsg}_失敗", result.exception)
                 updateUiState(CalendarState.LoadError)
                 emitAppMessageEvent(
-                    CalendarAppMessage.DiaryLoadingFailure
+                    CalendarAppMessage.DiaryLoadFailure
                 )
             }
         }
@@ -197,7 +197,7 @@ internal class CalendarViewModel @Inject constructor(
         when (val result = doesDiaryExistUseCase(date)) {
             is UseCaseResult.Success -> return result.value
             is UseCaseResult.Failure -> {
-                emitAppMessageEvent(CalendarAppMessage.DiaryInfoLoadingFailure)
+                emitAppMessageEvent(CalendarAppMessage.DiaryInfoLoadFailure)
                 return false
             }
         }

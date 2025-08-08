@@ -1,39 +1,43 @@
 package com.websarva.wings.android.zuboradiary.ui.fragment.dialog
 
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.websarva.wings.android.zuboradiary.R
 import com.websarva.wings.android.zuboradiary.ui.fragment.RESULT_KEY_PREFIX
 import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
 import com.websarva.wings.android.zuboradiary.ui.utils.toJapaneseDateString
 
-class DiaryLoadingDialogFragment : BaseAlertDialogFragment() {
+class DiaryLoadFailureDialogFragment : BaseAlertDialogFragment() {
 
     companion object {
         @JvmField
-        val KEY_RESULT = RESULT_KEY_PREFIX + DiaryLoadingDialogFragment::class.java.name
+        val KEY_RESULT = RESULT_KEY_PREFIX + DiaryLoadFailureDialogFragment::class.java.name
     }
 
     override fun createTitle(): String {
-        return getString(R.string.dialog_diary_loading_title)
+        return getString(R.string.dialog_diary_load_failure_title)
     }
 
     override fun createMessage(): String {
         val diaryDate =
-            DiaryLoadingDialogFragmentArgs.fromBundle(requireArguments()).parameters.date
+            DiaryLoadFailureDialogFragmentArgs.fromBundle(requireArguments()).date
         val diaryDateString = diaryDate.toJapaneseDateString(requireContext())
-        return diaryDateString + getString(R.string.dialog_diary_loading_message)
+        return diaryDateString + getString(R.string.dialog_diary_load_failure_message)
     }
 
     override fun handleOnPositiveButtonClick() {
-        val parameters =
-            DiaryLoadingDialogFragmentArgs.fromBundle(requireArguments()).parameters
-        setResult(KEY_RESULT, DialogResult.Positive(parameters))
+        setResult(KEY_RESULT, DialogResult.Positive(Unit))
     }
 
     override fun handleOnNegativeButtonClick() {
-        setResult(KEY_RESULT, DialogResult.Negative)
+        // 処理なし(customizeDialog()でNegativeButton削除)
     }
 
     override fun handleOnCancel() {
         setResult(KEY_RESULT, DialogResult.Cancel)
+    }
+
+    override fun customizeDialog(builder: MaterialAlertDialogBuilder) {
+        super.customizeDialog(builder)
+        builder.setNegativeButton("", null)
     }
 }

@@ -124,7 +124,7 @@ internal class DiaryShowViewModel @Inject constructor(
     }
 
     // Fragmentからの結果受取処理
-    fun onDiaryLoadingFailureDialogResultReceived(result: DialogResult<Unit>) {when (result) {
+    fun onDiaryLoadFailureDialogResultReceived(result: DialogResult<Unit>) {when (result) {
             is DialogResult.Positive<Unit>,
             DialogResult.Negative,
             DialogResult.Cancel -> {
@@ -172,7 +172,7 @@ internal class DiaryShowViewModel @Inject constructor(
                 Log.e(logTag, "${logMsg}_失敗", result.exception)
                 updateUiState(DiaryShowState.LoadError)
                 emitUiEvent(
-                    DiaryShowEvent.NavigateDiaryLoadingFailureDialog(date)
+                    DiaryShowEvent.NavigateDiaryLoadFailureDialog(date)
                 )
             }
         }

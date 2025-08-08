@@ -5,7 +5,7 @@ import com.websarva.wings.android.zuboradiary.domain.model.Diary
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 
-internal class ShouldRequestExitWithoutDiarySavingConfirmationUseCase {
+internal class ShouldRequestExitWithoutDiarySaveConfirmationUseCase {
 
     private val logTag = createLogTag()
 

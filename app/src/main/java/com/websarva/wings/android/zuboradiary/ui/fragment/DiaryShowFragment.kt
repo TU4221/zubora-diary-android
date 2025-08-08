@@ -18,7 +18,7 @@ import com.websarva.wings.android.zuboradiary.ui.fragment.common.DiaryItemsVisib
 import com.websarva.wings.android.zuboradiary.ui.fragment.common.DiaryLogTextUpdater
 import com.websarva.wings.android.zuboradiary.ui.fragment.common.DiaryWeatherTextUpdater
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.DiaryDeleteDialogFragment
-import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.DiaryLoadingFailureDialogFragment
+import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.DiaryLoadFailureDialogFragment
 import com.websarva.wings.android.zuboradiary.ui.model.event.CommonUiEvent
 import com.websarva.wings.android.zuboradiary.ui.model.event.DiaryShowEvent
 import com.websarva.wings.android.zuboradiary.ui.model.navigation.NavigationCommand
@@ -71,16 +71,16 @@ class DiaryShowFragment : BaseFragment<FragmentDiaryShowBinding, DiaryShowEvent>
     }
 
     override fun initializeFragmentResultReceiver() {
-        setUpDiaryLoadingFailureDialogResultReceiver()
+        setUpDiaryLoadFailureDialogResultReceiver()
         setUpDiaryDeleteDialogResultReceiver()
     }
 
     // 日記読込失敗確認ダイアログフラグメントからデータ受取
-    private fun setUpDiaryLoadingFailureDialogResultReceiver() {
+    private fun setUpDiaryLoadFailureDialogResultReceiver() {
         setUpDialogResultReceiver(
-            DiaryLoadingFailureDialogFragment.KEY_RESULT
+            DiaryLoadFailureDialogFragment.KEY_RESULT
         ) { result ->
-            mainViewModel.onDiaryLoadingFailureDialogResultReceived(result)
+            mainViewModel.onDiaryLoadFailureDialogResultReceived(result)
         }
     }
 
@@ -98,8 +98,8 @@ class DiaryShowFragment : BaseFragment<FragmentDiaryShowBinding, DiaryShowEvent>
             is DiaryShowEvent.NavigateDiaryEditFragment -> {
                 navigateDiaryEditFragment(event.date)
             }
-            is DiaryShowEvent.NavigateDiaryLoadingFailureDialog -> {
-                navigateDiaryLoadingFailureDialog(event.date)
+            is DiaryShowEvent.NavigateDiaryLoadFailureDialog -> {
+                navigateDiaryLoadFailureDialog(event.date)
             }
             is DiaryShowEvent.NavigateDiaryDeleteDialog -> {
                 navigateDiaryDeleteDialog(event.parameters)
@@ -257,9 +257,9 @@ class DiaryShowFragment : BaseFragment<FragmentDiaryShowBinding, DiaryShowEvent>
         navigateFragmentOnce(NavigationCommand.To(directions))
     }
 
-    private fun navigateDiaryLoadingFailureDialog(date: LocalDate) {
+    private fun navigateDiaryLoadFailureDialog(date: LocalDate) {
         val directions =
-            DiaryShowFragmentDirections.actionDiaryShowFragmentToDiaryLoadingFailureDialog(date)
+            DiaryShowFragmentDirections.actionDiaryShowFragmentToDiaryLoadFailureDialog(date)
         navigateFragmentOnce(NavigationCommand.To(directions))
     }
 

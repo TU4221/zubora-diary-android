@@ -9,17 +9,17 @@ import com.websarva.wings.android.zuboradiary.domain.model.Diary
 import com.websarva.wings.android.zuboradiary.domain.model.DiaryItemTitleSelectionHistoryItem
 import com.websarva.wings.android.zuboradiary.domain.model.DiaryListItem
 import com.websarva.wings.android.zuboradiary.domain.model.WordSearchResultListItem
-import com.websarva.wings.android.zuboradiary.domain.exception.diary.AllDiariesDeletionFailureException
+import com.websarva.wings.android.zuboradiary.domain.exception.diary.AllDiariesDeleteFailureException
 import com.websarva.wings.android.zuboradiary.domain.exception.diary.DiaryCountFailureException
-import com.websarva.wings.android.zuboradiary.domain.exception.diary.DiaryDeletionFailureException
+import com.websarva.wings.android.zuboradiary.domain.exception.diary.DiaryDeleteFailureException
 import com.websarva.wings.android.zuboradiary.domain.exception.diary.DiaryExistenceCheckFailureException
 import com.websarva.wings.android.zuboradiary.domain.exception.diary.DiaryListLoadFailureException
 import com.websarva.wings.android.zuboradiary.domain.exception.diary.DiaryLoadFailureException
 import com.websarva.wings.android.zuboradiary.domain.exception.diary.DiaryImageUriUsageCheckFailureException
 import com.websarva.wings.android.zuboradiary.domain.exception.diary.DiarySaveFailureException
 import com.websarva.wings.android.zuboradiary.domain.exception.diary.WordSearchResultCountFailureException
-import com.websarva.wings.android.zuboradiary.domain.exception.diary.AllDataDeletionFailureException
-import com.websarva.wings.android.zuboradiary.domain.exception.diary.DiaryItemTitleSelectionHistoryItemDeletionFailureException
+import com.websarva.wings.android.zuboradiary.domain.exception.diary.AllDataDeleteFailureException
+import com.websarva.wings.android.zuboradiary.domain.exception.diary.DiaryItemTitleSelectionHistoryItemDeleteFailureException
 import com.websarva.wings.android.zuboradiary.domain.exception.diary.DiaryItemTitleSelectionHistoryLoadFailureException
 import com.websarva.wings.android.zuboradiary.domain.exception.diary.WordSearchResultListLoadFailureException
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
@@ -204,35 +204,35 @@ internal class DiaryRepository (
         }
     }
 
-    @Throws(DiaryDeletionFailureException::class)
+    @Throws(DiaryDeleteFailureException::class)
     suspend fun deleteDiary(date: LocalDate) {
         withContext(Dispatchers.IO) {
             try {
                 diaryDataSource.deleteDiary(date)
             } catch (e: DataBaseAccessFailureException) {
-                throw DiaryDeletionFailureException(date, e)
+                throw DiaryDeleteFailureException(date, e)
             }
         }
     }
 
-    @Throws(AllDiariesDeletionFailureException::class)
+    @Throws(AllDiariesDeleteFailureException::class)
     suspend fun deleteAllDiaries() {
         withContext(Dispatchers.IO) {
             try {
                 diaryDataSource.deleteAllDiaries()
             } catch (e: DataBaseAccessFailureException) {
-                throw AllDiariesDeletionFailureException(e)
+                throw AllDiariesDeleteFailureException(e)
             }
         }
     }
 
-    @Throws(AllDataDeletionFailureException::class)
+    @Throws(AllDataDeleteFailureException::class)
     suspend fun deleteAllData() {
         withContext(Dispatchers.IO) {
             try {
                 diaryDataSource.deleteAllData()
             } catch (e: DataBaseAccessFailureException) {
-                throw AllDataDeletionFailureException(e)
+                throw AllDataDeleteFailureException(e)
             }
         }
     }
@@ -256,13 +256,13 @@ internal class DiaryRepository (
             }
     }
 
-    @Throws(DiaryItemTitleSelectionHistoryItemDeletionFailureException::class)
+    @Throws(DiaryItemTitleSelectionHistoryItemDeleteFailureException::class)
     suspend fun deleteDiaryItemTitleSelectionHistoryItem(title: String) {
         withContext(Dispatchers.IO) {
             try {
                 diaryDataSource.deleteHistoryItem(title)
             } catch (e: DataBaseAccessFailureException) {
-                throw DiaryItemTitleSelectionHistoryItemDeletionFailureException(title, e)
+                throw DiaryItemTitleSelectionHistoryItemDeleteFailureException(title, e)
             }
         }
     }

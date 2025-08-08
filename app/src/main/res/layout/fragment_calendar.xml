@@ -99,7 +99,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
                             android:textAppearance="@style/AppTextViewTextAppearance"
-                            android:text="@{viewModel.uiState instanceof CalendarState.LoadError ? @string/fragment_calendar_diary_Loading_failure_message : @string/fragment_calendar_no_diary_message}"
+                            android:text="@{viewModel.uiState instanceof CalendarState.LoadError ? @string/fragment_calendar_diary_load_failure_message : @string/fragment_calendar_no_diary_message}"
                             android:gravity="center_horizontal|top"
                             android:paddingTop="16dp"
                             android:visibility="@{viewModel.uiState instanceof CalendarState.NoDiary || viewModel.uiState instanceof CalendarState.LoadError ? View.VISIBLE : View.GONE}" />

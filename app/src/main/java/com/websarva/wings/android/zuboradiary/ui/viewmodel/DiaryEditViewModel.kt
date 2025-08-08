@@ -19,7 +19,7 @@ import com.websarva.wings.android.zuboradiary.domain.usecase.diary.FetchWeatherI
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.SaveDiaryUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.ShouldFetchWeatherInfoUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.ShouldRequestDiaryLoadConfirmationUseCase
-import com.websarva.wings.android.zuboradiary.domain.usecase.diary.ShouldRequestExitWithoutDiarySavingConfirmationUseCase
+import com.websarva.wings.android.zuboradiary.domain.usecase.diary.ShouldRequestExitWithoutDiarySaveConfirmationUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.ShouldRequestWeatherInfoConfirmationUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.settings.IsWeatherInfoFetchEnabledUseCase
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
@@ -29,7 +29,7 @@ import com.websarva.wings.android.zuboradiary.ui.model.event.DiaryEditEvent
 import com.websarva.wings.android.zuboradiary.ui.model.adapter.ConditionAdapterList
 import com.websarva.wings.android.zuboradiary.ui.model.parameters.DiaryDeleteParameters
 import com.websarva.wings.android.zuboradiary.ui.model.parameters.DiaryItemDeleteParameters
-import com.websarva.wings.android.zuboradiary.ui.model.parameters.DiaryLoadingParameters
+import com.websarva.wings.android.zuboradiary.ui.model.parameters.DiaryLoadParameters
 import com.websarva.wings.android.zuboradiary.ui.model.parameters.DiaryUpdateParameters
 import com.websarva.wings.android.zuboradiary.ui.model.parameters.NavigatePreviousParametersForDiaryEdit
 import com.websarva.wings.android.zuboradiary.ui.model.parameters.WeatherInfoFetchParameters
@@ -57,7 +57,7 @@ import kotlin.random.Random
 @HiltViewModel
 internal class DiaryEditViewModel @Inject constructor(
     private val handle: SavedStateHandle,
-    private val shouldRequestExitWithoutDiarySavingConfirmationUseCase: ShouldRequestExitWithoutDiarySavingConfirmationUseCase,
+    private val shouldRequestExitWithoutDiarySaveConfirmationUseCase: ShouldRequestExitWithoutDiarySaveConfirmationUseCase,
     private val shouldRequestDiaryLoadConfirmationUseCase: ShouldRequestDiaryLoadConfirmationUseCase,
     private val shouldRequestDiaryUpdateConfirmationUseCase: ShouldRequestDiaryUpdateConfirmationUseCase,
     private val shouldRequestWeatherInfoConfirmationUseCase: ShouldRequestWeatherInfoConfirmationUseCase,
@@ -308,7 +308,7 @@ internal class DiaryEditViewModel @Inject constructor(
 
     init {
         initializeDiaryData(handle)
-        setUpStateSavingObservers()
+        setUpStateSaveObservers()
     }
 
     private fun initializeDiaryData(handle: SavedStateHandle) {
@@ -324,7 +324,7 @@ internal class DiaryEditViewModel @Inject constructor(
         }
     }
 
-    private fun setUpStateSavingObservers() {
+    private fun setUpStateSaveObservers() {
         _isNewDiary.onEach {
             handle[SAVED_IS_NEW_DIARY_KEY] = it
         }.launchIn(viewModelScope)
@@ -493,26 +493,26 @@ internal class DiaryEditViewModel @Inject constructor(
     }
 
     // Fragmentからの結果受取処理
-    fun onDiaryLoadingDialogResultReceived(result: DialogResult<DiaryLoadingParameters>) {
+    fun onDiaryLoadDialogResultReceived(result: DialogResult<DiaryLoadParameters>) {
         when (result) {
-            is DialogResult.Positive<DiaryLoadingParameters> -> {
-                handleDiaryLoadingDialogPositiveResult(result.data)
+            is DialogResult.Positive<DiaryLoadParameters> -> {
+                handleDiaryLoadDialogPositiveResult(result.data)
             }
             is DialogResult.Negative,
             is DialogResult.Cancel -> {
-                handleDiaryLoadingDialogNegativeResult()
+                handleDiaryLoadDialogNegativeResult()
             }
         }
     }
 
-    private fun handleDiaryLoadingDialogPositiveResult(parameters: DiaryLoadingParameters) {
+    private fun handleDiaryLoadDialogPositiveResult(parameters: DiaryLoadParameters) {
         val date = parameters.date
         viewModelScope.launch {
             loadDiary(date)
         }
     }
 
-    private fun handleDiaryLoadingDialogNegativeResult() {
+    private fun handleDiaryLoadDialogNegativeResult() {
         val date = date.requireValue()
         val previousDate = previousDate
 
@@ -589,7 +589,7 @@ internal class DiaryEditViewModel @Inject constructor(
         }
     }
 
-    fun onDiaryLoadingFailureDialogResultReceived(result: DialogResult<Unit>) {
+    fun onDiaryLoadFailureDialogResultReceived(result: DialogResult<Unit>) {
         when (result) {
             is DialogResult.Positive<Unit>,
             DialogResult.Negative,
@@ -658,7 +658,7 @@ internal class DiaryEditViewModel @Inject constructor(
         deleteImageUri()
     }
 
-    fun onExitWithoutDiarySavingDialogResultReceived(
+    fun onExitWithoutDiarySaveDialogResultReceived(
         result: DialogResult<NavigatePreviousParametersForDiaryEdit>
     ) {
         when (result) {
@@ -748,7 +748,7 @@ internal class DiaryEditViewModel @Inject constructor(
         val previousDate = previousDate
         val originalDate = _originalDiary.requireValue().date
         val isNewDiary = isNewDiary.value
-        requestDiaryLoadingConfirmationAndFetchWeatherIfNeeded(
+        requestDiaryLoadConfirmationAndFetchWeatherIfNeeded(
             date,
             previousDate,
             originalDate,
@@ -775,7 +775,7 @@ internal class DiaryEditViewModel @Inject constructor(
                 if (previousState == DiaryEditState.Idle) {
                     updateUiState(DiaryEditState.LoadError)
                     emitUiEvent(
-                        DiaryEditEvent.NavigateDiaryLoadingFailureDialog(date)
+                        DiaryEditEvent.NavigateDiaryLoadFailureDialog(date)
                     )
                 } else {
                     updateUiState(DiaryEditState.Editing)
@@ -814,7 +814,7 @@ internal class DiaryEditViewModel @Inject constructor(
             is UseCaseResult.Failure -> {
                 Log.e(logTag, "${logMsg}失敗")
                 updateUiState(DiaryEditState.Editing)
-                emitAppMessageEvent(DiaryEditAppMessage.DiarySavingFailure)
+                emitAppMessageEvent(DiaryEditAppMessage.DiarySaveFailure)
             }
         }
     }
@@ -847,18 +847,18 @@ internal class DiaryEditViewModel @Inject constructor(
         }
     }
 
-    private suspend fun requestDiaryLoadingConfirmationAndFetchWeatherIfNeeded(
+    private suspend fun requestDiaryLoadConfirmationAndFetchWeatherIfNeeded(
         date: LocalDate,
         previousDate: LocalDate?,
         originalDate: LocalDate,
         isNewDiary: Boolean
     ) {
-        requestDiaryLoadingConfirmation(date, previousDate, originalDate, isNewDiary) {
+        requestDiaryLoadConfirmation(date, previousDate, originalDate, isNewDiary) {
             processWeatherInfoFetch(date, previousDate)
         }
     }
 
-    private suspend fun requestDiaryLoadingConfirmation(
+    private suspend fun requestDiaryLoadConfirmation(
         date: LocalDate,
         previousDate: LocalDate?,
         originalDate: LocalDate,
@@ -872,9 +872,9 @@ internal class DiaryEditViewModel @Inject constructor(
             is UseCaseResult.Success -> {
                 updateUiState(DiaryEditState.Editing)
                 if (result.value) {
-                    val parameters = DiaryLoadingParameters(date)
+                    val parameters = DiaryLoadParameters(date)
                     emitUiEvent(
-                        DiaryEditEvent.NavigateDiaryLoadingDialog(
+                        DiaryEditEvent.NavigateDiaryLoadDialog(
                             parameters
                         )
                     )
@@ -884,7 +884,7 @@ internal class DiaryEditViewModel @Inject constructor(
             }
             is UseCaseResult.Failure -> {
                 updateUiState(DiaryEditState.Editing)
-                emitAppMessageEvent(DiaryEditAppMessage.DiaryInfoLoadingFailure)
+                emitAppMessageEvent(DiaryEditAppMessage.DiaryInfoLoadFailure)
             }
         }
     }
@@ -919,7 +919,7 @@ internal class DiaryEditViewModel @Inject constructor(
             is UseCaseResult.Failure -> {
                 updateUiState(DiaryEditState.Editing)
                 emitAppMessageEvent(
-                    DiaryEditAppMessage.DiarySavingFailure
+                    DiaryEditAppMessage.DiarySaveFailure
                 )
             }
         }
@@ -1017,7 +1017,7 @@ internal class DiaryEditViewModel @Inject constructor(
         val previousDate = previousDate
         // MEMO:下記処理をdate(StateFlow)変数のCollectorから呼び出すと、
         //      画面回転時にも不要に呼び出してしまう為、下記にて処理。
-        requestDiaryLoadingConfirmationAndFetchWeatherIfNeeded(
+        requestDiaryLoadConfirmationAndFetchWeatherIfNeeded(
             date,
             previousDate,
             originalDate,
@@ -1083,12 +1083,12 @@ internal class DiaryEditViewModel @Inject constructor(
         originalDiary: Diary
     ) {
         val shouldRequest =
-            shouldRequestExitWithoutDiarySavingConfirmationUseCase(diary, originalDiary).value
+            shouldRequestExitWithoutDiarySaveConfirmationUseCase(diary, originalDiary).value
         if (shouldRequest) {
             val parameters = NavigatePreviousParametersForDiaryEdit(originalDiary)
             emitUiEvent(
                 DiaryEditEvent
-                    .NavigateExitWithoutDiarySavingConfirmationDialog(parameters)
+                    .NavigateExitWithoutDiarySaveConfirmationDialog(parameters)
             )
         } else {
             navigatePreviousFragment(originalDiary)
@@ -1202,20 +1202,20 @@ internal class DiaryEditViewModel @Inject constructor(
             val startDate = date.value
             if (startDate != null) {
                 for (i in 0 until 10) {
-                    val savingDate = startDate.minusDays(i.toLong())
+                    val saveDate = startDate.minusDays(i.toLong())
 
-                    when (val result = doesDiaryExistUseCase(savingDate)) {
+                    when (val result = doesDiaryExistUseCase(saveDate)) {
                         is UseCaseResult.Success -> {
                             if (result.value) continue
                         }
                         is UseCaseResult.Failure -> {
-                            emitAppMessageEvent(DiaryEditAppMessage.DiaryInfoLoadingFailure)
+                            emitAppMessageEvent(DiaryEditAppMessage.DiaryInfoLoadFailure)
                             isTesting = false
                             return@launch
                         }
                     }
                     diaryStateFlow.initialize()
-                    updateDate(savingDate)
+                    updateDate(saveDate)
                     val weather1Int = Random.nextInt(1, Weather.entries.size)
                     updateWeather1(Weather.of(weather1Int))
                     val weather2Int = Random.nextInt(1, Weather.entries.size)

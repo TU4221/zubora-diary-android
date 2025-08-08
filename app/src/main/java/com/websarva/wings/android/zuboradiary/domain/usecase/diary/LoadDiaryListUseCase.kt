@@ -16,20 +16,20 @@ internal class LoadDiaryListUseCase(
     private val logTag = createLogTag()
 
     suspend operator fun invoke(
-        numLoadingItems: Int,
-        loadingOffset: Int,
+        numLoadItems: Int,
+        loadOffset: Int,
         startDate: LocalDate?
     ): DefaultUseCaseResult<List<DiaryListItem>> {
         val logMsg = "日記リスト読込_"
         Log.i(logTag, "${logMsg}開始")
 
-        require(loadingOffset >= 0)
+        require(loadOffset >= 0)
 
         try {
             val loadedDiaryList =
                 diaryRepository.loadDiaryList(
-                    numLoadingItems,
-                    loadingOffset,
+                    numLoadItems,
+                    loadOffset,
                     startDate
                 )
             Log.i(logTag, "${logMsg}完了")

@@ -256,8 +256,8 @@
             </action>
 
             <action
-                android:id="@+id/action_diary_show_fragment_to_diary_loading_failure_dialog"
-                app:destination="@id/navigation_diary_loading_failure_dialog_for_diary_show_fragment"/>
+                android:id="@+id/action_diary_show_fragment_to_diary_load_failure_dialog"
+                app:destination="@id/navigation_diary_load_failure_dialog_for_diary_show_fragment"/>
 
             <action
                 android:id="@+id/action_diary_show_fragment_to_diary_delete_dialog"
@@ -274,8 +274,8 @@
         </fragment>
 
         <dialog
-            android:id="@+id/navigation_diary_loading_failure_dialog_for_diary_show_fragment"
-            android:name="com.websarva.wings.android.zuboradiary.ui.fragment.dialog.DiaryLoadingFailureDialogFragment">
+            android:id="@+id/navigation_diary_load_failure_dialog_for_diary_show_fragment"
+            android:name="com.websarva.wings.android.zuboradiary.ui.fragment.dialog.DiaryLoadFailureDialogFragment">
             <argument
                 android:name="date"
                 app:argType="java.time.LocalDate" />
@@ -332,12 +332,12 @@
             </action>
 
             <action
-                android:id="@+id/action_diary_edit_fragment_to_diary_loading_dialog"
-                app:destination="@id/navigation_diary_loading_dialog"/>
+                android:id="@+id/action_diary_edit_fragment_to_diary_load_dialog"
+                app:destination="@id/navigation_diary_load_dialog"/>
 
             <action
-                android:id="@+id/action_diary_edit_fragment_to_diary_loading_failure_dialog"
-                app:destination="@id/navigation_diary_loading_failure_dialog_for_diary_edit_fragment"/>
+                android:id="@+id/action_diary_edit_fragment_to_diary_load_failure_dialog"
+                app:destination="@id/navigation_diary_load_failure_dialog_for_diary_edit_fragment"/>
 
             <action
                 android:id="@+id/action_diary_edit_fragment_to_diary_update_dialog"
@@ -364,8 +364,8 @@
                 app:destination="@id/navigation_diary_image_delete_dialog"/>
 
             <action
-                android:id="@+id/action_diary_edit_fragment_to_exit_without_diary_saving_confirmation_dialog"
-                app:destination="@id/navigation_exit_without_diary_saving_dialog"/>
+                android:id="@+id/action_diary_edit_fragment_to_exit_without_diary_save_confirmation_dialog"
+                app:destination="@id/navigation_exit_without_diary_save_dialog"/>
 
             <action
                 android:id="@+id/action_diary_edit_fragment_to_app_message_dialog"
@@ -378,16 +378,16 @@
         </fragment>
 
         <dialog
-            android:id="@+id/navigation_diary_loading_dialog"
-            android:name="com.websarva.wings.android.zuboradiary.ui.fragment.dialog.DiaryLoadingDialogFragment">
+            android:id="@+id/navigation_diary_load_dialog"
+            android:name="com.websarva.wings.android.zuboradiary.ui.fragment.dialog.DiaryLoadDialogFragment">
             <argument
                 android:name="parameters"
-                app:argType="com.websarva.wings.android.zuboradiary.ui.model.parameters.DiaryLoadingParameters" />
+                app:argType="com.websarva.wings.android.zuboradiary.ui.model.parameters.DiaryLoadParameters" />
         </dialog>
 
         <dialog
-            android:id="@+id/navigation_diary_loading_failure_dialog_for_diary_edit_fragment"
-            android:name="com.websarva.wings.android.zuboradiary.ui.fragment.dialog.DiaryLoadingFailureDialogFragment">
+            android:id="@+id/navigation_diary_load_failure_dialog_for_diary_edit_fragment"
+            android:name="com.websarva.wings.android.zuboradiary.ui.fragment.dialog.DiaryLoadFailureDialogFragment">
             <argument
                 android:name="date"
                 app:argType="java.time.LocalDate" />
@@ -439,8 +439,8 @@
         </dialog>
 
         <dialog
-            android:id="@+id/navigation_exit_without_diary_saving_dialog"
-            android:name="com.websarva.wings.android.zuboradiary.ui.fragment.dialog.ExitWithoutDiarySavingDialogFragment">
+            android:id="@+id/navigation_exit_without_diary_save_dialog"
+            android:name="com.websarva.wings.android.zuboradiary.ui.fragment.dialog.ExitWithoutDiarySaveDialogFragment">
             <argument
                 android:name="parameters"
                 app:argType="com.websarva.wings.android.zuboradiary.ui.model.parameters.NavigatePreviousParametersForDiaryEdit" />

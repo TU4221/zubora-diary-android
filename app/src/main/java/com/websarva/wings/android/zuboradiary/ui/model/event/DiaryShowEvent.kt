@@ -6,7 +6,7 @@ import java.time.LocalDate
 
 sealed class DiaryShowEvent : UiEvent {
     internal data class NavigateDiaryEditFragment(val date: LocalDate) : DiaryShowEvent()
-    internal data class NavigateDiaryLoadingFailureDialog(val date: LocalDate) : DiaryShowEvent()
+    internal data class NavigateDiaryLoadFailureDialog(val date: LocalDate) : DiaryShowEvent()
     internal data class NavigateDiaryDeleteDialog(val parameters: DiaryDeleteParameters) : DiaryShowEvent()
     internal data class NavigatePreviousFragmentOnDiaryDeleted(
         val result: FragmentResult.Some<LocalDate>

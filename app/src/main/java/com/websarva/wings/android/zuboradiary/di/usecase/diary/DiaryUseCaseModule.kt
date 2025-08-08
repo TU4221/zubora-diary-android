@@ -21,7 +21,7 @@ import com.websarva.wings.android.zuboradiary.domain.usecase.diary.LoadWordSearc
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.SaveDiaryUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.ShouldFetchWeatherInfoUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.ShouldRequestDiaryLoadConfirmationUseCase
-import com.websarva.wings.android.zuboradiary.domain.usecase.diary.ShouldRequestExitWithoutDiarySavingConfirmationUseCase
+import com.websarva.wings.android.zuboradiary.domain.usecase.diary.ShouldRequestExitWithoutDiarySaveConfirmationUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.ShouldRequestWeatherInfoConfirmationUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.uri.ReleasePersistableUriPermissionUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.uri.TakePersistableUriPermissionUseCase
@@ -132,8 +132,8 @@ internal object DiaryUseCaseModule {
 
     @Singleton
     @Provides
-    fun provideShouldRequestExitWithoutDiarySavingConfirmationUseCase() =
-        ShouldRequestExitWithoutDiarySavingConfirmationUseCase()
+    fun provideShouldRequestExitWithoutDiarySaveConfirmationUseCase() =
+        ShouldRequestExitWithoutDiarySaveConfirmationUseCase()
 
     @Singleton
     @Provides

@@ -11,9 +11,9 @@
     <string name="dialog_diary_delete_title">警告</string>
     <string name="dialog_diary_delete_message">の日記を削除してもよろしいでしょうか。</string>
 
-    <!-- DiaryLoadingFailureDialog -->
-    <string name="dialog_diary_loading_failure_title">警告</string>
-    <string name="dialog_diary_loading_failure_message">の日記の読込に失敗しました。</string>
+    <!-- DiaryLoadFailureDialog -->
+    <string name="dialog_diary_load_failure_title">警告</string>
+    <string name="dialog_diary_load_failure_message">の日記の読込に失敗しました。</string>
 
     <!--*****************************************************************************************-->
 
@@ -65,7 +65,7 @@
     <string name="fragment_calendar_month_header_format">yyyy年MM月</string>
     <string name="fragment_calendar_month_header_tools_value">0000年00月00日</string>
     <string name="fragment_calendar_no_diary_message">日記がありません。</string>
-    <string name="fragment_calendar_diary_Loading_failure_message">日記の読込に失敗しました。</string>
+    <string name="fragment_calendar_diary_load_failure_message">日記の読込に失敗しました。</string>
     <string name="fragment_calendar_fab_content_description">日記編集</string>
 
     <!--*****************************************************************************************-->
@@ -197,17 +197,17 @@
     <string name="layout_diary_edit_item_comment">コメント</string>
     <string name="layout_diary_edit_item_comment_hint">○○をした。</string>
 
-    <!-- DiaryLoadingDialog -->
-    <string name="dialog_diary_loading_title">確認</string>
-    <string name="dialog_diary_loading_message">の日記は既に保存されています。保存された日記を読み込みますか。</string>
+    <!-- DiaryLoadDialog -->
+    <string name="dialog_diary_load_title">確認</string>
+    <string name="dialog_diary_load_message">の日記は既に保存されています。保存された日記を読み込みますか。</string>
 
     <!-- DiaryUpdateDialog -->
     <string name="dialog_diary_update_title">警告</string>
     <string name="dialog_diary_update_message">の日記は既に保存されています。保存された日記を上書きしますか。</string>
 
-    <!-- ExitWithoutDiarySavingDialog -->
-    <string name="dialog_exit_without_diary_saving_title">警告</string>
-    <string name="dialog_exit_without_diary_saving_message">編集した内容は保存されません。このまま編集を終了してもよろしいですか。</string>
+    <!-- ExitWithoutDiarySaveDialog -->
+    <string name="dialog_exit_without_diary_save_title">警告</string>
+    <string name="dialog_exit_without_diary_save_message">編集した内容は保存されません。このまま編集を終了してもよろしいですか。</string>
 
     <!-- WeatherInfoFetchDialog -->
     <string name="dialog_weather_info_fetch_title">確認</string>
@@ -282,39 +282,39 @@
     <string name="dialog_app_message_title_permission_request">権限が必要です</string>
     <string name="dialog_app_message_title_hint">ヒント</string>
     <!-- AppMessageCommonMessage -->
-    <string name="dialog_app_message_diary_loading_failure">日記の読込に失敗しました。</string>
+    <string name="dialog_app_message_diary_load_failure">日記の読込に失敗しました。</string>
     <string name="dialog_app_message_diary_delete_failure">日記の削除に失敗しました。</string>
-    <string name="dialog_app_message_diary_info_loading_failure">日記情報の読込に失敗しました。</string>
-    <string name="dialog_app_message_setting_loading_failure">設定の読込に失敗しました。</string>
+    <string name="dialog_app_message_diary_info_load_failure">日記情報の読込に失敗しました。</string>
+    <string name="dialog_app_message_setting_load_failure">設定の読込に失敗しました。</string>
     <!-- DiaryListAppMessage -->
-    <string name="dialog_diary_list_app_message_diary_list_loading_failure">日記リストの読込に失敗しました。</string>
+    <string name="dialog_diary_list_app_message_diary_list_load_failure">日記リストの読込に失敗しました。</string>
     <string name="dialog_diary_list_app_message_diary_delete_failure">@string/dialog_app_message_diary_delete_failure</string>
-    <string name="dialog_diary_list_app_message_diary_info_loading_failure">@string/dialog_app_message_diary_info_loading_failure</string>
+    <string name="dialog_diary_list_app_message_diary_info_load_failure">@string/dialog_app_message_diary_info_load_failure</string>
     <!-- WordSearchAppMessage -->
-    <string name="dialog_word_search_app_message_search_result_list_loading_failure">検索結果リストの読込に失敗しました。</string>
+    <string name="dialog_word_search_app_message_search_result_list_load_failure">検索結果リストの読込に失敗しました。</string>
     <!-- CalendarAppMessage -->
-    <string name="dialog_calendar_app_message_diary_loading_failure">@string/dialog_app_message_diary_loading_failure</string>
-    <string name="dialog_calendar_app_message_diary_info_loading_failure">@string/dialog_app_message_diary_info_loading_failure</string>
+    <string name="dialog_calendar_app_message_diary_load_failure">@string/dialog_app_message_diary_load_failure</string>
+    <string name="dialog_calendar_app_message_diary_info_load_failure">@string/dialog_app_message_diary_info_load_failure</string>
     <!-- SettingsAppMessage -->
-    <string name="dialog_settings_app_message_setting_loading_failure">@string/dialog_app_message_setting_loading_failure</string>
+    <string name="dialog_settings_app_message_setting_load_failure">@string/dialog_app_message_setting_load_failure</string>
     <string name="dialog_settings_app_message_settings_not_loaded_retry_restart">設定の読み込みに失敗しています。アプリを再起動してください。</string>
     <string name="dialog_settings_app_message_setting_update_failure">設定の更新に失敗しました。</string>
     <string name="dialog_settings_app_message_all_diary_delete_failure">全ての日記の削除に失敗しました。</string>
     <string name="dialog_settings_app_message_all_settings_initialization_failure">全設定の初期化に失敗しました。</string>
     <string name="dialog_settings_app_message_all_data_delete_failure">全てのデータの削除に失敗しました。</string>
     <!-- DiaryShowAppMessage -->
-    <string name="dialog_diary_show_app_message_diary_loading_failure">@string/dialog_app_message_diary_loading_failure</string>
+    <string name="dialog_diary_show_app_message_diary_load_failure">@string/dialog_app_message_diary_load_failure</string>
     <string name="dialog_diary_show_app_message_diary_delete_failure">@string/dialog_app_message_diary_delete_failure</string>
     <!-- DiaryEditAppMessage -->
-    <string name="dialog_diary_edit_app_message_diary_loading_failure">@string/dialog_app_message_diary_loading_failure</string>
-    <string name="dialog_diary_edit_app_message_diary_saving_failure">日記の保存に失敗しました。</string>
+    <string name="dialog_diary_edit_app_message_diary_load_failure">@string/dialog_app_message_diary_load_failure</string>
+    <string name="dialog_diary_edit_app_message_diary_save_failure">日記の保存に失敗しました。</string>
     <string name="dialog_diary_edit_app_message_diary_delete_failure">@string/dialog_app_message_diary_delete_failure</string>
-    <string name="dialog_diary_edit_app_message_diary_info_loading_failure">@string/dialog_app_message_diary_info_loading_failure</string>
+    <string name="dialog_diary_edit_app_message_diary_info_load_failure">@string/dialog_app_message_diary_info_load_failure</string>
     <string name="dialog_diary_edit_app_message_weather_info_fetch_failure">天気情報の取得に失敗しました。</string>
     <string name="dialog_diary_edit_app_message_weather_info_date_out_of_range">選択された日付の天気情報は取得できませんでした。本日より過去92日間の天気が取得可能です。</string>
     <string name="dialog_diary_edit_app_message_access_location_permission_request">天気情報を取得するためには位置情報利用権限が必要です。設定画面で権限を有効にしてください。</string>
     <!-- DiaryItemTitleEditAppMessage -->
-    <string name="dialog_diary_item_title_edit_app_message_selection_history_loading_failure">選択履歴の読込に失敗しました。</string>
+    <string name="dialog_diary_item_title_edit_app_message_selection_history_load_failure">選択履歴の読込に失敗しました。</string>
     <string name="dialog_diary_item_title_edit_app_message_selection_history_item_delete_failure">選択履歴の削除に失敗しました。</string>
 
     <!--*****************************************************************************************-->

@@ -3,7 +3,7 @@ package com.websarva.wings.android.zuboradiary.domain.usecase.settings
 import android.util.Log
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.data.repository.DiaryRepository
-import com.websarva.wings.android.zuboradiary.domain.exception.diary.AllDataDeletionFailureException
+import com.websarva.wings.android.zuboradiary.domain.exception.diary.AllDataDeleteFailureException
 import com.websarva.wings.android.zuboradiary.domain.usecase.exception.DeleteAllDataUseCaseException
 import com.websarva.wings.android.zuboradiary.domain.usecase.uri.ReleaseAllPersistableUriPermissionUseCase
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
@@ -33,15 +33,15 @@ internal class DeleteAllDataUseCase(
         return UseCaseResult.Success(Unit)
     }
 
-    @Throws(DeleteAllDataUseCaseException.AllDataDeletionFailure::class)
+    @Throws(DeleteAllDataUseCaseException.AllDataDeleteFailure::class)
     private suspend fun deleteAllData() {
         val logMsg = "全データ削除_"
         Log.i(logTag, "${logMsg}開始")
 
         try {
             diaryRepository.deleteAllData()
-        } catch (e: AllDataDeletionFailureException) {
-            throw DeleteAllDataUseCaseException.AllDataDeletionFailure(e)
+        } catch (e: AllDataDeleteFailureException) {
+            throw DeleteAllDataUseCaseException.AllDataDeleteFailure(e)
         }
 
         Log.i(logTag, "${logMsg}完了")

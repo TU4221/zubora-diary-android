@@ -67,10 +67,10 @@ internal class WordSearchViewModel @Inject internal constructor(
 
     private var previousSearchWord = "" // 二重検索防止用
 
-    private val initialWordSearchResultListLoadingJob: Job? = null
-    private var wordSearchResultListLoadingJob: Job? = initialWordSearchResultListLoadingJob // キャンセル用
+    private val initialWordSearchResultListLoadJob: Job? = null
+    private var wordSearchResultListLoadJob: Job? = initialWordSearchResultListLoadJob // キャンセル用
 
-    private val numLoadingItems = DiaryListViewModel.NUM_LOADING_ITEMS
+    private val numLoadItems = DiaryListViewModel.NUM_LOAD_ITEMS
     private val initialWordSearchResultList = WordSearchResultYearMonthList()
     private val _wordSearchResultList = MutableStateFlow(initialWordSearchResultList)
     val wordSearchResultList
@@ -179,8 +179,8 @@ internal class WordSearchViewModel @Inject internal constructor(
 
         val currentResultList = _wordSearchResultList.value
         val searchWord = _searchWord.value
-        cancelPreviousLoading()
-        wordSearchResultListLoadingJob =
+        cancelPreviousLoadJob()
+        wordSearchResultListLoadJob =
             viewModelScope.launch {
                 loadAdditionWordSearchResultList(currentResultList, searchWord)
             }
@@ -199,8 +199,8 @@ internal class WordSearchViewModel @Inject internal constructor(
         val currentResultList = _wordSearchResultList.value
         val currentSearchWord = _searchWord.value
 
-        cancelPreviousLoading()
-        wordSearchResultListLoadingJob =
+        cancelPreviousLoadJob()
+        wordSearchResultListLoadJob =
             viewModelScope.launch {
                 updateWordSearchResultList(currentResultList, currentSearchWord)
             }
@@ -221,8 +221,8 @@ internal class WordSearchViewModel @Inject internal constructor(
         if (value == previousSearchWord) return
 
         val currentResultList = _wordSearchResultList.value
-        cancelPreviousLoading()
-        wordSearchResultListLoadingJob =
+        cancelPreviousLoadJob()
+        wordSearchResultListLoadJob =
             viewModelScope.launch {
                 if (value.isEmpty()) {
                     clearWordSearchResultList()
@@ -239,8 +239,8 @@ internal class WordSearchViewModel @Inject internal constructor(
         if (searchWord.isEmpty()) emitUiEvent(WordSearchEvent.ShowKeyboard)
     }
 
-    private fun cancelPreviousLoading() {
-        val job = wordSearchResultListLoadingJob ?: return
+    private fun cancelPreviousLoadJob() {
+        val job = wordSearchResultListLoadJob ?: return
         if (!job.isCompleted) job.cancel()
     }
 
@@ -255,7 +255,7 @@ internal class WordSearchViewModel @Inject internal constructor(
         ) { _, lambdaWordSearch ->
             showWordSearchResultListFirstItemProgressIndicator()
             val value =
-                loadWordSearchResultDiaryList(numLoadingItems, 0, lambdaWordSearch)
+                loadWordSearchResultDiaryList(numLoadItems, 0, lambdaWordSearch)
             toUiWordSearchResultList(value, lambdaWordSearch)
         }
     }
@@ -271,9 +271,9 @@ internal class WordSearchViewModel @Inject internal constructor(
         ) { lambdaCurrentList, lambdaWordSearch ->
             require(lambdaCurrentList.isNotEmpty)
 
-            val loadingOffset = lambdaCurrentList.countDiaries()
+            val loadOffset = lambdaCurrentList.countDiaries()
             val value =
-                loadWordSearchResultDiaryList(numLoadingItems, loadingOffset, lambdaWordSearch)
+                loadWordSearchResultDiaryList(numLoadItems, loadOffset, lambdaWordSearch)
             val loadedResultList = toUiWordSearchResultList(value, lambdaWordSearch)
             val numLoadedDiaries =
                 lambdaCurrentList.countDiaries() + loadedResultList.countDiaries()
@@ -293,16 +293,16 @@ internal class WordSearchViewModel @Inject internal constructor(
             searchWord
         ) { lambdaCurrentList, lambdaWordSearch ->
 
-            var numLoadingItems = lambdaCurrentList.countDiaries()
+            var numLoadItems = lambdaCurrentList.countDiaries()
             // HACK:画面全体にリストアイテムが存在しない状態で日記を追加した後にリスト画面に戻ると、
             //      日記追加前のアイテム数しか表示されない状態となる。また、スクロール更新もできない。
             //      対策として下記コードを記述。
-            if (numLoadingItems < this@WordSearchViewModel.numLoadingItems) {
-                numLoadingItems = this@WordSearchViewModel.numLoadingItems
+            if (numLoadItems < this@WordSearchViewModel.numLoadItems) {
+                numLoadItems = this@WordSearchViewModel.numLoadItems
             }
             val value =
                 loadWordSearchResultDiaryList(
-                    numLoadingItems,
+                    numLoadItems,
                     0,
                     lambdaWordSearch
                 )
@@ -314,7 +314,7 @@ internal class WordSearchViewModel @Inject internal constructor(
         state: WordSearchState,
         currentResultList: WordSearchResultYearMonthList,
         searchWord: String,
-        processLoading: suspend (
+        processLoad: suspend (
             currentResultList: WordSearchResultYearMonthList,
             searchWord: String
         ) -> WordSearchResultYearMonthList
@@ -339,9 +339,9 @@ internal class WordSearchViewModel @Inject internal constructor(
             updateNumWordSearchResults(
                 countWordSearchResultDiaries(searchWord)
             )
-            val updateResultList = processLoading(currentResultList, searchWord)
+            val updateResultList = processLoad(currentResultList, searchWord)
             updateWordSearchResultList(
-                processLoading(currentResultList, searchWord)
+                processLoad(currentResultList, searchWord)
             )
             updateUiStateForResultList(updateResultList)
             Log.i(logTag, "${logMsg}_完了")
@@ -352,7 +352,7 @@ internal class WordSearchViewModel @Inject internal constructor(
             Log.e(logTag, "${logMsg}_失敗", e)
             updateWordSearchResultList(currentResultList)
             updateUiStateForResultList(currentResultList)
-            emitAppMessageEvent(WordSearchAppMessage.SearchResultListLoadingFailure)
+            emitAppMessageEvent(WordSearchAppMessage.SearchResultListLoadFailure)
         }
     }
 
@@ -374,17 +374,17 @@ internal class WordSearchViewModel @Inject internal constructor(
 
     @Throws(DomainException::class)
     private suspend fun loadWordSearchResultDiaryList(
-        numLoadingItems: Int,
-        loadingOffset: Int,
+        numLoadItems: Int,
+        loadOffset: Int,
         searchWord: String
     ): List<WordSearchResultListItem> {
-        require(numLoadingItems > 0)
-        require(loadingOffset >= 0)
+        require(numLoadItems > 0)
+        require(loadOffset >= 0)
 
         val result =
             loadWordSearchResultDiaryListUseCase(
-                numLoadingItems,
-                loadingOffset,
+                numLoadItems,
+                loadOffset,
                 searchWord
             )
         return when (result) {
@@ -435,8 +435,8 @@ internal class WordSearchViewModel @Inject internal constructor(
 
     private fun clearWordSearchResultList() {
         updateUiState(WordSearchState.Idle)
-        cancelPreviousLoading()
-        wordSearchResultListLoadingJob = initialWordSearchResultListLoadingJob
+        cancelPreviousLoadJob()
+        wordSearchResultListLoadJob = initialWordSearchResultListLoadJob
         updateWordSearchResultList(initialWordSearchResultList)
         updateNumWordSearchResults(initialNumWordSearchResults)
         updateIsLoadingOnScrolled(initialIsLoadingOnScrolled)

@@ -195,7 +195,7 @@ internal class SettingsViewModel @Inject constructor(
             SettingsState.LoadingAllSettings,
             SettingsState.LoadAllSettingsSuccess -> {
                 updateUiState(SettingsState.LoadAllSettingsFailure)
-                emitAppMessageEvent(SettingsAppMessage.SettingLoadingFailure)
+                emitAppMessageEvent(SettingsAppMessage.SettingLoadFailure)
             }
 
             SettingsState.Idle,
@@ -779,7 +779,7 @@ internal class SettingsViewModel @Inject constructor(
                 updateUiState(SettingsState.LoadAllSettingsSuccess)
                 Log.e(logTag, "全日記削除_失敗", result.exception)
                 when (result.exception) {
-                    is DeleteAllDiariesUseCaseException.AllDiariesDeletionFailure -> {
+                    is DeleteAllDiariesUseCaseException.AllDiariesDeleteFailure -> {
                         emitAppMessageEvent(SettingsAppMessage.AllDiaryDeleteFailure)
                     }
                     is DeleteAllDiariesUseCaseException.AllPersistableUriPermissionReleaseFailure -> {
@@ -812,7 +812,7 @@ internal class SettingsViewModel @Inject constructor(
                 Log.e(logTag, "アプリ全データ削除_失敗", result.exception)
                 updateUiState(SettingsState.LoadAllSettingsSuccess)
                 when (result.exception) {
-                    is DeleteAllDataUseCaseException.AllDataDeletionFailure -> {
+                    is DeleteAllDataUseCaseException.AllDataDeleteFailure -> {
                         emitAppMessageEvent(SettingsAppMessage.AllDataDeleteFailure)
                     }
                     is DeleteAllDataUseCaseException.AllPersistableUriPermissionReleaseFailure -> {

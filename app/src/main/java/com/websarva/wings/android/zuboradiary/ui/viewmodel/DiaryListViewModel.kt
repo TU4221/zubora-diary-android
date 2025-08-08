@@ -50,7 +50,7 @@ internal class DiaryListViewModel @Inject constructor(
     companion object {
         // MEMO:初期読込時の対象リストが画面全体に表示される値にすること。
         //      アイテム数が少ないと最後尾のプログラスインディケーターが表示される為。
-        const val NUM_LOADING_ITEMS: Int = 14/*日(2週間分)*/
+        const val NUM_LOAD_ITEMS: Int = 14/*日(2週間分)*/
     }
 
     private val logTag = createLogTag()
@@ -74,7 +74,7 @@ internal class DiaryListViewModel @Inject constructor(
                 false
             )
 
-    private var diaryListLoadingJob: Job? = null // キャンセル用
+    private var diaryListLoadJob: Job? = null // キャンセル用
 
     private val _diaryList = MutableStateFlow(DiaryYearMonthList())
     val diaryList
@@ -106,7 +106,7 @@ internal class DiaryListViewModel @Inject constructor(
             } catch (e: DomainException) {
                 Log.e(logTag, "${logMsg}_失敗", e)
                 updateUiStateForDiaryList(currentList)
-                emitAppMessageEvent(DiaryListAppMessage.DiaryListLoadingFailure)
+                emitAppMessageEvent(DiaryListAppMessage.DiaryListLoadFailure)
                 return@launch
             }
             Log.i(logTag, "${logMsg}_完了")
@@ -193,8 +193,8 @@ internal class DiaryListViewModel @Inject constructor(
         updateIsLoadingOnScrolled(true)
 
         val currentList = _diaryList.value
-        cancelPreviousLoading()
-        diaryListLoadingJob =
+        cancelPreviousLoadJob()
+        diaryListLoadJob =
             viewModelScope.launch {
                 loadAdditionDiaryList(currentList)
             }
@@ -211,8 +211,8 @@ internal class DiaryListViewModel @Inject constructor(
         if (uiState.value != DiaryListState.ShowingDiaryList) return
 
         val currentList = _diaryList.value
-        cancelPreviousLoading()
-        diaryListLoadingJob =
+        cancelPreviousLoadJob()
+        diaryListLoadJob =
             viewModelScope.launch {
                 refreshDiaryList(currentList)
             }
@@ -238,8 +238,8 @@ internal class DiaryListViewModel @Inject constructor(
     private fun handleDatePickerDialogPositiveResult(yearMonth: YearMonth) {
         updateSortConditionDate(yearMonth)
         val currentList = _diaryList.value
-        cancelPreviousLoading()
-        diaryListLoadingJob =
+        cancelPreviousLoadJob()
+        diaryListLoadJob =
             viewModelScope.launch {
                 loadNewDiaryList(currentList)
             }
@@ -268,8 +268,8 @@ internal class DiaryListViewModel @Inject constructor(
     }
 
     // データ処理
-    private fun cancelPreviousLoading() {
-        val job = diaryListLoadingJob ?: return
+    private fun cancelPreviousLoadJob() {
+        val job = diaryListLoadJob ?: return
         if (!job.isCompleted) job.cancel()
     }
 
@@ -279,7 +279,7 @@ internal class DiaryListViewModel @Inject constructor(
             currentList
         ) { _ ->
             showDiaryListFirstItemProgressIndicator()
-            val value = loadDiaryList(NUM_LOADING_ITEMS, 0)
+            val value = loadDiaryList(NUM_LOAD_ITEMS, 0)
             toUiDiaryList(value)
         }
     }
@@ -291,8 +291,8 @@ internal class DiaryListViewModel @Inject constructor(
         ) { lambdaCurrentList ->
             require(lambdaCurrentList.isNotEmpty)
 
-            val loadingOffset = lambdaCurrentList.countDiaries()
-            val value = loadDiaryList(NUM_LOADING_ITEMS, loadingOffset)
+            val loadOffset = lambdaCurrentList.countDiaries()
+            val value = loadDiaryList(NUM_LOAD_ITEMS, loadOffset)
             val loadedList = toUiDiaryList(value)
 
             val numLoadedDiaries = lambdaCurrentList.countDiaries() + loadedList.countDiaries()
@@ -307,14 +307,14 @@ internal class DiaryListViewModel @Inject constructor(
             DiaryListState.UpdatingDiaryList,
             currentList
         ) { lambdaCurrentList ->
-            var numLoadingItems = lambdaCurrentList.countDiaries()
+            var numLoadItems = lambdaCurrentList.countDiaries()
             // HACK:画面全体にリストアイテムが存在しない状態で日記を追加した後にリスト画面に戻ると、
             //      日記追加前のアイテム数しか表示されない状態となる。また、スクロール更新もできない。
             //      対策として下記コードを記述。
-            if (numLoadingItems < NUM_LOADING_ITEMS) {
-                numLoadingItems = NUM_LOADING_ITEMS
+            if (numLoadItems < NUM_LOAD_ITEMS) {
+                numLoadItems = NUM_LOAD_ITEMS
             }
-            val value = loadDiaryList(numLoadingItems, 0)
+            val value = loadDiaryList(numLoadItems, 0)
             toUiDiaryList(value)
         }
     }
@@ -322,7 +322,7 @@ internal class DiaryListViewModel @Inject constructor(
     private suspend fun loadDiaryList(
         state: DiaryListState,
         currentList: DiaryYearMonthList,
-        processLoading: suspend (DiaryYearMonthList) -> DiaryYearMonthList
+        processLoad: suspend (DiaryYearMonthList) -> DiaryYearMonthList
     ) {
         require(
             when (state) {
@@ -343,7 +343,7 @@ internal class DiaryListViewModel @Inject constructor(
 
         updateUiState(state)
         try {
-            val updateDiaryList = processLoading(currentList)
+            val updateDiaryList = processLoad(currentList)
             updateDiaryList(updateDiaryList)
             updateUiStateForDiaryList(updateDiaryList)
             Log.i(logTag, "${logMsg}_完了")
@@ -354,7 +354,7 @@ internal class DiaryListViewModel @Inject constructor(
             Log.e(logTag, "${logMsg}_失敗", e)
             updateDiaryList(currentList)
             updateUiStateForDiaryList(currentList)
-            emitAppMessageEvent(DiaryListAppMessage.DiaryListLoadingFailure)
+            emitAppMessageEvent(DiaryListAppMessage.DiaryListLoadFailure)
         }
     }
 
@@ -365,13 +365,13 @@ internal class DiaryListViewModel @Inject constructor(
 
     @Throws(DomainException::class)
     private suspend fun loadDiaryList(
-        numLoadingItems: Int,
-        loadingOffset: Int
+        numLoadItems: Int,
+        loadOffset: Int
     ): List<DiaryListItem> {
         val result =
             loadDiaryListUseCase(
-                numLoadingItems,
-                loadingOffset,
+                numLoadItems,
+                loadOffset,
                 sortConditionDate
             )
         when (result) {
@@ -430,7 +430,7 @@ internal class DiaryListViewModel @Inject constructor(
             is UseCaseResult.Success -> return result.value?.date
             is UseCaseResult.Failure -> {
                 Log.e(logTag, "最新日記読込_失敗", result.exception)
-                emitAppMessageEvent(DiaryListAppMessage.DiaryInfoLoadingFailure)
+                emitAppMessageEvent(DiaryListAppMessage.DiaryInfoLoadFailure)
                 return null
             }
         }
@@ -441,7 +441,7 @@ internal class DiaryListViewModel @Inject constructor(
             is UseCaseResult.Success -> return result.value?.date
             is UseCaseResult.Failure -> {
                 Log.e(logTag, "最古日記読込_失敗", result.exception)
-                emitAppMessageEvent(DiaryListAppMessage.DiaryInfoLoadingFailure)
+                emitAppMessageEvent(DiaryListAppMessage.DiaryInfoLoadFailure)
                 return null
             }
         }

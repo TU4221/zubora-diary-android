@@ -206,7 +206,7 @@ internal class DiaryItemTitleEditViewModel @Inject constructor(
                     when (it) {
                         is DiaryItemTitleSelectionHistoryLoadFailureException -> {
                             emitAppMessageEvent(
-                                DiaryItemTitleEditAppMessage.ItemTitleHistoryLoadingFailure
+                                DiaryItemTitleEditAppMessage.ItemTitleHistoryLoadFailure
                             )
                         }
                         else -> throw it

@@ -3,25 +3,29 @@ package com.websarva.wings.android.zuboradiary.ui.fragment.dialog
 import com.websarva.wings.android.zuboradiary.R
 import com.websarva.wings.android.zuboradiary.ui.fragment.RESULT_KEY_PREFIX
 import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
+import com.websarva.wings.android.zuboradiary.ui.utils.toJapaneseDateString
 
-class ExitWithoutDiarySavingDialogFragment : BaseAlertDialogFragment() {
+class DiaryLoadDialogFragment : BaseAlertDialogFragment() {
 
     companion object {
         @JvmField
-        val KEY_RESULT = RESULT_KEY_PREFIX + ExitWithoutDiarySavingDialogFragment::class.java.name
+        val KEY_RESULT = RESULT_KEY_PREFIX + DiaryLoadDialogFragment::class.java.name
     }
 
     override fun createTitle(): String {
-        return getString(R.string.dialog_exit_without_diary_saving_title)
+        return getString(R.string.dialog_diary_load_title)
     }
 
     override fun createMessage(): String {
-        return getString(R.string.dialog_exit_without_diary_saving_message)
+        val diaryDate =
+            DiaryLoadDialogFragmentArgs.fromBundle(requireArguments()).parameters.date
+        val diaryDateString = diaryDate.toJapaneseDateString(requireContext())
+        return diaryDateString + getString(R.string.dialog_diary_load_message)
     }
 
     override fun handleOnPositiveButtonClick() {
         val parameters =
-            ExitWithoutDiarySavingDialogFragmentArgs.fromBundle(requireArguments()).parameters
+            DiaryLoadDialogFragmentArgs.fromBundle(requireArguments()).parameters
         setResult(KEY_RESULT, DialogResult.Positive(parameters))
     }
 
