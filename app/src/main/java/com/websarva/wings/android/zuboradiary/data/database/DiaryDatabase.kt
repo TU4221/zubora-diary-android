@@ -16,17 +16,17 @@ import java.time.LocalDate
 )
 internal abstract class DiaryDatabase : RoomDatabase() {
 
-    abstract fun createDiaryDAO(): DiaryDAO
-    abstract fun createDiaryItemTitleSelectionHistoryDAO(): DiaryItemTitleSelectionHistoryDAO
+    abstract fun createDiaryDao(): DiaryDao
+    abstract fun createDiaryItemTitleSelectionHistoryDao(): DiaryItemTitleSelectionHistoryDao
 
     @Transaction
     suspend fun saveDiary(
         diaryEntity: DiaryEntity,
         updateTitleList: List<DiaryItemTitleSelectionHistoryItemEntity>
     ) {
-        createDiaryDAO().insertDiary(diaryEntity)
-        createDiaryItemTitleSelectionHistoryDAO().insertHistoryItem(updateTitleList)
-        createDiaryItemTitleSelectionHistoryDAO().deleteOldHistoryItem()
+        createDiaryDao().insertDiary(diaryEntity)
+        createDiaryItemTitleSelectionHistoryDao().insertHistoryItem(updateTitleList)
+        createDiaryItemTitleSelectionHistoryDao().deleteOldHistoryItem()
     }
 
     @Transaction
@@ -35,15 +35,15 @@ internal abstract class DiaryDatabase : RoomDatabase() {
         createDiaryEntity: DiaryEntity,
         updateTitleList: List<DiaryItemTitleSelectionHistoryItemEntity>
     ) {
-        createDiaryDAO().deleteDiary(deleteDiaryDate.toString())
-        createDiaryDAO().insertDiary(createDiaryEntity)
-        createDiaryItemTitleSelectionHistoryDAO().insertHistoryItem(updateTitleList)
-        createDiaryItemTitleSelectionHistoryDAO().deleteOldHistoryItem()
+        createDiaryDao().deleteDiary(deleteDiaryDate.toString())
+        createDiaryDao().insertDiary(createDiaryEntity)
+        createDiaryItemTitleSelectionHistoryDao().insertHistoryItem(updateTitleList)
+        createDiaryItemTitleSelectionHistoryDao().deleteOldHistoryItem()
     }
 
     @Transaction
     suspend fun deleteAllData() {
-        createDiaryDAO().deleteAllDiaries()
-        createDiaryItemTitleSelectionHistoryDAO().deleteAllItem()
+        createDiaryDao().deleteAllDiaries()
+        createDiaryItemTitleSelectionHistoryDao().deleteAllItem()
     }
 }

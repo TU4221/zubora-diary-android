@@ -9,8 +9,8 @@ import java.time.LocalDate
 
 internal class DiaryDataSource(
     private val diaryDatabase: DiaryDatabase,
-    private val diaryDAO: DiaryDAO,
-    private val diaryItemTitleSelectionHistoryDAO: DiaryItemTitleSelectionHistoryDAO
+    private val diaryDao: DiaryDao,
+    private val diaryItemTitleSelectionHistoryDao: DiaryItemTitleSelectionHistoryDao
 ) {
 
     private val logTag = createLogTag()
@@ -46,49 +46,49 @@ internal class DiaryDataSource(
     @Throws(DataBaseAccessFailureException::class)
     suspend fun countDiaries(): Int {
         return executeSuspendDbOperation {
-            diaryDAO.countDiaries()
+            diaryDao.countDiaries()
         }
     }
 
     @Throws(DataBaseAccessFailureException::class)
     suspend fun countDiaries(date: LocalDate): Int {
         return executeSuspendDbOperation {
-            diaryDAO.countDiaries(date.toString())
+            diaryDao.countDiaries(date.toString())
         }
     }
 
     @Throws(DataBaseAccessFailureException::class)
     suspend fun existsDiary(date: LocalDate): Boolean {
         return executeSuspendDbOperation {
-            diaryDAO.existsDiary(date.toString())
+            diaryDao.existsDiary(date.toString())
         }
     }
 
     @Throws(DataBaseAccessFailureException::class)
     suspend fun existsImageUri(uriString: String): Boolean {
         return executeSuspendDbOperation {
-            diaryDAO.existsImageUri(uriString)
+            diaryDao.existsImageUri(uriString)
         }
     }
 
     @Throws(DataBaseAccessFailureException::class)
     suspend fun selectDiary(date: LocalDate): DiaryEntity? {
         return executeSuspendDbOperation {
-            diaryDAO.selectDiary(date.toString())
+            diaryDao.selectDiary(date.toString())
         }
     }
 
     @Throws(DataBaseAccessFailureException::class)
     suspend fun selectNewestDiary(): DiaryEntity? {
         return executeSuspendDbOperation {
-            diaryDAO.selectNewestDiary()
+            diaryDao.selectNewestDiary()
         }
     }
 
     @Throws(DataBaseAccessFailureException::class)
     suspend fun selectOldestDiary(): DiaryEntity? {
         return executeSuspendDbOperation {
-            diaryDAO.selectOldestDiary()
+            diaryDao.selectOldestDiary()
         }
     }
 
@@ -104,9 +104,9 @@ internal class DiaryDataSource(
 
         return executeSuspendDbOperation {
             if (date == null) {
-                diaryDAO.selectDiaryListOrderByDateDesc(num, offset)
+                diaryDao.selectDiaryListOrderByDateDesc(num, offset)
             } else {
-                diaryDAO.selectDiaryListOrderByDateDesc(num, offset, date.toString())
+                diaryDao.selectDiaryListOrderByDateDesc(num, offset, date.toString())
             }
         }
     }
@@ -114,7 +114,7 @@ internal class DiaryDataSource(
     @Throws(DataBaseAccessFailureException::class)
     suspend fun countWordSearchResults(searchWord: String): Int {
         return executeSuspendDbOperation {
-            diaryDAO.countWordSearchResults(searchWord)
+            diaryDao.countWordSearchResults(searchWord)
         }
     }
 
@@ -129,7 +129,7 @@ internal class DiaryDataSource(
 
 
         return executeSuspendDbOperation {
-            diaryDAO.selectWordSearchResultListOrderByDateDesc(num, offset, searchWord)
+            diaryDao.selectWordSearchResultListOrderByDateDesc(num, offset, searchWord)
         }
     }
 
@@ -164,14 +164,14 @@ internal class DiaryDataSource(
     @Throws(DataBaseAccessFailureException::class)
     suspend fun deleteDiary(date: LocalDate) {
         executeSuspendDbOperation {
-            diaryDAO.deleteDiary(date.toString())
+            diaryDao.deleteDiary(date.toString())
         }
     }
 
     @Throws(DataBaseAccessFailureException::class)
     suspend fun deleteAllDiaries() {
         executeSuspendDbOperation {
-            diaryDAO.deleteAllDiaries()
+            diaryDao.deleteAllDiaries()
         }
     }
 
@@ -191,7 +191,7 @@ internal class DiaryDataSource(
         require(num >= 1)
         require(offset >= 0)
 
-        return diaryItemTitleSelectionHistoryDAO
+        return diaryItemTitleSelectionHistoryDao
             .selectHistoryListOrderByLogDesc(num, offset)
             .wrapDatabaseExceptions()
     }
@@ -199,7 +199,7 @@ internal class DiaryDataSource(
     @Throws(DataBaseAccessFailureException::class)
     suspend fun deleteHistoryItem(title: String) {
         return executeSuspendDbOperation {
-            diaryItemTitleSelectionHistoryDAO.deleteHistoryItem(title)
+            diaryItemTitleSelectionHistoryDao.deleteHistoryItem(title)
         }
     }
 }
