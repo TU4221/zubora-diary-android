@@ -320,7 +320,7 @@ internal class DiaryEditViewModel @Inject constructor(
         val shouldLoadDiary =
             handle.get<Boolean>(SHOULD_LOAD_DIARY_ARGUMENT_KEY) ?: throw IllegalArgumentException()
         viewModelScope.launch {
-            prepareDiary(date, shouldLoadDiary)
+            prepareDiaryEntry(date, shouldLoadDiary)
         }
     }
 
@@ -508,7 +508,7 @@ internal class DiaryEditViewModel @Inject constructor(
     private fun handleDiaryLoadingDialogPositiveResult(parameters: DiaryLoadingParameters) {
         val date = parameters.date
         viewModelScope.launch {
-            prepareDiary(date, true)
+            loadDiary(date)
         }
     }
 
@@ -730,28 +730,30 @@ internal class DiaryEditViewModel @Inject constructor(
     }
 
     // データ処理
-    private suspend fun prepareDiary(
+    private suspend fun prepareDiaryEntry(
         date: LocalDate,
         shouldLoadDiary: Boolean
     ) {
         if (shouldLoadDiary) {
             loadDiary(date)
-            updateIsNewDiary(false)
         } else {
-            updateDate(date)
-            updateIsNewDiary(true)
+            prepareNewDiaryEntry(date)
         }
-        if (!shouldLoadDiary) {
-            val previousDate = previousDate
-            val originalDate = _originalDiary.requireValue().date
-            val isNewDiary = isNewDiary.value
-            requestDiaryLoadingConfirmationAndFetchWeatherIfNeeded(
-                date,
-                previousDate,
-                originalDate,
-                isNewDiary
-            )
-        }
+    }
+
+    private suspend fun prepareNewDiaryEntry(date: LocalDate) {
+        updateIsNewDiary(true)
+        updateDate(date)
+        updateOriginalDiary(diaryStateFlow.createDiary())
+        val previousDate = previousDate
+        val originalDate = _originalDiary.requireValue().date
+        val isNewDiary = isNewDiary.value
+        requestDiaryLoadingConfirmationAndFetchWeatherIfNeeded(
+            date,
+            previousDate,
+            originalDate,
+            isNewDiary
+        )
     }
 
     private suspend fun loadDiary(date: LocalDate) {
@@ -765,6 +767,7 @@ internal class DiaryEditViewModel @Inject constructor(
                 updateUiState(DiaryEditState.Editing)
                 val diary = result.value
                 diaryStateFlow.update(diary)
+                updateIsNewDiary(false)
                 updateOriginalDiary(diaryStateFlow.createDiary())
             }
             is UseCaseResult.Failure -> {
