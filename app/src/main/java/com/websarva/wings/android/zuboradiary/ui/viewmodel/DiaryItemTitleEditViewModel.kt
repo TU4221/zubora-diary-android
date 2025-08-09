@@ -2,7 +2,6 @@ package com.websarva.wings.android.zuboradiary.ui.viewmodel
 
 import android.util.Log
 import androidx.lifecycle.viewModelScope
-import com.websarva.wings.android.zuboradiary.R
 import com.websarva.wings.android.zuboradiary.domain.model.ItemNumber
 import com.websarva.wings.android.zuboradiary.domain.exception.diary.DiaryItemTitleSelectionHistoryLoadFailureException
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
@@ -66,13 +65,14 @@ internal class DiaryItemTitleEditViewModel @Inject constructor(
      * */
     val itemTitleMutable get() = _itemTitle
 
-    private val _itemTitleErrorMessageResId = MutableStateFlow<Int?>(null)
-    val itemTitleErrorMessageResId
-        get() = _itemTitleErrorMessageResId.asStateFlow()
+    private val _itemTitleInputTextValidateResult =
+        MutableStateFlow<InputTextValidateResult>(InputTextValidateResult.Valid)
+    val itemTitleInputTextValidateResult
+        get() = _itemTitleInputTextValidateResult.asStateFlow()
 
     val isNewItemTitleSelectionEnabled =
-        _itemTitleErrorMessageResId
-            .map { it == null }
+        _itemTitleInputTextValidateResult
+            .map { it == InputTextValidateResult.Valid }
             .stateInWhileSubscribed(false)
 
     private val initialItemTitleSelectionHistoryList = SelectionHistoryList(emptyList())
@@ -228,7 +228,7 @@ internal class DiaryItemTitleEditViewModel @Inject constructor(
     }
 
     private suspend fun completeItemTitleEdit(itemNumber: ItemNumber, itemTitle: String) {
-        when (validateNewDiaryItemTitleSelectable(itemTitle)) {
+        when (val result = validateNewDiaryItemTitleSelectable(itemTitle)) {
             InputTextValidateResult.Valid -> {
                 val diaryItemTitle = DiaryItemTitle(itemNumber, itemTitle)
                 emitUiEvent(
@@ -238,36 +238,20 @@ internal class DiaryItemTitleEditViewModel @Inject constructor(
                 )
             }
             InputTextValidateResult.InvalidEmpty -> {
-                updateItemTitleErrorMessageResId(
-                    R.string.fragment_diary_item_title_edit_new_item_title_input_field_error_message_empty
-                )
+                updateItemTitleInputTextValidateResult(result)
             }
             InputTextValidateResult.InvalidInitialCharUnmatched -> {
-                updateItemTitleErrorMessageResId(
-                    R.string.fragment_diary_item_title_edit_new_item_title_input_field_error_message_initial_char_unmatched
-                )
+                updateItemTitleInputTextValidateResult(result)
             }
         }
     }
 
     private fun clearNewDiaryItemTitleErrorMessage(itemTitle: String) {
-        if (_itemTitleErrorMessageResId.value == null) return
+        if (_itemTitleInputTextValidateResult.value == InputTextValidateResult.Valid) return
 
-        when (validateNewDiaryItemTitleSelectable(itemTitle)) {
-            InputTextValidateResult.Valid -> {
-                updateItemTitleErrorMessageResId(null)
-            }
-            InputTextValidateResult.InvalidEmpty -> {
-                updateItemTitleErrorMessageResId(
-                    R.string.fragment_diary_item_title_edit_new_item_title_input_field_error_message_empty
-                )
-            }
-            InputTextValidateResult.InvalidInitialCharUnmatched -> {
-                updateItemTitleErrorMessageResId(
-                    R.string.fragment_diary_item_title_edit_new_item_title_input_field_error_message_initial_char_unmatched
-                )
-            }
-        }
+        updateItemTitleInputTextValidateResult(
+            validateNewDiaryItemTitleSelectable(itemTitle)
+        )
     }
 
     private fun validateNewDiaryItemTitleSelectable(title: String): InputTextValidateResult {
@@ -309,7 +293,7 @@ internal class DiaryItemTitleEditViewModel @Inject constructor(
         _itemTitle.value = itemTitle
     }
 
-    private fun updateItemTitleErrorMessageResId(errorMessageResId: Int?) {
-        _itemTitleErrorMessageResId.value = errorMessageResId
+    private fun updateItemTitleInputTextValidateResult(result: InputTextValidateResult) {
+        _itemTitleInputTextValidateResult.value = result
     }
 }

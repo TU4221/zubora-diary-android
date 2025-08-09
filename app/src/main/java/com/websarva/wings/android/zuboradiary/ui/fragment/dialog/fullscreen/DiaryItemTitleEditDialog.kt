@@ -19,6 +19,7 @@ import com.websarva.wings.android.zuboradiary.ui.model.navigation.NavigationComm
 import com.websarva.wings.android.zuboradiary.ui.model.parameters.DiaryItemTitleSelectionHistoryItemDeleteParameters
 import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
 import com.websarva.wings.android.zuboradiary.ui.model.DiaryItemTitle
+import com.websarva.wings.android.zuboradiary.ui.model.InputTextValidateResult
 import com.websarva.wings.android.zuboradiary.ui.model.event.CommonUiEvent
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
@@ -135,12 +136,18 @@ class DiaryItemTitleEditDialog :
         }
 
         launchAndRepeatOnViewLifeCycleStarted {
-            mainViewModel.itemTitleErrorMessageResId.collectLatest {
+            mainViewModel.itemTitleInputTextValidateResult.collectLatest {
                 binding.textInputLayoutNewItemTitle.error =
-                    if (it != null && it != 0) {
-                        getString(it)
-                    } else {
-                        null
+                    when (it) {
+                        InputTextValidateResult.Valid -> {
+                            null
+                        }
+                        InputTextValidateResult.InvalidEmpty -> {
+                            getString(R.string.fragment_diary_item_title_edit_new_item_title_input_field_error_message_empty)
+                        }
+                        InputTextValidateResult.InvalidInitialCharUnmatched -> {
+                            getString(R.string.fragment_diary_item_title_edit_new_item_title_input_field_error_message_initial_char_unmatched)
+                        }
                     }
             }
         }
