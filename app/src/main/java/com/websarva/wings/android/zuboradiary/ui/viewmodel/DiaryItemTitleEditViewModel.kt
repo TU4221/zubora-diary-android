@@ -7,6 +7,7 @@ import com.websarva.wings.android.zuboradiary.domain.exception.diary.DiaryItemTi
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.DeleteDiaryItemTitleSelectionHistoryItemUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.LoadDiaryItemTitleSelectionHistoryUseCase
+import com.websarva.wings.android.zuboradiary.domain.usecase.text.ValidateInputTextUseCase
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import com.websarva.wings.android.zuboradiary.ui.model.message.DiaryItemTitleEditAppMessage
 import com.websarva.wings.android.zuboradiary.ui.adapter.diaryitemtitle.SelectionHistoryList
@@ -33,7 +34,8 @@ import javax.inject.Inject
 @HiltViewModel
 internal class DiaryItemTitleEditViewModel @Inject constructor(
     private val loadDiaryItemTitleSelectionHistoryUseCase: LoadDiaryItemTitleSelectionHistoryUseCase,
-    private val deleteDiaryItemTitleSelectionHistoryItemUseCase: DeleteDiaryItemTitleSelectionHistoryItemUseCase
+    private val deleteDiaryItemTitleSelectionHistoryItemUseCase: DeleteDiaryItemTitleSelectionHistoryItemUseCase,
+    private val validateInputTextUseCase: ValidateInputTextUseCase
 ) : BaseViewModel<DiaryItemTitleEditEvent, DiaryItemTitleEditAppMessage, DiaryItemTitleEditState>(
     DiaryItemTitleEditState.Idle
 ) {
@@ -228,7 +230,7 @@ internal class DiaryItemTitleEditViewModel @Inject constructor(
     }
 
     private suspend fun completeItemTitleEdit(itemNumber: ItemNumber, itemTitle: String) {
-        when (val result = validateNewDiaryItemTitleSelectable(itemTitle)) {
+        when (val result = validateInputTextUseCase(itemTitle).value) {
             InputTextValidateResult.Valid -> {
                 val diaryItemTitle = DiaryItemTitle(itemNumber, itemTitle)
                 emitUiEvent(
@@ -250,22 +252,8 @@ internal class DiaryItemTitleEditViewModel @Inject constructor(
         if (_itemTitleInputTextValidateResult.value == InputTextValidateResult.Valid) return
 
         updateItemTitleInputTextValidateResult(
-            validateNewDiaryItemTitleSelectable(itemTitle)
+            validateInputTextUseCase(itemTitle).value
         )
-    }
-
-    private fun validateNewDiaryItemTitleSelectable(title: String): InputTextValidateResult {
-        // 空欄
-        if (title.isEmpty()) {
-            return InputTextValidateResult.InvalidEmpty
-        }
-
-        // 先頭が空白文字(\\s)
-        if (title.matches("\\s+.*".toRegex())) {
-            return InputTextValidateResult.InvalidInitialCharUnmatched
-        }
-
-        return InputTextValidateResult.Valid
     }
 
     private suspend fun deleteDiaryItemTitleSelectionHistoryItem(deleteTitle: String) {
