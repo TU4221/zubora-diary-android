@@ -13,7 +13,7 @@ import com.websarva.wings.android.zuboradiary.ui.model.message.DiaryItemTitleEdi
 import com.websarva.wings.android.zuboradiary.ui.adapter.diaryitemtitle.SelectionHistoryList
 import com.websarva.wings.android.zuboradiary.ui.adapter.diaryitemtitle.SelectionHistoryListItem
 import com.websarva.wings.android.zuboradiary.ui.model.DiaryItemTitle
-import com.websarva.wings.android.zuboradiary.ui.model.InputTextValidateResult
+import com.websarva.wings.android.zuboradiary.ui.model.InputTextValidationResult
 import com.websarva.wings.android.zuboradiary.ui.model.event.CommonUiEvent
 import com.websarva.wings.android.zuboradiary.ui.model.event.DiaryItemTitleEditEvent
 import com.websarva.wings.android.zuboradiary.ui.model.parameters.DiaryItemTitleSelectionHistoryItemDeleteParameters
@@ -67,14 +67,14 @@ internal class DiaryItemTitleEditViewModel @Inject constructor(
      * */
     val itemTitleMutable get() = _itemTitle
 
-    private val _itemTitleInputTextValidateResult =
-        MutableStateFlow<InputTextValidateResult>(InputTextValidateResult.Valid)
-    val itemTitleInputTextValidateResult
-        get() = _itemTitleInputTextValidateResult.asStateFlow()
+    private val _itemTitleInputTextValidationResult =
+        MutableStateFlow<InputTextValidationResult>(InputTextValidationResult.Valid)
+    val itemTitleInputTextValidationResult
+        get() = _itemTitleInputTextValidationResult.asStateFlow()
 
     val isNewItemTitleSelectionEnabled =
-        _itemTitleInputTextValidateResult
-            .map { it == InputTextValidateResult.Valid }
+        _itemTitleInputTextValidationResult
+            .map { it == InputTextValidationResult.Valid }
             .stateInWhileSubscribed(false)
 
     private val initialItemTitleSelectionHistoryList = SelectionHistoryList(emptyList())
@@ -231,7 +231,7 @@ internal class DiaryItemTitleEditViewModel @Inject constructor(
 
     private suspend fun completeItemTitleEdit(itemNumber: ItemNumber, itemTitle: String) {
         when (val result = validateInputTextUseCase(itemTitle).value) {
-            InputTextValidateResult.Valid -> {
+            InputTextValidationResult.Valid -> {
                 val diaryItemTitle = DiaryItemTitle(itemNumber, itemTitle)
                 emitUiEvent(
                     DiaryItemTitleEditEvent.CompleteEdit(
@@ -239,19 +239,19 @@ internal class DiaryItemTitleEditViewModel @Inject constructor(
                     )
                 )
             }
-            InputTextValidateResult.InvalidEmpty -> {
-                updateItemTitleInputTextValidateResult(result)
+            InputTextValidationResult.InvalidEmpty -> {
+                updateItemTitleInputTextValidationResult(result)
             }
-            InputTextValidateResult.InvalidInitialCharUnmatched -> {
-                updateItemTitleInputTextValidateResult(result)
+            InputTextValidationResult.InvalidInitialCharUnmatched -> {
+                updateItemTitleInputTextValidationResult(result)
             }
         }
     }
 
     private fun clearNewDiaryItemTitleErrorMessage(itemTitle: String) {
-        if (_itemTitleInputTextValidateResult.value == InputTextValidateResult.Valid) return
+        if (_itemTitleInputTextValidationResult.value == InputTextValidationResult.Valid) return
 
-        updateItemTitleInputTextValidateResult(
+        updateItemTitleInputTextValidationResult(
             validateInputTextUseCase(itemTitle).value
         )
     }
@@ -281,7 +281,7 @@ internal class DiaryItemTitleEditViewModel @Inject constructor(
         _itemTitle.value = itemTitle
     }
 
-    private fun updateItemTitleInputTextValidateResult(result: InputTextValidateResult) {
-        _itemTitleInputTextValidateResult.value = result
+    private fun updateItemTitleInputTextValidationResult(result: InputTextValidationResult) {
+        _itemTitleInputTextValidationResult.value = result
     }
 }
