@@ -1,22 +1,23 @@
-package com.websarva.wings.android.zuboradiary.ui.fragment.dialog
+package com.websarva.wings.android.zuboradiary.ui.fragment.dialog.alert
 
 import com.websarva.wings.android.zuboradiary.R
 import com.websarva.wings.android.zuboradiary.ui.fragment.RESULT_KEY_PREFIX
+import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.setResult
 import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
 
-class AllSettingsInitializationDialogFragment : BaseAlertDialogFragment() {
+class DiaryImageDeleteDialogFragment : BaseAlertDialogFragment() {
 
     companion object {
         @JvmField
-        val KEY_RESULT = RESULT_KEY_PREFIX + AllSettingsInitializationDialogFragment::class.java.name
+        val KEY_RESULT = RESULT_KEY_PREFIX + DiaryImageDeleteDialogFragment::class.java.name
     }
 
     override fun createTitle(): String {
-        return getString(R.string.dialog_all_settings_initialization_title)
+        return getString(R.string.dialog_diary_attached_image_delete_title)
     }
 
     override fun createMessage(): String {
-        return getString(R.string.dialog_all_settings_initialization_message)
+        return getString(R.string.dialog_diary_attached_image_delete_message)
     }
 
     override fun handleOnPositiveButtonClick() {

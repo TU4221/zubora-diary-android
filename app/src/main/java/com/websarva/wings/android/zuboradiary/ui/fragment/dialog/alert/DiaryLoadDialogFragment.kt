@@ -1,30 +1,32 @@
-package com.websarva.wings.android.zuboradiary.ui.fragment.dialog
+package com.websarva.wings.android.zuboradiary.ui.fragment.dialog.alert
 
 import com.websarva.wings.android.zuboradiary.R
 import com.websarva.wings.android.zuboradiary.ui.fragment.RESULT_KEY_PREFIX
+import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.setResult
 import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
 import com.websarva.wings.android.zuboradiary.ui.utils.toJapaneseDateString
 
-class DiaryUpdateDialogFragment : BaseAlertDialogFragment() {
+class DiaryLoadDialogFragment : BaseAlertDialogFragment() {
 
     companion object {
         @JvmField
-        val KEY_RESULT = RESULT_KEY_PREFIX + DiaryUpdateDialogFragment::class.java.name
+        val KEY_RESULT = RESULT_KEY_PREFIX + DiaryLoadDialogFragment::class.java.name
     }
 
     override fun createTitle(): String {
-        return getString(R.string.dialog_diary_update_title)
+        return getString(R.string.dialog_diary_load_title)
     }
 
     override fun createMessage(): String {
-        val updateDiaryDate =
-            DiaryUpdateDialogFragmentArgs.fromBundle(requireArguments()).parameters.diary.date
-        val updateDiaryDateString = updateDiaryDate.toJapaneseDateString(requireContext())
-        return updateDiaryDateString + getString(R.string.dialog_diary_update_message)
+        val diaryDate =
+            DiaryLoadDialogFragmentArgs.fromBundle(requireArguments()).parameters.date
+        val diaryDateString = diaryDate.toJapaneseDateString(requireContext())
+        return diaryDateString + getString(R.string.dialog_diary_load_message)
     }
 
     override fun handleOnPositiveButtonClick() {
-        val parameters = DiaryUpdateDialogFragmentArgs.fromBundle(requireArguments()).parameters
+        val parameters =
+            DiaryLoadDialogFragmentArgs.fromBundle(requireArguments()).parameters
         setResult(KEY_RESULT, DialogResult.Positive(parameters))
     }
 

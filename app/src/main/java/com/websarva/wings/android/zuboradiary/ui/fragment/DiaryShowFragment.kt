@@ -17,8 +17,8 @@ import com.websarva.wings.android.zuboradiary.ui.fragment.common.DiaryImageUpdat
 import com.websarva.wings.android.zuboradiary.ui.fragment.common.DiaryItemsVisibilityUpdater
 import com.websarva.wings.android.zuboradiary.ui.fragment.common.DiaryLogTextUpdater
 import com.websarva.wings.android.zuboradiary.ui.fragment.common.DiaryWeatherTextUpdater
-import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.DiaryDeleteDialogFragment
-import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.DiaryLoadFailureDialogFragment
+import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.alert.DiaryDeleteDialogFragment
+import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.alert.DiaryLoadFailureDialogFragment
 import com.websarva.wings.android.zuboradiary.ui.model.event.CommonUiEvent
 import com.websarva.wings.android.zuboradiary.ui.model.event.DiaryShowEvent
 import com.websarva.wings.android.zuboradiary.ui.model.navigation.NavigationCommand

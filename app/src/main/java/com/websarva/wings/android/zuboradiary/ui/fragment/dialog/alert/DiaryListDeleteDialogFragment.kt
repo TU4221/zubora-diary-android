@@ -1,15 +1,17 @@
-package com.websarva.wings.android.zuboradiary.ui.fragment.dialog
+package com.websarva.wings.android.zuboradiary.ui.fragment.dialog.alert
 
 import com.websarva.wings.android.zuboradiary.R
 import com.websarva.wings.android.zuboradiary.ui.fragment.RESULT_KEY_PREFIX
+import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.setResult
 import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
 import com.websarva.wings.android.zuboradiary.ui.utils.toJapaneseDateString
 
-class DiaryDeleteDialogFragment : BaseAlertDialogFragment() {
+
+class DiaryListDeleteDialogFragment : BaseAlertDialogFragment() {
 
     companion object {
         @JvmField
-        val KEY_RESULT = RESULT_KEY_PREFIX + DiaryDeleteDialogFragment::class.java.name
+        val KEY_RESULT = RESULT_KEY_PREFIX + DiaryListDeleteDialogFragment::class.java.name
     }
 
     override fun createTitle(): String {
@@ -17,15 +19,15 @@ class DiaryDeleteDialogFragment : BaseAlertDialogFragment() {
     }
 
     override fun createMessage(): String {
-        val diaryDate =
-            DiaryDeleteDialogFragmentArgs.fromBundle(requireArguments()).parameters.date
-        val diaryDateString = diaryDate.toJapaneseDateString(requireContext())
-        return diaryDateString + getString(R.string.dialog_diary_delete_message)
+        val date = DiaryListDeleteDialogFragmentArgs.fromBundle(requireArguments()).parameters.date
+        val dateString = date.toJapaneseDateString(requireContext())
+        return dateString + getString(R.string.dialog_diary_delete_message)
     }
 
     override fun handleOnPositiveButtonClick() {
+
         val parameters =
-            DiaryDeleteDialogFragmentArgs.fromBundle(requireArguments()).parameters
+            DiaryListDeleteDialogFragmentArgs.fromBundle(requireArguments()).parameters
         setResult(KEY_RESULT, DialogResult.Positive(parameters))
     }
 
