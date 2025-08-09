@@ -11,6 +11,7 @@ internal sealed class WordSearchAppMessage(
         R.string.dialog_app_message_title_access_error,
         R.string.dialog_word_search_app_message_search_result_list_load_failure
     ) {
+        // デシリアライズ時のシングルトン性を維持
         private fun readResolve(): Any = SearchResultListLoadFailure
     }
 }

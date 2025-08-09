@@ -11,6 +11,7 @@ internal sealed class DiaryEditAppMessage(
         R.string.dialog_app_message_title_access_error,
         R.string.dialog_diary_edit_app_message_diary_load_failure
     ) {
+        // デシリアライズ時のシングルトン性を維持
         private fun readResolve(): Any = DiaryLoadFailure
     }
 
@@ -18,6 +19,7 @@ internal sealed class DiaryEditAppMessage(
         R.string.dialog_app_message_title_access_error,
         R.string.dialog_diary_edit_app_message_diary_save_failure
     ) {
+        // デシリアライズ時のシングルトン性を維持
         private fun readResolve(): Any = DiarySaveFailure
     }
 
@@ -25,6 +27,7 @@ internal sealed class DiaryEditAppMessage(
         R.string.dialog_app_message_title_access_error,
         R.string.dialog_diary_edit_app_message_diary_delete_failure
     ) {
+        // デシリアライズ時のシングルトン性を維持
         private fun readResolve(): Any = DiaryDeleteFailure
     }
 
@@ -32,6 +35,7 @@ internal sealed class DiaryEditAppMessage(
         R.string.dialog_app_message_title_access_error,
         R.string.dialog_diary_edit_app_message_diary_info_load_failure
     ) {
+        // デシリアライズ時のシングルトン性を維持
         private fun readResolve(): Any = DiaryInfoLoadFailure
     }
 
@@ -39,6 +43,7 @@ internal sealed class DiaryEditAppMessage(
         R.string.dialog_app_message_title_connection_error,
         R.string.dialog_diary_edit_app_message_weather_info_fetch_failure
     ) {
+        // デシリアライズ時のシングルトン性を維持
         private fun readResolve(): Any = WeatherInfoFetchFailure
     }
 
@@ -46,6 +51,7 @@ internal sealed class DiaryEditAppMessage(
         R.string.dialog_app_message_title_hint,
         R.string.dialog_diary_edit_app_message_weather_info_date_out_of_range
     ) {
+        // デシリアライズ時のシングルトン性を維持
         private fun readResolve(): Any = WeatherInfoFetchFailure
     }
 
@@ -53,6 +59,7 @@ internal sealed class DiaryEditAppMessage(
         R.string.dialog_app_message_title_permission_request,
         R.string.dialog_diary_edit_app_message_access_location_permission_request
     ) {
+        // デシリアライズ時のシングルトン性を維持
         private fun readResolve(): Any = AccessLocationPermissionRequest
     }
 }

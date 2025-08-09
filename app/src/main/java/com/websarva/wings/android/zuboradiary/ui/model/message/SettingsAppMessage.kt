@@ -11,6 +11,7 @@ internal sealed class SettingsAppMessage(
         R.string.dialog_app_message_title_access_error,
         R.string.dialog_settings_app_message_setting_load_failure
     ) {
+        // デシリアライズ時のシングルトン性を維持
         private fun readResolve(): Any = SettingLoadFailure
     }
 
@@ -18,6 +19,7 @@ internal sealed class SettingsAppMessage(
         R.string.dialog_app_message_title_hint,
         R.string.dialog_settings_app_message_settings_not_loaded_retry_restart
     ) {
+        // デシリアライズ時のシングルトン性を維持
         private fun readResolve(): Any = SettingLoadFailure
     }
 
@@ -25,6 +27,7 @@ internal sealed class SettingsAppMessage(
         R.string.dialog_app_message_title_access_error,
         R.string.dialog_settings_app_message_setting_update_failure
     ) {
+        // デシリアライズ時のシングルトン性を維持
         private fun readResolve(): Any = SettingUpdateFailure
     }
 
@@ -32,6 +35,7 @@ internal sealed class SettingsAppMessage(
         R.string.dialog_app_message_title_access_error,
         R.string.dialog_settings_app_message_all_diary_delete_failure
     ) {
+        // デシリアライズ時のシングルトン性を維持
         private fun readResolve(): Any = AllDiaryDeleteFailure
     }
 
@@ -39,6 +43,7 @@ internal sealed class SettingsAppMessage(
         R.string.dialog_app_message_title_access_error,
         R.string.dialog_settings_app_message_all_settings_initialization_failure
     ) {
+        // デシリアライズ時のシングルトン性を維持
         private fun readResolve(): Any = SettingUpdateFailure
     }
 
@@ -46,6 +51,7 @@ internal sealed class SettingsAppMessage(
         R.string.dialog_app_message_title_access_error,
         R.string.dialog_settings_app_message_all_data_delete_failure
     ) {
+        // デシリアライズ時のシングルトン性を維持
         private fun readResolve(): Any = AllDataDeleteFailure
     }
 }

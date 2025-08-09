@@ -11,6 +11,7 @@ internal sealed class DiaryItemTitleEditAppMessage(
         R.string.dialog_app_message_title_access_error,
         R.string.dialog_diary_item_title_edit_app_message_selection_history_load_failure
     ) {
+        // デシリアライズ時のシングルトン性を維持
         private fun readResolve(): Any = ItemTitleHistoryLoadFailure
     }
 
@@ -19,6 +20,7 @@ internal sealed class DiaryItemTitleEditAppMessage(
         R.string.dialog_app_message_title_access_error,
         R.string.dialog_diary_item_title_edit_app_message_selection_history_item_delete_failure
     ) {
+        // デシリアライズ時のシングルトン性を維持
         private fun readResolve(): Any = ItemTitleHistoryDeleteFailure
     }
 }

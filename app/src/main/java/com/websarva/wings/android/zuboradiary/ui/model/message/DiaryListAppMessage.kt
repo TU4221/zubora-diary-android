@@ -11,6 +11,7 @@ internal sealed class DiaryListAppMessage(
         R.string.dialog_app_message_title_access_error,
         R.string.dialog_diary_list_app_message_diary_list_load_failure
     ) {
+        // デシリアライズ時のシングルトン性を維持
         private fun readResolve(): Any = DiaryListLoadFailure
     }
 
@@ -18,6 +19,7 @@ internal sealed class DiaryListAppMessage(
         R.string.dialog_app_message_title_access_error,
         R.string.dialog_diary_list_app_message_diary_delete_failure
     ) {
+        // デシリアライズ時のシングルトン性を維持
         private fun readResolve(): Any = DiaryDeleteFailure
     }
 
@@ -25,6 +27,7 @@ internal sealed class DiaryListAppMessage(
         R.string.dialog_app_message_title_access_error,
         R.string.dialog_diary_list_app_message_diary_info_load_failure
     ) {
+        // デシリアライズ時のシングルトン性を維持
         private fun readResolve(): Any = DiaryInfoLoadFailure
     }
 }
