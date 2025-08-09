@@ -228,7 +228,7 @@ internal class DiaryItemTitleEditViewModel @Inject constructor(
     }
 
     private suspend fun completeItemTitleEdit(itemNumber: ItemNumber, itemTitle: String) {
-        when (val result = validateNewDiaryItemTitleSelectable(itemTitle)) {
+        when (validateNewDiaryItemTitleSelectable(itemTitle)) {
             InputTextValidateResult.Valid -> {
                 val diaryItemTitle = DiaryItemTitle(itemNumber, itemTitle)
                 emitUiEvent(
@@ -237,8 +237,15 @@ internal class DiaryItemTitleEditViewModel @Inject constructor(
                     )
                 )
             }
-            is InputTextValidateResult.Invalid -> {
-                updateItemTitleErrorMessageResId(result.errorMessageResId)
+            InputTextValidateResult.InvalidEmpty -> {
+                updateItemTitleErrorMessageResId(
+                    R.string.fragment_diary_item_title_edit_new_item_title_input_field_error_message_empty
+                )
+            }
+            InputTextValidateResult.InvalidInitialCharUnmatched -> {
+                updateItemTitleErrorMessageResId(
+                    R.string.fragment_diary_item_title_edit_new_item_title_input_field_error_message_initial_char_unmatched
+                )
             }
         }
     }
@@ -246,13 +253,19 @@ internal class DiaryItemTitleEditViewModel @Inject constructor(
     private fun clearNewDiaryItemTitleErrorMessage(itemTitle: String) {
         if (_itemTitleErrorMessageResId.value == null) return
 
-        when (val result =validateNewDiaryItemTitleSelectable(itemTitle)) {
+        when (validateNewDiaryItemTitleSelectable(itemTitle)) {
             InputTextValidateResult.Valid -> {
                 updateItemTitleErrorMessageResId(null)
             }
-            is InputTextValidateResult.Invalid -> {
-                updateItemTitleErrorMessageResId(result.errorMessageResId)
-                return
+            InputTextValidateResult.InvalidEmpty -> {
+                updateItemTitleErrorMessageResId(
+                    R.string.fragment_diary_item_title_edit_new_item_title_input_field_error_message_empty
+                )
+            }
+            InputTextValidateResult.InvalidInitialCharUnmatched -> {
+                updateItemTitleErrorMessageResId(
+                    R.string.fragment_diary_item_title_edit_new_item_title_input_field_error_message_initial_char_unmatched
+                )
             }
         }
     }
@@ -260,16 +273,12 @@ internal class DiaryItemTitleEditViewModel @Inject constructor(
     private fun validateNewDiaryItemTitleSelectable(title: String): InputTextValidateResult {
         // 空欄
         if (title.isEmpty()) {
-            return InputTextValidateResult.Invalid(
-                R.string.fragment_diary_item_title_edit_new_item_title_input_field_error_message_empty
-            )
+            return InputTextValidateResult.InvalidEmpty
         }
 
         // 先頭が空白文字(\\s)
         if (title.matches("\\s+.*".toRegex())) {
-            return InputTextValidateResult.Invalid(
-                R.string.fragment_diary_item_title_edit_new_item_title_input_field_error_message_initial_char_unmatched
-            )
+            return InputTextValidateResult.InvalidInitialCharUnmatched
         }
 
         return InputTextValidateResult.Valid
