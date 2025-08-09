@@ -3,7 +3,7 @@ package com.websarva.wings.android.zuboradiary.ui.model.message
 import android.content.Context
 import java.io.Serializable
 
-internal sealed class AppMessage(
+internal abstract class AppMessage(
     private val dialogTitleStringResId: Int,
     private val dialogMessageStringResId: Int
 ) : Serializable {
