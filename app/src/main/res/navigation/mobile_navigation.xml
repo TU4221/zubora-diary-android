@@ -58,7 +58,7 @@
 
         <dialog
             android:id="@+id/navigation_start_year_month_picker_dialog"
-            android:name="com.websarva.wings.android.zuboradiary.ui.fragment.dialog.StartYearMonthPickerDialogFragment">
+            android:name="com.websarva.wings.android.zuboradiary.ui.fragment.dialog.sheet.StartYearMonthPickerDialogFragment">
             <argument
                 android:name="max_year"
                 app:argType="java.time.Year" />
@@ -186,12 +186,12 @@
 
         <dialog
             android:id="@+id/navigation_theme_color_picker_dialog"
-            android:name="com.websarva.wings.android.zuboradiary.ui.fragment.dialog.ThemeColorPickerDialogFragment">
+            android:name="com.websarva.wings.android.zuboradiary.ui.fragment.dialog.sheet.ThemeColorPickerDialogFragment">
         </dialog>
 
         <dialog
             android:id="@+id/navigation_calendar_start_day_picker_dialog"
-            android:name="com.websarva.wings.android.zuboradiary.ui.fragment.dialog.CalendarStartDayPickerDialogFragment">
+            android:name="com.websarva.wings.android.zuboradiary.ui.fragment.dialog.sheet.CalendarStartDayPickerDialogFragment">
             <argument
                 android:name="initial_value"
                 app:argType="java.time.DayOfWeek" />
