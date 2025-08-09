@@ -1,6 +1,7 @@
-package com.websarva.wings.android.zuboradiary.ui.fragment.dialog
+package com.websarva.wings.android.zuboradiary.ui.fragment.dialog.picker
 
 import com.websarva.wings.android.zuboradiary.ui.fragment.RESULT_KEY_PREFIX
+import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.setResult
 import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
 import java.time.LocalDate
 

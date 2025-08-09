@@ -1,4 +1,4 @@
-package com.websarva.wings.android.zuboradiary.ui.fragment.dialog
+package com.websarva.wings.android.zuboradiary.ui.fragment.dialog.picker
 
 import android.app.Dialog
 import android.os.Bundle

@@ -199,7 +199,7 @@
 
         <dialog
             android:id="@+id/navigation_reminder_notification_time_picker_dialog"
-            android:name="com.websarva.wings.android.zuboradiary.ui.fragment.dialog.ReminderNotificationTimePickerDialogFragment">
+            android:name="com.websarva.wings.android.zuboradiary.ui.fragment.dialog.picker.ReminderNotificationTimePickerDialogFragment">
         </dialog>
 
         <dialog
@@ -411,7 +411,7 @@
 
         <dialog
             android:id="@+id/navigation_date_picker_dialog"
-            android:name="com.websarva.wings.android.zuboradiary.ui.fragment.dialog.DatePickerDialogFragment">
+            android:name="com.websarva.wings.android.zuboradiary.ui.fragment.dialog.picker.DatePickerDialogFragment">
             <argument
                 android:name="date"
                 app:argType="java.time.LocalDate" />
