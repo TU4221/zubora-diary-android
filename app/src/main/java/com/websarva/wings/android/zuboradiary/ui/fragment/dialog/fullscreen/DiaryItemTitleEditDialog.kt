@@ -1,4 +1,4 @@
-package com.websarva.wings.android.zuboradiary.ui.fragment.dialog
+package com.websarva.wings.android.zuboradiary.ui.fragment.dialog.fullscreen
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -13,6 +13,7 @@ import com.websarva.wings.android.zuboradiary.ui.viewmodel.DiaryItemTitleEditVie
 import com.websarva.wings.android.zuboradiary.ui.adapter.diaryitemtitle.ItemTitleSelectionHistoryListAdapter
 import com.websarva.wings.android.zuboradiary.ui.adapter.diaryitemtitle.SelectionHistoryList
 import com.websarva.wings.android.zuboradiary.ui.fragment.RESULT_KEY_PREFIX
+import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.DiaryItemTitleDeleteDialogFragment
 import com.websarva.wings.android.zuboradiary.ui.model.event.DiaryItemTitleEditEvent
 import com.websarva.wings.android.zuboradiary.ui.model.navigation.NavigationCommand
 import com.websarva.wings.android.zuboradiary.ui.model.parameters.DiaryItemTitleSelectionHistoryItemDeleteParameters

@@ -35,7 +35,7 @@ import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.DiaryItemDelete
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.DiaryLoadDialogFragment
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.DiaryLoadFailureDialogFragment
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.DiaryImageDeleteDialogFragment
-import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.DiaryItemTitleEditDialog
+import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.fullscreen.DiaryItemTitleEditDialog
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.DiaryUpdateDialogFragment
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.ExitWithoutDiarySaveDialogFragment
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.WeatherInfoFetchDialogFragment

@@ -227,7 +227,7 @@
 
         <dialog
             android:id="@+id/navigation_open_source_licenses_fragment"
-            android:name="com.websarva.wings.android.zuboradiary.ui.fragment.dialog.OpenSourceLicensesDialogFragment" >
+            android:name="com.websarva.wings.android.zuboradiary.ui.fragment.dialog.fullscreen.OpenSourceLicensesDialogFragment" >
         </dialog>
 
     </navigation>
@@ -448,7 +448,7 @@
 
         <dialog
             android:id="@+id/navigation_diary_item_title_edit_dialog"
-            android:name="com.websarva.wings.android.zuboradiary.ui.fragment.dialog.DiaryItemTitleEditDialog"
+            android:name="com.websarva.wings.android.zuboradiary.ui.fragment.dialog.fullscreen.DiaryItemTitleEditDialog"
             tools:layout="@layout/dialog_diary_item_title_edit" >
             <argument
                 android:name="diary_item_title"

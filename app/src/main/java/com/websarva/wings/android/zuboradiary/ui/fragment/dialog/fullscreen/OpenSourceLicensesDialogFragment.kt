@@ -1,4 +1,4 @@
-package com.websarva.wings.android.zuboradiary.ui.fragment.dialog
+package com.websarva.wings.android.zuboradiary.ui.fragment.dialog.fullscreen
 
 import android.os.Bundle
 import android.view.LayoutInflater
