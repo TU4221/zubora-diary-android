@@ -2,7 +2,7 @@ package com.websarva.wings.android.zuboradiary.domain.usecase.text
 
 import android.util.Log
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
-import com.websarva.wings.android.zuboradiary.ui.model.InputTextValidationResult
+import com.websarva.wings.android.zuboradiary.ui.model.result.InputTextValidationResult
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 
 internal class ValidateInputTextUseCase {

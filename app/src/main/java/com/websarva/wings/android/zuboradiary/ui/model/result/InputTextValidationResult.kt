@@ -1,4 +1,4 @@
-package com.websarva.wings.android.zuboradiary.ui.model
+package com.websarva.wings.android.zuboradiary.ui.model.result
 
 internal sealed class InputTextValidationResult {
     data object Valid : InputTextValidationResult()
