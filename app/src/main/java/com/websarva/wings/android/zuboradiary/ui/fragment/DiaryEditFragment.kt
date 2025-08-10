@@ -15,7 +15,6 @@ import android.widget.AdapterView.OnItemClickListener
 import android.widget.ArrayAdapter
 import android.widget.LinearLayout
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.appcompat.view.ContextThemeWrapper
 import androidx.constraintlayout.motion.widget.MotionLayout
 import androidx.core.widget.NestedScrollView
 import androidx.fragment.app.viewModels
@@ -40,9 +39,7 @@ import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.alert.DiaryUpda
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.alert.ExitWithoutDiarySaveDialogFragment
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.alert.WeatherInfoFetchDialogFragment
 import com.websarva.wings.android.zuboradiary.ui.keyboard.KeyboardManager
-import com.websarva.wings.android.zuboradiary.ui.model.adapter.WeatherAdapterList
 import com.websarva.wings.android.zuboradiary.ui.model.event.DiaryEditEvent
-import com.websarva.wings.android.zuboradiary.ui.model.adapter.ConditionAdapterList
 import com.websarva.wings.android.zuboradiary.ui.model.navigation.NavigationCommand
 import com.websarva.wings.android.zuboradiary.ui.model.parameters.DiaryDeleteParameters
 import com.websarva.wings.android.zuboradiary.ui.model.parameters.DiaryItemDeleteParameters
@@ -52,6 +49,8 @@ import com.websarva.wings.android.zuboradiary.ui.model.parameters.NavigatePrevio
 import com.websarva.wings.android.zuboradiary.ui.model.parameters.WeatherInfoFetchParameters
 import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
 import com.websarva.wings.android.zuboradiary.ui.model.DiaryItemTitle
+import com.websarva.wings.android.zuboradiary.ui.view.adapter.ConditionSpinnerAdapter
+import com.websarva.wings.android.zuboradiary.ui.view.adapter.WeatherSpinnerAdapter
 import com.websarva.wings.android.zuboradiary.ui.model.event.CommonUiEvent
 import com.websarva.wings.android.zuboradiary.ui.utils.isAccessLocationGranted
 import com.websarva.wings.android.zuboradiary.ui.utils.toJapaneseDateString
@@ -383,6 +382,9 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditEvent>
 
     // 天気入力欄。
     private fun setUpWeatherInputField() {
+        binding.autoCompleteTextWeather1
+            .setAdapter(WeatherSpinnerAdapter(requireContext(), themeColor))
+
         binding.autoCompleteTextWeather1.onItemClickListener =
             OnItemClickListener { _: AdapterView<*>?, _: View?, position: Int, _: Long ->
                 val listAdapter = binding.autoCompleteTextWeather1.adapter
@@ -398,16 +400,9 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditEvent>
                     Log.d("20250428", "Weather collectLatest()")
                     val strWeather = value.toString(requireContext())
                     binding.autoCompleteTextWeather1.setText(strWeather, false)
-
-                    mainViewModel.onWeather1Changed()
+                    binding.autoCompleteTextWeather2
+                        .setAdapter(WeatherSpinnerAdapter(requireContext(), themeColor, value))
                 }
-        }
-
-        launchAndRepeatOnViewLifeCycleStarted {
-            mainViewModel.weather1AdapterList.collectLatest { value: WeatherAdapterList ->
-                val arrayAdapter = createWeatherSpinnerAdapter(value)
-                binding.autoCompleteTextWeather1.setAdapter(arrayAdapter)
-            }
         }
 
         binding.autoCompleteTextWeather2.onItemClickListener =
@@ -426,29 +421,15 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditEvent>
                     binding.autoCompleteTextWeather2.setText(strWeather, false)
                 }
         }
-
-        launchAndRepeatOnViewLifeCycleStarted {
-            mainViewModel.weather2AdapterList.collectLatest { value: WeatherAdapterList ->
-                val arrayAdapter = createWeatherSpinnerAdapter(value)
-                binding.autoCompleteTextWeather2.setAdapter(arrayAdapter)
-            }
-        }
-    }
-
-    private fun createWeatherSpinnerAdapter(list: WeatherAdapterList): ArrayAdapter<String> {
-        val themeResId = themeColor.themeResId
-        val contextWithTheme: Context = ContextThemeWrapper(requireContext(), themeResId)
-        val stringList = list.toStringList(requireContext())
-
-        return ArrayAdapter(
-            contextWithTheme,
-            R.layout.layout_drop_down_list_item,
-            stringList
-        )
     }
 
     // 気分入力欄。
     private fun setUpConditionInputField() {
+        binding.autoCompleteTextCondition
+            .setAdapter(
+                ConditionSpinnerAdapter(requireContext(), themeColor)
+            )
+
         binding.autoCompleteTextCondition.onItemClickListener =
             OnItemClickListener { _: AdapterView<*>?, _: View?, position: Int, _: Long ->
                 // TODO:引数からで取得できないか確認。(取得できるようならclearViewBindingsからリスナ解除処理削除)
@@ -459,7 +440,6 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditEvent>
                 mainViewModel.onConditionInputFieldItemClick(condition)
             }
 
-
         launchAndRepeatOnViewLifeCycleStarted {
             mainViewModel.condition
                 .collectLatest { value: Condition ->
@@ -467,24 +447,6 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditEvent>
                     binding.autoCompleteTextCondition.setText(strCondition, false)
                 }
         }
-
-        launchAndRepeatOnViewLifeCycleStarted {
-            mainViewModel.conditionAdapterList.collectLatest { value: ConditionAdapterList ->
-                val arrayAdapter = createConditionSpinnerAdapter(value)
-                binding.autoCompleteTextCondition.setAdapter(arrayAdapter)
-            }
-        }
-    }
-
-    private fun createConditionSpinnerAdapter(list: ConditionAdapterList): ArrayAdapter<String> {
-        val themeResId = themeColor.themeResId
-        val contextWithTheme: Context = ContextThemeWrapper(requireContext(), themeResId)
-        val stringList = list.toStringList(requireContext())
-
-        return ArrayAdapter(
-            contextWithTheme,
-            R.layout.layout_drop_down_list_item,
-            stringList)
     }
 
     @Suppress("EmptyMethod")

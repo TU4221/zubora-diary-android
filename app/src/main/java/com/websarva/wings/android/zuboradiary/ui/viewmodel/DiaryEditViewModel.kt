@@ -24,9 +24,7 @@ import com.websarva.wings.android.zuboradiary.domain.usecase.diary.ShouldRequest
 import com.websarva.wings.android.zuboradiary.domain.usecase.settings.IsWeatherInfoFetchEnabledUseCase
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import com.websarva.wings.android.zuboradiary.ui.model.message.DiaryEditAppMessage
-import com.websarva.wings.android.zuboradiary.ui.model.adapter.WeatherAdapterList
 import com.websarva.wings.android.zuboradiary.ui.model.event.DiaryEditEvent
-import com.websarva.wings.android.zuboradiary.ui.model.adapter.ConditionAdapterList
 import com.websarva.wings.android.zuboradiary.ui.model.parameters.DiaryDeleteParameters
 import com.websarva.wings.android.zuboradiary.ui.model.parameters.DiaryItemDeleteParameters
 import com.websarva.wings.android.zuboradiary.ui.model.parameters.DiaryLoadParameters
@@ -164,17 +162,8 @@ internal class DiaryEditViewModel @Inject constructor(
     val weather1
         get() = diaryStateFlow.weather1.asStateFlow()
 
-    private val initialWeatherAdapterList = WeatherAdapterList()
-    private val _weather1AdapterList = MutableStateFlow(initialWeatherAdapterList)
-    val weather1AdapterList
-        get() = _weather1AdapterList.asStateFlow()
-
     val weather2
         get() = diaryStateFlow.weather2.asStateFlow()
-
-    private val _weather2AdapterList = MutableStateFlow(initialWeatherAdapterList)
-    val weather2AdapterList
-        get() = _weather2AdapterList.asStateFlow()
 
     private val isEqualWeathers: Boolean
         get() {
@@ -186,10 +175,6 @@ internal class DiaryEditViewModel @Inject constructor(
 
     val condition
         get() = diaryStateFlow.condition.asStateFlow()
-
-    private val _conditionAdapterList = MutableStateFlow(ConditionAdapterList())
-    val conditionAdapterList
-        get() = _conditionAdapterList.asStateFlow()
 
     val numVisibleItems
         get() = diaryStateFlow.numVisibleItems.asStateFlow()
@@ -696,10 +681,6 @@ internal class DiaryEditViewModel @Inject constructor(
     }
 
     // StateFlow値変更時処理
-    fun onWeather1Changed() {
-        refreshWeather2OptionsBasedOnWeather1()
-    }
-
     fun onOriginalDiaryDateChanged(dateString: String?) {
         updateEditingDiaryDateString(dateString)
     }
@@ -1025,18 +1006,6 @@ internal class DiaryEditViewModel @Inject constructor(
         )
     }
 
-    // 天気、体調関係
-    private fun refreshWeather2OptionsBasedOnWeather1() {
-        val weather1 = diaryStateFlow.weather1.requireValue()
-        val newWeather2AdapterList =
-            if (weather1 == Weather.UNKNOWN) {
-                initialWeatherAdapterList
-            } else {
-                WeatherAdapterList(weather1)
-            }
-        updateWeather2AdapterList(newWeather2AdapterList)
-    }
-
     // 項目関係
     private fun getItemTitle(itemNumber: ItemNumber): StateFlow<String?> {
         return diaryStateFlow.getItemStateFlow(itemNumber).title
@@ -1189,10 +1158,6 @@ internal class DiaryEditViewModel @Inject constructor(
 
     private fun updateEditingDiaryDateString(dateString: String?) {
         _editingDiaryDateString.value = dateString
-    }
-
-    private fun updateWeather2AdapterList(adapterList: WeatherAdapterList) {
-        _weather2AdapterList.value = adapterList
     }
 
     // TODO:テスト用の為、最終的に削除
