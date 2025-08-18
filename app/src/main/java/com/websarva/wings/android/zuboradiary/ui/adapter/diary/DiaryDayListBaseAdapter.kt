@@ -15,9 +15,7 @@ internal abstract class DiaryDayListBaseAdapter protected constructor(
     protected val recyclerView: RecyclerView,
     protected val themeColor: ThemeColor,
     diffUtilItemCallback: DiffUtilItemCallback
-) :
-
-    ListAdapter<DiaryDayListBaseItem, RecyclerView.ViewHolder>(diffUtilItemCallback) {
+) : ListAdapter<DiaryDayListBaseItem, RecyclerView.ViewHolder>(diffUtilItemCallback) {
 
     fun interface OnClickItemListener {
         fun onClick(item: DiaryDayListBaseItem)
@@ -37,35 +35,19 @@ internal abstract class DiaryDayListBaseAdapter protected constructor(
         val inflater = LayoutInflater.from(parent.context)
         val themeColorInflater = ThemeColorInflaterCreator().create(inflater, themeColor)
 
-        return onCreateDiaryDayViewHolder(parent, themeColorInflater)
+        return createDiaryDayViewHolder(parent, themeColorInflater)
     }
 
-    protected abstract fun onCreateDiaryDayViewHolder(
+    protected abstract fun createDiaryDayViewHolder(
         parent: ViewGroup, themeColorInflater: LayoutInflater
     ): RecyclerView.ViewHolder
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         val item = getItem(position)
-        onBindDate(holder, item)
-        onBindItemClickListener(holder, item)
-        onBindOtherView(holder, item)
+        bindViewHolder(holder, item)
     }
 
-    protected abstract fun onBindDate(holder: RecyclerView.ViewHolder, item: DiaryDayListBaseItem)
-
-    protected abstract fun onBindItemClickListener(
-        holder: RecyclerView.ViewHolder,
-        item: DiaryDayListBaseItem
-    )
-
-    protected abstract fun onBindOtherView(
-        holder: RecyclerView.ViewHolder,
-        item: DiaryDayListBaseItem
-    )
-
-    protected fun onClickItem(item: DiaryDayListBaseItem) {
-        onClickItemListener?.onClick(item) ?: return
-    }
+    abstract fun bindViewHolder(holder: RecyclerView.ViewHolder, item: DiaryDayListBaseItem)
 
     protected abstract class DiffUtilItemCallback : DiffUtil.ItemCallback<DiaryDayListBaseItem>() {
 

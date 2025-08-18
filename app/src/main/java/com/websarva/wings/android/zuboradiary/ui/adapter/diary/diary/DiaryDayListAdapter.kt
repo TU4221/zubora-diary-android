@@ -22,76 +22,81 @@ internal class DiaryDayListAdapter(recyclerView: RecyclerView, themeColor: Theme
         DiffUtilItemCallback()
     ) {
 
-    override fun onCreateDiaryDayViewHolder(
+    override fun createDiaryDayViewHolder(
         parent: ViewGroup,
         themeColorInflater: LayoutInflater
     ): RecyclerView.ViewHolder {
         val binding =
             RowDiaryDayListBinding.inflate(themeColorInflater, parent, false)
-        return DiaryDayListViewHolder(binding)
+        return DiaryDayListViewHolder(binding, themeColor)
     }
 
-    override fun onBindDate(holder: RecyclerView.ViewHolder, item: DiaryDayListBaseItem) {
-        if (holder !is DiaryDayListViewHolder) throw IllegalStateException()
+    override fun bindViewHolder(holder: RecyclerView.ViewHolder, item: DiaryDayListBaseItem) {
+        holder as DiaryDayListViewHolder
+        item as DiaryDayListItem
 
-        val date = item.date
-        val context = holder.binding.root.context
-        val strDayOfWeek = date.dayOfWeek.toDiaryListDayOfWeekString(context)
-        holder.binding.includeDay.textDayOfWeek.text = strDayOfWeek
-        holder.binding.includeDay.textDayOfMonth.text =
-            NumberFormat.getInstance().format(date.dayOfMonth)
+        holder.bind(
+            item,
+            { onClickItemListener?.onClick(it) },
+            { onClickDeleteButtonListener?.onClick(it) }
+        )
     }
 
-    override fun onBindItemClickListener(
-        holder: RecyclerView.ViewHolder,
-        item: DiaryDayListBaseItem
-    ) {
-        if (holder !is DiaryDayListViewHolder) throw IllegalStateException()
-        holder.foregroundView.setOnClickListener {
-            onClickItem(item)
-        }
-    }
+    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+        super.onBindViewHolder(holder, position)
 
-    override fun onBindOtherView(holder: RecyclerView.ViewHolder, item: DiaryDayListBaseItem) {
-        if (holder !is DiaryDayListViewHolder) throw IllegalStateException()
-        if (item !is DiaryDayListItem) throw IllegalStateException()
+        holder as DiaryDayListViewHolder
+        val item = getItem(position) as DiaryDayListItem
 
-        onBindTitle(holder, item)
-        onBindImage(holder, item)
-    }
-
-    private fun onBindTitle(holder: DiaryDayListViewHolder, item: DiaryDayListItem) {
-        val title = item.title
-        holder.binding.textTitle.text = title
-    }
-
-    private fun onBindImage(holder: DiaryDayListViewHolder, item: DiaryDayListItem) {
-        val imageUri = item.imageUri
-        DiaryImageConfigurator()
-            .setUpImageOnDiaryList(
-                holder.binding.imageAttachedImage,
-                imageUri,
-                themeColor
-            )
+        holder.bind(
+            item,
+            { onClickItemListener?.onClick(it) },
+            { onClickDeleteButtonListener?.onClick(it) }
+        )
     }
 
     override fun onBindDeleteButtonClickListener(
         holder: RecyclerView.ViewHolder,
         item: DiaryDayListBaseItem
     ) {
-        if (holder !is DiaryDayListViewHolder) throw IllegalStateException()
-
-        holder.backgroundButtonView.setOnClickListener {
-            onClickDeleteButton(item)
-        }
     }
 
-    class DiaryDayListViewHolder(val binding: RowDiaryDayListBinding)
-        : LeftSwipeViewHolder(binding) {
+    class DiaryDayListViewHolder(
+        val binding: RowDiaryDayListBinding,
+        val themeColor: ThemeColor
+    ) : LeftSwipeViewHolder<DiaryDayListItem>(binding) {
+
         override val foregroundView
             get() = binding.linerLayoutForeground
         override val backgroundButtonView
             get() = binding.includeBackground.imageButtonDelete
+
+        override fun bind(
+            item: DiaryDayListItem,
+            onItemClick: (DiaryDayListItem) -> Unit,
+            onDeleteButtonClick: (DiaryDayListItem) -> Unit
+        ) {
+            val date = item.date
+            val context = binding.root.context
+            val strDayOfWeek = date.dayOfWeek.toDiaryListDayOfWeekString(context)
+            binding.includeDay.textDayOfWeek.text = strDayOfWeek
+            binding.includeDay.textDayOfMonth.text =
+                NumberFormat.getInstance().format(date.dayOfMonth)
+            binding.textTitle.text = item.title
+            DiaryImageConfigurator()
+                .setUpImageOnDiaryList(
+                    binding.imageAttachedImage,
+                    item.imageUri,
+                    themeColor
+                )
+
+            setUpForegroundViewOnClickListener {
+                onItemClick(item)
+            }
+            setUpBackgroundViewOnClickListener {
+                onDeleteButtonClick(item)
+            }
+        }
     }
 
     private class DiffUtilItemCallback : DiaryDayListBaseAdapter.DiffUtilItemCallback() {

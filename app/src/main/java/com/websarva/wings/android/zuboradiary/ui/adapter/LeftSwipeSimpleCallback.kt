@@ -16,8 +16,9 @@ internal open class LeftSwipeSimpleCallback(protected val recyclerView: SwipeRec
 
     private val logTag = createLogTag()
 
-    abstract class LeftSwipeViewHolder(binding: ViewBinding)
-        : RecyclerView.ViewHolder(binding.root) {
+    abstract class LeftSwipeViewHolder<T>(
+        binding: ViewBinding
+    ) : RecyclerView.ViewHolder(binding.root) {
 
         abstract val foregroundView: View
         abstract val backgroundButtonView: View
@@ -25,6 +26,20 @@ internal open class LeftSwipeSimpleCallback(protected val recyclerView: SwipeRec
         fun setClickableAllView(clickable: Boolean) {
             foregroundView.isClickable = clickable
             backgroundButtonView.isClickable = clickable
+        }
+
+        abstract fun bind(
+            item: T,
+            onItemClick: (T) -> Unit,
+            onDeleteButtonClick: (T) -> Unit
+        )
+
+        fun setUpForegroundViewOnClickListener(listener: View.OnClickListener) {
+            foregroundView.setOnClickListener(listener)
+        }
+
+        fun setUpBackgroundViewOnClickListener(listener: View.OnClickListener) {
+            backgroundButtonView.setOnClickListener(listener)
         }
     }
 
@@ -64,7 +79,7 @@ internal open class LeftSwipeSimpleCallback(protected val recyclerView: SwipeRec
         val lockedViewHolder =
             recyclerView.findViewHolderForAdapterPosition(invalidSwipeAdapterPosition)
 
-        val leftSwipeViewHolder = lockedViewHolder as LeftSwipeViewHolder
+        val leftSwipeViewHolder = lockedViewHolder as LeftSwipeViewHolder<*>
         leftSwipeViewHolder.setClickableAllView(true)
 
         clearInvalidSwipeAdapterPosition()
@@ -96,7 +111,7 @@ internal open class LeftSwipeSimpleCallback(protected val recyclerView: SwipeRec
     private fun animateCloseSwipedViewHolder(position: Int, viewHolder: RecyclerView.ViewHolder) {
         Log.d(logTag, "animateCloseSwipedViewHolder()_position = $position")
 
-        val leftSwipeViewHolder = viewHolder as LeftSwipeViewHolder
+        val leftSwipeViewHolder = viewHolder as LeftSwipeViewHolder<*>
         leftSwipeViewHolder.foregroundView.animate()
             .setDuration(300)
             .setInterpolator(FastOutSlowInInterpolator())
@@ -139,7 +154,7 @@ internal open class LeftSwipeSimpleCallback(protected val recyclerView: SwipeRec
     ): Int {
         Log.d(logTag, "getMovementFlags()_position = " + viewHolder.bindingAdapterPosition)
 
-        val leftSwipeViewHolder = viewHolder as LeftSwipeViewHolder
+        val leftSwipeViewHolder = viewHolder as LeftSwipeViewHolder<*>
 
         // アニメーション中スワイプ機能無効
         if (!leftSwipeViewHolder.foregroundView.isClickable) return 0
@@ -190,7 +205,7 @@ internal open class LeftSwipeSimpleCallback(protected val recyclerView: SwipeRec
     override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
         if (direction != ItemTouchHelper.LEFT) return
 
-        val leftSwipeViewHolder = viewHolder as LeftSwipeViewHolder
+        val leftSwipeViewHolder = viewHolder as LeftSwipeViewHolder<*>
         leftSwipeViewHolder.backgroundButtonView.performClick()
     }
 
@@ -212,7 +227,7 @@ internal open class LeftSwipeSimpleCallback(protected val recyclerView: SwipeRec
 
         if (actionState != ItemTouchHelper.ACTION_STATE_SWIPE) return
 
-        val leftSwipeViewHolder = viewHolder as LeftSwipeViewHolder
+        val leftSwipeViewHolder = viewHolder as LeftSwipeViewHolder<*>
 
         // アニメーション中は無効
         if (!leftSwipeViewHolder.foregroundView.isClickable) return
@@ -234,7 +249,7 @@ internal open class LeftSwipeSimpleCallback(protected val recyclerView: SwipeRec
         dX: Float,
         actionState: Int
     ) {
-        val leftSwipeViewHolder = viewHolder as LeftSwipeViewHolder
+        val leftSwipeViewHolder = viewHolder as LeftSwipeViewHolder<*>
         leftSwipeViewHolder.foregroundView.translationX = dX
     }
 

@@ -63,25 +63,16 @@ internal class ItemTitleSelectionHistoryListAdapter(
     }
 
     override fun onBindViewHolder(holder: ItemTitleSelectionHistoryViewHolder, position: Int) {
-        val item = checkNotNull(getItem(position))
-        val title = item.title
-        holder.foregroundView.apply {
-            text = title
-            setOnClickListener {
-                if (onClickItemListener == null) return@setOnClickListener
-                checkNotNull(onClickItemListener).onClick(title)
-            }
-        }
-        holder.backgroundButtonView.setOnClickListener {
-            if (onClickDeleteButtonListener == null) return@setOnClickListener
-
-            // MEMO:onBindViewHolder()の引数であるpositionを使用すると警告がでる。
-            checkNotNull(onClickDeleteButtonListener).onClick(title)
-        }
+        val item = getItem(position)
+        holder.bind(
+            item,
+            { onClickItemListener?.onClick(it) },
+            { onClickDeleteButtonListener?.onClick(it) },
+        )
     }
 
     fun interface OnClickItemListener {
-        fun onClick(title: String)
+        fun onClick(item: SelectionHistoryListItem)
     }
 
     fun setOnClickItemListener(onClickItemListener: OnClickItemListener) {
@@ -89,7 +80,7 @@ internal class ItemTitleSelectionHistoryListAdapter(
     }
 
     fun interface OnClickDeleteButtonListener {
-        fun onClick(title: String)
+        fun onClick(item: SelectionHistoryListItem)
     }
 
     fun setOnClickDeleteButtonListener(onClickDeleteButtonListener: OnClickDeleteButtonListener) {
@@ -98,11 +89,25 @@ internal class ItemTitleSelectionHistoryListAdapter(
 
     internal class ItemTitleSelectionHistoryViewHolder(
         val binding: RowItemTitleSelectionHistoryBinding
-    ) : LeftSwipeViewHolder(binding) {
+    ) : LeftSwipeViewHolder<SelectionHistoryListItem>(binding) {
         override val foregroundView
             get() = binding.textTitle
         override val backgroundButtonView
             get() = RowBackgroundDeleteButtonFullWideBinding.bind(binding.root).imageButtonDelete
+
+        override fun bind(
+            item: SelectionHistoryListItem,
+            onItemClick: (SelectionHistoryListItem) -> Unit,
+            onDeleteButtonClick: (SelectionHistoryListItem) -> Unit
+        ) {
+            foregroundView.text = item.title
+            setUpForegroundViewOnClickListener {
+                onItemClick.invoke(item)
+            }
+            setUpBackgroundViewOnClickListener {
+                onDeleteButtonClick(item)
+            }
+        }
     }
 
     internal class DiaryItemTitleSelectionHistoryDiffUtilItemCallback

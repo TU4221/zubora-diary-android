@@ -18,7 +18,7 @@ internal class WordSearchResultDayListAdapter(
     themeColor: ThemeColor
 ) : DiaryDayListBaseAdapter(recyclerView, themeColor, DiffUtilItemCallback()) {
 
-    override fun onCreateDiaryDayViewHolder(
+    override fun createDiaryDayViewHolder(
         parent: ViewGroup,
         themeColorInflater: LayoutInflater
     ): RecyclerView.ViewHolder {
@@ -27,58 +27,46 @@ internal class WordSearchResultDayListAdapter(
         return WordSearchResultDayViewHolder(binding)
     }
 
-    override fun onBindDate(holder: RecyclerView.ViewHolder, item: DiaryDayListBaseItem) {
-        if (holder !is WordSearchResultDayViewHolder) throw IllegalStateException()
+    override fun bindViewHolder(holder: RecyclerView.ViewHolder, item: DiaryDayListBaseItem) {
+        holder as WordSearchResultDayViewHolder
+        item as WordSearchResultDayListItem
 
-        val date = item.date
-        val context = holder.binding.root.context
-        val dayOfWeekString = date.dayOfWeek.toDiaryListDayOfWeekString(context)
-        holder.binding.includeDay.textDayOfWeek.text = dayOfWeekString
-        holder.binding.includeDay.textDayOfMonth.text =
-            NumberFormat.getInstance().format(date.dayOfMonth)
+        holder.bind(
+            item,
+            themeColor
+        ) { onClickItemListener?.onClick(it) }
     }
 
-    override fun onBindItemClickListener(
-        holder: RecyclerView.ViewHolder,
-        item: DiaryDayListBaseItem
-    ) {
-        holder.itemView.setOnClickListener { onClickItem(item) }
-    }
+    class WordSearchResultDayViewHolder(
+        val binding: RowWordSearchResultListBinding
+    ) : RecyclerView.ViewHolder(binding.root) {
 
-    override fun onBindOtherView(holder: RecyclerView.ViewHolder, item: DiaryDayListBaseItem) {
-        if (holder !is WordSearchResultDayViewHolder) throw IllegalStateException()
-        if (item !is WordSearchResultDayListItem) throw IllegalStateException()
+        fun bind(
+            item: WordSearchResultDayListItem,
+            themeColor: ThemeColor,
+            onItemClick: (WordSearchResultDayListItem) -> Unit,
+        ) {
+            val context = binding.root.context
+            binding.apply {
+                val date = item.date
+                val dayOfWeekString = date.dayOfWeek.toDiaryListDayOfWeekString(context)
+                includeDay.textDayOfWeek.text = dayOfWeekString
+                includeDay.textDayOfMonth.text = NumberFormat.getInstance().format(date.dayOfMonth)
 
-        onBindTitle(holder, item)
-        onBindItem(holder, item)
-    }
+                val title = item.createTitleSpannableString(context, themeColor)
+                textTitle.text = title
 
-    private fun onBindTitle(
-        holder: WordSearchResultDayViewHolder,
-        item: WordSearchResultDayListItem
-    ) {
-        val context = holder.binding.root.context
-        val title = item.createTitleSpannableString(context, themeColor)
-        holder.binding.textTitle.text = title
-    }
-
-    private fun onBindItem(
-        holder: WordSearchResultDayViewHolder,
-        item: WordSearchResultDayListItem
-    ) {
-        holder.binding.apply {
-            val context = root.context
-            val strItemNumber =
-                context.getString(R.string.fragment_word_search_result_item) + item.itemNumber
-            textItemNumber.text = strItemNumber
-            textItemTitle.text = item.createItemTitleSpannableString(context, themeColor)
-            textItemComment.text = item.createItemCommentSpannableString(context, themeColor)
+                val strItemNumber =
+                    context.getString(R.string.fragment_word_search_result_item) + item.itemNumber
+                textItemNumber.text = strItemNumber
+                textItemTitle.text = item.createItemTitleSpannableString(context, themeColor)
+                textItemComment.text = item.createItemCommentSpannableString(context, themeColor)
+            }
+            itemView.setOnClickListener {
+                onItemClick(item)
+            }
         }
-
     }
-
-    class WordSearchResultDayViewHolder(val binding: RowWordSearchResultListBinding)
-        : RecyclerView.ViewHolder(binding.root)
 
     private class DiffUtilItemCallback : DiaryDayListBaseAdapter.DiffUtilItemCallback() {
 

@@ -34,7 +34,7 @@ internal open class LeftSwipeBackgroundButtonSimpleCallback(recyclerView: SwipeR
         val adapterPosition = recyclerView.getChildAdapterPosition(childView)
         val viewHolder =
             recyclerView.findViewHolderForAdapterPosition(adapterPosition)
-        val leftSwipeViewHolder = viewHolder as LeftSwipeViewHolder
+        val leftSwipeViewHolder = viewHolder as LeftSwipeViewHolder<*>
 
         val tolerance = (3 * v.resources.displayMetrics.density).toInt() // スワイプ位置誤差許容値
         val foregroundView = leftSwipeViewHolder.foregroundView
@@ -77,7 +77,7 @@ internal open class LeftSwipeBackgroundButtonSimpleCallback(recyclerView: SwipeR
 
     override fun getSwipeThreshold(viewHolder: RecyclerView.ViewHolder): Float {
         Log.d(logTag, "getSwipeThreshold()_position = " + viewHolder.bindingAdapterPosition)
-        val leftSwipeViewHolder = viewHolder as LeftSwipeViewHolder
+        val leftSwipeViewHolder = viewHolder as LeftSwipeViewHolder<*>
 
         // スワイプ境界を背面ボタンの中心にする
         val threshold =
@@ -100,7 +100,7 @@ internal open class LeftSwipeBackgroundButtonSimpleCallback(recyclerView: SwipeR
         Log.d(logTag, "onSwiped()_position = " + viewHolder.bindingAdapterPosition)
         if (direction != ItemTouchHelper.LEFT) return
 
-        val leftSwipeViewHolder = viewHolder as LeftSwipeViewHolder
+        val leftSwipeViewHolder = viewHolder as LeftSwipeViewHolder<*>
 
         if (swipingAdapterPosition != viewHolder.getBindingAdapterPosition()) return
         swipedAdapterPosition = swipingAdapterPosition
@@ -116,7 +116,7 @@ internal open class LeftSwipeBackgroundButtonSimpleCallback(recyclerView: SwipeR
     ) {
         if (actionState != ItemTouchHelper.ACTION_STATE_SWIPE) return
 
-        val leftSwipeViewHolder = viewHolder as LeftSwipeViewHolder
+        val leftSwipeViewHolder = viewHolder as LeftSwipeViewHolder<*>
         val backgroundButtonWidth =
             leftSwipeViewHolder.backgroundButtonView.width.toFloat()
         val translationValueX =
