@@ -156,7 +156,6 @@ class DiaryItemTitleEditDialog :
     private fun setUpItemTitleSelectionHistory() {
         val itemTitleSelectionHistoryListAdapter =
             ItemTitleSelectionHistoryListAdapter(
-                requireContext(),
                 binding.recyclerItemTitleSelectionHistory,
                 themeColor
             )

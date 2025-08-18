@@ -1,6 +1,5 @@
 package com.websarva.wings.android.zuboradiary.ui.adapter.diaryitemtitle
 
-import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
@@ -16,13 +15,10 @@ import com.websarva.wings.android.zuboradiary.ui.theme.ThemeColorInflaterCreator
 import com.websarva.wings.android.zuboradiary.ui.adapter.diaryitemtitle.ItemTitleSelectionHistoryListAdapter.ItemTitleSelectionHistoryViewHolder
 import com.websarva.wings.android.zuboradiary.ui.view.custom.SwipeRecyclerView
 
-internal class ItemTitleSelectionHistoryListAdapter
-    (
-    private val context: Context,
+internal class ItemTitleSelectionHistoryListAdapter(
     private val recyclerView: SwipeRecyclerView,
     private val themeColor: ThemeColor
-) :
-    ListAdapter<SelectionHistoryListItem, ItemTitleSelectionHistoryViewHolder>(
+) : ListAdapter<SelectionHistoryListItem, ItemTitleSelectionHistoryViewHolder>(
         DiaryItemTitleSelectionHistoryDiffUtilItemCallback()
     ) {
 
@@ -32,11 +28,14 @@ internal class ItemTitleSelectionHistoryListAdapter
     private lateinit var leftSwipeSimpleCallback: LeftSwipeSimpleCallback
 
     fun build() {
-        recyclerView.adapter = this
-        recyclerView.layoutManager = LinearLayoutManager(context)
-        recyclerView.addItemDecoration(
-            DividerItemDecoration(context, DividerItemDecoration.VERTICAL)
-        )
+        recyclerView.apply {
+            adapter = this@ItemTitleSelectionHistoryListAdapter
+            layoutManager = LinearLayoutManager(context)
+            addItemDecoration(
+                DividerItemDecoration(context, DividerItemDecoration.VERTICAL)
+            )
+        }
+
         leftSwipeSimpleCallback = LeftSwipeSimpleCallback(recyclerView)
         leftSwipeSimpleCallback.build()
     }
