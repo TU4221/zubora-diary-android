@@ -7,30 +7,43 @@ import androidx.recyclerview.widget.RecyclerView
 import com.websarva.wings.android.zuboradiary.R
 import com.websarva.wings.android.zuboradiary.domain.model.ThemeColor
 import com.websarva.wings.android.zuboradiary.databinding.RowWordSearchResultListBinding
+import com.websarva.wings.android.zuboradiary.ui.adapter.ListBaseAdapter
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
-import com.websarva.wings.android.zuboradiary.ui.adapter.diary.DiaryDayListBaseAdapter
-import com.websarva.wings.android.zuboradiary.ui.adapter.diary.DiaryDayListBaseItem
+import com.websarva.wings.android.zuboradiary.ui.adapter.diary.DiaryDayListBaseDiffUtilItemCallback
+import com.websarva.wings.android.zuboradiary.ui.adapter.diary.wordsearchresult.WordSearchResultDayListAdapter.WordSearchResultDayViewHolder
 import com.websarva.wings.android.zuboradiary.ui.utils.toDiaryListDayOfWeekString
 import java.text.NumberFormat
 
 internal class WordSearchResultDayListAdapter(
     recyclerView: RecyclerView,
     themeColor: ThemeColor
-) : DiaryDayListBaseAdapter(recyclerView, themeColor, DiffUtilItemCallback()) {
+) : ListBaseAdapter<WordSearchResultDayListItem, WordSearchResultDayViewHolder>(
+    recyclerView,
+    themeColor,
+    DiffUtilItemCallback()
+) {
 
-    override fun createDiaryDayViewHolder(
+    override fun build() {
+        super.build()
+
+        // MEMO:DiaryYearMonthListBaseAdapter#build()内にて理由記載)
+        recyclerView.itemAnimator = null
+    }
+
+    override fun createViewHolder(
         parent: ViewGroup,
-        themeColorInflater: LayoutInflater
-    ): RecyclerView.ViewHolder {
+        themeColorInflater: LayoutInflater,
+        viewType: Int
+    ): WordSearchResultDayViewHolder {
         val binding =
             RowWordSearchResultListBinding.inflate(themeColorInflater, parent, false)
         return WordSearchResultDayViewHolder(binding)
     }
 
-    override fun bindViewHolder(holder: RecyclerView.ViewHolder, item: DiaryDayListBaseItem) {
-        holder as WordSearchResultDayViewHolder
-        item as WordSearchResultDayListItem
-
+    override fun bindViewHolder(
+        holder: WordSearchResultDayViewHolder,
+        item: WordSearchResultDayListItem
+    ) {
         holder.bind(
             item,
             themeColor
@@ -68,17 +81,15 @@ internal class WordSearchResultDayListAdapter(
         }
     }
 
-    private class DiffUtilItemCallback : DiaryDayListBaseAdapter.DiffUtilItemCallback() {
+    private class DiffUtilItemCallback :
+        DiaryDayListBaseDiffUtilItemCallback<WordSearchResultDayListItem>() {
 
         private val logTag = createLogTag()
 
         override fun areContentsTheSame(
-            oldItem: DiaryDayListBaseItem,
-            newItem: DiaryDayListBaseItem
+            oldItem: WordSearchResultDayListItem,
+            newItem: WordSearchResultDayListItem
         ): Boolean {
-            if (oldItem !is WordSearchResultDayListItem) throw IllegalStateException()
-            if (newItem !is WordSearchResultDayListItem) throw IllegalStateException()
-
             if (!oldItem.areContentsTheSame(newItem)) {
                 Log.d(logTag, "areContentsTheSame()_不一致")
                 return false

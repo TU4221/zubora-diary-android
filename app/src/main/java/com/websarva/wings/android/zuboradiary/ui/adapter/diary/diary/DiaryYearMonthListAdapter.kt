@@ -4,17 +4,19 @@ import android.util.Log
 import androidx.recyclerview.widget.RecyclerView
 import com.websarva.wings.android.zuboradiary.domain.model.ThemeColor
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
-import com.websarva.wings.android.zuboradiary.ui.adapter.diary.DiaryDayListBaseAdapter
 import com.websarva.wings.android.zuboradiary.ui.adapter.diary.DiaryDayListBaseItem
 import com.websarva.wings.android.zuboradiary.ui.adapter.diary.DiaryYearMonthListBaseAdapter
 import com.websarva.wings.android.zuboradiary.ui.adapter.diary.DiaryYearMonthListBaseItem
-import com.websarva.wings.android.zuboradiary.ui.adapter.diary.SwipeDiaryDayListBaseAdapter
 import com.websarva.wings.android.zuboradiary.ui.adapter.diary.SwipeDiaryYearMonthListBaseAdapter
 
 internal abstract class DiaryYearMonthListAdapter(
     recyclerView: RecyclerView,
     themeColor: ThemeColor
-) : SwipeDiaryYearMonthListBaseAdapter(recyclerView, themeColor, DiffUtilItemCallback()) {
+) : SwipeDiaryYearMonthListBaseAdapter<DiaryYearMonthListItem>(
+    recyclerView,
+    themeColor,
+    DiffUtilItemCallback()
+) {
 
     override fun createDiaryDayList(
         holder: DiaryYearMonthListViewHolder,
@@ -24,8 +26,7 @@ internal abstract class DiaryYearMonthListAdapter(
 
         val diaryDayListAdapter = createDiaryDayListAdapter(holder)
         val diaryDayList = item.diaryDayList.itemList
-        val convertedList: List<DiaryDayListBaseItem> = diaryDayList
-        diaryDayListAdapter.submitList(convertedList)
+        diaryDayListAdapter.submitList(diaryDayList)
     }
 
     private fun createDiaryDayListAdapter(
@@ -35,25 +36,23 @@ internal abstract class DiaryYearMonthListAdapter(
             DiaryDayListAdapter(holder.binding.recyclerDayList, themeColor)
         return diaryDayListAdapter.apply {
             build()
-            onClickItemListener =
-                DiaryDayListBaseAdapter.OnClickItemListener { item: DiaryDayListBaseItem ->
-                    onClickChildItemListener?.onClick(item) ?: return@OnClickItemListener
-                }
-            onClickDeleteButtonListener =
-                SwipeDiaryDayListBaseAdapter.OnClickDeleteButtonListener { item: DiaryDayListBaseItem ->
-                    onClickChildItemBackgroundButtonListener?.onClick(item)
-                        ?: return@OnClickDeleteButtonListener
-                }
+            registerOnClickItemListener { item: DiaryDayListBaseItem ->
+                onClickChildItemListener?.onClick(item)
+            }
+            registerOnClickDeleteButtonListener { item: DiaryDayListBaseItem ->
+                onClickChildItemBackgroundButtonListener?.onClick(item)
+            }
         }
     }
 
-    private class DiffUtilItemCallback : DiaryYearMonthListBaseAdapter.DiffUtilItemCallback() {
+    private class DiffUtilItemCallback :
+        DiaryYearMonthListBaseAdapter.DiffUtilItemCallback<DiaryYearMonthListItem>() {
 
         private val logTag = createLogTag()
 
             override fun areContentsTheSame(
-                oldItem: DiaryYearMonthListBaseItem,
-                newItem: DiaryYearMonthListBaseItem
+                oldItem: DiaryYearMonthListItem,
+                newItem: DiaryYearMonthListItem
             ): Boolean {
                 Log.d(
                     logTag,
@@ -63,9 +62,6 @@ internal abstract class DiaryYearMonthListAdapter(
                     logTag,
                     "areContentsTheSame()_newItem.yearMonth = " + newItem.yearMonth
                 )
-
-                if (oldItem !is DiaryYearMonthListItem) throw IllegalStateException()
-                if (newItem !is DiaryYearMonthListItem) throw IllegalStateException()
 
                 if (!oldItem.areContentsTheSame(newItem)) {
                     Log.d(logTag, "areContentsTheSame()_不一致")

@@ -12,7 +12,6 @@ import com.websarva.wings.android.zuboradiary.databinding.FragmentWordSearchBind
 import com.websarva.wings.android.zuboradiary.ui.keyboard.KeyboardManager
 import com.websarva.wings.android.zuboradiary.ui.adapter.diary.DiaryDayListBaseItem
 import com.websarva.wings.android.zuboradiary.ui.adapter.diary.DiaryYearMonthListBaseAdapter.OnClickChildItemListener
-import com.websarva.wings.android.zuboradiary.ui.adapter.diary.DiaryYearMonthListBaseItem
 import com.websarva.wings.android.zuboradiary.ui.adapter.diary.wordsearchresult.WordSearchResultYearMonthList
 import com.websarva.wings.android.zuboradiary.ui.adapter.diary.wordsearchresult.WordSearchResultYearMonthListAdapter
 import com.websarva.wings.android.zuboradiary.ui.model.event.CommonUiEvent
@@ -115,9 +114,7 @@ class WordSearchFragment : BaseFragment<FragmentWordSearchBinding, WordSearchEve
                     val listAdapter =
                         binding.recyclerWordSearchResultList.adapter
                                 as WordSearchResultYearMonthListAdapter
-                    val convertedList: List<DiaryYearMonthListBaseItem> =
-                        ArrayList<DiaryYearMonthListBaseItem>(value.itemList)
-                    listAdapter.submitList(convertedList) {
+                    listAdapter.submitList(value.itemList) {
                         mainViewModel.onWordSearchResultListUpdateCompleted()
                     }
                 }
@@ -194,7 +191,7 @@ class WordSearchFragment : BaseFragment<FragmentWordSearchBinding, WordSearchEve
     override fun clearViewBindings() {
         binding.recyclerWordSearchResultList.apply {
             val listAdapter = adapter as WordSearchResultYearMonthListAdapter
-            listAdapter.clearRecyclerViewBindings()
+            listAdapter.clearViewBindings()
             clearOnScrollListeners()
         }
         binding.floatingActionButtonTopScroll.setOnClickListener(null)

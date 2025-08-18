@@ -6,25 +6,28 @@ import android.view.View.OnLayoutChangeListener
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.websarva.wings.android.zuboradiary.R
 import com.websarva.wings.android.zuboradiary.domain.model.ThemeColor
 import com.websarva.wings.android.zuboradiary.databinding.RowDiaryYearMonthListBinding
 import com.websarva.wings.android.zuboradiary.databinding.RowNoDiaryMessageBinding
 import com.websarva.wings.android.zuboradiary.databinding.RowProgressBarBinding
+import com.websarva.wings.android.zuboradiary.ui.adapter.ListBaseAdapter
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
-import com.websarva.wings.android.zuboradiary.ui.theme.ThemeColorInflaterCreator
 
 // TODO:ViewHolderのViewに設定されたリスナを解除するように変更。
 // TODO:ViewHolderにのBindメソッドを用意してメソッド内でBindするように変更。
 // DiaryFragment、WordSearchFragmentの親RecyclerViewのListAdapter。
 // 親RecyclerViewを同じ構成にする為、一つのクラスで両方の子RecyclerViewに対応できるように作成。
-internal abstract class DiaryYearMonthListBaseAdapter protected constructor(
-    protected val recyclerView: RecyclerView,
-    protected val themeColor: ThemeColor,
-    diffUtilItemCallback: DiffUtilItemCallback
-) : ListAdapter<DiaryYearMonthListBaseItem, RecyclerView.ViewHolder>(diffUtilItemCallback) {
+internal abstract class DiaryYearMonthListBaseAdapter<T : DiaryYearMonthListBaseItem> protected constructor(
+    recyclerView: RecyclerView,
+    themeColor: ThemeColor,
+    diffUtilItemCallback: DiffUtilItemCallback<T>
+) : ListBaseAdapter<T, RecyclerView.ViewHolder>(
+    recyclerView,
+    themeColor,
+    diffUtilItemCallback
+) {
 
     private val logTag = createLogTag()
 
@@ -45,11 +48,10 @@ internal abstract class DiaryYearMonthListBaseAdapter protected constructor(
         NO_DIARY_MESSAGE(2)
     }
 
-    open fun build() {
-        recyclerView.apply {
-            adapter = this@DiaryYearMonthListBaseAdapter
-            layoutManager = LinearLayoutManager(context)
+    override fun build() {
+        super.build()
 
+        recyclerView.apply {
             // HACK:下記問題が発生する為アイテムアニメーションを無効化
             //      問題1.アイテム追加時もやがかかる。今回の構成(親Recycler:年月、子Recycler:日)上、
             //           既に表示されている年月に日のアイテムを追加すると、年月のアイテムに変更アニメーションが発生してしまう。
@@ -67,17 +69,19 @@ internal abstract class DiaryYearMonthListBaseAdapter protected constructor(
         }
     }
 
-    fun clearRecyclerViewBindings() {
-        recyclerView.apply {
-            adapter = null
-            layoutManager = null
-        }
+    override fun clearViewBindings() {
+        super.clearViewBindings()
+
+        recyclerView.clearOnScrollListeners()
+        recyclerView.removeOnLayoutChangeListener(onLayoutChangeListener)
+        onLayoutChangeListener = null
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
-        val inflater = LayoutInflater.from(parent.context)
-        val themeColorInflater = ThemeColorInflaterCreator().create(inflater, themeColor)
-
+    override fun createViewHolder(
+        parent: ViewGroup,
+        themeColorInflater: LayoutInflater,
+        viewType: Int
+    ): RecyclerView.ViewHolder {
         when(viewType) {
             ViewType.DIARY.viewTypeNumber -> {
                 val binding =
@@ -99,9 +103,8 @@ internal abstract class DiaryYearMonthListBaseAdapter protected constructor(
         }
     }
 
-    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+    override fun bindViewHolder(holder: RecyclerView.ViewHolder, item: T) {
         if (holder is DiaryYearMonthListViewHolder) {
-            val item = getItem(position)
             holder.apply {
                 // 対象行の情報を取得
                 val diaryYearMonth = item.yearMonth
@@ -140,14 +143,14 @@ internal abstract class DiaryYearMonthListBaseAdapter protected constructor(
     class ProgressBarViewHolder(binding: RowProgressBarBinding) :
         RecyclerView.ViewHolder(binding.root)
 
-    protected abstract class DiffUtilItemCallback
-        : DiffUtil.ItemCallback<DiaryYearMonthListBaseItem>() {
+    protected abstract class DiffUtilItemCallback<T : DiaryYearMonthListBaseItem>
+        : DiffUtil.ItemCallback<T>() {
 
             private val logTag = createLogTag()
 
             override fun areItemsTheSame(
-                oldItem: DiaryYearMonthListBaseItem,
-                newItem: DiaryYearMonthListBaseItem
+                oldItem: T,
+                newItem: T
             ): Boolean {
                 Log.d(
                     logTag,

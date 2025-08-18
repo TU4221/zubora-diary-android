@@ -12,7 +12,6 @@ import com.websarva.wings.android.zuboradiary.ui.model.message.AppMessage
 import com.websarva.wings.android.zuboradiary.databinding.FragmentDiaryListBinding
 import com.websarva.wings.android.zuboradiary.ui.adapter.diary.DiaryDayListBaseItem
 import com.websarva.wings.android.zuboradiary.ui.adapter.diary.DiaryYearMonthListBaseAdapter.OnClickChildItemListener
-import com.websarva.wings.android.zuboradiary.ui.adapter.diary.DiaryYearMonthListBaseItem
 import com.websarva.wings.android.zuboradiary.ui.adapter.diary.SwipeDiaryYearMonthListBaseAdapter.OnClickChildItemBackgroundButtonListener
 import com.websarva.wings.android.zuboradiary.ui.adapter.diary.diary.DiaryDayListItem
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.alert.DiaryListDeleteDialogFragment
@@ -168,9 +167,8 @@ class DiaryListFragment :
                         //setUpListAdapter()
                     }
 
-                    val convertedItemList: List<DiaryYearMonthListBaseItem> = value.itemList
                     val listAdapter = binding.recyclerDiaryList.adapter as DiaryYearMonthListAdapter
-                    listAdapter.submitList(convertedItemList) {
+                    listAdapter.submitList(value.itemList) {
                         mainViewModel.onDiaryListUpdateCompleted()
                     }
                 }
@@ -274,7 +272,7 @@ class DiaryListFragment :
         binding.materialToolbarTopAppBar.setOnMenuItemClickListener(null)
         binding.recyclerDiaryList.apply {
             val listAdapter = adapter as DiaryYearMonthListAdapter
-            listAdapter.clearRecyclerViewBindings()
+            listAdapter.clearViewBindings()
         }
 
         super.clearViewBindings()

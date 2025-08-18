@@ -161,11 +161,11 @@ class DiaryItemTitleEditDialog :
                 themeColor
             )
         itemTitleSelectionHistoryListAdapter.build()
-        itemTitleSelectionHistoryListAdapter.setOnClickItemListener { item: SelectionHistoryListItem ->
+        itemTitleSelectionHistoryListAdapter.registerOnClickItemListener { item: SelectionHistoryListItem ->
             mainViewModel.onDiaryItemTitleSelectionHistoryItemClick(item.title)
         }
         itemTitleSelectionHistoryListAdapter
-            .setOnClickDeleteButtonListener { item: SelectionHistoryListItem ->
+            .registerOnSwipeListener { item: SelectionHistoryListItem ->
                 mainViewModel
                     .onDiaryItemTitleSelectionHistoryItemDeleteButtonClick(
                         item.title

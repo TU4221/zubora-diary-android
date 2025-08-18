@@ -1,5 +1,6 @@
 package com.websarva.wings.android.zuboradiary.ui.adapter.diary
 
+import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.websarva.wings.android.zuboradiary.domain.model.ThemeColor
@@ -7,11 +8,11 @@ import com.websarva.wings.android.zuboradiary.ui.adapter.diary.diary.DiaryListSi
 
 // DiaryFragment、WordSearchFragmentの親RecyclerViewのListAdapter。
 // 親RecyclerViewを同じ構成にする為、一つのクラスで両方の子RecyclerViewに対応できるように作成。
-internal abstract class SwipeDiaryYearMonthListBaseAdapter protected constructor(
+internal abstract class SwipeDiaryYearMonthListBaseAdapter<T : DiaryYearMonthListBaseItem> protected constructor(
     recyclerView: RecyclerView,
     themeColor: ThemeColor,
-    diffUtilItemCallback: DiffUtilItemCallback
-) : DiaryYearMonthListBaseAdapter(recyclerView, themeColor, diffUtilItemCallback) {
+    diffUtilItemCallback: DiffUtilItemCallback<T>
+) : DiaryYearMonthListBaseAdapter<T>(recyclerView, themeColor, diffUtilItemCallback) {
 
     fun interface OnClickChildItemBackgroundButtonListener {
         fun onClick(item: DiaryDayListBaseItem)
@@ -33,8 +34,12 @@ internal abstract class SwipeDiaryYearMonthListBaseAdapter protected constructor
         })
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
-        val holder = super.onCreateViewHolder(parent, viewType)
+    override fun createViewHolder(
+        parent: ViewGroup,
+        themeColorInflater: LayoutInflater,
+        viewType: Int
+    ): RecyclerView.ViewHolder {
+        val holder = super.createViewHolder(parent, themeColorInflater, viewType)
 
         if (holder is DiaryYearMonthListViewHolder) {
             DiaryListSimpleCallback(recyclerView, holder.binding.recyclerDayList)
