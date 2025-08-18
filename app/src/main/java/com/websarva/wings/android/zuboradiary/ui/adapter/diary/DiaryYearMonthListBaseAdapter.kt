@@ -72,9 +72,12 @@ internal abstract class DiaryYearMonthListBaseAdapter<T : DiaryYearMonthListBase
     override fun clearViewBindings() {
         super.clearViewBindings()
 
-        recyclerView.clearOnScrollListeners()
-        recyclerView.removeOnLayoutChangeListener(onLayoutChangeListener)
+        recyclerView.apply {
+            clearOnScrollListeners()
+            removeOnLayoutChangeListener(onLayoutChangeListener)
+        }
         onLayoutChangeListener = null
+        onClickChildItemListener = null
     }
 
     override fun createViewHolder(
