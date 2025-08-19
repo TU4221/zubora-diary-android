@@ -61,7 +61,7 @@ internal class ItemTitleSelectionHistoryListAdapter(
         )
     }
 
-    internal class ItemTitleSelectionHistoryViewHolder(
+    class ItemTitleSelectionHistoryViewHolder(
         val binding: RowItemTitleSelectionHistoryBinding
     ) : LeftSwipeViewHolder<SelectionHistoryListItem>(binding) {
         override val foregroundView
