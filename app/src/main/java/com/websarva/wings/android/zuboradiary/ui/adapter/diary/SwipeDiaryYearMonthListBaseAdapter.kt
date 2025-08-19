@@ -8,16 +8,19 @@ import com.websarva.wings.android.zuboradiary.ui.adapter.diary.diary.DiaryListSi
 
 // DiaryFragment、WordSearchFragmentの親RecyclerViewのListAdapter。
 // 親RecyclerViewを同じ構成にする為、一つのクラスで両方の子RecyclerViewに対応できるように作成。
-internal abstract class SwipeDiaryYearMonthListBaseAdapter<T : DiaryYearMonthListBaseItem> protected constructor(
+internal abstract class SwipeDiaryYearMonthListBaseAdapter<
+        T : DiaryYearMonthListBaseItem,
+        CT : DiaryDayListBaseItem
+> protected constructor(
     recyclerView: RecyclerView,
     themeColor: ThemeColor,
     diffUtilItemCallback: DiffUtilItemCallback<T>
-) : DiaryYearMonthListBaseAdapter<T>(recyclerView, themeColor, diffUtilItemCallback) {
+) : DiaryYearMonthListBaseAdapter<T, CT>(recyclerView, themeColor, diffUtilItemCallback) {
 
-    fun interface OnClickChildItemBackgroundButtonListener {
-        fun onClick(item: DiaryDayListBaseItem)
+    fun interface OnClickChildItemBackgroundButtonListener<T> {
+        fun onClick(item: T)
     }
-    protected var onClickChildItemBackgroundButtonListener: OnClickChildItemBackgroundButtonListener? = null
+    protected var onClickChildItemBackgroundButtonListener: OnClickChildItemBackgroundButtonListener<CT>? = null
 
     private val simpleCallbackList: MutableList<DiaryListSimpleCallback> = ArrayList()
 
@@ -59,7 +62,7 @@ internal abstract class SwipeDiaryYearMonthListBaseAdapter<T : DiaryYearMonthLis
     }
 
     fun registerOnClickChildItemBackgroundButtonListener(
-        listener: OnClickChildItemBackgroundButtonListener
+        listener: OnClickChildItemBackgroundButtonListener<CT>
     ) {
         onClickChildItemBackgroundButtonListener = listener
     }

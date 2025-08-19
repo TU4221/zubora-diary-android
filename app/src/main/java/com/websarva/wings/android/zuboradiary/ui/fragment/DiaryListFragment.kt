@@ -10,7 +10,6 @@ import androidx.fragment.app.viewModels
 import com.websarva.wings.android.zuboradiary.R
 import com.websarva.wings.android.zuboradiary.ui.model.message.AppMessage
 import com.websarva.wings.android.zuboradiary.databinding.FragmentDiaryListBinding
-import com.websarva.wings.android.zuboradiary.ui.adapter.diary.DiaryDayListBaseItem
 import com.websarva.wings.android.zuboradiary.ui.adapter.diary.diary.DiaryDayListItem
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.alert.DiaryListDeleteDialogFragment
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.DiaryListViewModel
@@ -192,11 +191,10 @@ class DiaryListFragment :
 
         return diaryListAdapter.apply {
             build()
-            registerOnClickChildItemListener { item: DiaryDayListBaseItem ->
+            registerOnClickChildItemListener { item: DiaryDayListItem ->
                 mainViewModel.onDiaryListItemClick(item.date)
             }
-            registerOnClickChildItemBackgroundButtonListener { item: DiaryDayListBaseItem ->
-                if (item !is DiaryDayListItem) throw IllegalStateException()
+            registerOnClickChildItemBackgroundButtonListener { item: DiaryDayListItem ->
                 mainViewModel.onDiaryListItemDeleteButtonClick(item.date, item.imageUri)
             }
         }

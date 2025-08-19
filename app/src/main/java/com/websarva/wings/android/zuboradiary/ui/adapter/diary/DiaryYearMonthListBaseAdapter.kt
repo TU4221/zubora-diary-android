@@ -19,7 +19,10 @@ import com.websarva.wings.android.zuboradiary.utils.createLogTag
 // TODO:ViewHolderにのBindメソッドを用意してメソッド内でBindするように変更。
 // DiaryFragment、WordSearchFragmentの親RecyclerViewのListAdapter。
 // 親RecyclerViewを同じ構成にする為、一つのクラスで両方の子RecyclerViewに対応できるように作成。
-internal abstract class DiaryYearMonthListBaseAdapter<T : DiaryYearMonthListBaseItem> protected constructor(
+internal abstract class DiaryYearMonthListBaseAdapter<
+        T : DiaryYearMonthListBaseItem,
+        CT : DiaryDayListBaseItem
+> protected constructor(
     recyclerView: RecyclerView,
     themeColor: ThemeColor,
     diffUtilItemCallback: DiffUtilItemCallback<T>
@@ -33,10 +36,10 @@ internal abstract class DiaryYearMonthListBaseAdapter<T : DiaryYearMonthListBase
 
     private var onLayoutChangeListener: OnLayoutChangeListener? = null
 
-    fun interface OnClickChildItemListener {
-        fun onClick(item: DiaryDayListBaseItem)
+    fun interface OnClickChildItemListener<T> {
+        fun onClick(item: T)
     }
-    protected var onClickChildItemListener: OnClickChildItemListener? = null
+    protected var onClickChildItemListener: OnClickChildItemListener<CT>? = null
 
     // MEMO:@Suppress("unused")が不要と警告が発生したので削除したが、"unused"警告が再発する。
     //      その為、@Suppress("RedundantSuppression")で警告回避。
@@ -185,7 +188,7 @@ internal abstract class DiaryYearMonthListBaseAdapter<T : DiaryYearMonthListBase
             }
     }
 
-    fun registerOnClickChildItemListener(listener: OnClickChildItemListener) {
+    fun registerOnClickChildItemListener(listener: OnClickChildItemListener<CT>) {
         onClickChildItemListener = listener
     }
 

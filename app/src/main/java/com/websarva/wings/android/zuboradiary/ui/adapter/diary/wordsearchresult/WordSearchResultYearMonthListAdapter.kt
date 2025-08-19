@@ -10,7 +10,7 @@ import com.websarva.wings.android.zuboradiary.ui.adapter.diary.DiaryYearMonthLis
 internal abstract class WordSearchResultYearMonthListAdapter(
     recyclerView: RecyclerView,
     themeColor: ThemeColor
-) : DiaryYearMonthListBaseAdapter<WordSearchResultYearMonthListItem>(
+) : DiaryYearMonthListBaseAdapter<WordSearchResultYearMonthListItem, WordSearchResultDayListItem>(
     recyclerView,
     themeColor,
     DiffUtilItemCallback()
