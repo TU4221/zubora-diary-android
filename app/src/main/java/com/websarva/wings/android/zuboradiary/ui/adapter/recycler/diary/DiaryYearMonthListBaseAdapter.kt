@@ -1,4 +1,4 @@
-package com.websarva.wings.android.zuboradiary.ui.adapter.diary
+package com.websarva.wings.android.zuboradiary.ui.adapter.recycler.diary
 
 import android.util.Log
 import android.view.LayoutInflater
@@ -13,8 +13,8 @@ import com.websarva.wings.android.zuboradiary.domain.model.ThemeColor
 import com.websarva.wings.android.zuboradiary.databinding.RowDiaryYearMonthListBinding
 import com.websarva.wings.android.zuboradiary.databinding.RowNoDiaryMessageBinding
 import com.websarva.wings.android.zuboradiary.databinding.RowProgressBarBinding
-import com.websarva.wings.android.zuboradiary.ui.adapter.ListBaseAdapter
-import com.websarva.wings.android.zuboradiary.ui.adapter.diary.DiaryYearMonthListBaseAdapter.DiaryYearMonthListViewHolder
+import com.websarva.wings.android.zuboradiary.ui.adapter.recycler.ListBaseAdapter
+import com.websarva.wings.android.zuboradiary.ui.adapter.recycler.diary.DiaryYearMonthListBaseAdapter.DiaryYearMonthListViewHolder
 import com.websarva.wings.android.zuboradiary.ui.model.list.diary.DiaryDayListBaseItem
 import com.websarva.wings.android.zuboradiary.ui.model.list.diary.DiaryYearMonthListBaseItem
 import com.websarva.wings.android.zuboradiary.utils.createLogTag

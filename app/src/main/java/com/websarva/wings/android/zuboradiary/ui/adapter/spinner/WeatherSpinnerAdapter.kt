@@ -1,4 +1,4 @@
-package com.websarva.wings.android.zuboradiary.ui.view.adapter
+package com.websarva.wings.android.zuboradiary.ui.adapter.spinner
 
 import android.content.Context
 import android.widget.ArrayAdapter

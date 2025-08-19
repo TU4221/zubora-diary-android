@@ -1,4 +1,4 @@
-package com.websarva.wings.android.zuboradiary.ui.adapter.diaryitemtitle
+package com.websarva.wings.android.zuboradiary.ui.adapter.recycler.diaryitemtitle
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -7,9 +7,9 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import com.websarva.wings.android.zuboradiary.domain.model.ThemeColor
 import com.websarva.wings.android.zuboradiary.databinding.RowBackgroundDeleteButtonFullWideBinding
 import com.websarva.wings.android.zuboradiary.databinding.RowItemTitleSelectionHistoryBinding
-import com.websarva.wings.android.zuboradiary.ui.adapter.LeftSwipeListBaseAdapter
-import com.websarva.wings.android.zuboradiary.ui.adapter.LeftSwipeSimpleCallback.LeftSwipeViewHolder
-import com.websarva.wings.android.zuboradiary.ui.adapter.diaryitemtitle.ItemTitleSelectionHistoryListAdapter.ItemTitleSelectionHistoryViewHolder
+import com.websarva.wings.android.zuboradiary.ui.adapter.recycler.LeftSwipeListBaseAdapter
+import com.websarva.wings.android.zuboradiary.ui.adapter.recycler.LeftSwipeSimpleCallback.LeftSwipeViewHolder
+import com.websarva.wings.android.zuboradiary.ui.adapter.recycler.diaryitemtitle.ItemTitleSelectionHistoryListAdapter.ItemTitleSelectionHistoryViewHolder
 import com.websarva.wings.android.zuboradiary.ui.model.list.selectionhistory.SelectionHistoryListItem
 import com.websarva.wings.android.zuboradiary.ui.view.custom.SwipeRecyclerView
 

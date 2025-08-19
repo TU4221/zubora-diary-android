@@ -12,7 +12,7 @@ import com.websarva.wings.android.zuboradiary.databinding.FragmentWordSearchBind
 import com.websarva.wings.android.zuboradiary.ui.keyboard.KeyboardManager
 import com.websarva.wings.android.zuboradiary.ui.model.list.diary.wordsearchresult.WordSearchResultDayListItem
 import com.websarva.wings.android.zuboradiary.ui.model.list.diary.wordsearchresult.WordSearchResultYearMonthList
-import com.websarva.wings.android.zuboradiary.ui.adapter.diary.wordsearchresult.WordSearchResultYearMonthListAdapter
+import com.websarva.wings.android.zuboradiary.ui.adapter.recycler.diary.wordsearchresult.WordSearchResultYearMonthListAdapter
 import com.websarva.wings.android.zuboradiary.ui.model.event.CommonUiEvent
 import com.websarva.wings.android.zuboradiary.ui.model.event.WordSearchEvent
 import com.websarva.wings.android.zuboradiary.ui.model.navigation.NavigationCommand

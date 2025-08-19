@@ -1,16 +1,16 @@
-package com.websarva.wings.android.zuboradiary.ui.adapter.diary.diary
+package com.websarva.wings.android.zuboradiary.ui.adapter.recycler.diary.diary
 
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import com.websarva.wings.android.zuboradiary.domain.model.ThemeColor
 import com.websarva.wings.android.zuboradiary.databinding.RowDiaryDayListBinding
-import com.websarva.wings.android.zuboradiary.ui.adapter.LeftSwipeBackgroundButtonListBaseAdapter
+import com.websarva.wings.android.zuboradiary.ui.adapter.recycler.LeftSwipeBackgroundButtonListBaseAdapter
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import com.websarva.wings.android.zuboradiary.ui.view.imageview.DiaryImageConfigurator
-import com.websarva.wings.android.zuboradiary.ui.adapter.LeftSwipeSimpleCallback.LeftSwipeViewHolder
-import com.websarva.wings.android.zuboradiary.ui.adapter.diary.DiaryDayListBaseDiffUtilItemCallback
-import com.websarva.wings.android.zuboradiary.ui.adapter.diary.diary.DiaryDayListAdapter.DiaryDayListViewHolder
+import com.websarva.wings.android.zuboradiary.ui.adapter.recycler.LeftSwipeSimpleCallback.LeftSwipeViewHolder
+import com.websarva.wings.android.zuboradiary.ui.adapter.recycler.diary.DiaryDayListBaseDiffUtilItemCallback
+import com.websarva.wings.android.zuboradiary.ui.adapter.recycler.diary.diary.DiaryDayListAdapter.DiaryDayListViewHolder
 import com.websarva.wings.android.zuboradiary.ui.model.list.diary.diary.DiaryDayListItem
 import com.websarva.wings.android.zuboradiary.ui.utils.toDiaryListDayOfWeekString
 import com.websarva.wings.android.zuboradiary.ui.view.custom.SwipeRecyclerView

@@ -1,10 +1,10 @@
-package com.websarva.wings.android.zuboradiary.ui.adapter.diary
+package com.websarva.wings.android.zuboradiary.ui.adapter.recycler.diary
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.websarva.wings.android.zuboradiary.domain.model.ThemeColor
-import com.websarva.wings.android.zuboradiary.ui.adapter.diary.diary.DiaryListSimpleCallback
+import com.websarva.wings.android.zuboradiary.ui.adapter.recycler.diary.diary.DiaryListSimpleCallback
 import com.websarva.wings.android.zuboradiary.ui.model.list.diary.DiaryDayListBaseItem
 import com.websarva.wings.android.zuboradiary.ui.model.list.diary.DiaryYearMonthListBaseItem
 

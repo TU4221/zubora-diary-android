@@ -1,6 +1,6 @@
 package com.websarva.wings.android.zuboradiary.ui.model.list.diary.wordsearchresult
 
-import com.websarva.wings.android.zuboradiary.ui.adapter.diary.DiaryYearMonthListBaseAdapter
+import com.websarva.wings.android.zuboradiary.ui.adapter.recycler.diary.DiaryYearMonthListBaseAdapter
 import com.websarva.wings.android.zuboradiary.ui.model.list.diary.DiaryYearMonthListBaseItem
 import java.time.YearMonth
 

@@ -1,4 +1,4 @@
-package com.websarva.wings.android.zuboradiary.ui.adapter
+package com.websarva.wings.android.zuboradiary.ui.adapter.recycler
 
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView

@@ -1,4 +1,4 @@
-package com.websarva.wings.android.zuboradiary.ui.adapter.diary
+package com.websarva.wings.android.zuboradiary.ui.adapter.recycler.diary
 
 import android.util.Log
 import androidx.recyclerview.widget.DiffUtil

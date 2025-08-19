@@ -1,4 +1,4 @@
-package com.websarva.wings.android.zuboradiary.ui.adapter
+package com.websarva.wings.android.zuboradiary.ui.adapter.recycler
 
 import android.graphics.Rect
 import android.util.Log

@@ -14,7 +14,7 @@ import com.websarva.wings.android.zuboradiary.ui.model.list.diary.diary.DiaryDay
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.alert.DiaryListDeleteDialogFragment
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.DiaryListViewModel
 import com.websarva.wings.android.zuboradiary.ui.model.list.diary.diary.DiaryYearMonthList
-import com.websarva.wings.android.zuboradiary.ui.adapter.diary.diary.DiaryYearMonthListAdapter
+import com.websarva.wings.android.zuboradiary.ui.adapter.recycler.diary.diary.DiaryYearMonthListAdapter
 import com.websarva.wings.android.zuboradiary.ui.fragment.common.RequiresBottomNavigation
 import com.websarva.wings.android.zuboradiary.ui.fragment.common.ReselectableFragment
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.sheet.StartYearMonthPickerDialogFragment

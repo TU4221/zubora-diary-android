@@ -1,4 +1,4 @@
-package com.websarva.wings.android.zuboradiary.ui.adapter.diary.wordsearchresult
+package com.websarva.wings.android.zuboradiary.ui.adapter.recycler.diary.wordsearchresult
 
 import android.util.Log
 import android.view.LayoutInflater
@@ -7,10 +7,10 @@ import androidx.recyclerview.widget.RecyclerView
 import com.websarva.wings.android.zuboradiary.R
 import com.websarva.wings.android.zuboradiary.domain.model.ThemeColor
 import com.websarva.wings.android.zuboradiary.databinding.RowWordSearchResultListBinding
-import com.websarva.wings.android.zuboradiary.ui.adapter.ListBaseAdapter
+import com.websarva.wings.android.zuboradiary.ui.adapter.recycler.ListBaseAdapter
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
-import com.websarva.wings.android.zuboradiary.ui.adapter.diary.DiaryDayListBaseDiffUtilItemCallback
-import com.websarva.wings.android.zuboradiary.ui.adapter.diary.wordsearchresult.WordSearchResultDayListAdapter.WordSearchResultDayViewHolder
+import com.websarva.wings.android.zuboradiary.ui.adapter.recycler.diary.DiaryDayListBaseDiffUtilItemCallback
+import com.websarva.wings.android.zuboradiary.ui.adapter.recycler.diary.wordsearchresult.WordSearchResultDayListAdapter.WordSearchResultDayViewHolder
 import com.websarva.wings.android.zuboradiary.ui.model.list.diary.wordsearchresult.WordSearchResultDayListItem
 import com.websarva.wings.android.zuboradiary.ui.utils.toDiaryListDayOfWeekString
 import java.text.NumberFormat

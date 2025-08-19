@@ -1,7 +1,7 @@
-package com.websarva.wings.android.zuboradiary.ui.adapter.diary.diary
+package com.websarva.wings.android.zuboradiary.ui.adapter.recycler.diary.diary
 
 import androidx.recyclerview.widget.RecyclerView
-import com.websarva.wings.android.zuboradiary.ui.adapter.LeftSwipeBackgroundButtonSimpleCallback
+import com.websarva.wings.android.zuboradiary.ui.adapter.recycler.LeftSwipeBackgroundButtonSimpleCallback
 import com.websarva.wings.android.zuboradiary.ui.view.custom.SwipeRecyclerView
 
 internal class DiaryListSimpleCallback(

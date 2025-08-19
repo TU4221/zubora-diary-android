@@ -10,7 +10,7 @@ import com.websarva.wings.android.zuboradiary.R
 import com.websarva.wings.android.zuboradiary.databinding.DialogDiaryItemTitleEditBinding
 import com.websarva.wings.android.zuboradiary.ui.model.message.AppMessage
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.DiaryItemTitleEditViewModel
-import com.websarva.wings.android.zuboradiary.ui.adapter.diaryitemtitle.ItemTitleSelectionHistoryListAdapter
+import com.websarva.wings.android.zuboradiary.ui.adapter.recycler.diaryitemtitle.ItemTitleSelectionHistoryListAdapter
 import com.websarva.wings.android.zuboradiary.ui.model.list.selectionhistory.SelectionHistoryList
 import com.websarva.wings.android.zuboradiary.ui.model.list.selectionhistory.SelectionHistoryListItem
 import com.websarva.wings.android.zuboradiary.ui.fragment.RESULT_KEY_PREFIX
