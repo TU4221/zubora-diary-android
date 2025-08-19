@@ -23,11 +23,11 @@ internal open class LeftSwipeBackgroundButtonSimpleCallback(recyclerView: SwipeR
     override fun build() {
         super.build()
         recyclerView.setOnPerformClickListener { view, event ->
-            onClickSwipedViewHolder(view, event)
+            processSwipedViewHolderClick(view, event)
         }
     }
 
-    private fun onClickSwipedViewHolder(v: View, event: MotionEvent): Boolean {
+    private fun processSwipedViewHolderClick(v: View, event: MotionEvent): Boolean {
         // タッチViewHolder取得
         val childView = recyclerView.findChildViewUnder(event.x, event.y) ?: return false
 
