@@ -8,14 +8,15 @@ import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.CheckUnloadedWordSearchResultDiariesExistUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.CountWordSearchResultDiariesUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.LoadWordSearchResultDiaryListUseCase
+import com.websarva.wings.android.zuboradiary.ui.mapper.toUiModel
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import com.websarva.wings.android.zuboradiary.ui.model.message.WordSearchAppMessage
 import com.websarva.wings.android.zuboradiary.ui.model.list.diary.wordsearchresult.WordSearchResultDayList
-import com.websarva.wings.android.zuboradiary.ui.model.list.diary.wordsearchresult.WordSearchResultDayListItem
 import com.websarva.wings.android.zuboradiary.ui.model.list.diary.wordsearchresult.WordSearchResultYearMonthList
 import com.websarva.wings.android.zuboradiary.ui.model.event.CommonUiEvent
 import com.websarva.wings.android.zuboradiary.ui.model.state.WordSearchState
 import com.websarva.wings.android.zuboradiary.ui.model.event.WordSearchEvent
+import com.websarva.wings.android.zuboradiary.ui.model.list.diary.DiaryDayListItem
 import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.common.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -165,7 +166,7 @@ internal class WordSearchViewModel @Inject internal constructor(
         }
     }
 
-    fun onWordSearchResultListItemClick(item: WordSearchResultDayListItem) {
+    fun onWordSearchResultListItemClick(item: DiaryDayListItem.WordSearchResult) {
         val date = item.date
         viewModelScope.launch {
             emitUiEvent(WordSearchEvent.NavigateDiaryShowFragment(date))
@@ -401,13 +402,10 @@ internal class WordSearchViewModel @Inject internal constructor(
         Log.d("20250714", list.toString())
         if (list.isEmpty()) return WordSearchResultYearMonthList()
 
-        val resultDayListItemList: MutableList<WordSearchResultDayListItem> = ArrayList()
-        list.stream().forEach { x: WordSearchResultListItem ->
-            resultDayListItemList.add(
-                WordSearchResultDayListItem(x, searchWord)
+        val resultDayList =
+            WordSearchResultDayList(
+                list.stream().map { it.toUiModel(searchWord) }.toList()
             )
-        }
-        val resultDayList = WordSearchResultDayList(resultDayListItemList)
         val existsUnloadedDiaries =
             existsUnloadedDiaries(
                 searchWord,

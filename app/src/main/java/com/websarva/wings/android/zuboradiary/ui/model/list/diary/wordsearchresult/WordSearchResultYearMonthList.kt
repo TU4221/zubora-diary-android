@@ -1,6 +1,7 @@
 package com.websarva.wings.android.zuboradiary.ui.model.list.diary.wordsearchresult
 
 import com.websarva.wings.android.zuboradiary.ui.adapter.recycler.diary.DiaryYearMonthListBaseAdapter
+import com.websarva.wings.android.zuboradiary.ui.model.list.diary.DiaryDayListItem
 import com.websarva.wings.android.zuboradiary.ui.model.list.diary.DiaryYearMonthListBaseItem
 import java.time.YearMonth
 
@@ -49,7 +50,7 @@ internal class WordSearchResultYearMonthList {
     ): List<WordSearchResultYearMonthListItem> {
         require(wordSearchResultDayList.isNotEmpty)
 
-        var sortingDayItemList: MutableList<WordSearchResultDayListItem> = ArrayList()
+        var sortingDayItemList: MutableList<DiaryDayListItem.WordSearchResult> = ArrayList()
         val resultYearMonthListItemList: MutableList<WordSearchResultYearMonthListItem> = ArrayList()
         var resultYearMonthListItem: WordSearchResultYearMonthListItem
         var sortingYearMonth: YearMonth? = null

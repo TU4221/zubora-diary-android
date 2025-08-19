@@ -10,7 +10,6 @@ import androidx.fragment.app.viewModels
 import com.websarva.wings.android.zuboradiary.R
 import com.websarva.wings.android.zuboradiary.ui.model.message.AppMessage
 import com.websarva.wings.android.zuboradiary.databinding.FragmentDiaryListBinding
-import com.websarva.wings.android.zuboradiary.ui.model.list.diary.diary.DiaryDayListItem
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.alert.DiaryListDeleteDialogFragment
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.DiaryListViewModel
 import com.websarva.wings.android.zuboradiary.ui.model.list.diary.diary.DiaryYearMonthList
@@ -22,6 +21,7 @@ import com.websarva.wings.android.zuboradiary.ui.model.event.CommonUiEvent
 import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
 import com.websarva.wings.android.zuboradiary.ui.model.state.DiaryListState
 import com.websarva.wings.android.zuboradiary.ui.model.event.DiaryListEvent
+import com.websarva.wings.android.zuboradiary.ui.model.list.diary.DiaryDayListItem
 import com.websarva.wings.android.zuboradiary.ui.model.navigation.NavigationCommand
 import com.websarva.wings.android.zuboradiary.ui.model.parameters.DiaryDeleteParameters
 import dagger.hilt.android.AndroidEntryPoint
@@ -191,10 +191,10 @@ class DiaryListFragment :
 
         return diaryListAdapter.apply {
             build()
-            registerOnClickChildItemListener { item: DiaryDayListItem ->
+            registerOnClickChildItemListener { item: DiaryDayListItem.Standard ->
                 mainViewModel.onDiaryListItemClick(item)
             }
-            registerOnClickChildItemBackgroundButtonListener { item: DiaryDayListItem ->
+            registerOnClickChildItemBackgroundButtonListener { item: DiaryDayListItem.Standard ->
                 mainViewModel.onDiaryListItemDeleteButtonClick(item)
             }
         }

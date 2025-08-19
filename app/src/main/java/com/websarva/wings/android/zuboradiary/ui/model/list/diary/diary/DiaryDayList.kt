@@ -1,14 +1,15 @@
 package com.websarva.wings.android.zuboradiary.ui.model.list.diary.diary
 
 import com.websarva.wings.android.zuboradiary.ui.model.list.diary.DiaryDayBaseList
+import com.websarva.wings.android.zuboradiary.ui.model.list.diary.DiaryDayListItem
 
 internal class DiaryDayList : DiaryDayBaseList {
 
-    val itemList: List<DiaryDayListItem>
+    val itemList: List<DiaryDayListItem.Standard>
 
     val isNotEmpty get() = itemList.isNotEmpty()
 
-    constructor(itemList: List<DiaryDayListItem>) {
+    constructor(itemList: List<DiaryDayListItem.Standard>) {
         require(itemList.isNotEmpty())
 
         this.itemList = itemList.toList()

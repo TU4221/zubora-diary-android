@@ -11,14 +11,15 @@ import com.websarva.wings.android.zuboradiary.domain.usecase.diary.DeleteDiaryUs
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.LoadNewestDiaryUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.LoadOldestDiaryUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.LoadDiaryListUseCase
+import com.websarva.wings.android.zuboradiary.ui.mapper.toUiModel
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import com.websarva.wings.android.zuboradiary.ui.model.message.DiaryListAppMessage
 import com.websarva.wings.android.zuboradiary.ui.model.list.diary.diary.DiaryDayList
-import com.websarva.wings.android.zuboradiary.ui.model.list.diary.diary.DiaryDayListItem
 import com.websarva.wings.android.zuboradiary.ui.model.list.diary.diary.DiaryYearMonthList
 import com.websarva.wings.android.zuboradiary.ui.model.event.CommonUiEvent
 import com.websarva.wings.android.zuboradiary.ui.model.state.DiaryListState
 import com.websarva.wings.android.zuboradiary.ui.model.event.DiaryListEvent
+import com.websarva.wings.android.zuboradiary.ui.model.list.diary.DiaryDayListItem
 import com.websarva.wings.android.zuboradiary.ui.model.parameters.DiaryDeleteParameters
 import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
 import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
@@ -162,14 +163,14 @@ internal class DiaryListViewModel @Inject constructor(
         }
     }
 
-    fun onDiaryListItemClick(item: DiaryDayListItem) {
+    fun onDiaryListItemClick(item: DiaryDayListItem.Standard) {
         val date = item.date
         viewModelScope.launch {
             emitUiEvent(DiaryListEvent.NavigateDiaryShowFragment(date))
         }
     }
 
-    fun onDiaryListItemDeleteButtonClick(item: DiaryDayListItem) {
+    fun onDiaryListItemDeleteButtonClick(item: DiaryDayListItem.Standard) {
         if (uiState.value != DiaryListState.ShowingDiaryList) return
 
         val date = item.date
@@ -387,14 +388,10 @@ internal class DiaryListViewModel @Inject constructor(
     private suspend fun toUiDiaryList(diaryList: List<DiaryListItem>): DiaryYearMonthList {
         if (diaryList.isEmpty()) return DiaryYearMonthList()
 
-        val diaryDayListItemList: MutableList<DiaryDayListItem> = ArrayList()
-        diaryList.stream()
-            .forEach { x: DiaryListItem ->
-                diaryDayListItemList.add(
-                    DiaryDayListItem(x)
-                )
-            }
-        val diaryDayList = DiaryDayList(diaryDayListItemList)
+        val diaryDayList =
+            DiaryDayList(
+                diaryList.stream().map { it.toUiModel() }.toList()
+            )
         val existsUnloadedDiaries = existsUnloadedDiaries(diaryDayList.countDiaries())
         return DiaryYearMonthList(diaryDayList, !existsUnloadedDiaries)
     }

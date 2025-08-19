@@ -1,14 +1,15 @@
 package com.websarva.wings.android.zuboradiary.ui.model.list.diary.wordsearchresult
 
 import com.websarva.wings.android.zuboradiary.ui.model.list.diary.DiaryDayBaseList
+import com.websarva.wings.android.zuboradiary.ui.model.list.diary.DiaryDayListItem
 
 internal class WordSearchResultDayList : DiaryDayBaseList {
 
-    val itemList: List<WordSearchResultDayListItem>
+    val itemList: List<DiaryDayListItem.WordSearchResult>
 
     val isNotEmpty get() = itemList.isNotEmpty()
 
-    constructor(itemList: List<WordSearchResultDayListItem>) {
+    constructor(itemList: List<DiaryDayListItem.WordSearchResult>) {
         this.itemList = itemList.toList()
     }
 

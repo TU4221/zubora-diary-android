@@ -11,14 +11,14 @@ import com.websarva.wings.android.zuboradiary.ui.adapter.recycler.ListBaseAdapte
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import com.websarva.wings.android.zuboradiary.ui.adapter.recycler.diary.DiaryDayListBaseDiffUtilItemCallback
 import com.websarva.wings.android.zuboradiary.ui.adapter.recycler.diary.wordsearchresult.WordSearchResultDayListAdapter.WordSearchResultDayViewHolder
-import com.websarva.wings.android.zuboradiary.ui.model.list.diary.wordsearchresult.WordSearchResultDayListItem
+import com.websarva.wings.android.zuboradiary.ui.model.list.diary.DiaryDayListItem
 import com.websarva.wings.android.zuboradiary.ui.utils.toDiaryListDayOfWeekString
 import java.text.NumberFormat
 
 internal class WordSearchResultDayListAdapter(
     recyclerView: RecyclerView,
     themeColor: ThemeColor
-) : ListBaseAdapter<WordSearchResultDayListItem, WordSearchResultDayViewHolder>(
+) : ListBaseAdapter<DiaryDayListItem.WordSearchResult, WordSearchResultDayViewHolder>(
     recyclerView,
     themeColor,
     DiffUtilItemCallback()
@@ -43,7 +43,7 @@ internal class WordSearchResultDayListAdapter(
 
     override fun bindViewHolder(
         holder: WordSearchResultDayViewHolder,
-        item: WordSearchResultDayListItem
+        item: DiaryDayListItem.WordSearchResult
     ) {
         holder.bind(
             item,
@@ -56,9 +56,9 @@ internal class WordSearchResultDayListAdapter(
     ) : RecyclerView.ViewHolder(binding.root) {
 
         fun bind(
-            item: WordSearchResultDayListItem,
+            item: DiaryDayListItem.WordSearchResult,
             themeColor: ThemeColor,
-            onItemClick: (WordSearchResultDayListItem) -> Unit,
+            onItemClick: (DiaryDayListItem.WordSearchResult) -> Unit,
         ) {
             val context = binding.root.context
             binding.apply {
@@ -83,13 +83,13 @@ internal class WordSearchResultDayListAdapter(
     }
 
     private class DiffUtilItemCallback :
-        DiaryDayListBaseDiffUtilItemCallback<WordSearchResultDayListItem>() {
+        DiaryDayListBaseDiffUtilItemCallback<DiaryDayListItem.WordSearchResult>() {
 
         private val logTag = createLogTag()
 
         override fun areContentsTheSame(
-            oldItem: WordSearchResultDayListItem,
-            newItem: WordSearchResultDayListItem
+            oldItem: DiaryDayListItem.WordSearchResult,
+            newItem: DiaryDayListItem.WordSearchResult
         ): Boolean {
             if (!oldItem.areContentsTheSame(newItem)) {
                 Log.d(logTag, "areContentsTheSame()_不一致")

@@ -6,13 +6,13 @@ import com.websarva.wings.android.zuboradiary.domain.model.ThemeColor
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import com.websarva.wings.android.zuboradiary.ui.adapter.recycler.diary.DiaryYearMonthListBaseAdapter
 import com.websarva.wings.android.zuboradiary.ui.adapter.recycler.diary.SwipeDiaryYearMonthListBaseAdapter
-import com.websarva.wings.android.zuboradiary.ui.model.list.diary.diary.DiaryDayListItem
+import com.websarva.wings.android.zuboradiary.ui.model.list.diary.DiaryDayListItem
 import com.websarva.wings.android.zuboradiary.ui.model.list.diary.diary.DiaryYearMonthListItem
 
 internal abstract class DiaryYearMonthListAdapter(
     recyclerView: RecyclerView,
     themeColor: ThemeColor
-) : SwipeDiaryYearMonthListBaseAdapter<DiaryYearMonthListItem, DiaryDayListItem>(
+) : SwipeDiaryYearMonthListBaseAdapter<DiaryYearMonthListItem, DiaryDayListItem.Standard>(
     recyclerView,
     themeColor,
     DiffUtilItemCallback()
@@ -34,10 +34,10 @@ internal abstract class DiaryYearMonthListAdapter(
             DiaryDayListAdapter(holder.binding.recyclerDayList, themeColor)
         return diaryDayListAdapter.apply {
             build()
-            registerOnClickItemListener { item: DiaryDayListItem ->
+            registerOnClickItemListener { item: DiaryDayListItem.Standard ->
                 onClickChildItemListener?.onClick(item)
             }
-            registerOnClickDeleteButtonListener { item: DiaryDayListItem ->
+            registerOnClickDeleteButtonListener { item: DiaryDayListItem.Standard ->
                 onClickChildItemBackgroundButtonListener?.onClick(item)
             }
         }

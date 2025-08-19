@@ -1,6 +1,7 @@
 package com.websarva.wings.android.zuboradiary.ui.model.list.diary.diary
 
 import com.websarva.wings.android.zuboradiary.ui.adapter.recycler.diary.DiaryYearMonthListBaseAdapter
+import com.websarva.wings.android.zuboradiary.ui.model.list.diary.DiaryDayListItem
 import com.websarva.wings.android.zuboradiary.ui.model.list.diary.DiaryYearMonthListBaseItem
 import java.time.YearMonth
 
@@ -41,7 +42,7 @@ internal class DiaryYearMonthList {
     private fun createDiaryYearMonthListItem(diaryDayList: DiaryDayList): List<DiaryYearMonthListItem> {
         require(diaryDayList.isNotEmpty)
 
-        var sortingDayItemList: MutableList<DiaryDayListItem> = ArrayList()
+        var sortingDayItemList: MutableList<DiaryDayListItem.Standard> = ArrayList()
         val diaryYearMonthListItemList: MutableList<DiaryYearMonthListItem> = ArrayList()
         var diaryYearMonthListItem: DiaryYearMonthListItem
         var sortingYearMonth: YearMonth? = null

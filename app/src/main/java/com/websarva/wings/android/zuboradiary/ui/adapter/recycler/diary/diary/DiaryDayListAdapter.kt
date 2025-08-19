@@ -11,13 +11,13 @@ import com.websarva.wings.android.zuboradiary.ui.view.imageview.DiaryImageConfig
 import com.websarva.wings.android.zuboradiary.ui.adapter.recycler.LeftSwipeSimpleCallback.LeftSwipeViewHolder
 import com.websarva.wings.android.zuboradiary.ui.adapter.recycler.diary.DiaryDayListBaseDiffUtilItemCallback
 import com.websarva.wings.android.zuboradiary.ui.adapter.recycler.diary.diary.DiaryDayListAdapter.DiaryDayListViewHolder
-import com.websarva.wings.android.zuboradiary.ui.model.list.diary.diary.DiaryDayListItem
+import com.websarva.wings.android.zuboradiary.ui.model.list.diary.DiaryDayListItem
 import com.websarva.wings.android.zuboradiary.ui.utils.toDiaryListDayOfWeekString
 import com.websarva.wings.android.zuboradiary.ui.view.custom.SwipeRecyclerView
 import java.text.NumberFormat
 
 internal class DiaryDayListAdapter(recyclerView: SwipeRecyclerView, themeColor: ThemeColor)
-    : LeftSwipeBackgroundButtonListBaseAdapter<DiaryDayListItem, DiaryDayListViewHolder>(
+    : LeftSwipeBackgroundButtonListBaseAdapter<DiaryDayListItem.Standard, DiaryDayListViewHolder>(
         recyclerView,
         themeColor,
         DiffUtilItemCallback()
@@ -40,7 +40,7 @@ internal class DiaryDayListAdapter(recyclerView: SwipeRecyclerView, themeColor: 
         return DiaryDayListViewHolder(binding, themeColor)
     }
 
-    override fun bindViewHolder(holder: DiaryDayListViewHolder, item: DiaryDayListItem) {
+    override fun bindViewHolder(holder: DiaryDayListViewHolder, item: DiaryDayListItem.Standard) {
         holder.bind(
             item,
             { onClickItemListener?.onClick(it) },
@@ -51,7 +51,7 @@ internal class DiaryDayListAdapter(recyclerView: SwipeRecyclerView, themeColor: 
     class DiaryDayListViewHolder(
         val binding: RowDiaryDayListBinding,
         val themeColor: ThemeColor
-    ) : LeftSwipeViewHolder<DiaryDayListItem>(binding) {
+    ) : LeftSwipeViewHolder<DiaryDayListItem.Standard>(binding) {
 
         override val foregroundView
             get() = binding.linerLayoutForeground
@@ -59,9 +59,9 @@ internal class DiaryDayListAdapter(recyclerView: SwipeRecyclerView, themeColor: 
             get() = binding.includeBackground.imageButtonDelete
 
         override fun bind(
-            item: DiaryDayListItem,
-            onItemClick: (DiaryDayListItem) -> Unit,
-            onDeleteButtonClick: (DiaryDayListItem) -> Unit
+            item: DiaryDayListItem.Standard,
+            onItemClick: (DiaryDayListItem.Standard) -> Unit,
+            onDeleteButtonClick: (DiaryDayListItem.Standard) -> Unit
         ) {
             val date = item.date
             val context = binding.root.context
@@ -86,13 +86,13 @@ internal class DiaryDayListAdapter(recyclerView: SwipeRecyclerView, themeColor: 
         }
     }
 
-    private class DiffUtilItemCallback : DiaryDayListBaseDiffUtilItemCallback<DiaryDayListItem>() {
+    private class DiffUtilItemCallback : DiaryDayListBaseDiffUtilItemCallback<DiaryDayListItem.Standard>() {
 
         val logTag = createLogTag()
 
         override fun areContentsTheSame(
-            oldItem: DiaryDayListItem,
-            newItem: DiaryDayListItem
+            oldItem: DiaryDayListItem.Standard,
+            newItem: DiaryDayListItem.Standard
         ): Boolean {
             if (!oldItem.areContentsTheSame(newItem)) {
                 Log.d(logTag, "areContentsTheSame()_全項目不一致")
