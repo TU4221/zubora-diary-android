@@ -5,7 +5,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.websarva.wings.android.zuboradiary.domain.model.ThemeColor
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import com.websarva.wings.android.zuboradiary.ui.adapter.diary.DiaryYearMonthListBaseAdapter
-import com.websarva.wings.android.zuboradiary.ui.adapter.diary.DiaryYearMonthListBaseItem
 import com.websarva.wings.android.zuboradiary.ui.adapter.diary.SwipeDiaryYearMonthListBaseAdapter
 
 internal abstract class DiaryYearMonthListAdapter(
@@ -19,10 +18,8 @@ internal abstract class DiaryYearMonthListAdapter(
 
     override fun createDiaryDayList(
         holder: DiaryYearMonthListViewHolder.Item,
-        item: DiaryYearMonthListBaseItem
+        item: DiaryYearMonthListItem
     ) {
-        if (item !is DiaryYearMonthListItem) throw IllegalStateException()
-
         val diaryDayListAdapter = createDiaryDayListAdapter(holder)
         val diaryDayList = item.diaryDayList.itemList
         diaryDayListAdapter.submitList(diaryDayList)

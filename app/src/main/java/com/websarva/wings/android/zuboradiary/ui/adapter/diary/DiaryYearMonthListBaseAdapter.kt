@@ -127,7 +127,7 @@ internal abstract class DiaryYearMonthListBaseAdapter<
 
     abstract fun createDiaryDayList(
         holder: DiaryYearMonthListViewHolder.Item,
-        item: DiaryYearMonthListBaseItem
+        item: T
     )
 
     override fun getItemViewType(position: Int): Int {
