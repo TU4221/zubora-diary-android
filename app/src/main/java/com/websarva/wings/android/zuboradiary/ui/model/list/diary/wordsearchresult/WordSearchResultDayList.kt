@@ -1,6 +1,6 @@
-package com.websarva.wings.android.zuboradiary.ui.adapter.diary.wordsearchresult
+package com.websarva.wings.android.zuboradiary.ui.model.list.diary.wordsearchresult
 
-import com.websarva.wings.android.zuboradiary.ui.adapter.diary.DiaryDayBaseList
+import com.websarva.wings.android.zuboradiary.ui.model.list.diary.DiaryDayBaseList
 
 internal class WordSearchResultDayList : DiaryDayBaseList {
 

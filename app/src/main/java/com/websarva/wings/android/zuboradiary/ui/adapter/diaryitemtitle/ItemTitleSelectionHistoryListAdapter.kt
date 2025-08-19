@@ -10,6 +10,7 @@ import com.websarva.wings.android.zuboradiary.databinding.RowItemTitleSelectionH
 import com.websarva.wings.android.zuboradiary.ui.adapter.LeftSwipeListBaseAdapter
 import com.websarva.wings.android.zuboradiary.ui.adapter.LeftSwipeSimpleCallback.LeftSwipeViewHolder
 import com.websarva.wings.android.zuboradiary.ui.adapter.diaryitemtitle.ItemTitleSelectionHistoryListAdapter.ItemTitleSelectionHistoryViewHolder
+import com.websarva.wings.android.zuboradiary.ui.model.list.selectionhistory.SelectionHistoryListItem
 import com.websarva.wings.android.zuboradiary.ui.view.custom.SwipeRecyclerView
 
 internal class ItemTitleSelectionHistoryListAdapter(

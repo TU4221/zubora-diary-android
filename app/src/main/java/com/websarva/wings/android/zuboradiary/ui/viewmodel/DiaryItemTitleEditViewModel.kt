@@ -10,8 +10,8 @@ import com.websarva.wings.android.zuboradiary.domain.usecase.diary.LoadDiaryItem
 import com.websarva.wings.android.zuboradiary.domain.usecase.text.ValidateInputTextUseCase
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import com.websarva.wings.android.zuboradiary.ui.model.message.DiaryItemTitleEditAppMessage
-import com.websarva.wings.android.zuboradiary.ui.adapter.diaryitemtitle.SelectionHistoryList
-import com.websarva.wings.android.zuboradiary.ui.adapter.diaryitemtitle.SelectionHistoryListItem
+import com.websarva.wings.android.zuboradiary.ui.model.list.selectionhistory.SelectionHistoryList
+import com.websarva.wings.android.zuboradiary.ui.model.list.selectionhistory.SelectionHistoryListItem
 import com.websarva.wings.android.zuboradiary.ui.model.DiaryItemTitle
 import com.websarva.wings.android.zuboradiary.ui.model.result.InputTextValidationResult
 import com.websarva.wings.android.zuboradiary.ui.model.event.CommonUiEvent

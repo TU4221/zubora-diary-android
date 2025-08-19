@@ -1,5 +1,6 @@
-package com.websarva.wings.android.zuboradiary.ui.adapter.diary
+package com.websarva.wings.android.zuboradiary.ui.model.list.diary
 
+import com.websarva.wings.android.zuboradiary.ui.adapter.diary.DiaryYearMonthListBaseAdapter
 import java.time.YearMonth
 
 internal abstract class DiaryYearMonthListBaseItem {
@@ -29,7 +30,7 @@ internal abstract class DiaryYearMonthListBaseItem {
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
-        if (other !is  DiaryYearMonthListBaseItem) return false
+        if (other !is DiaryYearMonthListBaseItem) return false
 
         return yearMonth == other.yearMonth && viewType == other.viewType
     }

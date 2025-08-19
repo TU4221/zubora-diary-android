@@ -1,8 +1,8 @@
-package com.websarva.wings.android.zuboradiary.ui.adapter.diary.diary
+package com.websarva.wings.android.zuboradiary.ui.model.list.diary.diary
 
 import android.net.Uri
 import com.websarva.wings.android.zuboradiary.domain.model.DiaryListItem
-import com.websarva.wings.android.zuboradiary.ui.adapter.diary.DiaryDayListBaseItem
+import com.websarva.wings.android.zuboradiary.ui.model.list.diary.DiaryDayListBaseItem
 
 internal class DiaryDayListItem(listItem: DiaryListItem) :
     DiaryDayListBaseItem(listItem.date) {

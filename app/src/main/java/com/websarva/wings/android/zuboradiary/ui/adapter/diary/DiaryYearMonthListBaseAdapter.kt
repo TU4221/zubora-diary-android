@@ -15,6 +15,8 @@ import com.websarva.wings.android.zuboradiary.databinding.RowNoDiaryMessageBindi
 import com.websarva.wings.android.zuboradiary.databinding.RowProgressBarBinding
 import com.websarva.wings.android.zuboradiary.ui.adapter.ListBaseAdapter
 import com.websarva.wings.android.zuboradiary.ui.adapter.diary.DiaryYearMonthListBaseAdapter.DiaryYearMonthListViewHolder
+import com.websarva.wings.android.zuboradiary.ui.model.list.diary.DiaryDayListBaseItem
+import com.websarva.wings.android.zuboradiary.ui.model.list.diary.DiaryYearMonthListBaseItem
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 
 // TODO:ViewHolderのViewに設定されたリスナを解除するように変更。

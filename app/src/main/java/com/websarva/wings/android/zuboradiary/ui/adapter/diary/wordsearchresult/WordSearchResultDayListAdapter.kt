@@ -11,6 +11,7 @@ import com.websarva.wings.android.zuboradiary.ui.adapter.ListBaseAdapter
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import com.websarva.wings.android.zuboradiary.ui.adapter.diary.DiaryDayListBaseDiffUtilItemCallback
 import com.websarva.wings.android.zuboradiary.ui.adapter.diary.wordsearchresult.WordSearchResultDayListAdapter.WordSearchResultDayViewHolder
+import com.websarva.wings.android.zuboradiary.ui.model.list.diary.wordsearchresult.WordSearchResultDayListItem
 import com.websarva.wings.android.zuboradiary.ui.utils.toDiaryListDayOfWeekString
 import java.text.NumberFormat
 

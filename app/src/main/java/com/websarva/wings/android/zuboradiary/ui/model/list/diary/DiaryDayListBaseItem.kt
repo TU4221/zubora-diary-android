@@ -1,4 +1,4 @@
-package com.websarva.wings.android.zuboradiary.ui.adapter.diary
+package com.websarva.wings.android.zuboradiary.ui.model.list.diary
 
 import java.time.LocalDate
 
@@ -16,7 +16,7 @@ internal abstract class DiaryDayListBaseItem(
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
-        if (other !is  DiaryDayListBaseItem) return false
+        if (other !is DiaryDayListBaseItem) return false
 
         return date == other.date
     }

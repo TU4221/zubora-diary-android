@@ -2,6 +2,7 @@ package com.websarva.wings.android.zuboradiary.ui.adapter.diary
 
 import android.util.Log
 import androidx.recyclerview.widget.DiffUtil
+import com.websarva.wings.android.zuboradiary.ui.model.list.diary.DiaryDayListBaseItem
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 
 internal abstract class DiaryDayListBaseDiffUtilItemCallback<T : DiaryDayListBaseItem> :

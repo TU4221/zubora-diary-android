@@ -10,10 +10,10 @@ import androidx.fragment.app.viewModels
 import com.websarva.wings.android.zuboradiary.R
 import com.websarva.wings.android.zuboradiary.ui.model.message.AppMessage
 import com.websarva.wings.android.zuboradiary.databinding.FragmentDiaryListBinding
-import com.websarva.wings.android.zuboradiary.ui.adapter.diary.diary.DiaryDayListItem
+import com.websarva.wings.android.zuboradiary.ui.model.list.diary.diary.DiaryDayListItem
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.alert.DiaryListDeleteDialogFragment
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.DiaryListViewModel
-import com.websarva.wings.android.zuboradiary.ui.adapter.diary.diary.DiaryYearMonthList
+import com.websarva.wings.android.zuboradiary.ui.model.list.diary.diary.DiaryYearMonthList
 import com.websarva.wings.android.zuboradiary.ui.adapter.diary.diary.DiaryYearMonthListAdapter
 import com.websarva.wings.android.zuboradiary.ui.fragment.common.RequiresBottomNavigation
 import com.websarva.wings.android.zuboradiary.ui.fragment.common.ReselectableFragment
