@@ -36,7 +36,7 @@ internal abstract class DiaryYearMonthListBaseAdapter<T : DiaryYearMonthListBase
     fun interface OnClickChildItemListener {
         fun onClick(item: DiaryDayListBaseItem)
     }
-    var onClickChildItemListener: OnClickChildItemListener? = null
+    protected var onClickChildItemListener: OnClickChildItemListener? = null
 
     // MEMO:@Suppress("unused")が不要と警告が発生したので削除したが、"unused"警告が再発する。
     //      その為、@Suppress("RedundantSuppression")で警告回避。
@@ -183,6 +183,10 @@ internal abstract class DiaryYearMonthListBaseAdapter<T : DiaryYearMonthListBase
                 Log.d(logTag, "areItemsTheSame()_全項目一致")
                 return true
             }
+    }
+
+    fun registerOnClickChildItemListener(listener: OnClickChildItemListener) {
+        onClickChildItemListener = listener
     }
 
     /**

@@ -17,7 +17,7 @@ internal abstract class SwipeDiaryYearMonthListBaseAdapter<T : DiaryYearMonthLis
     fun interface OnClickChildItemBackgroundButtonListener {
         fun onClick(item: DiaryDayListBaseItem)
     }
-    var onClickChildItemBackgroundButtonListener: OnClickChildItemBackgroundButtonListener? = null
+    protected var onClickChildItemBackgroundButtonListener: OnClickChildItemBackgroundButtonListener? = null
 
     private val simpleCallbackList: MutableList<DiaryListSimpleCallback> = ArrayList()
 
@@ -56,6 +56,12 @@ internal abstract class SwipeDiaryYearMonthListBaseAdapter<T : DiaryYearMonthLis
         }
 
         return holder
+    }
+
+    fun registerOnClickChildItemBackgroundButtonListener(
+        listener: OnClickChildItemBackgroundButtonListener
+    ) {
+        onClickChildItemBackgroundButtonListener = listener
     }
 
     fun closeAllSwipedItem() {

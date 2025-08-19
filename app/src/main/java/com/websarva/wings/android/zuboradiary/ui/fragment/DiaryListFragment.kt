@@ -11,8 +11,6 @@ import com.websarva.wings.android.zuboradiary.R
 import com.websarva.wings.android.zuboradiary.ui.model.message.AppMessage
 import com.websarva.wings.android.zuboradiary.databinding.FragmentDiaryListBinding
 import com.websarva.wings.android.zuboradiary.ui.adapter.diary.DiaryDayListBaseItem
-import com.websarva.wings.android.zuboradiary.ui.adapter.diary.DiaryYearMonthListBaseAdapter.OnClickChildItemListener
-import com.websarva.wings.android.zuboradiary.ui.adapter.diary.SwipeDiaryYearMonthListBaseAdapter.OnClickChildItemBackgroundButtonListener
 import com.websarva.wings.android.zuboradiary.ui.adapter.diary.diary.DiaryDayListItem
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.alert.DiaryListDeleteDialogFragment
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.DiaryListViewModel
@@ -194,15 +192,13 @@ class DiaryListFragment :
 
         return diaryListAdapter.apply {
             build()
-            onClickChildItemListener =
-                OnClickChildItemListener { item: DiaryDayListBaseItem ->
-                    mainViewModel.onDiaryListItemClick(item.date)
-                }
-            onClickChildItemBackgroundButtonListener =
-                OnClickChildItemBackgroundButtonListener { item: DiaryDayListBaseItem ->
-                    if (item !is DiaryDayListItem) throw IllegalStateException()
-                    mainViewModel.onDiaryListItemDeleteButtonClick(item.date, item.imageUri)
-                }
+            registerOnClickChildItemListener { item: DiaryDayListBaseItem ->
+                mainViewModel.onDiaryListItemClick(item.date)
+            }
+            registerOnClickChildItemBackgroundButtonListener { item: DiaryDayListBaseItem ->
+                if (item !is DiaryDayListItem) throw IllegalStateException()
+                mainViewModel.onDiaryListItemDeleteButtonClick(item.date, item.imageUri)
+            }
         }
     }
 

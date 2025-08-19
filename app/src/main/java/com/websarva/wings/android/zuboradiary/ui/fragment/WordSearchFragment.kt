@@ -11,7 +11,6 @@ import com.websarva.wings.android.zuboradiary.ui.model.message.AppMessage
 import com.websarva.wings.android.zuboradiary.databinding.FragmentWordSearchBinding
 import com.websarva.wings.android.zuboradiary.ui.keyboard.KeyboardManager
 import com.websarva.wings.android.zuboradiary.ui.adapter.diary.DiaryDayListBaseItem
-import com.websarva.wings.android.zuboradiary.ui.adapter.diary.DiaryYearMonthListBaseAdapter.OnClickChildItemListener
 import com.websarva.wings.android.zuboradiary.ui.adapter.diary.wordsearchresult.WordSearchResultYearMonthList
 import com.websarva.wings.android.zuboradiary.ui.adapter.diary.wordsearchresult.WordSearchResultYearMonthListAdapter
 import com.websarva.wings.android.zuboradiary.ui.model.event.CommonUiEvent
@@ -134,10 +133,9 @@ class WordSearchFragment : BaseFragment<FragmentWordSearchBinding, WordSearchEve
 
         wordSearchResultListAdapter.apply {
             build()
-            onClickChildItemListener =
-                OnClickChildItemListener { item: DiaryDayListBaseItem ->
-                    mainViewModel.onWordSearchResultListItemClick(item.date)
-                }
+            registerOnClickChildItemListener { item: DiaryDayListBaseItem ->
+                mainViewModel.onWordSearchResultListItemClick(item.date)
+            }
         }
     }
 
