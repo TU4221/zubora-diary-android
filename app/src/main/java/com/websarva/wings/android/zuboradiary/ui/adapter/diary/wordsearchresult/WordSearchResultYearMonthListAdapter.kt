@@ -17,7 +17,7 @@ internal abstract class WordSearchResultYearMonthListAdapter(
 ) {
 
     override fun createDiaryDayList(
-        holder: DiaryYearMonthListViewHolder, item: DiaryYearMonthListBaseItem
+        holder: DiaryYearMonthListViewHolder.Item, item: DiaryYearMonthListBaseItem
     ) {
         if (item !is WordSearchResultYearMonthListItem) throw IllegalStateException()
 
@@ -26,7 +26,7 @@ internal abstract class WordSearchResultYearMonthListAdapter(
     }
 
     private fun createWordSearchResultDayListAdapter(
-        holder: DiaryYearMonthListViewHolder
+        holder: DiaryYearMonthListViewHolder.Item
     ): WordSearchResultDayListAdapter {
         val wordSearchResultDayListAdapter =
             WordSearchResultDayListAdapter(holder.binding.recyclerDayList, themeColor)

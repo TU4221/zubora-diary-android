@@ -47,15 +47,21 @@ internal abstract class SwipeDiaryYearMonthListBaseAdapter<
         parent: ViewGroup,
         themeColorInflater: LayoutInflater,
         viewType: Int
-    ): RecyclerView.ViewHolder {
+    ): DiaryYearMonthListViewHolder {
         val holder = super.createViewHolder(parent, themeColorInflater, viewType)
 
-        if (holder is DiaryYearMonthListViewHolder) {
-            DiaryListSimpleCallback(recyclerView, holder.binding.recyclerDayList)
-                .apply {
-                    build()
-                    simpleCallbackList.add(this)
-                }
+        when (holder) {
+            is DiaryYearMonthListViewHolder.Item -> {
+                DiaryListSimpleCallback(recyclerView, holder.binding.recyclerDayList)
+                    .apply {
+                        build()
+                        simpleCallbackList.add(this)
+                    }
+            }
+            is DiaryYearMonthListViewHolder.NoDiaryMessage,
+            is DiaryYearMonthListViewHolder.ProgressBar -> {
+                // 処理不要
+            }
         }
 
         return holder

@@ -2,6 +2,7 @@ package com.websarva.wings.android.zuboradiary.ui.adapter.diary
 
 import android.util.Log
 import android.view.LayoutInflater
+import android.view.View
 import android.view.View.OnLayoutChangeListener
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
@@ -13,6 +14,7 @@ import com.websarva.wings.android.zuboradiary.databinding.RowDiaryYearMonthListB
 import com.websarva.wings.android.zuboradiary.databinding.RowNoDiaryMessageBinding
 import com.websarva.wings.android.zuboradiary.databinding.RowProgressBarBinding
 import com.websarva.wings.android.zuboradiary.ui.adapter.ListBaseAdapter
+import com.websarva.wings.android.zuboradiary.ui.adapter.diary.DiaryYearMonthListBaseAdapter.DiaryYearMonthListViewHolder
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 
 // TODO:ViewHolderのViewに設定されたリスナを解除するように変更。
@@ -26,7 +28,7 @@ internal abstract class DiaryYearMonthListBaseAdapter<
     recyclerView: RecyclerView,
     themeColor: ThemeColor,
     diffUtilItemCallback: DiffUtilItemCallback<T>
-) : ListBaseAdapter<T, RecyclerView.ViewHolder>(
+) : ListBaseAdapter<T, DiaryYearMonthListViewHolder>(
     recyclerView,
     themeColor,
     diffUtilItemCallback
@@ -87,37 +89,44 @@ internal abstract class DiaryYearMonthListBaseAdapter<
         parent: ViewGroup,
         themeColorInflater: LayoutInflater,
         viewType: Int
-    ): RecyclerView.ViewHolder {
+    ): DiaryYearMonthListViewHolder {
         when(viewType) {
             ViewType.DIARY.viewTypeNumber -> {
                 val binding =
                     RowDiaryYearMonthListBinding.inflate(themeColorInflater, parent, false)
-                return DiaryYearMonthListViewHolder(binding)
+                return DiaryYearMonthListViewHolder.Item(binding)
             }
 
             ViewType.PROGRESS_INDICATOR.viewTypeNumber -> {
                 val binding =
                     RowProgressBarBinding.inflate(themeColorInflater, parent, false)
-                return ProgressBarViewHolder(binding)
+                return DiaryYearMonthListViewHolder.ProgressBar(binding)
             }
 
             else -> {
                 val binding =
                     RowNoDiaryMessageBinding.inflate(themeColorInflater, parent, false)
-                return NoDiaryMessageViewHolder(binding)
+                return DiaryYearMonthListViewHolder.NoDiaryMessage(binding)
             }
         }
     }
 
-    override fun bindViewHolder(holder: RecyclerView.ViewHolder, item: T) {
-        if (holder is DiaryYearMonthListViewHolder) {
-            holder.bind(item)
-            createDiaryDayList(holder, item)
+    override fun bindViewHolder(holder: DiaryYearMonthListViewHolder, item: T) {
+        holder.bind(item)
+        when (holder) {
+            is DiaryYearMonthListViewHolder.Item -> {
+                createDiaryDayList(holder, item)
+            }
+            is DiaryYearMonthListViewHolder.NoDiaryMessage,
+            is DiaryYearMonthListViewHolder.ProgressBar -> {
+                // 処理不要
+            }
         }
+
     }
 
     abstract fun createDiaryDayList(
-        holder: DiaryYearMonthListViewHolder,
+        holder: DiaryYearMonthListViewHolder.Item,
         item: DiaryYearMonthListBaseItem
     )
 
@@ -126,32 +135,47 @@ internal abstract class DiaryYearMonthListBaseAdapter<
         return item.viewType.viewTypeNumber
     }
 
-    class DiaryYearMonthListViewHolder(
-        val binding: RowDiaryYearMonthListBinding
-    ) : RecyclerView.ViewHolder(binding.root) {
+    sealed class DiaryYearMonthListViewHolder(
+        itemView: View
+    ) : RecyclerView.ViewHolder(itemView) {
 
-        fun bind(item: DiaryYearMonthListBaseItem) {
-            // 対象行の情報を取得
-            val diaryYearMonth = item.yearMonth
+        abstract fun bind(item: DiaryYearMonthListBaseItem)
 
-            // セクションバー設定
-            // 左端に余白を持たせる為、最初にスペースを入力。
-            val context = binding.root.context
-            val diaryDate =
-                ("  " + diaryYearMonth.year + context.getString(R.string.row_diary_year_month_list_section_bar_year)
-                        + diaryYearMonth.monthValue + context.getString(R.string.row_diary_year_month_list_section_bar_month))
-            binding.textSection.text = diaryDate
-            // 日記リストスクロール時に移動させているので、バインディング時に位置リセット
-            binding.textSection.y = 0f
+        data class Item(
+            val binding: RowDiaryYearMonthListBinding
+        ) : DiaryYearMonthListViewHolder(binding.root) {
+            override fun bind(item: DiaryYearMonthListBaseItem) {
+                // 対象行の情報を取得
+                val diaryYearMonth = item.yearMonth
+
+                // セクションバー設定
+                // 左端に余白を持たせる為、最初にスペースを入力。
+                val context = binding.root.context
+                val diaryDate =
+                    ("  " + diaryYearMonth.year + context.getString(R.string.row_diary_year_month_list_section_bar_year)
+                            + diaryYearMonth.monthValue + context.getString(R.string.row_diary_year_month_list_section_bar_month))
+                binding.textSection.text = diaryDate
+                // 日記リストスクロール時に移動させているので、バインディング時に位置リセット
+                binding.textSection.y = 0f
+            }
         }
 
+        data class NoDiaryMessage(
+            val binding: RowNoDiaryMessageBinding
+        ) : DiaryYearMonthListViewHolder(binding.root) {
+            override fun bind(item: DiaryYearMonthListBaseItem) {
+                // 処理なし
+            }
+        }
+
+        data class ProgressBar(
+            val binding: RowProgressBarBinding
+        ) : DiaryYearMonthListViewHolder(binding.root) {
+            override fun bind(item: DiaryYearMonthListBaseItem) {
+                // 処理なし
+            }
+        }
     }
-
-    class NoDiaryMessageViewHolder(binding: RowNoDiaryMessageBinding) :
-        RecyclerView.ViewHolder(binding.root)
-
-    class ProgressBarViewHolder(binding: RowProgressBarBinding) :
-        RecyclerView.ViewHolder(binding.root)
 
     protected abstract class DiffUtilItemCallback<T : DiaryYearMonthListBaseItem>
         : DiffUtil.ItemCallback<T>() {
@@ -266,8 +290,16 @@ internal abstract class DiaryYearMonthListBaseAdapter<
         // MEMO:RecyclerViewが空の時nullとなる。
         val firstVisibleViewHolder =
             recyclerView.findViewHolderForAdapterPosition(firstVisibleItemPosition) ?: return
-        if (firstVisibleViewHolder !is DiaryYearMonthListViewHolder) return
-
+        firstVisibleViewHolder as DiaryYearMonthListViewHolder
+        when (firstVisibleViewHolder) {
+            is DiaryYearMonthListViewHolder.Item -> {
+                // 処理継続
+            }
+            is DiaryYearMonthListViewHolder.NoDiaryMessage,
+            is DiaryYearMonthListViewHolder.ProgressBar -> {
+                return
+            }
+        }
 
 
         val firstVisibleItemView = checkNotNull(layoutManager.getChildAt(0))
@@ -301,7 +333,16 @@ internal abstract class DiaryYearMonthListBaseAdapter<
         val firstVisibleItemPosition = layoutManager.findFirstVisibleItemPosition()
         val secondVisibleViewHolder =
             recyclerView.findViewHolderForAdapterPosition(firstVisibleItemPosition + 1) ?: return
-        if (secondVisibleViewHolder !is DiaryYearMonthListViewHolder) return
+        secondVisibleViewHolder as DiaryYearMonthListViewHolder
+        when (secondVisibleViewHolder) {
+            is DiaryYearMonthListViewHolder.Item -> {
+                // 処理継続
+            }
+            is DiaryYearMonthListViewHolder.NoDiaryMessage,
+            is DiaryYearMonthListViewHolder.ProgressBar -> {
+                return
+            }
+        }
         secondVisibleViewHolder.binding.textSection.y = 0f // ズレ防止
     }
 

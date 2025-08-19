@@ -18,7 +18,7 @@ internal abstract class DiaryYearMonthListAdapter(
 ) {
 
     override fun createDiaryDayList(
-        holder: DiaryYearMonthListViewHolder,
+        holder: DiaryYearMonthListViewHolder.Item,
         item: DiaryYearMonthListBaseItem
     ) {
         if (item !is DiaryYearMonthListItem) throw IllegalStateException()
@@ -29,7 +29,7 @@ internal abstract class DiaryYearMonthListAdapter(
     }
 
     private fun createDiaryDayListAdapter(
-        holder: DiaryYearMonthListViewHolder
+        holder: DiaryYearMonthListViewHolder.Item,
     ): DiaryDayListAdapter {
         val diaryDayListAdapter =
             DiaryDayListAdapter(holder.binding.recyclerDayList, themeColor)
