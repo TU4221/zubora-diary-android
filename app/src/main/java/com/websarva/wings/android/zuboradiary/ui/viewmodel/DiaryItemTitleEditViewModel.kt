@@ -141,7 +141,7 @@ internal class DiaryItemTitleEditViewModel @Inject constructor(
         }
     }
 
-    fun onDiaryItemTitleSelectionHistoryItemDeleteButtonClick(item: SelectionHistoryListItem) {
+    fun onDiaryItemTitleSelectionHistoryItemSwipe(item: SelectionHistoryListItem) {
         val itemTitle = item.title
         viewModelScope.launch {
             emitUiEvent(
