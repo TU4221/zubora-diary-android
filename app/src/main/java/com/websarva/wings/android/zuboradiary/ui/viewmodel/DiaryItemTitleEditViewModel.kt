@@ -8,6 +8,7 @@ import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.DeleteDiaryItemTitleSelectionHistoryItemUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.LoadDiaryItemTitleSelectionHistoryUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.text.ValidateInputTextUseCase
+import com.websarva.wings.android.zuboradiary.ui.mapper.toUiModel
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import com.websarva.wings.android.zuboradiary.ui.model.message.DiaryItemTitleEditAppMessage
 import com.websarva.wings.android.zuboradiary.ui.model.list.selectionhistory.SelectionHistoryList
@@ -223,7 +224,7 @@ internal class DiaryItemTitleEditViewModel @Inject constructor(
                     }
                     SelectionHistoryList(
                         list.map { item ->
-                            SelectionHistoryListItem(item)
+                            item.toUiModel()
                         }
                     )
                 }.stateInWhileSubscribed(
