@@ -34,11 +34,11 @@ internal abstract class DiaryYearMonthListAdapter(
             DiaryDayListAdapter(holder.binding.recyclerDayList, themeColor)
         return diaryDayListAdapter.apply {
             build()
-            registerOnClickItemListener { item: DiaryDayListItem.Standard ->
-                onClickChildItemListener?.onClick(item)
+            registerOnItemClickListener { item: DiaryDayListItem.Standard ->
+                onChildItemClickListener?.onClick(item)
             }
             registerOnClickDeleteButtonListener { item: DiaryDayListItem.Standard ->
-                onClickChildItemBackgroundButtonListener?.onClick(item)
+                onChildItemBackgroundButtonClickListener?.onClick(item)
             }
         }
     }

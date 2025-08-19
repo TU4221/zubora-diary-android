@@ -43,8 +43,8 @@ internal class DiaryDayListAdapter(recyclerView: SwipeRecyclerView, themeColor: 
     override fun bindViewHolder(holder: DiaryDayListViewHolder, item: DiaryDayListItem.Standard) {
         holder.bind(
             item,
-            { onClickItemListener?.onClick(it) },
-            { onClickDeleteButtonListener?.onClick(it) }
+            { onItemClickListener?.onClick(it) },
+            { onBackgroundButtonClickListener?.onClick(it) }
         )
     }
 

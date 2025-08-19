@@ -37,10 +37,10 @@ internal abstract class DiaryYearMonthListBaseAdapter<
 
     private var onLayoutChangeListener: OnLayoutChangeListener? = null
 
-    fun interface OnClickChildItemListener<T> {
+    fun interface OnChildItemClickListener<T> {
         fun onClick(item: T)
     }
-    protected var onClickChildItemListener: OnClickChildItemListener<CT>? = null
+    protected var onChildItemClickListener: OnChildItemClickListener<CT>? = null
 
     // MEMO:@Suppress("unused")が不要と警告が発生したので削除したが、"unused"警告が再発する。
     //      その為、@Suppress("RedundantSuppression")で警告回避。
@@ -81,7 +81,7 @@ internal abstract class DiaryYearMonthListBaseAdapter<
             removeOnLayoutChangeListener(onLayoutChangeListener)
         }
         onLayoutChangeListener = null
-        onClickChildItemListener = null
+        onChildItemClickListener = null
     }
 
     override fun createViewHolder(
@@ -215,8 +215,8 @@ internal abstract class DiaryYearMonthListBaseAdapter<
             }
     }
 
-    fun registerOnClickChildItemListener(listener: OnClickChildItemListener<CT>) {
-        onClickChildItemListener = listener
+    fun registerOnChildItemClickListener(listener: OnChildItemClickListener<CT>) {
+        onChildItemClickListener = listener
     }
 
     /**

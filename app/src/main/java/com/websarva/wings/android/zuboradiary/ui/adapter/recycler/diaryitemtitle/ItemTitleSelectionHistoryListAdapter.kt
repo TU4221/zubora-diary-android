@@ -56,8 +56,8 @@ internal class ItemTitleSelectionHistoryListAdapter(
     ) {
         holder.bind(
             item,
-            { onClickItemListener?.onClick(it) },
-            { onSwipeListener?.onSwipe(it) },
+            { onItemClickListener?.onClick(it) },
+            { onItemSwipeListener?.onSwipe(it) },
         )
     }
 

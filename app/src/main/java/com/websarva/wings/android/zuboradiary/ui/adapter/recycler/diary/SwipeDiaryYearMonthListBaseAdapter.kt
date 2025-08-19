@@ -19,10 +19,10 @@ internal abstract class SwipeDiaryYearMonthListBaseAdapter<
     diffUtilItemCallback: DiffUtilItemCallback<T>
 ) : DiaryYearMonthListBaseAdapter<T, CT>(recyclerView, themeColor, diffUtilItemCallback) {
 
-    fun interface OnClickChildItemBackgroundButtonListener<T> {
+    fun interface OnChildItemBackgroundButtonClickListener<T> {
         fun onClick(item: T)
     }
-    protected var onClickChildItemBackgroundButtonListener: OnClickChildItemBackgroundButtonListener<CT>? = null
+    protected var onChildItemBackgroundButtonClickListener: OnChildItemBackgroundButtonClickListener<CT>? = null
 
     private val simpleCallbackList: MutableList<DiaryListSimpleCallback> = ArrayList()
 
@@ -42,7 +42,7 @@ internal abstract class SwipeDiaryYearMonthListBaseAdapter<
     override fun clearViewBindings() {
         super.clearViewBindings()
 
-        onClickChildItemBackgroundButtonListener = null
+        onChildItemBackgroundButtonClickListener = null
     }
 
     override fun createViewHolder(
@@ -69,10 +69,10 @@ internal abstract class SwipeDiaryYearMonthListBaseAdapter<
         return holder
     }
 
-    fun registerOnClickChildItemBackgroundButtonListener(
-        listener: OnClickChildItemBackgroundButtonListener<CT>
+    fun registerOnChildItemBackgroundButtonClickListener(
+        listener: OnChildItemBackgroundButtonClickListener<CT>
     ) {
-        onClickChildItemBackgroundButtonListener = listener
+        onChildItemBackgroundButtonClickListener = listener
     }
 
     fun closeAllSwipedItem() {

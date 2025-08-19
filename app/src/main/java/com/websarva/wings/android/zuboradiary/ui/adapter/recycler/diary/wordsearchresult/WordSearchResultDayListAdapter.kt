@@ -48,7 +48,7 @@ internal class WordSearchResultDayListAdapter(
         holder.bind(
             item,
             themeColor
-        ) { onClickItemListener?.onClick(it) }
+        ) { onItemClickListener?.onClick(it) }
     }
 
     class WordSearchResultDayViewHolder(

@@ -31,8 +31,8 @@ internal abstract class WordSearchResultYearMonthListAdapter(
             WordSearchResultDayListAdapter(holder.binding.recyclerDayList, themeColor)
         return wordSearchResultDayListAdapter.apply {
             build()
-            registerOnClickItemListener {
-                onClickChildItemListener?.onClick(it)
+            registerOnItemClickListener {
+                onChildItemClickListener?.onClick(it)
             }
         }
     }

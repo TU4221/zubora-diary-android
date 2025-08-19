@@ -11,20 +11,20 @@ internal abstract class LeftSwipeBackgroundButtonListBaseAdapter <T, VH : Recycl
     diffUtilItemCallback: DiffUtil.ItemCallback<T>
 ) : ListBaseAdapter<T, VH>(recyclerView, themeColor, diffUtilItemCallback) {
 
-    fun interface OnClickDeleteButtonListener<T> {
+    fun interface OnBackgroundButtonClickListener<T> {
         fun onClick(item: T)
     }
-    protected var onClickDeleteButtonListener: OnClickDeleteButtonListener<T>? = null
+    protected var onBackgroundButtonClickListener: OnBackgroundButtonClickListener<T>? = null
 
     override fun clearViewBindings() {
         super.clearViewBindings()
 
-        onClickDeleteButtonListener = null
+        onBackgroundButtonClickListener = null
     }
 
     fun registerOnClickDeleteButtonListener(
-        onClickDeleteButtonListener: OnClickDeleteButtonListener<T>
+        listener: OnBackgroundButtonClickListener<T>
     ) {
-        this.onClickDeleteButtonListener = onClickDeleteButtonListener
+        onBackgroundButtonClickListener = listener
     }
 }

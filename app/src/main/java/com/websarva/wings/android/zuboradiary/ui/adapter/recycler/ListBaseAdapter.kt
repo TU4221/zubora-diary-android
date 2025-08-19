@@ -15,10 +15,10 @@ internal abstract class ListBaseAdapter <T, VH : RecyclerView.ViewHolder> protec
     diffUtilItemCallback: DiffUtil.ItemCallback<T>
 ) : ListAdapter<T, VH>(diffUtilItemCallback) {
 
-    fun interface OnClickItemListener<T> {
+    fun interface OnItemClickListener<T> {
         fun onClick(item: T)
     }
-    protected var onClickItemListener: OnClickItemListener<T>? = null
+    protected var onItemClickListener: OnItemClickListener<T>? = null
 
     open fun build() {
         recyclerView.apply {
@@ -32,7 +32,7 @@ internal abstract class ListBaseAdapter <T, VH : RecyclerView.ViewHolder> protec
             adapter = null
             layoutManager = null
         }
-        onClickItemListener = null
+        onItemClickListener = null
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VH {
@@ -53,7 +53,7 @@ internal abstract class ListBaseAdapter <T, VH : RecyclerView.ViewHolder> protec
 
     abstract fun bindViewHolder(holder: VH, item: T)
 
-    fun registerOnClickItemListener(onClickItemListener: OnClickItemListener<T>) {
-        this.onClickItemListener = onClickItemListener
+    fun registerOnItemClickListener(listener: OnItemClickListener<T>) {
+        onItemClickListener = listener
     }
 }

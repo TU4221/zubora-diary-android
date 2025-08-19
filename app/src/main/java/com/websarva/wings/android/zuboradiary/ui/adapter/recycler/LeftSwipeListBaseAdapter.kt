@@ -13,10 +13,10 @@ internal abstract class LeftSwipeListBaseAdapter <T, VH : RecyclerView.ViewHolde
 
     protected lateinit var leftSwipeSimpleCallback: LeftSwipeSimpleCallback
 
-    fun interface OnSwipeListener<T> {
+    fun interface OnItemSwipeListener<T> {
         fun onSwipe(item: T)
     }
-    protected var onSwipeListener: OnSwipeListener<T>? = null
+    protected var onItemSwipeListener: OnItemSwipeListener<T>? = null
 
     override fun build() {
         super.build()
@@ -29,12 +29,12 @@ internal abstract class LeftSwipeListBaseAdapter <T, VH : RecyclerView.ViewHolde
         super.clearViewBindings()
 
         leftSwipeSimpleCallback.clearViewBindings()
-        onSwipeListener = null
+        onItemSwipeListener = null
     }
 
-    fun registerOnSwipeListener(
-        onSwipeListener: OnSwipeListener<T>
+    fun registerOnItemSwipeListener(
+        listener: OnItemSwipeListener<T>
     ) {
-        this.onSwipeListener = onSwipeListener
+        onItemSwipeListener = listener
     }
 }

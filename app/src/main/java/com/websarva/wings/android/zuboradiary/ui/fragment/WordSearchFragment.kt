@@ -133,7 +133,7 @@ class WordSearchFragment : BaseFragment<FragmentWordSearchBinding, WordSearchEve
 
         wordSearchResultListAdapter.apply {
             build()
-            registerOnClickChildItemListener { item: DiaryDayListItem.WordSearchResult ->
+            registerOnChildItemClickListener { item: DiaryDayListItem.WordSearchResult ->
                 mainViewModel.onWordSearchResultListItemClick(item)
             }
         }
