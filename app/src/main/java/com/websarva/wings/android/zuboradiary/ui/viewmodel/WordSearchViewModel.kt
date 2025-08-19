@@ -25,7 +25,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
-import java.time.LocalDate
 import javax.inject.Inject
 
 @HiltViewModel
@@ -166,7 +165,8 @@ internal class WordSearchViewModel @Inject internal constructor(
         }
     }
 
-    fun onWordSearchResultListItemClick(date: LocalDate) {
+    fun onWordSearchResultListItemClick(item: WordSearchResultDayListItem) {
+        val date = item.date
         viewModelScope.launch {
             emitUiEvent(WordSearchEvent.NavigateDiaryShowFragment(date))
         }

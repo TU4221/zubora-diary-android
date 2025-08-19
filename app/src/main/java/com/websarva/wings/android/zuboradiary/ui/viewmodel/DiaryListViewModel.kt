@@ -162,15 +162,18 @@ internal class DiaryListViewModel @Inject constructor(
         }
     }
 
-    fun onDiaryListItemClick(date: LocalDate) {
+    fun onDiaryListItemClick(item: DiaryDayListItem) {
+        val date = item.date
         viewModelScope.launch {
             emitUiEvent(DiaryListEvent.NavigateDiaryShowFragment(date))
         }
     }
 
-    fun onDiaryListItemDeleteButtonClick(date: LocalDate, uri: Uri?) {
+    fun onDiaryListItemDeleteButtonClick(item: DiaryDayListItem) {
         if (uiState.value != DiaryListState.ShowingDiaryList) return
 
+        val date = item.date
+        val uri = item.imageUri
         viewModelScope.launch {
             emitUiEvent(
                 DiaryListEvent.NavigateDiaryDeleteDialog(

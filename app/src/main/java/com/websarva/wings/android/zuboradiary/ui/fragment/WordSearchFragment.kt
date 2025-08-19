@@ -134,7 +134,7 @@ class WordSearchFragment : BaseFragment<FragmentWordSearchBinding, WordSearchEve
         wordSearchResultListAdapter.apply {
             build()
             registerOnClickChildItemListener { item: WordSearchResultDayListItem ->
-                mainViewModel.onWordSearchResultListItemClick(item.date)
+                mainViewModel.onWordSearchResultListItemClick(item)
             }
         }
     }

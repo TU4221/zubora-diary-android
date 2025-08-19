@@ -162,14 +162,11 @@ class DiaryItemTitleEditDialog :
             )
         itemTitleSelectionHistoryListAdapter.build()
         itemTitleSelectionHistoryListAdapter.registerOnClickItemListener { item: SelectionHistoryListItem ->
-            mainViewModel.onDiaryItemTitleSelectionHistoryItemClick(item.title)
+            mainViewModel.onDiaryItemTitleSelectionHistoryItemClick(item)
         }
         itemTitleSelectionHistoryListAdapter
             .registerOnSwipeListener { item: SelectionHistoryListItem ->
-                mainViewModel
-                    .onDiaryItemTitleSelectionHistoryItemDeleteButtonClick(
-                        item.title
-                    )
+                mainViewModel.onDiaryItemTitleSelectionHistoryItemDeleteButtonClick(item)
             }
 
         // 選択履歴読込・表示

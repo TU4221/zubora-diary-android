@@ -192,10 +192,10 @@ class DiaryListFragment :
         return diaryListAdapter.apply {
             build()
             registerOnClickChildItemListener { item: DiaryDayListItem ->
-                mainViewModel.onDiaryListItemClick(item.date)
+                mainViewModel.onDiaryListItemClick(item)
             }
             registerOnClickChildItemBackgroundButtonListener { item: DiaryDayListItem ->
-                mainViewModel.onDiaryListItemDeleteButtonClick(item.date, item.imageUri)
+                mainViewModel.onDiaryListItemDeleteButtonClick(item)
             }
         }
     }

@@ -126,7 +126,8 @@ internal class DiaryItemTitleEditViewModel @Inject constructor(
         }
     }
 
-    fun onDiaryItemTitleSelectionHistoryItemClick(itemTitle: String) {
+    fun onDiaryItemTitleSelectionHistoryItemClick(item: SelectionHistoryListItem) {
+        val itemTitle = item.title
         val itemNumber = _itemNumber.requireValue()
         viewModelScope.launch {
             emitUiEvent(
@@ -140,7 +141,8 @@ internal class DiaryItemTitleEditViewModel @Inject constructor(
         }
     }
 
-    fun onDiaryItemTitleSelectionHistoryItemDeleteButtonClick(itemTitle: String) {
+    fun onDiaryItemTitleSelectionHistoryItemDeleteButtonClick(item: SelectionHistoryListItem) {
+        val itemTitle = item.title
         viewModelScope.launch {
             emitUiEvent(
                 DiaryItemTitleEditEvent
