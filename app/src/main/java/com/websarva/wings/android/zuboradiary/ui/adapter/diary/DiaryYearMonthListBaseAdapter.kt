@@ -111,21 +111,7 @@ internal abstract class DiaryYearMonthListBaseAdapter<
 
     override fun bindViewHolder(holder: RecyclerView.ViewHolder, item: T) {
         if (holder is DiaryYearMonthListViewHolder) {
-            holder.apply {
-                // 対象行の情報を取得
-                val diaryYearMonth = item.yearMonth
-
-                // セクションバー設定
-                // 左端に余白を持たせる為、最初にスペースを入力。
-                val context = binding.root.context
-                val diaryDate =
-                    ("  " + diaryYearMonth.year + context.getString(R.string.row_diary_year_month_list_section_bar_year)
-                            + diaryYearMonth.monthValue + context.getString(R.string.row_diary_year_month_list_section_bar_month))
-                binding.textSection.text = diaryDate
-                // 日記リストスクロール時に移動させているので、バインディング時に位置リセット
-                binding.textSection.y = 0f
-            }
-
+            holder.bind(item)
             createDiaryDayList(holder, item)
         }
     }
@@ -140,8 +126,26 @@ internal abstract class DiaryYearMonthListBaseAdapter<
         return item.viewType.viewTypeNumber
     }
 
-    class DiaryYearMonthListViewHolder(val binding: RowDiaryYearMonthListBinding) :
-        RecyclerView.ViewHolder(binding.root)
+    class DiaryYearMonthListViewHolder(
+        val binding: RowDiaryYearMonthListBinding
+    ) : RecyclerView.ViewHolder(binding.root) {
+
+        fun bind(item: DiaryYearMonthListBaseItem) {
+            // 対象行の情報を取得
+            val diaryYearMonth = item.yearMonth
+
+            // セクションバー設定
+            // 左端に余白を持たせる為、最初にスペースを入力。
+            val context = binding.root.context
+            val diaryDate =
+                ("  " + diaryYearMonth.year + context.getString(R.string.row_diary_year_month_list_section_bar_year)
+                        + diaryYearMonth.monthValue + context.getString(R.string.row_diary_year_month_list_section_bar_month))
+            binding.textSection.text = diaryDate
+            // 日記リストスクロール時に移動させているので、バインディング時に位置リセット
+            binding.textSection.y = 0f
+        }
+
+    }
 
     class NoDiaryMessageViewHolder(binding: RowNoDiaryMessageBinding) :
         RecyclerView.ViewHolder(binding.root)
