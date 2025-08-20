@@ -5,20 +5,18 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.websarva.wings.android.zuboradiary.domain.model.ThemeColor
 import com.websarva.wings.android.zuboradiary.ui.adapter.recycler.LeftSwipeBackgroundButtonSimpleCallback
-import com.websarva.wings.android.zuboradiary.ui.model.list.diary.DiaryDayBaseList
 import com.websarva.wings.android.zuboradiary.ui.model.list.diary.DiaryDayListItem
 import com.websarva.wings.android.zuboradiary.ui.view.custom.SwipeRecyclerView
 
 // DiaryFragment、WordSearchFragmentの親RecyclerViewのListAdapter。
 // 親RecyclerViewを同じ構成にする為、一つのクラスで両方の子RecyclerViewに対応できるように作成。
 internal abstract class SwipeDiaryYearMonthListBaseAdapter<
-        LT : DiaryDayBaseList,
         CLIT : DiaryDayListItem
 > protected constructor(
     recyclerView: RecyclerView,
     themeColor: ThemeColor,
-    diffUtilItemCallback: DiffUtilItemCallback<LT>
-) : DiaryYearMonthListBaseAdapter<LT, CLIT>(recyclerView, themeColor, diffUtilItemCallback) {
+    diffUtilItemCallback: DiffUtilItemCallback<CLIT>
+) : DiaryYearMonthListBaseAdapter<CLIT>(recyclerView, themeColor, diffUtilItemCallback) {
 
     fun interface OnChildItemBackgroundButtonClickListener<T> {
         fun onClick(item: T)
@@ -105,7 +103,7 @@ internal abstract class SwipeDiaryYearMonthListBaseAdapter<
             super.onSelectedChanged(viewHolder, actionState)
 
             // 他ChildRecyclerView(DayList)のスワイプ状態を閉じる
-            val adapter = parentRecyclerView.adapter as SwipeDiaryYearMonthListBaseAdapter<*, *>
+            val adapter = parentRecyclerView.adapter as SwipeDiaryYearMonthListBaseAdapter<*>
             adapter.closeSwipedItemOtherDayList(this)
         }
     }

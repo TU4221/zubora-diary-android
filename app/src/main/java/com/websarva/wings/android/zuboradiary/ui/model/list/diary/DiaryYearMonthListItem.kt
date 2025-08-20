@@ -2,14 +2,14 @@ package com.websarva.wings.android.zuboradiary.ui.model.list.diary
 
 import java.time.YearMonth
 
-internal sealed class DiaryYearMonthListItem<T: DiaryDayBaseList> {
+internal sealed class DiaryYearMonthListItem<T : DiaryDayListItem> {
 
-    data class Diary<T : DiaryDayBaseList>(
+    data class Diary<T : DiaryDayListItem>(
         val yearMonth: YearMonth,
-        val diaryDayList: T
+        val diaryDayList: DiaryDayList<T>
     ) : DiaryYearMonthListItem<T>()
 
-    class NoDiaryMessage<T : DiaryDayBaseList> : DiaryYearMonthListItem<T>()
+    class NoDiaryMessage<T : DiaryDayListItem> : DiaryYearMonthListItem<T>()
 
-    class ProgressIndicator<T : DiaryDayBaseList> : DiaryYearMonthListItem<T>()
+    class ProgressIndicator<T : DiaryDayListItem> : DiaryYearMonthListItem<T>()
 }

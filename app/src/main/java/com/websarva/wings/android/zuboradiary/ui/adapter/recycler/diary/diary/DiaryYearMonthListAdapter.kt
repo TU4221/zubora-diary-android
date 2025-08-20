@@ -7,13 +7,12 @@ import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import com.websarva.wings.android.zuboradiary.ui.adapter.recycler.diary.DiaryYearMonthListBaseAdapter
 import com.websarva.wings.android.zuboradiary.ui.adapter.recycler.diary.SwipeDiaryYearMonthListBaseAdapter
 import com.websarva.wings.android.zuboradiary.ui.model.list.diary.DiaryDayListItem
-import com.websarva.wings.android.zuboradiary.ui.model.list.diary.diary.DiaryDayList
 import com.websarva.wings.android.zuboradiary.ui.model.list.diary.DiaryYearMonthListItem
 
 internal abstract class DiaryYearMonthListAdapter(
     recyclerView: RecyclerView,
     themeColor: ThemeColor
-) : SwipeDiaryYearMonthListBaseAdapter<DiaryDayList, DiaryDayListItem.Standard>(
+) : SwipeDiaryYearMonthListBaseAdapter<DiaryDayListItem.Standard>(
     recyclerView,
     themeColor,
     DiffUtilItemCallback()
@@ -21,7 +20,7 @@ internal abstract class DiaryYearMonthListAdapter(
 
     override fun createDiaryDayList(
         holder: DiaryYearMonthListViewHolder.Item,
-        item: DiaryYearMonthListItem.Diary<DiaryDayList>
+        item: DiaryYearMonthListItem.Diary<DiaryDayListItem.Standard>
     ) {
         val diaryDayListAdapter = createDiaryDayListAdapter(holder)
         val diaryDayList = item.diaryDayList.itemList
@@ -45,18 +44,18 @@ internal abstract class DiaryYearMonthListAdapter(
     }
 
     private class DiffUtilItemCallback :
-        DiaryYearMonthListBaseAdapter.DiffUtilItemCallback<DiaryDayList>() {
+        DiaryYearMonthListBaseAdapter.DiffUtilItemCallback<DiaryDayListItem.Standard>() {
 
         private val logTag = createLogTag()
 
             override fun areContentsTheSame(
-                oldItem: DiaryYearMonthListItem<DiaryDayList>,
-                newItem: DiaryYearMonthListItem<DiaryDayList>
+                oldItem: DiaryYearMonthListItem<DiaryDayListItem.Standard>,
+                newItem: DiaryYearMonthListItem<DiaryDayListItem.Standard>
             ): Boolean {
                 val result =
                     when (oldItem) {
                         is DiaryYearMonthListItem.Diary -> {
-                            if (newItem !is DiaryYearMonthListItem.Diary<DiaryDayList>) {
+                            if (newItem !is DiaryYearMonthListItem.Diary<DiaryDayListItem.Standard>) {
                                 false
                             } else {
                                 oldItem.diaryDayList == newItem.diaryDayList

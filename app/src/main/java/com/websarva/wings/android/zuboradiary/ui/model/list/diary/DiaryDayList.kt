@@ -1,27 +1,19 @@
-package com.websarva.wings.android.zuboradiary.ui.model.list.diary.diary
+package com.websarva.wings.android.zuboradiary.ui.model.list.diary
 
-import com.websarva.wings.android.zuboradiary.ui.model.list.diary.DiaryDayBaseList
-import com.websarva.wings.android.zuboradiary.ui.model.list.diary.DiaryDayListItem
+internal class DiaryDayList<T: DiaryDayListItem>(itemList: List<T>) : DiaryDayBaseList() {
 
-internal class DiaryDayList : DiaryDayBaseList {
-
-    val itemList: List<DiaryDayListItem.Standard>
+    val itemList: List<T>
 
     val isNotEmpty get() = itemList.isNotEmpty()
 
-    constructor(itemList: List<DiaryDayListItem.Standard>) {
+    init {
         require(itemList.isNotEmpty())
-
         this.itemList = itemList.toList()
-    }
-
-    constructor() {
-        this.itemList = ArrayList()
     }
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
-        if (other !is DiaryDayList) return false
+        if (other !is DiaryDayList<*>) return false
 
         return itemList == other.itemList
     }
@@ -34,7 +26,7 @@ internal class DiaryDayList : DiaryDayBaseList {
         return itemList.size
     }
 
-    fun combineDiaryDayLists(additionList: DiaryDayList): DiaryDayList {
+    fun combineDiaryDayLists(additionList: DiaryDayList<T>): DiaryDayList<T> {
         require(additionList.isNotEmpty)
 
         val resultItemList = itemList + additionList.itemList

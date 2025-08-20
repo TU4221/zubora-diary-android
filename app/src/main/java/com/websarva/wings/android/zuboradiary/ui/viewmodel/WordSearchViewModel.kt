@@ -11,12 +11,12 @@ import com.websarva.wings.android.zuboradiary.domain.usecase.diary.LoadWordSearc
 import com.websarva.wings.android.zuboradiary.ui.mapper.toUiModel
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import com.websarva.wings.android.zuboradiary.ui.model.message.WordSearchAppMessage
-import com.websarva.wings.android.zuboradiary.ui.model.list.diary.wordsearchresult.WordSearchResultDayList
 import com.websarva.wings.android.zuboradiary.ui.model.list.diary.wordsearchresult.WordSearchResultYearMonthList
 import com.websarva.wings.android.zuboradiary.ui.model.event.CommonUiEvent
 import com.websarva.wings.android.zuboradiary.ui.model.state.WordSearchState
 import com.websarva.wings.android.zuboradiary.ui.model.event.WordSearchEvent
 import com.websarva.wings.android.zuboradiary.ui.model.list.diary.DiaryDayListItem
+import com.websarva.wings.android.zuboradiary.ui.model.list.diary.DiaryDayList
 import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.common.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -403,7 +403,7 @@ internal class WordSearchViewModel @Inject internal constructor(
         if (list.isEmpty()) return WordSearchResultYearMonthList()
 
         val resultDayList =
-            WordSearchResultDayList(
+            DiaryDayList(
                 list.stream().map { it.toUiModel(searchWord) }.toList()
             )
         val existsUnloadedDiaries =

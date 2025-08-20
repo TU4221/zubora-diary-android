@@ -2,17 +2,18 @@ package com.websarva.wings.android.zuboradiary.ui.model.list.diary.wordsearchres
 
 import com.websarva.wings.android.zuboradiary.ui.model.list.diary.DiaryDayListItem
 import com.websarva.wings.android.zuboradiary.ui.model.list.diary.DiaryYearMonthListItem
+import com.websarva.wings.android.zuboradiary.ui.model.list.diary.DiaryDayList
 import java.time.YearMonth
 
 internal class WordSearchResultYearMonthList {
 
-    val itemList: List<DiaryYearMonthListItem<WordSearchResultDayList>>
+    val itemList: List<DiaryYearMonthListItem<DiaryDayListItem.WordSearchResult>>
 
     val isEmpty get() = itemList.isEmpty()
     val isNotEmpty get() = itemList.isNotEmpty()
 
     constructor(
-        wordSearchResultDayList: WordSearchResultDayList,
+        wordSearchResultDayList: DiaryDayList<DiaryDayListItem.WordSearchResult>,
         needsNoDiaryMessage: Boolean
     ) {
         require(wordSearchResultDayList.isNotEmpty)
@@ -23,7 +24,7 @@ internal class WordSearchResultYearMonthList {
     }
 
     private constructor(
-        itemList: List<DiaryYearMonthListItem<WordSearchResultDayList>>,
+        itemList: List<DiaryYearMonthListItem<DiaryDayListItem.WordSearchResult>>,
         needsNoDiaryMessage: Boolean
     ) {
         require(itemList.isNotEmpty())
@@ -36,7 +37,7 @@ internal class WordSearchResultYearMonthList {
      * false:ProgressIndicatorのみのリスト作成
      */
     constructor(needsNoDiaryMessage: Boolean) {
-        val emptyList: List<DiaryYearMonthListItem<WordSearchResultDayList>> = ArrayList()
+        val emptyList: List<DiaryYearMonthListItem<DiaryDayListItem.WordSearchResult>> = ArrayList()
         this.itemList = addLastItem(emptyList, needsNoDiaryMessage)
     }
 
@@ -45,13 +46,13 @@ internal class WordSearchResultYearMonthList {
     }
 
     private fun createWordSearchResultYearMonthListItem(
-        wordSearchResultDayList: WordSearchResultDayList
-    ): List<DiaryYearMonthListItem<WordSearchResultDayList>> {
+        wordSearchResultDayList: DiaryDayList<DiaryDayListItem.WordSearchResult>
+    ): List<DiaryYearMonthListItem<DiaryDayListItem.WordSearchResult>> {
         require(wordSearchResultDayList.isNotEmpty)
 
         var sortingDayItemList: MutableList<DiaryDayListItem.WordSearchResult> = ArrayList()
-        val resultYearMonthListItemList: MutableList<DiaryYearMonthListItem<WordSearchResultDayList>> = ArrayList()
-        var resultYearMonthListItem: DiaryYearMonthListItem<WordSearchResultDayList>
+        val resultYearMonthListItemList: MutableList<DiaryYearMonthListItem<DiaryDayListItem.WordSearchResult>> = ArrayList()
+        var resultYearMonthListItem: DiaryYearMonthListItem<DiaryDayListItem.WordSearchResult>
         var sortingYearMonth: YearMonth? = null
 
         // DayListItemを対象YearMonthListItem毎に仕分け
@@ -61,7 +62,7 @@ internal class WordSearchResultYearMonthList {
             val yearMonth = YearMonth.of(date.year, date.month)
 
             if (sortingYearMonth != null && yearMonth != sortingYearMonth) {
-                val sortedWordSearchResultDayList = WordSearchResultDayList(sortingDayItemList)
+                val sortedWordSearchResultDayList = DiaryDayList(sortingDayItemList)
                 resultYearMonthListItem =
                     DiaryYearMonthListItem.Diary(
                         sortingYearMonth,
@@ -75,7 +76,7 @@ internal class WordSearchResultYearMonthList {
         }
 
         // 最後尾YearMonthListItemの追加処理
-        val sortedWordSearchResultDayList = WordSearchResultDayList(sortingDayItemList)
+        val sortedWordSearchResultDayList = DiaryDayList(sortingDayItemList)
         resultYearMonthListItem =
             DiaryYearMonthListItem.Diary(
                 checkNotNull(sortingYearMonth),
@@ -87,11 +88,11 @@ internal class WordSearchResultYearMonthList {
     }
 
     private fun addLastItem(
-        itemList: List<DiaryYearMonthListItem<WordSearchResultDayList>>,
+        itemList: List<DiaryYearMonthListItem<DiaryDayListItem.WordSearchResult>>,
         needsNoDiaryMessage: Boolean
-    ): List<DiaryYearMonthListItem<WordSearchResultDayList>> {
+    ): List<DiaryYearMonthListItem<DiaryDayListItem.WordSearchResult>> {
         val mutableItemList =
-            itemList.filterIsInstance<DiaryYearMonthListItem.Diary<WordSearchResultDayList>>()
+            itemList.filterIsInstance<DiaryYearMonthListItem.Diary<DiaryDayListItem.WordSearchResult>>()
 
         return if (needsNoDiaryMessage) {
             addLastItemNoDiaryMessage(mutableItemList)
@@ -101,14 +102,14 @@ internal class WordSearchResultYearMonthList {
     }
 
     private fun addLastItemProgressIndicator(
-        itemList: List<DiaryYearMonthListItem<WordSearchResultDayList>>
-    ): List<DiaryYearMonthListItem<WordSearchResultDayList>> {
+        itemList: List<DiaryYearMonthListItem<DiaryDayListItem.WordSearchResult>>
+    ): List<DiaryYearMonthListItem<DiaryDayListItem.WordSearchResult>> {
         return itemList + DiaryYearMonthListItem.ProgressIndicator()
     }
 
     private fun addLastItemNoDiaryMessage(
-        itemList: List<DiaryYearMonthListItem<WordSearchResultDayList>>
-    ): List<DiaryYearMonthListItem<WordSearchResultDayList>> {
+        itemList: List<DiaryYearMonthListItem<DiaryDayListItem.WordSearchResult>>
+    ): List<DiaryYearMonthListItem<DiaryDayListItem.WordSearchResult>> {
         return itemList + DiaryYearMonthListItem.NoDiaryMessage()
     }
 
@@ -129,11 +130,11 @@ internal class WordSearchResultYearMonthList {
 
         val originalItemList =
             itemList
-                .filterIsInstance<DiaryYearMonthListItem.Diary<WordSearchResultDayList>>()
+                .filterIsInstance<DiaryYearMonthListItem.Diary<DiaryDayListItem.WordSearchResult>>()
                 .toMutableList()
         val additionItemList =
             additionList.itemList
-                .filterIsInstance<DiaryYearMonthListItem.Diary<WordSearchResultDayList>>()
+                .filterIsInstance<DiaryYearMonthListItem.Diary<DiaryDayListItem.WordSearchResult>>()
                 .toMutableList()
 
         // 元リスト最終アイテムの年月取得

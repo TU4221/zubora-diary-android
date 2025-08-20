@@ -14,7 +14,7 @@ import com.websarva.wings.android.zuboradiary.domain.usecase.diary.LoadDiaryList
 import com.websarva.wings.android.zuboradiary.ui.mapper.toUiModel
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import com.websarva.wings.android.zuboradiary.ui.model.message.DiaryListAppMessage
-import com.websarva.wings.android.zuboradiary.ui.model.list.diary.diary.DiaryDayList
+import com.websarva.wings.android.zuboradiary.ui.model.list.diary.DiaryDayList
 import com.websarva.wings.android.zuboradiary.ui.model.list.diary.diary.DiaryYearMonthList
 import com.websarva.wings.android.zuboradiary.ui.model.event.CommonUiEvent
 import com.websarva.wings.android.zuboradiary.ui.model.state.DiaryListState

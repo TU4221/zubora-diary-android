@@ -15,20 +15,18 @@ import com.websarva.wings.android.zuboradiary.databinding.RowNoDiaryMessageBindi
 import com.websarva.wings.android.zuboradiary.databinding.RowProgressBarBinding
 import com.websarva.wings.android.zuboradiary.ui.adapter.recycler.ListBaseAdapter
 import com.websarva.wings.android.zuboradiary.ui.adapter.recycler.diary.DiaryYearMonthListBaseAdapter.DiaryYearMonthListViewHolder
-import com.websarva.wings.android.zuboradiary.ui.model.list.diary.DiaryDayBaseList
 import com.websarva.wings.android.zuboradiary.ui.model.list.diary.DiaryDayListItem
 import com.websarva.wings.android.zuboradiary.ui.model.list.diary.DiaryYearMonthListItem
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 
 // TODO:ViewHolderのViewに設定されたリスナを解除するように変更。
 internal abstract class DiaryYearMonthListBaseAdapter<
-        LT : DiaryDayBaseList,
         CLIT : DiaryDayListItem
 > protected constructor(
     recyclerView: RecyclerView,
     themeColor: ThemeColor,
-    diffUtilItemCallback: DiffUtilItemCallback<LT>
-) : ListBaseAdapter<DiaryYearMonthListItem<LT>, DiaryYearMonthListViewHolder>(
+    diffUtilItemCallback: DiffUtilItemCallback<CLIT>
+) : ListBaseAdapter<DiaryYearMonthListItem<CLIT>, DiaryYearMonthListViewHolder>(
     recyclerView,
     themeColor,
     diffUtilItemCallback
@@ -113,12 +111,12 @@ internal abstract class DiaryYearMonthListBaseAdapter<
 
     override fun bindViewHolder(
         holder: DiaryYearMonthListViewHolder,
-        item: DiaryYearMonthListItem<LT>
+        item: DiaryYearMonthListItem<CLIT>
     ) {
         when (holder) {
             is DiaryYearMonthListViewHolder.Item -> {
                 holder.bind(item as DiaryYearMonthListItem.Diary<*>)
-                createDiaryDayList(holder, item as DiaryYearMonthListItem.Diary<LT>)
+                createDiaryDayList(holder, item as DiaryYearMonthListItem.Diary<CLIT>)
             }
             is DiaryYearMonthListViewHolder.NoDiaryMessage,
             is DiaryYearMonthListViewHolder.ProgressBar -> {
@@ -130,7 +128,7 @@ internal abstract class DiaryYearMonthListBaseAdapter<
 
     abstract fun createDiaryDayList(
         holder: DiaryYearMonthListViewHolder.Item,
-        item: DiaryYearMonthListItem.Diary<LT>
+        item: DiaryYearMonthListItem.Diary<CLIT>
     )
 
     override fun getItemViewType(position: Int): Int {
@@ -180,7 +178,7 @@ internal abstract class DiaryYearMonthListBaseAdapter<
         ) : DiaryYearMonthListViewHolder(binding.root)
     }
 
-    protected abstract class DiffUtilItemCallback<T : DiaryDayBaseList>
+    protected abstract class DiffUtilItemCallback<T : DiaryDayListItem>
         : DiffUtil.ItemCallback<DiaryYearMonthListItem<T>>() {
 
             private val logTag = createLogTag()

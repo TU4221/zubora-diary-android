@@ -7,12 +7,11 @@ import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import com.websarva.wings.android.zuboradiary.ui.adapter.recycler.diary.DiaryYearMonthListBaseAdapter
 import com.websarva.wings.android.zuboradiary.ui.model.list.diary.DiaryDayListItem
 import com.websarva.wings.android.zuboradiary.ui.model.list.diary.DiaryYearMonthListItem
-import com.websarva.wings.android.zuboradiary.ui.model.list.diary.wordsearchresult.WordSearchResultDayList
 
 internal abstract class WordSearchResultYearMonthListAdapter(
     recyclerView: RecyclerView,
     themeColor: ThemeColor
-) : DiaryYearMonthListBaseAdapter<WordSearchResultDayList, DiaryDayListItem.WordSearchResult>(
+) : DiaryYearMonthListBaseAdapter<DiaryDayListItem.WordSearchResult>(
     recyclerView,
     themeColor,
     DiffUtilItemCallback()
@@ -20,7 +19,7 @@ internal abstract class WordSearchResultYearMonthListAdapter(
 
     override fun createDiaryDayList(
         holder: DiaryYearMonthListViewHolder.Item,
-        item: DiaryYearMonthListItem.Diary<WordSearchResultDayList>
+        item: DiaryYearMonthListItem.Diary<DiaryDayListItem.WordSearchResult>
     ) {
         val listAdapter = createWordSearchResultDayListAdapter(holder)
         listAdapter.submitList(item.diaryDayList.itemList)
@@ -40,18 +39,18 @@ internal abstract class WordSearchResultYearMonthListAdapter(
     }
 
     private class DiffUtilItemCallback :
-        DiaryYearMonthListBaseAdapter.DiffUtilItemCallback<WordSearchResultDayList>() {
+        DiaryYearMonthListBaseAdapter.DiffUtilItemCallback<DiaryDayListItem.WordSearchResult>() {
 
         private val logTag = createLogTag()
 
         override fun areContentsTheSame(
-            oldItem: DiaryYearMonthListItem<WordSearchResultDayList>,
-            newItem: DiaryYearMonthListItem<WordSearchResultDayList>
+            oldItem: DiaryYearMonthListItem<DiaryDayListItem.WordSearchResult>,
+            newItem: DiaryYearMonthListItem<DiaryDayListItem.WordSearchResult>
         ): Boolean {
             val result =
                 when (oldItem) {
                     is DiaryYearMonthListItem.Diary -> {
-                        if (newItem !is DiaryYearMonthListItem.Diary<WordSearchResultDayList>) {
+                        if (newItem !is DiaryYearMonthListItem.Diary<DiaryDayListItem.WordSearchResult>) {
                             false
                         } else {
                             oldItem.diaryDayList == newItem.diaryDayList
