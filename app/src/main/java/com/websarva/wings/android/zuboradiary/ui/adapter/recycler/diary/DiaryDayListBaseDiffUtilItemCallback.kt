@@ -18,6 +18,8 @@ internal abstract class DiaryDayListBaseDiffUtilItemCallback<T : DiaryDayListIte
         Log.d(logTag, "oldItem_Date = " + oldItem.date)
         Log.d(logTag, "newItem_Date = " + newItem.date)
 
-        return oldItem.areItemsTheSame(newItem)
+        if (oldItem === newItem) return true
+
+        return oldItem.date == newItem.date
     }
 }

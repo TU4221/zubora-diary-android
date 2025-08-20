@@ -91,13 +91,18 @@ internal class WordSearchResultDayListAdapter(
             oldItem: DiaryDayListItem.WordSearchResult,
             newItem: DiaryDayListItem.WordSearchResult
         ): Boolean {
-            if (!oldItem.areContentsTheSame(newItem)) {
-                Log.d(logTag, "areContentsTheSame()_不一致")
-                return false
+            return if (
+                oldItem.title == newItem.title
+                && oldItem.itemNumber == newItem.itemNumber
+                && oldItem.itemTitle == newItem.itemTitle
+                && oldItem.itemComment == newItem.itemComment
+            ) {
+                Log.d(logTag, "areContentsTheSame()_全項目一致")
+                true
+            } else {
+                Log.d(logTag, "areContentsTheSame()_全項目不一致")
+                false
             }
-
-            Log.d(logTag, "areContentsTheSame()_全項目一致")
-            return true
         }
     }
 }

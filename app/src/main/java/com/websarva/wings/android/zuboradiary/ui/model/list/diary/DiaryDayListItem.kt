@@ -13,27 +13,12 @@ import java.time.LocalDate
 internal sealed class DiaryDayListItem(
     open val date: LocalDate
 ) {
-    fun areItemsTheSame(item: DiaryDayListItem): Boolean {
-        if (this === item) return true
-
-        return date == item.date
-    }
-
-    abstract fun areContentsTheSame(item: DiaryDayListItem): Boolean
 
     data class Standard(
         override val date: LocalDate,
         val title: String,
         val imageUri: Uri?
-    ) : DiaryDayListItem(date) {
-
-        override fun areContentsTheSame(item: DiaryDayListItem): Boolean {
-            if (this === item) return true
-            if (item !is Standard) return false
-
-            return title == item.title && imageUri == item.imageUri
-        }
-    }
+    ) : DiaryDayListItem(date)
 
     data class WordSearchResult(
         override val date: LocalDate,
@@ -43,17 +28,6 @@ internal sealed class DiaryDayListItem(
         val itemComment: String,
         val searchWord: String,
     ) : DiaryDayListItem(date) {
-
-        override fun areContentsTheSame(item: DiaryDayListItem): Boolean {
-            if (this === item) return true
-            if (item !is WordSearchResult) return false
-
-            return title == item.title
-                    && itemNumber == item.itemNumber
-                    && itemTitle == item.itemTitle
-                    && itemComment == item.itemComment
-        }
-
 
         // TODO:下記関数は最終的にViewHolderへ以降
         fun createTitleSpannableString(context: Context, themeColor: ThemeColor): SpannableString {

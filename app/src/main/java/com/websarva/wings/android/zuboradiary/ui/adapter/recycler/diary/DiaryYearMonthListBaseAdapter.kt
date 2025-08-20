@@ -194,7 +194,7 @@ internal abstract class DiaryYearMonthListBaseAdapter<
                     "areItemsTheSame()_newItem.yearMonth = " + newItem.yearMonth
                 )
 
-                if (!oldItem.areItemsTheSame(newItem)) {
+                if (!(oldItem.yearMonth == newItem.yearMonth && oldItem.viewType == newItem.viewType)) {
                     Log.d(logTag, "areItemsTheSame()_不一致")
                     return false
                 }

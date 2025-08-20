@@ -21,13 +21,6 @@ internal class DiaryYearMonthListItem : DiaryYearMonthListBaseItem {
         this.diaryDayList = diaryDayList
     }
 
-    override fun areContentsTheSame(item: DiaryYearMonthListBaseItem): Boolean {
-        if (this === item) return true
-        if (item !is DiaryYearMonthListItem) return false
-
-        return diaryDayList == item.diaryDayList
-    }
-
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other !is DiaryYearMonthListItem) return false

@@ -19,15 +19,6 @@ internal abstract class DiaryYearMonthListBaseItem {
         this.viewType = viewType
     }
 
-
-    fun areItemsTheSame(item: DiaryYearMonthListBaseItem): Boolean {
-        if (this === item) return true
-
-        return yearMonth == item.yearMonth && viewType == item.viewType
-    }
-
-    abstract fun areContentsTheSame(item: DiaryYearMonthListBaseItem): Boolean
-
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other !is DiaryYearMonthListBaseItem) return false

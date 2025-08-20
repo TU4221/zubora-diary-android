@@ -60,14 +60,13 @@ internal abstract class DiaryYearMonthListAdapter(
                     logTag,
                     "areContentsTheSame()_newItem.yearMonth = " + newItem.yearMonth
                 )
-
-                if (!oldItem.areContentsTheSame(newItem)) {
+                return if (oldItem.diaryDayList == newItem.diaryDayList) {
+                    Log.d(logTag, "areContentsTheSame()_全項目一致")
+                    true
+                } else {
                     Log.d(logTag, "areContentsTheSame()_不一致")
-                    return false
+                    false
                 }
-
-                Log.d(logTag, "areContentsTheSame()_全項目一致")
-                return true
             }
     }
 }
