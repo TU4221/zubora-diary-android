@@ -6,19 +6,21 @@ import com.websarva.wings.android.zuboradiary.domain.model.ThemeColor
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import com.websarva.wings.android.zuboradiary.ui.adapter.recycler.diary.DiaryYearMonthListBaseAdapter
 import com.websarva.wings.android.zuboradiary.ui.model.list.diary.DiaryDayListItem
-import com.websarva.wings.android.zuboradiary.ui.model.list.diary.wordsearchresult.WordSearchResultYearMonthListItem
+import com.websarva.wings.android.zuboradiary.ui.model.list.diary.DiaryYearMonthListItem
+import com.websarva.wings.android.zuboradiary.ui.model.list.diary.wordsearchresult.WordSearchResultDayList
 
 internal abstract class WordSearchResultYearMonthListAdapter(
     recyclerView: RecyclerView,
     themeColor: ThemeColor
-) : DiaryYearMonthListBaseAdapter<WordSearchResultYearMonthListItem, DiaryDayListItem.WordSearchResult>(
+) : DiaryYearMonthListBaseAdapter<WordSearchResultDayList, DiaryDayListItem.WordSearchResult>(
     recyclerView,
     themeColor,
     DiffUtilItemCallback()
 ) {
 
     override fun createDiaryDayList(
-        holder: DiaryYearMonthListViewHolder.Item, item: WordSearchResultYearMonthListItem
+        holder: DiaryYearMonthListViewHolder.Item,
+        item: DiaryYearMonthListItem.Diary<WordSearchResultDayList>
     ) {
         val listAdapter = createWordSearchResultDayListAdapter(holder)
         listAdapter.submitList(item.diaryDayList.itemList)
@@ -38,24 +40,34 @@ internal abstract class WordSearchResultYearMonthListAdapter(
     }
 
     private class DiffUtilItemCallback :
-        DiaryYearMonthListBaseAdapter.DiffUtilItemCallback<WordSearchResultYearMonthListItem>() {
+        DiaryYearMonthListBaseAdapter.DiffUtilItemCallback<WordSearchResultDayList>() {
 
         private val logTag = createLogTag()
 
         override fun areContentsTheSame(
-            oldItem: WordSearchResultYearMonthListItem,
-            newItem: WordSearchResultYearMonthListItem
+            oldItem: DiaryYearMonthListItem<WordSearchResultDayList>,
+            newItem: DiaryYearMonthListItem<WordSearchResultDayList>
         ): Boolean {
-            Log.d(logTag, "areContentsTheSame()_oldItem.yearMonth = " + oldItem.yearMonth)
-            Log.d(logTag, "areContentsTheSame()_newItem.yearMonth = " + newItem.yearMonth)
+            val result = when (oldItem) {
+                is DiaryYearMonthListItem.Diary -> {
+                    if (newItem !is DiaryYearMonthListItem.Diary<WordSearchResultDayList>) {
+                        false
+                    } else {
+                        oldItem.diaryDayList == newItem.diaryDayList
+                    }
+                }
 
-            return if (oldItem.diaryDayList == newItem.diaryDayList) {
-                Log.d(logTag, "areContentsTheSame()_全項目一致")
-                true
-            } else {
-                Log.d(logTag, "areContentsTheSame()_不一致")
-                false
+                is DiaryYearMonthListItem.NoDiaryMessage,
+                is DiaryYearMonthListItem.ProgressIndicator -> {
+                    return false
+                }
             }
+
+            Log.d(
+                logTag,
+                "areContentsTheSame()_result = ${result}_oldItem = ${oldItem}_newItem = $newItem"
+            )
+            return result
         }
     }
 }

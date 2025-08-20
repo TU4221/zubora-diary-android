@@ -1,13 +1,12 @@
 package com.websarva.wings.android.zuboradiary.ui.model.list.diary.diary
 
-import com.websarva.wings.android.zuboradiary.ui.adapter.recycler.diary.DiaryYearMonthListBaseAdapter
 import com.websarva.wings.android.zuboradiary.ui.model.list.diary.DiaryDayListItem
-import com.websarva.wings.android.zuboradiary.ui.model.list.diary.DiaryYearMonthListBaseItem
+import com.websarva.wings.android.zuboradiary.ui.model.list.diary.DiaryYearMonthListItem
 import java.time.YearMonth
 
 internal class DiaryYearMonthList {
 
-    val itemList: List<DiaryYearMonthListItem>
+    val itemList: List<DiaryYearMonthListItem<DiaryDayList>>
 
     val isEmpty get() = itemList.isEmpty()
     val isNotEmpty get() = itemList.isNotEmpty()
@@ -19,7 +18,7 @@ internal class DiaryYearMonthList {
         this.itemList = addLastItem(itemList, needsNoDiaryMessage)
     }
 
-    private constructor(itemList: List<DiaryYearMonthListItem>, needsNoDiaryMessage: Boolean) {
+    private constructor(itemList: List<DiaryYearMonthListItem<DiaryDayList>>, needsNoDiaryMessage: Boolean) {
         require(itemList.isNotEmpty())
 
         this.itemList = addLastItem(itemList, needsNoDiaryMessage)
@@ -30,7 +29,7 @@ internal class DiaryYearMonthList {
      * false:ProgressIndicatorのみのリスト作成
      */
     constructor(needsNoDiaryMessage: Boolean) {
-        val emptyList: List<DiaryYearMonthListItem> = ArrayList()
+        val emptyList: List<DiaryYearMonthListItem<DiaryDayList>> = ArrayList()
 
         this.itemList = addLastItem(emptyList, needsNoDiaryMessage)
     }
@@ -39,12 +38,12 @@ internal class DiaryYearMonthList {
         this.itemList = ArrayList()
     }
 
-    private fun createDiaryYearMonthListItem(diaryDayList: DiaryDayList): List<DiaryYearMonthListItem> {
+    private fun createDiaryYearMonthListItem(diaryDayList: DiaryDayList): List<DiaryYearMonthListItem<DiaryDayList>> {
         require(diaryDayList.isNotEmpty)
 
         var sortingDayItemList: MutableList<DiaryDayListItem.Standard> = ArrayList()
-        val diaryYearMonthListItemList: MutableList<DiaryYearMonthListItem> = ArrayList()
-        var diaryYearMonthListItem: DiaryYearMonthListItem
+        val diaryYearMonthListItemList: MutableList<DiaryYearMonthListItem<DiaryDayList>> = ArrayList()
+        var diaryYearMonthListItem: DiaryYearMonthListItem.Diary<DiaryDayList>
         var sortingYearMonth: YearMonth? = null
 
         val diaryDayListItemList = diaryDayList.itemList
@@ -55,7 +54,7 @@ internal class DiaryYearMonthList {
             if (sortingYearMonth != null && yearMonth != sortingYearMonth) {
                 val sortedDiaryDayList = DiaryDayList(sortingDayItemList)
                 diaryYearMonthListItem =
-                    DiaryYearMonthListItem(sortingYearMonth, sortedDiaryDayList)
+                    DiaryYearMonthListItem.Diary(sortingYearMonth, sortedDiaryDayList)
                 diaryYearMonthListItemList.add(diaryYearMonthListItem)
                 sortingDayItemList = ArrayList()
             }
@@ -65,17 +64,17 @@ internal class DiaryYearMonthList {
 
         val sortedDiaryDayList = DiaryDayList(sortingDayItemList)
         diaryYearMonthListItem =
-            DiaryYearMonthListItem(checkNotNull(sortingYearMonth) , sortedDiaryDayList)
+            DiaryYearMonthListItem.Diary(checkNotNull(sortingYearMonth) , sortedDiaryDayList)
         diaryYearMonthListItemList.add(diaryYearMonthListItem)
         return diaryYearMonthListItemList
     }
 
     private fun addLastItem(
-        itemList: List<DiaryYearMonthListItem>,
+        itemList: List<DiaryYearMonthListItem<DiaryDayList>>,
         needsNoDiaryMessage: Boolean
-    ) : List<DiaryYearMonthListItem> {
-        val mutableItemList = itemList.toMutableList()
-        mutableItemList.removeIf(DiaryYearMonthListBaseItem::isNotDiaryViewType)
+    ) : List<DiaryYearMonthListItem<DiaryDayList>> {
+        val mutableItemList =
+            itemList.filterIsInstance<DiaryYearMonthListItem.Diary<DiaryDayList>>()
         return if (needsNoDiaryMessage) {
             addLastItemNoDiaryMessage(mutableItemList)
         } else {
@@ -83,22 +82,20 @@ internal class DiaryYearMonthList {
         }
     }
 
-    private fun addLastItemProgressIndicator(itemList: List<DiaryYearMonthListItem>)
-        : List<DiaryYearMonthListItem> {
-        return itemList +
-                DiaryYearMonthListItem(DiaryYearMonthListBaseAdapter.ViewType.PROGRESS_INDICATOR)
+    private fun addLastItemProgressIndicator(itemList: List<DiaryYearMonthListItem<DiaryDayList>>)
+        : List<DiaryYearMonthListItem<DiaryDayList>> {
+        return itemList + DiaryYearMonthListItem.ProgressIndicator()
     }
 
-    private fun addLastItemNoDiaryMessage(itemList: List<DiaryYearMonthListItem>)
-        : List<DiaryYearMonthListItem> {
-        return itemList +
-                DiaryYearMonthListItem(DiaryYearMonthListBaseAdapter.ViewType.NO_DIARY_MESSAGE)
+    private fun addLastItemNoDiaryMessage(itemList: List<DiaryYearMonthListItem<DiaryDayList>>)
+        : List<DiaryYearMonthListItem<DiaryDayList>> {
+        return itemList + DiaryYearMonthListItem.NoDiaryMessage()
     }
 
     fun countDiaries(): Int {
         var count = 0
         for (item in itemList) {
-            if (item.viewType == DiaryYearMonthListBaseAdapter.ViewType.DIARY) {
+            if (item is DiaryYearMonthListItem.Diary) {
                 count += item.diaryDayList.countDiaries()
             }
         }
@@ -110,14 +107,14 @@ internal class DiaryYearMonthList {
     ): DiaryYearMonthList {
         require(additionList.isNotEmpty)
 
-        val originalItemList: MutableList<DiaryYearMonthListItem> =
-            itemList.toMutableList()
-        val additionItemList: MutableList<DiaryYearMonthListItem> =
-            additionList.itemList.toMutableList()
-
-        // List最終アイテム(日記以外
-        originalItemList.removeIf(DiaryYearMonthListBaseItem::isNotDiaryViewType)
-        additionItemList.removeIf(DiaryYearMonthListBaseItem::isNotDiaryViewType)
+        val originalItemList =
+            itemList
+                .filterIsInstance<DiaryYearMonthListItem.Diary<DiaryDayList>>()
+                .toMutableList()
+        val additionItemList =
+            additionList.itemList
+                .filterIsInstance<DiaryYearMonthListItem.Diary<DiaryDayList>>()
+                .toMutableList()
 
         // 元リスト最終アイテムの年月取得
         val originalListLastItemPosition = originalItemList.size - 1
@@ -125,7 +122,7 @@ internal class DiaryYearMonthList {
         val originalListLastItemYearMonth = originalListLastItem.yearMonth
 
         // 追加リスト先頭アイテムの年月取得
-        val additionListFirstItem = additionList.itemList[0]
+        val additionListFirstItem = additionItemList[0]
         val additionListFirstItemYearMonth = additionListFirstItem.yearMonth
 
         // 元リストに追加リストの年月が含まれていたらアイテムを足し込む
@@ -136,7 +133,7 @@ internal class DiaryYearMonthList {
             val combinedDiaryDayList =
                 originalLastDiaryDayList.combineDiaryDayLists(additionDiaryDayList)
             val combinedDiaryYearMonthListItem =
-                DiaryYearMonthListItem(originalListLastItemYearMonth, combinedDiaryDayList)
+                DiaryYearMonthListItem.Diary(originalListLastItemYearMonth, combinedDiaryDayList)
             originalItemList.removeAt(originalListLastItemPosition)
             originalItemList.add(combinedDiaryYearMonthListItem)
             additionItemList.removeAt(0)
