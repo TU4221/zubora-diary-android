@@ -1,6 +1,6 @@
 package com.websarva.wings.android.zuboradiary.ui.model.list.diary
 
-internal class DiaryDayList<T: DiaryDayListItem>(itemList: List<T>) : DiaryDayBaseList() {
+internal class DiaryDayList<T: DiaryDayListItem>(itemList: List<T>) {
 
     val itemList: List<T>
 
@@ -22,7 +22,7 @@ internal class DiaryDayList<T: DiaryDayListItem>(itemList: List<T>) : DiaryDayBa
         return itemList.hashCode()
     }
 
-    override fun countDiaries(): Int {
+    fun countDiaries(): Int {
         return itemList.size
     }
 

@@ -12,7 +12,7 @@ import com.websarva.wings.android.zuboradiary.ui.model.message.AppMessage
 import com.websarva.wings.android.zuboradiary.databinding.FragmentDiaryListBinding
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.alert.DiaryListDeleteDialogFragment
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.DiaryListViewModel
-import com.websarva.wings.android.zuboradiary.ui.model.list.diary.diary.DiaryYearMonthList
+import com.websarva.wings.android.zuboradiary.ui.model.list.diary.DiaryYearMonthList
 import com.websarva.wings.android.zuboradiary.ui.adapter.recycler.diary.diary.DiaryYearMonthListAdapter
 import com.websarva.wings.android.zuboradiary.ui.fragment.common.RequiresBottomNavigation
 import com.websarva.wings.android.zuboradiary.ui.fragment.common.ReselectableFragment
@@ -158,7 +158,7 @@ class DiaryListFragment :
 
         launchAndRepeatOnViewLifeCycleStarted {
             mainViewModel.diaryList
-                .collectLatest { value: DiaryYearMonthList ->
+                .collectLatest { value: DiaryYearMonthList<DiaryDayListItem.Standard> ->
                     if (shouldInitializeListAdapter) {
                         shouldInitializeListAdapter = false
                         //setUpListAdapter()

@@ -11,12 +11,12 @@ import com.websarva.wings.android.zuboradiary.domain.usecase.diary.LoadWordSearc
 import com.websarva.wings.android.zuboradiary.ui.mapper.toUiModel
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import com.websarva.wings.android.zuboradiary.ui.model.message.WordSearchAppMessage
-import com.websarva.wings.android.zuboradiary.ui.model.list.diary.wordsearchresult.WordSearchResultYearMonthList
 import com.websarva.wings.android.zuboradiary.ui.model.event.CommonUiEvent
 import com.websarva.wings.android.zuboradiary.ui.model.state.WordSearchState
 import com.websarva.wings.android.zuboradiary.ui.model.event.WordSearchEvent
 import com.websarva.wings.android.zuboradiary.ui.model.list.diary.DiaryDayListItem
 import com.websarva.wings.android.zuboradiary.ui.model.list.diary.DiaryDayList
+import com.websarva.wings.android.zuboradiary.ui.model.list.diary.DiaryYearMonthList
 import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.common.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -71,7 +71,7 @@ internal class WordSearchViewModel @Inject internal constructor(
     private var wordSearchResultListLoadJob: Job? = initialWordSearchResultListLoadJob // キャンセル用
 
     private val numLoadItems = DiaryListViewModel.NUM_LOAD_ITEMS
-    private val initialWordSearchResultList = WordSearchResultYearMonthList()
+    private val initialWordSearchResultList = DiaryYearMonthList<DiaryDayListItem.WordSearchResult>()
     private val _wordSearchResultList = MutableStateFlow(initialWordSearchResultList)
     val wordSearchResultList
         get() = _wordSearchResultList.asStateFlow()
@@ -246,7 +246,7 @@ internal class WordSearchViewModel @Inject internal constructor(
     }
 
     private suspend fun loadNewWordSearchResultList(
-        currentResultList: WordSearchResultYearMonthList,
+        currentResultList: DiaryYearMonthList<DiaryDayListItem.WordSearchResult>,
         searchWord: String
     ) {
         loadWordSearchResultList(
@@ -262,7 +262,7 @@ internal class WordSearchViewModel @Inject internal constructor(
     }
 
     private suspend fun loadAdditionWordSearchResultList(
-        currentResultList: WordSearchResultYearMonthList,
+        currentResultList: DiaryYearMonthList<DiaryDayListItem.WordSearchResult>,
         searchWord: String
     ) {
         loadWordSearchResultList(
@@ -285,7 +285,7 @@ internal class WordSearchViewModel @Inject internal constructor(
     }
 
     private suspend fun updateWordSearchResultList(
-        currentResultList: WordSearchResultYearMonthList,
+        currentResultList: DiaryYearMonthList<DiaryDayListItem.WordSearchResult>,
         searchWord: String
     ) {
         loadWordSearchResultList(
@@ -313,12 +313,12 @@ internal class WordSearchViewModel @Inject internal constructor(
 
     private suspend fun loadWordSearchResultList(
         state: WordSearchState,
-        currentResultList: WordSearchResultYearMonthList,
+        currentResultList: DiaryYearMonthList<DiaryDayListItem.WordSearchResult>,
         searchWord: String,
         processLoad: suspend (
-            currentResultList: WordSearchResultYearMonthList,
+            currentResultList: DiaryYearMonthList<DiaryDayListItem.WordSearchResult>,
             searchWord: String
-        ) -> WordSearchResultYearMonthList
+        ) -> DiaryYearMonthList<DiaryDayListItem.WordSearchResult>
     ) {
         require(
             when (state) {
@@ -357,7 +357,7 @@ internal class WordSearchViewModel @Inject internal constructor(
         }
     }
 
-    private fun updateUiStateForResultList(list: WordSearchResultYearMonthList) {
+    private fun updateUiStateForResultList(list: DiaryYearMonthList<DiaryDayListItem.WordSearchResult>) {
         val state =
             if (list.isNotEmpty) {
                 WordSearchState.ShowingResultList
@@ -369,7 +369,7 @@ internal class WordSearchViewModel @Inject internal constructor(
 
     private fun showWordSearchResultListFirstItemProgressIndicator() {
         updateWordSearchResultList(
-            WordSearchResultYearMonthList(false)
+            DiaryYearMonthList(false)
         )
     }
 
@@ -398,9 +398,9 @@ internal class WordSearchViewModel @Inject internal constructor(
     private suspend fun toUiWordSearchResultList(
         list: List<WordSearchResultListItem>,
         searchWord: String
-    ): WordSearchResultYearMonthList {
+    ): DiaryYearMonthList<DiaryDayListItem.WordSearchResult> {
         Log.d("20250714", list.toString())
-        if (list.isEmpty()) return WordSearchResultYearMonthList()
+        if (list.isEmpty()) return DiaryYearMonthList()
 
         val resultDayList =
             DiaryDayList(
@@ -411,7 +411,7 @@ internal class WordSearchViewModel @Inject internal constructor(
                 searchWord,
                 resultDayList.countDiaries()
             )
-        return WordSearchResultYearMonthList(resultDayList, !existsUnloadedDiaries)
+        return DiaryYearMonthList<DiaryDayListItem.WordSearchResult>(resultDayList, !existsUnloadedDiaries)
     }
 
     @Throws(DomainException::class)
@@ -444,7 +444,7 @@ internal class WordSearchViewModel @Inject internal constructor(
         previousSearchWord = searchWord
     }
 
-    private fun updateWordSearchResultList(list: WordSearchResultYearMonthList) {
+    private fun updateWordSearchResultList(list: DiaryYearMonthList<DiaryDayListItem.WordSearchResult>) {
         _wordSearchResultList.value = list
     }
 

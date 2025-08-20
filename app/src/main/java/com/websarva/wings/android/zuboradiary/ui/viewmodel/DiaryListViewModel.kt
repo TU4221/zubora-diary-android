@@ -15,7 +15,7 @@ import com.websarva.wings.android.zuboradiary.ui.mapper.toUiModel
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import com.websarva.wings.android.zuboradiary.ui.model.message.DiaryListAppMessage
 import com.websarva.wings.android.zuboradiary.ui.model.list.diary.DiaryDayList
-import com.websarva.wings.android.zuboradiary.ui.model.list.diary.diary.DiaryYearMonthList
+import com.websarva.wings.android.zuboradiary.ui.model.list.diary.DiaryYearMonthList
 import com.websarva.wings.android.zuboradiary.ui.model.event.CommonUiEvent
 import com.websarva.wings.android.zuboradiary.ui.model.state.DiaryListState
 import com.websarva.wings.android.zuboradiary.ui.model.event.DiaryListEvent
@@ -77,7 +77,7 @@ internal class DiaryListViewModel @Inject constructor(
 
     private var diaryListLoadJob: Job? = null // キャンセル用
 
-    private val _diaryList = MutableStateFlow(DiaryYearMonthList())
+    private val _diaryList = MutableStateFlow(DiaryYearMonthList<DiaryDayListItem.Standard>())
     val diaryList
         get() = _diaryList.asStateFlow()
 
@@ -277,7 +277,7 @@ internal class DiaryListViewModel @Inject constructor(
         if (!job.isCompleted) job.cancel()
     }
 
-    private suspend fun loadNewDiaryList(currentList: DiaryYearMonthList) {
+    private suspend fun loadNewDiaryList(currentList: DiaryYearMonthList<DiaryDayListItem.Standard>) {
         loadDiaryList(
             DiaryListState.LoadingNewDiaryList,
             currentList
@@ -288,7 +288,7 @@ internal class DiaryListViewModel @Inject constructor(
         }
     }
 
-    private suspend fun loadAdditionDiaryList(currentList: DiaryYearMonthList) {
+    private suspend fun loadAdditionDiaryList(currentList: DiaryYearMonthList<DiaryDayListItem.Standard>) {
         loadDiaryList(
             DiaryListState.LoadingAdditionDiaryList,
             currentList
@@ -306,7 +306,7 @@ internal class DiaryListViewModel @Inject constructor(
         }
     }
 
-    private suspend fun refreshDiaryList(currentList: DiaryYearMonthList) {
+    private suspend fun refreshDiaryList(currentList: DiaryYearMonthList<DiaryDayListItem.Standard>) {
         loadDiaryList(
             DiaryListState.UpdatingDiaryList,
             currentList
@@ -325,8 +325,9 @@ internal class DiaryListViewModel @Inject constructor(
 
     private suspend fun loadDiaryList(
         state: DiaryListState,
-        currentList: DiaryYearMonthList,
-        processLoad: suspend (DiaryYearMonthList) -> DiaryYearMonthList
+        currentList: DiaryYearMonthList<DiaryDayListItem.Standard>,
+        processLoad: suspend (DiaryYearMonthList<DiaryDayListItem.Standard>)
+        -> DiaryYearMonthList<DiaryDayListItem.Standard>
     ) {
         require(
             when (state) {
@@ -363,7 +364,7 @@ internal class DiaryListViewModel @Inject constructor(
     }
 
     private fun showDiaryListFirstItemProgressIndicator() {
-        val list = DiaryYearMonthList(false)
+        val list = DiaryYearMonthList<DiaryDayListItem.Standard>(false)
         updateDiaryList(list)
     }
 
@@ -385,7 +386,8 @@ internal class DiaryListViewModel @Inject constructor(
     }
 
     @Throws(DomainException::class)
-    private suspend fun toUiDiaryList(diaryList: List<DiaryListItem>): DiaryYearMonthList {
+    private suspend fun toUiDiaryList(diaryList: List<DiaryListItem>):
+            DiaryYearMonthList<DiaryDayListItem.Standard> {
         if (diaryList.isEmpty()) return DiaryYearMonthList()
 
         val diaryDayList =
@@ -406,7 +408,11 @@ internal class DiaryListViewModel @Inject constructor(
         }
     }
 
-    private suspend fun deleteDiary(date: LocalDate, uri: Uri?, currentList: DiaryYearMonthList) {
+    private suspend fun deleteDiary(
+        date: LocalDate,
+        uri: Uri?,
+        currentList: DiaryYearMonthList<DiaryDayListItem.Standard>
+    ) {
         val logMsg = "日記削除"
         Log.i(logTag, "${logMsg}_開始")
 
@@ -447,7 +453,7 @@ internal class DiaryListViewModel @Inject constructor(
         }
     }
 
-    private fun updateUiStateForDiaryList(list: DiaryYearMonthList) {
+    private fun updateUiStateForDiaryList(list: DiaryYearMonthList<DiaryDayListItem.Standard>) {
         val state =
             if (list.isNotEmpty) {
                 DiaryListState.ShowingDiaryList
@@ -457,7 +463,7 @@ internal class DiaryListViewModel @Inject constructor(
         updateUiState(state)
     }
 
-    private fun updateDiaryList(diaryList: DiaryYearMonthList) {
+    private fun updateDiaryList(diaryList: DiaryYearMonthList<DiaryDayListItem.Standard>) {
         _diaryList.value = diaryList
     }
 
