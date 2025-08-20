@@ -1,10 +1,11 @@
-package com.websarva.wings.android.zuboradiary.ui.adapter.recycler.diary.diary
+package com.websarva.wings.android.zuboradiary.ui.adapter.recycler.diary
 
 import androidx.recyclerview.widget.RecyclerView
 import com.websarva.wings.android.zuboradiary.ui.adapter.recycler.LeftSwipeBackgroundButtonSimpleCallback
+import com.websarva.wings.android.zuboradiary.ui.adapter.recycler.diary.diary.DiaryYearMonthListAdapter
 import com.websarva.wings.android.zuboradiary.ui.view.custom.SwipeRecyclerView
 
-internal class DiaryListSimpleCallback(
+internal class SwipeDiaryYearMonthListSimpleCallback(
     private val parentRecyclerView: RecyclerView,
     recyclerView: SwipeRecyclerView
 ) : LeftSwipeBackgroundButtonSimpleCallback(recyclerView) {

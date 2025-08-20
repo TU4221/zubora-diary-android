@@ -4,7 +4,6 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.websarva.wings.android.zuboradiary.domain.model.ThemeColor
-import com.websarva.wings.android.zuboradiary.ui.adapter.recycler.diary.diary.DiaryListSimpleCallback
 import com.websarva.wings.android.zuboradiary.ui.model.list.diary.DiaryDayBaseList
 import com.websarva.wings.android.zuboradiary.ui.model.list.diary.DiaryDayListItem
 
@@ -24,7 +23,7 @@ internal abstract class SwipeDiaryYearMonthListBaseAdapter<
     }
     protected var onChildItemBackgroundButtonClickListener: OnChildItemBackgroundButtonClickListener<CLIT>? = null
 
-    private val simpleCallbackList: MutableList<DiaryListSimpleCallback> = ArrayList()
+    private val simpleCallbackList: MutableList<SwipeDiaryYearMonthListSimpleCallback> = ArrayList()
 
     override fun build() {
         super.build()
@@ -54,7 +53,7 @@ internal abstract class SwipeDiaryYearMonthListBaseAdapter<
 
         when (holder) {
             is DiaryYearMonthListViewHolder.Item -> {
-                DiaryListSimpleCallback(recyclerView, holder.binding.recyclerDayList)
+                SwipeDiaryYearMonthListSimpleCallback(recyclerView, holder.binding.recyclerDayList)
                     .apply {
                         build()
                         simpleCallbackList.add(this)
@@ -81,7 +80,7 @@ internal abstract class SwipeDiaryYearMonthListBaseAdapter<
         }
     }
 
-    fun closeSwipedItemOtherDayList(selfSimpleCallback: DiaryListSimpleCallback) {
+    fun closeSwipedItemOtherDayList(selfSimpleCallback: SwipeDiaryYearMonthListSimpleCallback) {
         for (i in simpleCallbackList.indices) {
             if (simpleCallbackList[i] !== selfSimpleCallback) {
                 simpleCallbackList[i].closeSwipedItem()
