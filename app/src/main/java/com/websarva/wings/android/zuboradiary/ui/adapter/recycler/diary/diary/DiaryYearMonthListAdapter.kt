@@ -53,19 +53,20 @@ internal abstract class DiaryYearMonthListAdapter(
                 oldItem: DiaryYearMonthListItem<DiaryDayList>,
                 newItem: DiaryYearMonthListItem<DiaryDayList>
             ): Boolean {
-                val result = when (oldItem) {
-                    is DiaryYearMonthListItem.Diary -> {
-                        if (newItem !is DiaryYearMonthListItem.Diary<DiaryDayList>) {
+                val result =
+                    when (oldItem) {
+                        is DiaryYearMonthListItem.Diary -> {
+                            if (newItem !is DiaryYearMonthListItem.Diary<DiaryDayList>) {
+                                false
+                            } else {
+                                oldItem.diaryDayList == newItem.diaryDayList
+                            }
+                        }
+                        is DiaryYearMonthListItem.NoDiaryMessage,
+                        is DiaryYearMonthListItem.ProgressIndicator -> {
                             false
-                        } else {
-                            oldItem.diaryDayList == newItem.diaryDayList
                         }
                     }
-                    is DiaryYearMonthListItem.NoDiaryMessage,
-                    is DiaryYearMonthListItem.ProgressIndicator -> {
-                        false
-                    }
-                }
 
                 Log.d(
                     logTag,

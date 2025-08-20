@@ -48,20 +48,21 @@ internal abstract class WordSearchResultYearMonthListAdapter(
             oldItem: DiaryYearMonthListItem<WordSearchResultDayList>,
             newItem: DiaryYearMonthListItem<WordSearchResultDayList>
         ): Boolean {
-            val result = when (oldItem) {
-                is DiaryYearMonthListItem.Diary -> {
-                    if (newItem !is DiaryYearMonthListItem.Diary<WordSearchResultDayList>) {
+            val result =
+                when (oldItem) {
+                    is DiaryYearMonthListItem.Diary -> {
+                        if (newItem !is DiaryYearMonthListItem.Diary<WordSearchResultDayList>) {
+                            false
+                        } else {
+                            oldItem.diaryDayList == newItem.diaryDayList
+                        }
+                    }
+
+                    is DiaryYearMonthListItem.NoDiaryMessage,
+                    is DiaryYearMonthListItem.ProgressIndicator -> {
                         false
-                    } else {
-                        oldItem.diaryDayList == newItem.diaryDayList
                     }
                 }
-
-                is DiaryYearMonthListItem.NoDiaryMessage,
-                is DiaryYearMonthListItem.ProgressIndicator -> {
-                    return false
-                }
-            }
 
             Log.d(
                 logTag,

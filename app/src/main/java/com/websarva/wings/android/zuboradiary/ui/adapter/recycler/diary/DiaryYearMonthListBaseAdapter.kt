@@ -189,31 +189,32 @@ internal abstract class DiaryYearMonthListBaseAdapter<
                 oldItem: DiaryYearMonthListItem<T>,
                 newItem: DiaryYearMonthListItem<T>
             ): Boolean {
-                val result = when (oldItem) {
-                    is DiaryYearMonthListItem.Diary -> {
-                        if (oldItem === newItem) {
-                            true
-                        } else if (newItem !is DiaryYearMonthListItem.Diary<*>) {
+                val result =
+                    when (oldItem) {
+                        is DiaryYearMonthListItem.Diary -> {
+                            if (oldItem === newItem) {
+                                true
+                            } else if (newItem !is DiaryYearMonthListItem.Diary<*>) {
+                                false
+                            } else {
+                                oldItem.yearMonth == newItem.yearMonth
+                            }
+                        }
+
+                        is DiaryYearMonthListItem.NoDiaryMessage -> {
+                            newItem is DiaryYearMonthListItem.NoDiaryMessage<*>
+                        }
+
+                        is DiaryYearMonthListItem.ProgressIndicator -> {
+                            // HACK:RecyclerViewの初回アイテム表示時にスクロール初期位置がズレる事がある。
+                            //      原因はプログレスバーの存在。最初にアイテムを表示する時、読込中の意味を込めてプログレスバーのみを表示させている。
+                            //      スクロール読込機能の仕様により、読込データをRecyclerViewに表示する際、アイテムリスト末尾にプログレスバーを追加している。
+                            //      これにより、初回読込中プログレスバーとアイテムリスト末尾のプログレスバーが同一アイテムと認識するため、
+                            //      ListAdapterクラスの仕様により表示されていたプログレスバーが更新後も表示されるようにスクロール位置がズレた。
+                            //      プログレスバー同士が同一アイテムと認識されないようにするために、下記条件を追加して対策。
                             false
-                        } else {
-                            oldItem.yearMonth == newItem.yearMonth
                         }
                     }
-
-                    is DiaryYearMonthListItem.NoDiaryMessage -> {
-                        newItem is DiaryYearMonthListItem.NoDiaryMessage<*>
-                    }
-
-                    is DiaryYearMonthListItem.ProgressIndicator -> {
-                        // HACK:RecyclerViewの初回アイテム表示時にスクロール初期位置がズレる事がある。
-                        //      原因はプログレスバーの存在。最初にアイテムを表示する時、読込中の意味を込めてプログレスバーのみを表示させている。
-                        //      スクロール読込機能の仕様により、読込データをRecyclerViewに表示する際、アイテムリスト末尾にプログレスバーを追加している。
-                        //      これにより、初回読込中プログレスバーとアイテムリスト末尾のプログレスバーが同一アイテムと認識するため、
-                        //      ListAdapterクラスの仕様により表示されていたプログレスバーが更新後も表示されるようにスクロール位置がズレた。
-                        //      プログレスバー同士が同一アイテムと認識されないようにするために、下記条件を追加して対策。
-                        false
-                    }
-                }
 
                 Log.d(
                     logTag,
