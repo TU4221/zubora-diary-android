@@ -14,12 +14,17 @@ internal abstract class DiaryDayListBaseDiffUtilItemCallback<T : DiaryDayListIte
         oldItem: T,
         newItem: T
     ): Boolean {
-        Log.d(logTag, "areItemsTheSame()")
-        Log.d(logTag, "oldItem_Date = " + oldItem.date)
-        Log.d(logTag, "newItem_Date = " + newItem.date)
+        val result =
+            if (oldItem === newItem) {
+                true
+            } else {
+                oldItem.date == newItem.date
+            }
 
-        if (oldItem === newItem) return true
-
-        return oldItem.date == newItem.date
+        Log.d(
+            logTag,
+            "areItemsTheSame()_result = ${result}_oldItem = ${oldItem}_newItem = $newItem"
+        )
+        return result
     }
 }

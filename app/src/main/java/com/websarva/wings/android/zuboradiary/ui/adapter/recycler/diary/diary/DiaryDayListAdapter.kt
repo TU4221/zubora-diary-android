@@ -94,13 +94,13 @@ internal class DiaryDayListAdapter(recyclerView: SwipeRecyclerView, themeColor: 
             oldItem: DiaryDayListItem.Standard,
             newItem: DiaryDayListItem.Standard
         ): Boolean {
-            return if (oldItem.title == newItem.title && oldItem.imageUri == newItem.imageUri) {
-                Log.d(logTag, "areContentsTheSame()_全項目一致")
-                true
-            } else {
-                Log.d(logTag, "areContentsTheSame()_全項目不一致")
-                false
-            }
+            val result = oldItem.title == newItem.title && oldItem.imageUri == newItem.imageUri
+
+            Log.d(
+                logTag,
+                "areContentsTheSame()_result = ${result}_oldItem = ${oldItem}_newItem = $newItem"
+            )
+            return result
         }
     }
 }

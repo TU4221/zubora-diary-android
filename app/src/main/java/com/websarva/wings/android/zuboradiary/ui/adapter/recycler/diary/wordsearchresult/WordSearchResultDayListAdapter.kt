@@ -91,18 +91,17 @@ internal class WordSearchResultDayListAdapter(
             oldItem: DiaryDayListItem.WordSearchResult,
             newItem: DiaryDayListItem.WordSearchResult
         ): Boolean {
-            return if (
+            val result =
                 oldItem.title == newItem.title
-                && oldItem.itemNumber == newItem.itemNumber
-                && oldItem.itemTitle == newItem.itemTitle
-                && oldItem.itemComment == newItem.itemComment
-            ) {
-                Log.d(logTag, "areContentsTheSame()_全項目一致")
-                true
-            } else {
-                Log.d(logTag, "areContentsTheSame()_全項目不一致")
-                false
-            }
+                        && oldItem.itemNumber == newItem.itemNumber
+                        && oldItem.itemTitle == newItem.itemTitle
+                        && oldItem.itemComment == newItem.itemComment
+
+            Log.d(
+                logTag,
+                "areContentsTheSame()_result = ${result}_oldItem = ${oldItem}_newItem = $newItem"
+            )
+            return result
         }
     }
 }
