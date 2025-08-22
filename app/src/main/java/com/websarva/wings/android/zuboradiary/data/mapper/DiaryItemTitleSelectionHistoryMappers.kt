@@ -1,15 +1,15 @@
 package com.websarva.wings.android.zuboradiary.data.mapper
 
-import com.websarva.wings.android.zuboradiary.data.database.DiaryItemTitleSelectionHistoryItemEntity
-import com.websarva.wings.android.zuboradiary.domain.model.DiaryItemTitleSelectionHistoryItem
-import com.websarva.wings.android.zuboradiary.domain.model.list.selectionhistory.SelectionHistoryListItem
+import com.websarva.wings.android.zuboradiary.data.database.DiaryItemTitleSelectionHistoryEntity
+import com.websarva.wings.android.zuboradiary.domain.model.DiaryItemTitleSelectionHistory
+import com.websarva.wings.android.zuboradiary.domain.model.list.diaryitemtitle.DiaryItemTitleSelectionHistoryListItem
 
-internal fun DiaryItemTitleSelectionHistoryItemEntity.toDomainModel(): SelectionHistoryListItem {
-    return SelectionHistoryListItem(title)
+internal fun DiaryItemTitleSelectionHistoryEntity.toDomainModel(): DiaryItemTitleSelectionHistoryListItem {
+    return DiaryItemTitleSelectionHistoryListItem(title)
 }
 
-internal fun DiaryItemTitleSelectionHistoryItem.toDataModel(): DiaryItemTitleSelectionHistoryItemEntity {
-    return DiaryItemTitleSelectionHistoryItemEntity(
+internal fun DiaryItemTitleSelectionHistory.toDataModel(): DiaryItemTitleSelectionHistoryEntity {
+    return DiaryItemTitleSelectionHistoryEntity(
         title,
         log.toString()
     )

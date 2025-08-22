@@ -6,13 +6,13 @@ import com.websarva.wings.android.zuboradiary.domain.model.ItemNumber
 import com.websarva.wings.android.zuboradiary.domain.exception.diary.DiaryItemTitleSelectionHistoryLoadFailureException
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.DeleteDiaryItemTitleSelectionHistoryItemUseCase
-import com.websarva.wings.android.zuboradiary.domain.usecase.diary.LoadDiaryItemTitleSelectionHistoryUseCase
+import com.websarva.wings.android.zuboradiary.domain.usecase.diary.LoadDiaryItemTitleSelectionHistoryListUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.text.ValidateInputTextUseCase
 import com.websarva.wings.android.zuboradiary.ui.mapper.toUiModel
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import com.websarva.wings.android.zuboradiary.ui.model.message.DiaryItemTitleEditAppMessage
-import com.websarva.wings.android.zuboradiary.ui.model.list.selectionhistory.SelectionHistoryListUi
-import com.websarva.wings.android.zuboradiary.ui.model.list.selectionhistory.SelectionHistoryListItemUi
+import com.websarva.wings.android.zuboradiary.ui.model.list.diaryitemtitle.DiaryItemTitleSelectionHistoryListUi
+import com.websarva.wings.android.zuboradiary.ui.model.list.diaryitemtitle.DiaryItemTitleSelectionHistoryListItemUi
 import com.websarva.wings.android.zuboradiary.ui.model.DiaryItemTitle
 import com.websarva.wings.android.zuboradiary.ui.model.result.InputTextValidationResult
 import com.websarva.wings.android.zuboradiary.ui.model.event.CommonUiEvent
@@ -34,7 +34,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 internal class DiaryItemTitleEditViewModel @Inject constructor(
-    private val loadDiaryItemTitleSelectionHistoryUseCase: LoadDiaryItemTitleSelectionHistoryUseCase,
+    private val loadDiaryItemTitleSelectionHistoryListUseCase: LoadDiaryItemTitleSelectionHistoryListUseCase,
     private val deleteDiaryItemTitleSelectionHistoryItemUseCase: DeleteDiaryItemTitleSelectionHistoryItemUseCase,
     private val validateInputTextUseCase: ValidateInputTextUseCase
 ) : BaseViewModel<DiaryItemTitleEditEvent, DiaryItemTitleEditAppMessage, DiaryItemTitleEditState>(
@@ -78,8 +78,8 @@ internal class DiaryItemTitleEditViewModel @Inject constructor(
             .map { it == InputTextValidationResult.Valid }
             .stateInWhileSubscribed(false)
 
-    private val initialItemTitleSelectionHistoryList = SelectionHistoryListUi(emptyList())
-    lateinit var itemTitleSelectionHistoryList: StateFlow<SelectionHistoryListUi>
+    private val initialItemTitleSelectionHistoryList = DiaryItemTitleSelectionHistoryListUi(emptyList())
+    lateinit var itemTitleSelectionHistoryList: StateFlow<DiaryItemTitleSelectionHistoryListUi>
 
     init {
         setUpItemTitleSelectionHistoryList()
@@ -127,7 +127,7 @@ internal class DiaryItemTitleEditViewModel @Inject constructor(
         }
     }
 
-    fun onDiaryItemTitleSelectionHistoryItemClick(item: SelectionHistoryListItemUi) {
+    fun onDiaryItemTitleSelectionHistoryListItemClick(item: DiaryItemTitleSelectionHistoryListItemUi) {
         val itemTitle = item.title
         val itemNumber = _itemNumber.requireValue()
         viewModelScope.launch {
@@ -142,7 +142,7 @@ internal class DiaryItemTitleEditViewModel @Inject constructor(
         }
     }
 
-    fun onDiaryItemTitleSelectionHistoryItemSwipe(item: SelectionHistoryListItemUi) {
+    fun onDiaryItemTitleSelectionHistoryListItemSwipe(item: DiaryItemTitleSelectionHistoryListItemUi) {
         val itemTitle = item.title
         viewModelScope.launch {
             emitUiEvent(
@@ -182,7 +182,7 @@ internal class DiaryItemTitleEditViewModel @Inject constructor(
     ) {
         val deleteTitle = parameters.itemTitle
         viewModelScope.launch {
-            deleteDiaryItemTitleSelectionHistoryItem(deleteTitle)
+            deleteDiaryItemTitleSelectionHistory(deleteTitle)
         }
     }
 
@@ -206,7 +206,7 @@ internal class DiaryItemTitleEditViewModel @Inject constructor(
 
         updateUiState(DiaryItemTitleEditState.LoadingSelectionHistory)
         itemTitleSelectionHistoryList =
-            loadDiaryItemTitleSelectionHistoryUseCase().value
+            loadDiaryItemTitleSelectionHistoryListUseCase().value
                 .catch {
                     when (it) {
                         is DiaryItemTitleSelectionHistoryLoadFailureException -> {
@@ -255,7 +255,7 @@ internal class DiaryItemTitleEditViewModel @Inject constructor(
         )
     }
 
-    private suspend fun deleteDiaryItemTitleSelectionHistoryItem(deleteTitle: String) {
+    private suspend fun deleteDiaryItemTitleSelectionHistory(deleteTitle: String) {
         val logMsg = "日記項目タイトル選択履歴アイテム削除"
         Log.i(logTag, "${logMsg}_開始")
 

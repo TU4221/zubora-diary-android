@@ -4,7 +4,7 @@ import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import com.websarva.wings.android.zuboradiary.domain.model.ItemNumber
 import com.websarva.wings.android.zuboradiary.domain.model.Diary
-import com.websarva.wings.android.zuboradiary.domain.model.DiaryItemTitleSelectionHistoryItem
+import com.websarva.wings.android.zuboradiary.domain.model.DiaryItemTitleSelectionHistory
 import com.websarva.wings.android.zuboradiary.ui.utils.requireValue
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -120,14 +120,14 @@ internal class DiaryEditStateFlow(scope: CoroutineScope, handle: SavedStateHandl
             )
     }
 
-    fun createDiaryItemTitleSelectionHistoryList(): List<DiaryItemTitleSelectionHistoryItem> {
-        val list: MutableList<DiaryItemTitleSelectionHistoryItem> = ArrayList()
+    fun createDiaryItemTitleSelectionHistoryList(): List<DiaryItemTitleSelectionHistory> {
+        val list: MutableList<DiaryItemTitleSelectionHistory> = ArrayList()
         for (i in 0 until MAX_ITEMS) {
             val itemTitle = items[i].title.value ?: continue
             val itemTitleUpdateLog = items[i].titleUpdateLog.value ?: continue
             if (itemTitle.matches("\\S+.*".toRegex())) {
                 val item =
-                    DiaryItemTitleSelectionHistoryItem(
+                    DiaryItemTitleSelectionHistory(
                         itemTitle,
                         itemTitleUpdateLog
                     )

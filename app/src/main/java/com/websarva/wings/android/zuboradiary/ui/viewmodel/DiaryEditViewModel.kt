@@ -9,7 +9,7 @@ import com.websarva.wings.android.zuboradiary.domain.model.Condition
 import com.websarva.wings.android.zuboradiary.domain.model.ItemNumber
 import com.websarva.wings.android.zuboradiary.domain.model.Weather
 import com.websarva.wings.android.zuboradiary.domain.model.Diary
-import com.websarva.wings.android.zuboradiary.domain.model.DiaryItemTitleSelectionHistoryItem
+import com.websarva.wings.android.zuboradiary.domain.model.DiaryItemTitleSelectionHistory
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.DeleteDiaryUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.DoesDiaryExistUseCase
@@ -521,7 +521,7 @@ internal class DiaryEditViewModel @Inject constructor(
     private fun handleDiaryUpdateDialogPositiveResult(parameters: DiaryUpdateParameters) {
         val diary = parameters.diary
         val diaryItemTitleSelectionHistoryList =
-            parameters.diaryItemTitleSelectionHistoryItemList
+            parameters.diaryItemTitleSelectionHistoryList
         val originalDiary = parameters.originalDiary
         val isNewDiary = parameters.isNewDiary
         viewModelScope.launch {
@@ -768,7 +768,7 @@ internal class DiaryEditViewModel @Inject constructor(
 
     private suspend fun saveDiary(
         diary: Diary,
-        diaryItemTitleSelectionHistoryItemList: List<DiaryItemTitleSelectionHistoryItem>,
+        diaryItemTitleSelectionHistoryList: List<DiaryItemTitleSelectionHistory>,
         originalDiary: Diary,
         isNewDiary: Boolean
     ) {
@@ -779,7 +779,7 @@ internal class DiaryEditViewModel @Inject constructor(
         val result =
             saveDiaryUseCase(
                 diary,
-                diaryItemTitleSelectionHistoryItemList,
+                diaryItemTitleSelectionHistoryList,
                 originalDiary,
                 isNewDiary
             )
@@ -872,7 +872,7 @@ internal class DiaryEditViewModel @Inject constructor(
 
     private suspend fun requestDiaryUpdateConfirmation(
         diary: Diary,
-        diaryItemTitleSelectionHistoryItemList: List<DiaryItemTitleSelectionHistoryItem>,
+        diaryItemTitleSelectionHistoryList: List<DiaryItemTitleSelectionHistory>,
         originalDiary: Diary,
         isNewDiary: Boolean,
         onConfirmationNotNeeded: suspend () -> Unit
@@ -886,7 +886,7 @@ internal class DiaryEditViewModel @Inject constructor(
                 if (result.value) {
                     val parameters = DiaryUpdateParameters(
                         diary,
-                        diaryItemTitleSelectionHistoryItemList,
+                        diaryItemTitleSelectionHistoryList,
                         originalDiary,
                         isNewDiary
                     )

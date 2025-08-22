@@ -2,10 +2,10 @@ package com.websarva.wings.android.zuboradiary.di
 
 import android.content.Context
 import androidx.room.Room.databaseBuilder
-import com.websarva.wings.android.zuboradiary.data.database.DiaryDAO
+import com.websarva.wings.android.zuboradiary.data.database.DiaryDao
 import com.websarva.wings.android.zuboradiary.data.database.DiaryDataSource
 import com.websarva.wings.android.zuboradiary.data.database.DiaryDatabase
-import com.websarva.wings.android.zuboradiary.data.database.DiaryItemTitleSelectionHistoryDAO
+import com.websarva.wings.android.zuboradiary.data.database.DiaryItemTitleSelectionHistoryDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -25,27 +25,27 @@ internal object DatabaseModule {
 
     @Singleton
     @Provides
-    fun provideDiaryDAO(diaryDatabase: DiaryDatabase): DiaryDAO {
-        return diaryDatabase.createDiaryDAO()
+    fun provideDiaryDao(diaryDatabase: DiaryDatabase): DiaryDao {
+        return diaryDatabase.createDiaryDao()
     }
 
     @Singleton
     @Provides
-    fun provideSelectedItemTitlesHistoryDAO(diaryDatabase: DiaryDatabase): DiaryItemTitleSelectionHistoryDAO {
-        return diaryDatabase.createDiaryItemTitleSelectionHistoryDAO()
+    fun provideSelectedItemTitlesHistoryDao(diaryDatabase: DiaryDatabase): DiaryItemTitleSelectionHistoryDao {
+        return diaryDatabase.createDiaryItemTitleSelectionHistoryDao()
     }
 
     @Singleton
     @Provides
     fun provideDiaryDataSource(
         diaryDatabase: DiaryDatabase,
-        diaryDAO: DiaryDAO,
-        diaryItemTitleSelectionHistoryDAO: DiaryItemTitleSelectionHistoryDAO
+        diaryDao: DiaryDao,
+        diaryItemTitleSelectionHistoryDao: DiaryItemTitleSelectionHistoryDao
     ): DiaryDataSource {
         return DiaryDataSource(
             diaryDatabase,
-            diaryDAO,
-            diaryItemTitleSelectionHistoryDAO
+            diaryDao,
+            diaryItemTitleSelectionHistoryDao
         )
     }
 }

@@ -6,7 +6,7 @@ import com.websarva.wings.android.zuboradiary.data.database.DiaryDataSource
 import com.websarva.wings.android.zuboradiary.data.mapper.toDataModel
 import com.websarva.wings.android.zuboradiary.data.mapper.toDomainModel
 import com.websarva.wings.android.zuboradiary.domain.model.Diary
-import com.websarva.wings.android.zuboradiary.domain.model.DiaryItemTitleSelectionHistoryItem
+import com.websarva.wings.android.zuboradiary.domain.model.DiaryItemTitleSelectionHistory
 import com.websarva.wings.android.zuboradiary.domain.model.WordSearchResultListItem
 import com.websarva.wings.android.zuboradiary.domain.exception.diary.AllDiariesDeleteFailureException
 import com.websarva.wings.android.zuboradiary.domain.exception.diary.DiaryCountFailureException
@@ -22,7 +22,7 @@ import com.websarva.wings.android.zuboradiary.domain.exception.diary.DiaryItemTi
 import com.websarva.wings.android.zuboradiary.domain.exception.diary.DiaryItemTitleSelectionHistoryLoadFailureException
 import com.websarva.wings.android.zuboradiary.domain.exception.diary.WordSearchResultListLoadFailureException
 import com.websarva.wings.android.zuboradiary.domain.model.list.diary.DiaryDayListItem
-import com.websarva.wings.android.zuboradiary.domain.model.list.selectionhistory.SelectionHistoryListItem
+import com.websarva.wings.android.zuboradiary.domain.model.list.diaryitemtitle.DiaryItemTitleSelectionHistoryListItem
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -172,7 +172,7 @@ internal class DiaryRepository (
     @Throws(DiarySaveFailureException::class)
     suspend fun saveDiary(
         diary: Diary,
-        historyItemList: List<DiaryItemTitleSelectionHistoryItem>
+        historyItemList: List<DiaryItemTitleSelectionHistory>
     ) {
         withContext(Dispatchers.IO) {
             try {
@@ -190,7 +190,7 @@ internal class DiaryRepository (
     suspend fun deleteAndSaveDiary(
         deleteDiaryDate: LocalDate,
         newDiary: Diary,
-        historyItemList: List<DiaryItemTitleSelectionHistoryItem>
+        historyItemList: List<DiaryItemTitleSelectionHistory>
     ) {
         withContext(Dispatchers.IO) {
             try {
@@ -241,9 +241,9 @@ internal class DiaryRepository (
     /**
      * @throws DiaryItemTitleSelectionHistoryLoadFailureException
      */
-    fun loadDiaryItemTitleSelectionHistory(
+    fun loadDiaryItemTitleSelectionHistoryList(
         num: Int, offset: Int
-    ): Flow<List<SelectionHistoryListItem>> {
+    ): Flow<List<DiaryItemTitleSelectionHistoryListItem>> {
         require(num >= 1)
         require(offset >= 0)
 
@@ -258,7 +258,7 @@ internal class DiaryRepository (
     }
 
     @Throws(DiaryItemTitleSelectionHistoryItemDeleteFailureException::class)
-    suspend fun deleteDiaryItemTitleSelectionHistoryItem(title: String) {
+    suspend fun deleteDiaryItemTitleSelectionHistory(title: String) {
         withContext(Dispatchers.IO) {
             try {
                 diaryDataSource.deleteHistoryItem(title)

@@ -10,9 +10,9 @@ import com.websarva.wings.android.zuboradiary.R
 import com.websarva.wings.android.zuboradiary.databinding.DialogDiaryItemTitleEditBinding
 import com.websarva.wings.android.zuboradiary.ui.model.message.AppMessage
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.DiaryItemTitleEditViewModel
-import com.websarva.wings.android.zuboradiary.ui.adapter.recycler.diaryitemtitle.ItemTitleSelectionHistoryListAdapter
-import com.websarva.wings.android.zuboradiary.ui.model.list.selectionhistory.SelectionHistoryListUi
-import com.websarva.wings.android.zuboradiary.ui.model.list.selectionhistory.SelectionHistoryListItemUi
+import com.websarva.wings.android.zuboradiary.ui.adapter.recycler.diaryitemtitle.DiaryItemTitleSelectionHistoryListAdapter
+import com.websarva.wings.android.zuboradiary.ui.model.list.diaryitemtitle.DiaryItemTitleSelectionHistoryListUi
+import com.websarva.wings.android.zuboradiary.ui.model.list.diaryitemtitle.DiaryItemTitleSelectionHistoryListItemUi
 import com.websarva.wings.android.zuboradiary.ui.fragment.RESULT_KEY_PREFIX
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.alert.DiaryItemTitleDeleteDialogFragment
 import com.websarva.wings.android.zuboradiary.ui.model.event.DiaryItemTitleEditEvent
@@ -82,7 +82,7 @@ class DiaryItemTitleEditDialog :
                 val adapter =
                     checkNotNull(
                         binding.recyclerItemTitleSelectionHistory.adapter
-                    ) as ItemTitleSelectionHistoryListAdapter
+                    ) as DiaryItemTitleSelectionHistoryListAdapter
                 adapter.closeSwipedItem()
             }
             is DiaryItemTitleEditEvent.CompleteEdit -> {
@@ -156,27 +156,27 @@ class DiaryItemTitleEditDialog :
 
     private fun setUpItemTitleSelectionHistory() {
         val itemTitleSelectionHistoryListAdapter =
-            ItemTitleSelectionHistoryListAdapter(
+            DiaryItemTitleSelectionHistoryListAdapter(
                 binding.recyclerItemTitleSelectionHistory,
                 themeColor
             )
         itemTitleSelectionHistoryListAdapter.build()
-        itemTitleSelectionHistoryListAdapter.registerOnItemClickListener { item: SelectionHistoryListItemUi ->
-            mainViewModel.onDiaryItemTitleSelectionHistoryItemClick(item)
+        itemTitleSelectionHistoryListAdapter.registerOnItemClickListener { item: DiaryItemTitleSelectionHistoryListItemUi ->
+            mainViewModel.onDiaryItemTitleSelectionHistoryListItemClick(item)
         }
         itemTitleSelectionHistoryListAdapter
-            .registerOnItemSwipeListener { item: SelectionHistoryListItemUi ->
-                mainViewModel.onDiaryItemTitleSelectionHistoryItemSwipe(item)
+            .registerOnItemSwipeListener { item: DiaryItemTitleSelectionHistoryListItemUi ->
+                mainViewModel.onDiaryItemTitleSelectionHistoryListItemSwipe(item)
             }
 
         // 選択履歴読込・表示
         launchAndRepeatOnViewLifeCycleStarted {
             mainViewModel.itemTitleSelectionHistoryList
-                .collectLatest { value: SelectionHistoryListUi ->
+                .collectLatest { value: DiaryItemTitleSelectionHistoryListUi ->
                     val adapter =
                         checkNotNull(
                             binding.recyclerItemTitleSelectionHistory.adapter
-                        ) as ItemTitleSelectionHistoryListAdapter
+                        ) as DiaryItemTitleSelectionHistoryListAdapter
                     adapter.submitList(value.itemList)
                 }
         }
@@ -210,7 +210,7 @@ class DiaryItemTitleEditDialog :
 
     override fun clearViewBindings() {
         val adapter =
-            binding.recyclerItemTitleSelectionHistory.adapter as ItemTitleSelectionHistoryListAdapter
+            binding.recyclerItemTitleSelectionHistory.adapter as DiaryItemTitleSelectionHistoryListAdapter
         adapter.clearViewBindings()
 
         super.clearViewBindings()

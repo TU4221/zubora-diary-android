@@ -10,7 +10,7 @@ import com.websarva.wings.android.zuboradiary.domain.usecase.diary.CountDiariesU
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.CountWordSearchResultDiariesUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.DeleteDiaryItemTitleSelectionHistoryItemUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.DeleteDiaryUseCase
-import com.websarva.wings.android.zuboradiary.domain.usecase.diary.LoadDiaryItemTitleSelectionHistoryUseCase
+import com.websarva.wings.android.zuboradiary.domain.usecase.diary.LoadDiaryItemTitleSelectionHistoryListUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.LoadDiaryUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.LoadNewestDiaryUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.LoadOldestDiaryUseCase
@@ -182,9 +182,9 @@ internal object DiaryUseCaseModule {
 
     @Singleton
     @Provides
-    fun provideLoadDiaryItemTitleSelectionHistoryUseCase(
+    fun provideLoadDiaryItemTitleSelectionHistoryListUseCase(
         diaryRepository: DiaryRepository
-    ) = LoadDiaryItemTitleSelectionHistoryUseCase(diaryRepository)
+    ) = LoadDiaryItemTitleSelectionHistoryListUseCase(diaryRepository)
 
     @Singleton
     @Provides

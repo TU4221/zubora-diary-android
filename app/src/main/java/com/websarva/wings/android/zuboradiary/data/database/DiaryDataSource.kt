@@ -136,7 +136,7 @@ internal class DiaryDataSource(
     @Throws(DataBaseAccessFailureException::class)
     suspend fun saveDiary(
         diary: DiaryEntity,
-        historyItemList: List<DiaryItemTitleSelectionHistoryItemEntity>
+        historyItemList: List<DiaryItemTitleSelectionHistoryEntity>
     ) {
         executeSuspendDbOperation {
             diaryDatabase.saveDiary(
@@ -150,7 +150,7 @@ internal class DiaryDataSource(
     suspend fun deleteAndSaveDiary(
         deleteDiaryDate: LocalDate,
         newDiary: DiaryEntity,
-        historyItemList: List<DiaryItemTitleSelectionHistoryItemEntity>
+        historyItemList: List<DiaryItemTitleSelectionHistoryEntity>
     ) {
         executeSuspendDbOperation {
             diaryDatabase.deleteAndSaveDiary(
@@ -187,7 +187,7 @@ internal class DiaryDataSource(
      */
     fun selectHistoryListOrderByLogDesc(
         num: Int, offset: Int
-    ): Flow<List<DiaryItemTitleSelectionHistoryItemEntity>> {
+    ): Flow<List<DiaryItemTitleSelectionHistoryEntity>> {
         require(num >= 1)
         require(offset >= 0)
 
@@ -199,7 +199,7 @@ internal class DiaryDataSource(
     @Throws(DataBaseAccessFailureException::class)
     suspend fun deleteHistoryItem(title: String) {
         return executeSuspendDbOperation {
-            diaryItemTitleSelectionHistoryDao.deleteHistoryItem(title)
+            diaryItemTitleSelectionHistoryDao.deleteHistory(title)
         }
     }
 }

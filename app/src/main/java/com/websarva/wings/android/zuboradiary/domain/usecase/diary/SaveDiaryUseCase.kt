@@ -6,7 +6,7 @@ import com.websarva.wings.android.zuboradiary.data.repository.DiaryRepository
 import com.websarva.wings.android.zuboradiary.domain.exception.DomainException
 import com.websarva.wings.android.zuboradiary.domain.exception.diary.DiarySaveFailureException
 import com.websarva.wings.android.zuboradiary.domain.model.Diary
-import com.websarva.wings.android.zuboradiary.domain.model.DiaryItemTitleSelectionHistoryItem
+import com.websarva.wings.android.zuboradiary.domain.model.DiaryItemTitleSelectionHistory
 import com.websarva.wings.android.zuboradiary.domain.usecase.DefaultUseCaseResult
 import com.websarva.wings.android.zuboradiary.domain.usecase.uri.ReleasePersistableUriPermissionUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.uri.TakePersistableUriPermissionUseCase
@@ -23,7 +23,7 @@ internal class SaveDiaryUseCase(
 
     suspend operator fun invoke(
         diary: Diary,
-        diaryItemTitleSelectionHistoryItemList: List<DiaryItemTitleSelectionHistoryItem>,
+        diaryItemTitleSelectionHistoryItemList: List<DiaryItemTitleSelectionHistory>,
         originalDiary: Diary,
         isNewDiary: Boolean
     ): DefaultUseCaseResult<Unit> {
@@ -63,7 +63,7 @@ internal class SaveDiaryUseCase(
     @Throws(DiarySaveFailureException::class)
     private suspend fun saveDiary(
         diary: Diary,
-        diaryItemTitleSelectionHistoryItemList: List<DiaryItemTitleSelectionHistoryItem>,
+        diaryItemTitleSelectionHistoryItemList: List<DiaryItemTitleSelectionHistory>,
         originalDate: LocalDate,
         isNewDiary: Boolean
     ) {

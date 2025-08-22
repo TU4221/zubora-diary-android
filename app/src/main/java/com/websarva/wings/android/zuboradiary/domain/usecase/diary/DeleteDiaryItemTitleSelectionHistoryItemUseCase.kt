@@ -21,7 +21,7 @@ internal class DeleteDiaryItemTitleSelectionHistoryItemUseCase(
         Log.i(logTag, "${logMsg}開始")
 
         try {
-            diaryRepository.deleteDiaryItemTitleSelectionHistoryItem(deleteTitle)
+            diaryRepository.deleteDiaryItemTitleSelectionHistory(deleteTitle)
         } catch (e: DiaryItemTitleSelectionHistoryItemDeleteFailureException) {
             Log.e(logTag, "${logMsg}失敗", e)
             return UseCaseResult.Failure(e)

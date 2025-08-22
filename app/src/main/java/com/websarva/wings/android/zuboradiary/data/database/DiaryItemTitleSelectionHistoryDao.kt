@@ -14,22 +14,22 @@ internal interface DiaryItemTitleSelectionHistoryDao {
     fun selectHistoryListOrderByLogDesc(
         numTitles: Int,
         offset: Int
-    ): Flow<List<DiaryItemTitleSelectionHistoryItemEntity>>
+    ): Flow<List<DiaryItemTitleSelectionHistoryEntity>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertHistoryItem(
-        diaryItemTitleSelectionHistoryItemEntityList: List<DiaryItemTitleSelectionHistoryItemEntity>
+    suspend fun insertHistory(
+        diaryItemTitleSelectionHistoryEntityList: List<DiaryItemTitleSelectionHistoryEntity>
     )
 
     @Query("DELETE FROM diary_item_title_selection_history WHERE title = :title")
-    suspend fun deleteHistoryItem(title: String)
+    suspend fun deleteHistory(title: String)
 
     // MEMO:SQLITEはDELETE ORDER BYが使用できない。
     /*@Query("DELETE FROM diary_item_title_history ORDER BY log DESC LIMIT ((SELECT COUNT(*) FROM diary_item_title_history) - 50) OFFSET 50")*/
     @Query("DELETE FROM diary_item_title_selection_history WHERE title " +
             "NOT IN (SELECT title FROM diary_item_title_selection_history ORDER BY log DESC LIMIT 50 OFFSET 0)")
-    suspend fun deleteOldHistoryItem()
+    suspend fun deleteOldHistory()
 
     @Query("DELETE FROM diary_item_title_selection_history")
-    suspend fun deleteAllItem()
+    suspend fun deleteAllHistory()
 }
