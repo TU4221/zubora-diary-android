@@ -53,8 +53,8 @@ internal class LoadWordSearchResultListUseCase(
     // MEMO:本来はDataSource側で処理するべき内容だが、対象日記項目のみを抽出するには複雑なロジックになる為、
     //      ドメイン側で処理する。
     private fun convertWordSearchResultList(
-        diaryList: List<WordSearchResultListItem>
-        , searchWord: String
+        diaryList: List<WordSearchResultListItem>,
+        searchWord: String
     ): DiaryYearMonthList<DiaryDayListItem.WordSearchResult> {
         if (diaryList.isEmpty()) return DiaryYearMonthList()
 
